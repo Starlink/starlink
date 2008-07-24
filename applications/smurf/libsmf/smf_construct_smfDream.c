@@ -72,6 +72,8 @@
 *        Consistently use size_t
 *     2008-07-11 (AGG):
 *        Allow for lower-case SAM_MODE
+*     2008-07-24 (TIMJ):
+*        Use hdr->obsmode instead of SAM_MODE.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -139,13 +141,12 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
   int gridymin;              /* Minimum pixel value in Y for reconstruction grid */
   smfHead *hdr = NULL;       /* Header info */
   double *invmatx = NULL;    /* Pointer to the inverse matrix */
-  int i;                     /* Loop counter */
+  size_t i;                  /* Loop counter */
   int ix;                    /* X pixel counter */
   int jy;                    /* Y pixel counter */
   size_t k;                  /* Index into gridpts array */
   int ndfid;                 /* NDf identifier for current component */
   size_t nelem;              /* Size of data array to be allocated */
-  char obsmode[SZFITSCARD];  /* Observing mode */
   char weightsfile[SZFITSCARD]; /* Name of weights file */
   smfData *wtdata = NULL;    /* smfData for weights file */
   smfFile *wtfile = NULL;    /* smfFile for weights file */
@@ -165,17 +166,9 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
 
   /* Check we have DREAM data */
   hdr = data->hdr;
-  smf_fits_getS( hdr, "SAM_MODE", obsmode, sizeof(obsmode), status );
 
-  /* Lab data does not have a SAM_MODE (and absence should be treated
-     as proof that we are not in DREAM mode */
-  if (*status == SMF__NOKWRD) {
-    errAnnul( status );
-    return NULL;
-  }
+  if ( hdr->obsmode == SMF__OBS_DREAM) {
 
-  if ( strncmp( obsmode, "DREAM", 5) == 0 ||
-       strncmp( obsmode, "dream", 5) == 0 ) {
     /* Check we have valid pointers to the SMU path and jiggle vertices */
     if ( jigpath != NULL && jigvert != NULL ) {
       dream = smf_create_smfDream( status );

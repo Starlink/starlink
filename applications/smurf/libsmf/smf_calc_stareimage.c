@@ -50,6 +50,8 @@
 *        Free avdata to prevent memory leak.
 *     2008-07-11 (AGG):
 *        Allow for lower-case SAM_MODE
+*     2008-07-24 (TIMJ):
+*        Use hdr->obsmode instead of SAM_MODE.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -105,7 +107,6 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
   int j;                           /* Loop counter */
   size_t npts;                     /* Number of points in the averaged data */
   int numimages;                   /* Number of output STARE images */
-  char obsmode[LEN__METHOD+1];     /* Observing mode */
   HDSLoc *scu2redloc = NULL;       /* Locator to SCU2RED extension */
   double *zero = NULL;             /* Bolometer zero points */
 
@@ -131,9 +132,7 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
 
   /* Do we have STARE data? */
   hdr = data->hdr;
-  smf_fits_getS( hdr, "SAM_MODE", obsmode, LEN__METHOD+1, status );
-  if ( strncmp( obsmode, "STARE", 5) == 0 || 
-       strncmp( obsmode, "stare", 5) == 0 ) {
+  if ( hdr->obsmode == SMF__OBS_STARE ) {
     msgOutif(MSG__VERB," ", "Processing STARE data", status);
 
     if (smf_history_check( data, "smf_calc_stareimage", status) ) {

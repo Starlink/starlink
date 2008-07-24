@@ -51,6 +51,8 @@
 *        Add integer npts for call to ndfMap
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-07-24 (TIMJ):
+*        Use hdr->obsmode instead of SAM_MODE.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -147,7 +149,6 @@ void smf_dreamsolve( smfData *data, int *status ) {
   int nsampcycle;                  /* Number of samples per DREAM cycle */
   int nunkno;                      /* Number of unknowns in solution */
   int nvert;                       /* Number of vertices in DREAM pattern */
-  char obsmode[LEN__METHOD+1];     /* Observing mode */
   smfFile *ofile;                  /* Output file information */
   int outhgt;                      /* Height of output map */
   int outwid;                      /* Width of output map */
@@ -198,8 +199,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
 
   /* Check we have a DREAM observation. */
   hdr = data->hdr;
-  smf_fits_getS( hdr, "SAM_MODE", obsmode, sizeof(obsmode), status );
-  if ( strncmp( obsmode, "dream", 5) == 0 ) {
+  if ( hdr->obsmode == SMF__OBS_DREAM ) {
     msgOutif(MSG__VERB," ", "Processing DREAM data", status);
     /* Have we done this before? If so it's not fatal as new processed
        images will just be added onto the end of the current stack of

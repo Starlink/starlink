@@ -76,6 +76,8 @@
 *        Remove unnecessary call to calculate jiggrid array
 *     2008-07-18 (TIMJ):
 *        Use smf_find_subarray
+*     2008-07-24 (TIMJ):
+*        Use hdr->obsmode instead of SAM_MODE.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -177,9 +179,7 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
 
     /* Check we have a DREAM observation */
     hdr = data->hdr;
-    smf_fits_getS( hdr, "SAM_MODE", obsmode, LEN__METHOD, status);
-    if ( strncmp( obsmode, "DREAM", 5) == 0 ||
-	 strncmp( obsmode, "dream", 5) == 0 ) {
+    if ( hdr->obsmode == SMF__OBS_DREAM ) {
       /* OK we have DREAM data */
       dream = data->dream;
       /* Read DREAM parameters from input file */
