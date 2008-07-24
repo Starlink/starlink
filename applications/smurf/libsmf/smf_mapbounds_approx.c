@@ -100,6 +100,8 @@
 *        Set lbnd to 1,1
 *     2008-05-01 (AGG):
 *        Use FP angle in calculation of map size and centre
+*     2008-07-24 (AGG):
+*        Use absolute value of sine/cosine in calculating map size
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -276,8 +278,8 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
     smf_fits_getD( hdr, "INSTAP_Y", &instapy, status );
     /* If the instrument aperture is set, calculate the projected
        values in the tracking coordinate frame */
-    c = cos(theta);
-    s = sin(fabs(theta));
+    c = fabs(cos(theta));
+    s = fabs(sin(theta));
     if ( instapx || instapy ) {
       instap = 1;
       origval = instapx;
@@ -291,8 +293,8 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
 
     /* Calculate size of output map in pixels */
     /* Note: this works for the simulator... */
-    wdthbox = mapwdth*cos(mappa) + maphght*sin(mappa);
-    hghtbox = maphght*cos(mappa) + mapwdth*sin(mappa);
+    wdthbox = mapwdth*fabs(cos(mappa)) + maphght*fabs(sin(mappa));
+    hghtbox = maphght*fabs(cos(mappa)) + mapwdth*fabs(sin(mappa));
     wdthpix = (int) ( ( wdthbox*s + hghtbox*c ) / pixsize);
     hghtpix = (int) ( ( wdthbox*c + hghtbox*s ) / pixsize);
     origval = mapx;
