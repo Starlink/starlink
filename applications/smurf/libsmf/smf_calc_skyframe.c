@@ -102,6 +102,7 @@
 #include "star/slalib.h"
 
 /* SMURF includes */
+#include "sc2da/sc2ast.h"
 #include "smurf_par.h"
 #include "libsmf/smf.h"
 
@@ -126,7 +127,7 @@ void smf_calc_skyframe( const AstFrame *skyin, const char * system,
 /* Determine the tracking system, and choose the celestial coordinate system 
    for the output cube. */
   if( !strcmp( system, "TRACKING" ) ) {
-    usesys = smf_convert_system( hdr->state->tcs_tr_sys, status );
+    usesys = sc2ast_convert_system( hdr->state->tcs_tr_sys, status );
   } else {
     usesys = system;
   }

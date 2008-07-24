@@ -93,6 +93,7 @@
 #include "mers.h"
 
 /* SMURF includes */
+#include "sc2da/sc2ast.h"
 #include "smf.h"
 #include "smf_typ.h"
 
@@ -215,7 +216,7 @@ void smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3],
 /* If the detpos positions are referred to the TRACKING frame, change
    the SkyFrame from AZEL to the AST equivalent of the TRACKING Frame. */
       if( !hdr->dpazel ) {
-         astSetC( sky, "System", smf_convert_system( hdr->state->tcs_tr_sys,
+         astSetC( sky, "System", sc2ast_convert_system( hdr->state->tcs_tr_sys,
                                                      status ) ); 
       }
    }

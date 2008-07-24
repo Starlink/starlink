@@ -782,8 +782,6 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                    int *moving, AstSkyFrame **skyframe, int *sparse, 
                    int *gottsys, int *status );
 
-const char *smf_convert_system( const char *label, int *status );
-
 void smf_makefitschan( const char *system, double crval[2], double cdelt[2], 
                        double crota2, AstFitsChan *fc, int *status );
 

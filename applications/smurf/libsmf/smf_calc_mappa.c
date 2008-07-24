@@ -79,6 +79,7 @@
 #include "sae_par.h"
 
 /* SMURF includes */
+#include "sc2da/sc2ast.h"
 #include "libsmf/smf.h"
 
 double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf, 
@@ -106,7 +107,7 @@ double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf,
 
 /* Determine the tracking system, and choose the celestial coordinate system 
    for the output cube. */
-   trsys = smf_convert_system( hdr->state->tcs_tr_sys, status );
+   trsys = sc2ast_convert_system( hdr->state->tcs_tr_sys, status );
    if( !strcmp( system, "TRACKING" ) ) {
       usesys = trsys;
    } else {

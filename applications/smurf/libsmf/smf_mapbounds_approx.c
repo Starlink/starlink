@@ -252,7 +252,7 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
     /* Determine the tracking coordinate system, and choose the
        celestial coordinate system for the output image */
     if( !strncmp( system, "TRACKING", 8 ) ) {
-      usesys = smf_convert_system( hdr->state->tcs_tr_sys, status );
+      usesys = sc2ast_convert_system( hdr->state->tcs_tr_sys, status );
     } else {
       usesys = system;
     }

@@ -206,7 +206,7 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
 
   /* This should probably be a user-option but ICRS is probably a safe
      assumption */
-  astSetC( wcs, "SYSTEM", "ICRS" );
+  sc2ast_set_output_system( hdr->state->tcs_tr_sys, wcs, status );
 
   /* Store world coordinate transformations */
   ndfPtwcs ( wcs, uindf, status );
