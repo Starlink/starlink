@@ -103,7 +103,7 @@ itcl::class gaia3d::Gaia3dTool {
 
       #  Add the File menu.
       add_menubar
-      set File [add_menubutton "File" left]
+      set File [add_menubutton "File"]
       configure_menubutton File -underline 0
 
       #  Add option to create a new window.
@@ -127,7 +127,7 @@ itcl::class gaia3d::Gaia3dTool {
       bind $w_ <Control-c> [code $this close]
 
       #  Add the options menu
-      set Options [add_menubutton "Options" left]
+      set Options [add_menubutton "Options"]
       configure_menubutton Options -underline 0
 
       #  Create the extra cubes toolbox.

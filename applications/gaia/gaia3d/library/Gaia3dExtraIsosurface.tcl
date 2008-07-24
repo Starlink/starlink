@@ -74,7 +74,7 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
 
       #  Add the File menu.
       add_menubar
-      set File [add_menubutton "File" left]
+      set File [add_menubutton "File"]
       configure_menubutton File -underline 0
 
       #  Add window help.
@@ -89,7 +89,7 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
       bind $w_ <Control-c> [code $this close]
 
       #  Add the options menu
-      set Options [add_menubutton "Options" left]
+      set Options [add_menubutton "Options"]
       configure_menubutton Options -underline 0
 
       #  Add an option to use same colour for all surfaces.
