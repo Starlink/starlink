@@ -73,6 +73,7 @@
       CALL MSG_OUT( ' ', 'MSG is installed and working. - ^TOK' /
      :/ ' ^DTK - ^RTK - ^ITK - ^LTK - ^ERR',
      :     STATUS )
+      CALL MSG_SYNC( STATUS )
 
 *  Call ERR_REP and ERR_FLUSH.
       CALL ERR_BEGIN( STATUS )

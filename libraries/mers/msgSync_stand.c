@@ -1,16 +1,16 @@
-      SUBROUTINE MSG_SYNC( STATUS )
+/*
 *+
 *  Name:
-*     MSG_SYNC
+*     msgSync
 
 *  Purpose:
 *     Synchronise message output via the user interface.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Invocation:
-*     CALL MSG_SYNC( STATUS )
+*     msgSync( int * status );
 
 *  Description:
 *     This performs a synchronisation handshake with the user interface.
@@ -19,7 +19,7 @@
 *     the command device.
 
 *  Arguments:
-*     STATUS = INTEGER (Given and Returned)
+*     status = int * (Given and Returned)
 *        The global status: it is returned set to MSG__SYNER on error.
 
 *  Implementation Notes:
@@ -27,6 +27,7 @@
 *     -  The STANDALONE version does nothing.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1985, 1989 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -49,6 +50,7 @@
 *  Authors:
 *     BDK: Dennis Kelly (ROE)
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -58,21 +60,21 @@
 *        Converted to new prologue and layout.
 *     15-DEC-1989 (PCTR):
 *        Standalone version adapted from MSG_SYNC.
+*     23-JUL-2008 (TIMJ):
+*        Do nothing in C.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE                      ! No implicit typing
+#include "merswrap.h"
+#include "sae_par.h"
 
-*  Status:
-      INTEGER STATUS
-
-*.
- 
-*  Standalone version does nothing.
-
-      END
+void msgSync( int * status ) {
+  /*  Standalone version does nothing. */
+  if (*status != SAI__OK) return;
+  return;
+}

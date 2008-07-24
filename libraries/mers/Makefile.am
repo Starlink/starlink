@@ -65,11 +65,11 @@ F_ROUTINES = err1_bell.f err1_print.f \
              msg1_gtinf.f msg1_gtwsz.f msg1_gtstm.f msg1_ptinf.f
 
 
-F_ROUTINES_STAND = msg1_form_stand.f msg_sync_stand.f
+F_ROUTINES_STAND = msg1_form_stand.f
 
-C_ROUTINES_STAND = msgBell_stand.c
+C_ROUTINES_STAND = msgBell_stand.c msgSync_stand.c
 
-F_INTERFACE_STAND = msg_bell_stand.c
+F_INTERFACE_STAND = msg_bell_stand.c msg_sync_stand.c
 
 F_ROUTINES_STAND_SED = err1_prerr_stand.f msg1_print_stand.f
 
@@ -93,7 +93,7 @@ errStat.c errLevel.c errFacer.c
 
 C_INTERFACE_ADAM = err_adam.c
 
-C_INTERFACE_STAND = err_stand.c
+C_INTERFACE_STAND = 
 
 F_INTERFACE_ROUTINES = msg_setc.c msg_setd.c msg_setr.c msg_seti.c \
 msg_setl.c err_annul.c err_begin.c err_end.c err_syser.c err_mark.c \
