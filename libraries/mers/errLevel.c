@@ -1,26 +1,27 @@
-      SUBROUTINE ERR_LEVEL( LEVEL )
+/*
 *+
 *  Name:
-*     ERR_LEVEL
+*     errLevel
 
 *  Purpose:
 *     Inquire the current error context level. 
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Invocation:
-*     CALL ERR_LEVEL( LEVEL )
+*     errLevel( int * level );
 
 *  Description:
 *     Return the number of context markers set in the error message table. 
 
 *  Arguments:
-*     LEVEL = INTEGER (Returned)
+*     level = int * (returned)
 *        The error context level: all values greater than one indicate 
 *        the deferral of reported error messages.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -42,27 +43,25 @@
 
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     9-OCT-1990 (PCTR):
 *        Original version.
+*     23-JUL-2008 (TIMJ):
+*        Now in C calling emsLevel
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
+*/
 
-*  Arguments Returned:
-      INTEGER LEVEL
+#include "ems.h"
+#include "merswrap.h"
 
-*.
-
-*  Call EMS_LEVEL.
-      CALL EMS_LEVEL( LEVEL )
-
-      END
+void errLevel( int * level ) {
+  emsLevel( level );
+}

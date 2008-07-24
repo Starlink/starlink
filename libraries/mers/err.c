@@ -102,17 +102,6 @@ DECLARE_INTEGER(fstatus);
    return;
 }
 
-void errLevel( int *level ) {
-
-DECLARE_INTEGER(flevel);
-
-   F77_CALL(err_level)( INTEGER_ARG(&flevel) );
-
-   F77_IMPORT_INTEGER(flevel,*level);
-
-   return;
-}
-
 void errLoad( char *param,
               int param_length,
               int *parlen,
