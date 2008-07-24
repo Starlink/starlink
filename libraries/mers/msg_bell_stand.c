@@ -1,4 +1,4 @@
-      SUBROUTINE MSG_BELL( STATUS )
+/*
 *+
 *  Name:
 *     MSG_BELL
@@ -7,7 +7,7 @@
 *     Deliver an ASCII BEL character.
 
 *  Language:
-*    Starlink Fortran 77
+*    Starlink ANSI C
 
 *  Invocation:
 *     CALL MSG_BELL( STATUS )
@@ -25,6 +25,7 @@
 *     -  This subroutine is the stand-alone version of MSG_BELL.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1993 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -46,54 +47,29 @@
 
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     1-OCT-1993 (PCTR):
 *        Original version.
+*     23-JUL-2008 (TIMJ):
+*        Now written in C to call msgBell
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
- 
-*  Global Constants:
-      INCLUDE 'SAE_PAR'                 ! Standard SAE constants
-      INCLUDE 'MSG_ERR'                 ! MSG_ error codes
- 
-*  Status:
-      INTEGER STATUS
+#include "f77.h"
+#include "merswrap.h"
+#include "mers_f77.h"
 
-*  Local Constants:
-      INTEGER ASCBEL                    ! ASCII BEL code
-      PARAMETER ( ASCBEL = 7 )
-
-*  Local Variables:
-      CHARACTER BELCHR * 1              ! The bell character
-
-      INTEGER IOSTAT                    ! Fortran I/O status
-
-*.
-
-*  Check the inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Use a WRITE statement to deliver the bell character.
-      BELCHR = CHAR( ASCBEL )
-      WRITE( *, '( A )', IOSTAT = IOSTAT ) BELCHR
-
-*  Check the returned I/O status and report an error message if necessary.
-      IF ( IOSTAT .NE. 0 ) THEN
-         STATUS = MSG__OPTER
-         CALL EMS_MARK
-         CALL EMS_FIOER( 'FIOMSG', IOSTAT )
-         CALL EMS_REP( 'MSG_BELL_OPTER', 
-     :   'Error encountered during BELL output: ^FIOMSG', STATUS )
-         CALL EMS_RLSE
-      END IF
-
-      END
+F77_SUBROUTINE(msg_bell)( INTEGER(STATUS) ) {
+  int status;
+  F77_IMPORT_INTEGER( *STATUS, status );
+  msgBell( &status );
+  F77_EXPORT_INTEGER( status, *STATUS );
+}

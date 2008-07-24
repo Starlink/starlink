@@ -40,8 +40,7 @@
 #include <string.h>
 #include "f77.h"
 #include "merswrap.h"
-
-F77_SUBROUTINE(err_clear)( INTEGER(status) );
+#include "mers_f77.h"
 
 void errClear( int *status ) {
 
@@ -54,16 +53,12 @@ DECLARE_INTEGER(fstatus);
    return;
 }
 
-F77_SUBROUTINE(err_start)(  );
-
-void errStart(  ) {
+void errStart( void ) {
 
    F77_CALL(err_start)(  );
 
    return;
 }
-
-F77_SUBROUTINE(err_stop)( INTEGER(status) );
 
 void errStop( int *status ) {
 
@@ -75,8 +70,6 @@ DECLARE_INTEGER(fstatus);
 
    return;
 }
-
-F77_SUBROUTINE(msg_bell)( INTEGER(status) );
 
 void msgBell( int *status ) {
 
@@ -91,9 +84,6 @@ DECLARE_INTEGER(fstatus);
    return;
 }
 
-F77_SUBROUTINE(msg_ifget)( CHARACTER(pname),
-                           INTEGER(status)
-                           TRAIL(pname) );
 
 void msgIfget( const char *pname,
                int *status ) {
@@ -114,8 +104,6 @@ DECLARE_INTEGER(fstatus);
 
    return;
 }
-
-F77_SUBROUTINE(msg_sync)( INTEGER(status) );
 
 void msgSync( int *status ) {
 

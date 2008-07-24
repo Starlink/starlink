@@ -11,6 +11,7 @@ F77_SUBROUTINE(err_annul)( INTEGER(STATUS) );
 F77_SUBROUTINE(err_begin)( INTEGER(STATUS) );
 F77_SUBROUTINE(err_end)( INTEGER(STATUS) );
 
+F77_SUBROUTINE(err_clear)( INTEGER(status) );
 
 F77_SUBROUTINE(err_facer)( CHARACTER(token),
                            INTEGER(status)
@@ -56,6 +57,10 @@ F77_SUBROUTINE(err_rlse)( void );
 
 F77_SUBROUTINE(err_stat)( INTEGER(status) );
 
+F77_SUBROUTINE(err_start)( void );
+
+F77_SUBROUTINE(err_stop)( INTEGER(status) );
+
 F77_SUBROUTINE(err_syser)( CHARACTER(token),
                            INTEGER(systat)
                            TRAIL(token) );
@@ -63,6 +68,8 @@ F77_SUBROUTINE(err_tune)( CHARACTER(param),
                           INTEGER(value),
                           INTEGER(status)
                           TRAIL(param) );
+
+F77_SUBROUTINE(msg_bell)( INTEGER(status) );
 
 F77_SUBROUTINE(msg_blank)( INTEGER(status) );
 
@@ -97,6 +104,10 @@ F77_SUBROUTINE(msg_fmtr)( CHARACTER(token),
                           TRAIL(token)
                           TRAIL(format) );
 
+F77_SUBROUTINE(msg_ifget)( CHARACTER(pname),
+                           INTEGER(status)
+                           TRAIL(pname) );
+
 F77_SUBROUTINE(msg_iflev)( INTEGER(filter) );
 
 F77_SUBROUTINE(msg_ifset)( INTEGER(filter),
@@ -125,6 +136,8 @@ F77_SUBROUTINE(msg_outif)( INTEGER(prior),
                            TRAIL(text) );
 
 F77_SUBROUTINE(msg_renew)( void );
+
+F77_SUBROUTINE(msg_sync)( INTEGER(status) );
 
 F77_SUBROUTINE(msg_tune)( CHARACTER(param),
                           INTEGER(value),
