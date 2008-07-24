@@ -468,13 +468,6 @@ DECLARE_INTEGER(fstatus);
    return;
 }
 
-void msgRenew( void ) {
-
-   F77_CALL(msg_renew)(  );
-
-   return;
-}
-
 void msgTune( const char *param,
               int value,
               int *status ) {

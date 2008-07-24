@@ -1,27 +1,28 @@
-      SUBROUTINE MSG_RENEW
+/*
 *+
 *  Name:
-*     MSG_RENEW
+*     msgRenew
 
 *  Purpose:
 *     Renew any annulled message tokens in the current context.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Invocation:
-*     CALL MSG_RENEW
+*     msgRenew();
 
 *  Description:
-*     Any message tokens which have been annulled by a call to MSG_OUT,
-*     MSG_OUTIF, MSG_LOAD, ERR_REP, ERR_ANNUL or ERR_LOAD are renewed.
-*     If any new token value has been defined (using the MSG_SETx and 
-*     MSG_FMTx routines) since the previous tokens were annulled, no 
-*     action is taken. The intended use of MSG_RENEW is to renew all message
-*     tokens immediately after a call MSG_OUT, MSG_OUTIF, MSG_LOAD,
-*     ERR_REP, ERR_ANNUL or ERR_LOAD for re-use in a subsequent message.
+*     Any message tokens which have been annulled by a call to msgOut,
+*     msgOutif, msgLoad, errRep, errAnnul or errLoad are renewed.
+*     If any new token value has been defined (using the msgSetx and 
+*     msgFmtx routines) since the previous tokens were annulled, no 
+*     action is taken. The intended use of msgRenew is to renew all message
+*     tokens immediately after a call msgOut, msgOutif, msgLoad,
+*     errRep, errAnnul or errLoad for re-use in a subsequent message.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -43,24 +44,25 @@
 
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     21-JUN-1991 (PCTR):
 *        Original version.
+*     23-JUL-2008 (TIMJ):
+*        Now written in C to call emsRenew
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
-*  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+*/
 
-*.
+#include "ems.h"
+#include "merswrap.h"
 
-*  Call EMS_RENEW.
-      CALL EMS_RENEW
-
-      END
+void msgRenew( void ) {
+  emsRenew();
+}

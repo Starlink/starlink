@@ -60,7 +60,7 @@ F_ROUTINES = err1_bell.f err1_print.f \
              err_tune.f \
              msg_blank.f msg_fmtc.f msg_fmtd.f msg_fmti.f msg_fmtl.f \
              msg_fmtr.f msg_iflev.f msg_ifset.f msg_load.f msg_out.f \
-             msg_outif.f msg_renew.f \
+             msg_outif.f \
              msg_tune.f \
              msg1_gtinf.f msg1_gtwsz.f msg1_gtstm.f msg1_ptinf.f
 
@@ -89,7 +89,7 @@ F_BLOCK_DATA_FILES = msg1_blk.f err1_blk.f
 
 C_INTERFACE_ROUTINES = err.c msgSetc.c msgSetd.c msgSetr.c msgSeti.c \
 msgSetl.c errAnnul.c errBegin.c errEnd.c errSyser.c errMark.c errRlse.c \
-errStat.c errLevel.c errFacer.c
+errStat.c errLevel.c errFacer.c msgRenew.c
 
 C_INTERFACE_ADAM = err_adam.c
 
@@ -97,7 +97,7 @@ C_INTERFACE_STAND =
 
 F_INTERFACE_ROUTINES = msg_setc.c msg_setd.c msg_setr.c msg_seti.c \
 msg_setl.c err_annul.c err_begin.c err_end.c err_syser.c err_mark.c \
-err_rlse.c err_stat.c err_level.c err_facer.c
+err_rlse.c err_stat.c err_level.c err_facer.c msg_renew.c
 
 #  The installation test source
 TEST_SOURCE = err_test.f err_test.c err_test.ifl
