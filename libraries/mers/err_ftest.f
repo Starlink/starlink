@@ -55,6 +55,8 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+      INTEGER LEVEL
+
 *.
 
 *  Initialise status.
@@ -76,7 +78,9 @@
       CALL ERR_BEGIN( STATUS )
       STATUS = SAI__ERROR
       CALL ERR_MARK
-      CALL ERR_REP( ' ', 'ERR is installed and working.', STATUS )
+      CALL ERR_FACER( 'ERR', STATUS )
+      CALL ERR_REP( ' ', 'ERR is installed and working. - ^ERR',
+     :     STATUS )
       CALL ERR_FLBEL( STATUS )
       CALL ERR_RLSE
 
@@ -84,4 +88,7 @@
       CALL ERR_REP( ' ','Will annul this', STATUS )
       CALL ERR_ANNUL( STATUS )
       CALL ERR_END( STATUS )
+
+      CALL ERR_LEVEL( LEVEL )
+
       END

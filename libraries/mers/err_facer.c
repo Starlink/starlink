@@ -1,4 +1,4 @@
-      SUBROUTINE ERR_FACER( TOKEN, STATUS )
+/*
 *+
 *  Name:
 *     ERR_FACER
@@ -7,7 +7,7 @@
 *     Assign the message associated with a Starlink STATUS value to a token.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Invocation:
 *     CALL ERR_FACER( TOKEN, STATUS )
@@ -28,6 +28,7 @@
 *     computer system upon which the library is implemented.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -49,29 +50,39 @@
 
 *  Authors:
 *     BKM: B.K. McIlwrath (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     12-AUG-1994 (BKM):
 *        Original version (Converted from ERR_SYSER)
+*     23-JUL-2008 (TIMJ):
+*        Now written in C to call errSyser
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
+*/
 
-*  Arguments Given:
-      CHARACTER * ( * ) TOKEN
+#include "f77.h"
+#include "merswrap.h"
+#include "mers_f77.h"
 
-      INTEGER STATUS
+F77_SUBROUTINE(err_facer)( CHARACTER(TOKEN),
+                           INTEGER(STATUS)
+                           TRAIL(TOKEN) ) {
 
-*.
+  char *token;
+  int status;
 
-*  Load message string for TOKEN.
-      CALL EMS_FACER( TOKEN, STATUS )
+  GENPTR_CHARACTER(TOKEN);
 
-      END
+  token = starMallocAtomic( TOKEN_length + 1 );
+  F77_IMPORT_CHARACTER( TOKEN, TOKEN_length, token );
+  F77_IMPORT_INTEGER( *STATUS, status );
+
+  errFacer( token, status );
+  starFree( token );
+}

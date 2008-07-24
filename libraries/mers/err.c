@@ -42,25 +42,6 @@
 #include "merswrap.h"
 #include "mers_f77.h"
 
-void errFacer( const char *token,
-               int *status ) {
-
-DECLARE_CHARACTER_DYN(ftoken);
-DECLARE_INTEGER(fstatus);
-
-   F77_CREATE_CHARACTER(ftoken,strlen( token ));
-   F77_EXPORT_CHARACTER(token,ftoken,ftoken_length);
-   F77_EXPORT_INTEGER(*status,fstatus);
-
-   F77_CALL(err_facer)( CHARACTER_ARG(ftoken),
-                        INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(ftoken) );
-
-   F77_FREE_CHARACTER(ftoken);
-
-   return;
-}
-
 void errFioer( const char *token,
                int iostat ) {
 

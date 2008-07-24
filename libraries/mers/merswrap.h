@@ -50,7 +50,7 @@ void errClear( int *status );
 void errEnd( int *status );
 
 void errFacer( const char *token,
-               int *status );
+               int status );
 
 void errFioer( const char *token,
                int iostat );
