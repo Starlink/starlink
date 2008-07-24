@@ -869,7 +869,5 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
     }
   }
 
-  smf_dump_smfData( *data, 0, status );
-
 }
 

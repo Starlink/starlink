@@ -94,8 +94,6 @@ void smf_calc_mode ( smfHead * hdr, int * status ) {
   smf_fits_getS( hdr, "SAM_MODE", sam_mode, sizeof(sam_mode), status );
   smf_fits_getS( hdr, "OBS_TYPE", obs_type, sizeof(obs_type), status );
 
-  printf("OBSTYPE '%s' mode '%s'\n",obs_type, sam_mode);
-
   /* start with sample type */
   if (strcasecmp( sam_mode, "SCAN" ) == 0) {
     mode = SMF__OBS_SCAN;
@@ -131,7 +129,7 @@ void smf_calc_mode ( smfHead * hdr, int * status ) {
       errRep( " ", "Unrecognized observation type '^TYP'", status );
     }
   }
-  printf(" TYpe =%d mode=%d\n",type, mode);
+
   hdr->obstype = type;
   hdr->obsmode = mode;
 
