@@ -109,7 +109,7 @@ itcl::class gaia::ColourSwatch {
       #  Add a file menu for the basic windows controls and selection
       #  between the various colour selection modes.
       add_menubar
-      set File [add_menubutton "File" left]
+      set File [add_menubutton "File"]
       configure_menubutton File -underline 0
 
       #  Add options to switch between the various kinds of colour

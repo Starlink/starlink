@@ -99,7 +99,7 @@ itcl::class gaia::GaiaAstTransfer {
 
       #  Add the File menu.
       add_menubar
-      set File [add_menubutton "File" left]
+      set File [add_menubutton "File"]
       configure_menubutton File -underline 0
       add_short_help $itk_component(menubar).file {File menu: close window}
 

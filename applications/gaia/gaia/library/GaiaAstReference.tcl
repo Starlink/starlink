@@ -122,7 +122,7 @@ itcl::class gaia::GaiaAstReference {
 
       #  Add the File menu.
       add_menubar
-      set File [add_menubutton "File" left]
+      set File [add_menubutton "File"]
       configure_menubutton File -underline 0
       add_short_help $itk_component(menubar).file {File menu: close window}
 
@@ -1007,7 +1007,7 @@ itcl::class gaia::GaiaAstReference {
 
       #  Add the File menu.
       $add_ add_menubar
-      set File [$add_ add_menubutton "File" left]
+      set File [$add_ add_menubutton "File"]
       $add_ configure_menubutton File -underline 0
       $add_ add_short_help [$add_ component menubar].file \
          {File menu: close window}

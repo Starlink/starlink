@@ -101,7 +101,7 @@ itcl::class gaia::GaiaCube {
 
       #  Add the File menu.
       add_menubar
-      set File [add_menubutton "File" left]
+      set File [add_menubutton "File"]
       configure_menubutton File -underline 0
 
       #  Add item to read an ARD region from a file.
@@ -115,7 +115,7 @@ itcl::class gaia::GaiaCube {
       bind $w_ <Control-c> [code $this close]
 
       #  Add the View menu.
-      set View [add_menubutton "View" left]
+      set View [add_menubutton "View"]
       configure_menubutton View -underline 0
 
       #  View the cube FITS headers.
@@ -142,7 +142,7 @@ itcl::class gaia::GaiaCube {
          -command [code $this show_hdu_list_]
 
       #  Add the Options menu.
-      set Options [add_menubutton "Options" left]
+      set Options [add_menubutton "Options"]
       configure_menubutton Options -underline 0
 
       #  If HDS file mapping is not available, then set value off.
@@ -221,7 +221,7 @@ itcl::class gaia::GaiaCube {
 
       #  Add the coordinate selection menu (use global variable so we can
       #  share this).
-      set SpectralCoords [add_menubutton "Coords" left]
+      set SpectralCoords [add_menubutton "Coords"]
       configure_menubutton "Coords" -underline 0
       $SpectralCoords add command \
          -label "Change coordinates..." \

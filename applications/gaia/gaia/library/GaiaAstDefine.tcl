@@ -111,7 +111,7 @@ itcl::class gaia::GaiaAstDefine {
 
       #  Add the File menu.
       add_menubar
-      set File [add_menubutton "File" left]
+      set File [add_menubutton "File"]
       configure_menubutton File -underline 0
       add_short_help $itk_component(menubar).file {File menu: close window}
 
@@ -134,7 +134,7 @@ itcl::class gaia::GaiaAstDefine {
       bind $w_ <Control-a> [code $this accept]
 
       #  Add the options menu
-      set Options [add_menubutton "Options" left]
+      set Options [add_menubutton "Options"]
       configure_menubutton Options -underline 0
       add_short_help $itk_component(menubar).file {Options menu: expert functions}
 

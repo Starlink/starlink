@@ -116,7 +116,7 @@ itcl::class gaia::GaiaBlink {
 
       #  Create menubar and add File menu.
       add_menubar
-      set File [add_menubutton "File" left]
+      set File [add_menubutton "File"]
       configure_menubutton File -underline 0
       add_short_help $itk_component(menubar).file {File menu:}
 
@@ -146,7 +146,7 @@ itcl::class gaia::GaiaBlink {
 
       #  Add option to control some actions that may be removed when
       #  the controls panel is hidden or are not provided there.
-      set Actions [add_menubutton "Actions" left]
+      set Actions [add_menubutton "Actions"]
       configure_menubutton Actions -underline 0
       add_short_help $itk_component(menubar).actions \
          {Choose an action}
@@ -185,14 +185,14 @@ itcl::class gaia::GaiaBlink {
 
       #  Add option to control which images are displayed. Use a
       #  menu of checkbuttons.
-      set Images [add_menubutton "Images" left]
+      set Images [add_menubutton "Images"]
       configure_menubutton Images -underline 0
       add_short_help $itk_component(menubar).images \
         {Select images to display}
 
       #  Add option to control the appearance of the backbox. This
       #  provides a classic look when raised just before the current image.
-      set Options [add_menubutton "Options" left]
+      set Options [add_menubutton "Options"]
       configure_menubutton Options -underline 0
       add_short_help $itk_component(menubar).options \
          {Choose additional options}

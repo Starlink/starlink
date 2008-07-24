@@ -127,9 +127,9 @@ itcl::class gaia::GaiaSpectralPlot {
       #  Add an options menu for setting options that should probably
       #  be defined once only per-session, or infrequently.
       add_menubar
-      set File [add_menubutton "File" left]
+      set File [add_menubutton "File"]
       configure_menubutton File -underline 0
-      set Options [add_menubutton "Options" left]
+      set Options [add_menubutton "Options"]
       configure_menubutton Options -underline 0
 
       #  Add window help.
@@ -387,7 +387,7 @@ itcl::class gaia::GaiaSpectralPlot {
       #  If we have a GaiaSpecCoords instance use that to create a menu for
       #  selecting a coordinate system.
       if { $itk_option(-spec_coords) != {} } {
-         set SpectralCoords [add_menubutton "Coords" left]
+         set SpectralCoords [add_menubutton "Coords"]
          configure_menubutton "Coords" -underline 0
          $itk_option(-spec_coords) add_menu $SpectralCoords
       }
@@ -540,7 +540,7 @@ itcl::class gaia::GaiaSpectralPlot {
       }
 
       # Add menu and populate it.
-      set Graphics [add_menubutton "Graphics" left]
+      set Graphics [add_menubutton "Graphics"]
       configure_menubutton Graphics -underline 0
       $itk_component(draw) add_menuitems $Graphics
    }

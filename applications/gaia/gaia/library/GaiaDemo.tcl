@@ -104,7 +104,7 @@ itcl::class gaia::GaiaDemo {
 
       #  Add the File menu.
       add_menubar
-      set File [add_menubutton "File" left]
+      set File [add_menubutton "File"]
       configure_menubutton File -underline 0
       add_short_help $itk_component(menubar).file {File menu: close window}
 
@@ -129,7 +129,7 @@ itcl::class gaia::GaiaDemo {
       }
 
       #  Add control for "rolling" demo.
-      set Option [add_menubutton "Option" left]
+      set Option [add_menubutton "Option"]
       $Option add checkbutton -label "Rolling demo" \
 	  -onvalue 1 -offvalue 0 \
           -variable [scope itk_option(-rolling)]

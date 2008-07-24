@@ -100,7 +100,7 @@ itcl::class gaia::GaiaAstDisplayDomains {
 
       #  Add File menu for usual stuff.
       add_menubar
-      set File [add_menubutton "File" left]
+      set File [add_menubutton "File"]
       configure_menubutton File -underline 0
 
       #  Add option to create a new window.

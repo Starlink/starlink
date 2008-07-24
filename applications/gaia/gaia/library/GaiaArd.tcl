@@ -214,9 +214,9 @@ itcl::class gaia::GaiaArd {
 
       #  Add the File and Options menu.
       add_menubar
-      set File [add_menubutton "File" left]
+      set File [add_menubutton "File"]
       configure_menubutton File -underline 0
-      set Options [add_menubutton "Options" left]
+      set Options [add_menubutton "Options"]
       configure_menubutton Options -underline 0
 
       #  Add window help.

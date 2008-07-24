@@ -102,7 +102,7 @@ itcl::class gaia::GaiaTextImport {
 
       #  Add the File menu.
       add_menubar
-      set File [add_menubutton "File" left]
+      set File [add_menubutton "File"]
       configure_menubutton File -underline 0
 
       #  Add the cancel menu item.

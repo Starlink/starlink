@@ -91,11 +91,11 @@ itcl::class gaia::GaiaEsp {
 
         # Add the file menu
         add_menubar
-        set File [add_menubutton "File" left]
+        set File [add_menubutton "File"]
         configure_menubutton File -underline 0
-        set Options [add_menubutton "Options" left]
+        set Options [add_menubutton "Options"]
         configure_menubutton Options -underline 0
-        set Colours [add_menubutton "Colours" left]
+        set Colours [add_menubutton "Colours"]
         configure_menubutton Colours -underline 0
 
         # Add window help

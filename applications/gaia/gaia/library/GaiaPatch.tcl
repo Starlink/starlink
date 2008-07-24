@@ -144,9 +144,9 @@ itcl::class gaia::GaiaPatch {
       #  Add an options menu for setting options that should probably
       #  be defined once only per-session, or infrequently.
       add_menubar
-      set File [add_menubutton "File" left]
+      set File [add_menubutton "File"]
       configure_menubutton File -underline 0
-      set Options [add_menubutton "Options" left]
+      set Options [add_menubutton "Options"]
       configure_menubutton Options -underline 0
 
       #  Add window help.
