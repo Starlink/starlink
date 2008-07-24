@@ -29,11 +29,12 @@
 *                system, but this is hidden from smurf.
 *     2008-05-15 (BDK) add SC2STORETelpar structure.
 *     2008-05-28 (BDK) add sc2store_par.h.
+*     2008-07-24 (TIMJ) add instap to Telpar struct.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2007 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -70,6 +71,8 @@ struct SC2STORETelpar
      double dut1;       /* difference UT1-UTC */
      double latdeg;     /* telescope latitude in degrees */
      double longdeg;    /* telescope east longitude in degrees */
+     double instap_x; /* telescope aperture X offset in radians */
+     double instap_y;   /* telescope aperture Y offset in radians */
 };
 
 typedef struct SC2STORETelpar SC2STORETelpar;
