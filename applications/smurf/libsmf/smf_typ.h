@@ -216,6 +216,25 @@ typedef enum smf_modeltype {
   SMF__QUA=8              /* Quality flags */
 } smf_modeltype;
 
+/* Observing mode and type */
+
+typedef enum smf_obsmode {
+  SMF__OBS_NULL,
+  SMF__OBS_DREAM,
+  SMF__OBS_STARE,
+  SMF__OBS_SCAN
+} smf_obsmode;
+
+typedef enum smf_obstype {
+  SMF__TYP_NULL,
+  SMF__TYP_SCIENCE,
+  SMF__TYP_POINTING,
+  SMF__TYP_FOCUS,
+  SMF__TYP_SKYDIP,
+  SMF__TYP_FLATFIELD,
+  SMF__TYP_NOISE
+} smf_obstype;
+
 /* Ways of removing dark */
 typedef enum smf_dark_sub_meth {
   SMF__DKSUB_NONE,        /* Ignore the dark */
