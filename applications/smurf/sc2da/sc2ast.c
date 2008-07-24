@@ -99,6 +99,7 @@ int *status             /* global status (given and returned) */
                  JCMTState now used for time/pointing (EC)
      19Dec2006 : If "state" is NULL return the focal plane frameset (TJ)
      20Feb2007 : Clear the cache if instap is changed.
+     23Jul2008 : Set SkyRef (TJ)
 */
 
 {
@@ -469,7 +470,18 @@ int *status             /* global status (given and returned) */
       astSetD( skyframe, "ObsLon", -telpos[0] );
       astSetD( skyframe, "ObsLat", telpos[1] );
 
+      /* can not set SkyRefIs for now */
+      astSetD( skyframe, "SkyRef(1)", state->tcs_az_bc1 );
+      astSetD( skyframe, "SkyRef(2)", state->tcs_az_bc2 );
+
       astExempt( skyframe );
+   } else {
+     /* Set SkyRef but only if we are moving */
+     if (strcmp(state->tcs_tr_sys, "AZEL") == 0 ||
+         strcmp(state->tcs_tr_sys, "APP") == 0 ) {
+       astSetD( skyframe, "SkyRef(1)", state->tcs_az_bc1 );
+       astSetD( skyframe, "SkyRef(2)", state->tcs_az_bc2 );
+     }
    }
    astSet( skyframe, "Epoch=MJD %.*g", DBL_DIG, state->rts_end + 32.184/SC2AST_SPD );
 
