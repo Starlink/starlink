@@ -74,9 +74,11 @@
 *     2008-07-16 (TIMJ):
 *        Document flags. Do not copy the NDF id (otherwise smf_close_file
 *        will not try to free the malloced memory)
-*     2008-08-22 (EC):
+*     2008-07-22 (EC):
 *        -Implements SMF__NOCREATE_DATA/VARIANCE/QUALITY
 *        -Copy isTordered flag
+*     2008-07-23 (EC):
+*        Correctly calculate npts if isTordered=0
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -244,7 +246,11 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
 
   /* Redefine npts for polynomial coefficients */
   if ( ncoeff != 0 ) {
-    npts = dims[0]*dims[1]*ncoeff;
+    if( isTordered ) {
+      npts = dims[0]*dims[1]*ncoeff;
+    } else {
+      npts = dims[1]*dims[2]*ncoeff;
+    }
     poly = smf_malloc( npts, sizeof(double), 0, status);
     if ( *status != SAI__OK ) {
       errRep(FUNC_NAME, 

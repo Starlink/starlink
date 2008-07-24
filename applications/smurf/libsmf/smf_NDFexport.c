@@ -59,6 +59,8 @@
 *        Fixed axis index bug in 1-d frameset case using patch from DB
 *     2008-06-11 (EC):
 *        Renamed to smf_NDFexport from smf_model_NDFexport
+*     2008-07-23 (EC):
+*        Support exportation of FFT'd data
 
 *  Notes:
 *
@@ -114,12 +116,14 @@ void smf_NDFexport( const smfData *data, void *variance,
   int flag=0;                   /* Flag */
   AstFrameSet *fset1d=NULL;    	/* Frameset for 1D data */
   size_t i;                     /* Counter */
+  int fft;                      /* Flag for FFT data */
   HDSLoc *jcmtstateloc=NULL;    /* HDS Locator for JCMT headers */
   int lbnd[NDF__MXDIM];         /* Dimensions of container */
   Grp *inname=NULL;             /* 1-element group to hold input filename */
   size_t msize=0;               /* Number of files in name group */
   dim_t nbolo;                  /* Number of bolometers */
   size_t ndata=0;               /* Number of elements in data array */
+  dim_t nf=0;                   /* Number of frequencies if FFT */
   dim_t ntslice=0;              /* Number of time slices */
   int out[NDF__MXDIM];          /* Indices outputs of mapping */
   Grp *outname = NULL;          /* 1-element group to hold output filename */
@@ -134,8 +138,10 @@ void smf_NDFexport( const smfData *data, void *variance,
 
   if (*status != SAI__OK ) return;
 
+  fft = smf_isfft( data, status );
+
   /* Check for ICD-compliant data order */
-  if( !data->isTordered ) {
+  if( !fft && !data->isTordered ) {
     *status = SMF__BORDB;
     errRep( FUNC_NAME, "Data is bolo-ordered, must be time-ordered", status );
     return;
@@ -150,6 +156,14 @@ void smf_NDFexport( const smfData *data, void *variance,
     /* Assume 3-d cube of data */
     nbolo = data->dims[0]*data->dims[1];
     ntslice = data->dims[2];
+  } else if ( (data->ndims == 2) && fft ) {
+    nbolo = 1;
+    nf = data->dims[0];
+    ntslice = (nf-1)*2;
+  } else if ( (data->ndims == 4) && fft ) {
+    nbolo = data->dims[1]*data->dims[2];
+    nf = data->dims[0];
+    ntslice = (nf-1)*2;
   } else {
     *status = SAI__ERROR;
     msgSeti("NDIMS",data->ndims);
@@ -166,7 +180,7 @@ void smf_NDFexport( const smfData *data, void *variance,
   /* Create lbnd and ubnd arrays, and calculate buffer size */
   if( *status == SAI__OK ) {
     ndata = 1;
-    for( i=0; i<(size_t)data->ndims; i++ ) {
+    for( i=0; i<data->ndims; i++ ) {
       lbnd[i] = 1;
       ubnd[i] = data->dims[i];
       ndata *= data->dims[i];

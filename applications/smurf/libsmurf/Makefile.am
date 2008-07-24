@@ -10,7 +10,7 @@ smurf_unmakecube.c \
 smurf_impaztec.c smurf_dreamweights.c smurf_dreamsolve.c smurf_badbolos.c \
 smurf_skynoise.c smurf_starecalc.c smurf_help.c smurf_rawunpress.c \
 smurf_timesort.c smurf_gsd2acsis.c smurf_sc2fts.c \
-smurf_sc2clean.c smurf_gsdshow.c smurf_sc2concat.c
+smurf_sc2clean.c smurf_gsdshow.c smurf_sc2concat.c smurf_sc2fft.c
 
 noinst_INCLUDES = smurflib.h
 

@@ -81,6 +81,8 @@
 *        Add named QUALITY extension
 *     2008-05-30 (EC):
 *        Initialize history component
+*     2008-07-23 (EC):
+*        Allow 4-dimensional data to store FFTs
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -175,14 +177,16 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
       isNDF = 1;   /* Data have been flatfielded */
     }
     isTstream = 1; /* Data are in `time series' format */
+  } else if (ndims == 4) {/* FFT of a data cube */
+    isNDF = 0;
+    isTstream = 0;
   } else {
     /* Report an error due to an unsupported number of dimensions */
     if ( *status == SAI__OK) {
       *status = SAI__ERROR;
       msgSeti( "NDIMS", ndims);
       errRep( FUNC_NAME, 
-	      "Number of dimensions in output, ^NDIMS, is not equal to 1, 2 or 3",
-	      status);
+	      "Number of dimensions in output, ^NDIMS, is not in the range 1-4",	      status);
       return;
     }
   }

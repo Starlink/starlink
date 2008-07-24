@@ -109,6 +109,8 @@
 *     2008-05-28 (TIMJ):
 *        No longer use automatic provenance propagation. It took too
 *        long even if provenance had already been written.
+*     2008-07-23 (EC):
+*        Add SC2FFT
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -252,6 +254,8 @@ void smurf_mon( int * status ) {
     smurf_gsdshow( status );
   } else if (strcmp( taskname, "SC2CONCAT" ) == 0 ) {
     smurf_sc2concat( status );
+  } else if (strcmp( taskname, "SC2FFT" ) == 0 ) {
+    smurf_sc2fft( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );

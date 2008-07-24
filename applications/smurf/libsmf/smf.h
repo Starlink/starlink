@@ -1059,4 +1059,8 @@ void smf_choose_darks( const smfArray *darks, const smfData *indata,
 void smf_subtract_dark ( smfData * indata, const smfData * dark1, 
   const smfData * dark2, smf_dark_sub_meth method, int *status );
 
+smfData *smf_fft_data( const smfData *indata, int inverse, int *status );
+
+int smf_isfft( const smfData *data, int * status );
+
 #endif /* SMF_DEFINED */

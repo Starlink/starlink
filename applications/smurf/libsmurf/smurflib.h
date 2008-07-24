@@ -57,6 +57,8 @@
 *        Add GSDSHOW.
 *     2008-06-10 (TIMJ):
 *        Add SC2FTS
+*     2008-07-22 (EC):
+*        Add SC2FFT
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -109,5 +111,6 @@ void smurf_rawunpress( int * );
 void smurf_sc2clean( int * );
 void smurf_gsdshow( int * );
 void smurf_sc2concat( int * );
+void smurf_sc2fft( int * );
 
 #endif /* SMURF_LIB_DEFINED */

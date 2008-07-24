@@ -73,7 +73,7 @@ smf_filter_r2c.c smf_filter_edge.c smf_filter_notch.c \
 smf_NDFexport_smfFilter.c smf_calc_fcon.c \
 smf_dtype_str.c smf_map_or_malloc.c smf_find_darks.c smf_isdark.c \
 smf_reduce_dark.c smf_find_subarray.c smf_choose_darks.c \
-smf_subtract_dark.c
+smf_subtract_dark.c smf_fft_data.c smf_isfft.c
 
 
 noinst_INCLUDES = smf.h smf_typ.h
