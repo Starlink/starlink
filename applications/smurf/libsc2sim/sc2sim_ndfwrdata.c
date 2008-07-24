@@ -222,6 +222,8 @@
 *        - use one_strlcpy
 *     2008-07-23 (AGG):
 *        Write out BASEC1, BASEC2 and TRACKSYS
+*     2008-07-23 (EC):
+*        - Shutter us now a floating point
 
 *  Copyright:
 *     Copyright (C) 2007, 2008 Science and Technology Facilities Council.
@@ -509,7 +511,8 @@ int *status              /* Global status (given and returned) */
    astSetFitsCN ( fitschan, "COMMENT", "", "-- SCUBA-2 specific parameters --", 0 );
    astSetFitsS ( fitschan, "INSTRUME", instrume, "Instrument name - SCUBA-2", 0 );
    astSetFitsS ( fitschan, "SUBARRAY", sinx->subname, "subarray name", 0 );
-   astSetFitsS ( fitschan, "SHUTTER", "", "Shutter position for dark frames", 0 );
+   astSetFitsF ( fitschan, "SHUTTER", 1, "Shutter for darks: 0=closed, 1=open",
+                 0 );
    astSetFitsS ( fitschan, "FILTER", filter, "filter used", 0 );
    astSetFitsF ( fitschan, "WAVELEN", inx->lambda, "[m] Wavelength", 0 );
 
