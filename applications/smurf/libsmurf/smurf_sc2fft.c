@@ -34,8 +34,8 @@
 *  ADAM Parameters:
 *     IN = NDF (Read)
 *          Input files to be transformed
-*     INVERSE = _INTEGER (Read)
-*          If set perform inverse transform
+*     INVERSE = _LOGICAL (Read)
+*          If true perform inverse transform
 *     OUT = NDF (Write)
 *          Output files
 
@@ -122,7 +122,7 @@ void smurf_sc2fft( int *status ) {
   ndgCreat( "OUT", igrp, &ogrp, &outsize, &flag, status );
 
   /* Are we doing an inverse transform? */
-  parGet0i( "INVERSE", &inverse, status );
+  parGet0l( "INVERSE", &inverse, status );
 
   /* Loop over input files */
   for( i=1; (*status==SAI__OK)&&(i<=size); i++ ) {

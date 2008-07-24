@@ -186,6 +186,8 @@
 #         Add F* parameters to MAKEMAP.
 #         Add ALIGNSYS to MAKEMAP.
 #         Add REF to MAKEMAP
+#     23-JUL-2008 (EC):
+#         Add SC2CLEAN
 #     {enter_changes_here}
 
 #  Bugs:
@@ -2110,11 +2112,11 @@ package @PACKAGE@ {
             }
 
             parameter inverse {
-                type _INTEGER
+                type _LOGICAL
                 vpath {DEFAULT }
                 prompt {Perform inverse transformation if set}
                 ppath GLOBAL CURRENT
-                default 0
+                default FALSE
                 helpkey *
             }
 
