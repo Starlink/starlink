@@ -4599,12 +4599,12 @@ errEnd(status)
 void
 errFacer(token, status)
   char * token
-  ndfint &status
+  ndfint status
  ALIAS:
   NDF::err_facer = 2
  PROTOTYPE: $$
  CODE:
-  errFacer(token, &status );
+  errFacer(token, status );
 
 void
 errFioer(token, iostat)
