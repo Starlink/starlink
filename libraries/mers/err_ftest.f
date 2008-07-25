@@ -75,6 +75,14 @@
      :     STATUS )
       CALL MSG_SYNC( STATUS )
 
+      CALL MSG_SETC( 'D', 'Test')
+      CALL MSG_SETC( 'D', ' Consecutive')
+      CALL MSG_SETC( 'D', ' Calls')
+      CALL MSG_SETC( 'D', ' To')
+      CALL MSG_SETC( 'D', ' MSG_SETC')
+      CALL MSG_SETI( 'D', 5)
+      CALL MSG_OUT( ' ', 'Combo - ^D', STATUS )
+
 *  Call ERR_REP and ERR_FLUSH.
       CALL ERR_BEGIN( STATUS )
       STATUS = SAI__ERROR
