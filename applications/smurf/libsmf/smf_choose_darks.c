@@ -22,10 +22,10 @@
 *     indata = const smfData * (Given)
 *        Reference science observation to choose darks.
 *     dark1 = size_t * (Returned)
-*        Index in smfArray for the closest previous dark. -1 if none
+*        Index in smfArray for the closest previous dark. SMF__BADIDX if none
 *        can be found.
 *     dark2 = size_t * (Returned)
-*        Index in smfArray for the closest following dark. -1 if none
+*        Index in smfArray for the closest following dark. SMF__BADIDX if none
 *        can be found.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -41,6 +41,8 @@
 *  History:
 *     2008-07-18 (TIMJ):
 *        Initial version.
+*     2008-07-25 (TIMJ):
+*        Be more lenient with time gaps for scan mode. Use SMF__BADIDX
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -85,15 +87,17 @@ typedef struct {
 void smf_choose_darks( const smfArray *darks, const smfData *indata,
                        size_t *dark1, size_t *dark2, int * status ) {
   size_t i;          /* loop counter */
-  const double maxdiff = 15.0; /* maximum gap between dark and science */
+  const double maxdiffstare = 15.0; /* maximum gap between dark and science*/
+  const double maxdiffscan = 30.0 * 60.0; /* scan can be more lenient */
+  double maxdiff = 0.0;  /* actual difference allowed */
   double reftime;    /* MJD of input science data */
   int refsubnum;     /* Subarray number of science data */
 
   smf_timediff prev; /* information on closest previous */
   smf_timediff next; /* information on closest next */
 
-  *dark1 = (size_t)-1;
-  *dark2 = (size_t)-1;
+  *dark1 = SMF__BADIDX;
+  *dark2 = SMF__BADIDX;
 
   if (*status  != SAI__OK) return;
 
@@ -103,9 +107,9 @@ void smf_choose_darks( const smfArray *darks, const smfData *indata,
 
   /* initialise the diff structs */
   prev.diff = VAL__MAXD;
-  prev.index = -1;
+  prev.index = SMF__BADIDX;
   next.diff = VAL__MAXD;
-  next.index = -1;
+  next.index = SMF__BADIDX;
 
   /* loop through all the darks finding the ones closest in time
      with the correct subarray number */
@@ -141,11 +145,18 @@ void smf_choose_darks( const smfArray *darks, const smfData *indata,
     }
   }
 
+  /* max allowed diff depends on observing mode */
+  if ( indata->hdr->obsmode == SMF__OBS_SCAN ) {
+    maxdiff = maxdiffscan;
+  } else {
+    maxdiff = maxdiffstare;
+  }
+
   /* if we found a previous, see how close it really was
       - reduced darks still have all JCMTState if processed by
       SMURF internally.
   */
-  if (prev.index != (size_t)-1) {
+  if (prev.index != SMF__BADIDX) {
     smfData *thisdark = (darks->sdata)[prev.index];
     size_t endframe = thisdark->hdr->nframes - 1;
     double endtime = (thisdark->hdr->allState)[endframe].rts_end;
@@ -155,12 +166,12 @@ void smf_choose_darks( const smfArray *darks, const smfData *indata,
     difftime *= SPD;
     if ( difftime > maxdiff ) {
       /* dark is no good */
-      prev.index = -1;
+      prev.index = SMF__BADIDX;
     }
 
   }
 
-  if (next.index != (size_t)-1) {
+  if (next.index != SMF__BADIDX) {
     smfData *thisdark = (darks->sdata)[next.index];
     size_t endframe = indata->hdr->nframes - 1;
     double starttime = (thisdark->hdr->allState)[0].rts_end;
@@ -171,15 +182,15 @@ void smf_choose_darks( const smfArray *darks, const smfData *indata,
     difftime *= SPD;
     if ( difftime > maxdiff ) {
       /* dark is no good */
-      next.index = -1;
+      next.index = SMF__BADIDX;
     }
 
   }
 
-  if (prev.index == (size_t)-1) {
+  if (prev.index == SMF__BADIDX) {
     msgOutif( MSG__VERB, " ","Unable to find any prior dark", status );
   }
-  if (next.index == (size_t)-1) {
+  if (next.index == SMF__BADIDX) {
     msgOutif( MSG__VERB, " ","Unable to find any following dark", status );
   }
 
