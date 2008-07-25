@@ -17,17 +17,18 @@
 *     tiles = smf_choosetiles( Grp *igrp,  int size, int *lbnd, int *ubnd, 
 *                              smfBox *boxes, int spread, const double params[],
 *                              AstFrameSet *wcsout, int tile_size[2],
-*                              int trim, int border, int *ntiles, int *status )
+*                              int trim, int border, size_t *ntiles,
+*                              int *status )
 
 *  Arguments:
 *     igrp = Grp * (Given)
 *        Group of input NDFs.
 *     size = int (Given)
 *        Number of elements in igrp
-*     lbnd = dimt_t * (Given)
+*     lbnd = int * (Given)
 *        Pointer to an array holding the lower pixel index bounds of the 
 *        full size output grid.
-*     ubnd = dimt_t * (Given)
+*     ubnd = int * (Given)
 *        Pointer to an array holding the upper pixel index bounds of the 
 *        full size output grid.
 *     boxes = smfBox * (Given)
@@ -60,7 +61,7 @@
 *        width of the spreading kernel) in order to avoid edge effects.
 *        However, the extra border (the spreading width) will be trimmed
 *        off the tiles before the application terminates.
-*     ntiles = int * (Returned)
+*     ntiles = size_t * (Returned)
 *        Pointer to an int in which to return the number of tiles needed
 *        to cover the full size grid.
 
@@ -179,7 +180,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
                           int *ubnd, smfBox *boxes, int spread, 
                           const double params[], AstFrameSet *wcsout, 
                           int tile_size[ 2 ], int trim, int border,
-                          int *ntiles, int *status ){
+                          size_t *ntiles, int *status ){
 
 /* Local Variables */
    AstUnitMap *umap = NULL;

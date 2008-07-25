@@ -533,9 +533,9 @@ void smurf_makemap( int *status ) {
   Grp *igrp4 = NULL;         /* Group holding output NDF names */
   int ilast;                 /* Index of the last input file */
   int iout;                  /* Index of next output NDF name */
-  int ipbin=0;              /* Index of current polarisation angle bin */
+  int ipbin=0;               /* Index of current polarisation angle bin */
   int iterate=0;             /* Flag to denote ITERATE method */
-  int itile;                 /* Output tile index */
+  size_t itile;              /* Output tile index */
   int jin;                   /* Input NDF index within igrp */
   AstKeyMap *keymap=NULL;    /* Pointer to keymap of config settings */
   size_t ksize=0;            /* Size of group containing CONFIG file */
@@ -549,7 +549,7 @@ void smurf_makemap( int *status ) {
   char method[LEN__METHOD];  /* String for map-making method */
   int moving = 0;            /* Is the telescope base position changing? */
   int nparam = 0;            /* Number of extra parameters for pixel spreading*/
-  int ntile;                 /* Number of output tiles */
+  size_t ntile;              /* Number of output tiles */
   int nval;                  /* Number of parameter values supplied */
   size_t nxy;                /* Number of pixels in output image */
   smfData *odata=NULL;       /* Pointer to output SCUBA2 data struct */

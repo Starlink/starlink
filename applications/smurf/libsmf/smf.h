@@ -840,7 +840,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
                           int *ubnd, smfBox *boxes, int spread, 
                           const double params[], AstFrameSet *wcsout, 
                           int tile_size[ 2 ], int trim, int border,
-                          int *ntiles, int *status );
+                          size_t *ntiles, int *status );
 
 smfTile *smf_freetiles( smfTile *tiles, int size, int *status );
 
@@ -1013,7 +1013,7 @@ smf_store_outputbounds (const int lbnd_out[3],const int ubnd_out[3],
                         const AstMapping *oskymap, int *status);
 
 void
-smf_expand_tilegroup ( Grp * ogrp, int ntile, int npbin, size_t * outsize,
+smf_expand_tilegroup ( Grp * ogrp, size_t ntile, int npbin, size_t * outsize,
                        int * status);
 
 smfFilter *smf_create_smfFilter( smfData *template, int *status );

@@ -890,7 +890,7 @@ void smurf_makecube( int *status ) {
    int ipbin;                 /* Index of current polarisation angle bin */
    int is2d;                  /* Is the weights array 2-dimensional? */
    int ispec;                 /* Index of next spectrum within output NDF */
-   int itile;                 /* Output tile index */
+   size_t itile;              /* Output tile index */
    int jin;                   /* Input NDF index within igrp */
    int lbnd_out[ 3 ];         /* Lower pixel bounds for full output map */
    int lbnd_wgt[ 4 ];         /* Lower pixel bounds for weight array */
@@ -904,7 +904,7 @@ void smurf_makecube( int *status ) {
    int npbin;                 /* No. of polarisation angle bins */
    int npos;                  /* Number of samples included in output NDF */
    int nreject;               /* Number of rejected input spectra */
-   int ntile;                 /* Number of output tiles */
+   size_t ntile;              /* Number of output tiles */
    int nused;                 /* No. of input samples pasted into output cube */
    int nval;                  /* Number of parameter values supplied */
    int nwgtdim;               /* No. of axes in the weights array */

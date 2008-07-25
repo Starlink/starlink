@@ -13,18 +13,18 @@
 *     C function
 
 *  Invocation:
-*     smf_expand_tilegroup( Grp * ogrp, int ntile, int npbin,
-*                           int * outsize, int *status);
+*     smf_expand_tilegroup( Grp * ogrp, size_t ntile, size_t npbin,
+*                           size_t * outsize, int *status);
 
 *  Arguments:
 *     ogrp = Grp* (Given and Returned)
 *        The initial output group. It will be modified to contain the
 *        expanded filenames. Previous entries will be removed.
-*     ntile = int (Given)
+*     ntile = size_t (Given)
 *        Number of tiles.
-*     npbin = int (Given)
+*     npbin = size_t (Given)
 *        Number of polarimetry bins.
-*     outside = int * (Returned)
+*     outside = size_t * (Returned)
 *        Size of the newly modified output group.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -42,6 +42,8 @@
 *  History:
 *     2008-06-05 (TIMJ):
 *        Initial version taken from smurf_makecube
+*     2008-07-24 (TIMJ):
+*        Use size_t
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -83,13 +85,13 @@
 #include "smf.h"
 
 void
-smf_expand_tilegroup ( Grp * ogrp, int ntile, int npbin, size_t * outsize,
+smf_expand_tilegroup ( Grp * ogrp, size_t ntile, int npbin, size_t * outsize,
                        int * status) {
 
   char basename[ GRP__SZNAM + 1 ]; /* Output base file name */
   int blen;                  /* Used length of the "basename" string */
-  int ipbin;                 /* Loop pol bin counter */
-  int itile;                 /* Loop tile counter */
+  int ipbin;              /* Loop pol bin counter */
+  size_t itile;              /* Loop tile counter */
   char *pname = NULL;        /* Name of currently opened data file */
   Grp *tgrp = NULL;     /* Temporary group */
 
@@ -106,7 +108,7 @@ smf_expand_tilegroup ( Grp * ogrp, int ntile, int npbin, size_t * outsize,
 
     blen = astChrLen( basename );
     for( itile = 0; itile < ntile; itile++ ) {
-      sprintf( basename + blen, "_%d", itile + 1 );            
+      sprintf( basename + blen, "_%zd", itile + 1 );            
       grpPut1( ogrp, basename, 0, status );
     }
     *outsize = ntile;
