@@ -90,7 +90,6 @@ const char * smf_obsmode_str( smf_obsmode mode, int * status ) {
   /* Check entry status */
   if (*status != SAI__OK) return retval;
 
-  printf("Checking mode %d\n",mode);
   /* now switch on data type */
   switch( mode ) {
   case SMF__OBS_NULL:
