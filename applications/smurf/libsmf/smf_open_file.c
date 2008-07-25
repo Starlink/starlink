@@ -172,6 +172,8 @@
  *        Read dark squid information.
  *     2008-07-18 (TIMJ):
  *        Use size_t
+ *     2008-07-24 (TIMJ):
+ *        Calculate obs mode.
  *     {enter_further_changes_here}
 
  *  Copyright:
