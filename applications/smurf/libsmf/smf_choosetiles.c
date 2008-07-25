@@ -127,7 +127,7 @@
 *     14-JAN-2008 (DSB):
 *        Added argument "border".
 *     15-JAN-2008 (DSB):
-*        - Change the "basic" tile bounds to include the requested boirder,
+*        - Change the "basic" tile bounds to include the requested border,
 *        and add another box to the Tile structure holding the tile
 *        bounds without border.
 *        - Allow for reference points that are outside the bounds of the
@@ -141,6 +141,8 @@
 *        overruns in smf_reshapendf
 *     09-JUN-2008 (DSB):
 *        The third element of an array is is [ 2 ], not [ 3 ].
+*     24-JUL-2008 (TIMJ):
+*        Trap moving coordinates (or at least offset coordinate systems).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -172,6 +174,7 @@
 #include "ast.h"
 #include "sae_par.h"
 #include "prm_par.h"
+#include "merswrap.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -195,11 +198,11 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
    int extend = 0;
    int i;
    int indims;
-   int ix;
-   int iy;
+   size_t ix;
+   size_t iy;
    int lbin;
    int lbout;
-   int numtile[ 2 ];
+   size_t numtile[ 2 ];
    int plbnd[ 2 ];
    int pubnd[ 2 ];
    int refpixind;
@@ -284,12 +287,26 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
    value in the current Frame of the output WCS FrameSet), and find the
    corresponding grid coordinates. */
 
-      refwcs[ 0 ] = astGetD( wcsout, "SkyRef(1)" );
-      refwcs[ 1 ] = astGetD( wcsout, "SkyRef(2)" );
-      refwcs[ 2 ] = AST__BAD;
-
+      if ( strcmp(astGetC( wcsout, "SkyRefIs"), "Origin") == 0) {
+        /* these are offset coordinates */
+        refwcs[ 0 ] = 0.0;
+        refwcs[ 1 ] = 0.0;
+      } else {
+        /* relative to the sky reference point */
+        refwcs[ 0 ] = astGetD( wcsout, "SkyRef(1)" );
+        refwcs[ 1 ] = astGetD( wcsout, "SkyRef(2)" );
+      }
       astTranN( wcsout, 1, indims, 1, refwcs,
                 0, astGetI( wcsout, "Nout" ), 1, refpix );
+
+      if (refpix[ 0 ] == VAL__BADD || refpix[ 0 ] == VAL__BADD) {
+        if (*status == SAI__OK) {
+          *status = SAI__ERROR;
+          errRep(" ", "Error calculating grid coordinates of reference point",
+                 status );
+          return NULL;
+        }
+      }
 
 /* Convert grid coords to pixel coords */
       refpix[ 0 ] += tlbnd[ 0 ] - 1.5;
