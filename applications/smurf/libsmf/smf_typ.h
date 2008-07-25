@@ -136,6 +136,8 @@
 *        DA struct now includes dark squid
 *     2008-07-14 (TIMJ):
 *        smfArray can be dynamic
+*     2008-07-25 (TIMJ):
+*        Add SMF__BADIDX
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -243,6 +245,9 @@ typedef enum smf_dark_sub_meth {
   SMF__DKSUB_PREV,        /* Use previous dark */
   SMF__DKSUB_NEXT         /* Use following dark */
 } smf_dark_sub_meth;
+
+/* Indicate a bad array index */
+static const size_t SMF__BADIDX = (size_t)-1;
 
 /* suffix for simple binary files that store DIMM model components */
 #define SMF__DIMM_SUFFIX ".dimm"
