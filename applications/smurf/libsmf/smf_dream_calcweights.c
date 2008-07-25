@@ -160,7 +160,6 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
   int nboly;                    /* Number of bolometers in Y direction */
   int nframes;                  /* Number of timeslices in input data */
   int nsampcycle;               /* Number of samples in a jiggle cycle */
-  char obsmode[LEN__METHOD+1];  /* Observing mode */
   char *pname = NULL;           /* Pointer to filename string */
   int *qual = NULL;             /* True/false `quality' array (not NDF quality) */
   int qualdim[2];               /* Dimensions of quality array */
