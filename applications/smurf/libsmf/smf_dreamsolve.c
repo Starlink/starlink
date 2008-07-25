@@ -31,7 +31,6 @@
 
 *  Notes:
 *     - *** No FITS (sub)headers are yet written for the images ***
-*     - Further rationalizing of this into subroutines may be possible
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -53,10 +52,13 @@
 *        Update to use new smf_free behaviour
 *     2008-07-24 (TIMJ):
 *        Use hdr->obsmode instead of SAM_MODE.
+*     2008-07-25 (AGG):
+*        Partial update to use sc2math routines
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006-2007 University of British Columbia. All
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2006-2008 University of British Columbia. All
 *     Rights Reserved.
 
 *  Licence:
@@ -124,58 +126,33 @@ void smf_dreamsolve( smfData *data, int *status ) {
   int gridndf;                     /* NDF identifier for GRID parameters */
   void *gridpntr[3];               /* Mapped pointers */
   smfHead *hdr = NULL;             /* Header information for input data */
-  int i;                           /* Loop counter */
   double *interpwt = NULL;         /* Interpolation weights */
   double *invmat = NULL;           /* Inverted matrix */
-  int ipos;                        /* Position in reconstructed map */
-  int j;                           /* Loop counter */
-  int jbol;                        /* Bolometer counter */
-  int jgrid;                       /* Count through reconstructed map */
-  int jpos;                        /* Position in reconstructed map */
-  int k;                           /* Loop counter */
-  double *kvec = NULL;             /* Reduced vector of values */
-  int l;                           /* Loop counter */
   int lbnd[2];                     /* Lower bounds */
-  double lme;                      /* Quality of solution */
-  double lssum;                    /* Sum of square of known values */
   int nbol;                        /* Total number of bolometers */
-  int nbolx;                       /* Number of bolometers in X direction */
-  int nboly;                       /* Number of bolometers in Y direction */
   int ncycles;                     /* Number of DREAM cycles in data stream */
   size_t nelem;                    /* Total number of points */
   int ngrid;                       /* Number of grid points in output map */
+  int nimages;			   /* Number of images to write to output file */
   int nframes;                     /* Number of time samples */
   int npts;                        /* Total number of points (int version) */
   int nsampcycle;                  /* Number of samples per DREAM cycle */
-  int nunkno;                      /* Number of unknowns in solution */
-  int nvert;                       /* Number of vertices in DREAM pattern */
   smfFile *ofile;                  /* Output file information */
-  int outhgt;                      /* Height of output map */
-  int outwid;                      /* Width of output map */
-  double *par = NULL;              /* Parameters of problem eqn */
   double *pbolzero = NULL;         /* Bolometer zero points */
   double *psbuf = NULL;            /* */
   HDSLoc *scu2redloc = NULL;       /* Locator to SCU2RED extension */
-  double *sint = NULL;             /* Solved parameters */
-  int skyhgt;                      /* Height of reconstructed map */
-  int skywid;                      /* Width of reconstructed map */
-  double *sme = NULL;              /* RMS errors in solutions */
-  double *solint = NULL;           /* Solved intensity buffer */
-  double *solme = NULL;            /* RMS solved intensities */
   double *tstream = NULL;          /* Pointer to time series data */
-  double tv;                       /* Temporary flat-fielded value */
   int ubnd[2];                     /* Upper bounds */
   int vxmax;                       /* Maximum X SMU offset */
   int vxmin;                       /* Minimum X SMU offset */
   int vymax;                       /* Maximum Y SMU offset */
   int vymin;                       /* Minimum Y SMU offset */
-  int xmax;                        /* Maximum X extent of grid */
-  int xmin;                        /* Minimum X extent of grid */
-  int ymax;                        /* Maximum Y extent of grid */
-  int ymin;                        /* Minimum Y extent of grid */
-  int zx;                          /* X offset of output map in solution */
-  int zy;                          /* Y offset of output map in solution */
   int naver;                       /* Temporary value... */
+  int jigext[4] = { -1, 1, -1, 1 };/* Table of SMU pattern extents for a
+				      single bolometer */
+  int *qual = NULL;                /* True/false `quality' array (not NDF quality) */
+  double *map = NULL;              /* Pointer to output DREAM image */
+  int maxmap = 2400;               /* Maximum size of output DREAM image */
 
   if ( *status != SAI__OK ) return;
 
@@ -209,18 +186,18 @@ void smf_dreamsolve( smfData *data, int *status ) {
              status);
     }
 
-    /* Retrieve DREAM parameters */
+    /* Retrieve DREAM parameters - CHECK STATUS!! */
     dream = data->dream;
 
-    /* OK we have DREAM data - retrieve various values */
+    /* OK we have DREAM data - retrieve various values - CHECK FOR NON-NULL!! */
     nframes = (data->dims)[2];
-    nbolx = (data->dims)[0];
-    nboly = (data->dims)[1];
-    nbol =  nbolx * nboly;
-    nvert = dream->nvert;
+    nbol = (data->dims)[0]*(data->dims)[1];
     ngrid = dream->ngrid;    
     nsampcycle = dream->nsampcycle;
     ncycles = nframes / nsampcycle;
+
+    /* HACK - DEFINE!! */
+    qual = smf_malloc(nbol, sizeof(int), 1, status);
 
     /* Pointers to the weights arrays. If either of these are NULL
        then it means we were not able to find the weights file */
@@ -233,7 +210,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
                        status );
         msgSetc("W",drmwghts);
         *status = SAI__ERROR;
-        errRep(FUNC_NAME, "Unable to read WEIGHTS file, ^W", status);
+        errRep(FUNC_NAME, "Unable to read DREAM weights file, ^W", status);
       }
     }
 
@@ -249,44 +226,17 @@ void smf_dreamsolve( smfData *data, int *status ) {
     ndfMap( gridndf, "DATA", "_INTEGER", "WRITE", gridpntr, &npts, 
             status);
     gridext = gridpntr[0];
-    if ( *status == SAI__OK ) {
-      /* Initialize min/max values - remember the grid may not
-         necessarily be symmetric about 0 */
-      gridext[0] = VAL__MAXI;
-      gridext[1] = VAL__MINI;
-      gridext[2] = VAL__MAXI;
-      gridext[3] = VAL__MINI;
-      /* Find gridminmax from gridpts array */
-      for ( i=0; i<DREAM__MXGRID-1; i++) {
-        if ( (dream->gridpts)[i][0] < gridext[0] ) 
-          gridext[0] = (dream->gridpts)[i][0];
-        if ( (dream->gridpts)[i][0] > gridext[1] ) 
-          gridext[1] = (dream->gridpts)[i][0];
-        if ( (dream->gridpts)[i][1] < gridext[2] ) 
-          gridext[2] = (dream->gridpts)[i][1];
-        if ( (dream->gridpts)[i][1] > gridext[3] ) 
-          gridext[3] = (dream->gridpts)[i][1];
-      }
-    }
-    /* Write grid size into output file */
+    /* Calculate maximum extent of reconstruction grid in pixels */
+    sc2math_gridext( ngrid, dream->gridpts, &(gridext[0]), &(gridext[1]), 
+		     &(gridext[2]), &(gridext[3]), status );
+
+    /* Write grid size into output file - PROTECT FROM NON-NULL!! */
     ofile = data->file;
     ndfXpt0d( dream->gridstep, ofile->ndfid, "DREAM", "GRID_SIZE", status);
-    /* Free up these resources */
-    ndfAnnul( &gridndf, status );
-    datAnnul( &drmloc, status );
 
     /* Create SCU2RED extension to hold reconstructed images */
     scu2redloc = smf_get_xloc(data, "SCU2RED", "SCUBA2_MAP_ARR", "WRITE", 
                               0, NULL, status);
-
-    /* Calculate width and height of map which includes all points
-       contributing to all bolometers */
-    sc2math_gridext( ngrid, dream->gridpts, &xmin, &xmax, &ymin, &ymax, 
-                     status );
-    skywid = nbolx + xmax - xmin;
-    skyhgt = nboly + ymax - ymin;
-    /* Number of unknowns in solution */
-    nunkno = nbol + (skywid * skyhgt);
 
     /* Allocate memory for resources */
     psbuf = smf_malloc( (size_t)(nsampcycle * nbol), sizeof(double), 1, status);
@@ -299,32 +249,15 @@ void smf_dreamsolve( smfData *data, int *status ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to allocate memory for polzero", status);
     }
-    /* Memory for holding solution and errors */
-    nelem = (size_t)nunkno;
-    sme = smf_malloc( nelem, sizeof(double), 1, status);
+    map = smf_malloc( (size_t)maxmap, sizeof(double), 1, status);
     if ( *status == SMF__NOMEM ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Unable to allocate memory for sme", status);
-    }
-    sint = smf_malloc( nelem, sizeof(double), 1, status);
-    if ( *status == SMF__NOMEM ) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Unable to allocate memory for sint", status);
-    }
-    /* Allocate space for the parameter array */
-    par = smf_malloc( nelem, sizeof(double), 1, status );
-    if ( *status == SMF__NOMEM ) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Unable to allocate memory for par", status);
-    }
-    kvec = smf_malloc( nelem, sizeof(double), 1, status );
-    if ( *status == SMF__NOMEM ) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Unable to allocate memory for kvec", status);
+      errRep(FUNC_NAME, "Unable to allocate memory for map", status);
     }
 
     /* Loop over the number of DREAM cycles */
     if ( *status == SAI__OK ) {
+      /* PLACEHOLDER UNTIL A FURTHER DECISION IS MADE */
       naver = 1;
       /* Retrieve time stream data - averaged if necessary */
       if ( naver == 1 ) {
@@ -332,106 +265,30 @@ void smf_dreamsolve( smfData *data, int *status ) {
       } else {
         smf_average_dataD( data, 0, naver, nsampcycle, &tstream, &nelem, status );
       }
-      for ( cycle=0; cycle<ncycles/naver; cycle++ ) {
-        /* Extract the raw data of a cycle. */
-        sc2math_get_cycle ( cycle, nsampcycle, ncycles, nbol,
-                            tstream, psbuf, status );
-        /* Initialise the parameter array to zero */
-        for ( j=0; j<nunkno; j++ ) {
-          par[j] = 0.0;
-        }
-        /* Initialise the array to hold the parameters of the normal
-           equations to zero */
-        for ( j=0; j<nunkno; j++ ) {
-          kvec[j] = 0.0;
-        }
-        lssum = 0.0;
-        /* Generate the parameters of one problem equation at a time
-           and collect them into the normal equation array */
-        for ( j=0; j<nboly; j++ ) {
-          for ( i=0; i<nbolx; i++ ) {
-            /* Set the flag corresponding to the zero point of this
-               bolometer */
-            jbol = j*nbolx+i;
-            par[jbol] = 1.0;
-            for ( k=0; k<nsampcycle; k++ ) {
-              /* Set the weight for all the sky grid points relevant
-                 at this path point of this bolometer */
-              for ( l=0; l<ngrid; l++ ) {
-                ipos = i - xmin + (dream->gridpts)[l][0];
-                jpos = j - ymin + (dream->gridpts)[l][1];
-                jgrid = jpos * skywid + ipos;
-                par[nbol+jgrid] = interpwt[ngrid*k+l];
-              }
-              /* Combine the measurement for this bolometer at this
-                 path point into the measurement vector */
-              tv = psbuf[jbol*nsampcycle+k];
-              sc2math_vec ( nunkno, par, tv, kvec, &lssum );
-              /* Unset the weight for all the sky grid points
-                 relevant at this path point of this bolometer */
-              for ( l=0; l<ngrid; l++ ) {
-                ipos = i - xmin + (dream->gridpts)[l][0];
-                jpos = j - ymin + (dream->gridpts)[l][1];
-                jgrid = jpos * skywid + ipos;
-                par[nbol+jgrid] = 0.0;
-              }
-            }
-            /* Unset the flag corresponding to the zero point of
-               this bolometer */
-            par[jbol] = 0.0;
-          }
-        }
-        /* Solve for the pixel values and their rms values */
-        sc2math_sol ( nunkno, nsampcycle*nbol, invmat, kvec, lssum, &lme, 
-                      sme, sint );
-        /* Calculate the number of pixels around the edge of the
-           solved map which should be discarded because they lie
-           outside the area observed directly, and so have low
-           weight */
-        sc2math_gridext ( nvert, dream->jigvert, &vxmin, &vxmax, &vymin, &vymax,
-                          status );
-        outwid = nbolx + vxmax - vxmin;
-        outhgt = nboly + vymax - vymin;
-        zx = vxmin - xmin;
-        zy = vymin - ymin;
-        /* Extract the intensities - sint and sme contain both the
-           solved intensity data and the bolometer offsets  */
-        nelem = (size_t)(outwid*outhgt);
-        solint = smf_malloc( nelem, sizeof(double), 1, status);
-        if ( solint == NULL ) {
-          errRep(FUNC_NAME, "Unable to obtain memory for solint", status);
-          return;
-        }
-        solme = smf_malloc( nelem, sizeof(double), 1, status);
-        if ( solme == NULL ) {
-          errRep(FUNC_NAME, "Unable to obtain memory for solme", status);
-          return;
-        }
-        for ( j=0; j<outhgt; j++ ) {
-          for ( l=0; l<outwid; l++ ) {
-            solint[j*outwid+l] = sint[nbol+(j+zy)*skywid+zx+l];
-            solme[j*outwid+l] = sme[nbol+(j+zy)*skywid+zx+l];
-          }
-        }
-        for ( i=0; i<nbol; i++ ) {
-          pbolzero[i] = sint[i];
-        }
 
-        /* Write the solved intensities and zero offsets */
-        dims[0] = outwid;
-        dims[1] = outhgt;
-        smf_store_image( data, scu2redloc, cycle, 2, dims, nsampcycle, vxmin, vymin,
-                         solint, pbolzero, status );
+      /* Loop over number of images to solve for and store */
+      nimages = ncycles/naver;
+      for ( cycle=0; cycle<nimages; cycle++ ) {
+	/* Extract the raw data of a cycle. */
+	sc2math_get_cycle ( cycle, nsampcycle, ncycles, nbol,
+			    tstream, psbuf, status );
 
-        /* Free memory allocated for output solution pointers */
-        solint = smf_free( solint, status );
-        solme = smf_free( solme, status );
+	sc2math_mapsolve( nsampcycle, (data->dims)[0], (data->dims)[1], gridext, 
+			  dream->gridstep, jigext, dream->jigscal, interpwt, 
+			  invmat, qual, psbuf, maxmap, dims, map, pbolzero, 
+			  status );
+
+	/* Write the image and bolometer zero offsets */
+	smf_store_image( data, scu2redloc, cycle, 2, dims, nsampcycle, 
+			 0, 0, map, pbolzero, status );
       } /* End loop over cycle */
     }
     /* Add a history entry if everything's OK */
     smf_history_write(data, "smf_dreamsolve", "DREAM reconstruction successful", 
                       status);
-    /* Release SCU2RED locator */
+    /* Free up NDF resources */
+    ndfAnnul( &gridndf, status );
+    datAnnul( &drmloc, status );
     datAnnul( &scu2redloc, status );
   } else {
     msgOutif(MSG__VERB," ", 
