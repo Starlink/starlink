@@ -55,6 +55,7 @@
 static AstFrameSet *timeWcs( int subnum, int ntime,const SC2STORETelpar* telpar,
                              const double times[], int * status );
 static double sc2store_tzoffset(void);
+static void sc2store_initialise ( int *status );
 
 /* Private globals */
 
@@ -250,13 +251,7 @@ int *status              /* global status (given and returned) */
 
 /* Initialise Starlink error reporting NDF and start its context */
 
-   if ( sc2store_initialised == 0 )
-   {
-      errBegin ( status );
-      ndfInit ( 0, 0, status );
-      sc2store_initialised = 1;
-   }
-
+   sc2store_initialise( status );
    errMark();
    ndfBegin();
 
@@ -439,12 +434,7 @@ int *status                /* global status (given and returned) */
 
 /* Initialise Starlink error reporting NDF and start its context */
 
-   if ( sc2store_initialised == 0 )
-   {
-      errBegin ( status );
-      ndfInit ( 0, 0, status );
-      sc2store_initialised = 1;
-   }
+   sc2store_initialise( status );
 /*
    errMark();
    ndfBegin();
@@ -1336,13 +1326,7 @@ int *status                /* global status (given and returned) */
 
 /* Initialise Starlink error reporting NDF and start its context */
 
-   if ( sc2store_initialised == 0 )
-   {
-      errBegin ( status );
-      ndfInit ( 0, 0, status );
-      sc2store_initialised = 1;
-   }
-
+   sc2store_initialise( status );
    errMark();
    ndfBegin();
 
@@ -1611,13 +1595,7 @@ int *status              /* global status (given and returned) */
 
 /* Initialise Starlink error reporting NDF and start its context */
 
-   if ( sc2store_initialised == 0 )
-   {
-      errBegin ( status );
-      ndfInit ( 0, 0, status );
-      sc2store_initialised = 1;
-   }
-
+   sc2store_initialise( status );
    errMark();
    ndfBegin();
 
@@ -3374,13 +3352,7 @@ int *status              /* global status (given and returned) */
 
 /* Initialise Starlink error reporting NDF and start its context */
 
-   if ( sc2store_initialised == 0 )
-   {
-      errBegin ( status );
-      ndfInit ( 0, 0, status );
-      sc2store_initialised = 1;
-   }
-
+   sc2store_initialise( status );
    errMark();
    ndfBegin();
 
@@ -3901,4 +3873,41 @@ static double sc2store_tzoffset( void ) {
   diff = difftime( now, gmt_t );
   /* need answer in hours for AST */
   return (diff/3600.0);
+}
+
+/* initialise ERR and NDF */
+
+static void sc2store_initialise ( int * status ) {
+
+   if ( sc2store_initialised == 0 )
+   {
+      errBegin ( status );
+      ndfInit ( 0, NULL, status );
+      sc2store_initialised = 1;
+   }
+
+}
+
+/*+ sc2store_force_initialised - indicate that we have already initialised */
+
+void sc2store_force_initialised
+(
+ int *status
+ )
+/* Description:
+
+   Outside of the DA environment we need to be able to stop 
+   sc2store initialising ERR and NDF. This routine tells sc2store
+   not to bother. This will work so long as sc2store_initialise does
+   not start doing essential initialisations that are not related to
+   ERR or NDF
+
+   Authors:
+    T. Jenness (JAC, Hawaii)
+
+*/
+
+{
+  if (*status != SAI__OK) return;
+  sc2store_initialised = 1;
 }

@@ -628,6 +628,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
       }
 
       /* Read time series data from file */
+      sc2store_force_initialised( status );
       sc2store_rdtstream( pname, "READ", SC2STORE_FLATLEN,
                           SC2STORE__MAXFITS, 
                           &nfits, fitsrec, &colsize, &rowsize, 

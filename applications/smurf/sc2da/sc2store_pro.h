@@ -88,6 +88,14 @@ void sc2store_errconv
 int *status
 );
 
+/*+ sc2store_force_initialised - indicate that we have initialised
+  outside of sc2store */
+
+void sc2store_force_initialised
+(
+ int * status    /* global status (given and returned) */
+ );
+
 /*+ sc2store_free - unmap and close all references to output file */
 
 void sc2store_free
