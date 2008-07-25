@@ -40,7 +40,7 @@
 #include <stdio.h>
 
 #if ! USE_PTHREADS
-int main()
+int main( void )
 {
     printf( "No threads, test skipped\n" );
     return 0;
