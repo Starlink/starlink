@@ -37,6 +37,7 @@
 *     -  Use MSG1_FORM to construct the output message text.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1983, 1984, 1988, 1989, 1991 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1998, 1999, 2001 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
@@ -62,6 +63,7 @@
 *     BDK: Dennis Kelly (ROE)
 *     AJC: Alan Chipperfield (STARLINK)
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -87,6 +89,8 @@
 *        Add CLEAN argument to call MSG1_FORM
 *     22-FEB-2001 (AJC):
 *        Use MSG1_KTOK not EMS1_KTOK
+*     24-JUL-2008 (TIMJ):
+*        Use common block getter
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -102,7 +106,6 @@
       INCLUDE 'MSG_PAR'                 ! MSG_ public constants
 
 *  Global Variables:
-      INCLUDE 'MSG_CMN'                 ! MSG_ global constants
  
 *  Arguments Given:
       CHARACTER * ( * ) PARAM
@@ -117,6 +120,8 @@
 
 *  External Variables:
       EXTERNAL MSG1_BLK          ! Force inclusion of block data
+      EXTERNAL MSG1_GTSTM
+      LOGICAL MSG1_GTSTM
 
 *  Local Variables: 
 *.
@@ -131,7 +136,7 @@
 *     Status is SAI__OK, so form the returned message string.
 *     This will also annul the token table.
          CALL MSG1_FORM(
-     :      PARAM, TEXT, .NOT.MSGSTM, OPSTR, OPLEN, STATUS )
+     :      PARAM, TEXT, .NOT.MSG1_GTSTM(), OPSTR, OPLEN, STATUS )
 
       END IF
 

@@ -1,28 +1,27 @@
-      SUBROUTINE MSG_IFLEV( FILTER )
+      SUBROUTINE MSG1_PTWSZ( SIZE )
 *+
 *  Name:
-*     MSG_IFLEV
+*     MSG1_PTWSZ
 
 *  Purpose:
-*     Return the current filter level for conditional message output.
+*     Put the value of element MSGWSZ into the MSG_CMN common block.
 
 *  Language:
-*     Starlink Fortran 77
+*    Starlink Fortran 77
 
 *  Invocation:
-*     CALL MSG_IFLEV( FILTER )
+*     CALL MSG1_PTWSZ( SIZE )
 
 *  Description:
-*     The value of the current filtering level set for conditional
-*     message output is returned.
-
-*  Arguments:
-*     FILTER = INTEGER (Returned)
-*        The current message filtering level.
+*     This routine sets the value of element MSGWSZ in the MSG_CMN 
+*     common block. This should be used instead of directly accessing the
+*     common block since access from a different shared library may result in
+*     the comm block value being uninitialised by the corresponding BLOCK DATA
+*     module.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2004 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
 *  Licence:
@@ -42,37 +41,26 @@
 *     02111-1307, USA
 
 *  Authors:
-*     PCTR: P.C.T. Rees (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
-*     10-JUN-1991 (PCTR):
+*     1-JUL-2004 (DSB):
 *        Original version.
 *     24-JUL-2008 (TIMJ):
-*        Use Common block accessor
-*     {enter_changes_here}
+*        Copy from msg1_gtwsz
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
-*  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
 
-*  Global Variables:
+      IMPLICIT NONE                     
+      INCLUDE 'MSG_CMN'                 
+      INTEGER SIZE
 
-*  External Variables:
-      INTEGER MSG1_GTINF
-      EXTERNAL MSG1_GTINF
-
-*  Arguments Returned:
-      INTEGER FILTER
-
-*.
-
-*  Return the current value of the message output filter level.
-      FILTER = MSG1_GTINF()
+      MSGWSZ = SIZE
 
       END

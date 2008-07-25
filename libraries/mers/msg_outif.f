@@ -46,6 +46,7 @@
 *        The global status.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1991, 1992 Science & Engineering Research Council.
 *     Copyright (C) 1996, 1999, 2001 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
@@ -69,6 +70,7 @@
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
 *     AJC: A. J. Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     EC: Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
@@ -86,6 +88,8 @@
 *        Use MSG1_KTOK not EMS1_KTOK
 *     02-MAY-2008 (EC):
 *        Fixed logic for MSG__DEBUG
+*     24-JUL-2008 (TIMJ):
+*        Use common block accessor
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -102,7 +106,6 @@
       INCLUDE 'MSG_ERR'          ! MSG_ error codes
 
 *  Global Variables:
-      INCLUDE 'MSG_CMN'          ! MSG_ output filter level
 
 *  Arguments Given:
       INTEGER PRIOR
@@ -114,7 +117,10 @@
       INTEGER STATUS
 
 *  External Variables:
-      EXTERNAL MSG1_BLK          ! Force inclusion of block data
+      EXTERNAL MSG1_GTINF        ! Get message level
+      INTEGER MSG1_GTINF
+      EXTERNAL MSG1_GTSTM        ! Get stream mode
+      LOGICAL MSG1_GTSTM
 
 *  Local Variables:
       INTEGER MSGLEN             ! Message length
@@ -150,11 +156,12 @@
          ELSE
 
 *        Conditionally output the given message.
-            IF ( PRIOR .LE. MSGINF ) THEN
+            IF ( PRIOR .LE. MSG1_GTINF() ) THEN
 
 *           Form the output message string.
                CALL MSG1_FORM(
-     :            PARAM, TEXT, .NOT.MSGSTM, MSGSTR, MSGLEN, STATUS )
+     :              PARAM, TEXT, .NOT.MSG1_GTSTM(), MSGSTR, MSGLEN,
+     :              STATUS )
 
 *           Deliver the message string.
                CALL MSG1_PRINT( MSGSTR( : MSGLEN ), STATUS )

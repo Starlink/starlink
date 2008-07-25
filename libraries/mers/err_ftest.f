@@ -51,6 +51,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'MSG_PAR'
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -82,6 +83,13 @@
       CALL MSG_SETC( 'D', ' MSG_SETC')
       CALL MSG_SETI( 'D', 5)
       CALL MSG_OUT( ' ', 'Combo - ^D', STATUS )
+
+      CALL MSG_IFSET( MSG__VERB )
+      CALL MSG_OUTIF( MSG__DEBUG, ' ', 'Message should not be seen',
+     :     STATUS )
+
+      CALL MSG_OUTIF( MSG__NORM, ' ', 'Message should appear',
+     :     STATUS )
 
 *  Call ERR_REP and ERR_FLUSH.
       CALL ERR_BEGIN( STATUS )

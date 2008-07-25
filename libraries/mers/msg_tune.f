@@ -104,6 +104,8 @@
 *        EMS1_TUNE renamed EMS_TUNE
 *     02-MAY-2008 (TIMJ):
 *        Add MSG__DEBUG level.
+*     24-JUL-2008 (TIMJ):
+*        Use common block setter
 *     {enter_changes_here}
 
 *  Bugs:
@@ -126,7 +128,6 @@
       PARAMETER( MAX_LEVELS = 4 )
 
 *  Global Variables:
-      INCLUDE 'MSG_CMN'          ! MSG_ output filter level
 
 *  Arguments Given:
       CHARACTER*(*) PARAM
@@ -142,6 +143,7 @@
       INTEGER UVALUE               ! Value actually used
       INTEGER LEVEL                ! The required reporting level
       INTEGER LEVELS(MAX_LEVELS)   ! The possible reporting levels
+      INTEGER MSGWSZ               ! Message size from tuning
       CHARACTER*20 UPARAM          ! PARAM in upper case
       CHARACTER*20 TRANS           ! Translation of the environment variable
       CHARACTER*20 PARNAMES(MAX_PARS)  ! Tuning parameter names
@@ -215,9 +217,11 @@
             IF ( UPARAM .EQ. 'SZOUT' ) THEN
                IF ( UVALUE .EQ. 0 ) THEN
                   MSGWSZ = MSG__SZMSG
+                  CALL MSG1_PTWSZ( MSGWSZ )
                   CALL EMS_TUNE( 'SZOUT', MSGWSZ, STATUS )
                ELSE IF ( UVALUE .GT. 0 ) THEN
                   MSGWSZ = MIN( UVALUE, MSG__SZMSG )
+                  CALL MSG1_PTWSZ( MSGWSZ )
                   CALL EMS_TUNE( 'SZOUT', MSGWSZ, STATUS )
                ELSE
                   STATUS = MSG__BTUNE
@@ -226,10 +230,10 @@
 
             ELSE IF ( UPARAM .EQ. 'STREAM' ) THEN
                IF ( UVALUE .EQ. 0 ) THEN
-                  MSGSTM = .FALSE.
+                  CALL MSG1_PTSTM( .FALSE. )
                   CALL EMS_TUNE( 'STREAM', UVALUE, STATUS )
                ELSE IF ( UVALUE .EQ. 1 ) THEN
-                  MSGSTM = .TRUE.
+                  CALL MSG1_PTSTM( .TRUE. )
                   CALL EMS_TUNE( 'STREAM', UVALUE, STATUS )
                ELSE
                   STATUS = MSG__BTUNE

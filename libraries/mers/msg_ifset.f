@@ -55,6 +55,8 @@
 *        Original version.
 *     02-MAY-2008 (TIMJ):
 *        Added MSG__DEBUG
+*     24-JUL-2008 (TIMJ):
+*        Use common block accessor
 *     {enter_changes_here}
 
 *  Bugs:
@@ -71,7 +73,6 @@
       INCLUDE 'MSG_ERR'          ! MSG_ error codes
 
 *  Global Variables:
-      INCLUDE 'MSG_CMN'          ! MSG_ output filter level
 
 *  Arguments Given:
       INTEGER FILTER
@@ -99,7 +100,7 @@
       ELSE
 
 *     Assign the message filtering level.
-         MSGINF = FILTER
+         CALL MSG1_PTINF( FILTER )
       END IF
 
       END

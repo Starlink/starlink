@@ -62,7 +62,8 @@ F_ROUTINES = err1_bell.f err1_print.f \
              msg_fmtr.f msg_iflev.f msg_ifset.f msg_load.f msg_out.f \
              msg_outif.f \
              msg_tune.f \
-             msg1_gtinf.f msg1_gtwsz.f msg1_gtstm.f msg1_ptinf.f
+             msg1_gtinf.f msg1_gtwsz.f msg1_gtstm.f msg1_ptinf.f \
+	     msg1_ptstm.f msg1_ptwsz.f
 
 
 F_ROUTINES_STAND = msg1_form_stand.f
