@@ -45,7 +45,7 @@
 *     2008-04-30 (TIMJ):
 *        Add units, title and label.
 *     2008-07-24 (TIMJ):
-*        Support obstype and obsmode
+*        Support obstype and obsmode. Minor tidying.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -84,6 +84,7 @@
 #include "mers.h"
 #include "msg_par.h"
 #include "prm_par.h"
+#include "dat_par.h"
 
 /* SMURF includes */
 #include "smf.h"
@@ -127,17 +128,25 @@ void smf_dump_smfData( const smfData *data, int showflags, int *status) {
   /* Number of dimensions of data array */
   ndims = data->ndims;
   msgSeti("N",(int)ndims);
-  msgOut("", "  ndims = ^N", status);
+  if(ndims > DAT__MXDIM) {
+    msgSetc( "MSG", " TOO LARGE!");
+  } else {
+    msgSetc( "MSG", " ");
+  }
+  msgOut("", "  ndims = ^N ^MSG", status);
+
 
   /* Size of array in each dimension */
-  for ( i=0; i< ndims; i++) {
-    sprintf( string, "%d", (int)(data->dims)[i]);
-    msgSetc("D", string);
-    if ( i != ndims-1 ) {
-      msgSetc("D", "x");
+  if (ndims <= DAT__MXDIM) {
+    for ( i=0; i< ndims; i++) {
+      sprintf( string, "%" DIM_T_FMT, (data->dims)[i]);
+      msgSetc("D", string);
+      if ( i != ndims-1 ) {
+        msgSetc("D", "x");
+      }
     }
+    msgOut("", "  dims  = ^D", status);
   }
-  msgOut("", "  dims  = ^D", status);
 
   /* Are data time-ordered? */
   msgSeti("N",data->isTordered);
@@ -157,17 +166,15 @@ void smf_dump_smfData( const smfData *data, int showflags, int *status) {
   } else {
     msgSetc("D","D: NULL,");
   }
-  msgSetc("D"," ");
   if ( (data->pntr)[1] != NULL ) {
-    msgSetc("D","V: OK,");
+    msgSetc("D"," V: OK,");
   } else {
-    msgSetc("D","V: NULL,");
+    msgSetc("D"," V: NULL,");
   }
-  msgSetc("D"," ");
   if ( (data->pntr)[2] != NULL ) {
-    msgSetc("D","Q: OK");
+    msgSetc("D"," Q: OK");
   } else {
-    msgSetc("D","Q: NULL");
+    msgSetc("D"," Q: NULL");
   }
   msgOut("", "  pntr = ^D", status);
 
