@@ -253,23 +253,29 @@ void smf_simplerebinmap( double *data, double *variance, int *lut,
       /* Variance also needs re-normalization in sampvar case */
       
       for( i=0; i<msize; i++ ) {      
-	if( !mapweight[i] || (hitsmap[i] < SMF__MINSTATSAMP) ) {
-	  /* If 0 weight set pixels to bad */
-	  mapweight[i] = VAL__BADD;
-	  map[i] = VAL__BADD;
-	  mapvar[i] = VAL__BADD;
+        if( !mapweight[i] ) {
+          /* If 0 weight set pixels to bad */
+          mapweight[i] = VAL__BADD;
+          map[i] = VAL__BADD;
+          mapvar[i] = VAL__BADD;
 	} else {
 	  /* Otherwise re-normalize */
 	  thisweight = 1/mapweight[i];
 	  map[i] *= thisweight;
-	  mapvar[i] = (mapvar[i]*thisweight - map[i]*map[i])/hitsmap[i];
+
+          /* variance only reliable if we had enough samples */
+          if( hitsmap[i] >= SMF__MINSTATSAMP ) {
+            mapvar[i] = (mapvar[i]*thisweight - map[i]*map[i])/hitsmap[i];
+          } else {
+            mapvar[i] = VAL__BADD;
+          }
 	}
       }
     } else {
       /* Re-normalization for error propagation case */
 
       for( i=0; i<msize; i++ ) {      
-	if( !mapweight[i] || (hitsmap[i] < SMF__MINSTATSAMP) ) {
+	if( !mapweight[i] ) { 
 	  /* If 0 weight set pixels to bad */
 	  mapweight[i] = VAL__BADD;
 	  map[i] = VAL__BADD;
@@ -278,6 +284,11 @@ void smf_simplerebinmap( double *data, double *variance, int *lut,
 	  /* Otherwise re-normalize */
 	  mapvar[i] = 1/mapweight[i];
 	  map[i] *= mapvar[i];
+
+          /* variance only reliable if we had enough samples */
+          if( hitsmap[i] < SMF__MINSTATSAMP ) {
+            mapvar[i] = VAL__BADD;
+          }
 	}
       }
     }
