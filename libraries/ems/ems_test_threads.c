@@ -47,6 +47,10 @@ int main()
 }
 #else
 
+void *make_report( void *threadid );
+void *make_report_facility( void *threadid );
+void *make_report_load( void *threadid );
+
 #include <sae_par.h>
 #include <ems.h>
 #include <ems_par.h>
@@ -59,10 +63,10 @@ int main()
 
 void *make_report( void *threadid )
 {
-    int tid;
+    intptr_t tid;
     int status = EMS__TEST;
 
-    tid = (int) threadid;
+    tid = (intptr_t) threadid;
     if ( tid != 0 && tid != 3 ) {
 
         /* Basic error handling. */
@@ -76,10 +80,10 @@ void *make_report( void *threadid )
 
 void *make_report_facility( void *threadid )
 {
-    int tid;
+    intptr_t tid;
     int status = EMS__TEST;
 
-    tid = (int) threadid;
+    tid = (intptr_t) threadid;
     if ( tid != 0 && tid != 3 ) {
 
         /* Test facility lookup. */
@@ -94,14 +98,14 @@ void *make_report_facility( void *threadid )
 
 void *make_report_load( void *threadid )
 {
-    int tid;
+    intptr_t tid;
     int status = EMS__TEST;
     char param[EMS__SZPAR+1];
     int parlen;
     char opstr[EMS__SZMSG];
     int oplen;
 
-    tid = (int) threadid;
+    tid = (intptr_t) threadid;
     if ( tid != 0 && tid != 3 ) {
 
         /* Basic error handling. */
@@ -124,11 +128,11 @@ void *make_report_load( void *threadid )
     return NULL;
 }
 
-int main ( int argc, char *argv[] )
+int main ( void )
 {
     pthread_t threads[ NUM_THREADS ];
     int rc;
-    int t;
+    intptr_t t;
     int status = SAI__OK;
 
     /* Mandated for threads, also required to stop immediate delivery. */

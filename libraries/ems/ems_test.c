@@ -42,7 +42,7 @@
 #include <ems_par.h>
 #include <f77.h>
 
-int main(){
+int main( void ){
    int status;
    DECLARE_INTEGER( fstatus );
    DECLARE_CHARACTER( err, 5 );
