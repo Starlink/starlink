@@ -36,10 +36,12 @@ liberr_la_SOURCES = \
 liberr_standalone_la_SOURCES = \
 	$(F_ROUTINES_STAND) \
 	$(F_ROUTINES_STAND_SED) \
+	$(C_ROUTINES_STAND_SED) \
         $(C_ROUTINES_STAND) \
 	$(C_INTERFACE_STAND) \
 	$(F_INTERFACE_STAND) \
 	$(F_ROUTINES_UT) \
+	$(C_ROUTINES_UT) \
 	$(PRIVATE_INCLUDES)
 liberr_standalone_la_LIBADD = liberr.la
 
@@ -49,10 +51,11 @@ liberr_adam_la_SOURCES = \
 	$(C_INTERFACE_ADAM) \
 	$(F_INTERFACE_ADAM) \
 	$(F_ROUTINES_UT) \
+	$(C_ROUTINES_UT) \
 	$(PRIVATE_INCLUDES)
 liberr_adam_la_LIBADD = liberr.la
 
-PRIVATE_INCLUDES = ERR_CMN ERR_SYS MSG_CMN MSG_SYS mers_f77.h
+PRIVATE_INCLUDES = ERR_CMN ERR_SYS MSG_CMN MSG_SYS mers_f77.h mers1.h
 
 F_ROUTINES = err1_bell.f err1_print.f \
              err_fioer.f err_flbel.f err_flush.f \
@@ -72,19 +75,23 @@ C_ROUTINES_STAND = msgBell_stand.c msgSync_stand.c
 
 F_INTERFACE_STAND = msg_bell_stand.c msg_sync_stand.c
 
-F_ROUTINES_STAND_SED = err1_prerr_stand.f msg1_print_stand.f
+F_ROUTINES_STAND_SED = msg1_print_stand.f
 
-F_ROUTINES_ADAM = err1_prerr_adam.f err_clear_adam.f err_start_adam.f \
+C_ROUTINES_STAND_SED = err1Prerr_stand.c
+
+F_ROUTINES_ADAM = err_clear_adam.f err_start_adam.f \
                   err_stop_adam.f \
                   msg1_form_adam.f msg1_genv_adam.f msg1_gkey_adam.f \
                   msg1_gref_adam.f msg1_print_adam.f \
                   msg_bell_adam.f msg_ifget_adam.f msg_sync_adam.f 
 
-C_ROUTINES_ADAM =
+C_ROUTINES_ADAM = err1Prerr_adam.c
 
 F_INTERFACE_ADAM = 
 
-F_ROUTINES_UT = msg1_gesc.f msg1_gnam.f msg1_putc.f msg1_ktok.f msg1_rform.f
+F_ROUTINES_UT = msg1_gesc.f msg1_gnam.f msg1_putc.f msg1_rform.f
+
+C_ROUTINES_UT = msg1Ktok.c
 
 F_BLOCK_DATA_FILES = msg1_blk.f err1_blk.f
 
