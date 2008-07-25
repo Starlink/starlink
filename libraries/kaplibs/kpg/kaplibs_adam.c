@@ -57,6 +57,8 @@
 *        Added kpg1Gilst.
 *     15-JUL-2008 (TIMJ):
 *        const and size_t to match Grp
+*     24-JUL-2008 (TIMJ):
+*        Use more robust F77_CREATE_EXPORT_CHARACTER.
 *     {enter_further_changes_here}
 
 *-
@@ -149,12 +151,10 @@ void kpg1Gtgrp( const char *param, Grp **grp, size_t *size, int *status ){
    DECLARE_INTEGER(SIZE);
    DECLARE_INTEGER(STATUS);
 
-   F77_CREATE_CHARACTER(PARAM,strlen( param ));
-
    IGRP = grpC2F( *grp, status );
    if ( *status != SAI__OK ) return;
 
-   F77_EXPORT_CHARACTER(param,PARAM,PARAM_length);
+   F77_CREATE_EXPORT_CHARACTER(param,PARAM);
    F77_EXPORT_INTEGER(*status,STATUS);
 
    F77_CALL(kpg1_gtgrp)( CHARACTER_ARG(PARAM),
@@ -199,8 +199,7 @@ void kpg1Wrlst( const char *param, int arrdim, int npos, int nax, double *pos,
    DECLARE_LOGICAL(PNULL);
    DECLARE_INTEGER(STATUS);
 
-   F77_CREATE_CHARACTER(PARAM,strlen( param ));
-   F77_EXPORT_CHARACTER(param,PARAM,PARAM_length);
+   F77_CREATE_EXPORT_CHARACTER(param, PARAM);
    F77_EXPORT_INTEGER(arrdim,ARRDIM);
    F77_EXPORT_INTEGER(npos,NPOS);
    F77_EXPORT_INTEGER(nax,NAX);
@@ -208,8 +207,7 @@ void kpg1Wrlst( const char *param, int arrdim, int npos, int nax, double *pos,
    F77_EXPORT_DOUBLE_ARRAY( pos, POS, arrdim*nax );
    F77_EXPORT_INTEGER(ifrm,IFRM);
    F77_EXPORT_INTEGER( astP2I( iwcs ), IWCS );
-   F77_CREATE_CHARACTER(TITLE,strlen( title ));
-   F77_EXPORT_CHARACTER(title,TITLE,TITLE_length);
+   F77_CREATE_EXPORT_CHARACTER(title,TITLE);
    F77_EXPORT_INTEGER(id0,ID0);
    F77_CREATE_INTEGER_ARRAY( IDENTS, npos );
    F77_EXPORT_INTEGER_ARRAY( idents, IDENTS, npos );
@@ -268,8 +266,7 @@ void kpg1Wrtab( const char *param, int arrdim, int npos, int nax, double *pos,
    DECLARE_LOGICAL(PNULL);
    DECLARE_INTEGER(STATUS);
 
-   F77_CREATE_CHARACTER(PARAM,strlen( param ));
-   F77_EXPORT_CHARACTER(param,PARAM,PARAM_length);
+   F77_CREATE_EXPORT_CHARACTER(param,PARAM);
    F77_EXPORT_INTEGER(arrdim,ARRDIM);
    F77_EXPORT_INTEGER(npos,NPOS);
    F77_EXPORT_INTEGER(nax,NAX);
@@ -277,8 +274,7 @@ void kpg1Wrtab( const char *param, int arrdim, int npos, int nax, double *pos,
    F77_EXPORT_DOUBLE_ARRAY( pos, POS, arrdim*nax );
    F77_EXPORT_INTEGER(ifrm,IFRM);
    F77_EXPORT_INTEGER( astP2I( iwcs ), IWCS );
-   F77_CREATE_CHARACTER(TITLE,strlen( title ));
-   F77_EXPORT_CHARACTER(title,TITLE,TITLE_length);
+   F77_CREATE_EXPORT_CHARACTER(title, TITLE);
    F77_EXPORT_INTEGER(id0,ID0);
    F77_CREATE_INTEGER_ARRAY( IDENTS, npos );
    F77_EXPORT_INTEGER_ARRAY( idents, IDENTS, npos );
@@ -330,14 +326,12 @@ void kpg1Rgndf( const char *param, size_t maxsiz, size_t minsiz,
    DECLARE_INTEGER(SIZE);
    DECLARE_INTEGER(STATUS);
 
-   F77_CREATE_CHARACTER( PARAM, strlen( param ) );
-   F77_EXPORT_CHARACTER( param, PARAM, PARAM_length );
+   F77_CREATE_EXPORT_CHARACTER( param, PARAM );
 
    F77_EXPORT_INTEGER( maxsiz, MAXSIZ );
    F77_EXPORT_INTEGER( minsiz, MINSIZ );
 
-   F77_CREATE_CHARACTER( TEXT, strlen( text ) );
-   F77_EXPORT_CHARACTER( text, TEXT, TEXT_length );
+   F77_CREATE_EXPORT_CHARACTER( text, TEXT );
 
    F77_EXPORT_INTEGER( *status, STATUS );
 
@@ -384,14 +378,12 @@ void kpg1Wgndf( const char *param, const Grp *grp0, size_t maxsiz,
 
    F77_EXPORT_INTEGER( grpC2F( grp0, status ), IGRP0 );
  
-   F77_CREATE_CHARACTER( PARAM, strlen( param ) );
-   F77_EXPORT_CHARACTER( param, PARAM, PARAM_length );
+   F77_CREATE_EXPORT_CHARACTER( param, PARAM );
 
    F77_EXPORT_INTEGER( maxsiz, MAXSIZ );
    F77_EXPORT_INTEGER( minsiz, MINSIZ );
 
-   F77_CREATE_CHARACTER( TEXT, strlen( text ) );
-   F77_EXPORT_CHARACTER( text, TEXT, TEXT_length );
+   F77_CREATE_EXPORT_CHARACTER( text, TEXT );
 
    F77_EXPORT_INTEGER( *status, STATUS );
 
@@ -439,8 +431,7 @@ void kpg1Gtaxv( const char *param, int mxval, int exact, AstFrame *frame,
    DECLARE_INTEGER(NVAL);
    DECLARE_INTEGER(STATUS);
 
-   F77_CREATE_CHARACTER( PARAM, strlen( param ) );
-   F77_EXPORT_CHARACTER( param, PARAM, PARAM_length );
+   F77_CREATE_EXPORT_CHARACTER( param, PARAM);
    F77_EXPORT_INTEGER( mxval, MXVAL );
    F77_EXPORT_LOGICAL( exact, EXACT );
    F77_EXPORT_INTEGER( astP2I( frame ), FRAME );
@@ -498,8 +489,7 @@ void kpg1Gilst( int lonum, int upnum, int maxlin, const char *param,
    F77_EXPORT_INTEGER( lonum, LONUM );
    F77_EXPORT_INTEGER( upnum, UPNUM );
    F77_EXPORT_INTEGER( maxlin, MAXLIN );
-   F77_CREATE_CHARACTER( PARAM, strlen( param ) );
-   F77_EXPORT_CHARACTER( param, PARAM, PARAM_length );
+   F77_CREATE_EXPORT_CHARACTER( param, PARAM );
    F77_CREATE_DOUBLE_ARRAY( FLAG, flag );
    F77_ASSOC_DOUBLE_ARRAY( FLAG, flag );
    F77_CREATE_DOUBLE_ARRAY( NUMBER, number );

@@ -64,6 +64,8 @@
 *        Use starmem
 *     15-JUL-2008 (TIMJ):
 *        const and size_t to match Grp
+*     24-JUL-2008 (TIMJ):
+*        Use more robust F77_CREATE_EXPORT_CHARACTER
 *     {enter_further_changes_here}
 
 *-
@@ -482,8 +484,7 @@ void irqNew( int indf, const char *xname, IRQLocs **locs, int *status ){
    *locs= NULL;
 
    F77_EXPORT_INTEGER( indf, INDF );
-   F77_CREATE_CHARACTER( XNAME, strlen( xname ) );
-   F77_EXPORT_CHARACTER( xname, XNAME, XNAME_length );
+   F77_CREATE_EXPORT_CHARACTER( xname, XNAME );
    F77_EXPORT_INTEGER( *status, STATUS );
 
    F77_CALL(irq_new)( INTEGER_ARG(&INDF),
@@ -600,11 +601,9 @@ void irqAddqn( const IRQLocs *locs, const char *qname, int deflt,
    HDS_EXPORT_CLOCATOR( locs->loc[3], LOCS[3], status );
    HDS_EXPORT_CLOCATOR( locs->loc[4], LOCS[4], status );
 
-   F77_CREATE_CHARACTER( QNAME, strlen( qname ) );
-   F77_EXPORT_CHARACTER( qname, QNAME, QNAME_length );
+   F77_CREATE_EXPORT_CHARACTER( qname, QNAME );
    F77_EXPORT_LOGICAL( deflt, DEFLT );
-   F77_CREATE_CHARACTER( COMMNT, strlen( commnt ) );
-   F77_EXPORT_CHARACTER( commnt, COMMNT, COMMNT_length );
+   F77_CREATE_EXPORT_CHARACTER( commnt, COMMNT );
    F77_EXPORT_INTEGER( *status, STATUS );
 
    F77_CALL(irq_addqn)( CHARACTER_ARRAY_ARG(LOCS),
@@ -651,8 +650,7 @@ void irqSetqm( const IRQLocs *locs, int bad, const char *qname, int size,
    HDS_EXPORT_CLOCATOR( locs->loc[4], LOCS[4], status );
 
    F77_EXPORT_LOGICAL( bad, BAD );
-   F77_CREATE_CHARACTER( QNAME, strlen( qname ) );
-   F77_EXPORT_CHARACTER( qname, QNAME, QNAME_length );
+   F77_CREATE_EXPORT_CHARACTER( qname, QNAME );
    F77_EXPORT_INTEGER( size, SIZE );
    F77_CREATE_REAL_ARRAY( MASK, size );
    F77_EXPORT_REAL_ARRAY( mask, MASK, size );
@@ -702,8 +700,7 @@ void irqRwqn( const IRQLocs *locs, const char *qname, int set, int newval,
    HDS_EXPORT_CLOCATOR( locs->loc[3], LOCS[3], status );
    HDS_EXPORT_CLOCATOR( locs->loc[4], LOCS[4], status );
 
-   F77_CREATE_CHARACTER( QNAME, strlen( qname ) );
-   F77_EXPORT_CHARACTER( qname, QNAME, QNAME_length );
+   F77_CREATE_EXPORT_CHARACTER( qname, QNAME );
 
    F77_EXPORT_LOGICAL( set, SET );
    F77_EXPORT_LOGICAL( newval, NEWVAL );
@@ -750,8 +747,7 @@ void irqFxbit( const IRQLocs *locs, const char *qname, int bit, int *fixbit,
    HDS_EXPORT_CLOCATOR( locs->loc[3], LOCS[3], status );
    HDS_EXPORT_CLOCATOR( locs->loc[4], LOCS[4], status );
 
-   F77_CREATE_CHARACTER( QNAME, strlen( qname ) );
-   F77_EXPORT_CHARACTER( qname, QNAME, QNAME_length );
+   F77_CREATE_EXPORT_CHARACTER( qname, QNAME );
    F77_EXPORT_INTEGER( bit, BIT );
    F77_EXPORT_INTEGER( *status, STATUS );
 
@@ -799,8 +795,7 @@ void irqGetqn( const IRQLocs *locs, const char *qname, int *fixed, int *value,
    HDS_EXPORT_CLOCATOR( locs->loc[3], LOCS[3], status );
    HDS_EXPORT_CLOCATOR( locs->loc[4], LOCS[4], status );
 
-   F77_CREATE_CHARACTER( QNAME, strlen( qname ) );
-   F77_EXPORT_CHARACTER( qname, QNAME, QNAME_length );
+   F77_CREATE_EXPORT_CHARACTER( qname, QNAME );
    F77_CREATE_CHARACTER( COMMNT, commnt_len-1 );
    F77_EXPORT_INTEGER( *status, STATUS );
 
@@ -848,8 +843,7 @@ void irqRbit( const IRQLocs *locs, const char *qname, int *bit, int *status ){
    HDS_EXPORT_CLOCATOR( locs->loc[3], LOCS[3], status );
    HDS_EXPORT_CLOCATOR( locs->loc[4], LOCS[4], status );
 
-   F77_CREATE_CHARACTER( QNAME, strlen( qname ) );
-   F77_EXPORT_CHARACTER( qname, QNAME, QNAME_length );
+   F77_CREATE_EXPORT_CHARACTER( qname, QNAME );
    F77_EXPORT_INTEGER( *status, STATUS );
 
    F77_CALL(irq_rbit)( CHARACTER_ARRAY_ARG(LOCS),
@@ -884,8 +878,7 @@ void kpg1Wwrt( AstObject *obj, const char *name, const HDSLoc *loc,
 
    F77_EXPORT_INTEGER( astP2I( obj ), IAST );
 
-   F77_CREATE_CHARACTER( NAME, strlen( name ) );
-   F77_EXPORT_CHARACTER( name, NAME, NAME_length );
+   F77_CREATE_EXPORT_CHARACTER( name, NAME );
 
    if ( loc == NULL ) {
       F77_EXPORT_LOCATOR( DAT__ROOT, LOC );
@@ -930,9 +923,7 @@ void kpg1Wread( const HDSLoc *loc, const char *name, AstObject **obj,
       HDS_EXPORT_CLOCATOR( loc, LOC, status );
    }
 
-   F77_CREATE_CHARACTER( NAME, strlen( name ) );
-   F77_EXPORT_CHARACTER( name, NAME, NAME_length );
-
+   F77_CREATE_EXPORT_CHARACTER( name, NAME );
    F77_EXPORT_INTEGER( *status, STATUS );
 
    F77_CALL(kpg1_wread)( CHARACTER_ARG(LOC),
@@ -1272,8 +1263,7 @@ void kpg1Asffr( AstFrameSet *target, const char *domain, int *ifrm, int *status 
    DECLARE_INTEGER(STATUS);
 
    F77_EXPORT_INTEGER( astP2I( target ), TARGET );
-   F77_CREATE_CHARACTER( DOMAIN, strlen( domain ) );
-   F77_EXPORT_CHARACTER( domain, DOMAIN, DOMAIN_length );
+   F77_CREATE_EXPORT_CHARACTER( domain, DOMAIN );
    F77_EXPORT_INTEGER( *status, STATUS );
 
    F77_CALL(kpg1_asffr)( INTEGER_ARG(&TARGET),
@@ -1317,8 +1307,7 @@ void kpg1Datcp( HDSLoc *loc1, HDSLoc *loc2, const char *name, int *status ){
       HDS_EXPORT_CLOCATOR( loc2, LOC2, status );
    }
 
-   F77_CREATE_CHARACTER( NAME, strlen( name ) );
-   F77_EXPORT_CHARACTER( name, NAME, NAME_length );
+   F77_CREATE_EXPORT_CHARACTER( name, NAME );
    F77_EXPORT_INTEGER( *status, STATUS );
 
    F77_CALL(kpg1_datcp)( CHARACTER_ARG(LOC1),
