@@ -19,6 +19,10 @@
 *     the comm block value being uninitialised by the corresponding BLOCK DATA
 *     module.
 
+*  Arguments:
+*     STREAM = _LOGICAL (Given)
+*        Stream mode.
+
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2004 Central Laboratory of the Research Councils.
@@ -59,7 +63,7 @@
 
       IMPLICIT NONE
       INCLUDE 'MSG_CMN'           
-      INTEGER STREAM
+      LOGICAL STREAM
 
       MSGSTM = STREAM
 
