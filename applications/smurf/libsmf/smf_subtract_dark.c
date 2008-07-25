@@ -41,6 +41,8 @@
 *  History:
 *     21-JUL-2008 (TIMJ):
 *        Initial version.
+*     25-JUL-2008 (TIMJ):
+*        More robust error checking.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -123,6 +125,13 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
     return;
   }
 
+  if ( (indata->pntr)[0] == NULL) {
+    *status = SAI__ERROR;
+    errRep( " ", "Input data array for dark subtraction is a null pointer",
+            status);
+    return;
+  }
+
   /* calculate number of bolometers */
   nbols = (indata->dims)[0] * (indata->dims)[1];
 
@@ -136,7 +145,7 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
               status );
       return;
     }
-    
+
     dark = (dark1->pntr)[0];
 
     break;
@@ -194,17 +203,25 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
     case SMF__DKSUB_NEXT:
     case SMF__DKSUB_MEAN:
 
-    inptr = (indata->pntr)[0];
-    for (i = 0; i < (indata->dims)[2]; i++) {
-       size_t j;
-       size_t startidx = i * nbols;
-       int * slice = &(inptr[startidx]);
-       for (j = 0; j < nbols; j++) {
-         slice[j] -= dark[j];
-       }
-    }    
+      if (dark == NULL && *status == SAI__OK) {
+        *status = SAI__ERROR;
+        errRep(" ","Selected dark frame has a null pointer for data array",
+               status );
+      }
 
-    break;
+      if (*status == SAI__OK) {
+        inptr = (indata->pntr)[0];
+        for (i = 0; i < (indata->dims)[2]; i++) {
+          size_t j;
+          size_t startidx = i * nbols;
+          int * slice = &(inptr[startidx]);
+          for (j = 0; j < nbols; j++) {
+            slice[j] -= dark[j];
+          }
+        }
+      }
+      break;
+
     default:
       if (*status == SAI__OK) {
         *status = SAI__ERROR;
