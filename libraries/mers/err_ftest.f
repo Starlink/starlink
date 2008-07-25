@@ -13,6 +13,7 @@
 *     Test calls to the ERR/MSG libraries.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1993 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -34,11 +35,14 @@
 
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     29-SEP-1993 (PCTR):
 *        Original version.
+*     20-JUL-2008 (TIMJ):
+*        Add features for C port.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -83,6 +87,41 @@
       CALL MSG_SETC( 'D', ' MSG_SETC')
       CALL MSG_SETI( 'D', 5)
       CALL MSG_OUT( ' ', 'Combo - ^D', STATUS )
+
+      CALL MSG_SETC('D', 'A')
+      CALL MSG_SETC('D', 'B')
+      CALL MSG_SETC('D', 'C')
+      CALL MSG_SETC('D', 'D')
+      CALL MSG_SETC('D', 'E')
+      CALL MSG_OUT( ' ','Should be ABCDE - ^D', STATUS)
+      CALL ERR_BEGIN( STATUS )
+      CALL ERR_MARK
+      CALL MSG_SETC('D', 'A')
+      CALL MSG_SETC('D', 'B')
+      CALL MSG_SETC('D', 'C')
+      CALL MSG_SETC('D', 'D')
+      CALL MSG_SETC('D', 'E')
+      CALL MSG_OUT( ' ','Should be ABCDE - ^D', STATUS)
+      CALL ERR_RLSE
+      CALL MSG_SETC('D', 'A')
+      CALL MSG_SETC('D', 'B')
+      CALL MSG_SETC('D', 'C')
+      CALL MSG_SETC('D', 'D')
+      CALL MSG_SETC('D', 'E')
+      CALL MSG_OUT( ' ','Should be ABCDE - ^D', STATUS)
+      CALL MSG_SETC('D', 'A')
+      CALL MSG_SETC('D', 'B')
+      CALL MSG_SETC('D', 'C')
+      CALL MSG_SETC('D', 'D')
+      CALL MSG_SETC('D', 'E')
+      CALL MSG_OUT( ' ','Should be ABCDE - ^D', STATUS)
+      CALL ERR_END( STATUS )
+      CALL MSG_SETC('D', 'A')
+      CALL MSG_SETC('D', 'B')
+      CALL MSG_SETC('D', 'C')
+      CALL MSG_SETC('D', 'D')
+      CALL MSG_SETC('D', 'E')
+      CALL MSG_OUT( ' ','Should be ABCDE - ^D', STATUS)
 
       CALL MSG_IFSET( MSG__VERB, STATUS )
       CALL MSG_OUTIF( MSG__DEBUG, ' ', 'Message should not be seen',
