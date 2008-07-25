@@ -208,10 +208,10 @@
 #define FUNC_NAME "smf_iteratemap"
 
 void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, 
-		     AstFrameSet *outfset, int moving, 
-	             int *lbnd_out, int *ubnd_out, size_t maxmem, 
+                     AstFrameSet *outfset, int moving, 
+                     int *lbnd_out, int *ubnd_out, size_t maxmem, 
                      double *map, unsigned int *hitsmap, double *mapvar, 
-		     double *weights, int *status ) {
+                     double *weights, int *status ) {
 
   /* Local Variables */
   size_t aiter;                 /* Actual iterations of sigma clipper */
@@ -331,14 +331,14 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       errRep(FUNC_NAME, "NUMITER cannot be 0", status);      
     } else {
       if( numiter < 0 ) {
-	/* If negative, iterate to convergence or abs(numiter), whichever comes
+        /* If negative, iterate to convergence or abs(numiter), whichever comes
            first */
-	maxiter = abs(numiter);
-	untilconverge = 1;
+        maxiter = abs(numiter);
+        untilconverge = 1;
       } else {
-	/* Otherwise iterate a fixed number of times */
-	maxiter = numiter;
-	untilconverge = 0;
+        /* Otherwise iterate a fixed number of times */
+        maxiter = numiter;
+        untilconverge = 0;
       }
     }
 
@@ -351,7 +351,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       *status = SAI__ERROR;
       msgSetd("CHITOL",chitol);
       errRep(FUNC_NAME, 
-	     "SMF_ITERATEMAP: CHITOL is ^CHITOL, must be > 0", status);      
+             "SMF_ITERATEMAP: CHITOL is ^CHITOL, must be > 0", status);      
     }
 
     /* Do iterations completely in memory - minimize disk I/O */
@@ -361,12 +361,12 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
     if( memiter ) {
       msgOutif(MSG__VERB, " ", 
-	       "SMF_ITERATEMAP: MEMITER set; perform iterations in memory",
-	     status );
+               "SMF_ITERATEMAP: MEMITER set; perform iterations in memory",
+               status );
     } else {
       msgOutif(MSG__VERB, " ", 
-	     "SMF_ITERATEMAP: MEMITER not set; perform iterations on disk",
-	     status );
+               "SMF_ITERATEMAP: MEMITER not set; perform iterations on disk",
+               status );
     }
 
     /* Method to use for calculating the variance map */
@@ -376,12 +376,12 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
     if( varmapmethod ) {
       msgOutif(MSG__VERB, " ", 
-	     "SMF_ITERATEMAP: Will use sample variance to estimate variance map",
-	     status );
+               "SMF_ITERATEMAP: Will use sample variance to estimate variance map",
+               status );
     } else {
       msgOutif(MSG__VERB, " ", 
-	     "SMF_ITERATEMAP: Will use error propagation to estimate variance map",
-	     status );
+               "SMF_ITERATEMAP: Will use error propagation to estimate variance map",
+               status );
     }
 
     /* Will we export components to NDF at the end? */
@@ -401,10 +401,10 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
     if( astMapGet0I( keymap, "DCBOX", &temp ) ) {
       if( temp < 0 ) {
-	*status = SAI__ERROR;
-	errRep(FUNC_NAME, "dcbox cannot be < 0.", status );
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "dcbox cannot be < 0.", status );
       } else {
-	dcbox = (dim_t) temp;
+        dcbox = (dim_t) temp;
       }
     } else {
       dcbox = 0;
@@ -420,10 +420,10 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
     if( astMapGet0I( keymap, "SPIKEITER", &temp ) ) {
       if( temp < 0 ) {
-	*status = SAI__ERROR;
-	errRep(FUNC_NAME, "spikeiter cannot be < 0.", status );
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "spikeiter cannot be < 0.", status );
       } else {
-	spikeiter = (size_t) temp;
+        spikeiter = (size_t) temp;
       }
     } else {
       spikeiter = 0;
@@ -442,12 +442,12 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     }
 
     if( !astMapGet1D( keymap, "FILT_NOTCHLOW", SMF__MXNOTCH, &f_nnotch, 
-                     f_notchlow ) ) {
+                      f_notchlow ) ) {
       f_nnotch=0;
     }
 
     if( !astMapGet1D( keymap, "FILT_NOTCHHIGH", SMF__MXNOTCH, &f_nnotch2, 
-                     f_notchhigh ) ) {
+                      f_notchhigh ) ) {
       f_nnotch2=0;
     }
 
@@ -467,27 +467,27 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     if( astMapGet0D( keymap, "MAXLEN", &dtemp ) ) {
 
       if( dtemp < 0.0 ) {
-	/* Trap negative MAXLEN */
-	*status = SAI__ERROR;
-	errRep(FUNC_NAME, "Negative value for MAXLEN supplied.", status);
+        /* Trap negative MAXLEN */
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "Negative value for MAXLEN supplied.", status);
       } else if( dtemp == 0 ) {
-	/* 0 is OK... gets ignored later */
-	maxlen = 0;
+        /* 0 is OK... gets ignored later */
+        maxlen = 0;
       } else {
-	/* Obtain sample length from header of first file in igrp */
-	smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &data, status );
-	if( (*status == SAI__OK) && (data->hdr) ) {
-	  smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
+        /* Obtain sample length from header of first file in igrp */
+        smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &data, status );
+        if( (*status == SAI__OK) && (data->hdr) ) {
+          smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
 
-	  if( steptime > 0 ) {
-	    maxlen = (dim_t) (dtemp / steptime);
-	  } else {
-	    /* Trap invalud sample length in header */
-	    *status = SAI__ERROR;
-	    errRep(FUNC_NAME, "Invalid STEPTIME in FITS header.", status);
-	  }
-	}
-	smf_close_file( &data, status );
+          if( steptime > 0 ) {
+            maxlen = (dim_t) (dtemp / steptime);
+          } else {
+            /* Trap invalud sample length in header */
+            *status = SAI__ERROR;
+            errRep(FUNC_NAME, "Invalid STEPTIME in FITS header.", status);
+          }
+        }
+        smf_close_file( &data, status );
       }
 
     } else {
@@ -498,10 +498,10 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
     if( astMapGet0I( keymap, "PADSTART", &temp ) ) {
       if( temp < 0 ) {
-	*status = SAI__ERROR;
-	errRep(FUNC_NAME, "PADSTART cannot be < 0.", status );
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "PADSTART cannot be < 0.", status );
       } else {
-	padStart = (dim_t) temp;
+        padStart = (dim_t) temp;
       }
     } else {
       padStart = 0;
@@ -509,10 +509,10 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
     if( astMapGet0I( keymap, "PADEND", &temp ) ) {
       if( temp < 0 ) {
-	*status = SAI__ERROR;
-	errRep(FUNC_NAME, "PADEND cannot be < 0.", status );
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "PADEND cannot be < 0.", status );
       } else {
-	padEnd = (dim_t) temp;
+        padEnd = (dim_t) temp;
       }
     } else {
       padEnd = 0;
@@ -527,60 +527,60 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
       /* First pass count components, second pass allocate modeltyps & store */
       for( pass=1; pass<=2; pass++ ) {
-	j=0; /* Count number of characters in sub-string */
-	nmodels = 0;
+        j=0; /* Count number of characters in sub-string */
+        nmodels = 0;
 
-	/* Loop over all characters in asttemp, count # valid model names */
-	for( i=0; i<strlen(asttemp); i++ ) {
+        /* Loop over all characters in asttemp, count # valid model names */
+        for( i=0; i<strlen(asttemp); i++ ) {
 	  
-	  /* If current asttemp character non-delimeter, copy to modelname */
-	  if( asttemp[i] != ' ' ) {
-	    modelname[j] = asttemp[i];
-	    j++;
-	  }
+          /* If current asttemp character non-delimeter, copy to modelname */
+          if( asttemp[i] != ' ' ) {
+            modelname[j] = asttemp[i];
+            j++;
+          }
 	  
-	  /* If 3 characters in sub-string, extract type */
-	  if( j == 3 ) {
+          /* If 3 characters in sub-string, extract type */
+          if( j == 3 ) {
 
-	    thismodel = smf_model_gettype( modelname, status );	    
+            thismodel = smf_model_gettype( modelname, status );	    
 
-	    if( *status == SAI__OK ) {
+            if( *status == SAI__OK ) {
 	      
-	      /* If second pass modeltyps is allocated - store value */
-	      if( pass == 2 ) {
-		modeltyps[nmodels] = thismodel;
+              /* If second pass modeltyps is allocated - store value */
+              if( pass == 2 ) {
+                modeltyps[nmodels] = thismodel;
 
-		/* set havenoi/whichnoi */
-		if( thismodel == SMF__NOI ) {
-		  havenoi = 1;
-		  whichnoi = nmodels; 
-		}
+                /* set havenoi/whichnoi */
+                if( thismodel == SMF__NOI ) {
+                  havenoi = 1;
+                  whichnoi = nmodels; 
+                }
 
-		/* set haveext/whichext */
-		if( thismodel == SMF__EXT ) {
-		  haveext = 1;
-		  whichext = nmodels; 
-		}
-	      }
-	      nmodels++;
-	      j = 0;
-	    }
-	  }
-	}
+                /* set haveext/whichext */
+                if( thismodel == SMF__EXT ) {
+                  haveext = 1;
+                  whichext = nmodels; 
+                }
+              }
+              nmodels++;
+              j = 0;
+            }
+          }
+        }
 	
-	/* End of pass 1: allocate modeltyps */
-	if( pass == 1 ) {
-	  if( nmodels >= 1 ) {
-	    modeltyps = smf_malloc( nmodels, sizeof(*modeltyps), 0, status );
-	  } else {
-	    msgOut(" ", "SMF_ITERATEMAP: No valid models in MODELORDER",
-		   status );
-	  }
-	}
+        /* End of pass 1: allocate modeltyps */
+        if( pass == 1 ) {
+          if( nmodels >= 1 ) {
+            modeltyps = smf_malloc( nmodels, sizeof(*modeltyps), 0, status );
+          } else {
+            msgOut(" ", "SMF_ITERATEMAP: No valid models in MODELORDER",
+                   status );
+          }
+        }
       }
     } else {
       msgOut(" ", "SMF_ITERATEMAP: MODELORDER unspecified - will only rebin!",
-	     status);
+             status);
       nmodels = 0;
     }
   }
@@ -593,12 +593,12 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   if( untilconverge ) {
     msgSeti("MAX",maxiter);
     msgOut(" ", 
-	   "SMF_ITERATEMAP: Iterate to convergence (max ^MAX)",
-	   status );
+           "SMF_ITERATEMAP: Iterate to convergence (max ^MAX)",
+           status );
     msgSetd("CHITOL",chitol);
     msgOut(" ", 
-	   "SMF_ITERATEMAP: Stopping criteria is a change in chi^2 < ^CHITOL",
-	   status);
+           "SMF_ITERATEMAP: Stopping criteria is a change in chi^2 < ^CHITOL",
+           status);
   } else {
     msgSeti("MAX",maxiter);
     msgOut(" ", "SMF_ITERATEMAP: ^MAX Iterations", status );
@@ -606,12 +606,12 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
   msgSeti("NUMCOMP",nmodels);
   msgOutif(MSG__VERB," ", 
-	   "SMF_ITERATEMAP: ^NUMCOMP model components in solution: ", 
-	 status);
+           "SMF_ITERATEMAP: ^NUMCOMP model components in solution: ", 
+           status);
   for( i=0; i<nmodels; i++ ) {
     msgSetc( "MNAME", smf_model_getname(modeltyps[i], status) );
     msgOutif(MSG__VERB,
-	     " ", "  ^MNAME", status ); 
+             " ", "  ^MNAME", status ); 
   }
 
   /* Create an ordered smfGrp which keeps track of files corresponding to
@@ -631,11 +631,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   if( *status == SAI__OK ) {
 
     smf_checkmem_dimm( maxconcat, INST__SCUBA2, igroup->nrelated, modeltyps,
-		       nmodels, maxmem, &memneeded, status );
+                       nmodels, maxmem, &memneeded, status );
 
     if( *status == SMF__NOMEM ) {
       /* If we need too much memory, generate a warning message and then try
-	 to re-group the files using smaller chunks */
+         to re-group the files using smaller chunks */
 
       errAnnul( status );
       msgOut( " ", "SMF_ITERATEMAP: *** WARNING ***", status );
@@ -643,21 +643,21 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       msgSeti( "AVAIL", maxmem/SMF__MB );
       msgSeti( "NEED", memneeded/SMF__MB );
       msgOut( " ", "  ^LEN continuous samples requires ^NEED Mb > ^AVAIL Mb", 
-	      status );
+              status );
 
       /* Try is meant to be the largest chunks of ~equal length that fit in
-	 memory */
+         memory */
       try = maxconcat / ((size_t) ((double) memneeded/maxmem)+1)+1;
 
       msgSeti( "TRY", try );
       msgOut( " ", "  Will try to re-group data in chunks < ^TRY samples long",
-	      status);
+              status);
       msgOut( " ", "SMF_ITERATEMAP: ***************", status );
       
       /* Close igroup if needed before re-running smf_grp_related */
       
       if( igroup ) {
-	smf_close_smfGroup( &igroup, status );
+        smf_close_smfGroup( &igroup, status );
       }
 
       smf_grp_related( igrp, isize, 1, try, &maxconcat, &igroup, status );
@@ -685,13 +685,13 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     if( memiter ) {
       msgSeti( "NCONTCHUNKS", ncontchunks );
       msgOutif(MSG__VERB," ", 
-	     "SMF_ITERATEMAP: ^NCONTCHUNKS large continuous chunks outside iteration loop.", 
-	     status);
+               "SMF_ITERATEMAP: ^NCONTCHUNKS large continuous chunks outside iteration loop.", 
+               status);
     } else {
       msgSeti( "NCHUNKS", nchunks );
       msgOutif(MSG__VERB," ", 
-	     "SMF_ITERATEMAP: ^NCHUNKS file chunks inside iteration loop.", 
-	     status);
+               "SMF_ITERATEMAP: ^NCHUNKS file chunks inside iteration loop.", 
+               status);
     }
   }
 
@@ -710,45 +710,45 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       msgSeti("CHUNK", contchunk+1);
       msgSeti("NUMCHUNK", ncontchunks);
       msgOut( " ", 
-	      "SMF_ITERATEMAP: Continuous chunk ^CHUNK / ^NUMCHUNK =========",
-	      status);
+              "SMF_ITERATEMAP: Continuous chunk ^CHUNK / ^NUMCHUNK =========",
+              status);
     }
 
     if( *status == SAI__OK ) {
 
       /* Setup the map estimate from the current contchunk. */
       if( contchunk == 0 ) {
-	/* For the first chunk, calculate the map in-place */
-	thismap = map;
-	thishits = hitsmap;
-	thisvar = mapvar;
-	thisweight = weights;
+        /* For the first chunk, calculate the map in-place */
+        thismap = map;
+        thishits = hitsmap;
+        thisvar = mapvar;
+        thisweight = weights;
       } else if( contchunk == 1 ) {
-	/* Subsequent chunks are done in new map arrays and then added to
+        /* Subsequent chunks are done in new map arrays and then added to
            the first */
-	thismap = smf_malloc( msize, sizeof(*thismap), 0, status ); 
-	thishits = smf_malloc( msize, sizeof(*thishits), 0, status ); 
-	thisvar = smf_malloc( msize, sizeof(*thisvar), 0, status ); 
-	thisweight = smf_malloc( msize, sizeof(*thisweight), 0, status ); 
+        thismap = smf_malloc( msize, sizeof(*thismap), 0, status ); 
+        thishits = smf_malloc( msize, sizeof(*thishits), 0, status ); 
+        thisvar = smf_malloc( msize, sizeof(*thisvar), 0, status ); 
+        thisweight = smf_malloc( msize, sizeof(*thisweight), 0, status ); 
       }
 
       if( memiter ) {
 
-	/* If memiter=1 concat everything in this contchunk into a
-	   single smfArray. Note that the pointing LUT gets generated in
-	   smf_concat_smfGroup below. */
+        /* If memiter=1 concat everything in this contchunk into a
+           single smfArray. Note that the pointing LUT gets generated in
+           smf_concat_smfGroup below. */
 
-	msgSeti("C",contchunk+1);
-	msgOutif(MSG__VERB," ", 
-	       "SMF_ITERATEMAP: Concatenating files in continuous chunk ^C", 
-	       status);
+        msgSeti("C",contchunk+1);
+        msgOutif(MSG__VERB," ", 
+                 "SMF_ITERATEMAP: Concatenating files in continuous chunk ^C", 
+                 status);
 
-	/* Allocate length 1 array of smfArrays. */   
-	res = smf_malloc( nchunks, sizeof(*res), 1, status );
+        /* Allocate length 1 array of smfArrays. */   
+        res = smf_malloc( nchunks, sizeof(*res), 1, status );
 
-	/* Concatenate (no variance since we calculate it ourselves -- NOI) */
-	smf_concat_smfGroup( igroup, NULL, contchunk, 0, outfset, moving, lbnd_out, 
-			     ubnd_out, padStart, padEnd, 
+        /* Concatenate (no variance since we calculate it ourselves -- NOI) */
+        smf_concat_smfGroup( igroup, NULL, contchunk, 0, outfset, moving, lbnd_out, 
+                             ubnd_out, padStart, padEnd, 
                              SMF__NOCREATE_VARIANCE, &res[0], status );
       } 
     }
@@ -771,62 +771,62 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       qua = smf_malloc( nchunks, sizeof(*qua), 1, status );
 
       if( memiter ) {
-	/* If iterating in memory then RES has already been created from
-	   the concatenation of the input data. Create the other
-	   required models using res[0] as a template. Assert
-	   bolo-ordered data although the work has already been done at
-	   the concatenation stage. */
+        /* If iterating in memory then RES has already been created from
+           the concatenation of the input data. Create the other
+           required models using res[0] as a template. Assert
+           bolo-ordered data although the work has already been done at
+           the concatenation stage. */
 
-	smf_model_create( NULL, res, nchunks, SMF__LUT, 0, 
-			  NULL, 0, NULL, NULL,
-			  NULL, memiter, 
-			  memiter, lut, status ); 
+        smf_model_create( NULL, res, nchunks, SMF__LUT, 0, 
+                          NULL, 0, NULL, NULL,
+                          NULL, memiter, 
+                          memiter, lut, status ); 
 
-	smf_model_create( NULL, res, nchunks, SMF__AST, 0, 
-			  NULL, 0, NULL, NULL,
-			  NULL, memiter, 
-			  memiter, ast, status );
+        smf_model_create( NULL, res, nchunks, SMF__AST, 0, 
+                          NULL, 0, NULL, NULL,
+                          NULL, memiter, 
+                          memiter, ast, status );
 
-	smf_model_create( NULL, res, nchunks, SMF__QUA, 0, 
-			  NULL, 0, NULL, NULL,
-			  NULL, memiter, 
-			  memiter, qua, status );
+        smf_model_create( NULL, res, nchunks, SMF__QUA, 0, 
+                          NULL, 0, NULL, NULL,
+                          NULL, memiter, 
+                          memiter, qua, status );
 
-	/* Since a copy of the LUT is still open in res[0] free it up here */
-	for( i=0; i<res[0]->ndat; i++ ) {
-	  if( res[0]->sdata[i] ) {
-	    smf_close_mapcoord( res[0]->sdata[i], status );
-	  }
-	}
+        /* Since a copy of the LUT is still open in res[0] free it up here */
+        for( i=0; i<res[0]->ndat; i++ ) {
+          if( res[0]->sdata[i] ) {
+            smf_close_mapcoord( res[0]->sdata[i], status );
+          }
+        }
       
       } else {
-	/* If iterating using disk i/o need to create res and other model 
-	   components using igroup as template. In this case the pointing
-	   LUT probably doesn't exist, so give projection information to
-	   smf_model_create. Also assert bolo-ordered template 
-	   (in this case res). */
+        /* If iterating using disk i/o need to create res and other model 
+           components using igroup as template. In this case the pointing
+           LUT probably doesn't exist, so give projection information to
+           smf_model_create. Also assert bolo-ordered template 
+           (in this case res). */
 
-	res = smf_malloc( nchunks, sizeof(*res), 1, status );
+        res = smf_malloc( nchunks, sizeof(*res), 1, status );
 
-	smf_model_create( igroup, NULL, 0, SMF__RES, 0, 
-			  NULL, 0, NULL, NULL,
-			  &resgroup, memiter, 
-			  memiter, res, status );
+        smf_model_create( igroup, NULL, 0, SMF__RES, 0, 
+                          NULL, 0, NULL, NULL,
+                          &resgroup, memiter, 
+                          memiter, res, status );
 
-	smf_model_create( igroup, NULL, 0, SMF__LUT, 0, 
-			  outfset, moving, lbnd_out, ubnd_out,
-			  &lutgroup, memiter, 
-			  memiter, lut, status ); 
+        smf_model_create( igroup, NULL, 0, SMF__LUT, 0, 
+                          outfset, moving, lbnd_out, ubnd_out,
+                          &lutgroup, memiter, 
+                          memiter, lut, status ); 
 
-	smf_model_create( igroup, NULL, 0, SMF__AST, 0, 
-			  NULL, 0, NULL, NULL,
-			  &astgroup, memiter, 
-			  memiter, ast, status );
+        smf_model_create( igroup, NULL, 0, SMF__AST, 0, 
+                          NULL, 0, NULL, NULL,
+                          &astgroup, memiter, 
+                          memiter, ast, status );
 
-	smf_model_create( igroup, NULL, 0, SMF__QUA, 0, 
-			  NULL, 0, NULL, NULL,
-			  &quagroup, memiter, 
-			  memiter, qua, status );
+        smf_model_create( igroup, NULL, 0, SMF__QUA, 0, 
+                          NULL, 0, NULL, NULL,
+                          &quagroup, memiter, 
+                          memiter, qua, status );
       }
     }
 
@@ -837,23 +837,23 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       model = smf_malloc( nmodels, sizeof(*model), 1, status );
 
       if( memiter != 1 ) {
-	/* Array of smfgroups (one for each dynamic model component) */
-	modelgroups = smf_malloc( nmodels, sizeof(*modelgroups), 1, status );  
+        /* Array of smfgroups (one for each dynamic model component) */
+        modelgroups = smf_malloc( nmodels, sizeof(*modelgroups), 1, status );  
       }
 
       for( i=0; i<nmodels; i++ ) {
-	model[i] = smf_malloc( nchunks, sizeof(**model), 1, status );
+        model[i] = smf_malloc( nchunks, sizeof(**model), 1, status );
       
-	if( memiter ) {
-	  smf_model_create( NULL, res, nchunks, modeltyps[i], 0, 
-			    NULL, 0, NULL, NULL,
-			    NULL, memiter, memiter, model[i], status ); 
+        if( memiter ) {
+          smf_model_create( NULL, res, nchunks, modeltyps[i], 0, 
+                            NULL, 0, NULL, NULL,
+                            NULL, memiter, memiter, model[i], status ); 
 
-	} else {
-	  smf_model_create( igroup, NULL, 0, modeltyps[i], 0, 
-			    NULL, 0, NULL, NULL, &modelgroups[i], 
-			    memiter, memiter, model[i], status );
-	}
+        } else {
+          smf_model_create( igroup, NULL, 0, modeltyps[i], 0, 
+                            NULL, 0, NULL, NULL, &modelgroups[i], 
+                            memiter, memiter, model[i], status );
+        }
       }
     }
  
@@ -861,7 +861,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     if( *status == SAI__OK ) {
 
       /* Stuff pointers into smfDIMMData to pass around to model component
-	 solvers */
+         solvers */
 
       memset( &dat, 0, sizeof(dat) ); /* Initialize structure */
       dat.res = res;
@@ -871,92 +871,92 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       dat.mapvar = thisvar;
       dat.chisquared = chisquared;
       if( havenoi ) {
-	dat.noi = model[whichnoi];
+        dat.noi = model[whichnoi];
       } else {
-	dat.noi = NULL;
+        dat.noi = NULL;
       }
       if( haveext ) {
-	dat.ext = model[whichext];
+        dat.ext = model[whichext];
       } else {
-	dat.ext = NULL;
+        dat.ext = NULL;
       }
 
       quit = 0;
       iter = 0;
       while( !quit ) {
-	msgSeti("ITER", iter+1);
-	msgSeti("MAXITER", maxiter);
-	msgOut(" ", 
-	       "SMF_ITERATEMAP: Iteration ^ITER / ^MAXITER ---------------",
-	       status);
+        msgSeti("ITER", iter+1);
+        msgSeti("MAXITER", maxiter);
+        msgOut(" ", 
+               "SMF_ITERATEMAP: Iteration ^ITER / ^MAXITER ---------------",
+               status);
       
-	/* Assume we've converged until we find a chunk that hasn't */
-	if( iter > 0 ) {
-	  converged = 1;
-	} else {
-	  converged = 0;
-	}
+        /* Assume we've converged until we find a chunk that hasn't */
+        if( iter > 0 ) {
+          converged = 1;
+        } else {
+          converged = 0;
+        }
 
-	for( i=0; i<nchunks; i++ ) {
-	  if( !memiter ) {
-	    msgSeti("CHUNK", i+1);
-	    msgSeti("NUMCHUNK", nchunks);
-	    msgOut(" ", "SMF_ITERATEMAP: File chunk ^CHUNK / ^NUMCHUNK", 
-		   status);
-	  }
+        for( i=0; i<nchunks; i++ ) {
+          if( !memiter ) {
+            msgSeti("CHUNK", i+1);
+            msgSeti("NUMCHUNK", nchunks);
+            msgOut(" ", "SMF_ITERATEMAP: File chunk ^CHUNK / ^NUMCHUNK", 
+                   status);
+          }
 
-	  /* Open model files here if looping on-disk. Otherwise everything
-	     is already open from the smf_model_create calls */
+          /* Open model files here if looping on-disk. Otherwise everything
+             is already open from the smf_model_create calls */
 
-	  if( !memiter ) {
+          if( !memiter ) {
 	  
-	    /* If memiter not set open this chunk here */
-	    smf_open_related_model( resgroup, i, "UPDATE", &res[i], status );
-	    smf_open_related_model( lutgroup, i, "UPDATE", &lut[i], status );
-	    smf_open_related_model( astgroup, i, "UPDATE", &ast[i], status );
-	    smf_open_related_model( quagroup, i, "UPDATE", &qua[i], status );
+            /* If memiter not set open this chunk here */
+            smf_open_related_model( resgroup, i, "UPDATE", &res[i], status );
+            smf_open_related_model( lutgroup, i, "UPDATE", &lut[i], status );
+            smf_open_related_model( astgroup, i, "UPDATE", &ast[i], status );
+            smf_open_related_model( quagroup, i, "UPDATE", &qua[i], status );
 	  
-	    for( j=0; j<nmodels; j++ ) {
-	      smf_open_related_model( modelgroups[j], i, "UPDATE", 
-				      &model[j][i], status );
-	    }
-	  } 
+            for( j=0; j<nmodels; j++ ) {
+              smf_open_related_model( modelgroups[j], i, "UPDATE", 
+                                      &model[j][i], status );
+            }
+          } 
 
-	  /* If first iteration pre-condition the data */
-	  if( iter == 0 ) {
-	    msgOut(" ", "SMF_ITERATEMAP: Pre-conditioning chunk", status);
-	    for( idx=0; idx<res[i]->ndat; idx++ ) {
-	      /* Synchronize quality flags */
+          /* If first iteration pre-condition the data */
+          if( iter == 0 ) {
+            msgOut(" ", "SMF_ITERATEMAP: Pre-conditioning chunk", status);
+            for( idx=0; idx<res[i]->ndat; idx++ ) {
+              /* Synchronize quality flags */
 
-	      data = res[i]->sdata[idx];
-	      qua_data = (unsigned char *) qua[i]->sdata[idx]->pntr[0];
+              data = res[i]->sdata[idx];
+              qua_data = (unsigned char *) qua[i]->sdata[idx]->pntr[0];
 
-	      msgOutif(MSG__VERB," ", "  update quality", status);
-	      smf_update_quality( data, qua_data, 1, NULL, badfrac, status );
+              msgOutif(MSG__VERB," ", "  update quality", status);
+              smf_update_quality( data, qua_data, 1, NULL, badfrac, status );
 
-	      if( baseorder >= 0 ) {
-		msgOutif(MSG__VERB," ", "  fit polynomial baselines", status);
-		smf_scanfit( data, qua_data, baseorder, status );
+              if( baseorder >= 0 ) {
+                msgOutif(MSG__VERB," ", "  fit polynomial baselines", status);
+                smf_scanfit( data, qua_data, baseorder, status );
 
-		msgOutif(MSG__VERB," ", "  remove polynomial baselines", 
-			 status);
-		smf_subtract_poly( data, qua_data, 0, status );
-	      }
+                msgOutif(MSG__VERB," ", "  remove polynomial baselines", 
+                         status);
+                smf_subtract_poly( data, qua_data, 0, status );
+              }
 
-	      if( dcthresh && dcbox ) {
-		msgOutif(MSG__VERB," ", "  correct steps", status);
-		smf_correct_steps( data, qua_data, 20., 1000, status );
-	      }
+              if( dcthresh && dcbox ) {
+                msgOutif(MSG__VERB," ", "  correct steps", status);
+                smf_correct_steps( data, qua_data, 20., 1000, status );
+              }
 
-	      if( spikethresh ) {
-		msgOutif(MSG__VERB," ", "  flag spikes...", status);
-		smf_flag_spikes( data, qua_data, ~SMF__Q_JUMP,
-				 spikethresh, spikeiter, 100, 
-				 &aiter, NULL, status );
-		msgSeti("AITER",aiter);
-		msgOutif(MSG__VERB," ", "  ...finished in ^AITER iterations",
-		       status); 
-	      }
+              if( spikethresh ) {
+                msgOutif(MSG__VERB," ", "  flag spikes...", status);
+                smf_flag_spikes( data, qua_data, ~SMF__Q_JUMP,
+                                 spikethresh, spikeiter, 100, 
+                                 &aiter, NULL, status );
+                msgSeti("AITER",aiter);
+                msgOutif(MSG__VERB," ", "  ...finished in ^AITER iterations",
+                         status); 
+              }
 
               /* filter the data */
               if( dofft ) {
@@ -982,363 +982,363 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
                 filt = smf_free_smfFilter( filt, status );
               }
-	    }
-	  }
+            }
+          }
 
-	  msgOut(" ", 
-		 "SMF_ITERATEMAP: Calculate time-stream model components", 
-		 status);
+          msgOut(" ", 
+                 "SMF_ITERATEMAP: Calculate time-stream model components", 
+                 status);
 
-	  /* Call the model calculations in the desired order. */
-	  if( *status == SAI__OK ) {
-	    for( j=0; j<nmodels; j++ ) {
+          /* Call the model calculations in the desired order. */
+          if( *status == SAI__OK ) {
+            for( j=0; j<nmodels; j++ ) {
 	    
-	      /* Set up control flags for the model calculation */
-	      dimmflags = 0;
-	      if( iter==0 ) dimmflags |= SMF__DIMM_FIRSTITER;
-	      if( j==0 ) dimmflags |= SMF__DIMM_FIRSTCOMP;
+              /* Set up control flags for the model calculation */
+              dimmflags = 0;
+              if( iter==0 ) dimmflags |= SMF__DIMM_FIRSTITER;
+              if( j==0 ) dimmflags |= SMF__DIMM_FIRSTCOMP;
 	    
-	      msgSetc("MNAME", smf_model_getname(modeltyps[j],status));
-	      msgOutif(MSG__VERB," ", "  ^MNAME", status);
-	      modelptr = smf_model_getptr( modeltyps[j], status );
+              msgSetc("MNAME", smf_model_getname(modeltyps[j],status));
+              msgOutif(MSG__VERB," ", "  ^MNAME", status);
+              modelptr = smf_model_getptr( modeltyps[j], status );
 	    
-	      if( *status == SAI__OK ) {
-		(*modelptr)( &dat, i, keymap, model[j], dimmflags, status );
-	      }
+              if( *status == SAI__OK ) {
+                (*modelptr)( &dat, i, keymap, model[j], dimmflags, status );
+              }
 
-	      /* If bad status set exit condition */
-	      if( *status != SAI__OK ) {
-		j = nmodels;
-	      }
-	    }
-	  }
+              /* If bad status set exit condition */
+              if( *status != SAI__OK ) {
+                j = nmodels;
+              }
+            }
+          }
 
-	  /* Once all the other model components have been calculated put the
-	     previous iteration of AST back into the residual, zero ast,
-	     and rebin the noise+astro signal into the map */
+          /* Once all the other model components have been calculated put the
+             previous iteration of AST back into the residual, zero ast,
+             and rebin the noise+astro signal into the map */
 
-	  msgOut(" ", "SMF_ITERATEMAP: Rebin residual to estimate MAP", 
-		 status);
+          msgOut(" ", "SMF_ITERATEMAP: Rebin residual to estimate MAP", 
+                 status);
 
-	  if( *status == SAI__OK ) {
+          if( *status == SAI__OK ) {
 
-	    /* Loop over subgroup index (subarray) */
-	    for( idx=0; idx<res[i]->ndat; idx++ ) {
+            /* Loop over subgroup index (subarray) */
+            for( idx=0; idx<res[i]->ndat; idx++ ) {
 
-	      /* Add last iter. of astronomical signal back in to residual */
-	      ast_data = (double *)(ast[i]->sdata[idx]->pntr)[0];
-	      res_data = (double *)(res[i]->sdata[idx]->pntr)[0];
-	      lut_data = (int *)(lut[i]->sdata[idx]->pntr)[0];
-	      qua_data = (unsigned char *)(qua[i]->sdata[idx]->pntr)[0];
+              /* Add last iter. of astronomical signal back in to residual */
+              ast_data = (double *)(ast[i]->sdata[idx]->pntr)[0];
+              res_data = (double *)(res[i]->sdata[idx]->pntr)[0];
+              lut_data = (int *)(lut[i]->sdata[idx]->pntr)[0];
+              qua_data = (unsigned char *)(qua[i]->sdata[idx]->pntr)[0];
 
-	      if( havenoi ) {
-		var_data = (double *)(dat.noi[i]->sdata[idx]->pntr)[0];
-	      } else {
-		var_data = NULL;
-	      }
+              if( havenoi ) {
+                var_data = (double *)(dat.noi[i]->sdata[idx]->pntr)[0];
+              } else {
+                var_data = NULL;
+              }
 
-	      dsize = (ast[i]->sdata[idx]->dims)[0] *
-		(ast[i]->sdata[idx]->dims)[1] * (ast[i]->sdata[idx]->dims)[2];
+              dsize = (ast[i]->sdata[idx]->dims)[0] *
+                (ast[i]->sdata[idx]->dims)[1] * (ast[i]->sdata[idx]->dims)[2];
 
-	      /* Ignore data with these QUALITY flags */
-	      mask = ~SMF__Q_JUMP;
+              /* Ignore data with these QUALITY flags */
+              mask = ~SMF__Q_JUMP;
 
-	      for( k=0; k<dsize; k++ ) {	  
-		if( !(qua_data[k]&mask) && (ast_data[k] != VAL__BADD) ) {
-		  res_data[k] += ast_data[k];
-		}
+              for( k=0; k<dsize; k++ ) {	  
+                if( !(qua_data[k]&mask) && (ast_data[k] != VAL__BADD) ) {
+                  res_data[k] += ast_data[k];
+                }
 
-		/* Not really necessary.
-		   Set ast_data back to 0 since we've moved all of the signal
-		   into the residual, and then it will get re-estimated by
-		   calcmodel_ast after we finish estimating the map. */
+                /* Not really necessary.
+                   Set ast_data back to 0 since we've moved all of the signal
+                   into the residual, and then it will get re-estimated by
+                   calcmodel_ast after we finish estimating the map. */
 	      
-		ast_data[k] = 0;
-	      }
+                ast_data[k] = 0;
+              }
 
-	      /* Setup rebin flags */
-	      rebinflags = 0;
-	      if( (i == 0) && (idx == 0) ) {   
-		/* First call to rebin clears the arrays */
-		rebinflags = rebinflags | AST__REBININIT;
-	      }
+              /* Setup rebin flags */
+              rebinflags = 0;
+              if( (i == 0) && (idx == 0) ) {   
+                /* First call to rebin clears the arrays */
+                rebinflags = rebinflags | AST__REBININIT;
+              }
 	    
-	      if( (i == nchunks-1) && (idx == res[i]->ndat-1) ) {
-		/* Final call to rebin re-normalizes */
-		rebinflags = rebinflags | AST__REBINEND;
-	      }
+              if( (i == nchunks-1) && (idx == res[i]->ndat-1) ) {
+                /* Final call to rebin re-normalizes */
+                rebinflags = rebinflags | AST__REBINEND;
+              }
 	    
-	      /* Rebin the residual + astronomical signal into a map */
-	      smf_simplerebinmap( res_data, var_data, lut_data, qua_data, mask,
-				  dsize, varmapmethod, rebinflags, thismap, 
-				  thisweight, thishits, thisvar, msize, 
-				  status );
-	    }
-	  }
+              /* Rebin the residual + astronomical signal into a map */
+              smf_simplerebinmap( res_data, var_data, lut_data, qua_data, mask,
+                                  dsize, varmapmethod, rebinflags, thismap, 
+                                  thisweight, thishits, thisvar, msize, 
+                                  status );
+            }
+          }
 
-	  /* Close files here if memiter not set */
+          /* Close files here if memiter not set */
 
-	  if( !memiter ) {
-	    smf_close_related( &res[i], status );
-	    smf_close_related( &ast[i], status );    
-	    smf_close_related( &lut[i], status );    
-	    smf_close_related( &qua[i], status );    
+          if( !memiter ) {
+            smf_close_related( &res[i], status );
+            smf_close_related( &ast[i], status );    
+            smf_close_related( &lut[i], status );    
+            smf_close_related( &qua[i], status );    
 
-	    for( j=0; j<nmodels; j++ ) {
-	      smf_close_related( &model[j][i], status );
-	    }
-	  }
+            for( j=0; j<nmodels; j++ ) {
+              smf_close_related( &model[j][i], status );
+            }
+          }
 
-	  /* Set exit condition if bad status was set */
-	  if( *status != SAI__OK ) i=isize+1;
+          /* Set exit condition if bad status was set */
+          if( *status != SAI__OK ) i=isize+1;
 
-	  /* If NOI was present, we now have an estimate of chisquared */
-	  if( chisquared ) {
-	    msgSeti("CHUNK",i+1);
-	    msgSetd("CHISQ",chisquared[i]);
-	    msgOut( " ", 
-		    "SMF_ITERATEMAP: *** CHISQUARED = ^CHISQ for chunk ^CHUNK",
-		    status);
+          /* If NOI was present, we now have an estimate of chisquared */
+          if( chisquared ) {
+            msgSeti("CHUNK",i+1);
+            msgSetd("CHISQ",chisquared[i]);
+            msgOut( " ", 
+                    "SMF_ITERATEMAP: *** CHISQUARED = ^CHISQ for chunk ^CHUNK",
+                    status);
 
-	    if( iter > 0 ) {
-	      msgSetd("DIFF", chisquared[i]-lastchisquared[i]);
-	      msgOut( " ",
-		      "SMF_ITERATEMAP: *** change: ^DIFF", status );
-	    }
+            if( iter > 0 ) {
+              msgSetd("DIFF", chisquared[i]-lastchisquared[i]);
+              msgOut( " ",
+                      "SMF_ITERATEMAP: *** change: ^DIFF", status );
+            }
 
-	    /* Check for the stopping criteria */
-	    if( untilconverge ) {
-	      if( iter > 0 ) {
-		if( (lastchisquared[i]-chisquared[i]) > chitol ) {
-		  /* Found a chunk that isn't converged yet */
-		  converged=0;
-		}
-	      } 	    
-	    }
+            /* Check for the stopping criteria */
+            if( untilconverge ) {
+              if( iter > 0 ) {
+                if( (lastchisquared[i]-chisquared[i]) > chitol ) {
+                  /* Found a chunk that isn't converged yet */
+                  converged=0;
+                }
+              } 	    
+            }
 
-	    /* Update lastchisquared */
-	    lastchisquared[i] = chisquared[i];
+            /* Update lastchisquared */
+            lastchisquared[i] = chisquared[i];
 
-	  }
-	}
+          }
+        }
       
-	if( *status == SAI__OK ) {
-	  msgOut(" ", "SMF_ITERATEMAP: Calculate ast", status);
+        if( *status == SAI__OK ) {
+          msgOut(" ", "SMF_ITERATEMAP: Calculate ast", status);
 
-	  for( i=0; i<nchunks; i++ ) {
+          for( i=0; i<nchunks; i++ ) {
 
-	    /* Open files if memiter not set - otherwise they are still open
-	       from earlier call */
-	    if( !memiter ) {
-	      smf_open_related_model( astgroup, i, "UPDATE", &ast[i], status );
-	      smf_open_related_model( resgroup, i, "UPDATE", &res[i], status );
-	      smf_open_related_model( lutgroup, i, "UPDATE", &lut[i], status );
-	      smf_open_related_model( quagroup, i, "UPDATE", &qua[i], status );
+            /* Open files if memiter not set - otherwise they are still open
+               from earlier call */
+            if( !memiter ) {
+              smf_open_related_model( astgroup, i, "UPDATE", &ast[i], status );
+              smf_open_related_model( resgroup, i, "UPDATE", &res[i], status );
+              smf_open_related_model( lutgroup, i, "UPDATE", &lut[i], status );
+              smf_open_related_model( quagroup, i, "UPDATE", &qua[i], status );
 	      
-	      if( haveext ) {
-		smf_open_related_model( modelgroups[whichext], i, "UPDATE", 
-					&model[whichext][i], status );
-	      }
-	    }
+              if( haveext ) {
+                smf_open_related_model( modelgroups[whichext], i, "UPDATE", 
+                                        &model[whichext][i], status );
+              }
+            }
 
-	    /* Calculate the AST model component. It is a special model
-	       because it assumes that the map contains the best current
-	       estimate of the astronomical sky. It gets called in this
-	       separate loop since the map estimate gets updated by
-	       each chunk in the main model component loop */
+            /* Calculate the AST model component. It is a special model
+               because it assumes that the map contains the best current
+               estimate of the astronomical sky. It gets called in this
+               separate loop since the map estimate gets updated by
+               each chunk in the main model component loop */
 
-	    smf_calcmodel_ast( &dat, i, keymap, ast, 0, status );
+            smf_calcmodel_ast( &dat, i, keymap, ast, 0, status );
 
-	    /* If EXTinction was applied during this iteration, AST and RES
+            /* If EXTinction was applied during this iteration, AST and RES
                are currently in units of Jy. Un-do the EXTinction correction
                here so that RES is in the right units again before starting
                the next iteration */
 
-	    if( haveext ) {
-	      smf_calcmodel_ext( &dat, i, keymap, model[whichext], 
-				 SMF__DIMM_INVERT, status );
-	    }
+            if( haveext ) {
+              smf_calcmodel_ext( &dat, i, keymap, model[whichext], 
+                                 SMF__DIMM_INVERT, status );
+            }
 
-	    /* Close files if memiter not set */
-	    if( !memiter ) {
-	      smf_close_related( &ast[i], status );    
-	      smf_close_related( &res[i], status );
-	      smf_close_related( &lut[i], status );
-	      smf_close_related( &qua[i], status );
+            /* Close files if memiter not set */
+            if( !memiter ) {
+              smf_close_related( &ast[i], status );    
+              smf_close_related( &res[i], status );
+              smf_close_related( &lut[i], status );
+              smf_close_related( &qua[i], status );
 
-	      if( haveext ) {
-		smf_close_related( &model[whichext][i], status );
-	      }
-	    }
-	  }
-	}
+              if( haveext ) {
+                smf_close_related( &model[whichext][i], status );
+              }
+            }
+          }
+        }
 
-	/* Increment iteration counter */
-	iter++;
+        /* Increment iteration counter */
+        iter++;
 
-	if( *status == SAI__OK ) {
+        if( *status == SAI__OK ) {
 
-	  /* Check that we've exceeded maxiter */
-	  if( iter >= maxiter ) {
-	    quit = 1;
-	  }
+          /* Check that we've exceeded maxiter */
+          if( iter >= maxiter ) {
+            quit = 1;
+          }
 
-	  /* Check for convergence */
-	  if( untilconverge && converged ) {
-	    quit = 1;
-	  }
+          /* Check for convergence */
+          if( untilconverge && converged ) {
+            quit = 1;
+          }
 
-	} else {
-	  quit = 1;
-	}
+        } else {
+          quit = 1;
+        }
       }
 
       msgSeti("ITER",iter);
       msgOut( " ", 
-	      "SMF_ITERATEMAP: ****** Completed in ^ITER iterations", status);
+              "SMF_ITERATEMAP: ****** Completed in ^ITER iterations", status);
       if( untilconverge && converged ) {
-	msgOut( " ", 
-		"SMF_ITERATEMAP: ****** Solution CONVERGED",
-		status);
+        msgOut( " ", 
+                "SMF_ITERATEMAP: ****** Solution CONVERGED",
+                status);
       }
 
       /* Export DIMM model components to NDF files.
-	 Note that we don't do LUT since it is originally an extension in the
-	 input flatfielded data.
-	 Also - check that a filename is defined in the smfFile! */
+         Note that we don't do LUT since it is originally an extension in the
+         input flatfielded data.
+         Also - check that a filename is defined in the smfFile! */
   
       if( exportNDF && (*status == SAI__OK) ) {
-	msgOut(" ", "SMF_ITERATEMAP: Export model components to NDF files.", 
-	       status);
+        msgOut(" ", "SMF_ITERATEMAP: Export model components to NDF files.", 
+               status);
       
-	for( i=0; i<nchunks; i++ ) {  /* Chunk loop */
-	  msgSeti("CHUNK", i+1);
-	  msgSeti("NUMCHUNK", nchunks);
-	  msgOutif(MSG__VERB," ", "  Chunk ^CHUNK / ^NUMCHUNK", status);
+        for( i=0; i<nchunks; i++ ) {  /* Chunk loop */
+          msgSeti("CHUNK", i+1);
+          msgSeti("NUMCHUNK", nchunks);
+          msgOutif(MSG__VERB," ", "  Chunk ^CHUNK / ^NUMCHUNK", status);
 
-	  /* Open each subgroup, loop over smfArray elements and export,
-	     then close subgroup. DIMM open/close not needed if memiter set.
+          /* Open each subgroup, loop over smfArray elements and export,
+             then close subgroup. DIMM open/close not needed if memiter set.
              Note that QUA and NOI get stuffed into the QUALITY and
              VARIANCE components of the residual. Also notice that 
              everything must be changed to time-ordered data before
              writing ICD-compliant files. */
 
-	  if( !memiter ) { /* Open if we're doing disk i/o */
-	    /* Fixed components */
-	    smf_open_related_model( resgroup, i, "UPDATE", &res[i], status );
-	    smf_open_related_model( quagroup, i, "UPDATE", &qua[i], status );
-	    smf_open_related_model( astgroup, i, "UPDATE", &ast[i], status );
+          if( !memiter ) { /* Open if we're doing disk i/o */
+            /* Fixed components */
+            smf_open_related_model( resgroup, i, "UPDATE", &res[i], status );
+            smf_open_related_model( quagroup, i, "UPDATE", &qua[i], status );
+            smf_open_related_model( astgroup, i, "UPDATE", &ast[i], status );
 
-	    /* Dynamic components */
-	    for( j=0; j<nmodels; j++ ) { 
-	      smf_open_related_model( modelgroups[j], i, "UPDATE", 
-				      &model[j][i], status );	      
-	    }
-	  }
+            /* Dynamic components */
+            for( j=0; j<nmodels; j++ ) { 
+              smf_open_related_model( modelgroups[j], i, "UPDATE", 
+                                      &model[j][i], status );	      
+            }
+          }
 
-	  /* Loop over subgroup (subarray), re-order and export */
-	  for( idx=0; idx<res[i]->ndat; idx++ ) {
-	    smf_dataOrder( res[i]->sdata[idx], 1, status );
-	    smf_dataOrder( qua[i]->sdata[idx], 1, status );
-	    smf_dataOrder( ast[i]->sdata[idx], 1, status );
+          /* Loop over subgroup (subarray), re-order and export */
+          for( idx=0; idx<res[i]->ndat; idx++ ) {
+            smf_dataOrder( res[i]->sdata[idx], 1, status );
+            smf_dataOrder( qua[i]->sdata[idx], 1, status );
+            smf_dataOrder( ast[i]->sdata[idx], 1, status );
 
-	    for( j=0; j<nmodels; j++ ) { 
+            for( j=0; j<nmodels; j++ ) { 
 	      
-	      /* Check for existence of the model for this subarray - in
-		 some cases, like COM, there is only a file for one subarray,
-		 unlike RES from which the range of idx is derived */
-	      if( model[j][i]->sdata[idx] ) {
-		smf_dataOrder( model[j][i]->sdata[idx], 1, status );
-		if( *status == SMF__WDIM ) {
-		  /* fails if not 3-dimensional data. Just annul and write out 
-		     data as-is. */
-		  errAnnul(status);
-		  model[j][i]->sdata[idx]->isTordered=1;
-		}
-	      }
-	    }
+              /* Check for existence of the model for this subarray - in
+                 some cases, like COM, there is only a file for one subarray,
+                 unlike RES from which the range of idx is derived */
+              if( model[j][i]->sdata[idx] ) {
+                smf_dataOrder( model[j][i]->sdata[idx], 1, status );
+                if( *status == SMF__WDIM ) {
+                  /* fails if not 3-dimensional data. Just annul and write out 
+                     data as-is. */
+                  errAnnul(status);
+                  model[j][i]->sdata[idx]->isTordered=1;
+                }
+              }
+            }
 
-	    if( *status == SAI__OK ) {
-	      if( memiter ) {
-		/* Pointer to the header in the concatenated data */
-		hdr = res[i]->sdata[idx]->hdr;
-	      } else {
-		/* Open the header of the original input file in memiter=0
-		   case since it won't have been stored in the .DIMM files */
-		smf_open_file( igrp, resgroup->subgroups[i][idx], "READ", 
-			       SMF__NOCREATE_DATA, &data, status );
-		if( *status == SAI__OK ) {
-		  hdr = data->hdr;
-		}
-	      }
-	    }
+            if( *status == SAI__OK ) {
+              if( memiter ) {
+                /* Pointer to the header in the concatenated data */
+                hdr = res[i]->sdata[idx]->hdr;
+              } else {
+                /* Open the header of the original input file in memiter=0
+                   case since it won't have been stored in the .DIMM files */
+                smf_open_file( igrp, resgroup->subgroups[i][idx], "READ", 
+                               SMF__NOCREATE_DATA, &data, status );
+                if( *status == SAI__OK ) {
+                  hdr = data->hdr;
+                }
+              }
+            }
 
-	    /* QUA becomes the quality component of RES. NOI becomes
+            /* QUA becomes the quality component of RES. NOI becomes
                the variance component of RES if present. */
-	    if( *status == SAI__OK ) {
-	      if( havenoi ) {
-		var_data = (double *)(model[whichnoi][i]->sdata[idx]->pntr)[0];
-	      } else {
-		var_data = NULL;
-	      }
+            if( *status == SAI__OK ) {
+              if( havenoi ) {
+                var_data = (double *)(model[whichnoi][i]->sdata[idx]->pntr)[0];
+              } else {
+                var_data = NULL;
+              }
 	      
-	      if( (res[i]->sdata[idx]->file->name)[0] ) {
-		smf_NDFexport( res[i]->sdata[idx], var_data, 
-				     qua[i]->sdata[idx]->pntr[0], hdr,
-				     res[i]->sdata[idx]->file->name, 
-				     status );
-	      } else {
-		msgOut( " ", 
-			"SMF__ITERATEMAP: Can't export RES -- NULL filename",
-			status);
-	      }
+              if( (res[i]->sdata[idx]->file->name)[0] ) {
+                smf_NDFexport( res[i]->sdata[idx], var_data, 
+                               qua[i]->sdata[idx]->pntr[0], hdr,
+                               res[i]->sdata[idx]->file->name, 
+                               status );
+              } else {
+                msgOut( " ", 
+                        "SMF__ITERATEMAP: Can't export RES -- NULL filename",
+                        status);
+              }
 	      
-	      if( (ast[i]->sdata[idx]->file->name)[0] ) {
-		smf_NDFexport( ast[i]->sdata[idx], NULL, NULL, hdr, 
-				     ast[i]->sdata[idx]->file->name, 
-				   status );
-	      } else {
-		msgOut( " ", 
-			"SMF__ITERATEMAP: Can't export AST -- NULL filename",
-			status);
-	      }
-	    }
+              if( (ast[i]->sdata[idx]->file->name)[0] ) {
+                smf_NDFexport( ast[i]->sdata[idx], NULL, NULL, hdr, 
+                               ast[i]->sdata[idx]->file->name, 
+                               status );
+              } else {
+                msgOut( " ", 
+                        "SMF__ITERATEMAP: Can't export AST -- NULL filename",
+                        status);
+              }
+            }
 
-	    /* Dynamic components excluding NOI */
-	    for( j=0; j<nmodels; j++ ) 
-	      /* Remember to check again whether model[j][i]->sdata[idx] exists
+            /* Dynamic components excluding NOI */
+            for( j=0; j<nmodels; j++ ) 
+              /* Remember to check again whether model[j][i]->sdata[idx] exists
                  for cases like COM */
-	      if( (*status == SAI__OK) && (modeltyps[j] != SMF__NOI) &&
-		  model[j][i]->sdata[idx] ) {
-		if( (model[j][i]->sdata[idx]->file->name)[0] ) {
-		  smf_NDFexport( model[j][i]->sdata[idx], NULL, NULL,  
-				       hdr, 
-				       model[j][i]->sdata[idx]->file->name, 
-				       status);
-		} else {
-		  msgSetc("MOD",smf_model_getname(modeltyps[j], status) );
-		  msgOut( " ", 
-			  "SMF__ITERATEMAP: Can't export ^MOD: NULL filename",
-			  status);
-		}
-	      }
+              if( (*status == SAI__OK) && (modeltyps[j] != SMF__NOI) &&
+                  model[j][i]->sdata[idx] ) {
+                if( (model[j][i]->sdata[idx]->file->name)[0] ) {
+                  smf_NDFexport( model[j][i]->sdata[idx], NULL, NULL,  
+                                 hdr, 
+                                 model[j][i]->sdata[idx]->file->name, 
+                                 status);
+                } else {
+                  msgSetc("MOD",smf_model_getname(modeltyps[j], status) );
+                  msgOut( " ", 
+                          "SMF__ITERATEMAP: Can't export ^MOD: NULL filename",
+                          status);
+                }
+              }
 	    
-	    /* Close the input file containing the header */
-	    if( !memiter ) {
-	      smf_close_file( &data, status );
-	    }
-	  }
+            /* Close the input file containing the header */
+            if( !memiter ) {
+              smf_close_file( &data, status );
+            }
+          }
 	  
-	  if( !memiter ) { /* Close files if doing disk i/o */
-	    smf_close_related( &res[i], status );
-	    smf_close_related( &qua[i], status );
-	    smf_close_related( &ast[i], status );
+          if( !memiter ) { /* Close files if doing disk i/o */
+            smf_close_related( &res[i], status );
+            smf_close_related( &qua[i], status );
+            smf_close_related( &ast[i], status );
 	    
-	    for( j=0; j<nmodels; j++ ) { 
-	      smf_close_related( &model[j][i], status );
-	    }
-	  }
-	}
+            for( j=0; j<nmodels; j++ ) { 
+              smf_close_related( &model[j][i], status );
+            }
+          }
+        }
       }
     }
 
@@ -1353,28 +1353,28 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     /* fixed model smfArrays */
     if( res ) {
       for( i=0; i<nchunks; i++ ) {
-	if( res[i] ) smf_close_related( &res[i], status );
+        if( res[i] ) smf_close_related( &res[i], status );
       }
       res = smf_free( res, status );
     }
 
     if( ast ) {
       for( i=0; i<nchunks; i++ ) {
-	if( ast[i] ) smf_close_related( &ast[i], status );
+        if( ast[i] ) smf_close_related( &ast[i], status );
       }
       ast = smf_free( ast, status );
     }
 
     if( lut ) {
       for( i=0; i<nchunks; i++ ) {
-	if( lut[i] ) smf_close_related( &lut[i], status );
+        if( lut[i] ) smf_close_related( &lut[i], status );
       }
       lut = smf_free( lut, status );
     }
   
     if( qua ) {
       for( i=0; i<nchunks; i++ ) {
-	if( qua[i] ) smf_close_related( &qua[i], status );
+        if( qua[i] ) smf_close_related( &qua[i], status );
       }
       qua = smf_free( qua, status );
     }
@@ -1382,7 +1382,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     /* dynamic model smfGroups */
     if( modelgroups ) {
       for( i=0; i<nmodels; i++ ) {
-	if( modelgroups[i] ) smf_close_smfGroup( &modelgroups[i], status );
+        if( modelgroups[i] ) smf_close_smfGroup( &modelgroups[i], status );
       }
 
       /* Free array of smfGroup pointers at this time chunk */
@@ -1392,16 +1392,16 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     /* dynamic model smfArrays */
     if( model ) {
       for( i=0; i<nmodels; i++ ) {
-	if( model[i] ) {
-	  for( j=0; j<nchunks; j++ ) {
-	    /* Close each model component smfArray at each time chunk */
-	    if( model[i][j] ) 
-	      smf_close_related( &(model[i][j]), status );
-	  }
+        if( model[i] ) {
+          for( j=0; j<nchunks; j++ ) {
+            /* Close each model component smfArray at each time chunk */
+            if( model[i][j] ) 
+              smf_close_related( &(model[i][j]), status );
+          }
 	
-	  /* Free array of smfArray pointers for this model */
-	  model[i] = smf_free( model[i], status );
-	}
+          /* Free array of smfArray pointers for this model */
+          model[i] = smf_free( model[i], status );
+        }
       }
       model = smf_free( model, status );
     }
@@ -1411,7 +1411,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     if( contchunk >= 1 ) {
       msgOut( " ", "SMF_ITERATEMAP: Adding map estimated from this continuous chunk to total", status);
       smf_simpleaddmap( map, weights, hitsmap, mapvar, thismap, thisweight,
-			thishits, thisvar, msize, status );
+                        thishits, thisvar, msize, status );
     }
 
     /* Free chisquared array */
@@ -1431,6 +1431,4 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     smf_close_smfGroup( &igroup, status );
   }
 
-
- 
 }
