@@ -248,14 +248,23 @@ void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
     if (darks) {
       size_t dark1;
       size_t dark2;
+      smfData * dkdata1 = NULL;
+      smfData * dkdata2 = NULL;
 
       /* work out which darks are suitable */
       smf_choose_darks( darks, *ffdata, &dark1, &dark2, status );
 
       /* and correct for dark */
-      smf_subtract_dark( data, darks->sdata[dark1], darks->sdata[dark2],
-         SMF__DKSUB_PREV, status );
-
+      if (dark1 != SMF__BADIDX) dkdata1 = darks->sdata[dark1];
+      if (dark2 != SMF__BADIDX) dkdata2 = darks->sdata[dark2];
+      if (dkdata1 || dkdata2) {
+        smf_subtract_dark( data, dkdata1, dkdata2, SMF__DKSUB_PREV, status );
+      } else {
+        msgSetc( "FILE", file->name );
+        msgOutif(MSG__QUIET, " ",
+                 "Warning: File ^FILE has no suitable dark frame",
+                 status);
+      }
     }
 
     /* Flatfield the data */
