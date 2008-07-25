@@ -84,7 +84,7 @@
       CALL MSG_SETI( 'D', 5)
       CALL MSG_OUT( ' ', 'Combo - ^D', STATUS )
 
-      CALL MSG_IFSET( MSG__VERB )
+      CALL MSG_IFSET( MSG__VERB, STATUS )
       CALL MSG_OUTIF( MSG__DEBUG, ' ', 'Message should not be seen',
      :     STATUS )
 
