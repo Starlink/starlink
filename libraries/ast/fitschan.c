@@ -165,6 +165,7 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *  Authors:
 *     DSB: David Berry (Starlink)
 *     RFWS: R.F. Warren-Smith (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 
 *  History:
 *     11-DEC-1996 (DSB):
@@ -832,6 +833,9 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *     16-JUL-2008 (DSB):
 *        Plug memory leak caused by failure to free the Warnings
 *        attribute string when a FitsChan is deleted.
+*     24-JUL-2008 (TIMJ):
+*        Fix buffer overrun in astGetFits when writing the keyword
+*        to the buffer (occurred if the input string was 80 characters).
 *class--
 */
 
@@ -12541,6 +12545,7 @@ static int GetFits##code( AstFitsChan *this, const char *name, ctype value ){ \
    char *c;               /* Pointer to next character */ \
    int cl;                /* Length of string value */ \
    int ret;               /* The returned value */ \
+   size_t nwrite;         /* number of characters written to wbuf */ \
    size_t sz;             /* Data size */ \
 \
 /* Check the global error status. */ \
@@ -12591,11 +12596,6 @@ static int GetFits##code( AstFitsChan *this, const char *name, ctype value ){ \
 \
    } \
 \
-/* Release the memory used to hold keyword name, value and comment strings. */ \
-   lname = (char *) astFree( (void *) lname ); \
-   lvalue = (char *) astFree( (void *) lvalue ); \
-   lcom = (char *) astFree( (void *) lcom ); \
-\
 /* Issue a warning if the returned value is undefined. */ \
    if( ret ) { \
       if( ( ftype == AST__STRING && *value && !strcmp( *((char **) value), AST__UNDEFS ) ) || \
@@ -12605,10 +12605,17 @@ static int GetFits##code( AstFitsChan *this, const char *name, ctype value ){ \
                                         *(((double *) value)+1) == AST__UNDEFF ) ) || \
           ( ftype == AST__COMPLEXI && ( *((int *) value) == AST__UNDEFI || \
                                         *(((int *) value)+1) == AST__UNDEFI ) ) ){ \
-         sprintf( wbuf, "The %s keyword has an undefined value.", name ); \
+         nwrite = snprintf( wbuf, sizeof(wbuf), \
+                  "The %s keyword has an undefined value.", lname ); \
+         wbuf[sizeof(wbuf)-1] = '\0'; \
          Warn( this, "undefread", wbuf, method, class ); \
       } \
    } \
+\
+/* Release the memory used to hold keyword name, value and comment strings. */ \
+   lname = (char *) astFree( (void *) lname ); \
+   lvalue = (char *) astFree( (void *) lvalue ); \
+   lcom = (char *) astFree( (void *) lcom ); \
 \
 /* Return the answer. */ \
    return ret; \
