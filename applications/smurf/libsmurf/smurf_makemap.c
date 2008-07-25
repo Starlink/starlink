@@ -634,7 +634,7 @@ void smurf_makemap( int *status ) {
 
   /* Get METHOD - set rebin/iterate flags */
   parChoic( "METHOD", "REBIN", "REBIN, ITERATE.", 1,
-	    method, LEN__METHOD, status);
+            method, LEN__METHOD, status);
   if( strncmp( method, "REBIN", 5 ) == 0 ) {
     rebin = 1;
     iterate = 0;
@@ -730,9 +730,9 @@ void smurf_makemap( int *status ) {
     msgOutif(MSG__VERB, " ", "Tracking a stationary object", status);
   }
 
-/* Create a new group to hold the names of the output NDFs that have been
-   created. This group does not include any NDFs that correspond to tiles
-   that contain no input data. */
+  /* Create a new group to hold the names of the output NDFs that have been
+     created. This group does not include any NDFs that correspond to tiles
+     that contain no input data. */
   igrp4 = grpNew( "", status );
 
   /* Create an output smfData */
@@ -745,7 +745,7 @@ void smurf_makemap( int *status ) {
       goto L998;
     }
 
-/* Expand the group to hold an output NDF name for each tile. */
+    /* Expand the group to hold an output NDF name for each tile. */
     smf_expand_tilegroup( ogrp, ntile, 0, &outsize, status );
   }
 
@@ -757,12 +757,12 @@ void smurf_makemap( int *status ) {
     /* Initialise the index of the next output NDF name to use in "ogrp". */
     iout = 1;
 
-/* Loop round, creating each tile of the output array. Each tile is
-   initially made a little larger than required so that edge effects
-   (caused by the width of the spreading kernel) are avoided. The NDF
-   containing the tile is eventually reshaped to exclude the extra
-   boundary, resulting in a set of tiles that can be assembled edge-to-edge
-   to form the full output array. */
+    /* Loop round, creating each tile of the output array. Each tile is
+       initially made a little larger than required so that edge effects
+       (caused by the width of the spreading kernel) are avoided. The NDF
+       containing the tile is eventually reshaped to exclude the extra
+       boundary, resulting in a set of tiles that can be assembled edge-to-edge
+       to form the full output array. */
     tile = tiles;
     for( itile = 1; itile <= ntile && *status == SAI__OK; itile++, tile++ ) {
 
@@ -1004,11 +1004,11 @@ void smurf_makemap( int *status ) {
       /* Write WCS */
       if (wcstile2d) ndfPtwcs( wcstile2d, ondf, status );
 
-        /* write units - hack we do not have a smfHead */
+      /* write units - hack we do not have a smfHead */
       if (strlen(data_units)) ndfCput( data_units, ondf, "UNITS", status);
       ndfCput("Flux Density", ondf, "LABEL", status);
 
-        /* Weights are related to data_units */
+      /* Weights are related to data_units */
       one_strlcat(data_units, "**-2", sizeof(data_units), status);
       ndfCput(data_units, wndf, "UNITS", status);
 
@@ -1024,8 +1024,8 @@ void smurf_makemap( int *status ) {
       }
       histogram = astFree( histogram );
 
-/* Store the keywords holding the number of tiles generated and the index
-   of the current tile. */
+      /* Store the keywords holding the number of tiles generated and the index
+         of the current tile. */
       atlPtfti( fchan, "NUMTILES", ntile, 
                 "No. of tiles covering the field", status );
       atlPtfti( fchan, "TILENUM", itile, 
@@ -1038,10 +1038,10 @@ void smurf_makemap( int *status ) {
         fchan = astAnnul( fchan );
       }
 
-/* For each open output NDF (the main tile NDF, and any extension NDFs),
-   first clone the NDF identifier, then close the file (which will unmap
-   the NDF arrays), and then reshape the NDF to exclude the boundary 
-   that was added to the tile to avoid edge effects. */
+      /* For each open output NDF (the main tile NDF, and any extension NDFs),
+         first clone the NDF identifier, then close the file (which will unmap
+         the NDF arrays), and then reshape the NDF to exclude the boundary 
+         that was added to the tile to avoid edge effects. */
       msgOutif( MSG__VERB, " ", "Reshaping output NDFs", status );
       smf_reshapendf( &tdata, tile, status );
       smf_reshapendf( &wdata, tile, status );
@@ -1130,14 +1130,14 @@ void smurf_makemap( int *status ) {
     for(i=1; (i<=size) && ( *status == SAI__OK ); i++ ) {	
       smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
       if( *status != SAI__OK) {
-	msgSeti("I",i);
-	msgSeti("S",size);
-	errRep(FUNC_NAME, "Error opening input file ^I of ^S for provenance tracking", status);
+        msgSeti("I",i);
+        msgSeti("S",size);
+        errRep(FUNC_NAME, "Error opening input file ^I of ^S for provenance tracking", status);
       }
         
       /* Store steptime for calculating EXP_TIME */
       if ( i==1 ) {
-	smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
+        smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
       }
 
       /* Check units are consistent */
@@ -1145,10 +1145,10 @@ void smurf_makemap( int *status ) {
 
       /* Propagate provenance to the output file */
       smf_accumulate_prov( data, igrp, i, ondf, "SMURF:MAKEMAP(ITER)",
-			   status);
+                           status);
 
       /* Handle output FITS header creation (since the file is open and
-	 the header is available) */
+         the header is available) */
       smf_fits_outhdr( data->hdr->fitshdr, &fchan, NULL, status );
 
       /* close the input file */
