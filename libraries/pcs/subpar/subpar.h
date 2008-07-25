@@ -47,6 +47,9 @@
  *-
 */
 
+/* we need size_t */
+#include <stdlib.h>
+
 void subParFindpar( const char * name, size_t * namecode, int * status );
 void subParGet0c( size_t namecode, char *cvalue, size_t cvalue_length,
 		  int * status );
