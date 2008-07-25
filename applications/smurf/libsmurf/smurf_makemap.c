@@ -438,6 +438,8 @@
 *     2008-07-22 (AGG):
 *        Refactor provenance handling loop, initialize spread
 *        parameter to AST__NEAREST
+*     2008-07-25 (TIMJ):
+*        Filter out darks. Use kaplibs.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -518,13 +520,14 @@ void smurf_makemap( int *status ) {
   int blank=0;                 /* Was a blank line just output? */
   smfBox *boxes = NULL;      /* Pointer to array of i/p file bounding boxes */
   Grp *confgrp = NULL;       /* Group containing configuration file */
+  smfArray *darks = NULL;   /* Dark data */
   smfData *data=NULL;        /* Pointer to SCUBA2 data struct */
   char data_units[SMF__CHARLABEL+1]; /* Units string */
   double *exp_time = NULL;    /* Exposure time array written to output file */
   AstFitsChan *fchan = NULL; /* FitsChan holding output NDF FITS extension */
+  Grp * fgrp = NULL;         /* Filtered group, no darks */
   smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
   int first;                 /* Is this the first input file? */
-  int flag;                  /* Flag */
   int *histogram = NULL;     /* Histogram for calculating exposure statistics */
   unsigned int *hitsmap;     /* Hitsmap array calculated in ITERATE method */
   dim_t i;                   /* Loop counter */
@@ -597,7 +600,23 @@ void smurf_makemap( int *status ) {
   ndfBegin();
 
   /* Get group of input files */
-  ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
+  kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
+
+  /* Filter out darks */
+  smf_find_darks( igrp, &fgrp, NULL, 1, &darks, status );
+
+  /* input group is now the filtered group so we can use that and
+     free the old input group */
+  size = grpGrpsz( fgrp, status );
+  grpDelet( &igrp, status);
+  igrp = fgrp;
+  fgrp = NULL;
+
+  if (size == 0) {
+    msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
+             " nothing from which to make a map", status );
+    goto L998;
+  }
 
   /* Get the celestial coordinate system for the output map */
   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
@@ -718,7 +737,7 @@ void smurf_makemap( int *status ) {
 
   /* Create an output smfData */
   if (*status == SAI__OK) {
-    ndgCreat ( "OUT", NULL, &ogrp, &outsize, &flag, status );
+    kpg1Wgndf( "OUT", NULL, 1, 1, NULL, &ogrp, &outsize, status );
     /* If OUT is NULL annul the bad status but set a flag so that we
        know to skip memory checks and actual map-making */
     if( *status == PAR__NULL ) {
@@ -889,7 +908,8 @@ void smurf_makemap( int *status ) {
         if( !pt || pt[ 0 ] < VAL__MAXI ) {
 
           /* Read data from the ith input file in the group */      
-          smf_open_and_flatfield( tile->grp, NULL, ifile, NULL, &data, status ); 
+          smf_open_and_flatfield( tile->grp, NULL, ifile, darks, &data,
+                                  status ); 
 
           /* Check that the data dimensions are 3 (for time ordered data) */
           if( *status == SAI__OK ) {
@@ -1205,6 +1225,7 @@ void smurf_makemap( int *status ) {
   if( ogrp != NULL ) grpDelet( &ogrp, status);
   if( boxes ) boxes = smf_free( boxes, status );
   if( tiles ) tiles = smf_freetiles( tiles, ntile, status );
+  if( darks ) smf_close_related( &darks, status );
 
   ndfEnd( status );
   
