@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_iteratemap( Grp *igrp, AstKeyMap *keymap, 
+*     smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
 *                    AstFrameSet *outfset, int moving, 
 *	             int *lbnd_out, int *ubnd_out, size_t maxmem, 
 *                    double *map, unsigned int *hitsmap, double *mapvar, 
@@ -24,6 +24,8 @@
 *        Group of input data files
 *     keymap = AstKeyMap* (Given)
 *        keymap containing parameters to control map-maker
+*     darks = const smfArray * (Given)
+*        Collection of dark frames. Can be NULL.
 *     outfset = AstFrameSet* (Given)
 *        Frameset containing the sky->output map mapping if calculating
 *        pointing LUT on-the-fly
@@ -154,11 +156,14 @@
 *        - added edge and notch frequency-domain filters
 *     2008-07-03 (EC)
 *        - Added padstart/padend to config files
+*     2008-07-25 (TIMJ):
+*        Pass darks through to smf_concat_smfGroup
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2006-2008 University of British Columbia
 *     All Rights Reserved.
@@ -207,7 +212,7 @@
 
 #define FUNC_NAME "smf_iteratemap"
 
-void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, 
+void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
                      AstFrameSet *outfset, int moving, 
                      int *lbnd_out, int *ubnd_out, size_t maxmem, 
                      double *map, unsigned int *hitsmap, double *mapvar, 
@@ -747,8 +752,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
         res = smf_malloc( nchunks, sizeof(*res), 1, status );
 
         /* Concatenate (no variance since we calculate it ourselves -- NOI) */
-        smf_concat_smfGroup( igroup, NULL, contchunk, 0, outfset, moving, lbnd_out, 
-                             ubnd_out, padStart, padEnd, 
+        smf_concat_smfGroup( igroup, darks, contchunk, 0, outfset, moving,
+                             lbnd_out, ubnd_out, padStart, padEnd, 
                              SMF__NOCREATE_VARIANCE, &res[0], status );
       } 
     }

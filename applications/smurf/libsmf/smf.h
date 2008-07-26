@@ -600,7 +600,7 @@ void smf_insert_tslice ( smfData **idata, smfData *tdata, int index,
 
 inst_t smf_inst_get( const smfHead * hdr, int * status );
 
-void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, 
+void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
 		     AstFrameSet *outfset, int moving, 
 	             int *lbnd_out, int *ubnd_out, size_t mapmem,
                      double *map, unsigned int *hitsmap, double *mapvar, 
