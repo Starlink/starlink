@@ -38,6 +38,9 @@
 *         Add status checks on entry to avoid segmentation violations
 *         caused by passing unchecked NULL pointers into RTL functions 
 *         such as strlen.
+*     25-JUL-2008 (TIMJ):
+*         Use F77_CREATE_EXPORT_CHARACTER to completely avoid strlen
+*         null pointer risk.
 
 *-
 */
@@ -58,8 +61,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param, fparam);
    F77_EXPORT_INTEGER(*status,fstatus);
 
    F77_CALL(par_cancl)( CHARACTER_ARG(fparam),
@@ -99,12 +101,9 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
-   F77_CREATE_CHARACTER(fdefaul,strlen( defaul ));
-   F77_EXPORT_CHARACTER(defaul,fdefaul,fdefaul_length);
-   F77_CREATE_CHARACTER(fopts,strlen( opts ));
-   F77_EXPORT_CHARACTER(opts,fopts,fopts_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_CREATE_EXPORT_CHARACTER(defaul,fdefaul);
+   F77_CREATE_EXPORT_CHARACTER(opts,fopts);
    F77_EXPORT_LOGICAL(null,fnull);
    F77_CREATE_CHARACTER(fvalue,value_length-1);
    F77_EXPORT_INTEGER(*status,fstatus);
@@ -156,11 +155,9 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(maxval,fmaxval);
-   F77_CREATE_CHARACTER(fopts,strlen( opts ));
-   F77_EXPORT_CHARACTER(opts,fopts,fopts_length);
+   F77_CREATE_EXPORT_CHARACTER(opts,fopts);
    F77_CREATE_CHARACTER_ARRAY(fvalues,values_length-1,maxval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
@@ -200,10 +197,8 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
-   F77_CREATE_CHARACTER(fvalue,strlen( value ));
-   F77_EXPORT_CHARACTER(value,fvalue,fvalue_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_CREATE_EXPORT_CHARACTER(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
    F77_CALL(par_def0c)( CHARACTER_ARG(fparam),
@@ -233,8 +228,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_DOUBLE(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
@@ -263,8 +257,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
@@ -293,8 +286,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_LOGICAL(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
@@ -323,8 +315,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_REAL(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
@@ -358,8 +349,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nval,fnval);
    F77_CREATE_CHARACTER_ARRAY(fvalues,values_length-1,nval);
    F77_EXPORT_CHARACTER_ARRAY_P(values,fvalues,fvalues_length,nval);
@@ -396,8 +386,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nval,fnval);
    F77_CREATE_DOUBLE_ARRAY(fvalues,nval);
    F77_EXPORT_DOUBLE_ARRAY(values,fvalues,nval);
@@ -433,8 +422,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nval,fnval);
    F77_CREATE_INTEGER_ARRAY(fvalues,nval);
    F77_EXPORT_INTEGER_ARRAY(values,fvalues,nval);
@@ -470,8 +458,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nval,fnval);
    F77_CREATE_LOGICAL_ARRAY(fvalues,nval);
    F77_EXPORT_LOGICAL_ARRAY(values,fvalues,nval);
@@ -507,8 +494,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nval,fnval);
    F77_CREATE_REAL_ARRAY(fvalues,nval);
    F77_EXPORT_REAL_ARRAY(values,fvalues,nval);
@@ -554,8 +540,7 @@ int i,nvalues;
    if( *status != SAI__OK ) return;
 
    for (i=ndim,nvalues=1;i;i--) nvalues*=maxd[i-1];
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(ndim,fndim);
    F77_CREATE_INTEGER_ARRAY(fmaxd,ndim);
    F77_EXPORT_INTEGER_ARRAY(maxd,fmaxd,ndim);
@@ -608,8 +593,7 @@ int i,nvalues;
    if( *status != SAI__OK ) return;
 
    for (i=ndim,nvalues=1;i;i--) nvalues*=maxd[i-1];
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(ndim,fndim);
    F77_CREATE_INTEGER_ARRAY(fmaxd,ndim);
    F77_EXPORT_INTEGER_ARRAY(maxd,fmaxd,ndim);
@@ -661,8 +645,7 @@ int i,nvalues;
    if( *status != SAI__OK ) return;
 
    for (i=ndim,nvalues=1;i;i--) nvalues*=maxd[i-1];
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(ndim,fndim);
    F77_CREATE_INTEGER_ARRAY(fmaxd,ndim);
    F77_EXPORT_INTEGER_ARRAY(maxd,fmaxd,ndim);
@@ -714,8 +697,7 @@ int i,nvalues;
    if( *status != SAI__OK ) return;
 
    for (i=ndim,nvalues=1;i;i--) nvalues*=maxd[i-1];
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(ndim,fndim);
    F77_CREATE_INTEGER_ARRAY(fmaxd,ndim);
    F77_EXPORT_INTEGER_ARRAY(maxd,fmaxd,ndim);
@@ -767,8 +749,7 @@ int i,nvalues;
    if( *status != SAI__OK ) return;
 
    for (i=ndim,nvalues=1;i;i--) nvalues*=maxd[i-1];
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(ndim,fndim);
    F77_CREATE_INTEGER_ARRAY(fmaxd,ndim);
    F77_EXPORT_INTEGER_ARRAY(maxd,fmaxd,ndim);
@@ -814,8 +795,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nvals,fnvals);
    F77_CREATE_CHARACTER_ARRAY(fvalues,values_length-1,nvals);
    F77_EXPORT_INTEGER(*status,fstatus);
@@ -853,8 +833,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nvals,fnvals);
    F77_CREATE_DOUBLE_ARRAY(fvalues,nvals);
    F77_ASSOC_DOUBLE_ARRAY(fvalues,values);
@@ -891,8 +870,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nvals,fnvals);
    F77_CREATE_INTEGER_ARRAY(fvalues,nvals);
    F77_ASSOC_INTEGER_ARRAY(fvalues,values);
@@ -929,8 +907,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nvals,fnvals);
    F77_CREATE_LOGICAL_ARRAY(fvalues,nvals);
    F77_ASSOC_LOGICAL_ARRAY(fvalues,values);
@@ -967,8 +944,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nvals,fnvals);
    F77_CREATE_REAL_ARRAY(fvalues,nvals);
    F77_ASSOC_REAL_ARRAY(fvalues,values);
@@ -1014,8 +990,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_DOUBLE(defaul,fdefaul);
    F77_EXPORT_DOUBLE(vmin,fvmin);
    F77_EXPORT_DOUBLE(vmax,fvmax);
@@ -1064,8 +1039,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(defaul,fdefaul);
    F77_EXPORT_INTEGER(vmin,fvmin);
    F77_EXPORT_INTEGER(vmax,fvmax);
@@ -1114,8 +1088,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_REAL(defaul,fdefaul);
    F77_EXPORT_REAL(vmin,fvmin);
    F77_EXPORT_REAL(vmax,fvmax);
@@ -1167,8 +1140,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nvals,fnvals);
    F77_CREATE_DOUBLE_ARRAY(fdefaul,nvals);
    F77_EXPORT_DOUBLE_ARRAY(defaul,fdefaul,nvals);
@@ -1227,8 +1199,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nvals,fnvals);
    F77_CREATE_INTEGER_ARRAY(fdefaul,nvals);
    F77_EXPORT_INTEGER_ARRAY(defaul,fdefaul,nvals);
@@ -1287,8 +1258,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nvals,fnvals);
    F77_CREATE_REAL_ARRAY(fdefaul,nvals);
    F77_EXPORT_REAL_ARRAY(defaul,fdefaul,nvals);
@@ -1344,8 +1314,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(maxval,fmaxval);
    F77_EXPORT_DOUBLE(vmin,fvmin);
    F77_EXPORT_DOUBLE(vmax,fvmax);
@@ -1397,8 +1366,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(maxval,fmaxval);
    F77_EXPORT_INTEGER(vmin,fvmin);
    F77_EXPORT_INTEGER(vmax,fvmax);
@@ -1450,8 +1418,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(maxval,fmaxval);
    F77_EXPORT_REAL(vmin,fvmin);
    F77_EXPORT_REAL(vmax,fvmax);
@@ -1493,8 +1460,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_CREATE_CHARACTER(fvalue,value_length-1);
    F77_EXPORT_INTEGER(*status,fstatus);
 
@@ -1526,8 +1492,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(*status,fstatus);
 
    F77_CALL(par_get0d)( CHARACTER_ARG(fparam),
@@ -1556,8 +1521,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(*status,fstatus);
 
    F77_CALL(par_get0i)( CHARACTER_ARG(fparam),
@@ -1586,8 +1550,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(*status,fstatus);
 
    F77_CALL(par_get0l)( CHARACTER_ARG(fparam),
@@ -1616,8 +1579,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(*status,fstatus);
 
    F77_CALL(par_get0r)( CHARACTER_ARG(fparam),
@@ -1654,9 +1616,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
-   F77_EXPORT_INTEGER(maxval,fmaxval);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_CREATE_CHARACTER_ARRAY(fvalues,values_length-1,maxval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
@@ -1698,8 +1658,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(maxval,fmaxval);
    F77_CREATE_DOUBLE_ARRAY(fvalues,maxval);
    F77_ASSOC_DOUBLE_ARRAY(fvalues,values);
@@ -1741,8 +1700,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(maxval,fmaxval);
    F77_CREATE_INTEGER_ARRAY(fvalues,maxval);
    F77_ASSOC_INTEGER_ARRAY(fvalues,values);
@@ -1784,8 +1742,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(maxval,fmaxval);
    F77_CREATE_LOGICAL_ARRAY(fvalues,maxval);
    F77_ASSOC_LOGICAL_ARRAY(fvalues,values);
@@ -1827,8 +1784,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(maxval,fmaxval);
    F77_CREATE_REAL_ARRAY(fvalues,maxval);
    F77_ASSOC_REAL_ARRAY(fvalues,values);
@@ -1877,8 +1833,7 @@ int i,nvalues;
    if( *status != SAI__OK ) return;
 
    for (i=ndim,nvalues=1;i;i--) nvalues*=maxd[i-1];
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(ndim,fndim);
    F77_CREATE_INTEGER_ARRAY(fmaxd,ndim);
    F77_EXPORT_INTEGER_ARRAY(maxd,fmaxd,ndim);
@@ -1933,8 +1888,7 @@ int i,nvalues;
    if( *status != SAI__OK ) return;
 
    for (i=ndim,nvalues=1;i;i--) nvalues*=maxd[i-1];
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(ndim,fndim);
    F77_CREATE_INTEGER_ARRAY(fmaxd,ndim);
    F77_EXPORT_INTEGER_ARRAY(maxd,fmaxd,ndim);
@@ -1988,8 +1942,7 @@ int i,nvalues;
    if( *status != SAI__OK ) return;
 
    for (i=ndim,nvalues=1;i;i--) nvalues*=maxd[i-1];
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(ndim,fndim);
    F77_CREATE_INTEGER_ARRAY(fmaxd,ndim);
    F77_EXPORT_INTEGER_ARRAY(maxd,fmaxd,ndim);
@@ -2043,8 +1996,7 @@ int i,nvalues;
    if( *status != SAI__OK ) return;
 
    for (i=ndim,nvalues=1;i;i--) nvalues*=maxd[i-1];
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(ndim,fndim);
    F77_CREATE_INTEGER_ARRAY(fmaxd,ndim);
    F77_EXPORT_INTEGER_ARRAY(maxd,fmaxd,ndim);
@@ -2098,8 +2050,7 @@ int i,nvalues;
    if( *status != SAI__OK ) return;
 
    for (i=ndim,nvalues=1;i;i--) nvalues*=maxd[i-1];
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(ndim,fndim);
    F77_CREATE_INTEGER_ARRAY(fmaxd,ndim);
    F77_EXPORT_INTEGER_ARRAY(maxd,fmaxd,ndim);
@@ -2150,8 +2101,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(maxval,fmaxval);
    F77_CREATE_CHARACTER_ARRAY(fvalues,values_length-1,maxval);
    F77_EXPORT_INTEGER(*status,fstatus);
@@ -2194,8 +2144,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(maxval,fmaxval);
    F77_CREATE_DOUBLE_ARRAY(fvalues, maxval);
    F77_ASSOC_DOUBLE_ARRAY(fvalues,values);
@@ -2237,8 +2186,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(maxval,fmaxval);
    F77_CREATE_INTEGER_ARRAY(fvalues,maxval);
    F77_ASSOC_INTEGER_ARRAY(fvalues,values);
@@ -2280,8 +2228,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(maxval,fmaxval);
    F77_CREATE_LOGICAL_ARRAY(fvalues,maxval);
    F77_ASSOC_LOGICAL_ARRAY(fvalues,values);
@@ -2323,8 +2270,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(maxval,fmaxval);
    F77_CREATE_REAL_ARRAY(fvalues,maxval);
    F77_ASSOC_REAL_ARRAY(fvalues,values);
@@ -2372,8 +2318,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(defaul,fdefaul);
    F77_EXPORT_INTEGER(vmin,fvmin);
    F77_EXPORT_INTEGER(vmax,fvmax);
@@ -2422,8 +2367,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(defaul,fdefaul);
    F77_EXPORT_INTEGER(vmin,fvmin);
    F77_EXPORT_INTEGER(vmax,fvmax);
@@ -2475,8 +2419,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nvals,fnvals);
    F77_CREATE_DOUBLE_ARRAY(fdefaul,nvals);
    F77_EXPORT_DOUBLE_ARRAY(defaul,fdefaul,nvals);
@@ -2539,8 +2482,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nvals,fnvals);
    F77_CREATE_INTEGER_ARRAY(fdefaul,nvals);
    F77_EXPORT_INTEGER_ARRAY(defaul,fdefaul,nvals);
@@ -2603,8 +2545,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nvals,fnvals);
    F77_CREATE_REAL_ARRAY(fdefaul,nvals);
    F77_EXPORT_REAL_ARRAY(defaul,fdefaul,nvals);
@@ -2664,8 +2605,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(maxval,fmaxval);
    F77_CREATE_DOUBLE_ARRAY(fvmin,maxval);
    F77_EXPORT_DOUBLE_ARRAY(vmin,fvmin,maxval);
@@ -2722,8 +2662,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(maxval,fmaxval);
    F77_CREATE_INTEGER_ARRAY(fvmin,maxval);
    F77_EXPORT_INTEGER_ARRAY(vmin,fvmin,maxval);
@@ -2779,8 +2718,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(maxval,fmaxval);
    F77_CREATE_REAL_ARRAY(fvmin,maxval);
    F77_EXPORT_REAL_ARRAY(vmin,fvmin,maxval);
@@ -2830,8 +2768,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_LOGICAL(defaul,fdefaul);
    F77_EXPORT_LOGICAL(null,fnull);
    F77_EXPORT_INTEGER(*status,fstatus);
@@ -2865,10 +2802,8 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
-   F77_CREATE_CHARACTER(fvalue,strlen( value ));
-   F77_EXPORT_CHARACTER(value,fvalue,fvalue_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_CREATE_EXPORT_CHARACTER(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
    F77_CALL(par_maxc)( CHARACTER_ARG(fparam),
@@ -2898,8 +2833,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_DOUBLE(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
@@ -2928,8 +2862,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
@@ -2958,8 +2891,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_REAL(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
@@ -2989,10 +2921,8 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
-   F77_CREATE_CHARACTER(fvalue,strlen( value ));
-   F77_EXPORT_CHARACTER(value,fvalue,fvalue_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_CREATE_EXPORT_CHARACTER(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
    F77_CALL(par_minc)( CHARACTER_ARG(fparam),
@@ -3022,8 +2952,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_DOUBLE(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
@@ -3052,8 +2981,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
@@ -3082,8 +3010,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_REAL(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
@@ -3131,14 +3058,11 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
-   F77_CREATE_CHARACTER(fdefaul,strlen( defaul ));
-   F77_EXPORT_CHARACTER(defaul,fdefaul,fdefaul_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_CREATE_EXPORT_CHARACTER(defaul,fdefaul);
    F77_EXPORT_DOUBLE(vmin,fvmin);
    F77_EXPORT_DOUBLE(vmax,fvmax);
-   F77_CREATE_CHARACTER(fopts,strlen( opts ));
-   F77_EXPORT_CHARACTER(opts,fopts,fopts_length);
+   F77_CREATE_EXPORT_CHARACTER(opts,fopts);
    F77_EXPORT_LOGICAL(null,fnull);
    F77_CREATE_CHARACTER(fvalue,value_length-1);
    F77_EXPORT_INTEGER(*status,fstatus);
@@ -3199,14 +3123,11 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
-   F77_CREATE_CHARACTER(fdefaul,strlen( defaul ));
-   F77_EXPORT_CHARACTER(defaul,fdefaul,fdefaul_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_CREATE_EXPORT_CHARACTER(defaul,fdefaul);
    F77_EXPORT_INTEGER(vmin,fvmin);
    F77_EXPORT_INTEGER(vmax,fvmax);
-   F77_CREATE_CHARACTER(fopts,strlen( opts ));
-   F77_EXPORT_CHARACTER(opts,fopts,fopts_length);
+   F77_CREATE_EXPORT_CHARACTER(opts,fopts);
    F77_EXPORT_LOGICAL(null,fnull);
    F77_CREATE_CHARACTER(fvalue,value_length-1);
    F77_EXPORT_INTEGER(*status,fstatus);
@@ -3267,14 +3188,11 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
-   F77_CREATE_CHARACTER(fdefaul,strlen( defaul ));
-   F77_EXPORT_CHARACTER(defaul,fdefaul,fdefaul_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_CREATE_EXPORT_CHARACTER(defaul,fdefaul);
    F77_EXPORT_REAL(vmin,fvmin);
    F77_EXPORT_REAL(vmax,fvmax);
-   F77_CREATE_CHARACTER(fopts,strlen( opts ));
-   F77_EXPORT_CHARACTER(opts,fopts,fopts_length);
+   F77_CREATE_EXPORT_CHARACTER(opts,fopts);
    F77_EXPORT_LOGICAL(null,fnull);
    F77_CREATE_CHARACTER(fvalue,value_length-1);
    F77_EXPORT_INTEGER(*status,fstatus);
@@ -3334,13 +3252,11 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(maxval,fmaxval);
    F77_EXPORT_DOUBLE(vmin,fvmin);
    F77_EXPORT_DOUBLE(vmax,fvmax);
-   F77_CREATE_CHARACTER(fopts,strlen( opts ));
-   F77_EXPORT_CHARACTER(opts,fopts,fopts_length);
+   F77_CREATE_EXPORT_CHARACTER(opts,fopts);
    F77_CREATE_CHARACTER_ARRAY(fvalues,values_length-1,maxval);
    F77_EXPORT_INTEGER(*actval,factval);
    F77_EXPORT_INTEGER(*status,fstatus);
@@ -3400,13 +3316,11 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(maxval,fmaxval);
    F77_EXPORT_INTEGER(vmin,fvmin);
    F77_EXPORT_INTEGER(vmax,fvmax);
-   F77_CREATE_CHARACTER(fopts,strlen( opts ));
-   F77_EXPORT_CHARACTER(opts,fopts,fopts_length);
+   F77_CREATE_EXPORT_CHARACTER(opts,fopts);
    F77_CREATE_CHARACTER_ARRAY(fvalues,values_length-1,maxval);
    F77_EXPORT_INTEGER(*actval,factval);
    F77_EXPORT_INTEGER(*status,fstatus);
@@ -3466,13 +3380,11 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(maxval,fmaxval);
    F77_EXPORT_REAL(vmin,fvmin);
    F77_EXPORT_REAL(vmax,fvmax);
-   F77_CREATE_CHARACTER(fopts,strlen( opts ));
-   F77_EXPORT_CHARACTER(opts,fopts,fopts_length);
+   F77_CREATE_EXPORT_CHARACTER(opts,fopts);
    F77_CREATE_CHARACTER_ARRAY(fvalues,values_length-1,maxval);
    F77_EXPORT_INTEGER(*actval,factval);
    F77_EXPORT_INTEGER(*status,fstatus);
@@ -3515,10 +3427,8 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
-   F77_CREATE_CHARACTER(fprompt,strlen( prompt ));
-   F77_EXPORT_CHARACTER(prompt,fprompt,fprompt_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_CREATE_EXPORT_CHARACTER(prompt,fprompt);
    F77_EXPORT_INTEGER(*status,fstatus);
 
    F77_CALL(par_promt)( CHARACTER_ARG(fparam),
@@ -3549,10 +3459,8 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
-   F77_CREATE_CHARACTER(fvalue,strlen( value ));
-   F77_EXPORT_CHARACTER(value,fvalue,fvalue_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_CREATE_EXPORT_CHARACTER(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
    F77_CALL(par_put0c)( CHARACTER_ARG(fparam),
@@ -3582,8 +3490,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_DOUBLE(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
@@ -3612,8 +3519,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
@@ -3642,8 +3548,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_LOGICAL(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
@@ -3672,8 +3577,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_REAL(value,fvalue);
    F77_EXPORT_INTEGER(*status,fstatus);
 
@@ -3707,8 +3611,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nval,fnval);
    F77_CREATE_CHARACTER_ARRAY(fvalues,values_length-1,nval);
    F77_EXPORT_CHARACTER_ARRAY_P(values,fvalues,fvalues_length,nval);
@@ -3745,8 +3648,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nval,fnval);
    F77_CREATE_DOUBLE_ARRAY(fvalues,nval);
    F77_EXPORT_DOUBLE_ARRAY(values,fvalues,nval);
@@ -3782,8 +3684,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nval,fnval);
    F77_CREATE_INTEGER_ARRAY(fvalues,nval);
    F77_EXPORT_INTEGER_ARRAY(values,fvalues,nval);
@@ -3819,8 +3720,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nval,fnval);
    F77_CREATE_LOGICAL_ARRAY(fvalues,nval);
    F77_EXPORT_LOGICAL_ARRAY(values,fvalues,nval);
@@ -3856,8 +3756,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nval,fnval);
    F77_CREATE_REAL_ARRAY(fvalues,nval);
    F77_EXPORT_REAL_ARRAY(values,fvalues,nval);
@@ -3903,8 +3802,7 @@ int i,nvalues;
    if( *status != SAI__OK ) return;
 
    for(i=ndim,nvalues=1;i;i--) nvalues*=maxd[i-1];
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(ndim,fndim);
    F77_CREATE_INTEGER_ARRAY(fmaxd,ndim);
    F77_EXPORT_INTEGER_ARRAY(maxd,fmaxd,ndim);
@@ -3957,8 +3855,7 @@ int i,nvalues;
    if( *status != SAI__OK ) return;
 
    for(i=ndim,nvalues=1;i;i--) nvalues*=maxd[i-1];
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(ndim,fndim);
    F77_CREATE_INTEGER_ARRAY(fmaxd,ndim);
    F77_EXPORT_INTEGER_ARRAY(maxd,fmaxd,ndim);
@@ -4010,8 +3907,7 @@ int i,nvalues;
    if( *status != SAI__OK ) return;
 
    for(i=ndim,nvalues=1;i;i--) nvalues*=maxd[i-1];
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(ndim,fndim);
    F77_CREATE_INTEGER_ARRAY(fmaxd,ndim);
    F77_EXPORT_INTEGER_ARRAY(maxd,fmaxd,ndim);
@@ -4063,8 +3959,7 @@ int i,nvalues;
    if( *status != SAI__OK ) return;
 
    for(i=ndim,nvalues=1;i;i--) nvalues*=maxd[i-1];
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(ndim,fndim);
    F77_CREATE_INTEGER_ARRAY(fmaxd,ndim);
    F77_EXPORT_INTEGER_ARRAY(maxd,fmaxd,ndim);
@@ -4116,8 +4011,7 @@ int i,nvalues;
    if( *status != SAI__OK ) return;
 
    for(i=ndim,nvalues=1;i;i--) nvalues*=maxd[i-1];
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(ndim,fndim);
    F77_CREATE_INTEGER_ARRAY(fmaxd,ndim);
    F77_EXPORT_INTEGER_ARRAY(maxd,fmaxd,ndim);
@@ -4163,8 +4057,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nval,fnval);
    F77_CREATE_CHARACTER_ARRAY(fvalues,values_length-1,nval);
    F77_EXPORT_CHARACTER_ARRAY_P(values,fvalues,fvalues_length,nval);
@@ -4201,8 +4094,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nval,fnval);
    F77_CREATE_DOUBLE_ARRAY(fvalues,nval);
    F77_EXPORT_DOUBLE_ARRAY(values,fvalues,nval);
@@ -4238,8 +4130,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nval,fnval);
    F77_CREATE_INTEGER_ARRAY(fvalues,nval);
    F77_EXPORT_INTEGER_ARRAY(values,fvalues,nval);
@@ -4275,8 +4166,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nval,fnval);
    F77_CREATE_LOGICAL_ARRAY(fvalues,nval);
    F77_EXPORT_LOGICAL_ARRAY(values,fvalues,nval);
@@ -4312,8 +4202,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(nval,fnval);
    F77_CREATE_REAL_ARRAY(fvalues,nval);
    F77_EXPORT_REAL_ARRAY(values,fvalues,nval);
@@ -4346,8 +4235,7 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_EXPORT_INTEGER(*status,fstatus);
 
    F77_CALL(par_state)( CHARACTER_ARG(fparam),
@@ -4377,10 +4265,8 @@ DECLARE_INTEGER(fstatus);
 
    if( *status != SAI__OK ) return;
 
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
-   F77_CREATE_CHARACTER(fwhich,strlen( which ));
-   F77_EXPORT_CHARACTER(which,fwhich,fwhich_length);
+   F77_CREATE_EXPORT_CHARACTER(param,fparam);
+   F77_CREATE_EXPORT_CHARACTER(which,fwhich);
    F77_EXPORT_INTEGER(*status,fstatus);
 
    F77_CALL(par_unset)( CHARACTER_ARG(fparam),
