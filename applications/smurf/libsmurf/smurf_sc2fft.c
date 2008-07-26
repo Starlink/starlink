@@ -41,15 +41,18 @@
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2008-07-22 (EC):
 *        Initial version - based on sc2clean task
+*     2008-07-25 (TIMJ):
+*        Use kaplibs for group in/out.
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -100,7 +103,6 @@
 
 void smurf_sc2fft( int *status ) {
 
-  int flag;                 /* Flag for how group is terminated */
   size_t i=0;               /* Counter, index */
   smfData *idata=NULL;      /* Pointer to input smfData */
   Grp *igrp = NULL;         /* Input group of files */
@@ -116,10 +118,11 @@ void smurf_sc2fft( int *status ) {
   ndfBegin();
 
   /* Get input file(s) */
-  ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
+  kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Get output file(s) */
-  ndgCreat( "OUT", igrp, &ogrp, &outsize, &flag, status );
+  kpg1Wgndf( "OUT", igrp, size, size, "More output files required...",
+             &ogrp, &outsize, status );
 
   /* Are we doing an inverse transform? */
   parGet0l( "INVERSE", &inverse, status );
