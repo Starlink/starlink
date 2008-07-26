@@ -183,6 +183,8 @@
 *        Only access variance if status is good
 *     2008-05-28 (TIMJ):
 *        Use smf_accumulate_prov. Break from loop if status is bad.
+*     2008-07-25 (TIMJ):
+*        Use kaplibs for grp in/out. Filter darks.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -243,16 +245,16 @@
 void smurf_qlmakemap( int *status ) {
 
   /* Local Variables */
+  smfArray *darks = NULL;   /* Dark data */
   smfData *data = NULL;      /* Pointer to input SCUBA2 data struct */
   char data_units[SMF__CHARLABEL+1]; /* Units string */
   AstFitsChan *fchan = NULL; /* FitsChan holding output NDF FITS extension */
   smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
-  int flag;                  /* Flag */
+  Grp * fgrp = NULL;         /* Filtered group, no darks */
   int genvar = 0;            /* Flag to denote whether to generate
 				variances in output image */
   dim_t i;                   /* Loop counter */
   Grp *igrp = NULL;          /* Group of input files */
-  int indf;                  /* input NDF identifier */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   double *map = NULL;        /* Pointer to the rebinned map data */
   size_t mapsize;            /* Number of pixels in output image */
@@ -287,7 +289,23 @@ void smurf_qlmakemap( int *status ) {
   ndfBegin();
   
   /* Get group of input files */
-  ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
+  kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
+
+  /* Filter out darks */
+  smf_find_darks( igrp, &fgrp, NULL, 1, &darks, status );
+
+  /* input group is now the filtered group so we can use that and
+     free the old input group */
+  size = grpGrpsz( fgrp, status );
+  grpDelet( &igrp, status);
+  igrp = fgrp;
+  fgrp = NULL;
+
+  if (size == 0) {
+    msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
+             " nothing from which to make a map", status );
+    goto CLEANUP;
+  }
 
   /* Get the celestial coordinate system for the output image. */
   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
@@ -336,7 +354,8 @@ void smurf_qlmakemap( int *status ) {
   weights = smf_malloc( nweights, sizeof(double), 1, status);
 
   /* Create an output smfData */
-  ndgCreat( "OUT", NULL, &ogrp, &outsize, &flag, status );
+  kpg1Wgndf( "OUT", igrp, 1, 1, "More output files required...",
+             &ogrp, &outsize, status );
   smf_open_newfile( ogrp, 1, SMF__DOUBLE, 2, lbnd_out, ubnd_out, smfflags, &odata, 
 		    status );
 
@@ -359,7 +378,7 @@ void smurf_qlmakemap( int *status ) {
   msgOutif( MSG__VERB," ", "SMURF_QLMAKEMAP: Process data files", status );
   for ( i=1; i<=size && *status == SAI__OK; i++ ) {
     /* Read data from the ith input file in the group */
-    smf_open_and_flatfield( igrp, NULL, i, NULL, &data, status );
+    smf_open_and_flatfield( igrp, NULL, i, darks, &data, status );
 
     /* Check units are consistent */
     smf_check_units( i, data_units, data->hdr, status);
@@ -417,6 +436,8 @@ void smurf_qlmakemap( int *status ) {
     fchan = astAnnul( fchan );
   }
 
+ CLEANUP:
+
   /* Free the WCS pointer */
   if ( outframeset != NULL ) {
     outframeset = astAnnul( outframeset );
@@ -425,7 +446,7 @@ void smurf_qlmakemap( int *status ) {
   /* Tidy up and close the output file */  
   smf_close_file ( &odata, status );
   if ( ogrp != NULL ) grpDelet( &ogrp, status );
-
+  if (darks) smf_close_related( &darks, status );
   grpDelet( &igrp, status );
   
   ndfEnd( status );
