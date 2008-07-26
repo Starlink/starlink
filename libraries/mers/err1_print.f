@@ -183,8 +183,7 @@
 
 *     Loop to continue the remainder of the message.
 *     DO WHILE loop.
- 10         CONTINUE
-            IF ( IPOSN .NE. 0 ) THEN
+            DO WHILE ( IPOSN .NE. 0 )
 
 *        Re-initialise the output line for a continuation.
                LINE = '!'
@@ -194,8 +193,7 @@
                CALL MSG1_RFORM( TEXT, IPOSN, LINE( CONTAB : ERRWSZ ),
      :                       OPLEN )
                CALL ERR1_PRERR( LINE( : OPLEN+CONTAB-1 ), LSTAT )
-            GO TO 10
-            END IF
+            END DO
          END IF
       ELSE
 
