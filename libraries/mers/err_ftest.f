@@ -137,6 +137,10 @@
       CALL ERR_FACER( 'ERR', STATUS )
       CALL ERR_REP( ' ', 'ERR is installed and working. - ^ERR',
      :     STATUS )
+      CALL ERR_REP( ' ', 'Second line of error report',
+     :     STATUS )
+      CALL ERR_REP( ' ', 'Third line of error report',
+     :     STATUS )
       CALL ERR_FLBEL( STATUS )
       CALL ERR_RLSE
 
