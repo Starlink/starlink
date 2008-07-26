@@ -70,6 +70,7 @@
 #include "sae_par.h"
 #include "err_err.h"
 #include "err_par.h"
+#include "ems.h"
 
 #include <unistd.h>
 #include <stdio.h>
@@ -77,7 +78,6 @@
 void err1Prerr( const char * text, int * status ) {
 
   int errstat = 0;          /* status from printf */
-  int lstat = SAI__OK;      /* Local status */
 
   /* Fortran version stripped trailing space. We assume that the
      fortran interface to this routine has already done that */
@@ -90,6 +90,8 @@ void err1Prerr( const char * text, int * status ) {
   if (errstat < 0 || !isatty( STDERR_FILENO ) ) {
 
     *status = ERR__OPTER;
+    emsRep( "ERR1_PRERR", "Unable to deliver error message to STDERR",
+	    status );
 
     /* Write the message to STDOUT */
     printf( "%s\n", text );

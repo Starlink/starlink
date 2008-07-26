@@ -63,6 +63,9 @@
 #include "star/subpar.h"
 #include "sae_par.h"
 #include "msg_err.h"
+#include "ems.h"
+
+#include <stdio.h>
 
 void msg1Prtln( const char * text, int * status ) {
   int err;
