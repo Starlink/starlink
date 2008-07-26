@@ -141,6 +141,10 @@
       CALL ERR_RLSE
 
       STATUS = SAI__ERROR
+      CALL ERR_REP( ' ','Flushed error', STATUS)
+      CALL ERR_FLUSH(STATUS)
+
+      STATUS = SAI__ERROR
       CALL ERR_REP( ' ','Will annul this', STATUS )
       CALL ERR_ANNUL( STATUS )
       CALL ERR_END( STATUS )

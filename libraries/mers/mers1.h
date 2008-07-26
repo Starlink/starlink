@@ -39,8 +39,10 @@
 *-
 */
 
-void msg1Ktok ( void );
-
+void err1Bell( int * status );
 void err1Prerr( const char * text, int * status );
 
+void msg1Ktok ( void );
 void msg1Prtln( const char * text, int * status );
+
+

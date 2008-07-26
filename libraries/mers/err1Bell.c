@@ -1,13 +1,13 @@
-      SUBROUTINE ERR1_BELL( STATUS )
+/*
 *+
 *  Name:
-*     ERR1_BELL
+*     err1Bell
 
 *  Purpose:
 *     Deliver an ASCII BEL character.
 
 *  Language:
-*    Starlink Fortran 77
+*    Starlink ANSI C
 
 *  Invocation:
 *     CALL ERR1_BELL( STATUS )
@@ -18,10 +18,11 @@
 *     terminal.
 
 *  Arguments:
-*     STATUS = INTEGER (Returned)
+*     status = int * (Returned)
 *        The global status.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1993 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -43,46 +44,67 @@
 
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     1-OCT-1993 (PCTR):
 *        Original version.
+*     25-JUL-2008 (TIMJ):
+*        Rewrite in C
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
- 
-*  Global Constants:
-      INCLUDE 'SAE_PAR'                 ! Standard SAE constants
- 
-*  Status:
-      INTEGER STATUS
+#include "mers1.h"
+#include "sae_par.h"
 
-*  Local Constants:
-      INTEGER ASCBEL                    ! ASCII BEL code
-      PARAMETER ( ASCBEL = 7 )
+void err1Bell( int * status ) {
 
-*  Local Variables:
-      CHARACTER BELCHR * 1              ! The bell character
+  /* Fortran version only set status when return status from Prerr
+     was bad but this could leave it uninitialised */
+  *status = SAI__OK;
 
-      INTEGER ISTAT                     ! Local status
+  /*  deliver the bell character. */
+  err1Prerr( "\a", status );
 
-*.
+}
 
-*  Initialize the local status.
-      ISTAT = SAI__OK
+/* Remove fortran interface when no longer needed */
 
-*  Use SUBPAR_WRERR to deliver the bell character.
-      BELCHR = CHAR( ASCBEL )
-      CALL ERR1_PRERR( BELCHR, ISTAT )
+/*
+*+
+*  Name:
+*     ERR1_BELL
 
-*  Check the local status and return it on error.
-      IF ( ISTAT .NE. SAI__OK ) STATUS = ISTAT
+*  Purpose:
+*     Deliver an ASCII BEL character.
 
-      END
+*  Language:
+*    Starlink Fortran 77
+
+*  Invocation:
+*     CALL ERR1_BELL( STATUS )
+
+*  Description:
+*     A bell character is delivered to the user. If the user interface 
+*     in use supports this character, this will ring a bell on the 
+*     terminal.
+
+*  Arguments:
+*     STATUS = INTEGER (Returned)
+*        The global status.
+*/
+
+#include "f77.h"
+F77_SUBROUTINE(err1_bell)( INTEGER(STATUS) );
+
+F77_SUBROUTINE(err1_bell)( INTEGER(STATUS) ) {
+  int status;
+  err1Bell( &status );
+  F77_EXPORT_INTEGER( status, *STATUS );
+}
