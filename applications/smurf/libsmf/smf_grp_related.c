@@ -443,7 +443,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
            same chunk. Also check that the subsystems match, and that the
            continuous chunk doesn't exceed maxlen */
 
-        if( ( fabs((opentime - writetime)*24.*3600.) > steptime*2.) || 
+        if( ( fabs((opentime - writetime)*24.*3600.) > steptime*1.5) || 
             !matchsubsys || (maxlen && (totlen > maxlen)) ) {
           /* Found a discontinuity */
           thischunk++;
