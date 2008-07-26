@@ -27,12 +27,12 @@
 *        describe the spatial axes of the output cube. It should be a 
 *        valid value for the System attribute of an AST SkyFrame, or
 *        "TRACKING". 
+*     hdr = const smfHead* (Given)
+*        Header to be used to calculate base position and tracking system.
 *     alignsys = int (Given)
 *        If non-zero, then the input data will be aligned in the coordinate 
 *        system specified by "system" rather than in the default system
 *        (ICRS).
-*     hdr = const smfHead* (Given)
-*        Header to be used to calculate base position and tracking system.
 *     skyframe = AstFrameSet ** (Returned)
 *        A pointer to a location at which to return a pointer to an AST 
 *        SkyFrame describing the spatial axes of the output WCS FrameSet.
