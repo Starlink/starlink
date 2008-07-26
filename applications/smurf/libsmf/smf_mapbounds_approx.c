@@ -14,14 +14,14 @@
 *     C function
 
 *  Invocation:
-*     smf_mapbounds_approx( Grp *igrp, int size, char *system, double pixsize, 
+*     smf_mapbounds_approx( Grp *igrp, int index, char *system, double pixsize, 
 *                           int *lbnd_out, int *ubnd_out, AstFrameSet **outframeset,
 *                           int *moving, int *status );
 
 *  Arguments:
 *     igrp = Grp* (Given)
 *        Group of timestream NDF data files to retrieve pointing
-*     size = int (Given)
+*     index = size_t (Given)
 *        Index of the file to use for determining the map extent,
 *        usually 1 to use the first file in the Grp
 *     system = char* (Given)
@@ -147,18 +147,14 @@
 
 #define FUNC_NAME "smf_mapbounds_approx"
 
-void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize, 
+void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsize, 
 			   int *lbnd_out, int *ubnd_out, AstFrameSet **outframeset,
 			   int *moving, int *status ) {
 
   /* Local variables */
-  double az[ 2 ];              /* Azimuth values */
-  AstMapping *azel2usesys = NULL; /* Mapping form AZEL to requested system */
   double bolospacing = 6.28;   /* Bolometer spacing in arcsec */
   double c;                    /* cos theta */
   smfData *data = NULL;        /* pointer to  SCUBA2 data struct */
-  double dec[ 2 ];             /* Dec values */
-  double el[ 2 ];              /* Elevation values */
   int dxpix;                   /* Map X offset in pixels */
   int dypix;                   /* Map Y offset in pixels */
   smfFile *file = NULL;        /* SCUBA2 data file information */
@@ -181,11 +177,7 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
   double mapy;                 /* Map Y offset in radians */
   double origval = 0.0;        /* A temporary double variable */
   char *pname = NULL;          /* Name of currently opened data file */
-  double ra[ 2 ];              /* RA values */
   double s;                    /* sin theta */
-  double sep;                  /* Separation between first and last BASE positions */
-  AstFrame *sf1 = NULL;        /* Frame representing AZEL system */
-  AstFrame *sf2 = NULL;        /* Frame representing requested system */
   double shift[ 2 ];           /* Shifts from PIXEL to GRID coords */
   AstMapping *sky2map = NULL;  /* Mapping celestial->map coordinates */
   AstSkyFrame *skyframe = NULL;/* Output SkyFrame */
@@ -194,7 +186,6 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
   AstFrameSet *swcsin = NULL;  /* FrameSet describing input WCS */
   int temp;                    /* Temporary variable  */
   double theta = 0.0;          /* Angle between FP up and tracking up */
-  const char *usesys = NULL;   /* AST system for output image */
   double wdthbox;              /* Map width in arcsec */
   int wdthpix;                 /* RA-Dec map width in pixels */
   double x_array_corners[4];   /* X-Indices for corner bolos in array */ 
@@ -249,13 +240,6 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
     swcsin = hdr->wcs;
     /* Retrieve input SkyFrame */
     skyin = astGetFrame( swcsin, AST__CURRENT );
-    /* Determine the tracking coordinate system, and choose the
-       celestial coordinate system for the output image */
-    if( !strncmp( system, "TRACKING", 8 ) ) {
-      usesys = sc2ast_convert_system( hdr->state->tcs_tr_sys, status );
-    } else {
-      usesys = system;
-    }
 
     /* Retrieve map height and width from header */
     smf_fits_getD( hdr, "MAP_WDTH", &mapwdth, status );
@@ -333,71 +317,9 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
     goto CLEANUP;
   }
 
-  /* Now create the output FrameSet. Begin by taking a copy of the
-     input SkyFrame (in order to inherit all the other attributes like
-     Epoch, Equinox, ObsLat, ObsLon, Dut1, etc) and then set its
-     System to the required system. */
-  skyframe = astCopy( skyin );
-  astSetC( skyframe, "SYSTEM", usesys );
+  /* Now create the output FrameSet. */
+  smf_calc_skyframe( skyin, system, hdr, 0, &skyframe, skyref, moving, status );
 
-  /* We will later record the telescope base pointing position as the
-     SkyRef attribute in the output SkyFrame. To do this, we need to
-     convert the stored telescope base pointing position from AZEL to
-     the requested output system. Create a Mapping to do this using
-     astConvert, and then use the Mapping to transform the stored
-     position. */
-  sf1 = astCopy( skyin );
-  astSetC( sf1, "SYSTEM", "AZEL" );
-  azel2usesys = astConvert( sf1, skyframe, "" );
-  astTran2( azel2usesys, 1, &(hdr->state->tcs_az_bc1),
-	    &(hdr->state->tcs_az_bc2), 1, skyref, skyref+1 );
-  astNorm( skyframe, skyref );
-  /* Determine if the telescope is tracking a moving target such as a
-     planet or asteroid. This is indicated by significant change in
-     the telescope base pointing position within the ICRS coordinate
-     system. Here, "significant" means more than 0.1 arc-second. Users
-     will only want to track moving objects if the output image is in
-     AZEL or GAPPT, so we ignoring a moving base pointing position
-     unless the output system is AZEL or GAPPT. */
-  if( !strcmp( usesys, "AZEL" ) || !strcmp( usesys, "GAPPT" ) ) {
-    /* Set the "sf2" SkyFrame to represent ICRS coords ("sf1" already
-       represents AZEL coords). */
-    sf2 = astCopy( skyin );
-    astSetC( sf2, "System", "ICRS" );
-
-    /* Set the Epoch for `sf1' andf `sf2' to the epoch of the first
-       time slice, then use the Mapping from `sf1' (AzEl) to `sf2'
-       (ICRS) to convert the telescope base pointing position for the
-       first time slices from (az,el) to ICRS. */
-    astSet( sf1, "Epoch=MJD %.*g", DBL_DIG, 
-	    (hdr->allState)[ 0 ].tcs_tai + 32.184/86400.0 );
-    astSet( sf2, "Epoch=MJD %.*g", DBL_DIG, 
-	    (hdr->allState)[ 0 ].tcs_tai + 32.184/86400.0 );
-    az[ 0 ] = (hdr->allState)[ 0 ].tcs_az_bc1;
-    el[ 0 ] = (hdr->allState)[ 0 ].tcs_az_bc2;
-    astTran2( astConvert( sf1, sf2, "" ), 1, az, el, 1, ra, dec );
-
-    
-    /* Set the Epoch for `sf1' andf `sf2' to the epoch of the last
-       time slice, then use the Mapping from `sf1' (AzEl) to `sf2'
-       (ICRS) to convert the telescope base pointing position for the
-       last time slices from (az,el) to ICRS. */
-    astSet( sf1, "Epoch=MJD %.*g", DBL_DIG, 
-	    (hdr->allState)[ hdr->nframes - 1 ].tcs_tai + 32.184/86400.0 );
-    astSet( sf2, "Epoch=MJD %.*g", DBL_DIG, 
-	    (hdr->allState)[ hdr->nframes - 1 ].tcs_tai + 32.184/86400.0 );
-    az[ 1 ] = (hdr->allState)[ hdr->nframes - 1 ].tcs_az_bc1;
-    el[ 1 ] = (hdr->allState)[ hdr->nframes - 1 ].tcs_az_bc2;
-    astTran2( astConvert( sf1, sf2, "" ), 1, az + 1, el + 1, 1, 
-	      ra + 1, dec + 1 );
-
-    /* Get the arc distance between the two positions and
-       see if it is greater than 0.1 arc-sec. */
-    sep = slaDsep( ra[ 0 ], dec[ 0 ], ra[ 1 ], dec[ 1 ] );
-    *moving = ( sep > 0.1*AST__DD2R/3600.0 );
-  } else {
-    *moving = 0;
-  }
   /* Just for kicks, let the user know the value of *moving */
   msgSeti("M",*moving);
   msgOutif(MSG__VERB, " ", "Moving = ^M", status);
@@ -455,8 +377,7 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
   shift[0] = -lbnd_out[0];
   shift[1] = -lbnd_out[1];
   astRemapFrame( *outframeset, AST__BASE, astShiftMap( 2, shift, "") );
-
-  astSetC( *outframeset, "SYSTEM", usesys );
+ 
   astExport( *outframeset );
 
   /* Change the pixel bounds to be consistent with the new CRPIX */

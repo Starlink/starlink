@@ -614,7 +614,7 @@ void smf_mapbounds( Grp *igrp,  int size, const char *system,
                     int alignsys, int *lbnd_out, int *ubnd_out, 
         AstFrameSet **outframeset, int *moving, smfBox ** boxes,int *status );
 
-void smf_mapbounds_approx( Grp *igrp, int index, char *system, double pixsize, 
+void smf_mapbounds_approx( Grp *igrp, size_t index, char *system, double pixsize, 
 			   int *lbnd_out, int *ubnd_out, AstFrameSet **outframeset, 
 			   int *moving, int *status );
 
