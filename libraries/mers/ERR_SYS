@@ -47,15 +47,12 @@
 *     25-JUN-1991 (PCTR):
 *        Added new constant for ADAM error stream attribute.
 *     26-JUL-2008 (TIMJ):
-*        ERR__NOBEL no longer required. ERR__NEWFL unused.
+*        ERR__NOBEL no longer required. ERR__NEWFL and ERR__MXUNT unused.
 *     {enter_further_changes_here}
 
 *-
 
 *  Global Constants:
-      INTEGER ERR__MXUNT                ! Maximum allowed logical unit
-      PARAMETER( ERR__MXUNT = 119 )
-
       INTEGER ERR__SZOUT                ! Size of an output string
       PARAMETER( ERR__SZOUT = 79 )
 
