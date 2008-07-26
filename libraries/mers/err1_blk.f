@@ -49,7 +49,7 @@
 *     21-JUL-1999 (AJC):
 *        Added Tuning parameters
 *     26-JUL-2008 (TIMJ):
-*        ERRBEL no longer required.
+*        ERRBEL no longer required. ERROPN not used.
 *     {enter_further_changes_here}
 
 *-
@@ -64,7 +64,6 @@
       INCLUDE 'ERR_CMN'                 ! ERR_ global variables
 
 *  Global Data:
-      DATA ERROPN / ERR__NEWFL /
       DATA ERRWSZ / ERR__SZOUT /
       DATA ERRRVL / .FALSE. /
       DATA ERRSTM / .FALSE. /

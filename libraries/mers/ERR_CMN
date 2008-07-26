@@ -49,20 +49,16 @@
 *     20-JUL-1999 (AJC)
 *        Add tuning parameters
 *     26-JUL-2008 (TIMJ):
-*        No longer need ERRBEL
+*        No longer need ERRBEL. ERROPN and ERRDEF not used.
 *     {enter_further_changes_here}
 
 *-
 
 *  Common Blocks:
-      LOGICAL ERROPN                    ! Output file status
       INTEGER ERRWSZ                    ! Line size for wrapping
       LOGICAL ERRRVL                    ! Reveal all error messages
       LOGICAL ERRSTM                    ! Error in 'stream' mode
-      INTEGER ERRDEF                    ! The 'default' error level
 
-      COMMON / ERRCM1 / ERROPN
-      COMMON / ERRCM2 / ERRWSZ, ERRRVL, ERRSTM
-      COMMON / ERRCM3 / ERRDEF
+      COMMON / ERRCM1 / ERRWSZ, ERRRVL, ERRSTM
 
 *.
