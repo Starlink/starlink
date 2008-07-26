@@ -32,6 +32,7 @@
 *     -  Call ERR_FLUSH to flush the current error context.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1993 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -53,11 +54,14 @@
 
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     4-OCT-1993 (PCTR):
 *        Original version.
+*     26-JUL-2008 (TIMJ):
+*        Call ERR1_FLUSH not ERR_FLUSH. No longer need common block.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -69,21 +73,21 @@
       IMPLICIT NONE                     ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'                 ! Standard SAE constants
-      INCLUDE 'ERR_SYS'                 ! ERR_ private constants
 
 *  Global Variables:
-      INCLUDE 'ERR_CMN'                 ! ERR_ global variables
 
 *  Status:
       INTEGER STATUS
 
+*  Local Variables:
+      LOGICAL ERRBEL
+
 *.
 
-*  Set the ERR_ bell flag.
-      ERRBEL = ( .NOT. ERR__NOBEL )
+*  Set the bell flag.
+      ERRBEL = .TRUE.
 
 *  Flush the current error context.
-      CALL ERR_FLUSH( STATUS )
+      CALL ERR1_FLUSH( ERRBEL, STATUS )
 
       END

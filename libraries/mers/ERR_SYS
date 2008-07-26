@@ -16,6 +16,7 @@
 *     internally by the ERR_ system.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -37,6 +38,7 @@
 
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -44,6 +46,8 @@
 *        Original version.
 *     25-JUN-1991 (PCTR):
 *        Added new constant for ADAM error stream attribute.
+*     26-JUL-2008 (TIMJ):
+*        ERR__NOBEL no longer required.
 *     {enter_further_changes_here}
 
 *-
@@ -51,9 +55,6 @@
 *  Global Constants:
       LOGICAL ERR__NEWFL                ! Create a new error file
       PARAMETER( ERR__NEWFL = .TRUE. )
-
-      LOGICAL ERR__NOBEL                ! Do not send a bell character
-      PARAMETER( ERR__NOBEL = .FALSE. )
 
       INTEGER ERR__MXUNT                ! Maximum allowed logical unit
       PARAMETER( ERR__MXUNT = 119 )

@@ -57,7 +57,7 @@ liberr_adam_la_LIBADD = liberr.la
 
 PRIVATE_INCLUDES = ERR_CMN ERR_SYS MSG_CMN MSG_SYS mers_f77.h mers1.h
 
-F_ROUTINES = err1_print.f \
+F_ROUTINES = err1_print.f err1_flush.f \
              err_fioer.f err_flbel.f err_flush.f \
              err_load.f err_out.f err_rep.f \
              err_tune.f \

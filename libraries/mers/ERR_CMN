@@ -16,6 +16,7 @@
 *     global variables.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 1999 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
@@ -39,6 +40,7 @@
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
 *     AJC: A.J.Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -46,19 +48,20 @@
 *        Original version.
 *     20-JUL-1999 (AJC)
 *        Add tuning parameters
+*     26-JUL-2008 (TIMJ):
+*        No longer need ERRBEL
 *     {enter_further_changes_here}
 
 *-
 
 *  Common Blocks:
-      LOGICAL ERRBEL                    ! Bell character switch
       LOGICAL ERROPN                    ! Output file status
       INTEGER ERRWSZ                    ! Line size for wrapping
       LOGICAL ERRRVL                    ! Reveal all error messages
       LOGICAL ERRSTM                    ! Error in 'stream' mode
       INTEGER ERRDEF                    ! The 'default' error level
 
-      COMMON / ERRCM1 / ERROPN, ERRBEL
+      COMMON / ERRCM1 / ERROPN
       COMMON / ERRCM2 / ERRWSZ, ERRRVL, ERRSTM
       COMMON / ERRCM3 / ERRDEF
 

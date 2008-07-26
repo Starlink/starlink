@@ -1,4 +1,4 @@
-      SUBROUTINE ERR1_PRINT( TEXT, STATUS )
+      SUBROUTINE ERR1_PRINT( TEXT, ERRBEL, STATUS )
 *+
 *  Name:
 *     ERR1_PRINT
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ERR1_PRINT( TEXT, STATUS )
+*     CALL ERR1_PRINT( TEXT, ERRBEL, STATUS )
 
 *  Description:
 *     The text of the given error message is split into lines of length
@@ -20,13 +20,18 @@
 *  Arguments:
 *     TEXT = CHARACTER * ( * ) (Given)
 *        Text to be output.
+*     ERRBEL = LOGICAL (Given & Returned)
+*        If true, an attempt will be made to ring a terminal bell
+*        in addition to flushing the error messages. Will be set to
+*        false if the bell was rung.
 *     STATUS = INTEGER (Returned)
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 1983, 1985, 1987, 1989, 1990, 1991, 1992, 1993, 1994 Science & Engineering Research Council.
-*     Copyright (C) 1997, 1999, 2001 Central Laboratory of the Research Councils.
-*     All Rights Reserved.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 1983, 1985, 1987, 1989-1994 Science & Engineering
+*     Research Council. Copyright (C) 1997, 1999, 2001 Central 
+*     Laboratory of the Research Councils. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -51,6 +56,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     PCTR: P.C.T. Rees (STARLINK)
 *     AJC: A.J.Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -84,6 +90,8 @@
 *        Add tuning parameters ERRWSZ and ERRSTM
 *     26-FEB-2001 (AJC):
 *        Change EMS1_RFORM to MSG1_RFORM
+*     28-JUL-2008 (TIMJ):
+*        Add extra argument so that we do not need ERRBEL common block.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -100,10 +108,13 @@
       INCLUDE 'ERR_SYS'                 ! ERR_ private constants
 
 *  Global Variables:
-      INCLUDE 'ERR_CMN'                 ! ERR_ global variables
+      INCLUDE 'ERR_CMN'
 
 *  Arguments Given:
       CHARACTER * ( * ) TEXT
+
+*  Arguments Given & Returned:
+      LOGICAL ERRBEL
 
 *  Status:
       INTEGER STATUS
@@ -139,11 +150,11 @@
 
 *  Check whether a bell character is to be delivered and initialise the 
 *  output line.
-      IF ( ERRBEL .NEQV. ERR__NOBEL ) THEN
+      IF ( ERRBEL ) THEN
          BELCHR = CHAR( ASCBEL )
          LINE = BELCHR
          LSTART = 2
-         ERRBEL = ERR__NOBEL
+         ERRBEL = .FALSE.
       ELSE
          LINE = ' '
          LSTART = 1

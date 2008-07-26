@@ -27,15 +27,13 @@
 *        ERR__OPTER.
 
 *  Algorithm:
-*     -  Call EMS1_ECOPY to get the error message contents at the current
-*     context.
-*     -  Call ERR1_PRINT to deliver the error message(s) to the user.
-*     -  Call EMS_ANNUL to annul the error table.
+*     -  Call ERR1_FLUSH with bell disabled.
 
 *  Copyright:
-*     Copyright (C) 1983, 1984, 1989, 1990, 1991, 1994 Science & Engineering Research Council.
-*     Copyright (C) 1997, 1999, 2001 Central Laboratory of the Research Councils.
-*     All Rights Reserved.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 1983, 1984, 1989-1991, 1994 Science & Engineering 
+*     Research Council. Copyright (C) 1997, 1999, 2001 Central Laboratory
+*     of the Research Councils. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -60,6 +58,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     PCTR: P.C.T. Rees (STARLINK)
 *     AJC: A.J. Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -97,6 +96,8 @@
 *          (means have to add !'s here)
 *        Allow for !'s in LINE length
 *        Check for NOMSG at base level is not an error
+*     28-JUL-2008 (TIMJ):
+*        Call ERR1_FLUSH with NOBEL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -108,132 +109,22 @@
       IMPLICIT NONE                     ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'                 ! Standard SAE constants
-      INCLUDE 'EMS_PAR'                 ! EMS_ public constants
-      INCLUDE 'EMS_ERR'                 ! EMS_ error codes
-      INCLUDE 'ERR_ERR'                 ! ERR_ error codes
-      INCLUDE 'ERR_PAR'                 ! ERR_ public constants
-      INCLUDE 'ERR_SYS'                 ! ERR_ private constants
 
 *  Global Variables:
-      INCLUDE 'ERR_CMN'                 ! ERR_ global variables
 
 *  Status:
       INTEGER STATUS
 
 *  Local Constants:
-      INTEGER MAXTAB
-      PARAMETER ( MAXTAB = 3 )
 
 *  Local Variables:
-      CHARACTER * ( ERR__SZMSG ) OPSTR  ! Error message string
-      CHARACTER * ( ERR__SZPAR ) PARAM  ! Message name
-      CHARACTER * ( ERR__SZMSG + 3) LINE   ! Output line buffer
-      CHARACTER * ( MAXTAB ) TABS       ! Line tab
+      LOGICAL ERRBEL
 
-      INTEGER ISTAT                     ! Internal status
-      INTEGER LEVEL                     ! Error message context
-      INTEGER OPCNT                     ! Output line counter
-      INTEGER PARLEN                    ! Length of parameter name
-      INTEGER OPLEN                     ! Length of error message string
-      INTEGER LINLEN                    ! Length of output line
-      INTEGER LSTAT                     ! Status returned by MSG1_PUTC
-      INTEGER PSTAT                     ! Status returned by ERR1_PRINT
-
-      LOGICAL NOMSG                     ! If there's really no message
 *.
 
-*  Initialise the local status values and the output line counter.
-      OPCNT = 0
-      ISTAT = SAI__ERROR
-      PSTAT = SAI__OK
- 
-*  Set initial TABS value
-      TABS = '!! '
+      ERRBEL = .FALSE.
 
-*  Loop to get the error messages at the current context level.
-*  DO WHILE loop.
- 10   CONTINUE
-      IF ( .TRUE. ) THEN
-
-*     Get the last STATUS in case it's needed after EMS_ELOAD has annulled
-         CALL EMS_STAT( LSTAT )
-
-*     Get the error message.
-         CALL EMS_ELOAD( PARAM, PARLEN, OPSTR, OPLEN, ISTAT )
-
-*     Check for no messages to flush in the base context (i.e. because 
-*     they have been delivered immediately to the user). 
-*     In that case, just output BEL if required
-         NOMSG = .FALSE.
-         IF ( ISTAT .EQ. EMS__NOMSG ) THEN
-            CALL EMS_LEVEL( LEVEL )
-            IF ( ( LEVEL .EQ. EMS__BASE ) 
-     :       .AND. ( LSTAT .NE. SAI__OK ) ) NOMSG = .TRUE.
-         END IF
-
-         IF ( NOMSG ) THEN
-*        Check if any lines have been delivered.
-            IF ( OPCNT .EQ. 0 ) THEN
-
-*           Check whether a bell character is to be delivered: if so,
-*           deliver it and reset the bell flag.
-               IF ( ERRBEL .NEQV. ERR__NOBEL ) THEN
-                  CALL ERR1_BELL( PSTAT )
-                  ERRBEL = ERR__NOBEL
-               END IF
-               CALL EMS_ANNUL( ISTAT )
-            END IF
-
-*        Repeat the loop. Next will be 'no more messages' but this is needed
-*        to reset EMS_ELOAD.
-           GO TO 10
-
-         ELSE IF ( ISTAT .NE. SAI__OK ) THEN
-*        Construct the output line
-            LINE = TABS
-            LINLEN = MAXTAB
-            IF ( OPLEN .GT. 0 )
-     :         CALL MSG1_PUTC( OPSTR(1:OPLEN), LINE, LINLEN, LSTAT )
-
-*        Continue to print messages regardless of output errors.
-            CALL ERR1_PRINT( LINE( 1 : LINLEN ), PSTAT )
-            OPCNT = OPCNT + 1
-
-*        Only the first message of a flush has '!! ' prepended.
-*        Subsequent messages have '!  '
-            TABS = '!  '
-
-            GOTO 10
-
-         ELSE
-*        End of messages from EMS_ELOAD
-            GOTO 20
-
-         END IF
-
-      END IF
-
- 20   CONTINUE
-
-*  End of the error messages in the current context: if no output error 
-*  has occurred, annul the current error context. Ensure 'reveal' is not
-*  operative in EMS to avoid duplicate message output.
-      IF ( PSTAT .EQ. SAI__OK ) THEN
-         IF ( ERRRVL ) CALL EMS_TUNE( 'REVEAL', 0, PSTAT )
-         CALL EMS_ANNUL( STATUS )
-         IF ( ERRRVL ) CALL EMS_TUNE( 'REVEAL', 1, PSTAT )
-
-      ELSE
-
-*     Report an error message if an output error has occurred.
-*     Don't annul the context in this case.
-*     Output it as the last of the current flush
-         CALL ERR1_PRINT( 
-     :   '!  ERR_FLUSH: Error encountered during message output', 
-     :    PSTAT )
-         STATUS = ERR__OPTER
-
-      END IF
+*  Call internal flush routine with BEL disabled.
+      CALL ERR1_FLUSH( ERRBEL, STATUS )
 
       END

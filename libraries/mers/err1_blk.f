@@ -16,6 +16,7 @@
 *     This routine initialises the ERR_CMN common blocks.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 1999 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
@@ -39,6 +40,7 @@
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
 *     AJC: A.J. Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -46,6 +48,8 @@
 *        Original version.
 *     21-JUL-1999 (AJC):
 *        Added Tuning parameters
+*     26-JUL-2008 (TIMJ):
+*        ERRBEL no longer required.
 *     {enter_further_changes_here}
 
 *-
@@ -61,7 +65,6 @@
 
 *  Global Data:
       DATA ERROPN / ERR__NEWFL /
-      DATA ERRBEL / ERR__NOBEL /
       DATA ERRWSZ / ERR__SZOUT /
       DATA ERRRVL / .FALSE. /
       DATA ERRSTM / .FALSE. /
