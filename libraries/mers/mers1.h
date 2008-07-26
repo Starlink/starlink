@@ -42,3 +42,5 @@
 void msg1Ktok ( void );
 
 void err1Prerr( const char * text, int * status );
+
+void msg1Prtln( const char * text, int * status );

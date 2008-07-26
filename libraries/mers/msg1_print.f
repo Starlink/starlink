@@ -26,15 +26,14 @@
 *        The global status.
 
 *  Implementation Notes:
-*     -  This subroutine is the ADAM version of MSG1_PRINT.
-
-*  Algorithm:
-*     -  Use the parameter system to send a print message to the user
-*     interface.
+*     -  This subroutine is shared by both ADAM and standalone implementation.
+*        System specific message delivery is done via MSG1_PRTLN.
 
 *  Copyright:
-*     Copyright (C) 1982, 1983, 1984, 1987, 1989, 1990, 1991, 1992, 1994 Science & Engineering Research Council.
-*     Copyright (C) 1999, 2001, 2004 Central Laboratory of the Research Councils.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 1982-1984, 1987, 1989-1992, 1994 Science &
+*     Engineering Research Council. Copyright (C) 1999, 2001, 2004 Central
+*     Laboratory of the Research Councils.
 *     All Rights Reserved.
 
 *  Licence:
@@ -59,6 +58,7 @@
 *     BDK: Dennis Kelly (ROE)
 *     PCTR: P.C.T. Rees (STARLINK)
 *     AJC: A.J. Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -100,6 +100,11 @@
 *        Use MSG1_GT... functions to get the values from the MSG_CMN 
 *        common blocks rather than directly accessing the common blocks
 *        (which are initialised in a different shared library).
+*     25-JUL-2008 (TIMJ):
+*        The ADAM and standalone versions were identical in all ways
+*        except for the call to subpar or write (and the corresponding
+*        check of inherited or I/O status). Move the system specific
+*        code to a new routine to aid code reuse.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -155,7 +160,7 @@
 
          IF ( MSG1_GTSTM() ) THEN
 *     Output with no messing
-            CALL SUBPAR_WRMSG( TEXT, ISTAT )
+            CALL MSG1_PRTLN( TEXT, ISTAT )
 
          ELSE
 *     Call MSG1_RFORM to load the output line and deliver it.
@@ -167,7 +172,7 @@
             IF ( IPOSN .NE. 0 .AND. ISTAT .EQ. SAI__OK ) THEN
                CALL MSG1_RFORM( TEXT, IPOSN, LINE( : MSG1_GTWSZ()), 
      :                          OPLEN )
-               CALL SUBPAR_WRMSG( LINE( : OPLEN ), ISTAT )
+               CALL MSG1_PRTLN( LINE( : OPLEN ), ISTAT )
             GO TO 10
             END IF
          END IF
@@ -176,7 +181,7 @@
 *     If there is no text, then send a blank message.
          LINE = " "
          OPLEN = 1
-         CALL SUBPAR_WRMSG( ' ', ISTAT )
+         CALL MSG1_PRTLN( ' ', ISTAT )
       END IF
 
 *  If the message cannot be delivered, then annul the current error

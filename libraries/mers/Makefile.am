@@ -64,7 +64,7 @@ F_ROUTINES = err1_bell.f err1_print.f \
              msg_blank.f msg_fmtc.f msg_fmtd.f msg_fmti.f msg_fmtl.f \
              msg_fmtr.f msg_iflev.f msg_ifset.f msg_load.f msg_out.f \
              msg_outif.f \
-             msg_tune.f \
+             msg_tune.f msg1_print.f \
              msg1_gtinf.f msg1_gtwsz.f msg1_gtstm.f msg1_ptinf.f \
 	     msg1_ptstm.f msg1_ptwsz.f
 
@@ -75,17 +75,17 @@ C_ROUTINES_STAND = msgBell_stand.c msgSync_stand.c
 
 F_INTERFACE_STAND = msg_bell_stand.c msg_sync_stand.c
 
-F_ROUTINES_STAND_SED = msg1_print_stand.f
+F_ROUTINES_STAND_SED = 
 
-C_ROUTINES_STAND_SED = err1Prerr_stand.c
+C_ROUTINES_STAND_SED = err1Prerr_stand.c msg1Prtln_stand.c
 
 F_ROUTINES_ADAM = err_clear_adam.f err_start_adam.f \
                   err_stop_adam.f \
                   msg1_form_adam.f msg1_genv_adam.f msg1_gkey_adam.f \
-                  msg1_gref_adam.f msg1_print_adam.f \
+                  msg1_gref_adam.f \
                   msg_bell_adam.f msg_ifget_adam.f msg_sync_adam.f 
 
-C_ROUTINES_ADAM = err1Prerr_adam.c
+C_ROUTINES_ADAM = err1Prerr_adam.c msg1Prtln_adam.c
 
 F_INTERFACE_ADAM = 
 
