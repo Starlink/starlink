@@ -58,6 +58,7 @@
  *     AJC: A.J. Chipperfield (STARLINK)
  *     RTP: R.T.Platon (STARLINK)
  *     PWD: Peter W. Draper (JAC, Durham University)
+ *     TIMJ: Tim Jenness (JAC, Hawaii)
  *     {enter_new_authors_here}
  
  *  History:
@@ -67,6 +68,8 @@
  *        Remove unused variables
  *     13-MAY-2008 (PWD):
  *        Use struct to access message table.
+ *     28-JUL-2008 (TIMJ):
+ *        Initialise return buffer on error.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -91,6 +94,10 @@ void emsExpnd( const char *text, char *opstr, const int maxlen, int *oplen,
 
     TRACE( "emsExpnd" );
     DEBUG( "emsExpnd", "msglev = %d", msgtab->msglev );
+
+    /* make sure we are initialised regardless of status */
+    *oplen = 0;
+    opstr[0] = '\0';
 
     /*  Check the inherited global status. */
     if ( *status |= SAI__OK ) {
