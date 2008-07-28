@@ -7,6 +7,7 @@
  *    A simple test of the C EMS installation 
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -29,6 +30,8 @@
  *  Authors:
  *    AJC: A.J. Chipperfield (STARLINK)
  *    RTP: R.T.Platon (STARLINK)
+ *    TIMJ: Tim Jenness (JAC, Hawaii)
+ *    PWD: Peter Draper (Durham)
  *     {enter_new_authors_here}
 
  *-
@@ -47,6 +50,41 @@ int main( void ){
    DECLARE_INTEGER( fstatus );
    DECLARE_CHARACTER( err, 5 );
    DECLARE_CHARACTER( mess, EMS__SZMSG );
+   char buffer[EMS__SZTOK];
+   int oplen;
+
+   /* Test token concatenation in emsBegin/emsEnd block - need good status */
+   status = SAI__OK;
+   emsSetc("D", "A");
+   emsSetc("D", "B");
+   emsSetc("D", "C");
+   emsSetc("D", "D");
+   emsSetc("D", "E");
+   emsExpnd( "^D", buffer, sizeof(buffer), &oplen, &status );
+   printf("Before emsBegin    - Should be ABCDE: %s\n",buffer);
+   emsBegin( &status );
+   emsSetc("D", "A");
+   emsSetc("D", "B");
+   emsSetc("D", "C");
+   emsSetc("D", "D");
+   emsSetc("D", "E");
+   emsExpnd( "^D", buffer, sizeof(buffer), &oplen, &status );
+   printf("After emsBegin     - Should be ABCDE: %s\n",buffer);
+   emsSetc("D", "A");
+   emsSetc("D", "B");
+   emsSetc("D", "C");
+   emsSetc("D", "D");
+   emsSetc("D", "E");
+   emsExpnd( "^D", buffer, sizeof(buffer), &oplen, &status );
+   printf("2nd after emsBegin - Should be ABCDE: %s\n",buffer);
+   emsEnd( &status );
+   emsSetc("D", "A");
+   emsSetc("D", "B");
+   emsSetc("D", "C");
+   emsSetc("D", "D");
+   emsSetc("D", "E");
+   emsExpnd( "^D", buffer, sizeof(buffer), &oplen, &status );
+   printf("After emsEnd       - Should be ABCDE: %s\n",buffer);
 
 /* The basic C interface */
    printf( "\nTest the basic C interface\n" );
