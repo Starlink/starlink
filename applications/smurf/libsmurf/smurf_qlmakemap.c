@@ -339,6 +339,11 @@ void smurf_qlmakemap( int *status ) {
   smf_mapbounds_approx( igrp, 1, system, pixsize, lbnd_out, ubnd_out, 
 			&outframeset, &moving, status );
  
+  /* Write WCS bounds */
+  smf_store_outputbounds(0, lbnd_out, ubnd_out, outframeset, NULL, NULL, 
+                         status);
+  msgBlank( status );
+
   /* Compute number of pixels in output map */
   mapsize = (ubnd_out[0] - lbnd_out[0] + 1) * (ubnd_out[1] - lbnd_out[1] + 1);
 
