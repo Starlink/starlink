@@ -783,8 +783,9 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                    int *moving, AstSkyFrame **skyframe, int *sparse, 
                    int *gottsys, int *status );
 
-void smf_makefitschan( const char *system, double crval[2], double cdelt[2], 
-                       double crota2, AstFitsChan *fc, int *status );
+void smf_makefitschan( const char *system, double crpix[2], double crval[2],
+                       double cdelt[2], double crota2, AstFitsChan *fc,
+                       int *status );
 
 void smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3],
                      AstFrameSet **fset, int *status );

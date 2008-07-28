@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_makefitschan( const char *system, double crval[2], 
+*     smf_makefitschan( const char *system, double crpix[2], double crval[2], 
 *                       double cdelt[2], double crota2, AstFitsChan *fc, 
 *                       int *status );
 
@@ -21,6 +21,8 @@
 *     system = char * (Given)
 *        Specifies the celestial coordinate system. It should be a 
 *        valid value for the System attribute of an AST SkyFrame.
+*     crpix = double[ 2 ] (Given)
+*        Reference pixel associated with position crval[].
 *     crval = double[ 2 ] (Given)
 *        The longitude and latitude to use as the tangent point in the output 
 *        cube, in radians in the system specified by "system". 
@@ -45,6 +47,7 @@
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -52,9 +55,12 @@
 *        Initial version.
 *     1-NOV-2006 (DSB):
 *        New interface to allow more control of the projection parameters.
+*     28-JUL-2008 (TIMJ):
+*        Add CRPIX argument.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -93,8 +99,9 @@
 
 #define FUNC_NAME "smf_makefitschan"
 
-void smf_makefitschan( const char *system, double crval[2], double cdelt[2], 
-                       double crota2, AstFitsChan *fc, int *status ){
+void smf_makefitschan( const char *system, double crpix[2], double crval[2],
+                       double cdelt[2], double crota2, AstFitsChan *fc,
+                       int *status ){
 
 
 /* Local Variables */
@@ -110,8 +117,8 @@ void smf_makefitschan( const char *system, double crval[2], double cdelt[2],
    for( i = 0; i < ncard; i++ ) astDelFits( fc );
 
 /* Pixel coords of reference point. */
-   astSetFitsF( fc, "CRPIX1", 0.0, NULL, 0 );
-   astSetFitsF( fc, "CRPIX2", 0.0, NULL, 0 );
+   astSetFitsF( fc, "CRPIX1", crpix[0], NULL, 0 );
+   astSetFitsF( fc, "CRPIX2", crpix[1], NULL, 0 );
 
 /* World coords of reference point. */
    astSetFitsF( fc, "CRVAL1", crval[ 0 ]*AST__DR2D, NULL, 0 );
