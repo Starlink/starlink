@@ -628,7 +628,8 @@ etc.) to combine together \htmlref{keywords}{SEC:KEYW} which represent the basic
 \htmlref{statements}{SEC:STAT} can also be included which modify the way the ARD description is
 interpreted (for instance, by setting up an alternative coordinate system). 
 
-The ARD library includes two subroutines (\htmlref{ARD\_GROUP}{ARD_GROUP} and \htmlref{ARD\_GRPEX}{ARD_GRPEX}) which
+The ARD library includes two subroutines (\htmlref{ARD\_GROUP}{ARD_GROUP} and 
+\htmlref{ARD\_GRPEX}{ARD_GRPEX}) which
 simplify the task of obtaining ARD descriptions from the user or environment.
 Using these routines, an ARD description can be supplied to an application
 either directly, or by storing it in a text file and supplying the name of the
@@ -796,22 +797,25 @@ NDFs of any dimensionality up to the limit imposed by the NDF\_ system.
 
 \begin{enumerate}
 
-\item The example is actually an ADAM A-task, and so consists of a subroutine
-with a single argument giving the inherited status value. See
-\xref{SUN/101}{sun101}{} for
-further details about writing ADAM A-tasks. A ``stand-alone'' equivalent to the
-\htmlref{ARD\_GROUP}{ARD_GROUP} routine is available which can be used with non-ADAM applications. 
+\item The example is actually an ADAM A-task, and so consists of a
+subroutine with a single argument giving the inherited status value.
+See \xref{SUN/101}{sun101}{} for further details about writing ADAM
+A-tasks. A ``stand-alone'' equivalent to the
+\htmlref{ARD\_GROUP}{ARD_GROUP} routine is available which can be used
+with non-ADAM applications. 
 
 \item The INCLUDE statements are used to define the various ``symbolic
-constants'', which are used in this routine. Starlink software makes widespread
-use of such constants, which should always be defined in this way rather than by
-using actual numerical values. They are recognisable by the double underscore
-``\_\_'' (e.g. ``SAI\_\_OK'') which distinguishes them from subroutine names.
-SAE\_PAR defines constants starting with ``SAI\_\_'', NDF\_PAR defines constants
-starting with ``NDF\_\_'' (see \xref{SUN/33}{sun33}{}), PRM\_PAR defines constants starting with
-``VAL\_\_'' (see \xref{SUN/39}{sun39}{}), GRP\_PAR defines constants starting with
-``GRP\_\_'' (see \xref{SUN/150}{sun150}{}), and AST\_PAR defines constants 
-starting with ``AST\_\_'' (see \xref{SUN/210}{sun210}{}). 
+constants'', which are used in this routine. Starlink software makes
+widespread use of such constants, which should always be defined in
+this way rather than by using actual numerical values. They are
+recognisable by the double underscore ``\_\_'' (e.g. ``SAI\_\_OK'')
+which distinguishes them from subroutine names. SAE\_PAR defines
+constants starting with ``SAI\_\_'', NDF\_PAR defines constants
+starting with ``NDF\_\_'' (see \xref{SUN/33}{sun33}{}), PRM\_PAR
+defines constants starting with ``VAL\_\_'' (see
+\xref{SUN/39}{sun39}{}), GRP\_PAR defines constants starting with
+``GRP\_\_'' (see \xref{SUN/150}{sun150}{}), and AST\_PAR defines
+constants starting with ``AST\_\_'' (see \xref{SUN/210}{sun210}{}). 
 
 \item This application is designed to be able to handle data arrays of any
 dimensionality, up to the limit set by the NDF library. This limit is given by
@@ -841,15 +845,17 @@ than returning actual data values, this routine returns a {\em pointer} to the
 data values in IPDATA. The total number of pixels in the array is returned in 
 EL.
 
-\item Next, the ARD description is obtained using ADAM parameter 'REGION'. The
-returned ARD description is stored in a ``GRP group'' (rather like a Fortran
-character array). The GRP package is described in \xref{SUN/150}{sun150}{} and programmers using
-ARD should be aware of its contents. An integer value is returned in IGRP
-which is used to identify the group containing the ARD description throughout
-the rest of the application. The second argument is a ``null group identifier''
-(a symbolic constant defined within the include file GRP\_PAR). It is used to
-indicate that there is no existing ARD description on which to base the new ARD
-description; a completely new ARD description must be supplied. 
+\item Next, the ARD description is obtained using ADAM parameter
+'REGION'. The returned ARD description is stored in a ``GRP group''
+(rather like a Fortran character array). The GRP package is described
+in \xref{SUN/150}{sun150}{} and programmers using ARD should be aware
+of its contents. An integer value is returned in IGRP which is used to
+identify the group containing the ARD description throughout the rest
+of the application. The second argument is a ``null group identifier''
+(a symbolic constant defined within the include file GRP\_PAR). It is
+used to indicate that there is no existing ARD description on which to
+base the new ARD description; a completely new ARD description must be
+supplied. 
 
 \item We now obtain a pointer to a temporary array in which we can store the
 pixel mask corresponding to the ARD description. The mask has the same number of
