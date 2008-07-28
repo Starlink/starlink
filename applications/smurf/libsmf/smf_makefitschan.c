@@ -28,10 +28,11 @@
 *        cube, in radians in the system specified by "system". 
 *     cdelt = double[ 2 ] (Given)
 *        Spatial pixel sizes for the output cube at the tangent point, in 
-*        arcsec.
+*        radians. The correct sign will be applied automatically basedon
+*        on "system".
 *     crota2 = double (Given)
 *        The angle from north through east to the second pixel axis, in
-*        degrees.
+*        radians.
 *     fc = AstFitsChan * (Given)
 *        A pointer to a FitsCHan in which to put the FITS-WCS cards
 *        describing the tan plane projection.
@@ -56,7 +57,8 @@
 *     1-NOV-2006 (DSB):
 *        New interface to allow more control of the projection parameters.
 *     28-JUL-2008 (TIMJ):
-*        Add CRPIX argument.
+*        Add CRPIX argument. Tweak arguments to use radians (as calculated
+*        by smf_get_projpar).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -125,15 +127,15 @@ void smf_makefitschan( const char *system, double crpix[2], double crval[2],
    astSetFitsF( fc, "CRVAL2", crval[ 1 ]*AST__DR2D, NULL, 0 );
 
 /* Axis rotation. */
-   astSetFitsF( fc, "CROTA2", crota2, NULL, 0 );
+   astSetFitsF( fc, "CROTA2", crota2*AST__DR2D, NULL, 0 );
 
 /* Pixel size. AZEL is right-handed. */
    if( !strcmp( system, "AZEL" ) ) {
-      astSetFitsF( fc, "CDELT1", fabs(cdelt[ 0 ])/3600.0, NULL, 0 );
+      astSetFitsF( fc, "CDELT1", fabs(cdelt[ 0 ])*AST__DR2D, NULL, 0 );
    } else {
-      astSetFitsF( fc, "CDELT1", -fabs(cdelt[ 0 ])/3600.0, NULL, 0 );
+      astSetFitsF( fc, "CDELT1", -fabs(cdelt[ 0 ])*AST__DR2D, NULL, 0 );
    }
-   astSetFitsF( fc, "CDELT2", fabs(cdelt[ 1 ])/3600.0, NULL, 0 );
+   astSetFitsF( fc, "CDELT2", fabs(cdelt[ 1 ])*AST__DR2D, NULL, 0 );
 
 /* Axis types and reference frame. */
    if( !strcmp( system, "ICRS" ) ||
