@@ -97,5 +97,16 @@ int main( void ){
    printf( "Fake system call error lookup, Argument list too long\n" );
    emsSyser( "ERRNO", E2BIG );
    emsRep( "ERR10", "System error message: ^ERRNO", &status );
+
+   /* Test of tokens and renew. */
+   printf( "\nTest of tokens\n" );
+   status = SAI__ERROR;
+   emsSeti( "T1", 1 );
+   emsSeti( "T2", 2 );
+    emsSetc( "T3", "4" );
+   emsRep( "ERR1", "Error message: ^T1 + ^T2 != ^T3", &status );
+   emsRenew;
+   emsRep( "ERR1", "Error message: ^T1 + ^T2 != ^T3", &status );
+
    exit( 0 );
 }   
