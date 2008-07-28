@@ -126,6 +126,8 @@
 *     2008-06-05 (TIMJ):
 *        - par[] does not need to be an argument.
 *        - replace par[] with reference spatial frameset.
+*     2008-07-28 (TIMJ):
+*        Use smf_makefitschan.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -197,7 +199,7 @@ void smf_mapbounds( Grp *igrp,  int size, const char *system,
   AstFrameSet *fs = NULL;      /* A general purpose FrameSet pointer */
   smfHead *hdr = NULL;         /* Pointer to data header this time slice */
   int i;                       /* Loop counter */
-  int j;                       /* Loop counter */
+  dim_t j;                     /* Loop counter */
   dim_t k;                     /* Loop counter */
   int lbnd0[ 2 ];              /* Defaults for LBND parameter */
   double map_pa=0;             /* Map PA in output coord system (rads) */ 
@@ -390,25 +392,10 @@ void smf_mapbounds( Grp *igrp,  int size, const char *system,
           /* Now populate a FitsChan with FITS-WCS headers describing
              the required tan plane projection. The longitude and
              latitude axis types are set to either (RA,Dec) or (AZ,EL)
-             to get the correct handedness. Convert from radians to
-             degrees as required by FITS. */
+             to get the correct handedness. */
             fitschan = astFitsChan ( NULL, NULL, "" );
-
-            if( !strcmp( astGetC( oskyframe, "System" ), "AZEL" ) ){
-              astSetFitsS( fitschan, "CTYPE1", "AZ---TAN", " ", 1 );
-              astSetFitsS( fitschan, "CTYPE2", "EL---TAN", " ", 1 );
-            } else {
-              astSetFitsS( fitschan, "CTYPE1", "RA---TAN", " ", 1 );
-              astSetFitsS( fitschan, "CTYPE2", "DEC--TAN", " ", 1 );
-            }
-            astSetFitsF( fitschan, "CRPIX1", par[0], " ", 1 );
-            astSetFitsF( fitschan, "CRPIX2", par[1], " ", 1 );
-            astSetFitsF( fitschan, "CRVAL1", par[2]*AST__DR2D, " ", 1 );
-            astSetFitsF( fitschan, "CRVAL2", par[3]*AST__DR2D, " ", 1 );
-            astSetFitsF( fitschan, "CDELT1", par[4]*AST__DR2D, " ", 1 );
-            astSetFitsF( fitschan, "CDELT2", par[5]*AST__DR2D, " ", 1 );
-            astSetFitsF( fitschan, "CROTA2", par[6]*AST__DR2D, " ", 1 );
-
+            smf_makefitschan( astGetC( oskyframe, "System"), &(par[0]),
+                              &(par[2]), &(par[4]), par[6], fitschan, status ); 
             astClear( fitschan, "Card" );
             fs = astRead( fitschan );
 
