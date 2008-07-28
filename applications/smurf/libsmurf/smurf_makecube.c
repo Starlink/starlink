@@ -1251,7 +1251,7 @@ void smurf_makecube( int *status ) {
    parGet0l( "WEIGHTS", &savewgt, status );
 
 /* Report the WCS bounds and store the WCS bounds parameters */
-   smf_store_outputbounds( lbnd_out, ubnd_out, wcsout, oskyfrm,
+   smf_store_outputbounds( 1, lbnd_out, ubnd_out, wcsout, oskyfrm,
                            oskymap, status);
    msgBlank( status );
    blank = 1;

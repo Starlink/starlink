@@ -13,12 +13,16 @@
 *     C function
 
 *  Invocation:
-*     smf_store_outputbounds (const int lbnd_out[3], const int ubnd_out[3],
-*                        const AstFrameSet * wcsout, const AstSkyFrame *oskyfrm,
+*     smf_store_outputbounds (int updatepars, const int lbnd_out[3],
+*                        const int ubnd_out[3], const AstFrameSet * wcsout,
+*                        const AstSkyFrame *oskyfrm,
 *                        const AstMapping * oskymap, int *status) {
 
 
 *  Arguments:
+*     updatepars = int (Given)
+*        If true, parameter system is updated in addition to screen output.
+*        If false, the bounds are only written to the screen.
 *     lbnd_out = const int[3] (Given)
 *        Lower pixel bounds of the output map. Can have up to 3 values
 *        depending on the dimensionality of wcsout.
@@ -38,8 +42,9 @@
 *       Inherited status. 
 
 *  Description:
-*     Reports the WCS bounds of the output map and stores the coordinates
-*     of the bounding box in parameters FLBND, FUBND, FTR, FBR, FTL and FBL.
+*     Reports the WCS bounds of the output map and optiontall stores the
+*     coordinates of the bounding box in parameters FLBND, FUBND, FTR,
+*     FBR, FTL and FBL.
 
 *  Authors:
 *     DSB: David S Berry (JAC, UCLan)
@@ -51,6 +56,8 @@
 *        Initial version in smurf_makecube.
 *     04-JUN-2008 (TIMJ):
 *        Factor out into separate function.
+*     28-JUL-2008 (TIMJ):
+*        Parameter update is now optional.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -90,7 +97,8 @@
 #include "libsmf/smf.h"
 
 void
-smf_store_outputbounds (const int lbnd_out[3], const int ubnd_out[3],
+smf_store_outputbounds (int updatepars, const int lbnd_out[3],
+                        const int ubnd_out[3],
                         const AstFrameSet * wcsout, 
                         const AstSkyFrame *oskyfrm,
                         const AstMapping * oskymap, int *status) {
@@ -129,11 +137,13 @@ smf_store_outputbounds (const int lbnd_out[3], const int ubnd_out[3],
    astNorm( wcsout, wcslbnd_out );
    astNorm( wcsout, wcsubnd_out );
 
-   parPut1d( "FLBND", ndims,  wcslbnd_out, status );
-   parPut1d( "FUBND", ndims,  wcsubnd_out, status );
-
-   msgOutif( MSG__NORM, "WCS_WBND1",
-	     "   Output cube WCS bounds:", status );
+   if (ndims == 3) {
+     msgOutif( MSG__NORM, "WCS_WBND1",
+               "   Output cube WCS bounds:", status );
+   } else {
+     msgOutif( MSG__NORM, "WCS_WBND1",
+               "   Output map WCS bounds:", status );
+   }
 
    for( i = 0; i < ndims && *status == SAI__OK; i++ ) {
      msgSetc( "L", astFormat( wcsout, i+1, wcslbnd_out[i]));
@@ -152,6 +162,12 @@ smf_store_outputbounds (const int lbnd_out[3], const int ubnd_out[3],
      msgOutif( MSG__NORM, "WCS_WBND2",
 	       "        ^LAB: ^L -> ^U ^UNT", status );
    }
+
+   /* Return if we are not required to update the parameters */
+   if (!updatepars) return;
+
+   parPut1d( "FLBND", ndims,  wcslbnd_out, status );
+   parPut1d( "FUBND", ndims,  wcsubnd_out, status );
 
    /* if we have a 2d frameset we can use that directly rather
       than having to split the mapping or provide explicit 2d

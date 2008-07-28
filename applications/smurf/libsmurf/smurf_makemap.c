@@ -681,7 +681,7 @@ void smurf_makemap( int *status ) {
   msgOutif( MSG__DEBUG, " ", "Mapbounds took ^TDIFF s", status);
 
   /* Write WCS bounds */
-  smf_store_outputbounds(lbnd_out, ubnd_out, outfset, NULL, NULL, 
+  smf_store_outputbounds(1, lbnd_out, ubnd_out, outfset, NULL, NULL, 
                          status);
   msgBlank( status );
 

@@ -1008,8 +1008,9 @@ void smf_calc_skyframe( const AstFrame * skyin, const char * system,
                         int * moving, int * status );
 
 void
-smf_store_outputbounds (const int lbnd_out[3],const int ubnd_out[3],
-                        const AstFrameSet * wcsout, 
+smf_store_outputbounds (int updatepars, const int lbnd_out[3],
+                        const int ubnd_out[3],
+                        const AstFrameSet *wcsout, 
                         const AstSkyFrame *oskyfrm, 
                         const AstMapping *oskymap, int *status);
 
