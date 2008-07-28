@@ -121,7 +121,9 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
   /* Check for double-precision data */
   if( indata->dtype != SMF__DOUBLE ) {
     *status = SAI__ERROR;
-    errRep( FUNC_NAME, "smfData is not double precision", status );
+    errRep( FUNC_NAME, 
+            "Data is not double precision, must be flat-fielded first", 
+            status );
     return NULL;
   }
 
