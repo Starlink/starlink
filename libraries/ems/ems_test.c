@@ -103,9 +103,10 @@ int main( void ){
    status = SAI__ERROR;
    emsSeti( "T1", 1 );
    emsSeti( "T2", 2 );
-    emsSetc( "T3", "4" );
+   emsSetc( "T3", "4" );
+   emsSetc( "T3", " (concat)");
    emsRep( "ERR1", "Error message: ^T1 + ^T2 != ^T3", &status );
-   emsRenew;
+   emsRenew();
    emsRep( "ERR1", "Error message: ^T1 + ^T2 != ^T3", &status );
 
    exit( 0 );
