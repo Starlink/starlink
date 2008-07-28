@@ -67,19 +67,21 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the WCS, AXIS, DATA, QUALITY,
-*     LABEL, TITLE, HISTORY, and VARIANCE components of an NDF data
-*     structure and propagates all extensions.
+*     LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF 
+*     data structure and propagates all extensions.
 *     -  All non-complex numeric data types can be handled.
 
 *  Copyright:
 *     Copyright (C) 1998, 2000, 2003-2004 Central Laboratory of the
-*     Research Councils. Copyright (C) 2006 Particle Physics &
-*     Astronomy Research Council. All Rights Reserved.
+*     Research Councils. 
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -89,13 +91,14 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     TDCA: Tim D.C. Ash(STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     BEC: Brad Cavanagh (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -128,6 +131,8 @@
 *        Use CNF_PVAL
 *     27-APR-2006 (DSB):
 *        Added parameter INVERT.
+*     2008 July 14 (BEC)
+*        Propagate UNITS component to output NDF.
 *     {enter_further_changes_here}
 
 *-
