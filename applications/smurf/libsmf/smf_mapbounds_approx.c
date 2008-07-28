@@ -102,6 +102,10 @@
 *        Use FP angle in calculation of map size and centre
 *     2008-07-24 (AGG):
 *        Use absolute value of sine/cosine in calculating map size
+*     2008-07-24 (TIMJ):
+*        Use smf_calc_skyframe rather than duplicating code.
+*     2008-07-28 (TIMJ):
+*        Use smf_get_projpar rather than calculating ourselves.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -163,6 +167,7 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
   smfHead *hdr = NULL;         /* Pointer to data header this time slice */
   double hghtbox;              /* Map height in arcsec */
   int hghtpix;                 /* RA-Dec map height in pixels */
+  int i;                       /* loop counter */
   int instap = 0;              /* Flag to denote whether the
 				  instrument aperture is non-zero */
   double instapx = 0.0;        /* Effective X offset in tracking frame */
@@ -176,6 +181,7 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
   double mapx;                 /* Map X offset in radians */
   double mapy;                 /* Map Y offset in radians */
   double origval = 0.0;        /* A temporary double variable */
+  double par[7];               /* Projection parameters */
   char *pname = NULL;          /* Name of currently opened data file */
   double s;                    /* sin theta */
   double shift[ 2 ];           /* Shifts from PIXEL to GRID coords */
@@ -200,6 +206,7 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
 
   /* Initialize output frameset pointer to NULL */
   *outframeset = NULL;
+  for( i = 0; i < 7; i++ ) par[ i ] = AST__BAD;
 
   /* Read data from the given input file in the group - note index
      should be 1 as we use the first file in the Grp to define the map
@@ -320,45 +327,26 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
   /* Now create the output FrameSet. */
   smf_calc_skyframe( skyin, system, hdr, 0, &skyframe, skyref, moving, status );
 
-  /* Just for kicks, let the user know the value of *moving */
-  msgSeti("M",*moving);
-  msgOutif(MSG__VERB, " ", "Moving = ^M", status);
-  /* Set the reference position to the telescope BASE position */
-  astSetD( skyframe, "SkyRef(1)", skyref[0] );
-  astSetD( skyframe, "SkyRef(2)", skyref[1] );
-  /* Before adding to frameset, ensure that the SkyFrame represents
-     offsets from the first telescope base position, rather than
-     absolute coordinates */
-  if ( *moving ) {
-    astSet( skyframe, "SkyRefIs=origin,AlignOffset=1" );
-    /* Also set tangent position */
-    lon_0 = 0.0;
-    lat_0 = 0.0;
-  } else {
-    astSet( skyframe, "SkyRefIs=ignored,AlignOffset=0" );
-    lon_0 = DR2D * skyref[0];
-    lat_0 = DR2D * skyref[1];
-  }
+  /* Get the orientation of the map vertical within the output celestial
+     coordinate system. This is derived form the MAP_PA FITS header, which
+     gives the orientation of the map vertical within the tracking system. */
+  mappa = smf_calc_mappa( hdr, system, skyin, status );
+  
+  /* Calculate the projection parameters. We do not enable autogrid determination
+     for SCUBA-2 so we do not need to obtain all the data before calculating
+     projection parameters. */
+  smf_get_projpar( skyframe, skyref, *moving, 0, 0, NULL, 0,
+                   mappa, par, NULL, NULL, status );
+
+
 
   /* Now populate a FitsChan with FITS-WCS headers describing the
      required tan plane projection. The longitude and latitude axis
      types are set to either (RA,Dec) or (AZ,EL) to get the correct
-     handedness. Note lon_0 and lat_0 will already be in degrees
-     (unlike smf_mapbounds). */
+     handedness. */
   fitschan = astFitsChan ( NULL, NULL, "" );
-  if (*status == SAI__OK) {
-    /* Need to protect strcmp with status because astGetC can return
-       NULL pointer and on some systems that causes a SEGV in strcmp */
-    if ( !strcmp( astGetC( skyframe, "SYSTEM" ), "AZEL" ) ) {
-      sc2ast_makefitschan( 0.0, 0.0, (pixsize*DAS2D), (pixsize*DAS2D),
-			   lon_0, lat_0,
-			   "AZ---TAN", "EL---TAN", fitschan, status );
-    } else {
-      sc2ast_makefitschan( 0.0, 0.0, (-pixsize*DAS2D), (pixsize*DAS2D),
-			   lon_0, lat_0,
-			   "RA---TAN", "DEC--TAN", fitschan, status );
-    }
-  }
+  smf_makefitschan( astGetC( skyframe, "System"), &(par[0]),
+                    &(par[2]), &(par[4]), par[6], fitschan, status );
   astClear( fitschan, "Card" );
   fs = astRead( fitschan );
 
@@ -379,6 +367,18 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
   astRemapFrame( *outframeset, AST__BASE, astShiftMap( 2, shift, "") );
  
   astExport( *outframeset );
+
+/* Report the pixel bounds of the cube. */
+   if( *status == SAI__OK ) {
+      msgOutif( MSG__NORM, " ", " ", status );
+      msgSeti( "XL", lbnd_out[ 0 ] );
+      msgSeti( "YL", lbnd_out[ 1 ] );
+      msgSeti( "XU", ubnd_out[ 0 ] );
+      msgSeti( "YU", ubnd_out[ 1 ] );
+      msgOutif( MSG__NORM, " ", "   Output map pixel bounds: ( ^XL:^XU, ^YL:^YU )", 
+                status );
+   }
+
 
   /* Change the pixel bounds to be consistent with the new CRPIX */
   ubnd_out[0] -= lbnd_out[0]-1;
