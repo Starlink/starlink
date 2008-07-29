@@ -1015,6 +1015,8 @@ double lmat[]      /* equation matrix (given and returned) */
 
 }
 
+
+
 /*+ sc2math_fitsky - fit a sky baseline for each bolometer */
 
 void sc2math_fitsky
@@ -1082,6 +1084,91 @@ int *status            /* global status (given and returned) */
          for ( i=0; i<nframes; i++ )
          {
             scan[i] = inptr[nboll*i+j];
+         }
+
+/* fit a straight line with clipping */
+	 sc2math_sigmaclip ( cliptype, nframes, pos, scan, wt, &grad, &cons,
+			     status );
+         coptr[j] = cons;
+         coptr[j+nboll] = grad;
+      }
+
+      free ( scan );
+      free ( wt );
+      free ( pos );
+   }
+}
+
+
+
+/*+ sc2math_fitskyi - fit a sky baseline to integer data for each bolometer */
+
+void sc2math_fitskyi
+(
+int cliptype,          /* type of sigma clipping (given) */
+size_t nboll,          /* number of bolometers (given) */
+size_t nframes,        /* number of frames in scan (given) */
+size_t ncoeff,         /* number of coefficients (given) */
+const int *inptr,      /* measurement values (given) */
+double *coptr,         /* coefficients of fit (returned) */
+int *status            /* global status (given and returned) */
+)
+
+/* Description :
+    For each bolometer, determine an estimated sky level by
+    making a linear fit to timestream with sigma clipping.
+   Authors :
+    B.D.Kelly (bdk@roe.ac.uk)
+
+   History :
+    25Feb2005 : original (bdk)
+    14Jul2005 : add cliptype argument (bdk)
+    13Mar2006 : copied from map.c (agg)
+    01Nov2007 : use const and size_t where relevant (bdk)
+    23Jul2008 : integer version of sc2math_fitsky (bdk)
+*/
+
+{
+   double cons;        /* offset for straight-line fit */
+   double grad;        /* gradient of staright-line fit */
+   int i;              /* loop counter */
+   int j;              /* loop counter */
+   double *pos;        /* positions in scan for single bolometer */
+   double *scan;       /* copy of scan for single bolometer */
+   double *wt;         /* weights for single bolometer */
+
+
+   if ( !StatusOkP(status) ) return;
+
+/* provide default values */
+
+   for ( j=0; j<nboll; j++ )
+   {
+      for ( i=0; i<ncoeff; i++ )
+      {
+         coptr[j+i*nboll] = 0.0;
+      }
+   }
+
+   if ( nframes > 10 )
+   {
+      scan = calloc ( nframes, sizeof(double) );
+      pos = calloc ( nframes, sizeof(double) );
+      wt = calloc ( nframes, sizeof(double) );
+
+      for ( i=0; i<nframes; i++ )
+      {
+         pos[i] = (double)i;
+      }
+
+      for ( j=0; j<nboll; j++ )
+      {
+
+/* extract the values for one bolometer */
+
+         for ( i=0; i<nframes; i++ )
+         {
+            scan[i] = (double)inptr[nboll*i+j];
          }
 
 /* fit a straight line with clipping */

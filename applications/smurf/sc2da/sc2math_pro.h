@@ -149,6 +149,19 @@ double *coptr,         /* coefficients of fit (returned) */
 int *status            /* global status (given and returned) */
 );
 
+/*+ sc2math_fitskyi - fit a sky baseline to integer data for each bolometer */
+
+void sc2math_fitskyi
+(
+int cliptype,          /* type of sigma clipping (given) */
+size_t nboll,          /* number of bolometers (given) */
+size_t nframes,        /* number of frames in scan (given) */
+size_t ncoeff,         /* number of coefficients (given) */
+const int *inptr,      /* measurement values (given) */
+double *coptr,         /* coefficients of fit (returned) */
+int *status            /* global status (given and returned) */
+);
+
 /*+ sc2math_flat2mask - produce dead pixel mask from flatfield */
 
 void sc2math_flat2mask
