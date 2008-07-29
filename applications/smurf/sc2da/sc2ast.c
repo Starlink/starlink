@@ -483,7 +483,7 @@ int *status             /* global status (given and returned) */
        astSetD( skyframe, "SkyRef(2)", state->tcs_az_bc2 );
      }
    }
-   astSet( skyframe, "Epoch=MJD %.*g", DBL_DIG, state->rts_end + 32.184/SC2AST_SPD );
+   astSet( skyframe, "Epoch=MJD %.*g", DBL_DIG, state->tcs_tai + 32.184/SC2AST_SPD );
 
 /* Now modify the cached FrameSet to use the new Mapping and SkyFrame.
    First remove the existing current Frame and then add in the new one.
