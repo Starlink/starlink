@@ -64,6 +64,9 @@
 *
 *     This routine works sufficiently well for roughly square maps,
 *     but fails for maps with an aspect ratio more than about 1.5.
+*
+*     For DREAM/STARE observations, smf_mapbounds should be called with
+*     the fast flag enabled.
 
 *  Authors:
 *     Andy Gibb (UBC)

@@ -672,12 +672,13 @@ void smurf_makemap( int *status ) {
 
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Determine map bounds", status);
   gettimeofday( &tv1, NULL );
-  smf_mapbounds( igrp, size, system, spacerefwcs, alignsys,
+  smf_mapbounds( 1, igrp, size, system, spacerefwcs, alignsys,
                  lbnd_out, ubnd_out, &outfset, &moving, &boxes, status );
   gettimeofday( &tv2, NULL );
   msgBlank( status );
 
-  msgSeti("TDIFF",tv2.tv_sec-tv1.tv_sec);
+  msgSetd("TDIFF",((double)(tv2.tv_sec-tv1.tv_sec) +
+                   (1.0E-6*(double)(tv2.tv_usec-tv1.tv_usec))));
   msgOutif( MSG__DEBUG, " ", "Mapbounds took ^TDIFF s", status);
 
   /* Write WCS bounds */

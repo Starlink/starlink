@@ -14,13 +14,17 @@
 *     C function
 
 *  Invocation:
-*     smf_mapbounds( Grp *igrp,  int size, const char *system,
+*     smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
 *                   const AstFrameSet *refwcs,
 *                   int alignsys, int *lbnd_out, int *ubnd_out, 
 *                   AstFrameSet **outframeset, int *moving, smfBox ** boxes,
 *                   int *status );
 
 *  Arguments:
+*     fast = int (Given)
+*        If true and if the input map is not a scan, the bounds will only be
+*        calculated by looking at the first and last timeslice. For DREAM/STARE
+*        this is usually sufficient.
 *     igrp = Grp* (Given)
 *        Group of timestream NDF data files to retrieve pointing
 *     size = int (Given)
@@ -181,7 +185,7 @@
 
 #define FUNC_NAME "smf_mapbounds"
 
-void smf_mapbounds( Grp *igrp,  int size, const char *system,
+void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
                     const AstFrameSet *spacerefwcs,
                     int alignsys, int *lbnd_out, int *ubnd_out, 
                     AstFrameSet **outframeset, int *moving,
@@ -351,9 +355,20 @@ void smf_mapbounds( Grp *igrp,  int size, const char *system,
     }
 
     if( *status == SAI__OK) {
+      /* we are allowed to go fast in non scan modes */
+      int lfast = 0;
+      if (fast && data->hdr->obsmode != SMF__OBS_SCAN) {
+        lfast = fast;
+      }
 
       /* Get the astrometry for all the time slices in this data file */
       for( j=0; j<(data->dims)[2]; j++ ) {
+
+        /* skip if we are not at start or end. DREAM jiggle patterns may
+           be a problem and may require us to do one set of jiggles */
+        if (fast && j != 0 && j != (data->dims[2])-1) {
+          continue;
+        }
 
         /* Create output SkyFrame */
         if ( oskyframe == NULL ) {

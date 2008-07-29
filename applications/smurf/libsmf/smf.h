@@ -609,7 +609,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
 void * smf_malloc( size_t nelem, size_t bytes_per_elem, int zero, 
                    int * status );
 
-void smf_mapbounds( Grp *igrp,  int size, const char *system,
+void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
                     const AstFrameSet * spacesrefwcs,
                     int alignsys, int *lbnd_out, int *ubnd_out, 
         AstFrameSet **outframeset, int *moving, smfBox ** boxes,int *status );
