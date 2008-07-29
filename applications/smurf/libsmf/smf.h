@@ -1070,4 +1070,6 @@ int smf_isfft( const smfData *data, int * status );
 
 void smf_calc_mode( smfHead * hdr, int * status );
 
+double smf_calc_meantau( const smfHead *hdr, int * status );
+
 #endif /* SMF_DEFINED */
