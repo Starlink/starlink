@@ -200,13 +200,13 @@ void smurf_extinction( int * status ) {
                &ogrp, &outsize, status );
   } else {
     msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
-       " nothing to extinction correct", status );
+             " nothing to extinction correct", status );
   }
 
   /* Get METHOD */
   parChoic( "METHOD", "CSOTAU", 
-	    "CSOtau, Filtertau, WVMraw", 1,
-	    method, LEN__METHOD, status);
+            "CSOtau, Filtertau, WVMraw", 1,
+            method, LEN__METHOD, status);
 
   /* Get QUICK flag */
   parGet0l( "QUICK", &quick, status);
@@ -238,31 +238,31 @@ void smurf_extinction( int * status ) {
     /* If status is OK, make decisions on method keywords */
     if ( *status == SAI__OK ) {
       if ( strncmp( method, "CSOT", 4 ) == 0 ) {
-	/* Now ask for desired CSO tau */
-	/* Define the default value first time round */
-	if ( i == 1 ) {
-	  ohdr = odata->hdr;
-    deftau = smf_calc_meantau( ohdr, status );
-    parGdr0d( "CSOTAU", deftau, 0.0,1.0, 1, &tau, status );
-    printf("Def = %f  actual = %f\n", deftau, tau );
-	}
+        /* Now ask for desired CSO tau */
+        /* Define the default value first time round */
+        if ( i == 1 ) {
+          ohdr = odata->hdr;
+          deftau = smf_calc_meantau( ohdr, status );
+          parGdr0d( "CSOTAU", deftau, 0.0,1.0, 1, &tau, status );
+          printf("Def = %f  actual = %f\n", deftau, tau );
+        }
 
       } else if ( strncmp( method, "FILT", 4) == 0 ) {
-	/* Now ask for desired Filter-based tau */
-	/* Define the default value first time round */
-	if ( i == 1 ) {
-	  ohdr = odata->hdr;
-	  smf_fits_getS( ohdr, "FILTER", filter, 81, status);
-    deftau = smf_calc_meantau( ohdr, status );
-	  deftau = smf_scale_tau( deftau, filter, status );
-	  parDef0d( "FILTERTAU", deftau, status );
-	}
-	parGet0d( "FILTERTAU", &tau, status );
+        /* Now ask for desired Filter-based tau */
+        /* Define the default value first time round */
+        if ( i == 1 ) {
+          ohdr = odata->hdr;
+          smf_fits_getS( ohdr, "FILTER", filter, 81, status);
+          deftau = smf_calc_meantau( ohdr, status );
+          deftau = smf_scale_tau( deftau, filter, status );
+          parDef0d( "FILTERTAU", deftau, status );
+        }
+        parGet0d( "FILTERTAU", &tau, status );
       } else if ( strncmp( method, "WVMR", 4) == 0 ) {
-	msgOutif(MSG__VERB," ", "Using Raw WVM data", status);
+        msgOutif(MSG__VERB," ", "Using Raw WVM data", status);
       } else {
-	*status = SAI__ERROR;
-	errRep("", "Unsupported method. Possible programming error.", status);
+        *status = SAI__ERROR;
+        errRep("", "Unsupported method. Possible programming error.", status);
       }
     }
     /* Apply extinction correction - note that a check is made to
