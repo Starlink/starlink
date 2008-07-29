@@ -314,9 +314,8 @@ package @PACKAGE@ {
 
             parameter filtertau {
                 type _REAL
-                vpath {PROMPT }
                 prompt {Zenith optical depth for current filter}
-                ppath GLOBAL CURRENT
+                ppath DYNAMIC CURRENT
                 helpkey *
             }
 

@@ -244,7 +244,6 @@ void smurf_extinction( int * status ) {
           ohdr = odata->hdr;
           deftau = smf_calc_meantau( ohdr, status );
           parGdr0d( "CSOTAU", deftau, 0.0,1.0, 1, &tau, status );
-          printf("Def = %f  actual = %f\n", deftau, tau );
         }
 
       } else if ( strncmp( method, "FILT", 4) == 0 ) {
@@ -255,9 +254,8 @@ void smurf_extinction( int * status ) {
           smf_fits_getS( ohdr, "FILTER", filter, 81, status);
           deftau = smf_calc_meantau( ohdr, status );
           deftau = smf_scale_tau( deftau, filter, status );
-          parDef0d( "FILTERTAU", deftau, status );
+          parGdr0d( "FILTERTAU", deftau, 0.0, 100.0, 1, &tau, status );
         }
-        parGet0d( "FILTERTAU", &tau, status );
       } else if ( strncmp( method, "WVMR", 4) == 0 ) {
         msgOutif(MSG__VERB," ", "Using Raw WVM data", status);
       } else {
