@@ -104,6 +104,9 @@
  *        Replace strtok with strtok_r for thread-safety. Protect
  *        getenv with a mutex (better than nothing, but other threads
  *        could still do a setenv/putenv outside of EMS).
+ *     28-JUL-2008 (TIMJ):
+ *        - Use POSIX-friendly S_ISDIR() rather than S_IFDIR.
+ *        - Define POSIX compliance level for strtok_r
  *     {enter_changes_here}
 
  *  Bugs:
@@ -111,6 +114,9 @@
 
  *-
  */
+
+/* for strtok_r in standards compliance mode */
+#define _POSIX_C_SOURCE 200112L
 
 #if HAVE_CONFIG_H
 #include "config.h"
@@ -258,7 +264,7 @@ int ems1Starf( const char *envar, const char *relpath, const char *acmode,
            /* If a file is found, check it's not a directory. */
            if ( !notfound ) {
                if ( !stat( pathname, &statb ) ) {
-                   if ( statb.st_mode & S_IFDIR ) {
+		    if ( S_ISDIR(statb.st_mode) ) {
                        notfound = 1;
                    }
                }
