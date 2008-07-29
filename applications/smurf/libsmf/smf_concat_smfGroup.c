@@ -109,6 +109,8 @@
 *        Use strlcat/strlcpy
 *     2008-07-22 (TIMJ):
 *        Apply darks.
+*     2008-07-29 (TIMJ):
+*        Steptime is now in smfHead.
 
 *  Notes:
 *     If projection information supplied, pointing LUT will not be
@@ -681,7 +683,7 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
     /* Shift the origin of the time axis in the WCS if padStart != 0 */
     if( padStart && data->hdr && data->hdr->tswcs ) {
       /* Figure out the length of a sample in seconds */
-      smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
+      steptime = data->hdr->steptime;
       
       if( *status == SAI__OK ) {
         /* Obtain pointer to TimeFrame */

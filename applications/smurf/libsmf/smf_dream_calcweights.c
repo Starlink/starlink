@@ -78,6 +78,8 @@
 *        Use smf_find_subarray
 *     2008-07-24 (TIMJ):
 *        Use hdr->obsmode instead of SAM_MODE.
+*     2008-07-29 (TIMJ):
+*        Steptime is now in smfHead.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -183,7 +185,8 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
       dream = data->dream;
       /* Read DREAM parameters from input file */
       smf_find_subarray( hdr, subarray, sizeof(subarray), NULL, status );
-      smf_fits_getD( hdr, "STEPTIME", &tsamp, status);
+      tsamp = hdr->steptime;
+
       /* Convert steptime into millisec */
       tsamp *= 1000.0;
       nsampcycle = dream->nsampcycle;

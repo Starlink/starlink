@@ -54,11 +54,14 @@
 *        -Code stub for generation of 4-d WCS of forward transformation.
 *     2008-07-29 (EC):
 *        Calculate WCS for 4-d transformed data.
+*     2008-07-29 (TIMJ):
+*        Steptime is now in smfHead.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008 University of British Columbia.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -331,7 +334,7 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
         /* Setup the WCS for the FFT of data cube */
 
         if( indata->hdr && retdata->hdr && (retdata->ndims==4) ) {
-          smf_fits_getD(retdata->hdr, "STEPTIME", &steptime, status);
+          steptime = retdata->hdr->steptime;
           if( steptime < 0 ) {
             *status = SAI__ERROR;
             errRep(FUNC_NAME, 

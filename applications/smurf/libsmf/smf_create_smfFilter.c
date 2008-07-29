@@ -35,6 +35,7 @@
 
 *  Authors:
 *     Ed Chapin (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -48,11 +49,14 @@
 *        Fixed error in calculation of df (frequency steps)
 *     2008-06-23 (EC):
 *        Generate WCS that can be used when writing filter to an NDF
+*     2008-07-29 (TIMJ):
+*        Steptime is now in smfHead.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2006 University of British Columbia.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -141,7 +145,7 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
 
         if( template->hdr ) {
           /* Figure out length of a sample in order to calculate df */
-          smf_fits_getD(template->hdr, "STEPTIME", &steptime, status);
+          steptime = template->hdr->steptime;
           
           if( *status == SAI__OK ) {
 

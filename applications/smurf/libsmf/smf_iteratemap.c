@@ -158,6 +158,8 @@
 *        - Added padstart/padend to config files
 *     2008-07-25 (TIMJ):
 *        Pass darks through to smf_concat_smfGroup
+*     2008-07-29 (TIMJ):
+*        Steptime is now in smfHead.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -482,12 +484,12 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
         /* Obtain sample length from header of first file in igrp */
         smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &data, status );
         if( (*status == SAI__OK) && (data->hdr) ) {
-          smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
+          steptime = data->hdr->steptime;
 
           if( steptime > 0 ) {
             maxlen = (dim_t) (dtemp / steptime);
           } else {
-            /* Trap invalud sample length in header */
+            /* Trap invalid sample length in header */
             *status = SAI__ERROR;
             errRep(FUNC_NAME, "Invalid STEPTIME in FITS header.", status);
           }

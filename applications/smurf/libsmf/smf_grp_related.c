@@ -97,11 +97,13 @@
  *        Always use sizeof(*var).
  *     2008-07-18 (TIMJ):
  *        Use smf_find_subarray
+ *     2008-07-29 (TIMJ):
+ *        Steptime is now in smfHead.
  *     {enter_further_changes_here}
 
  *  Copyright:
  *     Copyright (C) 2008 Science and Technology Facilities Council.
- *     Copyright (C) 2006 University of British Columbia.
+ *     Copyright (C) 2006-2008 University of British Columbia.
  *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
  *     All Rights Reserved.
 
@@ -191,7 +193,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   double opentime;            /* RTS_END value at beginning of written data */
   int *refsubsys=NULL;        /* Array of template subarrays */
   double *starts = NULL;      /* Array of starting RTS_END values */
-  double steptime;            /* Length of a sample */
+  double steptime = 0;        /* Length of a sample */
   dim_t **subgroups = NULL;   /* Array containing index arrays to parent Grp */
   int subsysnum;              /* Subsystem numeric id. 0 - 8 */
   size_t thischunk;           /* Current chunk that we're on */
@@ -393,7 +395,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
 
     if( i == 0 ) {
       /* length of a sample */
-      smf_fits_getD(hdr, "STEPTIME", &steptime, status);
+      steptime = hdr->steptime;
     }
 
     /* Set header to first time slice and obtain RTS_END */

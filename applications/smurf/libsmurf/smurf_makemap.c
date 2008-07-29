@@ -440,6 +440,8 @@
 *        parameter to AST__NEAREST
 *     2008-07-25 (TIMJ):
 *        Filter out darks. Use kaplibs.
+*     2008-07-29 (TIMJ):
+*        Steptime is now in smfHead.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -943,7 +945,7 @@ void smurf_makemap( int *status ) {
 
           /* Store steptime for calculating EXP_TIME first time round*/
           if ( steptime == VAL__BADD) {
-            smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
+            steptime = data->hdr->steptime;
           }
 
           /* Propagate provenance to the output file */
@@ -1138,7 +1140,7 @@ void smurf_makemap( int *status ) {
         
       /* Store steptime for calculating EXP_TIME */
       if ( i==1 ) {
-        smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
+        steptime = data->hdr->steptime;
       }
 
       /* Check units are consistent */
