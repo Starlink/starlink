@@ -63,6 +63,8 @@
 *        Add units, title and dlabel.
 *     2008-07-24 (TIMJ):
 *        initialise obsmode and obstype
+*     2008-07-28 (TIMJ):
+*        initialise steptime
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -100,6 +102,7 @@
 #include "sae_par.h"
 #include "mers.h"
 #include "ndf.h"
+#include "prm_par.h"
 
 /* SMURF routines */
 #include "smf.h"
@@ -147,6 +150,7 @@ smf_create_smfHead( int * status ) {
   hdr->tsys = NULL;
   hdr->obsmode = SMF__OBS_NULL;
   hdr->obstype = SMF__TYP_NULL;
+  hdr->steptime = VAL__BADD;
   (hdr->units)[0] = '\0';
   (hdr->dlabel)[0] = '\0';
   (hdr->title)[0] = '\0';

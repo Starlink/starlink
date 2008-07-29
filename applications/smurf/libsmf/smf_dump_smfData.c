@@ -46,6 +46,8 @@
 *        Add units, title and label.
 *     2008-07-24 (TIMJ):
 *        Support obstype and obsmode. Minor tidying.
+*     2008-07-28 (TIMJ):
+*        Add step time
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -282,6 +284,10 @@ void smf_dump_smfData( const smfData *data, int showflags, int *status) {
       msgSetc( "TYP", "<NULL>" );
     }
     msgOut(" ", "    obsmode = ^MOD  obstype = ^TYP", status );
+
+    /* Step time */
+    msgSetd( "ST", hdr->steptime );
+    msgOut(" ", "    step time = ^ST", status);
 
     /* Flag to indicate whether we have control of overall state structure */
     msgSeti("I",hdr->isCloned);

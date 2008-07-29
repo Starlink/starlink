@@ -134,6 +134,8 @@
 *        Add telpos.
 *     2008-07-24 (TIMJ):
 *        Add obsmode, obstype.
+*     2008-07-28 (TIMJ):
+*        Add steptime
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -185,7 +187,7 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 		       AstFrameSet * wcs, AstFrameSet * tswcs,
 		       AstFitsChan * fitshdr,
 		       JCMTState * allState, dim_t curframe,
-		       const double instap[], dim_t nframes,
+           const double instap[], dim_t nframes, double steptime,
            smf_obsmode obsmode, smf_obstype obstype, unsigned int ndet,
 		       double fplanex[], double fplaney[],
 		       double detpos[], char *detname, 
@@ -226,6 +228,7 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
     hdr->telpos[2] = telpos[2];
     hdr->obsmode = obsmode;
     hdr->obstype = obstype;
+    hdr->steptime= steptime;
 
     /* Have to copy the string items in since the struct has a slot for them -
        we know these fit in the struct */

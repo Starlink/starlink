@@ -138,6 +138,9 @@
 *        smfArray can be dynamic
 *     2008-07-25 (TIMJ):
 *        Add SMF__BADIDX
+*     2008-07-28 (TIMJ):
+*        Add steptime to smfHead so that we don't have to extract
+*        it from the FITS header each time.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -316,6 +319,7 @@ typedef struct smfHead {
   int dpazel;               /* Flag: does "detpos" hold AZEL values? */
   double instap[2];         /* instrument aperture (focal plane offsets)  */
   double telpos[3];         /* West LON/LAT/Alt of telescope (deg/deg/m) */
+  double steptime;    /* Steptime in seconds */
   char units[SMF__CHARLABEL]; /* Data units */
   char dlabel[SMF__CHARLABEL]; /* Label associated with data */
   char title[SMF__CHARLABEL]; /* Title associated with data */

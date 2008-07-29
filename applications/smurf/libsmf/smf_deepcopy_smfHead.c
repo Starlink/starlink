@@ -66,6 +66,10 @@
 *        Add units, label and title
 *     2007-07-1 (DSB):
 *        Add telpos.
+*     2008-07-24 (TIMJ):
+*        Add obsmode, obstype.
+*     2008-07-28 (TIMJ):
+*        Add steptime.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -199,9 +203,9 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   /* Insert elements into new smfHead */
   new = smf_construct_smfHead( new, instrument, wcs, tswcs, fitshdr,
                                allState, curframe, instap, nframes,
-                               old->obsmode, old->obstype,ndet, fplanex,
-                               fplaney, detpos,detname, old->dpazel, tsys,
-                               old->title, old->dlabel, old->units,
+                               old->steptime, old->obsmode, old->obstype,ndet,
+                               fplanex, fplaney, detpos,detname, old->dpazel,
+                               tsys, old->title, old->dlabel, old->units,
                                old->telpos, status );
 
   /* set isCloned to 0 since we have allocated this memory */

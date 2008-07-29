@@ -174,6 +174,8 @@
  *        Use size_t
  *     2008-07-24 (TIMJ):
  *        Calculate obs mode.
+ *     2008-07-28 (TIMJ):
+ *        Calculate and store steptime
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -849,6 +851,25 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
   /* Read and store history */
   smf_history_read( *data, status );
 
+  /* Get the step time from the header if we have a hdr */
+  if (hdr) {
+    smf_fits_getD( hdr, "STEPTIME", &steptime, status );
+    if (*status == SMF__NOKWRD) {
+      errAnnul( status );
+      /* Attempt to calculate it from adjacent entries */
+      tmpState = hdr->allState;
+      if (hdr->nframes > 1 && tmpState[0].rts_end != VAL__BADD
+          && tmpState[1].rts_end != VAL__BADD) {
+        steptime = tmpState[1].rts_end - tmpState[0].rts_end;
+        steptime *= SPD;
+      } else {
+        /* no idea */
+        steptime = VAL__BADD;
+      }
+    }
+    hdr->steptime = steptime;
+  }
+
   /* Fix up JCMTState if there are any compatibility problems */
   if (*status == SAI__OK && hdr && hdr->allState) {
     /* TCS_TAI can be missing with old data files */
@@ -856,12 +877,12 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
     if (tmpState[0].tcs_tai == VAL__BADD) {
       /* need the step time - if we do not have it set
        tcs_tai to rts_end */
-      smf_fits_getD( hdr, "STEPTIME", &steptime, status );
-      if (*status == SMF__NOKWRD) {
-        errAnnul( status );
+      steptime = hdr->steptime;
+      if (steptime == VAL__BADD) {
         msgOutif(MSG__DEBUG," ","Could not determine step time when correcting TCS_TAI from RTS_END", status );
         steptime = 0.0;
       }
+
       /* correct TCS_TAI by half step time corrected to days */
       steptime = 0.5 * steptime / SPD; 
       if (*status == SAI__OK) {
