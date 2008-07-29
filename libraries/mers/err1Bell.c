@@ -18,8 +18,10 @@
 *     terminal.
 
 *  Arguments:
-*     status = int * (Returned)
-*        The global status.
+*     status = int * (Given & Returned)
+*        The global status. Not examined on input. If there is an
+*        error delivering the bell the returned status will be set
+*        to the error value overwriting any pre-existing error status.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -65,12 +67,13 @@
 
 void err1Bell( int * status ) {
 
-  /* Fortran version only set status when return status from Prerr
-     was bad but this could leave it uninitialised */
-  *status = SAI__OK;
+  int istat = SAI__OK;     /* Local status */
 
   /*  deliver the bell character. */
   err1Prerr( "\a", status );
+
+  /* Check the local status and return it on error */
+  if (istat != SAI__OK) *status = istat;
 
 }
 
@@ -96,7 +99,7 @@ void err1Bell( int * status ) {
 *     terminal.
 
 *  Arguments:
-*     STATUS = INTEGER (Returned)
+*     STATUS = INTEGER (Given & Returned)
 *        The global status.
 */
 
@@ -105,6 +108,7 @@ F77_SUBROUTINE(err1_bell)( INTEGER(STATUS) );
 
 F77_SUBROUTINE(err1_bell)( INTEGER(STATUS) ) {
   int status;
+  F77_IMPORT_STATUS( *STATUS, status );
   err1Bell( &status );
   F77_EXPORT_INTEGER( status, *STATUS );
 }
