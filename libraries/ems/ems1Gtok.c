@@ -86,8 +86,8 @@ Logical ems1Gtok( const char *namstr, char *tokval, int *tkvlen )
 
     /*  Set the limits for the search of the message token table. */
     i = toktab->tokcnt[ toktab->tokmrk ];
-    if ( toktab-> tokmrk > EMS__BASE ) {
-        last = toktab-> tokcnt[ toktab-> tokmrk - 1 ];
+    if ( toktab->tokmrk > EMS__BASE ) {
+        last = toktab->tokcnt[ toktab->tokmrk - 1 ];
     } else {
         last = 0;
     }
@@ -99,8 +99,8 @@ Logical ems1Gtok( const char *namstr, char *tokval, int *tkvlen )
         if ( strcasecmp( namstr, toktab->toknam[ i ] ) == 0 ) {
             
             /*  A match has been found, so load the returned token string. */
-            strcpy( tokval, toktab-> tokstr[ i ] );
-            *tkvlen = toktab-> toklen[ i ];
+            strcpy( tokval, toktab->tokstr[ i ] );
+            *tkvlen = toktab->toklen[ i ];
             return TRUE;
         }
         i--;
