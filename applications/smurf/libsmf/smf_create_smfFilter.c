@@ -155,7 +155,7 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
 
             filt->wcs = astFrameSet( astFrame( 2, "Domain=GRID" ), "" );
 
-            /* The output frame will have freq. along first axis, and
+            /* The current frame will have freq. along first axis, and
                real/imag coefficients along the other */
 
             specframe = astSpecFrame( "System=freq,Unit=Hz,StdOfRest=Topocentric" );
