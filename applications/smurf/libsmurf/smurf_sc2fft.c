@@ -135,7 +135,7 @@ void smurf_sc2fft( int *status ) {
                    SMF__NOCREATE_QUALITY, &idata, status );
 
     /* Check whether we need to transform the data at all */
-    if( smf_isfft(idata,status) == inverse ) {
+    if( smf_isfft(idata,NULL,status) == inverse ) {
 
       /* Tranform the data */
       odata = smf_fft_data( idata, inverse, status );
