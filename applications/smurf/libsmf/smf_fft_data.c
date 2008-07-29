@@ -93,6 +93,7 @@
 #include "sae_par.h"
 #include "mers.h"
 #include "ndf.h"
+#include "prm_par.h"
 #include "fftw3.h"
 
 /* SMURF routines */
@@ -335,7 +336,7 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
 
         if( indata->hdr && retdata->hdr && (retdata->ndims==4) ) {
           steptime = retdata->hdr->steptime;
-          if( steptime < 0 ) {
+          if( steptime < VAL__SMLD ) {
             *status = SAI__ERROR;
             errRep(FUNC_NAME, 
                    "FITS header error: STEPTIME must be > 0",
