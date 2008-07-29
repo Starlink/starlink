@@ -61,6 +61,8 @@
 *        Renamed to smf_NDFexport from smf_model_NDFexport
 *     2008-07-23 (EC):
 *        Support exportation of FFT'd data
+*     2008-07-29 (EC):
+*        Write useful WCS for FFT'd data
 
 *  Notes:
 *
@@ -261,7 +263,14 @@ void smf_NDFexport( const smfData *data, void *variance,
 	  /* For 3-dimensional data assume it is ICD bolo-format */
 	  ndfPtwcs( header->tswcs, tempdata->file->ndfid, status );
 
-	} else if( data->ndims == 1 ) {
+	} else if( smf_isfft(data, NULL, status) ) {
+          /* Data is FFT */
+          if( data->ndims == 4 ) {
+            /* Only handle 4d FFT data at the moment */
+            ndfPtwcs( header->tswcs, tempdata->file->ndfid, status );
+          }
+
+        } else if( data->ndims == 1 ) {
 	  /* For 1=dimensional data, assume it is the time axis which we
 	     extract from the 3d WCS */
 

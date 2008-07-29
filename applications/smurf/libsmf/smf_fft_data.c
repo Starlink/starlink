@@ -52,6 +52,8 @@
 *     2008-07-28 (EC):
 *        -Calculate correct ntslice for inverse.
 *        -Code stub for generation of 4-d WCS of forward transformation.
+*     2008-07-29 (EC):
+*        Calculate WCS for 4-d transformed data.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -84,6 +86,7 @@
 #include <string.h>
 
 /* Starlink includes */
+#include "ast.h"
 #include "sae_par.h"
 #include "mers.h"
 #include "ndf.h"
@@ -100,8 +103,12 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
   double *baseR=NULL;           /* base pointer to real part of transform */
   double *baseI=NULL;           /* base pointer to imag part of transform */
   double *baseB=NULL;           /* base pointer to bolo in time domain */
+  AstUnitMap *cmapping=NULL;    /* Mapping from grid to curframe3d */
+  AstFrame *curframe3d=NULL;    /* Current 3d frame (x,y,coeff) */
+  AstCmpFrame *curframe4d=NULL; /* Current Frame for 4-d FFT */
   smfData *data=NULL;           /* pointer to bolo-ordered data */
   double df=0;                  /* Frequency step size in Hz */
+  AstCmpMap *fftmapping=NULL;   /* Mapping from GRID to curframe2d */
   dim_t i;                      /* Loop counter */
   fftw_iodim iodim;             /* I/O dimensions for transformations */
   int isFFT=0;                  /* Are the input data freq. domain? */
@@ -112,8 +119,14 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
   dim_t ntslice=0;              /* Number of time slices */
   fftw_plan plan;               /* plan for FFT */
   smfData *retdata=NULL;        /* Pointer to new transformed smfData */
+  AstZoomMap *scalemapping=NULL;/* Scale grid coordinates by df */
+  AstSpecFrame *specframe=NULL; /* Current Frame of 1-D spectrum */
+  AstCmpMap *specmapping=NULL;  /* Mapping from GRID to FREQ */
   double steptime;              /* Length of a sample in seconds */
   double *val=NULL;             /* Element of data to be normalized */
+  AstFrameSet *tswcs=NULL;      /* WCS for 4d FFT data */
+  double zshift;                /* Amount by which to shift origin */
+  AstShiftMap *zshiftmapping=NULL;  /* Map to shift origin of GRID */
 
   if (*status != SAI__OK) return NULL;
 
@@ -312,23 +325,62 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
 
         /* Setup the WCS for the FFT of data cube */
 
-        if( indata->hdr && (retdata->ndims==4) ) {
+        if( indata->hdr && retdata->hdr && (retdata->ndims==4) ) {
           smf_fits_getD(retdata->hdr, "STEPTIME", &steptime, status);
-          df = 1. / (steptime * (double) ntslice );
-
-          if( (df < 0) && (*status == SAI__OK) ) {
+          if( steptime < 0 ) {
             *status = SAI__ERROR;
             errRep(FUNC_NAME, 
-                   "Frequency step <= 0: possible programming error.",
+                   "FITS header error: STEPTIME must be > 0",
                    status);
-          } 
+          }
 
           if( *status == SAI__OK ) {
+            /* Frequency steps in the FFT */
+            df = 1. / (steptime * (double) ntslice );
+
              /* Start an AST context */
             astBegin;
             
+            /* Create a new astFrameSet containing a 4d base GRID frame */
+            tswcs = astFrameSet( astFrame( 4, "Domain=GRID" ), "" );
+            
+            /* The current frame will have frequency along the first axis,
+               x, y bolo coordinates along the second and third axes,
+               and the component along a fourth axis of length two (real,
+               imaginary coefficients). */
+            
+            specframe = astSpecFrame( "System=freq,Unit=Hz,"
+                                      "StdOfRest=Topocentric" );
 
+            curframe3d = astFrame( 3, "Domain=GRID" ); /* x, y, component */
+            curframe4d = astCmpFrame( specframe, curframe3d, "" );
+
+            /* The mapping from 4d grid coordinates to (frequency, x,
+               y, coeff) is accomplished with a shift and a zoommap
+               for the 1st dimension, and unit mappings for the
+               others */
+
+            zshift = -1;
+            zshiftmapping = astShiftMap( 1, &zshift, "" ); 
+            scalemapping = astZoomMap( 1, df, "" );
+            specmapping = astCmpMap( zshiftmapping, scalemapping, 1, "" );
+            
+            cmapping = astUnitMap( 3, "" );
+
+            fftmapping = astCmpMap( specmapping, cmapping, 0, "" );
+
+            /* Add the curframe4d with the fftmapping to the frameset */
+            astAddFrame( tswcs, AST__BASE, fftmapping, curframe4d );
+
+            /* Export the frameset before ending the AST context */
+            astExport( tswcs );
             astEnd;
+
+            /* Free the old TSWCS if it exists, and insert the new TSWCS */
+            if( retdata->hdr->tswcs ) {
+              retdata->hdr->tswcs = astFree(retdata->hdr->tswcs);
+            }
+            retdata->hdr->tswcs = tswcs;
           }
         }
       }
