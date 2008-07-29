@@ -1,16 +1,17 @@
-      SUBROUTINE MSG_SYNC( STATUS )
+
+/* 
 *+
 *  Name:
-*     MSG_SYNC
+*     msgSync
 
 *  Purpose:
 *     Synchronise message output via the user interface.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Invocation:
-*     CALL MSG_SYNC( STATUS )
+*     msgSync( int * status );
 
 *  Description:
 *     This performs a synchronisation handshake with the user interface.
@@ -20,15 +21,16 @@
 *     report is made and the status value is returned set to MSG__SYNER.
 
 *  Arguments: 
-*     STATUS = INTEGER (Given and Returned)
+*     status = int * (Given and Returned)
 *        The global status: it is returned set to MSG__SYNER on error.
 
 *  Implementation Notes:
-*     -  This subroutine is the ADAM version of MSG_SYNC.
-*     -  This subroutine makes calls to SUBPAR_SYNC. 
+*     -  This subroutine is the ADAM version of msgSync.
+*     -  This subroutine makes calls to subParSync. 
 
 *  Copyright:
-*     Copyright (C) 1985, 1989, 1990, 1991 Science & Engineering Research Council.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 1985, 1989-1991 Science & Engineering Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -50,6 +52,7 @@
 *  Authors:
 *     BDK: Dennis Kelly (ROE)
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -62,54 +65,48 @@
 *     26-JUN-1991 (PCTR):
 *        Added mark and release to prevent message tokens being annulled
 *        on error.
+*     28-JUL-2008 (TIMJ):
+*        Rewrite in C.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE                      ! No implicit typing
+#include "merswrap.h"
+#include "star/subpar.h"
 
-*  Global Constants:
-      INCLUDE 'SAE_PAR'                  ! Standard SAE constants
-      INCLUDE 'MSG_ERR'                  ! MGS_ error codes
+#include "msg_err.h"
+#include "sae_par.h"
 
-*  Status:
-      INTEGER STATUS
+void msgSync( int * status ) {
 
-*  Local Variables:
-      INTEGER ISTAT                      ! Local status
+  int istat = SAI__OK;     /* Local status */
 
-*.
+  /*  Check the inherited global status. */
+  if (*status != SAI__OK) return;
 
-*  Check the inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
+  /*  Create a new error context. */
+  emsMark();
 
-*  Initialise the local status.
-      ISTAT = SAI__OK
+  /*  Perform a synchronisation handshake with the user interface. */
+  subParSync( &istat );
 
-*  Create a new error context.
-      CALL EMS_MARK
+  /*  Check the returned status. */
+  if ( istat != SAI__OK) {
 
-*  Perform a synchronisation handshake with the user interface.
-      CALL SUBPAR_SYNC( ISTAT )
+    /* Annul the error context and report a message synchronisation error. */
+    emsAnnul( &istat );
+    emsMark();
+    *status = MSG__SYNER;
+    emsRep( "MSG_SYNC_SYNER",
+	    "MSG_SYNC: Error encountered during message synchronisation",
+	    status );
+    emsRlse();
+  }
 
-*  Check the returned status.
-      IF ( ISTAT .NE. SAI__OK ) THEN
-
-*     Annul the error context and report a message synchronisation error.
-         CALL EMS_ANNUL( ISTAT )
-         CALL EMS_MARK
-         STATUS = MSG__SYNER
-         CALL EMS_REP( 'MSG_SYNC_SYNER', 
-     :   'MSG_SYNC: Error encountered during message synchronisation', 
-     :   STATUS )
-         CALL EMS_RLSE
-      END IF
-
-*  Release the current error context.
-      CALL EMS_RLSE
-
-      END
+  /*  Release the current error context. */
+  emsRlse();
+}

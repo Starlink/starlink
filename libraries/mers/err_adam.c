@@ -105,15 +105,3 @@ DECLARE_INTEGER(fstatus);
    return;
 }
 
-void msgSync( int *status ) {
-
-DECLARE_INTEGER(fstatus);
-
-   F77_EXPORT_INTEGER( *status, fstatus );
-
-   F77_CALL(msg_sync)( INTEGER_ARG(&fstatus) );
-
-   F77_IMPORT_INTEGER( fstatus, *status );
-
-   return;
-}

@@ -83,11 +83,11 @@ F_ROUTINES_ADAM = err_clear_adam.f err_start_adam.f \
                   err_stop_adam.f \
                   msg1_form_adam.f msg1_genv_adam.f msg1_gkey_adam.f \
                   msg1_gref_adam.f \
-                  msg_bell_adam.f msg_ifget_adam.f msg_sync_adam.f 
+                  msg_bell_adam.f msg_ifget_adam.f
 
-C_ROUTINES_ADAM = err1Prerr_adam.c msg1Prtln_adam.c
+C_ROUTINES_ADAM = err1Prerr_adam.c msg1Prtln_adam.c msgSync_adam.c
 
-F_INTERFACE_ADAM = 
+F_INTERFACE_ADAM = msg_sync_adam.c
 
 F_ROUTINES_UT = msg1_gesc.f msg1_gnam.f msg1_putc.f msg1_rform.f
 
