@@ -98,12 +98,12 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
   AstCmpFrame *curframe2d=NULL; /* Current Frame for 2-d FFT */
   smfFilter *filt=NULL;         /* Pointer to returned struct */
   AstCmpMap *fftmapping=NULL;   /* Mapping from GRID to curframe2d */
-  AstShiftMap *zshiftmapping=NULL;  /* Map to shift origin of GRID */
   AstZoomMap *scalemapping=NULL;/* Scale grid coordinates by df */
   AstSpecFrame *specframe=NULL; /* Current Frame of 1-D spectrum */
   AstCmpMap *specmapping=NULL;  /* Mapping from GRID to FREQ */
   double steptime;              /* Length of a sample in seconds */
   double zshift;                /* Amount by which to shift origin */
+  AstShiftMap *zshiftmapping=NULL;  /* Map to shift origin of GRID */
 
   if (*status != SAI__OK) return NULL;
 
