@@ -128,6 +128,9 @@
 *        - replace par[] with reference spatial frameset.
 *     2008-07-28 (TIMJ):
 *        Use smf_makefitschan.
+*     2008-07-29 (TIMJ):
+*        Tweak the logic to make it clear that skyin is only needed
+*        to determine the projection.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -212,7 +215,6 @@ void smf_mapbounds( Grp *igrp,  int size, const char *system,
   AstSkyFrame *oskyframe = NULL;/* Output SkyFrame */
   AstFrame *skyin = NULL;      /* Sky Frame in input FrameSet */
   double skyref[ 2 ];          /* Values for output SkyFrame SkyRef attribute */
-  AstFrameSet *swcsin = NULL;  /* FrameSet describing input WCS */
   int ubnd0[ 2 ];              /* Defaults for UBND parameter */
   double x_array_corners[4];   /* X-Indices for corner bolos in array */ 
   double x_map[4];             /* Projected X-coordinates of corner bolos */ 
@@ -353,19 +355,16 @@ void smf_mapbounds( Grp *igrp,  int size, const char *system,
       /* Get the astrometry for all the time slices in this data file */
       for( j=0; j<(data->dims)[2]; j++ ) {
 
-        /* smf_tslice_ast only needs to get called once to set up framesets */
-
-        if( data->hdr->wcs == NULL ) {
-          smf_tslice_ast( data, j, 1, status);
-        }
-
-        swcsin = hdr->wcs;
-
-        /* Retrieve input SkyFrame */
-        skyin = astGetFrame( swcsin, AST__CURRENT );
-
         /* Create output SkyFrame */
         if ( oskyframe == NULL ) {
+
+          /* smf_tslice_ast only needs to get called once to set up framesets */
+          if( data->hdr->wcs == NULL ) {
+            smf_tslice_ast( data, j, 1, status);
+          }
+
+          /* Retrieve input SkyFrame */
+          skyin = astGetFrame( hdr->wcs, AST__CURRENT );
 
           smf_calc_skyframe( skyin, system, hdr, alignsys, &oskyframe, skyref,
                              moving, status );
@@ -380,6 +379,8 @@ void smf_mapbounds( Grp *igrp,  int size, const char *system,
              projection parameters. */
           smf_get_projpar( oskyframe, skyref, *moving, 0, 0, NULL, 0,
                            map_pa, par, NULL, NULL, status );
+
+          if (skyin) skyin = astAnnul( skyin );
 
         } /* End oskyframe construction */
 
@@ -448,7 +449,6 @@ void smf_mapbounds( Grp *igrp,  int size, const char *system,
            memory usage */
         if (bolo2map) bolo2map = astAnnul( bolo2map );
         if (fs) fs = astAnnul( fs );
-        if ( skyin ) skyin = astAnnul( skyin );
 
         /* Break out of loop over time slices if bad status */
         if (*status != SAI__OK) goto CLEANUP;
