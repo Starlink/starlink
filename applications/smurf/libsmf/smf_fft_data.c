@@ -104,7 +104,9 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
   double *baseI=NULL;           /* base pointer to imag part of transform */
   double *baseB=NULL;           /* base pointer to bolo in time domain */
   AstUnitMap *cmapping=NULL;    /* Mapping from grid to curframe3d */
-  AstFrame *curframe3d=NULL;    /* Current 3d frame (x,y,coeff) */
+  AstFrame *curframe1d=NULL;    /* Current 1d frame (real/imag coeff) */
+  AstFrame *curframe2d=NULL;    /* Current 2d frame (bolo x,y) */
+  AstCmpFrame *curframe3d=NULL; /* Current 3d frame (x,y,coeff) */
   AstCmpFrame *curframe4d=NULL; /* Current Frame for 4-d FFT */
   smfData *data=NULL;           /* pointer to bolo-ordered data */
   double df=0;                  /* Frequency step size in Hz */
@@ -112,6 +114,7 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
   dim_t i;                      /* Loop counter */
   fftw_iodim iodim;             /* I/O dimensions for transformations */
   int isFFT=0;                  /* Are the input data freq. domain? */
+  AstCmpMap *mapping3d=NULL;    /* Mapping from 3d GRID to FREQ, X, Y */
   dim_t nbolo=0;                /* Number of detectors  */
   dim_t ndata=0;                /* Number of elements in new array */
   dim_t nf=0;                   /* Number of frequencies in FFT */
@@ -125,8 +128,10 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
   double steptime;              /* Length of a sample in seconds */
   double *val=NULL;             /* Element of data to be normalized */
   AstFrameSet *tswcs=NULL;      /* WCS for 4d FFT data */
-  double zshift;                /* Amount by which to shift origin */
-  AstShiftMap *zshiftmapping=NULL;  /* Map to shift origin of GRID */
+  double zshift2[3];            /* Amount by which to shift bolo origin */
+  double zshift;                /* Amount by which to shift freq. origin */
+  AstShiftMap *zshiftmapping=NULL;  /* Map to shift origin of freq. GRID */
+  AstShiftMap *zshiftmapping2=NULL; /* Map to shift origin of bolo GRID */
 
   if (*status != SAI__OK) return NULL;
 
@@ -352,22 +357,28 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
             specframe = astSpecFrame( "System=freq,Unit=Hz,"
                                       "StdOfRest=Topocentric" );
 
-            curframe3d = astFrame( 3, "Domain=GRID" ); /* x, y, component */
-            curframe4d = astCmpFrame( specframe, curframe3d, "" );
+            curframe2d = astFrame( 2, "Domain=BOLO" ); /* x, y, component */
+            curframe3d = astCmpFrame( specframe, curframe2d, "" );            
+            curframe1d = astFrame( 1, "Domain=COEFF"); /* real/imag component*/
+            curframe4d = astCmpFrame( curframe3d, curframe1d, "" );
 
             /* The mapping from 4d grid coordinates to (frequency, x,
                y, coeff) is accomplished with a shift and a zoommap
-               for the 1st dimension, and unit mappings for the
-               others */
+               for the 1st dimension, and a shift for the others */
 
             zshift = -1;
             zshiftmapping = astShiftMap( 1, &zshift, "" ); 
             scalemapping = astZoomMap( 1, df, "" );
             specmapping = astCmpMap( zshiftmapping, scalemapping, 1, "" );
             
-            cmapping = astUnitMap( 3, "" );
+            zshift2[0] = -1; /* Set BOLO origin to 0, 0 */
+            zshift2[1] = -1;
+            zshiftmapping2 = astShiftMap( 2, zshift2, "" );
 
-            fftmapping = astCmpMap( specmapping, cmapping, 0, "" );
+            mapping3d = astCmpMap( specmapping, zshiftmapping2, 0, "" );
+
+            cmapping = astUnitMap( 1, "" );
+            fftmapping = astCmpMap( mapping3d, cmapping, 0, "" );
 
             /* Add the curframe4d with the fftmapping to the frameset */
             astAddFrame( tswcs, AST__BASE, fftmapping, curframe4d );
