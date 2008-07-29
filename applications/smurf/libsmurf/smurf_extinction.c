@@ -33,7 +33,7 @@
 *     CSOTAU = REAL (Read)
 *          Value of the 225 GHz zenith optical depth. Only used if
 *          METHOD = CSOTAU. If a null (!) value is given, the task
-*          will use the value of the MEANWVM FITS header for each
+*          will use the value from the FITS header for each
 *          file. Note that if a value is entered by the user, that
 *          value is used for all input files.
 *     FILTERTAU = REAL (Read)
@@ -97,6 +97,8 @@
 *        Allow null value for CSO tau to use MEANWVM from current header
 *     2008-07-22 (TIMJ):
 *        Use kaplibs for group param in/out. Handle darks.
+*     2008-07-28 (TIMJ):
+*        Use smf_calc_meantau. use parGdr0d to handle NULL easier.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -240,24 +242,18 @@ void smurf_extinction( int * status ) {
 	/* Define the default value first time round */
 	if ( i == 1 ) {
 	  ohdr = odata->hdr;
-	  smf_fits_getD( ohdr, "MEANWVM", &deftau, status );
-	  parDef0d( "CSOTAU", deftau, status );
+    deftau = smf_calc_meantau( ohdr, status );
+    parGdr0d( "CSOTAU", deftau, 0.0,1.0, 1, &tau, status );
+    printf("Def = %f  actual = %f\n", deftau, tau );
 	}
-	parGet0d( "CSOTAU", &tau, status);
-	/* If a null value was given, use the MEANWVM from the header
-	   for this file */
-	if ( *status == PAR__NULL ) {
-	  errAnnul(status);
-	  ohdr = odata->hdr;
-	  smf_fits_getD( ohdr, "MEANWVM", &tau, status );
-	}
+
       } else if ( strncmp( method, "FILT", 4) == 0 ) {
 	/* Now ask for desired Filter-based tau */
 	/* Define the default value first time round */
 	if ( i == 1 ) {
 	  ohdr = odata->hdr;
 	  smf_fits_getS( ohdr, "FILTER", filter, 81, status);
-	  smf_fits_getD( ohdr, "MEANWVM", &deftau, status );
+    deftau = smf_calc_meantau( ohdr, status );
 	  deftau = smf_scale_tau( deftau, filter, status );
 	  parDef0d( "FILTERTAU", deftau, status );
 	}

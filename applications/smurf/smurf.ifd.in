@@ -307,9 +307,8 @@ package @PACKAGE@ {
 
             parameter csotau {
                 type _REAL
-                vpath {PROMPT }
                 prompt {Zenith optical depth at 225 GHz}
-                ppath GLOBAL CURRENT
+                ppath DYNAMIC CURRENT
                 helpkey *
             }
 
@@ -606,6 +605,14 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
+            parameter crota {
+                type _REAL
+                prompt {Position angle of second pixel axis in output (degs)}
+                ppath DYNAMIC
+                vpath DYNAMIC
+                helpkey *
+            }
+
             parameter in {
                 position 1
                 type NDF
@@ -670,6 +677,24 @@ package @PACKAGE@ {
                 type _LOGICAL
                 vpath DEFAULT
                 default 0
+                helpkey *
+            }
+
+            parameter reflat {
+                type LITERAL
+                access READ
+                ppath DYNAMIC
+                vpath DYNAMIC
+                prompt {Celestial latitude at output reference point}
+                helpkey *
+            }
+
+            parameter reflon {
+                type LITERAL
+                access READ
+                ppath DYNAMIC
+                vpath DYNAMIC
+                prompt {Celestial longitude at output reference point}
                 helpkey *
             }
 

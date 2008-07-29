@@ -185,6 +185,9 @@
 *        Use smf_accumulate_prov. Break from loop if status is bad.
 *     2008-07-25 (TIMJ):
 *        Use kaplibs for grp in/out. Filter darks.
+*     2008-07-28 (TIMJ):
+*        - report output bounds
+*        - use smf_calc_meantau
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -402,7 +405,7 @@ void smurf_qlmakemap( int *status ) {
 
     /* Correct for atmospheric extinction using the mean WVM-derived
        225-GHz optical depth */
-    smf_fits_getD( data->hdr, "MEANWVM", &tau, status );
+    tau = smf_calc_meantau( data->hdr, status );
     smf_correct_extinction( data, "CSOTAU", 1, tau, NULL, status );
 
     /* Propagate provenace */
