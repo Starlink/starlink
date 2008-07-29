@@ -49,6 +49,9 @@
 *        Initial version
 *     2008-07-23 (EC):
 *        Forward transformations now seem to work.
+*     2008-07-28 (EC):
+*        -Calculate correct ntslice for inverse.
+*        -Code stub for generation of 4-d WCS of forward transformation.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -91,23 +94,26 @@
 #include "smf_typ.h"
 #include "smf_err.h"
 
-#define FUNC_NAME "smf_create_smfFilter"
+#define FUNC_NAME "smf_fft_data"
 
 smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
   double *baseR=NULL;           /* base pointer to real part of transform */
   double *baseI=NULL;           /* base pointer to imag part of transform */
   double *baseB=NULL;           /* base pointer to bolo in time domain */
-  const smfData *data=NULL;     /* pointer to bolo-ordered data */
+  smfData *data=NULL;           /* pointer to bolo-ordered data */
+  double df=0;                  /* Frequency step size in Hz */
   dim_t i;                      /* Loop counter */
   fftw_iodim iodim;             /* I/O dimensions for transformations */
   int isFFT=0;                  /* Are the input data freq. domain? */
   dim_t nbolo=0;                /* Number of detectors  */
   dim_t ndata=0;                /* Number of elements in new array */
-  dim_t ntslice=0;              /* Number of time slices */
   dim_t nf=0;                   /* Number of frequencies in FFT */
+  double norm=1.;               /* Normalization factor for the FFT */
+  dim_t ntslice=0;              /* Number of time slices */
   fftw_plan plan;               /* plan for FFT */
   smfData *retdata=NULL;        /* Pointer to new transformed smfData */
-  smfData *tempdata=NULL;       /* Temporary data pointer */
+  double steptime;              /* Length of a sample in seconds */
+  double *val=NULL;             /* Element of data to be normalized */
 
   if (*status != SAI__OK) return NULL;
 
@@ -129,19 +135,16 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
 
   /* Create a copy of the input data since FFT operations often do
      calculations in-place */
-  tempdata = smf_deepcopy_smfData( indata, 0, SMF__NOCREATE_VARIANCE | 
-                                   SMF__NOCREATE_QUALITY | 
-                                   SMF__NOCREATE_FILE |
-                                   SMF__NOCREATE_DA, status );
+  data = smf_deepcopy_smfData( indata, 0, SMF__NOCREATE_VARIANCE | 
+                               SMF__NOCREATE_QUALITY | 
+                               SMF__NOCREATE_FILE |
+                               SMF__NOCREATE_DA, status );
 
   /* Re-order a time-domain cube if needed */
   if( indata->isTordered && (indata->ndims == 3) ) {
-    smf_dataOrder( tempdata, 0, status );
+    smf_dataOrder( data, 0, status );
   } 
 
-  data = tempdata;
-
-    
   /* Data dimensions. Time dimensions are either 1-d or 3-d. Frequency
      dimensions are either 2- or 4-d to store the real and imaginary
      parts along the last index. */
@@ -160,15 +163,13 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
   } else if( (data->ndims==2) && (data->dims[1]==2) ) {
     /* 1-d FFT of a single bolo */
     nf = data->dims[0];
-    ntslice = (nf-1)*2;
     nbolo=1;
-    isFFT = 1;
+    isFFT = smf_isfft( data, &ntslice, status );
   } else if( (data->ndims==4) && (data->dims[3]==2) ) {
     /* 3-d FFT of entire subarray */
     nf = data->dims[0];
-    ntslice = (nf-1)*2;
     nbolo=data->dims[1]*data->dims[2];
-    isFFT = 1;
+    isFFT = smf_isfft( data, &ntslice, status );
   } else {
     *status = SAI__ERROR;
     errRep( FUNC_NAME, "smfData has strange dimensions", status );
@@ -220,6 +221,9 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
         retdata->dims[3] = 2;
       }
     }
+
+    /* Returned data is always bolo-ordered */
+    retdata->isTordered=0;
 
     ndata=1;
     for( i=0; i<retdata->ndims; i++ ) {
@@ -284,28 +288,55 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
                status);
       }
 
-      for( i=0; (*status==SAI__OK)&&(i<nbolo); i++ ) {
-        /* Transform bolometers one at a time */
-        baseB = data->pntr[0];
-        baseB += i*ntslice;        
+      if( *status == SAI__OK ) {
+        for( i=0; i<nbolo; i++ ) {
+          /* Transform bolometers one at a time */
+          baseB = data->pntr[0];
+          baseB += i*ntslice;        
+          
+          baseR = retdata->pntr[0];
+          baseR += i*nf;
+          
+          baseI = baseR + nf*nbolo;
+          fftw_execute_split_dft_r2c( plan, baseB, baseR, baseI );
+        }
 
-        baseR = retdata->pntr[0];
-        baseR += i*nf;
+        /* Each sample needs to have a normalization applied */
+        norm = 1. / (double) ntslice; 
+        
+        val = retdata->pntr[0];
+        for( i=0; i<nf*nbolo*2; i++ ) {
+          *val *= norm;
+          val++;
+        }
 
-        baseI = baseR + nf*nbolo;
-        fftw_execute_split_dft_r2c( plan, baseB, baseR, baseI );
+        /* Setup the WCS for the FFT of data cube */
+
+        if( indata->hdr && (retdata->ndims==4) ) {
+          smf_fits_getD(retdata->hdr, "STEPTIME", &steptime, status);
+          df = 1. / (steptime * (double) ntslice );
+
+          if( (df < 0) && (*status == SAI__OK) ) {
+            *status = SAI__ERROR;
+            errRep(FUNC_NAME, 
+                   "Frequency step <= 0: possible programming error.",
+                   status);
+          } 
+
+          if( *status == SAI__OK ) {
+             /* Start an AST context */
+            astBegin;
+            
+
+            astEnd;
+          }
+        }
       }
-
     }
-    
-    /* Fix up the time/frequency axis in the tswcs */
-
-    
-
   }
   
  CLEANUP:
-  if( tempdata ) tempdata = smf_free( tempdata, status );
+  if( data ) data = smf_free( data, status );
 
   return retdata;
 

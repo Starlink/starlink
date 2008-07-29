@@ -1066,7 +1066,7 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
 
 smfData *smf_fft_data( const smfData *indata, int inverse, int *status );
 
-int smf_isfft( const smfData *data, int * status );
+int smf_isfft( const smfData *data, dim_t *ntslice, int * status );
 
 void smf_calc_mode( smfHead * hdr, int * status );
 

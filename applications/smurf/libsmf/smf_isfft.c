@@ -13,19 +13,30 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     int smf_isfft( const smfData * infile, int * status );
+*     int smf_isfft( const smfData *infile, dim_t *ntslice, int * status );
 
 *  Arguments:
 *     infile = const smfData * (Given)
 *        smfData to test.
+*     ntslice = dim_t* (Returned)
+*        Optionally return the number of time slices in the corresponding
+*        time-series data.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Returned Value:
-*     Boolean int. True if a FFT, otherwise false.
+*     Boolean int. True if a FFT, false if it is time-series. Status is
+*     set to SAI__ERROR if the data doesn't appear to be either.
 
 *  Description:
-*     Tests a smfData to see if it is FFT'd data.
+*     Tests a smfData to see if it is FFT'd data. Also optionally returns
+*     the number of time slices that correspond to the input data. This is
+*     not the completely trivial case that ntslice = nfreq * 2 since
+*     the FFT of real data in FFTW has ntslice/2 + 1 samples. To determine
+*     whether the input had an even or odd number of samples, this routine
+*     checks the last element of the FFT to see if it is real-valued (if it
+*     is, it is the Nyquist frequency of an even-number of input samples).
+*     If data is time-domain, simply returns the known ntslice of the input. 
 
 *  Authors:
 *     Ed Chapin (UBC)
@@ -34,10 +45,15 @@
 *  Notes:
 *     - Currently just checks for reasonable dimensionality, should check
 *       header as well.
+*     - The check for even/odd input length will give the wrong
+*       answer if the FFT for all of the detectors is identically 0, and
+*       the input had an even number of samples. 
 
 *  History:
-*     2008-07-13 (EC):
+*     2008-07-23 (EC):
 *        Initial version copied from smf_isfft.
+*     2008-07-28 (EC):
+*        Calculate ntslice.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -87,23 +103,87 @@
 #include "smf_typ.h"
 #include "smf_err.h"
 
-int smf_isfft( const smfData * indata, int * status ) {
-  smfHead * hdr;
-  double shutval;
+#define FUNC_NAME "smf_isfft"
+
+int smf_isfft( const smfData *indata, dim_t *ntslice, int *status ) {
+  dim_t i;                      /* Loop counter */
+  int isreal=1;                 /* Flag for real-valued Nyquist frequency */
+  dim_t nbolo=0;                /* Number of detectors  */
+  dim_t nf=0;                   /* Number of frequencies */
+  int retval=0;                 /* The return value */ 
+  double *val=NULL;             /* Pointer to element of data array */
 
   if (*status != SAI__OK) return 0;
 
   if (indata == NULL) {
     *status = SAI__ERROR;
-    errRep( " ", "NULL pointer given to smf_isfft"
+    errRep( FUNC_NAME, "NULL smfData pointer provided"
             " (possible programming error)", status);
     return 0;
   }
 
-  if( ( (indata->ndims==2) && (indata->dims[1]==2) ) || 
-      ( (indata->ndims==4) && (indata->dims[3]==2) ) ) {
-    return 1;
+  if( (indata->dtype == SMF__DOUBLE) && 
+      ( ( (indata->ndims==2) && (indata->dims[1]==2) ) || 
+        ( (indata->ndims==4) && (indata->dims[3]==2) ) ) ) {
+    /* Looks like frequency-domain data */
+    retval = 1;
+
+    /* Check length of corresponding time-domain array if requested */
+    if( ntslice ) {
+
+      /* Get numbers of detectors */
+      if( indata->ndims==2 ) {
+        nbolo = 1;
+      } else {
+        nbolo = indata->dims[1]*indata->dims[2];
+      }
+
+      /* Frequency is always the first dimension */
+      nf = indata->dims[0];
+
+      /* Check for a real value at the Nyquist frequency to decide if the
+         number of time slices is even or odd */
+    
+      val = indata->pntr[0];     /* Init pointer to last imag. of 1st bolo */
+      val += nf*nbolo + (nf-1);
+
+      for( i=0; isreal && (i<nbolo); i++ ) {      
+        if( *val ) { 
+          /* If complex-valued the input array had an odd length */
+          isreal = 0;
+        }
+
+        /* Increment pointer to end of next bolo */
+        val += nf;
+      }
+
+      /* Set ntslice after checking all the detectors */
+      *ntslice = nf*2 - 1 - isreal; 
+    }
+    
+  } else if( (indata->ndims==1) || (indata->ndims==3) ) {
+    /* Looks like time-domain data */
+    retval = 0;
+
+    /* Work out ntslice if requested */
+    if( ntslice ) {
+      if( indata->ndims == 1 ) {
+        *ntslice = indata->dims[0];
+      } else {
+        if( indata->isTordered ) {
+          *ntslice = indata->dims[2];          
+        } else {
+          *ntslice = indata->dims[0];
+        }
+      }
+    }    
+  } else {
+    /* Who knows... */
+    *status = SAI__ERROR;
+    errRep( FUNC_NAME, 
+            "Can't determine whether data are time- or frequency-domain", 
+            status);
   }
 
-  return 0;
+  return retval;
 }

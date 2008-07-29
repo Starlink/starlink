@@ -138,7 +138,7 @@ void smf_NDFexport( const smfData *data, void *variance,
 
   if (*status != SAI__OK ) return;
 
-  fft = smf_isfft( data, status );
+  fft = smf_isfft( data, NULL, status );
 
   /* Check for ICD-compliant data order */
   if( !fft && !data->isTordered ) {
