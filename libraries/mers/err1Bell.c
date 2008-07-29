@@ -108,7 +108,7 @@ F77_SUBROUTINE(err1_bell)( INTEGER(STATUS) );
 
 F77_SUBROUTINE(err1_bell)( INTEGER(STATUS) ) {
   int status;
-  F77_IMPORT_STATUS( *STATUS, status );
+  F77_IMPORT_INTEGER( *STATUS, status );
   err1Bell( &status );
   F77_EXPORT_INTEGER( status, *STATUS );
 }
