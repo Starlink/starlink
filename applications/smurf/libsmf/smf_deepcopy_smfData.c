@@ -156,12 +156,11 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   virtual = old->virtual;
   dtype = old->dtype;
   isTordered = old->isTordered;
+
+  npts = 1;
   for (i=0; i<ndims; i++) {
     dims[i] = (old->dims)[i];
-  }
-  npts = dims[0]*dims[1];
-  if (ndims == 3 ) {
-    npts *= dims[2];
+    npts *= dims[i];
   }
 
   /* Copy all history components provided one exists */
