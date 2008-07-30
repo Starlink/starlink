@@ -92,5 +92,5 @@ void errStart( void ) {
   emsLevel( &level );
 
   /* Set the default level for EMS. That is a level below which EMS will not */
-  emsTune( "MSGDEF", level, status );
+  emsTune( "MSGDEF", level, &status );
 }
