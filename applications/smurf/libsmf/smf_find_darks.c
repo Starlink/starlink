@@ -58,6 +58,8 @@
 *  History:
 *     2008-07-17 (TIMJ):
 *        Initial version
+*     2008-07-29 (TIMJ):
+*        Did not realise that ndgCpsup should be used to copy entries.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -127,6 +129,7 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
                      int reduce, smfArray ** darks, int * status ) {
 
   smfSortInfo *alldarks; /* array of sort structs */
+  Grp * dgrp = NULL;  /* Internal dark group */
   size_t dkcount = 0; /* Dark counter */
   size_t i;           /* loop counter */
   smfData *infile = NULL; /* input file */
@@ -148,6 +151,8 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
   /* Create new group for output files */
   ogrp = grpNew( "NonDark", status );
 
+  /* and a new group for darks */
+  dgrp = grpNew( "DarkFiles", status );
 
   /* Work out how many input files we have and allocate sufficient sorting
      space */
@@ -162,6 +167,8 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
     if (*status != SAI__OK) break;
 
     if (smf_isdark( infile, status ) ) {
+      /* Store the entry in the output group */
+      ndgCpsup( ingrp, i, dgrp, status );
       /* store the name and time in the struct */
       sortinfo = &(alldarks[dkcount]);
       one_strlcpy( sortinfo->name, infile->file->name, sizeof(sortinfo->name),
@@ -172,7 +179,7 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
       dkcount++;
     } else {
       /* store the file in the output group */
-      grpPut1( ogrp, infile->file->name, 0, status );
+      ndgCpsup( ingrp, i, ogrp, status );
       msgSetc("F", infile->file->name);
       msgOutif(MSG__DEBUG, " ", "Non-dark file: ^F",status);
     }
@@ -190,15 +197,9 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
 
   /* no need to do any more if neither darks nor darkgrp are defined */
   if (dkcount > 0 && (darks || darkgrp) ) {
-    Grp *dgrp = grpNew( "DarkFiles", status );
 
     /* sort darks into order */
     qsort( alldarks, dkcount, sizeof(*alldarks), sortbytime);
-
-    /* smf_open_file requires a Grp to be created first */
-    for (i = 0; i < dkcount; i++) {
-      grpPut1( dgrp, alldarks[i].name, 0, status);
-    }
 
     /* now open the darks and store them if requested */
     if (darks) {
@@ -222,17 +223,17 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
       }
       *darks = array;
     }
-
-    /* Store the output dark group in the return variable or free it */
-    if (darkgrp) {
-      *darkgrp = dgrp;
-    } else {
-      grpDelet( &dgrp, status);
-    }
   }
 
   /* free memory */
   alldarks = smf_free( alldarks, status );
+
+  /* Store the output dark group in the return variable or free it */
+  if (darkgrp) {
+    *darkgrp = dgrp;
+  } else {
+    grpDelet( &dgrp, status);
+  }
 
   msgSeti( "ND", (insize - dkcount) );
   msgSeti( "DK", dkcount );
