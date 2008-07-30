@@ -64,6 +64,7 @@
 */
 
 #include "merswrap.h"
+#include "mers1.h"
 #include "msg_err.h"
 #include "sae_par.h"
 #include "ems.h"

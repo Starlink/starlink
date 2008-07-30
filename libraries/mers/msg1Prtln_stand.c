@@ -90,7 +90,7 @@ void msg1Prtln( const char * text, int * status ) {
     emsRep( "MSG_PRINT_MESS",
 	    "msg1Prtln: Error printing message to stdout: ^ERR", status );
     emsRlse();
-  } else if (err != len) {
+  } else if ((size_t)err != len) {
     emsMark();
     *status = MSG__OPTER;
     emsSeti( "NEX", len );
