@@ -134,6 +134,13 @@
 #define AST__UNDEFS  "<undefined>"
 #define AST__UNDEFI -123456789
 
+/* Support macros to simplify defined-ness checks */
+/* These are experimental. Pending approval by David and the fortran
+   interface may require a subroutine interface */
+#define astIsUndefF(val)  ( val == AST__UNDEFF )
+#define astIsUndefI(val)  ( val == AST__UNDEFI )
+#define astIsUndefS(val)  ( strcmp(val, AST__UNDEFS) == 0 )
+
 #if defined(astCLASS)            /* Protected */
 #define AST__NOTYPE       -1
 #define AST__COMMENT       0
