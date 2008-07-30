@@ -187,7 +187,9 @@
 #         Add ALIGNSYS to MAKEMAP.
 #         Add REF to MAKEMAP
 #     23-JUL-2008 (EC):
-#         Add SC2CLEAN
+#         Add SC2FFT
+#     27-JUL-2008 (EC):
+#         Add OUT parameter to SC2CONCAT
 #     {enter_changes_here}
 
 #  Bugs:
@@ -2067,6 +2069,17 @@ package @PACKAGE@ {
                 ppath GLOBAL CURRENT
                 association <-GLOBAL.DATA_ARRAY
                 prompt {Input NDF data structure}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                ppath CURRENT
+                default {'./\*_con'}
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Output NDF data structure}
                 helpkey *
             }
 

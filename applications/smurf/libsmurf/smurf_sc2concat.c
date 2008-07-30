@@ -33,6 +33,8 @@
 *  ADAM Parameters:
 *     IN = NDF (Read)
 *          Input file(s)
+*     OUT = NDF (Write)
+*          Output concatenated files
 *     PADEND = _INTEGER (Read)
 *          Number of samples to pad at end.
 *     PADSTART = _INTEGER (Read)
@@ -49,6 +51,10 @@
 *        Initial version.
 *     2008-07-22 (TIMJ):
 *        Handle darks. USe kaplibs for groups. Free memory leak.
+*     2008-07-29 (EC):
+*        -Added parameter OUT
+*        -Switch to parGdr routines, and use steptime from header
+
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -93,6 +99,7 @@
 #include "prm_par.h"
 #include "sae_par.h"
 #include "msg_par.h"
+#include "star/one.h"
 #include "par.h"
 #include "par_err.h"
 
@@ -109,22 +116,29 @@
 void smurf_sc2concat( int *status ) {
 
   /* Local Variables */
+  Grp *basegrp=NULL;         /* Grp containing first file each chunk */
+  size_t basesize;           /* Number of files in base group */
   smfArray *concat=NULL;     /* Pointer to a smfArray */
   size_t contchunk;          /* Continuous chunk counter */
   smfArray *darks = NULL;    /* dark frames */
   smfData *data=NULL;        /* Pointer to a smfData */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
+  char fname[GRP__SZNAM+1];  /* String for holding filename */
+  size_t gcount=0;           /* Grp index counter */
+  size_t i;                  /* Loop counter */
   size_t idx;                /* Subarray counter */
   Grp *igrp = NULL;          /* Group of input files */
   smfGroup *igroup=NULL;     /* smfGroup corresponding to igrp */
+  size_t isize;              /* Number of files in input group */
   dim_t maxconcat=0;         /* Longest continuous chunk length in samples */
   dim_t maxlen=0;            /* Constrain maxconcat to this many samples */
   double maxlen_s;           /* Constrain maxconcat to this many seconds */
   size_t ncontchunks=0;      /* Number continuous chunks outside iter loop */
+  Grp *ogrp = NULL;          /* Output files  */
+  size_t osize;              /* Number of files in input group */
   dim_t padStart=0;          /* How many samples padding at start */
   dim_t padEnd=0;            /* How many samples padding at end */
-  size_t size;               /* Number of files in input group */
-  double steptime;           /* Length of an individual sample */
+  char *pname=NULL;          /* Poiner to fname */
   int temp;                  /* Temporary signed integer */
 
   if (*status != SAI__OK) return;
@@ -133,47 +147,33 @@ void smurf_sc2concat( int *status ) {
   ndfBegin();
 
   /* Read the input file */
-  kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
+  kpg1Rgndf( "IN", 0, 1, "", &igrp, &isize, status );
 
   /* Filter out darks */
   smf_find_darks( igrp, &fgrp, NULL, 1, &darks, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
-  size = grpGrpsz( fgrp, status );
+  isize = grpGrpsz( fgrp, status );
   grpDelet( &igrp, status);
   igrp = fgrp;
   fgrp = NULL;
 
-  if (size == 0) {
+  if (isize == 0) {
         msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
                  " nothing to concatenate", status );
     goto CLEANUP;
   }
 
-  /* Parse ADAM parameters */
+  /* --- Parse ADAM parameters ------------------------ */
 
   /* Maximum length of a continuous chunk */
-  parGet0d( "MAXLEN", &maxlen_s, status );
-  if( *status == PAR__NULL ) {
-    errAnnul( status );
-    maxlen = 0;
-  } else if( maxlen_s < 0 ) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "MAXLEN cannot be < 0.", status);
-  } else if( maxlen_s > 0 ) {    
+  parGdr0d( "MAXLEN", 0, 0, VAL__MAXI, 1, &maxlen_s, status );
+  if( maxlen_s > 0 ) {    
     /* Obtain sample length from header of first file in igrp */
     smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &data, status );
     if( (*status == SAI__OK) && data && (data->hdr) ) {
-      smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
-      
-      if( steptime > 0 ) {
-        maxlen = (dim_t) (maxlen_s / (double) steptime);
-      } else {
-        /* Trap invalud sample length in header */
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "Invalid STEPTIME in FITS header.", status);
-      }
+      maxlen = (dim_t) (maxlen_s / data->hdr->steptime);
     }
     if( data ) smf_close_file( &data, status );
   } else {
@@ -181,56 +181,68 @@ void smurf_sc2concat( int *status ) {
   }
   
   /* Padding */
+  parGdr0i( "PADSTART", 0, 0, VAL__MAXI, 1, &temp, status );
+  padStart = (dim_t) temp;
 
-  parGet0i( "PADSTART", &temp, status );
-  if( *status == PAR__NULL ) {
-    errAnnul( status );
-    padStart = 0;
-  } else if( temp < 0 ) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "PADSTART cannot be < 0.", status);
-  } else {
-    padStart = (dim_t) temp;
-  }
-
-  parGet0i( "PADEND", &temp, status );
-  if( *status == PAR__NULL ) {
-    errAnnul( status );
-    padEnd = 0;
-  } else if( temp < 0 ) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "PADEND cannot be < 0.", status);
-  } else {
-    padEnd = (dim_t) temp;
-  }
+  parGdr0i( "PADEND", 0, 0, VAL__MAXI, 1, &temp, status );
+  padEnd = (dim_t) temp;
 
   /* Group the input files by subarray and continuity */
-  smf_grp_related( igrp, size, 1, maxlen, &maxconcat, &igroup, status );
+  smf_grp_related( igrp, isize, 1, maxlen, &maxconcat, &igroup, status );
 
   /* Obtain the number of continuous chunks and subarrays */
   if( *status == SAI__OK ) {
     ncontchunks = igroup->chunk[igroup->ngroups-1]+1;
   }
 
+  /* Create a base group of filenames */
+  basegrp = grpNew( "Base Group", status );
+
+  /* Loop over time chunks */
+  for( i=0; i<igroup->ngroups; i++ ) {
+    /* Loop over subarray */
+    for( idx=0; idx<igroup->nrelated; idx++ ) {
+      /* Check for new continuous chunk */
+      if( i==0 || (igroup->chunk[i] != igroup->chunk[i-1]) ) {
+        ndgCpsup( igroup->grp, igroup->subgroups[i][idx], basegrp, status );
+      }
+    }
+  }
+
+  basesize = grpGrpsz( basegrp, status );
+
+  /* Get output file(s) */
+  kpg1Wgndf( "OUT", basegrp, basesize, basesize, 
+             "More output files required...",
+             &ogrp, &osize, status );
+
   /* Loop over continuous chunks */
+  gcount = 1;
   for( contchunk=0;(*status==SAI__OK)&&contchunk<ncontchunks; contchunk++ ) {
 
-    /* Concatenate. Note that smf_concat_smfGroup stores filenames for
-       each piece in concat->sdata[*]->file->name */
+    /* Concatenate this continuous chunk */
     smf_concat_smfGroup( igroup, darks, contchunk, 1, NULL, 0, NULL, 
                          NULL, padStart, padEnd, 0, &concat, status );
     
     /* Export concatenated data for each subarray to NDF file */
     for( idx=0; (*status==SAI__OK)&&idx<concat->ndat; idx++ ) {
       if( concat->sdata[idx]->file && concat->sdata[idx]->file->name ) {
-        smf_NDFexport( concat->sdata[idx], NULL, NULL, NULL, 
-                       concat->sdata[idx]->file->name, status );
+
+        /* Get the file name: note that we have to be careful to read
+           them out of this group in the same order that we put them 
+           in above! */
+        pname = fname;
+        grpGet( ogrp, gcount, 1, &pname, GRP__SZNAM, status);
+        smf_NDFexport( concat->sdata[idx], NULL, NULL, NULL, fname, status ); 
       } else {
         *status = SAI__ERROR;
         errRep( FUNC_NAME, 
                 "Unable to determine file name for concatenated data.",
                 status );
       }
+
+      /* Increment the group index counter */
+      gcount++;
     }
 
     /* Close the smfArray */
@@ -239,9 +251,11 @@ void smurf_sc2concat( int *status ) {
   }
 
  CLEANUP:
-  if (darks) smf_close_related( &darks, status );
-  if( igrp != NULL ) grpDelet( &igrp, status);
-  if (igroup) smf_close_smfGroup( &igroup, status );
+  if( darks ) smf_close_related( &darks, status );
+  if( igrp ) grpDelet( &igrp, status);
+  if( basegrp ) grpDelet( &basegrp, status );
+  if( ogrp ) grpDelet( &ogrp, status );
+  if( igroup ) smf_close_smfGroup( &igroup, status );
 
   ndfEnd( status );
   
