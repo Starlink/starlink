@@ -37,6 +37,7 @@ C_ROUTINES = emsAnnul.c emsBegin.c emsEload.c emsEnd.c emsErrno.c \
              emsRenew.c emsRep.c emsRlse.c emsSetc.c emsSetd.c \
              emsSeti.c emsSeti64.c emsSetl.c emsSetnc.c emsSetp.c \
              emsSetr.c emsSetu.c emsStat.c emsSyser.c emsTune.c \
+	     emsGtune.c \
              \
              ems1Eblk.c ems1Emark.c ems1Erlse.c ems1Estor.c ems1Estor1.c \
              ems1Fcerr.c ems1Flush.c ems1Form.c ems1Fthreaddata.c ems1Gesc.c \
@@ -50,7 +51,8 @@ C_ROUTINES = emsAnnul.c emsBegin.c emsEload.c emsEnd.c emsErrno.c \
 CF_ROUTINES = ems_annul.c ems_begin.c ems_eload.c ems_end.c ems_expnd.c \
               ems_facer.c ems_level.c ems_mark.c ems_mload.c ems_renew.c \
               ems_rep.c ems_rlse.c ems_setc.c ems_setd.c ems_seti.c \
-              ems_setl.c ems_setr.c ems_stat.c ems_syser.c ems_tune.c 
+              ems_setl.c ems_setr.c ems_stat.c ems_syser.c ems_tune.c \
+	      ems_gtune.c
 
 #  List of platform specific Fortran interface routines.  The distribution
 #  will contain a version of these files for each set of platforms.  The names

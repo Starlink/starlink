@@ -45,6 +45,8 @@
  *        Added emsSetnc and point ems_setc_c at it
  *      3-MAR-2006 (TIMJ):
  *        Add emsSetu / emsSetp / emsSeti64
+ *     30-JUL-2008 (PWD):
+ *        Add emsGtune.
  *     {enter_changes_here}
 
  *  Bugs:
@@ -69,84 +71,92 @@ void emsAnnul( int *status );
 void emsBegin( int *status );     
 
 void emsEload( char *param,       
-                  int *parlen,
-                  char *opstr,
-                  int *oplen,
-                  int *status );
+               int *parlen,
+               char *opstr,
+               int *oplen,
+               int *status );
 
 void emsEnd( int * status );      
 
 void emsErrno( const char *token, 
-                  int errval );
+               int errval );
 
 void emsExpnd( const char *text,
-                  char *opstr,
-                  const int maxlen,
-                  int *oplen,
-                  int *status );
+               char *opstr,
+               const int maxlen,
+               int *oplen,
+               int *status );
 
 void emsFacer( const char *token, 
-                  int status );
+               int status );
+
+void emsGtune( const char *key, 
+               int *value, 
+               int *status );
 
 void emsLevel( int *level );      
 
 void emsMark( void );             
 
 void emsMload( const char *msg,   
-                  const char *text,
-                  char *opstr,
-                  int *oplen,
-                  int *status );
+               const char *text,
+               char *opstr,
+               int *oplen,
+               int *status );
 
 void emsRenew( void );            
 
 void emsRep( const char *err,     
-                const char *text,
-                int *status );
+             const char *text,
+             int *status );
 
 void emsRlse( void );             
 
 void emsSetc( const char *token,  
-                 const char *cvalue,
-                 ... );
+              const char *cvalue,
+              ... );
 
 void emsSetnc( const char *token,  
-                 const char *cvalue,
-                 int mxchar );
+               const char *cvalue,
+               int mxchar );
 
 void emsSetd( const char *token,  
-                 double dvalue );
+              double dvalue );
 
 void emsSeti( const char *token,  
-                 int ivalue );
+              int ivalue );
 
 void emsSeti64( const char *token,  
-                 int64_t ivalue );
+                int64_t ivalue );
 
 void emsSetl( const char *token,  
-                 int lvalue );
+              int lvalue );
 
 void emsSetr( const char *token,  
-                 float rvalue );
+              float rvalue );
 
 void emsSetp( const char *token,  
-                 void * pvalue );
+              void * pvalue );
 
 void emsSetu( const char *token,  
-                 unsigned int ivalue );
+              unsigned int ivalue );
 
 void emsStat( int *status );      
 
 void emsSyser( const char *token, 
-                  int systat );
+               int systat );
 
-void emsTune( const char *key, const int value, int *status );
+void emsTune( const char *key, 
+              const int value, 
+              int *status );
 
 /* Internal Functions */
 /* Not for general use */
 int ems1Starf( const char *envar,       
-              const char *relpath, const char *acmode, 
-              char **filename, int *pathlen );
+               const char *relpath, 
+               const char *acmode, 
+               char **filename, 
+               int *pathlen );
 
 void ems1_get_facility_error( unsigned int errcode,
                               char **facility_name,
@@ -160,92 +170,92 @@ F77_SUBROUTINE(ems_annul) ( INTEGER(status ) );
 F77_SUBROUTINE(ems_begin) ( INTEGER(status ) );
 
 F77_SUBROUTINE(ems_eload) ( CHARACTER(param_f ),
-                 INTEGER(parlen),
-                 CHARACTER(opstr_f),
-                 INTEGER(oplen),
-                 INTEGER(status)
-                 TRAIL( plength )
-                 TRAIL( olength ) );
+                            INTEGER(parlen),
+                            CHARACTER(opstr_f),
+                            INTEGER(oplen),
+                            INTEGER(status)
+                            TRAIL( plength )
+                            TRAIL( olength ) );
 
 F77_SUBROUTINE(ems_expnd) ( CHARACTER(text),
-                 CHARACTER(opstr),
-                 INTEGER(oplen),
-                 INTEGER(status)
-                 TRAIL( tlength )
-                 TRAIL( olength ) );
+                            CHARACTER(opstr),
+                            INTEGER(oplen),
+                            INTEGER(status)
+                            TRAIL( tlength )
+                            TRAIL( olength ) );
 
 F77_SUBROUTINE (ems_fioer) ( CHARACTER(token),
-        INTEGER(iostat)
-        TRAIL(token) );
+                             INTEGER(iostat)
+                             TRAIL(token) );
 
 F77_SUBROUTINE(ems_end) ( INTEGER(status ) );
 
 F77_SUBROUTINE(ems_errno) ( CHARACTER(token_f),
-                 INTEGER(errno_f)
-                 TRAIL( tlength ) );
+                            INTEGER(errno_f)
+                            TRAIL( tlength ) );
 
 F77_SUBROUTINE(ems_facer) ( CHARACTER(token_f),
-                 INTEGER(status_f)
-                 TRAIL( tlength ) );
+                            INTEGER(status_f)
+                            TRAIL( tlength ) );
 
 F77_SUBROUTINE(ems_level) ( INTEGER(level ) );
 
 F77_SUBROUTINE(ems_mark) ( void );
 
 F77_SUBROUTINE(ems_mload) ( CHARACTER(param),
-                 CHARACTER(text),
-                 CHARACTER(opstr),
-                 INTEGER(oplen),
-                 INTEGER(status)
-                 TRAIL( plength )
-                 TRAIL( tlength )
-                 TRAIL( olength ) );
+                            CHARACTER(text),
+                            CHARACTER(opstr),
+                            INTEGER(oplen),
+                            INTEGER(status)
+                            TRAIL( plength )
+                            TRAIL( tlength )
+                            TRAIL( olength ) );
 
 F77_SUBROUTINE(ems_renew) ( void );
 
 F77_SUBROUTINE(ems_rep) ( CHARACTER(param),
-               CHARACTER(text),
-               INTEGER(status)
-               TRAIL( plength )
-               TRAIL( tlength ) );
+                          CHARACTER(text),
+                          INTEGER(status)
+                          TRAIL( plength )
+                          TRAIL( tlength ) );
 
 F77_SUBROUTINE(ems_rlse) ( void );
 
 F77_SUBROUTINE(ems_setc) ( CHARACTER(token),
-                CHARACTER(cvalue)
-                TRAIL( tlength )
-                TRAIL( clength ) );
+                           CHARACTER(cvalue)
+                           TRAIL( tlength )
+                           TRAIL( clength ) );
 
 F77_SUBROUTINE(ems_setd) ( CHARACTER(token),
-                DOUBLE(dvalue)
-                TRAIL( tlength ) );
+                           DOUBLE(dvalue)
+                           TRAIL( tlength ) );
 
 F77_SUBROUTINE(ems_seti) ( CHARACTER(token),
-                INTEGER(ivalue)
-                TRAIL( tlength ) );
+                           INTEGER(ivalue)
+                           TRAIL( tlength ) );
 
 F77_SUBROUTINE(ems_setl) ( CHARACTER(token),
-                INTEGER(lvalue)
-                TRAIL( tlength ) );
+                           INTEGER(lvalue)
+                           TRAIL( tlength ) );
 
 F77_SUBROUTINE(ems_setr) ( CHARACTER(token),
-                REAL(rvalue)
-                TRAIL( tlength ) );
+                           REAL(rvalue)
+                           TRAIL( tlength ) );
 
 F77_SUBROUTINE(ems_show) ( CHARACTER(topic),
-                INTEGER(status)
-	            TRAIL( tlength ) );
+                           INTEGER(status)
+                           TRAIL( tlength ) );
 
 F77_SUBROUTINE(ems_stat) ( INTEGER(status) );
 
 F77_SUBROUTINE(ems_syser) ( CHARACTER(token),
-                 INTEGER(systat)
-                 TRAIL( tlength ) );
+                            INTEGER(systat)
+                            TRAIL( tlength ) );
 
 F77_SUBROUTINE(ems_tune) ( CHARACTER(list),
-                INTEGER(value),
-                INTEGER(status)
-	            TRAIL( llength ) );
+                           INTEGER(value),
+                           INTEGER(status)
+                           TRAIL( llength ) );
 
 #endif	/* EMS_DEFINED */
 

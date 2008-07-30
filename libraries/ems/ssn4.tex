@@ -23,7 +23,7 @@ Copyright \copyright\ 2008 Science and Technology Facilities Council}
 \newcommand{\stardocauthors}   {P.C.T. Rees \\
                                 A.J. Chipperfield \\
                                 P.W. Draper}
-\newcommand{\stardocdate}      {21 Jul 2008}
+\newcommand{\stardocdate}      {30 Jul 2008}
 \newcommand{\stardoctitle}     {EMS \\ [\latex{1ex}]
                                 Error Message Service}
 \newcommand{\stardocversion}   {Version 2.2-0}
@@ -1493,7 +1493,7 @@ error codes.
 \texttt{EMS\_REP}
 (improper use of \texttt{EMS\-\_REP}).
 \item \texttt{EMS\_\_BDKEY} -- Invalid keyword will be ignored (improper use
-of \texttt{EMS\_TUNE}).
+of \texttt{EMS\_TUNE} or EMS\_GTUNE).
 \item \texttt{EMS\_\_BTUNE} -- Conflicting actions (improper use of
 \texttt{EMS\_TUNE}).
 \item \texttt{EMS\_\_CXOVF} -- Error context stack overflow (EMS fault).
@@ -1538,6 +1538,8 @@ the moment.
 \textit{Assign the message associated with a Starlink status to a token.}
 \item [\htmlref{EMS\_FIOER}{EMS_FIOER}  ( TOKEN, IOSTAT )] \listline 
 \textit{Assign the message associated with a Fortran I/O error to a token.}
+\item [\htmlref{EMS\_GTUNE}{EMS_GTUNE} ( KEY, VALUE, STATUS )] \listline 
+\textit{Inquire an EMS tuning parameter.}
 \item [\htmlref{EMS\_LEVEL}{EMS_LEVEL}  ( LEVEL )] \listline
 \textit{Inquire the current error context level.}
 \item [\htmlref{EMS\_MARK}{EMS_MARK}] \listline
@@ -1585,6 +1587,8 @@ const int maxlen, int \texttt{*}oplen, int \texttt{*}status );} \\
 \item[void emsFacer ( const char \texttt{*}token, int facerr );] \listline
 \textit{Assign the messages associated with a Starlink status value to a
 token.}
+\item[void emsGtune ( const char \texttt{*}key, \texttt{*}int value,
+int \texttt{*}status );] \listline
 \item[void emsLevel ( int \texttt{*}level );] \listline
 \textit{Inquire the current error context level.}
 \item[void emsMark ( void );] \listline
@@ -1870,6 +1874,46 @@ Specifications}
       computer system in use.
    }
 }
+
+\sstroutine{
+   EMS\_GTUNE
+}{
+   Inquire an EMS tuning parameter
+}{
+   \sstdescription{
+      Return the value of an EMS tuning parameter. The possible tuning
+      parameters are those defined in \texttt{EMS\_TUNE}.
+
+      The routine will attempt to execute regardless of the given value of
+      \texttt{STATUS}. If the given value is not SAI\_\_OK, then it is left
+      unchanged, even if the routine fails to complete. If \texttt{STATUS} is
+      SAI\_\_OK on entry and the routine fails to complete, \texttt{STATUS}
+      will be set and an error report made.
+
+   }
+   \sstinvocation{
+      CALL EMS\_TUNE( KEY, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         KEY = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The tuning parameter keyword
+      }
+      \sstsubsection{
+         VALUE = INTEGER (Returned)
+      }{
+         The current value of the tuning parameter.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+
+
 \sstroutine{
    EMS\_LEVEL
 }{
@@ -2203,6 +2247,11 @@ Specifications}
          VALUE = INTEGER (Given)
       }{
          The value to be assigned (see Description)
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
       }
    }
    \sstnotes{\begin{enumerate}

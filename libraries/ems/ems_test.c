@@ -52,6 +52,10 @@ int main( void ){
    DECLARE_CHARACTER( mess, EMS__SZMSG );
    char buffer[EMS__SZTOK];
    int oplen;
+   int value1;
+   int value2;
+   int value3;
+   int value4;
 
    /* Test token concatenation in emsBegin/emsEnd block - need good status */
    status = SAI__OK;
@@ -147,5 +151,62 @@ int main( void ){
    emsRenew();
    emsRep( "ERR1", "Error message: ^T1 + ^T2 != ^T3", &status );
 
+
+   /* Set and get some tuning values. */
+   status = SAI__OK;
+   emsTune( "SZOUT", 10, &status );
+   emsGtune( "SZOUT", &value1, &status );
+   emsTune( "SZOUT", 80, &status );
+   if ( status != SAI__OK ) {
+       printf( "\nSZOUT test failed with BAD status\n" );
+       status = SAI__OK;
+   }
+   else if ( value1 != 10 ) {
+       printf( "\nSZOUT test failed with BAD value\n" );
+   }
+
+   emsTune( "MSGDEF", 2, &status );
+   emsGtune( "MSGDEF", &value2, &status );
+   emsTune( "MSGDEF", 1, &status );
+   if ( status != SAI__OK ) {
+       printf( "\nMSGDEF test failed with BAD status\n" );
+       status = SAI__OK;
+   }
+   else if ( value2 != 2 ) {
+       printf( "\nMSGDEF test failed with BAD value\n" );
+   }
+
+   emsTune( "STREAM", 1, &status );
+   emsGtune( "STREAM", &value3, &status );
+   emsTune( "STREAM", 0, &status );
+   if ( status != SAI__OK ) {
+       printf( "\nSTREAM test failed with BAD status\n" );
+       status = SAI__OK;
+   }
+   else if ( value3 != 1 ) {
+       printf( "\nSTREAM test failed with BAD value\n" );
+   }
+
+   emsTune( "REVEAL", 1, &status );
+   emsGtune( "REVEAL", &value4, &status );
+   emsTune( "REVEAL", 0, &status );
+   if ( status != SAI__OK ) {
+       printf( "\nREVEAL test failed with BAD status\n" );
+       status = SAI__OK;
+   }
+   else if ( value4 != 1 ) {
+       printf( "\nREVEAL test failed with BAD value\n" );
+   }
+   
+   if( value1 != 10 || value2 != 2 || value3 != 1 || value4 != 1 ) {
+       printf( "\nTuning subsystem has failed\n" );
+   }
+   else {
+       printf( "\nTuning subsystem OK\n" );
+   }
+
+
    exit( 0 );
+
+
 }   
