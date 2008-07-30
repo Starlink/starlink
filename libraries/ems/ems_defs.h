@@ -69,7 +69,7 @@ typedef struct {
 typedef struct {
     int toklev;                     /* Token context level */
     int tokmrk;                     /* Number of markers */
-    int tokcnt[EMS__MXLEV+1];       /* Number of messages in table */
+    int tokcnt[EMS__MXLEV+1];       /* Number of tokens in table by level */
     int tokhiw[EMS__MXLEV+1];       /* Token table high water mark */
     int toklen[EMS__MXTOK+1];       /* Token string lengths */
     char toknam[EMS__MXTOK+1][EMS__SZNAM+1];   /* Token names */

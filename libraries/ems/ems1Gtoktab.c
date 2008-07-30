@@ -93,7 +93,7 @@ ems_toktab_t *ems1Gtoktab( void )
 {
     ems_thread_data_t *dataPtr;
 
-    TRACE( "ems1Gtoktab" );
+    TRACE( "ems1Gtoktab (threads)" );
 
     /*  If the thread ID doesn't match that of the initial thread then then
      *  look for a local table. If not found create one and associate it as

@@ -56,9 +56,13 @@
  *        Rewritten in C based on the Fortran routine EMS1_PFORM
  *      1-OCT-2001 (AJC):
  *        Remove setting high-water mark (it's already set by ems1Stok)
- *        - this allow emsRenew to work properly.
+ *        - this allows emsRenew to work properly.
  *     14-MAY-2008 (PWD):
  *        Use struct to access token table.
+ *     30-JUL-2008 (PWD):
+ *        When in a mark only kill tokens to the last high water mark,
+ *        not last token count. Without this token catenation can fail to
+ *        spot that a token with the same name already exists.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -81,7 +85,7 @@ void ems1Ktok ( void )
     /*  Clear the token table at the current context. */
     if ( toktab->tokmrk > 1 ) {
         toktab->tokcnt[ toktab->tokmrk ] = 
-            toktab-> tokcnt[ toktab->tokmrk - 1 ];
+            toktab->tokhiw[ toktab->tokmrk - 1 ];
     } else {
         toktab->tokcnt[ toktab->tokmrk ] = 0;
     }

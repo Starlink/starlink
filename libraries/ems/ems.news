@@ -2,6 +2,7 @@
   * Support for using EMS together with POSIX threads has been added.
     SSN/4 has been updated to describe this change. This is enabled 
     by default on platforms with POSIX threads support.
+  * A bug when concatenating message tokens inside a mark has been fixed.
 
 2.1-2
   * A memory overrun bug storing and retrieving parameter names has been 
