@@ -73,7 +73,6 @@
 #include <stdio.h>
 
 void msgBell( int * status ) {
-  int retval = 0;
 
   if (*status != SAI__OK) return;
 
