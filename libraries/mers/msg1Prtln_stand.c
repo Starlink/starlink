@@ -51,6 +51,8 @@
 *  History:
 *     25-JUL-2008 (TIMJ):
 *        Original version
+*     29-JUL-2008 (TIMJ):
+*        More robust error handling.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -65,19 +67,38 @@
 #include "msg_err.h"
 #include "ems.h"
 
+#include <string.h>
 #include <stdio.h>
+#include <errno.h>
 
 void msg1Prtln( const char * text, int * status ) {
-  int err;
+  int err;                /* return value from printf */
+  size_t len = 0;         /* Length of input text */
+
   if (*status != SAI__OK) return;
+
+  /* how many characters do we expect to deliver (including newline) */
+  len = strlen( text ) + 1;
 
   /* Note that we must add the newline */
   err = printf( "%s\n", text );
 
   if (err < 0) {
     *status = MSG__OPTER;
+    emsMark();
+    emsSyser( "ERR", errno );
     emsRep( "MSG_PRINT_MESS",
-	    "msg1Prtln: Error printing message to stdout", status );
+	    "msg1Prtln: Error printing message to stdout: ^ERR", status );
+    emsRlse();
+  } else if (err != len) {
+    emsMark();
+    *status = MSG__OPTER;
+    emsSeti( "NEX", len );
+    emsSeti( "NGOT", err );
+    emsRep("MSG_PRINT_MESS",
+	    "msg1Prtln: Error printing message to stdout. Printed ^NGOT"
+	    " characters but expected to print ^NEX", status );
+    emsRlse();
   }
 
 }

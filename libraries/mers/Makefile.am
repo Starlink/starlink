@@ -71,9 +71,9 @@ F_ROUTINES = err1_print.f err1_flush.f \
 
 F_ROUTINES_STAND = msg1_form_stand.f
 
-C_ROUTINES_STAND = msgBell_stand.c msgSync_stand.c
+C_ROUTINES_STAND = msgSync_stand.c
 
-F_INTERFACE_STAND = msg_bell_stand.c msg_sync_stand.c
+F_INTERFACE_STAND = msg_sync_stand.c
 
 F_ROUTINES_STAND_SED = 
 
@@ -83,7 +83,7 @@ F_ROUTINES_ADAM = err_clear_adam.f err_start_adam.f \
                   err_stop_adam.f \
                   msg1_form_adam.f msg1_genv_adam.f msg1_gkey_adam.f \
                   msg1_gref_adam.f \
-                  msg_bell_adam.f msg_ifget_adam.f
+                  msg_ifget_adam.f
 
 C_ROUTINES_ADAM = err1Prerr_adam.c msg1Prtln_adam.c msgSync_adam.c
 
@@ -97,7 +97,7 @@ F_BLOCK_DATA_FILES = msg1_blk.f err1_blk.f
 
 C_INTERFACE_ROUTINES = err.c msgSetc.c msgSetd.c msgSetr.c msgSeti.c \
 msgSetl.c errAnnul.c errBegin.c errEnd.c errSyser.c errMark.c errRlse.c \
-errStat.c errLevel.c errFacer.c msgRenew.c err1Bell.c
+errStat.c errLevel.c errFacer.c msgRenew.c err1Bell.c msgBell.c
 
 C_INTERFACE_ADAM = err_adam.c
 
@@ -105,7 +105,7 @@ C_INTERFACE_STAND =
 
 F_INTERFACE_ROUTINES = msg_setc.c msg_setd.c msg_setr.c msg_seti.c \
 msg_setl.c err_annul.c err_begin.c err_end.c err_syser.c err_mark.c \
-err_rlse.c err_stat.c err_level.c err_facer.c msg_renew.c
+err_rlse.c err_stat.c err_level.c err_facer.c msg_renew.c msg_bell.c
 
 #  The installation test source
 TEST_SOURCE = err_test.f err_test.c err_test.ifl

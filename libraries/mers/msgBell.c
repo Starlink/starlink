@@ -1,16 +1,16 @@
 /*
 *+
 *  Name:
-*     MSG_BELL
+*     msgBell
 
 *  Purpose:
 *     Deliver an ASCII BEL character.
 
 *  Language:
-*    Starlink ANSI C
+*     Starlink ANSI C
 
 *  Invocation:
-*     CALL MSG_BELL( STATUS )
+*     msgBell( int * status );
 
 *  Description:
 *     A bell character and a new line is delivered to the user. If the 
@@ -18,11 +18,8 @@
 *     will ring a bell and print a new line on the terminal.
 
 *  Arguments:
-*     STATUS = INTEGER (Given and Returned)
+*     status = int * (Given and Returned)
 *        The global status.
-
-*  Implementation Notes:
-*     -  This subroutine is the stand-alone version of MSG_BELL.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -54,7 +51,10 @@
 *     1-OCT-1993 (PCTR):
 *        Original version.
 *     23-JUL-2008 (TIMJ):
-*        Now written in C to call msgBell
+*        Now written in C
+*     29-JUL-2008 (TIMJ):
+*        Now the we have msg1Prtln there is no need for separate
+*        ADAM and standalone implementations.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -63,13 +63,31 @@
 *-
 */
 
-#include "f77.h"
 #include "merswrap.h"
-#include "mers_f77.h"
+#include "msg_err.h"
+#include "sae_par.h"
+#include "ems.h"
 
-F77_SUBROUTINE(msg_bell)( INTEGER(STATUS) ) {
-  int status;
-  F77_IMPORT_INTEGER( *STATUS, status );
-  msgBell( &status );
-  F77_EXPORT_INTEGER( status, *STATUS );
+#include <errno.h>
+#include <stdio.h>
+
+void msgBell( int * status ) {
+  int retval = 0;
+
+  if (*status != SAI__OK) return;
+
+  /* print the message using the ADAM or standalone output device
+     and call msgSync to ensure the output buffer is delivered. */
+  msg1Prtln( "\a", status );
+  msgSync( status );
+
+  /* Check the returned status and report an error message if necessary. */
+  if (*status != SAI__OK) {
+    *status = MSG__OPTER;
+    emsMark();
+    emsRep( "MSG_BELL_OPTER",
+	    "Error encountered during BELL output.", status );
+    emsRlse();
+  }
+
 }

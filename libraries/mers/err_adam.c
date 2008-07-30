@@ -71,20 +71,6 @@ DECLARE_INTEGER(fstatus);
    return;
 }
 
-void msgBell( int *status ) {
-
-DECLARE_INTEGER(fstatus);
-
-   F77_EXPORT_INTEGER( *status, fstatus );
-
-   F77_CALL(msg_bell)( INTEGER_ARG(&fstatus) );
-
-   F77_IMPORT_INTEGER( fstatus, *status );
-
-   return;
-}
-
-
 void msgIfget( const char *pname,
                int *status ) {
 
