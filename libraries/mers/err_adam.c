@@ -42,17 +42,6 @@
 #include "merswrap.h"
 #include "mers_f77.h"
 
-void errClear( int *status ) {
-
-DECLARE_INTEGER(fstatus);
-
-   F77_CALL(err_clear)( INTEGER_ARG(&fstatus) );
-
-   F77_IMPORT_INTEGER( fstatus, *status );
-
-   return;
-}
-
 void msgIfget( const char *pname,
                int *status ) {
 

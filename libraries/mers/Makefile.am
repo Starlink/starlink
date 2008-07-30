@@ -79,15 +79,14 @@ F_ROUTINES_STAND_SED =
 
 C_ROUTINES_STAND_SED = err1Prerr_stand.c msg1Prtln_stand.c
 
-F_ROUTINES_ADAM = err_clear_adam.f \
-                  msg1_form_adam.f msg1_genv_adam.f msg1_gkey_adam.f \
-                  msg1_gref_adam.f \
-                  msg_ifget_adam.f
+F_ROUTINES_ADAM = msg1_form_adam.f msg1_genv_adam.f msg1_gkey_adam.f \
+                  msg1_gref_adam.f msg_ifget_adam.f
 
 C_ROUTINES_ADAM = err1Prerr_adam.c msg1Prtln_adam.c msgSync_adam.c \
-	errStop_adam.c errStart_adam.c
+	errStop_adam.c errStart_adam.c errClear_adam.c
 
-F_INTERFACE_ADAM = msg_sync_adam.c err_stop_adam.c err_start_adam.c
+F_INTERFACE_ADAM = msg_sync_adam.c err_stop_adam.c err_start_adam.c \
+	err_clear_adam.c
 
 F_ROUTINES_UT = msg1_gesc.f msg1_gnam.f msg1_putc.f msg1_rform.f
 

@@ -1,4 +1,4 @@
-      SUBROUTINE ERR_CLEAR( STATUS )
+/*
 *+
 *  Name:
 *     ERR_CLEAR
@@ -8,7 +8,7 @@
 *     contents.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Invocation:
 *     CALL ERR_CLEAR( STATUS )
@@ -35,8 +35,8 @@
 *     This subroutine is for use only with the ADAM implementation of
 *     the Error Reporting System.
 
-*  [optional_subroutine_items]...
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 1995, 2001 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
@@ -69,58 +69,22 @@
 *        Correct EMS1_IEPND to LOGICAL type
 *     16-FEB-2001 (AJC):
 *        Avoid EMS internals
+*     29-JUL-2008 (TIMJ):
+*        Call errClear.
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
-*  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+*/
 
-*  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+#include "f77.h"
+#include "merswrap.h"
+#include "mers_f77.h"
 
-*  Status:
-      INTEGER STATUS             ! Global status
-
-*  Local Variables:
-      INTEGER LEVEL              ! Error context level
-      INTEGER TSTLEV             ! Test level variable
-*.
-
-*  Initialise the error context level.
-      TSTLEV = 0
-      CALL EMS_LEVEL( LEVEL )
-
-*  Loop to return the Error Reporting System to the default context
-*  level. We assume we're there when EMS_RLSE will go no lower.
-*  DO WHILE loop.
- 10    CONTINUE     
-      IF ( LEVEL .NE. TSTLEV ) THEN
-         TSTLEV = LEVEL
-         CALL EMS_RLSE
-         CALL EMS_LEVEL( LEVEL )
-         GO TO 10
-      END IF
-
-*  Check if there are any error messages pending output in the error
-*  table.
-      CALL EMS_STAT( STATUS )
-      IF ( STATUS .NE. SAI__OK ) THEN
-*     There are error messages pending output, so call ERR_FLUSH to
-*     deliver them to the user.
-         CALL ERR_FLUSH( STATUS )
-
-*     Check the returned status for output errors: if they have
-*     occurred, annul the error table at the current (default) context.
-         IF ( STATUS .NE. SAI__OK ) CALL EMS_ANNUL( STATUS )
-      ELSE
-
-*     There are no pending error messages, so just reset the status to
-*     SAI__OK.
-         STATUS = SAI__OK
-      END IF
-
-      END
+F77_SUBROUTINE(err_clear)( INTEGER(STATUS) ) {
+  int status;
+  errClear( &status );
+  F77_EXPORT_INTEGER( status, *STATUS );
+}
