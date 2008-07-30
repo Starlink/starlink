@@ -854,18 +854,32 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
   /* Get the step time from the header if we have a hdr */
   if (hdr) {
     smf_fits_getD( hdr, "STEPTIME", &steptime, status );
-    if (*status == SMF__NOKWRD) {
-      errAnnul( status );
+    if (*status == SMF__NOKWRD || astIsUndefF(steptime) ||
+        steptime == VAL__BADD ) {
+      if (*status != SAI__OK) errAnnul( status );
       /* Attempt to calculate it from adjacent entries */
       tmpState = hdr->allState;
       if (hdr->nframes > 1 && tmpState[0].rts_end != VAL__BADD
           && tmpState[1].rts_end != VAL__BADD) {
         steptime = tmpState[1].rts_end - tmpState[0].rts_end;
         steptime *= SPD;
+        msgSetd("STP", steptime);
+        msgOutif(MSG__QUIET, " ", "WARNING: Determined step time to be ^STP"
+                 " by examining state information", status );
       } else {
-        /* no idea */
+        /* no idea - make this fatal for now */
         steptime = VAL__BADD;
+        *status = SAI__ERROR;
+        errRep( " ", "Unable to determine step time from header or "
+                " from state information", status );
       }
+    }
+    if (*status == SAI__OK && steptime < VAL__SMLD) {
+      *status = SAI__ERROR;
+      msgSetd( "STP", steptime);
+      errRep( " ", "Determined a negative steptime (^STP). This can not happen",
+              status);
+      steptime = VAL__BADD;
     }
     hdr->steptime = steptime;
   }
