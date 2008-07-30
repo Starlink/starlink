@@ -168,8 +168,14 @@ int main( void ){
    status = SAI__ERROR;
    emsRep( "ERRSZOUT", "SZOUT check: long error message that should "
            "be wrapped into two lines", &status );
+   emsTune( "SZOUT", 20, &status ); 
+   emsRep( "ERRSZOUT", "SZOUT check: long error message that should "
+           "be wrapped into many lines", &status );
+
+   emsTune( "SZOUT", 0, &status );    
+   emsRep( "ERRSZOUT", "SZOUT check: long error message that should "
+           "be just one line", &status );
    status = SAI__OK;
-   emsTune( "SZOUT", 80, &status );
 
    emsTune( "MSGDEF", 2, &status );
    emsGtune( "MSGDEF", &value2, &status );

@@ -32,10 +32,10 @@
  *            boundaries if possible. The default maximum line length is 79
  *            characters.
  *
- *            If VALUE is set to 0, no wrapping will occur. If it is set
- *            greater than 6, it specifies the maximum output line
- *            length. Note that the minimum VALUE is 7, to allow for
- *            exclamation marks and indentation.
+ *            If VALUE is set to 0, no wrapping will occur (that is the
+ *            length will be set to the maximum possible). Note that the 
+ *            minimum is 7, to allow for exclamation marks and indentation.
+ *            Using a smaller value is an error.
  *
  *        'MSGDEF' Specifies the default error reporting level. That is a level
  *            below which EMS_RELEASE will not go. It can therefore be used by
@@ -118,6 +118,10 @@
  *        Remove unused variables
  *     13-MAY-2008 (PWD):
  *        Use struct to access message table.
+ *     30-JUL-2008 (PWD):
+ *        Limit SZOUT to EMS__SZMSG as this is the maximum size 
+ *        EMS will output. Make sure SZOUT is greater than 6 to 
+ *        also match the documented behaviour.
  *     {enter_changes_here}
 
  *  Bugs:
@@ -149,8 +153,8 @@ void emsTune( const char *key, const int value, int *status )
     if ( strcasecmp( key, "SZOUT" ) == 0 ) {
         if ( value == 0 ) {
             msgtab->msgwsz = EMS__SZMSG;
-        } else if ( value > 1 ) {
-            msgtab->msgwsz = value;
+        } else if ( value > 6 ) {
+            msgtab->msgwsz = MIN( value, EMS__SZMSG );
         } else {
             lstat = EMS__BTUNE;
         }
