@@ -28,7 +28,7 @@
 *       o for each continuous chunk of data, shorter than MAXLEN, a file
 *         is generated on disk for each subarray. The file name is determined
 *         as the name of the first input file for the chunk, with a suffix
-*         "_con".
+*         "_con". The can be modified using the parameter OUT.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
