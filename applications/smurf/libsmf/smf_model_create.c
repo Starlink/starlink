@@ -282,7 +282,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
 
     /* Form a group expression for the filename */
     len = sizeof(fname_grpex);
-    one_strlcpy( fname_grpex, "*_", len, status );
+    one_strlcpy( fname_grpex, "./*_", len, status );
     one_strlcat( fname_grpex, mname, len, status );
     one_strlcat( fname_grpex, suffix, len, status );
 
