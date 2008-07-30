@@ -1,4 +1,4 @@
-      SUBROUTINE ERR_STOP( STATUS )
+/*
 *+
 *  Name:
 *     ERR_STOP
@@ -7,7 +7,7 @@
 *     Close the Error Reporting System.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Invocation:
 *     CALL ERR_STOP( STATUS )
@@ -31,9 +31,10 @@
 *     -  Clear the message token table.
 
 *  Copyright:
-*     Copyright (C) 1983, 1987, 1989, 1990, 1991 Science & Engineering Research Council.
-*     Copyright (C) 2001 Central Laboratory of the Research Councils.
-*     All Rights Reserved.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 1983, 1987, 1989-1991 Science & Engineering
+*     Research Council. Copyright (C) 2001 Central Laboratory of the
+*     Research Councils. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -56,6 +57,7 @@
 *     BDK: Dennis Kelly (ROE)
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -74,37 +76,22 @@
 *     20-FEB-2001 (AJC):
 *        Remove report on status set but no report (can't happen)
 *         and avoids use of EMS internal EMS1_IEPND.
+*     29-JUL-2008 (TIMJ):
+*        Now C wrapper around errStop.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
+#include "f77.h"
+#include "merswrap.h"
+#include "mers_f77.h"
 
-*  Global Constants:
-      INCLUDE 'SAE_PAR'                 ! Standard SAE constants
-
-*  Status:
-      INTEGER STATUS
-
-*  Local Variables:
-      INTEGER ISTAT                     ! Local status
-
-*. 
-
-*  Set the local status.
-      ISTAT = STATUS
-
-*     Call ERR_CLEAR to clear the error message table.
-      CALL ERR_CLEAR( ISTAT )
-
-*  Call EMS1_ESTOP to close EMS_ error reporting.
-!      CALL EMS1_ESTOP
-
-*  Clear the message token table.
-!      CALL EMS1_MSTOP
-
-      END
+F77_SUBROUTINE(err_stop)( INTEGER(STATUS) ) {
+  int status;
+  F77_IMPORT_INTEGER( *STATUS, status );
+  errStop( &status );
+}

@@ -60,17 +60,6 @@ void errStart( void ) {
    return;
 }
 
-void errStop( int *status ) {
-
-DECLARE_INTEGER(fstatus);
-
-   F77_EXPORT_INTEGER( *status, fstatus );
-
-   F77_CALL(err_stop)( INTEGER_ARG(&fstatus) );
-
-   return;
-}
-
 void msgIfget( const char *pname,
                int *status ) {
 
