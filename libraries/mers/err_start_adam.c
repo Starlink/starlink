@@ -1,4 +1,4 @@
-      SUBROUTINE ERR_START
+/*
 *+
 *  Name:
 *     ERR_START
@@ -7,7 +7,7 @@
 *     Initialise the Error Reporting System.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Invocation:
 *     CALL ERR_START
@@ -19,12 +19,9 @@
 *     This subroutine is for use only with the ADAM implementation of
 *     the Error Reporting System.
 
-*  Algorithm:
-*     -  Call EMS1_MSTRT.
-*     -  Call EMS1_ESTRT.
-
 *  Copyright:
-*     Copyright (C) 1983, 1989, 1990, 1991 Science & Engineering Research Council.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 1983, 1989-1991 Science & Engineering Research Council.
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
@@ -49,6 +46,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     PCTR: P.C.T. Rees (STARLINK)
 *     AJC: A.J.Chipperfield (STARLINK,RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -64,39 +62,20 @@
 *        Added call to EMS1_MSTRT.
 *     16-FEB-2001 (AJC):
 *        Avoid use of EMS internals
+*     29-JUL-2008 (TIMJ):
+*        Call errStart.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
+#include "merswrap.h"
+#include "f77.h"
+#include "mers_f77.h"
 
-*  Global Constants:
-      INCLUDE 'SAE_PAR'
-
-*  local variables:
-      INTEGER STATUS                    ! Internal status
-      INTEGER LEVEL                     ! The default level 
-                                        ! (prevents EMS output)
-*.
-
-*  Initialise the EMS_ error reporting system.
-*  We can assume the tables are initialised
-!      CALL EMS1_MSTRT
-!      CALL EMS1_ESTRT
-
-*  Start a new error context
-      STATUS = SAI__OK
-      CALL EMS_BEGIN( STATUS )
-
-*  Get the new level as the 'default' level
-      CALL EMS_LEVEL( LEVEL )
-
-*  Set the default level for EMS. That is a level below which EMS will not
-*
-      CALL EMS_TUNE( 'MSGDEF', LEVEL, STATUS )
-
-      END
+F77_SUBROUTINE(err_start)( void ) {
+  errStart();
+}

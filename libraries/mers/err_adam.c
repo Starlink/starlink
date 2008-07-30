@@ -53,13 +53,6 @@ DECLARE_INTEGER(fstatus);
    return;
 }
 
-void errStart( void ) {
-
-   F77_CALL(err_start)(  );
-
-   return;
-}
-
 void msgIfget( const char *pname,
                int *status ) {
 
