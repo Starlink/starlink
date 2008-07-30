@@ -625,6 +625,7 @@ itcl::class gaia::Gaia {
          {Set startup-level configuration options} \
          -command [code $this make_toolbox startup 0 1]
 
+      #  Print becomes cascade menu with options for image and colourramp.
       set index [$m index "Print..."]
       catch {$m delete "Print..."}
       insert_menuitem $m $index cascade "Print..." \
@@ -639,6 +640,12 @@ itcl::class gaia::Gaia {
          {Print annotated postscript copy of colour ramp to file or printer} \
          -command [code $this print_ramp_]
 
+      #  Capture main window to a graphics format.
+      insert_menuitem $m $index command "Capture..." \
+         {Capture main window to a graphic format, GIF, JPEG, PNG, TIFF} \
+         -command [code $image_ capture]
+
+      #  Shortcuts for closing window.
       bind $w_  <Control-n> [code $this clone]
       bind $w_  <Control-q> [code $this quit]
 

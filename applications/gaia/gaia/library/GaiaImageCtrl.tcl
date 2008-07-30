@@ -415,6 +415,71 @@ itcl::class gaia::GaiaImageCtrl {
            -bot_right "$date"
    }
 
+   #  Capture a copy of the main window to a graphics file. Requires
+   #  that the tkimg package is installed.
+   public method capture {} {
+      if { [$image_ isclear] } {
+         warning_dialog "No image is currently loaded" $w_
+         return
+      }
+
+      #  Get a file name and a format. XXX add additional options to
+      #  define the format and add some JPEG options (-quality -progressive).
+      utilReUseWidget util::FileSelect $w_.capture \
+         -title "Select or name a graphics file" \
+         -dir "." \
+         -filter "*" \
+         -transient 1 \
+         -withdraw 1 \
+         -filter_types {{any *} {GIF(.gif) *.gif} {JPEG(.jpg) *.jpg} 
+            {JPEG(.jpeg) *.jpeg} {PNG(.png) *.png} {TIFF(.tiff) *.tiff} 
+            {TIFF(.tif) *.tif}}
+
+      if { [$w_.capture activate] } {
+         set filename [$w_.capture get]
+         set type [::file extension $filename]
+         set format "gif"
+         switch -glob $type {
+            j* {
+               set format "jpeg"
+            }
+            p* {
+               set format "png"
+            }
+            t* {
+               set format "tiff"
+            }
+         }
+
+         #  The graphic is created by making a copy of the window in another
+         #  image and writing that out. The copy requires that the main window
+         #  is unobscured (uses an X11 snap), so attempt to raise it and make
+         #  sure everything is up to date.
+         set image [::image create photo]
+         ::raise $w_
+         ::update
+         blt::winop snap $canvas_ $image
+
+         #  Load all the required tkimg packages.
+         if { $format != "gif" } {
+            package require img::jpeg
+            package require img::png
+            package require img::tiff
+         }
+
+         #  This can fail if the window is still obscured. Trap and complain.
+         busy {
+            if { [catch {$image write $filename -format $format} msg ] } {
+               if { $msg == "too many colors" } {
+                  info_dialog "The image display window must not be obscured,
+move any overlapping windows and try again"
+               }
+            }
+         }
+         ::image delete $image
+      }
+   }
+
    #  Create a graph to display the image data values along the line
    #  just created.
    #     "line_id" is the canvas id of the line.
@@ -1158,15 +1223,15 @@ itcl::class gaia::GaiaImageCtrl {
       lassign [$canvas_ bbox all] x0 y0 x1 y1
       $image_ convert coords $x0 $y0 canvas x0 y0 image
       $image_ convert coords $x1 $y1 canvas x1 y1 image
-      
+
       set w [expr int(abs($x1-$x0))]
       set h [expr int(abs($y1-$y0))]
-      
+
       #  Nothing on canvas, so nothing to do.
       if { $w == 0 || $h == 0 } {
          return
       }
-      
+
       if { $autofill_ } {
          set xf [expr min(150,int($cw/$w))]
          set yf [expr min(150,int($ch/$h))]
@@ -1188,9 +1253,9 @@ itcl::class gaia::GaiaImageCtrl {
          #  and nothing else understands differing scales (so can
          #  get callback loop).
          $image_ scale $xf $yf
-         
+
       } else {
-         
+
          set factor [expr {min(150,min($cw/$w, $ch/$h))}]
          if {$factor == 0} {
             set factor [expr {-max(($w-1)/$cw+1, ($h-1)/$ch+1)}]

@@ -1,62 +1,97 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <html>
-<head>
-<title>Printing</title>
-</head>
+  <head>
+    <title>Printing and Capturing</title>
+  </head>
 
-<body>
-<a name="xref_printing"></a>
-<h2 align=center><font color=red>Printing</font></h2>
+  <body>
+    <a name="xref_printing"></a>
+    <h2 align=center><font color=red>Printing and Capturing</font></h2>
+    <p>
+      There are two basic methods to get a copy of what is displayed in the
+      main window -- printing to postscript (which can be sent to a local
+      printer or captured to a file) and capturing directly to a graphics
+      format file -- GIF, JPEG, TIFF or PNG.
+    </p>
+    <h3>Capturing image and overlay graphics to a graphic format file</h3>
+    <p>
+      Capturing is just like taking a snapshot of the window using a tool like
+      GIMP, so requires that the window is unobscured and only creates
+      graphics at the same resolution as the screen (printing to postscript
+      does not have this limitation for overlay graphics), to do that select
+      the "Capture..." item in the "File" menu.  The format of the graphics
+      file produced is GIF by default, but will be one of the other supported
+      formats if the selected filename has a known extension (<tt>.jpeg</tt>,
+      <tt>.jpg</tt>, <tt>.png</tt>, <tt>.tiff</tt> or <tt>.tif</tt>).
+    </p>
 
-<h3>Image and overlay graphics</h3>
-<p>To get a postscript printout of what GAIA is displaying you need to
-use the "Print...", "Image..." item in the "File" menu. This creates a
-dialog window as shown below. Choose the options that you require and
-press "Print".
-<p align=center>
-<img src="print.gif">
-<br>
+    <h3>Postscript print of image and overlay graphics</h3> 
+    <p>
+      To get a postscript printout of what GAIA is displaying you need to use
+      the "Print...", "Image..." item in the "File" menu. This creates a
+      dialog window as shown below. Choose the options that you require and
+      press "Print" (this will be spooled to a local printer by default).
+    </p>
+    <p align=center>
+      <img src="print.gif">
+    </p>
+    <br>
 
-<p>For instance to get a basic colour encapsulated postscript file for
-inclusion in another document, select "Color", "Landscape" or
-"Portrait", "Encapsulated Postscript" and "Print to File:". Now enter
-the output file name and press "Print". The result can be viewed using
-a postscript viewer like ghostscript (usually the command "gv" or
-"gs").
+    <p>
+      To get a basic colour encapsulated postscript file for inclusion in
+      another document, select "Color", "Landscape" or "Portrait",
+      "Encapsulated Postscript" and "Print to File:". Now enter the output
+      file name and press "Print". The result can be viewed using a postscript
+      viewer like ghostscript (usually the command "gv" or "gs").
+    </p>
 
-<p>The "Print whole window" option should be selected if you require a
-copy of all the window, <i>including</i> any graphics that fall off
-the image itself (say any axis labels drawn as part of a grid
-overlay). If you use this option you should probably also set the
-background colour of the image to white (do this using the "Image
-background" item in the "View" menu).
-<p align=center>
-<img src="gridps.gif">
-<br>
+    <p>
+      The "Print whole window" option should be selected if you require a copy
+      of all the window, <i>including</i> any graphics that fall off the image
+      itself (say any axis labels drawn as part of a grid overlay). If you use
+      this option you should probably also set the background colour of the
+      image to white (do this using the "Image background" item in the "View"
+      menu).
+    </p>
+    <p align=center>
+      <img src="gridps.gif">
+    </p>
+    <br>
+      
+    <p>
+      When you print, you can only get a copy of what you can see, any parts
+      of the image (or graphics) that are not visible cannot be included in
+      the final print (naturally this also applies to capturing). This means
+      that you should arrange the image view carefully (see the 
+      <a href="display.html">display control</a> topic for advice on maximising
+      the visible area).
+    </p>
 
-<p>When you print, you can only get a copy of what you can see, any
-parts of the image (or graphics) that are not visible cannot be
-included in the final print. This means that you should arrange the
-image view carefully (see the <a href="display.html">display
-control</a> topic for advice on maximising the visible area).
+    <p>
+      Another limitation is that the image is printed at the viewable
+      resolution, but unlike capturing the overlay graphics are printed using
+      vector graphics, so should always display at the printer resolution.  If
+      the limited image resolution is a problem you'll need to print your
+      image some other way -- such as using the "psfcol_p" or "epsfcol_p"
+      output devices together with the KAPPA DISPLAY program.
+    </p>
 
-<p>Another limitation is that the image is printed at the viewable
-resolution (although overlay graphics are always printed using the
-printer resolution), so very large images may be artificially
-resolution restricted. If you suspect this is the case you'll need to
-print your image some other way (such as using the "psfcol_p" or
-"epsfcol_p" output devices together with the KAPPA DISPLAY program).
-
-<h3>Colour ramp</h3>
-<p>To get a representation of the colour ramp and how its values map
-to your image data values use the "Print...", "Ramp..." item in the
-"File menu". This produces a dialog similar to the image printing one:
-<p align=center>
-<img src="rampprint.gif">
-<br>
-<p>Using this you can create a encapsulated postscript file for inclusion
-with your image. The end result should look something like:
-<p align=center>
-<img src="rampps.gif">
-</body>
+    <h3>Postscript print of the colour ramp</h3>
+    <p>
+      To get a representation of the colour ramp and how its values map to
+      your image data values use the "Print...", "Ramp..." item in the "File
+      menu". This produces a dialog similar to the image printing one:
+    </p>
+    <p align=center>
+      <img src="rampprint.gif">
+    </p>
+    <br>
+    <p>
+      Using this you can create a encapsulated postscript file for inclusion
+      with your image. The end result should look something like:
+    </p>
+    <p align=center>
+      <img src="rampps.gif">
+    </p>
+  </body>
 </html>
