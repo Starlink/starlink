@@ -111,9 +111,11 @@
 *        Use smf_get_projpar rather than calculating ourselves.
 *     2008-07-29 (TIMJ):
 *        Trap undef values for keywords in non-scan mode.
+*        Use astIsUndefF macro. Realise that instap is already in smfHead.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Faciltiies Council.
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2008 University of British Columbia. 
 *     All Rights Reserved.
@@ -175,8 +177,8 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
   int i;                       /* loop counter */
   int instap = 0;              /* Flag to denote whether the
 				  instrument aperture is non-zero */
-  double instapx = 0.0;        /* Effective X offset in tracking frame */
-  double instapy = 0.0;        /* Effective Y offset in tracking frame */
+  double instapx = 0.0;        /* Effective X offset in tracking frame (arcsec) */
+  double instapy = 0.0;        /* Effective Y offset in tracking frame (arcsec) */
   dim_t k;                     /* Loop counter */
   double maphght = 0.0;        /* Map height in radians */
   double mappa = 0.0;          /* Map position angle in radians */
@@ -255,8 +257,8 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
     smf_fits_getD( hdr, "MAP_WDTH", &mapwdth, status );
     smf_fits_getD( hdr, "MAP_HGHT", &maphght, status );
 
-    if (mapwdth == AST__UNDEFF) mapwdth = 0.0;
-    if (maphght == AST__UNDEFF) maphght = 0.0;
+    if (astIsUndefF(mapwdth)) mapwdth = 0.0;
+    if (astIsUndefF(maphght)) maphght = 0.0;
 
     /* Retrieve the angle between the focal plane and the tracking
        coordinate system */
@@ -271,19 +273,16 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
     }    
     smf_fits_getD( hdr, "MAP_X", &mapx, status );
     smf_fits_getD( hdr, "MAP_Y", &mapy, status );
-    smf_fits_getD( hdr, "INSTAP_X", &instapx, status );
-    smf_fits_getD( hdr, "INSTAP_Y", &instapy, status );
-
     /* Undefs are a problem for non-scan maps if we have got this far */
-    if (mapx == AST__UNDEFF) mapx = 0.0;
-    if (mapy == AST__UNDEFF) mapy = 0.0;
-    if (instapx == AST__UNDEFF) instapx = 0.0;
-    if (instapy == AST__UNDEFF) instapy = 0.0;
+    if (astIsUndefF(mapx)) mapx = 0.0;
+    if (astIsUndefF(mapy)) mapy = 0.0;
 
     /* If the instrument aperture is set, calculate the projected
        values in the tracking coordinate frame */
     c = fabs(cos(theta));
     s = fabs(sin(theta));
+    instapx = hdr->instap[0] * DR2AS;
+    instapy = hdr->instap[1] * DR2AS;
     if ( instapx || instapy ) {
       instap = 1;
       origval = instapx;
@@ -293,7 +292,7 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
 
     /* Convert map Position Angle to radians */
     smf_fits_getD( hdr, "MAP_PA", &mappa, status );
-    if (mappa == AST__UNDEFF) mappa = 0.0;
+    if (astIsUndefF(mappa)) mappa = 0.0;
     mappa *= AST__DD2R;
 
     /* Calculate size of output map in pixels */

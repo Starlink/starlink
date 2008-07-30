@@ -48,6 +48,8 @@
 *        Check for undefined MAP_PA values, and use zero instead.
 *     10-JUN-2008 (DSB):
 *        Prevent warnings from being issued about undefined MAP_PA values.
+*     29-JUL-2008 (TIMJ):
+*        Use astIsUndefF macro.
 
 *  Copyright:
 *     Copyright (C) 2008 Science & Technology Facilities Council.
@@ -136,7 +138,7 @@ double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf,
    smf_fits_getD( hdr, "MAP_PA", &map_pa, status );
    if( warnings ) astSetC( hdr->fitshdr, "Warnings", warnings );
 
-   if( map_pa == AST__UNDEFF ) map_pa = 0.0;
+   if( astIsUndefF(map_pa) ) map_pa = 0.0;
    (void) astOffset2( sf, p1, map_pa*AST__DD2R, AST__DD2R/60.0, p2 );
 
 /* Take a copy of the Frame and set its System value to the requested

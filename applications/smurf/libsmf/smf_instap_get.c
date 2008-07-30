@@ -76,8 +76,8 @@
 void smf_instap_get( smfHead * hdr, int * status ) {
 
   /* Variables */
-  float instapx;                 /* contents of INSTAP_X header */
-  float instapy;                 /* contents of INSTAP_Y header */
+  double instapx;                 /* contents of INSTAP_X header */
+  double instapy;                 /* contents of INSTAP_Y header */
 
   /* Program logic */
 
@@ -94,8 +94,8 @@ void smf_instap_get( smfHead * hdr, int * status ) {
   if( !hdr->fitshdr ) return;
 
   /* Try getting INSTAP keywords */
-  smf_fits_getF( hdr, "INSTAP_X", &instapx, status );
-  smf_fits_getF( hdr, "INSTAP_Y", &instapy, status );
+  smf_fits_getD( hdr, "INSTAP_X", &instapx, status );
+  smf_fits_getD( hdr, "INSTAP_Y", &instapy, status );
 
   /* annul error due to INSTAP keywords not being specified */
   if( *status == SMF__NOKWRD ) {
@@ -103,8 +103,8 @@ void smf_instap_get( smfHead * hdr, int * status ) {
 
   /* Otherwise, store the values in the smfHead. */
   } else {
-    if( instapx != (float) AST__UNDEFF ) hdr->instap[ 0 ] = instapx*DAS2R;
-    if( instapy != (float) AST__UNDEFF ) hdr->instap[ 1 ] = instapy*DAS2R;
+    if( !astIsUndefF(instapx) ) hdr->instap[ 0 ] = instapx*DAS2R;
+    if( !astIsUndefF(instapy) ) hdr->instap[ 1 ] = instapy*DAS2R;
   }
 
 }
