@@ -331,6 +331,8 @@
 *        smf_calc_stats, smf_construct_smfGroup, smf_model_create,
 *        smf_open_related, smf_simplerebinmap, smf_open_related_model,
 *        smf_simpleaddmap
+*     2008-07-30 (EC):
+*        Add smf_grpCopy
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1071,5 +1073,8 @@ int smf_isfft( const smfData *data, dim_t *ntslice, int * status );
 void smf_calc_mode( smfHead * hdr, int * status );
 
 double smf_calc_meantau( const smfHead *hdr, int * status );
+
+Grp *smf_grpCopy( const Grp *grp1, size_t indxlo, size_t indxhi, int reject, 
+                  int *status );
 
 #endif /* SMF_DEFINED */

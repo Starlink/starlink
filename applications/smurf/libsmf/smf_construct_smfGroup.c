@@ -136,7 +136,7 @@ smfGroup *smf_construct_smfGroup( Grp *igrp, dim_t **subgroups, size_t *chunk,
 
   /* Copy the Grp */
   isize = grpGrpsz( igrp, status);
-  group->grp = grpCopy( igrp, 1, isize, 0, status);
+  group->grp = smf_grpCopy( igrp, 1, isize, 0, status);
   if ( *status != SAI__OK ) {
     errRep(FUNC_NAME, "Error copying Grp for smfGroup", status);
     goto CLEANUP;
