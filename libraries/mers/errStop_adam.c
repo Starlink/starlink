@@ -17,7 +17,7 @@
 *     System to its initial state.
 
 *  Arguments:
-*     STATUS = INTEGER (Given)
+*     status = int * (Given)
 *        The global status. Not used.
 
 *  Implementation Notes:
