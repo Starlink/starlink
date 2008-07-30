@@ -67,6 +67,9 @@
  *        Allow for MAXTAB in continuation line length
  *     13-MAY-2008 (PWD):
  *        Use struct to access message table.
+ *     30-JUL-2008 (PWD):
+ *        Back to using msgtab->msgwsz as length for a non-streamed
+ *        line (lost in transistion to C).
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -119,7 +122,7 @@ void ems1Prerr( const char *text, int *status )
 
             /*  Call ems1Rform to load the first output line and write the
              *  result. */
-            ems1Rform( text, EMS__SZOUT, &iposn, line, &oplen );
+            ems1Rform( text, msgtab->msgwsz, &iposn, line, &oplen );
             iostat = fprintf( OP_STREAM, "%s\n", line );
 
             /*  DO WHILE loop. */
@@ -130,8 +133,8 @@ void ems1Prerr( const char *text, int *status )
 
                 /*  Call ems1Rform to load the continuation line and write the
                  *  result. */
-                ems1Rform( text, EMS__SZOUT-MAXTAB, &iposn, &line[ MAXTAB ],
-                           &oplen );
+                ems1Rform( text, (msgtab->msgwsz)-MAXTAB, &iposn, 
+                           &line[ MAXTAB ], &oplen );
                 iostat = fprintf( OP_STREAM, "%s\n", line );
             }
         }

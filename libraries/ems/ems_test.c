@@ -154,16 +154,22 @@ int main( void ){
 
    /* Set and get some tuning values. */
    status = SAI__OK;
-   emsTune( "SZOUT", 10, &status );
+   emsTune( "SZOUT", 40, &status );
    emsGtune( "SZOUT", &value1, &status );
-   emsTune( "SZOUT", 80, &status );
    if ( status != SAI__OK ) {
        printf( "\nSZOUT test failed with BAD status\n" );
        status = SAI__OK;
    }
-   else if ( value1 != 10 ) {
+   else if ( value1 != 40 ) {
        printf( "\nSZOUT test failed with BAD value\n" );
    }
+
+   /*  May as well check this works. */
+   status = SAI__ERROR;
+   emsRep( "ERRSZOUT", "SZOUT check: long error message that should "
+           "be wrapped into two lines", &status );
+   status = SAI__OK;
+   emsTune( "SZOUT", 80, &status );
 
    emsTune( "MSGDEF", 2, &status );
    emsGtune( "MSGDEF", &value2, &status );
@@ -198,7 +204,7 @@ int main( void ){
        printf( "\nREVEAL test failed with BAD value\n" );
    }
    
-   if( value1 != 10 || value2 != 2 || value3 != 1 || value4 != 1 ) {
+   if( value1 != 40 || value2 != 2 || value3 != 1 || value4 != 1 ) {
        printf( "\nTuning subsystem has failed\n" );
    }
    else {

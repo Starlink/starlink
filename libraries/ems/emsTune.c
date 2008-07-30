@@ -37,8 +37,6 @@
  *            length. Note that the minimum VALUE is 7, to allow for
  *            exclamation marks and indentation.
  *
- *            PWD: this value isn't used and the description above is wrong.
- *
  *        'MSGDEF' Specifies the default error reporting level. That is a level
  *            below which EMS_RELEASE will not go. It can therefore be used by
  *            environments such as ADAM to prevent any output by EMS due to
