@@ -49,6 +49,8 @@
 *        Initial version - based on sc2clean task
 *     2008-07-25 (TIMJ):
 *        Use kaplibs for group in/out.
+*     2008-07-30 (EC):
+*        Handle raw data (filter out / apply darks, flatfield)
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -103,6 +105,8 @@
 
 void smurf_sc2fft( int *status ) {
 
+  smfArray *darks = NULL;   /* dark frames */
+  Grp *fgrp = NULL;         /* Filtered group, no darks */
   size_t i=0;               /* Counter, index */
   smfData *idata=NULL;      /* Pointer to input smfData */
   Grp *igrp = NULL;         /* Input group of files */
@@ -120,9 +124,24 @@ void smurf_sc2fft( int *status ) {
   /* Get input file(s) */
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
+  /* Filter out darks */
+  smf_find_darks( igrp, &fgrp, NULL, 1, &darks, status );
+  
+  /* input group is now the filtered group so we can use that and
+     free the old input group */
+  size = grpGrpsz( fgrp, status );
+  grpDelet( &igrp, status);
+  igrp = fgrp;
+  fgrp = NULL;
+
   /* Get output file(s) */
-  kpg1Wgndf( "OUT", igrp, size, size, "More output files required...",
-             &ogrp, &outsize, status );
+  if( size > 0 ) {
+    kpg1Wgndf( "OUT", igrp, size, size, "More output files required...",
+               &ogrp, &outsize, status );
+  } else {
+    msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
+             " nothing to do", status );
+  }
 
   /* Are we doing an inverse transform? */
   parGet0l( "INVERSE", &inverse, status );
@@ -131,8 +150,7 @@ void smurf_sc2fft( int *status ) {
   for( i=1; (*status==SAI__OK)&&(i<=size); i++ ) {
 
     /* Open the file */
-    smf_open_file( igrp, i, "READ", SMF__NOCREATE_VARIANCE | 
-                   SMF__NOCREATE_QUALITY, &idata, status );
+    smf_open_and_flatfield( igrp, NULL, i, darks, &idata, status );
 
     /* Check whether we need to transform the data at all */
     if( smf_isfft(idata,NULL,status) == inverse ) {
