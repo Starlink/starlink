@@ -366,7 +366,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
 
         /* skip if we are not at start or end. DREAM jiggle patterns may
            be a problem and may require us to do one set of jiggles */
-        if (fast && j != 0 && j != (data->dims[2])-1) {
+        if (lfast && j != 0 && j != (data->dims[2])-1) {
           continue;
         }
 
