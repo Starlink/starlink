@@ -284,9 +284,7 @@ void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
       flags |= SMF__NOCREATE_FILE;
       flags |= SMF__NOCREATE_DA;
       *ffdata = smf_deepcopy_smfData( data, 0, flags, status );
-    } else {    msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
-       " nothing to do", status );
-      /*      printf("using memcpy\n");*/
+    } else {    
       memcpy( ((*ffdata)->pntr)[0], (data->pntr)[0], npts * sizeof (double) );
     }
 
