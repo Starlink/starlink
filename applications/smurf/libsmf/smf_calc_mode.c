@@ -38,6 +38,8 @@
 *        Don't fail if smfData is not data from a known instrument.
 
 *  Notes:
+*     This function relies on an accurate hdr->instrument. i.e. call
+*     smf_inst_get first.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
