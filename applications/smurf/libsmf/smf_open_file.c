@@ -852,7 +852,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
   smf_history_read( *data, status );
 
   /* Get the step time from the header if we have a hdr */
-  if (hdr) {
+  if (hdr && (hdr->instrument!=INST__NONE) ) {
     smf_fits_getD( hdr, "STEPTIME", &steptime, status );
     if (*status == SMF__NOKWRD || astIsUndefF(steptime) ||
         steptime == VAL__BADD ) {

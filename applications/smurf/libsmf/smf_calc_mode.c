@@ -23,20 +23,25 @@
 
 *  Description:
 *     This function examines the FITS header to determine the observing mode
-*     and observation type.
+*     and observation type. If the instrument is INST__NONE they are set to
+*     SMF__TYP_NULL and SMF__OBS_NULL.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
 *     2008-07-24 (TIMJ):
 *        Initial version.
+*     2008-07-30 (EC):
+*        Don't fail if smfData is not data from a known instrument.
 
 *  Notes:
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2006-2007 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -90,43 +95,47 @@ void smf_calc_mode ( smfHead * hdr, int * status ) {
     return;
   }
 
-  /* Read the relevant headers */
-  smf_fits_getS( hdr, "SAM_MODE", sam_mode, sizeof(sam_mode), status );
-  smf_fits_getS( hdr, "OBS_TYPE", obs_type, sizeof(obs_type), status );
+  /* Proceed if we're using a valid instrument */
+  if( hdr->instrument != INST__NONE ) {
 
-  /* start with sample type */
-  if (strcasecmp( sam_mode, "SCAN" ) == 0) {
-    mode = SMF__OBS_SCAN;
-  } else if (strcasecmp( sam_mode, "STARE" ) == 0) {
-    mode = SMF__OBS_STARE;
-  } else if (strcasecmp( sam_mode, "DREAM" ) == 0) {
-    mode = SMF__OBS_DREAM;
-  } else {
-    if (*status != SAI__OK) {
-      *status = SAI__ERROR;
-      msgSetc( "MOD", sam_mode );
-      errRep( " ", "Unrecognized observing mode '^MOD'", status );
+    /* Read the relevant headers */
+    smf_fits_getS( hdr, "SAM_MODE", sam_mode, sizeof(sam_mode), status );
+    smf_fits_getS( hdr, "OBS_TYPE", obs_type, sizeof(obs_type), status );
+
+    /* start with sample type */
+    if (strcasecmp( sam_mode, "SCAN" ) == 0) {
+      mode = SMF__OBS_SCAN;
+    } else if (strcasecmp( sam_mode, "STARE" ) == 0) {
+      mode = SMF__OBS_STARE;
+    } else if (strcasecmp( sam_mode, "DREAM" ) == 0) {
+      mode = SMF__OBS_DREAM;
+    } else {
+      if (*status != SAI__OK) {
+        *status = SAI__ERROR;
+        msgSetc( "MOD", sam_mode );
+        errRep( " ", "Unrecognized observing mode '^MOD'", status );
+      }
     }
-  }
 
-  /* obs type */
-  if (strcasecmp( obs_type, "SCIENCE" ) == 0) {
-    type = SMF__TYP_SCIENCE;
-  } else if (strcasecmp( obs_type, "POINTING" ) == 0) {
-    type = SMF__TYP_POINTING;
-  } else if (strcasecmp( obs_type, "FOCUS" ) == 0) {
-    type = SMF__TYP_FOCUS;
-  } else if (strcasecmp( obs_type, "SKYDIP" ) == 0) {
-    type = SMF__TYP_SKYDIP;
-  } else if (strcasecmp( obs_type, "FLATFIELD" ) == 0) {
-    type = SMF__TYP_FLATFIELD;
-  } else if (strcasecmp( obs_type, "NOISE" ) == 0) {
-    type = SMF__TYP_NOISE;
-  } else {
-    if (*status != SAI__OK) {
-      *status = SAI__ERROR;
-      msgSetc( "TYP", obs_type );
-      errRep( " ", "Unrecognized observation type '^TYP'", status );
+    /* obs type */
+    if (strcasecmp( obs_type, "SCIENCE" ) == 0) {
+      type = SMF__TYP_SCIENCE;
+    } else if (strcasecmp( obs_type, "POINTING" ) == 0) {
+      type = SMF__TYP_POINTING;
+    } else if (strcasecmp( obs_type, "FOCUS" ) == 0) {
+      type = SMF__TYP_FOCUS;
+    } else if (strcasecmp( obs_type, "SKYDIP" ) == 0) {
+      type = SMF__TYP_SKYDIP;
+    } else if (strcasecmp( obs_type, "FLATFIELD" ) == 0) {
+      type = SMF__TYP_FLATFIELD;
+    } else if (strcasecmp( obs_type, "NOISE" ) == 0) {
+      type = SMF__TYP_NOISE;
+    } else {
+      if (*status != SAI__OK) {
+        *status = SAI__ERROR;
+        msgSetc( "TYP", obs_type );
+        errRep( " ", "Unrecognized observation type '^TYP'", status );
+      }
     }
   }
 
