@@ -278,13 +278,14 @@ void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
     errAnnul( status );
 
     /* What if ffdata is NULL? */
-    msgOutif(MSG__VERB," ", "Data FF: Copying to output file ", status);
+    msgOutif(MSG__DEBUG," ", "Data FF: Copying to output file ", status);
     if ( *ffdata == NULL ) {
       /* Don't need the smfFile or smfDA components */
       flags |= SMF__NOCREATE_FILE;
       flags |= SMF__NOCREATE_DA;
       *ffdata = smf_deepcopy_smfData( data, 0, flags, status );
-    } else {
+    } else {    msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
+       " nothing to do", status );
       /*      printf("using memcpy\n");*/
       memcpy( ((*ffdata)->pntr)[0], (data->pntr)[0], npts * sizeof (double) );
     }
