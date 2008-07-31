@@ -105,12 +105,14 @@ void err1Prerr( const char * text, int * status ) {
 
     /* Write the message to STDERR */
     errstat = fprintf( stderr, "%s", text );
+    fflush(stderr);
 
     /* If that failed or STDERR was not a TTY, try STDOUT */
     if (errstat < 0 || !isatty( STDERR_FILENO ) ) {
 
       /* Write the message to STDOUT */
       printf( "%s", text );
+      fflush(stdout);
     }
   }
 }

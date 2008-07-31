@@ -83,6 +83,9 @@ void msg1Prtln( const char * text, int * status ) {
   /* Note that we must add the newline */
   err = printf( "%s\n", text );
 
+  /* only call fflush if printf succeeded so as not to reset errno */
+  if (err > 0) fflush(stdout);
+
   if (err < 0) {
     *status = MSG__OPTER;
     emsMark();

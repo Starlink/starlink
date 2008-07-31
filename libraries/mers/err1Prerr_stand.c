@@ -85,6 +85,7 @@ void err1Prerr( const char * text, int * status ) {
   /* Write the message to STDERR */
   /* Note that this routine must include the new line character */
   errstat = fprintf( stderr, "%s\n", text );
+  fflush(stderr);
 
   /* If that failed or STDERR was not a TTY, try STDOUT */
   if (errstat < 0 || !isatty( STDERR_FILENO ) ) {
@@ -95,6 +96,7 @@ void err1Prerr( const char * text, int * status ) {
 
     /* Write the message to STDOUT */
     printf( "%s\n", text );
+    fflush(stdout);
   }
 
 }
