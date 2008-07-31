@@ -72,6 +72,8 @@
  *- 
  */
 
+#define _POSIX_C_SOURCE 200112L
+
 #if HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -99,6 +101,7 @@ void ems1Serr( char *errstr, int errlen, int *errnum )
 #else
         strerr = strerror( *errnum );
         strncpy( errstr, strerr, errlen );
+        errstr[errlen-1] = '\0';
 #endif
     }
     else {
