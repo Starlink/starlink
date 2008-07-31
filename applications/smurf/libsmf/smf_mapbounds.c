@@ -451,7 +451,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
           flbnd[ 1 ] = VAL__MAXD;
           fubnd[ 0 ] = VAL__MIND;
           fubnd[ 1 ] = VAL__MIND;
-          for (j=0; j<4; j++) { textreme[i] = (dim_t)VAL__BADI; }
+          for (j=0; j<4; j++) { textreme[j] = (dim_t)VAL__BADI; }
 
           /* see if the input frame is moving but the output is not */
           tracksys = sc2ast_convert_system( (hdr->allState)[0].tcs_tr_sys,
@@ -468,7 +468,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
 
           /* Loop over each time slice to calculate the maximum
              excursion */
-          for (j=0; j<(data->dims)[2]; j++) {
+          for (j=0; j<maxloop; j++) {
             JCMTState state = (hdr->allState)[j];
             double ac1 = state.tcs_tr_ac1;
             double ac2 = state.tcs_tr_ac2;
@@ -512,7 +512,6 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
         } else {
           ts = j;
         }
-        /* printf("Accessing time slice %d\n", (int)ts);*/
         /* Calculate the bolo to map-pixel transformation for this tslice */
         bolo2map = smf_rebin_totmap( data, ts, abskyframe, oskymap, 
                                      *moving, status );
