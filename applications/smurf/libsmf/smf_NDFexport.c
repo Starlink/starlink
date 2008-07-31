@@ -177,7 +177,7 @@ void smf_NDFexport( const smfData *data, void *variance,
   inname = grpNew( "GRP", status );
   outname = grpNew( "GRP", status );
   grpPut1( inname, name, 1, status );
-  grpGrpex( "./*|dimm|sdf|", inname, outname, &msize, &added, &flag, status );
+  grpGrpex( "*.sdf|.dimm||", inname, outname, &msize, &added, &flag, status );
 
   /* Create lbnd and ubnd arrays, and calculate buffer size */
   if( *status == SAI__OK ) {

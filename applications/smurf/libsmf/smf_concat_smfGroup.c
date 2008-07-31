@@ -179,8 +179,10 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
                           int *status ) {
 
   /* Local Variables */
+  int added;                    /* Number of elements added to grp */
   dim_t base;                   /* Base for array index */
   smfData *data=NULL;           /* Concatenated smfData */
+  int flag;                     /* Flag */
   char filename[GRP__SZNAM+1];  /* Input filename, derived from GRP */
   dim_t firstpiece = 0;         /* index to start of whichchunk */
   int foundfirst=0;             /* Flag indicates if first index found */
@@ -189,6 +191,7 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
   int havelut;                  /* flag for pointing LUT present */
   smfHead *hdr;                 /* pointer to smfHead in concat data */
   dim_t i;                      /* Loop counter */
+  Grp *ingrp=NULL;              /* Pointer to 1-element input group */
   dim_t j;                      /* Loop counter */
   dim_t k;                      /* Loop counter */
   dim_t l;                      /* Loop counter */
@@ -196,6 +199,8 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
   dim_t nbolo = 0;              /* Number of detectors */
   dim_t ndata;                  /* Total data points: nbolo*tlen */
   dim_t nrelated;               /* Number of subarrays */
+  Grp *outgrp=NULL;             /* Pointer to 1-element output group */
+  size_t outgrpsize;            /* Size of outgrp */
   int pass;                     /* Two passes over list of input files */
   char *pname;                  /* Pointer to input filename */
   unsigned char qual;           /* Set quality */
@@ -436,15 +441,25 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
                      coordinates are derived using an AST polyMap */
                 }
 
-                /* Copy over the name of the first file in subarray. Add
-                   the suffix "_con" to denote concatenated data */
+                /* Copy over the name of the first file in
+                   subarray. Use a grpex to strip off the path, and
+                   then add the suffix "_con.dimm" to denote concatenated
+                   iterative map-maker data */
+
+                ingrp = grpNew( "GRP", status );
+                outgrp = grpNew( "GRP", status );
+
+                ndgCpsup( igrp->grp, igrp->subgroups[j][i], ingrp, status );
+                grpGrpex( "./*_con.dimm|.sdf||", ingrp, outgrp, &outgrpsize, 
+                          &added, &flag, status );
 
                 pname = filename;
-                grpGet( igrp->grp, igrp->subgroups[j][i], 1, &pname, 
-                        SMF_PATH_MAX, status);		
+                grpGet( outgrp, 1, 1, &pname, SMF_PATH_MAX, status);
+
+                grpDelet( &ingrp, status );
+                grpDelet( &outgrp, status );
+
                 one_strlcpy( data->file->name, filename,
-                             sizeof(data->file->name), status );
-                one_strlcat( data->file->name, "_con",
                              sizeof(data->file->name), status );
 
                 /* Allocate space for the concatenated allState */
