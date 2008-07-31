@@ -514,6 +514,9 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           errAnnul( status );
         }
 
+        /* Determine the instrument */
+        hdr->instrument = smf_inst_get( hdr, status );
+
         /* and work out the observing mode */
         if (hdr->fitshdr) smf_calc_mode( hdr, status );
 
@@ -567,8 +570,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           datAnnul( &xloc, status );
         }
 
-        /* Determine the instrument */
-        hdr->instrument = smf_inst_get( hdr, status );
+
 
         /* On the basis of the instrument, we know need to fill in some
            additional header parameters. Some of these may be constants,
