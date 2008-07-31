@@ -680,9 +680,6 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         if ( !(flags & SMF__NOCREATE_HEAD) ) {
           smf_fits_crchan( nfits, fitsrec, &(hdr->fitshdr), status); 
 
-          /* and work out the observing mode */
-          if (hdr->fitshdr) smf_calc_mode( hdr, status );
-
           /* Instrument must be SCUBA-2 */
           /* hdr->instrument = INST__SCUBA2; */
 
@@ -693,14 +690,17 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
              the above assertion "Instrument must be SCUBA-2" would be 
              correct, and the following code is unnecessary. */
 
+          /* Determine the instrument */
+          hdr->instrument = smf_inst_get( hdr, status );
+
           /* Determine and store the telescope location in hdr->telpos */
           smf_telpos_get( hdr, status );
 
           /* Store the INSTAP values */
           smf_instap_get( hdr, status );
 
-          /* Determine the instrument */
-          hdr->instrument = smf_inst_get( hdr, status );
+          /* and work out the observing mode */
+          if (hdr->fitshdr) smf_calc_mode( hdr, status );
 	  
           /* On the basis of the instrument, we know need to fill in some
              additional header parameters. Some of these may be constants,
