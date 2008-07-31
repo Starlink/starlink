@@ -63,6 +63,8 @@
  *        Properly import token name
  *     13-AUG-2001 (AJC):
  *        Remove unused variables
+ *     30-JUL-2008 (TIMJ):
+ *        Initialise mesval. Important if ems1Serr fails.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -81,11 +83,12 @@
 
 /* Function Definitons: */
 void emsSyser( const char *token, int systat ){
-   int meslen;
+   size_t meslen;
    char mesval[EMS__SZMSG+1];
 
    TRACE("emsSyser");
 
+   mesval[0] = '\0';
    ems1Serr( mesval, EMS__SZTOK, &systat );
 
    meslen = strlen( mesval );
