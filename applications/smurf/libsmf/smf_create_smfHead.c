@@ -70,7 +70,8 @@
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
-*     Council. Copyright (C) 2006-2007 University of British Columbia.
+*     Council. 
+*     Copyright (C) 2006-2007 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
