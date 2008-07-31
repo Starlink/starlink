@@ -440,8 +440,11 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
           textreme[1] = (data->dims)[2] - 1;
           maxloop = 2;
         } else {
-
+          const char * tracksys;
           double flbnd[2], fubnd[2];
+          int usefixedbase = 0;
+          double bc1 = 0.0;
+          double bc2 = 0.0;
 
           /* initialise */
           flbnd[ 0 ] = VAL__MAXD;
@@ -450,14 +453,32 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
           fubnd[ 1 ] = VAL__MIND;
           for (j=0; j<4; j++) { textreme[i] = (dim_t)VAL__BADI; }
 
+          /* see if the input frame is moving but the output is not */
+          tracksys = sc2ast_convert_system( (hdr->allState)[0].tcs_tr_sys,
+                                            status );
+          if (strcmp(tracksys, "GAPPT") == 0 ||
+              strcmp(tracksys, "AZEL") == 0) {
+            if (strcmp(system, "APP") != 0 &&
+                strcmp(system, "AZEL") != 0) {
+              usefixedbase = 1;
+              bc1 = (hdr->allState)[0].tcs_tr_bc1;
+              bc2 = (hdr->allState)[0].tcs_tr_bc2;
+            }
+          }
+
+          /* Loop over each time slice to calculate the maximum
+             excursion */
           for (j=0; j<(data->dims)[2]; j++) {
             JCMTState state = (hdr->allState)[j];
             double ac1 = state.tcs_tr_ac1;
             double ac2 = state.tcs_tr_ac2;
-            double bc1 = state.tcs_tr_bc1;
-            double bc2 = state.tcs_tr_bc2;
             double offx, offy;
             int jstat = 0;
+
+            if (!usefixedbase) {
+              bc1 = state.tcs_tr_bc1;
+              bc2 = state.tcs_tr_bc2;
+            }
 
             /* calculate the separation of ACTUAL from BASE */
             slaDs2tp(ac1,ac2,bc1,bc2, &offx, &offy, &jstat );
@@ -468,6 +489,13 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
             if ( offy > fubnd[1] ) { fubnd[1] = offy; textreme[3] = j; }
           }
           maxloop = 4;
+          msgSetd("X1", textreme[0]);
+          msgSetd("X2", textreme[1]);
+          msgSetd("X3", textreme[2]);
+          msgSetd("X4", textreme[3]);
+          msgOutif( MSG__DEBUG, " ",
+                    "Extrema time slices are ^X1, ^X2, ^X3 and ^X4",
+                    status);
         }
       }
 
