@@ -135,6 +135,11 @@
 *     2008-07-29 (TIMJ):
 *        Tweak the logic to make it clear that skyin is only needed
 *        to determine the projection.
+*     2008-07-30 (TIMJ):
+*        Significant (eg 0.6s vs 13s) improvement in the speed of this
+*        routine in FAST mode. Now work out the maximum excursion of the
+*        telescope relative to BASE and only ask the transformation code
+*        to look at those 4 time slices.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -210,6 +215,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   dim_t k;                     /* Loop counter */
   int lbnd0[ 2 ];              /* Defaults for LBND parameter */
   double map_pa=0;             /* Map PA in output coord system (rads) */ 
+  dim_t maxloop;               /* Number of times to go round the time slice loop */
   double par[7];               /* Projection parameters */
   char *pname = NULL;          /* Name of currently opened data file */
   double shift[ 2 ];           /* Shifts from PIXEL to GRID coords */
@@ -217,6 +223,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
                                   Sky <> PIXEL mapping in output
                                   FrameSet */
   AstSkyFrame *oskyframe = NULL;/* Output SkyFrame */
+  dim_t textreme[4];           /* Time index corresponding to minmax TCS posn */
   AstFrame *skyin = NULL;      /* Sky Frame in input FrameSet */
   double skyref[ 2 ];          /* Values for output SkyFrame SkyRef attribute */
   int ubnd0[ 2 ];              /* Defaults for UBND parameter */
@@ -355,89 +362,131 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
     }
 
     if( *status == SAI__OK) {
-      /* we are allowed to go fast in non scan modes */
-      int lfast = 0;
-      if (fast && data->hdr->obsmode != SMF__OBS_SCAN) {
-        lfast = fast;
-      }
 
-      /* Get the astrometry for all the time slices in this data file */
-      for( j=0; j<(data->dims)[2]; j++ ) {
+      /* Create output SkyFrame if it has not come from a reference */
+      if ( oskyframe == NULL ) {
 
-        /* skip if we are not at start or end. DREAM jiggle patterns may
-           be a problem and may require us to do one set of jiggles */
-        if (lfast && j != 0 && j != (data->dims[2])-1) {
-          continue;
+        /* smf_tslice_ast only needs to get called once to set up framesets */
+        if( data->hdr->wcs == NULL ) {
+          smf_tslice_ast( data, 0, 1, status);
         }
 
-        /* Create output SkyFrame */
-        if ( oskyframe == NULL ) {
+        /* Retrieve input SkyFrame */
+        skyin = astGetFrame( hdr->wcs, AST__CURRENT );
 
-          /* smf_tslice_ast only needs to get called once to set up framesets */
-          if( data->hdr->wcs == NULL ) {
-            smf_tslice_ast( data, j, 1, status);
-          }
+        smf_calc_skyframe( skyin, system, hdr, alignsys, &oskyframe, skyref,
+                           moving, status );
 
-          /* Retrieve input SkyFrame */
-          skyin = astGetFrame( hdr->wcs, AST__CURRENT );
+        /* Get the orientation of the map vertical within the output celestial
+           coordinate system. This is derived form the MAP_PA FITS header, which
+           gives the orientation of the map vertical within the tracking system. */
+        map_pa = smf_calc_mappa( hdr, system, skyin, status );
 
-          smf_calc_skyframe( skyin, system, hdr, alignsys, &oskyframe, skyref,
-                             moving, status );
+        /* Calculate the projection parameters. We do not enable autogrid determination
+           for SCUBA-2 so we do not need to obtain all the data before calculating
+           projection parameters. */
+        smf_get_projpar( oskyframe, skyref, *moving, 0, 0, NULL, 0,
+                         map_pa, par, NULL, NULL, status );
 
-          /* Get the orientation of the map vertical within the output celestial
-             coordinate system. This is derived form the MAP_PA FITS header, which
-             gives the orientation of the map vertical within the tracking system. */
-          map_pa = smf_calc_mappa( hdr, system, skyin, status );
+        if (skyin) skyin = astAnnul( skyin );
 
-          /* Calculate the projection parameters. We do not enable autogrid determination
-             for SCUBA-2 so we do not need to obtain all the data before calculating
-             projection parameters. */
-          smf_get_projpar( oskyframe, skyref, *moving, 0, 0, NULL, 0,
-                           map_pa, par, NULL, NULL, status );
+      } /* End oskyframe construction */
 
-          if (skyin) skyin = astAnnul( skyin );
-
-        } /* End oskyframe construction */
-
-        if ( *outframeset == NULL && oskyframe != NULL && (*status == SAI__OK)){
-          /* Now created a spatial Mapping. Use the supplied reference frameset
-             if supplied */
-          if (spacerefwcs) {
-            oskymap = astGetMapping( spacerefwcs, AST__BASE, AST__CURRENT );
-          } else {
+      if ( *outframeset == NULL && oskyframe != NULL && (*status == SAI__OK)){
+        /* Now created a spatial Mapping. Use the supplied reference frameset
+           if supplied */
+        if (spacerefwcs) {
+          oskymap = astGetMapping( spacerefwcs, AST__BASE, AST__CURRENT );
+        } else {
           /* Now populate a FitsChan with FITS-WCS headers describing
              the required tan plane projection. The longitude and
              latitude axis types are set to either (RA,Dec) or (AZ,EL)
              to get the correct handedness. */
-            fitschan = astFitsChan ( NULL, NULL, "" );
-            smf_makefitschan( astGetC( oskyframe, "System"), &(par[0]),
-                              &(par[2]), &(par[4]), par[6], fitschan, status ); 
-            astClear( fitschan, "Card" );
-            fs = astRead( fitschan );
+          fitschan = astFitsChan ( NULL, NULL, "" );
+          smf_makefitschan( astGetC( oskyframe, "System"), &(par[0]),
+                            &(par[2]), &(par[4]), par[6], fitschan, status ); 
+          astClear( fitschan, "Card" );
+          fs = astRead( fitschan );
+            
+          /* Extract the output PIXEL->SKY Mapping. */
+          oskymap = astGetMapping( fs, AST__BASE, AST__CURRENT );
+          /* Tidy up */
+          fs = astAnnul( fs );
+        }
+        /* Get a copy of the output SkyFrame and ensure it represents
+           absolute coords rather than offset coords. */
+        abskyframe = astCopy( oskyframe );
+        astClear( abskyframe, "SkyRefIs" );
+        astClear( abskyframe, "AlignOffset" );
 
-            /* Extract the output PIXEL->SKY Mapping. */
-            oskymap = astGetMapping( fs, AST__BASE, AST__CURRENT );
-            /* Tidy up */
-            fs = astAnnul( fs );
+        /* Create the output FrameSet */
+        *outframeset = astFrameSet( astFrame(2, "Domain=GRID"), "");
+
+        /* Now add the SkyFrame to it */
+        astAddFrame( *outframeset, AST__BASE, oskymap, oskyframe );
+        /* Invert the oskymap mapping */
+        astInvert( oskymap );
+
+      } /* End WCS FrameSet construction */
+
+      maxloop = (data->dims)[2];
+      if (fast) {
+        /* For scan map we scan through looking for largest telescope moves.
+           For dream/stare we just look at the start and end time slices to
+           account for sky rotation. */
+
+        if (data->hdr->obsmode != SMF__OBS_SCAN) {
+          textreme[0] = 0;
+          textreme[1] = (data->dims)[2] - 1;
+          maxloop = 2;
+        } else {
+
+          double flbnd[2], fubnd[2];
+
+          /* initialise */
+          flbnd[ 0 ] = VAL__MAXD;
+          flbnd[ 1 ] = VAL__MAXD;
+          fubnd[ 0 ] = VAL__MIND;
+          fubnd[ 1 ] = VAL__MIND;
+          for (j=0; j<4; j++) { textreme[i] = (dim_t)VAL__BADI; }
+
+          for (j=0; j<(data->dims)[2]; j++) {
+            JCMTState state = (hdr->allState)[j];
+            double ac1 = state.tcs_tr_ac1;
+            double ac2 = state.tcs_tr_ac2;
+            double bc1 = state.tcs_tr_bc1;
+            double bc2 = state.tcs_tr_bc2;
+            double offx, offy;
+            int jstat = 0;
+
+            /* calculate the separation of ACTUAL from BASE */
+            slaDs2tp(ac1,ac2,bc1,bc2, &offx, &offy, &jstat );
+
+            if ( offx < flbnd[0] ) { flbnd[0] = offx; textreme[0] = j; }
+            if ( offy < flbnd[1] ) { flbnd[1] = offy; textreme[1] = j; }
+            if ( offx > fubnd[0] ) { fubnd[0] = offx; textreme[2] = j; }
+            if ( offy > fubnd[1] ) { fubnd[1] = offy; textreme[3] = j; }
           }
-          /* Get a copy of the output SkyFrame and ensure it represents
-             absolute coords rather than offset coords. */
-          abskyframe = astCopy( oskyframe );
-          astClear( abskyframe, "SkyRefIs" );
-          astClear( abskyframe, "AlignOffset" );
+          maxloop = 4;
+        }
+      }
 
-          /* Create the output FrameSet */
-          *outframeset = astFrameSet( astFrame(2, "Domain=GRID"), "");
+      /* Get the astrometry for all the relevant time slices in this data file */
+      for( j=0; j<maxloop; j++ ) {
+        dim_t ts;  /* Actual time slice to use */
 
-          /* Now add the SkyFrame to it */
-          astAddFrame( *outframeset, AST__BASE, oskymap, oskyframe );
-          /* Invert the oskymap mapping */
-          astInvert( oskymap );
-
-        } /* End WCS FrameSet construction */
-
+        /* if we are doing the fast loop, we need to read the time slice 
+           index from textreme. Else we just use the index */
+        if (fast) {
+          /* get the index but make sure it is good */
+          ts = textreme[j];
+          if (ts == (dim_t)VAL__BADI) continue;
+        } else {
+          ts = j;
+        }
+        /* printf("Accessing time slice %d\n", (int)ts);*/
         /* Calculate the bolo to map-pixel transformation for this tslice */
-        bolo2map = smf_rebin_totmap( data, j, abskyframe, oskymap, 
+        bolo2map = smf_rebin_totmap( data, ts, abskyframe, oskymap, 
                                      *moving, status );
 
         if ( *status == SAI__OK ) {
@@ -468,6 +517,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
         /* Break out of loop over time slices if bad status */
         if (*status != SAI__OK) goto CLEANUP;
       }
+
       /* Annul any remaining Ast objects before moving on to the next file */
       if (fs) fs = astAnnul( fs );
       if (bolo2map) bolo2map = astAnnul( bolo2map );
@@ -576,7 +626,6 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   if (*status != SAI__OK) {
     errRep(FUNC_NAME, "Unable to determine map bounds", status);
   }
-
   if (oskymap) oskymap  = astAnnul( oskymap );
   if (bolo2map) bolo2map = astAnnul( bolo2map );
   if (fitschan) fitschan = astAnnul( fitschan );
