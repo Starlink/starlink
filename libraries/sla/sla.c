@@ -81,6 +81,8 @@
 *        to enable elements test.
 *     14-JUL-2008 (TIMJ):
 *        Allowed to use const.
+*     30-JUL-2008 (TIMJ):
+*        Add slaDs2tp
 *-
 */
 
@@ -727,6 +729,40 @@ double slaDsep ( double a1, double b1, double a2, double b2 ) {
                                 DOUBLE_ARG(&A2),
                                 DOUBLE_ARG(&B2) );
    return result;
+}
+
+F77_SUBROUTINE(sla_ds2tp)( DOUBLE(RA), DOUBLE(DEC),
+                           DOUBLE(RAZ), DOUBLE(DECZ),
+                           DOUBLE(XI), DOUBLE(ETA),
+                           INTEGER(J) );
+
+void slaDs2tp ( double ra, double dec, double raz, double decz, double * xi, double * eta, int* j ) {
+
+  DECLARE_DOUBLE(RA);
+  DECLARE_DOUBLE(DEC);
+  DECLARE_DOUBLE(RAZ);
+  DECLARE_DOUBLE(DECZ);
+  DECLARE_DOUBLE(XI);
+  DECLARE_DOUBLE(ETA);
+  DECLARE_INTEGER(J);
+
+  F77_EXPORT_DOUBLE(ra, RA);
+  F77_EXPORT_DOUBLE(dec, DEC);
+  F77_EXPORT_DOUBLE(raz, RAZ);
+  F77_EXPORT_DOUBLE(decz, DECZ);
+
+  F77_CALL(sla_ds2tp)( DOUBLE_ARG(&RA),
+                       DOUBLE_ARG(&DEC),
+                       DOUBLE_ARG(&RAZ),
+                       DOUBLE_ARG(&DECZ),
+                       DOUBLE_ARG(&XI),
+                       DOUBLE_ARG(&ETA),
+                       INTEGER_ARG(&J) );
+
+  F77_IMPORT_DOUBLE(XI, *xi);
+  F77_IMPORT_DOUBLE(ETA, *eta);
+  F77_IMPORT_DOUBLE(J, *j);
+
 }
 
 F77_DOUBLE_FUNCTION(sla_dvdv)( DOUBLE_ARRAY(VA),
