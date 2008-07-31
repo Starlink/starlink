@@ -47,7 +47,7 @@ F77_SUBROUTINE (ems_gtune)( CHARACTER(key), INTEGER(value), INTEGER(status)
 
     cnfImpn( key, key_length, MAXKEYSZ, ckey );
 
-    emsGtune( ckey, value, status );
+    *value = emsGtune( ckey, status );
    
     return;
 }

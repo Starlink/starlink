@@ -32,7 +32,7 @@
  *    RTP: R.T.Platon (STARLINK)
  *    TIMJ: Tim Jenness (JAC, Hawaii)
  *    PWD: Peter Draper (Durham)
- *     {enter_new_authors_here}
+ *    {enter_new_authors_here}
 
  *-
  */
@@ -52,12 +52,14 @@ int main( void ){
    DECLARE_CHARACTER( mess, EMS__SZMSG );
    char buffer[EMS__SZTOK];
    int oplen;
+   int old_value;
    int value1;
    int value2;
    int value3;
    int value4;
 
    /* Test token concatenation in emsBegin/emsEnd block - need good status */
+   printf( "Test of token subsitution and concatenation\n" );
    status = SAI__OK;
    emsSetc("D", "A");
    emsSetc("D", "B");
@@ -66,6 +68,7 @@ int main( void ){
    emsSetc("D", "E");
    emsExpnd( "^D", buffer, sizeof(buffer), &oplen, &status );
    printf("Before emsBegin    - Should be ABCDE: %s\n",buffer);
+   emsRenew();
    emsBegin( &status );
    emsSetc("D", "A");
    emsSetc("D", "B");
@@ -88,7 +91,7 @@ int main( void ){
    emsSetc("D", "D");
    emsSetc("D", "E");
    emsExpnd( "^D", buffer, sizeof(buffer), &oplen, &status );
-   printf("After emsEnd       - Should be ABCDE: %s\n",buffer);
+   printf("After emsEnd       - Should be ABCDEABCDE: %s\n",buffer);
 
 /* The basic C interface */
    printf( "\nTest the basic C interface\n" );
@@ -153,9 +156,11 @@ int main( void ){
 
 
    /* Set and get some tuning values. */
+   printf( "\nTest tuning subsystem\n" );
+
    status = SAI__OK;
-   emsTune( "SZOUT", 40, &status );
-   emsGtune( "SZOUT", &value1, &status );
+   old_value = emsStune( "SZOUT", 40, &status );
+   value1 = emsGtune( "SZOUT", &status );
    if ( status != SAI__OK ) {
        printf( "\nSZOUT test failed with BAD status\n" );
        status = SAI__OK;
@@ -168,18 +173,19 @@ int main( void ){
    status = SAI__ERROR;
    emsRep( "ERRSZOUT", "SZOUT check: long error message that should "
            "be wrapped into two lines", &status );
-   emsTune( "SZOUT", 20, &status ); 
+   (void) emsStune( "SZOUT", 20, &status ); 
    emsRep( "ERRSZOUT", "SZOUT check: long error message that should "
            "be wrapped into many lines", &status );
 
-   emsTune( "SZOUT", 0, &status );    
+   (void) emsStune( "SZOUT", 0, &status );    
    emsRep( "ERRSZOUT", "SZOUT check: long error message that should "
            "be just one line", &status );
    status = SAI__OK;
-
-   emsTune( "MSGDEF", 2, &status );
-   emsGtune( "MSGDEF", &value2, &status );
-   emsTune( "MSGDEF", 1, &status );
+   (void) emsStune( "SZOUT", old_value, &status );
+    
+   old_value = emsStune( "MSGDEF", 2, &status );
+   value2 = emsGtune( "MSGDEF", &status );
+   (void) emsStune( "MSGDEF", old_value, &status );
    if ( status != SAI__OK ) {
        printf( "\nMSGDEF test failed with BAD status\n" );
        status = SAI__OK;
@@ -188,9 +194,9 @@ int main( void ){
        printf( "\nMSGDEF test failed with BAD value\n" );
    }
 
-   emsTune( "STREAM", 1, &status );
-   emsGtune( "STREAM", &value3, &status );
-   emsTune( "STREAM", 0, &status );
+   old_value = emsStune( "STREAM", 1, &status );
+   value3 = emsGtune( "STREAM", &status );
+   (void) emsStune( "STREAM", old_value, &status );
    if ( status != SAI__OK ) {
        printf( "\nSTREAM test failed with BAD status\n" );
        status = SAI__OK;
@@ -199,9 +205,9 @@ int main( void ){
        printf( "\nSTREAM test failed with BAD value\n" );
    }
 
-   emsTune( "REVEAL", 1, &status );
-   emsGtune( "REVEAL", &value4, &status );
-   emsTune( "REVEAL", 0, &status );
+   old_value = emsStune( "REVEAL", 1, &status );
+   value4 = emsGtune( "REVEAL", &status );
+   (void) emsStune( "REVEAL", old_value, &status );
    if ( status != SAI__OK ) {
        printf( "\nREVEAL test failed with BAD status\n" );
        status = SAI__OK;
@@ -211,14 +217,12 @@ int main( void ){
    }
    
    if( value1 != 40 || value2 != 2 || value3 != 1 || value4 != 1 ) {
-       printf( "\nTuning subsystem has failed\n" );
+       printf( "Tuning subsystem has failed\n" );
    }
    else {
-       printf( "\nTuning subsystem OK\n" );
+       printf( "Tuning subsystem OK\n" );
    }
 
 
    exit( 0 );
-
-
 }   

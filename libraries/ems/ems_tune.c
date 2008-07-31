@@ -37,7 +37,7 @@
 #include "f77.h"                       /* CNF macros and prototypes */
 
 F77_SUBROUTINE (ems_tune)( CHARACTER(key), INTEGER(value), INTEGER(status)
-        TRAIL(key) )
+                           TRAIL(key) )
 {
    char ckey[MAXKEYSZ+1];   /* Imported keyword */
 
@@ -47,7 +47,7 @@ F77_SUBROUTINE (ems_tune)( CHARACTER(key), INTEGER(value), INTEGER(status)
 
    cnfImpn( key, key_length, MAXKEYSZ, ckey );
 
-   emsTune( ckey, *value, status );
+   (void) emsStune( ckey, *value, status );
    
    return;
 }

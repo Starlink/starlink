@@ -37,7 +37,7 @@ C_ROUTINES = emsAnnul.c emsBegin.c emsEload.c emsEnd.c emsErrno.c \
              emsRenew.c emsRep.c emsRlse.c emsSetc.c emsSetd.c \
              emsSeti.c emsSeti64.c emsSetl.c emsSetnc.c emsSetp.c \
              emsSetr.c emsSetu.c emsStat.c emsSyser.c emsTune.c \
-	     emsGtune.c \
+	     emsGtune.c emsStune.c \
              \
              ems1Eblk.c ems1Emark.c ems1Erlse.c ems1Estor.c ems1Estor1.c \
              ems1Fcerr.c ems1Flush.c ems1Form.c ems1Fthreaddata.c ems1Gesc.c \

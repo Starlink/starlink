@@ -23,7 +23,7 @@ Copyright \copyright\ 2008 Science and Technology Facilities Council}
 \newcommand{\stardocauthors}   {P.C.T. Rees \\
                                 A.J. Chipperfield \\
                                 P.W. Draper}
-\newcommand{\stardocdate}      {30 Jul 2008}
+\newcommand{\stardocdate}      {31 Jul 2008}
 \newcommand{\stardoctitle}     {EMS \\ [\latex{1ex}]
                                 Error Message Service}
 \newcommand{\stardocversion}   {Version 2.2-0}
@@ -932,19 +932,33 @@ but the old names will still be recognised.
 There is no change to the argument lists.
 (See Appendix \ref{version_1_6} for more details.)
 
-Two additional functions are available for C programmers:
+Additional functions are available for C programmers:
 \begin{itemize}
+
 \item \texttt{emsErrno( char const *token, int errval )}
 This will assign the message associated
 with a C errno (\texttt{errval}) to the specified token. Note that this is
 logically different from \texttt{emsSyser}; on UNIX they produce the same
 result but on other systems they may be different.
+
+\item \texttt{int emsGtune( char const *key, int *status )}
+This returns the value of a tuning parameter. If differs from the Fortran
+version as the value is returned, not passed back by reference.
+
 \item \texttt{emsSetnc( char const *token, char const *string, int maxchar )} 
 This is similar to \texttt{emsSetc} but will limit the token length to
 \texttt{maxchar} characters.
 It must be used if \texttt{string} is not null-terminated.
 \texttt{ems.h} defines \texttt{ems\_setc\_c} to be equivalent to
 \texttt{emsSetnc} - there is no Fortran interface for this function.
+
+\item \texttt{int emsStune( char const *key, int value, int *status )}
+This replaces the \texttt{emsTune} function. It returns the old value of
+the given parameter so that it can be re-established using another call
+to this function (this may be necessary for systems that do not share
+tuning values).
+
+
 \end{itemize} 
 A full list of the C function prototypes is provided in Appendix~\ref{C_sect}.
 
@@ -1568,66 +1582,95 @@ to a token.}
 \section{\xlabel{c_interface_function_prototypes}C Interface Function
 Prototypes} \label{C_sect}
 \begin {description} 
+
 \item[void emsAnnul ( int \texttt{*}status );] \listline
 \textit{Annul the contents of the current error context.}
+
 \item[void emsBegin ( int \texttt{*}status );] \listline
 \textit{Begin a new error reporting environment.}
+
 \item[void emsEload
 ( char \texttt{*}parstr, int \texttt{*}parlen, char \texttt{*}opstr, 
 int \texttt{*}oplen, int \texttt{*}status );] \listline
 \textit{Return messages from the current error context.}
+
 \item[void emsEnd ( int \texttt{*}status );] \listline
 \textit{End the current error reporting environment.}
+
 \item[void emsErrno ( const char \texttt{*}token, int errval );] \listline
 \textit{Assign the message associated with a C errno to a token.}
+
 \item[void emsExpnd] \listline
 \textbf{( const char \texttt{*}text, char \texttt{*}opstr,
 const int maxlen, int \texttt{*}oplen, int \texttt{*}status );} \\
 \textit{Expand and return a message.}
+
 \item[void emsFacer ( const char \texttt{*}token, int facerr );] \listline
 \textit{Assign the messages associated with a Starlink status value to a
 token.}
-\item[void emsGtune ( const char \texttt{*}key, \texttt{*}int value,
-int \texttt{*}status );] \listline
+
+\item[int emsGtune ( const char \texttt{*}key, int \texttt{*}status );] 
+\listline
+\textit{Get the value of a tuning parameter}
+
 \item[void emsLevel ( int \texttt{*}level );] \listline
 \textit{Inquire the current error context level.}
+
 \item[void emsMark ( void );] \listline
 \textit{Start a new error context.}
+
 \item[void emsMload] \listline 
 \textbf{( const char \texttt{*}param, const char \texttt{*}text, 
 char \texttt{*}opstr, int \texttt{*}oplen, int~\texttt{*}status );} \\
 \textit{(Deprecated) Expand and return a message.}
+
 \item[void emsRenew ( void );] \listline
 \textit{Renew any annulled message tokens in the current context.}
+
 \item[void emsRep ( const char \texttt{*}param, const char \texttt{*}text, 
 int \texttt{*}status );] \listline
 \textit{Report an error message.}
+
 \item[void emsRlse ( void );] \listline
 \textit{Release (i.e.\ end) the current error context.}
+
 \item[void emsSetc ( const char \texttt{*}token,
 const char \texttt{*}cvalue, ... );] \listline
 \textit{Concise encoding of a given null-terminated string. String 
 \texttt{cvalue} must be null-terminated. (For historical
 reasons, additional arguments are permitted but have no effect.)}
+
 \item[void emsSetnc ( const char \texttt{*}token, const char \texttt{*}cvalue,
 int maxchar );] \listline
 \textit{Concise encoding of a given CHARACTER value - maximum \texttt{maxchar}
 characters.}
+
 \item[void emsSetd ( const char \texttt{*}token, double dvalue );] \listline
 \textit{Concise encoding of a given DOUBLE PRECISION value.}
+
 \item[void emsSeti ( const char \texttt{*}token, int ivalue );] \listline
 \textit{Concise encoding of a given INTEGER value.}
+
 \item[void emsSetl ( const char \texttt{*}token, int lvalue );] \listline
 \textit{Concise encoding of a given LOGICAL value.}
+
 \item[void emsSetr ( const char \texttt{*}token, float fvalue );] \listline
 \textit{Concise encoding of a given REAL value.}
+
 \item[void emsStat ( int \texttt{*}status );] \listline
 \textit{Inquire the last reported error status.}
+
+\item[int emsStune ( const char \texttt{*}key, int value,
+int \texttt{*}status );] \listline
+\textit{Set an EMS tuning parameter, returning previous value.}
+
 \item[void emsSyser ( const char \texttt{*}token, int systat );] \listline
 \textit{Assign an operating system error message to a token.}
+
 \item[void emsTune ( const char \texttt{*}key, int value,
 int \texttt{*}status );] \listline
-\textit{Set an EMS tuning parameter.}
+\textit{(Deprecated use emsStune) Set an EMS tuning parameter.}
+
 \end {description}
 
 \newpage
@@ -2274,93 +2317,5 @@ Specifications}
    }
 }
 \end {small}
-\rule{\textwidth}{0.5mm}
 
-\newpage
-\section{\xlabel{document_changes} Changes}
-\subsection{\xlabel{version_1_6}Version 1.6}
-\label{version_1_6}
-The names of the C interface functions have been changed from the form 
-\texttt{ems\_\textit{xxx}\_c} to the form \texttt{ems\textit{Xxx}} for
-compatibility with other Starlink libraries.
-There are no changes to the argument lists and existing code will continue to
-work by virtue of statements:
-\begin{quote}
-\texttt{\#define ems\_\textit{xxx}\_c ems\textit{Xxx}}
-\end{quote}
-in \texttt{ems.h}.
-
-Existing compiled code and executables will continue to work as the libraries
-contain simple drop-through functions with the old names.
-
-Relevant sections of this document have been revised.
-
-\subsection{\xlabel{version_1_7}Version 1.7}
-\label{version_1_7}
-
-EMS tuning parameters are implemented but there is no public interface to
-them at the EMS level.  They provide the functionality in EMS required for
-tuning MSG and ERR and will be altered by new subroutines 
-\xref{\texttt{ERR\_TUNE}}{sun104}{ERR_TUNE}
-and
-\xref{\texttt{MSG\_TUNE}}{sun104}{MSG_TUNE}
-in the 
-\xref{MERS}{sun104}{} package\latex{ described in SUN/104}.
-
-Some cosmetic improvements have been made to this document.
-
-\subsection{\xlabel{version_2_0_4}Version 2.0-4}
-\label{version_2_0_4}
-EMS Version 2.0-4 is released.
-
-This version of EMS is implemented entirely in C.  A Fortran interface
-(also implemented in C) is provided. EMS Version 2.0 or higher is required
-for use with MERS Version 1.7 or higher.
-
-
-The following functional changes have occurred since EMS Version 1.7-1:
-\begin{enumerate}
-\item Now that base-level output of error messages from EMS occurs in C, some
-undesirable conflicts may occur if output by this method occurs interspersed
-with Fortran output. The base level, EMS\_\_BASE is now available in the
-\texttt{ems\_par.h} header file and the \texttt{EMS\_PAR} Fortran include file.
-\item New subroutines \texttt{EMS\_TUNE} (and \texttt{emsTune}) and 
-\texttt{EMS\_EXPND} (and \texttt{emsExpnd}) are included.
-\texttt{EMS\_EXPND} (\texttt{emsExpnd}) is similar in function to 
-\texttt{EMS\_MLOAD} (\texttt{emsMload}), which is now deprecated because it
-has a redundant parameter, \texttt{PARAM}, and the C interface provides no
-limit on the output string size.
-\item The \texttt{EMS\_FMTx} and \texttt{emsFmtx} routines are withdrawn on the
-assumption that they have not been called directly and to avoid confusion
-between Fortran and C format syntax.
-\item \texttt{emsFioer} is withdrawn as it is Fortran-specific.
-The Fortran-callable \texttt{EMS\_FIOER} is still provided.
-\item The calling sequence for the C functions is identical to the existing C
-interface to Fortran EMS, with the following exceptions:
-\begin{itemize}
-\item The \texttt{maxchar} argument of \texttt{emsSetc} is now redundant and
-optional. The given string \texttt{cvalue} must be null-terminated and will be
-limited to EMS\_\_SZTOK characters.
-\item A new function \texttt{emsSetnc}, has been introduced for use where it is
-required to limit the number of characters other than by null-termination. 
-This has the additional \texttt{maxchar} argument and the old form of name, 
-\texttt{ems\_setc\_c} will be \#defined in \texttt{ems.h} to use
-\texttt{emsSetnc}. There is no Fortran interface for \texttt{emsSetnc}.
-\end{itemize}
-\item The temporary drop-through functions introduced in Version 1.6 to enable
-compiled C code which uses the old form of EMS function name (ems\_annul\_c
-\textit{etc.}) to continue working have been withdrawn. 
-
-\emph{Any such code which has not been re-compiled using a Version 1.6 or later
-\texttt{ems.h} header file must be re-compiled now}.
-\item The EMS library has been split into two -- one containing the C interface
-and the other containing the Fortran interface. This makes it possible to
-link C programs with EMS without requiring the Starlink CNF library to be
-present (use `\texttt{ems\_link Conly}`). 
-
-\emph{Any programs linked with the shared libraries must be re-linked.}
-\item A bug which prevented tokens from being renewed in some cases has been 
-fixed.
-\end{enumerate}
-SSN/4 has been revised to describe the new system.
 \end {document}

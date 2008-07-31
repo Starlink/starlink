@@ -70,6 +70,8 @@
  *-
  */
 
+#include <strings.h>
+
 #include "ems_par.h"                 /* EMS_ public constants */
 #include "ems_sys.h"                 /* EMS_ private constants */
 #include "ems1.h"                    /* EMS_ private function prototypes */

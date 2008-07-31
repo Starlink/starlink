@@ -46,7 +46,10 @@
  *      3-MAR-2006 (TIMJ):
  *        Add emsSetu / emsSetp / emsSeti64
  *     30-JUL-2008 (PWD):
- *        Add emsGtune.
+ *        Added emsGtune.
+ *     31-JUL-2008 (PWD):
+ *        Added emsStune and changed emsGtune to return the value as a result.
+ *        Marked emsTune as deprecated.
  *     {enter_changes_here}
 
  *  Bugs:
@@ -90,9 +93,8 @@ void emsExpnd( const char *text,
 void emsFacer( const char *token, 
                int status );
 
-void emsGtune( const char *key, 
-               int *value, 
-               int *status );
+int emsGtune( const char *key,  
+              int *status );
 
 void emsLevel( int *level );      
 
@@ -146,6 +148,11 @@ void emsStat( int *status );
 void emsSyser( const char *token, 
                int systat );
 
+int emsStune( const char *key,
+              const int value,
+              int *status );
+
+/*  Deprecated function. */
 void emsTune( const char *key, 
               const int value, 
               int *status );

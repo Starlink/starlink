@@ -10,25 +10,27 @@
  *     Starlink ANSI C
 
  *  Invocation:
- *     emsGtune( key, value, status )
+ *     value = emsGtune( key, status )
 
  *  Arguments:
  *     key = char* (Given)
  *        The name of the tuning parameter.
- *     value = int* (Returned)
- *        The tuning value (see description in emsTune).
  *     status = int* (Given and Returned)
  *        The global status.
 
+ *  Result:
+ *     The value of the tuning parameter.
+
  *  Description:
  *     The value of the given EMS tuning parameter is returned. The tuning
- *     parameters are described in emsTune.
+ *     parameters are described in emsStune.
  *
  *     The routine will attempt to execute regardless of the given value of
  *     STATUS. If the given value is not SAI__OK, then it is left unchanged,
  *     even if the routine fails to complete. If the STATUS is SAI__OK on
  *     entry and the routine fails to complete, STATUS will be set and an
- *     error report made.
+ *     error report made. In that instance the return will also be set
+ *     to 0.
 
  *  Copyright:
  *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -57,6 +59,8 @@
  *  History:
  *     30-JUL-2008 (PWD):
  *        Original version.
+ *     31-JUL-2008 (PWD):
+ *        Converted into a function to match new emsStune.
  *     {enter_changes_here}
 
  *  Bugs:
@@ -64,6 +68,8 @@
 
  *-
  */
+
+#include <strings.h>
 
 #include "sae_par.h"                 /* Standard SAE constants */
 #include "ems_par.h"                 /* EMS_ public constants */
@@ -73,9 +79,10 @@
 #include "ems1.h"                    /* EMS_ private functions prototypes */
 #include "ems_defs.h"                /* EMS_ message table */
 
-void emsGtune( const char *key, int *value, int *status )
+int emsGtune( const char *key, int *status )
 {
     int lstat;                /* Local status */
+    int value;                /* The value. */
 
     ems_msgtab_t *msgtab = ems1Gmsgtab();  /* Current message table */
 
@@ -83,19 +90,20 @@ void emsGtune( const char *key, int *value, int *status )
 
     /*  Initialise local status */
     lstat = SAI__OK;
+    value = 0;
 
     /*  Check that the given KEY is acceptable. */
     if ( strcasecmp( key, "SZOUT" ) == 0 ) {
-        *value = msgtab->msgwsz;
+        value = msgtab->msgwsz;
     } 
     else if ( strcasecmp( key, "MSGDEF" ) == 0 ) {
-        *value = msgtab->msgdef;
+        value = msgtab->msgdef;
     } 
     else if ( strcasecmp( key, "STREAM" ) == 0 ) {
-        *value = msgtab->msgstm;
+        value = msgtab->msgstm;
     } 
     else if ( strcasecmp( key, "REVEAL" ) == 0 ) {
-        *value = msgtab->msgrvl;
+        value = msgtab->msgrvl;
     } 
     else {
         /*  The given tuning parameter was not in the available set. */
@@ -110,5 +118,5 @@ void emsGtune( const char *key, int *value, int *status )
     /*  Set return status */
     if ( *status == SAI__OK ) *status = lstat;
 
-    return;
+    return value;
 }
