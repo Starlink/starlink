@@ -188,7 +188,8 @@ void smurf_sc2concat( int *status ) {
   padEnd = (dim_t) temp;
 
   /* Group the input files by subarray and continuity */
-  smf_grp_related( igrp, isize, 1, maxlen, &maxconcat, &igroup, status );
+  smf_grp_related( igrp, isize, 1, maxlen-padStart-padEnd, &maxconcat, &igroup,
+                   status );
 
   /* Obtain the number of continuous chunks and subarrays */
   if( *status == SAI__OK ) {
