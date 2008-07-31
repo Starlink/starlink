@@ -106,6 +106,8 @@
 #        noblock_clone.
 #     19-JUL-2006 (MBT):
 #        Added plastic support.
+#     23-JUL-2008 (PWD):
+#        Start adding VO support.
 #     {enter_changes_here}
 
 #-
@@ -743,6 +745,13 @@ itcl::class gaia::Gaia {
       if { $itk_option(-ukirt_ql) || $itk_option(-ukirt_xy) } {
          attach_camera
       }
+
+      #  Add SIAP query dialog to Data-Servers.
+      set m [get_menu Data-Servers]
+      set index [$m index "Reload config file..."]
+      insert_menuitem $m $index command "Reload VO image servers..." \
+         {Update VO image servers available in catalog directories} \
+         -command [code $this vo_update_siap_ $m $index]
    }
 
    #  Add a menubutton with the GAIA options.
@@ -2011,15 +2020,15 @@ is out of date. Do you want to update it?"
                "The local catalogue configuration file '$config_file'
 contains a description of catalogues that are shown in the
 Data-Servers menus. It appears that this file is now out of date with
-respect to the system default version (which may contain new
-catalogues and image servers) and you should probably allow it to be
+respect to the system default version \(which may contain new
+catalogues and image servers\) and you should probably allow it to be
 updated.
 When you open local catalogues of your own, or have ones created for
-you locally (the object detection toolbox does this), or apply
-configuration changes (such as changing the colour of the overlay
-markers) these preferences are recorded in this configuration
+you locally \(the object detection toolbox does this\), or apply
+configuration changes \(such as changing the colour of the overlay
+markers\) these preferences are recorded in this configuration
 file. Since you may not want to loose these changes a copy of your
-existing configuration file will be made (stamped with todays date)
+existing configuration file will be made \(stamped with todays date\)
 and added as a directory to the list of catalogue directories before
 applying the update. Using the \"Browse Catalog Directories...\"
 window gives you access to this."
@@ -2193,8 +2202,8 @@ window gives you access to this."
       if { $plastic_app_ == "" } {
 
          #  Construct the listener object and store it in a common variable.
-         set responder [gaia::GaiaPlastic #auto]
-         set app [plastic::PlasticApp #auto [list [itcl::code $responder]]]
+         set responder [gaia::GaiaPlastic \#auto]
+         set app [plastic::PlasticApp \#auto [list [itcl::code $responder]]]
 
          #  If a hub appears to be running, have a go at registering with it.
          if { [plastic::PlasticHub::is_hub_running] } {
@@ -2208,7 +2217,7 @@ window gives you access to this."
          #  Construct a sender object which works in tandem with the
          #  PlasticApp object to make outgoing calls.
          set plastic_sender_ \
-             [code [gaia::PlasticSender #auto -plastic_app [code $app]]]
+             [code [gaia::PlasticSender \#auto -plastic_app [code $app]]]
 
          #  Store the listener in a common variable.
          set plastic_app_ $app
@@ -2343,6 +2352,29 @@ window gives you access to this."
    #  Returns the PLASTIC application object, if there is one.
    public proc get_plastic_app {} {
       return [code $plastic_app_]
+   }
+
+   #  VO support
+   #  ----------
+
+   #  Update the available SIAP servers by querying a VO registry.
+   #  Arguments are the Data-Servers menu and the index of the entry that
+   #  invoked this method.
+   protected method vo_update_siap_ {m index} {
+      if { [gaia::GaiaVOTableAccess::check_for_gaiavo] } {
+         utilReUseWidget gaiavo::GaiaVORegistrySearch $w_.siap \
+            -service SIAP -command [code $this vo_updated_siap_]
+      } else {
+         #  Grey out menu, no GaiaVO.
+         $m entryconfigure $index -state disabled
+      }
+   }
+
+   #  Called when an update of the SIAP servers has been made, "msg" is the
+   #  response containing the list of servers in Skycat config format?
+   protected method vo_updated_siap_ {msg} {
+      puts "new SIAP servers"
+      puts $msg
    }
 
    #  Configuration options: (public variables)

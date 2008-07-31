@@ -59,6 +59,8 @@ static int GaiaVOTableTclListHeadings( ClientData clientData, Tcl_Interp *interp
                                        int objc, Tcl_Obj *CONST objv[] );
 static int GaiaVOTableTclOpen( ClientData clientData, Tcl_Interp *interp,
                                int objc, Tcl_Obj *CONST objv[] );
+static int GaiaVOTableTclRead( ClientData clientData, Tcl_Interp *interp,
+                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaVOTableTclSave( ClientData clientData, Tcl_Interp *interp,
                                int objc, Tcl_Obj *CONST objv[] );
 
@@ -80,6 +82,9 @@ int GaiaVOTable_Init( Tcl_Interp *interp )
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
     Tcl_CreateObjCommand( interp, "gaiavotable::open", GaiaVOTableTclOpen,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+    Tcl_CreateObjCommand( interp, "gaiavotable::read", GaiaVOTableTclRead,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
     Tcl_CreateObjCommand( interp, "gaiavotable::save", GaiaVOTableTclSave,
@@ -147,6 +152,35 @@ static int GaiaVOTableTclOpen( ClientData clientData, Tcl_Interp *interp,
         return TCL_OK;
     }
     Tcl_SetResult( interp, const_cast<char *>( "Failed to open VOTable" ),
+                   TCL_VOLATILE );
+    return TCL_ERROR;
+}
+
+/**
+ * Read a VOTable from a string. The result is the address of the object.
+ */
+static int GaiaVOTableTclRead( ClientData clientData, Tcl_Interp *interp,
+                               int objc, Tcl_Obj *CONST objv[] )
+{
+    Tcl_Obj *resultObj;
+    char *content;
+    VOTable *table;
+
+    /*  Check arguments, only allow one, the VOTable content. */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "votable_string" );
+        return TCL_ERROR;
+    }
+    content = Tcl_GetString( objv[1] );
+
+    /*  Create instance of VOTable and open the table. */
+    table = new gaia::VOTable();
+    if ( table->read( content ) ) {
+        resultObj = Tcl_GetObjResult( interp );
+        Tcl_SetLongObj( resultObj, exportVOTableHandle( table ) );
+        return TCL_OK;
+    }
+    Tcl_SetResult( interp, const_cast<char *>( "Failed to read VOTable" ),
                    TCL_VOLATILE );
     return TCL_ERROR;
 }

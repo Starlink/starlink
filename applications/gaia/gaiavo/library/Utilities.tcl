@@ -44,8 +44,6 @@ if {![llength [info command dict]]} {
 package require log
 package require tdom
 
-package provide WS::Utils 1.0.8
-
 namespace eval ::WS {}
 
 namespace eval ::WS::Utils {
@@ -450,13 +448,12 @@ proc ::WS::Utils::ProcessImportXml {mode baseUrl xml serviceName serviceInfoVar 
     $doc documentElement schema
     set prevSchema $currentSchema
     set currentSchema $schema
-
     parseScheme $mode $baseUrl $schema $serviceName serviceInfo tnsCount
 
     set currentSchema $prevSchema
     $doc delete
    } msg
-   puts "ProcessImportXml of $baseUrl failed (skipped)"
+   puts "ProcessImportXml of $baseUrl failed (skipped:$msg)"
 }
 
 ###########################################################################
@@ -1744,7 +1741,7 @@ proc ::WS::Utils::parseElementalType {mode dictVar serviceName node tns} {
         # Validate this is not really a complex type
         #
         if {[$node hasChildNodes]} {
-            set childNode [$node childNodes]
+            set childNode [lindex [$node childNodes] 0]
             $childNode setAttribute name $typeName
             parseComplexType $mode results $serviceName $childNode $tns
             return

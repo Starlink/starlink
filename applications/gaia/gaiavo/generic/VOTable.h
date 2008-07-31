@@ -77,6 +77,12 @@ namespace gaia
         //  Open a file containing a VOTable.
         int open( const char *file );
 
+        //  Read a VOTable contained in a single character buffer.
+        int read( const char *buffer );
+
+        //  Read a VOTable from an istream.
+        int read( istream *in );
+
         //  Create an empty VOTable for populating. Namespace qualified.
         void create();
 

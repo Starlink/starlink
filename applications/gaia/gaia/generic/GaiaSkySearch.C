@@ -58,7 +58,7 @@
  */
 
 #if HAVE_CONFIG_H
-#include <config.h> 
+#include <config.h>
 #endif
 
 #include <cstdlib>
@@ -86,13 +86,14 @@ public:
     int min_args;          // minimum number of args
     int max_args;          // maximum number of args
 } subcmds_[] = {
-    {"check",  &GaiaSkySearch::checkCmd,        1,  1},
-    {"csize",  &GaiaSkySearch::csizeCmd,        1,  1},
-    {"entry",  &GaiaSkySearch::entryCmd,        1,  4},
-    {"info",   &GaiaSkySearch::infoCmd,         1,  2},
-    {"open",   &GaiaSkySearch::openCmd,         1,  2},
-    {"origin", &GaiaSkySearch::originCmd,       0,  2},
-    {"save",   &GaiaSkySearch::saveCmd,         1,  5}
+    {"check",   &GaiaSkySearch::checkCmd,        1,  1},
+    {"content", &GaiaSkySearch::contentCmd,      0,  0},
+    {"csize",   &GaiaSkySearch::csizeCmd,        1,  1},
+    {"entry",   &GaiaSkySearch::entryCmd,        1,  4},
+    {"info",    &GaiaSkySearch::infoCmd,         1,  2},
+    {"open",    &GaiaSkySearch::openCmd,         1,  2},
+    {"origin",  &GaiaSkySearch::originCmd,       0,  2},
+    {"save",    &GaiaSkySearch::saveCmd,         1,  5}
 };
 
 /**
@@ -171,12 +172,12 @@ int GaiaSkySearch::astroCatCmd( ClientData, Tcl_Interp *interp,
 GaiaSkySearch::GaiaSkySearch( Tcl_Interp *interp,
                               const char *cmdname,
                               const char *instname )
-    : xOrigin_(0.0),
-      yOrigin_(0.0),
+    : TclAstroCat( interp, cmdname, instname ), //  Needed as SkySearch
+                                                //  inherits TclAstroCat
+                                                // as "public virtual"!
       SkySearch( interp, cmdname, instname ),
-      TclAstroCat(interp, cmdname, instname) //  Needed as SkySearch
-                                             //  inherits TclAstroCat
-                                             // as "public virtual"!
+      xOrigin_(0.0),
+      yOrigin_(0.0)
 {
     // Do nothing.
 }
@@ -201,7 +202,7 @@ int GaiaSkySearch::openCmd(int argc, char* argv[])
 
     CatalogInfoEntry *e = NULL;
     if ( argc == 2 && ( strlen(argv[1]) != 0 ) ) {
-        
+
         // Open given catalog in given directory path.
 	e = lookupCatalogDirectoryEntry( argv[1] );
 	if ( !e ) {
@@ -229,11 +230,11 @@ int GaiaSkySearch::openCmd(int argc, char* argv[])
         //  recognised by GaiaLocalCatalog.
         if ( GaiaLocalCatalog::is_foreign( argv[0] ) ) {
             cat_ = new GaiaLocalCatalog( e, interp_ );
-        } 
+        }
         else {
             cat_ = new LocalCatalog( e );
         }
-    } 
+    }
     else {
         cat_ = new AstroCatalog( e );   //  Class for remote catalogues.
     }
@@ -263,7 +264,7 @@ int GaiaSkySearch::checkCmd(int argc, char* argv[])
 {
     if ( GaiaLocalCatalog::is_foreign( argv[0] ) ) {
         return GaiaLocalCatalog::check_table( argv[0] );
-    } 
+    }
     else {
         return LocalCatalog::check_table( argv[0] );
     }
@@ -293,7 +294,7 @@ int GaiaSkySearch::entryCmd( int argc, char* argv[] )
                 return error( "no catalog is open" );
             }
             e = cat_->entry();
-        } 
+        }
         else {
             if ( argc > 2 ) {
 
@@ -387,7 +388,7 @@ int GaiaSkySearch::saveCmd( int argc, char* argv[] )
             }
             argv[0] = (char *) e->url();
 
-        } 
+        }
         else {
 
             //  Create a temporary name to store the results.
@@ -443,7 +444,7 @@ int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
                 Tcl_Free( (char *) mainArgv );
             }
             return error( "not a sub list" );
-        } 
+        }
         else {
             //  Allocate memory for columns sizes.
             if ( ncolumn == 0  ) {
@@ -616,12 +617,12 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
 
 /*
  * Parse the given symbol info and set the values of the last 7 args from
- * it. Overridden to support GAIA symbols. Note it's a copy because the types 
+ * it. Overridden to support GAIA symbols. Note it's a copy because the types
  * are hardcoded.
  */
-int GaiaSkySearch::parse_symbol( const QueryResult& r, int argc, char** argv, 
-                                 char*& shape, char*& fg, char*& bg, 
-                                 char*& ratio, char*& angle, char*& label, 
+int GaiaSkySearch::parse_symbol( const QueryResult& r, int argc, char** argv,
+                                 char*& shape, char*& fg, char*& bg,
+                                 char*& ratio, char*& angle, char*& label,
                                  char*& cond )
 {
     static char* symbols[] = {
@@ -642,7 +643,7 @@ int GaiaSkySearch::parse_symbol( const QueryResult& r, int argc, char** argv,
     };
     static int nsymbols = sizeof(symbols)/sizeof(char*);
     int found = 0;
-    
+
     if (argc < 1)
 	return error("empty plot symbol");
 
@@ -663,7 +664,7 @@ int GaiaSkySearch::parse_symbol( const QueryResult& r, int argc, char** argv,
 	    fg = bg = argv[1];
 	}
     }
-    
+
     // ratio
     if (argc >= 3) {
 	if (strlen(argv[2])) {
@@ -691,7 +692,7 @@ int GaiaSkySearch::parse_symbol( const QueryResult& r, int argc, char** argv,
 	    cond = argv[5];
 	}
     }
-    
+
     return TCL_OK;
 }
 
@@ -715,16 +716,16 @@ int GaiaSkySearch::originCmd( int argc, char *argv[] )
         char buf[80];
         sprintf( buf, "%f %f", xOrigin_, yOrigin_ );
         set_result( buf );
-    } 
+    }
     else {
         double xo;
         double yo;
         if ( Tcl_GetDouble( interp_, argv[0], &xo ) != TCL_OK ) {
-            return error( argv[0], " is not a floating point value");
-        } 
+            return error( argv[0], " is not a floating point value" );
+        }
         else {
             if ( Tcl_GetDouble( interp_, argv[1], &yo ) != TCL_OK ) {
-                return error( argv[1], " is not a floating point value");
+                return error( argv[1], " is not a floating point value" );
             }
         }
         xOrigin_ = xo;
@@ -789,7 +790,7 @@ int GaiaSkySearch::infoCmd(int argc, char* argv[])
                         if ( strstr( e->longName(), "}" ) ) {
                             save = 0;
                         }
-                    } 
+                    }
                     else {
                         save = 0;
                     }
@@ -798,6 +799,87 @@ int GaiaSkySearch::infoCmd(int argc, char* argv[])
             if ( save ) {
                 Tcl_AppendElement(interp_, (char*)e->longName());
             }
+        }
+    }
+    return TCL_OK;
+}
+
+/**
+ *  Get the content of the current query (whole catalogue if local, or
+ *  last query if remote) as a Tcl list.
+ */
+int GaiaSkySearch::contentCmd( int argc, char *argv[] )
+{
+    if ( !cat_ ) {
+        return error( "no catalog is currently open" );
+    }
+    
+    //  If a local catalogue use whole.
+    LocalCatalog *lc = dynamic_cast<LocalCatalog *>( cat_ );
+    QueryResult *qr;
+    if ( ! lc ) {
+        if ( ! result_ ) {
+            return error( "no query is available" );
+        }
+        qr = result_;
+    }
+    else {
+        qr = &lc->getQuery();
+    }
+
+    int ncols = qr->numCols();
+    int nrows = qr->numRows();
+    char* s;
+
+    Tcl_ResetResult( interp_ );
+    if ( cat_->isWcs() ) {
+        WorldCoords pos;
+        char dec_buf[32];
+        char ra_buf[32];
+        int dec_col = qr->dec_col();
+        int ra_col = qr->ra_col();
+
+        for ( int i = 0; i < nrows; i++ ) {
+            // Row includes formatted RA & Dec, do that first.
+            if ( qr->getPos( i, pos ) != 0 ) {
+                return TCL_ERROR;
+            }
+            pos.print( ra_buf, dec_buf, equinoxStr_ );
+
+            //  Put the column values in a list.
+            Tcl_AppendResult( interp_, " {", NULL );
+            for ( int j = 0; j < ncols; j++ ) {
+                if ( j == ra_col ) {
+                    Tcl_AppendElement( interp_, ra_buf );
+                }
+                else if ( j == dec_col ) {
+                    Tcl_AppendElement( interp_, dec_buf );
+                }
+                else {
+                    if ( qr->get( i, j, s ) == 0 ) {
+                        Tcl_AppendElement( interp_, s );
+                    }
+                    else {
+                        Tcl_AppendElement( interp_, "" );
+                    }
+                }
+            }
+            Tcl_AppendResult(interp_, "}", NULL);
+        }
+    }
+    else {
+        // Image coords or no coords - no special formatting needed.
+        for ( int i = 0; i < nrows; i++ ) {
+            Tcl_AppendResult( interp_, " {", NULL );
+            for ( int j = 0; j < ncols; j++) {
+                if ( qr->get( i, j, s ) == 0 ) {
+                    Tcl_AppendElement( interp_, s );
+                }
+                else {
+                    Tcl_AppendElement( interp_, "" );
+                }
+            }
+            Tcl_AppendResult(interp_, "}", NULL);
         }
     }
     return TCL_OK;

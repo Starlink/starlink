@@ -98,6 +98,17 @@ namespace gaia {
     }
 
     /**
+     *  Read a character buffer that contains a VOTable.
+     */
+    int VOTable::read( const char *buffer )
+    {
+        istream *in = new istringstream( buffer );
+        int result = read( in );
+        delete in;
+        return result;
+    }
+
+    /**
      *  Open a file and read the contents for a VOTable.
      */
     int VOTable::open( const char *file )
@@ -130,15 +141,20 @@ namespace gaia {
             }
             in = ifin;
         }
+        int result = read( in );
 
-        streambuf *fb = in->rdbuf();
-        char line[2048];
-        fb->sgetn( line, 2048 );
+        //  Close and release file.
+        delete in;
 
-        //  Need to rewind.
-        in->clear();
-        in->seekg( 0, ios::beg );
+        return result;
+    }
 
+    /**
+     *  Read a VOTable from an istream. The istream must be capable of
+     *  rewinding (so file or string stream).
+     */
+    int VOTable::read( istream *in )
+    {
         //  Release any currently open tables.
         if ( votable1_ ) {
             delete votable1_;
@@ -152,15 +168,24 @@ namespace gaia {
         //  Open the VOTable using the correct parsing classes. Currently this
         //  just scans for the namespace qualifying string in the first 2048
         //  characters of the file.
+        streambuf *fb = in->rdbuf();
+        char line[2048];
+        fb->sgetn( line, 2048 );
+        in->clear();                 // Rewind before proceeding.
+        in->seekg( 0, ios::beg ); 
+
+        //   Now look for namespace signifier.
         if ( strstr( line, VOTABLE_NS ) == NULL ) {
+
+            //  No namespace.
             votable1_ = openVOTable1( in );
         }
         else {
+            //  Namespace.
             votable2_ = openVOTable2( in );
         }
 
-        //  Close and release file.
-        delete in;
+        //  If we have a table, that's OK.
         if ( votable1_ || votable2_ ) {
             return 1;
         }

@@ -38,7 +38,6 @@
 ##                                                                           ##
 ###############################################################################
 
-package require WS::Utils
 if {![llength [info command dict]]} {
     package require dict
 }
@@ -51,8 +50,6 @@ catch {
     package require tls
     http::register https 443 ::tls::socket
 }
-
-package provide WS::Client 1.0.8
 
 namespace eval ::WS::Client {
     array set serviceArr {}
