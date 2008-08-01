@@ -2288,6 +2288,8 @@ int *status              /* global status (given and returned) */
       
       strncpy ( headers, fptr, (*nrec)*80 );
       headers[(*nrec)*80] = 0;
+   } else {
+     ErsRep(0, status, "sc2store_readfitshead: Error reading FITS header" );
    }
 
    datAnnul ( &fitsloc, status );
@@ -3148,7 +3150,7 @@ int *status                 /* global status (given and returned) */
    {
       sc2store_headput ( j, head[j], status );
    }
-
+   sc2store_errconv ( status );
 }
 
 
@@ -3191,7 +3193,7 @@ int *status              /* Global status (given and returned) */
       if ( *status == SAI__OK) 
       {
          *status = SAI__ERROR;
-         errRep ( "", "Unable to create NDF extension for DREAM", status );
+         ersRep ( 0, status, "Unable to create NDF extension for DREAM");
       }
    }
 
@@ -3203,8 +3205,7 @@ int *status              /* Global status (given and returned) */
       if ( *status == SAI__OK) 
       {
          *status = SAI__ERROR;
-         errRep ( "", "Unable to create placeholder for DREAM jigvert array",
-	   status );
+         ErsRep ( 0, status, "Unable to create placeholder for DREAM jigvert array");
       }
    }
    lbnd[0] = 1;
@@ -3217,8 +3218,7 @@ int *status              /* Global status (given and returned) */
       if ( *status == SAI__OK ) 
       {
          *status = SAI__ERROR;
-         errRep("", "Unable to obtain an NDF identifier for the jigvert array",
-	   status );
+         ErsRep(0, status, "Unable to obtain an NDF identifier for the jigvert array");
       }
    }
    
@@ -3231,7 +3231,7 @@ int *status              /* Global status (given and returned) */
       if ( *status == SAI__OK ) 
       {
          *status = SAI__ERROR;
-         errRep ( "", "Unable to map DREAM jigvert array", status );
+         ErsRep ( 0, status, "Unable to map DREAM jigvert array");
       }
    }
 
@@ -3243,8 +3243,7 @@ int *status              /* Global status (given and returned) */
       if ( *status == SAI__OK ) 
       {
          *status = SAI__ERROR;
-         errRep ( "", "Unable to create placeholder for DREAM jigpath array", 
-	   status );
+         ErsRep ( 0, status, "Unable to create placeholder for DREAM jigpath array");
       }
    }
    lbnd[0] = 1;
@@ -3257,8 +3256,8 @@ int *status              /* Global status (given and returned) */
       if ( *status == SAI__OK ) 
       {
          *status = SAI__ERROR;
-         errRep ( "", 
-	   "Unable to obtain an NDF identifier for the jigpath array", status );
+         ErsRep ( 0, status, 
+	   "Unable to obtain an NDF identifier for the jigpath array" );
       }
    }
    ndfMap ( sc2store_jigpndf, "DATA", "_DOUBLE", "WRITE", (void *)(&jpath), 
@@ -3268,7 +3267,7 @@ int *status              /* Global status (given and returned) */
       if ( *status == SAI__OK ) 
       {
          *status = SAI__ERROR;
-         errRep ( "", "Unable to map DREAM jigpath array", status );
+         ErsRep ( 0, status, "Unable to map DREAM jigpath array");
       }
    }
    
@@ -3293,6 +3292,7 @@ int *status              /* Global status (given and returned) */
          jpath[j+npath] = jigpath[j][1];
       }
    }
+   sc2store_errconv ( status );
 
 }
 
@@ -3613,7 +3613,7 @@ int *status                 /* global status (given and returned) */
 
 {
    AstFrameSet * wcs;                 /* World Coordinates frame set */
-
+   int *oldstat;                      /* Previous status used by AST */
 
    if ( !StatusOkP(status) ) return;
 
@@ -3656,11 +3656,12 @@ int *status                 /* global status (given and returned) */
    sc2store_writefitshead ( sc2store_indf, nrec, fitsrec, status );
 
 /* And create a convenience frameset for focal plane and time coordinates */
-
+   oldstat = astWatch( status );
    wcs = timeWcs ( subnum, nframes, telpar, ((double*)sc2store_ptr[RTS_END]),
      status );
    ndfPtwcs ( wcs, sc2store_indf, status );
    wcs = astAnnul ( wcs );
+   astWatch( oldstat );
 
 /* Store the CONFIGURE XML */
 
