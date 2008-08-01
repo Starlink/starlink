@@ -934,7 +934,8 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
 
 void smf_reportprogress( int max, int *status );
 
-const char *smf_getobsidss( AstFitsChan *hdr, int *status );
+char *smf_getobsidss( AstFitsChan *hdr, char * obsid,
+                      size_t szobs, char * obsidss, size_t szss, int *status );
 
 float smf_calc_telres( AstFitsChan *hdr, int *status );
 

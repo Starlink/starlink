@@ -100,6 +100,7 @@
 #include "sae_par.h"
 #include "star/ndg.h"
 #include "star/kaplibs.h"
+#include "star/one.h"
 
 AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop, 
                            int *conform, Grp **ogrp, int *status ){
@@ -109,19 +110,19 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
    AstKeyMap *obsmap = NULL;
    AstKeyMap *result = NULL;
    AstKeyMap *sysmap = NULL;
-   char **parts = NULL;
+   char *cvalue = NULL;
    char *match = NULL;
    char *nsubscan= NULL;
    char *pname = NULL;
    char filename[GRP__SZNAM + 1];    
    const char *key = NULL;
-   char *obsid = NULL;
-   char *subsysnr = NULL;
+   char obsid[SZFITSCARD];
+   char obsidss[SZFITSCARD];
+   char subsysnr[SZFITSCARD];
    int ifile;
    int indf1;             
    int iobs;
    int isys;
-   int n;
    int nobs;
    int nscan;
    int nsys;                   
@@ -159,21 +160,16 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
 /* Get a FitsChan holding the contents of the FITS extension. */
       kpgGtfts( indf1, &fc, status );
 
-/* Get the value of the OBSIDSS keyword, and split it up into OBSID and
-   SUBSYSNR values. */
-      parts = astChrSplitRE( smf_getobsidss( fc, status ),  
-                             "^(.*)_(\\d+)$", &n );
-      if( parts ) {
-         obsid = parts[ 0 ];
-         subsysnr = parts[ 1 ];
+      /* Get the value of the OBSIDSS and OBSID keywords */
+      (void)smf_getobsidss( fc, obsid, sizeof(obsid), obsidss,
+                            sizeof(obsidss), status );
 
-      } else if( *status == SAI__OK ) {
-         obsid = NULL;
-         subsysnr = NULL;
-
-         msgSetc( "O", smf_getobsidss( fc, status ) );
-         *status = SAI__ERROR;
-         errRep( "", "Cannot parse the OBSIDSS value \"^O\".", status );
+      /* and we also need SUBSYSNR as a string */
+      if (astGetFitsS( fc, "SUBSYSNR", &cvalue )) {
+          one_strlcpy( subsysnr, cvalue, sizeof(subsysnr), status );
+      } else if (*status == SAI__OK) {
+        *status = SAI__ERROR;
+        errRep( " ", "Unable to get SUBSYSNR from FITS header", status);
       }
 
 /* Get a pointer to the KeyMap holding information about this OBSID
@@ -201,9 +197,6 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
       }
 
 /* Free resources */
-      obsid = astFree(  obsid );
-      subsysnr = astFree( subsysnr );
-      parts = astFree( parts );
       sysmap = astAnnul( sysmap );
       obsmap = astAnnul( obsmap );
       fc = astAnnul( fc );

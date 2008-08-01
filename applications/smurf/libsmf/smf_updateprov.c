@@ -37,6 +37,7 @@
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -50,6 +51,8 @@
 *        Added "indf" and "creator" arguments. Changed to retain
 *        information about ancestors if one of the ancestors refers to 
 *        the OBSIDSS value of the input NDF.
+*     31-JUL-2008 (TIMJ):
+*        Use thread-safe obsidss API.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -85,6 +88,8 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
+#include <string.h>
+
 void smf_updateprov( int ondf, const smfData *data, int indf, 
                      const char *creator, int *status ){
 
@@ -94,7 +99,8 @@ void smf_updateprov( int ondf, const smfData *data, int indf,
    HDSLoc *prov = NULL;         /* Locator for ancestor provenance info */
    HDSLoc *tloc = NULL;         /* Locator for temp HDS storage */
    char value[ 256 ];           /* Buffer for ancestor's OBSIDSS value */
-   const char *obsidss = NULL;  /* OBSIDSS value in input file */
+   char obsidssbuf[SZFITSCARD]; /* OBSIDSS value in input file */
+   char *obsidss = NULL;        /* Pointer to OBSIDSS buffer */
    int found;                   /* Was OBSIDSS value found in an input ancestor? */
    int ianc;                    /* Ancestor index */
    int isroot;                  /* Ignore any ancestors in the input NDF? */
@@ -118,7 +124,8 @@ void smf_updateprov( int ondf, const smfData *data, int indf,
    isroot = 0;
 
 /* Get the OBSIDSS keyword value from the input FITS header. */
-   obsidss =  smf_getobsidss( fc, status );
+   obsidss = smf_getobsidss( fc, NULL, 0, obsidssbuf,
+                             sizeof(obsidssbuf), status );
    if( obsidss ) {
 
 /* Search through all the ancestors of the input NDF (including the input

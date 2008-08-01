@@ -58,6 +58,8 @@
 *        Allow a NULL pointer to be supplied for "obsidmap".
 *     2008-06-10 (DSB):
 *        Remove ASTWARN cards form the output header.
+*     2008-07-31 (TIMJ):
+*        Change getobsidss API to be thread-safe.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -96,6 +98,7 @@ void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
                       AstKeyMap ** obsidmap, int * status ) {
 
 /* Local Variables: */
+   char obsidss[SZFITSCARD];     /* Somewhere to put the obsidss */
    AstFitsChan *temphdr = NULL;  /* FitsChan holding temporary FITS headers */
 
 /* Check inherited status. */
@@ -132,6 +135,8 @@ void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
    header so that we do not risk losing the value after merging of the
    FITS headers. CADC require that it is OBSIDSS that is unique and the
    thing that should be tracked. */
-   if( obsidmap ) astMapPut0I( *obsidmap, smf_getobsidss( inhdr, status ), 1, 
-                               NULL );
+   if( obsidmap ) astMapPut0I( *obsidmap, 
+                               smf_getobsidss( inhdr, NULL, 0, obsidss,
+                                               sizeof(obsidss), status ),
+                               1, NULL );
 }

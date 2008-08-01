@@ -13,27 +13,35 @@
 *     C function
 
 *  Invocation:
-*     result = smf_getobsidss( AstFitsChan *hdr, int *status );
+*     result = smf_getobsidss( AstFitsChan *hdr, char * obsid,
+*              size_t szobs, char * obsidss, size_t szss, int *status );
 
 *  Arguments:
 *     hdr = AstFitsChan * (Given)
 *        The FITS header to be read.
+*     obsid = char * (Given)
+*        Buffer to receive Observation ID. Can be NULL.
+*     szobs = size_t (Given)
+*        Size of "obsid" buffer.
+*     obsidss = char * (Given)
+*        Buffer to receive subsystem observation ID. Can be NULL.
+*     szss = size_t (Given)
+*        Size of "obsidss" buffer.
 *     status = int * (Given and Returned)
 *        Pointer to inherited status.
 
 *  Returned Value:
-*     A pointer to a static buffer containing the OBSIDSS value. Note,
-*     the contents of this buffer will change each time this function is
-*     invoked, so a copy of the returned string should be taken if the
-*     string is needed beyond the next invocation of this function. A
-*     pointer to a null string is returned if an error occurs.
+*     Returns the pointer supplied for "obsidss". This allows the routine
+*     to be used inline. Will return NULL if "obsidss" is NULL. Returns
+*     NULL on error.
 
 *  Description:
-*     This function returns a pointer to a static buffer containing the
-*     OBSIDSS value read from the supplied FitsChan. If the FitsChan does
-*     not contain an OBSIDSS header, the returned value is formed by
-*     concatenating the OBSID and SUBSYSNR headers (an error is reported
-*     if either of these are not present in the FitsChan).
+*     Obtain the observation ID and the subsystem observation ID. If either
+*     argument is NULL they will not be returned. If both are NULL, there
+*     is an error. If the FitsChan does not contain an OBSIDSS header, the
+*     returned value is formed by concatenating the OBSID and SUBSYSNR
+*     headers (an error is reported if either of these are not present in
+*     the FitsChan).
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -44,6 +52,9 @@
 *     27-MAR-2008 (DSB)
 *        Initial version. Refactored from code by Tim Jenness in
 *        smf_fits_outhdr.c).
+*     31-JUL-2008 (TIMJ):
+*        No longer use a static buffer. Also give option of retrieving
+*        OBSID.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -74,51 +85,84 @@
 #include "sae_par.h"
 #include "ast.h"
 #include "mers.h"
+#include "star/one.h"
+
+#include "smf.h"
+
 #include <string.h>
 
-const char *smf_getobsidss( AstFitsChan *hdr, int *status ) {
+char *smf_getobsidss( AstFitsChan *hdr, char * obsid, size_t szobs,
+                      char * obsidss, size_t szss, int *status ) {
 
 /* Local Variables: */
-   static char result[81];  /* Static buffer for returned string */
-   char *value = NULL;      /* Pointer to static buffer containing header value */
+  char lobsid[SZFITSCARD];/* somewhere to put the obsid */
+  char *obspnt = NULL;    /* Local buffer or supplied buffer */
+  size_t size;            /* Size of obsid buffer */
+  char *value = NULL;     /* Pointer to static buffer containing header value */
    int nc;                  /* Number of characters written */
 
-/* Initialise the returned string to a null string. */
-   result[ 0 ] = 0;
-
 /* Check the inherited status */
-   if ( *status != SAI__OK ) return result;
+   if ( *status != SAI__OK ) return NULL;
 
-/* If we have a OBSIDSS header, return it. */
-   if( astGetFitsS( hdr, "OBSIDSS", &value ) ) {
-      strcpy( result, value );
+   /* Get the OBSID header, use either local buffer or supplied buffer */
+   if (obsid && szobs > 0) {
+     obspnt = obsid;
+     size = szobs;
+   } else {
+     obspnt = lobsid;
+     size = sizeof(lobsid);
+   }
+   if (astGetFitsS( hdr, "OBSID", &value)) {
+     one_strlcpy( obspnt, value, size, status);
+   } else {
+     /* OBSID is important if we have been given the external buffer */
+     if (obsid && *status == SAI__OK) {
+       *status = SAI__ERROR;
+       errRep( " ", "Could not find OBSID FITS header", status);
+     }
+     obspnt[0] = '\0';
+   }
+
+   /* Now find OBSIDSS if we need it */
+   if (*status == SAI__OK && obsidss) {
+
+     obsidss[0] = '\0';
+
+     /* If we have a OBSIDSS header, return it. */
+     if( astGetFitsS( hdr, "OBSIDSS", &value ) ) {
+       one_strlcpy( obsidss, value, szss, status );
 
 /* Otherwise, try to form the equivalent OBSIDSS value by concatenating
    OBSID and SUBSYSNR. Note, SCUBA-2 will not have SUBSYSNR but it will
-   always have OBSIDS, so we should never end up in this branch. */
-   } else if( astGetFitsS( hdr, "OBSID", &value ) ) {
+   always have OBSIDSS, so we should never end up in this branch. */
+     } else if( strlen(obspnt) ) {
 
-/* We need to copy the string returned by astGetFitsS immediately since
-   the pointer points to a static buffer that will be changed by the next 
-   call to astGetFitsS. */
-      nc = sprintf( result, "%s_", value );
+       /* copy the string into the SS buffer */
+       one_strlcpy( obsidss, obspnt, sizeof(obsidss), status );
+       one_strlcat( obsidss, "_", sizeof(obsidss), status );
 
-      if( astGetFitsS( hdr, "SUBSYSNR", &value ) ) {
-         strcpy( result + nc, value );
+       if( astGetFitsS( hdr, "SUBSYSNR", &value ) ) {
+         one_strlcat(obsidss, value, sizeof(obsidss), status );
 
-      } else if( *status == SAI__OK) {
+       } else if( *status == SAI__OK) {
          *status = SAI__ERROR;
          errRep( "", "Could not determine OBSIDSS value since OBSIDSS and "
                  "SUBSYSNR FITS headers are both missing.", status );
-      }
+       }
 
-   } else if( *status == SAI__OK) {
-      *status = SAI__ERROR;
-      errRep( "", "Could not determine OBSIDSS value since OBSIDSS and "
-              "OBSID FITS headers are both missing.", status );
+     } else if( *status == SAI__OK) {
+       *status = SAI__ERROR;
+       errRep( "", "Could not determine OBSIDSS value since OBSIDSS and "
+               "OBSID FITS headers are both missing.", status );
+     }
+
    }
 
-/* Return the result, or a null string iof an error has occurred. */
-   return ( *status == SAI__OK ) ? result : "";
+   /* Return the supplied obsidss buffer */
+   if (*status != SAI__OK) {
+     return NULL;
+   } else {
+     return obsidss;
+   }
 }
 
