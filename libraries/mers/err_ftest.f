@@ -135,7 +135,9 @@
       STATUS = SAI__ERROR
       CALL ERR_MARK
       CALL ERR_FACER( 'ERR', STATUS )
-      CALL ERR_REP( ' ', 'ERR is installed and working. - ^ERR',
+      CALL ERR_REP( ' ', 'ERR is installed and working. - ^ERR '/
+     :/ 'and this is a very long message that should be wrapped '/
+     :/ 'hopefully once',
      :     STATUS )
       CALL ERR_REP( ' ', 'Second line of error report',
      :     STATUS )
