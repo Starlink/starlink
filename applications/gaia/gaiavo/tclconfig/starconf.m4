@@ -49,17 +49,17 @@ m4_ifdef([_poss_STAR_RESTFP_FIX],
 ## acinclude.m4 file just before running ./bootstrap or autoreconf.
 m4_define([per_dir_PREFIX],   [m4_ifdef([OVERRIDE_PREFIX],
                                         [OVERRIDE_PREFIX],
-                                        [/home/pdraper/starlink_svn/star])])
+                                        [/loc/pwda/pdraper/starlink_svn/build])])
 m4_define([per_dir_STARLINK], [m4_ifdef([OVERRIDE_STARLINK],
                                         [OVERRIDE_STARLINK],
-                                        [/home/pdraper/starlink_svn/star])])
+                                        [/loc/pwda/pdraper/starlink_svn/build])])
 
 test -n "$_star_per_package_dirs" || _star_per_package_dirs=false
 test -n "$_star_docs_only"        || _star_docs_only=false
 
 
 # Ensure that STARLINK has a value, defaulting to
-# /home/pdraper/starlink_svn/star.  Note that this directory may be
+# /loc/pwda/pdraper/starlink_svn/build.  Note that this directory may be
 # different from /star, and reflects the value of
 # STARCONF_DEFAULT_STARLINK that the `starconf' package was configured
 # with before its installation. 
@@ -73,7 +73,7 @@ test -n "$_star_docs_only"        || _star_docs_only=false
 # is possible to make a test version of a new package, using tools
 # from an old installation, but installing in a new place.
 #
-# However, we install software in /home/pdraper/starlink_svn/star by
+# However, we install software in /loc/pwda/pdraper/starlink_svn/build by
 # default.  This is so even if $STARLINK and STARCONF_DEFAULT_STARLINK
 # are different, because in this case we are planning to use a
 # previous installation in $STARLINK or $STARCONF_DEFAULT_STARLINK,
@@ -1611,6 +1611,11 @@ fi
 # for_rtl_finish_ to run during closedown. The intel compiler signature
 # is to have "IFORT" in the --version string.
 #
+# Under Solaris and the studio compilers the argc and argv values are no
+# longer automatically shared, so we test for "Sun Fortran" and have a 
+# code section that copies the given argc and argv directly to the global
+# variable __xargc and __xargv, this may need fixing from time to time.
+# Doesn't seem to be a function for doing this job.
 #
 AC_DEFUN([STAR_INITIALISE_FORTRAN],
    [AC_CACHE_CHECK([how to initialise the Fortran RTL],
@@ -1621,14 +1626,14 @@ AC_DEFUN([STAR_INITIALISE_FORTRAN],
                 star_cv_initialise_fortran=g95-start
             elif "$FC" --version 2>&1 < /dev/null | grep 'GNU Fortran.*[[4-9]]\.[[0-9]][[0-9]]*\.[[0-9]][[0-9]]*' > /dev/null; then
                 star_cv_initialise_fortran=gfortran-setarg
-            elif "$FC" --version 2>&1 < /dev/null | grep 'IFORT' > /dev/null; then
-                star_cv_initialise_fortran=ifort-setarg
             else
                 star_cv_initialise_fortran=g77-setarg
             fi
         else
             if "$FC" --version 2>&1 < /dev/null | grep 'IFORT' > /dev/null; then
                 star_cv_initialise_fortran=ifort-setarg
+            elif "$FC" -V 2>&1 < /dev/null | grep 'Sun Fortran' > /dev/null; then
+                star_cv_initialise_fortran=sunstudio-setarg
             else
                 star_cv_initialise_fortran=
             fi
@@ -1651,6 +1656,10 @@ AC_DEFUN([STAR_INITIALISE_FORTRAN],
       ifort-setarg)
         AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
                   [{extern void for_rtl_init_(int*,char**); for_rtl_init_(&argc, argv);}])
+        ;;
+      sunstudio-setarg)
+        AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
+                  [{extern int __xargc; extern char **__xargv;__xargc = argc;__xargv = argv;}])
         ;;
       *) 
         AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],[])

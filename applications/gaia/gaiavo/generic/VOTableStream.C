@@ -249,9 +249,8 @@ namespace gaia {
         char b = in_->sbumpc();
         if ( b != EOF ) {
             bitset<8> bs( b );
-            //value = bs.to_string< char,char_traits<char>,allocator<char> >();
-            value = bs.to_string();
-
+            value = bs.to_string< char,char_traits<char>,allocator<char> >();
+            //value = bs.to_string();
             return true;
         }
         return false;
