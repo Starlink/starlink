@@ -1,10 +1,82 @@
-itk::usual AstroCat {}
+#+
+#  Name:
+#     GaiaVOCat
 
-itcl::class gaiavo::AstroCat {
+#  Type of Module:
+#     [incr Tcl] class
 
+#  Purpose:
+#     Query a VO service and display the result.
+
+#  Description:
+#     This class defines a standard basic UI for containing the query
+#     elements specific to a particular VO service (like SIAP). It
+#     controls the query and displays the resultant VOTable, which can
+#     be edited. On acceptance the various servers will be added to the
+#     general catalogue configuration, so that detailed queries for
+#     images and catalogues (same as any other Skycat server).
+#
+#     This is the VO equivalent of the cat::AstroCat class.
+
+#  Invocations:
+#
+#        GaiaVOCat object_name [configuration options]
+#
+#     This creates an instance of a GaiavoVolume object. The return is
+#     the name of the object.
+#
+#        object_name configure -configuration_options value
+#
+#     Applies any of the configuration options (after the instance has
+#     been created).
+#
+#        object_name method arguments
+#
+#     Performs the given method on this object.
+
+#  Copyright:
+#     Copyright (C) 2008 Science and Technology Facilities Council
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of the
+#     License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+#     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     PWD: Peter Draper (JAC, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     31-JUL-2008 (PWD):
+#        Original version.
+#     {enter_further_changes_here}
+
+#-
+
+#.
+
+itk::usual GaiaVOCat {}
+
+itcl::class gaiavo::GaiaVOCat {
+
+   #  Inheritances:
+   #  -------------
    inherit util::TopLevelWidget
 
-   #  Constructor.
+   #  Constructor:
+   #  ------------
    constructor {args} {
       eval itk_initialize $args
 
@@ -62,7 +134,7 @@ itcl::class gaiavo::AstroCat {
       #  Do the initial check for proxies.
       check_proxies
 
-      #  Add the registry component.
+      #  Add the registry query component.
       itk_component add registry {
          gaiavo::GaiaVORegistrySearch $w_.registry \
             -debug $itk_option(-debug) \
@@ -138,32 +210,13 @@ itcl::class gaiavo::AstroCat {
          {Progress bar: displays status of work in progress}
    }
 
-   #  Destructor.
+   #  Destructor:
+   #  -----------
    destructor {
    }
 
-   #  Respond to feedback about query progress (stop and start).
-   protected method set_feedback {onoff} {
-      if { $onoff == "off" } {
-         $itk_component(progressbar) reset
-      }
-   }
-
-   #  Check for a file ~/.skycat/proxies, once each session, and use it to
-   #  initialize environment variables for a proxy server.
-   public proc check_proxies {} {
-      if { $checked_proxies_ } {
-         return
-      }
-      cat::ProxyDialog::check_proxies $::env(HOME)/.skycat/proxies
-      set checked_proxies_ 1
-   }
-
-   #  Pop up a dialog to set or change the HTTP proxy server.
-   public proc proxies {} {
-      utilReUseWidget ProxyDialog .proxy \
-         -configfile $::env(HOME)/.skycat/proxies
-   }
+   #  Methods:
+   #  --------
 
    #  Close this window.
    public method close {} {
@@ -175,7 +228,6 @@ itcl::class gaiavo::AstroCat {
       $itk_component(results) sort_dialog
    }
 
-
    #  Called when the user has selected columns to sort the results by.
    #  The first arg is the sort columns, the second arg is the order
    #  (increasing, decreasing).
@@ -185,7 +237,8 @@ itcl::class gaiavo::AstroCat {
          $w_.cat sortcols $sort_cols
          $w_.cat sortorder $sort_order
          cat::CatalogInfo::save {} $w_ 0
-         $itk_component(results) config -sort_cols $sort_cols -sort_order $sort_order
+         $itk_component(results) config -sort_cols $sort_cols \
+            -sort_order $sort_order
          search
       }
    }
@@ -194,7 +247,6 @@ itcl::class gaiavo::AstroCat {
    public method select_columns {} {
       $itk_component(results) select_columns
    }
-
 
    #  Called when the user has selected columns to show.
    public method set_show_cols {cols} {
@@ -324,7 +376,31 @@ itcl::class gaiavo::AstroCat {
       $itk_component(registry) query
    }
 
-   # -- options --
+   #  Respond to feedback about query progress (stop and start).
+   protected method set_feedback {onoff} {
+      if { $onoff == "off" } {
+         $itk_component(progressbar) reset
+      }
+   }
+
+   #  Check for a file ~/.skycat/proxies, once each session, and use it to
+   #  initialize environment variables for a proxy server.
+   public proc check_proxies {} {
+      if { $checked_proxies_ } {
+         return
+      }
+      cat::ProxyDialog::check_proxies $::env(HOME)/.skycat/proxies
+      set checked_proxies_ 1
+   }
+
+   #  Pop up a dialog to set or change the HTTP proxy server.
+   public proc proxies {} {
+      utilReUseWidget ProxyDialog .proxy \
+         -configfile $::env(HOME)/.skycat/proxies
+   }
+
+   #  Configuration options: (public variables)
+   #  ----------------------
 
    #  Name of catalogue.
    itk_option define -catalog catalog Catalog {}
@@ -333,16 +409,22 @@ itcl::class gaiavo::AstroCat {
    #  means root).
    itk_option define -catalogdir catalogDir CatalogDir {}
 
+   #  Flag: if true, run queries in foreground for better debugging.
+   itk_option define -debug debug Debug 0
+
+   #  Command to execute when a query is completed.
+
+   #  Protected variables: (available to instance)
+   #  --------------------
+
    #  List of catalogue column headings (from results of most recent query).
    protected variable headings_ {}
 
    #  Result from most recent query (list of rows).
    protected variable info_ {}
 
-   #  Flag: if true, run queries in foreground for better debugging.
-   itk_option define -debug debug Debug 0
-
-   # -- common variables (common to all instances of this class) --
+   #  Common variables: (shared by all instances)
+   #  -----------------
 
    #  Flag: set to 1 after we checked for a proxy server.
    protected common checked_proxies_ 0
