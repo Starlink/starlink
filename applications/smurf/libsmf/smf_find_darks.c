@@ -288,9 +288,20 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
     msgOutif( MSG__VERB, " ", "Single input file was ^TXT a dark",
               status);
   } else {
+    if (dkcount == 1) {
+      msgSetc( "DKTXT", "was a dark");
+    } else {
+      msgSetc( "DKTXT", "were darks");
+    }
+    if ((insize-dkcount) == 1) {
+      msgSetc( "NDTXT", "was not a dark");
+    } else {
+      msgSetc( "NDTXT", "were not darks");
+    }
+
     /* This might be a useful message */
-    msgOutif( MSG__NORM, " ", "Out of ^TOT input files, ^DK were darks and "
-              "^ND were non-darks", status );
+    msgOutif( MSG__NORM, " ", "Out of ^TOT input files, ^DK ^DKTXT and "
+              "^ND ^NDTXT", status );
   }
 
   /* Now report the details of the observations */
