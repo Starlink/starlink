@@ -3193,7 +3193,7 @@ int *status              /* Global status (given and returned) */
       if ( *status == SAI__OK) 
       {
          *status = SAI__ERROR;
-         ersRep ( 0, status, "Unable to create NDF extension for DREAM");
+         ErsRep ( 0, status, "Unable to create NDF extension for DREAM");
       }
    }
 
