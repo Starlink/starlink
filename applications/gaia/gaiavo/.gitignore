@@ -5,3 +5,11 @@ Makefile.in
 .deps
 Makefile
 gai1_t2cn.f
+config.log
+pkgIndex.tcl
+config.h
+listvot
+configure.in
+config.status
+libgaiavo4.2.2.so
+autom4te.cache
