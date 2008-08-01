@@ -627,9 +627,11 @@ void smurf_makemap( int *status ) {
   /* Get the maximum amount of memory that we can use */
   parGet0i( "MAXMEM", &maxmem_mb, status );
   if ( maxmem_mb <= 0 ) {
-    msgSeti("MAXMEM", maxmem_mb);
-    *status = SAI__ERROR;
-    errRep(" ", "Invalid MAXMEM, ^MAXMEM Mb (must be > 0 )", status);
+    if (*status == SAI__OK) {
+      msgSeti("MAXMEM", maxmem_mb);
+      *status = SAI__ERROR;
+      errRep(" ", "Invalid MAXMEM, ^MAXMEM Mb (must be > 0 )", status);
+    }
   } else {
     maxmem = (size_t) maxmem_mb * SMF__MB;
   }
