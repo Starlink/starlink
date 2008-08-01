@@ -41,6 +41,8 @@
 *        Initial version
 *     2008-07-22 (TIMJ):
 *        SHUTTER is now a float.
+*     2008-07-31 (TIMJ):
+*        but leave in support for string.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -84,6 +86,7 @@
 #include "star/grp.h"
 #include "msg_par.h"
 #include "star/one.h"
+#include "ast_err.h"
 
 /* SMURF routines */
 #include "smf.h"
@@ -93,6 +96,7 @@
 int smf_isdark( const smfData * indata, int * status ) {
   smfHead * hdr;
   double shutval;
+  char shutter[SZFITSCARD];
 
   if (*status != SAI__OK) return 0;
 
@@ -105,8 +109,20 @@ int smf_isdark( const smfData * indata, int * status ) {
 
   hdr = indata->hdr;
 
-  /* Currently SHUTTER used to be a string */
+  /* Shutter is no a double. 0 indicates closed */
   smf_fits_getD( indata->hdr, "SHUTTER", &shutval, status );
+
+  /* Old data was a string. Handle it until we no longer need to */
+  if (*status == AST__FTCNV) {
+    errAnnul( status );
+    smf_fits_getS( indata->hdr, "SHUTTER", shutter, sizeof(shutter), status);
+    if (strcmp(shutter, "CLOSED") == 0) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
 
   if (shutval < 0.00001 ) {
     return 1;
