@@ -28,7 +28,8 @@
  *        Mainly required to work around sc2store problems.
  *     data = smfData ** (Returned)
  *        Pointer to pointer smfData struct to be filled with file info and data
- *        Should be freed using smf_close_file.
+ *        Should be freed using smf_close_file. Will be NULL if this routine completes
+ *        with error.
  *     status = int* (Given and Returned)
  *        Pointer to global status.
 
@@ -176,6 +177,8 @@
  *        Calculate obs mode.
  *     2008-07-28 (TIMJ):
  *        Calculate and store steptime
+ *     2008-07-31 (TIMJ):
+ *        Free any resources if there is an error opening the file.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -907,6 +910,11 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         }
       }
     }
+  }
+
+  /* free resources on error */
+  if (*status != SAI__OK) {
+    smf_close_file( data, status );
   }
 
 }
