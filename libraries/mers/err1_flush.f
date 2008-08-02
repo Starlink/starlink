@@ -108,6 +108,8 @@
 *        Move to internal shared function that can be called from ERR_FBEL
 *        and ERR_FLUSH. This allows us to remove the need for the ERRBEL
 *        COMMON block entry.
+*     31-JUL-2008 (TIMJ):
+*        Use common block accessor functions rather than COMMON itself
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -124,10 +126,10 @@
       INCLUDE 'EMS_ERR'                 ! EMS_ error codes
       INCLUDE 'ERR_ERR'                 ! ERR_ error codes
       INCLUDE 'ERR_PAR'                 ! ERR_ public constants
-      INCLUDE 'ERR_SYS'                 ! ERR_ private constants
 
-*  Global Variables:
-      INCLUDE 'ERR_CMN'
+*  External References:
+      LOGICAL ERR1_GTRVL
+      EXTERNAL ERR1_GTRVL
 
 *  Arguments Given & Returned:
       LOGICAL ERRBEL
@@ -234,9 +236,9 @@
 *  has occurred, annul the current error context. Ensure 'reveal' is not
 *  operative in EMS to avoid duplicate message output.
       IF ( PSTAT .EQ. SAI__OK ) THEN
-         IF ( ERRRVL ) CALL EMS_TUNE( 'REVEAL', 0, PSTAT )
+         IF ( ERR1_GTRVL() ) CALL EMS_TUNE( 'REVEAL', 0, PSTAT )
          CALL EMS_ANNUL( STATUS )
-         IF ( ERRRVL ) CALL EMS_TUNE( 'REVEAL', 1, PSTAT )
+         IF ( ERR1_GTRVL() ) CALL EMS_TUNE( 'REVEAL', 1, PSTAT )
 
       ELSE
 

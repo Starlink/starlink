@@ -82,6 +82,7 @@
 *        normal messages, they may appear out of order.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
@@ -103,6 +104,7 @@
 
 *  Authors:
 *     AJC: A.J. Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -114,6 +116,9 @@
 *        Improve error messages
 *     20-FEB-2001 (AJC):
 *        EMS1_TUNE now EMS_TUNE
+*     31-JUL-2008 (TIMJ):
+*        Use accessor functions to update global state.
+*        No longer call EMS_TUNE for STREAM or SZOUT.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -132,9 +137,6 @@
 *  Local Constants:
       INTEGER MAX_PARS           ! Number of possible tuning parameters
       PARAMETER ( MAX_PARS = 3 )
-
-*  Global Variables:
-      INCLUDE 'ERR_CMN'          ! MSG_ output filter level
 
 *  Arguments Given:
       CHARACTER*(*) PARAM
@@ -155,6 +157,10 @@
       LOGICAL ENV                  ! Whether PARAM is 'ENVIRONMENT'
       LOGICAL SET                  ! Whether value is to be set
       LOGICAL ENVVAL               ! Whether value came from env variable
+
+      LOGICAL ERRRVL               ! New REVEAL mode
+      LOGICAL ERRSTM               ! New STREAM mode
+      INTEGER ERRWSZ               ! New SZOUT
 
 *  Local Data:
       DATA PARNAMES/ 'SZOUT', 'STREAM', 'REVEAL' /
@@ -220,21 +226,22 @@
             IF ( UPARAM .EQ. 'SZOUT' ) THEN
                IF ( UVALUE .EQ. 0 ) THEN
                   ERRWSZ = ERR__SZMSG
-                  CALL EMS_TUNE( 'SZOUT', ERRWSZ, ISTAT )
+                  CALL ERR1_PTWSZ( ERRWSZ )
                ELSE IF ( UVALUE .GT. 6 ) THEN
                   ERRWSZ = MIN( UVALUE, ERR__SZMSG )
-                  CALL EMS_TUNE( 'SZOUT', ERRWSZ, ISTAT )
+                  CALL ERR1_PTWSZ( ERRWSZ )
                ELSE
                   ISTAT = ERR__BTUNE
                END IF
 
+
             ELSE IF ( UPARAM .EQ. 'STREAM' ) THEN
                IF ( UVALUE .EQ. 0 ) THEN
                   ERRSTM = .FALSE.
-                  CALL EMS_TUNE( 'STREAM', UVALUE, ISTAT )
+                  CALL ERR1_PTSTM( ERRSTM )
                ELSE IF ( UVALUE .EQ. 1 ) THEN
                   ERRSTM = .TRUE.
-                  CALL EMS_TUNE( 'STREAM', UVALUE, ISTAT )
+                  CALL ERR1_PTSTM( ERRSTM )
                ELSE
                   ISTAT = ERR__BTUNE
                END IF
@@ -243,9 +250,11 @@
                IF ( UVALUE .EQ. 0 ) THEN
                   ERRRVL = .FALSE.
                   CALL EMS_TUNE( 'REVEAL', UVALUE, ISTAT )
+                  CALL ERR1_PTRVL( ERRRVL )
                ELSE IF ( UVALUE .EQ. 1 ) THEN
                   ERRRVL = .TRUE.
                   CALL EMS_TUNE( 'REVEAL', UVALUE, ISTAT )
+                  CALL ERR1_PTRVL( ERRRVL )
                ELSE
                   ISTAT = ERR__BTUNE
                END IF

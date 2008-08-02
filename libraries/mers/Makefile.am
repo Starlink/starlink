@@ -55,9 +55,9 @@ liberr_adam_la_SOURCES = \
 	$(PRIVATE_INCLUDES)
 liberr_adam_la_LIBADD = liberr.la
 
-PRIVATE_INCLUDES = ERR_CMN ERR_SYS MSG_CMN MSG_SYS mers_f77.h mers1.h
+PRIVATE_INCLUDES = ERR_SYS MSG_CMN MSG_SYS mers_f77.h mers1.h
 
-F_ROUTINES = err1_print.f err1_flush.f \
+F_ROUTINES = err1_flush.f \
              err_fioer.f err_flbel.f err_flush.f \
              err_load.f err_out.f err_rep.f \
              err_tune.f \
@@ -92,11 +92,12 @@ F_ROUTINES_UT = msg1_gesc.f msg1_gnam.f msg1_putc.f msg1_rform.f
 
 C_ROUTINES_UT = msg1Ktok.c
 
-F_BLOCK_DATA_FILES = msg1_blk.f err1_blk.f
+F_BLOCK_DATA_FILES = msg1_blk.f
 
 C_INTERFACE_ROUTINES = err.c msgSetc.c msgSetd.c msgSetr.c msgSeti.c \
 msgSetl.c errAnnul.c errBegin.c errEnd.c errSyser.c errMark.c errRlse.c \
-errStat.c errLevel.c errFacer.c msgRenew.c err1Bell.c msgBell.c
+errStat.c errLevel.c errFacer.c msgRenew.c err1Bell.c msgBell.c \
+err1Print.c err1Blk.c
 
 C_INTERFACE_ADAM = err_adam.c
 

@@ -132,12 +132,13 @@
 
 *  Call ERR_REP and ERR_FLUSH.
       CALL ERR_BEGIN( STATUS )
+      CALL ERR_TUNE( 'SZOUT', 40, STATUS )
       STATUS = SAI__ERROR
       CALL ERR_MARK
       CALL ERR_FACER( 'ERR', STATUS )
       CALL ERR_REP( ' ', 'ERR is installed and working. - ^ERR '/
      :/ 'and this is a very long message that should be wrapped '/
-     :/ 'hopefully once',
+     :/ 'hopefully to 4 lines',
      :     STATUS )
       CALL ERR_REP( ' ', 'Second line of error report',
      :     STATUS )
@@ -145,6 +146,7 @@
      :     STATUS )
       CALL ERR_FLBEL( STATUS )
       CALL ERR_RLSE
+      CALL ERR_TUNE( 'SZOUT', 79, STATUS )
 
       STATUS = SAI__ERROR
       CALL ERR_REP( ' ','Flushed error', STATUS)

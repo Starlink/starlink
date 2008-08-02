@@ -39,8 +39,25 @@
 *-
 */
 
+/* This is the type of struct used for ERR globals */
+typedef struct {
+  int errwsz;
+  int errstm;
+  int errrvl;
+} ErrTune;
+
+
 void err1Bell( int * status );
 void err1Prerr( const char * text, int * status );
+void err1Print( const char * text, int * errbel, int * status );
+
+void err1Gtglbl( int *errwsz, int *errstm, int *errrvl );
+void err1Ptwsz( int errwsz );
+void err1Ptstm( int errstm );
+void err1Ptrvl( int errrvl );
+void err1RestoreEms( ErrTune * ems, int * status );
+void err1TuneEms( ErrTune * ems, int * status );
+
 
 void msg1Ktok ( void );
 void msg1Prtln( const char * text, int * status );

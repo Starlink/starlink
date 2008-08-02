@@ -44,7 +44,9 @@
 *     -  Use EMS1_ESTOR to store the message in the error table.
 
 *  Copyright:
-*     Copyright (C) 1983, 1989, 1990, 1991, 1994 Science & Engineering Research Council.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 1983, 1989-1991, 1994 Science & Engineering
+*     Research Council.
 *     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
@@ -70,6 +72,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     PCTR: P.C.T. Rees (STARLINK)
 *     AJC: A.J. Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -96,6 +99,8 @@
 *        Add CLEAN argument to call MSG1_FORM
 *     21-FEB-2001 (AJC):
 *        Use EMS_REP not EMS1_ESTOR
+*     31-JUL-2008 (TIMJ):
+*        Use common accessor rather than COMMON directly.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -112,8 +117,9 @@
       INCLUDE 'ERR_PAR'                 ! Public ERR_ constants
       INCLUDE 'EMS_ERR'                 ! EMS_ error codes
 
-*  Global Variables:
-      INCLUDE 'ERR_CMN'
+*  External References:
+      LOGICAL ERR1_GTSTM
+      EXTERNAL ERR1_GTSTM
 
 *  Arguments Given:
       CHARACTER * ( * ) PARAM
@@ -169,7 +175,7 @@
 
 *  Now form the given error message.
 *  Status is not altered by this routine.
-      CALL MSG1_FORM( PARAM, TEXT, .NOT.ERRSTM, TSTR, TLEN, ISTAT )
+      CALL MSG1_FORM( PARAM, TEXT, .NOT.ERR1_GTSTM(), TSTR, TLEN, ISTAT)
 
 *  Any double ^ will now be single - we must protect it from EMS_REP
       LPOS = 1
