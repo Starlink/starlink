@@ -74,7 +74,8 @@ PKG_HEADERS	= @PKG_HEADERS@
 PKG_LIB_FILE	= @PKG_LIB_FILE@
 PKG_STUB_LIB_FILE = @PKG_STUB_LIB_FILE@
 
-PKG_BIN_FILE	= vot2tab$(EXEEXT) tab2vot$(EXEEXT) listvot$(EXEEXT)
+PKG_BIN_FILE	= vot2tab$(EXEEXT) tab2vot$(EXEEXT) listvot$(EXEEXT) \
+	          $(PACKAGE_NAME)_tcl$(EXEEXT)
 
 bin_BINARIES	= $(PKG_BIN_FILE) $(PROGS)
 lib_BINARIES	= $(PKG_LIB_FILE)
@@ -316,6 +317,11 @@ listvot$(EXEEXT): listvot.o $(PKG_LIB_FILE)
 	$(LTLINK) $(LDFLAGS) tab2vot.o $(PKG_LIB_FILE) \
 	      $(LD_SEARCH_FLAGS) $(LD_LIBS) -lxerces-c \
 	      -o listvot$(EXEEXT)
+
+$(PACKAGE_NAME)_tcl$(EXEEXT): tclAppInit.o
+	$(LTLINK) $(LDFLAGS) tclAppInit.o \
+	      $(LD_SEARCH_FLAGS) $(LD_LIBS) $(TCL_LIB_SPEC) \
+	      -o $(PACKAGE_NAME)_tcl$(EXEEXT)
 
 #========================================================================
 # We need to enumerate the list of .c to .o lines here.
