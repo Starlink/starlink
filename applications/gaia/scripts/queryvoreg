@@ -1,0 +1,125 @@
+#!/bin/sh
+# The next line is executed by /bin/sh, but not Tcl \
+exec $GAIA_DIR/gaiavo_tcl $0 ${1+"$@"}
+#+
+#   Name:
+#      queryvoreg
+
+#   Purpose:
+#      Query a VO registry
+
+#   Usage:
+#      queryvoreg registry service predicate endmethod outfile
+
+#   Description:
+#      Queries a VO registry for all known services with of type
+#      "service" with additional constraints "predicate". The query is
+#      done to the given endmethod and the results of the query
+#      are written to a VOTable "outfile". An example is:
+#
+#        queryvoreq "http://nvo.stsci.edu/vor10/NVORegInt.asmx?WSDL" \
+#                   "SimpleImageAccess" "" "VOTCapabilityPredicate" \
+#                   query.vot
+#
+#      which will query for all known SIAP servers known to the NVO
+#      registry.
+
+#   Authors:
+#      Peter W. Draper (PWD):
+
+#  Copyright:
+#     Copyright (C) 2008 Science and Technology Facilties Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of the
+#     License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+#     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#   History:
+#      01-AUG-2008 (PWD):
+#         Original version.
+#-
+#.
+
+#  Check the command-line arguments.
+if { $argc == 5 } {
+   set registry [lindex $argv 0]
+   set service [lindex $argv 1]
+   set predicate [lindex $argv 2]
+   set endmethod [lindex $argv 3]
+   set outfile [lindex $argv 4]
+} else {
+   puts stderr {Usage: queryvoreg registry service predicate endmethod outfile}
+   exit
+}
+
+#  Establish the standard proxy define using http_proxy.
+#cat::ProxyDialog::check_proxies $::env(HOME)/.skycat/proxies
+set proxy {}
+set port {}
+if { [info exists ::env(http_proxy)] } {
+   if { [scan $::env(http_proxy) {http://%[^:/]:%d} proxy port] != 2 } {
+      scan $::env(http_proxy) {http://%[^:/]} proxy
+   }
+}
+::http::config -proxyhost $proxy
+::http::config -proxyport $port
+
+#  Access the service and get its WSDL description.
+::WS::Client::GetAndParseWsdl $registry {} VORegistry
+
+#  Set query dictionary.
+set inputs [list "predicate" $predicate "capability" "$service"]
+
+#  Do the query.
+set results [::WS::Client::DoRawCall VORegistry $endmethod $inputs]
+
+#  Parse results and access the SOAP message body.
+::dom parse -keepEmpties $results doc
+$doc documentElement top
+set xns {
+   ENV "http://schemas.xmlsoap.org/soap/envelope/"
+   xsi "http://www.w3.org/2001/XMLSchema-instance"
+   xs "http://www.w3.org/2001/XMLSchema"
+}
+$doc selectNodesNamespaces $xns
+set body [$top selectNodes ENV:Body]
+
+#  Locate RESOURCE and save in a skeletal VOTable as a string.
+set resource [$body getElementsByTagName RESOURCE]
+if { $resource != {} } {
+
+   if { [catch "::open $outfile w" fid] } {
+      puts stderr "Failed to open output file: $outfile ($fid)"
+      exit 1
+   }
+
+   puts $fid {<VOTABLE version="1.1"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.ivoa.net/xml/VOTable/v1.1 http://www.ivoa.net/xml/VOTable/v1.1"
+xmlns="http://www.ivoa.net/xml/VOTable/v1.1">
+<!--
+ !  VOTable written by GAIA
+ !-->
+   }
+   puts $fid [$resource asXML]
+   puts $fid {</VOTABLE>}
+   ::close $fid
+   puts stderr "Results written to file: $outfile"
+   exit 0
+}
+
+puts stderr "No services like: $service && $predicate"
+exit 1
