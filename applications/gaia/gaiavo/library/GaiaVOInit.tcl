@@ -2,7 +2,7 @@
 
 #  Pick up GAIAVO scripts before other packages that we depend on,
 #  or not, as required.
-if {![lcontain $auto_path $gaiavo_library]} {
+if { [lsearch -exact $auto_path $gaiavo_library] == -1 } {
     lappend auto_path $gaiavo_library
 }
 
