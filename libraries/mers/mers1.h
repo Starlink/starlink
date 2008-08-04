@@ -48,10 +48,12 @@ typedef struct {
 
 
 void err1Bell( int * status );
+void err1Flush ( int * errbel, int * status );
 void err1Prerr( const char * text, int * status );
 void err1Print( const char * text, int * errbel, int * status );
 
 void err1Gtglbl( int *errwsz, int *errstm, int *errrvl );
+int err1Gtrvl ( void );
 void err1Ptwsz( int errwsz );
 void err1Ptstm( int errstm );
 void err1Ptrvl( int errrvl );

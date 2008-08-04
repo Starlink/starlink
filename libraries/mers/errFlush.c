@@ -1,4 +1,4 @@
-      SUBROUTINE ERR_FLUSH( STATUS )
+/*
 *+
 *  Name:
 *     ERR_FLUSH
@@ -7,10 +7,10 @@
 *     Flush the current error context.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Invocation:
-*     CALL ERR_FLUSH( STATUS )
+*     errFlush(int * status);
 
 *  Description:
 *     Ensure that all pending error messages in the current error 
@@ -21,13 +21,13 @@
 *     set to ERR__OPTER.
 
 *  Arguments:
-*     STATUS = INTEGER (Returned)
+*     status = int * (Returned)
 *        The global status: it is set to SAI__OK on return if the 
 *        error message output is successful; if not, it is set to 
 *        ERR__OPTER.
 
 *  Algorithm:
-*     -  Call ERR1_FLUSH with bell disabled.
+*     -  Call err1Flush with bell disabled.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -98,33 +98,22 @@
 *        Check for NOMSG at base level is not an error
 *     28-JUL-2008 (TIMJ):
 *        Call ERR1_FLUSH with NOBEL.
+*     03-AUG-2008 (TIMJ):
+*        Rewrite in C
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
+#include "mers1.h"
+#include "merswrap.h"
 
-*  Global Constants:
+void errFlush ( int * status ) {
+  int errbel = 0;
 
-*  Global Variables:
-
-*  Status:
-      INTEGER STATUS
-
-*  Local Constants:
-
-*  Local Variables:
-      LOGICAL ERRBEL
-
-*.
-
-      ERRBEL = .FALSE.
-
-*  Call internal flush routine with BEL disabled.
-      CALL ERR1_FLUSH( ERRBEL, STATUS )
-
-      END
+  /*  Call internal flush routine with BEL disabled. */
+  err1Flush( &errbel, status );
+}

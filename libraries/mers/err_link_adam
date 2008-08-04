@@ -57,7 +57,7 @@
 #-
 
       echo -lerr_adam `psx_link_adam` `chr_link_adam` `cnf_link_adam` \
-           `ems_link_adam` \
+           `one_link_adam` `ems_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

@@ -57,8 +57,7 @@ liberr_adam_la_LIBADD = liberr.la
 
 PRIVATE_INCLUDES = ERR_SYS MSG_CMN MSG_SYS mers_f77.h mers1.h
 
-F_ROUTINES = err1_flush.f \
-             err_fioer.f err_flbel.f err_flush.f \
+F_ROUTINES = err_fioer.f \
              err_load.f err_out.f err_rep.f \
              err_tune.f \
              msg_blank.f msg_fmtc.f msg_fmtd.f msg_fmti.f msg_fmtl.f \
@@ -97,7 +96,7 @@ F_BLOCK_DATA_FILES = msg1_blk.f
 C_INTERFACE_ROUTINES = err.c msgSetc.c msgSetd.c msgSetr.c msgSeti.c \
 msgSetl.c errAnnul.c errBegin.c errEnd.c errSyser.c errMark.c errRlse.c \
 errStat.c errLevel.c errFacer.c msgRenew.c err1Bell.c msgBell.c \
-err1Print.c err1Blk.c
+err1Print.c err1Blk.c err1Flush.c errFlush.c errFlbel.c
 
 C_INTERFACE_ADAM = err_adam.c
 
@@ -105,7 +104,8 @@ C_INTERFACE_STAND =
 
 F_INTERFACE_ROUTINES = msg_setc.c msg_setd.c msg_setr.c msg_seti.c \
 msg_setl.c err_annul.c err_begin.c err_end.c err_syser.c err_mark.c \
-err_rlse.c err_stat.c err_level.c err_facer.c msg_renew.c msg_bell.c
+err_rlse.c err_stat.c err_level.c err_facer.c msg_renew.c msg_bell.c \
+err_flush.c err_flbel.c
 
 #  The installation test source
 TEST_SOURCE = err_test.f err_test.c err_test.ifl
@@ -119,7 +119,7 @@ TESTS = err_ftest
 
 check_PROGRAMS = err_ftest
 err_ftest_SOURCES = err_ftest.f
-err_ftest_LDADD = liberr_standalone.la `psx_link` `chr_link` `cnf_link`
+err_ftest_LDADD = liberr_standalone.la `psx_link` `chr_link` `cnf_link` `one_link`
 
 # Monoliths with C main do compile but we do not want a build dependency
 # on PCS

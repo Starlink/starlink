@@ -74,7 +74,6 @@ void ems1Mrerr( const char *text, int *status );
 void ems1Mutc( const char *cvalue, char *string, int iposn, int *status );
 void ems1Prerr( const char *text, int *status );
 void ems1Putc( const char *cvalue, const int maxlen, char *string, int *iposn, int *status );
-void ems1Rform( const char *text, const int maxlen, int *iposn, char *string, int *strlength  );
 void ems1Serr( char *errstr, int errlen, int *errnum_p );
 void ems1Stok( const char *token, const char *string );
 void ems1Tblk( void );

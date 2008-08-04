@@ -1,35 +1,34 @@
-      SUBROUTINE ERR_FLBEL( STATUS )
+/*
 *+
 *  Name:
-*     ERR_FLBEL
+*     errFlbel
 
 *  Purpose:
 *     Deliver an ASCII BEL and flush the current error context.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Invocation:
-*     CALL ERR_FLBEL( STATUS )
+*     errFlbel( int * status );
 
 *  Description:
 *     An ASCII BEL character is delivered to the user and then all
 *     pending error messages in the current error context are delivered
-*     to the user using a call to ERR_FLUSH. On successful completion, 
+*     to the user using a call to errFlush. On successful completion, 
 *     the error context is annulled and the status argument reset to 
 *     SAI__OK; if an error occurs during output of the error messages, the 
 *     error context is not annulled and the status argument is returned 
 *     set to ERR__OPTER.
 
 *  Arguments:
-*     STATUS = INTEGER (Returned)
+*     status = int * (Returned)
 *        The global status: it is set to SAI__OK on return if the 
 *        error message output is successful; if not, it is set to 
 *        ERR__OPTER.
 
 *  Algorithm:
-*     -  Call ERR1_PRERR to deliver the BEL character.
-*     -  Call ERR_FLUSH to flush the current error context.
+*     -  Call err1Flush with BEL set to true.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -62,32 +61,23 @@
 *        Original version.
 *     26-JUL-2008 (TIMJ):
 *        Call ERR1_FLUSH not ERR_FLUSH. No longer need common block.
+*     3-AUG-2008 (TIMJ):
+*        Rewrite in C
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
+#include "mers1.h"
+#include "merswrap.h"
 
-*  Global Constants:
+void errFlbel ( int * status ) {
+  int errbel = 1;
 
-*  Global Variables:
 
-*  Status:
-      INTEGER STATUS
-
-*  Local Variables:
-      LOGICAL ERRBEL
-
-*.
-
-*  Set the bell flag.
-      ERRBEL = .TRUE.
-
-*  Flush the current error context.
-      CALL ERR1_FLUSH( ERRBEL, STATUS )
-
-      END
+  /*  Flush the current error context. */
+  err1Flush( &errbel, status );
+}

@@ -170,6 +170,12 @@ void ems1_get_facility_error( unsigned int errcode,
                               char **error_ident,
                               char **error_text );
 
+/* Required by MERS. Not to be used by anyone else */
+
+void ems1Rform( const char *text, const int maxlen, int *iposn, char *string, int *strlength  );
+
+
+
 /* Fortran Wrappers Prototypes: */
 #include "f77.h"
 F77_SUBROUTINE(ems_annul) ( INTEGER(status ) );

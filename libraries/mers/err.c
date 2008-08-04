@@ -61,28 +61,6 @@ DECLARE_INTEGER(fiostat);
    return;
 }
 
-void errFlbel( int *status ) {
-
-DECLARE_INTEGER(fstatus);
-
-   F77_CALL(err_flbel)( INTEGER_ARG(&fstatus) );
-
-   F77_IMPORT_INTEGER(fstatus,*status);
-
-   return;
-}
-
-void errFlush( int *status ) {
-
-DECLARE_INTEGER(fstatus);
-
-   F77_CALL(err_flush)( INTEGER_ARG(&fstatus) );
-
-   F77_IMPORT_INTEGER(fstatus,*status);
-
-   return;
-}
-
 void errLoad( char *param,
               int param_length,
               int *parlen,

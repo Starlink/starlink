@@ -54,7 +54,7 @@
 
 #-
 
-      echo -lerr_standalone `psx_link` `cnf_link` `chr_link` `ems_link` \
+      echo -lerr_standalone `one_link` `psx_link` `cnf_link` `chr_link` `ems_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

@@ -75,6 +75,9 @@ void err1Gtglbl( int * errwsz, int * errstm, int * errrvl ) {
   return;
 }
 
+int err1Gtrvl ( void ) {
+  return this_err_glbl.errrvl;
+}
 
 void err1Ptwsz ( int errwsz ) {
   this_err_glbl.errwsz = errwsz;
