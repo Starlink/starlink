@@ -762,9 +762,6 @@ int gaiaInitMNDF( const char *name, int deepsearch, void **handle,
     int valid;
     int width;
 
-    /*  Mark the error stack */
-    emsMark();
-
     /*  Check that we're not going to have problems with the name
         length */
     if ( strlen( name ) > MAXNDFNAME ) {
@@ -773,6 +770,9 @@ int gaiaInitMNDF( const char *name, int deepsearch, void **handle,
                  "(limit is %d characters)", MAXNDFNAME );
         return 0;
     }
+
+    /*  Mark the error stack */
+    emsMark();
 
     /*  Attempt to open the given name as an NDF */
     if ( gaiaAccessNDF( name, &type, &width, &height, &header, &hlen,
@@ -1078,8 +1078,8 @@ NDFinfo *traceMNDFs( NDFinfo **headptr, HDSLoc *baseloc, int baseid,
 
     if ( status != SAI__OK ) {
         emsAnnul( &status );
-        emsRlse();
     }
+    emsRlse();
     return state;
 }
 
@@ -1878,7 +1878,7 @@ int gaiaNDFCanWrite( int ndfid )
     emsMark();
     ndfIsacc( ndfid, "WRITE", &writable, &status );
     if ( status != SAI__OK ) {
-        emsRlse();
+        emsAnnul( &status );
     }
     emsRlse();
     return writable;
@@ -1899,7 +1899,7 @@ int gaiaNDFExtensionExists( int ndfid, const char *name )
     emsMark();
     ndfXstat( ndfid, name, &exists, &status );
     if ( status != SAI__OK ) {
-        emsRlse();
+        emsAnnul( &status );
     }
     emsRlse();
     return exists;
@@ -2043,10 +2043,6 @@ int gaiaNDFFindChild( const char *name, int *ndfid, char **error_mess )
     int ncomp = 0;
     int status = SAI__OK;
 
-    /*  Mark the error stack */
-    emsMark();
-    *error_mess = NULL;
-
     /*  Check that we're not going to have problems with the name
         length */
     if ( strlen( name ) > MAXNDFNAME ) {
@@ -2055,6 +2051,10 @@ int gaiaNDFFindChild( const char *name, int *ndfid, char **error_mess )
                  "(limit is %d characters)", MAXNDFNAME );
         return 0;
     }
+
+    /*  Mark the error stack */
+    emsMark();
+    *error_mess = NULL;
 
     /*  Need to parse down to a filename and an HDS path. */
     filename = strdup( name );
