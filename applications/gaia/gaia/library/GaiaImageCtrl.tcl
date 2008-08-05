@@ -455,20 +455,27 @@ itcl::class gaia::GaiaImageCtrl {
          #  image and writing that out. The copy requires that the main window
          #  is unobscured (uses an X11 snap), so attempt to raise it and make
          #  sure everything is up to date.
-         set image [::image create photo]
-         ::raise $w_
-         ::update
-         blt::winop snap $canvas_ $image
-
-         #  Load all the required tkimg packages.
-         if { $format != "gif" } {
-            package require img::jpeg
-            package require img::png
-            package require img::tiff
-         }
-
-         #  This can fail if the window is still obscured. Trap and complain.
          busy {
+            set image [::image create photo]
+            
+            #  Attempt to unobscure.
+            ::raise $w_
+            ::update
+            ::after 500
+            ::update
+
+            #  And capture.
+            blt::winop snap $canvas_ $image
+
+            #  Load all the required tkimg packages.
+            if { $format != "gif" } {
+               package require img::jpeg
+               package require img::png
+               package require img::tiff
+            }
+
+            #  Write to disk file. This can fail if the window is still
+            #  obscured. So trap and complain. 
             if { [catch {$image write $filename -format $format} msg ] } {
                if { $msg == "too many colors" } {
                   info_dialog "The image display window must not be obscured,

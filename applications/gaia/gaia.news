@@ -2,8 +2,8 @@
     Version 4.2-2
     =============
 
-    A new capture to graphics format option has been added. This allows 
-    the direct saving of the main window display to a graphics file. 
+    A new export to graphics format option has been added. This allows 
+    the direct capture of the main window display to a graphics file. 
     Supported formats are GIF, JPEG, PNG and TIFF.
 
     The pick object toolbox will now report the FWHM in arcseconds as well
