@@ -71,7 +71,7 @@
 *     2008 February 4 (MJC):
 *        Use indexed keyword names more in keeping with the FITS 
 *        standard.  Fix bug from a misunderstanding of KeyMap returned
-*        by NDG_GTPRV.  Look for OBSIDSS is ANCESTORS structure, not
+*        by NDG_GTPRV.  Look for OBSIDSS in ANCESTORS structure, not
 *        ANCESTOR as in the specification.
 *     2008 February 5 (MJC):
 *        Modify OBSCNT to reflect number of OBSn headers written.
@@ -80,12 +80,14 @@
 *        the number of parents.
 *     2008 May 19 (MJC):
 *        Write FILEID keyword.
-*     2008 Jun 12 (TIMJ):
+*     2008 June 12 (TIMJ):
 *        Fix some valgrind warnings. FNAME used incorrectly for PATH.
+*     2008 August 6 (MJC):
+*        Only record unique OBSIDSS values.
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -116,8 +118,8 @@
       CHARACTER*( DAT__SZLOC ) ANCLOC ! Locator to an ancestor
       CHARACTER*80 CARD          ! FITS header card
       INTEGER CPOS               ! Current string position
-      CHARACTER*256 FNAME        ! Output file name
       INTEGER FSTAT              ! FITSIO status
+      LOGICAL HASID              ! Is the OBSIDSS key already present?
       LOGICAL IDPRS              ! Index to root present?
       INTEGER ID                 ! Index to a root ancestor
       INTEGER IDP                ! Index to current parent
@@ -125,6 +127,7 @@
       CHARACTER*( AST__SZCHR ) KEY ! Current key in KeyMap of root anc.
       INTEGER KEYMAP             ! AST KeyMap of root ancestors
       CHARACTER*8 KEYWRD         ! Header keyword
+      INTEGER KMIDSS             ! AST KeyMap of OBSIDSS
       CHARACTER*( DAT__SZLOC ) MORLOC ! Locator to MORE component
       CHARACTER*68 NAME          ! Path to ancestor
       INTEGER NCNAME             ! Character length of the name
@@ -135,6 +138,7 @@
       CHARACTER*30 OBIDSS        ! MORE.OBSIDSS value
       LOGICAL OBIPRS             ! OBSIDSS present?
       INTEGER PIPNTR             ! Pointer to indices of the parents
+      CHARACTER*256 FNAME        ! Output file name
       LOGICAL PRVPRS             ! PROVENANCE present?
       CHARACTER*( DAT__SZLOC ) PARLOC ! Locator to PARENTS component
       CHARACTER*256 PATH         ! Path to ancestor
@@ -248,6 +252,11 @@
      :                'Number of root-ancestor headers', FSTAT )
          NOBSID = 0
 
+*  Create a KeyMap to record the OBSIDSS values as keys.  The default
+*  is 300 elements, which ought to be plentyby a large factor, hence
+*  to resizing.
+         KMIDSS = AST_KEYMAP( ' ', STATUS )
+
          DO IREC = 1, NROOT
             KEY = AST_MAPKEY( KEYMAP, IREC, STATUS )
             IDPRS = AST_MAPGET0I( KEYMAP, KEY, ID, STATUS )
@@ -267,24 +276,31 @@
                IF ( THERE ) THEN
                   CALL CMP_GET0C( MORLOC, 'OBSIDSS', OBIDSS, STATUS )
                   IF ( STATUS .NE. SAI__OK ) GOTO 999
-                  NOBSID = NOBSID + 1
-                  
+
+*  Test whether or not this OBSIDSS is uniqwe within this NDF.
+                  HASID = AST_MAPHASKEY( KMIDSS, OBIDSS, STATUS )
+                  IF ( .NOT. HASID ) THEN
+                     NOBSID = NOBSID + 1
+                     CALL AST_MAPPUT0I( KMIDSS, OBIDSS, NOBSID, ' ',
+     :                                  STATUS )
+
 *  Form keyword without leading zeroes (the FITS Standard says it shall
 *  not done this way).
-                  KEYWRD = 'OBS'
-                  CPOS = 3
-                  CALL CHR_PUTI( NOBSID, KEYWRD, CPOS )
+                     KEYWRD = 'OBS'
+                     CPOS = 3
+                     CALL CHR_PUTI( NOBSID, KEYWRD, CPOS )
 
 *  Form comment.
-                  ANCCOM = 'Name of the '
-                  CPOS = 12
-                  CALL CHR_PUTI( NOBSID, ANCCOM, CPOS )
-                  CALL CHR_APPND( CHR_NTH( NOBSID ), ANCCOM, CPOS )
-                  CALL CHR_APPND( ' root ancestor', ANCCOM, CPOS )
+                     ANCCOM = 'Name of the '
+                     CPOS = 12
+                     CALL CHR_PUTI( NOBSID, ANCCOM, CPOS )
+                     CALL CHR_APPND( CHR_NTH( NOBSID ), ANCCOM, CPOS )
+                     CALL CHR_APPND( ' root ancestor', ANCCOM, CPOS )
 
 *  Write the OBSnnnnn header.
-                  CALL FTPKYS( FUNIT, KEYWRD, OBIDSS, ANCCOM( :CPOS ), 
-     :                         FSTAT )
+                     CALL FTPKYS( FUNIT, KEYWRD, OBIDSS,
+     :                            ANCCOM( :CPOS ), FSTAT )
+                  END IF
                   OBIPRS = .TRUE.
                END IF
 
@@ -296,7 +312,7 @@
             IF ( .NOT. OBIPRS ) THEN
                CALL MSG_SETI( 'I', IREC )
                CALL MSG_OUTIF( MSG__NORM, 'COF_PCADC_NOOBSIDSS',
-     :                         'Root ancester ^I has no OBSIDSS.',
+     :                         'Root ancestor ^I has no OBSIDSS.',
      :                         STATUS )
             END IF
 
@@ -304,6 +320,7 @@
             CALL DAT_ANNUL( ANCLOC, STATUS )
 
          END DO
+         CALL AST_ANNUL( KMIDSS, STATUS )
 
 *  Correct the OBSCNT header value to allow for missing OBSIDSS values.
          IF ( NOBSID .LT. NROOT ) THEN
