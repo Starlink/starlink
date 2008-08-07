@@ -633,35 +633,34 @@ void smurf_makemap( int *status ) {
   /* Get METHOD - set rebin/iterate flags */
   parChoic( "METHOD", "REBIN", "REBIN, ITERATE.", 1,
             method, LEN__METHOD, status);
-  if( *status == SAI__OK ) {
-    if( strncmp( method, "REBIN", 5 ) == 0 ) {
-      rebin = 1;
-      iterate = 0;
-    } else if ( strncmp( method, "ITERATE", 7 ) == 0 ) {
-      rebin = 0;
-      iterate = 1;
-    }
 
-    /* Get remaining parameters so errors are caught early */
-    if( rebin ) {
-      /* Obtain desired pixel-spreading scheme */
-      parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
-                "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
-                1, pabuf, 10, status );
-      
-      smf_get_spread( pabuf, &spread, &nparam, status );
-
+  if( strncmp( method, "REBIN", 5 ) == 0 ) {
+    rebin = 1;
+    iterate = 0;
+  } else if ( strncmp( method, "ITERATE", 7 ) == 0 ) {
+    rebin = 0;
+    iterate = 1;
+  }
+  
+  /* Get remaining parameters so errors are caught early */
+  if( rebin ) {
+    /* Obtain desired pixel-spreading scheme */
+    parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
+              "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
+              1, pabuf, 10, status );
+    
+    smf_get_spread( pabuf, &spread, &nparam, status );
+    
     /* Get an additional parameter vector if required. */
-      if( (*status==SAI__OK) && (nparam>0) ) {
-        parExacd( "PARAMS", nparam, params, status );
-      }
-      
-    } else if ( iterate ) {
-      /* Read a group of configuration settings into keymap */
-      kpg1Gtgrp( "CONFIG", &confgrp, &ksize, status );
-      kpg1Kymap( confgrp, &keymap, status );
-      if( confgrp ) grpDelet( &confgrp, status );      
+    if( nparam>0 ) {
+      parExacd( "PARAMS", nparam, params, status );
     }
+    
+  } else if ( iterate ) {
+    /* Read a group of configuration settings into keymap */
+    kpg1Gtgrp( "CONFIG", &confgrp, &ksize, status );
+    kpg1Kymap( confgrp, &keymap, status );
+    if( confgrp ) grpDelet( &confgrp, status );      
   }
 
   /* Calculate the map bounds */
