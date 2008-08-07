@@ -641,8 +641,8 @@ itcl::class gaia::Gaia {
          -command [code $this print_ramp_]
 
       #  Capture main window to a graphics format. Named export by popular demand.
-      insert_menuitem $m $index command "Export..." \
-         {Export main window to a graphic format, GIF, JPEG, PNG, TIFF} \
+      insert_menuitem $m $index command "Snapshot..." \
+         {Capture main window to a graphic format, GIF, JPEG, PNG, TIFF} \
          -command [code $image_ capture]
 
       #  Shortcuts for closing window.
