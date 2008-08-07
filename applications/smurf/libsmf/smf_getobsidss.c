@@ -88,8 +88,9 @@
 #include "star/one.h"
 
 #include "smf.h"
-
 #include <string.h>
+
+#define FUNC_NAME "smf_getobsidss"
 
 char *smf_getobsidss( AstFitsChan *hdr, char * obsid, size_t szobs,
                       char * obsidss, size_t szss, int *status ) {
@@ -101,8 +102,18 @@ char *smf_getobsidss( AstFitsChan *hdr, char * obsid, size_t szobs,
   char *value = NULL;     /* Pointer to static buffer containing header value */
    int nc;                  /* Number of characters written */
 
-/* Check the inherited status */
+   /* Check the inherited status */
    if ( *status != SAI__OK ) return NULL;
+   
+   /* Check for NULL hdr */
+
+   if( !hdr ) {
+     *status = SAI__ERROR;
+     errRep( " ", FUNC_NAME ": Must have non-NULL input hdr pointer"
+             " (possible programming error)", status);
+     return NULL;
+  }
+
 
    /* Get the OBSID header, use either local buffer or supplied buffer */
    if (obsid && szobs > 0) {

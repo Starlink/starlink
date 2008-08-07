@@ -625,50 +625,49 @@ void smurf_makemap( int *status ) {
             "GAPPT,FK4,FK4-NO-E,ECLIPTIC", 1, system, 10, status );
   
   /* Get the maximum amount of memory that we can use */
-  parGet0i( "MAXMEM", &maxmem_mb, status );
-  if ( maxmem_mb <= 0 ) {
-    if (*status == SAI__OK) {
-      msgSeti("MAXMEM", maxmem_mb);
-      *status = SAI__ERROR;
-      errRep(" ", "Invalid MAXMEM, ^MAXMEM Mb (must be > 0 )", status);
-    }
-  } else {
+  parGdr0i( "MAXMEM", 2000, 1, VAL__MAXI, 1, &maxmem_mb, status );
+  if( *status==SAI__OK ) {
     maxmem = (size_t) maxmem_mb * SMF__MB;
   }
 
   /* Get METHOD - set rebin/iterate flags */
   parChoic( "METHOD", "REBIN", "REBIN, ITERATE.", 1,
             method, LEN__METHOD, status);
-  if( strncmp( method, "REBIN", 5 ) == 0 ) {
-    rebin = 1;
-    iterate = 0;
-  } else if ( strncmp( method, "ITERATE", 7 ) == 0 ) {
-    rebin = 0;
-    iterate = 1;
-  }
+  if( *status == SAI__OK ) {
+    if( strncmp( method, "REBIN", 5 ) == 0 ) {
+      rebin = 1;
+      iterate = 0;
+    } else if ( strncmp( method, "ITERATE", 7 ) == 0 ) {
+      rebin = 0;
+      iterate = 1;
+    }
 
-  /* Get remaining parameters so errors are caught early */
-  if ( rebin ) {
-    /* Obtain desired pixel-spreading scheme */
-    parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
-              "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
-              1, pabuf, 10, status );
-
-    smf_get_spread( pabuf, &spread, &nparam, status );
+    /* Get remaining parameters so errors are caught early */
+    if( rebin ) {
+      /* Obtain desired pixel-spreading scheme */
+      parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
+                "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
+                1, pabuf, 10, status );
+      
+      smf_get_spread( pabuf, &spread, &nparam, status );
 
     /* Get an additional parameter vector if required. */
-    if ( nparam > 0 ) parExacd( "PARAMS", nparam, params, status );
-  } else if ( iterate ) {
-    /* Read a group of configuration settings into keymap */
-    kpg1Gtgrp( "CONFIG", &confgrp, &ksize, status );
-    kpg1Kymap( confgrp, &keymap, status );
-    if( confgrp ) grpDelet( &confgrp, status );      
+      if( (*status==SAI__OK) && (nparam>0) ) {
+        parExacd( "PARAMS", nparam, params, status );
+      }
+      
+    } else if ( iterate ) {
+      /* Read a group of configuration settings into keymap */
+      kpg1Gtgrp( "CONFIG", &confgrp, &ksize, status );
+      kpg1Kymap( confgrp, &keymap, status );
+      if( confgrp ) grpDelet( &confgrp, status );      
+    }
   }
 
   /* Calculate the map bounds */
 
   smf_getrefwcs( "REF", &specrefwcs, &spacerefwcs, status );
-  if ( specrefwcs ) specrefwcs = astAnnul( specrefwcs );
+  if( specrefwcs ) specrefwcs = astAnnul( specrefwcs );
 
   /* See if the input data is to be aligned in the output coordinate system
      rather than the default of ICRS. */
