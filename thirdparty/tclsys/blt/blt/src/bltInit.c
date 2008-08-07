@@ -470,8 +470,8 @@ Blt_Init(interp)
 	    }
 	}
 	args[0] = args[1] = TCL_EITHER;
-	Tcl_CreateMathFunc(interp, "min", 2, args, MinMathProc, (ClientData)0);
-	Tcl_CreateMathFunc(interp, "max", 2, args, MaxMathProc, (ClientData)0);
+	/*Tcl_CreateMathFunc(interp, "min", 2, args, MinMathProc, (ClientData)0);*/
+	/*Tcl_CreateMathFunc(interp, "max", 2, args, MaxMathProc, (ClientData)0);*/
 	Blt_RegisterArrayObj(interp);
 	bltEmptyStringObjPtr = Tcl_NewStringObj("", -1);
 	bltNaN = MakeNaN();
@@ -563,8 +563,8 @@ Blt_Init(interp)
 	    }
 	}
 	args[0] = args[1] = TCL_EITHER;
-	Tcl_CreateMathFunc(interp, "min", 2, args, MinMathProc, (ClientData)0);
-	Tcl_CreateMathFunc(interp, "max", 2, args, MaxMathProc, (ClientData)0);
+	/*Tcl_CreateMathFunc(interp, "min", 2, args, MinMathProc, (ClientData)0);*/
+	/*Tcl_CreateMathFunc(interp, "max", 2, args, MaxMathProc, (ClientData)0);*/
 	bltNaN = MakeNaN();
 	if (Tcl_PkgProvide(interp, "BLT", BLT_VERSION) != TCL_OK) {
 	    return TCL_ERROR;
