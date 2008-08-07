@@ -155,6 +155,8 @@
     be resolved (although re-using files with the same name remains 
     unsupported).
 
+    A bug that stopped cube rebining using a factor of 5 has been fixed.
+
   Humu Release
   ============
 
