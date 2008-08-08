@@ -10,6 +10,11 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
  * Peter W. Draper 27 Jan 03  Added extra_precision flags for milli-arcsec
+ *                 08 Aug 08  Use libwcs dec2str and ra2str functions in the
+ *                            print methods. Previous version wasn't careful
+ *                            enough at the boundary conditions (given the
+ *                            fraction part of the arcseconds value, which
+ *                            can round up).
  */
 static const char* const rcsId="@(#) $Id: HMS.C,v 1.1.1.1 2006/01/12 16:43:53 abrighto Exp $";
 
@@ -18,6 +23,7 @@ static const char* const rcsId="@(#) $Id: HMS.C,v 1.1.1.1 2006/01/12 16:43:53 ab
 #include <cmath>
 #include "error.h"
 #include "HMS.h"
+#include "fitshead.h"
 
 //  Default precision.
 int HMS::extra_precision = 0;
@@ -135,62 +141,29 @@ void HMS::print(char* buf) const
 //  Show 2 digits prec for dec, 3 for ra
 void HMS::print_normal_precise_( char *buf ) const
 {
-    // allan: 22.4.98: make sure seconds are formatted with leading zero
-    // (%02.2f doesn't do it)
-    char secs[32];
+    char lbuf[32];
 
-    if (show_sign_) {  // show 2 digits precision for dec, 3 for ra
-	if (sec_ < 10.) {  
-	    sprintf(secs, "0%2.2f", sec_);
-	}
-	else {
-	    sprintf(secs, "%2.2f", sec_);
-	}
+    if ( show_sign_ ) {
+        dec2str( lbuf, 32, val_, 2 );
     }
     else {
-	if (sec_ < 10.) {  
-	    sprintf(secs, "0%2.3f", sec_);
-	}
-	else {
-	    sprintf(secs, "%2.3f", sec_);
-	}
+        ra2str( lbuf, 32, val_ * 15.0, 3 );
     }
-
-    if (show_sign_ || sign_ == '-') {
-	sprintf(buf, "%c%02d:%02d:%s", sign_, hours_, min_, secs);
-    }
-    else {
-	sprintf(buf, "%02d:%02d:%s", hours_, min_, secs);
-    }
+    strncpy( buf, lbuf, 32 );
 }
 
 //  Show 4 digits prec for dec, 5 for ra
 void HMS::print_extra_precise_( char *buf ) const
 {
-    char secs[32];
-    if (show_sign_) {
-	if ( sec_ < 1000. ) {
-	    sprintf( secs, "0%2.4f", sec_ );
-	}
-	else {
-	    sprintf(secs, "%2.4f", sec_);
-	}
-    }
-    else {
-	if ( sec_ < 10000. ) {
-	    sprintf( secs, "0%2.5f", sec_ );
-	}
-	else {
-	    sprintf( secs, "%2.5f", sec_ );
-	}
-    }
+    char lbuf[32];
 
-    if ( show_sign_ || sign_ == '-' ) {
-	sprintf( buf, "%c%02d:%02d:%s", sign_, hours_, min_, secs );
+    if ( show_sign_ ) {
+        dec2str( lbuf, 32, val_, 4 );
     }
     else {
-	sprintf( buf, "%02d:%02d:%s", hours_, min_, secs );
+        ra2str( lbuf, 32, val_ * 15.0, 5 );
     }
+    strncpy( buf, lbuf, 32 );
 }
 
 
