@@ -193,7 +193,7 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   
   if( model->sdata[0] ) {
     /* Pointer to model data array */
-    model_data = (double *)(model->sdata[0]->pntr)[0];
+    model_data = (model->sdata[0]->pntr)[0];
 
     /* Copy of model data array */
     model_data_copy = smf_malloc( (model->sdata[0]->dims)[0], 
@@ -244,10 +244,10 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     }
 
     /* Get pointer to DATA component of residual */
-    res_data = (double *)(res->sdata[idx]->pntr)[0];
+    res_data = (res->sdata[idx]->pntr)[0];
 
     /* Geta pointer to the QUAlity array */
-    qua_data = (unsigned char *)(qua->sdata[idx]->pntr)[0];
+    qua_data = (qua->sdata[idx]->pntr)[0];
 
     /* Which QUALITY bits should be checked for correcting samples */
     mask_cor = ~(SMF__Q_JUMP | SMF__Q_SPIKE);

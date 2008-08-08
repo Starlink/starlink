@@ -139,10 +139,10 @@ void smf_calcmodel_ast( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     smf_dataOrder( qua->sdata[idx], lut->sdata[idx]->isTordered, status );
 
     /* Get pointers to DATA components */
-    res_data = (double *)(res->sdata[idx]->pntr)[0];
-    lut_data = (int *)(lut->sdata[idx]->pntr)[0];
-    model_data = (double *)(model->sdata[idx]->pntr)[0];
-    qua_data = (unsigned char *)(qua->sdata[idx]->pntr)[0];
+    res_data = (res->sdata[idx]->pntr)[0];
+    lut_data = (lut->sdata[idx]->pntr)[0];
+    model_data = (model->sdata[idx]->pntr)[0];
+    qua_data = (qua->sdata[idx]->pntr)[0];
 
     if( (res_data == NULL) || (lut_data == NULL) || (model_data == NULL) || 
 	(qua_data == NULL) ) {

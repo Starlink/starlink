@@ -209,9 +209,9 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   for( idx=0; idx<res->ndat; idx++ ) {
       
     /* Get pointers to DATA components */
-    res_data = (double *)(res->sdata[idx]->pntr)[0];
-    model_data = (double *)(model->sdata[idx]->pntr)[0];
-    qua_data = (unsigned char *)(qua->sdata[idx]->pntr)[0];
+    res_data = (res->sdata[idx]->pntr)[0];
+    model_data = (model->sdata[idx]->pntr)[0];
+    qua_data = (qua->sdata[idx]->pntr)[0];
 
     if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;
@@ -278,7 +278,6 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 
 	  dat->chisquared[chunk] += res_data[i]*res_data[i]/model_data[i];
 	  nchisq++;
-
 	}
       }
     }
