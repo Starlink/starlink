@@ -81,9 +81,17 @@
 *     {enter_further_changes_here}
 
 *  Notes:
-*     The "sample variance" method isn't correct. I've fudged an approximate
-*     formula for the standard error (squared) when the data are assigned
-*     arbitrary weights. Needs to be fixed up. 
+*     If the variance map is calculated from the scatter of data in each pixel,
+*     rather than using the Gaussian error propagation formula, the expression
+*     used is:   
+*                  sigma^2 =  sum(w_i)*sum(w_i*x_i^2) - [sum(w_i*x_i)]^2
+*                             ------------------------------------------
+*                                          N*[sum(w_i)]^2
+*
+*     Where  sigma^2 = estimated variance on the mean in this pixel
+*                w_i = i'th sample weight (1/variance if supplied, 1 otherwise)
+*                x_i = i'th data sample
+*                  N = number of samples in this pixel
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
