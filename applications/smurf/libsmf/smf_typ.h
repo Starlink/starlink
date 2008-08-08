@@ -393,7 +393,7 @@ typedef struct smfArray {
 
 typedef struct smfGroup {
   Grp *grp;                  /* Copy of input Grp */
-  dim_t **subgroups;         /* Array of indices into Grp */
+  dim_t **subgroups;         /* Indices into Grp [ngroups][nrelated] */
   size_t *chunk;             /* Flag for continuous chunks in time (ngroups)*/
   dim_t ngroups;             /* Number of subgroups */
   dim_t nrelated;            /* Maximum number of related files */

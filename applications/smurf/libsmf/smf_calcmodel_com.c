@@ -312,7 +312,7 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 	errRep(FUNC_NAME, "Failed to retrieve COM_BOXCARD from keymap", 
 	       status);
       } else {
-	/* Use damped boxcard for smoothing width */
+	/* Use damped boxcar for smoothing width */
 	boxcar = (int) boxcard;
       }
 
