@@ -286,20 +286,25 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 	  base += ntslice;
 	}
 
-        /* If we have good data, store it. Otherwise set VAL__BADD */
-        if( thissum ) {
+        /* Store the sum here. Init if first subarray, otherwise add to
+           sum from previous subarrays. */
+
+        if( idx == 0 ) {
           model_data[i] = thissum;
         } else {
-          model_data[i] = VAL__BADD;
+          model_data[i] += thissum;
         }
+
       }
     }
   }
     
-  /* Re-normalize the model */
+  /* Re-normalize the model, or set model to VAL__BADD if no data. */
   for( i=0; i<ntslice; i++ ) {
     if( weight[i] ) {
       model_data[i] /= weight[i];
+    } else {
+      model_data[i] = VAL__BADD;
     }
   }
 
