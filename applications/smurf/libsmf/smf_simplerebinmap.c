@@ -44,7 +44,7 @@
 *     map = double* (Returned)
 *        The output map array 
 *     mapweight = double* (Returned)
-*        Relative weighting for each pixel in map
+*        Relative weighting for each pixel in map. 
 *     hitsmap = unsigned int* (Returned)
 *        Number of samples that land in a pixel.
 *     mapvar = double* (Returned)
@@ -56,7 +56,7 @@
 
 *  Description:
 *     This function does a simple regridding of data into a map. If a 
-*     variance array is supplied it is used to calculated weights. Optionally
+*     variance array is supplied it is used to calculate weights. Optionally
 *     return a hitsmap (number of samples that land in a pixel).
 *     
 *  Authors:
@@ -87,6 +87,7 @@
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2006-2008 University of British Columbia
 *     All Rights Reserved.
 
 *  Licence:
@@ -141,7 +142,7 @@ void smf_simplerebinmap( double *data, double *variance, int *lut,
   /* Check inputs */
   if( !data || !map || !lut || !mapweight || !mapvar || !hitsmap ) {
     *status = SAI__ERROR;
-    errRep("FUNC_NAME", "Null inputs", status ); 
+    errRep(" ", FUNC_NAME ": Null inputs", status ); 
     return;
   }
 
