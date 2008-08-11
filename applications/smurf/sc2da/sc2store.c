@@ -3555,30 +3555,6 @@ int *status                 /* global status (given and returned) */
    sc2store_errconv ( status );
 }
 
-
-/* sc2store_force_initialised - indicate that we have already initialised */
-
-void sc2store_force_initialised ( int *status )
-{
-
-/* Description:
-
-   Outside of the DA environment we need to be able to stop 
-   sc2store initialising ERR and NDF. This routine tells sc2store
-   not to bother. This will work so long as sc2store_initialise does
-   not start doing essential initialisations that are not related to
-   ERR or NDF
-
-   Authors:
-    T. Jenness (JAC, Hawaii)
-
-*/
-
-  if (*status != SAI__OK) return;
-  sc2store_initialised = 1;
-}
-
-
 /*+ sc2store_wrtstream - store SCUBA-2 time stream data as NDF */
 
 void sc2store_wrtstream
@@ -3696,6 +3672,32 @@ int *status                 /* global status (given and returned) */
 /* The file is open */
 
    sc2store_sc2open = 1; 
+}
+
+/*+ sc2store_force_initialised - indicate that we have already initialised */
+
+void sc2store_force_initialised
+(
+int *status                 /* global status (given and returned) */
+)
+
+/* Description:
+    Outside of the DA environment we need to be able to stop 
+    sc2store initialising ERR and NDF. This routine tells sc2store
+    not to bother. This will work so long as sc2store_initialise does
+    not start doing essential initialisations that are not related to
+    ERR or NDF
+
+   Authors :
+    T. Jenness (JAC, Hawaii)
+
+   History:
+    11Aug2008 : fix up header (timj)
+*/
+
+{
+  if (*status != SAI__OK) return;
+  sc2store_initialised = 1;
 }
 
 /* timeWcs:  Calculate frameset for time series. */

@@ -510,6 +510,11 @@ const char *xmlfile,        /* name of CONFIGURE XML file (given) */
 int *status                 /* global status (given and returned) */
 );
 
- 
+/*+ sc2store_force_initialised - indicate that we have already initialised */
+
+void sc2store_force_initialised
+(
+int * status                /* global status (given and returned) */
+);
  
 #endif
