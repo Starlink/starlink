@@ -876,12 +876,19 @@ void sc2ast_set_output_system
  *  Purpose:
  *    Sets the SYSTEM attribute based on JCMT naming convention.
 
+ *  Description:
+ *    Sets the AST output system and also sets the SkyRefIs and
+ *    AlignOffset attributes if this system is associated with
+ *    a moving frame.
+
  *  Authors:
  *     TIMJ: Tim Jenness (JAC, Hawaii)
 
  *  History:
  *     23-JUL-2008 (TIMJ):
  *        Original version.
+ *     11-AUG-2008 (TIMJ):
+ *        Set AlignOffset and SkyRefIs if appropriate.
 
  */
 {
@@ -892,6 +899,11 @@ void sc2ast_set_output_system
   astsys = sc2ast_convert_system( trsys, status );
   if ( *status == SAI__OK) {
     astSetC( fset, "SYSTEM", astsys );
+
+    astsys = astGetC( fset, "SYSTEM");
+    if (strcmp(astsys,"AZEL") == 0 || strcmp(astsys, "GAPPT") == 0 ) {
+      astSet( fset, "SkyRefIs=Origin,AlignOffset=1" );
+    }
   }
 
 }
