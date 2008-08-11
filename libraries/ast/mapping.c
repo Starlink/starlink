@@ -11271,6 +11271,9 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
 \
+/* Initialise local variables. */ \
+   simple = NULL; \
+\
 /* Loop to determine how many pixels the output array contains. */ \
    npix_out = 1; \
    for ( idim = 0; idim < ndim_out; idim++ ) { \
@@ -11442,7 +11445,6 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
       } \
 \
 /* If OK, loop to determine how many input pixels are to be binned. */ \
-      simple = NULL; \
       npix = 1; \
       unsimplified_mapping = this; \
       if ( astOK ) { \
