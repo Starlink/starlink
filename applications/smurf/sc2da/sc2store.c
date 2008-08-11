@@ -3556,6 +3556,28 @@ int *status                 /* global status (given and returned) */
 }
 
 
+/* sc2store_force_initialised - indicate that we have already initialised */
+
+void sc2store_force_initialised ( int *status )
+{
+
+/* Description:
+
+   Outside of the DA environment we need to be able to stop 
+   sc2store initialising ERR and NDF. This routine tells sc2store
+   not to bother. This will work so long as sc2store_initialise does
+   not start doing essential initialisations that are not related to
+   ERR or NDF
+
+   Authors:
+    T. Jenness (JAC, Hawaii)
+
+*/
+
+  if (*status != SAI__OK) return;
+  sc2store_initialised = 1;
+}
+
 
 /*+ sc2store_wrtstream - store SCUBA-2 time stream data as NDF */
 
@@ -3676,13 +3698,13 @@ int *status                 /* global status (given and returned) */
    sc2store_sc2open = 1; 
 }
 
+/* timeWcs:  Calculate frameset for time series. */
 
 static
 AstFrameSet *timeWcs( int subnum, int ntime, const SC2STORETelpar* telpar,
                       const double times[], int * status ){
 
 /*
-*+
 *  Name:
 *     timeWcs
 
@@ -3735,7 +3757,6 @@ AstFrameSet *timeWcs( int subnum, int ntime, const SC2STORETelpar* telpar,
 *     19-DEC-2006 (TIMJ):
 *        Integrated into SCUBA-2 software as variant of ACSIS DA version
 
-*-
 */
 
 /* Local Variables: */
@@ -3887,28 +3908,4 @@ static void sc2store_initialise ( int * status ) {
       sc2store_initialised = 1;
    }
 
-}
-
-/*+ sc2store_force_initialised - indicate that we have already initialised */
-
-void sc2store_force_initialised
-(
- int *status
- )
-/* Description:
-
-   Outside of the DA environment we need to be able to stop 
-   sc2store initialising ERR and NDF. This routine tells sc2store
-   not to bother. This will work so long as sc2store_initialise does
-   not start doing essential initialisations that are not related to
-   ERR or NDF
-
-   Authors:
-    T. Jenness (JAC, Hawaii)
-
-*/
-
-{
-  if (*status != SAI__OK) return;
-  sc2store_initialised = 1;
 }
