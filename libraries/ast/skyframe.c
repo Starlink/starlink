@@ -8026,17 +8026,10 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
    AstSkyFrame *target;          /* Pointer to the SkyFrame structure */
    AstSkyFrame *temp;            /* Pointer to copy of target SkyFrame */
    AstSystemType align_sys;      /* System in which to align the SkyFrames */
-   double xin[ 2 ];              /* X values to transform */
-   double xout[ 2 ];             /* Transformed X values */
-   double yin[ 2 ];              /* Y values to transform */
-   double yout[ 2 ];             /* Transformed Y values */
-   int ii;                       /* How many positions in the array */
    int match;                    /* Coordinate conversion is possible? */
    int perm[ 2 ];                /* Permutation array for axis swap */
    int result_swap;              /* Swap result SkyFrame coordinates? */
    int set_usedefs;              /* Set the returned UseDefs attribute zero?*/
-   int skyref_set;               /* Is the target's SkyRef attribute set? */
-   int skyrefp_set;              /* Is the target's SkyRefP attribute set? */
    int target_axis;              /* Target SkyFrame axis index */
    int target_swap;              /* Swap target SkyFrame coordinates? */
 
@@ -8086,32 +8079,8 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
    value of the AlignSystem attribute from the template (if there is a
    template). */
       if ( template ) {
-
-/* astOverlay will set the System value of the result to that of the
-   template. If the result has set values for the SkyRef or SkyRefP
-   attributes, the attempt to set the results System value will involve
-   converting the SkyRef(P) positions form the old system to the new system,
-   which will cause a recursive invocation of th is function. To avoid
-   this, we temporarily clear the SkyRef and SkyRefP attributes (suitably
-   modified values are assigned to the result later). */
-         skyref_set = astTestSkyRef( *result, 0 ) || 
-                      astTestSkyRef( *result, 1 );
-         if( skyref_set ) {
-            astClearSkyRef( *result, 0 );
-            astClearSkyRef( *result, 1 );
-         }
-      
-         skyrefp_set = astTestSkyRefP( *result, 0 ) || 
-                       astTestSkyRefP( *result, 1 );
-         if( skyrefp_set ) {
-            astClearSkyRefP( *result, 0 );
-            astClearSkyRefP( *result, 1 );
-         }
-      
-/* Now overlay the template attributes, and get the alignment system. */
          astOverlay( template, template_axes, *result );
          align_sys = astGetAlignSystem( template );
-
       } else {
          align_sys = astGetAlignSystem( target );
       }
@@ -8189,43 +8158,6 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
 
 /* Annul the pointer to the PermMap (if created). */
          if ( permmap ) permmap = astAnnul( permmap );
-
-/* If the target originally had values for the SkyRef and/or SkyRefP
-   attributes, they will have been cleared in the result frame above (if 
-   a template was supplied) in order to avoid recursive invocations of this 
-   function needed to convert the positions from the target's system to the
-   template's system. We now know what the Mapping is from target to 
-   result, so use it to convert the SktRef and/or SkyRefP values, and
-   store the converted values back in the result. */
-         if( template ) {
-            ii = 0;
-
-            if( skyref_set ) {
-               xin[ ii ] = astGetSkyRef( target, 0 ) ;
-               yin[ ii++ ] = astGetSkyRef( target, 1 ) ;
-            }
-
-            if( skyrefp_set ) {
-               xin[ ii ] = astGetSkyRefP( target, 0 ) ;
-               yin[ ii++ ] = astGetSkyRefP( target, 1 ) ;
-            }
-
-            if( ii > 0 ) {
-               astTran2( *map, ii, xin, yin, 1, xout, yout );
-
-               ii = 0;
-   
-               if( skyref_set ) {
-                  astSetSkyRef( target, 0, xout[ ii ] ) ;
-                  astSetSkyRef( target, 1, yout[ ii++ ] );
-               }
-   
-               if( skyrefp_set ) {
-                  astSetSkyRefP( target, 0, xout[ ii ] ) ;
-                  astSetSkyRefP( target, 1, yout[ ii ] );
-               }
-            }
-         }
       }
 
 /* Result is not a SkyFrame. */
