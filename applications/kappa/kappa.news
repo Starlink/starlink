@@ -79,6 +79,10 @@
       - It uses NDF blocking to avoid excessive memory
       requirements.
 
+   o  PROVSHOW has a new parameter SHOW that can be used to select the
+   ancestors that are to be displayed (root ancestors, direct parents,
+   or all ancestors).
+
    o  SETBB can now use a comma-separated list of quality names 
    (such as created by SETQUAL) to define the bit mask instead of
    a numerical value.

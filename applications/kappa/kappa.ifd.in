@@ -2712,6 +2712,17 @@ package kappa {
             helpkey *
           }
 
+         parameter show {
+            position 2
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default ALL
+            prompt {The ancestors to be displayed}
+            helpkey *
+          }
+
       }
 
       action showqual {

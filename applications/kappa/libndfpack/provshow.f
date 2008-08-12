@@ -26,7 +26,7 @@
 *     immediate parent NDFs and older ancestor NDFs (i.e. the parents of
 *     the parents, etc.).
 *
-*     Each NDF (including the supplied NDF itself) is described in a
+*     Each displayed NDF (see parameter SHOW) is described in a
 *     block of lines. The first line holds an integer index for the NDF
 *     followed by the path to that NDF. Note, this path is where the NDF
 *     was when the provenance information was recorded. It is of course 
@@ -59,7 +59,7 @@
 *    direct parents of the supplied NDF. See parameter PARENTS.
 
 *  Usage:
-*     provshow ndf 
+*     provshow ndf show
 
 *  ADAM Parameters:
 *     NDF = NDF (Read)
@@ -68,6 +68,22 @@
 *        Name of a new text file in which to put the paths to the direct
 *        parents of the supplied NDF. These are written one per line with
 *        no extra text. If null, no file is created. [!]
+*     SHOW = LITERAL (Read)
+*        Determines which ancestors are displayed on the screen. It can
+*        take any of the following case-insensitive values (or any 
+*        abbreviation):
+*
+*        - "All" -- Display all ancestors, including the supplied NDF
+*                   itself.
+*
+*        - "Roots" -- Display only the root ancestors (i.e. ancestors that
+*                    do not themselves have any recorded parents). The 
+*                    supplied NDF itself is not displayed.
+*
+*        - "Parents" -- Display only the direct parents of the supplied
+*                       NDF. The supplied NDF itself is not displayed.
+*
+*        ["All"]
 
 *  Notes:
 *     - If a KAPPA application uses one or more input NDFs to create an 
@@ -88,7 +104,14 @@
 
 *  Examples:
 *     provshow m51 
-*        This displays the provenance information in the NDF m51. 
+*        This displays information about the NDF m51, and all its
+*        recorded ancestors.
+*     provshow m51 roots
+*        This displays information about the root ancestors of the NDF 
+*        m51. 
+*     provshow m51 parents
+*        This displays information about the direct parents of the NDF 
+*        m51. 
 
 *  Related Applications:
 *     KAPPA: PROVADD, HISLIST.
@@ -122,6 +145,8 @@
 *        Original version.
 *     7-FEB-2008 (DSB):
 *        Added parameter PARENTS.
+*     12-AUG-2008 (DSB):
+*        Added parameter SHOW.
 *     {enter_further_changes_here}
 
 *-
@@ -140,6 +165,10 @@
 *  External References:
       INTEGER CHR_LEN            ! Used length of a string
 
+*  Local Constants:
+      INTEGER MXPAR              ! Max number of direct parents
+      PARAMETER( MXPAR = 200 )
+
 *  Local Variables:
       CHARACTER CLOC*(DAT__SZLOC)! Locator to array cell
       CHARACTER ID*10            ! Integer index for the current NDF
@@ -147,9 +176,13 @@
       CHARACTER PLOC*(DAT__SZLOC)! Locator for PARENTS array
       CHARACTER PROV*(DAT__SZLOC)! Locator for provenance information
       CHARACTER PROVP*(DAT__SZLOC)! Locator for parent provenance info
+      CHARACTER SHOW*7           ! The ancestors to be displayed
+      CHARACTER PARIDS*255       ! Buffer for direct parent ID list
       CHARACTER VALUE*255        ! Buffer for one field value
+      INTEGER DIRPAR( MXPAR )    ! Integer IDs for direct parents
       INTEGER FD                 ! File descriptor for parents file
       INTEGER INDF               ! NDF identifier
+      INTEGER INTID              ! Integer ID for the current ancestor
       INTEGER IPAR               ! Index into list of parent indices
       INTEGER IROW               ! Row index
       INTEGER KYMAP1             ! AST KeyMap holding all prov info
@@ -159,6 +192,7 @@
       INTEGER NROW               ! No. of lines to display
       INTEGER PARI               ! Index of current parent in ancestors
       LOGICAL THERE              ! Does the named component exist?
+      LOGICAL USE                ! Display the current ancestor?
 *.
 
 
@@ -170,6 +204,10 @@
 
 *  Obtain an identifier for the NDF.
       CALL LPG_ASSOC( 'NDF', 'READ', INDF, STATUS )
+
+*  Determine which ancestors are to be displayed on the screenn.
+      CALL PAR_CHOIC( 'SHOW', 'All', 'All,Roots,Parents', .FALSE., SHOW, 
+     :                STATUS )
 
 *  Format the provenance information in the NDF. The resulting strings
 *  are returned in an AST KeyMap.
@@ -196,10 +234,7 @@
             GO TO 999
          END IF
 
-*  White space between NDF descriptions.
-         CALL MSG_BLANK( STATUS )
-
-*  First line starts with the ID value followed by the NDF path.
+*  Get the ID value for this ancestor.
          ID = ' '
          IF( .NOT. AST_MAPGET0C( KYMAP2, 'ID', ID, NC, STATUS ) ) THEN
             IF( STATUS .EQ. SAI__OK ) THEN
@@ -211,55 +246,101 @@
             GO TO 999
          END IF
 
-         VALUE = ' '
-         IF( .NOT. AST_MAPGET0C( KYMAP2, 'PATH', VALUE, NC, 
+*  Get the list of direct patent ID values for this ancestor.
+         PARIDS = ' '
+         IF( .NOT. AST_MAPGET0C( KYMAP2, 'PARENTS', PARIDS, NC, 
      :                           STATUS ) ) THEN
-            VALUE = '<the NDF path is unknown>'
+            PARIDS = '<unknown>'
          END IF
 
-         CALL MSG_SETC( 'ID', ID )
-         CALL MSG_SETC( 'P', VALUE )
-         CALL MSG_OUT( ' ', '^ID: ^P', STATUS )
+*  Decide if this ancestor should be displayed. This depends on the value
+*  supplied for parameter SHOW. If "ROOT" then only display this ancestor
+*  if it has no direct parents. 
+         IF( SHOW .EQ. 'ROOT' ) THEN
+            USE = ( PARIDS .EQ. '<unknown>' )
+
+*  If "PARENTS" then only display this ancestor if its integer ID is 
+*  included in the list of direct parent IDs stored when processing the
+*  first row (if this is the first row then we always process it).
+         ELSE IF( SHOW .EQ. 'PARENTS' ) THEN
+
+*  If we are currently checking the first row, then we never display 
+*  it, but we extract the direct parent ID values into an array of 
+*  integers for use when checking subsequent rows.
+            IF( IROW .EQ. 1 ) THEN
+               USE = .FALSE.
+               CALL KPG1_PRSAI( PARIDS, MXPAR, DIRPAR, NPAR, STATUS )
+
+*  If this is not the first row, we only display it if its integer ID
+*  value is in ther list od direct parent IDs obtained when checking the
+*  first row.
+            ELSE
+               CALL CHR_CTOI( ID, INTID, STATUS )
+               USE = .FALSE.
+               DO IPAR = 1, NPAR
+                  IF( DIRPAR( IPAR ) .EQ. INTID ) USE = .TRUE.
+               END DO
+
+            END IF
+
+*  For other values of SHOW, we display all ancestors.
+         ELSE
+            USE = .TRUE.
+         END IF
+
+*  Jump to the next row if we are not displaying the current row. 
+         IF( USE ) THEN
+
+*  White space between NDF descriptions.
+            CALL MSG_BLANK( STATUS )
+
+*  First line starts with the ID value followed by the NDF path.
+            VALUE = ' '
+            IF( .NOT. AST_MAPGET0C( KYMAP2, 'PATH', VALUE, NC, 
+     :                              STATUS ) ) THEN
+               VALUE = '<the NDF path is unknown>'
+            END IF
+	    
+            CALL MSG_SETC( 'ID', ID )
+            CALL MSG_SETC( 'P', VALUE )
+            CALL MSG_OUT( ' ', '^ID: ^P', STATUS )
 
 *  Next line shows the list of identifiers for the immediate parent NDFs.
-         VALUE = ' '
-         IF( .NOT. AST_MAPGET0C( KYMAP2, 'PARENTS', VALUE, NC, 
-     :                           STATUS ) ) THEN
-            VALUE = '<unknown>'
-         END IF
-
-         CALL MSG_SETC( 'P', VALUE )
-         CALL MSG_OUT( ' ', '   Parents:  ^P', STATUS )
+            CALL MSG_SETC( 'P', PARIDS )
+            CALL MSG_OUT( ' ', '   Parents:  ^P', STATUS )
 
 *  Next line shows the date at which the provenance was stored in the NDF.
-         VALUE = ' '
-         IF( .NOT. AST_MAPGET0C( KYMAP2, 'DATE', VALUE, NC, 
-     :                           STATUS ) ) THEN
-            VALUE = '<unknown>'
-         END IF
-
-         CALL MSG_SETC( 'P', VALUE )
-         CALL MSG_OUT( ' ', '   Date:  ^P', STATUS )
+            VALUE = ' '
+            IF( .NOT. AST_MAPGET0C( KYMAP2, 'DATE', VALUE, NC, 
+     :                              STATUS ) ) THEN
+               VALUE = '<unknown>'
+            END IF
+	    
+            CALL MSG_SETC( 'P', VALUE )
+            CALL MSG_OUT( ' ', '   Date:  ^P', STATUS )
 
 *  Next line shows the software that created the NDF.
-         VALUE = ' '
-         IF( .NOT. AST_MAPGET0C( KYMAP2, 'CREATOR', VALUE, NC, 
-     :                           STATUS ) ) THEN
-            VALUE = '<unknown>'
-         END IF
-
-         CALL MSG_SETC( 'P', VALUE )
-         CALL MSG_OUT( ' ', '   Creator:  ^P', STATUS )
+            VALUE = ' '
+            IF( .NOT. AST_MAPGET0C( KYMAP2, 'CREATOR', VALUE, NC, 
+     :                              STATUS ) ) THEN
+               VALUE = '<unknown>'
+            END IF
+	    
+            CALL MSG_SETC( 'P', VALUE )
+            CALL MSG_OUT( ' ', '   Creator:  ^P', STATUS )
 
 *  Next line shows a summary of any extra info describing the NDF.
-         VALUE = ' '
-         IF( AST_MAPGET0C( KYMAP2, 'MORE', VALUE, NC, STATUS ) ) THEN
-            CALL MSG_SETC( 'P', VALUE )
-            CALL MSG_OUT( ' ', '   More:  ^P', STATUS )
+            VALUE = ' '
+            IF( AST_MAPGET0C( KYMAP2, 'MORE', VALUE, NC, STATUS ) ) THEN
+               CALL MSG_SETC( 'P', VALUE )
+               CALL MSG_OUT( ' ', '   More:  ^P', STATUS )
+            END IF
+
          END IF
 
 *  Annul the keymap holding details for this row.
          CALL AST_ANNUL( KYMAP2, STATUS )
+
       END DO
 
 *  A final blank line.

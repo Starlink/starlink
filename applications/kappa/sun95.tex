@@ -40455,7 +40455,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
       parent NDFs and older ancestor NDFs (\emph{i.e.} the parents of the
       parents, \emph{etc.}).
 
-      Each NDF (including the supplied NDF itself) is described in a
+      Each displayed NDF (see parameter SHOW) is described in a
       block of lines.  The first line holds an integer index for the NDF
       followed by the path to that NDF.  Note, this path is where the NDF
       was when the provenance information was recorded.  It is of course
@@ -40497,7 +40497,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
 
    } 
    \sstusage{
-      provshow ndf
+      provshow ndf show
    }
    \sstparameters{ 
       \sstsubsection{ 
@@ -40512,19 +40512,61 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          parents of the supplied NDF.  These are written one per line with
          no extra text.  If null, no file is created.  {\tt [!]}
       } 
+      \sstsubsection{ 
+         SHOW = LITERAL (Read)
+      }{ 
+         Determines which ancestors are displayed on the screen. It can
+         take any of the following case-insensitive values (or any 
+         abbreviation):
+
+         \ssthitemlist{
+
+            \sstitem
+            {\tt "All"} --- Display all ancestors, including the supplied
+                            NDF itself.
+            
+            \sstitem
+            {\tt "Roots"}  --- Display only the root ancestors (i.e.
+                               ancestors that do not themselves have any 
+                               recorded parents). The supplied NDF itself 
+                               is not displayed.
+            
+            \sstitem
+            {\tt "Parents"} --- Display only the direct parents of the
+                                supplied NDF. The supplied NDF itself is 
+                                not displayed. 
+
+         }
+         {\tt ["All"]}
+
+      } 
    } 
    \sstexamples{ 
       \sstexamplesubsection{
          provshow m51
       }{ 
-        This displays the provenance information in the NDF m51.
-        }
+        This displays information about the NDF m51, and all its
+        recorded ancestors.
       }
-      \sstnotes{
-         \sstitemlist{
+      \sstexamplesubsection{
+         provshow m51 roots
+      }{ 
+        This displays information about the root ancestors of the NDF 
+        m51. 
+      }
+      \sstexamplesubsection{
+         provshow m51 parents
+      }{ 
+        This displays information about the direct parents of the NDF 
+        m51.
+     }
+   }
+
+   \sstnotes{
+      \sstitemlist{
 
          \sstitem
-
+   
          If a KAPPA application uses one or more input NDFs to create an
          output NDF, the output NDF may or may not contain provenance
          information depending on two things: 1) whether any of the input
@@ -40538,7 +40580,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          if the AUTOPROV variable is unset.  However, setting AUTOPROV to
          {\tt "0"} will always prevent provenance information being
          stored in the output NDFs.
-
+   
          \sstitem
          Some other packages, such as CCDPACK, follow the same strategy
          for creating and propagating provenance information.
@@ -55419,6 +55461,13 @@ The following applications have been modified:
 
           \item It uses NDF blocking to avoid excessive memory
           requirements.
+      \end{itemize}
+
+   \item [\htmlref{PROVSHOW}{PROVSHOW}] \mbox{}
+      \begin{itemize}
+          \item A new parameter, SHOW, can be used to select the
+           ancestors that are to be displayed (root ancestors, direct 
+           parents, or all ancestors).
       \end{itemize}
 
    \item [\htmlref{SETBB}{SETBB}] \mbox{}
