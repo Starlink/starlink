@@ -50,11 +50,6 @@
 *     assumed that the output map is the same size as the array
 *     footprint (scaled slightly to allow for non-alignment with the
 *     output coordinate frame).
-*
-*     For cases where the instrument aperture is non-zero, the pixel
-*     bounds are shifted by an amount calculated from the INSTAP_X/_Y
-*     FITS headers and knowledge of the angle between the focal plane
-*     and tracking coordinate systems (TCS_TR_ANG).
 
 * Notes:
 *     It is important to note that the map size is defined only by the
@@ -112,6 +107,8 @@
 *     2008-07-29 (TIMJ):
 *        Trap undef values for keywords in non-scan mode.
 *        Use astIsUndefF macro. Realise that instap is already in smfHead.
+*     2008-08-11 (TIMJ):
+*        Remove instrument aperture checks. Refuse to reduce non-scan.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -163,8 +160,6 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
 			   int *moving, int *status ) {
 
   /* Local variables */
-  double bolospacing = 6.28;   /* Bolometer spacing in arcsec */
-  double c;                    /* cos theta */
   smfData *data = NULL;        /* pointer to  SCUBA2 data struct */
   int dxpix;                   /* Map X offset in pixels */
   int dypix;                   /* Map Y offset in pixels */
@@ -175,20 +170,14 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
   double hghtbox;              /* Map height in arcsec */
   int hghtpix;                 /* RA-Dec map height in pixels */
   int i;                       /* loop counter */
-  int instap = 0;              /* Flag to denote whether the
-				  instrument aperture is non-zero */
-  double instapx = 0.0;        /* Effective X offset in tracking frame (arcsec) */
-  double instapy = 0.0;        /* Effective Y offset in tracking frame (arcsec) */
   dim_t k;                     /* Loop counter */
   double maphght = 0.0;        /* Map height in radians */
   double mappa = 0.0;          /* Map position angle in radians */
   double mapwdth = 0.0;        /* Map width in radians */
   double mapx;                 /* Map X offset in radians */
   double mapy;                 /* Map Y offset in radians */
-  double origval = 0.0;        /* A temporary double variable */
   double par[7];               /* Projection parameters */
   char *pname = NULL;          /* Name of currently opened data file */
-  double s;                    /* sin theta */
   double shift[ 2 ];           /* Shifts from PIXEL to GRID coords */
   AstMapping *sky2map = NULL;  /* Mapping celestial->map coordinates */
   AstSkyFrame *skyframe = NULL;/* Output SkyFrame */
@@ -196,7 +185,6 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
   double skyref[ 2 ];          /* Values for output SkyFrame SkyRef attribute */
   AstFrameSet *swcsin = NULL;  /* FrameSet describing input WCS */
   int temp;                    /* Temporary variable  */
-  double theta = 0.0;          /* Angle between FP up and tracking up */
   double wdthbox;              /* Map width in arcsec */
   int wdthpix;                 /* RA-Dec map width in pixels */
   double x_array_corners[4];   /* X-Indices for corner bolos in array */ 
@@ -217,6 +205,14 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
      should be 1 as we use the first file in the Grp to define the map
      bounds */
   smf_open_file( igrp, index, "READ", SMF__NOCREATE_DATA, &data, status );
+
+  /* Simply abort if it is not a scan */
+  if (*status == SAI__OK && data->hdr->obsmode != SMF__OBS_SCAN) {
+    *status = SAI__ERROR;
+    errRep(" ", "Can not call smf_mapbounds_approx with non-scan observation"
+           " (possible programming error)", status);
+    goto CLEANUP;
+  }
 
   /* Retrieve file name for use feedback */
   file = data->file;
@@ -260,35 +256,20 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
     if (astIsUndefF(mapwdth)) mapwdth = 0.0;
     if (astIsUndefF(maphght)) maphght = 0.0;
 
-    /* Retrieve the angle between the focal plane and the tracking
-       coordinate system */
-    theta = hdr->state->tcs_tr_ang;
-
     /* Make an approximation if map height and width are not set -
        note that this should ONLY apply for non-scan mode data */
-    if ( !mapwdth && !maphght ) {
-      /* 84 comes from 2 x 40 detectors + 4 inter-sub-array gap */
-      mapwdth = sqrt(2.0) * 84 * bolospacing * cos( (AST__DPIBY2/2.0) - theta);
-      maphght = mapwdth;
+    if ( !mapwdth || !maphght ) {
+      if (*status == SAI__OK) {
+        *status = SAI__ERROR;
+        errRep(" ", "MAP_WDTH and MAP_HGHT must be > 0", status);
+        goto CLEANUP;
+      }
     }    
     smf_fits_getD( hdr, "MAP_X", &mapx, status );
     smf_fits_getD( hdr, "MAP_Y", &mapy, status );
     /* Undefs are a problem for non-scan maps if we have got this far */
     if (astIsUndefF(mapx)) mapx = 0.0;
     if (astIsUndefF(mapy)) mapy = 0.0;
-
-    /* If the instrument aperture is set, calculate the projected
-       values in the tracking coordinate frame */
-    c = fabs(cos(theta));
-    s = fabs(sin(theta));
-    instapx = hdr->instap[0] * DR2AS;
-    instapy = hdr->instap[1] * DR2AS;
-    if ( instapx || instapy ) {
-      instap = 1;
-      origval = instapx;
-      instapx = instapx*c - instapy*s;
-      instapy = origval*s + instapy*c;
-    }
 
     /* Convert map Position Angle to radians */
     smf_fits_getD( hdr, "MAP_PA", &mappa, status );
@@ -299,13 +280,10 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
     /* Note: this works for the simulator... */
     wdthbox = mapwdth*fabs(cos(mappa)) + maphght*fabs(sin(mappa));
     hghtbox = maphght*fabs(cos(mappa)) + mapwdth*fabs(sin(mappa));
-    wdthpix = (int) ( ( wdthbox*s + hghtbox*c ) / pixsize);
-    hghtpix = (int) ( ( wdthbox*c + hghtbox*s ) / pixsize);
-    origval = mapx;
-    mapx = mapx*s + mapy*c;
-    mapy = mapy*s - origval*c;
-    dxpix = (int) ((mapx + instapx) / pixsize);
-    dypix = (int) ((mapy + instapy) / pixsize);
+    wdthpix = (int) ( wdthbox / pixsize);
+    hghtpix = (int) ( wdthbox / pixsize);
+    dxpix = (int) (mapx / pixsize);
+    dypix = (int) (mapy / pixsize);
 
     /* Get the offsets for each corner of the array */
     temp = (wdthpix - 1) / 2;
