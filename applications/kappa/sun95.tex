@@ -274,20 +274,21 @@
 \newcommand{\AGIref}{\xref{AGI}{sun48}{}}
 \newcommand{\ARDref}{\xref{ARD}{sun183}{}}
 \newcommand{\ASTERIXref}{\xref{{\footnotesize ASTERIX}}{sun98}{}}
-\newcommand{\CCDPACKref}{\xref{{\footnotesize CCDPACK}}{sun139}{}}
+\newcommand{\CCDPACK}{{\footnotesize CCDPACK}\normalsize}
+\newcommand{\CCDPACKref}{\xref{\CCDPACK}{sun139}{}}
 \newcommand{\CGSDRref}{\xref{{\footnotesize CGS4DR}}{sun27}{}}
 \newcommand{\CONVERT}{{\footnotesize CONVERT}\normalsize}
 \newcommand{\CONVERTref}{\xref{{\footnotesize CONVERT}}{sun55}{}}
 \newcommand{\CURSA}{{\footnotesize CURSA}\normalsize}
-\newcommand{\CURSAref}{\xref{{\footnotesize CURSA}}{sun190}{}}
+\newcommand{\CURSAref}{\xref{\CURSA}{sun190}{}}
 \newcommand{\ECHOMOPref}{\xref{{\footnotesize ECHOMOP}}{sun152}{}}
 \newcommand{\ESPref}{\xref{{\footnotesize ESP}}{sun180}{}}
 \newcommand{\EXTRACTORref}{\xref{{\footnotesize EXTRACTOR}}{sun226}{}}
 \newcommand{\FIGARO}{{\footnotesize FIGARO}\normalsize}
-\newcommand{\Figaroref}{\xref{{\footnotesize FIGARO}}{sun86}{}}
+\newcommand{\Figaroref}{\xref{\FIGARO}{sun86}{}}
 \newcommand{\FITSref}{\htmladdnormallink{FITS}{http://fits.gsfc.nasa.gov/}}
 \newcommand{\GAIA}{{\footnotesize GAIA}\normalsize}
-\newcommand{\GAIAref}{\xref{GAIA}{sun214}{}}
+\newcommand{\GAIAref}{\xref{\GAIA}{sun214}{}}
 \newcommand{\GWM}{{\footnotesize GWM}\normalsize}
 \newcommand{\GWMref}{\xref{GWM}{sun130}{}}
 \newcommand{\HDSref}{\xref{HDS}{sun92}{}~}
@@ -40497,7 +40498,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
 
    } 
    \sstusage{
-      provshow ndf show
+      provshow ndf [show]
    }
    \sstparameters{ 
       \sstsubsection{ 
@@ -40517,7 +40518,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
       }{ 
          Determines which ancestors are displayed on the screen. It can
          take any of the following case-insensitive values (or any 
-         abbreviation):
+         abbreviation).
 
          \ssthitemlist{
 
@@ -40567,7 +40568,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
 
          \sstitem
    
-         If a KAPPA application uses one or more input NDFs to create an
+         If a \KAPPA\ application uses one or more input NDFs to create an
          output NDF, the output NDF may or may not contain provenance
          information depending on two things: 1) whether any of the input
          NDFs already contain provenance information, and 2) the value of
@@ -40575,14 +40576,14 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          set the AUTOPROV variable to {\tt "1"} in order to create output
          NDFs that contain provenance information.  The exception to this
          if you are supplied with NDFs from another source that already
-         contain provenance.  If such NDFs are used as inputs to KAPPA
+         contain provenance.  If such NDFs are used as inputs to \KAPPA\ 
          applications, then the output NDFs will contain provenance even
          if the AUTOPROV variable is unset.  However, setting AUTOPROV to
          {\tt "0"} will always prevent provenance information being
          stored in the output NDFs.
    
          \sstitem
-         Some other packages, such as CCDPACK, follow the same strategy
+         Some other packages, such as \CCDPACK, follow the same strategy
          for creating and propagating provenance information.
       }
    }

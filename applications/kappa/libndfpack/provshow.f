@@ -59,7 +59,7 @@
 *    direct parents of the supplied NDF. See parameter PARENTS.
 
 *  Usage:
-*     provshow ndf show
+*     provshow ndf [show]
 
 *  ADAM Parameters:
 *     NDF = NDF (Read)
@@ -71,7 +71,7 @@
 *     SHOW = LITERAL (Read)
 *        Determines which ancestors are displayed on the screen. It can
 *        take any of the following case-insensitive values (or any 
-*        abbreviation):
+*        abbreviation).
 *
 *        - "All" -- Display all ancestors, including the supplied NDF
 *                   itself.
@@ -246,7 +246,7 @@
             GO TO 999
          END IF
 
-*  Get the list of direct patent ID values for this ancestor.
+*  Get the list of direct parent ID values for this ancestor.
          PARIDS = ' '
          IF( .NOT. AST_MAPGET0C( KYMAP2, 'PARENTS', PARIDS, NC, 
      :                           STATUS ) ) THEN
