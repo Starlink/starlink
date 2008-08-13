@@ -84,5 +84,6 @@ F77_SUBROUTINE(msg1_prtln)( CHARACTER(TEXT), INTEGER(STATUS) TRAIL(TEXT)) {
   F77_IMPORT_CHARACTER( TEXT, TEXT_length, text );
 
   msg1Prtln( text, &status );
+  starFree( text );
   F77_EXPORT_INTEGER( status, *STATUS );
 }
