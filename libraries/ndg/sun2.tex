@@ -1278,6 +1278,62 @@ to add further members.
 }
 
 \sstroutine{
+   NDG\_COPY
+}{
+   Copy a section of an existing NDG group to a new group
+}{
+   \sstdescription{
+      This routine extends the functionality of GRP\_COPY when copying
+      elements from a group created by NDG. Such groups have
+      {\tt "}supplemental information{\tt "} associated with them that holds further
+      information about each NDF in the group. This function ensures that
+      the returned group also has such supplemental information.
+
+      NDG{\tt '}s supplemental information is stored in a chain of {\tt "}slave
+      groups{\tt "} that are attached to each other using the facilities of
+      GRP (e.g. see GRP\_SOWN). The supplied group is the lowest level
+      {\tt "}slave{\tt "} in this chain.
+   }
+   \sstinvocation{
+      CALL NDG\_COPY( IGRP, INDXLO, INDXHI, REJECT, IGRP2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP1 = INTEGER (Given)
+      }{
+         A GRP identifier for the input group.
+      }
+      \sstsubsection{
+         INDXLO = INTEGER (Given)
+      }{
+         The lowest index to reject or to copy.
+      }
+      \sstsubsection{
+         INDXHI = INTEGER (Given)
+      }{
+         The highest index to reject or to copy.
+      }
+      \sstsubsection{
+         REJECT = LOGICAL ( Given)
+      }{
+         If reject is .TRUE., then names in the given range are
+         rejected.  Otherwise, names in the given range are copied.
+      }
+      \sstsubsection{
+         IGRP2 = INTEGER (Returned)
+      }{
+         A GRP identifier for the created group. Returned equal to
+         GRP\_\_NOID if an error occurs.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+
+\sstroutine{
    NDG\_CPSUP
 }{
    Copy supplemental information for an NDF

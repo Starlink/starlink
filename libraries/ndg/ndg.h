@@ -40,6 +40,8 @@
 *        Add some sprinkling of const-ness.
 *     15-JUL-2008 (TIMJ):
 *        Use size_t for index to match new Grp interface.
+*     13-AUG-2008 (DSB):
+*        Added ndgCopy.
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
@@ -93,5 +95,7 @@ void ndgMdprv( int indf, int ianc, HDSLoc *prov, int *status );
 void ndgRmprv( int indf, int ianc, int *status );
 void ndgRtprv( int indf, AstKeyMap **roots, int *status );
 void ndgFmprv( int indf, int base, AstKeyMap **keymap, int *status );
+Grp *ndgCopy( const Grp *grp1, size_t indxlo, size_t indxhi, int reject,
+	      int *status );
 
 #endif

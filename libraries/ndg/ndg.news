@@ -5,6 +5,9 @@ Version 5.3
    o New routines for accessing provenance information within NDFs;
    NDG_GTPRV, NDG_RTPRV, NDG_PTPRV, NDG_BEGPV and NDG_ENDPV.
 
+   o  New routine NDG_COPY copies a group created by NDG, including the
+   sumplemental information stored in associated groups.
+
 Version 5.2-3
 
    o Released under the GPL

@@ -39,7 +39,7 @@ ndg1_ndfch.f ndg1_hndlr.f \
 ndg1_ndfdl.f ndg1_sdfex.f ndg_ndfco.f \
 ndg1_subst.f ndg_gtsup.f ndg_ndfas.f ndg_ndfcp.f ndg_ndfcr.f ndg_ndfpr.f \
 ndg_ptsup.f ndg_setsz.f ndg1_sort.f ndg1_crpth.f ndg1_open.f ndg1_forxt.f \
-ndg_begpv.f ndg_endpv.f ndg_cpsup.f
+ndg_begpv.f ndg_endpv.f ndg_cpsup.f ndg_copy.f
 
 BASIC_C_WRAPPER = ndg.c
 

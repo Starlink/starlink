@@ -41,6 +41,8 @@
 *        Removed ndgPtprv (now in ndg_provenance.c) and modified ndgEndpv.
 *     15-JUL-2008 (TIMJ):
 *        Use size_t for index to match new Grp interface.
+*     13-AUG-2008 (DSB):
+*        Added ndgCopy.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -285,6 +287,37 @@ void ndgBegpv( int * status ) {
   F77_IMPORT_INTEGER( STATUS, *status );
 }
 
+
+F77_SUBROUTINE(ndg_copy)( INTEGER(IGRP1), INTEGER(INDXLO),
+			  INTEGER(INDXHI), LOGICAL(REJECT),
+			  INTEGER(IGRP2), INTEGER(STATUS));
+
+Grp * ndgCopy( const Grp* grp1, size_t indxlo, size_t indxhi, int reject,
+	       int * status ) {
+  DECLARE_INTEGER(IGRP1);
+  DECLARE_INTEGER(IGRP2);
+  DECLARE_INTEGER(INDXLO);
+  DECLARE_INTEGER(INDXHI);
+  DECLARE_LOGICAL(REJECT);
+  DECLARE_INTEGER(STATUS);
+
+  Grp * ret = NULL;
+
+  IGRP1 = grpC2F( grp1, status );
+  F77_EXPORT_LOGICAL( reject, REJECT );
+  F77_EXPORT_INTEGER( indxlo, INDXLO );
+  F77_EXPORT_INTEGER( indxhi, INDXHI );
+  F77_EXPORT_INTEGER( *status, STATUS );
+
+  F77_CALL(ndg_copy)( INTEGER_ARG(&IGRP1), INTEGER_ARG(&INDXLO),
+		      INTEGER_ARG(&INDXHI), LOGICAL_ARG(&REJECT),
+		      INTEGER_ARG(&IGRP2), INTEGER_ARG(&STATUS));
+
+  F77_IMPORT_INTEGER( STATUS, *status );
+
+  ret = grpF2C( IGRP2, status );
+  return ret;
+}
 
 
 
