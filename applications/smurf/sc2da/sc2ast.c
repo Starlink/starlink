@@ -862,7 +862,7 @@ int *status              /* global status (given and returned) */
 
 }
 
-/* sc2ast_set_output_system - set the output SYSTEM to match the
+/*+ sc2ast_set_output_system - set the output SYSTEM to match the
                               equivalent JCMT tracking system
  */
 
@@ -871,7 +871,8 @@ void sc2ast_set_output_system
  const char *trsys,      /* JCMT tracking system (given) */
  AstFrameSet *fset,      /* Frameset to update (updated) */
  int * status            /* inherited status (given & returned ) */
- )
+)
+
 /*
  *  Purpose:
  *    Sets the SYSTEM attribute based on JCMT naming convention.
