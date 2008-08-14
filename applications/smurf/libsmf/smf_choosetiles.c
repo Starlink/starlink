@@ -264,7 +264,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
          }
 
 
-/* We do not need to re-map the GRxID frame of the full sized output WCS
+/* We do not need to re-map the GRID frame of the full sized output WCS
    FrameSet. */
          result->map2d = NULL;
          result->map3d = NULL;
@@ -296,6 +296,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
         refwcs[ 0 ] = astGetD( wcsout, "SkyRef(1)" );
         refwcs[ 1 ] = astGetD( wcsout, "SkyRef(2)" );
       }
+      refwcs[ 2 ] = AST__BAD;
       astTranN( wcsout, 1, indims, 1, refwcs,
                 0, astGetI( wcsout, "Nout" ), 1, refpix );
 
