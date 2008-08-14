@@ -111,6 +111,8 @@
 *        long even if provenance had already been written.
 *     2008-07-23 (EC):
 *        Add SC2FFT
+*     2008-08-14 (TIMJ):
+*        Add SMURFCOPY
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -256,6 +258,8 @@ void smurf_mon( int * status ) {
     smurf_sc2concat( status );
   } else if (strcmp( taskname, "SC2FFT" ) == 0 ) {
     smurf_sc2fft( status );
+  } else if (strcmp( taskname, "SMURFCOPY" ) == 0 ) {
+    smurf_smurfcopy( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );

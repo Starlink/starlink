@@ -59,9 +59,12 @@
 *        Add SC2FTS
 *     2008-07-22 (EC):
 *        Add SC2FFT
+*     2008-08-14 (TIMJ):
+*        Add smurfcopy
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
 *     Council, University of British Columbia.  All Rights Reserved.
 
@@ -112,5 +115,6 @@ void smurf_sc2clean( int * );
 void smurf_gsdshow( int * );
 void smurf_sc2concat( int * );
 void smurf_sc2fft( int * );
+void smurf_smurfcopy( int * );
 
 #endif /* SMURF_LIB_DEFINED */
