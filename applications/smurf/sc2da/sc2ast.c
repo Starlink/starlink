@@ -910,14 +910,15 @@ void sc2ast_set_output_system
 
 
 
-/* sc2ast_convert_system - convert JCMT coordinate system to AST coordinate
+/*+ sc2ast_convert_system - convert JCMT coordinate system to AST coordinate
                            system
  */
 const char * sc2ast_convert_system 
 (
  const char *label,   /* Input JCMT coordinate system (given) */
  int * status         /* Inherited status (given & returned) */
- )
+)
+
 /*
 *  Purpose:
 *     Convert a JCMT label for a celestial coordinate system into the
