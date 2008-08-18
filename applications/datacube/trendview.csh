@@ -259,8 +259,8 @@ else
    set maxval = $percnt[2]
    set minval = $percnt[1]
 
-   set top = `calc exp="$maxval+($maxval-$minval)*0.02"`
-   set bot = `calc exp="$minval-0.05*($maxval-$minval)"`
+   set top = `calc exp="$maxval+(($maxval)-($minval))*0.02"`
+   set bot = `calc exp="$minval-0.05*(($maxval)-($minval))"`
 endif
      
 # Set default lower limit.  For zero mask offset, each plot lower y limit
