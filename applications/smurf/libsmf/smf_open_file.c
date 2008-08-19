@@ -672,10 +672,11 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
         /* and dark squid */
         if (dksquid) {
-          da->dksquid = smf_malloc( colsize * nframes, sizeof(int), 0,
+          da->dksquid = smf_malloc( rowsize * nframes, sizeof(int), 0,
                                     status );
+
           if (da->dksquid) memcpy( da->dksquid, dksquid,
-                                   sizeof(int) * colsize * nframes );
+                                   sizeof(int) * rowsize * nframes );
 
         }
 
