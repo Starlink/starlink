@@ -418,8 +418,8 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
             ndfDim( gndf, NDF__MXDIM, pdims, &npdims, status );
             (*data)->ncoeff = pdims[2];
             /* Allocate memory for poly coeffs & copy over */
-            opoly = smf_malloc( npoly, sizeof( double ), 0, status);
-            memcpy( opoly, poly, npoly*sizeof( double ) );
+            opoly = smf_malloc( npoly, sizeof( *opoly ), 0, status);
+            memcpy( opoly, poly, npoly*sizeof( *opoly ) );
             (*data)->poly = opoly;
           }
           /* Release these resources immediately as they're not needed */
@@ -557,7 +557,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           sc2store_headrmap( xloc, nframes, hdr->instrument, status );
 
           /* Malloc some memory to hold all the time series data */
-          hdr->allState = smf_malloc( nframes, sizeof(JCMTState),
+          hdr->allState = smf_malloc( nframes, sizeof(*(hdr->allState)),
                                       1, status );
 
           /* Loop over each element, reading in the information */
@@ -660,23 +660,23 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
            we do not need to worry about sc2store only allowing
            a single file at a time */
         da->flatcal = smf_malloc( colsize * rowsize * da->nflat, 
-                                  sizeof(double), 0, status );
-        da->flatpar = smf_malloc( da->nflat, sizeof(double), 0, status );
+                                  sizeof(*(da->flatcal)), 0, status );
+        da->flatpar = smf_malloc( da->nflat, sizeof(*(da->flatpar)), 0, status);
 
         /* Now copy across from the mapped version */
         if (da->flatcal != NULL) memcpy(da->flatcal, flatcal,
-                                        sizeof(double)*colsize*
+                                        sizeof(*(da->flatcal))*colsize*
                                         rowsize* da->nflat);
         if (da->flatpar != NULL) memcpy(da->flatpar, flatpar,
-                                        sizeof(double)* da->nflat);
+                                        sizeof(*(da->flatpar))* da->nflat);
 
         /* and dark squid */
         if (dksquid) {
-          da->dksquid = smf_malloc( rowsize * nframes, sizeof(int), 0,
-                                    status );
+          da->dksquid = smf_malloc( rowsize * nframes, sizeof(*(da->dksquid)), 
+                                    0, status );
 
           if (da->dksquid) memcpy( da->dksquid, dksquid,
-                                   sizeof(int) * rowsize * nframes );
+                                   sizeof(*(da->dksquid)) * rowsize * nframes );
 
         }
 
