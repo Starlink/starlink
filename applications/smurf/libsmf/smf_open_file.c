@@ -308,6 +308,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
   char xname[DAT__SZNAM+1];  /* Name of extension holding quality names */
   double steptime = 0.0;     /* Step time for this file */
 
+
   /* make sure return pointer is initialised */
   *data = NULL;
 
@@ -543,6 +544,12 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 	  /* Get the time series WCS */
 	  ndfGtwcs( indf, &(hdr->tswcs), status );
 
+          /* Get the obsidss */
+          if( hdr->fitshdr ) {
+            (void )smf_getobsidss( hdr->fitshdr, NULL, 0, hdr->obsidss, 
+                                   sizeof(hdr->obsidss), status );
+          }
+
           /* Need to get the location of the extension for STATE parsing */
           ndfXloc( indf, JCMT__EXTNAME, "READ", &tloc, status );
 
@@ -572,8 +579,6 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           /* Annul the locator */
           datAnnul( &xloc, status );
         }
-
-
 
         /* On the basis of the instrument, we know need to fill in some
            additional header parameters. Some of these may be constants,
@@ -607,9 +612,8 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
     } else {
       /* Get the time series WCS if header exists */
       if( hdr ) {
-	ndfGtwcs( indf, &(hdr->tswcs), status );
+    	ndfGtwcs( indf, &(hdr->tswcs), status );
       }
-
       /* OK, we have raw data. Close the NDF because
          sc2store_rdtstream will open it again */
       ndfAnnul( &indf, status );
@@ -703,9 +707,15 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           /* Store the INSTAP values */
           smf_instap_get( hdr, status );
 
-          /* and work out the observing mode */
-          if (hdr->fitshdr) smf_calc_mode( hdr, status );
+          if (hdr->fitshdr) {
+            /* and work out the observing mode */
+            smf_calc_mode( hdr, status );
 	  
+            /* Get the obsidss */
+            (void )smf_getobsidss( hdr->fitshdr, NULL, 0, hdr->obsidss, 
+                                   sizeof(hdr->obsidss), status );
+          }
+
           /* On the basis of the instrument, we know need to fill in some
              additional header parameters. Some of these may be constants,
              whereas others may involve more file access. Currently we use

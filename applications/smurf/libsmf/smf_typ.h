@@ -141,6 +141,8 @@
 *     2008-07-28 (TIMJ):
 *        Add steptime to smfHead so that we don't have to extract
 *        it from the FITS header each time.
+*     2008-08-20 (EC):
+*        Add obsidss to smfHead
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -180,6 +182,7 @@
 #include "ndf.h"
 #include "star/grp.h"
 #include "smurf_typ.h"
+#include "smurf_par.h"
 #include "fftw3.h"
 
 #define SMF_PATH_MAX GRP__SZNAM
@@ -196,7 +199,6 @@
 
 /* Define the size of strings defining NDF char components (Units, label) */
 #define SMF__CHARLABEL  32
-
 
 /* Different data types supported by SMURF */
 typedef enum smf_dtype {
@@ -319,10 +321,11 @@ typedef struct smfHead {
   int dpazel;               /* Flag: does "detpos" hold AZEL values? */
   double instap[2];         /* instrument aperture (focal plane offsets)  */
   double telpos[3];         /* West LON/LAT/Alt of telescope (deg/deg/m) */
-  double steptime;    /* Steptime in seconds */
+  double steptime;          /* Steptime in seconds */
   char units[SMF__CHARLABEL]; /* Data units */
-  char dlabel[SMF__CHARLABEL]; /* Label associated with data */
+  char dlabel[SMF__CHARLABEL];/* Label associated with data */
   char title[SMF__CHARLABEL]; /* Title associated with data */
+  char obsidss[SZFITSCARD];   /* Unique observation subsys id */
 
 } smfHead;
 
@@ -394,7 +397,7 @@ typedef struct smfArray {
 typedef struct smfGroup {
   Grp *grp;                  /* Copy of input Grp */
   dim_t **subgroups;         /* Indices into Grp [ngroups][nrelated] */
-  size_t *chunk;             /* Flag for continuous chunks in time (ngroups)*/
+  size_t *chunk;             /* Flag for continuous chunks in time [ngroups]*/
   dim_t ngroups;             /* Number of subgroups */
   dim_t nrelated;            /* Maximum number of related files */
 } smfGroup;

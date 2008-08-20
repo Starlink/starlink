@@ -155,5 +155,6 @@ smf_create_smfHead( int * status ) {
   (hdr->units)[0] = '\0';
   (hdr->dlabel)[0] = '\0';
   (hdr->title)[0] = '\0';
+  (hdr->obsidss)[0] = '\0';
   return hdr;
 }
