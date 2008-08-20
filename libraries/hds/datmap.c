@@ -34,7 +34,7 @@ datMap(const HDSLoc    *locator,
 #undef context_message
 #define context_name "DAT_MAP_ERR"
 #define context_message\
-        "DAT_MAP: Error mapping an HDS primitive."
+        "DAT_MAP: Error mapping an HDS primitive (^PRIMLOC)."
 
    GENPTR_POINTER(pntr)
    struct DSC type;
@@ -69,6 +69,8 @@ datMap(const HDSLoc    *locator,
    if (!_ok(*status))
       return *status;
    hds_gl_status = DAT__OK;
+
+   datMsg( "PRIMLOC", locator );
 
 /* Import the type and mode strings.  */
 
@@ -245,6 +247,7 @@ datMap(const HDSLoc    *locator,
    }
 
    _call(hds_gl_status)
+
    return hds_gl_status;
 }
 
@@ -263,11 +266,12 @@ datMapI(const HDSLoc    *locator,
 #undef context_message
 #define context_name "DAT_MAPI_ERR"
 #define context_message\
-        "DAT_MAPI: Error mapping an HDS primitive as integer values."
-
+        "DAT_MAPI: Error mapping HDS ^PRIM primitive as integer values."
+  emsMark();
+  datMsg( "PRIM", locator );
    datMap( locator, "_INTEGER", mode_str, ndim, dims,
            (void**)pntr, status );
-
+   emsRlse();
    return hds_gl_status;
 }
 
@@ -286,11 +290,12 @@ datMapR(const HDSLoc *locator,
 #undef context_message
 #define context_name "DAT_MAPR_ERR"
 #define context_message\
-        "DAT_MAPR: Error mapping an HDS primitive as real values."
-
+        "DAT_MAPR: Error mapping an HDS primitive as real values ^PRIM."
+  emsMark();
+  datMsg( "PRIM", locator );
    datMap( locator, "_REAL", mode_str, ndim, dims,
            (void**)pntr, status );
-
+   emsRlse();
    return hds_gl_status;
 }
 
@@ -309,11 +314,12 @@ datMapD(const HDSLoc *locator,
 #undef context_message
 #define context_name "DAT_MAPD_ERR"
 #define context_message\
-        "DAT_MAPD: Error mapping an HDS primitive as double precision values."
-
+        "DAT_MAPD: Error mapping an HDS primitive as double precision values. ^PRIM"
+  emsMark();
+  datMsg( "PRIM", locator );
    datMap( locator, "_DOUBLE", mode_str, ndim, dims,
            (void**)pntr, status );
-
+   emsRlse();
    return hds_gl_status;
 }
 
@@ -332,11 +338,12 @@ datMapL(const HDSLoc *locator,
 #undef context_message
 #define context_name "DAT_MAPL_ERR"
 #define context_message\
-        "DAT_MAPL: Error mapping an HDS primitive as logical values."
-
+        "DAT_MAPL: Error mapping an HDS primitive as logical values. ^PRIM"
+  emsMark();
+  datMsg( "PRIM", locator );
    datMap( locator, "_LOGICAL", mode_str, ndim, dims,
            (void**)pntr, status );
-
+   emsRlse();
    return hds_gl_status;
 }
 
@@ -355,11 +362,12 @@ datMapC(const HDSLoc *locator,
 #undef context_message
 #define context_name "DAT_MAPC_ERR"
 #define context_message\
-        "DAT_MAPC: Error mapping an HDS primitive as character values."
-
+        "DAT_MAPC: Error mapping an HDS primitive as character values ^PRIM"
+  emsMark();
+  datMsg( "PRIM", locator );
    datMap( locator, "_CHAR", mode_str, ndim, dims,
            (void**)pntr, status );
-
+   emsRlse();
    return hds_gl_status;
 }
 
@@ -379,12 +387,13 @@ datMapV(const HDSLoc *locator,
 #undef context_message
 #define context_name "DAT_MAPV_ERR"
 #define context_message\
-        "DAT_MAPV: Error mapping an HDS vectorized primitive."
+        "DAT_MAPV: Error mapping an HDS vectorized primitive. ^PRIM"
 
   /* Local variables */
   hdsdim dims[DAT__MXDIM];
   int    ndim;
-
+  emsMark();
+  datMsg( "PRIM", locator );
   /* Initialise return values */
   *pntr = NULL;
   *actval = 0;
@@ -393,7 +402,7 @@ datMapV(const HDSLoc *locator,
   datShape( locator, DAT__MXDIM, dims, &ndim, status );
   datMap( locator, type_str, mode_str, ndim, dims,
 	  pntr, status );
-
+  emsRlse();
   return hds_gl_status;
 }
 
