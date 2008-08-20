@@ -430,6 +430,7 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
                 hdr = data->hdr;
                 refhdr = refdata->hdr;	    
                 hdr->instrument = refhdr->instrument;
+                hdr->steptime = refhdr->steptime;
 
                 switch ( hdr->instrument ) {
                 case INST__AZTEC:

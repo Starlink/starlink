@@ -140,6 +140,8 @@
 *        Changed nchunks to dim_t
 *     2008-07-11 (TIMJ):
 *        Use one_strlcpy/strlcat
+*     2008-08-20 (EC):
+*        Create smfHead and propagate steptime
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -426,7 +428,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
 	  
           memset( &head, 0, sizeof(head) );
           head.dtype=SMF__NULL;
-	  
+
           /* Determine dimensions of model component */
 	  
           switch( mtype ) {
@@ -671,7 +673,10 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
                 data->dtype = head.dtype;
                 data->ndims = head.ndims;
                 memcpy( data->dims, head.dims, sizeof( head.dims ) );
-		
+                data->hdr = smf_create_smfHead( status );
+
+                if( data->hdr ) data->hdr->steptime = idata->hdr->steptime;
+
                 /* Data pointer points to mmap'd memory AFTER HEADER */
                 data->pntr[0] = dataptr;
 		
