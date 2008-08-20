@@ -454,6 +454,7 @@ int *status              /* Global status (given and returned) */
    astSetFitsL ( fitschan, "STANDARD", 0, "True if source is a calibrator", 0 );
    astSetFitsI ( fitschan, "OBSNUM", obsnum, "Observation Number", 0 );
    astSetFitsI ( fitschan, "NSUBSCAN", nsubscan, "Sub-scan Number", 0 );
+   astSetFitsI ( fitschan, "SEQCOUNT", obsnum, "Sequence Counter", 0 );
    astSetFitsL ( fitschan, "OBSEND", obsend, 
 		 "True if frame is last in current observation", 0 );
    astSetFitsS ( fitschan, "UTDATE", utdate, 
