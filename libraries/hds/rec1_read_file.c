@@ -167,6 +167,16 @@ argument of ^BLOC for file ^FILE (internal programming error).",
             iochan = rec_ga_fcv[ slot ].read;
          }
 
+         if (iochan == NULL) {
+           hds_gl_status = DAT__FILRD;
+           rec1_fmsg( "FILE", slot );
+           emsRep( "REC1_READ_FILE_1b2",
+                   "iochan could not be obtained for file ^FILE "
+                   "(internal programming error).",
+                   &hds_gl_status );
+           return hds_gl_status;
+         }
+
 /* VMS version:                                                             */
 /* ===========                                                              */
 #if defined( vms )
