@@ -99,6 +99,8 @@
  *        Use smf_find_subarray
  *     2008-07-29 (TIMJ):
  *        Steptime is now in smfHead.
+ *     2008-08-20 (EC):
+ *        Establish continuity based on OBSIDSS, SEQCOUNT and NSUBSCAN
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -145,6 +147,7 @@
 #include "star/ndg.h"
 #include "star/grp.h"
 #include "msg_par.h"
+#include "star/one.h"
 
 /* SMURF routines */
 #include "smf.h"
@@ -191,7 +194,12 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   dim_t ny;                   /* (data->dims)[1] */
   double obslam;              /* Observed wavelength from FITS header (m) */
   double opentime;            /* RTS_END value at beginning of written data */
+  int refnsubscan;            /* reference subscan file counter */
+  char refobsidss[SZFITSCARD];/* reference obsidss */
+  int refseqcount;            /* reference sequence counter */
   int *refsubsys=NULL;        /* Array of template subarrays */
+  int seqcount;               /* Sequence counter */
+  int nsubscan;               /* subscan file counter */
   double *starts = NULL;      /* Array of starting RTS_END values */
   double steptime = 0;        /* Length of a sample */
   dim_t **subgroups = NULL;   /* Array containing index arrays to parent Grp */
@@ -244,6 +252,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
     /* First step: open file and read start/end RTS_END values */
     smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
     hdr = data->hdr;
+
     /* Set header for first time slice */
     frame = 0;
     smf_tslice_ast( data, frame, 0, status );
@@ -352,9 +361,10 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   thislen = 0;
   totlen = 0;
   thischunk = 0;
-  opentime = 0;
-  writetime = 0;
   maxconcat = 0;
+  refseqcount=0;
+  refnsubscan=0;
+  refobsidss[0] = '\0';
 
   for( i=0; i<ngroups; i++ ) {
 
@@ -362,9 +372,15 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
     smf_open_file( igrp, subgroups[i][0], "READ", SMF__NOCREATE_DATA, &data, 
                    status );
 
-    if( *status == SAI__OK ) {
-      hdr = data->hdr;
 
+    /* Read the SEQCOUNT and NSUBSCAN header values */
+    hdr = data->hdr;
+    smf_fits_getI( hdr, "SEQCOUNT", &seqcount, status );
+    smf_fits_getI( hdr, "NSUBSCAN", &nsubscan, status );
+
+    if( *status == SAI__OK ) {
+
+      /* Length of chunk */
       if( data->isTordered ) {
         thislen = data->dims[2];
       } else {
@@ -403,8 +419,6 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
     smf_tslice_ast( data, frame, 0, status );
 
     if( *status == SAI__OK ) {
-      opentime = hdr->state->rts_end;
-
       if( i > 0 ) {
         /* check that we have the same subarrays */
         matchsubsys = 1;
@@ -445,8 +459,10 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
            same chunk. Also check that the subsystems match, and that the
            continuous chunk doesn't exceed maxlen */
 
-        if( ( fabs((opentime - writetime)*24.*3600.) > steptime*1.5) || 
+        if( !( !strncmp(refobsidss, hdr->obsidss, sizeof(refobsidss)) && 
+              (seqcount==refseqcount) && ((nsubscan-refnsubscan)==1) ) || 
             !matchsubsys || (maxlen && (totlen > maxlen)) ) {
+
           /* Found a discontinuity */
           thischunk++;
 
@@ -455,6 +471,11 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
           totlen = thislen;
         }
       }
+
+      /* update refobsidss, refseqcount, refnsubscan */
+      one_strlcpy( refobsidss, hdr->obsidss, sizeof(refobsidss), status );
+      refseqcount = seqcount;
+      refnsubscan = nsubscan;
     }
 
     /* Obtain the last RTS_END from this file */
@@ -465,8 +486,6 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
     smf_tslice_ast( data, frame, 0, status );
     
     if( *status == SAI__OK ) {
-      writetime = hdr->state->rts_end;
-
       /* Populate the reference subsystem array */
       for( j=0; j<nelem; j++ ) {
         if( subgroups[i][j] > 0 ) {
