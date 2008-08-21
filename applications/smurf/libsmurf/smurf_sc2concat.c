@@ -200,7 +200,7 @@ void smurf_sc2concat( int *status ) {
   basegrp = grpNew( "Base Group", status );
 
   /* Loop over time chunks */
-  for( i=0; i<igroup->ngroups; i++ ) {
+  for( i=0; (*status==SAI__OK)&&(i<igroup->ngroups); i++ ) {
     /* Loop over subarray */
     for( idx=0; idx<igroup->nrelated; idx++ ) {
       /* Check for new continuous chunk */
