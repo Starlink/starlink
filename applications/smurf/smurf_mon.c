@@ -113,6 +113,8 @@
 *        Add SC2FFT
 *     2008-08-14 (TIMJ):
 *        Add SMURFCOPY
+*     2008-08-20 (TIMJ):
+*        Report if the EMS stack level has changed.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -157,6 +159,7 @@
 #include "star/grp.h"
 #include "star/hds.h"
 #include "ast.h"
+#include "ems.h"
 #include "sc2da/sc2ast.h"
 
 #include "libsmurf/smurflib.h"
@@ -181,8 +184,13 @@ void smurf_mon( int * status ) {
   int nloc0;                   /* Number of active HDS Locators at start */
   int nloc1;                   /* Number of active HDS Locators at end */
   int memory_caching;          /* Is AST current caching unused memory? */
+  int emslev1;                 /* EMS level on entry */
+  int emslev2;                 /* EMS level on exit */
 
   if ( *status != SAI__OK ) return; 
+
+  /* Read the input error message stack level */
+  emsLevel( &emslev1 );
 
   /* Register our status variable with AST */
   astWatch( status );
@@ -319,6 +327,22 @@ void smurf_mon( int * status ) {
     printf("filter - %s\n",filter);
   }
   errEnd( status );
+
+  /* Read the exitt error message stack level */
+  emsLevel( &emslev2 );
+
+  if (*status == SAI__OK && emslev1 != emslev2 ) {
+    errMark();
+    msgBlank( status );
+    msgSetc( "NAME", taskname );
+    msgSeti( "LV1", emslev1);
+    msgSeti( "LV2", emslev2);
+    msgOut( " ", "WARNING: EMS Stack level went from ^LV1 to ^LV2"
+            " during execution of ^NAME (" PACKAGE_UPCASE " programming"
+            " error).", status );
+    msgBlank(status);
+    errRlse();
+  }
 
   /* The astFlushMemory function does nothing unless AST has been compiled 
    * with the MEM_DEBUG flag. If this is the case, then it frees all AST 
