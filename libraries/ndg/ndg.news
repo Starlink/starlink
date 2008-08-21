@@ -8,6 +8,9 @@ Version 5.3
    o  New routine NDG_COPY copies a group created by NDG, including the
    sumplemental information stored in associated groups.
 
+   o  New routine NDG_CREXP expands a supplied group expression into a
+   list of names of NDFs to be created.
+
 Version 5.2-3
 
    o Released under the GPL

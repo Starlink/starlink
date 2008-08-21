@@ -1,7 +1,7 @@
-      SUBROUTINE NDG1_CREXP( GRPEXP, IGRP0, IGRP, SIZE, FLAG, STATUS )
+      SUBROUTINE NDG_CREXP( GRPEXP, IGRP0, IGRP, SIZE, FLAG, STATUS )
 *+
 *  Name:
-*     NDG1_CREXP
+*     NDG_CREXP
 
 *  Purpose:
 *     Store the names of a specified group of NDF to be created.
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDG1_CREXP( GRPEXP, IGRP0, IGRP, SIZE, FLAG, STATUS )
+*     CALL NDG_CREXP( GRPEXP, IGRP0, IGRP, SIZE, FLAG, STATUS )
 
 *  Description:
 *     The supplied group expression is parsed (using the facilities of 
@@ -49,6 +49,7 @@
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council.
 *     Copyright (C) 1997, 1999 Central Laboratory of the Research Councils.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -87,6 +88,8 @@
 *        Modified to avoid copying structure from basis HDS files.
 *     29-JAN-2007 (DSB):
 *        Ensure variables are initialised to avoid valgrind warnings.
+*     21-AUG-2008 (DSB):
+*        Name changed from NDG1_CREXP to NDG_CREXP.
 *     {enter_further_changes_here}
 
 *  Bugs:

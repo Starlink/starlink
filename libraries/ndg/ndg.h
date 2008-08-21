@@ -97,5 +97,7 @@ void ndgRtprv( int indf, AstKeyMap **roots, int *status );
 void ndgFmprv( int indf, int base, AstKeyMap **keymap, int *status );
 Grp *ndgCopy( const Grp *grp1, size_t indxlo, size_t indxhi, int reject,
 	      int *status );
+void ndgCrexp( const char grpexp[], const Grp *igrp0, Grp **igrp, 
+               size_t *size, int *flag, int *status );
 
 #endif

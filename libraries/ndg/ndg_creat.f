@@ -229,7 +229,7 @@
 
 *  Expand the group expression into a list of NDF names and append
 *  them to the end of the specified group.
-      CALL NDG1_CREXP( GRPEXP, IGRP0, IGRP, SIZE, FLAG, STATUS )
+      CALL NDG_CREXP( GRPEXP, IGRP0, IGRP, SIZE, FLAG, STATUS )
 
 *  If an error has occurred while expanding the group expression, ask 
 *  the user to try again.

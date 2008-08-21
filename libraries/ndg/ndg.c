@@ -319,6 +319,38 @@ Grp * ndgCopy( const Grp* grp1, size_t indxlo, size_t indxhi, int reject,
   return ret;
 }
 
+F77_SUBROUTINE(ndg_crexp)( CHARACTER(GRPEXP), INTEGER(IGRP0), INTEGER(IGRP),
+			   INTEGER(SIZE), LOGICAL(FLAG), INTEGER(STATUS) TRAIL(GRPEXP) );
+
+void ndgCrexp( const char grpexp[], const Grp *igrp0, Grp ** igrp, size_t *size, int * flag,
+	       int *status ){
+   DECLARE_INTEGER(IGRP0);
+   DECLARE_INTEGER(IGRP);
+   DECLARE_INTEGER(SIZE);
+   DECLARE_INTEGER(STATUS);
+   DECLARE_LOGICAL(FLAG);
+   DECLARE_CHARACTER(GRPEXP, GRP__SZNAM);
+
+   IGRP = grpC2F( *igrp, status );
+   IGRP0 = grpC2F( igrp0, status );
+   if ( *status != SAI__OK ) return;
+
+   F77_EXPORT_CHARACTER( grpexp, GRPEXP, GRP__SZNAM );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(ndg_crexp)( CHARACTER_ARG(GRPEXP), INTEGER_ARG(&IGRP0), INTEGER_ARG(&IGRP),
+                        INTEGER_ARG(&SIZE), LOGICAL_ARG(&FLAG),
+                        INTEGER_ARG(&STATUS) TRAIL_ARG(GRPEXP) );
+
+   F77_IMPORT_INTEGER( SIZE, *size );
+   F77_IMPORT_LOGICAL( FLAG, *flag );
+   
+   F77_IMPORT_INTEGER( STATUS, *status );
+   *igrp = (Grp *) grpF2C( IGRP, status );
+
+   return;
+}
+
 
 
 

@@ -1623,6 +1623,68 @@ to add further members.
 }
 
 \sstroutine{
+   NDG\_CREXP
+}{
+   Store the names of a specified group of NDF to be created
+}{
+   \sstdescription{
+      The supplied group expression is parsed (using the facilities of
+      the GRP routine GRP\_GROUP, see SUN/150) to produce a list of
+      explicit NDF names. No check is made to see if these NDFs exist
+      or not, and any wild-cards in the NDF names are ignored. The names
+      are appended to the group identified by IGRP. If IGRP has the
+      value GRP\_\_NOID on entry, then a new group is created and IGRP is
+      returned holding the new group identifier.
+
+      If IGRP0 holds a valid group identifier on entry, then the group
+      identified by IGRP0 is used as the basis for any modification
+      element contained in the supplied group expression. If IGRP0 holds
+      an invalid identifier (such as GRP\_\_NOID) on entry then
+      modification elements are included literally in the output group.
+   }
+   \sstinvocation{
+      CALL NDG\_CREXP( GRPEXP, IGRP0, IGRP, SIZE, FLAG, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         GRPEXP = CHARACTER$*$($*$) (Given)
+      }{
+         The group expression specifying the NDF names to be stored in
+         the group.
+      }
+      \sstsubsection{
+         IGRP0 = INTEGER (Given)
+      }{
+         The GRP identifier for the group to be used as the basis for
+         any modification elements.
+      }
+      \sstsubsection{
+         IGRP = INTEGER (Given and Returned)
+      }{
+         The GRP identifier for the group to which the supplied NDF
+         names are to be appended.
+      }
+      \sstsubsection{
+         SIZE = INTEGER (Returned)
+      }{
+         The total number of NDF names in the returned group.
+      }
+      \sstsubsection{
+         FLAG = LOGICAL (Returned)
+      }{
+         If the group expression was terminated by the GRP {\tt "}flag{\tt "}
+         character, then FLAG is returned .TRUE. Otherwise it is
+         returned .FALSE. Retuned .FALSE. if an error occurs.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+
+\sstroutine{
    NDG\_CTPRV
 }{
    Count the number of ancestors used in the creation of an NDF

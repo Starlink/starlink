@@ -90,7 +90,7 @@
 
 *  Store a group of NDFs to be created.
       IGRP = GRP__NOID
-      CALL NDG1_CREXP( 'TOM,DICK,HARRY-', GRP__NOID, IGRP, SIZE, FLAG, 
+      CALL NDG_CREXP( 'TOM,DICK,HARRY-', GRP__NOID, IGRP, SIZE, FLAG, 
      :                 STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
