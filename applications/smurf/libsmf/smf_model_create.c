@@ -204,7 +204,6 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
                        smfArray **mdata, int *status ) {
 
   /* Local Variables */
-  int added=0;                  /* Number of names added to group */
   void *buf=NULL;               /* Pointer to total container buffer */
   int copyinput=0;              /* If set, container is copy of input */
   smfData *data = NULL;         /* Data struct for file */
@@ -288,7 +287,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
     one_strlcat( fname_grpex, mname, len, status );
     one_strlcat( fname_grpex, suffix, len, status );
 
-    grpGrpex( fname_grpex, igroup->grp, mgrp, &msize, &added, &flag, status );
+    ndgCrexp( fname_grpex, igroup->grp, &mgrp, &msize, &flag, status );
 
     if( (*status == SAI__OK) && (msize != isize) ) {
       *status = SAI__ERROR;

@@ -179,7 +179,6 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
                           int *status ) {
 
   /* Local Variables */
-  int added;                    /* Number of elements added to grp */
   dim_t base;                   /* Base for array index */
   smfData *data=NULL;           /* Concatenated smfData */
   int flag;                     /* Flag */
@@ -451,8 +450,8 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
                 outgrp = grpNew( "GRP", status );
 
                 ndgCpsup( igrp->grp, igrp->subgroups[j][i], ingrp, status );
-                grpGrpex( "./*_con.dimm|.sdf||", ingrp, outgrp, &outgrpsize, 
-                          &added, &flag, status );
+                ndgCrexp( "./*_con.dimm|.sdf||", ingrp, &outgrp, &outgrpsize,
+                          &flag, status );
 
                 pname = filename;
                 grpGet( outgrp, 1, 1, &pname, SMF_PATH_MAX, status);
