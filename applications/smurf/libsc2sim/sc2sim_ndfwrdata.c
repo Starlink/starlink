@@ -223,7 +223,11 @@
 *     2008-07-23 (AGG):
 *        Write out BASEC1, BASEC2 and TRACKSYS
 *     2008-07-23 (EC):
-*        - Shutter us now a floating point
+*        - Shutter is now a floating point
+*     2008-08-21 (AGG):
+*        - Set TCS_TAI not RTS_END when creating WCS for DREAM/STARE images
+*        - Set output coordinate system with sc2ast_set_output_system as this
+*          routine deals with moving sources too
 
 *  Copyright:
 *     Copyright (C) 2007, 2008 Science and Technology Facilities Council.
@@ -590,16 +594,14 @@ int *status              /* Global status (given and returned) */
 		   "[deg] Scan PA relative to N in SCAN_CRD system", 0 );
      astSetFitsS ( fitschan, "SCAN_PAT", "", "Scanning pattern", 0 );
    }
-   /* Write out BASE position and tracking coordinate system */
 
+   /* Write out BASE position and tracking coordinate system */
    astSetFitsS ( fitschan, "TRACKSYS", head[0].tcs_tr_sys, 
 		 "TCS Tracking coordinate system", 0 );
    astSetFitsF ( fitschan, "BASEC1", (head[0].tcs_tr_bc1)*AST__DR2D, 
 		 "[deg] TCS BASE position (longitude) in TRACKSYS", 0 );
    astSetFitsF ( fitschan, "BASEC2", (head[0].tcs_tr_bc2)*AST__DR2D, 
 		 "[deg] TCS BASE position (latitude) in TRACKSYS", 0 );
-
-
 
    /* JOS parameters */
    astSetFitsCN ( fitschan, "COMMENT", "", "-- JOS parameters --", 0 );
@@ -774,7 +776,7 @@ int *status              /* Global status (given and returned) */
 
        state.tcs_az_ac1 = head[seqstart].tcs_az_ac1;
        state.tcs_az_ac2 = head[seqstart].tcs_az_ac2;
-       state.rts_end = head[seqstart].rts_end;
+       state.tcs_tai = head[seqstart].tcs_tai;
 
        /* Set DATE-OBS string for this image - UTC */
        sc2sim_dateobs( inx->mjdaystart + 
@@ -794,7 +796,9 @@ int *status              /* Global status (given and returned) */
 	  new system rather than worrying about it ourselves. */
        astSetD( wcs, "SkyRef(1)", head[seqstart].tcs_az_ac1 );
        astSetD( wcs, "SkyRef(2)", head[seqstart].tcs_az_ac2 );
-       astSetC( wcs, "SYSTEM", cosys );
+
+       /* Set the output coordinate system */
+       sc2ast_set_output_system( head[seqstart].tcs_tr_sys, wcs, status );
 
        /* Set seqstart/end for FITS header */
        seqstart += seqoffset;
