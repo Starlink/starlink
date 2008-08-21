@@ -324,33 +324,33 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
     msgOutif(MSG__NORM, " ", "Processing data ^OBJ from the following observation^S :", status);
     for (i = 0; i < nobs; i++) {
       if (astMapGet0A( obsmap, astMapKey(obsmap, i ), &obsinfo )) {
-	const char * ctemp;
-	int itemp;
+        const char * ctemp;
+        int itemp;
 
-	/* only display object if we have not already done so */
-	if (nobj > 1) {
-	  astMapGet0C( obsinfo, "OBJECT", &ctemp );
-	  msgSetc( "OBJ", ctemp);
-	} else {
-	  msgSetc( "OBJ", " ");
-	}
+        /* only display object if we have not already done so */
+        if (nobj > 1) {
+          astMapGet0C( obsinfo, "OBJECT", &ctemp );
+          msgSetc( "OBJ", ctemp);
+        } else {
+          msgSetc( "OBJ", " ");
+        }
 
-	/* do not display "SCIENCE" as it is the default */
-	astMapGet0I( obsinfo, "OBSTYPE", &itemp );
-	if (itemp != SMF__TYP_SCIENCE) {
-	  msgSetc( "OT", "(");
-	  msgSetc( "OT", smf_obstype_str( itemp, status) );
-	  msgSetc( "OT", ")");
-	} else {
-	  msgSetc( "OT", " ");
-	}
-	astMapGet0I( obsinfo, "OBSMODE", &itemp );
-	msgSetc( "OM", smf_obsmode_str( itemp, status) );
-	astMapGet0I( obsinfo, "OBSNUM", &itemp );
-	msgSeti( "ON", itemp);
-	astMapGet0I( obsinfo, "UTDATE", &itemp );
-	msgSeti( "UT", itemp);
-	msgOutif(MSG__NORM, "", "  ^UT #^ON ^OM ^OBJ ^OT", status);
+        /* do not display "SCIENCE" as it is the default */
+        astMapGet0I( obsinfo, "OBSTYPE", &itemp );
+        if (itemp != SMF__TYP_SCIENCE) {
+          msgSetc( "OT", "(");
+          msgSetc( "OT", smf_obstype_str( itemp, status) );
+          msgSetc( "OT", ")");
+        } else {
+          msgSetc( "OT", " ");
+        }
+        astMapGet0I( obsinfo, "OBSMODE", &itemp );
+        msgSetc( "OM", smf_obsmode_str( itemp, status) );
+        astMapGet0I( obsinfo, "OBSNUM", &itemp );
+        msgSeti( "ON", itemp);
+        astMapGet0I( obsinfo, "UTDATE", &itemp );
+        msgSeti( "UT", itemp);
+        msgOutif(MSG__NORM, "", "  ^UT #^ON ^OM ^OBJ ^OT", status);
       }
     }
     msgBlank( status );
