@@ -19,7 +19,7 @@
 *  Arguments:
 *     indark = const smfData * (Given)
 *        Dark to be processed.
-*     outdark = smfData ** (Given)
+*     outdark = smfData ** (Returned)
 *        Pointer to return processed dark. *outdark is NULL
 *        if the input dark has already been reduced (is 2d).
 *     status = int* (Given and Returned)
