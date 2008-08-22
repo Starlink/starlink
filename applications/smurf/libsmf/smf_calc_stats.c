@@ -75,7 +75,7 @@
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
+*     Copyright (C) 2006-2008 University of British Columbia. All Rights
 *     Reserved.
 
 *  Licence:
@@ -175,8 +175,8 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
       *status = SAI__ERROR;
       msgSeti("ND", data->ndims);
       errRep(FUNC_NAME,
-	     "Number of dimensions of input file is ^ND: should be 3. Meaningless to compute statistics for 2-D data.",
-	     status);
+             "Number of dimensions of input file is ^ND: should be 3. Meaningless to compute statistics for 2-D data.",
+             status);
       return;
     }
   }
@@ -214,7 +214,7 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
       msgSeti("N", nmax);
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Requested index, ^I, is out of range (max is ^N).", 
-	     status);
+             status);
       return;
     }
   }
@@ -226,7 +226,7 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
       msgSeti("N", nsamp);
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Requested sample, ^J, is out of range (0 < lo < ^N).",
-	     status);
+             status);
       return;
     }
   }
@@ -236,7 +236,7 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
       msgSeti("N", nsamp);
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Requested sample, ^J, is out of range (0 < hi < ^N).",
-	     status);
+             status);
       return;
     }
   }
@@ -247,7 +247,7 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
     lo = hi;
     hi = temp;
     msgOutif(MSG__VERB," ", "Oops - lo > hi. Swapping them round.", 
-	     status);
+             status);
   }  
 
   /* If lo and hi are both zero then the whole range is assumed */
@@ -260,8 +260,8 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
     if ( *status == SAI__OK) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, 
-	     "Requested index range is zero (lo = hi). Unable to compute statistics.", 
-	     status);
+             "Requested index range is zero (lo = hi). Unable to compute statistics.", 
+             status);
       return;
     }
   }
@@ -272,7 +272,7 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
   statsdata = smf_malloc( npts, sizeof(double), 0, status );
   if( statsdata == NULL ) {
     errRep( FUNC_NAME, "Unable to allocate memory for statistics array", 
-	    status );
+            status );
     return;
   }
 
@@ -282,12 +282,12 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
     if ( strncmp( mode, "b", 1 ) == 0 ) {
       /* Pick out a bolometer time series */
       for ( k=lo; k<=hi; k++) {
-	statsdata[k-lo] = indata[index + k*nbol];
+        statsdata[k-lo] = indata[index + k*nbol];
       }
     } else {
       /* Pick out a range of bolometers from a timeslice */
       for ( k=lo; k<=hi; k++) {
-	statsdata[k-lo] = indata[nbol*index + k];
+        statsdata[k-lo] = indata[nbol*index + k];
       }
     }
   } else {
@@ -298,9 +298,9 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
   /* Calculate stats */
   if ( *status == SAI__OK) {
     kpgStatd( bad, npts, statsdata, nclip, clip, 
-	      &ngood, &imin, &dmin, &imax, &dmax, &sum, mean, stdev,
-	      &ngoodc, &iminc, &dminc, &imaxc, &dmaxc, &sumc, &meanc, &stdevc,
-	      status);
+              &ngood, &imin, &dmin, &imax, &dmax, &sum, mean, stdev,
+              &ngoodc, &iminc, &dminc, &imaxc, &dmaxc, &sumc, &meanc, &stdevc,
+              status);
   }    
 
   /* Free resources */
