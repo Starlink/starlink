@@ -21,13 +21,19 @@
 *     data = const smfData* (Given)
 *        Pointer to input data struct
 *     mode = const char* (Given)
-*        Mode to determine whether data are for fixed bolometer or timeslice
-*     index = const int (Given)
-*        Index into array of fixed datapoint
-*     lo = int (Given)
-*        Lower index bound into array
-*     hi = int (Given)
-*        Upper index bound into array
+*        Mode to determine whether data are for fixed bolometer or timeslice.
+*        - "b" to calculate stats for a single bolometer at coordinate "index".
+*        - "t" to calculate stats for a 2d slice at a particular time "index"
+*     index = const dim_t (Given)
+*        Index into array of fixed datapoint. For "b" this will be the bolometer
+*        number (assuming flattened). For "t" this will be the time slice.
+*     lo = dim_t (Given)
+*        Lower index bound into array. For "b" this is the index of the first
+*        time slice. For "t" this is the start bolometer. "0" for min value.
+*     hi = dim_t (Given)
+*        Upper index bound into array. For "b" this is the end time slice.
+*        For "t" this is the end bolometer.
+*        "0" for max value.
 *     mean = double* (Returned)
 *        Mean over specified interval
 *     stdev = double* (Returned)
@@ -38,7 +44,7 @@
 *  Description:
 *     This routine calculates the mean and standard deviation of a
 *     sample of points specified by three indices. The Kappa routine
-*     kpgStatd is used. The first index is which bolometer or
+*     kpgStatx is used. The first index is which bolometer or
 *     timeslice we are interest in, the second and third mark the
 *     range of values to include in the sample. If both lo and hi are
 *     zero then the entire range is used. On error a mean and std
@@ -47,11 +53,13 @@
 *  Notes: 
 *     - The range lo to hi is INCLUSIVE.
 *     - Further API updates are likely in order to take fuller advantage
-*       of kpsStatd.
+*       of kpgStatx.
+*     - This routine is not thread-safe since it uses Fortran kaplibs routines.
 
 *  Authors:
 *     Andy Gibb (UBC)
 *     Edward Chapin (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -72,9 +80,12 @@
 *        Update to use new smf_free behaviour
 *     2008-07-03 (EC):
 *        Use dim_t for index, lo and hi
+*     2008-08-21 (TIMJ):
+*        Works for multiple data types.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilties Council.
 *     Copyright (C) 2006-2008 University of British Columbia. All Rights
 *     Reserved.
 
@@ -127,14 +138,23 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
 		      int *status) {
 
   /* Local variables */
-  double *indata = NULL;      /* Pointer to input data array */
+  void *indata = NULL;        /* Pointer to input data array */
   size_t k;                   /* Loop counter */
+  size_t mult;                /* stride through data array */
   size_t npts;                /* Number of data points in range */
+  size_t nbperel;             /* number of bytes in data type */
   dim_t nbol;                 /* Number of bolometers */
   dim_t nmax;                 /* Max value for index */
-  dim_t nsamp;                  /* Number of samples */
-  double *statsdata = NULL;   /* Pointer to array for computing stats */
+  dim_t nsamp;                /* Number of samples */
+  size_t offset;              /* offset into data array */
+  void *statsdata = NULL;     /* Pointer to array for computing stats */
   int temp;                   /* Temporary variable */
+
+  /* Per data type pointers */
+  double *in_d = NULL;        /* pointer to double input data */
+  double *stats_d = NULL;     /* pointer to double stats data */
+  int *in_i = NULL;           /* pointer to int input data */
+  int *stats_i = NULL;        /* pointer to int stats data */
 
   /* Current list of variables for kpgStatd - move into API as appropriate */
   int nclip = 0;              /* Number of K-sigma clipping iterations to apply: 
@@ -180,10 +200,6 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
       return;
     }
   }
-
-  /* Should check data type for double */
-  smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status);
-  if ( *status != SAI__OK) return;
 
   /* Check mode */
   if ( strncmp( mode, "b", 1 ) == 0 ) {
@@ -266,10 +282,13 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
     }
   }
 
+  /* How many bytes per element */
+  nbperel = smf_dtype_size(data, status );
+
   /* Allocate memory for data */
   npts = hi - lo + 1;
 
-  statsdata = smf_malloc( npts, sizeof(double), 0, status );
+  statsdata = smf_malloc( npts, nbperel, 0, status );
   if( statsdata == NULL ) {
     errRep( FUNC_NAME, "Unable to allocate memory for statistics array", 
             status );
@@ -277,18 +296,41 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
   }
 
   /* Set range of data. Use <= because the range is inclusive. */
+
+  /* Calculate offset and multiplier. This lets us to work in either mode
+     without repeating code */
+  if (strncmp( mode, "b", 1 ) == 0 ) {
+    offset = index;
+    mult = nbol;
+  } else {
+    offset = nbol * index;
+    mult = 1;
+  }
+
   indata = (data->pntr)[0];
   if( indata != NULL ) {
-    if ( strncmp( mode, "b", 1 ) == 0 ) {
-      /* Pick out a bolometer time series */
-      for ( k=lo; k<=hi; k++) {
-        statsdata[k-lo] = indata[index + k*nbol];
+    switch ( data->dtype ) {
+      /* duplicate the for loop rather than using unsigned char and nbperel.
+         This is slightly clearer and also more efficient. */
+    case SMF__DOUBLE:
+      in_d = indata;
+      stats_d = statsdata;
+      for (k = lo; k <= hi; k++ ) {
+        stats_d[k-lo] = in_d[offset+(k*mult)];
       }
-    } else {
-      /* Pick out a range of bolometers from a timeslice */
-      for ( k=lo; k<=hi; k++) {
-        statsdata[k-lo] = indata[nbol*index + k];
+      break;
+    case SMF__INTEGER:
+      in_i = indata;
+      stats_i = statsdata;
+      for (k = lo; k <= hi; k++ ) {
+        stats_i[k-lo] = in_i[offset+(k*mult)];
       }
+      break;
+    default:
+      msgSetc( "TYP", smf_dtype_string( data, status ));
+      *status = SAI__ERROR;
+      errRep(" ", FUNC_NAME " Unsupported data type ^TYP",
+             status);
     }
   } else {
     *status = SAI__ERROR;
@@ -297,11 +339,26 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
 
   /* Calculate stats */
   if ( *status == SAI__OK) {
-    kpgStatd( bad, npts, statsdata, nclip, clip, 
-              &ngood, &imin, &dmin, &imax, &dmax, &sum, mean, stdev,
-              &ngoodc, &iminc, &dminc, &imaxc, &dmaxc, &sumc, &meanc, &stdevc,
-              status);
-  }    
+    switch ( data->dtype ) {
+    case SMF__DOUBLE:
+      kpgStatd( bad, npts, stats_d, nclip, clip, 
+                &ngood, &imin, &dmin, &imax, &dmax, &sum, mean, stdev,
+                &ngoodc, &iminc, &dminc, &imaxc, &dmaxc, &sumc, &meanc, &stdevc,
+                status);
+      break;
+    case SMF__INTEGER:
+      kpgStati( bad, npts, stats_i, nclip, clip, 
+                &ngood, &imin, &dmin, &imax, &dmax, &sum, mean, stdev,
+                &ngoodc, &iminc, &dminc, &imaxc, &dmaxc, &sumc, &meanc, &stdevc,
+                status);
+      break;
+    default:
+      msgSetc( "TYP", smf_dtype_string( data, status ));
+      *status = SAI__ERROR;
+      errRep(" ", FUNC_NAME " Unsupported data type ^TYP",
+             status);
+    }
+  }
 
   /* Free resources */
   if ( statsdata != NULL)
