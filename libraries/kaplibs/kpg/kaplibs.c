@@ -66,6 +66,8 @@
 *        const and size_t to match Grp
 *     24-JUL-2008 (TIMJ):
 *        Use more robust F77_CREATE_EXPORT_CHARACTER
+*     21-AUG-2008 (TIMJ):
+*        Add kpgStati
 *     {enter_further_changes_here}
 
 *-
@@ -372,6 +374,101 @@ void kpgStatd( int bad, int el, const double data[], int nclip, const float clip
   F77_EXPORT_INTEGER( *status, STATUS );
 
   F77_CALL(kpg1_statd)( LOGICAL_ARG(&BAD),
+			INTEGER_ARG(&EL),
+			DOUBLE_ARRAY_ARG(DATA),
+			INTEGER_ARG(&NCLIP),
+			REAL_ARRAY_ARG(CLIP),
+			INTEGER_ARG(&NGOOD),
+			INTEGER_ARG(&IMIN),
+			DOUBLE_ARG(&DMIN),
+			INTEGER_ARG(&IMAX),
+			DOUBLE_ARG(&DMAX),
+			DOUBLE_ARG(&SUM),
+			DOUBLE_ARG(&MEAN),
+			DOUBLE_ARG(&STDEV),
+			INTEGER_ARG(&NGOODC),
+			INTEGER_ARG(&IMINC),
+			DOUBLE_ARG(&DMINC),
+			INTEGER_ARG(&IMAXC),
+			DOUBLE_ARG(&DMAXC),
+			DOUBLE_ARG(&SUMC),
+			DOUBLE_ARG(&MEANC),
+			DOUBLE_ARG(&STDEVC),
+			INTEGER_ARG(&STATUS) );
+
+  F77_IMPORT_INTEGER( STATUS, *status );
+  F77_IMPORT_INTEGER( NGOOD, *ngood );
+  F77_IMPORT_INTEGER( IMIN, *imin );
+  F77_IMPORT_DOUBLE( DMIN, *dmin );
+  F77_IMPORT_INTEGER( IMAX, *imax );
+  F77_IMPORT_DOUBLE( DMAX, *dmax );
+  F77_IMPORT_DOUBLE( SUM, *sum );
+  F77_IMPORT_DOUBLE( MEAN, *mean );
+  F77_IMPORT_DOUBLE( STDEV, *stdev );
+  F77_IMPORT_INTEGER( NGOODC, *ngoodc );
+  F77_IMPORT_INTEGER( IMINC, *iminc );
+  F77_IMPORT_DOUBLE( DMINC, *dminc );
+  F77_IMPORT_INTEGER( IMAXC, *imaxc );
+  F77_IMPORT_DOUBLE( DMAXC, *dmaxc );
+  F77_IMPORT_DOUBLE( SUMC, *sumc );
+  F77_IMPORT_DOUBLE( MEANC, *meanc );
+  F77_IMPORT_DOUBLE( STDEVC, *stdevc );
+
+  F77_FREE_DOUBLE( DATA );
+  F77_FREE_REAL( CLIP );
+
+}
+
+/* ------------------------------- */
+
+F77_SUBROUTINE(kpg1_stati)( LOGICAL(BAD), INTEGER(EL), INTEGER_ARRAY(DATA),
+			    INTEGER(NCLIP), REAL_ARRAY(CLIP), INTEGER(NGOOD),
+			    INTEGER(IMIN), DOUBLE(DMIN), INTEGER(IMAX),
+			    DOUBLE(DMAX), DOUBLE(SUM), DOUBLE(MEAN), DOUBLE(STDEV),
+			    INTEGER(NGOODC), INTEGER(IMINC), DOUBLE(DMINC),
+			    INTEGER(IMAXC), DOUBLE(DMAXC), DOUBLE(SUMC), DOUBLE(MEANC),
+			    DOUBLE(STDEVC), INTEGER(STATUS) );
+
+void kpgStati( int bad, int el, const int data[], int nclip, const float clip[],
+	       int * ngood, int *imin, double * dmin, int * imax,
+	       double * dmax, double * sum, double * mean, double * stdev,
+	       int * ngoodc, int * iminc, double * dminc, int * imaxc, double * dmaxc,
+	       double * sumc, double * meanc, double * stdevc, int * status ) {
+
+  DECLARE_LOGICAL(BAD);
+  DECLARE_INTEGER(EL);
+  DECLARE_INTEGER_ARRAY_DYN(DATA);
+  DECLARE_INTEGER(NCLIP);
+  DECLARE_REAL_ARRAY_DYN(CLIP);
+  DECLARE_INTEGER(NGOOD);
+  DECLARE_INTEGER(IMIN);
+  DECLARE_DOUBLE(DMIN);
+  DECLARE_INTEGER(IMAX);
+  DECLARE_DOUBLE(DMAX);
+  DECLARE_DOUBLE(SUM);
+  DECLARE_DOUBLE(MEAN);
+  DECLARE_DOUBLE(STDEV);
+  DECLARE_INTEGER(NGOODC);
+  DECLARE_INTEGER(IMINC);
+  DECLARE_DOUBLE(DMINC);
+  DECLARE_INTEGER(IMAXC);
+  DECLARE_DOUBLE(DMAXC);
+  DECLARE_DOUBLE(SUMC);
+  DECLARE_DOUBLE(MEANC);
+  DECLARE_DOUBLE(STDEVC);
+  DECLARE_INTEGER(STATUS);
+
+  F77_CREATE_INTEGER_ARRAY( DATA, el );
+  F77_CREATE_REAL_ARRAY( CLIP, nclip );
+
+  F77_EXPORT_LOGICAL( bad, BAD );
+  F77_EXPORT_INTEGER( el, EL );
+  F77_EXPORT_INTEGER_ARRAY( data, DATA, el );
+  F77_EXPORT_INTEGER( nclip, NCLIP );
+  F77_EXPORT_REAL_ARRAY( clip, CLIP, nclip );
+  F77_EXPORT_INTEGER( *status, STATUS );
+
+  F77_CALL(kpg1_stati)( LOGICAL_ARG(&BAD),
 			INTEGER_ARG(&EL),
 			DOUBLE_ARRAY_ARG(DATA),
 			INTEGER_ARG(&NCLIP),

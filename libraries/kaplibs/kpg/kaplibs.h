@@ -153,6 +153,11 @@ void kpgStatd( int, int, const double[], int, const float[], int *, int *,
                int *, int *, double *, int *, double *, double *, double *, 
                double * , int * );
 
+void kpgStati( int, int, const int[], int, const float[], int *, int *, 
+               double *, int *, double *, double *, double *, double *, 
+               int *, int *, double *, int *, double *, double *, double *, 
+               double * , int * );
+
 void kpg1Wwrt( AstObject *, const char *, const HDSLoc *, int * );
 void kpg1Wread( const HDSLoc *, const char *, AstObject **, int * );
 void kpg1Mxmnr( int, int, float *, int *, float *, float *, int *, int *, int * );
