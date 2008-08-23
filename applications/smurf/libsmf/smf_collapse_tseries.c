@@ -24,6 +24,12 @@
 *        indata.
 *     doclip = int (Given)
 *        Do a clipped mean, else if false, calculate the mean.
+*     snrlim = double (Given)
+*        If non-zero, data will be set to bad value if the signal-to-noise
+*        ratio is below the supplied value.
+*     flagconst = int (Given)
+*        If true, elements with a standard deviation of zero but ngood
+*        greater than 1 will be flagged bad.
 *     outtype = smf_dtype (Given)
 *        Data type of "outdata". 
 *     outdata = smfData ** (Returned)
@@ -82,6 +88,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 /* Starlink includes */
 #include "sae_par.h"
@@ -100,7 +107,7 @@
 #define FUNC_NAME "smf_collapse_tseries"
 
 void smf_collapse_tseries( const smfData *indata, int doclip, 
-                           smf_dtype dtype,
+                           double snrlim, int flagconst, smf_dtype dtype,
                            smfData **outdata, 
                            int *status ) {
 
@@ -167,6 +174,19 @@ void smf_collapse_tseries( const smfData *indata, int doclip,
         index = ( j * dims[0] ) + i;
 
         smf_calc_stats( indata, "b", index, 0, 0, &mean, &stdev, status );
+
+        if (flagconst && stdev == 0.0) {
+          mean = VAL__BADD;
+          stdev = VAL__BADD;
+        }
+        if (snrlim > 0 && mean != VAL__BADD && stdev != VAL__BADD) {
+          double snr;
+          snr = fabs(mean/stdev);
+          if (snr < snrlim) {
+            mean = VAL__BADD;
+            stdev = VAL__BADD;
+          }
+        }
 
         switch (dtype) {
         case SMF__DOUBLE:

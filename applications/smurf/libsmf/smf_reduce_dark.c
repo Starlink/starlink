@@ -112,8 +112,9 @@ void smf_reduce_dark( const smfData *indark, smfData **outdark,
   }
 
   /* now calculate the average and standard deviation. Retaining the result
-     as integers */
-  smf_collapse_tseries( indark, 0, SMF__NULL, outdark, status );
+     as integers. Flag any bolometers that have constant signal or a signal
+     to noise less than 1. */
+  smf_collapse_tseries( indark, 0, 1.0, 1, SMF__NULL, outdark, status );
 
   return;
 }
