@@ -188,6 +188,9 @@
 *     2008-07-28 (TIMJ):
 *        - report output bounds
 *        - use smf_calc_meantau
+*     2008-08-22 (AGG):
+*        Check coordinate system before writing frameset to output
+*        file and set attributes for moving sources accordingly
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -248,7 +251,8 @@
 void smurf_qlmakemap( int *status ) {
 
   /* Local Variables */
-  smfArray *darks = NULL;   /* Dark data */
+  const char *astsys = NULL; /* Name of AST-supported coordinate system */
+  smfArray *darks = NULL;    /* Dark data */
   smfData *data = NULL;      /* Pointer to input SCUBA2 data struct */
   char data_units[SMF__CHARLABEL+1]; /* Units string */
   AstFitsChan *fchan = NULL; /* FitsChan holding output NDF FITS extension */
@@ -428,6 +432,10 @@ void smurf_qlmakemap( int *status ) {
   parPut0d("MEANSKY", overallmeansky, status);
 
   /* Write WCS FrameSet to output file */
+  astsys = astGetC( outframeset, "SYSTEM");
+  if (strcmp(astsys,"AZEL") == 0 || strcmp(astsys, "GAPPT") == 0 ) {
+    astSet( outframeset, "SkyRefIs=Origin,AlignOffset=1" );
+  }
   ndfPtwcs( outframeset, ondf, status );
 
   /* write units - hack we do not have a smfHead */

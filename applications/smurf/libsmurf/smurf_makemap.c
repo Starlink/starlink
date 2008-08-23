@@ -442,6 +442,9 @@
 *        Filter out darks. Use kaplibs.
 *     2008-07-29 (TIMJ):
 *        Steptime is now in smfHead.
+*     2008-08-22 (AGG):
+*        Check coordinate system before writing frameset to output
+*        file and set attributes for moving sources accordingly
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -518,6 +521,7 @@ void smurf_makemap( int *status ) {
 
   /* Local Variables */
   int alignsys;              /* Align data in the output system? */
+  const char *astsys = NULL; /* Name of AST-supported coordinate system */
   char basename[ GRP__SZNAM + 1 ]; /* Output base file name */
   int blank=0;                 /* Was a blank line just output? */
   smfBox *boxes = NULL;      /* Pointer to array of i/p file bounding boxes */
@@ -623,7 +627,7 @@ void smurf_makemap( int *status ) {
   /* Get the celestial coordinate system for the output map */
   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
             "GAPPT,FK4,FK4-NO-E,ECLIPTIC", 1, system, 10, status );
-  
+
   /* Get the maximum amount of memory that we can use */
   parGdr0i( "MAXMEM", 2000, 1, VAL__MAXI, 1, &maxmem_mb, status );
   if( *status==SAI__OK ) {
@@ -1005,7 +1009,13 @@ void smurf_makemap( int *status ) {
       weights3d = smf_free( weights3d, status );
 
       /* Write WCS */
-      if (wcstile2d) ndfPtwcs( wcstile2d, ondf, status );
+      if (wcstile2d) {
+	astsys = astGetC( wcstile2d, "SYSTEM");
+	if (strcmp(astsys,"AZEL") == 0 || strcmp(astsys, "GAPPT") == 0 ) {
+	  astSet( wcstile2d, "SkyRefIs=Origin,AlignOffset=1" );
+	}
+	ndfPtwcs( wcstile2d, ondf, status );
+      }
 
       /* write units - hack we do not have a smfHead */
       if (strlen(data_units)) ndfCput( data_units, ondf, "UNITS", status);
@@ -1176,6 +1186,10 @@ void smurf_makemap( int *status ) {
     hitsmap = smf_free( hitsmap, status );
 
     /* Write WCS */
+    astsys = astGetC( outfset, "SYSTEM");
+    if (strcmp(astsys,"AZEL") == 0 || strcmp(astsys, "GAPPT") == 0 ) {
+      astSet( outfset, "SkyRefIs=Origin,AlignOffset=1" );
+    }
     ndfPtwcs( outfset, ondf, status );
 
     /* write units - hack we do not have a smfHead */
