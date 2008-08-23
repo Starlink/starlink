@@ -116,5 +116,6 @@ void smurf_gsdshow( int * );
 void smurf_sc2concat( int * );
 void smurf_sc2fft( int * );
 void smurf_smurfcopy( int * );
+void smurf_calcdark( int * );
 
 #endif /* SMURF_LIB_DEFINED */

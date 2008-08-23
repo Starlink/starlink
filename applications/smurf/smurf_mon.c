@@ -115,6 +115,8 @@
 *        Add SMURFCOPY
 *     2008-08-20 (TIMJ):
 *        Report if the EMS stack level has changed.
+*     2008-08-22 (TIMJ):
+*        Add CALCDARK
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -268,6 +270,8 @@ void smurf_mon( int * status ) {
     smurf_sc2fft( status );
   } else if (strcmp( taskname, "SMURFCOPY" ) == 0 ) {
     smurf_smurfcopy( status );
+  } else if (strcmp( taskname, "CALCDARK" ) == 0 ) {
+    smurf_calcdark( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );

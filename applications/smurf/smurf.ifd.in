@@ -880,6 +880,39 @@ package @PACKAGE@ {
             }
         }
 
+        action calcdark {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input dark timeseries}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Processed darks}
+                helpkey *
+            }
+
+            parameter msg_filter {
+                type _CHAR
+                prompt {Message level}
+                default NORM
+                vpath DEFAULT	
+                helpkey *
+            }
+        }
+
         action dreamweights {
 
             helplib {$SMURF_HELP}
