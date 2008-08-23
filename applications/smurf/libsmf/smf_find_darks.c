@@ -147,7 +147,10 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
   Grp *ogrp = NULL;   /* local copy of output group */
   smfSortInfo *sortinfo; /* individual struct in array */
 
-  *outgrp = NULL;
+  if (outgrp) *outgrp = NULL;
+  if (darkgrp) *darkgrp = NULL;
+  if (darks) *darks = NULL;
+
   if (*status != SAI__OK) return;
 
   /* Sanity check to make sure we return some information */
