@@ -93,13 +93,6 @@
 void smf_reduce_dark( const smfData *indark, smfData **outdark, 
                       int *status ) {
 
-  int *avg = NULL; /* average */
-  dim_t dims[2];      /* dimensions of data array */
-  smfHead *hdr = NULL; /* copy of header */
-  AstKeyMap * history = NULL; /* history */
-  size_t nelem;   /* number of elements in "avg" */
-  void *pntr[3] = { NULL, NULL, NULL }; /* pointers to data */
-
   if (*status != SAI__OK) return;
 
   /* check we have a dark (inefficient if the caller has already 
@@ -118,18 +111,9 @@ void smf_reduce_dark( const smfData *indark, smfData **outdark,
     return;
   }
 
-  smf_average_dataI( indark, 0, 0, 1, &avg, &nelem, status );
-
-  /* now create a new smfData - we need to copy the header info */
-  hdr = smf_deepcopy_smfHead( indark->hdr, status );
-  dims[0] = indark->dims[0];
-  dims[1] = indark->dims[1];
-  pntr[0] = avg;
-  if (indark->history) history = astCopy( indark->history );
-
-  *outdark = smf_construct_smfData( NULL, NULL,  hdr, NULL,
-                                    indark->dtype, pntr, 1, dims, 2, 0, 0,
-                                    NULL, history, status );
+  /* now calculate the average and standard deviation. Retaining the result
+     as integers */
+  smf_collapse_tseries( indark, 0, SMF__NULL, outdark, status );
 
   return;
 }

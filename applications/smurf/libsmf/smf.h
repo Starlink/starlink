@@ -1078,4 +1078,10 @@ double smf_calc_meantau( const smfHead *hdr, int * status );
 Grp *smf_grpCopy( const Grp *grp1, size_t indxlo, size_t indxhi, int reject, 
                   int *status );
 
+void smf_collapse_tseries( const smfData *indata, int doclip, 
+                           smf_dtype dtype,
+                           smfData **outdata, 
+                           int *status );
+
+
 #endif /* SMF_DEFINED */
