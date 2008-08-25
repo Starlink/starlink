@@ -233,9 +233,11 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   msgOutif(MSG__VERB," ", 
            "Correcting for extinction with method ^M", status);
 
-  /* Should check data type for double */
-  smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status);
-  if ( *status != SAI__OK) return;
+  /* Should check data type for double if not allextcorr case */
+  if( !allextcorr ) {
+    smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status);
+    if ( *status != SAI__OK) return;
+  }
 
   /* Check desired optical depth method */
   if ( strncmp( method, "WVMR", 4) == 0 ) {
