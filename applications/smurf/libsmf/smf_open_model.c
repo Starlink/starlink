@@ -108,7 +108,7 @@ void smf_open_model( const Grp *igrp, int index, const char *mode,
   void *buf=NULL;               /* Pointer to total container buffer */
   size_t datalen=0;             /* Size of data buffer in bytes */
   int fd=0;                     /* File descriptor */
-  smfData head;                 /* Header for the file */
+  smfDIMMHead head;             /* Header for the file */
   size_t headlen=0;             /* Size of header in bytes */ 
   int i;                        /* Loop counter */
   int mflags=0;                 /* bit flags for mmap */
@@ -163,10 +163,10 @@ void smf_open_model( const Grp *igrp, int index, const char *mode,
 
     /* Length of data array buffer */
     ndata = 1;
-    for( i=0; i<head.ndims; i++ ) {
-      ndata *= (size_t) head.dims[i];
+    for( i=0; i<head.data.ndims; i++ ) {
+      ndata *= (size_t) head.data.dims[i];
     }
-    datalen = ndata * smf_dtype_sz(head.dtype,status); 
+    datalen = ndata * smf_dtype_sz(head.data.dtype,status); 
 
     /* map the entire file including the header */
     if( (buf = mmap( 0, datalen+headlen, mflags, MAP_SHARED, fd, 0 ) ) 
@@ -177,15 +177,16 @@ void smf_open_model( const Grp *igrp, int index, const char *mode,
   }
 
   /* Allocate memory for empty smfdata and fill relevant parts */
-  *data = smf_create_smfData( SMF__NOCREATE_HEAD | SMF__NOCREATE_DA, status );
+  *data = smf_create_smfData( SMF__NOCREATE_DA, status );
 
   if( *status == SAI__OK ) {
     /* Data from file header */
-    (*data)->dtype = head.dtype;
-    (*data)->ndims = head.ndims;
-    (*data)->isTordered = head.isTordered;
-    memcpy( (*data)->dims, head.dims, sizeof( head.dims ) );
-    
+    (*data)->dtype = head.data.dtype;
+    (*data)->ndims = head.data.ndims;
+    (*data)->isTordered = head.data.isTordered;
+    memcpy( (*data)->dims, head.data.dims, sizeof( head.data.dims ) );
+    (*data)->hdr->steptime = head.hdr.steptime;
+
     /* Data pointer points to memory AFTER HEADER */
     (*data)->pntr[0] = (unsigned char*)buf + headlen;
 
