@@ -143,6 +143,8 @@
 *        it from the FITS header each time.
 *     2008-08-20 (EC):
 *        Add obsidss to smfHead
+*     2008-08-25 (EC)
+*        Add smfDIMMHead
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -453,5 +455,13 @@ typedef struct smfFilter {
   double *real;         /* Real part of the filter */
   AstFrameSet *wcs;     /* Frameset describing filter */
 } smfFilter;
+
+/* Structure for static headers of DIMM files. Only some of the entries
+   are used, such as the data dimension fields in data, and steptime
+   in hdr. */
+typedef struct smfDIMMHead {
+  smfData data;
+  smfHead hdr;
+} smfDIMMHead;
 
 #endif /* SMF_TYP_DEFINED */

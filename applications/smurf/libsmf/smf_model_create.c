@@ -212,7 +212,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
   int fd=0;                     /* File descriptor */
   int flag=0;                   /* Flag */
   char fname_grpex[GRP__SZNAM+1];/* String for holding filename grpex */
-  smfData head;                 /* Header for the file */
+  smfDIMMHead head;             /* Header for the file */
   size_t headlen=0;             /* Size of header in bytes */ 
   void *headptr=NULL;           /* Pointer to header portion of buffer */
   dim_t i;                      /* Loop counter */
@@ -426,18 +426,18 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
           /* initialize the header */
 	  
           memset( &head, 0, sizeof(head) );
-          head.dtype=SMF__NULL;
+          head.data.dtype=SMF__NULL;
 
           /* Determine dimensions of model component */
 	  
           switch( mtype ) {
 	    
           case SMF__CUM: /* Cumulative model */
-            head.dtype = SMF__DOUBLE;
-            head.ndims = 3;
-            head.dims[0] = (idata->dims)[0];
-            head.dims[1] = (idata->dims)[1];
-            head.dims[2] = (idata->dims)[2];
+            head.data.dtype = SMF__DOUBLE;
+            head.data.ndims = 3;
+            head.data.dims[0] = (idata->dims)[0];
+            head.data.dims[1] = (idata->dims)[1];
+            head.data.dims[2] = (idata->dims)[2];
             break;
 	    
           case SMF__RES: /* Model residual */
@@ -445,54 +445,54 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
             break;
 	    
           case SMF__AST: /* Time-domain projection of map */
-            head.dtype = SMF__DOUBLE;
-            head.ndims = 3;
-            head.dims[0] = (idata->dims)[0];
-            head.dims[1] = (idata->dims)[1];
-            head.dims[2] = (idata->dims)[2];
+            head.data.dtype = SMF__DOUBLE;
+            head.data.ndims = 3;
+            head.data.dims[0] = (idata->dims)[0];
+            head.data.dims[1] = (idata->dims)[1];
+            head.data.dims[2] = (idata->dims)[2];
             break;
 	    
           case SMF__COM: /* Common-mode at each time step */
-            head.dtype = SMF__DOUBLE;
-            head.ndims = 1;
+            head.data.dtype = SMF__DOUBLE;
+            head.data.ndims = 1;
 
             if( isTordered ) { /* T is 3rd axis if time-ordered */
-              head.dims[0] = (idata->dims)[2]; 
+              head.data.dims[0] = (idata->dims)[2]; 
             } else {           /* T is 1st axis if bolo-ordered */
-              head.dims[0] = (idata->dims)[0]; 
+              head.data.dims[0] = (idata->dims)[0]; 
             }
             break;
 	
           case SMF__NOI: /* Noise model */
-            head.dtype = SMF__DOUBLE;
-            head.ndims = 3;
-            head.dims[0] = (idata->dims)[0];
-            head.dims[1] = (idata->dims)[1];
-            head.dims[2] = (idata->dims)[2];
+            head.data.dtype = SMF__DOUBLE;
+            head.data.ndims = 3;
+            head.data.dims[0] = (idata->dims)[0];
+            head.data.dims[1] = (idata->dims)[1];
+            head.data.dims[2] = (idata->dims)[2];
             break;
 
           case SMF__EXT: /* Extinction correction - gain for each bolo/time */
-            head.dtype = SMF__DOUBLE;
-            head.ndims = 3;
-            head.dims[0] = (idata->dims)[0];
-            head.dims[1] = (idata->dims)[1];
-            head.dims[2] = (idata->dims)[2];
+            head.data.dtype = SMF__DOUBLE;
+            head.data.ndims = 3;
+            head.data.dims[0] = (idata->dims)[0];
+            head.data.dims[1] = (idata->dims)[1];
+            head.data.dims[2] = (idata->dims)[2];
             break;
 
           case SMF__LUT: /* Pointing LookUp Table for each data point */
-            head.dtype = SMF__INTEGER;
-            head.ndims = 3;
-            head.dims[0] = (idata->dims)[0];
-            head.dims[1] = (idata->dims)[1];
-            head.dims[2] = (idata->dims)[2];
+            head.data.dtype = SMF__INTEGER;
+            head.data.ndims = 3;
+            head.data.dims[0] = (idata->dims)[0];
+            head.data.dims[1] = (idata->dims)[1];
+            head.data.dims[2] = (idata->dims)[2];
             break;
 
           case SMF__QUA: /* Quality byte for each data point */
-            head.dtype = SMF__UBYTE;
-            head.ndims = 3;
-            head.dims[0] = (idata->dims)[0];
-            head.dims[1] = (idata->dims)[1];
-            head.dims[2] = (idata->dims)[2];
+            head.data.dtype = SMF__UBYTE;
+            head.data.ndims = 3;
+            head.data.dims[0] = (idata->dims)[0];
+            head.data.dims[1] = (idata->dims)[1];
+            head.data.dims[2] = (idata->dims)[2];
             break;
 
           default:
@@ -504,20 +504,20 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
 
           /* Propagate information from template if copying */
           if( copyinput ) { /* If copying input, copy data dims directly */
-            head.dtype = idata->dtype; /* Inherit data type from template */
-            head.ndims = idata->ndims;
-            for( k=0; k<head.ndims; k++ ) {
-              head.dims[k] = (idata->dims)[k];
+            head.data.dtype = idata->dtype; /* Inherit type from template */
+            head.data.ndims = idata->ndims;
+            for( k=0; k<head.data.ndims; k++ ) {
+              head.data.dims[k] = (idata->dims)[k];
             }
           } 
 
           /* Set the data-ordering flag in the header */
-          head.isTordered = idata->isTordered;
+          head.data.isTordered = idata->isTordered;
 
           /* Calculate the size of the data buffer. Format:
 
              Header:
-             smfData struct 
+             smfDIMMHead struct 
 
              Data:
              buf   = [smf_dtype] * dims[0] * dims[1] * ...
@@ -532,10 +532,10 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
 
           /* Length of data array buffer */
           ndata = 1;
-          for( k=0; k<head.ndims; k++ ) {
-            ndata *= head.dims[k];
+          for( k=0; k<head.data.ndims; k++ ) {
+            ndata *= head.data.dims[k];
           }
-          datalen = ndata * smf_dtype_sz(head.dtype, status); 
+          datalen = ndata * smf_dtype_sz(head.data.dtype, status); 
 
           if( mgroup != NULL ) {
             /* Obtain a character string corresponding to the file name 
@@ -617,7 +617,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
 	      
             } else if( mtype == SMF__NOI ) {
               /* If this is a NOI, set to 1 to avoid divide-by-zeros */
-              if( head.dtype == SMF__DOUBLE ) {
+              if( head.data.dtype == SMF__DOUBLE ) {
                 for( l=0; l<ndata; l++ ) {
                   ((double *) dataptr)[l] = 1;
                 }
@@ -663,18 +663,16 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
               }
 	      
               /* Create a smfData for this element of the subgroup */
-              flag = SMF__NOCREATE_HEAD | SMF__NOCREATE_DA;
+              flag = SMF__NOCREATE_DA;
 
               data = smf_create_smfData( flag, status );
 
               if( *status == SAI__OK ) {
-                data->isTordered = head.isTordered; 
-                data->dtype = head.dtype;
-                data->ndims = head.ndims;
-                memcpy( data->dims, head.dims, sizeof( head.dims ) );
-                data->hdr = smf_create_smfHead( status );
-
-                if( data->hdr ) data->hdr->steptime = idata->hdr->steptime;
+                data->isTordered = head.data.isTordered; 
+                data->dtype = head.data.dtype;
+                data->ndims = head.data.ndims;
+                memcpy( data->dims, head.data.dims, sizeof( head.data.dims ) );
+                data->hdr->steptime = head.hdr.steptime;
 
                 /* Data pointer points to mmap'd memory AFTER HEADER */
                 data->pntr[0] = dataptr;
@@ -689,7 +687,8 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
                    there may not be an associated file on disk we store
                    the name here in case we wish to export the data
                    to an NDF file at a later point. */
-                one_strlcpy( data->file->name, name, sizeof(data->file->name), status );
+                one_strlcpy( data->file->name, name, sizeof(data->file->name), 
+                             status );
 		
                 /* Add the smfData to the smfArray */
                 smf_addto_smfArray( mdata[i], data, status );

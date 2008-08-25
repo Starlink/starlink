@@ -155,7 +155,7 @@ void smf_close_file( smfData ** data, int * status ) {
   size_t ndata=0;         /* Number of elements in data array */
   long pagesize=0;        /* Size of memory page used by mmap */
   long remainder=0;       /* Extra length beyond integer pagesuze */
-  smfData *temphead=NULL; /* Temporary smfData pointer */
+  smfDIMMHead *temphead=NULL; /* Pointer to DIMM header */
 
 
   /* we need to be able to clean up even if input status is bad -
@@ -211,7 +211,7 @@ void smf_close_file( smfData ** data, int * status ) {
 
       /* Length of the header including padding to page boundary */
       pagesize = sysconf(_SC_PAGESIZE);
-      headlen = sizeof(temphead);
+      headlen = sizeof(*temphead);
       remainder = headlen % pagesize;
       if( remainder  ) headlen = headlen - remainder + pagesize;
 
@@ -229,12 +229,11 @@ void smf_close_file( smfData ** data, int * status ) {
          update relevant header values before closing */
 
       buf = ((char*)((*data)->pntr[0]) - headlen);
-
-      temphead = (smfData *) buf;
-      temphead->isTordered = (*data)->isTordered;
-      temphead->dtype = (*data)->dtype;
-      temphead->ndims = (*data)->ndims;
-      memcpy( temphead->dims, (*data)->dims, sizeof( temphead->dims ) );
+      temphead = (smfDIMMHead *) buf;
+      temphead->data.isTordered = (*data)->isTordered;
+      temphead->data.dtype = (*data)->dtype;
+      temphead->data.ndims = (*data)->ndims;
+      memcpy( temphead->data.dims, (*data)->dims, sizeof( temphead->data.dims));
 
       if( msync( buf, buflen, MS_ASYNC ) == -1 ) {
 	*status = SAI__ERROR;
