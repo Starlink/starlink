@@ -133,9 +133,12 @@ void smf_write_smfData ( const smfData * data, const char * filename,
     size_t nbperel = 0;
     size_t nelem = 1;
 
-    /* provenance propagation */
-    smf_get_taskname( NULL, prvname, status );
-    smf_updateprov( outfile->ndfid, data, provid, prvname, status );
+    /* provenance propagation - but only if we have provenance to propagate */
+    if ( (data->file && data->file->ndfid && data->file->ndfid != NDF__NOID) ||
+         (provid != NDF__NOID) ) {
+      smf_get_taskname( NULL, prvname, status );
+      smf_updateprov( outfile->ndfid, data, provid, prvname, status );
+    }
 
     /* number of bytes per element */
     nbperel = smf_dtype_size( data, status );
@@ -143,24 +146,19 @@ void smf_write_smfData ( const smfData * data, const char * filename,
     /* Calculate how many elements to copy */
     for (i = 0; i< data->ndims; i++) {
       nelem *= (data->dims)[i];
-      printf("i %d = %d nelem = %d\n",(int)i, (int)(data->dims)[i],
-             (int)nelem);
-
     }
 
-    smf_dump_smfData( data, 0, status );
-
     /* Copy the data and variance and quality */
-    for (i = 0; i <= 2; i++ ) {
-      if (i == 2) nbperel = 1; /* quality = 1 byte */
-      printf("Nelem = %d nb = %d total = %d\n",(int)nelem,
-             (int)nbperel, (int)(nelem*nbperel));
-      if ((data->pntr)[i]) memcpy( (outdata->pntr)[i], (data->pntr)[i],
-                                   nelem * nbperel );
+    if (*status == SAI__OK) {
+      for (i = 0; i <= 2; i++ ) {
+        if (i == 2) nbperel = 1; /* quality = 1 byte */
+        if ((data->pntr)[i]) memcpy( (outdata->pntr)[i], (data->pntr)[i],
+                                     nelem * nbperel );
+      }
     }
 
     /* header information */
-    if (inhdr) {
+    if (inhdr && *status == SAI__OK) {
 
       /* FITS header */
       if (inhdr->fitshdr) kpgPtfts( outfile->ndfid, inhdr->fitshdr, status );
