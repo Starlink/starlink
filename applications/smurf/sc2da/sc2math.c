@@ -1314,80 +1314,80 @@ int *status               /* global status (given and returned) */
 */
 
 {
-   int i;              /* loop counter */
-   int j;              /* loop counter */
-   double lincal[2];   /* interpolation coeffs for a bolometer */
-   double t;           /* intermediate result */
-   double *temp;       /* pointer to storage for a single bolometer */
+  int i;              /* loop counter */
+  int j;              /* loop counter */
+  double lincal[2];   /* interpolation coeffs for a bolometer */
+  double t;           /* intermediate result */
+  double *temp;       /* pointer to storage for a single bolometer */
 
 
-   if ( !StatusOkP(status) ) return;
+  if ( !StatusOkP(status) ) return;
 
-   if ( strcmp ( "POLYNOMIAL", flatname ) == 0 )
-   {
+  if ( strcmp ( "POLYNOMIAL", flatname ) == 0 )
+    {
       for ( j=0; j<nframes; j++ )
-      {
+        {
 
-/* apply flatfield to each bolometer in frame */
+          /* apply flatfield to each bolometer in frame */
 
-         for ( i=0; i<nboll; i++ )
-         {
-	   t = inptr[j*nboll+i] - fcal[i+nboll];
-	   inptr[j*nboll+i] = fcal[i] 
-	     + fcal[i+2*nboll] 
-	     + fcal[i+3*nboll] * t 
-	     + fcal[i+4*nboll] * t * t
-	     + fcal[i+5*nboll] * t * t * t;
-         }
-      }
-   }
-   else if ( strcmp ( "TABLE", flatname ) == 0 )
-   {
+          for ( i=0; i<nboll; i++ )
+            {
+              t = inptr[j*nboll+i] - fcal[i+nboll];
+              inptr[j*nboll+i] = fcal[i] 
+                + fcal[i+2*nboll] 
+                + fcal[i+3*nboll] * t 
+                + fcal[i+4*nboll] * t * t
+                + fcal[i+5*nboll] * t * t * t;
+            }
+        }
+    }
+  else if ( strcmp ( "TABLE", flatname ) == 0 )
+    {
       temp = calloc ( nframes, sizeof(double) );
 
       for ( i=0; i<nboll; i++ )
-      {
+        {
 
-/* Get the time series for this bolometer and determine the interpolation
-   formula for its intensity conversion */
+          /* Get the time series for this bolometer and determine the interpolation
+             formula for its intensity conversion */
 
-         for ( j=0; j<nframes; j++ )
-         {
-            temp[j] = inptr[j*nboll+i];
-         }
+          for ( j=0; j<nframes; j++ )
+            {
+              temp[j] = inptr[j*nboll+i];
+            }
 
-/* Tailor the flatfield calibration coefficients */
+          /* Tailor the flatfield calibration coefficients */
 
-         sc2math_setcal ( nboll, i, nframes, temp, nflat, fpar, fcal,
-           lincal, status );
+          sc2math_setcal ( nboll, i, nframes, temp, nflat, fpar, fcal,
+                           lincal, status );
 
-/* apply flatfield for this bolometer in each frame */
+          /* apply flatfield for this bolometer in each frame */
 
-         for ( j=0; j<nframes; j++ )
-         {
-	    if ( ( lincal[0] == VAL__BADD ) || ( lincal[1] == VAL__BADD ) )
-	    {
-	       inptr[j*nboll+i] = VAL__BADD;
-	    }
-	    else
-	    {
-               inptr[j*nboll+i] = inptr[j*nboll+i] * lincal[1] + lincal[0];
-	    }
-         }
-      }
+          for ( j=0; j<nframes; j++ )
+            {
+              if ( ( lincal[0] == VAL__BADD ) || ( lincal[1] == VAL__BADD ) )
+                {
+                  inptr[j*nboll+i] = VAL__BADD;
+                }
+              else
+                {
+                  inptr[j*nboll+i] = inptr[j*nboll+i] * lincal[1] + lincal[0];
+                }
+            }
+        }
       free ( temp );
-   }
-   else if ( strcmp ( "NULL", flatname ) == 0 )
-   {
-/* Do nothing - just return the data unchanged */
-   }
-   else
-   {
+    }
+  else if ( strcmp ( "NULL", flatname ) == 0 )
+    {
+      /* Do nothing - just return the data unchanged */
+    }
+  else
+    {
       *status = DITS__APP_ERROR;
       sprintf ( errmess, "sc2math_flatten: invalid flatfield name - %s",
-        flatname );
+                flatname );
       ErsRep ( 0, status, errmess );
-   }
+    }
 
 }
 
