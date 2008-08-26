@@ -275,6 +275,8 @@
 *     2008-07-17 (TIMJ):
 *        - initialise scancrd
 *        - use one_strlcpy
+*     2008-08-25 (AGG):
+*        Force sc2store to think it's initialized to avoid EMS stack warnings
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -518,6 +520,9 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
   /* Main routine */
   ndfBegin ();
+
+  /* Force sc2store to think it's initialized */
+  sc2store_force_initialised( status );
 
   /* Setup instap (converted from arcsec to radians) and telpos */
   smf_calc_telpos( NULL, "JCMT", sinx->telpos, status );
