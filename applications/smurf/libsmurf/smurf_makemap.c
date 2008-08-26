@@ -123,6 +123,11 @@
 *          tile, but the tile will still be included in the tile numbering 
 *     OUT = NDF (Write)
 *          Output file
+*     OUTFILES = LITERAL (Write)
+*          The name of text file to create, in which to put the names of
+*          all the output NDFs created by this application via parameter
+*          OUT (one per line). If a null (!) value is supplied no file is 
+*          created. [!]
 *     PARAMS( 2 ) = _DOUBLE (Read)
 *          An optional array which consists of additional parameters
 *          required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
