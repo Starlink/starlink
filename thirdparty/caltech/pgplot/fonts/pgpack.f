@@ -81,7 +81,7 @@ C
       OPEN (UNIT=2, STATUS='NEW', FORM='UNFORMATTED', FILE='grfont.dat')
       NC1 = 1
       NC2 = 3000
-      WRITE (2) NC1,NC2,LOC,INDEX,BUFFER
+      WRITE (2) NC1,NC2,LOC,(INDEX(I),I=1,MAXCHR),(BUFFER(I),I=1,MAXBUF)
       CLOSE (UNIT=2)
 C
 C Write summary.

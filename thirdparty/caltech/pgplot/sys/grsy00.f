@@ -54,9 +54,13 @@ C 29-Nov-1990 - move font assignment to GRSYMK.
 C  7-Nov-1994 - look for font file in PGPLOT_DIR if PGPLOT_FONT is
 C               undefined [TJP].
 C-----------------------------------------------------------------------
-      INTEGER*2  BUFFER(27000)
-      INTEGER    FNTFIL, IER, INDEX(3000), NC1, NC2, NC3
-      INTEGER    L, GRTRIM
+      INTEGER MAXCHR, MAXBUF
+      PARAMETER (MAXCHR=3000)
+      PARAMETER (MAXBUF=27000)
+C
+      INTEGER*2  BUFFER(MAXBUF)
+      INTEGER    FNTFIL, IER, INDEX(MAXCHR), NC1, NC2, NC3
+      INTEGER    L, GRTRIM, I
       COMMON     /GRSYMB/ NC1, NC2, INDEX, BUFFER
       CHARACTER*128 FF
 C
@@ -71,7 +75,8 @@ C
       OPEN (UNIT=FNTFIL, FILE=FF(1:L), FORM='UNFORMATTED',
      2      STATUS='OLD', IOSTAT=IER)
       IF (IER.EQ.0) READ (UNIT=FNTFIL, IOSTAT=IER) 
-     1            NC1,NC2,NC3,INDEX,BUFFER
+     :     NC1,NC2,NC3,(INDEX(I),I=1,MAXCHR),
+     :     (BUFFER(I),I=1,MAXBUF)
       IF (IER.EQ.0) CLOSE (UNIT=FNTFIL, IOSTAT=IER)
       CALL GRFLUN(FNTFIL)
       IF (IER.NE.0) THEN
