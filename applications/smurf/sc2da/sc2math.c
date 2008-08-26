@@ -1310,7 +1310,8 @@ int *status               /* global status (given and returned) */
     05Oct2005 : generalise by adding flatname, nflat and fpar arguments (bdk)
     30Jul2007 : allow "NULL" flatfield - do nothing (bdk)
     03Sep2007 : allow for bad values in linear coeffs (bdk)
-    31Oct2007:  use const for appropriate arguments (bdk)
+    31Oct2007 : use const for appropriate arguments (bdk)
+    26Aug2008 : trap for bad value in input data (timj)
 */
 
 {
@@ -1332,12 +1333,15 @@ int *status               /* global status (given and returned) */
 
           for ( i=0; i<nboll; i++ )
             {
-              t = inptr[j*nboll+i] - fcal[i+nboll];
-              inptr[j*nboll+i] = fcal[i] 
-                + fcal[i+2*nboll] 
-                + fcal[i+3*nboll] * t 
-                + fcal[i+4*nboll] * t * t
-                + fcal[i+5*nboll] * t * t * t;
+              if (inptr[j*nboll+i] != VAL__BADD)
+                {
+                  t = inptr[j*nboll+i] - fcal[i+nboll];
+                  inptr[j*nboll+i] = fcal[i] 
+                    + fcal[i+2*nboll] 
+                    + fcal[i+3*nboll] * t 
+                    + fcal[i+4*nboll] * t * t
+                    + fcal[i+5*nboll] * t * t * t;
+                }
             }
         }
     }
@@ -1365,13 +1369,18 @@ int *status               /* global status (given and returned) */
 
           for ( j=0; j<nframes; j++ )
             {
-              if ( ( lincal[0] == VAL__BADD ) || ( lincal[1] == VAL__BADD ) )
+              if (inptr[j*nboll+i] != VAL__BADD)
                 {
-                  inptr[j*nboll+i] = VAL__BADD;
-                }
-              else
-                {
-                  inptr[j*nboll+i] = inptr[j*nboll+i] * lincal[1] + lincal[0];
+                  if ( ( lincal[0] == VAL__BADD ) ||
+                       ( lincal[1] == VAL__BADD ) )
+                    {
+                      inptr[j*nboll+i] = VAL__BADD;
+                    }
+                  else
+                    {
+                      inptr[j*nboll+i] = inptr[j*nboll+i] * lincal[1]
+                        + lincal[0];
+                    }
                 }
             }
         }
