@@ -54,6 +54,8 @@
 *  History:
 *     2008-08-21 (TIMJ):
 *        Initial version
+*     2008-08-25 (TIMJ):
+*        Should write variance not standard deviation.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -113,9 +115,9 @@ void smf_collapse_tseries( const smfData *indata, int doclip,
 
   /* Per type pointers */
   double *avg_d = NULL;
-  double *stdev_d = NULL;
+  double *var_d = NULL;
   int *avg_i = NULL;
-  int *stdev_i = NULL;
+  int *var_i = NULL;
 
   dim_t dims[2];      /* dimensions of data array */
   smfHead *hdr = NULL; /* copy of header */
@@ -149,11 +151,11 @@ void smf_collapse_tseries( const smfData *indata, int doclip,
   switch (dtype) {
   case SMF__DOUBLE:
     avg_d = pntr[0];
-    stdev_d = pntr[1];
+    var_d = pntr[1];
     break;
   case SMF__INTEGER:
     avg_i = pntr[0];
-    stdev_i = pntr[1];
+    var_i = pntr[1];
     break;
   default:
     msgSetc( "TYP", smf_dtype_string( indata, status ));
@@ -170,6 +172,7 @@ void smf_collapse_tseries( const smfData *indata, int doclip,
       for (j = 0; j < dims[1]; j++) {
         double mean = VAL__BADD;
         double stdev = VAL__BADD;
+        double variance = VAL__BADD;
         dim_t index;
         index = ( j * dims[0] ) + i;
 
@@ -178,20 +181,25 @@ void smf_collapse_tseries( const smfData *indata, int doclip,
         if (flagconst && stdev == 0.0) {
           mean = VAL__BADD;
           stdev = VAL__BADD;
+          printf("Flagging bad due to constant %d\n", (int)index);
         }
         if (snrlim > 0 && mean != VAL__BADD && stdev != VAL__BADD) {
           double snr;
           snr = fabs(mean/stdev);
           if (snr < snrlim) {
+            printf("Flag bad due to snr limit index %d %f\n",(int)index,snr);
             mean = VAL__BADD;
             stdev = VAL__BADD;
           }
+        }
+        if (stdev != VAL__BADD) {
+          variance = stdev * stdev;
         }
 
         switch (dtype) {
         case SMF__DOUBLE:
           avg_d[index] = mean;
-          stdev_d[index] = stdev;
+          var_d[index] = variance;
           break;
         case SMF__INTEGER:
           if (isnan(mean) || mean == VAL__BADD ) {
@@ -200,9 +208,10 @@ void smf_collapse_tseries( const smfData *indata, int doclip,
             avg_i[index] = (int)mean;
           }
           if (isnan(stdev) || stdev == VAL__BADD) {
-            stdev_i[index] = VAL__BADI;
+            var_i[index] = VAL__BADI;
           } else {
-            stdev_i[index] = (int)stdev;
+            if (variance > (double)VAL__MAXI) variance = VAL__BADD;
+            var_i[index] = (int)variance;
           }
           break;
         default:
