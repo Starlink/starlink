@@ -118,11 +118,9 @@ void smurf_calcdark( int *status ) {
              &ogrp, &outsize, status );
 
   for (i=1; i<=size; i++ ) {
-    smfData * outdata = NULL; /* output data file smfData */
-    smfFile * outfile = NULL; /* output file information */
     smfData * dark = (darks->sdata)[i-1]; /* This dark */
-    int lbnd[2] = { 1, 1 };
-    int ubnd[2];
+    char *pname = NULL;
+    char filename[GRP__SZNAM+1];
 
     if (*status != SAI__OK) break;
 
@@ -130,39 +128,11 @@ void smurf_calcdark( int *status ) {
        since we do not want to get a large file the wrong size */
     ndgNdfas( dgrp, i, "READ", &indf, status );
 
-    ubnd[0] = lbnd[0] + (dark->dims)[0] - 1;
-    ubnd[1] = lbnd[1] + (dark->dims)[1] - 1;
-    smf_open_newfile( ogrp, i, dark->dtype, dark->ndims, lbnd, ubnd,
-                      SMF__MAP_VAR, &outdata, status );
-    outfile = outdata->file;
-
-    /* Update provenance in the output before we close the input
-       because sc2store will not give us access to an NDF identifier
-       from the raw time series */
-    if (outfile) {
-      smf_updateprov( outfile->ndfid, NULL, indf,
-                      "SMURF:CALCDARK", status );
-    }
+    /* need the output filename */
+    pname = filename;
+    grpGet( ogrp, i, 1, &pname, sizeof(filename), status );
+    smf_write_smfData( dark, filename, indf, status );
     ndfAnnul( &indf, status);
-
-    if (*status == SAI__OK) {
-      size_t nbperel = smf_dtype_size( dark, status );
-      size_t nelem = (dark->dims)[0] * (dark->dims)[1];
-
-      /* Copy the dark data into the output file */
-      memcpy( (outdata->pntr)[0], (dark->pntr)[0], nelem * nbperel );
-      memcpy( (outdata->pntr)[1], (dark->pntr)[1], nelem * nbperel );
-
-      /* Set labels */
-      ndfCput( "Dark", outfile->ndfid, "TITLE", status);
-
-      /* Fits header */
-      kpgPtfts(outfile->ndfid, dark->hdr->fitshdr, status );
-
-    }
-
-    /* Free resources for files */
-    smf_close_file( &outdata, status );
   }
 
   /* Tidy up after ourselves: release the resources used by the grp routines  */

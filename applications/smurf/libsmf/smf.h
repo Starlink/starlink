@@ -1083,5 +1083,6 @@ void smf_collapse_tseries( const smfData *indata, int doclip,
                            smfData **outdata, 
                            int *status );
 
-
+void smf_write_smfData ( const smfData * data, const char * filename,
+                              int provid, int * status );
 #endif /* SMF_DEFINED */
