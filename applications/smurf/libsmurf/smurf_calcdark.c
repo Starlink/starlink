@@ -95,11 +95,8 @@ void smurf_calcdark( int *status ) {
   Grp *dgrp = NULL;         /* Group of darks */
   size_t i;                 /* Loop index */
   int indf;                 /* NDF identifier for input file */
-  int nout;                 /* Number of data points in output data file */
   Grp *igrp = NULL;         /* Input group of files */
   Grp *ogrp = NULL;         /* Output group of files */
-  void *outdata[1];         /* Pointer to array of output mapped pointers*/
-  int outndf;               /* Output NDF identifier */
   size_t outsize;           /* Total number of NDF names in the output group */
   size_t size;              /* Number of files in input group */
 
@@ -122,11 +119,12 @@ void smurf_calcdark( int *status ) {
 
   for (i=1; i<=size; i++ ) {
     smfData * outdata = NULL; /* output data file smfData */
-    smfHead * hdr = NULL;     /* dark header */
     smfFile * outfile = NULL; /* output file information */
     smfData * dark = (darks->sdata)[i-1]; /* This dark */
     int lbnd[2] = { 1, 1 };
     int ubnd[2];
+
+    if (*status != SAI__OK) break;
 
     /* Open input file and create output file. Do not propagate
        since we do not want to get a large file the wrong size */
