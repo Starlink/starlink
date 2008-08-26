@@ -181,13 +181,11 @@ void smf_collapse_tseries( const smfData *indata, int doclip,
         if (flagconst && stdev == 0.0) {
           mean = VAL__BADD;
           stdev = VAL__BADD;
-          printf("Flagging bad due to constant %d\n", (int)index);
         }
         if (snrlim > 0 && mean != VAL__BADD && stdev != VAL__BADD) {
           double snr;
           snr = fabs(mean/stdev);
           if (snr < snrlim) {
-            printf("Flag bad due to snr limit index %d %f\n",(int)index,snr);
             mean = VAL__BADD;
             stdev = VAL__BADD;
           }
@@ -209,8 +207,11 @@ void smf_collapse_tseries( const smfData *indata, int doclip,
           }
           if (isnan(stdev) || stdev == VAL__BADD) {
             var_i[index] = VAL__BADI;
+          } else if ( variance > (double)VAL__MAXI ) {
+            /* overflow. Convert to BAD */
+            var_i[index] = VAL__BADI;
+            avg_i[index] = VAL__BADI;
           } else {
-            if (variance > (double)VAL__MAXI) variance = VAL__BADD;
             var_i[index] = (int)variance;
           }
           break;
