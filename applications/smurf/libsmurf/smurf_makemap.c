@@ -450,6 +450,9 @@
 *     2008-08-22 (AGG):
 *        Check coordinate system before writing frameset to output
 *        file and set attributes for moving sources accordingly
+*     2008-08-26 (AGG):
+*        Check for non-NULL return value from astGetC before
+*        attempting string comparison
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1016,8 +1019,10 @@ void smurf_makemap( int *status ) {
       /* Write WCS */
       if (wcstile2d) {
 	astsys = astGetC( wcstile2d, "SYSTEM");
-	if (strcmp(astsys,"AZEL") == 0 || strcmp(astsys, "GAPPT") == 0 ) {
-	  astSet( wcstile2d, "SkyRefIs=Origin,AlignOffset=1" );
+	if ( astsys ) {
+	  if (strcmp(astsys,"AZEL") == 0 || strcmp(astsys, "GAPPT") == 0 ) {
+	    astSet( wcstile2d, "SkyRefIs=Origin,AlignOffset=1" );
+	  }
 	}
 	ndfPtwcs( wcstile2d, ondf, status );
       }
@@ -1192,8 +1197,10 @@ void smurf_makemap( int *status ) {
 
     /* Write WCS */
     astsys = astGetC( outfset, "SYSTEM");
-    if (strcmp(astsys,"AZEL") == 0 || strcmp(astsys, "GAPPT") == 0 ) {
-      astSet( outfset, "SkyRefIs=Origin,AlignOffset=1" );
+    if ( astsys ) {
+      if (strcmp(astsys,"AZEL") == 0 || strcmp(astsys, "GAPPT") == 0 ) {
+	astSet( outfset, "SkyRefIs=Origin,AlignOffset=1" );
+      }
     }
     ndfPtwcs( outfset, ondf, status );
 
