@@ -43,6 +43,8 @@
 *        Initial version.
 *     25-JUL-2008 (TIMJ):
 *        More robust error checking.
+*     25-AUG-2008 (TIMJ):
+*        Forgot to trap for bad values in darks.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -193,7 +195,11 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
     dark = dkbuf;
 
     for (i = 0; i < nbols; i++) {
-      dkbuf[i] = (dkp1[i] + dkp2[i]) / 2;
+      if (dkp1[i] != VAL__BADI && dkp2[i] != VAL__BADI) {
+        dkbuf[i] = (dkp1[i] + dkp2[i]) / 2;
+      } else {
+        dkbuf[i] = VAL__BADI;
+      }
     }
   }
 
@@ -216,7 +222,11 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
           size_t startidx = i * nbols;
           int * slice = &(inptr[startidx]);
           for (j = 0; j < nbols; j++) {
-            slice[j] -= dark[j];
+            if (dark[j] != VAL__BADI && slice[j] != VAL__BADI) {
+              slice[j] -= dark[j];
+            } else {
+              slice[j] = VAL__BADI;
+            }
           }
         }
       }
