@@ -56,6 +56,8 @@
 *        use ndfMap if other components were mapped.
 *        Do not malloc QUALITY if output smfData already has it but input doesn't.
 *        Separate QUALITY logic from DATA,VARIANCE logic.
+*     2008-08-26 (TIMJ):
+*        Need to trap VAL__BADI
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -93,6 +95,7 @@
 #include "sae_par.h"
 #include "mers.h"
 #include "ndf.h"
+#include "prm_par.h"
 
 /* SMURF routines */
 #include "smf.h"
@@ -209,7 +212,11 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
         tstream = (idata->pntr)[i];
         /* Input data are ints: must re-cast as double */
         for (j=0; j<npts; j++) {
-          outdata[j] = (double)tstream[j];
+          if (tstream[j] != VAL__BADI) {
+            outdata[j] = (double)tstream[j];
+          } else {
+            outdata[j] = VAL__BADD;
+          }
         }
       } else {
         /* Check if output pntr is null. If so allocate memory and

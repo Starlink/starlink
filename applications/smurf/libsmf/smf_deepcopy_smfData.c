@@ -79,6 +79,8 @@
 *        -Copy isTordered flag
 *     2008-07-23 (EC):
 *        Correctly calculate npts if isTordered=0
+*     2008-08-26 (TIMJ):
+*        Need to trap VAL__BADI
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -115,6 +117,7 @@
 #include "sae_par.h"
 #include "mers.h"
 #include "ndf.h"
+#include "prm_par.h"
 
 /* SMURF routines */
 #include "smf.h"
@@ -202,7 +205,11 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
         tstream = (old->pntr)[i];
         /* Input data are ints: must re-cast as double */
         for (j=0; j<npts; j++) {
-          outdata[j] = (double)tstream[j];
+          if (tstream[j] != VAL__BADI) {
+            outdata[j] = (double)tstream[j];
+          } else {
+            outdata[j] = VAL__BADD;
+          }
         }
         pntr[i] = outdata;
       } else {
