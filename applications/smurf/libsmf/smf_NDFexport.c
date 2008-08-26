@@ -170,7 +170,7 @@ void smf_NDFexport( const smfData *data, void *variance,
     *status = SAI__ERROR;
     msgSeti("NDIMS",data->ndims);
     errRep( FUNC_NAME, "Don't know how to export ^NDIMS dimensional data",
-	    status );
+            status );
   }
 
   /* Make a 1-element group containing the name of the new file */
@@ -217,7 +217,7 @@ void smf_NDFexport( const smfData *data, void *variance,
   if( qual ) flag |= SMF__MAP_QUAL;
 
   smf_open_newfile( outname, 1, data->dtype, data->ndims, lbnd, ubnd, 
-		    flag, &tempdata, status );
+                    flag, &tempdata, status );
 
   /* Copy the data/variance/quality array to new smfData */
   if( *status == SAI__OK ) {
@@ -240,31 +240,31 @@ void smf_NDFexport( const smfData *data, void *variance,
       /* MORE.JCMTSTATE */
       if( header->allState ) {
 	
-	/* Get an HDS locator */
-	ndfXnew( tempdata->file->ndfid, JCMT__EXTNAME, JCMT__EXTTYPE, 0, 0,
-		 &jcmtstateloc, status );
+        /* Get an HDS locator */
+        ndfXnew( tempdata->file->ndfid, JCMT__EXTNAME, JCMT__EXTTYPE, 0, 0,
+                 &jcmtstateloc, status );
 
-	/* Map the header */
-	sc2store_headcremap( jcmtstateloc, ntslice, INST__SCUBA2, status  );
+        /* Map the header */
+        sc2store_headcremap( jcmtstateloc, ntslice, INST__SCUBA2, status  );
 
-	/* Write out the per-frame headers */
-	for( i=0; i<ntslice; i++ ) {
-	  sc2store_headput( i, header->allState[i], status );
-	}
+        /* Write out the per-frame headers */
+        for( i=0; i<ntslice; i++ ) {
+          sc2store_headput( i, header->allState[i], status );
+        }
       }
 
       /* MORE.FITS */
       if( header->fitshdr ) {
-	kpgPtfts( tempdata->file->ndfid, header->fitshdr, status );
+        kpgPtfts( tempdata->file->ndfid, header->fitshdr, status );
       }
 
       /* WCS */
       if( header->tswcs ) {
-	if( data->ndims == 3 ) {
-	  /* For 3-dimensional data assume it is ICD bolo-format */
-	  ndfPtwcs( header->tswcs, tempdata->file->ndfid, status );
+        if( data->ndims == 3 ) {
+          /* For 3-dimensional data assume it is ICD bolo-format */
+          ndfPtwcs( header->tswcs, tempdata->file->ndfid, status );
 
-	} else if( smf_isfft(data, NULL, status) ) {
+        } else if( smf_isfft(data, NULL, status) ) {
           /* Data is FFT */
           if( data->ndims == 4 ) {
             /* Only handle 4d FFT data at the moment */
@@ -272,78 +272,78 @@ void smf_NDFexport( const smfData *data, void *variance,
           }
 
         } else if( data->ndims == 1 ) {
-	  /* For 1=dimensional data, assume it is the time axis which we
-	     extract from the 3d WCS */
+          /* For 1=dimensional data, assume it is the time axis which we
+             extract from the 3d WCS */
 
-	  astBegin;
+          astBegin;
 
-	  /* Get a pointer to the current->base Mapping (i.e. the Mapping from
-	     WCS coords to GRID coords). */
-	  cbmap = astGetMapping( header->tswcs, AST__CURRENT, AST__BASE );
+          /* Get a pointer to the current->base Mapping (i.e. the Mapping from
+             WCS coords to GRID coords). */
+          cbmap = astGetMapping( header->tswcs, AST__CURRENT, AST__BASE );
 
-	  /* Use astMapSplit to split off the Mapping for the time
-	     axis. This assumes that the time axis is the 3rd axis
-	     (i.e. index 2) */
+          /* Use astMapSplit to split off the Mapping for the time
+             axis. This assumes that the time axis is the 3rd axis
+             (i.e. index 2) */
 
-	  taxis = 3;
-	  astMapSplit( cbmap, 1, &taxis, out, &tmap );
+          taxis = 3;
+          astMapSplit( cbmap, 1, &taxis, out, &tmap );
 
-	  /* We now check that the Mapping was split succesfully. This should
-	     always be the case for the time axis since the time axis is 
-	     independent of the others, but it is as well to check in case of 
-	     bugs, etc. */
-	  if( !tmap ) {
-	    /* The "tmap" mapping will have 1 input (the WCS time value) -
-	       astMapSplit guarantees this. But we
-	       should also check that it also has only one output (the
-	       corresponding GRID axis). */
-	    *status = SAI__ERROR;
-	    errRep( FUNC_NAME, "Couldn't extract time-axis mapping",
-		    status );
-	  } else if( astGetI( tmap, "Nout" ) != 1 ) {
-	    *status = SAI__ERROR;
-	    errRep( FUNC_NAME, 
-		    "Time-axis mapping has incorrect number of outputs",
-		    status );
-	  } else {
+          /* We now check that the Mapping was split succesfully. This should
+             always be the case for the time axis since the time axis is 
+             independent of the others, but it is as well to check in case of 
+             bugs, etc. */
+          if( !tmap ) {
+            /* The "tmap" mapping will have 1 input (the WCS time value) -
+               astMapSplit guarantees this. But we
+               should also check that it also has only one output (the
+               corresponding GRID axis). */
+            *status = SAI__ERROR;
+            errRep( FUNC_NAME, "Couldn't extract time-axis mapping",
+                    status );
+          } else if( astGetI( tmap, "Nout" ) != 1 ) {
+            *status = SAI__ERROR;
+            errRep( FUNC_NAME, 
+                    "Time-axis mapping has incorrect number of outputs",
+                    status );
+          } else {
 
-	    /* Create a new FrameSet containing a 1D GRID Frame. */
-	    fset1d = astFrameSet( astFrame( 1, "Domain=GRID" ), "" );
+            /* Create a new FrameSet containing a 1D GRID Frame. */
+            fset1d = astFrameSet( astFrame( 1, "Domain=GRID" ), "" );
 
-	    /* Extract the 1D Frame (presumably a TimeFrame)
-	       describing time from the current (WCS) 3D Frame. */
-	    tfrm = astPickAxes( header->tswcs, 1, &taxis, NULL);
+            /* Extract the 1D Frame (presumably a TimeFrame)
+               describing time from the current (WCS) 3D Frame. */
+            tfrm = astPickAxes( header->tswcs, 1, &taxis, NULL);
 
-	    /* Add the time frame into the 1D FrameSet, using the
-	       Mapping returned by astMapSplit. Note, this Mapping
-	       goes from time to grid, so we invert it first so that
-	       it goes from grid to time, as required by
-	       astAddFrame. */
+            /* Add the time frame into the 1D FrameSet, using the
+               Mapping returned by astMapSplit. Note, this Mapping
+               goes from time to grid, so we invert it first so that
+               it goes from grid to time, as required by
+               astAddFrame. */
 
-	    astInvert( tmap );
-	    astAddFrame( fset1d, AST__BASE, tmap, tfrm );
-	  }
+            astInvert( tmap );
+            astAddFrame( fset1d, AST__BASE, tmap, tfrm );
+          }
 
-	  if( astOK && *status==SAI__OK ) {
-	    /* Write out the frameset */
-	    ndfPtwcs( fset1d, tempdata->file->ndfid, status );
-	  } else {
-	    *status = SAI__ERROR;
-	    errRep( FUNC_NAME, "Error extracting 1-d frameset",
-		    status );
-	  }
+          if( astOK && *status==SAI__OK ) {
+            /* Write out the frameset */
+            ndfPtwcs( fset1d, tempdata->file->ndfid, status );
+          } else {
+            *status = SAI__ERROR;
+            errRep( FUNC_NAME, "Error extracting 1-d frameset",
+                    status );
+          }
 
-	  astEnd;
+          astEnd;
 
-	} else {
-	  msgSeti("NDIMS",data->ndims);
-	  msgOut( " ", "SMF_NDFEXPORT: Don't know how to handle WCS for ^NDIMS dimensions", status );
-	}
+        } else {
+          msgSeti("NDIMS",data->ndims);
+          msgOut( " ", "SMF_NDFEXPORT: Don't know how to handle WCS for ^NDIMS dimensions", status );
+        }
       }
 
     } else {
       msgOut(" ",
-	     "SMF_NDFEXPORT: Warning: only know how to write SCUBA2 header", status );
+             "SMF_NDFEXPORT: Warning: only know how to write SCUBA2 header", status );
     }
 
   }
