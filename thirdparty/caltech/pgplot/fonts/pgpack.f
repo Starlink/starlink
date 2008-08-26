@@ -28,6 +28,9 @@ C Note: the array sizes are fixed by dimension statements in PGPLOT.
 C New characters cannot be added if they would increase the size of
 C the arrays.  Array INDEX is not very efficiently used as only about
 C 1000 of the possible 3000 characters are defined.
+C
+C 25-Aug-2008 - g95 will not dump all elements from array into an file
+C               without being told how many elements to dump [TimJ/JAC]
 C-----------------------------------------------------------------------
       INTEGER MAXCHR, MAXBUF
       PARAMETER (MAXCHR=3000)

@@ -53,6 +53,8 @@ C               by environment variable PGPLOT_FONT [TJP].
 C 29-Nov-1990 - move font assignment to GRSYMK.
 C  7-Nov-1994 - look for font file in PGPLOT_DIR if PGPLOT_FONT is
 C               undefined [TJP].
+C 25-Aug-2008 - g95 will not slurp all elements from file into an array
+C               without being told how many elements to slurp [TimJ/JAC]
 C-----------------------------------------------------------------------
       INTEGER MAXCHR, MAXBUF
       PARAMETER (MAXCHR=3000)
