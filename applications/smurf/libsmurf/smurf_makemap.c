@@ -453,6 +453,8 @@
 *     2008-08-26 (AGG):
 *        Check for non-NULL return value from astGetC before
 *        attempting string comparison
+*     2008-08-27 (AGG):
+*        Factor out WCS check for moving sources to smf_set_moving
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -529,7 +531,6 @@ void smurf_makemap( int *status ) {
 
   /* Local Variables */
   int alignsys;              /* Align data in the output system? */
-  const char *astsys = NULL; /* Name of AST-supported coordinate system */
   char basename[ GRP__SZNAM + 1 ]; /* Output base file name */
   int blank=0;                 /* Was a blank line just output? */
   smfBox *boxes = NULL;      /* Pointer to array of i/p file bounding boxes */
@@ -1018,12 +1019,7 @@ void smurf_makemap( int *status ) {
 
       /* Write WCS */
       if (wcstile2d) {
-	astsys = astGetC( wcstile2d, "SYSTEM");
-	if ( astsys ) {
-	  if (strcmp(astsys,"AZEL") == 0 || strcmp(astsys, "GAPPT") == 0 ) {
-	    astSet( wcstile2d, "SkyRefIs=Origin,AlignOffset=1" );
-	  }
-	}
+	smf_set_moving(wcstile2d,status);
 	ndfPtwcs( wcstile2d, ondf, status );
       }
 
@@ -1196,12 +1192,7 @@ void smurf_makemap( int *status ) {
     hitsmap = smf_free( hitsmap, status );
 
     /* Write WCS */
-    astsys = astGetC( outfset, "SYSTEM");
-    if ( astsys ) {
-      if (strcmp(astsys,"AZEL") == 0 || strcmp(astsys, "GAPPT") == 0 ) {
-	astSet( outfset, "SkyRefIs=Origin,AlignOffset=1" );
-      }
-    }
+    smf_set_moving(outfset,status);
     ndfPtwcs( outfset, ondf, status );
 
     /* write units - hack we do not have a smfHead */

@@ -83,6 +83,8 @@
 *        Can store WCS, data label and units in write mode.
 *     2008-08-26 (AGG):
 *        Set relevant WCS attributes for moving sources
+*     2008-08-27 (AGG):
+*        Factor out WCS check for moving sources to smf_set_moving
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -143,7 +145,6 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filen
                        int *status) {
 
   /* Local variables */
-  const char *astsys = NULL;    /* Name of AST-supported coordinate system */
   void *datarr[3] = { NULL, NULL, NULL }; /* Pointers for data */
   dim_t dimens[NDF__MXDIM];     /* Dimensions of image */
   int dims[NDF__MXDIM];         /* Extent of each dimension */
@@ -234,16 +235,13 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filen
     if (datalabel) ndfCput( datalabel, ndfid, "Label", status ); 
     if (dataunits) ndfCput( dataunits, ndfid, "Unit", status );
     if (wcs) {
+      /* Take a copy of the input WCS and modify if necessary that
+	 before writing to the NDF */
       ndfwcs = astCopy( wcs );
-      astsys = astGetC(ndfwcs, "SYSTEM");
-      if ( astsys && ndfwcs ) {
-	if (strcmp(astsys,"AZEL") == 0 || strcmp(astsys, "GAPPT") == 0 ) {
-	  astSet( ndfwcs, "SkyRefIs=Origin,AlignOffset=1" );
-	}
-      }
+      smf_set_moving( ndfwcs, status );
       ndfPtwcs( ndfwcs, ndfid, status );
+      if (ndfwcs) ndfwcs = astAnnul( ndfwcs );
     }
-    if (ndfwcs) ndfwcs = astAnnul( ndfwcs );
   }
 
 
