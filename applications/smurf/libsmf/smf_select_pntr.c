@@ -79,6 +79,7 @@
 #include "sae_par.h"
 #include "smf_typ.h"
 #include "smf.h"
+#include "mers.h"
 
 #define FUNC_NAME "smf_select_pntr"
 
@@ -120,7 +121,7 @@ smf_select_pntr( void *pntr[3], smf_dtype dtype, double **ddata, double **dvar,
     break;
 
   default:
-    msgSetc("DT", smf_dtype_str(dtype) );
+    msgSetc("DT", smf_dtype_str(dtype, status) );
     *status = SAI__ERROR;
     errRep(" ", "Data type ^DT not supported by " FUNC_NAME, status );
   }

@@ -1091,6 +1091,9 @@ void smf_collapse_tseries( const smfData *indata, int doclip,
 
 void smf_write_smfData ( const smfData * data, const char * filename,
                               int provid, int * status );
+void
+smf_select_pntr( void *pntr[3], smf_dtype dtype, double **ddata, double **dvar,
+                 int **idata, int **ivar, int *status );
 
 void smf_set_moving ( AstFrameSet* wcs, int *status );
 
