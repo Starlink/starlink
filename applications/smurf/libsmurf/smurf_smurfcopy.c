@@ -128,7 +128,7 @@ void smurf_smurfcopy ( int * status ) {
   kpg1Rgndf( "IN", 1, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_darks( igrp, &fgrp, NULL, 0, NULL, status );
+  smf_find_darks( igrp, &fgrp, NULL, 0, SMF__NULL, NULL, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */

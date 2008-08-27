@@ -1051,12 +1051,13 @@ const char * smf_obstype_str( smf_obstype type, int * status );
 const char * smf_obsmode_str( smf_obsmode type, int * status );
 
 void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
-                     int reduce, smfArray ** darks, int * status );
+                     int reduce, smf_dtype dtype, smfArray ** darks,
+                     int * status );
 
 int smf_isdark( const smfData *data, int * status );
 
-void smf_reduce_dark( const smfData *indark, smfData **outdark, 
-                      int *status );
+void smf_reduce_dark( const smfData *indark, smf_dtype dtype,
+                      smfData **outdark, int *status );
 
 void smf_find_subarray ( const smfHead * hdr, char subarray[],
                          size_t buflen, int *subnum, int *status );

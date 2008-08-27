@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     smf_find_darks(const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
-*                     int reduce, smfArray ** darks, int * status );
+*                     int reduce, smf_dtype dtype, smfArray ** darks,
+*                     int * status );
 
 *  Arguments:
 *     ingrp = const Grp* (Given)
@@ -29,6 +30,10 @@
 *        Logical, if true the darks are reduced (if needed) and converted
 *        to 2d images from the time series. If false, the darks are not
 *        touched. Only accessed if "darks" is true.
+*     dtype = smf_dtype (Given)
+*        Data type to use for reduced dark. Only accessed if "reduce" is
+*        true. SMF__NULL will indicate that the data type should be the
+*        same as the input type.
 *     darks = smfArray ** (Returned)
 *        Pointer to smfArray* to be created and filled with darks. Must
 *        be freed using smf_close_related. Can be NULL pointer if the darks
@@ -129,7 +134,8 @@ static int sortbytime( const void *in1, const void *in2);
 #define FUNC_NAME "smf_find_darks"
 
 void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
-                     int reduce, smfArray ** darks, int * status ) {
+                     int reduce, smf_dtype dtype, smfArray ** darks,
+                     int * status ) {
 
   smfSortInfo *alldarks; /* array of sort structs */
   Grp * dgrp = NULL;  /* Internal dark group */
@@ -255,7 +261,7 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
           /* do we have to process these darks? */
           if (reduce) {
             smfData *outfile = NULL;
-            smf_reduce_dark( infile, &outfile, status );
+            smf_reduce_dark( infile, dtype, &outfile, status );
             if (outfile) {
               smf_close_file( &infile, status );
               infile = outfile;

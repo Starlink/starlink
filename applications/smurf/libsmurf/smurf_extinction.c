@@ -185,7 +185,7 @@ void smurf_extinction( int * status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_darks( igrp, &fgrp, NULL, 1, &darks, status );
+  smf_find_darks( igrp, &fgrp, NULL, 1, SMF__NULL, &darks, status );
 
   /* input group is now the filtered group so we can use that and
      free the old input group */

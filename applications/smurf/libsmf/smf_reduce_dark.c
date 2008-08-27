@@ -13,12 +13,15 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_reduce_dark( const smfData * indark, smfData **outdark,
-*                      int * status );
+*     smf_reduce_dark( const smfData * indark, smf_dtype dtype,
+*                      smfData **outdark, int * status );
 
 *  Arguments:
 *     indark = const smfData * (Given)
 *        Dark to be processed.
+*     dtype = smf_dtype (Given)
+*        Data type of output smfData. SMF__NULL will return the
+*        dark using the same data type as indark uses.
 *     outdark = smfData ** (Returned)
 *        Pointer to return processed dark. *outdark is NULL
 *        if the input dark has already been reduced (is 2d).
@@ -90,7 +93,8 @@
 #include "smf.h"
 #include "smf_typ.h"
 
-void smf_reduce_dark( const smfData *indark, smfData **outdark, 
+void smf_reduce_dark( const smfData *indark, smf_dtype dtype, 
+                      smfData **outdark, 
                       int *status ) {
 
   if (*status != SAI__OK) return;
@@ -114,7 +118,7 @@ void smf_reduce_dark( const smfData *indark, smfData **outdark,
   /* now calculate the average and standard deviation. Retaining the result
      as integers. Flag any bolometers that have constant signal or a signal
      to noise less than 1. */
-  smf_collapse_tseries( indark, 0, 1.0, 1, SMF__NULL, outdark, status );
+  smf_collapse_tseries( indark, 0, 1.0, 1, dtype, outdark, status );
 
   return;
 }

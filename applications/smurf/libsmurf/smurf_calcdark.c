@@ -107,7 +107,7 @@ void smurf_calcdark( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out non-darks and reduce the darks themselves */
-  smf_find_darks( igrp, NULL, &dgrp, 1, &darks, status );
+  smf_find_darks( igrp, NULL, &dgrp, 1, SMF__NULL, &darks, status );
 
   /* no longer need the input group */
   grpDelet( &igrp, status );
