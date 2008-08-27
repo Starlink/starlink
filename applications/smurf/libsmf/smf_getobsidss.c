@@ -55,6 +55,9 @@
 *     31-JUL-2008 (TIMJ):
 *        No longer use a static buffer. Also give option of retrieving
 *        OBSID.
+*     27-AUG-2008 (DSB):
+*        Correct "sizeof(obsidss)" to "szss" when calling one_strcat and
+*        one_strlcpy.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -149,11 +152,11 @@ char *smf_getobsidss( AstFitsChan *hdr, char * obsid, size_t szobs,
      } else if( strlen(obspnt) ) {
 
        /* copy the string into the SS buffer */
-       one_strlcpy( obsidss, obspnt, sizeof(obsidss), status );
-       one_strlcat( obsidss, "_", sizeof(obsidss), status );
+       one_strlcpy( obsidss, obspnt, szss, status );
+       one_strlcat( obsidss, "_", szss, status );
 
        if( astGetFitsS( hdr, "SUBSYSNR", &value ) ) {
-         one_strlcat(obsidss, value, sizeof(obsidss), status );
+         one_strlcat(obsidss, value, szss, status );
 
        } else if( *status == SAI__OK) {
          *status = SAI__ERROR;
