@@ -333,6 +333,8 @@
 *        smf_simpleaddmap
 *     2008-07-30 (EC):
 *        Add smf_grpCopy
+*     2008-08-27 (AGG):
+*        Add smf_set_moving
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1086,4 +1088,7 @@ void smf_collapse_tseries( const smfData *indata, int doclip,
 
 void smf_write_smfData ( const smfData * data, const char * filename,
                               int provid, int * status );
+
+void smf_set_moving ( AstFrameSet* wcs, int *status );
+
 #endif /* SMF_DEFINED */
