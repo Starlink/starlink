@@ -147,21 +147,7 @@ void smf_collapse_tseries( const smfData *indata, int doclip,
 
 
   /* Assign the pointers */
-  switch (dtype) {
-  case SMF__DOUBLE:
-    avg_d = pntr[0];
-    var_d = pntr[1];
-    break;
-  case SMF__INTEGER:
-    avg_i = pntr[0];
-    var_i = pntr[1];
-    break;
-  default:
-    msgSetc( "TYP", smf_dtype_string( indata, status ));
-    *status = SAI__ERROR;
-    errRep(" ", FUNC_NAME " Unsupported data type ^TYP",
-           status);
-  }
+  smf_select_pntr( pntr, dtype, &avg_d, &var_d, &avg_i, &var_i, status );
 
   if (*status == SAI__OK) {
     dim_t i,j;
