@@ -81,6 +81,8 @@
 *        Add ndimsmapped to check that the NDF was mapped correctly
 *     2008-06-06 (TIMJ):
 *        Can store WCS, data label and units in write mode.
+*     2008-08-26 (AGG):
+*        Set relevant WCS attributes for moving sources
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -141,6 +143,7 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filen
                        int *status) {
 
   /* Local variables */
+  const char *astsys = NULL;    /* Name of AST-supported coordinate system */
   void *datarr[3] = { NULL, NULL, NULL }; /* Pointers for data */
   dim_t dimens[NDF__MXDIM];     /* Dimensions of image */
   int dims[NDF__MXDIM];         /* Extent of each dimension */
@@ -150,6 +153,7 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filen
   int ndat;                     /* Number of elements mapped in the requested NDF */
   int ndimsmapped;              /* Number of dimensions in mapped NDF */
   int ndfid;                    /* NDF identifier */
+  AstFrameSet *ndfwcs = NULL;   /* Copy of input FrameSet to write to NDF */
   smfFile *newfile = NULL;      /* New smfFile with details of requested NDF */
   int place;                    /* Placeholder for NDF */
   int temp;                     /* Temporary integer to convert to dim_t */
@@ -229,7 +233,17 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filen
   if (updating) {
     if (datalabel) ndfCput( datalabel, ndfid, "Label", status ); 
     if (dataunits) ndfCput( dataunits, ndfid, "Unit", status );
-    if (wcs) ndfPtwcs( wcs, ndfid, status );
+    if (wcs) {
+      ndfwcs = astCopy( wcs );
+      astsys = astGetC(ndfwcs, "SYSTEM");
+      if ( astsys && ndfwcs ) {
+	if (strcmp(astsys,"AZEL") == 0 || strcmp(astsys, "GAPPT") == 0 ) {
+	  astSet( ndfwcs, "SkyRefIs=Origin,AlignOffset=1" );
+	}
+      }
+      ndfPtwcs( ndfwcs, ndfid, status );
+    }
+    if (ndfwcs) ndfwcs = astAnnul( ndfwcs );
   }
 
 
