@@ -514,6 +514,8 @@ void smf_rebincube_ast( smfData *data, int first, int last, int *ptime,
                     params, AST__REBINEND | ast_flags, 0.0, 50, VAL__BADR, 
                     3, ldim, udim, lbnd_in, ubnd_in, data_array, var_array, 
                     wgt_array, nused );
+
+      if (fullmap) fullmap = astAnnul(fullmap);
    }
 
 /* Free resources. */
