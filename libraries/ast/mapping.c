@@ -260,6 +260,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        in astRebinSeq.
 *     9-MAY-2008 (DSB):
 *        Prevent memory over-run in RebinSeq<X>.
+*     27-AUG-2008 (DSB):
+*        Correct annulling of simplified mapping in RebinSeq.
 *class--
 */
 
@@ -11510,6 +11512,9 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
                        ndim_out, lbnd_out, ubnd_out, \
                        lbnd, ubnd, npix_out, \
                        (void *) out, (void *) out_var, weights, nused ); \
+\
+/* Annul the pointer to the simplified/cloned Mapping. */ \
+      simple = astAnnul( simple ); \
    } \
 \
 /* If required, finalise the sequence. */ \
@@ -11575,10 +11580,6 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
          } \
       } \
    } \
-\
-/* Annul the pointer to the simplified/cloned Mapping. */ \
-   simple = astAnnul( simple ); \
-\
 }
 
 /* Expand the above macro to generate a function for each required
