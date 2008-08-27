@@ -54,6 +54,8 @@
 *        so that smfArray.ndat reflects true number of allocated smfData. 
 *     2008-07-14 (TIMJ):
 *        Use dynamically resizing buffer.
+*     2008-08-27 (TIMJ):
+*        Dynamically resizing may change the pointer value.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -138,6 +140,7 @@ void smf_addto_smfArray( smfArray *ary, smfData *data, int *status ) {
     if (*status == SAI__OK && newbuf ) {
       ary->dyndata = newbuf;
       ary->dynsize = nbins;
+      ary->sdata = ary->dyndata;
     }
   }
 
