@@ -336,8 +336,9 @@
 *     2008-08-27 (AGG):
 *        Add smf_set_moving
 *     2008-08-27 (EC):
-*        Rename smf_simple_stats, smf_simplerebinmap, smf_simpleaddmap
-*        to     smf_stats1, smf_rebinmap1, smf_addmap1
+*        -Rename smf_simple_stats, smf_simplerebinmap, smf_simpleaddmap
+*         to     smf_stats1, smf_rebinmap1, smf_addmap1
+*        -Add smf_get_dims
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1096,5 +1097,8 @@ smf_select_pntr( void *pntr[3], smf_dtype dtype, double **ddata, double **dvar,
                  int **idata, int **ivar, int *status );
 
 void smf_set_moving ( AstFrameSet* wcs, int *status );
+
+void smf_get_dims( const smfData *data, dim_t *nbolo, dim_t *ntslice, 
+                   dim_t *ndata, int *status );
 
 #endif /* SMF_DEFINED */
