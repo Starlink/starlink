@@ -44,6 +44,8 @@
  *                 24/06/08  Remove restriction that requires a backing file
  *                           when moving HDU. This operation can be done
  *                           on memory FITS.
+ *                 27/08/08  Use DBL_DIG and FLT_DIG to encode double and
+ *                           float values so that we do not lose any precision.
  */
 static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.1.1.1 2006/01/12 16:43:57 abrighto Exp $";
 
@@ -57,6 +59,7 @@ static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.1.1.1 2006/01/12 16:43:57
 #include <unistd.h>
 #include <cmath>
 #include <ctime>
+#include <float.h>
 #include "util.h"
 #include "error.h"
 #include "fitsio2.h"
@@ -1518,6 +1521,15 @@ char* FitsIO::getTableValue(long row, int col, double scale)
 	break;
 
     case TFLOAT:
+	float f;
+	if (fits_read_col(fitsio_, TFLOAT, col, row, 1, 1, NULL, 
+			  &f, &anynulls, &status) != 0) {
+	    cfitsio_error();
+	    return NULL;
+	}
+	sprintf(buf_, "%.*g", FLT_DIG, f * (float)scale);
+	break;
+
     case TDOUBLE:
 	double d;
 	if (fits_read_col(fitsio_, TDOUBLE, col, row, 1, 1, NULL, 
@@ -1525,7 +1537,7 @@ char* FitsIO::getTableValue(long row, int col, double scale)
 	    cfitsio_error();
 	    return NULL;
 	}
-	sprintf(buf_, "%lg", d*scale);
+	sprintf(buf_, "%.*g", DBL_DIG, d*scale);
 	break;
 
     case TLOGICAL:
@@ -1649,9 +1661,9 @@ int FitsIO::setTableValue(long row, int col, const char* value)
     case TUINT:
     case TULONG:
 	unsigned long ul;
-	if (sscanf(value, "%lu", &l) != 1) 
+	if (sscanf(value, "%lu", &ul) != 1) 
 	    return error("invalid unsigned value: ", value);
-	if (fits_write_col(fitsio_, TULONG, col, row, 1, 1, &l, &status) != 0) 
+	if (fits_write_col(fitsio_, TULONG, col, row, 1, 1, &ul, &status) != 0) 
 	    return cfitsio_error();
 	break;
 
