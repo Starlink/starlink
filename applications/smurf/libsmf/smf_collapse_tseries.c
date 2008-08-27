@@ -13,15 +13,13 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_collapse_tseries( const smfData * indata, smfData **outdata,
-*                      int * status );
+*     smf_collapse_tseries( const smfData * indata, int doclip,
+*                           double snrlim, int flatconst, smf_dtype dtype,
+*                           smfData **outdata, int * status );
 
 *  Arguments:
 *     indata = const smfData * (Given)
 *        3D data to be processed.
-*     dtype = smf_dtype (Given)
-*        Data type of output smfData. SMF__NULL will use the data type of
-*        indata.
 *     doclip = int (Given)
 *        Do a clipped mean, else if false, calculate the mean.
 *     snrlim = double (Given)
@@ -30,8 +28,9 @@
 *     flagconst = int (Given)
 *        If true, elements with a standard deviation of zero but ngood
 *        greater than 1 will be flagged bad.
-*     outtype = smf_dtype (Given)
-*        Data type of "outdata". 
+*     dtype = smf_dtype (Given)
+*        Data type of output smfData. SMF__NULL will use the data type of
+*        indata.
 *     outdata = smfData ** (Returned)
 *        Pointer to returned data. Will be 2d.
 *     status = int* (Given and Returned)
