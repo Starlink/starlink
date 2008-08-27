@@ -61,6 +61,8 @@
 *        Add SC2FFT
 *     2008-08-14 (TIMJ):
 *        Add smurfcopy
+*     2008-08-26 (TIMJ):
+*        Add calcflat / calcdark
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -117,5 +119,6 @@ void smurf_sc2concat( int * );
 void smurf_sc2fft( int * );
 void smurf_smurfcopy( int * );
 void smurf_calcdark( int * );
+void smurf_calcflat( int * );
 
 #endif /* SMURF_LIB_DEFINED */
