@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smf_simple_stats
+*     smf_stats1
 
 *  Purpose:
 *     Low-level routine for calculating mean and standard deviation on
@@ -14,9 +14,9 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_simple_stats( double *data, dim_t start, dim_t nsamp, 
-*                       unsigned char *qual, unsigned char mask, double *mean, 
-*                       double *sigma, dim_t *ngood, int *status )
+*     smf_stats1( double *data, dim_t start, dim_t nsamp, 
+*                 unsigned char *qual, unsigned char mask, double *mean, 
+*                 double *sigma, dim_t *ngood, int *status )
 
 *  Arguments:
 *     data = double* (Given)
@@ -106,11 +106,11 @@
 #include "libsmf/smf_err.h"
 
 /* Simple default string for errRep */
-#define FUNC_NAME "smf_simple_stats"
+#define FUNC_NAME "smf_stats1"
 
-void smf_simple_stats( double *data, dim_t start, dim_t nsamp, 
-		       unsigned char *qual, unsigned char mask, double *mean, 
-		       double *sigma, dim_t *ngood, int *status ) {
+void smf_stats1( double *data, dim_t start, dim_t nsamp, 
+                 unsigned char *qual, unsigned char mask, double *mean, 
+                 double *sigma, dim_t *ngood, int *status ) {
 
   /* Local variables */
   dim_t count=0;              /* Number of samples in estimate */

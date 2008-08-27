@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smf_simplerebinmap
+*     smf_rebinmap1
 
 *  Purpose:
 *     Accumulate data directly into a map using a LUT
@@ -13,11 +13,11 @@
 *     C function
 
 *  Invocation:
-*     smf_simplerebinmap( double *data, double *variance, int *lut, 
-*                         unsigned char *qual, unsigned char mask,
-*                         dim_t dsize, int sampvar, int flags, double *map,
-*                         double *mapweight, unsigned int *hitsmap,
-*                         double *mapvar, dim_t msize, int *status ) {
+*     smf_rebinmap1( double *data, double *variance, int *lut, 
+*                    unsigned char *qual, unsigned char mask,
+*                    dim_t dsize, int sampvar, int flags, double *map,
+*                    double *mapweight, unsigned int *hitsmap,
+*                    double *mapvar, dim_t msize, int *status ) {
 
 *  Arguments:
 *     data = double* (Given)
@@ -132,13 +132,13 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-#define FUNC_NAME "smf_simplerebin"
+#define FUNC_NAME "smf_rebinmap1"
 
-void smf_simplerebinmap( double *data, double *variance, int *lut, 
-			 unsigned char *qual, unsigned char mask, dim_t dsize, 
-			 int sampvar, int flags, double *map, 
-			 double *mapweight, unsigned int *hitsmap, 
-			 double *mapvar, dim_t msize, int *status ) {
+void smf_rebinmap1( double *data, double *variance, int *lut, 
+                    unsigned char *qual, unsigned char mask, dim_t dsize, 
+                    int sampvar, int flags, double *map, 
+                    double *mapweight, unsigned int *hitsmap, 
+                    double *mapvar, dim_t msize, int *status ) {
 
   /* Local Variables */
   dim_t i;                   /* Loop counter */

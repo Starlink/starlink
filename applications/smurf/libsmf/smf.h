@@ -335,6 +335,9 @@
 *        Add smf_grpCopy
 *     2008-08-27 (AGG):
 *        Add smf_set_moving
+*     2008-08-27 (EC):
+*        Rename smf_simple_stats, smf_simplerebinmap, smf_simpleaddmap
+*        to     smf_stats1, smf_rebinmap1, smf_addmap1
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -676,11 +679,11 @@ double smf_scale_tau ( const double tauwvm, const char *filter, int *status);
 void smf_scanfit( smfData *data, unsigned char *quality, int order, 
 		  int *status );
 
-void smf_simplerebinmap( double *data, double *variance, int *lut, 
-			 unsigned char *qual, unsigned char mask, dim_t dsize, 
-			 int sampvar, int flags, double *map, 
-			 double *mapweight, unsigned int *hitsmap, 
-			 double *mapvar, dim_t msize, int *status );
+void smf_rebinmap1( double *data, double *variance, int *lut, 
+                    unsigned char *qual, unsigned char mask, dim_t dsize, 
+                    int sampvar, int flags, double *map, 
+                    double *mapweight, unsigned int *hitsmap, 
+                    double *mapvar, dim_t msize, int *status );
 
 void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim, 
 		      int dims[], int nsampcycle, int vxmin, int vymin, 
@@ -927,9 +930,9 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
                      double dcthresh, dim_t dcbox,
                       int *status );
 
-void smf_simple_stats( double *data, dim_t start, dim_t nsamp,
-                     unsigned char *qual, unsigned char mask, double *mean,
-                     double *sigma, dim_t *ngood, int *status );
+void smf_stats1( double *data, dim_t start, dim_t nsamp,
+                 unsigned char *qual, unsigned char mask, double *mean,
+                 double *sigma, dim_t *ngood, int *status );
 
 AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop, 
                            int *conform, Grp **ogrp, int *status );
@@ -964,11 +967,11 @@ void smf_detmaskc( char *in, int len, int ndim, int *dims_in, int maxis, int *ma
 
 void smf_kmmerge( const char *xname, AstKeyMap *keymap, int from, int into, int ndet, int *mask, int nts, int rts_num, int *status );
 
-void smf_simpleaddmap( double *map1, double *mapweight1, 
-                       unsigned int *hitsmap1, double *mapvar1, 
-                       double *map2, double *mapweight2, 
-                       unsigned int *hitsmap2, double *mapvar2, dim_t msize, 
-                       int *status );
+void smf_addmap1( double *map1, double *mapweight1, 
+                  unsigned int *hitsmap1, double *mapvar1, 
+                  double *map2, double *mapweight2, 
+                  unsigned int *hitsmap2, double *mapvar2, dim_t msize, 
+                  int *status );
 
 
 int *smf_find_median( float *farray, double *darray, size_t nel, 

@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smf_simpleaddbinmap
+*     smf_addmap1
 
 *  Purpose:
 *     Weighted addition of two maps with the same dimensions.
@@ -13,11 +13,11 @@
 *     C function
 
 *  Invocation:
-*     smf_simpleaddmap( double *map1, double *mapweight1, 
-*                       unsigned int *hitsmap1, double *mapvar1, 
-*                       double *map2, double *mapweight2, 
-*                       unsigned int *hitsmap2, double *mapvar2, dim_t msize, 
-*                       int *status ) {
+*     smf_addmap1( double *map1, double *mapweight1, 
+*                  unsigned int *hitsmap1, double *mapvar1, 
+*                  double *map2, double *mapweight2, 
+*                  unsigned int *hitsmap2, double *mapvar2, dim_t msize, 
+*                  int *status ) {
 
 *  Arguments:
 *     map1 = double* (Given and Returned)
@@ -98,13 +98,13 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-#define FUNC_NAME "smf_simpleaddmap"
+#define FUNC_NAME "smf_addmap1"
 
-void smf_simpleaddmap( double *map1, double *mapweight1, 
-                       unsigned int *hitsmap1, double *mapvar1, 
-                       double *map2, double *mapweight2, 
-                       unsigned int *hitsmap2, double *mapvar2, dim_t msize, 
-                       int *status ) {
+void smf_addmap1( double *map1, double *mapweight1, 
+                  unsigned int *hitsmap1, double *mapvar1, 
+                  double *map2, double *mapweight2, 
+                  unsigned int *hitsmap2, double *mapvar2, dim_t msize, 
+                  int *status ) {
 
   /* Local Variables */
   dim_t i;                   /* Loop counter */

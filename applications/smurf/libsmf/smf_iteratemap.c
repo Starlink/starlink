@@ -1076,10 +1076,10 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
               }
 	    
               /* Rebin the residual + astronomical signal into a map */
-              smf_simplerebinmap( res_data, var_data, lut_data, qua_data, mask,
-                                  dsize, varmapmethod, rebinflags, thismap, 
-                                  thisweight, thishits, thisvar, msize, 
-                                  status );
+              smf_rebinmap1( res_data, var_data, lut_data, qua_data, mask,
+                             dsize, varmapmethod, rebinflags, thismap, 
+                             thisweight, thishits, thisvar, msize, 
+                             status );
             }
           }
 
@@ -1417,8 +1417,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
 
     if( contchunk >= 1 ) {
       msgOut( " ", "SMF_ITERATEMAP: Adding map estimated from this continuous chunk to total", status);
-      smf_simpleaddmap( map, weights, hitsmap, mapvar, thismap, thisweight,
-                        thishits, thisvar, msize, status );
+      smf_addmap1( map, weights, hitsmap, mapvar, thismap, thisweight,
+                   thishits, thisvar, msize, status );
     }
 
     /* Free chisquared array */

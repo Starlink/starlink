@@ -38,7 +38,7 @@ smf_check_smfData.c smf_check_smfDA.c smf_check_smfFile.c smf_check_smfHead.c \
 smf_calc_wvm.c smf_subtract_poly.c smf_subtract_plane.c smf_fit_poly.c \
 smf_calc_stats.c smf_calc_covar.c \
 smf_create_smfArray.c smf_addto_smfArray.c \
-smf_calc_mapcoord.c smf_simplerebinmap.c smf_iteratemap.c \
+smf_calc_mapcoord.c smf_rebinmap1.c smf_iteratemap.c \
 smf_open_mapcoord.c smf_close_mapcoord.c smf_get_gridcoords.c \
 smf_model_create.c smf_model_getname.c smf_open_newfile.c smf_open_ndf.c \
 smf_create_smfDream.c smf_construct_smfDream.c smf_close_smfDream.c \
@@ -59,11 +59,11 @@ smf_dataOrder.c smf_choosepolbins.c smf_freepolbins.c smf_polext.c \
 smf_filter_execute.c smf_concat_smfGroup.c smf_checkdets.c smf_sortd.c \
 smf_reorder.c smf_updateprov.c smf_fits_setL.c smf_getrefwcs.c \
 smf_update_quality.c smf_get_spread.c smf_create_qualname.c \
-smf_correct_steps.c smf_simple_stats.c smf_sorti.c smf_ext2km.c \
+smf_correct_steps.c smf_stats1.c smf_sorti.c smf_ext2km.c \
 smf_km2ext.c smf_groupscans.c smf_reportprogress.c smf_getobsidss.c \
 smf_calc_telres.c smf_get_moltrans.c smf_quick_noise.c smf_flag_spikes.c \
 smf_find_bad_dets.c smf_detmask.c smf_maskacsis.c smf_kmmerge.c \
-smf_simpleaddmap.c smf_find_median.c smf_checkmem_map.c smf_checkmem_dimm.c \
+smf_addmap1.c smf_find_median.c smf_checkmem_map.c smf_checkmem_dimm.c \
 smf_dump_smfData.c smf_write_clabels.c smf_set_clabels.c \
 smf_check_units.c smf_get_projpar.c smf_calc_mappa.c \
 smf_get_taskname.c smf_display_projpars.c smf_calc_skyframe.c \

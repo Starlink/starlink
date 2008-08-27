@@ -194,8 +194,8 @@ void smf_flag_spikes( smfData *data, unsigned char *quality,
       base = i*ntslice;
 
       /* Calculate mean and rms of the bolometer */
-      smf_simple_stats( &dat[base], 0, ntslice, qua, mask, &mean,
-			&sig, &ngood, status );
+      smf_stats1( &dat[base], 0, ntslice, qua, mask, &mean,
+                  &sig, &ngood, status );
 
       if( *status == SMF__INSMP ) {
 	/* Insufficient samples for this bolometer. Annul the error. */
