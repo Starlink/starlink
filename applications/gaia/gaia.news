@@ -154,6 +154,10 @@
     be resolved (although re-using files with the same name remains 
     unsupported).
 
+    A problem reading coordinates from FITS tables has been fixed. These 
+    where being read without enough precision leading to alignment errors
+    when displayed.
+
     A bug that stopped cube rebining using a factor of 5 has been fixed.
 
   Humu Release
