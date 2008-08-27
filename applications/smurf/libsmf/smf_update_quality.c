@@ -162,14 +162,7 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
   }
 
   /* Calculate data dimensions */
-  if( data->isTordered ) {
-    nbolo = (data->dims)[0]*(data->dims)[1];
-    ntslice = (data->dims)[2];
-  } else {
-    ntslice = (data->dims)[0];
-    nbolo = (data->dims)[1]*(data->dims)[2];
-  }
-  ndata = nbolo*ntslice;
+  smf_get_dims( data, &nbolo, &ntslice, &ndata, status );
 
   /* Check for input badmask */
   if( badmask ) {

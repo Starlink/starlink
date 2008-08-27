@@ -178,14 +178,8 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
   /* Assert ICD data order */
   smf_dataOrder( data, 1, status );
 
-  /* Number of bolometers in the data stream */
-  if( data->ndims == 3 ) {
-    nbolo = data->dims[0] * data->dims[1]; 
-    ntslice = data->dims[2];
-  } else {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "Input smfData not time-ordered.", status);
-  }
+  /* Get the data dimensions */
+  smf_get_dims( data, &nbolo, &ntslice, NULL, status );
 
   /* If SMF__NOCREATE_FILE is not set, and file associated with an NDF,
      map a new MAPCOORD extension (or verify an existing one) */ 

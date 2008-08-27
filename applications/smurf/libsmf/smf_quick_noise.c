@@ -152,8 +152,7 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
   }
 
   /* Obtain data dimensions */
-  ntslice = (data->dims)[0];
-  nbolo = (data->dims)[1]*(data->dims)[2];
+  smf_get_dims( data, &nbolo, &ntslice, NULL, status );
   
   /* Check for reasonable bolo/nsamp/nchunk */
   if( bolo >= nbolo ) {

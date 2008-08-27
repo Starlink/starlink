@@ -153,9 +153,7 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
 
   if( *status == SAI__OK ) {
     /* obtain data dimensions */
-    ntslice = (data->dims)[0];
-    nbolo = (data->dims)[1]*(data->dims)[2];
-
+    smf_get_dims( data, &nbolo, &ntslice, NULL, status );
 
     /* If data stream too short for box size generate error */
     if( (dcbox*2) > ntslice ) {

@@ -219,9 +219,7 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     } else {
     
       /* Get the raw data dimensions */
-      nbolo = (res->sdata[idx]->dims)[1] * (res->sdata[idx]->dims)[2];
-      ntslice = (res->sdata[idx]->dims)[0];
-      ndata = nbolo*ntslice;
+      smf_get_dims( res->sdata[idx], &nbolo, &ntslice, &ndata, status );
 
       /* Flag spikes in the residual */
       if( spikethresh ) {
