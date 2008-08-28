@@ -52,7 +52,7 @@
 #     18-AUG-2006 (PWD):
 #        Modified to run the stilts process in the background.
 #     09-JUL-2008 (PWD):
-#        Removed stilts dependency, use GAIA facilities instead.
+#        Removed stilts dependency, use GAIA-VO facilities instead.
 #     {enter_further_changes_here}
 
 #-
