@@ -35,10 +35,6 @@
 *     is used. If more than SMF__MXSMF (usually 8) data files are added
 *     to the array a dynamically allocated buffer is used. It will be resized
 *     on demand.
-*     This routine makes the assumption that there cannot be more than
-*     SMF__MXSMF smfDatas in a smfArray, essentially allowing the
-*     grouping of all four SCUBA-2 subarrays at both
-*     wavelengths. Something a little more flexible is desireable.
 
 *  Authors:
 *     Andy Gibb (UBC)
