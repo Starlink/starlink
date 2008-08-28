@@ -85,7 +85,7 @@ itcl::class gaia::GaiaPlastic {
 
    #  Return URL of an icon representing this application.
    public method ivo://votech.org/info/getIconURL {sender_id args} {
-      return "http://star-www.dur.ac.uk/~pdraper/gaia/gaialogo.gif"
+      return "http://astro.dur.ac.uk/~pdraper/gaia/gaialogo.gif"
    }
 
    #  Load a FITS file specified as a URL into the display.
@@ -98,11 +98,14 @@ itcl::class gaia::GaiaPlastic {
             $basegaia open $fname
             return $TRUE
          } else {
-            #  Remote file, arrange to download this in the background.
-            set urlget_ \
-               [GaiaUrlGet .\#auto -notify_cmd [code $this display_file_]]
-            $urlget_ get $img_url
-            return $TRUE
+            #  Remote file, arrange to download this in the background, if not
+            #  already busy downloading...
+            if { $urlget_ == {} } {
+               set urlget_ \
+                  [GaiaUrlGet .\#auto -notify_cmd [code $this display_file_]]
+               $urlget_ get $img_url
+               return $TRUE
+            }
          }
       }
       return $FALSE
@@ -217,8 +220,10 @@ itcl::class gaia::GaiaPlastic {
       if { $basegaia != {} } {
          $basegaia open $filename
       }
-      delete object $urlget_
-      set urlget_ {}
+      if { $urlget_ != {} } {
+         catch {delete object $urlget_}
+         set urlget_ {}
+      }
    }
 
    #  Displays a catalogue in TST format.

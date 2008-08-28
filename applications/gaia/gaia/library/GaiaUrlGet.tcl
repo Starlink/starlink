@@ -80,7 +80,7 @@ itcl::class gaia::GaiaUrlGet {
       #  Create the interface.
       #  Label for URL.
       itk_component add label {
-         label $w_.label
+         label $w_.label -wraplength 400
       }
       pack $itk_component(label) -side top -fill x -expand 1 -pady 5 -padx 5
       
@@ -205,7 +205,7 @@ itcl::class gaia::GaiaUrlGet {
             }
          }
       }
-      wm withdraw $w_
+      catch {wm withdraw $w_}
    }
 
    #  Open or close a pipe to get feedback during HTTP transfers.
