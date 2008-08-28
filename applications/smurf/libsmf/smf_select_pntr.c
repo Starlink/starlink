@@ -84,7 +84,7 @@
 #define FUNC_NAME "smf_select_pntr"
 
 void
-smf_select_pntr( void *pntr[3], smf_dtype dtype, double **ddata, double **dvar,
+smf_select_pntr( void * const pntr[3], smf_dtype dtype, double **ddata, double **dvar,
                  int **idata, int **ivar, int *status ) {
 
   if (ddata) *ddata = NULL;
