@@ -936,7 +936,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
               /* Synchronize quality flags */
 
               data = res[i]->sdata[idx];
-              qua_data = (unsigned char *) qua[i]->sdata[idx]->pntr[0];
+              qua_data = qua[i]->sdata[idx]->pntr[0];
 
               msgOutif(MSG__VERB," ", "  update quality", status);
               smf_update_quality( data, qua_data, 1, NULL, badfrac, status );
@@ -1033,13 +1033,13 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
             for( idx=0; idx<res[i]->ndat; idx++ ) {
 
               /* Add last iter. of astronomical signal back in to residual */
-              ast_data = (double *)(ast[i]->sdata[idx]->pntr)[0];
-              res_data = (double *)(res[i]->sdata[idx]->pntr)[0];
-              lut_data = (int *)(lut[i]->sdata[idx]->pntr)[0];
-              qua_data = (unsigned char *)(qua[i]->sdata[idx]->pntr)[0];
+              ast_data = (ast[i]->sdata[idx]->pntr)[0];
+              res_data = (res[i]->sdata[idx]->pntr)[0];
+              lut_data = (lut[i]->sdata[idx]->pntr)[0];
+              qua_data = (qua[i]->sdata[idx]->pntr)[0];
 
               if( havenoi ) {
-                var_data = (double *)(dat.noi[i]->sdata[idx]->pntr)[0];
+                var_data = (dat.noi[i]->sdata[idx]->pntr)[0];
               } else {
                 var_data = NULL;
               }
@@ -1284,7 +1284,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
                the variance component of RES if present. */
             if( *status == SAI__OK ) {
               if( havenoi ) {
-                var_data = (double *)(model[whichnoi][i]->sdata[idx]->pntr)[0];
+                var_data = (model[whichnoi][i]->sdata[idx]->pntr)[0];
               } else {
                 var_data = NULL;
               }
