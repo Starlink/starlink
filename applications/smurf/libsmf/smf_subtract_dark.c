@@ -33,6 +33,10 @@
 *     different schemes are available.
 
 *  Notes:
+*     - Works with _INTEGER and _DOUBLE input "indata". Assumes that
+*       _DOUBLE does not mean the data have been flatfielded.
+*     - Actually a general purpose "subtract 2d image from time series"
+*       function. Now has a bad name.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -45,6 +49,8 @@
 *        More robust error checking.
 *     25-AUG-2008 (TIMJ):
 *        Forgot to trap for bad values in darks.
+*     27-AUG-2008 (TIMJ):
+*        Darks and indata can be _DOUBLE.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -100,9 +106,11 @@
 void smf_subtract_dark ( smfData * indata, const smfData * dark1, 
   const smfData * dark2, smf_dark_sub_meth method, int *status ) {
 
-  int *dark = NULL;    /* pointer to dark frame for this slice */
-  int *dkbuf = NULL;   /* malloced buffer for dark */
-  int *inptr = NULL;   /* pointer to input data */
+  int *idark = NULL;    /* Pointer to int dark frame to subtract */
+  double *ddark = NULL; /* Pointer to double frame to subtract */
+
+  void *dark = NULL;    /* pointer to dark frame for this slice */
+  double *dkbuf = NULL;   /* malloced buffer for dark */
   size_t i;            /* loop counter */
   size_t nbols;        /* number of bolometers */
 
@@ -118,19 +126,30 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
     return;
   }
 
-  if (indata->dtype != SMF__INTEGER) {
-    const char * dt = smf_dtype_str( indata->dtype, status );
-    msgSetc( "DT", dt );
-    *status = SAI__ERROR;
-    errRep( " ", "Attempting to dark subtract flatfielded data "
-            "(^DT not _INTEGER)!", status );
-    return;
-  }
-
   if ( (indata->pntr)[0] == NULL) {
     *status = SAI__ERROR;
     errRep( " ", "Input data array for dark subtraction is a null pointer",
             status);
+    return;
+  }
+
+  if (dark1 && dark2 && dark1->dtype != dark2->dtype) {
+    msgSetc("DT1", smf_dtype_string(dark1, status));
+    msgSetc("DT2", smf_dtype_string(dark2, status));
+    *status = SAI__ERROR;
+    errRep( " ","Both darks defined but with differing types (^DT1 != ^DT2)",
+            status);
+    return;
+  }
+
+  if (dark1 && (dark1->dtype != SMF__INTEGER && dark1->dtype != SMF__DOUBLE)) {
+    *status = SAI__ERROR;
+    errRep( " ","Dark 1 is neither INTEGER nor DOUBLE", status);
+    return;
+  }
+  if (dark2 && (dark2->dtype != SMF__INTEGER && dark2->dtype != SMF__DOUBLE)) {
+    *status = SAI__ERROR;
+    errRep( " ","Dark 2 is neither INTEGER nor DOUBLE", status);
     return;
   }
 
@@ -148,9 +167,10 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
       return;
     }
 
-    dark = (dark1->pntr)[0];
-
+    smf_select_pntr( dark1->pntr, dark1->dtype, &ddark, NULL,
+                     &idark, NULL, status );
     break;
+
   case SMF__DKSUB_NEXT:
     if (dark1 == NULL) {
       *status = SAI__ERROR;
@@ -158,9 +178,9 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
               status );
       return;
     }
-    
-    dark = (dark2->pntr)[0];
 
+    smf_select_pntr( dark2->pntr, dark2->dtype, &ddark, NULL,
+                     &idark, NULL, status );
     break;
 
   case SMF__DKSUB_INTERP:
@@ -171,7 +191,7 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
   case SMF__DKSUB_MEAN:
     if (!dark1 || !dark2) {
       *status = SAI__ERROR;
-      errRep( " ", "Requested interpolated dark but only one dark available",
+      errRep( " ", "Requested mean dark but only one dark available",
              status );
       return;
     }
@@ -187,18 +207,41 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
 
   /* validated input, now need to do something */
 
-  /* for mean we need to allocate a buffer */
+  /* for mean we need to allocate a buffer. Use a double */
   if (method == SMF__DKSUB_MEAN) {
-    int * dkp1 = (dark1->pntr)[0];
-    int * dkp2 = (dark2->pntr)[0];
+    int *idkp1;
+    double *ddkp1;
+    int *idkp2;
+    double *ddkp2;
+    
+    smf_select_pntr( dark1->pntr, dark1->dtype, &ddkp1, NULL,
+                     &idkp1, NULL, status );
+    smf_select_pntr( dark2->pntr, dark2->dtype, &ddkp2, NULL,
+                     &idkp2, NULL, status );
     dkbuf = smf_malloc( nbols, sizeof(*dkbuf), 0, status );
-    dark = dkbuf;
+    ddark = dkbuf;
 
-    for (i = 0; i < nbols; i++) {
-      if (dkp1[i] != VAL__BADI && dkp2[i] != VAL__BADI) {
-        dkbuf[i] = (dkp1[i] + dkp2[i]) / 2;
-      } else {
-        dkbuf[i] = VAL__BADI;
+    if (ddkp1 && ddkp2) {
+      for (i = 0; i < nbols; i++) {
+        if (ddkp1[i] != VAL__BADD && ddkp2[i] != VAL__BADD) {
+          dkbuf[i] = (ddkp1[i] + ddkp2[i]) / 2.0;
+        } else {
+          dkbuf[i] = VAL__BADD;
+        }
+      }
+    } else if (idkp1 && idkp1) {
+      for (i = 0; i < nbols; i++) {
+        if (idkp1[i] != VAL__BADI && idkp2[i] != VAL__BADI) {
+          dkbuf[i] = ((double)idkp1[i] + (double)idkp2[i]) / 2.0;
+        } else {
+          dkbuf[i] = VAL__BADD;
+        }
+      }
+    } else {
+      if (*status == SAI__OK) {
+        *status = SAI__ERROR;
+        errRep(" ",FUNC_NAME ": darks differ in type for mean calculation",
+               status);
       }
     }
   }
@@ -209,25 +252,80 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
     case SMF__DKSUB_NEXT:
     case SMF__DKSUB_MEAN:
 
-      if (dark == NULL && *status == SAI__OK) {
+      if ((idark == NULL && ddark == NULL) && *status == SAI__OK) {
         *status = SAI__ERROR;
         errRep(" ","Selected dark frame has a null pointer for data array",
                status );
       }
 
       if (*status == SAI__OK) {
-        inptr = (indata->pntr)[0];
-        for (i = 0; i < (indata->dims)[2]; i++) {
-          size_t j;
-          size_t startidx = i * nbols;
-          int * slice = &(inptr[startidx]);
-          for (j = 0; j < nbols; j++) {
-            if (dark[j] != VAL__BADI && slice[j] != VAL__BADI) {
-              slice[j] -= dark[j];
-            } else {
-              slice[j] = VAL__BADI;
+        double * ddata;
+        int * idata;
+        size_t j;
+        size_t startidx;
+
+        /* get the correct input data pointer */
+        smf_select_pntr( indata->pntr, indata->dtype, &ddata, NULL,
+                         &idata, NULL, status);
+
+        if (ddata) {
+          double * slice;
+          printf("In ddata branch\n");
+
+          for (i = 0; i < (indata->dims)[2]; i++) {
+            startidx = i * nbols;
+            slice = &(ddata[startidx]);
+            for (j=0;  j < nbols; j++) {
+              if (slice[j] != VAL__BADD) {
+                double dsub = 0.0;
+                if (ddark && ddark[j] != VAL__BADD) {
+                  dsub = ddark[j];
+                } else if (idark[j] != VAL__BADI) {
+                  dsub = (double)idark[j];
+                } else {
+                  dsub = VAL__BADD;
+                }
+                if (dsub != VAL__BADD) {
+                  slice[j] -= dsub;
+                } else {
+                  slice[j] = VAL__BADD;
+                }
+              }
             }
           }
+        } else if (idata) {
+          int *slice;
+          printf("In idata branch\n");
+
+          for (i = 0; i < (indata->dims)[2]; i++) {
+            startidx = i * nbols;
+            slice = &(idata[startidx]);
+            for (j=0;  j < nbols; j++) {
+              if (slice[j] != VAL__BADI) {
+                int isub = 0;
+                if (ddark && ddark[j] != VAL__BADD) {
+                  isub = (int)ddark[j];
+                } else if (idark[j] != VAL__BADI) {
+                  isub = idark[j];
+                } else {
+                  isub = VAL__BADI;
+                }
+                if (isub != VAL__BADI) {
+                  slice[j] -= isub;
+                } else {
+                  slice[j] = VAL__BADI;
+                }
+              }
+            }
+          }
+
+        } else {
+          if (*status == SAI__OK) {
+            *status = SAI__ERROR;
+            errRep( " ", FUNC_NAME ": Should not be possible to get here",
+                    status);
+          }
+
         }
       }
       break;
