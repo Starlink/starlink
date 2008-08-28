@@ -270,7 +270,6 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
 
         if (ddata) {
           double * slice;
-          printf("In ddata branch\n");
 
           for (i = 0; i < (indata->dims)[2]; i++) {
             startidx = i * nbols;
@@ -295,7 +294,6 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
           }
         } else if (idata) {
           int *slice;
-          printf("In idata branch\n");
 
           for (i = 0; i < (indata->dims)[2]; i++) {
             startidx = i * nbols;
