@@ -25,7 +25,10 @@
 *  Description:
 *     This routine retrieves all of the smfDatas stored in the given
 *     smfArray and frees up the resources for each one in turn. The
-*     input smfArray is also freed and set to NULL on success.
+*     input smfArray is also freed and set to NULL on success. If the
+*     "owndata" struct component is false, the smfDatas will not be
+*     freed (they are assumed to be someone else's responsibility) and
+*     only the struct memory will be freed.
 
 *  Notes:
 *      - This is the companion routine to smf_open_related.c and
@@ -47,6 +50,8 @@
 *        Free dynamic memory.
 *     2008-07-18 (TIMJ):
 *        Check for NULL pointer.
+*     2008-08-27 (TIMJ):
+*        Respect "owndata"
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -112,10 +117,12 @@ void smf_close_related ( smfArray **relfiles, int *status ) {
   nrelated = (*relfiles)->ndat;
 
   /* Loop over the number of files and close each smfData */
-  for (i=0; i<nrelated; i++) {
-    data = ((*relfiles)->sdata)[i];
-    if ( data != NULL ) {
-      smf_close_file( &data, status );
+  if ((*relfiles)->owndata) {
+    for (i=0; i<nrelated; i++) {
+      data = ((*relfiles)->sdata)[i];
+      if ( data != NULL ) {
+        smf_close_file( &data, status );
+      }
     }
   }
 

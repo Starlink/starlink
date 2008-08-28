@@ -392,6 +392,8 @@ typedef struct smfArray {
   smfData **dyndata;          /* pointer to dynamically allocated array */
   dim_t ndat;                 /* Number of smfDatas in current smfArray */
   dim_t dynsize;              /* Size of dynamically allocated array */
+  int   owndata;              /* If true, the smfDatas are owned by the
+                                smfArray and can be freed by the smfArray */
 } smfArray;
 
 /* This struct is used to group related files together */

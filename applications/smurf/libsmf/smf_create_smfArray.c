@@ -32,6 +32,8 @@
 *     - if smf_addto_smfArray is used to populate the smfArray,
 *       it will be dynamically resized if more than SMF__MXSMF items
 *       are stored in it.
+*     - By default, the smfArray is created assuming that any smfData
+*       can be freed by it.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -127,6 +129,9 @@ smfArray *smf_create_smfArray( int * status ) {
   /* Initialize number of smfDatas */
   ary->ndat = 0;
   ary->dynsize = 0;
+
+  /* we own any smfData */
+  ary->owndata = 1;
 
   return ary;
 
