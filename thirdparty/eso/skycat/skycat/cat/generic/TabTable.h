@@ -15,7 +15,8 @@
  *
  * who             when       what
  * --------------  --------   ----------------------------------------
- * Allan Brighton  9 Jan 96  Created
+ * Allan Brighton   9 Jan 96  Created
+ * Peter W. Draper 28 Aug 08  Increase MAX_COLUMNS to 512 from 256.
  */
 
 
@@ -102,7 +103,7 @@ public:
     // constants 
     enum {MAX_ROW_SIZE=8*1024};	 // max size of a tab table row
     enum {MAX_HEADER_SIZE=1024}; // max size of a tab table heading
-    enum {MAX_COLUMNS=255};	 // max number of table columns
+    enum {MAX_COLUMNS=512};	 // max number of table columns
 
 public:
     // constructor: initialize empty table
