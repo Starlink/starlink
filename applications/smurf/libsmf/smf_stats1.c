@@ -180,7 +180,8 @@ void smf_stats1( double *data, dim_t start, dim_t nsamp,
     *status = SMF__INSMP;
     msgSeti("MIN",SMF__MINSTATSAMP);
     msgSeti("N", count );
-    errRep( FUNC_NAME, "Insufficient number of good samples (^N<^MIN) for statistics", status );
+    msgSeti("MX", nsamp );
+    errRep( FUNC_NAME, "Insufficient number of good samples (^N<^MIN out of ^MX) for statistics", status );
     return;
   }
 
