@@ -41,6 +41,8 @@
 *        Add SPD
 *     2008-07-07 (TIMJ):
 *        GSL is available always.
+*     2008-08-27 (TIMJ):
+*        Add SC2FLAT__DTOI
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -175,5 +177,10 @@ error can not determine PI
 #define LEN__METHOD 20
 /* Length of a FITS record, includes trailing nul */
 #define SZFITSCARD 81
+
+/* Heater circuit constant for converting D/A setting to Amps */
+
+#define SC2FLAT__DTOI (20.0e-6/65536)
+
 
 #endif /* SMURF_PAR_DEFINED */
