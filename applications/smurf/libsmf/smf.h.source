@@ -1,4 +1,4 @@
-/*
+/*  -*- C -*-
 *+
 *  Name:
 *     smf.h
@@ -1103,4 +1103,7 @@ void smf_set_moving ( AstFrameSet* wcs, int *status );
 void smf_get_dims( const smfData *data, dim_t *nbolo, dim_t *ntslice, 
                    dim_t *ndata, int *status );
 
-
+void
+smf_flat_standardpow( const smfArray * heatframes, double refohms,
+                      const double heatref[], const double resistance[],
+                      double powref[], double bolref[], int * status);
