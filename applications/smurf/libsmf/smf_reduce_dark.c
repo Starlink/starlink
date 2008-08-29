@@ -45,6 +45,8 @@
 *  History:
 *     2008-07-17 (TIMJ):
 *        Initial version
+*     2008-08-28 (TIMJ):
+*        Use the flatfield to mask out bolometers
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -88,6 +90,7 @@
 #include "star/grp.h"
 #include "msg_par.h"
 #include "star/one.h"
+#include "prm_par.h"
 
 /* SMURF routines */
 #include "smf.h"
@@ -119,6 +122,62 @@ void smf_reduce_dark( const smfData *indark, smf_dtype dtype,
      as integers. Flag any bolometers that have constant signal or a signal
      to noise less than 1. */
   smf_collapse_tseries( indark, 0, 1.0, 1, dtype, outdark, status );
+
+  /* The flatpar array contains the flat parameters in the order
+     matching the bolometer data - ie colsize*rowsize for first
+     parameter then colsize*rowsize for second parameter and so on. A
+     dead pixel will have VAL__BADD as its first parameter. Mark this
+     in the mean array. */
+
+  if (indark->da && indark->da->flatcal) {
+    size_t nbols = (indark->dims)[0] * (indark->dims)[1];
+    size_t i;
+    double *flatcal = indark->da->flatcal;
+    int *idata = NULL;
+    int *ivar  = NULL;
+    double *ddata = NULL;
+    double *dvar  = NULL;
+
+    switch ((*outdark)->dtype) {
+    case SMF__DOUBLE:
+      ddata = ((*outdark)->pntr)[0];
+      dvar  = ((*outdark)->pntr)[1];
+
+      for (i=0; i<nbols; i++) {
+        if (flatcal[i] == VAL__BADD) {
+          ddata[i] = VAL__BADD;
+          dvar[i] = VAL__BADD;
+        }
+      }
+
+      break;
+
+    case SMF__INTEGER:
+      idata = ((*outdark)->pntr)[0];
+      ivar  = ((*outdark)->pntr)[1];
+
+      for (i=0; i<nbols; i++) {
+        if (flatcal[i] == VAL__BADD) {
+          idata[i] = VAL__BADI;
+          ivar[i] = VAL__BADI;
+        }
+      }
+
+      break;
+
+    default:
+
+      if (*status == SAI__OK) {
+        msgSetc( "DT", smf_dtype_string( *outdark, status ));
+        *status = SAI__ERROR;
+        errRep( " ", "Unsupported data type for masking (^DT)",
+                status );
+      }
+    }
+
+
+  }
+
 
   return;
 }
