@@ -121,5 +121,7 @@ AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_FILES(Makefile smurf.ifd component.xml libsmurf/Makefile \
                 libsmf/Makefile libsc2sim/Makefile libacsis/Makefile \
                 libaztec/Makefile libgsd/Makefile libsc2fts/Makefile)
+AC_CONFIG_FILES([libsmf/make_h], [chmod 755 libsmf/make_h])
+
 
 AC_OUTPUT

@@ -1,7 +1,14 @@
 
+dist_noinst_SCRIPTS = make_h
+
 noinst_LTLIBRARIES = libsmf.la
 
 libsmf_la_SOURCES = $(C_ROUTINES)
+
+CGENERIC_ROUTINES = smf_boxcar1.cgen
+
+# The .c files which are built from the above .cgen files.
+BUILT_C_ROUTINES = $(CGENERIC_ROUTINES:.cgen=.c)
 
 C_ROUTINES = smf_correct_extinction.c smf_scale_tau.c \
 smf_grp_related.c smf_construct_smfGroup.c smf_close_smfGroup.c \
@@ -76,11 +83,51 @@ smf_reduce_dark.c smf_find_subarray.c smf_choose_darks.c \
 smf_subtract_dark.c smf_fft_data.c smf_isfft.c \
 smf_obstype_str.c smf_obsmode_str.c smf_calc_mode.c smf_calc_meantau.c \
 smf_grpCopy.c smf_collapse_tseries.c smf_write_smfData.c smf_set_moving.c \
-smf_select_pntr.c smf_get_dims.c
+smf_select_pntr.c smf_get_dims.c \
+$(BUILT_C_ROUTINES)
 
 noinst_INCLUDES = smf.h smf_typ.h
 
 # fac files must be installed
 noinst_MESSAGES = smf_err.h
 
-BUILT_SOURCES = smf_err.h
+BUILT_SOURCES = smf_err.h $(BUILT_C_ROUTINES)
+
+$(C_ROUTINES:.c=.o): ../smf.h
+
+smf.h: smf.h.source make_h
+	./make_h 
+
+# Create the .c file which defines type-specific code generated from each 
+# .cgen file.
+$(CGENERIC_ROUTINES:.cgen=.c): 
+	echo "/*" > $@
+	echo "*  Name:" >> $@
+	echo "*    $@" >> $@
+	echo "" >> $@
+	echo "*  Purpose:" >> $@
+	echo "*    This file expands the generic C code held in $(@:.c=.cgen) to provide" >> $@
+	echo "*    the required type-specific implementations which can be called by" >> $@
+	echo "*    other functions." >> $@
+	echo "" >> $@
+	echo "*  Notes:" >> $@
+	echo "*    - This file is generated automatically at build time (see" >> $@
+	echo "*    libsmf/Makefile.am)" >> $@
+	echo "*/" >> $@
+	echo "" >> $@
+	echo "#include \"prm_par.h\"" >> $@
+	echo "#include \"cgeneric.h\"" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_DOUBLE_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_FLOAT_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+
+# Need to distribute the generic files
+EXTRA_DIST = $(CGENERIC_ROUTINES)

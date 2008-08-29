@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smf_boxcar1
+*     smf_boxcar1<X>
 
 *  Purpose:
 *     Low-level routine to smooth a 1-D array with a boxcar filter
@@ -13,13 +13,13 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_boxcar1 ( double *series, const size_t ninpts, size_t window, 
-*                   unsigned char *qual, unsigned char mask, 
-*                   int *status )
+*     void smf_boxcar1<X>( CGEN_TYPE *series, const size_t ninpts, 
+*                          size_t window, unsigned char *qual, 
+*                          unsigned char mask, int *status )
 
 *  Arguments:
-*     series = double* (Given)
-*        Pointer to data array
+*     series = CGEN_TYPE* (Given)
+*        Pointer to array that will be smoothed
 *     ninpts = const size_t (Given)
 *        Number of points in input series
 *     window = size_t (Given)
@@ -44,7 +44,6 @@
 *     intervals (smoothly changes from WINDOW to 1 sample in length). 
 
 *  Notes: 
-*     Does not deal with bad values
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -66,6 +65,8 @@
 *        -algorithm now smooths with shortened intervals at array ends
 *     2008-06-25 (EC):
 *        -Only evaluate smooth values with good QUALITY / not VAL__BADD
+*     2008-08-28 (EC):
+*        Re-written as a generic function
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -110,17 +111,17 @@
 #include "smurf_typ.h"
 
 /* Simple default string for errRep */
-#define FUNC_NAME "smf_boxcar1"
+#define FUNC_NAME "smf_boxcar1CGEN_CODE"
 
-void smf_boxcar1( double *series, const size_t ninpts, size_t window, 
-		  unsigned char *qual, unsigned char mask, 
-		  int *status) {
+void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts, 
+                                 size_t window, unsigned char *qual, 
+                                 unsigned char mask, int *status) {
 
   /* Local variables */
   size_t off;                 /* offset from loop counter to modified sample */
   size_t count;               /* Number of samples in window */
   size_t i;                   /* Loop counter */
-  double *seriescopy;         /* Copy of the time series */
+  CGEN_TYPE *seriescopy;      /* Copy of the time series */
   double sum;                 /* Sum of values in the window */
   
   /* Check status */
@@ -134,7 +135,8 @@ void smf_boxcar1( double *series, const size_t ninpts, size_t window,
     msgSeti("B",(int)window);
     msgSeti("N",(int)ninpts);
     *status = SAI__ERROR;
-    errRep(FUNC_NAME, "Size of window (^B) exceeds extent of data array (^N)", 
+    errRep(" ", FUNC_NAME 
+           "Size of window (^B) exceeds extent of data array (^N)", 
 	   status);
     return;
   }
@@ -184,17 +186,17 @@ void smf_boxcar1( double *series, const size_t ninpts, size_t window,
 	}
 	
 	/* Remove the sample at i from the window */
-	if( seriescopy[i] != VAL__BADD ) {
+	if( seriescopy[i] != CGEN_BAD ) {
 	  sum -= seriescopy[i];
 	  count--;
 	}
       }
 
-    } else {        /* VAL__BADD checking version */
+    } else {        /* CGEN_BAD checking version */
 
       for( i=0; i<ninpts; i++ ) {
 	/* sum another point from the unaltered array */
-	if( seriescopy[i] != VAL__BADD ) {
+	if( seriescopy[i] != CGEN_BAD ) {
 	  sum += seriescopy[i];
 	  count++;
 	}
@@ -203,14 +205,14 @@ void smf_boxcar1( double *series, const size_t ninpts, size_t window,
 	else off = -window/2;
 	
 	/* As soon as we have at least 2 samples start applying smooth val */
-	if( (count > 1) && (series[i+off] != VAL__BADD) ) {
+	if( (count > 1) && (series[i+off] != CGEN_BAD) ) {
 	  series[i+off] = sum / (double) count;      
 	}
 	
 	/* Subtract off the first sample in the window if we are at
 	   least window samples from the start here before adding in a
 	   new point next time around the loop */
-	if( (i >= (window-1)) && (seriescopy[i-(window-1)] != VAL__BADD) ) {
+	if( (i >= (window-1)) && (seriescopy[i-(window-1)] != CGEN_BAD) ) {
 	  sum -= seriescopy[i-(window-1)];
 	  count--;
 	}
@@ -221,12 +223,12 @@ void smf_boxcar1( double *series, const size_t ninpts, size_t window,
       for( i=ninpts-window; i<ninpts; i++ ) {
 	off = (ninpts-i-1)/2;
 	
-	if( (count > 1) && (series[i+off] != VAL__BADD) ) {
+	if( (count > 1) && (series[i+off] != CGEN_BAD) ) {
 	  series[i+off] = sum / (double) count;
 	}
 	
 	/* Remove the sample at i from the window */
-	if( seriescopy[i] != VAL__BADD ) {
+	if( seriescopy[i] != CGEN_BAD ) {
 	  sum -= seriescopy[i];
 	  count--;
 	}

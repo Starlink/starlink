@@ -326,7 +326,7 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     msgOutif(MSG__VERB, " ", "    boxcar width ^BOX",status);
 
     /* Do the smooth */
-    smf_boxcar1( model_data, ntslice, boxcar, NULL, 0, status );
+    smf_boxcar1D( model_data, ntslice, boxcar, NULL, 0, status );
 
     /* If damping, apply it here */
     if( do_boxfact && (*status == SAI__OK) ) {

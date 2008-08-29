@@ -339,6 +339,8 @@
 *        -Rename smf_simple_stats, smf_simplerebinmap, smf_simpleaddmap
 *         to     smf_stats1, smf_rebinmap1, smf_addmap1
 *        -Add smf_get_dims
+*     2008-08-28 (EC):
+*        -Renamed to smf.h.source in line with using cgeneric macros
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1101,4 +1103,4 @@ void smf_set_moving ( AstFrameSet* wcs, int *status );
 void smf_get_dims( const smfData *data, dim_t *nbolo, dim_t *ntslice, 
                    dim_t *ndata, int *status );
 
-#endif /* SMF_DEFINED */
+

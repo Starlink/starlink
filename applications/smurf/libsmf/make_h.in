@@ -1,0 +1,197 @@
+#!@PERL@
+
+#  Creates the smf.h C header file.
+
+# Open the output file.
+   open( OUTFILE, ">smf.h" );
+
+# Copy the fixed part to the output.
+   open( INFILE, "<smf.h.source" );
+   while( <INFILE> ){ print OUTFILE; }
+   close( INFILE );
+
+# Add a comment for the following stuff
+   print OUTFILE <<EOF;
+
+/* Prototypes and interfaces for generic functions */
+/* ----------------------------------------------- */
+/* Each distributed source file in the current directory with type ".cgen" 
+   is processed at build time to produce a corresponding ".c" file. Each of 
+   the generated type-specific functions is invoked using a generic interface 
+   macro which hides the code for selecting the type-specfic function. These 
+   lines in this header file are generated at build time by the make_h script. */
+
+EOF
+
+# Loop round all ".cgen" files in the current directory.
+   while( $file = <*.cgen> ){
+
+# Read through the cgen file, looking for the "Invocation" section of the 
+# prologue. 
+      $total = "";
+      $stage = 0;
+      open( INFILE, "<$file" );
+      while( $line = <INFILE> ){ 
+         chomp $line;
+
+         if( $stage == 0 ) {
+            if( $line =~ /^\* +Invocation\: *$/ ) {
+               $stage = 1;
+            }
+
+# When found, remove any leading "*    " string and concatenate the 
+# line until a blank line or the start of the next prologue section is found.
+         } elsif( $stage == 1 ) {
+
+            if( $line =~ /^\* *(.*) *$/ ){
+               $line = $1;
+            }
+
+            if( $line =~ /^ *$/ ){
+               $stage = 2;
+            } elsif( $line =~ /^ *(.+)\: *$/ ){
+               $stage = 2;
+            } else {
+               $total .= $line;
+            }
+
+#  When all the lines of the synopsis section have been concatenated, analyse 
+#  it to find the root function name, and parameter list.
+         } elsif( $stage == 2 ) {         
+            if( $total =~ /^ *(.*?)(\w+)\<X\> *\( *(.*) *\);? *$/ ) {
+               $ftype = $1;
+               $base = $2;
+               $args = $3;
+               $proto = "$ftype$base<X>( ";
+               $stage = 3;
+            } else {
+               last;
+            }
+
+#  Analyse the parameter list to get the name and type of each argument.
+#  First check there are no function pointer parameters (which may contain 
+#  commas).
+         } elsif( $stage == 3 ) {         
+
+            if( $args =~ /^(.*)\([^\(\)]*\)(.*)$/ ){
+               print ">>> The make_h script cannot currently handle function pointers as parameters\n";
+               last;
+            }
+
+            $names = "";
+            $enames = "";
+            $npar = 0;
+
+            foreach $par (split( /,/, $args)) {
+               if( $par =~ /^ *(.*?) *(\w+)(\[ *\d+ *\])? *$/ ) {
+                  $type[ $npar ] = $1.$3;
+                  $name[ $npar ] = $2;
+                  if( $npar != 0 ) {
+                     $proto .= ", ";
+                     $names .= ",";
+                     $enames .= ", ";
+                  }
+                  $proto .= $1.$3;                  
+                  $names .= $2;
+
+                  if( $type[ $npar ] =~ /:Xtype:/ ) {
+                     $enames .= "($type[ $npar ]) $name[ $npar ]";
+                  } else {
+                     $enames .= $name[ $npar ];
+                  }
+
+                  $npar++;
+               } else {
+                  last;
+               }
+            }
+            $proto .= " );";
+            $stage = 4;
+
+#  Now write out the type-specific function prototypes and interface definitions
+         } elsif( $stage == 4 ) {         
+            $dproto = $proto;
+            $dproto =~ s/<X>/D/g;
+            $dproto =~ s/CGEN_TYPE/double/g;
+            print OUTFILE "$dproto\n";
+
+            $fproto = $proto;
+            $fproto =~ s/<X>/F/g;
+            $fproto =~ s/CGEN_TYPE/float/g;
+            print OUTFILE "$fproto\n";
+
+            $fproto = $proto;
+            $fproto =~ s/<X>/I/g;
+            $fproto =~ s/CGEN_TYPE/int/g;
+            print OUTFILE "$fproto\n";
+
+            $denames = $enames;
+            $denames =~ s/:Xtype:/double/g;
+            $fenames = $enames;
+            $fenames =~ s/:Xtype:/float/g;
+            $ienames = $enames;
+            $ienames =~ s/:Xtype:/int/g;
+            
+            $pars = "type";
+            if( $names ) {
+               $pars .= ",$names";
+            }
+
+            if( $ftype =~ /\*/ ) {
+               $null = "NULL";
+            } else {
+               $null = "0";
+            }
+   
+            print OUTFILE <<EOF;
+#define $base($pars) \\
+   ( ( type == SMF__DOUBLE ) ? \\
+      ${base}D( $denames ) : \\
+   ( ( type == SMF__FLOAT ) ? \\
+      ${base}F( $fenames ) : \\
+   ( ( type == SMF__INTEGER ) ? \\
+      ${base}I( $ienames ) : ($ftype) \\
+   ( ( *status == SAI__OK ) ? \\
+      *status = SAI__ERROR, \\
+      msgSeti( "TYPE", type ), \\
+      errRep( "CUPID_BADTYPE", "Bad data type (^TYPE) used when invoking " \\
+              "name (internal SMURF programming error).", status),$null:$null ) ) )
+
+EOF
+
+            last;
+
+         }
+      }
+      close( INFILE );
+
+      if( $stage == 0 ){
+         print ">>> No prologue found in SMURF source file $file !!!!\n";
+         print ">>> Cannot make the SMURF header file smf.h !!!!\n";
+         exit 1;
+
+      } elsif( $stage == 1 ) {
+         print ">>> Cannot find the end of the Synopsis: section in the prologue of SMURF source file $file !!!!\n";
+         print ">>> Cannot make the SMURF header file smf.h !!!!\n";
+         exit 1;
+
+      } elsif( $stage == 2 ) {
+         print ">>> Ill-formed Synopsis: section in the prologue of SMURF source file $file !!!!\n";
+         print ">>> Cannot make the SMURF header file smf.h !!!!\n";
+         exit 1;
+
+      } elsif( $stage == 3 ) {
+         print ">>> Ill-formed parameter list in Synopsis: section of the prologue of SMURF source file $file !!!!\n";
+         print ">>> Cannot make the SMURF header file smf.h !!!!\n";
+         exit 1;
+      }
+
+   }
+
+# Close the "if" clause which checked to see if this header file has already 
+# been included.
+   print OUTFILE "#endif\n";
+
+# Close the output file.
+   close( OUTFILE );
+
