@@ -129,7 +129,8 @@ void smf_reduce_dark( const smfData *indark, smf_dtype dtype,
      dead pixel will have VAL__BADD as its first parameter. Mark this
      in the mean array. */
 
-  if (indark->da && indark->da->flatcal) {
+  if (indark->da && indark->da->flatcal
+      && strcmp( indark->da->flatname, "NULL") != 0 ) {
     size_t nbols = (indark->dims)[0] * (indark->dims)[1];
     size_t i;
     double *flatcal = indark->da->flatcal;
