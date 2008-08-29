@@ -136,7 +136,7 @@ void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts,
     msgSeti("N",(int)ninpts);
     *status = SAI__ERROR;
     errRep(" ", FUNC_NAME 
-           "Size of window (^B) exceeds extent of data array (^N)", 
+           ": Size of window (^B) exceeds extent of data array (^N)", 
 	   status);
     return;
   }
