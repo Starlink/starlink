@@ -55,6 +55,7 @@
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -62,10 +63,13 @@
 *        Initial version
 *     2008-04-18 (EC):
 *        Use SMF__MINSTATSAMP for sample length check
+*     2008-08-29 (TIMJ):
+*        Initialise return values even if status is bad on entry.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008 University of British Columbia. All Rights
 *     Reserved.
 
 *  Licence:
@@ -119,6 +123,11 @@ void smf_stats1( double *data, dim_t start, dim_t nsamp,
   double sum=0;               /* Sum of the data */
   double sumsq=0;             /* Sum of the square of the data */
 
+  /* initialise return values */
+  if (sigma) *sigma = VAL__BADD;
+  if (ngood) *ngood = 0;
+  if (mean) *mean = VAL__BADD;
+
   /* Check status */
   if (*status != SAI__OK) return;
 
@@ -170,7 +179,8 @@ void smf_stats1( double *data, dim_t start, dim_t nsamp,
   if( count < SMF__MINSTATSAMP ) {
     *status = SMF__INSMP;
     msgSeti("MIN",SMF__MINSTATSAMP);
-    errRep( FUNC_NAME, "Insufficient samples (<^MIN) for statistics", status );
+    msgSeti("N", count );
+    errRep( FUNC_NAME, "Insufficient number of good samples (^N<^MIN) for statistics", status );
     return;
   }
 
