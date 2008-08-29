@@ -27,12 +27,14 @@
 *        was used.
 *     resistance = const double [] (Given)
 *        Resistance for each pixel heater.
-*     powref = double [] (Given)
+*     powref = double [] (Returned)
 *        Resistance input powers. Must have space for the same number of
-*        elements as frames stored in "heatframes".
-*     bolref = double [] (Given)
+*        elements as frames stored in "heatframes". Memory allocated by
+*        caller.
+*     bolref = double [] (Returned)
 *        Response of each bolometer to powref. Dimensioned as number of 
-*        frames in "heatframes" times the number of bolometers.
+*        frames in "heatframes" times the number of bolometers. Memory
+*        allocated by caller.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
