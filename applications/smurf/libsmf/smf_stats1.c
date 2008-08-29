@@ -140,18 +140,18 @@ void smf_stats1( double *data, dim_t start, dim_t nsamp,
       /* Standard deviation calculating version */
       for( i=start; i<(start+nsamp); i++ ) {
 
-	if( !(qual[i] & mask) ) {
-	  sum += data[i];
-	  sumsq += data[i]*data[i];
-	  count++;
-	} 
+        if( !(qual[i] & mask) ) {
+          sum += data[i];
+          sumsq += data[i]*data[i];
+          count++;
+        } 
       }
     } else {
       /* Mean only */
       for( i=start; i<(start+nsamp); i++ ) if( !(qual[i] & mask) ) {
-	sum += data[i];
-	count++;
-      }
+          sum += data[i];
+          count++;
+        }
     }
 
   } else {
@@ -160,16 +160,16 @@ void smf_stats1( double *data, dim_t start, dim_t nsamp,
     if( sigma ) {
       /* Standard deviation calculating version */
       for( i=start; i<(start+nsamp); i++ ) if( data[i] != VAL__BADD ) {
-	sum += data[i];
-	sumsq += data[i]*data[i];
-	count++;
-      }
+          sum += data[i];
+          sumsq += data[i]*data[i];
+          count++;
+        }
     } else {
       /* Mean only */
       for( i=start; i<(start+nsamp); i++ ) if( data[i] != VAL__BADD ) {
-	sum += data[i];
-	count++;
-      }
+          sum += data[i];
+          count++;
+        }
     }
   }
 
