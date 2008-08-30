@@ -127,9 +127,10 @@ void smf_reduce_dark( const smfData *indark, smf_dtype dtype,
      matching the bolometer data - ie colsize*rowsize for first
      parameter then colsize*rowsize for second parameter and so on. A
      dead pixel will have VAL__BADD as its first parameter. Mark this
-     in the mean array. */
+     in the mean array. Do not do this for actual flatfield observations. */
 
   if (indark->da && indark->da->flatcal
+      && indark->hdr->obstype != SMF__TYP_FLATFIELD
       && strcmp( indark->da->flatname, "NULL") != 0 ) {
     size_t nbols = (indark->dims)[0] * (indark->dims)[1];
     size_t i;
