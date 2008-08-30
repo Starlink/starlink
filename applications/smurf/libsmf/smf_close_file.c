@@ -262,9 +262,9 @@ void smf_close_file( smfData ** data, int * status ) {
 
   /* Tidy up the header */
   if (hdr != NULL) {
-    if (hdr->wcs != NULL) (void) astAnnul( hdr->wcs );
-    if (hdr->tswcs != NULL) (void) astAnnul( hdr->tswcs );
-    if (hdr->fitshdr != NULL) (void) astAnnul( hdr->fitshdr );
+    if (hdr->wcs != NULL) hdr->wcs = astAnnul( hdr->wcs );
+    if (hdr->tswcs != NULL) hdr->tswcs = astAnnul( hdr->tswcs );
+    if (hdr->fitshdr != NULL) hdr->fitshdr = astAnnul( hdr->fitshdr );
     if (!hdr->isCloned) {
       /* We are responsible for this memory - although what happens
 	 when we are cloned and the original is freed first? Need
