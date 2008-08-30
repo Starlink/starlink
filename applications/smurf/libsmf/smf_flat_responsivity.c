@@ -84,6 +84,7 @@
 #include "smf.h"
 #include "smurf_par.h"
 
+#include "mers.h"
 #include "prm_par.h"
 #include "sae_par.h"
 
@@ -97,7 +98,7 @@ void smf_flat_responsivity ( smfData *respmap, size_t nheat,
   size_t k;                    /* loop counter */
   const double mcepass = 3.3;  /* factor for MCE low-pass filter */
   double mean;                 /* mean responsivity of a bolometer */
-  size_t ngood;                /* number of valid responsivities */
+  size_t ngood = 0;            /* number of valid responsivities */
   int nrgood;                  /* number of good responsivities for bolo */
   double *respdata = NULL;     /* responsivity data */
   double *resps = NULL;        /* responsivities for a bolometer at each step */
@@ -135,8 +136,6 @@ void smf_flat_responsivity ( smfData *respmap, size_t nheat,
 
   respdata = (respmap->pntr)[0];
   respvar  = (respmap->pntr)[1];
-
-  smf_dump_smfData( respmap, 0, status );
 
   resps = smf_malloc( nheat, sizeof(*resps), 0, status );
 
@@ -182,6 +181,9 @@ void smf_flat_responsivity ( smfData *respmap, size_t nheat,
     }
 
   }
+
+  msgSeti( "NG", ngood );
+  msgOut( " ", "Number of good responsivities: ^NG", status );
 
   if (resps) smf_free( resps, status );
 

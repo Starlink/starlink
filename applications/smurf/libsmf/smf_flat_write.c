@@ -127,9 +127,6 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
   /* Create a FITS header for DA */
   smf_fits_export2DA( frame->hdr->fitshdr, &ncards, fitsrec, status );
 
-  smf_dump_smfData( frame, 0, status );
-
-
   /* Copy the data as integers so it can be written to data file */
 
   ibuf = smf_malloc( numbols * bbhtframes->ndat, sizeof(*dbuf), 0, status );
