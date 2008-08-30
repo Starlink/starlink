@@ -1107,3 +1107,11 @@ void
 smf_flat_standardpow( const smfArray * heatframes, double refohms,
                       const double heatref[], const double resistance[],
                       double powref[], double bolref[], int * status);
+
+void smf_flat_responsivity ( smfData *respmap, size_t nheat,
+                             double *powval, double *bolval,  
+                             int *status );
+
+void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
+                     const double *powref, const double *bolref,
+                     int * status );

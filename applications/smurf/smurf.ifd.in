@@ -913,6 +913,76 @@ package @PACKAGE@ {
             }
         }
 
+        action calcflat {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input flatfield files}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                ppath DYNAMIC CURRENT
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Processed flatfield file}
+                helpkey *
+            }
+
+            parameter msg_filter {
+                type _CHAR
+                prompt {Message level}
+                default NORM
+                vpath DEFAULT	
+                helpkey *
+            }
+
+            parameter refres {
+                type _DOUBLE
+                access READ
+                ppath  DYNAMIC CURRENT
+                prompt {Reference pixel heater resistance}
+                helpkey *
+            }
+
+
+            parameter resist {
+                position 3
+                type LITERAL
+                access READ
+                ppath CURRENT
+                prompt {Heater resistance information}
+                helpkey *
+            }
+
+            parameter resp {
+                type NDF
+                access WRITE
+                vpath {PROMPT }
+                prompt {Responsivity map}
+                helpkey *
+            }
+
+            parameter respmask {
+                type _LOGICAL
+                vpath {PROMPT }
+                prompt {Mask bolometers with bad responsivity?}
+                ppath GLOBAL CURRENT
+                default TRUE
+                helpkey *
+            }
+
+        }
+
         action dreamweights {
 
             helplib {$SMURF_HELP}

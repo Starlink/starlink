@@ -84,6 +84,7 @@ smf_subtract_dark.c smf_fft_data.c smf_isfft.c \
 smf_obstype_str.c smf_obsmode_str.c smf_calc_mode.c smf_calc_meantau.c \
 smf_grpCopy.c smf_collapse_tseries.c smf_write_smfData.c smf_set_moving.c \
 smf_select_pntr.c smf_get_dims.c smf_flat_standardpow.c \
+smf_flat_responsivity.c smf_flat_write.c \
 $(BUILT_C_ROUTINES)
 
 noinst_INCLUDES = smf.h smf_typ.h
