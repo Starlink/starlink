@@ -39,6 +39,7 @@ $(MANIFESTS)/agi: \
 		$(MANIFESTS)/idi \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/psx \
@@ -229,6 +230,7 @@ $(MANIFESTS)/cat: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -309,6 +311,7 @@ $(MANIFESTS)/cgs3dr: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -333,6 +336,7 @@ $(MANIFESTS)/chart: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/ifd \
 		$(MANIFESTS)/mers \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pda \
 		$(MANIFESTS)/psx \
@@ -483,6 +487,7 @@ $(MANIFESTS)/cursa: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pda \
@@ -518,6 +523,7 @@ $(MANIFESTS)/daophot: \
 		$(MANIFESTS)/idi \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pgp \
 		$(MANIFESTS)/pgplot \
@@ -667,6 +673,7 @@ $(MANIFESTS)/echwind: \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/gwm \
 		$(MANIFESTS)/mers \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/pgplot \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
@@ -827,6 +834,7 @@ $(MANIFESTS)/findcoords: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pda \
@@ -854,6 +862,7 @@ $(MANIFESTS)/fio: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/psx \
@@ -872,6 +881,7 @@ $(MANIFESTS)/fluxes: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/jpl \
 		$(MANIFESTS)/mers \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/psx \
@@ -969,6 +979,7 @@ $(MANIFESTS)/graphpar: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pgp \
@@ -1067,6 +1078,7 @@ $(MANIFESTS)/hdstrace: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -1098,6 +1110,7 @@ $(MANIFESTS)/icl: \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/nbs \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
@@ -1117,6 +1130,7 @@ $(MANIFESTS)/idi: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/psx \
@@ -1147,6 +1161,7 @@ $(MANIFESTS)/img: \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -1231,6 +1246,7 @@ $(MANIFESTS)/ircamdr: \
 		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pda \
@@ -1508,6 +1524,7 @@ $(MANIFESTS)/mag: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/psx \
@@ -1522,9 +1539,11 @@ $(MANIFESTS)/match:
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/mers: \
+		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/messgen \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
@@ -1621,6 +1640,7 @@ $(MANIFESTS)/observe: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pgp \
@@ -1652,6 +1672,7 @@ $(MANIFESTS)/par: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
@@ -1668,6 +1689,7 @@ $(MANIFESTS)/pcs: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
@@ -1696,6 +1718,7 @@ $(MANIFESTS)/period: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pgp \
 		$(MANIFESTS)/psx \
@@ -1724,6 +1747,7 @@ $(MANIFESTS)/pgplot: \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/gwm \
 		$(MANIFESTS)/mers \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/starmem \
@@ -1879,6 +1903,7 @@ $(MANIFESTS)/pongo: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/idi \
 		$(MANIFESTS)/mers \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pda \
 		$(MANIFESTS)/pgp \
@@ -2442,6 +2467,7 @@ $(MANIFESTS)/starbench: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
@@ -2486,6 +2512,7 @@ $(MANIFESTS)/starman: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pgp \
 		$(MANIFESTS)/prm \
@@ -2514,6 +2541,7 @@ $(MANIFESTS)/startcl: \
 		$(MANIFESTS)/jpeg \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/nbs \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
@@ -2722,6 +2750,7 @@ $(MANIFESTS)/surf: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
 		$(MANIFESTS)/psx \
@@ -2769,6 +2798,7 @@ $(MANIFESTS)/trn: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/prm \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
@@ -2795,6 +2825,7 @@ $(MANIFESTS)/tsp: \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \

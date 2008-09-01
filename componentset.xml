@@ -138,7 +138,7 @@ system are supported.
 </component>
 
 <component id="convert" support="S">
-  <version>1.5-14</version>
+  <version>1.5-15</version>
   <path>applications/convert</path>
   <description>CONVERT -- format-conversion package</description>
   <abstract><p>
@@ -244,7 +244,7 @@ on-line catalogues via the Internet.
 </component>
 
 <component id="daophot" support="U">
-  <version>1.3-3</version>
+  <version>1.3-4</version>
   <path>applications/daophot</path>
   <description>Stellar Photometry Package</description>
   <abstract>
@@ -278,7 +278,7 @@ on-line catalogues via the Internet.
 </component>
 
 <component id="datacube" support="S">
-  <version>1.1-1</version>
+  <version>1.2</version>
   <path>applications/datacube</path>
   <description>DATACUBE - An IFS datacube manipulation package</description>
   <abstract><p>DATACUBE is a package which includes the IFU Data Product Co
@@ -534,7 +534,7 @@ variety of formats.
 </component>
 
 <component id="figaro" support="S">
-  <version>5.6-4</version>
+  <version>5.6-5</version>
   <path>applications/figaro</path>
   <description>FIGARO general data-reduction system</description>
   <abstract><p>
@@ -866,7 +866,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>1.9-1</version>
+  <version>1.9-8</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -1237,6 +1237,36 @@ file extension stored in the standard Starlink NDF data format.
   <notes><p>Starlink customised wrapper around latex2html</p></notes>
 </component>
 
+<component id="starbench" status="obsolete" support="U">
+  <version>1.4-2</version>
+  <path>applications/obsolete/starbench</path>
+  <description>StarBench - Starlink Benchmarking Utility</description>
+  <abstract><p>
+The Starlink Benchmarking Utility provides a set of tools for investigating
+the performance of computer systems running astronomy data reduction software.
+  </p></abstract>
+  <dependencies >
+    <build>pcs</build><use option='link'>daophot</use><use option='link'>ccdpack</use><use option='link'>pisa</use><use option='link'>figaro</use><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>C. A Clayton</name>
+      <uname>cac</uname>
+    </person>
+    <person>
+      <name>T. M. Gledhill</name>
+    </person>
+    <person>
+      <name>M. J. Bly</name>
+    </person>
+    <person>
+      <name>S. E. Rankin</name>
+    </person>
+  </developers>
+  <documentation> ssn23</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
 <component id="starman" status="obsolete" support="U">
   <version>2.0-1</version>
   <path>applications/obsolete/starman</path>
@@ -1288,7 +1318,7 @@ A software package designed to search for periodicities in data.
 </component>
 
 <component id="photom" support="S">
-  <version>1.10-2</version>
+  <version>1.11-0</version>
   <path>applications/photom</path>
   <description>PHOTOM - A Photometry Package</description>
   <abstract><p>PHOTOM is a package for measuring the sky corrected
@@ -1526,7 +1556,7 @@ package.
 </component>
 
 <component id="smurf">
-  <version>0.3.1</version>
+  <version>0.3.2</version>
   <path>applications/smurf</path>
   <description>SURF2 - SCUBA-2 User Reduction Facility</description>
   <abstract><p>
@@ -1536,7 +1566,7 @@ the James Clerk Maxwell Telescope. The tasks allows one to completely
 reduce your SCUBA-2 data.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><sourceset>messgen</sourceset><build>ast</build><build>sae</build><build>pcs</build><build>mers</build><build>ndf</build><build>shl</build><build>gsl</build><build>ndg</build><build>fftw</build><build>ard</build><build>kaplibs</build><build>pda</build><link>ndf</link><link>ast</link><link>hlp</link><link>ndg</link><link>shl</link><link>pda</link><sourceset>sst</sourceset>
+    <build>pcs</build><sourceset>messgen</sourceset><build>ast</build><build>sae</build><build>pcs</build><build>mers</build><build>ndf</build><build>shl</build><build>gsl</build><build>ndg</build><build>fftw</build><build>ard</build><build>kaplibs</build><build>pda</build><build>gsd</build><link>ndf</link><link>ast</link><link>hlp</link><link>ndg</link><link>shl</link><link>pda</link><link>gsd</link><sourceset>sst</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1544,7 +1574,7 @@ reduce your SCUBA-2 data.
       <uname>timj</uname>
     </person>
   </developers>
-  <documentation></documentation>
+  <documentation> sun259</documentation>
   <bugreports>t.jenness@jach.hawaii.edu</bugreports>
 </component>
 
@@ -1741,7 +1771,7 @@ UNIX).
 </component>
 
 <component id="surf">
-  <version>1.6-13</version>
+  <version>1.7-1</version>
   <path>applications/surf</path>
   <description>SURF - SCUBA User Reduction Facility</description>
   <abstract><p>
@@ -3888,55 +3918,6 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sun90">
-  <version>9</version>
-  <path>docs/sun/090</path>
-  <description>SNX --- Starlink Extensions to the NCAR Graphics Utilities</description>
-  <abstract><p>
-     The NCAR graphics suite (SUN/88) consists of a set of subprograms
-     which can be used to produce complete graphs in a variety of
-     formats.  The package has been in wide use for some years; the
-     latest version employs the ISO standard GKS interfaces for its
-     low-level plotting, giving it access to all Starlink graphics
-     devices, present and future.
-
-     The NCAR routines themselves are thoroughly documented, and just
-     a few simple calls will produce graphs of excellent appearance.
-     The package also provides a high level of flexibility, with
-     dozens of different details of the plot independently
-     controllable to give exactly the result required.  However,
-     beginners may be daunted by the mass of features offered, and
-     unless they take the extreme step of reading the manual may give
-     up before they realise what the package can do for them.  This
-     document describes minor extensions which provide more convenient
-     access to certain features without sacrificing flexibility.
-
-     The AUTOGRAPH part of the NCAR suite, used in conjunction with
-     the Starlink NCAR extensions and the Starlink low level plotting
-     package SGS (SUN/85), offers an alternative high level system to
-     PGPLOT (SUN/15) for producing graphs of one variable plotted
-     against another. All of the Starlink extensions provided within
-     SNX enhance the power of the facilities provided by AUTOGRAPH and
-     make it more accessible to the beginner.
-  </p></abstract>  
-  <dependencies >
-    <sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>P C T Rees</name>
-      <name>M J Bly</name>
-      <name>P T Wallace</name>
-    </person>
-  </developers>
-  <documentation> sun90</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <copyright>
-    <year>1987,1988,1989,1990,1991,1992,1993,1994,1995</year>
-    <name>PPARC</name>
-  </copyright>
-</component>
-
 <component id="sun91">
   <version>2</version>
   <path>docs/sun/091</path>
@@ -4073,32 +4054,6 @@ to handle data from a variety of different instruments.
   <copyright>
     <year>1991,1992</year>
     <name>CLRC</name>
-  </copyright>
-</component>
-
-<component id="sun120">
-  <version>3</version>
-  <path>docs/sun/120</path>
-  <description>CATPAC --- Catalogue Applications Package on UNIX</description>
-  <abstract><p>
-    CATPAC is the STARLINK Catalogue and Table Package. This document
-    describes the CATPAC applications available on UNIX. These include
-    applications for inputing, processing and reporting tabular data
-    including astronomical catalogues.
-  </p></abstract>  
-  <dependencies >
-    <sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>A R Wood</name>
-    </person>
-  </developers>
-  <documentation> sun120</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <copyright>
-    <year>1991,1993,1994</year>
-    <name>DRAL</name>
   </copyright>
 </component>
 
@@ -4992,7 +4947,7 @@ No longer under active control.
 </component>
 
 <component id="cnf" support="S">
-  <version>4.2-3</version>
+  <version>4.3-0</version>
   <path>libraries/cnf</path>
   <description>Mixed Language Programming -- FORTRAN and C</description>
   <abstract><p>The CNF package comprises two sets of software which
@@ -5034,7 +4989,7 @@ No longer under active control.
 </component>
 
 <component id="ems" support="S">
-  <version>2.1-2</version>
+  <version>2.2-0</version>
   <path>libraries/ems</path>
   <description>EMS -- Error Message Service</description>
   <abstract><p>The purpose of EMS is to provide facilities for
@@ -5329,7 +5284,7 @@ No longer under active control.
 </component>
 
 <component id="hlp" support="S">
-  <version>4.0-2</version>
+  <version>4.0-3</version>
   <path>libraries/hlp</path>
   <description>HLP -- interactive help system</description>
   <abstract><p>The Starlink HLP system allows an application program
@@ -5504,7 +5459,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="mers" support="U">
-  <version>1.8-1</version>
+  <version>1.8-2</version>
   <path>libraries/mers</path>
   <description>Message and Error Reporting Systems</description>
   <abstract><p>This package contains two Fortran subroutine libraries,
@@ -5517,7 +5472,7 @@ Ultrix and for SunOS and may still work for them.
       used specifically for reporting error messages.</p>
   </abstract>
   <dependencies >
-    <build>cnf</build><build>ems</build><build>sae</build><build>psx</build><link>chr</link><link>ems</link><link>psx</link><sourceset>messgen</sourceset><sourceset>messgen</sourceset><sourceset>star2html</sourceset>
+    <build>cnf</build><build>ems</build><build>one</build><build>sae</build><build>psx</build><link>chr</link><link>ems</link><link>one</link><link>psx</link><sourceset>messgen</sourceset><sourceset>messgen</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -5563,7 +5518,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="ndf" support="S">
-  <version>1.7</version>
+  <version>1.8</version>
   <path>libraries/ndf</path>
   <description>NDF - Routines for Accessing the Extensible N-Dimensional Data Format</description>
   <abstract><p>The Extensible N-Dimensional Data Format (NDF) is a
@@ -5628,7 +5583,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="one" support="U">
-  <version>1.1-5</version>
+  <version>1.2-2</version>
   <path>libraries/one</path>
   <description>General purpose Starlink odds and ends functions</description>
   <abstract><p> This library is a set of Fortran and C routines of a
@@ -5703,7 +5658,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="pcs" support="S">
-  <version>4.1-1</version>
+  <version>4.1-2</version>
   <path>libraries/pcs</path>
   <description>PCS -- Parameter and Communication Subsystems</description>
   <abstract>
@@ -6165,7 +6120,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="snx" support="U">
-  <version>1.1-1</version>
+  <version>1.1-3</version>
   <path>libraries/snx</path>
   <description>Starlink extensions to the NCAR Graphics Utilities</description>
   <abstract><p> The NCAR graphics suite (SUN/88) consists of a set of
@@ -6484,7 +6439,7 @@ Pence for giving his permission for CFITSIO to be released on Starlink.
 </component>
 
 <component id="ncar" support="U">
-  <version>1.3-1</version>
+  <version>1.3-2</version>
   <path>thirdparty/knoxville/ncar</path>
   <description>NCAR - Graphics Utilities</description>
   <abstract><p>The National Center for Atmospheric Research in Boulder,
