@@ -130,7 +130,7 @@ define     correl $FIG_DIR/figaro4
 define     cosbell $FIG_DIR/figaro2
 define     cosrej $FIG_DIR/figaro1
 define     creobj $FIG_DIR/figaro1
-define     criguass $FIG_DIR/figaro5
+define     crigauss $FIG_DIR/figaro5
 define     cscan $FIG_DIR/figaro5
 define     cset $FIG_DIR/figaro1
 define     cspike $FIG_DIR/figaro2
@@ -377,7 +377,7 @@ defhelp    correl   $FIG_HELP
 defhelp    cosbell $FIG_HELP
 defhelp    cosrej $FIG_HELP
 defhelp    creobj $FIG_HELP
-defhelp    criguass   $FIG_HELP
+defhelp    crigauss   $FIG_HELP
 defhelp    cscan   $FIG_HELP
 defhelp    cset $FIG_HELP
 defhelp    cspike $FIG_HELP

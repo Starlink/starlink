@@ -165,8 +165,8 @@ alias     cosrej    $FIG_DIR/cosrej
 alias fig_cosrej    $FIG_DIR/cosrej
 alias     creobj    $FIG_DIR/creobj
 alias fig_creobj    $FIG_DIR/creobj
-alias     criguass  $FIG_DIR/criguass
-alias two_criguass  $FIG_DIR/crigauss
+alias     crigauss  $FIG_DIR/crigauss
+alias two_crigauss  $FIG_DIR/crigauss
 alias     cset      $FIG_DIR/cset
 alias fig_cset      $FIG_DIR/cset
 alias     cspike    $FIG_DIR/cspike

@@ -130,8 +130,8 @@ cosrej () {    $FIG_DIR/cosrej ${1+"$@"}; }
 fig_cosrej () {    $FIG_DIR/cosrej ${1+"$@"}; }
 creobj () {    $FIG_DIR/creobj ${1+"$@"}; }
 fig_creobj () {    $FIG_DIR/creobj ${1+"$@"}; }
-criguass () {  $FIG_DIR/criguass ${1+"$@"}; }
-two_criguass () {  $FIG_DIR/crigauss ${1+"$@"}; }
+crigauss () {  $FIG_DIR/crigauss ${1+"$@"}; }
+two_crigauss () {  $FIG_DIR/crigauss ${1+"$@"}; }
 cset () {      $FIG_DIR/cset ${1+"$@"}; }
 fig_cset () {      $FIG_DIR/cset ${1+"$@"}; }
 cspike () {    $FIG_DIR/cspike ${1+"$@"}; }
