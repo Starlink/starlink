@@ -798,6 +798,8 @@ int *status              /* global status (given and returned) */
 
    History :
      10Feb2006 : original (dsb)
+     1Sep2008  : Set the SphMap attribute "UnitRadius" so that SphMaps 
+                 can be simplified. (dsb)
 */
 
 {
@@ -816,7 +818,7 @@ int *status              /* global status (given and returned) */
 /* If required, create a SphMap for converting spherical cartesian
    (x,y,z) positions to (lon,lat) positions. */
    if( !cache[ 0 ] ) {
-      cache[ 0 ] = (AstMapping *) astSphMap( "" );
+      cache[ 0 ] = (AstMapping *) astSphMap( "UnitRadius=1" );
       astExempt( cache[ 0 ] );
    }
 

@@ -49,6 +49,9 @@
 *       Initial version 
 *     2006-07-17 (dsb) 
 *       Modified to remove Nasmyth rotation
+*     2008-09-1 (dsb) 
+*       Set the SphMap attribute "UnitRadius" so that SphMaps can be 
+*       simplified.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -105,7 +108,7 @@ AstMapping *smf_maketanmap( double lon, double lat, AstMapping *cache[ 2 ],
   /* If required, create a SphMap for converting spherical cartesian
      (x,y,z) positions to (lon,lat) positions. */
   if( !cache[ 0 ] ) {
-    cache[ 0 ] = (AstMapping *) astSphMap( "" );
+    cache[ 0 ] = (AstMapping *) astSphMap( "UnitRadius=1" );
     astExempt( cache[ 0 ] );
   }
 
