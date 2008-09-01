@@ -86,6 +86,11 @@
 *        ["All"]
 
 *  Notes:
+*     - An input NDF is included in the provenance of an output NDF only
+*     if the Data component of the input NDF is mapped for read or update
+*     access by the application. In other words, input NDFs which are
+*     accessed only for their meta-data (e.g. WCS information) are not 
+*     included in the output provenance of an application.
 *     - If a KAPPA application uses one or more input NDFs to create an 
 *     output NDF, the output NDF may or may not contain provenance 
 *     information depending on two things: 1) whether any of the
