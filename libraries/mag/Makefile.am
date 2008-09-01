@@ -11,7 +11,7 @@ tapecreate_SOURCES = \
 # no variable tapecreate_TASKS -- tapecreate is an ATASK
 
 # Needs the mag libraries
-tapecreate_LDADD = $(LDADD) libmag_adam.la libmag.la
+tapecreate_LDADD = $(LDADD) `$(srcdir)/mag_link_adam`
 
 lib_LTLIBRARIES = libmag.la libmag_adam.la
 
