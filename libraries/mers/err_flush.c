@@ -56,6 +56,7 @@
 *     PCTR: P.C.T. Rees (STARLINK)
 *     AJC: A.J. Chipperfield (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David S Berry(JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -97,6 +98,8 @@
 *        Call ERR1_FLUSH with NOBEL.
 *     3-AUG-2008 (TIMJ):
 *        Call errFlush. Now in C.
+*     1-SEP-2008 (DSB):
+*        Export *STATUS correctly.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -112,5 +115,5 @@
 F77_SUBROUTINE(err_flush)( INTEGER(STATUS) ) {
   int status;
   errFlush( &status );
-  F77_EXPORT_INTEGER( *STATUS, status);
+  F77_EXPORT_INTEGER( status, *STATUS );
 }

@@ -51,6 +51,7 @@
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David S Berry(JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -60,6 +61,8 @@
 *        Call ERR1_FLUSH not ERR_FLUSH. No longer need common block.
 *     3-AUG-2008 (TIMJ):
 *        Call errFlbel. Now in C.
+*     1-SEP-2008 (DSB):
+*        Export *STATUS correctly.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -75,6 +78,6 @@
 F77_SUBROUTINE(err_flbel)( INTEGER(STATUS) ) {
   int status;
   errFlush( &status );
-  F77_EXPORT_INTEGER( *STATUS, status);
+  F77_EXPORT_INTEGER( status, *STATUS );
 }
 
