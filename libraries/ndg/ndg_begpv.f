@@ -54,6 +54,8 @@
 *        Use a pair of AST KeyMaps to hold the NDF names rather than a
 *        pair of GRP groups (avoids the need to purgew duplicate NDF
 *        names, which can be very slow for large numbers of NDFs).
+*     1-SEP-2008 (DSB):
+*        Create a KeyMap to hold the names of the mapped input NDFs.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -71,7 +73,8 @@
 *  Global Variables:
       INTEGER RDKMP              ! KeyMap holding input NDFs
       INTEGER WRKMP              ! KeyMap holding output NDFs
-      COMMON /NDG_PRV/ RDKMP, WRKMP
+      INTEGER MPKMP              ! KeyMap holding mapped NDFs
+      COMMON /NDG_PRV/ RDKMP, WRKMP, MPKMP
 
 *  External References:
       EXTERNAL NDG1_HNDLR
@@ -84,13 +87,16 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Indicate that the routine NDG1_HNDLR should be called whenever an NDF
-*  is opened or closed.
+*  is opened or closed, or has its data array mapped for read or update
+*  access
       CALL NDF_HNDLR( 'READ_EXISTING_NDF', NDG1_HNDLR, .TRUE., STATUS )
       CALL NDF_HNDLR( 'WRITE_EXISTING_NDF', NDG1_HNDLR, .TRUE., STATUS )
       CALL NDF_HNDLR( 'UPDATE_EXISTING_NDF', NDG1_HNDLR, .TRUE., 
      :                 STATUS )
       CALL NDF_HNDLR( 'OPEN_NEW_NDF', NDG1_HNDLR, .TRUE., STATUS )
       CALL NDF_HNDLR( 'CLOSE_NDF', NDG1_HNDLR, .TRUE., STATUS )
+      CALL NDF_HNDLR( 'READ_DATA', NDG1_HNDLR, .TRUE., STATUS )
+      CALL NDF_HNDLR( 'UPDATE_DATA', NDG1_HNDLR, .TRUE., STATUS )
 
 *  Indicate that the PROVENANCE extension should not be propagated by
 *  default when NDF_PROP or NDF_SCOPY is called.
@@ -105,5 +111,9 @@
 *  Create a AST KeyMap to hold the paths to the NDFs that are written during 
 *  the provenance block.
       WRKMP = AST_KEYMAP( ' ', STATUS )
+
+*  Create a AST KeyMap to hold the paths to the NDFs that have their Data
+*  array mapped for read or update access.
+      MPKMP = AST_KEYMAP( ' ', STATUS )
 
       END

@@ -19,10 +19,10 @@
 *     not be nested.
 *
 *     During a provenance block, a list is maintained of all the 
-*     existing NDFs that have been read (either in read or update 
-*     mode) during the block. Another list is maintained of all 
-*     the NDFs that have been written (either existing NDFs accessed 
-*     in update mode or new NDFs) during the block.
+*     existing NDFs that have had their Data array mapped (either in 
+*     read or update mode) during the block. Another list is maintained 
+*     of all the NDFs that have been written (either existing NDFs 
+*     accessed in update mode or new NDFs) during the block.
 *
 *     When the block ends, the provenance information within each 
 *     NDF in the second may be modified to include all the NDFs in the
@@ -83,6 +83,9 @@
 *        Set the history update mode of the output NDF to SKIP, in
 *        order to prevent a new history record being added to the output 
 *        NDF as a consequence of it being re-opened.
+*     1-SEP-2008 (DSB):
+*        Only include provenance from input NDFs that have had their Data
+*        array mapped for read or update.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -103,7 +106,8 @@
 *  Global Variables:
       INTEGER RDKMP              ! KeyMap holding input NDFs
       INTEGER WRKMP              ! KeyMap holding output NDFs
-      COMMON /NDG_PRV/ RDKMP, WRKMP
+      INTEGER MPKMP              ! KeyMap holding mapped NDFs
+      COMMON /NDG_PRV/ RDKMP, WRKMP, MPKMP
 
 *  Arguments Given:
       CHARACTER CREATR*(*) 
@@ -148,6 +152,8 @@
      :                STATUS )
       CALL NDF_HNDLR( 'OPEN_NEW_NDF', NDG1_HNDLR, .FALSE., STATUS )
       CALL NDF_HNDLR( 'CLOSE_NDF', NDG1_HNDLR, .FALSE., STATUS )
+      CALL NDF_HNDLR( 'READ_DATA', NDG1_HNDLR, .FALSE., STATUS )
+      CALL NDF_HNDLR( 'UPDATE_DATA', NDG1_HNDLR, .FALSE., STATUS )
 
 *  Indicate that the PROVENANCE extension should be propagated by
 *  default when NDF_PROP or NDF_SCOPY is called.
@@ -220,9 +226,11 @@
                         RDNDF = AST_MAPKEY( RDKMP, IR, STATUS )
 
 *  Existing NDFs that were opened for UPDATE will be in both KeyMaps. Check
-*  to make sure we are not establishing an NDF as its own parent. Also
+*  to make sure we are not establishing an NDF as its own parent. Also,
+*  check the Data array of the NDF was mapped for READ or UPDATE. Also
 *  check no error has occurred.
                         IF( WRNDF .NE. RDNDF .AND. 
+     :                      AST_MAPHASKEY( MPKMP, RDNDF, STATUS ) .AND.
      :                      STATUS .EQ. SAI__OK ) THEN 
 
 *  Get an NDF identifier for it. This will fail if the NDF has been
@@ -269,6 +277,7 @@
 
 *  Free resources.
       CALL AST_ANNUL( RDKMP, STATUS )
+      CALL AST_ANNUL( MPKMP, STATUS )
       CALL AST_ANNUL( WRKMP, STATUS )
 
       END

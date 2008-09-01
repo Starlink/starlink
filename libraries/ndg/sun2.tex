@@ -1727,11 +1727,11 @@ to add further members.
       matching call to NDG\_BEGPV. Note, provenance blocks must
       not be nested.
 
-      During a provenance block, a list is maintained of all the
-      existing NDFs that have been read (either in read or update
-      mode) during the block. Another list is maintained of all
-      the NDFs that have been written (either existing NDFs accessed
-      in update mode or new NDFs) during the block.
+      During a provenance block, a list is maintained of all the 
+      existing NDFs that have had their Data array mapped (either in 
+      read or update mode) during the block. Another list is maintained 
+      of all the NDFs that have been written (either existing NDFs 
+      accessed in update mode or new NDFs) during the block.
 
       When the block ends, the provenance information within each
       NDF in the second may be modified to include all the NDFs in the

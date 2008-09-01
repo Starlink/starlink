@@ -14,7 +14,8 @@
 
 *  Description:
 *     NDG_BEGPV registers this routine with the NDF library as an event
-*     handler to be called whenever an NDF is opened or closed.
+*     handler to be called whenever an NDF is opened or closed, or has
+*     its data array mapped for read or update access.
 
 *  Arguments:
 *     EVNAME = CHARACTER * ( * ) (Given)
@@ -54,8 +55,10 @@
 *        Original version.
 *     2-JUN-2008 (DSB):
 *        Use a pair of AST KeyMaps to hold the NDF names rather than a
-*        pair of GRP groups (avoids the need to purgew duplicate NDF
+*        pair of GRP groups (avoids the need to purge duplicate NDF
 *        names, which can be very slow for large numbers of NDFs).
+*     1-SEP-2008 (DSB):
+*        Record each input NDF that is mapped for read or update access.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -73,7 +76,8 @@
 *  Global Variables:
       INTEGER RDKMP              ! KeyMap holding input NDFs
       INTEGER WRKMP              ! KeyMap holding output NDFs
-      COMMON /NDG_PRV/ RDKMP, WRKMP
+      INTEGER MPKMP              ! KeyMap holding mapped NDFs
+      COMMON /NDG_PRV/ RDKMP, WRKMP, MPKMP
 
 *  Arguments Given:
       CHARACTER EVNAME*(*)
@@ -103,6 +107,12 @@
       IF( EVNAME .EQ. 'UPDATE_EXISTING_NDF' .OR. 
      :    EVNAME .EQ. 'OPEN_NEW_NDF' ) THEN
          CALL AST_MAPPUT0I( WRKMP, EVTEXT, 0, ' ', STATUS )
+      END IF
+
+*  If the event was the mapping of a data array for read or update access, 
+*  add the path to the NDF to the MPKMP KeyMap.
+      IF( EVNAME .EQ. 'UPDATE_DATA' .OR. EVNAME .EQ. 'READ_DATA' ) THEN
+         CALL AST_MAPPUT0I( MPKMP, EVTEXT, 0, ' ', STATUS )
       END IF
 
       END
