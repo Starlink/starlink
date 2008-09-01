@@ -111,6 +111,8 @@
 *        values in the ACB.
 *     3-APR-1990 (RFWS):
 *        Added the MASK argument and code to support it.
+*     1-SEP-2008 (RFWS):
+*        Raise an NDF event when the DATA array is mapped.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -289,6 +291,27 @@
             ACB_DMDPT( IACB ) = DPNTR
             IF ( CMPLX ) ACB_DMIPT( IACB ) = IPNTR
          END IF
+      END IF
+
+*  If no error has occurred, we use NDF1_EVENT to flag a "data array
+*  mapped" event. If the caller has registered a handler for this type of
+*  event (using NDF_HNDLR), it will be called.
+      IF( STATUS .EQ. SAI__OK ) THEN
+
+*  Assign the name of the data file to the MSG token "NDF_EVENT"
+         CALL NDF1_DMSG( 'NDF_EVENT', ACB_IDCB( IACB ) )
+
+*  Raise an appropriate NDF event.
+         IF( MODE .EQ. 'READ' ) THEN
+            CALL NDF1_EVENT( 'READ_DATA', STATUS )
+   
+         ELSE IF( MODE .EQ. 'WRITE' ) THEN
+            CALL NDF1_EVENT( 'WRITE_DATA', STATUS )
+   
+         ELSE IF( MODE .EQ. 'UPDATE' ) THEN
+            CALL NDF1_EVENT( 'UPDATE_DATA', STATUS )
+         END IF
+
       END IF
 
 *  Call error tracing routine and exit.

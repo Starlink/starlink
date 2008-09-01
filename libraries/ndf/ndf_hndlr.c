@@ -11,20 +11,23 @@ typedef void (* NdfEventHandler)( CHARACTER(EVNAME), CHARACTER(TEXT), INTEGER( S
                                   TRAIL(EVNAME) TRAIL(TEXT) );
 
 /* The number of different event types */
-#define NTYPE 5
+#define NTYPE 8
 
 /* The names of the different event types. */
 static const char *types[ NTYPE ] = { "OPEN_NEW_NDF", 
                                       "READ_EXISTING_NDF",
                                       "WRITE_EXISTING_NDF", 
                                       "UPDATE_EXISTING_NDF",
-                                      "CLOSE_NDF" };
+                                      "CLOSE_NDF",
+                                      "READ_DATA",
+                                      "WRITE_DATA",
+                                      "UPDATE_DATA" };
 
 /* An array of pointers to the currently registered event handlers. */
-static NdfEventHandler *handlers[ NTYPE ] = { NULL, NULL, NULL, NULL, NULL };
+static NdfEventHandler *handlers[ NTYPE ] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 
 /* The number of handlers registered for each event type. */
-static int nhandlers[ NTYPE ] = { 0, 0, 0, 0, 0 };
+static int nhandlers[ NTYPE ] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
 /* Local Prototypes */
 static int CheckType( const char *, int * );
@@ -99,10 +102,22 @@ F77_SUBROUTINE(ndf_hndlr)( CHARACTER(EVNAME),
 *     to the NDF that was opened.
 *
 *     - OPEN_NEW_NDF: Occurs after a new NDF has been opened. The "descriptive 
-*     information" is message token will contain the path to the NDF that was opened.
+*     information" is the path to the NDF that was opened.
 *
 *     - CLOSE_NDF: Occurs before an NDF is closed. The "descriptive information" is 
 *     the path to the NDF that is about to be closed.
+*
+*     - READ_DATA: Occurs when the DATA component of an NDF is mapped for
+*     read access. The "descriptive information" is the path to the NDF that 
+*     is mapped.
+*
+*     - WRITE_DATA: Occurs when the DATA component of an NDF is mapped for
+*     write access. The "descriptive information" is the path to the NDF that 
+*     is mapped.
+*
+*     - UPDATE_DATA: Occurs when the DATA component of an NDF is mapped for
+*     update access. The "descriptive information" is the path to the NDF that 
+*     is mapped.
 
 *  Notes:
 *     - Any number of handlers can be registered with a given event type.
@@ -111,7 +126,7 @@ F77_SUBROUTINE(ndf_hndlr)( CHARACTER(EVNAME),
 *     -  This routine is intended to be callable from Fortran.
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -137,6 +152,8 @@ F77_SUBROUTINE(ndf_hndlr)( CHARACTER(EVNAME),
 *  History:
 *     31-OCT-2007 (DSB):
 *        Original version.
+*     1-SEP-2008 (DSB):
+*        Added READ_DATA, WRITE_DATA and UPDATE_DATA event types.
 *     {@enter_changes_here@}
 
 *  Bugs:
@@ -223,6 +240,16 @@ F77_SUBROUTINE(ndf_hndlr)( CHARACTER(EVNAME),
 /* Make AST use the original status variable. */
    astWatch( old_status );
 
+/* Report a context error message. */
+   if( *STATUS != SAI__OK ) {
+      if( F77_ISTRUE( *SET ) ) {
+         errRep( "", "NDF_HDNLR: Failed to register a new NDF event handler",
+                 STATUS );
+      } else {
+         errRep( "", "NDF_HDNLR: Failed to clear an NDF event handler",
+                 STATUS );
+      }
+   }
 }
 
 
@@ -354,6 +381,12 @@ F77_SUBROUTINE(ndf1_event)( CHARACTER(EVNAME),
 
 /* Make AST use the original status variable. */
    astWatch( old_status );
+
+/* Report a context error message. */
+   if( *STATUS != SAI__OK ) {
+      errRep( "", "NDF1_EVENT: Failed to raise an NDF event (internal NDF ",
+              "library error)." );
+   }
 }
 
 
