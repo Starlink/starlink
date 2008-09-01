@@ -406,14 +406,21 @@
       INTEGER INDFR          ! NDF id. for the reference NDF
       INTEGER IPD1           ! Pntr. to input data array
       INTEGER IPD2           ! Pntr. to output data array
+      INTEGER IPIX2          ! Index of PIXEL Frame in o/p FrameSet
+      INTEGER IPIXR          ! Index of PIXEL Frame in ref. FrameSet
       INTEGER IPMAP          ! Pntr. to array of pix_in->pix_out Mappings
       INTEGER IPV1           ! Pntr. to input variance array
       INTEGER IPV2           ! Pntr. to output variance array
       INTEGER IPW            ! Pntr. to work array
+      INTEGER IWCS2          ! Original output WCS FrameSet
       INTEGER IWCSR          ! WCS FrameSet for reference NDF
+      INTEGER IWCSR2         ! New output WCS FrameSet
       INTEGER LBND( NDF__MXDIM ) ! Indices of lower-left corner of o/p
       INTEGER LBND1( NDF__MXDIM )! Indices of lower-left corner of input
       INTEGER MAP            ! AST id for (pix_in->pix_out) Mapping
+      INTEGER MAP3           ! AST Mapping (ref. GRID -> o/p GRID)
+      INTEGER MAP2           ! Mapping from PIXEL to output GRID Frame
+      INTEGER MAPR           ! AST Mapping (ref. GRID -> ref. PIXEL)
       INTEGER MAXPIX         ! Initial scale size in pixels
       INTEGER METHOD_CODE    ! Integer identifier for spreading method 
       INTEGER NAX            ! No. of axes in reference WCS Frame
@@ -655,11 +662,44 @@
          GO TO 999
       END IF
 
-*  Save the WCS FrameSet from the reference NDF into the output NDF.
-      CALL NDF_PTWCS( IWCSR, INDF2, STATUS )
-
 *  Change the bounds of the output NDF to the required values.
       CALL NDF_SBND( NDIM, LBND, UBND, INDF2, STATUS )
+
+*  We now create the WCS FrameSet for the output NDF.  This will be a 
+*  copy of the reference FrameSet, modified to take account of any 
+*  difference in the pixel origins between the reference and output 
+*  NDFs.  We do this by taking a copy of the reference WCS FrameSet and
+*  then re-mapping the GRID Frame in the copy.  The Mapping used is the 
+*  mapping from reference GRID Frame to output GRID Frame, going via the
+*  common PIXEL Frame.  Get the default WCS FrameSet for the output NDF.
+      CALL NDF_GTWCS( INDF2, IWCS2, STATUS )
+
+*  Find the PIXEL Frame.
+      CALL KPG1_ASFFR( IWCS2, 'PIXEL', IPIX2, STATUS )
+
+*  Get the Mapping from the PIXEL Frame to the output GRID Frame.
+      MAP2 = AST_GETMAPPING( IWCS2, IPIX2, AST__BASE, STATUS )
+
+*  Take a copy of the reference FrameSet.
+      IWCSR2 = AST_COPY( IWCSR, STATUS )
+
+*  Find the PIXEL Frame.
+      CALL KPG1_ASFFR( IWCSR2, 'PIXEL', IPIXR, STATUS )
+
+*  Get the Mapping from the reference GRID Frame to the PIXEL Frame.
+      MAPR = AST_GETMAPPING( IWCSR2, AST__BASE, IPIXR, STATUS )
+
+*  Concatenate and simplify MAPR and MAP2 to get the Mapping from
+*  reference GRID Frame to output GRID Frame.
+      MAP3 = AST_SIMPLIFY( AST_CMPMAP( MAPR, MAP2, .TRUE., ' ', 
+     :                                 STATUS ), STATUS )
+
+*  Re-map the GRID Frame in the copy of the reference WCS FrameSet so
+*  that it corresponds to the GRID Frame in the output NDF.
+      CALL AST_REMAPFRAME( IWCSR2, AST__BASE, MAP3, STATUS )
+
+*  Store this FrameSet in the output NDF.
+      CALL NDF_PTWCS( IWCSR2, INDF2, STATUS )
 
 *  Choose the data type to use.
       CALL NDF_MTYPE( '_INTEGER,_REAL,_DOUBLE', INDF2, INDF2, 'DATA', 
