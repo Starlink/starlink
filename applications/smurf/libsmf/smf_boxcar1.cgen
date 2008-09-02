@@ -128,7 +128,7 @@ void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts,
   if (*status != SAI__OK) return;
 
   /* Return if window is unity or the array only has 1 point */
-  if ( window == 1 || ninpts <= 1 ) return;
+  if ( window <= 1 || ninpts <= 1 ) return;
 
   /* Sanity check: is window smaller than size of input array? */
   if ( window > ninpts ) {
