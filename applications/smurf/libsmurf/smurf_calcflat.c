@@ -108,6 +108,7 @@ void smurf_calcflat( int *status ) {
   Grp *flatgrp = NULL;      /* Output flatfield group */
   size_t flatsize;          /* Size ouf output flatfield group */
   Grp * fgrp = NULL;        /* Filtered group */
+  double heatref;           /* Reference heater setting */
   size_t i = 0;             /* Counter, index */
   size_t j;                 /* Counter */
   size_t ksize;             /* Size of key map group */
@@ -210,7 +211,6 @@ void smurf_calcflat( int *status ) {
   if ( size == 0 ) {
 
     /* check that we are all from the same observation */
-    /* whilst we are at it, read the PIXHEAT header */
     for (i = 1; i < darks->ndat; i++) {
       if (strcmp( (darks->sdata)[0]->hdr->obsidss,
                   (darks->sdata)[i]->hdr->obsidss ) != 0 ) {
@@ -222,6 +222,12 @@ void smurf_calcflat( int *status ) {
     }
 
     /* Okay, single observation, darks in time order */
+
+    /* Report reference heater setting */
+    smf_fits_getD( (darks->sdata)[0]->hdr, "PIXHEAT", &heatref,
+                   status );
+    msgSetd( "PX", heatref );
+    msgOutif( MSG__NORM, " ", "Reference heater setting: ^PX", status );
 
     /* get some memory for pixel heater settings */
     pixheat = smf_malloc( darks->ndat, sizeof(*pixheat), 0, status );
@@ -237,6 +243,34 @@ void smurf_calcflat( int *status ) {
        but note that this branch assumes all files are darks but with
        varying PIXHEAT */
     for (i = 1; i < darks->ndat; i+=2) {
+      double heater;
+      double ref1;
+      double ref2;
+
+      /* get the pixel heater settings and make sure they are consistent */
+      smf_fits_getD( (darks->sdata)[i]->hdr, "PIXHEAT", &heater,
+                     status );
+
+      msgSetd( "PX", heater );
+      msgOutif( MSG__NORM, " ", "Processing heater setting ^PX", status );
+
+      /* Get reference */
+      smf_fits_getD( (darks->sdata)[i-1]->hdr, "PIXHEAT", &ref1,
+                     status );
+      smf_fits_getD( (darks->sdata)[i+1]->hdr, "PIXHEAT", &ref2,
+                     status );
+
+      if (ref1 != heatref || ref2 != heatref) {
+        if (*status == SAI__OK) {
+          *status = SAI__ERROR;
+          msgSetd( "REF", heatref );
+          msgSetd( "R1", ref1 );
+          msgSetd( "R2", ref2 );
+          errRep( " ", "Bracketing darks have inconsistent heater settings"
+                  " (^REF ref cf ^R1 and ^R2)", status );
+          break;
+        }
+      }
 
       /* Subtract darks using MEAN */
       smf_subtract_dark( (darks->sdata)[i], (darks->sdata)[i-1],
@@ -246,11 +280,8 @@ void smurf_calcflat( int *status ) {
       /* Store the frame for later */
       smf_addto_smfArray( bbhtframe, (darks->sdata)[i], status );
 
-      /* get the pixel heater settings */
-      smf_fits_getD( (darks->sdata)[i]->hdr, "PIXHEAT",
-                     &(pixheat[bbhtframe->ndat - 1]),
-                     status );
-      
+      pixheat[bbhtframe->ndat - 1] = heater;
+
     }
 
     /* We now have data for the various pixel heater settings.
