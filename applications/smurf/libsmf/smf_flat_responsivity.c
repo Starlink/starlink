@@ -131,8 +131,8 @@ void smf_flat_responsivity ( smfData *respmap, size_t nheat,
   
   if (*status != SAI__OK) return;
 
-  rowsize = (respmap->dims)[1];
-  colsize = (respmap->dims)[0];
+  rowsize = (respmap->dims)[SMF__ROW_INDEX];
+  colsize = (respmap->dims)[SMF__COL_INDEX];
 
   respdata = (respmap->pntr)[0];
   respvar  = (respmap->pntr)[1];

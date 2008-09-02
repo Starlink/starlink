@@ -278,8 +278,8 @@ void smurf_calcflat( int *status ) {
         void *pntr[] = {NULL, NULL, NULL};
         dim_t mydims[2];
         errAnnul( status );
-        mydims[0] = nrows;
-        mydims[1] = ncols;
+        mydims[SMF__ROW_INDEX] = nrows;
+        mydims[SMF__COL_INDEX] = ncols;
         
         pntr[0] = smf_malloc( nrows*ncols, sizeof(double), 0, status );
         pntr[1] = smf_malloc( nrows*ncols, sizeof(double), 0, status );
@@ -293,8 +293,8 @@ void smurf_calcflat( int *status ) {
         int ubnd[2];
 
         /* open the file */
-        ubnd[0] = nrows - lbnd[0] + 1;
-        ubnd[1] = ncols - lbnd[1] + 1;
+        ubnd[SMF__ROW_INDEX] = nrows - lbnd[SMF__ROW_INDEX] + 1;
+        ubnd[SMF__COL_INDEX] = ncols - lbnd[SMF__COL_INDEX] + 1;
         smf_open_newfile( rgrp, 1, SMF__DOUBLE, 2, lbnd, ubnd,
                           SMF__MAP_VAR, &respmap, status );
       }
