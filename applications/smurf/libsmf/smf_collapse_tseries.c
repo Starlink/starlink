@@ -13,15 +13,19 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_collapse_tseries( const smfData * indata, int doclip,
+*     smf_collapse_tseries( const smfData * indata, int nclip,
+*                           const float clip[],
 *                           double snrlim, int flatconst, smf_dtype dtype,
 *                           smfData **outdata, int * status );
 
 *  Arguments:
 *     indata = const smfData * (Given)
 *        3D data to be processed.
-*     doclip = int (Given)
-*        Do a clipped mean, else if false, calculate the mean.
+*     nclip = int (Given)
+*        Number of K-sigma clipping iterations to apply (number of elements
+*        in "clip").
+*     clip = const float[] (Given)
+*        N-sigma clip levels to use. Expressed as standard deviations.
 *     snrlim = double (Given)
 *        If non-zero, data will be set to bad value if the signal-to-noise
 *        ratio is below the supplied value.
@@ -107,7 +111,7 @@
 
 #define FUNC_NAME "smf_collapse_tseries"
 
-void smf_collapse_tseries( const smfData *indata, int doclip, 
+void smf_collapse_tseries( const smfData *indata, int nclip, const float clip[],
                            double snrlim, int flagconst, smf_dtype dtype,
                            smfData **outdata, 
                            int *status ) {
@@ -161,7 +165,8 @@ void smf_collapse_tseries( const smfData *indata, int doclip,
         dim_t index;
         index = ( j * dims[0] ) + i;
 
-        smf_calc_stats( indata, "b", index, 0, 0, &mean, &stdev, status );
+        smf_calc_stats( indata, "b", index, 0, 0, nclip, clip,
+                        &mean, &stdev, status );
 
         if (flagconst && stdev == 0.0) {
           mean = VAL__BADD;

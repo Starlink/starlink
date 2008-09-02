@@ -100,6 +100,8 @@ void smf_reduce_dark( const smfData *indark, smf_dtype dtype,
                       smfData **outdark, 
                       int *status ) {
 
+  float clip[1];      /* Sigma clip levels for statistics */
+
   if (*status != SAI__OK) return;
 
   /* check we have a dark (inefficient if the caller has already 
@@ -121,7 +123,8 @@ void smf_reduce_dark( const smfData *indark, smf_dtype dtype,
   /* now calculate the average and standard deviation. Retaining the result
      as integers. Flag any bolometers that have constant signal or a signal
      to noise less than 1. */
-  smf_collapse_tseries( indark, 0, 1.0, 1, dtype, outdark, status );
+  clip[0] = 3.0;
+  smf_collapse_tseries( indark, 1, clip, 1.0, 1, dtype, outdark, status );
 
   /* The flatpar array contains the flat parameters in the order
      matching the bolometer data - ie colsize*rowsize for first

@@ -399,8 +399,9 @@ void smf_boxcar1 ( double *series, const size_t ninpts, size_t window,
 		   int *status);
 
 void smf_calc_stats( const smfData *data, const char *mode, const dim_t index,
-                     dim_t lo, dim_t hi, double *mean, double *sigma, 
-		     int *status);
+                     dim_t lo, dim_t hi,  int nclip, const float clip[],
+                     double *mean, double *sigma, 
+                     int *status);
 
 double smf_calc_covar ( const smfData *data, const int i, const int j,
 			int lo, int hi, int *status);
@@ -1087,7 +1088,7 @@ double smf_calc_meantau( const smfHead *hdr, int * status );
 Grp *smf_grpCopy( const Grp *grp1, size_t indxlo, size_t indxhi, int reject, 
                   int *status );
 
-void smf_collapse_tseries( const smfData *indata, int doclip, 
+void smf_collapse_tseries( const smfData *indata, int nclip, const float clip[],
                            double snrlim, int flagconst, smf_dtype dtype,
                            smfData **outdata, 
                            int *status );

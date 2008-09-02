@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
-*                      dim_t lo, dim_t hi, double *mean, double *stdev,
+*                      dim_t lo, dim_t hi, int nclip, const float clip[],
+*                      double *mean, double *stdev,
 *                      int *status ) 
 
 *  Arguments:
@@ -34,6 +35,11 @@
 *        Upper index bound into array. For "b" this is the end time slice.
 *        For "t" this is the end bolometer.
 *        "0" for max value.
+*     nclip = int (Given)
+*        Number of K-sigma clipping iterations to apply (number of elements
+*        in "clip").
+*     clip = const float[] (Given)
+*        N-sigma clip levels to use. Expressed as standard deviations.
 *     mean = double* (Returned)
 *        Mean over specified interval
 *     stdev = double* (Returned)
@@ -82,6 +88,8 @@
 *        Use dim_t for index, lo and hi
 *     2008-08-21 (TIMJ):
 *        Works for multiple data types.
+*     2008-09-02 (TIMJ):
+*        Add clipping (see kpg1Statx).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -134,8 +142,9 @@
 #define MXCLIP 5
 
 void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
-                      dim_t lo, dim_t hi, double *mean, double *stdev, 
-		      int *status) {
+                      dim_t lo, dim_t hi, int nclip, const float clip[],
+                      double *mean, double *stdev, 
+                      int *status) {
 
   /* Local variables */
   void *indata = NULL;        /* Pointer to input data array */
@@ -157,10 +166,6 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
   int *stats_i = NULL;        /* pointer to int stats data */
 
   /* Current list of variables for kpgStatd - move into API as appropriate */
-  int nclip = 0;              /* Number of K-sigma clipping iterations to apply: 
-				 none at present  */
-  float clip[ MXCLIP ];       /* Array of clipping limits for successive iterations,
-				 expressed as standard deviations. */
   int bad = 1;                /* Do we check for bad pixels? Default to yes */
   int ngood;                  /* Number of valid pixels before clipping */
   int imin;                   /* Index where the pixel with the lowest value was 
