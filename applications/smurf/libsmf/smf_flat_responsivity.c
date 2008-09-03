@@ -98,6 +98,7 @@ void smf_flat_responsivity ( smfData *respmap, size_t nheat,
   size_t k;                    /* loop counter */
   const double mcepass = 3.3;  /* factor for MCE low-pass filter */
   double mean;                 /* mean responsivity of a bolometer */
+  size_t nbol;                 /* number of bolometers */
   size_t ngood = 0;            /* number of valid responsivities */
   int nrgood;                  /* number of good responsivities for bolo */
   double *respdata = NULL;     /* responsivity data */
@@ -139,17 +140,28 @@ void smf_flat_responsivity ( smfData *respmap, size_t nheat,
 
   resps = smf_malloc( nheat, sizeof(*resps), 0, status );
 
+  nbol = colsize * rowsize;
+
   for (j=0; j < rowsize; j++) {
+    size_t frameoffset = j * colsize;
 
     for (i=0; i< colsize; i++) {
+      size_t boloffset = frameoffset + i;
 
       /* Calculate the responsivity of this bolometer at each power step
          - note the use of k+1 */
       for ( k=0; k<nheat-1; k++ ) {
-        resps[k] = mcepass * 1.52e-13 * 
-          ( bolval[(k+1)*colsize*rowsize+j*colsize+i] - 
-            bolval[k*colsize*rowsize+j*colsize+i] ) / 
-          ( powval[k+1] - powval[k] );
+        if (bolval[(k+1)*nbol+boloffset] != VAL__BADD &&
+            bolval[k*nbol+boloffset] != VAL__BADD &&
+            powval[k+1] != VAL__BADD &&
+            powval[k] != VAL__BADD) {
+          resps[k] = mcepass * 1.52e-13 * 
+            ( bolval[(k+1)*nbol+boloffset] - 
+              bolval[k*nbol+boloffset] ) / 
+            ( powval[k+1] - powval[k] );
+        } else {
+          resps[k] = VAL__BADD;
+        }
       }
 
       /* Get statistics */
@@ -158,14 +170,14 @@ void smf_flat_responsivity ( smfData *respmap, size_t nheat,
                &nrgoodc, &iminc, &dminc, &imaxc, &dmaxc, &sumc, &meanc, &stdevc,
                status );
 
-      /* store the responsivity, setting bad results to zero */
+      /* store the responsivity, setting bad results to bad */
 
       if ( mean == VAL__BADD || stdev == VAL__BADD ||
            ( fabs(mean) > 5.0e6 ) || ( fabs(mean) < 0.1e6 ) || 
            ( stdev > 0.2*fabs(mean) ) ) {
-        respdata[j*colsize+i] = VAL__BADD;
+        respdata[boloffset] = VAL__BADD;
       } else {
-        respdata[j*colsize+i] = mean;
+        respdata[boloffset] = mean;
         ngood++;
       }
 
@@ -175,7 +187,7 @@ void smf_flat_responsivity ( smfData *respmap, size_t nheat,
         if (stdev != VAL__BADD && stdev >= 0) {
           variance = stdev * stdev;
         }
-        respvar[j*colsize+i] = variance;
+        respvar[boloffset] = variance;
       }
 
     }
