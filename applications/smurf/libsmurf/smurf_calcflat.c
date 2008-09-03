@@ -191,9 +191,11 @@ void smurf_calcflat( int *status ) {
       astMapGet1D( resmap, colname, nrows, &ngot, &(resistance[nrows*j]));
       if (ngot != nrows) {
         if (*status == SAI__OK) {
+          *status = SAI__ERROR;
+          msgSeti( "NG", ngot);
           msgSetc( "COL", colname );
           msgSeti( "NR", nrows );
-          errRep(" ", "Did not read ^NR resistor values from ^COL", status );
+          errRep(" ", "Did not read ^NR resistor values from column ^COL, read ^NG", status );
         }
         goto CLEANUP;
       }
@@ -213,6 +215,20 @@ void smurf_calcflat( int *status ) {
 
     /* Get reference subarray */
     smf_find_subarray( (darks->sdata)[0]->hdr, subarray, sizeof(subarray), &subnum, status );
+    if (*status != SAI__OK) goto CLEANUP;
+
+    /* Check row vs column count */
+    if ( ((darks->sdata)[0]->dims)[SMF__COL_INDEX] != ncols ||
+         ((darks->sdata)[0]->dims)[SMF__ROW_INDEX] != nrows ) {
+      *status = SAI__ERROR;
+      msgSeti( "RC", ncols );
+      msgSeti( "RR", nrows );
+      msgSeti( "DC", ((darks->sdata)[0]->dims)[SMF__COL_INDEX]);
+      msgSeti( "DR", ((darks->sdata)[0]->dims)[SMF__ROW_INDEX]);
+      errRep( " ", "Dimensions of subarray from resistor file (^RC x ^RR)"
+              " do not match those of data file (^DC x ^DR)", status );
+      goto CLEANUP;
+    }
 
     /* check that we are all from the same observation and same subarray */
     for (i = 1; i < darks->ndat; i++) {
