@@ -51,6 +51,8 @@
 *        Forgot to trap for bad values in darks.
 *     27-AUG-2008 (TIMJ):
 *        Darks and indata can be _DOUBLE.
+*     02-SEP-2008 (TIMJ):
+*        Logic tidy up
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -224,7 +226,8 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
     if (ddkp1 && ddkp2) {
       for (i = 0; i < nbols; i++) {
         if (ddkp1[i] != VAL__BADD && ddkp2[i] != VAL__BADD) {
-          dkbuf[i] = (ddkp1[i] + ddkp2[i]) / 2.0;
+          /* worry about numerical overflow */
+          dkbuf[i] = (0.5 * ddkp1[i]) + (0.5 * ddkp2[i]);
         } else {
           dkbuf[i] = VAL__BADD;
         }
@@ -232,7 +235,9 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
     } else if (idkp1 && idkp1) {
       for (i = 0; i < nbols; i++) {
         if (idkp1[i] != VAL__BADI && idkp2[i] != VAL__BADI) {
-          dkbuf[i] = ((double)idkp1[i] + (double)idkp2[i]) / 2.0;
+          /* worry about numerical overflow */
+          dkbuf[i] = (0.5 * (double)idkp1[i]) +
+            (0.5 * (double)idkp2[i]);
         } else {
           dkbuf[i] = VAL__BADD;
         }
@@ -270,25 +275,27 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
 
         if (ddata) {
           double * slice;
-
           for (i = 0; i < (indata->dims)[2]; i++) {
             startidx = i * nbols;
             slice = &(ddata[startidx]);
             for (j=0;  j < nbols; j++) {
               if (slice[j] != VAL__BADD) {
-                double dsub = 0.0;
-                if (ddark && ddark[j] != VAL__BADD) {
-                  dsub = ddark[j];
-                } else if (idark[j] != VAL__BADI) {
-                  dsub = (double)idark[j];
-                } else {
-                  dsub = VAL__BADD;
+                double darkval = VAL__BADD;
+
+                /* Get the relevant dark value */
+                if (ddark) {
+                  darkval = ddark[j];
+                } else if (idark && idark[j] != VAL__BADI) {
+                  darkval = (double)idark[j];
                 }
-                if (dsub != VAL__BADD) {
-                  slice[j] -= dsub;
+
+                /* subtract it if non-bad */
+                if (darkval != VAL__BADD ) {
+                  slice[j] -= darkval;
                 } else {
                   slice[j] = VAL__BADD;
                 }
+
               }
             }
           }
@@ -300,19 +307,22 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
             slice = &(idata[startidx]);
             for (j=0;  j < nbols; j++) {
               if (slice[j] != VAL__BADI) {
-                int isub = 0;
-                if (ddark && ddark[j] != VAL__BADD) {
-                  isub = (int)ddark[j];
-                } else if (idark[j] != VAL__BADI) {
-                  isub = idark[j];
-                } else {
-                  isub = VAL__BADI;
+                int darkval = VAL__BADI;
+
+                /* Get the relevant dark value */
+                if (idark) {
+                  darkval = idark[j];
+                } else if (ddark && ddark[j] != VAL__BADD) {
+                  darkval = (int)ddark[j];
                 }
-                if (isub != VAL__BADI) {
-                  slice[j] -= isub;
+
+                /* subtract it if non-bad */
+                if (darkval != VAL__BADI) {
+                  slice[j] -= darkval;
                 } else {
                   slice[j] = VAL__BADI;
                 }
+
               }
             }
           }
