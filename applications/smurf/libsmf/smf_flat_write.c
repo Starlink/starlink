@@ -53,6 +53,8 @@
 *        Add NULL telpar argument to wrtstream call.
 *     2008-08-27 (TIMJ):
 *        Rewrite for SMURF from sc2flat.c
+*     2008-09-02 (TIMJ):
+*        Write out variance
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -144,11 +146,13 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
         ibuf[index] = (int)dbuf[i];
       }
       if (dvar) {
-        if ( dvar[i] == VAL__BADD || dvar[i] > (int)VAL__MAXI) {
+        if ( dvar[i] == VAL__BADD || dvar[i] > (double)VAL__MAXI) {
           ivar[index] = VAL__BADI;
         } else {
           ivar[index] = (int)dvar[i];
         }
+      } else {
+        ivar[index] = VAL__BADI;
       }
     }
   }
@@ -169,8 +173,6 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
   jig_path[0][0] = 0.0;
   jig_path[0][1] = 0.0;
 
-
-
   sc2store_setcompflag ( 0, status );
   sc2store_wrtstream ( flatname, subnum, ncards,
                        fitsrec, colsize, rowsize, bbhtframes->ndat,
@@ -180,6 +182,22 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
                        nvert, jig_path, npath, xmlfile, status );
 
   sc2store_free ( status );
+
+  /* To copy in variance we need to reopen the file */
+  if (ivar) {
+    int indf = NDF__NOID;
+    int place = NDF__NOPL;
+    void *pntr[3];
+    int el;
+
+    ndfOpen( NULL, flatname, "UPDATE", "OLD", &indf, &place, status );
+    ndfMap( indf, "VARIANCE", "_INTEGER", "WRITE", pntr, &el, status );
+    if (*status == SAI__OK) {
+      memcpy( pntr[0], ivar, sizeof(int)*el );
+    }
+    ndfAnnul( &indf, status);
+  }
+
 
   if (ibuf) ibuf = smf_free( ibuf, status );
   if (ivar) ivar = smf_free( ivar, status );
