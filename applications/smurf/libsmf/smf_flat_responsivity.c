@@ -53,6 +53,9 @@
 *        Adjust conversion factor to amps.
 *     2008-08-27 (TIMJ):
 *        Rewrite for SMURF from sc2flat.c
+*     2008-09-03 (TIMJ):
+*        Use GSL to fit a gradient directly rather than trying to calculate
+*        stats on the differences.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -88,20 +91,21 @@
 #include "prm_par.h"
 #include "sae_par.h"
 
+#include "gsl/gsl_fit.h"
+
 void smf_flat_responsivity ( smfData *respmap, size_t nheat,
                              double *powval, double *bolval,  
                              int *status ) {
 
-  size_t dim0;                 /* first dimension in data array */
-  size_t dim1;                 /* second dimension in data array */
-  size_t i;                    /* loop counter */
-  size_t j;                    /* loop counter */
+  size_t bol;                  /* Bolometer offset into array */
+  double * bolv = NULL;        /* Temp space for bol values */
   size_t k;                    /* loop counter */
   const double mcepass = 3.3;  /* factor for MCE low-pass filter */
   double mean;                 /* mean responsivity of a bolometer */
   size_t nbol;                 /* number of bolometers */
   size_t ngood = 0;            /* number of valid responsivities */
   int nrgood;                  /* number of good responsivities for bolo */
+  double *powv = NULL;         /* Temp space for power values */
   double *respdata = NULL;     /* responsivity data */
   double *resps = NULL;        /* responsivities for a bolometer at each step */
   double *respvar = NULL;      /* responsivity variance */
@@ -135,62 +139,51 @@ void smf_flat_responsivity ( smfData *respmap, size_t nheat,
   respdata = (respmap->pntr)[0];
   respvar  = (respmap->pntr)[1];
 
+  /* Responsivities */
   resps = smf_malloc( nheat, sizeof(*resps), 0, status );
 
-  dim0 = (respmap->dims)[0];
-  dim1 = (respmap->dims)[1];
-  nbol = dim0 * dim1;
+  /* Space for fit data */
+  bolv = smf_malloc( nheat, sizeof(*bolv), 0, status );
+  powv = smf_malloc( nheat, sizeof(*powv), 0, status );
+
+  nbol = (respmap->dims)[0] * (respmap->dims)[1];
 
   /* dim1 must change slower than dim0 */
-  for (j=0; j < dim1; j++) {
-    size_t frameoffset = j * dim0;
+  for (bol=0; bol < nbol; bol++) {
 
-    for (i=0; i< dim0; i++) {
-      /* offset into nbol array */
-      size_t boloffset = frameoffset + i;
-
-      /* Calculate the responsivity of this bolometer at each power step
-         - note the use of k+1 */
-      for ( k=0; k<nheat-1; k++ ) {
-        if (bolval[(k+1)*nbol+boloffset] != VAL__BADD &&
-            bolval[k*nbol+boloffset] != VAL__BADD &&
-            powval[k+1] != VAL__BADD &&
-            powval[k] != VAL__BADD) {
-          resps[k] = mcepass * 1.52e-13 * 
-            ( bolval[(k+1)*nbol+boloffset] - 
-              bolval[k*nbol+boloffset] ) / 
-            ( powval[k+1] - powval[k] );
-        } else {
-          resps[k] = VAL__BADD;
-        }
+    /* perform a fit - responsivity is the gradient */
+    nrgood = 0;
+    for (k = 0; k < nheat; k++) {
+      if ( bolval[k*nbol+bol] != VAL__BADD &&
+           powval[k] != VAL__BADD) {
+        bolv[k] = mcepass * 1.52e-13 * bolval[k*nbol+bol];
+        powv[k] = powval[k];
+        nrgood++;
       }
+    }
 
-      /* Get statistics */
-      kpgStatd(1, nheat-1, resps, 0, 0,
-               &nrgood, &imin, &dmin, &imax, &dmax, &sum, &mean, &stdev,
-               &nrgoodc, &iminc, &dminc, &imaxc, &dmaxc, &sumc, &meanc, &stdevc,
-               status );
+    if (nrgood > 3) {
+      double c0, c1, cov00, cov01, cov11, sumsq;
+      double snr;
 
-      /* store the responsivity, setting bad results to bad */
+      /* we have not propagated variance from standardpow so we can not
+         weight the fit */
+      gsl_fit_linear( powv, 1, bolv, 1, nrgood, &c0, &c1, &cov00, &cov01,
+                      &cov11, &sumsq);
 
-      if ( mean == VAL__BADD || stdev == VAL__BADD ||
-           ( fabs(mean) > 5.0e6 ) || ( fabs(mean) < 0.1e6 ) || 
-           ( stdev > 0.2*fabs(mean) ) ) {
-        respdata[boloffset] = VAL__BADD;
+      snr = fabs(c1) / sqrt( cov11 );
+      if ( fabs(c1) > 5.0e6 || fabs(c1) < 0.1e6 || snr < 25.0 ) {
+        respdata[bol] = VAL__BADD;
+        respvar[bol] = VAL__BADD;
       } else {
-        respdata[boloffset] = mean;
+        respdata[bol] = c1;
+        respvar[bol] = cov11;
         ngood++;
       }
 
-      /* always store the sigma as variance */
-      if (respvar) {
-        double variance = VAL__BADD;
-        if (stdev != VAL__BADD && stdev >= 0) {
-          variance = stdev * stdev;
-        }
-        respvar[boloffset] = variance;
-      }
-
+    } else {
+      respdata[bol] = VAL__BADD;
+      respvar[bol] = VAL__BADD;
     }
 
   }
@@ -199,5 +192,7 @@ void smf_flat_responsivity ( smfData *respmap, size_t nheat,
   msgOut( " ", "Number of good responsivities: ^NG", status );
 
   if (resps) smf_free( resps, status );
+  if (bolv) smf_free( bolv, status );
+  if (powv) smf_free( powv, status );
 
 }
