@@ -129,6 +129,7 @@ void smurf_calcflat( int *status ) {
   int respmask = 0;          /* Mask bolometers that have bad responsivity? */
   size_t size;               /* Number of files in input group */
   char subarray[9];          /* subarray name */
+  int subnum;                /* subarray number */
   int utdate;                /* UTdate of observation */
 
   /* Main routine */
@@ -210,8 +211,13 @@ void smurf_calcflat( int *status ) {
   /* a full dark flatfield will be obvious */
   if ( size == 0 ) {
 
-    /* check that we are all from the same observation */
+    /* Get reference subarray */
+    smf_find_subarray( (darks->sdata)[0]->hdr, subarray, sizeof(subarray), &subnum, status );
+
+    /* check that we are all from the same observation and same subarray */
     for (i = 1; i < darks->ndat; i++) {
+      int nsub;
+
       if (strcmp( (darks->sdata)[0]->hdr->obsidss,
                   (darks->sdata)[i]->hdr->obsidss ) != 0 ) {
         *status = SAI__ERROR;
@@ -219,6 +225,15 @@ void smurf_calcflat( int *status ) {
                status);
         goto CLEANUP;
       }
+
+      smf_find_subarray( (darks->sdata)[i]->hdr, NULL, 0, &nsub, status );
+      if (nsub != subnum) {
+        *status = SAI__ERROR;
+        errRep( " ", "Flatfield command does not yet handle multiple subarrays in a single call",
+                status );
+        goto CLEANUP;
+      }
+
     }
 
     /* Okay, single observation, darks in time order */
@@ -352,7 +367,6 @@ void smurf_calcflat( int *status ) {
 
     /* Work out the output filename  - provide a default */
     ddata = (bbhtframe->sdata)[0];
-    smf_find_subarray( ddata->hdr, subarray, sizeof(subarray), NULL, status );
     smf_fits_getI( ddata->hdr, "UTDATE", &utdate, status );
     smf_fits_getI( ddata->hdr, "OBSNUM", &obsnum, status );
     snprintf( defname, sizeof(defname), "%s%08d_%05d_flat",
