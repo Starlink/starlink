@@ -122,8 +122,11 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
   if (*status != SAI__OK) return;
 
   frame = (bbhtframes->sdata)[0];
-  colsize = (frame->dims)[SMF__COL_INDEX];
-  rowsize = (frame->dims)[SMF__ROW_INDEX];
+
+  /* note that colsize is the number of rows and rowsize is the number of
+     columns */
+  colsize = (frame->dims)[SMF__ROW_INDEX];
+  rowsize = (frame->dims)[SMF__COL_INDEX];
   numbols = colsize * rowsize;
 
   /* Create a FITS header for DA */

@@ -292,10 +292,14 @@ static const size_t SMF__BADIDX = (size_t)-1;
 /* This constant defines the row and column index number for SMURF.
    If we have to support differing definitions we need to move these
    values into the smfData struct and set them correctly in smf_open_file
+
+   Note that "colsize" refers to the number of rows and "rowsize"
+   refers to the number of columns.
 */
 
-#define SMF__COL_INDEX 0
-#define SMF__ROW_INDEX 1
+#define SMF__ROW_INDEX 0
+#define SMF__COL_INDEX 1
+
 
 /* Global information about the data file itself */
 

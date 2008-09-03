@@ -92,7 +92,8 @@ void smf_flat_responsivity ( smfData *respmap, size_t nheat,
                              double *powval, double *bolval,  
                              int *status ) {
 
-  size_t colsize;              /* number of columns */
+  size_t dim0;                 /* first dimension in data array */
+  size_t dim1;                 /* second dimension in data array */
   size_t i;                    /* loop counter */
   size_t j;                    /* loop counter */
   size_t k;                    /* loop counter */
@@ -104,7 +105,6 @@ void smf_flat_responsivity ( smfData *respmap, size_t nheat,
   double *respdata = NULL;     /* responsivity data */
   double *resps = NULL;        /* responsivities for a bolometer at each step */
   double *respvar = NULL;      /* responsivity variance */
-  size_t rowsize;              /* number of rows */
   double stdev;                /* standard deviation of bolometer responsivity */
 
   int imin;                   /* Index where the pixel with the lowest value was 
@@ -132,20 +132,21 @@ void smf_flat_responsivity ( smfData *respmap, size_t nheat,
   
   if (*status != SAI__OK) return;
 
-  rowsize = (respmap->dims)[SMF__ROW_INDEX];
-  colsize = (respmap->dims)[SMF__COL_INDEX];
-
   respdata = (respmap->pntr)[0];
   respvar  = (respmap->pntr)[1];
 
   resps = smf_malloc( nheat, sizeof(*resps), 0, status );
 
-  nbol = colsize * rowsize;
+  dim0 = (respmap->dims)[0];
+  dim1 = (respmap->dims)[1];
+  nbol = dim0 * dim1;
 
-  for (j=0; j < rowsize; j++) {
-    size_t frameoffset = j * colsize;
+  /* dim1 must change slower than dim0 */
+  for (j=0; j < dim1; j++) {
+    size_t frameoffset = j * dim0;
 
-    for (i=0; i< colsize; i++) {
+    for (i=0; i< dim0; i++) {
+      /* offset into nbol array */
       size_t boloffset = frameoffset + i;
 
       /* Calculate the responsivity of this bolometer at each power step
