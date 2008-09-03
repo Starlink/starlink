@@ -363,6 +363,13 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
       errRep(" ", FUNC_NAME " Unsupported data type ^TYP",
              status);
     }
+
+    /* if clipping was enabled, switch to the clipped result */
+    if (nclip > 0) {
+      *mean = meanc;
+      *stdev = stdevc;
+    }
+
   }
 
   /* Free resources */
