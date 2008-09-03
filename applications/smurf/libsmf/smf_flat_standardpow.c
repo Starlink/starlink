@@ -26,7 +26,7 @@
 *        For each frame in "heatframes", this is the heater setting that
 *        was used.
 *     resistance = const double [] (Given)
-*        Resistance for each pixel heater.
+*        Resistance for each pixel heater. One value for each bolometer.
 *     powref = double [] (Returned)
 *        Resistance input powers. Must have space for the same number of
 *        elements as frames stored in "heatframes". Memory allocated by
@@ -58,6 +58,8 @@
 *        insert fix to interpolation from 13Feb2008.
 *     2008-08-27 (TIMJ):
 *        Rewrite for SMURF from sc2flat.c
+*     2008-09-03 (TIMJ):
+*        Throw out any bolometers that have any bad values in their darks.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -118,7 +120,7 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
   powbol = smf_malloc( nheat, sizeof(*powbol), 1, status );
 
   /* pointers to the data array associated with each input frame */
-  heatframe = smf_malloc( nheat, sizeof(heatframe), 0, status );
+  heatframe = smf_malloc( nheat, sizeof(*heatframe), 0, status );
 
   /* Choose the reference heater powers to be the actual heater settings acting on
      the adopted reference resistance.  */
@@ -131,9 +133,11 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
   /* Store pointers to data array for each frame */
   for ( j=0; j<nheat; j++) {
     smfData * fr = (heatframes->sdata)[j];
+    smf_dtype_check_fatal( fr, NULL, SMF__DOUBLE, status );
     heatframe[j] = (fr->pntr)[0];
   }
 
+  if (*status != SAI__OK) goto CLEANUP;
 
   /* For each bolometer interpolate to find the measurement it would report at the
      standard power input values */
@@ -156,9 +160,19 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
             }
         }
 
+      /* Trap bolometers that have any bad values in their measurements */
+      for ( j=0; j<nheat; j++) {
+        if ( (heatframe[j])[i] == VAL__BADD) {
+          powbol[0] = VAL__BADD;
+          break;
+        }
+      }
+
       /* Trap bolometers which are unresponsive */
 
-      if ( fabs ( heatframe[0][i] - heatframe[nheat-1][i] ) < 1.0 )
+      if ( powbol[0] != VAL__BADD && 
+           (heatframe[0][i] == VAL__BADD || heatframe[nheat-1][i] == VAL__BADD ||
+            (fabs ( heatframe[0][i] - heatframe[nheat-1][i] ) < 1.0) ) )
         {
           powbol[0] = VAL__BADD;
         }
@@ -219,7 +233,8 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
 
         }
     }
-   
+
+ CLEANUP:
   if (powbol) powbol = smf_free ( powbol, status );
   if (heatframe) heatframe = smf_free( heatframe, status );
 
