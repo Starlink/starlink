@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     void smf_flat_responsivity ( smfData *respmap, size_t nheat,
-*                                  double *powval, double *bolval,  
+*                                  const double powval[], const double bolval[],
 *                                  int *status );
 
 *  Arguments:
@@ -23,9 +23,9 @@
 *        Will be assumed to be the correct size as compared to bolval.
 *     nheat = size_t (Given)
 *        Number of measurements. 3rd dimension of bolval. Size of powval.
-*     powval = double [] (Given)
+*     powval = const double [] (Given)
 *        Resistance input powers. Must be nheat elements.
-*     bolval = double [] (Given)
+*     bolval = const double [] (Given)
 *        Response of each bolometer to powval. Dimensioned as number of 
 *        number of bolometers (size of respmap) time nheat.
 *     status = int* (Given and Returned)
@@ -94,7 +94,7 @@
 #include "gsl/gsl_fit.h"
 
 void smf_flat_responsivity ( smfData *respmap, size_t nheat,
-                             double *powval, double *bolval,  
+                             const double powval[], const double bolval[],
                              int *status ) {
 
   size_t bol;                  /* Bolometer offset into array */
