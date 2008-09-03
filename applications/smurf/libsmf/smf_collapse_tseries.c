@@ -172,7 +172,8 @@ void smf_collapse_tseries( const smfData *indata, int nclip, const float clip[],
           mean = VAL__BADD;
           stdev = VAL__BADD;
         }
-        if (snrlim > 0 && mean != VAL__BADD && stdev != VAL__BADD) {
+        if (snrlim > 0 && mean != VAL__BADD && stdev != VAL__BADD
+            && stdev != 0.0) {
           double snr;
           snr = fabs(mean/stdev);
           if (snr < snrlim) {
