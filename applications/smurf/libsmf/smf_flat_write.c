@@ -15,7 +15,8 @@
 *  Invocation:
 *     void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
 *                          const double heater[], const double powref[],
-*                          const double bolref[], int * status );
+*                          const double bolref[], const Grp * prvgrp,
+*                          int * status );
 
 *  Arguments:
 *     flatname = const char * (Given)
@@ -30,6 +31,9 @@
 *     bolref = const double [] (Given)
 *        Bolometer calibration values. Dimensioned as number of 
 *        number of bolometers times number of heat frames.
+*     prvgrp = const Grp * (Given)
+*        Group of files contributing provenance to the output flatfield
+*        file. Can be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -38,8 +42,9 @@
 
 *  Notes:
 *     - powval and bolval are calculated by smf_flat_standardpow.
-*     - uses sc2store to make a pseudo-time series containing the mean
-*       heater settings. The flatfield values are stored in the extensions.
+*     - uses sc2store to make a pseudo-time series containing the dark
+*       subtracted and averaged flatfield data. The flatfield values themselves
+*       are stored in the standard flatfield SCUBA2 extension.
 
 *  Authors:
 *     BDK: Dennis Kelly (UKATC)
@@ -91,12 +96,15 @@
 #include "sc2da/sc2store.h"
 #include "sc2da/sc2ast.h"
 
+#include "star/grp.h"
 #include "prm_par.h"
 #include "sae_par.h"
+#include "par_par.h"
 
 void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
                      const double heater[], const double powref[],
-                     const double bolref[], int * status ) {
+                     const double bolref[], const Grp * prvgrp,
+                     int * status ) {
 
   size_t colsize;              /* number of columns */
   double *dbuf = NULL;         /* input double buffer for mean data */
@@ -248,6 +256,19 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
   ndfPtwcs( result, indf, status );
 
   astEnd;
+
+  /* Write provenance information */
+  if (prvgrp) {
+    size_t size = grpGrpsz( prvgrp, status );
+    char prvname[ 2 * PAR__SZNAM + 1];
+
+    smf_get_taskname( NULL, prvname, status );
+    for (j=1; j<=size; j++) {
+      smf_accumulate_prov( NULL, prvgrp, j, indf, prvname, status );
+    }
+
+  }
+
 
   ndfAnnul( &indf, status);
 

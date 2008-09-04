@@ -455,7 +455,7 @@ void smurf_calcflat( int *status ) {
     if (flatgrp) grpDelet( &flatgrp, status );
 
     /* write out the flatfield */
-    smf_flat_write( flatname, bbhtframe, pixheat, powref, bolref, status );
+    smf_flat_write( flatname, bbhtframe, pixheat, powref, bolref, dkgrp, status );
 
     if (respmap) smf_close_file( &respmap, status );
 
