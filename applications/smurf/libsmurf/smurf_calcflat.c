@@ -118,6 +118,7 @@
 #include "smurflib.h"
 #include "libsmf/smf_err.h"
 #include "sc2da/sc2store.h"
+#include "sc2da/sc2ast.h"
 
 #define FUNC_NAME "smurf_calcflat"
 #define TASK_NAME "CALCFLAT"
@@ -128,6 +129,7 @@ void smurf_calcflat( int *status ) {
   double *bolref = NULL;    /* response of each bolometer to powref */
   smfArray * darks = NULL;  /* Darks */
   smfData *ddata = NULL;    /* A heater file */
+  Grp * dkgrp = NULL;       /* Group of darks */
   char defname[GRP__SZNAM+1]; /* default output file name */
   char flatname[GRP__SZNAM+1]; /* Actual output file name */
   Grp *flatgrp = NULL;      /* Output flatfield group */
@@ -164,7 +166,7 @@ void smurf_calcflat( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Find darks (might be all) */
-  smf_find_darks( igrp, &fgrp, NULL, 1, SMF__DOUBLE, &darks, status );
+  smf_find_darks( igrp, &fgrp, &dkgrp, 1, SMF__DOUBLE, &darks, status );
 
   if (!darks || darks->ndat <= 2) {
     if (*status == SAI__OK) {
@@ -243,8 +245,8 @@ void smurf_calcflat( int *status ) {
     if (*status != SAI__OK) goto CLEANUP;
 
     /* Check row vs column count */
-    if ( ((darks->sdata)[0]->dims)[SMF__COL_INDEX] != ncols ||
-         ((darks->sdata)[0]->dims)[SMF__ROW_INDEX] != nrows ) {
+    if ( ((darks->sdata)[0]->dims)[SMF__COL_INDEX] != (size_t)ncols ||
+         ((darks->sdata)[0]->dims)[SMF__ROW_INDEX] != (size_t)nrows ) {
       *status = SAI__ERROR;
       msgSeti( "RC", ncols );
       msgSeti( "RR", nrows );
@@ -383,6 +385,31 @@ void smurf_calcflat( int *status ) {
         ubnd[SMF__COL_INDEX] = ncols - lbnd[SMF__COL_INDEX] + 1;
         smf_open_newfile( rgrp, 1, SMF__DOUBLE, 2, lbnd, ubnd,
                           SMF__MAP_VAR, &respmap, status );
+
+        /* add some niceties - propagate some information from the first measurement */
+        if (*status == SAI__OK) {
+          smfData *refdata = (bbhtframe->sdata)[0];
+          char buffer[30];
+          AstFrameSet *wcs = NULL;
+
+          smf_accumulate_prov( NULL, dkgrp, 1, respmap->file->ndfid, "SMURF:CALCFLAT", status );
+          kpgPtfts( respmap->file->ndfid, refdata->hdr->fitshdr, status );
+
+          one_strlcpy( buffer, subarray, sizeof(buffer), status );
+          one_strlcat( buffer, " bolometer responsivity", sizeof(buffer), status );
+          respmap->hdr = smf_construct_smfHead( NULL, refdata->hdr->instrument,
+                                                NULL, NULL, NULL, NULL, 0, refdata->hdr->instap, 1,
+                                                refdata->hdr->steptime, refdata->hdr->obsmode,
+                                                refdata->hdr->obstype, 0, NULL, NULL, NULL, NULL,
+                                                0, NULL, buffer, "Responsivity",
+                                                "Amps/Watt", refdata->hdr->telpos, status );
+          smf_write_clabels( respmap, status );
+
+          /* create frame for focal plane coordinates */
+          sc2ast_createwcs( subnum, NULL, NULL, NULL, &wcs, status );
+          ndfPtwcs( wcs, respmap->file->ndfid, status );
+        }
+
       }
       if (rgrp) grpDelet( &rgrp, status );
     }
@@ -444,6 +471,7 @@ void smurf_calcflat( int *status ) {
   if (darks) smf_close_related( &darks, status );
   if (igrp) grpDelet( &igrp, status);
   if (ogrp) grpDelet( &ogrp, status);
+  if (dkgrp) grpDelet( &dkgrp, status );
   if (resistance) resistance = smf_free( resistance, status );
   if (pixheat) pixheat = smf_free( pixheat, status );
   if (bolref) bolref = smf_free( bolref, status );
