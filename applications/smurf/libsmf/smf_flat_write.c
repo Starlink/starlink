@@ -14,18 +14,20 @@
 
 *  Invocation:
 *     void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
-*                          const double *powref, const double *bolref,
-*                          int * status );
+*                          const double heater[], const double powref[],
+*                          const double bolref[], int * status );
 
 *  Arguments:
 *     flatname = const char * (Given)
 *        Name to be used for flatfield file.
 *     heatframes = const smfArray* (Given)
 *        Collection of heat frames.
-*     powref = double [] (Given)
+*     heater = const double [] (Given)
+*        Heater settings. One for each heatframe.
+*     powref = const double [] (Given)
 *        Heater power settings in pW. Must be same number of elements
 *        as present in "heatframes".
-*     bolref = double [] (Given)
+*     bolref = const double [] (Given)
 *        Bolometer calibration values. Dimensioned as number of 
 *        number of bolometers times number of heat frames.
 *     status = int* (Given and Returned)
@@ -87,26 +89,37 @@
 #include "smurf_par.h"
 
 #include "sc2da/sc2store.h"
+#include "sc2da/sc2ast.h"
 
 #include "prm_par.h"
 #include "sae_par.h"
 
 void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
-                     const double *powref, const double *bolref,
-                     int * status ) {
+                     const double heater[], const double powref[],
+                     const double bolref[], int * status ) {
 
   size_t colsize;              /* number of columns */
   double *dbuf = NULL;         /* input double buffer for mean data */
   double *dvar = NULL;         /* input double buffer for variance of data */
   char fitsrec[SC2STORE__MAXFITS*80+1]; /* Store for FITS records */
   int *ibuf = NULL;            /* int buffer for mean data */
+  int indf = NDF__NOID;        /* NDF identifier for output file */
   int *ivar = NULL;            /* int buffer for variance of data */
   smfData * frame = NULL;      /* single frame */
   size_t ncards;               /* number of fits cards */
   size_t numbols;              /* number of bolometers */
+  int place = NDF__NOPL;       /* Dummy placeholder for NDF */
   size_t rowsize;              /* number of rows */
   JCMTState *state;            /* State for this flatfield */
   int subnum;                  /* subarray number */
+
+  AstCmpFrame *totfrm;
+  AstCmpMap *totmap;
+  AstFrame *gridfrm;
+  AstFrameSet *result, *spacefset;
+  AstLutMap *heatmap;
+  AstFrame *heatfrm;
+
 
   int *dksquid;           /* pointer to dummy dark SQUID data */
   size_t i;                  /* loop counter */
@@ -186,21 +199,57 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
 
   sc2store_free ( status );
 
-  /* To copy in variance we need to reopen the file */
+  /* To copy in the variance and modify fix up the WCS we need to reopen
+     the file */
+
+  ndfOpen( NULL, flatname, "UPDATE", "OLD", &indf, &place, status );
+
+  /* make sure that history is not written twice */
+  ndfHsmod( "SKIP", indf, status );
+
   if (ivar) {
-    int indf = NDF__NOID;
-    int place = NDF__NOPL;
     void *pntr[3];
     int el;
-
-    ndfOpen( NULL, flatname, "UPDATE", "OLD", &indf, &place, status );
     ndfMap( indf, "VARIANCE", "_INTEGER", "WRITE", pntr, &el, status );
     if (*status == SAI__OK) {
       memcpy( pntr[0], ivar, sizeof(int)*el );
     }
-    ndfAnnul( &indf, status);
   }
 
+  /* For the WCS a time frame is less relevant than heater settings */
+  astBegin;
+
+  /* Create frame for focal plane coordinates */
+  sc2ast_createwcs( subnum, NULL, NULL, NULL, &spacefset, status );
+
+  /* Create a simple frame for heater settings */
+  heatfrm = astFrame( 1, "Domain=HEATER,Label(1)=Heater Setting" );
+  heatmap = astLutMap( bbhtframes->ndat, heater, 1.0, 1.0, "" );
+
+  /* Join the frames and mappings */
+  totfrm = astCmpFrame( spacefset, heatfrm, "" );
+  totmap = astCmpMap( spacefset, heatmap, 0, "" );
+
+  /* Create a 3D GRID frame */
+  gridfrm = astFrame( 3, "Domain=GRID,Title=FITS pixel coordinates" );
+  astSet( gridfrm, "Unit(1)=pixel,Label(1)=FITS pixel axis 1" );
+  astSet( gridfrm, "Unit(2)=pixel,Label(2)=FITS pixel axis 2" );
+  astSet( gridfrm, "Unit(3)=pixel,Label(2)=FITS pixel axis 3" );
+
+  /* Create the FrameSet to return, initially containing just the above
+     GRID Frame. */
+  result = astFrameSet( gridfrm, "" );
+
+  /* Add the total Frame into the FrameSet using the total Mapping to
+     connect it to the base (i.e. GRID) Frame. */
+  astAddFrame( result, AST__BASE, totmap, totfrm );
+
+  /* write it to the NDF */
+  ndfPtwcs( result, indf, status );
+
+  astEnd;
+
+  ndfAnnul( &indf, status);
 
   if (ibuf) ibuf = smf_free( ibuf, status );
   if (ivar) ivar = smf_free( ivar, status );

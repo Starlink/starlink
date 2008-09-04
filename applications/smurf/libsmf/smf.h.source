@@ -1114,5 +1114,5 @@ void smf_flat_responsivity ( smfData *respmap, size_t nheat,
                              int *status );
 
 void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
-                     const double *powref, const double *bolref,
-                     int * status );
+                     const double heater[], const double powref[],
+                     const double bolref[], int * status );
