@@ -101,7 +101,6 @@ void smf_flat_responsivity ( smfData *respmap, size_t nheat,
   double * bolv = NULL;        /* Temp space for bol values */
   size_t k;                    /* loop counter */
   const double mcepass = 3.3;  /* factor for MCE low-pass filter */
-  double mean;                 /* mean responsivity of a bolometer */
   size_t nbol;                 /* number of bolometers */
   size_t ngood = 0;            /* number of valid responsivities */
   int nrgood;                  /* number of good responsivities for bolo */
@@ -109,26 +108,6 @@ void smf_flat_responsivity ( smfData *respmap, size_t nheat,
   double *respdata = NULL;     /* responsivity data */
   double *resps = NULL;        /* responsivities for a bolometer at each step */
   double *respvar = NULL;      /* responsivity variance */
-  double stdev;                /* standard deviation of bolometer responsivity */
-
-  int imin;                   /* Index where the pixel with the lowest value was 
-                                 (first) found before clipping */
-  double dmin;                /* Minimum pixel value in the array before clipping */
-  int imax;                   /* Index where the pixel with the highest value was 
-                                 (first) found before clipping*/
-  double dmax;                /* Maximum pixel value in the array before clipping */
-  double sum;                 /* Sum of valid pixels before clipping */
-  int nrgoodc;                /* Number of valid pixels in the array after clipping */
-  int iminc;                  /* Index where the pixel with the lowest value was 
-                                 (first) found after clipping */
-  double dminc;               /* Minimum pixel value in the array after clipping */
-  int imaxc;                  /* Index where the pixel with the highest value was 
-                                 (first) found after clipping */
-  double dmaxc;               /* Maximum pixel value in the array after clipping */
-  double sumc;                /* Sum of valid pixels after clipping */
-  double meanc;               /* Mean of valid pixels after clipping */
-  double stdevc;              /* Standard deviation of the above*/
-
 
   if (*status != SAI__OK) return;
 
