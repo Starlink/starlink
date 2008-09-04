@@ -53,6 +53,8 @@
 *        Darks and indata can be _DOUBLE.
 *     02-SEP-2008 (TIMJ):
 *        Logic tidy up
+*     03-SEP-2008 (TIMJ):
+*        Fix issue with 2d input files
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -115,6 +117,7 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
   double *dkbuf = NULL;   /* malloced buffer for dark */
   size_t i;            /* loop counter */
   size_t nbols;        /* number of bolometers */
+  size_t nslices;       /* number of time slices in input data */
 
 
   if (*status != SAI__OK) return;
@@ -152,6 +155,20 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
   if (dark2 && (dark2->dtype != SMF__INTEGER && dark2->dtype != SMF__DOUBLE)) {
     *status = SAI__ERROR;
     errRep( " ","Dark 2 is neither INTEGER nor DOUBLE", status);
+    return;
+  }
+
+  /* darks must be 2d */
+  if (dark1 && ( dark1->ndims != 2 ||
+                 (dark1->ndims == 3 && (dark1->dims)[2] != 1) ) ) {
+    *status = SAI__ERROR;
+    errRep(" ", "Dark 1 is not 2d", status );
+    return;
+  }
+  if (dark2 && ( dark2->ndims != 2 ||
+                 (dark2->ndims == 3 && (dark2->dims)[2] != 1) ) ) {
+    *status = SAI__ERROR;
+    errRep(" ", "Dark 2 is not 2d", status );
     return;
   }
 
@@ -251,7 +268,14 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
     }
   }
 
+  /* See how many time slices are in the data */
+  if ( indata->ndims == 2 ) {
+    nslices = 1;
+  } else {
+    nslices = (indata->dims)[2];
+  }
 
+  /* Now subtract the dark */
   switch (method) {
     case SMF__DKSUB_PREV:
     case SMF__DKSUB_NEXT:
@@ -275,7 +299,8 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
 
         if (ddata) {
           double * slice;
-          for (i = 0; i < (indata->dims)[2]; i++) {
+
+          for (i = 0; i < nslices; i++) {
             startidx = i * nbols;
             slice = &(ddata[startidx]);
             for (j=0;  j < nbols; j++) {
@@ -302,7 +327,7 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
         } else if (idata) {
           int *slice;
 
-          for (i = 0; i < (indata->dims)[2]; i++) {
+          for (i = 0; i < nslices; i++) {
             startidx = i * nbols;
             slice = &(idata[startidx]);
             for (j=0;  j < nbols; j++) {
