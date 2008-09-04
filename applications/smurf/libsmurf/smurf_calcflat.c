@@ -307,7 +307,6 @@ void smurf_calcflat( int *status ) {
       smf_subtract_dark( (darks->sdata)[i], (darks->sdata)[i-1],
                          (darks->sdata)[i+1], SMF__DKSUB_MEAN, status);
 
-
       /* Store the frame for later */
       smf_addto_smfArray( bbhtframe, (darks->sdata)[i], status );
 
@@ -343,8 +342,8 @@ void smurf_calcflat( int *status ) {
         mydims[SMF__ROW_INDEX] = nrows;
         mydims[SMF__COL_INDEX] = ncols;
         
-        pntr[0] = smf_malloc( nrows*ncols, sizeof(double), 0, status );
-        pntr[1] = smf_malloc( nrows*ncols, sizeof(double), 0, status );
+        pntr[0] = smf_malloc( nbols, sizeof(double), 0, status );
+        pntr[1] = smf_malloc( nbols, sizeof(double), 0, status );
 
         respmap = smf_construct_smfData( NULL, NULL, NULL, NULL, SMF__DOUBLE,
                                          pntr, 0, mydims, 2, 0, 0, NULL,
@@ -371,14 +370,24 @@ void smurf_calcflat( int *status ) {
     /* Optionally discard the calibration if the responsivity is bad */
     parGet0l( "RESPMASK", &respmask, status );
     if (respmask) {
+      size_t nmask = 0;
+      size_t thisbol = 0;
       double *respdata = (respmap->pntr)[0];
       for (i = 0; i < nbols; i++ ) {
         if ( respdata[i] == VAL__BADD) {
+          thisbol = 0;
           for (j=0; j<bbhtframe->ndat; j++) {
-            bolref[j*nrows*ncols+i] = VAL__BADD;
-          } 
+            if (bolref[j*nbols+i] != VAL__BADD) {
+              bolref[j*nbols+i] = VAL__BADD;
+              thisbol++;
+            }
+          }
+          if (thisbol > 0) nmask++;
         }
       }
+      msgSeti( "NM", nmask);
+      msgOutif( MSG__NORM, "", "Responsivity mask has removed an additional ^NM bolometers",
+                status);
     }
 
     /* Work out the output filename  - provide a default */
