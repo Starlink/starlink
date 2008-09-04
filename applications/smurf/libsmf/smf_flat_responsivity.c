@@ -39,7 +39,14 @@
 *     evaluate the quality. Write the results to a text file.
 
 *  Notes:
-*     powval and bolval are calculated by smf_flat_standardpow.
+*     - powval and bolval are calculated by smf_flat_standardpow.
+*     - "raw2current" converts raw (10 or 20 kHz) data numbers to
+*       current through a TES
+*     - The MCE firmware low-pass filters the raw data and subsamples
+*       down to 200 Hz. This filtering is the reason for the "mcepass"
+*       factor.
+*     - The bolometers are nominally supposed to have a responsivity
+*       of -1.0e6 Amps/Watt.
 
 *  Authors:
 *     BDK: Dennis Kelly (UKATC)
@@ -105,6 +112,7 @@ void smf_flat_responsivity ( smfData *respmap, size_t nheat,
   size_t ngood = 0;            /* number of valid responsivities */
   int nrgood;                  /* number of good responsivities for bolo */
   double *powv = NULL;         /* Temp space for power values */
+  const double raw2current = 1.52e-13; /* Convert raw data numbers to current */
   double *respdata = NULL;     /* responsivity data */
   double *resps = NULL;        /* responsivities for a bolometer at each step */
   double *respvar = NULL;      /* responsivity variance */
@@ -135,7 +143,7 @@ void smf_flat_responsivity ( smfData *respmap, size_t nheat,
     for (k = 0; k < nheat; k++) {
       if ( bolval[k*nbol+bol] != VAL__BADD &&
            powval[k] != VAL__BADD) {
-        bolv[k] = mcepass * 1.52e-13 * bolval[k*nbol+bol];
+        bolv[k] = mcepass * raw2current * bolval[k*nbol+bol];
         powv[k] = powval[k];
         nrgood++;
       }
@@ -151,6 +159,9 @@ void smf_flat_responsivity ( smfData *respmap, size_t nheat,
                       &cov11, &sumsq);
 
       snr = fabs(c1) / sqrt( cov11 );
+
+      /* Nominal responsivity is -1.0e6 but we allow a bigger range
+         through */
       if ( fabs(c1) > 5.0e6 || fabs(c1) < 0.1e6 || snr < 25.0 ) {
         respdata[bol] = VAL__BADD;
         respvar[bol] = VAL__BADD;
