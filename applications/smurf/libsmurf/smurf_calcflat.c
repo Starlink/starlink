@@ -20,21 +20,44 @@
 *        Pointer to global status.
 
 *  Description:
-*     Calculate flatfield solution from a flatfield observation.
+*     This routine can alculate flatfield solution from a flatfield observation.
+*
+*     The flatfield observation consists of a series of dark measurements taken at 
+*     various pixel heater settings. One standard SCUBA-2 raw data file is stored for
+*     each measurement.
+*
+*     Some optimum pixel heater setting is chosen. The procedure is to record
+*     measurements at heater settings around this optimum value, continually returning
+*     to the optimum which is used as a reference to subtract pixel zero-point drifts.
 
 *  Notes:
+*     - Does not yet enforce the observation to be of type FLATFIELD.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
 *          Input files to be processed. Must all be from the same
-*          observation.
+*          observation and the same subarray.
+*     MSG_FILTER = _CHAR (Read)
+*          Control the verbosity of the application. Values can be
+*          QUIET (minimal messages), NORMAL, VERBOSE or DEBUG [NORMAL]
 *     OUT = NDF (Write)
-*          Output flatfield file.
+*          Output flatfield file. The primary data array contains the
+*          dark subtracted measurements for each heater setting. The
+*          flatfield itself is stored in the .MORE.SCUBA2.FLATCAL 
+*          extension. A default output filename based on the date of observation
+*          number, subarray name and observation number will be suggested.
+*     REFRES = _DOUBLE (Read)
+*          Reference pixel heat resistance. Defines the mean power scale to
+*          be used. Defaults to 2.0.
 *     RESIST = GROUP (Read)
-*          Resistor settings for each bolometer.
+*          Resistor settings for each bolometer. This is a text file, an
+*          example can be found in $STARLINK_DIR/share/smurf/resist.cfg
 *     RESP = NDF (Write)
 *          Responsivity image with variance. No image is written
 *          if Null [!]
+*     RESPMASK = _LOGICAL (Read)
+*          If true, responsivity data will be used to mask bolometer data
+*          when calculating the flatfield [TRUE]
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -43,6 +66,8 @@
 *  History:
 *     2008-08-26 (TIMJ):
 *        Original version.
+*     2008-09-03 (TIMJ):
+*        First version ready for testing.
 *     {enter_further_changes_here}
 
 *  Copyright:
