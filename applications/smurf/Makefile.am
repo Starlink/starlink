@@ -52,7 +52,8 @@ examples/simpar_heatrun.lis \
 examples/simpar_pong.lis \
 examples/simpar_stare.lis \
 examples/stareobs.lis \
-examples/staresim.lis
+examples/staresim.lis \
+examples/resist.cfg
 
 
 # Linking
