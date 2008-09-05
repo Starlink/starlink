@@ -39,13 +39,13 @@ $(MANIFESTS)/agi: \
 		$(MANIFESTS)/idi \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx
 	cd libraries/agi \
 	  && $(MAKE_CPT)
@@ -68,7 +68,8 @@ $(MANIFESTS)/ard: \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/sla \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd libraries/ard \
 	  && $(MAKE_CPT)
 
@@ -120,7 +121,8 @@ $(MANIFESTS)/atl: \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/sla \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd libraries/atl \
 	  && $(MAKE_CPT)
 
@@ -168,6 +170,7 @@ $(MANIFESTS)/atools: \
 		$(MANIFESTS)/sst \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk \
@@ -230,7 +233,6 @@ $(MANIFESTS)/cat: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -238,7 +240,8 @@ $(MANIFESTS)/cat: \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/sla \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd libraries/cat \
 	  && $(MAKE_CPT)
 
@@ -286,6 +289,7 @@ $(MANIFESTS)/ccdpack: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/startcl \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk \
@@ -311,7 +315,6 @@ $(MANIFESTS)/cgs3dr: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -319,6 +322,7 @@ $(MANIFESTS)/cgs3dr: \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/tsp
 	cd applications/obsolete/cgs3dr \
 	  && $(MAKE_CPT)
@@ -336,7 +340,6 @@ $(MANIFESTS)/chart: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/ifd \
 		$(MANIFESTS)/mers \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pda \
 		$(MANIFESTS)/psx \
@@ -344,6 +347,7 @@ $(MANIFESTS)/chart: \
 		$(MANIFESTS)/sgs \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx
 	cd applications/obsolete/chart \
 	  && $(MAKE_CPT)
@@ -412,6 +416,7 @@ $(MANIFESTS)/convert: \
 		$(MANIFESTS)/snx \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk \
@@ -463,6 +468,7 @@ $(MANIFESTS)/cupid: \
 		$(MANIFESTS)/sst \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk \
@@ -487,7 +493,6 @@ $(MANIFESTS)/cursa: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pda \
@@ -501,6 +506,7 @@ $(MANIFESTS)/cursa: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/startcl \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk
@@ -523,7 +529,6 @@ $(MANIFESTS)/daophot: \
 		$(MANIFESTS)/idi \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pgp \
 		$(MANIFESTS)/pgplot \
@@ -534,6 +539,7 @@ $(MANIFESTS)/daophot: \
 		$(MANIFESTS)/sgs \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk \
@@ -556,7 +562,8 @@ $(MANIFESTS)/datacube: \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/shl \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd applications/datacube \
 	  && $(MAKE_CPT)
 
@@ -600,6 +607,7 @@ $(MANIFESTS)/dipso: \
 		$(MANIFESTS)/snx \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk \
@@ -660,6 +668,7 @@ $(MANIFESTS)/echomop: \
 		$(MANIFESTS)/snx \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk \
@@ -673,12 +682,12 @@ $(MANIFESTS)/echwind: \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/gwm \
 		$(MANIFESTS)/mers \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/pgplot \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk
@@ -736,6 +745,7 @@ $(MANIFESTS)/esp: \
 		$(MANIFESTS)/sla \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk \
@@ -762,7 +772,8 @@ $(MANIFESTS)/extractor: \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd applications/extractor \
 	  && $(MAKE_CPT)
 
@@ -809,6 +820,7 @@ $(MANIFESTS)/figaro: \
 		$(MANIFESTS)/sla \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk \
@@ -834,7 +846,6 @@ $(MANIFESTS)/findcoords: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pda \
@@ -848,6 +859,7 @@ $(MANIFESTS)/findcoords: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/startcl \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk
@@ -862,13 +874,13 @@ $(MANIFESTS)/fio: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd libraries/fio \
 	  && $(MAKE_CPT)
 
@@ -881,14 +893,14 @@ $(MANIFESTS)/fluxes: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/jpl \
 		$(MANIFESTS)/mers \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/sla \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd applications/fluxes \
 	  && $(MAKE_CPT)
 
@@ -928,12 +940,12 @@ $(MANIFESTS)/gaia: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/startcl \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tcllibs \
 		$(MANIFESTS)/tclx \
-		$(MANIFESTS)/tk \
-		$(MANIFESTS)/vtk
+		$(MANIFESTS)/tk
 	cd applications/gaia \
 	  && $(MAKE_CPT)
 
@@ -979,7 +991,6 @@ $(MANIFESTS)/graphpar: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pgp \
@@ -988,6 +999,7 @@ $(MANIFESTS)/graphpar: \
 		$(MANIFESTS)/sgs \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx
 	cd libraries/graphpar \
 	  && $(MAKE_CPT)
@@ -1007,7 +1019,8 @@ $(MANIFESTS)/grp: \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd libraries/grp \
 	  && $(MAKE_CPT)
 
@@ -1065,6 +1078,7 @@ $(MANIFESTS)/hdstools: \
 		$(MANIFESTS)/sst \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/tcl
 	cd applications/hdstools \
 	  && $(MAKE_CPT)
@@ -1078,14 +1092,14 @@ $(MANIFESTS)/hdstrace: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd applications/hdstrace \
 	  && $(MAKE_CPT)
 
@@ -1110,12 +1124,12 @@ $(MANIFESTS)/icl: \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/nbs \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd applications/icl \
 	  && $(MAKE_CPT)
 
@@ -1130,13 +1144,13 @@ $(MANIFESTS)/idi: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx
 	cd libraries/idi \
 	  && $(MAKE_CPT)
@@ -1161,7 +1175,6 @@ $(MANIFESTS)/img: \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/ndf \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -1169,7 +1182,8 @@ $(MANIFESTS)/img: \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/sla \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd libraries/img \
 	  && $(MAKE_CPT)
 
@@ -1222,6 +1236,7 @@ $(MANIFESTS)/iras90: \
 		$(MANIFESTS)/snx \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk \
@@ -1246,7 +1261,6 @@ $(MANIFESTS)/ircamdr: \
 		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pda \
@@ -1256,6 +1270,7 @@ $(MANIFESTS)/ircamdr: \
 		$(MANIFESTS)/sgs \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx
 	cd applications/obsolete/ircamdr \
 	  && $(MAKE_CPT)
@@ -1311,6 +1326,7 @@ $(MANIFESTS)/jcmtdr: \
 		$(MANIFESTS)/snx \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk \
@@ -1366,6 +1382,7 @@ $(MANIFESTS)/kaplibs: \
 		$(MANIFESTS)/sst \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/trn
 	cd libraries/kaplibs \
@@ -1417,6 +1434,7 @@ $(MANIFESTS)/kappa: \
 		$(MANIFESTS)/sst \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk \
@@ -1469,6 +1487,7 @@ $(MANIFESTS)/kaprh: \
 		$(MANIFESTS)/sst \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk \
@@ -1524,13 +1543,13 @@ $(MANIFESTS)/mag: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd libraries/mag \
 	  && $(MAKE_CPT)
 
@@ -1539,15 +1558,14 @@ $(MANIFESTS)/match:
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/mers: \
-		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/messgen \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd libraries/mers \
 	  && $(MAKE_CPT)
 
@@ -1619,7 +1637,8 @@ $(MANIFESTS)/ndg: \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/sla \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd libraries/ndg \
 	  && $(MAKE_CPT)
 
@@ -1640,7 +1659,6 @@ $(MANIFESTS)/observe: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pgp \
@@ -1649,18 +1667,19 @@ $(MANIFESTS)/observe: \
 		$(MANIFESTS)/sla \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx
 	cd applications/observe \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/one: \
-		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd libraries/one \
 	  && $(MAKE_CPT)
 
@@ -1672,12 +1691,12 @@ $(MANIFESTS)/par: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd libraries/par \
 	  && $(MAKE_CPT)
 
@@ -1689,11 +1708,11 @@ $(MANIFESTS)/pcs: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd libraries/pcs \
 	  && $(MAKE_CPT)
 
@@ -1718,13 +1737,13 @@ $(MANIFESTS)/period: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pgp \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx
 	cd applications/period \
 	  && $(MAKE_CPT)
@@ -1747,10 +1766,10 @@ $(MANIFESTS)/pgplot: \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/gwm \
 		$(MANIFESTS)/mers \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk
 	cd thirdparty/caltech/pgplot \
@@ -1788,6 +1807,7 @@ $(MANIFESTS)/photom: \
 		$(MANIFESTS)/shl \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk \
@@ -1829,6 +1849,7 @@ $(MANIFESTS)/pisa: \
 		$(MANIFESTS)/sla \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk \
@@ -1882,6 +1903,7 @@ $(MANIFESTS)/polpack: \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/startcl \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk \
@@ -1903,7 +1925,6 @@ $(MANIFESTS)/pongo: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/idi \
 		$(MANIFESTS)/mers \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pda \
 		$(MANIFESTS)/pgp \
@@ -1916,6 +1937,7 @@ $(MANIFESTS)/pongo: \
 		$(MANIFESTS)/sla \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk \
@@ -2198,7 +2220,8 @@ $(MANIFESTS)/shl: \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd libraries/shl \
 	  && $(MAKE_CPT)
 
@@ -2260,6 +2283,7 @@ $(MANIFESTS)/smurf: \
 		$(MANIFESTS)/sst \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/trn
 	cd applications/smurf \
@@ -2317,6 +2341,7 @@ $(MANIFESTS)/specx: \
 		$(MANIFESTS)/sla \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk \
@@ -2450,7 +2475,8 @@ $(MANIFESTS)/sst: \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd applications/sst \
 	  && $(MAKE_CPT)
 
@@ -2467,12 +2493,12 @@ $(MANIFESTS)/starbench: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd applications/obsolete/starbench \
 	  && $(MAKE_CPT)
 
@@ -2512,7 +2538,6 @@ $(MANIFESTS)/starman: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/pgp \
 		$(MANIFESTS)/prm \
@@ -2521,6 +2546,7 @@ $(MANIFESTS)/starman: \
 		$(MANIFESTS)/sla \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx
 	cd applications/obsolete/starman \
 	  && $(MAKE_CPT)
@@ -2541,16 +2567,20 @@ $(MANIFESTS)/startcl: \
 		$(MANIFESTS)/jpeg \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/nbs \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk
 	cd applications/startcl \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/starutil:
+	cd libraries/starutil \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/starx: \
@@ -2750,14 +2780,14 @@ $(MANIFESTS)/surf: \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/sla \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd applications/surf \
 	  && $(MAKE_CPT)
 
@@ -2798,12 +2828,12 @@ $(MANIFESTS)/trn: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/prm \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/star2html \
-		$(MANIFESTS)/starmem
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
 	cd libraries/trn \
 	  && $(MAKE_CPT)
 
@@ -2825,7 +2855,6 @@ $(MANIFESTS)/tsp: \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
-		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
@@ -2836,6 +2865,7 @@ $(MANIFESTS)/tsp: \
 		$(MANIFESTS)/snx \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx
 	cd applications/tsp \
 	  && $(MAKE_CPT)
