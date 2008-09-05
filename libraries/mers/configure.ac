@@ -25,8 +25,8 @@ AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
-STAR_DECLARE_DEPENDENCIES([build], [cnf ems one sae psx])
-STAR_DECLARE_DEPENDENCIES([link],  [chr ems one psx])
+STAR_DECLARE_DEPENDENCIES([build], [cnf ems starutil sae psx])
+STAR_DECLARE_DEPENDENCIES([link],  [chr ems starutil psx])
 
 dnl   There are two distinct sets of error codes for this package
 STAR_MESSGEN(err_err.msg)

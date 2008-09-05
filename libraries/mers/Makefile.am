@@ -119,7 +119,7 @@ TESTS = err_ftest
 
 check_PROGRAMS = err_ftest
 err_ftest_SOURCES = err_ftest.f
-err_ftest_LDADD = liberr_standalone.la `psx_link` `chr_link` `cnf_link` `one_link`
+err_ftest_LDADD = liberr_standalone.la `psx_link` `chr_link` `cnf_link` `starutil_link`
 
 # Monoliths with C main do compile but we do not want a build dependency
 # on PCS

@@ -24,6 +24,8 @@
 
 #  Copyright:
 #     Copyright (C) 1995 Rutherford Appleton Laboratory
+#     Copyright (C) 2008 Science and Technology Facilities Council.
+#     All Rights Reserved.
 
 #  Authors:
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
@@ -47,6 +49,8 @@
 #        Added PSX and CHR library
 #      8-JUL-2004 (TIMJ):
 #        Remove liberr
+#      5-SEP-2008 (TIMJ):
+#        Add starutil_link
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -54,7 +58,7 @@
 
 #-
 
-      echo -lerr_standalone `one_link` `psx_link` `cnf_link` `chr_link` `ems_link` \
+      echo -lerr_standalone `starutil_link` `psx_link` `cnf_link` `chr_link` `ems_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

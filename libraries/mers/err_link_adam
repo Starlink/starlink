@@ -27,6 +27,8 @@
 
 #  Copyright:
 #     Copyright (C) 1995 Rutherford Appleton Laboratory
+#     Copyright (C) 2008 Science and Technology Facilities Council.
+#     All Rights Reserved.
 
 #  Authors:
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
@@ -49,6 +51,8 @@
 #        and PSX and CHR library
 #      8-JUL-2004 (TIMJ):
 #        Only have a single adam err library now.
+#      5-SEP-2008 (TIMJ):
+#        Add starutil_link
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -56,7 +60,7 @@
 
 #-
 
-      echo -lerr_adam `psx_link_adam` `chr_link_adam` `cnf_link_adam` \
+      echo -lerr_adam `starutil_link` `psx_link_adam` `chr_link_adam` `cnf_link_adam` \
            `one_link_adam` `ems_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}

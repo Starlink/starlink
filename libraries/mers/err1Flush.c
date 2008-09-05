@@ -113,6 +113,8 @@
 *        Use common block accessor functions rather than COMMON itself
 *     2-AUG-2008 (TIMJ):
 *        Rewrite in C
+*     5-SEP-2008 (TIMJ):
+*        Use starutil for strlcat and strlcpy.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -128,7 +130,7 @@
 #include "ems_err.h"
 #include "ems_par.h"
 #include "sae_par.h"
-#include "star/one.h"
+#include "star/util.h"
 
 #define SZTABS 3
 
@@ -141,18 +143,17 @@ void err1Flush ( int * errbel, int * status ) {
 
   int istat = SAI__ERROR;  /* Internal status */
   int level;            /* Error message context */
-  int ostat = SAI__OK;  /* Status from ONE */
   int opcnt = 0;        /* Output line counter */
   int parlen = 0;       /* Length of parameter name */
   int oplen = 0;        /* Length of error message string */
   int lstat = SAI__OK;  /* Status returned from ems1Putc */
   int pstat = SAI__OK;  /* Status returned by err1Print */
   int nomsg;            /* If there is really no message */
-
+  size_t slen;          /* return value from star_strlx */
 
   /*  Set initial TABS value - fatal programming error if this fails */
-  one_strlcpy( tabs, "!! ", sizeof(tabs), &ostat ); 
-  if (ostat != SAI__OK) {
+  slen = star_strlcpy( tabs, "!! ", sizeof(tabs) ); 
+  if ( slen > sizeof(tabs) ) {
     err1Print("!  errFlush: Error encountered during message output",
 	      errbel, &pstat );
     *status = ERR__OPTER;
@@ -196,13 +197,13 @@ void err1Flush ( int * errbel, int * status ) {
     } else if (istat != SAI__OK) {
 
       /* Construct the output line */
-      one_strlcpy( line, tabs, sizeof(line), &ostat );
+      star_strlcpy( line, tabs, sizeof(line) );
 
       if (oplen > 0) {
-	/* Do not need msg1Putc here because we are just appending
-	   the message to the tab and there is no possibility of overrun
-	   if ERR__SZMSG matches EMS__SZMSG */
-	one_strlcat( line, opstr, sizeof(line), &ostat );
+        /* Do not need msg1Putc here because we are just appending
+           the message to the tab and there is no possibility of overrun
+           if ERR__SZMSG matches EMS__SZMSG */
+        star_strlcat( line, opstr, sizeof(line) );
       }
 
       /* Continue to print messages regardless of output errors. */
@@ -211,7 +212,7 @@ void err1Flush ( int * errbel, int * status ) {
 
       /* Only the first message of a flush has '!! ' prepended.
        *        Subsequent messages have '!  ' */
-      one_strlcpy( tabs, "!  ", sizeof(tabs), &ostat );
+      star_strlcpy( tabs, "!  ", sizeof(tabs) );
 
       continue;
     } else {
