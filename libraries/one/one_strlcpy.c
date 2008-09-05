@@ -51,10 +51,13 @@
 *        Initial version.
 *     2008-07-10 (TIMJ):
 *        Trap null pointers.
+*     2008-09-05 (TIMJ):
+*        Use starutil to get strlcpy function.
 
 *  Notes:
 *     - This is for use from C only. 
-*     - If available the system strlcpy routine will be used.
+*     - Use starutil's star_strlcat if you can not use the Starlink error
+*       system. 
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -88,19 +91,11 @@
 
 #include "ems.h"
 #include "one.h"
+#include "star/util.h"
 #include "one_err.h"
 #include "sae_par.h"
 
 #include <stdlib.h>
-
-/* Use local or remote strlcpy */
-#if HAVE_STRLCPY
-#  include <string.h>
-#else
-size_t strlcpy( char * dst, const char * src, size_t size);
-#include "strlcpy.c"
-#endif
-
 
 size_t
 one_strlcpy( char * dest, const char * src, size_t size, int * status ) {
@@ -125,7 +120,7 @@ one_strlcpy( char * dest, const char * src, size_t size, int * status ) {
   }
 
   /* BSD function */
-  retval = strlcpy( dest, src, size );
+  retval = star_strlcpy( dest, src, size );
 
   if (retval >= size) {
     *status = ONE__TRUNC;

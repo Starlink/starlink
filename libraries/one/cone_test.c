@@ -54,7 +54,7 @@
 #define ONEBUFSIZ 15
 
 int
-main () {
+main ( void ) {
 
   size_t len;
   char src1[] = "0123456789";

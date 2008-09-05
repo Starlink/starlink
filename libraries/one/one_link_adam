@@ -25,6 +25,8 @@
 
 #  Copyright:
 #     Copyright (C) 1995 CCLRC
+#     Copyright	(C) 2008 Science and Technology Facilities Council.
+#     All Rights Reserved.
 
 #  Authors:
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
@@ -41,6 +43,8 @@
 #        Generic version.
 #     28-AUG-2004 (TIMJ):
 #        ADAM version of one_link
+#     5-SEP-2008 (TIMJ):
+#        Add starutil
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -48,7 +52,7 @@
 
 #-
 
-      echo -lone `ems_link_adam` `cnf_link_adam` \
+      echo -lone `ems_link_adam` `cnf_link_adam` `starutil_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

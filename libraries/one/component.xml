@@ -11,7 +11,7 @@
   in other more focussed Starlink libraries.
     </p></abstract>
   <dependencies >
-    <build>sae</build><build>ems</build><build>chr</build><build>cnf</build><link>ems</link><link>cnf</link><link>chr</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>sae</build><build>ems</build><build>cnf</build><build>starutil</build><link>ems</link><link>cnf</link><link>starutil</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
