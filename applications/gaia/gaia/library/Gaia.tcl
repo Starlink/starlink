@@ -2362,19 +2362,12 @@ window gives you access to this."
    #  invoked this method.
    protected method vo_update_siap_ {m index} {
       if { [gaia::GaiaVOTableAccess::check_for_gaiavo] } {
-         utilReUseWidget gaiavo::GaiaVORegistrySearch $w_.siap \
-            -service SIAP -command [code $this vo_updated_siap_]
+         utilReUseWidget gaiavo::GaiaVOCat $w_.siap \
+            -show_cols {shortName title}
       } else {
          #  Grey out menu, no GaiaVO.
          $m entryconfigure $index -state disabled
       }
-   }
-
-   #  Called when an update of the SIAP servers has been made, "msg" is the
-   #  response containing the list of servers in Skycat config format?
-   protected method vo_updated_siap_ {msg} {
-      puts "new SIAP servers"
-      puts $msg
    }
 
    #  Configuration options: (public variables)

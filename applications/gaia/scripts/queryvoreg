@@ -117,7 +117,7 @@ xmlns="http://www.ivoa.net/xml/VOTable/v1.1">
    puts $fid [$resource asXML]
    puts $fid {</VOTABLE>}
    ::close $fid
-   puts stderr "Results written to file: $outfile"
+   puts stdout "Results written to file: $outfile"
    exit 0
 }
 

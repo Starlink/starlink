@@ -112,6 +112,16 @@ itcl::class gaia::GaiaTempName {
 
    #  Get the next temporary name.
    public method get_name {} {
+      return [get_new_name_ $prefix $type]
+   }
+
+   #  Get the next temporary name, but with a different type.
+   public method get_typed_name {tmptype} {
+      return [get_new_name_ $prefix $tmptype]
+   }
+
+   #  Get the next temporary name with the given prefix and type.
+   protected method get_new_name_ {lprefix ltype} {
 
       #  If we need a name for a non-existent file keep looking until
       #  a free name is found.
@@ -119,7 +129,7 @@ itcl::class gaia::GaiaTempName {
       while { $loop } {
          incr unique_
          set loop 0
-         set tmpname [gaia::GaiaTempName::make_name $prefix $unique_ $type]
+         set tmpname [gaia::GaiaTempName::make_name $lprefix $unique_ $ltype]
          if { ! $exists } {
             if { [::file exists $tmpname] } {
                set loop 1

@@ -101,31 +101,26 @@ itcl::class gaiavo::GaiaVOCat {
 
       add_menuitem $m command "Remove selected" \
          {Remove selected rows from the results} \
-         -command [code $this remove_selected] \
-         -state disabled
+         -command [code $this remove_selected]
 
       add_menuitem $m command "Add new row..." \
          {Enter the data for a new row of results} \
-         -command [code $this enter_new_object] \
-         -state disabled
+         -command [code $this enter_new_object]
 
       add_menuitem $m command "Edit selected row..." \
          {Edit the data for the selected row} \
-         -command [code $this edit_selected_object] \
-         -state disabled
+         -command [code $this edit_selected_object]
 
       #  Options menu.
       set m [add_menubutton Options]
 
       add_menuitem $m command "Set Sort Columns..." \
          {Set options for sorting the query results} \
-         -command [code $this sort_dialog] \
-         -state disabled
+         -command [code $this sort_dialog]
 
       add_menuitem $m command "Hide/Show Columns..." \
          {Set options for displaying columns of the query results} \
-         -command [code $this select_columns] \
-         -state disabled
+         -command [code $this select_columns]
 
       add_menuitem $m command "Proxies..."  \
          "Define an HTTP proxy server for use with a firewall." \
@@ -137,7 +132,6 @@ itcl::class gaiavo::GaiaVOCat {
       #  Add the registry query component.
       itk_component add registry {
          gaiavo::GaiaVORegistrySearch $w_.registry \
-            -debug $itk_option(-debug) \
             -feedbackcommand  [code $this set_feedback] \
             -astrocat [code $w_.cat] \
             -command [code $this query_done]
@@ -160,13 +154,12 @@ itcl::class gaiavo::GaiaVOCat {
       }
       pack $itk_component(results) -side top -fill both -expand 1
       bind $itk_component(results).listbox <ButtonRelease-1> \
-         [code $this select_result_row]
+         [code $this select_result_row_]
 
       add_short_help $itk_component(results) \
          {Query results: {bitmap b1} = select object, \
              double click {bitmap b1} = label object, \
              {bitmap dragb2} = scroll list}
-
 
       #  Add the dialog button frame and the action buttons.
       itk_component add buttons {
@@ -329,7 +322,7 @@ itcl::class gaiavo::GaiaVOCat {
    }
 
    # This method is called when the background query is done.
-   public method query_done {status result} {
+   public method query_done {result} {
       set_state normal
 
       if { ! [file exists $result] } {
@@ -348,6 +341,12 @@ itcl::class gaiavo::GaiaVOCat {
             #  Update table.
             $itk_component(results) config -headings $headings_
 
+            #  Initial show columns.
+            if { $itk_option(-show_cols) != {} } {
+               $itk_component(results) set_options $headings_ Show 0
+               $itk_component(results) set_options $itk_option(-show_cols) Show 1
+            }
+
             if { "$prev_headings" != "$headings_" } {
                $itk_component(results) update_options
             }
@@ -356,6 +355,7 @@ itcl::class gaiavo::GaiaVOCat {
 
             $itk_component(results) config \
                -title "Returned [$itk_component(results) total_rows] rows"
+
          }
       }
    }
@@ -375,6 +375,12 @@ itcl::class gaiavo::GaiaVOCat {
 
       $itk_component(registry) query
    }
+
+   #  Row is selected.
+   protected method select_result_row_ {} {
+      puts "row selected, do something..."
+   }
+
 
    #  Respond to feedback about query progress (stop and start).
    protected method set_feedback {onoff} {
@@ -409,8 +415,8 @@ itcl::class gaiavo::GaiaVOCat {
    #  means root).
    itk_option define -catalogdir catalogDir CatalogDir {}
 
-   #  Flag: if true, run queries in foreground for better debugging.
-   itk_option define -debug debug Debug 0
+   #  Columns to show. Defined once during initialisation.
+   itk_option define -show_cols show_cols Show_Cols {}
 
    #  Command to execute when a query is completed.
 

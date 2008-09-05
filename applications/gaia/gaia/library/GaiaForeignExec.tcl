@@ -87,7 +87,7 @@
 #  Copyright:
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-#     Copyright (C) Science and Technology Facilities Council.
+#     Copyright (C) 2008 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -189,6 +189,12 @@ itcl::class gaia::GaiaForeignExec {
       set delete_sometime_ 1
    }
 
+   #  Delete the application immediately.
+   method delete_now {} {
+      set delete_sometime_ 1
+      set forret_($this) {}
+   }
+
    #  Execute the next command on the queue.
    private method run_next_command_ {} {
       set args [$command_queue_ pop]
@@ -208,7 +214,7 @@ itcl::class gaia::GaiaForeignExec {
                          -onoutput \[code $this inform_\] \
                          -onerror \[code $this error_\] \
                          $application $args"} msg
-         if { $msg != {} } {
+         if { $msg != {} && $msg != 0 } {
             error_ "$msg (bgexec): $::errorInfo"
          }
          command_completed_

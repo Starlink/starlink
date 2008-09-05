@@ -84,14 +84,12 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       eval itk_initialize $args
 
       #  Handler for temporary files.
-      set tempcats_ [gaia::GaiaTempName \#auto \
-                        -prefix GaiaVORegistry \
+      set tempcats_ [gaia::GaiaTempName \#auto -prefix GaiaVORegistry \
                         -type ".TAB"]
 
+      #  Display the registry. XXX Can edit during testing.
       set lwidth 10
       set vwidth 50
-
-      #  Display the registry. XXX Can edit during testing.
       itk_component add registry {
          LabelEntry $w_.registry \
             -text "Registry:" \
@@ -126,12 +124,7 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       }
       pack $itk_component(predicate) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(predicate)  \
-         {Simple predicate to qualify query, e.g. "title like '%galex%'"}
-
-      #  Create an object for running interruptable queries.
-      Batch $w_.batch \
-         -command [code $this query_done_] \
-         -debug $itk_option(-debug)
+         {Simple predicate to qualify query, e.g. "title LIKE '%%galex%%'"}
    }
 
    #  Destructor:
@@ -145,87 +138,66 @@ itcl::class gaiavo::GaiaVORegistrySearch {
 
    #  Do the query as a batch job.
    public method query {} {
+
+      #  Query starts, so might want to do something.
       if { $itk_option(-feedbackcommand) != {} } {
          eval $itk_option(-feedbackcommand) on
       }
-      
-      #cmdtrace on noeval notruncate
 
-      $w_.batch bg_eval [code $this do_query_]
+      #  Establish object to run the query script.
+      if { $querytask_ == {} } {
+         set querytask_ [gaia::GaiaForeignExec \#auto \
+                            -application $::gaia_dir/queryvoreg \
+                            -notify [code $this query_done_]]
+      }
+
+      puts "registry = $itk_option(-registry)"
+      puts "predicate = $itk_option(-predicate)"
+      puts "service = $service_"
+      puts "endmethod = $itk_option(-endmethod)"
+
+      set votable_ [$tempcats_ get_typed_name ".vot"]
+
+      puts "$querytask_ runwith $itk_option(-registry) $service_ \
+         $itk_option(-predicate) $itk_option(-endmethod) $votable_"
+
+      $querytask_ runwith $itk_option(-registry) $service_ \
+         $itk_option(-predicate) $itk_option(-endmethod) $votable_
    }
 
    #  Interrupt the query.
    public method interrupt {} {
-      $w_.batch interrupt
-   }
-
-   #  Query the registry.
-   protected method do_query_ {} {
-
-      #  Using http from Tcl core, so fix to use the standard proxy settings.
-      #  Do this each time to access new settings.
-      set_proxy_
-      
-      #  Access the service and get its WSDL description.
-      set def [::WS::Client::GetAndParseWsdl $itk_option(-registry) \
-                  {} VORegistry]
-      
-      #  Set query dictionary.
-      set inputs [list "predicate" "$itk_option(-predicate)" \
-                     "capability" "$service_"]
-      
-      #  Do the query.
-      set results [::WS::Client::DoRawCall VORegistry \
-                      $itk_option(-endmethod) $inputs]
-      
-      #  Parse results and access the SOAP message body.
-      ::dom parse -keepEmpties $results doc
-      $doc documentElement top
-      set xns {
-         ENV "http://schemas.xmlsoap.org/soap/envelope/"
-         xsi "http://www.w3.org/2001/XMLSchema-instance"
-         xs "http://www.w3.org/2001/XMLSchema"
+      if { $querytask_ != {} } {
+         $querytask_ delete_now
       }
-      $doc selectNodesNamespaces $xns
-      set body [$top selectNodes ENV:Body]
-      
-      #  Locate RESOURCE and save in a skeletal VOTable as a string.
-      set resource [$body getElementsByTagName RESOURCE]
-      if { $resource != {} } {
-         set votstr {<VOTABLE version="1.1"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:schemaLocation="http://www.ivoa.net/xml/VOTable/v1.1 http://www.ivoa.net/xml/VOTable/v1.1"
-            xmlns="http://www.ivoa.net/xml/VOTable/v1.1">
-            <!--
-            !  VOTable written by GAIA
-            !-->
-         }
-         append votstr [$resource asXML]
-         append votstr {</VOTABLE>}
-         
-         #  Read into a VOTable.
-         set votable [gaiavotable::read $votstr]
-         
-         #  Convert to a TST file. 
-         set filename [$tempcats_ get_name]
-         set tst [gaiavotable::save $votable 0 $filename]
-         gaiavotable::close $votable
-         
-         return $filename
-      }
-      return {}
-   }
-
-   #  Called when the query completes.
-   protected method query_done_ {status args} {
-
-      puts "status = $status, args = $args"
-
       if { $itk_option(-feedbackcommand) != {} } {
          eval $itk_option(-feedbackcommand) off
       }
+
+   }
+
+   #  Called when the query completes.
+   protected method query_done_ {} {
+
+      #  Immediate notification we're finished.
+      if { $itk_option(-feedbackcommand) != {} } {
+         eval $itk_option(-feedbackcommand) off
+      }
+
+      #  Check file exists.
+      if { ! [::file exists $votable_] } {
+         warning_dialog "Failed to query registry"
+         return
+      }
+
+      #  Convert to a TST file so we can open it up.
+      set vot [gaiavotable::open $votable_]
+      set filename [$tempcats_ get_name]
+      set tst [gaiavotable::save $vot 0 $filename]
+      gaiavotable::close $vot
+
       if { $itk_option(-command) != {} } {
-         eval $itk_option(-command) $status $args
+         eval $itk_option(-command) $filename
       }
    }
 
@@ -234,20 +206,6 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       if { [info exists services_($itk_option(-service))] } {
          set service_ $services_($itk_option(-service))
       }
-   }
-
-   #  Set the proxy server, if needed. Uses the http_proxy environment
-   #  variable.
-   protected method set_proxy_ {} {
-      set proxy {}
-      set port {}
-      if { [info exists ::env(http_proxy)] } {
-         if { [scan $::env(http_proxy) {http://%[^:/]:%d} proxy port] != 2 } {
-            scan $::env(http_proxy) {http://%[^:/]} proxy
-         }
-      }
-      ::http::config -proxyhost $proxy
-      ::http::config -proxyport $port
    }
 
    #  Configuration options: (public variables)
@@ -274,9 +232,6 @@ itcl::class gaiavo::GaiaVORegistrySearch {
    #  Command to execute when batch jobs starts and stops.
    itk_option define -feedbackcommand feedbackcommand FeedBackCommand {}
 
-   #  Whether to run batch command in foreground for debugging.
-   itk_option define -debug debug Debug 0
-
    #  An astrocat instance for handling the result as a TST.
    itk_option define -astrocat astrocat AstroCat {}
 
@@ -288,6 +243,12 @@ itcl::class gaiavo::GaiaVORegistrySearch {
 
    #  Temporary files.
    protected variable tempcats_ {}
+
+   #  Name of the VOTable from query.
+   protected variable votable_ {}
+
+   #  Task controlling querys.
+   protected variable querytask_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
