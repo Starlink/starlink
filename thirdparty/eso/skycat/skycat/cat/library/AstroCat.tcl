@@ -299,7 +299,7 @@ itcl::class cat::AstroCat {
 	    $m add separator
 	}
 	add_menuitem $m command "Proxies..."  \
-	    "Define an HTTP proxy server for use with a firewall." \
+	    "Define an HTTP proxy server." \
 	    -command [code cat::AstroCat::proxies]
 	check_proxies
 
