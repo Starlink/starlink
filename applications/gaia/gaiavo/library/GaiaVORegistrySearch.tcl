@@ -161,6 +161,7 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       puts "$querytask_ runwith $itk_option(-registry) $service_ \
          $itk_option(-predicate) $itk_option(-endmethod) $votable_"
 
+      set interrupted_ 0
       $querytask_ runwith $itk_option(-registry) $service_ \
          $itk_option(-predicate) $itk_option(-endmethod) $votable_
    }
@@ -168,7 +169,9 @@ itcl::class gaiavo::GaiaVORegistrySearch {
    #  Interrupt the query.
    public method interrupt {} {
       if { $querytask_ != {} } {
-         $querytask_ delete_now
+         set interrupted_ 1
+         catch {$querytask_ delete_now}
+         set querytask_ {}
       }
       if { $itk_option(-feedbackcommand) != {} } {
          eval $itk_option(-feedbackcommand) off
@@ -182,6 +185,11 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       #  Immediate notification we're finished.
       if { $itk_option(-feedbackcommand) != {} } {
          eval $itk_option(-feedbackcommand) off
+      }
+
+      if { $interrupted_ } {
+         info_dialog "Query interrupted"
+         return
       }
 
       #  Check file exists.
@@ -249,6 +257,9 @@ itcl::class gaiavo::GaiaVORegistrySearch {
 
    #  Task controlling querys.
    protected variable querytask_ {}
+
+   #  Set true when a query is being interrupted.
+   protected variable interrupted_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------

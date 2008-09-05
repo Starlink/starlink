@@ -184,7 +184,7 @@ itcl::class gaiavo::GaiaVOCat {
       }
       pack $itk_component(stop) -side left -expand 1 -pady 2m
       add_short_help $itk_component(stop) \
-         {{bitmap b1} = interrupt the current catalogue operation}
+         {{bitmap b1} = interrupt the current operation}
 
       itk_component add close {
          button $itk_component(buttons).close \

@@ -192,6 +192,7 @@ itcl::class gaia::GaiaForeignExec {
    #  Delete the application immediately.
    method delete_now {} {
       set delete_sometime_ 1
+      set deleted_ 1
       set forret_($this) {}
    }
 
@@ -207,6 +208,7 @@ itcl::class gaia::GaiaForeignExec {
          set forerr_($this) {}
          set forout_($this) {}
          set msg {}
+         set deleted_ 0
          catch {eval "blt::bgexec \[scope forret_($this)\] \
                          -keepnewline $keepnewlines \
                          -error \[scope forerr_($this)\] \
@@ -214,7 +216,7 @@ itcl::class gaia::GaiaForeignExec {
                          -onoutput \[code $this inform_\] \
                          -onerror \[code $this error_\] \
                          $application $args"} msg
-         if { $msg != {} && $msg != 0 } {
+         if { $msg != {} && $msg != 0 && !$deleted_ } {
             error_ "$msg (bgexec): $::errorInfo"
          }
          command_completed_
@@ -410,6 +412,9 @@ itcl::class gaia::GaiaForeignExec {
 
    #  Whether to show the output or not.
    protected variable show_output_ 0
+
+   #  True when process is deleted. Ignore any errors that result.
+   protected variable deleted_ 0
 
    #  Common variables (shared between all instances):
    #  ------------------------------------------------
