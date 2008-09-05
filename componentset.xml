@@ -1556,7 +1556,7 @@ package.
 </component>
 
 <component id="smurf">
-  <version>0.3.2</version>
+  <version>0.4.1</version>
   <path>applications/smurf</path>
   <description>SURF2 - SCUBA-2 User Reduction Facility</description>
   <abstract><p>
@@ -1866,6 +1866,37 @@ to handle data from a variety of different instruments.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
+
+<component id="gaia" support="S">
+  <version>4.1-0</version>
+  <path>applications/gaia</path>
+  <description>GAIA - Graphical Astronomy and Image Analysis</description>
+  <abstract><p>
+GAIA is an image display and analysis tool for astronomy. It provides the
+usual facilities of image display tools, plus more astronomically useful ones
+such as aperture &amp; optimal photometry, contouring, source detection, surface
+photometry, arbitrary region analysis, celestial coordinate readout,
+calibration and modification, grid overlays, blink comparison, defect patching
+and the ability to query on-line (WWW) catalogues.
+</p></abstract>
+  <dependencies >
+    <build>pcs</build><build option='link'>ard</build><build option='link'>atl</build><build option='link'>ast</build><build option='link'>blt</build><build option='link'>cat</build><build option='link'>cfitsio</build><build option='link'>generic</build><build option='link'>fio</build><build option='link'>img</build><build option='link'>itcl</build><build option='link'>pcs</build><build option='link'>pda</build><build option='link'>sae</build><build option='link'>skycat</build><build option='link'>startcl</build><build option='link'>sla</build><build option='link'>tcl</build><build option='link'>tclx</build><build option='link'>tk</build><build option='link'>tcllibs</build><sourceset>star2html</sourceset><configure>tcl</configure><configure>tk</configure><configure>blt</configure><configure>itcl</configure><use>convert</use><use>esp</use><use>extractor</use><use>kappa</use><use>photom</use><use>polpack</use><use>startcl</use><use>tcl</use><use>tk</use><use>blt</use><use>tclx</use><use>tcllibs</use><use>skycat</use><use>tkimg</use><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Peter W. Draper</name>
+      <uname>pwd</uname>
+      <email>p.w.draper@durham.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <documentation> sun214</documentation>
+  <bugreports>gaia@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
+</component>
 
 <component id="sc2">
   <version>3</version>
@@ -4989,6 +5020,43 @@ No longer under active control.
 </component>
 
 <component id="ems" support="S">
+  <version>2.1-2</version>
+  <path>libraries/ems</path>
+  <description>EMS -- Error Message Service</description>
+  <abstract><p>The purpose of EMS is to provide facilities for
+      constructing and storing error messages for future delivery to
+      the user -- usually via the Starlink Error Reporting System, ERR
+      (see SUN/104).  EMS can be regarded as a simplified version of
+      ERR without the binding to any software environment (e.g., for
+      message output or access to the parameter and data
+      systems).</p></abstract>
+  <dependencies >
+    <build>sae</build><build>cnf</build><build>starmem</build><link>cnf</link><link>starmem</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P C T Rees</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+      <role>owner</role>
+    </person>  </developers>
+  <documentation> ssn4</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
+</component>
+
+<component id="ems" support="S">
   <version>2.2-0</version>
   <path>libraries/ems</path>
   <description>EMS -- Error Message Service</description>
@@ -5472,7 +5540,37 @@ Ultrix and for SunOS and may still work for them.
       used specifically for reporting error messages.</p>
   </abstract>
   <dependencies >
-    <build>cnf</build><build>ems</build><build>one</build><build>sae</build><build>psx</build><link>chr</link><link>ems</link><link>one</link><link>psx</link><sourceset>messgen</sourceset><sourceset>messgen</sourceset><sourceset>star2html</sourceset>
+    <build>cnf</build><build>ems</build><build>sae</build><build>psx</build><link>chr</link><link>ems</link><link>psx</link><sourceset>messgen</sourceset><sourceset>messgen</sourceset><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P C T Rees</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun104</documentation> 
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
+<component id="mers" support="U">
+  <version>1.8-2</version>
+  <path>libraries/mers</path>
+  <description>Message and Error Reporting Systems</description>
+  <abstract><p>This package contains two Fortran subroutine libraries,
+      MSG and ERR, which can be used to provide informational text to
+      the user from any application program.  It also contains a
+      preliminary C interface for the two libraries -- this may be
+      subject to change in the light of experience.</p>
+    <p>The Message Reporting System, MSG, is used for reporting
+      non-error information and the Error Reporting System, ERR, is
+      used specifically for reporting error messages.</p>
+  </abstract>
+  <dependencies >
+    <build>cnf</build><build>ems</build><build>starutil</build><build>sae</build><build>psx</build><link>chr</link><link>ems</link><link>starutil</link><link>psx</link><sourceset>messgen</sourceset><sourceset>messgen</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -5591,7 +5689,7 @@ Ultrix and for SunOS and may still work for them.
   in other more focussed Starlink libraries.
     </p></abstract>
   <dependencies >
-    <build>sae</build><build>ems</build><build>chr</build><build>cnf</build><link>ems</link><link>cnf</link><link>chr</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>sae</build><build>ems</build><build>cnf</build><build>starutil</build><link>ems</link><link>cnf</link><link>starutil</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -6167,6 +6265,28 @@ Ultrix and for SunOS and may still work for them.
   </developers>
   <documentation></documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
+<component id="starutil" support="U">
+  <version>0.1-1</version>
+  <path>libraries/starutil</path>
+  <description>Low level utility C routines</description>
+  <abstract><p> This library is a set of low-level C utility routines.
+   They deliberately do not require any other Starlink software and do not
+   use Starlink status handling. This is simply somewhere to put useful C
+   functions.
+    </p></abstract>
+  <dependencies >
+    
+  </dependencies>
+  <developers>
+    <person>
+      <name>Tim Jenness</name>
+      <uname>timj</uname>
+    </person>
+  </developers>
+  <documentation></documentation>
+  <bugreports>t.jenness@jach.hawaii.edu</bugreports>
 </component>
 
 <component id="trn" support="S">
