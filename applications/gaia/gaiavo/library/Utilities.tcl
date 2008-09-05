@@ -44,6 +44,9 @@ if {![llength [info command dict]]} {
 package require log
 package require tdom
 
+#  Uncomment to see debug messages.
+#::log::lvSuppress debug 0
+
 namespace eval ::WS {}
 
 namespace eval ::WS::Utils {
@@ -1235,7 +1238,10 @@ proc ::WS::Utils::processImport {mode baseUrl importNode serviceName serviceInfo
             unset token
         }
         http {
-            puts "url = $url"
+
+            #  Don't process any external schemas, not that important.
+            return
+
             set token [::http::geturl $url]
             ::http::wait $token
             set ncode [::http::ncode $token]
