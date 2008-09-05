@@ -139,11 +139,36 @@ itcl::class gaiavo::GaiaVOCat {
       pack $itk_component(registry) -side top -fill both -expand 1
       add_short_help $itk_component(registry) {Controls to set registry query}
 
+      #  Controls for the query.
+      itk_component add querybuttons {
+         frame $w_.querybuttons -borderwidth 2 -relief raised
+      }
+      pack $itk_component(querybuttons) -side top -fill x
+
+      itk_component add query {
+         button $itk_component(querybuttons).query \
+            -text "Query" \
+            -command [code $this query]
+      }
+      pack $itk_component(query) -side left -expand 1 -pady 2m
+      add_short_help $itk_component(query) \
+         {{bitmap b1} = start catalogue query}
+
+      itk_component add interrupt {
+         button $itk_component(querybuttons).interrupt \
+            -text "Interrupt" \
+            -state disabled \
+            -command [code $this interrupt]
+      }
+      pack $itk_component(interrupt) -side left -expand 1 -pady 2m
+      add_short_help $itk_component(interrupt) \
+         {{bitmap b1} = interrupt the registry query}
+
       #  Add the table for displaying the query results.
       itk_component add results {
          QueryResult $w_.results \
             -astrocat [code $w_.cat] \
-            -title "Search Results" \
+            -title "Query Results" \
             -hscroll 1 \
             -height 12 \
             -sortcommand [code $this set_sort_cols] \
@@ -166,25 +191,6 @@ itcl::class gaiavo::GaiaVOCat {
          frame $w_.buttons -borderwidth 2 -relief raised
       }
       pack  $itk_component(buttons) -side top -fill x
-
-      itk_component add search {
-         button $itk_component(buttons).search \
-            -text "Search" \
-            -command [code $this search]
-      }
-      pack $itk_component(search) -side left -expand 1 -pady 2m
-      add_short_help $itk_component(search) \
-         {{bitmap b1} = start catalogue search}
-
-      itk_component add stop {
-         button $itk_component(buttons).stop \
-            -text "Stop" \
-            -state disabled \
-            -command [code $this interrupt]
-      }
-      pack $itk_component(stop) -side left -expand 1 -pady 2m
-      add_short_help $itk_component(stop) \
-         {{bitmap b1} = interrupt the current operation}
 
       itk_component add close {
          button $itk_component(buttons).close \
@@ -232,7 +238,7 @@ itcl::class gaiavo::GaiaVOCat {
          cat::CatalogInfo::save {} $w_ 0
          $itk_component(results) config -sort_cols $sort_cols \
             -sort_order $sort_order
-         search
+         query
       }
    }
 
@@ -264,18 +270,18 @@ itcl::class gaiavo::GaiaVOCat {
 
       # update the display
       clear
-      search
+      query
    }
 
    #  Pop up a dialog to enter the data for a new row.
    public method enter_new_object {} {
-      $itk_component(results) enter_new_object [code $this search]
+      $itk_component(results) enter_new_object [code $this query]
    }
 
 
    #  Pop up a window so that the user can edit the selected object(s).
    public method edit_selected_object {} {
-      $itk_component(results) edit_selected_object [code $this search]
+      $itk_component(results) edit_selected_object [code $this query]
    }
 
    #  Open the catalogue for this window.
@@ -300,22 +306,22 @@ itcl::class gaiavo::GaiaVOCat {
       wm iconname $w_ [$w_.cat shortname $name $itk_option(-catalogdir)]
    }
 
-   #  Interrupt the current search.
+   #  Interrupt the current query.
    public method interrupt {} {
       $itk_component(registry) interrupt
       set_feedback off
-      catch {$itk_component(results) config -title "Search Results"}
+      catch {$itk_component(results) config -title "Query Results"}
       set_state normal
    }
 
    #  Set/reset widget states while busy.
    public method set_state {state} {
       if { $state == "normal" } {
-         $itk_component(search) config -state normal
-         $itk_component(stop) config -state disabled
+         $itk_component(query) config -state normal
+         $itk_component(interrupt) config -state disabled
       } else {
-         $itk_component(search) config -state disabled
-         $itk_component(stop) config -state normal
+         $itk_component(query) config -state disabled
+         $itk_component(interrupt) config -state normal
       }
       update idletasks
       $itk_component(progressbar) reset
@@ -360,17 +366,17 @@ itcl::class gaiavo::GaiaVOCat {
       }
    }
 
-   #  Start the catalogue search based on the current search options and
+   #  Start the catalogue query based on the current query options and
    #  display the results in the table.
-   public method search {args} {
+   public method query {args} {
       #  Start the query in the background.
       catch {
-         $itk_component(results) config -title "Searching..."
+         $itk_component(results) config -title "Querying..."
          $itk_component(results) clear
       }
 
       set_state disabled
-      $itk_component(progressbar) config -text "Searching registry..."
+      $itk_component(progressbar) config -text "Querying registry..."
       $itk_component(progressbar) look_busy
 
       $itk_component(registry) query
