@@ -1,0 +1,68 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     starutil_link
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against STARMEM
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building
+#     applications which use STARUTIL in order to generate the correct
+#     arguments for the compiler (or ld) command. The arguments
+#     generated are written to the standard output.
+
+#  Invocation:
+#     The script is normally invoked as part of a compiler command line,
+#     such as:
+#
+#        gcc -o program -L/star/lib `starutil_link` program.c
+
+#  Copyright:
+#     Copyright (C) 1995 Rutherford Appleton Laboratory
+#     Copyright (C) 2008 Science and Technology Facilities Council.
+#     All Rights Reserved.
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     BLY:  M.J. Bly (Starlink, RAL)
+#     AJC:  A.J. Chipperfield (Starlink, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
+#     {enter_new_authors_here}
+
+#  History:
+#     7-JUL-1993 (RFWS):
+#        Original version.
+#     21-JUN-1995 (RFWS):
+#        Added new awk script to permit larger numbers of libraries.
+#     22-JUN-1995 (BLY):
+#        Generic version.
+#     18-JUL-1995 (AJC):
+#        Mod for EMS
+#     12-MAR-2001 (AJC):
+#        Mod for C EMS
+#      6-Aug-2001 (AJC):
+#        Add the Conly argument
+#     13-Aug-2001 (AJC):
+#        EMS now two libraries
+#     09-Feb-2006 (TIMJ):
+#        Create for starmem
+#     04-Sep-2008 (TIMJ):
+#        Modify for starutil
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+      echo -lstarutil \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+
+#  End of script.

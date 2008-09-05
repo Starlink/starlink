@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="starutil" support="U">
+  <version>0.1-1</version>
+  <path>libraries/starutil</path>
+  <description>Low level utility C routines</description>
+  <abstract><p> This library is a set of low-level C utility routines.
+   They deliberately do not require any other Starlink software and do not
+   use Starlink status handling. This is simply somewhere to put useful C
+   functions.
+    </p></abstract>
+  <dependencies >
+    
+  </dependencies>
+  <developers>
+    <person>
+      <name>Tim Jenness</name>
+      <uname>timj</uname>
+    </person>
+  </developers>
+  <documentation></documentation>
+  <bugreports>t.jenness@jach.hawaii.edu</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
