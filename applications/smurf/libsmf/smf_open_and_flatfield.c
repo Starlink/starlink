@@ -187,17 +187,20 @@ void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
   if (*status == SAI__OK) {
     smf_open_file( igrp, index, "READ", 0, &data, status);
     if ( *status != SAI__OK) {
-      errRep("", "Unable to open input file(s)", status);
+      errRep("", FUNC_NAME ": Unable to open input file(s)", status);
     }
   }
 
   /* Open the output file for write. If the output grp is NULL then
-     ffdata is returned NULL. Use UPDATE mode to retain components such as WCS */
+     ffdata is returned NULL. Use UPDATE mode to retain components
+     such as WCS */
+
   if (*status == SAI__OK) {
     /* Returns without action if ogrp is not defined */
     smf_open_file( ogrp, index, "UPDATE", 0, ffdata, status);
     if ( *status == SAI__ERROR) {
-      errRep("", "Unable to open output flatfielded file(s)", status);
+      errRep("", FUNC_NAME ": Unable to open output flatfielded file(s)", 
+             status);
     }
 
     /* Propagate provenance to the output. We always have to run this
@@ -240,7 +243,8 @@ void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
                                             sizeof(double), status );
         (*ffdata)->dtype = SMF__DOUBLE;
       } else {
-        errRep(FUNC_NAME, "Error: unable to allocate memory for new smfData", 
+        errRep( "", FUNC_NAME 
+                ": Error, unable to allocate memory for new smfData", 
                status);
       }
     }
