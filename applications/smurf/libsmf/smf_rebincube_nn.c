@@ -182,6 +182,8 @@
 *     12-FEB-2008 (DSB):
 *        Modify the way that good Tsys values are cheked for so that 
 *        data that falls outside the otuput cube is included in the check.
+*     12-FEB-2008 (DSB):
+*        Update naccept when using a 3D weights array.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -241,6 +243,11 @@ void smf_rebincube_nn( smfData *data, int first, int last,
    AstMapping *totmap = NULL;  /* WCS->GRID Mapping from input WCS FrameSet */
    const char *name = NULL;    /* Pointer to current detector name */
    const double *tsys = NULL;  /* Pointer to Tsys value for first detector */
+   dim_t gxout;                /* Output X grid index */
+   dim_t gyout;                /* Output Y grid index */
+   dim_t ichan;                /* Input channel index */
+   dim_t idet;                 /* detector index */
+   dim_t itime;                /* Index of current time slice */
    dim_t nchanout;             /* No of spectral channels in the output */
    dim_t timeslice_size;       /* No of detector values in one time slice */
    double *detxin = NULL;      /* Work space for input X grid coords */
@@ -253,21 +260,16 @@ void smf_rebincube_nn( smfData *data, int first, int last,
    float *ddata = NULL;        /* Pointer to start of input detector data */
    float *tdata = NULL;        /* Pointer to start of input time slice data */
    float *work = NULL;         /* Pointer to start of work array */
-   int *specpop = NULL;        /* Input channels per output channel */
    float teff;                 /* Effective integration time */
    float texp;                 /* Total time ( = ton + toff ) */
    int *nexttime;              /* Pointer to next time slice index to use */
+   int *specpop = NULL;        /* Input channels per output channel */
    int *spectab = NULL;        /* I/p->o/p channel number conversion table */
    int found;                  /* Was current detector name found in detgrp? */
-   int ichan;                  /* Input channel index */
+   int ignore;                 /* Ignore this time slice? */
+   int iv0;                    /* Offset for pixel in 1st o/p spectral channel */
    int naccept_old;            /* Previous number of accepted spectra */
    int ochan;                  /* Output channel index */
-   int gxout;                  /* Output X grid index */
-   int gyout;                  /* Output Y grid index */
-   int idet;                   /* detector index */
-   int ignore;                 /* Ignore this time slice? */
-   int itime;                  /* Index of current time slice */
-   int iv0;                    /* Offset for pixel in 1st o/p spectral channel */
    smfHead *hdr = NULL;        /* Pointer to data header for this time slice */
 
    static int *pop_array = NULL;/* I/p spectra pasted into each output spectrum */
@@ -290,8 +292,8 @@ void smf_rebincube_nn( smfData *data, int first, int last,
    contributions from one and only one input channel in each input file. 
    Create an array with an element for each output channel, holding the 
    number of input channels that contribute to the output channel. */
+   nchanout = dim[ 2 ];
    if( is2d ) {
-      nchanout = dim[ 2 ];
       specpop = astMalloc( nchanout*sizeof( int ) );
       memset( specpop, 0, nchanout*sizeof( int ) );
       for( ichan = 0; ichan < nchan; ichan++ ) {
@@ -370,7 +372,7 @@ void smf_rebincube_nn( smfData *data, int first, int last,
 
 /* If this time slice is not being pasted into the output cube, pass on. */
       if( nexttime ){
-         if( *nexttime != itime ) continue;
+         if( *nexttime != (int) itime ) continue;
          nexttime++;
       }
 
@@ -471,6 +473,7 @@ void smf_rebincube_nn( smfData *data, int first, int last,
                                             wgt, genvar, invar, ddata, 
                                             data_array, var_array, 
                                             wgt_array, nused, status );
+                     (*naccept)++;
                   }
 
 /* Now we update the total and effective exposure time arrays for the
