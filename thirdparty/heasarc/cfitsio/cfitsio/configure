@@ -3386,31 +3386,31 @@ SHLIB_SUFFIX=".so"
 lhea_shlib_cflags=
 case $EXT in
   cygwin)
-    SHLIB_LD="$CC -shared"
+    SHLIB_LD="$CC -shared $CFLAGS"
     SHLIB_SUFFIX=".dll"
     ;;
   darwin)
-    SHLIB_LD="$CC -dynamiclib"
+    SHLIB_LD="$CC -dynamiclib $CFLAGS"
     SHLIB_SUFFIX=".dylib"
     lhea_shlib_cflags="-fPIC -fno-common"
     ;;
   hpu)
-    SHLIB_LD="ld -b"
+    SHLIB_LD="ld -b $LDFLAGS"
     SHLIB_SUFFIX=".sl"
     ;;
   lnx)
     SHLIB_LD=":"
     ;;
   osf)
-    SHLIB_LD="ld -shared -expect_unresolved '*'"
+    SHLIB_LD="ld -shared -expect_unresolved '*' $LDFLAGS"
     LD_FLAGS="-taso"
     ;;
   sol)
-    SHLIB_LD="/usr/ccs/bin/ld -G"
+    SHLIB_LD="/usr/ccs/bin/ld -G $LDFLAGS"
     lhea_shlib_cflags="-KPIC"
     ;;
   sgi)
-    SHLIB_LD="ld -shared -rdata_shared"
+    SHLIB_LD="ld -shared -rdata_shared $LDFLAGS"
     ;;
   *)
     { echo "$as_me:$LINENO: WARNING: Unable to determine how to make a shared library" >&5
@@ -3420,7 +3420,7 @@ esac
 # Darwin uses gcc (=cc), but needs different flags (see above)
 # if test "x$GCC" = xyes; then
 if test "x$GCC" = xyes && test "x$EXT" != xdarwin && test "x$EXT" != xcygwin; then
-  SHLIB_LD="$CC -shared"
+  SHLIB_LD="$CC -shared $CFLAGS"
   lhea_shlib_cflags='-fPIC'
 fi
 if test "x$lhea_shlib_cflags" != x; then
