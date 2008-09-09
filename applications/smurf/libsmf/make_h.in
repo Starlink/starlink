@@ -154,7 +154,7 @@ EOF
    ( ( *status == SAI__OK ) ? \\
       *status = SAI__ERROR, \\
       msgSeti( "TYPE", type ), \\
-      errRep( "CUPID_BADTYPE", "Bad data type (^TYPE) used when invoking " \\
+      errRep( "SMURF_BADTYPE", "Bad data type (^TYPE) used when invoking " \\
               "name (internal SMURF programming error).", status),$null:$null ) ) )
 
 EOF
