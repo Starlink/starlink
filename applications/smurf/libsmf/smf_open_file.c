@@ -330,7 +330,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
     if ( indf == NDF__NOID ) {
       if (*status == SAI__OK) *status = SAI__ERROR;
       msgSetc( "FILE", filename );
-      errRep(FUNC_NAME, "Could not locate file ^FILE", status);
+      errRep("", FUNC_NAME ": Could not locate file ^FILE", status);
       return;
     }
     msgSetc( "F", filename );
@@ -403,7 +403,8 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         if ( xloc == NULL ) {
           if ( *status == SAI__OK) {
             *status = SAI__ERROR;
-            errRep(FUNC_NAME, "Unable to obtain an HDS locator to the SCU2RED extension, despite its existence", status);
+            errRep("", FUNC_NAME ": Unable to obtain an HDS locator to the "
+                   "SCU2RED extension, despite its existence", status);
           }
         }
         ndfOpen( xloc, "SCANFIT", "READ", "OLD", &gndf, &place, status );
@@ -411,7 +412,8 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         if ( *status == SAI__OK ) {
           if ( gndf == NDF__NOID ) {
             *status = SAI__ERROR;
-            errRep(FUNC_NAME, "Unable to obtain an NDF identifier for the SCANFIT coefficients", status);
+            errRep("", FUNC_NAME ": Unable to obtain an NDF identifier for "
+                   "the SCANFIT coefficients", status);
           } else {
             /* Read and store the polynomial coefficients */
             ndfMap( gndf, "DATA", "_DOUBLE", "READ", &tpoly[0], &npoly, status );
@@ -514,7 +516,8 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         kpgGtfts( indf, &(hdr->fitshdr), status );
         /* Just continue if there are no FITS headers */
         if ( *status == KPG__NOFTS ) {
-          errRep(FUNC_NAME, "File has no FITS header - continuing but this may cause problems later", status );
+          errRep("", FUNC_NAME ": File has no FITS header - continuing but "
+                 "this may cause problems later", status );
           errAnnul( status );
         }
 
@@ -622,7 +625,8 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
       da = (*data)->da;
       if (*status == SAI__OK && da == NULL) {
         *status = SAI__ERROR;
-        errRep(FUNC_NAME, "Internal programming error. Status good but no DA struct allocated", status);
+        errRep("", FUNC_NAME ": Internal programming error. Status good but "
+               "no DA struct allocated", status);
       }
 
       /* decide if we are storing header information */
@@ -676,12 +680,13 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
         /* and dark squid */
         if (dksquid) {
+
           da->dksquid = smf_malloc( rowsize * nframes, sizeof(*(da->dksquid)), 
                                     0, status );
 
           if (da->dksquid) memcpy( da->dksquid, dksquid,
                                    sizeof(*(da->dksquid)) * rowsize * nframes );
-
+          
         }
 
         /* Create a FitsChan from the FITS headers */
@@ -747,19 +752,22 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           msgSeti( "NC", colsize);
           msgSeti( "DIMS", ndfdims[0]);
           *status = SAI__ERROR;
-          errRep( "smf_open_file", "Number of input columns not equal to the number of output columns (^NC != ^DIMS)",status);
+          errRep( "", FUNC_NAME ": Number of input columns not equal to the "
+                  "number of output columns (^NC != ^DIMS)",status);
         }
         if (ndfdims[1] != (int)rowsize) {
           msgSeti( "NR", rowsize);
           msgSeti( "DIMS", ndfdims[1]);
           *status = SAI__ERROR;
-          errRep( "smf_open_file", "Number of input rows not equal to the number of output rows (^NR != ^DIMS)",status);
+          errRep( "", FUNC_NAME ":Number of input rows not equal to the "
+                  "number of output rows (^NR != ^DIMS)",status);
         }
         if (ndfdims[2] != (int)nframes) {
           msgSeti( "NF", nframes);
           msgSeti( "DIMS", ndfdims[2]);
           *status = SAI__ERROR;
-          errRep( "smf_open_file", "Number of input timeslices not equal to the number of output timeslices (^NF != ^DIMS)",status);
+          errRep( "", FUNC_NAME ": Number of input timeslices not equal to "
+                  "the number of output timeslices (^NF != ^DIMS)",status);
         } else {
           if ( !(flags & SMF__NOCREATE_HEAD) ) {
             hdr->nframes = nframes;
@@ -815,7 +823,8 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         if ( jigvndf == NDF__NOID) {
           if (*status == SAI__OK ) {
             *status = SAI__ERROR;
-            errRep(FUNC_NAME, "Unable to obtain NDF ID for JIGVERT", status);
+            errRep("", FUNC_NAME ": Unable to obtain NDF ID for JIGVERT", 
+                   status);
           }
         } else {
           smf_open_ndf( jigvndf, "READ", filename, SMF__INTEGER, &jigvdata, status);
@@ -825,7 +834,8 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         if ( jigpndf == NDF__NOID) {
           if (*status == SAI__OK ) {
             *status = SAI__ERROR;
-            errRep(FUNC_NAME, "Unable to obtain NDF ID for JIGPATH", status);
+            errRep("", FUNC_NAME ": Unable to obtain NDF ID for JIGPATH", 
+                   status);
           }
         } else {
           smf_open_ndf( jigpndf, "READ", filename, SMF__DOUBLE, &jigpdata, status);
@@ -836,7 +846,8 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         } else {
           if (*status == SAI__OK ) {
             *status = SAI__ERROR;
-            errRep(FUNC_NAME, "smfData for jiggle vertices is NULL", status);
+            errRep("", FUNC_NAME ": smfData for jiggle vertices is NULL", 
+                   status);
           }
         }
         if ( jigpdata != NULL ) {
@@ -845,7 +856,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         } else {
           if (*status == SAI__OK ) {
             *status = SAI__ERROR;
-            errRep(FUNC_NAME, "smfData for SMU path is NULL", status);
+            errRep("", FUNC_NAME ": smfData for SMU path is NULL", status);
           }
         }
 
@@ -886,15 +897,15 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         /* no idea - make this fatal for now */
         steptime = VAL__BADD;
         *status = SAI__ERROR;
-        errRep( " ", "Unable to determine step time from header or "
+        errRep( "", FUNC_NAME ": Unable to determine step time from header or "
                 " from state information", status );
       }
     }
     if (*status == SAI__OK && steptime < VAL__SMLD) {
       *status = SAI__ERROR;
       msgSetd( "STP", steptime);
-      errRep( " ", "Determined a negative steptime (^STP). This can not happen",
-              status);
+      errRep( "", FUNC_NAME ": Determined a negative steptime (^STP). "
+              "This can not happen", status);
       steptime = VAL__BADD;
     }
     hdr->steptime = steptime;
