@@ -35,6 +35,7 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -96,9 +97,10 @@ smf_deepcopy_smfDA( const smfData *old, int * status ) {
   double *flatcal;        /* pointer to flatfield calibration */
   double *flatpar;        /* pointer to flatfield parameters */
   char flatname[SC2STORE_FLATLEN];/* name of flatfield algorithm */
-  int nflat;              /* number of flat coeffs per bol */
-  int nbol;               /* Number of bolometers */
-
+  size_t nflat;           /* number of flat coeffs per bol */
+  size_t nbol;            /* Number of bolometers */
+  size_t ncol;            /* Number of columns */
+  size_t ntslice;         /* NUmber of time slices */
   smfDA *newda = NULL;             /* Pointer to new smfDA struct */
   smfDA *oldda = NULL;             /* Pointer to new smfDA struct */
 
@@ -110,23 +112,25 @@ smf_deepcopy_smfDA( const smfData *old, int * status ) {
   /* Copy elements */
   nflat = oldda->nflat;
 
-  /* Need the number of bolometers */
+  /* Need the number of bolometers, columns and time slices */
   nbol = (old->dims)[0] * (old->dims)[1];
+  ncol = (old->dims)[SMF__COL_INDEX];
+  ntslice = (old->dims)[2];
 
   /* Allocate space for and copy contents of pointers */
-  flatcal = smf_malloc( nbol * nflat, sizeof(double), 0, status );
+  flatcal = smf_malloc( nbol * nflat, sizeof(*flatcal), 0, status );
   if ( flatcal != NULL ) {
-    memcpy( flatcal, oldda->flatcal, sizeof(double)*nbol*nflat );
+    memcpy( flatcal, oldda->flatcal, sizeof(*flatcal)*nbol*nflat );
   }
-  flatpar = smf_malloc( nflat, sizeof(double), 0, status );
+  flatpar = smf_malloc( nflat, sizeof(*flatpar), 0, status );
   if ( flatpar != NULL ) {
-    memcpy( flatpar, oldda->flatpar, sizeof(double)*nflat);
+    memcpy( flatpar, oldda->flatpar, sizeof(*flatpar)*nflat);
   }
 
   if (oldda->dksquid) {
-    dksquid = smf_malloc( (old->dims)[2], sizeof(*dksquid), 0, status );
+    dksquid = smf_malloc( ncol*ntslice, sizeof(*dksquid), 0, status );
     if (dksquid) {
-      memcpy( dksquid, oldda->dksquid, sizeof(*dksquid) * (old->dims)[2] );
+      memcpy( dksquid, oldda->dksquid, sizeof(*dksquid)*ncol*ntslice );
     }
   }
 
