@@ -5,7 +5,7 @@ noinst_LTLIBRARIES = libsmf.la
 
 libsmf_la_SOURCES = $(C_ROUTINES)
 
-CGENERIC_ROUTINES = smf_boxcar1.cgen
+CGENERIC_ROUTINES = smf_boxcar1.cgen smf_templateFit1.cgen
 
 # The .c files which are built from the above .cgen files.
 BUILT_C_ROUTINES = $(CGENERIC_ROUTINES:.cgen=.c)
@@ -24,7 +24,7 @@ smf_open_and_flatfield.c \
 smf_flatfield.c smf_check_flat.c smf_flatten.c \
 smf_clone_data.c smf_scanfit.c smf_get_xloc.c smf_get_ndfid.c \
 smf_create_smfData.c smf_create_smfFile.c smf_create_smfHead.c \
-smf_create_smfDA.c smf_boxcar1.c \
+smf_create_smfDA.c \
 smf_construct_smfFile.c smf_construct_smfHead.c smf_construct_smfDA.c \
 smf_construct_smfData.c smf_deepcopy_smfFile.c \
 smf_deepcopy_smfHead.c smf_deepcopy_smfData.c smf_deepcopy_smfDA.c \
@@ -84,7 +84,7 @@ smf_subtract_dark.c smf_fft_data.c smf_isfft.c \
 smf_obstype_str.c smf_obsmode_str.c smf_calc_mode.c smf_calc_meantau.c \
 smf_grpCopy.c smf_collapse_tseries.c smf_write_smfData.c smf_set_moving.c \
 smf_select_pntr.c smf_get_dims.c smf_flat_standardpow.c \
-smf_flat_responsivity.c smf_flat_write.c \
+smf_flat_responsivity.c smf_flat_write.c smf_clean_dksquid.c \
 $(BUILT_C_ROUTINES)
 
 noinst_INCLUDES = smf.h smf_typ.h
@@ -125,6 +125,11 @@ $(CGENERIC_ROUTINES:.cgen=.c):
 	echo "#undef CGEN_CODE_TYPE" >> $@
 	echo "" >> $@
 	echo "#define CGEN_CODE_TYPE CGEN_FLOAT_TYPE" >> $@
+	echo "#include \"cgeneric_defs.h\"" >> $@
+	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_CODE_TYPE" >> $@
+	echo "" >> $@
+	echo "#define CGEN_CODE_TYPE CGEN_INT_TYPE" >> $@
 	echo "#include \"cgeneric_defs.h\"" >> $@
 	echo "#include \"$(@:.c=.cgen)\"" >> $@
 	echo "#undef CGEN_CODE_TYPE" >> $@

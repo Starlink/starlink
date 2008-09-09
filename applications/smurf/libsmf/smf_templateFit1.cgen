@@ -1,0 +1,218 @@
+/*
+*+
+*  Name:
+*     smf_templateFit1<X>
+
+*  Purpose:
+*     Low-level routine to fit a 1-d template to data using a gain and offset.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     Subroutine
+
+*  Invocation:
+*     void smf_templateFit1<X>( CGEN_TYPE *data, const size_t n, 
+*                               const size_t stride, 
+*                               const double *template, int remove,
+*                               double *gain, double *offset, int *status )
+
+*  Arguments:
+*     data = CGEN_TYPE* (Given)
+*        Pointer to array that contains data to be fit
+*     n = const size_t (Given)
+*        Number of points in the input data
+*     stride = const size_t (Given)
+*        If adjacent data points not stored contiguously, use stride > 1
+*     template = const double* (Given)
+*        1-d array containing template to be fit
+*     remove = int (Given)
+*        If set, remove the fitted template from data
+*     gain = double* (Returned)
+*        If provided return the gain of the fit
+*     offset = double* (Returned)
+*        If provided return the offset of the fit
+*     status = int* (Given and Returned)
+*        Pointer to global status.
+
+*  Description:
+*     This routine fits an array of data points using a 1-d template
+*     by solving the maximum-likelihood values of gain and offset in
+*     the following expression:
+*
+*                 data(t) = gain*template(t) + offset 
+*
+*    Setting the remove flag will cause the fitted model to be
+*    subtracted from data. In this case, for any sample at which the
+*    data and/or template values are VAL__BAD<X>, the value of data at
+*    that sample is set to VAL__BAD<X>. On error gain and offset are
+*    set to VAL__BADD. The fit fails if there are fewer than 3 good
+*    samples, in which case status is set to SMF__INSMP.
+
+*  Notes: 
+
+*  Authors:
+*     Edward Chapin (UBC)
+*     {enter_new_authors_here}
+
+*  History:
+*     2008-09-02 (EC):
+*        Initial version
+*     {enter_further_changes_here}
+
+*  Copyright:
+*     Copyright (C) 2006 University of British Columbia. All Rights
+*     Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 3 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+*/
+
+/* Standard includes */
+#include <stdio.h>
+#include <string.h>
+
+/* Starlink includes */
+#include "sae_par.h"
+#include "ast.h"
+#include "mers.h"
+#include "msg_par.h"
+#include "prm_par.h"
+
+/* SMURF includes */
+#include "smf.h"
+#include "smf_err.h"
+#include "smurf_par.h"
+#include "smurf_typ.h"
+
+/* Simple default string for errRep */
+#define FUNC_NAME "smf_templateFit1"
+
+void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, const size_t n, 
+                                      const size_t stride, 
+                                      const double *template, int remove,
+                                      double *gain, double *offset, 
+                                      int *status ) {
+
+  /* Local variables */
+  double a;                   /* Gain coefficient */
+  double b;                   /* Offset coefficient */
+  size_t off;                 /* offset from loop counter to modified sample */
+  size_t i;                   /* Loop counter */
+  size_t ngood=0;             /* Number of good samples */
+  double s_d=0;               /* Sum of the data points */
+  double s_dt=0;              /* Sum of the data * template */
+  double s_t=0;               /* Sum of the template points */
+  double s_tsq=0;             /* Sum of the squares of the template points */
+
+  /* Check status */
+  if (*status != SAI__OK) return;
+
+  /* Check for valid inputs */
+  if( !data ) {
+    *status = SAI__ERROR;
+    errRep(" ", FUNC_NAME ": possible programming error, data is NULL", status);
+    return;
+  }
+
+  if( !template ) {
+    *status = SAI__ERROR;
+    errRep(" ", FUNC_NAME ": possible programming error, template is NULL", 
+           status);
+    return;
+  }
+
+  /* Initialize gain and offset to bad values */
+  if( gain ) *gain = VAL__BADD;
+  if( offset ) *offset = VAL__BADD;
+
+  if( stride > 1 ) {
+    /* Calculate sums in case of non-contiguous data */
+    off = 0;
+    for( i=0; i<n; i++ ) {
+      if( (data[off] != CGEN_BAD) && (template[i] != VAL__BADD) ) {
+        s_d += data[off];
+        s_dt += data[off]*template[i];
+        s_t += template[i];
+        s_tsq += template[i]*template[i];
+        ngood ++;        
+      }
+      off += stride;
+    }
+  } else {
+    /* Calculate sums in case of contiguous data */
+    for( i=0; i<n; i++ ) {
+      if( (data[i] != CGEN_BAD) && (template[i] != VAL__BADD) ) {
+        s_d += data[i];
+        s_dt += data[i]*template[i];
+        s_t += template[i];
+        s_tsq += template[i]*template[i];
+        ngood ++;        
+      }
+    }
+  }
+
+  if( ngood >= 3 ) {
+    /* Calculate fit coefficients */
+    a = (ngood * s_dt - s_d*s_t) /
+      (n*s_tsq - s_t*s_t);
+
+    b = (s_d*s_tsq - s_t*s_dt) / 
+      (n*s_tsq - s_t*s_t);
+
+    /* Return gain and offset if requested */
+    if( gain ) {
+      *gain = a;
+    }
+
+    if( offset ) {
+      *offset = b;
+    }
+
+    /* Remove fitted templated if requested */
+    if( remove ) {
+      if( stride > 1 ) {
+        off = 0;
+        for( i=0; i<n; i++ ) {
+          if( (data[off] != CGEN_BAD) && (template[i] != VAL__BADD) ) {
+            data[off] -= (CGEN_TYPE) (a*template[i] + b);
+          } else {
+            data[off] = CGEN_BAD;
+          }
+          off += stride;
+        }     
+      } else {
+        for( i=0; i<n; i++ ) {
+          if( (data[i] != CGEN_BAD) && (template[i] != VAL__BADD) ) {
+            data[i] -= (CGEN_TYPE) (a*template[i] + b);
+          } else {
+            data[i] = CGEN_BAD;
+          }
+        }
+      }
+    }
+
+  } else {
+    *status = SMF__INSMP;
+    errRep( " ", FUNC_NAME 
+            ": insufficient good data points (<3) in input arrays", status);
+  }
+}
