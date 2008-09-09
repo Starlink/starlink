@@ -14,11 +14,11 @@
 
 *  Invocation:
 *     smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
-*                          size_t whichchunk, int isTordered, 
-*                   			 AstFrameSet *outfset, int moving, 
-*	        	               int *lbnd_out, int *ubnd_out, dim_t padStart,
-*                          dim_t padEnd, int flags,
-*                  			  smfArray **concat, int *status )
+*                          size_t whichchunk, int isTordered,
+*                          AstFrameSet *outfset, int moving, int
+*                          *lbnd_out, int *ubnd_out, dim_t padStart,
+*                          dim_t padEnd, int flags, smfArray **concat,
+*                          int *status )
 
 *  Arguments:
 *     igrp = smfGroup* (Given)
@@ -111,6 +111,8 @@
 *        Apply darks.
 *     2008-07-29 (TIMJ):
 *        Steptime is now in smfHead.
+*     2008-09-09 (EC):
+*        Concat dark squid signals.
 
 *  Notes:
 *     If projection information supplied, pointing LUT will not be
@@ -180,6 +182,8 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
 
   /* Local Variables */
   dim_t base;                   /* Base for array index */
+  int creflag;                  /* flags for smfData creation */
+  smfDA *da=NULL;               /* Pointer to smfDA struct */
   smfData *data=NULL;           /* Concatenated smfData */
   int flag;                     /* Flag */
   char filename[GRP__SZNAM+1];  /* Input filename, derived from GRP */
@@ -195,7 +199,8 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
   dim_t k;                      /* Loop counter */
   dim_t l;                      /* Loop counter */
   dim_t lastpiece = 0;          /* index to end of whichchunk */
-  dim_t nbolo = 0;              /* Number of detectors */
+  dim_t nbolo=0;                /* Number of detectors */
+  dim_t ncol=0;                 /* Number of columns */
   dim_t ndata;                  /* Total data points: nbolo*tlen */
   dim_t nrelated;               /* Number of subarrays */
   Grp *outgrp=NULL;             /* Pointer to 1-element output group */
@@ -421,8 +426,13 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
               /* Copy first data right after the initial padding */
               tchunk = padStart;
  
-              /* Allocate memory for empty smfData with a smfHead */
-              data = smf_create_smfData( SMF__NOCREATE_DA, status );
+              /* Allocate memory for empty smfData with a smfHead. Create
+                 a DA struct only if the input file has one. */
+
+              if( refdata->da ) creflag = 0;
+              else creflag = SMF__NOCREATE_DA;
+              data = smf_create_smfData( creflag, status );
+              da = data->da;
 
               if( *status == SAI__OK ) {
                 /* Copy over basic header information from the reference */
@@ -472,18 +482,25 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
                   data->dims[0] = refdims[0];
                   data->dims[1] = refdims[1];
                   data->dims[2] = tlen;
+                  ncol = data->dims[SMF__COL_INDEX];
                 } else {
                   data->dims[0] = tlen;
                   data->dims[1] = refdims[0];
                   data->dims[2] = refdims[1];
+                  ncol = data->dims[1+SMF__COL_INDEX];
                 }
                 data->ndims = 3;
 		
                 /* Set the data type and order */
                 data->dtype = refdtype;
                 data->isTordered = isTordered;
-
                 ndata = nbolo*tlen;
+
+                /* Allocate space for dksquid array. Ignore other DA for now*/
+                if( da ) {
+                  da->dksquid = smf_malloc( ncol*tlen, sizeof(*(da->dksquid)),
+                                            0, status );
+                }
 
                 /* Un-set havearray values corresponding to flags */
                 havearray[0] = havearray[0] && !(flags&SMF__NOCREATE_DATA);
@@ -565,7 +582,6 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
                       reftlen*sizeof(*hdr->allState) );
 
               /* Copy LUT */
-
               if( havelut ) {
                 sz = sizeof( *(refdata->lut) );
                 if( isTordered ) {
@@ -584,6 +600,12 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
                             reftlen*sz );
                   }
                 }
+              }
+
+              /* dark squids */
+              if( da ) {
+                memcpy( &(da->dksquid[tchunk*ncol]), refdata->da->dksquid,
+                        reftlen*ncol*sizeof(*(da->dksquid)) );
               }
 
               /* Now do DATA/QUALITY/VARIANCE */
