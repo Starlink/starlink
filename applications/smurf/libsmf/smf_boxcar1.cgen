@@ -111,7 +111,7 @@
 #include "smurf_typ.h"
 
 /* Simple default string for errRep */
-#define FUNC_NAME "smf_boxcar1CGEN_CODE"
+#define FUNC_NAME "smf_boxcar1"
 
 void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts, 
                                  size_t window, unsigned char *qual, 
