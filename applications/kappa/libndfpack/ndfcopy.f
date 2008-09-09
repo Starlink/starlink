@@ -206,6 +206,9 @@
 *        comments to avoid multiline comments.
 *     2006 April 12 (MJC):
 *        Remove unused variables.
+*     9-SEP-2008 (DSB):
+*        Report an error if TRIM is true but there are no significant
+*        output pixel axes.
 *     {enter_further_changes_here}
 
 *-
@@ -342,7 +345,18 @@
       CALL PAR_GET0L( 'TRIM', TRIM, STATUS )
 
 *  If there are no insignificant axes, there is nothing to trim.
-      IF( SIGDIM .EQ. NDIM ) TRIM = .FALSE.
+      IF( SIGDIM .EQ. NDIM ) THEN
+         TRIM = .FALSE.
+
+*  If there are no significant axes, trimming is not possible.
+      ELSE IF( SIGDIM .EQ. 0 .AND. TRIM ) THEN
+         IF( STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( ' ', 'Cannot trim insignificant output '//
+     :                    'pixel axes since all output pixel axes '//
+     :                    'are insignificant.', STATUS )
+         END IF
+      END IF
 
 *  If not, copy all components from the input NDF (or section) to
 *  create  the output NDF.
