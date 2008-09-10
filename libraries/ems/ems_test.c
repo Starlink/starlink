@@ -40,10 +40,11 @@
 /* ensure it doesn't look in this directory for the header files */
 #include <stdio.h>
 #include <errno.h>
-#include <sae_par.h>
-#include <ems.h>
-#include <ems_par.h>
-#include <f77.h>
+#include "sae_par.h"
+#include "ems.h"
+#include "ems_par.h"
+#include "f77.h"
+#include "ems_f77.h"
 
 int main( void ){
    int status;
