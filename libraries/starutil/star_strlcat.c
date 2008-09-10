@@ -24,7 +24,6 @@
 *  Arguments:
 *     dest = char * (Returned)
 *        Destination buffer for "src". Must be nul-terminated.
-*        If status is bad on entry, "dest" will not be touched.
 *     src = const char * (Given)
 *        String to be appended onto "dest".
 *     sizedest = size_t (Given)

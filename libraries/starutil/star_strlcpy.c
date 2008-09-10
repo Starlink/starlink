@@ -24,8 +24,6 @@
 *  Arguments:
 *     dest = char * (Returned)
 *        Destination buffer for "src". Will be nul-terminated.
-*        If status is bad on entry, dest will be nul-terminated
-*        if it is non-NULL.
 *     src = const char * (Given)
 *        String to be copied.
 *     sizedest = size_t (Given)
