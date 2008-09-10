@@ -58,9 +58,11 @@ main ( void ) {
   char src2[] = "01234567890123456789";
   char dest1[ONEBUFSIZ];
   int exstat = EXIT_SUCCESS;
+  char small[3];
 
   dest1[0] = '\0';
-  
+  small[0] = '\0';
+
   /* Test strlcpy */
 
   len = star_strlcpy( dest1, src1, ONEBUFSIZ );
@@ -96,6 +98,30 @@ main ( void ) {
            (int)len);
     exstat = EXIT_FAILURE;
   }
+
+  /* Now try ellipsis */
+  dest1[0] = '\0';
+  if ( star_strappend(dest1, src1, ONEBUFSIZ) ) {
+    printf("No ellipsis - correct\n");
+  } else {
+    printf("Got ellipsis by mistake\n");
+    exstat = EXIT_FAILURE;
+  }
+
+  if (!star_strappend(dest1, src1, ONEBUFSIZ) ) {
+    printf("Ellipsis: '%s'\n",dest1);
+  } else {
+    printf("Should have truncated\n");
+    exstat = EXIT_FAILURE;
+  }
+
+  if ( !star_strappend( small, src1, sizeof(small) )) {
+    printf("Got small ellipsis: '%s'\n", small);
+  } else {
+    printf("Did not truncate!\n");
+    exstat = EXIT_FAILURE;
+  }
+
 
   return exstat;
 
