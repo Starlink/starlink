@@ -174,6 +174,9 @@ void ems1_get_facility_error( unsigned int errcode,
 
 void ems1Rform( const char *text, const int maxlen, int *iposn, char *string, int *strlength  );
 
+void ems1Gesc( const char *escchr, const char *string, int *iposn );
+
+void ems1Gnam( const char *string, int *iposn, char *name, int *namlen, int *status);
 
 
 /* Fortran Wrappers Prototypes: */
