@@ -1,4 +1,4 @@
-#include <config.h>
+#include "config.h"
       SUBROUTINE GKDATE(IYEAR,MONTH,IDAY)
 *
 * Copyright (C) SERC 1986

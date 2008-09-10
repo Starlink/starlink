@@ -1,4 +1,4 @@
-#include <config.h>
+#include "config.h"
       SUBROUTINE gns_1INITI (STATUS)
 *+
 *  Name:

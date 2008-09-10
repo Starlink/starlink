@@ -1,5 +1,5 @@
 * Process this file with fpp to produce CNF_PAR
-#include <config.h>
+#include "config.h"
 
 *+
 *  Name:

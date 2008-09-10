@@ -1,4 +1,4 @@
-#include <config.h>
+#include "config.h"
 
       INTEGER FUNCTION GKLAND(IOP1, IOP2)
 *

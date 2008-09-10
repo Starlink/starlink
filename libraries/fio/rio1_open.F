@@ -1,4 +1,4 @@
-#include <config.h>
+#include "config.h"
       SUBROUTINE RIO1_OPEN( UNIT, FILE, ACMODU, FORMU, RECSZ, RECLEN,
      :   STATUS )
 *+

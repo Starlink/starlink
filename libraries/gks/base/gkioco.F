@@ -1,4 +1,4 @@
-#include <config.h>
+#include "config.h"
 
       SUBROUTINE GKIOCO(IFUNC, STRING, NLEFT)
 *

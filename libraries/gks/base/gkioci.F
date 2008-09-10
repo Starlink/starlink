@@ -1,4 +1,4 @@
-#include <config.h>
+#include "config.h"
 
       SUBROUTINE GKIOCI(IFUNC, NPR, SPR, STRING, NOUT)
 *

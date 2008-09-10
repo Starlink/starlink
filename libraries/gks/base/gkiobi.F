@@ -1,4 +1,4 @@
-#include <config.h>
+#include "config.h"
 
       SUBROUTINE GKIOBI(IFUNC, NPR, IPR, NINT, INTA, NOUT)
 *

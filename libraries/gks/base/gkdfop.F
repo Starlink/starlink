@@ -1,4 +1,4 @@
-#include <config.h>
+#include "config.h"
       INTEGER FUNCTION GKDFOP(LUN, NAME, RECLEN)
 *
 * Copyright (C) SERC 1986

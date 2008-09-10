@@ -1,4 +1,4 @@
-#include <config.h>
+#include "config.h"
 #if HAVE_INTRINSIC_NINT
 #  define xNINT NINT
 #elif HAVE_INTRINSIC_ANINT

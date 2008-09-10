@@ -1,4 +1,4 @@
-#include <config.h>
+#include "config.h"
 
       SUBROUTINE GKIOFO(IFUNC, NINT, INTA, NLEFT)
 *

@@ -1,4 +1,4 @@
-#include <config.h>
+#include "config.h"
       SUBROUTINE FIO1_OPEN( UNIT, FILE, FSTAT, FORMAT, ACCESS, RDONLY,
      :   CCNTL, CC, RECLEN, RECSZ, STATUS )
 *+
