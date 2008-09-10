@@ -1,5 +1,5 @@
 #if HAVE_CONFIG_H
-#  include <config.h>
+#  include "config.h"
 #endif
 C+
       SUBROUTINE GEN_MOVE(BYTES,FROM,TO)

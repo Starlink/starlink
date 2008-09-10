@@ -21,7 +21,7 @@
 *         attempt to return LUN after error with file still open).
 C-----------------------------------------------------------------------
 #if HAVE_CONFIG_H
-# include <config.h>
+# include "config.h"
 #endif
       SUBROUTINE SPECX_SET
 

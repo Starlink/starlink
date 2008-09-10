@@ -1,5 +1,5 @@
 #if HAVE_CONFIG_H
-#  include <config.h>
+#  include "config.h"
 #endif
 C+
 C                    D S A Z _ T F O P E N 

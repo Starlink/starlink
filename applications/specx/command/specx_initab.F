@@ -24,7 +24,7 @@
 *-----------------------------------------------------------------------
 
 #if HAVE_CONFIG_H
-# include <config.h>
+# include "config.h"
 #endif
 
 * Some compilers preprocess include files. This leads to problems with

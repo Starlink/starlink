@@ -18,7 +18,7 @@ C    amended 16th April, ERMSG moved to FORLIB, retyped.
 C
 C+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #if HAVE_CONFIG_H
-# include <config.h>
+# include "config.h"
 #endif
       SUBROUTINE COMND(COM)
 

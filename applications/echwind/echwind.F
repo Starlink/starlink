@@ -1,5 +1,5 @@
 #if HAVE_CONFIG_H
-# include <config.h>
+# include "config.h"
 #endif
 *+  ECHWIND  -  interactive configuration program for echelle spectrographs
 

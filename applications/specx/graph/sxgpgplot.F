@@ -19,7 +19,7 @@
 *       SAVE cursor position in SXGCURSOR
 *-----------------------------------------------------------------------
 #if HAVE_CONFIG_H
-#  include <config.h>
+#  include "config.h"
 #endif
 
       SUBROUTINE SXGINIT

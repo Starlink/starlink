@@ -1,5 +1,5 @@
 #if HAVE_CONFIG_H
-#  include <config.h>
+#  include "config.h"
 #endif
       SUBROUTINE SPD_WFGA( INFO, COVRSX, NELM, NCOMP_ARG, FITPAR,
      :                     FITDIM, CONT, XDWC, CFLAGS, PFLAGS,

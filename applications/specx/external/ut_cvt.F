@@ -4,7 +4,7 @@ C        Unused RARAD, DECRAD
 *-----------------------------------------------------------------------
 
 #if HAVE_CONFIG_H
-#  include <config.h>
+#  include "config.h"
 #endif
 
       SUBROUTINE EXTRNL2 (ERROR)
