@@ -77,6 +77,7 @@
 
 #include "merswrap.h"
 #include "star/subpar.h"
+#include "ems.h"
 
 #include "msg_err.h"
 #include "sae_par.h"
