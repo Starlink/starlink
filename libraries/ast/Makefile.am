@@ -392,7 +392,7 @@ AST_PAR: ast_par.source astbad
 # configure.ac, and so is not distributed automatically.
 #
 # makeh is required in order to build ast.h after distribution (see below).
-EXTRA_DIST = ast_par.source
+EXTRA_DIST = ast_par.source sun210_figures sun211_figures
 
 # ast.h depends on the error-facility files.  ast.h _could_ be made
 # before distribution, but since it's generated from other distributed
