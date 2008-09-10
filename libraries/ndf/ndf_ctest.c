@@ -6,10 +6,12 @@
 #include "sae_par.h"             /* Standard error code definitions         */
 #include "ary_err.h"             /* ARY error code definitions              */
 #include "star/hds.h"            /* datAnnul                                */
+#include "f77.h"
 
 /* Standard C include files.                                                */
 /* -------------------------                                                */
 #include <stdio.h>
+#include <string.h>
 
 #if HAVE_FC_MAIN
 void FC_MAIN () {}

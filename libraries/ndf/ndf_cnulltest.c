@@ -6,6 +6,7 @@
 #include "sae_par.h"
 #include "ary_err.h"
 #include "star/hds.h"
+#include "f77.h"
 
 #if HAVE_FC_MAIN
 void FC_MAIN () {}
