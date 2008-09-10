@@ -119,6 +119,30 @@ void subParGetKey( size_t namecode, char *keyword, size_t keyword_length,
   return;
 }
 
+/* Note that REFLEN is supplied, not returned, in the C interface. */
+
+F77_LOGICAL_FUNCTION(subpar_gref)( INTEGER(NAMECODE), CHARACTER(REFSTR),
+                                   INTEGER(REFLEN) TRAIL(REFSTR) );
+
+int subParGref( size_t namecode, char * refstr, size_t reflen ) {
+  DECLARE_INTEGER(NAMECODE);
+  DECLARE_CHARACTER_DYN(REFSTR);
+  DECLARE_INTEGER(REFLEN);
+  int retval = 0;
+
+  F77_EXPORT_INTEGER( namecode, NAMECODE );
+  F77_CREATE_CHARACTER( REFSTR, reflen - 1 );
+
+  retval = F77_CALL(subpar_gref)( INTEGER_ARG(&NAMECODE),
+                                  CHARACTER_ARG(REFSTR),
+                                  INTEGER_ARG(&REFLEN)
+                                  TRAIL_ARG(REFSTR) );
+
+  F77_IMPORT_CHARACTER( REFSTR, REFSTR_length, refstr );
+  F77_FREE_CHARACTER( REFSTR );
+  return retval;
+}
+
 F77_SUBROUTINE(subpar_sync)(INTEGER(STATUS));
 
 void subParSync( int * status ) {

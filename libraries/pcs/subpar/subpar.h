@@ -55,6 +55,7 @@ void subParGet0c( size_t namecode, char *cvalue, size_t cvalue_length,
 		  int * status );
 void subParGetkey( size_t namecode, char *keyword, size_t keyword_length,
 		   int * status);
+int subParGref( size_t namecode, char * refstr, size_t reflen );
 void subParSync( int * status );
 void subParWrerr( const char * string, int * status );
 void subParWrmsg( const char * string, int * status );
