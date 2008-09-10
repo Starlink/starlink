@@ -96,7 +96,7 @@ BUILT_SOURCES = smf_err.h $(BUILT_C_ROUTINES)
 
 $(C_ROUTINES:.c=.o): ../smf.h
 
-smf.h: smf.h.source make_h $(CGENERIC_ROUTINES)
+smf.h: smf.h.source make_h
 	./make_h 
 
 # Create the .c file which defines type-specific code generated from each 
