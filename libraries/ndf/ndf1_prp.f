@@ -138,7 +138,9 @@
 *        Fixed bug: propagated WCS information was not being stripped
 *        before writing it to the output data object.
 *     31-OCT-2007 (DSB):
-*        Add call to NDF1_EVENT.
+*        Add call to NDF1_EVENT to record the output NDF.
+*     10-SEP-2008 (RFWS):
+*        Raise an NDF event when the input DATA array is copied.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -282,6 +284,14 @@
          IF ( CPF( NDF__DCPF ) ) THEN
             CALL ARY_COPY( ACB_DID( IACB1 ), PLACE, DCB_DID( IDCB2 ),
      :                     STATUS )
+
+*  If no error has occurred, we use NDF1_EVENT to flag a "data array
+*  read" event. If the caller has registered a handler for this type of
+*  event (using NDF_HNDLR), it will be called.
+            IF( STATUS .EQ. SAI__OK ) THEN
+               CALL NDF1_DMSG( 'NDF_EVENT', IDCB1  )
+               CALL NDF1_EVENT( 'READ_DATA', STATUS )
+            END IF
 
 *  If the DATA component is not being propagated, then create a new
 *  (undefined) data array with the same attributes, storing an ARY_
