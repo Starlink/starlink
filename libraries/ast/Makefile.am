@@ -470,4 +470,4 @@ ast_test_SOURCES = ast_test.c
 
 #ast_test_LDADD = `ast_link`
 # Expand ast_link to avoid libast_pass2, which causes problems for Solaris
-ast_test_LDADD = libast.la libast_pal.la libast_grf_3.2.la libast_wcslib.la libast_grf_2.0.la libast_grf3d.la libast_ems.la `ems_link` -lm
+ast_test_LDADD = libast.la libast_pal.la libast_grf_3.2.la libast_wcslib.la libast_grf_2.0.la libast_grf3d.la libast_err.la -lm
