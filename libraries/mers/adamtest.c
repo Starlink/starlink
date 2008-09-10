@@ -46,6 +46,7 @@
 #include "mers.h"
 #include "msg_err.h"
 
+#define STRING "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 void adamtest ( int * status ) {
 
@@ -63,5 +64,13 @@ void adamtest ( int * status ) {
   errRep( " ", "Object $TESTOBJ should be somewhere", status );
 
   errRep( " ", "Multiple %ET and ^STATUS and %TESTOBJ and %BLAH", status );
+
+  msgSetc( "X1", STRING );
+  msgSetc( "X2", STRING);
+  msgSetc( "X3", STRING);
+  msgSetc( "X4", STRING);
+  msgSetc( "X5", STRING);
+  msgSetc( "X6", STRING);
+  errRep( " ","Overflow: ^X1:^X2:^X3:^X4:^X5:^X6", status );
 
 }
