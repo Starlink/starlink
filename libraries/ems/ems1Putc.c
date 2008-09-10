@@ -34,7 +34,8 @@
  *     string = char* (Given and Returned)
  *        The string into which CVALUE is to be copied.
  *     iposn = int* (Given and Returned)
- *        The position pointer within STRING.
+ *        The position pointer within STRING. On entry, must be -1
+ *        if the string is to be copied into the beginning of the buffer.
  *     status = int* (Returned)
  *        The global status.
  
