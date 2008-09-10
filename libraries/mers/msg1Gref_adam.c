@@ -1,16 +1,17 @@
-      LOGICAL FUNCTION MSG1_GREF( PARAM, REFSTR, REFLEN )
+/*
 *+
 *  Name:
-*     MSG1_GREF
+*     msg1Gref
 
 *  Purpose:
 *     Get the reference for the specified parameter.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Invocation:
-*     RESULT = MSG1_GREF( PARAM, REFSTR, REFLEN )
+*     result = msg1Gref( const char * param, char refstr[],
+*                        size_t reflen );
 
 *  Description:
 *     This routine makes an enquiry of the parameter system to
@@ -18,25 +19,29 @@
 *     associated with the specified parameter.
 
 *  Arguments:
-*     PARAM = CHARACTER * ( * ) (Given)
+*     param = const char * (Given)
 *        The parameter name.
-*     REFSTR = CHARACTER * ( * ) (Returned)
-*        The reference.
-*     REFLEN = INTEGER (Returned)
-*        The length of the reference.
+*     refstr = char * (Returned)
+*        The reference. Buffer size of "reflen"
+*     reflen = size_t (Given)
+*        The length of the reference buffer .
+
+*  Return Value:
+*     int = boolean indicating whether the parameter was found.
 
 *  Implementation Notes:
-*     -  This function is only for use in the ADAM version of MSG_.
-*     -  This function makes calls to SUBPAR_FINDPAR and SUBPAR_GREF
+*     -  This function is only for use in the ADAM version of msg
+*     -  This function makes calls to subParFindpar and subParGref.
 
 *  Algorithm:
-*     SUBPAR_GREF attempts to get a name via a valid locator from the parameter
+*     subParGref attempts to get a name via a valid locator from the parameter
 *     system.
 *     -  If this fails and the parameter type indicates a name, it gets
 *     the name from the parameter table.
 
 *  Copyright:
 *     Copyright (C) 2002 Central Laboratory of the Research Councils.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -62,53 +67,44 @@
 *  History:
 *     3-DEC-2002 (AJC):
 *        Original version.
+*     9-SEP-2008 (TIMJ):
+*        Rewrite in C.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
+#include "sae_par.h"
+#include "ems.h"
+#include "mers1.h"
 
-*  Global Constants:
-      INCLUDE 'SAE_PAR'                 ! Standard SAE constants
+#include "star/subpar.h"
 
-*  Arguments Given:
-      CHARACTER * ( * ) PARAM
+int msg1Gref( const char * param, char *refstr, size_t reflen ) {
 
-*  Arguments Returned:
-      CHARACTER * ( * ) REFSTR
-      INTEGER REFLEN
+  int status = SAI__OK;                 /* Local status */
+  size_t namecode;                      /* Parameter namecode */
+  int retval;
+
+  /*  Initialise the returned value of MSG1_GREF.*/
+  retval = 0;
+
+  /*  Initialise the returned string. */
+  refstr[0] = '\0';
+
+  /*  Set new error reporting context */
+  emsMark();
+
+  /*  Get the parameteer namecode and then the reference */
+  subParFindpar( param, &namecode, &status );
+  retval = subParGref( namecode, refstr, reflen );
       
-*  External References:
-      LOGICAL SUBPAR_GREF
+  /*  Annul any error reports and release the error context */
+  if (status != SAI__OK) emsAnnul( status );
+  emsRlse;
 
-*  Local Variables:
-      INTEGER STATUS                    ! Local status
-      INTEGER NAMECODE                  ! Parameter namecode
-*.
-
-*  Initialise the returned value of MSG1_GREF.
-      MSG1_GREF = .FALSE.
-
-*  Initialise the returned string.
-      REFSTR =  ' '
-      REFLEN = 1
-
-*  Initialise the local status.
-      STATUS = SAI__OK
-
-*  Set new error reporting context
-      CALL EMS_MARK
-
-*  Get the parameteer namecode and then the reference
-      CALL SUBPAR_FINDPAR( PARAM, NAMECODE, STATUS )
-      MSG1_GREF = SUBPAR_GREF( NAMECODE, REFSTR, REFLEN )
-      
-*  Annul any error reports and release the error context
-      IF( STATUS .NE. SAI__OK ) CALL EMS_ANNUL( STATUS )
-      CALL EMS_RLSE
-
-      END
+  return retval;
+}

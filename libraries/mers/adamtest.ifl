@@ -1,0 +1,26 @@
+#
+#  Simple parameter file to test MERS in an ADAM context 
+#
+
+interface ADAMTEST
+
+parameter ET
+   type '_INTEGER'
+   keyword 'EXPOSURE_TIME'
+   prompt 'Exposure time required'
+endparameter
+
+parameter TESTOBJ
+          keyword 'TEST_OBJECT'
+            type NDF
+            access READ
+            vpath PROMPT
+            prompt 'An NDF holding the analysis mask'
+            helpkey *
+endparameter
+
+message MSG1
+  text  'Amazingly you can embed error messages in parameter files'
+endmessage
+
+endinterface

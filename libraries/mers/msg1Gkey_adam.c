@@ -1,38 +1,43 @@
-      LOGICAL FUNCTION MSG1_GKEY( PARAM, KEYSTR, KEYLEN )
+/*
 *+
 *  Name:
-*     MSG1_GKEY
+*     msg1Gkey
 
 *  Purpose:
 *     Get the keyword for the specified parameter.
 
 *  Language:
-*    Starlink Fortran 77
+*    Starlink ANSI C
 
 *  Invocation:
-*     RESULT = MSG1_GKEY( PARAM, KEYSTR, KEYLEN)
+*    result = msg1Gkey( const char * param, char refstr[],
+*                        size_t reflen );
 
 *  Description:
 *     This routine makes an enquiry of the parameter system to
 *     get the keyword associated with the specified message parameter.
 
 *  Arguments:
-*     PARAM = CHARACTER * ( * ) (Given)
+*     param = const char * (Given)
 *        The parameter name.
-*     KEYSTR = CHARACTER * ( * ) (Returned)
+*     keystr = char * (Returned)
 *        The keyword.
-*     KEYLEN = INTEGER (Returned)
-*        The length of the keyword.
+*     reflen = size_t (Returned)
+*        The length of the keyword buffer.
+
+*  Return Value:
+*     int = boolean indicating whether the parameter was found.
 
 *  Implementation Notes:
-*     -  This function is only for use in the ADAM version of MSG_.
-*     -  This function makes calls to SUBPAR_FINDPAR and SUBPAR_GETKEY.
+*     -  This function is only for use in the ADAM version of msg.
+*     -  This function makes calls to subParFindpar and subParGetkey.
 
 *  Algorithm:
 *     -  Ask the parameter system for the keyword.
 
 *  Copyright:
-*     Copyright (C) 1982, 1983, 1984, 1989, 1990, 1991 Science & Engineering Research Council.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 1982-1984, 1989-1991 Science & Engineering Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -55,6 +60,7 @@
 *     JRG: Jack Giddings (UCL)
 *     SLW: Sid Wright (UCL)
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -71,66 +77,51 @@
 *     22-OCT-1991 (PCTR):
 *        Added EMS_MARK and EMS_RLSE to annul any error messages from 
 *        SUBPAR on error.
+*     10-SEP-2008 (TIMJ):
+*        Rewrite in C
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
+#include "sae_par.h"
+#include "ems.h"
+#include "star/subpar.h"
+#include "mers1.h"
 
-*  Global Constants:
-      INCLUDE 'SAE_PAR'                 ! Standard SAE constants
+int msg1Gkey( const char * param, char * keystr, size_t keylen ) {
 
-*  Arguments Given:
-      CHARACTER * ( * ) PARAM
+  int status = SAI__OK;                 /* Local status */
+  size_t namecode;                      /* Parameter namecode */
+  int retval;
 
-*  Arguments Returned:
-      CHARACTER * ( * ) KEYSTR
+  /*  Initialise the returned value of MSG1_GKEY.*/
+  retval = 0;
 
-      INTEGER KEYLEN
+  /*  Initialise the returned string. */
+  keystr[0] = '\0';
 
-*  External References:
-      INTEGER CHR_LEN                   ! Filled string length
+  /*  Set new error reporting context */
+  emsMark();
 
-*  Local Variables:
-      INTEGER NAMCOD                    ! Code number of parameter
-      INTEGER STATUS                    ! Local status
+  /*  Attempt to get the keyword associated with PARAM from the parameter 
+   *  system. */
+  subParFindpar( param, &namecode, &status );
+  subParGetkey( namecode, keystr, keylen, &status );
 
-*.
+  if (status == SAI__OK) {
+    /*     Set returned arguments for normal successful completion. */
+    retval = 1;
+  } else {
+    /*     Annul the error context and abort. */
+    emsAnnul( &status );
+  }
 
-*  Initialise the returned value of MSG1_GKEY. 
-      MSG1_GKEY = .FALSE.
+  /*  Release the error reporting context. */
+  emsRlse();
 
-*  Initialise the returned string.
-      KEYSTR = ' '
-      KEYLEN = 1
-
-*  Initialise status.
-      STATUS = SAI__OK
-
-*  Mark a new error reporting context.
-      CALL EMS_MARK
-
-*  Attempt to get the keyword associated with PARAM from the parameter 
-*  system.
-      CALL SUBPAR_FINDPAR( PARAM, NAMCOD, STATUS )
-      CALL SUBPAR_GETKEY( NAMCOD, KEYSTR, STATUS )
-
-      IF ( STATUS .EQ. SAI__OK ) THEN
-
-*     Set returned arguments for normal successful completion.
-         MSG1_GKEY = .TRUE.
-         KEYLEN = CHR_LEN( KEYSTR )
-      ELSE
-
-*     Annul the error context and abort.
-         CALL EMS_ANNUL( STATUS )
-      END IF
-
-*  Release the error reporting context.
-      CALL EMS_RLSE
-
-      END
+  return retval;
+}

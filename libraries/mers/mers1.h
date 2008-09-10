@@ -39,6 +39,8 @@
 *-
 */
 
+#include <stdlib.h>
+
 /* This is the type of struct used for ERR globals */
 typedef struct {
   int errwsz;
@@ -54,12 +56,20 @@ void err1Print( const char * text, int * errbel, int * status );
 
 void err1Gtglbl( int *errwsz, int *errstm, int *errrvl );
 int err1Gtrvl ( void );
+int err1Gtstm ( void );
+int err1Gtwsz ( void );
 void err1Ptwsz( int errwsz );
 void err1Ptstm( int errstm );
 void err1Ptrvl( int errrvl );
 void err1RestoreEms( ErrTune * ems, int * status );
 void err1TuneEms( ErrTune * ems, int * status );
 
+
+void msg1Form ( const char * param, const char * text, int clean,
+                size_t msglen, char * msgstr, int * status );
+int msg1Genv( const char * param, char *msgstr, size_t msglen );
+int msg1Gref( const char * param, char *refstr, size_t reflen );
+int msg1Gkey( const char * param, char *keystr, size_t keylen );
 
 void msg1Ktok ( void );
 void msg1Prtln( const char * text, int * status );

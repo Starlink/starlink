@@ -1,4 +1,4 @@
-      SUBROUTINE ERR_REP( PARAM, TEXT, STATUS )
+/*
 *+
 *  Name:
 *     ERR_REP
@@ -7,7 +7,7 @@
 *     Report an error message.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C (callable from Fortran)
 
 *  Invocation:
 *     CALL ERR_REP( PARAM, TEXT, STATUS )
@@ -107,105 +107,26 @@
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
+#include "f77.h"
+#include "merswrap.h"
+#include "mers_f77.h"
+#include "err_par.h"
 
-*  Global Constants:
-      INCLUDE 'SAE_PAR'                 ! Standard SAE constants
-      INCLUDE 'ERR_ERR'                 ! ERR_ error codes
-      INCLUDE 'ERR_PAR'                 ! Public ERR_ constants
-      INCLUDE 'EMS_ERR'                 ! EMS_ error codes
+F77_SUBROUTINE(err_rep)( CHARACTER(PARAM), CHARACTER(TEXT),
+                         INTEGER(STATUS) TRAIL(PARAM) TRAIL(TEXT) ) {
+  char param[ERR__SZPAR];
+  char text[ERR__SZMSG];
+  int status;
 
-*  External References:
-      LOGICAL ERR1_GTSTM
-      EXTERNAL ERR1_GTSTM
+  GENPTR_CHARACTER(PARAM);
+  GENPTR_CHARACTER(TEXT);
 
-*  Arguments Given:
-      CHARACTER * ( * ) PARAM
-      CHARACTER * ( * ) TEXT
+  cnfImpn( PARAM, PARAM_length, ERR__SZPAR, param );
+  cnfImpn( TEXT, TEXT_length, ERR__SZMSG, text );
+  F77_IMPORT_INTEGER( *STATUS, status );
 
-*  Status:
-      INTEGER STATUS
+  errRep( param, text, &status );
 
-*  Local Variables:
-      CHARACTER * ( ERR__SZMSG ) TSTR   ! Intermediate error message text
-      CHARACTER * ( ERR__SZMSG ) MSTR   ! Final error message text
-      CHARACTER * ( ERR__SZPAR ) PSTR   ! Local error name text
-
-      INTEGER ISTAT                     ! Internal status
-      INTEGER MLEN                      ! Length of final error message text
-      INTEGER TLEN                      ! Length of the temporary message
-      INTEGER LPOS                      ! String position pointer
-      INTEGER TOKPOS                    ! Position of ^ in string
-*.
- 
-*  Check the inherited status: if it is SAI__OK, then set status to
-*  ERR__BADOK and store an additional message in the error table.
-      IF ( STATUS .EQ. SAI__OK ) THEN
-
-*     Set the report status equal to ERR__BADOK.
-         STATUS = ERR__BADOK
-
-*     Make an additional error report.
-         PSTR = 'ERR_REP_BADOK'
-         MSTR = 'STATUS not set in call to ERR_REP ' //
-     :          '(improper use of ERR_REP)'
-
-*     Store the additional message in the error table (first create a new
-*     error reporting context to avoid loss of tokens in the base level).
-*     Associate status ERR__BADOK with the additional message.
-*     If EMS_REP returns an error status it will be ignored but will
-*     almost certainly be repeated later with the given message.
-         CALL EMS_MARK
-         ISTAT = ERR__BADOK
-         CALL EMS_REP( PSTR, MSTR, ISTAT )
-
-*     Release the error context.
-         CALL EMS_RLSE
-
-*     Set the given message status to ERR__UNSET
-         ISTAT = ERR__UNSET
-
-*  Else, a normal bad status is given - set ISTAT to the given status value
-      ELSE
-         ISTAT = STATUS
-
-      END IF
-
-*  Now form the given error message.
-*  Status is not altered by this routine.
-      CALL MSG1_FORM( PARAM, TEXT, .NOT.ERR1_GTSTM(), TSTR, TLEN, ISTAT)
-
-*  Any double ^ will now be single - we must protect it from EMS_REP
-      LPOS = 1
-      MLEN = 0
-      TOKPOS = INDEX( TSTR(1:TLEN), '^' )
-      DOWHILE ( TOKPOS .GT. 0 )
-         CALL MSG1_PUTC( TSTR(LPOS:LPOS+TOKPOS-1), MSTR, MLEN, ISTAT )
-         CALL MSG1_PUTC( '^', MSTR, MLEN, ISTAT )
-         LPOS = LPOS + TOKPOS
-         TOKPOS = INDEX( TSTR(LPOS:), '^' )
-      END DO
-
-*  Now copy the remainder of the string
-      IF ( LPOS .LE. TLEN ) THEN
-         MSTR(MLEN+1:) = TSTR(LPOS:TLEN)
-         MLEN = MLEN + ( TLEN - LPOS + 1 )
-      END IF
-
-*  Report the already constructed message with EMS_REP
-      CALL EMS_REP( PARAM, MSTR(1:MLEN), STATUS )
-
-*  Check the returned status for message output errors and attempt to
-*  report an additional error in the case of failure - but only on the 
-*  first occasion.
-      IF ( ISTAT .EQ. EMS__OPTER .AND. STATUS .NE. ERR__OPTER ) THEN
-         STATUS = ERR__OPTER
-         ISTAT = ERR__OPTER
-         PSTR = 'ERR_REP_OPTER'
-         MSTR = 'ERR_REP: Error encountered during message output'
-         CALL EMS_REP( PSTR, MSTR, ISTAT )
-      END IF
-
-      END
+}

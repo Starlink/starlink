@@ -125,32 +125,6 @@ DECLARE_INTEGER(fstatus);
    return;
 }
 
-void errRep( const char *param,
-             const char *text,
-             int *status ) {
-
-DECLARE_CHARACTER_DYN(fparam);
-DECLARE_CHARACTER_DYN(ftext);
-DECLARE_INTEGER(fstatus);
-
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
-   F77_CREATE_CHARACTER(ftext,strlen( text ));
-   F77_EXPORT_CHARACTER(text,ftext,ftext_length);
-   F77_EXPORT_INTEGER(*status,fstatus);
-
-   F77_CALL(err_rep)( CHARACTER_ARG(fparam),
-                      CHARACTER_ARG(ftext),
-                      INTEGER_ARG(&fstatus)
-                      TRAIL_ARG(fparam)
-                      TRAIL_ARG(ftext) );
-
-   F77_FREE_CHARACTER(fparam);
-   F77_FREE_CHARACTER(ftext);
-
-   return;
-}
-
 void errTune( const char *param,
               int value,
               int *status ) {

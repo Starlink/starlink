@@ -19,6 +19,7 @@ AC_PROG_CC
 AC_PROG_FC
 AC_PROG_LIBTOOL
 AC_PROG_LN_S
+AC_CHECK_FUNCS([strtok_r])
 
 dnl   If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)

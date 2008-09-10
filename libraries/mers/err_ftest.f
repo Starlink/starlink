@@ -149,7 +149,9 @@
       CALL ERR_TUNE( 'SZOUT', 79, STATUS )
 
       STATUS = SAI__ERROR
-      CALL ERR_REP( ' ','Flushed error', STATUS)
+      CALL ERR_REP( ' ',
+     :     'Flushed error with ^^X escape ^^Y char',
+     :     STATUS)
       CALL ERR_FLUSH(STATUS)
 
       STATUS = SAI__ERROR
