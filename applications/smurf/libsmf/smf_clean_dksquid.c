@@ -88,6 +88,7 @@
 
 void smf_clean_dksquid( smfData *indata, size_t window, int *status ) {
 
+  double corr;            /* Linear correlation coefficient */
   double *dksquid=NULL;   /* Buffer for smoothed dark squid */
   double gain;            /* Gain parameter from template fit */
   size_t i;               /* Loop counter */
@@ -188,13 +189,13 @@ void smf_clean_dksquid( smfData *indata, size_t window, int *status ) {
         case SMF__DOUBLE:
           smf_templateFit1D( &( ((double *)indata->pntr[0])[index] ),
                              ntslice, stride, dksquid, 1, &gain, &offset, 
-                             status );
+                             &corr, status );
           break;
           
         case SMF__INTEGER:
           smf_templateFit1I( &( ((int *)indata->pntr[0])[index] ),
                              ntslice, stride, dksquid, 1, &gain, &offset, 
-                             status );
+                             &corr, status );
           break;
           
         default:
@@ -216,8 +217,10 @@ void smf_clean_dksquid( smfData *indata, size_t window, int *status ) {
           msgSeti( "ROW", j );
           msgSetd( "GAI", gain );
           msgSetd( "OFF", offset );
+          msgSetd( "CORR", corr );
           msgOutif( MSG__DEBUG, "", FUNC_NAME
-                    ": ROW,COL (^ROW,^COL) GAIN,OFFSET (^GAI,^OFF)", status );
+                    ": ROW,COL (^ROW,^COL) GAIN,OFFSET,CORR (^GAI,^OFF,^CORR)",
+                    status );
         }
       }
     }

@@ -16,7 +16,8 @@
 *     void smf_templateFit1<X>( CGEN_TYPE *data, const size_t n, 
 *                               const size_t stride, 
 *                               const double *template, int remove,
-*                               double *gain, double *offset, int *status )
+*                               double *gain, double *offset, 
+*                               double *corr, int *status )
 
 *  Arguments:
 *     data = CGEN_TYPE* (Given)
@@ -33,6 +34,8 @@
 *        If provided return the gain of the fit
 *     offset = double* (Returned)
 *        If provided return the offset of the fit
+*     corr = double* (Returned)
+*        If provided return linear correlation coeff. (range=-1 to +1)
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -89,6 +92,7 @@
 /* Standard includes */
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 /* Starlink includes */
 #include "sae_par.h"
@@ -110,7 +114,7 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, const size_t n,
                                       const size_t stride, 
                                       const double *template, int remove,
                                       double *gain, double *offset, 
-                                      int *status ) {
+                                      double *corr, int *status ) {
 
   /* Local variables */
   double a;                   /* Gain coefficient */
@@ -119,6 +123,7 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, const size_t n,
   size_t i;                   /* Loop counter */
   size_t ngood=0;             /* Number of good samples */
   double s_d=0;               /* Sum of the data points */
+  double s_dsq=0;             /* Sum of the squares of the data points */
   double s_dt=0;              /* Sum of the data * template */
   double s_t=0;               /* Sum of the template points */
   double s_tsq=0;             /* Sum of the squares of the template points */
@@ -150,6 +155,7 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, const size_t n,
     for( i=0; i<n; i++ ) {
       if( (data[off] != CGEN_BAD) && (template[i] != VAL__BADD) ) {
         s_d += data[off];
+        s_dsq += data[off]*data[off];
         s_dt += data[off]*template[i];
         s_t += template[i];
         s_tsq += template[i]*template[i];
@@ -162,6 +168,7 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, const size_t n,
     for( i=0; i<n; i++ ) {
       if( (data[i] != CGEN_BAD) && (template[i] != VAL__BADD) ) {
         s_d += data[i];
+        s_dsq += data[i]*data[i];
         s_dt += data[i]*template[i];
         s_t += template[i];
         s_tsq += template[i]*template[i];
@@ -172,11 +179,11 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, const size_t n,
 
   if( ngood >= 3 ) {
     /* Calculate fit coefficients */
-    a = (ngood * s_dt - s_d*s_t) /
-      (n*s_tsq - s_t*s_t);
+    a = (ngood*s_dt - s_d*s_t) /
+      (ngood*s_tsq - s_t*s_t);
 
     b = (s_d*s_tsq - s_t*s_dt) / 
-      (n*s_tsq - s_t*s_t);
+      (ngood*s_tsq - s_t*s_t);
 
     /* Return gain and offset if requested */
     if( gain ) {
@@ -185,6 +192,12 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, const size_t n,
 
     if( offset ) {
       *offset = b;
+    }
+
+    /* Return linear correlation coefficient if requested */
+    if( corr ) {
+      *corr = (ngood*s_dt - s_d*s_t) /
+        ( sqrt(ngood*s_tsq - s_t*s_t) * sqrt(ngood*s_dsq - s_d*s_d) );
     }
 
     /* Remove fitted templated if requested */
