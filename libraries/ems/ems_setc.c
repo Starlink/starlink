@@ -36,6 +36,8 @@
 #include "ems1.h"                      /* ems1_ function prototypes */
 #include "f77.h"                       /* CNF macros and prototypes */
 
+#include "ems_f77.h"
+
 F77_SUBROUTINE(ems_setc) ( CHARACTER(token), CHARACTER(cvalue)
          TRAIL(token) TRAIL(cvalue) )
 {

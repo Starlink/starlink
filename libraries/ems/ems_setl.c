@@ -33,6 +33,8 @@
 #include "ems_sys.h"                   /* EMS internal constants */
 #include "f77.h"                       /* CNF macros and prototypes */
 
+#include "ems_f77.h"
+
 F77_SUBROUTINE(ems_setl) ( CHARACTER(token), LOGICAL(lvalue)
          TRAIL(token) )
 {

@@ -33,6 +33,8 @@
 #include "ems_par.h"                   /* EMS constants            */
 #include "f77.h"                       /* CNF macros and prototypes */
 
+#include "ems_f77.h"
+
 F77_SUBROUTINE(ems_eload) ( CHARACTER(param), INTEGER(parlen), CHARACTER(opstr),
             INTEGER(oplen), INTEGER(status) TRAIL(param) TRAIL(opstr)) {
 

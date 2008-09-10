@@ -30,7 +30,7 @@ include_MESSAGES = ems_err.h EMS_ERR
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 PUBLIC_INCLUDES = ems.h ems_par.h EMS_PAR
-PRIVATE_INCLUDES = ems_sys.h ems1.h ems_defs.h
+PRIVATE_INCLUDES = ems_sys.h ems1.h ems_defs.h ems_f77.h
 
 C_ROUTINES = emsAnnul.c emsBegin.c emsEload.c emsEnd.c emsErrno.c \
              emsExpnd.c emsFacer.c emsLevel.c emsMark.c emsMload.c \

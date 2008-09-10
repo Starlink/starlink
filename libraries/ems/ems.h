@@ -50,6 +50,8 @@
  *     31-JUL-2008 (PWD):
  *        Added emsStune and changed emsGtune to return the value as a result.
  *        Marked emsTune as deprecated.
+ *     10-SEP-2008 (TIMJ):
+ *        Remove fortran prototypes. Should not be in a public include file.
  *     {enter_changes_here}
 
  *  Bugs:
@@ -177,101 +179,6 @@ void ems1Rform( const char *text, const int maxlen, int *iposn, char *string, in
 void ems1Gesc( const char *escchr, const char *string, int *iposn );
 
 void ems1Gnam( const char *string, int *iposn, char *name, int *namlen, int *status);
-
-
-/* Fortran Wrappers Prototypes: */
-#include "f77.h"
-F77_SUBROUTINE(ems_annul) ( INTEGER(status ) );
-
-F77_SUBROUTINE(ems_begin) ( INTEGER(status ) );
-
-F77_SUBROUTINE(ems_eload) ( CHARACTER(param_f ),
-                            INTEGER(parlen),
-                            CHARACTER(opstr_f),
-                            INTEGER(oplen),
-                            INTEGER(status)
-                            TRAIL( plength )
-                            TRAIL( olength ) );
-
-F77_SUBROUTINE(ems_expnd) ( CHARACTER(text),
-                            CHARACTER(opstr),
-                            INTEGER(oplen),
-                            INTEGER(status)
-                            TRAIL( tlength )
-                            TRAIL( olength ) );
-
-F77_SUBROUTINE (ems_fioer) ( CHARACTER(token),
-                             INTEGER(iostat)
-                             TRAIL(token) );
-
-F77_SUBROUTINE(ems_end) ( INTEGER(status ) );
-
-F77_SUBROUTINE(ems_errno) ( CHARACTER(token_f),
-                            INTEGER(errno_f)
-                            TRAIL( tlength ) );
-
-F77_SUBROUTINE(ems_facer) ( CHARACTER(token_f),
-                            INTEGER(status_f)
-                            TRAIL( tlength ) );
-
-F77_SUBROUTINE(ems_level) ( INTEGER(level ) );
-
-F77_SUBROUTINE(ems_mark) ( void );
-
-F77_SUBROUTINE(ems_mload) ( CHARACTER(param),
-                            CHARACTER(text),
-                            CHARACTER(opstr),
-                            INTEGER(oplen),
-                            INTEGER(status)
-                            TRAIL( plength )
-                            TRAIL( tlength )
-                            TRAIL( olength ) );
-
-F77_SUBROUTINE(ems_renew) ( void );
-
-F77_SUBROUTINE(ems_rep) ( CHARACTER(param),
-                          CHARACTER(text),
-                          INTEGER(status)
-                          TRAIL( plength )
-                          TRAIL( tlength ) );
-
-F77_SUBROUTINE(ems_rlse) ( void );
-
-F77_SUBROUTINE(ems_setc) ( CHARACTER(token),
-                           CHARACTER(cvalue)
-                           TRAIL( tlength )
-                           TRAIL( clength ) );
-
-F77_SUBROUTINE(ems_setd) ( CHARACTER(token),
-                           DOUBLE(dvalue)
-                           TRAIL( tlength ) );
-
-F77_SUBROUTINE(ems_seti) ( CHARACTER(token),
-                           INTEGER(ivalue)
-                           TRAIL( tlength ) );
-
-F77_SUBROUTINE(ems_setl) ( CHARACTER(token),
-                           INTEGER(lvalue)
-                           TRAIL( tlength ) );
-
-F77_SUBROUTINE(ems_setr) ( CHARACTER(token),
-                           REAL(rvalue)
-                           TRAIL( tlength ) );
-
-F77_SUBROUTINE(ems_show) ( CHARACTER(topic),
-                           INTEGER(status)
-                           TRAIL( tlength ) );
-
-F77_SUBROUTINE(ems_stat) ( INTEGER(status) );
-
-F77_SUBROUTINE(ems_syser) ( CHARACTER(token),
-                            INTEGER(systat)
-                            TRAIL( tlength ) );
-
-F77_SUBROUTINE(ems_tune) ( CHARACTER(list),
-                           INTEGER(value),
-                           INTEGER(status)
-                           TRAIL( llength ) );
 
 #endif	/* EMS_DEFINED */
 

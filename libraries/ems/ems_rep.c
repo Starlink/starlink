@@ -34,6 +34,8 @@
 #include "ems_par.h"                   /* EMS constatnts           */
 #include "f77.h"                       /* CNF macros and prototypes */
 
+#include "ems_f77.h"
+
 F77_SUBROUTINE(ems_rep) ( CHARACTER(err), CHARACTER(text), INTEGER(status)
          TRAIL(err) TRAIL(text) ) {
 

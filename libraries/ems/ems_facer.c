@@ -33,6 +33,8 @@
 #include "ems_sys.h"                   /* EMS internal constants */
 #include "f77.h"                       /* CNF macros and prototypes */
 
+#include "ems_f77.h"
+
 F77_SUBROUTINE(ems_facer) ( CHARACTER(token), INTEGER(fstat) TRAIL(token) )
 {
    char ctok[EMS__SZNAM+1];      /* Imported token name */
