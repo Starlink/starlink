@@ -26,16 +26,16 @@
 *  Return Value:
 
 *  Description: 
-*     Columns of SCUBA-2 detectors exhibit a strong correlated signal which
-*     is shown clearly in the dark squids. As the dark squids do not see
-*     astronomical or atmospheric signal they can be used as a template to
-*     remove this correlated noise without risk of removing signal from
-*     real sources. The dark squids are smoothed to avoid increasing the
-*     white noise level of detectors once they are subtracted. They
-*     are fit to the raw (un-flatfielded) detector by solving for a gain
-*     and offset using the explicit least-squares solution. If a dark squid
-*     is identically 0 this routine flags every detector in the column as
-*     SMF__Q_BADB.
+*     Columns of SCUBA-2 detectors exhibit a strong correlated signal
+*     which is shown clearly in the dark squids. As the dark squids do
+*     not see astronomical or atmospheric signal they can be used as a
+*     template to remove this correlated noise without risk of
+*     removing signal from real sources. The dark squids are smoothed
+*     to avoid increasing the white noise level of detectors once they
+*     are subtracted. They are fit to the raw (un-flatfielded)
+*     detector by solving for a gain and offset using the explicit
+*     least-squares solution. If a dark squid is constant this routine
+*     flags every detector in the column as SMF__Q_BADB.
 
 *  Notes:
 
@@ -46,6 +46,9 @@
 *  History:
 *     2008-08-27 (EC):
 *        Initial version
+*     2008-09-11 (EC):
+*        -flag SMF__Q_BADB all bolos in column if dark squid is dead
+*        -fixed array index bug
 
 *  Copyright:
 *     Copyright (C) 2008 University of British Columbia.
@@ -88,13 +91,17 @@
 
 void smf_clean_dksquid( smfData *indata, size_t window, int *status ) {
 
+  size_t arrayoff;        /* Array offset */
   double corr;            /* Linear correlation coefficient */
+  int dkgood;             /* Flag for non-constant dark squid */ 
   double *dksquid=NULL;   /* Buffer for smoothed dark squid */
+  int firstdk;            /* First value in dksquid signal */
   double gain;            /* Gain parameter from template fit */
   size_t i;               /* Loop counter */
   dim_t index;            /* index into buffer */
   int isTordered;         /* Data order */
   size_t j;               /* Loop counter */
+  size_t k;               /* Loop counter */
   dim_t nbolo;            /* Number of bolometers */
   dim_t ncol;             /* Number of columns */
   dim_t ndata;            /* Number of data points */
@@ -154,18 +161,23 @@ void smf_clean_dksquid( smfData *indata, size_t window, int *status ) {
   /* Loop over columns */
   for( i=0; (*status==SAI__OK)&&(i<ncol); i++ ) {
     
-    /* Copy the dark squid into an array (always time-ordered) */
+    /* Copy the dark squid into an array (always time-ordered), while 
+       checking to see if it is a constant value (dead) */
     index = i;
+    firstdk = indata->da->dksquid[index];
+    dkgood = 0;
     for( j=0; j<ntslice; j++ ) {
       dksquid[j] = indata->da->dksquid[index];
       index += ncol;
+      if( dksquid[j] != firstdk ) dkgood=1;
     }
 
-    /* Smooth the dark squid template */
-    smf_boxcar1D( dksquid, ntslice, window, NULL, 0, status );
+    if( dkgood ) {
+      /* Smooth the dark squid template */
+      smf_boxcar1D( dksquid, ntslice, window, NULL, 0, status );
+    } 
 
-    /* Loop over rows, removing the fitted dksquid template. Also check
-       for badbolo flags before trying. */
+    /* Loop over rows, removing the fitted dksquid template. */
     for( j=0; (*status==SAI__OK) && (j<nrow); j++ ) {
 
       /* Calculate index of first sample for this bolometer, and the stride */
@@ -179,11 +191,20 @@ void smf_clean_dksquid( smfData *indata, size_t window, int *status ) {
         stride = nbolo;
       } else {
         stride = 1;
+        index *= ntslice;
       }
 
-      /* Continue if no quality, or bolo isn't flagged as bad quality */
-      
-      if( !qua || !(qua[index]&SMF__Q_BADB) ) {
+      /* If dark squid is bad, flag this entire bolo as bad */
+      if( !dkgood && qua ) {
+        arrayoff = index;
+        for( k=0; k<ntslice; k++ ) {
+          qua[arrayoff] |= SMF__Q_BADB;
+          arrayoff += stride;
+        }
+      }
+
+      /* Continue if dkgood, and no indication of a bad bolometer */      
+      if( dkgood && (!qua || !(qua[index]&SMF__Q_BADB)) ) {
 
         switch( indata->dtype ) {
         case SMF__DOUBLE:
