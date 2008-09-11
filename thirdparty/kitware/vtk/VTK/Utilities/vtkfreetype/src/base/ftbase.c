@@ -20,6 +20,8 @@
 
 #define  FT_MAKE_OPTION_SINGLE_OBJECT
 
+#include "ftconfig.h"
+
 #include "ftutil.c"
 #include "ftdbgmem.c"
 #include "ftstream.c"
