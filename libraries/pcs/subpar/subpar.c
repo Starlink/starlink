@@ -99,7 +99,7 @@ F77_SUBROUTINE(subpar_getkey)( INTEGER(NAMECODE), CHARACTER(KEYWORD),
 			      INTEGER(STATUS) TRAIL(KEYWORD) );
 
 
-void subParGetKey( size_t namecode, char *keyword, size_t keyword_length,
+void subParGetkey( size_t namecode, char *keyword, size_t keyword_length,
 		  int * status ) {
   DECLARE_INTEGER(NAMECODE);
   DECLARE_CHARACTER_DYN(KEYWORD);
