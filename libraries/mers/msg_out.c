@@ -1,4 +1,4 @@
-      SUBROUTINE MSG_OUT( PARAM, TEXT, STATUS )
+/*
 *+
 *  Name:
 *     MSG_OUT
@@ -7,7 +7,7 @@
 *     Output a message.
 
 *  Language:
-*    Starlink Fortran 77
+*    Starlink ANSI C (Callable from Fortran)
 
 *  Invocation:
 *     CALL MSG_OUT( PARAM, TEXT, STATUS )
@@ -36,9 +36,10 @@
 *     with priority normal.
 
 *  Copyright:
-*     Copyright (C) 1983, 1984, 1988, 1991, 1992 Science & Engineering Research Council.
-*     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
-*     All Rights Reserved.
+*     Copyright (C) Science and Technology Facilities Council.
+*     Copyright (C) 1983, 1984, 1988, 1991, 1992 Science & Engineering
+*     Research Council.  Copyright (C) 1999, 2001 Central Laboratory
+*     of the Research Councils.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -61,6 +62,7 @@
 *     BDK: Dennis Kelly (ROE)
 *     AJC: Alan Chipperfield (STARLINK)
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -79,40 +81,38 @@
 *        Correct Algorithm above
 *     22-FEB-2001 (AJC):
 *        Replace EMS1_KTOK with MSG1_KTOK
+*     10-SEP-2008 (TIMJ):
+*        Call msgOut.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
- 
-*  Global Constants:
-      INCLUDE 'SAE_PAR'                 ! Standard SAE constants
-      INCLUDE 'MSG_PAR'                 ! MSG_ public constants
- 
-*  Arguments Given:
-      CHARACTER * ( * ) PARAM
-      CHARACTER * ( * ) TEXT
- 
-*  Status:
-      INTEGER STATUS
+#include "f77.h"
+#include "mers_f77.h"
+#include "merswrap.h"
+#include "msg_par.h"
+#include "err_par.h"
 
-*.
+F77_SUBROUTINE(msg_out)( CHARACTER(PARAM),
+                           CHARACTER(TEXT),
+                           INTEGER(STATUS)
+                           TRAIL(PARAM)
+                           TRAIL(TEXT) ) {
+  char param[ERR__SZPAR];
+  char text[MSG__SZMSG];
+  int status;
 
-*  Check the inherited global status.
-      IF ( STATUS .NE. SAI__OK ) THEN
+  cnfImpn( PARAM, PARAM_length, ERR__SZPAR, param );
+  cnfImpn( TEXT, TEXT_length, MSG__SZMSG, text );
 
-*     Status is not SAI__OK, so just annul the token table.
-         CALL MSG1_KTOK
-      ELSE
+  F77_IMPORT_INTEGER( *STATUS, status );
 
+  msgOut( param, text, &status );
 
-*     Call MSG_OUTIF with the conditional output priority set to 
-*     MSG__NORM.
-         CALL MSG_OUTIF( MSG__NORM, PARAM, TEXT, STATUS )
-      END IF
+  F77_EXPORT_INTEGER( status, *STATUS );
 
-      END
+}

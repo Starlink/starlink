@@ -70,6 +70,7 @@
 
 *  Call MSG_OUT.
       CALL MSG_BELL( STATUS )
+      CALL MSG_BLANK( STATUS )
       CALL MSG_SETC( 'TOK', '(SETC)')
       CALL MSG_SETD( 'DTK', 0.0D0 )
       CALL MSG_SETR( 'RTK', 0.0 )

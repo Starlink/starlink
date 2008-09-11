@@ -60,8 +60,8 @@ PRIVATE_INCLUDES = mers_f77.h mers1.h
 F_ROUTINES = err_fioer.f \
              err_load.f err_out.f \
              err_tune.f \
-             msg_blank.f msg_fmtc.f msg_fmtd.f msg_fmti.f msg_fmtl.f \
-             msg_fmtr.f msg_iflev.f msg_ifset.f msg_out.f \
+             msg_fmtc.f msg_fmtd.f msg_fmti.f msg_fmtl.f \
+             msg_fmtr.f msg_iflev.f msg_ifset.f \
              msg_tune.f
 
 F_ROUTINES_STAND =
@@ -93,7 +93,7 @@ C_INTERFACE_ROUTINES = err.c msgSetc.c msgSetd.c msgSetr.c msgSeti.c \
 msgSetl.c errAnnul.c errBegin.c errEnd.c errSyser.c errMark.c errRlse.c \
 errStat.c errLevel.c errFacer.c msgRenew.c err1Bell.c msgBell.c \
 err1Print.c mers1Blk.c err1Flush.c errFlush.c errFlbel.c errRep.c \
-msgLoad.c msgOutif.c msg1Print.c
+msgLoad.c msgOutif.c msg1Print.c msgOut.c msgBlank.c
 
 C_INTERFACE_ADAM = err_adam.c
 
@@ -102,7 +102,8 @@ C_INTERFACE_STAND =
 F_INTERFACE_ROUTINES = msg_setc.c msg_setd.c msg_setr.c msg_seti.c \
 msg_setl.c err_annul.c err_begin.c err_end.c err_syser.c err_mark.c \
 err_rlse.c err_stat.c err_level.c err_facer.c msg_renew.c msg_bell.c \
-err_flush.c err_flbel.c err_rep.c msg_load.c msg_outif.c
+err_flush.c err_flbel.c err_rep.c msg_load.c msg_outif.c msg_out.c \
+msg_blank.c
 
 #  The installation test source
 TEST_SOURCE = err_test.f err_test.c err_test.ifl

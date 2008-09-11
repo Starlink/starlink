@@ -149,19 +149,6 @@ DECLARE_INTEGER(fstatus);
    return;
 }
 
-void msgBlank( int *status ) {
-
-DECLARE_INTEGER(fstatus);
-
-   F77_EXPORT_INTEGER(*status,fstatus);
-
-   F77_CALL(msg_blank)( INTEGER_ARG(&fstatus) );
-
-   F77_IMPORT_INTEGER(fstatus,*status);
-
-   return;
-}
-
 void msgFmtc( const char *token,
               const char *format,
               const char *cvalue ) {
@@ -322,34 +309,6 @@ DECLARE_INTEGER(fstatus);
 
    return;
 }
-
-void msgOut( const char *param,
-             const char *text,
-             int *status ) {
-
-DECLARE_CHARACTER_DYN(fparam);
-DECLARE_CHARACTER_DYN(ftext);
-DECLARE_INTEGER(fstatus);
-
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
-   F77_CREATE_CHARACTER(ftext,strlen( text ));
-   F77_EXPORT_CHARACTER(text,ftext,ftext_length);
-   F77_EXPORT_INTEGER(*status,fstatus);
-
-   F77_CALL(msg_out)( CHARACTER_ARG(fparam),
-                      CHARACTER_ARG(ftext),
-                      INTEGER_ARG(&fstatus)
-                      TRAIL_ARG(fparam)
-                      TRAIL_ARG(ftext) );
-
-   F77_FREE_CHARACTER(fparam);
-   F77_FREE_CHARACTER(ftext);
-   F77_IMPORT_INTEGER(fstatus,*status);
-
-   return;
-}
-
 
 void msgTune( const char *param,
               int value,

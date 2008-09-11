@@ -1,16 +1,16 @@
-      SUBROUTINE MSG_BLANK( STATUS )
+/*
 *+
 *  Name:
-*     MSG_BLANK
+*     msgBlank
 
 *  Purpose:
 *     Output a blank line.
 
 *  Language:
-*    Starlink Fortran 77
+*    Starlink ANSI C
 
 *  Invocation:
-*     CALL MSG_BLANK( STATUS )
+*     msgBlank( int * status );
 
 *  Description:
 *     A blank line is output to the user. If the status argument is not
@@ -19,13 +19,15 @@
 *     set to MSG__OPTER.
 
 *  Arguments:
-*     STATUS = INTEGER (Given and Returned)
+*     status = int * (Given and Returned)
 *        The global status.
 
 *  Algorithm:
-*     -  Use MSG1_PRINT to send a print message to the user interface.
+*     -  Use msgOut in private error context to prevent tokens from
+*        being cleared.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1990, 1991, 1992 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -47,6 +49,7 @@
 
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -57,36 +60,32 @@
 *     26-AUG-1992 (PCTR):
 *        Output the blank line conditionally, assuming MSG__NORM to be
 *        the priority.
+*     10-SEP-2008 (TIMJ):
+*        Rewrite in C. Use msgOut.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Declarations:
-      IMPLICIT NONE                     ! No implicit typing
+#include "merswrap.h"
+#include "sae_par.h"
+#include "ems.h"
 
-*  Global Constants:
-      INCLUDE 'SAE_PAR'                 ! Standard SAE constants
-      INCLUDE 'MSG_PAR'                 ! MSG_ public constants
+void msgBlank( int * status ) {
 
-*  Status:
-      INTEGER STATUS
+  /*  Check the inherited global status. */
+  if (*status != SAI__OK) return;
 
-*.
+  /*  Mark a new error reporting context to ensure that no existing message 
+   *  tokens are annulled. */
+  emsMark();
 
-*  Check the inherited global status. 
-      IF ( STATUS .NE. SAI__OK ) RETURN
+  /* Deliver the message with normal priority */
+  msgOut( "MSG_BLANK", " ", status );
 
-*  Mark a new error reporting context to ensure that no existing message 
-*  tokens are annulled.
-      CALL EMS_MARK
-
-*  Call MSG_OUTIF with the delivery priority set to MSG__NORM.
-      CALL MSG_OUTIF( MSG__NORM, 'MSG_BLANK', ' ', STATUS )
-
-*  Release the current error reporting context.
-      CALL EMS_RLSE
-
-      END
+  /*  Release the current error reporting context. */
+  emsRlse();
+}
