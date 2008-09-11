@@ -108,6 +108,7 @@
 #include "msg_err.h"
 #include "mers1.h"
 #include "ems.h"
+#include "merswrap.h"
 
 void msgOutif( int prior, const char * param, const char * text, int * status) {
 
