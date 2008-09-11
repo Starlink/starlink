@@ -420,7 +420,7 @@ int VOTable::table_data( const NS::TABLE& table, ofstream& out )
                     units = "---";
                 }
                 if ( fiter->datatype() ) {
-                    datatypes = fiter->datatype();
+                    datatypes = fiter->datatype().get();
                 }
                 else {
                     datatypes = "---";
@@ -452,7 +452,7 @@ int VOTable::table_data( const NS::TABLE& table, ofstream& out )
                 }
                 datatypes += '\t';
                 if ( fiter->datatype() ) {
-                    datatypes += fiter->datatype();
+                    datatypes += fiter->datatype().get();
                 }
                 else {
                     datatypes += "---";
@@ -787,7 +787,7 @@ int VOTable::data_binarydata( const NS::TABLE& table, const NS::BINARY& bdata,
     for ( ; fiter != fend; ++fiter ) {
 
         string type;
-        to_lower( fiter->datatype(), type );
+        to_lower( fiter->datatype().get(), type );
 
         if ( type == "boolean" ) {
             field_types.push_back( VOTableStream::BOOLEAN );

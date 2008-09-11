@@ -202,52 +202,82 @@ namespace gaia {
 
         const char *value = e->symbol();
         if ( value && value[0] != '\0' ) {
-            pseq.push_back( PARAM( "char", "symbol", value ) );
+            PARAM param( "symbol" );
+            param.value( value );
+            param.datatype( "char" );
+            pseq.push_back( param );
         }
 
         value = e->longName();
         if ( value && value[0] != '\0' ) {
-            pseq.push_back( PARAM( "char", "long_name", value ) );
+            PARAM param( "long_name" );
+            param.value( value );
+            param.datatype( "char" );
+            pseq.push_back( param );
         }
 
         value = e->shortName();
         if ( value && value[0] != '\0' ) {
-            pseq.push_back( PARAM( "char", "short_name", value ) );
+            PARAM param( "short_name" );
+            param.value( value );
+            param.datatype( "char" );
+            pseq.push_back( param );
         }
 
         value = e->url();
         if ( value && value[0] != '\0' ) {
-            pseq.push_back( PARAM( "char", "url", value ) );
+            PARAM param( "url" );
+            param.value( value );
+            param.datatype( "char" );
+            pseq.push_back( param );
         }
 
         value = e->searchCols();
         if ( value && value[0] != '\0' ) {
-            pseq.push_back( PARAM( "char", "search_cols", value ) );
+            PARAM param( "search_cols" );
+            param.value( value );
+            param.datatype( "char" );
+            pseq.push_back( param );
         }
 
         value = e->sortCols();
         if ( value && value[0] != '\0' ) {
-            pseq.push_back( PARAM( "char", "sort_cols", value ) );
+            PARAM param( "sort_cols" );
+            param.value( value );
+            param.datatype( "char" );
+            pseq.push_back( param );
         }
 
         value = e->sortOrder();
         if ( value && value[0] != '\0' ) {
-            pseq.push_back( PARAM( "char", "sort_order", value ) );
+            PARAM param( "sort_order" );
+            param.value( value );
+            param.datatype( "char" );
+            pseq.push_back( param );
         }
 
         value = e->showCols();
         if ( value && value[0] != '\0' ) {
-            pseq.push_back( PARAM( "char", "show_cols", value ) );
+            PARAM param( "show_cols" );
+            param.value( value );
+            param.datatype( "char" );
+            pseq.push_back( param );
         }
 
         value = e->copyright();
         if ( value && value[0] != '\0' ) {
-            pseq.push_back( PARAM( "char", "copyright", value ) );
+            PARAM param( "copyright" );
+            param.value( value );
+            param.datatype( "char" );
+            pseq.push_back( param );
         }
 
         value = e->help();
         if ( value && value[0] != '\0' ) {
-            pseq.push_back( PARAM( "char", "help", value ) );
+            PARAM param( "help" );
+            param.value( value );
+            param.datatype( "char" );
+            pseq.push_back( param );
         }
     }
 
@@ -293,7 +323,8 @@ namespace gaia {
         for ( int i = 0; i < ncols; i++ ) {
 
             //  Basic FIELD element.
-            FIELD field( "char", cat->colName( i ) );
+            FIELD field( cat->colName( i ) );
+            field.datatype( "char" );
 
             //  UCD, unit and utype.
             ucd_set = false;
