@@ -177,6 +177,7 @@ Options:
  -focus_follows_mouse <bool> - entry focus follows mouse (default: 0).
  -geometry <wxh+x+y>      - geometry of the main window (default: last session).
  -linear_cartesian <bool> - assuming CAR projections are a linear mapping (default: 1).
+ -ident <string>          - identifying string that will be prefixed to the window title.
  -interop_menu <bool>     - reveal interop menu for PLASTIC interactions (default: 1).
  -isize <n>               - search box for centroiding (default: 9).
  -max_scale <n>           - maximum scale for magnification menu (default: 20).
