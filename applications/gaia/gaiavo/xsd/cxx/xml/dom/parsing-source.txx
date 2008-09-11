@@ -3,6 +3,9 @@
 // copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
+// Starlink mods:  Set options to stop access of external DTDs and to 
+//                 permit attempts to parse after an error.
+
 #if _XERCES_VERSION >= 30000
 #  include <xercesc/dom/DOMLSParser.hpp>
 #else
@@ -28,6 +31,7 @@ namespace xsd
     {
       namespace dom
       {
+
         // parser
         //
         template <typename C>
@@ -138,6 +142,8 @@ namespace xsd
             conf->setParameter (XMLUni::fgDOMValidate, false);
             conf->setParameter (XMLUni::fgXercesSchema, false);
             conf->setParameter (XMLUni::fgXercesSchemaFullChecking, false);
+            conf->setParameter (XMLUni::fgXercesLoadExternalDTD, false);
+            conf->setParameter (XMLUni::fgXercesContinueAfterFatalError, true);
           }
           else
           {
@@ -202,6 +208,8 @@ namespace xsd
             parser->setFeature (XMLUni::fgDOMValidation, false);
             parser->setFeature (XMLUni::fgXercesSchema, false);
             parser->setFeature (XMLUni::fgXercesSchemaFullChecking, false);
+            parser->setFeature (XMLUni::fgXercesLoadExternalDTD, false);
+            parser->setFeature (XMLUni::fgXercesContinueAfterFatalError, true);
           }
           else
           {
@@ -328,6 +336,8 @@ namespace xsd
             conf->setParameter (XMLUni::fgDOMValidate, false);
             conf->setParameter (XMLUni::fgXercesSchema, false);
             conf->setParameter (XMLUni::fgXercesSchemaFullChecking, false);
+            conf->setParameter (XMLUni::fgXercesLoadExternalDTD, false);
+            conf->setParameter (XMLUni::fgXercesContinueAfterFatalError, true);
           }
           else
           {
@@ -392,6 +402,8 @@ namespace xsd
             parser->setFeature (XMLUni::fgDOMValidation, false);
             parser->setFeature (XMLUni::fgXercesSchema, false);
             parser->setFeature (XMLUni::fgXercesSchemaFullChecking, false);
+            parser->setFeature (XMLUni::fgXercesLoadExternalDTD, false);
+            parser->setFeature (XMLUni::fgXercesContinueAfterFatalError, true);
           }
           else
           {
