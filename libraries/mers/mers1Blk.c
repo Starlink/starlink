@@ -117,13 +117,13 @@ int msg1Gtwsz ( void ) {
 }
 
 void msg1Ptwsz ( int msgwsz ) {
-  this_err_glbl.errwsz = msgwsz;
+  this_err_glbl.msgwsz = msgwsz;
 }
 void msg1Ptstm ( int msgstm ) {
-  this_err_glbl.errstm = msgstm;
+  this_err_glbl.msgstm = msgstm;
 }
 void msg1Ptinf ( int msginf ) {
-  this_err_glbl.errrvl = msginf;
+  this_err_glbl.msginf = msginf;
 }
 
 /* Functions to set the corresponding tuning parameters in EMS
