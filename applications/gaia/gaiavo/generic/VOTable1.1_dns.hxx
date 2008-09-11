@@ -1434,16 +1434,20 @@ namespace votable_11_dns
     // datatype
     // 
     typedef ::votable_11_dns::dataType datatype_type;
+    typedef ::xsd::cxx::tree::optional< datatype_type > datatype_optional;
     typedef ::xsd::cxx::tree::traits< datatype_type, char > datatype_traits;
 
-    const datatype_type&
+    const datatype_optional&
     datatype () const;
 
-    datatype_type&
+    datatype_optional&
     datatype ();
 
     void
     datatype (const datatype_type& x);
+
+    void
+    datatype (const datatype_optional& x);
 
     void
     datatype (::std::auto_ptr< datatype_type > p);
@@ -1570,16 +1574,20 @@ namespace votable_11_dns
     // value
     // 
     typedef ::xml_schema::string value_type;
+    typedef ::xsd::cxx::tree::optional< value_type > value_optional;
     typedef ::xsd::cxx::tree::traits< value_type, char > value_traits;
 
-    const value_type&
+    const value_optional&
     value () const;
 
-    value_type&
+    value_optional&
     value ();
 
     void
     value (const value_type& x);
+
+    void
+    value (const value_optional& x);
 
     void
     value (::std::auto_ptr< value_type > p);
@@ -1607,9 +1615,7 @@ namespace votable_11_dns
 
     // Constructors.
     //
-    PARAM (const datatype_type&,
-           const name_type&,
-           const value_type&);
+    PARAM (const name_type&);
 
     PARAM (const ::xercesc::DOMElement& e,
            ::xml_schema::flags f = 0,
@@ -1639,14 +1645,14 @@ namespace votable_11_dns
     LINK_sequence LINK_;
     ID_optional ID_;
     unit_optional unit_;
-    ::xsd::cxx::tree::one< datatype_type > datatype_;
+    datatype_optional datatype_;
     precision_optional precision_;
     width_optional width_;
     ref_optional ref_;
     ::xsd::cxx::tree::one< name_type > name_;
     ucd_optional ucd_;
     utype_optional utype_;
-    ::xsd::cxx::tree::one< value_type > value_;
+    value_optional value_;
     arraysize_optional arraysize_;
   };
 
@@ -2034,16 +2040,20 @@ namespace votable_11_dns
     // datatype
     // 
     typedef ::votable_11_dns::dataType datatype_type;
+    typedef ::xsd::cxx::tree::optional< datatype_type > datatype_optional;
     typedef ::xsd::cxx::tree::traits< datatype_type, char > datatype_traits;
 
-    const datatype_type&
+    const datatype_optional&
     datatype () const;
 
-    datatype_type&
+    datatype_optional&
     datatype ();
 
     void
     datatype (const datatype_type& x);
+
+    void
+    datatype (const datatype_optional& x);
 
     void
     datatype (::std::auto_ptr< datatype_type > p);
@@ -2211,8 +2221,7 @@ namespace votable_11_dns
 
     // Constructors.
     //
-    FIELD (const datatype_type&,
-           const name_type&);
+    FIELD (const name_type&);
 
     FIELD (const ::xercesc::DOMElement& e,
            ::xml_schema::flags f = 0,
@@ -2242,7 +2251,7 @@ namespace votable_11_dns
     LINK_sequence LINK_;
     ID_optional ID_;
     unit_optional unit_;
-    ::xsd::cxx::tree::one< datatype_type > datatype_;
+    datatype_optional datatype_;
     precision_optional precision_;
     width_optional width_;
     ref_optional ref_;

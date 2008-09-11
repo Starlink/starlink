@@ -177,14 +177,14 @@
       </xs:sequence>
       <xs:attribute name="ID" type="xs:ID"/>
       <xs:attribute name="unit" type="xs:token"/>
-      <xs:attribute name="datatype" type="dataType" use="required"/>
+      <xs:attribute name="datatype" type="dataType"/>
       <xs:attribute name="precision" type="precType"/>
       <xs:attribute name="width" type="xs:positiveInteger"/>
       <xs:attribute name="ref" type="xs:IDREF"/>
       <xs:attribute name="name" type="xs:token" use="required"/>
       <xs:attribute name="ucd" type="ucdType"/>
       <xs:attribute name="utype" type="xs:string"/>
-      <xs:attribute name="value" type="xs:string" use="required"/>
+      <xs:attribute name="value" type="xs:string"/>
       <xs:attribute name="arraysize" type="arrayDEF"/>
     </xs:complexType>
   </xs:element>
@@ -223,7 +223,7 @@
       </xs:sequence>
       <xs:attribute name="ID" type="xs:ID"/>
       <xs:attribute name="unit" type="xs:token"/>
-      <xs:attribute name="datatype" type="dataType" use="required"/>
+      <xs:attribute name="datatype" type="dataType"/>
       <xs:attribute name="precision" type="precType"/>
       <xs:attribute name="width" type="xs:positiveInteger"/>
       <xs:attribute name="ref" type="xs:IDREF"/>

@@ -996,22 +996,28 @@ namespace votable_11
     this->unit_.set (x);
   }
 
-  const PARAM::datatype_type& PARAM::
+  const PARAM::datatype_optional& PARAM::
   datatype () const
   {
-    return this->datatype_.get ();
+    return this->datatype_;
   }
 
-  PARAM::datatype_type& PARAM::
+  PARAM::datatype_optional& PARAM::
   datatype ()
   {
-    return this->datatype_.get ();
+    return this->datatype_;
   }
 
   void PARAM::
   datatype (const datatype_type& x)
   {
     this->datatype_.set (x);
+  }
+
+  void PARAM::
+  datatype (const datatype_optional& x)
+  {
+    this->datatype_ = x;
   }
 
   void PARAM::
@@ -1188,22 +1194,28 @@ namespace votable_11
     this->utype_.set (x);
   }
 
-  const PARAM::value_type& PARAM::
+  const PARAM::value_optional& PARAM::
   value () const
   {
-    return this->value_.get ();
+    return this->value_;
   }
 
-  PARAM::value_type& PARAM::
+  PARAM::value_optional& PARAM::
   value ()
   {
-    return this->value_.get ();
+    return this->value_;
   }
 
   void PARAM::
   value (const value_type& x)
   {
     this->value_.set (x);
+  }
+
+  void PARAM::
+  value (const value_optional& x)
+  {
+    this->value_ = x;
   }
 
   void PARAM::
@@ -1694,22 +1706,28 @@ namespace votable_11
     this->unit_.set (x);
   }
 
-  const FIELD::datatype_type& FIELD::
+  const FIELD::datatype_optional& FIELD::
   datatype () const
   {
-    return this->datatype_.get ();
+    return this->datatype_;
   }
 
-  FIELD::datatype_type& FIELD::
+  FIELD::datatype_optional& FIELD::
   datatype ()
   {
-    return this->datatype_.get ();
+    return this->datatype_;
   }
 
   void FIELD::
   datatype (const datatype_type& x)
   {
     this->datatype_.set (x);
+  }
+
+  void FIELD::
+  datatype (const datatype_optional& x)
+  {
+    this->datatype_ = x;
   }
 
   void FIELD::
@@ -5077,23 +5095,21 @@ namespace votable_11
   //
 
   PARAM::
-  PARAM (const datatype_type& datatype,
-         const name_type& name,
-         const value_type& value)
+  PARAM (const name_type& name)
   : ::xml_schema::type (),
     DESCRIPTION_ (::xml_schema::flags (), this),
     VALUES_ (::xml_schema::flags (), this),
     LINK_ (::xml_schema::flags (), this),
     ID_ (::xml_schema::flags (), this),
     unit_ (::xml_schema::flags (), this),
-    datatype_ (datatype, ::xml_schema::flags (), this),
+    datatype_ (::xml_schema::flags (), this),
     precision_ (::xml_schema::flags (), this),
     width_ (::xml_schema::flags (), this),
     ref_ (::xml_schema::flags (), this),
     name_ (name, ::xml_schema::flags (), this),
     ucd_ (::xml_schema::flags (), this),
     utype_ (::xml_schema::flags (), this),
-    value_ (value, ::xml_schema::flags (), this),
+    value_ (::xml_schema::flags (), this),
     arraysize_ (::xml_schema::flags (), this)
   {
   }
@@ -5302,24 +5318,10 @@ namespace votable_11
       }
     }
 
-    if (!datatype_.present ())
-    {
-      throw ::xsd::cxx::tree::expected_attribute< char > (
-        "datatype",
-        "");
-    }
-
     if (!name_.present ())
     {
       throw ::xsd::cxx::tree::expected_attribute< char > (
         "name",
-        "");
-    }
-
-    if (!value_.present ())
-    {
-      throw ::xsd::cxx::tree::expected_attribute< char > (
-        "value",
         "");
     }
   }
@@ -5562,15 +5564,14 @@ namespace votable_11
   //
 
   FIELD::
-  FIELD (const datatype_type& datatype,
-         const name_type& name)
+  FIELD (const name_type& name)
   : ::xml_schema::type (),
     DESCRIPTION_ (::xml_schema::flags (), this),
     VALUES_ (::xml_schema::flags (), this),
     LINK_ (::xml_schema::flags (), this),
     ID_ (::xml_schema::flags (), this),
     unit_ (::xml_schema::flags (), this),
-    datatype_ (datatype, ::xml_schema::flags (), this),
+    datatype_ (::xml_schema::flags (), this),
     precision_ (::xml_schema::flags (), this),
     width_ (::xml_schema::flags (), this),
     ref_ (::xml_schema::flags (), this),
@@ -5784,13 +5785,6 @@ namespace votable_11
         this->type (r);
         continue;
       }
-    }
-
-    if (!datatype_.present ())
-    {
-      throw ::xsd::cxx::tree::expected_attribute< char > (
-        "datatype",
-        "");
     }
 
     if (!name_.present ())
@@ -9278,13 +9272,14 @@ namespace votable_11
 
     // datatype
     //
+    if (i.datatype ())
     {
       ::xercesc::DOMAttr& a (
         ::xsd::cxx::xml::dom::create_attribute (
           "datatype",
           e));
 
-      a << i.datatype ();
+      a << *i.datatype ();
     }
 
     // precision
@@ -9360,13 +9355,14 @@ namespace votable_11
 
     // value
     //
+    if (i.value ())
     {
       ::xercesc::DOMAttr& a (
         ::xsd::cxx::xml::dom::create_attribute (
           "value",
           e));
 
-      a << i.value ();
+      a << *i.value ();
     }
 
     // arraysize
@@ -9618,13 +9614,14 @@ namespace votable_11
 
     // datatype
     //
+    if (i.datatype ())
     {
       ::xercesc::DOMAttr& a (
         ::xsd::cxx::xml::dom::create_attribute (
           "datatype",
           e));
 
-      a << i.datatype ();
+      a << *i.datatype ();
     }
 
     // precision
