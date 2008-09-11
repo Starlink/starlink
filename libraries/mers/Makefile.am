@@ -87,7 +87,7 @@ F_ROUTINES_UT = msg1_gesc.f msg1_gnam.f msg1_putc.f msg1_rform.f
 
 C_ROUTINES_UT = msg1Ktok.c
 
-F_BLOCK_DATA_FILES = msg1_blk.f
+F_BLOCK_DATA_FILES =
 
 C_INTERFACE_ROUTINES = err.c msgSetc.c msgSetd.c msgSetr.c msgSeti.c \
 msgSetl.c errAnnul.c errBegin.c errEnd.c errSyser.c errMark.c errRlse.c \

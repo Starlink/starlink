@@ -51,10 +51,10 @@
 *-
 
 *  Global Constants:
-      INTEGER ERR__SZMSG	        ! Maximum length of error message text
+      INTEGER ERR__SZMSG          ! Maximum length of error message text
       PARAMETER( ERR__SZMSG = 200 )
 
-      INTEGER ERR__SZPAR                ! Maximum length of error message name
+      INTEGER ERR__SZPAR          ! Maximum length of error message name
       PARAMETER( ERR__SZPAR = 15 )
 
 *.
