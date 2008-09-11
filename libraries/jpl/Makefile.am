@@ -15,20 +15,21 @@ staretc_DATA = jpleph.dat
 # Build tools
 noinst_PROGRAMS = ephdsk
 
+# Add comdat.o to work around gfortran linker problem on OS X.
 ephdsk_SOURCES = ephdsk.f
-ephdsk_LDADD = libjpl.la
+ephdsk_LDADD = libjpl.la comdat.o
 
 shorteph_SOURCES = shorteph.f
-shorteph_LDADD = libjpl.la
+shorteph_LDADD = libjpl.la comdat.o
 
 jplpleph_SOURCES = jplpleph.f
-jplpleph_LDADD = libjpl.la
+jplpleph_LDADD = libjpl.la comdat.o
 
 jplstate_SOURCES = jplstate.f
-jplstate_LDADD = libjpl.la
+jplstate_LDADD = libjpl.la comdat.o
 
 jplconst_SOURCES = jplconst.f
-jplconst_LDADD = libjpl.la
+jplconst_LDADD = libjpl.la comdat.o
 
 
 libjpl_la_SOURCES = $(BLOCK_DATA_ROUTINES) $(F_ROUTINES) $(FPP_ROUTINES)
