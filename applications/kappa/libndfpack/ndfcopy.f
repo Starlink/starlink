@@ -241,7 +241,7 @@
                                  ! structure
       CHARACTER LOC5*(DAT__SZLOC)! Locator to AXIS component
       CHARACTER NAME*(DAT__SZNAM)! Name of AXIS component
-      CHARACTER TTL*80           ! Frame title
+      CHARACTER TTL*(AST__SZCHR) ! Frame title
       CHARACTER TYPE*(DAT__SZTYP)! Numerical type of array component
       INTEGER CAXES( NDF__MXDIM )! Non-degenerate current Frame axes
       INTEGER EL                 ! No. of elements in mapped array
