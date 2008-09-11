@@ -749,9 +749,9 @@ itcl::class gaia::Gaia {
       #  Add SIAP query dialog to Data-Servers.
       set m [get_menu Data-Servers]
       set index [$m index "Reload config file..."]
-      insert_menuitem $m $index command "Reload VO image servers..." \
-         {Update VO image servers available in catalog directories} \
-         -command [code $this vo_update_siap_ $m $index]
+      insert_menuitem $m $index command "Query VO image servers..." \
+         {Find VO image servers and query for images} \
+         -command [code $this vo_find_siap_ $m $index]
    }
 
    #  Add a menubutton with the GAIA options.
@@ -2357,16 +2357,31 @@ window gives you access to this."
    #  VO support
    #  ----------
 
-   #  Update the available SIAP servers by querying a VO registry.
-   #  Arguments are the Data-Servers menu and the index of the entry that
-   #  invoked this method.
-   protected method vo_update_siap_ {m index} {
+   #  Find SIAP VO servers and query for images.
+   protected method vo_find_siap_ {m index} {
       if { [gaia::GaiaVOTableAccess::check_for_gaiavo] } {
-         utilReUseWidget gaiavo::GaiaVOCat $w_.siap \
-            -show_cols {shortName title}
+         utilReUseWidget gaiavo::GaiaVOCatRegistry $w_.voregistry \
+            -show_cols {shortName title} \
+            -activate_cmd [code $this vo_query_siap_]
       } else {
          #  Grey out menu, no GaiaVO.
          $m entryconfigure $index -state disabled
+      }
+   }
+
+   #  Open a dialog for querying a SIAP server.
+   protected method vo_query_siap_ {headers row} {
+      if { [gaia::GaiaVOTableAccess::check_for_gaiavo] } {
+
+         #  See if the given headers and row data specify a SIAP
+         #  server. Need a accessURL field for that.
+         set accessURL [gaiavo::GaiaVOCatSIAP::getAccessURL $headers $row]
+         puts "accessURL = $accessURL"
+         if { $accessURL != {} } {
+            gaiavo::GaiaVOCatSIAP $w_.siapquery\#auto -accessURL $accessURL
+         } else {
+            warning_dialog "SIAP service does not specify an accessURL" $w_
+         }
       }
    }
 
