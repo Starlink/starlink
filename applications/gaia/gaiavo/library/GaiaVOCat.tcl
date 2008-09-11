@@ -10,19 +10,16 @@
 
 #  Description:
 #     This class defines a standard basic UI for containing the query
-#     elements specific to a particular VO service (like SIAP). It
-#     controls the query and displays the resultant VOTable, which can
-#     be edited. On acceptance the various servers will be added to the
-#     general catalogue configuration, so that detailed queries for
-#     images and catalogues (same as any other Skycat server).
-#
-#     This is the VO equivalent of the cat::AstroCat class.
+#     elements specific to a particular VO service. It controls the query and
+#     displays the resultant VOTable. Subclasses should be created that
+#     specialise the query itself and what actions to take when activating
+#     a response.
 
 #  Invocations:
 #
 #        GaiaVOCat object_name [configuration options]
 #
-#     This creates an instance of a GaiavoVolume object. The return is
+#     This creates an instance of a GaiaVOCat object. The return is
 #     the name of the object.
 #
 #        object_name configure -configuration_options value
@@ -91,6 +88,16 @@ itcl::class gaiavo::GaiaVOCat {
 
       #  File menu.
       set m [add_menubutton File]
+      
+      #  Read old query from disk.
+      add_menuitem $m command "Open..." \
+         {Read previous query results from a VOTable} \
+         -command [code $this read_query]
+
+      #  Save query to disk.
+      add_menuitem $m command "Save as..." \
+         {Save query results to a VOTable} \
+         -command [code $this save_query]
 
       add_menuitem $m command "Close" \
          {Close this window} \
@@ -128,16 +135,23 @@ itcl::class gaiavo::GaiaVOCat {
 
       #  Do the initial check for proxies.
       check_proxies
+   }
 
-      #  Add the registry query component.
-      itk_component add registry {
-         gaiavo::GaiaVORegistrySearch $w_.registry \
-            -feedbackcommand  [code $this set_feedback] \
-            -astrocat [code $w_.cat] \
-            -command [code $this query_done]
-      }
-      pack $itk_component(registry) -side top -fill both -expand 1
-      add_short_help $itk_component(registry) {Controls to set registry query}
+   #  Destructor:
+   #  -----------
+   destructor {
+   }
+
+   #  Methods:
+   #  --------
+
+   #  Finish building the UI. Done later as can rely on configuration
+   #  options in sub-classes (add_query_component_ is defined there).
+   public method init {} {
+
+      #  Add the query component. Usually has some controls
+      #  for establishing the query context and initiating it.
+      add_query_component_
 
       #  Controls for the query.
       itk_component add querybuttons {
@@ -152,7 +166,7 @@ itcl::class gaiavo::GaiaVOCat {
       }
       pack $itk_component(query) -side left -expand 1 -pady 2m
       add_short_help $itk_component(query) \
-         {{bitmap b1} = start catalogue query}
+         {Start query}
 
       itk_component add interrupt {
          button $itk_component(querybuttons).interrupt \
@@ -162,7 +176,7 @@ itcl::class gaiavo::GaiaVOCat {
       }
       pack $itk_component(interrupt) -side left -expand 1 -pady 2m
       add_short_help $itk_component(interrupt) \
-         {{bitmap b1} = interrupt the registry query}
+         {Interrupt the query}
 
       #  Add the table for displaying the query results.
       itk_component add results {
@@ -178,19 +192,21 @@ itcl::class gaiavo::GaiaVOCat {
       } {
       }
       pack $itk_component(results) -side top -fill both -expand 1
-      bind $itk_component(results).listbox <ButtonRelease-1> \
-         [code $this select_result_row_]
-
-      add_short_help $itk_component(results) \
-         {Query results: {bitmap b1} = select object, \
-             double click {bitmap b1} = label object, \
-             {bitmap dragb2} = scroll list}
+      add_short_help $itk_component(results) {Results of query to repository}
 
       #  Add the dialog button frame and the action buttons.
       itk_component add buttons {
          frame $w_.buttons -borderwidth 2 -relief raised
       }
       pack  $itk_component(buttons) -side top -fill x
+
+      itk_component add open {
+         button $itk_component(buttons).open \
+            -text "Open" \
+            -command [code $this open]
+      }
+      pack $itk_component(open) -side left -expand 1 -pady 2m
+      add_short_help $itk_component(open) {Open window to query selected service}
 
       itk_component add close {
          button $itk_component(buttons).close \
@@ -209,17 +225,45 @@ itcl::class gaiavo::GaiaVOCat {
          {Progress bar: displays status of work in progress}
    }
 
-   #  Destructor:
-   #  -----------
-   destructor {
-   }
-
-   #  Methods:
-   #  --------
-
    #  Close this window.
    public method close {} {
       wm withdraw $w_
+   }
+
+   #  Save query to a VOTable.
+   public method save_query {} {
+      set w [FileSelect .\#auto -title "Save query to a local file"]
+      if {[$w activate]} {
+         set filename [$w get]
+         if {[file exists $filename]} {
+            if {! [confirm_dialog \
+                      "File `[file tail $filename]' exists. Overwrite it?" $w_]} {
+               return
+            }
+         }
+         $query_component_ save_query $filename
+      }
+   }
+
+   #  Read query from a VOTable.
+   public method read_query {} {
+      set w [FileSelect .\#auto -title "Read old query from a local file"]
+      if { [$w activate] } {
+         set filename [$w get]
+         if {[file exists $filename]} {
+            $query_component_ read_query [$w get]
+         } else {
+            warning_dialog "File '$filename' doesn't exist" $w_
+         }
+      }
+   }
+
+   #  Open services for the selected rows. Depends on the type of service query
+   #  as to what will happen. For SIAP we should open a window to download an image.
+   public method open {} {
+      foreach row [$itk_component(results) get_selected] { 
+         open_service_ $row
+      }
    }
 
    #  Pop up a dialog to sort the list.
@@ -278,7 +322,6 @@ itcl::class gaiavo::GaiaVOCat {
       $itk_component(results) enter_new_object [code $this query]
    }
 
-
    #  Pop up a window so that the user can edit the selected object(s).
    public method edit_selected_object {} {
       $itk_component(results) edit_selected_object [code $this query]
@@ -308,7 +351,7 @@ itcl::class gaiavo::GaiaVOCat {
 
    #  Interrupt the current query.
    public method interrupt {} {
-      $itk_component(registry) interrupt
+      $query_component_ interrupt
       set_feedback off
       catch {$itk_component(results) config -title "Query Results"}
       set_state normal
@@ -329,6 +372,7 @@ itcl::class gaiavo::GaiaVOCat {
 
    # This method is called when the background query is done.
    public method query_done {result} {
+
       set_state normal
 
       if { ! [file exists $result] } {
@@ -376,23 +420,27 @@ itcl::class gaiavo::GaiaVOCat {
       }
 
       set_state disabled
-      $itk_component(progressbar) config -text "Querying registry..."
+      $itk_component(progressbar) config -text "Querying..."
       $itk_component(progressbar) look_busy
 
-      $itk_component(registry) query
+      $query_component_ query
    }
-
-   #  Row is selected.
-   protected method select_result_row_ {} {
-      puts "row selected, do something..."
-   }
-
 
    #  Respond to feedback about query progress (stop and start).
    protected method set_feedback {onoff} {
       if { $onoff == "off" } {
          $itk_component(progressbar) reset
       }
+   }
+
+   #  Add the component that will control the query parameters.
+   protected method add_query_component_ {} {
+      puts stderr "must implement an add_query_component_ method"
+   }
+
+   #  Open a service, "args" is a list of values from a row of the current table.
+   protected method open_service_ {args} {
+      puts stderr "Must implemenent an open_service_ method"
    }
 
    #  Check for a file ~/.skycat/proxies, once each session, and use it to
@@ -424,7 +472,10 @@ itcl::class gaiavo::GaiaVOCat {
    #  Columns to show. Defined once during initialisation.
    itk_option define -show_cols show_cols Show_Cols {}
 
-   #  Command to execute when a query is completed.
+   #  Command to execute when a response is activated. The command will
+   #  be trailed by the accessURL value and the full row content. Normally
+   #  this will open a window to do the actual service query for images etc.
+   itk_option define -activate_cmd activate_cmd Activate_Cmd {}
 
    #  Protected variables: (available to instance)
    #  --------------------
@@ -434,6 +485,9 @@ itcl::class gaiavo::GaiaVOCat {
 
    #  Result from most recent query (list of rows).
    protected variable info_ {}
+
+   #  Component that will perform the query. Must be defined in add_query_component_.
+   protected variable query_component_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

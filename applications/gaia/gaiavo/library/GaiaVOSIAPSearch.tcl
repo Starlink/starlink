@@ -1,29 +1,23 @@
 #+
 #  Name:
-#     GaiaVORegistrySearch
+#     GaiaVOSIAPSearch
 
 #  Type of Module:
 #     [incr Tcl] class
 
 #  Purpose:
-#     Class for querying a VO registry.
+#     Class for querying a VO SIAP server.
 
 #  Description:
-#     This class defines the access methods for querying the NVO version 1
-#     registry. This should probably be generalised to offer the list of
-#     registry of registries held by the IVOA at http://rofr.ivoa.net and
-#     work with standard methods and any registry, but currently it is
-#     fixed. XXX review this when version 1 stabilizes.
-#
-#     The query is defined using a service type like SimpleImageAccess, and an
-#     ADQL predicate to refine the search and the results is returned as 
-#     a VOTable (rather than the more generalised XML of a registry response).
+#     Provides controls for constructing and doing a query of a SIAP version
+#     1 server. The server is defined by an accessURL, which will be qualified
+#     by a position and size on the sky.
 
 #  Invocations:
 #
-#        GaiaVORegistrySearch object_name [configuration options]
+#        GaiaVOSIAPSearch object_name [configuration options]
 #
-#     This creates an instance of a GaiavoVolume object. The return is
+#     This creates an instance of a GaiaSIAPSearch object. The return is
 #     the name of the object.
 #
 #        object_name configure -configuration_options value
@@ -60,7 +54,7 @@
 #     {enter_new_authors_here}
 
 #  History:
-#     22-JUL-2008 (PWD):
+#     08-AUG-2008 (PWD):
 #        Original version.
 #     {enter_further_changes_here}
 
@@ -68,9 +62,9 @@
 
 #.
 
-itk::usual GaiaVORegistrySearch {}
+itk::usual GaiaVOSIAPSearch {}
 
-itcl::class gaiavo::GaiaVORegistrySearch {
+itcl::class gaiavo::GaiaVOSIAPSearch {
 
    #  Inheritances:
    #  -------------
@@ -84,47 +78,56 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       eval itk_initialize $args
 
       #  Handler for temporary files.
-      set tempcats_ [gaia::GaiaTempName \#auto -prefix GaiaVORegistry \
+      set tempcats_ [gaia::GaiaTempName \#auto -prefix GaiaVOSIAP \
                         -exists 0 -type ".TAB"]
 
-      #  Display the registry. XXX Can edit during testing.
+      #  Display the SIAP accessURL. XXX Can edit during testing.
       set lwidth 10
       set vwidth 50
-      itk_component add registry {
-         LabelEntry $w_.registry \
-            -text "Registry:" \
+      itk_component add server {
+         LabelEntry $w_.server \
+            -text "Server:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
-            -value $itk_option(-registry) \
-            -textvariable [scope itk_option(-registry)]
+            -value $itk_option(-accessURL) \
+            -textvariable [scope itk_option(-accessURL)]
       }
-      pack $itk_component(registry) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(registry) {VO Registry}
+      pack $itk_component(server) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(server) {SIAP server URL}
 
-      #  Display the type of service. Can edit during testing.
-      itk_component add service {
-         LabelEntry $w_.service \
-            -text "Service:" \
+      #  Get the position on the sky, an RA and a Dec.
+      itk_component add ra {
+         LabelEntry $w_.ra \
+            -text "RA:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
-            -value $service_ \
-            -textvariable [scope service_]
+            -value $ra_ \
+            -textvariable [scope ra_]
       }
-      pack $itk_component(service) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(service) {Service type}
+      pack $itk_component(ra) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(ra) {RA centre of images}
 
-      #  Simple predicate.
-      itk_component add predicate {
-         LabelEntry $w_.predicate \
-            -text "Predicate:" \
+      itk_component add dec {
+         LabelEntry $w_.dec \
+            -text "Dec:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
-            -value $itk_option(-predicate) \
-            -textvariable [scope itk_option(-predicate)]
+            -value $dec_ \
+            -textvariable [scope dec_]
       }
-      pack $itk_component(predicate) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(predicate)  \
-         {Simple predicate to qualify query, e.g. "title LIKE '%%galex%%'"}
+      pack $itk_component(dec) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(dec) {Dec centre of images}
+
+      itk_component add size {
+         LabelEntry $w_.size \
+            -text "Size:" \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
+            -value $size_ \
+            -textvariable [scope size_]
+      }
+      pack $itk_component(size) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(size) {Size of images}
    }
 
    #  Destructor:
@@ -147,13 +150,13 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       #  Establish object to run the query script.
       if { $querytask_ == {} } {
          set querytask_ [gaia::GaiaForeignExec \#auto \
-                            -application $::gaia_dir/queryvoreg \
+                            -application $::gaia_dir/querysiap \
                             -notify [code $this query_done_]]
       }
       set votable_ [$tempcats_ get_typed_name ".vot"]
       set interrupted_ 0
-      $querytask_ runwith $itk_option(-registry) $service_ \
-         $itk_option(-predicate) $itk_option(-endmethod) $votable_
+      puts "$querytask_ runwith $itk_option(-accessURL) $ra_ $dec_ $size_ $votable_"
+      $querytask_ runwith $itk_option(-accessURL) $ra_ $dec_ $size_ $votable_
    }
 
    #  Interrupt the query.
@@ -166,11 +169,12 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       if { $itk_option(-feedbackcommand) != {} } {
          eval $itk_option(-feedbackcommand) off
       }
-
    }
 
    #  Called when the query completes.
    protected method query_done_ {} {
+      
+      puts "query_done"
 
       #  Immediate notification we're finished.
       if { $itk_option(-feedbackcommand) != {} } {
@@ -184,19 +188,12 @@ itcl::class gaiavo::GaiaVORegistrySearch {
 
       #  Check file exists.
       if { ! [::file exists $votable_] } {
-         warning_dialog "Failed to query registry"
+         warning_dialog "Failed to query SIAP server"
          return
       }
 
       #  Convert to TST and do the command to display etc.
       read_query $votable_
-   }
-
-   #  Translate a service type to its full description.
-   protected method set_service_ {} {
-      if { [info exists services_($itk_option(-service))] } {
-         set service_ $services_($itk_option(-service))
-      }
    }
 
    #  Save the result of a query to an external VOTable.
@@ -209,40 +206,37 @@ itcl::class gaiavo::GaiaVORegistrySearch {
    #  Read the query directly from an existing file.
    public method read_query {filename} {
 
+      puts "read_query: $filename"
+
       #  Convert to a TST file so we can open it up as usual.
       set vot [gaiavotable::open $filename]
+      puts "1"
       set tempname [$tempcats_ get_name]
+      puts "2"
       set tst [gaiavotable::save $vot 0 $tempname]
+      puts "3"
       gaiavotable::close $vot
+      puts "4"
 
       #  This is the current VOTable now.
       set votable_ $filename
+      puts "5"
 
       #  Do command so that something happens.
       if { $itk_option(-command) != {} } {
+         puts "6"
          eval $itk_option(-command) $tempname
       }
+      puts "7"
    }
 
    #  Configuration options: (public variables)
    #  ----------------------
 
-   #  The VO registry to query. End point that returns the WSDL.
-   itk_option define -registry registry Registry \
-      "http://nvo.stsci.edu/vor10/NVORegInt.asmx?WSDL"
+   #  The SIAP accessURL.
+   itk_option define -accessURL accessURL AccessURL {}
 
-   #  The method of the registry to use.
-   itk_option define -endmethod endmethod EndMethod "VOTCapabilityPredicate"
-
-   #  The type of query, SIAP, SSAP or CONE.
-   itk_option define -service service Service SIAP {
-      set_service_
-   }
-
-   #  The query predicate.
-   itk_option define -predicate predicate Predicate {}
-
-   #  Command to execute when a list of servers is accepted.
+   #  Command to execute when a list of images is accepted.
    itk_option define -command command Command {}
 
    #  Command to execute when batch jobs starts and stops.
@@ -253,9 +247,6 @@ itcl::class gaiavo::GaiaVORegistrySearch {
 
    #  Protected variables: (available to instance)
    #  --------------------
-
-   #  The full name of the service.
-   protected variable service_ {}
 
    #  Temporary files.
    protected variable tempcats_ {}
@@ -269,14 +260,13 @@ itcl::class gaiavo::GaiaVORegistrySearch {
    #  Set true when a query is being interrupted.
    protected variable interrupted_ 0
 
+   #  SIAP RA, Dec and size.
+   protected variable ra_ 0.0
+   protected variable dec_ 0.0
+   protected variable size_ 0.01
+
    #  Common variables: (shared by all instances)
    #  -----------------
-
-   #  Mapping for short to full names of services.
-   protected common services_
-   set services_(SIAP) "SimpleImageAccess"
-   set services_(SSAP) "SimpleSpectralAccess"
-   set services_(CONE) "conesearch"
 
 #  End of class definition.
 }
