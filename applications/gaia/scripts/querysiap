@@ -1,0 +1,94 @@
+#!/bin/sh
+# The next line is executed by /bin/sh, but not Tcl \
+exec $GAIA_DIR/gaiavo_tcl $0 ${1+"$@"}
+#+
+#   Name:
+#      querysiap
+
+#   Purpose:
+#      Query a SIAP server for images.
+
+#   Usage:
+#      querysiap endpoint ra dec size outfile
+
+#   Description:
+#      Queries a VO Simple Image Access Protocol version 1 server for all
+#      all known images in a given area of the sky. The result is a VOTable
+#      containing the response.
+#
+#      The RA and Dec values are in FK5/J2000 and must be in decimal
+#      degrees. The size should also be degrees.
+
+#   Authors:
+#      Peter W. Draper (PWD):
+
+#  Copyright:
+#     Copyright (C) 2008 Science and Technology Facilties Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of the
+#     License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+#     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#   History:
+#      08-SEP-2008 (PWD):
+#         Original version.
+#-
+#.
+
+#  Check the command-line arguments.
+if { $argc == 5 } {
+   set endpoint [lindex $argv 0]
+   set ra [lindex $argv 1]
+   set dec [lindex $argv 2]
+   set size [lindex $argv 3]
+   set outfile [lindex $argv 4]
+} else {
+   puts stderr {Usage: querysiap endpoint ra dec size outfile}
+   exit 1
+}
+
+#  Open the output file.
+if { [catch "::open $outfile w" fid] } {
+   puts stderr "Failed to open output file: $outfile"
+   exit 1
+}
+
+#  Establish the standard proxy define using http_proxy.
+#cat::ProxyDialog::check_proxies $::env(HOME)/.skycat/proxies
+set proxy {}
+set port {}
+if { [info exists ::env(http_proxy)] } {
+   if { [scan $::env(http_proxy) {http://%[^:/]:%d} proxy port] != 2 } {
+      scan $::env(http_proxy) {http://%[^:/]} proxy
+   }
+}
+::http::config -proxyhost $proxy
+::http::config -proxyport $port
+
+#  Construct the query. Endpoint can terminate in & or ?
+switch -glob $endpoint {
+    *& {
+        set query ${endpoint}POS=${ra},${dec}&SIZE=${size}
+    }
+    default {
+        set query ${endpoint}&POS=${ra},${dec}&SIZE=${size}
+    }
+}
+
+#  Download the response.
+::http::geturl $query -channel $fid
+::close $fid
+exit
