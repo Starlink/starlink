@@ -1,16 +1,16 @@
-      SUBROUTINE MSG1_PRINT( TEXT, STATUS )
+/*
 *+
 *  Name:
-*     MSG1_PRINT
+*     msg1Print
 
 *  Purpose:
 *     Deliver the text of a message to the user. 
 
 *  Language:
-*    Starlink Fortran 77
+*    Starlink ANSI C
 
 *  Invocation:
-*     CALL MSG1_PRINT( TEXT, STATUS )
+*     msg1Print( const char * text, int * status );
 
 *  Description:
 *     This uses the parameter system to deliver the message text to the 
@@ -20,14 +20,14 @@
 *     the user.
 
 *  Arguments:
-*     TEXT = CHARACTER * ( * ) (Given)
+*     text = const char * (Given)
 *        The message text.
-*     STATUS = INTEGER (Given and Returned)
+*     status = int * (Given and Returned)
 *        The global status.
 
 *  Implementation Notes:
 *     -  This subroutine is shared by both ADAM and standalone implementation.
-*        System specific message delivery is done via MSG1_PRTLN.
+*        System specific message delivery is done via msg1Prtln.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -105,100 +105,86 @@
 *        except for the call to subpar or write (and the corresponding
 *        check of inherited or I/O status). Move the system specific
 *        code to a new routine to aid code reuse.
+*     10-SEP-2008 (TIMJ):
+*        Rewrite in C
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Declarations:
-      IMPLICIT NONE                     ! No implicit typing
+#include "sae_par.h"
+#include "msg_err.h"
+#include "msg_sys.h"
+#include "msg_par.h"
+#include "mers1.h"
+#include "ems.h"
 
-*  Global Constants:
-      INCLUDE 'SAE_PAR'                 ! Standard SAE constants
-      INCLUDE 'MSG_ERR'                 ! MSG_ error codes
-      INCLUDE 'MSG_PAR'                 ! MSG_ public constants
-      INCLUDE 'MSG_SYS'                 ! MSG_ private constants
+#include <string.h>
 
-*  Arguments Given:
-      CHARACTER * ( * ) TEXT
+void msg1Print( const char * text, int * status ) {
 
-*  Status:
-      INTEGER STATUS
 
-*  External References:
-      INTEGER CHR_LEN                   ! String length
-      INTEGER MSG1_GTWSZ
-      LOGICAL MSG1_GTSTM
-      EXTERNAL MSG1_GTSTM
-      EXTERNAL MSG1_GTWSZ
+  int iposn;                     /* Character position for text */
+  int leng;                      /* String length */
+  int istat = SAI__OK;           /* Local status */
+  int oplen;                     /* Output string length */
+  char line[MSG__SZMSG+1];       /* Output line of text */
 
-*  Local Variables:
-      INTEGER IPOSN                     ! Character pointer
-      INTEGER ISTAT                     ! Local status
-      INTEGER LENG                      ! Given string length
-      INTEGER OPLEN                     ! Output string length
+  /*  Check the inherited global status.  */
+  if (*status != SAI__OK) return;
 
-      CHARACTER * ( MSG__SZMSG ) LINE   ! Output line of text
+  /*  Create a new error context */
+  emsMark();
 
-*.
+  /*  Find the filled length of the message text string and write it 
+   *  to the standard output stream. */
+  leng = strlen( text );
 
-*  Check the inherited global status. 
-      IF ( STATUS .NE. SAI__OK ) RETURN
+  /*  If the text is not blank, then continue. */
+  if (leng > 0) {
 
-*  Create a new error context and initialise the local status.
-      CALL EMS_MARK
-      ISTAT = SAI__OK
+    if (msg1Gtstm()) {
 
-*  Find the filled length of the message text string and write it 
-*  to the standard output stream.
-      LENG = CHR_LEN( TEXT )
+      /*     Output with no messing */
+      msg1Prtln( text, &istat );
+    } else {
 
-      IF ( LENG .GT. 0 ) THEN
-         LENG = MIN( LENG, MSG__SZMSG )
+      /*     Call MSG1_RFORM to load the output line and deliver it. */
+      iposn = 0;
 
-         IF ( MSG1_GTSTM() ) THEN
-*     Output with no messing
-            CALL MSG1_PRTLN( TEXT, ISTAT )
+      /*     Loop to deliver the message in line-sized chunks. */
+      ems1Rform( text, msg1Gtwsz(), &iposn, line, &oplen );
+      msg1Prtln( line, &istat );
 
-         ELSE
-*     Call MSG1_RFORM to load the output line and deliver it.
-            IPOSN = 1
+      while ( iposn != 0 && istat == SAI__OK) {
+        ems1Rform( text, msg1Gtwsz(), &iposn, line, &oplen );
+        msg1Prtln( line, &istat );
+      }
+    }
+  } else {
 
-*     Loop to deliver the message in line-sized chunks.
-*     DO WHILE loop.
- 10         CONTINUE
-            IF ( IPOSN .NE. 0 .AND. ISTAT .EQ. SAI__OK ) THEN
-               CALL MSG1_RFORM( TEXT, IPOSN, LINE( : MSG1_GTWSZ()), 
-     :                          OPLEN )
-               CALL MSG1_PRTLN( LINE( : OPLEN ), ISTAT )
-            GO TO 10
-            END IF
-         END IF
+    /*     If there is no text, then send a blank message. */
+    msg1Prtln( "", &istat );
+  }
 
-      ELSE
-*     If there is no text, then send a blank message.
-         LINE = " "
-         OPLEN = 1
-         CALL MSG1_PRTLN( ' ', ISTAT )
-      END IF
+  /*  If the message cannot be delivered, then annul the current error
+   *  context and report the error. */
+  if (istat != SAI__OK) {
+    *status = istat;
+    emsAnnul( &istat );
+    emsMark();
+    emsSetc ( "OPLINE", line );
+    emsRep( "MSG_PRINT_MESS",
+            "msg1Print: ^LINE", status );
+    *status = MSG__OPTER;
+    emsRep( "MSG_PRINT_OPTER",
+            "Error encountered during message output", status );
+    emsRlse();
+  }
 
-*  If the message cannot be delivered, then annul the current error
-*  context and report the error.
-      IF ( ISTAT .NE. SAI__OK ) THEN
-         STATUS = ISTAT
-         CALL EMS_ANNUL( ISTAT )
-         CALL EMS_MARK
-         CALL EMS_REP( 'MSG_PRINT_MESS',
-     :                 'MSG1_PRINT: ' // LINE( : OPLEN ), STATUS )
-         STATUS = MSG__OPTER
-         CALL EMS_REP( 'MSG_PRINT_OPTER', 
-     :   'Error encountered during message output', STATUS )
-         CALL EMS_RLSE
-      END IF
-
-*  Release the current error context.
-      CALL EMS_RLSE
-
-      END
+  /*  Release the current error context. */
+  emsRlse();
+}

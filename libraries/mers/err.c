@@ -323,45 +323,6 @@ DECLARE_INTEGER(fstatus);
    return;
 }
 
-void msgLoad( const char *param,
-              const char *text,
-              char *opstr,
-              int opstr_length,
-              int *oplen,
-              int *status ) {
-
-DECLARE_CHARACTER_DYN(fparam);
-DECLARE_CHARACTER_DYN(ftext);
-DECLARE_CHARACTER_DYN(fopstr);
-DECLARE_INTEGER(foplen);
-DECLARE_INTEGER(fstatus);
-
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
-   F77_CREATE_CHARACTER(ftext,strlen( text ));
-   F77_EXPORT_CHARACTER(text,ftext,ftext_length);
-   F77_CREATE_CHARACTER(fopstr,opstr_length-1);
-   F77_EXPORT_INTEGER(*status,fstatus);
-
-   F77_CALL(msg_load)( CHARACTER_ARG(fparam),
-                       CHARACTER_ARG(ftext),
-                       CHARACTER_ARG(fopstr),
-                       INTEGER_ARG(&foplen),
-                       INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(fparam)
-                       TRAIL_ARG(ftext)
-                       TRAIL_ARG(fopstr) );
-
-   F77_FREE_CHARACTER(fparam);
-   F77_FREE_CHARACTER(ftext);
-   F77_IMPORT_CHARACTER(fopstr,fopstr_length,opstr);
-   F77_FREE_CHARACTER(fopstr);
-   F77_IMPORT_INTEGER(foplen,*oplen);
-   F77_IMPORT_INTEGER(fstatus,*status);
-
-   return;
-}
-
 void msgOut( const char *param,
              const char *text,
              int *status ) {
@@ -389,36 +350,6 @@ DECLARE_INTEGER(fstatus);
    return;
 }
 
-void msgOutif( int prior,
-               const char *param,
-               const char *text,
-               int *status ) {
-
-DECLARE_INTEGER(fprior);
-DECLARE_CHARACTER_DYN(fparam);
-DECLARE_CHARACTER_DYN(ftext);
-DECLARE_INTEGER(fstatus);
-
-   F77_EXPORT_INTEGER(prior,fprior);
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
-   F77_CREATE_CHARACTER(ftext,strlen( text ));
-   F77_EXPORT_CHARACTER(text,ftext,ftext_length);
-   F77_EXPORT_INTEGER(*status,fstatus);
-
-   F77_CALL(msg_outif)( INTEGER_ARG(&fprior),
-                        CHARACTER_ARG(fparam),
-                        CHARACTER_ARG(ftext),
-                        INTEGER_ARG(&fstatus)
-                        TRAIL_ARG(fparam)
-                        TRAIL_ARG(ftext) );
-
-   F77_FREE_CHARACTER(fparam);
-   F77_FREE_CHARACTER(ftext);
-   F77_IMPORT_INTEGER(fstatus,*status);
-
-   return;
-}
 
 void msgTune( const char *param,
               int value,

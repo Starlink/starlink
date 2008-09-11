@@ -1,16 +1,16 @@
 /*
 *+
 *  Name:
-*     err1Blk
+*     mers1Blk
 
 *  Purpose:
-*     ERR Tuning parameter access.
+*     MERS Tuning parameter access.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Type of module:
-*     BLOCK DATA
+*     C globals
 
 *  Description:
 *     This routine initialises and provides access to the global tuning
@@ -54,6 +54,8 @@
 *     30-JUL-2008 (TIMJ):
 *        Rewrite in C. Not thread-safe yet.
 *        Add accessor routines.
+*     10-SEP-2008 (TIMJ):
+*        Include MSG globals
 *     {enter_further_changes_here}
 
 *-
@@ -62,10 +64,15 @@
 #include "ems.h"
 #include "mers1.h"
 #include "sae_par.h"
+#include "msg_par.h"
 
 #define ERR__SZOUT 79
+#define MSG__SZOUT 79
 
-static ErrTune this_err_glbl = { ERR__SZOUT , 0, 0 };
+static MersTune this_err_glbl = { 
+  ERR__SZOUT, 0, 0,
+  MSG__SZOUT, 0, MSG__NORM
+};
 
 
 void err1Gtglbl( int * errwsz, int * errstm, int * errrvl ) {
@@ -97,13 +104,35 @@ void err1Ptrvl ( int errrvl ) {
   this_err_glbl.errrvl = errrvl;
 }
 
+int msg1Gtinf ( void ) {
+  return this_err_glbl.msginf;
+}
+
+int msg1Gtstm ( void ) {
+  return this_err_glbl.msgstm;
+}
+
+int msg1Gtwsz ( void ) {
+  return this_err_glbl.msgwsz;
+}
+
+void msg1Ptwsz ( int msgwsz ) {
+  this_err_glbl.errwsz = msgwsz;
+}
+void msg1Ptstm ( int msgstm ) {
+  this_err_glbl.errstm = msgstm;
+}
+void msg1Ptinf ( int msginf ) {
+  this_err_glbl.errrvl = msginf;
+}
+
 /* Functions to set the corresponding tuning parameters in EMS
    and also to return EMS to its original state. Note that an
    ErrTune struct is passed in to the first function and will
    be filled in with original state. It is then passed to the
    restore function. */
 
-void err1TuneEms( ErrTune * ems, int * status ) {
+void err1TuneEms( MersTune * ems, int * status ) {
   if (*status != SAI__OK) return;
 
   /* Note that it is possible for SZOUT to be used by ERR
@@ -115,7 +144,7 @@ void err1TuneEms( ErrTune * ems, int * status ) {
 
 }
 
-void err1RestoreEms( ErrTune * ems, int * status ) {
+void err1RestoreEms( MersTune * ems, int * status ) {
   if (*status != SAI__OK) return;
 
   (void)emsStune( "REVEAL", ems->errrvl, status );
@@ -152,4 +181,30 @@ F77_SUBROUTINE(err1_ptrvl)( LOGICAL(ERRRVL) ) {
 }
 F77_SUBROUTINE(err1_ptwsz)( INTEGER(ERRWSZ) ) {
   err1Ptwsz( *ERRWSZ );
+}
+
+F77_LOGICAL_FUNCTION(msg1_gtstm)( void ) {
+  DECLARE_LOGICAL(MSGSTM);
+  F77_IMPORT_LOGICAL(this_err_glbl.msgstm, MSGSTM );
+  return MSGSTM;
+}
+F77_INTEGER_FUNCTION(msg1_gtinf)( void ) {
+  DECLARE_INTEGER(MSGINF);
+  F77_IMPORT_INTEGER(this_err_glbl.msginf, MSGINF );
+  return MSGINF;
+}
+F77_INTEGER_FUNCTION(msg1_gtwsz)( void ) {
+  DECLARE_INTEGER(MSGWSZ);
+  F77_IMPORT_INTEGER(this_err_glbl.msgwsz, MSGWSZ );
+  return MSGWSZ;
+}
+
+F77_SUBROUTINE(msg1_ptstm)( LOGICAL(MSGSTM) ) {
+  msg1Ptstm( *MSGSTM );
+}
+F77_SUBROUTINE(msg1_ptinf)( INTEGER(MSGINF) ) {
+  msg1Ptinf( *MSGINF );
+}
+F77_SUBROUTINE(msg1_ptwsz)( INTEGER(MSGWSZ) ) {
+  msg1Ptwsz( *MSGWSZ );
 }

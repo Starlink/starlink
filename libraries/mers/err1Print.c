@@ -171,13 +171,13 @@ void err1Print( const char * text, int *errbel, int *status) {
       /*     Loop to continue the remainder of the message.*/
       while (iposn != 0) {
 
-	/*        Re-initialise the output line for a continuation. */
-	strcpy( line, constr );
+        /*        Re-initialise the output line for a continuation. */
+        strcpy( line, constr );
 
-	/*        Call MSG1_RFORM to load the continuation line and write the
-	 *        result. */
-	ems1Rform( text, errwsz - contab, &iposn, &(line[contab]), &oplen);
-	err1Prerr( line, &lstat );
+        /*        Call MSG1_RFORM to load the continuation line and write the
+         *        result. */
+        ems1Rform( text, errwsz - contab, &iposn, &(line[contab]), &oplen);
+        err1Prerr( line, &lstat );
       }
     }
   } else {

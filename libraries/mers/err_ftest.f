@@ -59,7 +59,8 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
-
+      CHARACTER *(30)  OPSTR
+      INTEGER OPLEN
       INTEGER LEVEL
 
 *.
@@ -129,6 +130,17 @@
 
       CALL MSG_OUTIF( MSG__NORM, ' ', 'Message should appear',
      :     STATUS )
+
+*  Control width
+      CALL MSG_TUNE( 'SZOUT', 20, STATUS )
+      CALL MSG_SETC( 'X', 'ABCDEFGHIJKLMN OPQRSTUVWXYZ')
+      CALL MSG_OUTIF( MSG__QUIET, ' ', 'Line wrap: ^X ^X ^X ^X',
+     :     STATUS)
+
+*  Loading
+      CALL MSG_SETC( 'XX', 'LOAD WORKING' );
+      CALL MSG_LOAD( ' ','Load test: ^XX', OPSTR, OPLEN, STATUS )
+      PRINT *, 'Output from LOAD:',OPSTR
 
 *  Call ERR_REP and ERR_FLUSH.
       CALL ERR_BEGIN( STATUS )

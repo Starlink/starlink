@@ -1,4 +1,4 @@
-      SUBROUTINE MSG_OUTIF( PRIOR, PARAM, TEXT, STATUS )
+/*
 *+
 *  Name:
 *     MSG_OUTIF
@@ -7,7 +7,7 @@
 *     Conditionally deliver the text of a message to the user.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C (Callable from Fortran)
 
 *  Invocation:
 *     CALL MSG_OUTIF( PRIOR, PARAM, TEXT, STATUS )
@@ -27,13 +27,15 @@
 *           -  MSG__QUIET = always output the message, regardless of the
 *           output filter setting;
 *           -  MSG__NORM = output the message if the current output
-*           filter is set to either MSG__NORM or MSG__VERB;
+*           filter is set to either MSG__NORM or MSG__VERB or MSG__DEBUG;
 *           -  MSG__VERB = output the message only if the current
-*           output filter is set to MSG__VERB.
+*           output filter is set to MSG__VERB or MSG__DEBUG;
+*           -  MSG__DEBUG = out the message only if the current
+*           output filter is set to MSG__DEBUG.
 *
 *        Here, the collating sequence:
 *
-*           MSG__QUIET < MSG__NORM < MSG__VERB
+*           MSG__QUIET < MSG__NORM < MSG__VERB < MSG__DEBUG
 *           
 *        may be assumed. Any other value will result in an error report
 *        and the status being returned set to MSG__INVIF: no further 
@@ -90,88 +92,41 @@
 *        Fixed logic for MSG__DEBUG
 *     24-JUL-2008 (TIMJ):
 *        Use common block accessor
+*     10-SEP-2008 (TIMJ):
+*        Call msgOutif
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
-*  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+*/
 
-*  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'MSG_PAR'          ! MSG_ public constants
-      INCLUDE 'MSG_ERR'          ! MSG_ error codes
+#include "f77.h"
+#include "mers_f77.h"
+#include "merswrap.h"
+#include "msg_par.h"
+#include "err_par.h"
 
-*  Global Variables:
+F77_SUBROUTINE(msg_outif)( INTEGER(PRIOR),
+                           CHARACTER(PARAM),
+                           CHARACTER(TEXT),
+                           INTEGER(STATUS)
+                           TRAIL(PARAM)
+                           TRAIL(TEXT) ) {
+  char param[ERR__SZPAR];
+  char text[MSG__SZMSG];
+  int prior;
+  int status;
 
-*  Arguments Given:
-      INTEGER PRIOR
+  cnfImpn( PARAM, PARAM_length, ERR__SZPAR, param );
+  cnfImpn( TEXT, TEXT_length, MSG__SZMSG, text );
 
-      CHARACTER * ( * ) PARAM
-      CHARACTER * ( * ) TEXT
+  F77_IMPORT_INTEGER( *STATUS, status );
+  F77_IMPORT_INTEGER( *PRIOR, prior );
 
-*  Status:
-      INTEGER STATUS
+  msgOutif( prior, param, text, &status );
 
-*  External Variables:
-      EXTERNAL MSG1_GTINF        ! Get message level
-      INTEGER MSG1_GTINF
-      EXTERNAL MSG1_GTSTM        ! Get stream mode
-      LOGICAL MSG1_GTSTM
+  F77_EXPORT_INTEGER( status, *STATUS );
 
-*  Local Variables:
-      INTEGER MSGLEN             ! Message length
-
-      CHARACTER * ( MSG__SZMSG ) MSGSTR ! Message string
-
-*.
-
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) THEN
-
-*     Call MSG1_KTOK to annul any defined message tokens.
-         CALL MSG1_KTOK
-      ELSE
-
-*     The given status is OK, so check that the given value of the
-*     output filter is allowed.
-         IF ( PRIOR .LT. MSG__QUIET .OR. PRIOR .GT. MSG__DEBUG ) THEN
-
-*        The given message filtering level is out of range: set the
-*        returned status and report an error. (Mark and subsequently 
-*        release an error context to prevent token name clashes.)
-            CALL EMS_MARK
-            STATUS = MSG__INVIF
-            CALL EMS_SETI( 'PRIOR', PRIOR )
-            CALL EMS_REP( 'MSG_OUTIF_INVIF',
-     :      'MSG_OUTIF: Invalid message filtering value:  ^PRIOR', 
-     :      STATUS )
-            CALL EMS_RLSE
-
-*        Annul the message token table.
-            CALL MSG1_KTOK
-         ELSE
-
-*        Conditionally output the given message.
-            IF ( PRIOR .LE. MSG1_GTINF() ) THEN
-
-*           Form the output message string.
-               CALL MSG1_FORM(
-     :              PARAM, TEXT, .NOT.MSG1_GTSTM(), MSGSTR, MSGLEN,
-     :              STATUS )
-
-*           Deliver the message string.
-               CALL MSG1_PRINT( MSGSTR( : MSGLEN ), STATUS )
-            ELSE
-
-*           Call MSG1_KTOK to annul any defined message tokens, even
-*           though the message was not output.
-               CALL MSG1_KTOK
-            END IF
-         END IF
-      END IF
-
-      END
+}

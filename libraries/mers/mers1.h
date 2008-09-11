@@ -46,7 +46,10 @@ typedef struct {
   int errwsz;
   int errstm;
   int errrvl;
-} ErrTune;
+  int msgwsz;
+  int msgstm;
+  int msginf;
+} MersTune;
 
 
 void err1Bell( int * status );
@@ -58,11 +61,13 @@ void err1Gtglbl( int *errwsz, int *errstm, int *errrvl );
 int err1Gtrvl ( void );
 int err1Gtstm ( void );
 int err1Gtwsz ( void );
+
 void err1Ptwsz( int errwsz );
 void err1Ptstm( int errstm );
 void err1Ptrvl( int errrvl );
-void err1RestoreEms( ErrTune * ems, int * status );
-void err1TuneEms( ErrTune * ems, int * status );
+
+void err1RestoreEms( MersTune * ems, int * status );
+void err1TuneEms( MersTune * ems, int * status );
 
 
 void msg1Form ( const char * param, const char * text, int clean,
@@ -73,5 +78,15 @@ int msg1Gkey( const char * param, char *keystr, size_t keylen );
 
 void msg1Ktok ( void );
 void msg1Prtln( const char * text, int * status );
+void msg1Print( const char * text, int * status );
+
+int msg1Gtrvl ( void );
+int msg1Gtstm ( void );
+int msg1Gtwsz ( void );
+
+void msg1Ptwsz( int msgwsz );
+void msg1Ptstm( int msgstm );
+void msg1Ptinf( int msginf );
+
 
 

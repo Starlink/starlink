@@ -1,45 +1,51 @@
-      SUBROUTINE MSG_LOAD( PARAM, TEXT, OPSTR, OPLEN, STATUS )
+
+/*
 *+
 *  Name:
-*     MSG_LOAD
+*     msgLoad
 
 *  Purpose:
 *     Expand and return a message.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Invocation:
-*     CALL MSG_LOAD( PARAM, TEXT, OPSTR, OPLEN, STATUS )
+*     void msgLoad( const char *param, const char *text,
+*                   char *opstr, int opstr_length,
+*                  int *oplen, int *status )
 
 *  Description:
 *     Any tokens in the supplied message are expanded and the result is
 *     returned in the character variable supplied. If the status
 *     argument is not set to SAI__OK on entry, no action is taken
 *     except that the values of any existing message tokens are always
-*     left undefined after a call to MSG_LOAD. If the expanded message 
+*     left undefined after a call to msgLoad. If the expanded message 
 *     is longer than the length of the supplied character variable, 
 *     the message is terminated with an ellipsis.
 
 *  Arguments:
-*     PARAM = CHARACTER * ( * ) (Given)
+*     param = const char * (Given)
 *        The message name.
-*     TEXT = CHARACTER * ( * ) (Given)
+*     text = const char * (Given)
 *        The raw message text.
-*     OPSTR = CHARACTER * ( * ) (Returned)
+*     opstr = char * (Returned)
 *        The expanded message text.
-*     OPLEN = INTEGER (Returned)
+*     opstr_length = int (Given)
+*        Size of opstr buffer.
+*     oplen = int * (Returned)
 *        The length of the expanded message.
-*     STATUS = INTEGER (Given and Returned)
+*     status = int * (Given and Returned)
 *        The global status.
 
 *  Algorithm:
-*     -  Use MSG1_FORM to construct the output message text.
+*     -  Use msg1Form to construct the output message text.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 1983, 1984, 1988, 1989, 1991 Science & Engineering Research Council.
-*     Copyright (C) 1995, 1998, 1999, 2001 Central Laboratory of the Research Councils.
+*     Copyright (C) 1983, 1984, 1988, 1989, 1991 Science & Engineering
+*     Research Council. Copyright (C) 1995, 1998, 1999, 2001 Central
+*     Laboratory of the Research Councils.
 *     All Rights Reserved.
 
 *  Licence:
@@ -91,53 +97,43 @@
 *        Use MSG1_KTOK not EMS1_KTOK
 *     24-JUL-2008 (TIMJ):
 *        Use common block getter
+*     10-SEP-2008 (TIMJ):
+*        Rewrite in C
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
- 
-*  Global Constants:
-      INCLUDE 'SAE_PAR'                 ! Standard SAE constants
-      INCLUDE 'MSG_PAR'                 ! MSG_ public constants
+#include "msg_par.h"
+#include "sae_par.h"
 
-*  Global Variables:
- 
-*  Arguments Given:
-      CHARACTER * ( * ) PARAM
-      CHARACTER * ( * ) TEXT
+#include "mers.h"
+#include "mers1.h"
 
-*  Arguments Returned:
-      CHARACTER * ( * ) OPSTR
-      INTEGER OPLEN
- 
-*  Status:
-      INTEGER STATUS
+#include <string.h>
 
-*  External Variables:
-      EXTERNAL MSG1_BLK          ! Force inclusion of block data
-      EXTERNAL MSG1_GTSTM
-      LOGICAL MSG1_GTSTM
+void msgLoad( const char *param,
+              const char *text,
+              char *opstr,
+              int opstr_length,
+              int *oplen,
+              int *status ) {
 
-*  Local Variables: 
-*.
+  /*  Check the inherited global status. */
+  if (*status != SAI__OK) {
 
-*  Check the inherited global status.
-      IF ( STATUS .NE. SAI__OK ) THEN
+    /*     Status is not SAI__OK, so just annul the token table. */
+    msg1Ktok();
 
-*     Status is not SAI__OK, so just annul the token table.
-         CALL MSG1_KTOK
+  } else {
 
-      ELSE
-*     Status is SAI__OK, so form the returned message string.
-*     This will also annul the token table.
-         CALL MSG1_FORM(
-     :      PARAM, TEXT, .NOT.MSG1_GTSTM(), OPSTR, OPLEN, STATUS )
+    /*     Status is SAI__OK, so form the returned message string.
+     *     This will also annul the token table. */
+    msg1Form( param, text, !msg1Gtstm(), opstr_length, opstr, status );
+    *oplen = strlen( opstr );
+  }
 
-      END IF
-
-      END
+}
