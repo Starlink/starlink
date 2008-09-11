@@ -111,7 +111,6 @@
 
 void msgOutif( int prior, const char * param, const char * text, int * status) {
 
-  int msglen;    /* Message length */
   char msgstr[MSG__SZMSG];    /* Message string */
 
   /*  Check inherited global status. */

@@ -121,6 +121,8 @@
 #include "mers.h"
 #include "mers1.h"
 
+#include <string.h>
+
 void errRep( const char * param, const char * text, int * status ) {
 
   char tstr[ERR__SZMSG];    /* Intermediate error message text */
@@ -130,7 +132,7 @@ void errRep( const char * param, const char * text, int * status ) {
   int strstat = 1;          /* status from star_strappend */
   int istat = SAI__OK;      /* Internal status */
   int mlen = 0;             /* Length of final error message text */
-  int lpos = 0;             /* string position pointer */
+  size_t lpos = 0;             /* string position pointer */
   int tokpos = 0;           /* Position of ^ in string */
 
   /* Terminate strings */

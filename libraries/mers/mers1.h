@@ -80,7 +80,7 @@ void msg1Ktok ( void );
 void msg1Prtln( const char * text, int * status );
 void msg1Print( const char * text, int * status );
 
-int msg1Gtrvl ( void );
+int msg1Gtinf ( void );
 int msg1Gtstm ( void );
 int msg1Gtwsz ( void );
 

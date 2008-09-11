@@ -103,8 +103,8 @@ int msg1Gref( const char * param, char *refstr, size_t reflen ) {
   retval = subParGref( namecode, refstr, reflen );
       
   /*  Annul any error reports and release the error context */
-  if (status != SAI__OK) emsAnnul( status );
-  emsRlse;
+  if (status != SAI__OK) emsAnnul( &status );
+  emsRlse();
 
   return retval;
 }
