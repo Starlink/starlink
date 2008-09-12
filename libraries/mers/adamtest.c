@@ -52,6 +52,12 @@ void adamtest ( int * status ) {
 
   if (*status != SAI__OK) return;
 
+  msgOut("MSG1", "This text should not appear for msgOut", status );
+  msgSeti("TEST", 5);
+  msgOut(" ", "     Testing ^^ %% % $ $$ %ET - $TESTOBJ ^TEST",status);
+  msgOut( " ", "  Testing $ %ET Again %%ET ^^$", status );
+  msgOut(" ", "$$DOLLAR ^^CARET %%PERCENT at start of string", status);
+
   /* Make up a bad status */
   *status = MSG__SYNER;
   errRep( " ", "This is the error message ^STATUS embedded",
@@ -64,6 +70,8 @@ void adamtest ( int * status ) {
   errRep( " ", "Object $TESTOBJ should be somewhere", status );
 
   errRep( " ", "Multiple %ET and ^STATUS and %TESTOBJ and %BLAH", status );
+
+  errRep( " ", "Double up %% escape $$ characters", status );
 
   msgSetc( "X1", STRING );
   msgSetc( "X2", STRING);

@@ -249,8 +249,8 @@ void msg1Form ( const char * param, const char * text, int clean,
     literl = 0;
 
     /*     Initialise the text pointers and local status. */
-    curpos = 0;
-    lstpos = 0;
+    curpos = -1;
+    lstpos = -1;
     iposn = 0;
     lstat = SAI__OK;
     pstat = SAI__OK;
@@ -292,7 +292,7 @@ void msg1Form ( const char * param, const char * text, int clean,
         /*        No more escape characters have been found, so append all 
          *        the text that remains to the returned message text and exit 
          *        the loop. */
-        pstat = star_strappend( msgstr, &(texst2[lstpos]), msglen );
+        pstat = star_strappend( msgstr, &(texst2[lstpos+1]), msglen );
         break;
       } else {
 
@@ -332,9 +332,13 @@ void msg1Form ( const char * param, const char * text, int clean,
           literl = 0;
 
           /*           Append any text prior to the escape character. */
-          if (curpos > 0) star_strappend( msgstr, &texst2[lstpos+1], msglen);
+          if (curpos >= 0) {
+            texst2[curpos] = '\0';
+            star_strappend( msgstr, &texst2[lstpos+1], msglen);
+            texst2[curpos] = escape[0];
+          }
 
-          /*           Find the token name. */
+          /*           Find the token name - curpos is updated. */
           ems1Gnam( texst2, &curpos, namstr, &namlen, &lstat );
 
           /*           Check that a token name exists. */
@@ -374,7 +378,6 @@ void msg1Form ( const char * param, const char * text, int clean,
               star_strappend( msgstr, namstr, msglen);
               star_strappend( msgstr, ">", msglen);
             }
-
 
             /*              Assign a "null" ESCAPE. */
             escape[0] = '\0';
