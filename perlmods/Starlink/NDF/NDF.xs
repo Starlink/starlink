@@ -4607,16 +4607,6 @@ errFacer(token, status)
   errFacer(token, status );
 
 void
-errFioer(token, iostat)
-  char * token
-  ndfint iostat
- ALIAS:
-  NDF::err_fioer = 2 
- PROTOTYPE: $$
- CODE:
-  errFioer(token, iostat);
-
-void
 errFlbel(status)
   ndfint &status = NO_INIT
  ALIAS:
