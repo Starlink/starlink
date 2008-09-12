@@ -1,16 +1,16 @@
-      SUBROUTINE ERR_OUT( PARAM, TEXT, STATUS )
+/*
 *+
 *  Name:
-*     ERR_OUT
+*     errOut
 
 *  Purpose:
 *     Report an error message and deliver it to the user.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Invocation:
-*     CALL ERR_OUT( PARAM, TEXT, STATUS )
+*     errOut( const char * param, const char * text, int * status );
 
 *  Description:
 *     The message is added to the error table at the current error context. 
@@ -20,11 +20,11 @@
 *     undefined. 
 
 *  Arguments:
-*     PARAM = CHARACTER * ( * ) (Given)
+*     param = const char * (Given)
 *        Expression containing the message parameter name.
-*     TEXT = CHARACTER * ( * ) (Given)
+*     text = const char * (Given)
 *        Expression containing the error message text.
-*     STATUS = INTEGER (Given and Returned)
+*     status = int * (Given and Returned)
 *        The global status. On normal completion Status is returned 
 *        set to SAI__OK.
 
@@ -38,9 +38,10 @@
 *     -  Use ERR_REP and then ERR_FLUSH.
 
 *  Copyright:
-*     Copyright (C) 1983, 1989, 1991, 1993 Science & Engineering Research Council.
-*     Copyright (C) 1996 Central Laboratory of the Research Councils.
-*     All Rights Reserved.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 1983, 1989, 1991, 1993 Science & Engineering
+*     Research Council.  Copyright (C) 1996 Central Laboratory of the
+*     Research Councils.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -64,6 +65,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     PCTR: P.C.T. Rees (STARLINK)
 *     AJC: A.J. Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -83,32 +85,24 @@
 *     25-JAN-1996 (AJC):
 *        Change argument ERROR to PARAM in code
 *         and MSG to PARAM in prologue.
+*     11-SEP-2008 (TIMJ):
+*        Rewrite in C
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
+#include "sae_par.h"
+#include "merswrap.h"
 
-*  Global Constants:
-      INCLUDE 'SAE_PAR'                 ! Standard SAE constants
-
-*  Arguments Given:
-      CHARACTER * ( * ) PARAM
-      CHARACTER * ( * ) TEXT
-
-*  Status:
-      INTEGER STATUS
-
-*.
+void errOut( const char * param, const char * text, int * status ) {
  
-*  Report the new error.
-      CALL ERR_REP( PARAM, TEXT, STATUS )
+  /*  Report the new error. */
+  errRep( param, text, status );
 
-*  Flush the error table.
-      CALL ERR_FLUSH( STATUS )
-
-      END
+  /*  Flush the error table. */
+  errFlush( status );
+}

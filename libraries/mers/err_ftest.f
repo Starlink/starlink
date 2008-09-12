@@ -143,6 +143,10 @@
       CALL MSG_LOAD( ' ','Load test: ^XX', OPSTR, OPLEN, STATUS )
       PRINT *, 'Output from LOAD:',OPSTR
 
+*  ERR_OUT
+      STATUS = SAI__ERROR
+      CALL ERR_OUT( ' ', 'Calling ERR_OUT', STATUS )
+
 *  Call ERR_REP and ERR_FLUSH.
       CALL ERR_BEGIN( STATUS )
       CALL ERR_TUNE( 'SZOUT', 40, STATUS )
