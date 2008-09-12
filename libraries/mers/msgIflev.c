@@ -1,23 +1,23 @@
-      SUBROUTINE MSG_IFLEV( FILTER )
+/*
 *+
 *  Name:
-*     MSG_IFLEV
+*     msgIflev
 
 *  Purpose:
 *     Return the current filter level for conditional message output.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Invocation:
-*     CALL MSG_IFLEV( FILTER )
+*     msgIflev( int * filter );
 
 *  Description:
 *     The value of the current filtering level set for conditional
 *     message output is returned.
 
 *  Arguments:
-*     FILTER = INTEGER (Returned)
+*     filter = int * (Returned)
 *        The current message filtering level.
 
 *  Copyright:
@@ -51,28 +51,20 @@
 *        Original version.
 *     24-JUL-2008 (TIMJ):
 *        Use Common block accessor
+*     12-SEP-2008 (TIMJ):
+*        Rewrite in C
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
-*  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+*/
 
-*  Global Variables:
+#include "mers1.h"
+#include "merswrap.h"
 
-*  External Variables:
-      INTEGER MSG1_GTINF
-      EXTERNAL MSG1_GTINF
-
-*  Arguments Returned:
-      INTEGER FILTER
-
-*.
-
-*  Return the current value of the message output filter level.
-      FILTER = MSG1_GTINF()
-
-      END
+void msgIflev( int * filter ) {
+  /*  Return the current value of the message output filter level. */
+  *filter = msg1Gtinf();
+}

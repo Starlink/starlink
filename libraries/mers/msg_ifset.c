@@ -1,4 +1,4 @@
-      SUBROUTINE MSG_IFSET( FILTER, STATUS )
+/*
 *+
 *  Name:
 *     MSG_IFSET
@@ -7,7 +7,7 @@
 *     Set the filter level for conditional message output.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C (Callable from Fortran)
 
 *  Invocation:
 *     CALL MSG_IFSET( FILTER, STATUS )
@@ -57,50 +57,28 @@
 *        Added MSG__DEBUG
 *     24-JUL-2008 (TIMJ):
 *        Use common block accessor
+*     12-SEP-2008 (TIMJ):
+*        Rewrite in C
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
-*  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+*/
 
-*  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'MSG_PAR'          ! MSG_ public constants
-      INCLUDE 'MSG_ERR'          ! MSG_ error codes
+#include "f77.h"
+#include "merswrap.h"
+#include "mers_f77.h"
 
-*  Global Variables:
+F77_SUBROUTINE(msg_ifset)( INTEGER(FILTER),
+                           INTEGER(STATUS) ) {
+  int filter;
+  int status;
 
-*  Arguments Given:
-      INTEGER FILTER
+  F77_IMPORT_INTEGER( *STATUS, status );
+  F77_IMPORT_INTEGER( *FILTER, filter );
+  msgIfset( filter, &status );
+  F77_EXPORT_INTEGER( status, *STATUS );
 
-*  Status:
-      INTEGER STATUS
-
-*.
-
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Check that the given filter value is acceptable.
-      IF ( FILTER .LT. MSG__QUIET .OR. FILTER .GT. MSG__DEBUG ) THEN
-
-*     The given value for message filtering is outside the allowed
-*     range: set status and report an error message.
-         CALL EMS_MARK
-         STATUS = MSG__INVIF
-         CALL EMS_SETI( 'FILTER', FILTER )
-         CALL EMS_REP( 'MSG_IFSET_INVIF',
-     :   'MSG_IFSET: Invalid message filtering value: ^FILTER', 
-     :   STATUS )
-         CALL EMS_RLSE
-      ELSE
-
-*     Assign the message filtering level.
-         CALL MSG1_PTINF( FILTER )
-      END IF
-
-      END
+}

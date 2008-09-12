@@ -218,34 +218,6 @@ DECLARE_REAL(frvalue);
    return;
 }
 
-void msgIflev( int *filter ) {
-
-DECLARE_INTEGER(ffilter);
-
-   F77_CALL(msg_iflev)( INTEGER_ARG(&ffilter) );
-
-   F77_IMPORT_INTEGER(ffilter,*filter);
-
-   return;
-}
-
-void msgIfset( int filter,
-               int *status ) {
-
-DECLARE_INTEGER(ffilter);
-DECLARE_INTEGER(fstatus);
-
-   F77_EXPORT_INTEGER(filter,ffilter);
-   F77_EXPORT_INTEGER(*status,fstatus);
-
-   F77_CALL(msg_ifset)( INTEGER_ARG(&ffilter),
-                        INTEGER_ARG(&fstatus) );
-
-   F77_IMPORT_INTEGER(fstatus,*status);
-
-   return;
-}
-
 void msgTune( const char *param,
               int value,
               int *status ) {
