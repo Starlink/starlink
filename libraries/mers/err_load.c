@@ -1,4 +1,4 @@
-      SUBROUTINE ERR_LOAD( PARAM, PARLEN, OPSTR, OPLEN, STATUS )
+/*
 *+
 *  Name:
 *     ERR_LOAD
@@ -7,7 +7,7 @@
 *     Return error messages from the current error context.
 
 *  Language:
-*    Starlink Fortran 77
+*    Starlink ANSI C (Callable from Fortran)
 
 *  Invocation:
 *     ERR_LOAD( PARAM, PARLEN, OPSTR, OPLEN, STATUS )
@@ -42,6 +42,7 @@
 *        it is set to SAI__OK when there are no more messages
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1989, 1990, 1994 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -64,6 +65,7 @@
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
 *     AJC: A.J. Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -75,31 +77,48 @@
 *        Changed argument list to include the message name.
 *     16-APR-1994 (AJC):
 *        Revised comments for revised behaviouur
+*     12-SEP-2008 (TIMJ):
+*        Now in C. Calls errLoad.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
- 
-*  Arguments Returned:
-      CHARACTER * ( * ) PARAM
+#include "f77.h"
+#include "mers_f77.h"
+#include "merswrap.h"
 
-      INTEGER PARLEN
+F77_SUBROUTINE(err_load)( CHARACTER(PARAM),
+                          INTEGER(PARLEN),
+                          CHARACTER(OPSTR),
+                          INTEGER(OPLEN),
+                          INTEGER(STATUS)
+                          TRAIL(PARAM)
+                          TRAIL(OPSTR) ) {
 
-      CHARACTER * ( * ) OPSTR
+  char * opstr;
+  char * param;
+  int oplen;
+  int parlen;
+  int status;
 
-      INTEGER OPLEN
+  opstr = starMallocAtomic( OPSTR_length + 1 );
+  param = starMallocAtomic( PARAM_length + 1 );
+  F77_IMPORT_INTEGER( *STATUS, status );
 
-*  Status:
-      INTEGER STATUS
+  errLoad( param, PARAM_length+1, &parlen,
+           opstr, OPSTR_length+1, &oplen, &status );
 
-*.
+  F77_EXPORT_INTEGER( status, *STATUS );
+  F77_EXPORT_INTEGER( oplen, *OPLEN );
+  F77_EXPORT_INTEGER( parlen, *PARLEN );
 
-*  Load the pending error messages at the current context.
-      CALL EMS_ELOAD( PARAM, PARLEN, OPSTR, OPLEN, STATUS )
+  F77_EXPORT_CHARACTER( opstr, OPSTR, OPSTR_length );
+  F77_EXPORT_CHARACTER( param, PARAM, PARAM_length );
+  starFree( opstr );
+  starFree( param );
 
-      END
+}

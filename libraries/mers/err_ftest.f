@@ -56,12 +56,16 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'
+      INCLUDE 'ERR_PAR'
 
 *  Status:
       INTEGER STATUS             ! Global status
       CHARACTER *(30)  OPSTR
       INTEGER OPLEN
       INTEGER LEVEL
+      CHARACTER *(10) PARAM
+      CHARACTER *(ERR__SZMSG) OPSTRE
+      INTEGER PARLEN
 
 *.
 
@@ -178,4 +182,12 @@
 
       CALL ERR_LEVEL( LEVEL )
 
+*  ERR_LOAD
+      CALL ERR_BEGIN( STATUS )
+      STATUS = SAI__ERROR
+      CALL ERR_REP( ' ','Text should be retrieved with ERR_LOAD',
+     :     STATUS )
+      CALL ERR_LOAD( PARAM, PARLEN, OPSTRE, OPLEN, STATUS )
+      PRINT *,'ERR_LOAD TEXT: ',OPSTRE
+      CALL ERR_END( STATUS )
       END

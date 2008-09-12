@@ -61,43 +61,6 @@ DECLARE_INTEGER(fiostat);
    return;
 }
 
-void errLoad( char *param,
-              int param_length,
-              int *parlen,
-              char *opstr,
-              int opstr_length,
-              int *oplen,
-              int *status ) {
-
-DECLARE_CHARACTER_DYN(fparam);
-DECLARE_INTEGER(fparlen);
-DECLARE_CHARACTER_DYN(fopstr);
-DECLARE_INTEGER(foplen);
-DECLARE_INTEGER(fstatus);
-
-   F77_CREATE_CHARACTER(fparam,param_length-1);
-   F77_CREATE_CHARACTER(fopstr,opstr_length-1);
-   F77_EXPORT_INTEGER(*status,fstatus);
-
-   F77_CALL(err_load)( CHARACTER_ARG(fparam),
-                       INTEGER_ARG(&fparlen),
-                       CHARACTER_ARG(fopstr),
-                       INTEGER_ARG(&foplen),
-                       INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(fparam)
-                       TRAIL_ARG(fopstr) );
-
-   F77_IMPORT_CHARACTER(fparam,fparam_length,param);
-   F77_FREE_CHARACTER(fparam);
-   F77_IMPORT_INTEGER(fparlen,*parlen);
-   F77_IMPORT_CHARACTER(fopstr,fopstr_length,opstr);
-   F77_FREE_CHARACTER(fopstr);
-   F77_IMPORT_INTEGER(foplen,*oplen);
-   F77_IMPORT_INTEGER(fstatus,*status);
-
-   return;
-}
-
 void errTune( const char *param,
               int value,
               int *status ) {
