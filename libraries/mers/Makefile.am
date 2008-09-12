@@ -56,7 +56,7 @@ liberr_adam_la_LIBADD = liberr.la
 
 PRIVATE_INCLUDES = mers_f77.h mers1.h
 
-F_ROUTINES = err_fioer.f \
+F_ROUTINES =  \
              err_tune.f \
              msg_fmtc.f msg_fmtd.f msg_fmti.f msg_fmtl.f \
              msg_fmtr.f \
@@ -100,7 +100,7 @@ F_INTERFACE_ROUTINES = msg_setc.c msg_setd.c msg_setr.c msg_seti.c \
 msg_setl.c err_annul.c err_begin.c err_end.c err_syser.c err_mark.c \
 err_rlse.c err_stat.c err_level.c err_facer.c msg_renew.c msg_bell.c \
 err_flush.c err_flbel.c err_rep.c msg_load.c msg_outif.c msg_out.c \
-msg_blank.c err_out.c err_load.c msg_iflev.c msg_ifset.c
+msg_blank.c err_out.c err_load.c msg_iflev.c msg_ifset.c err_fioer.c
 
 #  The installation test source
 TEST_SOURCE = err_test.f err_test.c err_test.ifl

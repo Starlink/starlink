@@ -1,3 +1,9 @@
+Version 2.0
+-----------
+
+ o Complete rewrite in C.
+ o errFioer removed from interface (there is no corresponding C interface in EMS)
+
 Version 1.8-2
 -------------
 

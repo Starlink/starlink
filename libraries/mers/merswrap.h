@@ -7,6 +7,7 @@
 *     Prototypes for public interface.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -33,6 +34,8 @@
 *  History:
 *     16-APR-2006 (TIMJ):
 *        Add prolog.
+*     12-SEP-2008 (TIMJ):
+*        No point in publishing errFioer
 
 *-
 */
@@ -51,9 +54,6 @@ void errEnd( int *status );
 
 void errFacer( const char *token,
                int status );
-
-void errFioer( const char *token,
-               int iostat );
 
 void errFlbel( int *status );
 

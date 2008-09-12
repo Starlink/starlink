@@ -42,24 +42,6 @@
 #include "merswrap.h"
 #include "mers_f77.h"
 
-void errFioer( const char *token,
-               int iostat ) {
-
-DECLARE_CHARACTER_DYN(ftoken);
-DECLARE_INTEGER(fiostat);
-
-   F77_CREATE_CHARACTER(ftoken,strlen( token ));
-   F77_EXPORT_CHARACTER(token,ftoken,ftoken_length);
-   F77_EXPORT_INTEGER(iostat,fiostat);
-
-   F77_CALL(err_fioer)( CHARACTER_ARG(ftoken),
-                        INTEGER_ARG(&fiostat)
-                        TRAIL_ARG(ftoken) );
-
-   F77_FREE_CHARACTER(ftoken);
-
-   return;
-}
 
 void errTune( const char *param,
               int value,

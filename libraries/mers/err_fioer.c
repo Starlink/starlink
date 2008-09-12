@@ -1,4 +1,4 @@
-      SUBROUTINE ERR_FIOER( TOKEN, IOSTAT )
+/*
 *+
 *  Name:
 *     ERR_FIOER
@@ -7,7 +7,7 @@
 *     Assign a Fortran I/O error message to a token.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C (Callable from Fortran)
 
 *  Invocation:
 *     CALL ERR_FIOER( TOKEN, IOSTAT )
@@ -62,18 +62,20 @@
 *     {note_any_bugs_here}
 
 *-
-      
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
+*/
 
-*  Arguments Given:
-      CHARACTER * ( * ) TOKEN
+#include "f77.h"
+#include "mers_f77.h"
 
-      INTEGER IOSTAT
+/* EMS does not publish the fortran prototype */
+F77_SUBROUTINE (ems_fioer)( CHARACTER(token), INTEGER(iostat) TRAIL(token) );
 
-*.
+F77_SUBROUTINE(err_fioer)( CHARACTER(TOKEN),
+                           INTEGER(IOSTAT)
+                           TRAIL(TOKEN) ) {
 
-*  Set Fortran I/O status message.
-      CALL EMS_FIOER( TOKEN, IOSTAT )
+  /* Note that we pass this directly to the EMS Fortran wrapper and so
+     do not need to convert strings or other arguments */
+  F77_CALL(ems_fioer)( TOKEN, IOSTAT TRAIL_ARG(TOKEN) );
 
-      END
+}
