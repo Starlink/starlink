@@ -1,4 +1,4 @@
-#include <config.h>
+#include "config.h"
       REAL FUNCTION sla_GRESID (S)
 *+
 *     - - - - - - -
