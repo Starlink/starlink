@@ -1,10 +1,10 @@
 /*
 *+
 *  Name:
-*     star_strappend
+*     star_strellcpy
 
 *  Purpose:
-*     A wrapper around strlcat that inserts ellipsis on truncation
+*     A wrapper around strlcpy that inserts ellipsis on truncation
 
 *  Language:
 *     Starlink ANSI C
@@ -13,14 +13,13 @@
 *     C function
 
 *  Description:
-*     This function appends a string onto another string but if the
+*     This function copies a string into a buffer but if the
 *     output string has been truncated, "..." will be added to the end
 *     of the string to indicate truncation. Returns true if everything
 *     was okay or false if the string was truncated.
 
 *  Invocation:
-*     trunc = star_strlappend( char * dest, const char * src, size_t sizedest);
-
+*     trunc = star_strellcpy( char * dest, const char * src, size_t sizedest);
 
 *  Arguments:
 *     dest = char * (Returned)
@@ -33,7 +32,7 @@
 
 *  Returned Value:
 *     size_t retval
-*        True if the string was appended successfully. False if it was
+*        True if the string was copied successfully. False if it was
 *        truncated.
 
 *  Authors:
@@ -41,11 +40,11 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     2008-09-10 (TIMJ):
+*     2008-09-11 (TIMJ):
 *        Initial version.
 
 *  Notes:
-*     - This is for use from C only. 
+*     - This is for use from C only.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -76,13 +75,13 @@
 #include "./util.h"
 
 int
-star_strappend( char * dest, const char * src, size_t size ) {
+star_strellcpy( char * dest, const char * src, size_t size ) {
   size_t nappend = 0;
   int retval = 0;
   const char ellipsis[] = "...";
   size_t nullpos = 0;      /* position to insert ellipsis */
 
-  nappend = star_strlcat( dest, src, size );
+  nappend = star_strlcpy( dest, src, size );
 
   if (nappend > size) {
 

@@ -15,6 +15,8 @@
  *  History:
  *     2008-09-04 (TIMJ):
  *        Initial version.
+ *     2008-09-11 (TIMJ):
+ *        Add star_strellcpy and star_strappend.
 
  *  Copyright:
  *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -54,6 +56,8 @@ size_t
 star_strlcat( char * dest, const char * src, size_t size );
 int
 star_strappend( char * dest, const char * src, size_t size );
+int
+star_strellcpy( char * dest, const char * src, size_t size );
 
 /* STAR_UTIL_H_INCLUDED */
 #endif

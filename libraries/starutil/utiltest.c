@@ -122,6 +122,20 @@ main ( void ) {
     exstat = EXIT_FAILURE;
   }
 
+  dest1[0] = '\0';
+  if (star_strellcpy( dest1, src1, ONEBUFSIZ) ) {
+    printf("No ellipsis - correct\n");
+  } else {
+    printf("Got ellipsis by mistake\n");
+    exstat = EXIT_FAILURE;
+  }
+
+  if (!star_strellcpy( dest1, src2, ONEBUFSIZ) ) {
+    printf("Truncation - correct\n");
+  } else {
+    printf("Got no truncation by mistake\n");
+    exstat = EXIT_FAILURE;
+  }
 
   return exstat;
 

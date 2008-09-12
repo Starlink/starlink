@@ -15,7 +15,8 @@ libstarutil_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 endif
 
 
-PUBLIC_C_FILES = star_strlcat.c star_strlcpy.c star_strappend.c
+PUBLIC_C_FILES = star_strlcat.c star_strlcpy.c star_strappend.c \
+	star_strellcpy.c
 
 PRIVATE_C_FILES = 
 
