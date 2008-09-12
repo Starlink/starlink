@@ -72,14 +72,14 @@ F_ROUTINES_STAND_SED =
 
 C_ROUTINES_STAND_SED = err1Prerr_stand.c msg1Prtln_stand.c
 
-F_ROUTINES_ADAM =  msg_ifget_adam.f
+F_ROUTINES_ADAM = 
 
 C_ROUTINES_ADAM = err1Prerr_adam.c msg1Prtln_adam.c msgSync_adam.c \
 	errStop_adam.c errStart_adam.c errClear_adam.c msg1Genv_adam.c \
-	msg1Form_adam.c msg1Gref_adam.c msg1Gkey_adam.c
+	msg1Form_adam.c msg1Gref_adam.c msg1Gkey_adam.c msgIfget_adam.c
 
 F_INTERFACE_ADAM = msg_sync_adam.c err_stop_adam.c err_start_adam.c \
-	err_clear_adam.c
+	err_clear_adam.c msg_ifget_adam.c
 
 C_ROUTINES_UT = msg1Ktok.c
 
@@ -92,7 +92,7 @@ err1Print.c mers1Blk.c err1Flush.c errFlush.c errFlbel.c errRep.c \
 msgLoad.c msgOutif.c msg1Print.c msgOut.c msgBlank.c errOut.c errLoad.c \
 msgIflev.c msgIfset.c
 
-C_INTERFACE_ADAM = err_adam.c
+C_INTERFACE_ADAM = 
 
 C_INTERFACE_STAND = 
 
