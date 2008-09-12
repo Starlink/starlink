@@ -50,7 +50,6 @@ liberr_adam_la_SOURCES = \
 	$(C_ROUTINES_ADAM) \
 	$(C_INTERFACE_ADAM) \
 	$(F_INTERFACE_ADAM) \
-	$(F_ROUTINES_UT) \
 	$(C_ROUTINES_UT) \
 	$(PRIVATE_INCLUDES)
 liberr_adam_la_LIBADD = liberr.la
@@ -82,8 +81,6 @@ C_ROUTINES_ADAM = err1Prerr_adam.c msg1Prtln_adam.c msgSync_adam.c \
 
 F_INTERFACE_ADAM = msg_sync_adam.c err_stop_adam.c err_start_adam.c \
 	err_clear_adam.c
-
-F_ROUTINES_UT = msg1_gesc.f msg1_gnam.f msg1_putc.f msg1_rform.f
 
 C_ROUTINES_UT = msg1Ktok.c
 
