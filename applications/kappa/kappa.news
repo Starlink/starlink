@@ -22,6 +22,11 @@
 
 2 Modified_applications
 
+   o  COLLAPSE
+
+      -  A COMP parameter is now available to collapse variance
+      and quality information.
+
    o  FFCLEAN 
    
       - This has been extended to operate on cubes, either by

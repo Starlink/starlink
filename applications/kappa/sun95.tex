@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.34}
 \newcommand{\stardocnumber}    {95.34}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2008 July 24}
+\newcommand{\stardocdate}      {2008 September 12}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.9-8}
+\newcommand{\stardocversion}   {1.9-9}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -17802,6 +17802,18 @@ XV; PBMPLUS; NETPBM.
          be used.
       }
       \sstsubsection{
+         COMP = LITERAL (Read)
+      }{
+         The name of the NDF array component for which statistics are
+         required: {\tt "Data"}, {\tt "Error"}, {\tt "Quality"} or 
+         {\tt "Variance"} (where {\tt "Error"} is the alternative to 
+         {\tt "Variance"} and causes the square root of the variance
+         values to be taken before computing the statistics).  If 
+         {\tt "Quality"} is specified, then the quality
+         values are treated as numerical values (in the range 0 to
+         255).  {\tt ["Data"]}
+      }
+      \sstsubsection{
          ESTIMATOR = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The method to use for estimating the output pixel values.  It
@@ -17815,8 +17827,10 @@ XV; PBMPLUS; NETPBM.
             {\tt "Mean"} --- Mean value
 
             \sstitem
-            {\tt "WMean"}  --- Weighted mean in wich each data value is weighted
-                        by the reciprocal of the associated variance.  
+            {\tt "WMean"}  --- Weighted mean in which each data value is 
+                        weighted by the reciprocal of the associated variance 
+                        (not available for COMP={\tt "Variance"} or
+                        {\tt "Error"}).  
 
             \sstitem
             {\tt "Mode"}   --- Modal value
@@ -17939,7 +17953,8 @@ XV; PBMPLUS; NETPBM.
          statistic, and to derive output variance.  If VARIANCE is {\tt TRUE}
          and the NDF contains a variance array, this array will be
          used to define the weights, otherwise all the weights will be
-         set equal.  {\tt [TRUE]}
+         set equal.  By definition this parameter is set to FALSE when 
+         COMP is {\tt "Variance"} or {\tt "Error"}.  {\tt [TRUE]}
       }
       \sstsubsection{
          WCSATTS = GROUP (Read)
@@ -40569,9 +40584,9 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          \sstitem
 
          An input NDF is included in the provenance of an output NDF only
-	 if the Data component of the input NDF is mapped for read or
+	 if the DATA component of the input NDF is mapped for read or
 	 update access by the application. In other words, input NDFs
-	 which are accessed only for their meta-data (\emph{e.g.} WCS
+	 which are accessed only for their metadata (\emph{e.g.} WCS
 	 information) are not included in the output provenance of an
 	 application.
 
@@ -55409,6 +55424,14 @@ The following new applications have been added:
 The following applications have been modified:
 
 \begin{description}
+
+   \item [\htmlref{COLLAPSE}{COLLAPSE}] \mbox{}
+      \begin{itemize}
+         \item A COMP parameter is now available to collapse variance
+         and quality information.  Selecting variance has some
+         ramifications in that the VARIANCE parameter will effectively 
+         be {\tt FALSE}, and the {\tt "WMean"} estimator is not available.
+      \end{itemize}
 
    \item [\htmlref{FFCLEAN}{FFCLEAN}] \mbox{}
       \begin{itemize}

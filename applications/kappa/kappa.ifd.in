@@ -9160,6 +9160,14 @@ package kappa {
             ppath DYNAMIC
             helpkey *
           }
+         parameter comp {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DYNAMIC
+            prompt {Array component to collapse}
+            default Data
+            helpkey *
+          }
          parameter estimator {
             position 6
             type LITERAL

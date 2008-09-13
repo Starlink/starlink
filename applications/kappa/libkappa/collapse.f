@@ -60,14 +60,24 @@
 *        supplied.  If the axes of the current Frame are not parallel to
 *        the NDF pixel axes, then the pixel axis which is most nearly 
 *        parallel to the specified current Frame axis will be used.
+*     COMP = LITERAL (Read)
+*        The name of the NDF array component for which statistics are
+*        required: "Data", "Error", "Quality" or "Variance" (where
+*        "Error" is the alternative to "Variance" and causes the square
+*        root of the variance values to be taken before computing the
+*        statistics).  If "Quality" is specified, then the quality
+*        values are treated as numerical values (in the range 0 to
+*        255).  ["Data"]
 *     ESTIMATOR = LITERAL (Read)
 *        The method to use for estimating the output pixel values.  It
 *        can be one of the following options.  The first four are
 *        more for general collapsing, and the remainder are for cube
 *        analysis.
 *          "Mean"   -- Mean value
-*          "WMean"  -- Weighted mean in wich each data value is weighted
-*                      by the reciprocal of the associated variance.  
+*          "WMean"  -- Weighted mean in which each data value is 
+*                      weighted by the reciprocal of the associated 
+*                      variance (not available for COMP="Variance" or
+*                      "Error").  
 *          "Mode"   -- Modal value
 *          "Median" -- Median value.  Note that this is extremely memory
 *                      and CPU intensive for large datasets; use with 
@@ -143,7 +153,8 @@
 *        statistic, and to derive output variance.  If VARIANCE is TRUE 
 *        and the NDF contains a variance array, this array will be
 *        used to define the weights, otherwise all the weights will be
-*        set equal.  [TRUE]
+*        set equal.  By definition this parameter is set to FALSE when 
+*        COMP is "Variance" or "Error".  [TRUE]
 *     WCSATTS = GROUP (Read)
 *        A group of attribute settings which will be used to make 
 *        temporary changes to the properties of the current co-ordinate 
@@ -392,6 +403,8 @@
 *        formatted axis values.
 *     2008 June 17 (MJC):
 *        Trim trailing blanks from output NDF character components.
+*     2008 September 11 (MJC):
+*        Add COMP parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -528,6 +541,7 @@
       LOGICAL GOTAX              ! Does the NDF have an AXIS component?
       LOGICAL LOOP               ! Continue to loop through dimensions?
       LOGICAL NDFVAR             ! NDF contains a variance array?
+      LOGICAL PROVAR             ! Collapse VARIANCE?
       LOGICAL TRIM               ! Remove collapsed axes from o/p?
       LOGICAL USEALL             ! Use the entire collapse pixel axis?
       LOGICAL USEVAR             ! Allow weights to be derived from the
@@ -554,6 +568,11 @@
 
 *  Get the bounds of the NDF.
       CALL NDF_BOUND( INDFI, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+
+*  Get the component we require.
+      CALL PAR_CHOIC( 'COMP', 'DATA', 'DATA,VARIANCE,QUALITY,ERROR',
+     :                .FALSE., COMP, STATUS )
+      PROVAR = COMP .EQ. 'VARIANCE' .OR. COMP .EQ. 'ERROR'
 
 *  Get the WCS FrameSet from the NDF.
       CALL KPG1_GTWCS( INDFI, IWCS, STATUS )
@@ -735,23 +754,30 @@
 *  Obtain the component and processing data type.
 *  ==============================================
 
-*  See if the input NDF has a Variance component.
+*  See if the input NDF has a VARIANCE component.
       CALL NDF_STATE( INDFI, 'VARIANCE', NDFVAR, STATUS )
 
 *  Find out whether variances are to be used to define the weights, if
 *  the NDF contains any.
       USEVAR = .FALSE.
-      IF ( NDFVAR ) CALL PAR_GET0L( 'VARIANCE', USEVAR, STATUS )
+      IF ( NDFVAR ) THEN
+         IF ( .NOT. PROVAR )
+     :     CALL PAR_GET0L( 'VARIANCE', USEVAR, STATUS )
 
+      ELSE IF ( PROVAR ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'COLLAPSE_ERR3', 'COLLAPSE: There is no '//
+     :                 'VARIANCE component to collapse.', STATUS )
+         GO TO 999
+      END IF
+      
 *  Weights will be derived from variances only if allowed by USEVAR and
 *  if the NDF contains a variance array.
       VAR = ( USEVAR .AND. NDFVAR )
 
 *  Store a list of components to be accessed.
       IF ( VAR ) THEN
-         COMP = 'DATA,VARIANCE'
-      ELSE
-         COMP = 'DATA'
+         COMP = COMP( : CHR_LEN( COMP ) ) // ',VARIANCE'
       END IF
 
 *  Determine the numeric type to be used for processing the input
@@ -896,10 +922,17 @@
 *  Obtain the remaining parameters.
 *  ================================
 
-*  Get the ESTIMATOR and WLIM parameters.
-      CALL PAR_CHOIC( 'ESTIMATOR', 'Mean','Mean,WMean,Mode,Median,Max,'/
-     :                /'Min,Comax,Comin,Absdev,RMS,Sigma,Sum,Iwc,Iwd,'/
-     :                /'Integ', .FALSE., ESTIM, STATUS )
+*  Get the ESTIMATOR and WLIM parameters.  Can weight with the
+*  variance if it is the variance that's being collapsed.
+      IF ( PROVAR ) THEN
+         CALL PAR_CHOIC( 'ESTIMATOR', 'Mean','Mean,Mode,Median,Max,'/
+     :                   /'Min,Comax,Comin,Absdev,RMS,Sigma,Sum,Iwc,'/
+     :                   /'Iwd,Integ', .FALSE., ESTIM, STATUS )
+      ELSE
+         CALL PAR_CHOIC( 'ESTIMATOR', 'Mean','Mean,WMean,Mode,Median,'/
+     :                   /'Max,Min,Comax,Comin,Absdev,RMS,Sigma,Sum,'/
+     :                   /'Iwc,Iwd,Integ', .FALSE., ESTIM, STATUS )
+      END IF
 
       CALL PAR_GDR0R( 'WLIM', 0.3, 0.0, 1.0, .FALSE., WLIM, STATUS )
 
