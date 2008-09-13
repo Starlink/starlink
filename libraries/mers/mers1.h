@@ -52,6 +52,8 @@ typedef struct {
 } MersTune;
 
 
+int mers1Getenv( int usemsg, const char * param, int * status );
+
 void err1Bell( int * status );
 void err1Flush ( int * errbel, int * status );
 void err1Prerr( const char * text, int * status );

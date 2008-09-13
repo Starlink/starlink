@@ -173,7 +173,7 @@
 
       STATUS = SAI__ERROR
       CALL ERR_REP( ' ',
-     :     'Flushed error with ^^X escape ^^Y char',
+     :     'Flushed error with ^^X escape ^^Y char and a % or 2',
      :     STATUS)
       CALL ERR_FLUSH(STATUS)
 
