@@ -439,6 +439,7 @@
       CHARACTER AUNITS*( 30 )    ! Units of co-ordinates 
       CHARACTER ATTRIB*( 10 )    ! AST attribute name
       CHARACTER COMP * ( 13 )    ! List of components to process
+      CHARACTER COMPO * ( 13 )   ! List of output components to process
       CHARACTER DTYPE*( NDF__SZFTP ) ! Numeric type for output arrays
       CHARACTER ESTIM*( 6 )      ! Method to use to estimate collapsed
                                  ! values
@@ -775,9 +776,12 @@
 *  if the NDF contains a variance array.
       VAR = ( USEVAR .AND. NDFVAR )
 
-*  Store a list of components to be accessed.
+*  Store a list of components to be accessed.  The output component list
+*  must start with the DATA_ARRAY.
+      COMPO = 'DATA'
       IF ( VAR ) THEN
          COMP = COMP( : CHR_LEN( COMP ) ) // ',VARIANCE'
+         COMPO = COMPO( : 4 ) // ',VARIANCE'
       END IF
 
 *  Determine the numeric type to be used for processing the input
@@ -1048,7 +1052,7 @@
 
 *  Map the full input, and output data and (if needed) variance arrays.
          CALL NDF_MAP( IBL, COMP, ITYPE, 'READ', IPIN, EL1, STATUS )
-         CALL NDF_MAP( OBL, COMP, ITYPE, 'WRITE', IPOUT, EL2, STATUS )
+         CALL NDF_MAP( OBL, COMPO, ITYPE, 'WRITE', IPOUT, EL2, STATUS )
 
          IF ( .NOT. VAR ) THEN
             IPIN( 2 ) = IPIN( 1 )
