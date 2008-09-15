@@ -175,27 +175,3 @@ DECLARE_REAL(frvalue);
 
    return;
 }
-
-void msgTune( const char *param,
-              int value,
-              int *status ) {
-
-DECLARE_CHARACTER_DYN(fparam);
-DECLARE_INTEGER(fvalue);
-DECLARE_INTEGER(fstatus);
-
-   F77_CREATE_CHARACTER(fparam,strlen( param ));
-   F77_EXPORT_CHARACTER(param,fparam,fparam_length);
-   F77_EXPORT_INTEGER(value,fvalue);
-   F77_EXPORT_INTEGER(*status,fstatus);
-
-   F77_CALL(msg_tune)( CHARACTER_ARG(fparam),
-                       INTEGER_ARG(&fvalue),
-                       INTEGER_ARG(&fstatus)
-                       TRAIL_ARG(fparam) );
-
-   F77_FREE_CHARACTER(fparam);
-   F77_IMPORT_INTEGER(fstatus,*status);
-
-   return;
-}

@@ -57,8 +57,7 @@ liberr_adam_la_LIBADD = liberr.la
 PRIVATE_INCLUDES = mers_f77.h mers1.h
 
 F_ROUTINES = msg_fmtc.f msg_fmtd.f msg_fmti.f msg_fmtl.f \
-             msg_fmtr.f \
-             msg_tune.f
+             msg_fmtr.f
 
 F_ROUTINES_STAND =
 
@@ -88,7 +87,7 @@ msgSetl.c errAnnul.c errBegin.c errEnd.c errSyser.c errMark.c errRlse.c \
 errStat.c errLevel.c errFacer.c msgRenew.c err1Bell.c msgBell.c \
 err1Print.c mers1Blk.c err1Flush.c errFlush.c errFlbel.c errRep.c \
 msgLoad.c msgOutif.c msg1Print.c msgOut.c msgBlank.c errOut.c errLoad.c \
-msgIflev.c msgIfset.c mers1Getenv.c errTune.c
+msgIflev.c msgIfset.c mers1Getenv.c errTune.c msgTune.c
 
 C_INTERFACE_ADAM = 
 
@@ -99,7 +98,7 @@ msg_setl.c err_annul.c err_begin.c err_end.c err_syser.c err_mark.c \
 err_rlse.c err_stat.c err_level.c err_facer.c msg_renew.c msg_bell.c \
 err_flush.c err_flbel.c err_rep.c msg_load.c msg_outif.c msg_out.c \
 msg_blank.c err_out.c err_load.c msg_iflev.c msg_ifset.c err_fioer.c \
-err_tune.c
+err_tune.c msg_tune.c
 
 #  The installation test source
 TEST_SOURCE = err_test.f err_test.c err_test.ifl
