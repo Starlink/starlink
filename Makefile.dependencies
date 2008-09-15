@@ -945,7 +945,8 @@ $(MANIFESTS)/gaia: \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tcllibs \
 		$(MANIFESTS)/tclx \
-		$(MANIFESTS)/tk
+		$(MANIFESTS)/tk \
+		$(MANIFESTS)/vtk
 	cd applications/gaia \
 	  && $(MAKE_CPT)
 
