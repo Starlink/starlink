@@ -133,14 +133,14 @@
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'N', NOPT )
          CALL ERR_REP( 'KPG1_GTCHV_1', 'KPG1_GTCHV: No. of supplied '//
-     :                 'options (^N) is less than 1 (programming '//
+     :                 'options (^N) is fewer than 1 (programming '//
      :                 'error).', STATUS )
 
       ELSE IF( NVAL .LE. 0 ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'N', NVAL )
          CALL ERR_REP( 'KPG1_GTCHV_2', 'KPG1_GTCHV: No. of required '//
-     :                 'options (^N) is less than 1 (programming '//
+     :                 'options (^N) is fewer than 1 (programming '//
      :                 'error).', STATUS )
 
       ELSE IF( IDEF( 1 ) .NE. 0 ) THEN
@@ -154,7 +154,7 @@
                CALL MSG_SETI( 'N', NOPT )
 
                CALL ERR_REP( 'KPG1_GTCHV_3', 'KPG1_GTCHV: The ^ITH '//
-     :                       'default value (^D) is less than 1 or '//
+     :                       'default value (^D) is fewer than 1 or '//
      :                       'greater than the number of available '//
      :                       'options (^N) (programming error).', 
      :                       STATUS )
