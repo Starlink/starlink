@@ -12,16 +12,17 @@
  *     emsFacer( token, status )
 
  *  Description:
- *     This function provides a C interface for the Error Message 
- *     Service routine EMS_FACER (written in Fortran).
+ *     This function queires the Error Message Service database
+ *     to associate an error message with a supplied status value.
 
  *  Arguments:
  *     token = const char * (Given)
  *        The message token to be associated with the error text.
  *     status = int (Given)
- *        The errno value.
+ *        The status value.
 
  *  Copyright:
+ *     Copyright (C) 2008 Science and Technology Facilities Council.
  *     Copyright (C) 1994 Science & Engineering Research Council.
  *     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
  *     All Rights Reserved.
@@ -45,6 +46,7 @@
  *  Authors:
  *     AJC: A.J.Chipperfield (STARLINK)
  *     RTP: R.T.Platon (STARLINK)
+ *     TIMJ: Tim Jenness (JAC, Hawaii)
  *     {enter_new_authors_here}
 
  *  History:
@@ -58,6 +60,8 @@
  *        Use FSTAT not LSTAT in sprintf 
  *     13-AUG-2001 (AJC):
  *        Remove unused variables
+ *     15-SEP-2008 (TIMJ):
+ *        3 arg emsSetc is deprecated.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -106,7 +110,7 @@ void emsFacer( const char *token, int fstat ){
 
 /*  A message has been returned.
  */
-   emsSetc( token, mesval, meslen );
+   emsSetc( token, mesval );
 
    return;
 }

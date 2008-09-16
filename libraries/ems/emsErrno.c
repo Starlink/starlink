@@ -63,6 +63,8 @@
  *        removed Fortran interface
  *      8-AUG-2001 (AJC):
  *        Change ems1_serr to ems1Serr
+ *      15-SEP-2008 (TIMJ):
+ *        3-arg emsSetc is deprecated.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -93,11 +95,11 @@ void emsErrno( const char *token, int errval ){
 /* Check for a good translation */
    if ( strspn(mess," ") != EMS__SZTOK ){
 /*   OK - put the mesage in a token */
-      emsSetc( token, mess, EMS__SZTOK );
+      emsSetc( token, mess);
    } else {
 /*   Bad - construct an error message */
-      emsSetc( token, "No translation for errno", EMS__SZTOK);
-      emsSetc( token, " ", EMS__SZTOK);
+      emsSetc( token, "No translation for errno");
+      emsSetc( token, " ");
       emsSeti( token, errval );
    }
    return;
