@@ -51,6 +51,8 @@
 #        Remove liberr
 #      5-SEP-2008 (TIMJ):
 #        Add starutil_link
+#     16-SEP-2008 (TIMJ):
+#        No longer need PSX
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -58,7 +60,7 @@
 
 #-
 
-      echo -lerr_standalone `starutil_link` `psx_link` `cnf_link` `chr_link` `ems_link` \
+      echo -lerr_standalone `cnf_link` `chr_link` `ems_link` `starutil_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

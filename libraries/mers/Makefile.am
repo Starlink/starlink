@@ -112,14 +112,14 @@ TESTS = err_ftest
 
 check_PROGRAMS = err_ftest
 err_ftest_SOURCES = err_ftest.f
-err_ftest_LDADD = liberr_standalone.la `psx_link` `chr_link` `cnf_link` `starutil_link`
+err_ftest_LDADD = liberr_standalone.la `chr_link` `cnf_link` `starutil_link`
 
 # Monoliths with C main do compile but we do not want a build dependency
 # on PCS
 #check_MONOLITHS = err_test
 #err_test_TASKS =
 #err_test_SOURCES = err_test.c
-#err_test_LDADD = liberr_adam.la `psx_link_adam` `chr_link_adam` `cnf_link_adam`
+#err_test_LDADD = liberr_adam.la `chr_link_adam` `cnf_link_adam`
 
 dist_starnews_DATA = mers.news
 dist_pkgdata_DATA = LICENCE
