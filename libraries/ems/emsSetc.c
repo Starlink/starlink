@@ -16,24 +16,20 @@
  *     value, leading spaces are retained but trailing spaces removed.
  *     The string will be truncated to EMS__SZTOK characters if not null-
  *     terminated earlier.
- *     A null or blank string will be rendered as a token of one space.
- *     A Fortran interface EMS_SETC is also provided.
+ *     A blank string will be rendered as a token of one space. If the C
+ *     pointer is NULL, the string <Null> will be inserted instead.
+ *     A Fortran interface EMS_SETC is also provided (but it does not include
+ *     the printf formatting).
 
  *  Arguments:
  *     token = const char * (Given)
  *        The message token name.
  *     cvalue = const char * (Given)
  *        The CHARACTER value to be assigned to the message token.
- *        A NULL pointer is treated as an empty string.
- *
- *     For historical reasons, the following optional third argument may
- *     be given - in former versions of the function it could be used to
- *     restrict the size of the token, particularly if the given string
- *     was not null-terminated. It is no longer used - if restriction is
- *     required, function emsSetnc should be used instead.
- *
- *     maxchar = int (Given)
- *        The maximum desired length of the token.
+ *        A NULL pointer is converted to <Null>.
+ *     ... = va_list (Given)
+ *        The string supplied 
+
 
  *  Copyright:
  *     Copyright (C) 1990, 1991 Science & Engineering Research Council.
@@ -84,6 +80,11 @@
  *        Trap null pointer.
  *     15-MAY-2008 (PWD):
  *        Remove unused variable.
+ *     15-SEP-2008 (TIMJ)
+ *        - Decide that a NULL pointer should print something rather than
+ *          a space.
+ *        - Allow the input text to have printf-style formatting, reusing
+ *          the deprecated 3 arg calling scheme.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -93,28 +94,49 @@
  */
 
 /* Include Statements: */
+#include <stdarg.h>                    /* Optional arg handling */
+#include <stdio.h>                     /* sprintf */
 #include <string.h>                    /* String handling library functions */
+
+
 #include "ems_par.h"                   /* ems_ public constant definitions */
 #include "ems_sys.h"                   /* ems_ private macro definitions */
 #include "ems.h"                       /* ems_ function prototypes */
 #include "ems1.h"                      /* ems_ internal function prototypes */
+
+#define ELLIPSIS "..."
 
 /* Function Definitons: */
 void emsSetc( const char *token, const char *cvalue, ... )
 {
     int i;
     char valbuf[ EMS__SZTOK + 1 ];
+    const char null[] = "<Null>";
+    va_list args;                      /* Variable argument list */
+    size_t len;                        /* Length of text after replacement */
 
     TRACE( "emsSetc" );
     DEBUG( "emsSetc", "emsSetc: '%s'", token );
 
-    /*  Find the used length of the string */
+    /*  Handle null pointer and printf formatting */
     valbuf[0] = '\0';
-    if ( cvalue ) strncpy( valbuf, cvalue, EMS__SZTOK );
+    if ( cvalue ) {
+      va_start( args, cvalue );
+      len = vsnprintf( valbuf, sizeof(valbuf), cvalue, args );
+      if (len > (sizeof(valbuf) - 1) ) {
+        /* add truncation indicator */
+        valbuf[sizeof(valbuf)-1-strlen(ELLIPSIS)-1] = '\0';
+        strcat(valbuf, ELLIPSIS);
+      }
+      va_end(args);
+    } else {
+      strncpy( valbuf, null, sizeof(valbuf) );
+    }
     valbuf[ EMS__SZTOK ] = '\0';
 
+    /*  Find the used length of the string */
     for ( i = strlen( valbuf ); i > 0 ; i-- ) {
-        if ( cvalue[ i - 1 ] != ' ' ) break;
+        if ( valbuf[ i - 1 ] != ' ' ) break;
     }
     valbuf[ i ] = '\0';
 
