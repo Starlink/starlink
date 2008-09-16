@@ -9,7 +9,7 @@
  *     Starlink ANSI C
 
  *  Invocation:
- *     emsSetc( token, cvalue )
+ *     emsSetc( token, cvalue, ... )
 
  *  Description:
  *     This function sets the specified message token to the given string
