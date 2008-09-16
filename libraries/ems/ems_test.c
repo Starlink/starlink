@@ -104,6 +104,8 @@ int main( void ){
    status = SAI__ERROR;
    emsRep( "ERR2", "Error message 2", &status );
    printf( "This should appear between the two error messages\n" );
+   emsRep( "ERR3", "Printf %d < 2  %.1f < 5.5", &status, 2, 5.5);
+
    emsRlse();
 
 /* Now the Fortran interface (from C) */

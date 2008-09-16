@@ -63,6 +63,7 @@
 #define EMS_DEFINED
 
 /* ANSI types */
+#include <stdarg.h>
 #include <stddef.h>
 #include <inttypes.h>
 
@@ -112,7 +113,7 @@ void emsRenew( void );
 
 void emsRep( const char *err,     
              const char *text,
-             int *status );
+             int *status, ... );
 
 void emsRlse( void );             
 

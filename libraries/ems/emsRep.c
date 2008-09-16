@@ -9,7 +9,7 @@
  *     Starlink ANSI C
 
  *  Invocation:
- *     emsRep( err, text, status )
+ *     emsRep( err, text, status, ... )
 
  *  Description:
  *     This function provides a C interface for the Error Message 
@@ -22,6 +22,21 @@
  *        The error message text.
  *     status = int * (Given and Returned)
  *        The global status value.
+ *     ... = arguments to printf (Given)
+ *        If the "text" in the error message contains "%" C-style
+ *        format specifiers then an optional list of additional arguments
+ *        may follow it in in order to supply values to be substituted
+ *        for these specifiers. This can sometimes remove the need for explicit
+ *        tokens to be set using emsSetx. The rules for supplying these are
+ *        as for the sprintf() C function.
+
+ *  Notes:
+ *     Using printf formatting can be useful for cases where a variable
+ *     type has no corresponding emsSet routine and can result in less code
+ *     for error message reporting. Note though that escape character parsing
+ *     will be performed on the resulting string and an attempt to replace
+ *     tokens will also be made. If there is a chance that the formatted
+ *     string will include escape characters, tokens should be used.
 
  *  Copyright:
  *     Copyright (C) 1990, 1991 Science & Engineering Research Council.
@@ -88,19 +103,29 @@
 #include "ems1.h"                     /* EMS_ Internal function prototypes */
 #include "ems_defs.h"                 /* EMS_ message table */
 
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
+
+#define ELLIPSIS "..."
+
 /* Function Definitons: */
-void emsRep( const char *err, const char *text, int *status )
+void emsRep( const char *err, const char *text, int *status, ... )
 {
     int istat;                         /* Internal status */
     int mlen;                          /* Length of final error message text */
     int plen;                          /* Length of the message name */
     char mstr[EMS__SZMSG+1];           /* Final error message text */
     char pstr[EMS__SZPAR+1];           /* Local error name text */
+    char vstr[EMS__SZMSG+1];           /* sprintf expanded string */
+
+    va_list args;                      /* Variable argument list */
+    size_t len;                        /* Length of text after replacement */
 
     ems_msgtab_t *msgtab = ems1Gmsgtab();  /* Current message table */
     
     TRACE( "emsRep" );
-    
+
     /*  Check the inherited status: if it is SAI__OK, then set status to
      *  EMS__BADOK and store an additional message in the error table.
      */
@@ -138,9 +163,19 @@ void emsRep( const char *err, const char *text, int *status )
         istat = *status;
     }
 
+    /* Handle any optional arguments */
+    va_start( args, status );
+    len = vsnprintf( vstr, sizeof(vstr), text, args );
+    if (len > (sizeof(vstr) - 1) ) {
+      /* add truncation indicator */
+      mstr[sizeof(vstr)-1-strlen(ELLIPSIS)-1] = '\0';
+      strcat(vstr, ELLIPSIS);
+    }
+    va_end( args );
+
     /*  Now form the given error message.  Status is not altered by this
      *  routine. */
-    ems1Form( text, EMS__SZMSG, !msgtab->msgstm, mstr, &mlen, 
+    ems1Form( vstr, EMS__SZMSG, !msgtab->msgstm, mstr, &mlen, 
               &istat );
 
     /*  Use EMS1_ESTOR to store the error message in the error table. */

@@ -12,6 +12,12 @@
      routine emsStune. This also returns the current value of the 
      tuning parameter.
 
+   * The C interface to emsRep has been modified so that it can take
+     printf()-style format specifiers. This allows C programmers to use
+     standard formatting techniques instead of tokens. Note though that
+     C format specifiers are subject to parsing for escape characters
+     whereas tokens are not.
+
 2.1-2
 
    * A memory overrun bug storing and retrieving parameter names has been 
