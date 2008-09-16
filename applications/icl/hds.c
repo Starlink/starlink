@@ -33,6 +33,8 @@
  *      Correct type to ftype in call emsSetc
  *   22-NOV-2005 (TIMJ):
  *      Use modern HDS API with HDSLoc*
+ *   15-SEP-2008 (TIMJ):
+*       3 arg emsSetc is deprecated.
  ******************************************************************************
  */
 #include <string.h>
@@ -1450,7 +1452,7 @@ proc_createglobal(node *n)
 
 	} else {
             status = SAI__ERROR;
-            emsSetc( "TYPE", type, DAT__SZTYP);
+            emsSetnc( "TYPE", type, DAT__SZTYP);
             emsRep(" ",
 		"CREATEGLOBAL : Illegal HDS component type, ^TYPE", &status);
         }

@@ -61,7 +61,9 @@
 *     [routine_deficiencies]...
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
+*     All Rights Reserved.
 
 *  Authors:
 *     AJC: A.J.Chipperfield (Starlink, RAL)
@@ -72,6 +74,8 @@
 *        Original version.
 *      22-NOV-2005 (TIMJ):
 *        Use modern C HDS interface
+*      15-SEP-2008 (TIMJ):
+*        3 arg emsSetc is deprecated.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -108,7 +112,7 @@ int i;
          datPut( toploc, hdstype, ndims, dims, data, status );
       } else {
          *status = SAI__ERROR;
-         emsSetc( "TYPE", hdstype, EMS__SZTOK );
+         emsSetnc( "TYPE", hdstype, EMS__SZTOK );
          emsRep(" ",
            "Cannot handle primitive data type ^TYPE.", status );
       }

@@ -47,9 +47,12 @@
 *        datAnnul
 *
 * Copyright:
+*   Copyright (C) 2008 Science and Technology Facilities Council.
 *   Copyright (C) 1999 Central Laboratory of the Research Councils
+*   All Rights Reserved.
 *
 * Authors:
+*    TIMJ: Tim Jenness (JAC, Hawaii)
 *    AJC: A.J.Chipperfield (Starlink, RAL)
 *    {enter_new_authors_here}
 *
@@ -66,6 +69,8 @@
 *       Handle array of structures at top level
 *    22-NOV-2005 (TIMJ):
 *       Use modern HDS 
+*    15-SEP-2008 (TIMJ):
+*       3 arg emsSetc is deprecated.
 *    {enter_further_changes_here}
 *
 *-
@@ -197,7 +202,7 @@ if ( !ndims ) {
                tags[i].type = (void *)IDL_TYP_LONG;
             } else if ( type[0] == '_' ) {
                *status = SAI__ERROR;
-               emsSetc( "TYPE", type, EMS__SZTOK );
+               emsSetnc( "TYPE", type, EMS__SZTOK );
                emsRep( " ", "Illegal type ^TYPE", status );
             }
 
