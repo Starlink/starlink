@@ -48,7 +48,8 @@ F77_SUBROUTINE(psx_remove)( CHARACTER(pathname), INTEGER(status)
 *     - POSIX standard, IEEE Std 1003.1
 
 *  Copyright:
-*     Copyright (C) 1999-2004 CLRC
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 1999-2004 CLRC. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -78,6 +79,8 @@ F77_SUBROUTINE(psx_remove)( CHARACTER(pathname), INTEGER(status)
 *        PSX-ify. Status is now set on error.
 *     23-FEB-2006 (TIMJ):
 *        Use starMalloc
+*     16-FEB-2008 (TIMJ):
+*        Use starFree not cnfFree.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -86,41 +89,41 @@ F77_SUBROUTINE(psx_remove)( CHARACTER(pathname), INTEGER(status)
 *-
 */
 
-   GENPTR_CHARACTER(pathname)
-   GENPTR_INTEGER(status)
+  GENPTR_CHARACTER(pathname)
+  GENPTR_INTEGER(status)
 
-   char *file = NULL;
-   int rstatus = 0;
+  char *file = NULL;
+  int rstatus = 0;
 
-/* Check the global status. */
-   if( *status != SAI__OK ) return;
+  /* Check the global status. */
+  if( *status != SAI__OK ) return;
 
-/* Allocate memory to store a null-terminated copy of the file name. */
-   file = starMalloc( pathname_length + 1 );
-   if ( file ) {
+  /* Allocate memory to store a null-terminated copy of the file name. */
+  file = starMalloc( pathname_length + 1 );
+  if ( file ) {
 
-/* Copy the blank padded fortran file name to a null terminated C string. */
-      cnfImprt( pathname, pathname_length, file );
+    /* Copy the blank padded fortran file name to a null terminated C string. */
+    cnfImprt( pathname, pathname_length, file );
 
-/* Remove the file. */
-      rstatus = remove( file );
+    /* Remove the file. */
+    rstatus = remove( file );
 
-/* Check status value */
-      if (rstatus == -1) {
-	*status = PSX__ERRNO;
-	emsSyser("ERRNO", errno);
-	emsSetc("PATH", file );
-	psx1_rep_c("PSX_REMOVE_ERR",
-		   "Error removing '^PATH': ^ERRNO", status);
+    /* Check status value */
+    if (rstatus == -1) {
+      *status = PSX__ERRNO;
+      emsSyser("ERRNO", errno);
+      emsSetc("PATH", file );
+      psx1_rep_c("PSX_REMOVE_ERR",
+                 "Error removing '^PATH': ^ERRNO", status);
 
-      }
+    }
 
-/* Free the memory. */
-      starFree( file );
-   } else {
-     *status = PSX__NOMEM;
-     psx1_rep_c("PSX_REMOVE_ERR2",
-		"Unable to allocate memory for path removal", status);
+    /* Free the memory. */
+    starFree( file );
+  } else {
+    *status = PSX__NOMEM;
+    psx1_rep_c("PSX_REMOVE_ERR2",
+               "Unable to allocate memory for path removal", status);
 
-   }
+  }
 }
