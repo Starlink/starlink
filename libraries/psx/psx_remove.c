@@ -96,7 +96,7 @@ F77_SUBROUTINE(psx_remove)( CHARACTER(pathname), INTEGER(status)
    if( *status != SAI__OK ) return;
 
 /* Allocate memory to store a null-terminated copy of the file name. */
-   file = (char *) starMalloc( pathname_length + 1 );
+   file = starMalloc( pathname_length + 1 );
    if ( file ) {
 
 /* Copy the blank padded fortran file name to a null terminated C string. */
@@ -116,7 +116,7 @@ F77_SUBROUTINE(psx_remove)( CHARACTER(pathname), INTEGER(status)
       }
 
 /* Free the memory. */
-      cnfFree( file );
+      starFree( file );
    } else {
      *status = PSX__NOMEM;
      psx1_rep_c("PSX_REMOVE_ERR2",
