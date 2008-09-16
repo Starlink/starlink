@@ -104,13 +104,8 @@ int main( void ){
    status = SAI__ERROR;
    emsRep( "ERR2", "Error message 2", &status );
    printf( "This should appear between the two error messages\n" );
-   emsRep( "ERR3", "Printf %d < 2  %.1f < 5.5", &status, 2, 5.5);
-
    emsSetc( "NULL", NULL );
-   emsRep( "ERR4", "Null pointer token: ^NULL Null printf: %s", &status, NULL );
-
-   emsSetc( "P", "msg%d", 5 );
-   emsRep( "ERR5", "emsSetc formatting: ^P - should be 'msg5'", &status );
+   emsRep( "ERR6", "emsRep classic with inline % symbol", &status );
 
    emsRlse();
 

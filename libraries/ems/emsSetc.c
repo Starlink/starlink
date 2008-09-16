@@ -9,7 +9,7 @@
  *     Starlink ANSI C
 
  *  Invocation:
- *     emsSetc( token, cvalue, ... )
+ *     emsSetc( token, cvalue )
 
  *  Description:
  *     This function sets the specified message token to the given string
@@ -27,9 +27,6 @@
  *     cvalue = const char * (Given)
  *        The CHARACTER value to be assigned to the message token.
  *        A NULL pointer is converted to <Null>.
- *     ... = va_list (Given)
- *        The string supplied 
-
 
  *  Copyright:
  *     Copyright (C) 1990, 1991 Science & Engineering Research Council.
@@ -83,8 +80,8 @@
  *     15-SEP-2008 (TIMJ)
  *        - Decide that a NULL pointer should print something rather than
  *          a space.
- *        - Allow the input text to have printf-style formatting, reusing
- *          the deprecated 3 arg calling scheme.
+ *     16-SEP-2008 (TIMJ):
+ *        Remove deprecated 3 arg interface.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -94,7 +91,6 @@
  */
 
 /* Include Statements: */
-#include <stdarg.h>                    /* Optional arg handling */
 #include <stdio.h>                     /* sprintf */
 #include <string.h>                    /* String handling library functions */
 
@@ -104,16 +100,12 @@
 #include "ems.h"                       /* ems_ function prototypes */
 #include "ems1.h"                      /* ems_ internal function prototypes */
 
-#define ELLIPSIS "..."
-
 /* Function Definitons: */
-void emsSetc( const char *token, const char *cvalue, ... )
+void emsSetc( const char *token, const char *cvalue )
 {
     int i;
     char valbuf[ EMS__SZTOK + 1 ];
     const char null[] = "<Null>";
-    va_list args;                      /* Variable argument list */
-    size_t len;                        /* Length of text after replacement */
 
     TRACE( "emsSetc" );
     DEBUG( "emsSetc", "emsSetc: '%s'", token );
@@ -121,14 +113,7 @@ void emsSetc( const char *token, const char *cvalue, ... )
     /*  Handle null pointer and printf formatting */
     valbuf[0] = '\0';
     if ( cvalue ) {
-      va_start( args, cvalue );
-      len = vsnprintf( valbuf, sizeof(valbuf), cvalue, args );
-      if (len > (sizeof(valbuf) - 1) ) {
-        /* add truncation indicator */
-        valbuf[sizeof(valbuf)-1-strlen(ELLIPSIS)-1] = '\0';
-        strcat(valbuf, ELLIPSIS);
-      }
-      va_end(args);
+      strncpy( valbuf, cvalue, sizeof(valbuf) );
     } else {
       strncpy( valbuf, null, sizeof(valbuf) );
     }

@@ -52,6 +52,8 @@
  *        Marked emsTune as deprecated.
  *     10-SEP-2008 (TIMJ):
  *        Remove fortran prototypes. Should not be in a public include file.
+ *     16-SEP-2008 (TIMJ):
+ *        Remove 3 arg version of emsSetc
  *     {enter_changes_here}
 
  *  Bugs:
@@ -113,13 +115,12 @@ void emsRenew( void );
 
 void emsRep( const char *err,     
              const char *text,
-             int *status, ... );
+             int *status );
 
 void emsRlse( void );             
 
 void emsSetc( const char *token,  
-              const char *cvalue,
-              ... );
+              const char *cvalue );
 
 void emsSetnc( const char *token,  
                const char *cvalue,

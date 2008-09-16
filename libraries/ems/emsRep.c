@@ -110,17 +110,13 @@
 #define ELLIPSIS "..."
 
 /* Function Definitons: */
-void emsRep( const char *err, const char *text, int *status, ... )
+void emsRep( const char *err, const char *text, int *status )
 {
     int istat;                         /* Internal status */
     int mlen;                          /* Length of final error message text */
     int plen;                          /* Length of the message name */
     char mstr[EMS__SZMSG+1];           /* Final error message text */
     char pstr[EMS__SZPAR+1];           /* Local error name text */
-    char vstr[EMS__SZMSG+1];           /* sprintf expanded string */
-
-    va_list args;                      /* Variable argument list */
-    size_t len;                        /* Length of text after replacement */
 
     ems_msgtab_t *msgtab = ems1Gmsgtab();  /* Current message table */
     
@@ -163,19 +159,9 @@ void emsRep( const char *err, const char *text, int *status, ... )
         istat = *status;
     }
 
-    /* Handle any optional arguments */
-    va_start( args, status );
-    len = vsnprintf( vstr, sizeof(vstr), text, args );
-    if (len > (sizeof(vstr) - 1) ) {
-      /* add truncation indicator */
-      vstr[sizeof(vstr)-1-strlen(ELLIPSIS)-1] = '\0';
-      strcat(vstr, ELLIPSIS);
-    }
-    va_end( args );
-
     /*  Now form the given error message.  Status is not altered by this
      *  routine. */
-    ems1Form( vstr, EMS__SZMSG, !msgtab->msgstm, mstr, &mlen, 
+    ems1Form( text, EMS__SZMSG, !msgtab->msgstm, mstr, &mlen, 
               &istat );
 
     /*  Use EMS1_ESTOR to store the error message in the error table. */

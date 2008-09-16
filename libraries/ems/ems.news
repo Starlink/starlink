@@ -12,18 +12,9 @@
      routine emsStune. This also returns the current value of the 
      tuning parameter.
 
-   * The C interface to emsRep has been modified so that it can take
-     printf()-style format specifiers. This allows C programmers to use
-     standard formatting techniques instead of tokens. Note though that
-     C format specifiers are subject to parsing for escape characters
-     whereas tokens are not.
+   * The old 3 argument interface to emsSetc has been removed.
 
-   * The old 3 argument interface to emsSetc has been removed and replaced
-     with a printf-style interface.
-
-        emsSetc( "TOKEN", "msg%d", myint );
-
-   * emsSetc now print "<Null>" when given a NULL pointer. Previously it
+   * emsSetc now prints "<Null>" when given a NULL pointer. Previously it
      was converted to a single space but that was hard to see in printouts.
 
 2.1-2
