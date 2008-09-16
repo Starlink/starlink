@@ -309,6 +309,8 @@
 *        Minimize compiler warnings. Use new style ems calling convention.
 *     04-Jul-2005 (PWD):
 *        Comment out void arglist function prototypes. GCC4 doesn't allow those.
+*     15-SEP-2008 (TIMJ):
+*        3-arg emsSetc is deprecated.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -720,7 +722,7 @@ int NBS_TUNE ( RW_CHARACTER(name), R_INTEGER(value), W_INTEGER(oldvalue),
       else                                                 /* Report error */
          {
 	 *status = NBS__BADOPTION;
-         emsSetc( "OPT", tname, MAXNAME );
+         emsSetnc( "OPT", tname, MAXNAME );
          emsRep( "NBS_TUNE_BADOPT", "Bad tune option /^OPT/", status );
          }
       }
@@ -890,7 +892,7 @@ int NBS_TUNE_NOTICEBOARD ( R_INTEGER(id), RW_CHARACTER(name), R_INTEGER(value),
       else
          {
 	 *status = NBS__BADOPTION;
-         emsSetc( "OPT", tname, MAXNAME );
+         emsSetnc( "OPT", tname, MAXNAME );
          emsRep( "NBS_TUNE_NB_BADOPT",
                 "Bad noticeboard tune option /^OPT/", status );
          }
@@ -6136,7 +6138,7 @@ int NBS_GET_INFO ( R_INTEGER(id), RW_CHARACTER(name), W_INTEGER(value),
          else if (strncmp (tname,"SAVE_NAME",2) == 0)	/* File name */
             {
 	    *status = NBS__BADOPTION;
-            emsSetc( "OPT", tname, MAXNAME );
+            emsSetnc( "OPT", tname, MAXNAME );
             emsRep( "NBS_GET_INFO_BADOPT",
                "Bad info option /^OPT/ - now supported by NBS_GET_CINFO",
                status );
@@ -6153,7 +6155,7 @@ int NBS_GET_INFO ( R_INTEGER(id), RW_CHARACTER(name), W_INTEGER(value),
 	 else
             {
 	    *status = NBS__BADOPTION;
-            emsSetc( "OPT", tname, MAXNAME );
+            emsSetnc( "OPT", tname, MAXNAME );
             emsRep( "NBS_GET_INFO_BADOPT", "Bad info option /^OPT/", status );
             }
       }
@@ -6282,7 +6284,7 @@ int NBS_GET_CINFO ( R_INTEGER(id), RW_CHARACTER(name), RW_CHARACTER(value),
 	 else
             {
 	    *status = NBS__BADOPTION;
-            emsSetc( "OPT", tname, MAXNAME );
+            emsSetnc( "OPT", tname, MAXNAME );
             emsRep( "NBS_GET_CINFO_BADOPT", "Bad info option /^OPT/", status );
             }
       }
