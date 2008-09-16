@@ -168,7 +168,7 @@ void emsRep( const char *err, const char *text, int *status, ... )
     len = vsnprintf( vstr, sizeof(vstr), text, args );
     if (len > (sizeof(vstr) - 1) ) {
       /* add truncation indicator */
-      mstr[sizeof(vstr)-1-strlen(ELLIPSIS)-1] = '\0';
+      vstr[sizeof(vstr)-1-strlen(ELLIPSIS)-1] = '\0';
       strcat(vstr, ELLIPSIS);
     }
     va_end( args );
