@@ -29,10 +29,12 @@ void psx1_rep_c( char *param, char *text, int *status )
 
 *  External Routines Used:
 *     EMS:
-*        ems_rep_c
+*        emsRep
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -52,11 +54,14 @@ void psx1_rep_c( char *param, char *text, int *status )
 
 *  Authors:
 *     PMA: Peter Allan (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     15-APR-1991 (PMA):
 *        Original version.
+*     16-SEP-2008 (TIMJ):
+*        Use modern interface to emsRep
 *     {enter_changes_here}
 
 *  Bugs:
@@ -68,5 +73,5 @@ void psx1_rep_c( char *param, char *text, int *status )
 
 
 {
-   ems_rep_c( param, text, status );
+   emsRep( param, text, status );
 }
