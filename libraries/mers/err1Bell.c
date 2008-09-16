@@ -76,39 +76,3 @@ void err1Bell( int * status ) {
   if (istat != SAI__OK) *status = istat;
 
 }
-
-/* Remove fortran interface when no longer needed */
-
-/*
-*+
-*  Name:
-*     ERR1_BELL
-
-*  Purpose:
-*     Deliver an ASCII BEL character.
-
-*  Language:
-*    Starlink Fortran 77
-
-*  Invocation:
-*     CALL ERR1_BELL( STATUS )
-
-*  Description:
-*     A bell character is delivered to the user. If the user interface 
-*     in use supports this character, this will ring a bell on the 
-*     terminal.
-
-*  Arguments:
-*     STATUS = INTEGER (Given & Returned)
-*        The global status.
-*/
-
-#include "f77.h"
-F77_SUBROUTINE(err1_bell)( INTEGER(STATUS) );
-
-F77_SUBROUTINE(err1_bell)( INTEGER(STATUS) ) {
-  int status;
-  F77_IMPORT_INTEGER( *STATUS, status );
-  err1Bell( &status );
-  F77_EXPORT_INTEGER( status, *STATUS );
-}

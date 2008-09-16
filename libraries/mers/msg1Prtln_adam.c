@@ -67,23 +67,3 @@ void msg1Prtln( const char * text, int * status ) {
   if (*status != SAI__OK) return;
   subParWrmsg( text, status );
 }
-
-
-/* Now provide the Fortran interface until it is no longer required */
-
-#include "f77.h"
-F77_SUBROUTINE(msg1_prtln)( CHARACTER(TEXT), INTEGER(STATUS) TRAIL(TEXT));
-
-F77_SUBROUTINE(msg1_prtln)( CHARACTER(TEXT), INTEGER(STATUS) TRAIL(TEXT)) {
-  int status;
-  char *text;
-  GENPTR_CHARACTER(TEXT);
-
-  F77_IMPORT_INTEGER( *STATUS, status );
-  text = starMallocAtomic( TEXT_length + 1 );
-  F77_IMPORT_CHARACTER( TEXT, TEXT_length, text );
-
-  msg1Prtln( text, &status );
-  starFree( text );
-  F77_EXPORT_INTEGER( status, *STATUS );
-}

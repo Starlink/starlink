@@ -74,37 +74,3 @@ void msg1Ktok ( void ) {
   emsExpnd( " ", string, sizeof(string), &lenstr, &istat );
 }
 
-
-/* Now provide the Fortran interface until it is no longer required */
-
-/*
-+
-*  Name:
-*     MSG1_KTOK
-
-*  Purpose:
-*     Clear the message token table.
-
-*  Language:
-*     Starlink Fortran 77
-
-*  Invocation:
-*     CALL MSG1_KTOK
-
-*  Description:
-*     Clear all the message tokens at the current context level.
-
-*  Arguments:
-*     None
-
-*  Algorithm:
-*     Call EMS_EXPND with bad status - just kills tokens
-
-*/
-
-#include "f77.h"
-F77_SUBROUTINE(msg1_ktok)( void );
-
-F77_SUBROUTINE(msg1_ktok)( void ) {
-  msg1Ktok();
-}
