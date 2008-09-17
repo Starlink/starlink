@@ -54,6 +54,7 @@
  *        Remove fortran prototypes. Should not be in a public include file.
  *     16-SEP-2008 (TIMJ):
  *        Remove 3 arg version of emsSetc
+ *        Remove old ems_xxx_c interface definitions.
  *     {enter_changes_here}
 
  *  Bugs:
@@ -65,7 +66,6 @@
 #define EMS_DEFINED
 
 /* ANSI types */
-#include <stdarg.h>
 #include <stddef.h>
 #include <inttypes.h>
 
@@ -183,35 +183,3 @@ void ems1Gesc( const char *escchr, const char *string, int *iposn );
 void ems1Gnam( const char *string, int *iposn, char *name, int *namlen, int *status);
 
 #endif	/* EMS_DEFINED */
-
-#ifndef EMS_C_DEFINED
-#define EMS_C_DEFINED
-/* define old function names = new names */
-#define ems_annul_c emsAnnul
-#define ems_begin_c emsBegin
-#define ems_eload_c emsEload
-#define ems_end_c emsEnd
-#define ems_errno_c emsErrno
-#define ems_expnd_c emsExpnd
-#define ems_facer_c emsFacer
-#define ems_fioer_c emsFioer
-#define ems_level_c emsLevel
-#define ems_mark_c emsMark
-#define ems_mload_c emsMload
-#define ems_renew_c emsRenew
-#define ems_rep_c emsRep
-#define ems_rlse_c emsRlse
-#define ems_setc_c emsSetnc
-#define ems_setd_c emsSetd
-#define ems_seti_c emsSeti
-#define ems_setl_c emsSetl
-#define ems_setr_c emsSetr
-#define ems_stat_c emsStat
-#define ems_syser_c emsSyser
-#define ems_tune_c emsTune
-
-/* Internal Functions */
-#define ems1_starf_c  ems1Starf
-
-#endif	/* EMS_C_DEFINED */
-
