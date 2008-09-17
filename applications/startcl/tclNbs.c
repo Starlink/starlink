@@ -136,7 +136,7 @@ char *argv[]
    int tcl_status;          /* status to be returned */
    int istat;
 
-   ems_mark_c();
+   emsMark();
 
    tcl_status = TCL_OK;
 
@@ -253,8 +253,8 @@ char *argv[]
          tcl_status = TCL_ERROR;
       }
 
-      ems_annul_c(&istat);
-      ems_rlse_c();
+      emsAnnul(&istat);
+      emsRlse();
    }
    return tcl_status;
 }
@@ -1154,7 +1154,7 @@ ClientData clientData   /* tcl clienta data (given) */
 
 
    status = TCL_OK;
-   ems_mark_c();
+   emsMark();
 
    ptr = &entrylist;
 
@@ -1243,8 +1243,8 @@ ClientData clientData   /* tcl clienta data (given) */
      clientData );
    timer->timer_set = 1;
 
-   ems_annul_c(&istat);
-   ems_rlse_c();
+   emsAnnul(&istat);
+   emsRlse();
 }
 
 
