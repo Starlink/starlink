@@ -229,9 +229,9 @@
          if ( result == NULL )
          {
             *STATUS = NDF__NOMEM;
-            ems_seti_c( "NBYTES", (int) size );
-            ems_errno_c( "MESSAGE", errno );
-            ems_rep_c( "NDF1_EXPFN_1",
+            emsSeti( "NBYTES", (int) size );
+            emsErrno( "MESSAGE", errno );
+            emsRep( "NDF1_EXPFN_1",
                        "Unable to allocate a block of ^NBYTES bytes of \
 memory - ^MESSAGE",
                        STATUS );
@@ -267,9 +267,9 @@ memory - ^MESSAGE",
             if ( !( systat & STS$M_SUCCESS ) )
             {
                *STATUS = ( systat == RMS$_PRV ) ? NDF__FILPR : NDF__FILIN;
-               ems_setc_c( "FILE", result, len );
-               ems_syser_c( "MESSAGE", systat );
-               ems_rep_c( "NDF1_EXPFN_2",
+               emsSetnc( "FILE", result, len );
+               emsSyser( "MESSAGE", systat );
+               emsRep( "NDF1_EXPFN_2",
                           "Error in file name \'^FILE\' - ^MESSAGE.",
                           STATUS );
             }
@@ -290,10 +290,10 @@ memory - ^MESSAGE",
                if ( !( systat & STS$M_SUCCESS ) )
    	       {
                   *STATUS = ( systat == RMS$_PRV ) ? NDF__FILPR : NDF__FILNF;
-                  ems_setc_c( "FILE", (const char *) nam.nam$l_esa,
+                  emsSetnc( "FILE", (const char *) nam.nam$l_esa,
                               (int) nam.nam$b_esl );
-                  ems_syser_c( "MESSAGE", systat );
-                  ems_rep_c( "NDF1_EXPFN_3",
+                  emsSyser( "MESSAGE", systat );
+                  emsRep( "NDF1_EXPFN_3",
                              "Error searching for file ^FILE - ^MESSAGE.",
                              STATUS );
 	       }
@@ -315,9 +315,9 @@ memory - ^MESSAGE",
                   if ( FID_length < 7 )
 	          {
                      *STATUS = NDF__TRUNC;
-                     ems_setc_c( "ROUTINE", "NDF1_EXPFN", EMS__SZTOK );
-                     ems_seti_c( "LEN", FID_length );
-                     ems_rep_c( "NDF1_EXPFN_4",
+                     emsSetnc( "ROUTINE", "NDF1_EXPFN", EMS__SZTOK );
+                     emsSeti( "LEN", FID_length );
+                     emsRep( "NDF1_EXPFN_4",
                                 "Routine ^ROUTINE called with a FID argument \
 which is too short (^LEN characters) to accommodate the returned file \
 identification (7 characters) - internal programming error.",
@@ -358,9 +358,9 @@ identification (7 characters) - internal programming error.",
                if ( tmp == NULL )
                {
                   *STATUS = NDF__NOMEM;
-                  ems_seti_c( "NBYTES", (int) size );
-                  ems_errno_c( "MESSAGE", errno );
-                  ems_rep_c( "NDF1_EXPFN_5",
+                  emsSeti( "NBYTES", (int) size );
+                  emsErrno( "MESSAGE", errno );
+                  emsRep( "NDF1_EXPFN_5",
                              "Unable to allocate a block of ^NBYTES bytes of \
 memory - ^MESSAGE",
                              STATUS );
@@ -425,8 +425,8 @@ memory - ^MESSAGE",
                   if ( getcwd( cwd, (size_t) FILENAME_MAX ) == NULL )
                   {
                      *STATUS = NDF__FATIN;
-                     ems_errno_c( "MESSAGE", errno );
-                     ems_rep_c( "NDF1_EXPFN_6",
+                     emsErrno( "MESSAGE", errno );
+                     emsRep( "NDF1_EXPFN_6",
                                 "Unable to determine the path name of the \
 current working directory - ^MESSAGE",
                                 STATUS );
@@ -452,9 +452,9 @@ current working directory - ^MESSAGE",
                      if ( tmp == NULL )
                      {
                         *STATUS = NDF__NOMEM;
-                        ems_seti_c( "NBYTES", (int) size );
-                        ems_errno_c( "MESSAGE", errno );
-                        ems_rep_c( "NDF1_EXPFN_7",
+                        emsSeti( "NBYTES", (int) size );
+                        emsErrno( "MESSAGE", errno );
+                        emsRep( "NDF1_EXPFN_7",
                                    "Unable to allocate a block of ^NBYTES \
 bytes of memory - ^MESSAGE",
                                    STATUS );
@@ -484,9 +484,9 @@ bytes of memory - ^MESSAGE",
                if ( stat( result, &statbuf ) )
       	       {
                   *STATUS = NDF__FILNF;
-                  ems_setc_c( "FILE", result, EMS__SZTOK );
-                  ems_errno_c( "MESSAGE", errno );
-                  ems_rep_c( "NDF1_EXPFN_8",
+                  emsSetnc( "FILE", result, EMS__SZTOK );
+                  emsErrno( "MESSAGE", errno );
+                  emsRep( "NDF1_EXPFN_8",
                              "Unable to obtain file status information for \
 file \'^FILE\' - ^MESSAGE",
                              STATUS );
@@ -501,12 +501,12 @@ file \'^FILE\' - ^MESSAGE",
                                               1 ) )
 	       {
                   *STATUS = NDF__TRUNC;
-                  ems_setc_c( "ROUTINE", "NDF1_EXPFN", EMS__SZTOK );
-                  ems_seti_c( "LEN", FID_length );
-                  ems_seti_c( "RET", (int) ( sizeof( statbuf.st_ino ) +
+                  emsSetnc( "ROUTINE", "NDF1_EXPFN", EMS__SZTOK );
+                  emsSeti( "LEN", FID_length );
+                  emsSeti( "RET", (int) ( sizeof( statbuf.st_ino ) +
                                              sizeof( statbuf.st_dev ) +
                                              1 ) );
-                  ems_rep_c( "NDF1_EXPFN_9",
+                  emsRep( "NDF1_EXPFN_9",
                              "Routine ^ROUTINE called with a FID argument \
 which is too short (^LEN characters) to accommodate the returned file \
 identification (^RET characters) - internal programming error.",
@@ -545,15 +545,15 @@ identification (^RET characters) - internal programming error.",
                if ( result[ i ] != '\0' )
 	       {
                   *STATUS = NDF__TRUNC;
-                  ems_setc_c( "ROUTINE", "NDF1_EXPFN", EMS__SZTOK );
-                  ems_seti_c( "LEN", OUT_length );
-                  ems_seti_c( "FLEN", (int) strlen( result ) );
-                  ems_rep_c( "NDF1_EXPFN_10",
+                  emsSetnc( "ROUTINE", "NDF1_EXPFN", EMS__SZTOK );
+                  emsSeti( "LEN", OUT_length );
+                  emsSeti( "FLEN", (int) strlen( result ) );
+                  emsRep( "NDF1_EXPFN_10",
                              "Routine ^ROUTINE called with an OUT argument \
 which is too short (^LEN characters) to accommodate the returned file \
 name (^FLEN characters).",
                              STATUS );
-	          ems_rep_c( "NDF1_EXPFN_11",
+	          emsRep( "NDF1_EXPFN_11",
                              "The NDF_ library is unable to handle a file \
 name of this length.", STATUS );
 	       }

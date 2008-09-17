@@ -56,7 +56,7 @@ int main( int argc, char *argv[] )
     name = NULL;
     emsMark();
     status = SAI__ERROR;
-    ems_rep_c( "NDF_TEST_ERR", errormess, &status );
+    emsRep( "NDF_TEST_ERR", errormess, &status );
     ndfOpen( NULL, name, "write", "new", &indf, &place, &status );
     if ( status == SAI__OK ) {
         printf( "NULL open check failed\n" );
@@ -92,7 +92,7 @@ int main( int argc, char *argv[] )
     title_length = 0;
     emsMark();
     status = SAI__ERROR;
-    ems_rep_c( "NDF_TEST_ERR", errormess, &status );
+    emsRep( "NDF_TEST_ERR", errormess, &status );
     ndfCget( indf, "TITLE", title, title_length, &status );
     if ( status != SAI__OK ) {
         emsAnnul( &status );
@@ -121,7 +121,7 @@ int main( int argc, char *argv[] )
     emsMark();
     strcpy( title, checktitle );
     status = SAI__ERROR;
-    ems_rep_c( "NDF_TEST_ERR", errormess, &status );
+    emsRep( "NDF_TEST_ERR", errormess, &status );
     ndfCget( indf, "TITLE", title, title_length, &status );
     if ( strcmp( title, ndftitle ) == 0 ) {
         printf( "Failed to reget title from NDF\n" );

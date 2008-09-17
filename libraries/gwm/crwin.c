@@ -262,8 +262,8 @@ for ( i = 0; i < wc_nchars; i++ ) GWM_wc.yesno[i] = 0;
 if ( lstat != GWM_SUCCESS )
    {
    *status = GWM__NOWIN;
-   ems_setc_c( "TOKEN", lwname, wname_length );
-   ems_rep_c( "GWM_CRWIN_NOWIN", "Unable to create GWM window : ^TOKEN",
+   emsSetnc( "TOKEN", lwname, wname_length );
+   emsRep( "GWM_CRWIN_NOWIN", "Unable to create GWM window : ^TOKEN",
               status );
    return;
    }

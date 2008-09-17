@@ -120,9 +120,9 @@
 	 if ( result == NULL )
 	 {
 	    *status = NDF__NOMEM;
-	    ems_seti_c( "NBYTES", (int) size );
-	    ems_errno_c( "MESSAGE", errno );
-	    ems_rep_c( "NDF1_TILDE_1",
+	    emsSeti( "NBYTES", (int) size );
+	    emsErrno( "MESSAGE", errno );
+	    emsRep( "NDF1_TILDE_1",
                        "Unable to allocate ^NBYTES bytes of memory - ^MESSAGE",
 		       status );
 	 }
@@ -148,8 +148,8 @@
 	    if ( user == NULL )
 	    {
 	       *status = NDF__FATIN;
-	       ems_errno_c( "MESSAGE", errno );
-	       ems_rep_c( "NDF1_TILDE_2",
+	       emsErrno( "MESSAGE", errno );
+	       emsRep( "NDF1_TILDE_2",
                           "Unable to determine the user name under which the \
 current process is logged in - ^MESSAGE",
 		          status );
@@ -164,9 +164,9 @@ current process is logged in - ^MESSAGE",
 	    if ( user == NULL )
 	    {
 	       *status = NDF__NOMEM;
-	       ems_seti_c( "NBYTES", i );
-	       ems_errno_c( "MESSAGE", errno );
-	       ems_rep_c( "NDF1_TILDE_3",
+	       emsSeti( "NBYTES", i );
+	       emsErrno( "MESSAGE", errno );
+	       emsRep( "NDF1_TILDE_3",
                           "Unable to allocate ^NBYTES bytes of memory - \
 ^MESSAGE",
 			  status );
@@ -193,9 +193,9 @@ current process is logged in - ^MESSAGE",
 	    if ( pw == NULL )
 	    {
 	       *status = NDF__FATIN;
-	       ems_setc_c( "USER", user, EMS__SZTOK );
-	       ems_errno_c( "MESSAGE", errno );
-	       ems_rep_c( "NDF1_TILDE_4",
+	       emsSetnc( "USER", user, EMS__SZTOK );
+	       emsErrno( "MESSAGE", errno );
+	       emsRep( "NDF1_TILDE_4",
                           "Unable to obtain initial working directory \
 information from the system database for user \'^USER\' - ^MESSAGE",
 		          status );
@@ -213,9 +213,9 @@ information from the system database for user \'^USER\' - ^MESSAGE",
 	       if ( result == NULL )
 	       {
 	          *status = NDF__NOMEM;
-	          ems_seti_c( "NBYTES", (int) size );
-		  ems_errno_c( "MESSAGE", errno );
-	          ems_rep_c( "NDF1_TILDE_5",
+	          emsSeti( "NBYTES", (int) size );
+		  emsErrno( "MESSAGE", errno );
+	          emsRep( "NDF1_TILDE_5",
                              "Unable to allocate ^NBYTES bytes of memory - \
 ^MESSAGE",
                              status );

@@ -99,8 +99,8 @@ cnf_free( lwname );
 if ( lstat != GWM_SUCCESS )
    {
    *status = GWM__NOWIN;
-   ems_setc_c( "TOKEN", lwname, wname_length );
-   ems_rep_c( "GWM_DSWIN_NOWIN", "Unable to destroy GWM window : ^TOKEN",
+   emsSetnc( "TOKEN", lwname, wname_length );
+   emsRep( "GWM_DSWIN_NOWIN", "Unable to destroy GWM window : ^TOKEN",
               status );
    return;
    }

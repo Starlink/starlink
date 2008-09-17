@@ -119,8 +119,8 @@ cnf_free( lwname );
 if ( lstat != GWM_SUCCESS )
    {
    *status = GWM__WINNF;
-   ems_setc_c( "TOKEN", lwname, wname_length );
-   ems_rep_c( "GWM_SETCI_WINNF", "Window not found : ^TOKEN", status );
+   emsSetnc( "TOKEN", lwname, wname_length );
+   emsRep( "GWM_SETCI_WINNF", "Window not found : ^TOKEN", status );
    return;
    }
 
@@ -131,7 +131,7 @@ lstat = GWM_GetColTable( GWM_display_id, window_id, &cols, &lncols );
 if ( lstat != GWM_SUCCESS )
    {
    *status = GWM__ERROR;
-   ems_rep_c( "GWM_SETCI_ERROR", "Error inquiring colours", status );
+   emsRep( "GWM_SETCI_ERROR", "Error inquiring colours", status );
    return;
    }
 

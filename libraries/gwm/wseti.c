@@ -116,8 +116,8 @@ for ( i = 0; i < wc_nchars; i++ )
 if ( noption == -1 )
    {
    *status = GWM__INOPT;
-   ems_setc_c( "TOKEN", loption, option_length );
-   ems_rep_c( "GWM_WSETL_INOPT", "Invalid integer option : ^TOKEN", status );
+   emsSetnc( "TOKEN", loption, option_length );
+   emsRep( "GWM_WSETL_INOPT", "Invalid integer option : ^TOKEN", status );
    return;
    }
 
@@ -125,8 +125,8 @@ if ( noption == -1 )
 if ( strcmp( "I", GWM_wc.types[noption] ) != 0 )
    {
    *status = GWM__INOPT;
-   ems_setc_c( "TOKEN", loption, option_length );
-   ems_rep_c( "GWM_WSETL_INOPT", "Invalid integer option : ^TOKEN", status );
+   emsSetnc( "TOKEN", loption, option_length );
+   emsRep( "GWM_WSETL_INOPT", "Invalid integer option : ^TOKEN", status );
    return;
    }
 

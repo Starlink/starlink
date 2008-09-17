@@ -141,9 +141,9 @@
       if ( fname == NULL )
       {
          *STATUS = NDF__NOMEM;
-	 ems_seti_c( "NBYTES", (int) size );
-	 ems_errno_c( "MESSAGE", errno );
-	 ems_rep_c( "NDF1_FILAC_1",
+	 emsSeti( "NBYTES", (int) size );
+	 emsErrno( "MESSAGE", errno );
+	 emsRep( "NDF1_FILAC_1",
 	            "Unable to allocate a block of ^NBYTES bytes of memory - \
 ^MESSAGE",
 		    STATUS );
@@ -164,9 +164,9 @@
          if ( mode == NULL )
          {
             *STATUS = NDF__NOMEM;
-	    ems_seti_c( "NBYTES", (int) size );
-	    ems_errno_c( "MESSAGE", errno );
-	    ems_rep_c( "NDF1_FILAC_2",
+	    emsSeti( "NBYTES", (int) size );
+	    emsErrno( "MESSAGE", errno );
+	    emsRep( "NDF1_FILAC_2",
 	               "Unable to allocate a block of ^NBYTES bytes of memory \
 - ^MESSAGE", STATUS );
          }
@@ -201,8 +201,8 @@
 	    else
 	    {
 	       *STATUS = NDF__FATIN;
-	       ems_setc_c( "MODE", mode, MODE_length );
-	       ems_rep_c( "NDF1_FILAC_3",
+	       emsSetnc( "MODE", mode, MODE_length );
+	       emsRep( "NDF1_FILAC_3",
 		          "Routine NDF1_FILAC called with an invalid file \
 access mode of \'^MODE\' (internal programming error).", STATUS );
 	    }	    
@@ -223,10 +223,10 @@ access mode of \'^MODE\' (internal programming error).", STATUS );
 	       if ( !acc && F77_ISTRUE( *REPORT ) )
 	       {
 	          *STATUS = NDF__FILPR;
-	          ems_setc_c( "FNAME", fname, FNAME_length );
-	          ems_setc_c( "MODE", mode, MODE_length );
-	          ems_errno_c( "MESSAGE", errno );
-	          ems_rep_c( "NDF1_FILAC_4",
+	          emsSetnc( "FNAME", fname, FNAME_length );
+	          emsSetnc( "MODE", mode, MODE_length );
+	          emsErrno( "MESSAGE", errno );
+	          emsRep( "NDF1_FILAC_4",
 			     "Unable to open the file \'^FNAME\' for ^MODE \
 access - ^MESSAGE",
 			     STATUS );

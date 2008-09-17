@@ -73,7 +73,7 @@ XGetErrorText( display_id, (int)error->error_code, string, stlen );
 
 /* Report this error using EMS */
 status = GWM__XERR;
-ems_rep_c( "GWM_XTRAP_XERR", strcat( "X error : ", string ), &status );
+emsRep( "GWM_XTRAP_XERR", strcat( "X error : ", string ), &status );
 
 return 0;
 }

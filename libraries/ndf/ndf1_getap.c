@@ -163,8 +163,8 @@
          if ( !( systat & STS$M_SUCCESS ) || ( systat == LIB$_STRTRU ) )
          {
             *STATUS = NDF__FATIN;
-	    ems_syser_c( "MESSAGE", systat );
-	    ems_rep_c( "NDF1_GETAP_VMS",
+	    emsSyser( "MESSAGE", systat );
+	    emsRep( "NDF1_GETAP_VMS",
 	               "Error determining the file name of the currently \
 executing VMS image - ^MESSAGE.", STATUS );
          }

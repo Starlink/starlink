@@ -125,7 +125,7 @@ else
 if ( !GWM_display_id )
    {
    *status = GWM__NODIS;
-   ems_rep_c( "GWM_OPEN_NODIS", "Unable to open display", status );
+   emsRep( "GWM_OPEN_NODIS", "Unable to open display", status );
    return;
    }
 

@@ -117,15 +117,15 @@ void ndfInit( int argc, char *const argv[], int *status ) {
    necessary. */
    if ( argc < 0 ) {
       *status = NDF__ARCIN;
-      ems_seti_c( "ARGC", argc );
-      ems_rep_c( "ndfInit_argc", "Invalid argument count (^ARGC); this value "
+      emsSeti( "ARGC", argc );
+      emsRep( "ndfInit_argc", "Invalid argument count (^ARGC); this value "
                  "should not be less than zero.", status );
 
 /* Check the argument vector pointer similarly to ensure it is not
    NULL. */
    } else if ( ( argc > 0 ) && !argv ) {
       *status = NDF__ARGIN;
-      ems_rep_c( "ndfInit_arg1", "Invalid NULL pointer given for argument "
+      emsRep( "ndfInit_arg1", "Invalid NULL pointer given for argument "
                  "list.", status );
       
 /* Otherwise, check that each individual argument string pointer is
@@ -134,8 +134,8 @@ void ndfInit( int argc, char *const argv[], int *status ) {
       for ( iarg = 0; iarg < argc; iarg++ ) {
          if ( !argv[ iarg ] ) {
             *status = NDF__ARGIN;
-            ems_seti_c( "ARG", iarg );
-            ems_rep_c( "ndfInit_arg2", "Invalid NULL string pointer given for "
+            emsSeti( "ARG", iarg );
+            emsRep( "ndfInit_arg2", "Invalid NULL string pointer given for "
                        "argument number ^ARG.", status );
             break;
          }
@@ -151,7 +151,7 @@ void ndfInit( int argc, char *const argv[], int *status ) {
 /* Otherwise, report context information and call the error tracing
    function. */
    } else {
-      ems_rep_c( "ndfInit_err", "ndfInit: Error initialising the NDF_ library "
+      emsRep( "ndfInit_err", "ndfInit: Error initialising the NDF_ library "
                  "for use from a C main routine.", status );
       ndf1Trace( "ndfInit", status );
    }

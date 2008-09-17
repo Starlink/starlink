@@ -292,7 +292,7 @@ void img1ExtractParam( const char *string, const int n, char *value,
   /*  Check that the required number exist. If not complain. */
   if ( first == (char *) NULL ) { 
     *status = IMG__FATIN;
-    ems_rep_c( " ","img1StringArray: too few parameters for request.",
+    emsRep( " ","img1StringArray: too few parameters for request.",
                status );
   }
   strcpy ( value, first );

@@ -250,8 +250,8 @@ F77_SUBROUTINE(ndf1_farg)( INTEGER(IARG), CHARACTER(ARG) TRAIL(ARG) );
                if ( !( systat & STS$M_SUCCESS ) ||
                      ( systat == LIB$_STRTRU ) ) {
                   *STATUS = NDF__FATIN;
-                  ems_syser_c( "MESSAGE", systat );
-                  ems_rep_c( "NDF1_GTARG_VMS0",
+                  emsSyser( "MESSAGE", systat );
+                  emsRep( "NDF1_GTARG_VMS0",
                              "Error determining the file name of the \
 currently executing VMS image - ^MESSAGE.", STATUS );
 
@@ -312,8 +312,8 @@ currently executing VMS image - ^MESSAGE.", STATUS );
 /* Check for and report any errors.					    */
                if ( !( systat & STS$M_SUCCESS ) ) {
                   *STATUS = NDF__FATIN;
-                  ems_syser_c( "MESSAGE", systat );
-                  ems_rep_c( "NDF1_GTCMD_VMSN",
+                  emsSyser( "MESSAGE", systat );
+                  emsRep( "NDF1_GTCMD_VMSN",
                              "Error obtaining the VMS \"foreign\" command \
 line used to invoke the current application - ^MESSAGE.", STATUS );
 

@@ -194,8 +194,8 @@
           if ( !( systat & STS$M_SUCCESS ) || ( systat == LIB$_STRTRU ) )
             {
               *STATUS = NDF__FATIN;
-              ems_syser_c( "MESSAGE", systat );
-              ems_rep_c( "NDF1_GTFIL_1",
+              emsSyser( "MESSAGE", systat );
+              emsRep( "NDF1_GTFIL_1",
                          "Error determining the file name of the currently \
 executing VMS image - ^MESSAGE.", STATUS );
             }
@@ -253,9 +253,9 @@ executing VMS image - ^MESSAGE.", STATUS );
               if ( name == NULL )
                 {
                   *STATUS = NDF__NOMEM;
-                  ems_seti_c( "NBYTES", (int) size );
-                  ems_errno_c( "MESSAGE", errno );
-                  ems_rep_c( "NDF1_GTFIL_2",
+                  emsSeti( "NBYTES", (int) size );
+                  emsErrno( "MESSAGE", errno );
+                  emsRep( "NDF1_GTFIL_2",
                              "Unable to allocate a block of ^NBYTES bytes of \
 memory - ^MESSAGE",
                              STATUS );
@@ -317,9 +317,9 @@ memory - ^MESSAGE",
                           if ( localpath == NULL )
                             {
                               *STATUS = NDF__NOMEM;
-                              ems_seti_c( "NBYTES", (int) size );
-                              ems_errno_c( "MESSAGE", errno );
-                              ems_rep_c( "NDF1_GTFIL_3",
+                              emsSeti( "NBYTES", (int) size );
+                              emsErrno( "MESSAGE", errno );
+                              emsRep( "NDF1_GTFIL_3",
                                          "Unable to allocate a block of ^NBYTES \
 bytes of memory - ^MESSAGE",
                                          STATUS );
@@ -342,9 +342,9 @@ bytes of memory - ^MESSAGE",
                                   if ( file == NULL )
                                     {
                                       *STATUS = NDF__NOMEM;
-                                      ems_seti_c( "NBYTES", (int) size );
-                                      ems_errno_c( "MESSAGE", errno );
-                                      ems_rep_c( "NDF1_GTFIL_4",
+                                      emsSeti( "NBYTES", (int) size );
+                                      emsErrno( "MESSAGE", errno );
+                                      emsRep( "NDF1_GTFIL_4",
                                                  "Unable to allocate a block of \
 ^NBYTES bytes of memory - ^MESSAGE",
                                                  STATUS );
@@ -414,8 +414,8 @@ bytes of memory - ^MESSAGE",
                           if ( getcwd( cwd, (size_t) FILENAME_MAX ) == NULL )
                             {
                               *STATUS = NDF__FATIN;
-                              ems_errno_c( "MESSAGE", errno );
-                              ems_rep_c( "NDF1_GTFIL_5",
+                              emsErrno( "MESSAGE", errno );
+                              emsRep( "NDF1_GTFIL_5",
                                          "Unable to determine the path name of the \
 current working directory - ^MESSAGE",
                                          STATUS );
@@ -443,9 +443,9 @@ current working directory - ^MESSAGE",
                               if ( result == NULL )
                                 {
                                   *STATUS = NDF__NOMEM;
-                                  ems_seti_c( "NBYTES", (int) size );
-                                  ems_errno_c( "MESSAGE", errno );
-                                  ems_rep_c( "NDF1_GTFIL_6",
+                                  emsSeti( "NBYTES", (int) size );
+                                  emsErrno( "MESSAGE", errno );
+                                  emsRep( "NDF1_GTFIL_6",
                                              "Unable to allocate a block of ^NBYTES \
 bytes of memory - ^MESSAGE",
                                              STATUS );

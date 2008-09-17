@@ -112,9 +112,9 @@
       if ( cmd == NULL )
       {
          *STATUS = NDF__NOMEM;
-	 ems_seti_c( "NBYTES", (int) size );
-	 ems_errno_c( "MESSAGE", errno );
-	 ems_rep_c( "NDF1_DOCMD_1",
+	 emsSeti( "NBYTES", (int) size );
+	 emsErrno( "MESSAGE", errno );
+	 emsRep( "NDF1_DOCMD_1",
 	            "Unable to allocate a block of ^NBYTES bytes of memory \
 - ^MESSAGE", STATUS );
       }
@@ -139,8 +139,8 @@
 	 if ( !( result & STS$M_SUCCESS ) )
          {
 	    *STATUS = NDF__EXCER;
-	    ems_syser_c( "MESSAGE", result );
-	    ems_rep_c( "NDF1_DOCMD_2",
+	    emsSyser( "MESSAGE", result );
+	    emsRep( "NDF1_DOCMD_2",
 	               "Error occurred while executing an external command \
 - ^MESSAGE.", STATUS );
 	 }
@@ -156,8 +156,8 @@
 	 if ( result == -1 )
 	 {
 	    *STATUS = NDF__EXCER;
-	    ems_syser_c( "MESSAGE", errno );
-	    ems_rep_c( "NDF1_DOCMD_3",
+	    emsSyser( "MESSAGE", errno );
+	    emsRep( "NDF1_DOCMD_3",
 	               "Unable to create a child process to execute an \
 external command - ^MESSAGE",
 		       STATUS );
@@ -168,12 +168,12 @@ external command - ^MESSAGE",
 	 else if( WIFEXITED( result ) && ( WEXITSTATUS( result ) == 127 ) )
          {
 	    *STATUS = NDF__EXCER;
-	    ems_rep_c( "NDF1_DOCMD_4",
+	    emsRep( "NDF1_DOCMD_4",
 	               "Command interpreter could not execute in response to \
 a call to \"system\" to execute an external command.",
                        STATUS );
-	    ems_seti_c( "STS", result );
-	    ems_rep_c( "NDF1_DOCMD_5",
+	    emsSeti( "STS", result );
+	    emsRep( "NDF1_DOCMD_5",
 	               "\"system\" call returned the error status ^STS.",
                        STATUS );
 	 }
@@ -183,8 +183,8 @@ a call to \"system\" to execute an external command.",
 	 else if( result )
          {
 	    *STATUS = NDF__EXCER;
-	    ems_seti_c( "STS", result );
-	    ems_rep_c( "NDF1_DOCMD_6",
+	    emsSeti( "STS", result );
+	    emsRep( "NDF1_DOCMD_6",
 	               "Command interpreter invoked by a call to \"system\" \
 to execute an external command returned an error status of ^STS.",
 		       STATUS );
@@ -195,8 +195,8 @@ to execute an external command returned an error status of ^STS.",
 /* format conversion command to be executed.				    */
 	 if ( *STATUS != SAI__OK )
 	 {
-	    ems_setc_c( "CMD", cmd, EMS__SZTOK );
-	    ems_rep_c( "NDF1_DOCMD_7", "Command was: ^CMD", STATUS );
+	    emsSetnc( "CMD", cmd, EMS__SZTOK );
+	    emsRep( "NDF1_DOCMD_7", "Command was: ^CMD", STATUS );
 	 }
 
 /* Free the allocated space.						    */

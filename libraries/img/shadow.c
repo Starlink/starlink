@@ -106,7 +106,7 @@ F77_SUBROUTINE(shadow)(INTEGER(istat))
 
   /*  If an error occurred add the routine name. */
   if( *istat !=  SAI__OK ) {
-    ems_rep_c( "SHADOW_ERR", "SHADOW: failed to produce output image.", 
+    emsRep( "SHADOW_ERR", "SHADOW: failed to produce output image.", 
                istat );
   }
 }
