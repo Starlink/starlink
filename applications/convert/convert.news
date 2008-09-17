@@ -3,6 +3,9 @@
  The creation of AXIS structures by SPECX2NDF can now be suppressed 
  using its new AXIS parameter.
 
+ NDF2FITS is now much quicker when writing out WCS information that
+ includes a large table of values.
+
 1 CONVERT_Version_1.5-13
 
  NDF2FITS supports the propagation of provenance information to FITS
