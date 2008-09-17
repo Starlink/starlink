@@ -101,21 +101,37 @@ itcl::class gaiavo::GaiaVOCatSIAP {
 
    #  Open a service, "args" is a list of values from a row of the current table.
    protected method open_service_ {args} {
-      
+
       #  Need to locate the VOX:Image_AccessReference field to get the URL for
       #  downloading the image.
-
-      set ucds [$itk_component(siap) get_ucds]
-
+      set ucds [$w_.cat ucd]
       set n 0
       foreach ucd $ucds {
-         if { [string match -nocase -glob "*accessref*" $ucd] } {
+         if { [string match -nocase "*accessref*" $ucd] } {
             break
          }
          incr n
       }
-      set accessref [lindex $args $n]
-      puts "accessref = $accessref"
+      set accessref [eval lindex $args $n]
+
+      if { $itk_option(-gaia) != {} } {
+         if { $urlget_ == {} } {
+            set urlget_ [gaia::GaiaUrlGet .\#auto \
+                            -notify_cmd [code $this display_image_]]
+            blt::busy hold $w_
+            $urlget_ get $accessref
+         }
+      }
+   }
+
+   #  Display an image.
+   protected method display_image_ {filename type} {
+      blt::busy release $w_
+      $itk_option(-gaia) open $filename
+      if { $urlget_ != {} } {
+         catch {delete object $urlget_}
+      }
+      set urlget_ {}
    }
 
    #  Extract the accessURL for the SIAP service from a list of headers
@@ -134,8 +150,14 @@ itcl::class gaiavo::GaiaVOCatSIAP {
    #  The accessURL for the SIAP server.
    itk_option define -accessURL accessURL AccessURL {}
 
+   #  Instance of GAIA to display the image.
+   itk_option define -gaia gaia Gaia {}
+
    #  Protected variables: (available to instance)
    #  --------------------
+
+   #  Active getter for downloading an image.
+   protected variable urlget_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

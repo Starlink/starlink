@@ -2377,7 +2377,8 @@ window gives you access to this."
          #  server. Need a accessURL field for that.
          set accessURL [gaiavo::GaiaVOCatSIAP::getAccessURL $headers $row]
          if { $accessURL != {} } {
-            gaiavo::GaiaVOCatSIAP $w_.siapquery\#auto -accessURL $accessURL
+            gaiavo::GaiaVOCatSIAP $w_.siapquery\#auto \
+               -accessURL $accessURL -gaia $this
          } else {
             warning_dialog "SIAP service does not specify an accessURL" $w_
          }
