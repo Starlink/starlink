@@ -284,7 +284,7 @@ int centroidCmd( struct StarImageInfo *info, char *args, char **errStr )
    }
 
    /*  Call Fortran routine to do the work. */
-   ems_mark_c();
+   emsMark();
    status = SAI__OK;
    F77_CALL(rtd_cent)( CHARACTER_ARG(type), POINTER_ARG(&image),
                        LOGICAL_ARG(&swap), INTEGER_ARG(&nx),
@@ -329,7 +329,7 @@ int centroidCmd( struct StarImageInfo *info, char *args, char **errStr )
        /*  Set success of routine to false. */
        result = 0;
    }
-   ems_rlse_c();
+   emsRlse();
    Tcl_Free( (char *) listArgv );
    cnfFree( xin );
    cnfFree( yin );

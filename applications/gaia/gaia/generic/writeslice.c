@@ -203,7 +203,7 @@ int writesliceCmd( struct StarImageInfo *info, char *args, char **errStr )
     }
     
     /*  Call Fortran routine to do the work. */
-    ems_mark_c();
+    emsMark();
     F77_CALL(rtd_slice)( CHARACTER_ARG(name), POINTER_ARG(&image),
                          LOGICAL_ARG(&swap), CHARACTER_ARG(type),
                          INTEGER_ARG(&nx), INTEGER_ARG(&ny),
@@ -220,6 +220,6 @@ int writesliceCmd( struct StarImageInfo *info, char *args, char **errStr )
         /*  Set success of routine to false. */
         result = 0;
     }
-    ems_rlse_c();
+    emsRlse();
     return result;
 }

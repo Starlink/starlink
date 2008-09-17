@@ -419,7 +419,7 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
         }
 
         /*  Call Fortran routine to do the work of replacement. */
-        ems_mark_c();
+        emsMark();
         F77_CALL(rpatch)( INTEGER_ARG(&ndfId), CHARACTER_ARG(type),
                           REAL_ARG(&scale), INTEGER_ARG(&nFit),
                           CHARACTER_ARG(fitFile),
@@ -460,7 +460,7 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
             /*  Set success of routine to false. */
             result = 0;
         }
-        ems_rlse_c();
+        emsRlse();
 
     } else if ( undo ) {
 
