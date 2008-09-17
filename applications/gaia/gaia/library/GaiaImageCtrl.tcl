@@ -400,7 +400,8 @@ itcl::class gaia::GaiaImageCtrl {
         set object [$image_ object]
         set file [file tail $itk_option(-file)]
         set center [$image_ wcscenter]
-        set user [id user]
+        set user {}
+        catch {set user [id user]}
         set app [lindex [winfo name .] 0]
         set date [clock format [clock seconds] -format {%b %d, %Y at %H:%M:%S}]
         utilReUseWidget gaia::GaiaImagePrint $w_.print \
