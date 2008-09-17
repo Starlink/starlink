@@ -830,22 +830,28 @@ namespace votable_11
     this->name_.set (x);
   }
 
-  const INFO::value_type& INFO::
+  const INFO::value_optional& INFO::
   value () const
   {
-    return this->value_.get ();
+    return this->value_;
   }
 
-  INFO::value_type& INFO::
+  INFO::value_optional& INFO::
   value ()
   {
-    return this->value_.get ();
+    return this->value_;
   }
 
   void INFO::
   value (const value_type& x)
   {
     this->value_.set (x);
+  }
+
+  void INFO::
+  value (const value_optional& x)
+  {
+    this->value_ = x;
   }
 
   void INFO::
@@ -1110,22 +1116,28 @@ namespace votable_11
     this->ref_.set (x);
   }
 
-  const PARAM::name_type& PARAM::
+  const PARAM::name_optional& PARAM::
   name () const
   {
-    return this->name_.get ();
+    return this->name_;
   }
 
-  PARAM::name_type& PARAM::
+  PARAM::name_optional& PARAM::
   name ()
   {
-    return this->name_.get ();
+    return this->name_;
   }
 
   void PARAM::
   name (const name_type& x)
   {
     this->name_.set (x);
+  }
+
+  void PARAM::
+  name (const name_optional& x)
+  {
+    this->name_ = x;
   }
 
   void PARAM::
@@ -1820,22 +1832,28 @@ namespace votable_11
     this->ref_.set (x);
   }
 
-  const FIELD::name_type& FIELD::
+  const FIELD::name_optional& FIELD::
   name () const
   {
-    return this->name_.get ();
+    return this->name_;
   }
 
-  FIELD::name_type& FIELD::
+  FIELD::name_optional& FIELD::
   name ()
   {
-    return this->name_.get ();
+    return this->name_;
   }
 
   void FIELD::
   name (const name_type& x)
   {
     this->name_.set (x);
+  }
+
+  void FIELD::
+  name (const name_optional& x)
+  {
+    this->name_ = x;
   }
 
   void FIELD::
@@ -2646,22 +2664,28 @@ namespace votable_11
     this->name_.set (x);
   }
 
-  const OPTION::value_type& OPTION::
+  const OPTION::value_optional& OPTION::
   value () const
   {
-    return this->value_.get ();
+    return this->value_;
   }
 
-  OPTION::value_type& OPTION::
+  OPTION::value_optional& OPTION::
   value ()
   {
-    return this->value_.get ();
+    return this->value_;
   }
 
   void OPTION::
   value (const value_type& x)
   {
     this->value_.set (x);
+  }
+
+  void OPTION::
+  value (const value_optional& x)
+  {
+    this->value_ = x;
   }
 
   void OPTION::
@@ -3471,47 +3495,6 @@ namespace votable_11
 
   // version
   // 
-
-  version::
-  version (value v)
-  : ::xml_schema::nmtoken (_xsd_version_literals_[v])
-  {
-  }
-
-  version::
-  version (const char* v)
-  : ::xml_schema::nmtoken (v)
-  {
-  }
-
-  version::
-  version (const ::std::string& v)
-  : ::xml_schema::nmtoken (v)
-  {
-  }
-
-  version::
-  version (const ::xml_schema::nmtoken& v)
-  : ::xml_schema::nmtoken (v)
-  {
-  }
-
-  version::
-  version (const version& v,
-           ::xml_schema::flags f,
-           ::xml_schema::container* c)
-  : ::xml_schema::nmtoken (v, f, c)
-  {
-  }
-
-  version& version::
-  operator= (value v)
-  {
-    static_cast< ::xml_schema::nmtoken& > (*this) = 
-    ::xml_schema::nmtoken (_xsd_version_literals_[v]);
-
-    return *this;
-  }
 
 
   // type
@@ -4957,45 +4940,41 @@ namespace votable_11
   //
 
   INFO::
-  INFO (const name_type& name,
-        const value_type& value)
+  INFO (const name_type& name)
   : ::xml_schema::string (),
     ID_ (::xml_schema::flags (), this),
     name_ (name, ::xml_schema::flags (), this),
-    value_ (value, ::xml_schema::flags (), this)
+    value_ (::xml_schema::flags (), this)
   {
   }
 
   INFO::
   INFO (const char* string,
-        const name_type& name,
-        const value_type& value)
+        const name_type& name)
   : ::xml_schema::string (string),
     ID_ (::xml_schema::flags (), this),
     name_ (name, ::xml_schema::flags (), this),
-    value_ (value, ::xml_schema::flags (), this)
+    value_ (::xml_schema::flags (), this)
   {
   }
 
   INFO::
   INFO (const ::std::string& string,
-        const name_type& name,
-        const value_type& value)
+        const name_type& name)
   : ::xml_schema::string (string),
     ID_ (::xml_schema::flags (), this),
     name_ (name, ::xml_schema::flags (), this),
-    value_ (value, ::xml_schema::flags (), this)
+    value_ (::xml_schema::flags (), this)
   {
   }
 
   INFO::
   INFO (const ::xml_schema::string& string,
-        const name_type& name,
-        const value_type& value)
+        const name_type& name)
   : ::xml_schema::string (string),
     ID_ (::xml_schema::flags (), this),
     name_ (name, ::xml_schema::flags (), this),
-    value_ (value, ::xml_schema::flags (), this)
+    value_ (::xml_schema::flags (), this)
   {
   }
 
@@ -5070,13 +5049,6 @@ namespace votable_11
         "name",
         "");
     }
-
-    if (!value_.present ())
-    {
-      throw ::xsd::cxx::tree::expected_attribute< char > (
-        "value",
-        "");
-    }
   }
 
   INFO* INFO::
@@ -5095,7 +5067,7 @@ namespace votable_11
   //
 
   PARAM::
-  PARAM (const name_type& name)
+  PARAM ()
   : ::xml_schema::type (),
     DESCRIPTION_ (::xml_schema::flags (), this),
     VALUES_ (::xml_schema::flags (), this),
@@ -5106,7 +5078,7 @@ namespace votable_11
     precision_ (::xml_schema::flags (), this),
     width_ (::xml_schema::flags (), this),
     ref_ (::xml_schema::flags (), this),
-    name_ (name, ::xml_schema::flags (), this),
+    name_ (::xml_schema::flags (), this),
     ucd_ (::xml_schema::flags (), this),
     utype_ (::xml_schema::flags (), this),
     value_ (::xml_schema::flags (), this),
@@ -5316,13 +5288,6 @@ namespace votable_11
         this->arraysize (r);
         continue;
       }
-    }
-
-    if (!name_.present ())
-    {
-      throw ::xsd::cxx::tree::expected_attribute< char > (
-        "name",
-        "");
     }
   }
 
@@ -5564,7 +5529,7 @@ namespace votable_11
   //
 
   FIELD::
-  FIELD (const name_type& name)
+  FIELD ()
   : ::xml_schema::type (),
     DESCRIPTION_ (::xml_schema::flags (), this),
     VALUES_ (::xml_schema::flags (), this),
@@ -5575,7 +5540,7 @@ namespace votable_11
     precision_ (::xml_schema::flags (), this),
     width_ (::xml_schema::flags (), this),
     ref_ (::xml_schema::flags (), this),
-    name_ (name, ::xml_schema::flags (), this),
+    name_ (::xml_schema::flags (), this),
     ucd_ (::xml_schema::flags (), this),
     utype_ (::xml_schema::flags (), this),
     arraysize_ (::xml_schema::flags (), this),
@@ -5785,13 +5750,6 @@ namespace votable_11
         this->type (r);
         continue;
       }
-    }
-
-    if (!name_.present ())
-    {
-      throw ::xsd::cxx::tree::expected_attribute< char > (
-        "name",
-        "");
     }
   }
 
@@ -6521,11 +6479,11 @@ namespace votable_11
   //
 
   OPTION::
-  OPTION (const value_type& value)
+  OPTION ()
   : ::xml_schema::type (),
     OPTION1_ (::xml_schema::flags (), this),
     name_ (::xml_schema::flags (), this),
-    value_ (value, ::xml_schema::flags (), this)
+    value_ (::xml_schema::flags (), this)
   {
   }
 
@@ -6603,13 +6561,6 @@ namespace votable_11
         this->value (r);
         continue;
       }
-    }
-
-    if (!value_.present ())
-    {
-      throw ::xsd::cxx::tree::expected_attribute< char > (
-        "value",
-        "");
     }
   }
 
@@ -7645,12 +7596,37 @@ namespace votable_11
   //
 
   version::
+  version (const char* nmtoken)
+  : ::xml_schema::nmtoken (nmtoken)
+  {
+  }
+
+  version::
+  version (const ::std::string& nmtoken)
+  : ::xml_schema::nmtoken (nmtoken)
+  {
+  }
+
+  version::
+  version (const ::xml_schema::nmtoken& nmtoken)
+  : ::xml_schema::nmtoken (nmtoken)
+  {
+  }
+
+  version::
+  version (const version& x,
+           ::xml_schema::flags f,
+           ::xml_schema::container* c)
+  : ::xml_schema::nmtoken (x, f, c)
+  {
+  }
+
+  version::
   version (const ::xercesc::DOMElement& e,
            ::xml_schema::flags f,
            ::xml_schema::container* c)
   : ::xml_schema::nmtoken (e, f, c)
   {
-    _xsd_version_convert ();
   }
 
   version::
@@ -7659,7 +7635,6 @@ namespace votable_11
            ::xml_schema::container* c)
   : ::xml_schema::nmtoken (a, f, c)
   {
-    _xsd_version_convert ();
   }
 
   version::
@@ -7669,7 +7644,6 @@ namespace votable_11
            ::xml_schema::container* c)
   : ::xml_schema::nmtoken (s, e, f, c)
   {
-    _xsd_version_convert ();
   }
 
   version* version::
@@ -7679,35 +7653,10 @@ namespace votable_11
     return new version (*this, f, c);
   }
 
-  version::value version::
-  _xsd_version_convert () const
+  version::
+  ~version ()
   {
-    ::xsd::cxx::tree::enum_comparator< char > c (_xsd_version_literals_);
-    const value* i (::std::lower_bound (
-                      _xsd_version_indexes_,
-                      _xsd_version_indexes_ + 1,
-                      *this,
-                      c));
-
-    if (i == _xsd_version_indexes_ + 1 || _xsd_version_literals_[*i] != *this)
-    {
-      throw ::xsd::cxx::tree::unexpected_enumerator < char > (*this);
-    }
-
-    return *i;
   }
-
-  const char* const version::
-  _xsd_version_literals_[1] =
-  {
-    "1.1"
-  };
-
-  const version::value version::
-  _xsd_version_indexes_[1] =
-  {
-    ::votable_11::version::cxx_1_1
-  };
 
   // type
   //
@@ -9190,13 +9139,14 @@ namespace votable_11
 
     // value
     //
+    if (i.value ())
     {
       ::xercesc::DOMAttr& a (
         ::xsd::cxx::xml::dom::create_attribute (
           "value",
           e));
 
-      a << i.value ();
+      a << *i.value ();
     }
   }
 
@@ -9320,13 +9270,14 @@ namespace votable_11
 
     // name
     //
+    if (i.name ())
     {
       ::xercesc::DOMAttr& a (
         ::xsd::cxx::xml::dom::create_attribute (
           "name",
           e));
 
-      a << i.name ();
+      a << *i.name ();
     }
 
     // ucd
@@ -9662,13 +9613,14 @@ namespace votable_11
 
     // name
     //
+    if (i.name ())
     {
       ::xercesc::DOMAttr& a (
         ::xsd::cxx::xml::dom::create_attribute (
           "name",
           e));
 
-      a << i.name ();
+      a << *i.name ();
     }
 
     // ucd
@@ -10077,13 +10029,14 @@ namespace votable_11
 
     // value
     //
+    if (i.value ())
     {
       ::xercesc::DOMAttr& a (
         ::xsd::cxx::xml::dom::create_attribute (
           "value",
           e));
 
-      a << i.value ();
+      a << *i.value ();
     }
   }
 
@@ -10476,7 +10429,7 @@ namespace votable_11
   }
 
   void
-  operator<< (::xercesc::DOMAttr& a, const version& i)
+  operator<< (::xercesc::DOMAttr& a,const version& i)
   {
     a << static_cast< const ::xml_schema::nmtoken& > (i);
   }

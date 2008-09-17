@@ -2376,7 +2376,6 @@ window gives you access to this."
          #  See if the given headers and row data specify a SIAP
          #  server. Need a accessURL field for that.
          set accessURL [gaiavo::GaiaVOCatSIAP::getAccessURL $headers $row]
-         puts "accessURL = $accessURL"
          if { $accessURL != {} } {
             gaiavo::GaiaVOCatSIAP $w_.siapquery\#auto -accessURL $accessURL
          } else {

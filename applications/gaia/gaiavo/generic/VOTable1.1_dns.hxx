@@ -1268,36 +1268,36 @@ namespace votable_11_dns
     // value
     // 
     typedef ::xml_schema::string value_type;
+    typedef ::xsd::cxx::tree::optional< value_type > value_optional;
     typedef ::xsd::cxx::tree::traits< value_type, char > value_traits;
 
-    const value_type&
+    const value_optional&
     value () const;
 
-    value_type&
+    value_optional&
     value ();
 
     void
     value (const value_type& x);
 
     void
+    value (const value_optional& x);
+
+    void
     value (::std::auto_ptr< value_type > p);
 
     // Constructors.
     //
-    INFO (const name_type&,
-          const value_type&);
+    INFO (const name_type&);
 
     INFO (const char*,
-          const name_type&,
-          const value_type&);
+          const name_type&);
 
     INFO (const ::std::string&,
-          const name_type&,
-          const value_type&);
+          const name_type&);
 
     INFO (const ::xml_schema::string&,
-          const name_type&,
-          const value_type&);
+          const name_type&);
 
     INFO (const ::xercesc::DOMElement& e,
           ::xml_schema::flags f = 0,
@@ -1324,7 +1324,7 @@ namespace votable_11_dns
     protected:
     ID_optional ID_;
     ::xsd::cxx::tree::one< name_type > name_;
-    ::xsd::cxx::tree::one< value_type > value_;
+    value_optional value_;
   };
 
   class PARAM: public ::xml_schema::type
@@ -1515,16 +1515,20 @@ namespace votable_11_dns
     // name
     // 
     typedef ::xml_schema::token name_type;
+    typedef ::xsd::cxx::tree::optional< name_type > name_optional;
     typedef ::xsd::cxx::tree::traits< name_type, char > name_traits;
 
-    const name_type&
+    const name_optional&
     name () const;
 
-    name_type&
+    name_optional&
     name ();
 
     void
     name (const name_type& x);
+
+    void
+    name (const name_optional& x);
 
     void
     name (::std::auto_ptr< name_type > p);
@@ -1615,7 +1619,7 @@ namespace votable_11_dns
 
     // Constructors.
     //
-    PARAM (const name_type&);
+    PARAM ();
 
     PARAM (const ::xercesc::DOMElement& e,
            ::xml_schema::flags f = 0,
@@ -1649,7 +1653,7 @@ namespace votable_11_dns
     precision_optional precision_;
     width_optional width_;
     ref_optional ref_;
-    ::xsd::cxx::tree::one< name_type > name_;
+    name_optional name_;
     ucd_optional ucd_;
     utype_optional utype_;
     value_optional value_;
@@ -2121,16 +2125,20 @@ namespace votable_11_dns
     // name
     // 
     typedef ::xml_schema::token name_type;
+    typedef ::xsd::cxx::tree::optional< name_type > name_optional;
     typedef ::xsd::cxx::tree::traits< name_type, char > name_traits;
 
-    const name_type&
+    const name_optional&
     name () const;
 
-    name_type&
+    name_optional&
     name ();
 
     void
     name (const name_type& x);
+
+    void
+    name (const name_optional& x);
 
     void
     name (::std::auto_ptr< name_type > p);
@@ -2221,7 +2229,7 @@ namespace votable_11_dns
 
     // Constructors.
     //
-    FIELD (const name_type&);
+    FIELD ();
 
     FIELD (const ::xercesc::DOMElement& e,
            ::xml_schema::flags f = 0,
@@ -2255,7 +2263,7 @@ namespace votable_11_dns
     precision_optional precision_;
     width_optional width_;
     ref_optional ref_;
-    ::xsd::cxx::tree::one< name_type > name_;
+    name_optional name_;
     ucd_optional ucd_;
     utype_optional utype_;
     arraysize_optional arraysize_;
@@ -2968,23 +2976,27 @@ namespace votable_11_dns
     // value
     // 
     typedef ::xml_schema::string value_type;
+    typedef ::xsd::cxx::tree::optional< value_type > value_optional;
     typedef ::xsd::cxx::tree::traits< value_type, char > value_traits;
 
-    const value_type&
+    const value_optional&
     value () const;
 
-    value_type&
+    value_optional&
     value ();
 
     void
     value (const value_type& x);
 
     void
+    value (const value_optional& x);
+
+    void
     value (::std::auto_ptr< value_type > p);
 
     // Constructors.
     //
-    OPTION (const value_type&);
+    OPTION ();
 
     OPTION (const ::xercesc::DOMElement& e,
             ::xml_schema::flags f = 0,
@@ -3011,7 +3023,7 @@ namespace votable_11_dns
     protected:
     OPTION1_sequence OPTION1_;
     name_optional name_;
-    ::xsd::cxx::tree::one< value_type > value_;
+    value_optional value_;
   };
 
   class LINK: public ::xml_schema::type
@@ -3897,18 +3909,13 @@ namespace votable_11_dns
   class version: public ::xml_schema::nmtoken
   {
     public:
-    enum value
-    {
-      cxx_1_1
-    };
+    // Constructors.
+    //
+    version (const char*);
 
-    version (value v);
+    version (const ::std::string&);
 
-    version (const char* v);
-
-    version (const ::std::string& v);
-
-    version (const ::xml_schema::nmtoken& v);
+    version (const ::xml_schema::nmtoken&);
 
     version (const ::xercesc::DOMElement& e,
              ::xml_schema::flags f = 0,
@@ -3931,22 +3938,8 @@ namespace votable_11_dns
     _clone (::xml_schema::flags f = 0,
             ::xml_schema::container* c = 0) const;
 
-    version&
-    operator= (value v);
-
-    virtual
-    operator value () const
-    {
-      return _xsd_version_convert ();
-    }
-
-    protected:
-    value
-    _xsd_version_convert () const;
-
-    public:
-    static const char* const _xsd_version_literals_[1];
-    static const value _xsd_version_indexes_[1];
+    virtual 
+    ~version ();
   };
 
   class type: public ::xml_schema::nmtoken

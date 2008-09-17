@@ -92,6 +92,17 @@ proc raise { window { above "" } } {
    }
 }
 
+#  DEBUG: track all puts.
+#rename ::puts ::puts_orig
+#proc ::puts {args} {
+#   for { set i [info level] } { $i > -1 } { incr i -1 } { 
+#      ::puts_orig "$i: [info level $i]"
+#   }
+#   eval ::puts_orig $args
+#}
+#puts "puts redefined"
+
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 #  Set the place for locating all external files.

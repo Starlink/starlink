@@ -155,7 +155,6 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
       }
       set votable_ [$tempcats_ get_typed_name ".vot"]
       set interrupted_ 0
-      puts "$querytask_ runwith $itk_option(-accessURL) $ra_ $dec_ $size_ $votable_"
       $querytask_ runwith $itk_option(-accessURL) $ra_ $dec_ $size_ $votable_
    }
 
@@ -174,8 +173,6 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
    #  Called when the query completes.
    protected method query_done_ {} {
       
-      puts "query_done"
-
       #  Immediate notification we're finished.
       if { $itk_option(-feedbackcommand) != {} } {
          eval $itk_option(-feedbackcommand) off
@@ -206,28 +203,19 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
    #  Read the query directly from an existing file.
    public method read_query {filename} {
 
-      puts "read_query: $filename"
-
       #  Convert to a TST file so we can open it up as usual.
       set vot [gaiavotable::open $filename]
-      puts "1"
       set tempname [$tempcats_ get_name]
-      puts "2"
       set tst [gaiavotable::save $vot 0 $tempname]
-      puts "3"
       gaiavotable::close $vot
-      puts "4"
 
       #  This is the current VOTable now.
       set votable_ $filename
-      puts "5"
 
       #  Do command so that something happens.
       if { $itk_option(-command) != {} } {
-         puts "6"
          eval $itk_option(-command) $tempname
       }
-      puts "7"
    }
 
    #  Configuration options: (public variables)

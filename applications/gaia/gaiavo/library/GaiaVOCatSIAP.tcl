@@ -104,7 +104,9 @@ itcl::class gaiavo::GaiaVOCatSIAP {
       
       #  Need to locate the VOX:Image_AccessReference field to get the URL for
       #  downloading the image.
+
       set ucds [$itk_component(siap) get_ucds]
+
       set n 0
       foreach ucd $ucds {
          if { [string match -nocase -glob "*accessref*" $ucd] } {
@@ -119,9 +121,6 @@ itcl::class gaiavo::GaiaVOCatSIAP {
    #  Extract the accessURL for the SIAP service from a list of headers
    #  and the associated data row.
    public proc getAccessURL {headers row} {
-      puts "getAccessURL"
-      puts "$headers"
-      puts "$row"
       eval lassign "$row" $headers
       if { [info exists accessURL] } {
          return $accessURL

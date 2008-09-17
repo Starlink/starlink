@@ -382,7 +382,7 @@ itcl::class gaiavo::GaiaVOCat {
 
          busy {
             $w_.cat open $result
-
+            
             #  Need to update QueryResult with content?
             set prev_headings $headings_
             set headings_ [$w_.cat headings]

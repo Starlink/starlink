@@ -103,7 +103,7 @@
       <xs:attribute name="version">
         <xs:simpleType>
           <xs:restriction base="xs:NMTOKEN">
-            <xs:enumeration value="1.1"/>
+            <xs:pattern value="[vV]*1.[10]"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
@@ -163,7 +163,7 @@
       <xs:extension base="xs:string">
         <xs:attribute name="ID" type="xs:ID"/>
         <xs:attribute name="name" type="xs:token" use="required"/>
-        <xs:attribute name="value" type="xs:string" use="required"/>
+        <xs:attribute name="value" type="xs:string"/>
       </xs:extension>
     </xs:simpleContent></xs:complexType>
   </xs:element>
@@ -182,7 +182,7 @@
       <xs:attribute name="precision" type="precType"/>
       <xs:attribute name="width" type="xs:positiveInteger"/>
       <xs:attribute name="ref" type="xs:IDREF"/>
-      <xs:attribute name="name" type="xs:token" use="required"/>
+      <xs:attribute name="name" type="xs:token"/>
       <xs:attribute name="ucd" type="ucdType"/>
       <xs:attribute name="utype" type="xs:string"/>
       <xs:attribute name="value" type="xs:string"/>
@@ -228,7 +228,7 @@
       <xs:attribute name="precision" type="precType"/>
       <xs:attribute name="width" type="xs:positiveInteger"/>
       <xs:attribute name="ref" type="xs:IDREF"/>
-      <xs:attribute name="name" type="xs:token" use="required"/>
+      <xs:attribute name="name" type="xs:token"/>
       <xs:attribute name="ucd" type="ucdType"/>
       <xs:attribute name="utype" type="xs:string"/>
       <xs:attribute name="arraysize" type="xs:string"/>
@@ -327,7 +327,7 @@
         <xs:element ref="OPTION" minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
       <xs:attribute name="name" type="xs:token"/>
-      <xs:attribute name="value" type="xs:string" use="required"/>
+      <xs:attribute name="value" type="xs:string"/>
     </xs:complexType>
   </xs:element>
 

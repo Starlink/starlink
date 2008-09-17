@@ -53,6 +53,15 @@
 #include <fcntl.h>
 
 #include <xercesc/dom/DOM.hpp>
+#include <xercesc/util/XMLUniDefs.hpp> // chLatin_*
+#include <xercesc/framework/Wrapper4InputSource.hpp>
+
+#include <xsd/cxx/xml/dom/auto-ptr.hxx>
+#include <xsd/cxx/xml/sax/std-input-source.hxx>
+#include <xsd/cxx/xml/dom/bits/error-handler-proxy.hxx>
+
+#include <xsd/cxx/tree/exceptions.hxx>
+#include <xsd/cxx/tree/error-handler.hxx>
 
 /*  Skycat includes. */
 #include <HTTP.h>
@@ -215,7 +224,7 @@ namespace gaia {
     }
 
     /**
-     *  Save the current VOTable to a file. Namespace qualified only.
+     *  Save the current VOTable to a file.
      */
     void VOTable::save( const char *file )
     {
@@ -225,6 +234,7 @@ namespace gaia {
             xml_schema::namespace_infomap map;
             map[""].name = "http://www.ivoa.net/xml/VOTable/v1.1";
             map[""].schema = "VOTable1.1.xsd";
+            votable2_->version( "1.1" );
             VOTABLE_write( out, *votable2_, map );
         }
     }
@@ -244,23 +254,82 @@ namespace gaia {
 
     /**
      *  Read stream for a VOTable version 1.1 without any namespace
-     *  qualification.
+     *  qualification (which also means we ignore false namespaces).
      */
     votable_11_dns::VOTABLE *VOTable::openVOTable1( istream *in )
     {
-        using namespace votable_11_dns;
-        try {
-            auto_ptr<VOTABLE> table =
-                VOTABLE_read( *in,
-                              xml_schema::flags::dont_validate |
-                              xml_schema::flags::dont_initialize |
-                              xml_schema::flags::keep_dom );
-            return table.release();
+        using namespace xercesc;
+        namespace xml = xsd::cxx::xml;
+        namespace tree = xsd::cxx::tree;
+
+        // Instantiate the DOM parser.
+        const XMLCh ls_id[] = { xercesc::chLatin_L,
+                                xercesc::chLatin_S,
+                                xercesc::chNull };
+
+        //  Get an implementation of the Load-Store (LS) interface.
+        DOMImplementation* impl(DOMImplementationRegistry::getDOMImplementation(ls_id));
+
+        //  Create a DOMBuilder.
+        auto_ptr<DOMBuilder> parser(impl->createDOMBuilder(DOMImplementationLS::MODE_SYNCHRONOUS,0));
+
+        //  Discard comment nodes.
+        parser->setFeature(XMLUni::fgDOMComments, false);
+
+        //  Enable datatype normalisation.
+        parser->setFeature(XMLUni::fgDOMDatatypeNormalization, true);
+
+        //  Do not create EntityReference nodes in the DOM tree. No
+        //  EntityReference nodes will be created, only the nodes
+        //  corresponding to their fully expanded substitution text will be
+        //  created.
+        parser->setFeature(XMLUni::fgDOMEntities, false);
+
+        //  Starlink: do not check namespaces.
+        parser->setFeature(XMLUni::fgDOMNamespaces, false );
+
+        //  Do not include ignorable whitespace.
+        parser->setFeature(XMLUni::fgDOMWhitespaceInElementContent, false);
+
+        //  No validation.
+        parser->setFeature(XMLUni::fgDOMValidation, false);
+        parser->setFeature(XMLUni::fgXercesSchema, false);
+        parser->setFeature(XMLUni::fgXercesSchemaFullChecking, false);
+        parser->setFeature(XMLUni::fgXercesLoadExternalDTD, false);
+        parser->setFeature(XMLUni::fgXercesContinueAfterFatalError, true);
+
+        //  We will release the DOM document ourselves.
+        parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument, true);
+
+        //  Set error handler.
+        tree::error_handler<char> eh;
+        xml::dom::bits::error_handler_proxy<char> ehp(eh);
+        parser->setErrorHandler(&ehp);
+
+        //  Wrap input stream.
+        xml::sax::std_input_source isrc(*in);
+        xercesc::Wrapper4InputSource wrap(&isrc, false);
+
+        //  Do the parse.
+        xml::dom::auto_ptr<DOMDocument> doc(parser->parse(wrap));
+        if ( ehp.failed() ) {
+            doc.reset();
         }
-        catch ( const xml_schema::exception &e ) {
-            //  Basic report to terminal.
-            cerr << "open_votable: ";
-            cerr << e << endl;
+        else {
+            using namespace votable_11_dns;
+            try {
+                auto_ptr<VOTABLE> table =
+                    VOTABLE_read( doc,
+                                  xml_schema::flags::dont_validate |
+                                  xml_schema::flags::dont_initialize |
+                                  xml_schema::flags::keep_dom );
+                return table.release();
+            }
+            catch ( const xml_schema::exception &e ) {
+                //  Basic report to terminal.
+                cerr << "open_votable: ";
+                cerr << e << endl;
+            }
         }
 
         //  Open failed.

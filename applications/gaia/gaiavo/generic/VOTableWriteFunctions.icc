@@ -161,7 +161,7 @@ void VOTable::table_description( NS::TABLE& table, string& description )
         int n = nodes->getLength();
         for ( int i = 0; i < n; i++ ) {
             DOMElement *element = static_cast<DOMElement*>( nodes->item( i ) );
-            if ( XMLString::compareString( element->getNodeName(), 
+            if ( XMLString::compareString( element->getNodeName(),
                                            tempstr ) == 0 ) {
                 const XMLCh *content = element->getTextContent();
                 description += XMLString::transcode( content );
@@ -191,12 +191,13 @@ NS::TABLE& VOTable::votable_get( NS::VOTABLE& votable, int index )
         //  Convert TABLE DOM node back to TABLE class.
         DOMElement *tableelement =
             static_cast<DOMElement*>( tables->item( index ) );
-
-         xml_schema::type&
-             schema_node( *reinterpret_cast<xml_schema::type*>
-                          ( tableelement->getUserData
-                            ( xml_schema::dom::tree_node_key ) ) );
-         return dynamic_cast<TABLE&>( schema_node );
+        xml_schema::type&
+            schema_node( *reinterpret_cast<xml_schema::type*>
+                         ( tableelement->getUserData
+                           ( xml_schema::dom::tree_node_key ) ) );
+        if ( &schema_node ) {
+            return dynamic_cast<TABLE&>( schema_node );
+        }
     }
 
     cerr << "No table with index " << index <<
@@ -268,12 +269,18 @@ int VOTable::table_params( const NS::TABLE& table, ofstream& out )
         TABLE::PARAM_const_iterator pend( table.PARAM().end() );
         string name;
         for ( ; piter != pend; ++piter ) {
-            name = piter->name();
-            //  Parameter names may not start with '-'.
-            if ( name.find( '-' ) == 0 ) {
-                name.erase( 0, 1 );
+            if ( piter->name() ) {
+                name = piter->name().get();
+                //  Parameter names may not start with '-'.
+                if ( name.find( '-' ) == 0 ) {
+                    name.erase( 0, 1 );
+                }
+                out << name << ": " << piter->value() << '\n';
             }
-            out << name << ": " << piter->value() << '\n';
+            else {
+                //  Unnamed parameter.
+                out << ": " << piter->value() << '\n';
+            }
         }
         out << '\n';
 
@@ -341,7 +348,19 @@ int VOTable::table_data( const NS::TABLE& table, ofstream& out )
 
             //  FIELD meta data.
             //  Get these values as string instances and cast to lower case.
-            to_lower( fiter->name(), name );
+            if ( fiter->name() ) {
+                to_lower( fiter->name().get(), name );
+            }
+            else {
+                //  ID is sometimes used as name.
+                if ( fiter->ID() ) {
+                    to_lower( fiter->ID().get(), name );
+                }
+                else {
+                    //  Unnamed field.
+                    name = "unnamed";
+                }
+            }
             if ( fiter->ucd() ) {
                 to_lower( fiter->ucd().get(), ucd );
             }
@@ -399,7 +418,17 @@ int VOTable::table_data( const NS::TABLE& table, ofstream& out )
 
             /*  Add column name and gather other meta-data. */
             if ( ncol == 0 ) {
-                header = fiter->name();
+                if ( fiter->name() ) {
+                    header = fiter->name().get();
+                }
+                else {
+                    if ( fiter->ID() ) {
+                        header = fiter->ID().get();
+                    }
+                    else {
+                        header = "unnamed";
+                    }
+                }
                 sep = "---";
                 if ( fiter->ucd() ) {
                     ucds = fiter->ucd().get();
@@ -427,7 +456,18 @@ int VOTable::table_data( const NS::TABLE& table, ofstream& out )
                 }
             }
             else {
-                header += '\t' + fiter->name();
+                if ( fiter->name() ) {
+                    header += '\t' + fiter->name().get();
+                }
+                else {
+                    if ( fiter->ID() ) {
+                        header += '\t' + fiter->ID().get();
+                    }
+                    else {
+                        header += '\t' + "unnamed";
+                    }
+                }
+
                 sep += "---\t";
                 ucds += '\t';
                 if ( fiter->ucd() ) {
@@ -631,8 +671,13 @@ int VOTable::data_tabledata( const NS::TABLE& table, const NS::TABLEDATA& tdata,
         FIELD::VALUES_optional values( fiter->VALUES() );
         if ( values ) {
             VALUES::null_optional nullv( values.get().null() );
-            if ( ! nullv.get().empty() ) {
-                nullvalues.push_back( nullv.get() );
+            if ( &nullv.get() != 0 ) {
+                if ( ! nullv.get().empty() ) {
+                    nullvalues.push_back( nullv.get() );
+                }
+                else {
+                    nullvalues.push_back( "" );
+                }
             }
             else {
                 nullvalues.push_back( "" );
@@ -720,8 +765,8 @@ int VOTable::data_tabledata( const NS::TABLE& table, const NS::TABLEDATA& tdata,
  *  are converted from radians to degrees if needed.
  */
 int VOTable::data_binarydata( const NS::TABLE& table, const NS::BINARY& bdata,
-                     ofstream& out, int& id_index, int& ra_index,
-                     bool& ra_radians, int& dec_index, bool& dec_radians )
+                              ofstream& out, int& id_index, int& ra_index,
+                              bool& ra_radians, int& dec_index, bool& dec_radians )
 {
     using namespace NS;
 
@@ -833,9 +878,15 @@ int VOTable::data_binarydata( const NS::TABLE& table, const NS::BINARY& bdata,
         FIELD::VALUES_optional values( fiter->VALUES() );
         if ( values ) {
             VALUES::null_optional nullv( values.get().null() );
-            if ( ! nullv.get().empty() ) {
-                havenull.push_back( true );
-                nullvalues.push_back( nullv.get() );
+            if ( &nullv.get() != 0 ) {
+                if ( ! nullv.get().empty() ) {
+                    havenull.push_back( true );
+                    nullvalues.push_back( nullv.get() );
+                }
+                else {
+                    havenull.push_back( false );
+                    nullvalues.push_back( "" );
+                }
             }
             else {
                 havenull.push_back( false );
@@ -863,11 +914,11 @@ int VOTable::data_binarydata( const NS::TABLE& table, const NS::BINARY& bdata,
                 break;
             }
         }
-        if ( id_index == -1 ) {
+        if ( id_index == -1 && ok ) {
             out << '\t' << row;
             row++;
         }
-        out << '\n';
+        if ( ok ) out << '\n';
     }
 
     delete istr;
@@ -880,8 +931,8 @@ int VOTable::data_binarydata( const NS::TABLE& table, const NS::BINARY& bdata,
  *  are converted from radians to degrees if needed.
  */
 int VOTable::data_fitsdata( const NS::FITS& fdata, ofstream& out, int& id_index,
-                   int& ra_index, bool& ra_radians, int& dec_index,
-                   bool& dec_radians )
+                            int& ra_index, bool& ra_radians, int& dec_index,
+                            bool& dec_radians )
 {
     using namespace NS;
 
@@ -1030,7 +1081,8 @@ int VOTable::data_fitsdata( const NS::FITS& fdata, ofstream& out, int& id_index,
 
 /**
  *  Determine an arraysizes value. Will be 1 by default and 0 if the arraysize
- *  is set to "*".
+ *  is set to "*". If a multi-dimensional size is encountered then we indicate
+ *  this by a single size. Those are not supported by GAIA.
  */
 int VOTable::field_arraysize( const NS::FIELD& field )
 {
@@ -1045,6 +1097,21 @@ int VOTable::field_arraysize( const NS::FIELD& field )
         }
         else if ( as == "" ) {
             arraysize = 1;
+        }
+        else if ( as.find( "x" ) == string::npos ) {
+            //  Multi-dimensional. XXX untested.
+            size_t pos1 = 0;
+            size_t pos2 = 0;
+            int dim = 0;
+            arraysize = 1;
+            while ( ( pos2 = as.find( "x", pos1 ) ) != string::npos ) {
+                from_string( as.substr( pos2, pos1 - pos2 ), dim, dec );
+                arraysize *= dim;
+                pos1 = pos2 + 1;
+            }
+            //  Last element.
+            from_string( as.substr( pos1 ), dim, dec );
+            arraysize *= dim;
         }
         else {
             from_string( as, arraysize, dec );

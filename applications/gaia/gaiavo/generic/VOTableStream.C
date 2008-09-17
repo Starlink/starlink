@@ -179,6 +179,12 @@ namespace gaia {
         bool result = true;
         bool value;
         int status;
+        
+        //  If runlength encoded, first four bytes are the quantity.
+        if ( quantity == 0 ) {
+            readValue( quantity );
+        }
+
         for ( int i = 0; i < quantity; i++ ) {
             status = readBoolean( value );
             if ( status == 1 ) {
@@ -227,6 +233,12 @@ namespace gaia {
     {
         bool result = true;
         string value;
+
+        //  If runlength encoded, first four bytes are the quantity.
+        if ( quantity == 0 ) {
+            readValue( quantity );
+        }
+
         for ( int i = 0; i < quantity; i++ ) {
             if ( readBitArray( value ) ) {
                 *out << value;
@@ -265,6 +277,11 @@ namespace gaia {
     {
         bool result = true;
         unsigned char value;
+
+        //  If runlength encoded, first four bytes are the quantity.
+        if ( quantity == 0 ) {
+            readValue( quantity );
+        }
 
         //  Extract the null value.
         unsigned char nullvalue;
@@ -323,39 +340,25 @@ namespace gaia {
     {
         bool result = true;
         char value;
-        if ( quantity > 0 ) {
-            for ( int i = 0; i < quantity; i++ ) {
-                if ( readChar( value ) ) {
-                    if ( value == '\0' ) {
-                        //  End of string.
-                        break;
-                    }
-                    else {
-                        *out << value;
-                    }
+
+        //  If runlength encoded, first four bytes are the quantity.
+        if ( quantity == 0 ) {
+            readValue( quantity );
+        }
+
+        for ( int i = 0; i < quantity; i++ ) {
+            if ( readChar( value ) ) {
+                if ( value == '\0' ) {
+                    //  End of string.
+                    break;
                 }
                 else {
-                    result = false;
-                    break;
+                    *out << value;
                 }
             }
-        }
-        else {
-            // String which will be terminated by '\0'.
-            while ( true ) {
-                if ( readChar( value ) ) {
-                    if ( value == '\0' ) {
-                        //  End of string.
-                        break;
-                    }
-                    else {
-                        *out << value;
-                    }
-                }
-                else {
-                    result = false;
-                    break;
-                }
+            else {
+                result = false;
+                break;
             }
         }
         return result;
@@ -385,39 +388,25 @@ namespace gaia {
     {
         bool result = true;
         wchar_t value;
-        if ( quantity > 0 ) {
-            for ( int i = 0; i < quantity; i++ ) {
-                if ( readUniChar( value ) ) {
-                    if ( value == '\0' ) {
-                        break;
-                    }
-                    else {
-                        *out << value;
-                    }
-                }
-                else {
-                    result = false;
-                    break;
-                }
-            }
-        }
-        else {
-            //  '\0' terminated values.
-            while ( true ) {
-                if ( readUniChar( value ) ) {
-                    if ( value == '\0' ) {
-                        break;
-                    }
-                    else {
-                        *out << value;
-                    }
-                }
-                else {
-                    result = false;
-                    break;
-                }
-            }
 
+        //  If runlength encoded, first four bytes are the quantity.
+        if ( quantity == 0 ) {
+            readValue( quantity );
+        }
+
+        for ( int i = 0; i < quantity; i++ ) {
+            if ( readUniChar( value ) ) {
+                if ( value == '\0' ) {
+                    break;
+                }
+                else {
+                    *out << value;
+                }
+            }
+            else {
+                result = false;
+                break;
+            }
         }
         return result;
     }
@@ -465,6 +454,11 @@ namespace gaia {
     {
         bool result = true;
         T value;
+
+        //  If runlength encoded, first four bytes are the quantity.
+        if ( quantity == 0 ) {
+            readValue( quantity );
+        }
 
         T nullvalue;
         if ( havenull ) {
@@ -515,6 +509,11 @@ namespace gaia {
     {
         bool result = true;
         T value;
+
+        //  If runlength encoded, first four bytes are the quantity.
+        if ( quantity == 0 ) {
+            readValue( quantity );
+        }
 
         T nullvalue;
         if ( havenull ) {
