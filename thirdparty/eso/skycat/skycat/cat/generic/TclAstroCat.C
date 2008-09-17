@@ -3,13 +3,14 @@
  * $Id: TclAstroCat.C,v 1.3 2006/03/26 13:22:33 abrighto Exp $
  *
  * TclAstroCat.C - method definitions for class TclAstroCat
- * 
+ *
  * See the man page for a complete description.
- * 
+ *
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
  * pbiereic        26/08/99   Changed Cat_Init()
+ * Peter W. Draper 17/09/08   Added VO support meta-data access.
  */
 static const char* const rcsId="@(#) $Id: TclAstroCat.C,v 1.3 2006/03/26 13:22:33 abrighto Exp $";
 
@@ -51,7 +52,7 @@ extern "C" int Astrotcl_Init(Tcl_Interp *interp);
 void defineCatBitmaps(Tcl_Interp*);
 
 
-// Tcl procedure to search for an init for Cat startup file.  
+// Tcl procedure to search for an init for Cat startup file.
 static char initScript[] = "if {[info proc ::cat::Init]==\"\"} {\n\
   namespace eval ::cat {}\n\
   proc ::cat::Init {} {\n"
@@ -66,7 +67,7 @@ static char initScript[] = "if {[info proc ::cat::Init]==\"\"} {\n\
 ::cat::Init";
 
 
-/* 
+/*
  * Declare a table of tcl subcommands.
  *
  * NOTE: keep this table sorted, so we can use a binary search on it !
@@ -75,17 +76,21 @@ static char initScript[] = "if {[info proc ::cat::Init]==\"\"} {\n\
 static class TclAstroCatSubCmds {
 public:
     char* name;      // method name
-    int (TclAstroCat::*fptr)(int argc, char* argv[]); 
+    int (TclAstroCat::*fptr)(int argc, char* argv[]);
     int min_args;    // minimum number of args
     int max_args;    // maximum number of args
-} subcmds_[] = { 
+} subcmds_[] = {
     {"authorize",   &TclAstroCat::authorizeCmd,    0,  4},
     {"check",       &TclAstroCat::checkCmd,        1,  1},
     {"checkrow",    &TclAstroCat::checkrowCmd,     1,  1},
     {"close",       &TclAstroCat::closeCmd,        0,  0},
     {"copyright",   &TclAstroCat::copyrightCmd,    0,  0},
+    {"datatype",    &TclAstroCat::datatypeCmd,     0,  0},
     {"dec_col",     &TclAstroCat::dec_colCmd,      0,  0},
     {"entry",       &TclAstroCat::entryCmd,        1,  4},
+    {"epoch",       &TclAstroCat::epochCmd,        0,  0},
+    {"equinox",     &TclAstroCat::equinoxCmd,      0,  0},
+    {"equinoxprefix",&TclAstroCat::equinoxPrefixCmd,0,  0},
     {"feedback",    &TclAstroCat::feedbackCmd,     1,  1},
     {"getcol",      &TclAstroCat::getcolCmd,       2,  2},
     {"getidpos",    &TclAstroCat::getidposCmd,     1,  1},
@@ -118,7 +123,11 @@ public:
     {"sortcols",    &TclAstroCat::sortcolsCmd,     0,  1},
     {"sortorder",   &TclAstroCat::sortorderCmd,    0,  1},
     {"symbol",      &TclAstroCat::symbolCmd,       0,  1},
+    {"system",      &TclAstroCat::systemCmd,       0,  0},
+    {"ucd",         &TclAstroCat::ucdCmd,          0,  0},
+    {"unit",        &TclAstroCat::unitCmd,         0,  0},
     {"url",         &TclAstroCat::urlCmd,          0,  2},
+    {"utype",       &TclAstroCat::utypeCmd,        0,  0},
     {"x_col",       &TclAstroCat::x_colCmd,        0,  0},
     {"y_col",       &TclAstroCat::y_colCmd,        0,  0},
 };
@@ -129,16 +138,16 @@ public:
  */
 int TclAstroCat::call(const char* name, int len, int argc, char* argv[])
 {
-    // since this tcl command has a lot of subcommands, 
+    // since this tcl command has a lot of subcommands,
     // we do a binary search on the method table
-    int low = 0, 
+    int low = 0,
 	high = sizeof(subcmds_)/sizeof(*subcmds_) - 1,
-	mid, 
+	mid,
 	cond;
 
     while (low <= high) {
 	mid = (low + high) / 2;
-	if ((cond = strcmp(name, subcmds_[mid].name)) < 0) 
+	if ((cond = strcmp(name, subcmds_[mid].name)) < 0)
 	    high = mid - 1;
 	else if (cond > 0)
 	    low = mid + 1;
@@ -149,7 +158,7 @@ int TclAstroCat::call(const char* name, int len, int argc, char* argv[])
 	    return (this->*t.fptr)(argc, argv);
 	}
     }
-    
+
     // not found ? extend search to parent class
     return TclCommand::call(name, len, argc, argv);
 }
@@ -165,19 +174,19 @@ extern "C" int TclAstroImage_Init(Tcl_Interp *interp);
 extern "C" int TclWorldCoords_Init(Tcl_Interp *interp);
 extern "C" int TclTcsCat_Init(Tcl_Interp *interp);
 
-extern "C" 
-int Cat_Init(Tcl_Interp* interp)  
+extern "C"
+int Cat_Init(Tcl_Interp* interp)
 {
     // Initialize the local packages that "cat" depends on (we include the
     // object files from these packages directly, to avoid having the
     // extra dependencies.)
 
-    // initialize the tclutil package 
+    // initialize the tclutil package
     if (Tclutil_Init(interp) == TCL_ERROR) {
 	return TCL_ERROR;
     }
 
-    // initialize the astrotcl package 
+    // initialize the astrotcl package
     if (Astrotcl_Init(interp) == TCL_ERROR) {
 	return TCL_ERROR;
     }
@@ -192,7 +201,7 @@ int Cat_Init(Tcl_Interp* interp)
     // define bitmaps used by Tcl library
     defineCatBitmaps(interp);
 
-    // install the astroimage command 
+    // install the astroimage command
     if (TclAstroImage_Init(interp) == TCL_ERROR) {
         return TCL_ERROR;
     }
@@ -204,20 +213,20 @@ int Cat_Init(Tcl_Interp* interp)
     if (TclTcsCat_Init(interp) == TCL_ERROR) {
         return TCL_ERROR;
     }
-    // install the astrocat command 
+    // install the astrocat command
     Tcl_CreateCommand(interp, "astrocat", (Tcl_CmdProc*)TclAstroCat::astroCatCmd, NULL, NULL);
 
-    // Set the global Tcl variable cat_version 
+    // Set the global Tcl variable cat_version
     Tcl_SetVar(interp, "cat_version", PACKAGE_VERSION, TCL_GLOBAL_ONLY);
     return Tcl_Eval(interp, initScript);
 }
 
 
-/* 
+/*
  * for backward compat.
  */
 extern "C"
-int TclAstroCat_Init(Tcl_Interp* interp)  
+int TclAstroCat_Init(Tcl_Interp* interp)
 {
     return Cat_Init(interp);
 }
@@ -264,7 +273,7 @@ TclAstroCat::TclAstroCat(Tcl_Interp* interp, const char* cmdname, const char* in
  */
 TclAstroCat::~TclAstroCat()
 {
-    if (cat_) 
+    if (cat_)
 	delete cat_;
     if (result_)
 	delete result_;
@@ -273,9 +282,9 @@ TclAstroCat::~TclAstroCat()
 
 /*
  * Return the catalog directory entry for the given name or list of
- * names. 
+ * names.
  *
- * "dirList" may be the name of a catalog directory, or a Tcl list 
+ * "dirList" may be the name of a catalog directory, or a Tcl list
  * of catalog directory names forming the path to the directory.
  */
 CatalogInfoEntry* TclAstroCat::lookupCatalogDirectoryEntry(const char* dirList)
@@ -324,7 +333,7 @@ CatalogInfoEntry* TclAstroCat::lookupCatalogDirectoryEntry(const char* dirList)
 /*
  * Open the given astromonical catalog and refer to it in future
  * queries.
- * 
+ *
  * Usage: $cat open catalogName ?catalogDirectory?
  *
  * Where "name" is the name of the catalog (short or long name)
@@ -358,9 +367,9 @@ int TclAstroCat::openCmd(int argc, char* argv[])
 	    return fmt_error("catalog entry for '%s' not found under '%s': ", argv[0], argv[1]);
 
 	// make a new AstroCatalog object from the entry
-	if (AstroCatalog::isLocalCatalog(entry)) 
+	if (AstroCatalog::isLocalCatalog(entry))
 	  cat_ = new LocalCatalog(entry);
-	else 
+	else
 	  cat_ = new AstroCatalog(entry);
 
 	if (!cat_ || cat_->status() != 0)
@@ -368,7 +377,7 @@ int TclAstroCat::openCmd(int argc, char* argv[])
     }
 
     // set up feedback, if requested
-    if (feedback_) 
+    if (feedback_)
 	cat_->feedback(feedback_);
 
     return TCL_OK;
@@ -421,13 +430,13 @@ int TclAstroCat::saveCmd(int argc, char* argv[])
     }
 
     if (argc <= 2) {
-	if (!result_) 
+	if (!result_)
 	    return error("no previous data to save");
 
 	int id_col = 0;  // catalog's id column index
-	if (cat_) 
+	if (cat_)
 	    id_col = cat_->entry()->id_col();
-	
+
 	return (iflag ? result_->insert(filename, id_col) : result_->save(filename));
     }
 
@@ -436,21 +445,21 @@ int TclAstroCat::saveCmd(int argc, char* argv[])
     int freeColNames = 0;
 
     char* equinoxStr = "J2000";
-    if (argc >= 4) 
+    if (argc >= 4)
 	equinoxStr = argv[3];
 
     // get the column names
     if (argc <= 4) {		// use current catalog
-	if (!cat_) 
+	if (!cat_)
 	    return error("no catalog is currently open");
 	numCols = cat_->numCols();
 	colNames = cat_->colNames();
-    } 
+    }
     else if (argc == 5) {	// use headings list
-	if (Tcl_SplitList(interp_, argv[4], &numCols, &colNames) != TCL_OK) 
+	if (Tcl_SplitList(interp_, argv[4], &numCols, &colNames) != TCL_OK)
 	    return TCL_ERROR;
 	freeColNames++;		// delete memory later
-    } 
+    }
     else {
 	return error("wrong # of args for save"); // should not get here ...
     }
@@ -467,17 +476,17 @@ int TclAstroCat::saveCmd(int argc, char* argv[])
 
 
 /*
- * Save the query results with the given columns and values to the given 
+ * Save the query results with the given columns and values to the given
  * filename. If iflag is true, insert in the existing file, otherwise create
- * a new file. 
+ * a new file.
  * "equinoxStr" specifies the equinox of the image being displayed, or one of
  " "J2000", "B1950", "GALACTIC", "ECLIPTIC".
  * (the coordinate conversion routines expect coordinates in this system).
  */
-int TclAstroCat::saveQueryResult(const char* filename, int numCols, char** colNames, 
+int TclAstroCat::saveQueryResult(const char* filename, int numCols, char** colNames,
 				 char* info, int iflag, const char* equinoxStr)
 {
-    // create a QueryResult object from the headings and data and 
+    // create a QueryResult object from the headings and data and
     // save (or append) it to the file
     QueryResult r;
     int id_col = 0;  // catalog's id column index
@@ -492,16 +501,16 @@ int TclAstroCat::saveQueryResult(const char* filename, int numCols, char** colNa
 
 
 /*
- * Remove the query results with the given columns and values from the given 
- * filename. 
+ * Remove the query results with the given columns and values from the given
+ * filename.
  * "equinoxStr" specifies the equinox of the image being displayed, or one of
  " "J2000", "B1950", "GALACTIC", "ECLIPTIC".
  * (the coordinate conversion routines expect coordinates in this system).
  */
-int TclAstroCat::removeQueryResult(const char* filename, int numCols, char** colNames, 
+int TclAstroCat::removeQueryResult(const char* filename, int numCols, char** colNames,
 				   char* info, const char* equinoxStr)
 {
-    // create a QueryResult object from the headings and data and 
+    // create a QueryResult object from the headings and data and
     // remove rows matching it from the file
     QueryResult r;
     if (cat_)
@@ -529,15 +538,15 @@ int TclAstroCat::removeQueryResult(const char* filename, int numCols, char** col
  * Otherwise the catalog headings are used, if there is a current
  * catalog.
  *
- * The data rows are removed from the file, which should be in the form of a 
+ * The data rows are removed from the file, which should be in the form of a
  * local catalog (tab table), such as that used by the starbase utilities.
  */
 int TclAstroCat::removeCmd(int argc, char* argv[])
 {
     if (argc <= 1) {
-	if (!result_) 
+	if (!result_)
 	    return error("no previous data for remove");
-    
+
 	return result_->remove(argv[0], 0);
     }
 
@@ -547,27 +556,27 @@ int TclAstroCat::removeCmd(int argc, char* argv[])
 
     double equinox = 2000.;
     char* equinoxStr = "J2000";
-    if (argc >= 3) 
+    if (argc >= 3)
 	equinoxStr = argv[2];
-    
+
     // get the column names
     if (argc <= 3) {		// use current catalog
-	if (!cat_) 
+	if (!cat_)
 	    return error("no catalog is currently open");
 	numCols = cat_->numCols();
 	colNames = cat_->colNames();
     } else if (argc == 4) {	// use headings list
-	if (Tcl_SplitList(interp_, argv[3], &numCols, &colNames) != TCL_OK) 
+	if (Tcl_SplitList(interp_, argv[3], &numCols, &colNames) != TCL_OK)
 	    return TCL_ERROR;
 	freeColNames++;		// delete memory later
     } else {
 	return error("wrong # of args for remove"); // should not get here ...
     }
 
-    // create a QueryResult object from the headings and data and 
+    // create a QueryResult object from the headings and data and
     // remove rows matching it from the file
     int status = removeQueryResult(argv[0], numCols, (char**)colNames, argv[1], equinoxStr);
-    
+
     // clean up
     if (freeColNames && colNames)
 	Tcl_Free((char *)colNames);	// free split list of column headings
@@ -586,26 +595,26 @@ int TclAstroCat::checkCmd(int argc, char* argv[])
 }
 
 
-/* 
+/*
  * Tcl subcommand: "iswcs" returns true if the catalog is based on world
  * coordinates
  */
 int TclAstroCat::iswcsCmd(int argc, char* argv[])
 {
-    if (!cat_) 
+    if (!cat_)
 	return error("no catalog is open");
 
     return set_result(cat_->isWcs());
 }
 
 
-/* 
+/*
  * Tcl subcommand: "ispix" returns true if the catalog is based on image
  * pixel coordinates
  */
 int TclAstroCat::ispixCmd(int argc, char* argv[])
 {
-    if (!cat_) 
+    if (!cat_)
 	return error("no catalog is open");
 
     return set_result(cat_->isPix());
@@ -628,7 +637,7 @@ int TclAstroCat::checkrowCmd(int argc, char* argv[])
 {
     int numValues;
     char** values;
-    if (Tcl_SplitList(interp_, argv[0], &numValues, &values) != TCL_OK) 
+    if (Tcl_SplitList(interp_, argv[0], &numValues, &values) != TCL_OK)
 	return TCL_ERROR;
 
     // if (numValues < 3) {
@@ -639,7 +648,7 @@ int TclAstroCat::checkrowCmd(int argc, char* argv[])
     if (! cat_)
 	return error("no catalog is currently selected");
     WorldOrImageCoords pos;
-    if (cat_->isWcs()) 
+    if (cat_->isWcs())
 	pos = WorldCoords(values[cat_->ra_col()], values[cat_->dec_col()]);
     else if (cat_->isPix())
 	pos = ImageCoords(values[cat_->x_col()], values[cat_->y_col()]);
@@ -649,7 +658,7 @@ int TclAstroCat::checkrowCmd(int argc, char* argv[])
 
 
 /*
- * feedback subcommand: 
+ * feedback subcommand:
  *
  * specifies a Tcl file descriptor to use to write feedback info during
  * HTTP transfer of catalog data.  1 Arg: file descriptor.
@@ -683,12 +692,12 @@ int TclAstroCat::feedbackCmd(int argc, char* argv[])
  */
 int TclAstroCat::queryCmd(int argc, char* argv[])
 {
-    if (!cat_) 
+    if (!cat_)
 	return error("no catalog is currently open");
 
     // generate the query from the command args
     AstroQuery q;
-    if (genAstroQuery(interp_, argc, argv, q, pos1_, pos2_, 
+    if (genAstroQuery(interp_, argc, argv, q, pos1_, pos2_,
 		      equinoxStr_, feedback_, cat_->entry()) != TCL_OK)
 	return TCL_ERROR;
 
@@ -711,15 +720,15 @@ int TclAstroCat::queryCmd(int argc, char* argv[])
 	Tcl_ResetResult(interp_);
 
 	for (i = 0; i < nrows; i++) {
-	    
+
 	    // start a row
 	    Tcl_AppendResult(interp_, " {", NULL);
-	    
+
 	    if (cat_->isWcs()) { // include formatted world coords
 		WorldCoords pos;
-		if (result_->getPos(i, pos) != 0) 
+		if (result_->getPos(i, pos) != 0)
 		    return TCL_ERROR;
-		
+
 		// format the ra,dec position arguments in H:M:S...
 		char ra_buf[32], dec_buf[32];
 		int ra_col = result_->ra_col(), dec_col = result_->dec_col();
@@ -727,7 +736,7 @@ int TclAstroCat::queryCmd(int argc, char* argv[])
 
 		// put the column values in a list
 		for (j = 0; j < ncols; j++) {
-		    if (result_->get(i, j, s) != 0) 
+		    if (result_->get(i, j, s) != 0)
 			s = "";
 		    if (j == ra_col)
 			Tcl_AppendElement(interp_, ra_buf) ;
@@ -740,7 +749,7 @@ int TclAstroCat::queryCmd(int argc, char* argv[])
 	    else {  // image coords - no special formatting needed
 		// put the column values in a list
 		for (j = 0; j < ncols; j++) {
-		    if (result_->get(i, j, s) != 0) 
+		    if (result_->get(i, j, s) != 0)
 			s = "";
 		    Tcl_AppendElement(interp_, s) ;
 		}
@@ -749,7 +758,7 @@ int TclAstroCat::queryCmd(int argc, char* argv[])
 	    // end a row
 	    Tcl_AppendResult(interp_, "}", NULL);
 	}
-	
+
 	return TCL_OK;
     }
     return TCL_ERROR;	// an query error occured (and was reported)
@@ -757,7 +766,7 @@ int TclAstroCat::queryCmd(int argc, char* argv[])
 
 
 /*
- * Request an image from the current image server and return (in Tcl) 
+ * Request an image from the current image server and return (in Tcl)
  * the name of the FITS file holding the image.
  *
  * usage: $cat getimage -option value ...
@@ -767,12 +776,12 @@ int TclAstroCat::queryCmd(int argc, char* argv[])
  */
 int TclAstroCat::getimageCmd(int argc, char* argv[])
 {
-    if (!cat_) 
+    if (!cat_)
 	return error("no catalog is currently open");
 
     // generate the query from the command args
     AstroQuery q;
-    if (genAstroQuery(interp_, argc, argv, q, pos1_, pos2_, 
+    if (genAstroQuery(interp_, argc, argv, q, pos1_, pos2_,
 		      equinoxStr_, feedback_, cat_->entry()) != TCL_OK)
 	return TCL_ERROR;
 
@@ -787,7 +796,7 @@ int TclAstroCat::getimageCmd(int argc, char* argv[])
 /*
  * querypos subcommand:
  *
- * usage: $cat querypos 
+ * usage: $cat querypos
  *
  * Return the world or image coordinate position arguments from the most
  * recent query, posibly expanded by a name server such as SIMBAD. The
@@ -803,7 +812,7 @@ int TclAstroCat::queryposCmd(int argc, char* argv[])
 	pos1_.print(os, equinoxStr_);	// print coords in given equinox
 	if (pos1_.isWcs())
 	    os << " " << equinoxStr_;
-	
+
 	return set_result(os.str().c_str());
     }
     return TCL_OK;
@@ -844,18 +853,18 @@ int TclAstroCat::infoCmd(int argc, char* argv[])
     else {
 	e = CatalogInfo::root();
     }
-	
-    if (!e || !e->link()) 
+
+    if (!e || !e->link())
 	return error("can't find catalog info");
     e = e->link();  // get pointer to first catalog in directory
-    
+
     // get the serv_type
     Tcl_ResetResult(interp_);
     int n = strlen(argv[0]);
     for (; e != NULL; e = e->next()) {
 	if (strncmp(argv[0], e->servType(), n) == 0) {
 	    // ignore local catalogs in /tmp, since they will be deleted later
-	    if (! (strcmp(e->servType(), "local") == 0 
+	    if (! (strcmp(e->servType(), "local") == 0
 		   && strncmp(e->url(), "/tmp/", 5) == 0)) {
 		Tcl_AppendElement(interp_, (char*)e->longName());
 	    }
@@ -878,9 +887,9 @@ int TclAstroCat::rootCmd(int argc, char* argv[])
     Tcl_ResetResult(interp_);
 
     const CatalogInfoEntry* e = CatalogInfo::root();
-    if (!e) 
+    if (!e)
 	return error("no catalogs are loaded");
-    
+
     return set_result(e->longName());
 }
 
@@ -902,7 +911,7 @@ void TclAstroCat::appendKeyVal(const char* keyword, const char* value)
 
 /*
  * append the given list value to the Tcl result. The value is assumed
- * to already be a a colon separated list of space separated lists. 
+ * to already be a a colon separated list of space separated lists.
  * "a b c : d e f". Here we make sure that the lists are proper Tcl lists,
  * with special chars handled correctly.
  */
@@ -917,9 +926,9 @@ int TclAstroCat::appendListVal(const char* value)
 
     do {
 	Tcl_AppendResult(interp_, " {", NULL);
-    
+
 	p = strchr(q, ':');
-	if (p) 
+	if (p)
 	    *p++ = '\0';
 
 	int numValues;
@@ -979,9 +988,9 @@ int TclAstroCat::tclListToConfigStreamValue(const char* tclList, ostream& os)
     char** values = NULL;
 
     // split into {keyword value} lists
-    if (Tcl_SplitList(interp_, (char*)tclList, &numValues, &values) != TCL_OK) 
+    if (Tcl_SplitList(interp_, (char*)tclList, &numValues, &values) != TCL_OK)
 	return TCL_ERROR;
-    
+
     for (int i = 0; i < numValues; i++) {
 	os << values[i];
 	if (i < (numValues-1))
@@ -1005,7 +1014,7 @@ int TclAstroCat::tclListToConfigStreamLine(const char* tclList, ostream& os)
     char** values = NULL;
 
     // split into {keyword value} lists
-    if (Tcl_SplitList(interp_, (char*)tclList, &numValues, &values) != TCL_OK) 
+    if (Tcl_SplitList(interp_, (char*)tclList, &numValues, &values) != TCL_OK)
 	return TCL_ERROR;
 
     if (numValues != 2) {
@@ -1045,7 +1054,7 @@ int TclAstroCat::tclListToConfigStream(const char* tclList, ostream& os)
     char** values = NULL;
 
     // split into {keyword value} lists
-    if (Tcl_SplitList(interp_, (char*)tclList, &numValues, &values) != TCL_OK) 
+    if (Tcl_SplitList(interp_, (char*)tclList, &numValues, &values) != TCL_OK)
 	return TCL_ERROR;
 
     for (int i = 0; i < numValues; i++) {
@@ -1072,12 +1081,12 @@ int TclAstroCat::tclListToConfigStream(const char* tclList, ostream& os)
  * catalog or for the given catalog if one is specified.
  *
  * The format of the return value is a tcl list of {keyword value} pairs:
- *  
+ *
  *  {{key value} {key value} ...}
  *
  * for example:
  *
- * {{serv_type catalog} 
+ * {{serv_type catalog}
  *  {long_name "Guide Star Catalog at ESO"}
  *  {short_name gsc@eso}
  *  {url http://archive.eso.org/...}
@@ -1110,8 +1119,8 @@ int TclAstroCat::tclListToConfigStream(const char* tclList, ostream& os)
  * of the argument is the same as that for update. The entry is added to the
  * given directory or the top level if none is specified.
  *
- * "entry remove" removes the entry for the named catalog from the internal 
- * default catalog list. 
+ * "entry remove" removes the entry for the named catalog from the internal
+ * default catalog list.
  *
  */
 int TclAstroCat::entryCmd(int argc, char* argv[])
@@ -1124,10 +1133,10 @@ int TclAstroCat::entryCmd(int argc, char* argv[])
     Tcl_ResetResult(interp_);
     if (strcmp(argv[0], "get") == 0) {
 	char buf[80];
-	
+
 	if (argc == 1) {
 	    // get entry from current catalog
-	    if (! cat_) 
+	    if (! cat_)
 		return error("no catalog is open");
 	    e = cat_->entry();
 	}
@@ -1137,10 +1146,10 @@ int TclAstroCat::entryCmd(int argc, char* argv[])
 		dir = lookupCatalogDirectoryEntry(argv[2]);
 		if (!dir)
 		    return TCL_ERROR;
-	    } 
+	    }
 	    // get entry from named catalog
 	    e = CatalogInfo::lookup(dir, argv[1]);
-	    if (!e) 
+	    if (!e)
 		return error("can't find catalog entry for: ", argv[1]);
 	}
 
@@ -1243,18 +1252,18 @@ int TclAstroCat::entryCmd(int argc, char* argv[])
 	    return error("internal error writing config entry");
 
 	istringstream is(os.str());
-	
+
 	if (update || set) {
 	    if (argc == 2) {
 		// use current catalog entry
-		if (! cat_) 
+		if (! cat_)
 		    return error("no catalog is open");
 		e = cat_->entry();
 	    }
 	    else {
 		// update named catalog entry (in named dir)
 		e = CatalogInfo::lookup(dir, argv[2]);
-		if (!e) 
+		if (!e)
 		    return error("can't find catalog entry for: ", argv[2]);
 	    }
 	    if (update) {
@@ -1282,8 +1291,8 @@ int TclAstroCat::entryCmd(int argc, char* argv[])
 
 
 /*
- * load subcommand: 
- * 
+ * load subcommand:
+ *
  * usage: $cat load $filename ?longName?
  *
  * This command loads the named catalog config file, making the catalogs
@@ -1320,8 +1329,8 @@ int TclAstroCat::loadCmd(int argc, char* argv[])
 
 
 /*
- * reload subcommand: 
- * 
+ * reload subcommand:
+ *
  * usage: $cat reload
  *
  * This command reloads the default catalog config file and updates the
@@ -1368,61 +1377,118 @@ int TclAstroCat::headingsCmd(int argc, char* argv[])
  */
 int TclAstroCat::id_colCmd(int argc, char* argv[])
 {
-    if (cat_) 
+    if (cat_)
 	return set_result(cat_->id_col());
     return TCL_OK;
 }
 int TclAstroCat::ra_colCmd(int argc, char* argv[])
 {
-    if (cat_) 
+    if (cat_)
 	return set_result(cat_->ra_col());
     return TCL_OK;
 }
 int TclAstroCat::dec_colCmd(int argc, char* argv[])
 {
-    if (cat_) 
+    if (cat_)
 	return set_result(cat_->dec_col());
     return TCL_OK;
 }
 int TclAstroCat::x_colCmd(int argc, char* argv[])
 {
-    if (cat_) 
+    if (cat_)
 	return set_result(cat_->x_col());
     return TCL_OK;
 }
 int TclAstroCat::y_colCmd(int argc, char* argv[])
 {
-    if (cat_) 
+    if (cat_)
 	return set_result(cat_->y_col());
     return TCL_OK;
 }
 
+/*
+ * VO meta-data subcommands:
+ */
+int TclAstroCat::systemCmd(int argc, char* argv[])
+{
+    if (cat_)
+	return set_result(cat_->system());
+    return TCL_OK;
+}
+
+int TclAstroCat::epochCmd(int argc, char* argv[])
+{
+    if (cat_)
+	return set_result(cat_->epoch());
+    return TCL_OK;
+}
+
+int TclAstroCat::equinoxCmd(int argc, char* argv[])
+{
+    if (cat_)
+	return set_result(cat_->equinox());
+    return TCL_OK;
+}
+int TclAstroCat::equinoxPrefixCmd(int argc, char* argv[])
+{
+    if (cat_)
+	return set_result(cat_->equinoxprefix());
+    return TCL_OK;
+}
+
+int TclAstroCat::unitCmd(int argc, char* argv[])
+{
+    if (cat_)
+	return set_result(cat_->unit());
+    return TCL_OK;
+}
+
+int TclAstroCat::ucdCmd(int argc, char* argv[])
+{
+    if (cat_)
+	return set_result(cat_->ucd());
+    return TCL_OK;
+}
+
+int TclAstroCat::utypeCmd(int argc, char* argv[])
+{
+    if (cat_)
+	return set_result(cat_->utype());
+    return TCL_OK;
+}
+
+int TclAstroCat::datatypeCmd(int argc, char* argv[])
+{
+    if (cat_)
+	return set_result(cat_->datatype());
+    return TCL_OK;
+}
 
 /*
- * is_tcs command: 
+ * is_tcs command:
  *
  * usage:  $cat is_tcs ?catalog? ?boolValue?
  *
- * With 0 or 1 arg, returns true if this catalog (or the given one) 
+ * With 0 or 1 arg, returns true if this catalog (or the given one)
  * is a TCS catalog.
  *
  * If a value is specified, it sets the tcs flag for the given catalog.
- * 
+ *
  */
 int TclAstroCat::is_tcsCmd(int argc, char* argv[])
 {
     if (argc == 0) {
-	if (cat_) 
+	if (cat_)
 	    return set_result(cat_->is_tcs());
 	return set_result(0);
     }
     CatalogInfoEntry* e = CatalogInfo::lookup(argv[0]);
-    if (!e) 
+    if (!e)
 	return TCL_ERROR;
 
     if (argc == 1)
 	return set_result(e->is_tcs());
-    
+
     int is_tcs = 0;
     if (Tcl_GetBoolean(interp_, argv[1], &is_tcs) != TCL_OK)
 	return TCL_ERROR;
@@ -1432,16 +1498,16 @@ int TclAstroCat::is_tcsCmd(int argc, char* argv[])
 }
 
 /*
- * symbol subcommand: 
+ * symbol subcommand:
  *
  * usage:  $cat symbol ?value?
  *
  * With no args, return the "symbol" entry for this catalog.
  * With one arg, specify a new value for the symbol entry,
- * which should be a list of the form: 
+ * which should be a list of the form:
  *
  *    {{colNames symbolExpr sizeExpr} ...}
- * 
+ *
  * where colNames is a list of column names used, symbolExpr is one of
  * the accepted symbol expressions, such as "circle ?color?" and
  * sizeExpr is an expression (or a list of {expr ?units?}) giving the
@@ -1450,7 +1516,7 @@ int TclAstroCat::is_tcsCmd(int argc, char* argv[])
 int TclAstroCat::symbolCmd(int argc, char* argv[])
 {
     if (argc == 0) {
-	if (cat_) 
+	if (cat_)
 	    return appendListVal(cat_->symbol());
     }
     if (! cat_)
@@ -1461,13 +1527,13 @@ int TclAstroCat::symbolCmd(int argc, char* argv[])
 }
 
 /*
- * searchcols subcommand: 
+ * searchcols subcommand:
  *
  * usage:  $cat searchcols ?value?
  *
  * With no args, return the "search_cols" entry for this catalog.
  * With one arg, specify a new value for the search_cols entry,
- * which should be a list of the form: 
+ * which should be a list of the form:
  *
  *    {{colName minLabel maxLabel} ...}
  *
@@ -1475,7 +1541,7 @@ int TclAstroCat::symbolCmd(int argc, char* argv[])
 int TclAstroCat::searchcolsCmd(int argc, char* argv[])
 {
     if (argc == 0) {
-	if (cat_) 
+	if (cat_)
 	    return appendListVal(cat_->searchCols());
     }
     else if (! cat_)
@@ -1486,13 +1552,13 @@ int TclAstroCat::searchcolsCmd(int argc, char* argv[])
 
 
 /*
- * sortcols subcommand: 
+ * sortcols subcommand:
  *
  * usage:  $cat sortcols ?value?
  *
  * With no args, return the "sort_cols" entry for this catalog.
  * With one arg, specify a new value for the sort_cols entry,
- * which should be a list of the form: 
+ * which should be a list of the form:
  *
  *    {col1 col2 ...}
  *
@@ -1500,7 +1566,7 @@ int TclAstroCat::searchcolsCmd(int argc, char* argv[])
 int TclAstroCat::sortcolsCmd(int argc, char* argv[])
 {
     if (argc == 0) {
-	if (cat_) 
+	if (cat_)
 	    return set_result(cat_->sortCols());
     }
     else if (! cat_)
@@ -1511,13 +1577,13 @@ int TclAstroCat::sortcolsCmd(int argc, char* argv[])
 
 
 /*
- * sortorder subcommand: 
+ * sortorder subcommand:
  *
  * usage:  $cat sortorder ?value?
  *
  * With no args, return the "sort_order" entry for this catalog.
  * With one arg, specify a new value for the sort_order entry,
- * which should be a list of the form: 
+ * which should be a list of the form:
  *
  *    {col1 col2 ...}
  *
@@ -1525,7 +1591,7 @@ int TclAstroCat::sortcolsCmd(int argc, char* argv[])
 int TclAstroCat::sortorderCmd(int argc, char* argv[])
 {
     if (argc == 0) {
-	if (cat_) 
+	if (cat_)
 	    return set_result(cat_->sortOrder());
     }
     else if (! cat_)
@@ -1536,13 +1602,13 @@ int TclAstroCat::sortorderCmd(int argc, char* argv[])
 
 
 /*
- * showcols subcommand: 
+ * showcols subcommand:
  *
  * usage:  $cat showcols ?value?
  *
  * With no args, return the "show_cols" entry for this catalog.
  * With one arg, specify a new value for the show_cols entry,
- * which should be a list of the form: 
+ * which should be a list of the form:
  *
  *    {col1 col2 ...}
  *
@@ -1550,7 +1616,7 @@ int TclAstroCat::sortorderCmd(int argc, char* argv[])
 int TclAstroCat::showcolsCmd(int argc, char* argv[])
 {
     if (argc == 0) {
-	if (cat_) 
+	if (cat_)
 	    return set_result(cat_->showCols());
     }
     else if (! cat_)
@@ -1589,7 +1655,7 @@ int TclAstroCat::helpCmd(int argc, char* argv[])
 /*
  * servtype subcommand: return the servtype for this catalog or
  * for the given catalog.
- * 
+ *
  * "directory" may be the name of the parent catalog directory, or a list
  * of parent directories forming the path to the given name.
  *
@@ -1610,9 +1676,9 @@ int TclAstroCat::servtypeCmd(int argc, char* argv[])
 	dir = lookupCatalogDirectoryEntry(argv[1]);
 	if (!dir)
 	    return TCL_ERROR;
-    } 
+    }
     const CatalogInfoEntry* e = CatalogInfo::lookup(dir, argv[0]);
-    if (e) 
+    if (e)
 	return set_result(e->servType());
     return TCL_OK;
 }
@@ -1621,7 +1687,7 @@ int TclAstroCat::servtypeCmd(int argc, char* argv[])
 /*
  * url subcommand: return the url for this catalog or
  * for the given catalog.
- * 
+ *
  * usage: $cat url ?name? ?directory?
  *
  * "directory" may be the name of the parent catalog directory, or a list
@@ -1642,9 +1708,9 @@ int TclAstroCat::urlCmd(int argc, char* argv[])
 	dir = lookupCatalogDirectoryEntry(argv[1]);
 	if (!dir)
 	    return TCL_ERROR;
-    } 
+    }
     const CatalogInfoEntry* e = CatalogInfo::lookup(dir, argv[0]);
-    if (e) 
+    if (e)
 	return set_result(e->url());
     return TCL_OK;
 }
@@ -1675,21 +1741,21 @@ int TclAstroCat::getcolCmd(int argc, char* argv[])
     char** values;
     int index = -1;
 
-    if (cat_) 
+    if (cat_)
 	index = cat_->colIndex(argv[0]);
-    
+
     if (index >= 0) {
-	if (Tcl_SplitList(interp_, argv[1], &numValues, &values) != TCL_OK) 
+	if (Tcl_SplitList(interp_, argv[1], &numValues, &values) != TCL_OK)
 	    return TCL_ERROR;
 	if (index < numValues) {
 	    set_result(values[index]);
 	}
 	Tcl_Free((char *)values);
-    } 
+    }
     else {
 	return error("no such column: ", argv[0]);
     }
-    
+
     return TCL_OK;
 }
 
@@ -1707,15 +1773,15 @@ int TclAstroCat::getidposCmd(int argc, char* argv[])
 {
     // get column indexes from catalog info
     int id_col = 0, ra_col = 1, dec_col = 2;
-    if (cat_) { 
+    if (cat_) {
 	id_col = cat_->id_col();
 	ra_col = cat_->ra_col();
 	dec_col = cat_->dec_col();
     }
-    
+
     int numValues;
     char** values;
-    if (Tcl_SplitList(interp_, argv[0], &numValues, &values) != TCL_OK) 
+    if (Tcl_SplitList(interp_, argv[0], &numValues, &values) != TCL_OK)
 	    return TCL_ERROR;
 
     Tcl_ResetResult(interp_);
@@ -1751,7 +1817,7 @@ int TclAstroCat::getidposCmd(int argc, char* argv[])
  */
 int TclAstroCat::getpreviewCmd(int argc, char* argv[])
 {
-    if (!cat_) 
+    if (!cat_)
 	return error("no catalog is open");
 
     char* url = NULL;
@@ -1768,9 +1834,9 @@ int TclAstroCat::getpreviewCmd(int argc, char* argv[])
 	    }
 	}
     }
-    if (!url) 
+    if (!url)
 	return error("missing -url option");
-    
+
     char* type;
     if (cat_->getPreview(url, type) != 0)
 	return TCL_ERROR;
@@ -1784,13 +1850,13 @@ int TclAstroCat::getpreviewCmd(int argc, char* argv[])
 
 /*
  * authorize subcommand: If the previous HTTP GET returned an
- * authorization error: (The HTML error text returned in Tcl contained 
+ * authorization error: (The HTML error text returned in Tcl contained
  * the string: "Authorization Required"), the application can
  * ask the user to enter a username and password to use to access the
  * URL and then retry the GET after using this subcommand to set the
  * authorization information to use.
  *
- * usage: 
+ * usage:
  *
  *     $cat authorize
  *     $cat authorize username passwd ?realm server?
@@ -1806,26 +1872,26 @@ int TclAstroCat::getpreviewCmd(int argc, char* argv[])
  *
  * If arguments are specified, they should be the username and password
  * and optionally the realm and server hostname. If the last 2 args are
- * specified, the information is stored in a file for later lookup 
+ * specified, the information is stored in a file for later lookup
  * (see tclutil/util/src/HTTP.C).
  */
 int TclAstroCat::authorizeCmd(int argc, char* argv[])
 {
-    if (!cat_) 
+    if (!cat_)
 	return error("no catalog is open");
-    
+
     if (argc == 0) {
 	HTTP& http = cat_->http();
 	ostringstream os;
-	os << http.authorizationRequired() 
+	os << http.authorizationRequired()
 	   << " " << http.www_auth_realm()
 	   << " " << http.hostname();
 	return set_result(os.str().c_str());
     }
 
-    if (argc == 2) 
+    if (argc == 2)
 	HTTP::authorize(argv[0], argv[1]);
-    else if (argc == 4) 
+    else if (argc == 4)
 	HTTP::authorize(argv[0], argv[1], argv[2], argv[3]);
     else
 	return error("expected: astrocat authorize ?username passwd realm server?");
@@ -1835,7 +1901,7 @@ int TclAstroCat::authorizeCmd(int argc, char* argv[])
 
 
 /*
- * longname subcommand: 
+ * longname subcommand:
  *
  * usage: $cat longname ?name? ?directory?
  *
@@ -1848,7 +1914,7 @@ int TclAstroCat::authorizeCmd(int argc, char* argv[])
 int TclAstroCat::longnameCmd(int argc, char* argv[])
 {
     if (argc == 0) {
-	if (cat_) 
+	if (cat_)
 	    return set_result(cat_->longName());
 	return TCL_OK;
     }
@@ -1859,22 +1925,22 @@ int TclAstroCat::longnameCmd(int argc, char* argv[])
 	dir = lookupCatalogDirectoryEntry(argv[1]);
 	if (!dir)
 	    return TCL_ERROR;
-    } 
+    }
     const CatalogInfoEntry* e = CatalogInfo::lookup(dir, argv[0]);
-    if (e) 
+    if (e)
 	return set_result(e->longName());
     return TCL_OK;
 }
 
 
 /*
- * plot subcommand: plot the contents of the given tab table file in the given 
+ * plot subcommand: plot the contents of the given tab table file in the given
  * BLT graph widget).
- * 
+ *
  * usage: $cat plot $graph $element $filename xVector yVector
  *
  *      element    is the BLT graph element name
- * 
+ *
  *      filename   is the local catalog file
  *
  *      xVector    is the name of the BLT x vector
@@ -1897,7 +1963,7 @@ int TclAstroCat::plotCmd(int argc, char* argv[])
     Mem m(filename);
     if (m.status() != 0)
 	return TCL_ERROR;
-    
+
     // make a tab table out of the file
     TabTable tab((char*)m.ptr());
     if (tab.status() != 0)
@@ -1906,7 +1972,7 @@ int TclAstroCat::plotCmd(int argc, char* argv[])
     // plot each row under the element name of the column heading
     int ncols = tab.numCols();
     if (ncols < 2)
-	return error("expected at least 2 table columns to plot"); 
+	return error("expected at least 2 table columns to plot");
     // XXX how to interp 3 or more columns ?
 
     int nrows = tab.numRows();
@@ -1915,14 +1981,14 @@ int TclAstroCat::plotCmd(int argc, char* argv[])
     int n;
 
     for (int row = 0; row < nrows; row++) {
-	if (tab.get(row, 0, xyvalues[n=row*2]) != 0 
+	if (tab.get(row, 0, xyvalues[n=row*2]) != 0
 	    || tab.get(row, 1, xyvalues[++n]) != 0) {
 	    delete[] xyvalues;
 	    return TCL_ERROR;
 	}
     }
 
-    if (Blt_GraphElement(interp_, graph, elem, nvalues, xyvalues, 
+    if (Blt_GraphElement(interp_, graph, elem, nvalues, xyvalues,
 			 argv[3], argv[4]) != TCL_OK) {
 	delete[] xyvalues;
 	return TCL_ERROR;
@@ -1934,7 +2000,7 @@ int TclAstroCat::plotCmd(int argc, char* argv[])
 
 
 /*
- * shortname subcommand: 
+ * shortname subcommand:
  *
  * usage: $cat shortname ?name? ?directory?
  *
@@ -1947,7 +2013,7 @@ int TclAstroCat::plotCmd(int argc, char* argv[])
 int TclAstroCat::shortnameCmd(int argc, char* argv[])
 {
     if (argc == 0) {
-	if (cat_) 
+	if (cat_)
 	    return set_result(cat_->shortName());
 	return TCL_OK;
     }
@@ -1957,9 +2023,9 @@ int TclAstroCat::shortnameCmd(int argc, char* argv[])
 	dir = lookupCatalogDirectoryEntry(argv[1]);
 	if (!dir)
 	    return TCL_ERROR;
-    } 
+    }
     const CatalogInfoEntry* e = CatalogInfo::lookup(dir, argv[0]);
-    if (e) 
+    if (e)
 	return set_result(e->shortName());
     return TCL_OK;
 }
@@ -1985,7 +2051,7 @@ int TclAstroCat::shortnameCmd(int argc, char* argv[])
  * r.entry() method should be called to set the catalog entry before calling
  * this method).
  */
-int TclAstroCat::getQueryResult(int numCols, char** colNames, const char* list, 
+int TclAstroCat::getQueryResult(int numCols, char** colNames, const char* list,
 				const char* equinoxStr, QueryResult& r)
 {
     ostringstream os;
@@ -1994,7 +2060,7 @@ int TclAstroCat::getQueryResult(int numCols, char** colNames, const char* list,
     char raStr[32], decStr[32];
 
     int status = Tcl_SplitList(interp_, (char*)list, &numRows, &rows);
-    if (status == TCL_OK) { 
+    if (status == TCL_OK) {
 	for (int row = 0; row < numRows; row++) {
 	    int ncols = 0;
 	    char** cols = NULL;
@@ -2009,14 +2075,14 @@ int TclAstroCat::getQueryResult(int numCols, char** colNames, const char* list,
 		int ra_col = r.ra_col();
 		int dec_col = r.dec_col();
 		const char* raPtr = cols[ra_col];
-		const char* decPtr = cols[dec_col]; 
+		const char* decPtr = cols[dec_col];
 		WorldCoords pos(raPtr, decPtr, equinoxStr);  // converts to J2000 internally
 		if (pos.status() != 0) {
 		    raStr[0] = decStr[0] = '\0';
 		}
 		else {
 		  // print in catalog's equinox
-		  pos.print(raStr, decStr, r.equinox()); 
+		  pos.print(raStr, decStr, r.equinox());
 		}
 
 		// output the columns
@@ -2026,15 +2092,15 @@ int TclAstroCat::getQueryResult(int numCols, char** colNames, const char* list,
 		    else if (col == dec_col)
 			os << decStr;
 		    else
-			os << cols[col]; 
+			os << cols[col];
 		    if (col < n)
 			os << '\t';
 		}
-	    } 
+	    }
 	    else {
 		// output the columns
 		for (int col = 0; col < ncols; col++) {
-		    os << cols[col]; 
+		    os << cols[col];
 		    if (col < n)
 			os << '\t';
 		}
@@ -2044,9 +2110,9 @@ int TclAstroCat::getQueryResult(int numCols, char** colNames, const char* list,
 	}
     }
 
-    // create a QueryResult object from the headings and data and 
+    // create a QueryResult object from the headings and data and
     // save (or append) it to the file
-    if (status == 0) 
+    if (status == 0)
 	status = r.init(numCols, colNames, os.str().c_str());
 
     if (rows)

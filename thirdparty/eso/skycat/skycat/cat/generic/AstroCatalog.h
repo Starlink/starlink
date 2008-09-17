@@ -128,6 +128,15 @@ public:
     int y_col() {return entry_->y_col();}
     int is_tcs() {return entry_->is_tcs();}
 
+    //  PWD: more "standard" fields.
+    const char* system() {return entry_->system();}
+    double epoch() {return entry_->epoch();}
+    const char* equinoxprefix() {return entry_->equinoxprefix();}
+    const char* unit() {return entry_->unit();}
+    const char* ucd() {return entry_->ucd();}
+    const char* utype() {return entry_->utype();}
+    const char* datatype() {return entry_->datatype();}
+
     // return true if the catalog uses world coordinates
     int isWcs() {return entry_->isWcs();}
     

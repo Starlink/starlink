@@ -112,6 +112,16 @@ public:
     virtual int urlCmd(int argc, char* argv[]);
     virtual int x_colCmd(int argc, char* argv[]);
     virtual int y_colCmd(int argc, char* argv[]);
+
+    // PWD: extras.
+    virtual int systemCmd(int argc, char* argv[]);
+    virtual int epochCmd(int argc, char* argv[]);
+    virtual int equinoxCmd(int argc, char* argv[]);
+    virtual int equinoxPrefixCmd(int argc, char* argv[]);
+    virtual int unitCmd(int argc, char* argv[]);
+    virtual int ucdCmd(int argc, char* argv[]);
+    virtual int utypeCmd(int argc, char* argv[]);
+    virtual int datatypeCmd(int argc, char* argv[]);
 };
 
 #endif /* _TclAstroCat_h_ */

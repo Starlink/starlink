@@ -403,11 +403,11 @@ int AstroCatalog::getImage(const AstroQuery& q)
 int AstroCatalog::getImage(const char* url)
 {
     char* ctype = "";
-    if ( ( getPreview(url, ctype) == 0 ) && 
-         ( strcmp(ctype, "image/x-fits") == 0 ||
-           strcmp(ctype, "image/fits" ) == 0 ) ) {
-        return 0;		// ok
-    }
+    if (getPreview(url, ctype) == 0 && 
+        ( strcmp(ctype, "image/x-fits") == 0 || 
+          strcmp(ctype, "image/fits" ) == 0 ) )
+	return 0;		// ok
+
     return 1;			// error
 }
 
@@ -982,7 +982,8 @@ int AstroCatalog::getPreview(const char* url, char*& ctype)
     }
 
     // pure FITS or starbase table ?
-    if (strcmp(t, "x-fits") == 0 
+    if (strcmp(t, "x-fits") == 0
+        || strcmp(t, "fits" ) == 0
         || strcmp(t, "fits") == 0 
 	|| strcmp(t, "x-starbase") == 0 
 	|| strcmp(t, "plain") == 0 
