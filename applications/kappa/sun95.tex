@@ -55459,6 +55459,12 @@ The following applications have been modified:
          the file format. 
       \end{itemize}
 
+   \item [\htmlref{FITSTEXT}{FITSTEXT}] \mbox{}
+      \begin{itemize}
+          \item It can now handle lines that have white space that
+          extends beyond column 80.
+      \end{itemize}
+
    \item [\htmlref{MAKESNR}{MAKESNR}] \mbox{}
       \begin{itemize}
          \item Made more efficient by only calculating the default value
@@ -55503,6 +55509,11 @@ The following applications have been modified:
            parents, or all ancestors).
       \end{itemize}
 
+   \item [\htmlref{REGRID}{REGRID}] \mbox{}
+      \begin{itemize}
+          \item It no longer flips the RA axis in an (RA,Dec) image.
+      \end{itemize}
+
    \item [\htmlref{SETBB}{SETBB}] \mbox{}
       \begin{itemize}
           \item It can now use a comma-separated list of quality names 
@@ -55523,6 +55534,7 @@ The following applications have been modified:
          \item Parameter GENVAR now allows a null value.  Null requests
          that a value of FALSE be adopted if and only if all the input NDFs 
          have variance components.  TRUE is used otherwise.
+         \item It now sets the output pixel origin correctly.
       \end{itemize}
 
 \end{description}
@@ -55539,6 +55551,9 @@ The following applications have been modified:
    select the spectral axis, {\tt "TIME"} to pick the time axis, and
    {\tt "SKYLON"} and {\tt "SKYLAT"} to choose the sky longitude and
    latitude axes respectively.
+
+   \item Created character components now have trailing blanks
+   truncated.
 
 \end{itemize}
 
