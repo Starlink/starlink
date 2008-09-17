@@ -251,7 +251,7 @@ F77_INTEGER_FUNCTION(slv_loadw)( CHARACTER(TASK),
 /* If an error occurred, report a contextual error message and clear
    the process ID. */
    if ( status != SAI__OK ) {
-      ems_rep_c( "SLV_LOADW_ERR",
+      emsRep( "SLV_LOADW_ERR",
                  "SLV_LOADW: Error while loading a slave task.", &status );
       PID = (F77_INTEGER_TYPE) -1;
    }
@@ -483,7 +483,7 @@ static void Kill( pid_t pid, int *status ) {
    if ( pid > (pid_t) 0 ) {
 
 /* Begin a new error reporting context. */
-      ems_begin_c( status );
+      emsBegin( status );
 
 /* Look up the PID in the active task list. */
       task = LookupTask( pid );
@@ -491,8 +491,8 @@ static void Kill( pid_t pid, int *status ) {
 /* If the PID was not found, then report an error. */
       if ( !task ) {
          *status = SAI__ERROR;
-         ems_seti_c( "PID", (int) pid );
-         ems_rep_c( "SLV_KILL_PID",
+         emsSeti( "PID", (int) pid );
+         emsRep( "SLV_KILL_PID",
                     "Process ^PID is not a valid slave process.", status );
 
 /* If the task has already been killed, or has terminated, then just
@@ -521,18 +521,18 @@ static void Kill( pid_t pid, int *status ) {
    }
 
 /* End the error reporting context. */
-   ems_end_c( status );
+   emsEnd( status );
 }
 
 void SlvWaitK( pid_t pid, int timeout, int *status ) {
-   ems_begin_c( status );
+   emsBegin( status );
    WaitK( pid, timeout, status );
    if ( *status != SAI__OK ) {
-      ems_rep_c( "SLV_WAITK_ERR",
+      emsRep( "SLV_WAITK_ERR",
                  "SlvWaitK: Error while waiting for a slave task to "
                  "terminate.", status );
    }
-   ems_end_c( status );
+   emsEnd( status );
 }
 
 /* Wait for a killed task to terminate. */
@@ -547,7 +547,7 @@ static void WaitK( pid_t pid, int timeout, int *status ) {
    if ( pid > (pid_t) 0 ) {
 
 /* Begin a new error reporting context. */
-      ems_begin_c( status );
+      emsBegin( status );
 
 /* Look up the PID in the active task list. */
       task = LookupTask( pid );
@@ -555,15 +555,15 @@ static void WaitK( pid_t pid, int timeout, int *status ) {
 /* If the PID was not found, then report an error. */
       if ( !task ) {
          *status = SAI__ERROR;
-         ems_seti_c( "PID", (int) pid );
-         ems_rep_c( "SLV_WAITK_PID",
+         emsSeti( "PID", (int) pid );
+         emsRep( "SLV_WAITK_PID",
                     "Process ^PID is not a valid slave process.", status );
          
 /* If the task has not previously been killed, then report an error. */
       } else if ( !task->killed ) {
          *status = SAI__ERROR;
-         ems_seti_c( "PID", (int) pid );
-         ems_rep_c( "SLV_WAITK_NO",
+         emsSeti( "PID", (int) pid );
+         emsRep( "SLV_WAITK_NO",
                     "Process ^PID has not previously been killed.", status );
 
 /* Otherwise, note the current time and loop until the process
@@ -592,9 +592,9 @@ static void WaitK( pid_t pid, int timeout, int *status ) {
 /* If the timeout has been exceeded, report an error and quit waiting. */
             if ( ( timeout > 0 ) && ( delay > (double) timeout ) ) {
                *status = SAI__ERROR;
-               ems_seti_c( "PID", (int) pid );
-               ems_seti_c( "SEC", timeout );
-               ems_rep_c( "SLV_WAITK_TIME",
+               emsSeti( "PID", (int) pid );
+               emsSeti( "SEC", timeout );
+               emsRep( "SLV_WAITK_TIME",
                           "Timed out after ^SEC seconds while waiting for "
                           "process ^PID to terminate.", status );
 
@@ -625,7 +625,7 @@ static void WaitK( pid_t pid, int timeout, int *status ) {
       }
 
 /* End the error reporting context. */
-      ems_end_c( status );
+      emsEnd( status );
    }
 }
 
@@ -697,10 +697,10 @@ static void InitAMS( int *status ) {
 
 /* Report any error. */
          if ( *status != SAI__OK ) {
-            ems_facer_c( "MESSAGE", *status );
-            ems_rep_c( "SLV_AMS_MSG", "^MESSAGE", status );
-            ems_setc_c( "NAME", master, EMS__SZTOK );
-            ems_rep_c( "SLV_AMS_INIT",
+            emsFacer( "MESSAGE", *status );
+            emsRep( "SLV_AMS_MSG", "^MESSAGE", status );
+            emsSetnc( "NAME", master, EMS__SZTOK );
+            emsRep( "SLV_AMS_INIT",
                        "Error initialising message system with task name "
                        "\"^NAME\".", status );
 #if PRINT
@@ -785,8 +785,8 @@ static pid_t LoadW( const char *name, const char *file, int detach,
    if ( !loaded && ( *status == SAI__OK ) ) {
       if ( !file[ 0 ] ) {
          *status = SAI__ERROR;
-         ems_setc_c( "NAME", name, EMS__SZTOK );
-         ems_rep_c( "SLV_LOAD_NOFL",
+         emsSetnc( "NAME", name, EMS__SZTOK );
+         emsRep( "SLV_LOAD_NOFL",
                     "Unable to load task \"^NAME\": no executable file name "
                     "given.", status );
 
@@ -812,9 +812,9 @@ static pid_t LoadW( const char *name, const char *file, int detach,
 /* Report an error if we failed to allocate the memory. */
          if ( !new_environ ) {
             *status = SAI__ERROR;
-            ems_errno_c( "MESSAGE", errno );
-            ems_seti_c( "SIZE", ( nn + 3 ) * (int) sizeof( char * ) );
-            ems_rep_c( "SLV_LOAD_MEM",
+            emsErrno( "MESSAGE", errno );
+            emsSeti( "SIZE", ( nn + 3 ) * (int) sizeof( char * ) );
+            emsRep( "SLV_LOAD_MEM",
                        "Failed to allocate a block of ^SIZE byte(s) of "
                        "memory: ^MESSAGE.", status );
 
@@ -850,8 +850,8 @@ static pid_t LoadW( const char *name, const char *file, int detach,
             pid = fork();
             if ( pid == (pid_t) -1 ) {
                *status = SAI__ERROR;
-               ems_errno_c( "MESSAGE", errno );
-               ems_rep_c( "SLV_LOAD_FORK",
+               emsErrno( "MESSAGE", errno );
+               emsRep( "SLV_LOAD_FORK",
                           "Error while forking a new process: ^MESSAGE.",
                           status );
 
@@ -940,19 +940,19 @@ static pid_t LoadW( const char *name, const char *file, int detach,
 #endif
                      *status = SAI__ERROR;
                      if ( WIFSIGNALED( task->exit_status ) ) {
-                        ems_setc_c( "FILE", file, EMS__SZTOK );
-                        ems_seti_c( "SIGNAL", WTERMSIG( task->exit_status ) );
-                        ems_rep_c( "SLV_LOADW_SIG",
+                        emsSetnc( "FILE", file, EMS__SZTOK );
+                        emsSeti( "SIGNAL", WTERMSIG( task->exit_status ) );
+                        emsRep( "SLV_LOADW_SIG",
                                    "Child process to execute the file "
                                    "\"^FILE\" was unexpectedly terminated "
                                    "by a signal (no. ^SIGNAL).", status );
                      } else {
-                        ems_setc_c( "FILE", file, EMS__SZTOK );
-                        ems_seti_c( "EXIT",
+                        emsSetnc( "FILE", file, EMS__SZTOK );
+                        emsSeti( "EXIT",
                                      WEXITSTATUS( task->exit_status ) );
-                        ems_errno_c( "MESSAGE",
+                        emsErrno( "MESSAGE",
                                      WEXITSTATUS( task->exit_status ) );
-                        ems_rep_c( "SLV_LOADW_EXIT",
+                        emsRep( "SLV_LOADW_EXIT",
                                    "Child process to execute the file "
                                    "\"^FILE\" terminated unexpectedly with "
                                    "exit status ^EXIT (^MESSAGE).", status );
@@ -983,15 +983,15 @@ static pid_t LoadW( const char *name, const char *file, int detach,
                      (void) fflush( NULL );
 #endif
                      *status = SAI__ERROR;
-                     ems_seti_c( "SEC", timeout );
-                     ems_setc_c( "FILE", file, EMS__SZTOK );
-                     ems_seti_c( "PID", (int) pid );
-                     ems_rep_c( "SLC_LOAD_TIME1",
+                     emsSeti( "SEC", timeout );
+                     emsSetnc( "FILE", file, EMS__SZTOK );
+                     emsSeti( "PID", (int) pid );
+                     emsRep( "SLC_LOAD_TIME1",
                                 "Timed out ^SEC seconds after loading "
                                 "file \"^FILE\" into process ^PID.",
                                 status );
-                     ems_setc_c( "NAME", name, EMS__SZTOK );
-                     ems_rep_c( "SLV_LOAD_TIME2",
+                     emsSetnc( "NAME", name, EMS__SZTOK );
+                     emsRep( "SLV_LOAD_TIME2",
                                 "Failed to establish a message path to new "
                                 "task \"^NAME\".", status );
 
@@ -1117,7 +1117,7 @@ static void Closedown( void ) {
    (void) sigprocmask( SIG_UNBLOCK, &set, NULL );
 
 /* Mark the error stack to catch any errors. */
-   ems_mark_c();
+   emsMark();
 
 /* Loop to kill each task. */
    for ( i = 0; i < nkill; i++ ) {
@@ -1130,8 +1130,8 @@ static void Closedown( void ) {
    }
 
 /* Annul any errors and release the error stack. */
-   ems_annul_c( &status );
-   ems_rlse_c();
+   emsAnnul( &status );
+   emsRlse();
 
 /* Free the PID array. */
    free( pid );
@@ -1141,14 +1141,14 @@ static void Closedown( void ) {
 }
 
 void SlvKillW( pid_t pid, int *status ) {
-   ems_begin_c( status );
+   emsBegin( status );
    KillW( pid, status );
    if ( *status != SAI__OK ) {
-      ems_rep_c( "SLV_KILLW_ERR",
+      emsRep( "SLV_KILLW_ERR",
                  "SlvKillW: Error while killing and waiting for a slave "
                  "task to terminate.", status );
    }
-   ems_end_c( status );
+   emsEnd( status );
 }
 
 /* Kill a slave task and wait (indefinitely) for it to terminate. */
@@ -1159,7 +1159,7 @@ static void KillW( pid_t pid, int *status ) {
    if ( pid > (pid_t) 0 ) {
 
 /* Begin a new error reporting context. */
-      ems_begin_c( status );
+      emsBegin( status );
 
 /* Kill the task. */
       Kill( pid, status );
@@ -1168,7 +1168,7 @@ static void KillW( pid_t pid, int *status ) {
       if ( *status == SAI__OK ) WaitK( pid, 0, status );
 
 /* End the error reporting context. */
-      ems_end_c( status );
+      emsEnd( status );
    }
 }
 
@@ -1230,7 +1230,7 @@ static void HandleInform( const char *msg_name,
    if ( !handled && ( *status == SAI__OK ) ) {
       cnf_exprt( "SLV_MSG", MSG_NAME, MSG_NAME_length );
       cnf_exprt( "^MESSAGE", MSG_TEXT, MSG_TEXT_length );
-      ems_setc_c( "MESSAGE", msg_value, msg_length );
+      emsSetnc( "MESSAGE", msg_value, msg_length );
       STATUS = *status;
       F77_CALL(msg_out)( CHARACTER_ARG(MSG_NAME), CHARACTER_ARG(MSG_TEXT),
                          INTEGER_ARG(&STATUS)
@@ -1262,7 +1262,7 @@ static void ErrFlush( int path, int messid, int *status ) {
    while ( new_status == SAI__OK ) {
 
 /* Retrieve the message from EMS. Quit if there are none left. */
-      ems_eload_c( name, &name_len, text + 3, &text_len, status );
+      emsEload( name, &name_len, text + 3, &text_len, status );
       if ( *status == SAI__OK ) break;
 
 /* Prefix "!! " to the first message, and "!  " to subsequent ones. */
@@ -1430,9 +1430,9 @@ static void HandleParamReq( int path, int messid,
    so report an additional contextual error message showing the new
    parameter value. */
                   if ( *act_status != SAI__OK ) {
-                     ems_setc_c( "PARAM", parname, EMS__SZTOK );
-                     ems_setc_c( "VALUE", parvalue, EMS__SZTOK );
-                     ems_rep_c( "SLV_OBEYW_NEW",
+                     emsSetnc( "PARAM", parname, EMS__SZTOK );
+                     emsSetnc( "VALUE", parvalue, EMS__SZTOK );
+                     emsRep( "SLV_OBEYW_NEW",
                                 "Sending parameter value '^PARAM=^VALUE' "
                                 "to slave task.",act_status );
                   }
@@ -1444,9 +1444,9 @@ static void HandleParamReq( int path, int messid,
    the slave task. */
                } else {
                   if ( *act_status == SAI__OK ) *act_status = SAI__ERROR;
-                  ems_setc_c( "PARAM", parname, EMS__SZTOK );
+                  emsSetnc( "PARAM", parname, EMS__SZTOK );
                   if ( pardata->nreq == 2 ) {
-                     ems_rep_c( "SLV_OBEYW_NULL",
+                     emsRep( "SLV_OBEYW_NULL",
                                 "Out of values - sending null parameter "
                                 "value '^PARAM=!' to slave task.",
                                 act_status );
@@ -1457,7 +1457,7 @@ static void HandleParamReq( int path, int messid,
    response as a final attempt to avoid an infinite loop. Only really
    naughty tasks will ignore this. */
                   } else { 
-                     ems_rep_c( "SLV_OBEYW_NULL",
+                     emsRep( "SLV_OBEYW_NULL",
                                 "Out of values - sending abort parameter "
                                 "value '^PARAM=!!' to slave task.",
                                 act_status );
@@ -1541,7 +1541,7 @@ static void HandleParamReq( int path, int messid,
                                  "master \"%s\" parameter.\n", master );
                   (void) fflush( NULL );
 #endif
-                  ems_mark_c();
+                  emsMark();
                   STATUS = *status;
                   /*                  for ( i=0; i <= PARVALUE_length; i++ ) PARVALUE[i] = ' ';*/
                   F77_CALL(subpar_getname)( INTEGER_ARG(&IPAR),
@@ -1560,7 +1560,7 @@ static void HandleParamReq( int path, int messid,
                                     "is \"null\".\n" );
                      (void) fflush( NULL );
 #endif
-                     ems_annul_c( status );
+                     emsAnnul( status );
                      parvalue = "!";
 
 /* If the parameter state is "abort, annul any associated error
@@ -1571,7 +1571,7 @@ static void HandleParamReq( int path, int messid,
                                     "is \"abort\".\n" );
                      (void) fflush( NULL );
 #endif
-                     ems_annul_c( status );
+                     emsAnnul( status );
                      parvalue = "!!";
 
 /* If a value was obtained successfully, make a copy of it. */
@@ -1581,7 +1581,7 @@ static void HandleParamReq( int path, int messid,
                   }
 
 /* Release the error stack. */
-                  ems_rlse_c();
+                  emsRlse();
                }
             }
          }
@@ -1601,7 +1601,7 @@ static void HandleParamReq( int path, int messid,
 /* If an error has occurred, attempt to clean up by sending an "abort"
    reponse to the slave task. */
       } else {
-         ems_begin_c( status );
+         emsBegin( status );
          parvalue = "!!";
 #if PRINT
          (void) fprintf(stderr,  "HandleParamReq: Sending parameter reply \"%s=%s\" "
@@ -1610,7 +1610,7 @@ static void HandleParamReq( int path, int messid,
 #endif
          ams_reply( path, messid, MESSYS__MESSAGE, MESSYS__PARAMREP, OBEY,
                     msg_name, strlen( parvalue ), (char *) parvalue, status );
-         ems_end_c( status );
+         emsEnd( status );
       }
    }
 }
@@ -1653,7 +1653,7 @@ void SlvObeyW( const char *task, const char *action,
    (void) fflush( NULL );
 #endif
 
-   ems_mark_c();
+   emsMark();
    istat = SAI__OK;
 
 /* Loop to interpret messages from the task while the action is
@@ -1670,8 +1670,8 @@ void SlvObeyW( const char *task, const char *action,
 
 /* Deal with any errors in obtaining the message. */
       if ( *status != SAI__OK ) {
-         ems_facer_c( "MESSAGE", *status );
-         ems_rep_c( "SLV_OBEYW_MSG",
+         emsFacer( "MESSAGE", *status );
+         emsRep( "SLV_OBEYW_MSG",
                     "Error in message from slave task: ^MESSAGE", status );
 
 /* Detect confirmation of the action from the task. */
@@ -1728,8 +1728,8 @@ void SlvObeyW( const char *task, const char *action,
                 !strncmp( msg_value, "!  ", 3 ) ) ) {
             istat = SAI__ERROR;
             (void) strncpy( msg_value, "   ", 3 );
-            ems_setc_c( "MESSAGE", msg_value, msg_length );
-            ems_rep_c( "SLV_ERR", "^MESSAGE", &istat );
+            emsSetnc( "MESSAGE", msg_value, msg_length );
+            emsRep( "SLV_ERR", "^MESSAGE", &istat );
 
          } else {
             if ( istat != SAI__OK ) ErrFlush( path, messid, &istat );
@@ -1755,9 +1755,9 @@ void SlvObeyW( const char *task, const char *action,
 
       } else {
          *status = SAI__ERROR;
-         ems_seti_c( "STAT", msg_status );
-         ems_facer_c( "MESSAGE", msg_status );
-         ems_rep_c( "SLV_OBEYW_EH",
+         emsSeti( "STAT", msg_status );
+         emsFacer( "MESSAGE", msg_status );
+         emsRep( "SLV_OBEYW_EH",
                     "Unexpected message from slave task: message status = "
                     "^STAT (^MESSAGE).", status );
       }
@@ -1765,17 +1765,17 @@ void SlvObeyW( const char *task, const char *action,
 /* If an error has occurred and the action was not acknowledged by the
    task, then report contextual information. */
       if ( *status != SAI__OK ) {
-         ems_setc_c( "ACTION", action, EMS__SZTOK );
-         ems_setc_c( "TASK", task, EMS__SZTOK );
+         emsSetnc( "ACTION", action, EMS__SZTOK );
+         emsSetnc( "TASK", task, EMS__SZTOK );
          if ( !started ) {
-            ems_rep_c( "SLV_OBEYW_NO",
+            emsRep( "SLV_OBEYW_NO",
                        "Confirmation of action was not received from slave "
                        "task.", status );
          }
       }
    }
 
-   ems_rlse_c();
+   emsRlse();
 
    while ( param_list ) {
       tmp = param_list;
@@ -1795,17 +1795,17 @@ F77_SUBROUTINE(slv_kill)( INTEGER(PID), INTEGER(STATUS) ) {
    int status;
 
    status = (int) *STATUS;
-   ems_begin_c( &status );
+   emsBegin( &status );
 
    pid = (pid_t) *PID;
 
    Kill( pid, &status );
 
    if ( status != SAI__OK ) {
-      ems_rep_c( "SLV_KILL_ERR",
+      emsRep( "SLV_KILL_ERR",
                  "SLV_KILL: Error while killing a slave task.", &status );
    }
-   ems_end_c( &status );
+   emsEnd( &status );
 
    *STATUS = (F77_INTEGER_TYPE) status;
 }
@@ -1821,7 +1821,7 @@ F77_SUBROUTINE(slv_waitk)( INTEGER(PID), INTEGER(TIMEOUT), INTEGER(STATUS) ) {
    int status;
 
    status = (int) *STATUS;
-   ems_begin_c( &status );
+   emsBegin( &status );
 
    pid = (pid_t) *PID;
    timeout = (int) *TIMEOUT;
@@ -1829,11 +1829,11 @@ F77_SUBROUTINE(slv_waitk)( INTEGER(PID), INTEGER(TIMEOUT), INTEGER(STATUS) ) {
    WaitK( pid, timeout, &status );
 
    if ( status != SAI__OK ) {
-      ems_rep_c( "SLV_WAITK_ERR",
+      emsRep( "SLV_WAITK_ERR",
                  "SLV_WAITK: Error waiting for a slave task to terminate.",
                  &status );
    }
-   ems_end_c( &status );
+   emsEnd( &status );
 
    *STATUS = (F77_INTEGER_TYPE) status;
 }
@@ -1848,17 +1848,17 @@ F77_SUBROUTINE(slv_killw)( INTEGER(PID), INTEGER(STATUS) ) {
    int status;
 
    status = (int) *STATUS;
-   ems_begin_c( &status );
+   emsBegin( &status );
 
    pid = (pid_t) *PID;
 
    KillW( pid, &status );
    if ( status != SAI__OK ) {
-      ems_rep_c( "SLV_KILLW_ERR",
+      emsRep( "SLV_KILLW_ERR",
                  "SLV_KILLW: Error while killing and waiting for a slave "
                  "task to terminate.", &status );
    }
-   ems_end_c( &status );
+   emsEnd( &status );
 
    *STATUS = (F77_INTEGER_TYPE) status;
 }
@@ -1895,9 +1895,9 @@ F77_INTEGER_FUNCTION(slv_obeyw)( CHARACTER(TASK),
    SlvObeyW( task, action, command, assoc, &status );
 
    if ( status != SAI__OK ) {
-      ems_setc_c( "ACTION", action, ACTION_length );
-      ems_setc_c( "TASK", task , TASK_length );
-      ems_rep_c( "SLV_OBEYW_ERR",
+      emsSetnc( "ACTION", action, ACTION_length );
+      emsSetnc( "TASK", task , TASK_length );
+      emsRep( "SLV_OBEYW_ERR",
                  "SLV_OBEYW: Error executing the '^ACTION' action in slave "
                  "task '^TASK'.", &status );
    }
@@ -1911,13 +1911,13 @@ F77_INTEGER_FUNCTION(slv_obeyw)( CHARACTER(TASK),
 }
 
 void SlvKill( pid_t pid, int *status ) {
-   ems_begin_c( status );
+   emsBegin( status );
    Kill( pid, status );
    if ( *status != SAI__OK ) {
-      ems_rep_c( "SLV_KILL_ERR",
+      emsRep( "SLV_KILL_ERR",
                  "SlvKill: Error while killing a slave task.", status );
    }
-   ems_end_c( status );
+   emsEnd( status );
 }
 
 /*  
