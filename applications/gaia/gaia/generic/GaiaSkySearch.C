@@ -840,9 +840,10 @@ int GaiaSkySearch::contentCmd( int argc, char *argv[] )
         int ra_col = qr->ra_col();
 
         for ( int i = 0; i < nrows; i++ ) {
+
             // Row includes formatted RA & Dec, do that first.
             if ( qr->getPos( i, pos ) != 0 ) {
-                return TCL_ERROR;
+                return error( "Failed getting world coordinates" );
             }
             pos.print( ra_buf, dec_buf, equinoxStr_ );
 
