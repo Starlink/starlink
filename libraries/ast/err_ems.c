@@ -12,6 +12,7 @@
 *     rather than by the default mechanism.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
 
@@ -38,6 +39,8 @@
 *  History:
 *     6-NOV-1996 (DSB):
 *        Original version.
+*     16-SEP-2008 (TIMJ):
+*        Use modern EMS interface
 *     {enter_changes_here}
 */
 
@@ -101,5 +104,5 @@ void astPutErr_( int status, const char *message ) {
    report the error message through EMS and to associate the error
    status with it. Ignore any returned status value. */
    local_status = status;
-   ems_rep_c( "AST_ERROR", message, &local_status );
+   emsRep( "AST_ERROR", message, &local_status );
 }
