@@ -181,7 +181,7 @@ itcl::class gaia::GaiaUrlGet {
          $itk_component(label) configure -text "Downloading: $url"
 
          $itk_component(progress) config -text \
-            "Attempting to contact remote server..."
+            "Contacting remote server..."
          $itk_component(progress) look_busy
          set_feedback on
 
@@ -197,7 +197,7 @@ itcl::class gaia::GaiaUrlGet {
          $itk_component(label) configure -text "Downloading: $url"
 
          $itk_component(progress) config -text \
-            "Attempting to contact remote server..."
+            "Contacting remote server..."
          $itk_component(progress) look_busy
          set_feedback on
 
@@ -208,7 +208,7 @@ itcl::class gaia::GaiaUrlGet {
 
    #  Download the given HTTP URL.
    protected method get_http_ {url tempfile} {
-      $w_.cat getpreview -url $url -tempfile $tempfile
+      return [$w_.cat getpreview -url $url -tempfile $tempfile]
    }
 
    #  Download the the FTP URL.
