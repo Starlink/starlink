@@ -6,7 +6,7 @@
 #     [incr Tcl] class
 
 #  Purpose:
-#     Download the content of a URL to a loca file.
+#     Download the content of a URL to a local file.
 
 #  Description:
 #     Instances of this class are used to download the content of
@@ -34,6 +34,7 @@
 
 #  Copyright:
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2008 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -65,6 +66,9 @@
 
 #.
 
+package require ftp
+package require uri
+
 itk::usual GaiaUrlGet {}
 
 itcl::class gaia::GaiaUrlGet {
@@ -83,7 +87,7 @@ itcl::class gaia::GaiaUrlGet {
          label $w_.label -wraplength 400
       }
       pack $itk_component(label) -side top -fill x -expand 1 -pady 5 -padx 5
-      
+
       #  Add a progress bar to display the progress of data transfers.
       itk_component add progress {
          util::ProgressBar $w_.progress
@@ -106,11 +110,14 @@ itcl::class gaia::GaiaUrlGet {
       #  Make sure proxys are established.
       check_proxies
 
+      #  Controller for temporary files.
+      set tmpfiles_ [gaia::GaiaTempName \#auto -prefix "GaiaTemp"]
+
       #  Create the astrocat instance for doing the download. Needs an actual
       #  catalogue to open, so create a fudged one.
       astrocat $w_.cat
       catch {
-         set tmpcat_ "/tmp/GaiaTempURLGet[incr count_].TAB"
+         set tmpcat_ [$tmpfiles_ get_typed_name ".TAB"]
          set fd [open "$tmpcat_" w]
          puts $fd "id\t x\t y\n--\n0\t 0\t 0\n"
          close $fd
@@ -140,16 +147,23 @@ itcl::class gaia::GaiaUrlGet {
       if { $wfd_ != {} } {
          catch {close $wfd_}
       }
+
+      #  Delete temporary files.
+      catch {
+         $tmpfiles_ clear
+         delete object tmpfiles_
+      }
    }
 
    #  Methods:
    #  --------
 
-   #  Download the data from a given URL to a temporary local file. If the 
+   #  Download the data from a given URL to a temporary local file. If the
    #  URL points at a local file that name will be returned.
    #
-   #  When the download complete the notify_cmd command will be
-   #  executed and the name of the temporary file will be appended to it.
+   #  When the download complete the notify_cmd command will be executed and
+   #  the name of the temporary file will be appended to it.
+
    public method get { url } {
 
       if { [string first "file:" $url] == 0 } {
@@ -157,9 +171,10 @@ itcl::class gaia::GaiaUrlGet {
          #  URL points at a local file, just return that.
          set filename [regsub {file://localhost|file://|file:} $url ""]
          download_done 0 [list $filename image/x-fits]
-      } else {
 
-         #  Activate dialog and start the download.
+      } elseif { [string first "ftp:" $url] == 0 } {
+
+         #  Assume FTP, so activate dialog and start the download.
          wm deiconify $w_
          raise $w_
 
@@ -170,13 +185,38 @@ itcl::class gaia::GaiaUrlGet {
          $itk_component(progress) look_busy
          set_feedback on
 
-         $w_.batch bg_eval [code $this get_url_ $url]
+         set tempfile [$tmpfiles_ get_typed_name ".fits"]
+         $w_.batch bg_eval [code $this get_ftp_ $url $tempfile]
+
+      } else {
+
+         #  Assume HTTP, so activate dialog and start the download.
+         wm deiconify $w_
+         raise $w_
+
+         $itk_component(label) configure -text "Downloading: $url"
+
+         $itk_component(progress) config -text \
+            "Attempting to contact remote server..."
+         $itk_component(progress) look_busy
+         set_feedback on
+
+         set tempfile [$tmpfiles_ get_typed_name ".fits"]
+         $w_.batch bg_eval [code $this get_http_ $url $tempfile]
       }
    }
 
-   #   Download the given URL.
-   protected method get_url_ {url} {
-      $w_.cat getpreview -url $url
+   #  Download the given HTTP URL.
+   protected method get_http_ {url tempfile} {
+      $w_.cat getpreview -url $url -tempfile $tempfile
+   }
+
+   #  Download the the FTP URL.
+   protected method get_ftp_ {url tempfile} {
+      if { [catch {exec $::gaia_dir/ftpget $url $tempfile} msg] } {
+         error "Failed to download FTP file: $msg"
+      }
+      return "$tempfile image/x-fits"
    }
 
    #  Method called when the download is complete.
@@ -192,15 +232,19 @@ itcl::class gaia::GaiaUrlGet {
       set_feedback off
 
       $itk_component(label) configure -text ""
-      
+
       if { $status } {
          error_dialog $result $w_
       } else {
          if {[llength $result] != 2} {
             error_dialog "error downloading remote data (result = $result)"
          } else {
-            lassign $result filename type
             if { $itk_option(-notify_cmd) != {} } {
+               lassign $result filename type
+
+               #  Check if this is a compressed file. If so change the suffix
+               #  so that it will be opened correctly.
+               set filename [check_compressed_ $filename]
                eval $itk_option(-notify_cmd) $filename $type
             }
          }
@@ -239,7 +283,7 @@ itcl::class gaia::GaiaUrlGet {
          $w_.cat feedback {}
       }
    }
-   
+
    #  This method is called by the fileevent handler during the data transfer.
    protected method feedback_ {} {
       set text [gets $rfd_]
@@ -253,13 +297,39 @@ itcl::class gaia::GaiaUrlGet {
       $itk_component(progress) config -text $text
       update idletasks
    }
-   
 
    #  Interrupt the download.
    public method interrupt {} {
       $w_.batch interrupt
       set_feedback off
       wm withdraw $w_
+   }
+
+   #  Check the temporary file to see if it is known to be compressed.
+   protected method check_compressed_ {filename} {
+      
+      set fid [::open $filename "r"]
+      set magic0 [::read $fid 1]
+      set magic1 [::read $fid 1]
+      
+      if { $magic0 == "\037" } {
+         if { $magic1 == "\213" } {
+            #  GZIP.
+            set newname "${filename}.gz"
+         } elseif { $magic1 == "\036" } {
+            #  HUFFMANN.
+            set newname "[file rootname $filename].hfits"
+         } elseif { $magic1 == "\235" } {
+            #  UNIX COMPRESS
+            set newname "${filename}.Z"
+         }
+         if { $newname != $filename } {
+            ::file rename -force $filename $newname
+            $tmpfiles_ add_name $newname
+            return $newname
+         }
+      }
+      return $filename
    }
 
    #  Check for a file ~/.skycat/proxies, once each session, and use it to
@@ -296,6 +366,9 @@ itcl::class gaia::GaiaUrlGet {
 
    #  Temporary catalogue to initialise astrocat instance.
    protected variable tmpcat_ {}
+
+   #  Object for managing temporary files.
+   protected variable tmpfiles_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

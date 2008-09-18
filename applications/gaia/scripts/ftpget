@@ -1,0 +1,107 @@
+#!/bin/sh
+# The next line is executed by /bin/sh, but not Tcl \
+exec $GAIA_DIR/gaia_tcl $0 ${1+"$@"}
+#+
+#   Name:
+#      ftpget
+
+#   Purpose:
+#      Download a file from an FTP server.
+
+#   Usage:
+#      ftpget url file
+
+#   Description:
+#      Download a file from an FTP server. The file is referenced
+#      by the given URL (ftp://host/path/file)
+
+#   Authors:
+#     PWD: Peter W. Draper (JAC/Durham University)
+
+#  Copyright:
+#     Copyright (C) 2008 Science and Technology Facilties Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of the
+#     License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+#     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#   History:
+#      18-SEP-2008 (PWD):
+#         Original version.
+#-
+#.
+
+#  Packages from tcllibs.
+package require ftp
+package require uri
+
+#  Check the command-line arguments.
+if { $argc == 2 } {
+   set url [lindex $argv 0]
+   set outfile [lindex $argv 1]
+} else {
+   puts stderr {Usage: ftpget url file}
+   exit 1
+}
+
+#  Open the output file.
+if { [catch "::open $outfile w" fid] } {
+   puts stderr "Failed to open output file: $outfile"
+   exit 1
+}
+
+#  Parse URL.
+array set urlparts [uri::split $url]
+
+if { $urlparts(user) == {} } {
+   set urlparts(user) "anonymous"
+}
+if { $urlparts(pwd) == {} } {
+   set urlparts(pwd) "user@localhost.localdomain"
+}
+if { $urlparts(port) == {} } {
+   set urlparts(port) 21
+}
+
+#  Open the connection.
+set fdc [ftp::Open $urlparts(host) $urlparts(user) $urlparts(pwd) \
+            -port $urlparts(port)]
+if { $fdc < 0 } {
+   puts stderr "Cannot reach host for url \"$url\""
+   exit 1
+}
+
+#  We have reached the host, now get on to retrieve the item. Do this
+#  by cd-ing to the directory and then getting the file.
+set ftp_dir [file dirname $urlparts(path)]
+set ftp_file [file tail $urlparts(path)]
+
+set result [ftp::Cd $fdc $ftp_dir]
+if { $result == 0 } {
+   ftp::Close $fdc
+   puts stderr "Cannot reach directory of url \"$url\""
+   exit 1
+}
+
+#  Now get the file, writing content to fid.
+ftp::Get $fdc $ftp_file -channel $fid
+::close $fid
+
+#  Close connection.
+ftp::Close $fdc
+
+puts "Downloaded $url to $outfile"
+exit 0
