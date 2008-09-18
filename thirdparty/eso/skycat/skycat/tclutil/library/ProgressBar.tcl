@@ -10,7 +10,9 @@
 # Allan Brighton  23 Jan 96  Created
 # Peter W. Draper 05 Jan 06  Tk now uses "readonly" state (disabled greys out
 #                            text, making it illegible).
-#
+#                 05 Sep 08  Fix a bug in cancelling the look busy timers.
+#                            Trap after to handle mid-event creation errors.
+#                 18 Sep 08  Catch after on do_something.
 
 itk::usual ProgressBar {}
 
@@ -93,7 +95,9 @@ itcl::class util::ProgressBar {
 	    $itk_component(scale) config \
 		-sliderlength 0 \
 		-troughcolor $itk_option(-busycolor)
-	    after cancel [code $this do_something]
+            if { $last_id_ != {} } {
+                catch {after cancel $last_id_}
+            }
 	}
     }
 
@@ -110,8 +114,10 @@ itcl::class util::ProgressBar {
 	    incr itk_option(-value) $inc_
 	    $itk_component(scale) set $itk_option(-value)
 	    update
-	    after $itk_option(-speed) [code $this do_something]
-	}
+            catch {
+                after $itk_option(-speed) [code catch "$this do_something"]
+            }
+        }
     }
 
     
@@ -170,5 +176,8 @@ itcl::class util::ProgressBar {
     
     # controls direction for busy animation
     protected variable inc_ 1
+ 
+    # id of last after command
+    protected variable last_id_ {}
 }
 
