@@ -445,22 +445,22 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
     /* Debugging info - do not set all the tokens unless we
        actually need to print them out */
     msgIflev( &curlevel );
-    if (curlevel >= MSG__VERB) {
+    if (curlevel >= MSG__DEBUG) {
       msgSeti("K",k+1);
       msgSetc("F",fittype);
-      msgOutif(MSG__VERB," ", 
+      msgOutif(MSG__DEBUG," ", 
 	       " Fit results for timeslice ^K (fit type = ^F)", status );
       msgSetd("DS",sky0);
-      msgOutif(MSG__VERB," ", 
+      msgOutif(MSG__DEBUG," ", 
 	       "              Sky0   = ^DS, ", status );
       msgSetd("DE",dskyel);
-      msgOutif(MSG__VERB," ", 
+      msgOutif(MSG__DEBUG," ", 
 	       "              Dskyel = ^DE, ", status );
       msgSetd("DA",dskyaz);
-      msgOutif(MSG__VERB," ", 
+      msgOutif(MSG__DEBUG," ", 
 	       "              Dskyaz = ^DA", status );
       msgSetd("X",chisq);
-      msgOutif(MSG__VERB," ", 
+      msgOutif(MSG__DEBUG," ", 
 	       "              X^2 = ^X", status );
     } 
 

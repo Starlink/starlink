@@ -247,13 +247,13 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
       *meansky = sky0;
       /* Debugging info */
       msgIflev( &curlevel );
-      if (curlevel >= MSG__VERB) {
+      if (curlevel >= MSG__DEBUG) {
 	msgSeti("K",k+1);
 	msgSetc("F",fittype);
-	msgOutif(MSG__VERB," ", 
+	msgOutif(MSG__DEBUG," ", 
 		 " Fit results for timeslice ^K (fit type = ^F)", status );
 	msgSetd("DS",sky0);
-	msgOutif(MSG__VERB," ", 
+	msgOutif(MSG__DEBUG," ", 
 		 "              Sky0   = ^DS, ", status );
       }
     }
@@ -389,24 +389,24 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
 
       /* Debugging info */
       msgIflev( &curlevel );
-      if (curlevel >= MSG__VERB) {
+      if (curlevel >= MSG__DEBUG) {
 	msgSeti("K",k+1);
 	msgSetc("F",fittype);
-	msgOutif(MSG__VERB," ", 
+	msgOutif(MSG__DEBUG," ", 
 		 " Fit results for timeslice ^K (fit type = ^F)", status );
 	msgSetd("DS",sky0);
-	msgOutif(MSG__VERB," ", 
+	msgOutif(MSG__DEBUG," ", 
 		 "              Sky0   = ^DS, ", status );
 	msgSetd("DE",dskyel);
-	msgOutif(MSG__VERB," ", 
+	msgOutif(MSG__DEBUG," ", 
 		 "              Dskyel = ^DE, ", status );
 	if ( dskyaz != 0 ) {
 	  msgSetd("DA",dskyaz);
-	  msgOutif(MSG__VERB," ", 
+	  msgOutif(MSG__DEBUG," ", 
 		   "              Dskyaz = ^DA", status );
 	}
 	msgSetd("X",chisq);
-	msgOutif(MSG__VERB," ", 
+	msgOutif(MSG__DEBUG," ", 
 		 "              X^2 = ^X", status );
       }
       
