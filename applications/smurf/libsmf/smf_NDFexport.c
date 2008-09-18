@@ -140,7 +140,7 @@ void smf_NDFexport( const smfData *data, void *variance,
 
   if (*status != SAI__OK ) return;
 
-  fft = smf_isfft( data, NULL, status );
+  fft = smf_isfft( data, NULL, NULL, NULL, status );
 
   /* Check for ICD-compliant data order */
   if( !fft && !data->isTordered ) {
@@ -264,7 +264,7 @@ void smf_NDFexport( const smfData *data, void *variance,
           /* For 3-dimensional data assume it is ICD bolo-format */
           ndfPtwcs( header->tswcs, tempdata->file->ndfid, status );
 
-        } else if( smf_isfft(data, NULL, status) ) {
+        } else if( smf_isfft(data, NULL, NULL, NULL, status) ) {
           /* Data is FFT */
           if( data->ndims == 4 ) {
             /* Only handle 4d FFT data at the moment */

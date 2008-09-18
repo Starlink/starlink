@@ -153,14 +153,22 @@ void smurf_sc2fft( int *status ) {
     smf_open_and_flatfield( igrp, NULL, i, darks, &idata, status );
 
     /* Check whether we need to transform the data at all */
-    if( smf_isfft(idata,NULL,status) == inverse ) {
+    if( smf_isfft(idata,NULL,NULL,NULL,status) == inverse ) {
+
+      /* If inverse transform, convert to cartesian representation first */
+      if( inverse ) {
+        smf_fft_cart2pol( idata, 1, status );
+      }
 
       /* Tranform the data */
       odata = smf_fft_data( idata, inverse, status );
       
-      /* If output is time-domain, ensure that it is ICD bolo-ordered */
       if( inverse ) {
+        /* If output is time-domain, ensure that it is ICD bolo-ordered */
         smf_dataOrder( odata, 1, status );
+      } else {
+        /* Store FFT of data in polar form */
+        smf_fft_cart2pol( odata, 0, status );
       }
       
       /* Export the data to a new file */

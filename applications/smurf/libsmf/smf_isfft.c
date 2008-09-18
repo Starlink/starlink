@@ -13,7 +13,8 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     int smf_isfft( const smfData *infile, dim_t *ntslice, int * status );
+*     int smf_isfft( const smfData *infile, dim_t *ntslice, dim_t *nbolo,
+*                    dim_t *nf, int * status );
 
 *  Arguments:
 *     infile = const smfData * (Given)
@@ -21,6 +22,10 @@
 *     ntslice = dim_t* (Returned)
 *        Optionally return the number of time slices in the corresponding
 *        time-series data.
+*     nbolo = dim_t* (Returned)
+*        Optionally return the number of bolometers
+*     nf = dim_t* (Returned)
+*        Optionally return the number of frequencies
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -57,6 +62,7 @@
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -105,11 +111,12 @@
 
 #define FUNC_NAME "smf_isfft"
 
-int smf_isfft( const smfData *indata, dim_t *ntslice, int *status ) {
+int smf_isfft( const smfData *indata, dim_t *ntslice, dim_t *nbolo, 
+               dim_t *nf, int *status ) {
   dim_t i;                      /* Loop counter */
   int isreal=1;                 /* Flag for real-valued Nyquist frequency */
-  dim_t nbolo=0;                /* Number of detectors  */
-  dim_t nf=0;                   /* Number of frequencies */
+  dim_t nbolo0=0;               /* Number of detectors  */
+  dim_t nf0=0;                  /* Number of frequencies */
   int retval=0;                 /* The return value */ 
   double *val=NULL;             /* Pointer to element of data array */
 
@@ -117,7 +124,7 @@ int smf_isfft( const smfData *indata, dim_t *ntslice, int *status ) {
 
   if (indata == NULL) {
     *status = SAI__ERROR;
-    errRep( FUNC_NAME, "NULL smfData pointer provided"
+    errRep( "", FUNC_NAME ": NULL smfData pointer provided"
             " (possible programming error)", status);
     return 0;
   }
@@ -128,60 +135,68 @@ int smf_isfft( const smfData *indata, dim_t *ntslice, int *status ) {
     /* Looks like frequency-domain data */
     retval = 1;
 
-    /* Check length of corresponding time-domain array if requested */
-    if( ntslice ) {
+    /* Check dimensions of data if requested */
+    if( ntslice || nbolo || nf ) {
 
       /* Get numbers of detectors */
       if( indata->ndims==2 ) {
-        nbolo = 1;
+        nbolo0 = 1;
       } else {
-        nbolo = indata->dims[1]*indata->dims[2];
+        nbolo0 = indata->dims[1]*indata->dims[2];
       }
 
       /* Frequency is always the first dimension */
-      nf = indata->dims[0];
+      nf0 = indata->dims[0];
 
       /* Check for a real value at the Nyquist frequency to decide if the
          number of time slices is even or odd */
     
       val = indata->pntr[0];     /* Init pointer to last imag. of 1st bolo */
-      val += nf*nbolo + (nf-1);
+      val += nf0*nbolo0 + (nf0-1);
 
-      for( i=0; isreal && (i<nbolo); i++ ) {      
+      for( i=0; isreal && (i<nbolo0); i++ ) {      
         if( *val ) { 
           /* If complex-valued the input array had an odd length */
           isreal = 0;
         }
 
         /* Increment pointer to end of next bolo */
-        val += nf;
+        val += nf0;
       }
 
-      /* Set ntslice after checking all the detectors */
-      *ntslice = nf*2 - 1 - isreal; 
+      if( ntslice ) *ntslice = nf0*2 - 1 - isreal; 
+      if( nbolo ) *nbolo = nbolo0;
+      if( nf ) *nf = nf0;
+
     }
     
   } else if( (indata->ndims==1) || (indata->ndims==3) ) {
     /* Looks like time-domain data */
     retval = 0;
 
-    /* Work out ntslice if requested */
-    if( ntslice ) {
+    /* Check dimensions of data if requested */
+
+    if( nf ) *nf = 0;
+
+    if( ntslice || nbolo ) {
       if( indata->ndims == 1 ) {
-        *ntslice = indata->dims[0];
+        if( ntslice ) *ntslice = indata->dims[0];
+        if( nbolo ) *nbolo = 1;
       } else {
         if( indata->isTordered ) {
-          *ntslice = indata->dims[2];          
+          if( ntslice ) *ntslice = indata->dims[2];          
+          if( nbolo ) *nbolo = indata->dims[0]*indata->dims[1];
         } else {
-          *ntslice = indata->dims[0];
+          if( ntslice ) *ntslice = indata->dims[0];
+          if( nbolo ) *nbolo = indata->dims[1]*indata->dims[2];
         }
       }
     }    
   } else {
     /* Who knows... */
     *status = SAI__ERROR;
-    errRep( FUNC_NAME, 
-            "Can't determine whether data are time- or frequency-domain", 
+    errRep( "", FUNC_NAME 
+            ": Can't determine whether data are time- or frequency-domain", 
             status);
   }
 

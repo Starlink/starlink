@@ -184,14 +184,10 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
     isFFT = 0;
   } else if( (data->ndims==2) && (data->dims[1]==2) ) {
     /* 1-d FFT of a single bolo */
-    nf = data->dims[0];
-    nbolo=1;
-    isFFT = smf_isfft( data, &ntslice, status );
+    isFFT = smf_isfft( data, &ntslice, &nbolo, &nf, status );
   } else if( (data->ndims==4) && (data->dims[3]==2) ) {
     /* 3-d FFT of entire subarray */
-    nf = data->dims[0];
-    nbolo=data->dims[1]*data->dims[2];
-    isFFT = smf_isfft( data, &ntslice, status );
+    isFFT = smf_isfft( data, &ntslice, &nbolo, &nf, status );
   } else {
     *status = SAI__ERROR;
     errRep( FUNC_NAME, "smfData has strange dimensions", status );

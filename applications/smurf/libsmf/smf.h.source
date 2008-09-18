@@ -1075,7 +1075,8 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
 
 smfData *smf_fft_data( const smfData *indata, int inverse, int *status );
 
-int smf_isfft( const smfData *data, dim_t *ntslice, int * status );
+int smf_isfft( const smfData *indata, dim_t *ntslice, dim_t *nbolo, 
+               dim_t *nf, int *status );
 
 void smf_calc_mode( smfHead * hdr, int * status );
 
@@ -1114,3 +1115,5 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
                      const double bolref[], const Grp* prvgrp, int * status );
 
 void smf_clean_dksquid( smfData *indata, size_t window, int *status );
+
+void smf_fft_cart2pol( smfData *data, int inverse, int *status ); 
