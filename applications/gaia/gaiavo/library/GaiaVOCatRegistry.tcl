@@ -73,6 +73,7 @@ itcl::class gaiavo::GaiaVOCatRegistry {
    #  ------------
    constructor {args} {
       eval itk_initialize $args
+      wm title $w_ "Query VO Registry for services"
    }
 
    #  Destructor:
@@ -99,7 +100,8 @@ itcl::class gaiavo::GaiaVOCatRegistry {
          gaiavo::GaiaVORegistrySearch $w_.registry \
             -feedbackcommand  [code $this set_feedback] \
             -astrocat [code $w_.cat] \
-            -command [code $this query_done]
+            -command [code $this query_done] \
+            -query_cmd [code $this query]
       }
       pack $itk_component(registry) -side top -fill both -expand 1
       add_short_help $itk_component(registry) {Controls to set registry query}

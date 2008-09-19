@@ -194,6 +194,9 @@ itcl::class gaiavo::GaiaVOCat {
       pack $itk_component(results) -side top -fill both -expand 1
       add_short_help $itk_component(results) {Results of query to repository}
 
+      #  Double click is same as "Open".
+      bind $itk_component(results).listbox <Double-1> [code $this open]
+
       #  Add the dialog button frame and the action buttons.
       itk_component add buttons {
          frame $w_.buttons -borderwidth 2 -relief raised

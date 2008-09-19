@@ -120,7 +120,8 @@ itcl::class gaiavo::GaiaVORegistrySearch {
             -labelwidth $lwidth \
             -valuewidth $vwidth \
             -value $itk_option(-predicate) \
-            -textvariable [scope itk_option(-predicate)]
+            -textvariable [scope itk_option(-predicate)] \
+            -command [code $this start_query_]
       }
       pack $itk_component(predicate) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(predicate)  \
@@ -135,6 +136,14 @@ itcl::class gaiavo::GaiaVORegistrySearch {
 
    #  Methods:
    #  --------
+
+   #  Start query. If a query_cmd is registered then this will be performed
+   #  when <Return> is pressed in the predicate field.
+   protected method start_query_ {args} {
+      if { $itk_option(-query_cmd) != {} } {
+         eval $itk_option(-query_cmd)
+      }
+   }
 
    #  Do the query as a batch job.
    public method query {} {
@@ -250,6 +259,11 @@ itcl::class gaiavo::GaiaVORegistrySearch {
 
    #  An astrocat instance for handling the result as a TST.
    itk_option define -astrocat astrocat AstroCat {}
+
+   #  Command to execute to inititate a query externally (that's use this to
+   #  do the same job as the "Query" button). Issued when return is pressed in
+   #  the predicate entry.
+   itk_option define -query_cmd query_cmd Query_Cmd {}
 
    #  Protected variables: (available to instance)
    #  --------------------

@@ -72,6 +72,7 @@ itcl::class gaiavo::GaiaVOCatSIAP {
    #  Constructor:
    #  ------------
    constructor {args} {
+      wm title $w_ "Query VO Simple Image Access server"
       eval itk_initialize $args
    }
 
@@ -140,6 +141,19 @@ itcl::class gaiavo::GaiaVOCatSIAP {
       eval lassign "$row" $headers
       if { [info exists accessURL] } {
          return $accessURL
+      }
+      return {}
+   }
+
+   #  Extract a name for SIAP service from a list of headers
+   #  and the associated data row.
+   public proc getName {headers row} {
+      eval lassign "$row" $headers
+      if { [info exists shortName] && $shortName != {} } {
+         return $shortName
+      }
+      if { [info exists title] } {
+         return $title
       }
       return {}
    }

@@ -84,7 +84,7 @@ itcl::class gaia::GaiaUrlGet {
       #  Create the interface.
       #  Label for URL.
       itk_component add label {
-         label $w_.label -wraplength 400
+         label $w_.label -wraplength 500
       }
       pack $itk_component(label) -side top -fill x -expand 1 -pady 5 -padx 5
 
