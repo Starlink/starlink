@@ -427,4 +427,18 @@ namespace gaia {
 
         return 1;
     }
+
+    /** 
+     *  Get the value of a named INFO element.
+     */
+    int VOTable::infoValue( const char *name, string& value )
+    {
+        if ( votable1_ ) {
+            return votable_info_value( *votable1_, name, value );
+        }
+        else if ( votable2_ ) {
+            return votable_info_value( *votable2_, name, value );
+        }
+        return 0;
+    }
 }

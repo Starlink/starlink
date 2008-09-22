@@ -80,3 +80,7 @@ int data_fitsdata( const NS::FITS& fdata, ofstream& out, int& id_index,
                    bool& dec_radians );
 
 int field_arraysize( const NS::FIELD& field );
+
+int votable_info_value( NS::VOTABLE& votable, const char *namevalue,
+                        string &value );
+

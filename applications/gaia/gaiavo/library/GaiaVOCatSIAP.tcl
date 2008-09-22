@@ -84,6 +84,48 @@ itcl::class gaiavo::GaiaVOCatSIAP {
    #  Methods:
    #  --------
 
+   #  Add additional menu items. Nameserver.
+   public method init {} {
+      GaiaVOCat::init
+
+      set m [add_menubutton Options "Options menu"]
+
+      set ns_menu [menu $m.ns]
+      add_menuitem $m cascade "Set Name Server" \
+         {Select the name server used to resolve astronomical object names} \
+         -menu $ns_menu
+
+      if { [catch {set list [$w_.cat info namesvr]} msg] } {
+         error_dialog $msg $w_
+         return
+      }
+
+      foreach namesvr $list {
+         $ns_menu add radiobutton \
+            -label $namesvr \
+            -command [code $this set_namesvr $namesvr] \
+            -variable [scope itk_option(-namesvr)]
+      }
+
+      if { ![info exists namesvr] } {
+         error_dialog "No default name server found for astronomical objects"
+         return
+      }
+
+      #  Set default name server.
+      set_namesvr $namesvr
+   }
+
+   #  Set the name server used, pass to other components.
+   public method set_namesvr {name} {
+      configure -namesvr $name
+      if { [info exists itk_component(siap)] } {
+         $itk_component(siap) configure -namesvr $name
+      } else {
+         puts "skipped component(siap)"
+      }
+   }
+
    #  Add the component that will control the query.
    protected method add_query_component_ {} {
 
@@ -92,7 +134,8 @@ itcl::class gaiavo::GaiaVOCatSIAP {
             -accessURL $itk_option(-accessURL) \
             -feedbackcommand  [code $this set_feedback] \
             -astrocat [code $w_.cat] \
-            -command [code $this query_done]
+            -command [code $this query_done] \
+            -namesvr $itk_option(-namesvr)
       }
       pack $itk_component(siap) -side top -fill both -expand 1
       add_short_help $itk_component(siap) {Controls for querying SIAP server}
@@ -166,6 +209,9 @@ itcl::class gaiavo::GaiaVOCatSIAP {
 
    #  Instance of GAIA to display the image.
    itk_option define -gaia gaia Gaia {}
+
+   #  The name server.
+   itk_option define -namesvr namesvr NameSvr {}
 
    #  Protected variables: (available to instance)
    #  --------------------

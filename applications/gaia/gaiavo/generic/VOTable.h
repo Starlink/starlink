@@ -101,6 +101,9 @@ namespace gaia
         //  Convert an extended Skycat catalogue into a VOTable.
         int readTST( AstroCatalog *cat );
 
+        //  Get the value of a named INFO element.
+        int infoValue( const char *name, string& value );
+
     protected:
 
         //  Create namespace qualified versions of VOTable members for the

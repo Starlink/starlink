@@ -95,6 +95,18 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
       pack $itk_component(server) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(server) {SIAP server URL}
 
+      #  Get the position from an object name lookup.
+      itk_component add object {
+         LabelEntry $w_.object \
+            -text "Object name:" \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
+            -command [code $this object_query_]
+      }
+      pack $itk_component(object) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(object) \
+         {Name of an object to lookup, press <Return> to activate}
+
       #  Get the position on the sky, an RA and a Dec.
       itk_component add ra {
          LabelEntry $w_.ra \
@@ -105,7 +117,7 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
             -textvariable [scope ra_]
       }
       pack $itk_component(ra) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(ra) {RA centre of images}
+      add_short_help $itk_component(ra) {RA centre of images, degrees or HH:MM:SS}
 
       itk_component add dec {
          LabelEntry $w_.dec \
@@ -116,7 +128,7 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
             -textvariable [scope dec_]
       }
       pack $itk_component(dec) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(dec) {Dec centre of images}
+      add_short_help $itk_component(dec) {Dec centre of images, degrees or DD:MM:SS}
 
       itk_component add size {
          LabelEntry $w_.size \
@@ -127,7 +139,7 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
             -textvariable [scope size_]
       }
       pack $itk_component(size) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(size) {Size of images}
+      add_short_help $itk_component(size) {Size of images, arcminutes}
    }
 
    #  Destructor:
@@ -139,13 +151,18 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
    #  Methods:
    #  --------
 
-   #  Do the query as a batch job.
+   #  Do the query as a background job.
    public method query {} {
 
       #  Query starts, so might want to do something.
       if { $itk_option(-feedbackcommand) != {} } {
          eval $itk_option(-feedbackcommand) on
       }
+
+      #  Transform RA and Dec values into degrees, if needed. The search size
+      #  is in arcminutes, transform that.
+      lassign [skycat::.wcs hmstod $ra_ $dec_] ra dec
+      set size [expr $size_/60.0]
 
       #  Establish object to run the query script.
       if { $querytask_ == {} } {
@@ -155,7 +172,7 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
       }
       set votable_ [$tempcats_ get_typed_name ".vot"]
       set interrupted_ 0
-      $querytask_ runwith $itk_option(-accessURL) $ra_ $dec_ $size_ $votable_
+      $querytask_ runwith $itk_option(-accessURL) $ra $dec $size $votable_
    }
 
    #  Interrupt the query.
@@ -205,16 +222,51 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
 
       #  Convert to a TST file so we can open it up as usual.
       set vot [gaiavotable::open $filename]
-      set tempname [$tempcats_ get_name]
-      set tst [gaiavotable::save $vot 0 $tempname]
-      gaiavotable::close $vot
 
-      #  This is the current VOTable now.
-      set votable_ $filename
+      #  Check the STATUS return.
+      set status [gaiavotable::info $vot "QUERY_STATUS"]
+      if { $status != "ERROR" } {
+         set tempname [$tempcats_ get_name]
+         set tst [gaiavotable::save $vot 0 $tempname]
+         gaiavotable::close $vot
 
-      #  Do command so that something happens.
-      if { $itk_option(-command) != {} } {
-         eval $itk_option(-command) $tempname
+         #  This is the current VOTable now.
+         set votable_ $filename
+
+         #  Do command so that something happens.
+         if { $itk_option(-command) != {} } {
+            eval $itk_option(-command) $tempname
+         }
+      } else {
+         warning_dialog "Query returned an error ($status)"
+      }
+   }
+
+   #  Perform a query for the position of an object.
+   protected method object_query_ {args} {
+      set name [$itk_component(object) get]
+      if { $name != {} } {
+         if { $batch_ == {} } {
+            set batch_ [Batch $w_.batch \
+                           -command [code $this name_query_done_]]
+         }
+         blt::busy hold $w_
+         $batch_ bg_eval [code $this do_object_query_ $itk_option(-namesvr) $name]
+      }
+   }
+
+   #  Do the name server query.
+   protected method do_object_query_ {namesvr name} {
+      return [$itk_option(-astrocat) namesvr $itk_option(-namesvr) $name]
+   }
+
+   #  Called when a name server query completes.
+   protected method name_query_done_ {status args} {
+      blt::busy release $w_
+      if { $status } {
+         error_dialog $args
+      } else {
+         eval lassign $args ra_ dec_
       }
    }
 
@@ -233,6 +285,9 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
    #  An astrocat instance for handling the result as a TST.
    itk_option define -astrocat astrocat AstroCat {}
 
+   #  Nameserver for looking up object coordinates.
+   itk_option define -namesvr namesvr NameSvr ned@eso
+
    #  Protected variables: (available to instance)
    #  --------------------
 
@@ -249,9 +304,12 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
    protected variable interrupted_ 0
 
    #  SIAP RA, Dec and size.
-   protected variable ra_ 0.0
-   protected variable dec_ 0.0
-   protected variable size_ 0.01
+   protected variable ra_ 00:00:00
+   protected variable dec_ 00:00:00
+   protected variable size_ 10
+
+   #  Batch job handler.
+   protected variable batch_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

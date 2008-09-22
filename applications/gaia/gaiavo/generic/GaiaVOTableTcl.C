@@ -59,6 +59,8 @@ static int GaiaVOTableTclListHeadings( ClientData clientData, Tcl_Interp *interp
                                        int objc, Tcl_Obj *CONST objv[] );
 static int GaiaVOTableTclOpen( ClientData clientData, Tcl_Interp *interp,
                                int objc, Tcl_Obj *CONST objv[] );
+static int GaiaVOTableTclInfo( ClientData clientData, Tcl_Interp *interp,
+                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaVOTableTclRead( ClientData clientData, Tcl_Interp *interp,
                                int objc, Tcl_Obj *CONST objv[] );
 static int GaiaVOTableTclSave( ClientData clientData, Tcl_Interp *interp,
@@ -79,6 +81,9 @@ int GaiaVOTable_Init( Tcl_Interp *interp )
                           (Tcl_CmdDeleteProc *) NULL );
     Tcl_CreateObjCommand( interp, "gaiavotable::listheadings", 
                           GaiaVOTableTclListHeadings,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+    Tcl_CreateObjCommand( interp, "gaiavotable::info", GaiaVOTableTclInfo,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
     Tcl_CreateObjCommand( interp, "gaiavotable::open", GaiaVOTableTclOpen,
@@ -298,6 +303,40 @@ static int GaiaVOTableTclSave( ClientData clientData, Tcl_Interp *interp,
                 return TCL_OK;
             }
             Tcl_SetResult( interp, const_cast<char *>( "Failed to save TABLE" ), 
+                           TCL_VOLATILE );
+        }
+    }
+    return TCL_ERROR;
+}
+
+/**
+ *  Get an INFO value from a VOTable. The INFO is identified by it's name.
+ *  (e.q. "QUERY_STATUS" for <INFO name="QUERY_STATUS">).
+ */
+static int GaiaVOTableTclInfo( ClientData clientData, Tcl_Interp *interp,
+                               int objc, Tcl_Obj *CONST objv[] )
+{
+    VOTable *table;
+    string str;
+
+    /*  Check arguments, only allow two, the address of the VOTable and the
+     *  name of the INFO element. */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "votable_reference INFO_name" );
+        return TCL_ERROR;
+    }
+
+    /*  Import the table. */
+    if ( importVOTableHandle( interp, objv[1], table ) == TCL_OK ) {
+
+        /*  Get the value. */
+        if ( table->infoValue( Tcl_GetString( objv[2] ), str ) ) {
+            Tcl_SetResult( interp, const_cast<char *>( str.c_str() ), 
+                           TCL_VOLATILE );
+            return TCL_OK;
+        }
+        else {
+            Tcl_SetResult( interp, const_cast<char *>( "Failed to locate INFO value" ), 
                            TCL_VOLATILE );
         }
     }
