@@ -19,6 +19,9 @@
  *     A special override of the plot_objects function is added to
  *     sort out problems with catalogues that have both WCS and X-Y
  *     coordinates.
+ * 
+ *     A "namesvr" command is provided so that coordinates can be 
+ *     retrieved for objects, without doing a full catalogue or image query.
 
  *  Authors:
  *     P.W. Draper (PWD)
@@ -26,6 +29,7 @@
  *  Copyright:
  *     Copyright (C) 1998-2000 Central Laboratory of the Research Councils
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     Copyright (C) 2008 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -86,14 +90,15 @@ public:
     int min_args;          // minimum number of args
     int max_args;          // maximum number of args
 } subcmds_[] = {
-    {"check",   &GaiaSkySearch::checkCmd,        1,  1},
-    {"content", &GaiaSkySearch::contentCmd,      0,  0},
-    {"csize",   &GaiaSkySearch::csizeCmd,        1,  1},
-    {"entry",   &GaiaSkySearch::entryCmd,        1,  4},
-    {"info",    &GaiaSkySearch::infoCmd,         1,  2},
-    {"open",    &GaiaSkySearch::openCmd,         1,  2},
-    {"origin",  &GaiaSkySearch::originCmd,       0,  2},
-    {"save",    &GaiaSkySearch::saveCmd,         1,  5}
+    {"check",      &GaiaSkySearch::checkCmd,        1,  1},
+    {"content",    &GaiaSkySearch::contentCmd,      0,  0},
+    {"csize",      &GaiaSkySearch::csizeCmd,        1,  1},
+    {"entry",      &GaiaSkySearch::entryCmd,        1,  4},
+    {"info",       &GaiaSkySearch::infoCmd,         1,  2},
+    {"namesvr",    &GaiaSkySearch::namesvrCmd,      2,  2},
+    {"open",       &GaiaSkySearch::openCmd,         1,  2},
+    {"origin",     &GaiaSkySearch::originCmd,       0,  2},
+    {"save",       &GaiaSkySearch::saveCmd,         1,  5}
 };
 
 /**
@@ -883,5 +888,40 @@ int GaiaSkySearch::contentCmd( int argc, char *argv[] )
             Tcl_AppendResult(interp_, "}", NULL);
         }
     }
+    return TCL_OK;
+}
+
+/**
+ *  Return the RA and Dec for a named object using the given nameserver.
+ */
+int GaiaSkySearch::namesvrCmd( int argc, char *argv[] )
+{
+    AstroCatalog* cat = AstroCatalog::open( argv[0] );
+
+    if ( cat == NULL ) {
+        return TCL_ERROR;
+    }
+
+    QueryResult result;
+    if ( cat->getObject( argv[1], 0, NULL, result ) ) {
+        delete cat;
+        return TCL_ERROR;
+    }
+
+    WorldCoords pos;
+    if ( result.getPos( 0, pos ) != 0 ) {
+        delete cat;
+        return TCL_ERROR;
+    }
+
+    char ra_buf[32];
+    char dec_buf[32];
+    pos.print( ra_buf, dec_buf, cat->equinox() );
+
+    char buf[80];
+    sprintf( buf, "%s %s", ra_buf, dec_buf );
+
+    Tcl_SetResult( interp_, buf, NULL );
+    delete cat;
     return TCL_OK;
 }
