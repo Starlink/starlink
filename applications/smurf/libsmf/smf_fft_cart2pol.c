@@ -147,7 +147,7 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
         } else {
           /* Convert polar --> cartesian */
           if( power ) {
-            if( amp < 0 ) {
+            if( baseR[j] < 0 ) {
               /* Check for sqrt of negative number */
               *status = SAI__ERROR;
               errRep( "", FUNC_NAME 
@@ -169,9 +169,9 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
     } else {
       for( j=0; j<nf; j++ ) {
         /* Convert cartesian --> polar */
-        amp = sqrt( baseR[j]*baseR[j] + baseI[j]*baseI[j] );
+        amp = baseR[j]*baseR[j] + baseI[j]*baseI[j];
+        if( !power ) amp = sqrt(amp);
         theta = atan2( baseI[j], baseR[j] );
-        if( power ) amp = amp*amp;
         baseR[j] = amp;
         baseI[j] = theta;
       }
