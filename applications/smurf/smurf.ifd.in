@@ -2260,6 +2260,24 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter polar {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {Use polar instead of cartesian representation of FFT?}
+                ppath GLOBAL CURRENT
+                default FALSE
+                helpkey *
+            }
+
+            parameter power {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {Calculate power spectrum (in polar coordinates)?}
+                ppath GLOBAL CURRENT
+                default FALSE
+                helpkey *
+            }
+
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}

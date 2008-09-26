@@ -36,6 +36,10 @@
 *          Input files to be transformed
 *     INVERSE = _LOGICAL (Read)
 *          If true perform inverse transform
+*     POLAR = _LOGICAL (Read)
+*          If true use polar representation (amplitude,argument) of FFT
+*     POWER = _LOGICAL (Read)
+*          If set use polar representation of FFT with squared amplitudes
 *     OUT = NDF (Write)
 *          Output files
 
@@ -116,6 +120,8 @@ void smurf_sc2fft( int *status ) {
   Grp *ogrp = NULL;         /* Output group of files */
   size_t outsize;           /* Total number of NDF names in the output group */
   char *pname=NULL;         /* Poiner to fname */
+  int polar=0;              /* Flag for FFT in polar coordinates */
+  int power=0;              /* Flag for squaring amplitude coeffs */
   size_t size;              /* Number of files in input group */
 
   /* Main routine */
@@ -139,12 +145,25 @@ void smurf_sc2fft( int *status ) {
     kpg1Wgndf( "OUT", igrp, size, size, "More output files required...",
                &ogrp, &outsize, status );
   } else {
-    msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
+    msgOutif(MSG__NORM, " ", TASK_NAME ": All supplied input frames were DARK,"
              " nothing to do", status );
   }
 
   /* Are we doing an inverse transform? */
   parGet0l( "INVERSE", &inverse, status );
+
+  /* Are we using polar coordinates instead of cartesian for the FFT? */
+  parGet0l( "POLAR", &polar, status );
+
+  /* Are we going to assume amplitudes are squared? */
+  parGet0l( "POWER", &power, status );
+
+  /* If power is true, we must be in polar form */
+  if( power && !polar) {
+    msgOutif( MSG__NORM, " ", TASK_NAME 
+              ": power spectrum requested so setting POLAR=TRUE", status );
+    polar = 1;
+  }
 
   /* Loop over input files */
   for( i=1; (*status==SAI__OK)&&(i<=size); i++ ) {
@@ -156,8 +175,8 @@ void smurf_sc2fft( int *status ) {
     if( smf_isfft(idata,NULL,NULL,NULL,status) == inverse ) {
 
       /* If inverse transform, convert to cartesian representation first */
-      if( inverse ) {
-        smf_fft_cart2pol( idata, 1, 0, status );
+      if( inverse && polar ) {
+        smf_fft_cart2pol( idata, 1, power, status );
       }
 
       /* Tranform the data */
@@ -166,9 +185,9 @@ void smurf_sc2fft( int *status ) {
       if( inverse ) {
         /* If output is time-domain, ensure that it is ICD bolo-ordered */
         smf_dataOrder( odata, 1, status );
-      } else {
+      } else if( polar ) {
         /* Store FFT of data in polar form */
-        smf_fft_cart2pol( odata, 0, 0, status );
+        smf_fft_cart2pol( odata, 0, power, status );
       }
       
       /* Export the data to a new file */
