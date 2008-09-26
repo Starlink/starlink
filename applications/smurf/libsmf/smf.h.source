@@ -1116,4 +1116,4 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
 
 void smf_clean_dksquid( smfData *indata, size_t window, int *status );
 
-void smf_fft_cart2pol( smfData *data, int inverse, int *status ); 
+void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ); 

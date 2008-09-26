@@ -157,7 +157,7 @@ void smurf_sc2fft( int *status ) {
 
       /* If inverse transform, convert to cartesian representation first */
       if( inverse ) {
-        smf_fft_cart2pol( idata, 1, status );
+        smf_fft_cart2pol( idata, 1, 0, status );
       }
 
       /* Tranform the data */
@@ -168,7 +168,7 @@ void smurf_sc2fft( int *status ) {
         smf_dataOrder( odata, 1, status );
       } else {
         /* Store FFT of data in polar form */
-        smf_fft_cart2pol( odata, 0, status );
+        smf_fft_cart2pol( odata, 0, 0, status );
       }
       
       /* Export the data to a new file */

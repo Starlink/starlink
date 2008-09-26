@@ -13,13 +13,16 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     void smf_fft_cart2pol( smfData *data, int inverse, int *status );
+*     void smf_fft_cart2pol( smfData *data, int inverse, int power, 
+*                            int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
 *        smfData to convert
 *     inverse = int (Given)
 *        If set convert polar --> cartesian. Otherwise cartesian --> polar.
+*     power = int (Given)
+*        If set, magnitudes in polar form are squared to give power units
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -95,7 +98,7 @@
 
 #define FUNC_NAME "smf_fft_cart2pol"
 
-void smf_fft_cart2pol( smfData *data, int inverse, int *status ) {
+void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
 
   double amp;                   /* Amplitude coeff */
   double *baseR=NULL;           /* base pointer to real/amplitude coeff */
@@ -133,7 +136,6 @@ void smf_fft_cart2pol( smfData *data, int inverse, int *status ) {
     baseR += i*nf;
     baseI = baseR + nf*nbolo;
 
-
     if( inverse ) {
       for( j=0; (*status==SAI__OK)&&(j<nf); j++ ) {
         if( fabs(baseI[j]) > AST__DPI ) {
@@ -141,13 +143,25 @@ void smf_fft_cart2pol( smfData *data, int inverse, int *status ) {
           *status = SAI__ERROR;
           errRep( "", FUNC_NAME 
                   ": abs(argument) > PI. FFT data may not be in polar form.", 
-                  status);
-          
+                  status);          
         } else {
           /* Convert polar --> cartesian */
+          if( power ) {
+            if( amp < 0 ) {
+              /* Check for sqrt of negative number */
+              *status = SAI__ERROR;
+              errRep( "", FUNC_NAME 
+                      ": amplitude^2 < 0. FFT data may not be in correct form", 
+                      status);          
+            } else {
+              amp = sqrt(baseR[j]);
+            }
+          } else {
+            amp = baseR[j];
+          }
+
           real = baseR[j]*cos(baseI[j]);
           imag = baseR[j]*sin(baseI[j]);
-          //printf( "%d %d %d %d\n", baseR, baseI, real, imag); 
           baseR[j] = real;
           baseI[j] = imag;
         }
@@ -157,6 +171,7 @@ void smf_fft_cart2pol( smfData *data, int inverse, int *status ) {
         /* Convert cartesian --> polar */
         amp = sqrt( baseR[j]*baseR[j] + baseI[j]*baseI[j] );
         theta = atan2( baseI[j], baseR[j] );
+        if( power ) amp = amp*amp;
         baseR[j] = amp;
         baseI[j] = theta;
       }
