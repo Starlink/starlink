@@ -182,6 +182,9 @@
 *        will receive contributions from different input files, not
 *        necessarily starting at the first input file or ending at the
 *        last.
+*     26-SEP-2008 (DSB):
+*        Increased tolerance for variations in Tsys conversion factor
+*        from 0.001% to 1.0%.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -298,10 +301,10 @@ void  smf_rebincube( smfData *data, int first, int last,
 
    } else if( fcon2 != *fcon && *fcon != VAL__BADD) {
 
-/* fcon can be different by fraction of a percent and still be accurate enough 
+/* fcon can be different by small amount and still be accurate enough 
    for our purposes */
       double percent = 100.0 * fabs(*fcon - fcon2 ) / *fcon;
-      if ( percent > 0.001) {
+      if ( percent > 1.0 ) {
         msgSetd( "ORI", *fcon );
         msgSetd( "NEW", fcon2 );
         msgSetc( "FILE", data->file->name );
