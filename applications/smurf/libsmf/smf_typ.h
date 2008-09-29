@@ -222,7 +222,8 @@ typedef enum smf_modeltype {
   SMF__NOI=5,             /* Noise model */
   SMF__EXT=6,             /* Extinction correction */
   SMF__LUT=7,             /* Pointing LUT */
-  SMF__QUA=8              /* Quality flags */
+  SMF__QUA=8,             /* Quality flags */
+  SMF__DKS=9              /* Dark squid signals */  
 } smf_modeltype;
 
 /* Observing mode and type */

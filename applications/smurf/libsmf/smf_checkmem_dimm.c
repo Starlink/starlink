@@ -108,8 +108,10 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
 
 
  /* Local Variables */
-  dim_t i;                       /* Loop counter */
+  dim_t i;                     /* Loop counter */
+  size_t ncol;                 /* Number of columns */
   size_t ndet;                 /* Number of detectors each time step */
+  size_t nrow;                 /* Number of rows */
   size_t nsamp;                /* ndet*maxlen */
   size_t total;                /* Total bytes required */
 
@@ -120,21 +122,22 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
 
   if( maxlen < 1 ) {
     *status = SAI__ERROR;
-    errRep("FUNC_NAME", "maxlen cannot be < 1", status);
+    errRep("", FUNC_NAME ": maxlen cannot be < 1", status);
   }
 
   if( (nrelated < 1) || (nrelated > SMF__MXSMF) ) {
     msgSeti("NREL",nrelated);
     msgSeti("MAXREL",SMF__MXSMF);
     *status = SAI__ERROR;
-    errRep("FUNC_NAME", "nrelated, ^NREL, must be in the range [1,^MAXREL]", 
+    errRep("", FUNC_NAME ": nrelated, ^NREL, must be in the range [1,^MAXREL]", 
 	   status);    
   }
 
   if( modeltyps ) {
     if( nmodels < 1 ) {
     *status = SAI__ERROR;
-    errRep("FUNC_NAME", "modeltyps specified, mmodels cannot be < 1", status);
+    errRep("", FUNC_NAME ": modeltyps specified, mmodels cannot be < 1", 
+           status);
     }
   }
 
@@ -143,11 +146,20 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
     /* How many detectors at each time step? */
     switch( instrument ) {
     case INST__SCUBA2:
-      ndet = 40*32;
+      /* Kludgey, but at least we check SMF__COL_INDEX so this will help
+         us catch possible future problems if order is changed */
+      if( SMF__COL_INDEX ) {
+        ncol = 32;
+        nrow = 40;
+      } else {
+        ncol = 40;
+        nrow = 32;
+      }
+      ndet = ncol*nrow;
       break;
     default:
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Invalid instrument given.", status);
+      errRep("", FUNC_NAME ": Invalid instrument given.", status);
     }
   }
 
@@ -181,9 +193,13 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
 	case SMF__EXT:
 	  total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
 	  break;
+        case SMF__DKS:
+          total += (maxlen + nrow*2)*ncol*smf_dtype_sz(SMF__DOUBLE,status) *
+            nrelated;
+          break;
 	default:
 	  *status = SAI__ERROR;
-	  errRep(FUNC_NAME, "Invalid smf_modeltype given.", status);
+	  errRep("", FUNC_NAME ": Invalid smf_modeltype given.", status);
 	}
 
 	/* Exit on bad status */
@@ -198,8 +214,8 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
       *status = SMF__NOMEM;
       msgSeti("REQ",total/SMF__MB);
       msgSeti("AVAIL",available/SMF__MB);
-      errRep("FUNC_NAME", 
-	     "Requested memory ^REQ Mb for map exceeds available ^AVAIL Mb", 
+      errRep("", FUNC_NAME 
+	     ": Requested memory ^REQ Mb for map exceeds available ^AVAIL Mb", 
 	     status);
     }
 

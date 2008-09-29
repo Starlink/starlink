@@ -1114,6 +1114,11 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
                      const double heater[], const double powref[],
                      const double bolref[], const Grp* prvgrp, int * status );
 
-void smf_clean_dksquid( smfData *indata, size_t window, int *status );
+void smf_clean_dksquid( smfData *indata, unsigned char *quality, 
+                        size_t window,  smfData *model, 
+                        int calcdk, int nofit, int *status );
 
 void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ); 
+
+void smf_calcmodel_dks( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
+			smfArray **allmodel, int flags, int *status);

@@ -495,6 +495,21 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
             head.data.dims[2] = (idata->dims)[2];
             break;
 
+          case SMF__DKS: /* Scaled Dark SQUID */
+            head.data.dtype = SMF__DOUBLE;
+            head.data.ndims = 2;
+            /* Store column dark squid followed by gain+offset each row */
+            if( isTordered ) { /* T is 3rd axis if time-ordered */
+              head.data.dims[0] = (idata->dims)[2] + 
+                (idata->dims)[SMF__ROW_INDEX]*2;
+              head.data.dims[1] = (idata->dims)[SMF__COL_INDEX];
+            } else {           /* T is 1st axis if bolo-ordered */
+              head.data.dims[0] = (idata->dims)[0] + 
+                (idata->dims)[1+SMF__ROW_INDEX]*2;
+              head.data.dims[1] = (idata->dims)[1+SMF__COL_INDEX];
+            }
+            break;
+
           default:
             *status = SAI__ERROR;
             msgSetc( "TYPE", smf_model_getname(mtype, status) );
@@ -643,6 +658,17 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
               smf_fits_getD( idata->hdr, "MEANWVM", &tau, status );
               smf_correct_extinction( idata, "CSOTAU", 1, tau, 
                                       (double *) dataptr, status );
+
+            } else if( mtype == SMF__DKS ) {
+              /* Initialize the model to hold an un-smoothed copy of
+                 the dark squids (get smoothed later in smf_calcmodel_dks).
+                 Since we need to pass a smfData to clean_dksquid, kludge
+                 head.data so that its pntr[0] temporarily points to the
+                 model data array. */
+
+              head.data.pntr[0] = dataptr;
+              smf_clean_dksquid( idata, NULL, 0, &(head.data), 1, 1, status ); 
+              head.data.pntr[0] = NULL;
 
             } else {
               /* otherwise zero the buffer */

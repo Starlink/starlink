@@ -116,10 +116,12 @@ smf_modeltype smf_model_gettype( const char *modelname, int *status ) {
     return SMF__LUT;
   } else if( strncmp( tempstring, "QUA", 3 ) == 0 ) {
     return SMF__QUA;
+  } else if( strncmp( tempstring, "DKS", 3 ) == 0 ) {
+    return SMF__DKS;
   } else {
     *status = SAI__ERROR;
     msgSetc("MNAME",modelname);
-    errRep(FUNC_NAME, "Invalid model name ^MNAME", status);        
+    errRep("", FUNC_NAME ": Invalid model name ^MNAME", status);        
   }
 
   return SMF__NUL;

@@ -90,7 +90,7 @@
 
 #define FUNC_NAME "smf_model_getname"
 
-const char *smf_model_getname( smf_modeltype type, int *status) {
+const char *smf_model_getname( smf_modeltype type, int *status ) {
 
   /* Local Variables */
   const char *retval = NULL;
@@ -135,10 +135,14 @@ const char *smf_model_getname( smf_modeltype type, int *status) {
     retval = "qua";
     break;
 
+  case SMF__DKS:
+    retval = "dks";
+    break;
+
   default:
     retval = "nul";
     *status = SAI__ERROR;
-    errRep(FUNC_NAME, "Invalid smf_modeltype given.", status);        
+    errRep( "", FUNC_NAME ": Invalid smf_modeltype given.", status);        
   }
 
   return retval;
