@@ -135,9 +135,10 @@ itcl::class gaiavo::GaiaVOCatSIAP {
             -feedbackcommand  [code $this set_feedback] \
             -astrocat [code $w_.cat] \
             -command [code $this query_done] \
-            -namesvr $itk_option(-namesvr)
+            -namesvr $itk_option(-namesvr) \
+            -gaiactrl [$itk_option(-gaia) get_image]
       }
-      pack $itk_component(siap) -side top -fill both -expand 1
+      pack $itk_component(siap) -side top -fill x
       add_short_help $itk_component(siap) {Controls for querying SIAP server}
 
       set query_component_ $itk_component(siap)

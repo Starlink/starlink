@@ -103,7 +103,7 @@ itcl::class gaiavo::GaiaVOCatRegistry {
             -command [code $this query_done] \
             -query_cmd [code $this query]
       }
-      pack $itk_component(registry) -side top -fill both -expand 1
+      pack $itk_component(registry) -side top -fill x
       add_short_help $itk_component(registry) {Controls to set registry query}
 
       set query_component_ $itk_component(registry)

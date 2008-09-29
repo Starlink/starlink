@@ -81,11 +81,11 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
       set tempcats_ [gaia::GaiaTempName \#auto -prefix GaiaVOSIAP \
                         -exists 0 -type ".TAB"]
 
-      #  Display the SIAP accessURL. XXX Can edit during testing.
+      #  Display the SIAP accessURL.
       set lwidth 10
       set vwidth 50
       itk_component add server {
-         LabelEntry $w_.server \
+         LabelValue $w_.server \
             -text "Server:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -140,6 +140,32 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
       }
       pack $itk_component(size) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(size) {Size of images, arcminutes}
+
+      #  Additional options. Set search region from the displayed
+      #  image, mark region by dragging.
+      itk_component add options {
+         frame $w_.options
+      }
+
+      itk_component add setfromimg {
+         button $itk_component(options).setfromimg \
+            -text "Set from image" \
+            -command [code $this set_from_image]
+      }
+      pack $itk_component(setfromimg) -side right -padx 1m -pady 2m
+      add_short_help $itk_component(setfromimg) \
+         {Set search region to match currently displayed image}
+
+      itk_component add selectarea {
+         button $itk_component(options).selectarea \
+            -text "Select area..." \
+            -command [code $this select_area]
+      }
+      pack $itk_component(selectarea) -side right -padx 1m -pady 2m
+      add_short_help $itk_component(selectarea) \
+         {Select region of image with mouse button 1}
+
+      pack $itk_component(options) -fill x -expand 1
    }
 
    #  Destructor:
@@ -150,6 +176,12 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
 
    #  Methods:
    #  --------
+
+   #  Complete interface.
+   public method init {} {
+      FrameWidget::init
+      set_from_image
+   }
 
    #  Do the query as a background job.
    public method query {} {
@@ -270,6 +302,70 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
       }
    }
 
+   #  Define the region to query so that it matches the displayed image.
+   public method set_from_image {} {
+      set list [get_image_center_radius]
+      if { [llength $list] > 2 } {
+         lassign $list ra_ dec_ size_
+      }
+   }
+
+   #  Return a list of values indicating the center coordinates and radius
+   #  of the current image.
+   public method get_image_center_radius {} {
+      set image [$itk_option(-gaiactrl) get_image]
+      if { ! [$image isclear] } {
+         set center [$image wcscenter]
+         if { [llength $center] >= 2 } {
+            lassign $center ra dec equinox
+            set radius [format "%.2f" [$image wcsradius]]
+            if { $radius } {
+               return [list $ra $dec $radius]
+            }
+         }
+      }
+      return
+   }
+
+   #  Select area on the image for the query region.
+   public method select_area {} {
+      set list [select_image_area]
+      if { [llength $list] > 2 } {
+         lassign $list ra_ dec_ size_
+      }
+   }
+
+   #  Ask the user to select an area of the image by dragging out a region on
+   #  the image return the resulting center pos and radius as a list of
+   #  {ra dec radius-in-arcmin}.
+   public method select_image_area {} {
+      set image [$itk_option(-gaiactrl) get_image]
+      if { [$image isclear] } {
+         error_dialog "No image is currently loaded"
+         return
+      }
+
+      #  Get canvas coords of selected area.
+      set list [$itk_option(-gaiactrl) select_area]
+      if { [llength $list] != 4 } {
+         return
+      }
+      lassign $list x0 y0 x1 y1
+      
+      #  Get center and radius in canvas coords.
+      set x [expr ($x0+$x1)/2.]
+      set y [expr ($y0+$y1)/2.]
+      
+      if { [catch {$image convert coords $x $y canvas ra dec "wcs J2000"} msg] } {
+         error_dialog \
+            "error converting canvas ($x, $y) to world coordinates: $msg" $w_
+         return
+      }
+
+      set radius [expr [$image wcsdist $x0 $y0 $x $y]/60.]
+      return [list $ra $dec $radius]
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -287,6 +383,9 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
 
    #  Nameserver for looking up object coordinates.
    itk_option define -namesvr namesvr NameSvr ned@eso
+   
+   #  GaiaImageCtrl instance.
+   itk_option define -gaiactrl gaiactrl GaiaCtrl {}
 
    #  Protected variables: (available to instance)
    #  --------------------

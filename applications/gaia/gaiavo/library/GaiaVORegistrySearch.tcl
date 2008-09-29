@@ -87,11 +87,11 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       set tempcats_ [gaia::GaiaTempName \#auto -prefix GaiaVORegistry \
                         -exists 0 -type ".TAB"]
 
-      #  Display the registry. XXX Can edit during testing.
+      #  Display the registry.
       set lwidth 10
       set vwidth 50
       itk_component add registry {
-         LabelEntry $w_.registry \
+         LabelValue $w_.registry \
             -text "Registry:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -101,9 +101,9 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       pack $itk_component(registry) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(registry) {VO Registry}
 
-      #  Display the type of service. Can edit during testing.
+      #  Display the type of service.
       itk_component add service {
-         LabelEntry $w_.service \
+         LabelValue $w_.service \
             -text "Service:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
