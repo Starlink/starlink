@@ -10,10 +10,11 @@ chitol = 1e-6
 exportndf = 0
 
 # Model components/order (space delimited list)
+#  dks = fit and remove dark squid for the column
 #  com = remove common-mode signal
 #  ext = apply extinction correction
 #  noi = estimate time-domain variance
-modelorder = com ext noi
+modelorder = dks com ext noi
 
 # low-pass boxcar filter on COM (samples) to assist with convergence
 # if boxfact set reduce width of boxcar by this factor each iteration
@@ -21,6 +22,10 @@ modelorder = com ext noi
 com_boxcar  = 400
 com_boxfact = 0.5
 com_boxmin  = 100
+
+# low-pass filter dark squid signals using boxcar of this width (if dks
+# model is specified)
+dks_boxcar = 100
 
 # additional despiking after each iteration within noi calculation
 noispikethresh = 10
