@@ -193,8 +193,8 @@ int smf_isfft( const smfData *indata, dim_t *ntslice, dim_t *nbolo,
       }
     }    
   } else {
-    /* Who knows... */
-    *status = SAI__ERROR;
+    /* Don't know... set SMF__WDIM so that caller can trap */
+    *status = SMF__WDIM;
     errRep( "", FUNC_NAME 
             ": Can't determine whether data are time- or frequency-domain", 
             status);
