@@ -114,7 +114,7 @@ defhelp topped   $ESP_HELP
 {   Announce the ESP commands are available.
 
 print " "
-print "   ESP commands are now available (Version PKG_VERS)."
+print "   ESP commands are now available (Version 0.11-4)."
 print " "
 print "   Type `help esp' or `esphelp' for help on ESP commands."
 print " "

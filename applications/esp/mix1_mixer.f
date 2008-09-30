@@ -1,4 +1,4 @@
-      SUBROUTINE MIX1_MIXER(XMAX,YMAX,ELEMS,ARRAY1,ARRAY2,STATUS)    
+      SUBROUTINE MIX1_MIXER(XMAX,YMAX,ELEMS,SEED,ARRAY1,ARRAY2,STATUS)
 *+
 *  Name: 
 *     MIX1_MIXER
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL MIX1_MIXER(XMAX,YMAX,ELEMS,ARRAY1,ARRAY2,STATUS)
+*     CALL MIX1_MIXER(XMAX,YMAX,ELEMS,SEED,ARRAY1,ARRAY2,STATUS)
       
 *  Description:
 *     Selected pixel pairs randomly and swaps their values
@@ -24,6 +24,8 @@
 *        The length of the y axis of the image. Units pixels.
 *     ELEMS = INTEGER (Given)
 *        The number of pixels in the image.
+*     SEED = INTEGER (Given)
+*        The seed for the random number generator.
 *     ARRAY1(ELEMS) = REAL (Given)
 *        The array containing the source NDF image count values.
 *     ARRAY2(ELEMS) = REAL (Returned)
@@ -33,10 +35,13 @@
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     DSB: David S Berry (JAC,UCLan)
 
 *  History:
-*     14-Oct-1992
+*     14-OCT-1992 (GJP)
 *     (Original version)
+*     30-SEP-2008 (DSB)
+*     Added SEED argument.
 
 *  Bugs:
 *     None known.
@@ -53,6 +58,7 @@
       INTEGER ELEMS                   ! Number of pixels in the data array
       INTEGER XMAX                    ! Length of the image x axis
       INTEGER YMAX                    ! Length of the image y axis
+      INTEGER SEED                    ! Random number seed
       REAL ARRAY1(ELEMS)              ! Array containing input NDF 
 
 *  Arguments Returned:
@@ -83,7 +89,7 @@
  5    CONTINUE
 
 *   Initialise the random number generator.  
-      CALL MIX1_RAND(0,2001,RND,STATUS)
+      CALL MIX1_RAND(0,SEED,RND,STATUS)
 
 *   Number of pixel pairs swapped between 
 *   displays of the progress.

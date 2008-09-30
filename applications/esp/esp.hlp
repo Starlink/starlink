@@ -1545,7 +1545,7 @@ To mixup the position of all the pixels in an image.
 
 Usage:
 
-   MIXUP IN OUT
+   MIXUP IN OUT [SEED]
 
 Description:
 
@@ -1566,12 +1566,19 @@ IN = _NDF (Read)
 3 OUT
 OUT = _NDF (Write)
    The name of the NDF data that will be created.
+3 SEED
+SEED = _INTEGER (Read)
+   An integer seed value to use for the random number 
+   generator. If a null (!) value is given, the seed is 
+   set to a non-repeatable value determined by the time 
+   and the process number. The default value is 2001.
 2 Examples
 mixup in=ic3374 out=ic3374m
    The pixel positions in the input file IC3374 will be
    scrambled and the resulting image output as IC3374M.
 2 Authors
 GJP: Grant Privett (STARLINK)
+DSB: David S Berry (JAC,UCLan)
 2 History
  3-JUL-1993 (GJP)
 
@@ -1584,6 +1591,11 @@ GJP: Grant Privett (STARLINK)
  24-Feb-1997 (GJP)
 
  Minor Linux problem removed.
+
+ 30-SEP-2008 (DSB)
+
+ Added SEED parameter.
+
 1 SECTOR
 May be used to display the average pixel values within a wedge
 shaped sector/slice of the image.

@@ -2,6 +2,13 @@
 ESP - Extended Surface Photometry
 =================================
 
+Release 0.11-4
+--------------
+
+Add a new paremeter (SEED) to the MIXUP command. This allows the set of
+random numbers used by the command to be controlled.
+
+
 Release 0.11-3
 --------------
 

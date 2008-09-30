@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="esp" support="S">
-  <version>0.11-3</version>
+  <version>0.11-4</version>
   <path>applications/esp</path>
   <description>Extended Surface Photometry</description>
   <abstract><p>ESP (Extended Surface Photometry) is a package of

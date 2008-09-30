@@ -7,11 +7,14 @@
 
 #  Authors:
 #     GJP: Grant Privett (STARLINK)
+#     DSB: David S Berry (JAC,UCLan)
 #     {enter_new_authors_here}
 
 #  History:
 #     05-JUL-1993 (GJP):
 #        Original version.
+#     30-SEP-2008 (DSB):
+#        Added SEED.
 #     {enter_changes_here}
 
 #-    
@@ -42,6 +45,18 @@ interface MIXUP
     ppath 'default'
     vpath 'prompt'
     default mixout
+    helpkey '*'
+  endparameter
+
+  parameter SEED         # The random number seed
+    type '_INTEGER'
+    access 'read'
+    keyword 'SEED'
+    position 3
+    prompt 'Seed for random number generator'
+    ppath 'default'
+    vpath 'default'
+    default 2001
     helpkey '*'
   endparameter
 

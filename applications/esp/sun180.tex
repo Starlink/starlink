@@ -10,9 +10,9 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {180.5}
 \newcommand{\stardocauthors}   {Norman Gray\\Mark Taylor\\Grant Privett}
-\newcommand{\stardocdate}      {27 January 2000}
+\newcommand{\stardocdate}      {30 September 2008}
 \newcommand{\stardoctitle}     {ESP --- Extended Surface Photometry}
-\newcommand{\stardocversion}   {Version 0.10-8}	%%VERSION%%
+\newcommand{\stardocversion}   {Version 0.11-4}	%%VERSION%%
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {%
 ESP (\textbf{E}xtended {\bf S}urface {\bf P}hotometry) is a package 
@@ -5166,7 +5166,7 @@ The ESP routine descriptions are contained in the following pages.
       the significance of 'objects' identified by the other applications.
    }
    \sstusage{
-      MIXUP IN OUT
+      MIXUP IN OUT [SEED]
    }
    \sstparameters{
       \sstsubsection{
@@ -5179,6 +5179,14 @@ The ESP routine descriptions are contained in the following pages.
       }{
          The name of the NDF data that will be created.
       }
+      \sstsubsection{
+         SEED = \_INTEGER (Read)
+      }{
+         An integer seed value to use for the random number generator. If
+         a null (!) value is given, the seed is set to a non-repeatable
+         value determined by the time and the process number. The default
+         value is 2001.
+      }
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -5186,6 +5194,12 @@ The ESP routine descriptions are contained in the following pages.
       }{
          The pixel positions in the input file IC3374 will be
          scrambled and the resulting image output as IC3374M.
+      }
+      \sstexamplesubsection{
+         mixup in=ic3374 out=ic3374m seed=!
+      }{
+         The same, except that the random numbers wused to mix up the
+         data will be non-repeatable.
       }
    }
 }

@@ -52,7 +52,8 @@
 #-
 
 
-      echo `ndf_link_adam` `agi_link_adam` `fio_link_adam` `shl_link_adam` \
+      echo `kaplibs_link_adam -nogrf` `ndf_link_adam` `agi_link_adam` \
+           `fio_link_adam` `shl_link_adam` \
            `ard_link_adam` `psx_link_adam` `pda_link` `cat_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}

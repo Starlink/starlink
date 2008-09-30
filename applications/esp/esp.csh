@@ -154,7 +154,7 @@ alias esp_topped ${ESP_DIR}/esp_topped
 #
 
 echo ""
-echo "   ESP commands are now available -- (Version PKG_VERS)"
+echo "   ESP commands are now available -- (Version 0.11-4)"
 echo ""
 echo "   Type  esphelp  for help on ESP commands"
 echo "   Type  showme sun180  to see the hypertext document."

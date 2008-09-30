@@ -28,16 +28,22 @@
 *     the significance of 'objects' identified by the other applications.
 
 *  Usage:
-*     MIXUP IN OUT 
+*     MIXUP IN OUT [SEED]
 
 *  ADAM Parameters:
 *     IN = _NDF (Read)
 *        The name of the NDF that is to be scrambled.
 *     OUT = _NDF (Write)
 *        The name of the NDF data that will be created. 
+*     SEED = _INTEGER (Read)
+*        An integer seed value to use for the random number generator. If
+*        a null (!) value is given, the seed is set to a non-repeatable
+*        value determined by the time and the process number. The 
+*        default value is 2001.
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     DSB: David S Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -47,6 +53,8 @@
 *     NAG free version.
 *     24-Feb-1997 (GJP)
 *     Minor Linux problem removed.
+*     30-SEP-2008 (DSB)
+*     Added SEED parameter.
 
 *  Examples:
 *     mixup in=ic3374 out=ic3374m
@@ -63,11 +71,15 @@
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF_ public constant
       INCLUDE 'CNF_PAR'
+      INCLUDE 'PAR_ERR'
                      
 *  Status:     
       INTEGER STATUS                  ! Global status
 
-*  Local Variables:                                                          
+*  External references:
+      REAL KPG1_SEED                  ! Non-repeatable seed generator
+
+*  Local Variables:
       INTEGER ELEMS                   ! Number of data items in the NDF
       INTEGER LBND(7)                 ! Lower bounds for each image axis
       INTEGER NDF1                    ! Identifier for the source NDF 
@@ -80,6 +92,7 @@
       INTEGER PRANGE(2)               ! Number of pixels in the image x 
                                       ! and y axes 
       INTEGER UBND(7)                 ! Upper bounds for each image axis
+      INTEGER SEED                    ! SEED value
       INTEGER XMAX                    ! Width in pixels of the image
       INTEGER YMAX                    ! Length in pixels of the image
 *.                              
@@ -98,6 +111,13 @@
 *   Obtain an identifier for the NDF structure to be examined.       
       CALL NDF_ASSOC('IN','READ',NDF1,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
+
+*   Obtain the seed value.
+      CALL PAR_GET0I( 'SEED', SEED, STATUS )
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         SEED = INT( KPG1_SEED( STATUS ) )
+      END IF
 
 *   Display the name of the NDF.
       CALL NDF_MSG('IN',NDF1)           
@@ -171,7 +191,7 @@
       YMAX=PRANGE(2)
 
 *   Mixup the image pixels.
-         CALL MIX1_MIXER(XMAX,YMAX,ELEMS,
+         CALL MIX1_MIXER(XMAX,YMAX,ELEMS,SEED,
      :                   %VAL(CNF_PVAL(POINT1(1))),
      :                   %VAL(CNF_PVAL(POINT2(1))),STATUS)  
          IF (STATUS.NE.SAI__OK) GOTO 9999
