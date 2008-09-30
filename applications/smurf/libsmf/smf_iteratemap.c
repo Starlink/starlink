@@ -160,6 +160,8 @@
 *        Pass darks through to smf_concat_smfGroup
 *     2008-07-29 (TIMJ):
 *        Steptime is now in smfHead.
+*     2008-09-30 (EC):
+*        Use smf_write_smfData instead of smf_NDFexport
 *     {enter_further_changes_here}
 
 *  Notes:

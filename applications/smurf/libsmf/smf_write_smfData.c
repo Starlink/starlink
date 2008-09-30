@@ -54,7 +54,7 @@
 *     2008-08-25 (TIMJ):
 *        Initial version.
 *     2008-09-30 (EC):
-*        Added functionality from NDFexport: 
+*        Added functionality from smf_NDFexport: 
 *        - write WCS information
 *        - write JCMT State array
 *        - add variance and quality overrides
