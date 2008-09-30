@@ -194,7 +194,7 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
 	  total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
 	  break;
         case SMF__DKS:
-          total += (maxlen + nrow*2)*ncol*smf_dtype_sz(SMF__DOUBLE,status) *
+          total += (maxlen + nrow*3)*ncol*smf_dtype_sz(SMF__DOUBLE,status) *
             nrelated;
           break;
 	default:

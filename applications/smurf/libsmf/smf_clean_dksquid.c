@@ -114,6 +114,7 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
 
   size_t arrayoff;        /* Array offset */
   double corr;            /* Linear correlation coefficient */
+  double *corrbuf=NULL;   /* Array of correlation coeffs all bolos this col */
   int curlevel;           /* Current messaging level */
   int needDA=0;           /* Do we need dksquids from the DA? */ 
   int dkgood;             /* Flag for non-constant dark squid */ 
@@ -215,17 +216,21 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
     /* Assume this dark squid is good */
     dkgood = 1;
 
-    /* Point dksquid, gainbuff and offsetbuf to the right place in model if 
-       supplied. Initialize fit coeffs to VAL__BADD */
+    /* Point dksquid, gainbuf, offsetbuf and corrbuf to the right
+       place in model if supplied. Initialize fit coeffs to
+       VAL__BADD */
+
     if( model ) {
       dksquid = model->pntr[0];
-      dksquid += i*(ntslice+nrow*2);
+      dksquid += i*(ntslice+nrow*3);
       gainbuf = dksquid + ntslice;
       offsetbuf = gainbuf + nrow;
+      corrbuf = offsetbuf + nrow;
 
       for( j=0; j<nrow; j++ ) {
         gainbuf[j] = VAL__BADD;
         offsetbuf[j] = VAL__BADD;
+        corrbuf[j] = VAL__BADD;
       }
     }
 
@@ -319,6 +324,7 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
           if( model ) {
             gainbuf[j] = gain;
             offsetbuf[j] = offset;
+            corrbuf[j] = corr;
           }
 
           if( curlevel >= MSG__DEBUG ) {

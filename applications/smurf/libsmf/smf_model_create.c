@@ -498,14 +498,14 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
           case SMF__DKS: /* Scaled Dark SQUID */
             head.data.dtype = SMF__DOUBLE;
             head.data.ndims = 2;
-            /* Store column dark squid followed by gain+offset each row */
+            /* Store column dark squid followed by gain+off+corr each row */
             if( isTordered ) { /* T is 3rd axis if time-ordered */
               head.data.dims[0] = (idata->dims)[2] + 
-                (idata->dims)[SMF__ROW_INDEX]*2;
+                (idata->dims)[SMF__ROW_INDEX]*3;
               head.data.dims[1] = (idata->dims)[SMF__COL_INDEX];
             } else {           /* T is 1st axis if bolo-ordered */
               head.data.dims[0] = (idata->dims)[0] + 
-                (idata->dims)[1+SMF__ROW_INDEX]*2;
+                (idata->dims)[1+SMF__ROW_INDEX]*3;
               head.data.dims[1] = (idata->dims)[1+SMF__COL_INDEX];
             }
             break;
