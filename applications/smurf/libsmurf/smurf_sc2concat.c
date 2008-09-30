@@ -229,12 +229,15 @@ void smurf_sc2concat( int *status ) {
     for( idx=0; (*status==SAI__OK)&&idx<concat->ndat; idx++ ) {
       if( concat->sdata[idx]->file && concat->sdata[idx]->file->name ) {
 
+        smf_clean_dksquid( concat->sdata[idx], NULL, 100, NULL, 0, 0, status );
+
         /* Get the file name: note that we have to be careful to read
            them out of this group in the same order that we put them 
            in above! */
         pname = fname;
         grpGet( ogrp, gcount, 1, &pname, GRP__SZNAM, status);
-        smf_NDFexport( concat->sdata[idx], NULL, NULL, NULL, fname, status ); 
+        smf_write_smfData( concat->sdata[idx], NULL, NULL, fname, NDF__NOID,
+                           status ); 
       } else {
         *status = SAI__ERROR;
         errRep( FUNC_NAME, 
