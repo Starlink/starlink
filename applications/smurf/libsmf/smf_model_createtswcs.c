@@ -84,14 +84,7 @@ void smf_model_createtswcs( smfData *model, smf_modeltype type,
                             AstFrameSet *refwcs, int *status ) {
 
   /* Local Variables */
-  int caxis;                    /* column axis index */
   AstMapping *cbmap=NULL;       /* Pointer to current->base mapping */
-  AstFrame *cfrm=NULL;          /* 1D frame for column */
-  AstCmpFrame *cfrm2=NULL;      /* 2D frame */
-  AstMapping *cmap=NULL;        /* Mapping for column axis */
-  AstCmpMap *cmap2=NULL;        /* 2d Mapping */
-  AstFrame *ofrm=NULL;          /* 1D frame for other axis */
-  AstUnitMap *omap=NULL;        /* Mapping for other axis */
   AstFrameSet *fset=NULL;       /* the returned framset */ 
   int out[NDF__MXDIM];          /* Indices outputs of mapping */
   int taxis;                    /* Index of time axis */ 
@@ -196,62 +189,8 @@ void smf_model_createtswcs( smfData *model, smf_modeltype type,
     break;
     
   case SMF__DKS:
-    /* For the dark squid model the only meaningful axis we can extract
-       from refwcs is the column. The other axis contains both row and time
-       information. */
-
-    /* Get a pointer to the current->base Mapping (i.e. the Mapping from
-       WCS coords to GRID coords). */
-    cbmap = astGetMapping( refwcs, AST__CURRENT, AST__BASE );
-    
-    /* Use astMapSplit to split off the Mapping for the column
-       axis (remember this index starts at 1) */
-    
-    caxis = 1+SMF__COL_INDEX;
-    astMapSplit( cbmap, 1, &caxis, out, &cmap );
-    
-    /* We now check that the Mapping was split succesfully. This
-       should always be the case for the column axis since it is
-       independent of the others, but it is as well to check in case
-       of bugs, etc. */
-    if( !cmap ) {
-      /* The "tmap" mapping will have 1 input (the WCS time value) -
-         astMapSplit guarantees this. But we
-         should also check that it also has only one output (the
-         corresponding GRID axis). */
-      *status = SAI__ERROR;
-      errRep( "", FUNC_NAME ": Couldn't extract column-axis mapping",
-              status );
-    } else if( astGetI( cmap, "Nout" ) != 1 ) {
-      *status = SAI__ERROR;
-      errRep( "", FUNC_NAME 
-              ": Column-axis mapping has incorrect number of outputs",
-              status );
-    } else {
-      
-      /* This Mapping goes from column to grid, so we invert it first so
-         that it goes from grid to column, as required by
-         astAddFrame. */      
-      astInvert( cmap );
-      
-      /* Create a new FrameSet containing a 2D GRID Frame. */
-      fset = astFrameSet( astFrame( 2, "Domain=GRID" ), "" );
-      
-      /* Extract the 1D column Frame from the reference (WCS) 3D Frame. */
-      cfrm = astPickAxes( refwcs, 1, &caxis, NULL);
-
-      /* Create a unit mapping for the other axis */
-      omap = astUnitMap( 1, "" );
-
-      /* Create another 1D frame for the oter axis */
-      ofrm = astFrame( 1, "Domain=DKSQUID+COEFF" );
-         
-      /* Combine the frames and mappings in parallel, then add to frameset */
-      cmap2 = astCmpMap( cmap, omap, 0, "" );
-      cfrm2 = astCmpFrame( cfrm, ofrm, "" );                        
-      astAddFrame( fset, AST__BASE, cmap2, cfrm2 );
-    }
-    
+    /* Don't know how to make a particularly meaningful framset */
+    fset = NULL;
     break;
     
   default:
@@ -266,7 +205,7 @@ void smf_model_createtswcs( smfData *model, smf_modeltype type,
     errRep( "", FUNC_NAME ": Ast error creating frameset for ^MODEL", status );
   }
   
-  if( *status==SAI__OK ) {
+  if( (*status==SAI__OK) && fset ) {
     /* Export the frameset before ending the ast context */
     astExport( fset );
     
