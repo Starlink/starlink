@@ -57,11 +57,11 @@ testhelp_DEPENDENCIES = demo.shl
 
 ctesthelp_SOURCES = ctesthelp.c
 ctesthelp_DEPENDENCIES = demo.shl
-ctesthelp_LDADD = libshl.la `hlp_link` `err_link` `one_link` `fio_link` \
+ctesthelp_LDADD = libshl.la `hlp_link` `err_link` `one_link` `fio_link` `psx_link` \
 	`cnfrtl_link` @FCLIBS@
 
 test_pager_SOURCES = test_pager.f
-test_pager_LDADD = libshl.la `hlp_link` `err_link` `one_link` `fio_link`
+test_pager_LDADD = libshl.la `hlp_link` `err_link` `one_link` `fio_link` `psx_link`
 
 # need to compile the test help file
 demo.shl: demo.hlp

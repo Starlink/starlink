@@ -23,7 +23,7 @@
      SHL.</p>
   </abstract>
   <dependencies >
-    <build>pcs</build><build>sae</build><build>fio</build><build>cnf</build><build>hlp</build><build>mers</build><build>one</build><link>fio</link><link>cnf</link><link>hlp</link><link>par</link><link>mers</link><link>one</link>
+    <build>pcs</build><build>sae</build><build>fio</build><build>cnf</build><build>hlp</build><build>mers</build><build>one</build><build>psx</build><link>fio</link><link>cnf</link><link>hlp</link><link>par</link><link>mers</link><link>one</link><link>psx</link>
   </dependencies>
   <developers>
     <person>

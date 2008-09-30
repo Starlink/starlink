@@ -1,2 +1,2 @@
-echo -lshl `hlp_link` `one_link` `psx_link` `err_link` `fio_link` \
+echo -lshl `hlp_link` `one_link` `psx_link` `err_link` `fio_link` `psx_link` \
 | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'

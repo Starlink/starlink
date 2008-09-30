@@ -1,2 +1,2 @@
-echo -lshl_adam -lshl `hlp_link_adam` `one_link` `fio_link_adam`\
+echo -lshl_adam -lshl `hlp_link_adam` `one_link` `fio_link_adam` `psx_link_adam` \
 | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'

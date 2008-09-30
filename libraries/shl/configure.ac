@@ -29,8 +29,8 @@ dnl    Build ADAM task for testing
 STAR_MONOLITHS
 
 dnl    This package depends on HLP
-STAR_DECLARE_DEPENDENCIES([build], [sae fio cnf hlp mers one ])
-STAR_DECLARE_DEPENDENCIES([link],  [fio cnf hlp par mers one])
+STAR_DECLARE_DEPENDENCIES([build], [sae fio cnf hlp mers one psx])
+STAR_DECLARE_DEPENDENCIES([link],  [fio cnf hlp par mers one psx])
 
 dnl    Help library translation (for tests)
 STAR_CHECK_PROGS(hlib)
