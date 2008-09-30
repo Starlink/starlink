@@ -274,6 +274,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
   char modelname[4];            /* Name of current model component */
   smf_calcmodelptr modelptr=NULL; /* Pointer to current model calc function */
   dim_t msize;                  /* Number of elements in map */
+  char name[GRP__SZNAM+1];      /* Buffer for storing exported model names */
   dim_t nchunks=0;              /* Number of chunks within iteration loop */
   size_t ncontchunks=0;         /* Number continuous chunks outside iter loop*/
   dim_t nmodels=0;              /* Number of model components / iteration */
@@ -383,12 +384,12 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
 
     if( varmapmethod ) {
       msgOutif(MSG__VERB, " ", 
-               "SMF_ITERATEMAP: Will use sample variance to estimate variance map",
-               status );
+               "SMF_ITERATEMAP: Will use sample variance to estimate"
+               " variance map", status );
     } else {
       msgOutif(MSG__VERB, " ", 
-               "SMF_ITERATEMAP: Will use error propagation to estimate variance map",
-               status );
+               "SMF_ITERATEMAP: Will use error propagation to estimate"
+               " variance map", status );
     }
 
     /* Will we export components to NDF at the end? */
@@ -692,8 +693,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
     if( memiter ) {
       msgSeti( "NCONTCHUNKS", ncontchunks );
       msgOutif(MSG__VERB," ", 
-               "SMF_ITERATEMAP: ^NCONTCHUNKS large continuous chunks outside iteration loop.", 
-               status);
+               "SMF_ITERATEMAP: ^NCONTCHUNKS large continuous chunks outside"
+               " iteration loop.", status);
     } else {
       msgSeti( "NCHUNKS", nchunks );
       msgOutif(MSG__VERB," ", 
@@ -1290,10 +1291,14 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
               }
 	      
               if( (res[i]->sdata[idx]->file->name)[0] ) {
-                smf_NDFexport( res[i]->sdata[idx], var_data, 
-                               qua[i]->sdata[idx]->pntr[0], hdr,
-                               res[i]->sdata[idx]->file->name, 
-                               status );
+                
+                smf_model_createtswcs( res[i]->sdata[idx], SMF__RES, hdr->tswcs,
+                                       status );
+                smf_model_stripsuffix( res[i]->sdata[idx]->file->name, 
+                                       name, status );
+                smf_write_smfData( res[i]->sdata[idx], var_data, 
+                                   qua[i]->sdata[idx]->pntr[0], name, NDF__NOID,
+                                   status );
               } else {
                 msgOut( " ", 
                         "SMF__ITERATEMAP: Can't export RES -- NULL filename",
@@ -1301,9 +1306,12 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
               }
 	      
               if( (ast[i]->sdata[idx]->file->name)[0] ) {
-                smf_NDFexport( ast[i]->sdata[idx], NULL, NULL, hdr, 
-                               ast[i]->sdata[idx]->file->name, 
-                               status );
+                smf_model_createtswcs( ast[i]->sdata[idx], SMF__AST, hdr->tswcs,
+                                       status );
+                smf_model_stripsuffix( ast[i]->sdata[idx]->file->name, 
+                                       name, status );
+                smf_write_smfData( ast[i]->sdata[idx], NULL, NULL, name, 
+                                   NDF__NOID, status );
               } else {
                 msgOut( " ", 
                         "SMF__ITERATEMAP: Can't export AST -- NULL filename",
@@ -1318,10 +1326,13 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
               if( (*status == SAI__OK) && (modeltyps[j] != SMF__NOI) &&
                   model[j][i]->sdata[idx] ) {
                 if( (model[j][i]->sdata[idx]->file->name)[0] ) {
-                  smf_NDFexport( model[j][i]->sdata[idx], NULL, NULL,  
-                                 hdr, 
-                                 model[j][i]->sdata[idx]->file->name, 
-                                 status);
+                  smf_model_createtswcs( model[j][i]->sdata[idx], modeltyps[j], 
+                                         hdr->tswcs,status );
+
+                  smf_model_stripsuffix( model[j][i]->sdata[idx]->file->name, 
+                                         name, status );
+                  smf_write_smfData( model[j][i]->sdata[idx], NULL, NULL, name, 
+                                     NDF__NOID, status );
                 } else {
                   msgSetc("MOD",smf_model_getname(modeltyps[j], status) );
                   msgOut( " ", 
@@ -1416,7 +1427,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
     /* In the multiple contchunk case, add maps together */
 
     if( contchunk >= 1 ) {
-      msgOut( " ", "SMF_ITERATEMAP: Adding map estimated from this continuous chunk to total", status);
+      msgOut( " ", "SMF_ITERATEMAP: Adding map estimated from this continuous"
+              " chunk to total", status);
       smf_addmap1( map, weights, hitsmap, mapvar, thismap, thisweight,
                    thishits, thisvar, msize, status );
     }

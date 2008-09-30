@@ -13,13 +13,18 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_write_smfData( const smfData * data, const char * filename,
-*                        int provid, int *status );
+*     smf_write_smfData ( const smfData * data, void *variance,
+*                        unsigned char *quality, const char * filename,
+*                        int provid, int * status );
 
 *  Arguments:
 *     data = const smfData* (Given)
 *        Pointer to smfData to dump to disk file. Returns without action
 *        if NULL pointer.
+*     variance = void * (Given)
+*        If set, use this buffer instead of VARIANCE associated with data.
+*     quality = unsigned char * (Given)
+*        If set, use this buffer instead of QUALITY associated with data.
 *     filename = const char * (Given)
 *        Name of output NDF.
 *     provid = int (Given)
@@ -33,20 +38,31 @@
 *     appropriate. smfDA will be ignored.
 
 *  Notes:
-*     Will not write Data Acquisition information.
+*     Will not write Data Acquisition information. If time-series WCS
+*     information is in the header, it is assumed to be consistent with
+*     the data array. If a JCMTState array is present, it can only be written
+*     if the number of time slices can be determined. ntslices is assumed
+*     to be the length of the only axis if data is 1-d, and the length of the
+*     3rd axis for 3d data (ICD format).
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
 *     2008-08-25 (TIMJ):
 *        Initial version.
-
+*     2008-09-30 (EC):
+*        Added functionality from NDFexport: 
+*        - write WCS information
+*        - write JCMT State array
+*        - add variance and quality overrides
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
+*     University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -95,23 +111,36 @@
 
 #define FUNC_NAME "smf_write_smfData"
 
-void smf_write_smfData ( const smfData * data, const char * filename,
-                              int provid, int * status ) {
+void smf_write_smfData ( const smfData * data, void *variance,
+                         unsigned char *quality, const char * filename,
+                         int provid, int * status ) {
 
   size_t i;                     /* Loop counter */
   int flags = 0;                /* Flags for open file */
+  HDSLoc *jcmtstateloc=NULL;    /* HDS Locator for JCMT headers */
   int lbnd[NDF__MXDIM];         /* Lower pixel bounds */
+  dim_t ntslice=0;              /* Number of time slices */
+  int haventslice=0;            /* Flag indicating whether ntslice is known */
   Grp * ogrp = NULL;            /* Small group for output filename */
   smfData * outdata = NULL;     /* Mapped output file */
   char prvname[2*PAR__SZNAM+1]; /* provenance ID string */
+  unsigned char *qual=NULL;     /* Pointer to QUALITY buffer */
   int ubnd[NDF__MXDIM];         /* Upper pixel bounds */
+  void *var=NULL;               /* Pointer to VARIANCE buffer */
 
   if (*status != SAI__OK) return;
   if (data == NULL) return;
 
+  /* Check for VARIANCE and QUALITY components, and header */
+  if( variance ) var = variance;
+  else var = (data->pntr)[1];    
+
+  if( quality ) qual = quality;
+  else qual = (data->pntr)[2];
+  
   /* see if we need to write variance and quality */
-  if ( (data->pntr)[1] ) flags |= SMF__MAP_VAR;
-  if ( (data->pntr)[2] ) flags |= SMF__MAP_QUAL;
+  if ( var ) flags |= SMF__MAP_VAR;
+  if ( qual ) flags |= SMF__MAP_QUAL;
  
   /* create a group so that we can reuse smf_open_newfile interface */
   ogrp = grpNew( "", status );
@@ -122,6 +151,20 @@ void smf_write_smfData ( const smfData * data, const char * filename,
     lbnd[i] = 1;
     ubnd[i] = lbnd[i] + (data->dims)[i] - 1;
   }
+
+  /* Get ntslice -- assume ICD ordered data, and only handle 1 & 3-d data */
+  if( data->ndims == 1 ) {
+    ntslice = data->dims[0];
+    haventslice = 1;
+  }
+
+  if( data->ndims == 3 ) {
+    ntslice = data->dims[2];
+    haventslice = 1;
+  }
+
+  msgSetc( "NAME", filename );
+  msgOutif( MSG__VERB, "", FUNC_NAME ": writing ^NAME", status );
 
   /* Open the file */
   smf_open_newfile( ogrp, 1, data->dtype, data->ndims, lbnd, ubnd,
@@ -150,11 +193,12 @@ void smf_write_smfData ( const smfData * data, const char * filename,
 
     /* Copy the data and variance and quality */
     if (*status == SAI__OK) {
-      for (i = 0; i <= 2; i++ ) {
-        if (i == 2) nbperel = 1; /* quality = 1 byte */
-        if ((data->pntr)[i]) memcpy( (outdata->pntr)[i], (data->pntr)[i],
-                                     nelem * nbperel );
-      }
+
+      if( (data->pntr)[0] ) memcpy( (outdata->pntr)[0], (data->pntr)[0],
+                                    nelem * nbperel );
+
+      if( var ) memcpy( (outdata->pntr)[1], var, nelem * nbperel );
+      if( qual ) memcpy( (outdata->pntr)[2], qual, nelem * 1 );
     }
 
     /* header information */
@@ -171,8 +215,24 @@ void smf_write_smfData ( const smfData * data, const char * filename,
       if ( strlen(inhdr->dlabel) ) ndfCput( inhdr->dlabel, outfile->ndfid,
                                            "Label", status );
 
+      /* WCS */
+      if( inhdr->tswcs ) ndfPtwcs( inhdr->tswcs, outfile->ndfid, status );
 
-
+      /* JCMT State -- if ntslice is known */
+      if( inhdr->allState && haventslice ) {
+        /* Get an HDS locator */
+        ndfXnew( outfile->ndfid, JCMT__EXTNAME, JCMT__EXTTYPE, 0, 0,
+                 &jcmtstateloc, status );
+        
+        /* Map the header */
+        sc2store_headcremap( jcmtstateloc, ntslice, INST__SCUBA2, status  );
+        
+        /* Write out the per-frame headers */
+        for( i=0; (*status==SAI__OK)&&(i<ntslice); i++ ) {
+          sc2store_headput( i, inhdr->allState[i], status );
+        }
+      }
+      
     }
   }
   

@@ -195,7 +195,7 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
     }
 
     if( (model->ndims != 2) ||
-        (model->dims[0] != ntslice+nrow*2) ||
+        (model->dims[0] != ntslice+nrow*3) ||
         (model->dims[1] != ncol) ) {
       *status = SAI__ERROR;
       errRep(" ", FUNC_NAME ": model has incorrect dimensions", status );

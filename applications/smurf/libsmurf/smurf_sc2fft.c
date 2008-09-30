@@ -193,7 +193,7 @@ void smurf_sc2fft( int *status ) {
       /* Export the data to a new file */
       pname = fname;
       grpGet( ogrp, i, 1, &pname, GRP__SZNAM, status );
-      smf_NDFexport( odata, NULL, NULL, NULL, fname, status );
+      smf_write_smfData( odata, NULL, NULL, fname, NDF__NOID, status );
 
       /* Free resources */
       smf_close_file( &odata, status );

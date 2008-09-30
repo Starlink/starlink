@@ -1090,8 +1090,10 @@ void smf_collapse_tseries( const smfData *indata, int nclip, const float clip[],
                            smfData **outdata, 
                            int *status );
 
-void smf_write_smfData ( const smfData * data, const char * filename,
-                              int provid, int * status );
+void smf_write_smfData ( const smfData * data, void *variance,
+                         unsigned char *quality, const char * filename,
+                         int provid, int * status );
+
 void
 smf_select_pntr( void *const pntr[3], smf_dtype dtype, double **ddata, double **dvar,
                  int **idata, int **ivar, int *status );
@@ -1122,3 +1124,8 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status );
 
 void smf_calcmodel_dks( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
 			smfArray **allmodel, int flags, int *status);
+
+void smf_model_createtswcs( smfData *model, smf_modeltype type, 
+                            AstFrameSet *refwcs, int *status );
+
+void smf_model_stripsuffix( const char *instr, char *outstr, int *status );

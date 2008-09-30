@@ -239,7 +239,7 @@ void smf_NDFexport( const smfData *data, void *variance,
     /* If header was provided, create and map relevant information */
     if( header && (tempdata->file) ) {
     
-      if( header->instrument == INST__SCUBA2 ) {
+      if( header->instrument ) {
       
         /* MORE.JCMTSTATE */
         if( header->allState ) {
@@ -346,12 +346,7 @@ void smf_NDFexport( const smfData *data, void *variance,
           }
         }
         
-      } else {
-        msgOut(" ",
-               "SMF_NDFEXPORT: Warning: only know how to write SCUBA2 header", 
-               status );
-      }
-      
+      }       
     }
   }
 
