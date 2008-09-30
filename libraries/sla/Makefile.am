@@ -28,7 +28,7 @@ libsla_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
 endif
 
 PUBLIC_F_INCLUDES = 
-PUBLIC_C_INCLUDES = slalib.h sla_r.h
+PUBLIC_C_INCLUDES = slalib.h 
 PRIVATE_INCLUDES = f77.h
 PUBLIC_INCLUDES = $(PUBLIC_F_INCLUDES) $(PUBLIC_C_INCLUDES)
 
@@ -36,7 +36,7 @@ FPP_ROUTINES = \
 	random.F \
 	gresid.F
 
-C_ROUTINES = sla.c sla_r.c
+C_ROUTINES = sla.c 
 
 F_ROUTINES = addet.f afin.f airmas.f altaz.f amp.f ampqk.f aop.f	\
     aoppa.f aoppat.f aopqk.f atmdsp.f atms.f atmt.f av2m.f bear.f	\
