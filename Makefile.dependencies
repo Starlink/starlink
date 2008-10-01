@@ -1882,7 +1882,6 @@ $(MANIFESTS)/polpack: \
 		$(MANIFESTS)/kaplibs \
 		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
-		$(MANIFESTS)/nbs \
 		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
 		$(MANIFESTS)/ndg \
