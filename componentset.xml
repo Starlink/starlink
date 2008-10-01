@@ -423,7 +423,7 @@ proposal, or before or during an observing run.
 </component>
 
 <component id="esp" support="S">
-  <version>0.11-3</version>
+  <version>0.11-4</version>
   <path>applications/esp</path>
   <description>Extended Surface Photometry</description>
   <abstract><p>ESP (Extended Surface Photometry) is a package of
@@ -5472,7 +5472,7 @@ Ultrix and for SunOS and may still work for them.
       used specifically for reporting error messages.</p>
   </abstract>
   <dependencies >
-    <build>cnf</build><build>ems</build><build>starutil</build><build>sae</build><build>psx</build><link>chr</link><link>ems</link><link>starutil</link><link>psx</link><sourceset>messgen</sourceset><sourceset>messgen</sourceset><sourceset>star2html</sourceset>
+    <build>cnf</build><build>ems</build><build>starutil</build><build>sae</build><link>chr</link><link>ems</link><link>starutil</link><sourceset>messgen</sourceset><sourceset>messgen</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -6077,7 +6077,7 @@ Ultrix and for SunOS and may still work for them.
      SHL.</p>
   </abstract>
   <dependencies >
-    <build>pcs</build><build>sae</build><build>fio</build><build>cnf</build><build>hlp</build><build>mers</build><build>one</build><link>fio</link><link>cnf</link><link>hlp</link><link>par</link><link>mers</link><link>one</link>
+    <build>pcs</build><build>sae</build><build>fio</build><build>cnf</build><build>hlp</build><build>mers</build><build>one</build><build>psx</build><link>fio</link><link>cnf</link><link>hlp</link><link>par</link><link>mers</link><link>one</link><link>psx</link>
   </dependencies>
   <developers>
     <person>
