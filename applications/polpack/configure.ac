@@ -32,7 +32,7 @@ dnl POLPACK source files depend on include files from the following components
 STAR_DECLARE_DEPENDENCIES([build], [ast cat chr cnf hds fio grp mers ndf ndg par prm sae startcl tcl trn ifd])
 
 dnl The POLPACK link script links against the following components
-STAR_DECLARE_DEPENDENCIES([build], [sla nbs kaplibs shl tcl], [link])
+STAR_DECLARE_DEPENDENCIES([build], [sla kaplibs shl tcl], [link])
 
 dnl Using POLPACK requires the following components to be available at run-time.
 STAR_DECLARE_DEPENDENCIES([use], [kappa ccdpack tcl tk startcl])

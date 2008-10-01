@@ -47,7 +47,7 @@
 
 #-
 
-      echo @TCL_LIBS@ -lsla `nbs_link_adam` `kaplibs_link_adam -nogks` \
+      echo @TCL_LIBS@ -lsla `kaplibs_link_adam -nogks` \
            `shl_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
