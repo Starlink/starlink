@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_clean_dksquid( smfData *indata, unsigned char *quality, 
-*                        size_t window, smfData *model, 
+*                        unsigned char mask, size_t window, smfData *model, 
 *                        int calcdk, int nofit, int *status ) {
 
 *  Arguments:
@@ -22,6 +22,8 @@
 *        Pointer to the input smfData. Should be raw, un-flatfielded.
 *     quality = unsigned char * (Given)
 *        Override quality inside indata
+*     mask = unsigned char (Given)
+*        Use to define which bits in quality are relevant to ignore indata
 *     window = size_t (Given)
 *        Width of boxcar smooth for squid before fitting and removing
 *     model = smfData * (Given)
@@ -68,6 +70,10 @@
 *     2008-09-11 (EC):
 *        -flag SMF__Q_BADB all bolos in column if dark squid is dead
 *        -fixed array index bug
+*     2008-10-01 (EC):
+*        -fixed logic bugs
+*        -added mask for quality
+*        -flag bolo as bad if fit failed
 
 *  Copyright:
 *     Copyright (C) 2008 University of British Columbia.
@@ -109,7 +115,7 @@
 #define FUNC_NAME "smf_clean_dksquid"
 
 void smf_clean_dksquid( smfData *indata, unsigned char *quality, 
-                        size_t window, smfData *model, 
+                        unsigned char mask, size_t window, smfData *model, 
                         int calcdk, int nofit, int *status ) {
 
   size_t arrayoff;        /* Array offset */
@@ -283,13 +289,15 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
 
         switch( indata->dtype ) {
         case SMF__DOUBLE:
-          smf_templateFit1D( &( ((double *)indata->pntr[0])[index] ),
+          smf_templateFit1D( &( ((double *)indata->pntr[0])[index] ), 
+                             &qua[index], mask,
                              ntslice, stride, dksquid, 1, &gain, &offset, 
                              &corr, status );
           break;
           
         case SMF__INTEGER:
-          smf_templateFit1I( &( ((int *)indata->pntr[0])[index] ),
+          smf_templateFit1I( &( ((int *)indata->pntr[0])[index] ), 
+                             &qua[index], mask, 
                              ntslice, stride, dksquid, 1, &gain, &offset, 
                              &corr, status );
           break;
@@ -302,10 +310,9 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
                   status );
         }
        
-        /* Annul SMF__INSMP as it was probably due to a bad bolometer */
-
         msgIflev( &curlevel );
         if( *status == SMF__INSMP ) {
+          /* Annul SMF__INSMP as it was probably due to a bad bolometer */
           errAnnul( status );
           if( curlevel >= MSG__DEBUG ) {
             msgSeti( "COL", i );
@@ -313,6 +320,15 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
             msgOutif( MSG__DEBUG, "", FUNC_NAME
                       ": ROW,COL (^ROW,^COL) insufficient good samples", 
                       status );
+          }
+          
+          /* Flag entire bolo as bad if it isn't already */
+          if( qua && !(qua[index]&SMF__Q_BADB) ) {
+            arrayoff = index;
+            for( k=0; k<ntslice; k++ ) {
+              qua[arrayoff] |= SMF__Q_BADB;
+              arrayoff += stride;
+            }
           }
         } else {
           /* Store gain and offset in model */

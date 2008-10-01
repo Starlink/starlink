@@ -667,7 +667,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
                  model data array. */
 
               head.data.pntr[0] = dataptr;
-              smf_clean_dksquid( idata, NULL, 0, &(head.data), 1, 1, status ); 
+              smf_clean_dksquid(idata, NULL, 0, 0, &(head.data), 1, 1, status);
               head.data.pntr[0] = NULL;
 
             } else {

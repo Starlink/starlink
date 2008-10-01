@@ -1113,7 +1113,7 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
                      const double bolref[], const Grp* prvgrp, int * status );
 
 void smf_clean_dksquid( smfData *indata, unsigned char *quality, 
-                        size_t window,  smfData *model, 
+                        unsigned char mask, size_t window,  smfData *model, 
                         int calcdk, int nofit, int *status );
 
 void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ); 

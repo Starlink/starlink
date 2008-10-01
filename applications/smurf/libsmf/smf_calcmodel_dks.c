@@ -195,13 +195,14 @@ void smf_calcmodel_dks( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
               /* For the first iteration we need to smooth the dark squids */
               smf_boxcar1D( dksquid, ntslice, boxcar, NULL, 0, status );
               
-            } else {
+            } else if( (gainbuf[j]!=VAL__BADD) && (offsetbuf[j]!=VAL__BADD) ) {
               for( k=0; k<ntslice; k++ ) {
                 /* If this isn't first iteration, put the previous iteration
                    back into the signal */                
                 if( !(qua_data[index+k]&mask) ) {
-                  res_data[index+k] += dksquid[k]*gainbuf[k] + offsetbuf[k]; 
+                  res_data[index+k] += dksquid[k]*gainbuf[j] + offsetbuf[j]; 
                 }
+
               }
             }
           }
@@ -209,9 +210,8 @@ void smf_calcmodel_dks( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
       }
       /* Then re-fit and remove the dark squid signal */
       msgOutif( MSG__VERB, "", "   cleaning detectors", status );
-      smf_clean_dksquid( res->sdata[idx], qua_data, 0, model->sdata[idx],
+      smf_clean_dksquid( res->sdata[idx], qua_data, mask, 0, model->sdata[idx],
                          0, 0, status );
-
     }
   }
 }
