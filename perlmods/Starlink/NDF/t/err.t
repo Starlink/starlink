@@ -86,7 +86,6 @@ is($i, $good, "check status");
 
 # Token tests (cant check the return)
 err_facer('TESTING', &NDF::ERR__BADOK);
-err_fioer('FIOERR', 52);
 
 
 err_end($status);
