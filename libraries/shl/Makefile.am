@@ -9,7 +9,7 @@ cinclude_HEADERS = shl.h
 
 browsehlp_SOURCES = browsehlp.c
 browsehlp_LDADD = libshl.la `err_link` `one_link` `hlp_link` `fio_link`\
-	`cnfrtl_link` @FCLIBS@
+	`psx_link` `cnfrtl_link` @FCLIBS@
 browsehlp_DEPENDENCIES = shl.h
 
 lib_LTLIBRARIES = libshl.la libshl_adam.la
@@ -51,7 +51,7 @@ check_MONOLITHS = testhelp
 # no variable testhelp_TASKS -- testhelp is an ATASK
 testhelp_SOURCES = testhelp.f
 testhelp_LDADD = libshl_adam.la libshl.la \
-	`hlp_link_adam` `one_link` `fio_link_adam`
+	`hlp_link_adam` `one_link` `fio_link_adam` `psx_link`
 
 testhelp_DEPENDENCIES = demo.shl
 
