@@ -100,7 +100,7 @@ F77_SUBROUTINE(aio_crefco)( CHARACTER(type), CHARACTER(fmt),
   else
     {
     *status = SAI__ERROR;
-    emsSetc( "TYPE", type, type_length );
+    emsSetnc( "TYPE", type, type_length );
     emsRep( " ", "Unrecognised format type /^TYPE/",
                status );
     }
