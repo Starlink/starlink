@@ -125,6 +125,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! Machine-precision constants
+      INCLUDE 'KPG_ERR'          ! KPG error codes
 
 *  Arguments Given:
       <TYPE> MAXMUM              ! Maximum value used to evaluate the
@@ -195,7 +196,7 @@
 
 *  Need at least three values before even a median has any sense.
       IF ( NVALUE .LT. 1 ) THEN
-         STATUS = SAI__ERROR
+         STATUS = KPG__HSTIV
          CALL ERR_REP( 'KPG1_HSTFx_TOOFEW',
      :     'There are too few values to compute ordered statistics.',
      :     STATUS )
