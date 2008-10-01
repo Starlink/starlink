@@ -177,19 +177,23 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, const size_t n,
     }
   }
 
-  if( ngood >= 3 ) {
+  /* Check for divide-by-zero */
+  if( ngood*s_tsq == s_t*s_t ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": divide-by-zero detected", status );
+  } else if( ngood >= 3 ) {
     /* Calculate fit coefficients */
     a = (ngood*s_dt - s_d*s_t) /
       (ngood*s_tsq - s_t*s_t);
-
+    
     b = (s_d*s_tsq - s_t*s_dt) / 
       (ngood*s_tsq - s_t*s_t);
-
+    
     /* Return gain and offset if requested */
     if( gain ) {
       *gain = a;
     }
-
+    
     if( offset ) {
       *offset = b;
     }
@@ -222,7 +226,7 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, const size_t n,
         }
       }
     }
-
+    
   } else {
     *status = SMF__INSMP;
     errRep( " ", FUNC_NAME 

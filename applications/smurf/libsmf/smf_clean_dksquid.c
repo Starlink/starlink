@@ -213,13 +213,9 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
   /* Loop over columns */
   for( i=0; (*status==SAI__OK)&&(i<ncol); i++ ) {
 
-    /* Assume this dark squid is good */
-    dkgood = 1;
-
     /* Point dksquid, gainbuf, offsetbuf and corrbuf to the right
        place in model if supplied. Initialize fit coeffs to
        VAL__BADD */
-
     if( model ) {
       dksquid = model->pntr[0];
       dksquid += i*(ntslice+nrow*3);
@@ -237,19 +233,23 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
     if( needDA ) {
       /* Copy dark squids from the DA extension into dksquid */
       index = i;
-      firstdk = indata->da->dksquid[index];
-      dkgood = 0;         /* Only check to see if dark squid signal changes */
       for( j=0; j<ntslice; j++ ) {
         dksquid[j] = indata->da->dksquid[index];
         index += ncol;
-        if( dksquid[j] != firstdk ) dkgood=1;
       }
+    }
 
-      if( dkgood ) {
-        /* Smooth the dark squid template */
-        smf_boxcar1D( dksquid, ntslice, window, NULL, 0, status );
-      } 
-    } 
+    /* Check for a good dark squid by seeing if it ever changes */
+    dkgood = 0;
+    firstdk = dksquid[0];
+    for( j=0; j<ntslice; j++ ) {
+      if( dksquid[j] != firstdk ) dkgood=1;
+    }
+
+    if( needDA && dkgood ) {
+      /* Smooth the dark squid template */
+      smf_boxcar1D( dksquid, ntslice, window, NULL, 0, status );
+    }
 
     /* Loop over rows, removing the fitted dksquid template. */
     for( j=0; (!nofit) && (*status==SAI__OK) && (j<nrow); j++ ) {
@@ -268,8 +268,8 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
         index *= ntslice;
       }
 
-      /* If newly read dark squid is bad, flag entire bolo as bad */
-      if( needDA && !dkgood && qua ) {
+      /* If dark squid is bad, flag entire bolo as bad if it isn't already */
+      if( !dkgood && qua && !(qua[index]&SMF__Q_BADB) ) {
         arrayoff = index;
         for( k=0; k<ntslice; k++ ) {
           qua[arrayoff] |= SMF__Q_BADB;
@@ -277,14 +277,9 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
         }
       }
 
-      /* Finally, check for SMF__Q_BADB - handles the case that we were
-         called previously to generate model, and now we are just using
-         it */
+      /* Try to fit if we think we have a good dark squid and bolo */
 
-      if( qua && (qua[index]&SMF__Q_BADB) ) dkgood = 0;
-
-      /* Continue if we think we have a good dark squid to fit out */
-      if( dkgood ) {
+      if( (!qua && dkgood) || (qua && dkgood && !(qua[index]&SMF__Q_BADB)) ) {
 
         switch( indata->dtype ) {
         case SMF__DOUBLE:
