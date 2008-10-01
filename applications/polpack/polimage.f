@@ -171,6 +171,8 @@
 *        Use CNF_PVAL
 *     7-MAR-2005 (DSB):
 *        Corrected use of CNF_PVAL
+*     1-OCT-2008 (DSB):
+*        Correct binning of pixel coords.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -527,6 +529,21 @@
          ELSE
             SZHI = 1.0
             SZLO = 0.0
+         END IF
+
+*  If the X, Y and Z columns are pixel coordinates, use the edges of the
+*  corresponding pixel as the upper and lower bounds. 
+         IF( IWCS .NE. AST__NULL ) THEN
+            SXHI = KPG1_CEIL( SXHI )
+            SXLO = KPG1_CEIL( SXLO ) - 1
+            SYHI = KPG1_CEIL( SYHI )
+            SYLO = KPG1_CEIL( SYLO ) - 1
+
+            IF( GOTZ ) THEN
+               SZHI = KPG1_CEIL( SZHI )
+               SZLO = KPG1_CEIL( SZLO ) - 1
+            END IF
+
          END IF
 
 *  Find the number of bins along each axis.
