@@ -303,6 +303,7 @@ public:
     { "astwarnings",     &StarRtdImage::astwarningsCmd,     0, 0 },
     { "astwcs2pix",      &StarRtdImage::astwcs2pixCmd,      2, 2 },
     { "astwrite",        &StarRtdImage::astwriteCmd,        1, 3 },
+    { "autosetcutlevels",&StarRtdImage::autosetcutlevelsCmd,0, 0 },
     { "biasimage",       &StarRtdImage::biasimageCmd,       0, 3 },
     { "blankcolor",      &StarRtdImage::blankcolorCmd,      1, 1 },
     { "colorramp",       &StarRtdImage::colorrampCmd,       0, 2 },
@@ -6477,6 +6478,23 @@ int StarRtdImage::astalwaysmergeCmd( int argc, char *argv[] )
     else {
         StarFitsIO::setAlwaysMerge( 1 );
     }
+    return TCL_OK;
+}
+
+//+
+//   StarRtdImage::autosetcutlevels
+//
+//   Purpose:
+//      Return the current setting of the autoSetCutLevels_ member.
+//      When unset this stops the application of autocuts and
+//      the user defined limits are honoured.
+//-
+int StarRtdImage::autosetcutlevelsCmd( int argc, char *argv[] )
+{
+#ifdef _DEBUG_
+    cout << "Called StarRtdImage::autosetcutlevelsCmd" << std::endl;
+#endif
+    set_result( autoSetCutLevels_ );
     return TCL_OK;
 }
 

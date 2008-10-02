@@ -417,8 +417,10 @@ itcl::class gaia::GaiaImagePanel {
                $itk_component(high)    $row,1 -fill x -anchor w \
          }
 
-         add_short_help $itk_component(low) {Image low cut value, type return after editing value}
-         add_short_help $itk_component(high) {Image high cut value, type return after editing value}
+         add_short_help $itk_component(low) \
+            {Image low cut value, type return after editing value, blue when set}
+         add_short_help $itk_component(high) \
+            {Image high cut value, type return after editing value, blue when set}
       }
 
       #  Image transformation controls.
@@ -631,17 +633,14 @@ itcl::class gaia::GaiaImagePanel {
    #  Set the cut levels using a given percentage cut...
    method set_percent_level {percent} {
       busy {$image_ autocut -percent $percent}
-      lassign [$image_ cut] low high
-      $itk_component(low) config -value $low
-      $itk_component(high) config -value $high
-      catch {[$itk_option(-image) component cut] update_graph}
+      updateValues
    }
 
    #  Set the colormap
    protected method set_colormap_ {map} {
       global gaia_library
       $image_ cmap file $gaia_library/colormaps/$map.lasc
-	
+
       #  If the colormap is read-only, we need to regenerate the colour ramp.
       if { [$image_ cmap isreadonly] } {
          catch {$itk_option(-image) component colorramp update_colors}
@@ -688,6 +687,17 @@ itcl::class gaia::GaiaImagePanel {
          if {"$f" != "[$itk_component(high) component entry]"} {
             $itk_component(high) config -value $high
          }
+
+         #  Toggle the label to blue when the cut is fixed.
+         if { ! [$image_ autosetcutlevels] } {
+            [$itk_component(low) component label] configure -foreground blue
+            [$itk_component(high) component label] configure -foreground blue
+         } else {
+            [$itk_component(low) component label] configure \
+               -foreground black
+            [$itk_component(high) component label] configure \
+               -foreground black
+         }
       }
       update_cut_window
 
@@ -695,7 +705,6 @@ itcl::class gaia::GaiaImagePanel {
          $itk_component(trans) update_trans
       }
    }
-
 
    #  Override the set the cut levels method to use GaiaImageCut
    #  instead of RtdImageCut
@@ -710,7 +719,6 @@ itcl::class gaia::GaiaImagePanel {
          -transient 1 \
          -command [code $this updateValues]
    }
-
 
    #  Disable the interchange facility, potentially undoing the current
    #  state.
@@ -728,6 +736,19 @@ itcl::class gaia::GaiaImagePanel {
       [$itk_component(trans) component rotate] configure -state normal
    }
 
+   #  Set the cut levels when the user types them in and hits return.
+   #  Make this clear by highlighting the values.
+   protected method set_cut_levels {args} {
+      set low [$itk_component(low) get]
+      set high [$itk_component(high) get]
+      if {[catch {expr {$low}} msg] || [catch {expr {$high}} msg]} {
+         error_dialog $msg
+      } else {
+         $image_ cut $low $high
+         updateValues
+      }
+   }
+
    #   Define the fonts as the RtdImagePanel ones are not available on
    #   all Linux systems.
    itk_option define -labelfont labelFont LabelFont -adobe-helvetica-bold-r-normal-*-12*
@@ -742,5 +763,4 @@ itcl::class gaia::GaiaImagePanel {
 
    #   Protected variable.
    protected variable make_now_ 0
-
 }

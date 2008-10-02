@@ -69,6 +69,8 @@
  *        Added isCompoundCmd.
  *     26-APR-2006 (PWD):
  *        Added updateImageCmd and volatility marking.
+ *     02-OCT-2008 (PWD):
+ *        Added autosetcutlevelsCmd.
  *-
  */
 
@@ -371,6 +373,9 @@ class StarRtdImage : public Skycat
    // Command to get or set the volatility status. Note this happens
    // automatically when replaceImageDataCmd is called.
    int volatileCmd( int argc, char *argv[] );
+
+   // Command to get the value of the autoSetCutLevels_ member.
+   int autosetcutlevelsCmd( int argc, char *argv[] );
 
  protected:
 
