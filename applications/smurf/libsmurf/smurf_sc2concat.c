@@ -229,9 +229,6 @@ void smurf_sc2concat( int *status ) {
     for( idx=0; (*status==SAI__OK)&&idx<concat->ndat; idx++ ) {
       if( concat->sdata[idx]->file && concat->sdata[idx]->file->name ) {
 
-        smf_clean_dksquid( concat->sdata[idx], NULL, 0, 100, NULL, 0, 0, 
-                           status );
-
         /* Get the file name: note that we have to be careful to read
            them out of this group in the same order that we put them 
            in above! */
