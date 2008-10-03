@@ -75,6 +75,7 @@
 #include "ndf.h"
 #include "prm_par.h"
 #include "sae_par.h"
+#include "smf.h"
 
 int *smf_find_bad_dets( Grp *igrp,  int size, int *nbaddet, int *status ){
 

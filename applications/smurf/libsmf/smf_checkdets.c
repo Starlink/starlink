@@ -87,8 +87,8 @@ void smf_checkdets( Grp *detgrp, smfData *data, int *status ){
    int baddetslen;            /* Used length of "baddets" string */
    int exclude;               /* Exclude the listed detectors? */
    int found;                 /* Was current detector name found in detgrp? */
-   int irec;                  /* Index of current input detector */
-   int ndetgrp;               /* Size of "detgrp" group */
+   size_t irec;               /* Index of current input detector */
+   size_t ndetgrp;            /* Size of "detgrp" group */
 
 /* Check inherited status. Also check a group was supplied. */
    if( *status != SAI__OK || !detgrp ) return;
@@ -156,7 +156,7 @@ void smf_checkdets( Grp *detgrp, smfData *data, int *status ){
 /* Copy all the remaining names from alldets to the supplied group. */
       for( irec = 1; irec <= (data->dims)[ 1 ]; irec++ ) {
          grpGet( alldets, irec, 1, &buf, GRP__SZNAM, status );
-         if( detname && strcmp( detname, "REMOVE" ) ) {
+         if( strcmp( detname, "REMOVE" ) ) {
             grpPut1( detgrp, detname, 0, status );
          }
       }

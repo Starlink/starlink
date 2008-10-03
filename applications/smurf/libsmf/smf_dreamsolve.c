@@ -143,10 +143,6 @@ void smf_dreamsolve( smfData *data, int *status ) {
   HDSLoc *scu2redloc = NULL;       /* Locator to SCU2RED extension */
   double *tstream = NULL;          /* Pointer to time series data */
   int ubnd[2];                     /* Upper bounds */
-  int vxmax;                       /* Maximum X SMU offset */
-  int vxmin;                       /* Minimum X SMU offset */
-  int vymax;                       /* Maximum Y SMU offset */
-  int vymin;                       /* Minimum Y SMU offset */
   int naver;                       /* Temporary value... */
   int jigext[4] = { -1, 1, -1, 1 };/* Table of SMU pattern extents for a
 				      single bolometer */

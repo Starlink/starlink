@@ -75,6 +75,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "smf.h"
+
 #include "par.h"
 #include "f77.h"
 #include "sae_par.h"

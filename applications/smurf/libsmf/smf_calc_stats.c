@@ -224,8 +224,8 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
       msgSetc("M", mode);
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unsupported mode, ^M. Must be b or t.", status);
-      return;
     }
+    return;
   }
 
   /* Check index is in range */
@@ -236,8 +236,8 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Requested index, ^I, is out of range (max is ^N).", 
              status);
-      return;
     }
+    return;
   }
 
   /* Check requested range is valid */
@@ -248,8 +248,8 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Requested sample, ^J, is out of range (0 < lo < ^N).",
              status);
-      return;
     }
+    return;
   }
   if ( hi >= nsamp ) {
     if ( *status == SAI__OK) {
@@ -258,8 +258,8 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Requested sample, ^J, is out of range (0 < hi < ^N).",
              status);
-      return;
     }
+    return;
   }
 
   /* Check hi is larger than lo; swap if not */
@@ -283,8 +283,8 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
       errRep(FUNC_NAME, 
              "Requested index range is zero (lo = hi). Unable to compute statistics.", 
              status);
-      return;
     }
+    return;
   }
 
   /* How many bytes per element */

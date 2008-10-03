@@ -68,6 +68,8 @@
 #include "sae_par.h"
 #include "ast.h"
 #include "mers.h"
+#include "smf.h"
+
 #include <string.h>
 #include <math.h>
 
@@ -78,7 +80,7 @@ float smf_calc_telres( AstFitsChan *hdr, int *status ) {
    double los;
    double loe;
    float diam;
-   float lambda;
+   float lambda = 0;
    float result;            
    int nc;
 

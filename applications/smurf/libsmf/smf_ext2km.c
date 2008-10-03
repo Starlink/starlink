@@ -99,6 +99,8 @@
 #include "mers.h"
 #include "star/kaplibs.h"
 
+#include "smf.h"
+
 void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap,
                  int mode, int *status ){
 

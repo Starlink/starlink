@@ -103,7 +103,6 @@ char *smf_getobsidss( AstFitsChan *hdr, char * obsid, size_t szobs,
   char *obspnt = NULL;    /* Local buffer or supplied buffer */
   size_t size;            /* Size of obsid buffer */
   char *value = NULL;     /* Pointer to static buffer containing header value */
-   int nc;                  /* Number of characters written */
 
    /* Check the inherited status */
    if ( *status != SAI__OK ) return NULL;

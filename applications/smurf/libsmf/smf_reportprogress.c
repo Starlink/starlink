@@ -75,6 +75,8 @@
 #include "sae_par.h"
 #include "mers.h"
 
+#include "smf.h"
+
 void smf_reportprogress( int max, int *status ){
 
 /* Local Variables */
