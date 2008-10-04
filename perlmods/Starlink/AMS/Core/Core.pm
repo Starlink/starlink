@@ -207,7 +207,7 @@ sub adamtask_message {
   $command eq "inform" && do {
 
     # Check for error messages
-    if ($message[6] =~ /^!/) {
+    if ($message[6] =~ /^\a+!/) {
       print $ERRHAND "$message[6]\n" unless $err_hide;
     } else {
       print $MSGHAND "$message[6]\n" unless $msg_hide;
@@ -875,8 +875,11 @@ $PARAMREP_SUB = sub {
 
 # Exit handler
 END {
-  adamtask_exit;
-  print "ADAM exited\n" if $DEBUG;
+  {
+    local($., $@, $!, $^E, $?);
+    adamtask_exit;
+    print "ADAM exited\n" if $DEBUG;
+  }
 }
 
 
