@@ -140,7 +140,7 @@ void err1Print( const char * text, int *errbel, int *status) {
 
   /*  Check whether a bell character is to be delivered and initialise the 
    *  output line. */
-  if (errbel) {
+  if (*errbel) {
     strcpy(line, "\a");
     lstart = 1;
     *errbel = 0;
