@@ -45,8 +45,9 @@
 *        Pointer to global status.
 
 *  Description:
-*     Calculate mean and standard deviation. If less than 2 good samples,
-*     exists with status set to SMF__INSMP.
+*     Calculate mean and standard deviation provided there is at least 1
+*     good sample. However, status is set to SMF__INSMP if there are not
+*     at least SMF__MINSTATSAMP good samples. 
 
 *  Notes: 
 *     The algorithm is "naive" and may suffer roundoff problems. It may be
@@ -173,6 +174,13 @@ void smf_stats1( double *data, dim_t start, dim_t nsamp,
     }
   }
 
+  /* Calculate numbers as long as count > 0 */
+  if( count > 0 ) {
+    mu = sum / count;
+    if( mean ) *mean = mu;
+    if( sigma ) *sigma = sqrt( (sumsq - count*mu*mu)/(count) );
+  }
+
   if( ngood ) *ngood = count;
 
   /* Enough samples? */
@@ -181,13 +189,10 @@ void smf_stats1( double *data, dim_t start, dim_t nsamp,
     msgSeti("MIN",SMF__MINSTATSAMP);
     msgSeti("N", count );
     msgSeti("MX", nsamp );
-    errRep( FUNC_NAME, "Insufficient number of good samples (^N<^MIN out of ^MX) for statistics", status );
+    errRep( "", FUNC_NAME 
+            ": Insufficient number of good samples (^N<^MIN out of ^MX) for "
+            "statistics", status );
     return;
   }
 
-  /* Finalize calculation and return result */
-  mu = sum / count;
-
-  if( mean ) *mean = mu;
-  if( sigma ) *sigma = sqrt( (sumsq - count*mu*mu)/(count) );
 }
