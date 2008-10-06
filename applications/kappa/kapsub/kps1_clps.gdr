@@ -184,6 +184,8 @@
 *        Bug fix: reorder the co-ordinate array for INTEG.
 *     2007 December 10 (MJC);
 *        Add NFLAG argument.
+*     2008 October 5 (MJC);
+*        Allowed for non-trimmed data.
 *     {enter_further_changes_here}
 
 *-
@@ -257,6 +259,7 @@
       INTEGER POS2( NDF__MXDIM ) ! Output pixel indices 
       INTEGER START              ! The first input element to use
       INTEGER STEP1              ! Vector step between collapsed pixels
+      LOGICAL TRIM               ! Number of axes is trimmed?
       LOGICAL USECO              ! Method uses the co-ordinate array?
       LOGICAL USECV              ! Method uses a covariance array?
       LOGICAL USEIND             ! Method uses the pixel-index array?
@@ -366,6 +369,9 @@
 *  the input data and variance values. 
       ELSE 
 
+*  Has there been a reduction in the number of axes.
+         TRIM = NDIM1 .GT. NDIM2
+
 *  Step through every pixel in the output arrays.
          DO IEL2 = 1, NEL2      
 
@@ -376,8 +382,10 @@
                   POS1( IAX1 ) = POS2( IAX1 )
                ELSE IF( IAX1 .EQ. AXIS ) THEN
                   POS1( IAX1 ) = LO
-               ELSE
+               ELSE IF ( TRIM ) THEN
                   POS1( IAX1 ) = POS2( IAX1 - 1 )
+               ELSE
+                  POS1( IAX1 ) = POS2( IAX1 )
                END IF
             END DO
 
