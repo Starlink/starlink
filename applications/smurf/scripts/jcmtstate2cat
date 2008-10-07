@@ -135,7 +135,7 @@ for my $f (@files) {
 	    dat_get1c( $iloc, $size, @data, my $el, $status );
     } else {
 	    if ($status == &NDF::SAI__OK) {
-        $status = &NDF::SAI__ERRROR;
+        $status = &NDF::SAI__ERROR;
         err_rep( " ", "Unsupported type $type", $status );
 	    }
     }
