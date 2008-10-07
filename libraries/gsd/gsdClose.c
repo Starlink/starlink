@@ -63,7 +63,7 @@
 *    rp: Rachael Padman (MRAO)
 *    hme: Horst Meyerdierks (UoE, Starlink)
 *    timj: Tim Jenness (JAC, Hawaii)
-
+*    ror: Russell Redman (HIA)
 
 * History:
 *    08 Sep 1986 (jhf):
@@ -76,6 +76,8 @@
 *       Translation to C. Renamed from GSD_CLOSE. Interface revised.
 *    04 Jul 2008 (timj):
 *       use proper GSD structs rather than void
+*    06 Oct 2008 (ror):
+*       Support reading from stdin.
 
 
 * Copyright:
@@ -100,7 +102,13 @@ int gsdClose( FILE *fptr, GSDFileDesc *file_dsc, GSDItemDesc *item_dsc,
    int status;
 
    status = 0;
-   if ( fptr     ) status = fclose( fptr );
+   if ( fptr     ) {
+     if (fptr == stdin) {
+       if (ferror(stdin)) clearerr(stdin);
+     } else {
+       status = fclose( fptr );
+     }
+   }
    if ( file_dsc ) (void) free( file_dsc );
    if ( item_dsc ) (void) free( item_dsc );
    if ( data_ptr ) (void) free( data_ptr );

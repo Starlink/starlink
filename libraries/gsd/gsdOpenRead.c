@@ -122,7 +122,12 @@
 *    01 Apr 1997 (timj):
 *       Support for actual given filename in remote DATADIR
 *    03 Jul 2008 (TIMJ):
-*       Use const
+*       Use const and proper GSD structs in API
+*    06 Oct 2008 (ror):
+*       Support reading from stdin.
+*    06 Oct 2008 (timj):
+*       Use bigger buffer for input filename (still a buffer overrun
+*       is highly likely)
 
 * Copyright:
 *    Copyright (C) 2008 Science and Technology Facilities Council.
@@ -148,7 +153,7 @@ int gsdOpenRead( const char *file, float *version, char *label, int *nitem,
    int status;
    int ier, inr, no_items, start_item, start_byte;
 
-   char dfile[128], *datadir;
+   char dfile[1024], *datadir;
 /*.
  */
 
@@ -169,25 +174,29 @@ int gsdOpenRead( const char *file, float *version, char *label, int *nitem,
  * then upper and lower case suffix and DATADIR
  */
    sprintf( dfile, "%s", file );
-   *fptr = fopen( dfile, "r" );
-   if ( !*fptr ) { 
-     sprintf( dfile, "%s.dat", file );
+   if (strcmp(file,"-") == 0) {
+     *fptr = stdin;
+   } else {
      *fptr = fopen( dfile, "r" );
      if ( !*fptr ) { 
-       sprintf( dfile, "%s.DAT", file );
+       sprintf( dfile, "%s.dat", file );
        *fptr = fopen( dfile, "r" );
        if ( !*fptr ) { 
-         if ( datadir != NULL ) {
-  	   sprintf( dfile, "%s/%s", datadir, file );
-  	   *fptr = fopen( dfile, "r" );
-  	   if ( !*fptr ) { 
-  	     sprintf( dfile, "%s/%s.dat", datadir, file );
-  	     *fptr = fopen( dfile, "r" );
-	     if ( !*fptr ) { 
-	       sprintf( dfile, "%s/%s.DAT", datadir, file );
-	       *fptr = fopen( dfile, "r" );
-	     }
-  	   }
+         sprintf( dfile, "%s.DAT", file );
+         *fptr = fopen( dfile, "r" );
+         if ( !*fptr ) { 
+           if ( datadir != NULL ) {
+             sprintf( dfile, "%s/%s", datadir, file );
+             *fptr = fopen( dfile, "r" );
+             if ( !*fptr ) { 
+               sprintf( dfile, "%s/%s.dat", datadir, file );
+               *fptr = fopen( dfile, "r" );
+               if ( !*fptr ) { 
+                 sprintf( dfile, "%s/%s.DAT", datadir, file );
+                 *fptr = fopen( dfile, "r" );
+               }
+             }
+           }
          }
        }
      }
@@ -238,7 +247,13 @@ int gsdOpenRead( const char *file, float *version, char *label, int *nitem,
 /* Return.
  */
    abort:
-   if ( status && *fptr         ) (void) fclose( *fptr );
+   if ( status && *fptr         ) {
+     if (*fptr == stdin) {
+       if (ferror(stdin)) clearerr(stdin);
+     } else {
+       (void) fclose( *fptr );
+     }
+   }
    if ( status && *file_dsc ) (void) free( *file_dsc );
    if ( status && *item_dsc ) (void) free( *item_dsc );
    if ( status && *data_ptr     ) (void) free( *data_ptr );

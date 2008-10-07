@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="gsd" support="U">
-  <version>1.0-1</version>
+  <version>1.0-2</version>
   <path>libraries/gsd</path>
   <description>Global Section Datafile (GSD) access library</description>
   <abstract><p>This library provides read-only access to GSD files created at the James Clerk Maxwell Telescope. It is mainly useful for accessing JCMT archive data.

@@ -1,3 +1,10 @@
+GSD Version 1.0-2                           5 October 2008
+
+ - Can now read from standard input (use "-" as filename)
+
+ - API has been cleaned up to use C structs rather than
+   pointers to void.
+
 GSD Version 1.0-1                           9 March 2004
 
   Switch build system to GNU configure

@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(gsd, 1.0-1, t.jenness@jach.hawaii.edu)
+AC_INIT(gsd, 1.0-2, t.jenness@jach.hawaii.edu)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
