@@ -80,8 +80,8 @@
       INTEGER STATUS           ! Global status
 
 *  Local Variables:
-      CHARACTER DOM*20         ! Domain attribute for a Frame
-      CHARACTER IDENT*20       ! Ident attribute for a Frame
+      CHARACTER*(AST__SZCHR) DOM          ! Domain attribute for a Frame
+      CHARACTER*(AST__SZCHR) IDENT        ! Ident attribute for a Frame
       DOUBLE PRECISION RLBND( ATL__MXDIM )! Region lower bounds   
       DOUBLE PRECISION RUBND( ATL__MXDIM )! Region upper bounds   
       INTEGER FRM              ! Pointer to a Frame in Plot
