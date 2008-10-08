@@ -4,6 +4,7 @@
 #include "ems_par.h"		 /* EMS_ constants */
 #include "f77.h"		 /* Fortran 77 <=> C interface macros */
 #include "ast.h"		 /* AST definitions */
+#include "mers.h"
 
 /* A type for a pointer to a function that can be called to handle an
    NDF event. */
@@ -346,7 +347,7 @@ F77_SUBROUTINE(ndf1_event)( CHARACTER(EVNAME),
    EVNAME string. */
    evname = astString( EVNAME, EVNAME_length );
 
-/* Verify the supplied event type nad get its index within the types and
+/* Verify the supplied event type and get its index within the types and
    handlers arrays. */
    ihandler = CheckType( evname, STATUS );
 
@@ -384,8 +385,8 @@ F77_SUBROUTINE(ndf1_event)( CHARACTER(EVNAME),
 
 /* Report a context error message. */
    if( *STATUS != SAI__OK ) {
-      errRep( "", "NDF1_EVENT: Failed to raise an NDF event (internal NDF ",
-              "library error)." );
+      errRep( "", "NDF1_EVENT: Failed to raise an NDF event (internal NDF "
+              "library error).", STATUS );
    }
 }
 
