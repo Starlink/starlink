@@ -51,8 +51,10 @@
 *        should disappear as ANSI compilers become the default.
 
 *  Copyright:
-*     Copyright (C) 1991, 1993 Science & Engineering Research Council
-*     Copyright (C) 2006 Particle Physics and Astronomy Research Council
+*     Copyright (C) 1991, 1993 Science & Engineering Research Council.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2007,2008 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -209,6 +211,8 @@
 *      13-JUL-2007 (PWD):
 *        Parameterise the type of Fortran character string lengths. Can
 *        be long.
+*      7-OCT-2008 (TIMJ):
+*        Initialise pointers.
 *     {enter_further_changes_here}
 *        
 
@@ -482,23 +486,23 @@
    const int X##_length = L
 
 /*  ---  Declare and construct dynamic CHARACTER arguments ---                      */
-#define DECLARE_CHARACTER_DYN(X)   F77_CHARACTER_TYPE *X;\
-   int X##_length
+#define DECLARE_CHARACTER_DYN(X)   F77_CHARACTER_TYPE *X = NULL;\
+   int X##_length = 0
 #define F77_CREATE_CHARACTER(X,L)  X=cnfCref(L);\
    X##_length = (L>0?L:1)
 
 /* Declare Dynamic Fortran arrays */
-#define DECLARE_INTEGER_ARRAY_DYN(X) F77_INTEGER_TYPE *X
-#define DECLARE_REAL_ARRAY_DYN(X)    F77_REAL_TYPE *X
-#define DECLARE_DOUBLE_ARRAY_DYN(X)  F77_DOUBLE_TYPE *X
-#define DECLARE_LOGICAL_ARRAY_DYN(X) F77_LOGICAL_TYPE *X
-#define DECLARE_BYTE_ARRAY_DYN(X)    F77_BYTE_TYPE *X
-#define DECLARE_WORD_ARRAY_DYN(X)    F77_WORD_TYPE *X
-#define DECLARE_UBYTE_ARRAY_DYN(X)   F77_UBYTE_TYPE *X
-#define DECLARE_UWORD_ARRAY_DYN(X)   F77_UWORD_TYPE *X
-#define DECLARE_POINTER_ARRAY_DYN(X) F77_POINTER_TYPE *X
-#define DECLARE_CHARACTER_ARRAY_DYN(X)   F77_CHARACTER_TYPE *X;\
-   int X##_length
+#define DECLARE_INTEGER_ARRAY_DYN(X) F77_INTEGER_TYPE *X = NULL
+#define DECLARE_REAL_ARRAY_DYN(X)    F77_REAL_TYPE *X = NULL
+#define DECLARE_DOUBLE_ARRAY_DYN(X)  F77_DOUBLE_TYPE *X = NULL
+#define DECLARE_LOGICAL_ARRAY_DYN(X) F77_LOGICAL_TYPE *X = NULL
+#define DECLARE_BYTE_ARRAY_DYN(X)    F77_BYTE_TYPE *X = NULL
+#define DECLARE_WORD_ARRAY_DYN(X)    F77_WORD_TYPE *X = NULL
+#define DECLARE_UBYTE_ARRAY_DYN(X)   F77_UBYTE_TYPE *X = NULL
+#define DECLARE_UWORD_ARRAY_DYN(X)   F77_UWORD_TYPE *X = NULL
+#define DECLARE_POINTER_ARRAY_DYN(X) F77_POINTER_TYPE *X = NULL
+#define DECLARE_CHARACTER_ARRAY_DYN(X)   F77_CHARACTER_TYPE *X = NULL;\
+   int X##_length = 0
 
 /* Create arrays dynamic Fortran arrays for those types which require */
 /* Separate space for Fortran and C arrays                            */
