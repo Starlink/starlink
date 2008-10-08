@@ -14,7 +14,7 @@
 #define DAT__MXDIM 7		 /* Maximum number of object dimensions	    */
 #define DAT__NOLOC "<NOT A LOCATOR> "/*	Null (invalid) locator value	    */
 #define DAT__NOWLD 0		 /* Null wild-card search context	    */
-#define DAT__ROOT "<ROOT LOCATOR>   "/* Root locator value		    */
+#define DAT__ROOT  "<ROOT LOCATOR>  "/* Root locator value		    */
 #define DAT__SZGRP 15		 /* Size of group name			    */
 #define DAT__SZLOC ( ( 15 > (int) sizeof( struct LOC ) ) ? \
 		     15 : (int) sizeof( struct LOC ) )
