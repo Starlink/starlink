@@ -27,10 +27,15 @@
 
 *  Description:
 *     Given a string for the observation return the enumerated value
-*     as defined in sc2sim_struct.h. 
+*     as defined in sc2sim_struct.h. The enumerated type MODE__NONE is
+*     returned on error or if the supplied observing mode string is
+*     not recognized. It is the caller's responsibility to check the
+*     return value and issue an error.
 
 *  Authors:
 *     Ed Chapin (UBC)
+*     Jen Balfour (UBC)
+*     Andy Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -42,10 +47,12 @@
 *        Add liss mode
 *     2007-07-03 (EC): 
 *        Made enumerated types more readable / fixed up null return value
+*     2008-10-10 (AGG):
+*        Add NOISE observing mode check
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2005-2008 University of British Columbia. All
+*     Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -71,12 +78,15 @@
 /* Standard includes */
 #include <string.h>
 
+/* Starlink includes */
+#include "sae_par.h"
+
 /* SC2SIM includes */
 #include "sc2sim.h"
 
 obsMode sc2sim_getobsmode( char *name, int *status ) {
    /* Check status */
-   if ( !StatusOkP(status) ) return MODE__NONE;
+   if ( *status != SAI__OK ) return MODE__NONE;
 
    if( strcmp( name, "STARE" ) == 0 ) return MODE__STARE;
    else if( strcmp( name, "DSTARE" ) == 0 ) return MODE__DSTARE;
@@ -87,6 +97,7 @@ obsMode sc2sim_getobsmode( char *name, int *status ) {
    else if( strcmp( name, "BOUS" ) == 0 ) return MODE__BOUS;
    else if( strcmp( name, "SINGLESCAN" ) == 0 ) return MODE__SINGLESCAN;
    else if( strcmp( name, "LISS" ) == 0 ) return MODE__LISS;
+   else if( strcmp( name, "NOISE" ) == 0 ) return MODE__NOISE;
    else return MODE__NONE;
 
 }

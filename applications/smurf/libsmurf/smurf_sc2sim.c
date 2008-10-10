@@ -488,6 +488,8 @@
 *         Check for simstats parameter before writing simulation info to stdout
 *     2008-05-29 (TIMJ):
 *         Free bolos array.
+*     2008-10-10 (AGG):
+*         Add NOISE observing mode
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -577,9 +579,11 @@ void smurf_sc2sim( int *status ) {
   double digcurrent;              /* digitisation mean current */
   double digmean;                 /* digitisation mean value */
   double digscale;                /* digitisation scale factore */
+  int dreamstare = 0;             /* Flag for running a DREAM/STARE observation */
   double elevation;               /* telescope elevation (radians) */
   char filter[8];                 /* string to hold filter name */
   double *heater = NULL;          /* bolometer heater ratios */
+  int heatrun = 0;                /* Flag for running a HEATRUN observation */
   int hitsonly = 0;               /* Flag to indicate hits-only simulation */
   int maxwrite;                   /* file close time */
   obsMode mode;                   /* what type of observation are we doing? */
@@ -591,6 +595,7 @@ void smurf_sc2sim( int *status ) {
 				     files are overwritten */
   double *pzero = NULL;           /* bolometer power offsets */
   int rseed;                      /* seed for random number generator */
+  int scan = 0;                   /* Flag for running a SCAN observation */
   Grp *simGrp = NULL;             /* Group containing sim parameter file */
   AstKeyMap *simkeymap = NULL;    /* AstKeyMap for sim parameters */
   int simstats = 0;               /* Flag to denote whether just to
@@ -605,26 +610,23 @@ void smurf_sc2sim( int *status ) {
   double *ybc = NULL;             /* projected NAS Y offsets of bolometers 
 				     in arcsec */
   double *ybolo = NULL;           /* Native bolo y-offsets */
-  
-  char ard[LEN__METHOD];         /* Name of ARD description */
-  int ardFlag=0;                 /* Flag for ARD description */
-  Grp *ardGrp = NULL;            /* Group containing ARD description */
-  int *bolos = NULL;             /* Array of all bolometers */
-  int lbnd[2];                   /* Lower pixel bounds for bad pixel mask */
-  int lbnde[2];                  /* Lower pixel bounds encompassing all
-				    external pixels */
-  int lbndi[2];                  /* Lower pixel bounds encompassing all
-				    internal pixels */
-  int regval=0;                  /* First keyword in ARD description */
-  float trcoeff;                 /* Coefficients for ARD mapping */
-  int ubnd[2];                   /* Upper pixel bounds for bad pixel mask */
-  int ubnde[2];                  /* Upper pixel bounds encompassing all
-				    external pixels */
-  int ubndi[2];                  /* Upper pixel bounds encompassing all
-				    internal pixels */
-  int heatrun = 0;
-  int dreamstare = 0;
-  int scan = 0;
+  /* ARD parameters */
+  char ard[LEN__METHOD];          /* Name of ARD description */
+  int ardFlag=0;                  /* Flag for ARD description */
+  Grp *ardGrp = NULL;             /* Group containing ARD description */
+  int *bolos = NULL;              /* Array of all bolometers */
+  int lbnd[2];                    /* Lower pixel bounds for bad pixel mask */
+  int lbnde[2];                   /* Lower pixel bounds encompassing all
+			  	     external pixels */
+  int lbndi[2];                   /* Lower pixel bounds encompassing all
+				     internal pixels */
+  int regval=0;                   /* First keyword in ARD description */
+  float trcoeff;                  /* Coefficients for ARD mapping */
+  int ubnd[2];                    /* Upper pixel bounds for bad pixel mask */
+  int ubnde[2];                   /* Upper pixel bounds encompassing all
+				     external pixels */
+  int ubndi[2];                   /* Upper pixel bounds encompassing all
+				     internal pixels */
 
   /* Get input parameters */
   kpg1Gtgrp ( "OBSPAR", &obsGrp, &osize, status );
@@ -657,6 +659,7 @@ void smurf_sc2sim( int *status ) {
   sc2sim_instrinit ( &inx, &sinx, obskeymap, simkeymap, coeffs, &digcurrent,
 		     &digmean, &digscale, &elevation, weights, &heater, 
 		     &pzero, &xbc, &ybc, &xbolo, &ybolo, status );
+
   /* Re-initialise random number generator to give a different sequence
      each time by using the given seed. */
   srand ( rseed );
@@ -697,6 +700,10 @@ void smurf_sc2sim( int *status ) {
     msgSetc("M","STARE");
     dreamstare = 1;
     break;
+  case MODE__NOISE:
+    msgSetc("M","NOISE");
+    dreamstare = 1;
+    break;
   case MODE__DREAM:
     msgSetc("M","DREAM");
     dreamstare = 1;
@@ -722,9 +729,13 @@ void smurf_sc2sim( int *status ) {
     scan = 1;
     break;
   default:
-    *status = SAI__ERROR;
-    msgSetc( "M", inx.obsmode );
-    errRep("", "^M is not a supported observation mode", status);
+    /* Check status - if things are OK then there is a problem with
+       the given observation mode */
+    if ( *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      msgSetc( "M", inx.obsmode );
+      errRep("", "^M is not a supported observation mode", status);
+    }
   }
 
   /* Has the user requested a listing of the stats only? */
@@ -762,8 +773,6 @@ void smurf_sc2sim( int *status ) {
 	  errRep("", "^S is not a supported simulation type", status);
 	}
       }
-    } else if ( dreamstare ) {
-      hitsonly = 0;
     }
 
     /* Get the file close interval */

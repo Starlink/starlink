@@ -277,6 +277,8 @@
 *        - use one_strlcpy
 *     2008-08-25 (AGG):
 *        Force sc2store to think it's initialized to avoid EMS stack warnings
+*     2008-10-10 (AGG):
+*        Add NOISE observations
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -716,6 +718,18 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
       break;
 
+    case MODE__NOISE:
+      /* A noise observation is just a short Stare */
+      msgOutif(MSG__VERB, " ", "Do a NOISE observation", status );
+      /* Always only lasts 10 s */
+      count = 10. / inx->steptime;
+      posptr = smf_malloc ( count*2, sizeof(*posptr), 1, status );
+      if( *status == SAI__OK ) {
+        memset( posptr, 0, count*2*sizeof(double) );
+      }
+
+      break;
+
     case MODE__DREAM:
       /* Call sc2sim_getpat to get the dream pointing solution */
       msgOutif(MSG__VERB, " ", "Do a DREAM observation", status );
@@ -747,10 +761,10 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     case MODE__SINGLESCAN:
       /* Call sc2sim_getsinglescan to get scan pointing solution */
       msgOutif(MSG__VERB, " ", "Do a SINGLESCAN observation", status );
-      accel[0] = 432.0;
+      accel[0] = 432.0;           /* Source? */
       accel[1] = 540.0;
-      vmax[0] = inx->vmax;        /*200.0;*/
-      vmax[1] = inx->vmax;        /*200.0;*/
+      vmax[0] = inx->vmax;        /* Max is 600.0 arcsec/s */
+      vmax[1] = inx->vmax;        /* Max is 600.0 arcsec/s */
       
       sc2sim_getsinglescan ( inx->scan_angle, inx->width, accel, vmax, 
                              samptime, &count, &posptr, status );
@@ -766,8 +780,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       msgOutif(MSG__VERB, " ", "Do a BOUS observation", status );
       accel[0] = 432.0;
       accel[1] = 540.0;
-      vmax[0] = inx->vmax;        /*200.0;*/
-      vmax[1] = inx->vmax;        /*200.0;*/
+      vmax[0] = inx->vmax;        /* Max is 600.0 arcsec/s */
+      vmax[1] = inx->vmax;        /* Max is 600.0 arcsec/s */
       
       sc2sim_getbous ( inx->bous_angle, inx->width, inx->height, 
                        inx->spacing, accel, vmax, samptime, &count, 
@@ -786,8 +800,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       accel[0] = 0.0;
       accel[1] = 0.0;
 
-      vmax[0] = inx->vmax;        /*200.0;*/
-      vmax[1] = inx->vmax;        /*200.0;*/
+      vmax[0] = inx->vmax;        /* Max is 600.0 arcsec/s */
+      vmax[1] = inx->vmax;        /* Max is 600.0 arcsec/s */
 
       sc2sim_getliss ( inx->liss_angle, inx->width, inx->height, 
                        inx->spacing, accel, vmax, samptime, inx->nmaps, 
@@ -799,9 +813,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     
     case MODE__PONG:
       /* Get pong pointing solution */
-
-      vmax[0] = inx->vmax;        /*200.0;*/
-      vmax[1] = inx->vmax;        /*200.0;*/
+      vmax[0] = inx->vmax;        /* Max is 600.0 arcsec/s */
+      vmax[1] = inx->vmax;        /* Max is 600.0 arcsec/s */
 
       accel[0] = 0.0;
       accel[1] = 0.0;
@@ -1322,6 +1335,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                 size_t percent;
                 
               case MODE__STARE:
+              case MODE__NOISE:
               case MODE__DREAM:
                 /* offsets and micro steps - simulator does not seem to do offsetting */
                 percent = 100 * (1 + (head[j].rts_num / frmperms)) / inx->nmicstep;
@@ -1336,8 +1350,10 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                 head[j].tcs_percent_cmp = percent;
                 break;
               default: /* should not get here */
-                printf("Not possible to get here\n");
-                abort();
+		if ( *status == SAI__OK ) {
+		  *status = SAI__ERROR;
+		  errRep("", "Error - observing mode not set", status);
+		}
               } /* switch */
 
               /* Angle between "up" in Nasmyth coordinates, and "up"

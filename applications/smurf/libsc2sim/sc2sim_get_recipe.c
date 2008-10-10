@@ -39,6 +39,8 @@
 *        Original
 *     2008-05-04 (AGG):
 *        Add support for Lissajous observing mode
+*     2008-10-10 (AGG):
+*        Add support for NOISE observing mode
 
 *  Copyright:
 *     Copyright (C) 2008 University of British Columbia. All Rights Reserved.
@@ -111,9 +113,11 @@ void sc2sim_get_recipe ( const struct sc2sim_obs_struct *inx, char *recipe,
     /* SCIENCE observation - now check obsmode */
     if ( scan ) {
       strncpy( recipe, "REDUCE_SCAN", 12);
-    } else if ( (strncmp( inx->obsmode, "DREAM", 4) == 0) || 
-		(strncmp( inx->obsmode, "STARE", 4) == 0) ) {
+    } else if ( (strncmp( inx->obsmode, "DREAM", 5) == 0) || 
+		(strncmp( inx->obsmode, "STARE", 5) == 0) ) {
       strncpy( recipe, "REDUCE_DREAMSTARE", 18);
+    } else if (strncmp( inx->obsmode, "NOISE", 5) == 0) {
+      strncpy( recipe, "REDUCE_NOISE", 13);
     } else {
       /* Shouldn't get here... */
       *status = SAI__ERROR;
