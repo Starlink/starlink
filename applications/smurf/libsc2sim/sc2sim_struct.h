@@ -99,6 +99,8 @@
  *        Add obstype.
  *     2008-04-24 (AGG):
  *        Add nfocstep, focstep and focstart
+ *     2008-10-10 (AGG):
+ *        Add MODE__NOISE to obsMode
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -138,7 +140,7 @@ struct bolpix             /* pixel location of bolometer */
 
 /* Enumerated type for observing modes */
 typedef enum {MODE__STARE, MODE__DSTARE, MODE__DREAM, MODE__PONG, 
-	      MODE__POLSPIN, MODE__HEATRUN, 
+	      MODE__POLSPIN, MODE__HEATRUN, MODE__NOISE,
               MODE__BOUS, MODE__SINGLESCAN, MODE__LISS, MODE__NONE} obsMode;
 
 /* Enumerated type for map coordinate frame */
