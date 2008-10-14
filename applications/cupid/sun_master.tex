@@ -713,8 +713,8 @@ each pixel value when performing the Gaussian fit. The most significant
 configuration parameters for this algorithm are: {\tt
 GaussClumps.FwhmBeam} and {\tt GaussClumps.VeloRes} which determine the
 minimum clump size, and {\tt GaussClumps.Thresh} which (together with the
-ADAM parameter RMS) determine the second of the above termination
-criteria.
+ADAM parameter RMS) determine the third of the termination
+criteria listed below.
 
 Note, this implementation of the GaussClumps algorithm is a completely
 independent re-write, and includes some differences from other
@@ -766,7 +766,7 @@ fitting a Gaussian clump to a peak in the data array may be dominated by
 pixels that are largely unaffected by changes in the parameters of the
 Gaussian clumps\footnote{This can happen for instance when neighbouring
 peaks are present within the area of pixels used to fit a central peak.}.
-This can result in a very poor fit to the clump. To avoid this at attempt
+This can result in a very poor fit to the clump. To avoid this, an attempt
 is made to identify such pixels and to lower the weight associated with
 them.
 
@@ -867,7 +867,7 @@ emission. This typically produces a set of rings (in 2D), or shells (in 3D),
 outlining the clumps. However, these structures can be badly affected by
 noise in the data and so need to be cleaned up. This is done using a
 sequence of cellular automata which first dilate the rings or shells, and
-the erodes them. After cleaning, all pixels within each ring or shell
+then erodes them. After cleaning, all pixels within each ring or shell
 are assumed to belong to a single clump.
 
 \subsubsection{Identifying the Clump Edges}
@@ -932,25 +932,25 @@ which each data pixel is marked as either an edge pixel or a peak pixel
 or neither. Usually, the edge pixels can be seen to follow the outline of
 the visible clumps, but will often be badly affected by noise in the
 data. For instance, there may be holes in the edges surrounding a peak,
-or spurious pixels may be have been marked as edge pixels. Before
+or spurious pixels may have been marked as edge pixels. Before
 continuing, it is necessary to reduce the effect of this noise. This is
 done in two steps described below.
 
 \begin{enumerate}
-\item The edge regions were ``dilated'' (\emph{i.e.} thickened) using a
+\item The edge regions are ``dilated'' (\emph{i.e.} thickened) using a
 cellular automata algorithm which proceeds as follows: if a pixel is
 marked as an edge pixel, then all immediate neighbours of the pixel are
 also marked as edge pixels. Each pixel is considered to be the central
 pixel in a square of 3$\times$3 neighbouring pixels for 2D data, or the central
 pixel in a cube of 3$\times$3$\times$3 neighbouring pixels for 3D data.
 
-\item The thickened edge regions were then ``eroded'' (\emph{i.e.} made
+\item The thickened edge regions are then ``eroded'' (\emph{i.e.} made
 thinner) using another cellular automata algorithm which proceeds as follows. 
-If the number of neighbouring edge pixels surrounding a central pixel was
+If the number of neighbouring edge pixels surrounding a central pixel is
 greater than a specified threshold value (given by the configuration
-parameter {\tt Reinhold.CAThresh}), the central pixel would be marked as
-an edge pixel. If the number of neighbouring edge pixels was equal to or
-below this threshold, the central pixel would not be marked as an edge pixel. 
+parameter {\tt Reinhold.CAThresh}), the central pixel is marked as
+an edge pixel. If the number of neighbouring edge pixels is equal to or
+below this threshold, the central pixel is not marked as an edge pixel. 
 This transformation can be applied repeatedly to increase the amount of
 erosion by setting a value greater than one for the configuration parameter 
 {\tt Reinhold.CAIterations}.
@@ -1012,7 +1012,7 @@ hole in the edges surrounding a peak, the clump identifier value will
 ``leak out'' through the hole into the surrounding areas. This is where the
 limitations of the filling algorithm have a positive benefit, in that they
 prevent the leak from spreading round corners without limit. Instead, such 
-leaks will tend to be produce straight features radiating out from a clump
+leaks will tend to produce straight features radiating out from a clump
 parallel to a pixel axis, which will terminate as soon as they meet another 
 edge.
 
@@ -1117,13 +1117,14 @@ produced.
 
 \section{Examining the Results}
 
-
-The pixel values in the output NDF created by \htmlref{FINDCLUMPS}{FINDCLUMPS} 
-and \htmlref{EXTRACTCLUMPS}{EXTRACTCLUMPS} are integer values that
-indicate which clump each pixel belongs to (that is, all pixels that are
-contain within a single clump will all have the same integer value in the
-output NDF). Pixels that are not contained within any clump have bad
-values. 
+For all algorithms other than GaussClumps, the pixel values in the output
+NDF created by \htmlref{FINDCLUMPS}{FINDCLUMPS} and
+\htmlref{EXTRACTCLUMPS}{EXTRACTCLUMPS} are integer values that indicate
+which clump each pixel belongs to (that is, all pixels that are contain
+within a single clump will all have the same integer value in the output
+NDF). Pixels that are not contained within any clump have bad values.
+For GaussClumps, each pixel value in the output NDF is the sum of the
+Gaussian models that contribute to that pixel.
 
 
 \subsection{2D Data}
