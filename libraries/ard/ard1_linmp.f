@@ -78,6 +78,8 @@
 *  History:
 *     17-JUL-2001 (DSB):
 *        Original version.
+*     14-OCT-2008 (DSB):
+*        Correct test on DPP.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -326,13 +328,12 @@
                A( I ) = OUT( 1, I ) 
                B( I ) = OUT( 2, I ) 
             END DO
-            DPP = AST_DISTANCE( FRM, A, B, STATUS )/
-     :            ( EPS*SQRT( DBLE( NIN ) ) )
+            DPP = AST_DISTANCE( FRM, A, B, STATUS )
 
          END DO
 
 *  Store an estimate of the arc-distance (within the user coords) per pixel.
-         WCSDAT( 1 ) = DPP
+         WCSDAT( 1 ) = DPP/( EPS*SQRT( DBLE( NIN ) ) )
 
       END IF
 
