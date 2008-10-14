@@ -1510,6 +1510,7 @@
 *  which file caused the error.
       FIRST = .TRUE.
       LOOP = .TRUE.
+      ERRMSG = ' '
       DO WHILE ( LOOP )
          CALL FTGMSG( ERRMSG )
          LOOP = ERRMSG .NE. ' '
