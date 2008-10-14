@@ -142,6 +142,8 @@
 *        - Add focus (SMU) position to API
 *        - Remove telemission from API
 *        - Add defocus multiplier
+*     2008-10-10 (AGG):
+*        Allow NOISE observations, set the astronomical signal to zero
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -223,7 +225,7 @@ int *status                  /* global status (given and returned) */
 
 {
    /* Local variables */
-  double a[3];                    /* Quadratic coefficients for defocus multiplier */
+   double a[3];                    /* Quadratic coefficients for defocus multiplier */
    double airmass;                 /* airmass for each bolometer */
    double astvalue;                /* obs. astronomical value in pW */
    double atmvalue;                /* obs. atmospheric emission in pW */
@@ -253,7 +255,7 @@ int *status                  /* global status (given and returned) */
    double zenatm;                  /* zenith atmospheric signal (pW) */
 
     /* Check status */
-   if ( !StatusOkP(status) ) return;
+   if ( *status != SAI__OK ) return;
 
    /* Concatenate mappings to get bolo->astronomical image coordinates */
    if ( inx.planetnum == -1 ) {
@@ -330,6 +332,11 @@ int *status                  /* global status (given and returned) */
      a[1] = 0.1;
      a[2] = -0.05;
      defocus = a[0] + a[1]*focposn + a[2]*focposn*focposn;
+   }
+
+   /* For a noise observation, set the astronomical signal to zero */
+   if ( strncmp(inx.obsmode, "NOISE", 5) == 0 ) {
+     defocus = 0.0;
    }
 
    /* Get the zenith atmospheric signal */ 
