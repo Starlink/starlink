@@ -207,7 +207,7 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
   if (*status == SAI__OK) {
     hdr->instrument = instrument;
     hdr->wcs = wcs;
-    hdr->wcs = tswcs;
+    hdr->tswcs = tswcs;
     hdr->fitshdr = fitshdr;
     hdr->curframe = curframe;
     hdr->nframes = nframes;
