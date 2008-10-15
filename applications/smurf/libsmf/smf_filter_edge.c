@@ -113,23 +113,8 @@ void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status ) {
     if( *status != SAI__OK ) return;
   }
 
-  if( f < 0 ) {
-    *status = SAI__ERROR;
-    msgSetd("F",f);
-    errRep( FUNC_NAME, "Filter edge ^F Hz cannot be < 0.", status );
-    return;
-  }
-
   /* Calculate offset of edge frequency in filter */
-  iedge = (size_t) round( f/filt->df ); 
-
-  if( iedge >= filt->dim ) {
-    /* Bad status if edge above Nyquist frequency */
-    *status = SAI__ERROR;
-    msgSetd("F",f);
-    errRep( FUNC_NAME, "Filter edge ^F Hz is > Nyquist", status );
-    return;
-  }
+  iedge = smf_get_findex( f, filt->df, filt->dim, status );
 
   /* Since we're zero'ing a continuous piece of memory, just use memset */
 

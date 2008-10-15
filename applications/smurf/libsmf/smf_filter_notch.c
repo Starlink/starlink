@@ -133,23 +133,13 @@ void smf_filter_notch( smfFilter *filt, const double f_low[],
   for( i=0; (*status == SAI__OK) && i<n; i++ ) {
     /* Calculate edge offsets for notch, checking for reversed inputs */
     if( f_high[i] > f_low[i] ) {
-      iedge_low = (size_t) lround( f_low[i]/filt->df ); 
-      iedge_high = (size_t) lround( f_high[i]/filt->df ); 
+      iedge_low = smf_get_findex( f_low[i], filt->df, filt->dim, status );
+      iedge_high = smf_get_findex( f_high[i], filt->df, filt->dim, status );
     } else {
-      iedge_low = (size_t) lround( f_high[i]/filt->df ); 
-      iedge_high = (size_t) lround( f_low[i]/filt->df ); 
+      iedge_low = smf_get_findex( f_high[i], filt->df, filt->dim, status );
+      iedge_high = smf_get_findex( f_low[i], filt->df, filt->dim, status );
     }
     
-    /* Check for valid ranges */
-    if( iedge_low >= filt->dim ) {
-      /* Notch is above Nyquist frequency. Generate bad status */
-      *status = SAI__ERROR;
-      errRep( FUNC_NAME, "Notch filter is completely above Nyquist", status );
-    } else if( iedge_high >= filt->dim ) {
-      /* Only upper edge of notch > Nyquist. Set to Nyquist */
-      iedge_high = filt->dim-1;
-    }
-
     if( *status == SAI__OK ) {
       /* Since we're zero'ing a continuous piece of memory, just use memset */
 
