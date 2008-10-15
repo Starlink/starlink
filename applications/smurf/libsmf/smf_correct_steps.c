@@ -134,20 +134,20 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
 
   if( !qua ) {
     *status = SAI__ERROR;
-    errRep( FUNC_NAME, "No valid QUALITY array was provided", status );
+    errRep( "", FUNC_NAME ": No valid QUALITY array was provided", status );
     return;
   }
 
   if( !dat ) {
     *status = SAI__ERROR;
-    errRep( FUNC_NAME, "smfData does not contain a DATA component", status );
+    errRep( "", FUNC_NAME ": smfData does not contain a DATA component", 
+            status );
     return;
   }
 
   if( data->dtype != SMF__DOUBLE ) {
     *status = SAI__ERROR;
-    errRep(FUNC_NAME, 
-	   "Data is not double-precision", status);
+    errRep("", FUNC_NAME ": Data is not double-precision", status);
     return;
   }
 
@@ -160,18 +160,17 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
       *status = SAI__ERROR;
       msgSeti("NTSLICE",ntslice);
       msgSeti("DCBOX",ntslice);
-      errRep(FUNC_NAME,
-	     "Can't find jumps: ntslice=^NTSLICE, must be > dcbox(=^DCBOX)*2",
-	     status);
+      errRep("", FUNC_NAME
+	     ": Can't find jumps: ntslice=^NTSLICE, must be > dcbox" 
+             "(=^DCBOX)*2", status);
     }
 
     /* Check for valid threshold */
     if( dcthresh <= 0 ) {
       *status = SAI__ERROR;
       msgSeti("DCTHRESH",dcthresh);
-      errRep(FUNC_NAME,
-	     "Can't find jumps: dcthresh (^dcthresh) must be > 0",
-	     status);
+      errRep("", FUNC_NAME 
+             ": Can't find jumps: dcthresh (^dcthresh) must be > 0", status);
     }
   }  
 
