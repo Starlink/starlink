@@ -182,7 +182,7 @@ StarWCS::StarWCS( const char *header, const size_t lheader )
             AstFitsChan *fitschan = astFitsChan( NULL, NULL, "" );
             int ncard = (int) lheader / FITSCARD;
             gaiaUtilsGtFitsChan( (char *) header, ncard, &fitschan );
-            
+
             // Look for the image dimensions and store these if found. We
             // need these for calculating the size of the image in world
             // coordinates and AST doesn't retain this information.
@@ -415,18 +415,11 @@ void StarWCS::setSecPix()
     astTran2( wcs_, 2, xin, yin, 1, xout, yout );
 
     // And now get the distance between these positions in degrees.
-    if ( raIndex_ == 1 ) {
-        point1[0] = xout[0];
-        point1[1] = yout[0];
-        point2[0] = xout[1];
-        point2[1] = yout[1];
-    }
-    else {
-        point1[1] = xout[0];
-        point1[0] = yout[0];
-        point2[1] = xout[1];
-        point2[0] = yout[1];
-    }
+    point1[0] = xout[0];
+    point1[1] = yout[0];
+    point2[0] = xout[1];
+    point2[1] = yout[1];
+
     dist = astDistance( wcs_, point1, point2 );
     if ( ! astOK ) astClearStatus;
     if ( dist == AST__BAD ) {
@@ -445,18 +438,11 @@ void StarWCS::setSecPix()
     astTran2( wcs_, 2, xin, yin, 1, xout, yout );
 
     // And now get the distance between these positions in degrees.
-    if ( raIndex_ == 1 ) {
-        point1[0] = xout[0];
-        point1[1] = yout[0];
-        point2[0] = xout[1];
-        point2[1] = yout[1];
-    }
-    else {
-        point1[1] = xout[0];
-        point1[0] = yout[0];
-        point2[1] = xout[1];
-        point2[0] = yout[1];
-    }
+    point1[0] = xout[0];
+    point1[1] = yout[0];
+    point2[0] = xout[1];
+    point2[1] = yout[1];
+
     dist = astDistance( wcs_, point1, point2 );
     if ( ! astOK ) astClearStatus;
     if ( dist == AST__BAD ) {
@@ -587,7 +573,7 @@ char* StarWCS::pix2wcs( double x, double y, int notbound, char* buf,
                         int bufsz, int hms_flag ) const
 {
     buf[0] = '\0';
-    int onimage = ( x >= 0 && y >= 0 && 
+    int onimage = ( x >= 0 && y >= 0 &&
                     x <= ( nxpix_ + 1 ) && y <= ( nypix_ + 1 ) );
     if ( isWcs() && ( onimage || notbound ) ) {
         double newx[1], newy[1], oldx[1], oldy[1];
@@ -882,18 +868,12 @@ double StarWCS::width() const
     xin[0] = 1.0;
     xin[1] = (double) nxpix_/2;
     astTran2( wcs_, 2, xin, yin, 1, xout, yout );
-    if ( raIndex_ == 1 ) {
-        point1[1] = xout[0];
-        point1[0] = yout[0];
-        point2[1] = xout[1];
-        point2[0] = yout[1];
-    }
-    else {
-        point1[0] = xout[0];
-        point1[1] = yout[0];
-        point2[0] = xout[1];
-        point2[1] = yout[1];
-    }
+
+    point1[0] = xout[0];
+    point1[1] = yout[0];
+    point2[0] = xout[1];
+    point2[1] = yout[1];
+
     dist1 = astDistance( wcs_, point1, point2 );
     if ( ! astOK ) astClearStatus;
     if ( dist1 == AST__BAD ) {
@@ -903,29 +883,23 @@ double StarWCS::width() const
     xin[0] = (double) nxpix_/2;
     xin[1] = (double) nxpix_;
     astTran2( wcs_, 2, xin, yin, 1, xout, yout );
-    if ( raIndex_ == 1 ) {
-        point1[1] = xout[0];
-        point1[0] = yout[0];
-        point2[1] = xout[1];
-        point2[0] = yout[1];
-    }
-    else {
-        point1[0] = xout[0];
-        point1[1] = yout[0];
-        point2[0] = xout[1];
-        point2[1] = yout[1];
-    }
+
+    point1[0] = xout[0];
+    point1[1] = yout[0];
+    point2[0] = xout[1];
+    point2[1] = yout[1];
+
     dist2 = astDistance( wcs_, point1, point2 );
     if ( ! astOK ) astClearStatus;
     if ( dist2 == AST__BAD ) {
         return 0.0;
     }
-    
+
     dist = dist1 + dist2;
 
     //  Check that distance isn't 0, this indicates that edge of image
     //  is same coordinate (and above didn't help). If so use arcsec per pixel
-    //  estimate. 
+    //  estimate.
     if ( dist == 0.0 || dist < DBL_EPSILON ) {
         dist = xSecPix_ * nxpix_;
     }
@@ -956,18 +930,12 @@ double StarWCS::height() const
     yin[0] = 1.0;
     yin[1] = (double) nypix_/2;
     astTran2( wcs_, 2, xin, yin, 1, xout, yout );
-    if ( raIndex_ == 1 ) {
-        point1[0] = xout[0];
-        point1[1] = yout[0];
-        point2[0] = xout[1];
-        point2[1] = yout[1];
-    }
-    else {
-        point1[1] = xout[0];
-        point1[0] = yout[0];
-        point2[1] = xout[1];
-        point2[0] = yout[1];
-    }
+
+    point1[0] = xout[0];
+    point1[1] = yout[0];
+    point2[0] = xout[1];
+    point2[1] = yout[1];
+
     dist1 = astDistance( wcs_, point1, point2 );
     if ( ! astOK ) astClearStatus;
     if ( dist1 == AST__BAD ) {
@@ -977,29 +945,23 @@ double StarWCS::height() const
     yin[0] = (double) nypix_/2;
     yin[0] = (double) nypix_;
     astTran2( wcs_, 2, xin, yin, 1, xout, yout );
-    if ( raIndex_ == 1 ) {
-        point1[0] = xout[0];
-        point1[1] = yout[0];
-        point2[0] = xout[1];
-        point2[1] = yout[1];
-    }
-    else {
-        point1[1] = xout[0];
-        point1[0] = yout[0];
-        point2[1] = xout[1];
-        point2[0] = yout[1];
-    }
+
+    point1[0] = xout[0];
+    point1[1] = yout[0];
+    point2[0] = xout[1];
+    point2[1] = yout[1];
+
     dist2 = astDistance( wcs_, point1, point2 );
     if ( ! astOK ) astClearStatus;
     if ( dist2 == AST__BAD ) {
         return 0.0;
     }
-    
+
     dist = dist1 + dist2;
 
     //  Check that distance isn't 0, this indicates that edge of image
     //  is same coordinate (and above didn't help). If so use arcsec per pixel
-    //  estimate. 
+    //  estimate.
     if ( dist == 0.0 || dist < DBL_EPSILON ) {
         dist = ySecPix_ * nypix_;
     }
@@ -1033,18 +995,11 @@ double StarWCS::radius() const
     astTran2( wcs_, 2, xin, yin, 1, xout, yout );
 
     // And now get the distance between these positions in radians.
-    if ( raIndex_ == 1 ) {
-        point1[0] = xout[0];
-        point1[1] = yout[0];
-        point2[0] = xout[1];
-        point2[1] = yout[1];
-    }
-    else {
-        point1[1] = xout[0];
-        point1[0] = yout[0];
-        point2[1] = xout[1];
-        point2[0] = yout[1];
-    }
+    point1[0] = xout[0];
+    point1[1] = yout[0];
+    point2[0] = xout[1];
+    point2[1] = yout[1];
+
     dist = astDistance( wcs_, point1, point2 );
     if ( ! astOK ) astClearStatus;
 
@@ -1084,25 +1039,25 @@ double StarWCS::radius() const
 //  Note this mimics a FITS-WCS system.
 //
 //  Args:
-// 	ra      = Center right ascension in degrees
-// 	dec     = Center declination in degrees
-// 	secpix  = Number of arcseconds per pixel
-// 	xrefpix = Reference pixel X coordinate
-// 	yrefpix	= Reference pixel Y coordinate
-// 	nxpix   = Number of pixels along x-axis
-// 	nypix   = Number of pixels along y-axis
-// 	rotate  = Rotation angle (clockwise positive) in degrees
-// 	equinox = Equinox of coordinates, 1950 and 2000 supported
-// 	epoch   = Epoch of coordinates, used for FK4/FK5 conversion no effect if 0
-// 	proj    = Projection
+//      ra      = Center right ascension in degrees
+//      dec     = Center declination in degrees
+//      secpix  = Number of arcseconds per pixel
+//      xrefpix = Reference pixel X coordinate
+//      yrefpix = Reference pixel Y coordinate
+//      nxpix   = Number of pixels along x-axis
+//      nypix   = Number of pixels along y-axis
+//      rotate  = Rotation angle (clockwise positive) in degrees
+//      equinox = Equinox of coordinates, 1950 and 2000 supported
+//      epoch   = Epoch of coordinates, used for FK4/FK5 conversion no effect if 0
+//      proj    = Projection
 //
 int StarWCS::set( double ra, double dec,
-		  double secpix,
-		  double xrefpix, double yrefpix,
-		  int nxpix, int nypix,
-		  double rotate,
-		  int equinox, double epoch,
-		  const char *proj )
+                  double secpix,
+                  double xrefpix, double yrefpix,
+                  int nxpix, int nypix,
+                  double rotate,
+                  int equinox, double epoch,
+                  const char *proj )
 {
     if ( wcs_ ) {
         wcs_ = (AstFrameSet *) astAnnul( wcs_ );
@@ -1450,7 +1405,7 @@ int StarWCS::make2D()
         }
     }
 
-    //  And extract them. Use the ATL routine as this also does some 
+    //  And extract them. Use the ATL routine as this also does some
     //  work to make sure that any ROIs are picked up and Ident'd. That's
     //  important for grid plotting.
     int lbnd[2];
