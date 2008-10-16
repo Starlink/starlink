@@ -160,6 +160,10 @@
 
     A bug that stopped cube rebining using a factor of 5 has been fixed.
 
+    Bugs in the code estimating the image scale, width and height have
+    been fixed. This only affected images with swapped WCS axes (i.e.
+    when Dec was the first axis and RA the second).
+
   Humu Release
   ============
 
