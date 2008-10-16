@@ -106,6 +106,9 @@
  * Allan Brighton  28/12/05  Replaced init script
  * Peter W. Draper 20/04/07  Add TkCanvasPsImage_Init call to use canvas
  *                           printing that handles zoomed images.
+ *                 16/10/08  Record if user set the levels in setCutLevels
+ *                           even if they are not changed. That's makes more
+ *                           sense to the user.
  */
 static const char* const rcsId="@(#) $Id: RtdImage.C,v 1.5 2006/02/02 17:36:47 abrighto Exp $";
 
@@ -1231,17 +1234,17 @@ int RtdImage::setCutLevels(double min, double max, int scaled, int user)
     if (!user && !autoSetCutLevels_)
 	return TCL_OK;
 
+    // assume the user has set the cut levels, so we wont change them
+    // if a new image is loaded...
+    if (user)
+	autoSetCutLevels_ = 0;
+
     // check if there is a change from the previous cut levels
     if (scaled && min == image_->lowCut() && max == image_->highCut())
 	return TCL_OK; // no change
 
     image_->setCutLevels(min, max, scaled);
     image_->colorScale(colors_->colorCount(), colors_->pixelval());
-
-    // assume the user has set the cut levels, so we wont change them
-    // if a new image is loaded...
-    if (user)
-	autoSetCutLevels_ = 0;
 
     // make sure the new lookup table is propagated
     LookupTable lookup = image_->lookupTable();
