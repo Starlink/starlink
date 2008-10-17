@@ -164,6 +164,11 @@
     been fixed. This only affected images with swapped WCS axes (i.e.
     when Dec was the first axis and RA the second).
 
+    Typing <return> in the low: and high: entry fields has always fixed
+    the display limits. This fact is now made clear by changing the 
+    labels of these two fields to display in blue. Several issues 
+    have also been fixed that should make this work more reliably.
+
   Humu Release
   ============
 
