@@ -134,11 +134,11 @@ int *status             /* global status (given and returned) */
    const double xoff[8] =
       { -41.5,  33.5,  41.5, -33.5, -41.5,  33.5,  41.5, -33.5 };
    const double yoff[8] =
-      {  33.5,  41.5, -33.5, -41.5,  33.5,  41.5, -33.5, -41.5 };
+     {  33.5,  41.5, -33.5, -41.5,  33.5,  41.5, -33.5, -41.5 };
 
    const double flip[8] =
-      { 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0 };
-
+   /*{ 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0 };*/
+   { -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0 };
 
 /* Distortion mappings. X and Y are in the distorted image, x and y are
    undistorted (Nasmyth). All units are mm.
@@ -363,6 +363,7 @@ int *status             /* global status (given and returned) */
       rev[ 1 ] = 0;
       rev[ 2 ] = 0;
       rev[ 3 ] = flip[ subnum ];
+
       flipmap = astMatrixMap( 2, 2, 0, rev, "" );
       map_cache[ subnum ] = (AstMapping *) astCmpMap( map_cache[ subnum ], 
                                                       flipmap, 1, "" );
