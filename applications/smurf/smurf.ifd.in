@@ -2055,58 +2055,78 @@ package @PACKAGE@ {
             }
             parameter badfrac {
                 type _DOUBLE
+                vpath {DEFAULT}
                 prompt {Fraction of bad samples to flag entire bolo bad}
                 default 0.05
                 helpkey *
             }
             parameter dcthresh {
                 type _DOUBLE
+                vpath {DEFAULT}
                 prompt {N-sigma threshold for DC step repair}
-                default 20
+                default 150
                 helpkey *
             }
             parameter dcbox {
                 type _INTEGER
+                vpath {DEFAULT}
                 prompt {Size of box (samples) to measure means for DC step-finding}
-                default 1000
+                default 400
+                helpkey *
+            }
+            parameter dkclean {
+                type _LOGICAL
+                vpath {DEFAULT }
+                prompt {Fit and remove dark squid signals}
+                ppath GLOBAL CURRENT
+                default FALSE
                 helpkey *
             }
             parameter filt_edgehigh {
                 type _DOUBLE
+                vpath {DEFAULT}
                 prompt {Frequency [Hz] of hard high-pass filter}
                 default 0
                 helpkey *
             }
             parameter filt_edgelow {
                 type _DOUBLE
+                vpath {DEFAULT}
                 prompt {Frequency [Hz] of hard low-pass filter}
                 default 0
                 helpkey *
             }
             parameter filt_notchhigh {
                 type _DOUBLE
+                vpath {DEFAULT}
                 prompt {Array of upper-frequency edges [Hz] for notch filters}
+                default 0
                 helpkey *
             }
             parameter filt_notchlow {
                 type _DOUBLE
+                vpath {DEFAULT}
                 prompt {Array of lower-frequency edges [Hz] for notch filters}
+                default 0
                 helpkey *
             }
             parameter order {
                 type _INTEGER
+                vpath {DEFAULT}
                 prompt {Remove baseline polynomial of order}
-                default 1
+                default 0
                 helpkey *
             }
             parameter spikethresh {
                 type _DOUBLE
+                vpath {DEFAULT}
                 prompt {N-sigma threshold for spike-flagger}
-                default 5
+                default 0
                 helpkey *
             }
             parameter spikeiter {
                 type _INTEGER
+                vpath {DEFAULT}
                 prompt {Number of iterations for spike-finder (0=until converge)}
                 default 0
                 helpkey *
