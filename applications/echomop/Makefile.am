@@ -24,7 +24,7 @@ echmono_DEPENDENCIES = libechomop.la
 echmono_LDADD = libechomop.la \
 	 `$(srcdir)/ech_coalesce_link_flags \
 	 pda_link_adam pgp_link_adam sla_link_adam one_link_adam \
-	 hlp_link fio_link_adam ndf_link_adam \
+	 hlp_link fio_link_adam ndf_link_adam starutil_link \
 	 kaplibs_link_adam ast_link`
 
 bin_PROGRAMS = echhelp
