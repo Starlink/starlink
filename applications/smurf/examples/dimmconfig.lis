@@ -1,7 +1,7 @@
 # Number of iterations
 #  postive number  = fixed number of iterations
 #  negative number = maximum iterations if using chi^2 stopping criteria
-numiter = 1
+numiter = 3
 
 # chi^2 tolerance in negative-numiter case (requires noi model component)
 chitol = 1e-6
@@ -14,7 +14,7 @@ exportndf = 0
 #  com = remove common-mode signal
 #  ext = apply extinction correction
 #  noi = estimate time-domain variance
-modelorder = dks com ext noi
+modelorder = dks com noi
 
 # low-pass boxcar filter on COM (samples) to assist with convergence
 # if boxfact set reduce width of boxcar by this factor each iteration
@@ -54,10 +54,10 @@ maxlen = 0
 badfrac = 0.05
 
 # S/N threshold to detect DC steps
-# dcthresh = 20
+dcthresh = 150
 
 # box size over which to measure rms for DC step finder
-# dcbox = 1000
+dcbox = 400
 
 # subtract a baseline polynomial of this order
 # order = 1
@@ -70,11 +70,11 @@ badfrac = 0.05
 
 # Hard-edge high-pass frequency-domain filter 
 #   e.g. keep only frequencies >= 0.1 Hz
-filt_edgehigh = 0.1
+# filt_edgehigh = 0.1
 
 # Hard-edge low-pass frequency-domain filter
 #   e.g. keep only frequencies <= 90 Hz
-filt_edgelow = 90
+# filt_edgelow = 90
 
 # Hard-edge band-cut frequency-domain notch filters.
 # filt_notchlow gives lower edges of frequencies to cut in Hz
