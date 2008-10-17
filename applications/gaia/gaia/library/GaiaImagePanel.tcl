@@ -661,6 +661,7 @@ itcl::class gaia::GaiaImagePanel {
    #  Update the display with the current image values (overriden for
    #  float panel changes). Note fix to stop floating point compares.
    public method updateValues {} {
+
       if {$itk_option(-showobject)} {
          set s [$image_ object]
          set f [file tail [$image_ fullname]]
@@ -678,25 +679,27 @@ itcl::class gaia::GaiaImagePanel {
       }
 
       if {$itk_option(-showcut)} {
-         #  avoid conflict with user typing
-         lassign [$image_ cut] low high
-         set f [focus]
-         if {"$f" != "[$itk_component(low) component entry]"} {
+         #  Avoid conflict with user typing by temporarily blocking
+         #  (used to avoid changing values with focus, but that means
+         #  the value shown can be out of date, when the focus has just been
+         #  left ).
+         busy {
+            lassign [$image_ cut] low high
             $itk_component(low) config -value $low
-         }
-         if {"$f" != "[$itk_component(high) component entry]"} {
             $itk_component(high) config -value $high
-         }
 
-         #  Toggle the label to blue when the cut is fixed.
-         if { ! [$image_ autosetcutlevels] } {
-            [$itk_component(low) component label] configure -foreground blue
-            [$itk_component(high) component label] configure -foreground blue
-         } else {
-            [$itk_component(low) component label] configure \
-               -foreground black
-            [$itk_component(high) component label] configure \
-               -foreground black
+            #  Toggle the label to blue when the cut is fixed.
+            if { ! [$image_ autosetcutlevels] } {
+               [$itk_component(low) component label] \
+                  configure -foreground blue
+               [$itk_component(high) component label] \
+                  configure -foreground blue
+            } else {
+               [$itk_component(low) component label] \
+                  configure -foreground black
+               [$itk_component(high) component label] \
+                  configure -foreground black
+            }
          }
       }
       update_cut_window
