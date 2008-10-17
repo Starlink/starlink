@@ -46,6 +46,8 @@
 *     DCBOX = INTEGER (Read)
 *          Width of the box (samples) over which to estimate the mean
 *          signal level for DC step detection
+*     DKSQUID = _LOGICAL (Read)
+*          If true fit and remove dark squid signals
 *     FILT_EDGEHIGH = _DOUBLE (Read)
 *          Apply a hard-edged high-pass filter at this frequency (Hz)
 *     FILT_EDGELOW = _DOUBLE (Read)
@@ -134,9 +136,11 @@ void smurf_sc2clean( int *status ) {
   dim_t dcbox=0;            /* width of box for measuring DC steps */
   int dcbox_s=0;            /* signed int version of dcbox */
   double dcthresh=0;        /* n-sigma threshold for DC steps */
+  int dkclean;              /* Flag for dark squid cleaning */
   smfData *ffdata = NULL;   /* Pointer to output data struct */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
   size_t i = 0;             /* Counter, index */
+  int j;                    /* Loop counter */
   Grp *igrp = NULL;         /* Input group of files */
   unsigned char mask;       /* Bitmask for quality */
   size_t nflag;             /* Number of flagged samples */
@@ -202,6 +206,9 @@ void smurf_sc2clean( int *status ) {
     spikeiter = (size_t) spikeiter_s;
   }
 
+  /* Clean dark squids */
+  parGet0l( "DKCLEAN", &dkclean, status );
+
   /* Frequency-domain filtering */
   parGet0d( "FILT_EDGELOW", &f_edgelow, status );
   parGet0d( "FILT_EDGEHIGH", &f_edgehigh, status );
@@ -214,9 +221,15 @@ void smurf_sc2clean( int *status ) {
   if( f_nnotch ) {
     /* Number of upper and lower edges must match */
     if( f_nnotch != f_nnotch2 ) {
+      msgOut( "", FUNC_NAME "Number of upper and lower notch edges don't match,"
+              "no notch filters will be applied.", status );
       f_nnotch = 0;
     } else {
-      dofft = 1;
+      for( j=0; j<f_nnotch; j++ ) {
+        if( f_notchlow[j] != f_notchhigh[j] ) {
+          dofft = 1;
+        }
+      }
     }
   }
 
@@ -263,7 +276,7 @@ void smurf_sc2clean( int *status ) {
       msgOutif(MSG__VERB," ",
 	       "Fixing DC steps of size ^DCTHRESH-sigma in ^DCBOX samples", 
 	       status); 
-      smf_correct_steps( ffdata, NULL, dcthresh, dcbox, status );
+      smf_correct_steps( ffdata, NULL, dcthresh, dcbox, 1, status );
     }
     
     /* Flag spikes */
@@ -290,6 +303,14 @@ void smurf_sc2clean( int *status ) {
 	msgOutif(MSG__VERB," ", "Finished in ^AITER iterations",
 		 status); 
       }
+    }
+
+    /* Clean out the dark squid signal */
+    if( dkclean ) {
+	msgOutif(MSG__VERB," ",
+		 "Cleaning dark squid signals from data.",
+		 status);
+      smf_clean_dksquid( ffdata, NULL, 0, 100, NULL, 0, 0, status );
     }
 
     /* frequency-domain filtering */

@@ -393,6 +393,12 @@ void smurf_qlmakemap( int *status ) {
     /* Read data from the ith input file in the group */
     smf_open_and_flatfield( igrp, NULL, i, darks, &data, status );
 
+    /* Flag bolometers with DC steps as bad */
+    smf_correct_steps( data, NULL, 150, 400, 1, status );
+
+    /* Clean off the dark squid signals */
+    smf_clean_dksquid( data, NULL, 0, 100, NULL, 0, 0, status );
+
     /* Check units are consistent */
     smf_check_units( i, data_units, data->hdr, status);
 
@@ -400,7 +406,7 @@ void smurf_qlmakemap( int *status ) {
     smf_fits_outhdr( data->hdr->fitshdr, &fchan, NULL, status );
 
     /* Remove bolometer drifts if a fit is present */
-    smf_subtract_poly( data, NULL, 1, status );
+    /* smf_subtract_poly( data, NULL, 1, status ); */
 
     /* Remove a mean sky level - call low-level 1-D routine */
     smf_subtract_plane1( data, "MEAN", &meansky, status );

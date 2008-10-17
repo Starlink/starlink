@@ -955,7 +955,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
 
               if( dcthresh && dcbox ) {
                 msgOutif(MSG__VERB," ", "  correct steps", status);
-                smf_correct_steps( data, qua_data, 20., 1000, status );
+                smf_correct_steps( data, qua_data, dcthresh, dcbox, 1, status );
               }
 
               if( spikethresh ) {
@@ -1293,7 +1293,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
               }
 	      
               if( (res[i]->sdata[idx]->file->name)[0] ) {
-                
                 smf_model_createtswcs( res[i]->sdata[idx], SMF__RES, hdr->tswcs,
                                        status );
                 smf_model_stripsuffix( res[i]->sdata[idx]->file->name, 
@@ -1330,7 +1329,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
                 if( (model[j][i]->sdata[idx]->file->name)[0] ) {
                   smf_model_createtswcs( model[j][i]->sdata[idx], modeltyps[j], 
                                          hdr->tswcs,status );
-
                   smf_model_stripsuffix( model[j][i]->sdata[idx]->file->name, 
                                          name, status );
                   smf_write_smfData( model[j][i]->sdata[idx], NULL, NULL, name, 

@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     smf_correct_steps( smfData *data, unsigned char *quality, 
-*                        double dcthresh, dim_t dcbox, int *status )
+*                        double dcthresh, dim_t dcbox, int flagbolo,
+*                        int *status )
 
 *  Arguments:
 *     data = smfData * (Given and Returned)
@@ -27,6 +28,8 @@
 *        N-sigma threshold for DC jump to be detected
 *     dcbox = dim_t (Given)
 *        Length of box (in samples) over which to calculate statistics
+*     flagbolo = int (Given)
+*        If set don't repair. Instead flag entire bolo as bad when step found.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -34,8 +37,8 @@
 *     First estimate white-noise level as r.m.s. in box of length dcbox.
 *     Then calculate running averages in two adjacent intervals of
 *     length dcbox. Jumps are flagged and corrected at peak values of
-*     difference between the averages in two intervals. Data stream is
-*     assumed to be periodic (routine wraps-around).
+*     difference between the averages in two intervals. If flagbolo is set,
+*     instead of repairing the step just flag entire bolometer as SMF__Q_BADB.
 
 *  Notes:
 
@@ -46,9 +49,12 @@
 *  History:
 *     2008-03-05 (EC):
 *        Initial Version
-*     2009-04-01 (EC):
+*     2008-04-01 (EC):
 *        - Use smf_quick_noise to estimate signal r.m.s.
 *        - wrap-around at ends of the bolometer data
+*     2008-10-16 (EC):
+*        - remove wrapping at ends of bolo data
+*        - option to flag bolo as bad if steps detected
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -96,16 +102,19 @@
 #define FUNC_NAME "smf_correct_steps"
 
 void smf_correct_steps( smfData *data, unsigned char *quality, 
-		       double dcthresh, dim_t dcbox, int *status ) {
+                        double dcthresh, dim_t dcbox, int flagbolo, 
+                        int *status ) {
 
   /* Local Variables */
   double *alljump=NULL;         /* Buffer containing DC jumps */
   dim_t base;                   /* Index to starting point of bolo */
   double baseline;              /* Current baseline estimate  */
+  int curlevel;                 /* Current messaging level */
   double *dat=NULL;             /* Pointer to bolo data */
   double dcstep;                /* Size of DC steps to detect */
   dim_t i;                      /* Loop Counter */
   int injump;                   /* Flag for DC jump detection */
+  int isbad;                    /* Set if bolo is bad */
   dim_t j;                      /* Loop Counter */
   double maxdiff;               /* Max difference between mean1 and mean2 */
   dim_t maxind;                 /* index to location of maxdiff */
@@ -185,9 +194,10 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
     /* allocate alljump buffer */
     alljump = smf_malloc( ntslice, sizeof(*alljump), 0, status );
     
-    if( *status == SAI__OK ) for( i=0; i<nbolo; i++ ) {
+    for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
       base = i*ntslice;
-
+      isbad = 0;
+      
       /* Continue if bolo stream is not flagged bad */
       if( !(qua[base] & SMF__Q_BADB) && (*status == SAI__OK) ) {
 	
@@ -207,14 +217,24 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
 	  maxind = 0;  /* index to location of maxdiff */
 	  
 	  /* counter is at mean1/mean2 boundary -- location potential jumps.
-	     Counter runs from dcbox --> ntslice+dcbox-1, and the ends of
-             the bolometer array are assumed to wrap-around */
+	     Counter runs from dcbox --> ntslice-dcbox. */
 
-	  for( j=dcbox; j<(ntslice+dcbox); j++ ) {
+	  for( j=dcbox; j<(ntslice-dcbox); j++ ) {
+
+            /*
+            if( i==900 ) {
+              msgSeti("J", j);
+              msgSetd("M1", mean1);
+              msgSetd("M2", mean2);
+              msgSetd("D", mean2-mean1);
+              msgOut("","^J ^M1 ^M2 ^D",status);
+            }
+            */
 
 	    if( fabs(mean2 - mean1) >= dcstep ) {
 	      /* is the difference between the two boxes significant? */
-	      
+              isbad = 1;
+
 	      if( !injump ) {
 		/* Starting new jump, initialize search */
 		maxdiff = mean2 - mean1;
@@ -255,24 +275,52 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
 		(nmean2+1);
 	      nmean2 ++;
 	    }
+
+            /* Don't need to continue if bad bolo, and flagbolo set */
+            if( flagbolo && isbad ) break;
 	  }
 	  
-	  /* calculate the new corrected baseline */
-	  baseline = 0;
-	  for( j=1; j<ntslice; j++ ) {
-	    if( alljump[j] ) {
+	  /* calculate the new corrected baseline if requested */
+          if( !flagbolo ) {
+            baseline = 0;
+            msgIflev( &curlevel );
+            for( j=1; j<ntslice; j++ ) {
+              if( alljump[j] ) {
 
-	      /* Update the baseline at each sample in which jumps occured */
-	      baseline += alljump[j];
+                /* Update the baseline at each sample in which jumps occured */
+                baseline += alljump[j];
 	      
-	      /* Flag the jump in QUALITY */
-	      qua[base+j] |= SMF__Q_JUMP;
-	    } 
+                /* Flag the jump in QUALITY */
+                qua[base+j] |= SMF__Q_JUMP;
 
-	    /* Correct the data by the current baseline estimate */
-	    dat[base+j] -= baseline;
-	  }
-	}
+                if( curlevel >= MSG__DEBUG ) {
+                  msgSeti( "BOL", i );
+                  msgSeti( "T", j );
+                  msgSetd( "STEP", alljump[j] );
+                  msgSetd( "THRESH", dcstep );
+                  msgOutif( MSG__DEBUG, "", 
+                            "jump ^STEP (>^THRESH) in bolo ^BOL at ^T", 
+                            status );
+                }
+              } 
+
+              /* Correct the data by the current baseline estimate */
+              dat[base+j] -= baseline;
+            }
+          }
+        }
+      }
+      
+      /* If we got a SMF__INSMP, flag entire bolometer as bad and annul */
+      if( *status == SMF__INSMP ) {
+        errAnnul( status );
+        isbad = 1;
+      }
+
+      if( isbad ) {
+        for(j=0; j<ntslice; j++) {
+          qua[base+j] |= SMF__Q_BADB;
+        }
       }
     }
 

@@ -543,7 +543,7 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
                   }
                 }
 
-                /* Copy over the TSWCS */
+                /* Copy over the TSWCS */                
                 if( (*status == SAI__OK) && (refhdr->tswcs) ) {
                   hdr->tswcs = astCopy( refhdr->tswcs );
                   if (!astOK) {
