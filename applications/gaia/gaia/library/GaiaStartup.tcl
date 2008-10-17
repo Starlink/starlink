@@ -106,7 +106,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Add the File menu.
       add_menubar
-      set File [add_menubutton "File" left]
+      set File [add_menubutton "File"]
       configure_menubutton File -underline 0
 
       #  Add the apply menu item
@@ -234,7 +234,7 @@ itcl::class gaia::GaiaStartup {
       set values_($this,default_itt) ramp
       set values_($this,extended_precision) 0
       set values_($this,float_panel) 0
-      set values_($this,focus_follows_mouse) 1
+      set values_($this,focus_follows_mouse) 0
       set values_($this,interop_menu) 1
       set values_($this,linear_cartesian) 1
       set values_($this,max_scale) 20
