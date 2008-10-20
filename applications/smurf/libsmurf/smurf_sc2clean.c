@@ -46,6 +46,8 @@
 *     DCBOX = INTEGER (Read)
 *          Width of the box (samples) over which to estimate the mean
 *          signal level for DC step detection
+*     DCBAD - _LOGICAL (Read)
+*          If true, instead of repaiting DC steps, flag bolo as bad
 *     DKSQUID = _LOGICAL (Read)
 *          If true fit and remove dark squid signals
 *     FILT_EDGEHIGH = _DOUBLE (Read)
@@ -133,6 +135,7 @@ void smurf_sc2clean( int *status ) {
   size_t aiter;             /* Number of iterations in sigma-clipper */
   double badfrac=0;         /* Fraction of bad samples to flag bad bolo */
   smfArray *darks = NULL;          /* Dark data */
+  int dcbad;                /* Flag bolometers with steps as bad */
   dim_t dcbox=0;            /* width of box for measuring DC steps */
   int dcbox_s=0;            /* signed int version of dcbox */
   double dcthresh=0;        /* n-sigma threshold for DC steps */
@@ -191,20 +194,22 @@ void smurf_sc2clean( int *status ) {
 
   /* Check for DC step correction paramaters */
   parGet0d( "DCTHRESH", &dcthresh, status );
-  parGdr0i( "DCBOX", 1000, 0, 32767, 1, &dcbox_s, status );
+  parGdr0i( "DCBOX", 1000, 0, NUM__MAXI, 1, &dcbox_s, status );
   if( *status == SAI__OK ) {
     dcbox = (dim_t) dcbox_s;
   }
+  parGet0l( "DKCLEAN", &dkclean, status );
 
   /* Order of polynomial for baseline fits */
   parGet0i( "ORDER", &order, status );
 
   /* Spike flagging */
   parGet0d( "SPIKETHRESH", &spikethresh, status );
-  parGdr0i( "SPIKEITER", 0, 0, 32767, 1, &spikeiter_s, status );
+  parGdr0i( "SPIKEITER", 0, 0, NUM__MAXI, 1, &spikeiter_s, status );
   if( *status == SAI__OK ) {
     spikeiter = (size_t) spikeiter_s;
   }
+  parGet0l( "DKCLEAN", &dcbad, status );
 
   /* Clean dark squids */
   parGet0l( "DKCLEAN", &dkclean, status );
@@ -262,21 +267,29 @@ void smurf_sc2clean( int *status ) {
     smf_update_quality( ffdata, NULL, 1, NULL, badfrac, status );
 
     /* Remove baselines */
-    msgSeti("ORDER",order);
-    msgOutif(MSG__VERB," ",
-	     "Fitting and removing ^ORDER-order polynomial baselines", 
-	     status);  
-    smf_scanfit( ffdata, NULL, order, status );
-    smf_subtract_poly( ffdata, NULL, 0, status );
+    if( order >= 0 ) {
+      msgSeti("ORDER",order);
+      msgOutif(MSG__VERB," ",
+               "Fitting and removing ^ORDER-order polynomial baselines", 
+               status);  
+      smf_scanfit( ffdata, NULL, order, status );
+      smf_subtract_poly( ffdata, NULL, 0, status );
+    }
 
     /* Fix large DC steps */
     if( dcthresh && dcbox ) {
       msgSetd("DCTHRESH",dcthresh);
       msgSeti("DCBOX",dcbox);
-      msgOutif(MSG__VERB," ",
+      if( dcbad ) {
+        msgOutif(MSG__VERB," ",
+                 "Flagging bolos with ^DCTHRESH-sigma DC steps in ^DCBOX "
+                 "samples", status);
+      } else {
+        msgOutif(MSG__VERB," ",
 	       "Fixing DC steps of size ^DCTHRESH-sigma in ^DCBOX samples", 
-	       status); 
-      smf_correct_steps( ffdata, NULL, dcthresh, dcbox, 1, status );
+                 status);
+      } 
+      smf_correct_steps( ffdata, NULL, dcthresh, dcbox, dcbad, status );
     }
     
     /* Flag spikes */
@@ -286,13 +299,13 @@ void smurf_sc2clean( int *status ) {
 
       if( !spikeiter ) {
 	msgOutif(MSG__VERB," ",
-		 "Flagging ^spikethresh-sigma spikes iteratively to convergence.",
-		 status);
+		 "Flagging ^spikethresh-sigma spikes iteratively to "
+                 "convergence.", status);
 	
       } else {
 	msgOutif(MSG__VERB," ",
-		 "Flagging ^spikethresh-sigma spikes with ^spikeiter iterations",
-		 status);
+		 "Flagging ^spikethresh-sigma spikes with ^spikeiter "
+                 "iterations", status);
       }
 
       smf_flag_spikes( ffdata, NULL, mask, spikethresh, spikeiter, 100, &aiter, 
