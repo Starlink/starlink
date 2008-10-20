@@ -1131,3 +1131,5 @@ void smf_bolonoise( smfData *data, size_t window, double f_low,
                double *whitenoise, double *fratio, int *status );
 
 size_t smf_get_findex( double f, double df, dim_t nf, int *status );
+
+void smf_update_valbad( smfData *data, unsigned char mask, int *status );
