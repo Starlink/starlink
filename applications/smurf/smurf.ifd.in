@@ -2074,6 +2074,14 @@ package @PACKAGE@ {
                 default 400
                 helpkey *
             }
+            parameter dcbad {
+                type _LOGICAL
+                vpath {DEFAULT}
+                prompt {Flag entire bolo bad if DC step is found}
+                ppath GLOBAL CURRENT
+                default TRUE
+                helpkey *
+            }
             parameter dkclean {
                 type _LOGICAL
                 vpath {DEFAULT }
@@ -2114,7 +2122,7 @@ package @PACKAGE@ {
                 type _INTEGER
                 vpath {DEFAULT}
                 prompt {Remove baseline polynomial of order}
-                default 0
+                default -1
                 helpkey *
             }
             parameter spikethresh {
