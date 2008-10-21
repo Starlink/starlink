@@ -7,7 +7,8 @@ photom_mon_SOURCES = photom_mon.f
 photom_mon_TASKS = photom autophotom photgrey photopt
 
 photom_mon_LDADD = tasks/libphotom_tasks.la subs/libphotom_subs.la \
-        `ndf_link_adam` `ard_link_adam` `agi_link_adam` `fio_link_adam`
+        `ndf_link_adam` `ard_link_adam` `agi_link_adam` `fio_link_adam` \
+        `starutil_link`
 
 pkgdata_DATA = $(DATA_FILES)
 DATA_FILES = testphotom.dat testphotom.sdf
