@@ -1747,8 +1747,6 @@ astMAKE_INITGLOBALS(Plot)
 #define splitvalue_buff astGLOBAL(Plot,SplitValue_Buff)      
 #define stripescapes_buff astGLOBAL(Plot,StripEscapes_Buff)      
 
-
-
 static pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
 #define LOCK_MUTEX2 pthread_mutex_lock( &mutex2 ); 
 #define UNLOCK_MUTEX2 pthread_mutex_unlock( &mutex2 ); 
@@ -29113,6 +29111,9 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(frame);
 
 /* Initialise variables to avoid "used of uninitialised variable"
    messages from dumb compilers. */
