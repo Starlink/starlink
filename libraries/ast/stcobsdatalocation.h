@@ -111,9 +111,27 @@ typedef struct AstStcObsDataLocationVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   void (* StcSetObs)( AstStcObsDataLocation *, AstPointList * );
+   void (* StcSetObs)( AstStcObsDataLocation *, AstPointList *, int * );
 
 } AstStcObsDataLocationVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstStcObsDataLocationGlobals {
+   AstStcObsDataLocationVtab Class_Vtab;
+   int Class_Init;
+} AstStcObsDataLocationGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitStcObsDataLocationGlobals_( AstStcObsDataLocationGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -125,7 +143,7 @@ astPROTO_ISA(StcObsDataLocation)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstStcObsDataLocation *astStcObsDataLocation_( void *, int, AstKeyMap **, const char *, ... );
+AstStcObsDataLocation *astStcObsDataLocation_( void *, int, AstKeyMap **, const char *, int *, ...);
 #else
 AstStcObsDataLocation *astStcObsDataLocationId_( void *, int, AstKeyMap **, const char *, ... );
 #endif
@@ -133,14 +151,14 @@ AstStcObsDataLocation *astStcObsDataLocationId_( void *, int, AstKeyMap **, cons
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
-AstStcObsDataLocation *astInitStcObsDataLocation_( void *, size_t, int, AstStcObsDataLocationVtab *, const char *, AstRegion *, int, AstKeyMap ** );
+AstStcObsDataLocation *astInitStcObsDataLocation_( void *, size_t, int, AstStcObsDataLocationVtab *, const char *, AstRegion *, int, AstKeyMap **, int * );
 
 /* Vtab initialiser. */
-void astInitStcObsDataLocationVtab_( AstStcObsDataLocationVtab *, const char * );
+void astInitStcObsDataLocationVtab_( AstStcObsDataLocationVtab *, const char *, int * );
 
 /* Loader. */
 AstStcObsDataLocation *astLoadStcObsDataLocation_( void *, size_t, AstStcObsDataLocationVtab *,
-                                   const char *, AstChannel * );
+                                   const char *, AstChannel *, int * );
 
 #endif
 
@@ -149,7 +167,7 @@ AstStcObsDataLocation *astLoadStcObsDataLocation_( void *, size_t, AstStcObsData
 
 
 #if defined(astCLASS)            /* Protected */
-void astStcSetObs_( AstStcObsDataLocation *, AstPointList * );
+void astStcSetObs_( AstStcObsDataLocation *, AstPointList *, int * );
 #endif
 
 /* Function interfaces. */
@@ -182,13 +200,13 @@ void astStcSetObs_( AstStcObsDataLocation *, AstPointList * );
 
 /* Initialiser. */
 #define astInitStcObsDataLocation(mem,size,init,vtab,name,region,ncoords,coords) \
-astINVOKE(O,astInitStcObsDataLocation_(mem,size,init,vtab,name,region,ncoords,coords))
+astINVOKE(O,astInitStcObsDataLocation_(mem,size,init,vtab,name,region,ncoords,coords,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitStcObsDataLocationVtab(vtab,name) astINVOKE(V,astInitStcObsDataLocationVtab_(vtab,name))
+#define astInitStcObsDataLocationVtab(vtab,name) astINVOKE(V,astInitStcObsDataLocationVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadStcObsDataLocation(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadStcObsDataLocation_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadStcObsDataLocation_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -199,6 +217,10 @@ astINVOKE(O,astLoadStcObsDataLocation_(mem,size,vtab,name,astCheckChannel(channe
 
 #if defined(astCLASS)            /* Protected */
 #define astStcSetObs(this,obs) \
-astINVOKE(V,astStcSetObs_(astCheckStcObsDataLocation(this),obs?astCheckPointList(obs):NULL))
+astINVOKE(V,astStcSetObs_(astCheckStcObsDataLocation(this),obs?astCheckPointList(obs):NULL,STATUS_PTR))
 #endif
 #endif
+
+
+
+

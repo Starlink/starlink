@@ -89,6 +89,8 @@ f     The StcObsDataLocation class does not define any new routines beyond those
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
 #include "object.h"              /* Base Object class */
@@ -111,13 +113,41 @@ f     The StcObsDataLocation class does not define any new routines beyond those
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstStcObsDataLocationVtab class_vtab;  /* Virtual function table */
-static int class_init = 0;         /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject * );
+static int (* parent_getobjsize)( AstObject *, int * );
+
+ 
+
+#ifdef THREAD_SAFE
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; 
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(StcObsDataLocation)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(StcObsDataLocation,Class_Init)
+#define class_vtab astGLOBAL(StcObsDataLocation,Class_Vtab)
+
+
+#include <pthread.h>
+
+
+#else
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstStcObsDataLocationVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -128,15 +158,15 @@ AstStcObsDataLocation *astStcObsDataLocationId_( void *, int, AstKeyMap **, cons
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static void Copy( const AstObject *, AstObject * );
-static void Delete( AstObject * );
-static void Dump( AstObject *, AstChannel * );
-static void StcSetObs( AstStcObsDataLocation *, AstPointList * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Delete( AstObject *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void StcSetObs( AstStcObsDataLocation *, AstPointList *, int * );
 
-static int GetObjSize( AstObject * );
+static int GetObjSize( AstObject *, int * );
 /* Member functions. */
 /* ================= */
-static int GetObjSize( AstObject *this_object ) {
+static int GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -149,7 +179,7 @@ static int GetObjSize( AstObject *this_object ) {
 
 *  Synopsis:
 *     #include "stcobsdatalocation.h"
-*     int GetObjSize( AstObject *this ) 
+*     int GetObjSize( AstObject *this, int *status ) 
 
 *  Class Membership:
 *     StcObsDataLocation member function (over-rides the astGetObjSize protected
@@ -162,6 +192,8 @@ static int GetObjSize( AstObject *this_object ) {
 *  Parameters:
 *     this
 *        Pointer to the StcObsDataLocation.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Object size, in bytes.
@@ -187,7 +219,7 @@ static int GetObjSize( AstObject *this_object ) {
 /* Invoke the GetObjSize method inherited from the parent class, and then
    add on any components of the class structure defined by thsi class
    which are stored in dynamically allocated memory. */
-   result = (*parent_getobjsize)( this_object );
+   result = (*parent_getobjsize)( this_object, status );
    result += astGetObjSize( this->obs );
 
 /* If an error occurred, clear the result value. */
@@ -198,7 +230,7 @@ static int GetObjSize( AstObject *this_object ) {
 }
 
 
-void astInitStcObsDataLocationVtab_(  AstStcObsDataLocationVtab *vtab, const char *name ) {
+void astInitStcObsDataLocationVtab_(  AstStcObsDataLocationVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -235,12 +267,16 @@ void astInitStcObsDataLocationVtab_(  AstStcObsDataLocationVtab *vtab, const cha
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstStcVtab *stc;        /* Pointer to Stc component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -249,8 +285,8 @@ void astInitStcObsDataLocationVtab_(  AstStcObsDataLocationVtab *vtab, const cha
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAStcObsDataLocation) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -273,9 +309,14 @@ void astInitStcObsDataLocationVtab_(  AstStcObsDataLocationVtab *vtab, const cha
    astSetDump( vtab, Dump, "StcObsDataLocation", "Observation coverage" );
    astSetCopy( vtab, Copy );
    astSetDelete( vtab, Delete );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
-static void StcSetObs( AstStcObsDataLocation *this, AstPointList *obs ) {
+static void StcSetObs( AstStcObsDataLocation *this, AstPointList *obs, int *status ) {
 /*
 *+
 *  Name:
@@ -330,7 +371,7 @@ static void StcSetObs( AstStcObsDataLocation *this, AstPointList *obs ) {
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -342,7 +383,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for StcObsDataLocation 
@@ -353,6 +394,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the object to be copied.
 *     objout
 *        Pointer to the object being constructed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -384,7 +427,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -396,7 +439,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for StcObsDataLocation objects.
@@ -404,6 +447,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the object to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -425,7 +470,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -437,7 +482,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -448,6 +493,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the StcObsDataLocation whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -485,12 +532,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsAStcObsDataLocation and astCheckStcObsDataLocation functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(StcObsDataLocation,Stc,check,&class_init)
+astMAKE_ISA(StcObsDataLocation,Stc,check,&class_check)
 astMAKE_CHECK(StcObsDataLocation)
 
 
 AstStcObsDataLocation *astStcObsDataLocation_( void *region_void, int ncoords, 
-                               AstKeyMap **coords, const char *options, ... ) {
+                               AstKeyMap **coords, const char *options, int *status, ...) {
 /*
 *++
 *  Name:
@@ -588,9 +635,13 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstRegion *region;            /* Pointer to Region structure */
    AstStcObsDataLocation *new;   /* Pointer to new StcObsDataLocation */
    va_list args;                 /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -611,7 +662,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Obtain the variable argument list and pass it along with the options string
    to the astVSet method to initialise the new StcObsDataLocation's attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -638,7 +689,7 @@ AstStcObsDataLocation *astStcObsDataLocationId_( void *region_void, int ncoords,
 *  Synopsis:
 *     #include "stcobsdatalocation.h"
 *     AstStcObsDataLocation *astStcObsDataLocationId( AstRegion *region,
-*                  int ncoords, AstKeyMap *coords[], const char *options, ... )
+*                  int ncoords, AstKeyMap *coords[], const char *options, ..., int *status )
 
 *  Class Membership:
 *     StcObsDataLocation constructor.
@@ -658,17 +709,28 @@ AstStcObsDataLocation *astStcObsDataLocationId_( void *region_void, int ncoords,
 
 *  Parameters:
 *     As for astStcObsDataLocation_.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The ID value associated with the new StcObsDataLocation.
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstKeyMap **keymaps;            /* Pointer to array of KeyMap pointers */
    AstRegion *region;              /* Pointer to Region structure */
    AstStcObsDataLocation *new;     /* Pointer to new StcObsDataLocation */
    int icoord;                     /* Keymap index */
-   va_list args;                   /* Variable argument list */
+   va_list args;                   /* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
+/* Variable argument list */
+
+   int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -716,7 +778,7 @@ AstStcObsDataLocation *astStcObsDataLocationId_( void *region_void, int ncoords,
 AstStcObsDataLocation *astInitStcObsDataLocation_( void *mem, size_t size, 
                                     int init, AstStcObsDataLocationVtab *vtab, 
                                     const char *name, AstRegion *region,
-                                    int ncoords, AstKeyMap **coords ) {
+                                    int ncoords, AstKeyMap **coords, int *status ) {
 /*
 *+
 *  Name:
@@ -829,7 +891,7 @@ AstStcObsDataLocation *astInitStcObsDataLocation_( void *mem, size_t size,
 }
 
 AstStcObsDataLocation *astLoadStcObsDataLocation_( void *mem, size_t size, AstStcObsDataLocationVtab *vtab, 
-                                                   const char *name, AstChannel *channel ) {
+                                                   const char *name, AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -902,6 +964,7 @@ AstStcObsDataLocation *astLoadStcObsDataLocation_( void *mem, size_t size, AstSt
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstStcObsDataLocation *new;              /* Pointer to the new StcObsDataLocation */
 
 /* Initialise. */
@@ -909,6 +972,9 @@ AstStcObsDataLocation *astLoadStcObsDataLocation_( void *mem, size_t size, AstSt
 
 /* Check the global error status. */
    if ( !astOK ) return new;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* If a NULL virtual function table has been supplied, then this is
    the first loader to be invoked for this StcObsDataLocation. In this case the
@@ -971,7 +1037,11 @@ AstStcObsDataLocation *astLoadStcObsDataLocation_( void *mem, size_t size, AstSt
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
 
-void astStcSetObs_( AstStcObsDataLocation *this, AstPointList *obs ){
+void astStcSetObs_( AstStcObsDataLocation *this, AstPointList *obs, int *status ){
    if ( !astOK ) return;
-   (**astMEMBER(this,StcObsDataLocation,StcSetObs))( this, obs );
+   (**astMEMBER(this,StcObsDataLocation,StcSetObs))( this, obs, status );
 }
+
+
+
+

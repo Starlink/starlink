@@ -112,47 +112,59 @@ typedef struct AstGrismMapVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   double (* GetGrismNR)( AstGrismMap * );
-   int (* TestGrismNR)( AstGrismMap * );
-   void (* ClearGrismNR)( AstGrismMap * );
-   void (* SetGrismNR)( AstGrismMap *, double );
+   double (* GetGrismNR)( AstGrismMap *, int * );
+   int (* TestGrismNR)( AstGrismMap *, int * );
+   void (* ClearGrismNR)( AstGrismMap *, int * );
+   void (* SetGrismNR)( AstGrismMap *, double, int * );
 
-   double (* GetGrismNRP)( AstGrismMap * );
-   int (* TestGrismNRP)( AstGrismMap * );
-   void (* ClearGrismNRP)( AstGrismMap * );
-   void (* SetGrismNRP)( AstGrismMap *, double );
+   double (* GetGrismNRP)( AstGrismMap *, int * );
+   int (* TestGrismNRP)( AstGrismMap *, int * );
+   void (* ClearGrismNRP)( AstGrismMap *, int * );
+   void (* SetGrismNRP)( AstGrismMap *, double, int * );
 
-   double (* GetGrismWaveR)( AstGrismMap * );
-   int (* TestGrismWaveR)( AstGrismMap * );
-   void (* ClearGrismWaveR)( AstGrismMap * );
-   void (* SetGrismWaveR)( AstGrismMap *, double );
+   double (* GetGrismWaveR)( AstGrismMap *, int * );
+   int (* TestGrismWaveR)( AstGrismMap *, int * );
+   void (* ClearGrismWaveR)( AstGrismMap *, int * );
+   void (* SetGrismWaveR)( AstGrismMap *, double, int * );
 
-   double (* GetGrismAlpha)( AstGrismMap * );
-   int (* TestGrismAlpha)( AstGrismMap * );
-   void (* ClearGrismAlpha)( AstGrismMap * );
-   void (* SetGrismAlpha)( AstGrismMap *, double );
+   double (* GetGrismAlpha)( AstGrismMap *, int * );
+   int (* TestGrismAlpha)( AstGrismMap *, int * );
+   void (* ClearGrismAlpha)( AstGrismMap *, int * );
+   void (* SetGrismAlpha)( AstGrismMap *, double, int * );
 
-   double (* GetGrismG)( AstGrismMap * );
-   int (* TestGrismG)( AstGrismMap * );
-   void (* ClearGrismG)( AstGrismMap * );
-   void (* SetGrismG)( AstGrismMap *, double );
+   double (* GetGrismG)( AstGrismMap *, int * );
+   int (* TestGrismG)( AstGrismMap *, int * );
+   void (* ClearGrismG)( AstGrismMap *, int * );
+   void (* SetGrismG)( AstGrismMap *, double, int * );
 
-   int (* GetGrismM)( AstGrismMap * );
-   int (* TestGrismM)( AstGrismMap * );
-   void (* ClearGrismM)( AstGrismMap * );
-   void (* SetGrismM)( AstGrismMap *, int );
+   int (* GetGrismM)( AstGrismMap *, int * );
+   int (* TestGrismM)( AstGrismMap *, int * );
+   void (* ClearGrismM)( AstGrismMap *, int * );
+   void (* SetGrismM)( AstGrismMap *, int, int * );
 
-   double (* GetGrismEps)( AstGrismMap * );
-   int (* TestGrismEps)( AstGrismMap * );
-   void (* ClearGrismEps)( AstGrismMap * );
-   void (* SetGrismEps)( AstGrismMap *, double );
+   double (* GetGrismEps)( AstGrismMap *, int * );
+   int (* TestGrismEps)( AstGrismMap *, int * );
+   void (* ClearGrismEps)( AstGrismMap *, int * );
+   void (* SetGrismEps)( AstGrismMap *, double, int * );
 
-   double (* GetGrismTheta)( AstGrismMap * );
-   int (* TestGrismTheta)( AstGrismMap * );
-   void (* ClearGrismTheta)( AstGrismMap * );
-   void (* SetGrismTheta)( AstGrismMap *, double );
+   double (* GetGrismTheta)( AstGrismMap *, int * );
+   int (* TestGrismTheta)( AstGrismMap *, int * );
+   void (* ClearGrismTheta)( AstGrismMap *, int * );
+   void (* SetGrismTheta)( AstGrismMap *, double, int * );
 
 } AstGrismMapVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstGrismMapGlobals {
+   AstGrismMapVtab Class_Vtab;
+   int Class_Init;
+   char GetAttrib_Buff[ 101 ];
+} AstGrismMapGlobals;
+
+#endif
 #endif
 
 /* Function prototypes. */
@@ -164,7 +176,7 @@ astPROTO_ISA(GrismMap)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstGrismMap *astGrismMap_( const char *, ... );
+AstGrismMap *astGrismMap_( const char *, int *, ...);
 #else
 AstGrismMap *astGrismMapId_( const char *, ... );
 #endif
@@ -173,59 +185,65 @@ AstGrismMap *astGrismMapId_( const char *, ... );
 
 /* Initialiser. */
 AstGrismMap *astInitGrismMap_( void *, size_t, int, AstGrismMapVtab *,
-                             const char * );
+                             const char *, int * );
 
 /* Vtab initialiser. */
-void astInitGrismMapVtab_( AstGrismMapVtab *, const char * );
+void astInitGrismMapVtab_( AstGrismMapVtab *, const char *, int * );
 
 /* Loader. */
 AstGrismMap *astLoadGrismMap_( void *, size_t, AstGrismMapVtab *,
-                             const char *, AstChannel * );
+                             const char *, AstChannel *, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitGrismMapGlobals_( AstGrismMapGlobals * );
+#endif
+
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
 
-   double astGetGrismNR_( AstGrismMap * );
-   int astTestGrismNR_( AstGrismMap * );
-   void astClearGrismNR_( AstGrismMap * );
-   void astSetGrismNR_( AstGrismMap *, double );
+   double astGetGrismNR_( AstGrismMap *, int * );
+   int astTestGrismNR_( AstGrismMap *, int * );
+   void astClearGrismNR_( AstGrismMap *, int * );
+   void astSetGrismNR_( AstGrismMap *, double, int * );
 
-   double astGetGrismNRP_( AstGrismMap * );
-   int astTestGrismNRP_( AstGrismMap * );
-   void astClearGrismNRP_( AstGrismMap * );
-   void astSetGrismNRP_( AstGrismMap *, double );
+   double astGetGrismNRP_( AstGrismMap *, int * );
+   int astTestGrismNRP_( AstGrismMap *, int * );
+   void astClearGrismNRP_( AstGrismMap *, int * );
+   void astSetGrismNRP_( AstGrismMap *, double, int * );
 
-   double astGetGrismWaveR_( AstGrismMap * );
-   int astTestGrismWaveR_( AstGrismMap * );
-   void astClearGrismWaveR_( AstGrismMap * );
-   void astSetGrismWaveR_( AstGrismMap *, double );
+   double astGetGrismWaveR_( AstGrismMap *, int * );
+   int astTestGrismWaveR_( AstGrismMap *, int * );
+   void astClearGrismWaveR_( AstGrismMap *, int * );
+   void astSetGrismWaveR_( AstGrismMap *, double, int * );
 
-   double astGetGrismAlpha_( AstGrismMap * );
-   int astTestGrismAlpha_( AstGrismMap * );
-   void astClearGrismAlpha_( AstGrismMap * );
-   void astSetGrismAlpha_( AstGrismMap *, double );
+   double astGetGrismAlpha_( AstGrismMap *, int * );
+   int astTestGrismAlpha_( AstGrismMap *, int * );
+   void astClearGrismAlpha_( AstGrismMap *, int * );
+   void astSetGrismAlpha_( AstGrismMap *, double, int * );
 
-   double astGetGrismG_( AstGrismMap * );
-   int astTestGrismG_( AstGrismMap * );
-   void astClearGrismG_( AstGrismMap * );
-   void astSetGrismG_( AstGrismMap *, double );
+   double astGetGrismG_( AstGrismMap *, int * );
+   int astTestGrismG_( AstGrismMap *, int * );
+   void astClearGrismG_( AstGrismMap *, int * );
+   void astSetGrismG_( AstGrismMap *, double, int * );
 
-   int astGetGrismM_( AstGrismMap * );
-   int astTestGrismM_( AstGrismMap * );
-   void astClearGrismM_( AstGrismMap * );
-   void astSetGrismM_( AstGrismMap *, int );
+   int astGetGrismM_( AstGrismMap *, int * );
+   int astTestGrismM_( AstGrismMap *, int * );
+   void astClearGrismM_( AstGrismMap *, int * );
+   void astSetGrismM_( AstGrismMap *, int, int * );
 
-   double astGetGrismEps_( AstGrismMap * );
-   int astTestGrismEps_( AstGrismMap * );
-   void astClearGrismEps_( AstGrismMap * );
-   void astSetGrismEps_( AstGrismMap *, double );
+   double astGetGrismEps_( AstGrismMap *, int * );
+   int astTestGrismEps_( AstGrismMap *, int * );
+   void astClearGrismEps_( AstGrismMap *, int * );
+   void astSetGrismEps_( AstGrismMap *, double, int * );
 
-   double astGetGrismTheta_( AstGrismMap * );
-   int astTestGrismTheta_( AstGrismMap * );
-   void astClearGrismTheta_( AstGrismMap * );
-   void astSetGrismTheta_( AstGrismMap *, double );
+   double astGetGrismTheta_( AstGrismMap *, int * );
+   int astTestGrismTheta_( AstGrismMap *, int * );
+   void astClearGrismTheta_( AstGrismMap *, int * );
+   void astSetGrismTheta_( AstGrismMap *, double, int * );
 
 #endif
 
@@ -259,13 +277,13 @@ AstGrismMap *astLoadGrismMap_( void *, size_t, AstGrismMapVtab *,
 
 /* Initialiser. */
 #define astInitGrismMap(mem,size,init,vtab,name) \
-astINVOKE(O,astInitGrismMap_(mem,size,init,vtab,name))
+astINVOKE(O,astInitGrismMap_(mem,size,init,vtab,name,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitGrismMapVtab(vtab,name) astINVOKE(V,astInitGrismMapVtab_(vtab,name))
+#define astInitGrismMapVtab(vtab,name) astINVOKE(V,astInitGrismMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadGrismMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadGrismMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadGrismMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -276,46 +294,50 @@ astINVOKE(O,astLoadGrismMap_(mem,size,vtab,name,astCheckChannel(channel)))
 
 #if defined(astCLASS)            /* Protected */
 
-#define astGetGrismNR(this) astINVOKE(V,astGetGrismNR_(astCheckGrismMap(this)))
-#define astTestGrismNR(this) astINVOKE(V,astTestGrismNR_(astCheckGrismMap(this)))
-#define astClearGrismNR(this) astINVOKE(V,astClearGrismNR_(astCheckGrismMap(this)))
-#define astSetGrismNR(this,value) astINVOKE(V,astSetGrismNR_(astCheckGrismMap(this),value))
+#define astGetGrismNR(this) astINVOKE(V,astGetGrismNR_(astCheckGrismMap(this),STATUS_PTR))
+#define astTestGrismNR(this) astINVOKE(V,astTestGrismNR_(astCheckGrismMap(this),STATUS_PTR))
+#define astClearGrismNR(this) astINVOKE(V,astClearGrismNR_(astCheckGrismMap(this),STATUS_PTR))
+#define astSetGrismNR(this,value) astINVOKE(V,astSetGrismNR_(astCheckGrismMap(this),value,STATUS_PTR))
 
-#define astGetGrismNRP(this) astINVOKE(V,astGetGrismNRP_(astCheckGrismMap(this)))
-#define astTestGrismNRP(this) astINVOKE(V,astTestGrismNRP_(astCheckGrismMap(this)))
-#define astClearGrismNRP(this) astINVOKE(V,astClearGrismNRP_(astCheckGrismMap(this)))
-#define astSetGrismNRP(this,value) astINVOKE(V,astSetGrismNRP_(astCheckGrismMap(this),value))
+#define astGetGrismNRP(this) astINVOKE(V,astGetGrismNRP_(astCheckGrismMap(this),STATUS_PTR))
+#define astTestGrismNRP(this) astINVOKE(V,astTestGrismNRP_(astCheckGrismMap(this),STATUS_PTR))
+#define astClearGrismNRP(this) astINVOKE(V,astClearGrismNRP_(astCheckGrismMap(this),STATUS_PTR))
+#define astSetGrismNRP(this,value) astINVOKE(V,astSetGrismNRP_(astCheckGrismMap(this),value,STATUS_PTR))
 
-#define astGetGrismWaveR(this) astINVOKE(V,astGetGrismWaveR_(astCheckGrismMap(this)))
-#define astTestGrismWaveR(this) astINVOKE(V,astTestGrismWaveR_(astCheckGrismMap(this)))
-#define astClearGrismWaveR(this) astINVOKE(V,astClearGrismWaveR_(astCheckGrismMap(this)))
-#define astSetGrismWaveR(this,value) astINVOKE(V,astSetGrismWaveR_(astCheckGrismMap(this),value))
+#define astGetGrismWaveR(this) astINVOKE(V,astGetGrismWaveR_(astCheckGrismMap(this),STATUS_PTR))
+#define astTestGrismWaveR(this) astINVOKE(V,astTestGrismWaveR_(astCheckGrismMap(this),STATUS_PTR))
+#define astClearGrismWaveR(this) astINVOKE(V,astClearGrismWaveR_(astCheckGrismMap(this),STATUS_PTR))
+#define astSetGrismWaveR(this,value) astINVOKE(V,astSetGrismWaveR_(astCheckGrismMap(this),value,STATUS_PTR))
 
-#define astGetGrismAlpha(this) astINVOKE(V,astGetGrismAlpha_(astCheckGrismMap(this)))
-#define astTestGrismAlpha(this) astINVOKE(V,astTestGrismAlpha_(astCheckGrismMap(this)))
-#define astClearGrismAlpha(this) astINVOKE(V,astClearGrismAlpha_(astCheckGrismMap(this)))
-#define astSetGrismAlpha(this,value) astINVOKE(V,astSetGrismAlpha_(astCheckGrismMap(this),value))
+#define astGetGrismAlpha(this) astINVOKE(V,astGetGrismAlpha_(astCheckGrismMap(this),STATUS_PTR))
+#define astTestGrismAlpha(this) astINVOKE(V,astTestGrismAlpha_(astCheckGrismMap(this),STATUS_PTR))
+#define astClearGrismAlpha(this) astINVOKE(V,astClearGrismAlpha_(astCheckGrismMap(this),STATUS_PTR))
+#define astSetGrismAlpha(this,value) astINVOKE(V,astSetGrismAlpha_(astCheckGrismMap(this),value,STATUS_PTR))
 
-#define astGetGrismG(this) astINVOKE(V,astGetGrismG_(astCheckGrismMap(this)))
-#define astTestGrismG(this) astINVOKE(V,astTestGrismG_(astCheckGrismMap(this)))
-#define astClearGrismG(this) astINVOKE(V,astClearGrismG_(astCheckGrismMap(this)))
-#define astSetGrismG(this,value) astINVOKE(V,astSetGrismG_(astCheckGrismMap(this),value))
+#define astGetGrismG(this) astINVOKE(V,astGetGrismG_(astCheckGrismMap(this),STATUS_PTR))
+#define astTestGrismG(this) astINVOKE(V,astTestGrismG_(astCheckGrismMap(this),STATUS_PTR))
+#define astClearGrismG(this) astINVOKE(V,astClearGrismG_(astCheckGrismMap(this),STATUS_PTR))
+#define astSetGrismG(this,value) astINVOKE(V,astSetGrismG_(astCheckGrismMap(this),value,STATUS_PTR))
 
-#define astGetGrismM(this) astINVOKE(V,astGetGrismM_(astCheckGrismMap(this)))
-#define astTestGrismM(this) astINVOKE(V,astTestGrismM_(astCheckGrismMap(this)))
-#define astClearGrismM(this) astINVOKE(V,astClearGrismM_(astCheckGrismMap(this)))
-#define astSetGrismM(this,value) astINVOKE(V,astSetGrismM_(astCheckGrismMap(this),value))
+#define astGetGrismM(this) astINVOKE(V,astGetGrismM_(astCheckGrismMap(this),STATUS_PTR))
+#define astTestGrismM(this) astINVOKE(V,astTestGrismM_(astCheckGrismMap(this),STATUS_PTR))
+#define astClearGrismM(this) astINVOKE(V,astClearGrismM_(astCheckGrismMap(this),STATUS_PTR))
+#define astSetGrismM(this,value) astINVOKE(V,astSetGrismM_(astCheckGrismMap(this),value,STATUS_PTR))
 
-#define astGetGrismEps(this) astINVOKE(V,astGetGrismEps_(astCheckGrismMap(this)))
-#define astTestGrismEps(this) astINVOKE(V,astTestGrismEps_(astCheckGrismMap(this)))
-#define astClearGrismEps(this) astINVOKE(V,astClearGrismEps_(astCheckGrismMap(this)))
-#define astSetGrismEps(this,value) astINVOKE(V,astSetGrismEps_(astCheckGrismMap(this),value))
+#define astGetGrismEps(this) astINVOKE(V,astGetGrismEps_(astCheckGrismMap(this),STATUS_PTR))
+#define astTestGrismEps(this) astINVOKE(V,astTestGrismEps_(astCheckGrismMap(this),STATUS_PTR))
+#define astClearGrismEps(this) astINVOKE(V,astClearGrismEps_(astCheckGrismMap(this),STATUS_PTR))
+#define astSetGrismEps(this,value) astINVOKE(V,astSetGrismEps_(astCheckGrismMap(this),value,STATUS_PTR))
 
-#define astGetGrismTheta(this) astINVOKE(V,astGetGrismTheta_(astCheckGrismMap(this)))
-#define astTestGrismTheta(this) astINVOKE(V,astTestGrismTheta_(astCheckGrismMap(this)))
-#define astClearGrismTheta(this) astINVOKE(V,astClearGrismTheta_(astCheckGrismMap(this)))
-#define astSetGrismTheta(this,value) astINVOKE(V,astSetGrismTheta_(astCheckGrismMap(this),value))
+#define astGetGrismTheta(this) astINVOKE(V,astGetGrismTheta_(astCheckGrismMap(this),STATUS_PTR))
+#define astTestGrismTheta(this) astINVOKE(V,astTestGrismTheta_(astCheckGrismMap(this),STATUS_PTR))
+#define astClearGrismTheta(this) astINVOKE(V,astClearGrismTheta_(astCheckGrismMap(this),STATUS_PTR))
+#define astSetGrismTheta(this,value) astINVOKE(V,astSetGrismTheta_(astCheckGrismMap(this),value,STATUS_PTR))
 
 
 #endif
 #endif
+
+
+
+

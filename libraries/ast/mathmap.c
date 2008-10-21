@@ -166,11 +166,14 @@ f     The MathMap class does not define any new routines beyond those
 /* Interface definitions. */
 /* ---------------------- */
 #include "channel.h"             /* I/O channels */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "mapping.h"             /* Coordinate mappings (parent class) */
 #include "cmpmap.h"              /* Compound Mappings */
 #include "mathmap.h"             /* Interface definition for this class */
 #include "memory.h"              /* Memory allocation facilities */
+#include "globals.h"             /* Thread-safe global data access */
 #include "object.h"              /* Base Object class */
 #include "pointset.h"            /* Sets of points */
 #include "unitmap.h"             /* Unit Mapping */
@@ -197,18 +200,19 @@ f     The MathMap class does not define any new routines beyond those
    useful). Provide shorthand for use within this module. */
 typedef AstMathMapRandContext_ Rcontext;
 
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstMathMapVtab class_vtab; /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject * );
-static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
-static const char *(* parent_getattrib)( AstObject *, const char * );
-static int (* parent_testattrib)( AstObject *, const char * );
-static void (* parent_clearattrib)( AstObject *, const char * );
-static void (* parent_setattrib)( AstObject *, const char * );
+static int (* parent_getobjsize)( AstObject *, int * );
+static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static const char *(* parent_getattrib)( AstObject *, const char *, int * );
+static int (* parent_testattrib)( AstObject *, const char *, int * );
+static void (* parent_clearattrib)( AstObject *, const char *, int * );
+static void (* parent_setattrib)( AstObject *, const char *, int * );
 
 /* This declaration enumerates the operation codes recognised by the
    EvaluateFunction function which evaluates arithmetic expressions. */
@@ -500,6 +504,81 @@ static const Symbol symbol[] = {
 static const int symbol_ldcon = 0; /* Load a constant */
 static const int symbol_ldvar = 1; /* Load a variable */
 
+/* Define macros for accessing each item of thread specific global data. */
+#ifdef THREAD_SAFE
+
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; \
+   globals->GetAttrib_Buff[ 0 ] = 0;
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(MathMap)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(MathMap,Class_Init)
+#define class_vtab astGLOBAL(MathMap,Class_Vtab)
+#define getattrib_buff astGLOBAL(MathMap,GetAttrib_Buff)
+
+
+
+static pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
+#define LOCK_MUTEX2 pthread_mutex_lock( &mutex2 ); 
+#define UNLOCK_MUTEX2 pthread_mutex_unlock( &mutex2 ); 
+
+static pthread_mutex_t mutex3 = PTHREAD_MUTEX_INITIALIZER;
+#define LOCK_MUTEX3 pthread_mutex_lock( &mutex3 ); 
+#define UNLOCK_MUTEX3 pthread_mutex_unlock( &mutex3 ); 
+
+static pthread_mutex_t mutex4 = PTHREAD_MUTEX_INITIALIZER;
+#define LOCK_MUTEX4 pthread_mutex_lock( &mutex4 ); 
+#define UNLOCK_MUTEX4 pthread_mutex_unlock( &mutex4 ); 
+
+static pthread_mutex_t mutex5 = PTHREAD_MUTEX_INITIALIZER;
+#define LOCK_MUTEX5 pthread_mutex_lock( &mutex5 ); 
+#define UNLOCK_MUTEX5 pthread_mutex_unlock( &mutex5 ); 
+
+static pthread_mutex_t mutex6 = PTHREAD_MUTEX_INITIALIZER;
+#define LOCK_MUTEX6 pthread_mutex_lock( &mutex6 ); 
+#define UNLOCK_MUTEX6 pthread_mutex_unlock( &mutex6 ); 
+
+static pthread_mutex_t mutex7 = PTHREAD_MUTEX_INITIALIZER;
+#define LOCK_MUTEX7 pthread_mutex_lock( &mutex7 ); 
+#define UNLOCK_MUTEX7 pthread_mutex_unlock( &mutex7 ); 
+
+/* If thread safety is not needed, declare and initialise globals at static 
+   variables. */ 
+#else
+
+static char getattrib_buff[ 51 ];
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstMathMapVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#define LOCK_MUTEX2
+#define UNLOCK_MUTEX2
+
+#define LOCK_MUTEX3
+#define UNLOCK_MUTEX3
+
+#define LOCK_MUTEX4
+#define UNLOCK_MUTEX4
+
+#define LOCK_MUTEX5
+#define UNLOCK_MUTEX5
+
+#define LOCK_MUTEX6
+#define UNLOCK_MUTEX6
+
+#define LOCK_MUTEX7
+#define UNLOCK_MUTEX7
+
+#endif
+
+
 /* External Interface Function Prototypes. */
 /* ======================================= */
 /* The following functions have public prototypes only (i.e. no
@@ -509,49 +588,49 @@ AstMathMap *astMathMapId_( int, int, int, const char *[], int, const char *[], c
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static int GetObjSize( AstObject * );
-static const char *GetAttrib( AstObject *, const char * );
-static double Gauss( Rcontext * );
-static double LogGamma( double );
-static double Poisson( Rcontext *, double );
-static double Rand( Rcontext * );
-static int DefaultSeed( const Rcontext * );
-static int Equal( AstObject *, AstObject * );
-static int GetSeed( AstMathMap * );
-static int GetSimpFI( AstMathMap * );
-static int GetSimpIF( AstMathMap * );
-static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
-static int TestAttrib( AstObject *, const char * );
-static int TestSeed( AstMathMap * );
-static int TestSimpFI( AstMathMap * );
-static int TestSimpIF( AstMathMap * );
-static void CleanFunctions( int, const char *[], char *** );
-static void ClearAttrib( AstObject *, const char * );
-static void ClearSeed( AstMathMap * );
-static void ClearSimpFI( AstMathMap * );
-static void ClearSimpIF( AstMathMap * );
-static void CompileExpression( const char *, const char *, const char *, int, const char *[], int **, double **, int * );
-static void CompileMapping( const char *, const char *, int, int, int, const char *[], int, const char *[], int ***, int ***, double ***, double ***, int *, int * );
-static void Copy( const AstObject *, AstObject * );
-static void Delete( AstObject * );
-static void Dump( AstObject *, AstChannel * );
-static void EvaluateFunction( Rcontext *, int, const double **, const int *, const double *, int, double * );
-static void EvaluationSort( const double [], int, int [], int **, int * );
-static void ExtractExpressions( const char *, const char *, int, const char *[], int, char *** );
-static void ExtractVariables( const char *, const char *, int, const char *[], int, int, int, int, int, char *** );
-static void ParseConstant( const char *, const char *, const char *, int, int *, double * );
-static void ParseName( const char *, int, int * );
-static void ParseVariable( const char *, const char *, const char *, int, int, const char *[], int *, int * );
-static void SetAttrib( AstObject *, const char * );
-static void SetSeed( AstMathMap *, int );
-static void SetSimpFI( AstMathMap *, int );
-static void SetSimpIF( AstMathMap *, int );
-static void ValidateSymbol( const char *, const char *, const char *, int, int, int *, int **, int **, int *, double ** );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static int GetObjSize( AstObject *, int * );
+static const char *GetAttrib( AstObject *, const char *, int * );
+static double Gauss( Rcontext *, int * );
+static double LogGamma( double, int * );
+static double Poisson( Rcontext *, double, int * );
+static double Rand( Rcontext *, int * );
+static int DefaultSeed( const Rcontext *, int * );
+static int Equal( AstObject *, AstObject *, int * );
+static int GetSeed( AstMathMap *, int * );
+static int GetSimpFI( AstMathMap *, int * );
+static int GetSimpIF( AstMathMap *, int * );
+static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
+static int TestAttrib( AstObject *, const char *, int * );
+static int TestSeed( AstMathMap *, int * );
+static int TestSimpFI( AstMathMap *, int * );
+static int TestSimpIF( AstMathMap *, int * );
+static void CleanFunctions( int, const char *[], char ***, int * );
+static void ClearAttrib( AstObject *, const char *, int * );
+static void ClearSeed( AstMathMap *, int * );
+static void ClearSimpFI( AstMathMap *, int * );
+static void ClearSimpIF( AstMathMap *, int * );
+static void CompileExpression( const char *, const char *, const char *, int, const char *[], int **, double **, int *, int * );
+static void CompileMapping( const char *, const char *, int, int, int, const char *[], int, const char *[], int ***, int ***, double ***, double ***, int *, int *, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Delete( AstObject *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void EvaluateFunction( Rcontext *, int, const double **, const int *, const double *, int, double *, int * );
+static void EvaluationSort( const double [], int, int [], int **, int *, int * );
+static void ExtractExpressions( const char *, const char *, int, const char *[], int, char ***, int * );
+static void ExtractVariables( const char *, const char *, int, const char *[], int, int, int, int, int, char ***, int * );
+static void ParseConstant( const char *, const char *, const char *, int, int *, double *, int * );
+static void ParseName( const char *, int, int *, int * );
+static void ParseVariable( const char *, const char *, const char *, int, int, const char *[], int *, int *, int * );
+static void SetAttrib( AstObject *, const char *, int * );
+static void SetSeed( AstMathMap *, int, int * );
+static void SetSimpFI( AstMathMap *, int, int * );
+static void SetSimpIF( AstMathMap *, int, int * );
+static void ValidateSymbol( const char *, const char *, const char *, int, int, int *, int **, int **, int *, double **, int * );
 
 /* Member functions. */
 /* ================= */
-static void CleanFunctions( int nfun, const char *fun[], char ***clean ) {
+static void CleanFunctions( int nfun, const char *fun[], char ***clean, int *status ) {
 /*
 *  Name:
 *     CleanFunctions
@@ -564,7 +643,7 @@ static void CleanFunctions( int nfun, const char *fun[], char ***clean ) {
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     void CleanFunctions( int nfun, const char *fun[], char ***clean )
+*     void CleanFunctions( int nfun, const char *fun[], char ***clean, int *status )
 
 *  Class Membership:
 *     MathMap member function.
@@ -589,6 +668,8 @@ static void CleanFunctions( int nfun, const char *fun[], char ***clean ) {
 *        Both the returned array of pointers, and the strings to which they
 *        point, will be dynamically allocated and should be freed by the
 *        caller (using astFree) when no longer required.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *        - A NULL value will be returned for "*clean" if this function is
@@ -646,7 +727,7 @@ static void CleanFunctions( int nfun, const char *fun[], char ***clean ) {
    }
 }
 
-static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     ClearAttrib
@@ -659,7 +740,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     void ClearAttrib( AstObject *this, const char *attrib )
+*     void ClearAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     MathMap member function (over-rides the astClearAttrib protected
@@ -676,6 +757,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -707,13 +790,13 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is not recognised, pass it on to the parent method
    for further interpretation. */
    } else {
-      (*parent_clearattrib)( this_object, attrib );
+      (*parent_clearattrib)( this_object, attrib, status );
    }
 }
 
 static void CompileExpression( const char *method, const char *class,
                                const char *exprs, int nvar, const char *var[],
-                               int **code, double **con, int *stacksize ) {
+                               int **code, double **con, int *stacksize, int *status ) {
 /*
 *  Name:
 *     CompileExpression
@@ -912,7 +995,7 @@ static void CompileExpression( const char *method, const char *class,
    information at the same time. */
       if ( found ) {
          ValidateSymbol( method, class, exprs, iend, sym, &lpar, &argcount,
-                         &opensym, &ncon, con );
+                         &opensym, &ncon, con, status );
 
 /* If it was not one of the standard symbols, then check if the next
    symbol was expected to be an operator. If so, then there is a missing
@@ -921,13 +1004,13 @@ static void CompileExpression( const char *method, const char *class,
          if ( opernext ) {
             astError( AST__MIOPR,
                       "%s(%s): Missing or invalid operator in the expression "
-                      "\"%.*s\".",
+                      "\"%.*s\".", status,
                       method, class, istart + 1, exprs );
 
 /* If the next symbol was expected to be an operand, then it may be a
    constant, so try to parse it as one. */
          } else {
-            ParseConstant( method, class, exprs, istart, &iend, &c );
+            ParseConstant( method, class, exprs, istart, &iend, &c, status );
             if ( astOK ) {
 
 /* If successful, set the symbol number to "symbol_ldcon" (load
@@ -946,7 +1029,7 @@ static void CompileExpression( const char *method, const char *class,
    variable name, so try to parse it as one. */
                } else {
                   ParseVariable( method, class, exprs, istart, nvar, var,
-                                 &ivar, &iend );
+                                 &ivar, &iend, status );
                   if ( astOK ) {
 
 /* If successful, set the symbol to "symbol_ldvar" (load variable) and
@@ -967,7 +1050,7 @@ static void CompileExpression( const char *method, const char *class,
                      } else {
                         astError( AST__MIOPA,
                                   "%s(%s): Missing or invalid operand in the "
-                                  "expression \"%.*s\".",
+                                  "expression \"%.*s\".", status,
                                   method, class, istart + 1, exprs );
                      }
                   }
@@ -1011,7 +1094,7 @@ static void CompileExpression( const char *method, const char *class,
       if ( !opernext ) {
          astError( AST__MIOPA,
                    "%s(%s): Missing or invalid operand in the expression "
-                   "\"%s\".",
+                   "\"%s\".", status,
                    method, class, exprs );
 
 /* If the final parenthesis level is positive, then there is a missing
@@ -1019,13 +1102,13 @@ static void CompileExpression( const char *method, const char *class,
       } else if ( lpar > 0 ) {
          astError( AST__MRPAR,
                    "%s(%s): Missing right parenthesis in the expression "
-                   "\"%s\".",
+                   "\"%s\".", status,
                    method, class, exprs );
       }
    }
 
 /* Sort the symbols into evaluation order to produce output opcodes. */
-   EvaluationSort( *con, nsym, symlist, code, stacksize );
+   EvaluationSort( *con, nsym, symlist, code, stacksize, status );
 
 /* Free any memory used as workspace. */
    if ( argcount ) argcount = astFree( argcount );
@@ -1053,7 +1136,7 @@ static void CompileMapping( const char *method, const char *class,
                             int ninv, const char *invfun[],
                             int ***fwdcode, int ***invcode,
                             double ***fwdcon, double ***invcon,
-                            int *fwdstack, int *invstack ) {
+                            int *fwdstack, int *invstack, int *status ) {
 /*
 *  Name:
 *     CompileMapping
@@ -1072,7 +1155,7 @@ static void CompileMapping( const char *method, const char *class,
 *                          int ninv, const char *invfun[],
 *                          int ***fwdcode, int ***invcode,
 *                          double ***fwdcon, double ***invcon,
-*                          int *fwdstack, int *invstack )
+*                          int *fwdstack, int *invstack, int *status )
 
 *  Class Membership:
 *     MathMap member function.
@@ -1174,6 +1257,8 @@ static void CompileMapping( const char *method, const char *class,
 *     invstack
 *        Pointer to an int in which to return the size of the push-down stack
 *        required to evaluate the inverse transformation functions.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - A value of NULL will be returned for the "*fwdcode", "*invcode",
@@ -1231,7 +1316,7 @@ static void CompileMapping( const char *method, const char *class,
 /* Extract the variable names from the left hand sides of these
    functions and check them for validity and absence of duplication. */
       ExtractVariables( method, class, nvar, strings, nin, nout, nfwd, ninv, 1,
-                        &var );
+                        &var, status );
    }
 
 /* Free the temporary array of string pointers. */
@@ -1239,7 +1324,7 @@ static void CompileMapping( const char *method, const char *class,
 
 /* Extract the expressions from the right hand sides of the forward
    transformation functions. */
-   ExtractExpressions( method, class, nfwd, fwdfun, 1, &exprs );
+   ExtractExpressions( method, class, nfwd, fwdfun, 1, &exprs, status );
 
 /* If OK, and the forward transformation is defined, then allocate and
    initialise space for an array of pointers to the opcodes for each
@@ -1258,12 +1343,12 @@ static void CompileMapping( const char *method, const char *class,
             CompileExpression( method, class, exprs[ ifun ],
                                nin + ifun, (const char **) var,
                                &( *fwdcode )[ ifun ], &( *fwdcon )[ ifun ],
-                               &stacksize );
+                               &stacksize, status );
 
 /* If an error occurs, then report contextual information and quit. */
             if ( !astOK ) {
                astError( astStatus,
-                         "Error in forward transformation function %d.",
+                         "Error in forward transformation function %d.", status,
                          ifun + 1 );
                break;
             }
@@ -1304,7 +1389,7 @@ static void CompileMapping( const char *method, const char *class,
 /* Extract the variable names from the left hand sides of these
    functions and check them for validity and absence of duplication. */
       ExtractVariables( method, class, nvar, strings, nin, nout, nfwd, ninv, 0,
-                        &var );
+                        &var, status );
    }
 
 /* Free the temporary array of string pointers. */
@@ -1312,7 +1397,7 @@ static void CompileMapping( const char *method, const char *class,
 
 /* Extract the expressions from the right hand sides of the inverse
    transformation functions. */
-   ExtractExpressions( method, class, ninv, invfun, 0, &exprs );
+   ExtractExpressions( method, class, ninv, invfun, 0, &exprs, status );
 
 /* If OK, and the forward transformation is defined, then allocate and
    initialise space for an array of pointers to the opcodes for each
@@ -1331,12 +1416,12 @@ static void CompileMapping( const char *method, const char *class,
             CompileExpression( method, class, exprs[ ifun ],
                                nout + ifun, (const char **) var,
                                &( *invcode )[ ifun ], &( *invcon )[ ifun ],
-                               &stacksize );
+                               &stacksize, status );
 
 /* If an error occurs, then report contextual information and quit. */
             if ( !astOK ) {
                astError( astStatus,
-                         "Error in inverse transformation function %d.",
+                         "Error in inverse transformation function %d.", status,
                          ifun + 1 );
                break;
             }
@@ -1364,7 +1449,7 @@ static void CompileMapping( const char *method, const char *class,
    }
 }
 
-static int DefaultSeed( const Rcontext *context ) {
+static int DefaultSeed( const Rcontext *context, int *status ) {
 /*
 *  Name:
 *     DefaultSeed
@@ -1377,7 +1462,7 @@ static int DefaultSeed( const Rcontext *context ) {
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     int DefaultSeed( Rcontext *context )
+*     int DefaultSeed( Rcontext *context, int *status )
 
 *  Class Membership:
 *     MathMap member function.
@@ -1392,6 +1477,8 @@ static int DefaultSeed( const Rcontext *context ) {
 *     context
 *        Pointer to the random number generator context associated with
 *        the MathMap.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The unpredictable integer.
@@ -1417,6 +1504,7 @@ static int DefaultSeed( const Rcontext *context ) {
    to a value derived by combining bit patterns obtained from the system
    clock and the processor time used. The result needs to be positive and
    lie in the range 0 to "m-1". */
+   LOCK_MUTEX5
    if ( !init ) {
       rand = (long int) ( ( (unsigned long int) time( NULL ) ^
                             (unsigned long int) clock() ) %
@@ -1435,6 +1523,7 @@ static int DefaultSeed( const Rcontext *context ) {
 /* Note that this initialisation has been performed. */
       init = 1;
    }
+   UNLOCK_MUTEX5
 
 /* Generate a new bit pattern from the system time. Apart from the
    first invocation, this will be a different time to that used above. */
@@ -1470,7 +1559,7 @@ static int DefaultSeed( const Rcontext *context ) {
    return (int) bits;
 }
 
-static int Equal( AstObject *this_object, AstObject *that_object ) {
+static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
 *  Name:
 *     Equal
@@ -1483,7 +1572,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 *  Synopsis:
 *     #include "mapping.h"
-*     int Equal( AstObject *this, AstObject *that ) 
+*     int Equal( AstObject *this, AstObject *that, int *status ) 
 
 *  Class Membership:
 *     MathMap member function (over-rides the astEqual protected
@@ -1498,6 +1587,8 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *        Pointer to the first Object (a MathMap).
 *     that
 *        Pointer to the second Object.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if the MathMaps are equivalent, zero otherwise.
@@ -1655,7 +1746,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 static void EvaluateFunction( Rcontext *rcontext, int npoint,
                               const double **ptr_in, const int *code,
-                              const double *con, int stacksize, double *out ) {
+                              const double *con, int stacksize, double *out, int *status ) {
 /*
 *  Name:
 *     EvaluateFunction
@@ -1670,7 +1761,7 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
 *     #include "mathmap.h"
 *     void EvaluateFunction( Rcontext *rcontext, int npoint,
 *                            const double **ptr_in, const int *code,
-*                            const double *con, int stacksize, double *out )
+*                            const double *con, int stacksize, double *out, int *status )
 
 *  Class Membership:
 *     MathMap member function.
@@ -1711,6 +1802,8 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
 *     out
 *        Pointer to an array of double (with "npoint" elements) in which to
 *        return the vector of result values.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Constants: */
@@ -1786,6 +1879,7 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
 
 /* If this is the first invocation of this function, then initialise
    constant values. */
+   LOCK_MUTEX2
    if ( !init ) {
 
 /* Trigonometrical conversion factors. */
@@ -1805,6 +1899,7 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
 /* Note that initialisation has been performed. */
       init = 1;
    }
+   UNLOCK_MUTEX2
 
 /* Allocate space for an array of pointers to elements of the
    workspace stack (each stack element being an array of double). */
@@ -2406,7 +2501,7 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
    do { \
 \
 /* Obtain a value drawn from a standard Gaussian distribution. */ \
-      ran = Gauss( rcontext ); \
+      ran = Gauss( rcontext, status ); \
 \
 /* Multiply by "ABS(x2)", trapping possible overflow. */ \
       result = ABS( (x2) ); \
@@ -2529,7 +2624,7 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
             ARG_1( OP_LOG10,    *y = ( x > 0.0 ) ? log10( x ) : AST__BAD )
             ARG_1( OP_NINT,     *y = ( x >= 0 ) ?
                                      floor( x + 0.5 ) : ceil( x - 0.5 ) )
-            ARG_1( OP_POISS,    *y = Poisson( rcontext, x ) )
+            ARG_1( OP_POISS,    *y = Poisson( rcontext, x, status ) )
             ARG_1( OP_SECH,     *y = ( x = CATCH_MATHS_OVERFLOW( cosh( x ) ),
                                        ( x == AST__BAD ) ? 0.0 : 1.0 / x ) )
             ARG_1( OP_SIN,      *y = sin( x ) )
@@ -2552,7 +2647,7 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
             ARG_2( OP_MOD,      *y = ( x2 != 0.0 ) ?
                                      fmod( x1, x2 ) : AST__BAD )
             ARG_2( OP_POW,      *y = CATCH_MATHS_ERROR( pow( x1, x2 ) ) )
-            ARG_2( OP_RAND,     ran = Rand( rcontext );
+            ARG_2( OP_RAND,     ran = Rand( rcontext, status );
                                 *y = x1 * ran + x2 * ( 1.0 - ran ); )
             ARG_2( OP_SIGN,     *y = ( ( x1 >= 0.0 ) == ( x2 >= 0.0 ) ) ?
                                      x1 : -x1 )
@@ -2658,7 +2753,7 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
 }
 
 static void EvaluationSort( const double con[], int nsym, int symlist[],
-                            int **code, int *stacksize ) {
+                            int **code, int *stacksize, int *status ) {
 /*
 *  Name:
 *     EvaluationSort
@@ -2672,7 +2767,7 @@ static void EvaluationSort( const double con[], int nsym, int symlist[],
 *  Synopsis:
 *     #include "mathmap.h"
 *     void EvaluationSort( const double con[], int nsym, int symlist[],
-*                          int **code, int *stacksize )
+*                          int **code, int *stacksize, int *status )
 
 *  Class Membership:
 *     MathMap member function.
@@ -2712,6 +2807,8 @@ static void EvaluationSort( const double con[], int nsym, int symlist[],
 *     stacksize
 *        Pointer to an int in which to return the size of the push-down stack
 *        required to evaluate the expression using the returned opcodes.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - A value of NULL will be returned for the "*code" pointer and a value
@@ -2868,7 +2965,7 @@ static void EvaluationSort( const double con[], int nsym, int symlist[],
 
 static void ExtractExpressions( const char *method, const char *class,
                                 int nfun, const char *fun[], int forward,
-                                char ***exprs ) {
+                                char ***exprs, int *status ) {
 /*
 *  Name:
 *     ExtractExpressions
@@ -2883,7 +2980,7 @@ static void ExtractExpressions( const char *method, const char *class,
 *     #include "mathmap.h"
 *     void ExtractExpressions( const char *method, const char *class,
 *                              int nfun, const char *fun[], int forward,
-*                              char ***exprs )
+*                              char ***exprs, int *status )
 
 *  Class Membership:
 *     MathMap member function.
@@ -2931,6 +3028,8 @@ static void ExtractExpressions( const char *method, const char *class,
 *        functions are absent, then this indicates an undefined transformation
 *        and the returned pointer value will be NULL. An error results if
 *        an "=" sign is present but no expression follows it.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *        - A NULL value will be returned for "*exprs" if this function is
@@ -2981,10 +3080,10 @@ static void ExtractExpressions( const char *method, const char *class,
             } else {
                astError( AST__NORHS,
                          "%s(%s): Missing right hand side in expression: "
-                         "\"%s\".",
+                         "\"%s\".", status,
                          method, class, fun[ ifun ] );
                astError( astStatus,
-                         "Error in %s transformation function %d.",
+                         "Error in %s transformation function %d.", status,
                          forward ? "forward" : "inverse", ifun + 1 );
                break;
             }
@@ -3006,10 +3105,10 @@ static void ExtractExpressions( const char *method, const char *class,
    citing the first instance of a missing "=" sign. */
    if ( astOK && ( nud != 0 ) && ( nud != nfun ) ) {
       astError( AST__NORHS,
-                "%s(%s): Missing right hand side in function: \"%s\".",
+                "%s(%s): Missing right hand side in function: \"%s\".", status,
                 method, class, fun[ iud ] );
       astError( astStatus,
-                "Error in %s transformation function %d.",
+                "Error in %s transformation function %d.", status,
                 forward ? "forward" : "inverse", iud + 1 );
    }
 
@@ -3023,7 +3122,7 @@ static void ExtractExpressions( const char *method, const char *class,
 static void ExtractVariables( const char *method, const char *class,
                               int nfun, const char *fun[],
                               int nin, int nout, int nfwd, int ninv,
-                              int forward, char ***var ) {
+                              int forward, char ***var, int *status ) {
 /*
 *  Name:
 *     ExtractVariables
@@ -3039,7 +3138,7 @@ static void ExtractVariables( const char *method, const char *class,
 *     void ExtractVariables( const char *method, const char *class,
 *                            int nfun, const char *fun[],
 *                            int nin, int nout, int nfwd, int ninv,
-*                            int forward, char ***var )
+*                            int forward, char ***var, int *status )
 
 *  Class Membership:
 *     MathMap member function.
@@ -3094,6 +3193,8 @@ static void ExtractVariables( const char *method, const char *class,
 *        Both the returned array of pointers, and the strings to which they
 *        point, will be stored in dynamically allocated memory and should
 *        be freed by the caller (using astFree) when no longer required.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *        - A NULL value will be returned for "*var" if this function is
@@ -3149,12 +3250,12 @@ static void ExtractVariables( const char *method, const char *class,
          if ( !nc ) {
             if ( c ) {
                astError( AST__MISVN,
-                         "%s(%s): No left hand side in expression: \"%s\".",
+                         "%s(%s): No left hand side in expression: \"%s\".", status,
                          method, class, fun[ ifun ] );
             } else {
                astError( AST__MISVN,
                          "%s: Transformation function contains no variable "
-                         "name.",
+                         "name.", status,
                          method );
             }
             break;
@@ -3177,13 +3278,13 @@ static void ExtractVariables( const char *method, const char *class,
          ( *var )[ ifun ][ nc ] = '\0';
 
 /* Try to parse the contents of the extracted string as a name. */
-         ParseName( ( *var )[ ifun ], 0, &iend );
+         ParseName( ( *var )[ ifun ], 0, &iend, status );
 
 /* If unsuccessful, or if all the characters were not parsed, then we
    have an invalid variable name, so report an error and quit. */
          if ( ( iend < 0 ) || ( *var )[ ifun ][ iend + 1 ] ) {
             astError( AST__VARIN,
-                      "%s(%s): Variable name is invalid: \"%s\".",
+                      "%s(%s): Variable name is invalid: \"%s\".", status,
                       method, class, ( *var )[ ifun ] );
             break;
          }
@@ -3203,7 +3304,7 @@ static void ExtractVariables( const char *method, const char *class,
 
 /* Report a contextual error message. */
          astError( astStatus,
-                   "Error in %s transformation function %d.",
+                   "Error in %s transformation function %d.", status,
                    duser1, iuser1 );
       }
    }
@@ -3218,7 +3319,7 @@ static void ExtractVariables( const char *method, const char *class,
             if ( !strcmp( ( *var )[ i1 ], ( *var )[ i2 ] ) ) {
                astError( AST__DUVAR,
                          "%s(%s): Duplicate definition of variable name: "
-                         "\"%s\".",
+                         "\"%s\".", status,
                          method, class, ( *var )[ i1 ] );
 
 /* For each transformation function involved, determine the function
@@ -3241,7 +3342,7 @@ static void ExtractVariables( const char *method, const char *class,
 
 /* Report a contextual error message. */
                astError( astStatus,
-                         "Conflict between %s function %d and %s function %d.",
+                         "Conflict between %s function %d and %s function %d.", status,
                          duser1, iuser1, duser2, iuser2 );
                break;
             }
@@ -3257,7 +3358,7 @@ static void ExtractVariables( const char *method, const char *class,
    }
 }
 
-static double Gauss( Rcontext *context ) {
+static double Gauss( Rcontext *context, int *status ) {
 /*
 *  Name:
 *     Gauss
@@ -3270,7 +3371,7 @@ static double Gauss( Rcontext *context ) {
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     double Gauss( Rcontext *context )
+*     double Gauss( Rcontext *context, int *status )
 
 *  Class Membership:
 *     MathMap member function.
@@ -3284,6 +3385,8 @@ static double Gauss( Rcontext *context ) {
 *     context
 *        Pointer to an Rcontext structure which holds the random number
 *        generator's context between invocations.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A sample from a standard Gaussian distribution.
@@ -3307,6 +3410,8 @@ static double Gauss( Rcontext *context ) {
    static double y;              /* Second result value */
    static int ysaved = 0;        /* Previously-saved value available? */
 
+   LOCK_MUTEX7
+
 /* If the random number generator context is not active, then it will
    be (re)initialised on the first invocation of Rand (below). Ensure
    that any previously-saved value within this function is first
@@ -3328,8 +3433,8 @@ static double Gauss( Rcontext *context ) {
    unit circle, while avoiding the origin (which maps to an infinite
    result). */
          do {
-            x = 2.0 * Rand( context ) - 1.0;
-            y = 2.0 * Rand( context ) - 1.0;
+            x = 2.0 * Rand( context, status ) - 1.0;
+            y = 2.0 * Rand( context, status ) - 1.0;
             rsq = x * x + y * y;
          } while ( ( rsq >= 1.0 ) || ( rsq == 0.0 ) );
 
@@ -3353,11 +3458,13 @@ static double Gauss( Rcontext *context ) {
       ysaved = 1;
    }
 
+   UNLOCK_MUTEX7
+
 /* Return the current result. */
    return x;
 }
 
-static int GetObjSize( AstObject *this_object ) {
+static int GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -3370,7 +3477,7 @@ static int GetObjSize( AstObject *this_object ) {
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     int GetObjSize( AstObject *this ) 
+*     int GetObjSize( AstObject *this, int *status ) 
 
 *  Class Membership:
 *     MathMap member function (over-rides the astGetObjSize protected
@@ -3383,6 +3490,8 @@ static int GetObjSize( AstObject *this_object ) {
 *  Parameters:
 *     this
 *        Pointer to the MathMap.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Object size, in bytes.
@@ -3408,7 +3517,7 @@ static int GetObjSize( AstObject *this_object ) {
 /* Invoke the GetObjSize method inherited from the parent class, and then
    add on any components of the class structure defined by thsi class
    which are stored in dynamically allocated memory. */
-   result = (*parent_getobjsize)( this_object );
+   result = (*parent_getobjsize)( this_object, status );
 
    SIZEOF_POINTER_ARRAY( this->fwdfun, this->nfwd )
    SIZEOF_POINTER_ARRAY( this->invfun, this->ninv )
@@ -3424,7 +3533,7 @@ static int GetObjSize( AstObject *this_object ) {
    return result;
 }
 
-static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+static const char *GetAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     GetAttrib
@@ -3437,7 +3546,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     const char *GetAttrib( AstObject *this, const char *attrib )
+*     const char *GetAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     MathMap member function (over-rides the protected astGetAttrib
@@ -3454,6 +3563,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string containing the name of
 *        the attribute whose value is required. This name should be in
 *        lower case, with all white space removed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     - Pointer to a null-terminated string containing the attribute
@@ -3471,14 +3582,11 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *     reason.
 */
 
-/* Local Constants: */
-#define BUFF_LEN 50              /* Max. characters in result buffer */
-
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstMathMap *this;             /* Pointer to the MathMap structure */
    const char *result;           /* Pointer value to return */
    int ival;                     /* Integer attribute value */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
    result = NULL;
@@ -3486,12 +3594,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Check the global error status. */   
    if ( !astOK ) return result;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this_object);
+
 /* Obtain a pointer to the MathMap structure. */
    this = (AstMathMap *) this_object;
 
 /* Compare "attrib" with each recognised attribute name in turn,
    obtaining the value of the required attribute. If necessary, write
-   the value into "buff" as a null-terminated string in an appropriate
+   the value into "getattrib_buff" as a null-terminated string in an appropriate
    format.  Set "result" to point at the result string. */
 
 /* Seed. */
@@ -3499,8 +3610,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    if ( !strcmp( attrib, "seed" ) ) {
       ival = astGetSeed( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* SimpFI. */
@@ -3508,8 +3619,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "simpfi" ) ) {
       ival = astGetSimpFI( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* SimpIF. */
@@ -3517,24 +3628,22 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "simpif" ) ) {
       ival = astGetSimpIF( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_getattrib)( this_object, attrib );
+      result = (*parent_getattrib)( this_object, attrib, status );
    }
 
 /* Return the result. */
    return result;
 
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
 
-void astInitMathMapVtab_(  AstMathMapVtab *vtab, const char *name ) {
+void astInitMathMapVtab_(  AstMathMapVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -3571,11 +3680,15 @@ void astInitMathMapVtab_(  AstMathMapVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -3584,8 +3697,8 @@ void astInitMathMapVtab_(  AstMathMapVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAMathMap) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -3633,9 +3746,14 @@ void astInitMathMapVtab_(  AstMathMapVtab *vtab, const char *name ) {
    astSetDelete( vtab, Delete );
    astSetDump( vtab, Dump, "MathMap",
                "Transformation using mathematical functions" );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
-static double LogGamma( double x ) {
+static double LogGamma( double x, int *status ) {
 /*
 *  Name:
 *     LogGamma
@@ -3648,7 +3766,7 @@ static double LogGamma( double x ) {
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     double LogGamma( double x )
+*     double LogGamma( double x, int *status )
 
 *  Class Membership:
 *     MathMap member function.
@@ -3662,6 +3780,8 @@ static double LogGamma( double x ) {
 *  Parameters:
 *     x
 *        The function argument, which must be greater than zero.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The natural logarithm of the gamma function with "x" as argument,
@@ -3691,12 +3811,14 @@ static double LogGamma( double x ) {
 
 /* If initialisation has not yet been performed, calculate the
    constant required below. */
+   LOCK_MUTEX3
    if ( !init ) {
       root_twopi = sqrt( 2.0 * acos( -1.0 ) );
 
 /* Note that initialisation has been performed. */
       init = 1;
    }
+   UNLOCK_MUTEX3
 
 /* Return a bad value if "x" is not greater than zero. */
    if ( x <= 0.0 ) {
@@ -3725,7 +3847,7 @@ static double LogGamma( double x ) {
 }
 
 static int MapMerge( AstMapping *this, int where, int series, int *nmap,
-                     AstMapping ***map_list, int **invert_list ) {
+                     AstMapping ***map_list, int **invert_list, int *status ) {
 /*
 *  Name:
 *     MapMerge
@@ -3739,7 +3861,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *  Synopsis:
 *     #include "mapping.h"
 *     int MapMerge( AstMapping *this, int where, int series, int *nmap,
-*                   AstMapping ***map_list, int **invert_list )
+*                   AstMapping ***map_list, int **invert_list, int *status )
 
 *  Class Membership:
 *     MathMap method (over-rides the protected astMapMerge method
@@ -3842,6 +3964,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *        length, the "*invert_list" array will be extended (and its
 *        pointer updated) if necessary to accommodate any new
 *        elements.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     If simplification was possible, the function returns the index
@@ -3997,7 +4121,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* If the two MathMaps can be merged, create a UnitMap as a
    replacement. */
    if ( astOK && simplify ) {
-      new = (AstMapping *) astUnitMap( nin1, "" );
+      new = (AstMapping *) astUnitMap( nin1, "", status );
 
 /* If OK, annul the pointers to the original MathMaps. */
       if ( astOK ) {
@@ -4036,7 +4160,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 static void ParseConstant( const char *method, const char *class,
                            const char *exprs, int istart, int *iend,
-                           double *con ) {
+                           double *con, int *status ) {
 /*
 *  Name:
 *     ParseConstant
@@ -4051,7 +4175,7 @@ static void ParseConstant( const char *method, const char *class,
 *     #include "mathmap.h"
 *     void ParseConstant( const char *method, const char *class,
 *                         const char *exprs, int istart, int *iend,
-*                         double *con )
+*                         double *con, int *status )
 
 *  Class Membership:
 *     MathMap member function.
@@ -4094,6 +4218,8 @@ static void ParseConstant( const char *method, const char *class,
 *     con
 *        Pointer to a double, in which the value of the constant, if found,
 *        will be returned.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -4220,7 +4346,7 @@ static void ParseConstant( const char *method, const char *class,
       if ( astOK && !valid ) {
          astError( AST__CONIN,
                    "%s(%s): Invalid constant syntax in the expression "
-                   "\"%.*s\".",
+                   "\"%.*s\".", status,
                    method, class, *iend + 1, exprs );
       }
 
@@ -4232,7 +4358,7 @@ static void ParseConstant( const char *method, const char *class,
    }
 }
 
-static void ParseName( const char *exprs, int istart, int *iend ) {
+static void ParseName( const char *exprs, int istart, int *iend, int *status ) {
 /*
 *  Name:
 *     ParseName
@@ -4245,7 +4371,7 @@ static void ParseName( const char *exprs, int istart, int *iend ) {
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     void ParseName( const char *exprs, int istart, int *iend )
+*     void ParseName( const char *exprs, int istart, int *iend, int *status )
 
 *  Class Membership:
 *     MathMap member function.
@@ -4273,6 +4399,8 @@ static void ParseName( const char *exprs, int istart, int *iend ) {
 *        Pointer to an int in which to return the index in "exprs" of the
 *        final character which forms part of the name. If no name is
 *        found, a value of -1 is returned.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -4297,7 +4425,7 @@ static void ParseName( const char *exprs, int istart, int *iend ) {
 
 static void ParseVariable( const char *method, const char *class,
                            const char *exprs, int istart, int nvar,
-                           const char *var[], int *ivar, int *iend ) {
+                           const char *var[], int *ivar, int *iend, int *status ) {
 /*
 *  Name:
 *     ParseVariable
@@ -4312,7 +4440,7 @@ static void ParseVariable( const char *method, const char *class,
 *     #include "mathmap.h"
 *     void ParseVariable( const char *method, const char *class,
 *                         const char *exprs, int istart, int nvar,
-*                         const char *var[], int *ivar, int *iend )
+*                         const char *var[], int *ivar, int *iend, int *status )
 
 *  Class Membership:
 *     MathMap member function.
@@ -4365,6 +4493,8 @@ static void ParseVariable( const char *method, const char *class,
 *        Pointer to an int in which to return the index in "exprs" of the
 *        final character which forms part of the variable name. If no variable
 *        name is found, a value of -1 is returned.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -4380,7 +4510,7 @@ static void ParseVariable( const char *method, const char *class,
 
 /* Determine if the characters in the expression starting at index
    "istart" constitute a valid name. */
-   ParseName( exprs, istart, iend );
+   ParseName( exprs, istart, iend, status );
 
 /* If so, calculate the length of the name. */
    if ( *iend >= istart ) {
@@ -4402,7 +4532,7 @@ static void ParseVariable( const char *method, const char *class,
       if ( !found ) {
          astError( AST__UDVOF,
                    "%s(%s): Undefined variable or function in the expression "
-                   "\"%.*s\".",
+                   "\"%.*s\".", status,
                    method, class, *iend + 1, exprs );
          *ivar = -1;
          *iend = -1;
@@ -4410,7 +4540,7 @@ static void ParseVariable( const char *method, const char *class,
    }
 }
 
-static double Poisson( Rcontext *context, double mean ) {
+static double Poisson( Rcontext *context, double mean, int *status ) {
 /*
 *  Name:
 *     Poisson
@@ -4423,7 +4553,7 @@ static double Poisson( Rcontext *context, double mean ) {
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     double Poisson( Rcontext *context, double mean )
+*     double Poisson( Rcontext *context, double mean, int *status )
 
 *  Class Membership:
 *     MathMap member function.
@@ -4442,6 +4572,8 @@ static double Poisson( Rcontext *context, double mean ) {
 *     mean
 *        The mean of the Poisson distribution, which should not be
 *        negative.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A sample (which will only take integer values) from the Poisson
@@ -4477,6 +4609,8 @@ static double Poisson( Rcontext *context, double mean ) {
    static double sqrt_point9;    /* Square root of 0.9 */
    static double thresh;         /* Threshold for product of samples */
    static int init = 0;          /* Local initialisation performed? */
+
+   LOCK_MUTEX6
 
 /* If initialisation has not yet been performed, then perform it
    now. */
@@ -4535,7 +4669,7 @@ static double Poisson( Rcontext *context, double mean ) {
 /* Multiply the random samples, counting the number needed to reach
    the threshold. */
       do {
-         product *= Rand( context );
+         product *= Rand( context, status );
          result += 1.0;
       } while ( product > thresh );
 
@@ -4551,7 +4685,7 @@ static double Poisson( Rcontext *context, double mean ) {
          last_mean = mean;
          log_mean = log( mean );
          root_2mean = sqrt( 2.0 * mean );
-         beta = mean * log_mean - LogGamma( mean + 1.0 );
+         beta = mean * log_mean - LogGamma( mean + 1.0, status );
       }
 
 /* Loop until a suitable random sample has been generated. */
@@ -4564,7 +4698,7 @@ static double Poisson( Rcontext *context, double mean ) {
    library. If necessary, obtain a new sample. */
             do {
                errno = 0;
-               ran = tan( pi * Rand( context ) );
+               ran = tan( pi * Rand( context, status ) );
             } while ( ( ran > ranmax ) ||
                       ( ( errno == ERANGE ) &&
                         ( ( ( ran >= 0.0 ) ? ran : -ran ) == HUGE_VAL ) ) );
@@ -4589,11 +4723,11 @@ static double Poisson( Rcontext *context, double mean ) {
    performed above). */
          ran *= sqrt_point9;
          pfract = ( 0.9 + ran * ran ) *
-                  exp( result * log_mean - LogGamma( result + 1.0 ) - beta );
+                  exp( result * log_mean - LogGamma( result + 1.0, status ) - beta );
 
 /* Accept the sample with this fractional probability, otherwise
    obtain a new sample. */
-      } while ( Rand( context ) > pfract );
+      } while ( Rand( context, status ) > pfract );
 
 /* If the mean is huge, the relative standard deviation will be
    negligible compared to the machine precision. In such cases, the
@@ -4603,11 +4737,13 @@ static double Poisson( Rcontext *context, double mean ) {
       result = mean;
    }
 
+   UNLOCK_MUTEX6
+
 /* Return the result. */
    return result;
 }
 
-static double Rand( Rcontext *context ) {
+static double Rand( Rcontext *context, int *status ) {
 /*
 *  Name:
 *     Rand
@@ -4620,7 +4756,7 @@ static double Rand( Rcontext *context ) {
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     double Rand( Rcontext *context )
+*     double Rand( Rcontext *context, int *status )
 
 *  Class Membership:
 *     MathMap member function.
@@ -4637,6 +4773,8 @@ static double Rand( Rcontext *context ) {
 *     context
 *        Pointer to an Rcontext structure which holds the random number
 *        generator's context between invocations.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - The sequence of numbers returned is determined by the "seed"
@@ -4684,6 +4822,7 @@ static double Rand( Rcontext *context ) {
 
 /* First, perform local initialisation for this function, if not
    already done. */
+      LOCK_MUTEX4
       if ( !init ) {
 
 /* Obtain the approximate number of bits used by the random integer
@@ -4722,6 +4861,7 @@ static double Rand( Rcontext *context ) {
 /* Note that local initialisation has been done. */
          init = 1;
       }
+      UNLOCK_MUTEX4
 
 /* Obtain the seed value, enforcing positivity. */
       seed = (long int) context->seed;
@@ -4801,7 +4941,7 @@ static double Rand( Rcontext *context ) {
    return result;
 }
 
-static void SetAttrib( AstObject *this_object, const char *setting ) {
+static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
 *     SetAttrib
@@ -4814,7 +4954,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     void SetAttrib( AstObject *this, const char *setting )
+*     void SetAttrib( AstObject *this, const char *setting, int *status )
 
 *  Class Membership:
 *     MathMap member function (extends the astSetAttrib method inherited from
@@ -4839,6 +4979,8 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 *     setting
 *        Pointer to a null terminated string specifying the new attribute
 *        value.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -4889,11 +5031,11 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Pass any unrecognised setting to the parent method for further
    interpretation. */
    } else {
-      (*parent_setattrib)( this_object, setting );
+      (*parent_setattrib)( this_object, setting, status );
    }
 }
 
-static int TestAttrib( AstObject *this_object, const char *attrib ) {
+static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     TestAttrib
@@ -4906,7 +5048,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     int TestAttrib( AstObject *this, const char *attrib )
+*     int TestAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     MathMap member function (over-rides the astTestAttrib protected
@@ -4923,6 +5065,8 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if a value has been set, otherwise zero.
@@ -4965,7 +5109,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is not recognised, pass it on to the parent method
    for further interpretation. */
    } else {
-      result = (*parent_testattrib)( this_object, attrib );
+      result = (*parent_testattrib)( this_object, attrib, status );
    }
 
 /* Return the result, */
@@ -4973,7 +5117,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 }
 
 static AstPointSet *Transform( AstMapping *map, AstPointSet *in,
-                               int forward, AstPointSet *out ) {
+                               int forward, AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     Transform
@@ -4987,7 +5131,7 @@ static AstPointSet *Transform( AstMapping *map, AstPointSet *in,
 *  Synopsis:
 *     #include "mathmap.h"
 *     AstPointSet *Transform( AstMapping *map, AstPointSet *in,
-*                             int forward, AstPointSet *out )
+*                             int forward, AstPointSet *out, int *status )
 
 *  Class Membership:
 *     MathMap member function (over-rides the astTransform method inherited
@@ -5011,6 +5155,8 @@ static AstPointSet *Transform( AstMapping *map, AstPointSet *in,
 *        Pointer to a PointSet which will hold the transformed (output)
 *        coordinate values. A NULL value may also be given, in which case a
 *        new PointSet will be created by this function.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the output (possibly new) PointSet.
@@ -5054,7 +5200,7 @@ static AstPointSet *Transform( AstMapping *map, AstPointSet *in,
    function inherited from the parent Mapping class. This function validates
    all arguments and generates an output PointSet if necessary, but does not
    actually transform any coordinate values. */
-   result = (*parent_transform)( map, in, forward, out );
+   result = (*parent_transform)( map, in, forward, out, status );
 
 /* We will now extend the parent astTransform method by performing the
    transformation needed to generate the output coordinate values. */
@@ -5133,7 +5279,7 @@ static AstPointSet *Transform( AstMapping *map, AstPointSet *in,
                            forward ? this->fwdcon[ ifun ] :
                                      this->invcon[ ifun ],
                            forward ? this->fwdstack : this->invstack,
-                           data_ptr[ ifun + ncoord_in ] );
+                           data_ptr[ ifun + ncoord_in ], status );
       }
    }
 
@@ -5156,7 +5302,7 @@ static AstPointSet *Transform( AstMapping *map, AstPointSet *in,
 static void ValidateSymbol( const char *method, const char *class,
                             const char *exprs, int iend, int sym,
                             int *lpar, int **argcount, int **opensym,
-                            int *ncon, double **con ) {
+                            int *ncon, double **con, int *status ) {
 /*
 *  Name:
 *     ValidateSymbol
@@ -5172,7 +5318,7 @@ static void ValidateSymbol( const char *method, const char *class,
 *     void ValidateSymbol( const char *method, const char *class,
 *                          const char *exprs, int iend, int sym, int *lpar,
 *                          int **argcount, int **opensym, int *ncon,
-*                          double **con )
+*                          double **con, int *status )
 
 *  Class Membership:
 *     MathMap member function.
@@ -5247,6 +5393,8 @@ static void ValidateSymbol( const char *method, const char *class,
 *
 *        The allocated space must be freed by the caller (using astFree) when
 *        no longer required.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - The dynamically allocated arrays normally returned by this function
@@ -5271,7 +5419,7 @@ static void ValidateSymbol( const char *method, const char *class,
          if ( ( *lpar <= 0 ) || ( ( *argcount )[ *lpar - 1 ] == 0 ) ) {
             astError( AST__COMIN,
                       "%s(%s): Spurious comma encountered in the expression "
-                      "\"%.*s\".",
+                      "\"%.*s\".", status,
                       method, class, iend + 1, exprs );
 
 /* If a comma is valid, then increment the argument count at the
@@ -5312,7 +5460,7 @@ static void ValidateSymbol( const char *method, const char *class,
          if ( *lpar == 0 ) {
             astError( AST__MLPAR,
                       "%s(%s): Missing left parenthesis in the expression "
-                      "\"%.*s\".",
+                      "\"%.*s\".", status,
                       method, class, iend + 1, exprs );
 
 /* If the parenthesis level is valid and the symbol which opened this
@@ -5327,7 +5475,7 @@ static void ValidateSymbol( const char *method, const char *class,
                  symbol[ ( *opensym )[ *lpar - 1 ] ].nargs ) {
                astError( AST__WRNFA,
                          "%s(%s): Wrong number of function arguments in the "
-                         "expression \"%.*s\".",
+                         "expression \"%.*s\".", status,
                          method, class, iend + 1, exprs );
 
 /* If the number of arguments is valid, decrement the parenthesis
@@ -5348,7 +5496,7 @@ static void ValidateSymbol( const char *method, const char *class,
                  ( -symbol[ ( *opensym )[ *lpar - 1 ] ].nargs ) ) {
                astError( AST__WRNFA,
                          "%s(%s): Insufficient function arguments in the "
-                         "expression \"%.*s\".",
+                         "expression \"%.*s\".", status,
                          method, class, iend + 1, exprs );
 
 /* If the number of arguments is valid, increase the size of the
@@ -5436,7 +5584,7 @@ static void ValidateSymbol( const char *method, const char *class,
    when it is next invoked. */
 astMAKE_CLEAR(MathMap,Seed,rcontext.seed,( this->rcontext.seed_set = 0,
                                            this->rcontext.active = 0,
-                                           DefaultSeed( &this->rcontext ) ))
+                                           DefaultSeed( &this->rcontext, status ) ))
 
 /* Return the "seed" value from the random number generator
    context. */
@@ -5601,7 +5749,7 @@ astMAKE_TEST(MathMap,SimpIF,( this->simp_if != -INT_MAX ))
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -5613,7 +5761,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for MathMap objects.
@@ -5623,6 +5771,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the object to be copied.
 *     objout
 *        Pointer to the object being constructed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -5727,7 +5877,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -5739,7 +5889,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for MathMap objects.
@@ -5747,6 +5897,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the object to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -5773,7 +5925,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -5785,7 +5937,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -5796,6 +5948,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the MathMap whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Constants: */
@@ -5881,8 +6035,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* SimpFI. */
 /* ------- */
 /* Write out the forward-inverse simplification flag. */
-   set = TestSimpFI( this );
-   ival = set ? GetSimpFI( this ) : astGetSimpFI( this );
+   set = TestSimpFI( this, status );
+   ival = set ? GetSimpFI( this, status ) : astGetSimpFI( this );
    astWriteInt( channel, "SimpFI", set, 0, ival,
                 ival ? "Forward-inverse pairs may simplify" :
                        "Forward-inverse pairs do not simplify" );
@@ -5890,8 +6044,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* SimpIF. */
 /* ------- */
 /* Write out the inverse-forward simplification flag. */
-   set = TestSimpIF( this );
-   ival = set ? GetSimpIF( this ) : astGetSimpIF( this );
+   set = TestSimpIF( this, status );
+   ival = set ? GetSimpIF( this, status ) : astGetSimpIF( this );
    astWriteInt( channel, "SimpIF", set, 0, ival,
                 ival ? "Inverse-forward pairs may simplify" :
                        "Inverse-forward pairs do not simplify" );
@@ -5900,8 +6054,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ----- */
 /* Write out any random number seed value which is set. Prefix this with
    a separate flag which indicates if the seed has been set. */
-   set = TestSeed( this );
-   ival = set ? GetSeed( this ) : astGetSeed( this );
+   set = TestSeed( this, status );
+   ival = set ? GetSeed( this, status ) : astGetSeed( this );
    astWriteInt( channel, "Seeded", set, 0, set,
                 set? "Explicit random number seed set" :
                      "No random number seed set" );
@@ -5918,13 +6072,13 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsAMathMap and astCheckMathMap functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(MathMap,Mapping,check,&class_init)
+astMAKE_ISA(MathMap,Mapping,check,&class_check)
 astMAKE_CHECK(MathMap)
 
 AstMathMap *astMathMap_( int nin, int nout,
                          int nfwd, const char *fwd[],
                          int ninv, const char *inv[],
-                         const char *options, ... ) {
+                         const char *options, int *status, ...) {
 /*
 *+
 *  Name:
@@ -5941,7 +6095,7 @@ AstMathMap *astMathMap_( int nin, int nout,
 *     AstMathMap *astMathMap( int nin, int nout,
 *                             int nfwd, const char *fwd[],
 *                             int ninv, const char *inv[],
-*                             const char *options, ... )
+*                             const char *options, ..., int *status )
 
 *  Class Membership:
 *     MathMap constructor.
@@ -5975,6 +6129,8 @@ AstMathMap *astMathMap_( int nin, int nout,
 *        initialising the new MathMap. The syntax used is the same as
 *        for the astSet method and may include "printf" format
 *        specifiers identified by "%" symbols in the normal way.
+*     status
+*        Pointer to the inherited status variable.
 *     ...
 *        If the "options" string contains "%" format specifiers, then
 *        an optional list of arguments may follow it in order to
@@ -5998,8 +6154,12 @@ AstMathMap *astMathMap_( int nin, int nout,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstMathMap *new;              /* Pointer to new MathMap */
    va_list args;                 /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -6016,7 +6176,7 @@ AstMathMap *astMathMap_( int nin, int nout,
 
 /* Obtain the variable argument list and pass it along with the options string
    to the astVSet method to initialise the new MathMap's attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -6763,8 +6923,17 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstMathMap *new;              /* Pointer to new MathMap */
    va_list args;                 /* Variable argument list */
+
+   int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
@@ -6796,7 +6965,7 @@ AstMathMap *astInitMathMap_( void *mem, size_t size, int init,
                              AstMathMapVtab *vtab, const char *name,
                              int nin, int nout,
                              int nfwd, const char *fwd[],
-                             int ninv, const char *inv[] ) {
+                             int ninv, const char *inv[], int *status ) {
 /*
 *+
 *  Name:
@@ -6909,43 +7078,43 @@ AstMathMap *astInitMathMap_( void *mem, size_t size, int init,
    reporting an error if necessary. */
    if ( nin < 1 ) {
       astError( AST__BADNI,
-                "astInitMathMap(%s): Bad number of input coordinates (%d).",
+                "astInitMathMap(%s): Bad number of input coordinates (%d).", status,
                 name, nin );
       astError( AST__BADNI,
-                "This number should be one or more." );
+                "This number should be one or more." , status);
    } else if ( nout < 1 ) {
       astError( AST__BADNO,
-                "astInitMathMap(%s): Bad number of output coordinates (%d).",
+                "astInitMathMap(%s): Bad number of output coordinates (%d).", status,
                 name, nout );
       astError( AST__BADNI,
-                "This number should be one or more." );
+                "This number should be one or more." , status);
 
 /* Check that sufficient number of forward and inverse transformation
    functions have been supplied and report an error if necessary. */
    } else if ( nfwd < nout ) {
       astError( AST__INNTF,
                 "astInitMathMap(%s): Too few forward transformation functions "
-                "given (%d).",
+                "given (%d).", status,
                 name, nfwd );
       astError( astStatus,
                 "At least %d forward transformation functions must be "
-                "supplied. ",
+                "supplied. ", status,
                 nout );
    } else if ( ninv < nin ) {
       astError( AST__INNTF,
                 "astInitMathMap(%s): Too few inverse transformation functions "
-                "given (%d).",
+                "given (%d).", status,
                 name, ninv );
       astError( astStatus,
                 "At least %d inverse transformation functions must be "
-                "supplied. ",
+                "supplied. ", status,
                 nin );
 
 /* Of OK, clean the forward and inverse functions provided. This makes
    a lower-case copy with white space removed. */
    } else {
-      CleanFunctions( nfwd, fwd, &fwdfun );
-      CleanFunctions( ninv, inv, &invfun );
+      CleanFunctions( nfwd, fwd, &fwdfun, status );
+      CleanFunctions( ninv, inv, &invfun, status );
 
 /* Compile the cleaned functions. From the returned pointers (if
    successful), we can now tell which transformations (forward and/or
@@ -6954,7 +7123,7 @@ AstMathMap *astInitMathMap_( void *mem, size_t size, int init,
                       nfwd, (const char **) fwdfun,
                       ninv, (const char **) invfun,
                       &fwdcode, &invcode, &fwdcon, &invcon,
-                      &fwdstack, &invstack );
+                      &fwdstack, &invstack, status );
 
 /* Initialise a Mapping structure (the parent class) as the first
    component within the MathMap structure, allocating memory if
@@ -7001,7 +7170,7 @@ AstMathMap *astInitMathMap_( void *mem, size_t size, int init,
          new->rcontext.active = 0;
          new->rcontext.random_int = 0;
          new->rcontext.seed_set = 0;
-         new->rcontext.seed = DefaultSeed( &new->rcontext );
+         new->rcontext.seed = DefaultSeed( &new->rcontext, status );
 
 /* If an error occurred, clean up by deleting the new object. */
          if ( !astOK ) new = astDelete( new );
@@ -7014,7 +7183,7 @@ AstMathMap *astInitMathMap_( void *mem, size_t size, int init,
 
 AstMathMap *astLoadMathMap_( void *mem, size_t size,
                              AstMathMapVtab *vtab, const char *name,
-                             AstChannel *channel ) {
+                             AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -7089,12 +7258,16 @@ AstMathMap *astLoadMathMap_( void *mem, size_t size,
 */
 
 /* Local Constants: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
    AstMathMap *new;              /* Pointer to the new MathMap */
    char key[ KEY_LEN + 1 ];      /* Buffer for keyword strings */
-   int ifun;                     /* Loop counter for functions */
+   int ifun;                     /* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
+
+/* Loop counter for functions */
    int invert;                   /* Invert attribute value */
    int nin;                      /* True number of input coordinates */
    int nout;                     /* True number of output coordinates */
@@ -7183,12 +7356,12 @@ AstMathMap *astLoadMathMap_( void *mem, size_t size,
 /* Forward-inverse simplification flag. */
 /* ------------------------------------ */
             new->simp_fi = astReadInt( channel, "simpfi", -INT_MAX );
-            if ( TestSimpFI( new ) ) SetSimpFI( new, new->simp_fi );
+            if ( TestSimpFI( new, status ) ) SetSimpFI( new, new->simp_fi, status );
 
 /* Inverse-forward simplification flag. */
 /* ------------------------------------ */
             new->simp_if = astReadInt( channel, "simpif", -INT_MAX );
-            if ( TestSimpIF( new ) ) SetSimpIF( new, new->simp_if );
+            if ( TestSimpIF( new, status ) ) SetSimpIF( new, new->simp_if, status );
 
 /* Random number context. */
 /* ---------------------- */
@@ -7199,13 +7372,13 @@ AstMathMap *astLoadMathMap_( void *mem, size_t size,
 /* Read the flag that determines if the Seed value is set, and the
    Seed value itself. */
             new->rcontext.seed_set = astReadInt( channel, "seeded", 0 );
-            if ( TestSeed( new ) ) {
+            if ( TestSeed( new, status ) ) {
                new->rcontext.seed = astReadInt( channel, "seed", 0 );
-               SetSeed( new, new->rcontext.seed );
+               SetSeed( new, new->rcontext.seed, status );
 
 /* Supply an unpredictable default Seed value if necessary. */
             } else {
-               new->rcontext.seed = DefaultSeed( &new->rcontext );
+               new->rcontext.seed = DefaultSeed( &new->rcontext, status );
             }
 
 /* Compile the MathMap's transformation functions. */
@@ -7214,7 +7387,7 @@ AstMathMap *astLoadMathMap_( void *mem, size_t size,
                             new->ninv, (const char **) new->invfun,
                             &new->fwdcode, &new->invcode,
                             &new->fwdcon, &new->invcon,
-                            &new->fwdstack, &new->invstack );
+                            &new->fwdstack, &new->invstack, status );
          }
 
 /* If an error occurred, clean up by deleting the new MathMap. */
@@ -7228,3 +7401,8 @@ AstMathMap *astLoadMathMap_( void *mem, size_t size,
 /* Undefine macros local to this function. */
 #undef KEY_LEN
 }
+
+
+
+
+

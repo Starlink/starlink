@@ -11,6 +11,8 @@
 *     description of the module and its interface, see the .h file of
 *     the same name.
 
+*     Note, it is assumed that malloc, free and realloc are thread-safe.
+
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
@@ -123,12 +125,6 @@
 /* The maximum number of fields within a format string allowed by astSscanf. */
 #define VMAXFLD 20
 
-/* Define the largest size of a cached memory block in bytes. This does
-   not include the size of the Memory header. This does not need to be
-   too big because the vast majority of memory blocks allocated by AST are
-   less than a few hundred bytes. */
-#define MXCSIZE 300
-
 /* The maximum number of nested astBeginPM/astEndPM contexts. */
 #define PM_STACK_MAXSIZE 20
 
@@ -158,6 +154,7 @@
 /* Interface definitions. */
 /* ---------------------- */
 #include "error.h"               /* Error reporting facilities */
+#include "globals.h"             /* Thread-specific global data */
 #include "memory.h"              /* Interface to this module */
 
 #ifdef MEM_DEBUG
@@ -177,6 +174,10 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <limits.h>
+
+#ifdef THREAD_SAFE
+#include <pthread.h>
+#endif
 
 /* Function Macros. */
 /* =============== */
@@ -243,7 +244,7 @@
    if it has (but not if the global status is already set). */ \
    if ( !ptr ) { \
       if ( astOK ) { \
-         astError( AST__PTRIN, "Invalid NULL pointer (address %p).", ptr ); \
+         astError( AST__PTRIN, "Invalid NULL pointer (address %p).", status, ptr ); \
       } \
 \
 /* If OK, derive a pointer to the memory header that precedes the \
@@ -258,7 +259,7 @@
       if ( isdynmem->magic != MAGIC( isdynmem, isdynmem->size ) ) { \
          if ( astOK ) { \
             astError( AST__PTRIN, \
-                      "Invalid pointer or corrupted memory at address %p.", \
+                      "Invalid pointer or corrupted memory at address %p.", status, \
                       ptr ); \
          } \
 \
@@ -314,36 +315,11 @@
 /* A macro that returns the size of the a Memory structure padded to a
    multiple of 8 bytes. */
 #define SIZEOF_MEMORY \
-   ( ( SizeOf_Memory != 0 ) ? SizeOf_Memory : SizeOfMemory() )
+   ( ( sizeof_memory != 0 ) ? sizeof_memory : SizeOfMemory( status ) )
 
-
-/* Module Type Definitions. */
-/* ======================== */
-/* Header for allocated memory. */
-/* ---------------------------- */
-/* This stores a "magic" value so that dynamically allocated memory
-   can be recognised, together with the allocated size. It also
-   ensures correct alignment. */
-typedef struct Memory {
-   struct Memory *next;
-   unsigned long magic;
-   size_t size;
-
-#ifdef MEM_DEBUG
-   struct Memory *prev; /* Pointer to the previous linked Memory structure */
-   int id;      /* A unique identifier for every allocated memory chunk */
-   int perm;    /* Is this chunk part of an acceptable once-off "memory leak"? */
-#endif
-
-} Memory;
 
 /* Module Variables. */
 /* ================= */
-
-/* The size of a Memory header structure, padded to a multiple of 8
-   bytes. This value is initialised by the SizeOfMemory function, and
-   should be accessed using the SIZEOF_MEMORY macro. */
-static size_t SizeOf_Memory = 0;
 
 /* Extra stuff for debugging of memory management (tracking of leaks
    etc). */
@@ -383,7 +359,43 @@ static int Quiet_Use = 0;
 /* Report the ID of every cached block when the cache is emptied? */
 static int List_Cache = 0;
 
+#ifdef THREAD_SAFE
+static pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
+#define LOCK_DEBUG_MUTEX pthread_mutex_lock( &mutex2 );
+#define UNLOCK_DEBUG_MUTEX pthread_mutex_unlock( &mutex2 );
+#else
+#define LOCK_DEBUG_MUTEX
+#define UNLOCK_DEBUG_MUTEX
 #endif
+
+#endif
+
+/* Define macros for accessing all items of thread-safe global data 
+   used by this module. */
+#ifdef THREAD_SAFE
+
+#define sizeof_memory astGLOBAL(Memory,Sizeof_Memory)
+#define cache astGLOBAL(Memory,Cache)
+#define cache_init astGLOBAL(Memory,Cache_Init)
+#define use_cache astGLOBAL(Memory,Use_Cache)
+
+/* Define the initial values for the global data for this module. */
+#define GLOBAL_inits \
+   globals->Sizeof_Memory = 0; \
+   globals->Cache_Init = 0; \
+   globals->Use_Cache = 0; \
+
+/* Create the global initialisation function. */
+astMAKE_INITGLOBALS(Memory)
+
+/* If thread safety is not needed, declare globals at static variables. */ 
+/* -------------------------------------------------------------------- */ 
+#else
+
+/* The size of a Memory header structure, padded to a multiple of 8
+   bytes. This value is initialised by the SizeOfMemory function, and
+   should be accessed using the SIZEOF_MEMORY macro. */
+static size_t sizeof_memory = 0;
 
 /* A cache of allocated but currently unused memory block. This cache is
    maintained in order to avoid the overhead of continual calls to malloc to
@@ -395,20 +407,22 @@ static int List_Cache = 0;
    "cache". Each free memory block contains (in its Memory header) a pointer 
    to the header for another free memory block of the same size (or a NULL 
    pointer if there are no other free memory blocks of the same size). */
-static Memory *Cache[ MXCSIZE + 1 ];
+static Memory *cache[ MXCSIZE + 1 ];
 
 /* Has the "cache" array been initialised? */
-static int Cache_Init = 0;
+static int cache_init = 0;
 
 /* Should the cache be used? */
-static int Use_Cache = 0;
+static int use_cache = 0;
+
+#endif
 
 /* Prototypes for Private Functions. */
 /* ================================= */
-static size_t SizeOfMemory( void );
-static char *CheckTempStart( const char *, const char *, const char *, char *, int *, int *, int *, int *, int *, int *, int * );
-static char *ChrMatcher( const char *, const char *, const char *, const char *[], int, int, int, char ***, int * );
-static char *ChrSuber( const char *, const char *, const char *[], int, char ***, int * );
+static size_t SizeOfMemory( int * );
+static char *CheckTempStart( const char *, const char *, const char *, char *, int *, int *, int *, int *, int *, int *, int *, int * );
+static char *ChrMatcher( const char *, const char *, const char *, const char *[], int, int, int, char ***, int *, int * );
+static char *ChrSuber( const char *, const char *, const char *[], int, char ***, int *, int * );
 
 #ifdef MEM_DEBUG
 static void Issue( Memory * );
@@ -417,7 +431,7 @@ static void DeIssue( Memory * );
 
 /* Function implementations. */
 /* ========================= */
-char *astAppendString_( char *str1, int *nc, const char *str2 ) {
+char *astAppendString_( char *str1, int *nc, const char *str2, int *status ) {
 /*
 *  Name:
 *     astAppendString
@@ -510,7 +524,7 @@ static char *CheckTempStart( const char *template, const char *temp,
                              const char *pattern,
                              char *allowed, int *ntemp, int *allow, 
                              int *min_nc, int *max_nc, int *start_sub, 
-                             int *end_sub, int *greedy ){
+                             int *end_sub, int *greedy, int *status ){
 /*
 *  Name:
 *     CheckTempStart
@@ -526,7 +540,7 @@ static char *CheckTempStart( const char *template, const char *temp,
 *                           const char *pattern,
 *                           char *allowed, int *ntemp, int *allow, 
 *                           int *min_nc, int *max_nc, int *start_sub, 
-*                           int *end_sub, int *greedy )
+*                           int *end_sub, int *greedy, int *status )
 
 *  Description:
 *     This function returns inforation about the leading field in a
@@ -577,6 +591,8 @@ static char *CheckTempStart( const char *template, const char *temp,
 *     greedy
 *        Address of an int in which to return a flag which is non-zero if
 *        the template starts with a greedy quantifier.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to a (possibly newly allocated) memory area holding a
@@ -587,7 +603,7 @@ static char *CheckTempStart( const char *template, const char *temp,
 
 *  Notes:
 *     - The returned value is also stored in the module variable
-*     SizeOf_Memory. 
+*     sizeof_memory. 
 */
 
 /* Local Variables: */
@@ -645,7 +661,7 @@ static char *CheckTempStart( const char *template, const char *temp,
 /* Report an error if no closing bracket was found. */
          } else {
             astError( AST__BADSUB, "Invalid pattern matching template \"%s\": "
-                      "missing ']'.", pattern );
+                      "missing ']'.", status, pattern );
          }
 
 /* Indicate how many template characters have been used. */
@@ -693,7 +709,7 @@ static char *CheckTempStart( const char *template, const char *temp,
 
          if( *temp == '*' || *temp == '?' || *temp == '+' ){
             astError( AST__BADSUB, "Invalid pattern matching template \"%s\": "
-                      "field starts with '%c'.", pattern, temp[ *ntemp ] );
+                      "field starts with '%c'.", status, pattern, temp[ *ntemp ] );
          } else {
             result = astStore( allowed, temp, 2 );
             result[ 1 ] = 0;
@@ -762,7 +778,7 @@ static char *CheckTempStart( const char *template, const char *temp,
    return result;
 }
 
-int astChrMatch_( const char *str1, const char *str2 ) {
+int astChrMatch_( const char *str1, const char *str2, int *status ) {
 /*
 *+
 *  Name:
@@ -827,7 +843,7 @@ int astChrMatch_( const char *str1, const char *str2 ) {
    return match;
 }
 
-int astChrMatchN_( const char *str1, const char *str2, size_t n ) {
+int astChrMatchN_( const char *str1, const char *str2, size_t n, int *status ) {
 /*
 *+
 *  Name:
@@ -899,7 +915,7 @@ int astChrMatchN_( const char *str1, const char *str2, size_t n ) {
    return match;
 }
 
-char **astChrSplit_( const char *str, int *n ) {
+char **astChrSplit_( const char *str, int *n, int *status ) {
 /*
 *+
 *  Name:
@@ -999,7 +1015,7 @@ char **astChrSplit_( const char *str, int *n ) {
    return result;
 }
 
-char **astChrSplitC_( const char *str, char c, int *n ) {
+char **astChrSplitC_( const char *str, char c, int *n, int *status ) {
 /*
 *+
 *  Name:
@@ -1120,7 +1136,7 @@ char **astChrSplitC_( const char *str, char c, int *n ) {
    return result;
 }
 
-char **astChrSplitRE_( const char *str, const char *regexp, int *n ) {
+char **astChrSplitRE_( const char *str, const char *regexp, int *n, int *status ) {
 /*
 *+
 *  Name:
@@ -1179,7 +1195,7 @@ char **astChrSplitRE_( const char *str, const char *regexp, int *n ) {
 
 /* Call ChrSuber to do the work, saving the matching parts of the test 
    string. */
-   temp = ChrSuber( str, regexp, NULL, 0, &result, n );
+   temp = ChrSuber( str, regexp, NULL, 0, &result, n, status );
    if( temp ) {
       temp = astFree( temp );
 
@@ -1195,7 +1211,7 @@ char **astChrSplitRE_( const char *str, const char *regexp, int *n ) {
 }
 
 char *ChrSuber( const char *test, const char *pattern, const char *subs[],
-                int nsub, char ***parts, int *npart ){
+                int nsub, char ***parts, int *npart, int *status ){
 /*
 *  Name:
 *     ChrSuber
@@ -1210,7 +1226,7 @@ char *ChrSuber( const char *test, const char *pattern, const char *subs[],
 *     #include "memory.h"
 *     char *ChrSuber( const char *test, const char *pattern, 
 *                     const char *subs[], int nsub, char ***parts,
-*                     int *npart )
+*                     int *npart, int *status )
 
 *  Description:
 *     This function performs the work for astChrSub and astChrSplitRE.
@@ -1240,6 +1256,8 @@ char *ChrSuber( const char *test, const char *pattern, const char *subs[],
 *     npart
 *        Address of a location at which to return the length of the
 *        "parts" array. Ignored if "parts" is NULL.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated string holding the result
@@ -1352,7 +1370,7 @@ char *ChrSuber( const char *test, const char *pattern, const char *subs[],
 
 /* See if the test string matches the current template. */
       result = ChrMatcher( test, template, pattern, subs, nsub, 0, 1,
-                           parts, npart );
+                           parts, npart, status );
 
 /* Free resources. */
       template = astFree( template );
@@ -1376,7 +1394,7 @@ char *ChrSuber( const char *test, const char *pattern, const char *subs[],
 }
 
 char *astChrSub_( const char *test, const char *pattern, const char *subs[],
-                  int nsub ){
+                  int nsub, int *status ){
 /*
 *+
 *  Name:
@@ -1493,10 +1511,10 @@ c     the supplied test string does not match the template.
 
 /* Call ChrSuber to do the work, without saving the matching parts of the
    test string. */
-   return ChrSuber( test, pattern, subs, nsub, NULL, NULL );
+   return ChrSuber( test, pattern, subs, nsub, NULL, NULL, status );
 }
 
-void *astFree_( void *ptr ) {
+void *astFree_( void *ptr, int *status ) {
 /*
 *+
 *  Name:
@@ -1536,9 +1554,13 @@ void *astFree_( void *ptr ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    Memory *mem;                  /* Pointer to memory header */
    int isdynamic;                /* Is the memory dynamically allocated? */
    size_t size;                  /* The usable size of the memory block */
+
+/* If needed, get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* If the incoming pointer is NULL, do nothing. Otherwise, check if it
    points at dynamically allocated memory (IsDynamic sets the global
@@ -1560,9 +1582,9 @@ void *astFree_( void *ptr ) {
 /* If the memory block is small enough, and the cache is being used, put it 
    into the cache rather than freeing it, so that it can be reused. */
       size = mem->size;
-      if( Use_Cache && size <= MXCSIZE ) {
-         mem->next = Cache[ size ];
-         Cache[ size ] = mem;
+      if( use_cache && size <= MXCSIZE ) {
+         mem->next = cache[ size ];
+         cache[ size ] = mem;
 
 /* Set the size to zero to indicate that the memory block has been freed.
    The size of the block is implied by the Cache element it is stored in. */
@@ -1581,9 +1603,10 @@ void *astFree_( void *ptr ) {
 
 /* Always return a NULL pointer. */
    return NULL;
+
 }
 
-void *astGrow_( void *ptr, int n, size_t size ) {
+void *astGrow_( void *ptr, int n, size_t size, int *status ) {
 /*
 *+
 *  Name:
@@ -1639,6 +1662,7 @@ void *astGrow_( void *ptr, int n, size_t size ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    int isdynamic;                /* Is the memory dynamically allocated? */
    Memory *mem;                  /* Pointer to memory header */
    size_t newsize;               /* New size to allocate */
@@ -1646,6 +1670,9 @@ void *astGrow_( void *ptr, int n, size_t size ) {
 
 /* Check the global error status. */
    if ( !astOK ) return ptr;
+
+/* If needed, get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialise. */
    new = ptr;
@@ -1684,7 +1711,7 @@ void *astGrow_( void *ptr, int n, size_t size ) {
    return new;
 }
 
-int astIsDynamic_( const void *ptr ) {
+int astIsDynamic_( const void *ptr, int *status ) {
 /*
 *+
 *  Name:
@@ -1724,10 +1751,14 @@ int astIsDynamic_( const void *ptr ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    Memory *isdynmem;               /* Pointer to memory header */ \
 
 /* Check the global error status and the supplied pointer. */
    if ( !astOK || ! ptr ) return 0;
+
+/* If needed, get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Derive a pointer to the memory header that precedes the 
    supplied region of memory. */ 
@@ -1738,7 +1769,7 @@ int astIsDynamic_( const void *ptr ) {
    return ( isdynmem->magic == MAGIC( isdynmem, isdynmem->size ) );
 }
 
-void *astMalloc_( size_t size ) {
+void *astMalloc_( size_t size, int *status ) {
 /*
 *+
 *  Name:
@@ -1781,21 +1812,29 @@ void *astMalloc_( size_t size ) {
 *-
 */
 
+/* Local Constants: */
+#define ERRBUF_LEN 80
+
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   char errbuf[ ERRBUF_LEN ];    /* Buffer for system error message */
    Memory *mem;                  /* Pointer to space allocated by malloc */
    void *result;                 /* Returned pointer */
 
-/* Check the global error status. */
-   if ( !astOK ) return NULL;
-
 /* Initialise. */
    result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* If needed, get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check that the size requested is not negative and report an error
    if it is. */
    if ( size < (size_t) 0 ) {
       astError( AST__MEMIN,
-                "Invalid attempt to allocate %lu bytes of memory.",
+                "Invalid attempt to allocate %lu bytes of memory.", status,
                 (unsigned long) size );
 
 /* Otherwise, if the size is greater than zero, either get a previously
@@ -1805,9 +1844,9 @@ void *astMalloc_( size_t size ) {
 
 /* If the cache is being used and a cached memory block of the required size 
    is available, remove it from the cache array and use it. */
-      mem = ( size <= MXCSIZE ) ? Cache[ size ] : NULL;
-      if( Use_Cache && mem ) {
-         Cache[ size ] = mem->next;
+      mem = ( size <= MXCSIZE ) ? cache[ size ] : NULL;
+      if( use_cache && mem ) {
+         cache[ size ] = mem->next;
          mem->next = NULL;
          mem->size = (size_t) size;
 
@@ -1817,8 +1856,9 @@ void *astMalloc_( size_t size ) {
 
 /* Report an error if malloc failed. */
          if ( !mem ) {
-            astError( AST__NOMEM, "malloc: %s", strerror( errno ) );
-            astError( AST__NOMEM, "Failed to allocate %lu bytes of memory.",
+            strerror_r( errno, errbuf, ERRBUF_LEN );
+            astError( AST__NOMEM, "malloc: %s", status, errbuf );
+            astError( AST__NOMEM, "Failed to allocate %lu bytes of memory.", status,
                       (unsigned long) size );
 
 /* If successful, set the "magic number" in the header and also store
@@ -1852,10 +1892,11 @@ void *astMalloc_( size_t size ) {
 /* Return the result. */
    return result;
 }
+#undef ERRBUF_LEN
 
 static char *ChrMatcher( const char *test, const char *template, 
                          const char *pattern, const char *subs[], int nsub, 
-                         int ignore, int expdoll, char ***mres, int *mlen ){
+                         int ignore, int expdoll, char ***mres, int *mlen, int *status ){
 /*
 *  Name:
 *     ChrMatcher
@@ -1870,7 +1911,7 @@ static char *ChrMatcher( const char *test, const char *template,
 *     #include "memory.h"
 *     char *ChrMatcher( const char *test, const char *template, 
 *                       const char *pattern, const char *subs[], int nsub, 
-*                       int ignore, int expdoll, char ***mres, int *mlen )
+*                       int ignore, int expdoll, char ***mres, int *mlen, int *status )
 
 *  Description:
 *     This function is performs most of the work for astChrSub.
@@ -1902,6 +1943,8 @@ static char *ChrMatcher( const char *test, const char *template,
 *     mlen
 *        Address of a location at which to return the length of the
 *        returned "mres" array. Ignored if "mres" is NULL.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated string holding the result of the
@@ -1997,7 +2040,7 @@ static char *ChrMatcher( const char *test, const char *template,
    minimum number or must be exactly equal to the minimum number.  */
       allowed = CheckTempStart( template, b, pattern, allowed, &nb, &allow, 
                                 &min_na, &max_na, &start_sub, &end_sub,
-                                &greedy );
+                                &greedy, status );
       if( !astOK ) break;
 
 /* Increment the the pointer to the next template character. */
@@ -2018,7 +2061,7 @@ static char *ChrMatcher( const char *test, const char *template,
    field */
             if( in_sub ) {
                astError( AST__BADSUB, "Invalid pattern matching template \"%s\": "
-                         "missing ')'.", pattern );
+                         "missing ')'.", status, pattern );
                break;
             } 
 
@@ -2052,7 +2095,7 @@ static char *ChrMatcher( const char *test, const char *template,
    field. */
             if( ! in_sub ) {
                astError( AST__BADSUB, "Invalid pattern matching template \"%s\": "
-                         "missing '('.", pattern );
+                         "missing '('.", status, pattern );
                break;
             }
 
@@ -2121,7 +2164,7 @@ static char *ChrMatcher( const char *test, const char *template,
             if( greedy ) {
                for( na = max_na; na >= min_na; na-- ) {
                   r = ChrMatcher( a + na, b, pattern, NULL, 0, 1, 0,
-                                  NULL, NULL );
+                                  NULL, NULL, status );
                   if( r ) {
                      match = 1;
                      r = astFree( r );
@@ -2136,7 +2179,7 @@ static char *ChrMatcher( const char *test, const char *template,
             } else {
                for( na = min_na; na <= max_na; na++ ) {
                   r = ChrMatcher( a + na, b, pattern, NULL, 0, 1, 0,
-                                  NULL, NULL );
+                                  NULL, NULL, status );
                   if( r ) {
                      match = 1;
                      r = astFree( r );
@@ -2162,7 +2205,7 @@ static char *ChrMatcher( const char *test, const char *template,
    field. */
          if( ! in_sub ) {
             astError( AST__BADSUB, "Invalid pattern matching template \"%s\": "
-                      "missing '('.", pattern );
+                      "missing '('.", status, pattern );
          }
 
 /* We are no longer in a substitution field. */
@@ -2192,7 +2235,7 @@ static char *ChrMatcher( const char *test, const char *template,
       while( *b ) {
          allowed = CheckTempStart( template, b, pattern, allowed, &nb, &allow, 
                                    &min_na, &max_na, &start_sub, &end_sub, 
-                                   &greedy );
+                                   &greedy, status );
          b += nb;
          allowed = astFree( allowed );
 
@@ -2210,7 +2253,7 @@ static char *ChrMatcher( const char *test, const char *template,
 /* Report an error if we are still inside a substitution field */
    if( match && in_sub && !ignore ) {
       astError( AST__BADSUB, "Invalid pattern matching template \"%s\": "
-                "missing ')'.", pattern );
+                "missing ')'.", status, pattern );
       match = 0;
    } 
 
@@ -2238,7 +2281,7 @@ static char *ChrMatcher( const char *test, const char *template,
                   sprintf( stemp, ".*($%d).*", dollar );
                   sres = ChrMatcher( stest, stemp, stemp,
                                      (void *) ( matches + dollar - 1 ),
-                                     1, 0, 0, NULL, NULL );
+                                     1, 0, 0, NULL, NULL, status );
                   if( sres ) {
                      (void) astFree( stest );
                      stest = sres;
@@ -2299,7 +2342,7 @@ static char *ChrMatcher( const char *test, const char *template,
    return result;
 }
 
-int astMemCaching_( int newval ){
+int astMemCaching_( int newval, int *status ){
 /*
 *+
 *  Name:
@@ -2322,6 +2365,9 @@ int astMemCaching_( int newval ){
 *
 *     If caching is switched on or off as a result of this call, then the
 *     current contents of the cache are discarded.
+*
+*     Note, each thread has a separate cache. Calling this function
+*     affects only the currently executing thread.
 
 *  Parameters:
 *     newval
@@ -2336,6 +2382,7 @@ int astMemCaching_( int newval ){
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           
    int i;
    int result;
    Memory *mem;
@@ -2348,14 +2395,17 @@ int astMemCaching_( int newval ){
 /* Check the global error status. */
    if ( !astOK ) return 0;
 
+/* If needed, get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
 /* Store the original value of the tuning parameter. */
-   result = Use_Cache;
+   result = use_cache;
    
 /* If a new value is to be set. */
    if( newval != AST__TUNULL ) {
 
 /* If the cache has been initialised, empty it. */
-      if( Cache_Init ) {
+      if( cache_init ) {
 
 /* If we are listing the ID of every memory block in the cache, count the
    number of blocks in the cache and then allocate an array to store the ID
@@ -2366,7 +2416,7 @@ int astMemCaching_( int newval ){
 
             id_list_size = 0;
             for( i = 0; i <= MXCSIZE; i++ ) {
-               next = Cache[ i ];
+               next = cache[ i ];
                while( next ) {
                   id_list_size++;
                   next = next->next;
@@ -2376,7 +2426,7 @@ int astMemCaching_( int newval ){
             id_list = MALLOC( sizeof(int)*id_list_size );
             if( !id_list ) {
                astError( AST__INTER, "astMemCaching: Cannot allocate %lu "
-                         "bytes of memory", (unsigned long)(sizeof(int)*id_list_size) );
+                         "bytes of memory", status, (unsigned long)(sizeof(int)*id_list_size) );
             }            
 
             id_list_size = 0;
@@ -2387,9 +2437,9 @@ int astMemCaching_( int newval ){
 #endif
 
          for( i = 0; i <= MXCSIZE; i++ ) {
-            while( Cache[ i ] ) {
-               mem = Cache[ i ];
-               Cache[ i ] = mem->next;
+            while( cache[ i ] ) {
+               mem = cache[ i ];
+               cache[ i ] = mem->next;
                mem->size = (size_t) i;
 
 #ifdef MEM_DEBUG
@@ -2439,12 +2489,12 @@ int astMemCaching_( int newval ){
 /* Otherwise, initialise the cache array to hold a NULL pointer at every
    element. */
       } else {
-         for( i = 0; i <= MXCSIZE; i++ ) Cache[ i ] = NULL;
-         Cache_Init = 1;
+         for( i = 0; i <= MXCSIZE; i++ ) cache[ i ] = NULL;
+         cache_init = 1;
       }
 
 /* Store the new value. */
-      Use_Cache = newval;
+      use_cache = newval;
 
    }
 
@@ -2452,7 +2502,7 @@ int astMemCaching_( int newval ){
    return result;
 }
 
-void *astRealloc_( void *ptr, size_t size ) {
+void *astRealloc_( void *ptr, size_t size, int *status ) {
 /*
 *+
 *  Name:
@@ -2508,7 +2558,12 @@ void *astRealloc_( void *ptr, size_t size ) {
 *-
 */
 
+/* Local Constants: */
+#define ERRBUF_LEN 80
+
 /* Local Variables: */
+   astDECLARE_GLOBALS;           
+   char errbuf[ ERRBUF_LEN ];    /* Buffer for system error message */
    int isdynamic;                /* Was memory allocated dynamically? */
    void *result;                 /* Returned pointer */
    Memory *mem;                  /* Pointer to memory header */
@@ -2518,6 +2573,9 @@ void *astRealloc_( void *ptr, size_t size ) {
 
 /* Initialise. */
    result = ptr;
+
+/* If needed, get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* If a NULL pointer was supplied, use astMalloc to allocate some new
    memory. */
@@ -2535,7 +2593,7 @@ void *astRealloc_( void *ptr, size_t size ) {
    if necessary. */
          if ( size < (size_t) 0 ) {
             astError( AST__MEMIN,
-               "Invalid attempt to reallocate a block of memory to %ld bytes.",
+               "Invalid attempt to reallocate a block of memory to %ld bytes.", status,
                       (long) size );
 
 /* If OK, obtain a pointer to the memory header. */
@@ -2552,12 +2610,11 @@ void *astRealloc_( void *ptr, size_t size ) {
             } else {
 
 /* If the cache is being used, for small memory blocks, do the equivalent of 
-
-               mem = realloc( mem, SIZEOF_MEMORY + size );
+               mem = REALLOC( mem, SIZEOF_MEMORY + size );
 
    using astMalloc, astFree and memcpy explicitly in order to ensure
    that the memory blocks are cached. */
-               if( Use_Cache && mem->size <= MXCSIZE && size <= MXCSIZE ) {
+               if( use_cache && mem->size <= MXCSIZE && size <= MXCSIZE ) {
                   result = astMalloc( size );
                   if( result ) { 
                      if( mem->size < size ) {
@@ -2583,9 +2640,10 @@ void *astRealloc_( void *ptr, size_t size ) {
 /* If this failed, report an error and return the original pointer
    value. */
                   if ( !mem ) {
-                     astError( AST__NOMEM, "realloc: %s", strerror( errno ) );
+                     strerror_r( errno, errbuf, ERRBUF_LEN );
+                     astError( AST__NOMEM, "realloc: %s", status, errbuf );
                      astError( AST__NOMEM, "Failed to reallocate a block of "
-                               "memory to %ld bytes.", (long) size );
+                               "memory to %ld bytes.", status, (long) size );
    
 /* If successful, set the new "magic" value and size in the memory
    header and obtain a pointer to the start of the region of memory to
@@ -2610,8 +2668,9 @@ void *astRealloc_( void *ptr, size_t size ) {
 /* Return the result. */
    return result;   
 }
+#undef ERRBUF_LEN
 
-void astRemoveLeadingBlanks_( char *string ) {
+void astRemoveLeadingBlanks_( char *string, int *status ) {
 /*
 *+
 *  Name:
@@ -2662,7 +2721,7 @@ void astRemoveLeadingBlanks_( char *string ) {
    }
 }
 
-size_t astSizeOf_( const void *ptr ) {
+size_t astSizeOf_( const void *ptr, int *status ) {
 /*
 *+
 *  Name:
@@ -2702,6 +2761,7 @@ size_t astSizeOf_( const void *ptr ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    int isdynamic;                /* Was the memory allocated dynamically? */
    size_t size;                  /* Memory size */
 
@@ -2710,6 +2770,9 @@ size_t astSizeOf_( const void *ptr ) {
 
 /* Initialise. */
    size = (size_t) 0;
+
+/* If needed, get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check if a non-NULL valid pointer has been given. If so, extract
    the memory size from the header which precedes it. */
@@ -2722,7 +2785,7 @@ size_t astSizeOf_( const void *ptr ) {
    return size;
 }
 
-static size_t SizeOfMemory( void ){
+static size_t SizeOfMemory( int *status ){
 /*
 *  Name:
 *     SizeOfMemory
@@ -2735,7 +2798,7 @@ static size_t SizeOfMemory( void ){
 *     Private function.
 
 *  Synopsis:
-*     size_t SizeOfMemory( void )
+*     size_t SizeOfMemory( int *status )
 
 *  Description:
 *     This function returns the size of a Memory structure used to
@@ -2747,28 +2810,38 @@ static size_t SizeOfMemory( void ){
 *     requires this alignment if the returned pointer is going to be used to
 *     store doubles.
 
+*  Parameters:
+*     status
+*        Pointer to the inherited status variable.
+
 *  Returned Value:
 *     The size to use for a Memory structure.
 
 *  Notes:
 *     - The returned value is also stored in the module variable
-*     SizeOf_Memory. 
+*     sizeof_memory. 
 */
 
+/* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+
+/* If needed, get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
 /* Get the basic size of a Memory structure. */
-   SizeOf_Memory = sizeof( Memory );
+   sizeof_memory = sizeof( Memory );
 
 /* Now increase the returned value to ensure it is a multiple of 8. Mask 
    off all but the last 3 bits, xor with 0x7 to get the remainder, add 1 
    to make it a multiple of 8 bytes. */
-   SizeOf_Memory += ((SizeOf_Memory & 0x7) ? ((SizeOf_Memory & 0x7) ^ 0x7) + 1 : 0);
+   sizeof_memory += ((sizeof_memory & 0x7) ? ((sizeof_memory & 0x7) ^ 0x7) + 1 : 0);
 
 /* Return the value */
-   return SizeOf_Memory;
+   return sizeof_memory;
 
 }
 
-size_t astTSizeOf_( const void *ptr ) {
+size_t astTSizeOf_( const void *ptr, int *status ) {
 /*
 *+
 *  Name:
@@ -2809,11 +2882,15 @@ size_t astTSizeOf_( const void *ptr ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    int isdynamic;                /* Was the memory allocated dynamically? */
    size_t size;                  /* Memory size */
 
 /* Check the global error status. */
    if ( !astOK ) return (size_t) 0;
+
+/* If needed, get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialise. */
    size = (size_t) 0;
@@ -2830,7 +2907,7 @@ size_t astTSizeOf_( const void *ptr ) {
    return size;
 }
 
-void *astStore_( void *ptr, const void *data, size_t size ) {
+void *astStore_( void *ptr, const void *data, size_t size, int *status ) {
 /*
 *+
 *  Name:
@@ -2889,11 +2966,15 @@ void *astStore_( void *ptr, const void *data, size_t size ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    int valid;                    /* Is the memory pointer usable? */
    void *new;                    /* Pointer to returned memory */
 
 /* Check the global error status. */
    if ( !astOK ) return ptr;
+
+/* If needed, get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialise. */
    new = ptr;
@@ -2934,7 +3015,7 @@ void *astStore_( void *ptr, const void *data, size_t size ) {
    return new;
 }
 
-char *astString_( const char *chars, int nchars ) {
+char *astString_( const char *chars, int nchars, int *status ) {
 /*
 *+
 *  Name:
@@ -2998,7 +3079,7 @@ char *astString_( const char *chars, int nchars ) {
    report an error if it is not. */
    if ( nchars < 0 ) {
       astError( AST__NCHIN, "astString: Invalid attempt to allocate a string "
-                "with %d characters.", nchars);
+                "with %d characters.", status, nchars);
 
 /* Allocate memory to hold the string. */
    } else {
@@ -3017,7 +3098,7 @@ char *astString_( const char *chars, int nchars ) {
    return result;
 }
 
-char **astStringArray_( const char *chars, int nel, int len ) {
+char **astStringArray_( const char *chars, int nel, int len, int *status ) {
 /*
 *+
 *  Name:
@@ -3100,14 +3181,14 @@ s
    if ( nel < 0 ) {
       astError( AST__NELIN,
                 "astStringArray: Invalid attempt to allocate an array of "
-                "%d strings.", nel );
+                "%d strings.", status, nel );
 
 /* If the string length will be used, check that it is valid and
    report an error if it is not. */
    } else if ( ( nel > 0 ) && ( len < 0 ) ) {
       astError( AST__NCHIN,
                 "astStringArray: Invalid attempt to allocate an "
-                "array of strings with %d characters in each.", len );
+                "array of strings with %d characters in each.", status, len );
 
 /* Allocate memory to hold the array of string pointers plus the
    string data (with terminating nulls). */
@@ -3143,7 +3224,7 @@ s
    return result;
 }
 
-size_t astChrLen_( const char *string ) {
+size_t astChrLen_( const char *string, int *status ) {
 /*
 *+
 *  Name:
@@ -3242,6 +3323,7 @@ int astSscanf_( const char *str, const char *fmt, ...) {
    char *c;                 /* Pointer to the next character to check */
    char *newfor;            /* Pointer to modified format string */
    const char *d;           /* Pointer to the next character to check */
+   int *status;             /* Pointer to inherited status value */
    int iptr;                /* Index into ptr array */
    int lfor;                /* No. of characters in format string */
    int lstr;                /* No. of characters in scanned string */
@@ -3255,6 +3337,9 @@ int astSscanf_( const char *str, const char *fmt, ...) {
 
 /* Initialise the variable argument list pointer. */
    va_start( args, fmt );
+
+/* Get a pointer to the integer holding the inherited status value. */
+   status = astGetStatusPtr;
 
 /* Initialise the returned string length. */
    ret = 0;
@@ -3298,7 +3383,7 @@ int astSscanf_( const char *str, const char *fmt, ...) {
 	          } else {
                      astError( AST__INTER, "astSscanf: Format string " 
                                "'%s' contains more than %d fields "
-                               "(AST internal programming error).", 
+                               "(AST internal programming error).", status, 
                                fmt, VMAXFLD );
                      break;
                   }
@@ -3786,7 +3871,7 @@ int astMemoryTune_( const char *name, int value ){
          
       } else if( astOK ) {
          astError( AST__TUNAM, "astMemoryTune: Unknown AST memory tuning " 
-                   "parameter specified \"%s\".", name );
+                   "parameter specified \"%s\".", status, name );
       }
    }
 
@@ -3825,6 +3910,8 @@ void astBeginPM_( void ) {
 *-
 */
 
+   LOCK_DEBUG_MUTEX;
+
 /* The global Perm_Mem flag indicates whether or not subsequent memory 
    management functions in this module should store pointers to allocated 
    blocks in the PM_List array. Push the current value of this flag
@@ -3832,13 +3919,14 @@ void astBeginPM_( void ) {
    if( PM_Stack_Size >= PM_STACK_MAXSIZE ){
       if( astOK ) {
          astError( AST__INTER, "astBeginPM: Maximum stack size has been "
-                   "exceeded (internal AST programming error)." );
+                   "exceeded (internal AST programming error)." , status);
       } 
 
    } else {
       PM_Stack[ PM_Stack_Size++ ] = Perm_Mem;
       Perm_Mem = 1;
    }
+   UNLOCK_DEBUG_MUTEX;
 }
 
 void astEndPM_( void ) {
@@ -3865,18 +3953,22 @@ void astEndPM_( void ) {
 *-
 */
 
+   LOCK_DEBUG_MUTEX;
+
 /* The global Perm_Mem flag indicates whether or not subsequent memory 
    management functions in this module should store pointers to allocated 
    blocks in the PM_List array. Pop the value from the top of this stack. */
    if( PM_Stack_Size == 0 ){
       if( astOK ) {
          astError( AST__INTER, "astEndPM: astEndPM called without "
-                   "matching astBeginPM (internal AST programming error)." );
+                   "matching astBeginPM (internal AST programming error)." , status);
       } 
 
    } else {
       Perm_Mem = PM_Stack[ --PM_Stack_Size ];
    }
+
+   UNLOCK_DEBUG_MUTEX;
 }
 
 void astFlushMemory_( int leak ) {
@@ -3943,7 +4035,7 @@ void astFlushMemory_( int leak ) {
 /* Report an error if any active pointers remained. */
    if( nact && leak ){
       astError( AST__INTER, "astFlushMemory: %d AST memory blocks have not "
-                "been released (programming error).", nact );
+                "been released (programming error).", status, nact );
    } else {
       printf("astFlushMemory: All AST memory blocks were released correctly.\n" );
    }
@@ -3976,6 +4068,8 @@ static void Issue( Memory *mem ) {
 /* Return if no pointer was supplied. */
    if( !mem ) return;
 
+   LOCK_DEBUG_MUTEX;
+
 /* Store a unique identifier for this pointer. Unless global Keep_ID is
    non-zero, a new identifier is used each time the pointer becomes active 
    (i.e. each time it is remove from the cache or malloced). */
@@ -3994,6 +4088,7 @@ static void Issue( Memory *mem ) {
 /* Report that the pointer is being issued. */
    astMemoryUse( (void *) mem + SIZEOF_MEMORY, ISSUED );
 
+   UNLOCK_DEBUG_MUTEX;
 }
 
 static void DeIssue( Memory *mem ) {
@@ -4027,6 +4122,8 @@ static void DeIssue( Memory *mem ) {
 /* Return if no pointer was supplied. */
    if( !mem ) return;
 
+   LOCK_DEBUG_MUTEX;
+
 /* Report that the pointer is being freed. */
    astMemoryUse( (void *) mem + SIZEOF_MEMORY, FREED );
 
@@ -4037,9 +4134,13 @@ static void DeIssue( Memory *mem ) {
    if( next ) next->prev = prev;
    if( mem == Active_List ) Active_List = next;
 
+   UNLOCK_DEBUG_MUTEX;
 }
 
 
 #endif
+
+
+
 
 

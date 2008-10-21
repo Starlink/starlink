@@ -75,6 +75,8 @@ f     The Circle class does not define any new routines beyond those
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
 #include "object.h"              /* Base Object class */
@@ -103,16 +105,43 @@ f     The Circle class does not define any new routines beyond those
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstCircleVtab class_vtab;    /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
-static AstMapping *(* parent_simplify)( AstMapping * );
-static void (* parent_setregfs)( AstRegion *, AstFrame * );
-static void (* parent_resetcache)( AstRegion * );
+static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static AstMapping *(* parent_simplify)( AstMapping *, int * );
+static void (* parent_setregfs)( AstRegion *, AstFrame *, int * );
+static void (* parent_resetcache)( AstRegion *, int * );
+
+
+#ifdef THREAD_SAFE
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; 
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(Circle)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(Circle,Class_Init)
+#define class_vtab astGLOBAL(Circle,Class_Vtab)
+
+
+#include <pthread.h>
+
+
+#else
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstCircleVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -123,23 +152,23 @@ AstCircle *astCircleId_( void *, int, const double[], const double[], void *, co
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static AstMapping *Simplify( AstMapping * );
-static AstPointSet *RegBaseMesh( AstRegion * );
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static double *RegCentre( AstRegion *this, double *, double **, int, int );
-static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int ** );
-static void Cache( AstCircle * );
-static void Copy( const AstObject *, AstObject * );
-static void Delete( AstObject * );
-static void Dump( AstObject *, AstChannel * );
-static void RegBaseBox( AstRegion *this, double *, double * );
-static void SetRegFS( AstRegion *, AstFrame * );
-static void ResetCache( AstRegion *this );
+static AstMapping *Simplify( AstMapping *, int * );
+static AstPointSet *RegBaseMesh( AstRegion *, int * );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static double *RegCentre( AstRegion *this, double *, double **, int, int, int * );
+static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
+static void Cache( AstCircle *, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Delete( AstObject *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void RegBaseBox( AstRegion *this, double *, double *, int * );
+static void SetRegFS( AstRegion *, AstFrame *, int * );
+static void ResetCache( AstRegion *this, int * );
 
 /* Member functions. */
 /* ================= */
 
-AstRegion *astBestCircle_( AstPointSet *mesh, double *cen, AstRegion *unc ){
+AstRegion *astBestCircle_( AstPointSet *mesh, double *cen, AstRegion *unc, int *status ){
 /*
 *+
 *  Name:
@@ -243,7 +272,7 @@ AstRegion *astBestCircle_( AstPointSet *mesh, double *cen, AstRegion *unc ){
          rad = sqrt( nc*s2r/n );
 
 /* Create the returned Region. */
-         result = (AstRegion *) astCircle( unc, 1, cen, &rad, unc, "" );
+         result = (AstRegion *) astCircle( unc, 1, cen, &rad, unc, "", status );
       }
    }
 
@@ -254,7 +283,7 @@ AstRegion *astBestCircle_( AstPointSet *mesh, double *cen, AstRegion *unc ){
    return result;
 }
 
-void astInitCircleVtab_(  AstCircleVtab *vtab, const char *name ) {
+void astInitCircleVtab_(  AstCircleVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -291,11 +320,15 @@ void astInitCircleVtab_(  AstCircleVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstRegionVtab *region;        /* Pointer to Region component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -304,8 +337,8 @@ void astInitCircleVtab_(  AstCircleVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsACircle) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -342,9 +375,14 @@ void astInitCircleVtab_(  AstCircleVtab *vtab, const char *name ) {
    astSetDelete( vtab, Delete );
    astSetCopy( vtab, Copy );
    astSetDump( vtab, Dump, "Circle", "Circular or spherical region" );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
-static void Cache( AstCircle *this ){
+static void Cache( AstCircle *this, int *status ){
 /*
 *  Name:
 *     Cache
@@ -357,7 +395,7 @@ static void Cache( AstCircle *this ){
 
 *  Synopsis:
 *     #include "circle.h"
-*     void Cache( AstCircle *this )
+*     void Cache( AstCircle *this, int *status )
 
 *  Class Membership:
 *     Circle member function 
@@ -370,6 +408,8 @@ static void Cache( AstCircle *this ){
 *  Parameters:
 *     this
 *        Pointer to the Circle.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -431,7 +471,7 @@ static void Cache( AstCircle *this ){
    }
 }
 
-static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
+static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int *status ){
 /*
 *  Name:
 *     RegBaseBox
@@ -445,7 +485,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 
 *  Synopsis:
 *     #include "circle.h"
-*     void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd )
+*     void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd, int *status )
 
 *  Class Membership:
 *     Circle member function (over-rides the astRegBaseBox protected
@@ -470,6 +510,8 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 *        covered by the Region in the base Frame of the encapsulated
 *        FrameSet. It should have at least as many elements as there are 
 *        axes in the base Frame.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -491,7 +533,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
    nc = astGetNin( this_region->frameset );
 
 /* Ensure cached information is available. */
-   Cache( this );
+   Cache( this, status );
 
 /* Do each base Frame axis. */
    for( i = 0; i < nc; i++ ) {
@@ -525,7 +567,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 
 }
 
-static AstPointSet *RegBaseMesh( AstRegion *this_region ){
+static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
 /*
 *  Name:
 *     RegBaseMesh
@@ -539,7 +581,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
 
 *  Synopsis:
 *     #include "circle.h"
-*     AstPointSet *astRegBaseMesh( AstRegion *this )
+*     AstPointSet *astRegBaseMesh( AstRegion *this, int *status )
 
 *  Class Membership:
 *     Circle member function (over-rides the astRegBaseMesh protected
@@ -553,6 +595,8 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
 *  Parameters:
 *     this
 *        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the PointSet. The axis values in this PointSet will have 
@@ -611,14 +655,14 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
       np = astGetMeshSize( this );
 
 /* Ensure cached information is available. */
-      Cache( (AstCircle *) this );
+      Cache( (AstCircle *) this, status );
 
 /* First deal with 1-D "circles" (where we ignore MeshSize). */
       if( naxes == 1 ) {
 
 /* The boundary of a 1-D circle consists of 2 points - the two extreme values. 
    Create a PointSet to hold 2 1-D values, and store the extreme values. */
-         result = astPointSet( 2, 1, "" );
+         result = astPointSet( 2, 1, "", status );
          ptr = astGetPoints( result );
          if( astOK ) {
             ptr[ 0 ][ 0 ] = ( this->centre )[ 0 ] - this->radius;
@@ -632,7 +676,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
          delta = 2*AST__DPI/np;
 
 /* Create a suitable PointSet to hold the returned positions. */
-         result = astPointSet( np, 2, "" );
+         result = astPointSet( np, 2, "", status );
          ptr = astGetPoints( result );
          if( astOK ) {
 
@@ -665,7 +709,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
          astRegBaseBox( this, p1, p2 );
 
 /* Create a Box region which just encompasses the circle. */
-         box = astBox( frm, 0, this->centre, p1, NULL, "" );
+         box = astBox( frm, 0, this->centre, p1, NULL, "", status );
 
 /* Get a mesh covering this box. */
          astSetMeshSize( box, np );
@@ -708,7 +752,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
 }
 
 static double *RegCentre( AstRegion *this_region, double *cen, double **ptr, 
-                          int index, int ifrm ){
+                          int index, int ifrm, int *status ){
 /*
 *  Name:
 *     RegCentre
@@ -722,7 +766,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 *  Synopsis:
 *     #include "circle.h"
 *     double *RegCentre( AstRegion *this, double *cen, double **ptr, 
-*                        int index, int ifrm )
+*                        int index, int ifrm, int *status )
 
 *  Class Membership:
 *     Circle member function (over-rides the astRegCentre protected
@@ -752,6 +796,8 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 *        Should be AST__BASE or AST__CURRENT. Indicates whether the centre 
 *        position is supplied and returned in the base or current Frame of 
 *        the FrameSet encapsulated within "this".
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     If both "cen" and "ptr" are NULL then a pointer to a newly
@@ -790,7 +836,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
    ncc = astGetNout( this_region->frameset );
 
 /* Ensure cached information is available. */
-   Cache( this );
+   Cache( this, status );
 
 /* If the centre coords are to be returned, return either a copy of the 
    base Frame centre coords, or transform the base Frame centre coords
@@ -858,7 +904,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 }
 
 static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
-                    int **mask ){
+                    int **mask, int *status ){
 /*
 *  Name:
 *     RegPins
@@ -872,7 +918,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 *  Synopsis:
 *     #include "circle.h"
 *     int RegPins( AstRegion *this, AstPointSet *pset, AstRegion *unc,
-*                  int **mask ){
+*                  int **mask, int *status ){
 
 *  Class Membership:
 *     Circle member function (over-rides the astRegPins protected
@@ -906,6 +952,8 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 *        and is set to zero otherwise. A NULL value may be supplied
 *        in which case no array is created. If created, the array should
 *        be freed using astFree when no longer needed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Non-zero if the points all fall on the boundary of the given
@@ -954,7 +1002,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    if( astGetNcoord( pset ) != nc && astOK ) {
       astError( AST__INTER, "astRegPins(%s): Illegal number of axis "
                 "values per point (%d) in the supplied PointSet - should be "
-                "%d (internal AST programming error).", astGetClass( this ),
+                "%d (internal AST programming error).", status, astGetClass( this ),
                 astGetNcoord( pset ), nc );
    }
 
@@ -963,7 +1011,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    if( unc && astGetNaxes( unc ) != nc && astOK ) {
       astError( AST__INTER, "astRegPins(%s): Illegal number of axes (%d) "
                 "in the supplied uncertainty Region - should be "
-                "%d (internal AST programming error).", astGetClass( this ),
+                "%d (internal AST programming error).", status, astGetClass( this ),
                 astGetNaxes( unc ), nc );
    }
 
@@ -999,7 +1047,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    }
 
 /* Ensure cached information is available. */
-   Cache( this );
+   Cache( this, status );
 
 /* The required border width is half of the total diagonal of the two bounding 
    boxes. */   
@@ -1010,9 +1058,9 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    found above, and the other of which is smaller than "this" by the amount
    found above. */
       rad = this->radius + 0.5*drad;
-      large_circle = astCircle( frm, 1, this->centre, &rad, NULL, "" );
+      large_circle = astCircle( frm, 1, this->centre, &rad, NULL, "", status );
       rad = this->radius - 0.5*drad;
-      small_circle = astCircle( frm, 1, this->centre, &rad, NULL, "" );
+      small_circle = astCircle( frm, 1, this->centre, &rad, NULL, "", status );
 
 /* Negate the smaller region.*/
       astNegate( small_circle );
@@ -1099,7 +1147,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    return result;
 }
 
-static void ResetCache( AstRegion *this ){
+static void ResetCache( AstRegion *this, int *status ){
 /*
 *  Name:
 *     ResetCache
@@ -1112,7 +1160,7 @@ static void ResetCache( AstRegion *this ){
 
 *  Synopsis:
 *     #include "circle.h"
-*     void ResetCache( AstRegion *this )
+*     void ResetCache( AstRegion *this, int *status )
 
 *  Class Membership:
 *     Region member function (overrides the astResetCache method
@@ -1125,14 +1173,16 @@ static void ResetCache( AstRegion *this ){
 *  Parameters:
 *     this
 *        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
 */
    if( this ) {
       ( (AstCircle *) this )->stale = 1;
-      (*parent_resetcache)( this );
+      (*parent_resetcache)( this, status );
    }
 }
 
-static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
+static void SetRegFS( AstRegion *this_region, AstFrame *frm, int *status ) {
 /*
 *  Name:
 *     SetRegFS
@@ -1145,7 +1195,7 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
 
 *  Synopsis:
 *     #include "circle.h"
-*     void SetRegFS( AstRegion *this_region, AstFrame *frm )
+*     void SetRegFS( AstRegion *this_region, AstFrame *frm, int *status )
 
 *  Class Membership:
 *     Circle method (over-rides the astSetRegFS method inherited from
@@ -1161,6 +1211,8 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
 *        Pointer to the Region.
 *     frm
 *        The Frame to use.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -1170,13 +1222,13 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
 
 /* Invoke the parent method to store the FrameSet in the parent Region
    structure. */
-   (* parent_setregfs)( this_region, frm );
+   (* parent_setregfs)( this_region, frm, status );
 
 /* Re-calculate cached information. */
    astResetCache( this_region );
 }
 
-static AstMapping *Simplify( AstMapping *this_mapping ) {
+static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /*
 *  Name:
 *     Simplify
@@ -1189,7 +1241,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 *  Synopsis:
 *     #include "circle.h"
-*     AstMapping *Simplify( AstMapping *this )
+*     AstMapping *Simplify( AstMapping *this, int *status )
 
 *  Class Membership:
 *     Circle method (over-rides the astSimplify method inherited
@@ -1206,6 +1258,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 *  Parameters:
 *     this
 *        Pointer to the original Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to the simplified Region. A cloned pointer to the
@@ -1245,7 +1299,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 /* Invoke the parent Simplify method inherited from the Region class. This
    will simplify the encapsulated FrameSet and uncertainty Region. */
-   new = (AstRegion *) (*parent_simplify)( this_mapping );
+   new = (AstRegion *) (*parent_simplify)( this_mapping, status );
 
 /* Note if any simplification took place. This is assumed to be the case
    if the pointer returned by the above call is different to the supplied
@@ -1344,7 +1398,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 }
 
 static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
-                               int forward, AstPointSet *out ) {
+                               int forward, AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     Transform
@@ -1358,7 +1412,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 *  Synopsis:
 *     #include "circle.h"
 *     AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-*                             int forward, AstPointSet *out )
+*                             int forward, AstPointSet *out, int *status )
 
 *  Class Membership:
 *     Circle member function (over-rides the astTransform protected
@@ -1383,6 +1437,8 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 *        Pointer to a PointSet which will hold the transformed (output)
 *        coordinate values. A NULL value may also be given, in which case a
 *        new PointSet will be created by this function.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the output (possibly new) PointSet.
@@ -1427,7 +1483,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    function inherited from the parent Region class. This function validates
    all arguments and generates an output PointSet if necessary,
    containing a copy of the input PointSet. */
-   result = (*parent_transform)( this_mapping, in, forward, out );
+   result = (*parent_transform)( this_mapping, in, forward, out, status );
 
 /* We will now extend the parent astTransform method by performing the
    calculations needed to generate the output coordinate values. */
@@ -1464,7 +1520,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    if ( astOK ) {
 
 /* Ensure cached information is available. */
-      Cache( this );
+      Cache( this, status );
 
 /* Loop round each point */
       for ( point = 0; point < npoint; point++ ) {
@@ -1528,7 +1584,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -1540,7 +1596,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for Region objects.
@@ -1550,6 +1606,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the object to be copied.
 *     objout
 *        Pointer to the object being constructed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     -  This constructor makes a deep copy.
@@ -1580,7 +1638,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -1592,7 +1650,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for Circle objects.
@@ -1600,6 +1658,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the object to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     This function attempts to execute even if the global error status is
@@ -1618,7 +1678,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -1630,7 +1690,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -1641,6 +1701,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the Circle whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -1675,12 +1737,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsACircle and astCheckCircle functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(Circle,Region,check,&class_init)
+astMAKE_ISA(Circle,Region,check,&class_check)
 astMAKE_CHECK(Circle)
 
 AstCircle *astCircle_( void *frame_void, int form, const double centre[], 
                        const double point[], AstRegion *unc, 
-                       const char *options, ... ) {
+                       const char *options, int *status, ...) {
 /*
 *++
 *  Name:
@@ -1810,9 +1872,13 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstCircle *new;               /* Pointer to new Circle */
    va_list args;                 /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -1832,7 +1898,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Obtain the variable argument list and pass it along with the options string
    to the astVSet method to initialise the new Circle's attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -1887,10 +1953,19 @@ AstCircle *astCircleId_( void *frame_void, int form, const double centre[],
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstCircle *new;               /* Pointer to new Circle */
    AstRegion *unc;               /* Pointer to Region structure */
    va_list args;                 /* Variable argument list */
+
+   int *status;                  /* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
+/* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -1930,7 +2005,7 @@ AstCircle *astCircleId_( void *frame_void, int form, const double centre[],
 AstCircle *astInitCircle_( void *mem, size_t size, int init, AstCircleVtab *vtab, 
                            const char *name, AstFrame *frame, int form,
                            const double centre[], const double point[],
-                           AstRegion *unc ) {
+                           AstRegion *unc, int *status ) {
 /*
 *+
 *  Name:
@@ -2048,7 +2123,7 @@ AstCircle *astInitCircle_( void *mem, size_t size, int init, AstCircleVtab *vtab
    if( form != 0 && form != 1 && astOK ) {
       astError( AST__BADIN, "astInitCircle(%s): The value supplied for "
                 "parameter \"form\" (%d) is illegal - it should be 0 or 1 "
-                "(programming error).", name, form );
+                "(programming error).", status, name, form );
    }
 
 /* Get the number of axis values required for each position. */
@@ -2074,7 +2149,7 @@ AstCircle *astInitCircle_( void *mem, size_t size, int init, AstCircleVtab *vtab
 
 /* Create a PointSet to hold the centre position, and a point on the
    circumference, and get points to the data arrays. */
-   pset = astPointSet( 2, nc, "" );
+   pset = astPointSet( 2, nc, "", status );
    ptr = astGetPoints( pset );
 
 /* Copy the centre and circumference coordinates into the PointSet, checking 
@@ -2082,11 +2157,11 @@ AstCircle *astInitCircle_( void *mem, size_t size, int init, AstCircleVtab *vtab
    for( i = 0; astOK && i < nc; i++ ) {
       if( centre[ i ] == AST__BAD ) {
          astError( AST__BADIN, "astInitCircle(%s): The value of axis %d is "
-                   "undefined at the circle centre.", name, i + 1 );
+                   "undefined at the circle centre.", status, name, i + 1 );
       } 
       if( astOK && circum[ i ] == AST__BAD ) {
          astError( AST__BADIN, "astInitCircle(%s): The value of axis %d is "
-                   "undefined on the circumference of the circle.", name, i + 1 );
+                   "undefined on the circumference of the circle.", status, name, i + 1 );
       }
       ptr[ i ][ 0 ] = centre[ i ];
       ptr[ i ][ 1 ] = circum[ i ];
@@ -2106,7 +2181,7 @@ AstCircle *astInitCircle_( void *mem, size_t size, int init, AstCircleVtab *vtab
 /* ------------------------ */
          new->stale = 1;
          new->centre = NULL;
-         Cache( new );
+         Cache( new, status );
 
 /* If an error occurred, clean up by deleting the new Circle. */
          if ( !astOK ) new = astDelete( new );
@@ -2122,7 +2197,7 @@ AstCircle *astInitCircle_( void *mem, size_t size, int init, AstCircleVtab *vtab
 }
 
 AstCircle *astLoadCircle_( void *mem, size_t size, AstCircleVtab *vtab, 
-                           const char *name, AstChannel *channel ) {
+                           const char *name, AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -2195,6 +2270,7 @@ AstCircle *astLoadCircle_( void *mem, size_t size, AstCircleVtab *vtab,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstCircle *new;              /* Pointer to the new Circle */
 
 /* Initialise. */
@@ -2202,6 +2278,9 @@ AstCircle *astLoadCircle_( void *mem, size_t size, AstCircleVtab *vtab,
 
 /* Check the global error status. */
    if ( !astOK ) return new;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* If a NULL virtual function table has been supplied, then this is
    the first loader to be invoked for this Circle. In this case the
@@ -2247,7 +2326,7 @@ AstCircle *astLoadCircle_( void *mem, size_t size, AstCircleVtab *vtab,
 /* Cache intermediate results in the Circle structure */
       new->centre = NULL;
       new->stale = 1;
-      Cache( new );
+      Cache( new, status );
 
 /* If an error occurred, clean up by deleting the new Circle. */
       if ( !astOK ) new = astDelete( new );
@@ -2268,6 +2347,10 @@ AstCircle *astLoadCircle_( void *mem, size_t size, AstCircleVtab *vtab,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
+
+
+
+
 
 
 

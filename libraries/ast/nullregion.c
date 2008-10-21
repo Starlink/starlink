@@ -69,6 +69,8 @@ f     The NullRegion class does not define any new routines beyond those
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
 #include "object.h"              /* Base Object class */
@@ -95,14 +97,41 @@ f     The NullRegion class does not define any new routines beyond those
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstNullRegionVtab class_vtab;    /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
-static AstMapping *(* parent_simplify)( AstMapping * );
+static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static AstMapping *(* parent_simplify)( AstMapping *, int * );
+
+
+#ifdef THREAD_SAFE
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; 
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(NullRegion)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(NullRegion,Class_Init)
+#define class_vtab astGLOBAL(NullRegion,Class_Vtab)
+
+
+#include <pthread.h>
+
+
+#else
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstNullRegionVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -113,20 +142,20 @@ AstNullRegion *astNullRegionId_( void *, void *, const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static AstMapping *Simplify( AstMapping * );
-static AstPointSet *RegBaseMesh( AstRegion * );
-static AstPointSet *RegMesh( AstRegion * );
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static AstRegion *GetDefUnc( AstRegion * );
-static int Overlap( AstRegion *, AstRegion * );
-static int OverlapX( AstRegion *, AstRegion * );
-static void Dump( AstObject *, AstChannel * );
-static void RegBaseBox( AstRegion *this, double *, double * );
-static void GetRegionBounds( AstRegion *this, double *, double * );
+static AstMapping *Simplify( AstMapping *, int * );
+static AstPointSet *RegBaseMesh( AstRegion *, int * );
+static AstPointSet *RegMesh( AstRegion *, int * );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static AstRegion *GetDefUnc( AstRegion *, int * );
+static int Overlap( AstRegion *, AstRegion *, int * );
+static int OverlapX( AstRegion *, AstRegion *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void RegBaseBox( AstRegion *this, double *, double *, int * );
+static void GetRegionBounds( AstRegion *this, double *, double *, int * );
 
 /* Member functions. */
 /* ================= */
-static AstRegion *GetDefUnc( AstRegion *this ) {
+static AstRegion *GetDefUnc( AstRegion *this, int *status ) {
 /*
 *+
 *  Name:
@@ -186,7 +215,7 @@ static AstRegion *GetDefUnc( AstRegion *this ) {
    if( cen ) {
       for( i = 0; i < n; i++ ) cen[ i ] = 0.0;
       rad = 0.0;
-      result = (AstRegion *) astCircle( this, 1, cen, &rad, NULL, "" );
+      result = (AstRegion *) astCircle( this, 1, cen, &rad, NULL, "", status );
       cen = astFree( cen );
    }
 
@@ -194,7 +223,7 @@ static AstRegion *GetDefUnc( AstRegion *this ) {
    return result;
 }
 
-void astInitNullRegionVtab_(  AstNullRegionVtab *vtab, const char *name ) {
+void astInitNullRegionVtab_(  AstNullRegionVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -231,11 +260,15 @@ void astInitNullRegionVtab_(  AstNullRegionVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstRegionVtab *region;        /* Pointer to Region component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -244,8 +277,8 @@ void astInitNullRegionVtab_(  AstNullRegionVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsANullRegion) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -277,9 +310,14 @@ void astInitNullRegionVtab_(  AstNullRegionVtab *vtab, const char *name ) {
 /* Declare the copy constructor, destructor and class dump
    functions. */
    astSetDump( vtab, Dump, "NullRegion", "Boundless region" );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
-static int Overlap( AstRegion *this, AstRegion *that ){
+static int Overlap( AstRegion *this, AstRegion *that, int *status ){
 /*
 *  Name:
 *     Overlap
@@ -352,10 +390,10 @@ static int Overlap( AstRegion *this, AstRegion *that ){
 
 /* Invoke the private "OverlapX" member function with the two arguments 
    swapped. */
-   return OverlapX( that, this );
+   return OverlapX( that, this, status );
 }
 
-static int OverlapX( AstRegion *that, AstRegion *this ){
+static int OverlapX( AstRegion *that, AstRegion *this, int *status ){
 /*
 *  Name:
 *     OverlapX
@@ -442,7 +480,7 @@ static int OverlapX( AstRegion *that, AstRegion *this ){
    return result;
 }
 
-static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
+static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int *status ){
 /*
 *  Name:
 *     RegBaseBox
@@ -456,7 +494,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 
 *  Synopsis:
 *     #include "nullregion.h"
-*     void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd )
+*     void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd, int *status )
 
 *  Class Membership:
 *     NullRegion member function (over-rides the astRegBaseBox protected
@@ -481,6 +519,8 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 *        covered by the Region in the base Frame of the encapsulated
 *        FrameSet. It should have at least as many elements as there are 
 *        axes in the base Frame.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -507,7 +547,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 
 }
 
-static AstPointSet *RegBaseMesh( AstRegion *this ){
+static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
 /*
 *  Name:
 *     RegBaseMesh
@@ -521,7 +561,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
 
 *  Synopsis:
 *     #include "nullregion.h"
-*     AstPointSet *astRegBaseMesh( AstRegion *this )
+*     AstPointSet *astRegBaseMesh( AstRegion *this, int *status )
 
 *  Class Membership:
 *     NullRegion member function (over-rides the astRegBaseMesh protected
@@ -537,6 +577,8 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
 *  Parameters:
 *     this
 *        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *    Pointer to a new PointSet containing a single point with value of
@@ -569,7 +611,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
       nc = astGetNin( this->frameset );
 
 /* Create the PointSet. */
-      result = astPointSet( 1, nc, "" );
+      result = astPointSet( 1, nc, "", status );
 
 /* Get a pointer to the axis values. */
       ptr = astGetPoints( result );
@@ -587,7 +629,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
    return result;
 }
 
-static void GetRegionBounds( AstRegion *this_region, double *lbnd, double *ubnd ){
+static void GetRegionBounds( AstRegion *this_region, double *lbnd, double *ubnd, int *status ){
 /*
 *  Name:
 *     GetRegionBounds
@@ -601,7 +643,7 @@ static void GetRegionBounds( AstRegion *this_region, double *lbnd, double *ubnd 
 
 *  Synopsis:
 *     #include "nullregion.h"
-*     void astGetRegionBounds( AstRegion *this, double *lbnd, double *ubnd )
+*     void astGetRegionBounds( AstRegion *this, double *lbnd, double *ubnd, int *status )
 
 *  Class Membership:
 *     NullRegion member function (over-rides the astGetRegionBounds protected
@@ -626,6 +668,8 @@ static void GetRegionBounds( AstRegion *this_region, double *lbnd, double *ubnd 
 *        covered by the Region in the current Frame of the encapsulated
 *        FrameSet. It should have at least as many elements as there are 
 *        axes in the Region.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -652,7 +696,7 @@ static void GetRegionBounds( AstRegion *this_region, double *lbnd, double *ubnd 
 
 }
 
-static AstPointSet *RegMesh( AstRegion *this ){
+static AstPointSet *RegMesh( AstRegion *this, int *status ){
 /*
 *  Name:
 *     RegMesh
@@ -666,7 +710,7 @@ static AstPointSet *RegMesh( AstRegion *this ){
 
 *  Synopsis:
 *     #include "nullregion.h"
-*     AstPointSet *astRegMesh( AstRegion *this )
+*     AstPointSet *astRegMesh( AstRegion *this, int *status )
 
 *  Class Membership:
 *     NullRegion member function (over-rides the astRegMesh protected
@@ -681,6 +725,8 @@ static AstPointSet *RegMesh( AstRegion *this ){
 *  Parameters:
 *     this
 *        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     NULL pointer.
@@ -693,12 +739,12 @@ static AstPointSet *RegMesh( AstRegion *this ){
 
    astError( AST__INTER, "astRegMesh(%s): The %s class does not implement "
              "the astRegMesh method inherited from the Region class "
-             "(internal AST programming error).", astGetClass( this ), 
+             "(internal AST programming error).", status, astGetClass( this ), 
              astGetClass( this ) );
    return NULL;
 }
 
-static AstMapping *Simplify( AstMapping *this_mapping ) {
+static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /*
 *  Name:
 *     Simplify
@@ -711,7 +757,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 *  Synopsis:
 *     #include "nullregion.h"
-*     AstMapping *Simplify( AstMapping *this )
+*     AstMapping *Simplify( AstMapping *this, int *status )
 
 *  Class Membership:
 *     NullRegion method (over-rides the astSimplify method inherited
@@ -728,6 +774,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 *  Parameters:
 *     this
 *        Pointer to the original Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to the simplified Region. A cloned pointer to the
@@ -758,7 +806,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 /* Invoke the parent Simplify method inherited from the Region class. This
    will simplify the encapsulated FrameSet and uncertainty Region. */
-   new = (AstRegion *) (*parent_simplify)( this_mapping );
+   new = (AstRegion *) (*parent_simplify)( this_mapping, status );
 
 /* Is the Mapping from base Frame to current Frame in the Region a
    UnitMap? If so, no simplification is possible. */
@@ -770,7 +818,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 /* Create a NullRegion from the current Frame. */
       frm = astGetFrame( new->frameset, AST__CURRENT );
-      result = (AstMapping *) astNullRegion( frm, astGetUnc( new, 0 ), "" );
+      result = (AstMapping *) astNullRegion( frm, astGetUnc( new, 0 ), "", status );
 
 /* Free resources. */
       frm = astAnnul( frm );      
@@ -791,7 +839,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 }
 
 static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
-                               int forward, AstPointSet *out ) {
+                               int forward, AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     Transform
@@ -805,7 +853,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 *  Synopsis:
 *     #include "nullregion.h"
 *     AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-*                             int forward, AstPointSet *out )
+*                             int forward, AstPointSet *out, int *status )
 
 *  Class Membership:
 *     NullRegion member function (over-rides the astTransform protected
@@ -830,6 +878,8 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 *        Pointer to a PointSet which will hold the transformed (output)
 *        coordinate values. A NULL value may also be given, in which case a
 *        new PointSet will be created by this function.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the output (possibly new) PointSet.
@@ -866,7 +916,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    function inherited from the parent Region class. This function validates
    all arguments and generates an output PointSet if necessary,
    containing a copy of the input PointSet. */
-   result = (*parent_transform)( this_mapping, in, forward, out );
+   result = (*parent_transform)( this_mapping, in, forward, out, status );
 
 /* We will now extend the parent astTransform method by performing the
    calculations needed to generate the output coordinate values. */
@@ -914,7 +964,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -926,7 +976,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -937,6 +987,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the NullRegion whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -971,10 +1023,10 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsANullRegion and astCheckNullRegion functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(NullRegion,Region,check,&class_init)
+astMAKE_ISA(NullRegion,Region,check,&class_check)
 astMAKE_CHECK(NullRegion)
 
-AstNullRegion *astNullRegion_( void *frame_void, AstRegion *unc, const char *options, ... ) {
+AstNullRegion *astNullRegion_( void *frame_void, AstRegion *unc, const char *options, int *status, ...) {
 /*
 *++
 *  Name:
@@ -1067,9 +1119,13 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstNullRegion *new;           /* Pointer to new NullRegion */
    va_list args;                 /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -1089,7 +1145,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Obtain the variable argument list and pass it along with the options string
    to the astVSet method to initialise the new NullRegion's attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -1141,10 +1197,19 @@ AstNullRegion *astNullRegionId_( void *frame_void, void *unc_void,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstNullRegion *new;           /* Pointer to new NullRegion */
    AstRegion *unc;               /* Pointer to Region structure */
    va_list args;                 /* Variable argument list */
+
+   int *status;                  /* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
+/* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -1183,7 +1248,7 @@ AstNullRegion *astNullRegionId_( void *frame_void, void *unc_void,
 
 AstNullRegion *astInitNullRegion_( void *mem, size_t size, int init, 
                                    AstNullRegionVtab *vtab, const char *name, 
-                                   AstFrame *frame, AstRegion *unc ) {
+                                   AstFrame *frame, AstRegion *unc, int *status ) {
 /*
 *+
 *  Name:
@@ -1283,7 +1348,7 @@ AstNullRegion *astInitNullRegion_( void *mem, size_t size, int init,
 }
 
 AstNullRegion *astLoadNullRegion_( void *mem, size_t size, AstNullRegionVtab *vtab, 
-                                   const char *name, AstChannel *channel ) {
+                                   const char *name, AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -1356,6 +1421,7 @@ AstNullRegion *astLoadNullRegion_( void *mem, size_t size, AstNullRegionVtab *vt
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstNullRegion *new;              /* Pointer to the new NullRegion */
 
 /* Initialise. */
@@ -1363,6 +1429,9 @@ AstNullRegion *astLoadNullRegion_( void *mem, size_t size, AstNullRegionVtab *vt
 
 /* Check the global error status. */
    if ( !astOK ) return new;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* If a NULL virtual function table has been supplied, then this is
    the first loader to be invoked for this NullRegion. In this case the
@@ -1424,6 +1493,10 @@ AstNullRegion *astLoadNullRegion_( void *mem, size_t size, AstNullRegionVtab *vt
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
+
+
+
+
 
 
 

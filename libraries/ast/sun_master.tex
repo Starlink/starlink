@@ -18,18 +18,18 @@
 
 % Variable part - replace [xxx] as appropriate.
 c+
-\newcommand{\stardocnumber}    {211.22}
+\newcommand{\stardocnumber}    {211.23}
 c-
 f+
-\newcommand{\stardocnumber}    {210.22}
+\newcommand{\stardocnumber}    {210.23}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {20th July 2007}
+\newcommand{\stardocdate}      {19th May 2008}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
                                 in Astronomy}
-\newcommand{\stardoccopyright} {Copyright (C) 1997-2007 Council for the Central Laboratory of the Research Councils}
+\newcommand{\stardoccopyright} {Copyright (C) 1997-2008 Council for the Central Laboratory of the Research Councils}
 \newcommand{\stardoctitlehtml} {AST - A Library for Handling World Coordinate
                                       Systems in Astronomy}
 \newcommand{\stardocversion}   {V<VERSION_NUMBER>}
@@ -4597,7 +4597,7 @@ contexts. Each call to AST\_END will then annul only those Object
 pointers created since the matching call to AST\_BEGIN.
 f-
 
-\subsection{Exporting and Exempting AST Pointers}
+\subsection{Exporting, Importing and Exempting AST Pointers}
 c+
 The astExport function allows you to export particular pointers from
 one AST context (\secref{ss:contexts}) to the next outer one, as
@@ -4647,6 +4647,18 @@ Object pointer. Without this, there is no way of getting that pointer
 out.
 f-
 
+f+
+The AST\_IMPORT routine can be used in a similar manner to import a
+pointer into the current context, so that it is deleted when the current
+context is closed using AST\_END.
+f-
+
+c+
+The astImport routine can be used in a similar manner to import a
+pointer into the current context, so that it is deleted when the current
+context is closed using astEnd.
+c-
+
 c+
 Sometimes, you may also want to exempt a pointer from all the effects
 of AST contexts. You should not need to do this often, but it will
@@ -4695,6 +4707,92 @@ This will prevent the pointer being affected by any subsequent use of
 AST\_END. Of course, it then becomes your responsibility to annul this
 pointer (using AST\_ANNUL) when it is no longer required.
 f-
+
+
+c+
+\subsection{AST Objects within Multi-threaded Applications}
+
+When the AST library is built from source, the build process checks to
+see if the POSIX threads library (``{\tt pthreads}'') is available. If so,
+appropriate {\tt pthreads} calls are inserted into the AST source code to
+ensure that AST is thread-safe, and the AST\_\_THREADSAFE macro (defined
+in the ``ast.h'' header file is set to ``{tt yes}''. If the {tt pthreads}
+library cannot be found when AST is built, a working version of the AST 
+library will still be created, but it will not be thread-safe. In this
+case the AST\_\_THREADSAFE macro will be set to ``{tt no}'' in ast.h. The
+rest of this section assumes that the thread-safe version of AST is being
+used.
+
+Note, some AST functions call externally specified functions (\emph{e.g.}
+the source and sink functions used by the Channel class or the graphics
+primitives functions used by the Plot class). AST does not know whether
+such functions are thread-safe or not. For this reason, invocations of these
+functions within a multi-threaded environment are serialised using a mutex
+in order to avoid two or more threads executing an external function 
+simultaneously.
+
+If an application uses more than one thread, the possibility arises that 
+an Object created by one thread may be accessed by another thread, potentially
+simultaneously. If any of the threads modifies any aspect of the Object,
+this could lead to serious problems within the other threads. For this
+reason, some restrictions are placed on how Objects can be used in a
+multi-threaded application.
+
+\subsubsection{Locking AST Objects for Exclusive Use}
+The basic restriction is that a thread can only access Objects that it
+has previously locked for its own exclusive use. If a thread attempts to
+access any Object that it has not locked, an error is reported. 
+
+When an Object is created, it is initially locked by the calling thread.
+Therefore a thread does not need to lock an Object explicitly if it was
+created in the same thread.
+
+If the Object pointer is then passed to another thread, the first thread
+must unlock the Object using astUnlock and the second thread must then lock
+it using astLock.
+
+If a thread attempts to lock an Object that is already locked by another
+thread, it can choose to report an error immediately or to wait until the 
+Object is available.
+
+If two or more threads need simultaneous access to an Object, a deep copy
+of the Object should be taken for each thread, using astCopy, and then
+the copies should be unlocked and passed to the othe threads, which
+should then lock them. Note, if a thread modifies the Object, the
+modification will have no effect on the other threads, because the Object
+copies are independent of each other.
+
+\subsubsection{AST Pointer Contexts}
+
+Each thread maintains its own set of nested AST contexts, so when astEnd
+is called, only pointers that were created within the current thread will
+be annulled.
+
+Attempting to use astExport, astImport, astExempt astAnnul or astDelete on 
+a pointer that was created in a different thread will lead to unpredictable 
+behaviour. In general if an Object created in one thread needs to be
+accessed in a second thread, the second thread should create a clone of
+the pointer using astClone, and then use the cloned pointer rather than
+the original pointer.
+
+When a thread exits, it may potentially pass an Object pointer back to
+its parent. 
+
+There is no automatic procedure for ensuring that all Objects are deleted
+when a thread exits. This means that each thread should ensure it deletes 
+all Objects that it creates in order to avoid memory leaks. Using an
+astBegin/astEnd block in the thread start function is the easiest way to
+do this. 
+
+If a thread wants to return an AST Object to its parent thread
+(\emph{e.g.} by storing a pointer in the data structure that was passed to
+the thread upon creation), it should
+exempt the pointer using astExempt before the thread exits. The parent
+thread should then import the pointer into its current context using 
+astImport.
+
+c-
+
 
 \subsection{\label{ss:copyingobjects}Copying Objects}
 
@@ -21399,12 +21497,10 @@ attribute values.
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V4.6}
+\subsection{Changes Introduced in V4.6}
 
 The following describes the most significant changes which have
-occurred in the AST library between versions V4.5 and V4.6 (the
-current version):
+occurred in the AST library between versions V4.5 and V4.6:
 
 \begin{enumerate}
 
@@ -21426,9 +21522,38 @@ celestial coordinate systems.
 
 \end{enumerate}
 
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V5.0}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V4.6 and V5.0 (the
+current version):
+
+\begin{enumerate}
+
+
+\item The AST library is now thread-safe (assuming that the POSIX pthreads 
+library is available when AST is built). Many of the macros defined in
+the ast.h header file have changed. It is therefore necessary to
+re-compile all source code that includes ast.h.
+
+\item New methods astLock and astUnlock allow an AST Object to be locked
+for exclusive use by a thread.
+
+-  The TimeFrame class now support Local Time as a time scale. The offset
+from UTC to Local Time is specified by a new TimeFrame attribute called 
+LTOffset.
+
+-  The Channel class has a new attribute called Strict which controls
+whether or not to report an error if unexpected data items are found
+within an AST Object description read from an external data source. Note,
+the default behaviour is now not to report such errors. This differs from
+previous versions of AST which always reported an error is unexpected
+input items were encountered.
+
+\end{enumerate}
+
 Programs which are statically linked will need to be re-linked in
 order to take advantage of these new facilities.
-
-
 
 \end{document}

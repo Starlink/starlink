@@ -58,6 +58,12 @@
 
 /* Macros. */
 /* ======= */
+#if defined(astCLASS) || defined(astFORTRAN77)
+#define STATUS_PTR status
+#else
+#define STATUS_PTR astGetStatusPtr
+#endif
+
 
 #if defined(astCLASS)            /* Protected */
 
@@ -66,6 +72,12 @@
 #define AST__FLUXDENW      2
 #define AST__SBRIGHT       3
 #define AST__SBRIGHTW      4
+
+/* Define constants used to size global arrays in this module. */
+#define AST__FLUXFRAME_GETATTRIB_BUFF_LEN 50
+#define AST__FLUXFRAME_GETLABEL_BUFF_LEN 200
+#define AST__FLUXFRAME_GETSYMBOL_BUFF_LEN 20
+#define AST__FLUXFRAME_GETTITLE_BUFF_LEN 200
 
 #endif
 
@@ -102,15 +114,31 @@ typedef struct AstFluxFrameVtab {
 /* Unique flag value to determine class membership. */
    int *check;                   /* Check value */
 
-   AstSystemType (* GetDensitySystem)( AstFluxFrame * );
-   const char *(* GetDensityUnit)( AstFluxFrame * );
+   AstSystemType (* GetDensitySystem)( AstFluxFrame *, int * );
+   const char *(* GetDensityUnit)( AstFluxFrame *, int * );
 
-   double (* GetSpecVal)( AstFluxFrame * );
-   int (* TestSpecVal)( AstFluxFrame * );
-   void (* ClearSpecVal)( AstFluxFrame * );
-   void (* SetSpecVal)( AstFluxFrame *, double );
+   double (* GetSpecVal)( AstFluxFrame *, int * );
+   int (* TestSpecVal)( AstFluxFrame *, int * );
+   void (* ClearSpecVal)( AstFluxFrame *, int * );
+   void (* SetSpecVal)( AstFluxFrame *, double, int * );
 
 } AstFluxFrameVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstFluxFrameGlobals {
+   AstFluxFrameVtab Class_Vtab;
+   int Class_Init;
+   char GetAttrib_Buff[ AST__FLUXFRAME_GETATTRIB_BUFF_LEN + 1 ];
+   char GetLabel_Buff[ AST__FLUXFRAME_GETLABEL_BUFF_LEN + 1 ];
+   char GetSymbol_Buff[ AST__FLUXFRAME_GETSYMBOL_BUFF_LEN + 1 ];
+   char GetTitle_Buff[ AST__FLUXFRAME_GETTITLE_BUFF_LEN + 1 ];
+} AstFluxFrameGlobals;
+
+#endif
+
 #endif
 
 /* Function prototypes. */
@@ -122,7 +150,7 @@ astPROTO_ISA(FluxFrame)           /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected */
-AstFluxFrame *astFluxFrame_( double, void *, const char *, ... );
+AstFluxFrame *astFluxFrame_( double, void *, const char *, int *, ...);
 #else
 AstFluxFrame *astFluxFrameId_( double, void *, const char *, ... );
 #endif
@@ -132,15 +160,21 @@ AstFluxFrame *astFluxFrameId_( double, void *, const char *, ... );
 /* Initialiser. */
 AstFluxFrame *astInitFluxFrame_( void *, size_t, int, 
                                  AstFluxFrameVtab *,
-                                 const char *, double, AstSpecFrame * );
+                                 const char *, double, AstSpecFrame *, int * );
 
 /* Vtab initialiser. */
-void astInitFluxFrameVtab_( AstFluxFrameVtab *, const char * );
+void astInitFluxFrameVtab_( AstFluxFrameVtab *, const char *, int * );
 
 /* Loader. */
 AstFluxFrame *astLoadFluxFrame_( void *, size_t, 
                                  AstFluxFrameVtab *,
-                                 const char *, AstChannel *channel );
+                                 const char *, AstChannel *channel, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitFluxFrameGlobals_( AstFluxFrameGlobals * );
+#endif
+
 #endif
 
 /* Prototypes for member functions. */
@@ -148,13 +182,13 @@ AstFluxFrame *astLoadFluxFrame_( void *, size_t,
 
 #if defined(astCLASS)            /* Protected */
 
-AstSystemType astGetDensitySystem_( AstFluxFrame * );
-const char *astGetDensityUnit_( AstFluxFrame * );
+AstSystemType astGetDensitySystem_( AstFluxFrame *, int * );
+const char *astGetDensityUnit_( AstFluxFrame *, int * );
 
-double astGetSpecVal_( AstFluxFrame * );
-int astTestSpecVal_( AstFluxFrame * );
-void astClearSpecVal_( AstFluxFrame * );
-void astSetSpecVal_( AstFluxFrame *, double );
+double astGetSpecVal_( AstFluxFrame *, int * );
+int astTestSpecVal_( AstFluxFrame *, int * );
+void astClearSpecVal_( AstFluxFrame *, int * );
+void astSetSpecVal_( AstFluxFrame *, double, int * );
 
 #endif
 
@@ -188,13 +222,13 @@ void astSetSpecVal_( AstFluxFrame *, double );
 
 /* Initialiser. */
 #define astInitFluxFrame(mem,size,init,vtab,name,specval,specfrm) \
-astINVOKE(O,astInitFluxFrame_(mem,size,init,vtab,name,specval,astCheckSpecFrame(specfrm)))
+astINVOKE(O,astInitFluxFrame_(mem,size,init,vtab,name,specval,astCheckSpecFrame(specfrm),STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitFluxFrameVtab(vtab,name) astINVOKE(V,astInitFluxFrameVtab_(vtab,name))
+#define astInitFluxFrameVtab(vtab,name) astINVOKE(V,astInitFluxFrameVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadFluxFrame(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadFluxFrame_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadFluxFrame_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 
 #endif
 
@@ -211,13 +245,17 @@ astINVOKE(O,astLoadFluxFrame_(mem,size,vtab,name,astCheckChannel(channel)))
 
 #if defined(astCLASS)            /* Protected */
 
-#define astGetDensitySystem(this) astINVOKE(V,astGetDensitySystem_(astCheckFluxFrame(this)))
-#define astGetDensityUnit(this) astINVOKE(V,astGetDensityUnit_(astCheckFluxFrame(this)))
+#define astGetDensitySystem(this) astINVOKE(V,astGetDensitySystem_(astCheckFluxFrame(this),STATUS_PTR))
+#define astGetDensityUnit(this) astINVOKE(V,astGetDensityUnit_(astCheckFluxFrame(this),STATUS_PTR))
 
-#define astGetSpecVal(this) astINVOKE(V,astGetSpecVal_(astCheckFluxFrame(this)))
-#define astTestSpecVal(this) astINVOKE(V,astTestSpecVal_(astCheckFluxFrame(this)))
-#define astClearSpecVal(this) astINVOKE(V,astClearSpecVal_(astCheckFluxFrame(this)))
-#define astSetSpecVal(this,value) astINVOKE(V,astSetSpecVal_(astCheckFluxFrame(this),value))
+#define astGetSpecVal(this) astINVOKE(V,astGetSpecVal_(astCheckFluxFrame(this),STATUS_PTR))
+#define astTestSpecVal(this) astINVOKE(V,astTestSpecVal_(astCheckFluxFrame(this),STATUS_PTR))
+#define astClearSpecVal(this) astINVOKE(V,astClearSpecVal_(astCheckFluxFrame(this),STATUS_PTR))
+#define astSetSpecVal(this,value) astINVOKE(V,astSetSpecVal_(astCheckFluxFrame(this),value,STATUS_PTR))
 
 #endif
 #endif
+
+
+
+

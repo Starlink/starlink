@@ -105,6 +105,24 @@ typedef struct AstNullRegionVtab {
 
 /* Properties (e.g. methods) specific to this class. */
 } AstNullRegionVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstNullRegionGlobals {
+   AstNullRegionVtab Class_Vtab;
+   int Class_Init;
+} AstNullRegionGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitNullRegionGlobals_( AstNullRegionGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -116,7 +134,7 @@ astPROTO_ISA(NullRegion)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstNullRegion *astNullRegion_( void *, AstRegion *, const char *, ... );
+AstNullRegion *astNullRegion_( void *, AstRegion *, const char *, int *, ...);
 #else
 AstNullRegion *astNullRegionId_( void *, AstRegion *, const char *, ... );
 #endif
@@ -125,14 +143,14 @@ AstNullRegion *astNullRegionId_( void *, AstRegion *, const char *, ... );
 
 /* Initialiser. */
 AstNullRegion *astInitNullRegion_( void *, size_t, int, AstNullRegionVtab *,
-                                   const char *, AstFrame *, AstRegion * );
+                                   const char *, AstFrame *, AstRegion *, int * );
 
 /* Vtab initialiser. */
-void astInitNullRegionVtab_( AstNullRegionVtab *, const char * );
+void astInitNullRegionVtab_( AstNullRegionVtab *, const char *, int * );
 
 /* Loader. */
 AstNullRegion *astLoadNullRegion_( void *, size_t, AstNullRegionVtab *,
-                                   const char *, AstChannel * );
+                                   const char *, AstChannel *, int * );
 
 #endif
 
@@ -169,13 +187,13 @@ AstNullRegion *astLoadNullRegion_( void *, size_t, AstNullRegionVtab *,
 
 /* Initialiser. */
 #define astInitNullRegion(mem,size,init,vtab,name,frame,unc) \
-astINVOKE(O,astInitNullRegion_(mem,size,init,vtab,name,frame,unc))
+astINVOKE(O,astInitNullRegion_(mem,size,init,vtab,name,frame,unc,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitNullRegionVtab(vtab,name) astINVOKE(V,astInitNullRegionVtab_(vtab,name))
+#define astInitNullRegionVtab(vtab,name) astINVOKE(V,astInitNullRegionVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadNullRegion(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadNullRegion_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadNullRegion_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -187,3 +205,7 @@ astINVOKE(O,astLoadNullRegion_(mem,size,vtab,name,astCheckChannel(channel)))
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif
+
+
+
+

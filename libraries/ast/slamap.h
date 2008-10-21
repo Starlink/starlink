@@ -200,8 +200,23 @@ typedef struct AstSlaMapVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   void (* SlaAdd)( AstSlaMap *, const char *, const double[] );
+   void (* SlaAdd)( AstSlaMap *, const char *, const double[], int * );
 } AstSlaMapVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstSlaMapGlobals {
+   AstSlaMapVtab Class_Vtab;
+   int Class_Init;
+   double Eq_Cache;
+   double Ep_Cache;
+   double Amprms_Cache[ 21 ];
+} AstSlaMapGlobals;
+
+#endif
+
 #endif
 
 /* Function prototypes. */
@@ -213,7 +228,7 @@ astPROTO_ISA(SlaMap)             /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstSlaMap *astSlaMap_( int, const char *, ... );
+AstSlaMap *astSlaMap_( int, const char *, int *, ...);
 #else
 AstSlaMap *astSlaMapId_( int, const char *, ... );
 #endif
@@ -222,24 +237,29 @@ AstSlaMap *astSlaMapId_( int, const char *, ... );
 
 /* Initialiser. */
 AstSlaMap *astInitSlaMap_( void *, size_t, int, AstSlaMapVtab *,
-                           const char *, int );
+                           const char *, int, int * );
 
 /* Vtab initialiser. */
-void astInitSlaMapVtab_( AstSlaMapVtab *, const char * );
+void astInitSlaMapVtab_( AstSlaMapVtab *, const char *, int * );
 
 /* Loader. */
 AstSlaMap *astLoadSlaMap_( void *, size_t, AstSlaMapVtab *,
-                           const char *, AstChannel * );
+                           const char *, AstChannel *, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitSlaMapGlobals_( AstSlaMapGlobals * );
+#endif
 
 /* Other functions. */
-void astSTPConv1_( double, int, double[3], double[3], int, double[3], double[3] );
-void astSTPConv_( double, int, int, double[3], double *[3], int, double[3], double *[3] );
+void astSTPConv1_( double, int, double[3], double[3], int, double[3], double[3], int * );
+void astSTPConv_( double, int, int, double[3], double *[3], int, double[3], double *[3], int * );
 
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-void astSlaAdd_( AstSlaMap *, const char *, const double[] );
+void astSlaAdd_( AstSlaMap *, const char *, const double[], int * );
 
 /* Function interfaces. */
 /* ==================== */
@@ -271,13 +291,13 @@ void astSlaAdd_( AstSlaMap *, const char *, const double[] );
 
 /* Initialiser. */
 #define astInitSlaMap(mem,size,init,vtab,name,flags) \
-astINVOKE(O,astInitSlaMap_(mem,size,init,vtab,name,flags))
+astINVOKE(O,astInitSlaMap_(mem,size,init,vtab,name,flags,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitSlaMapVtab(vtab,name) astINVOKE(V,astInitSlaMapVtab_(vtab,name))
+#define astInitSlaMapVtab(vtab,name) astINVOKE(V,astInitSlaMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadSlaMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadSlaMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadSlaMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -286,7 +306,7 @@ astINVOKE(O,astLoadSlaMap_(mem,size,vtab,name,astCheckChannel(channel)))
    before use.  This provides a contextual error report if a pointer
    to the wrong sort of Object is supplied. */
 #define astSlaAdd(this,cvt,args) \
-astINVOKE(V,astSlaAdd_(astCheckSlaMap(this),cvt,args))
+astINVOKE(V,astSlaAdd_(astCheckSlaMap(this),cvt,args,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 #define astSTPConv astSTPConv_
@@ -294,3 +314,7 @@ astINVOKE(V,astSlaAdd_(astCheckSlaMap(this),cvt,args))
 #endif
 
 #endif
+
+
+
+

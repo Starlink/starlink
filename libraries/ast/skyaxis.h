@@ -207,6 +207,16 @@
 /* ---------------------- */
 #include "axis.h"                /* Coordinate axes (parent class) */
 
+/* Macros */
+/* ====== */
+/* Define constants used to size global arrays in this module. */
+/* Define numerical constants for use in thie module. */
+#define AST__SKYAXIS_GETAXISFORMAT_BUFF_LEN 50
+#define AST__SKYAXIS_DHMSFORMAT_BUFF_LEN 70
+#define AST__SKYAXIS_DHMSUNIT_BUFF_LEN 17
+#define AST__SKYAXIS_GETATTRIB_BUFF_LEN 50
+
+
 /* Type Definitions. */
 /* ================= */
 /* SkyAxis structure. */
@@ -239,19 +249,36 @@ typedef struct AstSkyAxisVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   int (* GetAxisAsTime)( AstSkyAxis * );
-   int (* GetAxisIsLatitude)( AstSkyAxis * );
-   int (* GetAxisCentreZero)( AstSkyAxis * );
-   int (* TestAxisAsTime)( AstSkyAxis * );
-   int (* TestAxisIsLatitude)( AstSkyAxis * );
-   int (* TestAxisCentreZero)( AstSkyAxis * );
-   void (* ClearAxisAsTime)( AstSkyAxis * );
-   void (* ClearAxisIsLatitude)( AstSkyAxis * );
-   void (* ClearAxisCentreZero)( AstSkyAxis * );
-   void (* SetAxisAsTime)( AstSkyAxis *, int );
-   void (* SetAxisIsLatitude)( AstSkyAxis *, int );
-   void (* SetAxisCentreZero)( AstSkyAxis *, int );
+   int (* GetAxisAsTime)( AstSkyAxis *, int * );
+   int (* GetAxisIsLatitude)( AstSkyAxis *, int * );
+   int (* GetAxisCentreZero)( AstSkyAxis *, int * );
+   int (* TestAxisAsTime)( AstSkyAxis *, int * );
+   int (* TestAxisIsLatitude)( AstSkyAxis *, int * );
+   int (* TestAxisCentreZero)( AstSkyAxis *, int * );
+   void (* ClearAxisAsTime)( AstSkyAxis *, int * );
+   void (* ClearAxisIsLatitude)( AstSkyAxis *, int * );
+   void (* ClearAxisCentreZero)( AstSkyAxis *, int * );
+   void (* SetAxisAsTime)( AstSkyAxis *, int, int * );
+   void (* SetAxisIsLatitude)( AstSkyAxis *, int, int * );
+   void (* SetAxisCentreZero)( AstSkyAxis *, int, int * );
 } AstSkyAxisVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstSkyAxisGlobals {
+   AstSkyAxisVtab Class_Vtab;
+   int Class_Init;
+   char DHmsFormat_Buff[ AST__SKYAXIS_DHMSFORMAT_BUFF_LEN + 1 ];
+   char DHmsUnit_Buff[ AST__SKYAXIS_DHMSUNIT_BUFF_LEN + 1 ];
+   char GetAttrib_Buff[ AST__SKYAXIS_GETATTRIB_BUFF_LEN + 1 ];
+   char GetAxisFormat_Buff[ AST__SKYAXIS_GETAXISFORMAT_BUFF_LEN + 1 ];
+} AstSkyAxisGlobals;
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -263,7 +290,7 @@ astPROTO_ISA(SkyAxis)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstSkyAxis *astSkyAxis_( const char *, ... );
+AstSkyAxis *astSkyAxis_( const char *, int *, ...);
 #else
 AstSkyAxis *astSkyAxisId_( const char *, ... );
 #endif
@@ -272,31 +299,37 @@ AstSkyAxis *astSkyAxisId_( const char *, ... );
 
 /* Initialiser. */
 AstSkyAxis *astInitSkyAxis_( void *, size_t, int, AstSkyAxisVtab *,
-                             const char * );
+                             const char *, int * );
 
 /* Vtab initialiser. */
-void astInitSkyAxisVtab_( AstSkyAxisVtab *, const char * );
+void astInitSkyAxisVtab_( AstSkyAxisVtab *, const char *, int * );
 
 /* Loader. */
 AstSkyAxis *astLoadSkyAxis_( void *, size_t, AstSkyAxisVtab *,
-                             const char *, AstChannel * );
+                             const char *, AstChannel *, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitSkyAxisGlobals_( AstSkyAxisGlobals * );
+#endif
+
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
 #if defined(astCLASS)            /* Protected */
-int astGetAxisAsTime_( AstSkyAxis * );
-int astGetAxisIsLatitude_( AstSkyAxis * );
-int astGetAxisCentreZero_( AstSkyAxis * );
-int astTestAxisAsTime_( AstSkyAxis * );
-int astTestAxisIsLatitude_( AstSkyAxis * );
-int astTestAxisCentreZero_( AstSkyAxis * );
-void astClearAxisAsTime_( AstSkyAxis * );
-void astClearAxisIsLatitude_( AstSkyAxis * );
-void astClearAxisCentreZero_( AstSkyAxis * );
-void astSetAxisAsTime_( AstSkyAxis *, int );
-void astSetAxisIsLatitude_( AstSkyAxis *, int );
-void astSetAxisCentreZero_( AstSkyAxis *, int );
+int astGetAxisAsTime_( AstSkyAxis *, int * );
+int astGetAxisIsLatitude_( AstSkyAxis *, int * );
+int astGetAxisCentreZero_( AstSkyAxis *, int * );
+int astTestAxisAsTime_( AstSkyAxis *, int * );
+int astTestAxisIsLatitude_( AstSkyAxis *, int * );
+int astTestAxisCentreZero_( AstSkyAxis *, int * );
+void astClearAxisAsTime_( AstSkyAxis *, int * );
+void astClearAxisIsLatitude_( AstSkyAxis *, int * );
+void astClearAxisCentreZero_( AstSkyAxis *, int * );
+void astSetAxisAsTime_( AstSkyAxis *, int, int * );
+void astSetAxisIsLatitude_( AstSkyAxis *, int, int * );
+void astSetAxisCentreZero_( AstSkyAxis *, int, int * );
 #endif
 
 /* Function interfaces. */
@@ -329,13 +362,13 @@ void astSetAxisCentreZero_( AstSkyAxis *, int );
 
 /* Initialiser. */
 #define astInitSkyAxis(mem,size,init,vtab,name) \
-astINVOKE(O,astInitSkyAxis_(mem,size,init,vtab,name))
+astINVOKE(O,astInitSkyAxis_(mem,size,init,vtab,name,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitSkyAxisVtab(vtab,name) astINVOKE(V,astInitSkyAxisVtab_(vtab,name))
+#define astInitSkyAxisVtab(vtab,name) astINVOKE(V,astInitSkyAxisVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadSkyAxis(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadSkyAxis_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadSkyAxis_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -345,31 +378,35 @@ astINVOKE(O,astLoadSkyAxis_(mem,size,vtab,name,astCheckChannel(channel)))
    the wrong sort of object is supplied. */
 #if defined(astCLASS)            /* Protected */
 #define astClearAxisAsTime(this) \
-astINVOKE(V,astClearAxisAsTime_(astCheckSkyAxis(this)))
+astINVOKE(V,astClearAxisAsTime_(astCheckSkyAxis(this),STATUS_PTR))
 #define astClearAxisIsLatitude(this) \
-astINVOKE(V,astClearAxisIsLatitude_(astCheckSkyAxis(this)))
+astINVOKE(V,astClearAxisIsLatitude_(astCheckSkyAxis(this),STATUS_PTR))
 #define astGetAxisAsTime(this) \
-astINVOKE(V,astGetAxisAsTime_(astCheckSkyAxis(this)))
+astINVOKE(V,astGetAxisAsTime_(astCheckSkyAxis(this),STATUS_PTR))
 #define astGetAxisIsLatitude(this) \
-astINVOKE(V,astGetAxisIsLatitude_(astCheckSkyAxis(this)))
+astINVOKE(V,astGetAxisIsLatitude_(astCheckSkyAxis(this),STATUS_PTR))
 #define astSetAxisAsTime(this,value) \
-astINVOKE(V,astSetAxisAsTime_(astCheckSkyAxis(this),value))
+astINVOKE(V,astSetAxisAsTime_(astCheckSkyAxis(this),value,STATUS_PTR))
 #define astSetAxisIsLatitude(this,value) \
-astINVOKE(V,astSetAxisIsLatitude_(astCheckSkyAxis(this),value))
+astINVOKE(V,astSetAxisIsLatitude_(astCheckSkyAxis(this),value,STATUS_PTR))
 #define astTestAxisAsTime(this) \
-astINVOKE(V,astTestAxisAsTime_(astCheckSkyAxis(this)))
+astINVOKE(V,astTestAxisAsTime_(astCheckSkyAxis(this),STATUS_PTR))
 #define astTestAxisIsLatitude(this) \
-astINVOKE(V,astTestAxisIsLatitude_(astCheckSkyAxis(this)))
+astINVOKE(V,astTestAxisIsLatitude_(astCheckSkyAxis(this),STATUS_PTR))
 
 #define astClearAxisCentreZero(this) \
-astINVOKE(V,astClearAxisCentreZero_(astCheckSkyAxis(this)))
+astINVOKE(V,astClearAxisCentreZero_(astCheckSkyAxis(this),STATUS_PTR))
 #define astGetAxisCentreZero(this) \
-astINVOKE(V,astGetAxisCentreZero_(astCheckSkyAxis(this)))
+astINVOKE(V,astGetAxisCentreZero_(astCheckSkyAxis(this),STATUS_PTR))
 #define astSetAxisCentreZero(this,value) \
-astINVOKE(V,astSetAxisCentreZero_(astCheckSkyAxis(this),value))
+astINVOKE(V,astSetAxisCentreZero_(astCheckSkyAxis(this),value,STATUS_PTR))
 #define astTestAxisCentreZero(this) \
-astINVOKE(V,astTestAxisCentreZero_(astCheckSkyAxis(this)))
+astINVOKE(V,astTestAxisCentreZero_(astCheckSkyAxis(this),STATUS_PTR))
 
 
 #endif
 #endif
+
+
+
+

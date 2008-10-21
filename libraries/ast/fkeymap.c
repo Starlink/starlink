@@ -593,10 +593,9 @@ F77_LOGICAL_FUNCTION(ast_mapget1a)( INTEGER(THIS),
    AstObject **values;
    int i;
 
-   values = astMalloc( sizeof( AstObject *)*(size_t) *MXVAL );
-
    astAt( "AST_MAPGET1A", NULL, 0 );
    astWatchSTATUS(
+      values = astMalloc( sizeof( AstObject *)*(size_t) *MXVAL );
       key = astString( KEY, KEY_length );
       RESULT = astMapGet1A( astI2P( *THIS ), key, *MXVAL, NVAL, values ) ? F77_TRUE : F77_FALSE;
       astFree( key );
@@ -628,10 +627,9 @@ F77_LOGICAL_FUNCTION(ast_mapget1c)( INTEGER(THIS),
    char *values, *c, *d;
    int i, j, term;
 
-   values = astMalloc( sizeof( char )*(size_t) (*MXVAL)*( VALUE_length + 1 ) );
-
    astAt( "AST_MAPGET1A", NULL, 0 );
    astWatchSTATUS(
+      values = astMalloc( sizeof( char )*(size_t) (*MXVAL)*( VALUE_length + 1 ) );
       key = astString( KEY, KEY_length );
       RESULT = astMapGet1C( astI2P( *THIS ), key, VALUE_length + 1, *MXVAL, 
                             NVAL, values ) ? F77_TRUE : F77_FALSE;

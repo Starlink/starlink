@@ -118,6 +118,8 @@ f     The DssMap class does not define any new routines beyond those
 /* Interface definitions. */
 /* ---------------------- */
 #include "memory.h"              /* Memory allocation facilities */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "object.h"              /* Base Object class */
 #include "pointset.h"            /* Sets of points/coordinates */
@@ -143,14 +145,41 @@ f     The DssMap class does not define any new routines beyond those
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstDssMapVtab class_vtab; /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject * );
-static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
+static int (* parent_getobjsize)( AstObject *, int * );
+static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+
+
+#ifdef THREAD_SAFE
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; 
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(DssMap)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(DssMap,Class_Init)
+#define class_vtab astGLOBAL(DssMap,Class_Vtab)
+
+
+#include <pthread.h>
+
+
+#else
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstDssMapVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -160,21 +189,21 @@ static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstP
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static AstFitsChan *DssFits( AstDssMap * );
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
+static AstFitsChan *DssFits( AstDssMap *, int * );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static int platepix( double, double, struct WorldCoor *, double *, double * );
 static int platepos( double, double, struct WorldCoor *, double *, double * );
-static struct WorldCoor *BuildWcs( AstFitsChan *, const char *, const char * );
-static void Copy( const AstObject *, AstObject * );
-static void Delete( AstObject *obj );
-static void Dump( AstObject *, AstChannel * );
-static int Equal( AstObject *, AstObject * );
+static struct WorldCoor *BuildWcs( AstFitsChan *, const char *, const char *, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Delete( AstObject *obj, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static int Equal( AstObject *, AstObject *, int * );
 
-static int GetObjSize( AstObject * );
+static int GetObjSize( AstObject *, int * );
 /* Member functions. */
 /* ================= */
-static int Equal( AstObject *this_object, AstObject *that_object ) {
+static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
 *  Name:
 *     Equal
@@ -187,7 +216,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 *  Synopsis:
 *     #include "dssmap.h"
-*     int Equal( AstObject *this, AstObject *that ) 
+*     int Equal( AstObject *this, AstObject *that, int *status ) 
 
 *  Class Membership:
 *     DssMap member function (over-rides the astEqual protected
@@ -202,6 +231,8 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *        Pointer to the first Object (a DssMap).
 *     that
 *        Pointer to the second Object.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if the DssMaps are equivalent, zero otherwise.
@@ -288,7 +319,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
    return result;
 }
 
-static int GetObjSize( AstObject *this_object ) {
+static int GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -301,7 +332,7 @@ static int GetObjSize( AstObject *this_object ) {
 
 *  Synopsis:
 *     #include "dssmap.h"
-*     int GetObjSize( AstObject *this ) 
+*     int GetObjSize( AstObject *this, int *status ) 
 
 *  Class Membership:
 *     DssMap member function (over-rides the astGetObjSize protected
@@ -314,6 +345,8 @@ static int GetObjSize( AstObject *this_object ) {
 *  Parameters:
 *     this
 *        Pointer to the DssMap.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Object size, in bytes.
@@ -339,7 +372,7 @@ static int GetObjSize( AstObject *this_object ) {
 /* Invoke the GetObjSize method inherited from the parent class, and then
    add on any components of the class structure defined by thsi class
    which are stored in dynamically allocated memory. */
-   result = (*parent_getobjsize)( this_object );
+   result = (*parent_getobjsize)( this_object, status );
    result += astTSizeOf( this->wcs );
 
 /* If an error occurred, clear the result value. */
@@ -351,7 +384,7 @@ static int GetObjSize( AstObject *this_object ) {
 
 
 static struct WorldCoor *BuildWcs( AstFitsChan *fits, const char *method,
-                                   const char *class ) {
+                                   const char *class, int *status ) {
 /*
 *  Name:
 *     BuildWcs
@@ -433,19 +466,19 @@ static struct WorldCoor *BuildWcs( AstFitsChan *fits, const char *method,
       name = "PLTRAH";
       if( !astGetFitsF( fits, name, &rah ) && astOK ){
          astError( AST__BDFTS, "%s(%s): No value has been supplied for the "
-                   "FITS keyword '%s'.", method, class, name );
+                   "FITS keyword '%s'.", status, method, class, name );
       }
 
       name = "PLTRAM";
       if( !astGetFitsF( fits, name, &ram ) && astOK ){
          astError( AST__BDFTS, "%s(%s): No value has been supplied for the "
-                  "FITS keyword '%s'.", method, class, name );
+                  "FITS keyword '%s'.", status, method, class, name );
       }
 
       name = "PLTRAS";
       if( !astGetFitsF( fits, name, &ras ) && astOK ){
          astError( AST__BDFTS, "%s(%s): No value has been supplied for the "
-                  "FITS keyword '%s'.", method, class, name );
+                  "FITS keyword '%s'.", status, method, class, name );
       }
 
       ra_hours = rah + (ram / (double)60.0) + (ras / (double)3600.0);
@@ -473,19 +506,19 @@ static struct WorldCoor *BuildWcs( AstFitsChan *fits, const char *method,
       name = "PLTDECD";
       if( !astGetFitsF( fits, name, &decd ) && astOK ){
          astError( AST__BDFTS, "%s(%s): No value has been supplied for the "
-                  "FITS keyword '%s'.", method, class, name );
+                  "FITS keyword '%s'.", status, method, class, name );
       }
 
       name = "PLTDECM";
       if( !astGetFitsF( fits, name, &decm ) && astOK ){
          astError( AST__BDFTS, "%s(%s): No value has been supplied for the "
-                  "FITS keyword '%s'.", method, class, name );
+                  "FITS keyword '%s'.", status, method, class, name );
       }
 
       name = "PLTDECS";
       if( !astGetFitsF( fits, name, &decs ) && astOK ){
          astError( AST__BDFTS, "%s(%s): No value has been supplied for the "
-                  "FITS keyword '%s'.", method, class, name );
+                  "FITS keyword '%s'.", status, method, class, name );
       }
 
       dec_deg = dsign * (decd+(decm/(double)60.0)+(decs/(double)3600.0));
@@ -495,33 +528,33 @@ static struct WorldCoor *BuildWcs( AstFitsChan *fits, const char *method,
       name = "PLTSCALE";
       if( !astGetFitsF( fits, name, &ret->plate_scale ) && astOK ){
          astError( AST__BDFTS, "%s(%s): No value has been supplied for the "
-                  "FITS keyword '%s'.", method, class, name );
+                  "FITS keyword '%s'.", status, method, class, name );
       }
 
 /* X and Y corners (in pixels) */
       name = "CNPIX1";
       if( !astGetFitsF( fits, name, &ret->x_pixel_offset ) && astOK ){
          astError( AST__BDFTS, "%s(%s): No value has been supplied for the "
-                  "FITS keyword '%s'.", method, class, name );
+                  "FITS keyword '%s'.", status, method, class, name );
       }
 
       name = "CNPIX2";
       if( !astGetFitsF( fits, name, &ret->y_pixel_offset ) && astOK ){
          astError( AST__BDFTS, "%s(%s): No value has been supplied for the "
-                  "FITS keyword '%s'.", method, class, name );
+                  "FITS keyword '%s'.", status, method, class, name );
       }
 
 /* X and Y pixel sizes (microns). */
       name = "XPIXELSZ";
       if( !astGetFitsF( fits, name, &ret->x_pixel_size ) && astOK ){
          astError( AST__BDFTS, "%s(%s): No value has been supplied for the "
-                  "FITS keyword '%s'.", method, class, name );
+                  "FITS keyword '%s'.", status, method, class, name );
       }
 
       name = "YPIXELSZ";
       if( !astGetFitsF( fits, name, &ret->y_pixel_size ) && astOK ){
          astError( AST__BDFTS, "%s(%s): No value has been supplied for the "
-                  "FITS keyword '%s'.", method, class, name );
+                  "FITS keyword '%s'.", status, method, class, name );
       }
 
 /* Orientation Coefficients. Only report an error if PPO3 or PPO6 are
@@ -534,7 +567,7 @@ static struct WorldCoor *BuildWcs( AstFitsChan *fits, const char *method,
             ret->ppo_coeff[i] = 0.0;
             if( ( i == 2 || i == 5 ) && astOK ) {
                astError( AST__BDFTS, "%s(%s): No value has been supplied "
-                         "for the FITS keyword '%s'.", method, class, 
+                         "for the FITS keyword '%s'.", status, method, class, 
                          name );
                break;
             }
@@ -551,7 +584,7 @@ static struct WorldCoor *BuildWcs( AstFitsChan *fits, const char *method,
             ret->amd_x_coeff[i] = 0.0;
             if( i < 13 && astOK ){
                astError( AST__BDFTS, "%s(%s): No value has been supplied "
-                         "for the FITS keyword '%s'.", method, class, name );
+                         "for the FITS keyword '%s'.", status, method, class, name );
                break;
             }
          }
@@ -563,7 +596,7 @@ static struct WorldCoor *BuildWcs( AstFitsChan *fits, const char *method,
             ret->amd_y_coeff[i] = 0.0;
             if( i < 13 && astOK ){
                astError( AST__BDFTS, "%s(%s): No value has been supplied "
-                         "for the FITS keyword '%s'.", method, class, name );
+                         "for the FITS keyword '%s'.", status, method, class, name );
                break;
             }
          }
@@ -577,7 +610,7 @@ static struct WorldCoor *BuildWcs( AstFitsChan *fits, const char *method,
    return ret;
 }
 
-static AstFitsChan *DssFits( AstDssMap *this ) {
+static AstFitsChan *DssFits( AstDssMap *this, int *status ) {
 /*
 *+
 *  Name:
@@ -638,7 +671,7 @@ static AstFitsChan *DssFits( AstDssMap *this ) {
    wcs = (struct WorldCoor *) this->wcs,
 
 /* Create a new empty FitsChan, using DSS encoding. */
-   ret = astFitsChan( NULL, NULL, "Encoding=DSS" );
+   ret = astFitsChan( NULL, NULL, "Encoding=DSS", status );
 
 /* Create the keyword values and stored them in the returned FitsChan... */
 
@@ -713,7 +746,7 @@ static AstFitsChan *DssFits( AstDssMap *this ) {
    return ret;
 }
 
-void astInitDssMapVtab_(  AstDssMapVtab *vtab, const char *name ) {
+void astInitDssMapVtab_(  AstDssMapVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -750,11 +783,15 @@ void astInitDssMapVtab_(  AstDssMapVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -763,8 +800,8 @@ void astInitDssMapVtab_(  AstDssMapVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsADssMap) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -791,10 +828,15 @@ void astInitDssMapVtab_(  AstDssMapVtab *vtab, const char *name ) {
    astSetDump( object, Dump, "DssMap", "DSS plate fit mapping" );
    astSetCopy( object, Copy );
    astSetDelete( object, Delete );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
 static int MapMerge( AstMapping *this, int where, int series, int *nmap,
-                     AstMapping ***map_list, int **invert_list ) {
+                     AstMapping ***map_list, int **invert_list, int *status ) {
 /*
 *  Name:
 *     MapMerge
@@ -808,7 +850,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *  Synopsis:
 *     #include "mapping.h"
 *     int MapMerge( AstMapping *this, int where, int series, int *nmap,
-*                   AstMapping ***map_list, int **invert_list )
+*                   AstMapping ***map_list, int **invert_list, int *status )
 
 *  Class Membership:
 *     DssMap method (over-rides the protected astMapMerge method
@@ -911,6 +953,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *        length, the "*invert_list" array will be extended (and its
 *        pointer updated) if necessary to accommodate any new
 *        elements.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     If simplification was possible, the function returns the index
@@ -1047,7 +1091,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* If all the keywords were updated succesfully, create the new DssMap
    based on the modified FITS header cards. */
                   if( ok ){
-		     dmnew = astDssMap( fits, "" );
+		     dmnew = astDssMap( fits, "", status );
 
 /* Anull the DssMap pointer in the list and replace it with the new one.
    The invert flag is left unchanged. */
@@ -1095,7 +1139,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 }
 
 static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-                               int forward, AstPointSet *out ) {
+                               int forward, AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     Transform
@@ -1109,7 +1153,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *  Synopsis:
 *     #include "dssmap.h"
 *     AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-*                             int forward, AstPointSet *out )
+*                             int forward, AstPointSet *out, int *status )
 
 *  Class Membership:
 *     DssMap member function (over-rides the astTransform protected
@@ -1133,6 +1177,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *        Pointer to a PointSet which will hold the transformed (output)
 *        coordinate values. A NULL value may also be given, in which case a
 *        new PointSet will be created by this function.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the output (possibly new) PointSet.
@@ -1169,7 +1215,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    function inherited from the parent Mapping class. This function validates
    all arguments and generates an output PointSet if necessary, but does not
    actually transform any coordinate values. */
-   result = (*parent_transform)( this, in, forward, out );
+   result = (*parent_transform)( this, in, forward, out, status );
 
 /* We will now extend the parent astTransform method by performing the
    calculations needed to generate the output coordinate values. */
@@ -1269,7 +1315,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -1281,7 +1327,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for DssMap objects.
@@ -1291,6 +1337,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the object to be copied.
 *     objout
 *        Pointer to the object being constructed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -1320,7 +1368,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -1332,7 +1380,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for DssMap objects.
@@ -1340,6 +1388,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the object to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -1362,7 +1412,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -1374,7 +1424,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -1385,6 +1435,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the DssMap whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
    AstDssMap *this;          /* Pointer to the DssMap structure */
@@ -1437,10 +1489,10 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsADssMap and astCheckDssMap functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(DssMap,Mapping,check,&class_init)
+astMAKE_ISA(DssMap,Mapping,check,&class_check)
 astMAKE_CHECK(DssMap)
 
-AstDssMap *astDssMap_( void *fits_void, const char *options, ... ) {
+AstDssMap *astDssMap_( void *fits_void, const char *options, int *status, ...) {
 /*
 *+
 *  Name:
@@ -1454,7 +1506,7 @@ AstDssMap *astDssMap_( void *fits_void, const char *options, ... ) {
 
 *  Synopsis:
 *     #include "dssmap.h"
-*     AstDssMap *astDssMap( AstFitsChan *fits, const char *options, ... )
+*     AstDssMap *astDssMap( AstFitsChan *fits, const char *options, int *status, ... )
 
 *  Class Membership:
 *     DssMap constructor.
@@ -1481,6 +1533,8 @@ AstDssMap *astDssMap_( void *fits_void, const char *options, ... ) {
 *        initialising the new DssMap. The syntax used is identical to
 *        that for the astSet function and may include "printf" format
 *        specifiers identified by "%" symbols in the normal way.
+*     status
+*        Pointer to the inherited status variable.
 *     ...
 *        If the "options" string contains "%" format specifiers, then
 *        an optional list of additional arguments may follow it in
@@ -1509,9 +1563,13 @@ AstDssMap *astDssMap_( void *fits_void, const char *options, ... ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstFitsChan *fits;            /* Pointer to supplied FitsChan */
    AstDssMap *new;               /* Pointer to new DssMap */
    va_list args;                 /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    new = NULL;
@@ -1533,7 +1591,7 @@ AstDssMap *astDssMap_( void *fits_void, const char *options, ... ) {
 
 /* Obtain the variable argument list and pass it along with the options string
    to the astVSet method to initialise the new DssMap's attributes. */
-         va_start( args, options );
+         va_start( args, status );
          astVSet( new, options, NULL, args );
          va_end( args );
 
@@ -1548,7 +1606,7 @@ AstDssMap *astDssMap_( void *fits_void, const char *options, ... ) {
 
 AstDssMap *astInitDssMap_( void *mem, size_t size, int init,
                            AstDssMapVtab *vtab, const char *name,
-                           AstFitsChan *fits ) {
+                           AstFitsChan *fits, int *status ) {
 /*
 *+
 *  Name:
@@ -1632,7 +1690,7 @@ AstDssMap *astInitDssMap_( void *mem, size_t size, int init,
    "platepos" function. The required values are extracted from the
    supplied FitsChan. An error is reported and NULL returned if any required 
    keywords are missing or unusable. */
-   if ( ( wcs = BuildWcs( fits, "astInitDssMap", name ) ) ) {
+   if ( ( wcs = BuildWcs( fits, "astInitDssMap", name, status ) ) ) {
 
 /* Initialise a 2-D Mapping structure (the parent class) as the first component
    within the DssMap structure, allocating memory if necessary. Specify that
@@ -1663,7 +1721,7 @@ AstDssMap *astInitDssMap_( void *mem, size_t size, int init,
 
 AstDssMap *astLoadDssMap_( void *mem, size_t size,
                              AstDssMapVtab *vtab, const char *name,
-                             AstChannel *channel ) {
+                             AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -1738,10 +1796,14 @@ AstDssMap *astLoadDssMap_( void *mem, size_t size,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstDssMap *new;              /* Pointer to the new DssMap */
    char name_buff[ 11 ];        /* Buffer for item name */
    int i;                       /* Coefficient index */
    struct WorldCoor *wcs;       /* Pointer to Wcs information */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* Initialise. */
    new = NULL;
@@ -1795,43 +1857,43 @@ AstDssMap *astLoadDssMap_( void *mem, size_t size,
          wcs->plate_ra = astReadDouble( channel, "pltra", AST__BAD );
          if( wcs->plate_ra == AST__BAD && astOK ){
             astError( AST__RDERR, "astRead(DssMap): 'PltRA' object (Plate "
-                      "centre RA) missing from input." );
+                      "centre RA) missing from input." , status);
          }
         
          wcs->plate_dec = astReadDouble( channel, "pltdec", AST__BAD );
          if( wcs->plate_dec == AST__BAD && astOK ){
             astError( AST__RDERR, "astRead(DssMap): 'PltDec' object (Plate "
-                      "centre Dec) missing from input." );
+                      "centre Dec) missing from input." , status);
          }
         
          wcs->plate_scale = astReadDouble( channel, "pltscl", AST__BAD );
          if( wcs->plate_scale == AST__BAD && astOK ){
             astError( AST__RDERR, "astRead(DssMap): 'PltScl' object (Plate "
-                      "scale) missing from input." );
+                      "scale) missing from input." , status);
          }
         
          wcs->x_pixel_offset = astReadDouble( channel, "cnpix1", AST__BAD );
          if( wcs->x_pixel_offset == AST__BAD && astOK ){
             astError( AST__RDERR, "astRead(DssMap): 'CNPix1' object (X pixel "
-                      "offset) missing from input." );
+                      "offset) missing from input." , status);
          }
         
          wcs->y_pixel_offset = astReadDouble( channel, "cnpix2", AST__BAD );
          if( wcs->y_pixel_offset == AST__BAD && astOK ){
             astError( AST__RDERR, "astRead(DssMap): 'CNPix2' object (Y pixel "
-                      "offset) missing from input." );
+                      "offset) missing from input." , status);
          }
         
          wcs->x_pixel_size = astReadDouble( channel, "xpixsz", AST__BAD );
          if( wcs->x_pixel_size == AST__BAD && astOK ){
             astError( AST__RDERR, "astRead(DssMap): 'XPixSz' object (X pixel "
-                      "size) missing from input." );
+                      "size) missing from input." , status);
          }
         
          wcs->y_pixel_size = astReadDouble( channel, "ypixsz", AST__BAD );
          if( wcs->y_pixel_size == AST__BAD && astOK ){
             astError( AST__RDERR, "astRead(DssMap): 'YPixSz' object (Y pixel "
-                      "size) missing from input." );
+                      "size) missing from input." , status);
          }
         
          for( i = 0; i < 6 && astOK; i++ ) {
@@ -1841,7 +1903,7 @@ AstDssMap *astLoadDssMap_( void *mem, size_t size,
                if( i == 2 || i == 5 ) {
                   if( astOK ) astError( AST__RDERR, "astRead(DssMap): 'PPO%d' "
                                         "object (orientation coefficient %d) "
-                                        "missing from input.", i + 1, i + 1 );
+                                        "missing from input.", status, i + 1, i + 1 );
                } else {
                   wcs->ppo_coeff[i] = 0.0;
                }
@@ -1855,7 +1917,7 @@ AstDssMap *astLoadDssMap_( void *mem, size_t size,
                if( i < 13 ){
                   if( astOK ) astError( AST__RDERR, "astRead(DssMap): 'AMDX%d' "
                                         "object (plate solution X coefficient "
-                                        "%d) missing from input.", i + 1, i + 1 );
+                                        "%d) missing from input.", status, i + 1, i + 1 );
                } else {
                   wcs->amd_x_coeff[i] = 0.0;
                }
@@ -1869,7 +1931,7 @@ AstDssMap *astLoadDssMap_( void *mem, size_t size,
                if( i < 13 ){
                   if( astOK ) astError( AST__RDERR, "astRead(DssMap): 'AMDY%d' "
                                         "object (plate solution Y coefficient "
-                                        "%d) missing from input.", i + 1, i + 1 );
+                                        "%d) missing from input.", status, i + 1, i + 1 );
                } else {
                   wcs->amd_y_coeff[i] = 0.0;
                }
@@ -1896,9 +1958,9 @@ AstDssMap *astLoadDssMap_( void *mem, size_t size,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
-AstFitsChan *astDssFits_( AstDssMap *this ){
+AstFitsChan *astDssFits_( AstDssMap *this, int *status ){
    if( !astOK ) return NULL;
-   return (**astMEMBER(this,DssMap,DssFits))( this );
+   return (**astMEMBER(this,DssMap,DssFits))( this, status );
 }
 
 /* The code which follows in this file is covered by the following
@@ -2215,3 +2277,7 @@ double	*ypix;		/* y pixel number  (dec or lat without rotation) */
    Sep  5 1997  Modified by R.F. Warren-Smith (Starlink) to make the
                 platepos and platepix functions static.
  */
+
+
+
+

@@ -174,9 +174,27 @@ typedef struct AstWinMapVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   int (* WinTerms)( AstWinMap *, double **, double ** );
+   int (* WinTerms)( AstWinMap *, double **, double **, int * );
 
 } AstWinMapVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstWinMapGlobals {
+   AstWinMapVtab Class_Vtab;
+   int Class_Init;
+} AstWinMapGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitWinMapGlobals_( AstWinMapGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -188,7 +206,7 @@ astPROTO_ISA(WinMap)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstWinMap *astWinMap_( int, const double [], const double [], const double [], const double [], const char *, ... );
+AstWinMap *astWinMap_( int, const double [], const double [], const double [], const double [], const char *, int *, ...);
 #else
 AstWinMap *astWinMapId_( int, const double [], const double [], const double [], const double [], const char *, ... );
 #endif
@@ -198,20 +216,20 @@ AstWinMap *astWinMapId_( int, const double [], const double [], const double [],
 /* Initialiser. */
 AstWinMap *astInitWinMap_( void *, size_t, int, AstWinMapVtab *,
                            const char *, int, const double *, const double *, 
-                           const double *, const double * );
+                           const double *, const double *, int * );
 
 /* Vtab initialiser. */
-void astInitWinMapVtab_( AstWinMapVtab *, const char * );
+void astInitWinMapVtab_( AstWinMapVtab *, const char *, int * );
 
 /* Loader. */
 AstWinMap *astLoadWinMap_( void *, size_t, AstWinMapVtab *,
-                           const char *, AstChannel * );
+                           const char *, AstChannel *, int * );
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
-int astWinTerms_( AstWinMap *, double **, double ** );
+int astWinTerms_( AstWinMap *, double **, double **, int * );
 #endif
 
 /* Function interfaces. */
@@ -245,13 +263,13 @@ int astWinTerms_( AstWinMap *, double **, double ** );
 /* Initialiser. */
 #define \
 astInitWinMap(mem,size,init,vtab,name,ncoord,c1_in,c2_in,c1_out,c2_out) \
-astINVOKE(O,astInitWinMap_(mem,size,init,vtab,name,ncoord,c1_in,c2_in,c1_out,c2_out))
+astINVOKE(O,astInitWinMap_(mem,size,init,vtab,name,ncoord,c1_in,c2_in,c1_out,c2_out,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitWinMapVtab(vtab,name) astINVOKE(V,astInitWinMapVtab_(vtab,name))
+#define astInitWinMapVtab(vtab,name) astINVOKE(V,astInitWinMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadWinMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadWinMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadWinMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -262,7 +280,11 @@ astINVOKE(O,astLoadWinMap_(mem,size,vtab,name,astCheckChannel(channel)))
 
 #if defined(astCLASS)            /* Protected */
 #define astWinTerms(this,scale,shift) \
-astINVOKE(V,astWinTerms_(astCheckWinMap(this),scale,shift))
+astINVOKE(V,astWinTerms_(astCheckWinMap(this),scale,shift,STATUS_PTR))
 #endif
 
 #endif
+
+
+
+

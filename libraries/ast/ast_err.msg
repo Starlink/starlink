@@ -163,5 +163,7 @@ PXFRRM          <Attempt to delete original Plot3D base Frame>
 BADSUB          <Illegal syntax for string substitution template>
 BADFLG          <Incompatible flags for re-sampling or re-binning>
 
+! New codes introduced for V5.0
+LCKERR          <Error locking or unlocking an AST Object>
 
 .END

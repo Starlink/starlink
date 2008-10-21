@@ -227,16 +227,28 @@ typedef struct AstSphMapVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   int (* GetUnitRadius)( AstSphMap * );
-   int (* TestUnitRadius)( AstSphMap * );
-   void (* ClearUnitRadius)( AstSphMap * );
-   void (* SetUnitRadius)( AstSphMap *, int );
+   int (* GetUnitRadius)( AstSphMap *, int * );
+   int (* TestUnitRadius)( AstSphMap *, int * );
+   void (* ClearUnitRadius)( AstSphMap *, int * );
+   void (* SetUnitRadius)( AstSphMap *, int, int * );
 
-   double (* GetPolarLong)( AstSphMap * );
-   int (* TestPolarLong)( AstSphMap * );
-   void (* ClearPolarLong)( AstSphMap * );
-   void (* SetPolarLong)( AstSphMap *, double );
+   double (* GetPolarLong)( AstSphMap *, int * );
+   int (* TestPolarLong)( AstSphMap *, int * );
+   void (* ClearPolarLong)( AstSphMap *, int * );
+   void (* SetPolarLong)( AstSphMap *, double, int * );
 } AstSphMapVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstSphMapGlobals {
+   AstSphMapVtab Class_Vtab;
+   int Class_Init;
+   char GetAttrib_Buff[ 51 ];
+} AstSphMapGlobals;
+#endif
+
 #endif
 
 /* Function prototypes. */
@@ -248,37 +260,43 @@ astPROTO_ISA(SphMap)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstSphMap *astSphMap_( const char *, ... );
+AstSphMap *astSphMap_( const char *, int *, ...);
 #else
-AstSphMap *astSphMapId_( const char *, ... );
+AstSphMap *astSphMapId_( const char *, ...);
 #endif
 
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
 AstSphMap *astInitSphMap_( void *, size_t, int, AstSphMapVtab *,
-                           const char * );
+                           const char *, int * );
 
 /* Vtab initialiser. */
-void astInitSphMapVtab_( AstSphMapVtab *, const char * );
+void astInitSphMapVtab_( AstSphMapVtab *, const char *, int * );
 
 /* Loader. */
 AstSphMap *astLoadSphMap_( void *, size_t, AstSphMapVtab *,
-                           const char *, AstChannel * );
+                           const char *, AstChannel *, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitSphMapGlobals_( AstSphMapGlobals * );
+#endif
+
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
-int astGetUnitRadius_( AstSphMap * );
-int astTestUnitRadius_( AstSphMap * );
-void astClearUnitRadius_( AstSphMap * );
-void astSetUnitRadius_( AstSphMap *, int );
+int astGetUnitRadius_( AstSphMap *, int * );
+int astTestUnitRadius_( AstSphMap *, int * );
+void astClearUnitRadius_( AstSphMap *, int * );
+void astSetUnitRadius_( AstSphMap *, int, int * );
 
-double astGetPolarLong_( AstSphMap * );
-int astTestPolarLong_( AstSphMap * );
-void astClearPolarLong_( AstSphMap * );
-void astSetPolarLong_( AstSphMap *, double );
+double astGetPolarLong_( AstSphMap *, int * );
+int astTestPolarLong_( AstSphMap *, int * );
+void astClearPolarLong_( AstSphMap *, int * );
+void astSetPolarLong_( AstSphMap *, double, int * );
 #endif
 
 /* Function interfaces. */
@@ -312,13 +330,13 @@ void astSetPolarLong_( AstSphMap *, double );
 /* Initialiser. */
 #define \
 astInitSphMap(mem,size,init,vtab,name) \
-astINVOKE(O,astInitSphMap_(mem,size,init,vtab,name))
+astINVOKE(O,astInitSphMap_(mem,size,init,vtab,name,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitSphMapVtab(vtab,name) astINVOKE(V,astInitSphMapVtab_(vtab,name))
+#define astInitSphMapVtab(vtab,name) astINVOKE(V,astInitSphMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadSphMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadSphMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadSphMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -328,15 +346,19 @@ astINVOKE(O,astLoadSphMap_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 
 #if defined(astCLASS)            /* Protected */
-#define astClearUnitRadius(this)     astINVOKE(V,astClearUnitRadius_(astCheckSphMap(this)))
-#define astGetUnitRadius(this)       astINVOKE(V,astGetUnitRadius_(astCheckSphMap(this)))
-#define astSetUnitRadius(this,value) astINVOKE(V,astSetUnitRadius_(astCheckSphMap(this),value))
-#define astTestUnitRadius(this)      astINVOKE(V,astTestUnitRadius_(astCheckSphMap(this)))
+#define astClearUnitRadius(this)     astINVOKE(V,astClearUnitRadius_(astCheckSphMap(this),STATUS_PTR))
+#define astGetUnitRadius(this)       astINVOKE(V,astGetUnitRadius_(astCheckSphMap(this),STATUS_PTR))
+#define astSetUnitRadius(this,value) astINVOKE(V,astSetUnitRadius_(astCheckSphMap(this),value,STATUS_PTR))
+#define astTestUnitRadius(this)      astINVOKE(V,astTestUnitRadius_(astCheckSphMap(this),STATUS_PTR))
 
-#define astClearPolarLong(this)     astINVOKE(V,astClearPolarLong_(astCheckSphMap(this)))
-#define astGetPolarLong(this)       astINVOKE(V,astGetPolarLong_(astCheckSphMap(this)))
-#define astSetPolarLong(this,value) astINVOKE(V,astSetPolarLong_(astCheckSphMap(this),value))
-#define astTestPolarLong(this)      astINVOKE(V,astTestPolarLong_(astCheckSphMap(this)))
+#define astClearPolarLong(this)     astINVOKE(V,astClearPolarLong_(astCheckSphMap(this),STATUS_PTR))
+#define astGetPolarLong(this)       astINVOKE(V,astGetPolarLong_(astCheckSphMap(this),STATUS_PTR))
+#define astSetPolarLong(this,value) astINVOKE(V,astSetPolarLong_(astCheckSphMap(this),value,STATUS_PTR))
+#define astTestPolarLong(this)      astINVOKE(V,astTestPolarLong_(astCheckSphMap(this),STATUS_PTR))
 #endif
 
 #endif
+
+
+
+

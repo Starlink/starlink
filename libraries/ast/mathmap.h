@@ -178,6 +178,12 @@
 /* This value defines the size of an internal table in the AstMathMap
    data type. Since it will be publicly accessible (but of no external
    use), we give it an obscure name. */
+
+#if defined(astCLASS) || defined(astFORTRAN77)
+#define STATUS_PTR status
+#else
+#define STATUS_PTR astGetStatusPtr
+#endif
 #define AST_MATHMAP_RAND_CONTEXT_NTAB_ (32)
 
 /* Type Definitions. */
@@ -238,19 +244,32 @@ typedef struct AstMathMapVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   int (* GetSeed)( AstMathMap * );
-   int (* GetSimpFI)( AstMathMap * );
-   int (* GetSimpIF)( AstMathMap * );
-   int (* TestSeed)( AstMathMap * );
-   int (* TestSimpFI)( AstMathMap * );
-   int (* TestSimpIF)( AstMathMap * );
-   void (* ClearSeed)( AstMathMap * );
-   void (* ClearSimpFI)( AstMathMap * );
-   void (* ClearSimpIF)( AstMathMap * );
-   void (* SetSeed)( AstMathMap *, int );
-   void (* SetSimpFI)( AstMathMap *, int );
-   void (* SetSimpIF)( AstMathMap *, int );
+   int (* GetSeed)( AstMathMap *, int * );
+   int (* GetSimpFI)( AstMathMap *, int * );
+   int (* GetSimpIF)( AstMathMap *, int * );
+   int (* TestSeed)( AstMathMap *, int * );
+   int (* TestSimpFI)( AstMathMap *, int * );
+   int (* TestSimpIF)( AstMathMap *, int * );
+   void (* ClearSeed)( AstMathMap *, int * );
+   void (* ClearSimpFI)( AstMathMap *, int * );
+   void (* ClearSimpIF)( AstMathMap *, int * );
+   void (* SetSeed)( AstMathMap *, int, int * );
+   void (* SetSimpFI)( AstMathMap *, int, int * );
+   void (* SetSimpIF)( AstMathMap *, int, int * );
 } AstMathMapVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstMathMapGlobals {
+   AstMathMapVtab Class_Vtab;
+   int Class_Init;
+   char GetAttrib_Buff[ 51 ];
+} AstMathMapGlobals;
+
+#endif
+
 #endif
 
 /* Function prototypes. */
@@ -263,7 +282,7 @@ astPROTO_ISA(MathMap)            /* Test class membership */
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
 AstMathMap *astMathMap_( int, int, int, const char *[], int, const char *[],
-                         const char *, ... );
+                         const char *, int *, ...);
 #else
 AstMathMap *astMathMapId_( int, int, int, const char *[], int, const char *[],
                            const char *, ... );
@@ -274,31 +293,37 @@ AstMathMap *astMathMapId_( int, int, int, const char *[], int, const char *[],
 /* Initialiser. */
 AstMathMap *astInitMathMap_( void *, size_t, int, AstMathMapVtab *,
                              const char *, int, int,
-                             int, const char *[], int, const char *[] );
+                             int, const char *[], int, const char *[], int * );
 
 /* Vtab initialiser. */
-void astInitMathMapVtab_( AstMathMapVtab *, const char * );
+void astInitMathMapVtab_( AstMathMapVtab *, const char *, int * );
 
 /* Loader. */
 AstMathMap *astLoadMathMap_( void *, size_t, AstMathMapVtab *,
-                             const char *, AstChannel * );
+                             const char *, AstChannel *, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitMathMapGlobals_( AstMathMapGlobals * );
+#endif
+
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
 #if defined(astCLASS)            /* Protected */
-int astGetSeed_( AstMathMap * );
-int astGetSimpFI_( AstMathMap * );
-int astGetSimpIF_( AstMathMap * );
-int astTestSeed_( AstMathMap * );
-int astTestSimpFI_( AstMathMap * );
-int astTestSimpIF_( AstMathMap * );
-void astClearSeed_( AstMathMap * );
-void astClearSimpFI_( AstMathMap * );
-void astClearSimpIF_( AstMathMap * );
-void astSetSeed_( AstMathMap *, int );
-void astSetSimpFI_( AstMathMap *, int );
-void astSetSimpIF_( AstMathMap *, int );
+int astGetSeed_( AstMathMap *, int * );
+int astGetSimpFI_( AstMathMap *, int * );
+int astGetSimpIF_( AstMathMap *, int * );
+int astTestSeed_( AstMathMap *, int * );
+int astTestSimpFI_( AstMathMap *, int * );
+int astTestSimpIF_( AstMathMap *, int * );
+void astClearSeed_( AstMathMap *, int * );
+void astClearSimpFI_( AstMathMap *, int * );
+void astClearSimpIF_( AstMathMap *, int * );
+void astSetSeed_( AstMathMap *, int, int * );
+void astSetSimpFI_( AstMathMap *, int, int * );
+void astSetSimpIF_( AstMathMap *, int, int * );
 #endif
 
 /* Function interfaces. */
@@ -331,13 +356,13 @@ void astSetSimpIF_( AstMathMap *, int );
 
 /* Initialiser. */
 #define astInitMathMap(mem,size,init,vtab,name,nin,nout,nfwd,fwd,ninv,inv) \
-astINVOKE(O,astInitMathMap_(mem,size,init,vtab,name,nin,nout,nfwd,fwd,ninv,inv))
+astINVOKE(O,astInitMathMap_(mem,size,init,vtab,name,nin,nout,nfwd,fwd,ninv,inv,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitMathMapVtab(vtab,name) astINVOKE(V,astInitMathMapVtab_(vtab,name))
+#define astInitMathMapVtab(vtab,name) astINVOKE(V,astInitMathMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadMathMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadMathMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadMathMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -347,28 +372,32 @@ astINVOKE(O,astLoadMathMap_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 #if defined(astCLASS)            /* Protected */
 #define astClearSeed(this) \
-astINVOKE(V,astClearSeed_(astCheckMathMap(this)))
+astINVOKE(V,astClearSeed_(astCheckMathMap(this),STATUS_PTR))
 #define astClearSimpFI(this) \
-astINVOKE(V,astClearSimpFI_(astCheckMathMap(this)))
+astINVOKE(V,astClearSimpFI_(astCheckMathMap(this),STATUS_PTR))
 #define astClearSimpIF(this) \
-astINVOKE(V,astClearSimpIF_(astCheckMathMap(this)))
+astINVOKE(V,astClearSimpIF_(astCheckMathMap(this),STATUS_PTR))
 #define astGetSeed(this) \
-astINVOKE(V,astGetSeed_(astCheckMathMap(this)))
+astINVOKE(V,astGetSeed_(astCheckMathMap(this),STATUS_PTR))
 #define astGetSimpFI(this) \
-astINVOKE(V,astGetSimpFI_(astCheckMathMap(this)))
+astINVOKE(V,astGetSimpFI_(astCheckMathMap(this),STATUS_PTR))
 #define astGetSimpIF(this) \
-astINVOKE(V,astGetSimpIF_(astCheckMathMap(this)))
+astINVOKE(V,astGetSimpIF_(astCheckMathMap(this),STATUS_PTR))
 #define astSetSeed(this,value) \
-astINVOKE(V,astSetSeed_(astCheckMathMap(this),value))
+astINVOKE(V,astSetSeed_(astCheckMathMap(this),value,STATUS_PTR))
 #define astSetSimpFI(this,value) \
-astINVOKE(V,astSetSimpFI_(astCheckMathMap(this),value))
+astINVOKE(V,astSetSimpFI_(astCheckMathMap(this),value,STATUS_PTR))
 #define astSetSimpIF(this,value) \
-astINVOKE(V,astSetSimpIF_(astCheckMathMap(this),value))
+astINVOKE(V,astSetSimpIF_(astCheckMathMap(this),value,STATUS_PTR))
 #define astTestSeed(this) \
-astINVOKE(V,astTestSeed_(astCheckMathMap(this)))
+astINVOKE(V,astTestSeed_(astCheckMathMap(this),STATUS_PTR))
 #define astTestSimpFI(this) \
-astINVOKE(V,astTestSimpFI_(astCheckMathMap(this)))
+astINVOKE(V,astTestSimpFI_(astCheckMathMap(this),STATUS_PTR))
 #define astTestSimpIF(this) \
-astINVOKE(V,astTestSimpIF_(astCheckMathMap(this)))
+astINVOKE(V,astTestSimpIF_(astCheckMathMap(this),STATUS_PTR))
 #endif
 #endif
+
+
+
+

@@ -84,8 +84,11 @@ f     The ZoomMap class does not define any new routines beyond those
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
+#include "globals.h"             /* Thread-safe global data access */
 #include "object.h"              /* Base Object class */
 #include "pointset.h"            /* Sets of points/coordinates */
 #include "mapping.h"             /* Coordinate mappings (parent class) */
@@ -109,17 +112,49 @@ f     The ZoomMap class does not define any new routines beyond those
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstZoomMapVtab class_vtab; /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
-static const char *(* parent_getattrib)( AstObject *, const char * );
-static int (* parent_testattrib)( AstObject *, const char * );
-static void (* parent_clearattrib)( AstObject *, const char * );
-static void (* parent_setattrib)( AstObject *, const char * );
+static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static const char *(* parent_getattrib)( AstObject *, const char *, int * );
+static int (* parent_testattrib)( AstObject *, const char *, int * );
+static void (* parent_clearattrib)( AstObject *, const char *, int * );
+static void (* parent_setattrib)( AstObject *, const char *, int * );
+
+/* Define macros for accessing each item of thread specific global data. */
+#ifdef THREAD_SAFE
+
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; \
+   globals->GetAttrib_Buff[ 0 ] = 0;
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(ZoomMap)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(ZoomMap,Class_Init)
+#define class_vtab astGLOBAL(ZoomMap,Class_Vtab)
+#define getattrib_buff astGLOBAL(ZoomMap,GetAttrib_Buff)
+
+
+
+/* If thread safety is not needed, declare and initialise globals at static 
+   variables. */ 
+#else
+
+static char getattrib_buff[ 101 ];
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstZoomMapVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -130,24 +165,24 @@ AstZoomMap *astZoomMapId_( int, double, const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static const char *GetAttrib( AstObject *, const char * );static double GetZoom( AstZoomMap * );
-static double Rate( AstMapping *, double *, int, int);
-static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
-static int Equal( AstObject *, AstObject * );
-static int GetIsLinear( AstMapping * );
-static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
-static int TestAttrib( AstObject *, const char * );
-static int TestZoom( AstZoomMap * );
-static void ClearAttrib( AstObject *, const char * );
-static void ClearZoom( AstZoomMap * );
-static void Dump( AstObject *, AstChannel * );
-static void SetAttrib( AstObject *, const char * );
-static void SetZoom( AstZoomMap *, double );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static const char *GetAttrib( AstObject *, const char *, int * );static double GetZoom( AstZoomMap *, int * );
+static double Rate( AstMapping *, double *, int, int, int * );
+static int *MapSplit( AstMapping *, int, int *, AstMapping **, int * );
+static int Equal( AstObject *, AstObject *, int * );
+static int GetIsLinear( AstMapping *, int * );
+static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
+static int TestAttrib( AstObject *, const char *, int * );
+static int TestZoom( AstZoomMap *, int * );
+static void ClearAttrib( AstObject *, const char *, int * );
+static void ClearZoom( AstZoomMap *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void SetAttrib( AstObject *, const char *, int * );
+static void SetZoom( AstZoomMap *, double, int * );
 
 /* Member functions. */
 /* ================= */
-static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     ClearAttrib
@@ -160,7 +195,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "zoommap.h"
-*     void ClearAttrib( AstObject *this, const char *attrib )
+*     void ClearAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     ZoomMap member function (over-rides the astClearAttrib protected
@@ -177,6 +212,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -198,11 +235,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      (*parent_clearattrib)( this_object, attrib );
+      (*parent_clearattrib)( this_object, attrib, status );
    }
 }
 
-static int Equal( AstObject *this_object, AstObject *that_object ) {
+static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
 *  Name:
 *     Equal
@@ -215,7 +252,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 *  Synopsis:
 *     #include "zoommap.h"
-*     int Equal( AstObject *this, AstObject *that ) 
+*     int Equal( AstObject *this, AstObject *that, int *status ) 
 
 *  Class Membership:
 *     ZoomMap member function (over-rides the astEqual protected
@@ -230,6 +267,8 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *        Pointer to the first Object (a ZoomMap).
 *     that
 *        Pointer to the second Object.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if the ZoomMaps are equivalent, zero otherwise.
@@ -289,7 +328,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
    return result;
 }
 
-static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+static const char *GetAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     GetAttrib
@@ -302,7 +341,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "zoommap.h"
-*     const char *GetAttrib( AstObject *this, const char *attrib )
+*     const char *GetAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     ZoomMap member function (over-rides the protected astGetAttrib
@@ -319,6 +358,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string containing the name of
 *        the attribute whose value is required. This name should be in
 *        lower case, with all white space removed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     - Pointer to a null-terminated string containing the attribute
@@ -336,14 +377,11 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *     reason.
 */
 
-/* Local Constants: */
-#define BUFF_LEN 50              /* Max. characters in result buffer */
-
 /* Local Variables: */
+   astDECLARE_GLOBALS;          /* Pointer to thread-specific global data */
    AstZoomMap *this;             /* Pointer to the ZoomMap structure */
    const char *result;           /* Pointer value to return */
    double zoom;                  /* Zoom attribute value */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
    result = NULL;
@@ -351,12 +389,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Check the global error status. */   
    if ( !astOK ) return result;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this_object);
+
 /* Obtain a pointer to the ZoomMap structure. */
    this = (AstZoomMap *) this_object;
 
 /* Compare "attrib" with each recognised attribute name in turn,
    obtaining the value of the required attribute. If necessary, write
-   the value into "buff" as a null-terminated string in an appropriate
+   the value into "getattrib_buff" as a null-terminated string in an appropriate
    format.  Set "result" to point at the result string. */
 
 /* Zoom. */
@@ -364,24 +405,21 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    if ( !strcmp( attrib, "zoom" ) ) {
       zoom = astGetZoom( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, zoom );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, zoom );
+         result = getattrib_buff;
       }
 
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_getattrib)( this_object, attrib );
+      result = (*parent_getattrib)( this_object, attrib, status );
    }
 
 /* Return the result. */
    return result;
-
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
 
-static int GetIsLinear( AstMapping *this_mapping ){
+static int GetIsLinear( AstMapping *this_mapping, int *status ){
 /*
 *  Name:
 *     GetIsLinear
@@ -394,7 +432,7 @@ static int GetIsLinear( AstMapping *this_mapping ){
 
 *  Synopsis:
 *     #include "mapping.h"
-*     void GetIsLinear( AstMapping *this )
+*     void GetIsLinear( AstMapping *this, int *status )
 
 *  Class Membership:
 *     ZoomMap member function (over-rides the protected astGetIsLinear
@@ -407,11 +445,13 @@ static int GetIsLinear( AstMapping *this_mapping ){
 *  Parameters:
 *     this
 *        Pointer to the ZoomMap.
+*     status
+*        Pointer to the inherited status variable.
 */
    return 1;
 }
 
-void astInitZoomMapVtab_(  AstZoomMapVtab *vtab, const char *name ) {
+void astInitZoomMapVtab_(  AstZoomMapVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -448,11 +488,15 @@ void astInitZoomMapVtab_(  AstZoomMapVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -461,8 +505,8 @@ void astInitZoomMapVtab_(  AstZoomMapVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAZoomMap) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -501,10 +545,15 @@ void astInitZoomMapVtab_(  AstZoomMapVtab *vtab, const char *name ) {
 /* Declare the class dump function. There is no copy constructor or
    destructor. */
    astSetDump( vtab, Dump, "ZoomMap", "Zoom about the origin" );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
 static int MapMerge( AstMapping *this, int where, int series, int *nmap,
-                     AstMapping ***map_list, int **invert_list ) {
+                     AstMapping ***map_list, int **invert_list, int *status ) {
 /*
 *  Name:
 *     MapMerge
@@ -518,7 +567,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *  Synopsis:
 *     #include "mapping.h"
 *     int MapMerge( AstMapping *this, int where, int series, int *nmap,
-*                   AstMapping ***map_list, int **invert_list )
+*                   AstMapping ***map_list, int **invert_list, int *status )
 
 *  Class Membership:
 *     ZoomMap method (over-rides the protected astMapMerge method
@@ -621,6 +670,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *        length, the "*invert_list" array will be extended (and its
 *        pointer updated) if necessary to accommodate any new
 *        elements.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     If simplification was possible, the function returns the index
@@ -747,9 +798,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    Mapping and create the appropriate replacement. */
          nin = astGetNin( ( *map_list )[ where ] );
          if ( unit ) {
-            new = (AstMapping *) astUnitMap( nin, "" );
+            new = (AstMapping *) astUnitMap( nin, "", status );
          } else {
-            new = (AstMapping *) astZoomMap( nin, zoom, "" );
+            new = (AstMapping *) astZoomMap( nin, zoom, "", status );
          }
       }
 
@@ -862,15 +913,15 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Create a replacement UnitMap or ZoomMap if appropriate. */
             if ( unit ) {
-               new = (AstMapping *) astUnitMap( nin, "" );
+               new = (AstMapping *) astUnitMap( nin, "", status );
             } else if ( single ) {
-               new = (AstMapping *) astZoomMap( nin, minzoom, "" );
+               new = (AstMapping *) astZoomMap( nin, minzoom, "", status );
 
 /* Otherwise, replace the original ZoomMaps and UnitMaps with a
    diagonal MatrixMap containing the zoom factors as its diagonal
    elements. */
             } else {
-               new = (AstMapping *) astMatrixMap( nin, nin, 1, zooms, "" );
+               new = (AstMapping *) astMatrixMap( nin, nin, 1, zooms, "", status );
             }
          }
       }
@@ -925,7 +976,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map ){
+static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, int *status ){
 /*
 *  Name:
 *     MapSplit
@@ -939,7 +990,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 
 *  Synopsis:
 *     #include "zoommap.h"
-*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map )
+*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map, int *status )
 
 *  Class Membership:
 *     ZoomMap method (over-rides the protected astMapSplit method
@@ -971,6 +1022,8 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 *        outputs may be different to "nin"). A NULL pointer will be
 *        returned if the supplied ZoomMap has no subset of outputs which 
 *        depend only on the selected inputs.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated array of ints. The number of
@@ -1007,7 +1060,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 /* Allocate memory for the returned array and create a ZoomMap with the
    required number of axes. */
    result = astMalloc( sizeof( int )*(size_t) nin );
-   *map = (AstMapping *) astZoomMap( nin, astGetZoom( this ), "" );
+   *map = (AstMapping *) astZoomMap( nin, astGetZoom( this ), "", status );
 
 /* Set its Invert attribute to be like the supplied ZoomMap. */
    astSetInvert( *map, astGetInvert( this ) );
@@ -1047,7 +1100,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
    return result;
 }
 
-static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
+static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status ){
 /*
 *  Name:
 *     Rate
@@ -1060,7 +1113,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
 
 *  Synopsis:
 *     #include "zoommap.h"
-*     result = Rate( AstMapping *this, double *at, int ax1, int ax2 )
+*     result = Rate( AstMapping *this, double *at, int ax1, int ax2, int *status )
 
 *  Class Membership:
 *     ZoomMap member function (overrides the astRate method inherited
@@ -1086,6 +1139,8 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
 *        The index of the Mapping input which is to be varied in order to
 *        find the rate of change (input numbering starts at 0 for the first 
 *        input).
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The rate of change of Mapping output "ax1" with respect to input 
@@ -1123,7 +1178,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
    return result;
 }
 
-static void SetAttrib( AstObject *this_object, const char *setting ) {
+static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
 *     astSetAttrib
@@ -1195,11 +1250,11 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      (*parent_setattrib)( this_object, setting );
+      (*parent_setattrib)( this_object, setting, status );
    }
 }
 
-static int TestAttrib( AstObject *this_object, const char *attrib ) {
+static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     TestAttrib
@@ -1212,7 +1267,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "zoommap.h"
-*     int TestAttrib( AstObject *this, const char *attrib )
+*     int TestAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     ZoomMap member function (over-rides the astTestAttrib protected
@@ -1229,6 +1284,8 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if a value has been set, otherwise zero.
@@ -1261,7 +1318,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_testattrib)( this_object, attrib );
+      result = (*parent_testattrib)( this_object, attrib, status );
    }
 
 /* Return the result, */
@@ -1269,7 +1326,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 }
 
 static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-                               int forward, AstPointSet *out ) {
+                               int forward, AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     Transform
@@ -1283,7 +1340,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *  Synopsis:
 *     #include "zoommap.h"
 *     AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-*                             int forward, AstPointSet *out )
+*                             int forward, AstPointSet *out, int *status )
 
 *  Class Membership:
 *     ZoomMap member function (over-rides the astTransform protected
@@ -1307,6 +1364,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *        Pointer to a PointSet which will hold the transformed (output)
 *        coordinate values. A NULL value may also be given, in which case a
 *        new PointSet will be created by this function.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the output (possibly new) PointSet.
@@ -1342,7 +1401,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    function inherited from the parent Mapping class. This function validates
    all arguments and generates an output PointSet if necessary, but does not
    actually transform any coordinate values. */
-   result = (*parent_transform)( this, in, forward, out );
+   result = (*parent_transform)( this, in, forward, out, status );
 
 /* We will now extend the parent astTransform method by performing the
    calculations needed to generate the output coordinate values. */
@@ -1438,7 +1497,7 @@ astMAKE_SET(ZoomMap,Zoom,double,zoom,(
             ( value != 0.0 ) ?
             value :
             ( astError( AST__ZOOMI,
-                       "astSetZoom(%s): A zoom factor of zero is not allowed.",
+                       "astSetZoom(%s): A zoom factor of zero is not allowed.", status,
                         astGetClass( this ) ),
               this->zoom ) ))
 astMAKE_TEST(ZoomMap,Zoom,( this->zoom != 0.0 ))
@@ -1453,7 +1512,7 @@ astMAKE_TEST(ZoomMap,Zoom,( this->zoom != 0.0 ))
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -1465,7 +1524,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -1476,6 +1535,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the ZoomMap whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -1507,8 +1568,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Zoom. */
 /* ----- */
-   set = TestZoom( this );
-   dval = set ? GetZoom( this ) : astGetZoom( this );
+   set = TestZoom( this, status );
+   dval = set ? GetZoom( this, status ) : astGetZoom( this );
    astWriteDouble( channel, "Zoom", set, 1, dval, "Zoom factor" );
 }
 
@@ -1516,10 +1577,10 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsAZoomMap and astCheckZoomMap functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(ZoomMap,Mapping,check,&class_init)
+astMAKE_ISA(ZoomMap,Mapping,check,&class_check)
 astMAKE_CHECK(ZoomMap)
 
-AstZoomMap *astZoomMap_( int ncoord, double zoom, const char *options, ... ) {
+AstZoomMap *astZoomMap_( int ncoord, double zoom, const char *options, int *status, ...) {
 /*
 *++
 *  Name:
@@ -1595,12 +1656,23 @@ f     AST_ZOOMMAP = INTEGER
 c     function is invoked with the AST error status set, or if it
 f     function is invoked with STATUS set to an error value, or if it
 *     should fail for any reason.
+
+*  Status Handling:
+*     The protected interface to this function includes an extra
+*     parameter at the end of the parameter list descirbed above. This
+*     parameter is a pointer to the integer inherited status
+*     variable: "int *status".
+
 *--
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstZoomMap *new;              /* Pointer to new ZoomMap */
    va_list args;                 /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -1617,7 +1689,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Obtain the variable argument list and pass it along with the options string
    to the astVSet method to initialise the new ZoomMap's attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -1670,8 +1742,17 @@ AstZoomMap *astZoomMapId_( int ncoord, double zoom,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstZoomMap *new;              /* Pointer to new ZoomMap */
    va_list args;                 /* Variable argument list */
+
+   int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -1702,7 +1783,7 @@ AstZoomMap *astZoomMapId_( int ncoord, double zoom,
 
 AstZoomMap *astInitZoomMap_( void *mem, size_t size, int init,
                              AstZoomMapVtab *vtab, const char *name,
-                             int ncoord, double zoom ) {
+                             int ncoord, double zoom, int *status ) {
 /*
 *+
 *  Name:
@@ -1790,7 +1871,7 @@ AstZoomMap *astInitZoomMap_( void *mem, size_t size, int init,
    class of object being processed. */
    if ( zoom == 0.0 ) {
       astError( AST__ZOOMI, "astInitZoomMap(%s): A zoom factor of zero is not "
-                "allowed.", name );
+                "allowed.", status, name );
    } else {
 
 /* Initialise a Mapping structure (the parent class) as the first component
@@ -1818,7 +1899,7 @@ AstZoomMap *astInitZoomMap_( void *mem, size_t size, int init,
 
 AstZoomMap *astLoadZoomMap_( void *mem, size_t size,
                              AstZoomMapVtab *vtab, const char *name,
-                             AstChannel *channel ) {
+                             AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -1893,6 +1974,7 @@ AstZoomMap *astLoadZoomMap_( void *mem, size_t size,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstZoomMap *new;              /* Pointer to the new ZoomMap */
 
 /* Initialise. */
@@ -1900,6 +1982,9 @@ AstZoomMap *astLoadZoomMap_( void *mem, size_t size,
 
 /* Check the global error status. */
    if ( !astOK ) return new;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* If a NULL virtual function table has been supplied, then this is
    the first loader to be invoked for this ZoomMap. In this case the
@@ -1942,7 +2027,7 @@ AstZoomMap *astLoadZoomMap_( void *mem, size_t size,
 /* Zoom. */
 /* ----- */
       new->zoom = astReadDouble( channel, "zoom", 0.0 );
-      if ( TestZoom( new ) ) SetZoom( new, new->zoom );
+      if ( TestZoom( new, status ) ) SetZoom( new, new->zoom, status );
 
 /* If an error occurred, clean up by deleting the new ZoomMap. */
       if ( !astOK ) new = astDelete( new );
@@ -1963,3 +2048,8 @@ AstZoomMap *astLoadZoomMap_( void *mem, size_t size,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
+
+
+
+
+

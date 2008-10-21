@@ -124,34 +124,91 @@
 
 /* Macros. */
 /* ======= */
+
+#if defined(astCLASS) || defined(astFORTRAN77)
+#define STATUS_PTR status
+#else
+#define STATUS_PTR astGetStatusPtr
+#endif
 #define AST__TUNULL -99999
+
+/* Type definitions */
+/* ================ */
+
+#if defined(astCLASS) 
+
+/* Header for allocated memory. */
+/* ---------------------------- */
+/* This stores a "magic" value so that dynamically allocated memory
+   can be recognised, together with the allocated size. It also
+   ensures correct alignment. */
+typedef struct Memory {
+   struct Memory *next;
+   unsigned long magic;
+   size_t size;
+
+#ifdef MEM_DEBUG
+   struct Memory *prev; /* Pointer to the previous linked Memory structure */
+   int id;      /* A unique identifier for every allocated memory chunk */
+   int perm;    /* Is this chunk part of an acceptable once-off "memory leak"? */
+#endif
+
+} Memory;
+
+/* Define the largest size of a cached memory block in bytes. This does
+   not include the size of the Memory header. This does not need to be
+   too big because the vast majority of memory blocks allocated by AST are
+   less than a few hundred bytes. */
+#define MXCSIZE 300
+
+#endif
+
+
+#if defined(THREAD_SAFE) && defined(astCLASS) 
+
+/* Define a structure holding all data items that are global within the
+   memory.c file. */
+typedef struct AstMemoryGlobals {
+   size_t Sizeof_Memory;
+   int Cache_Init;
+   int Use_Cache;
+   Memory *Cache[ MXCSIZE + 1 ];
+
+} AstMemoryGlobals;
+
+#endif
 
 /* Function prototypes. */
 /* ==================== */
+
+#if defined(THREAD_SAFE) && defined(astCLASS)
+void astInitMemoryGlobals_( AstMemoryGlobals * );
+#endif
+
 #if defined(astCLASS) || 1       /* Nominally protected, but available for */
                                  /* use in developing (e.g.) foreign */
                                  /* language or graphics interfaces. */
-int astMemCaching_( int );
-char **astChrSplit_( const char *, int * );
-char **astChrSplitRE_( const char *, const char *, int * );
-char **astChrSplitC_( const char *, char, int * );
-int astChrMatch_( const char *, const char * );
-int astChrMatchN_( const char *, const char *, size_t );
-char **astStringArray_( const char *, int, int );
-char *astString_( const char *, int );
+int astMemCaching_( int, int * );
+char **astChrSplit_( const char *, int *, int * );
+char **astChrSplitRE_( const char *, const char *, int *, int * );
+char **astChrSplitC_( const char *, char, int *, int * );
+int astChrMatch_( const char *, const char *, int * );
+int astChrMatchN_( const char *, const char *, size_t, int * );
+char **astStringArray_( const char *, int, int, int * );
+char *astString_( const char *, int, int * );
 int astSscanf_( const char *str, const char *format, ...);
-size_t astSizeOf_( const void * );
-int astIsDynamic_( const void * );
-size_t astTSizeOf_( const void * );
-void *astFree_( void * );
-void *astGrow_( void *, int, size_t );
-void *astMalloc_( size_t );
-void *astRealloc_( void *, size_t );
-void *astStore_( void *, const void *, size_t );
-size_t astChrLen_( const char * );
-void astRemoveLeadingBlanks_( char * );
-char *astAppendString_( char *, int *, const char * );
-char *astChrSub_( const char *, const char *, const char *[], int );
+size_t astSizeOf_( const void *, int * );
+int astIsDynamic_( const void *, int * );
+size_t astTSizeOf_( const void *, int * );
+void *astFree_( void *, int * );
+void *astGrow_( void *, int, size_t, int * );
+void *astMalloc_( size_t, int * );
+void *astRealloc_( void *, size_t, int * );
+void *astStore_( void *, const void *, size_t, int * );
+size_t astChrLen_( const char *, int * );
+void astRemoveLeadingBlanks_( char *, int * );
+char *astAppendString_( char *, int *, const char *, int * );
+char *astChrSub_( const char *, const char *, const char *[], int, int * );
 
 #ifdef MEM_DEBUG
 void astActiveMemory_( const char * );
@@ -172,32 +229,32 @@ void astEndPM_( void );
 /* ==================== */
 /* These wrap up the functions defined by this module. */
 
-#define astChrMatch(str1,str2) astERROR_INVOKE(astChrMatch_(str1,str2))
-#define astChrMatchN(str1,str2,n) astERROR_INVOKE(astChrMatchN_(str1,str2,n))
-#define astFree(ptr) astERROR_INVOKE(astFree_(ptr))
-#define astGrow(ptr,n,size) astERROR_INVOKE(astGrow_(ptr,n,size))
-#define astMalloc(size) astERROR_INVOKE(astMalloc_(size))
-#define astMemCaching(flag) astERROR_INVOKE(astMemCaching_(flag))
-#define astRealloc(ptr,size) astERROR_INVOKE(astRealloc_(ptr,size))
-#define astSizeOf(ptr) astERROR_INVOKE(astSizeOf_(ptr))
-#define astIsDynamic(ptr) astERROR_INVOKE(astIsDynamic_(ptr))
-#define astTSizeOf(ptr) astERROR_INVOKE(astTSizeOf_(ptr))
-#define astStore(ptr,data,size) astERROR_INVOKE(astStore_(ptr,data,size))
-#define astAppendString(ptr,len,text) astERROR_INVOKE(astAppendString_(ptr,len,text))
-#define astString(chars,nchars) astERROR_INVOKE(astString_(chars,nchars))
-#define astStringArray(chars,nel,len) astERROR_INVOKE(astStringArray_(chars,nel,len))
-#define astChrLen(string) astERROR_INVOKE(astChrLen_(string))
-#define astRemoveLeadingBlanks(string) astERROR_INVOKE(astRemoveLeadingBlanks_(string))
-#define astChrSub(test,template,subs,nsub) astERROR_INVOKE(astChrSub_(test,template,subs,nsub))
+#define astChrMatch(str1,str2) astERROR_INVOKE(astChrMatch_(str1,str2,STATUS_PTR))
+#define astChrMatchN(str1,str2,n) astERROR_INVOKE(astChrMatchN_(str1,str2,n,STATUS_PTR))
+#define astFree(ptr) astERROR_INVOKE(astFree_(ptr,STATUS_PTR))
+#define astGrow(ptr,n,size) astERROR_INVOKE(astGrow_(ptr,n,size,STATUS_PTR))
+#define astMalloc(size) astERROR_INVOKE(astMalloc_(size,STATUS_PTR))
+#define astMemCaching(flag) astERROR_INVOKE(astMemCaching_(flag,STATUS_PTR))
+#define astRealloc(ptr,size) astERROR_INVOKE(astRealloc_(ptr,size,STATUS_PTR))
+#define astSizeOf(ptr) astERROR_INVOKE(astSizeOf_(ptr,STATUS_PTR))
+#define astIsDynamic(ptr) astERROR_INVOKE(astIsDynamic_(ptr,STATUS_PTR))
+#define astTSizeOf(ptr) astERROR_INVOKE(astTSizeOf_(ptr,STATUS_PTR))
+#define astStore(ptr,data,size) astERROR_INVOKE(astStore_(ptr,data,size,STATUS_PTR))
+#define astAppendString(ptr,len,text) astERROR_INVOKE(astAppendString_(ptr,len,text,STATUS_PTR))
+#define astString(chars,nchars) astERROR_INVOKE(astString_(chars,nchars,STATUS_PTR))
+#define astStringArray(chars,nel,len) astERROR_INVOKE(astStringArray_(chars,nel,len,STATUS_PTR))
+#define astChrLen(string) astERROR_INVOKE(astChrLen_(string,STATUS_PTR))
+#define astRemoveLeadingBlanks(string) astERROR_INVOKE(astRemoveLeadingBlanks_(string,STATUS_PTR))
+#define astChrSub(test,template,subs,nsub) astERROR_INVOKE(astChrSub_(test,template,subs,nsub,STATUS_PTR))
 
 #ifdef HAVE_NONANSI_SSCANF
 #define astSscanf astERROR_INVOKE(astSscanf_)
 #else
 #define astSscanf astERROR_INVOKE(sscanf)
 #endif
-#define astChrSplit(str,n) astERROR_INVOKE(astChrSplit_(str,n))
-#define astChrSplitC(str,c,n) astERROR_INVOKE(astChrSplitC_(str,c,n))
-#define astChrSplitRE(str,c,n) astERROR_INVOKE(astChrSplitRE_(str,c,n))
+#define astChrSplit(str,n) astERROR_INVOKE(astChrSplit_(str,n,STATUS_PTR))
+#define astChrSplitC(str,c,n) astERROR_INVOKE(astChrSplitC_(str,c,n,STATUS_PTR))
+#define astChrSplitRE(str,c,n) astERROR_INVOKE(astChrSplitRE_(str,c,n,STATUS_PTR))
 
 /* Functions used for debugging memory leaks, etc */
 #ifdef MEM_DEBUG
@@ -229,3 +286,6 @@ void astEndPM_( void );
 #endif
 
 #endif
+
+
+

@@ -112,9 +112,27 @@ typedef struct AstIntervalVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   AstInterval *(* MergeInterval)( AstInterval *, AstRegion * );
+   AstInterval *(* MergeInterval)( AstInterval *, AstRegion *, int * );
 
 } AstIntervalVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstIntervalGlobals {
+   AstIntervalVtab Class_Vtab;
+   int Class_Init;
+} AstIntervalGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitIntervalGlobals_( AstIntervalGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -126,7 +144,7 @@ astPROTO_ISA(Interval)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstInterval *astInterval_( void *, const double[], const double[], AstRegion *, const char *, ... );
+AstInterval *astInterval_( void *, const double[], const double[], AstRegion *, const char *, int *, ...);
 #else
 AstInterval *astIntervalId_( void *, const double[], const double[], AstRegion *, const char *, ... );
 #endif
@@ -136,22 +154,22 @@ AstInterval *astIntervalId_( void *, const double[], const double[], AstRegion *
 /* Initialiser. */
 AstInterval *astInitInterval_( void *, size_t, int, AstIntervalVtab *,
                                const char *, AstFrame *, const double[],
-                               const double[], AstRegion * );
+                               const double[], AstRegion *, int * );
 
 /* Vtab initialiser. */
-void astInitIntervalVtab_( AstIntervalVtab *, const char * );
+void astInitIntervalVtab_( AstIntervalVtab *, const char *, int * );
 
 /* Loader. */
 AstInterval *astLoadInterval_( void *, size_t, AstIntervalVtab *,
-                               const char *, AstChannel * );
+                               const char *, AstChannel *, int * );
 
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
-AstInterval *astMergeInterval_( AstInterval *, AstRegion * );
-AstInterval *astBoxInterval_( AstBox * );
+AstInterval *astMergeInterval_( AstInterval *, AstRegion *, int * );
+AstInterval *astBoxInterval_( AstBox *, int * );
 #endif
 
 /* Function interfaces. */
@@ -184,13 +202,13 @@ AstInterval *astBoxInterval_( AstBox * );
 
 /* Initialiser. */
 #define astInitInterval(mem,size,init,vtab,name,frame,lbnd,ubnd,unc) \
-astINVOKE(O,astInitInterval_(mem,size,init,vtab,name,frame,lbnd,ubnd,unc))
+astINVOKE(O,astInitInterval_(mem,size,init,vtab,name,frame,lbnd,ubnd,unc,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitIntervalVtab(vtab,name) astINVOKE(V,astInitIntervalVtab_(vtab,name))
+#define astInitIntervalVtab(vtab,name) astINVOKE(V,astInitIntervalVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadInterval(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadInterval_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadInterval_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -200,7 +218,11 @@ astINVOKE(O,astLoadInterval_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 
 #if defined(astCLASS)            /* Protected */
-#define astMergeInterval(this,reg) astINVOKE(O,astMergeInterval_(astCheckInterval(this),astCheckRegion(reg)))
-#define astBoxInterval(box) astINVOKE(O,astBoxInterval_(astCheckBox(box)))
+#define astMergeInterval(this,reg) astINVOKE(O,astMergeInterval_(astCheckInterval(this),astCheckRegion(reg),STATUS_PTR))
+#define astBoxInterval(box) astINVOKE(O,astBoxInterval_(astCheckBox(box),STATUS_PTR))
 #endif
 #endif
+
+
+
+

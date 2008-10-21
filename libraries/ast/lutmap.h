@@ -171,12 +171,25 @@ typedef struct AstLutMapVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   int (*GetLutInterp)( AstLutMap * );
-   int (* TestLutInterp)( AstLutMap * );
-   void (* ClearLutInterp)( AstLutMap * );
-   void (* SetLutInterp)( AstLutMap *, int );
+   int (*GetLutInterp)( AstLutMap *, int * );
+   int (* TestLutInterp)( AstLutMap *, int * );
+   void (* ClearLutInterp)( AstLutMap *, int * );
+   void (* SetLutInterp)( AstLutMap *, int, int * );
 
 } AstLutMapVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstLutMapGlobals {
+   AstLutMapVtab Class_Vtab;
+   int Class_Init;
+   char GetAttrib_Buff[ 101 ];
+} AstLutMapGlobals;
+
+#endif
+
 #endif
 
 /* Function prototypes. */
@@ -188,7 +201,7 @@ astPROTO_ISA(LutMap)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstLutMap *astLutMap_( int, const double [], double, double, const char *, ... );
+AstLutMap *astLutMap_( int, const double [], double, double, const char *, int *, ...);
 #else
 AstLutMap *astLutMapId_( int, const double [], double, double, const char *, ... );
 #endif
@@ -196,22 +209,28 @@ AstLutMap *astLutMapId_( int, const double [], double, double, const char *, ...
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
-AstLutMap *astInitLutMap_( void *, size_t, int, AstLutMapVtab *, const char *, int, const double *, double, double );
+AstLutMap *astInitLutMap_( void *, size_t, int, AstLutMapVtab *, const char *, int, const double *, double, double, int * );
 
 /* Vtab initialiser. */
-void astInitLutMapVtab_( AstLutMapVtab *, const char * );
+void astInitLutMapVtab_( AstLutMapVtab *, const char *, int * );
 
 /* Loader. */
-AstLutMap *astLoadLutMap_( void *, size_t, AstLutMapVtab *, const char *, AstChannel * );
+AstLutMap *astLoadLutMap_( void *, size_t, AstLutMapVtab *, const char *, AstChannel *, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitLutMapGlobals_( AstLutMapGlobals * );
+#endif
+
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
-   int astGetLutInterp_( AstLutMap * );
-   int astTestLutInterp_( AstLutMap * );
-   void astClearLutInterp_( AstLutMap * );
-   void astSetLutInterp_( AstLutMap *, int );
+   int astGetLutInterp_( AstLutMap *, int * );
+   int astTestLutInterp_( AstLutMap *, int * );
+   void astClearLutInterp_( AstLutMap *, int * );
+   void astSetLutInterp_( AstLutMap *, int, int * );
 #endif
 
 /* Function interfaces. */
@@ -245,13 +264,13 @@ AstLutMap *astLoadLutMap_( void *, size_t, AstLutMapVtab *, const char *, AstCha
 /* Initialiser. */
 #define \
 astInitLutMap(mem,size,init,vtab,name,nlut,lut,start,inc) \
-astINVOKE(O,astInitLutMap_(mem,size,init,vtab,name,nlut,lut,start,inc))
+astINVOKE(O,astInitLutMap_(mem,size,init,vtab,name,nlut,lut,start,inc,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitLutMapVtab(vtab,name) astINVOKE(V,astInitLutMapVtab_(vtab,name))
+#define astInitLutMapVtab(vtab,name) astINVOKE(V,astInitLutMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadLutMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadLutMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadLutMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -261,13 +280,17 @@ astINVOKE(O,astLoadLutMap_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 #if defined(astCLASS)            /* Protected */
 #define astClearLutInterp(this) \
-        astINVOKE(V,astClearLutInterp_(astCheckLutMap(this)))
+        astINVOKE(V,astClearLutInterp_(astCheckLutMap(this),STATUS_PTR))
 #define astGetLutInterp(this) \
-        astINVOKE(V,astGetLutInterp_(astCheckLutMap(this)))
+        astINVOKE(V,astGetLutInterp_(astCheckLutMap(this),STATUS_PTR))
 #define astSetLutInterp(this,value) \
-        astINVOKE(V,astSetLutInterp_(astCheckLutMap(this),value))
+        astINVOKE(V,astSetLutInterp_(astCheckLutMap(this),value,STATUS_PTR))
 #define astTestLutInterp(this) \
-        astINVOKE(V,astTestLutInterp_(astCheckLutMap(this)))
+        astINVOKE(V,astTestLutInterp_(astCheckLutMap(this),STATUS_PTR))
 #endif
 
 #endif
+
+
+
+

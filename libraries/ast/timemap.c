@@ -164,6 +164,8 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 /* ---------------------- */
 #include "pal.h"              /* SLALIB interface */
 #include "slamap.h"              /* Spatial sla mappings */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
 #include "object.h"              /* Base Object class */
@@ -186,15 +188,43 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstTimeMapVtab class_vtab; /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject * );
-static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
-static double (* parent_rate)( AstMapping *, double *, int, int );
+static int (* parent_getobjsize)( AstObject *, int * );
+static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static double (* parent_rate)( AstMapping *, double *, int, int, int * );
+
+
+
+#ifdef THREAD_SAFE
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; 
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(TimeMap)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(TimeMap,Class_Init)
+#define class_vtab astGLOBAL(TimeMap,Class_Vtab)
+
+
+#include <pthread.h>
+
+
+#else
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstTimeMapVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -205,26 +235,26 @@ AstTimeMap *astTimeMapId_( int, const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static const char *CvtString( int, const char **, int *, int *, const char *[ MAX_ARGS ] );
-static double Gmsta( double, double, int );
-static double Rate( AstMapping *, double *, int, int );
-static double Rcc( double, double, double, double, double );
-static int Equal( AstObject *, AstObject * );
-static int CvtCode( const char * );
-static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
-static void AddArgs( int, double * );
-static void AddTimeCvt( AstTimeMap *, int, const double * );
-static void Copy( const AstObject *, AstObject * );
-static void Delete( AstObject * );
-static void Dump( AstObject *, AstChannel * );
-static void TimeAdd( AstTimeMap *, const char *, const double[] );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static const char *CvtString( int, const char **, int *, int *, const char *[ MAX_ARGS ], int * );
+static double Gmsta( double, double, int, int * );
+static double Rate( AstMapping *, double *, int, int, int * );
+static double Rcc( double, double, double, double, double, int * );
+static int Equal( AstObject *, AstObject *, int * );
+static int CvtCode( const char *, int * );
+static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
+static void AddArgs( int, double *, int * );
+static void AddTimeCvt( AstTimeMap *, int, const double *, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Delete( AstObject *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void TimeAdd( AstTimeMap *, const char *, const double[], int * );
 
-static int GetObjSize( AstObject * );
+static int GetObjSize( AstObject *, int * );
 /* Member functions. */
 /* ================= */
 
-static int Equal( AstObject *this_object, AstObject *that_object ) {
+static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
 *  Name:
 *     Equal
@@ -237,7 +267,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 *  Synopsis:
 *     #include "timemap.h"
-*     int Equal( AstObject *this, AstObject *that ) 
+*     int Equal( AstObject *this, AstObject *that, int *status ) 
 
 *  Class Membership:
 *     TimeMap member function (over-rides the astEqual protected
@@ -252,6 +282,8 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *        Pointer to the first Object (a TimeMap).
 *     that
 *        Pointer to the second Object.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if the TimeMaps are equivalent, zero otherwise.
@@ -304,7 +336,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
                   if( this->cvttype[ i ] != that->cvttype[ i ] ) {
                      result = 0;
                   } else {
-                     CvtString( this->cvttype[ i ], &comment, &nargs, &szargs, argdesc );
+                     CvtString( this->cvttype[ i ], &comment, &nargs, &szargs, argdesc, status );
                      for( j = 0; j < nargs; j++ ) {
                         if( !astEQUAL( this->cvtargs[ i ][ j ],
                                        that->cvtargs[ i ][ j ] ) ){
@@ -334,7 +366,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
    return result;
 }
 
-static int GetObjSize( AstObject *this_object ) {
+static int GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -347,7 +379,7 @@ static int GetObjSize( AstObject *this_object ) {
 
 *  Synopsis:
 *     #include "timemap.h"
-*     int GetObjSize( AstObject *this ) 
+*     int GetObjSize( AstObject *this, int *status ) 
 
 *  Class Membership:
 *     TimeMap member function (over-rides the astGetObjSize protected
@@ -360,6 +392,8 @@ static int GetObjSize( AstObject *this_object ) {
 *  Parameters:
 *     this
 *        Pointer to the TimeMap.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Object size, in bytes.
@@ -386,7 +420,7 @@ static int GetObjSize( AstObject *this_object ) {
 /* Invoke the GetObjSize method inherited from the parent class, and then
    add on any components of the class structure defined by thsi class
    which are stored in dynamically allocated memory. */
-   result = (*parent_getobjsize)( this_object );
+   result = (*parent_getobjsize)( this_object, status );
 
    for ( cvt = 0; cvt < this->ncvt; cvt++ ) {
       result += astTSizeOf( this->cvtargs[ cvt ] );
@@ -403,7 +437,7 @@ static int GetObjSize( AstObject *this_object ) {
 }
 
 
-static void AddArgs( int cvttype, double *cvtargs ) {
+static void AddArgs( int cvttype, double *cvtargs, int *status ) {
 /*
 *  Name:
 *     AddArgs
@@ -416,7 +450,7 @@ static void AddArgs( int cvttype, double *cvtargs ) {
 
 *  Synopsis:
 *     #include "timemap.h"
-*     void AddArgs( int cvttype, double *cvtargs )
+*     void AddArgs( int cvttype, double *cvtargs, int *status )
 
 *  Class Membership:
 *     TimeMap member function.
@@ -430,6 +464,8 @@ static void AddArgs( int cvttype, double *cvtargs ) {
 *        The conversion type.
 *     cvtargs
 *        The arguments for the conversion.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -509,7 +545,7 @@ static void AddArgs( int cvttype, double *cvtargs ) {
    }         
 }
 
-static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args ) {
+static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args, int *status ) {
 /*
 *  Name:
 *     AddTimeCvt
@@ -660,13 +696,13 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args ) {
    required user-supplied arguments, and the size of the array in which
    to put the user-supplied arguments (the array may leave room after
    the user-supplied arguments for various useful pre-calculated values). */
-   cvt_string = CvtString( cvttype, &comment, &nargs, &szargs, argdesc );
+   cvt_string = CvtString( cvttype, &comment, &nargs, &szargs, argdesc, status );
 
 /* If the coordinate conversion type was not valid, then report an
    error. */
    if ( astOK && !cvt_string ) {
       astError( AST__TIMIN,
-                "Invalid time coordinate conversion type (%d).",
+                "Invalid time coordinate conversion type (%d).", status,
                 astGetClass( this ), (int) cvttype );
    }
 
@@ -697,12 +733,12 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args ) {
          this->ncvt++;
 
 /* Test for each valid code value in turn and assign the appropriate extra values. */
-         AddArgs( cvttype, this->cvtargs[ ncvt ] );
+         AddArgs( cvttype, this->cvtargs[ ncvt ], status );
       }
    }
 }
 
-static int CvtCode( const char *cvt_string ) {
+static int CvtCode( const char *cvt_string, int *status ) {
 /*
 *  Name:
 *     CvtCode
@@ -715,7 +751,7 @@ static int CvtCode( const char *cvt_string ) {
 
 *  Synopsis:
 *     #include "timemap.h"
-*     int CvtCode( const char *cvt_string )
+*     int CvtCode( const char *cvt_string, int *status )
 
 *  Class Membership:
 *     TimeMap member function.
@@ -730,6 +766,8 @@ static int CvtCode( const char *cvt_string ) {
 *        Pointer to a constant null-terminated string representing a
 *        time coordinate conversion. This is case sensitive and should
 *        contain no unnecessary white space.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The equivalent conversion code. If the string was not
@@ -843,7 +881,7 @@ static int CvtCode( const char *cvt_string ) {
 
 static const char *CvtString( int cvt_code, const char **comment,
                               int *nargs, int *szargs,
-                              const char *arg[ MAX_ARGS ] ) {
+                              const char *arg[ MAX_ARGS ], int *status ) {
 /*
 *  Name:
 *     CvtString
@@ -857,7 +895,7 @@ static const char *CvtString( int cvt_code, const char **comment,
 *  Synopsis:
 *     #include "timemap.h"
 *     const char *CvtString( int cvt_code, const char **comment, int *nargs, 
-*                            int *szargs, const char *arg[ MAX_ARGS ] )
+*                            int *szargs, const char *arg[ MAX_ARGS ], int *status )
 
 *  Class Membership:
 *     TimeMap member function.
@@ -891,6 +929,8 @@ static const char *CvtString( int cvt_code, const char **comment,
 *        null-terminated string for each argument (above) containing a
 *        description of what each argument represents. This includes both
 *        user-supplied arguments and pre-calculated values.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to a constant null-terminated string representation of
@@ -1177,7 +1217,7 @@ static const char *CvtString( int cvt_code, const char **comment,
    return result;
 }
 
-double astDat_( double in, int forward ){
+double astDat_( double in, int forward, int *status ){
 /*
 *+
 *  Name:
@@ -1574,7 +1614,7 @@ double astDat_( double in, int forward ){
    return result;
 }
 
-static double Gmsta( double in, double off, int forward ){
+static double Gmsta( double in, double off, int forward, int *status ){
 /*
 *  Name:
 *     Gmsta
@@ -1587,7 +1627,7 @@ static double Gmsta( double in, double off, int forward ){
 
 *  Synopsis:
 *     #include "timemap.h"
-*     double Gmsta( double in, double off, int forward ){
+*     double Gmsta( double in, double off, int forward, int *status ){
 
 *  Class Membership:
 *     TimeMap member function 
@@ -1609,6 +1649,8 @@ static double Gmsta( double in, double off, int forward ){
 *        If non-zero, "in" should be a UT1 value, and the returned value
 *        is GMST. If zero, "in" should be a GMST value, and the returned 
 *        value is UT1.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     An offset in days from the MJD given by "off". When the returned
@@ -1676,7 +1718,7 @@ static double Gmsta( double in, double off, int forward ){
    return result;
 }
 
-void astInitTimeMapVtab_(  AstTimeMapVtab *vtab, const char *name ) {
+void astInitTimeMapVtab_(  AstTimeMapVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -1713,11 +1755,15 @@ void astInitTimeMapVtab_(  AstTimeMapVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -1726,8 +1772,8 @@ void astInitTimeMapVtab_(  AstTimeMapVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsATimeMap) to determine if an object belongs to
    this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -1759,10 +1805,15 @@ void astInitTimeMapVtab_(  AstTimeMapVtab *vtab, const char *name ) {
    astSetDelete( vtab, Delete );
    astSetDump( vtab, Dump, "TimeMap",
                "Conversion between time coordinate systems" );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
 static int MapMerge( AstMapping *this, int where, int series, int *nmap,
-                     AstMapping ***map_list, int **invert_list ) {
+                     AstMapping ***map_list, int **invert_list, int *status ) {
 /*
 *  Name:
 *     MapMerge
@@ -1776,7 +1827,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *  Synopsis:
 *     #include "mapping.h
 *     int MapMerge( AstMapping *this, int where, int series, int *nmap,
-*                   AstMapping ***map_list, int **invert_list )
+*                   AstMapping ***map_list, int **invert_list, int *status )
 
 *  Class Membership:
 *     TimeMap method (over-rides the protected astMapMerge method
@@ -1879,6 +1930,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *        length, the "*invert_list" array will be extended (and its
 *        pointer updated) if necessary to accommodate any new
 *        elements.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     If simplification was possible, the function returns the index
@@ -1990,7 +2043,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    the associated number of arguments. Then store these arguments. */
             cvttype[ nstep ] = timemap->cvttype[ icvt ];
             (void) CvtString( cvttype[ nstep ], &comment, 
-                              &narg, szarg + nstep, argdesc );
+                              &narg, szarg + nstep, argdesc, status );
             if ( !astOK ) break;
             for ( iarg = 0; iarg < szarg[ nstep ]; iarg++ ) {
                cvtargs[ nstep ][ iarg ] = timemap->cvtargs[ icvt ][ iarg ];
@@ -2008,10 +2061,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 #define SWAP_CODES( code1, code2 ) \
             if ( cvttype[ nstep ] == code1 ) { \
                cvttype[ nstep ] = code2; \
-               AddArgs(  code2, cvtargs[ nstep ] ); \
+               AddArgs(  code2, cvtargs[ nstep ], status ); \
             } else if ( cvttype[ nstep ] == code2 ) { \
                cvttype[ nstep ] = code1; \
-               AddArgs(  code1, cvtargs[ nstep ] ); \
+               AddArgs(  code1, cvtargs[ nstep ], status ); \
             }
 
 /* Macro to exchange a transformation type code for its inverse (and
@@ -2022,13 +2075,13 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                tmp = cvtargs[ nstep ][ 0 ]; \
                cvtargs[ nstep ][ 0 ] = cvtargs[ nstep ][ 1 ]; \
                cvtargs[ nstep ][ 1 ] = tmp; \
-               AddArgs(  cvttype[ nstep ], cvtargs[ nstep ] ); \
+               AddArgs(  cvttype[ nstep ], cvtargs[ nstep ], status ); \
             } else if ( cvttype[ nstep ] == code2 ) { \
                cvttype[ nstep ] = code1; \
                tmp = cvtargs[ nstep ][ 0 ]; \
                cvtargs[ nstep ][ 0 ] = cvtargs[ nstep ][ 1 ]; \
                cvtargs[ nstep ][ 1 ] = tmp; \
-               AddArgs(  cvttype[ nstep ], cvtargs[ nstep ] ); \
+               AddArgs(  cvttype[ nstep ], cvtargs[ nstep ], status ); \
             }
 
 /* Use these macros to apply the changes where needed. */
@@ -2201,15 +2254,15 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* If the replacement Mapping is a UnitMap, then create it. */
             if ( unit ) {
                new = (AstMapping *)
-                        astUnitMap( astGetNin( ( *map_list )[ where ] ), "" );
+                        astUnitMap( astGetNin( ( *map_list )[ where ] ), "", status );
 
 /* Otherwise, create a replacement TimeMap and add each of the
    remaining transformation steps to it. */
             } else {
-               new = (AstMapping *) astTimeMap( 0, "" );
+               new = (AstMapping *) astTimeMap( 0, "", status );
                for ( istep = 0; istep < nstep; istep++ ) {
                   AddTimeCvt( (AstTimeMap *) new, cvttype[ istep ],
-                             cvtargs[ istep ] );
+                             cvtargs[ istep ], status );
                }
             }
 
@@ -2260,7 +2313,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
+static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status ){
 /*
 *  Name:
 *     Rate
@@ -2273,7 +2326,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
 
 *  Synopsis:
 *     #include "timemap.h"
-*     result = Rate( AstMapping *this, double *at, int ax1, int ax2 )
+*     result = Rate( AstMapping *this, double *at, int ax1, int ax2, int *status )
 
 *  Class Membership:
 *     TimeMap member function (overrides the astRate method inherited
@@ -2299,6 +2352,8 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
 *        The index of the Mapping input which is to be varied in order to
 *        find the rate of change (input numbering starts at 0 for the first 
 *        input).
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The rate of change of Mapping output "ax1" with respect to input 
@@ -2363,13 +2418,13 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
 
 /* If this is non-linear TimeMap, use the astRate method inherited from the 
    parent Mapping class. */
-   if( result == AST__BAD ) result = (*parent_rate)( this, at, ax1, ax2 );
+   if( result == AST__BAD ) result = (*parent_rate)( this, at, ax1, ax2, status );
 
 /* Return the result. */
    return result;
 }
 
-static double Rcc( double tdb, double ut1, double wl, double u, double v ){
+static double Rcc( double tdb, double ut1, double wl, double u, double v, int *status ){
 /*
 *  Name:
 *     Rcc
@@ -2382,7 +2437,7 @@ static double Rcc( double tdb, double ut1, double wl, double u, double v ){
 
 *  Synopsis:
 *     #include "timemap.h"
-*     double Rcc( double tdb, double ut1, double wl, double u, double v )
+*     double Rcc( double tdb, double ut1, double wl, double u, double v, int *status )
 
 *  Class Membership:
 *     TimeMap member function 
@@ -2406,6 +2461,8 @@ static double Rcc( double tdb, double ut1, double wl, double u, double v ){
 *        Clock distance from Earth spin axis (km)
 *     v
 *        Clock distance north of Earth equatorial plane (km)
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The clock correction, TDB-TT, in seconds. TDB is coordinate time in the 
@@ -3397,7 +3454,7 @@ static double Rcc( double tdb, double ut1, double wl, double u, double v ){
 
 }
 
-static void TimeAdd( AstTimeMap *this, const char *cvt, const double args[] ) {
+static void TimeAdd( AstTimeMap *this, const char *cvt, const double args[], int *status ) {
 /*
 *++
 *  Name:
@@ -3560,21 +3617,21 @@ f     AST_TRANSFORM
 
 /* Validate the type string supplied and obtain the equivalent
    conversion type code. */
-   cvttype = CvtCode( cvt );
+   cvttype = CvtCode( cvt, status );
 
 /* If the string was not recognised, then report an error. */
    if ( astOK && ( cvttype == AST__TIME_NULL ) ) {
       astError( AST__TIMIN,
                 "%s(%s): Invalid TimeMap time coordinate "
-                "conversion type \"%s\".", "astAddTime", astGetClass( this ), cvt );
+                "conversion type \"%s\".", status, "astAddTime", astGetClass( this ), cvt );
    }
 
 /* Add the new conversion to the TimeMap. */
-   AddTimeCvt( this, cvttype, args );
+   AddTimeCvt( this, cvttype, args, status );
 }
 
 static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-                               int forward, AstPointSet *out ) {
+                               int forward, AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     Transform
@@ -3588,7 +3645,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *  Synopsis:
 *     #include "timemap.h"
 *     AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-*                             int forward, AstPointSet *out )
+*                             int forward, AstPointSet *out, int *status )
 
 *  Class Membership:
 *     TimeMap member function (over-rides the astTransform method inherited
@@ -3613,6 +3670,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *        Pointer to a PointSet which will hold the transformed (output)
 *        coordinate values. A NULL value may also be given, in which case a
 *        new PointSet will be created by this function.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the output (possibly new) PointSet.
@@ -3658,7 +3717,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    function inherited from the parent Mapping class. This function validates
    all arguments and generates an output PointSet if necessary, but does not
    actually transform any coordinate values. */
-   result = (*parent_transform)( this, in, forward, out );
+   result = (*parent_transform)( this, in, forward, out, status );
 
 /* We will now extend the parent astTransform method by performing the
    coordinate conversions needed to generate the output coordinate values. */
@@ -3918,7 +3977,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                         tai = tt - (TTOFF/SPD);
                         utc = tai + astDat( tai, 0 )/SPD;
                         time[ point ] += Rcc( tt, utc, args[ 1 ], args[ 3 ],
-                                              args[ 4 ] )/SPD;
+                                              args[ 4 ], status )/SPD;
                      }
                   }
                } else {
@@ -3928,7 +3987,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                         tai = tdb - (TTOFF/SPD);
                         utc = tai + astDat( tai, 0 )/SPD;
                         time[ point ] -= Rcc( tdb, utc, args[ 1 ], args[ 3 ],
-                                                args[ 4 ] )/SPD;
+                                                args[ 4 ], status )/SPD;
                      }
                   }
                }
@@ -3946,7 +4005,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                         tai = tdb - (TTOFF/SPD);
                         utc = tai + astDat( tai, 0 )/SPD;
                         time[ point ] -= Rcc( tdb, utc, args[ 1 ], args[ 3 ],
-                                                args[ 4 ] )/SPD;
+                                                args[ 4 ], status )/SPD;
                      }
                   }
                } else {
@@ -3956,7 +4015,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                         tai = tt - (TTOFF/SPD);
                         utc = tai + astDat( tai, 0 )/SPD;
                         time[ point ] += Rcc( tt, utc, args[ 1 ], args[ 3 ],
-                                              args[ 4 ] )/SPD;
+                                              args[ 4 ], status )/SPD;
                      }
                   }
                }
@@ -4048,13 +4107,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                if ( forward ) {
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] = Gmsta( time[ point ], args[ 0 ], 1 );
+                        time[ point ] = Gmsta( time[ point ], args[ 0 ], 1, status );
                      }
                   }
                } else {
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] = Gmsta( time[ point ], args[ 0 ], 0 );
+                        time[ point ] = Gmsta( time[ point ], args[ 0 ], 0, status );
                      }
                   }
                }
@@ -4066,13 +4125,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                if ( forward ) {
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] = Gmsta( time[ point ], args[ 0 ], 0 );
+                        time[ point ] = Gmsta( time[ point ], args[ 0 ], 0, status );
                      }
                   }
                } else {
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
-                        time[ point ] = Gmsta( time[ point ], args[ 0 ], 1 );
+                        time[ point ] = Gmsta( time[ point ], args[ 0 ], 1, status );
                      }
                   }
                }
@@ -4205,7 +4264,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
                         gmstx = time[ point ] + args[ 1 ]/D2PI;
-                        tdb = Gmsta( gmstx, args[ 0 ], 0 ) 
+                        tdb = Gmsta( gmstx, args[ 0 ], 0, status ) 
                               + args[ 0 ] + (32 + TTOFF)/SPD;
                         time[ point ] += palSlaEqeqx( tdb )/D2PI;
                      }
@@ -4214,7 +4273,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
                         gmstx = time[ point ] + args[ 1 ]/D2PI;
-                        tdb = Gmsta( gmstx, args[ 0 ], 0 ) 
+                        tdb = Gmsta( gmstx, args[ 0 ], 0, status ) 
                               + args[ 0 ] + (32+TTOFF)/SPD;
                         time[ point ] -= palSlaEqeqx( tdb )/D2PI;
                      }
@@ -4229,7 +4288,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
                         gmstx = time[ point ] + args[ 1 ]/D2PI;
-                        tdb = Gmsta( gmstx, args[ 0 ], 0 ) 
+                        tdb = Gmsta( gmstx, args[ 0 ], 0, status ) 
                               + args[ 0 ] + (32+TTOFF)/SPD;
                         time[ point ] -= palSlaEqeqx( tdb )/D2PI;
                      }
@@ -4238,7 +4297,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
                         gmstx = time[ point ] + args[ 1 ]/D2PI;
-                        tdb = Gmsta( gmstx, args[ 0 ], 0 ) 
+                        tdb = Gmsta( gmstx, args[ 0 ], 0, status ) 
                               + args[ 0 ] + (32 + TTOFF)/SPD;
                         time[ point ] += palSlaEqeqx( tdb )/D2PI;
                      }
@@ -4263,7 +4322,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -4275,7 +4334,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for TimeMap objects.
@@ -4285,6 +4344,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the object to be copied.
 *     objout
 *        Pointer to the object being constructed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -4347,7 +4408,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -4359,7 +4420,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for TimeMap objects.
@@ -4367,6 +4428,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the object to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -4397,7 +4460,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -4410,7 +4473,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 *  Synopsis:
 *     #include "timemap.h"
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -4421,6 +4484,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the TimeMap whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Constants: */
@@ -4478,11 +4543,11 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    was not recognised, report an error and give up. */
       if ( astOK ) {
          sval = CvtString( this->cvttype[ icvt ], &comment, 
-                           &nargs, &szargs, argdesc );
+                           &nargs, &szargs, argdesc, status );
          if ( astOK && !sval ) {
             astError( AST__TIMIN,
                       "astWrite(%s): Corrupt %s contains invalid TimeMap "
-                      "time coordinate conversion code (%d).",
+                      "time coordinate conversion code (%d).", status,
                       astGetClass( channel ), astGetClass( this ),
                       (int) this->cvttype[ icvt ] );
             break;
@@ -4520,10 +4585,10 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsATimeMap and astCheckTimeMap functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(TimeMap,Mapping,check,&class_init)
+astMAKE_ISA(TimeMap,Mapping,check,&class_check)
 astMAKE_CHECK(TimeMap)
 
-AstTimeMap *astTimeMap_( int flags, const char *options, ... ) {
+AstTimeMap *astTimeMap_( int flags, const char *options, int *status, ...) {
 /*
 *++
 *  Name:
@@ -4617,8 +4682,12 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstTimeMap *new;              /* Pointer to the new TimeMap */
    va_list args;                 /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -4634,7 +4703,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Obtain the variable argument list and pass it along with the options string
    to the astVSet method to initialise the new TimeMap's attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -4685,8 +4754,17 @@ AstTimeMap *astTimeMapId_( int flags, const char *options, ... ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstTimeMap *new;              /* Pointer to the new TimeMap */
    va_list args;                 /* Variable argument list */
+
+   int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -4716,7 +4794,7 @@ AstTimeMap *astTimeMapId_( int flags, const char *options, ... ) {
 
 AstTimeMap *astInitTimeMap_( void *mem, size_t size, int init,
                              AstTimeMapVtab *vtab, const char *name,
-                             int flags ) {
+                             int flags, int *status ) {
 /*
 *+
 *  Name:
@@ -4819,7 +4897,7 @@ AstTimeMap *astInitTimeMap_( void *mem, size_t size, int init,
 
 AstTimeMap *astLoadTimeMap_( void *mem, size_t size,
                            AstTimeMapVtab *vtab, const char *name,
-                           AstChannel *channel ) {
+                           AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -4894,12 +4972,16 @@ AstTimeMap *astLoadTimeMap_( void *mem, size_t size,
 */
 
 /* Local Constants: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
    AstTimeMap *new;              /* Pointer to the new TimeMap */
    char *sval;                   /* Pointer to string value */
-   char key[ KEY_LEN + 1 ];      /* Buffer for keyword string */
+   char key[ KEY_LEN + 1 ];      /* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
+
+/* Buffer for keyword string */
    const char *argdesc[ MAX_ARGS ]; /* Pointers to argument descriptions */
    const char *comment;          /* Pointer to comment string */
    int iarg;                     /* Loop counter for arguments */
@@ -4986,19 +5068,19 @@ AstTimeMap *astLoadTimeMap_( void *mem, size_t size,
                if ( !sval ) {
                   astError( AST__BADIN,
                             "astRead(%s): A time coordinate conversion "
-                            "type is missing from the input TimeMap data.",
+                            "type is missing from the input TimeMap data.", status,
                             astGetClass( channel ) );
 
 /* Otherwise, convert the string representation into the required
    conversion type code. */
                } else {
-                  new->cvttype[ icvt ] = CvtCode( sval );
+                  new->cvttype[ icvt ] = CvtCode( sval, status );
 
 /* If the string was not recognised, report an error. */
                   if ( new->cvttype[ icvt ] == AST__TIME_NULL ) {
                      astError( AST__BADIN,
                               "astRead(%s): Invalid time conversion "
-                              "type \"%s\" in TimeMap data.",
+                              "type \"%s\" in TimeMap data.", status,
                               astGetClass( channel ), sval );
                   }
                }
@@ -5010,7 +5092,7 @@ AstTimeMap *astLoadTimeMap_( void *mem, size_t size,
 /* Obtain the number of arguments associated with the conversion and
    allocate memory to hold them. */
             (void) CvtString( new->cvttype[ icvt ], &comment, 
-                              &nargs, &szargs, argdesc );
+                              &nargs, &szargs, argdesc, status );
             new->cvtargs[ icvt ] = astMalloc( sizeof( double ) *
                                               (size_t) szargs );
 
@@ -5054,7 +5136,11 @@ AstTimeMap *astLoadTimeMap_( void *mem, size_t size,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
-void astTimeAdd_( AstTimeMap *this, const char *cvt, const double args[] ) {
+void astTimeAdd_( AstTimeMap *this, const char *cvt, const double args[], int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,TimeMap,TimeAdd))( this, cvt, args );
+   (**astMEMBER(this,TimeMap,TimeAdd))( this, cvt, args, status );
 }
+
+
+
+

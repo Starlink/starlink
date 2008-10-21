@@ -165,6 +165,24 @@ typedef struct AstSwitchMapVtab {
 /* Properties (e.g. methods) specific to this class. */
 /* None. */
 } AstSwitchMapVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstSwitchMapGlobals {
+   AstSwitchMapVtab Class_Vtab;
+   int Class_Init;
+} AstSwitchMapGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitSwitchMapGlobals_( AstSwitchMapGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -176,7 +194,7 @@ astPROTO_ISA(SwitchMap)             /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstSwitchMap *astSwitchMap_( void *, void *, int, void **, const char *, ... );
+AstSwitchMap *astSwitchMap_( void *, void *, int, void **, const char *, int *, ...);
 #else
 AstSwitchMap *astSwitchMapId_( void *, void *, int, void **, const char *, ... );
 #endif
@@ -186,21 +204,21 @@ AstSwitchMap *astSwitchMapId_( void *, void *, int, void **, const char *, ... )
 /* Initialiser. */
 AstSwitchMap *astInitSwitchMap_( void *, size_t, int, AstSwitchMapVtab *,
                                  const char *, AstMapping *, AstMapping *,
-                                 int, AstMapping ** );
+                                 int, AstMapping **, int * );
 
 /* Vtab initialiser. */
-void astInitSwitchMapVtab_( AstSwitchMapVtab *, const char * );
+void astInitSwitchMapVtab_( AstSwitchMapVtab *, const char *, int * );
 
 /* Loader. */
 AstSwitchMap *astLoadSwitchMap_( void *, size_t, AstSwitchMapVtab *,
-                                 const char *, AstChannel * );
+                                 const char *, AstChannel *, int * );
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
 #if defined(astCLASS)            /* Protected */
 
-int astSwitchList_( AstSwitchMap *, int, int *, AstMapping ***, int ** );
+int astSwitchList_( AstSwitchMap *, int, int *, AstMapping ***, int **, int * );
 
 #endif
 
@@ -236,13 +254,13 @@ int astSwitchList_( AstSwitchMap *, int, int *, AstMapping ***, int ** );
 /* Initialiser. */
 #define astInitSwitchMap(mem,size,init,vtab,name,fsmap,ismap,nroute,routemaps) \
 astINVOKE(O,astInitSwitchMap_(mem,size,init,vtab,name,astCheckMapping(fsmap),\
-          astCheckMapping(ismap),nroute,routemaps))
+          astCheckMapping(ismap),nroute,routemaps,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitSwitchMapVtab(vtab,name) astINVOKE(V,astInitSwitchMapVtab_(vtab,name))
+#define astInitSwitchMapVtab(vtab,name) astINVOKE(V,astInitSwitchMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadSwitchMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadSwitchMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadSwitchMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 
 #define astSwitchList astSwitchList_
 
@@ -255,3 +273,7 @@ astINVOKE(O,astLoadSwitchMap_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 /* None. */
 #endif
+
+
+
+

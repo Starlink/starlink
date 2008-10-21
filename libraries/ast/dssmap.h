@@ -290,9 +290,27 @@ typedef struct AstDssMapVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   AstFitsChan *(* DssFits)( AstDssMap * );
+   AstFitsChan *(* DssFits)( AstDssMap *, int * );
 
 } AstDssMapVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstDssMapGlobals {
+   AstDssMapVtab Class_Vtab;
+   int Class_Init;
+} AstDssMapGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitDssMapGlobals_( AstDssMapGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -304,27 +322,27 @@ astPROTO_ISA(DssMap)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstDssMap *astDssMap_( void *, const char *, ... );
+AstDssMap *astDssMap_( void *, const char *, int *, ...);
 #endif
 
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
 AstDssMap *astInitDssMap_( void *, size_t, int, AstDssMapVtab *,
-                             const char *, AstFitsChan * );
+                             const char *, AstFitsChan *, int * );
 
 /* Vtab initialiser. */
-void astInitDssMapVtab_( AstDssMapVtab *, const char * );
+void astInitDssMapVtab_( AstDssMapVtab *, const char *, int * );
 
 /* Loader. */
 AstDssMap *astLoadDssMap_( void *, size_t, AstDssMapVtab *,
-                             const char *, AstChannel * );
+                             const char *, AstChannel *, int * );
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
-AstFitsChan *astDssFits_( AstDssMap * );
+AstFitsChan *astDssFits_( AstDssMap *, int * );
 
 #endif
 
@@ -356,13 +374,13 @@ AstFitsChan *astDssFits_( AstDssMap * );
 
 /* Initialiser. */
 #define astInitDssMap(mem,size,init,vtab,name,fits) \
-astINVOKE(O,astInitDssMap_(mem,size,init,vtab,name,astCheckFitsChan(fits)))
+astINVOKE(O,astInitDssMap_(mem,size,init,vtab,name,astCheckFitsChan(fits),STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitDssMapVtab(vtab,name) astINVOKE(V,astInitDssMapVtab_(vtab,name))
+#define astInitDssMapVtab(vtab,name) astINVOKE(V,astInitDssMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadDssMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadDssMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadDssMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -372,6 +390,10 @@ astINVOKE(O,astLoadDssMap_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 
 #if defined(astCLASS)            /* Protected */
-#define astDssFits(this) astINVOKE(O,astDssFits_(astCheckDssMap(this)))
+#define astDssFits(this) astINVOKE(O,astDssFits_(astCheckDssMap(this),STATUS_PTR))
 #endif
 #endif
+
+
+
+

@@ -138,6 +138,7 @@
 \
 /* Store the STATUS value in a local int. */ \
    int ast_local_status = *STATUS; \
+   int *status = &ast_local_status; \
 \
 /* Make this int the AST error status variable, saving the address of \
    the previous variable. */ \
@@ -155,15 +156,11 @@
 
 /* Function prototypes. */
 /* ==================== */
-#if defined(astCLASS) || defined(astFORTRAN77)  /* Protected. */
 void astStringExport_( const char *, char *, int );
-#endif
 
 /* Function interfaces. */
 /* ==================== */
 /* These wrap up the functions defined by this module to make them
    easier to use. */
-#if defined(astCLASS) || defined(astFORTRAN77)  /* Protected. */
 #define astStringExport astStringExport_
-#endif
 #endif

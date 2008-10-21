@@ -50,7 +50,6 @@
 
 /* Macros */
 /* ====== */
-#define astCLASS                 /* Make protected functions available */
 #define MXDEV 16                 /* Max no of concurrent PGPLOT devices */
 #define MXSTRLEN 80              /* Max PGPLOT string length */
 #define CAMERA_OK 123456789      /* Flags that a Camera has been initialised */

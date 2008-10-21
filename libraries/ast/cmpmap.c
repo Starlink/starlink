@@ -143,6 +143,8 @@ f     The CmpMap class does not define any new routines beyond those
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
 #include "object.h"              /* Base Object class */
@@ -153,6 +155,7 @@ f     The CmpMap class does not define any new routines beyond those
 #include "unitmap.h"             /* Unit transformations */
 #include "cmpmap.h"              /* Interface definition for this class */
 #include "frameset.h"            /* Interface definition for FrameSets */
+#include "globals.h"             /* Thread-safe global data access */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -167,16 +170,55 @@ f     The CmpMap class does not define any new routines beyond those
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstCmpMapVtab class_vtab; /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject * );
-static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
-static int (* parent_maplist)( AstMapping *, int, int, int *, AstMapping ***, int ** );
-static int *(* parent_mapsplit)( AstMapping *, int, int *, AstMapping ** );
+static int (* parent_getobjsize)( AstObject *, int * );
+static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static int (* parent_maplist)( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
+static int *(* parent_mapsplit)( AstMapping *, int, int *, AstMapping **, int * );
+
+#if defined(THREAD_SAFE)
+static int (* parent_managelock)( AstObject *, int, int, int * );
+#endif
+
+
+/* Define macros for accessing each item of thread specific global data. */
+#ifdef THREAD_SAFE
+
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; \
+   globals->Simplify_Depth = 0; \
+   globals->Simplify_Stackmaps = NULL;
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(CmpMap)
+
+#define class_init astGLOBAL(CmpMap,Class_Init)
+#define class_vtab astGLOBAL(CmpMap,Class_Vtab)
+#define simplify_depth astGLOBAL(CmpMap,Simplify_Depth)
+#define simplify_stackmaps astGLOBAL(CmpMap,Simplify_Stackmaps)
+
+
+
+/* If thread safety is not needed, declare and initialise globals at static 
+   variables. */ 
+#else
+
+static int simplify_depth  = 0;
+static AstMapping **simplify_stackmaps = NULL;
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstCmpMapVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -187,27 +229,31 @@ AstCmpMap *astCmpMapId_( void *, void *, int, const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static AstMapping *CombineMaps( AstMapping *, int, AstMapping *, int, int );
-static AstMapping *Simplify( AstMapping * );
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static double Rate( AstMapping *, double *, int, int );
-static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
-static int *MapSplit1( AstMapping *, int, int *, AstMapping ** );
-static int CountMappings( AstMapping * );
-static int Equal( AstObject *, AstObject * );
-static int GetIsLinear( AstMapping * );
-static int MapList( AstMapping *, int, int, int *, AstMapping ***, int ** );
-static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
-static int PatternCheck( int, int, int **, int * );
-static void Copy( const AstObject *, AstObject * );
-static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
-static void Delete( AstObject * );
-static void Dump( AstObject *, AstChannel * );
+static AstMapping *CombineMaps( AstMapping *, int, AstMapping *, int, int, int * );
+static AstMapping *Simplify( AstMapping *, int * );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static double Rate( AstMapping *, double *, int, int, int * );
+static int *MapSplit( AstMapping *, int, int *, AstMapping **, int * );
+static int *MapSplit1( AstMapping *, int, int *, AstMapping **, int * );
+static int Equal( AstObject *, AstObject *, int * );
+static int GetIsLinear( AstMapping *, int * );
+static int MapList( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
+static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
+static int PatternCheck( int, int, int **, int *, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int *, int * );
+static void Delete( AstObject *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static int GetObjSize( AstObject *, int * );
 
-static int GetObjSize( AstObject * );
+#if defined(THREAD_SAFE)
+static int ManageLock( AstObject *, int, int, int * );
+#endif
+
+
 /* Member functions. */
 /* ================= */
-static int Equal( AstObject *this_object, AstObject *that_object ) {
+static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
 *  Name:
 *     Equal
@@ -220,7 +266,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 *  Synopsis:
 *     #include "cmpmap.h"
-*     int Equal( AstObject *this, AstObject *that ) 
+*     int Equal( AstObject *this, AstObject *that, int *status ) 
 
 *  Class Membership:
 *     CmpMap member function (over-rides the astEqual protected
@@ -235,6 +281,8 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *        Pointer to the first Object (a CmpMap).
 *     that
 *        Pointer to the second Object.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if the CmpMaps are equivalent, zero otherwise.
@@ -341,7 +389,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
    return result;
 }
 
-static int GetIsLinear( AstMapping *this_mapping ){
+static int GetIsLinear( AstMapping *this_mapping, int *status ){
 /*
 *  Name:
 *     GetIsLinear
@@ -354,7 +402,7 @@ static int GetIsLinear( AstMapping *this_mapping ){
 
 *  Synopsis:
 *     #include "mapping.h"
-*     void GetIsLinear( AstMapping *this )
+*     void GetIsLinear( AstMapping *this, int *status )
 
 *  Class Membership:
 *     CmpMap member function (over-rides the protected astGetIsLinear
@@ -368,13 +416,15 @@ static int GetIsLinear( AstMapping *this_mapping ){
 *  Parameters:
 *     this
 *        Pointer to the CmpqMap.
+*     status
+*        Pointer to the inherited status variable.
 */
    AstCmpMap *this;
    this = (AstCmpMap *) this_mapping;
    return astGetIsLinear( this->map1 ) && astGetIsLinear( this->map2 );
 }
 
-static int GetObjSize( AstObject *this_object ) {
+static int GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -387,7 +437,7 @@ static int GetObjSize( AstObject *this_object ) {
 
 *  Synopsis:
 *     #include "cmpmap.h"
-*     int GetObjSize( AstObject *this ) 
+*     int GetObjSize( AstObject *this, int *status ) 
 
 *  Class Membership:
 *     CmpMap member function (over-rides the astGetObjSize protected
@@ -400,6 +450,8 @@ static int GetObjSize( AstObject *this_object ) {
 *  Parameters:
 *     this
 *        Pointer to the CmpMap.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Object size, in bytes.
@@ -425,7 +477,7 @@ static int GetObjSize( AstObject *this_object ) {
 /* Invoke the GetObjSize method inherited from the parent class, and then
    add on any components of the class structure defined by thsi class
    which are stored in dynamically allocated memory. */
-   result = (*parent_getobjsize)( this_object );
+   result = (*parent_getobjsize)( this_object, status );
 
    result += astGetObjSize( this->map1 );
    result += astGetObjSize( this->map2 );
@@ -439,7 +491,7 @@ static int GetObjSize( AstObject *this_object ) {
 
 static AstMapping *CombineMaps( AstMapping *mapping1, int invert1,
                                 AstMapping *mapping2, int invert2,
-                                int series ) {
+                                int series, int *status ) {
 /*
 *  Name:
 *     CombineMaps
@@ -454,7 +506,7 @@ static AstMapping *CombineMaps( AstMapping *mapping1, int invert1,
 *     #include "cmpmap.h"
 *     AstMapping *CombineMaps( AstMapping *mapping1, int invert1,
 *                              AstMapping *mapping2, int invert2,
-*                              int series )
+*                              int series, int *status )
 
 *  Class Membership:
 *     CmpMap member function.
@@ -478,6 +530,8 @@ static AstMapping *CombineMaps( AstMapping *mapping1, int invert1,
 *     series
 *        Whether the Mappings are to be combined in series (as opposed to
 *        in parallel).
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to the resulting compound Mapping (a CmpMap).
@@ -552,7 +606,7 @@ static AstMapping *CombineMaps( AstMapping *mapping1, int invert1,
    }
 
 /* Combine the two Mappings into a CmpMap. */
-   result = (AstMapping *) astCmpMap( map1, map2, series, "" );
+   result = (AstMapping *) astCmpMap( map1, map2, series, "", status );
    
 /* If the first Mapping's Invert value was changed, restore it to its
    original state. */
@@ -587,7 +641,7 @@ static AstMapping *CombineMaps( AstMapping *mapping1, int invert1,
 
 static void Decompose( AstMapping *this_mapping, AstMapping **map1, 
                        AstMapping **map2, int *series, int *invert1, 
-                       int *invert2 ) {
+                       int *invert2, int *status ) {
 /*
 *
 *  Name:
@@ -603,7 +657,7 @@ static void Decompose( AstMapping *this_mapping, AstMapping **map1,
 *     #include "mapping.h"
 *     void Decompose( AstMapping *this, AstMapping **map1, 
 *                     AstMapping **map2, int *series,
-*                     int *invert1, int *invert2 )
+*                     int *invert1, int *invert2, int *status )
 
 *  Class Membership:
 *     CmpMap member function (over-rides the protected astDecompose
@@ -637,6 +691,8 @@ static void Decompose( AstMapping *this_mapping, AstMapping **map1,
 *        The value of the Invert attribute to be used with map1. 
 *     invert2
 *        The value of the Invert attribute to be used with map2. 
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - Any changes made to the component Mappings using the returned
@@ -699,7 +755,7 @@ static void Decompose( AstMapping *this_mapping, AstMapping **map1,
    }
 }
 
-void astInitCmpMapVtab_(  AstCmpMapVtab *vtab, const char *name ) {
+void astInitCmpMapVtab_(  AstCmpMapVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -736,11 +792,15 @@ void astInitCmpMapVtab_(  AstCmpMapVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -749,8 +809,8 @@ void astInitCmpMapVtab_(  AstCmpMapVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsACmpMap) to determine if an object belongs to
    this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -765,6 +825,11 @@ void astInitCmpMapVtab_(  AstCmpMapVtab *vtab, const char *name ) {
    mapping = (AstMappingVtab *) vtab;
    parent_getobjsize = object->GetObjSize;
    object->GetObjSize = GetObjSize;
+
+#if defined(THREAD_SAFE)
+   parent_managelock = object->ManageLock;
+   object->ManageLock = ManageLock;
+#endif
 
    parent_maplist = mapping->MapList;
    mapping->MapList = MapList;
@@ -788,10 +853,100 @@ void astInitCmpMapVtab_(  AstCmpMapVtab *vtab, const char *name ) {
    astSetCopy( vtab, Copy );
    astSetDelete( vtab, Delete );
    astSetDump( vtab, Dump, "CmpMap", "Compound Mapping" );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
+#if defined(THREAD_SAFE)
+static int ManageLock( AstObject *this_object, int mode, int extra, int *status ) {
+/*
+*  Name:
+*     ManageLock
+
+*  Purpose:
+*     Manage the thread lock on an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "object.h"
+*     AstObject *ManageLock( AstObject *this, int mode, int extra, int *status ) 
+
+*  Class Membership:
+*     CmpMap member function (over-rides the astManageLock protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function manages the thread lock on the supplied Object. The
+*     lock can be locked, unlocked or checked by this function as 
+*     deteremined by parameter "mode". See astLock for details of the way
+*     these locks are used.
+
+*  Parameters:
+*     this
+*        Pointer to the Object.
+*     mode
+*        An integer flag indicating what the function should do:
+*
+*        AST__LOCK: Lock the Object for exclusive use by the calling
+*        thread. The "extra" value indicates what should be done if the
+*        Object is already locked (wait or report an error - see astLock).
+*
+*        AST__UNLOCK: Unlock the Object for use by other threads.
+*
+*        AST__CHECKLOCK: Check that the object is locked for use by the
+*        calling thread (report an error if not).
+*     extra
+*        Extra mode-specific information. 
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*    A local status value: 
+*        0 - Success
+*        1 - Could not lock or unlock the object because it was already 
+*            locked by another thread.
+*        2 - Failed to lock a POSIX mutex
+*        3 - Failed to unlock a POSIX mutex
+*        4 - Bad "mode" value supplied.
+
+*  Notes:
+*     - This function attempts to execute even if an error has already
+*     occurred.
+*/
+
+/* Local Variables: */
+   AstCmpMap *this;       /* Pointer to CmpMap structure */
+   int result;            /* Returned status value */
+
+/* Initialise */
+   result = 0;
+
+/* Check the supplied pointer is not NULL. */
+   if( !this_object ) return result;
+
+/* Obtain a pointers to the CmpMap structure. */
+   this = (AstCmpMap *) this_object;
+
+/* Invoke the astManageLock method on any Objects contained within
+   the supplied Object. */
+   if( !result ) result = astManageLock( this->map1, mode, extra );
+   if( !result ) result = astManageLock( this->map2, mode, extra );
+
+/* Invoke the ManageLock method inherited from the parent class, and
+   return the resulting status value. */
+   if( !result ) result = (*parent_managelock)( this_object, mode, extra, status );
+   return result;
+
+}
+#endif
+
 static int MapList( AstMapping *this_mapping, int series, int invert,
-                     int *nmap, AstMapping ***map_list, int **invert_list ) {
+                     int *nmap, AstMapping ***map_list, int **invert_list, int *status ) {
 /*
 *  Name:
 *     MapList
@@ -984,14 +1139,14 @@ static int MapList( AstMapping *this_mapping, int series, int invert,
    single entity. We can use the parent class method to do this. */
    } else {
       result = ( *parent_maplist )( this_mapping, series, invert, nmap,
-                                    map_list, invert_list );
+                                    map_list, invert_list, status );
    }
 
    return result;
 }
 
 static int MapMerge( AstMapping *this, int where, int series, int *nmap,
-                     AstMapping ***map_list, int **invert_list ) {
+                     AstMapping ***map_list, int **invert_list, int *status ) {
 /*
 *  Name:
 *     MapMerge
@@ -1364,11 +1519,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                   new1 = CombineMaps( invert1 ? cmpmap1->map2 : cmpmap1->map1,
                                       invert1 ? invert1b      : invert1a,
                                       invert2 ? cmpmap2->map2 : cmpmap2->map1,
-                                      invert2 ? invert2b      : invert2a, 0 );
+                                      invert2 ? invert2b      : invert2a, 0, status );
                   new2 = CombineMaps( invert1 ? cmpmap1->map1 : cmpmap1->map2,
                                       invert1 ? invert1a      : invert1b,
                                       invert2 ? cmpmap2->map1 : cmpmap2->map2,
-                                      invert2 ? invert2a      : invert2b, 0 );
+                                      invert2 ? invert2a      : invert2b, 0, status );
 
 /* Having converted the parallel combination of series CmpMaps into a
    pair of equivalent parallel CmpMaps that can be combined in series,
@@ -1387,7 +1542,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* If either CmpMap was simplified, then combine the resulting
    Mappings in series to give the replacement CmpMap. */
                   if ( simpler ) new =
-                               (AstMapping *) astCmpMap( simp1, simp2, 1, "" );
+                               (AstMapping *) astCmpMap( simp1, simp2, 1, "", status );
 
 /* Annul the temporary Mapping pointers. */
                   new1 = astAnnul( new1 );
@@ -1447,9 +1602,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    which, when combined in parallel, are equivalent to the original
    ones. */
                      new1 = CombineMaps( cmpmap1->map1, invert1a,
-                                         cmpmap2->map1, invert2a, 1 );
+                                         cmpmap2->map1, invert2a, 1, status );
                      new2 = CombineMaps( cmpmap1->map2, invert1b,
-                                         cmpmap2->map2, invert2b, 1 );
+                                         cmpmap2->map2, invert2b, 1, status );
 
 /* Having converted the series combination of parallel CmpMaps into a
    pair of equivalent series CmpMaps that can be combined in parallel,
@@ -1465,7 +1620,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* If either CmpMap was simplified, then combine the resulting
    Mappings in parallel to give the replacement CmpMap. */
                      if ( simpler ) new =
-                               (AstMapping *) astCmpMap( simp1, simp2, 0, "" );
+                               (AstMapping *) astCmpMap( simp1, simp2, 0, "", status );
 
 /* Annul the temporary Mapping pointers. */
                      new1 = astAnnul( new1 );
@@ -1657,7 +1812,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                nunit = 0;
                npin_new = nout2a + nout2b;
             }
-            unit = nunit ? astUnitMap( nunit, "" ) : NULL;
+            unit = nunit ? astUnitMap( nunit, "", status ) : NULL;
 
 /* Determine the number of outputs for the final PermMap and allocate memory 
    for its permutation arrays. */
@@ -1686,7 +1841,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                      } else if( iconid >= 0 ) {
                         astError( AST__INTER, "astMapMerge(CmpMap): Swapped PermMap "
                                   "input is not constant (internal AST programming "
-                                  "error)." );
+                                  "error)." , status);
                         break;
 
                      } else {
@@ -1720,7 +1875,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                      } else if( iconid >= 0 ) {
                         astError( AST__INTER, "astMapMerge(CmpMap): Swapped PermMap "
                                   "input is not constant (internal AST programming "
-                                  "error)." );
+                                  "error)." , status);
                         break;
 
                      } else {
@@ -1738,25 +1893,25 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Create the new PermMap */
                new_pm = astPermMap( npin_new, inperm_new, npout_new,
-                                    outperm_new, const_new, "" );
+                                    outperm_new, const_new, "", status );
 
 /* Create the new CmpMap.*/
                if( aconstants ) {
                   if( unit ) {
-                     new_cm = astCmpMap( cmpmap2->map2, unit, 0, "" );
+                     new_cm = astCmpMap( cmpmap2->map2, unit, 0, "", status );
                   } else {
                      new_cm = astCopy( cmpmap2->map2 );
                   }
 
                } else if( bconstants ) {
                   if( unit ) {
-                     new_cm = astCmpMap( unit, cmpmap2->map1, 0, "" );
+                     new_cm = astCmpMap( unit, cmpmap2->map1, 0, "", status );
                   } else {
                      new_cm = astCopy( cmpmap2->map1 );
                   }
 
                } else{
-                  new_cm = astCmpMap( cmpmap2->map2, cmpmap2->map1, 0, "" );
+                  new_cm = astCmpMap( cmpmap2->map2, cmpmap2->map1, 0, "", status );
                }
 
             }
@@ -1819,7 +1974,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map ){
+static int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map, int *status ){
 /*
 *  Name:
 *     MapSplit
@@ -1901,7 +2056,7 @@ static int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map ){
    if ( !astOK ) return result;
 
 /* First see if the forward transformation can be split as requested. */
-   result = MapSplit1( this, nin, in, map );
+   result = MapSplit1( this, nin, in, map, status );
 
 /* If forward transformation could not be split, we attempt to split the
    inverse transformation by selecting every possible sub-set of Mapping
@@ -1946,7 +2101,7 @@ static int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map ){
 
 /* Attempt to split the inverted Mapping using the current subset of
    outputs. */
-                  result2 = MapSplit1( this2, mout, out, &map2 );
+                  result2 = MapSplit1( this2, mout, out, &map2, status );
 
 /* If succesful... */
                   if( result2 ) {
@@ -2016,7 +2171,7 @@ static int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map ){
    return result;
 }
 
-static int *MapSplit1( AstMapping *this_map, int nin, int *in, AstMapping **map ){
+static int *MapSplit1( AstMapping *this_map, int nin, int *in, AstMapping **map, int *status ){
 /*
 *  Name:
 *     MapSplit1
@@ -2030,7 +2185,7 @@ static int *MapSplit1( AstMapping *this_map, int nin, int *in, AstMapping **map 
 
 *  Synopsis:
 *     #include "cmpmap.h"
-*     int *MapSplit1( AstMapping *this, int nin, int *in, AstMapping **map )
+*     int *MapSplit1( AstMapping *this, int nin, int *in, AstMapping **map, int *status )
 
 *  Class Membership:
 *     CmpMap method 
@@ -2061,6 +2216,8 @@ static int *MapSplit1( AstMapping *this_map, int nin, int *in, AstMapping **map 
 *        outputs may be different to "nin"). A NULL pointer will be
 *        returned if the supplied CmpMap has no subset of outputs which 
 *        depend only on the selected inputs.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated array of ints. The number of
@@ -2171,7 +2328,7 @@ static int *MapSplit1( AstMapping *this_map, int nin, int *in, AstMapping **map 
             if( result ) {
 
 /* Form the required CmpMap. */
-               *map = (AstMapping *) astCmpMap( amap, bmap, 1, "" );
+               *map = (AstMapping *) astCmpMap( amap, bmap, 1, "", status );
 
 /* Free resources. */
                bmap = astAnnul( bmap );
@@ -2223,7 +2380,7 @@ static int *MapSplit1( AstMapping *this_map, int nin, int *in, AstMapping **map 
             }              
 
 /* Create a PermMap which reorders the inputs into ascending order. */
-            pmap = doperm ? astPermMap( nin, inp, nin, outp, NULL, "" ) : NULL;
+            pmap = doperm ? astPermMap( nin, inp, nin, outp, NULL, "", status ) : NULL;
 
 /* Store the sorted input indices in the inp work array, get a pointer
    to the first input relating to the second component Mapping, and shift
@@ -2267,7 +2424,7 @@ static int *MapSplit1( AstMapping *this_map, int nin, int *in, AstMapping **map 
    the returned results array. */
             if( ok ) {
                if( res1 && res2 ) {
-                  tmap = astCmpMap( rmap1, rmap2, 0, "" );
+                  tmap = astCmpMap( rmap1, rmap2, 0, "", status );
                   nout1 = astGetNout( rmap1 );
                   nout2 = astGetNout( rmap2 );
                   result = astMalloc( sizeof(int)*(size_t) (nout1+nout2) );
@@ -2296,7 +2453,7 @@ static int *MapSplit1( AstMapping *this_map, int nin, int *in, AstMapping **map 
 /* If required, add in the PermMap which re-orders the inputs. */
                if( ok ) {
                   if( doperm ) {
-                     *map = (AstMapping *) astCmpMap( pmap, tmap, 1, "" );
+                     *map = (AstMapping *) astCmpMap( pmap, tmap, 1, "", status );
                   } else {
                      *map = astCopy( tmap );
                   }
@@ -2333,7 +2490,153 @@ static int *MapSplit1( AstMapping *this_map, int nin, int *in, AstMapping **map 
    return result;
 }
 
-static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
+static int PatternCheck( int val, int check, int **list, int *list_len, int *status ){
+/*
+*  Name:
+*     Looping
+
+*  Purpose:
+*     Check for repeating patterns in a set of integer values.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpmap.h"
+*     int PatternCheck( int val, int nmap, int **mlist, int **nlist, int *list_len )
+
+*  Class Membership:
+*     CmpMap member function.
+
+*  Description:
+*     This function appends a supplied integer to a dynamic list, creating 
+*     or expanding the list if necessary.It then optionally, check the
+*     list for evidence of repeating patterns. If such a pattern is
+*     found, its wavelength is returned.
+
+*  Parameters:
+*     val
+*        The integer value to add to the list.
+*     check
+*        Should a check for reating patterns be performed?
+*     list
+*        Address of a location at which is stored a pointer to an array
+*        holding the values supplied on previous invocations of this 
+*        function. If a NULL pointer is supplied a new array is allocated.
+*        On exit, the supplied value is appended to the end of the array. The 
+*        array is extended as necessary. The returned pointer should be
+*        freed using astFree when no longer needed.
+*     list_len
+*        Address of a location at which is stored the number of elements
+*        in the "list" array.
+
+*  Returned Value:
+*     A non-zero "wavelength" value is returned if there is a repeating
+*     pattern is found in the "list" array. Otherwise, zero is returned.
+*     The "wavelength" is the number of integer values which constitute a
+*     single instance of the pattern.
+
+*  Notes:
+*     - A value of 1 is returned if this function is invoked with the AST 
+*     error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   int *wave[ 30 ];          /* Pointers to start of waves */
+   int iat;                  /* Index of elements added by this invocation */
+   int jat;                  /* Index of element condiered next */
+   int jlo;                  /* Earliest "mlist" entry to consider */
+   int k;                    /* Index of element within pattern */
+   int mxwave;               /* Max pattern length to consider */
+   int iwave;                /* Index of current wave */
+   int nwave;                /* Number of waves required to mark a pattern */
+   int result;               /* Returned flag */
+   int wavelen;              /* Current pattern length */
+
+/* Check the global status. */
+   if ( !astOK ) return 1;
+
+/* Initialise */
+   result = 0;
+
+/* If no array has been supplied, create a new array. */
+   if( !(*list) ) {
+      *list = astMalloc( 100*sizeof( int ) );
+      *list_len = 0;
+   }
+
+/* Store the new value in the array, extending it if necessary. */
+   iat = (*list_len)++;
+   *list = astGrow( *list, *list_len, sizeof( int ) );
+   if( astOK ) {
+      (*list)[ iat ] = val;
+
+/* If required, determine the maximum "wavelength" for looping patterns to be 
+   checked, and store the earliest list entry to consider. We take 3 complete 
+   patterns as evidence of looping, but we only do the check when the
+   list length is at least 30. */
+      if( check && *list_len > 29 ){
+         mxwave = iat/3;
+         if( mxwave > 50 ) mxwave = 50;
+         jlo = iat - 3*mxwave;
+
+/* Search backwards from the end of "list" looking for the most recent
+   occurence of the supplied "val" value. Limit the search to
+   wavelengths of no more than the above limit. */
+         jat = iat - 1;
+         while( jat >= jlo ) {
+            if( (*list)[ jat ] == val ) {
+
+/* When an earlier occurrence of "val" is found, see if the values
+   which preceed it are the same as the values which preceed the new
+   element if "list" added by this invocation. We use 3 complete
+   patterns as evidence of looping, unless the wavelength is 1 in which
+   case we use 30 patterns (this is because wavelengths of 1 can occur
+   in short sequences legitamately). */
+               wavelen = iat - jat;
+
+               if( wavelen == 1 ) {
+                  nwave = 30;
+                  if( nwave > iat ) nwave = iat;
+               } else {
+                  nwave = 3;
+               }
+
+               if( nwave*wavelen <= *list_len ) {
+                  result = wavelen;
+                  wave[ 0 ] = *list + *list_len - wavelen;
+                  for( iwave = 1; iwave < nwave; iwave++ ) {
+                     wave[ iwave ] = wave[ iwave - 1 ] - wavelen;
+                  }
+
+                  for( k = 0; k < wavelen; k++ ) {
+                     for( iwave = 1; iwave < nwave; iwave++ ) {
+                        if( *wave[ iwave ] != *wave[ 0 ] ) {
+                           result = 0;
+                           break;
+                        }
+                        wave[ iwave ]++;
+                     }
+                     wave[ 0 ]++;
+                  }   
+               }
+
+/* Break if we have found a repeating pattern. */
+               if( result ) break;
+
+            }
+            jat--;
+         }
+      }
+   }
+
+   if( !astOK ) result= 1;
+
+/* Return the result.*/
+   return result;
+}
+
+static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status ){
 /*
 *  Name:
 *     Rate
@@ -2346,7 +2649,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
 
 *  Synopsis:
 *     #include "cmpmap.h"
-*     result = Rate( AstMapping *this, double *at, int ax1, int ax2 )
+*     result = Rate( AstMapping *this, double *at, int ax1, int ax2, int *status )
 
 *  Class Membership:
 *     CmpMap member function (overrides the astRate method inherited
@@ -2372,6 +2675,8 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
 *        The index of the Mapping input which is to be varied in order to
 *        find the rate of change (input numbering starts at 0 for the first 
 *        input).
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The rate of change of Mapping output "ax1" with respect to input 
@@ -2495,7 +2800,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
    return result;
 }
 
-static AstMapping *Simplify( AstMapping *this_mapping ) {
+static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /*
 *  Name:
 *     Simplify
@@ -2508,7 +2813,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 *  Synopsis:
 *     #include "mapping.h"
-*     AstMapping *Simplify( AstMapping *this )
+*     AstMapping *Simplify( AstMapping *this, int *status )
 
 *  Class Membership:
 *     CmpMap method (over-rides the astSimplify method inherited from
@@ -2522,6 +2827,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 *  Parameters:
 *     this
 *        Pointer to the original Mapping.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A new pointer to the (possibly simplified) Mapping.
@@ -2533,6 +2840,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstCmpMap *this;              /* Pointer to CmpMap structure */
    AstMapping **map_list;        /* Mapping array pointer */
    AstMapping *map;              /* Pointer to cloned Mapping pointer */
@@ -2557,14 +2865,14 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    int wlen1;                    /* Pattern wavelength for "modified" values */
    int wlen2;                    /* Pattern wavelength for "nmap" values */
 
-   static int depth = 0;         /* Depth of recursion */
-   static AstMapping **stackmaps = NULL;/* Mappings being simplified higher up */
-
 /* Initialise. */
    result = NULL;
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this_mapping);
 
 /* It is possible for the astSimplify method to be called recursively from
    within astSimplify. It is also possible that the Mapping being
@@ -2582,18 +2890,18 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    recursive invocations of this function. First compare the supplied
    Mapping with the Mappingsbeing simpliied higher up. Return without
    action if a match is found. */
-   for( i = 0; i < depth; i++ ) {
-      if( astEqual( this_mapping, stackmaps[ i ] ) ) {
+   for( i = 0; i < simplify_depth; i++ ) {
+      if( astEqual( this_mapping, simplify_stackmaps[ i ] ) ) {
          return astClone( this_mapping );
       }
    }
 
 /* We have further work to do, so increment the recursion depth, extend
-   the stackmaps array, and store the new Mapping in it for future use. */
-   depth++;
-   stackmaps = astGrow( stackmaps, depth, sizeof( AstMapping * ) );
+   the simplify_stackmaps array, and store the new Mapping in it for future use. */
+   simplify_depth++;
+   simplify_stackmaps = astGrow( simplify_stackmaps, simplify_depth, sizeof( AstMapping * ) );
    if( astOK ) {
-      stackmaps[ depth - 1 ] = astClone( this_mapping );
+      simplify_stackmaps[ simplify_depth - 1 ] = astClone( this_mapping );
    }   
 
 /* Obtain a pointer to the CmpMap structure. */
@@ -2650,8 +2958,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    of any pattern found. If a pattern was discovered, we ignore it unless 
    there is also a pattern in the "nmap" values - the wavelengths of the
    two patterns must be related by a integer factor. */
-            wlen1 = PatternCheck( modified, 1, &mlist, &mlist_len );
-            wlen2 = PatternCheck( nmap, wlen1, &nlist, &nlist_len );
+            wlen1 = PatternCheck( modified, 1, &mlist, &mlist_len, status );
+            wlen2 = PatternCheck( nmap, wlen1, &nlist, &nlist_len, status );
             if( wlen1 && wlen2 ) {
 
 /* Ensure wlen2 is larger tnan or equal to wlen1. */
@@ -2756,7 +3064,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    result pointer with the new pointer this produces, annulling the
    previous pointer. */
                   tmp = (AstMapping *) astCmpMap( map_list[ i ], result,
-                                                  this->series, "" );
+                                                  this->series, "", status );
                   (void) astAnnul( result );
                   result = tmp;
 
@@ -2792,14 +3100,14 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    invert_list = astFree( invert_list );
 
 /* Decrement the recursion depth and free the pointer to the supplied 
-   Mapping currently stored at the end of the stackmaps array. */
-   depth--;
+   Mapping currently stored at the end of the simplify_stackmaps array. */
+   simplify_depth--;
    if( astOK ) {
-      stackmaps[ depth ] = astAnnul( stackmaps[ depth ] );
+      simplify_stackmaps[ simplify_depth ] = astAnnul( simplify_stackmaps[ simplify_depth ] );
    }   
 
-/* If we are now at depth zero, free the stackmaps array. */
-   if( depth == 0 ) stackmaps = astFree( stackmaps );
+/* If we are now at depth zero, free the simplify_stackmaps array. */
+   if( simplify_depth == 0 ) simplify_stackmaps = astFree( simplify_stackmaps );
 
 /* If an error occurred, annul the returned Mapping. */
    if ( !astOK ) result = astAnnul( result );
@@ -2809,7 +3117,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 }
 
 static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-                               int forward, AstPointSet *out ) {
+                               int forward, AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     Transform
@@ -2823,7 +3131,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *  Synopsis:
 *     #include "cmpmap.h"
 *     AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-*                             int forward, AstPointSet *out )
+*                             int forward, AstPointSet *out, int *status )
 
 *  Class Membership:
 *     CmpMap member function (over-rides the astTransform method inherited
@@ -2848,6 +3156,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *        Pointer to a PointSet which will hold the transformed (output)
 *        coordinate values. A NULL value may also be given, in which case a
 *        new PointSet will be created by this function.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the output (possibly new) PointSet.
@@ -2894,7 +3204,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    function inherited from the parent Mapping class. This function validates
    all arguments and generates an output PointSet if necessary, but does not
    actually transform any coordinate values. */
-   result = (*parent_transform)( this, in, forward, out );
+   result = (*parent_transform)( this, in, forward, out, status );
 
 /* We now extend the parent astTransform method by applying the component
    Mappings of the CmpMap to generate the output coordinate values. */
@@ -2942,8 +3252,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 /* Create temporary PointSets to describe the input and output points for this
    batch. */
-            temp1 = astPointSet( np, nin, "" );
-            temp2 = astPointSet( np, nout, "" );
+            temp1 = astPointSet( np, nin, "", status );
+            temp2 = astPointSet( np, nout, "", status );
 
 /* Associate the required subsets of the input and output coordinates with the
    two PointSets. */
@@ -2987,8 +3297,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 /* Create temporary PointSets to describe the input and output coordinates for
    the first Mapping. */
-         temp1 = astPointSet( npoint, nin1, "" );
-         temp2 = astPointSet( npoint, nout1, "" );
+         temp1 = astPointSet( npoint, nin1, "", status );
+         temp2 = astPointSet( npoint, nout1, "", status );
 
 /* Associate the required subsets of the input and output coordinates with
    these PointSets. */
@@ -3006,8 +3316,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Create a new pair of temporary PointSets to describe the input and output
    coordinates for the second Mapping, and associate the required subsets of
    the input and output coordinates with these PointSets. */
-         temp1 = astPointSet( npoint, nin2, "" );
-         temp2 = astPointSet( npoint, nout2, "" );
+         temp1 = astPointSet( npoint, nin2, "", status );
+         temp2 = astPointSet( npoint, nout2, "", status );
          astSetSubPoints( in, 0, nin1, temp1 );
          astSetSubPoints( result, 0, nout1, temp2 );
 
@@ -3033,7 +3343,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -3045,7 +3355,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for CmpMap objects.
@@ -3055,6 +3365,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the object to be copied.
 *     objout
 *        Pointer to the object being constructed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -3088,7 +3400,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -3100,7 +3412,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for CmpMap objects.
@@ -3108,6 +3420,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the object to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -3135,7 +3449,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -3147,7 +3461,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -3158,6 +3472,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the CmpMap whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -3226,11 +3542,11 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsACmpMap and astCheckCmpMap functions using the
    macros defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(CmpMap,Mapping,check,&class_init)
+astMAKE_ISA(CmpMap,Mapping,check,&class_check)
 astMAKE_CHECK(CmpMap)
 
 AstCmpMap *astCmpMap_( void *map1_void, void *map2_void, int series,
-                       const char *options, ... ) {
+                       const char *options, int *status, ...) {
 /*
 *+
 *  Name:
@@ -3298,6 +3614,7 @@ AstCmpMap *astCmpMap_( void *map1_void, void *map2_void, int series,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstCmpMap *new;               /* Pointer to new CmpMap */
    AstMapping *map1;             /* Pointer to first Mapping structure */
    AstMapping *map2;             /* Pointer to second Mapping structure */
@@ -3305,6 +3622,9 @@ AstCmpMap *astCmpMap_( void *map1_void, void *map2_void, int series,
 
 /* Initialise. */
    new = NULL;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return new;
@@ -3327,7 +3647,7 @@ AstCmpMap *astCmpMap_( void *map1_void, void *map2_void, int series,
 /* Obtain the variable argument list and pass it along with the
    options string to the astVSet method to initialise the new CmpMap's
    attributes. */
-         va_start( args, options );
+         va_start( args, status );
          astVSet( new, options, NULL, args );
          va_end( args );
 
@@ -3480,13 +3800,22 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstCmpMap *new;               /* Pointer to new CmpMap */
    AstMapping *map1;             /* Pointer to first Mapping structure */
    AstMapping *map2;             /* Pointer to second Mapping structure */
    va_list args;                 /* Variable argument list */
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
 /* Initialise. */
    new = NULL;
+
+   int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
 
 /* Check the global status. */
    if ( !astOK ) return new;
@@ -3524,7 +3853,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 AstCmpMap *astInitCmpMap_( void *mem, size_t size, int init,
                            AstCmpMapVtab *vtab, const char *name,
-                           AstMapping *map1, AstMapping *map2, int series ) {
+                           AstMapping *map1, AstMapping *map2, int series, int *status ) {
 /*
 *+
 *  Name:
@@ -3632,7 +3961,7 @@ AstCmpMap *astInitCmpMap_( void *mem, size_t size, int init,
             astError( AST__INNCO, "astInitCmpMap(%s): The number of output "
                       "coordinates per point (%d) for the first Mapping "
                       "supplied does not match the number of input "
-                      "coordinates (%d) for the second Mapping.", name, nout1,
+                      "coordinates (%d) for the second Mapping.", status, name, nout1,
                       nin2 );
          }
       }
@@ -3708,7 +4037,7 @@ AstCmpMap *astInitCmpMap_( void *mem, size_t size, int init,
 
 AstCmpMap *astLoadCmpMap_( void *mem, size_t size,
                            AstCmpMapVtab *vtab, const char *name,
-                           AstChannel *channel ) {
+                           AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -3783,6 +4112,7 @@ AstCmpMap *astLoadCmpMap_( void *mem, size_t size,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstCmpMap *new;               /* Pointer to the new CmpMap */
 
 /* Initialise. */
@@ -3790,6 +4120,9 @@ AstCmpMap *astLoadCmpMap_( void *mem, size_t size,
 
 /* Check the global error status. */
    if ( !astOK ) return new;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* If a NULL virtual function table has been supplied, then this is
    the first loader to be invoked for this CmpMap. In this case the
@@ -3876,198 +4209,8 @@ AstCmpMap *astLoadCmpMap_( void *mem, size_t size,
 
 
 
-static int PatternCheck( int val, int check, int **list, int *list_len ){
-/*
-*  Name:
-*     Looping
-
-*  Purpose:
-*     Check for repeating patterns in a set of integer values.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "cmpmap.h"
-*     int PatternCheck( int val, int nmap, int **mlist, int **nlist, int *list_len )
-
-*  Class Membership:
-*     CmpMap member function.
-
-*  Description:
-*     This function appends a supplied integer to a dynamic list, creating 
-*     or expanding the list if necessary.It then optionally, check the
-*     list for evidence of repeating patterns. If such a pattern is
-*     found, its wavelength is returned.
-
-*  Parameters:
-*     val
-*        The integer value to add to the list.
-*     check
-*        Should a check for reating patterns be performed?
-*     list
-*        Address of a location at which is stored a pointer to an array
-*        holding the values supplied on previous invocations of this 
-*        function. If a NULL pointer is supplied a new array is allocated.
-*        On exit, the supplied value is appended to the end of the array. The 
-*        array is extended as necessary. The returned pointer should be
-*        freed using astFree when no longer needed.
-*     list_len
-*        Address of a location at which is stored the number of elements
-*        in the "list" array.
-
-*  Returned Value:
-*     A non-zero "wavelength" value is returned if there is a repeating
-*     pattern is found in the "list" array. Otherwise, zero is returned.
-*     The "wavelength" is the number of integer values which constitute a
-*     single instance of the pattern.
-
-*  Notes:
-*     - A value of 1 is returned if this function is invoked with the AST 
-*     error status set, or if it should fail for any reason.
-*/
-
-/* Local Variables: */
-   int *wave[ 30 ];          /* Pointers to start of waves */
-   int iat;                  /* Index of elements added by this invocation */
-   int jat;                  /* Index of element condiered next */
-   int jlo;                  /* Earliest "mlist" entry to consider */
-   int k;                    /* Index of element within pattern */
-   int mxwave;               /* Max pattern length to consider */
-   int iwave;                /* Index of current wave */
-   int nwave;                /* Number of waves required to mark a pattern */
-   int result;               /* Returned flag */
-   int wavelen;              /* Current pattern length */
-
-/* Check the global status. */
-   if ( !astOK ) return 1;
-
-/* Initialise */
-   result = 0;
-
-/* If no array has been supplied, create a new array. */
-   if( !(*list) ) {
-      *list = astMalloc( 100*sizeof( int ) );
-      *list_len = 0;
-   }
-
-/* Store the new value in the array, extending it if necessary. */
-   iat = (*list_len)++;
-   *list = astGrow( *list, *list_len, sizeof( int ) );
-   if( astOK ) {
-      (*list)[ iat ] = val;
-
-/* If required, determine the maximum "wavelength" for looping patterns to be 
-   checked, and store the earliest list entry to consider. We take 3 complete 
-   patterns as evidence of looping, but we only do the check when the
-   list length is at least 30. */
-      if( check && *list_len > 29 ){
-         mxwave = iat/3;
-         if( mxwave > 50 ) mxwave = 50;
-         jlo = iat - 3*mxwave;
-
-/* Search backwards from the end of "list" looking for the most recent
-   occurence of the supplied "val" value. Limit the search to
-   wavelengths of no more than the above limit. */
-         jat = iat - 1;
-         while( jat >= jlo ) {
-            if( (*list)[ jat ] == val ) {
-
-/* When an earlier occurrence of "val" is found, see if the values
-   which preceed it are the same as the values which preceed the new
-   element if "list" added by this invocation. We use 3 complete
-   patterns as evidence of looping, unless the wavelength is 1 in which
-   case we use 30 patterns (this is because wavelengths of 1 can occur
-   in short sequences legitamately). */
-               wavelen = iat - jat;
-
-               if( wavelen == 1 ) {
-                  nwave = 30;
-                  if( nwave > iat ) nwave = iat;
-               } else {
-                  nwave = 3;
-               }
-
-               if( nwave*wavelen <= *list_len ) {
-                  result = wavelen;
-                  wave[ 0 ] = *list + *list_len - wavelen;
-                  for( iwave = 1; iwave < nwave; iwave++ ) {
-                     wave[ iwave ] = wave[ iwave - 1 ] - wavelen;
-                  }
-
-                  for( k = 0; k < wavelen; k++ ) {
-                     for( iwave = 1; iwave < nwave; iwave++ ) {
-                        if( *wave[ iwave ] != *wave[ 0 ] ) {
-                           result = 0;
-                           break;
-                        }
-                        wave[ iwave ]++;
-                     }
-                     wave[ 0 ]++;
-                  }   
-               }
-
-/* Break if we have found a repeating pattern. */
-               if( result ) break;
-
-            }
-            jat--;
-         }
-      }
-   }
-
-   if( !astOK ) result= 1;
-
-/* Return the result.*/
-   return result;
-}
 
 
 
-static int CountMappings( AstMapping *this_mapping ){
-/*
-*  Name:
-*     CountMappings
 
-*  Purpose:
-*     Count the total number of atomic Mappings in a given Mapping.
 
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "cmpmap.h"
-*     int CountMappings( AstMapping *this_mapping )
-
-*  Class Membership:
-*     CmpMap member function.
-
-*  Description:
-*     This function returns the number of atomic Mappings in the given
-*     Mapping. This will be one unless the supplied Mapping is a CmpMap.
-
-*  Parameters:
-*     this_mapping
-*        Pointer to the Mapping.
-
-*  Returned Value:
-*     The Mapping count. Zero if an error has occurred.
-
-*/
-
-/* Local Variables: */
-   AstCmpMap *this;  /* Pointer to the CmpMap structure */
-   int result;       /* Returned value */
-
-/* Check the global status. */
-   if ( !astOK ) return 0;
-
-   if( astIsACmpMap( this_mapping ) ) {
-      this = (AstCmpMap *) this_mapping;
-      result = CountMappings( this->map1 ) + CountMappings( this->map2 );
-   } else {
-      result = 1;
-   }
-
-   return result;
-}

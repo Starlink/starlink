@@ -111,6 +111,24 @@ typedef struct AstCircleVtab {
 
 /* Properties (e.g. methods) specific to this class. */
 } AstCircleVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstCircleGlobals {
+   AstCircleVtab Class_Vtab;
+   int Class_Init;
+} AstCircleGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitCircleGlobals_( AstCircleGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -122,7 +140,7 @@ astPROTO_ISA(Circle)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstCircle *astCircle_( void *, int, const double[], const double[], AstRegion *, const char *, ... );
+AstCircle *astCircle_( void *, int, const double[], const double[], AstRegion *, const char *, int *, ...);
 #else
 AstCircle *astCircleId_( void *, int, const double[], const double[], AstRegion *, const char *, ... );
 #endif
@@ -132,21 +150,21 @@ AstCircle *astCircleId_( void *, int, const double[], const double[], AstRegion 
 /* Initialiser. */
 AstCircle *astInitCircle_( void *, size_t, int, AstCircleVtab *,
                            const char *, AstFrame *, int, const double[],
-                           const double[], AstRegion * );
+                           const double[], AstRegion *, int * );
 
 /* Vtab initialiser. */
-void astInitCircleVtab_( AstCircleVtab *, const char * );
+void astInitCircleVtab_( AstCircleVtab *, const char *, int * );
 
 /* Loader. */
 AstCircle *astLoadCircle_( void *, size_t, AstCircleVtab *,
-                           const char *, AstChannel * );
+                           const char *, AstChannel *, int * );
 
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
-AstRegion *astBestCircle_( AstPointSet *, double *, AstRegion * );
+AstRegion *astBestCircle_( AstPointSet *, double *, AstRegion *, int * );
 #endif
 
 /* Function interfaces. */
@@ -179,13 +197,13 @@ AstRegion *astBestCircle_( AstPointSet *, double *, AstRegion * );
 
 /* Initialiser. */
 #define astInitCircle(mem,size,init,vtab,name,frame,form,p1,p2,unc) \
-astINVOKE(O,astInitCircle_(mem,size,init,vtab,name,frame,form,p1,p2,unc))
+astINVOKE(O,astInitCircle_(mem,size,init,vtab,name,frame,form,p1,p2,unc,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitCircleVtab(vtab,name) astINVOKE(V,astInitCircleVtab_(vtab,name))
+#define astInitCircleVtab(vtab,name) astINVOKE(V,astInitCircleVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadCircle(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadCircle_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadCircle_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -195,6 +213,10 @@ astINVOKE(O,astLoadCircle_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 
 #if defined(astCLASS)            /* Protected */
-#define astBestCircle(pset,cen,unc) astBestCircle_(pset,cen,unc)
+#define astBestCircle(pset,cen,unc) astBestCircle_(pset,cen,unc,STATUS_PTR)
 #endif
 #endif
+
+
+
+

@@ -83,6 +83,8 @@
 #define AST__XMLMISC   358768954    /* Id for XmlMiscItem structure */
 #define AST__XMLPAR    874366235    /* Id for XmlParent structure */
 
+/* Define constants used to size global arrays in this module. */
+#define AST__XML_GETTAG_BUFF_LEN 200
 
 /* Type Definitions. */
 /* ================= */
@@ -247,124 +249,144 @@ struct AstXmlDTDec {
 };
 
 
+#if defined(THREAD_SAFE) && defined(astCLASS)
+
+/* Define a structure holding all data items that are global within the
+   xml.c file. */
+typedef struct AstXmlGlobals {
+   int Next_ID;
+   char GetTag_Buff[ AST__XML_GETTAG_BUFF_LEN + 1 ];
+} AstXmlGlobals;
+
+#endif
 
 
 
 
 /* Function prototypes. */
 /* ==================== */
-AstXmlAttribute *astXmlCheckAttribute_( void *, int );
-AstXmlBlack *astXmlCheckBlack_( void *, int );
-AstXmlCDataSection *astXmlCheckCDataSection_( void *, int );
-AstXmlComment *astXmlCheckComment_( void *, int );
-AstXmlContentItem *astXmlGetItem_( AstXmlElement *, int );
-AstXmlDTDec *astXmlCheckDTDec_( void *, int );
-AstXmlDeclPI *astXmlCheckDeclPI_( void *, int );
-AstXmlDocument *astXmlCheckDocument_( void *, int );
-AstXmlElement *astXmlAddElement_( AstXmlElement *, const char *, const char * );
-AstXmlElement *astXmlCheckElement_( void *, int );
-AstXmlParent *astXmlGetParent_( AstXmlObject * );
-AstXmlObject *astXmlGetRoot_( AstXmlObject * );
-AstXmlElement *astXmlReadDocument_( AstXmlDocument **, int (*)( AstXmlElement * ), int, char (*)( void * ), void * );
-AstXmlNamespace *astXmlCheckNamespace_( void *, int );
-AstXmlObject *astXmlCopy_( AstXmlObject * );
-AstXmlObject *astXmlCheckObject_( void *, int );
-AstXmlPI *astXmlCheckPI_( void *, int );
-AstXmlPrologue *astXmlCheckPrologue_( void *, int );
-AstXmlWhite *astXmlCheckWhite_( void *, int );
-AstXmlCharData *astXmlCheckCharData_( void *, int );
-AstXmlContentItem *astXmlCheckContentItem_( void *, int );
-AstXmlMiscItem *astXmlCheckMiscItem_( void *, int );
-AstXmlParent *astXmlCheckParent_( void *, int );
-const char *astXmlFormat_( AstXmlObject * );
-const char *astXmlGetAttributeValue_( AstXmlElement *, const char *);
-const char *astXmlGetName_( AstXmlObject * );
-const char *astXmlGetTag_( AstXmlObject *, int );
-const char *astXmlGetURI_( AstXmlObject * );
-const char *astXmlGetValue_( AstXmlObject *, int );
-const char *astXmlShow_( AstXmlObject * );
-int astXmlCheckType_( void *, long int );
-int astXmlGetNattr_( AstXmlElement *);
-int astXmlGetNitem_( AstXmlElement *);
-void *astXmlAnnulTree_( AstXmlObject * );
-void *astXmlAnnul_( AstXmlObject * );
-void *astXmlDelete_( void * );
-void astXmlAddAttr_( AstXmlElement *, const char *, const char *, const char * );
-void astXmlAddCDataSection_( AstXmlElement *, const char * );
-void astXmlAddCharData_( AstXmlParent *, int, const char * );
-void astXmlAddComment_( AstXmlParent *, int, const char * );
-void astXmlAddPI_( AstXmlParent *, int, const char *, const char * );
-void astXmlAddURI_( AstXmlElement *, const char *, const char * );
-void astXmlInsertElement_( AstXmlElement *, AstXmlElement * );
-void astXmlPurge_( AstXmlParent * );
-void astXmlRemoveAttr_( AstXmlElement *, const char *, const char * );
-void astXmlRemoveItem_( AstXmlContentItem * );
-void astXmlRemoveURI_( AstXmlElement *, const char * );
-void astXmlSetXmlDec_( AstXmlDocument *, const char * );
-void astXmlSetDTDEC_( AstXmlDocument *, const char *, const char *, const char *);
+AstXmlAttribute *astXmlCheckAttribute_( void *, int, int * );
+AstXmlBlack *astXmlCheckBlack_( void *, int, int * );
+AstXmlCDataSection *astXmlCheckCDataSection_( void *, int, int * );
+AstXmlComment *astXmlCheckComment_( void *, int, int * );
+AstXmlContentItem *astXmlGetItem_( AstXmlElement *, int, int * );
+AstXmlDTDec *astXmlCheckDTDec_( void *, int, int * );
+AstXmlDeclPI *astXmlCheckDeclPI_( void *, int, int * );
+AstXmlDocument *astXmlCheckDocument_( void *, int, int * );
+AstXmlElement *astXmlAddElement_( AstXmlElement *, const char *, const char *, int * );
+AstXmlElement *astXmlCheckElement_( void *, int, int * );
+AstXmlParent *astXmlGetParent_( AstXmlObject *, int * );
+AstXmlObject *astXmlGetRoot_( AstXmlObject *, int * );
+AstXmlElement *astXmlReadDocument_( AstXmlDocument **, int (*)( AstXmlElement *, int * ), int, char (*)( void *, int * ), void *, int * );
+AstXmlNamespace *astXmlCheckNamespace_( void *, int, int * );
+AstXmlObject *astXmlCopy_( AstXmlObject *, int * );
+AstXmlObject *astXmlCheckObject_( void *, int, int * );
+AstXmlPI *astXmlCheckPI_( void *, int, int * );
+AstXmlPrologue *astXmlCheckPrologue_( void *, int, int * );
+AstXmlWhite *astXmlCheckWhite_( void *, int, int * );
+AstXmlCharData *astXmlCheckCharData_( void *, int, int * );
+AstXmlContentItem *astXmlCheckContentItem_( void *, int, int * );
+AstXmlMiscItem *astXmlCheckMiscItem_( void *, int, int * );
+AstXmlParent *astXmlCheckParent_( void *, int, int * );
+const char *astXmlFormat_( AstXmlObject *, int * );
+const char *astXmlGetAttributeValue_( AstXmlElement *, const char *, int * );
+const char *astXmlGetName_( AstXmlObject *, int * );
+const char *astXmlGetTag_( AstXmlObject *, int, int * );
+const char *astXmlGetType_( AstXmlObject *, int * );
+const char *astXmlGetURI_( AstXmlObject *, int * );
+const char *astXmlGetValue_( AstXmlObject *, int, int * );
+const char *astXmlShow_( AstXmlObject *, int * );
+int astXmlCheckType_( void *, long int, int * );
+int astXmlGetNattr_( AstXmlElement *, int * );
+int astXmlGetNitem_( AstXmlElement *, int * );
+void *astXmlAnnulTree_( AstXmlObject *, int * );
+void *astXmlAnnul_( AstXmlObject *, int * );
+void *astXmlDelete_( void *, int * );
+void astXmlAddAttr_( AstXmlElement *, const char *, const char *, const char *, int * );
+void astXmlAddCDataSection_( AstXmlElement *, const char *, int * );
+void astXmlAddCharData_( AstXmlParent *, int, const char *, int * );
+void astXmlAddComment_( AstXmlParent *, int, const char *, int * );
+void astXmlAddPI_( AstXmlParent *, int, const char *, const char *, int * );
+void astXmlAddURI_( AstXmlElement *, const char *, const char *, int * );
+void astXmlInsertElement_( AstXmlElement *, AstXmlElement *, int * );
+void astXmlPurge_( AstXmlParent *, int * );
+void astXmlRemoveAttr_( AstXmlElement *, const char *, const char *, int * );
+void astXmlRemoveItem_( AstXmlContentItem *, int * );
+void astXmlRemoveURI_( AstXmlElement *, const char *, int * );
+void astXmlSetXmlDec_( AstXmlDocument *, const char *, int * );
+void astXmlSetDTDec_( AstXmlDocument *, const char *, const char *, const char *, int * );
+
+#if defined(THREAD_SAFE) && defined(astCLASS)
+void astInitXmlGlobals_( AstXmlGlobals * );
+#else
 
 #ifdef DEBUG
 int astXmlTrace_( int );           
 #endif
 
+#endif
+
 /* Function interfaces. */
 /* ==================== */
 /* These wrap up the functions defined by this module. */
+#define astXmlGetType(this) astXmlGetType_(this,STATUS_PTR)
+#define astXmlCheckAttribute(this,nullok) astXmlCheckAttribute_(this,nullok,STATUS_PTR)
+#define astXmlCheckBlack(this,nullok) astXmlCheckBlack_(this,nullok,STATUS_PTR)
+#define astXmlCheckCDataSection(this,nullok) astXmlCheckCDataSection_(this,nullok,STATUS_PTR)
+#define astXmlCheckCharData(this,nullok) astXmlCheckCharData_(this,nullok,STATUS_PTR)
+#define astXmlCheckComment(this,nullok) astXmlCheckComment_(this,nullok,STATUS_PTR)
+#define astXmlCheckContentItem(this,nullok) astXmlCheckContentItem_(this,nullok,STATUS_PTR)
+#define astXmlCheckDTDec(this,nullok) astXmlCheckDTDec_(this,nullok,STATUS_PTR)
+#define astXmlCheckDeclPI(this,nullok) astXmlCheckDeclPI_(this,nullok,STATUS_PTR)
+#define astXmlCheckDocument(this,nullok) astXmlCheckDocument_(this,nullok,STATUS_PTR)
+#define astXmlCheckElement(this,nullok) astXmlCheckElement_(this,nullok,STATUS_PTR)
+#define astXmlCheckMiscItem(this,nullok) astXmlCheckMiscItem_(this,nullok,STATUS_PTR)
+#define astXmlCheckNamespace(this,nullok) astXmlCheckNamespace_(this,nullok,STATUS_PTR)
+#define astXmlCheckObject(this,nullok) astXmlCheckObject_(this,nullok,STATUS_PTR)
+#define astXmlCheckPI(this,nullok) astXmlCheckPI_(this,nullok,STATUS_PTR)
+#define astXmlCheckParent(this,nullok) astXmlCheckParent_(this,nullok,STATUS_PTR)
+#define astXmlCheckPrologue(this,nullok) astXmlCheckPrologue_(this,nullok,STATUS_PTR)
+#define astXmlCheckWhite(this,nullok) astXmlCheckWhite_(this,nullok,STATUS_PTR)
 
-#define astXmlCheckAttribute(this,nullok) astXmlCheckAttribute_(this,nullok)
-#define astXmlCheckBlack(this,nullok) astXmlCheckBlack_(this,nullok)
-#define astXmlCheckCDataSection(this,nullok) astXmlCheckCDataSection_(this,nullok)
-#define astXmlCheckCharData(this,nullok) astXmlCheckCharData_(this,nullok)
-#define astXmlCheckComment(this,nullok) astXmlCheckComment_(this,nullok)
-#define astXmlCheckContentItem(this,nullok) astXmlCheckContentItem_(this,nullok)
-#define astXmlCheckDTDec(this,nullok) astXmlCheckDTDec_(this,nullok)
-#define astXmlCheckDeclPI(this,nullok) astXmlCheckDeclPI_(this,nullok)
-#define astXmlCheckDocument(this,nullok) astXmlCheckDocument_(this,nullok)
-#define astXmlCheckElement(this,nullok) astXmlCheckElement_(this,nullok)
-#define astXmlCheckMiscItem(this,nullok) astXmlCheckMiscItem_(this,nullok)
-#define astXmlCheckNamespace(this,nullok) astXmlCheckNamespace_(this,nullok)
-#define astXmlCheckObject(this,nullok) astXmlCheckObject_(this,nullok)
-#define astXmlCheckPI(this,nullok) astXmlCheckPI_(this,nullok)
-#define astXmlCheckParent(this,nullok) astXmlCheckParent_(this,nullok)
-#define astXmlCheckPrologue(this,nullok) astXmlCheckPrologue_(this,nullok)
-#define astXmlCheckWhite(this,nullok) astXmlCheckWhite_(this,nullok)
-
-#define astXmlAddAttr(elem,name,value,prefix) astXmlAddAttr_(astXmlCheckElement(elem,0),name,value,prefix)
-#define astXmlAddURI(elem,prefix,uri) astXmlAddURI_(astXmlCheckElement(elem,0),prefix,uri)
-#define astXmlAnnul(this) astXmlAnnul_(astXmlCheckObject(this,1))
-#define astXmlDelete(this) astXmlDelete_(this)
-#define astXmlAnnulTree(this) astXmlAnnulTree_(astXmlCheckObject(this,1))
-#define astXmlAddCDataSection(this,text) astXmlAddCDataSection_(astXmlCheckElement(this,0),text)
-#define astXmlAddCharData(this,where,text) astXmlAddCharData_(astXmlCheckParent(this,0),where,text)
-#define astXmlAddComment(this,where,text) astXmlAddComment_(astXmlCheckParent(this,0),where,text)
-#define astXmlAddElement(this,name,prefix) astXmlAddElement_(astXmlCheckElement(this,1),name,prefix)
-#define astXmlAddPI(this,where,target,text) astXmlAddPI_(astXmlCheckParent(this,0),where,target,text)
-#define astXmlGetParent(this) astXmlGetParent_(astXmlCheckObject(this,0))
-#define astXmlGetRoot(this) astXmlGetRoot_(astXmlCheckObject(this,0))
-#define astXmlGetName(this) astXmlGetName_(astXmlCheckObject(this,0))
-#define astXmlGetValue(this,report) astXmlGetValue_(astXmlCheckObject(this,0),report)
-#define astXmlGetAttributeValue(this,name) astXmlGetAttributeValue_(astXmlCheckElement(this,0),name)
-#define astXmlGetNattr(this) astXmlGetNattr_(astXmlCheckElement(this,0))
-#define astXmlGetNitem(this) astXmlGetNitem_(astXmlCheckElement(this,0))
-#define astXmlGetItem(this,item) astXmlGetItem_(astXmlCheckElement(this,0),item)
-#define astXmlGetAttributeValue(this,name) astXmlGetAttributeValue_(astXmlCheckElement(this,0),name)
-#define astXmlGetTag(this,opening) astXmlGetTag_(astXmlCheckObject(this,0),opening)
-#define astXmlGetURI(this) astXmlGetURI_(astXmlCheckObject(this,0))
-#define astXmlFormat(this) astXmlFormat_(astXmlCheckObject(this,0))
-#define astXmlShow(this) astXmlShow_(astXmlCheckObject(this,0))
-#define astXmlRemoveItem(this) astXmlRemoveItem_(astXmlCheckContentItem(this,0))
-#define astXmlRemoveAttr(this,name,prefix) astXmlRemoveAttr_(astXmlCheckElement(this,0),name,prefix)
-#define astXmlRemoveURI(this,prefix) astXmlRemoveURI_(astXmlCheckElement(this,0),prefix)
-#define astXmlReadDocument(doc,is_wanted,skip,source,data) astXmlReadDocument_(doc,is_wanted,skip,source,data) 
-#define astXmlInsertElement(this,elem) astXmlInsertElement_(astXmlCheckElement(this,0),astXmlCheckElement(elem,0)) 
-#define astXmlPurge(this) astXmlPurge_(astXmlCheckParent(this,1)) 
-#define astXmlSetXmlDec(this,text) astXmlSetXmlDec_(astXmlCheckDocument(this,0),text) 
-#define astXmlSetDTDec(this,text1,text2,text3) astXmlSetDTDec_(astXmlCheckDocument(this,0),text1,text2,text3) 
-#define astXmlCheckType(this,type) astXmlCheckType_(this,type)
-#define astXmlCopy(this) astXmlCopy_(astXmlCheckObject(this,1))
+#define astXmlAddAttr(elem,name,value,prefix) astXmlAddAttr_(astXmlCheckElement(elem,0),name,value,prefix,STATUS_PTR)
+#define astXmlAddURI(elem,prefix,uri) astXmlAddURI_(astXmlCheckElement(elem,0),prefix,uri,STATUS_PTR)
+#define astXmlAnnul(this) astXmlAnnul_(astXmlCheckObject(this,1),STATUS_PTR)
+#define astXmlDelete(this) astXmlDelete_(this,STATUS_PTR)
+#define astXmlAnnulTree(this) astXmlAnnulTree_(astXmlCheckObject(this,1),STATUS_PTR)
+#define astXmlAddCDataSection(this,text) astXmlAddCDataSection_(astXmlCheckElement(this,0),text,STATUS_PTR)
+#define astXmlAddCharData(this,where,text) astXmlAddCharData_(astXmlCheckParent(this,0),where,text,STATUS_PTR)
+#define astXmlAddComment(this,where,text) astXmlAddComment_(astXmlCheckParent(this,0),where,text,STATUS_PTR)
+#define astXmlAddElement(this,name,prefix) astXmlAddElement_(astXmlCheckElement(this,1),name,prefix,STATUS_PTR)
+#define astXmlAddPI(this,where,target,text) astXmlAddPI_(astXmlCheckParent(this,0),where,target,text,STATUS_PTR)
+#define astXmlGetParent(this) astXmlGetParent_(astXmlCheckObject(this,0),STATUS_PTR)
+#define astXmlGetRoot(this) astXmlGetRoot_(astXmlCheckObject(this,0),STATUS_PTR)
+#define astXmlGetName(this) astXmlGetName_(astXmlCheckObject(this,0),STATUS_PTR)
+#define astXmlGetValue(this,report) astXmlGetValue_(astXmlCheckObject(this,0),report,STATUS_PTR)
+#define astXmlGetAttributeValue(this,name) astXmlGetAttributeValue_(astXmlCheckElement(this,0),name,STATUS_PTR)
+#define astXmlGetNattr(this) astXmlGetNattr_(astXmlCheckElement(this,0),STATUS_PTR)
+#define astXmlGetNitem(this) astXmlGetNitem_(astXmlCheckElement(this,0),STATUS_PTR)
+#define astXmlGetItem(this,item) astXmlGetItem_(astXmlCheckElement(this,0),item,STATUS_PTR)
+#define astXmlGetAttributeValue(this,name) astXmlGetAttributeValue_(astXmlCheckElement(this,0),name,STATUS_PTR)
+#define astXmlGetTag(this,opening) astXmlGetTag_(astXmlCheckObject(this,0),opening,STATUS_PTR)
+#define astXmlGetURI(this) astXmlGetURI_(astXmlCheckObject(this,0),STATUS_PTR)
+#define astXmlFormat(this) astXmlFormat_(astXmlCheckObject(this,0),STATUS_PTR)
+#define astXmlShow(this) astXmlShow_(astXmlCheckObject(this,0),STATUS_PTR)
+#define astXmlRemoveItem(this) astXmlRemoveItem_(astXmlCheckContentItem(this,0),STATUS_PTR)
+#define astXmlRemoveAttr(this,name,prefix) astXmlRemoveAttr_(astXmlCheckElement(this,0),name,prefix,STATUS_PTR)
+#define astXmlRemoveURI(this,prefix) astXmlRemoveURI_(astXmlCheckElement(this,0),prefix,STATUS_PTR)
+#define astXmlReadDocument(doc,is_wanted,skip,source,data) astXmlReadDocument_(doc,is_wanted,skip,source,data,STATUS_PTR) 
+#define astXmlInsertElement(this,elem) astXmlInsertElement_(astXmlCheckElement(this,0),astXmlCheckElement(elem,0),STATUS_PTR) 
+#define astXmlPurge(this) astXmlPurge_(astXmlCheckParent(this,1),STATUS_PTR) 
+#define astXmlSetXmlDec(this,text) astXmlSetXmlDec_(astXmlCheckDocument(this,0),text,STATUS_PTR) 
+#define astXmlSetDTDec(this,text1,text2,text3) astXmlSetDTDec_(astXmlCheckDocument(this,0),text1,text2,text3,STATUS_PTR) 
+#define astXmlCheckType(this,type) astXmlCheckType_(this,type,STATUS_PTR)
+#define astXmlCopy(this) astXmlCopy_(astXmlCheckObject(this,1),STATUS_PTR)
 
 #ifdef DEBUG
 #define astXmlTrace(show) astXmlTrace_(show)
 #endif
 
 #endif
+
+
+

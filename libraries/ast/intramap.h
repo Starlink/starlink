@@ -184,11 +184,41 @@ typedef struct AstIntraMapVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   const char *(* GetIntraFlag)( AstIntraMap * );
-   int (* TestIntraFlag)( AstIntraMap * );
-   void (* ClearIntraFlag)( AstIntraMap * );
-   void (* SetIntraFlag)( AstIntraMap *, const char * );
+   const char *(* GetIntraFlag)( AstIntraMap *, int * );
+   int (* TestIntraFlag)( AstIntraMap *, int * );
+   void (* ClearIntraFlag)( AstIntraMap *, int * );
+   void (* SetIntraFlag)( AstIntraMap *, const char *, int * );
 } AstIntraMapVtab;
+
+
+/* Structure to hold data for transformation functions. */
+typedef struct AstIntraMapTranData {
+   void (* tran)( AstMapping *, int, int, const double *[], int, int, double *[] );
+                                 /* Pointer to transformation function */
+   void (* tran_wrap)( void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), AstMapping *, int, int, const double *[], int, int, double *[], int * );
+                                 /* Pointer to wrapper function */
+   char *author;                 /* Author's name */
+   char *contact;                /* Contact details (e.g. e-mail address) */
+   char *name;                   /* Function name (assigned by caller) */
+   char *purpose;                /* Comment string describing purpose */
+   int nin;                      /* Number of input coordinates per point */
+   int nout;                     /* Number of output coordinates per point */
+   unsigned int flags;           /* Flags to describe function behaviour */
+} AstIntraMapTranData;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstIntraMapGlobals {
+   AstIntraMapVtab Class_Vtab;
+   int Class_Init;
+   AstIntraMapTranData *Tran_Data;
+   int Tran_Nfun;
+} AstIntraMapGlobals;
+
+#endif
+
 #endif
 
 /* Function prototypes. */
@@ -200,7 +230,7 @@ astPROTO_ISA(IntraMap)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstIntraMap *astIntraMap_( const char *, int, int, const char *, ... );
+AstIntraMap *astIntraMap_( const char *, int, int, const char *, int *, ...);
 #else
 AstIntraMap *astIntraMapId_( const char *, int, int, const char *, ... );
 #endif
@@ -209,28 +239,35 @@ AstIntraMap *astIntraMapId_( const char *, int, int, const char *, ... );
 
 /* Initialiser. */
 AstIntraMap *astInitIntraMap_( void *, size_t, int, AstIntraMapVtab *,
-                               const char *, const char *, int, int );
+                               const char *, const char *, int, int, int * );
 
 /* Vtab initialiser. */
-void astInitIntraMapVtab_( AstIntraMapVtab *, const char * );
+void astInitIntraMapVtab_( AstIntraMapVtab *, const char *, int * );
 
 /* Loader. */
 AstIntraMap *astLoadIntraMap_( void *, size_t, AstIntraMapVtab *,
-                               const char *, AstChannel * );
+                               const char *, AstChannel *, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitIntraMapGlobals_( AstIntraMapGlobals * );
+#endif
+
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-void astIntraReg_( const char *, int, int, void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), unsigned int, const char *, const char *, const char * );
+void astIntraReg_( const char *, int, int, void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), unsigned int, const char *, const char *, const char *, int * );
 
 #if defined(astCLASS)            /* Protected */
-const char *astGetIntraFlag_( AstIntraMap * );
-int astTestIntraFlag_( AstIntraMap * );
-void astClearIntraFlag_( AstIntraMap * );
-void astSetIntraFlag_( AstIntraMap *, const char * );
+const char *astGetIntraFlag_( AstIntraMap *, int * );
+int astTestIntraFlag_( AstIntraMap *, int * );
+void astClearIntraFlag_( AstIntraMap *, int * );
+void astSetIntraFlag_( AstIntraMap *, const char *, int * );
 
 #else                            /* Public only */
-void astIntraRegFor_( const char *, int, int, void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), void (*)( void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), AstMapping *, int, int, const double *[], int, int, double *[] ), unsigned int, const char *, const char *, const char * );
+void astIntraRegFor_( const char *, int, int, void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), void (*)( void (*)( AstMapping *, int, int, const double *[], int, int, double *[]), AstMapping *, int, int, const double *[], int, int, double *[], int * ), unsigned int, const char *, const char *, const char *, int * );
+
 #endif
 
 /* Function interfaces. */
@@ -263,13 +300,13 @@ void astIntraRegFor_( const char *, int, int, void (*)( AstMapping *, int, int, 
 
 /* Initialiser. */
 #define astInitIntraMap(mem,size,init,vtab,name,fname,nin,nout) \
-astINVOKE(O,astInitIntraMap_(mem,size,init,vtab,name,fname,nin,nout))
+astINVOKE(O,astInitIntraMap_(mem,size,init,vtab,name,fname,nin,nout,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitIntraMapVtab(vtab,name) astINVOKE(V,astInitIntraMapVtab_(vtab,name))
+#define astInitIntraMapVtab(vtab,name) astINVOKE(V,astInitIntraMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadIntraMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadIntraMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadIntraMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -279,20 +316,24 @@ astINVOKE(O,astLoadIntraMap_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 
 #define astIntraReg(name,nin,nout,tran,flags,purpose,author,contact) \
-astIntraReg_(name,nin,nout,tran,flags,purpose,author,contact)
+astIntraReg_(name,nin,nout,tran,flags,purpose,author,contact,STATUS_PTR)
 
 #if defined(astCLASS)            /* Protected */
 #define astClearIntraFlag(this) \
-astINVOKE(V,astClearIntraFlag_(astCheckIntraMap(this)))
+astINVOKE(V,astClearIntraFlag_(astCheckIntraMap(this),STATUS_PTR))
 #define astGetIntraFlag(this) \
-astINVOKE(V,astGetIntraFlag_(astCheckIntraMap(this)))
+astINVOKE(V,astGetIntraFlag_(astCheckIntraMap(this),STATUS_PTR))
 #define astSetIntraFlag(this,value) \
-astINVOKE(V,astSetIntraFlag_(astCheckIntraMap(this),value))
+astINVOKE(V,astSetIntraFlag_(astCheckIntraMap(this),value,STATUS_PTR))
 #define astTestIntraFlag(this) \
-astINVOKE(V,astTestIntraFlag_(astCheckIntraMap(this)))
+astINVOKE(V,astTestIntraFlag_(astCheckIntraMap(this),STATUS_PTR))
 
 #else                            /* Public only */
 #define astIntraRegFor(name,nin,nout,tran,tran_wrap,flags,purpose,author,contact) \
-astIntraRegFor_(name,nin,nout,tran,tran_wrap,flags,purpose,author,contact)
+astIntraRegFor_(name,nin,nout,tran,tran_wrap,flags,purpose,author,contact,STATUS_PTR)
 #endif
 #endif
+
+
+
+

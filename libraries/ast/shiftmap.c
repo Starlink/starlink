@@ -70,6 +70,8 @@ f     The ShiftMap class does not define any new routines beyond those
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory management facilities */
 #include "object.h"              /* Base Object class */
@@ -98,18 +100,41 @@ f     The ShiftMap class does not define any new routines beyond those
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstShiftMapVtab class_vtab; /* Virtual function table */
-static int class_init = 0;         /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject * );
-static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
-static const char *(* parent_getattrib)( AstObject *, const char * );
-static int (* parent_testattrib)( AstObject *, const char * );
-static void (* parent_clearattrib)( AstObject *, const char * );
-static void (* parent_setattrib)( AstObject *, const char * );
+static int (* parent_getobjsize)( AstObject *, int * );
+static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+
+
+#ifdef THREAD_SAFE
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; 
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(ShiftMap)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(ShiftMap,Class_Init)
+#define class_vtab astGLOBAL(ShiftMap,Class_Vtab)
+
+
+#include <pthread.h>
+
+
+#else
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstShiftMapVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -121,20 +146,16 @@ AstShiftMap *astShiftMapId_( int, const double [], const char *, ... );
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static int GetObjSize( AstObject * );
-static const char *GetAttrib( AstObject *, const char * );
-static double Rate( AstMapping *, double *, int, int );
-static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
-static int TestAttrib( AstObject *, const char * );
-static void ClearAttrib( AstObject *, const char * );
-static void Copy( const AstObject *, AstObject * );
-static void Delete( AstObject * );
-static void Dump( AstObject *, AstChannel * );
-static void SetAttrib( AstObject *, const char * );
-static int Equal( AstObject *, AstObject * );
-static int GetIsLinear( AstMapping * );
-static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static int GetObjSize( AstObject *, int * );
+static double Rate( AstMapping *, double *, int, int, int * );
+static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Delete( AstObject *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static int Equal( AstObject *, AstObject *, int * );
+static int GetIsLinear( AstMapping *, int * );
+static int *MapSplit( AstMapping *, int, int *, AstMapping **, int * );
 
 /* Function Macros */
 /* =============== */
@@ -150,54 +171,7 @@ exceptions, so bad values are dealt with explicitly. */
 /* Member functions. */
 /* ================= */
 
-static void ClearAttrib( AstObject *this_object, const char *attrib ) {
-/*
-*  Name:
-*     ClearAttrib
-
-*  Purpose:
-*     Clear an attribute value for a ShiftMap.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "shiftmap.h"
-*     void ClearAttrib( AstObject *this, const char *attrib )
-
-*  Class Membership:
-*     ShiftMap member function (over-rides the astClearAttrib protected
-*     method inherited from the Mapping class).
-
-*  Description:
-*     This function clears the value of a specified attribute for a
-*     ShiftMap, so that the default value will subsequently be used.
-
-*  Parameters:
-*     this
-*        Pointer to the ShiftMap.
-*     attrib
-*        Pointer to a null-terminated string specifying the attribute
-*        name.  This should be in lower case with no surrounding white
-*        space.
-*/
-
-/* Local Variables: */
-   AstShiftMap *this;             /* Pointer to the ShiftMap structure */
-
-/* Check the global error status. */
-   if ( !astOK ) return;
-
-/* Obtain a pointer to the ShiftMap structure. */
-   this = (AstShiftMap *) this_object;
-
-/* At the moment the ShiftMap class has no attributes, so pass it on to the 
-   parent method for further interpretation. */
-   (*parent_clearattrib)( this_object, attrib );
-
-}
-
-static int Equal( AstObject *this_object, AstObject *that_object ) {
+static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
 *  Name:
 *     Equal
@@ -210,7 +184,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 *  Synopsis:
 *     #include "shiftmap.h"
-*     int Equal( AstObject *this, AstObject *that ) 
+*     int Equal( AstObject *this, AstObject *that, int *status ) 
 
 *  Class Membership:
 *     ShiftMap member function (over-rides the astEqual protected
@@ -225,6 +199,8 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *        Pointer to the first Object (a ShiftMap).
 *     that
 *        Pointer to the second Object.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if the ShiftMaps are equivalent, zero otherwise.
@@ -298,7 +274,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
    return result;
 }
 
-static int GetIsLinear( AstMapping *this_mapping ){
+static int GetIsLinear( AstMapping *this_mapping, int *status ){
 /*
 *  Name:
 *     GetIsLinear
@@ -311,7 +287,7 @@ static int GetIsLinear( AstMapping *this_mapping ){
 
 *  Synopsis:
 *     #include "mapping.h"
-*     void GetIsLinear( AstMapping *this )
+*     void GetIsLinear( AstMapping *this, int *status )
 
 *  Class Membership:
 *     ShiftMap member function (over-rides the protected astGetIsLinear
@@ -324,11 +300,13 @@ static int GetIsLinear( AstMapping *this_mapping ){
 *  Parameters:
 *     this
 *        Pointer to the ShiftMap.
+*     status
+*        Pointer to the inherited status variable.
 */
    return 1;
 }
 
-static int GetObjSize( AstObject *this_object ) {
+static int GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -341,7 +319,7 @@ static int GetObjSize( AstObject *this_object ) {
 
 *  Synopsis:
 *     #include "shiftmap.h"
-*     int GetObjSize( AstObject *this ) 
+*     int GetObjSize( AstObject *this, int *status ) 
 
 *  Class Membership:
 *     ShiftMap member function (over-rides the astGetObjSize protected
@@ -354,6 +332,8 @@ static int GetObjSize( AstObject *this_object ) {
 *  Parameters:
 *     this
 *        Pointer to the ShiftMap.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Object size, in bytes.
@@ -379,7 +359,7 @@ static int GetObjSize( AstObject *this_object ) {
 /* Invoke the GetObjSize method inherited from the parent class, and then
    add on any components of the class structure defined by thsi class
    which are stored in dynamically allocated memory. */
-   result = (*parent_getobjsize)( this_object );
+   result = (*parent_getobjsize)( this_object, status );
    result += astTSizeOf( this->shift );
 
 /* If an error occurred, clear the result value. */
@@ -389,81 +369,7 @@ static int GetObjSize( AstObject *this_object ) {
    return result;
 }
 
-static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
-/*
-*  Name:
-*     GetAttrib
-
-*  Purpose:
-*     Get the value of a specified attribute for a ShiftMap.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "shiftmap.h"
-*     const char *GetAttrib( AstObject *this, const char *attrib )
-
-*  Class Membership:
-*     ShiftMap member function (over-rides the protected astGetAttrib
-*     method inherited from the Mapping class).
-
-*  Description:
-*     This function returns a pointer to the value of a specified
-*     attribute for a ShiftMap, formatted as a character string.
-
-*  Parameters:
-*     this
-*        Pointer to the ShiftMap.
-*     attrib
-*        Pointer to a null-terminated string containing the name of
-*        the attribute whose value is required. This name should be in
-*        lower case, with all white space removed.
-
-*  Returned Value:
-*     - Pointer to a null-terminated string containing the attribute
-*     value.
-
-*  Notes:
-*     - The returned string pointer may point at memory allocated
-*     within the ShiftMap, or at static memory. The contents of the
-*     string may be over-written or the pointer may become invalid
-*     following a further invocation of the same function or any
-*     modification of the ShiftMap. A copy of the string should
-*     therefore be made if necessary.
-*     - A NULL pointer will be returned if this function is invoked
-*     with the global error status set, or if it should fail for any
-*     reason.
-*/
-
-/* Local Constants: */
-#define BUFF_LEN 50              /* Max. characters in result buffer */
-
-/* Local Variables: */
-   AstShiftMap *this;             /* Pointer to the ShiftMap structure */
-   const char *result;           /* Pointer value to return */
-
-/* Initialise. */
-   result = NULL;
-
-/* Check the global error status. */   
-   if ( !astOK ) return result;
-
-/* Obtain a pointer to the ShiftMap structure. */
-   this = (AstShiftMap *) this_object;
-
-/* At the moment the ShiftMap class has no attributes, so pass it on to the 
-   parent method for further interpretation. */
-   result = (*parent_getattrib)( this_object, attrib );
-
-/* Return the result. */
-   return result;
-
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
-}
-
-void astInitShiftMapVtab_(  AstShiftMapVtab *vtab, const char *name ) {
+void astInitShiftMapVtab_(  AstShiftMapVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -500,11 +406,16 @@ void astInitShiftMapVtab_(  AstShiftMapVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -513,8 +424,8 @@ void astInitShiftMapVtab_(  AstShiftMapVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAShiftMap) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -527,15 +438,6 @@ void astInitShiftMapVtab_(  AstShiftMapVtab *vtab, const char *name ) {
    mapping = (AstMappingVtab *) vtab;
    parent_getobjsize = object->GetObjSize;
    object->GetObjSize = GetObjSize;
-
-   parent_clearattrib = object->ClearAttrib;
-   object->ClearAttrib = ClearAttrib;
-   parent_getattrib = object->GetAttrib;
-   object->GetAttrib = GetAttrib;
-   parent_setattrib = object->SetAttrib;
-   object->SetAttrib = SetAttrib;
-   parent_testattrib = object->TestAttrib;
-   object->TestAttrib = TestAttrib;
 
    parent_transform = mapping->Transform;
    mapping->Transform = Transform;
@@ -553,10 +455,14 @@ void astInitShiftMapVtab_(  AstShiftMapVtab *vtab, const char *name ) {
    astSetCopy( (AstObjectVtab *) vtab, Copy );
    astSetDelete( (AstObjectVtab *) vtab, Delete );
 
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
 static int MapMerge( AstMapping *this, int where, int series, int *nmap,
-                     AstMapping ***map_list, int **invert_list ) {
+                     AstMapping ***map_list, int **invert_list, int *status ) {
 /*
 *  Name:
 *     MapMerge
@@ -570,7 +476,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *  Synopsis:
 *     #include "mapping.h"
 *     int MapMerge( AstMapping *this, int where, int series, int *nmap,
-*                   AstMapping ***map_list, int **invert_list )
+*                   AstMapping ***map_list, int **invert_list, int *status )
 
 *  Class Membership:
 *     ShiftMap method (over-rides the protected astMapMerge method
@@ -673,6 +579,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *        length, the "*invert_list" array will be extended (and its
 *        pointer updated) if necessary to accommodate any new
 *        elements.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     If simplification was possible, the function returns the index
@@ -706,7 +614,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    the WinMap class do the simplifying. Create the returned WinMap, initially 
    with undefined corners. */
    nin = astGetNin( this );
-   w1 = astWinMap( nin, NULL, NULL, NULL, NULL, "" );
+   w1 = astWinMap( nin, NULL, NULL, NULL, NULL, "", status );
 
 /* If succesful, store the scale and shift terms in the WinMap. The scale
    terms are unity. */
@@ -734,7 +642,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map ){
+static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, int *status ){
 /*
 *  Name:
 *     MapSplit
@@ -748,7 +656,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 
 *  Synopsis:
 *     #include "shiftmap.h"
-*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map )
+*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map, int *status )
 
 *  Class Membership:
 *     ShiftMap method (over-rides the protected astMapSplit method
@@ -780,6 +688,8 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 *        outputs may be different to "nin"). A NULL pointer will be
 *        returned if the supplied ShiftMap has no subset of outputs which 
 *        depend only on the selected inputs.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated array of ints. The number of
@@ -817,7 +727,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 /* Allocate memory for the returned array and create a ShiftMap with the
    required number of axes and initially unsorted shifts. */
    result = astMalloc( sizeof( int )*(size_t) nin );
-   newsm = astShiftMap( nin, this->shift, "" );
+   newsm = astShiftMap( nin, this->shift, "", status );
    *map = (AstMapping *) newsm;
 
 /* Check pointers can be used safely. */
@@ -861,7 +771,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
    return result;
 }
 
-static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
+static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status ){
 /*
 *  Name:
 *     Rate
@@ -874,7 +784,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
 
 *  Synopsis:
 *     #include "shiftmap.h"
-*     result = Rate( AstMapping *this, double *at, int ax1, int ax2 )
+*     result = Rate( AstMapping *this, double *at, int ax1, int ax2, int *status )
 
 *  Class Membership:
 *     ShiftMap member function (overrides the astRate method inherited
@@ -900,6 +810,8 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
 *        The index of the Mapping input which is to be varied in order to
 *        find the rate of change (input numbering starts at 0 for the first 
 *        input).
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The rate of change of Mapping output "ax1" with respect to input 
@@ -911,128 +823,8 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
    return ( ax1 == ax2 ) ? 1.0 : 0.0;
 }
 
-static void SetAttrib( AstObject *this_object, const char *setting ) {
-/*
-*  Name:
-*     astSetAttrib
-
-*  Purpose:
-*     Set an attribute value for a ShiftMap.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "shiftmap.h"
-*     void SetAttrib( AstObject *this, const char *setting )
-
-*  Class Membership:
-*     ShiftMap member function (over-rides the astSetAttrib protected
-*     method inherited from the Mapping class).
-
-*  Description:
-*     This function assigns an attribute value for a ShiftMap, the
-*     attribute and its value being specified by means of a string of
-*     the form:
-*
-*        "attribute= value "
-*
-*     Here, "attribute" specifies the attribute name and should be in
-*     lower case with no white space present. The value to the right
-*     of the "=" should be a suitable textual representation of the
-*     value to be assigned and this will be interpreted according to
-*     the attribute's data type.  White space surrounding the value is
-*     only significant for string attributes.
-
-*  Parameters:
-*     this
-*        Pointer to the ShiftMap.
-*     setting
-*        Pointer to a null-terminated string specifying the new attribute
-*        value.
-*/
-
-/* Local Variables: */
-   AstShiftMap *this;             /* Pointer to the ShiftMap structure */
-   int len;                      /* Length of setting string */
-
-/* Check the global error status. */
-   if ( !astOK ) return;
-
-/* Obtain a pointer to the ShiftMap structure. */
-   this = (AstShiftMap *) this_object;
-
-/* Obtain the length of the setting string. */
-   len = (int) strlen( setting );
-
-/* The ShiftMap class currently has no attributes, so pass it on to the parent
-   method for further interpretation. */
-   (*parent_setattrib)( this_object, setting );
-
-}
-
-static int TestAttrib( AstObject *this_object, const char *attrib ) {
-/*
-*  Name:
-*     TestAttrib
-
-*  Purpose:
-*     Test if a specified attribute value is set for a ShiftMap.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "shiftmap.h"
-*     int TestAttrib( AstObject *this, const char *attrib )
-
-*  Class Membership:
-*     ShiftMap member function (over-rides the astTestAttrib protected
-*     method inherited from the Mapping class).
-
-*  Description:
-*     This function returns a boolean result (0 or 1) to indicate whether
-*     a value has been set for one of a ShiftMap's attributes.
-
-*  Parameters:
-*     this
-*        Pointer to the ShiftMap.
-*     attrib
-*        Pointer to a null-terminated string specifying the attribute
-*        name.  This should be in lower case with no surrounding white
-*        space.
-
-*  Returned Value:
-*     One if a value has been set, otherwise zero.
-
-*  Notes:
-*     - A value of zero will be returned if this function is invoked
-*     with the global status set, or if it should fail for any reason.
-*/
-
-/* Local Variables: */
-   AstShiftMap *this;             /* Pointer to the ShiftMap structure */
-   int result;                   /* Result value to return */
-
-/* Initialise. */
-   result = 0;
-
-/* Check the global error status. */
-   if ( !astOK ) return result;
-
-/* Obtain a pointer to the ShiftMap structure. */
-   this = (AstShiftMap *) this_object;
-
-/* The ShiftMap class currently has no attributes, so pass it on to the parent
-   method for further interpretation. */
-   result = (*parent_testattrib)( this_object, attrib );
-
-/* Return the result, */
-   return result;
-}
-
 static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-                               int forward, AstPointSet *out ) {
+                               int forward, AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     Transform
@@ -1046,7 +838,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *  Synopsis:
 *     #include "shiftmap.h"
 *     AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-*                             int forward, AstPointSet *out )
+*                             int forward, AstPointSet *out, int *status )
 
 *  Class Membership:
 *     ShiftMap member function (over-rides the astTransform protected
@@ -1070,6 +862,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *        Pointer to a PointSet which will hold the transformed (output)
 *        coordinate values. A NULL value may also be given, in which case a
 *        new PointSet will be created by this function.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the output (possibly new) PointSet.
@@ -1108,7 +902,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    function inherited from the parent Mapping class. This function validates
    all arguments and generates an output PointSet if necessary, but does not
    actually transform any coordinate values. */
-   result = (*parent_transform)( this, in, forward, out );
+   result = (*parent_transform)( this, in, forward, out, status );
 
 /* We will now extend the parent astTransform method by performing the
    calculations needed to generate the output coordinate values. */
@@ -1129,7 +923,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    if( !map->shift && astOK ){
       class = astGetClass( this );
       astError( AST__BADSM, "astTransform(%s): The supplied %s does not "
-                "contain any shift information.", class, class );
+                "contain any shift information.", status, class, class );
    }
 
 /* Perform coordinate arithmetic. */
@@ -1180,7 +974,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -1192,7 +986,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for ShiftMap objects.
@@ -1202,6 +996,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the ShiftMap to be copied.
 *     objout
 *        Pointer to the ShiftMap being constructed.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -1233,7 +1029,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -1245,7 +1041,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for ShiftMap objects.
@@ -1253,6 +1049,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the ShiftMap to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - This destructor does nothing and exists only to maintain a
@@ -1273,7 +1071,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -1285,7 +1083,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -1296,6 +1094,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the ShiftMap whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Constants: */
@@ -1339,10 +1139,10 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsAShiftMap and astCheckShiftMap functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(ShiftMap,Mapping,check,&class_init)
+astMAKE_ISA(ShiftMap,Mapping,check,&class_check)
 astMAKE_CHECK(ShiftMap)
 
-AstShiftMap *astShiftMap_( int ncoord, const double shift[], const char *options, ... ) {
+AstShiftMap *astShiftMap_( int ncoord, const double shift[], const char *options, int *status, ...) {
 /*
 *++
 *  Name:
@@ -1414,12 +1214,23 @@ f     AST_SHIFTMAP = INTEGER
 c     function is invoked with the AST error status set, or if it
 f     function is invoked with STATUS set to an error value, or if it
 *     should fail for any reason.
+
+*  Status Handling:
+*     The protected interface to this function includes an extra
+*     parameter at the end of the parameter list descirbed above. This
+*     parameter is a pointer to the integer inherited status
+*     variable: "int *status".
+
 *--
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstShiftMap *new;              /* Pointer to new ShiftMap */
    va_list args;                  /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -1436,7 +1247,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Obtain the variable argument list and pass it along with the options string
    to the astVSet method to initialise the new ShiftMap's attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -1489,8 +1300,17 @@ AstShiftMap *astShiftMapId_( int ncoord, const double shift[],
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstShiftMap *new;            /* Pointer to new ShiftMap */
    va_list args;                /* Variable argument list */
+
+   int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -1521,7 +1341,7 @@ AstShiftMap *astShiftMapId_( int ncoord, const double shift[],
 
 AstShiftMap *astInitShiftMap_( void *mem, size_t size, int init,
                               AstShiftMapVtab *vtab, const char *name,
-                              int ncoord, const double *shift ) {
+                              int ncoord, const double *shift, int *status ) {
 /*
 *+
 *  Name:
@@ -1637,7 +1457,7 @@ AstShiftMap *astInitShiftMap_( void *mem, size_t size, int init,
 
 AstShiftMap *astLoadShiftMap_( void *mem, size_t size,
                                AstShiftMapVtab *vtab, const char *name,
-                               AstChannel *channel ) {
+                               AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -1712,12 +1532,16 @@ AstShiftMap *astLoadShiftMap_( void *mem, size_t size,
 */
 
 /* Local Constants. */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
    AstShiftMap *new;            /* Pointer to the new ShiftMap */
    char buff[ KEY_LEN + 1 ];    /* Buffer for keyword string */
-   int axis;                    /* Axis index */
+   int axis;                    /* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
+
+/* Axis index */
    int ncoord;                  /* The number of coordinate axes */
 
 /* Initialise. */
@@ -1793,4 +1617,8 @@ AstShiftMap *astLoadShiftMap_( void *mem, size_t size,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
+
+
+
+
 

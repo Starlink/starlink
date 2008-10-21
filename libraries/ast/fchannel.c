@@ -240,7 +240,7 @@ f--
    )
 }
 
-void astSinkWrap_( void (* sink)( const char * ), const char *line ) {
+void astSinkWrap_( void (* sink)( const char * ), const char *line, int *status ) {
 /*
 *+
 *  Name:
@@ -295,7 +295,7 @@ void astSinkWrap_( void (* sink)( const char * ), const char *line ) {
    line_out = NULL;
 }
 
-char *astSourceWrap_( const char *(* source)( void ) ) {
+char *astSourceWrap_( const char *(* source)( void ), int *status ) {
 /*
 *+
 *  Name:

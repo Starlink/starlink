@@ -60,6 +60,12 @@
 
 /* Macros. */
 /* ======= */
+#if defined(astCLASS) || defined(astFORTRAN77)
+#define STATUS_PTR status
+#else
+#define STATUS_PTR astGetStatusPtr
+#endif
+
 
 #if defined(astCLASS)            /* Protected */
 
@@ -132,61 +138,78 @@ typedef struct AstSpecFrameVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   void (* GetRefPos)( AstSpecFrame *, AstSkyFrame *, double *, double * );
-   void (* SetRefPos)( AstSpecFrame *, AstSkyFrame *, double, double );
+   void (* GetRefPos)( AstSpecFrame *, AstSkyFrame *, double *, double *, int * );
+   void (* SetRefPos)( AstSpecFrame *, AstSkyFrame *, double, double, int * );
 
-   AstStdOfRestType (* GetStdOfRest)( AstSpecFrame * );
-   int (* TestStdOfRest)( AstSpecFrame * );
-   void (* ClearStdOfRest)( AstSpecFrame * );
-   void (* SetStdOfRest)( AstSpecFrame *, AstStdOfRestType );
+   AstStdOfRestType (* GetStdOfRest)( AstSpecFrame *, int * );
+   int (* TestStdOfRest)( AstSpecFrame *, int * );
+   void (* ClearStdOfRest)( AstSpecFrame *, int * );
+   void (* SetStdOfRest)( AstSpecFrame *, AstStdOfRestType, int * );
 
-   AstStdOfRestType (* GetAlignStdOfRest)( AstSpecFrame * );
-   int (* TestAlignStdOfRest)( AstSpecFrame * );
-   void (* ClearAlignStdOfRest)( AstSpecFrame * );
-   void (* SetAlignStdOfRest)( AstSpecFrame *, AstStdOfRestType );
+   AstStdOfRestType (* GetAlignStdOfRest)( AstSpecFrame *, int * );
+   int (* TestAlignStdOfRest)( AstSpecFrame *, int * );
+   void (* ClearAlignStdOfRest)( AstSpecFrame *, int * );
+   void (* SetAlignStdOfRest)( AstSpecFrame *, AstStdOfRestType, int * );
 
-   AstStdOfRestType (* GetSourceVRF)( AstSpecFrame * );
-   int (* TestSourceVRF)( AstSpecFrame * );
-   void (* ClearSourceVRF)( AstSpecFrame * );
-   void (* SetSourceVRF)( AstSpecFrame *, AstStdOfRestType );
+   AstStdOfRestType (* GetSourceVRF)( AstSpecFrame *, int * );
+   int (* TestSourceVRF)( AstSpecFrame *, int * );
+   void (* ClearSourceVRF)( AstSpecFrame *, int * );
+   void (* SetSourceVRF)( AstSpecFrame *, AstStdOfRestType, int * );
 
-   AstSystemType (* GetSourceSys)( AstSpecFrame * );
-   int (* TestSourceSys)( AstSpecFrame * );
-   void (* ClearSourceSys)( AstSpecFrame * );
-   void (* SetSourceSys)( AstSpecFrame *, AstSystemType );
+   AstSystemType (* GetSourceSys)( AstSpecFrame *, int * );
+   int (* TestSourceSys)( AstSpecFrame *, int * );
+   void (* ClearSourceSys)( AstSpecFrame *, int * );
+   void (* SetSourceSys)( AstSpecFrame *, AstSystemType, int * );
 
-   double (* GetRestFreq)( AstSpecFrame * );
-   int (* TestRestFreq)( AstSpecFrame * );
-   void (* ClearRestFreq)( AstSpecFrame * );
-   void (* SetRestFreq)( AstSpecFrame *, double );
+   double (* GetRestFreq)( AstSpecFrame *, int * );
+   int (* TestRestFreq)( AstSpecFrame *, int * );
+   void (* ClearRestFreq)( AstSpecFrame *, int * );
+   void (* SetRestFreq)( AstSpecFrame *, double, int * );
 
-   double (* GetRefRA)( AstSpecFrame * );
-   int (* TestRefRA)( AstSpecFrame * );
-   void (* ClearRefRA)( AstSpecFrame * );
-   void (* SetRefRA)( AstSpecFrame *, double );
+   double (* GetRefRA)( AstSpecFrame *, int * );
+   int (* TestRefRA)( AstSpecFrame *, int * );
+   void (* ClearRefRA)( AstSpecFrame *, int * );
+   void (* SetRefRA)( AstSpecFrame *, double, int * );
 
-   double (* GetRefDec)( AstSpecFrame * );
-   int (* TestRefDec)( AstSpecFrame * );
-   void (* ClearRefDec)( AstSpecFrame * );
-   void (* SetRefDec)( AstSpecFrame *, double );
+   double (* GetRefDec)( AstSpecFrame *, int * );
+   int (* TestRefDec)( AstSpecFrame *, int * );
+   void (* ClearRefDec)( AstSpecFrame *, int * );
+   void (* SetRefDec)( AstSpecFrame *, double, int * );
 
-   double (* GetSourceVel)( AstSpecFrame * );
-   int (* TestSourceVel)( AstSpecFrame * );
-   void (* ClearSourceVel)( AstSpecFrame * );
-   void (* SetSourceVel)( AstSpecFrame *, double );
+   double (* GetSourceVel)( AstSpecFrame *, int * );
+   int (* TestSourceVel)( AstSpecFrame *, int * );
+   void (* ClearSourceVel)( AstSpecFrame *, int * );
+   void (* SetSourceVel)( AstSpecFrame *, double, int * );
 
-   double (* GetSpecOrigin)( AstSpecFrame * );
-   int (* TestSpecOrigin)( AstSpecFrame * );
-   void (* ClearSpecOrigin)( AstSpecFrame * );
-   void (* SetSpecOrigin)( AstSpecFrame *, double );
+   double (* GetSpecOrigin)( AstSpecFrame *, int * );
+   int (* TestSpecOrigin)( AstSpecFrame *, int * );
+   void (* ClearSpecOrigin)( AstSpecFrame *, int * );
+   void (* SetSpecOrigin)( AstSpecFrame *, double, int * );
 
-   int (* GetAlignSpecOffset)( AstSpecFrame * );
-   int (* TestAlignSpecOffset)( AstSpecFrame * );
-   void (* ClearAlignSpecOffset)( AstSpecFrame * );
-   void (* SetAlignSpecOffset)( AstSpecFrame *, int );
+   int (* GetAlignSpecOffset)( AstSpecFrame *, int * );
+   int (* TestAlignSpecOffset)( AstSpecFrame *, int * );
+   void (* ClearAlignSpecOffset)( AstSpecFrame *, int * );
+   void (* SetAlignSpecOffset)( AstSpecFrame *, int, int * );
 
 
 } AstSpecFrameVtab;
+
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstSpecFrameGlobals {
+   AstSpecFrameVtab Class_Vtab;
+   int Class_Init;
+   char GetAttrib_Buff[ 51 ];
+   char GetLabel_Buff[ 201 ];
+   char GetSymbol_Buff[ 21 ];
+   char GetTitle_Buff[ 201 ];
+} AstSpecFrameGlobals;
+
+#endif
+
 #endif
 
 /* Function prototypes. */
@@ -198,7 +221,7 @@ astPROTO_ISA(SpecFrame)           /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected */
-AstSpecFrame *astSpecFrame_( const char *, ... );
+AstSpecFrame *astSpecFrame_( const char *, int *, ...);
 #else
 AstSpecFrame *astSpecFrameId_( const char *, ... );
 #endif
@@ -208,73 +231,79 @@ AstSpecFrame *astSpecFrameId_( const char *, ... );
 /* Initialiser. */
 AstSpecFrame *astInitSpecFrame_( void *, size_t, int, 
                                          AstSpecFrameVtab *,
-                                         const char * );
+                                         const char *, int * );
 
 /* Vtab initialiser. */
-void astInitSpecFrameVtab_( AstSpecFrameVtab *, const char * );
+void astInitSpecFrameVtab_( AstSpecFrameVtab *, const char *, int * );
 
 /* Loader. */
 AstSpecFrame *astLoadSpecFrame_( void *, size_t, 
                                          AstSpecFrameVtab *,
-                                         const char *, AstChannel *channel );
+                                         const char *, AstChannel *channel, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitSpecFrameGlobals_( AstSpecFrameGlobals * );
+#endif
+
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-void astGetRefPos_( AstSpecFrame *, AstSkyFrame *, double *, double * );
-void astSetRefPos_( AstSpecFrame *, AstSkyFrame *, double, double );
+void astGetRefPos_( AstSpecFrame *, AstSkyFrame *, double *, double *, int * );
+void astSetRefPos_( AstSpecFrame *, AstSkyFrame *, double, double, int * );
 
 #if defined(astCLASS)            /* Protected */
 
-AstStdOfRestType astGetStdOfRest_( AstSpecFrame * );
-int astTestStdOfRest_( AstSpecFrame * );
-void astClearStdOfRest_( AstSpecFrame * );
-void astSetStdOfRest_( AstSpecFrame *, AstStdOfRestType );
+AstStdOfRestType astGetStdOfRest_( AstSpecFrame *, int * );
+int astTestStdOfRest_( AstSpecFrame *, int * );
+void astClearStdOfRest_( AstSpecFrame *, int * );
+void astSetStdOfRest_( AstSpecFrame *, AstStdOfRestType, int * );
 
-AstStdOfRestType astGetAlignStdOfRest_( AstSpecFrame * );
-int astTestAlignStdOfRest_( AstSpecFrame * );
-void astClearAlignStdOfRest_( AstSpecFrame * );
-void astSetAlignStdOfRest_( AstSpecFrame *, AstStdOfRestType );
+AstStdOfRestType astGetAlignStdOfRest_( AstSpecFrame *, int * );
+int astTestAlignStdOfRest_( AstSpecFrame *, int * );
+void astClearAlignStdOfRest_( AstSpecFrame *, int * );
+void astSetAlignStdOfRest_( AstSpecFrame *, AstStdOfRestType, int * );
 
-AstStdOfRestType astGetSourceVRF_( AstSpecFrame * );
-int astTestSourceVRF_( AstSpecFrame * );
-void astClearSourceVRF_( AstSpecFrame * );
-void astSetSourceVRF_( AstSpecFrame *, AstStdOfRestType );
+AstStdOfRestType astGetSourceVRF_( AstSpecFrame *, int * );
+int astTestSourceVRF_( AstSpecFrame *, int * );
+void astClearSourceVRF_( AstSpecFrame *, int * );
+void astSetSourceVRF_( AstSpecFrame *, AstStdOfRestType, int * );
 
-AstSystemType astGetSourceSys_( AstSpecFrame * );
-int astTestSourceSys_( AstSpecFrame * );
-void astClearSourceSys_( AstSpecFrame * );
-void astSetSourceSys_( AstSpecFrame *, AstSystemType );
+AstSystemType astGetSourceSys_( AstSpecFrame *, int * );
+int astTestSourceSys_( AstSpecFrame *, int * );
+void astClearSourceSys_( AstSpecFrame *, int * );
+void astSetSourceSys_( AstSpecFrame *, AstSystemType, int * );
 
-double astGetRestFreq_( AstSpecFrame * );
-int astTestRestFreq_( AstSpecFrame * );
-void astClearRestFreq_( AstSpecFrame * );
-void astSetRestFreq_( AstSpecFrame *, double );
+double astGetRestFreq_( AstSpecFrame *, int * );
+int astTestRestFreq_( AstSpecFrame *, int * );
+void astClearRestFreq_( AstSpecFrame *, int * );
+void astSetRestFreq_( AstSpecFrame *, double, int * );
 
-double astGetRefRA_( AstSpecFrame * );
-int astTestRefRA_( AstSpecFrame * );
-void astClearRefRA_( AstSpecFrame * );
-void astSetRefRA_( AstSpecFrame *, double );
+double astGetRefRA_( AstSpecFrame *, int * );
+int astTestRefRA_( AstSpecFrame *, int * );
+void astClearRefRA_( AstSpecFrame *, int * );
+void astSetRefRA_( AstSpecFrame *, double, int * );
 
-double astGetRefDec_( AstSpecFrame * );
-int astTestRefDec_( AstSpecFrame * );
-void astClearRefDec_( AstSpecFrame * );
-void astSetRefDec_( AstSpecFrame *, double );
+double astGetRefDec_( AstSpecFrame *, int * );
+int astTestRefDec_( AstSpecFrame *, int * );
+void astClearRefDec_( AstSpecFrame *, int * );
+void astSetRefDec_( AstSpecFrame *, double, int * );
 
-double astGetSourceVel_( AstSpecFrame * );
-int astTestSourceVel_( AstSpecFrame * );
-void astClearSourceVel_( AstSpecFrame * );
-void astSetSourceVel_( AstSpecFrame *, double );
+double astGetSourceVel_( AstSpecFrame *, int * );
+int astTestSourceVel_( AstSpecFrame *, int * );
+void astClearSourceVel_( AstSpecFrame *, int * );
+void astSetSourceVel_( AstSpecFrame *, double, int * );
 
-double astGetSpecOrigin_( AstSpecFrame * );
-int astTestSpecOrigin_( AstSpecFrame * );
-void astClearSpecOrigin_( AstSpecFrame * );
-void astSetSpecOrigin_( AstSpecFrame *, double );
+double astGetSpecOrigin_( AstSpecFrame *, int * );
+int astTestSpecOrigin_( AstSpecFrame *, int * );
+void astClearSpecOrigin_( AstSpecFrame *, int * );
+void astSetSpecOrigin_( AstSpecFrame *, double, int * );
 
-int astGetAlignSpecOffset_( AstSpecFrame * );
-int astTestAlignSpecOffset_( AstSpecFrame * );
-void astClearAlignSpecOffset_( AstSpecFrame * );
-void astSetAlignSpecOffset_( AstSpecFrame *, int );
+int astGetAlignSpecOffset_( AstSpecFrame *, int * );
+int astTestAlignSpecOffset_( AstSpecFrame *, int * );
+void astClearAlignSpecOffset_( AstSpecFrame *, int * );
+void astSetAlignSpecOffset_( AstSpecFrame *, int, int * );
 
 #endif
 
@@ -308,13 +337,13 @@ void astSetAlignSpecOffset_( AstSpecFrame *, int );
 
 /* Initialiser. */
 #define astInitSpecFrame(mem,size,init,vtab,name) \
-astINVOKE(O,astInitSpecFrame_(mem,size,init,vtab,name))
+astINVOKE(O,astInitSpecFrame_(mem,size,init,vtab,name,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitSpecFrameVtab(vtab,name) astINVOKE(V,astInitSpecFrameVtab_(vtab,name))
+#define astInitSpecFrameVtab(vtab,name) astINVOKE(V,astInitSpecFrameVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadSpecFrame(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadSpecFrame_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadSpecFrame_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 
 #endif
 
@@ -329,62 +358,66 @@ astINVOKE(O,astLoadSpecFrame_(mem,size,vtab,name,astCheckChannel(channel)))
    before use. This provides a contextual error report if a pointer to
    the wrong sort of object is supplied. */
 
-#define astGetRefPos(this,frm,lon,lat) astINVOKE(V,astGetRefPos_(astCheckSpecFrame(this),(frm==NULL?NULL:astCheckSkyFrame(frm)),lon,lat))
-#define astSetRefPos(this,frm,lon,lat) astINVOKE(V,astSetRefPos_(astCheckSpecFrame(this),(frm==NULL?NULL:astCheckSkyFrame(frm)),lon,lat))
+#define astGetRefPos(this,frm,lon,lat) astINVOKE(V,astGetRefPos_(astCheckSpecFrame(this),(frm==NULL?NULL:astCheckSkyFrame(frm)),lon,lat,STATUS_PTR))
+#define astSetRefPos(this,frm,lon,lat) astINVOKE(V,astSetRefPos_(astCheckSpecFrame(this),(frm==NULL?NULL:astCheckSkyFrame(frm)),lon,lat,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 
-#define astGetStdOfRest(this) astINVOKE(V,astGetStdOfRest_(astCheckSpecFrame(this)))
-#define astTestStdOfRest(this) astINVOKE(V,astTestStdOfRest_(astCheckSpecFrame(this)))
-#define astClearStdOfRest(this) astINVOKE(V,astClearStdOfRest_(astCheckSpecFrame(this)))
-#define astSetStdOfRest(this,value) astINVOKE(V,astSetStdOfRest_(astCheckSpecFrame(this),value))
+#define astGetStdOfRest(this) astINVOKE(V,astGetStdOfRest_(astCheckSpecFrame(this),STATUS_PTR))
+#define astTestStdOfRest(this) astINVOKE(V,astTestStdOfRest_(astCheckSpecFrame(this),STATUS_PTR))
+#define astClearStdOfRest(this) astINVOKE(V,astClearStdOfRest_(astCheckSpecFrame(this),STATUS_PTR))
+#define astSetStdOfRest(this,value) astINVOKE(V,astSetStdOfRest_(astCheckSpecFrame(this),value,STATUS_PTR))
 
-#define astGetAlignStdOfRest(this) astINVOKE(V,astGetAlignStdOfRest_(astCheckSpecFrame(this)))
-#define astTestAlignStdOfRest(this) astINVOKE(V,astTestAlignStdOfRest_(astCheckSpecFrame(this)))
-#define astClearAlignStdOfRest(this) astINVOKE(V,astClearAlignStdOfRest_(astCheckSpecFrame(this)))
-#define astSetAlignStdOfRest(this,value) astINVOKE(V,astSetAlignStdOfRest_(astCheckSpecFrame(this),value))
+#define astGetAlignStdOfRest(this) astINVOKE(V,astGetAlignStdOfRest_(astCheckSpecFrame(this),STATUS_PTR))
+#define astTestAlignStdOfRest(this) astINVOKE(V,astTestAlignStdOfRest_(astCheckSpecFrame(this),STATUS_PTR))
+#define astClearAlignStdOfRest(this) astINVOKE(V,astClearAlignStdOfRest_(astCheckSpecFrame(this),STATUS_PTR))
+#define astSetAlignStdOfRest(this,value) astINVOKE(V,astSetAlignStdOfRest_(astCheckSpecFrame(this),value,STATUS_PTR))
 
-#define astGetSourceVRF(this) astINVOKE(V,astGetSourceVRF_(astCheckSpecFrame(this)))
-#define astTestSourceVRF(this) astINVOKE(V,astTestSourceVRF_(astCheckSpecFrame(this)))
-#define astClearSourceVRF(this) astINVOKE(V,astClearSourceVRF_(astCheckSpecFrame(this)))
-#define astSetSourceVRF(this,value) astINVOKE(V,astSetSourceVRF_(astCheckSpecFrame(this),value))
+#define astGetSourceVRF(this) astINVOKE(V,astGetSourceVRF_(astCheckSpecFrame(this),STATUS_PTR))
+#define astTestSourceVRF(this) astINVOKE(V,astTestSourceVRF_(astCheckSpecFrame(this),STATUS_PTR))
+#define astClearSourceVRF(this) astINVOKE(V,astClearSourceVRF_(astCheckSpecFrame(this),STATUS_PTR))
+#define astSetSourceVRF(this,value) astINVOKE(V,astSetSourceVRF_(astCheckSpecFrame(this),value,STATUS_PTR))
 
-#define astGetSourceSys(this) astINVOKE(V,astGetSourceSys_(astCheckSpecFrame(this)))
-#define astTestSourceSys(this) astINVOKE(V,astTestSourceSys_(astCheckSpecFrame(this)))
-#define astClearSourceSys(this) astINVOKE(V,astClearSourceSys_(astCheckSpecFrame(this)))
-#define astSetSourceSys(this,value) astINVOKE(V,astSetSourceSys_(astCheckSpecFrame(this),value))
+#define astGetSourceSys(this) astINVOKE(V,astGetSourceSys_(astCheckSpecFrame(this),STATUS_PTR))
+#define astTestSourceSys(this) astINVOKE(V,astTestSourceSys_(astCheckSpecFrame(this),STATUS_PTR))
+#define astClearSourceSys(this) astINVOKE(V,astClearSourceSys_(astCheckSpecFrame(this),STATUS_PTR))
+#define astSetSourceSys(this,value) astINVOKE(V,astSetSourceSys_(astCheckSpecFrame(this),value,STATUS_PTR))
 
-#define astGetRestFreq(this) astINVOKE(V,astGetRestFreq_(astCheckSpecFrame(this)))
-#define astTestRestFreq(this) astINVOKE(V,astTestRestFreq_(astCheckSpecFrame(this)))
-#define astClearRestFreq(this) astINVOKE(V,astClearRestFreq_(astCheckSpecFrame(this)))
-#define astSetRestFreq(this,value) astINVOKE(V,astSetRestFreq_(astCheckSpecFrame(this),value))
+#define astGetRestFreq(this) astINVOKE(V,astGetRestFreq_(astCheckSpecFrame(this),STATUS_PTR))
+#define astTestRestFreq(this) astINVOKE(V,astTestRestFreq_(astCheckSpecFrame(this),STATUS_PTR))
+#define astClearRestFreq(this) astINVOKE(V,astClearRestFreq_(astCheckSpecFrame(this),STATUS_PTR))
+#define astSetRestFreq(this,value) astINVOKE(V,astSetRestFreq_(astCheckSpecFrame(this),value,STATUS_PTR))
 
-#define astGetRefRA(this) astINVOKE(V,astGetRefRA_(astCheckSpecFrame(this)))
-#define astTestRefRA(this) astINVOKE(V,astTestRefRA_(astCheckSpecFrame(this)))
-#define astClearRefRA(this) astINVOKE(V,astClearRefRA_(astCheckSpecFrame(this)))
-#define astSetRefRA(this,value) astINVOKE(V,astSetRefRA_(astCheckSpecFrame(this),value))
+#define astGetRefRA(this) astINVOKE(V,astGetRefRA_(astCheckSpecFrame(this),STATUS_PTR))
+#define astTestRefRA(this) astINVOKE(V,astTestRefRA_(astCheckSpecFrame(this),STATUS_PTR))
+#define astClearRefRA(this) astINVOKE(V,astClearRefRA_(astCheckSpecFrame(this),STATUS_PTR))
+#define astSetRefRA(this,value) astINVOKE(V,astSetRefRA_(astCheckSpecFrame(this),value,STATUS_PTR))
 
-#define astGetRefDec(this) astINVOKE(V,astGetRefDec_(astCheckSpecFrame(this)))
-#define astTestRefDec(this) astINVOKE(V,astTestRefDec_(astCheckSpecFrame(this)))
-#define astClearRefDec(this) astINVOKE(V,astClearRefDec_(astCheckSpecFrame(this)))
-#define astSetRefDec(this,value) astINVOKE(V,astSetRefDec_(astCheckSpecFrame(this),value))
+#define astGetRefDec(this) astINVOKE(V,astGetRefDec_(astCheckSpecFrame(this),STATUS_PTR))
+#define astTestRefDec(this) astINVOKE(V,astTestRefDec_(astCheckSpecFrame(this),STATUS_PTR))
+#define astClearRefDec(this) astINVOKE(V,astClearRefDec_(astCheckSpecFrame(this),STATUS_PTR))
+#define astSetRefDec(this,value) astINVOKE(V,astSetRefDec_(astCheckSpecFrame(this),value,STATUS_PTR))
 
-#define astGetSourceVel(this) astINVOKE(V,astGetSourceVel_(astCheckSpecFrame(this)))
-#define astTestSourceVel(this) astINVOKE(V,astTestSourceVel_(astCheckSpecFrame(this)))
-#define astClearSourceVel(this) astINVOKE(V,astClearSourceVel_(astCheckSpecFrame(this)))
-#define astSetSourceVel(this,value) astINVOKE(V,astSetSourceVel_(astCheckSpecFrame(this),value))
+#define astGetSourceVel(this) astINVOKE(V,astGetSourceVel_(astCheckSpecFrame(this),STATUS_PTR))
+#define astTestSourceVel(this) astINVOKE(V,astTestSourceVel_(astCheckSpecFrame(this),STATUS_PTR))
+#define astClearSourceVel(this) astINVOKE(V,astClearSourceVel_(astCheckSpecFrame(this),STATUS_PTR))
+#define astSetSourceVel(this,value) astINVOKE(V,astSetSourceVel_(astCheckSpecFrame(this),value,STATUS_PTR))
 
-#define astGetSpecOrigin(this) astINVOKE(V,astGetSpecOrigin_(astCheckSpecFrame(this)))
-#define astTestSpecOrigin(this) astINVOKE(V,astTestSpecOrigin_(astCheckSpecFrame(this)))
-#define astClearSpecOrigin(this) astINVOKE(V,astClearSpecOrigin_(astCheckSpecFrame(this)))
-#define astSetSpecOrigin(this,value) astINVOKE(V,astSetSpecOrigin_(astCheckSpecFrame(this),value))
+#define astGetSpecOrigin(this) astINVOKE(V,astGetSpecOrigin_(astCheckSpecFrame(this),STATUS_PTR))
+#define astTestSpecOrigin(this) astINVOKE(V,astTestSpecOrigin_(astCheckSpecFrame(this),STATUS_PTR))
+#define astClearSpecOrigin(this) astINVOKE(V,astClearSpecOrigin_(astCheckSpecFrame(this),STATUS_PTR))
+#define astSetSpecOrigin(this,value) astINVOKE(V,astSetSpecOrigin_(astCheckSpecFrame(this),value,STATUS_PTR))
 
-#define astClearAlignSpecOffset(this) astINVOKE(V,astClearAlignSpecOffset_(astCheckSpecFrame(this)))
-#define astGetAlignSpecOffset(this) astINVOKE(V,astGetAlignSpecOffset_(astCheckSpecFrame(this)))
-#define astSetAlignSpecOffset(this,value) astINVOKE(V,astSetAlignSpecOffset_(astCheckSpecFrame(this),value))
-#define astTestAlignSpecOffset(this) astINVOKE(V,astTestAlignSpecOffset_(astCheckSpecFrame(this)))
+#define astClearAlignSpecOffset(this) astINVOKE(V,astClearAlignSpecOffset_(astCheckSpecFrame(this),STATUS_PTR))
+#define astGetAlignSpecOffset(this) astINVOKE(V,astGetAlignSpecOffset_(astCheckSpecFrame(this),STATUS_PTR))
+#define astSetAlignSpecOffset(this,value) astINVOKE(V,astSetAlignSpecOffset_(astCheckSpecFrame(this),value,STATUS_PTR))
+#define astTestAlignSpecOffset(this) astINVOKE(V,astTestAlignSpecOffset_(astCheckSpecFrame(this),STATUS_PTR))
 
 
 
 #endif
 #endif
+
+
+
+

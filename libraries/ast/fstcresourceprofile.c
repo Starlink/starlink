@@ -57,6 +57,7 @@
 #include "c2f77.h"               /* F77 <-> C support functions/macros */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory handling facilities */
+#include "object.h"              /* Basic AST Object management functions */
 #include "stcresourceprofile.h" /* C interface to the StcResourceProfile class */
 
 

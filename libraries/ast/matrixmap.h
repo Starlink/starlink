@@ -190,10 +190,28 @@ typedef struct AstMatrixMapVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   AstMatrixMap *(* MtrRot)( AstMatrixMap *, double, const double[] ); 
-   AstMatrixMap *(* MtrMult)( AstMatrixMap *,  AstMatrixMap * );
+   AstMatrixMap *(* MtrRot)( AstMatrixMap *, double, const double[], int * ); 
+   AstMatrixMap *(* MtrMult)( AstMatrixMap *,  AstMatrixMap *, int * );
 
 } AstMatrixMapVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstMatrixMapGlobals {
+   AstMatrixMapVtab Class_Vtab;
+   int Class_Init;
+} AstMatrixMapGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitMatrixMapGlobals_( AstMatrixMapGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -205,7 +223,7 @@ astPROTO_ISA(MatrixMap)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstMatrixMap *astMatrixMap_( int, int, int, const double[], const char *, ... );
+AstMatrixMap *astMatrixMap_( int, int, int, const double[], const char *, int *, ...);
 #else
 AstMatrixMap *astMatrixMapId_( int, int, int, const double[], const char *, ... );
 #endif
@@ -214,21 +232,21 @@ AstMatrixMap *astMatrixMapId_( int, int, int, const double[], const char *, ... 
 
 /* Initialiser. */
 AstMatrixMap *astInitMatrixMap_( void *, size_t, int, AstMatrixMapVtab *,
-                                 const char *, int, int, int, const double[] );
+                                 const char *, int, int, int, const double[], int * );
 
 /* Vtab initialiser. */
-void astInitMatrixMapVtab_( AstMatrixMapVtab *, const char * );
+void astInitMatrixMapVtab_( AstMatrixMapVtab *, const char *, int * );
 
 /* Loader. */
 AstMatrixMap *astLoadMatrixMap_( void *, size_t, AstMatrixMapVtab *,
-                                 const char *, AstChannel * );
+                                 const char *, AstChannel *, int * );
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
-AstMatrixMap *astMtrRot_( AstMatrixMap *, double, const double[] );
-AstMatrixMap *astMtrMult_( AstMatrixMap *, AstMatrixMap * );
+AstMatrixMap *astMtrRot_( AstMatrixMap *, double, const double[], int * );
+AstMatrixMap *astMtrMult_( AstMatrixMap *, AstMatrixMap *, int * );
 #endif
 
 /* Function interfaces. */
@@ -261,13 +279,13 @@ AstMatrixMap *astMtrMult_( AstMatrixMap *, AstMatrixMap * );
 
 /* Initialiser. */
 #define astInitMatrixMap(mem,size,init,vtab,name,nin,nout,form,matrix) \
-astINVOKE(O,astInitMatrixMap_(mem,size,init,vtab,name,nin,nout,form,matrix))
+astINVOKE(O,astInitMatrixMap_(mem,size,init,vtab,name,nin,nout,form,matrix,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitMatrixMapVtab(vtab,name) astINVOKE(V,astInitMatrixMapVtab_(vtab,name))
+#define astInitMatrixMapVtab(vtab,name) astINVOKE(V,astInitMatrixMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadMatrixMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadMatrixMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadMatrixMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -278,9 +296,13 @@ astINVOKE(O,astLoadMatrixMap_(mem,size,vtab,name,astCheckChannel(channel)))
 
 #if defined(astCLASS)            /* Protected */
 #define astMtrRot(this,theta,axis) \
-astINVOKE(O,astMtrRot_(astCheckMatrixMap(this),theta,axis))
+astINVOKE(O,astMtrRot_(astCheckMatrixMap(this),theta,axis,STATUS_PTR))
 
 #define astMtrMult(this,a) \
-astINVOKE(O,astMtrMult_(astCheckMatrixMap(this),astCheckMatrixMap(a)))
+astINVOKE(O,astMtrMult_(astCheckMatrixMap(this),astCheckMatrixMap(a),STATUS_PTR))
 #endif
 #endif
+
+
+
+

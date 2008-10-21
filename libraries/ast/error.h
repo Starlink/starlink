@@ -17,39 +17,11 @@
 *     Note that this module is not a class implementation, although it
 *     resembles one.
 
-*  Functions Defined:
-*     Public:
-*        astSetStatus
-*           Set the AST error status to an explicit value.
-*        astWatch
-*           Identify a new error status variable for the AST library.
-*
-*     Protected:
-*        astAt
-*           Store a routine, file and line number context in case of error.
-*        astError
-*           Set the AST error status and report an error message.
-*        astReporting
-*           Controls the reporting of error messages.
-*        astAssert
-*           Acts as an assertion error
-
-*  Macros Defined:
-*     Public:
-*        astClearStatus
-*           Clear an AST error condition.
-*        astOK
-*           Test whether AST routines have been successful.
-*        astStatus
-*           Obtain the AST error status value.
-*
-*     Protected:
-*        AST__FAC
-*           A "facility" number unique to this library.
-
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -100,18 +72,36 @@
 *        to the status variable are now global rather than static. 
 *     1-MAR-2006 (DSB):
 *        Remove astAssert.
+*     19-SEP-2008 (DSB)
+*        Big changes for thread-safe version of AST.
 *-
 */
 
+
+
+/* Include files. */
+/* ============== */
+#if defined(THREAD_SAFE)
+#include <pthread.h>
+#endif
+
+
+
 /* Macros. */
 /* ======= */
+#if defined(astCLASS) || defined(astFORTRAN77) /* Protected */
+
 /* Define a facility number that is unique to this library.  The number here
  * is the facility code assigned to the AST library, but it doesn't have to
  * be this number -- it only has to be probably unique.  If that code were
  * ever to change, then you can update this number if you feel it's tidier
  * that way. */
-#if defined(astCLASS)            /* Protected */
 #define AST__FAC (1521)
+
+/* Max number of messages which can be deferred when reporting is
+   switched off. */
+#define AST__ERROR_MSTACK_SIZE 100
+
 #endif
 
 /* This macro expands to an invocation of a specified function, together
@@ -121,51 +111,101 @@
 #if defined(astCLASS) || defined(astFORTRAN77)
 #define astERROR_INVOKE(function) (function)
 #else
-#define astERROR_INVOKE(function) (astAt_(NULL,__FILE__,__LINE__,0),(function))
+#define astERROR_INVOKE(function) (astAt_(NULL,__FILE__,__LINE__,0,astGetStatusPtr),(function))
 #endif
 
-/* Externally declared variables */
-/* ============================= */
-/* This is the variable which holds a pointer to the status value. It is
-   declared in error.c */
-extern int *starlink_ast_status_ptr;
+
+
+/* Type definitions */
+/* ================ */
+
+#if defined(THREAD_SAFE) && ( defined(astCLASS) || defined(astFORTRAN77) )
+
+/* Define a structure holding all data items that are global within the
+   error.c file. */
+typedef struct AstErrorGlobals {
+
+/* Reporting flag: delivery of message is supressed if zero. */
+   int Reporting;
+
+/* Error context. */
+   const char *Current_File;     /* Current file name pointer */
+   const char *Current_Routine;  /* Current routine name pointer */
+   int Current_Line;             /* Current line number */
+   int Foreign_Set;              /* Have foreign values been set? */
+
+/* Un-reported message stack */
+   char *Message_Stack[ AST__ERROR_MSTACK_SIZE ];
+   int Mstack_Size;
+
+} AstErrorGlobals;
+
+/* Structure to hold the internal status variable, and the status
+   pointer for a single thread. */
+typedef struct AstStatusBlock {
+   int internal_status;
+   int *status_ptr;
+} AstStatusBlock;
+
+#endif
+
+
 
 /* Function prototypes. */
 /* ==================== */
-/* Prototypes for the functions provided by this module. */
-int *astWatch_( int * );
-int astStatus_( void );
-void astClearStatus_( void );
-void astSetStatus_( int );
 
-#if defined(astCLASS) || 1       /* Nominally protected, but available for */
-                                 /* use in developing (e.g.) foreign */
-                                 /* language or graphics interfaces. */
-void astAt_( const char *, const char *, int, int );
-void astError_( int, const char *, ... );
-int astReporting_( int );
+int *astWatch_( int * );
+void astClearStatus_( int * );
+int *astGetStatusPtr_( void );
+void astAt_( const char *, const char *, int, int, int * );
+
+#if defined(astCLASS) || defined(astFORTRAN77)      /* Protected only */
+int astReporting_( int, int * );
+void astError_( int, const char *, int *, ... );
+#if defined(THREAD_SAFE) 
+void astInitErrorGlobals_( AstErrorGlobals * );
 #endif
+
+#else                       /* Public only */
+void astErrorPublic_( int, const char *, ... );
+
+#endif
+
+
 
 /* Function interfaces. */
 /* ==================== */
 /* These wrap up the functions defined by this module to make them
    easier to use. */
-#define astClearStatus astClearStatus_()
-#define astOK (*starlink_ast_status_ptr==0)
-#define astSetStatus(status) astSetStatus_(status)
-#define astStatus astStatus_()
-#define astWatch(status_address) astWatch_(status_address)
 
-#if defined(astCLASS) 
-#define astAt(routine,file,line) astAt_(routine,file,line,0)
-#else
-#define astAt(routine,file,line) astAt_(routine,file,line,1)
-#endif
+#define astWatch(status_ptr) astWatch_(status_ptr)
+#define astGetStatusPtr astGetStatusPtr_()
+#define astOK (astStatus==0)
+#define astSetStatus(status_value) (astStatus=(status_value))
 
-#if defined(astCLASS) || 1       /* Nominally protected, but available for */
-                                 /* use in developing (e.g.) foreign */
-                                 /* language or graphics interfaces. */
+#if defined(astCLASS)     /* Protected */
+
+#define astAt(routine,file,line) astAt_(routine,file,line,0,status)
+#define astClearStatus astClearStatus_(status)
+#define astStatus (*status)
 #define astError astError_
-#define astReporting astReporting_
+#define astReporting(report) astReporting_(report,status)
+
+#elif defined(astFORTRAN77)
+
+#define astAt(routine,file,line) astAt_(routine,file,line,1,STATUS)
+#define astClearStatus astClearStatus_(status)
+#define astStatus (*status)
+#define astError astError_
+#define astReporting(report) astReporting_(report,status)
+
+#else
+
+#define astAt(routine,file,line) astAt_(routine,file,line,1,astGetStatusPtr)
+#define astClearStatus astClearStatus_(astGetStatusPtr)
+#define astStatus (*astGetStatusPtr)
+#define astError astErrorPublic_
+
 #endif
+
 #endif

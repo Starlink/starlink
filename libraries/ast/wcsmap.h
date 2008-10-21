@@ -288,6 +288,12 @@
 /* Macros. */
 /* ------- */
 /* Max. number of parameters for a WCS projection */
+
+#if defined(astCLASS) || defined(astFORTRAN77)
+#define STATUS_PTR status
+#else
+#define STATUS_PTR astGetStatusPtr
+#endif
 #define AST__WCSMX 10   
 
 /* pi:  180 degrees in radians - from SLALIB file slamac.h. */
@@ -371,17 +377,30 @@ typedef struct AstWcsMapVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   double (* GetNatLat)( AstWcsMap * );
-   double (* GetNatLon)( AstWcsMap * );
-   double (* GetPV)( AstWcsMap *, int, int );
-   int (* GetWcsAxis)( AstWcsMap *, int );
-   int (* GetWcsType)( AstWcsMap * );
-   int (* TestPV)( AstWcsMap *, int, int );
-   void (* ClearPV)( AstWcsMap *, int, int );
-   void (* SetPV)( AstWcsMap *, int, int, double );
-   int (* IsZenithal)( AstWcsMap * );
+   double (* GetNatLat)( AstWcsMap *, int * );
+   double (* GetNatLon)( AstWcsMap *, int * );
+   double (* GetPV)( AstWcsMap *, int, int, int * );
+   int (* GetWcsAxis)( AstWcsMap *, int, int * );
+   int (* GetWcsType)( AstWcsMap *, int * );
+   int (* GetPVMax)( AstWcsMap *, int, int * );
+   int (* TestPV)( AstWcsMap *, int, int, int * );
+   void (* ClearPV)( AstWcsMap *, int, int, int * );
+   void (* SetPV)( AstWcsMap *, int, int, double, int * );
+   int (* IsZenithal)( AstWcsMap *, int * );
 
 } AstWcsMapVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstWcsMapGlobals {
+   AstWcsMapVtab Class_Vtab;
+   int Class_Init;
+   char GetAttrib_Buff[ 101 ];
+} AstWcsMapGlobals;
+
+#endif
 #endif
 
 /* Function prototypes. */
@@ -393,7 +412,7 @@ astPROTO_ISA(WcsMap)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstWcsMap *astWcsMap_( int, int, int, int, const char *, ... );
+AstWcsMap *astWcsMap_( int, int, int, int, const char *, int *, ...);
 #else
 AstWcsMap *astWcsMapId_( int, int, int, int, const char *, ... );
 #endif
@@ -402,31 +421,38 @@ AstWcsMap *astWcsMapId_( int, int, int, int, const char *, ... );
 
 /* Initialiser. */
 AstWcsMap *astInitWcsMap_( void *, size_t, int, AstWcsMapVtab *,
-                           const char *, int, int, int, int );
+                           const char *, int, int, int, int, int * );
 
 /* Vtab initialiser. */
-void astInitWcsMapVtab_( AstWcsMapVtab *, const char * );
+void astInitWcsMapVtab_( AstWcsMapVtab *, const char *, int * );
 
 /* Loader. */
 AstWcsMap *astLoadWcsMap_( void *, size_t, AstWcsMapVtab *,
-                           const char *, AstChannel * );
+                           const char *, AstChannel *, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitWcsMapGlobals_( AstWcsMapGlobals * );
+#endif
+
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
-   const char *PrjDesc_( int );
-   const char *PrjName_( int );
-   double astGetNatLat_( AstWcsMap * );
-   double astGetNatLon_( AstWcsMap * );
-   double astGetPV_( AstWcsMap *, int, int );
-   int PrjType_( const char * );
-   int astGetWcsAxis_( AstWcsMap *, int );
-   int astGetWcsType_( AstWcsMap * );
-   int astTestPV_( AstWcsMap *, int, int );
-   int astIsZenithal_( AstWcsMap * );
-   void astClearPV_( AstWcsMap *, int, int );
-   void astSetPV_( AstWcsMap *, int, int, double );
+   const char *astWcsPrjDesc_( int, int * );
+   const char *astWcsPrjName_( int, int * );
+   double astGetNatLat_( AstWcsMap *, int * );
+   double astGetNatLon_( AstWcsMap *, int * );
+   double astGetPV_( AstWcsMap *, int, int, int * );
+   int astWcsPrjType_( const char *, int * );
+   int astGetWcsAxis_( AstWcsMap *, int, int * );
+   int astGetWcsType_( AstWcsMap *, int * );
+   int astGetPVMax_( AstWcsMap *, int, int * );
+   int astTestPV_( AstWcsMap *, int, int, int * );
+   int astIsZenithal_( AstWcsMap *, int * );
+   void astClearPV_( AstWcsMap *, int, int, int * );
+   void astSetPV_( AstWcsMap *, int, int, double, int * );
 #endif
 
 /* Function interfaces. */
@@ -459,13 +485,13 @@ AstWcsMap *astLoadWcsMap_( void *, size_t, AstWcsMapVtab *,
 
 /* Initialiser. */
 #define astInitWcsMap(mem,size,init,vtab,name,ncoord,type,lon,lat) \
-astINVOKE(O,astInitWcsMap_(mem,size,init,vtab,name,ncoord,type,lon,lat))
+astINVOKE(O,astInitWcsMap_(mem,size,init,vtab,name,ncoord,type,lon,lat,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitWcsMapVtab(vtab,name) astINVOKE(V,astInitWcsMapVtab_(vtab,name))
+#define astInitWcsMapVtab(vtab,name) astINVOKE(V,astInitWcsMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadWcsMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadWcsMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadWcsMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -476,33 +502,40 @@ astINVOKE(O,astLoadWcsMap_(mem,size,vtab,name,astCheckChannel(channel)))
 
 #if defined(astCLASS)            /* Protected */
 
-#define astWcsPrjType PrjType_
-#define astWcsPrjName PrjName_
-#define astWcsPrjDesc PrjDesc_
+#define astWcsPrjType(ctype) astWcsPrjType_(ctype,STATUS_PTR)
+#define astWcsPrjName(type) astWcsPrjName_(type,STATUS_PTR)
+#define astWcsPrjDesc(type) astWcsPrjDesc_(type,STATUS_PTR)
 
 #define astClearPV(this,i,j) \
-astINVOKE(V,astClearPV_(astCheckWcsMap(this),i,j))
+astINVOKE(V,astClearPV_(astCheckWcsMap(this),i,j,STATUS_PTR))
 #define astGetPV(this,i,j) \
-astINVOKE(V,astGetPV_(astCheckWcsMap(this),i,j))
+astINVOKE(V,astGetPV_(astCheckWcsMap(this),i,j,STATUS_PTR))
 #define astSetPV(this,i,j,par) \
-astINVOKE(V,astSetPV_(astCheckWcsMap(this),i,j,par))
+astINVOKE(V,astSetPV_(astCheckWcsMap(this),i,j,par,STATUS_PTR))
 #define astTestPV(this,i,j) \
-astINVOKE(V,astTestPV_(astCheckWcsMap(this),i,j))
+astINVOKE(V,astTestPV_(astCheckWcsMap(this),i,j,STATUS_PTR))
 
 #define astGetWcsType(this) \
-astINVOKE(V,astGetWcsType_(astCheckWcsMap(this)))
+astINVOKE(V,astGetWcsType_(astCheckWcsMap(this),STATUS_PTR))
+
+#define astGetPVMax(this,i) \
+astINVOKE(V,astGetPVMax_(astCheckWcsMap(this),i,STATUS_PTR))
 
 #define astGetNatLat(this) \
-astINVOKE(V,astGetNatLat_(astCheckWcsMap(this)))
+astINVOKE(V,astGetNatLat_(astCheckWcsMap(this),STATUS_PTR))
 
 #define astGetNatLon(this) \
-astINVOKE(V,astGetNatLon_(astCheckWcsMap(this)))
+astINVOKE(V,astGetNatLon_(astCheckWcsMap(this),STATUS_PTR))
 
 #define astGetWcsAxis(this,index) \
-astINVOKE(V,astGetWcsAxis_(astCheckWcsMap(this),index))
+astINVOKE(V,astGetWcsAxis_(astCheckWcsMap(this),index,STATUS_PTR))
 
 #define astIsZenithal(this) \
-astINVOKE(V,astIsZenithal_(astCheckWcsMap(this)))
+astINVOKE(V,astIsZenithal_(astCheckWcsMap(this),STATUS_PTR))
 
 #endif
 #endif
+
+
+
+

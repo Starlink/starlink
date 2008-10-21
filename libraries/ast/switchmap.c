@@ -130,6 +130,8 @@ f     The SwitchMap class does not define any new routines beyond those
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
 #include "object.h"              /* Base Object class */
@@ -152,14 +154,46 @@ f     The SwitchMap class does not define any new routines beyond those
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstSwitchMapVtab class_vtab; /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject * );
-static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
+static int (* parent_getobjsize)( AstObject *, int * );
+static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+
+#if defined(THREAD_SAFE)
+static int (* parent_managelock)( AstObject *, int, int, int * );
+#endif
+
+
+
+#ifdef THREAD_SAFE
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; 
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(SwitchMap)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(SwitchMap,Class_Init)
+#define class_vtab astGLOBAL(SwitchMap,Class_Vtab)
+
+
+#include <pthread.h>
+
+
+#else
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstSwitchMapVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -170,20 +204,24 @@ AstSwitchMap *astSwitchMapId_( void *, void *, int, void **, const char *, ... )
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static double Rate( AstMapping *, double *, int, int );
-static int Equal( AstObject *, AstObject * );
-static int GetObjSize( AstObject * );
-static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
-static void Copy( const AstObject *, AstObject * );
-static void Delete( AstObject * );
-static void Dump( AstObject *, AstChannel * );
-static AstMapping *GetSelector( AstSwitchMap *, int, int * );
-static AstMapping *GetRoute( AstSwitchMap *, double, int * );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static double Rate( AstMapping *, double *, int, int, int * );
+static int Equal( AstObject *, AstObject *, int * );
+static int GetObjSize( AstObject *, int * );
+static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Delete( AstObject *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static AstMapping *GetSelector( AstSwitchMap *, int, int *, int * );
+static AstMapping *GetRoute( AstSwitchMap *, double, int *, int * );
+
+#if defined(THREAD_SAFE)
+static int ManageLock( AstObject *, int, int, int * );
+#endif
 
 /* Member functions. */
 /* ================= */
-static int Equal( AstObject *this_object, AstObject *that_object ) {
+static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
 *  Name:
 *     Equal
@@ -196,7 +234,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 *  Synopsis:
 *     #include "switchmap.h"
-*     int Equal( AstObject *this, AstObject *that ) 
+*     int Equal( AstObject *this, AstObject *that, int *status ) 
 
 *  Class Membership:
 *     SwitchMap member function (over-rides the astEqual protected
@@ -211,6 +249,8 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *        Pointer to the first Object (a SwitchMap).
 *     that
 *        Pointer to the second Object.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if the SwitchMaps are equivalent, zero otherwise.
@@ -259,16 +299,16 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
       if( that->nroute == nroute ) {
    
 /* Get the forward selector Mappings from the two SwitchMaps. */
-         fsmap1 = GetSelector( this, 1, &fsinv1 );
-         fsmap2 = GetSelector( that, 1, &fsinv2 );
+         fsmap1 = GetSelector( this, 1, &fsinv1, status );
+         fsmap2 = GetSelector( that, 1, &fsinv2, status );
    
 /* Are they equal? */
          if( ( !fsmap1 && !fsmap2 ) || 
              ( fsmap1 && fsmap2 && astEqual( fsmap1, fsmap2 ) ) ) {
    
 /* Get the inverse selector Mappings from the two SwitchMaps. */
-            ismap1 = GetSelector( this, 0, &isinv1 );
-            ismap2 = GetSelector( that, 0, &isinv2 );
+            ismap1 = GetSelector( this, 0, &isinv1, status );
+            ismap2 = GetSelector( that, 0, &isinv2, status );
    
 /* Are they equal? */
             if( ( !ismap1 && !ismap2 ) || 
@@ -279,8 +319,8 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
    Mapping Invert flag after testing the route Mappings for equality. */
                result = 1;
                for( i = 0; result && i < nroute; i++ ) {
-                  rmap1 = GetRoute( this, (double) ( i + 1 ), &rinv1 );
-                  rmap2 = GetRoute( that, (double) ( i + 1 ), &rinv2 );
+                  rmap1 = GetRoute( this, (double) ( i + 1 ), &rinv1, status );
+                  rmap2 = GetRoute( that, (double) ( i + 1 ), &rinv2, status );
                   if( !astEqual( rmap1, rmap2 ) ) result = 0;
                   astSetInvert( rmap2, rinv2 );
                   astSetInvert( rmap1, rinv1 );
@@ -309,7 +349,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
    return result;
 }
 
-static int GetObjSize( AstObject *this_object ) {
+static int GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -322,7 +362,7 @@ static int GetObjSize( AstObject *this_object ) {
 
 *  Synopsis:
 *     #include "switchmap.h"
-*     int GetObjSize( AstObject *this ) 
+*     int GetObjSize( AstObject *this, int *status ) 
 
 *  Class Membership:
 *     SwitchMap member function (over-rides the astGetObjSize protected
@@ -335,6 +375,8 @@ static int GetObjSize( AstObject *this_object ) {
 *  Parameters:
 *     this
 *        Pointer to the SwitchMap.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Object size, in bytes.
@@ -361,7 +403,7 @@ static int GetObjSize( AstObject *this_object ) {
 /* Invoke the GetObjSize method inherited from the parent class, and then
    add on any components of the class structure defined by this class
    which are stored in dynamically allocated memory. */
-   result = (*parent_getobjsize)( this_object );
+   result = (*parent_getobjsize)( this_object, status );
 
    result += astGetObjSize( this->fsmap );
    result += astGetObjSize( this->ismap );
@@ -379,7 +421,7 @@ static int GetObjSize( AstObject *this_object ) {
    return result;
 }
 
-static AstMapping *GetRoute( AstSwitchMap *this, double sel, int *inv ){
+static AstMapping *GetRoute( AstSwitchMap *this, double sel, int *inv, int *status ){
 /*
 *  Name:
 *     GetRoute
@@ -392,7 +434,7 @@ static AstMapping *GetRoute( AstSwitchMap *this, double sel, int *inv ){
 
 *  Synopsis:
 *     #include "switchmap.h"
-*     AstMapping *GetRoute( AstSwitchMap *this, double sel, int *inv )
+*     AstMapping *GetRoute( AstSwitchMap *this, double sel, int *inv, int *status )
 
 *  Class Membership:
 *     SwitchMap method.
@@ -415,6 +457,8 @@ static AstMapping *GetRoute( AstSwitchMap *this, double sel, int *inv ){
 *        Invert flag of the returned Mapping. The astSetInvert method
 *        should be used to re-instate this value once all use of the Mapping 
 *        has been completed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returns:
 *     A pointer to the route Mapping to use. Note, the returned pointer 
@@ -469,7 +513,7 @@ static AstMapping *GetRoute( AstSwitchMap *this, double sel, int *inv ){
 
 }
 
-static AstMapping *GetSelector( AstSwitchMap *this, int fwd, int *inv ){
+static AstMapping *GetSelector( AstSwitchMap *this, int fwd, int *inv, int *status ){
 /*
 *  Name:
 *     GetSelector
@@ -482,7 +526,7 @@ static AstMapping *GetSelector( AstSwitchMap *this, int fwd, int *inv ){
 
 *  Synopsis:
 *     #include "switchmap.h"
-*     AstMapping *GetSelector( AstSwitchMap *this, int fwd, int *inv )
+*     AstMapping *GetSelector( AstSwitchMap *this, int fwd, int *inv, int *status )
 
 *  Class Membership:
 *     SwitchMap method.
@@ -504,6 +548,8 @@ static AstMapping *GetSelector( AstSwitchMap *this, int fwd, int *inv ){
 *        Invert flag of the returned Mapping. The astSetInvert method
 *        should be used to re-instate this value once all use of the Mapping 
 *        has been completed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returns:
 *     A pointer to the selector Mapping to use. Note, the returned pointer 
@@ -550,7 +596,7 @@ static AstMapping *GetSelector( AstSwitchMap *this, int fwd, int *inv ){
 
 }
 
-void astInitSwitchMapVtab_(  AstSwitchMapVtab *vtab, const char *name ) {
+void astInitSwitchMapVtab_(  AstSwitchMapVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -587,11 +633,15 @@ void astInitSwitchMapVtab_(  AstSwitchMapVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -600,8 +650,8 @@ void astInitSwitchMapVtab_(  AstSwitchMapVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsASwitchMap) to determine if an object belongs to
    this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -617,6 +667,11 @@ void astInitSwitchMapVtab_(  AstSwitchMapVtab *vtab, const char *name ) {
    parent_getobjsize = object->GetObjSize;
    object->GetObjSize = GetObjSize;
 
+#if defined(THREAD_SAFE)
+   parent_managelock = object->ManageLock;
+   object->ManageLock = ManageLock;
+#endif
+
    parent_transform = mapping->Transform;
    mapping->Transform = Transform;
 
@@ -630,10 +685,104 @@ void astInitSwitchMapVtab_(  AstSwitchMapVtab *vtab, const char *name ) {
    astSetCopy( vtab, Copy );
    astSetDelete( vtab, Delete );
    astSetDump( vtab, Dump, "SwitchMap", "Alternate regionalised Mapping" );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
+#if defined(THREAD_SAFE)
+static int ManageLock( AstObject *this_object, int mode, int extra, int *status ) {
+/*
+*  Name:
+*     ManageLock
+
+*  Purpose:
+*     Manage the thread lock on an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "object.h"
+*     AstObject *ManageLock( AstObject *this, int mode, int extra, int *status ) 
+
+*  Class Membership:
+*     SwitchMap member function (over-rides the astManageLock protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function manages the thread lock on the supplied Object. The
+*     lock can be locked, unlocked or checked by this function as 
+*     deteremined by parameter "mode". See astLock for details of the way
+*     these locks are used.
+
+*  Parameters:
+*     this
+*        Pointer to the Object.
+*     mode
+*        An integer flag indicating what the function should do:
+*
+*        AST__LOCK: Lock the Object for exclusive use by the calling
+*        thread. The "extra" value indicates what should be done if the
+*        Object is already locked (wait or report an error - see astLock).
+*
+*        AST__UNLOCK: Unlock the Object for use by other threads.
+*
+*        AST__CHECKLOCK: Check that the object is locked for use by the
+*        calling thread (report an error if not).
+*     extra
+*        Extra mode-specific information. 
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*    A local status value: 
+*        0 - Success
+*        1 - Could not lock or unlock the object because it was already 
+*            locked by another thread.
+*        2 - Failed to lock a POSIX mutex
+*        3 - Failed to unlock a POSIX mutex
+*        4 - Bad "mode" value supplied.
+
+*  Notes:
+*     - This function attempts to execute even if an error has already
+*     occurred.
+*/
+
+/* Local Variables: */
+   AstSwitchMap *this;       /* Pointer to SwitchMap structure */
+   int i;                      /* Loop count */
+   int result;                 /* Returned status value */
+
+/* Initialise */
+   result = 0;
+
+/* Check the supplied pointer is not NULL. */
+   if( !this_object ) return result;
+
+/* Obtain a pointers to the SwitchMap structure. */
+   this = (AstSwitchMap *) this_object;
+
+/* Invoke the astManageLock method on any Objects contained within
+   the supplied Object. */
+   if( !result ) result = astManageLock( this->fsmap, mode, extra );
+   if( !result ) result = astManageLock( this->ismap, mode, extra );
+   for( i = 0; i < this->nroute; i++ ) {
+      if( !result ) result = astManageLock( this->routemap[ i ], mode, extra );
+   }
+
+/* Invoke the ManageLock method inherited from the parent class, and
+   return the resulting status value. */
+   if( !result ) result = (*parent_managelock)( this_object, mode, extra, status );
+   return result;
+
+}
+#endif
+
 static int MapMerge( AstMapping *this, int where, int series, int *nmap,
-                     AstMapping ***map_list, int **invert_list ) {
+                     AstMapping ***map_list, int **invert_list, int *status ) {
 /*
 *  Name:
 *     MapMerge
@@ -647,7 +796,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *  Synopsis:
 *     #include "mapping.h"
 *     int MapMerge( AstMapping *this, int where, int series, int *nmap,
-*                   AstMapping ***map_list, int **invert_list )
+*                   AstMapping ***map_list, int **invert_list, int *status )
 
 *  Class Membership:
 *     SwitchMap method (over-rides the protected astMapMerge method
@@ -750,6 +899,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *        length, the "*invert_list" array will be extended (and its
 *        pointer updated) if necessary to accommodate any new
 *        elements.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     If simplification was possible, the function returns the index
@@ -852,7 +1003,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* If the two SwitchMaps are equal but opposite, annul the first of the two 
    Mappings, and replace it with a UnitMap. Also set the invert flag. */ 
          if( equal ) {
-            new = (AstMapping *) astUnitMap( astGetNin( ( *map_list )[ ilo ] ), "" );
+            new = (AstMapping *) astUnitMap( astGetNin( ( *map_list )[ ilo ] ), "", status );
             (void) astAnnul( ( *map_list )[ ilo ] );
             ( *map_list )[ ilo ] = new;
             ( *invert_list )[ ilo ] = 0;
@@ -895,7 +1046,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
             astSetInvert( map->routemap[ i ], !(map->routeinv[ i ]) );
          }
    
-         new = (AstMapping *) astSwitchMap( map->ismap, map->fsmap, nroute, (void **) map->routemap, "" );
+         new = (AstMapping *) astSwitchMap( map->ismap, map->fsmap, nroute, (void **) map->routemap, "", status );
    
          (void) astAnnul( ( *map_list )[ where ] );
          ( *map_list )[ where ] = (AstMapping *) new;
@@ -922,7 +1073,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          if( simp ) { 
             (void) astAnnul( ( *map_list )[ where ] );
             ( *map_list )[ where ] = (AstMapping *) astSwitchMap( sfsmap, sismap,
-                                                    nroute, (void **) srmap, "" );
+                                                    nroute, (void **) srmap, "", status );
             result = where;
          }
 
@@ -953,7 +1104,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
+static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status ){
 /*
 *  Name:
 *     Rate
@@ -966,7 +1117,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
 
 *  Synopsis:
 *     #include "switchmap.h"
-*     result = Rate( AstMapping *this, double *at, int ax1, int ax2 )
+*     result = Rate( AstMapping *this, double *at, int ax1, int ax2, int *status )
 
 *  Class Membership:
 *     SwitchMap member function (overrides the astRate method inherited
@@ -992,6 +1143,8 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
 *        The index of the Mapping input which is to be varied in order to
 *        find the rate of change (input numbering starts at 0 for the first 
 *        input).
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The rate of change of Mapping output "ax1" with respect to input 
@@ -1023,7 +1176,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
    invert flag (this takes account of whether the SwtichMap has been
    inverted or not). This call resets the selector's invert flag temporarily 
    back to the value it had when the SwitchMap was created. */
-   smap = GetSelector( map, 1, &fsinv );
+   smap = GetSelector( map, 1, &fsinv, status );
 
 /* If the SwitchMap has no forward selector Mapping, return AST__BAD. */
    if( smap ) {
@@ -1039,7 +1192,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
    not, return AST__BAD if not). This takes account of whether the
    SwitchMap has been inverted, and also temporarily re-instates the
    original value of the route Mapping's Invert flag . */
-      rmap = GetRoute( map, sel, &rinv );
+      rmap = GetRoute( map, sel, &rinv, status );
       if( rmap ) {
 
 /* Use the astRate method of the route Mapping. */
@@ -1059,7 +1212,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
 
 
 int astSwitchList_( AstSwitchMap *this, int invert, int *nmap, 
-                    AstMapping ***map_list, int **invert_list ) {
+                    AstMapping ***map_list, int **invert_list, int *status ) {
 /*
 *+
 *  Name:
@@ -1176,7 +1329,7 @@ int astSwitchList_( AstSwitchMap *this, int invert, int *nmap,
       astSetInvert( this, invert );
 
 /* Get the forward selector Mapping. */
-      map = GetSelector( this, 1, &inv );
+      map = GetSelector( this, 1, &inv, status );
 
 /* If the SwitchMap has a forward selector Mapping, return a clone of the
    Mapping pointer, and the invert flag to be used with it, then
@@ -1195,7 +1348,7 @@ int astSwitchList_( AstSwitchMap *this, int invert, int *nmap,
       }
 
 /* Likewise, get and return the inverse selector Mapping.*/
-      map = GetSelector( this, 0, &inv );
+      map = GetSelector( this, 0, &inv, status );
       if( map ) {
          ( *map_list )[ 1 ] = astClone( map );
          ( *invert_list )[ 1 ] = astGetInvert( map );
@@ -1209,7 +1362,7 @@ int astSwitchList_( AstSwitchMap *this, int invert, int *nmap,
       for( i = 0; i < result; i++ ){
 
 /* Get the next route Mapping. */
-         map = GetRoute( this, (double) i + 1.0, &inv );
+         map = GetRoute( this, (double) i + 1.0, &inv, status );
 
 /* If the SwitchMap has a route Mapping for the current selector value, 
    return a clone of the Mapping pointer, and the invert flag to be used 
@@ -1247,7 +1400,7 @@ int astSwitchList_( AstSwitchMap *this, int invert, int *nmap,
 }
 
 static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-                               int forward, AstPointSet *out ) {
+                               int forward, AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     Transform
@@ -1261,7 +1414,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *  Synopsis:
 *     #include "switchmap.h"
 *     AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-*                             int forward, AstPointSet *out )
+*                             int forward, AstPointSet *out, int *status )
 
 *  Class Membership:
 *     SwitchMap member function (over-rides the astTransform method inherited
@@ -1286,6 +1439,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *        Pointer to a PointSet which will hold the transformed (output)
 *        coordinate values. A NULL value may also be given, in which case a
 *        new PointSet will be created by this function.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the output (possibly new) PointSet.
@@ -1342,7 +1497,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    function inherited from the parent Mapping class. This function validates
    all arguments and generates an output PointSet if necessary, but does not
    actually transform any coordinate values. */
-   result = (*parent_transform)( this, in, forward, out );
+   result = (*parent_transform)( this, in, forward, out, status );
 
 /* We now extend the parent astTransform method by applying the component
    Mappings of the SwitchMap to generate the output coordinate values. */
@@ -1357,7 +1512,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    }
 
 /* Get the appropriate selector Mapping. */
-   selmap = GetSelector( map, forward, &selinv );
+   selmap = GetSelector( map, forward, &selinv, status );
 
 /* Transform the supplied positions using the above selector Mapping. */
    selps = astTransform( selmap, in, forward, NULL );
@@ -1409,27 +1564,27 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 /* Create a PointSet large enough to hold all the supplied positions
    which are to be transformed by the most popular route Mapping. */
-      ps1 = astPointSet( maxpop, ncin, "" );
+      ps1 = astPointSet( maxpop, ncin, "", status );
       ptr1 = astGetPoints( ps1 );
 
 /* Create a PointSet large enough to hold all the output positions
    created by the most popular route Mapping. */
-      ps2 = astPointSet( maxpop, ncout, "" );
+      ps2 = astPointSet( maxpop, ncout, "", status );
       ptr2 = astGetPoints( ps2 );
       if( astOK ) {
 
 /* Loop round each route Mapping which is used by at least 1 point. */
          for( iroute = 0; iroute < nroute; iroute++ ) {
             if( popmap[ iroute ] >0 ) {
-               rmap = GetRoute( map, (double)( iroute + 1 ), &rinv );
+               rmap = GetRoute( map, (double)( iroute + 1 ), &rinv, status );
 
 /* Construct two PointSets of the correct size to hold the input and
    output points to be processed with the current route Mapping. We
    re-use the memory allocated for the largest route Mapping's PointSet. */
                if( popmap[ iroute ] != maxpop ) {
-                  ps1a = astPointSet( popmap[ iroute ], ncin, "" );
+                  ps1a = astPointSet( popmap[ iroute ], ncin, "", status );
                   astSetPoints( ps1a, ptr1 );
-                  ps2a = astPointSet( popmap[ iroute ], ncout, "" );
+                  ps2a = astPointSet( popmap[ iroute ], ncout, "", status );
                   astSetPoints( ps2a, ptr2 );
                } else {
                   ps1a = astClone( ps1 );
@@ -1505,7 +1660,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -1517,7 +1672,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for SwitchMap objects.
@@ -1527,6 +1682,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the object to be copied.
 *     objout
 *        Pointer to the object being constructed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -1573,7 +1730,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -1585,7 +1742,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for SwitchMap objects.
@@ -1593,6 +1750,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the object to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -1626,7 +1785,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -1638,7 +1797,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -1649,6 +1808,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the SwitchMap whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -1732,11 +1893,11 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsASwitchMap and astCheckSwitchMap functions using the
    macros defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(SwitchMap,Mapping,check,&class_init)
+astMAKE_ISA(SwitchMap,Mapping,check,&class_check)
 astMAKE_CHECK(SwitchMap)
 
 AstSwitchMap *astSwitchMap_( void *fsmap_void, void *ismap_void, int nroute, 
-                             void **routemaps_void, const char *options, ... ) {
+                             void **routemaps_void, const char *options, int *status, ...) {
 /*
 *+
 *  Name:
@@ -1805,6 +1966,7 @@ AstSwitchMap *astSwitchMap_( void *fsmap_void, void *ismap_void, int nroute,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstSwitchMap *new;            /* Pointer to new SwitchMap */
    AstMapping *fsmap;            /* Pointer to fwd selector Mapping */
    AstMapping *ismap;            /* Pointer to inv selector Mapping */
@@ -1815,12 +1977,15 @@ AstSwitchMap *astSwitchMap_( void *fsmap_void, void *ismap_void, int nroute,
 /* Initialise. */
    new = NULL;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
 /* Check the global status. */
    if ( !astOK ) return new;
 
 /* Report an error if no route Mappings have been supplied. */
    if( nroute <= 0 ) astError( AST__BDPAR, "astSwitchMap(SwitchMap): "
-                               "Bad number of route Mappings (%d) specified.", 
+                               "Bad number of route Mappings (%d) specified.", status, 
                                nroute );
 
 /* Otherwise create an array to hold the route Mapping pointers. */
@@ -1850,7 +2015,7 @@ AstSwitchMap *astSwitchMap_( void *fsmap_void, void *ismap_void, int nroute,
 /* Obtain the variable argument list and pass it along with the
    options string to the astVSet method to initialise the new SwitchMap's
    attributes. */
-         va_start( args, options );
+         va_start( args, status );
          astVSet( new, options, NULL, args );
          va_end( args );
 
@@ -2053,22 +2218,31 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstSwitchMap *new;            /* Pointer to new SwitchMap */
    AstMapping *fsmap;            /* Pointer to fwd selector Mapping */
    AstMapping *ismap;            /* Pointer to inv selector Mapping */
    AstMapping **routemaps;       /* Array of route Mapping pointers */
-   int i;                        /* Route Mappings index */
+   int i;                        /* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
+/* Route Mappings index */
    va_list args;                 /* Variable argument list */
 
 /* Initialise. */
    new = NULL;
+
+   int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
 
 /* Check the global status. */
    if ( !astOK ) return new;
 
 /* Report an error if no route Mappings have been supplied. */
    if( nroute <= 0 ) astError( AST__BDPAR, "astSwitchMap(SwitchMap): "
-                               " Bad number of route Mappings (%d) specified.", 
+                               " Bad number of route Mappings (%d) specified.", status, 
                                nroute );
 
 /* Otherwise create an array to hold the route Mapping pointers. */
@@ -2117,7 +2291,7 @@ f     function is invoked with STATUS set to an error value, or if it
 AstSwitchMap *astInitSwitchMap_( void *mem, size_t size, int init,
                                  AstSwitchMapVtab *vtab, const char *name,
                                  AstMapping *fsmap, AstMapping *ismap,
-                                 int nroute, AstMapping **routemaps ) {
+                                 int nroute, AstMapping **routemaps, int *status ) {
 /*
 *+
 *  Name:
@@ -2214,7 +2388,7 @@ AstSwitchMap *astInitSwitchMap_( void *mem, size_t size, int init,
          if( astOK ) {
             astError( AST__BADNI, "astInitSwitchMap(%s): Route Mapping "
                       "number %d has %d input(s) but the first route "
-                      "Mapping has %d input(s).", name, i + 1, 
+                      "Mapping has %d input(s).", status, name, i + 1, 
                       astGetNin( routemaps[ i ] ), nin );
          }
 
@@ -2222,7 +2396,7 @@ AstSwitchMap *astInitSwitchMap_( void *mem, size_t size, int init,
          if( astOK ) {
             astError( AST__BADNO, "astInitSwitchMap(%s): Route Mapping "
                       "number %d has %d output(s) but the first route "
-                      "Mapping has %d output(s).", name, i + 1, 
+                      "Mapping has %d output(s).", status, name, i + 1, 
                       astGetNin( routemaps[ i ] ), nin );
          }
       }
@@ -2233,17 +2407,17 @@ AstSwitchMap *astInitSwitchMap_( void *mem, size_t size, int init,
    if( fsmap && astOK ) {
       if( !astGetTranForward( fsmap ) ) {
          astError( AST__INTRD, "astInitSwitchMap(%s): The forward selector Mapping "
-              "is not able to transform coordinates in the forward direction.",
+              "is not able to transform coordinates in the forward direction.", status,
               name );
 
       } else if( astGetNin( fsmap ) != nin ){ 
          astError( AST__BADNI, "astInitSwitchMap(%s): The forward selector "
                    "Mapping has %d input(s) but the SwitchMap has %d "
-                   "input(s).", name, astGetNin( fsmap ), nin );
+                   "input(s).", status, name, astGetNin( fsmap ), nin );
 
       } else if( astGetNout( fsmap ) != 1 ){ 
          astError( AST__BADNO, "astInitSwitchMap(%s): The forward selector "
-                   "Mapping has %d outputs but should only have 1.", name, 
+                   "Mapping has %d outputs but should only have 1.", status, name, 
                    astGetNin( fsmap ), nin );
       }
    }
@@ -2253,16 +2427,16 @@ AstSwitchMap *astInitSwitchMap_( void *mem, size_t size, int init,
    if( ismap && astOK ) {
       if( !astGetTranInverse( ismap ) ) {
          astError( AST__INTRD, "astInitSwitchMap(%s): The inverse selector Mapping "
-              "is not able to transform coordinates in the inverse direction.",
+              "is not able to transform coordinates in the inverse direction.", status,
               name );
       } else if( nout != astGetNout( ismap ) ){ 
          astError( AST__BADNO, "astInitSwitchMap(%s): The inverse selector "
                    "Mapping has %d output(s) but the SwitchMap has %d "
-                   "output(s).", name, astGetNout( ismap ), nout );
+                   "output(s).", status, name, astGetNout( ismap ), nout );
 
       } else if( astGetNin( ismap ) != 1 ){ 
          astError( AST__BADNI, "astInitSwitchMap(%s): The inverse selector "
-                   "Mapping has %d inputs but should only have 1.", name, 
+                   "Mapping has %d inputs but should only have 1.", status, name, 
                    astGetNout( ismap ), nin );
 
       }
@@ -2271,7 +2445,7 @@ AstSwitchMap *astInitSwitchMap_( void *mem, size_t size, int init,
 /* Report an error if neither ismap nor fsmap were supplied. */
    if( !fsmap && !ismap && astOK ) {
       astError( AST__INTRD, "astInitSwitchMap(%s): No selector Mappings "
-                "supplied.", name );
+                "supplied.", status, name );
    }
 
 /* Initialise a Mapping structure (the parent class) as the first component
@@ -2322,7 +2496,7 @@ AstSwitchMap *astInitSwitchMap_( void *mem, size_t size, int init,
 
 AstSwitchMap *astLoadSwitchMap_( void *mem, size_t size,
                                  AstSwitchMapVtab *vtab, const char *name,
-                                 AstChannel *channel ) {
+                                 AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -2397,6 +2571,7 @@ AstSwitchMap *astLoadSwitchMap_( void *mem, size_t size,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstSwitchMap *new;               
    AstMapping *rmap;
    int i;
@@ -2407,6 +2582,9 @@ AstSwitchMap *astLoadSwitchMap_( void *mem, size_t size,
 
 /* Check the global error status. */
    if ( !astOK ) return new;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* If a NULL virtual function table has been supplied, then this is
    the first loader to be invoked for this SwitchMap. In this case the
@@ -2504,3 +2682,7 @@ AstSwitchMap *astLoadSwitchMap_( void *mem, size_t size,
    same interface. */
 
 /* None. */
+
+
+
+

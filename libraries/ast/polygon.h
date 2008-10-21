@@ -113,6 +113,24 @@ typedef struct AstPolygonVtab {
 
 /* Properties (e.g. methods) specific to this class. */
 } AstPolygonVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstPolygonGlobals {
+   AstPolygonVtab Class_Vtab;
+   int Class_Init;
+} AstPolygonGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitPolygonGlobals_( AstPolygonGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -124,7 +142,7 @@ astPROTO_ISA(Polygon)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstPolygon *astPolygon_( void *, int, int, const double *, AstRegion *, const char *, ... );
+AstPolygon *astPolygon_( void *, int, int, const double *, AstRegion *, const char *, int *, ...);
 #else
 AstPolygon *astPolygonId_( void *, int, int, const double *, AstRegion *, const char *, ... );
 #endif
@@ -132,14 +150,14 @@ AstPolygon *astPolygonId_( void *, int, int, const double *, AstRegion *, const 
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
-AstPolygon *astInitPolygon_( void *, size_t, int, AstPolygonVtab *, const char *, AstFrame *, int, int, const double *, AstRegion * );
+AstPolygon *astInitPolygon_( void *, size_t, int, AstPolygonVtab *, const char *, AstFrame *, int, int, const double *, AstRegion *, int * );
 
 /* Vtab initialiser. */
-void astInitPolygonVtab_( AstPolygonVtab *, const char * );
+void astInitPolygonVtab_( AstPolygonVtab *, const char *, int * );
 
 /* Loader. */
 AstPolygon *astLoadPolygon_( void *, size_t, AstPolygonVtab *,
-                             const char *, AstChannel * );
+                             const char *, AstChannel *, int * );
 
 #endif
 
@@ -178,14 +196,14 @@ AstPolygon *astLoadPolygon_( void *, size_t, AstPolygonVtab *,
 
 /* Initialiser. */
 #define astInitPolygon(mem,size,init,vtab,name,frame,npnt,indim,points,unc) \
-astINVOKE(O,astInitPolygon_(mem,size,init,vtab,name,frame,npnt,indim,points,unc))
+astINVOKE(O,astInitPolygon_(mem,size,init,vtab,name,frame,npnt,indim,points,unc,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitPolygonVtab(vtab,name) astINVOKE(V,astInitPolygonVtab_(vtab,name))
+#define astInitPolygonVtab(vtab,name) astINVOKE(V,astInitPolygonVtab_(vtab,name,STATUS_PTR))
 
 /* Loader. */
 #define astLoadPolygon(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadPolygon_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadPolygon_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -197,3 +215,7 @@ astINVOKE(O,astLoadPolygon_(mem,size,vtab,name,astCheckChannel(channel)))
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif
+
+
+
+

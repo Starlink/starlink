@@ -107,7 +107,7 @@
 *-
 */
 
-AstLoaderType *astGetLoader( const char *class ) {
+AstLoaderType *astGetLoader( const char *class, int *status ) {
    if ( !astOK ) return NULL;
 
 #define LOAD(name) \
@@ -175,7 +175,10 @@ if ( !strcmp( class, #name ) ) return (AstLoaderType *) astLoad##name##_
    LOAD(StcObsDataLocation);
 
    astError( AST__OCLUK, "astGetLoader: Object of unknown class \"%s\" cannot "
-                         "be loaded.", class );
+                         "be loaded.", status, class );
    return NULL;
 #undef LOAD
 }
+
+
+

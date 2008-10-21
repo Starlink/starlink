@@ -252,6 +252,17 @@
 #include "channel.h"
 #endif
 
+
+/* Macros */
+/* ====== */
+#if defined(astCLASS)
+#define AST__AXIS_GETDEFAULTFORMAT_BUFF_LEN 50       
+#define AST__AXIS_AXISFORMAT_BUFF_LEN 127 
+#define AST__AXIS_GETAXISNORMUNIT_BUFF_LEN 127 
+#define AST__AXIS_GETATTRIB_BUFF_LEN 50
+#endif
+
+
 /* Type Definitions. */
 /* ================= */
 /* Axis structure. */
@@ -279,6 +290,7 @@ typedef struct AstAxis {
 /* This table contains all information that is the same for all
    objects in the class (e.g. pointers to its virtual functions). */
 #if defined(astCLASS)            /* Protected */
+
 typedef struct AstAxisVtab {
 
 /* Properties (e.g. methods) inherited from the parent class. */
@@ -288,54 +300,72 @@ typedef struct AstAxisVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   const char *(* AxisAbbrev)( AstAxis *, const char *, const char *, const char * );
-   const char *(* AxisFormat)( AstAxis *, double );
-   const char *(* GetAxisFormat)( AstAxis * );
-   const char *(* GetAxisLabel)( AstAxis * );
-   const char *(* GetAxisSymbol)( AstAxis * );
-   const char *(* GetAxisUnit)( AstAxis * );
-   const char *(* GetAxisNormUnit)( AstAxis * );
-   double (* AxisGap)( AstAxis *, double, int * );
-   double (* AxisDistance)( AstAxis *, double, double );
-   double (* AxisOffset)( AstAxis *, double, double );
-   int (* AxisIn)( AstAxis *, double, double, double, int );
-   int (* AxisFields)( AstAxis *, const char *, const char *, int, char **, int *, double * );
-   int (* AxisUnformat)( AstAxis *, const char *, double * );
-   int (* GetAxisDigits)( AstAxis * );
-   int (* GetAxisDirection)( AstAxis * );
-   int (* TestAxisDigits)( AstAxis * );
-   int (* TestAxisDirection)( AstAxis * );
-   int (* TestAxisFormat)( AstAxis * );
-   int (* TestAxisLabel)( AstAxis * );
-   int (* TestAxisSymbol)( AstAxis * );
-   int (* TestAxisUnit)( AstAxis * );
-   int (* TestAxisNormUnit)( AstAxis * );
-   void (* AxisNorm)( AstAxis *, double * );
-   void (* AxisOverlay)( AstAxis *, AstAxis * );
-   void (* ClearAxisDigits)( AstAxis * );
-   void (* ClearAxisDirection)( AstAxis * );
-   void (* ClearAxisFormat)( AstAxis * );
-   void (* ClearAxisLabel)( AstAxis * );
-   void (* ClearAxisSymbol)( AstAxis * );
-   void (* ClearAxisUnit)( AstAxis * );
-   void (* SetAxisDigits)( AstAxis *, int );
-   void (* SetAxisDirection)( AstAxis *, int );
-   void (* SetAxisFormat)( AstAxis *, const char * );
-   void (* SetAxisLabel)( AstAxis *, const char * );
-   void (* SetAxisSymbol)( AstAxis *, const char * );
-   void (* SetAxisUnit)( AstAxis *, const char * );
+   const char *(* AxisAbbrev)( AstAxis *, const char *, const char *, const char *, int * );
+   const char *(* AxisFormat)( AstAxis *, double, int * );
+   const char *(* GetAxisFormat)( AstAxis *, int * );
+   const char *(* GetAxisLabel)( AstAxis *, int * );
+   const char *(* GetAxisSymbol)( AstAxis *, int * );
+   const char *(* GetAxisUnit)( AstAxis *, int * );
+   const char *(* GetAxisNormUnit)( AstAxis *, int * );
+   double (* AxisGap)( AstAxis *, double, int *, int * );
+   double (* AxisDistance)( AstAxis *, double, double, int * );
+   double (* AxisOffset)( AstAxis *, double, double, int * );
+   int (* AxisIn)( AstAxis *, double, double, double, int, int * );
+   int (* AxisFields)( AstAxis *, const char *, const char *, int, char **, int *, double *, int * );
+   int (* AxisUnformat)( AstAxis *, const char *, double *, int * );
+   int (* GetAxisDigits)( AstAxis *, int * );
+   int (* GetAxisDirection)( AstAxis *, int * );
+   int (* TestAxisDigits)( AstAxis *, int * );
+   int (* TestAxisDirection)( AstAxis *, int * );
+   int (* TestAxisFormat)( AstAxis *, int * );
+   int (* TestAxisLabel)( AstAxis *, int * );
+   int (* TestAxisSymbol)( AstAxis *, int * );
+   int (* TestAxisUnit)( AstAxis *, int * );
+   int (* TestAxisNormUnit)( AstAxis *, int * );
+   void (* AxisNorm)( AstAxis *, double *, int * );
+   void (* AxisOverlay)( AstAxis *, AstAxis *, int * );
+   void (* ClearAxisDigits)( AstAxis *, int * );
+   void (* ClearAxisDirection)( AstAxis *, int * );
+   void (* ClearAxisFormat)( AstAxis *, int * );
+   void (* ClearAxisLabel)( AstAxis *, int * );
+   void (* ClearAxisSymbol)( AstAxis *, int * );
+   void (* ClearAxisUnit)( AstAxis *, int * );
+   void (* SetAxisDigits)( AstAxis *, int, int * );
+   void (* SetAxisDirection)( AstAxis *, int, int * );
+   void (* SetAxisFormat)( AstAxis *, const char *, int * );
+   void (* SetAxisLabel)( AstAxis *, const char *, int * );
+   void (* SetAxisSymbol)( AstAxis *, const char *, int * );
+   void (* SetAxisUnit)( AstAxis *, const char *, int * );
 
-   double (* GetAxisTop)( AstAxis * );
-   int (* TestAxisTop)( AstAxis * );
-   void (* ClearAxisTop)( AstAxis * );
-   void (* SetAxisTop)( AstAxis *, double );
+   double (* GetAxisTop)( AstAxis *, int * );
+   int (* TestAxisTop)( AstAxis *, int * );
+   void (* ClearAxisTop)( AstAxis *, int * );
+   void (* SetAxisTop)( AstAxis *, double, int * );
 
-   double (* GetAxisBottom)( AstAxis * );
-   int (* TestAxisBottom)( AstAxis * );
-   void (* ClearAxisBottom)( AstAxis * );
-   void (* SetAxisBottom)( AstAxis *, double );
+   double (* GetAxisBottom)( AstAxis *, int * );
+   int (* TestAxisBottom)( AstAxis *, int * );
+   void (* ClearAxisBottom)( AstAxis *, int * );
+   void (* SetAxisBottom)( AstAxis *, double, int * );
 
 } AstAxisVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstAxisGlobals {
+   AstAxisVtab Class_Vtab;
+   int Class_Init;
+   char GetDefaultFormat_Buff[ AST__AXIS_GETDEFAULTFORMAT_BUFF_LEN + 1 ];  
+   char AxisFormat_Buff[ AST__AXIS_AXISFORMAT_BUFF_LEN + 1 ];  
+   char GetAxisNormUnit_Buff[ AST__AXIS_GETAXISNORMUNIT_BUFF_LEN + 1 ];  
+   char GetAttrib_Buff[ AST__AXIS_GETATTRIB_BUFF_LEN + 1 ];
+} AstAxisGlobals;
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -347,7 +377,7 @@ astPROTO_ISA(Axis)               /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstAxis *astAxis_( const char *, ... );
+AstAxis *astAxis_( const char *, int *, ...);
 #else
 AstAxis *astAxisId_( const char *, ... );
 #endif
@@ -355,66 +385,72 @@ AstAxis *astAxisId_( const char *, ... );
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
-AstAxis *astInitAxis_( void *, size_t, int, AstAxisVtab *, const char * );
+AstAxis *astInitAxis_( void *, size_t, int, AstAxisVtab *, const char *, int * );
 
 /* Vtab initialiser. */
-void astInitAxisVtab_( AstAxisVtab *, const char * );
+void astInitAxisVtab_( AstAxisVtab *, const char *, int * );
 
 /* Loader. */
 AstAxis *astLoadAxis_( void *, size_t, AstAxisVtab *, const char *,
-                       AstChannel * );
+                       AstChannel *, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitAxisGlobals_( AstAxisGlobals * );
+#endif
+
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-const char *astAxisFormat_( AstAxis *, double );
-int astAxisUnformat_( AstAxis *, const char *, double * );
-void astAxisNorm_( AstAxis *, double * );
+const char *astAxisFormat_( AstAxis *, double, int * );
+int astAxisUnformat_( AstAxis *, const char *, double *, int * );
+void astAxisNorm_( AstAxis *, double *, int * );
 
 #if defined(astCLASS)            /* Protected */
-const char *astAxisAbbrev_( AstAxis *, const char *, const char *, const char * );
-const char *astGetAxisFormat_( AstAxis * );
-const char *astGetAxisLabel_( AstAxis * );
-const char *astGetAxisSymbol_( AstAxis * );
-const char *astGetAxisUnit_( AstAxis * );
-const char *astGetAxisNormUnit_( AstAxis * );
-double astAxisGap_( AstAxis *, double, int * );
-double astAxisDistance_( AstAxis *, double, double );
-double astAxisOffset_( AstAxis *, double, double );
-int astGetAxisDigits_( AstAxis * );
-int astGetAxisDirection_( AstAxis * );
-int astTestAxisDigits_( AstAxis * );
-int astTestAxisDirection_( AstAxis * );
-int astAxisFields_( AstAxis *, const char *, const char *, int, char **, int *, double * );
-int astAxisIn_( AstAxis *, double, double, double, int );
-int astTestAxisFormat_( AstAxis * );
-int astTestAxisLabel_( AstAxis * );
-int astTestAxisSymbol_( AstAxis * );
-int astTestAxisUnit_( AstAxis * );
-int astTestAxisNormUnit_( AstAxis * );
-void astAxisOverlay_( AstAxis *, AstAxis * );
-void astClearAxisDigits_( AstAxis * );
-void astClearAxisDirection_( AstAxis * );
-void astClearAxisFormat_( AstAxis * );
-void astClearAxisLabel_( AstAxis * );
-void astClearAxisSymbol_( AstAxis * );
-void astClearAxisUnit_( AstAxis * );
-void astSetAxisDigits_( AstAxis *, int );
-void astSetAxisDirection_( AstAxis *, int );
-void astSetAxisFormat_( AstAxis *, const char * );
-void astSetAxisLabel_( AstAxis *, const char * );
-void astSetAxisSymbol_( AstAxis *, const char * );
-void astSetAxisUnit_( AstAxis *, const char * );
+const char *astAxisAbbrev_( AstAxis *, const char *, const char *, const char *, int * );
+const char *astGetAxisFormat_( AstAxis *, int * );
+const char *astGetAxisLabel_( AstAxis *, int * );
+const char *astGetAxisSymbol_( AstAxis *, int * );
+const char *astGetAxisUnit_( AstAxis *, int * );
+const char *astGetAxisNormUnit_( AstAxis *, int * );
+double astAxisGap_( AstAxis *, double, int *, int * );
+double astAxisDistance_( AstAxis *, double, double, int * );
+double astAxisOffset_( AstAxis *, double, double, int * );
+int astGetAxisDigits_( AstAxis *, int * );
+int astGetAxisDirection_( AstAxis *, int * );
+int astTestAxisDigits_( AstAxis *, int * );
+int astTestAxisDirection_( AstAxis *, int * );
+int astAxisFields_( AstAxis *, const char *, const char *, int, char **, int *, double *, int * );
+int astAxisIn_( AstAxis *, double, double, double, int, int * );
+int astTestAxisFormat_( AstAxis *, int * );
+int astTestAxisLabel_( AstAxis *, int * );
+int astTestAxisSymbol_( AstAxis *, int * );
+int astTestAxisUnit_( AstAxis *, int * );
+int astTestAxisNormUnit_( AstAxis *, int * );
+void astAxisOverlay_( AstAxis *, AstAxis *, int * );
+void astClearAxisDigits_( AstAxis *, int * );
+void astClearAxisDirection_( AstAxis *, int * );
+void astClearAxisFormat_( AstAxis *, int * );
+void astClearAxisLabel_( AstAxis *, int * );
+void astClearAxisSymbol_( AstAxis *, int * );
+void astClearAxisUnit_( AstAxis *, int * );
+void astSetAxisDigits_( AstAxis *, int, int * );
+void astSetAxisDirection_( AstAxis *, int, int * );
+void astSetAxisFormat_( AstAxis *, const char *, int * );
+void astSetAxisLabel_( AstAxis *, const char *, int * );
+void astSetAxisSymbol_( AstAxis *, const char *, int * );
+void astSetAxisUnit_( AstAxis *, const char *, int * );
 
-double astGetAxisTop_( AstAxis * );
-int astTestAxisTop_( AstAxis * );
-void astClearAxisTop_( AstAxis * );
-void astSetAxisTop_( AstAxis *, double );
+double astGetAxisTop_( AstAxis *, int * );
+int astTestAxisTop_( AstAxis *, int * );
+void astClearAxisTop_( AstAxis *, int * );
+void astSetAxisTop_( AstAxis *, double, int * );
 
-double astGetAxisBottom_( AstAxis * );
-int astTestAxisBottom_( AstAxis * );
-void astClearAxisBottom_( AstAxis * );
-void astSetAxisBottom_( AstAxis *, double );
+double astGetAxisBottom_( AstAxis *, int * );
+int astTestAxisBottom_( AstAxis *, int * );
+void astClearAxisBottom_( AstAxis *, int * );
+void astSetAxisBottom_( AstAxis *, double, int * );
 
 #endif
 
@@ -448,13 +484,13 @@ void astSetAxisBottom_( AstAxis *, double );
 
 /* Initialiser. */
 #define astInitAxis(mem,size,init,vtab,name) \
-astINVOKE(O,astInitAxis_(mem,size,init,vtab,name))
+astINVOKE(O,astInitAxis_(mem,size,init,vtab,name,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitAxisVtab(vtab,name) astINVOKE(V,astInitAxisVtab_(vtab,name))
+#define astInitAxisVtab(vtab,name) astINVOKE(V,astInitAxisVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadAxis(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadAxis_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadAxis_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -463,97 +499,101 @@ astINVOKE(O,astLoadAxis_(mem,size,vtab,name,astCheckChannel(channel)))
    use. This provides a contextual error report if a pointer to the
    wrong sort of object is supplied. */
 #define astAxisFormat(this,value) \
-astINVOKE(V,astAxisFormat_(astCheckAxis(this),value))
+astINVOKE(V,astAxisFormat_(astCheckAxis(this),value,STATUS_PTR))
 #define astAxisNorm(this,value) \
-astINVOKE(V,astAxisNorm_(astCheckAxis(this),value))
+astINVOKE(V,astAxisNorm_(astCheckAxis(this),value,STATUS_PTR))
 #define astAxisUnformat(this,string,value) \
-astINVOKE(V,astAxisUnformat_(astCheckAxis(this),string,value))
+astINVOKE(V,astAxisUnformat_(astCheckAxis(this),string,value,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 #define astAxisAbbrev(this,fmt,str1,str2) \
-astINVOKE(V,astAxisAbbrev_(astCheckAxis(this),fmt,str1,str2))
+astINVOKE(V,astAxisAbbrev_(astCheckAxis(this),fmt,str1,str2,STATUS_PTR))
 #define astAxisGap(this,gap,ntick) \
-astINVOKE(V,astAxisGap_(astCheckAxis(this),gap,ntick))
+astINVOKE(V,astAxisGap_(astCheckAxis(this),gap,ntick,STATUS_PTR))
 #define astAxisFields(this,fmt,str,maxfld,fields,nc,val) \
-astINVOKE(V,astAxisFields_(astCheckAxis(this),fmt,str,maxfld,fields,nc,val))
+astINVOKE(V,astAxisFields_(astCheckAxis(this),fmt,str,maxfld,fields,nc,val,STATUS_PTR))
 #define astAxisIn(this,lo,hi,val,closed) \
-astINVOKE(V,astAxisIn_(astCheckAxis(this),lo,hi,val,closed))
+astINVOKE(V,astAxisIn_(astCheckAxis(this),lo,hi,val,closed,STATUS_PTR))
 #define astAxisDistance(this,v1,v2) \
-astINVOKE(V,astAxisDistance_(astCheckAxis(this),v1,v2))
+astINVOKE(V,astAxisDistance_(astCheckAxis(this),v1,v2,STATUS_PTR))
 #define astAxisOffset(this,v1,dist) \
-astINVOKE(V,astAxisOffset_(astCheckAxis(this),v1,dist))
+astINVOKE(V,astAxisOffset_(astCheckAxis(this),v1,dist,STATUS_PTR))
 #define astAxisOverlay(template,result) \
-astINVOKE(V,astAxisOverlay_(astCheckAxis(template),astCheckAxis(result)))
+astINVOKE(V,astAxisOverlay_(astCheckAxis(template),astCheckAxis(result),STATUS_PTR))
 #define astClearAxisDigits(this) \
-astINVOKE(V,astClearAxisDigits_(astCheckAxis(this)))
+astINVOKE(V,astClearAxisDigits_(astCheckAxis(this),STATUS_PTR))
 #define astClearAxisDirection(this) \
-astINVOKE(V,astClearAxisDirection_(astCheckAxis(this)))
+astINVOKE(V,astClearAxisDirection_(astCheckAxis(this),STATUS_PTR))
 #define astClearAxisFormat(this) \
-astINVOKE(V,astClearAxisFormat_(astCheckAxis(this)))
+astINVOKE(V,astClearAxisFormat_(astCheckAxis(this),STATUS_PTR))
 #define astClearAxisLabel(this) \
-astINVOKE(V,astClearAxisLabel_(astCheckAxis(this)))
+astINVOKE(V,astClearAxisLabel_(astCheckAxis(this),STATUS_PTR))
 #define astClearAxisSymbol(this) \
-astINVOKE(V,astClearAxisSymbol_(astCheckAxis(this)))
+astINVOKE(V,astClearAxisSymbol_(astCheckAxis(this),STATUS_PTR))
 #define astClearAxisUnit(this) \
-astINVOKE(V,astClearAxisUnit_(astCheckAxis(this)))
+astINVOKE(V,astClearAxisUnit_(astCheckAxis(this),STATUS_PTR))
 #define astGetAxisDigits(this) \
-astINVOKE(V,astGetAxisDigits_(astCheckAxis(this)))
+astINVOKE(V,astGetAxisDigits_(astCheckAxis(this),STATUS_PTR))
 #define astGetAxisDirection(this) \
-astINVOKE(V,astGetAxisDirection_(astCheckAxis(this)))
+astINVOKE(V,astGetAxisDirection_(astCheckAxis(this),STATUS_PTR))
 #define astGetAxisFormat(this) \
-astINVOKE(V,astGetAxisFormat_(astCheckAxis(this)))
+astINVOKE(V,astGetAxisFormat_(astCheckAxis(this),STATUS_PTR))
 #define astGetAxisLabel(this) \
-astINVOKE(V,astGetAxisLabel_(astCheckAxis(this)))
+astINVOKE(V,astGetAxisLabel_(astCheckAxis(this),STATUS_PTR))
 #define astGetAxisSymbol(this) \
-astINVOKE(V,astGetAxisSymbol_(astCheckAxis(this)))
+astINVOKE(V,astGetAxisSymbol_(astCheckAxis(this),STATUS_PTR))
 #define astGetAxisUnit(this) \
-astINVOKE(V,astGetAxisUnit_(astCheckAxis(this)))
+astINVOKE(V,astGetAxisUnit_(astCheckAxis(this),STATUS_PTR))
 #define astGetAxisNormUnit(this) \
-astINVOKE(V,astGetAxisNormUnit_(astCheckAxis(this)))
+astINVOKE(V,astGetAxisNormUnit_(astCheckAxis(this),STATUS_PTR))
 #define astSetAxisDigits(this,digits) \
-astINVOKE(V,astSetAxisDigits_(astCheckAxis(this),digits))
+astINVOKE(V,astSetAxisDigits_(astCheckAxis(this),digits,STATUS_PTR))
 #define astSetAxisDirection(this,direction) \
-astINVOKE(V,astSetAxisDirection_(astCheckAxis(this),direction))
+astINVOKE(V,astSetAxisDirection_(astCheckAxis(this),direction,STATUS_PTR))
 #define astSetAxisFormat(this,format) \
-astINVOKE(V,astSetAxisFormat_(astCheckAxis(this),format))
+astINVOKE(V,astSetAxisFormat_(astCheckAxis(this),format,STATUS_PTR))
 #define astSetAxisLabel(this,label) \
-astINVOKE(V,astSetAxisLabel_(astCheckAxis(this),label))
+astINVOKE(V,astSetAxisLabel_(astCheckAxis(this),label,STATUS_PTR))
 #define astSetAxisSymbol(this,symbol) \
-astINVOKE(V,astSetAxisSymbol_(astCheckAxis(this),symbol))
+astINVOKE(V,astSetAxisSymbol_(astCheckAxis(this),symbol,STATUS_PTR))
 #define astSetAxisUnit(this,unit) \
-astINVOKE(V,astSetAxisUnit_(astCheckAxis(this),unit))
+astINVOKE(V,astSetAxisUnit_(astCheckAxis(this),unit,STATUS_PTR))
 #define astTestAxisDigits(this) \
-astINVOKE(V,astTestAxisDigits_(astCheckAxis(this)))
+astINVOKE(V,astTestAxisDigits_(astCheckAxis(this),STATUS_PTR))
 #define astTestAxisDirection(this) \
-astINVOKE(V,astTestAxisDirection_(astCheckAxis(this)))
+astINVOKE(V,astTestAxisDirection_(astCheckAxis(this),STATUS_PTR))
 #define astTestAxisFormat(this) \
-astINVOKE(V,astTestAxisFormat_(astCheckAxis(this)))
+astINVOKE(V,astTestAxisFormat_(astCheckAxis(this),STATUS_PTR))
 #define astTestAxisLabel(this) \
-astINVOKE(V,astTestAxisLabel_(astCheckAxis(this)))
+astINVOKE(V,astTestAxisLabel_(astCheckAxis(this),STATUS_PTR))
 #define astTestAxisSymbol(this) \
-astINVOKE(V,astTestAxisSymbol_(astCheckAxis(this)))
+astINVOKE(V,astTestAxisSymbol_(astCheckAxis(this),STATUS_PTR))
 #define astTestAxisUnit(this) \
-astINVOKE(V,astTestAxisUnit_(astCheckAxis(this)))
+astINVOKE(V,astTestAxisUnit_(astCheckAxis(this),STATUS_PTR))
 #define astTestAxisNormUnit(this) \
-astINVOKE(V,astTestAxisNormUnit_(astCheckAxis(this)))
+astINVOKE(V,astTestAxisNormUnit_(astCheckAxis(this),STATUS_PTR))
 
 #define astClearAxisTop(this) \
-astINVOKE(V,astClearAxisTop_(astCheckAxis(this)))
+astINVOKE(V,astClearAxisTop_(astCheckAxis(this),STATUS_PTR))
 #define astGetAxisTop(this) \
-astINVOKE(V,astGetAxisTop_(astCheckAxis(this)))
+astINVOKE(V,astGetAxisTop_(astCheckAxis(this),STATUS_PTR))
 #define astSetAxisTop(this,top) \
-astINVOKE(V,astSetAxisTop_(astCheckAxis(this),top))
+astINVOKE(V,astSetAxisTop_(astCheckAxis(this),top,STATUS_PTR))
 #define astTestAxisTop(this) \
-astINVOKE(V,astTestAxisTop_(astCheckAxis(this)))
+astINVOKE(V,astTestAxisTop_(astCheckAxis(this),STATUS_PTR))
 
 #define astClearAxisBottom(this) \
-astINVOKE(V,astClearAxisBottom_(astCheckAxis(this)))
+astINVOKE(V,astClearAxisBottom_(astCheckAxis(this),STATUS_PTR))
 #define astGetAxisBottom(this) \
-astINVOKE(V,astGetAxisBottom_(astCheckAxis(this)))
+astINVOKE(V,astGetAxisBottom_(astCheckAxis(this),STATUS_PTR))
 #define astSetAxisBottom(this,bottom) \
-astINVOKE(V,astSetAxisBottom_(astCheckAxis(this),bottom))
+astINVOKE(V,astSetAxisBottom_(astCheckAxis(this),bottom,STATUS_PTR))
 #define astTestAxisBottom(this) \
-astINVOKE(V,astTestAxisBottom_(astCheckAxis(this)))
+astINVOKE(V,astTestAxisBottom_(astCheckAxis(this),STATUS_PTR))
 
 #endif
 #endif
+
+
+
+

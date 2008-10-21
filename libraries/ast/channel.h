@@ -232,6 +232,11 @@
 /* --------------- */
 #include <stddef.h>
 
+/* Macros */
+/* ====== */
+/* Define constants used to size global arrays in this module. */
+#define AST__CHANNEL_GETATTRIB_BUFF_LEN 50    
+
 /* Type Definitions. */
 /* ================= */
 /* Channel structure. */
@@ -245,14 +250,15 @@ typedef struct AstChannel {
 
 /* Attributes specific to objects in this class. */
    const char *(* source)( void ); /* Pointer to source function */
-   char *(* source_wrap)( const char *(*)( void ) );
+   char *(* source_wrap)( const char *(*)(void), int * );
                                  /* Source wrapper function pointer */
    void (* sink)( const char * ); /* Pointer to sink function */
-   void (* sink_wrap)( void (*)( const char * ), const char * );
+   void (* sink_wrap)( void (*)( const char *), const char *, int * );
                                  /* Sink wrapper function pointer */
    int comment;                  /* Output comments? */
    int full;                     /* Set max/normal/min information level */
    int skip;                     /* Skip data between Objects? */
+   int strict;                   /* Report unexpected data items? */
 } AstChannel;
 
 /* Virtual function table. */
@@ -269,36 +275,78 @@ typedef struct AstChannelVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   AstObject *(* Read)( AstChannel * );
-   AstObject *(* ReadObject)( AstChannel *, const char *, AstObject * );
-   char *(* GetNextText)( AstChannel * );
-   char *(* ReadString)( AstChannel *, const char *, const char * );
-   double (* ReadDouble)( AstChannel *, const char *, double );
-   int (* GetComment)( AstChannel * );
-   int (* GetFull)( AstChannel * );
-   int (* GetSkip)( AstChannel * );
-   int (* ReadInt)( AstChannel *, const char *, int );
-   int (* TestComment)( AstChannel * );
-   int (* TestFull)( AstChannel * );
-   int (* TestSkip)( AstChannel * );
-   int (* Write)( AstChannel *, AstObject * );
-   void (* ClearComment)( AstChannel * );
-   void (* ClearFull)( AstChannel * );
-   void (* ClearSkip)( AstChannel * );
-   void (* GetNextData)( AstChannel *, int, char **, char ** );
-   void (* PutNextText)( AstChannel *, const char * );
-   void (* ReadClassData)( AstChannel *, const char * );
-   void (* SetComment)( AstChannel *, int );
-   void (* SetFull)( AstChannel *, int );
-   void (* SetSkip)( AstChannel *, int );
-   void (* WriteBegin)( AstChannel *, const char *, const char * );
-   void (* WriteDouble)( AstChannel *, const char *, int, int, double, const char * );
-   void (* WriteEnd)( AstChannel *, const char * );
-   void (* WriteInt)( AstChannel *, const char *, int, int, int, const char * );
-   void (* WriteIsA)( AstChannel *, const char *, const char * );
-   void (* WriteObject)( AstChannel *, const char *, int, int, AstObject *, const char * );
-   void (* WriteString)( AstChannel *, const char *, int, int, const char *, const char * );
+   AstObject *(* Read)( AstChannel *, int * );
+   AstObject *(* ReadObject)( AstChannel *, const char *, AstObject *, int * );
+   char *(* GetNextText)( AstChannel *, int * );
+   char *(* ReadString)( AstChannel *, const char *, const char *, int * );
+   double (* ReadDouble)( AstChannel *, const char *, double, int * );
+   int (* GetComment)( AstChannel *, int * );
+   int (* GetFull)( AstChannel *, int * );
+   int (* GetSkip)( AstChannel *, int * );
+   int (* GetStrict)( AstChannel *, int * );
+   int (* ReadInt)( AstChannel *, const char *, int, int * );
+   int (* TestComment)( AstChannel *, int * );
+   int (* TestFull)( AstChannel *, int * );
+   int (* TestSkip)( AstChannel *, int * );
+   int (* TestStrict)( AstChannel *, int * );
+   int (* Write)( AstChannel *, AstObject *, int * );
+   void (* ClearComment)( AstChannel *, int * );
+   void (* ClearFull)( AstChannel *, int * );
+   void (* ClearSkip)( AstChannel *, int * );
+   void (* ClearStrict)( AstChannel *, int * );
+   void (* GetNextData)( AstChannel *, int, char **, char **, int * );
+   void (* PutNextText)( AstChannel *, const char *, int * );
+   void (* ReadClassData)( AstChannel *, const char *, int * );
+   void (* SetComment)( AstChannel *, int, int * );
+   void (* SetFull)( AstChannel *, int, int * );
+   void (* SetSkip)( AstChannel *, int, int * );
+   void (* SetStrict)( AstChannel *, int, int * );
+   void (* WriteBegin)( AstChannel *, const char *, const char *, int * );
+   void (* WriteDouble)( AstChannel *, const char *, int, int, double, const char *, int * );
+   void (* WriteEnd)( AstChannel *, const char *, int * );
+   void (* WriteInt)( AstChannel *, const char *, int, int, int, const char *, int * );
+   void (* WriteIsA)( AstChannel *, const char *, const char *, int * );
+   void (* WriteObject)( AstChannel *, const char *, int, int, AstObject *, const char *, int * );
+   void (* WriteString)( AstChannel *, const char *, int, int, const char *, const char *, int * );
 } AstChannelVtab;
+
+/* Define a private structure type used to store linked lists of
+   name-value associations. */
+typedef struct AstChannelValue {
+   struct AstChannelValue *flink; /* Link to next element */
+   struct AstChannelValue *blink; /* Link to previous element */
+   char *name;                    /* Pointer to name string */
+   union {                        /* Holds pointer to value */
+      char *string;               /* Pointer to string value */
+      AstObject *object;          /* Pointer to Object value */
+   } ptr;
+   int is_object;                 /* Whether value is an Object (else string) */
+} AstChannelValue;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstChannelGlobals {
+   AstChannelVtab Class_Vtab;
+   int Class_Init;
+   int AstReadClassData_Msg;
+   char GetAttrib_Buff[ AST__CHANNEL_GETATTRIB_BUFF_LEN + 1 ];
+   int Items_Written;
+   int Current_Indent;
+   int Nest;
+   int Nwrite_Invoc;
+   char **Object_Class;
+   AstChannelValue **Values_List;
+   char **Values_Class;
+   int *Values_OK;
+   int *End_Of_Object;
+} AstChannelGlobals;
+
+#endif
+
+
+
 #endif
 
 /* Function prototypes. */
@@ -311,15 +359,15 @@ astPROTO_ISA(Channel)            /* Test class membership */
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
 AstChannel *astChannel_( const char *(*)( void ), void (*)( const char * ),
-                         const char *, ... );
+                         const char *, int *, ...);
 #else
 AstChannel *astChannelId_( const char *(*)( void ), void (*)( const char * ),
                            const char *, ... );
 AstChannel *astChannelForId_( const char *(*)( void ),
-                              char *(*)( const char *(*)( void ) ),
+                              char *(*)( const char *(*)( void ), int * ),
                               void (*)( const char * ),
                               void (*)( void (*)( const char * ),
-                                        const char * ),
+                                        const char *, int * ),
                               const char *, ... );
 #endif
 
@@ -329,57 +377,66 @@ AstChannel *astChannelForId_( const char *(*)( void ),
 /* Initialiser. */
 AstChannel *astInitChannel_( void *, size_t, int, AstChannelVtab *,
                              const char *, const char *(*)( void ), 
-                             char *(*)( const char *(*)( void ) ), 
+                             char *(*)( const char *(*)( void ), int * ), 
                              void (*)( const char * ), 
                              void (*)( void (*)( const char * ), 
-                             const char * ) );
+                             const char *, int * ), int * );
 
 
 /* Vtab initialiser. */
-void astInitChannelVtab_( AstChannelVtab *, const char * );
+void astInitChannelVtab_( AstChannelVtab *, const char *, int * );
 
 /* Loader. */
 AstChannel *astLoadChannel_( void *, size_t, AstChannelVtab *,
-                             const char *, AstChannel *channel );
+                             const char *, AstChannel *channel, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitChannelGlobals_( AstChannelGlobals * );
+#endif
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-AstObject *astRead_( AstChannel * );
-int astWrite_( AstChannel *, AstObject * );
+AstObject *astRead_( AstChannel *, int * );
+int astWrite_( AstChannel *, AstObject *, int * );
 
-char *astSourceWrap_( const char *(*)( void ) );
-void astSinkWrap_( void (*)( const char * ), const char * );
+char *astSourceWrap_( const char *(*)( void ), int * );
+void astSinkWrap_( void (*)( const char * ), const char *, int * );
 
 # if defined(astCLASS)           /* Protected */
-AstObject *astReadObject_( AstChannel *, const char *, AstObject * );
-char *astGetNextText_( AstChannel * );
-char *astReadString_( AstChannel *, const char *, const char * );
-double astReadDouble_( AstChannel *, const char *, double );
-int astGetComment_( AstChannel * );
-int astGetFull_( AstChannel * );
-int astGetSkip_( AstChannel * );
-int astReadInt_( AstChannel *, const char *, int );
-int astTestComment_( AstChannel * );
-int astTestFull_( AstChannel * );
-int astTestSkip_( AstChannel * );
-void astClearComment_( AstChannel * );
-void astClearFull_( AstChannel * );
-void astClearSkip_( AstChannel * );
-void astGetNextData_( AstChannel *, int, char **, char ** );
-void astPutNextText_( AstChannel *, const char * );
-void astReadClassData_( AstChannel *, const char * );
-void astSetComment_( AstChannel *, int );
-void astSetFull_( AstChannel *, int );
-void astSetSkip_( AstChannel *, int );
-void astWriteBegin_( AstChannel *, const char *, const char * );
-void astWriteDouble_( AstChannel *, const char *, int, int, double, const char * );
-void astWriteEnd_( AstChannel *, const char * );
-void astWriteInt_( AstChannel *, const char *, int, int, int, const char * );
-int astWriteInvocations_( void );
-void astWriteIsA_( AstChannel *, const char *, const char * );
-void astWriteObject_( AstChannel *, const char *, int, int, AstObject *, const char * );
-void astWriteString_( AstChannel *, const char *, int, int, const char *, const char * );
+AstObject *astReadObject_( AstChannel *, const char *, AstObject *, int * );
+char *astGetNextText_( AstChannel *, int * );
+char *astReadString_( AstChannel *, const char *, const char *, int * );
+double astReadDouble_( AstChannel *, const char *, double, int * );
+int astGetComment_( AstChannel *, int * );
+int astGetFull_( AstChannel *, int * );
+int astGetSkip_( AstChannel *, int * );
+int astGetStrict_( AstChannel *, int * );
+int astReadInt_( AstChannel *, const char *, int, int * );
+int astTestComment_( AstChannel *, int * );
+int astTestFull_( AstChannel *, int * );
+int astTestSkip_( AstChannel *, int * );
+int astTestStrict_( AstChannel *, int * );
+void astClearComment_( AstChannel *, int * );
+void astClearFull_( AstChannel *, int * );
+void astClearSkip_( AstChannel *, int * );
+void astClearStrict_( AstChannel *, int * );
+void astGetNextData_( AstChannel *, int, char **, char **, int * );
+void astPutNextText_( AstChannel *, const char *, int * );
+void astReadClassData_( AstChannel *, const char *, int * );
+void astSetComment_( AstChannel *, int, int * );
+void astSetFull_( AstChannel *, int, int * );
+void astSetSkip_( AstChannel *, int, int * );
+void astSetStrict_( AstChannel *, int, int * );
+void astWriteBegin_( AstChannel *, const char *, const char *, int * );
+void astWriteDouble_( AstChannel *, const char *, int, int, double, const char *, int * );
+void astWriteEnd_( AstChannel *, const char *, int * );
+void astWriteInt_( AstChannel *, const char *, int, int, int, const char *, int * );
+int astWriteInvocations_( int * );
+void astWriteIsA_( AstChannel *, const char *, const char *, int * );
+void astWriteObject_( AstChannel *, const char *, int, int, AstObject *, const char *, int * );
+void astWriteString_( AstChannel *, const char *, int, int, const char *, const char *, int * );
 #endif
 
 /* Function interfaces. */
@@ -412,13 +469,13 @@ void astWriteString_( AstChannel *, const char *, int, int, const char *, const 
 
 /* Initialiser. */
 #define astInitChannel(mem,size,init,vtab,name,source,source_wrap,sink,sink_wrap) \
-astINVOKE(O,astInitChannel_(mem,size,init,vtab,name,source,source_wrap,sink,sink_wrap))
+astINVOKE(O,astInitChannel_(mem,size,init,vtab,name,source,source_wrap,sink,sink_wrap,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitChannelVtab(vtab,name) astINVOKE(V,astInitChannelVtab_(vtab,name))
+#define astInitChannelVtab(vtab,name) astINVOKE(V,astInitChannelVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadChannel(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadChannel_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadChannel_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to member functions. */
@@ -427,70 +484,82 @@ astINVOKE(O,astLoadChannel_(mem,size,vtab,name,astCheckChannel(channel)))
    before use.  This provides a contextual error report if a pointer
    to the wrong sort of Object is supplied. */
 
-#define astRead(this) astINVOKE(O,astRead_(astCheckChannel(this)))
+#define astRead(this) astINVOKE(O,astRead_(astCheckChannel(this),STATUS_PTR))
 #define astWrite(this,object) \
-astINVOKE(V,astWrite_(astCheckChannel(this),astCheckObject(object)))
+astINVOKE(V,astWrite_(astCheckChannel(this),astCheckObject(object),STATUS_PTR))
 
 #define astSourceWrap astSourceWrap_
 #define astSinkWrap astSinkWrap_
 
 #if defined(astCLASS)            /* Protected */
 #define astClearComment(this) \
-astINVOKE(V,astClearComment_(astCheckChannel(this)))
+astINVOKE(V,astClearComment_(astCheckChannel(this),STATUS_PTR))
 #define astClearFull(this) \
-astINVOKE(V,astClearFull_(astCheckChannel(this)))
+astINVOKE(V,astClearFull_(astCheckChannel(this),STATUS_PTR))
 #define astClearSkip(this) \
-astINVOKE(V,astClearSkip_(astCheckChannel(this)))
+astINVOKE(V,astClearSkip_(astCheckChannel(this),STATUS_PTR))
+#define astClearStrict(this) \
+astINVOKE(V,astClearStrict_(astCheckChannel(this),STATUS_PTR))
 #define astGetComment(this) \
-astINVOKE(V,astGetComment_(astCheckChannel(this)))
+astINVOKE(V,astGetComment_(astCheckChannel(this),STATUS_PTR))
 #define astGetFull(this) \
-astINVOKE(V,astGetFull_(astCheckChannel(this)))
+astINVOKE(V,astGetFull_(astCheckChannel(this),STATUS_PTR))
 #define astGetNextData(this,begin,name,val) \
-astINVOKE(V,astGetNextData_(astCheckChannel(this),begin,name,val))
+astINVOKE(V,astGetNextData_(astCheckChannel(this),begin,name,val,STATUS_PTR))
 #define astGetNextText(this) \
-astINVOKE(V,astGetNextText_(astCheckChannel(this)))
+astINVOKE(V,astGetNextText_(astCheckChannel(this),STATUS_PTR))
 #define astGetSkip(this) \
-astINVOKE(V,astGetSkip_(astCheckChannel(this)))
+astINVOKE(V,astGetSkip_(astCheckChannel(this),STATUS_PTR))
+#define astGetStrict(this) \
+astINVOKE(V,astGetStrict_(astCheckChannel(this),STATUS_PTR))
 #define astPutNextText(this,line) \
-astINVOKE(V,astPutNextText_(astCheckChannel(this),line))
+astINVOKE(V,astPutNextText_(astCheckChannel(this),line,STATUS_PTR))
 #define astReadClassData(this,class) \
-astINVOKE(V,astReadClassData_(astCheckChannel(this),class))
+astINVOKE(V,astReadClassData_(astCheckChannel(this),class,STATUS_PTR))
 #define astReadDouble(this,name,def) \
-astINVOKE(V,astReadDouble_(astCheckChannel(this),name,def))
+astINVOKE(V,astReadDouble_(astCheckChannel(this),name,def,STATUS_PTR))
 #define astReadInt(this,name,def) \
-astINVOKE(V,astReadInt_(astCheckChannel(this),name,def))
+astINVOKE(V,astReadInt_(astCheckChannel(this),name,def,STATUS_PTR))
 #define astReadObject(this,name,def) \
-astINVOKE(O,astReadObject_(astCheckChannel(this),name,(def)?astCheckObject(def):NULL))
+astINVOKE(O,astReadObject_(astCheckChannel(this),name,(def)?astCheckObject(def):NULL,STATUS_PTR))
 #define astReadString(this,name,def) \
-astINVOKE(V,astReadString_(astCheckChannel(this),name,def))
+astINVOKE(V,astReadString_(astCheckChannel(this),name,def,STATUS_PTR))
 #define astSetComment(this,value) \
-astINVOKE(V,astSetComment_(astCheckChannel(this),value))
+astINVOKE(V,astSetComment_(astCheckChannel(this),value,STATUS_PTR))
 #define astSetFull(this,value) \
-astINVOKE(V,astSetFull_(astCheckChannel(this),value))
+astINVOKE(V,astSetFull_(astCheckChannel(this),value,STATUS_PTR))
 #define astSetSkip(this,value) \
-astINVOKE(V,astSetSkip_(astCheckChannel(this),value))
+astINVOKE(V,astSetSkip_(astCheckChannel(this),value,STATUS_PTR))
+#define astSetStrict(this,value) \
+astINVOKE(V,astSetStrict_(astCheckChannel(this),value,STATUS_PTR))
 #define astTestComment(this) \
-astINVOKE(V,astTestComment_(astCheckChannel(this)))
+astINVOKE(V,astTestComment_(astCheckChannel(this),STATUS_PTR))
 #define astTestFull(this) \
-astINVOKE(V,astTestFull_(astCheckChannel(this)))
+astINVOKE(V,astTestFull_(astCheckChannel(this),STATUS_PTR))
 #define astTestSkip(this) \
-astINVOKE(V,astTestSkip_(astCheckChannel(this)))
+astINVOKE(V,astTestSkip_(astCheckChannel(this),STATUS_PTR))
+#define astTestStrict(this) \
+astINVOKE(V,astTestStrict_(astCheckChannel(this),STATUS_PTR))
 #define astWriteBegin(this,class,comment) \
-astINVOKE(V,astWriteBegin_(astCheckChannel(this),class,comment))
+astINVOKE(V,astWriteBegin_(astCheckChannel(this),class,comment,STATUS_PTR))
 #define astWriteDouble(this,name,set,helpful,value,comment) \
-astINVOKE(V,astWriteDouble_(astCheckChannel(this),name,set,helpful,value,comment))
+astINVOKE(V,astWriteDouble_(astCheckChannel(this),name,set,helpful,value,comment,STATUS_PTR))
 #define astWriteEnd(this,class) \
-astINVOKE(V,astWriteEnd_(astCheckChannel(this),class))
+astINVOKE(V,astWriteEnd_(astCheckChannel(this),class,STATUS_PTR))
 #define astWriteInt(this,name,set,helpful,value,comment) \
-astINVOKE(V,astWriteInt_(astCheckChannel(this),name,set,helpful,value,comment))
+astINVOKE(V,astWriteInt_(astCheckChannel(this),name,set,helpful,value,comment,STATUS_PTR))
 #define astWriteIsA(this,class,comment) \
-astINVOKE(V,astWriteIsA_(astCheckChannel(this),class,comment))
+astINVOKE(V,astWriteIsA_(astCheckChannel(this),class,comment,STATUS_PTR))
 #define astWriteObject(this,name,set,helpful,value,comment) \
-astINVOKE(V,astWriteObject_(astCheckChannel(this),name,set,helpful,astCheckObject(value),comment))
+astINVOKE(V,astWriteObject_(astCheckChannel(this),name,set,helpful,astCheckObject(value),comment,STATUS_PTR))
 #define astWriteString(this,name,set,helpful,value,comment) \
-astINVOKE(V,astWriteString_(astCheckChannel(this),name,set,helpful,value,comment))
+astINVOKE(V,astWriteString_(astCheckChannel(this),name,set,helpful,value,comment,STATUS_PTR))
 
-#define astWriteInvocations astWriteInvocations_()
+#define astWriteInvocations astWriteInvocations_(STATUS_PTR)
 
 #endif
 #endif
+
+
+
+

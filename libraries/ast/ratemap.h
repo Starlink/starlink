@@ -162,6 +162,24 @@ typedef struct AstRateMapVtab {
 /* Properties (e.g. methods) specific to this class. */
 /* None. */
 } AstRateMapVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstRateMapGlobals {
+   AstRateMapVtab Class_Vtab;
+   int Class_Init;
+} AstRateMapGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitRateMapGlobals_( AstRateMapGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -173,7 +191,7 @@ astPROTO_ISA(RateMap)             /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstRateMap *astRateMap_( void *, int, int, const char *, ... );
+AstRateMap *astRateMap_( void *, int, int, const char *, int *, ...);
 #else
 AstRateMap *astRateMapId_( void *, int, int, const char *, ... );
 #endif
@@ -182,14 +200,14 @@ AstRateMap *astRateMapId_( void *, int, int, const char *, ... );
 
 /* Initialiser. */
 AstRateMap *astInitRateMap_( void *, size_t, int, AstRateMapVtab *,
-                             const char *, AstMapping *, int, int );
+                             const char *, AstMapping *, int, int, int * );
 
 /* Vtab initialiser. */
-void astInitRateMapVtab_( AstRateMapVtab *, const char * );
+void astInitRateMapVtab_( AstRateMapVtab *, const char *, int * );
 
 /* Loader. */
 AstRateMap *astLoadRateMap_( void *, size_t, AstRateMapVtab *,
-                             const char *, AstChannel * );
+                             const char *, AstChannel *, int * );
 #endif
 
 /* Prototypes for member functions. */
@@ -226,13 +244,13 @@ AstRateMap *astLoadRateMap_( void *, size_t, AstRateMapVtab *,
 
 /* Initialiser. */
 #define astInitRateMap(mem,size,init,vtab,name,map,iin,iout) \
-astINVOKE(O,astInitRateMap_(mem,size,init,vtab,name,astCheckMapping(map),iin,iout))
+astINVOKE(O,astInitRateMap_(mem,size,init,vtab,name,astCheckMapping(map),iin,iout,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitRateMapVtab(vtab,name) astINVOKE(V,astInitRateMapVtab_(vtab,name))
+#define astInitRateMapVtab(vtab,name) astINVOKE(V,astInitRateMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadRateMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadRateMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadRateMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -242,3 +260,7 @@ astINVOKE(O,astLoadRateMap_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 /* None. */
 #endif
+
+
+
+

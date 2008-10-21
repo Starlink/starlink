@@ -114,6 +114,24 @@ typedef struct AstBoxVtab {
 
 /* Properties (e.g. methods) specific to this class. */
 } AstBoxVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstBoxGlobals {
+   AstBoxVtab Class_Vtab;
+   int Class_Init;
+} AstBoxGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitBoxGlobals_( AstBoxGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -125,7 +143,7 @@ astPROTO_ISA(Box)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstBox *astBox_( void *, int, const double[], const double[], AstRegion *, const char *, ... );
+AstBox *astBox_( void *, int, const double[], const double[], AstRegion *, const char *, int *, ...);
 #else
 AstBox *astBoxId_( void *, int, const double[], const double[], AstRegion *, const char *, ... );
 #endif
@@ -135,14 +153,14 @@ AstBox *astBoxId_( void *, int, const double[], const double[], AstRegion *, con
 /* Initialiser. */
 AstBox *astInitBox_( void *, size_t, int, AstBoxVtab *,
                      const char *, AstFrame *, int, const double[],
-                     const double[], AstRegion * );
+                     const double[], AstRegion *, int * );
 
 /* Vtab initialiser. */
-void astInitBoxVtab_( AstBoxVtab *, const char * );
+void astInitBoxVtab_( AstBoxVtab *, const char *, int * );
 
 /* Loader. */
 AstBox *astLoadBox_( void *, size_t, AstBoxVtab *,
-                     const char *, AstChannel * );
+                     const char *, AstChannel *, int * );
 
 #endif
 
@@ -181,13 +199,13 @@ AstBox *astLoadBox_( void *, size_t, AstBoxVtab *,
 
 /* Initialiser. */
 #define astInitBox(mem,size,init,vtab,name,frame,form,p1,p2,unc) \
-astINVOKE(O,astInitBox_(mem,size,init,vtab,name,frame,form,p1,p2,unc))
+astINVOKE(O,astInitBox_(mem,size,init,vtab,name,frame,form,p1,p2,unc,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitBoxVtab(vtab,name) astINVOKE(V,astInitBoxVtab_(vtab,name))
+#define astInitBoxVtab(vtab,name) astINVOKE(V,astInitBoxVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadBox(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadBox_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadBox_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -199,3 +217,7 @@ astINVOKE(O,astLoadBox_(mem,size,vtab,name,astCheckChannel(channel)))
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif
+
+
+
+

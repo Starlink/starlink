@@ -57,6 +57,12 @@
 
 /* Macros. */
 /* ======= */
+#if defined(astCLASS) || defined(astFORTRAN77)
+#define STATUS_PTR status
+#else
+#define STATUS_PTR astGetStatusPtr
+#endif
+
 
 #if defined(astCLASS)            /* Protected */
 
@@ -102,17 +108,30 @@ typedef struct AstPlot3DVtab {
 /* Unique flag value to determine class membership. */
    int *check;                   /* Check value */
 
-   int (* GetRootCorner)( AstPlot3D * );
-   int (* TestRootCorner)( AstPlot3D * );
-   void (* SetRootCorner)( AstPlot3D *, int );
-   void (* ClearRootCorner)( AstPlot3D * );
+   int (* GetRootCorner)( AstPlot3D *, int * );
+   int (* TestRootCorner)( AstPlot3D *, int * );
+   void (* SetRootCorner)( AstPlot3D *, int, int * );
+   void (* ClearRootCorner)( AstPlot3D *, int * );
 
-   double (* GetNorm)( AstPlot3D *, int );
-   int (* TestNorm)( AstPlot3D *, int );
-   void (* SetNorm)( AstPlot3D *, int, double );
-   void (* ClearNorm)( AstPlot3D *, int );
+   double (* GetNorm)( AstPlot3D *, int, int * );
+   int (* TestNorm)( AstPlot3D *, int, int * );
+   void (* SetNorm)( AstPlot3D *, int, double, int * );
+   void (* ClearNorm)( AstPlot3D *, int, int * );
 
 } AstPlot3DVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstPlot3DGlobals {
+   AstPlot3DVtab Class_Vtab;
+   int Class_Init;
+   char GetAttrib_Buff[ 101 ];
+} AstPlot3DGlobals;
+
+#endif
+
 #endif
 
 /* Function prototypes. */
@@ -124,7 +143,7 @@ astPROTO_ISA(Plot3D)           /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected */
-AstPlot3D *astPlot3D_( void *, const float *, const double *, const char *, ... );
+AstPlot3D *astPlot3D_( void *, const float *, const double *, const char *, int *, ...);
 #else
 AstPlot3D *astPlot3DId_( void *, const float [], const double [], const char *, ... );
 #endif
@@ -134,15 +153,21 @@ AstPlot3D *astPlot3DId_( void *, const float [], const double [], const char *, 
 /* Initialiser. */
 AstPlot3D *astInitPlot3D_( void *, size_t, int, AstPlot3DVtab *, 
                            const char *, AstFrame *, const float *, 
-                           const double * );
+                           const double *, int * );
 
 /* Vtab initialiser. */
-void astInitPlot3DVtab_( AstPlot3DVtab *, const char * );
+void astInitPlot3DVtab_( AstPlot3DVtab *, const char *, int * );
 
 /* Loader. */
 AstPlot3D *astLoadPlot3D_( void *, size_t, 
                                          AstPlot3DVtab *,
-                                         const char *, AstChannel *channel );
+                                         const char *, AstChannel *channel, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitPlot3DGlobals_( AstPlot3DGlobals * );
+#endif
+
 #endif
 
 /* Prototypes for member functions. */
@@ -150,15 +175,15 @@ AstPlot3D *astLoadPlot3D_( void *, size_t,
 
 #if defined(astCLASS)            /* Protected */
 
-   int astGetRootCorner_( AstPlot3D * );
-   int astTestRootCorner_( AstPlot3D * );
-   void astSetRootCorner_( AstPlot3D *, int );
-   void astClearRootCorner_( AstPlot3D * );
+   int astGetRootCorner_( AstPlot3D *, int * );
+   int astTestRootCorner_( AstPlot3D *, int * );
+   void astSetRootCorner_( AstPlot3D *, int, int * );
+   void astClearRootCorner_( AstPlot3D *, int * );
 
-   double astGetNorm_( AstPlot3D *, int );
-   int astTestNorm_( AstPlot3D *, int );
-   void astSetNorm_( AstPlot3D *, int, double );
-   void astClearNorm_( AstPlot3D *, int );
+   double astGetNorm_( AstPlot3D *, int, int * );
+   int astTestNorm_( AstPlot3D *, int, int * );
+   void astSetNorm_( AstPlot3D *, int, double, int * );
+   void astClearNorm_( AstPlot3D *, int, int * );
 
 #endif
 
@@ -192,13 +217,13 @@ AstPlot3D *astLoadPlot3D_( void *, size_t,
 
 /* Initialiser. */
 #define astInitPlot3D(mem,size,init,vtab,name,frame,graph,base) \
-astINVOKE(O,astInitPlot3D_(mem,size,init,vtab,name,frame,graph,base))
+astINVOKE(O,astInitPlot3D_(mem,size,init,vtab,name,frame,graph,base,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitPlot3DVtab(vtab,name) astINVOKE(V,astInitPlot3DVtab_(vtab,name))
+#define astInitPlot3DVtab(vtab,name) astINVOKE(V,astInitPlot3DVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadPlot3D(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadPlot3D_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadPlot3D_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 
 #endif
 
@@ -213,15 +238,19 @@ astINVOKE(O,astLoadPlot3D_(mem,size,vtab,name,astCheckChannel(channel)))
 
 #if defined(astCLASS)            /* Protected */
 
-#define astGetRootCorner(this) astINVOKE(V,astGetRootCorner_(astCheckPlot3D(this)))
-#define astTestRootCorner(this) astINVOKE(V,astTestRootCorner_(astCheckPlot3D(this)))
-#define astClearRootCorner(this) astINVOKE(V,astClearRootCorner_(astCheckPlot3D(this)))
-#define astSetRootCorner(this,value) astINVOKE(V,astSetRootCorner_(astCheckPlot3D(this),value))
+#define astGetRootCorner(this) astINVOKE(V,astGetRootCorner_(astCheckPlot3D(this),STATUS_PTR))
+#define astTestRootCorner(this) astINVOKE(V,astTestRootCorner_(astCheckPlot3D(this),STATUS_PTR))
+#define astClearRootCorner(this) astINVOKE(V,astClearRootCorner_(astCheckPlot3D(this),STATUS_PTR))
+#define astSetRootCorner(this,value) astINVOKE(V,astSetRootCorner_(astCheckPlot3D(this),value,STATUS_PTR))
 
-#define astGetNorm(this,axis) astINVOKE(V,astGetNorm_(astCheckPlot3D(this),axis))
-#define astTestNorm(this,axis) astINVOKE(V,astTestNorm_(astCheckPlot3D(this),axis))
-#define astClearNorm(this,axis) astINVOKE(V,astClearNorm_(astCheckPlot3D(this),axis))
-#define astSetNorm(this,axis,value) astINVOKE(V,astSetNorm_(astCheckPlot3D(this),axis,value))
+#define astGetNorm(this,axis) astINVOKE(V,astGetNorm_(astCheckPlot3D(this),axis,STATUS_PTR))
+#define astTestNorm(this,axis) astINVOKE(V,astTestNorm_(astCheckPlot3D(this),axis,STATUS_PTR))
+#define astClearNorm(this,axis) astINVOKE(V,astClearNorm_(astCheckPlot3D(this),axis,STATUS_PTR))
+#define astSetNorm(this,axis,value) astINVOKE(V,astSetNorm_(astCheckPlot3D(this),axis,value,STATUS_PTR))
 
 #endif
 #endif
+
+
+
+

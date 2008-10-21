@@ -271,7 +271,6 @@
    "protected" symbols available. NB, this module is not a proper AST 
    class, but it defines this macro sanyway in order to get the protected
    symbols defined in memory.h */
-#define astCLASS proj
 
 #include <math.h>
 #include <string.h>

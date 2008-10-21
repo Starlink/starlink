@@ -130,6 +130,10 @@ static void ast_resample_uinterp##X( int ndim, \
                                      Xtype *out, Xtype *out_var, \
                                      int *nbad ) { \
    DECLARE_INTEGER(STATUS); \
+   int *status; \
+\
+/* Get a pointer to the inherited staus value. */ \
+   status = astGetStatusPtr; \
 \
 /* Obtain the C status and then invoke the FORTRAN 77 interpolation \
    function via the stored pointer. Note that the "coords" array we \
@@ -180,9 +184,11 @@ MAKE_AST_RESAMPLE_UINTERP(UB,unsigned char,UBYTE)
 static void ast_resample_ukern1( double offset, const double params[],
                                  int flags, double *value ) {
    DECLARE_INTEGER(STATUS);
+   int *status;
 
 /* Obtain the C status and then invoke the FORTRAN 77 interpolation
    function via the stored pointer. */
+   status = astGetStatusPtr;
    STATUS = astStatus;
    ( *ast_resample_FINTERP )( DOUBLE_ARG(&offset),
                               DOUBLE_ARRAY_ARG(params),

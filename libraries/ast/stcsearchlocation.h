@@ -108,6 +108,24 @@ typedef struct AstStcSearchLocationVtab {
 
 /* Properties (e.g. methods) specific to this class. */
 } AstStcSearchLocationVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstStcSearchLocationGlobals {
+   AstStcSearchLocationVtab Class_Vtab;
+   int Class_Init;
+} AstStcSearchLocationGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitStcSearchLocationGlobals_( AstStcSearchLocationGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -119,7 +137,7 @@ astPROTO_ISA(StcSearchLocation)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstStcSearchLocation *astStcSearchLocation_(  void *, int, AstKeyMap **, const char *, ... );
+AstStcSearchLocation *astStcSearchLocation_(  void *, int, AstKeyMap **, const char *, int *, ...);
 #else
 AstStcSearchLocation *astStcSearchLocationId_(  void *, int, AstKeyMap **, const char *, ... );
 #endif
@@ -127,13 +145,13 @@ AstStcSearchLocation *astStcSearchLocationId_(  void *, int, AstKeyMap **, const
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
-AstStcSearchLocation *astInitStcSearchLocation_( void *, size_t, int, AstStcSearchLocationVtab *, const char *, AstRegion *, int, AstKeyMap ** );
+AstStcSearchLocation *astInitStcSearchLocation_( void *, size_t, int, AstStcSearchLocationVtab *, const char *, AstRegion *, int, AstKeyMap **, int * );
 
 /* Vtab initialiser. */
-void astInitStcSearchLocationVtab_( AstStcSearchLocationVtab *, const char * );
+void astInitStcSearchLocationVtab_( AstStcSearchLocationVtab *, const char *, int * );
 
 /* Loader. */
-AstStcSearchLocation *astLoadStcSearchLocation_( void *, size_t, AstStcSearchLocationVtab *, const char *, AstChannel * );
+AstStcSearchLocation *astLoadStcSearchLocation_( void *, size_t, AstStcSearchLocationVtab *, const char *, AstChannel *, int * );
 
 #endif
 
@@ -170,13 +188,13 @@ AstStcSearchLocation *astLoadStcSearchLocation_( void *, size_t, AstStcSearchLoc
 
 /* Initialiser. */
 #define astInitStcSearchLocation(mem,size,init,vtab,name,region,ncoords,coords) \
-astINVOKE(O,astInitStcSearchLocation_(mem,size,init,vtab,name,region,ncoords,coords))
+astINVOKE(O,astInitStcSearchLocation_(mem,size,init,vtab,name,region,ncoords,coords,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitStcSearchLocationVtab(vtab,name) astINVOKE(V,astInitStcSearchLocationVtab_(vtab,name))
+#define astInitStcSearchLocationVtab(vtab,name) astINVOKE(V,astInitStcSearchLocationVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadStcSearchLocation(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadStcSearchLocation_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadStcSearchLocation_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -188,3 +206,7 @@ astINVOKE(O,astLoadStcSearchLocation_(mem,size,vtab,name,astCheckChannel(channel
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif
+
+
+
+

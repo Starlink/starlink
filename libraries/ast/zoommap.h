@@ -189,11 +189,25 @@ typedef struct AstZoomMapVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   double (*GetZoom)( AstZoomMap * );
-   int (* TestZoom)( AstZoomMap * );
-   void (* ClearZoom)( AstZoomMap * );
-   void (* SetZoom)( AstZoomMap *, double );
+   double (*GetZoom)( AstZoomMap *, int * );
+   int (* TestZoom)( AstZoomMap *, int * );
+   void (* ClearZoom)( AstZoomMap *, int * );
+   void (* SetZoom)( AstZoomMap *, double, int * );
 } AstZoomMapVtab;
+
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstZoomMapGlobals {
+   AstZoomMapVtab Class_Vtab;
+   int Class_Init;
+   char GetAttrib_Buff[ 101 ];
+} AstZoomMapGlobals;
+
+#endif
+
 #endif
 
 /* Function prototypes. */
@@ -205,7 +219,7 @@ astPROTO_ISA(ZoomMap)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstZoomMap *astZoomMap_( int, double, const char *, ... );
+AstZoomMap *astZoomMap_( int, double, const char *, int *, ...);
 #else
 AstZoomMap *astZoomMapId_( int, double, const char *, ... );
 #endif
@@ -214,23 +228,29 @@ AstZoomMap *astZoomMapId_( int, double, const char *, ... );
 
 /* Initialiser. */
 AstZoomMap *astInitZoomMap_( void *, size_t, int, AstZoomMapVtab *,
-                             const char *, int, double );
+                             const char *, int, double, int * );
 
 /* Vtab initialiser. */
-void astInitZoomMapVtab_( AstZoomMapVtab *, const char * );
+void astInitZoomMapVtab_( AstZoomMapVtab *, const char *, int * );
 
 /* Loader. */
 AstZoomMap *astLoadZoomMap_( void *, size_t, AstZoomMapVtab *,
-                             const char *, AstChannel * );
+                             const char *, AstChannel *, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitZoomMapGlobals_( AstZoomMapGlobals * );
+#endif
+
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
-double astGetZoom_( AstZoomMap * );
-int astTestZoom_( AstZoomMap * );
-void astClearZoom_( AstZoomMap * );
-void astSetZoom_( AstZoomMap *, double );
+double astGetZoom_( AstZoomMap *, int * );
+int astTestZoom_( AstZoomMap *, int * );
+void astClearZoom_( AstZoomMap *, int * );
+void astSetZoom_( AstZoomMap *, double, int * );
 #endif
 
 /* Function interfaces. */
@@ -263,13 +283,13 @@ void astSetZoom_( AstZoomMap *, double );
 
 /* Initialiser. */
 #define astInitZoomMap(mem,size,init,vtab,name,ncoord,zoom) \
-astINVOKE(O,astInitZoomMap_(mem,size,init,vtab,name,ncoord,zoom))
+astINVOKE(O,astInitZoomMap_(mem,size,init,vtab,name,ncoord,zoom,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitZoomMapVtab(vtab,name) astINVOKE(V,astInitZoomMapVtab_(vtab,name))
+#define astInitZoomMapVtab(vtab,name) astINVOKE(V,astInitZoomMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadZoomMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadZoomMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadZoomMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -279,10 +299,14 @@ astINVOKE(O,astLoadZoomMap_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 
 #if defined(astCLASS)            /* Protected */
-#define astClearZoom(this) astINVOKE(V,astClearZoom_(astCheckZoomMap(this)))
-#define astGetZoom(this) astINVOKE(V,astGetZoom_(astCheckZoomMap(this)))
+#define astClearZoom(this) astINVOKE(V,astClearZoom_(astCheckZoomMap(this),STATUS_PTR))
+#define astGetZoom(this) astINVOKE(V,astGetZoom_(astCheckZoomMap(this),STATUS_PTR))
 #define astSetZoom(this,value) \
-astINVOKE(V,astSetZoom_(astCheckZoomMap(this),value))
-#define astTestZoom(this) astINVOKE(V,astTestZoom_(astCheckZoomMap(this)))
+astINVOKE(V,astSetZoom_(astCheckZoomMap(this),value,STATUS_PTR))
+#define astTestZoom(this) astINVOKE(V,astTestZoom_(astCheckZoomMap(this),STATUS_PTR))
 #endif
 #endif
+
+
+
+

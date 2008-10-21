@@ -71,6 +71,7 @@ GRP_C_ROUTINES = \
     fwinmap.c \
     fxmlchan.c \
     fzoommap.c \
+    globals.c \
     grismmap.c \
     interval.c \
     intramap.c \
@@ -134,6 +135,7 @@ AST_H_FILES = \
     proj.h \
     memory.h \
     error.h \
+    globals.h \
     unit.h \
     ast_err.h \
     version.h \
@@ -307,6 +309,7 @@ lib_LTLIBRARIES = \
     libast_pal.la \
     libast_wcslib.la
 
+
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 dist_starnews_DATA = ast.news
 dist_pkgdata_DATA = LICENCE
@@ -316,8 +319,21 @@ dist_pkgdata_DATA = LICENCE
 # Note we do not simply set the AM_CFLAGS variable, as this would also
 # apply to programs compiled without using libtool, possibly causing the
 # compilation to fail.
+
+if !NOTHREADS
+
 if !NOPIC
+libast_la_CFLAGS = $(AM_CFLAGS) -prefer-pic -DTHREAD_SAFE
+else
+libast_la_CFLAGS = $(AM_CFLAGS) -DTHREAD_SAFE
+endif
+
+else
 libast_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
+
+endif
+
+if !NOPIC
 libast_err_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_ems_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_grf3d_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
@@ -329,11 +345,13 @@ libast_pal_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_wcslib_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 endif
 
+#  The module containing the main AST classes
 libast_la_SOURCES = \
     $(GRP_C_ROUTINES) \
     $(GRP_C_INCLUDE_FILES) \
     $(GRP_F_INCLUDE_FILES) \
     ast_err.h
+
 # AST_PAR is really part of GRP_F_INCLUDE_FILES, but it must not be
 # distributed, so list it separately.
 nodist_libast_la_SOURCES = \

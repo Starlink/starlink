@@ -118,6 +118,24 @@ typedef struct AstEllipseVtab {
 
 /* Properties (e.g. methods) specific to this class. */
 } AstEllipseVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstEllipseGlobals {
+   AstEllipseVtab Class_Vtab;
+   int Class_Init;
+} AstEllipseGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitEllipseGlobals_( AstEllipseGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -129,7 +147,7 @@ astPROTO_ISA(Ellipse)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstEllipse *astEllipse_( void *, int, const double[2], const double[2], const double[2], AstRegion *, const char *, ... );
+AstEllipse *astEllipse_( void *, int, const double[2], const double[2], const double[2], AstRegion *, const char *, int *, ...);
 #else
 AstEllipse *astEllipseId_( void *, int, const double[2], const double[2], const double[2], AstRegion *, const char *, ... );
 #endif
@@ -139,21 +157,21 @@ AstEllipse *astEllipseId_( void *, int, const double[2], const double[2], const 
 /* Initialiser. */
 AstEllipse *astInitEllipse_( void *, size_t, int, AstEllipseVtab *,
                            const char *, AstFrame *, int, const double[2],
-                           const double[2], const double[2], AstRegion * );
+                           const double[2], const double[2], AstRegion *, int * );
 
 /* Vtab initialiser. */
-void astInitEllipseVtab_( AstEllipseVtab *, const char * );
+void astInitEllipseVtab_( AstEllipseVtab *, const char *, int * );
 
 /* Loader. */
 AstEllipse *astLoadEllipse_( void *, size_t, AstEllipseVtab *,
-                             const char *, AstChannel * );
+                             const char *, AstChannel *, int * );
 
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
-AstRegion *astBestEllipse_( AstPointSet *, double *, AstRegion * );
+AstRegion *astBestEllipse_( AstPointSet *, double *, AstRegion *, int * );
 #endif
 
 /* Function interfaces. */
@@ -186,13 +204,13 @@ AstRegion *astBestEllipse_( AstPointSet *, double *, AstRegion * );
 
 /* Initialiser. */
 #define astInitEllipse(mem,size,init,vtab,name,frame,form,p1,p2,p3,unc) \
-astINVOKE(O,astInitEllipse_(mem,size,init,vtab,name,frame,form,p1,p2,p3,unc))
+astINVOKE(O,astInitEllipse_(mem,size,init,vtab,name,frame,form,p1,p2,p3,unc,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitEllipseVtab(vtab,name) astINVOKE(V,astInitEllipseVtab_(vtab,name))
+#define astInitEllipseVtab(vtab,name) astINVOKE(V,astInitEllipseVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadEllipse(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadEllipse_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadEllipse_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -202,6 +220,10 @@ astINVOKE(O,astLoadEllipse_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 
 #if defined(astCLASS)            /* Protected */
-#define astBestEllipse(pset,cen,unc) astBestEllipse_(pset,cen,unc)
+#define astBestEllipse(pset,cen,unc) astBestEllipse_(pset,cen,unc,STATUS_PTR)
 #endif
 #endif
+
+
+
+

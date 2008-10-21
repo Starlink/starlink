@@ -551,6 +551,12 @@
 
 /* Macros. */
 /* ------- */
+#if defined(astCLASS) || defined(astFORTRAN77)
+#define STATUS_PTR status
+#else
+#define STATUS_PTR astGetStatusPtr
+#endif
+
 #if defined(astCLASS)            /* Protected */
 
 /* A bad value for the System attribute. */
@@ -561,6 +567,14 @@
 
 /* Flag bitmasks for use with astSetFrameFlags. */
 # define AST__INTFLAG 1  /* FrameSet integrity is currently being restored */
+
+/* Define constants used to size global arrays in this module. */
+#define AST__FRAME_LABEL_BUFF_LEN 100       /* Max length of default axis Label string */
+#define AST__FRAME_SYMBOL_BUFF_LEN 50       /* Max length of default axis Symbol string */
+#define AST__FRAME_TITLE_BUFF_LEN 100       /* Max length of default title string */
+#define AST__FRAME_GETATTRIB_BUFF_LEN 50    /* Max length of string returned by GetAttrib */
+#define AST__FRAME_ASTFMTDECIMALYR_BUFF_LEN 50    /* Max length of string returned by GetAttrib */
+#define AST__FRAME_ASTFORMATID_MAX_STRINGS 50     /* Number of string values buffer by astFormatID*/
 
 #endif
 
@@ -636,151 +650,168 @@ typedef struct AstFrameVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   AstAxis *(* GetAxis)( AstFrame *, int );
-   AstFrame *(* PickAxes)( AstFrame *, int, const int[], AstMapping ** );
-   AstLineDef *(* LineDef)( AstFrame *, const double[2], const double[2] );
-   AstPointSet *(* ResolvePoints)( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet * );
-   const char *(* Abbrev)( AstFrame *, int, const char *, const char *, const char * );
-   const char *(* Format)( AstFrame *, int, double );
-   const char *(* GetDomain)( AstFrame * );
-   const char *(* GetFormat)( AstFrame *, int );
-   const char *(* GetLabel)( AstFrame *, int );
-   const char *(* GetSymbol)( AstFrame *, int );
-   const char *(* GetTitle)( AstFrame * );
-   const char *(* GetNormUnit)( AstFrame *, int );
-   const char *(* GetUnit)( AstFrame *, int );
-   const int *(* GetPerm)( AstFrame * );
-   double (* Angle)( AstFrame *, const double[], const double[], const double[] );
-   double (* Distance)( AstFrame *, const double[], const double[] );
-   double (* Gap)( AstFrame *, int, double, int * );
-   int (* Fields)( AstFrame *, int, const char *, const char *, int, char **, int *, double * );
-   double (* AxDistance)( AstFrame *, int, double, double );
-   double (* AxOffset)( AstFrame *, int, double, double );
-   int (* AxIn)( AstFrame *, int, double, double, double, int );
-   int (* GetDigits)( AstFrame * );
-   int (* GetDirection)( AstFrame *, int );
-   int (* GetMatchEnd)( AstFrame * );
-   int (* GetMaxAxes)( AstFrame * );
-   int (* GetMinAxes)( AstFrame * );
-   int (* GetNaxes)( AstFrame * );
-   int (* GetPermute)( AstFrame * );
-   int (* GetPreserveAxes)( AstFrame * );
-   int (* IsUnitFrame)( AstFrame * );
-   int (* LineCrossing)( AstFrame *, AstLineDef *, AstLineDef *, double ** );
-   int (* LineContains)( AstFrame *, AstLineDef *, int, double * );
-   int (* Match)( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
-   int (* SubFrame)( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
-   int (* TestDigits)( AstFrame * );
-   int (* TestDirection)( AstFrame *, int );
-   int (* TestDomain)( AstFrame * );
-   int (* TestFormat)( AstFrame *, int );
-   int (* TestLabel)( AstFrame *, int );
-   int (* TestMatchEnd)( AstFrame * );
-   int (* TestMaxAxes)( AstFrame * );
-   int (* TestMinAxes)( AstFrame * );
-   int (* TestPermute)( AstFrame * );
-   int (* TestPreserveAxes)( AstFrame * );
-   int (* TestSymbol)( AstFrame *, int );
-   int (* TestTitle)( AstFrame * );
-   int (* TestUnit)( AstFrame *, int );
-   int (* Unformat)( AstFrame *, int, const char *, double * );
-   int (* ValidateAxis)( AstFrame *, int, const char * );
-   AstSystemType (* ValidateSystem)( AstFrame *, AstSystemType, const char * );
-   AstSystemType (* SystemCode)( AstFrame *, const char * );
-   const char *(* SystemString)( AstFrame *, AstSystemType );
-   struct AstFrameSet *(* Convert)( AstFrame *, AstFrame *, const char * );
-   struct AstFrameSet *(* ConvertX)( AstFrame *, AstFrame *, const char * );
-   struct AstFrameSet *(* FindFrame)( AstFrame *, AstFrame *, const char * );
-   void (* CheckPerm)( AstFrame *, const int *, const char * );
-   void (* ClearDigits)( AstFrame * );
-   void (* ClearDirection)( AstFrame *, int );
-   void (* ClearDomain)( AstFrame * );
-   void (* ClearFormat)( AstFrame *, int );
-   void (* ClearLabel)( AstFrame *, int );
-   void (* ClearMatchEnd)( AstFrame * );
-   void (* ClearMaxAxes)( AstFrame * );
-   void (* ClearMinAxes)( AstFrame * );
-   void (* ClearPermute)( AstFrame * );
-   void (* ClearPreserveAxes)( AstFrame * );
-   void (* ClearSymbol)( AstFrame *, int );
-   void (* ClearTitle)( AstFrame * );
-   void (* ClearUnit)( AstFrame *, int );
-   void (* Norm)( AstFrame *, double[] );
-   void (* NormBox)( AstFrame *, double *, double *, AstMapping * );
-   void (* Offset)( AstFrame *, const double[], const double[], double, double[] );
-   double (* AxAngle)( AstFrame *, const double[2], const double[2], int );
-   double (* Offset2)( AstFrame *, const double[2], double, double, double[2] );
-   void (* Overlay)( AstFrame *, const int *, AstFrame * );
-   void (* PermAxes)( AstFrame *, const int[] );
-   void (* PrimaryFrame)( AstFrame *, int, AstFrame **, int * );
-   void (* Resolve)( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
-   void (* SetAxis)( AstFrame *, int, AstAxis * );
-   void (* SetDigits)( AstFrame *, int );
-   void (* SetDirection)( AstFrame *, int, int );
-   void (* SetDomain)( AstFrame *, const char * );
-   void (* SetFormat)( AstFrame *, int, const char * );
-   void (* SetLabel)( AstFrame *, int, const char * );
-   void (* SetMatchEnd)( AstFrame *, int );
-   void (* SetMaxAxes)( AstFrame *, int );
-   void (* SetMinAxes)( AstFrame *, int );
-   void (* SetPermute)( AstFrame *, int );
-   void (* SetPreserveAxes)( AstFrame *, int );
-   void (* SetSymbol)( AstFrame *, int, const char * );
-   void (* SetTitle)( AstFrame *, const char * );
-   void (* SetUnit)( AstFrame *, int, const char * );
-   void (* ValidateAxisSelection)( AstFrame *, int, const int *, const char * );
-   void (* LineOffset)( AstFrame *, AstLineDef *, double, double, double[2] );
+   AstAxis *(* GetAxis)( AstFrame *, int, int * );
+   AstFrame *(* PickAxes)( AstFrame *, int, const int[], AstMapping **, int * );
+   AstLineDef *(* LineDef)( AstFrame *, const double[2], const double[2], int * );
+   AstPointSet *(* ResolvePoints)( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet *, int * );
+   const char *(* Abbrev)( AstFrame *, int, const char *, const char *, const char *, int * );
+   const char *(* Format)( AstFrame *, int, double, int * );
+   const char *(* GetDomain)( AstFrame *, int * );
+   const char *(* GetFormat)( AstFrame *, int, int * );
+   const char *(* GetLabel)( AstFrame *, int, int * );
+   const char *(* GetSymbol)( AstFrame *, int, int * );
+   const char *(* GetTitle)( AstFrame *, int * );
+   const char *(* GetNormUnit)( AstFrame *, int, int * );
+   const char *(* GetUnit)( AstFrame *, int, int * );
+   const int *(* GetPerm)( AstFrame *, int * );
+   double (* Angle)( AstFrame *, const double[], const double[], const double[], int * );
+   double (* Distance)( AstFrame *, const double[], const double[], int * );
+   double (* Gap)( AstFrame *, int, double, int *, int * );
+   int (* Fields)( AstFrame *, int, const char *, const char *, int, char **, int *, double *, int * );
+   double (* AxDistance)( AstFrame *, int, double, double, int * );
+   double (* AxOffset)( AstFrame *, int, double, double, int * );
+   int (* AxIn)( AstFrame *, int, double, double, double, int, int * );
+   int (* GetDigits)( AstFrame *, int * );
+   int (* GetDirection)( AstFrame *, int, int * );
+   int (* GetMatchEnd)( AstFrame *, int * );
+   int (* GetMaxAxes)( AstFrame *, int * );
+   int (* GetMinAxes)( AstFrame *, int * );
+   int (* GetNaxes)( AstFrame *, int * );
+   int (* GetPermute)( AstFrame *, int * );
+   int (* GetPreserveAxes)( AstFrame *, int * );
+   int (* IsUnitFrame)( AstFrame *, int * );
+   int (* LineCrossing)( AstFrame *, AstLineDef *, AstLineDef *, double **, int * );
+   int (* LineContains)( AstFrame *, AstLineDef *, int, double *, int * );
+   int (* Match)( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame **, int * );
+   int (* SubFrame)( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
+   int (* TestDigits)( AstFrame *, int * );
+   int (* TestDirection)( AstFrame *, int, int * );
+   int (* TestDomain)( AstFrame *, int * );
+   int (* TestFormat)( AstFrame *, int, int * );
+   int (* TestLabel)( AstFrame *, int, int * );
+   int (* TestMatchEnd)( AstFrame *, int * );
+   int (* TestMaxAxes)( AstFrame *, int * );
+   int (* TestMinAxes)( AstFrame *, int * );
+   int (* TestPermute)( AstFrame *, int * );
+   int (* TestPreserveAxes)( AstFrame *, int * );
+   int (* TestSymbol)( AstFrame *, int, int * );
+   int (* TestTitle)( AstFrame *, int * );
+   int (* TestUnit)( AstFrame *, int, int * );
+   int (* Unformat)( AstFrame *, int, const char *, double *, int * );
+   int (* ValidateAxis)( AstFrame *, int, const char *, int * );
+   AstSystemType (* ValidateSystem)( AstFrame *, AstSystemType, const char *, int * );
+   AstSystemType (* SystemCode)( AstFrame *, const char *, int * );
+   const char *(* SystemString)( AstFrame *, AstSystemType, int * );
+   struct AstFrameSet *(* Convert)( AstFrame *, AstFrame *, const char *, int * );
+   struct AstFrameSet *(* ConvertX)( AstFrame *, AstFrame *, const char *, int * );
+   struct AstFrameSet *(* FindFrame)( AstFrame *, AstFrame *, const char *, int * );
+   void (* CheckPerm)( AstFrame *, const int *, const char *, int * );
+   void (* ClearDigits)( AstFrame *, int * );
+   void (* ClearDirection)( AstFrame *, int, int * );
+   void (* ClearDomain)( AstFrame *, int * );
+   void (* ClearFormat)( AstFrame *, int, int * );
+   void (* ClearLabel)( AstFrame *, int, int * );
+   void (* ClearMatchEnd)( AstFrame *, int * );
+   void (* ClearMaxAxes)( AstFrame *, int * );
+   void (* ClearMinAxes)( AstFrame *, int * );
+   void (* ClearPermute)( AstFrame *, int * );
+   void (* ClearPreserveAxes)( AstFrame *, int * );
+   void (* ClearSymbol)( AstFrame *, int, int * );
+   void (* ClearTitle)( AstFrame *, int * );
+   void (* ClearUnit)( AstFrame *, int, int * );
+   void (* Norm)( AstFrame *, double[], int * );
+   void (* NormBox)( AstFrame *, double *, double *, AstMapping *, int * );
+   void (* Offset)( AstFrame *, const double[], const double[], double, double[], int * );
+   double (* AxAngle)( AstFrame *, const double[2], const double[2], int, int * );
+   double (* Offset2)( AstFrame *, const double[2], double, double, double[2], int * );
+   void (* Overlay)( AstFrame *, const int *, AstFrame *, int * );
+   void (* PermAxes)( AstFrame *, const int[], int * );
+   void (* PrimaryFrame)( AstFrame *, int, AstFrame **, int *, int * );
+   void (* Resolve)( AstFrame *, const double [], const double [], const double [], double [], double *, double *, int * );
+   void (* SetAxis)( AstFrame *, int, AstAxis *, int * );
+   void (* SetDigits)( AstFrame *, int, int * );
+   void (* SetDirection)( AstFrame *, int, int, int * );
+   void (* SetDomain)( AstFrame *, const char *, int * );
+   void (* SetFormat)( AstFrame *, int, const char *, int * );
+   void (* SetLabel)( AstFrame *, int, const char *, int * );
+   void (* SetMatchEnd)( AstFrame *, int, int * );
+   void (* SetMaxAxes)( AstFrame *, int, int * );
+   void (* SetMinAxes)( AstFrame *, int, int * );
+   void (* SetPermute)( AstFrame *, int, int * );
+   void (* SetPreserveAxes)( AstFrame *, int, int * );
+   void (* SetSymbol)( AstFrame *, int, const char *, int * );
+   void (* SetTitle)( AstFrame *, const char *, int * );
+   void (* SetUnit)( AstFrame *, int, const char *, int * );
+   void (* ValidateAxisSelection)( AstFrame *, int, const int *, const char *, int * );
+   void (* LineOffset)( AstFrame *, AstLineDef *, double, double, double[2], int * );
 
-   double (* GetTop)( AstFrame *, int );
-   int (* TestTop)( AstFrame *, int );
-   void (* ClearTop)( AstFrame *, int );
-   void (* SetTop)( AstFrame *, int, double );
+   double (* GetTop)( AstFrame *, int, int * );
+   int (* TestTop)( AstFrame *, int, int * );
+   void (* ClearTop)( AstFrame *, int, int * );
+   void (* SetTop)( AstFrame *, int, double, int * );
 
-   double (* GetBottom)( AstFrame *, int );
-   int (* TestBottom)( AstFrame *, int );
-   void (* ClearBottom)( AstFrame *, int );
-   void (* SetBottom)( AstFrame *, int, double );
+   double (* GetBottom)( AstFrame *, int, int * );
+   int (* TestBottom)( AstFrame *, int, int * );
+   void (* ClearBottom)( AstFrame *, int, int * );
+   void (* SetBottom)( AstFrame *, int, double, int * );
 
-   AstSystemType (* GetSystem)( AstFrame * );
-   int (* TestSystem)( AstFrame * );
-   void (* ClearSystem)( AstFrame * );
-   void (* SetSystem)( AstFrame *, AstSystemType );
+   AstSystemType (* GetSystem)( AstFrame *, int * );
+   int (* TestSystem)( AstFrame *, int * );
+   void (* ClearSystem)( AstFrame *, int * );
+   void (* SetSystem)( AstFrame *, AstSystemType, int * );
 
-   AstSystemType (* GetAlignSystem)( AstFrame * );
-   int (* TestAlignSystem)( AstFrame * );
-   void (* ClearAlignSystem)( AstFrame * );
-   void (* SetAlignSystem)( AstFrame *, AstSystemType );
+   AstSystemType (* GetAlignSystem)( AstFrame *, int * );
+   int (* TestAlignSystem)( AstFrame *, int * );
+   void (* ClearAlignSystem)( AstFrame *, int * );
+   void (* SetAlignSystem)( AstFrame *, AstSystemType, int * );
 
-   double (* GetEpoch)( AstFrame * );
-   int (* TestEpoch)( AstFrame * );
-   void (* ClearEpoch)( AstFrame * );
-   void (* SetEpoch)( AstFrame *, double );
+   double (* GetEpoch)( AstFrame *, int * );
+   int (* TestEpoch)( AstFrame *, int * );
+   void (* ClearEpoch)( AstFrame *, int * );
+   void (* SetEpoch)( AstFrame *, double, int * );
 
-   int (* TestActiveUnit)( AstFrame * );
-   int (* GetActiveUnit)( AstFrame * );
-   void (* SetActiveUnit)( AstFrame *, int );
+   int (* TestActiveUnit)( AstFrame *, int * );
+   int (* GetActiveUnit)( AstFrame *, int * );
+   void (* SetActiveUnit)( AstFrame *, int, int * );
 
-   double (* GetObsLon)( AstFrame * );
-   int (* TestObsLon)( AstFrame * );
-   void (* ClearObsLon)( AstFrame * );
-   void (* SetObsLon)( AstFrame *, double );
+   double (* GetObsLon)( AstFrame *, int * );
+   int (* TestObsLon)( AstFrame *, int * );
+   void (* ClearObsLon)( AstFrame *, int * );
+   void (* SetObsLon)( AstFrame *, double, int * );
 
-   double (* GetObsLat)( AstFrame * );
-   int (* TestObsLat)( AstFrame * );
-   void (* ClearObsLat)( AstFrame * );
-   void (* SetObsLat)( AstFrame *, double );
+   double (* GetObsLat)( AstFrame *, int * );
+   int (* TestObsLat)( AstFrame *, int * );
+   void (* ClearObsLat)( AstFrame *, int * );
+   void (* SetObsLat)( AstFrame *, double, int * );
 
-   double (* GetDut1)( AstFrame * );
-   int (* TestDut1)( AstFrame * );
-   void (* ClearDut1)( AstFrame * );
-   void (* SetDut1)( AstFrame *, double );
+   double (* GetDut1)( AstFrame *, int * );
+   int (* TestDut1)( AstFrame *, int * );
+   void (* ClearDut1)( AstFrame *, int * );
+   void (* SetDut1)( AstFrame *, double, int * );
 
-   void (* SetFrameFlags)( AstFrame *, int );
-   int (* GetFrameFlags)( AstFrame * );
+   void (* SetFrameFlags)( AstFrame *, int, int * );
+   int (* GetFrameFlags)( AstFrame *, int * );
 
 } AstFrameVtab;
 
+#if defined(THREAD_SAFE) 
 
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstFrameGlobals {
+   AstFrameVtab Class_Vtab;
+   int Class_Init;
+   char GetAttrib_Buff[ AST__FRAME_GETATTRIB_BUFF_LEN + 1 ];
+   char *AstFormatID_Strings[ AST__FRAME_ASTFORMATID_MAX_STRINGS ];
+   int AstFormatID_Istr;
+   int AstFormatID_Init;
+   char Label_Buff[ AST__FRAME_LABEL_BUFF_LEN + 1 ];
+   char Symbol_Buff[ AST__FRAME_SYMBOL_BUFF_LEN + 1 ];
+   char Title_Buff[ AST__FRAME_TITLE_BUFF_LEN + 1 ];
+   char AstFmtDecimalYr_Buff[ AST__FRAME_ASTFMTDECIMALYR_BUFF_LEN + 1 ]; 
+} AstFrameGlobals;
+
+#endif
 #endif
 
 /* More include files. */
@@ -804,7 +835,7 @@ astPROTO_ISA(Frame)              /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected */
-AstFrame *astFrame_( int, const char *, ... );
+AstFrame *astFrame_( int, const char *, int *, ...);
 #else
 AstFrame *astFrameId_( int, const char *, ... );
 #endif
@@ -813,171 +844,176 @@ AstFrame *astFrameId_( int, const char *, ... );
 
 /* Initialiser. */
 AstFrame *astInitFrame_( void *, size_t, int, AstFrameVtab *, const char *,
-                         int );
+                         int, int * );
 
 /* Vtab initialiser. */
-void astInitFrameVtab_( AstFrameVtab *, const char * );
+void astInitFrameVtab_( AstFrameVtab *, const char *, int * );
 
 /* Loader. */
 AstFrame *astLoadFrame_( void *, size_t, AstFrameVtab *,
-                         const char *, AstChannel *channel );
+                         const char *, AstChannel *channel, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitFrameGlobals_( AstFrameGlobals * );
+#endif
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-AstFrameSet *astConvert_( AstFrame *, AstFrame *, const char * );
-AstFrameSet *astFindFrame_( AstFrame *, AstFrame *, const char * );
-double astAngle_( AstFrame *, const double[], const double[], const double[] );
-double astDistance_( AstFrame *, const double[], const double[] );
-void astNorm_( AstFrame *, double[] );
-double astAxDistance_( AstFrame *, int, double, double );
-double astAxOffset_( AstFrame *, int, double, double );
-double astAxAngle_( AstFrame *, const double[2], const double[2], int );
-double astOffset2_( AstFrame *, const double[2], double, double, double[2] );
-void astOffset_( AstFrame *, const double[], const double[], double, double[] );
-void astResolve_( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
-int astGetActiveUnit_( AstFrame * );
-void astSetActiveUnit_( AstFrame *, int );
+AstFrameSet *astConvert_( AstFrame *, AstFrame *, const char *, int * );
+AstFrameSet *astFindFrame_( AstFrame *, AstFrame *, const char *, int * );
+double astAngle_( AstFrame *, const double[], const double[], const double[], int * );
+double astDistance_( AstFrame *, const double[], const double[], int * );
+void astNorm_( AstFrame *, double[], int * );
+double astAxDistance_( AstFrame *, int, double, double, int * );
+double astAxOffset_( AstFrame *, int, double, double, int * );
+double astAxAngle_( AstFrame *, const double[2], const double[2], int, int * );
+double astOffset2_( AstFrame *, const double[2], double, double, double[2], int * );
+void astOffset_( AstFrame *, const double[], const double[], double, double[], int * );
+void astResolve_( AstFrame *, const double [], const double [], const double [], double [], double *, double *, int * );
+int astGetActiveUnit_( AstFrame *, int * );
+void astSetActiveUnit_( AstFrame *, int, int * );
 
 #if defined(astCLASS)            /* Protected */
-void astNormBox_( AstFrame *, double *, double *, AstMapping * );
-AstFrame *astPickAxes_( AstFrame *, int, const int[], AstMapping ** );
-const char *astFormat_( AstFrame *, int, double );
-int astUnformat_( AstFrame *, int, const char *, double * );
-void astPermAxes_( AstFrame *, const int[] );
+void astNormBox_( AstFrame *, double *, double *, AstMapping *, int * );
+AstFrame *astPickAxes_( AstFrame *, int, const int[], AstMapping **, int * );
+const char *astFormat_( AstFrame *, int, double, int * );
+int astUnformat_( AstFrame *, int, const char *, double *, int * );
+void astPermAxes_( AstFrame *, const int[], int * );
 #else
-AstFrame *astPickAxesId_( AstFrame *, int, const int[], AstMapping ** );
-const char *astFormatId_( AstFrame *, int, double );
-int astUnformatId_( AstFrame *, int, const char *, double * );
-void astPermAxesId_( AstFrame *, const int[] );
+AstFrame *astPickAxesId_( AstFrame *, int, const int[], AstMapping **, int * );
+const char *astFormatId_( AstFrame *, int, double, int * );
+int astUnformatId_( AstFrame *, int, const char *, double *, int * );
+void astPermAxesId_( AstFrame *, const int[], int * );
 #endif
 
 #if defined(astCLASS)            /* Protected */
-int astAxIn_( AstFrame *, int, double, double, double, int );
-AstAxis * astGetAxis_( AstFrame *, int );
-AstFrameSet *astConvertX_( AstFrame *, AstFrame *, const char * );
-AstLineDef *astLineDef_( AstFrame *, const double[2], const double[2] );
-AstPointSet *astResolvePoints_( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet * );
-const char *astAbbrev_( AstFrame *, int, const char *, const char *, const char * );
-const char *astGetDomain_( AstFrame * );
-const char *astGetFormat_( AstFrame *, int );
-const char *astGetLabel_( AstFrame *, int );
-const char *astGetSymbol_( AstFrame *, int );
-const char *astGetTitle_( AstFrame * );
-const char *astGetUnit_( AstFrame *, int );
-const char *astGetNormUnit_( AstFrame *, int );
-const int *astGetPerm_( AstFrame * );
-double astGap_( AstFrame *, int, double, int * );
-int astFields_( AstFrame *, int, const char *, const char *, int, char **, int *, double * );
-int astGetDigits_( AstFrame * );
-int astGetDirection_( AstFrame *, int );
-int astGetMatchEnd_( AstFrame * );
-int astGetMaxAxes_( AstFrame * );
-int astGetMinAxes_( AstFrame * );
-int astGetNaxes_( AstFrame * );
-int astGetPermute_( AstFrame * );
-int astGetPreserveAxes_( AstFrame * );
-int astIsUnitFrame_( AstFrame * );
-int astLineCrossing_( AstFrame *, AstLineDef *, AstLineDef *, double **);
-int astLineContains_( AstFrame *, AstLineDef *, int, double * );
-int astMatch_( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
-int astSubFrame_( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
-int astTestDigits_( AstFrame * );
-int astTestDirection_( AstFrame *, int );
-int astTestDomain_( AstFrame * );
-int astTestFormat_( AstFrame *, int );
-int astTestLabel_( AstFrame *, int );
-int astTestMatchEnd_( AstFrame * );
-int astTestMaxAxes_( AstFrame * );
-int astTestMinAxes_( AstFrame * );
-int astTestPermute_( AstFrame * );
-int astTestPreserveAxes_( AstFrame * );
-int astTestSymbol_( AstFrame *, int );
-int astTestTitle_( AstFrame * );
-int astTestUnit_( AstFrame *, int );
-int astValidateAxis_( AstFrame *, int, const char * );
-AstSystemType astValidateSystem_( AstFrame *, AstSystemType, const char * );
-AstSystemType astSystemCode_( AstFrame *, const char * );
-const char *astSystemString_( AstFrame *, AstSystemType );
-void astCheckPerm_( AstFrame *, const int *, const char * );
-void astClearDigits_( AstFrame * );
-void astClearDirection_( AstFrame *, int );
-void astClearDomain_( AstFrame * );
-void astClearFormat_( AstFrame *, int );
-void astClearLabel_( AstFrame *, int );
-void astClearMatchEnd_( AstFrame * );
-void astClearMaxAxes_( AstFrame * );
-void astClearMinAxes_( AstFrame * );
-void astClearPermute_( AstFrame * );
-void astClearPreserveAxes_( AstFrame * );
-void astClearSymbol_( AstFrame *, int );
-void astClearTitle_( AstFrame * );
-void astClearUnit_( AstFrame *, int );
-void astOverlay_( AstFrame *, const int *, AstFrame * );
-void astPrimaryFrame_( AstFrame *, int, AstFrame **, int * );
-void astSetAxis_( AstFrame *, int, AstAxis * );
-void astSetDigits_( AstFrame *, int );
-void astSetDirection_( AstFrame *, int, int );
-void astSetDomain_( AstFrame *, const char * );
-void astSetFormat_( AstFrame *, int, const char * );
-void astSetLabel_( AstFrame *, int, const char * );
-void astSetMatchEnd_( AstFrame *, int );
-void astSetMaxAxes_( AstFrame *, int );
-void astSetMinAxes_( AstFrame *, int );
-void astSetPermute_( AstFrame *, int );
-void astSetPreserveAxes_( AstFrame *, int );
-void astSetSymbol_( AstFrame *, int, const char * );
-void astSetTitle_( AstFrame *, const char * );
-void astSetUnit_( AstFrame *, int, const char * );
-void astValidateAxisSelection_( AstFrame *, int, const int *, const char * );
-double astReadDateTime_( const char * );
-const char *astFmtDecimalYr_( double, int);
-void astLineOffset_( AstFrame *, AstLineDef *, double, double, double[2] );
+int astAxIn_( AstFrame *, int, double, double, double, int, int * );
+AstAxis * astGetAxis_( AstFrame *, int, int * );
+AstFrameSet *astConvertX_( AstFrame *, AstFrame *, const char *, int * );
+AstLineDef *astLineDef_( AstFrame *, const double[2], const double[2], int * );
+AstPointSet *astResolvePoints_( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet *, int * );
+const char *astAbbrev_( AstFrame *, int, const char *, const char *, const char *, int * );
+const char *astGetDomain_( AstFrame *, int * );
+const char *astGetFormat_( AstFrame *, int, int * );
+const char *astGetLabel_( AstFrame *, int, int * );
+const char *astGetSymbol_( AstFrame *, int, int * );
+const char *astGetTitle_( AstFrame *, int * );
+const char *astGetUnit_( AstFrame *, int, int * );
+const char *astGetNormUnit_( AstFrame *, int, int * );
+const int *astGetPerm_( AstFrame *, int * );
+double astGap_( AstFrame *, int, double, int *, int * );
+int astFields_( AstFrame *, int, const char *, const char *, int, char **, int *, double *, int * );
+int astGetDigits_( AstFrame *, int * );
+int astGetDirection_( AstFrame *, int, int * );
+int astGetMatchEnd_( AstFrame *, int * );
+int astGetMaxAxes_( AstFrame *, int * );
+int astGetMinAxes_( AstFrame *, int * );
+int astGetNaxes_( AstFrame *, int * );
+int astGetPermute_( AstFrame *, int * );
+int astGetPreserveAxes_( AstFrame *, int * );
+int astIsUnitFrame_( AstFrame *, int * );
+int astLineCrossing_( AstFrame *, AstLineDef *, AstLineDef *, double **, int * );
+int astLineContains_( AstFrame *, AstLineDef *, int, double *, int * );
+int astMatch_( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame **, int * );
+int astSubFrame_( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
+int astTestDigits_( AstFrame *, int * );
+int astTestDirection_( AstFrame *, int, int * );
+int astTestDomain_( AstFrame *, int * );
+int astTestFormat_( AstFrame *, int, int * );
+int astTestLabel_( AstFrame *, int, int * );
+int astTestMatchEnd_( AstFrame *, int * );
+int astTestMaxAxes_( AstFrame *, int * );
+int astTestMinAxes_( AstFrame *, int * );
+int astTestPermute_( AstFrame *, int * );
+int astTestPreserveAxes_( AstFrame *, int * );
+int astTestSymbol_( AstFrame *, int, int * );
+int astTestTitle_( AstFrame *, int * );
+int astTestUnit_( AstFrame *, int, int * );
+int astValidateAxis_( AstFrame *, int, const char *, int * );
+AstSystemType astValidateSystem_( AstFrame *, AstSystemType, const char *, int * );
+AstSystemType astSystemCode_( AstFrame *, const char *, int * );
+const char *astSystemString_( AstFrame *, AstSystemType, int * );
+void astCheckPerm_( AstFrame *, const int *, const char *, int * );
+void astClearDigits_( AstFrame *, int * );
+void astClearDirection_( AstFrame *, int, int * );
+void astClearDomain_( AstFrame *, int * );
+void astClearFormat_( AstFrame *, int, int * );
+void astClearLabel_( AstFrame *, int, int * );
+void astClearMatchEnd_( AstFrame *, int * );
+void astClearMaxAxes_( AstFrame *, int * );
+void astClearMinAxes_( AstFrame *, int * );
+void astClearPermute_( AstFrame *, int * );
+void astClearPreserveAxes_( AstFrame *, int * );
+void astClearSymbol_( AstFrame *, int, int * );
+void astClearTitle_( AstFrame *, int * );
+void astClearUnit_( AstFrame *, int, int * );
+void astOverlay_( AstFrame *, const int *, AstFrame *, int * );
+void astPrimaryFrame_( AstFrame *, int, AstFrame **, int *, int * );
+void astSetAxis_( AstFrame *, int, AstAxis *, int * );
+void astSetDigits_( AstFrame *, int, int * );
+void astSetDirection_( AstFrame *, int, int, int * );
+void astSetDomain_( AstFrame *, const char *, int * );
+void astSetFormat_( AstFrame *, int, const char *, int * );
+void astSetLabel_( AstFrame *, int, const char *, int * );
+void astSetMatchEnd_( AstFrame *, int, int * );
+void astSetMaxAxes_( AstFrame *, int, int * );
+void astSetMinAxes_( AstFrame *, int, int * );
+void astSetPermute_( AstFrame *, int, int * );
+void astSetPreserveAxes_( AstFrame *, int, int * );
+void astSetSymbol_( AstFrame *, int, const char *, int * );
+void astSetTitle_( AstFrame *, const char *, int * );
+void astSetUnit_( AstFrame *, int, const char *, int * );
+void astValidateAxisSelection_( AstFrame *, int, const int *, const char *, int * );
+double astReadDateTime_( const char *, int * );
+const char *astFmtDecimalYr_( double, int, int * );
+void astLineOffset_( AstFrame *, AstLineDef *, double, double, double[2], int * );
 
-double astGetTop_( AstFrame *, int );
-int astTestTop_( AstFrame *, int );
-void astClearTop_( AstFrame *, int );
-void astSetTop_( AstFrame *, int, double );
+double astGetTop_( AstFrame *, int, int * );
+int astTestTop_( AstFrame *, int, int * );
+void astClearTop_( AstFrame *, int, int * );
+void astSetTop_( AstFrame *, int, double, int * );
 
-double astGetBottom_( AstFrame *, int );
-int astTestBottom_( AstFrame *, int );
-void astClearBottom_( AstFrame *, int );
-void astSetBottom_( AstFrame *, int, double );
+double astGetBottom_( AstFrame *, int, int * );
+int astTestBottom_( AstFrame *, int, int * );
+void astClearBottom_( AstFrame *, int, int * );
+void astSetBottom_( AstFrame *, int, double, int * );
 
-AstSystemType astGetSystem_( AstFrame * );
-int astTestSystem_( AstFrame * );
-void astClearSystem_( AstFrame * );
-void astSetSystem_( AstFrame *, AstSystemType );
+AstSystemType astGetSystem_( AstFrame *, int * );
+int astTestSystem_( AstFrame *, int * );
+void astClearSystem_( AstFrame *, int * );
+void astSetSystem_( AstFrame *, AstSystemType, int * );
 
-AstSystemType astGetAlignSystem_( AstFrame * );
-int astTestAlignSystem_( AstFrame * );
-void astClearAlignSystem_( AstFrame * );
-void astSetAlignSystem_( AstFrame *, AstSystemType );
+AstSystemType astGetAlignSystem_( AstFrame *, int * );
+int astTestAlignSystem_( AstFrame *, int * );
+void astClearAlignSystem_( AstFrame *, int * );
+void astSetAlignSystem_( AstFrame *, AstSystemType, int * );
 
-double astGetEpoch_( AstFrame * );
-int astTestEpoch_( AstFrame * );
-void astClearEpoch_( AstFrame * );
-void astSetEpoch_( AstFrame *, double );
+double astGetEpoch_( AstFrame *, int * );
+int astTestEpoch_( AstFrame *, int * );
+void astClearEpoch_( AstFrame *, int * );
+void astSetEpoch_( AstFrame *, double, int * );
 
-double astGetObsLon_( AstFrame * );
-int astTestObsLon_( AstFrame * );
-void astClearObsLon_( AstFrame * );
-void astSetObsLon_( AstFrame *, double );
+double astGetObsLon_( AstFrame *, int * );
+int astTestObsLon_( AstFrame *, int * );
+void astClearObsLon_( AstFrame *, int * );
+void astSetObsLon_( AstFrame *, double, int * );
 
-double astGetObsLat_( AstFrame * );
-int astTestObsLat_( AstFrame * );
-void astClearObsLat_( AstFrame * );
-void astSetObsLat_( AstFrame *, double );
+double astGetObsLat_( AstFrame *, int * );
+int astTestObsLat_( AstFrame *, int * );
+void astClearObsLat_( AstFrame *, int * );
+void astSetObsLat_( AstFrame *, double, int * );
 
-double astGetDut1_( AstFrame * );
-int astTestDut1_( AstFrame * );
-void astClearDut1_( AstFrame * );
-void astSetDut1_( AstFrame *, double );
+double astGetDut1_( AstFrame *, int * );
+int astTestDut1_( AstFrame *, int * );
+void astClearDut1_( AstFrame *, int * );
+void astSetDut1_( AstFrame *, double, int * );
 
-int astTestActiveUnit_( AstFrame * );
+int astTestActiveUnit_( AstFrame *, int * );
 
-void astSetFrameFlags_( AstFrame *, int );
-int astGetFrameFlags_( AstFrame * );
+void astSetFrameFlags_( AstFrame *, int, int * );
+int astGetFrameFlags_( AstFrame *, int * );
 
 #endif
 
@@ -1010,13 +1046,13 @@ int astGetFrameFlags_( AstFrame * );
 
 /* Initialiser. */
 #define astInitFrame(mem,size,init,vtab,name,naxes) \
-astINVOKE(O,astInitFrame_(mem,size,init,vtab,name,naxes))
+astINVOKE(O,astInitFrame_(mem,size,init,vtab,name,naxes,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitFrameVtab(vtab,name) astINVOKE(V,astInitFrameVtab_(vtab,name))
+#define astInitFrameVtab(vtab,name) astINVOKE(V,astInitFrameVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadFrame(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadFrame_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadFrame_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -1025,296 +1061,300 @@ astINVOKE(O,astLoadFrame_(mem,size,vtab,name,astCheckChannel(channel)))
    use. This provides a contextual error report if a pointer to the
    wrong sort of Object is supplied. */
 #define astConvert(from,to,domainlist) \
-astINVOKE(O,astConvert_(astCheckFrame(from),astCheckFrame(to),domainlist))
+astINVOKE(O,astConvert_(astCheckFrame(from),astCheckFrame(to),domainlist,STATUS_PTR))
 #define astAngle(this,a,b,c) \
-astINVOKE(V,astAngle_(astCheckFrame(this),a,b,c))
+astINVOKE(V,astAngle_(astCheckFrame(this),a,b,c,STATUS_PTR))
 #define astDistance(this,point1,point2) \
-astINVOKE(V,astDistance_(astCheckFrame(this),point1,point2))
+astINVOKE(V,astDistance_(astCheckFrame(this),point1,point2,STATUS_PTR))
 #define astFindFrame(target,template,domainlist) \
-astINVOKE(O,astFindFrame_(astCheckFrame(target),astCheckFrame(template),domainlist))
+astINVOKE(O,astFindFrame_(astCheckFrame(target),astCheckFrame(template),domainlist,STATUS_PTR))
 #define astNorm(this,value) \
-astINVOKE(V,astNorm_(astCheckFrame(this),value))
+astINVOKE(V,astNorm_(astCheckFrame(this),value,STATUS_PTR))
 #define astAxDistance(this,axis,v1,v2) \
-astINVOKE(V,astAxDistance_(astCheckFrame(this),axis,v1,v2))
+astINVOKE(V,astAxDistance_(astCheckFrame(this),axis,v1,v2,STATUS_PTR))
 #define astAxOffset(this,axis,v1,dist) \
-astINVOKE(V,astAxOffset_(astCheckFrame(this),axis,v1,dist))
+astINVOKE(V,astAxOffset_(astCheckFrame(this),axis,v1,dist,STATUS_PTR))
 #define astOffset(this,point1,point2,offset,point3) \
-astINVOKE(V,astOffset_(astCheckFrame(this),point1,point2,offset,point3))
+astINVOKE(V,astOffset_(astCheckFrame(this),point1,point2,offset,point3,STATUS_PTR))
 #define astAxAngle(this,a,b,axis) \
-astINVOKE(V,astAxAngle_(astCheckFrame(this),a,b,axis))
+astINVOKE(V,astAxAngle_(astCheckFrame(this),a,b,axis,STATUS_PTR))
 #define astOffset2(this,point1,angle,offset,point2) \
-astINVOKE(V,astOffset2_(astCheckFrame(this),point1,angle,offset,point2))
+astINVOKE(V,astOffset2_(astCheckFrame(this),point1,angle,offset,point2,STATUS_PTR))
 #define astResolve(this,point1,point2,point3,point4,d1,d2) \
-astINVOKE(V,astResolve_(astCheckFrame(this),point1,point2,point3,point4,d1,d2))
+astINVOKE(V,astResolve_(astCheckFrame(this),point1,point2,point3,point4,d1,d2,STATUS_PTR))
 #define astGetActiveUnit(this) \
-astINVOKE(V,astGetActiveUnit_(astCheckFrame(this)))
+astINVOKE(V,astGetActiveUnit_(astCheckFrame(this),STATUS_PTR))
 #define astSetActiveUnit(this,value) \
-astINVOKE(V,astSetActiveUnit_(astCheckFrame(this),value))
+astINVOKE(V,astSetActiveUnit_(astCheckFrame(this),value,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 #define astNormBox(this,lbnd,ubnd,reg) \
-astINVOKE(V,astNormBox_(astCheckFrame(this),lbnd,ubnd,astCheckMapping(reg)))
+astINVOKE(V,astNormBox_(astCheckFrame(this),lbnd,ubnd,astCheckMapping(reg),STATUS_PTR))
 #define astFormat(this,axis,value) \
-astINVOKE(V,astFormat_(astCheckFrame(this),axis,value))
+astINVOKE(V,astFormat_(astCheckFrame(this),axis,value,STATUS_PTR))
 #define astPermAxes(this,perm) \
-astINVOKE(V,astPermAxes_(astCheckFrame(this),perm))
+astINVOKE(V,astPermAxes_(astCheckFrame(this),perm,STATUS_PTR))
 #define astPickAxes(this,naxes,axes,map) \
-astINVOKE(O,astPickAxes_(astCheckFrame(this),naxes,axes,(AstMapping **)(map)))
+astINVOKE(O,astPickAxes_(astCheckFrame(this),naxes,axes,(AstMapping **)(map),STATUS_PTR))
 #define astUnformat(this,axis,string,value) \
-astINVOKE(V,astUnformat_(astCheckFrame(this),axis,string,value))
+astINVOKE(V,astUnformat_(astCheckFrame(this),axis,string,value,STATUS_PTR))
 #else
 #define astFormat(this,axis,value) \
-astINVOKE(V,astFormatId_(astCheckFrame(this),axis,value))
+astINVOKE(V,astFormatId_(astCheckFrame(this),axis,value,STATUS_PTR))
 #define astPermAxes(this,perm) \
-astINVOKE(V,astPermAxesId_(astCheckFrame(this),perm))
+astINVOKE(V,astPermAxesId_(astCheckFrame(this),perm,STATUS_PTR))
 #define astPickAxes(this,naxes,axes,map) \
-astINVOKE(O,astPickAxesId_(astCheckFrame(this),naxes,axes,(AstMapping **)(map)))
+astINVOKE(O,astPickAxesId_(astCheckFrame(this),naxes,axes,(AstMapping **)(map),STATUS_PTR))
 #define astUnformat(this,axis,string,value) \
-astINVOKE(V,astUnformatId_(astCheckFrame(this),axis,string,value))
+astINVOKE(V,astUnformatId_(astCheckFrame(this),axis,string,value,STATUS_PTR))
 #endif
 
 #if defined(astCLASS)            /* Protected */
 #define astAxIn(this,axis,lo,hi,val,closed) \
-astINVOKE(V,astAxIn_(astCheckFrame(this),axis,lo,hi,val,closed))
+astINVOKE(V,astAxIn_(astCheckFrame(this),axis,lo,hi,val,closed,STATUS_PTR))
 #define astAbbrev(this,axis,fmt,str1,str2) \
-astINVOKE(V,astAbbrev_(astCheckFrame(this),axis,fmt,str1,str2))
+astINVOKE(V,astAbbrev_(astCheckFrame(this),axis,fmt,str1,str2,STATUS_PTR))
 #define astFields(this,axis,fmt,str,maxfld,fields,nc,val) \
-astINVOKE(V,astFields_(astCheckFrame(this),axis,fmt,str,maxfld,fields,nc,val))
+astINVOKE(V,astFields_(astCheckFrame(this),axis,fmt,str,maxfld,fields,nc,val,STATUS_PTR))
 #define astCheckPerm(this,perm,method) \
-astINVOKE(V,astCheckPerm_(astCheckFrame(this),perm,method))
+astINVOKE(V,astCheckPerm_(astCheckFrame(this),perm,method,STATUS_PTR))
 #define astResolvePoints(this,p1,p2,in,out) \
-astINVOKE(O,astResolvePoints_(astCheckFrame(this),p1,p2,astCheckPointSet(in),((out)?astCheckPointSet(out):NULL)))
+astINVOKE(O,astResolvePoints_(astCheckFrame(this),p1,p2,astCheckPointSet(in),((out)?astCheckPointSet(out):NULL),STATUS_PTR))
 #define astLineDef(this,p1,p2) \
-astINVOKE(V,astLineDef_(astCheckFrame(this),p1,p2))
+astINVOKE(V,astLineDef_(astCheckFrame(this),p1,p2,STATUS_PTR))
 #define astLineOffset(this,line,par,prp,point) \
-astINVOKE(V,astLineOffset_(astCheckFrame(this),line,par,prp,point))
+astINVOKE(V,astLineOffset_(astCheckFrame(this),line,par,prp,point,STATUS_PTR))
 #define astLineCrossing(this,l1,l2,cross) \
-astINVOKE(V,astLineCrossing_(astCheckFrame(this),l1,l2,cross))
+astINVOKE(V,astLineCrossing_(astCheckFrame(this),l1,l2,cross,STATUS_PTR))
 #define astLineContains(this,l,def,point) \
-astINVOKE(V,astLineContains_(astCheckFrame(this),l,def,point))
+astINVOKE(V,astLineContains_(astCheckFrame(this),l,def,point,STATUS_PTR))
 #define astClearDigits(this) \
-astINVOKE(V,astClearDigits_(astCheckFrame(this)))
+astINVOKE(V,astClearDigits_(astCheckFrame(this),STATUS_PTR))
 #define astClearDirection(this,axis) \
-astINVOKE(V,astClearDirection_(astCheckFrame(this),axis))
+astINVOKE(V,astClearDirection_(astCheckFrame(this),axis,STATUS_PTR))
 #define astClearDomain(this) \
-astINVOKE(V,astClearDomain_(astCheckFrame(this)))
+astINVOKE(V,astClearDomain_(astCheckFrame(this),STATUS_PTR))
 #define astClearFormat(this,axis) \
-astINVOKE(V,astClearFormat_(astCheckFrame(this),axis))
+astINVOKE(V,astClearFormat_(astCheckFrame(this),axis,STATUS_PTR))
 #define astClearLabel(this,axis) \
-astINVOKE(V,astClearLabel_(astCheckFrame(this),axis))
+astINVOKE(V,astClearLabel_(astCheckFrame(this),axis,STATUS_PTR))
 #define astClearMatchEnd(this) \
-astINVOKE(V,astClearMatchEnd_(astCheckFrame(this)))
+astINVOKE(V,astClearMatchEnd_(astCheckFrame(this),STATUS_PTR))
 #define astClearMaxAxes(this) \
-astINVOKE(V,astClearMaxAxes_(astCheckFrame(this)))
+astINVOKE(V,astClearMaxAxes_(astCheckFrame(this),STATUS_PTR))
 #define astClearMinAxes(this) \
-astINVOKE(V,astClearMinAxes_(astCheckFrame(this)))
+astINVOKE(V,astClearMinAxes_(astCheckFrame(this),STATUS_PTR))
 #define astClearPermute(this) \
-astINVOKE(V,astClearPermute_(astCheckFrame(this)))
+astINVOKE(V,astClearPermute_(astCheckFrame(this),STATUS_PTR))
 #define astClearPreserveAxes(this) \
-astINVOKE(V,astClearPreserveAxes_(astCheckFrame(this)))
+astINVOKE(V,astClearPreserveAxes_(astCheckFrame(this),STATUS_PTR))
 #define astClearSymbol(this,axis) \
-astINVOKE(V,astClearSymbol_(astCheckFrame(this),axis))
+astINVOKE(V,astClearSymbol_(astCheckFrame(this),axis,STATUS_PTR))
 #define astClearTitle(this) \
-astINVOKE(V,astClearTitle_(astCheckFrame(this)))
+astINVOKE(V,astClearTitle_(astCheckFrame(this),STATUS_PTR))
 #define astClearUnit(this,axis) \
-astINVOKE(V,astClearUnit_(astCheckFrame(this),axis))
+astINVOKE(V,astClearUnit_(astCheckFrame(this),axis,STATUS_PTR))
 #define astConvertX(to,from,domainlist) \
-astINVOKE(O,astConvertX_(astCheckFrame(to),astCheckFrame(from),domainlist))
+astINVOKE(O,astConvertX_(astCheckFrame(to),astCheckFrame(from),domainlist,STATUS_PTR))
 #define astGap(this,axis,gap,ntick) \
-astINVOKE(V,astGap_(astCheckFrame(this),axis,gap,ntick))
+astINVOKE(V,astGap_(astCheckFrame(this),axis,gap,ntick,STATUS_PTR))
 #define astGetAxis(this,axis) \
-astINVOKE(O,astGetAxis_(astCheckFrame(this),axis))
+astINVOKE(O,astGetAxis_(astCheckFrame(this),axis,STATUS_PTR))
 #define astGetDigits(this) \
-astINVOKE(V,astGetDigits_(astCheckFrame(this)))
+astINVOKE(V,astGetDigits_(astCheckFrame(this),STATUS_PTR))
 #define astGetDirection(this,axis) \
-astINVOKE(V,astGetDirection_(astCheckFrame(this),axis))
+astINVOKE(V,astGetDirection_(astCheckFrame(this),axis,STATUS_PTR))
 #define astGetDomain(this) \
-astINVOKE(V,astGetDomain_(astCheckFrame(this)))
+astINVOKE(V,astGetDomain_(astCheckFrame(this),STATUS_PTR))
 #define astGetFormat(this,axis) \
-astINVOKE(V,astGetFormat_(astCheckFrame(this),axis))
+astINVOKE(V,astGetFormat_(astCheckFrame(this),axis,STATUS_PTR))
 #define astGetLabel(this,axis) \
-astINVOKE(V,astGetLabel_(astCheckFrame(this),axis))
+astINVOKE(V,astGetLabel_(astCheckFrame(this),axis,STATUS_PTR))
 #define astGetMatchEnd(this) \
-astINVOKE(V,astGetMatchEnd_(astCheckFrame(this)))
+astINVOKE(V,astGetMatchEnd_(astCheckFrame(this),STATUS_PTR))
 #define astGetMaxAxes(this) \
-astINVOKE(V,astGetMaxAxes_(astCheckFrame(this)))
+astINVOKE(V,astGetMaxAxes_(astCheckFrame(this),STATUS_PTR))
 #define astGetMinAxes(this) \
-astINVOKE(V,astGetMinAxes_(astCheckFrame(this)))
+astINVOKE(V,astGetMinAxes_(astCheckFrame(this),STATUS_PTR))
 #define astGetNaxes(this) \
-astINVOKE(V,astGetNaxes_(astCheckFrame(this)))
+astINVOKE(V,astGetNaxes_(astCheckFrame(this),STATUS_PTR))
 #define astGetPerm(this) \
-astINVOKE(V,astGetPerm_(astCheckFrame(this)))
+astINVOKE(V,astGetPerm_(astCheckFrame(this),STATUS_PTR))
 #define astGetPermute(this) \
-astINVOKE(V,astGetPermute_(astCheckFrame(this)))
+astINVOKE(V,astGetPermute_(astCheckFrame(this),STATUS_PTR))
 #define astGetPreserveAxes(this) \
-astINVOKE(V,astGetPreserveAxes_(astCheckFrame(this)))
+astINVOKE(V,astGetPreserveAxes_(astCheckFrame(this),STATUS_PTR))
 #define astGetSymbol(this,axis) \
-astINVOKE(V,astGetSymbol_(astCheckFrame(this),axis))
+astINVOKE(V,astGetSymbol_(astCheckFrame(this),axis,STATUS_PTR))
 #define astGetTitle(this) \
-astINVOKE(V,astGetTitle_(astCheckFrame(this)))
+astINVOKE(V,astGetTitle_(astCheckFrame(this),STATUS_PTR))
 #define astGetUnit(this,axis) \
-astINVOKE(V,astGetUnit_(astCheckFrame(this),axis))
+astINVOKE(V,astGetUnit_(astCheckFrame(this),axis,STATUS_PTR))
 #define astGetNormUnit(this,axis) \
-astINVOKE(V,astGetNormUnit_(astCheckFrame(this),axis))
+astINVOKE(V,astGetNormUnit_(astCheckFrame(this),axis,STATUS_PTR))
 #define astMatch(template,target,template_axes,target_axes,map,result) \
-astINVOKE(V,astMatch_(astCheckFrame(template),astCheckFrame(target),template_axes,target_axes,(AstMapping **)(map),(AstFrame **)(result)))
+astINVOKE(V,astMatch_(astCheckFrame(template),astCheckFrame(target),template_axes,target_axes,(AstMapping **)(map),(AstFrame **)(result),STATUS_PTR))
 #define astIsUnitFrame(this) \
-astINVOKE(V,astIsUnitFrame_(astCheckFrame(this)))
+astINVOKE(V,astIsUnitFrame_(astCheckFrame(this),STATUS_PTR))
 #define astOverlay(template,template_axes,result) \
-astINVOKE(V,astOverlay_(astCheckFrame(template),template_axes,astCheckFrame(result)))
+astINVOKE(V,astOverlay_(astCheckFrame(template),template_axes,astCheckFrame(result),STATUS_PTR))
 #define astPrimaryFrame(this,axis1,frame,axis2) \
-astINVOKE(V,astPrimaryFrame_(astCheckFrame(this),axis1,(AstFrame **)(frame),axis2))
+astINVOKE(V,astPrimaryFrame_(astCheckFrame(this),axis1,(AstFrame **)(frame),axis2,STATUS_PTR))
 #define astSetAxis(this,axis,newaxis) \
-astINVOKE(V,astSetAxis_(astCheckFrame(this),axis,astCheckAxis(newaxis)))
+astINVOKE(V,astSetAxis_(astCheckFrame(this),axis,astCheckAxis(newaxis),STATUS_PTR))
 #define astSetDigits(this,digits) \
-astINVOKE(V,astSetDigits_(astCheckFrame(this),digits))
+astINVOKE(V,astSetDigits_(astCheckFrame(this),digits,STATUS_PTR))
 #define astSetDirection(this,axis,direction) \
-astINVOKE(V,astSetDirection_(astCheckFrame(this),axis,direction))
+astINVOKE(V,astSetDirection_(astCheckFrame(this),axis,direction,STATUS_PTR))
 #define astSetDomain(this,domain) \
-astINVOKE(V,astSetDomain_(astCheckFrame(this),domain))
+astINVOKE(V,astSetDomain_(astCheckFrame(this),domain,STATUS_PTR))
 #define astSetFormat(this,axis,format) \
-astINVOKE(V,astSetFormat_(astCheckFrame(this),axis,format))
+astINVOKE(V,astSetFormat_(astCheckFrame(this),axis,format,STATUS_PTR))
 #define astSetLabel(this,axis,label) \
-astINVOKE(V,astSetLabel_(astCheckFrame(this),axis,label))
+astINVOKE(V,astSetLabel_(astCheckFrame(this),axis,label,STATUS_PTR))
 #define astSetMatchEnd(this,value) \
-astINVOKE(V,astSetMatchEnd_(astCheckFrame(this),value))
+astINVOKE(V,astSetMatchEnd_(astCheckFrame(this),value,STATUS_PTR))
 #define astSetMaxAxes(this,value) \
-astINVOKE(V,astSetMaxAxes_(astCheckFrame(this),value))
+astINVOKE(V,astSetMaxAxes_(astCheckFrame(this),value,STATUS_PTR))
 #define astSetMinAxes(this,value) \
-astINVOKE(V,astSetMinAxes_(astCheckFrame(this),value))
+astINVOKE(V,astSetMinAxes_(astCheckFrame(this),value,STATUS_PTR))
 #define astSetPermute(this,value) \
-astINVOKE(V,astSetPermute_(astCheckFrame(this),value))
+astINVOKE(V,astSetPermute_(astCheckFrame(this),value,STATUS_PTR))
 #define astSetPreserveAxes(this,value) \
-astINVOKE(V,astSetPreserveAxes_(astCheckFrame(this),value))
+astINVOKE(V,astSetPreserveAxes_(astCheckFrame(this),value,STATUS_PTR))
 #define astSetSymbol(this,axis,symbol) \
-astINVOKE(V,astSetSymbol_(astCheckFrame(this),axis,symbol))
+astINVOKE(V,astSetSymbol_(astCheckFrame(this),axis,symbol,STATUS_PTR))
 #define astSetTitle(this,title) \
-astINVOKE(V,astSetTitle_(astCheckFrame(this),title))
+astINVOKE(V,astSetTitle_(astCheckFrame(this),title,STATUS_PTR))
 #define astSetUnit(this,axis,unit) \
-astINVOKE(V,astSetUnit_(astCheckFrame(this),axis,unit))
+astINVOKE(V,astSetUnit_(astCheckFrame(this),axis,unit,STATUS_PTR))
 #define astSubFrame(target,template,result_naxes,target_axes,template_axes,map,result) \
-astINVOKE(V,astSubFrame_(astCheckFrame(target),template?astCheckFrame(template):NULL,result_naxes,target_axes,template_axes,(AstMapping **)(map),(AstFrame **)(result)))
+astINVOKE(V,astSubFrame_(astCheckFrame(target),template?astCheckFrame(template):NULL,result_naxes,target_axes,template_axes,(AstMapping **)(map),(AstFrame **)(result),STATUS_PTR))
 #define astTestDigits(this) \
-astINVOKE(V,astTestDigits_(astCheckFrame(this)))
+astINVOKE(V,astTestDigits_(astCheckFrame(this),STATUS_PTR))
 #define astTestDirection(this,axis) \
-astINVOKE(V,astTestDirection_(astCheckFrame(this),axis))
+astINVOKE(V,astTestDirection_(astCheckFrame(this),axis,STATUS_PTR))
 #define astTestDomain(this) \
-astINVOKE(V,astTestDomain_(astCheckFrame(this)))
+astINVOKE(V,astTestDomain_(astCheckFrame(this),STATUS_PTR))
 #define astTestFormat(this,axis) \
-astINVOKE(V,astTestFormat_(astCheckFrame(this),axis))
+astINVOKE(V,astTestFormat_(astCheckFrame(this),axis,STATUS_PTR))
 #define astTestLabel(this,axis) \
-astINVOKE(V,astTestLabel_(astCheckFrame(this),axis))
+astINVOKE(V,astTestLabel_(astCheckFrame(this),axis,STATUS_PTR))
 #define astTestMatchEnd(this) \
-astINVOKE(V,astTestMatchEnd_(astCheckFrame(this)))
+astINVOKE(V,astTestMatchEnd_(astCheckFrame(this),STATUS_PTR))
 #define astTestMaxAxes(this) \
-astINVOKE(V,astTestMaxAxes_(astCheckFrame(this)))
+astINVOKE(V,astTestMaxAxes_(astCheckFrame(this),STATUS_PTR))
 #define astTestMinAxes(this) \
-astINVOKE(V,astTestMinAxes_(astCheckFrame(this)))
+astINVOKE(V,astTestMinAxes_(astCheckFrame(this),STATUS_PTR))
 #define astTestPermute(this) \
-astINVOKE(V,astTestPermute_(astCheckFrame(this)))
+astINVOKE(V,astTestPermute_(astCheckFrame(this),STATUS_PTR))
 #define astTestPreserveAxes(this) \
-astINVOKE(V,astTestPreserveAxes_(astCheckFrame(this)))
+astINVOKE(V,astTestPreserveAxes_(astCheckFrame(this),STATUS_PTR))
 #define astTestSymbol(this,axis) \
-astINVOKE(V,astTestSymbol_(astCheckFrame(this),axis))
+astINVOKE(V,astTestSymbol_(astCheckFrame(this),axis,STATUS_PTR))
 #define astTestTitle(this) \
-astINVOKE(V,astTestTitle_(astCheckFrame(this)))
+astINVOKE(V,astTestTitle_(astCheckFrame(this),STATUS_PTR))
 #define astTestUnit(this,axis) \
-astINVOKE(V,astTestUnit_(astCheckFrame(this),axis))
+astINVOKE(V,astTestUnit_(astCheckFrame(this),axis,STATUS_PTR))
 #define astValidateAxis(this,axis,method) \
-astINVOKE(V,astValidateAxis_(astCheckFrame(this),axis,method))
+astINVOKE(V,astValidateAxis_(astCheckFrame(this),axis,method,STATUS_PTR))
 #define astValidateAxisSelection(this,naxes,axes,method) \
-astINVOKE(V,astValidateAxisSelection_(astCheckFrame(this),naxes,axes,method))
+astINVOKE(V,astValidateAxisSelection_(astCheckFrame(this),naxes,axes,method,STATUS_PTR))
 
-#define astFmtDecimalYr astFmtDecimalYr_
-#define astReadDateTime astReadDateTime_
+#define astFmtDecimalYr(year,digits) astFmtDecimalYr_(year,digits,STATUS_PTR)
+#define astReadDateTime(value) astReadDateTime_(value,STATUS_PTR)
 
 #define astValidateSystem(this,system,method) \
-astINVOKE(V,astValidateSystem_(astCheckFrame(this),system,method))
+astINVOKE(V,astValidateSystem_(astCheckFrame(this),system,method,STATUS_PTR))
 #define astSystemString(this,system) \
-astINVOKE(V,astSystemString_(astCheckFrame(this),system))
+astINVOKE(V,astSystemString_(astCheckFrame(this),system,STATUS_PTR))
 #define astSystemCode(this,system) \
-astINVOKE(V,astSystemCode_(astCheckFrame(this),system))
+astINVOKE(V,astSystemCode_(astCheckFrame(this),system,STATUS_PTR))
 
 #define astClearTop(this,axis) \
-astINVOKE(V,astClearTop_(astCheckFrame(this),axis))
+astINVOKE(V,astClearTop_(astCheckFrame(this),axis,STATUS_PTR))
 #define astGetTop(this,axis) \
-astINVOKE(V,astGetTop_(astCheckFrame(this),axis))
+astINVOKE(V,astGetTop_(astCheckFrame(this),axis,STATUS_PTR))
 #define astSetTop(this,axis,value) \
-astINVOKE(V,astSetTop_(astCheckFrame(this),axis,value))
+astINVOKE(V,astSetTop_(astCheckFrame(this),axis,value,STATUS_PTR))
 #define astTestTop(this,axis) \
-astINVOKE(V,astTestTop_(astCheckFrame(this),axis))
+astINVOKE(V,astTestTop_(astCheckFrame(this),axis,STATUS_PTR))
 
 #define astClearBottom(this,axis) \
-astINVOKE(V,astClearBottom_(astCheckFrame(this),axis))
+astINVOKE(V,astClearBottom_(astCheckFrame(this),axis,STATUS_PTR))
 #define astGetBottom(this,axis) \
-astINVOKE(V,astGetBottom_(astCheckFrame(this),axis))
+astINVOKE(V,astGetBottom_(astCheckFrame(this),axis,STATUS_PTR))
 #define astSetBottom(this,axis,value) \
-astINVOKE(V,astSetBottom_(astCheckFrame(this),axis,value))
+astINVOKE(V,astSetBottom_(astCheckFrame(this),axis,value,STATUS_PTR))
 #define astTestBottom(this,axis) \
-astINVOKE(V,astTestBottom_(astCheckFrame(this),axis))
+astINVOKE(V,astTestBottom_(astCheckFrame(this),axis,STATUS_PTR))
 
 #define astClearSystem(this) \
-astINVOKE(V,astClearSystem_(astCheckFrame(this)))
+astINVOKE(V,astClearSystem_(astCheckFrame(this),STATUS_PTR))
 #define astGetSystem(this) \
-astINVOKE(V,astGetSystem_(astCheckFrame(this)))
+astINVOKE(V,astGetSystem_(astCheckFrame(this),STATUS_PTR))
 #define astSetSystem(this,value) \
-astINVOKE(V,astSetSystem_(astCheckFrame(this),value))
+astINVOKE(V,astSetSystem_(astCheckFrame(this),value,STATUS_PTR))
 #define astTestSystem(this) \
-astINVOKE(V,astTestSystem_(astCheckFrame(this)))
+astINVOKE(V,astTestSystem_(astCheckFrame(this),STATUS_PTR))
 
 #define astClearAlignSystem(this) \
-astINVOKE(V,astClearAlignSystem_(astCheckFrame(this)))
+astINVOKE(V,astClearAlignSystem_(astCheckFrame(this),STATUS_PTR))
 #define astGetAlignSystem(this) \
-astINVOKE(V,astGetAlignSystem_(astCheckFrame(this)))
+astINVOKE(V,astGetAlignSystem_(astCheckFrame(this),STATUS_PTR))
 #define astSetAlignSystem(this,value) \
-astINVOKE(V,astSetAlignSystem_(astCheckFrame(this),value))
+astINVOKE(V,astSetAlignSystem_(astCheckFrame(this),value,STATUS_PTR))
 #define astTestAlignSystem(this) \
-astINVOKE(V,astTestAlignSystem_(astCheckFrame(this)))
+astINVOKE(V,astTestAlignSystem_(astCheckFrame(this),STATUS_PTR))
 
 #define astClearEpoch(this) \
-astINVOKE(V,astClearEpoch_(astCheckFrame(this)))
+astINVOKE(V,astClearEpoch_(astCheckFrame(this),STATUS_PTR))
 #define astGetEpoch(this) \
-astINVOKE(V,astGetEpoch_(astCheckFrame(this)))
+astINVOKE(V,astGetEpoch_(astCheckFrame(this),STATUS_PTR))
 #define astSetEpoch(this,value) \
-astINVOKE(V,astSetEpoch_(astCheckFrame(this),value))
+astINVOKE(V,astSetEpoch_(astCheckFrame(this),value,STATUS_PTR))
 #define astTestEpoch(this) \
-astINVOKE(V,astTestEpoch_(astCheckFrame(this)))
+astINVOKE(V,astTestEpoch_(astCheckFrame(this),STATUS_PTR))
 
 #define astGetObsLon(this) \
-astINVOKE(V,astGetObsLon_(astCheckFrame(this)))
+astINVOKE(V,astGetObsLon_(astCheckFrame(this),STATUS_PTR))
 #define astTestObsLon(this) \
-astINVOKE(V,astTestObsLon_(astCheckFrame(this)))
+astINVOKE(V,astTestObsLon_(astCheckFrame(this),STATUS_PTR))
 #define astClearObsLon(this) \
-astINVOKE(V,astClearObsLon_(astCheckFrame(this)))
+astINVOKE(V,astClearObsLon_(astCheckFrame(this),STATUS_PTR))
 #define astSetObsLon(this,value) \
-astINVOKE(V,astSetObsLon_(astCheckFrame(this),value))
+astINVOKE(V,astSetObsLon_(astCheckFrame(this),value,STATUS_PTR))
 
 #define astGetObsLat(this) \
-astINVOKE(V,astGetObsLat_(astCheckFrame(this)))
+astINVOKE(V,astGetObsLat_(astCheckFrame(this),STATUS_PTR))
 #define astTestObsLat(this) \
-astINVOKE(V,astTestObsLat_(astCheckFrame(this)))
+astINVOKE(V,astTestObsLat_(astCheckFrame(this),STATUS_PTR))
 #define astClearObsLat(this) \
-astINVOKE(V,astClearObsLat_(astCheckFrame(this)))
+astINVOKE(V,astClearObsLat_(astCheckFrame(this),STATUS_PTR))
 #define astSetObsLat(this,value) \
-astINVOKE(V,astSetObsLat_(astCheckFrame(this),value))
+astINVOKE(V,astSetObsLat_(astCheckFrame(this),value,STATUS_PTR))
 
 
 #define astClearDut1(this) \
-astINVOKE(V,astClearDut1_(astCheckFrame(this)))
+astINVOKE(V,astClearDut1_(astCheckFrame(this),STATUS_PTR))
 #define astGetDut1(this) \
-astINVOKE(V,astGetDut1_(astCheckFrame(this)))
+astINVOKE(V,astGetDut1_(astCheckFrame(this),STATUS_PTR))
 #define astSetDut1(this,value) \
-astINVOKE(V,astSetDut1_(astCheckFrame(this),value))
+astINVOKE(V,astSetDut1_(astCheckFrame(this),value,STATUS_PTR))
 #define astTestDut1(this) \
-astINVOKE(V,astTestDut1_(astCheckFrame(this)))
+astINVOKE(V,astTestDut1_(astCheckFrame(this),STATUS_PTR))
 
 #define astTestActiveUnit(this) \
-astINVOKE(V,astTestActiveUnit_(astCheckFrame(this)))
+astINVOKE(V,astTestActiveUnit_(astCheckFrame(this),STATUS_PTR))
 
 #define astSetFrameFlags(this,flags) \
-astINVOKE(V,astSetFrameFlags_(astCheckFrame(this),flags))
+astINVOKE(V,astSetFrameFlags_(astCheckFrame(this),flags,STATUS_PTR))
 #define astGetFrameFlags(this) \
-astINVOKE(V,astGetFrameFlags_(astCheckFrame(this)))
+astINVOKE(V,astGetFrameFlags_(astCheckFrame(this),STATUS_PTR))
 
 #endif
 #endif
+
+
+
+

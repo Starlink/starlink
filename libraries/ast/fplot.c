@@ -404,8 +404,8 @@ F77_SUBROUTINE(ast_grfset)( INTEGER(THIS), CHARACTER(NAME),
       } else {
          wrapper = (AstGrfWrap) FGFlushWrapper;
          if( astOK ) astError( AST__INTER, "%s(%s): AST internal programming "
-                   "error - Grf function id %d not yet supported.", method, 
-                   class, ifun );
+                   "error - Grf function id %d not yet supported.", status, 
+                   method, class, ifun );
       }
       astGrfWrapper( astI2P( *THIS ), name, wrapper );
    )
@@ -416,6 +416,8 @@ static int FGAttrWrapper( AstPlot *this, int attr, double value,
    DECLARE_DOUBLE(OLDVAL);
    int ret;
    F77_INTEGER_TYPE(GRFCON);
+   int *status = astGetStatusPtr;
+
    if ( !astOK ) return 0;
 
    GRFCON = astP2I( astGrfConID( this ) );
@@ -432,6 +434,7 @@ static int FGAttrWrapper( AstPlot *this, int attr, double value,
 
 static int FGFlushWrapper( AstPlot *this ) {
    F77_INTEGER_TYPE(GRFCON);
+   int *status = astGetStatusPtr;
    if ( !astOK ) return 0;
    GRFCON = astP2I( astGrfConID( this ) );
    return ( *(int (*)(INTEGER(grfcon))) this->grffun[ AST__GFLUSH ])(INTEGER_ARG(&GRFCON));
@@ -440,6 +443,7 @@ static int FGFlushWrapper( AstPlot *this ) {
 static int FGLineWrapper( AstPlot *this, int n, const float *x, 
                           const float *y ) {
    F77_INTEGER_TYPE(GRFCON);
+   int *status = astGetStatusPtr;
    if ( !astOK ) return 0;
    GRFCON = astP2I( astGrfConID( this ) );
    return ( *(int (*)( INTEGER(grfcon), INTEGER(n), REAL_ARRAY(x), REAL_ARRAY(y) ))
@@ -452,6 +456,7 @@ static int FGLineWrapper( AstPlot *this, int n, const float *x,
 static int FGMarkWrapper( AstPlot *this, int n, const float *x, 
                           const float *y, int type ) {
    F77_INTEGER_TYPE(GRFCON);
+   int *status = astGetStatusPtr;
    if ( !astOK ) return 0;
    GRFCON = astP2I( astGrfConID( this ) );
    return ( *(int (*)( INTEGER(grfcon), INTEGER(n), REAL_ARRAY(x), REAL_ARRAY(y),
@@ -472,6 +477,7 @@ static int FGTextWrapper( AstPlot *this, const char *text, float x, float y,
    int fjust_length;
 
    F77_INTEGER_TYPE(GRFCON);
+   int *status = astGetStatusPtr;
    if ( !astOK ) return 0;
    GRFCON = astP2I( astGrfConID( this ) );
 
@@ -500,6 +506,7 @@ static int FGTextWrapper( AstPlot *this, const char *text, float x, float y,
 
 static int FGCapWrapper( AstPlot *this, int cap, int value ) {
    F77_INTEGER_TYPE(GRFCON);
+   int *status = astGetStatusPtr;
    if ( !astOK ) return 0;
    GRFCON = astP2I( astGrfConID( this ) );
    return ( *(int (*)( INTEGER(grfcon), INTEGER(cap), INTEGER(value) ) )
@@ -518,6 +525,7 @@ static int FGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
    int fjust_length;
 
    F77_INTEGER_TYPE(GRFCON);
+   int *status = astGetStatusPtr;
    if ( !astOK ) return 0;
    GRFCON = astP2I( astGrfConID( this ) );
 
@@ -549,6 +557,7 @@ static int FGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
 
 static int FGQchWrapper( AstPlot *this, float *chv, float *chh ) {
    F77_INTEGER_TYPE(GRFCON);
+   int *status = astGetStatusPtr;
    if ( !astOK ) return 0;
    GRFCON = astP2I( astGrfConID( this ) );
    return ( *(int (*)( INTEGER(grfcon), REAL(chv), REAL(chh) ) )
@@ -557,6 +566,7 @@ static int FGQchWrapper( AstPlot *this, float *chv, float *chh ) {
 
 static int FGScalesWrapper( AstPlot *this, float *alpha, float *beta ) {
    F77_INTEGER_TYPE(GRFCON);
+   int *status = astGetStatusPtr;
    if ( !astOK ) return 0;
    GRFCON = astP2I( astGrfConID( this ) );
    return ( *(int (*)( INTEGER(grfcon), REAL(alpha), REAL(beta) ) )

@@ -75,6 +75,8 @@ f     The PointList class does not define any new routines beyond those
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
 #include "object.h"              /* Base Object class */
@@ -84,6 +86,7 @@ f     The PointList class does not define any new routines beyond those
 #include "pointlist.h"           /* Interface definition for this class */
 #include "mapping.h"             /* Position mappings */
 #include "unitmap.h"             /* Unit Mapping */
+#include "frame.h"               /* Coordinate systems */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -100,14 +103,41 @@ f     The PointList class does not define any new routines beyond those
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstPointListVtab class_vtab;    /* Virtual function table */
-static int class_init = 0;          /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
-static AstMapping *(* parent_simplify)( AstMapping * );
+static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static AstMapping *(* parent_simplify)( AstMapping *, int * );
+
+
+#ifdef THREAD_SAFE
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; 
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(PointList)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(PointList,Class_Init)
+#define class_vtab astGLOBAL(PointList,Class_Vtab)
+
+
+#include <pthread.h>
+
+
+#else
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstPointListVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -119,33 +149,33 @@ AstPointList *astPointListId_( void *, int, int, int, const double *, void *, co
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
-static int MaskLD( AstRegion *, AstMapping *, int, int, const int[], const int ubnd[], long double [], long double );
+static int MaskLD( AstRegion *, AstMapping *, int, int, const int[], const int ubnd[], long double [], long double, int * );
 #endif
-static int MaskB( AstRegion *, AstMapping *, int, int, const int[], const int[], signed char[], signed char );
-static int MaskD( AstRegion *, AstMapping *, int, int, const int[], const int[], double[], double );
-static int MaskF( AstRegion *, AstMapping *, int, int, const int[], const int[], float[], float );
-static int MaskI( AstRegion *, AstMapping *, int, int, const int[], const int[], int[], int );
-static int MaskL( AstRegion *, AstMapping *, int, int, const int[], const int[], long int[], long int );
-static int MaskS( AstRegion *, AstMapping *, int, int, const int[], const int[], short int[], short int );
-static int MaskUB( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned char[], unsigned char );
-static int MaskUI( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned int[], unsigned int );
-static int MaskUL( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned long int[], unsigned long int );
-static int MaskUS( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned short int[], unsigned short int );
+static int MaskB( AstRegion *, AstMapping *, int, int, const int[], const int[], signed char[], signed char, int * );
+static int MaskD( AstRegion *, AstMapping *, int, int, const int[], const int[], double[], double, int * );
+static int MaskF( AstRegion *, AstMapping *, int, int, const int[], const int[], float[], float, int * );
+static int MaskI( AstRegion *, AstMapping *, int, int, const int[], const int[], int[], int, int * );
+static int MaskL( AstRegion *, AstMapping *, int, int, const int[], const int[], long int[], long int, int * );
+static int MaskS( AstRegion *, AstMapping *, int, int, const int[], const int[], short int[], short int, int * );
+static int MaskUB( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned char[], unsigned char, int * );
+static int MaskUI( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned int[], unsigned int, int * );
+static int MaskUL( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned long int[], unsigned long int, int * );
+static int MaskUS( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned short int[], unsigned short int, int * );
 
-static AstMapping *Simplify( AstMapping * );
-static AstPointSet *RegBaseMesh( AstRegion * );
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static int GetClosed( AstRegion * );
-static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int ** );
-static void Copy( const AstObject *, AstObject * );
-static void Delete( AstObject * );
-static void Dump( AstObject *, AstChannel * );
-static void RegBaseBox( AstRegion *this, double *, double * );
+static AstMapping *Simplify( AstMapping *, int * );
+static AstPointSet *RegBaseMesh( AstRegion *, int * );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static int GetClosed( AstRegion *, int * );
+static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Delete( AstObject *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void RegBaseBox( AstRegion *this, double *, double *, int * );
 
 /* Member functions. */
 /* ================= */
 
-static int GetClosed( AstRegion *this ) {
+static int GetClosed( AstRegion *this, int *status ) {
 /*
 *  Name:
 *     GetClosed
@@ -158,7 +188,7 @@ static int GetClosed( AstRegion *this ) {
 
 *  Synopsis:
 *     #include "pointlist.h"
-*     int GetClosed( AstRegion *this )
+*     int GetClosed( AstRegion *this, int *status )
 
 *  Class Membership:
 *     PointList member function (over-rides the astGetClosed method
@@ -174,6 +204,8 @@ static int GetClosed( AstRegion *this ) {
 *  Parameters:
 *     this
 *        Pointer to the PointList.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The value to use for the Closed attribute.
@@ -192,7 +224,7 @@ static int GetClosed( AstRegion *this ) {
    return ( astGetNegated( this ) == 0 );
 }
 
-void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name ) {
+void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -229,11 +261,15 @@ void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstRegionVtab *region;        /* Pointer to Region component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -242,8 +278,8 @@ void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAPointList) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -287,6 +323,11 @@ void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name ) {
    astSetDelete( vtab, Delete );
    astSetCopy( vtab, Copy );
    astSetDump( vtab, Dump, "PointList", "Collection of points" );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
 /*
@@ -422,7 +463,7 @@ void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name ) {
 #define MAKE_MASK(X,Xtype) \
 static int Mask##X( AstRegion *this, AstMapping *map, int inside, int ndim, \
                     const int lbnd[], const int ubnd[], \
-                    Xtype in[], Xtype val ) { \
+                    Xtype in[], Xtype val, int *status ) { \
 \
 /* Local Variables: */ \
    AstFrame *grid_frame;         /* Pointer to Frame describing grid coords */ \
@@ -462,9 +503,9 @@ static int Mask##X( AstRegion *this, AstMapping *map, int inside, int ndim, \
    number of axes in the Region. Report an error if necessary. */ \
       if ( astOK && ( nax != nin ) ) { \
          astError( AST__NGDIN, "astMask"#X"(%s): Bad number of mapping " \
-                   "inputs (%d).", astGetClass( this ), nin ); \
+                   "inputs (%d).", status, astGetClass( this ), nin ); \
          astError( AST__NGDIN, "The %s given requires %d coordinate value%s " \
-                   "to specify a position.", \
+                   "to specify a position.", status, \
                    astGetClass( this ), nax, ( nax == 1 ) ? "" : "s" ); \
       } \
 \
@@ -472,15 +513,15 @@ static int Mask##X( AstRegion *this, AstMapping *map, int inside, int ndim, \
    number of grid dimensions. Report an error if necessary. */ \
       if ( astOK && ( ndim != nout ) ) { \
          astError( AST__NGDIN, "astMask"#X"(%s): Bad number of mapping " \
-                   "outputs (%d).", astGetClass( this ), nout ); \
+                   "outputs (%d).", status, astGetClass( this ), nout ); \
          astError( AST__NGDIN, "The pixel grid requires %d coordinate value%s " \
-                   "to specify a position.", \
+                   "to specify a position.", status, \
                    ndim, ( ndim == 1 ) ? "" : "s" ); \
       } \
 \
 /* Create a new Region by mapping the supplied Region with the supplied \
    Mapping.*/ \
-      grid_frame = astFrame( ndim, "Domain=grid" ); \
+      grid_frame = astFrame( ndim, "Domain=grid", status ); \
       used_region = astMapRegion( this, map, grid_frame ); \
       grid_frame = astAnnul( grid_frame ); \
 \
@@ -489,10 +530,10 @@ static int Mask##X( AstRegion *this, AstMapping *map, int inside, int ndim, \
    } else if ( astOK && ( ( ndim != nax ) || ( ndim < 1 ) ) ) { \
       used_region = NULL; \
       astError( AST__NGDIN, "astMask"#X"(%s): Bad number of input grid " \
-                "dimensions (%d).", astGetClass( this ), ndim ); \
+                "dimensions (%d).", status, astGetClass( this ), ndim ); \
       if ( ndim != nax ) { \
          astError( AST__NGDIN, "The %s given requires %d coordinate value%s " \
-                   "to specify an input position.", \
+                   "to specify an input position.", status, \
                    astGetClass( this ), nax, ( nax == 1 ) ? "" : "s" ); \
       } \
 \
@@ -509,9 +550,9 @@ static int Mask##X( AstRegion *this, AstMapping *map, int inside, int ndim, \
          if ( lbnd[ idim ] > ubnd[ idim ] ) { \
             astError( AST__GBDIN, "astMask"#X"(%s): Lower bound of " \
                       "input grid (%d) exceeds corresponding upper bound " \
-                      "(%d).", astGetClass( this ), \
+                      "(%d).", status, astGetClass( this ), \
                       lbnd[ idim ], ubnd[ idim ] ); \
-            astError( AST__GBDIN, "Error in input dimension %d.", \
+            astError( AST__GBDIN, "Error in input dimension %d.", status, \
                       idim + 1 ); \
             break; \
          } \
@@ -595,7 +636,7 @@ MAKE_MASK(UB,unsigned char)
 /* Undefine the macro. */
 #undef MAKE_MASK
 
-static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
+static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int *status ){
 /*
 *  Name:
 *     RegBaseBox
@@ -609,7 +650,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 
 *  Synopsis:
 *     #include "pointlist.h"
-*     void astRegBaseBox( AstRegion *this, double *lbnd, double *ubnd )
+*     void astRegBaseBox( AstRegion *this, double *lbnd, double *ubnd, int *status )
 
 *  Class Membership:
 *     PointList member function (over-rides the astRegBaseBox protected
@@ -634,6 +675,8 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 *        covered by the Region in the base Frame of the encapsulated
 *        FrameSet. It should have at least as many elements as there are 
 *        axes in the base Frame.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -728,7 +771,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
    
 }
 
-static AstPointSet *RegBaseMesh( AstRegion *this ){
+static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
 /*
 *  Name:
 *     RegBaseMesh
@@ -742,7 +785,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
 
 *  Synopsis:
 *     #include "pointlist.h"
-*     AstPointSet *astRegBaseMesh( AstRegion *this )
+*     AstPointSet *astRegBaseMesh( AstRegion *this, int *status )
 
 *  Class Membership:
 *     PointList member function (over-rides the astRegBaseMesh protected
@@ -756,6 +799,8 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
 *  Parameters:
 *     this
 *        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the PointSet. The axis values in this PointSet will have 
@@ -798,7 +843,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
 }
 
 static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
-                    int **mask ){
+                    int **mask, int *status ){
 /*
 *  Name:
 *     RegPins
@@ -812,7 +857,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 *  Synopsis:
 *     #include "pointlist.h"
 *     int RegPins( AstRegion *this, AstPointSet *pset, AstRegion *unc,
-*                  int **mask )
+*                  int **mask, int *status )
 
 *  Class Membership:
 *     PointList member function (over-rides the astRegPins protected
@@ -846,6 +891,8 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 *        and is set to zero otherwise. A NULL value may be supplied
 *        in which case no array is created. If created, the array should
 *        be freed using astFree when no longer needed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Non-zero if the points all fall on the boundary of the given
@@ -975,7 +1022,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
          }
 
 /* Create the new PointList holding the supplied points. */
-         pl = astPointList( unc, np, nc, np, work, unc, "" );
+         pl = astPointList( unc, np, nc, np, work, unc, "", status );
 
 /* Transform the points in "this" PointList using the new PointList as a
    Mapping. */
@@ -1022,7 +1069,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    return result;
 }
 
-static AstMapping *Simplify( AstMapping *this_mapping ) {
+static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /*
 *  Name:
 *     Simplify
@@ -1035,7 +1082,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 *  Synopsis:
 *     #include "pointlist.h"
-*     AstMapping *Simplify( AstMapping *this )
+*     AstMapping *Simplify( AstMapping *this, int *status )
 
 *  Class Membership:
 *     PointList method (over-rides the astSimplify method inherited
@@ -1052,6 +1099,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 *  Parameters:
 *     this
 *        Pointer to the original Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to the simplified Region. A cloned pointer to the
@@ -1095,7 +1144,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 /* Invoke the parent Simplify method inherited from the Region class. This
    will simplify the encapsulated FrameSet and uncertainty Region. */
-   new = (AstRegion *) (*parent_simplify)( this_mapping );
+   new = (AstRegion *) (*parent_simplify)( this_mapping, status );
 
 /* Note if any simplification took place. This is assumed to be the case
    if the pointer returned by the above call is different to the supplied
@@ -1139,7 +1188,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
          }
 
 /* Create a new PointList, and use it in place of the original. */
-         new2 = astPointList( fr, np, nc, np, pts, unc, "" );
+         new2 = astPointList( fr, np, nc, np, pts, unc, "", status );
          (void) astAnnul( new );
          new = (AstRegion *) new2;
          simpler = 1;
@@ -1175,7 +1224,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 }
 
 static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
-                               int forward, AstPointSet *out ) {
+                               int forward, AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     Transform
@@ -1189,7 +1238,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 *  Synopsis:
 *     #include "pointlist.h"
 *     AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-*                             int forward, AstPointSet *out )
+*                             int forward, AstPointSet *out, int *status )
 
 *  Class Membership:
 *     PointList member function (over-rides the astTransform protected
@@ -1215,6 +1264,8 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 *        Pointer to a PointSet which will hold the transformed (output)
 *        coordinate values. A NULL value may also be given, in which case a
 *        new PointSet will be created by this function.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the output (possibly new) PointSet.
@@ -1267,7 +1318,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    function inherited from the parent Region class. This function validates
    all arguments and generates an output PointSet if necessary,
    containing a copy of the input PointSet. */
-   result = (*parent_transform)( this_mapping, in, forward, out );
+   result = (*parent_transform)( this_mapping, in, forward, out, status );
 
 /* We will now extend the parent astTransform method by performing the
    calculations needed to generate the output coordinate values. */
@@ -1302,7 +1353,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    if( astGetNcoord( pset_reg ) != ncoord_base && astOK ) {
       astError( AST__INTER, "astTransform(PointList): Illegal number of "
                 "coords (%d) in the Region - should be %d "
-                "(internal AST programming error).", astGetNcoord( pset_reg ),
+                "(internal AST programming error).", status, astGetNcoord( pset_reg ),
                 ncoord_base );
    }
 
@@ -1413,7 +1464,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -1425,7 +1476,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for PointList objects.
@@ -1435,6 +1486,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the object to be copied.
 *     objout
 *        Pointer to the object being constructed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     -  This constructor makes a deep copy.
@@ -1468,7 +1521,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -1480,7 +1533,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for PointList objects.
@@ -1488,6 +1541,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the object to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     This function attempts to execute even if the global error status is
@@ -1507,7 +1562,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -1519,7 +1574,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -1530,6 +1585,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the PointList whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -1564,12 +1621,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsAPointList and astCheckPointList functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(PointList,Region,check,&class_init)
+astMAKE_ISA(PointList,Region,check,&class_check)
 astMAKE_CHECK(PointList)
 
 AstPointList *astPointList_( void *frame_void, int npnt, int ncoord, int dim, 
                              const double *points, AstRegion *unc,
-                             const char *options, ... ) {
+                             const char *options, int *status, ...) {
 /*
 *++
 *  Name:
@@ -1697,13 +1754,24 @@ f     AST_POINTLIST = INTEGER
 c     function is invoked with the AST error status set, or if it
 f     function is invoked with STATUS set to an error value, or if it
 *     should fail for any reason.
+
+*  Status Handling:
+*     The protected interface to this function includes an extra
+*     parameter at the end of the parameter list descirbed above. This
+*     parameter is a pointer to the integer inherited status
+*     variable: "int *status".
+
 *--
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstPointList *new;            /* Pointer to new PointList */
    va_list args;                 /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -1724,7 +1792,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Obtain the variable argument list and pass it along with the options string
    to the astVSet method to initialise the new PointList's attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -1779,10 +1847,19 @@ AstPointList *astPointListId_( void *frame_void, int npnt, int ncoord, int dim,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstPointList *new;            /* Pointer to new PointList */
    AstRegion *unc;               /* Pointer to Region structure */
    va_list args;                 /* Variable argument list */
+
+   int *status;                  /* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
+/* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -1823,7 +1900,7 @@ AstPointList *astPointListId_( void *frame_void, int npnt, int ncoord, int dim,
 AstPointList *astInitPointList_( void *mem, size_t size, int init, AstPointListVtab *vtab, 
                                  const char *name, AstFrame *frame, int npnt, 
                                  int ncoord, int dim, const double *points,
-                                 AstRegion *unc ) {
+                                 AstRegion *unc, int *status ) {
 /*
 *+
 *  Name:
@@ -1947,13 +2024,13 @@ AstPointList *astInitPointList_( void *mem, size_t size, int init, AstPointListV
    nin = astGetNaxes( frame );
    if( nin != ncoord ) {
       astError( AST__NCPIN, "astInitPointList(%s): Bad number of coordinate "
-                "values (%d).", name, ncoord );
+                "values (%d).", status, name, ncoord );
       astError( AST__NCPIN, "The %s given requires %d coordinate value(s) for "
-                "each input point.", astGetClass( frame ), nin );
+                "each input point.", status, astGetClass( frame ), nin );
 
 /* If so create a PointSet and store the supplied points in it. */
    } else {
-      pset = astPointSet( npnt, ncoord , "" );
+      pset = astPointSet( npnt, ncoord , "", status );
       ptr = astGetPoints( pset );
       if( astOK ) {
          for( i = 0; i < ncoord; i++ ) {
@@ -1988,7 +2065,7 @@ AstPointList *astInitPointList_( void *mem, size_t size, int init, AstPointListV
 }
 
 AstPointList *astLoadPointList_( void *mem, size_t size, AstPointListVtab *vtab, 
-                                 const char *name, AstChannel *channel ) {
+                                 const char *name, AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -2061,6 +2138,7 @@ AstPointList *astLoadPointList_( void *mem, size_t size, AstPointListVtab *vtab,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstPointList *new;              /* Pointer to the new PointList */
 
 /* Initialise. */
@@ -2068,6 +2146,9 @@ AstPointList *astLoadPointList_( void *mem, size_t size, AstPointListVtab *vtab,
 
 /* Check the global error status. */
    if ( !astOK ) return new;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* If a NULL virtual function table has been supplied, then this is
    the first loader to be invoked for this PointList. In this case the
@@ -2130,3 +2211,7 @@ AstPointList *astLoadPointList_( void *mem, size_t size, AstPointListVtab *vtab,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
+
+
+
+

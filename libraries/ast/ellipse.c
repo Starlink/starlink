@@ -75,6 +75,8 @@ f     The Ellipse class does not define any new routines beyond those
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
 #include "object.h"              /* Base Object class */
@@ -104,16 +106,43 @@ f     The Ellipse class does not define any new routines beyond those
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstEllipseVtab class_vtab;    /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
-static AstMapping *(* parent_simplify)( AstMapping * );
-static void (* parent_setregfs)( AstRegion *, AstFrame * );
-static void (* parent_resetcache)( AstRegion * );
+static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static AstMapping *(* parent_simplify)( AstMapping *, int * );
+static void (* parent_setregfs)( AstRegion *, AstFrame *, int * );
+static void (* parent_resetcache)( AstRegion *, int * );
+
+
+#ifdef THREAD_SAFE
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; 
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(Ellipse)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(Ellipse,Class_Init)
+#define class_vtab astGLOBAL(Ellipse,Class_Vtab)
+
+
+#include <pthread.h>
+
+
+#else
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstEllipseVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -124,23 +153,23 @@ AstEllipse *astEllipseId_( void *, int, const double[2], const double[2], const 
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static AstMapping *Simplify( AstMapping * );
-static AstPointSet *RegBaseMesh( AstRegion * );
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static double *RegCentre( AstRegion *this, double *, double **, int, int );
-static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int ** );
-static void Cache( AstEllipse * );
-static void Copy( const AstObject *, AstObject * );
-static void Delete( AstObject * );
-static void Dump( AstObject *, AstChannel * );
-static void RegBaseBox( AstRegion *this, double *, double * );
-static void SetRegFS( AstRegion *, AstFrame * );
-static void ResetCache( AstRegion *this );
+static AstMapping *Simplify( AstMapping *, int * );
+static AstPointSet *RegBaseMesh( AstRegion *, int * );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static double *RegCentre( AstRegion *this, double *, double **, int, int, int * );
+static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
+static void Cache( AstEllipse *, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Delete( AstObject *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void RegBaseBox( AstRegion *this, double *, double *, int * );
+static void SetRegFS( AstRegion *, AstFrame *, int * );
+static void ResetCache( AstRegion *this, int * );
 
 /* Member functions. */
 /* ================= */
 
-AstRegion *astBestEllipse( AstPointSet *mesh, double *cen, AstRegion *unc ){
+AstRegion *astBestEllipse_( AstPointSet *mesh, double *cen, AstRegion *unc, int *status ){
 /*
 *+
 *  Name:
@@ -404,7 +433,7 @@ AstRegion *astBestEllipse( AstPointSet *mesh, double *cen, AstRegion *unc ){
                astOffset2( frm, cen, at + AST__DPIBY2, mn, pb );
 
 /* Create the Ellipse to return. */
-               result = (AstRegion *) astEllipse( frm, 0, cen, pa, pb, unc, "" );
+               result = (AstRegion *) astEllipse( frm, 0, cen, pa, pb, unc, "", status );
             } 
          }
 
@@ -425,7 +454,7 @@ AstRegion *astBestEllipse( AstPointSet *mesh, double *cen, AstRegion *unc ){
    return result;
 }
 
-void astInitEllipseVtab_(  AstEllipseVtab *vtab, const char *name ) {
+void astInitEllipseVtab_(  AstEllipseVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -462,11 +491,15 @@ void astInitEllipseVtab_(  AstEllipseVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstRegionVtab *region;        /* Pointer to Region component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -475,8 +508,8 @@ void astInitEllipseVtab_(  AstEllipseVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAEllipse) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -513,9 +546,14 @@ void astInitEllipseVtab_(  AstEllipseVtab *vtab, const char *name ) {
    astSetDelete( vtab, Delete );
    astSetCopy( vtab, Copy );
    astSetDump( vtab, Dump, "Ellipse", "Elliptical region" );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
-static void Cache( AstEllipse *this ){
+static void Cache( AstEllipse *this, int *status ){
 /*
 *  Name:
 *     Cache
@@ -528,7 +566,7 @@ static void Cache( AstEllipse *this ){
 
 *  Synopsis:
 *     #include "ellipse.h"
-*     void Cache( AstEllipse *this )
+*     void Cache( AstEllipse *this, int *status )
 
 *  Class Membership:
 *     Ellipse member function 
@@ -541,6 +579,8 @@ static void Cache( AstEllipse *this ){
 *  Parameters:
 *     this
 *        Pointer to the Ellipse.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -593,7 +633,7 @@ static void Cache( AstEllipse *this ){
          a = astDistance( frm, centre, point1 );      
          if( astOK && ( a == 0.0 || a == AST__BAD ) ) {
             astError( AST__BADIN, "astInitEllipse(%s): The supplied points "
-                      "imply a zero-width ellipse.", astGetClass( this ) );
+                      "imply a zero-width ellipse.", status, astGetClass( this ) );
          }
    
 /* Find the point (point3) on the primary axis which is closest to point 2, 
@@ -608,11 +648,11 @@ static void Cache( AstEllipse *this ){
                b = a*y/sqrt( b );
                if( b == 0.0 ) {
                   astError( AST__BADIN, "astInitEllipse(%s): The supplied points "
-                            "imply a zero-width ellipse.", astGetClass( this ) );
+                            "imply a zero-width ellipse.", status, astGetClass( this ) );
                }
             } else {
                astError( AST__BADIN, "astInitEllipse(%s): The supplied points "
-                         "do not determine an ellipse.", astGetClass( this ) );
+                         "do not determine an ellipse.", status, astGetClass( this ) );
             }
    
          } else {
@@ -663,7 +703,7 @@ static void Cache( AstEllipse *this ){
    }
 }
 
-static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
+static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int *status ){
 /*
 *  Name:
 *     RegBaseBox
@@ -677,7 +717,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 
 *  Synopsis:
 *     #include "ellipse.h"
-*     void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd )
+*     void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd, int *status )
 
 *  Class Membership:
 *     Ellipse member function (over-rides the astRegBaseBox protected
@@ -702,6 +742,8 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 *        covered by the Region in the base Frame of the encapsulated
 *        FrameSet. It should have at least as many elements as there are 
 *        axes in the base Frame.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -728,7 +770,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 
 }
 
-static AstPointSet *RegBaseMesh( AstRegion *this_region ){
+static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
 /*
 *  Name:
 *     RegBaseMesh
@@ -742,7 +784,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
 
 *  Synopsis:
 *     #include "ellipse.h"
-*     AstPointSet *astRegBaseMesh( AstRegion *this )
+*     AstPointSet *astRegBaseMesh( AstRegion *this, int *status )
 
 *  Class Membership:
 *     Ellipse member function (over-rides the astRegBaseMesh protected
@@ -756,6 +798,8 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
 *  Parameters:
 *     this
 *        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the PointSet. Annul the pointer using astAnnul when it 
@@ -816,7 +860,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
       this = (AstEllipse *) this_region;
 
 /* Ensure cached information is available. */
-      Cache( this );
+      Cache( this, status );
 
 /* Get a pointer to the base Frame in the encapsulated FrameSet. */
       frm = astGetFrame( this_region->frameset, AST__BASE );
@@ -828,7 +872,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
       delta = 2*AST__DPI/np;
 
 /* Create a suitable PointSet to hold the returned positions. */
-      result = astPointSet( np, 2, "" );
+      result = astPointSet( np, 2, "", status );
       ptr = astGetPoints( result );
       if( astOK ) {
 
@@ -926,7 +970,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
 }
 
 static double *RegCentre( AstRegion *this_region, double *cen, double **ptr, 
-                          int index, int ifrm ){
+                          int index, int ifrm, int *status ){
 /*
 *  Name:
 *     RegCentre
@@ -940,7 +984,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 *  Synopsis:
 *     #include "ellipse.h"
 *     double *RegCentre( AstRegion *this, double *cen, double **ptr, 
-*                        int index, int ifrm )
+*                        int index, int ifrm, int *status )
 
 *  Class Membership:
 *     Ellipse member function (over-rides the astRegCentre protected
@@ -970,6 +1014,8 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 *        Should be AST__BASE or AST__CURRENT. Indicates whether the centre 
 *        position is supplied and returned in the base or current Frame of 
 *        the FrameSet encapsulated within "this".
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     If both "cen" and "ptr" are NULL then a pointer to a newly
@@ -1022,7 +1068,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
    } else {
 
 /* Ensure cached information is available. */
-      Cache( this );
+      Cache( this, status );
 
 /* Get a pointer to the axis values stored in the Region structure. */
       rptr = astGetPoints( this_region->points );
@@ -1077,7 +1123,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 }
 
 static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
-                    int **mask ){
+                    int **mask, int *status ){
 /*
 *  Name:
 *     RegPins
@@ -1091,7 +1137,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 *  Synopsis:
 *     #include "ellipse.h"
 *     int RegPins( AstRegion *this, AstPointSet *pset, AstRegion *unc,
-*                  int **mask )
+*                  int **mask, int *status )
 
 *  Class Membership:
 *     Ellipse member function (over-rides the astRegPins protected
@@ -1125,6 +1171,8 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 *        and is set to zero otherwise. A NULL value may be supplied
 *        in which case no array is created. If created, the array should
 *        be freed using astFree when no longer needed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Non-zero if the points all fall on the boundary of the given
@@ -1170,7 +1218,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    if( astGetNcoord( pset ) != 2 && astOK ) {
       astError( AST__INTER, "astRegPins(%s): Illegal number of axis "
                 "values per point (%d) in the supplied PointSet - should be "
-                "2 (internal AST programming error).", astGetClass( this ),
+                "2 (internal AST programming error).", status, astGetClass( this ),
                 astGetNcoord( pset ) );
    }
 
@@ -1178,7 +1226,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    if( unc && astGetNaxes( unc ) != 2 && astOK ) {
       astError( AST__INTER, "astRegPins(%s): Illegal number of axes (%d) "
                 "in the supplied uncertainty Region - should be 2 "
-                "(internal AST programming error).", astGetClass( this ),
+                "(internal AST programming error).", status, astGetClass( this ),
                 astGetNaxes( unc ) );
    }
 
@@ -1208,7 +1256,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    }
 
 /* Ensure cached information is available. */
-   Cache( this );
+   Cache( this, status );
 
 /* The required border width is half of the total diagonal of the two bounding 
    boxes. */   
@@ -1220,14 +1268,14 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    found above. */
       p1[ 0 ] = this->a + 0.5*drad;
       p1[ 1 ] = this->b + 0.5*drad;
-      large_ellipse = astEllipse( frm, 1, this->centre, p1, &(this->angle), NULL, "" );
+      large_ellipse = astEllipse( frm, 1, this->centre, p1, &(this->angle), NULL, "", status );
 
       p1[ 0 ] = this->a - 0.5*drad;
       p1[ 1 ] = this->b - 0.5*drad;
       lim = 1.0E-6*drad;
       if( p1[ 0 ] < lim ) p1[ 0 ] = lim;
       if( p1[ 1 ] < lim ) p1[ 1 ] = lim;
-      small_ellipse = astEllipse( frm, 1, this->centre, p1, &(this->angle), NULL, "" );
+      small_ellipse = astEllipse( frm, 1, this->centre, p1, &(this->angle), NULL, "", status );
 
 /* Negate the smaller region.*/
       astNegate( small_ellipse );
@@ -1310,7 +1358,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    return result;
 }
 
-static void ResetCache( AstRegion *this ){
+static void ResetCache( AstRegion *this, int *status ){
 /*
 *  Name:
 *     ResetCache
@@ -1323,7 +1371,7 @@ static void ResetCache( AstRegion *this ){
 
 *  Synopsis:
 *     #include "ellipse.h"
-*     void ResetCache( AstRegion *this )
+*     void ResetCache( AstRegion *this, int *status )
 
 *  Class Membership:
 *     Region member function (overrides the astResetCache method
@@ -1336,14 +1384,16 @@ static void ResetCache( AstRegion *this ){
 *  Parameters:
 *     this
 *        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
 */
    if( this ) {
       ( (AstEllipse *) this )->stale = 1;
-      (*parent_resetcache)( this );
+      (*parent_resetcache)( this, status );
    }
 }
 
-static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
+static void SetRegFS( AstRegion *this_region, AstFrame *frm, int *status ) {
 /*
 *  Name:
 *     SetRegFS
@@ -1356,7 +1406,7 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
 
 *  Synopsis:
 *     #include "ellipse.h"
-*     void SetRegFS( AstRegion *this_region, AstFrame *frm )
+*     void SetRegFS( AstRegion *this_region, AstFrame *frm, int *status )
 
 *  Class Membership:
 *     Ellipse method (over-rides the astSetRegFS method inherited from
@@ -1372,6 +1422,8 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
 *        Pointer to the Region.
 *     frm
 *        The Frame to use.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -1381,14 +1433,14 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
 
 /* Invoke the parent method to store the FrameSet in the parent Region
    structure. */
-   (* parent_setregfs)( this_region, frm );
+   (* parent_setregfs)( this_region, frm, status );
 
 /* Indicate that cached information will need to be re-calculated before
    it is next used. */
    astResetCache( this_region );
 }
 
-static AstMapping *Simplify( AstMapping *this_mapping ) {
+static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /*
 *  Name:
 *     Simplify
@@ -1401,7 +1453,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 *  Synopsis:
 *     #include "ellipse.h"
-*     AstMapping *Simplify( AstMapping *this )
+*     AstMapping *Simplify( AstMapping *this, int *status )
 
 *  Class Membership:
 *     Ellipse method (over-rides the astSimplify method inherited
@@ -1418,6 +1470,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 *  Parameters:
 *     this
 *        Pointer to the original Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to the simplified Region. A cloned pointer to the
@@ -1457,7 +1511,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 /* Invoke the parent Simplify method inherited from the Region class. This
    will simplify the encapsulated FrameSet and uncertainty Region. */
-   new = (AstRegion *) (*parent_simplify)( this_mapping );
+   new = (AstRegion *) (*parent_simplify)( this_mapping, status );
 
 /* Note if any simplification took place. This is assumed to be the case
    if the pointer returned by the above call is different to the supplied
@@ -1554,7 +1608,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 
 static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
-                               int forward, AstPointSet *out ) {
+                               int forward, AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     Transform
@@ -1568,7 +1622,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 *  Synopsis:
 *     #include "ellipse.h"
 *     AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-*                             int forward, AstPointSet *out )
+*                             int forward, AstPointSet *out, int *status )
 
 *  Class Membership:
 *     Ellipse member function (over-rides the astTransform protected
@@ -1593,6 +1647,8 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 *        Pointer to a PointSet which will hold the transformed (output)
 *        coordinate values. A NULL value may also be given, in which case a
 *        new PointSet will be created by this function.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the output (possibly new) PointSet.
@@ -1640,10 +1696,10 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    function inherited from the parent Region class. This function validates
    all arguments and generates an output PointSet if necessary,
    containing a copy of the input PointSet. */
-   result = (*parent_transform)( this_mapping, in, forward, out );
+   result = (*parent_transform)( this_mapping, in, forward, out, status );
 
 /* Ensure cached information is available. */
-   Cache( this );
+   Cache( this, status );
 
 /* We will now extend the parent astTransform method by performing the
    calculations needed to generate the output coordinate values. */
@@ -1750,7 +1806,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -1762,7 +1818,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for Ellipse objects.
@@ -1772,6 +1828,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the object to be copied.
 *     objout
 *        Pointer to the object being constructed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     -  This constructor makes a deep copy.
@@ -1801,7 +1859,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -1813,7 +1871,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for Ellipse objects.
@@ -1821,6 +1879,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the object to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     This function attempts to execute even if the global error status is
@@ -1840,7 +1900,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -1852,7 +1912,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -1863,6 +1923,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the Ellipse whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -1897,12 +1959,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsAEllipse and astCheckEllipse functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(Ellipse,Region,check,&class_init)
+astMAKE_ISA(Ellipse,Region,check,&class_check)
 astMAKE_CHECK(Ellipse)
 
 AstEllipse *astEllipse_( void *frame_void, int form, const double centre[2], 
                          const double point1[2], const double point2[2], 
-                         AstRegion *unc, const char *options, ... ) {
+                         AstRegion *unc, const char *options, int *status, ...) {
 /*
 *++
 *  Name:
@@ -2051,9 +2113,13 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstEllipse *new;              /* Pointer to new Ellipse */
    va_list args;                 /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -2073,7 +2139,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Obtain the variable argument list and pass it along with the options string
    to the astVSet method to initialise the new Ellipse's attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -2102,7 +2168,7 @@ AstEllipse *astEllipseId_( void *frame_void, int form, const double centre[2],
 *     #include "ellipse.h"
 *     AstEllipse *astEllipseId( void *frame_void, int form, const double centre[2],
 *                         const double point1[2], const double point2[2], 
-*                         void *unc_void, const char *options, ... )
+*                         void *unc_void, const char *options, ..., int *status )
 
 *  Class Membership:
 *     Ellipse constructor.
@@ -2122,16 +2188,27 @@ AstEllipse *astEllipseId_( void *frame_void, int form, const double centre[2],
 
 *  Parameters:
 *     As for astEllipse_.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The ID value associated with the new Ellipse.
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstEllipse *new;              /* Pointer to new Ellipse */
    AstRegion *unc;               /* Pointer to Region structure */
    va_list args;                 /* Variable argument list */
+
+   int *status;                  /* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
+/* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -2171,7 +2248,7 @@ AstEllipse *astEllipseId_( void *frame_void, int form, const double centre[2],
 AstEllipse *astInitEllipse_( void *mem, size_t size, int init, AstEllipseVtab *vtab, 
                              const char *name, AstFrame *frame, int form,
                              const double centre[2], const double point1[2],
-                             const double point2[2], AstRegion *unc ){
+                             const double point2[2], AstRegion *unc, int *status ){
 /*
 *+
 *  Name:
@@ -2299,7 +2376,7 @@ AstEllipse *astInitEllipse_( void *mem, size_t size, int init, AstEllipseVtab *v
    if( form != 0 && form != 1 && astOK ) {
       astError( AST__BADIN, "astInitEllipse(%s): The value supplied for "
                 "parameter \"form\" (%d) is illegal - it should be 0 or 1 "
-                "(programming error).", name, form );
+                "(programming error).", status, name, form );
    }
 
 /* Get the number of axis values required for each position. */
@@ -2308,7 +2385,7 @@ AstEllipse *astInitEllipse_( void *mem, size_t size, int init, AstEllipseVtab *v
 /* Report an error if the Frame is not 2-dimensional. */
    if( nc != 2 ) {
       astError( AST__BADIN, "astInitEllipse(%s): The supplied %s has %d "
-                "axes - ellipses must have exactly 2 axes.", name,
+                "axes - ellipses must have exactly 2 axes.", status, name,
                 astGetClass( frame ), nc );
    }
 
@@ -2332,7 +2409,7 @@ AstEllipse *astInitEllipse_( void *mem, size_t size, int init, AstEllipseVtab *v
 
 /* Create a PointSet to hold the supplied values, and get points to the
    data arrays. */
-   pset = astPointSet( 3, nc, "" );
+   pset = astPointSet( 3, nc, "", status );
    ptr = astGetPoints( pset );
 
 /* Copy the supplied coordinates into the PointSet, checking that no bad 
@@ -2340,17 +2417,17 @@ AstEllipse *astInitEllipse_( void *mem, size_t size, int init, AstEllipseVtab *v
    for( i = 0; astOK && i < nc; i++ ) {
       if( centre[ i ] == AST__BAD ) {
          astError( AST__BADIN, "astInitEllipse(%s): The value of axis %d is "
-                   "undefined at the ellipse centre.", name, i + 1 );
+                   "undefined at the ellipse centre.", status, name, i + 1 );
       } 
       if( astOK && p1[ i ] == AST__BAD ) {
          astError( AST__BADIN, "astInitEllipse(%s): The value of axis %d is "
                    "undefined at point 1 on the circumference of "
-                   "the ellipse.", name, i + 1 );
+                   "the ellipse.", status, name, i + 1 );
       }
       if( astOK && p2[ i ] == AST__BAD ) {
          astError( AST__BADIN, "astInitEllipse(%s): The value of axis %d is "
                    "undefined at point 2 on the circumference of "
-                   "the ellipse.", name, i + 1 );
+                   "the ellipse.", status, name, i + 1 );
       }
       ptr[ i ][ 0 ] = centre[ i ];
       ptr[ i ][ 1 ] = p1[ i ];
@@ -2388,7 +2465,7 @@ AstEllipse *astInitEllipse_( void *mem, size_t size, int init, AstEllipseVtab *v
 }
 
 AstEllipse *astLoadEllipse_( void *mem, size_t size, AstEllipseVtab *vtab, 
-                           const char *name, AstChannel *channel ) {
+                           const char *name, AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -2461,6 +2538,7 @@ AstEllipse *astLoadEllipse_( void *mem, size_t size, AstEllipseVtab *vtab,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstEllipse *new;              /* Pointer to the new Ellipse */
 
 /* Initialise. */
@@ -2468,6 +2546,9 @@ AstEllipse *astLoadEllipse_( void *mem, size_t size, AstEllipseVtab *vtab,
 
 /* Check the global error status. */
    if ( !astOK ) return new;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* If a NULL virtual function table has been supplied, then this is
    the first loader to be invoked for this Ellipse. In this case the
@@ -2533,6 +2614,10 @@ AstEllipse *astLoadEllipse_( void *mem, size_t size, AstEllipseVtab *vtab,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
+
+
+
+
 
 
 

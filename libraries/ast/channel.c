@@ -33,6 +33,7 @@ f     and "sink" routines which connect it to an external data store
 *     - Comment: Include textual comments in output?
 *     - Full: Set level of output detail
 *     - Skip: Skip irrelevant data?
+*     - Strict: Report an error if unexpected data items are found?
 
 *  Functions:
 c     In addition to those functions applicable to all Objects, the
@@ -90,6 +91,8 @@ f     - AST_WRITE: Write an Object to a Channel
 *     16-AUG-2006 (DSB):
 *        - Document non-destructive nature of unsuccessful astRead calls
 *        on a FitsChan.
+*     3-OCT-2008 (DSB):
+*        Added "Strict" attribute.
 *class--
 */
 
@@ -109,15 +112,21 @@ f     - AST_WRITE: Write an Object to a Channel
 /* Define the increment used for indenting output text. */
 #define INDENT_INC 3
 
+/* Max length of string returned by GetAttrib */
+#define GETATTRIB_BUFF_LEN 50    
+
 /* Include files. */
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
 #include "object.h"              /* Base Object class */
 #include "channel.h"             /* Interface definition for this class */
 #include "loader.h"              /* Interface to the global loader */
+#include "globals.h"             /* Thread-safe global data access */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -134,33 +143,74 @@ f     - AST_WRITE: Write an Object to a Channel
 #include <stdio.h>
 #include <string.h>
 
-/* Type definitions. */
-/* ================= */
-/* Define a private structure type used to store linked lists of
-   name-value associations. */
-typedef struct Value {
-   struct Value *flink;          /* Link to next element */
-   struct Value *blink;          /* Link to previous element */
-   char *name;                   /* Pointer to name string */
-   union {                       /* Holds pointer to value */
-      char *string;              /* Pointer to string value */
-      AstObject *object;         /* Pointer to Object value */
-   } ptr;
-   int is_object;                /* Whether value is an Object (else string) */
-} Value;
-
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstChannelVtab class_vtab; /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static const char *(* parent_getattrib)( AstObject *, const char * );
-static int (* parent_testattrib)( AstObject *, const char * );
-static void (* parent_clearattrib)( AstObject *, const char * );
-static void (* parent_setattrib)( AstObject *, const char * );
+static const char *(* parent_getattrib)( AstObject *, const char *, int * );
+static int (* parent_testattrib)( AstObject *, const char *, int * );
+static void (* parent_clearattrib)( AstObject *, const char *, int * );
+static void (* parent_setattrib)( AstObject *, const char *, int * );
+
+/* Define macros for accessing each item of thread specific global data. */
+#ifdef THREAD_SAFE
+
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; \
+   globals->AstReadClassData_Msg = 0; \
+   globals->GetAttrib_Buff[ 0 ] = 0; \
+   globals->Items_Written = 0; \
+   globals->Current_Indent = 0; \
+   globals->Nest = -1; \
+   globals->Nwrite_Invoc = 0; \
+   globals->Object_Class = NULL; \
+   globals->Values_List = NULL; \
+   globals->Values_Class = NULL; \
+   globals->Values_OK = NULL; \
+   globals->End_Of_Object = NULL;
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(Channel)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(Channel,Class_Init)
+#define class_vtab astGLOBAL(Channel,Class_Vtab)
+#define astreadclassdata_msg astGLOBAL(Channel,AstReadClassData_Msg)
+#define getattrib_buff astGLOBAL(Channel,GetAttrib_Buff)
+#define items_written  astGLOBAL(Channel,Items_Written)
+#define current_indent astGLOBAL(Channel,Current_Indent)
+#define nest           astGLOBAL(Channel,Nest)
+#define nwrite_invoc   astGLOBAL(Channel,Nwrite_Invoc)
+#define object_class   astGLOBAL(Channel,Object_Class)
+#define values_list    astGLOBAL(Channel,Values_List)
+#define values_class   astGLOBAL(Channel,Values_Class)
+#define values_ok      astGLOBAL(Channel,Values_OK)
+#define end_of_object  astGLOBAL(Channel,End_Of_Object)
+
+
+
+static pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
+#define LOCK_MUTEX2 pthread_mutex_lock( &mutex2 ); 
+#define UNLOCK_MUTEX2 pthread_mutex_unlock( &mutex2 ); 
+
+static pthread_mutex_t mutex3 = PTHREAD_MUTEX_INITIALIZER;
+#define LOCK_MUTEX3 pthread_mutex_lock( &mutex3 ); 
+#define UNLOCK_MUTEX3 pthread_mutex_unlock( &mutex3 ); 
+
+/* If thread safety is not needed, declare and initialise globals at static 
+   variables. */ 
+#else
+
+/* Contextual error message reported in astReadClassData? */
+static int astreadclassdata_msg = 0;
+
+/* Buffer returned by GetAttrib. */
+static char getattrib_buff[ GETATTRIB_BUFF_LEN + 1 ];
 
 /* Count of the number of output items written since the last "Begin"
    or "IsA" item. */
@@ -174,7 +224,7 @@ static int current_indent = 0;
 static int nest = -1;
 
 /* The number of times astWrite has been invoked. */
-static int nWriteInvoc = 0;
+static int nwrite_invoc = 0;
 
 /***
    The following items are all pointers to dynamically allocated
@@ -189,7 +239,7 @@ static char **object_class = NULL;
 
 /* Stack of pointers to the elements designated as the "heads" of
    circular, doubly linked lists of name-value associations. */
-static Value **values_list = NULL;
+static AstChannelValue **values_list = NULL;
 
 /* Stack of pointers to null-terminated character strings giving the
    names of the classes for which the values held in the values lists
@@ -205,65 +255,86 @@ static int *values_ok = NULL;
    the Objects being built at each nesting level. */
 static int *end_of_object = NULL;
 
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstChannelVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+#define LOCK_MUTEX2
+#define UNLOCK_MUTEX2
+#define LOCK_MUTEX3
+#define UNLOCK_MUTEX3
+
+#endif
+
 /* External Interface Function Prototypes. */
 /* ======================================= */
 /* The following functions have public prototypes only (i.e. no
    protected prototypes), so we must provide local prototypes for use
    within this module. */
-AstChannel *astChannelForId_( const char *(*)( void ), char *(*)( const char *(*)( void ) ), void (*)( const char * ), void (*)( void (*)( const char * ), const char * ), const char *, ... );
+AstChannel *astChannelForId_( const char *(*)( void ),
+                              char *(*)( const char *(*)( void ), int * ),
+                              void (*)( const char * ),
+                              void (*)( void (*)( const char * ),
+                                        const char *, int * ),
+                              const char *, ... );
 AstChannel *astChannelId_( const char *(*)( void ), void (*)( const char * ), const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static AstObject *Read( AstChannel * );
-static AstObject *ReadObject( AstChannel *, const char *, AstObject * );
-static Value *FreeValue( Value * );
-static Value *LookupValue( const char * );
-static char *InputTextItem( AstChannel * );
-static char *InputTextItem( AstChannel * );
-static char *ReadString( AstChannel *, const char *, const char * );
-static char *SourceWrap( const char *(*)( void ) );
-static const char *GetAttrib( AstObject *, const char * );
-static double ReadDouble( AstChannel *, const char *, double );
-static int GetComment( AstChannel * );
-static int GetFull( AstChannel * );
-static int GetSkip( AstChannel * );
-static int ReadInt( AstChannel *, const char *, int );
-static int TestAttrib( AstObject *, const char * );
-static int TestComment( AstChannel * );
-static int TestFull( AstChannel * );
-static int TestSkip( AstChannel * );
-static int Use( AstChannel *, int, int );
-static int Write( AstChannel *, AstObject * );
-static void AppendValue( Value *, Value ** );
-static void ClearAttrib( AstObject *, const char * );
-static void ClearComment( AstChannel * );
-static void ClearFull( AstChannel * );
-static void ClearSkip( AstChannel * );
-static void ClearValues( AstChannel * );
-static void Dump( AstObject *, AstChannel * );
-static void GetNextData( AstChannel *, int, char **, char ** );
-static void OutputTextItem( AstChannel *, const char * );
-static void PutNextText( AstChannel *, const char * );
-static void ReadClassData( AstChannel *, const char * );
-static void RemoveValue( Value *, Value ** );
-static void SetAttrib( AstObject *, const char * );
-static void SetComment( AstChannel *, int );
-static void SetFull( AstChannel *, int );
-static void SetSkip( AstChannel *, int );
-static void SinkWrap( void (*)( const char * ), const char * );
-static void Unquote( AstChannel *, char * );
-static void WriteBegin( AstChannel *, const char *, const char * );
-static void WriteDouble( AstChannel *, const char *, int, int, double, const char * );
-static void WriteEnd( AstChannel *, const char * );
-static void WriteInt( AstChannel *, const char *, int, int, int, const char * );
-static void WriteIsA( AstChannel *, const char *, const char * );
-static void WriteObject( AstChannel *, const char *, int, int, AstObject *, const char * );
-static void WriteString( AstChannel *, const char *, int, int, const char *, const char * );
+static AstObject *Read( AstChannel *, int * );
+static AstObject *ReadObject( AstChannel *, const char *, AstObject *, int * );
+static AstChannelValue *FreeValue( AstChannelValue *, int * );
+static AstChannelValue *LookupValue( const char *, int * );
+static char *GetNextText( AstChannel *, int * );
+static char *InputTextItem( AstChannel *, int * );
+static char *ReadString( AstChannel *, const char *, const char *, int * );
+static char *SourceWrap( const char *(*)( void ), int * );
+static const char *GetAttrib( AstObject *, const char *, int * );
+static double ReadDouble( AstChannel *, const char *, double, int * );
+static int GetComment( AstChannel *, int * );
+static int GetFull( AstChannel *, int * );
+static int GetSkip( AstChannel *, int * );
+static int GetStrict( AstChannel *, int * );
+static int ReadInt( AstChannel *, const char *, int, int * );
+static int TestAttrib( AstObject *, const char *, int * );
+static int TestComment( AstChannel *, int * );
+static int TestFull( AstChannel *, int * );
+static int TestSkip( AstChannel *, int * );
+static int TestStrict( AstChannel *, int * );
+static int Use( AstChannel *, int, int, int * );
+static int Write( AstChannel *, AstObject *, int * );
+static void AppendValue( AstChannelValue *, AstChannelValue **, int * );
+static void ClearAttrib( AstObject *, const char *, int * );
+static void ClearComment( AstChannel *, int * );
+static void ClearFull( AstChannel *, int * );
+static void ClearSkip( AstChannel *, int * );
+static void ClearStrict( AstChannel *, int * );
+static void ClearValues( AstChannel *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void GetNextData( AstChannel *, int, char **, char **, int * );
+static void OutputTextItem( AstChannel *, const char *, int * );
+static void PutNextText( AstChannel *, const char *, int * );
+static void ReadClassData( AstChannel *, const char *, int * );
+static void RemoveValue( AstChannelValue *, AstChannelValue **, int * );
+static void SetAttrib( AstObject *, const char *, int * );
+static void SetComment( AstChannel *, int, int * );
+static void SetFull( AstChannel *, int, int * );
+static void SetSkip( AstChannel *, int, int * );
+static void SetStrict( AstChannel *, int, int * );
+static void SinkWrap( void (*)( const char * ), const char *, int * );
+static void Unquote( AstChannel *, char *, int * );
+static void WriteBegin( AstChannel *, const char *, const char *, int * );
+static void WriteDouble( AstChannel *, const char *, int, int, double, const char *, int * );
+static void WriteEnd( AstChannel *, const char *, int * );
+static void WriteInt( AstChannel *, const char *, int, int, int, const char *, int * );
+static void WriteIsA( AstChannel *, const char *, const char *, int * );
+static void WriteObject( AstChannel *, const char *, int, int, AstObject *, const char *, int * );
+static void WriteString( AstChannel *, const char *, int, int, const char *, const char *, int * );
 
 /* Member functions. */
 /* ================= */
-static void AppendValue( Value *value, Value **head ) {
+static void AppendValue( AstChannelValue *value, AstChannelValue **head, int *status ) {
 /*
 *  Name:
 *     AppendValue
@@ -276,7 +347,7 @@ static void AppendValue( Value *value, Value **head ) {
 
 *  Synopsis:
 *     #include "channel.h"
-*     void AppendValue( Value *value, Value **head )
+*     void AppendValue( AstChannelValue *value, AstChannelValue **head, int *status )
 
 *  Class Membership:
 *     Channel member function.
@@ -297,6 +368,8 @@ static void AppendValue( Value *value, Value **head ) {
 *        (this pointer should be NULL if the list is initially
 *        empty). This pointer will only be updated if a new element is
 *        being added to an empty list.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - This function does not perform error chacking and does not
@@ -322,7 +395,7 @@ static void AppendValue( Value *value, Value **head ) {
    }
 }
 
-static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     ClearAttrib
@@ -335,7 +408,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "channel.h"
-*     void ClearAttrib( AstObject *this, const char *attrib )
+*     void ClearAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     Channel member function (over-rides the astClearAttrib protected
@@ -352,6 +425,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -380,14 +455,19 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "skip" ) ) {
       astClearSkip( this );
 
+/* Strict. */
+/* ------- */
+   } else if ( !strcmp( attrib, "strict" ) ) {
+      astClearStrict( this );
+
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      (*parent_clearattrib)( this_object, attrib );
+      (*parent_clearattrib)( this_object, attrib, status );
    }
 }
 
-static void ClearValues( AstChannel *this ) {
+static void ClearValues( AstChannel *this, int *status ) {
 /*
 *  Name:
 *     ClearValues
@@ -400,7 +480,7 @@ static void ClearValues( AstChannel *this ) {
 
 *  Synopsis:
 *     #include "channel.h"
-*     void ClearValues( AstChannel *this )
+*     void ClearValues( AstChannel *this, int *status )
 
 *  Class Membership:
 *     Channel member function.
@@ -423,6 +503,8 @@ static void ClearValues( AstChannel *this ) {
 *     this
 *        Pointer to the Channel being read. This is only used for
 *        constructing error messages. It must not be NULL.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - This function attempts to execute even if the global error
@@ -431,8 +513,12 @@ static void ClearValues( AstChannel *this ) {
 */
 
 /* Local Variables: */
-   Value **head;                 /* Address of pointer to values list */
-   Value *value;                 /* Pointer to value list element */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   AstChannelValue **head;       /* Address of pointer to values list */
+   AstChannelValue *value;       /* Pointer to value list element */
+
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this);
 
 /* If "values_class" is non-NULL, then the values list has previously
    been filled with Values for a class. */
@@ -441,14 +527,14 @@ static void ClearValues( AstChannel *this ) {
 /* If "values_ok" is zero, however, then these Values have not yet
    been read by a class loader. This must be due to a bad class name
    associated with them or because the class data are not available in
-   the correct order. Report an error (unless the error status is
-   already set). */
-      if ( !values_ok[ nest ] && astOK ) {
+   the correct order. If we are using strict error reporting, then report 
+   an error (unless the error status is already set). */
+      if ( astGetStrict( this ) && !values_ok[ nest ] && astOK ) {
          astError( AST__BADIN,
-                   "astRead(%s): Invalid class structure in input data.",
+                   "astRead(%s): Invalid class structure in input data.", status,
                    astGetClass( this ) );
          astError( AST__BADIN,
-                   "Class \"%s\" is invalid or out of order within a %s.",
+                   "Class \"%s\" is invalid or out of order within a %s.", status,
                    values_class[ nest ], object_class[ nest ] );
       }
 
@@ -471,30 +557,31 @@ static void ClearValues( AstChannel *this ) {
 
 /* If no error has yet occurred, then report an appropriate error
    message, depending on whether the Value is associated with an
-   Object or a string. */
-      if ( astOK ) {
+   Object or a string. Only do this if we are using strict error
+   reporting. */
+      if ( astGetStrict( this ) && astOK ) {
          if ( value->is_object ) {
             astError( AST__BADIN,
                       "astRead(%s): The Object \"%s = <%s>\" was "
-                      "not recognised as valid input.",
+                      "not recognised as valid input.", status,
                       astGetClass( this ), value->name,
                       astGetClass( value->ptr.object ) );
          } else {
             astError( AST__BADIN,
                       "astRead(%s): The value \"%s = %s\" was not "
-                      "recognised as valid input.",
+                      "recognised as valid input.", status,
                       astGetClass( this ), value->name, value->ptr.string );
          }
       }
 
 /* Remove the Value structure from the list (which updates the head of
    list pointer) and free its resources. */
-      RemoveValue( value, head );
-      value = FreeValue( value );
+      RemoveValue( value, head, status );
+      value = FreeValue( value, status );
    }
 }
 
-static Value *FreeValue( Value *value ) {
+static AstChannelValue *FreeValue( AstChannelValue *value, int *status ) {
 /*
 *  Name:
 *     FreeValue
@@ -507,7 +594,7 @@ static Value *FreeValue( Value *value ) {
 
 *  Synopsis:
 *     #include "channel.h"
-*     Value *FreeValue( Value *value )
+*     AstChannelValue *FreeValue( AstChannelValue *value, int *status )
 
 *  Class Membership:
 *     Channel member function.
@@ -520,6 +607,8 @@ static Value *FreeValue( Value *value ) {
 *  Parameters:
 *     value
 *        Pointer to the Value structure to be freed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A NULL pointer is always returned.
@@ -558,7 +647,7 @@ static Value *FreeValue( Value *value ) {
    return NULL;
 }
 
-static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+static const char *GetAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     GetAttrib
@@ -571,7 +660,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "channel.h"
-*     const char *GetAttrib( AstObject *this, const char *attrib )
+*     const char *GetAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     Channel member function (over-rides the protected astGetAttrib
@@ -588,6 +677,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null terminated string containing the name of
 *        the attribute whose value is required. This name should be in
 *        lower case, with all white space removed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     - Pointer to a null terminated string containing the attribute
@@ -605,16 +696,14 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *     reason.
 */
 
-/* Local Constants: */
-#define BUFF_LEN 50              /* Max. characters in result buffer */
-
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    AstChannel *this;             /* Pointer to the Channel structure */
    const char *result;           /* Pointer value to return */
    int comment;                  /* Comment attribute value */
    int full;                     /* Full attribute value */
    int skip;                     /* Skip attribute value */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
+   int strict;                   /* Report errors for unexpected data items? */
 
 /* Initialise. */
    result = NULL;
@@ -622,12 +711,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Check the global error status. */   
    if ( !astOK ) return result;
 
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this_object);
+
 /* Obtain a pointer to the Channel structure. */
    this = (AstChannel *) this_object;
 
 /* Compare "attrib" with each recognised attribute name in turn,
    obtaining the value of the required attribute. If necessary, write
-   the value into "buff" as a null terminated string in an appropriate
+   the value into "getattrib_buff" as a null terminated string in an appropriate
    format.  Set "result" to point at the result string. */
 
 /* Comment. */
@@ -635,8 +727,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    if ( !strcmp( attrib, "comment" ) ) {
       comment = astGetComment( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", comment );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", comment );
+         result = getattrib_buff;
       }
 
 /* Full. */
@@ -644,8 +736,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "full" ) ) {
       full = astGetFull( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", full );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", full );
+         result = getattrib_buff;
       }
 
 /* Skip. */
@@ -653,25 +745,32 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "skip" ) ) {
       skip = astGetSkip( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", skip );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", skip );
+         result = getattrib_buff;
+      }
+
+/* Strict. */
+/* ------- */
+   } else if ( !strcmp( attrib, "strict" ) ) {
+      strict = astGetStrict( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%d", strict );
+         result = getattrib_buff;
       }
 
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_getattrib)( this_object, attrib );
+      result = (*parent_getattrib)( this_object, attrib, status );
    }
 
 /* Return the result. */
    return result;
 
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
 
 static void GetNextData( AstChannel *this, int skip, char **name,
-                         char **val ) {
+                         char **val, int *status ) {
 /*
 *+
 *  Name:
@@ -803,7 +902,7 @@ static void GetNextData( AstChannel *this, int skip, char **name,
 /* Read the next input line as text (the loop is needed to allow
    initial lines to be skipped if the "skip" flag is set). */
    done = 0;
-   while ( !done && ( line = InputTextItem( this ) ) && astOK ) {
+   while ( !done && ( line = InputTextItem( this, status ) ) && astOK ) {
 
 /* If OK, determine the line length. */
       len = strlen( line );
@@ -836,7 +935,7 @@ static void GetNextData( AstChannel *this, int skip, char **name,
             ( *val )[ i + 1 ] = '\0';
 
 /* Also remove any quotes from the string. */
-            Unquote( this, *val );
+            Unquote( this, *val, status );
          }
 
 /* Object value. */
@@ -919,7 +1018,7 @@ static void GetNextData( AstChannel *this, int skip, char **name,
    is not set, then report an error. */
       } else if ( !skip ) {
          astError( AST__BADIN,
-                   "astRead(%s): Cannot interpret the input data: \"%s\".",
+                   "astRead(%s): Cannot interpret the input data: \"%s\".", status,
                    astGetClass( this ), line );
       }
 
@@ -942,7 +1041,7 @@ static void GetNextData( AstChannel *this, int skip, char **name,
    }
 }
 
-static char *GetNextText( AstChannel *this ) {
+static char *GetNextText( AstChannel *this, int *status ) {
 /*
 *+
 *  Name:
@@ -993,8 +1092,10 @@ static char *GetNextText( AstChannel *this ) {
 
 /* Local Constants: */
 #define MIN_CHARS 81             /* Initial size for allocating memory */
+#define ERRBUF_LEN 80
 
 /* Local Variables: */
+   char errbuf[ ERRBUF_LEN ];    /* Buffer for system error message */
    char *line;                   /* Pointer to line data to be returned */
    int c;                        /* Input character */
    int len;                      /* Length of input line */
@@ -1007,6 +1108,10 @@ static char *GetNextText( AstChannel *this ) {
 /* Check the global error status. */
    if ( !astOK ) return line;
 
+/* About to call an externally supplied function which may not be
+   thread-safe, so lock a mutex first. */
+   LOCK_MUTEX3;
+
 /* Source function defined. */
 /* ------------------------ */
 /* If a source function (and its wrapper function) is defined for the
@@ -1014,7 +1119,7 @@ static char *GetNextText( AstChannel *this ) {
    read a line of input text. This is returned in a dynamically
    allocated string. */
    if ( this->source && this->source_wrap ) {
-      line = ( *this->source_wrap )( this->source );
+      line = ( *this->source_wrap )( this->source, status );
 
 /* No source function. */
 /* ------------------- */
@@ -1055,12 +1160,13 @@ static char *GetNextText( AstChannel *this ) {
    "errno" value (but only if one was set). */
       if ( astOK && ( c == EOF ) && ferror( stdin ) ) {
          if ( readstat ) {
+            strerror_r( readstat, errbuf, ERRBUF_LEN );
             astError( AST__RDERR,
-                      "astRead(%s): Read error on standard input - %s.",
-                      astGetClass( this ), strerror( readstat ) );
+                      "astRead(%s): Read error on standard input - %s.", status,
+                      astGetClass( this ), errbuf );
          } else {
             astError( AST__RDERR,
-                      "astRead(%s): Read error on standard input.",
+                      "astRead(%s): Read error on standard input.", status,
                       astGetClass( this ) );
          }
       }
@@ -1084,20 +1190,23 @@ static char *GetNextText( AstChannel *this ) {
       }
    }
 
+   UNLOCK_MUTEX3;
+
 /* Return the result pointer. */
    return line;
 
 /* Undefine macros local to this function. */
 #undef MIN_CHARS
+#undef ERRBUF_LEN
 }
 
 AstChannel *astInitChannel_( void *mem, size_t size, int init,
                              AstChannelVtab *vtab, const char *name,
                              const char *(* source)( void ),
-                             char *(* source_wrap)( const char *(*)( void ) ),
+                             char *(* source_wrap)( const char *(*)( void ), int * ),
                              void (* sink)( const char * ),
                              void (* sink_wrap)( void (*)( const char * ),
-                                                 const char * ) ) {
+                                                 const char *, int * ), int *status ) {
 /*
 *+
 *  Name:
@@ -1114,10 +1223,10 @@ AstChannel *astInitChannel_( void *mem, size_t size, int init,
 *     AstChannel *astInitChannel( void *mem, size_t size, int init,
 *                                 AstChannelVtab *vtab, const char *name,
 *                                 const char *(* source)( void ),
-*                                 char *(* source_wrap)( const char *(*)( void ) ),
+*                                 char *(* source_wrap)( const char *(*)( void ), int * ),
 *                                 void (* sink)( const char * ),
 *                                 void (* sink_wrap)( void (*)( const char * ),
-*                                                     const char * ) )
+*                                                     const char *, int * ) )
 
 *  Class Membership:
 *     Channel initialiser.
@@ -1256,6 +1365,7 @@ AstChannel *astInitChannel_( void *mem, size_t size, int init,
       new->comment = -INT_MAX;
       new->full = -INT_MAX;
       new->skip = -INT_MAX;
+      new->strict = -INT_MAX;
 
 /* If an error occurred, clean up by deleting the new object. */
       if ( !astOK ) new = astDelete( new );
@@ -1265,7 +1375,7 @@ AstChannel *astInitChannel_( void *mem, size_t size, int init,
    return new;
 }
 
-void astInitChannelVtab_(  AstChannelVtab *vtab, const char *name ) {
+void astInitChannelVtab_(  AstChannelVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -1302,10 +1412,14 @@ void astInitChannelVtab_(  AstChannelVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -1314,8 +1428,8 @@ void astInitChannelVtab_(  AstChannelVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAChannel) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -1324,11 +1438,13 @@ void astInitChannelVtab_(  AstChannelVtab *vtab, const char *name ) {
    vtab->ClearComment = ClearComment;
    vtab->ClearFull = ClearFull;
    vtab->ClearSkip = ClearSkip;
+   vtab->ClearStrict = ClearStrict;
    vtab->GetComment = GetComment;
    vtab->GetFull = GetFull;
    vtab->GetNextData = GetNextData;
    vtab->GetNextText = GetNextText;
    vtab->GetSkip = GetSkip;
+   vtab->GetStrict = GetStrict;
    vtab->PutNextText = PutNextText;
    vtab->Read = Read;
    vtab->ReadClassData = ReadClassData;
@@ -1339,9 +1455,11 @@ void astInitChannelVtab_(  AstChannelVtab *vtab, const char *name ) {
    vtab->SetComment = SetComment;
    vtab->SetFull = SetFull;
    vtab->SetSkip = SetSkip;
+   vtab->SetStrict = SetStrict;
    vtab->TestComment = TestComment;
    vtab->TestFull = TestFull;
    vtab->TestSkip = TestSkip;
+   vtab->TestStrict = TestStrict;
    vtab->Write = Write;
    vtab->WriteBegin = WriteBegin;
    vtab->WriteDouble = WriteDouble;
@@ -1367,9 +1485,14 @@ void astInitChannelVtab_(  AstChannelVtab *vtab, const char *name ) {
 /* Declare the Dump function for this class. There is no destructor or
    copy constructor. */
    astSetDump( vtab, Dump, "Channel", "Basic I/O Channel" );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
-static char *InputTextItem( AstChannel *this ) {
+static char *InputTextItem( AstChannel *this, int *status ) {
 /*
 *  Name:
 *     InputTextItem
@@ -1477,7 +1600,7 @@ static char *InputTextItem( AstChannel *this ) {
 #undef MIN_CHARS
 }
 
-static Value *LookupValue( const char *name ) {
+static AstChannelValue *LookupValue( const char *name, int *status ) {
 /*
 *  Name:
 *     LookupValue
@@ -1490,7 +1613,7 @@ static Value *LookupValue( const char *name ) {
 
 *  Synopsis:
 *     #include "channel.h"
-*     Value *LookupValue( const char *name )
+*     AstChannelValue *LookupValue( const char *name )
 
 *  Class Membership:
 *     Channel member function.
@@ -1524,15 +1647,19 @@ static Value *LookupValue( const char *name ) {
 */
 
 /* Local Variables: */
-   Value **head;                 /* Address of head of list pointer */
-   Value *result;                /* Pointer value to return */
-   Value *value;                 /* Pointer to list element */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   AstChannelValue **head;       /* Address of head of list pointer */
+   AstChannelValue *result;      /* Pointer value to return */
+   AstChannelValue *value;       /* Pointer to list element */
 
 /* Initialise. */
    result = NULL;
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(NULL);
 
 /* Check that the "values_ok" flag is set. If not, the Values in the
    values list belong to a different class to that of the current
@@ -1553,7 +1680,7 @@ static Value *LookupValue( const char *name ) {
 /* If a name match is found, remove the element from the list, return
    a pointer to it and quit searching. */
             if ( !strcmp( name, value->name ) ) {
-               RemoveValue( value, head );
+               RemoveValue( value, head, status );
                result = value;
                break;
             }
@@ -1569,7 +1696,7 @@ static Value *LookupValue( const char *name ) {
    return result;
 }
 
-static void OutputTextItem( AstChannel *this, const char *line ) {
+static void OutputTextItem( AstChannel *this, const char *line, int *status ) {
 /*
 *  Name:
 *     OutputTextItem
@@ -1582,7 +1709,7 @@ static void OutputTextItem( AstChannel *this, const char *line ) {
 
 *  Synopsis:
 *     #include "channel.h"
-*     void OutputTextItem( AstChannel *this, const char *line )
+*     void OutputTextItem( AstChannel *this, const char *line, int *status )
 
 *  Class Membership:
 *     Channel member function.
@@ -1599,10 +1726,18 @@ static void OutputTextItem( AstChannel *this, const char *line ) {
 *        Pointer to a constant null-terminated string containing the
 *        data item to be output (no newline character should be
 *        appended).
+*     status
+*        Pointer to the inherited status variable.
 */
+
+/* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this);
 
 /* Write out the line of text using the astPutNextText method (which
    may be over-ridden). */
@@ -1612,7 +1747,7 @@ static void OutputTextItem( AstChannel *this, const char *line ) {
    if ( astOK ) items_written++;
 }
 
-static void PutNextText( AstChannel *this, const char *line ) {
+static void PutNextText( AstChannel *this, const char *line, int *status ) {
 /*
 *+
 *  Name:
@@ -1653,20 +1788,27 @@ static void PutNextText( AstChannel *this, const char *line ) {
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* About to call an externally supplied function which may not be
+   thread-safe, so lock a mutex first. */
+   LOCK_MUTEX2;
+
 /* If a sink function (and its wrapper function) is defined for the
    Channel, use the wrapper function to invoke the sink function to
    output the text line. */
    if ( this->sink && this->sink_wrap ) {
-      ( *this->sink_wrap )( *this->sink, line );
+      ( *this->sink_wrap )( *this->sink, line, status );
 
 /* Otherwise, simply write the text to standard output with a newline
    appended. */
    } else {
       (void) printf( "%s\n", line );
    }
+
+   UNLOCK_MUTEX2;
+
 }
 
-static AstObject *Read( AstChannel *this ) {
+static AstObject *Read( AstChannel *this, int *status ) {
 /*
 *++
 *  Name:
@@ -1732,6 +1874,7 @@ f     is invoked with STATUS set to an error value, or if it should fail
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    AstLoaderType *loader;        /* Pointer to loader for Object */
    AstObject *new;               /* Pointer to new Object */
    char *class;                  /* Pointer to Object class name string */
@@ -1744,6 +1887,9 @@ f     is invoked with STATUS set to an error value, or if it should fail
 
 /* Check the global error status. */
    if ( !astOK ) return new;
+
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this);
 
 /* Determine if we are reading a top-level (i.e. user-level) Object
    definition, as opposed to the definition of an Object contained
@@ -1771,14 +1917,14 @@ f     is invoked with STATUS set to an error value, or if it should fail
          if ( !top ) {
             astError( AST__EOCHN,
                       "astRead(%s): End of input encountered while trying to "
-                      "read an AST Object.", astGetClass( this ) );
+                      "read an AST Object.", status, astGetClass( this ) );
          }
 
 /* If a data item was found, check it is a "Begin" item. If not, there
    is a data item missing, so report an error and free all memory. */
       } else if ( strcmp( name, "begin" ) ) {
          astError( AST__BADIN,
-                   "astRead(%s): Missing \"Begin\" when expecting an Object.",
+                   "astRead(%s): Missing \"Begin\" when expecting an Object.", status,
                    astGetClass( this ) );
          name = astFree( name );
          if ( class ) class = astFree( class );
@@ -1790,7 +1936,7 @@ f     is invoked with STATUS set to an error value, or if it should fail
 
 /* Use the associated class name to locate the loader for that
    class. This function will then be used to build the Object. */
-         loader = astGetLoader( class );
+         loader = astGetLoader( class, status );
 
 /* Extend all necessary stack arrays to accommodate entries for the
    next nesting level (this allocates space if none has yet been
@@ -1798,7 +1944,7 @@ f     is invoked with STATUS set to an error value, or if it should fail
          end_of_object = astGrow( end_of_object, nest + 2, sizeof( int ) );
          object_class = astGrow( object_class, nest + 2, sizeof( char * ) );
          values_class = astGrow( values_class, nest + 2, sizeof( char * ) );
-         values_list = astGrow( values_list, nest + 2, sizeof( Value * ) );
+         values_list = astGrow( values_list, nest + 2, sizeof( AstChannelValue * ) );
          values_ok = astGrow( values_ok, nest + 2, sizeof( int ) );
 
 /* If an error occurred, free the memory used by the class string,
@@ -1822,12 +1968,12 @@ f     is invoked with STATUS set to an error value, or if it should fail
    data stream and builds the Object. Supply NULL/zero values to the
    loader so that it will substitute values appropriate to its own
    class. */
-            new = (*loader)( NULL, (size_t) 0, NULL, NULL, this );
+            new = (*loader)( NULL, (size_t) 0, NULL, NULL, this, status );
 
 /* Clear the values list for the current nesting level. If the list
    has not been read or any Values remain in it, an error will
    result. */
-            ClearValues( this );
+            ClearValues( this, status );
 
 /* If no error has yet occurred, check that the "end_of_object" flag
    has been set. If not, the input data were not correctly terminated,
@@ -1835,14 +1981,14 @@ f     is invoked with STATUS set to an error value, or if it should fail
             if ( astOK && !end_of_object[ nest ] ) {
                astError( AST__BADIN,
                          "astRead(%s): Unexpected end of input (missing end "
-                         "of %s).",
+                         "of %s).", status,
                          astGetClass( this ), object_class[ nest ] );
             }
 
 /* If an error occurred, report contextual information. Only do this
    for top-level Objects to avoid multple messages. */
             if ( !astOK && top ) {
-               astError( astStatus, "Error while reading a %s from a %s.",
+               astError( astStatus, "Error while reading a %s from a %s.", status,
                          class, astGetClass( this ) );
             }
 
@@ -1875,7 +2021,7 @@ f     is invoked with STATUS set to an error value, or if it should fail
    return new;
 }
 
-static void ReadClassData( AstChannel *this, const char *class ) {
+static void ReadClassData( AstChannel *this, const char *class, int *status ) {
 /*
 *+
 *  Name:
@@ -1923,15 +2069,18 @@ static void ReadClassData( AstChannel *this, const char *class ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    AstObject *object;            /* Pointer to new Object */
-   Value *value;                 /* Pointer to Value structure */
+   AstChannelValue *value;       /* Pointer to Value structure */
    char *name;                   /* Pointer to data item name string */
    char *val;                    /* Pointer to data item value string */
    int done;                     /* All class data read? */
-   static int msg;               /* Contextual error message reported? */
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this);
 
 /* If the "values_ok" flag is set, this indicates that the values list
    (at the current nesting level) has been filled by a previous
@@ -1940,7 +2089,7 @@ static void ReadClassData( AstChannel *this, const char *class ) {
    remain in the current values list. If any such entries are found,
    they represent input data that were not read, so an error will
    result. */
-   if ( values_ok[ nest ] ) ClearValues( this );
+   if ( values_ok[ nest ] ) ClearValues( this, status );
 
 /* If "values_class" is non-NULL, this indicates that the values list
    (at the current nesting level) has been filled by a previous
@@ -1965,10 +2114,10 @@ static void ReadClassData( AstChannel *this, const char *class ) {
    } else if ( end_of_object[ nest ] ) {
       astError( AST__LDERR,
                 "astRead(%s): Invalid attempt to read further %s data "
-                "following an end of %s.",
+                "following an end of %s.", status,
                 astGetClass( this ), class, object_class[ nest ] );
       astError( AST__LDERR,
-                "Perhaps the wrong class loader has been invoked?" );
+                "Perhaps the wrong class loader has been invoked?" , status);
 
 /* If we need new values, loop to read input data items until the end
    of the data for a class is reached. */
@@ -1988,7 +2137,7 @@ static void ReadClassData( AstChannel *this, const char *class ) {
             if ( !name ) {
                astError( AST__EOCHN,
                          "astRead(%s): Unexpected end of input (missing end "
-                         "of %s).",
+                         "of %s).", status,
                          astGetClass( this ), object_class[ nest ] );
 
 /* "IsA" item. */
@@ -2034,10 +2183,10 @@ static void ReadClassData( AstChannel *this, const char *class ) {
    the corresponding "Begin" item), then report an error. */
                } else {
                   astError( AST__BADIN,
-                            "astRead(%s): Bad class structure in input data.",
+                            "astRead(%s): Bad class structure in input data.", status,
                             astGetClass( this ) );
                   astError( AST__BADIN,
-                            "End of %s read when expecting end of %s.",
+                            "End of %s read when expecting end of %s.", status,
                             val, object_class[ nest ] );
 
 /* Free the memory used by the class string, which will not now be
@@ -2057,7 +2206,7 @@ static void ReadClassData( AstChannel *this, const char *class ) {
    non-Object value, encoded as a string. Allocate memory for a Value
    structure to describe it. */
             } else if ( val ) {
-               value = astMalloc( sizeof( Value ) );
+               value = astMalloc( sizeof( AstChannelValue ) );
                if ( astOK ) {
 
 /* Store pointers to the name and value string in the Value structure
@@ -2068,7 +2217,7 @@ static void ReadClassData( AstChannel *this, const char *class ) {
 
 /* Append the Value structure to the values list for the current
    nesting level. */
-                  AppendValue( value, values_list + nest );
+                  AppendValue( value, values_list + nest, status );
 
 /* If an error occurred, free the memory holding the "name" and "val"
    strings. */
@@ -2083,14 +2232,14 @@ static void ReadClassData( AstChannel *this, const char *class ) {
    definition should follow. Allocate memory for a Value structure to
    describe it. */
             } else {
-               value = astMalloc( sizeof( Value ) );
+               value = astMalloc( sizeof( AstChannelValue ) );
 
 /* Invoke astRead to read the Object definition from subsequent data
    items and to build the Object, returning a pointer to it. This will
    result in recursive calls to the current function, but as these
    will use higher nesting levels they will not interfere with the
    current invocation. */
-               msg = 0;
+               astreadclassdata_msg = 0;
                object = astRead( this );
                if ( astOK ) {
 
@@ -2102,17 +2251,17 @@ static void ReadClassData( AstChannel *this, const char *class ) {
 
 /* Append the Value structure to the values list for the current
    nesting level. */
-                  AppendValue( value, values_list + nest );
+                  AppendValue( value, values_list + nest, status );
 
 /* If an error occurred, report a contextual error maessage and set
-   the "msg" flag (this prevents multiple messages if this function is
+   the "astreadclassdata_msg" flag (this prevents multiple messages if this function is
    invoked recursively to deal with nested Objects). */
                } else {
-                  if ( !msg ) {
+                  if ( !astreadclassdata_msg ) {
                      astError( astStatus,
-                               "Failed to read the \"%s\" Object value.",
+                               "Failed to read the \"%s\" Object value.", status,
                                name );
-                     msg = 1;
+                     astreadclassdata_msg = 1;
                   }
 
 /* Free the memory holding the "name" string and any Value structure
@@ -2126,7 +2275,7 @@ static void ReadClassData( AstChannel *this, const char *class ) {
    }
 }
 
-static double ReadDouble( AstChannel *this, const char *name, double def ) {
+static double ReadDouble( AstChannel *this, const char *name, double def, int *status ) {
 /*
 *+
 *  Name:
@@ -2182,7 +2331,7 @@ static double ReadDouble( AstChannel *this, const char *name, double def ) {
 */
 
 /* Local Variables: */
-   Value *value;                 /* Pointer to required Value structure */
+   AstChannelValue *value;       /* Pointer to required Value structure */
    double result;                /* Value to be returned */
    int nc;                       /* Number of characters read by astSscanf */
    
@@ -2194,7 +2343,7 @@ static double ReadDouble( AstChannel *this, const char *name, double def ) {
 
 /* Search for a Value structure with the required name in the current
    values list.*/
-   value = LookupValue( name );
+   value = LookupValue( name, status );
    if ( astOK ) {
 
 /* If a Value was found, check that it describes a string (as opposed
@@ -2213,7 +2362,7 @@ static double ReadDouble( AstChannel *this, const char *name, double def ) {
                astError( AST__BADIN,
                          "astRead(%s): The value \"%s = %s\" cannot "
                          "be read as a double precision floating point "
-                         "number.", astGetClass( this ),
+                         "number.", status, astGetClass( this ),
                          value->name, value->ptr.string );
             }
 
@@ -2221,13 +2370,13 @@ static double ReadDouble( AstChannel *this, const char *name, double def ) {
          } else {
             astError( AST__BADIN,
                       "astRead(%s): The Object \"%s = <%s>\" cannot "
-                      "be read as a double precision floating point number.",
+                      "be read as a double precision floating point number.", status,
                       astGetClass( this ),
                       value->name, astGetClass( value->ptr.object ) );
          }
 
 /* Free the Value structure and the resources it points at. */
-         value = FreeValue( value );
+         value = FreeValue( value, status );
 
 /* If no suitable Value structure was found, then use the default
    value instead. */
@@ -2240,7 +2389,7 @@ static double ReadDouble( AstChannel *this, const char *name, double def ) {
    return result;
 }
 
-static int ReadInt( AstChannel *this, const char *name, int def ) {
+static int ReadInt( AstChannel *this, const char *name, int def, int *status ) {
 /*
 *+
 *  Name:
@@ -2296,7 +2445,7 @@ static int ReadInt( AstChannel *this, const char *name, int def ) {
 */
 
 /* Local Variables: */
-   Value *value;                 /* Pointer to required Value structure */
+   AstChannelValue *value;       /* Pointer to required Value structure */
    int nc;                       /* Number of characters read by astSscanf */
    int result;                   /* Value to be returned */
    
@@ -2308,7 +2457,7 @@ static int ReadInt( AstChannel *this, const char *name, int def ) {
 
 /* Search for a Value structure with the required name in the current
    values list.*/
-   value = LookupValue( name );
+   value = LookupValue( name, status );
    if ( astOK ) {
 
 /* If a Value was found, check that it describes a string (as opposed
@@ -2326,7 +2475,7 @@ static int ReadInt( AstChannel *this, const char *name, int def ) {
                     && ( nc >= (int) strlen( value->ptr.string ) ) ) ) {
                astError( AST__BADIN,
                          "astRead(%s): The value \"%s = %s\" cannot "
-                         "be read as an integer.", astGetClass( this ),
+                         "be read as an integer.", status, astGetClass( this ),
                          value->name, value->ptr.string );
             }
 
@@ -2334,12 +2483,12 @@ static int ReadInt( AstChannel *this, const char *name, int def ) {
          } else {
             astError( AST__BADIN,
                       "astRead(%s): The Object \"%s = <%s>\" cannot "
-                      "be read as an integer.", astGetClass( this ),
+                      "be read as an integer.", status, astGetClass( this ),
                       value->name, astGetClass( value->ptr.object ) );
          }
 
 /* Free the Value structure and the resources it points at. */
-         value = FreeValue( value );
+         value = FreeValue( value, status );
 
 /* If no suitable Value structure was found, then use the default
    value instead. */
@@ -2353,7 +2502,7 @@ static int ReadInt( AstChannel *this, const char *name, int def ) {
 }
 
 static AstObject *ReadObject( AstChannel *this, const char *name,
-                              AstObject *def ) {
+                              AstObject *def, int *status ) {
 /*
 *+
 *  Name:
@@ -2413,7 +2562,7 @@ static AstObject *ReadObject( AstChannel *this, const char *name,
 
 /* Local Variables: */
    AstObject *result;            /* Pointer value to return */
-   Value *value;                 /* Pointer to required Value structure */
+   AstChannelValue *value;       /* Pointer to required Value structure */
 
 /* Initialise. */
    result = NULL;
@@ -2423,7 +2572,7 @@ static AstObject *ReadObject( AstChannel *this, const char *name,
 
 /* Search for a Value structure with the required name in the current
    values list.*/
-   value = LookupValue( name );
+   value = LookupValue( name, status );
    if ( astOK ) {
 
 /* If a Value was found, check that it describes an Object (as opposed to
@@ -2441,12 +2590,12 @@ static AstObject *ReadObject( AstChannel *this, const char *name,
          } else {
             astError( AST__BADIN,
                       "astRead(%s): The value \"%s = %s\" cannot be "
-                      "read as an Object.", astGetClass( this ),
+                      "read as an Object.", status, astGetClass( this ),
                       value->name, value->ptr.string );
          }
 
 /* Free the Value structure and the resources it points at. */
-         value = FreeValue( value );
+         value = FreeValue( value, status );
 
 /* If no suitable Value structure was found, clone the default
    pointer, if given. */
@@ -2460,7 +2609,7 @@ static AstObject *ReadObject( AstChannel *this, const char *name,
 }
 
 static char *ReadString( AstChannel *this, const char *name,
-                         const char *def ) {
+                         const char *def, int *status ) {
 /*
 *+
 *  Name:
@@ -2525,7 +2674,7 @@ static char *ReadString( AstChannel *this, const char *name,
 */
 
 /* Local Variables: */
-   Value *value;                 /* Pointer to required Value structure */
+   AstChannelValue *value;       /* Pointer to required Value structure */
    char *result;                 /* Pointer value to return */
 
 /* Initialise. */
@@ -2536,7 +2685,7 @@ static char *ReadString( AstChannel *this, const char *name,
 
 /* Search for a Value structure with the required name in the current
    values list.*/
-   value = LookupValue( name );
+   value = LookupValue( name, status );
    if ( astOK ) {
 
 /* If a Value was found, check that it describes a string (as opposed
@@ -2554,12 +2703,12 @@ static char *ReadString( AstChannel *this, const char *name,
          } else {
             astError( AST__BADIN,
                       "astRead(%s): The Object \"%s = <%s>\" cannot "
-                      "be read as a string.", astGetClass( this ),
+                      "be read as a string.", status, astGetClass( this ),
                       value->name, astGetClass( value->ptr.object ) );
          }
 
 /* Free the Value structure and the resources it points at. */
-         value = FreeValue( value );
+         value = FreeValue( value, status );
 
 /* If no suitable Value structure was found, then make a dynamic copy
    of the default string (if given) and return a pointer to this. */
@@ -2572,7 +2721,7 @@ static char *ReadString( AstChannel *this, const char *name,
    return result;
 }
 
-static void RemoveValue( Value *value, Value **head ) {
+static void RemoveValue( AstChannelValue *value, AstChannelValue **head, int *status ) {
 /*
 *  Name:
 *     RemoveValue
@@ -2585,7 +2734,7 @@ static void RemoveValue( Value *value, Value **head ) {
 
 *  Synopsis:
 *     #include "channel.h"
-*     void RemoveValue( Value *value, Value **head );
+*     void RemoveValue( AstChannelValue *value, AstChannelValue **head, int *status );
 
 *  Class Membership:
 *     Channel member function.
@@ -2605,6 +2754,8 @@ static void RemoveValue( Value *value, Value **head ) {
 *        list. This pointer will be updated to point at the list
 *        element that follows the one removed. If the list becomes
 *        empty, the pointer will be set to NULL.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - This function does not perform error chacking and does not
@@ -2629,7 +2780,7 @@ static void RemoveValue( Value *value, Value **head ) {
    value->blink = value;
 }
 
-static void SetAttrib( AstObject *this_object, const char *setting ) {
+static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
 *     astSetAttrib
@@ -2677,6 +2828,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by "astSscanf" */
    int skip;                     /* Skip attribute value */
+   int strict;                   /* Report errors for unexpected data items? */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -2714,14 +2866,21 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                && ( nc >= len ) ) {
       astSetSkip( this, skip );
 
+/* Strict. */
+/* ------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( setting, "strict= %d %n", &strict, &nc ) )
+               && ( nc >= len ) ) {
+      astSetStrict( this, strict );
+
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      (*parent_setattrib)( this_object, setting );
+      (*parent_setattrib)( this_object, setting, status );
    }
 }
 
-static void SinkWrap( void (* sink)( const char * ), const char *line ) {
+static void SinkWrap( void (* sink)( const char * ), const char *line, int *status ) {
 /*
 *  Name:
 *     SinkWrap
@@ -2734,7 +2893,7 @@ static void SinkWrap( void (* sink)( const char * ), const char *line ) {
 
 *  Synopsis:
 *     #include "channel.h"
-*     static void SinkWrap( void (* sink)( const char * ), const char *line )
+*     void SinkWrap( void (* sink)( const char * ), const char *line, int *status )
 
 *  Class Membership:
 *     Channel member function.
@@ -2751,6 +2910,8 @@ static void SinkWrap( void (* sink)( const char * ), const char *line ) {
 *        text to be written, and which returns void. This is the form
 *        of Channel sink function employed by the C language interface
 *        to the AST library.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Check the global error status. */
@@ -2760,7 +2921,7 @@ static void SinkWrap( void (* sink)( const char * ), const char *line ) {
    ( *sink )( line );
 }
 
-static char *SourceWrap( const char *(* source)( void ) ) {
+static char *SourceWrap( const char *(* source)( void ), int *status ) {
 /*
 *  Name:
 *     SourceWrap
@@ -2773,7 +2934,7 @@ static char *SourceWrap( const char *(* source)( void ) ) {
 
 *  Synopsis:
 *     #include "channel.h"
-*     static char *SourceWrap( const char *(* source)( void ) )
+*     char *SourceWrap( const char *, int *status(* source)( void ) )
 
 *  Class Membership:
 *     Channel member function.
@@ -2791,6 +2952,8 @@ static char *SourceWrap( const char *(* source)( void ) ) {
 *        containing the text that it read. This is the form of Channel
 *        source function employed by the C language interface to the
 *        AST library.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated, null terminated string
@@ -2828,7 +2991,7 @@ static char *SourceWrap( const char *(* source)( void ) ) {
    return result;
 }
 
-static int TestAttrib( AstObject *this_object, const char *attrib ) {
+static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     TestAttrib
@@ -2841,7 +3004,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "channel.h"
-*     int TestAttrib( AstObject *this, const char *attrib )
+*     int TestAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     Channel member function (over-rides the astTestAttrib protected
@@ -2858,6 +3021,8 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if a value has been set, otherwise zero.
@@ -2897,17 +3062,22 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "skip" ) ) {
       result = astTestSkip( this );
 
+/* Strict. */
+/* ------- */
+   } else if ( !strcmp( attrib, "strict" ) ) {
+      result = astTestStrict( this );
+
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_testattrib)( this_object, attrib );
+      result = (*parent_testattrib)( this_object, attrib, status );
    }
 
 /* Return the result, */
    return result;
 }
 
-static void Unquote( AstChannel *this, char *str ) {
+static void Unquote( AstChannel *this, char *str, int *status ) {
 /*
 *  Name:
 *     Unquote
@@ -2920,7 +3090,7 @@ static void Unquote( AstChannel *this, char *str ) {
 
 *  Synopsis:
 *     #include "channel.h"
-*     void Unquote( AstChannel *this, char *str )
+*     void Unquote( AstChannel *this, char *str, int *status )
 
 *  Class Membership:
 *     Channel member function.
@@ -2947,6 +3117,8 @@ static void Unquote( AstChannel *this, char *str ) {
 *        location as the original but has a new null character
 *        appended if necessary (it will usually be shorter than the
 *        original).
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -2993,12 +3165,12 @@ static void Unquote( AstChannel *this, char *str ) {
    quotes, so report an error. */
    if ( quoted ) {
       astError( AST__UNMQT,
-                "astRead(%s): Unmatched quotes in input data: %s.",
+                "astRead(%s): Unmatched quotes in input data: %s.", status,
                 astGetClass( this ), str );
    }
 }
 
-static int Use( AstChannel *this, int set, int helpful ) {
+static int Use( AstChannel *this, int set, int helpful, int *status ) {
 /*
 *  Name:
 *     Use
@@ -3011,7 +3183,7 @@ static int Use( AstChannel *this, int set, int helpful ) {
 
 *  Synopsis:
 *     #include "channel.h"
-*     int Use( AstChannel *this, int set, int helpful )
+*     int Use( AstChannel *this, int set, int helpful, int *status )
 
 *  Class Membership:
 *     Channel member function.
@@ -3033,6 +3205,8 @@ static int Use( AstChannel *this, int set, int helpful ) {
 *        The "set" flag supplied.
 *     helpful
 *        The "helpful" value supplied.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if the value should be written out, otherwise zero.
@@ -3067,7 +3241,7 @@ static int Use( AstChannel *this, int set, int helpful ) {
    return result;
 }
 
-static int Write( AstChannel *this, AstObject *object ) {
+static int Write( AstChannel *this, AstObject *object, int *status ) {
 /*
 *++
 *  Name:
@@ -3141,7 +3315,7 @@ f     with STATUS set to an error value, or if it should fail for any
 }
 
 static void WriteBegin( AstChannel *this, const char *class,
-                        const char *comment ) {
+                        const char *comment, int *status ) {
 /*
 *+
 *  Name:
@@ -3184,12 +3358,16 @@ static void WriteBegin( AstChannel *this, const char *class,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    char *line;                   /* Pointer to dynamic output string */
    int i;                        /* Loop counter for indentation characters */
    int nc;                       /* Number of output characters */
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this);
 
 /* Start building a dynamic string with an initial space. Then add
    further spaces to suit the current indentation level. */
@@ -3209,7 +3387,7 @@ static void WriteBegin( AstChannel *this, const char *class,
    }
 
 /* Write out the resulting line of text. */
-   OutputTextItem( this, line );
+   OutputTextItem( this, line, status );
 
 /* Free the dynamic string. */
    line = astFree( line );
@@ -3222,7 +3400,7 @@ static void WriteBegin( AstChannel *this, const char *class,
 
 static void WriteDouble( AstChannel *this, const char *name,
                          int set, int helpful,
-                         double value, const char *comment ) {
+                         double value, const char *comment, int *status ) {
 /*
 *+
 *  Name:
@@ -3312,6 +3490,7 @@ static void WriteDouble( AstChannel *this, const char *name,
 #define BUFF_LEN 100             /* Size of local formatting buffer */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    char *line;                   /* Pointer to dynamic output string */
    char buff[ BUFF_LEN + 1 ];    /* Local formatting buffer */
    int i;                        /* Loop counter for indentation characters */
@@ -3320,10 +3499,13 @@ static void WriteDouble( AstChannel *this, const char *name,
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this);
+
 /* Use the "set" and "helpful" flags, along with the Channel's
    attributes to decide whether this value should actually be
    written. */
-   if ( Use( this, set, helpful ) ) {
+   if ( Use( this, set, helpful, status ) ) {
 
 /* Start building a dynamic string with an initial space, or a comment
    character if "set" is zero. Then add further spaces to suit the
@@ -3353,7 +3535,7 @@ static void WriteDouble( AstChannel *this, const char *name,
       }
 
 /* Write out the resulting line of text. */
-      OutputTextItem( this, line );
+      OutputTextItem( this, line, status );
 
 /* Free the dynamic string. */
       line = astFree( line );
@@ -3363,7 +3545,7 @@ static void WriteDouble( AstChannel *this, const char *name,
 #undef BUFF_LEN
 }
 
-static void WriteEnd( AstChannel *this, const char *class ) {
+static void WriteEnd( AstChannel *this, const char *class, int *status ) {
 /*
 *+
 *  Name:
@@ -3398,12 +3580,16 @@ static void WriteEnd( AstChannel *this, const char *class ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    char *line;                   /* Pointer to dynamic output string */
    int i;                        /* Loop counter for indentation characters */
    int nc;                       /* Number of output characters */
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this);
 
 /* Decrement the indentation level so that the "End" item matches the
    corresponding "Begin" item. */
@@ -3421,14 +3607,14 @@ static void WriteEnd( AstChannel *this, const char *class ) {
    line = astAppendString( line, &nc, class );
 
 /* Write out the resulting line of text. */
-   OutputTextItem( this, line );
+   OutputTextItem( this, line, status );
 
 /* Free the dynamic string. */
    line = astFree( line );
 }
 
 static void WriteInt( AstChannel *this, const char *name, int set, int helpful,
-                      int value, const char *comment ) {
+                      int value, const char *comment, int *status ) {
 /*
 *+
 *  Name:
@@ -3518,6 +3704,7 @@ static void WriteInt( AstChannel *this, const char *name, int set, int helpful,
 #define BUFF_LEN 50              /* Size of local formatting buffer */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    char *line;                   /* Pointer to dynamic output string */
    char buff[ BUFF_LEN + 1 ];    /* Local formatting buffer */
    int i;                        /* Loop counter for indentation characters */
@@ -3526,10 +3713,13 @@ static void WriteInt( AstChannel *this, const char *name, int set, int helpful,
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this);
+
 /* Use the "set" and "helpful" flags, along with the Channel's
    attributes to decide whether this value should actually be
    written. */
-   if ( Use( this, set, helpful ) ) {
+   if ( Use( this, set, helpful, status ) ) {
 
 /* Start building a dynamic string with an initial space, or a comment
    character if "set" is zero. Then add further spaces to suit the
@@ -3554,7 +3744,7 @@ static void WriteInt( AstChannel *this, const char *name, int set, int helpful,
       }
 
 /* Write out the resulting line of text. */
-      OutputTextItem( this, line );
+      OutputTextItem( this, line, status );
 
 /* Free the dynamic string. */
       line = astFree( line );
@@ -3564,7 +3754,7 @@ static void WriteInt( AstChannel *this, const char *name, int set, int helpful,
 #undef BUFF_LEN
 }
 
-int astWriteInvocations_( void ){
+int astWriteInvocations_( int *status ){
 /*
 *+
 *  Name:
@@ -3592,11 +3782,13 @@ int astWriteInvocations_( void ){
 *     the AstUnit class as an example.
 *-
 */
-   return nWriteInvoc;
+   astDECLARE_GLOBALS;
+   astGET_GLOBALS(NULL);
+   return nwrite_invoc;
 }
 
 static void WriteIsA( AstChannel *this, const char *class,
-                      const char *comment ) {
+                      const char *comment, int *status ) {
 /*
 *+
 *  Name:
@@ -3642,12 +3834,16 @@ static void WriteIsA( AstChannel *this, const char *class,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    char *line;                   /* Pointer to dynamic output string */
    int i;                        /* Loop counter for indentation characters */
    int nc;                       /* Number of output characters */
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this);
 
 /* Output an "IsA" item only if there has been at least one item
    written since the last "Begin" or "IsA" item, or if the Full
@@ -3675,7 +3871,7 @@ static void WriteIsA( AstChannel *this, const char *class,
       }
 
 /* Write out the resulting line of text. */
-      OutputTextItem( this, line );
+      OutputTextItem( this, line, status );
 
 /* Free the dynamic string. */
       line = astFree( line );
@@ -3687,7 +3883,7 @@ static void WriteIsA( AstChannel *this, const char *class,
 
 static void WriteObject( AstChannel *this, const char *name,
                          int set, int helpful,
-                         AstObject *value, const char *comment ) {
+                         AstObject *value, const char *comment, int *status ) {
 /*
 *+
 *  Name:
@@ -3774,6 +3970,7 @@ static void WriteObject( AstChannel *this, const char *name,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    char *line;                   /* Pointer to dynamic output string */
    int i;                        /* Loop counter for indentation characters */
    int nc;                       /* Number of output characters */
@@ -3781,10 +3978,13 @@ static void WriteObject( AstChannel *this, const char *name,
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this);
+
 /* Use the "set" and "helpful" flags, along with the Channel's
    attributes to decide whether this value should actually be
    written. */
-   if ( Use( this, set, helpful ) ) {
+   if ( Use( this, set, helpful, status ) ) {
 
 /* Start building a dynamic string with an initial space, or a comment
    character if "set" is zero. Then add further spaces to suit the
@@ -3807,7 +4007,7 @@ static void WriteObject( AstChannel *this, const char *name,
       }
 
 /* Write out the resulting line of text. */
-      OutputTextItem( this, line );
+      OutputTextItem( this, line, status );
 
 /* Free the dynamic string. */
       line = astFree( line );
@@ -3825,7 +4025,7 @@ static void WriteObject( AstChannel *this, const char *name,
 
 static void WriteString( AstChannel *this, const char *name,
                          int set, int helpful,
-                         const char *value, const char *comment ) {
+                         const char *value, const char *comment, int *status ) {
 /*
 *+
 *  Name:
@@ -3913,6 +4113,7 @@ static void WriteString( AstChannel *this, const char *name,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    char *line;                   /* Pointer to dynamic output string */
    int i;                        /* Loop counter for characters */
    int nc;                       /* Number of output characters */
@@ -3922,10 +4123,13 @@ static void WriteString( AstChannel *this, const char *name,
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this);
+
 /* Use the "set" and "helpful" flags, along with the Channel's
    attributes to decide whether this value should actually be
    written. */
-   if ( Use( this, set, helpful ) ) {
+   if ( Use( this, set, helpful, status ) ) {
 
 /* Start building a dynamic string with an initial space, or a comment
    character if "set" is zero. Then add further spaces to suit the
@@ -3979,7 +4183,7 @@ static void WriteString( AstChannel *this, const char *name,
       }
 
 /* Write out the resulting line of text. */
-      OutputTextItem( this, line );
+      OutputTextItem( this, line, status );
 
 /* Free the dynamic string. */
       line = astFree( line );
@@ -4123,6 +4327,71 @@ astMAKE_GET(Channel,Skip,int,0,( this->skip != -INT_MAX ? this->skip : 0 ))
 astMAKE_SET(Channel,Skip,int,skip,( value != 0 ))
 astMAKE_TEST(Channel,Skip,( this->skip != -INT_MAX ))
 
+/*
+*att++
+*  Name:
+*     Strict
+
+*  Purpose:
+*     Report an error if any unexpeted data items are found?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This is a boolean attribute which indicates whether an error should
+*     be reported when reading an Object from a Channel if the external
+*     Object description is found to contain items that are not understood.
+*
+*     If Strict is zero (the default), then unexpected items in the
+*     Object description are simply ignored, and any remaining items are
+*     used to construct the returned Object. If Strict is non-zero, an
+*     error will be reported and a NULL Object pointer returned if any
+*     unexpected items are encountered.
+*
+*     As AST continues to be developed, new attributes are added
+*     occasionally to selected classes. If an older version of AST is
+*     used to read external Object descriptions created by a more recent
+*     version of AST, then the Channel class will, by default, ignored
+*     the new attributes using the remaining attributes to construct the 
+*     Object. This is usually a good thing. However, since external
+*     Object descriptions are often stored in plain text, it is possible
+*     to edit them using a text editor. This gives rise to the possibility 
+*     of genuine errors in the description due to finger-slips, typos, or
+*     simple mis-understanding. Such inappropriate attributes will be
+*     ignored if Strict is left at its default zero value. This will
+*     cause the mis-spelled attribute to revert to its default value,
+*     potentially causing subtle changes in the behaviour of application
+*     software. If such an effect is suspected, the Strict attribute can
+*     be set non-zero, resulting in the erroneous attribute being
+*     identified in an error message.
+
+*  Notes:
+*     - This attribute was introduced in AST version 5.0. Prior to this
+*     version of AST unexpected data items always caused an error to be
+*     reported. So applications linked against versions of AST prior to
+*     version 5.0 may not be able to read Object descriptions created 
+*     by later versions of AST, if the Object's class description has
+*     changed.
+
+*  Applicability:
+*     Channel
+*        All Channels have this attribute.
+*     FitsChan
+*        The FitsChan class currently ignores this attribute.
+*att--
+*/
+
+/* This ia a boolean value (0 or 1) with a value of -INT_MAX when
+   undefined but yielding a default of zero. */
+astMAKE_CLEAR(Channel,Strict,strict,-INT_MAX)
+astMAKE_GET(Channel,Strict,int,0,( this->strict != -INT_MAX ? this->strict : 0 ))
+astMAKE_SET(Channel,Strict,int,strict,( value != 0 ))
+astMAKE_TEST(Channel,Strict,( this->strict != -INT_MAX ))
+
 /* Destructor. */
 /* ----------- */
 /* None. */
@@ -4133,7 +4402,7 @@ astMAKE_TEST(Channel,Skip,( this->skip != -INT_MAX ))
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -4145,7 +4414,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -4156,6 +4425,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the Object whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -4188,16 +4459,24 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Skip. */
 /* ----- */
-   set = TestSkip( this );
-   ival = set ? GetSkip( this ) : astGetSkip( this );
+   set = TestSkip( this, status );
+   ival = set ? GetSkip( this, status ) : astGetSkip( this );
    astWriteInt( channel, "Skip", set, 0, ival,
                 ival ? "Ignore data between Objects" :
                        "No data allowed between Objects" );
 
+/* Strict. */
+/* ------- */
+   set = TestStrict( this, status );
+   ival = set ? GetStrict( this, status ) : astGetStrict( this );
+   astWriteInt( channel, "Strict", set, 0, ival,
+                ival ? "Report unexpected data items" :
+                       "Ignore unexpected data items" );
+
 /* Full. */
 /* ----- */
-   set = TestFull( this );
-   ival = set ? GetFull( this ) : astGetFull( this );
+   set = TestFull( this, status );
+   ival = set ? GetFull( this, status ) : astGetFull( this );
    if ( ival < 0 ) {
       comment = "Suppress non-essential output";
    }else if ( ival == 0 ) {
@@ -4209,8 +4488,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Comment. */
 /* -------- */
-   set = TestComment( this );
-   ival = set ? GetComment( this ) : astGetComment( this );
+   set = TestComment( this, status );
+   ival = set ? GetComment( this, status ) : astGetComment( this );
    astWriteInt( channel, "Comm", set, 0, ival,
                 ival ? "Display comments" :
                        "Omit comments" );
@@ -4220,12 +4499,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsAChannel and astCheckChannel functions using the
    macros defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(Channel,Object,check,&class_init)
+astMAKE_ISA(Channel,Object,check,&class_check)
 astMAKE_CHECK(Channel)
 
 AstChannel *astChannel_( const char *(* source)( void ),
                          void (* sink)( const char * ),
-                         const char *options, ... ) {
+                         const char *options, int *status, ...) {
 /*
 *+
 *  Name:
@@ -4241,7 +4520,7 @@ AstChannel *astChannel_( const char *(* source)( void ),
 *     #include "channel.h"
 *     AstChannel *astChannel( const char *(* source)( void ),
 *                             void (* sink)( const char * ),
-*                             const char *options, ... )
+*                             const char *options, ..., int *status )
 
 *  Class Membership:
 *     Channel constructor.
@@ -4290,6 +4569,8 @@ AstChannel *astChannel_( const char *(* source)( void ),
 *        initialising the new Channel. The syntax used is identical to
 *        that for the astSet function and may include "printf" format
 *        specifiers identified by "%" symbols in the normal way.
+*     status
+*        Pointer to the inherited status variable.
 *     ...
 *        If the "options" string contains "%" format specifiers, then
 *        an optional list of additional arguments may follow it in
@@ -4315,8 +4596,12 @@ AstChannel *astChannel_( const char *(* source)( void ),
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstChannel *new;              /* Pointer to new Channel */
    va_list args;                 /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -4336,7 +4621,7 @@ AstChannel *astChannel_( const char *(* source)( void ),
 /* Obtain the variable argument list and pass it along with the
    options string to the astVSet method to initialise the new
    Channel's attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -4492,8 +4777,17 @@ f     pointer.
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstChannel *new;              /* Pointer to new Channel */
    va_list args;                 /* Variable argument list */
+
+   int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -4526,10 +4820,10 @@ f     pointer.
 }
 
 AstChannel *astChannelForId_( const char *(* source)( void ),
-                              char *(* source_wrap)( const char *(*)( void ) ),
+                              char *(* source_wrap)( const char *(*)( void ), int * ),
                               void (* sink)( const char * ),
                               void (* sink_wrap)( void (*)( const char * ),
-                                                  const char * ),
+                                                  const char *, int * ),
                               const char *options, ... ) {
 /*
 *+
@@ -4546,10 +4840,10 @@ AstChannel *astChannelForId_( const char *(* source)( void ),
 *     #include "channel.h"
 *     AstChannel *astChannelFor( const char *(* source)( void ),
 *                                char *(* source_wrap)( const char *(*)
-*                                                       ( void ) ),
+*                                                       ( void ), int * ),
 *                                void (* sink)( const char * ),
 *                                void (* sink_wrap)( void (*)( const char * ),
-*                                                    const char * ),
+*                                                    const char *, int * ),
 *                                const char *options, ... )
 
 *  Class Membership:
@@ -4667,11 +4961,19 @@ AstChannel *astChannelForId_( const char *(* source)( void ),
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    AstChannel *new;              /* Pointer to new Channel */
    va_list args;                 /* Variable argument list */
+   int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialise the Channel, allocating memory and initialising the
    virtual function table as well if necessary. */
@@ -4700,7 +5002,7 @@ AstChannel *astChannelForId_( const char *(* source)( void ),
 
 AstChannel *astLoadChannel_( void *mem, size_t size,
                              AstChannelVtab *vtab, const char *name,
-                             AstChannel *channel ) {
+                             AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -4775,6 +5077,7 @@ AstChannel *astLoadChannel_( void *mem, size_t size,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstChannel *new;              /* Pointer to the new Channel */
 
 /* Initialise. */
@@ -4782,6 +5085,9 @@ AstChannel *astLoadChannel_( void *mem, size_t size,
 
 /* Check the global error status. */
    if ( !astOK ) return new;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* If a NULL virtual function table has been supplied, then this is
    the first loader to be invoked for this Channel. In this case the
@@ -4832,17 +5138,22 @@ AstChannel *astLoadChannel_( void *mem, size_t size,
 /* Skip. */
 /* ----- */
       new->skip = astReadInt( channel, "skip", -INT_MAX );
-      if ( TestSkip( new ) ) SetSkip( new, new->skip );
+      if ( TestSkip( new, status ) ) SetSkip( new, new->skip, status );
+
+/* Strict. */
+/* ------- */
+      new->strict = astReadInt( channel, "strict", -INT_MAX );
+      if ( TestStrict( new, status ) ) SetStrict( new, new->strict, status );
 
 /* Full. */
 /* ----- */
       new->full = astReadInt( channel, "full", -INT_MAX );
-      if ( TestFull( new ) ) SetFull( new, new->full );
+      if ( TestFull( new, status ) ) SetFull( new, new->full, status );
 
 /* Comment. */
 /* -------- */
       new->comment = astReadInt( channel, "comm", -INT_MAX );
-      if ( TestComment( new ) ) SetComment( new, new->comment );
+      if ( TestComment( new, status ) ) SetComment( new, new->comment, status );
 
 /* If an error occurred, clean up by deleting the new Channel. */
       if ( !astOK ) new = astDelete( new );
@@ -4864,85 +5175,87 @@ AstChannel *astLoadChannel_( void *mem, size_t size,
    Note that the member function may not be the one defined here, as
    it may have been over-ridden by a derived class. However, it should
    still have the same interface. */
-void astGetNextData_( AstChannel *this, int begin, char **name, char **val ) {
+void astGetNextData_( AstChannel *this, int begin, char **name, char **val, int *status ) {
    *name = NULL;
    *val = NULL;
    if ( !astOK ) return;
-   (**astMEMBER(this,Channel,GetNextData))( this, begin, name, val );
+   (**astMEMBER(this,Channel,GetNextData))( this, begin, name, val, status );
 }
-char *astGetNextText_( AstChannel *this ) {
+char *astGetNextText_( AstChannel *this, int *status ) {
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Channel,GetNextText))( this );
+   return (**astMEMBER(this,Channel,GetNextText))( this, status );
 }
-void astPutNextText_( AstChannel *this, const char *line ) {
+void astPutNextText_( AstChannel *this, const char *line, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,Channel,PutNextText))( this, line );
+   (**astMEMBER(this,Channel,PutNextText))( this, line, status );
 }
-AstObject *astRead_( AstChannel *this ) {
+AstObject *astRead_( AstChannel *this, int *status ) {
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Channel,Read))( this );
+   return (**astMEMBER(this,Channel,Read))( this, status );
 }
-void astReadClassData_( AstChannel *this, const char *class ) {
+void astReadClassData_( AstChannel *this, const char *class, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,Channel,ReadClassData))( this, class );
+   (**astMEMBER(this,Channel,ReadClassData))( this, class, status );
 }
-double astReadDouble_( AstChannel *this, const char *name, double def ) {
+double astReadDouble_( AstChannel *this, const char *name, double def, int *status ) {
    if ( !astOK ) return 0.0;
-   return (**astMEMBER(this,Channel,ReadDouble))( this, name, def );
+   return (**astMEMBER(this,Channel,ReadDouble))( this, name, def, status );
 }
-int astReadInt_( AstChannel *this, const char *name, int def ) {
+int astReadInt_( AstChannel *this, const char *name, int def, int *status ) {
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Channel,ReadInt))( this, name, def );
+   return (**astMEMBER(this,Channel,ReadInt))( this, name, def, status );
 }
 AstObject *astReadObject_( AstChannel *this, const char *name,
-                           AstObject *def ) {
+                           AstObject *def, int *status ) {
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Channel,ReadObject))( this, name, def );
+   return (**astMEMBER(this,Channel,ReadObject))( this, name, def, status );
 }
-char *astReadString_( AstChannel *this, const char *name, const char *def ) {
+char *astReadString_( AstChannel *this, const char *name, const char *def, int *status ) {
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Channel,ReadString))( this, name, def );
+   return (**astMEMBER(this,Channel,ReadString))( this, name, def, status );
 }
 void astWriteBegin_( AstChannel *this, const char *class,
-                     const char *comment ) {
+                     const char *comment, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,Channel,WriteBegin))( this, class, comment );
+   (**astMEMBER(this,Channel,WriteBegin))( this, class, comment, status );
 }
 void astWriteDouble_( AstChannel *this, const char *name, int set, int helpful,
-                      double value, const char *comment ) {
+                      double value, const char *comment, int *status ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Channel,WriteDouble))( this, name, set, helpful, value,
-                                            comment );
+                                            comment, status );
 }
-void astWriteEnd_( AstChannel *this, const char *class ) {
+void astWriteEnd_( AstChannel *this, const char *class, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,Channel,WriteEnd))( this, class );
+   (**astMEMBER(this,Channel,WriteEnd))( this, class, status );
 }
 void astWriteInt_( AstChannel *this, const char *name, int set, int helpful,
-                   int value, const char *comment ) {
+                   int value, const char *comment, int *status ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Channel,WriteInt))( this, name, set, helpful, value,
-                                         comment );
+                                         comment, status );
 }
-void astWriteIsA_( AstChannel *this, const char *class, const char *comment ) {
+void astWriteIsA_( AstChannel *this, const char *class, const char *comment, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,Channel,WriteIsA))( this, class, comment );
+   (**astMEMBER(this,Channel,WriteIsA))( this, class, comment, status );
 }
 void astWriteString_( AstChannel *this, const char *name, int set, int helpful,
-                      const char *value, const char *comment ) {
+                      const char *value, const char *comment, int *status ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Channel,WriteString))( this, name, set, helpful, value,
-                                            comment );
+                                            comment, status );
 }
 
 /* Count the number of times astWrite is invoked (excluding invocations
    made from within the astWriteObject method - see below). The count is 
    done here so that invocations of astWrite within a sub-class will be 
    included. */
-int astWrite_( AstChannel *this, AstObject *object ) {
+int astWrite_( AstChannel *this, AstObject *object, int *status ) {
+   astDECLARE_GLOBALS;           
    if ( !astOK ) return 0;
-   nWriteInvoc++;
-   return (**astMEMBER(this,Channel,Write))( this, object );
+   astGET_GLOBALS(this);
+   nwrite_invoc++;
+   return (**astMEMBER(this,Channel,Write))( this, object, status );
 }
 
 /* We do not want to count invocations of astWrite made from within the
@@ -4950,9 +5263,16 @@ int astWrite_( AstChannel *this, AstObject *object ) {
    (this assumes that each invocation of astWriteObject will only invoke
    astWrite once). */
 void astWriteObject_( AstChannel *this, const char *name, int set,
-                      int helpful, AstObject *value, const char *comment ) {
+                      int helpful, AstObject *value, const char *comment, int *status ) {
+   astDECLARE_GLOBALS;           
    if ( !astOK ) return;
-   nWriteInvoc--;
+   astGET_GLOBALS(this);
+   nwrite_invoc--;
    (**astMEMBER(this,Channel,WriteObject))( this, name, set, helpful, value,
-                                            comment );
+                                            comment, status );
 }
+
+
+
+
+

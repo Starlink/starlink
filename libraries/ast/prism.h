@@ -89,6 +89,12 @@
 /* ------------------ */
 /* This structure contains all information that is unique to each object in
    the class (e.g. its instance variables). */
+#if defined(astCLASS) || defined(astFORTRAN77)
+#define STATUS_PTR status
+#else
+#define STATUS_PTR astGetStatusPtr
+#endif
+
 typedef struct AstPrism {
 
 /* Attributes inherited from the parent class. */
@@ -115,6 +121,24 @@ typedef struct AstPrismVtab {
 
 /* Properties (e.g. methods) specific to this class. */
 } AstPrismVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstPrismGlobals {
+   AstPrismVtab Class_Vtab;
+   int Class_Init;
+} AstPrismGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitPrismGlobals_( AstPrismGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -126,7 +150,7 @@ astPROTO_ISA(Prism)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstPrism *astPrism_( void *, void *, const char *, ... );
+AstPrism *astPrism_( void *, void *, const char *, int *, ...);
 #else
 AstPrism *astPrismId_( void *, void *, const char *, ... );
 #endif
@@ -135,14 +159,14 @@ AstPrism *astPrismId_( void *, void *, const char *, ... );
 
 /* Initialiser. */
 AstPrism *astInitPrism_( void *, size_t, int, AstPrismVtab *,
-                     const char *, AstRegion *, AstRegion * );
+                     const char *, AstRegion *, AstRegion *, int * );
 
 /* Vtab initialiser. */
-void astInitPrismVtab_( AstPrismVtab *, const char * );
+void astInitPrismVtab_( AstPrismVtab *, const char *, int * );
 
 /* Loader. */
 AstPrism *astLoadPrism_( void *, size_t, AstPrismVtab *,
-                         const char *, AstChannel * );
+                         const char *, AstChannel *, int * );
 
 #endif
 
@@ -181,13 +205,13 @@ AstPrism *astLoadPrism_( void *, size_t, AstPrismVtab *,
 
 /* Initialiser. */
 #define astInitPrism(mem,size,init,vtab,name,reg1,reg2) \
-astINVOKE(O,astInitPrism_(mem,size,init,vtab,name,reg1,reg2))
+astINVOKE(O,astInitPrism_(mem,size,init,vtab,name,reg1,reg2,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitPrismVtab(vtab,name) astINVOKE(V,astInitPrismVtab_(vtab,name))
+#define astInitPrismVtab(vtab,name) astINVOKE(V,astInitPrismVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadPrism(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadPrism_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadPrism_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -199,3 +223,7 @@ astINVOKE(O,astLoadPrism_(mem,size,vtab,name,astCheckChannel(channel)))
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif
+
+
+
+

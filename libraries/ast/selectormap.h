@@ -163,6 +163,24 @@ typedef struct AstSelectorMapVtab {
 /* Properties (e.g. methods) specific to this class. */
 /* None. */
 } AstSelectorMapVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstSelectorMapGlobals {
+   AstSelectorMapVtab Class_Vtab;
+   int Class_Init;
+} AstSelectorMapGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitSelectorMapGlobals_( AstSelectorMapGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -174,7 +192,7 @@ astPROTO_ISA(SelectorMap)             /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstSelectorMap *astSelectorMap_( int, void **, double, const char *, ... );
+AstSelectorMap *astSelectorMap_( int, void **, double, const char *, int *, ...);
 #else
 AstSelectorMap *astSelectorMapId_( int, void **, double, const char *, ... );
 #endif
@@ -183,14 +201,14 @@ AstSelectorMap *astSelectorMapId_( int, void **, double, const char *, ... );
 
 /* Initialiser. */
 AstSelectorMap *astInitSelectorMap_( void *, size_t, int, AstSelectorMapVtab *,
-                                     const char *, int, AstRegion **, double );
+                                     const char *, int, AstRegion **, double, int * );
 
 /* Vtab initialiser. */
-void astInitSelectorMapVtab_( AstSelectorMapVtab *, const char * );
+void astInitSelectorMapVtab_( AstSelectorMapVtab *, const char *, int * );
 
 /* Loader. */
 AstSelectorMap *astLoadSelectorMap_( void *, size_t, AstSelectorMapVtab *,
-                                     const char *, AstChannel * );
+                                     const char *, AstChannel *, int * );
 #endif
 
 /* Prototypes for member functions. */
@@ -227,13 +245,13 @@ AstSelectorMap *astLoadSelectorMap_( void *, size_t, AstSelectorMapVtab *,
 
 /* Initialiser. */
 #define astInitSelectorMap(mem,size,init,vtab,name,nreg,regs,badval) \
-astINVOKE(O,astInitSelectorMap_(mem,size,init,vtab,name,nreg,regs,badval))
+astINVOKE(O,astInitSelectorMap_(mem,size,init,vtab,name,nreg,regs,badval,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitSelectorMapVtab(vtab,name) astINVOKE(V,astInitSelectorMapVtab_(vtab,name))
+#define astInitSelectorMapVtab(vtab,name) astINVOKE(V,astInitSelectorMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadSelectorMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadSelectorMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadSelectorMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -243,3 +261,7 @@ astINVOKE(O,astLoadSelectorMap_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 /* None. */
 #endif
+
+
+
+

@@ -86,12 +86,22 @@
 #include "frameset.h"              /* Parent FrameSet class */
 #include "keymap.h"              
 
+#if defined(astCLASS)       /* Protected */
+#include "grf.h"              
+#endif
+
 /* C header files. */
 /* --------------- */
 #include <stddef.h>
 
 /* Macros. */
 /* ======= */
+
+#if defined(astCLASS) || defined(astFORTRAN77)
+#define STATUS_PTR status
+#else
+#define STATUS_PTR astGetStatusPtr
+#endif
 #define AST__NPID      20   /* No. of different genuine plot object id's */
 
 #define AST__GATTR	0   /* Identifiers for GRF functions */
@@ -139,6 +149,10 @@
 #define AST__GRIDLINE_ID    23 /* Id for astGridLine AST__curves */
 #define AST__TICKS_ID       24 /* Id for major and minor tick marks */
 
+/* Define constants used to size global arrays in this module. */
+#define AST__PLOT_POLY_MAX  1000 /* Max. no. of points in a poly line */
+#define AST__PLOT_CRV_MXBRK 1000 /* Max. no. of breaks allowed in a plotted curve */
+#define AST__PLOT_STRIPESCAPES_BUFF_LEN 50 /* Length of string returned by astStripEscapes */
 
 #endif
 
@@ -172,15 +186,15 @@ typedef int (* AstGQchFun)( AstKeyMap *, float *, float * );
 typedef void (* AstGrfWrap)( void );              
 
 /* Interfaces for the wrapper functions which wrap specific Grf funstions. */
-typedef int (* AstGAttrWrap)( struct AstPlot *, int, double, double *, int );
-typedef int (* AstGFlushWrap)( struct AstPlot * );
-typedef int (* AstGLineWrap)( struct AstPlot *, int, const float *, const float * );
-typedef int (* AstGMarkWrap)( struct AstPlot *, int, const float *, const float *, int );
-typedef int (* AstGTextWrap)( struct AstPlot *, const char *, float, float, const char *, float, float );
-typedef int (* AstGCapWrap)( struct AstPlot *, int, int );
-typedef int (* AstGTxExtWrap)( struct AstPlot *, const char *, float, float, const char *, float, float, float *, float * );
-typedef int (* AstGScalesWrap)( struct AstPlot *, float *, float * );
-typedef int (* AstGQchWrap)( struct AstPlot *, float *, float * );
+typedef int (* AstGAttrWrap)( struct AstPlot *, int, double, double *, int, int * );
+typedef int (* AstGFlushWrap)( struct AstPlot *, int * );
+typedef int (* AstGLineWrap)( struct AstPlot *, int, const float *, const float *, int * );
+typedef int (* AstGMarkWrap)( struct AstPlot *, int, const float *, const float *, int, int * );
+typedef int (* AstGTextWrap)( struct AstPlot *, const char *, float, float, const char *, float, float, int * );
+typedef int (* AstGCapWrap)( struct AstPlot *, int, int, int * );
+typedef int (* AstGTxExtWrap)( struct AstPlot *, const char *, float, float, const char *, float, float, float *, float *, int * );
+typedef int (* AstGScalesWrap)( struct AstPlot *, float *, float *, int * );
+typedef int (* AstGQchWrap)( struct AstPlot *, float *, float *, int * );
 
 /* A structure in which a collection of Grf function pointers can be
    stored. */
@@ -326,219 +340,312 @@ typedef struct AstPlotVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   AstPointSet *(* GetDrawnTicks)( AstPlot *, int, int );
-   void (* SetTickValues)( AstPlot *, int, int, double *, int, double * );
-   void (* DrawExtraTicks)( AstPlot *, int, AstPointSet * );
-   int (* Border)( AstPlot * );
-   void (* BoundingBox)( AstPlot *, float[2], float[2] );
-   AstKeyMap *(* GetGrfContext)( AstPlot * );
-   void (* Clip)( AstPlot *, int, const double [], const double [] );
-   int (* CvBrk)( AstPlot *, int, double *, double *, double * );
-   void (* CopyPlotDefaults)( AstPlot *, int, AstPlot *, int );
-   void (* Mirror)( AstPlot *, int );
-   void (* GridLine)( AstPlot *, int, const double [], double );
-   void (* Curve)( AstPlot *, const double [], const double [] );
-   void (* GenCurve)( AstPlot *, AstMapping * );
-   void (* PolyCurve)( AstPlot *, int, int, int, const double * );
-   void (* GrfSet)( AstPlot *, const char *, AstGrfFun );
-   void (* GrfPush)( AstPlot * );
-   void (* GrfPop)( AstPlot * );
-   void (* GrfWrapper)( AstPlot *, const char *, AstGrfWrap );
-   void (* Grid)( AstPlot * ); 
-   void (* Mark)( AstPlot *, int, int, int, const double *, int  ); 
-   void (* Text)( AstPlot *, const char *, const double [], const float [], const char * );
+   AstPointSet *(* GetDrawnTicks)( AstPlot *, int, int, int * );
+   void (* SetTickValues)( AstPlot *, int, int, double *, int, double *, int * );
+   void (* DrawExtraTicks)( AstPlot *, int, AstPointSet *, int * );
+   int (* Border)( AstPlot *, int * );
+   void (* BoundingBox)( AstPlot *, float[2], float[2], int * );
+   AstKeyMap *(* GetGrfContext)( AstPlot *, int * );
+   void (* Clip)( AstPlot *, int, const double [], const double [], int * );
+   int (* CvBrk)( AstPlot *, int, double *, double *, double *, int * );
+   void (* CopyPlotDefaults)( AstPlot *, int, AstPlot *, int, int * );
+   void (* Mirror)( AstPlot *, int, int * );
+   void (* GridLine)( AstPlot *, int, const double [], double, int * );
+   void (* Curve)( AstPlot *, const double [], const double [], int * );
+   void (* GenCurve)( AstPlot *, AstMapping *, int * );
+   void (* PolyCurve)( AstPlot *, int, int, int, const double *, int * );
+   void (* GrfSet)( AstPlot *, const char *, AstGrfFun, int * );
+   void (* GrfPush)( AstPlot *, int * );
+   void (* GrfPop)( AstPlot *, int * );
+   void (* GrfWrapper)( AstPlot *, const char *, AstGrfWrap, int * );
+   void (* Grid)( AstPlot *, int * ); 
+   void (* Mark)( AstPlot *, int, int, int, const double *, int, int * ); 
+   void (* Text)( AstPlot *, const char *, const double [], const float [], const char *, int * );
 
-   double (* GetTol)( AstPlot * );
-   int (* TestTol)( AstPlot * );
-   void (* SetTol)( AstPlot *, double );
-   void (* ClearTol)( AstPlot * );
+   double (* GetTol)( AstPlot *, int * );
+   int (* TestTol)( AstPlot *, int * );
+   void (* SetTol)( AstPlot *, double, int * );
+   void (* ClearTol)( AstPlot *, int * );
 
-   int (* GetGrid)( AstPlot * );
-   int (* TestGrid)( AstPlot * );
-   void (* SetGrid)( AstPlot *, int );
-   void (* ClearGrid)( AstPlot * );
+   int (* GetGrid)( AstPlot *, int * );
+   int (* TestGrid)( AstPlot *, int * );
+   void (* SetGrid)( AstPlot *, int, int * );
+   void (* ClearGrid)( AstPlot *, int * );
 
-   int (* GetTickAll)( AstPlot * );
-   int (* TestTickAll)( AstPlot * );
-   void (* SetTickAll)( AstPlot *, int );
-   void (* ClearTickAll)( AstPlot * );
+   int (* GetTickAll)( AstPlot *, int * );
+   int (* TestTickAll)( AstPlot *, int * );
+   void (* SetTickAll)( AstPlot *, int, int * );
+   void (* ClearTickAll)( AstPlot *, int * );
 
-   int (* GetForceExterior)( AstPlot * );
-   int (* TestForceExterior)( AstPlot * );
-   void (* SetForceExterior)( AstPlot *, int );
-   void (* ClearForceExterior)( AstPlot * );
+   int (* GetForceExterior)( AstPlot *, int * );
+   int (* TestForceExterior)( AstPlot *, int * );
+   void (* SetForceExterior)( AstPlot *, int, int * );
+   void (* ClearForceExterior)( AstPlot *, int * );
 
-   int (* GetInvisible)( AstPlot * );
-   int (* TestInvisible)( AstPlot * );
-   void (* SetInvisible)( AstPlot *, int );
-   void (* ClearInvisible)( AstPlot * );
+   int (* GetInvisible)( AstPlot *, int * );
+   int (* TestInvisible)( AstPlot *, int * );
+   void (* SetInvisible)( AstPlot *, int, int * );
+   void (* ClearInvisible)( AstPlot *, int * );
 
-   int (* GetBorder)( AstPlot * );
-   int (* TestBorder)( AstPlot * );
-   void (* SetBorder)( AstPlot *, int );
-   void (* ClearBorder)( AstPlot * );
+   int (* GetBorder)( AstPlot *, int * );
+   int (* TestBorder)( AstPlot *, int * );
+   void (* SetBorder)( AstPlot *, int, int * );
+   void (* ClearBorder)( AstPlot *, int * );
 
-   int (* GetClipOp)( AstPlot * );
-   int (* TestClipOp)( AstPlot * );
-   void (* SetClipOp)( AstPlot *, int );
-   void (* ClearClipOp)( AstPlot * );
+   int (* GetClipOp)( AstPlot *, int * );
+   int (* TestClipOp)( AstPlot *, int * );
+   void (* SetClipOp)( AstPlot *, int, int * );
+   void (* ClearClipOp)( AstPlot *, int * );
 
-   int (* GetClip)( AstPlot * );
-   int (* TestClip)( AstPlot * );
-   void (* SetClip)( AstPlot *, int );
-   void (* ClearClip)( AstPlot * );
+   int (* GetClip)( AstPlot *, int * );
+   int (* TestClip)( AstPlot *, int * );
+   void (* SetClip)( AstPlot *, int, int * );
+   void (* ClearClip)( AstPlot *, int * );
 
-   int (* GetGrf)( AstPlot * );
-   int (* TestGrf)( AstPlot * );
-   void (* SetGrf)( AstPlot *, int );
-   void (* ClearGrf)( AstPlot * );
+   int (* GetGrf)( AstPlot *, int * );
+   int (* TestGrf)( AstPlot *, int * );
+   void (* SetGrf)( AstPlot *, int, int * );
+   void (* ClearGrf)( AstPlot *, int * );
 
-   int (* GetDrawTitle)( AstPlot * );
-   int (* TestDrawTitle)( AstPlot * );
-   void (* SetDrawTitle)( AstPlot *, int );
-   void (* ClearDrawTitle)( AstPlot * );
+   int (* GetDrawTitle)( AstPlot *, int * );
+   int (* TestDrawTitle)( AstPlot *, int * );
+   void (* SetDrawTitle)( AstPlot *, int, int * );
+   void (* ClearDrawTitle)( AstPlot *, int * );
 
-   int (* GetLabelUp)( AstPlot *, int );
-   int (* TestLabelUp)( AstPlot *, int );
-   void (* SetLabelUp)( AstPlot *, int, int );
-   void (* ClearLabelUp)( AstPlot *, int );
+   int (* GetLabelUp)( AstPlot *, int, int * );
+   int (* TestLabelUp)( AstPlot *, int, int * );
+   void (* SetLabelUp)( AstPlot *, int, int, int * );
+   void (* ClearLabelUp)( AstPlot *, int, int * );
 
-   int (* GetLogPlot)( AstPlot *, int );
-   int (* TestLogPlot)( AstPlot *, int );
-   void (* SetLogPlot)( AstPlot *, int, int );
-   void (* ClearLogPlot)( AstPlot *, int );
+   int (* GetLogPlot)( AstPlot *, int, int * );
+   int (* TestLogPlot)( AstPlot *, int, int * );
+   void (* SetLogPlot)( AstPlot *, int, int, int * );
+   void (* ClearLogPlot)( AstPlot *, int, int * );
 
-   int (* GetLogTicks)( AstPlot *, int );
-   int (* TestLogTicks)( AstPlot *, int );
-   void (* SetLogTicks)( AstPlot *, int, int );
-   void (* ClearLogTicks)( AstPlot *, int );
+   int (* GetLogTicks)( AstPlot *, int, int * );
+   int (* TestLogTicks)( AstPlot *, int, int * );
+   void (* SetLogTicks)( AstPlot *, int, int, int * );
+   void (* ClearLogTicks)( AstPlot *, int, int * );
 
-   int (* GetLogLabel)( AstPlot *, int );
-   int (* TestLogLabel)( AstPlot *, int );
-   void (* SetLogLabel)( AstPlot *, int, int );
-   void (* ClearLogLabel)( AstPlot *, int );
+   int (* GetLogLabel)( AstPlot *, int, int * );
+   int (* TestLogLabel)( AstPlot *, int, int * );
+   void (* SetLogLabel)( AstPlot *, int, int, int * );
+   void (* ClearLogLabel)( AstPlot *, int, int * );
 
-   int (* GetDrawAxes)( AstPlot *, int );
-   int (* TestDrawAxes)( AstPlot *, int );
-   void (* SetDrawAxes)( AstPlot *, int, int );
-   void (* ClearDrawAxes)( AstPlot *, int );
+   int (* GetDrawAxes)( AstPlot *, int, int * );
+   int (* TestDrawAxes)( AstPlot *, int, int * );
+   void (* SetDrawAxes)( AstPlot *, int, int, int * );
+   void (* ClearDrawAxes)( AstPlot *, int, int * );
 
-   int (* GetAbbrev)( AstPlot *, int );
-   int (* TestAbbrev)( AstPlot *, int );
-   void (* SetAbbrev)( AstPlot *, int, int );
-   void (* ClearAbbrev)( AstPlot *, int );
+   int (* GetAbbrev)( AstPlot *, int, int * );
+   int (* TestAbbrev)( AstPlot *, int, int * );
+   void (* SetAbbrev)( AstPlot *, int, int, int * );
+   void (* ClearAbbrev)( AstPlot *, int, int * );
 
-   int (* GetEscape)( AstPlot * );
-   int (* TestEscape)( AstPlot * );
-   void (* SetEscape)( AstPlot *, int );
-   void (* ClearEscape)( AstPlot * );
+   int (* GetEscape)( AstPlot *, int * );
+   int (* TestEscape)( AstPlot *, int * );
+   void (* SetEscape)( AstPlot *, int, int * );
+   void (* ClearEscape)( AstPlot *, int * );
 
-   int (* GetLabelling)( AstPlot * );
-   int (* TestLabelling)( AstPlot * );
-   void (* SetLabelling)( AstPlot *, int );
-   void (* ClearLabelling)( AstPlot * );
+   int (* GetLabelling)( AstPlot *, int * );
+   int (* TestLabelling)( AstPlot *, int * );
+   void (* SetLabelling)( AstPlot *, int, int * );
+   void (* ClearLabelling)( AstPlot *, int * );
 
-   double (* GetMajTickLen)( AstPlot *, int );
-   int (* TestMajTickLen)( AstPlot *, int );
-   void (* SetMajTickLen)( AstPlot *, int, double );
-   void (* ClearMajTickLen)( AstPlot *, int );
+   double (* GetMajTickLen)( AstPlot *, int, int * );
+   int (* TestMajTickLen)( AstPlot *, int, int * );
+   void (* SetMajTickLen)( AstPlot *, int, double, int * );
+   void (* ClearMajTickLen)( AstPlot *, int, int * );
 
-   double (* GetMinTickLen)( AstPlot *, int );
-   int (* TestMinTickLen)( AstPlot *, int );
-   void (* SetMinTickLen)( AstPlot *, int, double );
-   void (* ClearMinTickLen)( AstPlot *, int );
+   double (* GetMinTickLen)( AstPlot *, int, int * );
+   int (* TestMinTickLen)( AstPlot *, int, int * );
+   void (* SetMinTickLen)( AstPlot *, int, double, int * );
+   void (* ClearMinTickLen)( AstPlot *, int, int * );
 
-   double (* GetNumLabGap)( AstPlot *, int );
-   int (* TestNumLabGap)( AstPlot *, int );
-   void (* SetNumLabGap)( AstPlot *, int, double );
-   void (* ClearNumLabGap)( AstPlot *, int );
+   double (* GetNumLabGap)( AstPlot *, int, int * );
+   int (* TestNumLabGap)( AstPlot *, int, int * );
+   void (* SetNumLabGap)( AstPlot *, int, double, int * );
+   void (* ClearNumLabGap)( AstPlot *, int, int * );
 
-   double (* GetTextLabGap)( AstPlot *, int );
-   int (* TestTextLabGap)( AstPlot *, int );
-   void (* SetTextLabGap)( AstPlot *, int, double );
-   void (* ClearTextLabGap)( AstPlot *, int );
+   double (* GetTextLabGap)( AstPlot *, int, int * );
+   int (* TestTextLabGap)( AstPlot *, int, int * );
+   void (* SetTextLabGap)( AstPlot *, int, double, int * );
+   void (* ClearTextLabGap)( AstPlot *, int, int * );
 
-   double (* GetTitleGap)( AstPlot * );
-   int (* TestTitleGap)( AstPlot * );
-   void (* SetTitleGap)( AstPlot *, double );
-   void (* ClearTitleGap)( AstPlot * );
+   double (* GetTitleGap)( AstPlot *, int * );
+   int (* TestTitleGap)( AstPlot *, int * );
+   void (* SetTitleGap)( AstPlot *, double, int * );
+   void (* ClearTitleGap)( AstPlot *, int * );
 
-   double (* GetLabelAt)( AstPlot *, int  );
-   int (* TestLabelAt)( AstPlot *, int  );
-   void (* SetLabelAt)( AstPlot *, int, double );
-   void (* ClearLabelAt)( AstPlot *, int );
+   double (* GetLabelAt)( AstPlot *, int, int * );
+   int (* TestLabelAt)( AstPlot *, int, int * );
+   void (* SetLabelAt)( AstPlot *, int, double, int * );
+   void (* ClearLabelAt)( AstPlot *, int, int * );
 
-   double (* GetGap)( AstPlot *, int  );
-   int (* TestGap)( AstPlot *, int  );
-   void (* SetGap)( AstPlot *, int, double );
-   void (* ClearGap)( AstPlot *, int );
+   double (* GetGap)( AstPlot *, int, int * );
+   int (* TestGap)( AstPlot *, int, int * );
+   void (* SetGap)( AstPlot *, int, double, int * );
+   void (* ClearGap)( AstPlot *, int, int * );
 
-   double (* GetLogGap)( AstPlot *, int  );
-   int (* TestLogGap)( AstPlot *, int  );
-   void (* SetLogGap)( AstPlot *, int, double );
-   void (* ClearLogGap)( AstPlot *, int );
+   double (* GetLogGap)( AstPlot *, int, int * );
+   int (* TestLogGap)( AstPlot *, int, int * );
+   void (* SetLogGap)( AstPlot *, int, double, int * );
+   void (* ClearLogGap)( AstPlot *, int, int * );
 
-   double (* GetCentre)( AstPlot *, int  );
-   int (* TestCentre)( AstPlot *, int  );
-   void (* SetCentre)( AstPlot *, int, double );
-   void (* ClearCentre)( AstPlot *, int );
+   double (* GetCentre)( AstPlot *, int, int * );
+   int (* TestCentre)( AstPlot *, int, int * );
+   void (* SetCentre)( AstPlot *, int, double, int * );
+   void (* ClearCentre)( AstPlot *, int, int * );
 
-   int (* GetEdge)( AstPlot *, int );
-   int (* TestEdge)( AstPlot *, int );
-   void (* SetEdge)( AstPlot *, int, int );
-   void (* ClearEdge)( AstPlot *, int );
+   int (* GetEdge)( AstPlot *, int, int * );
+   int (* TestEdge)( AstPlot *, int, int * );
+   void (* SetEdge)( AstPlot *, int, int, int * );
+   void (* ClearEdge)( AstPlot *, int, int * );
 
-   int (* GetNumLab)( AstPlot *, int );
-   int (* TestNumLab)( AstPlot *, int );
-   void (* SetNumLab)( AstPlot *, int, int );
-   void (* ClearNumLab)( AstPlot *, int );
+   int (* GetNumLab)( AstPlot *, int, int * );
+   int (* TestNumLab)( AstPlot *, int, int * );
+   void (* SetNumLab)( AstPlot *, int, int, int * );
+   void (* ClearNumLab)( AstPlot *, int, int * );
 
-   int (* GetMinTick)( AstPlot *, int );
-   int (* TestMinTick)( AstPlot *, int );
-   void (* SetMinTick)( AstPlot *, int, int );
-   void (* ClearMinTick)( AstPlot *, int );
+   int (* GetMinTick)( AstPlot *, int, int * );
+   int (* TestMinTick)( AstPlot *, int, int * );
+   void (* SetMinTick)( AstPlot *, int, int, int * );
+   void (* ClearMinTick)( AstPlot *, int, int * );
 
-   int (* GetTextLab)( AstPlot *, int );
-   int (* TestTextLab)( AstPlot *, int );
-   void (* SetTextLab)( AstPlot *, int, int );
-   void (* ClearTextLab)( AstPlot *, int );
+   int (* GetTextLab)( AstPlot *, int, int * );
+   int (* TestTextLab)( AstPlot *, int, int * );
+   void (* SetTextLab)( AstPlot *, int, int, int * );
+   void (* ClearTextLab)( AstPlot *, int, int * );
 
-   int (* GetLabelUnits)( AstPlot *, int );
-   int (* TestLabelUnits)( AstPlot *, int );
-   void (* SetLabelUnits)( AstPlot *, int, int );
-   void (* ClearLabelUnits)( AstPlot *, int );
+   int (* GetLabelUnits)( AstPlot *, int, int * );
+   int (* TestLabelUnits)( AstPlot *, int, int * );
+   void (* SetLabelUnits)( AstPlot *, int, int, int * );
+   void (* ClearLabelUnits)( AstPlot *, int, int * );
 
-   int (* GetStyle)( AstPlot *, int );
-   int (* TestStyle)( AstPlot *, int );
-   void (* SetStyle)( AstPlot *, int, int );
-   void (* ClearStyle)( AstPlot *, int );
+   int (* GetStyle)( AstPlot *, int, int * );
+   int (* TestStyle)( AstPlot *, int, int * );
+   void (* SetStyle)( AstPlot *, int, int, int * );
+   void (* ClearStyle)( AstPlot *, int, int * );
 
-   int (* GetFont)( AstPlot *, int );
-   int (* TestFont)( AstPlot *, int );
-   void (* SetFont)( AstPlot *, int, int );
-   void (* ClearFont)( AstPlot *, int );
+   int (* GetFont)( AstPlot *, int, int * );
+   int (* TestFont)( AstPlot *, int, int * );
+   void (* SetFont)( AstPlot *, int, int, int * );
+   void (* ClearFont)( AstPlot *, int, int * );
 
-   int (* GetColour)( AstPlot *, int );
-   int (* TestColour)( AstPlot *, int );
-   void (* SetColour)( AstPlot *, int, int );
-   void (* ClearColour)( AstPlot *, int );
+   int (* GetColour)( AstPlot *, int, int * );
+   int (* TestColour)( AstPlot *, int, int * );
+   void (* SetColour)( AstPlot *, int, int, int * );
+   void (* ClearColour)( AstPlot *, int, int * );
 
-   double (* GetWidth)( AstPlot *, int );
-   int (* TestWidth)( AstPlot *, int );
-   void (* SetWidth)( AstPlot *, int, double );
-   void (* ClearWidth)( AstPlot *, int );
+   double (* GetWidth)( AstPlot *, int, int * );
+   int (* TestWidth)( AstPlot *, int, int * );
+   void (* SetWidth)( AstPlot *, int, double, int * );
+   void (* ClearWidth)( AstPlot *, int, int * );
 
-   double (* GetSize)( AstPlot *, int );
-   int (* TestSize)( AstPlot *, int );
-   void (* SetSize)( AstPlot *, int, double );
-   void (* ClearSize)( AstPlot *, int );
+   double (* GetSize)( AstPlot *, int, int * );
+   int (* TestSize)( AstPlot *, int, int * );
+   void (* SetSize)( AstPlot *, int, double, int * );
+   void (* ClearSize)( AstPlot *, int, int * );
 
-   int (* GetInk)( AstPlot * );
-   int (* TestInk)( AstPlot * );
-   void (* SetInk)( AstPlot *, int );
-   void (* ClearInk)( AstPlot * );
+   int (* GetInk)( AstPlot *, int * );
+   int (* TestInk)( AstPlot *, int * );
+   void (* SetInk)( AstPlot *, int, int * );
+   void (* ClearInk)( AstPlot *, int * );
 
 } AstPlotVtab;
+
+/* Structure holding information about curves drawn by astGridLine and 
+   astCurve. */
+typedef struct AstPlotCurveData{
+   int out;          /* Was the curve completely outside the clipping area? */
+   int nbrk;         /* The number of breaks in the curve. */
+   float xbrk[ AST__PLOT_CRV_MXBRK ];  /* Graphics X coordinate at each break. */
+   float ybrk[ AST__PLOT_CRV_MXBRK ];  /* Graphics Y coordinate at each break. */
+   float vxbrk[ AST__PLOT_CRV_MXBRK ]; /* X comp. of unit tangent vector */
+   float vybrk[ AST__PLOT_CRV_MXBRK ]; /* Y comp. of unit tangent vector */
+   float length;     /* Drawn length of the curve in graphics coordinates */
+} AstPlotCurveData;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstPlotGlobals {
+   AstPlotVtab Class_Vtab;
+   int Class_Init;
+   double GrfAttrs_attrs_t[ GRF__NATTR ]; 
+   int GrfAttrs_nesting_t;            
+   double Crv_limit_t;
+   double Crv_scerr_t;
+   double Crv_tol_t;
+   double Crv_ux0_t;
+   double Crv_uy0_t;
+   double Crv_vxl_t;
+   double Crv_vyl_t;
+   double Crv_xhi_t;
+   double Crv_xl_t;
+   double Crv_xlo_t;
+   double Crv_yhi_t;
+   double Crv_yl_t;
+   double Crv_ylo_t;
+   float *Crv_vxbrk_t;
+   float *Crv_vybrk_t;
+   float *Crv_xbrk_t;
+   float *Crv_ybrk_t;
+   float Crv_len_t;
+   int Crv_ink_t;
+   int Crv_nbrk_t;
+   int Crv_nent_t;
+   int Crv_out_t;
+   int Crv_clip_t;
+   void (*Crv_map_t)( int, double *, double *, double *, const char *, const char *, int *, struct AstGlobals * );
+   void *Crv_mapstatics_t;
+   float Box_lbnd_t[ 2 ];
+   float Box_ubnd_t[ 2 ];
+   float Boxp_lbnd_t[ 2 ];
+   float Boxp_ubnd_t[ 2 ];
+   int Boxp_freeze_t;
+   float Poly_x_t[ AST__PLOT_POLY_MAX ];
+   float Poly_y_t[ AST__PLOT_POLY_MAX ];
+   int   Poly_n_t;
+   int           Map1_ncoord_t;
+   AstPlot      *Map1_plot_t;
+   AstMapping   *Map1_map_t;
+   AstFrame     *Map1_frame_t;
+   const double *Map1_origin_t;
+   double        Map1_length_t;
+   int           Map1_axis_t;
+   void         *Map1_statics_t;
+   int           Map1_norm_t;
+   int           Map1_log_t;
+   int           Map2_ncoord_t;
+   AstPlot      *Map2_plot_t;
+   AstMapping   *Map2_map_t;
+   double        Map2_x0_t;
+   double        Map2_y0_t;
+   double        Map2_deltax_t;
+   double        Map2_deltay_t;
+   void         *Map2_statics_t;
+   int           Map3_ncoord_t;
+   AstPlot      *Map3_plot_t;
+   AstMapping   *Map3_map_t;
+   AstFrame     *Map3_frame_t;
+   const double *Map3_origin_t;
+   const double *Map3_end_t;
+   double        Map3_scale_t;
+   void         *Map3_statics_t;
+   int           Map4_ncoord_t;
+   AstPlot      *Map4_plot_t;
+   AstMapping   *Map4_map_t;
+   AstMapping   *Map4_umap_t;
+   void         *Map4_statics_t;
+   AstPlotCurveData Curve_data_t;
+   char GetAttrib_Buff[ 200 ];
+   char SplitValue_Buff[ 200 ];
+   char StripEscapes_Buff[ AST__PLOT_STRIPESCAPES_BUFF_LEN + 1 ];
+} AstPlotGlobals;
+
+#endif
 #endif
 
 /* Function prototypes. */
@@ -550,7 +657,7 @@ astPROTO_ISA(Plot)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstPlot *astPlot_( void *, const float *, const double *, const char *, ... );
+AstPlot *astPlot_( void *, const float *, const double *, const char *, int *, ...);
 #else
 AstPlot *astPlotId_( void *, const float [], const double [], const char *, ... );
 #endif
@@ -559,237 +666,243 @@ AstPlot *astPlotId_( void *, const float [], const double [], const char *, ... 
 
 /* Initialiser. */
 AstPlot *astInitPlot_( void *, size_t, int, AstPlotVtab *, 
-                       const char *, AstFrame *, const float *, const double * );
+                       const char *, AstFrame *, const float *, const double *, int * );
 
 /* Vtab initialiser. */
-void astInitPlotVtab_( AstPlotVtab *, const char * );
+void astInitPlotVtab_( AstPlotVtab *, const char *, int * );
 
 /* Loader. */
 AstPlot *astLoadPlot_( void *, size_t, AstPlotVtab *,
-                       const char *, AstChannel *channel );
+                       const char *, AstChannel *channel, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitPlotGlobals_( AstPlotGlobals * );
+#endif
+
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-   AstKeyMap *astGrfConID_( AstPlot * );
-   const char *astStripEscapes_( const char * );
-   int astFindEscape_( const char *, int *, int *, int * );
-   int astBorder_( AstPlot * );
-   AstKeyMap *astGetGrfContext_( AstPlot * );
-   void astBoundingBox_( AstPlot *, float[2], float[2] );
-   void astClip_( AstPlot *, int, const double [], const double [] );
-   void astGridLine_( AstPlot *, int, const double [], double );
-   void astCurve_( AstPlot *, const double [], const double [] );
-   void astGrid_( AstPlot * );
-   void astMark_( AstPlot *, int, int, int, const double *, int  ); 
-   void astGrfSet_( AstPlot *, const char *, AstGrfFun );
-   void astGrfPush_( AstPlot * );
-   void astGrfPop_( AstPlot * );
-   void astGenCurve_( AstPlot *, AstMapping * );
-   void astPolyCurve_( AstPlot *, int, int, int, const double * );
-   void astText_( AstPlot *, const char *, const double [], const float [], const char * );
+   AstKeyMap *astGrfConID_( AstPlot *, int * );
+   const char *astStripEscapes_( const char *, int * );
+   int astFindEscape_( const char *, int *, int *, int *, int * );
+   int astBorder_( AstPlot *, int * );
+   AstKeyMap *astGetGrfContext_( AstPlot *, int * );
+   void astBoundingBox_( AstPlot *, float[2], float[2], int * );
+   void astClip_( AstPlot *, int, const double [], const double [], int * );
+   void astGridLine_( AstPlot *, int, const double [], double, int * );
+   void astCurve_( AstPlot *, const double [], const double [], int * );
+   void astGrid_( AstPlot *, int * );
+   void astMark_( AstPlot *, int, int, int, const double *, int, int * ); 
+   void astGrfSet_( AstPlot *, const char *, AstGrfFun, int * );
+   void astGrfPush_( AstPlot *, int * );
+   void astGrfPop_( AstPlot *, int * );
+   void astGenCurve_( AstPlot *, AstMapping *, int * );
+   void astPolyCurve_( AstPlot *, int, int, int, const double *, int * );
+   void astText_( AstPlot *, const char *, const double [], const float [], const char *, int * );
 
-   void astGrfWrapper_( AstPlot *, const char *, AstGrfWrap );
-   int astGrfFunID_( const char *, const char *, const char *  );
+   void astGrfWrapper_( AstPlot *, const char *, AstGrfWrap, int * );
+   int astGrfFunID_( const char *, const char *, const char *, int * );
 
 #if defined(astCLASS)            /* Protected */
-   int astCvBrk_( AstPlot *, int, double *, double *, double * );
-   void astCopyPlotDefaults_( AstPlot *, int, AstPlot *, int );
-   void astMirror_( AstPlot *, int );
-   AstPointSet *astGetDrawnTicks_( AstPlot *, int, int );
-   void astSetTickValues_( AstPlot *, int, int, double *, int, double * );
-   void astDrawExtraTicks_( AstPlot *, int, AstPointSet * );
-   void astGrfAttrs_( AstPlot *, int, int, int, const char *, const char * );
+   int astCvBrk_( AstPlot *, int, double *, double *, double *, int * );
+   void astCopyPlotDefaults_( AstPlot *, int, AstPlot *, int, int * );
+   void astMirror_( AstPlot *, int, int * );
+   AstPointSet *astGetDrawnTicks_( AstPlot *, int, int, int * );
+   void astSetTickValues_( AstPlot *, int, int, double *, int, double *, int * );
+   void astDrawExtraTicks_( AstPlot *, int, AstPointSet *, int * );
+   void astGrfAttrs_( AstPlot *, int, int, int, const char *, const char *, int * );
 
-   double astGetTol_( AstPlot * );
-   int astTestTol_( AstPlot * );
-   void astSetTol_( AstPlot *, double );
-   void astClearTol_( AstPlot * );
+   double astGetTol_( AstPlot *, int * );
+   int astTestTol_( AstPlot *, int * );
+   void astSetTol_( AstPlot *, double, int * );
+   void astClearTol_( AstPlot *, int * );
 
-   int astGetGrid_( AstPlot * );
-   int astTestGrid_( AstPlot * );
-   void astSetGrid_( AstPlot *, int );
-   void astClearGrid_( AstPlot * );
+   int astGetGrid_( AstPlot *, int * );
+   int astTestGrid_( AstPlot *, int * );
+   void astSetGrid_( AstPlot *, int, int * );
+   void astClearGrid_( AstPlot *, int * );
 
-   int astGetTickAll_( AstPlot * );
-   int astTestTickAll_( AstPlot * );
-   void astSetTickAll_( AstPlot *, int );
-   void astClearTickAll_( AstPlot * );
+   int astGetTickAll_( AstPlot *, int * );
+   int astTestTickAll_( AstPlot *, int * );
+   void astSetTickAll_( AstPlot *, int, int * );
+   void astClearTickAll_( AstPlot *, int * );
 
-   int astGetForceExterior_( AstPlot * );
-   int astTestForceExterior_( AstPlot * );
-   void astSetForceExterior_( AstPlot *, int );
-   void astClearForceExterior_( AstPlot * );
+   int astGetForceExterior_( AstPlot *, int * );
+   int astTestForceExterior_( AstPlot *, int * );
+   void astSetForceExterior_( AstPlot *, int, int * );
+   void astClearForceExterior_( AstPlot *, int * );
 
-   int astGetInvisible_( AstPlot * );
-   int astTestInvisible_( AstPlot * );
-   void astSetInvisible_( AstPlot *, int );
-   void astClearInvisible_( AstPlot * );
+   int astGetInvisible_( AstPlot *, int * );
+   int astTestInvisible_( AstPlot *, int * );
+   void astSetInvisible_( AstPlot *, int, int * );
+   void astClearInvisible_( AstPlot *, int * );
 
-   int astGetBorder_( AstPlot * );
-   int astTestBorder_( AstPlot * );
-   void astSetBorder_( AstPlot *, int );
-   void astClearBorder_( AstPlot * );
+   int astGetBorder_( AstPlot *, int * );
+   int astTestBorder_( AstPlot *, int * );
+   void astSetBorder_( AstPlot *, int, int * );
+   void astClearBorder_( AstPlot *, int * );
 
-   int astGetClip_( AstPlot * );
-   int astTestClip_( AstPlot * );
-   void astSetClip_( AstPlot *, int );
-   void astClearClip_( AstPlot * );
+   int astGetClip_( AstPlot *, int * );
+   int astTestClip_( AstPlot *, int * );
+   void astSetClip_( AstPlot *, int, int * );
+   void astClearClip_( AstPlot *, int * );
 
-   int astGetClipOp_( AstPlot * );
-   int astTestClipOp_( AstPlot * );
-   void astSetClipOp_( AstPlot *, int );
-   void astClearClipOp_( AstPlot * );
+   int astGetClipOp_( AstPlot *, int * );
+   int astTestClipOp_( AstPlot *, int * );
+   void astSetClipOp_( AstPlot *, int, int * );
+   void astClearClipOp_( AstPlot *, int * );
 
-   int astGetGrf_( AstPlot * );
-   int astTestGrf_( AstPlot * );
-   void astSetGrf_( AstPlot *, int );
-   void astClearGrf_( AstPlot * );
+   int astGetGrf_( AstPlot *, int * );
+   int astTestGrf_( AstPlot *, int * );
+   void astSetGrf_( AstPlot *, int, int * );
+   void astClearGrf_( AstPlot *, int * );
 
-   int astGetDrawTitle_( AstPlot * );
-   int astTestDrawTitle_( AstPlot * );
-   void astSetDrawTitle_( AstPlot *, int );
-   void astClearDrawTitle_( AstPlot * );
+   int astGetDrawTitle_( AstPlot *, int * );
+   int astTestDrawTitle_( AstPlot *, int * );
+   void astSetDrawTitle_( AstPlot *, int, int * );
+   void astClearDrawTitle_( AstPlot *, int * );
 
-   int astGetLabelUp_( AstPlot *, int );
-   int astTestLabelUp_( AstPlot *, int );
-   void astSetLabelUp_( AstPlot *, int, int );
-   void astClearLabelUp_( AstPlot *, int );
+   int astGetLabelUp_( AstPlot *, int, int * );
+   int astTestLabelUp_( AstPlot *, int, int * );
+   void astSetLabelUp_( AstPlot *, int, int, int * );
+   void astClearLabelUp_( AstPlot *, int, int * );
 
-   int astGetLogPlot_( AstPlot *, int );
-   int astTestLogPlot_( AstPlot *, int );
-   void astSetLogPlot_( AstPlot *, int, int );
-   void astClearLogPlot_( AstPlot *, int );
+   int astGetLogPlot_( AstPlot *, int, int * );
+   int astTestLogPlot_( AstPlot *, int, int * );
+   void astSetLogPlot_( AstPlot *, int, int, int * );
+   void astClearLogPlot_( AstPlot *, int, int * );
 
-   int astGetLogTicks_( AstPlot *, int );
-   int astTestLogTicks_( AstPlot *, int );
-   void astSetLogTicks_( AstPlot *, int, int );
-   void astClearLogTicks_( AstPlot *, int );
+   int astGetLogTicks_( AstPlot *, int, int * );
+   int astTestLogTicks_( AstPlot *, int, int * );
+   void astSetLogTicks_( AstPlot *, int, int, int * );
+   void astClearLogTicks_( AstPlot *, int, int * );
 
-   int astGetLogLabel_( AstPlot *, int );
-   int astTestLogLabel_( AstPlot *, int );
-   void astSetLogLabel_( AstPlot *, int, int );
-   void astClearLogLabel_( AstPlot *, int );
+   int astGetLogLabel_( AstPlot *, int, int * );
+   int astTestLogLabel_( AstPlot *, int, int * );
+   void astSetLogLabel_( AstPlot *, int, int, int * );
+   void astClearLogLabel_( AstPlot *, int, int * );
 
-   int astGetDrawAxes_( AstPlot *, int );
-   int astTestDrawAxes_( AstPlot *, int );
-   void astSetDrawAxes_( AstPlot *, int, int );
-   void astClearDrawAxes_( AstPlot *, int );
+   int astGetDrawAxes_( AstPlot *, int, int * );
+   int astTestDrawAxes_( AstPlot *, int, int * );
+   void astSetDrawAxes_( AstPlot *, int, int, int * );
+   void astClearDrawAxes_( AstPlot *, int, int * );
 
-   int astGetAbbrev_( AstPlot *, int );
-   int astTestAbbrev_( AstPlot *, int );
-   void astSetAbbrev_( AstPlot *, int, int );
-   void astClearAbbrev_( AstPlot *, int );
+   int astGetAbbrev_( AstPlot *, int, int * );
+   int astTestAbbrev_( AstPlot *, int, int * );
+   void astSetAbbrev_( AstPlot *, int, int, int * );
+   void astClearAbbrev_( AstPlot *, int, int * );
 
-   int astGetEscape_( AstPlot * );
-   int astTestEscape_( AstPlot * );
-   void astSetEscape_( AstPlot *, int );
-   void astClearEscape_( AstPlot * );
+   int astGetEscape_( AstPlot *, int * );
+   int astTestEscape_( AstPlot *, int * );
+   void astSetEscape_( AstPlot *, int, int * );
+   void astClearEscape_( AstPlot *, int * );
 
-   double astGetLabelAt_( AstPlot *, int  );
-   int astTestLabelAt_( AstPlot *, int  );
-   void astSetLabelAt_( AstPlot *, int, double );
-   void astClearLabelAt_( AstPlot *, int );
+   double astGetLabelAt_( AstPlot *, int, int * );
+   int astTestLabelAt_( AstPlot *, int, int * );
+   void astSetLabelAt_( AstPlot *, int, double, int * );
+   void astClearLabelAt_( AstPlot *, int, int * );
 
-   double astGetGap_( AstPlot *, int  );
-   int astTestGap_( AstPlot *, int  );
-   void astSetGap_( AstPlot *, int, double );
-   void astClearGap_( AstPlot *, int );
+   double astGetGap_( AstPlot *, int, int * );
+   int astTestGap_( AstPlot *, int, int * );
+   void astSetGap_( AstPlot *, int, double, int * );
+   void astClearGap_( AstPlot *, int, int * );
 
-   double astGetLogGap_( AstPlot *, int  );
-   int astTestLogGap_( AstPlot *, int  );
-   void astSetLogGap_( AstPlot *, int, double );
-   void astClearLogGap_( AstPlot *, int );
+   double astGetLogGap_( AstPlot *, int, int * );
+   int astTestLogGap_( AstPlot *, int, int * );
+   void astSetLogGap_( AstPlot *, int, double, int * );
+   void astClearLogGap_( AstPlot *, int, int * );
 
-   double astGetCentre_( AstPlot *, int  );
-   int astTestCentre_( AstPlot *, int  );
-   void astSetCentre_( AstPlot *, int, double );
-   void astClearCentre_( AstPlot *, int );
+   double astGetCentre_( AstPlot *, int, int * );
+   int astTestCentre_( AstPlot *, int, int * );
+   void astSetCentre_( AstPlot *, int, double, int * );
+   void astClearCentre_( AstPlot *, int, int * );
 
-   int astGetLabelling_( AstPlot * );
-   int astTestLabelling_( AstPlot * );
-   void astSetLabelling_( AstPlot *, int );
-   void astClearLabelling_( AstPlot * );
+   int astGetLabelling_( AstPlot *, int * );
+   int astTestLabelling_( AstPlot *, int * );
+   void astSetLabelling_( AstPlot *, int, int * );
+   void astClearLabelling_( AstPlot *, int * );
 
-   double astGetMajTickLen_( AstPlot *, int );
-   int astTestMajTickLen_( AstPlot *, int );
-   void astSetMajTickLen_( AstPlot *, int, double );
-   void astClearMajTickLen_( AstPlot *, int );
+   double astGetMajTickLen_( AstPlot *, int, int * );
+   int astTestMajTickLen_( AstPlot *, int, int * );
+   void astSetMajTickLen_( AstPlot *, int, double, int * );
+   void astClearMajTickLen_( AstPlot *, int, int * );
 
-   double astGetMinTickLen_( AstPlot *, int );
-   int astTestMinTickLen_( AstPlot *, int );
-   void astSetMinTickLen_( AstPlot *, int, double );
-   void astClearMinTickLen_( AstPlot *, int );
+   double astGetMinTickLen_( AstPlot *, int, int * );
+   int astTestMinTickLen_( AstPlot *, int, int * );
+   void astSetMinTickLen_( AstPlot *, int, double, int * );
+   void astClearMinTickLen_( AstPlot *, int, int * );
 
-   double astGetNumLabGap_( AstPlot *, int );
-   int astTestNumLabGap_( AstPlot *, int );
-   void astSetNumLabGap_( AstPlot *, int, double );
-   void astClearNumLabGap_( AstPlot *, int );
+   double astGetNumLabGap_( AstPlot *, int, int * );
+   int astTestNumLabGap_( AstPlot *, int, int * );
+   void astSetNumLabGap_( AstPlot *, int, double, int * );
+   void astClearNumLabGap_( AstPlot *, int, int * );
 
-   double astGetTextLabGap_( AstPlot *, int );
-   int astTestTextLabGap_( AstPlot *, int );
-   void astSetTextLabGap_( AstPlot *, int, double );
-   void astClearTextLabGap_( AstPlot *, int );
+   double astGetTextLabGap_( AstPlot *, int, int * );
+   int astTestTextLabGap_( AstPlot *, int, int * );
+   void astSetTextLabGap_( AstPlot *, int, double, int * );
+   void astClearTextLabGap_( AstPlot *, int, int * );
 
-   double astGetTitleGap_( AstPlot * );
-   int astTestTitleGap_( AstPlot * );
-   void astSetTitleGap_( AstPlot *, double );
-   void astClearTitleGap_( AstPlot * );
+   double astGetTitleGap_( AstPlot *, int * );
+   int astTestTitleGap_( AstPlot *, int * );
+   void astSetTitleGap_( AstPlot *, double, int * );
+   void astClearTitleGap_( AstPlot *, int * );
 
-   int astGetEdge_( AstPlot *, int );
-   int astTestEdge_( AstPlot *, int );
-   void astSetEdge_( AstPlot *, int, int );
-   void astClearEdge_( AstPlot *, int );
+   int astGetEdge_( AstPlot *, int, int * );
+   int astTestEdge_( AstPlot *, int, int * );
+   void astSetEdge_( AstPlot *, int, int, int * );
+   void astClearEdge_( AstPlot *, int, int * );
 
-   int astGetMinTick_( AstPlot *, int );
-   int astTestMinTick_( AstPlot *, int );
-   void astSetMinTick_( AstPlot *, int, int );
-   void astClearMinTick_( AstPlot *, int );
+   int astGetMinTick_( AstPlot *, int, int * );
+   int astTestMinTick_( AstPlot *, int, int * );
+   void astSetMinTick_( AstPlot *, int, int, int * );
+   void astClearMinTick_( AstPlot *, int, int * );
 
-   int astGetNumLab_( AstPlot *, int );
-   int astTestNumLab_( AstPlot *, int );
-   void astSetNumLab_( AstPlot *, int, int );
-   void astClearNumLab_( AstPlot *, int );
+   int astGetNumLab_( AstPlot *, int, int * );
+   int astTestNumLab_( AstPlot *, int, int * );
+   void astSetNumLab_( AstPlot *, int, int, int * );
+   void astClearNumLab_( AstPlot *, int, int * );
 
-   int astGetTextLab_( AstPlot *, int );
-   int astTestTextLab_( AstPlot *, int );
-   void astSetTextLab_( AstPlot *, int, int );
-   void astClearTextLab_( AstPlot *, int );
+   int astGetTextLab_( AstPlot *, int, int * );
+   int astTestTextLab_( AstPlot *, int, int * );
+   void astSetTextLab_( AstPlot *, int, int, int * );
+   void astClearTextLab_( AstPlot *, int, int * );
 
-   int astGetLabelUnits_( AstPlot *, int );
-   int astTestLabelUnits_( AstPlot *, int );
-   void astSetLabelUnits_( AstPlot *, int, int );
-   void astClearLabelUnits_( AstPlot *, int );
+   int astGetLabelUnits_( AstPlot *, int, int * );
+   int astTestLabelUnits_( AstPlot *, int, int * );
+   void astSetLabelUnits_( AstPlot *, int, int, int * );
+   void astClearLabelUnits_( AstPlot *, int, int * );
 
-   int astGetStyle_( AstPlot *, int );
-   int astTestStyle_( AstPlot *, int );
-   void astSetStyle_( AstPlot *, int, int );
-   void astClearStyle_( AstPlot *, int );
+   int astGetStyle_( AstPlot *, int, int * );
+   int astTestStyle_( AstPlot *, int, int * );
+   void astSetStyle_( AstPlot *, int, int, int * );
+   void astClearStyle_( AstPlot *, int, int * );
 
-   int astGetFont_( AstPlot *, int );
-   int astTestFont_( AstPlot *, int );
-   void astSetFont_( AstPlot *, int, int );
-   void astClearFont_( AstPlot *, int );
+   int astGetFont_( AstPlot *, int, int * );
+   int astTestFont_( AstPlot *, int, int * );
+   void astSetFont_( AstPlot *, int, int, int * );
+   void astClearFont_( AstPlot *, int, int * );
 
-   int astGetColour_( AstPlot *, int );
-   int astTestColour_( AstPlot *, int );
-   void astSetColour_( AstPlot *, int, int );
-   void astClearColour_( AstPlot *, int );
+   int astGetColour_( AstPlot *, int, int * );
+   int astTestColour_( AstPlot *, int, int * );
+   void astSetColour_( AstPlot *, int, int, int * );
+   void astClearColour_( AstPlot *, int, int * );
 
-   double astGetWidth_( AstPlot *, int );
-   int astTestWidth_( AstPlot *, int );
-   void astSetWidth_( AstPlot *, int, double );
-   void astClearWidth_( AstPlot *, int );
+   double astGetWidth_( AstPlot *, int, int * );
+   int astTestWidth_( AstPlot *, int, int * );
+   void astSetWidth_( AstPlot *, int, double, int * );
+   void astClearWidth_( AstPlot *, int, int * );
 
-   double astGetSize_( AstPlot *, int );
-   int astTestSize_( AstPlot *, int );
-   void astSetSize_( AstPlot *, int, double );
-   void astClearSize_( AstPlot *, int );
+   double astGetSize_( AstPlot *, int, int * );
+   int astTestSize_( AstPlot *, int, int * );
+   void astSetSize_( AstPlot *, int, double, int * );
+   void astClearSize_( AstPlot *, int, int * );
 
-   int astGetInk_( AstPlot * );
-   int astTestInk_( AstPlot * );
-   void astSetInk_( AstPlot *, int );
-   void astClearInk_( AstPlot * );
+   int astGetInk_( AstPlot *, int * );
+   int astTestInk_( AstPlot *, int * );
+   void astSetInk_( AstPlot *, int, int * );
+   void astClearInk_( AstPlot *, int * );
 #endif
 
 /* Function interfaces. */
@@ -820,13 +933,13 @@ AstPlot *astLoadPlot_( void *, size_t, AstPlotVtab *,
 
 /* Initialiser. */
 #define astInitPlot(mem,size,init,vtab,name,frame,graph,base) \
-astINVOKE(O,astInitPlot_(mem,size,init,vtab,name,frame,graph,base))
+astINVOKE(O,astInitPlot_(mem,size,init,vtab,name,frame,graph,base,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitPlotVtab(vtab,name) astINVOKE(V,astInitPlotVtab_(vtab,name))
+#define astInitPlotVtab(vtab,name) astINVOKE(V,astInitPlotVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadPlot(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadPlot_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadPlot_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to member functions. */
@@ -837,419 +950,423 @@ astINVOKE(O,astLoadPlot_(mem,size,vtab,name,astCheckChannel(channel)))
 
 
 #define astGetGrfContext(this) \
-astINVOKE(O,astGetGrfContext_(astCheckPlot(this)))
+astINVOKE(O,astGetGrfContext_(astCheckPlot(this),STATUS_PTR))
 
 #define astBorder(this) \
-astINVOKE(V,astBorder_(astCheckPlot(this)))
+astINVOKE(V,astBorder_(astCheckPlot(this),STATUS_PTR))
 
 #define astBoundingBox(this,lbnd,ubnd) \
-astINVOKE(V,astBoundingBox_(astCheckPlot(this),lbnd,ubnd))
+astINVOKE(V,astBoundingBox_(astCheckPlot(this),lbnd,ubnd,STATUS_PTR))
 
 #define astClip(this,iframe,lbnd,ubnd) \
-astINVOKE(V,astClip_(astCheckPlot(this),iframe,lbnd,ubnd))
+astINVOKE(V,astClip_(astCheckPlot(this),iframe,lbnd,ubnd,STATUS_PTR))
 
 #define astMark(this,nmark,ncoord,indim,in,type) \
-astINVOKE(V,astMark_(astCheckPlot(this),nmark,ncoord,indim,in,type))
+astINVOKE(V,astMark_(astCheckPlot(this),nmark,ncoord,indim,in,type,STATUS_PTR))
 
 #define astText(this,text,pos,up,just) \
-astINVOKE(V,astText_(astCheckPlot(this),text,pos,up,just))
+astINVOKE(V,astText_(astCheckPlot(this),text,pos,up,just,STATUS_PTR))
 
 #define astGrid(this) \
-astINVOKE(V,astGrid_(astCheckPlot(this)))
+astINVOKE(V,astGrid_(astCheckPlot(this),STATUS_PTR))
 
 #define astGridLine(this,axis,start,length) \
-astINVOKE(V,astGridLine_(astCheckPlot(this),axis,start,length))
+astINVOKE(V,astGridLine_(astCheckPlot(this),axis,start,length,STATUS_PTR))
 
 #define astCurve(this,start,finish) \
-astINVOKE(V,astCurve_(astCheckPlot(this),start,finish))
+astINVOKE(V,astCurve_(astCheckPlot(this),start,finish,STATUS_PTR))
 
 #define astGenCurve(this,map) \
-astINVOKE(V,astGenCurve_(astCheckPlot(this),astCheckMapping(map)))
+astINVOKE(V,astGenCurve_(astCheckPlot(this),astCheckMapping(map),STATUS_PTR))
 
 #define astPolyCurve(this,npoint,ncoord,dim,in) \
-astINVOKE(V,astPolyCurve_(astCheckPlot(this),npoint,ncoord,dim,in))
+astINVOKE(V,astPolyCurve_(astCheckPlot(this),npoint,ncoord,dim,in,STATUS_PTR))
 
 #define astGrfSet(this,name,fun) \
-astINVOKE(V,astGrfSet_(astCheckPlot(this),name,fun))
+astINVOKE(V,astGrfSet_(astCheckPlot(this),name,fun,STATUS_PTR))
 
 #define astGrfPush(this) \
-astINVOKE(V,astGrfPush_(astCheckPlot(this)))
+astINVOKE(V,astGrfPush_(astCheckPlot(this),STATUS_PTR))
 
 #define astGrfPop(this) \
-astINVOKE(V,astGrfPop_(astCheckPlot(this)))
+astINVOKE(V,astGrfPop_(astCheckPlot(this),STATUS_PTR))
 
 
-#define astGrfFunID astGrfFunID_
-#define astFindEscape astFindEscape_
-#define astStripEscapes(text) astStripEscapes_(text)
-#define astGrfConID(this) astGrfConID_(this)
+#define astGrfFunID(name,method,class) astGrfFunID_(name,method,class,STATUS_PTR)
+#define astFindEscape(text,type,value,nc) astFindEscape_(text,type,value,nc,STATUS_PTR) 
+#define astStripEscapes(text) astStripEscapes_(text,STATUS_PTR)
+#define astGrfConID(this) astGrfConID_(this,STATUS_PTR)
 
 #define astGrfWrapper(this,name,wrapper) \
-astINVOKE(V,astGrfWrapper_(astCheckPlot(this),name,wrapper))
+astINVOKE(V,astGrfWrapper_(astCheckPlot(this),name,wrapper,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 
 #define astGrfAttrs(this,id,set,prim,method,class) \
-astGrfAttrs_(astCheckPlot(this),id,set,prim,method,class )
+astGrfAttrs_(astCheckPlot(this),id,set,prim,method,class,STATUS_PTR)
 
 #define astCvBrk(this,ibrk,brk,vbrk,len) \
-astINVOKE(V,astCvBrk_(astCheckPlot(this),ibrk,brk,vbrk,len))
+astINVOKE(V,astCvBrk_(astCheckPlot(this),ibrk,brk,vbrk,len,STATUS_PTR))
 
 #define astCopyPlotDefaults(this,axis,dplot,daxis) \
-astINVOKE(V,astCopyPlotDefaults_(astCheckPlot(this),axis,astCheckPlot(dplot),daxis))
+astINVOKE(V,astCopyPlotDefaults_(astCheckPlot(this),axis,astCheckPlot(dplot),daxis,STATUS_PTR))
 
 #define astMirror(this,axis) \
-astINVOKE(V,astMirror_(astCheckPlot(this),axis))
+astINVOKE(V,astMirror_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astGetDrawnTicks(this,axis,major) \
-astINVOKE(O,astGetDrawnTicks_(astCheckPlot(this),axis,major))
+astINVOKE(O,astGetDrawnTicks_(astCheckPlot(this),axis,major,STATUS_PTR))
 
 #define astSetTickValues(this,axis,nmajor,major,nminor,minor) \
-astINVOKE(V,astSetTickValues_(astCheckPlot(this),axis,nmajor,major,nminor,minor))
+astINVOKE(V,astSetTickValues_(astCheckPlot(this),axis,nmajor,major,nminor,minor,STATUS_PTR))
 
 #define astDrawExtraTicks(this,axis,pset) \
-astINVOKE(V,astDrawExtraTicks_(astCheckPlot(this),axis,astCheckPointSet(pset)))
+astINVOKE(V,astDrawExtraTicks_(astCheckPlot(this),axis,astCheckPointSet(pset),STATUS_PTR))
 
 #define astClearTol(this) \
-astINVOKE(V,astClearTol_(astCheckPlot(this)))
+astINVOKE(V,astClearTol_(astCheckPlot(this),STATUS_PTR))
 #define astGetTol(this) \
-astINVOKE(V,astGetTol_(astCheckPlot(this)))
+astINVOKE(V,astGetTol_(astCheckPlot(this),STATUS_PTR))
 #define astSetTol(this,tol) \
-astINVOKE(V,astSetTol_(astCheckPlot(this),tol))
+astINVOKE(V,astSetTol_(astCheckPlot(this),tol,STATUS_PTR))
 #define astTestTol(this) \
-astINVOKE(V,astTestTol_(astCheckPlot(this)))
+astINVOKE(V,astTestTol_(astCheckPlot(this),STATUS_PTR))
 
 #define astClearGrid(this) \
-astINVOKE(V,astClearGrid_(astCheckPlot(this)))
+astINVOKE(V,astClearGrid_(astCheckPlot(this),STATUS_PTR))
 #define astGetGrid(this) \
-astINVOKE(V,astGetGrid_(astCheckPlot(this)))
+astINVOKE(V,astGetGrid_(astCheckPlot(this),STATUS_PTR))
 #define astSetGrid(this,grid) \
-astINVOKE(V,astSetGrid_(astCheckPlot(this),grid))
+astINVOKE(V,astSetGrid_(astCheckPlot(this),grid,STATUS_PTR))
 #define astTestGrid(this) \
-astINVOKE(V,astTestGrid_(astCheckPlot(this)))
+astINVOKE(V,astTestGrid_(astCheckPlot(this),STATUS_PTR))
 
 #define astClearInk(this) \
-astINVOKE(V,astClearInk_(astCheckPlot(this)))
+astINVOKE(V,astClearInk_(astCheckPlot(this),STATUS_PTR))
 #define astGetInk(this) \
-astINVOKE(V,astGetInk_(astCheckPlot(this)))
+astINVOKE(V,astGetInk_(astCheckPlot(this),STATUS_PTR))
 #define astSetInk(this,ink) \
-astINVOKE(V,astSetInk_(astCheckPlot(this),ink))
+astINVOKE(V,astSetInk_(astCheckPlot(this),ink,STATUS_PTR))
 #define astTestInk(this) \
-astINVOKE(V,astTestInk_(astCheckPlot(this)))
+astINVOKE(V,astTestInk_(astCheckPlot(this),STATUS_PTR))
 
 #define astClearTickAll(this) \
-astINVOKE(V,astClearTickAll_(astCheckPlot(this)))
+astINVOKE(V,astClearTickAll_(astCheckPlot(this),STATUS_PTR))
 #define astGetTickAll(this) \
-astINVOKE(V,astGetTickAll_(astCheckPlot(this)))
+astINVOKE(V,astGetTickAll_(astCheckPlot(this),STATUS_PTR))
 #define astSetTickAll(this,tickall) \
-astINVOKE(V,astSetTickAll_(astCheckPlot(this),tickall))
+astINVOKE(V,astSetTickAll_(astCheckPlot(this),tickall,STATUS_PTR))
 #define astTestTickAll(this) \
-astINVOKE(V,astTestTickAll_(astCheckPlot(this)))
+astINVOKE(V,astTestTickAll_(astCheckPlot(this),STATUS_PTR))
 
 #define astClearForceExterior(this) \
-astINVOKE(V,astClearForceExterior_(astCheckPlot(this)))
+astINVOKE(V,astClearForceExterior_(astCheckPlot(this),STATUS_PTR))
 #define astGetForceExterior(this) \
-astINVOKE(V,astGetForceExterior_(astCheckPlot(this)))
+astINVOKE(V,astGetForceExterior_(astCheckPlot(this),STATUS_PTR))
 #define astSetForceExterior(this,frcext) \
-astINVOKE(V,astSetForceExterior_(astCheckPlot(this),frcext))
+astINVOKE(V,astSetForceExterior_(astCheckPlot(this),frcext,STATUS_PTR))
 #define astTestForceExterior(this) \
-astINVOKE(V,astTestForceExterior_(astCheckPlot(this)))
+astINVOKE(V,astTestForceExterior_(astCheckPlot(this),STATUS_PTR))
 
 #define astClearBorder(this) \
-astINVOKE(V,astClearBorder_(astCheckPlot(this)))
+astINVOKE(V,astClearBorder_(astCheckPlot(this),STATUS_PTR))
 #define astGetBorder(this) \
-astINVOKE(V,astGetBorder_(astCheckPlot(this)))
+astINVOKE(V,astGetBorder_(astCheckPlot(this),STATUS_PTR))
 #define astSetBorder(this,border) \
-astINVOKE(V,astSetBorder_(astCheckPlot(this),border))
+astINVOKE(V,astSetBorder_(astCheckPlot(this),border,STATUS_PTR))
 #define astTestBorder(this) \
-astINVOKE(V,astTestBorder_(astCheckPlot(this)))
+astINVOKE(V,astTestBorder_(astCheckPlot(this),STATUS_PTR))
 
 #define astClearClip(this) \
-astINVOKE(V,astClearClip_(astCheckPlot(this)))
+astINVOKE(V,astClearClip_(astCheckPlot(this),STATUS_PTR))
 #define astGetClip(this) \
-astINVOKE(V,astGetClip_(astCheckPlot(this)))
+astINVOKE(V,astGetClip_(astCheckPlot(this),STATUS_PTR))
 #define astSetClip(this,clip) \
-astINVOKE(V,astSetClip_(astCheckPlot(this),clip))
+astINVOKE(V,astSetClip_(astCheckPlot(this),clip,STATUS_PTR))
 #define astTestClip(this) \
-astINVOKE(V,astTestClip_(astCheckPlot(this)))
+astINVOKE(V,astTestClip_(astCheckPlot(this),STATUS_PTR))
 
 #define astClearClipOp(this) \
-astINVOKE(V,astClearClipOp_(astCheckPlot(this)))
+astINVOKE(V,astClearClipOp_(astCheckPlot(this),STATUS_PTR))
 #define astGetClipOp(this) \
-astINVOKE(V,astGetClipOp_(astCheckPlot(this)))
+astINVOKE(V,astGetClipOp_(astCheckPlot(this),STATUS_PTR))
 #define astSetClipOp(this,clipop) \
-astINVOKE(V,astSetClipOp_(astCheckPlot(this),clipop))
+astINVOKE(V,astSetClipOp_(astCheckPlot(this),clipop,STATUS_PTR))
 #define astTestClipOp(this) \
-astINVOKE(V,astTestClipOp_(astCheckPlot(this)))
+astINVOKE(V,astTestClipOp_(astCheckPlot(this),STATUS_PTR))
 
 #define astClearInvisible(this) \
-astINVOKE(V,astClearInvisible_(astCheckPlot(this)))
+astINVOKE(V,astClearInvisible_(astCheckPlot(this),STATUS_PTR))
 #define astGetInvisible(this) \
-astINVOKE(V,astGetInvisible_(astCheckPlot(this)))
+astINVOKE(V,astGetInvisible_(astCheckPlot(this),STATUS_PTR))
 #define astSetInvisible(this,invisible) \
-astINVOKE(V,astSetInvisible_(astCheckPlot(this),invisible))
+astINVOKE(V,astSetInvisible_(astCheckPlot(this),invisible,STATUS_PTR))
 #define astTestInvisible(this) \
-astINVOKE(V,astTestInvisible_(astCheckPlot(this)))
+astINVOKE(V,astTestInvisible_(astCheckPlot(this),STATUS_PTR))
 
 #define astClearGrf(this) \
-astINVOKE(V,astClearGrf_(astCheckPlot(this)))
+astINVOKE(V,astClearGrf_(astCheckPlot(this),STATUS_PTR))
 #define astGetGrf(this) \
-astINVOKE(V,astGetGrf_(astCheckPlot(this)))
+astINVOKE(V,astGetGrf_(astCheckPlot(this),STATUS_PTR))
 #define astSetGrf(this,grf) \
-astINVOKE(V,astSetGrf_(astCheckPlot(this),grf))
+astINVOKE(V,astSetGrf_(astCheckPlot(this),grf,STATUS_PTR))
 #define astTestGrf(this) \
-astINVOKE(V,astTestGrf_(astCheckPlot(this)))
+astINVOKE(V,astTestGrf_(astCheckPlot(this),STATUS_PTR))
 
 #define astClearDrawTitle(this) \
-astINVOKE(V,astClearDrawTitle_(astCheckPlot(this)))
+astINVOKE(V,astClearDrawTitle_(astCheckPlot(this),STATUS_PTR))
 #define astGetDrawTitle(this) \
-astINVOKE(V,astGetDrawTitle_(astCheckPlot(this)))
+astINVOKE(V,astGetDrawTitle_(astCheckPlot(this),STATUS_PTR))
 #define astSetDrawTitle(this,drawtitle) \
-astINVOKE(V,astSetDrawTitle_(astCheckPlot(this),drawtitle))
+astINVOKE(V,astSetDrawTitle_(astCheckPlot(this),drawtitle,STATUS_PTR))
 #define astTestDrawTitle(this) \
-astINVOKE(V,astTestDrawTitle_(astCheckPlot(this)))
+astINVOKE(V,astTestDrawTitle_(astCheckPlot(this),STATUS_PTR))
 
 #define astClearDrawAxes(this,axis) \
-astINVOKE(V,astClearDrawAxes_(astCheckPlot(this),axis))
+astINVOKE(V,astClearDrawAxes_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetDrawAxes(this,axis) \
-astINVOKE(V,astGetDrawAxes_(astCheckPlot(this),axis))
+astINVOKE(V,astGetDrawAxes_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetDrawAxes(this,axis,drawaxes) \
-astINVOKE(V,astSetDrawAxes_(astCheckPlot(this),axis,drawaxes))
+astINVOKE(V,astSetDrawAxes_(astCheckPlot(this),axis,drawaxes,STATUS_PTR))
 #define astTestDrawAxes(this,axis) \
-astINVOKE(V,astTestDrawAxes_(astCheckPlot(this),axis))
+astINVOKE(V,astTestDrawAxes_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearAbbrev(this,axis) \
-astINVOKE(V,astClearAbbrev_(astCheckPlot(this),axis))
+astINVOKE(V,astClearAbbrev_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetAbbrev(this,axis) \
-astINVOKE(V,astGetAbbrev_(astCheckPlot(this),axis))
+astINVOKE(V,astGetAbbrev_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetAbbrev(this,axis,abbrev) \
-astINVOKE(V,astSetAbbrev_(astCheckPlot(this),axis,abbrev))
+astINVOKE(V,astSetAbbrev_(astCheckPlot(this),axis,abbrev,STATUS_PTR))
 #define astTestAbbrev(this,axis) \
-astINVOKE(V,astTestAbbrev_(astCheckPlot(this),axis))
+astINVOKE(V,astTestAbbrev_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearEscape(this) \
-astINVOKE(V,astClearEscape_(astCheckPlot(this)))
+astINVOKE(V,astClearEscape_(astCheckPlot(this),STATUS_PTR))
 #define astGetEscape(this) \
-astINVOKE(V,astGetEscape_(astCheckPlot(this)))
+astINVOKE(V,astGetEscape_(astCheckPlot(this),STATUS_PTR))
 #define astSetEscape(this,escape) \
-astINVOKE(V,astSetEscape_(astCheckPlot(this),escape))
+astINVOKE(V,astSetEscape_(astCheckPlot(this),escape,STATUS_PTR))
 #define astTestEscape(this) \
-astINVOKE(V,astTestEscape_(astCheckPlot(this)))
+astINVOKE(V,astTestEscape_(astCheckPlot(this),STATUS_PTR))
 
 #define astClearLabelAt(this,axis) \
-astINVOKE(V,astClearLabelAt_(astCheckPlot(this),axis))
+astINVOKE(V,astClearLabelAt_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetLabelAt(this,axis) \
-astINVOKE(V,astGetLabelAt_(astCheckPlot(this),axis))
+astINVOKE(V,astGetLabelAt_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetLabelAt(this,axis,labelat) \
-astINVOKE(V,astSetLabelAt_(astCheckPlot(this),axis,labelat))
+astINVOKE(V,astSetLabelAt_(astCheckPlot(this),axis,labelat,STATUS_PTR))
 #define astTestLabelAt(this,axis) \
-astINVOKE(V,astTestLabelAt_(astCheckPlot(this),axis))
+astINVOKE(V,astTestLabelAt_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearGap(this,axis) \
-astINVOKE(V,astClearGap_(astCheckPlot(this),axis))
+astINVOKE(V,astClearGap_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetGap(this,axis) \
-astINVOKE(V,astGetGap_(astCheckPlot(this),axis))
+astINVOKE(V,astGetGap_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetGap(this,axis,gap) \
-astINVOKE(V,astSetGap_(astCheckPlot(this),axis,gap))
+astINVOKE(V,astSetGap_(astCheckPlot(this),axis,gap,STATUS_PTR))
 #define astTestGap(this,axis) \
-astINVOKE(V,astTestGap_(astCheckPlot(this),axis))
+astINVOKE(V,astTestGap_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearLogGap(this,axis) \
-astINVOKE(V,astClearLogGap_(astCheckPlot(this),axis))
+astINVOKE(V,astClearLogGap_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetLogGap(this,axis) \
-astINVOKE(V,astGetLogGap_(astCheckPlot(this),axis))
+astINVOKE(V,astGetLogGap_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetLogGap(this,axis,gap) \
-astINVOKE(V,astSetLogGap_(astCheckPlot(this),axis,gap))
+astINVOKE(V,astSetLogGap_(astCheckPlot(this),axis,gap,STATUS_PTR))
 #define astTestLogGap(this,axis) \
-astINVOKE(V,astTestLogGap_(astCheckPlot(this),axis))
+astINVOKE(V,astTestLogGap_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearCentre(this,axis) \
-astINVOKE(V,astClearCentre_(astCheckPlot(this),axis))
+astINVOKE(V,astClearCentre_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetCentre(this,axis) \
-astINVOKE(V,astGetCentre_(astCheckPlot(this),axis))
+astINVOKE(V,astGetCentre_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetCentre(this,axis,centre) \
-astINVOKE(V,astSetCentre_(astCheckPlot(this),axis,centre))
+astINVOKE(V,astSetCentre_(astCheckPlot(this),axis,centre,STATUS_PTR))
 #define astTestCentre(this,axis) \
-astINVOKE(V,astTestCentre_(astCheckPlot(this),axis))
+astINVOKE(V,astTestCentre_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearMajTickLen(this,axis) \
-astINVOKE(V,astClearMajTickLen_(astCheckPlot(this),axis))
+astINVOKE(V,astClearMajTickLen_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetMajTickLen(this,axis) \
-astINVOKE(V,astGetMajTickLen_(astCheckPlot(this),axis))
+astINVOKE(V,astGetMajTickLen_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetMajTickLen(this,axis,majticklen) \
-astINVOKE(V,astSetMajTickLen_(astCheckPlot(this),axis,majticklen))
+astINVOKE(V,astSetMajTickLen_(astCheckPlot(this),axis,majticklen,STATUS_PTR))
 #define astTestMajTickLen(this,axis) \
-astINVOKE(V,astTestMajTickLen_(astCheckPlot(this),axis))
+astINVOKE(V,astTestMajTickLen_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearMinTickLen(this,axis) \
-astINVOKE(V,astClearMinTickLen_(astCheckPlot(this),axis))
+astINVOKE(V,astClearMinTickLen_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetMinTickLen(this,axis) \
-astINVOKE(V,astGetMinTickLen_(astCheckPlot(this),axis))
+astINVOKE(V,astGetMinTickLen_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetMinTickLen(this,axis,minticklen) \
-astINVOKE(V,astSetMinTickLen_(astCheckPlot(this),axis,minticklen))
+astINVOKE(V,astSetMinTickLen_(astCheckPlot(this),axis,minticklen,STATUS_PTR))
 #define astTestMinTickLen(this,axis) \
-astINVOKE(V,astTestMinTickLen_(astCheckPlot(this),axis))
+astINVOKE(V,astTestMinTickLen_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearNumLabGap(this,axis) \
-astINVOKE(V,astClearNumLabGap_(astCheckPlot(this),axis))
+astINVOKE(V,astClearNumLabGap_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetNumLabGap(this,axis) \
-astINVOKE(V,astGetNumLabGap_(astCheckPlot(this),axis))
+astINVOKE(V,astGetNumLabGap_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetNumLabGap(this,axis,numlabgap) \
-astINVOKE(V,astSetNumLabGap_(astCheckPlot(this),axis,numlabgap))
+astINVOKE(V,astSetNumLabGap_(astCheckPlot(this),axis,numlabgap,STATUS_PTR))
 #define astTestNumLabGap(this,axis) \
-astINVOKE(V,astTestNumLabGap_(astCheckPlot(this),axis))
+astINVOKE(V,astTestNumLabGap_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearTextLabGap(this,axis) \
-astINVOKE(V,astClearTextLabGap_(astCheckPlot(this),axis))
+astINVOKE(V,astClearTextLabGap_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetTextLabGap(this,axis) \
-astINVOKE(V,astGetTextLabGap_(astCheckPlot(this),axis))
+astINVOKE(V,astGetTextLabGap_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetTextLabGap(this,axis,textlabgap) \
-astINVOKE(V,astSetTextLabGap_(astCheckPlot(this),axis,textlabgap))
+astINVOKE(V,astSetTextLabGap_(astCheckPlot(this),axis,textlabgap,STATUS_PTR))
 #define astTestTextLabGap(this,axis) \
-astINVOKE(V,astTestTextLabGap_(astCheckPlot(this),axis))
+astINVOKE(V,astTestTextLabGap_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearTitleGap(this) \
-astINVOKE(V,astClearTitleGap_(astCheckPlot(this)))
+astINVOKE(V,astClearTitleGap_(astCheckPlot(this),STATUS_PTR))
 #define astGetTitleGap(this) \
-astINVOKE(V,astGetTitleGap_(astCheckPlot(this)))
+astINVOKE(V,astGetTitleGap_(astCheckPlot(this),STATUS_PTR))
 #define astSetTitleGap(this,titlegap) \
-astINVOKE(V,astSetTitleGap_(astCheckPlot(this),titlegap))
+astINVOKE(V,astSetTitleGap_(astCheckPlot(this),titlegap,STATUS_PTR))
 #define astTestTitleGap(this) \
-astINVOKE(V,astTestTitleGap_(astCheckPlot(this)))
+astINVOKE(V,astTestTitleGap_(astCheckPlot(this),STATUS_PTR))
 
 #define astClearLabelling(this) \
-astINVOKE(V,astClearLabelling_(astCheckPlot(this)))
+astINVOKE(V,astClearLabelling_(astCheckPlot(this),STATUS_PTR))
 #define astGetLabelling(this) \
-astINVOKE(V,astGetLabelling_(astCheckPlot(this)))
+astINVOKE(V,astGetLabelling_(astCheckPlot(this),STATUS_PTR))
 #define astSetLabelling(this,labelling) \
-astINVOKE(V,astSetLabelling_(astCheckPlot(this),labelling))
+astINVOKE(V,astSetLabelling_(astCheckPlot(this),labelling,STATUS_PTR))
 #define astTestLabelling(this) \
-astINVOKE(V,astTestLabelling_(astCheckPlot(this)))
+astINVOKE(V,astTestLabelling_(astCheckPlot(this),STATUS_PTR))
 
 #define astClearEdge(this,axis) \
-astINVOKE(V,astClearEdge_(astCheckPlot(this),axis))
+astINVOKE(V,astClearEdge_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetEdge(this,axis) \
-astINVOKE(V,astGetEdge_(astCheckPlot(this),axis))
+astINVOKE(V,astGetEdge_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetEdge(this,axis,edge) \
-astINVOKE(V,astSetEdge_(astCheckPlot(this),axis,edge))
+astINVOKE(V,astSetEdge_(astCheckPlot(this),axis,edge,STATUS_PTR))
 #define astTestEdge(this,axis) \
-astINVOKE(V,astTestEdge_(astCheckPlot(this),axis))
+astINVOKE(V,astTestEdge_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearMinTick(this,axis) \
-astINVOKE(V,astClearMinTick_(astCheckPlot(this),axis))
+astINVOKE(V,astClearMinTick_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetMinTick(this,axis) \
-astINVOKE(V,astGetMinTick_(astCheckPlot(this),axis))
+astINVOKE(V,astGetMinTick_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetMinTick(this,axis,mintick) \
-astINVOKE(V,astSetMinTick_(astCheckPlot(this),axis,mintick))
+astINVOKE(V,astSetMinTick_(astCheckPlot(this),axis,mintick,STATUS_PTR))
 #define astTestMinTick(this,axis) \
-astINVOKE(V,astTestMinTick_(astCheckPlot(this),axis))
+astINVOKE(V,astTestMinTick_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearNumLab(this,axis) \
-astINVOKE(V,astClearNumLab_(astCheckPlot(this),axis))
+astINVOKE(V,astClearNumLab_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetNumLab(this,axis) \
-astINVOKE(V,astGetNumLab_(astCheckPlot(this),axis))
+astINVOKE(V,astGetNumLab_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetNumLab(this,axis,numlab) \
-astINVOKE(V,astSetNumLab_(astCheckPlot(this),axis,numlab))
+astINVOKE(V,astSetNumLab_(astCheckPlot(this),axis,numlab,STATUS_PTR))
 #define astTestNumLab(this,axis) \
-astINVOKE(V,astTestNumLab_(astCheckPlot(this),axis))
+astINVOKE(V,astTestNumLab_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearLabelUp(this,axis) \
-astINVOKE(V,astClearLabelUp_(astCheckPlot(this),axis))
+astINVOKE(V,astClearLabelUp_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetLabelUp(this,axis) \
-astINVOKE(V,astGetLabelUp_(astCheckPlot(this),axis))
+astINVOKE(V,astGetLabelUp_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetLabelUp(this,axis,labelup) \
-astINVOKE(V,astSetLabelUp_(astCheckPlot(this),axis,labelup))
+astINVOKE(V,astSetLabelUp_(astCheckPlot(this),axis,labelup,STATUS_PTR))
 #define astTestLabelUp(this,axis) \
-astINVOKE(V,astTestLabelUp_(astCheckPlot(this),axis))
+astINVOKE(V,astTestLabelUp_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearLogPlot(this,axis) \
-astINVOKE(V,astClearLogPlot_(astCheckPlot(this),axis))
+astINVOKE(V,astClearLogPlot_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetLogPlot(this,axis) \
-astINVOKE(V,astGetLogPlot_(astCheckPlot(this),axis))
+astINVOKE(V,astGetLogPlot_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetLogPlot(this,axis,logplot) \
-astINVOKE(V,astSetLogPlot_(astCheckPlot(this),axis,logplot))
+astINVOKE(V,astSetLogPlot_(astCheckPlot(this),axis,logplot,STATUS_PTR))
 #define astTestLogPlot(this,axis) \
-astINVOKE(V,astTestLogPlot_(astCheckPlot(this),axis))
+astINVOKE(V,astTestLogPlot_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearLogTicks(this,axis) \
-astINVOKE(V,astClearLogTicks_(astCheckPlot(this),axis))
+astINVOKE(V,astClearLogTicks_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetLogTicks(this,axis) \
-astINVOKE(V,astGetLogTicks_(astCheckPlot(this),axis))
+astINVOKE(V,astGetLogTicks_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetLogTicks(this,axis,logticks) \
-astINVOKE(V,astSetLogTicks_(astCheckPlot(this),axis,logticks))
+astINVOKE(V,astSetLogTicks_(astCheckPlot(this),axis,logticks,STATUS_PTR))
 #define astTestLogTicks(this,axis) \
-astINVOKE(V,astTestLogTicks_(astCheckPlot(this),axis))
+astINVOKE(V,astTestLogTicks_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearLogLabel(this,axis) \
-astINVOKE(V,astClearLogLabel_(astCheckPlot(this),axis))
+astINVOKE(V,astClearLogLabel_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetLogLabel(this,axis) \
-astINVOKE(V,astGetLogLabel_(astCheckPlot(this),axis))
+astINVOKE(V,astGetLogLabel_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetLogLabel(this,axis,loglabel) \
-astINVOKE(V,astSetLogLabel_(astCheckPlot(this),axis,loglabel))
+astINVOKE(V,astSetLogLabel_(astCheckPlot(this),axis,loglabel,STATUS_PTR))
 #define astTestLogLabel(this,axis) \
-astINVOKE(V,astTestLogLabel_(astCheckPlot(this),axis))
+astINVOKE(V,astTestLogLabel_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearTextLab(this,axis) \
-astINVOKE(V,astClearTextLab_(astCheckPlot(this),axis))
+astINVOKE(V,astClearTextLab_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetTextLab(this,axis) \
-astINVOKE(V,astGetTextLab_(astCheckPlot(this),axis))
+astINVOKE(V,astGetTextLab_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetTextLab(this,axis,textlab) \
-astINVOKE(V,astSetTextLab_(astCheckPlot(this),axis,textlab))
+astINVOKE(V,astSetTextLab_(astCheckPlot(this),axis,textlab,STATUS_PTR))
 #define astTestTextLab(this,axis) \
-astINVOKE(V,astTestTextLab_(astCheckPlot(this),axis))
+astINVOKE(V,astTestTextLab_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearLabelUnits(this,axis) \
-astINVOKE(V,astClearLabelUnits_(astCheckPlot(this),axis))
+astINVOKE(V,astClearLabelUnits_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetLabelUnits(this,axis) \
-astINVOKE(V,astGetLabelUnits_(astCheckPlot(this),axis))
+astINVOKE(V,astGetLabelUnits_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetLabelUnits(this,axis,labelunits) \
-astINVOKE(V,astSetLabelUnits_(astCheckPlot(this),axis,labelunits))
+astINVOKE(V,astSetLabelUnits_(astCheckPlot(this),axis,labelunits,STATUS_PTR))
 #define astTestLabelUnits(this,axis) \
-astINVOKE(V,astTestLabelUnits_(astCheckPlot(this),axis))
+astINVOKE(V,astTestLabelUnits_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearStyle(this,axis) \
-astINVOKE(V,astClearStyle_(astCheckPlot(this),axis))
+astINVOKE(V,astClearStyle_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetStyle(this,axis) \
-astINVOKE(V,astGetStyle_(astCheckPlot(this),axis))
+astINVOKE(V,astGetStyle_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetStyle(this,axis,style) \
-astINVOKE(V,astSetStyle_(astCheckPlot(this),axis,style))
+astINVOKE(V,astSetStyle_(astCheckPlot(this),axis,style,STATUS_PTR))
 #define astTestStyle(this,axis) \
-astINVOKE(V,astTestStyle_(astCheckPlot(this),axis))
+astINVOKE(V,astTestStyle_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearFont(this,axis) \
-astINVOKE(V,astClearFont_(astCheckPlot(this),axis))
+astINVOKE(V,astClearFont_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetFont(this,axis) \
-astINVOKE(V,astGetFont_(astCheckPlot(this),axis))
+astINVOKE(V,astGetFont_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetFont(this,axis,font) \
-astINVOKE(V,astSetFont_(astCheckPlot(this),axis,font))
+astINVOKE(V,astSetFont_(astCheckPlot(this),axis,font,STATUS_PTR))
 #define astTestFont(this,axis) \
-astINVOKE(V,astTestFont_(astCheckPlot(this),axis))
+astINVOKE(V,astTestFont_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearColour(this,axis) \
-astINVOKE(V,astClearColour_(astCheckPlot(this),axis))
+astINVOKE(V,astClearColour_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetColour(this,axis) \
-astINVOKE(V,astGetColour_(astCheckPlot(this),axis))
+astINVOKE(V,astGetColour_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetColour(this,axis,colour) \
-astINVOKE(V,astSetColour_(astCheckPlot(this),axis,colour))
+astINVOKE(V,astSetColour_(astCheckPlot(this),axis,colour,STATUS_PTR))
 #define astTestColour(this,axis) \
-astINVOKE(V,astTestColour_(astCheckPlot(this),axis))
+astINVOKE(V,astTestColour_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearWidth(this,axis) \
-astINVOKE(V,astClearWidth_(astCheckPlot(this),axis))
+astINVOKE(V,astClearWidth_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetWidth(this,axis) \
-astINVOKE(V,astGetWidth_(astCheckPlot(this),axis))
+astINVOKE(V,astGetWidth_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetWidth(this,axis,width) \
-astINVOKE(V,astSetWidth_(astCheckPlot(this),axis,width))
+astINVOKE(V,astSetWidth_(astCheckPlot(this),axis,width,STATUS_PTR))
 #define astTestWidth(this,axis) \
-astINVOKE(V,astTestWidth_(astCheckPlot(this),axis))
+astINVOKE(V,astTestWidth_(astCheckPlot(this),axis,STATUS_PTR))
 
 #define astClearSize(this,axis) \
-astINVOKE(V,astClearSize_(astCheckPlot(this),axis))
+astINVOKE(V,astClearSize_(astCheckPlot(this),axis,STATUS_PTR))
 #define astGetSize(this,axis) \
-astINVOKE(V,astGetSize_(astCheckPlot(this),axis))
+astINVOKE(V,astGetSize_(astCheckPlot(this),axis,STATUS_PTR))
 #define astSetSize(this,axis,size) \
-astINVOKE(V,astSetSize_(astCheckPlot(this),axis,size))
+astINVOKE(V,astSetSize_(astCheckPlot(this),axis,size,STATUS_PTR))
 #define astTestSize(this,axis) \
-astINVOKE(V,astTestSize_(astCheckPlot(this),axis))
+astINVOKE(V,astTestSize_(astCheckPlot(this),axis,STATUS_PTR))
 #endif
 #endif
+
+
+
+

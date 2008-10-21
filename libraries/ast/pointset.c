@@ -124,7 +124,7 @@
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static void Clear##attr( AstPointSet *this, int axis ) { \
+static void Clear##attr( AstPointSet *this, int axis, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -132,7 +132,7 @@ static void Clear##attr( AstPointSet *this, int axis ) { \
 /* Validate the axis index. */ \
    if( axis < 0 || axis >= this->ncoord ){ \
       astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
-                #attr " - it should be in the range 1 to %d.", \
+                #attr " - it should be in the range 1 to %d.", status, \
                 "astClear" #attr, astGetClass( this ), \
                 axis + 1, this->ncoord ); \
 \
@@ -144,13 +144,13 @@ static void Clear##attr( AstPointSet *this, int axis ) { \
 \
 /* External interface. */ \
 /* ------------------- */ \
-void astClear##attr##_( AstPointSet *this, int axis ) { \
+void astClear##attr##_( AstPointSet *this, int axis, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
 \
 /* Invoke the required method via the virtual function table. */ \
-   (**astMEMBER(this,PointSet,Clear##attr))( this, axis ); \
+   (**astMEMBER(this,PointSet,Clear##attr))( this, axis, status ); \
 }   
 
 
@@ -211,7 +211,7 @@ void astClear##attr##_( AstPointSet *this, int axis ) { \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static type Get##attr( AstPointSet *this, int axis ) { \
+static type Get##attr( AstPointSet *this, int axis, int *status ) { \
    type result;                  /* Result to be returned */ \
 \
 /* Initialise */ \
@@ -223,7 +223,7 @@ static type Get##attr( AstPointSet *this, int axis ) { \
 /* Validate the axis index. */ \
    if( axis < 0 || axis >= this->ncoord ){ \
       astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
-                #attr " - it should be in the range 1 to %d.", \
+                #attr " - it should be in the range 1 to %d.", status, \
                 "astGet" #attr, astGetClass( this ), \
                 axis + 1, this->ncoord ); \
 \
@@ -240,13 +240,13 @@ static type Get##attr( AstPointSet *this, int axis ) { \
 } \
 /* External interface. */ \
 /* ------------------- */  \
-type astGet##attr##_( AstPointSet *this, int axis ) { \
+type astGet##attr##_( AstPointSet *this, int axis, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return (bad_value); \
 \
 /* Invoke the required method via the virtual function table. */ \
-   return (**astMEMBER(this,PointSet,Get##attr))( this, axis ); \
+   return (**astMEMBER(this,PointSet,Get##attr))( this, axis, status ); \
 }
 
 /*
@@ -308,7 +308,7 @@ type astGet##attr##_( AstPointSet *this, int axis ) { \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static void Set##attr( AstPointSet *this, int axis, type value ) { \
+static void Set##attr( AstPointSet *this, int axis, type value, int *status ) { \
    int i; \
 \
 /* Check the global error status. */ \
@@ -317,7 +317,7 @@ static void Set##attr( AstPointSet *this, int axis, type value ) { \
 /* Validate the axis index. */ \
    if( axis < 0 || axis >= this->ncoord ){ \
       astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
-                #attr " - it should be in the range 1 to %d.", \
+                #attr " - it should be in the range 1 to %d.", status, \
                 "astSet" #attr, astGetClass( this ), \
                 axis + 1, this->ncoord ); \
 \
@@ -335,13 +335,13 @@ static void Set##attr( AstPointSet *this, int axis, type value ) { \
 \
 /* External interface. */ \
 /* ------------------- */ \
-void astSet##attr##_( AstPointSet *this, int axis, type value ) { \
+void astSet##attr##_( AstPointSet *this, int axis, type value, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
 \
 /* Invoke the required method via the virtual function table. */ \
-   (**astMEMBER(this,PointSet,Set##attr))( this, axis, value ); \
+   (**astMEMBER(this,PointSet,Set##attr))( this, axis, value, status ); \
 }
 
 /*
@@ -397,7 +397,7 @@ void astSet##attr##_( AstPointSet *this, int axis, type value ) { \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static int Test##attr( AstPointSet *this, int axis ) { \
+static int Test##attr( AstPointSet *this, int axis, int *status ) { \
    int result;                   /* Value to return */ \
 \
    result= 0; \
@@ -408,7 +408,7 @@ static int Test##attr( AstPointSet *this, int axis ) { \
 /* Validate the axis index. */ \
    if( axis < 0 || axis >= this->ncoord ){ \
       astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
-                #attr " - it should be in the range 1 to %d.", \
+                #attr " - it should be in the range 1 to %d.", status, \
                 "astTest" #attr, astGetClass( this ), \
                 axis + 1, this->ncoord ); \
 \
@@ -425,21 +425,24 @@ static int Test##attr( AstPointSet *this, int axis ) { \
 } \
 /* External interface. */ \
 /* ------------------- */ \
-int astTest##attr##_( AstPointSet *this, int axis ) { \
+int astTest##attr##_( AstPointSet *this, int axis, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return 0; \
 \
 /* Invoke the required method via the virtual function table. */ \
-   return (**astMEMBER(this,PointSet,Test##attr))( this, axis ); \
+   return (**astMEMBER(this,PointSet,Test##attr))( this, axis, status ); \
 }
 
 /* Include files. */
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
+#include "globals.h"             /* Thread-safe global data access */
 #include "object.h"              /* Base Object class */
 #include "pointset.h"            /* Interface definition for this class */
 
@@ -457,57 +460,87 @@ int astTest##attr##_( AstPointSet *this, int axis ) { \
 
 /* Module Variables. */
 /* ================= */
-/* Module Variables. */
-/* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstPointSetVtab class_vtab; /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static const char *(* parent_getattrib)( AstObject *, const char * );
-static int (* parent_testattrib)( AstObject *, const char * );
-static void (* parent_clearattrib)( AstObject *, const char * );
-static void (* parent_setattrib)( AstObject *, const char * );
-static int (* parent_equal)( AstObject *, AstObject * );
-static int (* parent_getobjsize)( AstObject * );
+static const char *(* parent_getattrib)( AstObject *, const char *, int * );
+static int (* parent_testattrib)( AstObject *, const char *, int * );
+static void (* parent_clearattrib)( AstObject *, const char *, int * );
+static void (* parent_setattrib)( AstObject *, const char *, int * );
+static int (* parent_equal)( AstObject *, AstObject *, int * );
+static int (* parent_getobjsize)( AstObject *, int * );
+
+/* Define macros for accessing each item of thread specific global data. */
+#ifdef THREAD_SAFE
+
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; \
+   globals->GetAttrib_Buff[ 0 ] = 0;
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(PointSet)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(PointSet,Class_Init)
+#define class_vtab astGLOBAL(PointSet,Class_Vtab)
+#define getattrib_buff astGLOBAL(PointSet,GetAttrib_Buff)
+
+
+
+/* If thread safety is not needed, declare and initialise globals at static 
+   variables. */ 
+#else
+
+static char getattrib_buff[ 101 ];
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstPointSetVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
 /* The following functions have public prototypes only (i.e. no
    protected prototypes), so we must provide local prototypes for use
    within this module. */
-AstPointSet *astPointSetId_( int, int, const char *, ... );
+AstPointSet *astPointSetId_( int, int, const char *, int *, ...);
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static const char *GetAttrib( AstObject *, const char * );
-static double **GetPoints( AstPointSet * );
-static int Equal( AstObject *, AstObject * );
-static int GetNcoord( const AstPointSet * );
-static int GetNpoint( const AstPointSet * );
-static int GetObjSize( AstObject * );
-static int GetObjSize( AstObject * );
-static int TestAttrib( AstObject *, const char * );
-static AstPointSet *AppendPoints( AstPointSet *, AstPointSet * );
-static void ClearAttrib( AstObject *, const char * );
-static void Copy( const AstObject *, AstObject * );
-static void Delete( AstObject * );
-static void Dump( AstObject *, AstChannel * );
-static void PermPoints( AstPointSet *, int, const int[] );
-static void SetAttrib( AstObject *, const char * );
-static void SetPoints( AstPointSet *, double ** );
-static void SetNpoint( AstPointSet *, int );
-static void SetSubPoints( AstPointSet *, int, int, AstPointSet * );
+static const char *GetAttrib( AstObject *, const char *, int * );
+static double **GetPoints( AstPointSet *, int * );
+static int Equal( AstObject *, AstObject *, int * );
+static int GetNcoord( const AstPointSet *, int * );
+static int GetNpoint( const AstPointSet *, int * );
+static int GetObjSize( AstObject *, int * );
+static int TestAttrib( AstObject *, const char *, int * );
+static AstPointSet *AppendPoints( AstPointSet *, AstPointSet *, int * );
+static void CheckPerm( AstPointSet *, const int *, const char *, int * );
+static void ClearAttrib( AstObject *, const char *, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Delete( AstObject *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void PermPoints( AstPointSet *, int, const int[], int * );
+static void SetAttrib( AstObject *, const char *, int * );
+static void SetPoints( AstPointSet *, double **, int * );
+static void SetNpoint( AstPointSet *, int, int * );
+static void SetSubPoints( AstPointSet *, int, int, AstPointSet *, int * );
 
-static double GetPointAccuracy( AstPointSet *, int );
-static int TestPointAccuracy( AstPointSet *, int );
-static void ClearPointAccuracy( AstPointSet *, int );
-static void SetPointAccuracy( AstPointSet *, int, double );
+static double GetPointAccuracy( AstPointSet *, int, int * );
+static int TestPointAccuracy( AstPointSet *, int, int * );
+static void ClearPointAccuracy( AstPointSet *, int, int * );
+static void SetPointAccuracy( AstPointSet *, int, double, int * );
 
 /* Member functions. */
 /* ================= */
-static AstPointSet *AppendPoints( AstPointSet *this, AstPointSet *that ) {
+static AstPointSet *AppendPoints( AstPointSet *this, AstPointSet *that, int *status ) {
 /*
 *+
 *  Name:
@@ -569,7 +602,7 @@ static AstPointSet *AppendPoints( AstPointSet *this, AstPointSet *that ) {
    ncoord = astGetNcoord( this );
    if( ncoord != astGetNcoord( that ) ) {
       astError( AST__NPTIN, "astAppendPoints(%s): Number of coordinates "
-                "per point differ in the two supplied PointSets.",
+                "per point differ in the two supplied PointSets.", status,
                 astGetClass( this ) );
 
 /* Calculate the new size for the PointSet. */
@@ -578,7 +611,7 @@ static AstPointSet *AppendPoints( AstPointSet *this, AstPointSet *that ) {
       n2 = astGetNpoint( that );
 
 /* Create the new PointSet and get pointers to its data. */
-      result = astPointSet( n1 + n2, ncoord, "" );
+      result = astPointSet( n1 + n2, ncoord, "", status );
       ptr1 = astGetPoints( this );
       ptr2 = astGetPoints( that );
       ptr = astGetPoints( result );
@@ -606,7 +639,7 @@ static AstPointSet *AppendPoints( AstPointSet *this, AstPointSet *that ) {
    return result;
 }
 
-static void CheckPerm( AstPointSet *this, const int *perm, const char *method ) {
+static void CheckPerm( AstPointSet *this, const int *perm, const char *method, int *status ) {
 /*
 *+
 *  Name:
@@ -714,14 +747,14 @@ static void CheckPerm( AstPointSet *this, const int *perm, const char *method ) 
    occurred, then report an error (note we convert to one-based axis
    numbering in the error message). */
    if ( !valid && astOK ) {
-      astError( AST__PRMIN, "%s(%s): Invalid coordinate permutation array.",
+      astError( AST__PRMIN, "%s(%s): Invalid coordinate permutation array.", status,
                 method, astGetClass( this ) );
       astError( AST__PRMIN, "Each coordinate index should lie in the range 1 to %d "
-                "and should occur only once.", ncoord );
+                "and should occur only once.", status, ncoord );
    }
 }
 
-static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     ClearAttrib
@@ -734,7 +767,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "pointset.h"
-*     void ClearAttrib( AstObject *this, const char *attrib )
+*     void ClearAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     PointSet member function (over-rides the astClearAttrib
@@ -751,6 +784,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -769,17 +804,17 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    if ( !strcmp( attrib, "ncoord" ) ||
         !strcmp( attrib, "npoint" ) ) {
       astError( AST__NOWRT, "astClear: Invalid attempt to clear the \"%s\" "
-                "value for a %s.", attrib, astGetClass( this ) );
-      astError( AST__NOWRT, "This is a read-only attribute." );
+                "value for a %s.", status, attrib, astGetClass( this ) );
+      astError( AST__NOWRT, "This is a read-only attribute." , status);
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      (*parent_clearattrib)( this_object, attrib );
+      (*parent_clearattrib)( this_object, attrib, status );
    }
 }
 
-static int Equal( AstObject *this_object, AstObject *that_object ) {
+static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
 *  Name:
 *     Equal
@@ -792,7 +827,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 *  Synopsis:
 *     #include "pointset.h"
-*     int Equal( AstObject *this, AstObject *that ) 
+*     int Equal( AstObject *this, AstObject *that, int *status ) 
 
 *  Class Membership:
 *     PointSet member function (over-rides the astEqual protected
@@ -807,6 +842,8 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *        Pointer to the first PointSet.
 *     that
 *        Pointer to the second PointSet.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if the PointSets are equivalent, zero otherwise.
@@ -849,7 +886,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 /* Invoke the Equal method inherited from the parent Object class. This checks
    that the Objects are both of the same class (amongst other things). */
-   if( (*parent_equal)( this_object, that_object ) ) {
+   if( (*parent_equal)( this_object, that_object, status ) ) {
 
 /* Obtain pointers to the two PointSet structures. */
       this = (AstPointSet *) this_object;
@@ -967,7 +1004,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 #undef SMALL
 }
 
-static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+static const char *GetAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     GetAttrib
@@ -980,7 +1017,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "pointset.h"
-*     const char *GetAttrib( AstObject *this, const char *attrib )
+*     const char *GetAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     PointSet member function (over-rides the protected astGetAttrib
@@ -997,6 +1034,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string containing the name of
 *        the attribute whose value is required. This name should be in
 *        lower case, with all white space removed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     - Pointer to a null-terminated string containing the attribute
@@ -1014,15 +1053,12 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *     reason.
 */
 
-/* Local Constants: */
-#define BUFF_LEN 50              /* Max. characters in result buffer */
-
 /* Local Variables: */
+   astDECLARE_GLOBALS;          /* Pointer to thread-specific global data */
    AstPointSet *this;            /* Pointer to the PointSet structure */
    const char *result;           /* Pointer value to return */
    int ncoord;                   /* Ncoord attribute value */
    int npoint;                   /* Npoint attribute value */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
    result = NULL;
@@ -1030,12 +1066,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Check the global error status. */   
    if ( !astOK ) return result;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this_object);
+
 /* Obtain a pointer to the PointSet structure. */
    this = (AstPointSet *) this_object;
 
 /* Compare "attrib" with each recognised attribute name in turn,
    obtaining the value of the required attribute. If necessary, write
-   the value into "buff" as a null-terminated string in an appropriate
+   the value into "getattrib_buff" as a null-terminated string in an appropriate
    format.  Set "result" to point at the result string. */
 
 /* Ncoord. */
@@ -1043,8 +1082,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    if ( !strcmp( attrib, "ncoord" ) ) {
       ncoord = astGetNcoord( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ncoord );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ncoord );
+         result = getattrib_buff;
       }
 
 /* Npoint. */
@@ -1052,24 +1091,21 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "npoint" ) ) {
       npoint = astGetNpoint( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", npoint );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", npoint );
+         result = getattrib_buff;
       }
 
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_getattrib)( this_object, attrib );
+      result = (*parent_getattrib)( this_object, attrib, status );
    }
 
 /* Return the result. */
    return result;
-
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
 
-static int GetObjSize( AstObject *this_object ) {
+static int GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -1082,7 +1118,7 @@ static int GetObjSize( AstObject *this_object ) {
 
 *  Synopsis:
 *     #include "pointset.h"
-*     int GetObjSize( AstObject *this ) 
+*     int GetObjSize( AstObject *this, int *status ) 
 
 *  Class Membership:
 *     PointSet member function (over-rides the astGetObjSize protected
@@ -1095,6 +1131,8 @@ static int GetObjSize( AstObject *this_object ) {
 *  Parameters:
 *     this
 *        Pointer to the Object.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Object size, in bytes.
@@ -1120,7 +1158,7 @@ static int GetObjSize( AstObject *this_object ) {
 /* Invoke the GetObjSize method inherited from the parent class, and then
    add on any components of the class structure defined by thsi class
    which are stored in dynamically allocated memory. */
-   result = (*parent_getobjsize)( this_object );
+   result = (*parent_getobjsize)( this_object, status );
 
    result += astTSizeOf( this->ptr );
    result += astTSizeOf( this->values );
@@ -1133,7 +1171,7 @@ static int GetObjSize( AstObject *this_object ) {
    return result;
 }
 
-static int GetNcoord( const AstPointSet *this ) {
+static int GetNcoord( const AstPointSet *this, int *status ) {
 /*
 *+
 *  Name:
@@ -1176,7 +1214,7 @@ static int GetNcoord( const AstPointSet *this ) {
    return this->ncoord;
 }
 
-static int GetNpoint( const AstPointSet *this ) {
+static int GetNpoint( const AstPointSet *this, int *status ) {
 /*
 *+
 *  Name:
@@ -1218,7 +1256,7 @@ static int GetNpoint( const AstPointSet *this ) {
    return this->npoint;
 }
 
-static double **GetPoints( AstPointSet *this ) {
+static double **GetPoints( AstPointSet *this, int *status ) {
 /*
 *+
 *  Name:
@@ -1323,7 +1361,7 @@ static double **GetPoints( AstPointSet *this ) {
             for( j = 0; j < this->npoint; j++ ) {
                if( !finite( (this->ptr)[ i ][ j ] ) ) {
                   astError( AST__INTER, "astGetPoints(PointSet): Non-finite "
-                            "axis value returned.");
+                            "axis value returned.", status);
                   break;
                }
             }
@@ -1337,7 +1375,7 @@ static double **GetPoints( AstPointSet *this ) {
    return this->ptr;
 }
 
-void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name ) {
+void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -1374,10 +1412,15 @@ void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -1386,8 +1429,8 @@ void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAPointSet) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -1428,9 +1471,14 @@ void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name ) {
    astSetCopy( vtab, Copy );
    astSetDelete( vtab, Delete );
    astSetDump( vtab, Dump, "PointSet", "Container for a set of points" );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
-static void PermPoints( AstPointSet *this, int forward, const int perm[] ) {
+static void PermPoints( AstPointSet *this, int forward, const int perm[], int *status ) {
 /*
 *+
 *  Name:
@@ -1490,7 +1538,7 @@ static void PermPoints( AstPointSet *this, int forward, const int perm[] ) {
 
 /* Validate the permutation array, to check that it describes a genuine
    permutation. */
-   CheckPerm( this, perm, "astPermPoints" );
+   CheckPerm( this, perm, "astPermPoints", status );
 
 /* Obtain the number of PointSet axes. */
    ncoord = astGetNcoord( this );
@@ -1517,7 +1565,7 @@ static void PermPoints( AstPointSet *this, int forward, const int perm[] ) {
    old = astFree( old );
 }
 
-static void SetAttrib( AstObject *this_object, const char *setting ) {
+static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
 *     astSetAttrib
@@ -1588,21 +1636,21 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    specified. */
    if ( MATCH( "ncoord" ) ||
         MATCH( "npoint" ) ) {
-      astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.",
+      astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.", status,
                 setting, astGetClass( this ) );
-      astError( AST__NOWRT, "This is a read-only attribute." );
+      astError( AST__NOWRT, "This is a read-only attribute." , status);
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      (*parent_setattrib)( this_object, setting );
+      (*parent_setattrib)( this_object, setting, status );
    }
 
 /* Undefine macros local to this function. */
 #undef MATCH
 }
 
-static void SetNpoint( AstPointSet *this, int npoint ) {
+static void SetNpoint( AstPointSet *this, int npoint, int *status ) {
 /*
 *+
 *  Name:
@@ -1641,8 +1689,8 @@ static void SetNpoint( AstPointSet *this, int npoint ) {
 /* Check the new size is valid. */
    if( npoint < 1 || npoint > this->npoint ) {
       astError( AST__NPTIN, "astSetNpoint(%s): Number of points (%d) is "
-                "not valid.", astGetClass( this ), npoint );
-      astError( AST__NPTIN, "Should be in the range 1 to %d.", this->npoint );
+                "not valid.", status, astGetClass( this ), npoint );
+      astError( AST__NPTIN, "Should be in the range 1 to %d.", status, this->npoint );
 
 /* Store the new size. */
    } else {
@@ -1650,7 +1698,7 @@ static void SetNpoint( AstPointSet *this, int npoint ) {
    }
 }
 
-static void SetPoints( AstPointSet *this, double **ptr ) {
+static void SetPoints( AstPointSet *this, double **ptr, int *status ) {
 /*
 *+
 *  Name:
@@ -1729,7 +1777,7 @@ static void SetPoints( AstPointSet *this, double **ptr ) {
       for ( i = 0; i < this->ncoord; i++ ) {
          if ( !ptr[ i ] ) {
             astError( AST__PDSIN, "astSetPoints(%s): Invalid NULL pointer in "
-                      "element %d of array of pointers to coordinate values.",
+                      "element %d of array of pointers to coordinate values.", status,
                       astGetClass( this ), i );
             break;
          }
@@ -1759,7 +1807,7 @@ static void SetPoints( AstPointSet *this, double **ptr ) {
 }
 
 static void SetSubPoints( AstPointSet *point1, int point, int coord,
-                          AstPointSet *point2 ) {
+                          AstPointSet *point2, int *status ) {
 /*
 *+
 *  Name:
@@ -1841,7 +1889,7 @@ static void SetSubPoints( AstPointSet *point1, int point, int coord,
       if ( ( point < 0 ) || ( point + npoint2 > npoint1 ) ) {
          astError( AST__PTRNG, "astSetSubPoints(%s): Range of points in "
                    "output %s (%d to %d) lies outside the input %s extent "
-                   "(0 to %d).",
+                   "(0 to %d).", status,
                    astGetClass( point1 ), astGetClass( point2 ), point,
                    point + npoint2, astGetClass( point1 ), npoint1 );
 
@@ -1849,7 +1897,7 @@ static void SetSubPoints( AstPointSet *point1, int point, int coord,
       } else if ( ( coord < 0 ) || ( coord + ncoord2 > ncoord1 ) ) {
          astError( AST__CORNG, "astSetSubPoints(%s): Range of coordinates in "
                    "output %s (%d to %d) lies outside the input %s extent "
-                   "(0 to %d).",
+                   "(0 to %d).", status,
                    astGetClass( point1 ), astGetClass( point2 ), coord,
                    coord + ncoord2, astGetClass( point1 ), ncoord1 );
 
@@ -1881,7 +1929,7 @@ static void SetSubPoints( AstPointSet *point1, int point, int coord,
    }
 }
 
-static int TestAttrib( AstObject *this_object, const char *attrib ) {
+static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     TestAttrib
@@ -1894,7 +1942,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "pointset.h"
-*     int TestAttrib( AstObject *this, const char *attrib )
+*     int TestAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     PointSet member function (over-rides the astTestAttrib protected
@@ -1911,6 +1959,8 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if a value has been set, otherwise zero.
@@ -1944,7 +1994,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_testattrib)( this_object, attrib );
+      result = (*parent_testattrib)( this_object, attrib, status );
    }
 
 /* Return the result, */
@@ -1988,7 +2038,7 @@ MAKE_TEST(PointAccuracy,(this->acc?this->acc[axis]!=AST__BAD:0))
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -2000,7 +2050,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for PointSet objects.
@@ -2010,6 +2060,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the object to be copied.
 *     objout
 *        Pointer to the object being constructed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -2085,7 +2137,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -2097,7 +2149,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for PointSet objects.
@@ -2105,6 +2157,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the object to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -2134,7 +2188,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -2146,7 +2200,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -2157,6 +2211,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the PointSet whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - It is not recommended that PointSets containing large numbers
@@ -2257,10 +2313,10 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsAPointSet and astCheckPointSet functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(PointSet,Object,check,&class_init)
+astMAKE_ISA(PointSet,Object,check,&class_check)
 astMAKE_CHECK(PointSet)
 
-AstPointSet *astPointSet_( int npoint, int ncoord, const char *options, ... ) {
+AstPointSet *astPointSet_( int npoint, int ncoord, const char *options, int *status, ...) {
 /*
 *+
 *  Name:
@@ -2275,7 +2331,7 @@ AstPointSet *astPointSet_( int npoint, int ncoord, const char *options, ... ) {
 *  Synopsis:
 *     #include "pointset.h"
 *     AstPointSet *astPointSet( int npoint, int ncoord,
-*                               const char *options, ... )
+*                               const char *options, ..., int *status )
 
 *  Class Membership:
 *     PointSet constructor.
@@ -2297,6 +2353,8 @@ AstPointSet *astPointSet_( int npoint, int ncoord, const char *options, ... ) {
 *        initialising the new PointSet. The syntax used is the same as
 *        for the astSet method and may include "printf" format
 *        specifiers identified by "%" symbols in the normal way.
+*     status
+*        Pointer to the inherited status variable.
 *     ...
 *        If the "options" string contains "%" format specifiers, then
 *        an optional list of arguments may follow it in order to
@@ -2315,8 +2373,12 @@ AstPointSet *astPointSet_( int npoint, int ncoord, const char *options, ... ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstPointSet *new;             /* Pointer to new PointSet */
    va_list args;                 /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -2334,7 +2396,7 @@ AstPointSet *astPointSet_( int npoint, int ncoord, const char *options, ... ) {
 /* Obtain the variable argument list and pass it along with the
    options string to the astVSet method to initialise the new
    PointSet's attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -2347,7 +2409,7 @@ AstPointSet *astPointSet_( int npoint, int ncoord, const char *options, ... ) {
 }
 
 AstPointSet *astPointSetId_( int npoint, int ncoord,
-                             const char *options, ... ) {
+                             const char *options, int *status, ...) {
 /*
 *  Name:
 *     astPointSetId_
@@ -2387,11 +2449,15 @@ AstPointSet *astPointSetId_( int npoint, int ncoord,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstPointSet *new;             /* Pointer to new PointSet */
    va_list args;                 /* Variable argument list */
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialise the PointSet, allocating memory and initialising the
    virtual function table as well if necessary. */
@@ -2406,7 +2472,7 @@ AstPointSet *astPointSetId_( int npoint, int ncoord,
 /* Obtain the variable argument list and pass it along with the
    options string to the astVSet method to initialise the new
    PointSet's attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -2420,7 +2486,7 @@ AstPointSet *astPointSetId_( int npoint, int ncoord,
 
 AstPointSet *astInitPointSet_( void *mem, size_t size, int init,
                                AstPointSetVtab *vtab, const char *name,
-                               int npoint, int ncoord ) {
+                               int npoint, int ncoord, int *status ) {
 /*
 *+
 *  Name:
@@ -2506,10 +2572,10 @@ AstPointSet *astInitPointSet_( void *mem, size_t size, int init,
    necessary. */
    if ( npoint < 1 ) {
       astError( AST__NPTIN, "astInitPointSet(%s): Number of points (%d) is "
-                "not valid.", name, npoint );
+                "not valid.", status, name, npoint );
    } else if ( ncoord < 1 ) {
       astError( AST__NCOIN, "astInitPointSet(%s): Number of coordinates per "
-                "point (%d) is not valid.", name, ncoord );
+                "point (%d) is not valid.", status, name, ncoord );
    }
 
 /* Initialise an Object structure (the parent class) as the first component
@@ -2541,7 +2607,7 @@ AstPointSet *astInitPointSet_( void *mem, size_t size, int init,
 
 AstPointSet *astLoadPointSet_( void *mem, size_t size,
                                AstPointSetVtab *vtab, const char *name,
-                               AstChannel *channel ) {
+                               AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -2611,12 +2677,16 @@ AstPointSet *astLoadPointSet_( void *mem, size_t size,
 */
 
 /* Local Constants: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
    AstPointSet *new;             /* Pointer to the new PointSet */
    char key[ KEY_LEN + 1 ];      /* Buffer for keywords */
-   double acc;                   /* Accuracy value */
+   double acc;                   /* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
+
+/* Accuracy value */
    int coord;                    /* Loop counter for coordinates */
    int empty;                    /* PointSet empty? */
    int i;                        /* Counter for coordinate values */
@@ -2758,36 +2828,41 @@ AstPointSet *astLoadPointSet_( void *mem, size_t size,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
-int astGetNpoint_( const AstPointSet *this ) {
+int astGetNpoint_( const AstPointSet *this, int *status ) {
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,PointSet,GetNpoint))( this );
+   return (**astMEMBER(this,PointSet,GetNpoint))( this, status );
 }
-int astGetNcoord_( const AstPointSet *this ) {
+int astGetNcoord_( const AstPointSet *this, int *status ) {
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,PointSet,GetNcoord))( this );
+   return (**astMEMBER(this,PointSet,GetNcoord))( this, status );
 }
-double **astGetPoints_( AstPointSet *this ) {
+double **astGetPoints_( AstPointSet *this, int *status ) {
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,PointSet,GetPoints))( this );
+   return (**astMEMBER(this,PointSet,GetPoints))( this, status );
 }
-void astPermPoints_( AstPointSet *this, int forward, const int perm[] ) {
+void astPermPoints_( AstPointSet *this, int forward, const int perm[], int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,PointSet,PermPoints))( this, forward, perm );
+   (**astMEMBER(this,PointSet,PermPoints))( this, forward, perm, status );
 }
-void astSetPoints_( AstPointSet *this, double **ptr ) {
+void astSetPoints_( AstPointSet *this, double **ptr, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,PointSet,SetPoints))( this, ptr );
+   (**astMEMBER(this,PointSet,SetPoints))( this, ptr, status );
 }
-void astSetNpoint_( AstPointSet *this, int npoint ) {
+void astSetNpoint_( AstPointSet *this, int npoint, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,PointSet,SetNpoint))( this, npoint );
+   (**astMEMBER(this,PointSet,SetNpoint))( this, npoint, status );
 }
 void astSetSubPoints_( AstPointSet *point1, int point, int coord,
-                       AstPointSet *point2) {
+                       AstPointSet *point2, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(point1,PointSet,SetSubPoints))( point1, point, coord, point2 );
+   (**astMEMBER(point1,PointSet,SetSubPoints))( point1, point, coord, point2, status );
 }
-AstPointSet *astAppendPoints_( AstPointSet *this, AstPointSet *that ) {
+AstPointSet *astAppendPoints_( AstPointSet *this, AstPointSet *that, int *status ) {
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,PointSet,AppendPoints))( this, that );
+   return (**astMEMBER(this,PointSet,AppendPoints))( this, that, status );
 }
+
+
+
+
+

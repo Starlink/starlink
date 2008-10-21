@@ -66,7 +66,6 @@
 
 /* Macros */
 /* ====== */
-#define astCLASS                 /* Make protected functions available */
 #define MXSTRLEN 80              /* String length at which truncation starts
                                     within pgqtxt and pgptxt. */
 

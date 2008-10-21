@@ -70,6 +70,12 @@
 
 /* Macros. */
 /* ------- */
+#if defined(astCLASS) || defined(astFORTRAN77)
+#define STATUS_PTR status
+#else
+#define STATUS_PTR astGetStatusPtr
+#endif
+
 #if defined(astCLASS)            /* Protected */
 #endif
 
@@ -102,6 +108,18 @@ typedef struct AstSpecFluxFrameVtab {
 /* Properties (e.g. methods) specific to this class. */
 
 } AstSpecFluxFrameVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstSpecFluxFrameGlobals {
+   AstSpecFluxFrameVtab Class_Vtab;
+   int Class_Init;
+   char GetTitle_Buff[ 201 ];
+} AstSpecFluxFrameGlobals;
+
+#endif
 #endif
 
 /* Function prototypes. */
@@ -113,7 +131,7 @@ astPROTO_ISA(SpecFluxFrame)           /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstSpecFluxFrame *astSpecFluxFrame_( void *, void *, const char *, ... );
+AstSpecFluxFrame *astSpecFluxFrame_( void *, void *, const char *, int *, ...);
 #else
 AstSpecFluxFrame *astSpecFluxFrameId_( void *, void *, const char *, ... );
 #endif
@@ -122,14 +140,20 @@ AstSpecFluxFrame *astSpecFluxFrameId_( void *, void *, const char *, ... );
 
 /* Initialiser. */
 AstSpecFluxFrame *astInitSpecFluxFrame_( void *, size_t, int, AstSpecFluxFrameVtab *,
-                               const char *, AstSpecFrame *, AstFluxFrame * );
+                               const char *, AstSpecFrame *, AstFluxFrame *, int * );
 
 /* Vtab initialiser. */
-void astInitSpecFluxFrameVtab_( AstSpecFluxFrameVtab *, const char * );
+void astInitSpecFluxFrameVtab_( AstSpecFluxFrameVtab *, const char *, int * );
 
 /* Loader. */
 AstSpecFluxFrame *astLoadSpecFluxFrame_( void *, size_t, AstSpecFluxFrameVtab *,
-                               const char *, AstChannel * );
+                               const char *, AstChannel *, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitSpecFluxFrameGlobals_( AstSpecFluxFrameGlobals * );
+#endif
+
 #endif
 
 /* Prototypes for member functions. */
@@ -165,13 +189,13 @@ AstSpecFluxFrame *astLoadSpecFluxFrame_( void *, size_t, AstSpecFluxFrameVtab *,
 
 /* Initialiser. */
 #define astInitSpecFluxFrame(mem,size,init,vtab,name,frame1,frame2) \
-astINVOKE(O,astInitSpecFluxFrame_(mem,size,init,vtab,name,astCheckSpecFrame(frame1),astCheckFluxFrame(frame2)))
+astINVOKE(O,astInitSpecFluxFrame_(mem,size,init,vtab,name,astCheckSpecFrame(frame1),astCheckFluxFrame(frame2),STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitSpecFluxFrameVtab(vtab,name) astINVOKE(V,astInitSpecFluxFrameVtab_(vtab,name))
+#define astInitSpecFluxFrameVtab(vtab,name) astINVOKE(V,astInitSpecFluxFrameVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadSpecFluxFrame(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadSpecFluxFrame_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadSpecFluxFrame_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -181,3 +205,7 @@ astINVOKE(O,astLoadSpecFluxFrame_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 
 #endif
+
+
+
+

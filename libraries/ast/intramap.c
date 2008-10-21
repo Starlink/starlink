@@ -14,7 +14,6 @@ f     AST_INTRAMAP (also see AST_INTRAREG)
 *  Description:
 c     The IntraMap class provides a specialised form of Mapping which
 c     encapsulates a privately-defined coordinate transformation
-c     function (e.g. written in C) so that it may be used like any
 c     other AST Mapping. This allows you to create Mappings that
 c     perform any conceivable coordinate transformation.
 f     The IntraMap class provides a specialised form of Mapping which
@@ -107,8 +106,11 @@ f     The IntraMap class does not define any new routines beyond those
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
+#include "globals.h"             /* Thread-safe global data access */
 #include "object.h"              /* Base Object class */
 #include "pointset.h"            /* Sets of points/coordinates */
 #include "mapping.h"             /* Coordinate mappings (parent class) */
@@ -128,46 +130,66 @@ f     The IntraMap class does not define any new routines beyond those
 #include <stdio.h>
 #include <string.h>
 
-/* Module Type Definitions. */
-/* ======================== */
-/* Structure to hold data for transformation functions. */
-typedef struct TranData {
-   void (* tran)( AstMapping *, int, int, const double *[], int, int, double *[] );
-                                 /* Pointer to transformation function */
-   void (* tran_wrap)( void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), AstMapping *, int, int, const double *[], int, int, double *[] );
-                                 /* Pointer to wrapper function */
-   char *author;                 /* Author's name */
-   char *contact;                /* Contact details (e.g. e-mail address) */
-   char *name;                   /* Function name (assigned by caller) */
-   char *purpose;                /* Comment string describing purpose */
-   int nin;                      /* Number of input coordinates per point */
-   int nout;                     /* Number of output coordinates per point */
-   unsigned int flags;           /* Flags to describe function behaviour */
-} TranData;
-
 /* Module Variables. */
 /* ================= */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
+
+/* Pointers to parent class methods which are used or extended by this
+   class. */
+static int (* parent_getobjsize)( AstObject *, int * );
+static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static const char *(* parent_getattrib)( AstObject *, const char *, int * );
+static int (* parent_getnin)( AstMapping *, int * );
+static int (* parent_getnout)( AstMapping *, int * );
+static int (* parent_testattrib)( AstObject *, const char *, int * );
+static void (* parent_clearattrib)( AstObject *, const char *, int * );
+static void (* parent_setattrib)( AstObject *, const char *, int * );
+
+/* Define macros for accessing each item of thread specific global data. */
+#ifdef THREAD_SAFE
+
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; \
+   globals->Tran_Data = NULL; \
+   globals->Tran_Nfun = 0;
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(IntraMap)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(IntraMap,Class_Init)
+#define class_vtab astGLOBAL(IntraMap,Class_Vtab)
+#define tran_data astGLOBAL(IntraMap,Tran_Data)
+#define tran_nfun astGLOBAL(IntraMap,Tran_Nfun)
+
+
+
+static pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
+#define LOCK_MUTEX2 pthread_mutex_lock( &mutex2 ); 
+#define UNLOCK_MUTEX2 pthread_mutex_unlock( &mutex2 ); 
+
+/* If thread safety is not needed, declare and initialise globals at static 
+   variables. */ 
+#else
 /* Pointer to array of transformation function data. */
-static TranData *tran_data = NULL;
+static AstIntraMapTranData *tran_data = NULL;
 
 /* Number of transformation functions registered. */
 static int tran_nfun = 0;
 
+
 /* Define the class virtual function table and its initialisation flag
    as static variables. */
-static AstIntraMapVtab class_vtab; /* Virtual function table */
+static AstIntraMapVtab class_vtab;   /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
+#define LOCK_MUTEX2
+#define UNLOCK_MUTEX2
 
-/* Pointers to parent class methods which are used or extended by this
-   class. */
-static int (* parent_getobjsize)( AstObject * );
-static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
-static const char *(* parent_getattrib)( AstObject *, const char * );
-static int (* parent_getnin)( AstMapping * );
-static int (* parent_getnout)( AstMapping * );
-static int (* parent_testattrib)( AstObject *, const char * );
-static void (* parent_clearattrib)( AstObject *, const char * );
-static void (* parent_setattrib)( AstObject *, const char * );
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -175,32 +197,32 @@ static void (* parent_setattrib)( AstObject *, const char * );
    protected prototypes), so we must provide local prototypes for use
    within this module. */
 AstIntraMap *astIntraMapId_( const char *, int, int, const char *, ... );
-void astIntraRegFor_( const char *, int, int, void (* tran)( AstMapping *, int, int, const double *[], int, int, double *[] ), void (* tran_wrap)( void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), AstMapping *, int, int, const double *[], int, int, double *[] ), unsigned int, const char *, const char *, const char * );
+void astIntraRegFor_( const char *, int, int, void (* tran)( AstMapping *, int, int, const double *[], int, int, double *[] ), void (* tran_wrap)( void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), AstMapping *, int, int, const double *[], int, int, double *[], int * ), unsigned int, const char *, const char *, const char *, int * );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static char *CleanName( const char *, const char * );
-static int GetObjSize( AstObject * );
-static const char *GetAttrib( AstObject *, const char * );
-static const char *GetIntraFlag( AstIntraMap * );
-static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
-static int TestAttrib( AstObject *, const char * );
-static int TestIntraFlag( AstIntraMap * );
-static void ClearAttrib( AstObject *, const char * );
-static void ClearIntraFlag( AstIntraMap * );
-static void Copy( const AstObject *, AstObject * );
-static void Delete( AstObject * );
-static void Dump( AstObject *, AstChannel * );
-static int Equal( AstObject *, AstObject * );
-static void IntraReg( const char *, int, int, void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), void (*)( void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), AstMapping *, int, int, const double *[], int, int, double *[] ), unsigned int, const char *, const char *, const char * );
-static void SetAttrib( AstObject *, const char * );
-static void SetIntraFlag( AstIntraMap *, const char * );
-static void TranWrap( void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), AstMapping *, int, int, const double *[], int, int, double *[] );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static char *CleanName( const char *, const char *, int * );
+static int GetObjSize( AstObject *, int * );
+static const char *GetAttrib( AstObject *, const char *, int * );
+static const char *GetIntraFlag( AstIntraMap *, int * );
+static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
+static int TestAttrib( AstObject *, const char *, int * );
+static int TestIntraFlag( AstIntraMap *, int * );
+static void ClearAttrib( AstObject *, const char *, int * );
+static void ClearIntraFlag( AstIntraMap *, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Delete( AstObject *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static int Equal( AstObject *, AstObject *, int * );
+static void IntraReg( const char *, int, int, void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), void (*)( void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), AstMapping *, int, int, const double *[], int, int, double *[], int * ), unsigned int, const char *, const char *, const char *, int * );
+static void SetAttrib( AstObject *, const char *, int * );
+static void SetIntraFlag( AstIntraMap *, const char *, int * );
+static void TranWrap( void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), AstMapping *, int, int, const double *[], int, int, double *[], int * );
 
 /* Member functions. */
 /* ================= */
-static char *CleanName( const char *name, const char *caller ) {
+static char *CleanName( const char *name, const char *caller, int *status ) {
 /*
 *  Name:
 *     CleanName
@@ -213,7 +235,7 @@ static char *CleanName( const char *name, const char *caller ) {
 
 *  Synopsis:
 *     #include "intramap.h"
-*     char *CleanName( const char *name, const char *caller )
+*     char *CleanName( const char *name, const char *caller, int *status )
 
 *  Class Membership:
 *     IntraMap member function.
@@ -232,6 +254,8 @@ static char *CleanName( const char *name, const char *caller ) {
 *        Pointer to a null-terminated string containing the name of
 *        the calling function. This is only used to construct error
 *        messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to a dynamically-allocated null-terminated string
@@ -264,7 +288,7 @@ static char *CleanName( const char *name, const char *caller ) {
 /* If the name is entirely blank, then report an error. */
    if ( !len ) {
       astError( AST__ITFNI, "%s: Invalid blank transformation function name "
-                            "given.", caller );
+                            "given.", status, caller );
 
 /* Otherwise, allocate memory to hold the cleaned name. */
    } else {
@@ -286,7 +310,7 @@ static char *CleanName( const char *name, const char *caller ) {
    return result;
 }
 
-static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     ClearAttrib
@@ -299,7 +323,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "intramap.h"
-*     void ClearAttrib( AstObject *this, const char *attrib )
+*     void ClearAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     IntraMap member function (over-rides the astClearAttrib protected
@@ -316,6 +340,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -339,11 +365,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is not recognised, pass it on to the parent method
    for further interpretation. */
    } else {
-      (*parent_clearattrib)( this_object, attrib );
+      (*parent_clearattrib)( this_object, attrib, status );
    }
 }
 
-static int Equal( AstObject *this_object, AstObject *that_object ) {
+static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
 *  Name:
 *     Equal
@@ -356,7 +382,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 *  Synopsis:
 *     #include "intramap.h"
-*     int Equal( AstObject *this, AstObject *that ) 
+*     int Equal( AstObject *this, AstObject *that, int *status ) 
 
 *  Class Membership:
 *     IntraMap member function (over-rides the astEqual protected
@@ -371,6 +397,8 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *        Pointer to the first Object (a IntraMap).
 *     that
 *        Pointer to the second Object.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if the IntraMaps are equivalent, zero otherwise.
@@ -437,7 +465,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
    return result;
 }
 
-static int GetObjSize( AstObject *this_object ) {
+static int GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -450,7 +478,7 @@ static int GetObjSize( AstObject *this_object ) {
 
 *  Synopsis:
 *     #include "intramap.h"
-*     int GetObjSize( AstObject *this ) 
+*     int GetObjSize( AstObject *this, int *status ) 
 
 *  Class Membership:
 *     IntraMap member function (over-rides the astGetObjSize protected
@@ -463,6 +491,8 @@ static int GetObjSize( AstObject *this_object ) {
 *  Parameters:
 *     this
 *        Pointer to the IntraMap.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Object size, in bytes.
@@ -488,7 +518,7 @@ static int GetObjSize( AstObject *this_object ) {
 /* Invoke the GetObjSize method inherited from the parent class, and then
    add on any components of the class structure defined by thsi class
    which are stored in dynamically allocated memory. */
-   result = (*parent_getobjsize)( this_object );
+   result = (*parent_getobjsize)( this_object, status );
    result += astTSizeOf( this->intraflag );
 
 /* If an error occurred, clear the result value. */
@@ -498,7 +528,7 @@ static int GetObjSize( AstObject *this_object ) {
    return result;
 }
 
-static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+static const char *GetAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     GetAttrib
@@ -511,7 +541,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "intramap.h"
-*     const char *GetAttrib( AstObject *this, const char *attrib )
+*     const char *GetAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     IntraMap member function (over-rides the protected astGetAttrib
@@ -528,6 +558,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string containing the name of
 *        the attribute whose value is required. This name should be in
 *        lower case, with all white space removed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     - Pointer to a null-terminated string containing the attribute
@@ -573,14 +605,14 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_getattrib)( this_object, attrib );
+      result = (*parent_getattrib)( this_object, attrib, status );
    }
 
 /* Return the result. */
    return result;
 }
 
-void astInitIntraMapVtab_(  AstIntraMapVtab *vtab, const char *name ) {
+void astInitIntraMapVtab_(  AstIntraMapVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -617,11 +649,15 @@ void astInitIntraMapVtab_(  AstIntraMapVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -630,8 +666,8 @@ void astInitIntraMapVtab_(  AstIntraMapVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAIntraMap) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -677,6 +713,11 @@ void astInitIntraMapVtab_(  AstIntraMapVtab *vtab, const char *name ) {
    astSetDelete( vtab, Delete );
    astSetDump( vtab, Dump, "IntraMap",
                "Map points using a private transformation function" );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
 static void IntraReg( const char *name, int nin, int nout,
@@ -687,10 +728,10 @@ static void IntraReg( const char *name, int nin, int nout,
                                                     double *[] ),
                                           AstMapping *, int, int,
                                           const double *[], int, int,
-                                          double *[] ),
+                                          double *[], int * ),
                       unsigned int flags,
                       const char *purpose, const char *author,
-                      const char *contact ) {
+                      const char *contact, int *status ) {
 /*
 *  Name:
 *     IntraReg
@@ -711,10 +752,10 @@ static void IntraReg( const char *name, int nin, int nout,
 *                                                  double *[] ),
 *                                        AstMapping *, int, int,
 *                                        const double *[], int, int,
-*                                        double *[] ),
+*                                        double *[], int * ),
 *                    unsigned int flags,
 *                    const char *purpose, const char *author,
-*                    const char *contact )
+*                    const char *contact, int *status )
 
 *  Class Membership:
 *     IntraMap member function.
@@ -767,9 +808,12 @@ static void IntraReg( const char *name, int nin, int nout,
 *        Pointer to a null-terminated string containing contact
 *        details for the author of the function (e.g. an e-mail or WWW
 *        address).
+*     status
+*        Pointer to the inherited status variable.
 */
    
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    char *clname;                 /* Pointer to cleaned name string */
    int found;                    /* Transformation function found? */
    int ifun;                     /* Loop counter for function information */
@@ -777,27 +821,30 @@ static void IntraReg( const char *name, int nin, int nout,
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
 /* Indicate that subsequent memory allocations may never be freed (other
    than by any AST exit handler). */
    astBeginPM;
 
 /* Clean (and validate) the name supplied. */
-   clname = CleanName( name, "astIntraReg" );
+   clname = CleanName( name, "astIntraReg", status );
 
 /* If OK, also validate the numbers of input and output
    coordinates. Report an error if necessary. */
    if ( astOK ) {
       if ( ( nin < 0 ) && ( nin != AST__ANY ) ) {
          astError( AST__BADNI, "astIntraReg(%s): Bad number of input "
-                               "coordinates (%d).", clname, nin );
+                               "coordinates (%d).", status, clname, nin );
          astError( AST__BADNI, "This number should be zero or more (or "
-                               "AST__ANY)." );
+                               "AST__ANY)." , status);
 
       } else if ( ( nout < 0 ) && ( nout != AST__ANY ) ) {
          astError( AST__BADNO, "astIntraReg(%s): Bad number of output "
-                               "coordinates (%d).", clname, nout );
+                               "coordinates (%d).", status, clname, nout );
          astError( AST__BADNO, "This number should be zero or more (or "
-                               "AST__ANY)." );
+                               "AST__ANY)." , status);
       }
    }
 
@@ -823,14 +870,14 @@ static void IntraReg( const char *name, int nin, int nout,
               strcmp( contact, tran_data[ ifun ].contact ) ) {
             astError( AST__MRITF, "astIntraReg: Invalid attempt to register "
                                   "the transformation function name \"%s\" "
-                                  "multiple times.", clname );
+                                  "multiple times.", status, clname );
          }
 
 /* If this is a new function, extend the array of transformation
    function data to accommodate it. */
       } else {
 
-         tran_data = astGrow( tran_data, tran_nfun + 1, sizeof( TranData ) );
+         tran_data = astGrow( tran_data, tran_nfun + 1, sizeof( AstIntraMapTranData ) );
 
 /* Store the information supplied. */
          if ( astOK ) {
@@ -880,7 +927,7 @@ void astIntraReg_( const char *name, int nin, int nout,
                    void (* tran)( AstMapping *, int, int, const double *[],
                                   int, int, double *[] ),
                    unsigned int flags, const char *purpose, const char *author,
-                   const char *contact ) {
+                   const char *contact, int *status ) {
 /*
 *++
 *  Name:
@@ -1161,7 +1208,7 @@ f     implemented.
 /* Register the transformation function together with the appropriate
    wrapper function for the C language. */
    IntraReg( name, nin, nout, tran, TranWrap, flags, purpose, author,
-             contact );
+             contact, status );
 }
 
 void astIntraRegFor_( const char *name, int nin, int nout,
@@ -1172,9 +1219,9 @@ void astIntraRegFor_( const char *name, int nin, int nout,
                                                     double *[] ),
                                           AstMapping *, int, int,
                                           const double *[], int, int,
-                                          double *[] ),
+                                          double *[], int * ),
                       unsigned int flags, const char *purpose,
-                      const char *author, const char *contact ) {
+                      const char *author, const char *contact, int *status ) {
 /*
 *+
 *  Name:
@@ -1198,7 +1245,7 @@ void astIntraRegFor_( const char *name, int nin, int nout,
 *                                                        double *[] ),
 *                                              AstMapping *, int, int,
 *                                              const double *[], int, int,
-*                                              double *[] ),
+*                                              double *[], int * ),
 *                          unsigned int flags, const char *purpose,
 *                          const char *author, const char *contact )
 
@@ -1273,11 +1320,11 @@ void astIntraRegFor_( const char *name, int nin, int nout,
 /* Register the transformation function together with the appropriate
    wrapper function for the foreign language interface. */
    IntraReg( name, nin, nout, tran, tran_wrap, flags, purpose, author,
-             contact );
+             contact, status );
 }
 
 static int MapMerge( AstMapping *this, int where, int series, int *nmap,
-                     AstMapping ***map_list, int **invert_list ) {
+                     AstMapping ***map_list, int **invert_list, int *status ) {
 /*
 *  Name:
 *     MapMerge
@@ -1291,7 +1338,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *  Synopsis:
 *     #include "intramap.h"
 *     int MapMerge( AstMapping *this, int where, int series, int *nmap,
-*                   AstMapping ***map_list, int **invert_list )
+*                   AstMapping ***map_list, int **invert_list, int *status )
 
 *  Class Membership:
 *     IntraMap method (over-rides the protected astMapMerge method
@@ -1394,6 +1441,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *        length, the "*invert_list" array will be extended (and its
 *        pointer updated) if necessary to accommodate any new
 *        elements.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     If simplification was possible, the function returns the index
@@ -1408,6 +1457,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstIntraMap *intramap1;       /* Pointer to first IntraMap */
    AstIntraMap *intramap2;       /* Pointer to second IntraMap */
    AstMapping *new;              /* Pointer to replacement Mapping */
@@ -1427,6 +1477,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
 
 /* Further initialisation. */
    new = NULL;
@@ -1505,7 +1558,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* If the two IntraMaps can be simplified, create a UnitMap to replace
    them. */
       if ( simpler ) {
-         new = (AstMapping *) astUnitMap( nin1, "" );
+         new = (AstMapping *) astUnitMap( nin1, "", status );
 
 /* Annul the pointers to the IntraMaps. */
          if ( astOK ) {
@@ -1543,7 +1596,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static void SetAttrib( AstObject *this_object, const char *setting ) {
+static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
 *     SetAttrib
@@ -1556,7 +1609,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 *  Synopsis:
 *     #include "intramap.h"
-*     void SetAttrib( AstObject *this, const char *setting )
+*     void SetAttrib( AstObject *this, const char *setting, int *status )
 
 *  Class Membership:
 *     IntraMap member function (over-rides the astSetAttrib method inherited
@@ -1582,6 +1635,8 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 *     setting
 *        Pointer to a null terminated string specifying the new attribute
 *        value.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Vaiables: */
@@ -1617,11 +1672,11 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* If the attribute is not recognised, pass it on to the parent method
    for further interpretation. */
    } else {
-      (*parent_setattrib)( this_object, setting );
+      (*parent_setattrib)( this_object, setting, status );
    }
 }
 
-static int TestAttrib( AstObject *this_object, const char *attrib ) {
+static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     TestAttrib
@@ -1634,7 +1689,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "intramap.h"
-*     int TestAttrib( AstObject *this, const char *attrib )
+*     int TestAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     IntraMap member function (over-rides the astTestAttrib protected
@@ -1651,6 +1706,8 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if a value has been set, otherwise zero.
@@ -1685,7 +1742,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is not recognised, pass it on to the parent method
    for further interpretation. */
    } else {
-      result = (*parent_testattrib)( this_object, attrib );
+      result = (*parent_testattrib)( this_object, attrib, status );
    }
 
 /* Return the result, */
@@ -1693,7 +1750,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 }
 
 static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
-                               int forward, AstPointSet *out ) {
+                               int forward, AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     Transform
@@ -1707,7 +1764,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 *  Synopsis:
 *     #include "intramap.h"
 *     AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-*                             int forward, AstPointSet *out )
+*                             int forward, AstPointSet *out, int *status )
 
 *  Class Membership:
 *     IntraMap member function (over-rides the astTransform protected
@@ -1732,6 +1789,8 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 *        (output) coordinate values. A NULL value may also be given,
 *        in which case a new PointSet will be created by this
 *        function.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the output (possibly new) PointSet.
@@ -1749,6 +1808,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstIntraMap *this;            /* Pointer to IntraMap structure */
    AstMapping *id;               /* Public ID for the IntraMap supplied */
    AstPointSet *result;          /* Pointer to output PointSet */
@@ -1758,10 +1818,13 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    int ncoord_out;               /* Number of coordinates per output point */
    int npoint;                   /* Number of points */
    int ok;                       /* AST status OK? */
-   int status;                   /* AST status value */
+   int status_value;             /* AST status value */
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this_mapping);
 
 /* Obtain a pointer to the IntraMap structure. */
    this = (AstIntraMap *) this_mapping;
@@ -1771,7 +1834,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    function validates all arguments and generates an output PointSet
    if necessary, but does not actually transform any coordinate
    values. */
-   result = (*parent_transform)( this_mapping, in, forward, out );
+   result = (*parent_transform)( this_mapping, in, forward, out, status );
 
 /* We will now extend the parent astTransform method by performing the
    calculations needed to generate the output coordinate values. */
@@ -1800,20 +1863,23 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    IntraMap and use the wrapper function to invoke the transformation
    function itself. */
    if ( ( ok = astOK ) ) {
+      LOCK_MUTEX2;
       ( *tran_data[ this->ifun ].tran_wrap )( tran_data[ this->ifun ].tran,
                                               id, npoint, ncoord_in, ptr_in,
-                                              forward, ncoord_out, ptr_out );
+                                              forward, ncoord_out, ptr_out, 
+                                              status );
+      UNLOCK_MUTEX2;
 
 /* If an error occurred, report a contextual error message. To ensure
    that the location of the error appears in the message, we first clear
    the global status (which makes the error system think this is the
    first report). */
       if ( !( ok = astOK ) ) {
-         status = astStatus;
+         status_value = astStatus;
          astClearStatus;
-         astError( status,
+         astError( status_value,
                    "astTransform(%s): Error signalled by \"%s\" "
-                   "transformation function.",
+                   "transformation function.", status,
                    astGetClass( this ), tran_data[ this->ifun ].name );
       }
    }
@@ -1827,7 +1893,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    if ( !astOK && ok ) {
       astError( astStatus,
                 "astTransform(%s): %s pointer corrupted by \"%s\" "
-                "transformation function.",
+                "transformation function.", status,
                 astGetClass( this ), astGetClass( this ),
                 tran_data[ this->ifun ].name );
    }
@@ -1846,7 +1912,7 @@ static void TranWrap( void (* tran)( AstMapping *, int, int, const double *[],
                                      int, int, double *[] ),
                       AstMapping *this, int npoint, int ncoord_in,
                       const double *ptr_in[], int forward, int ncoord_out,
-                      double *ptr_out[] ) {
+                      double *ptr_out[], int *status ) {
 /*
 *  Name:
 *     TranWrap
@@ -1862,7 +1928,7 @@ static void TranWrap( void (* tran)( AstMapping *, int, int, const double *[],
 *                                   int, int, double *[] ),
 *                    AstMapping *this, int npoint, int ncoord_in,
 *                    const double *ptr_in[], int forward, int ncoord_out,
-*                    double *ptr_out[] )
+*                    double *ptr_out[], int *status )
 
 *  Class Membership:
 *     IntraMap member function.
@@ -1917,6 +1983,8 @@ static void TranWrap( void (* tran)( AstMapping *, int, int, const double *[],
 *        (transformed) point will be written.  The value of coordinate
 *        number "coord" for output point number "point" will therefore
 *        be found in "ptr_out[coord][point]".
+*     status
+*        Pointer to the inherited status value.
 */
 
 /* Check the global error status. */
@@ -2012,7 +2080,7 @@ astMAKE_TEST(IntraMap,IntraFlag,( this->intraflag != NULL ))
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -2024,7 +2092,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for IntraMap objects.
@@ -2034,6 +2102,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the object to be copied.
 *     objout
 *        Pointer to the object being constructed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     -  This constructor makes a deep copy.
@@ -2068,7 +2138,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -2080,7 +2150,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for IntraMap objects.
@@ -2088,6 +2158,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the object to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     This function attempts to execute even if the global error status is
@@ -2106,7 +2178,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -2118,7 +2190,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -2129,15 +2201,21 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the IntraMap whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;            /* Pointer to thread-specific global data */
    AstIntraMap *this;             /* Pointer to the IntraMap structure */
    const char *sval;              /* Pointer to string value */
    int set;                       /* Attribute value set? */
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this_object);
 
 /* Obtain a pointer to the IntraMap structure. */
    this = (AstIntraMap *) this_object;
@@ -2153,8 +2231,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* IntraFlag string. */
 /* ----------------- */
-   set = TestIntraFlag( this );
-   sval = set ? GetIntraFlag( this ) : astGetIntraFlag( this );
+   set = TestIntraFlag( this, status );
+   sval = set ? GetIntraFlag( this, status ) : astGetIntraFlag( this );
    astWriteString( channel, "Iflag", set, 0, sval,
                    "IntraMap identification string" );
 
@@ -2178,11 +2256,11 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsAIntraMap and astCheckIntraMap functions using the
    macros defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(IntraMap,Mapping,check,&class_init)
+astMAKE_ISA(IntraMap,Mapping,check,&class_check)
 astMAKE_CHECK(IntraMap)
 
 AstIntraMap *astIntraMap_( const char *name, int nin, int nout,
-                           const char *options, ... ) {
+                           const char *options, int *status, ...) {
 /*
 *++
 *  Name:
@@ -2298,8 +2376,12 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstIntraMap *new;             /* Pointer to new IntraMap */
    va_list args;                 /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -2317,7 +2399,7 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Obtain the variable argument list and pass it along with the
    options string to the astVSet method to initialise the new
    IntraMap's attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -2370,8 +2452,17 @@ AstIntraMap *astIntraMapId_( const char *name, int nin, int nout,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstIntraMap *new;             /* Pointer to new IntraMap */
    va_list args;                 /* Variable argument list */
+
+   int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -2404,7 +2495,7 @@ AstIntraMap *astIntraMapId_( const char *name, int nin, int nout,
 
 AstIntraMap *astInitIntraMap_( void *mem, size_t size, int init,
                                AstIntraMapVtab *vtab, const char *name,
-                               const char *fname, int nin, int nout ) {
+                               const char *fname, int nin, int nout, int *status ) {
 /*
 *+
 *  Name:
@@ -2481,6 +2572,7 @@ AstIntraMap *astInitIntraMap_( void *mem, size_t size, int init,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;            /* Pointer to thread-specific global data */
    AstIntraMap *new;              /* Pointer to new IntraMap */
    char *clname;                  /* Cleaned transformation function name */
    int found;                     /* Transformation function name found? */
@@ -2492,6 +2584,9 @@ AstIntraMap *astInitIntraMap_( void *mem, size_t size, int init,
 /* Check the global status. */
    if ( !astOK ) return NULL;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
 /* Initialise variables to avoid "used of uninitialised variable"
    messages from dumb compilers. */
    found = 0;
@@ -2501,7 +2596,7 @@ AstIntraMap *astInitIntraMap_( void *mem, size_t size, int init,
    if ( init ) astInitIntraMapVtab( vtab, name );
 
 /* Clean (and validate) the transformation function name supplied. */
-   clname = CleanName( fname, "astIntraMap" );
+   clname = CleanName( fname, "astIntraMap", status );
 
 /* Search for a registered transformation function name which matches. */
    if ( astOK ) {
@@ -2519,7 +2614,7 @@ AstIntraMap *astInitIntraMap_( void *mem, size_t size, int init,
       if ( !found ) {
          astError( AST__URITF, "astInitIntraMap(%s): The transformation "
                                "function \"%s\" has not been registered using "
-                               "astIntraReg.", name, clname );
+                               "astIntraReg.", status, name, clname );
 
 /* Check that the number of input coordinates is compatible with the
    number used by the transformation function (as specified when it
@@ -2530,7 +2625,7 @@ AstIntraMap *astInitIntraMap_( void *mem, size_t size, int init,
             astError( AST__BADNI, "astInitIntraMap(%s): Number of input "
                                   "coordinates (%d) does not match the number "
                                   "used by the \"%s\" transformation function "
-                                  "(%d).", name, nin, tran_data[ ifun ].name,
+                                  "(%d).", status, name, nin, tran_data[ ifun ].name,
                                   tran_data[ ifun ].nin  );
             
 /* Similarly check the number of output coordinates. */
@@ -2539,7 +2634,7 @@ AstIntraMap *astInitIntraMap_( void *mem, size_t size, int init,
             astError( AST__BADNO, "astInitIntraMap(%s): Number of output "
                                   "coordinates (%d) does not match the number "
                                   "used by the \"%s\" transformation function "
-                                  "(%d).", name, nout, tran_data[ ifun ].name,
+                                  "(%d).", status, name, nout, tran_data[ ifun ].name,
                                   tran_data[ ifun ].nout  );
 
 /* If OK, initialise a Mapping structure (the parent class) as the
@@ -2576,7 +2671,7 @@ AstIntraMap *astInitIntraMap_( void *mem, size_t size, int init,
 
 AstIntraMap *astLoadIntraMap_( void *mem, size_t size,
                                AstIntraMapVtab *vtab, const char *name,
-                               AstChannel *channel ) {
+                               AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -2651,6 +2746,7 @@ AstIntraMap *astLoadIntraMap_( void *mem, size_t size,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;            /* Pointer to thread-specific global data */
    AstIntraMap *new;              /* Pointer to the new IntraMap */
    char *author;                  /* Pointer to author's name string */
    char *contact;                 /* Pointer to contact details string */
@@ -2666,6 +2762,9 @@ AstIntraMap *astLoadIntraMap_( void *mem, size_t size,
 
 /* Check the global error status. */
    if ( !astOK ) return new;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* If a NULL virtual function table has been supplied, then this is
    the first loader to be invoked for this IntraMap. In this case the
@@ -2733,27 +2832,27 @@ AstIntraMap *astLoadIntraMap_( void *mem, size_t size,
          if ( !found ) {
             astError( AST__URITF, "astLoadIntraMap(%s): An IntraMap was read "
                                   "which uses an unknown transformation "
-                                  "function.", astGetClass( channel ) );
+                                  "function.", status, astGetClass( channel ) );
             astError( AST__URITF, "This is a private extension to the AST "
                                   "library: to handle it, you must obtain the "
-                                  "source code from its author." );
+                                  "source code from its author." , status);
             astError( AST__URITF, "You can then register it with AST in your "
                                   "software by calling astIntraReg (see "
-                                  "SUN/211)." );
-            astError( AST__URITF, "" );
-            astError( AST__URITF, "   Function name:   \"%s\".", fname );
-            astError( AST__URITF, "   Purpose:         \"%s\".", purpose );
-            astError( AST__URITF, "   Author:          \"%s\".", author );
-            astError( AST__URITF, "   Contact address: \"%s\".", contact );
-            astError( AST__URITF, "" );
+                                  "SUN/211)." , status);
+            astError( AST__URITF, "" , status);
+            astError( AST__URITF, "   Function name:   \"%s\".", status, fname );
+            astError( AST__URITF, "   Purpose:         \"%s\".", status, purpose );
+            astError( AST__URITF, "   Author:          \"%s\".", status, author );
+            astError( AST__URITF, "   Contact address: \"%s\".", status, contact );
+            astError( AST__URITF, "" , status);
 
 /* Obtain the numbers of input and output coordinates for the
    IntraMap. Use parent methods for this, since if any derived class
    has overridden these methods it may depend on data that have not
    yet been loaded. */
          } else {
-            nin = ( *parent_getnin )( (AstMapping *) new );
-            nout = ( *parent_getnout )( (AstMapping *) new );
+            nin = ( *parent_getnin )( (AstMapping *) new, status );
+            nout = ( *parent_getnout )( (AstMapping *) new, status );
             if ( astOK ) {
 
 /* Check that the numbers of coordinates are compatible with the
@@ -2765,7 +2864,7 @@ AstIntraMap *astLoadIntraMap_( void *mem, size_t size,
                                         "input coordinates for the IntraMap "
                                         "read (%d) does not match the number "
                                         "used by the registered \"%s\" "
-                                        "transformation function (%d).",
+                                        "transformation function (%d).", status,
                                         astGetClass( channel ), nin,
                                         tran_data[ ifun ].name,
                                         tran_data[ ifun ].nin  );
@@ -2775,7 +2874,7 @@ AstIntraMap *astLoadIntraMap_( void *mem, size_t size,
                                         "output coordinates for the IntraMap "
                                         "read (%d) does not match the number "
                                         "used by the registered \"%s\" "
-                                        "transformation function (%d).",
+                                        "transformation function (%d).", status,
                                         astGetClass( channel ), nout,
                                         tran_data[ ifun ].name,
                                         tran_data[ ifun ].nout  );
@@ -2814,3 +2913,8 @@ AstIntraMap *astLoadIntraMap_( void *mem, size_t size,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
+
+
+
+
+

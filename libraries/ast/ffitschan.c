@@ -85,8 +85,8 @@
 
 /* Prototypes for private functions. */
 /* ================================= */
-static char *SourceWrap( const char *(*)( void ) );
-static void SinkWrap( void (*)( const char * ), const char * );
+static char *SourceWrap( const char *(*)( void ), int * );
+static void SinkWrap( void (*)( const char * ), const char *, int * );
 
 /* Prototypes for external functions. */
 /* ================================== */
@@ -100,7 +100,8 @@ F77_SUBROUTINE(ast_null)( void );
    class and invoked when necessary by C code in the main class
    implementation. All FORTRAN-specific aspects of this interface are
    encapsulated here. */
-static void SinkWrap( void (* sink)( const char * ), const char *line ) {
+static void SinkWrap( void (* sink)( const char * ), const char *line,
+                      int *status ) {
 /*
 *  Name:
 *     SinkWrap
@@ -112,7 +113,8 @@ static void SinkWrap( void (* sink)( const char * ), const char *line ) {
 *     Private function.
 
 *  Synopsis:
-*     static void SinkWrap( void (* sink)( const char * ), const char *line )
+*     static void SinkWrap( void (* sink)( const char * ), const char *line, 
+*                           int *status )
 
 *  Description:
 *     This function invokes the sink function whose pointer is
@@ -127,6 +129,8 @@ static void SinkWrap( void (* sink)( const char * ), const char *line ) {
 *        card and an integer error status), that returns void.  This
 *        is the form of FitsChan sink function employed by the FORTRAN
 *        language interface to the AST library.
+*     status
+*        Pointer to inherited status value.
 */
 
 /* Local Variables: */
@@ -164,7 +168,7 @@ static void SinkWrap( void (* sink)( const char * ), const char *line ) {
    astSetStatus( STATUS );
 }
 
-static char *SourceWrap( const char *(* source)( void ) ) {
+static char *SourceWrap( const char *(* source)( void ), int *status ) {
 /*
 *  Name:
 *     SourceWrap
@@ -176,7 +180,7 @@ static char *SourceWrap( const char *(* source)( void ) ) {
 *     Private function.
 
 *  Synopsis:
-*     static char *SourceWrap( const char *(* source)( void ) )
+*     static char *SourceWrap( const char *(* source)( void ), int *status )
 
 *  Description:
 *     This function invokes the source function whose pointer is
@@ -193,6 +197,8 @@ static char *SourceWrap( const char *(* source)( void ) ) {
 *        integer.  This is the form of FitsChan source function
 *        employed by the FORTRAN language interface to the AST
 *        library.
+*     status
+*        Pointer to inherited status.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated, null terminated string

@@ -108,6 +108,24 @@ typedef struct AstStcCatalogEntryLocationVtab {
 
 /* Properties (e.g. methods) specific to this class. */
 } AstStcCatalogEntryLocationVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstStcCatalogEntryLocationGlobals {
+   AstStcCatalogEntryLocationVtab Class_Vtab;
+   int Class_Init;
+} AstStcCatalogEntryLocationGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitStcCatalogEntryLocationGlobals_( AstStcCatalogEntryLocationGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -119,7 +137,7 @@ astPROTO_ISA(StcCatalogEntryLocation)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstStcCatalogEntryLocation *astStcCatalogEntryLocation_( void *, int, AstKeyMap **, const char *, ... );
+AstStcCatalogEntryLocation *astStcCatalogEntryLocation_( void *, int, AstKeyMap **, const char *, int *, ...);
 #else
 AstStcCatalogEntryLocation *astStcCatalogEntryLocationId_( void *, int, AstKeyMap **, const char *, ... );
 #endif
@@ -127,14 +145,14 @@ AstStcCatalogEntryLocation *astStcCatalogEntryLocationId_( void *, int, AstKeyMa
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
-AstStcCatalogEntryLocation *astInitStcCatalogEntryLocation_( void *, size_t, int, AstStcCatalogEntryLocationVtab *, const char *, AstRegion *, int, AstKeyMap ** );
+AstStcCatalogEntryLocation *astInitStcCatalogEntryLocation_( void *, size_t, int, AstStcCatalogEntryLocationVtab *, const char *, AstRegion *, int, AstKeyMap **, int * );
 
 /* Vtab initialiser. */
-void astInitStcCatalogEntryLocationVtab_( AstStcCatalogEntryLocationVtab *, const char * );
+void astInitStcCatalogEntryLocationVtab_( AstStcCatalogEntryLocationVtab *, const char *, int * );
 
 /* Loader. */
 AstStcCatalogEntryLocation *astLoadStcCatalogEntryLocation_( void *, size_t, AstStcCatalogEntryLocationVtab *,
-                                   const char *, AstChannel * );
+                                   const char *, AstChannel *, int * );
 
 #endif
 
@@ -171,13 +189,13 @@ AstStcCatalogEntryLocation *astLoadStcCatalogEntryLocation_( void *, size_t, Ast
 
 /* Initialiser. */
 #define astInitStcCatalogEntryLocation(mem,size,init,vtab,name,region,ncoords,coords) \
-astINVOKE(O,astInitStcCatalogEntryLocation_(mem,size,init,vtab,name,region,ncoords,coords))
+astINVOKE(O,astInitStcCatalogEntryLocation_(mem,size,init,vtab,name,region,ncoords,coords,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitStcCatalogEntryLocationVtab(vtab,name) astINVOKE(V,astInitStcCatalogEntryLocationVtab_(vtab,name))
+#define astInitStcCatalogEntryLocationVtab(vtab,name) astINVOKE(V,astInitStcCatalogEntryLocationVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadStcCatalogEntryLocation(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadStcCatalogEntryLocation_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadStcCatalogEntryLocation_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -189,3 +207,7 @@ astINVOKE(O,astLoadStcCatalogEntryLocation_(mem,size,vtab,name,astCheckChannel(c
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif
+
+
+
+

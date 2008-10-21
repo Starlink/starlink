@@ -160,8 +160,26 @@ typedef struct AstTimeMapVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   void (* TimeAdd)( AstTimeMap *, const char *, const double[] );
+   void (* TimeAdd)( AstTimeMap *, const char *, const double[], int * );
 } AstTimeMapVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstTimeMapGlobals {
+   AstTimeMapVtab Class_Vtab;
+   int Class_Init;
+} AstTimeMapGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitTimeMapGlobals_( AstTimeMapGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -173,7 +191,7 @@ astPROTO_ISA(TimeMap)             /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstTimeMap *astTimeMap_( int, const char *, ... );
+AstTimeMap *astTimeMap_( int, const char *, int *, ...);
 #else
 AstTimeMap *astTimeMapId_( int, const char *, ... );
 #endif
@@ -182,22 +200,22 @@ AstTimeMap *astTimeMapId_( int, const char *, ... );
 
 /* Initialiser. */
 AstTimeMap *astInitTimeMap_( void *, size_t, int, AstTimeMapVtab *,
-                             const char *, int );
+                             const char *, int, int * );
 
 /* Vtab initialiser. */
-void astInitTimeMapVtab_( AstTimeMapVtab *, const char * );
+void astInitTimeMapVtab_( AstTimeMapVtab *, const char *, int * );
 
 /* Loader. */
 AstTimeMap *astLoadTimeMap_( void *, size_t, AstTimeMapVtab *,
-                             const char *, AstChannel * );
+                             const char *, AstChannel *, int * );
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-void astTimeAdd_( AstTimeMap *, const char *, const double[] );
+void astTimeAdd_( AstTimeMap *, const char *, const double[], int * );
 
 #if defined(astCLASS)            /* Protected. */
-double astDat_( double, int );
+double astDat_( double, int, int * );
 #endif
 
 /* Function interfaces. */
@@ -230,13 +248,13 @@ double astDat_( double, int );
 
 /* Initialiser. */
 #define astInitTimeMap(mem,size,init,vtab,name,flags) \
-astINVOKE(O,astInitTimeMap_(mem,size,init,vtab,name,flags))
+astINVOKE(O,astInitTimeMap_(mem,size,init,vtab,name,flags,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitTimeMapVtab(vtab,name) astINVOKE(V,astInitTimeMapVtab_(vtab,name))
+#define astInitTimeMapVtab(vtab,name) astINVOKE(V,astInitTimeMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadTimeMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadTimeMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadTimeMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -245,9 +263,13 @@ astINVOKE(O,astLoadTimeMap_(mem,size,vtab,name,astCheckChannel(channel)))
    before use.  This provides a contextual error report if a pointer
    to the wrong sort of Object is supplied. */
 #define astTimeAdd(this,cvt,args) \
-astINVOKE(V,astTimeAdd_(astCheckTimeMap(this),cvt,args))
+astINVOKE(V,astTimeAdd_(astCheckTimeMap(this),cvt,args,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
-#define astDat(in,forward) astDat_(in,forward)
+#define astDat(in,forward) astDat_(in,forward,STATUS_PTR)
 #endif
 #endif
+
+
+
+

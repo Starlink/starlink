@@ -162,6 +162,24 @@ typedef struct AstTranMapVtab {
 /* Properties (e.g. methods) specific to this class. */
 /* None. */
 } AstTranMapVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstTranMapGlobals {
+   AstTranMapVtab Class_Vtab;
+   int Class_Init;
+} AstTranMapGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitTranMapGlobals_( AstTranMapGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -173,7 +191,7 @@ astPROTO_ISA(TranMap)             /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstTranMap *astTranMap_( void *, void *, const char *, ... );
+AstTranMap *astTranMap_( void *, void *, const char *, int *, ...);
 #else
 AstTranMap *astTranMapId_( void *, void *, const char *, ... );
 #endif
@@ -182,14 +200,14 @@ AstTranMap *astTranMapId_( void *, void *, const char *, ... );
 
 /* Initialiser. */
 AstTranMap *astInitTranMap_( void *, size_t, int, AstTranMapVtab *,
-                           const char *, AstMapping *, AstMapping *);
+                           const char *, AstMapping *, AstMapping *, int * );
 
 /* Vtab initialiser. */
-void astInitTranMapVtab_( AstTranMapVtab *, const char * );
+void astInitTranMapVtab_( AstTranMapVtab *, const char *, int * );
 
 /* Loader. */
 AstTranMap *astLoadTranMap_( void *, size_t, AstTranMapVtab *,
-                           const char *, AstChannel * );
+                           const char *, AstChannel *, int * );
 #endif
 
 /* Prototypes for member functions. */
@@ -226,13 +244,13 @@ AstTranMap *astLoadTranMap_( void *, size_t, AstTranMapVtab *,
 
 /* Initialiser. */
 #define astInitTranMap(mem,size,init,vtab,name,map1,map2) \
-astINVOKE(O,astInitTranMap_(mem,size,init,vtab,name,astCheckMapping(map1),astCheckMapping(map2)))
+astINVOKE(O,astInitTranMap_(mem,size,init,vtab,name,astCheckMapping(map1),astCheckMapping(map2),STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitTranMapVtab(vtab,name) astINVOKE(V,astInitTranMapVtab_(vtab,name))
+#define astInitTranMapVtab(vtab,name) astINVOKE(V,astInitTranMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadTranMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadTranMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadTranMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -242,3 +260,7 @@ astINVOKE(O,astLoadTranMap_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 /* None. */
 #endif
+
+
+
+

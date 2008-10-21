@@ -171,6 +171,24 @@ typedef struct AstShiftMapVtab {
 /* Properties (e.g. methods) specific to this class. */
 
 } AstShiftMapVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstShiftMapGlobals {
+   AstShiftMapVtab Class_Vtab;
+   int Class_Init;
+} AstShiftMapGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitShiftMapGlobals_( AstShiftMapGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -182,7 +200,7 @@ astPROTO_ISA(ShiftMap)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstShiftMap *astShiftMap_( int, const double [], const char *, ... );
+AstShiftMap *astShiftMap_( int, const double [], const char *, int *, ...);
 #else
 AstShiftMap *astShiftMapId_( int, const double [], const char *, ... );
 #endif
@@ -191,14 +209,14 @@ AstShiftMap *astShiftMapId_( int, const double [], const char *, ... );
 
 /* Initialiser. */
 AstShiftMap *astInitShiftMap_( void *, size_t, int, AstShiftMapVtab *,
-                               const char *, int, const double * );
+                               const char *, int, const double *, int * );
 
 /* Vtab initialiser. */
-void astInitShiftMapVtab_( AstShiftMapVtab *, const char * );
+void astInitShiftMapVtab_( AstShiftMapVtab *, const char *, int * );
 
 /* Loader. */
 AstShiftMap *astLoadShiftMap_( void *, size_t, AstShiftMapVtab *,
-                               const char *, AstChannel * );
+                               const char *, AstChannel *, int * );
 #endif
 
 /* Prototypes for member functions. */
@@ -237,13 +255,13 @@ AstShiftMap *astLoadShiftMap_( void *, size_t, AstShiftMapVtab *,
 /* Initialiser. */
 #define \
 astInitShiftMap(mem,size,init,vtab,name,ncoord,shift) \
-astINVOKE(O,astInitShiftMap_(mem,size,init,vtab,name,ncoord,shift))
+astINVOKE(O,astInitShiftMap_(mem,size,init,vtab,name,ncoord,shift,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitShiftMapVtab(vtab,name) astINVOKE(V,astInitShiftMapVtab_(vtab,name))
+#define astInitShiftMapVtab(vtab,name) astINVOKE(V,astInitShiftMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadShiftMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadShiftMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadShiftMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -256,3 +274,7 @@ astINVOKE(O,astLoadShiftMap_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 #endif
+
+
+
+

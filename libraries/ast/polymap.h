@@ -170,6 +170,24 @@ typedef struct AstPolyMapVtab {
 /* Properties (e.g. methods) specific to this class. */
 
 } AstPolyMapVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstPolyMapGlobals {
+   AstPolyMapVtab Class_Vtab;
+   int Class_Init;
+} AstPolyMapGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitPolyMapGlobals_( AstPolyMapGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -181,7 +199,7 @@ astPROTO_ISA(PolyMap)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstPolyMap *astPolyMap_( int, int, int, const double[], int, const double[], const char *, ... );
+AstPolyMap *astPolyMap_( int, int, int, const double[], int, const double[], const char *, int *, ...);
 #else
 AstPolyMap *astPolyMapId_( int, int, int, const double[], int, const double[], const char *, ... );
 #endif
@@ -189,14 +207,14 @@ AstPolyMap *astPolyMapId_( int, int, int, const double[], int, const double[], c
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
-AstPolyMap *astInitPolyMap_( void *, size_t, int, AstPolyMapVtab *, const char *, int, int, int, const double[], int, const double[] );
+AstPolyMap *astInitPolyMap_( void *, size_t, int, AstPolyMapVtab *, const char *, int, int, int, const double[], int, const double[], int * );
 
 /* Vtab initialiser. */
-void astInitPolyMapVtab_( AstPolyMapVtab *, const char * );
+void astInitPolyMapVtab_( AstPolyMapVtab *, const char *, int * );
 
 /* Loader. */
 AstPolyMap *astLoadPolyMap_( void *, size_t, AstPolyMapVtab *,
-                                 const char *, AstChannel * );
+                                 const char *, AstChannel *, int * );
 #endif
 
 /* Prototypes for member functions. */
@@ -234,13 +252,13 @@ AstPolyMap *astLoadPolyMap_( void *, size_t, AstPolyMapVtab *,
 
 /* Initialiser. */
 #define astInitPolyMap(mem,size,init,vtab,name,nin,nout,ncoeff_f,coeff_f,ncoeff_i,coeff_i) \
-astINVOKE(O,astInitPolyMap_(mem,size,init,vtab,name,nin,nout,ncoeff_f,coeff_f,ncoeff_i,coeff_i))
+astINVOKE(O,astInitPolyMap_(mem,size,init,vtab,name,nin,nout,ncoeff_f,coeff_f,ncoeff_i,coeff_i,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitPolyMapVtab(vtab,name) astINVOKE(V,astInitPolyMapVtab_(vtab,name))
+#define astInitPolyMapVtab(vtab,name) astINVOKE(V,astInitPolyMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadPolyMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadPolyMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadPolyMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -252,3 +270,7 @@ astINVOKE(O,astLoadPolyMap_(mem,size,vtab,name,astCheckChannel(channel)))
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif
+
+
+
+

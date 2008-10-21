@@ -91,6 +91,8 @@ f     The Box class does not define any new routines beyond those
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
 #include "object.h"              /* Base Object class */
@@ -120,23 +122,50 @@ f     The Box class does not define any new routines beyond those
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstBoxVtab class_vtab;    /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject * );
-static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
-static AstMapping *(* parent_simplify)( AstMapping * );
-static void (* parent_setnegated)( AstRegion *, int );
-static void (* parent_setclosed)( AstRegion *, int );
-static void (* parent_clearnegated)( AstRegion * );
-static void (* parent_clearclosed)( AstRegion * );
-static void (* parent_setunc)( AstRegion *, AstRegion * );
-static void (* parent_setregfs)( AstRegion *, AstFrame * );
-static void (* parent_resetcache)( AstRegion * );
+static int (* parent_getobjsize)( AstObject *, int * );
+static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static AstMapping *(* parent_simplify)( AstMapping *, int * );
+static void (* parent_setnegated)( AstRegion *, int, int * );
+static void (* parent_setclosed)( AstRegion *, int, int * );
+static void (* parent_clearnegated)( AstRegion *, int * );
+static void (* parent_clearclosed)( AstRegion *, int * );
+static void (* parent_setunc)( AstRegion *, AstRegion *, int * );
+static void (* parent_setregfs)( AstRegion *, AstFrame *, int * );
+static void (* parent_resetcache)( AstRegion *, int * );
  
+
+#ifdef THREAD_SAFE
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; 
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(Box)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(Box,Class_Init)
+#define class_vtab astGLOBAL(Box,Class_Vtab)
+
+
+#include <pthread.h>
+
+
+#else
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstBoxVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
+
 /* External Interface Function Prototypes. */
 /* ======================================= */
 /* The following functions have public prototypes only (i.e. no
@@ -146,32 +175,32 @@ AstBox *astBoxId_( void *, int, const double[], const double[], void *, const ch
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static AstBox *BestBox( AstFrame *, AstPointSet *, AstRegion * );
-static AstMapping *Simplify( AstMapping * );
-static AstPointSet *RegBaseGrid( AstRegion * );
-static AstPointSet *RegBaseMesh( AstRegion * );
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static double *RegCentre( AstRegion *this, double *, double **, int, int );
-static double SetShrink( AstBox *, double );
-static int MakeGrid( int, double **, int, double *, double *, int, int, double );
-static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int ** );
-static void Cache( AstBox *, int );
-static void ClearClosed( AstRegion * );
-static void ClearNegated( AstRegion * );
-static void Copy( const AstObject *, AstObject * );
-static void Delete( AstObject * );
-static void Dump( AstObject *, AstChannel * );
-static void RegBaseBox( AstRegion *this, double *, double * );
-static void ResetCache( AstRegion *this );
-static void SetClosed( AstRegion *, int );
-static void SetNegated( AstRegion *, int );
-static void SetRegFS( AstRegion *, AstFrame * );
-static void SetUnc( AstRegion *, AstRegion * );
+static AstBox *BestBox( AstFrame *, AstPointSet *, AstRegion *, int * );
+static AstMapping *Simplify( AstMapping *, int * );
+static AstPointSet *RegBaseGrid( AstRegion *, int * );
+static AstPointSet *RegBaseMesh( AstRegion *, int * );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static double *RegCentre( AstRegion *this, double *, double **, int, int, int * );
+static double SetShrink( AstBox *, double, int * );
+static int MakeGrid( int, double **, int, double *, double *, int, int, double, int * );
+static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
+static void Cache( AstBox *, int, int * );
+static void ClearClosed( AstRegion *, int * );
+static void ClearNegated( AstRegion *, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Delete( AstObject *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void RegBaseBox( AstRegion *this, double *, double *, int * );
+static void ResetCache( AstRegion *this, int * );
+static void SetClosed( AstRegion *, int, int * );
+static void SetNegated( AstRegion *, int, int * );
+static void SetRegFS( AstRegion *, AstFrame *, int * );
+static void SetUnc( AstRegion *, AstRegion *, int * );
 
-static int GetObjSize( AstObject * );
+static int GetObjSize( AstObject *, int * );
 /* Member functions. */
 /* ================= */
-static int GetObjSize( AstObject *this_object ) {
+static int GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -184,7 +213,7 @@ static int GetObjSize( AstObject *this_object ) {
 
 *  Synopsis:
 *     #include "box.h"
-*     int GetObjSize( AstObject *this ) 
+*     int GetObjSize( AstObject *this, int *status ) 
 
 *  Class Membership:
 *     Box member function (over-rides the astGetObjSize protected
@@ -197,6 +226,8 @@ static int GetObjSize( AstObject *this_object ) {
 *  Parameters:
 *     this
 *        Pointer to the Box.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Object size, in bytes.
@@ -222,7 +253,7 @@ static int GetObjSize( AstObject *this_object ) {
 /* Invoke the GetObjSize method inherited from the parent class, and then
    add on any components of the class structure defined by thsi class
    which are stored in dynamically allocated memory. */
-   result = (*parent_getobjsize)( this_object );
+   result = (*parent_getobjsize)( this_object, status );
 
    result += astTSizeOf( this->extent );  
    result += astTSizeOf( this->shextent );
@@ -238,7 +269,7 @@ static int GetObjSize( AstObject *this_object ) {
 }
 
 
-static void ClearClosed( AstRegion *this ){
+static void ClearClosed( AstRegion *this, int *status ){
 /*
 *  Name:
 *     ClearClosed
@@ -251,7 +282,7 @@ static void ClearClosed( AstRegion *this ){
 
 *  Synopsis:
 *     #include "box.h"
-*     void ClearClosed( AstRegion *this )
+*     void ClearClosed( AstRegion *this, int *status )
 
 *  Class Membership:
 *     Box member function (over-rides the protected astClearClosed
@@ -263,6 +294,8 @@ static void ClearClosed( AstRegion *this ){
 *  Parameters:
 *     this
 *        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -275,14 +308,14 @@ static void ClearClosed( AstRegion *this ){
    old = astGetClosed( this );
 
 /* Invoke the clear method inherited from the parent Region class */
-   (*parent_clearclosed)( this );
+   (*parent_clearclosed)( this, status );
 
 /* If the new value is not the same as the old value, inidcatethat we
    need to re-calculate the cached information in the Box. */
    if( astGetClosed( this ) != old ) astResetCache( this );
 }
 
-static void ClearNegated( AstRegion *this ){
+static void ClearNegated( AstRegion *this, int *status ){
 /*
 *  Name:
 *     ClearNegated
@@ -295,7 +328,7 @@ static void ClearNegated( AstRegion *this ){
 
 *  Synopsis:
 *     #include "box.h"
-*     void ClearNegated( AstRegion *this )
+*     void ClearNegated( AstRegion *this, int *status )
 
 *  Class Membership:
 *     Box member function (over-rides the protected astClearNegated
@@ -307,6 +340,8 @@ static void ClearNegated( AstRegion *this ){
 *  Parameters:
 *     this
 *        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -319,13 +354,13 @@ static void ClearNegated( AstRegion *this ){
    old = astGetNegated( this );
 
 /* Invoke the clear method inherited from the parent Region class */
-   (*parent_clearnegated)( this );
+   (*parent_clearnegated)( this, status );
 
 /* If the new value is not the same as the old value, inidcatethat we
    need to re-calculate the cached information in the Box. */
    if( astGetNegated( this ) != old ) astResetCache( this );
 }
-void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name ) {
+void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -362,12 +397,16 @@ void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstRegionVtab *region;        /* Pointer to Region component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -376,8 +415,8 @@ void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsABox) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -432,9 +471,14 @@ void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name ) {
    astSetDelete( vtab, Delete );
    astSetCopy( vtab, Copy );
    astSetDump( vtab, Dump, "Box", "Axis intervals" );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
-static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc ){
+static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc, int *status ){
 /*
 *  Name:
 *     BestBox
@@ -447,7 +491,7 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc ){
 
 *  Synopsis:
 *     #include "box.h"
-*     AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc )
+*     AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc, int *status )
 
 *  Class Membership:
 *     Box member function 
@@ -464,6 +508,8 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc ){
 *     unc
 *        A Region representing the uncertainty associated with each point
 *        on the mesh.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the best fitting Region. It will inherit the positional
@@ -663,7 +709,7 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc ){
       }
 
 /* Create the returned Box. */
-      result = astBox( unc, 1, blbnd, bubnd, unc, "" );
+      result = astBox( unc, 1, blbnd, bubnd, unc, "", status );
    }
 
 /* Free resources */
@@ -680,7 +726,7 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc ){
    return result;
 }
 
-static void Cache( AstBox *this, int lohi ){
+static void Cache( AstBox *this, int lohi, int *status ){
 /*
 *  Name:
 *     Cache
@@ -693,7 +739,7 @@ static void Cache( AstBox *this, int lohi ){
 
 *  Synopsis:
 *     #include "box.h"
-*     void Cache( AstRegion *this, int lohi )
+*     void Cache( AstRegion *this, int lohi, int *status )
 
 *  Class Membership:
 *     Box member function 
@@ -708,6 +754,8 @@ static void Cache( AstBox *this, int lohi ){
 *        Pointer to the Box.
 *     lohi
 *        Are the lo and hi arrays to be used?
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -838,7 +886,7 @@ static void Cache( AstBox *this, int lohi ){
 }
 
 static int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
-                     double *ubnd, int np_axis, int iaxis, double axval ){
+                     double *ubnd, int np_axis, int iaxis, double axval, int *status ){
 /*
 *  Name:
 *     MakeGrid
@@ -852,7 +900,7 @@ static int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
 *  Synopsis:
 *     #include "box.h"
 *     int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
-*                   double *ubnd, int np_axis, int iaxis, double axval )
+*                   double *ubnd, int np_axis, int iaxis, double axval, int *status )
 
 *  Class Membership:
 *     Box member function 
@@ -888,6 +936,8 @@ static int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
 *        sample positions will have the axis value given by "axval".
 *     axval
 *        The constant value for the axis with index "iaxis".
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The number of points added to the "ptr" arrays.
@@ -970,7 +1020,7 @@ static int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
    return astOK ? ( ipp - ip ): 0 ;
 }
 
-static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
+static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int *status ){
 /*
 *  Name:
 *     RegBaseBox
@@ -984,7 +1034,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 
 *  Synopsis:
 *     #include "box.h"
-*     void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd )
+*     void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd, int *status )
 
 *  Class Membership:
 *     Box member function (over-rides the astRegBaseBox protected
@@ -1009,6 +1059,8 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 *        covered by the Region in the base Frame of the encapsulated
 *        FrameSet. It should have at least as many elements as there are 
 *        axes in the base Frame.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -1026,7 +1078,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
    this = (AstBox *) this_region;
 
 /* Ensure cached information is up to date. */
-   Cache( this, 0 );
+   Cache( this, 0, status );
 
 /* Get the number of base Frame axes in the Region. */
    nc = astGetNin( this_region->frameset );
@@ -1041,7 +1093,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
    }
 }
 
-static AstPointSet *RegBaseGrid( AstRegion *this ){
+static AstPointSet *RegBaseGrid( AstRegion *this, int *status ){
 /*
 *  Name:
 *     RegBaseGrid
@@ -1055,7 +1107,7 @@ static AstPointSet *RegBaseGrid( AstRegion *this ){
 
 *  Synopsis:
 *     #include "box.h"
-*     AstPointSet *RegBaseGrid( AstRegion *this )
+*     AstPointSet *RegBaseGrid( AstRegion *this, int *status )
 
 *  Class Membership:
 *     Box member function (over-rides the astRegBaseGrid protected
@@ -1069,6 +1121,8 @@ static AstPointSet *RegBaseGrid( AstRegion *this ){
 *  Parameters:
 *     this
 *        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the PointSet. If the Region is unbounded, a NULL pointer
@@ -1134,7 +1188,7 @@ static AstPointSet *RegBaseGrid( AstRegion *this ){
 /* First deal with the simple case of 1-D boxes. Store "np" axis values
    evenly spaced between lbnd and ubnd. */
       if( naxes == 1 ) {
-         result = astPointSet( np, 1, "" );
+         result = astPointSet( np, 1, "", status );
          ptr = astGetPoints( result );
          if( astOK ) {
             ax = ptr[ 0 ];
@@ -1178,7 +1232,7 @@ static AstPointSet *RegBaseGrid( AstRegion *this ){
          for( i = 1; i <= m; i++ ) {
 
 /* Shrink the Box temporarily. */
-            SetShrink( (AstBox *) this, (shrink0*i)/m );
+            SetShrink( (AstBox *) this, (shrink0*i)/m, status );
 
 /* Set the new MeshSize. */
             npp = k1;
@@ -1203,7 +1257,7 @@ static AstPointSet *RegBaseGrid( AstRegion *this ){
          }
 
 /* Unshrink the Box. */
-         SetShrink( (AstBox *) this, shrink0 );
+         SetShrink( (AstBox *) this, shrink0, status );
 
 /* Reinstate the original MeshSize. */
          astSetMeshSize( this, np );
@@ -1227,7 +1281,7 @@ static AstPointSet *RegBaseGrid( AstRegion *this ){
    return result;
 }
 
-static AstPointSet *RegBaseMesh( AstRegion *this ){
+static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
 /*
 *  Name:
 *     RegBaseMesh
@@ -1241,7 +1295,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
 
 *  Synopsis:
 *     #include "box.h"
-*     AstPointSet *RegBaseMesh( AstRegion *this )
+*     AstPointSet *RegBaseMesh( AstRegion *this, int *status )
 
 *  Class Membership:
 *     Box member function (over-rides the astRegBaseMesh protected
@@ -1255,6 +1309,8 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
 *  Parameters:
 *     this
 *        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the PointSet. The axis values in this PointSet will have 
@@ -1349,7 +1405,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
 
 /* If so, we return a PointSet holding a single point. */
       if( single ) {
-         result = astPointSet( 1, naxes, "" );
+         result = astPointSet( 1, naxes, "", status );
          ptr = astGetPoints( result );
          if( astOK ) {
             for( i = 0; i < naxes; i++ ) {
@@ -1362,7 +1418,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
 
 /* The boundary of a 1-D box consists of 2 points - the two extreme values. 
    Create a PointSet to hold 2 1-D values, and store the extreme values. */
-         result = astPointSet( 2, 1, "" );
+         result = astPointSet( 2, 1, "", status );
          ptr = astGetPoints( result );
          if( astOK ) {
             ptr[ 0 ][ 0 ] = lbnd[ 0 ];
@@ -1492,7 +1548,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
             } else if( astOK ) {
                astError( AST__INTER, "astRegBaseMesh(%s): Distance around "
                          "box perimeter is zero (internal AST programming "
-                         "error).", astGetClass( this ) );
+                         "error).", status, astGetClass( this ) );
             }
 
 /* If the Frame has no usable metric, give an equal number of points
@@ -1507,7 +1563,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
          }
 
 /* Create a PointSet with enough room and get a pointer to its data arrays. */
-         result = astPointSet( np, 2, "" );
+         result = astPointSet( np, 2, "", status );
          ptr = astGetPoints( result );
          if( astOK ) {
 
@@ -1558,7 +1614,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
    points. */
          np = 2*naxes;
          for( iaxis = 1; iaxis < naxes; iaxis++ ) np *= np_axis;
-         result = astPointSet( np, naxes, "" );
+         result = astPointSet( np, naxes, "", status );
          ptr = astGetPoints( result );
          if( astOK ) {
 
@@ -1570,11 +1626,11 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
 
 /* First do the upper face for this axis. */
                ip += MakeGrid( naxes, ptr, ip, lbnd, ubnd, np_axis, iaxis, 
-                               ubnd[ iaxis ] );
+                               ubnd[ iaxis ], status );
 
 /* Now do the lower face for this axis. */
                ip += MakeGrid( naxes, ptr, ip, lbnd, ubnd, np_axis, iaxis, 
-                               lbnd[ iaxis ] );
+                               lbnd[ iaxis ], status );
             }
 
 /* Remove any unused space at the end of the PointSet. */
@@ -1604,7 +1660,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
 }
 
 static double *RegCentre( AstRegion *this_region, double *cen, double **ptr, 
-                          int index, int ifrm ){
+                          int index, int ifrm, int *status ){
 /*
 *  Name:
 *     RegCentre
@@ -1618,7 +1674,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 *  Synopsis:
 *     #include "box.h"
 *     double *RegCentre( AstRegion *this, double *cen, double **ptr, 
-*                        int index, int ifrm )
+*                        int index, int ifrm, int *status )
 
 *  Class Membership:
 *     Box member function (over-rides the astRegCentre protected
@@ -1648,6 +1704,8 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 *        Should be AST__BASE or AST__CURRENT. Indicates whether the centre 
 *        position is supplied and returned in the base or current Frame of 
 *        the FrameSet encapsulated within "this".
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     If both "cen" and "ptr" are NULL then a pointer to a newly
@@ -1694,7 +1752,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
    into the current Frame. First ensure cached information (which
    includes the centre coords) is up to date. */
    if( !ptr && !cen ) {
-      Cache( this, 0 );
+      Cache( this, 0, status );
       if( ifrm == AST__CURRENT ) {
          result = astRegTranPoint( this_region, this->centre, 1, 1 );
       } else {
@@ -1765,7 +1823,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 }
 
 static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
-                    int **mask ){
+                    int **mask, int *status ){
 /*
 *  Name:
 *     RegPins
@@ -1779,7 +1837,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 *  Synopsis:
 *     #include "box.h"
 *     int RegPins( AstRegion *this, AstPointSet *pset, AstRegion *unc,
-*                  int **mask )
+*                  int **mask, int *status )
 
 *  Class Membership:
 *     Box member function (over-rides the astRegPins protected
@@ -1813,6 +1871,8 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 *        and is set to zero otherwise. A NULL value may be supplied
 *        in which case no array is created. If created, the array should
 *        be freed using astFree when no longer needed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Non-zero if the points all fall on the boundary of the given
@@ -1854,7 +1914,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    this = (AstBox *) this_region;
 
 /* Ensure cached information is up to date. */
-   Cache( this, 0 );
+   Cache( this, 0, status );
 
 /* Get the number of base Frame axes in the Box, and check the supplied 
    PointSet has the same number of axis values per point. */
@@ -1863,7 +1923,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    if( astGetNcoord( pset ) != nc && astOK ) {
       astError( AST__INTER, "astRegPins(%s): Illegal number of axis "
                 "values per point (%d) in the supplied PointSet - should be "
-                "%d (internal AST programming error).", astGetClass( this ),
+                "%d (internal AST programming error).", status, astGetClass( this ),
                 astGetNcoord( pset ), nc );
    }
 
@@ -1872,7 +1932,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    if( unc && astGetNaxes( unc ) != nc && astOK ) {
       astError( AST__INTER, "astRegPins(%s): Illegal number of axes (%d) "
                 "in the supplied uncertainty Region - should be "
-                "%d (internal AST programming error).", astGetClass( this ),
+                "%d (internal AST programming error).", status, astGetClass( this ),
                 astGetNaxes( unc ), nc );
    }
 
@@ -1923,8 +1983,8 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
          small[ i ] += this->centre[ i ];
       }
 
-      large_box = astBox( frm, 0, this->centre, large, NULL, "" );
-      small_box = astBox( frm, 0, this->centre, small, NULL, "" );
+      large_box = astBox( frm, 0, this->centre, large, NULL, "", status );
+      small_box = astBox( frm, 0, this->centre, small, NULL, "", status );
 
 /* Negate the smaller region.*/
       astNegate( small_box );
@@ -2013,7 +2073,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    return result;
 }
 
-static void ResetCache( AstRegion *this ){
+static void ResetCache( AstRegion *this, int *status ){
 /*
 *  Name:
 *     ResetCache
@@ -2026,7 +2086,7 @@ static void ResetCache( AstRegion *this ){
 
 *  Synopsis:
 *     #include "box.h"
-*     void ResetCache( AstRegion *this )
+*     void ResetCache( AstRegion *this, int *status )
 
 *  Class Membership:
 *     Region member function (overrides the astResetCache method
@@ -2039,14 +2099,16 @@ static void ResetCache( AstRegion *this ){
 *  Parameters:
 *     this
 *        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
 */
    if( this ) {
       ((AstBox *) this )->stale = 1;
-      (*parent_resetcache)( this );
+      (*parent_resetcache)( this, status );
    }
 }
 
-static void SetClosed( AstRegion *this, int value ){
+static void SetClosed( AstRegion *this, int value, int *status ){
 /*
 *  Name:
 *     SetClosed
@@ -2059,7 +2121,7 @@ static void SetClosed( AstRegion *this, int value ){
 
 *  Synopsis:
 *     #include "box.h"
-*     void SetClosed( AstRegion *this, int value )
+*     void SetClosed( AstRegion *this, int value, int *status )
 
 *  Class Membership:
 *     Box member function (over-rides the protected astSetClosed
@@ -2073,6 +2135,8 @@ static void SetClosed( AstRegion *this, int value ){
 *        Pointer to the Region.
 *     value
 *        The new attribute value.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -2085,14 +2149,14 @@ static void SetClosed( AstRegion *this, int value ){
    old = astGetClosed( this );
 
 /* Invoke the set method inherited from the parent Region class */
-   (*parent_setclosed)( this, value );
+   (*parent_setclosed)( this, value, status );
 
 /* If the new value is not the same as the old value, indicate that we
    need to re-calculate the cached information in the Box. */
    if( value != old ) astResetCache( this );
 }
 
-static void SetNegated( AstRegion *this, int value ){
+static void SetNegated( AstRegion *this, int value, int *status ){
 /*
 *  Name:
 *     SetNegated
@@ -2105,7 +2169,7 @@ static void SetNegated( AstRegion *this, int value ){
 
 *  Synopsis:
 *     #include "box.h"
-*     void SetNegated( AstRegion *this, int value )
+*     void SetNegated( AstRegion *this, int value, int *status )
 
 *  Class Membership:
 *     Box member function (over-rides the protected astSetNegated
@@ -2119,6 +2183,8 @@ static void SetNegated( AstRegion *this, int value ){
 *        Pointer to the Region.
 *     value
 *        The new attribute value.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -2131,14 +2197,14 @@ static void SetNegated( AstRegion *this, int value ){
    old = astGetNegated( this );
 
 /* Invoke the set method inherited from the parent Region class */
-   (*parent_setnegated)( this, value );
+   (*parent_setnegated)( this, value, status );
 
 /* If the new value is not the same as the old value, indicate that we
    need to re-calculate the cached information in the Box. */
    if( value != old ) astResetCache( this );
 }
 
-static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
+static void SetRegFS( AstRegion *this_region, AstFrame *frm, int *status ) {
 /*
 *  Name:
 *     SetRegFS
@@ -2151,7 +2217,7 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
 
 *  Synopsis:
 *     #include "box.h"
-*     void SetRegFS( AstRegion *this_region, AstFrame *frm )
+*     void SetRegFS( AstRegion *this_region, AstFrame *frm, int *status )
 
 *  Class Membership:
 *     Box method (over-rides the astSetRegFS method inherited from
@@ -2167,6 +2233,8 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
 *        Pointer to the Region.
 *     frm
 *        The Frame to use.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -2176,13 +2244,13 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
 
 /* Invoke the parent method to store the FrameSet in the parent Region
    structure. */
-   (* parent_setregfs)( this_region, frm );
+   (* parent_setregfs)( this_region, frm, status );
 
 /* Indicate that we need to re-calculate the cached information in the Box. */
    astResetCache( this_region );
 }
 
-static double SetShrink( AstBox *this, double shrink ){
+static double SetShrink( AstBox *this, double shrink, int *status ){
 /*
 *  Name:
 *     SetShrink
@@ -2195,7 +2263,7 @@ static double SetShrink( AstBox *this, double shrink ){
 
 *  Synopsis:
 *     #include "box.h"
-*     double SetShrink( AstBox *this, double shrink );
+*     double SetShrink( AstBox *this, double shrink, int *status );
 
 *  Class Membership:
 *     Box method 
@@ -2211,6 +2279,8 @@ static double SetShrink( AstBox *this, double shrink ){
 *        Pointer to the Box.
 *     shrink
 *        The new Shrink factor.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The original shrink factor.
@@ -2237,7 +2307,7 @@ static double SetShrink( AstBox *this, double shrink ){
    return result;
 }
 
-static void SetUnc( AstRegion *this, AstRegion *unc ){
+static void SetUnc( AstRegion *this, AstRegion *unc, int *status ){
 /*
 *  Name:
 *     SetUnc
@@ -2250,7 +2320,7 @@ static void SetUnc( AstRegion *this, AstRegion *unc ){
 
 *  Synopsis:
 *     #include "box.h"
-*     void SetUnc( AstRegion *this, AstRegion *unc )
+*     void SetUnc( AstRegion *this, AstRegion *unc, int *status )
 
 *  Class Membership:
 *     Box method (over-rides the astSetUnc method inherited from the 
@@ -2277,19 +2347,21 @@ static void SetUnc( AstRegion *this, AstRegion *unc ){
 *        a Circle or an Ellipse. A deep copy of the supplied Region will be 
 *        taken, so subsequent changes to the uncertainty Region using the 
 *        supplied pointer will have no effect on the Region "this".
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Check the inherited status. */
    if( !astOK ) return;
 
 /* Invoke the astSetUnc method inherited from the parent Region class. */
-   (*parent_setunc)( this, unc );
+   (*parent_setunc)( this, unc, status );
 
 /* Indicate that we need to re-calculate the cached information in the Box. */
    astResetCache( this );
 }
 
-static AstMapping *Simplify( AstMapping *this_mapping ) {
+static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /*
 *  Name:
 *     Simplify
@@ -2302,7 +2374,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 *  Synopsis:
 *     #include "box.h"
-*     AstMapping *Simplify( AstMapping *this )
+*     AstMapping *Simplify( AstMapping *this, int *status )
 
 *  Class Membership:
 *     Box method (over-rides the astSimplify method inherited
@@ -2319,6 +2391,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 *  Parameters:
 *     this
 *        Pointer to the original Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to the simplified Region. A cloned pointer to the
@@ -2382,7 +2456,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 /* Invoke the parent Simplify method inherited from the Region class. This
    will simplify the encapsulated FrameSet and uncertainty Region. */
-   new = (AstRegion *) (*parent_simplify)( this_mapping );
+   new = (AstRegion *) (*parent_simplify)( this_mapping, status );
 
 /* Note if any simplification took place. This is assumed to be the case
    if the pointer returned by the above call is different to the supplied
@@ -2405,7 +2479,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
       newbox = (AstBox *) new;
 
 /* Ensure cached information is up to date. */
-      Cache( newbox, 0 );
+      Cache( newbox, 0, status );
 
 /* Get the number of inputs and outputs for the PermMap */
       nin = astGetNin( map );
@@ -2527,13 +2601,13 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
  
 /* Create a new Region of the required class. */
             if( isNull ) {
-               new = (AstRegion *) astNullRegion( frm, unc, "" );
+               new = (AstRegion *) astNullRegion( frm, unc, "", status );
 
             } else if( isInterval ){
-               new = (AstRegion *) astInterval( frm, lbnd, ubnd, unc, "" );
+               new = (AstRegion *) astInterval( frm, lbnd, ubnd, unc, "", status );
 
             } else {
-               new = (AstRegion *) astBox( frm, 1, lbnd, ubnd, unc, "" );
+               new = (AstRegion *) astBox( frm, 1, lbnd, ubnd, unc, "", status );
             }
 
 /* If the original box was Negated. Negate the new one. */
@@ -2572,7 +2646,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
  
 /* Find the best fitting box (defined in the current Frame) through these 
    points */
-      newbox = BestBox( frm, mesh, unc );
+      newbox = BestBox( frm, mesh, unc, status );
 
 /* See if all points within this mesh fall on the boundary of the best
    fitting Box, to within the uncertainty of the Region. */
@@ -2602,11 +2676,11 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 /* Create a PointSet holding the base Frame axis values at the four
    corners of the Box. */
-         ps1 = astPointSet( 4, 2, "" );
+         ps1 = astPointSet( 4, 2, "", status );
          ptr1 = astGetPoints( ps1 );
          if( astOK ) {
             box = (AstBox *) new;
-            Cache( box, 0 );
+            Cache( box, 0, status );
 
 /* If the determinant of the Jacobian matrix of the Mapping is negative
    then a clockwise rotation is mapped into an anti-clockwise rotation
@@ -2661,7 +2735,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
                corners[ ic ] = ptr2[ 0 ][ ic ];
                corners[ 4 + ic ] = ptr2[ 1 ][ ic ];
             }
-            newpoly = astPolygon( frm, 4, 4, corners, unc, "" );
+            newpoly = astPolygon( frm, 4, 4, corners, unc, "", status );
 
 /* See if all points within the Box mesh fall on the boundary of this
    Polygon, to within the uncertainty of the Region. */
@@ -2709,7 +2783,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 }
 
 static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-                               int forward, AstPointSet *out ) {
+                               int forward, AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     Transform
@@ -2723,7 +2797,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *  Synopsis:
 *     #include "box.h"
 *     AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-*                             int forward, AstPointSet *out )
+*                             int forward, AstPointSet *out, int *status )
 
 *  Class Membership:
 *     Box member function (over-rides the astTransform protected
@@ -2748,6 +2822,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *        Pointer to a PointSet which will hold the transformed (output)
 *        coordinate values. A NULL value may also be given, in which case a
 *        new PointSet will be created by this function.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the output (possibly new) PointSet.
@@ -2794,7 +2870,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    function inherited from the parent Region class. This function validates
    all arguments and generates an output PointSet if necessary,
    containing a copy of the input PointSet. */
-   result = (*parent_transform)( this, in, forward, out );
+   result = (*parent_transform)( this, in, forward, out, status );
 
 /* We will now extend the parent astTransform method by performing the
    calculations needed to generate the output coordinate values. */
@@ -2824,7 +2900,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    neg = astGetNegated( reg );
 
 /* Ensire the cached information is up to date. */
-   Cache( box, 1 );
+   Cache( box, 1, status );
 
 /* Perform coordinate arithmetic. */
 /* ------------------------------ */
@@ -2929,7 +3005,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -2941,7 +3017,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for Region objects.
@@ -2951,6 +3027,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the object to be copied.
 *     objout
 *        Pointer to the object being constructed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     -  This constructor makes a deep copy.
@@ -2993,7 +3071,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -3005,7 +3083,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for Box objects.
@@ -3013,6 +3091,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the object to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     This function attempts to execute even if the global error status is
@@ -3035,7 +3115,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -3047,7 +3127,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -3058,6 +3138,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the Box whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -3092,11 +3174,11 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsABox and astCheckBox functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(Box,Region,check,&class_init)
+astMAKE_ISA(Box,Region,check,&class_check)
 astMAKE_CHECK(Box)
 
 AstBox *astBox_( void *frame_void, int form, const double point1[], 
-                 const double point2[], AstRegion *unc, const char *options, ... ) {
+                 const double point2[], AstRegion *unc, const char *options, int *status, ...) {
 /*
 *++
 *  Name:
@@ -3231,13 +3313,24 @@ f     AST_BOX = INTEGER
 c     function is invoked with the AST error status set, or if it
 f     function is invoked with STATUS set to an error value, or if it
 *     should fail for any reason.
+
+*  Status Handling:
+*     The protected interface to this function includes an extra
+*     parameter at the end of the parameter list descirbed above. This
+*     parameter is a pointer to the integer inherited status
+*     variable: "int *status".
+
 *--
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstBox *new;                  /* Pointer to new Box */
    va_list args;                 /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -3257,7 +3350,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Obtain the variable argument list and pass it along with the options string
    to the astVSet method to initialise the new Box's attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -3312,10 +3405,19 @@ AstBox *astBoxId_( void *frame_void, int form, const double point1[],
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstBox *new;                  /* Pointer to new Box */
    AstRegion *unc;               /* Pointer to Region structure */
    va_list args;                 /* Variable argument list */
+
+   int *status;                  /* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
+/* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -3355,7 +3457,7 @@ AstBox *astBoxId_( void *frame_void, int form, const double point1[],
 AstBox *astInitBox_( void *mem, size_t size, int init, AstBoxVtab *vtab, 
                      const char *name, AstFrame *frame, int form,
                      const double point1[], const double point2[],
-                     AstRegion *unc ) {
+                     AstRegion *unc, int *status ) {
 /*
 *+
 *  Name:
@@ -3474,7 +3576,7 @@ AstBox *astInitBox_( void *mem, size_t size, int init, AstBoxVtab *vtab,
 
 /* Create a PointSet to hold the supplied values, and get points to the
    data arrays. */
-   pset = astPointSet( 2, nc, "" );
+   pset = astPointSet( 2, nc, "", status );
    ptr = astGetPoints( pset );
 
 /* Copy the supplied coordinates into the PointSet, checking that no bad 
@@ -3482,12 +3584,12 @@ AstBox *astInitBox_( void *mem, size_t size, int init, AstBoxVtab *vtab,
    for( i = 0; astOK && i < nc; i++ ) {
       if( point1[ i ] == AST__BAD ) {
          astError( AST__BADIN, "astInitBox(%s): The value of axis %d is "
-                   "undefined at point 1 of the box.", name, i + 1 );
+                   "undefined at point 1 of the box.", status, name, i + 1 );
          break;
       } 
       if( point2[ i ] == AST__BAD ) {
          astError( AST__BADIN, "astInitBox(%s): The value of axis %d is "
-                   "undefined at point 2 of the box.", name, i + 1 );
+                   "undefined at point 2 of the box.", status, name, i + 1 );
          break;
       }
       ptr[ i ][ 0 ] = point1[ i ];
@@ -3534,7 +3636,7 @@ AstBox *astInitBox_( void *mem, size_t size, int init, AstBoxVtab *vtab,
 }
 
 AstBox *astLoadBox_( void *mem, size_t size, AstBoxVtab *vtab, 
-                     const char *name, AstChannel *channel ) {
+                     const char *name, AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -3607,6 +3709,7 @@ AstBox *astLoadBox_( void *mem, size_t size, AstBoxVtab *vtab,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstBox *new;              /* Pointer to the new Box */
 
 /* Initialise. */
@@ -3614,6 +3717,9 @@ AstBox *astLoadBox_( void *mem, size_t size, AstBoxVtab *vtab,
 
 /* Check the global error status. */
    if ( !astOK ) return new;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* If a NULL virtual function table has been supplied, then this is
    the first loader to be invoked for this Box. In this case the
@@ -3684,6 +3790,10 @@ AstBox *astLoadBox_( void *mem, size_t size, AstBoxVtab *vtab,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
+
+
+
+
 
 
 

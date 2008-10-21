@@ -87,6 +87,8 @@
 *           Export an Object pointer to an outer context.
 *        astGet<X>, where <X> = C, D, F, I, L
 *           Get an attribute value for an Object.
+*        astImport
+*           Import an Object pointer into the current context.
 *        astSame
 *           Return true if two pointers refer to the same object.
 *        astSet
@@ -340,8 +342,29 @@
 #include <float.h>
 #include <stdio.h>
 
+#if defined(THREAD_SAFE)
+#include <pthread.h>
+#endif
+
 /* Macros. */
 /* ======= */
+#if defined(astCLASS) || defined(astFORTRAN77)
+#define STATUS_PTR status
+#else
+#define STATUS_PTR astGetStatusPtr
+#endif
+
+#define AST__THREADSAFE yes
+
+#if defined(astCLASS )
+#define AST__GETATTRIB_BUFF_LEN 50 /* Length of string returned by GetAttrib. */
+#define AST__ASTGETC_MAX_STRINGS 50 /* Number of string values to buffer within astGetC */
+
+#define AST__LOCK 1      /* Tells astManageLock to lock the object */
+#define AST__UNLOCK 2    /* Tells astManageLock to unlock the object */
+#define AST__CHECKLOCK 3 /* Tells astManageLock to check the object is locked */
+
+#endif
 
 /*
 *+
@@ -441,7 +464,7 @@ astERROR_INVOKE(astRet##rettype##_(function))
 #if defined(astCLASS)
 #define astRetO_(x) ((void *)(x))
 #else
-#define astRetO_(x) ((void *)astMakeId_((AstObject *)(x)))
+#define astRetO_(x) ((void *)astMakeId_((AstObject *)(x),STATUS_PTR))
 #endif
 
 /*
@@ -487,7 +510,7 @@ astERROR_INVOKE(astRet##rettype##_(function))
    function. */
 #if !defined(astCLASS) || defined(AST_CHECK_CLASS)
 #define astINVOKE_CHECK(class,this) \
-astCheck##class##_((Ast##class *)astEnsurePointer_(this))
+astCheck##class##_((Ast##class *)astEnsurePointer_(this),astGetStatusPtr)
 
 /* For the internal interface, astINVOKE_CHECK omits the
    astCheck<class> function (unless AST_CHECK_CLASS is defined). */
@@ -498,10 +521,10 @@ astCheck##class##_((Ast##class *)astEnsurePointer_(this))
 /* Define astINVOKE_ISA to invoke the astIsA<Class> function. */
 #if defined(astCLASS)            /* Protected */
 #define astINVOKE_ISA(class,this) \
-astIsA##class##_((const Ast##class *)(this))
+astIsA##class##_((const Ast##class *)(this),status)
 #else                            /* Public */
 #define astINVOKE_ISA(class,this) \
-astINVOKE(V,astIsA##class##_((const Ast##class *)astEnsurePointer_(this)))
+astINVOKE(V,astIsA##class##_((const Ast##class *)astEnsurePointer_(this),astGetStatusPtr))
 #endif
 
 /* The astEnsurePointer_ macro ensures a true C pointer, converting
@@ -509,7 +532,7 @@ astINVOKE(V,astIsA##class##_((const Ast##class *)astEnsurePointer_(this)))
 #if defined(astCLASS)            /* Protected */
 #define astEnsurePointer_(x) ((void *)(x))
 #else                            /* Public */
-#define astEnsurePointer_(x) ((void *)astMakePointer_((AstObject *)(x)))
+#define astEnsurePointer_(x) ((void *)astCheckLock_(astMakePointer_((AstObject *)(x),STATUS_PTR),STATUS_PTR))
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -555,7 +578,7 @@ astINVOKE(V,astIsA##class##_((const Ast##class *)astEnsurePointer_(this)))
 #define astMAKE_CHECK(class) \
 \
 /* Declare the function (see the object.c file for a prologue). */ \
-Ast##class *astCheck##class##_( Ast##class *this ) { \
+Ast##class *astCheck##class##_( Ast##class *this, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return this; \
@@ -568,7 +591,7 @@ Ast##class *astCheck##class##_( Ast##class *this ) { \
    unsuitable. */ \
       if ( astOK ) { \
          astError( AST__OBJIN, "Pointer to " #class " required, but pointer " \
-                   "to %s given.", astGetClass( this ) ); \
+                   "to %s given.", status, astGetClass( this ) ); \
       } \
    } \
 \
@@ -582,7 +605,7 @@ Ast##class *astCheck##class##_( Ast##class *this ) { \
 #define astMAKE_CHECK(class) \
 \
 /* Declare the function (see the object.c file for a prologue). */ \
-Ast##class *astCheck##class##_( Ast##class *this ) { \
+Ast##class *astCheck##class##_( Ast##class *this, int *status ) { \
 \
    char buf[100]; \
 \
@@ -597,14 +620,14 @@ Ast##class *astCheck##class##_( Ast##class *this ) { \
    unsuitable. */ \
       if ( astOK ) { \
          astError( AST__OBJIN, "Pointer to " #class " required, but pointer " \
-                   "to %s given.", astGetClass( this ) ); \
+                   "to %s given.", status, astGetClass( this ) ); \
       }\
 \
    } else { \
 \
 /* Call the astMemoryUse function to report it if the memory block is \
    being watched. */ \
-      sprintf( buf, "checked (refcnt: %d)", astGetRefCount_( (AstObject *) this ) ); \
+      sprintf( buf, "checked (refcnt: %d)", astGetRefCount_( (AstObject *) this, status ) ); \
       astMemoryUse( this, buf ); \
    } \
 \
@@ -676,7 +699,7 @@ Ast##class *astCheck##class##_( Ast##class *this ) { \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static void Clear##attribute( Ast##class *this ) { \
+static void Clear##attribute( Ast##class *this, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -687,13 +710,13 @@ static void Clear##attribute( Ast##class *this ) { \
 \
 /* External interface. */ \
 /* ------------------- */ \
-void astClear##attribute##_( Ast##class *this ) { \
+void astClear##attribute##_( Ast##class *this, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
 \
 /* Invoke the required method via the virtual function table. */ \
-   (**astMEMBER(this,class,Clear##attribute))( this ); \
+   (**astMEMBER(this,class,Clear##attribute))( this, status ); \
 }   
 #endif
 
@@ -761,7 +784,7 @@ void astClear##attribute##_( Ast##class *this ) { \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static type Get##attribute( Ast##class *this ) { \
+static type Get##attribute( Ast##class *this, int *status ) { \
    type result;                  /* Result to be returned */ \
 \
 /* Check the global error status. */ \
@@ -778,13 +801,13 @@ static type Get##attribute( Ast##class *this ) { \
 } \
 /* External interface. */ \
 /* ------------------- */  \
-type astGet##attribute##_( Ast##class *this ) { \
+type astGet##attribute##_( Ast##class *this, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return (bad_value); \
 \
 /* Invoke the required method via the virtual function table. */ \
-   return (**astMEMBER(this,class,Get##attribute))( this ); \
+   return (**astMEMBER(this,class,Get##attribute))( this, status ); \
 }
 #endif
 
@@ -838,7 +861,7 @@ type astGet##attribute##_( Ast##class *this ) { \
 #define astMAKE_ISA(class,parent,check,magic) \
 \
 /* Declare the function (see the object.c file for a prologue). */ \
-int astIsA##class##_( const Ast##class *this ) { \
+int astIsA##class##_( const Ast##class *this, int *status ) { \
 \
 /* Local Variables: */ \
    int isa = 0;                  /* Is object a member? */ \
@@ -932,7 +955,7 @@ int astIsA##class##_( const Ast##class *this ) { \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static void Set##attribute( Ast##class *this, type value ) { \
+static void Set##attribute( Ast##class *this, type value, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -943,13 +966,13 @@ static void Set##attribute( Ast##class *this, type value ) { \
 \
 /* External interface. */ \
 /* ------------------- */ \
-void astSet##attribute##_( Ast##class *this, type value ) { \
+void astSet##attribute##_( Ast##class *this, type value, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
 \
 /* Invoke the required method via the virtual function table. */ \
-   (**astMEMBER(this,class,Set##attribute))( this, value ); \
+   (**astMEMBER(this,class,Set##attribute))( this, value, status ); \
 }
 #endif
 
@@ -1012,7 +1035,7 @@ void astSet##attribute##_( Ast##class *this, type value ) { \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static int Test##attribute( Ast##class *this ) { \
+static int Test##attribute( Ast##class *this, int *status ) { \
    int result;                   /* Value to return */ \
 \
 /* Check the global error status. */ \
@@ -1029,13 +1052,13 @@ static int Test##attribute( Ast##class *this ) { \
 } \
 /* External interface. */ \
 /* ------------------- */ \
-int astTest##attribute##_( Ast##class *this ) { \
+int astTest##attribute##_( Ast##class *this, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return 0; \
 \
 /* Invoke the required method via the virtual function table. */ \
-   return (**astMEMBER(this,class,Test##attribute))( this ); \
+   return (**astMEMBER(this,class,Test##attribute))( this, status ); \
 }
 #endif
 
@@ -1156,8 +1179,8 @@ int astTest##attribute##_( Ast##class *this ) { \
 */
 
 /* Define the macros. */
-#define astPROTO_CHECK(class) Ast##class *astCheck##class##_( Ast##class * );
-#define astPROTO_ISA(class) int astIsA##class##_( const Ast##class * );
+#define astPROTO_CHECK(class) Ast##class *astCheck##class##_( Ast##class *, int * );
+#define astPROTO_ISA(class) int astIsA##class##_( const Ast##class *, int * );
 
 /* Macros which return the maximum and minimum of two values. */
 #define astMAX(aa,bb) ((aa)>(bb)?(aa):(bb))
@@ -1193,6 +1216,14 @@ typedef struct AstObject {
    char *id;                     /* Pointer to ID string */
    char *ident;                  /* Pointer to Ident string */
    char usedefs;                 /* Use default attribute values? */
+
+#if defined(THREAD_SAFE)
+   int locker;                   /* Thread that has locked this Object */
+   pthread_mutex_t mutex;        /* Mutex for this Object */
+   pthread_mutex_t mutexl; 
+   struct AstGlobals *globals;   /* Pointer to thread-specific global data */
+#endif
+
 } AstObject;
 
 /* Virtual function table. */
@@ -1209,36 +1240,36 @@ struct AstChannel;
 typedef struct AstObjectVtab {
 
 /* Properties specific to this class. */
-   const char *( *GetID )( AstObject * );
-   const char *( *GetIdent )( AstObject * );
-   const char *(* GetAttrib)( AstObject *, const char * );
-   int (* TestAttrib)( AstObject *, const char * );
-   int (* TestID)( AstObject * );
-   int (* Same)( AstObject *, AstObject * );
-   int (* TestIdent)( AstObject * );
-   void (* Clear)( AstObject *, const char * );
-   void (* ClearAttrib)( AstObject *, const char * );
-   void (* ClearID)( AstObject * );
-   void (* ClearIdent)( AstObject * );
-   void (* Dump)( AstObject *, struct AstChannel * );
-   int (* Equal)( AstObject *, AstObject * );
-   void (* SetAttrib)( AstObject *, const char * );
-   void (* SetID)( AstObject *, const char * );
-   void (* SetIdent)( AstObject *, const char * );
-   void (* Show)( AstObject * );
-   void (* VSet)( AstObject *, const char *, char **, va_list );
+   const char *( *GetID )( AstObject *, int * );
+   const char *( *GetIdent )( AstObject *, int * );
+   const char *(* GetAttrib)( AstObject *, const char *, int * );
+   int (* TestAttrib)( AstObject *, const char *, int * );
+   int (* TestID)( AstObject *, int * );
+   int (* Same)( AstObject *, AstObject *, int * );
+   int (* TestIdent)( AstObject *, int * );
+   void (* Clear)( AstObject *, const char *, int * );
+   void (* ClearAttrib)( AstObject *, const char *, int * );
+   void (* ClearID)( AstObject *, int * );
+   void (* ClearIdent)( AstObject *, int * );
+   void (* Dump)( AstObject *, struct AstChannel *, int * );
+   int (* Equal)( AstObject *, AstObject *, int * );
+   void (* SetAttrib)( AstObject *, const char *, int * );
+   void (* SetID)( AstObject *, const char *, int * );
+   void (* SetIdent)( AstObject *, const char *, int * );
+   void (* Show)( AstObject *, int * );
+   void (* VSet)( AstObject *, const char *, char **, va_list, int * );
 
-   int (* GetObjSize)( AstObject * );
+   int (* GetObjSize)( AstObject *, int * );
 
-   int (* TestUseDefs)( AstObject * );
-   int (* GetUseDefs)( AstObject * );
-   void (* SetUseDefs)( AstObject *, int );
-   void (* ClearUseDefs)( AstObject * );
+   int (* TestUseDefs)( AstObject *, int * );
+   int (* GetUseDefs)( AstObject *, int * );
+   void (* SetUseDefs)( AstObject *, int, int * );
+   void (* ClearUseDefs)( AstObject *, int * );
 
    const char *class;            /* Pointer to class name string */
-   void (** delete)( AstObject * ); /* Pointer to array of destructors */
-   void (** copy)( const AstObject *, AstObject * ); /* Copy constructors */
-   void (** dump)( AstObject *, struct AstChannel * ); /* Dump functions */
+   void (** delete)( AstObject *, int * ); /* Pointer to array of destructors */
+   void (** copy)( const AstObject *, AstObject *, int * ); /* Copy constructors */
+   void (** dump)( AstObject *, struct AstChannel *, int * ); /* Dump functions */
    const char **dump_class;      /* Dump function class string pointers */
    const char **dump_comment;    /* Dump function comment string pointers */
    int ndelete;                  /* Number of destructors */
@@ -1247,7 +1278,30 @@ typedef struct AstObjectVtab {
    int nobject;                  /* Number of active objects in the class */
    int nfree;                    /* No. of entries in "free_list" */
    AstObject **free_list;        /* List of pointers for freed Objects */
+
+#if defined(THREAD_SAFE)
+   int (* ManageLock)( AstObject *, int, int, int * );
+   pthread_mutex_t mutex;        /* Mutex for this Vtab */
+#endif
+
 } AstObjectVtab;
+#endif
+
+#if defined(THREAD_SAFE) && defined(astCLASS)
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstObjectGlobals {
+   int Retain_Esc; 
+   int Context_Level; 
+   int *Active_Handles; 
+   char GetAttrib_Buff[ AST__GETATTRIB_BUFF_LEN + 1 ];  
+   char *AstGetC_Strings[ AST__ASTGETC_MAX_STRINGS ];  
+   int AstGetC_Istr;           
+   int AstGetC_Init; 
+} AstObjectGlobals;
+
 #endif
 
 /* More include files. */
@@ -1275,97 +1329,112 @@ astPROTO_ISA(Object)             /* Test class membership */
 
 /* Initialiser. */
 AstObject *astInitObject_( void *, size_t, int, AstObjectVtab *,
-                           const char * );
+                           const char *, int * );
 
 /* Vtab Initialiser. */
-void astInitObjectVtab_( AstObjectVtab *, const char * );
+void astInitObjectVtab_( AstObjectVtab *, const char *, int * );
 
 /* Loader. */
 AstObject *astLoadObject_( void *, size_t, AstObjectVtab *,
-                           const char *, AstChannel *channel );
+                           const char *, AstChannel *channel, int * );
+
+#if defined(THREAD_SAFE) 
+void astInitObjectGlobals_( AstObjectGlobals * );
+#endif
+
 #endif
 
 /* Prototypes for other class functions. */
 /* ------------------------------------- */
 #if !defined(astCLASS)           /* Public */
 void astBegin_( void );
-void astEnd_( void );
+void astEnd_( int * );
 #endif
 
-AstObject *astI2P_( int );
-AstObject *astMakeId_( AstObject * );
-AstObject *astMakePointer_( AstObject * );
-int astP2I_( AstObject * );
-int astVersion_( void );
-int astEscapes_( int );
-int astTune_( const char *, int );
+AstObject *astI2P_( int, int * );
+AstObject *astMakeId_( AstObject *, int * );
+AstObject *astMakePointer_( AstObject *, int * );
+int astP2I_( AstObject *, int * );
+int astVersion_( int * );
+int astEscapes_( int, int * );
+int astTune_( const char *, int, int * );
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
 #if defined(astCLASS)            /* Protected */
-AstObject *astAnnul_( AstObject * );
-AstObject *astDelete_( AstObject * );
-void astSet_( void *, const char *, ... );
+AstObject *astAnnul_( AstObject *, int * );
+AstObject *astDelete_( AstObject *, int * );
+void astSet_( void *, const char *, int *, ... );
 
 #else                            /* Public */
-AstObject *astDeleteId_( AstObject * );
-void astExportId_( AstObject * );
+AstObject *astDeleteId_( AstObject *, int * );
+void astLockId_( AstObject *, int, int * );
+void astUnlockId_( AstObject *, int * );
+void astExportId_( AstObject *, int * );
+void astImportId_( AstObject *, int * );
 void astSetId_( void *, const char *, ... );
 #endif
 
-void astExemptId_( AstObject * );
-AstObject *astAnnulId_( AstObject * );
-AstObject *astClone_( AstObject * );
-AstObject *astCopy_( const AstObject * );
-const char *astGetC_( AstObject *, const char * );
-double astGetD_( AstObject *, const char * );
-float astGetF_( AstObject *, const char * );
-int astGetI_( AstObject *, const char * );
-int astTest_( AstObject *, const char * );
-int astSame_( AstObject *, AstObject * );
-long astGetL_( AstObject *, const char * );
-void astClear_( AstObject *, const char * );
-void astSetC_( AstObject *, const char *, const char * );
-void astSetD_( AstObject *, const char *, double );
-void astSetF_( AstObject *, const char *, float );
-void astSetI_( AstObject *, const char *, int );
-void astSetL_( AstObject *, const char *, long );
-void astShow_( AstObject * );
+void astExemptId_( AstObject *, int * );
+AstObject *astAnnulId_( AstObject *, int * );
+AstObject *astCheckLock_( AstObject *, int * );
+AstObject *astClone_( AstObject *, int * );
+AstObject *astCopy_( const AstObject *, int * );
+const char *astGetC_( AstObject *, const char *, int * );
+double astGetD_( AstObject *, const char *, int * );
+float astGetF_( AstObject *, const char *, int * );
+int astGetI_( AstObject *, const char *, int * );
+int astTest_( AstObject *, const char *, int * );
+int astSame_( AstObject *, AstObject *, int * );
+long astGetL_( AstObject *, const char *, int * );
+void astClear_( AstObject *, const char *, int * );
+void astSetC_( AstObject *, const char *, const char *, int * );
+void astSetD_( AstObject *, const char *, double, int * );
+void astSetF_( AstObject *, const char *, float, int * );
+void astSetI_( AstObject *, const char *, int, int * );
+void astSetL_( AstObject *, const char *, long, int * );
+void astShow_( AstObject *, int * );
 
 #if defined(astCLASS)            /* Protected */
 
-AstObject *astCast_( AstObject *, AstObject * );
+AstObject *astCast_( AstObject *, AstObject *, int * );
 
-int astGetObjSize_( AstObject * );
-
-int astTestUseDefs_( AstObject * );
-int astGetUseDefs_( AstObject * );
-void astSetUseDefs_( AstObject *, int );
-void astClearUseDefs_( AstObject * );
-
-const char *astGetAttrib_( AstObject *, const char * );
-const char *astGetClass_( const AstObject * );
-const char *astGetID_( AstObject * );
-const char *astGetIdent_( AstObject * );
-int astEqual_( AstObject *, AstObject * );
-int astGetNobject_( const AstObject * );
-int astGetRefCount_( const AstObject * );
-int astTestAttrib_( AstObject *, const char * );
-int astTestID_( AstObject * );
-int astTestIdent_( AstObject * );
-void astClearAttrib_( AstObject *, const char * );
-void astClearID_( AstObject * );
-void astClearIdent_( AstObject * );
-void astDump_( AstObject *, AstChannel * );
-void astSetAttrib_( AstObject *, const char * );
-void astSetCopy_( AstObjectVtab *, void (*)( const AstObject *, AstObject * ) );
-void astSetDelete_( AstObjectVtab *, void (*)( AstObject * ) );
-void astSetDump_( AstObjectVtab *, void (*)( AstObject *, AstChannel * ), const char *, const char * );
-void astSetVtab_( AstObject *, AstObjectVtab * );
-void astSetID_( AstObject *, const char * );
-void astSetIdent_( AstObject *, const char * );
-void astVSet_( AstObject *, const char *, char **, va_list );
+#if defined(THREAD_SAFE)
+int astManageLock_( AstObject *, int, int, int * );
 #endif
+
+int astGetObjSize_( AstObject *, int * );
+
+int astTestUseDefs_( AstObject *, int * );
+int astGetUseDefs_( AstObject *, int * );
+void astSetUseDefs_( AstObject *, int, int * );
+void astClearUseDefs_( AstObject *, int * );
+
+const char *astGetAttrib_( AstObject *, const char *, int * );
+const char *astGetClass_( const AstObject *, int * );
+const char *astGetID_( AstObject *, int * );
+const char *astGetIdent_( AstObject *, int * );
+int astEqual_( AstObject *, AstObject *, int * );
+int astGetNobject_( const AstObject *, int * );
+int astGetRefCount_( const AstObject *, int * );
+int astTestAttrib_( AstObject *, const char *, int * );
+int astTestID_( AstObject *, int * );
+int astTestIdent_( AstObject *, int * );
+void astClearAttrib_( AstObject *, const char *, int * );
+void astClearID_( AstObject *, int * );
+void astClearIdent_( AstObject *, int * );
+void astDump_( AstObject *, AstChannel *, int * );
+void astSetAttrib_( AstObject *, const char *, int * );
+void astSetCopy_( AstObjectVtab *, void (*)( const AstObject *, AstObject *, int * ), int * );
+void astSetDelete_( AstObjectVtab *, void (*)( AstObject *, int * ), int * );
+void astSetDump_( AstObjectVtab *, void (*)( AstObject *, AstChannel *, int * ), const char *, const char *, int * );
+void astSetVtab_( AstObject *, AstObjectVtab *, int * );
+void astSetID_( AstObject *, const char *, int * );
+void astSetIdent_( AstObject *, const char *, int * );
+void astVSet_( AstObject *, const char *, char **, va_list, int * );
+
+#endif
+
 
 /* Function interfaces. */
 /* ==================== */
@@ -1387,30 +1456,32 @@ void astVSet_( AstObject *, const char *, char **, va_list );
 
 /* Initialiser. */
 #define astInitObject(mem,size,init,vtab,name) \
-astINVOKE(O,astInitObject_(mem,size,init,vtab,name))
+astINVOKE(O,astInitObject_(mem,size,init,vtab,name,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitObjectVtab(vtab,name) astINVOKE(V,astInitObjectVtab_(vtab,name))
+#define astInitObjectVtab(vtab,name) astINVOKE(V,astInitObjectVtab_(vtab,name,STATUS_PTR))
 
 /* Loader. */
 #define astLoadObject(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadObject_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadObject_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to other class functions. */
 /* ------------------------------------ */
 #if !defined(astCLASS)           /* Public */
-#define astBegin astINVOKE(V,astBegin_())
-#define astEnd astINVOKE(V,astEnd_())
+#define astBegin astBegin_()
+#define astEnd astINVOKE(V,astEnd_(STATUS_PTR))
+#else                            /* Protected */
+#define astMakePointer_NoLockCheck(id) ((void *)astMakePointer_((AstObject *)(id),STATUS_PTR))
 #endif
 
-#define astVersion astVersion_()
-#define astEscapes(int) astEscapes_(int)
-#define astTune(name,val) astTune_(name,val)
-#define astI2P(integer) ((void *)astI2P_(integer))
-#define astMakeId(pointer) ((void *)astMakeId_((AstObject *)(pointer)))
-#define astMakePointer(id) ((void *)astMakePointer_((AstObject *)(id)))
-#define astP2I(pointer) astP2I_((AstObject *)(pointer))
+#define astVersion astVersion_(STATUS_PTR)
+#define astEscapes(int) astEscapes_(int,STATUS_PTR)
+#define astTune(name,val) astTune_(name,val,STATUS_PTR)
+#define astI2P(integer) ((void *)astI2P_(integer,STATUS_PTR))
+#define astMakeId(pointer) ((void *)astMakeId_((AstObject *)(pointer),STATUS_PTR))
+#define astP2I(pointer) astP2I_((AstObject *)(pointer),STATUS_PTR)
+#define astMakePointer(id) ((void *)astCheckLock_(astMakePointer_((AstObject *)(id),STATUS_PTR),STATUS_PTR))
 
 /* Interfaces to member functions. */
 /* ------------------------------- */
@@ -1425,96 +1496,106 @@ astINVOKE(O,astLoadObject_(mem,size,vtab,name,astCheckChannel(channel)))
    must therefore be passed identifier values without conversion to C
    pointers. */
 #if defined(astCLASS)            /* Protected */
-#define astAnnul(this) astINVOKE(O,astAnnul_(astCheckObject(this)))
-#define astAnnulId(this) astINVOKE(O,astAnnulId_((AstObject *)(this)))
-#define astDelete(this) astINVOKE(O,astDelete_(astCheckObject(this)))
+#define astAnnul(this) astINVOKE(O,astAnnul_(astCheckObject(this),STATUS_PTR))
+#define astAnnulId(this) astINVOKE(O,astAnnulId_((AstObject *)(this),STATUS_PTR))
+#define astDelete(this) astINVOKE(O,astDelete_(astCheckObject(this),STATUS_PTR))
 #define astSet astINVOKE(F,astSet_)
 
 #else                            /* Public */
-#define astAnnul(this) astINVOKE(O,astAnnulId_((AstObject *)(this)))
-#define astDelete(this) astINVOKE(O,astDeleteId_((AstObject *)(this)))
-#define astExport(this) astINVOKE(V,astExportId_((AstObject *)(this)))
+#define astAnnul(this) astINVOKE(O,astAnnulId_((AstObject *)(this),STATUS_PTR))
+#define astDelete(this) astINVOKE(O,astDeleteId_((AstObject *)(this),STATUS_PTR))
+#define astExport(this) astINVOKE(V,astExportId_((AstObject *)(this),STATUS_PTR))
+#define astImport(this) astINVOKE(V,astImportId_((AstObject *)(this),STATUS_PTR))
 #define astSet astINVOKE(F,astSetId_)
+#define astLock(this,wait) astINVOKE(V,astLockId_((AstObject *)(this),wait,STATUS_PTR))
+#define astUnlock(this) astINVOKE(V,astUnlockId_((AstObject *)(this),STATUS_PTR))
 #endif
 
-#define astExempt(this) astINVOKE(V,astExemptId_((AstObject *)(this)))
-#define astClear(this,attrib) \
-astINVOKE(V,astClear_(astCheckObject(this),attrib))
-#define astClone(this) astINVOKE(O,astClone_(astCheckObject(this)))
-#define astCopy(this) astINVOKE(O,astCopy_(astCheckObject(this)))
-#define astGetC(this,attrib) \
-astINVOKE(V,astGetC_(astCheckObject(this),attrib))
-#define astGetD(this,attrib) \
-astINVOKE(V,astGetD_(astCheckObject(this),attrib))
-#define astGetF(this,attrib) \
-astINVOKE(V,astGetF_(astCheckObject(this),attrib))
+#define astExempt(this) astINVOKE(V,astExemptId_((AstObject *)(this),STATUS_PTR))
+#define astClear(this,attrib) astINVOKE(V,astClear_(astCheckObject(this),attrib,STATUS_PTR))
+#define astClone(this) astINVOKE(O,astClone_(astCheckObject(this),STATUS_PTR))
+#define astCopy(this) astINVOKE(O,astCopy_(astCheckObject(this),STATUS_PTR))
+#define astGetC(this,attrib) astINVOKE(V,astGetC_(astCheckObject(this),attrib,STATUS_PTR))
+#define astGetD(this,attrib) astINVOKE(V,astGetD_(astCheckObject(this),attrib,STATUS_PTR))
+#define astGetF(this,attrib) astINVOKE(V,astGetF_(astCheckObject(this),attrib,STATUS_PTR))
 #define astGetI(this,attrib) \
-astINVOKE(V,astGetI_(astCheckObject(this),attrib))
+astINVOKE(V,astGetI_(astCheckObject(this),attrib,STATUS_PTR))
 #define astGetL(this,attrib) \
-astINVOKE(V,astGetL_(astCheckObject(this),attrib))
+astINVOKE(V,astGetL_(astCheckObject(this),attrib,STATUS_PTR))
 #define astSetC(this,attrib,value) \
-astINVOKE(V,astSetC_(astCheckObject(this),attrib,value))
+astINVOKE(V,astSetC_(astCheckObject(this),attrib,value,STATUS_PTR))
 #define astSetD(this,attrib,value) \
-astINVOKE(V,astSetD_(astCheckObject(this),attrib,value))
+astINVOKE(V,astSetD_(astCheckObject(this),attrib,value,STATUS_PTR))
 #define astSetF(this,attrib,value) \
-astINVOKE(V,astSetF_(astCheckObject(this),attrib,value))
+astINVOKE(V,astSetF_(astCheckObject(this),attrib,value,STATUS_PTR))
 #define astSetI(this,attrib,value) \
-astINVOKE(V,astSetI_(astCheckObject(this),attrib,value))
+astINVOKE(V,astSetI_(astCheckObject(this),attrib,value,STATUS_PTR))
 #define astSetL(this,attrib,value) \
-astINVOKE(V,astSetL_(astCheckObject(this),attrib,value))
+astINVOKE(V,astSetL_(astCheckObject(this),attrib,value,STATUS_PTR))
 #define astShow(this) \
-astINVOKE(V,astShow_(astCheckObject(this)))
+astINVOKE(V,astShow_(astCheckObject(this),STATUS_PTR))
 #define astTest(this,attrib) \
-astINVOKE(V,astTest_(astCheckObject(this),attrib))
+astINVOKE(V,astTest_(astCheckObject(this),attrib,STATUS_PTR))
 #define astSame(this,that) \
-astINVOKE(V,astSame_(astCheckObject(this),astCheckObject(that)))
+astINVOKE(V,astSame_(astCheckObject(this),astCheckObject(that),STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 
-#define astGetObjSize(this) astINVOKE(V,astGetObjSize_(astCheckObject(this)))
+#if defined(THREAD_SAFE)
+#define astManageLock(this,mode,extra) \
+astINVOKE(V,astManageLock_(astCheckObject(this),mode, extra,STATUS_PTR))
+#else
+#define astManageLock(this,mode,extra) 
+#endif
 
-#define astClearUseDefs(this) astINVOKE(V,astClearUseDefs_(astCheckObject(this)))
-#define astTestUseDefs(this) astINVOKE(V,astTestUseDefs_(astCheckObject(this)))
-#define astGetUseDefs(this) astINVOKE(V,astGetUseDefs_(astCheckObject(this)))
-#define astSetUseDefs(this,val) astINVOKE(V,astSetUseDefs_(astCheckObject(this),val))
+#define astGetObjSize(this) astINVOKE(V,astGetObjSize_(astCheckObject(this),STATUS_PTR))
+
+#define astClearUseDefs(this) astINVOKE(V,astClearUseDefs_(astCheckObject(this),STATUS_PTR))
+#define astTestUseDefs(this) astINVOKE(V,astTestUseDefs_(astCheckObject(this),STATUS_PTR))
+#define astGetUseDefs(this) astINVOKE(V,astGetUseDefs_(astCheckObject(this),STATUS_PTR))
+#define astSetUseDefs(this,val) astINVOKE(V,astSetUseDefs_(astCheckObject(this),val,STATUS_PTR))
 
 #define astClearAttrib(this,attrib) \
-astINVOKE(V,astClearAttrib_(astCheckObject(this),attrib))
-#define astClearID(this) astINVOKE(V,astClearID_(astCheckObject(this)))
-#define astClearIdent(this) astINVOKE(V,astClearIdent_(astCheckObject(this)))
+astINVOKE(V,astClearAttrib_(astCheckObject(this),attrib,STATUS_PTR))
+#define astClearID(this) astINVOKE(V,astClearID_(astCheckObject(this),STATUS_PTR))
+#define astClearIdent(this) astINVOKE(V,astClearIdent_(astCheckObject(this),STATUS_PTR))
 #define astDump(this,channel) \
-astINVOKE(V,astDump_(astCheckObject(this),astCheckChannel(channel)))
+astINVOKE(V,astDump_(astCheckObject(this),astCheckChannel(channel),STATUS_PTR))
+
 #define astEqual(this,that) \
-astINVOKE(V,((this==that)||astEqual_(astCheckObject(this),astCheckObject(that))))
+astINVOKE(V,((this==that)||astEqual_(astCheckObject(this),astCheckObject(that),STATUS_PTR)))
 #define astGetAttrib(this,attrib) \
-astINVOKE(V,astGetAttrib_(astCheckObject(this),attrib))
-#define astGetClass(this) astINVOKE(V,astGetClass_((const AstObject *)(this)))
-#define astGetID(this) astINVOKE(V,astGetID_(astCheckObject(this)))
-#define astGetIdent(this) astINVOKE(V,astGetIdent_(astCheckObject(this)))
-#define astGetNobject(this) astINVOKE(V,astGetNobject_(astCheckObject(this)))
-#define astGetRefCount(this) astINVOKE(V,astGetRefCount_(astCheckObject(this)))
+astINVOKE(V,astGetAttrib_(astCheckObject(this),attrib,STATUS_PTR))
+#define astGetClass(this) astINVOKE(V,astGetClass_((const AstObject *)(this),STATUS_PTR))
+#define astGetID(this) astINVOKE(V,astGetID_(astCheckObject(this),STATUS_PTR))
+#define astGetIdent(this) astINVOKE(V,astGetIdent_(astCheckObject(this),STATUS_PTR))
+#define astGetNobject(this) astINVOKE(V,astGetNobject_(astCheckObject(this),STATUS_PTR))
+#define astGetRefCount(this) astINVOKE(V,astGetRefCount_(astCheckObject(this),STATUS_PTR))
 #define astSetAttrib(this,setting) \
-astINVOKE(V,astSetAttrib_(astCheckObject(this),setting))
+astINVOKE(V,astSetAttrib_(astCheckObject(this),setting,STATUS_PTR))
 #define astSetCopy(vtab,copy) \
-astINVOKE(V,astSetCopy_((AstObjectVtab *)(vtab),copy))
+astINVOKE(V,astSetCopy_((AstObjectVtab *)(vtab),copy,STATUS_PTR))
 #define astSetDelete(vtab,delete) \
-astINVOKE(V,astSetDelete_((AstObjectVtab *)(vtab),delete))
+astINVOKE(V,astSetDelete_((AstObjectVtab *)(vtab),delete,STATUS_PTR))
 #define astSetDump(vtab,dump,class,comment) \
-astINVOKE(V,astSetDump_((AstObjectVtab *)(vtab),dump,class,comment))
+astINVOKE(V,astSetDump_((AstObjectVtab *)(vtab),dump,class,comment,STATUS_PTR))
 #define astSetVtab(object,vtab) \
-astINVOKE(V,astSetVtab_((AstObject *)object,(AstObjectVtab *)(vtab)))
+astINVOKE(V,astSetVtab_((AstObject *)object,(AstObjectVtab *)(vtab),STATUS_PTR))
 #define astCast(this,obj) \
-astINVOKE(V,astCast_((AstObject *)(this),(AstObject *)(obj)))
-#define astSetID(this,id) astINVOKE(V,astSetID_(astCheckObject(this),id))
-#define astSetIdent(this,id) astINVOKE(V,astSetIdent_(astCheckObject(this),id))
+astINVOKE(V,astCast_((AstObject *)(this),(AstObject *)(obj),STATUS_PTR))
+#define astSetID(this,id) astINVOKE(V,astSetID_(astCheckObject(this),id,STATUS_PTR))
+#define astSetIdent(this,id) astINVOKE(V,astSetIdent_(astCheckObject(this),id,STATUS_PTR))
 #define astVSet(this,settings,text,args) \
-astINVOKE(V,astVSet_(astCheckObject(this),settings,text,args))
+astINVOKE(V,astVSet_(astCheckObject(this),settings,text,args,STATUS_PTR))
 #define astTestAttrib(this,attrib) \
-astINVOKE(V,astTestAttrib_(astCheckObject(this),attrib))
-#define astTestID(this) astINVOKE(V,astTestID_(astCheckObject(this)))
-#define astTestIdent(this) astINVOKE(V,astTestIdent_(astCheckObject(this)))
+astINVOKE(V,astTestAttrib_(astCheckObject(this),attrib,STATUS_PTR))
+#define astTestID(this) astINVOKE(V,astTestID_(astCheckObject(this),STATUS_PTR))
+#define astTestIdent(this) astINVOKE(V,astTestIdent_(astCheckObject(this),STATUS_PTR))
 
 /* Deprecated synonym. */
 #define astClass(this) astGetClass(this)
 #endif
 #endif
+
+
+

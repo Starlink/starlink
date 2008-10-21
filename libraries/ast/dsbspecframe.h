@@ -95,29 +95,43 @@ typedef struct AstDSBSpecFrameVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   double (* GetDSBCentre)( AstDSBSpecFrame * );
-   int (* TestDSBCentre)( AstDSBSpecFrame * );
-   void (* ClearDSBCentre)( AstDSBSpecFrame * );
-   void (* SetDSBCentre)( AstDSBSpecFrame *, double );
+   double (* GetDSBCentre)( AstDSBSpecFrame *, int * );
+   int (* TestDSBCentre)( AstDSBSpecFrame *, int * );
+   void (* ClearDSBCentre)( AstDSBSpecFrame *, int * );
+   void (* SetDSBCentre)( AstDSBSpecFrame *, double, int * );
 
-   double (* GetIF)( AstDSBSpecFrame * );
-   int (* TestIF)( AstDSBSpecFrame * );
-   void (* ClearIF)( AstDSBSpecFrame * );
-   void (* SetIF)( AstDSBSpecFrame *, double );
+   double (* GetIF)( AstDSBSpecFrame *, int * );
+   int (* TestIF)( AstDSBSpecFrame *, int * );
+   void (* ClearIF)( AstDSBSpecFrame *, int * );
+   void (* SetIF)( AstDSBSpecFrame *, double, int * );
 
-   int (* GetSideBand)( AstDSBSpecFrame * );
-   int (* TestSideBand)( AstDSBSpecFrame * );
-   void (* ClearSideBand)( AstDSBSpecFrame * );
-   void (* SetSideBand)( AstDSBSpecFrame *, int );
+   int (* GetSideBand)( AstDSBSpecFrame *, int * );
+   int (* TestSideBand)( AstDSBSpecFrame *, int * );
+   void (* ClearSideBand)( AstDSBSpecFrame *, int * );
+   void (* SetSideBand)( AstDSBSpecFrame *, int, int * );
 
-   int (* GetAlignSideBand)( AstDSBSpecFrame * );
-   int (* TestAlignSideBand)( AstDSBSpecFrame * );
-   void (* ClearAlignSideBand)( AstDSBSpecFrame * );
-   void (* SetAlignSideBand)( AstDSBSpecFrame *, int );
+   int (* GetAlignSideBand)( AstDSBSpecFrame *, int * );
+   int (* TestAlignSideBand)( AstDSBSpecFrame *, int * );
+   void (* ClearAlignSideBand)( AstDSBSpecFrame *, int * );
+   void (* SetAlignSideBand)( AstDSBSpecFrame *, int, int * );
 
-   double (* GetImagFreq)( AstDSBSpecFrame * );
+   double (* GetImagFreq)( AstDSBSpecFrame *, int * );
 
 } AstDSBSpecFrameVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstDSBSpecFrameGlobals {
+   AstDSBSpecFrameVtab Class_Vtab;
+   int Class_Init;
+   char GetAttrib_Buff[ 101 ];
+   char GetLabel_Buff[ 101 ];
+} AstDSBSpecFrameGlobals;
+
+#endif
+
 #endif
 
 /* Function prototypes. */
@@ -129,7 +143,7 @@ astPROTO_ISA(DSBSpecFrame)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstDSBSpecFrame *astDSBSpecFrame_( const char *, ... );
+AstDSBSpecFrame *astDSBSpecFrame_( const char *, int *, ...);
 #else
 AstDSBSpecFrame *astDSBSpecFrameId_( const char *, ... );
 #endif
@@ -138,40 +152,46 @@ AstDSBSpecFrame *astDSBSpecFrameId_( const char *, ... );
 
 /* Initialiser. */
 AstDSBSpecFrame *astInitDSBSpecFrame_( void *, size_t, int, AstDSBSpecFrameVtab *,
-                                       const char * );
+                                       const char *, int * );
 
 /* Vtab initialiser. */
-void astInitDSBSpecFrameVtab_( AstDSBSpecFrameVtab *, const char * );
+void astInitDSBSpecFrameVtab_( AstDSBSpecFrameVtab *, const char *, int * );
 
 /* Loader. */
 AstDSBSpecFrame *astLoadDSBSpecFrame_( void *, size_t, AstDSBSpecFrameVtab *,
-                                       const char *, AstChannel * );
+                                       const char *, AstChannel *, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitDSBSpecFrameGlobals_( AstDSBSpecFrameGlobals * );
+#endif
+
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
-   double astGetDSBCentre_( AstDSBSpecFrame * );
-   int astTestDSBCentre_( AstDSBSpecFrame * );
-   void astClearDSBCentre_( AstDSBSpecFrame * );
-   void astSetDSBCentre_( AstDSBSpecFrame *, double );
+   double astGetDSBCentre_( AstDSBSpecFrame *, int * );
+   int astTestDSBCentre_( AstDSBSpecFrame *, int * );
+   void astClearDSBCentre_( AstDSBSpecFrame *, int * );
+   void astSetDSBCentre_( AstDSBSpecFrame *, double, int * );
 
-   double astGetIF_( AstDSBSpecFrame * );
-   int astTestIF_( AstDSBSpecFrame * );
-   void astClearIF_( AstDSBSpecFrame * );
-   void astSetIF_( AstDSBSpecFrame *, double );
+   double astGetIF_( AstDSBSpecFrame *, int * );
+   int astTestIF_( AstDSBSpecFrame *, int * );
+   void astClearIF_( AstDSBSpecFrame *, int * );
+   void astSetIF_( AstDSBSpecFrame *, double, int * );
 
-   int astGetSideBand_( AstDSBSpecFrame * );
-   int astTestSideBand_( AstDSBSpecFrame * );
-   void astClearSideBand_( AstDSBSpecFrame * );
-   void astSetSideBand_( AstDSBSpecFrame *, int );
+   int astGetSideBand_( AstDSBSpecFrame *, int * );
+   int astTestSideBand_( AstDSBSpecFrame *, int * );
+   void astClearSideBand_( AstDSBSpecFrame *, int * );
+   void astSetSideBand_( AstDSBSpecFrame *, int, int * );
 
-   int astGetAlignSideBand_( AstDSBSpecFrame * );
-   int astTestAlignSideBand_( AstDSBSpecFrame * );
-   void astClearAlignSideBand_( AstDSBSpecFrame * );
-   void astSetAlignSideBand_( AstDSBSpecFrame *, int );
+   int astGetAlignSideBand_( AstDSBSpecFrame *, int * );
+   int astTestAlignSideBand_( AstDSBSpecFrame *, int * );
+   void astClearAlignSideBand_( AstDSBSpecFrame *, int * );
+   void astSetAlignSideBand_( AstDSBSpecFrame *, int, int * );
 
-   double astGetImagFreq_( AstDSBSpecFrame * );
+   double astGetImagFreq_( AstDSBSpecFrame *, int * );
 #endif
 
 /* Function interfaces. */
@@ -205,13 +225,13 @@ AstDSBSpecFrame *astLoadDSBSpecFrame_( void *, size_t, AstDSBSpecFrameVtab *,
 /* Initialiser. */
 #define \
 astInitDSBSpecFrame(mem,size,init,vtab,name) \
-astINVOKE(O,astInitDSBSpecFrame_(mem,size,init,vtab,name))
+astINVOKE(O,astInitDSBSpecFrame_(mem,size,init,vtab,name,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitDSBSpecFrameVtab(vtab,name) astINVOKE(V,astInitDSBSpecFrameVtab_(vtab,name))
+#define astInitDSBSpecFrameVtab(vtab,name) astINVOKE(V,astInitDSBSpecFrameVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadDSBSpecFrame(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadDSBSpecFrame_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadDSBSpecFrame_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -223,42 +243,46 @@ astINVOKE(O,astLoadDSBSpecFrame_(mem,size,vtab,name,astCheckChannel(channel)))
 #if defined(astCLASS)            /* Protected */
 
 #define astGetDSBCentre(this) \
-astINVOKE(V,astGetDSBCentre_(astCheckDSBSpecFrame(this)))
+astINVOKE(V,astGetDSBCentre_(astCheckDSBSpecFrame(this),STATUS_PTR))
 #define astTestDSBCentre(this) \
-astINVOKE(V,astTestDSBCentre_(astCheckDSBSpecFrame(this)))
+astINVOKE(V,astTestDSBCentre_(astCheckDSBSpecFrame(this),STATUS_PTR))
 #define astClearDSBCentre(this) \
-astINVOKE(V,astClearDSBCentre_(astCheckDSBSpecFrame(this)))
+astINVOKE(V,astClearDSBCentre_(astCheckDSBSpecFrame(this),STATUS_PTR))
 #define astSetDSBCentre(this,val) \
-astINVOKE(V,astSetDSBCentre_(astCheckDSBSpecFrame(this),val))
+astINVOKE(V,astSetDSBCentre_(astCheckDSBSpecFrame(this),val,STATUS_PTR))
 				                                   
 #define astGetIF(this) \
-astINVOKE(V,astGetIF_(astCheckDSBSpecFrame(this)))
+astINVOKE(V,astGetIF_(astCheckDSBSpecFrame(this),STATUS_PTR))
 #define astTestIF(this) \
-astINVOKE(V,astTestIF_(astCheckDSBSpecFrame(this)))
+astINVOKE(V,astTestIF_(astCheckDSBSpecFrame(this),STATUS_PTR))
 #define astClearIF(this) \
-astINVOKE(V,astClearIF_(astCheckDSBSpecFrame(this)))
+astINVOKE(V,astClearIF_(astCheckDSBSpecFrame(this),STATUS_PTR))
 #define astSetIF(this,val) \
-astINVOKE(V,astSetIF_(astCheckDSBSpecFrame(this),val))
+astINVOKE(V,astSetIF_(astCheckDSBSpecFrame(this),val,STATUS_PTR))
 				                                   
 #define astGetSideBand(this) \
-astINVOKE(V,astGetSideBand_(astCheckDSBSpecFrame(this)))
+astINVOKE(V,astGetSideBand_(astCheckDSBSpecFrame(this),STATUS_PTR))
 #define astTestSideBand(this) \
-astINVOKE(V,astTestSideBand_(astCheckDSBSpecFrame(this)))
+astINVOKE(V,astTestSideBand_(astCheckDSBSpecFrame(this),STATUS_PTR))
 #define astClearSideBand(this) \
-astINVOKE(V,astClearSideBand_(astCheckDSBSpecFrame(this)))
+astINVOKE(V,astClearSideBand_(astCheckDSBSpecFrame(this),STATUS_PTR))
 #define astSetSideBand(this,val) \
-astINVOKE(V,astSetSideBand_(astCheckDSBSpecFrame(this),val))
+astINVOKE(V,astSetSideBand_(astCheckDSBSpecFrame(this),val,STATUS_PTR))
 
 #define astGetAlignSideBand(this) \
-astINVOKE(V,astGetAlignSideBand_(astCheckDSBSpecFrame(this)))
+astINVOKE(V,astGetAlignSideBand_(astCheckDSBSpecFrame(this),STATUS_PTR))
 #define astTestAlignSideBand(this) \
-astINVOKE(V,astTestAlignSideBand_(astCheckDSBSpecFrame(this)))
+astINVOKE(V,astTestAlignSideBand_(astCheckDSBSpecFrame(this),STATUS_PTR))
 #define astClearAlignSideBand(this) \
-astINVOKE(V,astClearAlignSideBand_(astCheckDSBSpecFrame(this)))
+astINVOKE(V,astClearAlignSideBand_(astCheckDSBSpecFrame(this),STATUS_PTR))
 #define astSetAlignSideBand(this,val) \
-astINVOKE(V,astSetAlignSideBand_(astCheckDSBSpecFrame(this),val))
+astINVOKE(V,astSetAlignSideBand_(astCheckDSBSpecFrame(this),val,STATUS_PTR))
 
 #define astGetImagFreq(this) \
-astINVOKE(V,astGetImagFreq_(astCheckDSBSpecFrame(this)))
+astINVOKE(V,astGetImagFreq_(astCheckDSBSpecFrame(this),STATUS_PTR))
 #endif
 #endif
+
+
+
+

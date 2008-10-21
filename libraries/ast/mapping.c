@@ -260,8 +260,6 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        in astRebinSeq.
 *     9-MAY-2008 (DSB):
 *        Prevent memory over-run in RebinSeq<X>.
-*     27-AUG-2008 (DSB):
-*        Correct annulling of simplified mapping in RebinSeq.
 *class--
 */
 
@@ -272,6 +270,10 @@ f     - AST_TRANN: Transform N-dimensional coordinates
    symbols available. */
 #define astCLASS Mapping
 
+/* Define numerical constants for use in thie module. */
+#define GETATTRIB_BUFF_LEN 50
+#define FUNPN_MAX_CACHE  5
+
 /* Include files. */
 /* ============== */
 
@@ -281,6 +283,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
 #include "object.h"              /* Base Object class */
@@ -290,7 +294,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 #include "cmpmap.h"              /* Compund Mappings */
 #include "unitmap.h"             /* Unit Mappings */
 #include "permmap.h"             /* Axis permutations */
-#include "pal.h"              /* SLALIB interface */
+#include "pal.h"                 /* SLALIB interface */
+#include "globals.h"             /* Thread-safe global data access */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -356,143 +361,192 @@ typedef struct PN {
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag as
-   static variables. */
-static AstMappingVtab class_vtab; /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static const char *(* parent_getattrib)( AstObject *, const char * );
-static int (* parent_testattrib)( AstObject *, const char * );
-static void (* parent_clearattrib)( AstObject *, const char * );
-static void (* parent_setattrib)( AstObject *, const char * );
-static int (* parent_equal)( AstObject *, AstObject * );
+static const char *(* parent_getattrib)( AstObject *, const char *, int * );
+static int (* parent_testattrib)( AstObject *, const char *, int * );
+static void (* parent_clearattrib)( AstObject *, const char *, int * );
+static void (* parent_setattrib)( AstObject *, const char *, int * );
+static int (* parent_equal)( AstObject *, AstObject *, int * );
 
-/* Pointer to origin (unsimplified) Mapping, only used for reporting
-   error messages. */
-static AstMapping *unsimplified_mapping;
 
-/* A flag which indicates if the astRate method should be disabled in
-   order to improve algorithm speed in cases where the rate value is not
-   significant. If astRate is disabled then it always returns a constant
-   value of 1.0. */
+/* Define macros for accessing each item of thread specific global data. */
+#ifdef THREAD_SAFE
+
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; \
+   globals->GetAttrib_Buff[ 0 ] = 0; \
+   globals->Unsimplified_Mapping = NULL; \
+   globals->Rate_Disabled = 0; 
+
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(Mapping)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(Mapping,Class_Init)
+#define class_vtab astGLOBAL(Mapping,Class_Vtab)
+#define getattrib_buff astGLOBAL(Mapping,GetAttrib_Buff)
+#define unsimplified_mapping astGLOBAL(Mapping,Unsimplified_Mapping)
+#define rate_disabled astGLOBAL(Mapping,Rate_Disabled)
+#define funpn_pset1_cache astGLOBAL(Mapping,FunPN_Pset1_Cache)
+#define funpn_pset2_cache astGLOBAL(Mapping,FunPN_Pset2_Cache)
+#define funpn_next_slot astGLOBAL(Mapping,FunPN_Next_Slot)
+#define funpn_pset_size astGLOBAL(Mapping,FunPN_Pset_Size)
+
+
+
+/* If thread safety is not needed, declare and initialise globals at static 
+   variables. */ 
+#else
+
+/* Buffer returned by GetAttrib. */ 
+static char getattrib_buff[ GETATTRIB_BUFF_LEN + 1 ];
+
+/* Pointer to origin (unsimplified) Mapping, only used for reporting 
+   error messages. */ 
+static AstMapping *unsimplified_mapping = NULL;
+
+/* A flag which indicates if the astRate method should be disabled in 
+   order to improve algorithm speed in cases where the rate value is not 
+   significant. If astRate is disabled then it always returns a constant 
+   value of 1.0. */ 
 static int rate_disabled = 0;
+
+/* static values used in function "FunPN". */ 
+static AstPointSet *funpn_pset1_cache[ FUNPN_MAX_CACHE ];
+static AstPointSet *funpn_pset2_cache[ FUNPN_MAX_CACHE ];
+static int funpn_next_slot;
+static int funpn_pset_size[ FUNPN_MAX_CACHE ];
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstMappingVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* Prototypes for private member functions. */
 /* ======================================== */
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
 static void InterpolateBlockAverageLD( int, const int[], const int[], const long double [], const long double [], int, const int[], const double *const[], const double[], int, long double, long double *, long double *, int * ); 
-static int InterpolateKernel1LD( AstMapping *, int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, long double, long double *, long double * );
-static int InterpolateLinearLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, long double *, long double * );
-static int InterpolateNearestLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, long double *, long double * );
-static void SpreadKernel1LD( AstMapping *, int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, long double, int, long double *, long double *, double *, int * );
-static void SpreadLinearLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, int, long double *, long double *, double *, int * );
-static void SpreadNearestLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, int, long double *, long double *, double *, int * );
-static int ResampleLD( AstMapping *, int, const int [], const int [], const long double [], const long double [], int, void (*)(), const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [] );
-static void RebinLD( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [] );
-static void RebinSeqLD( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], double [], int * );
-static void ConserveFluxLD( double, int, const int *, long double, long double *, long double * );
+static int InterpolateKernel1LD( AstMapping *, int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double *), int, const double *, int, long double, long double *, long double *, int * );
+static int InterpolateLinearLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, long double *, long double *, int * );
+static int InterpolateNearestLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, long double *, long double *, int * );
+static void SpreadKernel1LD( AstMapping *, int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), int, const double *, int, long double, int, long double *, long double *, double *, int *, int * );
+static void SpreadLinearLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, int, long double *, long double *, double *, int *, int * );
+static void SpreadNearestLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, int, long double *, long double *, double *, int *, int * );
+static int ResampleLD( AstMapping *, int, const int [], const int [], const long double [], const long double [], int, void (*)(), const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], int * );
+static void RebinLD( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], int * );
+static void RebinSeqLD( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], double [], int *, int * );
+static void ConserveFluxLD( double, int, const int *, long double, long double *, long double *, int * );
 #endif
 
-static AstMapping *Simplify( AstMapping * );
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static PN *FitPN( AstMapping *, double *, int, int, double, double, double * );
-static PN *InterpPN( int, double *, double * );
-static const char *GetAttrib( AstObject *, const char * );
-static double EvaluateDPN( PN *, double );
-static double EvaluatePN( PN *, double );
-static double J1Bessel( double );
-static double LocalMaximum( const MapData *, double, double, double [] );
-static double MapFunction( const MapData *, const double [], int * );
-static double MatrixDet( int, const double * );
-static double MaxD( double, double );
-static double NewVertex( const MapData *, int, double, double [], double [], int *, double [] );
-static double Random( long int * );
-static double Rate( AstMapping *, double *, int, int );
-static double UphillSimplex( const MapData *, double, int, const double [], double [], double *, int * );
-static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
-static int Equal( AstObject *, AstObject * );
-static int GetInvert( AstMapping * );
-static int GetIsSimple( AstMapping * );
-static int GetNin( AstMapping * );
-static int GetNout( AstMapping * );
-static int GetReport( AstMapping * );
-static int GetIsLinear( AstMapping * );
-static int GetTranForward( AstMapping * );
-static int GetTranInverse( AstMapping * );
-static int InterpolateKernel1B( AstMapping *, int, const int *, const int *, const signed char *, const signed char *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, signed char, signed char *, signed char * );
-static int InterpolateKernel1D( AstMapping *, int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, double, double *, double * );
-static int InterpolateKernel1F( AstMapping *, int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, float, float *, float * );
-static int InterpolateKernel1I( AstMapping *, int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, int, int *, int * );
-static int InterpolateKernel1L( AstMapping *, int, const int *, const int *, const long int *, const long int *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, long int, long int *, long int * );
-static int InterpolateKernel1S( AstMapping *, int, const int *, const int *, const short int *, const short int *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, short int, short int *, short int * );
-static int InterpolateKernel1UB( AstMapping *, int, const int *, const int *, const unsigned char *, const unsigned char *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, unsigned char, unsigned char *, unsigned char * );
-static int InterpolateKernel1UI( AstMapping *, int, const int *, const int *, const unsigned int *, const unsigned int *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, unsigned int, unsigned int *, unsigned int * );
-static int InterpolateKernel1UL( AstMapping *, int, const int *, const int *, const unsigned long int *, const unsigned long int *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, unsigned long int, unsigned long int *, unsigned long int * );
-static int InterpolateKernel1US( AstMapping *, int, const int *, const int *, const unsigned short int *, const unsigned short int *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, unsigned short int, unsigned short int *, unsigned short int * );
-static int InterpolateLinearB( int, const int *, const int *, const signed char *, const signed char *, int, const int *, const double *const *, int, signed char, signed char *, signed char * );
-static int InterpolateLinearD( int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, int, double, double *, double * );
-static int InterpolateLinearF( int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, int, float, float *, float * );
-static int InterpolateLinearI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int *, int * );
-static int InterpolateLinearL( int, const int *, const int *, const long int *, const long int *, int, const int *, const double *const *, int, long int, long int *, long int * );
-static int InterpolateLinearS( int, const int *, const int *, const short int *, const short int *, int, const int *, const double *const *, int, short int, short int *, short int * );
-static int InterpolateLinearUB( int, const int *, const int *, const unsigned char *, const unsigned char *, int, const int *, const double *const *, int, unsigned char, unsigned char *, unsigned char * );
-static int InterpolateLinearUI( int, const int *, const int *, const unsigned int *, const unsigned int *, int, const int *, const double *const *, int, unsigned int, unsigned int *, unsigned int * );
-static int InterpolateLinearUL( int, const int *, const int *, const unsigned long int *, const unsigned long int *, int, const int *, const double *const *, int, unsigned long int, unsigned long int *, unsigned long int * );
-static int InterpolateLinearUS( int, const int *, const int *, const unsigned short int *, const unsigned short int *, int, const int *, const double *const *, int, unsigned short int, unsigned short int *, unsigned short int * );
-static int InterpolateNearestB( int, const int *, const int *, const signed char *, const signed char *, int, const int *, const double *const *, int, signed char, signed char *, signed char * );
-static int InterpolateNearestD( int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, int, double, double *, double * );
-static int InterpolateNearestF( int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, int, float, float *, float * );
-static int InterpolateNearestI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int *, int * );
-static int InterpolateNearestL( int, const int *, const int *, const long int *, const long int *, int, const int *, const double *const *, int, long int, long int *, long int * );
-static int InterpolateNearestS( int, const int *, const int *, const short int *, const short int *, int, const int *, const double *const *, int, short int, short int *, short int * );
-static int InterpolateNearestUB( int, const int *, const int *, const unsigned char *, const unsigned char *, int, const int *, const double *const *, int, unsigned char, unsigned char *, unsigned char * );
-static int InterpolateNearestUI( int, const int *, const int *, const unsigned int *, const unsigned int *, int, const int *, const double *const *, int, unsigned int, unsigned int *, unsigned int * );
-static int InterpolateNearestUL( int, const int *, const int *, const unsigned long int *, const unsigned long int *, int, const int *, const double *const *, int, unsigned long int, unsigned long int *, unsigned long int * );
-static int InterpolateNearestUS( int, const int *, const int *, const unsigned short int *, const unsigned short int *, int, const int *, const double *const *, int, unsigned short int, unsigned short int *, unsigned short int * );
-static int LinearApprox( AstMapping *, const double *, const double *, double, double * );
-static int MapList( AstMapping *, int, int, int *, AstMapping ***, int ** );
-static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
-static int MaxI( int, int );
-static int MinI( int, int );
-static int ResampleAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)(), const double *, int, double, int, const void *, int, const int *, const int *, const int *, const int *, void *, void * );
-static int ResampleB( AstMapping *, int, const int [], const int [], const signed char [], const signed char [], int, void (*)(), const double [], int, double, int, signed char, int, const int [], const int [], const int [], const int [], signed char [], signed char [] );
-static int ResampleD( AstMapping *, int, const int [], const int [], const double [], const double [], int, void (*)(), const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [] );
-static int ResampleF( AstMapping *, int, const int [], const int [], const float [], const float [], int, void (*)(), const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [] );
-static int ResampleI( AstMapping *, int, const int [], const int [], const int [], const int [], int, void (*)(), const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [] );
-static int ResampleL( AstMapping *, int, const int [], const int [], const long int [], const long int [], int, void (*)(), const double [], int, double, int, long int, int, const int [], const int [], const int [], const int [], long int [], long int [] );
-static int ResampleS( AstMapping *, int, const int [], const int [], const short int [], const short int [], int, void (*)(), const double [], int, double, int, short int, int, const int [], const int [], const int [], const int [], short int [], short int [] );
-static int ResampleSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)(), const double *, double, int, const void *, int, const int *, const int *, const int *, const int *, void *, void * );
-static int ResampleUB( AstMapping *, int, const int [], const int [], const unsigned char [], const unsigned char [], int, void (*)(), const double [], int, double, int, unsigned char, int, const int [], const int [], const int [], const int [], unsigned char [], unsigned char [] );
-static int ResampleUI( AstMapping *, int, const int [], const int [], const unsigned int [], const unsigned int [], int, void (*)(), const double [], int, double, int, unsigned int, int, const int [], const int [], const int [], const int [], unsigned int [], unsigned int [] );
-static int ResampleUL( AstMapping *, int, const int [], const int [], const unsigned long int [], const unsigned long int [], int, void (*)(), const double [], int, double, int, unsigned long int, int, const int [], const int [], const int [], const int [], unsigned long int [], unsigned long int [] );
-static int ResampleUS( AstMapping *, int, const int [], const int [], const unsigned short int [], const unsigned short int [], int, void (*)(), const double [], int, double, int, unsigned short int, int, const int [], const int [], const int [], const int [], unsigned short int [], unsigned short int [] );
-static int ResampleWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)(), const double *, int, const void *, int, const int *, const int *, const int *, const int *, void *, void * );
-static int SpecialBounds( const MapData *, double *, double *, double [], double [] );
-static int TestAttrib( AstObject *, const char * );
-static int TestInvert( AstMapping * );
-static int TestReport( AstMapping * );
-static void ClearAttrib( AstObject *, const char * );
-static void ClearInvert( AstMapping * );
-static void ClearReport( AstMapping * );
-static void CombinePN( PN *, PN * );
-static void ConserveFluxB( double, int, const int *, signed char, signed char *, signed char * );
-static void ConserveFluxD( double, int, const int *, double, double *, double * );
-static void ConserveFluxF( double, int, const int *, float, float *, float * );
-static void ConserveFluxI( double, int, const int *, int, int *, int * );
-static void ConserveFluxL( double, int, const int *, long int, long int *, long int * );
-static void ConserveFluxS( double, int, const int *, short int, short int *, short int * );
-static void ConserveFluxUB( double, int, const int *, unsigned char, unsigned char *, unsigned char * );
-static void ConserveFluxUI( double, int, const int *, unsigned int, unsigned int *, unsigned int * );
-static void ConserveFluxUL( double, int, const int *, unsigned long int, unsigned long int *, unsigned long int * );
-static void ConserveFluxUS( double, int, const int *, unsigned short int, unsigned short int *, unsigned short int * );
-static void Copy( const AstObject *, AstObject * );
-static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
-static void Delete( AstObject * );
-static void Dump( AstObject *, AstChannel * );
-static void FunPN( AstMapping *, double *, int, int, int, double *, double * );
-static void Gauss( double, const double [], int, double * );
-static void GlobalBounds( MapData *, double *, double *, double [], double [] );
+static AstMapping *Simplify( AstMapping *, int * );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static PN *FitPN( AstMapping *, double *, int, int, double, double, double *, int * );
+static PN *InterpPN( int, double *, double *, int * );
+static const char *GetAttrib( AstObject *, const char *, int * );
+static double EvaluateDPN( PN *, double, int * );
+static double EvaluatePN( PN *, double, int * );
+static double J1Bessel( double, int * );
+static double LocalMaximum( const MapData *, double, double, double [], int * );
+static double MapFunction( const MapData *, const double [], int *, int * );
+static double MatrixDet( int, const double *, int * );
+static double MaxD( double, double, int * );
+static double NewVertex( const MapData *, int, double, double [], double [], int *, double [], int * );
+static double Random( long int *, int * );
+static double Rate( AstMapping *, double *, int, int, int * );
+static double UphillSimplex( const MapData *, double, int, const double [], double [], double *, int *, int * );
+static int *MapSplit( AstMapping *, int, int *, AstMapping **, int * );
+static int Equal( AstObject *, AstObject *, int * );
+static int GetInvert( AstMapping *, int * );
+static int GetIsSimple( AstMapping *, int * );
+static int GetNin( AstMapping *, int * );
+static int GetNout( AstMapping *, int * );
+static int GetReport( AstMapping *, int * );
+static int GetIsLinear( AstMapping *, int * );
+static int GetTranForward( AstMapping *, int * );
+static int GetTranInverse( AstMapping *, int * );
+static int InterpolateKernel1B( AstMapping *, int, const int *, const int *, const signed char *, const signed char *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, signed char, signed char *, signed char *, int * );
+static int InterpolateKernel1D( AstMapping *, int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, double, double *, double *, int * );
+static int InterpolateKernel1F( AstMapping *, int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, float, float *, float *, int * );
+static int InterpolateKernel1I( AstMapping *, int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, int, int *, int *, int * );
+static int InterpolateKernel1L( AstMapping *, int, const int *, const int *, const long int *, const long int *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, long int, long int *, long int *, int * );
+static int InterpolateKernel1S( AstMapping *, int, const int *, const int *, const short int *, const short int *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, short int, short int *, short int *, int * );
+static int InterpolateKernel1UB( AstMapping *, int, const int *, const int *, const unsigned char *, const unsigned char *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, unsigned char, unsigned char *, unsigned char *, int * );
+static int InterpolateKernel1UI( AstMapping *, int, const int *, const int *, const unsigned int *, const unsigned int *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, unsigned int, unsigned int *, unsigned int *, int * );
+static int InterpolateKernel1UL( AstMapping *, int, const int *, const int *, const unsigned long int *, const unsigned long int *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, unsigned long int, unsigned long int *, unsigned long int *, int * );
+static int InterpolateKernel1US( AstMapping *, int, const int *, const int *, const unsigned short int *, const unsigned short int *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), void (*)( double, const double *, int, double * ), int, const double *, int, unsigned short int, unsigned short int *, unsigned short int *, int * );
+static int InterpolateLinearB( int, const int *, const int *, const signed char *, const signed char *, int, const int *, const double *const *, int, signed char, signed char *, signed char *, int * );
+static int InterpolateLinearD( int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, int, double, double *, double *, int * );
+static int InterpolateLinearF( int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, int, float, float *, float *, int * );
+static int InterpolateLinearI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int *, int *, int * );
+static int InterpolateLinearL( int, const int *, const int *, const long int *, const long int *, int, const int *, const double *const *, int, long int, long int *, long int *, int * );
+static int InterpolateLinearS( int, const int *, const int *, const short int *, const short int *, int, const int *, const double *const *, int, short int, short int *, short int *, int * );
+static int InterpolateLinearUB( int, const int *, const int *, const unsigned char *, const unsigned char *, int, const int *, const double *const *, int, unsigned char, unsigned char *, unsigned char *, int * );
+static int InterpolateLinearUI( int, const int *, const int *, const unsigned int *, const unsigned int *, int, const int *, const double *const *, int, unsigned int, unsigned int *, unsigned int *, int * );
+static int InterpolateLinearUL( int, const int *, const int *, const unsigned long int *, const unsigned long int *, int, const int *, const double *const *, int, unsigned long int, unsigned long int *, unsigned long int *, int * );
+static int InterpolateLinearUS( int, const int *, const int *, const unsigned short int *, const unsigned short int *, int, const int *, const double *const *, int, unsigned short int, unsigned short int *, unsigned short int *, int * );
+static int InterpolateNearestB( int, const int *, const int *, const signed char *, const signed char *, int, const int *, const double *const *, int, signed char, signed char *, signed char *, int * );
+static int InterpolateNearestD( int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, int, double, double *, double *, int * );
+static int InterpolateNearestF( int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, int, float, float *, float *, int * );
+static int InterpolateNearestI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int *, int *, int * );
+static int InterpolateNearestL( int, const int *, const int *, const long int *, const long int *, int, const int *, const double *const *, int, long int, long int *, long int *, int * );
+static int InterpolateNearestS( int, const int *, const int *, const short int *, const short int *, int, const int *, const double *const *, int, short int, short int *, short int *, int * );
+static int InterpolateNearestUB( int, const int *, const int *, const unsigned char *, const unsigned char *, int, const int *, const double *const *, int, unsigned char, unsigned char *, unsigned char *, int * );
+static int InterpolateNearestUI( int, const int *, const int *, const unsigned int *, const unsigned int *, int, const int *, const double *const *, int, unsigned int, unsigned int *, unsigned int *, int * );
+static int InterpolateNearestUL( int, const int *, const int *, const unsigned long int *, const unsigned long int *, int, const int *, const double *const *, int, unsigned long int, unsigned long int *, unsigned long int *, int * );
+static int InterpolateNearestUS( int, const int *, const int *, const unsigned short int *, const unsigned short int *, int, const int *, const double *const *, int, unsigned short int, unsigned short int *, unsigned short int *, int * );
+static int LinearApprox( AstMapping *, const double *, const double *, double, double *, int * );
+static int MapList( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
+static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
+static int MaxI( int, int, int * );
+static int MinI( int, int, int * );
+static int ResampleAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)(), const double *, int, double, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, int * );
+static int ResampleB( AstMapping *, int, const int [], const int [], const signed char [], const signed char [], int, void (*)(), const double [], int, double, int, signed char, int, const int [], const int [], const int [], const int [], signed char [], signed char [], int * );
+static int ResampleD( AstMapping *, int, const int [], const int [], const double [], const double [], int, void (*)(), const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [], int * );
+static int ResampleF( AstMapping *, int, const int [], const int [], const float [], const float [], int, void (*)(), const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [], int * );
+static int ResampleI( AstMapping *, int, const int [], const int [], const int [], const int [], int, void (*)(), const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [], int * );
+static int ResampleL( AstMapping *, int, const int [], const int [], const long int [], const long int [], int, void (*)(), const double [], int, double, int, long int, int, const int [], const int [], const int [], const int [], long int [], long int [], int * );
+static int ResampleS( AstMapping *, int, const int [], const int [], const short int [], const short int [], int, void (*)(), const double [], int, double, int, short int, int, const int [], const int [], const int [], const int [], short int [], short int [], int * );
+static int ResampleSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)(), const double *, double, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, int * );
+static int ResampleUB( AstMapping *, int, const int [], const int [], const unsigned char [], const unsigned char [], int, void (*)(), const double [], int, double, int, unsigned char, int, const int [], const int [], const int [], const int [], unsigned char [], unsigned char [], int * );
+static int ResampleUI( AstMapping *, int, const int [], const int [], const unsigned int [], const unsigned int [], int, void (*)(), const double [], int, double, int, unsigned int, int, const int [], const int [], const int [], const int [], unsigned int [], unsigned int [], int * );
+static int ResampleUL( AstMapping *, int, const int [], const int [], const unsigned long int [], const unsigned long int [], int, void (*)(), const double [], int, double, int, unsigned long int, int, const int [], const int [], const int [], const int [], unsigned long int [], unsigned long int [], int * );
+static int ResampleUS( AstMapping *, int, const int [], const int [], const unsigned short int [], const unsigned short int [], int, void (*)(), const double [], int, double, int, unsigned short int, int, const int [], const int [], const int [], const int [], unsigned short int [], unsigned short int [], int * );
+static int ResampleWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, void (*)(), const double *, int, const void *, int, const int *, const int *, const int *, const int *, void *, void *, int * );
+static int SpecialBounds( const MapData *, double *, double *, double [], double [], int * );
+static int TestAttrib( AstObject *, const char *, int * );
+static int TestInvert( AstMapping *, int * );
+static int TestReport( AstMapping *, int * );
+static void ClearAttrib( AstObject *, const char *, int * );
+static void ClearInvert( AstMapping *, int * );
+static void ClearReport( AstMapping *, int * );
+static void CombinePN( PN *, PN *, int * );
+static void ConserveFluxB( double, int, const int *, signed char, signed char *, signed char *, int * );
+static void ConserveFluxD( double, int, const int *, double, double *, double *, int * );
+static void ConserveFluxF( double, int, const int *, float, float *, float *, int * );
+static void ConserveFluxI( double, int, const int *, int, int *, int *, int * );
+static void ConserveFluxL( double, int, const int *, long int, long int *, long int *, int * );
+static void ConserveFluxS( double, int, const int *, short int, short int *, short int *, int * );
+static void ConserveFluxUB( double, int, const int *, unsigned char, unsigned char *, unsigned char *, int * );
+static void ConserveFluxUI( double, int, const int *, unsigned int, unsigned int *, unsigned int *, int * );
+static void ConserveFluxUL( double, int, const int *, unsigned long int, unsigned long int *, unsigned long int *, int * );
+static void ConserveFluxUS( double, int, const int *, unsigned short int, unsigned short int *, unsigned short int *, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int *, int * );
+static void Delete( AstObject *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void FunPN( AstMapping *, double *, int, int, int, double *, double *, int * );
+static void Gauss( double, const double [], int, double *, int * );
+static void GlobalBounds( MapData *, double *, double *, double [], double [], int * );
 static void InterpolateBlockAverageB( int, const int[], const int[], const signed char [], const signed char [], int, const int[], const double *const[], const double[], int, signed char, signed char *, signed char *, int * ); 
 static void InterpolateBlockAverageD( int, const int[], const int[], const double [], const double [], int, const int[], const double *const[], const double[], int, double, double *, double *, int * ); 
 static void InterpolateBlockAverageF( int, const int[], const int[], const float [], const float [], int, const int[], const double *const[], const double[], int, float, float *, float *, int * ); 
@@ -503,51 +557,51 @@ static void InterpolateBlockAverageUB( int, const int[], const int[], const unsi
 static void InterpolateBlockAverageUI( int, const int[], const int[], const unsigned int [], const unsigned int [], int, const int[], const double *const[], const double[], int, unsigned int, unsigned int *, unsigned int *, int * ); 
 static void InterpolateBlockAverageUL( int, const int[], const int[], const unsigned long int [], const unsigned long int [], int, const int[], const double *const[], const double[], int, unsigned long int, unsigned long int *, unsigned long int *, int * ); 
 static void InterpolateBlockAverageUS( int, const int[], const int[], const unsigned short int [], const unsigned short int [], int, const int[], const double *const[], const double[], int, unsigned short int, unsigned short int *, unsigned short int *, int * ); 
-static void Invert( AstMapping * );
-static void MapBox( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [] );
-static void RebinAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, double, int, const void *, int, const int *, const int *, const int *, const int *, int, void *, void *, double *, int * );
-static void RebinD( AstMapping *, double, int, const int [], const int [], const double [], const double [], int, const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [] );
-static void RebinF( AstMapping *, double, int, const int [], const int [], const float [], const float [], int, const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [] );
-static void RebinI( AstMapping *, double, int, const int [], const int [], const int [], const int [], int, const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [] );
-static void RebinSeqD( AstMapping *, double, int, const int [], const int [], const double [], const double [], int, const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [], double [], int * );
-static void RebinSeqF( AstMapping *, double, int, const int [], const int [], const float [], const float [], int, const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [], double [], int * );
-static void RebinSeqI( AstMapping *, double, int, const int [], const int [], const int [], const int [], int, const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [], double [], int * );
-static void RebinSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, int, void *, void *, double *, int * );
-static void RebinWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, int, void *, void *, double *, int * );
-static void ReportPoints( AstMapping *, int, AstPointSet *, AstPointSet * );
-static void SetAttrib( AstObject *, const char * );
-static void SetInvert( AstMapping *, int );
-static void SetReport( AstMapping *, int );
-static void Sinc( double, const double [], int, double * );
-static void SincCos( double, const double [], int, double * );
-static void SincGauss( double, const double [], int, double * );
-static void SincSinc( double, const double [], int, double * );
-static void Somb( double, const double [], int, double * );
-static void SombCos( double, const double [], int, double * );
-static void SpreadKernel1D( AstMapping *, int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, double, int, double *, double *, double *, int * );
-static void SpreadKernel1F( AstMapping *, int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, float, int, float *, float *, double *, int * );
-static void SpreadKernel1I( AstMapping *, int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, int, int, int *, int *, double *, int * );
-static void SpreadLinearD( int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, int, double, int, double *, double *, double *, int * );
-static void SpreadLinearF( int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, int, float, int, float *, float *, double *, int * );
-static void SpreadLinearI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int, int *, int *, double *, int * );
-static void SpreadNearestD( int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, int, double, int, double *, double *, double *, int * );
-static void SpreadNearestF( int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, int, float, int, float *, float *, double *, int * );
-static void SpreadNearestI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int, int *, int *, double *, int * );
-static void Tran1( AstMapping *, int, const double [], int, double [] );
-static void Tran2( AstMapping *, int, const double [], const double [], int, double [], double [] );
-static void TranGrid( AstMapping *, int, const int[], const int[], double, int, int, int, int, double * );
-static void TranGridAdaptively( AstMapping *, int, const int[], const int[], const int[], const int[], double, int, int, double *[]  );
-static void TranGridSection( AstMapping *, const double *, int, const int *, const int *, const int *, const int *, int, double *[] );
-static void TranGridWithBlocking( AstMapping *, const double *, int, const int *, const int *, const int *, const int *, int, double *[]  );
-static void TranN( AstMapping *, int, int, int, const double *, int, int, int, double * );
-static void TranP( AstMapping *, int, int, const double *[], int, int, double *[] );
-static void ValidateMapping( AstMapping *, int, int, int, int, const char * );
+static void Invert( AstMapping *, int * );
+static void MapBox( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [], int * );
+static void RebinAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, double, int, const void *, int, const int *, const int *, const int *, const int *, int, void *, void *, double *, int *, int * );
+static void RebinD( AstMapping *, double, int, const int [], const int [], const double [], const double [], int, const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [], int * );
+static void RebinF( AstMapping *, double, int, const int [], const int [], const float [], const float [], int, const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [], int * );
+static void RebinI( AstMapping *, double, int, const int [], const int [], const int [], const int [], int, const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [], int * );
+static void RebinSeqD( AstMapping *, double, int, const int [], const int [], const double [], const double [], int, const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [], double [], int *, int * );
+static void RebinSeqF( AstMapping *, double, int, const int [], const int [], const float [], const float [], int, const double [], int, double, int, float, int, const int [], const int [], const int [], const int [], float [], float [], double [], int *, int * );
+static void RebinSeqI( AstMapping *, double, int, const int [], const int [], const int [], const int [], int, const double [], int, double, int, int, int, const int [], const int [], const int [], const int [], int [], int [], double [], int *, int * );
+static void RebinSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, int, void *, void *, double *, int *, int * );
+static void RebinWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int, const double *, int, const void *, int, const int *, const int *, const int *, const int *, int, void *, void *, double *, int *, int * );
+static void ReportPoints( AstMapping *, int, AstPointSet *, AstPointSet *, int * );
+static void SetAttrib( AstObject *, const char *, int * );
+static void SetInvert( AstMapping *, int, int * );
+static void SetReport( AstMapping *, int, int * );
+static void Sinc( double, const double [], int, double *, int * );
+static void SincCos( double, const double [], int, double *, int * );
+static void SincGauss( double, const double [], int, double *, int * );
+static void SincSinc( double, const double [], int, double *, int * );
+static void Somb( double, const double [], int, double *, int * );
+static void SombCos( double, const double [], int, double *, int * );
+static void SpreadKernel1D( AstMapping *, int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), int, const double *, int, double, int, double *, double *, double *, int *, int * );
+static void SpreadKernel1F( AstMapping *, int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), int, const double *, int, float, int, float *, float *, double *, int *, int * );
+static void SpreadKernel1I( AstMapping *, int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, void (*)( double, const double *, int, double *, int * ), int, const double *, int, int, int, int *, int *, double *, int *, int * );
+static void SpreadLinearD( int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, int, double, int, double *, double *, double *, int *, int * );
+static void SpreadLinearF( int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, int, float, int, float *, float *, double *, int *, int * );
+static void SpreadLinearI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int, int *, int *, double *, int *, int * );
+static void SpreadNearestD( int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, int, double, int, double *, double *, double *, int *, int * );
+static void SpreadNearestF( int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, int, float, int, float *, float *, double *, int *, int * );
+static void SpreadNearestI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int, int *, int *, double *, int *, int * );
+static void Tran1( AstMapping *, int, const double [], int, double [], int * );
+static void Tran2( AstMapping *, int, const double [], const double [], int, double [], double [], int * );
+static void TranGrid( AstMapping *, int, const int[], const int[], double, int, int, int, int, double *, int * );
+static void TranGridAdaptively( AstMapping *, int, const int[], const int[], const int[], const int[], double, int, int, double *[], int * );
+static void TranGridSection( AstMapping *, const double *, int, const int *, const int *, const int *, const int *, int, double *[], int * );
+static void TranGridWithBlocking( AstMapping *, const double *, int, const int *, const int *, const int *, const int *, int, double *[], int * );
+static void TranN( AstMapping *, int, int, int, const double *, int, int, int, double *, int * );
+static void TranP( AstMapping *, int, int, const double *[], int, int, double *[], int * );
+static void ValidateMapping( AstMapping *, int, int, int, int, const char *, int * );
 
 
 
 /* Member functions. */
 /* ================= */
-static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     ClearAttrib
@@ -560,7 +614,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "mapping.h"
-*     void ClearAttrib( AstObject *this, const char *attrib )
+*     void ClearAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     Mapping member function (over-rides the astClearAttrib protected
@@ -577,6 +631,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -610,17 +666,17 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
                !strcmp( attrib, "tranforward" ) ||
                !strcmp( attrib, "traninverse" ) ) {
       astError( AST__NOWRT, "astClear: Invalid attempt to clear the \"%s\" "
-                "value for a %s.", attrib, astGetClass( this ) );
-      astError( AST__NOWRT, "This is a read-only attribute." );
+                "value for a %s.", status, attrib, astGetClass( this ) );
+      astError( AST__NOWRT, "This is a read-only attribute." , status);
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      (*parent_clearattrib)( this_object, attrib );
+      (*parent_clearattrib)( this_object, attrib, status );
    }
 }
 
-static void CombinePN( PN *lo, PN *hi ) {
+static void CombinePN( PN *lo, PN *hi, int *status ) {
 /*
 *  Name:
 *     CombinePN
@@ -634,7 +690,7 @@ static void CombinePN( PN *lo, PN *hi ) {
 
 *  Synopsis:
 *     #include "mapping.h"
-*     void CombinePN( PN *lo, PN *hi )
+*     void CombinePN( PN *lo, PN *hi, int *status )
 
 *  Class Membership:
 *     Mapping member function.
@@ -653,6 +709,8 @@ static void CombinePN( PN *lo, PN *hi ) {
 *        combined higher-order polynomial.
 *     hi
 *        A polynomial covering the higher x interval. Unchanged on exit.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -750,7 +808,7 @@ static void CombinePN( PN *lo, PN *hi ) {
    type. */
 #define MAKE_CONSERVEFLUX(X,Xtype) \
 static void ConserveFlux##X( double factor, int npoint, const int *offset, \
-                             Xtype badval, Xtype *out, Xtype *out_var ) { \
+                             Xtype badval, Xtype *out, Xtype *out_var, int *status ) { \
 \
 /* Local Variables: */ \
    int off_out;                  /* Pixel offset into output array */ \
@@ -795,7 +853,7 @@ MAKE_CONSERVEFLUX(UB,unsigned char)
 #undef MAKE_CONSERVEFLUX
 
 static void Decompose( AstMapping *this, AstMapping **map1, AstMapping **map2, 
-                       int *series, int *invert1, int *invert2 ) {
+                       int *series, int *invert1, int *invert2, int *status ) {
 /*
 *+
 *  Name:
@@ -893,7 +951,7 @@ static void Decompose( AstMapping *this, AstMapping **map1, AstMapping **map2,
    if( invert2 ) *invert2 = 0;
 }
 
-int astRateState_( int disabled ) {
+int astRateState_( int disabled, int *status ) {
 /*
 *+
 *  Name:
@@ -936,12 +994,14 @@ int astRateState_( int disabled ) {
 
 *-
 */
+   astDECLARE_GLOBALS;
+   astGET_GLOBALS(NULL);
    int result = rate_disabled;
    rate_disabled = disabled;
    return result;
 }   
 
-static int Equal( AstObject *this_object, AstObject *that_object ) {
+static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
 *  Name:
 *     Equal
@@ -954,7 +1014,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 *  Synopsis:
 *     #include "mapping.h"
-*     int Equal( AstObject *this, AstObject *that ) 
+*     int Equal( AstObject *this, AstObject *that, int *status ) 
 
 *  Class Membership:
 *     Mapping member function (over-rides the astEqual protected
@@ -979,6 +1039,8 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *        Pointer to the first Object (a Mapping).
 *     that
 *        Pointer to the second Object.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if the Frames are equivalent, zero otherwise.
@@ -1002,14 +1064,14 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 /* Invoke the Equal method inherited from the parent Object class. This checks
    that the Objects are both of the same class (amongst other things). */
-   if( (*parent_equal)( this_object, that_object ) ) {
+   if( (*parent_equal)( this_object, that_object, status ) ) {
 
 /* Report an error since the concrete sub-class should have over-riden
    this method. */
       astError( AST__INTER, "astEqual(Mapping): The %s class does "
                 "not override the abstract astEqual method inherited "
                 "from the base Mapping class (internal AST programming "
-                "error).", astGetClass( this_object ) );
+                "error).", status, astGetClass( this_object ) );
    }
 
 /* If an error occurred, clear the result value. */
@@ -1020,7 +1082,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 }
 
 static void FunPN( AstMapping *map, double *at, int ax1, int ax2,
-                   int n, double *x, double *y ) {
+                   int n, double *x, double *y, int *status ) {
 /*
 *  Name:
 *     FunPN
@@ -1035,7 +1097,7 @@ static void FunPN( AstMapping *map, double *at, int ax1, int ax2,
 *  Synopsis:
 *     #include "mapping.h"
 *     void FunPN( AstMapping *map, double *at, int ax1, int ax2,
-*                 int n, double *x, double *y )
+*                 int n, double *x, double *y, int *status )
 
 *  Class Membership:
 *     Mapping method.
@@ -1079,16 +1141,13 @@ static void FunPN( AstMapping *map, double *at, int ax1, int ax2,
 *     y
 *        An array in which to return the function values at the positions
 *        given in "x".
+*     status
+*        Pointer to the inherited status variable.
 
 */
-#define MAX_CACHE  5
 
 /* Local Variables: */
-   static AstPointSet *pset1_cache[ MAX_CACHE ];
-   static AstPointSet *pset2_cache[ MAX_CACHE ];
-   static int next_slot;
-   static int pset_size[ MAX_CACHE ];
-
+   astDECLARE_GLOBALS;
    AstPointSet *pset1;
    AstPointSet *pset2;
    double **ptr1;
@@ -1105,37 +1164,40 @@ static void FunPN( AstMapping *map, double *at, int ax1, int ax2,
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(map);
+ 
 /* Initialise variables to avoid "used of uninitialised variable"
    messages from dumb compilers. */
    pset2 = NULL;
 
 /* If required, initialise things. */
    if( ax1 == -1 ) {
-      for( i = 0; i < MAX_CACHE; i++ ) {
-         pset_size[ i ] = 0;
-         pset1_cache[ i ] = NULL;
-         pset2_cache[ i ] = NULL;
+      for( i = 0; i < FUNPN_MAX_CACHE; i++ ) {
+         funpn_pset_size[ i ] = 0;
+         funpn_pset1_cache[ i ] = NULL;
+         funpn_pset2_cache[ i ] = NULL;
       }
-      next_slot = 0;
+      funpn_next_slot = 0;
 
 /* If required, clean up. */
    } else if( ax1 == -2 ) {
-      for( i = 0; i < MAX_CACHE; i++ ) {
-         pset_size[ i ] = 0;
-         if( pset1_cache[ i ] ) pset1_cache[ i ] = astAnnul( pset1_cache[ i ] );
-         if( pset2_cache[ i ] ) pset2_cache[ i ] = astAnnul( pset2_cache[ i ] );
+      for( i = 0; i < FUNPN_MAX_CACHE; i++ ) {
+         funpn_pset_size[ i ] = 0;
+         if( funpn_pset1_cache[ i ] ) funpn_pset1_cache[ i ] = astAnnul( funpn_pset1_cache[ i ] );
+         if( funpn_pset2_cache[ i ] ) funpn_pset2_cache[ i ] = astAnnul( funpn_pset2_cache[ i ] );
       }
-      next_slot = 0;
+      funpn_next_slot = 0;
 
 /* Otherwise do the transformations. */
    } else {
 
 /* See if we have already created PointSets of the correct size. */
       pset1 = NULL;
-      for( i = 0; i < MAX_CACHE; i++ ) {
-         if( pset_size[ i ] == n ) {
-            pset1 = pset1_cache[ i ];
-            pset2 = pset2_cache[ i ];
+      for( i = 0; i < FUNPN_MAX_CACHE; i++ ) {
+         if( funpn_pset_size[ i ] == n ) {
+            pset1 = funpn_pset1_cache[ i ];
+            pset2 = funpn_pset2_cache[ i ];
             break;
          }
       }
@@ -1143,11 +1205,11 @@ static void FunPN( AstMapping *map, double *at, int ax1, int ax2,
 /* If we have not, create new PointSets now. */
       if( pset1 == NULL ) {
          nin = astGetNin( map );
-         pset1 = astPointSet( n, nin, "" );
+         pset1 = astPointSet( n, nin, "", status );
          ptr1 = astGetPoints( pset1 );
 
          nout = astGetNout( map );
-         pset2 = astPointSet( n, nout, "" );
+         pset2 = astPointSet( n, nout, "", status );
          ptr2 = astGetPoints( pset2 );
 
 /* Store the input position in the input PointSet. */
@@ -1159,14 +1221,14 @@ static void FunPN( AstMapping *map, double *at, int ax1, int ax2,
 
 /* Add these new PointSets to the cache, removing any existing 
    PointSets. */
-         if( pset_size[ next_slot ] > 0 ) {
-            (void) astAnnul( pset1_cache[ next_slot ] );
-            (void) astAnnul( pset2_cache[ next_slot ] );
+         if( funpn_pset_size[ funpn_next_slot ] > 0 ) {
+            (void) astAnnul( funpn_pset1_cache[ funpn_next_slot ] );
+            (void) astAnnul( funpn_pset2_cache[ funpn_next_slot ] );
          }
-         pset1_cache[ next_slot ] = pset1;
-         pset2_cache[ next_slot ] = pset2;
-         pset_size[ next_slot ] = n;
-         if( ++next_slot == MAX_CACHE ) next_slot = 0;
+         funpn_pset1_cache[ funpn_next_slot ] = pset1;
+         funpn_pset2_cache[ funpn_next_slot ] = pset2;
+         funpn_pset_size[ funpn_next_slot ] = n;
+         if( ++funpn_next_slot == FUNPN_MAX_CACHE ) funpn_next_slot = 0;
 
 /* If existing PointSets were found, get there data arrays. */
       } else {
@@ -1190,11 +1252,9 @@ static void FunPN( AstMapping *map, double *at, int ax1, int ax2,
       ptr2[ ax1 ] = oldy;
  
    } 
-
-#undef MAX_CACHE 
 }
 
-static double EvaluateDPN( PN *pn, double x ) {
+static double EvaluateDPN( PN *pn, double x, int *status ) {
 /*
 *  Name:
 *     EvaluateDPN
@@ -1207,7 +1267,7 @@ static double EvaluateDPN( PN *pn, double x ) {
 
 *  Synopsis:
 *     #include "mapping.h"
-*     static double EvaluateDPN( PN *pn, double x ) {
+*     double EvaluateDPN( PN *pn, double x, int *status ) 
 
 *  Class Membership:
 *     Mapping method.
@@ -1221,6 +1281,8 @@ static double EvaluateDPN( PN *pn, double x ) {
 *        Pointer to the structure describing the polynomial.
 *     x
 *        The x value at which to evaluate the polynomial gradient.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returns:
 *     The polynomial gradient value.
@@ -1247,7 +1309,7 @@ static double EvaluateDPN( PN *pn, double x ) {
 
 }
 
-static double EvaluatePN( PN *pn, double x ) {
+static double EvaluatePN( PN *pn, double x, int *status ) {
 /*
 *  Name:
 *     EvaluatePN
@@ -1260,7 +1322,7 @@ static double EvaluatePN( PN *pn, double x ) {
 
 *  Synopsis:
 *     #include "mapping.h"
-*     static double EvaluatePN( PN *pn, double x ) {
+*     static double EvaluatePN( PN *pn, double x, int *status ) {
 
 *  Class Membership:
 *     Mapping method.
@@ -1274,6 +1336,8 @@ static double EvaluatePN( PN *pn, double x ) {
 *        Pointer to the structure descirbing the polynomial.
 *     x
 *        The x value at which to evaluate the polynomial.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returns:
 *     The polynomial value.
@@ -1300,7 +1364,7 @@ static double EvaluatePN( PN *pn, double x ) {
 }
 
 static PN *FitPN( AstMapping *map, double *at, int ax1, int ax2, double x0, 
-                  double h, double *rms ){
+                  double h, double *rms, int *status ){
 /*
 *  Name:
 *     FitPN
@@ -1315,7 +1379,7 @@ static PN *FitPN( AstMapping *map, double *at, int ax1, int ax2, double x0,
 *  Synopsis:
 *     #include "mapping.h"
 *     PN *FitPN( AstMapping *map, double *at, int ax1, int ax2, double x0, 
-*                double h, double *rms )
+*                double h, double *rms, int *status )
 
 *  Class Membership:
 *     Mapping method.
@@ -1352,6 +1416,8 @@ static PN *FitPN( AstMapping *map, double *at, int ax1, int ax2, double x0,
 *        A pointer to a location at which to return the RMS residual
 *        between the returned polynomial and the function, estimated at
 *        points mid way between the interpolating points. May be NULL.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returns:
 *     The PN structure holding the polynomial coefficients, etc, or NULL
@@ -1383,7 +1449,7 @@ static PN *FitPN( AstMapping *map, double *at, int ax1, int ax2, double x0,
    }
 
 /* Get the function values at these positions. */
-   FunPN( map, at, ax1, ax2, RATE_ORDER + 1, x, y );
+   FunPN( map, at, ax1, ax2, RATE_ORDER + 1, x, y, status );
 
 /* Convert the x values into x offsets from "x0", and convert the y
    values into y offsets from the central y value. */
@@ -1399,7 +1465,7 @@ static PN *FitPN( AstMapping *map, double *at, int ax1, int ax2, double x0,
    }
 
 /* Find the polynomial which interpolates these points. */
-   ret = InterpPN( RATE_ORDER + 1, x, y );
+   ret = InterpPN( RATE_ORDER + 1, x, y, status );
 
 /* If required, find the rms error between the polynomial and the 
    function at points mid-way between the interpolating points. */
@@ -1417,7 +1483,7 @@ static PN *FitPN( AstMapping *map, double *at, int ax1, int ax2, double x0,
          x[ RATE_ORDER + 1 ] = x[ RATE_ORDER ] + 2*dh;
 
 /* Evaluate the function at these positions. */
-         FunPN( map, at, ax1, ax2, RATE_ORDER + 2, x, y );
+         FunPN( map, at, ax1, ax2, RATE_ORDER + 2, x, y, status );
 
 /* Loop round evaluating the polynomial fit and incrementing the sum of
    the squared residuals. */
@@ -1425,7 +1491,7 @@ static PN *FitPN( AstMapping *map, double *at, int ax1, int ax2, double x0,
          n = 0;
          for( i = 0; i <= RATE_ORDER + 1; i++ ) {
             if( y[ i ] != AST__BAD ) {
-               e = EvaluatePN( ret, x[ i ] - x0 ) + off - y[ i ];
+               e = EvaluatePN( ret, x[ i ] - x0, status ) + off - y[ i ];
                s2 += e*e;
                n++;
             }
@@ -1445,7 +1511,7 @@ static PN *FitPN( AstMapping *map, double *at, int ax1, int ax2, double x0,
 }
 
 static void Gauss( double offset, const double params[], int flags,
-                   double *value ) {
+                   double *value, int *status ) {
 /*
 *  Name:
 *     Gauss
@@ -1459,7 +1525,7 @@ static void Gauss( double offset, const double params[], int flags,
 *  Synopsis:
 *     #include "mapping.h"
 *     void Gauss( double offset, const double params[], int flags,
-*                 double *value )
+*                 double *value, int *status )
 
 *  Class Membership:
 *     Mapping member function.
@@ -1479,6 +1545,8 @@ static void Gauss( double offset, const double params[], int flags,
 *        Not used.
 *     value
 *        Pointer to a double to receive the calculated kernel value.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - This function does not perform error checking and does not
@@ -1489,7 +1557,7 @@ static void Gauss( double offset, const double params[], int flags,
    *value = exp( -params[ 0 ] * offset * offset );
 }
 
-static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+static const char *GetAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     GetAttrib
@@ -1502,7 +1570,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "mapping.h"
-*     const char *GetAttrib( AstObject *this, const char *attrib )
+*     const char *GetAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     Mapping member function (over-rides the protected astGetAttrib
@@ -1519,6 +1587,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null terminated string containing the name of
 *        the attribute whose value is required. This name should be in
 *        lower case, with all white space removed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to a null terminated string containing the attribute
@@ -1536,10 +1606,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *     reason.
 */
 
-/* Local Constants: */
-#define BUFF_LEN 50              /* Max. characters in result buffer */
-
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstMapping *this;             /* Pointer to the Mapping structure */
    const char *result;           /* Pointer value to return */
    int invert;                   /* Invert attribute value */
@@ -1550,7 +1618,6 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    int report;                   /* Report attribute value */
    int tran_forward;             /* TranForward attribute value */
    int tran_inverse;             /* TranInverse attribute value */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
    result = NULL;
@@ -1558,12 +1625,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Check the global error status. */   
    if ( !astOK ) return result;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this_object);
+ 
 /* Obtain a pointer to the Mapping structure. */
    this = (AstMapping *) this_object;
 
 /* Compare "attrib" with each recognised attribute name in turn,
    obtaining the value of the required attribute. If necessary, write
-   the value into "buff" as a null terminated string in an appropriate
+   the value into "getattrib_buff" as a null terminated string in an appropriate
    format.  Set "result" to point at the result string. */
 
 /* Invert. */
@@ -1571,8 +1641,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    if ( !strcmp( attrib, "invert" ) ) {
       invert = astGetInvert( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", invert );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", invert );
+         result = getattrib_buff;
       }
 
 /* IsLinear. */
@@ -1580,8 +1650,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "islinear" ) ) {
       islinear = astGetIsLinear( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", islinear );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", islinear );
+         result = getattrib_buff;
       }
 
 /* IsSimple. */
@@ -1589,8 +1659,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "issimple" ) ) {
       issimple = astGetIsSimple( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", issimple );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", issimple );
+         result = getattrib_buff;
       }
 
 /* Nin. */
@@ -1598,8 +1668,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "nin" ) ) {
       nin = astGetNin( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", nin );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", nin );
+         result = getattrib_buff;
       }
 
 /* Nout. */
@@ -1607,8 +1677,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "nout" ) ) {
       nout = astGetNout( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", nout );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", nout );
+         result = getattrib_buff;
       }
 
 /* Report. */
@@ -1616,8 +1686,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "report" ) ) {
       report = astGetReport( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", report );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", report );
+         result = getattrib_buff;
       }
 
 /* TranForward. */
@@ -1625,8 +1695,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "tranforward" ) ) {
       tran_forward = astGetTranForward( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", tran_forward );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", tran_forward );
+         result = getattrib_buff;
       }
 
 /* TranInverse. */
@@ -1634,24 +1704,21 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "traninverse" ) ) {
       tran_inverse = astGetTranInverse( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", tran_inverse );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", tran_inverse );
+         result = getattrib_buff;
       }
 
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_getattrib)( this_object, attrib );
+      result = (*parent_getattrib)( this_object, attrib, status );
    }
 
 /* Return the result. */
    return result;
-
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
 
-static int GetIsLinear( AstMapping *this ) {
+static int GetIsLinear( AstMapping *this, int *status ) {
 /*
 *+
 *  Name:
@@ -1693,7 +1760,7 @@ static int GetIsLinear( AstMapping *this ) {
    return 0;
 }
 
-static int GetNin( AstMapping *this ) {
+static int GetNin( AstMapping *this, int *status ) {
 /*
 *+
 *  Name:
@@ -1751,7 +1818,7 @@ static int GetNin( AstMapping *this ) {
    return result;
 }
 
-static int GetNout( AstMapping *this ) {
+static int GetNout( AstMapping *this, int *status ) {
 /*
 *+
 *  Name:
@@ -1809,7 +1876,7 @@ static int GetNout( AstMapping *this ) {
    return result;
 }
 
-static int GetTranForward( AstMapping *this ) {
+static int GetTranForward( AstMapping *this, int *status ) {
 /*
 *+
 *  Name:
@@ -1868,7 +1935,7 @@ static int GetTranForward( AstMapping *this ) {
    return result;
 }
 
-static int GetTranInverse( AstMapping *this ) {
+static int GetTranInverse( AstMapping *this, int *status ) {
 /*
 *+
 *  Name:
@@ -1928,7 +1995,7 @@ static int GetTranInverse( AstMapping *this ) {
 }
 
 static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
-                          double xl[], double xu[] ) {
+                          double xl[], double xu[], int *status ) {
 /*
 *  Name:
 *     GlobalBounds
@@ -1942,7 +2009,7 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
 *  Synopsis:
 *     #include "mapping.h"
 *     void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
-*                        double xl[], double xu[] );
+*                        double xl[], double xu[], int *status );
 
 *  Class Membership:
 *     Mapping member function.
@@ -1992,6 +2059,8 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
 *        input point at which the Mapping function takes the value of
 *        the new global upper bound.  This array is not altered if an
 *        improved estimate of the global upper bound cannot be found.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - The efficiency of this function will usually be improved if
@@ -2095,8 +2164,8 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
 /* Create two PointSets to act as buffers to hold a complete batch of
    input and output coordinates. Obtain pointers to their coordinate
    arrays. */
-      pset_in = astPointSet( nbatch, ncoord, "" );
-      pset_out = astPointSet( nbatch, mapdata->nout, "" );
+      pset_in = astPointSet( nbatch, ncoord, "", status );
+      pset_out = astPointSet( nbatch, mapdata->nout, "", status );
       ptr_in = astGetPoints( pset_in );
       ptr_out = astGetPoints( pset_out );
 
@@ -2167,7 +2236,7 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
    pseudo-random positions uniformly distributed within it. */\
    for ( batch = 0; batch < nbatch; batch++ ) {\
       for ( coord = 0; coord < ncoord; coord++ ) {\
-         random = Random( &seed );\
+         random = Random( &seed, status );\
          ptr_in[ coord ][ batch ] = sample_lo[ coord ] * random +\
                                     sample_hi[ coord ] * ( 1.0 - random );\
       }\
@@ -2306,7 +2375,7 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
    barring an error), then negate it to obtain the value of the local
    minimum found. */
             mapdata->negate = 1;
-            new_min = LocalMaximum( mapdata, acc, 0.01, x );
+            new_min = LocalMaximum( mapdata, acc, 0.01, x, status );
             if ( new_min != AST__BAD ) {
                new_min = -new_min;
 
@@ -2424,7 +2493,7 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
 
 /* Find a local maximum in the Mapping function. */
             mapdata->negate = 0;
-            new_max = LocalMaximum( mapdata, acc, 0.01, x );
+            new_max = LocalMaximum( mapdata, acc, 0.01, x, status );
             if ( new_max != AST__BAD ) {
 
 /* Use the result to further update the active region limits. */
@@ -2493,20 +2562,20 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
    if ( astOK ) {
       if ( *lbnd != AST__BAD ) {
          mapdata->negate = 1;
-         *lbnd = LocalMaximum( mapdata, 0.0, sqrt( DBL_EPSILON ), xl );
+         *lbnd = LocalMaximum( mapdata, 0.0, sqrt( DBL_EPSILON ), xl, status );
          if ( *lbnd != AST__BAD ) *lbnd = - *lbnd;
       }
 
 /* Similarly polish the estimate of the global maximum. */
       if ( *ubnd != AST__BAD ) {
          mapdata->negate = 0;
-         *ubnd = LocalMaximum( mapdata, 0.0, sqrt( DBL_EPSILON ), xu );
+         *ubnd = LocalMaximum( mapdata, 0.0, sqrt( DBL_EPSILON ), xu, status );
       }
 
 /* If either extremum could not be found, then report an error. */
       if ( ( *lbnd == AST__BAD ) || ( *ubnd == AST__BAD ) ) {
          astError( AST__MBBNF, "astMapBox(%s): No valid output coordinates "
-                   "(after %d test points).", astGetClass( mapdata->mapping ),
+                   "(after %d test points).", status, astGetClass( mapdata->mapping ),
                    2 * maxiter );
       }
 
@@ -2526,7 +2595,7 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
 #undef FILL_POSITION_BUFFER
 }
 
-void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name ) {
+void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -2563,10 +2632,14 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -2575,8 +2648,8 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAMapping) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -2653,6 +2726,11 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name ) {
    astSetDelete( vtab, Delete );
    astSetCopy( vtab, Copy );
    astSetDump( vtab, Dump, "Mapping", "Mapping between coordinate systems" );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
 /*
@@ -2673,7 +2751,9 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name ) {
 *                                int npoint, const int *offset,
 *                                const double *const *coords,
 *                                void (* kernel)( double, const double [], int,
-*                                                 double * ),
+*                                                 double *, int * ),
+*                                void (* fkernel)( double, const double [], int,
+*                                                  double * ),
 *                                int neighb, const double *params, int flags,
 *                                <Xtype> badval,
 *                                <Xtype> *out, <Xtype> *out_var )
@@ -2761,6 +2841,9 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name ) {
 *        AST__NOBAD flag is specified).
 *     kernel
 *        Pointer to the 1-dimensional kernel function to be used.
+*     fkernel
+*        Pointer to the 1-dimensional kernel function to be used with no
+*        trailing status argument. This is only used if "kernel" is NULL.
 *     neighb
 *        The number of neighbouring pixels in each dimension (on each
 *        side of the interpolation position) which are to contribute
@@ -2832,12 +2915,15 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
                                   int npoint, const int *offset, \
                                   const double *const *coords, \
                                   void (* kernel)( double, const double [], \
-                                                   int, double * ), \
+                                                   int, double *, int * ), \
+                                  void (* fkernel)( double, const double [], \
+                                                    int, double * ), \
                                   int neighb, const double *params, \
                                   int flags, Xtype badval, \
-                                  Xtype *out, Xtype *out_var ) { \
+                                  Xtype *out, Xtype *out_var, int *status ) { \
 \
 /* Local Variables: */ \
+   astDECLARE_GLOBALS;           /* Thread-specific data */ \
    Xfloattype hi_lim;            /* Upper limit on output values */ \
    Xfloattype lo_lim;            /* Lower limit on output values */ \
    Xfloattype sum;               /* Weighted sum of pixel data values */ \
@@ -2895,6 +2981,9 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return result; \
+\
+/* Get a pointer to a structure holding thread-specific global data values */ \
+   astGET_GLOBALS(this); \
 \
 /* Further initialisation. */ \
    kerror = 0; \
@@ -3192,7 +3281,7 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
    contextual error message. */ \
    if ( kerror ) { \
       astError( astStatus, "astResample"#X"(%s): Error signalled by " \
-                "user-supplied 1-d interpolation kernel.", \
+                "user-supplied 1-d interpolation kernel.", status, \
                 astGetClass( unsimplified_mapping ) ); \
    } \
 \
@@ -3231,8 +3320,8 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
    lie within the input grid. */ \
       if ( !bad ) { \
          ix = (int) floor( x ); \
-         lo_x = MaxI( ix - neighb + 1, lbnd_in[ 0 ] ); \
-         hi_x = MinI( ix + neighb,     ubnd_in[ 0 ] ); \
+         lo_x = MaxI( ix - neighb + 1, lbnd_in[ 0 ], status ); \
+         hi_x = MinI( ix + neighb,     ubnd_in[ 0 ], status ); \
 \
 /* Initialise sums for forming the interpolated result. */ \
          sum = (Xfloattype) 0.0; \
@@ -3250,7 +3339,11 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
 /* If necessary, test if the input pixel is bad. If not, calculate its \
    weight by evaluating the kernel function. */ \
             if ( !( Usebad ) || ( in[ off_in ] != badval ) ) { \
-               ( *kernel )( (double) ix - x, params, flags, &pixwt ); \
+               if( kernel ) { \
+                  ( *kernel )( (double) ix - x, params, flags, &pixwt, status ); \
+               } else { \
+                  ( *fkernel )( (double) ix - x, params, flags, &pixwt ); \
+               } \
 \
 /* Check for errors arising in the kernel function. */ \
                if ( !astOK ) { \
@@ -3324,19 +3417,24 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
    grid. */ \
          if ( !bad ) { \
             ix = (int) floor( x ); \
-            lo_x = MaxI( ix - neighb + 1, lbnd_in[ 0 ] ); \
-            hi_x = MinI( ix + neighb,     ubnd_in[ 0 ] ); \
+            lo_x = MaxI( ix - neighb + 1, lbnd_in[ 0 ], status ); \
+            hi_x = MinI( ix + neighb,     ubnd_in[ 0 ], status ); \
             iy = (int) floor( y ); \
-            lo_y = MaxI( iy - neighb + 1, lbnd_in[ 1 ] ); \
-            hi_y = MinI( iy + neighb,     ubnd_in[ 1 ] ); \
+            lo_y = MaxI( iy - neighb + 1, lbnd_in[ 1 ], status ); \
+            hi_y = MinI( iy + neighb,     ubnd_in[ 1 ], status ); \
 \
 /* Loop to evaluate the kernel function along the x dimension, storing \
    the resulting values. The function's argument is the offset of the \
    contributing pixel (along this dimension) from the input \
    position. */ \
             for ( ix = lo_x; ix <= hi_x; ix++ ) { \
-               ( *kernel )( (double) ix - x, params, flags, \
-                            kval + ix - lo_x ); \
+               if( kernel ) { \
+                  ( *kernel )( (double) ix - x, params, flags, \
+                               kval + ix - lo_x, status ); \
+               } else { \
+                  ( *fkernel )( (double) ix - x, params, flags, \
+                               kval + ix - lo_x ); \
+               } \
 \
 /* Check for errors arising in the kernel function. */ \
                if ( !astOK ) { \
@@ -3358,7 +3456,11 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
    kernel function for each y index value. */ \
             off1 = lo_x - lbnd_in[ 0 ] + ystride * ( lo_y - lbnd_in[ 1 ] ); \
             for ( iy = lo_y; iy <= hi_y; iy++, off1 += ystride ) { \
-               ( *kernel )( (double) iy - y, params, flags, &wt_y ); \
+               if( kernel ) { \
+                  ( *kernel )( (double) iy - y, params, flags, &wt_y, status ); \
+               } else { \
+                  ( *fkernel )( (double) iy - y, params, flags, &wt_y ); \
+               } \
 \
 /* Check for errors arising in the kernel function. */ \
                if ( !astOK ) { \
@@ -3445,8 +3547,8 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
    interpolated result. Constrain these values to lie within the input \
    grid. */ \
       ixn = (int) floor( xn ); \
-      lo[ idim ] = MaxI( ixn - neighb + 1, lbnd_in[ idim ] ); \
-      hi[ idim ] = MinI( ixn + neighb,     ubnd_in[ idim ] ); \
+      lo[ idim ] = MaxI( ixn - neighb + 1, lbnd_in[ idim ], status ); \
+      hi[ idim ] = MinI( ixn + neighb,     ubnd_in[ idim ], status ); \
 \
 /* Accumulate the offset (from the start of the input array) of the \
    contributing pixel which has the lowest index in each dimension. */ \
@@ -3477,8 +3579,13 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
    point. */ \
          xn = coords[ idim ][ point ]; \
          for ( ixn = lo[ idim ]; ixn <= hi[ idim ]; ixn++ ) { \
-            ( *kernel )( (double) ixn - xn, params, flags, \
-                         wtptr[ idim ] + ixn - lo[ idim ] ); \
+            if( kernel ) { \
+               ( *kernel )( (double) ixn - xn, params, flags, \
+                            wtptr[ idim ] + ixn - lo[ idim ], status ); \
+            } else { \
+               ( *fkernel )( (double) ixn - xn, params, flags, \
+                             wtptr[ idim ] + ixn - lo[ idim ] ); \
+            } \
 \
 /* Check for errors arising in the kernel function. */ \
             if ( !astOK ) { \
@@ -3941,7 +4048,7 @@ static int InterpolateLinear##X( int ndim_in, \
                                  int npoint, const int *offset, \
                                  const double *const *coords, \
                                  int flags, Xtype badval, \
-                                 Xtype *out, Xtype *out_var ) { \
+                                 Xtype *out, Xtype *out_var, int *status ) { \
 \
 /* Local Variables: */ \
    Xfloattype sum;               /* Weighted sum of pixel data values */ \
@@ -4490,8 +4597,8 @@ static int InterpolateLinear##X( int ndim_in, \
    fractional weight to be given to each pixel in order to interpolate \
    linearly between them. */ \
       ixn = (int) floor( xn ); \
-      lo[ idim ] = MaxI( ixn, lbnd_in[ idim ] ); \
-      hi[ idim ] = MinI( ixn + 1, ubnd_in[ idim ] ); \
+      lo[ idim ] = MaxI( ixn, lbnd_in[ idim ], status ); \
+      hi[ idim ] = MinI( ixn + 1, ubnd_in[ idim ], status ); \
       frac_lo[ idim ] = 1.0 - fabs( xn - (double) lo[ idim ] ); \
       frac_hi[ idim ] = 1.0 - fabs( xn - (double) hi[ idim ] ); \
 \
@@ -4879,7 +4986,7 @@ static int InterpolateNearest##X( int ndim_in, \
                                   int npoint, const int *offset, \
                                   const double *const *coords, \
                                   int flags, Xtype badval, \
-                                  Xtype *out, Xtype *out_var ) { \
+                                  Xtype *out, Xtype *out_var, int *status ) { \
 \
 /* Local Variables: */ \
    Xtype var;                    /* Variance value */ \
@@ -5528,6 +5635,7 @@ static void InterpolateBlockAverage##X( int ndim_in, \
    int *hi;                      /* Pointer to array of upper indices */ \
    int *ixm;                     /* Pointer to array of current indices */ \
    int *lo;                      /* Pointer to array of lower indices */ \
+   int *status;                  /* Pointer to inherited status value */ \
    int *stride;                  /* Pointer to array of dimension strides */ \
    int bad;                      /* Output pixel bad? */ \
    int bad_var;                  /* Output variance bad? */ \
@@ -5553,6 +5661,9 @@ static void InterpolateBlockAverage##X( int ndim_in, \
 \
 /* Initialise. */ \
    *nbad = 0; \
+\
+/* Get a pointer to the inherited status argument. */ \
+   status = astGetStatusPtr; \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -5837,8 +5948,8 @@ static void InterpolateBlockAverage##X( int ndim_in, \
    lie within the input grid. */ \
    if ( !bad ) { \
       ix = (int) floor( x ); \
-      lo_x = MaxI( ix - neighb + 1, lbnd_in[ 0 ] ); \
-      hi_x = MinI( ix + neighb,     ubnd_in[ 0 ] ); \
+      lo_x = MaxI( ix - neighb + 1, lbnd_in[ 0 ], status ); \
+      hi_x = MinI( ix + neighb,     ubnd_in[ 0 ], status ); \
 \
 /* Initialise sums for forming the interpolated result. */ \
       sum = (Xfloattype) 0.0; \
@@ -5905,11 +6016,11 @@ static void InterpolateBlockAverage##X( int ndim_in, \
    grid. */ \
       if ( !bad ) { \
          ix = (int) floor( x ); \
-         lo_x = MaxI( ix - neighb + 1, lbnd_in[ 0 ] ); \
-         hi_x = MinI( ix + neighb,     ubnd_in[ 0 ] ); \
+         lo_x = MaxI( ix - neighb + 1, lbnd_in[ 0 ], status ); \
+         hi_x = MinI( ix + neighb,     ubnd_in[ 0 ], status ); \
          iy = (int) floor( y ); \
-         lo_y = MaxI( iy - neighb + 1, lbnd_in[ 1 ] ); \
-         hi_y = MinI( iy + neighb,     ubnd_in[ 1 ] ); \
+         lo_y = MaxI( iy - neighb + 1, lbnd_in[ 1 ], status ); \
+         hi_y = MinI( iy + neighb,     ubnd_in[ 1 ], status ); \
 \
 /* Initialise sums for forming the interpolated result. */ \
          sum = (Xfloattype) 0.0; \
@@ -5977,8 +6088,8 @@ static void InterpolateBlockAverage##X( int ndim_in, \
    interpolated result. Constrain these values to lie within the input \
    grid. */ \
       ixn = (int) floor( xn ); \
-      lo[ idim ] = MaxI( ixn - neighb + 1, lbnd_in[ idim ] ); \
-      hi[ idim ] = MinI( ixn + neighb,     ubnd_in[ idim ] ); \
+      lo[ idim ] = MaxI( ixn - neighb + 1, lbnd_in[ idim ], status ); \
+      hi[ idim ] = MinI( ixn + neighb,     ubnd_in[ idim ], status ); \
 \
 /* If the cube has a zero dimension then no data can come from it. */ \
       bad = ( lo[ idim ] > hi[ idim ] ); \
@@ -6259,7 +6370,7 @@ MAKE_INTERPOLATE_BLOCKAVE(UB,unsigned char,0,float,0)
 #undef MAKE_INTERPOLATE_BLOCKAVE
 
 
-static PN *InterpPN( int np, double *x, double *y ) {
+static PN *InterpPN( int np, double *x, double *y, int *status ) {
 /*
 *  Name:
 *     InterpPN
@@ -6272,7 +6383,7 @@ static PN *InterpPN( int np, double *x, double *y ) {
 
 *  Synopsis:
 *     #include "mapping.h"
-*     static PN *InterpPN( int np, double *x, double *y )
+*     PN *InterpPN( int np, double *x, double *y, int *status )
 
 *  Class Membership:
 *     Mapping member function.
@@ -6293,6 +6404,8 @@ static PN *InterpPN( int np, double *x, double *y ) {
 *        array must increase monotonically.
 *     y
 *        Pointer to a an array of "np" y values.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned:
 *     Pointer to a structure describing the polynomial, or NULL if no
@@ -6335,7 +6448,7 @@ static PN *InterpPN( int np, double *x, double *y ) {
 */
     for( k = 1; k < np; k++ ) {
        for( i = 0; i < np - k; i++ ) {
-          CombinePN( pn[i], pn[i+1] );
+          CombinePN( pn[i], pn[i+1], status );
        }
     }
 
@@ -6354,7 +6467,7 @@ static PN *InterpPN( int np, double *x, double *y ) {
 }
 
 
-static void Invert( AstMapping *this ) {
+static void Invert( AstMapping *this, int *status ) {
 /*
 *++
 *  Name:
@@ -6411,7 +6524,7 @@ f        The global status.
    if ( astGetInvert( this ) != invert ) astSetInvert( this, invert );
 }
 
-static double J1Bessel( double x ) {
+static double J1Bessel( double x, int *status ) {
 /*
 *  Name:
 *     J1Bessel
@@ -6424,7 +6537,7 @@ static double J1Bessel( double x ) {
 
 *  Synopsis:
 *     #include "mapping.h"
-*     double J1Bessel( double x )
+*     double J1Bessel( double x, int *status )
 
 *  Class Membership:
 *     Mapping member function.
@@ -6436,6 +6549,8 @@ static double J1Bessel( double x ) {
 *  Parameters:
 *     x
 *        The argument for J1.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The calculated J1(x) value.
@@ -6502,7 +6617,7 @@ static double J1Bessel( double x ) {
 }
 
 static int LinearApprox( AstMapping *this, const double *lbnd, 
-                         const double *ubnd, double tol, double *fit ) {
+                         const double *ubnd, double tol, double *fit, int *status ) {
 /*
 *++
 *  Name:
@@ -6671,7 +6786,7 @@ f     - A value of .FALSE.
 
 /* Create a PointSet to hold input coordinates and obtain a pointer
    to its coordinate arrays. */
-   pset_in_f = astPointSet( 2 * ndim_in, ndim_in, "" );
+   pset_in_f = astPointSet( 2 * ndim_in, ndim_in, "", status );
    ptr_in_f = astGetPoints( pset_in_f );
    if ( astOK ) {
 
@@ -6797,7 +6912,7 @@ f     - A value of .FALSE.
 /* --------------------------------------------------- */   
 /* Create a PointSet to hold the test coordinates and obtain an array
    of pointers to its coordinate data. */
-      pset_in_t = astPointSet( npoint, ndim_in, "" );
+      pset_in_t = astPointSet( npoint, ndim_in, "", status );
       ptr_in_t = astGetPoints( pset_in_t );
       if ( astOK ) {
 
@@ -6968,7 +7083,7 @@ f     - A value of .FALSE.
 }
 
 static double LocalMaximum( const MapData *mapdata, double acc, double fract,
-                            double x[] ) {
+                            double x[], int *status ) {
 /*
 *  Name:
 *     LocalMaximum
@@ -6982,7 +7097,7 @@ static double LocalMaximum( const MapData *mapdata, double acc, double fract,
 *  Synopsis:
 *     #include "mapping.h"
 *     double LocalMaximum( const MapData *mapdata, double acc, double fract,
-*                          double x[] );
+*                          double x[], int *status );
 
 *  Class Membership:
 *     Mapping member function.
@@ -7012,6 +7127,8 @@ static double LocalMaximum( const MapData *mapdata, double acc, double fract,
 *        an initial estimate of the position of the maximum. On exit,
 *        this will be updated to contain the best estimate of the
 *        maximum's position, as found by this function.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The best estimate of the Mapping function's maximum value.
@@ -7066,7 +7183,7 @@ static double LocalMaximum( const MapData *mapdata, double acc, double fract,
 
 /* Find an approximation to a local maximum using the simplex method
    and check for errors. */
-      maximum = UphillSimplex( mapdata, acc, maxcall, dx, x, &err, &ncall );
+      maximum = UphillSimplex( mapdata, acc, maxcall, dx, x, &err, &ncall, status );
       if ( astOK ) {
 
 /* Use this maximum value if no previous maximum has been found. */
@@ -7108,7 +7225,7 @@ static void MapBox( AstMapping *this,
                     const double lbnd_in[], const double ubnd_in[],
                     int forward, int coord_out,
                     double *lbnd_out, double *ubnd_out,
-                    double xl[], double xu[] ) {
+                    double xl[], double xu[], int *status ) {
 /*
 *+
 *  Name:
@@ -7261,7 +7378,7 @@ static void MapBox( AstMapping *this,
    if ( astOK ) {
       if ( ( coord_out < 0 ) || ( coord_out >= nout ) ) {
          astError( AST__BADCI, "astMapBox(%s): Output coordinate index (%d) "
-                   "invalid - it should be in the range 1 to %d.",
+                   "invalid - it should be in the range 1 to %d.", status,
                    astGetClass( this ), coord_out + 1, nout );
       }
    }
@@ -7288,8 +7405,8 @@ static void MapBox( AstMapping *this,
 
 /* Create PointSets for passing coordinate data to and from the
    Mapping. */
-      mapdata.pset_in = astPointSet( 1, nin, "" );
-      mapdata.pset_out = astPointSet( 1, nout, "" );
+      mapdata.pset_in = astPointSet( 1, nin, "", status );
+      mapdata.pset_out = astPointSet( 1, nout, "", status );
 
 /* Obtain pointers to these PointSets' coordinate arrays. */
       mapdata.ptr_in = astGetPoints( mapdata.pset_in );
@@ -7318,18 +7435,18 @@ static void MapBox( AstMapping *this,
    estimate of the required output bounds. Do this only so long as the
    number of points involved is not excessive. */
          if ( nin <= 12 ) {
-            refine = SpecialBounds( &mapdata, &lbnd, &ubnd, x_l, x_u );
+            refine = SpecialBounds( &mapdata, &lbnd, &ubnd, x_l, x_u, status );
          } else {
             refine = 1;
          }
 
 /* Then attempt to refine this estimate using a global search
    algorithm. */
-         if( refine ) GlobalBounds( &mapdata, &lbnd, &ubnd, x_l, x_u );
+         if( refine ) GlobalBounds( &mapdata, &lbnd, &ubnd, x_l, x_u, status );
 
 /* If an error occurred, generate a contextual error message. */
          if ( !astOK ) {
-            astError( astStatus, "Unable to find a bounding box for a %s.",
+            astError( astStatus, "Unable to find a bounding box for a %s.", status,
                       astGetClass( this ) );
          }
       }
@@ -7369,7 +7486,7 @@ static void MapBox( AstMapping *this,
 }
 
 static double MapFunction( const MapData *mapdata, const double in[],
-                           int *ncall ) {
+                           int *ncall, int *status ) {
 /*
 *  Name:
 *     MapFunction
@@ -7383,7 +7500,7 @@ static double MapFunction( const MapData *mapdata, const double in[],
 *  Synopsis:
 *     #include "mapping.h"
 *     double MapFunction( const MapData *mapdata, const double in[],
-*                         int *ncall );
+*                         int *ncall, int *status );
 
 *  Class Membership:
 *     Mapping member function.
@@ -7420,6 +7537,8 @@ static double MapFunction( const MapData *mapdata, const double in[],
 *        but this will be omitted if the input coordinates supplied
 *        are outside the constrained range so that no transformation
 *        is performed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The selected output coordinate value, or AST__BAD, as appropriate.
@@ -7491,7 +7610,7 @@ static double MapFunction( const MapData *mapdata, const double in[],
 }
 
 static int MapList( AstMapping *this, int series, int invert, int *nmap,
-                     AstMapping ***map_list, int **invert_list ) {
+                     AstMapping ***map_list, int **invert_list, int *status ) {
 /*
 *+
 *  Name:
@@ -7642,7 +7761,7 @@ static int MapList( AstMapping *this, int series, int invert, int *nmap,
 }
 
 static int MapMerge( AstMapping *this, int where, int series, int *nmap,
-                     AstMapping ***map_list, int **invert_list ) {
+                     AstMapping ***map_list, int **invert_list, int *status ) {
 /*
 *+
 *  Name:
@@ -7779,7 +7898,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return -1;
 }
 
-static int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map ){
+static int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map, int *status ){
 /*
 *+
 *  Name:
@@ -7872,7 +7991,7 @@ static int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map ){
       if( in[ iin ] < 0 || in[ iin ] >= mapnin ) {
          astError( AST__AXIIN, "astMapSplit(%s): One of the supplied Mapping "
                    "input indices has value %d which is invalid; it should "
-                   "be in the range 1 to %d.", astGetClass( this ), 
+                   "be in the range 1 to %d.", status, astGetClass( this ), 
                    in[ iin ] + 1, mapnin );
          break;
       }
@@ -7925,11 +8044,11 @@ static int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map ){
 
 /* If the inputs are to be permuted, create the PermMap. */
                if( perm ) {
-                  pm = astPermMap( nin, in, nin, outperm, NULL, "" );
+                  pm = astPermMap( nin, in, nin, outperm, NULL, "", status );
 
 /* The returned Mapping is a series CmpMap containing this PermMap
    followed by the supplied Mapping. */
-                  rmap = astCmpMap( pm, this, 1, "" );
+                  rmap = astCmpMap( pm, this, 1, "", status );
                   *map = astSimplify( rmap );
                   rmap = astAnnul( rmap );
 
@@ -7959,7 +8078,7 @@ static int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map ){
    return result;
 }
 
-static double MatrixDet( int ndim, const double *matrix ){
+static double MatrixDet( int ndim, const double *matrix, int *status ){
 /*
 *  Name:
 *     MatrixDet
@@ -7972,7 +8091,7 @@ static double MatrixDet( int ndim, const double *matrix ){
 
 *  Synopsis:
 *     #include "mapping.h"
-*     double MatrixDet( int ndim, const double *matrix )
+*     double MatrixDet( int ndim, const double *matrix, int *status )
 
 *  Class Membership:
 *     Mapping member function.
@@ -7986,6 +8105,8 @@ static double MatrixDet( int ndim, const double *matrix ){
 *     matrix
 *        The matrix element values. The first row of "ndim" elements
 *        should be supplied first, followed by the second row, etc.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The determinant.
@@ -8027,7 +8148,7 @@ static double MatrixDet( int ndim, const double *matrix ){
    return result;
 }
 
-static double MaxD( double a, double b ) {
+static double MaxD( double a, double b, int *status ) {
 /*
 *  Name:
 *     MaxD
@@ -8040,7 +8161,7 @@ static double MaxD( double a, double b ) {
 
 *  Synopsis:
 *     #include "mapping.h"
-*     double MaxD( double a, double b )
+*     double MaxD( double a, double b, int *status )
 
 *  Class Membership:
 *     Mapping member function.
@@ -8053,6 +8174,8 @@ static double MaxD( double a, double b ) {
 *        The first value.
 *     b
 *        The second value.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The maximum.
@@ -8062,7 +8185,7 @@ static double MaxD( double a, double b ) {
    return ( a > b ) ? a : b;
 }
 
-static int MaxI( int a, int b ) {
+static int MaxI( int a, int b, int *status ) {
 /*
 *  Name:
 *     MaxI
@@ -8075,7 +8198,7 @@ static int MaxI( int a, int b ) {
 
 *  Synopsis:
 *     #include "mapping.h"
-*     int MaxI( int a, int b )
+*     int MaxI( int a, int b, int *status )
 
 *  Class Membership:
 *     Mapping member function.
@@ -8088,6 +8211,8 @@ static int MaxI( int a, int b ) {
 *        The first value.
 *     b
 *        The second value.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The maximum.
@@ -8097,7 +8222,7 @@ static int MaxI( int a, int b ) {
    return ( a > b ) ? a : b;
 }
 
-static int MinI( int a, int b ) {
+static int MinI( int a, int b, int *status ) {
 /*
 *  Name:
 *     MinI
@@ -8110,7 +8235,7 @@ static int MinI( int a, int b ) {
 
 *  Synopsis:
 *     #include "mapping.h"
-*     int MinI( int a, int b )
+*     int MinI( int a, int b, int *status )
 
 *  Class Membership:
 *     Mapping member function.
@@ -8123,6 +8248,8 @@ static int MinI( int a, int b ) {
 *        The first value.
 *     b
 *        The second value.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The minimum.
@@ -8133,7 +8260,7 @@ static int MinI( int a, int b ) {
 }
 
 static double NewVertex( const MapData *mapdata, int lo, double scale,
-                         double x[], double f[], int *ncall, double xnew[] ) {
+                         double x[], double f[], int *ncall, double xnew[], int *status ) {
 /*
 *  Name:
 *     NewVertex
@@ -8147,7 +8274,7 @@ static double NewVertex( const MapData *mapdata, int lo, double scale,
 *  Synopsis:
 *     #include "mapping.h"
 *     double NewVertex( const MapData *mapdata, int lo, double scale,
-*                       double x[], double f[], int *ncall, double xnew[] );
+*                       double x[], double f[], int *ncall, double xnew[], int *status );
 
 *  Class Membership:
 *     Mapping member function.
@@ -8191,6 +8318,8 @@ static double NewVertex( const MapData *mapdata, int lo, double scale,
 *     xnew
 *        An array of double with one element for each input coordinate
 *        of the Mapping function. This is used as workspace.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Mapping function value at the new vertex. This value is
@@ -8251,7 +8380,7 @@ static double NewVertex( const MapData *mapdata, int lo, double scale,
    }
 
 /* Evaluate the Mapping function at the new vertex. */
-   fnew = MapFunction( mapdata, xnew, ncall );
+   fnew = MapFunction( mapdata, xnew, ncall, status );
  
 /* If the result is not bad and exceeds the previous value at the
    lowest vertex, then replace the lowest vertex with this new one. */
@@ -8266,7 +8395,7 @@ static double NewVertex( const MapData *mapdata, int lo, double scale,
    return fnew;
 }
 
-static double Random( long int *seed ) {
+static double Random( long int *seed, int *status ) {
 /*
 *  Name:
 *     Random
@@ -8279,7 +8408,7 @@ static double Random( long int *seed ) {
 
 *  Synopsis:
 *     #include "mapping.h"
-*     double Random( long int *seed );
+*     double Random( long int *seed, int *status );
 
 *  Class Membership:
 *     Mapping member function.
@@ -8296,6 +8425,8 @@ static double Random( long int *seed ) {
 *        non-zero seed value. This will be updated with a new seed
 *        which may be supplied on the next invocation in order to
 *        obtain a different pseudo-random value.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The pseudo-random value.
@@ -8314,7 +8445,7 @@ static double Random( long int *seed ) {
    return ( (double) ( *seed - 1 ) ) / (double) 2147483646;
 }
 
-static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
+static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status ){
 /*
 *+
 *  Name:
@@ -8391,6 +8522,9 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
 /* Check the global error status. */
    if ( !astOK ) return ret;
 
+/* Allocate resources */
+   FunPN( NULL, NULL, -1, 0, 0, NULL, NULL, status );
+
 /* Obtain the numbers of input and output coordinates for the Mapping. */
    nin = astGetNin( this );
    nout = astGetNout( this );
@@ -8398,21 +8532,21 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
 /* Validate the output index. */
    if ( astOK && ( ax1 < 0 || ax1 >= nout ) ) {
       astError( AST__AXIIN, "astRate(%s): The supplied Mapping output "
-                "index (%d) is invalid; it should be in the range 1 to %d.", 
+                "index (%d) is invalid; it should be in the range 1 to %d.", status, 
                 astGetClass( this ), ax1 + 1, nout );
    }
 
 /* Validate the input index. */
    if ( astOK && ( ax2 < 0 || ax2 >= nin ) ) {
       astError( AST__AXIIN, "astRate(%s): The supplied Mapping input "
-                "index (%d) is invalid; it should be in the range 1 to %d.", 
+                "index (%d) is invalid; it should be in the range 1 to %d.", status, 
                 astGetClass( this ), ax2 + 1, nin );
    }
 
 /* Check the Mapping has a forward transformation. */
    if ( astOK && !astGetTranForward( this ) ) {
       astError( AST__NODEF, "astRate(%s): The supplied Mapping does not "
-                "have a defined forward transformation.", 
+                "have a defined forward transformation.", status, 
                 astGetClass( this ) );
    }
 
@@ -8439,7 +8573,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
    derivative of the function in the region of "x0". Find a polynomial fit 
    to the function over this initial interval. The independant variable 
    of this fit is (x-x0) and the dependant variable is (y(x)-y(x0). */
-      fit = FitPN( this, at, ax1, ax2, x0, h, NULL );
+      fit = FitPN( this, at, ax1, ax2, x0, h, NULL, status );
       if( !fit ) return AST__BAD;
 
 /* We need an estimate of how much the derivative may typically change
@@ -8455,10 +8589,10 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
       sp = 0.0;
       dh = h/4.0;
       for( i = -(RATE_ORDER/2); i < (RATE_ORDER+1)/2; i++ ) {
-         r = EvaluateDPN( fit, i*dh );
+         r = EvaluateDPN( fit, i*dh, status );
          s1 += r;
          s2 += r*r;
-         r = EvaluatePN( fit, i*dh ) + fit->y0;
+         r = EvaluatePN( fit, i*dh, status ) + fit->y0;
          sp += r*r;
       }
       s2 /= RATE_ORDER;
@@ -8518,7 +8652,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
          fitted = 0;
          fitok = 1;
          while( rms < 0.2*sp && ixy < MXY && ( !fitted || fitok ) ) {
-            fit = FitPN( this, at, ax1, ax2, x0, h0, &rms );
+            fit = FitPN( this, at, ax1, ax2, x0, h0, &rms, status );
             if( fit ) {
                fitted = 1;
                fitok = 1;
@@ -8582,7 +8716,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
       
                   h0 *= 0.1;
                   ixy--;
-                  fit = FitPN( this, at, ax1, ax2, x0, h0, &rms );
+                  fit = FitPN( this, at, ax1, ax2, x0, h0, &rms, status );
                   if( fit ) {
                      x[ 2 ] = x[ 1 ];
                      x[ 1 ] = x[ 0 ];
@@ -8617,7 +8751,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
    the power of ten which correspnds to the minimum of the function. */
             if( ret == AST__BAD ) {
                if( x[ 0 ] != AST__BAD ) {
-                  fit = InterpPN( 3, x, y );
+                  fit = InterpPN( 3, x, y, status );
                   if( fit ){
                      if( fit->coeff[ 2 ] > 0.0 ) {
                         h0 = h*pow( 10.0, -0.5*fit->coeff[ 1 ]/fit->coeff[ 2 ] );
@@ -8627,7 +8761,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
                }
 
 /* Use the best estimate of h to calculate the returned derivatives. */
-               fit = FitPN( this, at, ax1, ax2, x0, h0, &rms );
+               fit = FitPN( this, at, ax1, ax2, x0, h0, &rms, status );
                if( fit ) {         
                   ret = fit->coeff[ 1 ];
                   fit = astFree( fit );
@@ -8638,7 +8772,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
    }
 
 /* Free resources */
-   FunPN( NULL, NULL, -2, 0, 0, NULL, NULL );
+   FunPN( NULL, NULL, -2, 0, 0, NULL, NULL, status );
 
 /* Return the result. */
    return ret;
@@ -9182,9 +9316,10 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
                      double tol, int maxpix, Xtype badval, \
                      int ndim_out, const int lbnd_out[], \
                      const int ubnd_out[], const int lbnd[], \
-                     const int ubnd[], Xtype out[], Xtype out_var[] ) { \
+                     const int ubnd[], Xtype out[], Xtype out_var[], int *status ) { \
 \
 /* Local Variables: */ \
+   astDECLARE_GLOBALS;           /* Thread-specific data */ \
    AstMapping *simple;           /* Pointer to simplified Mapping */ \
    Xtype *d;                     /* Pointer to next output data value */ \
    Xtype *v;                     /* Pointer to next output variance value */ \
@@ -9200,6 +9335,9 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
 \
+/* Get a pointer to a structure holding thread-specific global data values */ \
+   astGET_GLOBALS(this); \
+\
 /* Obtain values for the Nin and Nout attributes of the Mapping. */ \
    nin = astGetNin( this ); \
    nout = astGetNout( this ); \
@@ -9209,10 +9347,10 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
    if necessary. */ \
    if ( astOK && ( ( ndim_in != nin ) || ( ndim_in < 1 ) ) ) { \
       astError( AST__NGDIN, "astRebin"#X"(%s): Bad number of input grid " \
-                "dimensions (%d).", astGetClass( this ), ndim_in ); \
+                "dimensions (%d).", status, astGetClass( this ), ndim_in ); \
       if ( ndim_in != nin ) { \
          astError( AST__NGDIN, "The %s given requires %d coordinate value%s " \
-                   "to specify an input position.", \
+                   "to specify an input position.", status, \
                    astGetClass( this ), nin, ( nin == 1 ) ? "" : "s" ); \
       } \
    } \
@@ -9222,10 +9360,10 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
    error if necessary. */ \
    if ( astOK && ( ( ndim_out != nout ) || ( ndim_out < 1 ) ) ) { \
       astError( AST__NGDIN, "astRebin"#X"(%s): Bad number of output grid " \
-                "dimensions (%d).", astGetClass( this ), ndim_out ); \
+                "dimensions (%d).", status, astGetClass( this ), ndim_out ); \
       if ( ndim_out != nout ) { \
          astError( AST__NGDIN, "The %s given generates %s%d coordinate " \
-                   "value%s for each output position.", astGetClass( this ), \
+                   "value%s for each output position.", status, astGetClass( this ), \
                    ( nout < ndim_out ) ? "only " : "", nout, \
                    ( nout == 1 ) ? "" : "s" ); \
       } \
@@ -9238,9 +9376,9 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
          if ( lbnd_in[ idim ] > ubnd_in[ idim ] ) { \
             astError( AST__GBDIN, "astRebin"#X"(%s): Lower bound of " \
                       "input grid (%d) exceeds corresponding upper bound " \
-                      "(%d).", astGetClass( this ), \
+                      "(%d).", status, astGetClass( this ), \
                       lbnd_in[ idim ], ubnd_in[ idim ] ); \
-            astError( AST__GBDIN, "Error in input dimension %d.", \
+            astError( AST__GBDIN, "Error in input dimension %d.", status, \
                       idim + 1 ); \
             break; \
          } \
@@ -9251,17 +9389,17 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
    report an error if necessary. */ \
    if ( astOK && ( tol < 0.0 ) ) { \
       astError( AST__PATIN, "astRebin"#X"(%s): Invalid positional " \
-                "accuracy tolerance (%.*g pixel).", \
+                "accuracy tolerance (%.*g pixel).", status, \
                 astGetClass( this ), DBL_DIG, tol ); \
-      astError( AST__PATIN, "This value should not be less than zero." ); \
+      astError( AST__PATIN, "This value should not be less than zero." , status); \
    } \
 \
 /* Check that the initial scale size in pixels supplied is valid and \
    report an error if necessary. */ \
    if ( astOK && ( maxpix < 0 ) ) { \
       astError( AST__SSPIN, "astRebin"#X"(%s): Invalid initial scale " \
-                "size in pixels (%d).", astGetClass( this ), maxpix ); \
-      astError( AST__SSPIN, "This value should not be less than zero." ); \
+                "size in pixels (%d).", status, astGetClass( this ), maxpix ); \
+      astError( AST__SSPIN, "This value should not be less than zero." , status); \
    } \
 \
 /* Check that the lower and upper bounds of the output grid are \
@@ -9271,9 +9409,9 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
          if ( lbnd_out[ idim ] > ubnd_out[ idim ] ) { \
             astError( AST__GBDIN, "astRebin"#X"(%s): Lower bound of " \
                       "output grid (%d) exceeds corresponding upper bound " \
-                      "(%d).", astGetClass( this ), \
+                      "(%d).", status, astGetClass( this ), \
                       lbnd_out[ idim ], ubnd_out[ idim ] ); \
-            astError( AST__GBDIN, "Error in output dimension %d.", \
+            astError( AST__GBDIN, "Error in output dimension %d.", status, \
                       idim + 1 ); \
             break; \
          } \
@@ -9286,7 +9424,7 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
          if ( lbnd[ idim ] > ubnd[ idim ] ) { \
             astError( AST__GBDIN, "astRebin"#X"(%s): Lower bound of " \
                       "input region (%d) exceeds corresponding upper " \
-                      "bound (%d).", astGetClass( this ), \
+                      "bound (%d).", status, astGetClass( this ), \
                       lbnd[ idim ], ubnd[ idim ] ); \
 \
 /* Also check that the input region lies wholly within the input \
@@ -9294,18 +9432,18 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
          } else if ( lbnd[ idim ] < lbnd_in[ idim ] ) { \
             astError( AST__GBDIN, "astRebin"#X"(%s): Lower bound of " \
                       "input region (%d) is less than corresponding " \
-                      "bound of input grid (%d).", astGetClass( this ), \
+                      "bound of input grid (%d).", status, astGetClass( this ), \
                       lbnd[ idim ], lbnd_in[ idim ] ); \
          } else if ( ubnd[ idim ] > ubnd_in[ idim ] ) { \
             astError( AST__GBDIN, "astRebin"#X"(%s): Upper bound of " \
                       "input region (%d) exceeds corresponding " \
-                      "bound of input grid (%d).", astGetClass( this ), \
+                      "bound of input grid (%d).", status, astGetClass( this ), \
                       ubnd[ idim ], ubnd_in[ idim ] ); \
          } \
 \
 /* Say which dimension produced the error. */ \
          if ( !astOK ) { \
-            astError( AST__GBDIN, "Error in output dimension %d.", \
+            astError( AST__GBDIN, "Error in output dimension %d.", status, \
                       idim + 1 ); \
             break; \
          } \
@@ -9343,7 +9481,7 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
    Mapping is not defined. */ \
    if ( !astGetTranForward( simple ) && astOK ) { \
       astError( AST__TRNND, "astRebin"#X"(%s): An forward coordinate " \
-                "transformation is not defined by the %s supplied.", \
+                "transformation is not defined by the %s supplied.", status, \
                 astGetClass( unsimplified_mapping ), \
                 astGetClass( unsimplified_mapping ) ); \
    } \
@@ -9387,7 +9525,7 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
                     (const void *) &badval, \
                     ndim_out, lbnd_out, ubnd_out, \
                     lbnd, ubnd, npix_out, \
-                    (void *) out, (void *) out_var, work, NULL ); \
+                    (void *) out, (void *) out_var, work, NULL, status ); \
 \
 /* If required set output pixels bad if they have a total weight less \
    than "wlim". */ \
@@ -9438,7 +9576,7 @@ static void RebinAdaptively( AstMapping *this, int ndim_in,
                             int ndim_out, const int *lbnd_out,
                             const int *ubnd_out, const int *lbnd,
                             const int *ubnd, int npix_out, void *out, 
-                            void *out_var, double *work, int *nused ){
+                            void *out_var, double *work, int *nused, int *status ){
 /*
 *  Name:
 *     RebinAdaptively
@@ -9460,7 +9598,7 @@ static void RebinAdaptively( AstMapping *this, int ndim_in,
 *                          int ndim_out, const int *lbnd_out,
 *                          const int *ubnd_out, const int *lbnd,
 *                          const int *ubnd, int npix_out, void *out, 
-*                          void *out_var, double *work, int *nused )
+*                          void *out_var, double *work, int *nused, int *status )
 
 *  Class Membership:
 *     Mapping member function.
@@ -9648,6 +9786,8 @@ static void RebinAdaptively( AstMapping *this, int ndim_in,
 *     nused
 *        An optional pointer to an int which will be incremented by the
 *        number of input values pasted into the output array. Ignored if NULL.
+*     status
+*        Pointer to the inherited status variable.
 */
                       
 /* Local Variables: */
@@ -9780,7 +9920,7 @@ static void RebinAdaptively( AstMapping *this, int ndim_in,
          RebinWithBlocking( this, linear_fit, ndim_in, lbnd_in, ubnd_in,
                             in, in_var, type, spread,  params, flags, 
                             badval_ptr, ndim_out, lbnd_out, ubnd_out, lbnd, 
-                            ubnd, npix_out, out, out_var, work, nused );
+                            ubnd, npix_out, out, out_var, work, nused, status );
 
 /* Otherwise, allocate workspace to perform the sub-division. */
       } else {
@@ -9805,7 +9945,7 @@ static void RebinAdaptively( AstMapping *this, int ndim_in,
             RebinAdaptively( this, ndim_in, lbnd_in, ubnd_in, in, in_var, 
                              type, spread, params, flags, tol, maxpix,
                              badval_ptr, ndim_out, lbnd_out, ubnd_out,
-                             lo, hi, npix_out, out, out_var, work, nused );
+                             lo, hi, npix_out, out, out_var, work, nused, status );
 
 /* Now set up a second section which covers the remaining half of the
    original input section. */
@@ -9818,7 +9958,7 @@ static void RebinAdaptively( AstMapping *this, int ndim_in,
                RebinAdaptively( this, ndim_in, lbnd_in, ubnd_in, in, in_var, 
                                 type, spread, params, flags, tol, maxpix,
                                 badval_ptr,  ndim_out, lbnd_out, ubnd_out,
-                                lo, hi, npix_out, out, out_var, work, nused );
+                                lo, hi, npix_out, out, out_var, work, nused, status );
             }
          }
 
@@ -9841,7 +9981,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                           const int *lbnd_out, const int *ubnd_out,
                           const int *lbnd, const int *ubnd, int npix_out,
                           void *out, void *out_var, double *work, 
-                          int *nused ) {
+                          int *nused, int *status ) {
 /*
 *  Name:
 *     RebinSection
@@ -10026,6 +10166,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Thread-specific data */ 
    AstPointSet *pset_in;         /* Input PointSet for transformation */
    AstPointSet *pset_out;        /* Output PointSet for transformation */
    const double *grad;           /* Pointer to gradient matrix of linear fit */
@@ -10058,11 +10199,14 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
    const double *par;            /* Pointer to parameter array */
    double fwhm;                  /* Full width half max. of gaussian */
    double lpar[ 1 ];             /* Local parameter array */
-   void (* kernel)( double, const double [], int, double * ); /* Kernel fn. */
+   void (* kernel)( double, const double [], int, double *, int * ); /* Kernel fn. */
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Get a pointer to a structure holding thread-specific global data values */
+   astGET_GLOBALS(this);
+ 
 /* Further initialisation. */
    pset_in = NULL;
    ptr_in = NULL;
@@ -10102,7 +10246,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
 
 /* Create a PointSet to hold the output grid coordinates and obtain an
    array of pointers to its coordinate data. */
-         pset_out = astPointSet( npoint, ndim_out, "" );
+         pset_out = astPointSet( npoint, ndim_out, "", status );
          ptr_out = astGetPoints( pset_out );
          if ( astOK ) {
 
@@ -10277,7 +10421,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
 
 /* Create a PointSet to hold the coordinates of the input pixels and
    obtain a pointer to its coordinate data. */
-         pset_in = astPointSet( npoint, ndim_in, "" );
+         pset_in = astPointSet( npoint, ndim_in, "", status );
          ptr_in = astGetPoints( pset_in );
          if ( astOK ) {
 
@@ -10416,7 +10560,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                                     (const double *const *) ptr_out, \
                                     flags, *( (Xtype *) badval_ptr ), \
                                     npix_out, (Xtype *) out, \
-                                    (Xtype *) out_var, work, nused ); \
+                                    (Xtype *) out_var, work, nused, status ); \
                   break;
        
 /* Use the above macro to invoke the appropriate function. */
@@ -10457,7 +10601,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                                    (const double *const *) ptr_out, \
                                    flags, *( (Xtype *) badval_ptr ), \
                                    npix_out, (Xtype *) out, \
-                                   (Xtype *) out_var, work, nused ); \
+                                   (Xtype *) out_var, work, nused, status ); \
                   break;
 
 /* Use the above macro to invoke the appropriate function. */
@@ -10509,7 +10653,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                   if ( neighb <= 0 ) {
                      neighb = 2;
                   } else {
-                     neighb = MaxI( 1, neighb );
+                     neighb = MaxI( 1, neighb, status );
                   }
                   break;
 
@@ -10524,7 +10668,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                   if ( neighb <= 0 ) {
                      neighb = 2;
                   } else {
-                     neighb = MaxI( 1, neighb );
+                     neighb = MaxI( 1, neighb, status );
                   }
                   break;
 
@@ -10536,7 +10680,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
 
 /* Store the required value of "k" in a local parameter array and pass
    this array to the kernel function. */
-                  lpar[ 0 ] = 0.5 / MaxD( 1.0, params[ 1 ] );
+                  lpar[ 0 ] = 0.5 / MaxD( 1.0, params[ 1 ], status );
                   par = lpar;
 
 /* Obtain the number of neighbouring pixels to use. If this is zero or
@@ -10547,7 +10691,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
 /* Calculate the maximum number of neighbouring pixels required by the
    width of the kernel, and use this value if preferable. */
                   neighb = MinI( neighb,
-                                 (int) ceil( MaxD( 1.0, params[ 1 ] ) ) );
+                                 (int) ceil( MaxD( 1.0, params[ 1 ], status ) ), status );
                   break;
 
 /* sinc(pi*x)*exp(-k*x*x) */
@@ -10557,7 +10701,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                   kernel = SincGauss;
 
 /* Constrain the full width half maximum of the gaussian factor. */
-                  fwhm = MaxD( 0.1, params[ 1 ] );
+                  fwhm = MaxD( 0.1, params[ 1 ], status );
 
 /* Store the required value of "k" in a local parameter array and pass
    this array to the kernel function. */
@@ -10580,7 +10724,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                   kernel = Gauss;
 
 /* Constrain the full width half maximum of the gaussian. */
-                  fwhm = MaxD( 0.1, params[ 1 ] );
+                  fwhm = MaxD( 0.1, params[ 1 ], status );
 
 /* Store the required value of "k" in a local parameter array and pass
    this array to the kernel function. */
@@ -10604,7 +10748,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
 
 /* Store the required value of "k" in a local parameter array and pass
    this array to the kernel function. */
-                  lpar[ 0 ] = 0.5 / MaxD( 1.0, params[ 1 ] );
+                  lpar[ 0 ] = 0.5 / MaxD( 1.0, params[ 1 ], status );
                   par = lpar;
 
 /* Obtain the number of neighbouring pixels to use. If this is zero or
@@ -10615,7 +10759,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
 /* Calculate the maximum number of neighbouring pixels required by the
    width of the kernel, and use this value if preferable. */
                   neighb = MinI( neighb,
-                                 (int) ceil( MaxD( 1.0, params[ 1 ] ) ) );
+                                 (int) ceil( MaxD( 1.0, params[ 1 ], status ) ), status );
                   break;
 
 /* sinc(pi*x)*sinc(k*pi*x) */
@@ -10626,7 +10770,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
 
 /* Store the required value of "k" in a local parameter array and pass
    this array to the kernel function. */
-                  lpar[ 0 ] = 0.5 / MaxD( 1.0, params[ 1 ] );
+                  lpar[ 0 ] = 0.5 / MaxD( 1.0, params[ 1 ], status );
                   par = lpar;
 
 /* Obtain the number of neighbouring pixels to use. If this is zero or
@@ -10637,7 +10781,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
 /* Calculate the maximum number of neighbouring pixels required by the
    width of the kernel, and use this value if preferable. */
                   neighb = MinI( neighb,
-                                 (int) ceil( MaxD( 1.0, params[ 1 ] ) ) );
+                                 (int) ceil( MaxD( 1.0, params[ 1 ], status ) ), status );
                   break;
             }
 
@@ -10653,7 +10797,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                                          kernel, neighb, par, flags, \
                                          *( (Xtype *) badval_ptr ), \
                                          npix_out, (Xtype *) out, \
-                                         (Xtype *) out_var, work, nused ); \
+                                         (Xtype *) out_var, work, nused, status ); \
                   break;
 
 /* Use the above macro to invoke the appropriate function. */
@@ -10687,7 +10831,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
 #define CASE_ERROR(X) \
             case TYPE_##X: \
                astError( AST__SISIN, "astRebin"#X"(%s): Invalid " \
-                         "pixel spreading scheme (%d) specified.", \
+                         "pixel spreading scheme (%d) specified.", status, \
                          astGetClass( unsimplified_mapping ), spread ); \
                break;
                                  
@@ -11251,9 +11395,10 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
                      int ndim_out, const int lbnd_out[], \
                      const int ubnd_out[], const int lbnd[], \
                      const int ubnd[], Xtype out[], Xtype out_var[], \
-                     double weights[], int *nused ) { \
+                     double weights[], int *nused, int *status ) { \
 \
 /* Local Variables: */ \
+   astDECLARE_GLOBALS;           /* Thread-specific data */ \
    AstMapping *simple;           /* Pointer to simplified Mapping */ \
    Xtype *d;                     /* Pointer to next output data value */ \
    Xtype *v;                     /* Pointer to next output variance value */ \
@@ -11273,8 +11418,8 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
 \
-/* Initialise local variables. */ \
-   simple = NULL; \
+/* Get a pointer to a structure holding thread-specific global data values */ \
+   astGET_GLOBALS(this); \
 \
 /* Loop to determine how many pixels the output array contains. */ \
    npix_out = 1; \
@@ -11283,6 +11428,7 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
    } \
 \
 /* If no input data was supplied, jump to the normalisation section. */ \
+   simple = NULL; \
    if( in ) { \
 \
 /* Ensure any supplied "in_var" pointer is ignored if no input variances are \
@@ -11306,10 +11452,10 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
    if necessary. */ \
       if ( astOK && ( ( ndim_in != nin ) || ( ndim_in < 1 ) ) ) { \
          astError( AST__NGDIN, "astRebinSeq"#X"(%s): Bad number of input grid " \
-                   "dimensions (%d).", astGetClass( this ), ndim_in ); \
+                   "dimensions (%d).", status, astGetClass( this ), ndim_in ); \
          if ( ndim_in != nin ) { \
             astError( AST__NGDIN, "The %s given requires %d coordinate value%s " \
-                      "to specify an input position.", \
+                      "to specify an input position.", status, \
                       astGetClass( this ), nin, ( nin == 1 ) ? "" : "s" ); \
          } \
       } \
@@ -11319,10 +11465,10 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
    error if necessary. */ \
       if ( astOK && ( ( ndim_out != nout ) || ( ndim_out < 1 ) ) ) { \
          astError( AST__NGDIN, "astRebinSeq"#X"(%s): Bad number of output grid " \
-                   "dimensions (%d).", astGetClass( this ), ndim_out ); \
+                   "dimensions (%d).", status, astGetClass( this ), ndim_out ); \
          if ( ndim_out != nout ) { \
             astError( AST__NGDIN, "The %s given generates %s%d coordinate " \
-                      "value%s for each output position.", astGetClass( this ), \
+                      "value%s for each output position.", status, astGetClass( this ), \
                       ( nout < ndim_out ) ? "only " : "", nout, \
                       ( nout == 1 ) ? "" : "s" ); \
          } \
@@ -11335,9 +11481,9 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
             if ( lbnd_in[ idim ] > ubnd_in[ idim ] ) { \
                astError( AST__GBDIN, "astRebinSeq"#X"(%s): Lower bound of " \
                          "input grid (%d) exceeds corresponding upper bound " \
-                         "(%d).", astGetClass( this ), \
+                         "(%d).", status, astGetClass( this ), \
                          lbnd_in[ idim ], ubnd_in[ idim ] ); \
-               astError( AST__GBDIN, "Error in input dimension %d.", \
+               astError( AST__GBDIN, "Error in input dimension %d.", status, \
                          idim + 1 ); \
                break; \
             } \
@@ -11348,17 +11494,17 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
    report an error if necessary. */ \
       if ( astOK && ( tol < 0.0 ) ) { \
          astError( AST__PATIN, "astRebinSeq"#X"(%s): Invalid positional " \
-                   "accuracy tolerance (%.*g pixel).", \
+                   "accuracy tolerance (%.*g pixel).", status, \
                    astGetClass( this ), DBL_DIG, tol ); \
-         astError( AST__PATIN, "This value should not be less than zero." ); \
+         astError( AST__PATIN, "This value should not be less than zero." , status); \
       } \
 \
 /* Check that the initial scale size in pixels supplied is valid and \
    report an error if necessary. */ \
       if ( astOK && ( maxpix < 0 ) ) { \
          astError( AST__SSPIN, "astRebinSeq"#X"(%s): Invalid initial scale " \
-                   "size in pixels (%d).", astGetClass( this ), maxpix ); \
-         astError( AST__SSPIN, "This value should not be less than zero." ); \
+                   "size in pixels (%d).", status, astGetClass( this ), maxpix ); \
+         astError( AST__SSPIN, "This value should not be less than zero." , status); \
       } \
 \
 /* Check that the lower and upper bounds of the output grid are \
@@ -11368,9 +11514,9 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
             if ( lbnd_out[ idim ] > ubnd_out[ idim ] ) { \
                astError( AST__GBDIN, "astRebinSeq"#X"(%s): Lower bound of " \
                          "output grid (%d) exceeds corresponding upper bound " \
-                         "(%d).", astGetClass( this ), \
+                         "(%d).", status, astGetClass( this ), \
                          lbnd_out[ idim ], ubnd_out[ idim ] ); \
-               astError( AST__GBDIN, "Error in output dimension %d.", \
+               astError( AST__GBDIN, "Error in output dimension %d.", status, \
                          idim + 1 ); \
                break; \
             } \
@@ -11383,7 +11529,7 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
             if ( lbnd[ idim ] > ubnd[ idim ] ) { \
                astError( AST__GBDIN, "astRebinSeq"#X"(%s): Lower bound of " \
                          "input region (%d) exceeds corresponding upper " \
-                         "bound (%d).", astGetClass( this ), \
+                         "bound (%d).", status, astGetClass( this ), \
                          lbnd[ idim ], ubnd[ idim ] ); \
 \
 /* Also check that the input region lies wholly within the input \
@@ -11391,18 +11537,18 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
             } else if ( lbnd[ idim ] < lbnd_in[ idim ] ) { \
                astError( AST__GBDIN, "astRebinSeq"#X"(%s): Lower bound of " \
                          "input region (%d) is less than corresponding " \
-                         "bound of input grid (%d).", astGetClass( this ), \
+                         "bound of input grid (%d).", status, astGetClass( this ), \
                          lbnd[ idim ], lbnd_in[ idim ] ); \
             } else if ( ubnd[ idim ] > ubnd_in[ idim ] ) { \
                astError( AST__GBDIN, "astRebinSeq"#X"(%s): Upper bound of " \
                          "input region (%d) exceeds corresponding " \
-                         "bound of input grid (%d).", astGetClass( this ), \
+                         "bound of input grid (%d).", status, astGetClass( this ), \
                          ubnd[ idim ], ubnd_in[ idim ] ); \
             } \
 \
 /* Say which dimension produced the error. */ \
             if ( !astOK ) { \
-               astError( AST__GBDIN, "Error in output dimension %d.", \
+               astError( AST__GBDIN, "Error in output dimension %d.", status, \
                          idim + 1 ); \
                break; \
             } \
@@ -11414,7 +11560,7 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
          if( astOK ) { \
             astError( AST__BDPAR, "astRebinSeq"#X"(%s): Incompatible flags " \
                       "AST__GENVAR and AST__USEVAR have been specified " \
-                      "together (programming error).", astGetClass( this ) ); \
+                      "together (programming error).", status, astGetClass( this ) ); \
          } \
       } \
 \
@@ -11424,11 +11570,11 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
          if( ( flags & AST__USEVAR ) ) { \
             astError( AST__BDPAR, "astRebinSeq"#X"(%s): The AST__USEVAR flag " \
                       "was specified but no input variance array was supplied " \
-                      "(programming error).", astGetClass( this )  ); \
+                      "(programming error).", status, astGetClass( this )  ); \
          } else if( ( flags & AST__VARWGT ) ) { \
             astError( AST__BDPAR, "astRebinSeq"#X"(%s): The AST__VARWGT flag " \
                       "was specified but no input variance array was supplied " \
-                      "(programming error).", astGetClass( this )  ); \
+                      "(programming error).", status, astGetClass( this )  ); \
          } \
       } \
 \
@@ -11438,11 +11584,11 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
          if( ( flags & AST__USEVAR ) ) { \
             astError( AST__BDPAR, "astRebinSeq"#X"(%s): The AST__USEVAR flag " \
                       "was specified but no output variance array was supplied " \
-                      "(programming error).", astGetClass( this )  ); \
+                      "(programming error).", status, astGetClass( this )  ); \
          } else if( ( flags & AST__GENVAR ) ) { \
             astError( AST__BDPAR, "astRebinSeq"#X"(%s): The AST__GENVAR flag " \
                       "was specified but no output variance array was supplied " \
-                      "(programming error).", astGetClass( this )  ); \
+                      "(programming error).", status, astGetClass( this )  ); \
          } \
       } \
 \
@@ -11470,7 +11616,7 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
    Mapping is not defined. */ \
       if ( !astGetTranForward( simple ) && astOK ) { \
          astError( AST__TRNND, "astRebinSeq"#X"(%s): An forward coordinate " \
-                   "transformation is not defined by the %s supplied.", \
+                   "transformation is not defined by the %s supplied.", status, \
                    astGetClass( unsimplified_mapping ), \
                    astGetClass( unsimplified_mapping ) ); \
       } \
@@ -11511,10 +11657,11 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
                        (const void *) &badval, \
                        ndim_out, lbnd_out, ubnd_out, \
                        lbnd, ubnd, npix_out, \
-                       (void *) out, (void *) out_var, weights, nused ); \
+                       (void *) out, (void *) out_var, weights, nused, status ); \
 \
 /* Annul the pointer to the simplified/cloned Mapping. */ \
       simple = astAnnul( simple ); \
+\
    } \
 \
 /* If required, finalise the sequence. */ \
@@ -11603,7 +11750,7 @@ static void RebinWithBlocking( AstMapping *this, const double *linear_fit,
                                const int *lbnd_out, const int *ubnd_out,
                                const int *lbnd, const int *ubnd, int npix_out,
                                void *out, void *out_var, double *work,
-                               int *nused ) {
+                               int *nused, int *status ) {
 /*
 *  Name:
 *     RebinWithBlocking
@@ -11880,7 +12027,7 @@ static void RebinWithBlocking( AstMapping *this, const double *linear_fit,
    extend outside the grid itself. */
          lbnd_block[ idim ] = lbnd[ idim ];
          ubnd_block[ idim ] = MinI( lbnd[ idim ] + dim_block[ idim ] - 1,
-                                    ubnd[ idim ] );
+                                    ubnd[ idim ], status );
       }
 
 /* Rebin each block of input pixels. */
@@ -11894,7 +12041,7 @@ static void RebinWithBlocking( AstMapping *this, const double *linear_fit,
          RebinSection( this, linear_fit, ndim_in, lbnd_in, ubnd_in, in, 
                        in_var, type, spread, params, flags, badval_ptr,
                        ndim_out, lbnd_out, ubnd_out, lbnd_block, ubnd_block, 
-                       npix_out, out, out_var, work, nused );
+                       npix_out, out, out_var, work, nused, status );
 
 /* Update the block extent to identify the next block of input pixels. */
          idim = 0;
@@ -11907,10 +12054,10 @@ static void RebinWithBlocking( AstMapping *this, const double *linear_fit,
    the resulting extent does not go outside the region being rebinned. */
             if ( ubnd_block[ idim ] < ubnd[ idim ] ) {
                lbnd_block[ idim ] = MinI( lbnd_block[ idim ] +
-                                          dim_block[ idim ], ubnd[ idim ] );
+                                          dim_block[ idim ], ubnd[ idim ], status );
                ubnd_block[ idim ] = MinI( lbnd_block[ idim ] +
                                           dim_block[ idim ] - 1,
-                                          ubnd[ idim ] );
+                                          ubnd[ idim ], status );
                break;
 
 /* If any less significant dimensions are found where the upper bound
@@ -11919,7 +12066,7 @@ static void RebinWithBlocking( AstMapping *this, const double *linear_fit,
             } else {
                lbnd_block[ idim ] = lbnd[ idim ];
                ubnd_block[ idim ] = MinI( lbnd[ idim ] + dim_block[ idim ] - 1,
-                                          ubnd[ idim ] );
+                                          ubnd[ idim ], status );
 
 /* All the blocks have been processed once the position along the most
    significant dimension has been reset. */
@@ -11936,7 +12083,7 @@ static void RebinWithBlocking( AstMapping *this, const double *linear_fit,
 }
 
 static void ReportPoints( AstMapping *this, int forward,
-                          AstPointSet *in_points, AstPointSet *out_points ) {
+                          AstPointSet *in_points, AstPointSet *out_points, int *status ) {
 /*
 *+
 *  Name:
@@ -12922,9 +13069,10 @@ static int Resample##X( AstMapping *this, int ndim_in, \
                         int maxpix, Xtype badval, \
                         int ndim_out, const int lbnd_out[], \
                         const int ubnd_out[], const int lbnd[], \
-                        const int ubnd[], Xtype out[], Xtype out_var[] ) { \
+                        const int ubnd[], Xtype out[], Xtype out_var[], int *status ) { \
 \
 /* Local Variables: */ \
+   astDECLARE_GLOBALS;           /* Thread-specific data */ \
    AstMapping *simple;           /* Pointer to simplified Mapping */ \
    int idim;                     /* Loop counter for coordinate dimensions */ \
    int nin;                      /* Number of Mapping input coordinates */ \
@@ -12938,6 +13086,9 @@ static int Resample##X( AstMapping *this, int ndim_in, \
 /* Check the global error status. */ \
    if ( !astOK ) return result; \
 \
+/* Get a pointer to a structure holding thread-specific global data values */ \
+   astGET_GLOBALS(this); \
+\
 /* Obtain values for the Nin and Nout attributes of the Mapping. */ \
    nin = astGetNin( this ); \
    nout = astGetNout( this ); \
@@ -12947,10 +13098,10 @@ static int Resample##X( AstMapping *this, int ndim_in, \
    if necessary. */ \
    if ( astOK && ( ( ndim_in != nin ) || ( ndim_in < 1 ) ) ) { \
       astError( AST__NGDIN, "astResample"#X"(%s): Bad number of input grid " \
-                "dimensions (%d).", astGetClass( this ), ndim_in ); \
+                "dimensions (%d).", status, astGetClass( this ), ndim_in ); \
       if ( ndim_in != nin ) { \
          astError( AST__NGDIN, "The %s given requires %d coordinate value%s " \
-                   "to specify an input position.", \
+                   "to specify an input position.", status, \
                    astGetClass( this ), nin, ( nin == 1 ) ? "" : "s" ); \
       } \
    } \
@@ -12960,10 +13111,10 @@ static int Resample##X( AstMapping *this, int ndim_in, \
    error if necessary. */ \
    if ( astOK && ( ( ndim_out != nout ) || ( ndim_out < 1 ) ) ) { \
       astError( AST__NGDIN, "astResample"#X"(%s): Bad number of output grid " \
-                "dimensions (%d).", astGetClass( this ), ndim_out ); \
+                "dimensions (%d).", status, astGetClass( this ), ndim_out ); \
       if ( ndim_out != nout ) { \
          astError( AST__NGDIN, "The %s given generates %s%d coordinate " \
-                   "value%s for each output position.", astGetClass( this ), \
+                   "value%s for each output position.", status, astGetClass( this ), \
                    ( nout < ndim_out ) ? "only " : "", nout, \
                    ( nout == 1 ) ? "" : "s" ); \
       } \
@@ -12976,9 +13127,9 @@ static int Resample##X( AstMapping *this, int ndim_in, \
          if ( lbnd_in[ idim ] > ubnd_in[ idim ] ) { \
             astError( AST__GBDIN, "astResample"#X"(%s): Lower bound of " \
                       "input grid (%d) exceeds corresponding upper bound " \
-                      "(%d).", astGetClass( this ), \
+                      "(%d).", status, astGetClass( this ), \
                       lbnd_in[ idim ], ubnd_in[ idim ] ); \
-            astError( AST__GBDIN, "Error in input dimension %d.", \
+            astError( AST__GBDIN, "Error in input dimension %d.", status, \
                       idim + 1 ); \
             break; \
          } \
@@ -12989,17 +13140,17 @@ static int Resample##X( AstMapping *this, int ndim_in, \
    report an error if necessary. */ \
    if ( astOK && ( tol < 0.0 ) ) { \
       astError( AST__PATIN, "astResample"#X"(%s): Invalid positional " \
-                "accuracy tolerance (%.*g pixel).", \
+                "accuracy tolerance (%.*g pixel).", status, \
                 astGetClass( this ), DBL_DIG, tol ); \
-      astError( AST__PATIN, "This value should not be less than zero." ); \
+      astError( AST__PATIN, "This value should not be less than zero." , status); \
    } \
 \
 /* Check that the initial scale size in pixels supplied is valid and \
    report an error if necessary. */ \
    if ( astOK && ( maxpix < 0 ) ) { \
       astError( AST__SSPIN, "astResample"#X"(%s): Invalid initial scale " \
-                "size in pixels (%d).", astGetClass( this ), maxpix ); \
-      astError( AST__SSPIN, "This value should not be less than zero." ); \
+                "size in pixels (%d).", status, astGetClass( this ), maxpix ); \
+      astError( AST__SSPIN, "This value should not be less than zero." , status); \
    } \
 \
 /* Check that the lower and upper bounds of the output grid are \
@@ -13009,9 +13160,9 @@ static int Resample##X( AstMapping *this, int ndim_in, \
          if ( lbnd_out[ idim ] > ubnd_out[ idim ] ) { \
             astError( AST__GBDIN, "astResample"#X"(%s): Lower bound of " \
                       "output grid (%d) exceeds corresponding upper bound " \
-                      "(%d).", astGetClass( this ), \
+                      "(%d).", status, astGetClass( this ), \
                       lbnd_out[ idim ], ubnd_out[ idim ] ); \
-            astError( AST__GBDIN, "Error in output dimension %d.", \
+            astError( AST__GBDIN, "Error in output dimension %d.", status, \
                       idim + 1 ); \
             break; \
          } \
@@ -13024,7 +13175,7 @@ static int Resample##X( AstMapping *this, int ndim_in, \
          if ( lbnd[ idim ] > ubnd[ idim ] ) { \
             astError( AST__GBDIN, "astResample"#X"(%s): Lower bound of " \
                       "output region (%d) exceeds corresponding upper " \
-                      "bound (%d).", astGetClass( this ), \
+                      "bound (%d).", status, astGetClass( this ), \
                       lbnd[ idim ], ubnd[ idim ] ); \
 \
 /* Also check that the output region lies wholly within the output \
@@ -13032,18 +13183,18 @@ static int Resample##X( AstMapping *this, int ndim_in, \
          } else if ( lbnd[ idim ] < lbnd_out[ idim ] ) { \
             astError( AST__GBDIN, "astResample"#X"(%s): Lower bound of " \
                       "output region (%d) is less than corresponding " \
-                      "bound of output grid (%d).", astGetClass( this ), \
+                      "bound of output grid (%d).", status, astGetClass( this ), \
                       lbnd[ idim ], lbnd_out[ idim ] ); \
          } else if ( ubnd[ idim ] > ubnd_out[ idim ] ) { \
             astError( AST__GBDIN, "astResample"#X"(%s): Upper bound of " \
                       "output region (%d) exceeds corresponding " \
-                      "bound of output grid (%d).", astGetClass( this ), \
+                      "bound of output grid (%d).", status, astGetClass( this ), \
                       ubnd[ idim ], ubnd_out[ idim ] ); \
          } \
 \
 /* Say which dimension produced the error. */ \
          if ( !astOK ) { \
-            astError( AST__GBDIN, "Error in output dimension %d.", \
+            astError( AST__GBDIN, "Error in output dimension %d.", status, \
                       idim + 1 ); \
             break; \
          } \
@@ -13055,13 +13206,13 @@ static int Resample##X( AstMapping *this, int ndim_in, \
       if( tol == 0.0 ) { \
          astError( AST__CNFLX, "astResample"#X"(%s): Flux conservation was " \
                    "requested but cannot be performed because zero tolerance " \
-                   "was also specified.", astGetClass( this ) ); \
+                   "was also specified.", status, astGetClass( this ) ); \
 \
 /* Also check "nin" and "nout" are equal. */ \
       } else if( nin != nout ) { \
          astError( AST__CNFLX, "astResample"#X"(%s): Flux conservation was " \
                 "requested but cannot be performed because the Mapping " \
-                "has different numbers of inputs and outputs.", \
+                "has different numbers of inputs and outputs.", status, \
                 astGetClass( this ) ); \
       } \
    } \
@@ -13091,7 +13242,7 @@ static int Resample##X( AstMapping *this, int ndim_in, \
    Mapping is not defined. */ \
    if ( !astGetTranInverse( simple ) && astOK ) { \
       astError( AST__TRNND, "astResample"#X"(%s): An inverse coordinate " \
-                "transformation is not defined by the %s supplied.", \
+                "transformation is not defined by the %s supplied.", status, \
                 astGetClass( unsimplified_mapping ), \
                 astGetClass( unsimplified_mapping ) ); \
    } \
@@ -13109,7 +13260,7 @@ static int Resample##X( AstMapping *this, int ndim_in, \
                                 (const void *) &badval, \
                                 ndim_out, lbnd_out, ubnd_out, \
                                 lbnd, ubnd, \
-                                (void *) out, (void *) out_var ); \
+                                (void *) out, (void *) out_var, status ); \
 \
 /* Annul the pointer to the simplified/cloned Mapping. */ \
    simple = astAnnul( simple ); \
@@ -13148,7 +13299,7 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
                                int maxpix, const void *badval_ptr,
                                int ndim_out, const int *lbnd_out,
                                const int *ubnd_out, const int *lbnd,
-                               const int *ubnd, void *out, void *out_var ) {
+                               const int *ubnd, void *out, void *out_var, int *status ) {
 /*
 *  Name:
 *     ResampleAdaptively
@@ -13511,7 +13662,7 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
                                         in, in_var, type, interp, finterp,
                                         params, flags, badval_ptr,
                                         ndim_out, lbnd_out, ubnd_out,
-                                        lbnd, ubnd, out, out_var );
+                                        lbnd, ubnd, out, out_var, status );
 
 /* Otherwise, allocate workspace to perform the sub-division. */
       } else {
@@ -13539,7 +13690,7 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
                                          params, flags, tol, maxpix,
                                          badval_ptr, ndim_out,
                                          lbnd_out, ubnd_out,
-                                         lo, hi, out, out_var );
+                                         lo, hi, out, out_var, status );
 
 /* Now set up a second section which covers the remaining half of the
    original output section. */
@@ -13554,7 +13705,7 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
                                              params, flags, tol, maxpix,
                                              badval_ptr,  ndim_out,
                                              lbnd_out, ubnd_out,
-                                             lo, hi, out, out_var );
+                                             lo, hi, out, out_var, status );
             }
          }
 
@@ -13584,7 +13735,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                             const void *badval_ptr, int ndim_out,
                             const int *lbnd_out, const int *ubnd_out,
                             const int *lbnd, const int *ubnd,
-                            void *out, void *out_var ) {
+                            void *out, void *out_var, int *status ) {
 /*
 *  Name:
 *     ResampleSection
@@ -13780,6 +13931,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Thread-specific data */ 
    AstPointSet *pset_in;         /* Input PointSet for transformation */
    AstPointSet *pset_out;        /* Output PointSet for transformation */
    const double *grad;           /* Pointer to gradient matrix of linear fit */
@@ -13814,10 +13966,14 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
    int s;                        /* Temporary variable for strides */
    int usevar;                   /* Process variance array? */
    void (* gifunc)();            /* General interpolation function */
-   void (* kernel)( double, const double [], int, double * ); /* Kernel fn. */
+   void (* kernel)( double, const double [], int, double *, int * ); /* Kernel fn. */
+   void (* fkernel)( double, const double [], int, double * ); /* User kernel fn. */
 
 /* Initialise. */
    result = 0;
+
+/* Get a pointer to a structure holding thread-specific global data values */
+   astGET_GLOBALS(this);
 
 /* Check the global error status. */
    if ( !astOK ) return result;
@@ -13828,6 +13984,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
    neighb = 0;
    gifunc = NULL;
    kernel = NULL;
+   fkernel = NULL;
 
 /* See if we are conserving flux */
    conserve = flags & AST__CONSERVEFLUX;
@@ -13838,7 +13995,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
    an error. */
    if( ( flags & AST__NOBAD ) && conserve ) {
       astError( AST__BADFLG, "astResample: Cannot use the AST__NOBAD and "
-                "AST__CONSERVEFLUX flags together (programming error)." );
+                "AST__CONSERVEFLUX flags together (programming error)." , status);
    }
 
 /* Calculate the number of output points, as given by the product of
@@ -13872,7 +14029,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 
 /* Create a PointSet to hold the input grid coordinates and obtain an
    array of pointers to its coordinate data. */
-         pset_in = astPointSet( npoint, ndim_in, "" );
+         pset_in = astPointSet( npoint, ndim_in, "", status );
          ptr_in = astGetPoints( pset_in );
          if ( astOK ) {
 
@@ -14034,13 +14191,13 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
          if( conserve && astOK ) { 
             astError( AST__CNFLX, "astResampleSection(%s): Flux conservation "
                 "was requested but cannot be performed because either the Mapping "
-                "is too non-linear, or the requested tolerance is too small.",
+                "is too non-linear, or the requested tolerance is too small.", status,
                  astGetClass( this ) ); 
          } 
 
 /* Create a PointSet to hold the coordinates of the output pixels and
    obtain a pointer to its coordinate data. */
-         pset_out = astPointSet( npoint, ndim_out, "" );
+         pset_out = astPointSet( npoint, ndim_out, "", status );
          ptr_out = astGetPoints( pset_out );
          if ( astOK ) {
 
@@ -14185,7 +14342,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                                          npoint, offset, \
                                          (const double *const *) ptr_in, \
                                          flags, *( (Xtype *) badval_ptr ), \
-                                         (Xtype *) out, (Xtype *) out_var ); \
+                                         (Xtype *) out, (Xtype *) out_var, status ); \
                   break;
        
 /* Use the above macro to invoke the appropriate function. */
@@ -14225,7 +14382,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                                         npoint, offset, \
                                         (const double *const *) ptr_in, \
                                         flags, *( (Xtype *) badval_ptr ), \
-                                        (Xtype *) out, (Xtype *) out_var ); \
+                                        (Xtype *) out, (Xtype *) out_var, status ); \
                   break;
 
 /* Use the above macro to invoke the appropriate function. */
@@ -14276,7 +14433,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                   if ( neighb <= 0 ) {
                      neighb = 2;
                   } else {
-                     neighb = MaxI( 1, neighb );
+                     neighb = MaxI( 1, neighb, status );
                   }
                   break;
 
@@ -14288,7 +14445,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 
 /* Store the required value of "k" in a local parameter array and pass
    this array to the kernel function. */
-                  lpar[ 0 ] = 0.5 / MaxD( 1.0, params[ 1 ] );
+                  lpar[ 0 ] = 0.5 / MaxD( 1.0, params[ 1 ], status );
                   par = lpar;
 
 /* Obtain the number of neighbouring pixels to use. If this is zero or
@@ -14299,7 +14456,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 /* Calculate the maximum number of neighbouring pixels required by the
    width of the kernel, and use this value if preferable. */
                   neighb = MinI( neighb,
-                                 (int) ceil( MaxD( 1.0, params[ 1 ] ) ) );
+                                 (int) ceil( MaxD( 1.0, params[ 1 ], status ) ), status );
                   break;
 
 /* somb(pi*x) interpolation. */
@@ -14313,7 +14470,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                   if ( neighb <= 0 ) {
                      neighb = 2;
                   } else {
-                     neighb = MaxI( 1, neighb );
+                     neighb = MaxI( 1, neighb, status );
                   }
                   break;
 
@@ -14325,7 +14482,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 
 /* Store the required value of "k" in a local parameter array and pass
    this array to the kernel function. */
-                  lpar[ 0 ] = 0.5 / MaxD( 1.0, params[ 1 ] );
+                  lpar[ 0 ] = 0.5 / MaxD( 1.0, params[ 1 ], status );
                   par = lpar;
 
 /* Obtain the number of neighbouring pixels to use. If this is zero or
@@ -14336,7 +14493,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 /* Calculate the maximum number of neighbouring pixels required by the
    width of the kernel, and use this value if preferable. */
                   neighb = MinI( neighb,
-                                 (int) ceil( MaxD( 1.0, params[ 1 ] ) ) );
+                                 (int) ceil( MaxD( 1.0, params[ 1 ], status ) ), status );
                   break;
 
 /* sinc(pi*x)*exp(-k*x*x) interpolation. */
@@ -14346,7 +14503,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                   kernel = SincGauss;
 
 /* Constrain the full width half maximum of the gaussian factor. */
-                  fwhm = MaxD( 0.1, params[ 1 ] );
+                  fwhm = MaxD( 0.1, params[ 1 ], status );
 
 /* Store the required value of "k" in a local parameter array and pass
    this array to the kernel function. */
@@ -14370,7 +14527,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 
 /* Store the required value of "k" in a local parameter array and pass
    this array to the kernel function. */
-                  lpar[ 0 ] = 0.5 / MaxD( 1.0, params[ 1 ] );
+                  lpar[ 0 ] = 0.5 / MaxD( 1.0, params[ 1 ], status );
                   par = lpar;
 
 /* Obtain the number of neighbouring pixels to use. If this is zero or
@@ -14381,18 +14538,18 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 /* Calculate the maximum number of neighbouring pixels required by the
    width of the kernel, and use this value if preferable. */
                   neighb = MinI( neighb,
-                                 (int) ceil( MaxD( 1.0, params[ 1 ] ) ) );
+                                 (int) ceil( MaxD( 1.0, params[ 1 ], status ) ), status );
                   break;
 
 /* User-supplied kernel. */
 /* --------------------- */
 /* Assign the kernel function. */
                case AST__UKERN1:
-                  kernel = (void (*)( double, const double [],
-                                      int, double * )) finterp;
+                  fkernel = (void (*)( double, const double [],
+                                       int, double * )) finterp;
 
 /* Calculate the number of neighbouring pixels to use. */
-                  neighb = MaxI( 1, (int) floor( params[ 0 ] + 0.5 ) );
+                  neighb = MaxI( 1, (int) floor( params[ 0 ] + 0.5 ), status );
 
 /* Pass a pointer to the "params" array. */
                   par = params;
@@ -14409,9 +14566,9 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                                          (Xtype *) in, (Xtype *) in_var, \
                                          npoint, offset, \
                                          (const double *const *) ptr_in, \
-                                         kernel, neighb, par, flags, \
+                                         kernel, fkernel, neighb, par, flags, \
                                          *( (Xtype *) badval_ptr ), \
-                                         (Xtype *) out, (Xtype *) out_var ); \
+                                         (Xtype *) out, (Xtype *) out_var, status ); \
                   break;
 
 /* Use the above macro to invoke the appropriate function. */
@@ -14494,7 +14651,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                   } else { \
                      astError( astStatus, "astResample"#X"(%s): Error " \
                                "signalled by user-supplied sub-pixel " \
-                               "interpolation function.", \
+                               "interpolation function.", status, \
                                astGetClass( unsimplified_mapping ) ); \
                   } \
                   break;
@@ -14529,7 +14686,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 #define CASE_ERROR(X) \
             case TYPE_##X: \
                astError( AST__SISIN, "astResample"#X"(%s): Invalid " \
-                         "sub-pixel interpolation scheme (%d) specified.", \
+                         "sub-pixel interpolation scheme (%d) specified.", status, \
                          astGetClass( unsimplified_mapping ), interp ); \
                break;
                                  
@@ -14567,7 +14724,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
       case ( TYPE_##X ): \
          ConserveFlux##X( factor, npoint, offset, *( (Xtype *) badval_ptr ), \
                           (Xtype *) out, \
-                          (Xtype *) ( usevar ? out_var : NULL ) ); \
+                          (Xtype *) ( usevar ? out_var : NULL ), status ); \
          break;
        
 /* Use the above macro to invoke the appropriate function. */
@@ -14614,7 +14771,7 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
                                  const void *badval_ptr, int ndim_out,
                                  const int *lbnd_out, const int *ubnd_out,
                                  const int *lbnd, const int *ubnd,
-                                 void *out, void *out_var ) {
+                                 void *out, void *out_var, int *status ) {
 /*
 *  Name:
 *     ResampleWithBlocking
@@ -14636,7 +14793,7 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
 *                               const void *badval_ptr, int ndim_out,
 *                               const int *lbnd_out, const int *ubnd_out,
 *                               const int *lbnd, const int *ubnd,
-*                               void *out, void *out_var )
+*                               void *out, void *out_var, int *status )
 
 *  Class Membership:
 *     Mapping member function.
@@ -14797,6 +14954,8 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
 *
 *        If no output variance estimates are required, a NULL pointer
 *        should be given.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The number of output grid points for which no valid output value 
@@ -14904,13 +15063,13 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
    extend outside the grid itself. */
          lbnd_block[ idim ] = lbnd[ idim ];
          ubnd_block[ idim ] = MinI( lbnd[ idim ] + dim_block[ idim ] - 1,
-                                    ubnd[ idim ] );
+                                    ubnd[ idim ], status );
       }
 
 /* Determine the flux conservation constant if needed. */
 /* --------------------------------------------------- */
    if( ( flags & AST__CONSERVEFLUX ) && linear_fit ) {
-      factor = MatrixDet( ndim_in, linear_fit + ndim_in );
+      factor = MatrixDet( ndim_in, linear_fit + ndim_in, status );
    } else {
       factor = 1.0;
    }
@@ -14929,7 +15088,7 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
                                     in, in_var, type, interp, finterp, params,
                                     factor, flags, badval_ptr,
                                     ndim_out, lbnd_out, ubnd_out,
-                                    lbnd_block, ubnd_block, out, out_var );
+                                    lbnd_block, ubnd_block, out, out_var, status );
 
 /* Update the block extent to identify the next block of output
    pixels. */
@@ -14944,10 +15103,10 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
    resampled. */
             if ( ubnd_block[ idim ] < ubnd[ idim ] ) {
                lbnd_block[ idim ] = MinI( lbnd_block[ idim ] +
-                                          dim_block[ idim ], ubnd[ idim ] );
+                                          dim_block[ idim ], ubnd[ idim ], status );
                ubnd_block[ idim ] = MinI( lbnd_block[ idim ] +
                                           dim_block[ idim ] - 1,
-                                          ubnd[ idim ] );
+                                          ubnd[ idim ], status );
                break;
 
 /* If any less significant dimensions are found where the upper bound
@@ -14956,7 +15115,7 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
             } else {
                lbnd_block[ idim ] = lbnd[ idim ];
                ubnd_block[ idim ] = MinI( lbnd[ idim ] + dim_block[ idim ] - 1,
-                                          ubnd[ idim ] );
+                                          ubnd[ idim ], status );
 
 /* All the blocks have been processed once the position along the most
    significant dimension has been reset. */
@@ -14978,7 +15137,7 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
    return result;
 }
 
-static void SetAttrib( AstObject *this_object, const char *setting ) {
+static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
 *     astSetAttrib
@@ -15069,14 +15228,14 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
         MATCH( "issimple" ) ||
         MATCH( "tranforward" ) ||
         MATCH( "traninverse" ) ) {
-      astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.",
+      astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.", status,
                 setting, astGetClass( this ) );
-      astError( AST__NOWRT, "This is a read-only attribute." );
+      astError( AST__NOWRT, "This is a read-only attribute." , status);
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      (*parent_setattrib)( this_object, setting );
+      (*parent_setattrib)( this_object, setting, status );
    }
 
 /* Undefine macros local to this function. */
@@ -15084,7 +15243,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 }
 
 static void Sinc( double offset, const double params[], int flags,
-                  double *value ) {
+                  double *value, int *status ) {
 /*
 *  Name:
 *     Sinc
@@ -15098,7 +15257,7 @@ static void Sinc( double offset, const double params[], int flags,
 *  Synopsis:
 *     #include "mapping.h"
 *     void Sinc( double offset, const double params[], int flags,
-*                double *value )
+*                double *value, int *status )
 
 *  Class Membership:
 *     Mapping member function.
@@ -15118,6 +15277,8 @@ static void Sinc( double offset, const double params[], int flags,
 *        Not used.
 *     value
 *        Pointer to a double to receive the calculated kernel value.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - This function does not perform error checking and does not
@@ -15143,7 +15304,7 @@ static void Sinc( double offset, const double params[], int flags,
 }
 
 static void SincCos( double offset, const double params[], int flags,
-                     double *value ) {
+                     double *value, int *status ) {
 /*
 *  Name:
 *     SincCos
@@ -15157,7 +15318,7 @@ static void SincCos( double offset, const double params[], int flags,
 *  Synopsis:
 *     #include "mapping.h"
 *     void SincCos( double offset, const double params[], int flags,
-*                   double *value )
+*                   double *value, int *status )
 
 *  Class Membership:
 *     Mapping member function.
@@ -15179,6 +15340,8 @@ static void SincCos( double offset, const double params[], int flags,
 *        Not used.
 *     value
 *        Pointer to a double to receive the calculated kernel value.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - This function does not perform error checking and does not
@@ -15218,7 +15381,7 @@ static void SincCos( double offset, const double params[], int flags,
 }
 
 static void SincGauss( double offset, const double params[], int flags,
-                       double *value ) {
+                       double *value, int *status ) {
 /*
 *  Name:
 *     SincGauss
@@ -15232,7 +15395,7 @@ static void SincGauss( double offset, const double params[], int flags,
 *  Synopsis:
 *     #include "mapping.h"
 *     void SincGauss( double offset, const double params[], int flags,
-*                     double *value )
+*                     double *value, int *status )
 
 *  Class Membership:
 *     Mapping member function.
@@ -15253,6 +15416,8 @@ static void SincGauss( double offset, const double params[], int flags,
 *        Not used.
 *     value
 *        Pointer to a double to receive the calculated kernel value.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - This function does not perform error checking and does not
@@ -15280,7 +15445,7 @@ static void SincGauss( double offset, const double params[], int flags,
 }
 
 static void SincSinc( double offset, const double params[], int flags,
-                      double *value ) {
+                      double *value, int *status ) {
 /*
 *  Name:
 *     SincSinc
@@ -15294,7 +15459,7 @@ static void SincSinc( double offset, const double params[], int flags,
 *  Synopsis:
 *     #include "mapping.h"
 *     void SincSinc( double offset, const double params[], int flags,
-*                    double *value )
+*                    double *value, int *status )
 
 *  Class Membership:
 *     Mapping member function.
@@ -15316,6 +15481,8 @@ static void SincSinc( double offset, const double params[], int flags,
 *        Not used.
 *     value
 *        Pointer to a double to receive the calculated kernel value.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - This function does not perform error checking and does not
@@ -15354,7 +15521,7 @@ static void SincSinc( double offset, const double params[], int flags,
    }
 }
 
-static AstMapping *Simplify( AstMapping *this ) {
+static AstMapping *Simplify( AstMapping *this, int *status ) {
 /*
 *++
 *  Name:
@@ -15519,7 +15686,7 @@ f     function is invoked with STATUS set to an error value, or if it
 }
 
 static void Somb( double offset, const double params[], int flags,
-                  double *value ) {
+                  double *value, int *status ) {
 /*
 *  Name:
 *     Somb
@@ -15533,7 +15700,7 @@ static void Somb( double offset, const double params[], int flags,
 *  Synopsis:
 *     #include "mapping.h"
 *     void Somb( double offset, const double params[], int flags,
-*                double *value )
+*                double *value, int *status )
 
 *  Class Membership:
 *     Mapping member function.
@@ -15554,6 +15721,8 @@ static void Somb( double offset, const double params[], int flags,
 *        Not used.
 *     value
 *        Pointer to a double to receive the calculated kernel value.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - This function does not perform error checking and does not
@@ -15575,11 +15744,11 @@ static void Somb( double offset, const double params[], int flags,
    offset *= pi;
 
 /* Evaluate the function. */
-   *value = ( offset != 0.0 ) ? ( 2.0*J1Bessel( offset ) / offset ) : 1.0;
+   *value = ( offset != 0.0 ) ? ( 2.0*J1Bessel( offset, status ) / offset ) : 1.0;
 }
 
 static void SombCos( double offset, const double params[], int flags,
-                     double *value ) {
+                     double *value, int *status ) {
 /*
 *  Name:
 *     SombCos
@@ -15593,7 +15762,7 @@ static void SombCos( double offset, const double params[], int flags,
 *  Synopsis:
 *     #include "mapping.h"
 *     void SombCos( double offset, const double params[], int flags,
-*                   double *value )
+*                   double *value, int *status )
 
 *  Class Membership:
 *     Mapping member function.
@@ -15616,6 +15785,8 @@ static void SombCos( double offset, const double params[], int flags,
 *        Not used.
 *     value
 *        Pointer to a double to receive the calculated kernel value.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - This function does not perform error checking and does not
@@ -15645,7 +15816,7 @@ static void SombCos( double offset, const double params[], int flags,
 /* If the cos(k*pi*x) term has not reached zero, calculate the
    result. */
    if ( offset_k < halfpi ) {
-      *value = ( ( offset != 0.0 ) ? ( J1Bessel( offset ) / offset ) : 1.0 ) *
+      *value = ( ( offset != 0.0 ) ? ( J1Bessel( offset, status ) / offset ) : 1.0 ) *
                cos( offset_k );
 
 /* Otherwise, the result is zero. */
@@ -15655,7 +15826,7 @@ static void SombCos( double offset, const double params[], int flags,
 }
 
 static int SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
-                          double xl[], double xu[] ) {
+                          double xl[], double xu[], int *status ) {
 /*
 *  Name:
 *     SpecialBounds
@@ -15669,7 +15840,7 @@ static int SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
 *  Synopsis:
 *     #include "mapping.h"
 *     int SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
-*                        double xl[], double xu[] );
+*                        double xl[], double xu[], int *status );
 
 *  Class Membership:
 *     Mapping member function.
@@ -15718,6 +15889,8 @@ static int SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
 *        necessarily unique) input point at which the upper output
 *        bound is reached. This array is not altered if an improved
 *        estimate of the upper bound cannot be found.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned:
 *     A flag indicating if the returned values can be refined.
@@ -15793,7 +15966,7 @@ static int SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
 /* Create a PointSet to hold the coordinates and obtain a pointer to
    its coordinate values. Also allocate workspace for calculating the
    corner coordinates. */
-   pset_in = astPointSet( npoint, ncoord, "" );
+   pset_in = astPointSet( npoint, ncoord, "", status );
    ptr_in = astGetPoints( pset_in );
    limit = astMalloc( sizeof( int ) * (size_t) ncoord );
    if ( astOK ) {
@@ -15987,7 +16160,7 @@ static int SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
 *                           int npoint, const int *offset, 
 *                           const double *const *coords,
 *                           void (* kernel)( double, const double [], int,
-*                                            double * ),
+*                                            double *, int * ),
 *                           int neighb, const double *params, int flags,
 *                           <Xtype> badval, int npix_out,  <Xtype> *out, 
 *                           <Xtype> *out_var, double *work, int *nused )
@@ -16155,13 +16328,14 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
                               int npoint, const int *offset, \
                               const double *const *coords, \
                               void (* kernel)( double, const double [], \
-                                               int, double * ), \
+                                               int, double *, int * ), \
                               int neighb, const double *params, \
                               int flags, Xtype badval, int npix_out, \
                               Xtype *out, Xtype *out_var, double *work, \
-                              int *nused ) { \
+                              int *nused, int *status ) { \
 \
 /* Local Variables: */ \
+   astDECLARE_GLOBALS;           /* Thread-specific data */ \
    Xtype in_val;                 /* Input pixel value */ \
    Xtype c; \
    double error; \
@@ -16224,6 +16398,9 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
+\
+/* Get a pointer to a structure holding thread-specific global data values */ \
+   astGET_GLOBALS(this); \
 \
 /* Further initialisation. */ \
    kerror = 0; \
@@ -16445,7 +16622,7 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
    contextual error message. */ \
    if ( kerror ) { \
       astError( astStatus, "astRebin"#X"(%s): Error signalled by " \
-                "user-supplied 1-d interpolation kernel.", \
+                "user-supplied 1-d interpolation kernel.", status, \
                 astGetClass( unsimplified_mapping ) ); \
    } \
 \
@@ -16491,8 +16668,8 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
    lie within the output grid. */ \
       if ( !bad ) { \
          ix = (int) floor( x ) - neighb + 1; \
-         lo_ix = MaxI( ix, lbnd_out[ 0 ] ); \
-         hi_ix = MinI( ix + nb2 - 1, ubnd_out[ 0 ] ); \
+         lo_ix = MaxI( ix, lbnd_out[ 0 ], status ); \
+         hi_ix = MinI( ix + nb2 - 1, ubnd_out[ 0 ], status ); \
 \
 /* Skip to the next input point if the current input point makes no \
    contribution to any output pixel. */ \
@@ -16515,7 +16692,7 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 \
                sum = 0.0; \
                for ( jx = 0; jx < nb2; jx++ ) { \
-                  ( *kernel )( xx, params, flags, &pixwt ); \
+                  ( *kernel )( xx, params, flags, &pixwt, status ); \
 \
 /* Check for errors arising in the kernel function. */ \
                   if ( !astOK ) { \
@@ -16618,11 +16795,11 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
    contributions from the current input pixel. Constrain these values \
    to lie within the input grid. */ \
             ix = (int) floor( x ) - neighb + 1; \
-            lo_ix = MaxI( ix, lbnd_out[ 0 ] ); \
-            hi_ix = MinI( ix + nb2 - 1, ubnd_out[ 0 ] ); \
+            lo_ix = MaxI( ix, lbnd_out[ 0 ], status ); \
+            hi_ix = MinI( ix + nb2 - 1, ubnd_out[ 0 ], status ); \
             iy = (int) floor( y ) - neighb + 1; \
-            lo_iy = MaxI( iy, lbnd_out[ 1 ] ); \
-            hi_iy = MinI( iy + nb2 - 1, ubnd_out[ 1 ] ); \
+            lo_iy = MaxI( iy, lbnd_out[ 1 ], status ); \
+            hi_iy = MinI( iy + nb2 - 1, ubnd_out[ 1 ], status ); \
 \
 /* Skip to the next input point if the current input point makes no \
    contribution to any output pixel. */ \
@@ -16651,7 +16828,7 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 \
                   kp = filter; \
                   for ( jy = 0; jy < nb2; jy++ ) { \
-                     ( *kernel )( yy, params, flags, &pixwt ); \
+                     ( *kernel )( yy, params, flags, &pixwt, status ); \
 \
 /* Check for errors arising in the kernel function. */ \
                      if ( !astOK ) { \
@@ -16673,7 +16850,7 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
    position. Also form the total data sum in the filter array. */ \
                   sum = 0.0; \
                   for ( jx = 0; jx < nb2; jx++ ) { \
-                     ( *kernel )( xx, params, flags, &pixwt ); \
+                     ( *kernel )( xx, params, flags, &pixwt, status ); \
 \
 /* Check for errors arising in the kernel function. */ \
                      if ( !astOK ) { \
@@ -16793,8 +16970,8 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
    Constrain these values to lie within the output grid. */ \
             ixn = (int) floor( xn ); \
             ixn0 = ixn - neighb + 1; \
-            lo[ idim ] = MaxI( ixn0, lbnd_out[ idim ] ); \
-            hi[ idim ] = MinI( ixn + neighb, ubnd_out[ idim ] ); \
+            lo[ idim ] = MaxI( ixn0, lbnd_out[ idim ], status ); \
+            hi[ idim ] = MinI( ixn + neighb, ubnd_out[ idim ], status ); \
             jlo[ idim ] = lo[ idim ] - ixn0; \
             jhi[ idim ] = hi[ idim ] - ixn0; \
 \
@@ -16822,7 +16999,7 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
                sum = AST__BAD; \
                xnl[ idim ] = xxn; \
                for ( jxn = 0; jxn < nb2; jxn++ ) { \
-                  ( *kernel )( xxn, params, flags, wtptr[ idim ] + jxn ); \
+                  ( *kernel )( xxn, params, flags, wtptr[ idim ] + jxn, status ); \
 \
 /* Check for errors arising in the kernel function. */ \
                   if ( !astOK ) { \
@@ -17162,7 +17339,7 @@ static void SpreadLinear##X( int ndim_out, \
                             int npoint, const int *offset, \
                             const double *const *coords, int flags, \
                             Xtype badval, int npix_out, Xtype *out, \
-                            Xtype *out_var, double *work, int *nused ) { \
+                            Xtype *out_var, double *work, int *nused, int *status ) { \
 \
 /* Local Variables: */ \
    Xtype c;                      /* Contribution to output value */ \
@@ -17695,8 +17872,8 @@ static void SpreadLinear##X( int ndim_out, \
    input grid. Also calculate the fractional weight to be given to each \
    pixel in order to divide the input value linearly between them. */ \
             ixn = (int) floor( xn ); \
-            lo[ idim ] = MaxI( ixn, lbnd_out[ idim ] ); \
-            hi[ idim ] = MinI( ixn + 1, ubnd_out[ idim ] ); \
+            lo[ idim ] = MaxI( ixn, lbnd_out[ idim ], status ); \
+            hi[ idim ] = MinI( ixn + 1, ubnd_out[ idim ], status ); \
             frac_lo[ idim ] = 1.0 - fabs( xn - (double) lo[ idim ] ); \
             frac_hi[ idim ] = 1.0 - fabs( xn - (double) hi[ idim ] ); \
 \
@@ -17977,7 +18154,7 @@ static void SpreadNearest##X( int ndim_out, \
                              int npoint, const int *offset, \
                              const double *const *coords, int flags, \
                              Xtype badval, int npix_out, Xtype *out, \
-                             Xtype *out_var, double *work, int *nused ) { \
+                             Xtype *out_var, double *work, int *nused, int *status ) { \
 \
 /* Local Variables: */ \
    Xtype c;                      /* Contribution to output value */ \
@@ -18540,7 +18717,7 @@ MAKE_SPREAD_NEAREST(I,int,1)
 
 
 
-static int TestAttrib( AstObject *this_object, const char *attrib ) {
+static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     TestAttrib
@@ -18553,7 +18730,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "mapping.h"
-*     int TestAttrib( AstObject *this, const char *attrib )
+*     int TestAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     Mapping member function (over-rides the astTestAttrib protected
@@ -18570,6 +18747,8 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if a value has been set, otherwise zero.
@@ -18618,7 +18797,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_testattrib)( this_object, attrib );
+      result = (*parent_testattrib)( this_object, attrib, status );
    }
 
 /* Return the result, */
@@ -18626,7 +18805,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 }
 
 static void Tran1( AstMapping *this, int npoint, const double xin[],
-                   int forward, double xout[] ) {
+                   int forward, double xout[], int *status ) {
 /*
 *++
 *  Name:
@@ -18699,7 +18878,7 @@ f        The global status.
    if ( !astOK ) return;
 
 /* Validate the Mapping and numbers of points/coordinates. */
-   ValidateMapping( this, forward, npoint, 1, 1, "astTran1" );
+   ValidateMapping( this, forward, npoint, 1, 1, "astTran1", status );
 
 /* Set up pointers to the input and output coordinate arrays. */
    if ( astOK ) {
@@ -18707,8 +18886,8 @@ f        The global status.
       out_ptr[ 0 ] = xout;
 
 /* Create PointSets to describe the input and output points. */
-      in_points = astPointSet( npoint, 1, "" );
-      out_points = astPointSet( npoint, 1, "" );
+      in_points = astPointSet( npoint, 1, "", status );
+      out_points = astPointSet( npoint, 1, "", status );
 
 /* Associate the data pointers with the PointSets (note we must
    explicitly remove the "const" qualifier from the input data here,
@@ -18732,7 +18911,7 @@ f        The global status.
 
 static void Tran2( AstMapping *this,
                    int npoint, const double xin[], const double yin[],
-                   int forward, double xout[], double yout[] ) {
+                   int forward, double xout[], double yout[], int *status ) {
 /*
 *++
 *  Name:
@@ -18816,7 +18995,7 @@ f        The global status.
    if ( !astOK ) return;
 
 /* Validate the Mapping and the numbers of points/coordinates. */
-   ValidateMapping( this, forward, npoint, 2, 2, "astTran2" );
+   ValidateMapping( this, forward, npoint, 2, 2, "astTran2", status );
 
 /* Set up pointers to the input and output coordinate arrays. */
    if ( astOK ) {
@@ -18826,8 +19005,8 @@ f        The global status.
       out_ptr[ 1 ] = yout;
 
 /* Create PointSets to describe the input and output points. */
-      in_points = astPointSet( npoint, 2, "" );
-      out_points = astPointSet( npoint, 2, "" );
+      in_points = astPointSet( npoint, 2, "", status );
+      out_points = astPointSet( npoint, 2, "", status );
 
 /* Associate the data pointers with the PointSets (note we must
    explicitly remove the "const" qualifier from the input data here,
@@ -18851,7 +19030,7 @@ f        The global status.
 
 static void TranGrid( AstMapping *this, int ncoord_in, const int lbnd[], 
                       const int ubnd[], double tol, int maxpix, int forward, 
-                      int ncoord_out, int outdim, double *out ) {
+                      int ncoord_out, int outdim, double *out, int *status ) {
 /*
 *++
 *  Name:
@@ -19022,6 +19201,7 @@ f     be reversed.
 */
 
 /* Local Variables: */ 
+   astDECLARE_GLOBALS;           /* Thread-specific data */ 
    AstMapping *simple;           /* Pointer to simplified Mapping */ 
    double **out_ptr;             /* Pointer to array of output data pointers */
    int coord;                    /* Loop counter for coordinates */
@@ -19031,6 +19211,9 @@ f     be reversed.
 /* Check the global error status. */ 
    if ( !astOK ) return; 
 
+/* Get a pointer to a structure holding thread-specific global data values */
+   astGET_GLOBALS(this);
+
 /* Calculate the number of points in the grid, and check that the lower and 
    upper bounds of the input grid are consistent. Report an error if any 
    pair is not. */ 
@@ -19039,9 +19222,9 @@ f     be reversed.
       if ( lbnd[ idim ] > ubnd[ idim ] ) { 
          astError( AST__GBDIN, "astTranGrid(%s): Lower bound of " 
                    "input grid (%d) exceeds corresponding upper bound " 
-                   "(%d).", astGetClass( this ), 
+                   "(%d).", status, astGetClass( this ), 
                    lbnd[ idim ], ubnd[ idim ] ); 
-         astError( AST__GBDIN, "Error in input dimension %d.", 
+         astError( AST__GBDIN, "Error in input dimension %d.", status, 
                    idim + 1 ); 
          break; 
       } else {
@@ -19051,31 +19234,31 @@ f     be reversed.
 
 /* Validate the mapping and numbers of points/coordinates. */
    ValidateMapping( this, forward, npoint, ncoord_in, ncoord_out,
-                    "astTranGrid" );
+                    "astTranGrid", status );
 
 /* Check that the positional accuracy tolerance supplied is valid and 
    report an error if necessary. */ 
    if ( astOK && ( tol < 0.0 ) ) { 
       astError( AST__PATIN, "astTranGrid(%s): Invalid positional " 
-                "accuracy tolerance (%.*g pixel).", 
+                "accuracy tolerance (%.*g pixel).", status, 
                 astGetClass( this ), DBL_DIG, tol ); 
-      astError( AST__PATIN, "This value should not be less than zero." ); 
+      astError( AST__PATIN, "This value should not be less than zero." , status); 
    } 
 
 /* Check that the initial scale size in grid points supplied is valid and 
    report an error if necessary. */ 
    if ( astOK && ( maxpix < 0 ) ) { 
       astError( AST__SSPIN, "astTranGrid(%s): Invalid initial scale " 
-                "size in grid points (%d).", astGetClass( this ), maxpix ); 
-      astError( AST__SSPIN, "This value should not be less than zero." ); 
+                "size in grid points (%d).", status, astGetClass( this ), maxpix ); 
+      astError( AST__SSPIN, "This value should not be less than zero." , status); 
    } 
 
 /* Validate the output array dimension argument. */
    if ( astOK && ( outdim < npoint ) ) {
       astError( AST__DIMIN, "astTranGrid(%s): The output array dimension value "
-                "(%d) is invalid.", astGetClass( this ), outdim );
+                "(%d) is invalid.", status, astGetClass( this ), outdim );
       astError( AST__DIMIN, "This should not be less than the number of "
-                "grid points being transformed (%d).", npoint );
+                "grid points being transformed (%d).", status, npoint );
    }
 
 /* If there are sufficient pixels to make it worthwhile, simplify the 
@@ -19093,12 +19276,12 @@ f     be reversed.
          if( astOK ) {
             if ( forward && !astGetTranForward( simple ) ) { 
                astError( AST__TRNND, "astTranGrid(%s): A forward coordinate " 
-                         "transformation is not defined by the %s supplied.", 
+                         "transformation is not defined by the %s supplied.", status, 
                          astGetClass( unsimplified_mapping ), 
                          astGetClass( unsimplified_mapping ) ); 
             } else if ( !forward && !astGetTranInverse( simple ) ) { 
                astError( AST__TRNND, "astTranGrid(%s): An inverse coordinate " 
-                         "transformation is not defined by the %s supplied.", 
+                         "transformation is not defined by the %s supplied.", status, 
                          astGetClass( unsimplified_mapping ), 
                          astGetClass( unsimplified_mapping ) ); 
             }
@@ -19122,7 +19305,7 @@ f     be reversed.
 
 /* Perform the transformation. */
          TranGridAdaptively( simple, ncoord_in, lbnd, ubnd, lbnd, ubnd, tol, 
-                             maxpix, ncoord_out, out_ptr );
+                             maxpix, ncoord_out, out_ptr, status );
 
 /* If required, uninvert the Mapping. */
          if( !forward ) astInvert( simple );
@@ -19141,7 +19324,7 @@ static void TranGridAdaptively( AstMapping *this, int ncoord_in,
                                 const int *lbnd_in, const int *ubnd_in,
                                 const int lbnd[], const int ubnd[], 
                                 double tol, int maxpix, int ncoord_out, 
-                                double *out[] ){
+                                double *out[], int *status ){
 /*
 *  Name:
 *     TranGridAdaptively
@@ -19398,7 +19581,7 @@ static void TranGridAdaptively( AstMapping *this, int ncoord_in,
    if ( astOK ) {
       if ( !divide ) {
          TranGridWithBlocking( this, linear_fit, ncoord_in, lbnd_in,
-                               ubnd_in, lbnd, ubnd, ncoord_out, out );
+                               ubnd_in, lbnd, ubnd, ncoord_out, out, status );
 
 /* Otherwise, allocate workspace to perform the sub-division. */
       } else {
@@ -19421,7 +19604,7 @@ static void TranGridAdaptively( AstMapping *this, int ncoord_in,
 /* Rebin the resulting smaller section using a recursive invocation
    of this function. */
             TranGridAdaptively( this, ncoord_in, lbnd_in, ubnd_in, lo, hi, 
-                                tol, maxpix, ncoord_out, out );
+                                tol, maxpix, ncoord_out, out, status );
 
 /* Now set up a second section which covers the remaining half of the
    original input section. */
@@ -19431,7 +19614,7 @@ static void TranGridAdaptively( AstMapping *this, int ncoord_in,
 /* If this section contains pixels, transform it in the same way. */
             if ( lo[ dimx ] <= hi[ dimx ] ) {
                TranGridAdaptively( this, ncoord_in, lbnd_in, ubnd_in, lo, hi, 
-                                   tol, maxpix, ncoord_out, out );
+                                   tol, maxpix, ncoord_out, out, status );
             }
          }
 
@@ -19449,7 +19632,7 @@ static void TranGridAdaptively( AstMapping *this, int ncoord_in,
 static void TranGridSection( AstMapping *this, const double *linear_fit,
                              int ndim_in, const int *lbnd_in,  
                              const int *ubnd_in, const int *lbnd, 
-                             const int *ubnd, int ndim_out, double *out[] ){
+                             const int *ubnd, int ndim_out, double *out[], int *status ){
 /*
 *  Name:
 *     TranGridSection
@@ -19622,7 +19805,7 @@ static void TranGridSection( AstMapping *this, const double *linear_fit,
 
 /* Create a PointSet to hold the output grid coordinates and obtain an
    array of pointers to its coordinate data. */
-         pset_out = astPointSet( npoint, ndim_out, "" );
+         pset_out = astPointSet( npoint, ndim_out, "", status );
          ptr_out = astGetPoints( pset_out );
          if ( astOK ) {
 
@@ -19788,7 +19971,7 @@ static void TranGridSection( AstMapping *this, const double *linear_fit,
 
 /* Create a PointSet to hold the coordinates of the input pixels and
    obtain a pointer to its coordinate data. */
-         pset_in = astPointSet( npoint, ndim_in, "" );
+         pset_in = astPointSet( npoint, ndim_in, "", status );
          ptr_in = astGetPoints( pset_in );
          if ( astOK ) {
 
@@ -19928,7 +20111,7 @@ static void TranGridWithBlocking( AstMapping *this, const double *linear_fit,
                                   int ndim_in, const int *lbnd_in, 
                                   const int *ubnd_in, const int *lbnd, 
                                   const int *ubnd, int ndim_out, 
-                                  double *out[] ){
+                                  double *out[], int *status ){
 /*
 *  Name:
 *     TranGridWithBlocking
@@ -19945,7 +20128,7 @@ static void TranGridWithBlocking( AstMapping *this, const double *linear_fit,
 *                                int ndim_in, const int *lbnd_in, 
 *                                const int *ubnd_in, const int *lbnd, 
 *                                const int *ubnd, int ndim_out, 
-*                                double *out[] )
+*                                double *out[], int *status )
 
 *  Class Membership:
 *     Mapping member function.
@@ -20025,6 +20208,8 @@ static void TranGridWithBlocking( AstMapping *this, const double *linear_fit,
 *        For example, if the input grid is 2-dimensional and extends from 
 *        (2,-1) to (3,1), the output points will be stored in the order 
 *        (2,-1), (3, -1), (2,0), (3,0), (2,1), (3,1).
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -20119,7 +20304,7 @@ static void TranGridWithBlocking( AstMapping *this, const double *linear_fit,
    extend outside the grid itself. */
          lbnd_block[ idim ] = lbnd[ idim ];
          ubnd_block[ idim ] = MinI( lbnd[ idim ] + dim_block[ idim ] - 1,
-                                    ubnd[ idim ] );
+                                    ubnd[ idim ], status );
       }
 
 /* Transform each block of input grid positions. */
@@ -20131,7 +20316,7 @@ static void TranGridWithBlocking( AstMapping *this, const double *linear_fit,
 
 /* Rebin the current block, accumulating the sum of bad pixels produced. */
          TranGridSection( this, linear_fit, ndim_in, lbnd_in, ubnd_in,
-                          lbnd_block, ubnd_block, ndim_out, out );
+                          lbnd_block, ubnd_block, ndim_out, out, status );
 
 /* Update the block extent to identify the next block of input pixels. */
          idim = 0;
@@ -20144,10 +20329,10 @@ static void TranGridWithBlocking( AstMapping *this, const double *linear_fit,
    the resulting extent does not go outside the region being rebinned. */
             if ( ubnd_block[ idim ] < ubnd[ idim ] ) {
                lbnd_block[ idim ] = MinI( lbnd_block[ idim ] +
-                                          dim_block[ idim ], ubnd[ idim ] );
+                                          dim_block[ idim ], ubnd[ idim ], status );
                ubnd_block[ idim ] = MinI( lbnd_block[ idim ] +
                                           dim_block[ idim ] - 1,
-                                          ubnd[ idim ] );
+                                          ubnd[ idim ], status );
                break;
 
 /* If any less significant dimensions are found where the upper bound
@@ -20156,7 +20341,7 @@ static void TranGridWithBlocking( AstMapping *this, const double *linear_fit,
             } else {
                lbnd_block[ idim ] = lbnd[ idim ];
                ubnd_block[ idim ] = MinI( lbnd[ idim ] + dim_block[ idim ] - 1,
-                                          ubnd[ idim ] );
+                                          ubnd[ idim ], status );
 
 /* All the blocks have been processed once the position along the most
    significant dimension has been reset. */
@@ -20175,7 +20360,7 @@ static void TranGridWithBlocking( AstMapping *this, const double *linear_fit,
 static void TranN( AstMapping *this, int npoint,
                    int ncoord_in, int indim, const double *in,
                    int forward,
-                   int ncoord_out, int outdim, double *out ) {
+                   int ncoord_out, int outdim, double *out, int *status ) {
 /*
 *++
 *  Name:
@@ -20311,22 +20496,22 @@ f     be reversed.
    if ( !astOK ) return;
 
 /* Validate the mapping and numbers of points/coordinates. */
-   ValidateMapping( this, forward, npoint, ncoord_in, ncoord_out, "astTranN" );
+   ValidateMapping( this, forward, npoint, ncoord_in, ncoord_out, "astTranN", status );
 
 /* Also validate the input array dimension argument. */
    if ( astOK && ( indim < npoint ) ) {
       astError( AST__DIMIN, "astTranN(%s): The input array dimension value "
-                "(%d) is invalid.", astGetClass( this ), indim );
+                "(%d) is invalid.", status, astGetClass( this ), indim );
       astError( AST__DIMIN, "This should not be less than the number of "
-                "points being transformed (%d).", npoint );
+                "points being transformed (%d).", status, npoint );
    }
 
 /* Similarly, validate the output array dimension argument. */
    if ( astOK && ( outdim < npoint ) ) {
       astError( AST__DIMIN, "astTranN(%s): The output array dimension value "
-                "(%d) is invalid.", astGetClass( this ), outdim );
+                "(%d) is invalid.", status, astGetClass( this ), outdim );
       astError( AST__DIMIN, "This should not be less than the number of "
-                "points being transformed (%d).", npoint );
+                "points being transformed (%d).", status, npoint );
    }
 
 /* Allocate memory to hold the arrays of input and output data
@@ -20359,8 +20544,8 @@ f     be reversed.
          }
 
 /* Create PointSets to describe the input and output points. */
-         in_points = astPointSet( npoint, ncoord_in, "" );
-         out_points = astPointSet( npoint, ncoord_out, "" );
+         in_points = astPointSet( npoint, ncoord_in, "", status );
+         out_points = astPointSet( npoint, ncoord_out, "", status );
 
 /* Associate the data pointers with the PointSets (note we must
    explicitly remove the "const" qualifier from the input data here,
@@ -20389,7 +20574,7 @@ f     be reversed.
 
 static void TranP( AstMapping *this, int npoint,
                    int ncoord_in, const double *ptr_in[],
-                   int forward, int ncoord_out, double *ptr_out[] ) {
+                   int forward, int ncoord_out, double *ptr_out[], int *status ) {
 /*
 c++
 *  Name:
@@ -20477,12 +20662,12 @@ c--
    if ( !astOK ) return;
 
 /* Validate the Mapping and number of points/coordinates. */
-   ValidateMapping( this, forward, npoint, ncoord_in, ncoord_out, "astTranP" );
+   ValidateMapping( this, forward, npoint, ncoord_in, ncoord_out, "astTranP", status );
 
 /* Create PointSets to describe the input and output points. */
    if ( astOK ) {
-      in_points = astPointSet( npoint, ncoord_in, "" );
-      out_points = astPointSet( npoint, ncoord_out, "" );
+      in_points = astPointSet( npoint, ncoord_in, "", status );
+      out_points = astPointSet( npoint, ncoord_out, "", status );
 
 /* Associate the data pointers with the PointSets (note we must
    explicitly remove the "const" qualifier from the input data here,
@@ -20505,7 +20690,7 @@ c--
 }
 
 static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-                               int forward, AstPointSet *out ) {
+                               int forward, AstPointSet *out, int *status ) {
 /*
 *+
 *  Name:
@@ -20594,7 +20779,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Report an error if the transformation is not defined. */
    if ( astOK && !def ) {
       astError( AST__TRNND, "astTransform(%s): %s coordinate transformation "
-                "is not defined by the %s supplied.", astGetClass( this ),
+                "is not defined by the %s supplied.", status, astGetClass( this ),
                 forward ? "A forward" : "An inverse", astGetClass( this ) );
    }
 
@@ -20614,10 +20799,10 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    required by the mapping. Report an error if these numbers do not match. */
    if ( astOK && ( ncoord_in != nin ) ) {
       astError( AST__NCPIN, "astTransform(%s): Bad number of coordinate "
-                "values (%d) in input %s.", astGetClass( this ), ncoord_in,
+                "values (%d) in input %s.", status, astGetClass( this ), ncoord_in,
                 astGetClass( in ) );
       astError( AST__NCPIN, "The %s given requires %d coordinate value(s) for "
-                "each input point.", astGetClass( this ), nin );
+                "each input point.", status, astGetClass( this ), nin );
    }
 
 /* If still OK, and a non-NULL pointer has been given for the output PointSet,
@@ -20632,16 +20817,16 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
       if ( astOK ) {
          if ( npoint_out < npoint ) {
             astError( AST__NOPTS, "astTransform(%s): Too few points (%d) in "
-                      "output %s.", astGetClass( this ), npoint_out,
+                      "output %s.", status, astGetClass( this ), npoint_out,
                       astGetClass( out ) );
             astError( AST__NOPTS, "The %s needs space to hold %d transformed "
-                      "point(s).", astGetClass( this ), npoint );
+                      "point(s).", status, astGetClass( this ), npoint );
          } else if ( ncoord_out < nout ) {
             astError( AST__NOCTS, "astTransform(%s): Too few coordinate "
-                      "values per point (%d) in output %s.",
+                      "values per point (%d) in output %s.", status,
                       astGetClass( this ), ncoord_out, astGetClass( out ) );
             astError( AST__NOCTS, "The %s supplied needs space to store %d "
-                      "coordinate value(s) per transformed point.",
+                      "coordinate value(s) per transformed point.", status,
                       astGetClass( this ), nout );
          }
       }
@@ -20652,7 +20837,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    coordinate data. */
    if ( astOK ) {
       if ( !out ) {
-         result = astPointSet( npoint, nout, "" );
+         result = astPointSet( npoint, nout, "", status );
 
 /* Otherwise, use the PointSet supplied. */
       } else {
@@ -21060,7 +21245,7 @@ f     The AST__UK1ER error value is defined in the AST_ERR include file.
 
 static double UphillSimplex( const MapData *mapdata, double acc, int maxcall,
                              const double dx[], double xmax[], double *err,
-                             int *ncall ) {
+                             int *ncall, int *status ) {
 /*
 *  Name:
 *     UphillSimplex
@@ -21075,7 +21260,7 @@ static double UphillSimplex( const MapData *mapdata, double acc, int maxcall,
 *     #include "mapping.h"
 *     double UphillSimplex( const MapData *mapdata, double acc, int maxcall,
 *                           const double dx[], double xmax[], double *err,
-*                           int *ncall );
+*                           int *ncall, int *status );
 
 *  Class Membership:
 *     Mapping member function.
@@ -21120,6 +21305,8 @@ static double UphillSimplex( const MapData *mapdata, double acc, int maxcall,
 *     ncall
 *        Pointer to an int in which the number of Mapping function
 *        evaluations will be returned.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     An estimate of the Mapping function value at the local maximum.
@@ -21197,7 +21384,7 @@ static double UphillSimplex( const MapData *mapdata, double acc, int maxcall,
          }
 
 /* Evaluate the Mapping function at each vertex. */
-         f[ vertex ] = MapFunction( mapdata, &x[ vertex * ncoord ], ncall );
+         f[ vertex ] = MapFunction( mapdata, &x[ vertex * ncoord ], ncall, status );
          if ( f[ vertex ] == AST__BAD ) f[ vertex ] = -DBL_MAX;
       }
 
@@ -21261,7 +21448,7 @@ static double UphillSimplex( const MapData *mapdata, double acc, int maxcall,
 /* If performing another iteration, first try reflecting the worst
    vertex through the opposite face of the simplex. Check for
    errors. */
-         fnew = NewVertex( mapdata, lo, -1.0, x, f, ncall, xnew );
+         fnew = NewVertex( mapdata, lo, -1.0, x, f, ncall, xnew, status );
          ncalla++;
          if ( astOK ) {
 
@@ -21301,7 +21488,7 @@ static double UphillSimplex( const MapData *mapdata, double acc, int maxcall,
                }
 
 /* Evaluate the Mapping function at the new vertex. */
-               f[ lo ] = MapFunction( mapdata, &x[ lo * ncoord ], ncall );
+               f[ lo ] = MapFunction( mapdata, &x[ lo * ncoord ], ncall, status );
                if ( f[ lo ] == AST__BAD ) f[ lo ] = -DBL_MAX;
                ncalla++;
 
@@ -21309,7 +21496,7 @@ static double UphillSimplex( const MapData *mapdata, double acc, int maxcall,
    is a new maximum, then see if more of the same is even better by
    trying to expand the best vertex away from the opposite face. */
             } else if ( fnew >= f[ hi ] ) {
-               fnew = NewVertex( mapdata, lo, factor, x, f, ncall, xnew );
+               fnew = NewVertex( mapdata, lo, factor, x, f, ncall, xnew, status );
                ncalla++;
 
 /* Otherwise, if the new vertex was no improvement on the second
@@ -21317,7 +21504,7 @@ static double UphillSimplex( const MapData *mapdata, double acc, int maxcall,
    face. */
             } else if ( fnew <= f[ nextlo ] ) {
                fsave = f[ lo ];
-               fnew = NewVertex( mapdata, lo, 1.0 / factor, x, f, ncall, xnew );
+               fnew = NewVertex( mapdata, lo, 1.0 / factor, x, f, ncall, xnew, status );
                ncalla++;
 
 /* If this didn't result in any improvement, then contract the entire
@@ -21343,7 +21530,7 @@ static double UphillSimplex( const MapData *mapdata, double acc, int maxcall,
 /* Evaluate the Mapping function at each new vertex. */
                         f[ vertex ] = MapFunction( mapdata,
                                                    &x[ vertex * ncoord ],
-                                                   ncall );
+                                                   ncall, status );
                         if ( f[ vertex ] == AST__BAD ) f[ vertex ] = -DBL_MAX;
                         ncalla++;
                      }
@@ -21368,7 +21555,7 @@ static double UphillSimplex( const MapData *mapdata, double acc, int maxcall,
 
 static void ValidateMapping( AstMapping *this, int forward,
                              int npoint, int ncoord_in, int ncoord_out,
-                             const char *method ) {
+                             const char *method, int *status ) {
 /*
 *  Name:
 *     ValidateMapping
@@ -21383,7 +21570,7 @@ static void ValidateMapping( AstMapping *this, int forward,
 *     #include "mapping.h"
 *     void ValidateMapping( AstMapping *this, int forward,
 *                           int npoint, int ncoord_in, int ncoord_out,
-*                           const char *method )
+*                           const char *method, int *status )
 
 *  Class Membership:
 *     Mapping member function.
@@ -21412,6 +21599,8 @@ static void ValidateMapping( AstMapping *this, int forward,
 *        Pointer to a null terminated character string containing the
 *        name of the method which invoked this function to validate a
 *        Mapping. This is used solely for constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -21425,7 +21614,7 @@ static void ValidateMapping( AstMapping *this, int forward,
    if ( !( forward ? astGetTranForward( this ) : astGetTranInverse( this ) )
         && astOK ) {
       astError( AST__TRNND, "%s(%s): %s coordinate transformation "
-                "is not defined by the %s supplied.", method,
+                "is not defined by the %s supplied.", status, method,
                 astGetClass( this ),
                 ( forward ? "A forward" : "An inverse" ),
                 astGetClass( this ) );
@@ -21441,9 +21630,9 @@ static void ValidateMapping( AstMapping *this, int forward,
    not match. */
    if ( astOK && ( ncoord_in != nin ) ) {
       astError( AST__NCPIN, "%s(%s): Bad number of input coordinate values "
-                "(%d).", method, astGetClass( this ), ncoord_in );
+                "(%d).", status, method, astGetClass( this ), ncoord_in );
       astError( AST__NCPIN, "The %s given requires %d coordinate value%s for "
-                "each input point.", astGetClass( this ), nin,
+                "each input point.", status, astGetClass( this ), nin,
                 ( nin == 1 ) ? "" : "s" );
    }
 
@@ -21452,9 +21641,9 @@ static void ValidateMapping( AstMapping *this, int forward,
    not match. */
    if ( astOK && ( ncoord_out != nout ) ) {
       astError( AST__NCPIN, "%s(%s): Bad number of output coordinate values "
-                "(%d).", method, astGetClass( this ), ncoord_out );
+                "(%d).", status, method, astGetClass( this ), ncoord_out );
       astError( AST__NCPIN, "The %s given generates %s%d coordinate value%s "
-                "for each output point.", astGetClass( this ),
+                "for each output point.", status, astGetClass( this ),
                 ( nout < ncoord_out ) ? "only " : "", nout,
                 ( nout == 1 ) ? "" : "s" );
    }
@@ -21463,7 +21652,7 @@ static void ValidateMapping( AstMapping *this, int forward,
    and report an error if necessary. */
    if ( astOK && ( npoint < 0 ) ) {
       astError( AST__NPTIN, "%s(%s): Number of points to be transformed (%d) "
-                "is invalid.", method, astGetClass( this ), npoint );
+                "is invalid.", status, method, astGetClass( this ), npoint );
    }
 }
 
@@ -21854,7 +22043,7 @@ astMAKE_TEST(Mapping,Report,( this->report != CHAR_MAX ))
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -21866,7 +22055,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for Mapping objects.
@@ -21876,6 +22065,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the Mapping to be copied.
 *     objout
 *        Pointer to the Mapping being constructed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - This constructor exists simply to ensure that the "Report"
@@ -21897,7 +22088,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -21909,7 +22100,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for Mapping objects.
@@ -21917,6 +22108,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the Mapping to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - This destructor does nothing and exists only to maintain a
@@ -21929,7 +22122,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -21941,7 +22134,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -21952,6 +22145,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the Mapping whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -22028,8 +22223,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Invert. */
 /* ------- */
-   set = TestInvert( this );
-   ival = set ? GetInvert( this ) : astGetInvert( this );
+   set = TestInvert( this, status );
+   ival = set ? GetInvert( this, status ) : astGetInvert( this );
    astWriteInt( channel, "Invert", set, 0, ival,
                 ival ? "Mapping inverted" :
                        "Mapping not inverted" );
@@ -22056,8 +22251,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Report. */
 /* ------- */
-   set = TestReport( this );
-   ival = set ? GetReport( this ) : astGetReport( this );
+   set = TestReport( this, status );
+   ival = set ? GetReport( this, status ) : astGetReport( this );
    astWriteInt( channel, "Report", set, 0, ival,
                 ival ? "Report coordinate transformations" :
                        "Don't report coordinate transformations" );
@@ -22067,13 +22262,13 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsAMapping and astCheckMapping functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(Mapping,Object,check,&class_init)
+astMAKE_ISA(Mapping,Object,check,&class_check)
 astMAKE_CHECK(Mapping)
 
 AstMapping *astInitMapping_( void *mem, size_t size, int init,
                              AstMappingVtab *vtab, const char *name,
                              int nin, int nout,
-                             int tran_forward, int tran_inverse ) {
+                             int tran_forward, int tran_inverse, int *status ) {
 /*
 *+
 *  Name:
@@ -22176,12 +22371,12 @@ AstMapping *astInitMapping_( void *mem, size_t size, int init,
    necessary. */
    if ( nin < 0 ) {
       astError( AST__BADNI, "astInitMapping(%s): Bad number of input "
-                "coordinates (%d).", name, nin );
-      astError( AST__BADNI, "This number should be zero or more." );
+                "coordinates (%d).", status, name, nin );
+      astError( AST__BADNI, "This number should be zero or more." , status);
    } else if ( nout < 0 ) {
       astError( AST__BADNO, "astInitMapping(%s): Bad number of output "
-                "coordinates (%d).", name, nout );
-      astError( AST__BADNI, "This number should be zero or more." );
+                "coordinates (%d).", status, name, nout );
+      astError( AST__BADNI, "This number should be zero or more." , status);
    }
 
 /* Initialise an Object structure (the parent class) as the first component
@@ -22217,7 +22412,7 @@ AstMapping *astInitMapping_( void *mem, size_t size, int init,
 
 AstMapping *astLoadMapping_( void *mem, size_t size,
                              AstMappingVtab *vtab, const char *name,
-                             AstChannel *channel ) {
+                             AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -22292,6 +22487,7 @@ AstMapping *astLoadMapping_( void *mem, size_t size,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstMapping *new;              /* Pointer to the new Mapping */
 
 /* Initialise. */
@@ -22299,6 +22495,9 @@ AstMapping *astLoadMapping_( void *mem, size_t size,
 
 /* Check the global error status. */
    if ( !astOK ) return new;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* If a NULL virtual function table has been supplied, then this is
    the first loader to be invoked for this Mapping. In this case the
@@ -22351,7 +22550,7 @@ AstMapping *astLoadMapping_( void *mem, size_t size,
 /* Invert. */
 /* ------- */
       new->invert = astReadInt( channel, "invert", CHAR_MAX );
-      if ( TestInvert( new ) ) SetInvert( new, new->invert );
+      if ( TestInvert( new, status ) ) SetInvert( new, new->invert, status );
 
 /* IsSimple. */
 /* --------- */
@@ -22368,7 +22567,7 @@ AstMapping *astLoadMapping_( void *mem, size_t size,
 /* Report. */
 /* ------- */
       new->report = astReadInt( channel, "report", CHAR_MAX );
-      if ( TestReport( new ) ) SetReport( new, new->report );
+      if ( TestReport( new, status ) ) SetReport( new, new->report, status );
 
 /* If an error occurred, clean up by deleting the new Mapping. */
       if ( !astOK ) new = astDelete( new );
@@ -22392,64 +22591,64 @@ AstMapping *astLoadMapping_( void *mem, size_t size,
    still have the same interface. */
 
 void astDecompose_( AstMapping *this, AstMapping **map1, AstMapping **map2, 
-                    int *series, int *invert1, int *invert2 ) {
+                    int *series, int *invert1, int *invert2, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,Mapping,Decompose))( this, map1, map2, series, invert1, invert2 );
+   (**astMEMBER(this,Mapping,Decompose))( this, map1, map2, series, invert1, invert2, status );
 }
-int astGetNin_( AstMapping *this ) {
+int astGetNin_( AstMapping *this, int *status ) {
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Mapping,GetNin))( this );
+   return (**astMEMBER(this,Mapping,GetNin))( this, status );
 }
-int astGetNout_( AstMapping *this ) {
+int astGetNout_( AstMapping *this, int *status ) {
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Mapping,GetNout))( this );
+   return (**astMEMBER(this,Mapping,GetNout))( this, status );
 }
-int astGetIsLinear_( AstMapping *this ) {
+int astGetIsLinear_( AstMapping *this, int *status ) {
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Mapping,GetIsLinear))( this );
+   return (**astMEMBER(this,Mapping,GetIsLinear))( this, status );
 }
-int astGetTranForward_( AstMapping *this ) {
+int astGetTranForward_( AstMapping *this, int *status ) {
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Mapping,GetTranForward))( this );
+   return (**astMEMBER(this,Mapping,GetTranForward))( this, status );
 }
-int astGetTranInverse_( AstMapping *this ) {
+int astGetTranInverse_( AstMapping *this, int *status ) {
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Mapping,GetTranInverse))( this );
+   return (**astMEMBER(this,Mapping,GetTranInverse))( this, status );
 }
-void astInvert_( AstMapping *this ) {
+void astInvert_( AstMapping *this, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,Mapping,Invert))( this );
+   (**astMEMBER(this,Mapping,Invert))( this, status );
 }
 void astMapBox_( AstMapping *this,
                  const double lbnd_in[], const double ubnd_in[], int forward,
                  int coord_out, double *lbnd_out, double *ubnd_out,
-                 double xl[], double xu[] ) {
+                 double xl[], double xu[], int *status ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Mapping,MapBox))( this, lbnd_in, ubnd_in, forward,
-                                       coord_out, lbnd_out, ubnd_out, xl, xu );
+                                       coord_out, lbnd_out, ubnd_out, xl, xu, status );
 }
 int astMapList_( AstMapping *this, int series, int invert, int *nmap,
-                  AstMapping ***map_list, int **invert_list ) {
+                  AstMapping ***map_list, int **invert_list, int *status ) {
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Mapping,MapList))( this, series, invert,
-                                        nmap, map_list, invert_list );
+                                        nmap, map_list, invert_list, status );
 }
-int *astMapSplit_( AstMapping *this, int nin, int *in, AstMapping **map ){
+int *astMapSplit_( AstMapping *this, int nin, int *in, AstMapping **map, int *status ){
    if( map ) *map = NULL;
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Mapping,MapSplit))( this, nin, in, map );
+   return (**astMEMBER(this,Mapping,MapSplit))( this, nin, in, map, status );
 }
 int astMapMerge_( AstMapping *this, int where, int series, int *nmap,
-                  AstMapping ***map_list, int **invert_list ) {
+                  AstMapping ***map_list, int **invert_list, int *status ) {
    if ( !astOK ) return -1;
    return (**astMEMBER(this,Mapping,MapMerge))( this, where, series, nmap,
-                                                map_list, invert_list );
+                                                map_list, invert_list, status );
 }
 void astReportPoints_( AstMapping *this, int forward,
-                       AstPointSet *in_points, AstPointSet *out_points ) {
+                       AstPointSet *in_points, AstPointSet *out_points, int *status ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Mapping,ReportPoints))( this, forward,
-                                             in_points, out_points );
+                                             in_points, out_points, status );
 }
 #define MAKE_RESAMPLE_(X,Xtype) \
 int astResample##X##_( AstMapping *this, int ndim_in, const int *lbnd_in, \
@@ -22460,7 +22659,7 @@ int astResample##X##_( AstMapping *this, int ndim_in, const int *lbnd_in, \
                        int ndim_out, \
                        const int *lbnd_out, const int *ubnd_out, \
                        const int *lbnd, const int *ubnd, Xtype *out, \
-                       Xtype *out_var ) { \
+                       Xtype *out_var, int *status ) { \
    if ( !astOK ) return 0; \
    return (**astMEMBER(this,Mapping,Resample##X))( this, ndim_in, lbnd_in, \
                                                    ubnd_in, in, in_var, \
@@ -22469,7 +22668,7 @@ int astResample##X##_( AstMapping *this, int ndim_in, const int *lbnd_in, \
                                                    badval, ndim_out, \
                                                    lbnd_out, ubnd_out, \
                                                    lbnd, ubnd, \
-                                                   out, out_var ); \
+                                                   out, out_var, status ); \
 }
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_RESAMPLE_(LD,long double)
@@ -22495,7 +22694,7 @@ void astRebin##X##_( AstMapping *this, double wlim, int ndim_in, const int *lbnd
                     int ndim_out, \
                     const int *lbnd_out, const int *ubnd_out, \
                     const int *lbnd, const int *ubnd, Xtype *out, \
-                    Xtype *out_var ) { \
+                    Xtype *out_var, int *status ) { \
    if ( !astOK ) return; \
    (**astMEMBER(this,Mapping,Rebin##X))( this, wlim, ndim_in, lbnd_in, \
                                          ubnd_in, in, in_var, \
@@ -22504,7 +22703,7 @@ void astRebin##X##_( AstMapping *this, double wlim, int ndim_in, const int *lbnd
                                          badval, ndim_out, \
                                          lbnd_out, ubnd_out, \
                                          lbnd, ubnd, \
-                                         out, out_var ); \
+                                         out, out_var, status ); \
 }
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_REBIN_(LD,long double)
@@ -22523,7 +22722,7 @@ void astRebinSeq##X##_( AstMapping *this, double wlim, int ndim_in, const int *l
                         int ndim_out, \
                         const int *lbnd_out, const int *ubnd_out, \
                         const int *lbnd, const int *ubnd, Xtype *out, \
-                        Xtype *out_var, double *weights, int *nused ) { \
+                        Xtype *out_var, double *weights, int *nused, int *status ) { \
    if ( !astOK ) return; \
    (**astMEMBER(this,Mapping,RebinSeq##X))( this, wlim, ndim_in, lbnd_in, \
                                          ubnd_in, in, in_var, \
@@ -22532,7 +22731,7 @@ void astRebinSeq##X##_( AstMapping *this, double wlim, int ndim_in, const int *l
                                          badval, ndim_out, \
                                          lbnd_out, ubnd_out, \
                                          lbnd, ubnd, \
-                                         out, out_var, weights, nused ); \
+                                         out, out_var, weights, nused, status ); \
 }
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_REBINSEQ_(LD,long double)
@@ -22542,31 +22741,35 @@ MAKE_REBINSEQ_(F,float)
 MAKE_REBINSEQ_(I,int)
 #undef MAKE_REBINSEQ_
 
-double astRate_( AstMapping *this, double *at, int ax1, int ax2 ){
+double astRate_( AstMapping *this, double *at, int ax1, int ax2, int *status ){
+   astDECLARE_GLOBALS;
+
    if ( !astOK ) return AST__BAD;
+
+   astGET_GLOBALS(this);
 
    if( ax1 < 0 || ax1 >= astGetNout( this ) ) {
       astError( AST__AXIIN, "astRate(%s): Invalid output index (%d) "
-                "specified - should be in the range 1 to %d.",
+                "specified - should be in the range 1 to %d.", status,
                 astGetClass( this ), ax1 + 1, astGetNout( this ) );
       
    } else if( ax2 < 0 || ax2 >= astGetNin( this ) ) {
       astError( AST__AXIIN, "astRate(%s): Invalid input index (%d) "
-                "specified - should be in the range 1 to %d.",
+                "specified - should be in the range 1 to %d.", status,
                 astGetClass( this ), ax2 + 1, astGetNin( this ) );
    }
 
    if( rate_disabled ) {
       return ( at[ ax2 ] != AST__BAD ) ? 1.0 : AST__BAD;
    } else {    
-      return (**astMEMBER(this,Mapping,Rate))( this, at, ax1, ax2 );
+      return (**astMEMBER(this,Mapping,Rate))( this, at, ax1, ax2, status );
    }   
 }
-AstMapping *astSimplify_( AstMapping *this ) {
+AstMapping *astSimplify_( AstMapping *this, int *status ) {
    AstMapping *result;
    if ( !astOK ) return NULL;
    if( !astGetIsSimple( this ) ) {      /* Only simplify if not already done */
-      result = (**astMEMBER(this,Mapping,Simplify))( this );
+      result = (**astMEMBER(this,Mapping,Simplify))( this, status );
       if( result ) result->issimple = 1;/* Indicate simplification has been done */
    } else {
       result = astClone( this );
@@ -22574,50 +22777,50 @@ AstMapping *astSimplify_( AstMapping *this ) {
    return result;
 }
 AstPointSet *astTransform_( AstMapping *this, AstPointSet *in,
-                            int forward, AstPointSet *out ) {
+                            int forward, AstPointSet *out, int *status ) {
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Mapping,Transform))( this, in, forward, out );
+   return (**astMEMBER(this,Mapping,Transform))( this, in, forward, out, status );
 }
 void astTran1_( AstMapping *this, int npoint, const double xin[],
-                int forward, double xout[] ) {
+                int forward, double xout[], int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,Mapping,Tran1))( this, npoint, xin, forward, xout );
+   (**astMEMBER(this,Mapping,Tran1))( this, npoint, xin, forward, xout, status );
 }
 void astTran2_( AstMapping *this,
                 int npoint, const double xin[], const double yin[],
-                int forward, double xout[], double yout[] ) {
+                int forward, double xout[], double yout[], int *status ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Mapping,Tran2))( this, npoint, xin, yin,
-                                      forward, xout, yout );
+                                      forward, xout, yout, status );
 }
 void astTranGrid_( AstMapping *this, int ncoord_in, const int lbnd[], 
                    const int ubnd[], double tol, int maxpix, int forward, 
-                   int ncoord_out, int outdim, double *out ) {
+                   int ncoord_out, int outdim, double *out, int *status ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Mapping,TranGrid))( this, ncoord_in, lbnd, ubnd, tol, 
                                          maxpix, forward, ncoord_out, outdim, 
-                                         out );
+                                         out, status );
 }
 void astTranN_( AstMapping *this, int npoint,
                 int ncoord_in, int indim, const double *in,
-                int forward, int ncoord_out, int outdim, double *out ) {
+                int forward, int ncoord_out, int outdim, double *out, int *status ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Mapping,TranN))( this, npoint,
                                       ncoord_in, indim, in,
-                                      forward, ncoord_out, outdim, out );
+                                      forward, ncoord_out, outdim, out, status );
 }
 void astTranP_( AstMapping *this, int npoint,
                 int ncoord_in, const double *ptr_in[],
-                int forward, int ncoord_out, double *ptr_out[] ) {
+                int forward, int ncoord_out, double *ptr_out[], int *status ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Mapping,TranP))( this, npoint,
                                       ncoord_in, ptr_in,
-                                      forward, ncoord_out, ptr_out );
+                                      forward, ncoord_out, ptr_out, status );
 }
 int astLinearApprox_( AstMapping *this, const double *lbnd, 
-                       const double *ubnd, double tol, double *fit ){
+                       const double *ubnd, double tol, double *fit, int *status ){
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Mapping,LinearApprox))( this, lbnd, ubnd, tol, fit );
+   return (**astMEMBER(this,Mapping,LinearApprox))( this, lbnd, ubnd, tol, fit, status );
 }
 
 /* Public Interface Function Prototypes. */
@@ -22625,16 +22828,16 @@ int astLinearApprox_( AstMapping *this, const double *lbnd,
 /* The following functions have public prototypes only (i.e. no
    protected prototypes), so we must provide local prototypes for use
    within this module. */
-void DecomposeId_( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
-void MapBoxId_( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [] );
-double astRateId_( AstMapping *, double *, int, int );
-void astMapSplitId_( AstMapping *, int, int *, int *, AstMapping ** );
+void DecomposeId_( AstMapping *, AstMapping **, AstMapping **, int *, int *, int *, int * );
+void MapBoxId_( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [], int * );
+double astRateId_( AstMapping *, double *, int, int, int * );
+void astMapSplitId_( AstMapping *, int, int *, int *, AstMapping **, int * );
 
 /* Special interface function implementations. */
 /* ------------------------------------------- */
 void astDecomposeId_( AstMapping *this, AstMapping **map1, 
                       AstMapping **map2, int *series, int *invert1, 
-                      int *invert2  ) {
+                      int *invert2, int *status ) {
 /*
 *++
 *  Name:
@@ -22781,7 +22984,7 @@ f        will be returned holding AST__NULL.
    if ( !astOK ) return;
 
 /* Invoke the normal astDecompose_ function to decompose the Mapping. */
-      astDecompose_( this, map1, map2, series, invert1, invert2 );
+      astDecompose( this, map1, map2, series, invert1, invert2 );
 
 /* If required, return ID values for the component Mappings. */
    if ( map1 ) *map1 = astMakeId( *map1 );
@@ -22793,7 +22996,7 @@ void astMapBoxId_( AstMapping *this,
                    const double lbnd_in[], const double ubnd_in[],
                    int forward, int coord_out,
                    double *lbnd_out, double *ubnd_out,
-                   double xl[], double xu[] ) {
+                   double xl[], double xu[], int *status ) {
 /*
 *++
 *  Name:
@@ -22993,11 +23196,11 @@ f     routine is invoked with STATUS set to an error value.
 
 /* Invoke the protected version of this function with the "coord_out"
    value decremented. */
-   astMapBox_( this, lbnd_in, ubnd_in, forward, coord_out - 1,
-               lbnd_out, ubnd_out, xl, xu );
+   astMapBox( this, lbnd_in, ubnd_in, forward, coord_out - 1,
+              lbnd_out, ubnd_out, xl, xu );
 }
 
-double astRateId_( AstMapping *this, double *at, int ax1, int ax2 ){
+double astRateId_( AstMapping *this, double *at, int ax1, int ax2, int *status ){
 /*
 *++
 *  Name:
@@ -23086,11 +23289,11 @@ f        calculated.
 
 /* Invoke the protected version of this function with the axis indices
    decremented. */
-   return astRate_( this, at, ax1 - 1, ax2 - 1 );
+   return astRate( this, at, ax1 - 1, ax2 - 1 );
 }
 
 void astMapSplitId_( AstMapping *this, int nin, int *in, int *out, 
-                            AstMapping **map ){
+                            AstMapping **map, int *status ){
 /*
 *++
 *  Name:
@@ -23224,5 +23427,10 @@ f     MAP.
 /* Return an ID value for the Mapping. */
    *map = astMakeId( *map );
 }
+
+
+
+
+
 
 

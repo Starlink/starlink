@@ -68,7 +68,7 @@
 
 /* Prototypes for private functions. */
 /* ================================= */
-static void TranWrap( void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), AstMapping *, int, int, const double *[], int, int, double *[] );
+static void TranWrap( void (*)( AstMapping *, int, int, const double *[], int, int, double *[] ), AstMapping *, int, int, const double *[], int, int, double *[], int * );
 
 /* Transformation function interface. */
 /* ================================== */
@@ -81,7 +81,7 @@ static void TranWrap( void (* tran)( AstMapping *, int, int, const double *[],
                                      int, int, double *[] ),
                       AstMapping *this, int npoint, int ncoord_in,
                       const double *ptr_in[], int forward, int ncoord_out,
-                      double *ptr_out[] ) {
+                      double *ptr_out[], int *status ) {
 /*
 *  Name:
 *     TranWrap
@@ -97,7 +97,7 @@ static void TranWrap( void (* tran)( AstMapping *, int, int, const double *[],
 *                                   int, int, double *[] ),
 *                    AstMapping *this, int npoint, int ncoord_in,
 *                    const double *ptr_in[], int forward, int ncoord_out,
-*                    double *ptr_out[] )
+*                    double *ptr_out[], int *status )
 
 *  Description:
 *     This function invokes a FORTRAN implementation of a
@@ -146,6 +146,8 @@ static void TranWrap( void (* tran)( AstMapping *, int, int, const double *[],
 *        (transformed) point will be written.  The value of coordinate
 *        number "coord" for output point number "point" will therefore
 *        be found in "ptr_out[coord][point]".
+*     status
+*        Pointer to the inherited status value.
 */
 
 /* Local Variables; */

@@ -673,9 +673,7 @@ f     - Title: The Plot title drawn using AST_GRID
 /* Values for constants used in this class. */
 #define CRV_NSEG       14 /* No. of curve segments drawn by function Crv */
 #define CRV_NPNT       15 /* CRV_NSEG plus one */
-#define CRV_MXBRK    1000 /* Max. no. of breaks allowed in a plotted curve */
 #define CRV_MXENT      10 /* Max. no. of recursive entries into function Crv */
-#define POLY_MAX     1000 /* Max. no. of points in a poly line */
 #define MAJTICKS_OPT   10 /* Optimum number of major axiss or grid lines */
 #define MAJTICKS_MAX   14 /* Max. number of major ticks or grid lines */
 #define MAJTICKS_MIN    6 /* Min. number of major ticks or grid lines */
@@ -689,6 +687,16 @@ f     - Title: The Plot title drawn using AST_GRID
 #define NOFONT       -999 /* A value which represents a null Style value */
 #define NOCOLOUR     -999 /* A value which represents a null Style value */
 #define NOSIZE      -99.9 /* A value which represents a null Style value */
+
+#if defined(THREAD_SAFE)
+#define GLOBALS_PROTO , AstGlobals *
+#define GLOBALS_ARG , AstGlobals *AST__GLOBALS
+#define GLOBALS_NAME , AST__GLOBALS
+#else
+#define GLOBALS_PROTO 
+#define GLOBALS_ARG 
+#define GLOBALS_NAME 
+#endif
 
 /*
 *
@@ -748,7 +756,7 @@ f     - Title: The Plot title drawn using AST_GRID
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static void Clear##attr( AstPlot *this, int axis ) { \
+static void Clear##attr( AstPlot *this, int axis, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -756,7 +764,7 @@ static void Clear##attr( AstPlot *this, int axis ) { \
 /* Validate the axis index. */ \
    if( axis < 0 || axis >= ( nval ? nval : astGetNin( this ) ) ){ \
       astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
-                #attr " - it should be in the range 1 to %d.", \
+                #attr " - it should be in the range 1 to %d.", status, \
                 "astClear" #attr, astGetClass( this ), \
                 axis + 1, ( nval ? nval : astGetNin( this ) ) ); \
 \
@@ -768,13 +776,13 @@ static void Clear##attr( AstPlot *this, int axis ) { \
 \
 /* External interface. */ \
 /* ------------------- */ \
-void astClear##attr##_( AstPlot *this, int axis ) { \
+void astClear##attr##_( AstPlot *this, int axis, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
 \
 /* Invoke the required method via the virtual function table. */ \
-   (**astMEMBER(this,Plot,Clear##attr))( this, axis ); \
+   (**astMEMBER(this,Plot,Clear##attr))( this, axis, status ); \
 }   
 
 
@@ -838,7 +846,7 @@ void astClear##attr##_( AstPlot *this, int axis ) { \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static type Get##attr( AstPlot *this, int axis ) { \
+static type Get##attr( AstPlot *this, int axis, int *status ) { \
    type result;                  /* Result to be returned */ \
 \
 /* Initialise */ \
@@ -850,7 +858,7 @@ static type Get##attr( AstPlot *this, int axis ) { \
 /* Validate the axis index. */ \
    if( axis < 0 || axis >= ( nval ? nval : astGetNin( this ) ) ){ \
       astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
-                #attr " - it should be in the range 1 to %d.", \
+                #attr " - it should be in the range 1 to %d.", status, \
                 "astGet" #attr, astGetClass( this ), \
                 axis + 1, ( nval ? nval : astGetNin( this ) ) ); \
 \
@@ -867,13 +875,13 @@ static type Get##attr( AstPlot *this, int axis ) { \
 } \
 /* External interface. */ \
 /* ------------------- */  \
-type astGet##attr##_( AstPlot *this, int axis ) { \
+type astGet##attr##_( AstPlot *this, int axis, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return (bad_value); \
 \
 /* Invoke the required method via the virtual function table. */ \
-   return (**astMEMBER(this,Plot,Get##attr))( this, axis ); \
+   return (**astMEMBER(this,Plot,Get##attr))( this, axis, status ); \
 }
 
 /*
@@ -937,7 +945,7 @@ type astGet##attr##_( AstPlot *this, int axis ) { \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static void Set##attr( AstPlot *this, int axis, type value ) { \
+static void Set##attr( AstPlot *this, int axis, type value, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -945,7 +953,7 @@ static void Set##attr( AstPlot *this, int axis, type value ) { \
 /* Validate the axis index. */ \
    if( axis < 0 || axis >= ( nval ? nval : astGetNin( this ) ) ){ \
       astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
-                #attr " - it should be in the range 1 to %d.", \
+                #attr " - it should be in the range 1 to %d.", status, \
                 "astSet" #attr, astGetClass( this ), \
                 axis + 1, ( nval ? nval : astGetNin( this ) ) ); \
 \
@@ -957,13 +965,13 @@ static void Set##attr( AstPlot *this, int axis, type value ) { \
 \
 /* External interface. */ \
 /* ------------------- */ \
-void astSet##attr##_( AstPlot *this, int axis, type value ) { \
+void astSet##attr##_( AstPlot *this, int axis, type value, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
 \
 /* Invoke the required method via the virtual function table. */ \
-   (**astMEMBER(this,Plot,Set##attr))( this, axis, value ); \
+   (**astMEMBER(this,Plot,Set##attr))( this, axis, value, status ); \
 }
 
 /*
@@ -1023,7 +1031,7 @@ void astSet##attr##_( AstPlot *this, int axis, type value ) { \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static int Test##attr( AstPlot *this, int axis ) { \
+static int Test##attr( AstPlot *this, int axis, int *status ) { \
    int result;                   /* Value to return */ \
 \
 /* Initialise */ \
@@ -1035,7 +1043,7 @@ static int Test##attr( AstPlot *this, int axis ) { \
 /* Validate the axis index. */ \
    if( axis < 0 || axis >= ( nval ? nval : astGetNin( this ) ) ){ \
       astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
-                #attr " - it should be in the range 1 to %d.", \
+                #attr " - it should be in the range 1 to %d.", status, \
                 "astTest" #attr, astGetClass( this ), \
                 axis + 1, ( nval ? nval : astGetNin( this ) ) ); \
 \
@@ -1052,13 +1060,13 @@ static int Test##attr( AstPlot *this, int axis ) { \
 } \
 /* External interface. */ \
 /* ------------------- */ \
-int astTest##attr##_( AstPlot *this, int axis ) { \
+int astTest##attr##_( AstPlot *this, int axis, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return 0; \
 \
 /* Invoke the required method via the virtual function table. */ \
-   return (**astMEMBER(this,Plot,Test##attr))( this, axis ); \
+   return (**astMEMBER(this,Plot,Test##attr))( this, axis, status ); \
 }
 
 /*
@@ -1123,8 +1131,8 @@ int astTest##attr##_( AstPlot *this, int axis ) { \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static type GetUsed##attr( AstPlot *, int ); \
-static type GetUsed##attr( AstPlot *this, int axis ) { \
+static type GetUsed##attr( AstPlot *, int, int *status ); \
+static type GetUsed##attr( AstPlot *this, int axis, int *status ) { \
    type result;                  /* Result to be returned */ \
 \
 /* Initialise */ \
@@ -1136,7 +1144,7 @@ static type GetUsed##attr( AstPlot *this, int axis ) { \
 /* Validate the axis index. */ \
    if( axis < 0 || axis >= ( nval ? nval : astGetNin( this ) ) ){ \
       astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
-                #attr " - it should be in the range 1 to %d.", \
+                #attr " - it should be in the range 1 to %d.", status, \
                 "astGetUsed" #attr, astGetClass( this ), \
                 axis + 1, ( nval ? nval : astGetNin( this ) ) ); \
 \
@@ -1222,8 +1230,8 @@ static type GetUsed##attr( AstPlot *this, int axis ) { \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static void SetUsed##attr( AstPlot *, int, type ); \
-static void SetUsed##attr( AstPlot *this, int axis, type value ) { \
+static void SetUsed##attr( AstPlot *, int, type, int *status ); \
+static void SetUsed##attr( AstPlot *this, int axis, type value, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -1231,7 +1239,7 @@ static void SetUsed##attr( AstPlot *this, int axis, type value ) { \
 /* Validate the axis index. */ \
    if( axis < 0 || axis >= ( nval ? nval : astGetNin( this ) ) ){ \
       astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
-                #attr " - it should be in the range 1 to %d.", \
+                #attr " - it should be in the range 1 to %d.", status, \
                 "astSetUsed" #attr, astGetClass( this ), \
                 axis + 1, ( nval ? nval : astGetNin( this ) ) ); \
 \
@@ -1262,7 +1270,7 @@ static void SetUsed##attr( AstPlot *this, int axis, type value ) { \
 *     This macro expands to an implementation of a private member function of
 *     the form:
 *
-*        static <Type> GetUsed<Attr>( Ast<Class> *this )
+*        static <Type> GetUsed<Attr>( AstPlot *this )
 *
 *     which implement a method for getting a specified attribute value for a
 *     class. Note, no public interface function is created.
@@ -1298,8 +1306,8 @@ static void SetUsed##attr( AstPlot *this, int axis, type value ) { \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static type GetUsed##attr( Ast##class * ); \
-static type GetUsed##attr( Ast##class *this ) { \
+static type GetUsed##attr( Ast##class *, int *status ); \
+static type GetUsed##attr( Ast##class *this, int *status ) { \
    type result;               /* Result to be returned */ \
 \
 /* Check the global error status. */ \
@@ -1353,7 +1361,7 @@ static type GetUsed##attr( Ast##class *this ) { \
 *     This macro expands to an implementation of a private member function of
 *     the form:
 *
-*        static void SetUsed<Attr>( Ast<Class> *this, <Type> value )
+*        static void SetUsed<Attr>( AstPlot *this, <Type> value )
 *
 *     which implements a method for setting a specified attribute value for a
 *     class.
@@ -1385,8 +1393,8 @@ static type GetUsed##attr( Ast##class *this ) { \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static void SetUsed##attr( Ast##class *, type ); \
-static void SetUsed##attr( Ast##class *this, type value ) { \
+static void SetUsed##attr( Ast##class *, type, int *status ); \
+static void SetUsed##attr( Ast##class *this, type value, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -1402,6 +1410,8 @@ static void SetUsed##attr( Ast##class *this, type value ) { \
 /* ---------------------- */
 #include "channel.h"             /* I/O channels */
 #include "cmpmap.h"              /* Compound mapping class */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "frame.h"               /* Coordinate frame descriptions */
 #include "frameset.h"            /* Parent FrameSet class */
@@ -1410,6 +1420,7 @@ static void SetUsed##attr( Ast##class *this, type value ) { \
 #include "object.h"              /* Base Object class */ 
 #include "plot.h"                /* Interface definition for this class */
 #include "pointset.h"            /* Class holding lists of positions */
+#include "keymap.h"              /* Hash maps */
 #include "skyaxis.h"             /* Sky coordinate axes */
 #include "skyframe.h"            /* Sky coordinate frames */
 #include "winmap.h"              /* Scale and shift mappings */
@@ -1417,6 +1428,7 @@ static void SetUsed##attr( Ast##class *this, type value ) { \
 #include "wcsmap.h"              /* FITS-WCS projectsions */
 #include "unitmap.h"             /* Unit mappings */
 #include "permmap.h"             /* Axis permutations */
+#include "globals.h"             /* Thread-safe global data access */
 
 
 /* Error code definitions. */
@@ -1450,17 +1462,127 @@ typedef struct LabelList {
    int saved_prio;
 } LabelList;
 
-/* Structure holding information about curves drawn by astGridLine and 
-   astCurve. */
-typedef struct CurveData{
-   int out;          /* Was the curve completely outside the clipping area? */
-   int nbrk;         /* The number of breaks in the curve. */
-   float xbrk[ CRV_MXBRK ];  /* Graphics X coordinate at each break. */
-   float ybrk[ CRV_MXBRK ];  /* Graphics Y coordinate at each break. */
-   float vxbrk[ CRV_MXBRK ]; /* X comp. of unit tangent vector */
-   float vybrk[ CRV_MXBRK ]; /* Y comp. of unit tangent vector */
-   float length;     /* Drawn length of the curve in graphics coordinates */
-} CurveData;
+/* Structure to hold static data used internally within the Crv function. */
+typedef struct CrvStatics {
+   double *pdl2;   /* Pointer to next squared segment length */
+   double *pdx;    /* Pointer to next segment X increment */
+   double *pdy;    /* Pointer to next segment Y increment */
+   double cosang;  /* Cosine of angle between adjacent segments */
+   double d0;      /* Distance to start of first sub-segment */
+   double delta;   /* Distance between adjacent sub-segments */
+   double dl;      /* Segment length in graphics coordinates */
+   double dll;     /* Segment length for previous segment */
+   double last_x;  /* Graphics X at the end of the previous segment */
+   double last_y;  /* Graphics Y at the end of the previous segment */
+   double limit2;  /* Shortest acceptable squared segment length */
+   double t1;      /* Increment in X */
+   double t2;      /* Increment in Y */
+   double t3;      /* Squared segment length */
+   double vx;      /* X component of unit vector for current segment */
+   double vxl;     /* X component of unit vector for previous segment */
+   double vy;      /* Y component of unit vector for current segment */
+   double vyl;     /* Y component of unit vector for previous segment */
+   int *seg0;      /* Pointer to current segment OK flag */
+   int *segm;      /* Pointer to previous segment OK flag */
+   int *segp;      /* Pointer to next segment OK flag */
+   int all_bad;    /* Are all supplied positions bad or clipped?  */
+   int el;         /* Total sub-segment count */
+   int j;          /* Sub-segment index */
+   int last_ok;    /* Was the previous position defined? */
+   int nel;        /* Total number of sub-segments */
+   int nlong;      /* No.of segments longer than limit2 */
+   int nseg;       /* Number of segments being sub-divided */
+   int nshort;     /* No.of segments shorter than limit2 */
+
+#ifdef CRV_TRACE
+   int levels[100];
+#endif
+
+} CrvStatics;
+
+
+/* Structure to hold static data used internally within the Crv function. */
+typedef struct GetTicksStatics {
+   AstFrame *frame;          /* Pointer to the current Frame */
+   AstMapping *map;          /* Pointer to Base->Current Mapping */
+   AstPointSet *pset;        /* Pointer to a PointSet holding physical coords */
+   double **ptr;             /* Pointer to physical coordinate values */
+   double defgaps[ 2 ];      /* Initial test gaps for each axis */
+   double typval[ 2 ];       /* Typical value on each axis */
+   double width[ 2 ];        /* Range of used axis values */
+   int maxticks;             /* Max. number of ticks on each axis */
+   int mintick;              /* Min. number of ticks on each axis */
+   int ngood[ 2 ];           /* No. of good physical values on each axis */
+   int bad;                  /* Were any bad pixels found? */
+} GetTicksStatics;
+
+/* Structure to hold static data used internally within the EdgeCrossings
+   function. */
+typedef struct EdgeCrossingsStatics {
+   AstFrame *frame;          /* Pointer to current Frame in Plot */
+   AstPointSet *pset1;       /* Graphics cooords at edge samples */
+   AstPointSet *pset2;       /* Physical cooords at edge samples */
+   AstPointSet *pset4;       /* Graphics cooords at offset edge samples */
+   double **ptr1;            /* Pointer to graphics coord. data */
+   double **ptr2;            /* Pointer to physical coord. data */
+   double **ptr4;            /* Pointer to graphics coord. data */
+   double edgehi;            /* High bound on varying graphics axis */
+   double edgelo;            /* Low bound on varying graphics axis */
+   double edgeval;           /* Constant graphics axis value along edge */
+   double limit;             /* Three times the RMS step size */
+   int dim;                  /* Extended number of samples */
+   int edgeax;               /* Graphics axis to which edgeval refers */
+   int paxis;                /* Axis used in first invocation */
+   int pedge;                /* Edge used in first invocation */
+} EdgeCrossingsStatics;
+
+
+/* Structure to hold static data used internally within the Map1
+   function. */
+typedef struct Map1Statics {
+   AstPointSet *pset1;       /* PointSet holding physical coords */
+   AstPointSet *pset2;       /* PointSet holding graphics coords */
+   double **ptr1;            /* Pointer to physical coord data */
+   double *pax;              /* Pointer to start of axis data */
+   double *ptr2[ 2 ];        /* Pointers to graphics coord data */
+   double *work1;            /* Pointer to work space */
+   double *work2;            /* Pointer to work space */
+   double axorig;            /* Distance offset */
+   double axscale;           /* Distance scale */
+   int neg;                  /* Negate axis values? */
+   int nl;                   /* No. of points in pset1 and pset2 */
+} Map1Statics;
+
+/* Structure to hold static data used internally within the Map2
+   function. */
+typedef struct Map2Statics {
+   AstPointSet *pset1;       /* PointSet holding graphics coords */
+   AstPointSet *pset2;       /* PointSet holding physical coords */
+   double **ptr2;            /* Pointer to physical coord data */
+   double *ptr1[ 2 ];        /* Pointers to graphics coord data */
+   int nl;                   /* No. of points in pset1 and pset2 */
+} Map2Statics;
+
+/* Structure to hold static data used internally within the Map3
+   function. */
+typedef struct Map3Statics {
+   AstPointSet *pset1;       /* PointSet holding physical coords */
+   AstPointSet *pset2;       /* PointSet holding graphics coords */
+   double **ptr1;            /* Pointer to physical coord data */
+   double *ptr2[ 2 ];        /* Pointers to graphics coord data */
+   int nc;                   /* No. of physical axes */
+   int nl;                   /* No. of points in pset1 and pset2 */
+   double *pos;              /* Pointer to memory for a single position */
+} Map3Statics;
+
+/* Structure to hold static data used internally within the Map4
+   function. */
+typedef struct Map4Statics {
+   AstPointSet *pset1;       /* PointSet holding distances */
+   AstPointSet *pset2;       /* PointSet holding physical coords */
+   AstPointSet *pset3;       /* PointSet holding graphics coords */
+   int nl;                   /* No. of points in pset1 and pset2 */
+} Map4Statics;
 
 /* Structure to hold information about tick marks for a single axis. */
 typedef struct TickInfo{
@@ -1478,19 +1600,166 @@ typedef struct TickInfo{
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag as
-   static variables. */
-static AstPlotVtab class_vtab; /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static void (* parent_removeframe)( AstFrameSet *, int );
+static void (* parent_removeframe)( AstFrameSet *, int, int * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int,
-                                          AstPointSet * );
-static const char *(* parent_getattrib)( AstObject *, const char * );
-static int (* parent_testattrib)( AstObject *, const char * );
-static void (* parent_clearattrib)( AstObject *, const char * );
-static void (* parent_setattrib)( AstObject *, const char * );
+                                          AstPointSet *, int * );
+static const char *(* parent_getattrib)( AstObject *, const char *, int * );
+static int (* parent_testattrib)( AstObject *, const char *, int * );
+static void (* parent_clearattrib)( AstObject *, const char *, int * );
+static void (* parent_setattrib)( AstObject *, const char *, int * );
+
+#if defined(THREAD_SAFE)
+static int (* parent_managelock)( AstObject *, int, int, int * );
+#endif
+
+/* Strings giving the label for the graphics items corresponding to
+   AST__BORDER_ID, AST__GRIDLINE_ID, etc. */
+static char *GrfLabels = "Border Curves Title Markers Strings Axis1 Axis2 Axis3 "
+                         "NumLab1 NumLab2 NumLab3 TextLab1 TextLab2 TextLab3 "
+                         "Ticks1 Ticks2 Ticks3 Grid1 Grid2 Grid3 Axes NumLab "
+                         "TextLab Grid Ticks";
+
+/* Text values used to represent edges externally. */
+static const char *xedge[4] = { "left", "top", "right", "bottom" };
+
+/* Text values used to represent Labelling externally. */
+static const char *xlbling[2] = { "interior", "exterior" };
+
+/* Define macros for accessing each item of thread specific global data. */
+#ifdef THREAD_SAFE
+
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; \
+   globals->GrfAttrs_nesting_t = 0; \
+   globals->Crv_nent_t = 0; \
+   globals->Box_lbnd_t[ 0 ] = FLT_MAX; \
+   globals->Box_ubnd_t[ 0 ] = FLT_MIN; \
+   globals->Boxp_lbnd_t[ 0 ] = FLT_MAX; \
+   globals->Boxp_ubnd_t[ 0 ] = FLT_MIN; \
+   globals->Box_lbnd_t[ 1 ] = FLT_MAX; \
+   globals->Box_ubnd_t[ 1 ] = FLT_MIN; \
+   globals->Boxp_lbnd_t[ 1 ] = FLT_MAX; \
+   globals->Boxp_ubnd_t[ 1 ] = FLT_MIN; \
+   globals->Boxp_freeze_t = 0; \
+   globals->Map1_plot_t = NULL; \
+   globals->Map1_map_t = NULL; \
+   globals->Map1_frame_t = NULL; \
+   globals->Map1_origin_t = NULL; \
+   globals->Map1_statics_t = NULL; \
+   globals->Map2_plot_t = NULL; \
+   globals->Map2_map_t = NULL; \
+   globals->Map2_statics_t = NULL; \
+   globals->Map3_plot_t = NULL; \
+   globals->Map3_map_t = NULL; \
+   globals->Map3_frame_t = NULL; \
+   globals->Map3_origin_t = NULL; \
+   globals->Map3_end_t = NULL; \
+   globals->Map3_statics_t = NULL; \
+   globals->Map4_plot_t = NULL; \
+   globals->Map4_map_t = NULL; \
+   globals->Map4_umap_t = NULL; \
+   globals->Map4_statics_t = NULL; \
+   globals->Curve_data_t.nbrk = -1; \
+   globals->GetAttrib_Buff[ 0 ] = 0; \
+   globals->SplitValue_Buff[ 0 ] = 0; \
+   globals->StripEscapes_Buff[ 0 ] = 0;
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(Plot)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(Plot,Class_Init)
+#define class_vtab astGLOBAL(Plot,Class_Vtab)
+#define grfattrs_nesting astGLOBAL(Plot,GrfAttrs_nesting_t)      
+#define grfattrs_attrs  astGLOBAL(Plot,GrfAttrs_attrs_t)      
+#define Crv_limit 	astGLOBAL(Plot,Crv_limit_t)      
+#define Crv_scerr 	astGLOBAL(Plot,Crv_scerr_t)      
+#define Crv_tol 	astGLOBAL(Plot,Crv_tol_t)        
+#define Crv_ux0 	astGLOBAL(Plot,Crv_ux0_t)        
+#define Crv_uy0 	astGLOBAL(Plot,Crv_uy0_t)        
+#define Crv_vxl 	astGLOBAL(Plot,Crv_vxl_t)        
+#define Crv_vyl 	astGLOBAL(Plot,Crv_vyl_t)        
+#define Crv_xhi 	astGLOBAL(Plot,Crv_xhi_t)        
+#define Crv_xl 		astGLOBAL(Plot,Crv_xl_t)         
+#define Crv_xlo 	astGLOBAL(Plot,Crv_xlo_t)        
+#define Crv_yhi 	astGLOBAL(Plot,Crv_yhi_t)        
+#define Crv_yl 		astGLOBAL(Plot,Crv_yl_t)         
+#define Crv_ylo 	astGLOBAL(Plot,Crv_ylo_t)        
+#define Crv_vxbrk 	astGLOBAL(Plot,Crv_vxbrk_t)      
+#define Crv_vybrk 	astGLOBAL(Plot,Crv_vybrk_t)      
+#define Crv_xbrk 	astGLOBAL(Plot,Crv_xbrk_t)       
+#define Crv_ybrk 	astGLOBAL(Plot,Crv_ybrk_t)       
+#define Crv_len 	astGLOBAL(Plot,Crv_len_t)        
+#define Crv_ink 	astGLOBAL(Plot,Crv_ink_t)        
+#define Crv_nbrk 	astGLOBAL(Plot,Crv_nbrk_t)       
+#define Crv_nent 	astGLOBAL(Plot,Crv_nent_t)       
+#define Crv_out 	astGLOBAL(Plot,Crv_out_t)        
+#define Crv_clip 	astGLOBAL(Plot,Crv_clip_t)       
+#define Crv_map		astGLOBAL(Plot,Crv_map_t)
+#define Box_lbnd 	astGLOBAL(Plot,Box_lbnd_t)       
+#define Box_ubnd 	astGLOBAL(Plot,Box_ubnd_t)       
+#define Boxp_lbnd 	astGLOBAL(Plot,Boxp_lbnd_t)      
+#define Boxp_ubnd 	astGLOBAL(Plot,Boxp_ubnd_t)      
+#define Boxp_freeze 	astGLOBAL(Plot,Boxp_freeze_t)    
+#define Poly_x 		astGLOBAL(Plot,Poly_x_t)         
+#define Poly_y 		astGLOBAL(Plot,Poly_y_t)         
+#define Poly_n 		astGLOBAL(Plot,Poly_n_t)         
+#define Map1_ncoord 	astGLOBAL(Plot,Map1_ncoord_t)        
+#define Map1_plot 	astGLOBAL(Plot,Map1_plot_t)      
+#define Map1_map 	astGLOBAL(Plot,Map1_map_t)       
+#define Map1_frame 	astGLOBAL(Plot,Map1_frame_t)     
+#define Map1_origin 	astGLOBAL(Plot,Map1_origin_t)    
+#define Map1_length 	astGLOBAL(Plot,Map1_length_t)    
+#define Map1_axis 	astGLOBAL(Plot,Map1_axis_t)      
+#define Map1_statics 	astGLOBAL(Plot,Map1_statics_t)      
+#define Map1_norm 	astGLOBAL(Plot,Map1_norm_t)      
+#define Map1_log 	astGLOBAL(Plot,Map1_log_t)       
+#define Map2_ncoord 	astGLOBAL(Plot,Map2_ncoord_t)        
+#define Map2_plot 	astGLOBAL(Plot,Map2_plot_t)      
+#define Map2_map 	astGLOBAL(Plot,Map2_map_t)       
+#define Map2_x0 	astGLOBAL(Plot,Map2_x0_t)        
+#define Map2_y0 	astGLOBAL(Plot,Map2_y0_t)        
+#define Map2_deltax 	astGLOBAL(Plot,Map2_deltax_t)    
+#define Map2_deltay 	astGLOBAL(Plot,Map2_deltay_t)    
+#define Map2_statics 	astGLOBAL(Plot,Map1_statics_t)      
+#define Map3_ncoord 	astGLOBAL(Plot,Map3_ncoord_t)        
+#define Map3_plot 	astGLOBAL(Plot,Map3_plot_t)      
+#define Map3_map 	astGLOBAL(Plot,Map3_map_t)       
+#define Map3_frame 	astGLOBAL(Plot,Map3_frame_t)     
+#define Map3_origin 	astGLOBAL(Plot,Map3_origin_t)    
+#define Map3_end 	astGLOBAL(Plot,Map3_end_t)       
+#define Map3_scale 	astGLOBAL(Plot,Map3_scale_t)     
+#define Map3_statics 	astGLOBAL(Plot,Map3_statics_t)      
+#define Map4_ncoord 	astGLOBAL(Plot,Map4_ncoord_t)        
+#define Map4_plot 	astGLOBAL(Plot,Map4_plot_t)      
+#define Map4_map 	astGLOBAL(Plot,Map4_map_t)       
+#define Map4_umap 	astGLOBAL(Plot,Map4_umap_t)      
+#define Map4_statics 	astGLOBAL(Plot,Map4_statics_t)      
+#define Curve_data 	astGLOBAL(Plot,Curve_data_t)      
+#define getattrib_buff  astGLOBAL(Plot,GetAttrib_Buff)      
+#define splitvalue_buff astGLOBAL(Plot,SplitValue_Buff)      
+#define stripescapes_buff astGLOBAL(Plot,StripEscapes_Buff)      
+
+
+
+static pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
+#define LOCK_MUTEX2 pthread_mutex_lock( &mutex2 ); 
+#define UNLOCK_MUTEX2 pthread_mutex_unlock( &mutex2 ); 
+
+/* If thread safety is not needed, declare and initialise globals at static 
+   variables. */ 
+#else
+
+/* Variables used within astGrfAttrs_ */
+static double grfattrs_attrs[ GRF__NATTR ]; /* Saved attribute values */
+static int grfattrs_nesting = 0;            /* Nesting level. */
 
 /* Variables used to pass information to the curve drawing functions. See 
    the prologues of functions Crv and CrvLine for details. */
@@ -1517,7 +1786,7 @@ static int Crv_nbrk;
 static int Crv_nent = 0;
 static int Crv_out;
 static int Crv_clip;
-static void (*Crv_map)( int, double *, double *, double *, const char *, const char * );
+static void (*Crv_map)( int, double *, double *, double *, const char *, const char *, int * );
 
 /* The lower and upper bounds of the graphics coordinates enclosing all
    lines and numerical labels drawn by astGrid. */
@@ -1533,8 +1802,8 @@ static int Boxp_freeze = 0;
 
 /* Variables used to stored buffered poly lines (see functions Opoly, Bpoly
    and Apoly). */
-static float Poly_x[ POLY_MAX ];
-static float Poly_y[ POLY_MAX ];
+static float Poly_x[ AST__PLOT_POLY_MAX ];
+static float Poly_y[ AST__PLOT_POLY_MAX ];
 static int   Poly_n;
 
 /* Variables used by function Map1. See the prologue of Map1 for details. */
@@ -1544,6 +1813,7 @@ static AstMapping   *Map1_map = NULL;
 static AstFrame     *Map1_frame = NULL; 
 static const double *Map1_origin = NULL; 
 static double        Map1_length;
+static void         *Map1_statics = NULL;
 static int           Map1_axis;
 static int           Map1_norm;
 static int           Map1_log;
@@ -1556,6 +1826,7 @@ static double        Map2_x0;
 static double        Map2_y0;
 static double        Map2_deltax;
 static double        Map2_deltay;
+static void         *Map2_statics = NULL;
 
 /* Variables used by function Map3. See the prologue of Map3 for details. */
 static int           Map3_ncoord;       
@@ -1565,355 +1836,365 @@ static AstFrame     *Map3_frame = NULL;
 static const double *Map3_origin = NULL; 
 static const double *Map3_end = NULL; 
 static double        Map3_scale;
+static void         *Map3_statics = NULL;
 
 /* Variables used by function Map4. See the prologue of Map4 for details. */
 static int           Map4_ncoord;       
 static AstPlot      *Map4_plot = NULL; 
 static AstMapping   *Map4_map = NULL; 
 static AstMapping   *Map4_umap = NULL; 
+static void         *Map4_statics = NULL;
 
 /* A structure which stores information about the breaks in the last curve
    drawn using the public methods "astGridLine" and "astCurve". */
-static CurveData Curve_data;
+static AstPlotCurveData Curve_data;
 
-/* Strings giving the label for the graphics items corresponding to
-   AST__BORDER_ID, AST__GRIDLINE_ID, etc. */
-static char *GrfLabels = "Border Curves Title Markers Strings Axis1 Axis2 Axis3 "
-                         "NumLab1 NumLab2 NumLab3 TextLab1 TextLab2 TextLab3 "
-                         "Ticks1 Ticks2 Ticks3 Grid1 Grid2 Grid3 Axes NumLab "
-                         "TextLab Grid Ticks";
+/* Buffers for strings returned by various functions. */
+static char splitvalue_buff[ 200 ];
+static char stripescapes_buff[ AST__PLOT_STRIPESCAPES_BUFF_LEN + 1 ];
+static char getattrib_buff[ 200 ];
 
-/* Text values used to represent edges externally. */
-static const char *xedge[4] = { "left", "top", "right", "bottom" };
 
-/* Text values used to represent Labelling externally. */
-static const char *xlbling[2] = { "interior", "exterior" };
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstPlotVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#define LOCK_MUTEX2
+#define UNLOCK_MUTEX2
+
+#endif
+
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 
-static double GetTol( AstPlot * );
-static int TestTol( AstPlot * );
-static void ClearTol( AstPlot * );
-static void SetTol( AstPlot *, double );
+static double GetTol( AstPlot *, int * );
+static int TestTol( AstPlot *, int * );
+static void ClearTol( AstPlot *, int * );
+static void SetTol( AstPlot *, double, int * );
 
-static int GetGrid( AstPlot * );
-static int TestGrid( AstPlot * );
-static void ClearGrid( AstPlot * );
-static void SetGrid( AstPlot *, int );
+static int GetGrid( AstPlot *, int * );
+static int TestGrid( AstPlot *, int * );
+static void ClearGrid( AstPlot *, int * );
+static void SetGrid( AstPlot *, int, int * );
 
-static int GetTickAll( AstPlot * );
-static int TestTickAll( AstPlot * );
-static void ClearTickAll( AstPlot * );
-static void SetTickAll( AstPlot *, int );
+static int GetTickAll( AstPlot *, int * );
+static int TestTickAll( AstPlot *, int * );
+static void ClearTickAll( AstPlot *, int * );
+static void SetTickAll( AstPlot *, int, int * );
 
-static int GetForceExterior( AstPlot * );
-static int TestForceExterior( AstPlot * );
-static void ClearForceExterior( AstPlot * );
-static void SetForceExterior( AstPlot *, int );
+static int GetForceExterior( AstPlot *, int * );
+static int TestForceExterior( AstPlot *, int * );
+static void ClearForceExterior( AstPlot *, int * );
+static void SetForceExterior( AstPlot *, int, int * );
 
-static int GetBorder( AstPlot * );
-static int TestBorder( AstPlot * );
-static void ClearBorder( AstPlot * );
-static void SetBorder( AstPlot *, int );
+static int GetBorder( AstPlot *, int * );
+static int TestBorder( AstPlot *, int * );
+static void ClearBorder( AstPlot *, int * );
+static void SetBorder( AstPlot *, int, int * );
 
-static int GetInvisible( AstPlot * );
-static int TestInvisible( AstPlot * );
-static void ClearInvisible( AstPlot * );
-static void SetInvisible( AstPlot *, int );
+static int GetInvisible( AstPlot *, int * );
+static int TestInvisible( AstPlot *, int * );
+static void ClearInvisible( AstPlot *, int * );
+static void SetInvisible( AstPlot *, int, int * );
 
-static int GetInk( AstPlot * );
-static int TestInk( AstPlot * );
-static void ClearInk( AstPlot * );
-static void SetInk( AstPlot *, int );
+static int GetInk( AstPlot *, int * );
+static int TestInk( AstPlot *, int * );
+static void ClearInk( AstPlot *, int * );
+static void SetInk( AstPlot *, int, int * );
 
-static int GetClipOp( AstPlot * );
-static int TestClipOp( AstPlot * );
-static void ClearClipOp( AstPlot * );
-static void SetClipOp( AstPlot *, int );
+static int GetClipOp( AstPlot *, int * );
+static int TestClipOp( AstPlot *, int * );
+static void ClearClipOp( AstPlot *, int * );
+static void SetClipOp( AstPlot *, int, int * );
 
-static int GetClip( AstPlot * );
-static int TestClip( AstPlot * );
-static void ClearClip( AstPlot * );
-static void SetClip( AstPlot *, int );
+static int GetClip( AstPlot *, int * );
+static int TestClip( AstPlot *, int * );
+static void ClearClip( AstPlot *, int * );
+static void SetClip( AstPlot *, int, int * );
 
-static int GetGrf( AstPlot * );
-static int TestGrf( AstPlot * );
-static void ClearGrf( AstPlot * );
-static void SetGrf( AstPlot *, int );
+static int GetGrf( AstPlot *, int * );
+static int TestGrf( AstPlot *, int * );
+static void ClearGrf( AstPlot *, int * );
+static void SetGrf( AstPlot *, int, int * );
 
-static int GetDrawTitle( AstPlot * );
-static int TestDrawTitle( AstPlot * );
-static void ClearDrawTitle( AstPlot * );
-static void SetDrawTitle( AstPlot *, int );
+static int GetDrawTitle( AstPlot *, int * );
+static int TestDrawTitle( AstPlot *, int * );
+static void ClearDrawTitle( AstPlot *, int * );
+static void SetDrawTitle( AstPlot *, int, int * );
 
-static int GetDrawAxes( AstPlot *, int );
-static int TestDrawAxes( AstPlot *, int );
-static void ClearDrawAxes( AstPlot *, int );
-static void SetDrawAxes( AstPlot *, int, int );
+static int GetDrawAxes( AstPlot *, int, int * );
+static int TestDrawAxes( AstPlot *, int, int * );
+static void ClearDrawAxes( AstPlot *, int, int * );
+static void SetDrawAxes( AstPlot *, int, int, int * );
 
-static int GetAbbrev( AstPlot *, int );
-static int TestAbbrev( AstPlot *, int );
-static void ClearAbbrev( AstPlot *, int );
-static void SetAbbrev( AstPlot *, int, int );
+static int GetAbbrev( AstPlot *, int, int * );
+static int TestAbbrev( AstPlot *, int, int * );
+static void ClearAbbrev( AstPlot *, int, int * );
+static void SetAbbrev( AstPlot *, int, int, int * );
 
-static int GetEscape( AstPlot * );
-static int TestEscape( AstPlot * );
-static void ClearEscape( AstPlot * );
-static void SetEscape( AstPlot *, int );
+static int GetEscape( AstPlot *, int * );
+static int TestEscape( AstPlot *, int * );
+static void ClearEscape( AstPlot *, int * );
+static void SetEscape( AstPlot *, int, int * );
 
-static double GetLabelAt( AstPlot *, int );
-static int TestLabelAt( AstPlot *, int );
-static void ClearLabelAt( AstPlot *, int );
-static void SetLabelAt( AstPlot *, int, double );
+static double GetLabelAt( AstPlot *, int, int * );
+static int TestLabelAt( AstPlot *, int, int * );
+static void ClearLabelAt( AstPlot *, int, int * );
+static void SetLabelAt( AstPlot *, int, double, int * );
 
-static double GetNumLabGap( AstPlot *, int );
-static int TestNumLabGap( AstPlot *, int );
-static void ClearNumLabGap( AstPlot *, int );
-static void SetNumLabGap( AstPlot *, int, double );
+static double GetNumLabGap( AstPlot *, int, int * );
+static int TestNumLabGap( AstPlot *, int, int * );
+static void ClearNumLabGap( AstPlot *, int, int * );
+static void SetNumLabGap( AstPlot *, int, double, int * );
 
-static double GetTextLabGap( AstPlot *, int );
-static int TestTextLabGap( AstPlot *, int );
-static void ClearTextLabGap( AstPlot *, int );
-static void SetTextLabGap( AstPlot *, int, double );
+static double GetTextLabGap( AstPlot *, int, int * );
+static int TestTextLabGap( AstPlot *, int, int * );
+static void ClearTextLabGap( AstPlot *, int, int * );
+static void SetTextLabGap( AstPlot *, int, double, int * );
 
-static double GetCentre( AstPlot *, int );
-static int TestCentre( AstPlot *, int );
-static void ClearCentre( AstPlot *, int );
-static void SetCentre( AstPlot *, int, double );
+static double GetCentre( AstPlot *, int, int * );
+static int TestCentre( AstPlot *, int, int * );
+static void ClearCentre( AstPlot *, int, int * );
+static void SetCentre( AstPlot *, int, double, int * );
 
-static double GetGap( AstPlot *, int );
-static int TestGap( AstPlot *, int );
-static void ClearGap( AstPlot *, int );
-static void SetGap( AstPlot *, int, double );
+static double GetGap( AstPlot *, int, int * );
+static int TestGap( AstPlot *, int, int * );
+static void ClearGap( AstPlot *, int, int * );
+static void SetGap( AstPlot *, int, double, int * );
 
-static int GetLabelling( AstPlot *  );
-static int TestLabelling( AstPlot * );
-static void ClearLabelling( AstPlot * );
-static void SetLabelling( AstPlot *, int );
+static int GetLabelling( AstPlot *, int * );
+static int TestLabelling( AstPlot *, int * );
+static void ClearLabelling( AstPlot *, int * );
+static void SetLabelling( AstPlot *, int, int * );
 
-static double GetMajTickLen( AstPlot *, int );
-static int TestMajTickLen( AstPlot *, int );
-static void ClearMajTickLen( AstPlot *, int );
-static void SetMajTickLen( AstPlot *, int, double );
+static double GetMajTickLen( AstPlot *, int, int * );
+static int TestMajTickLen( AstPlot *, int, int * );
+static void ClearMajTickLen( AstPlot *, int, int * );
+static void SetMajTickLen( AstPlot *, int, double, int * );
 
-static double GetLogGap( AstPlot *, int );
-static int TestLogGap( AstPlot *, int );
-static void ClearLogGap( AstPlot *, int );
-static void SetLogGap( AstPlot *, int, double );
+static double GetLogGap( AstPlot *, int, int * );
+static int TestLogGap( AstPlot *, int, int * );
+static void ClearLogGap( AstPlot *, int, int * );
+static void SetLogGap( AstPlot *, int, double, int * );
 
-static double GetTitleGap( AstPlot * );
-static int TestTitleGap( AstPlot * );
-static void ClearTitleGap( AstPlot * );
-static void SetTitleGap( AstPlot *, double );
+static double GetTitleGap( AstPlot *, int * );
+static int TestTitleGap( AstPlot *, int * );
+static void ClearTitleGap( AstPlot *, int * );
+static void SetTitleGap( AstPlot *, double, int * );
 
-static double GetMinTickLen( AstPlot *, int );
-static int TestMinTickLen( AstPlot *, int );
-static void ClearMinTickLen( AstPlot *, int );
-static void SetMinTickLen( AstPlot *, int, double );
+static double GetMinTickLen( AstPlot *, int, int * );
+static int TestMinTickLen( AstPlot *, int, int * );
+static void ClearMinTickLen( AstPlot *, int, int * );
+static void SetMinTickLen( AstPlot *, int, double, int * );
 
-static int GetEdge( AstPlot *, int );
-static int TestEdge( AstPlot *, int );
-static void ClearEdge( AstPlot *, int );
-static void SetEdge( AstPlot *, int, int );
+static int GetEdge( AstPlot *, int, int * );
+static int TestEdge( AstPlot *, int, int * );
+static void ClearEdge( AstPlot *, int, int * );
+static void SetEdge( AstPlot *, int, int, int * );
 
-static int GetLabelUp( AstPlot *, int );
-static int TestLabelUp( AstPlot *, int );
-static void ClearLabelUp( AstPlot *, int );
-static void SetLabelUp( AstPlot *, int, int );
+static int GetLabelUp( AstPlot *, int, int * );
+static int TestLabelUp( AstPlot *, int, int * );
+static void ClearLabelUp( AstPlot *, int, int * );
+static void SetLabelUp( AstPlot *, int, int, int * );
 
-static int GetLogPlot( AstPlot *, int );
-static int TestLogPlot( AstPlot *, int );
-static void ClearLogPlot( AstPlot *, int );
-static void SetLogPlot( AstPlot *, int, int );
+static int GetLogPlot( AstPlot *, int, int * );
+static int TestLogPlot( AstPlot *, int, int * );
+static void ClearLogPlot( AstPlot *, int, int * );
+static void SetLogPlot( AstPlot *, int, int, int * );
 
-static int GetLogTicks( AstPlot *, int );
-static int TestLogTicks( AstPlot *, int );
-static void ClearLogTicks( AstPlot *, int );
-static void SetLogTicks( AstPlot *, int, int );
+static int GetLogTicks( AstPlot *, int, int * );
+static int TestLogTicks( AstPlot *, int, int * );
+static void ClearLogTicks( AstPlot *, int, int * );
+static void SetLogTicks( AstPlot *, int, int, int * );
 
-static int GetLogLabel( AstPlot *, int );
-static int TestLogLabel( AstPlot *, int );
-static void ClearLogLabel( AstPlot *, int );
-static void SetLogLabel( AstPlot *, int, int );
+static int GetLogLabel( AstPlot *, int, int * );
+static int TestLogLabel( AstPlot *, int, int * );
+static void ClearLogLabel( AstPlot *, int, int * );
+static void SetLogLabel( AstPlot *, int, int, int * );
 
-static int GetNumLab( AstPlot *, int );
-static int TestNumLab( AstPlot *, int );
-static void ClearNumLab( AstPlot *, int );
-static void SetNumLab( AstPlot *, int, int );
+static int GetNumLab( AstPlot *, int, int * );
+static int TestNumLab( AstPlot *, int, int * );
+static void ClearNumLab( AstPlot *, int, int * );
+static void SetNumLab( AstPlot *, int, int, int * );
 
-static int GetMinTick( AstPlot *, int );
-static int TestMinTick( AstPlot *, int );
-static void ClearMinTick( AstPlot *, int );
-static void SetMinTick( AstPlot *, int, int );
+static int GetMinTick( AstPlot *, int, int * );
+static int TestMinTick( AstPlot *, int, int * );
+static void ClearMinTick( AstPlot *, int, int * );
+static void SetMinTick( AstPlot *, int, int, int * );
 
-static int GetTextLab( AstPlot *, int );
-static int TestTextLab( AstPlot *, int );
-static void ClearTextLab( AstPlot *, int );
-static void SetTextLab( AstPlot *, int, int );
+static int GetTextLab( AstPlot *, int, int * );
+static int TestTextLab( AstPlot *, int, int * );
+static void ClearTextLab( AstPlot *, int, int * );
+static void SetTextLab( AstPlot *, int, int, int * );
 
-static int GetLabelUnits( AstPlot *, int );
-static int TestLabelUnits( AstPlot *, int );
-static void ClearLabelUnits( AstPlot *, int );
-static void SetLabelUnits( AstPlot *, int, int );
+static int GetLabelUnits( AstPlot *, int, int * );
+static int TestLabelUnits( AstPlot *, int, int * );
+static void ClearLabelUnits( AstPlot *, int, int * );
+static void SetLabelUnits( AstPlot *, int, int, int * );
 
-static int GetStyle( AstPlot *, int );
-static int TestStyle( AstPlot *, int );
-static void ClearStyle( AstPlot *, int );
-static void SetStyle( AstPlot *, int, int );
+static int GetStyle( AstPlot *, int, int * );
+static int TestStyle( AstPlot *, int, int * );
+static void ClearStyle( AstPlot *, int, int * );
+static void SetStyle( AstPlot *, int, int, int * );
 
-static int GetFont( AstPlot *, int );
-static int TestFont( AstPlot *, int );
-static void ClearFont( AstPlot *, int );
-static void SetFont( AstPlot *, int, int );
+static int GetFont( AstPlot *, int, int * );
+static int TestFont( AstPlot *, int, int * );
+static void ClearFont( AstPlot *, int, int * );
+static void SetFont( AstPlot *, int, int, int * );
 
-static int GetColour( AstPlot *, int );
-static int TestColour( AstPlot *, int );
-static void ClearColour( AstPlot *, int );
-static void SetColour( AstPlot *, int, int );
+static int GetColour( AstPlot *, int, int * );
+static int TestColour( AstPlot *, int, int * );
+static void ClearColour( AstPlot *, int, int * );
+static void SetColour( AstPlot *, int, int, int * );
 
-static double GetWidth( AstPlot *, int );
-static int TestWidth( AstPlot *, int );
-static void ClearWidth( AstPlot *, int );
-static void SetWidth( AstPlot *, int, double );
+static double GetWidth( AstPlot *, int, int * );
+static int TestWidth( AstPlot *, int, int * );
+static void ClearWidth( AstPlot *, int, int * );
+static void SetWidth( AstPlot *, int, double, int * );
 
-static double GetSize( AstPlot *, int );
-static int TestSize( AstPlot *, int );
-static void ClearSize( AstPlot *, int );
-static void SetSize( AstPlot *, int, double );
+static double GetSize( AstPlot *, int, int * );
+static int TestSize( AstPlot *, int, int * );
+static void ClearSize( AstPlot *, int, int * );
+static void SetSize( AstPlot *, int, double, int * );
 
-static const char *GetAttrib( AstObject *, const char * );
-static int TestAttrib( AstObject *, const char * );
-static void ClearAttrib( AstObject *, const char * );
-static void SetAttrib( AstObject *, const char * );
+static const char *GetAttrib( AstObject *, const char *, int * );
+static int TestAttrib( AstObject *, const char *, int * );
+static void ClearAttrib( AstObject *, const char *, int * );
+static void SetAttrib( AstObject *, const char *, int * );
 
-static AstFrameSet *Fset2D( AstFrameSet *, int );
-static AstPointSet *DefGap( AstPlot *, double *, int *, double *, int *, const char *, const char * );
-static AstPointSet *Trans( AstPlot *, AstFrame *, AstMapping *, AstPointSet *, int, AstPointSet *, int, const char *, const char * );
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static CurveData **CleanCdata( CurveData ** );
-static CurveData **DrawGrid( AstPlot *, TickInfo **, int, const char *, const char * );
-static TickInfo **CleanGrid( TickInfo ** );
-static TickInfo **GridLines( AstPlot *, double *, double *, int *, const char *, const char * );
-static TickInfo *TickMarks( AstPlot *, int, double *, double *, int *, const char *, const char * );
-static char **CheckLabels2( AstPlot *, AstFrame *, int, double *, int, char **, double );
-static char *FindWord( char *, const char *, const char ** );
-static char *GrfItem( int, const char *, int * );
-static const char *SplitValue( AstPlot *, const char *, int, int * );
-static const char *JustMB( AstPlot *, int, const char *, float *, float *, float, float, const char *, float, float, float, float, float *, float *, const char *, const char * );
-static double **MakeGrid( AstPlot *, AstFrame *, AstMapping *, int, int, double, double, double, double, int, AstPointSet **, AstPointSet**, int, const char *, const char * );
-static double GetTicks( AstPlot *, int, double *, double **, int *, double **, int *, int, int *, double *, const char *, const char * );
-static double GetUseSize( AstPlot *, int );
-static AstKeyMap *GetGrfContext( AstPlot * );
-static double GetUseWidth( AstPlot *, int );
-static double GoodGrid( AstPlot *, int *, AstPointSet **, AstPointSet **, const char *, const char * );
-static double Typical( int, double *, double, double, double * );
-static int Border( AstPlot * );
-static int Boundary( AstPlot *, const char *, const char * );
-static int BoxCheck( float *, float *, float *, float * );
-static int CGAttrWrapper( AstPlot *, int, double, double *, int );
-static int CGCapWrapper( AstPlot *, int, int );
-static int CGFlushWrapper( AstPlot * );
-static int CGLineWrapper( AstPlot *, int, const float *, const float * );
-static int CGMarkWrapper( AstPlot *, int, const float *, const float *, int );
-static int CGQchWrapper( AstPlot *, float *, float * );
-static int CGScalesWrapper( AstPlot *, float *, float * );
-static int CGTextWrapper( AstPlot *, const char *, float, float, const char *, float, float );
-static int CGTxExtWrapper( AstPlot *, const char *, float, float, const char *, float, float, float *, float * );
-static int CheckLabels( AstPlot *, AstFrame *, int, double *, int, int, char **, double );
-static int ChrLen( const char * );
+static AstFrameSet *Fset2D( AstFrameSet *, int, int * );
+static AstPointSet *DefGap( AstPlot *, double *, int *, double *, int *, const char *, const char *, int * );
+static AstPointSet *Trans( AstPlot *, AstFrame *, AstMapping *, AstPointSet *, int, AstPointSet *, int, const char *, const char *, int * );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static AstPlotCurveData **CleanCdata( AstPlotCurveData **, int * );
+static AstPlotCurveData **DrawGrid( AstPlot *, TickInfo **, int, const char *, const char *, int * );
+static TickInfo **CleanGrid( TickInfo **, int * );
+static TickInfo **GridLines( AstPlot *, double *, double *, int *, const char *, const char *, int * );
+static TickInfo *TickMarks( AstPlot *, int, double *, double *, int *, const char *, const char *, int * );
+static char **CheckLabels2( AstPlot *, AstFrame *, int, double *, int, char **, double, int * );
+static char *FindWord( char *, const char *, const char **, int * );
+static char *GrfItem( int, const char *, int *, int * );
+static const char *SplitValue( AstPlot *, const char *, int, int *, int * );
+static const char *JustMB( AstPlot *, int, const char *, float *, float *, float, float, const char *, float, float, float, float, float *, float *, const char *, const char *, int * );
+static double **MakeGrid( AstPlot *, AstFrame *, AstMapping *, int, int, double, double, double, double, int, AstPointSet **, AstPointSet**, int, const char *, const char *, int * );
+static double GetTicks( AstPlot *, int, double *, double **, int *, double **, int *, int, int *, double *, GetTicksStatics **, const char *, const char *, int * );
+static double GetUseSize( AstPlot *, int, int * );
+static AstKeyMap *GetGrfContext( AstPlot *, int * );
+static double GetUseWidth( AstPlot *, int, int * );
+static double GoodGrid( AstPlot *, int *, AstPointSet **, AstPointSet **, const char *, const char *, int * );
+static double Typical( int, double *, double, double, double *, int * );
+static int Border( AstPlot *, int * );
+static int Boundary( AstPlot *, const char *, const char *, int * );
+static int BoxCheck( float *, float *, float *, float *, int * );
+static int CGAttrWrapper( AstPlot *, int, double, double *, int, int * );
+static int CGCapWrapper( AstPlot *, int, int, int * );
+static int CGFlushWrapper( AstPlot *, int * );
+static int CGLineWrapper( AstPlot *, int, const float *, const float *, int * );
+static int CGMarkWrapper( AstPlot *, int, const float *, const float *, int, int * );
+static int CGQchWrapper( AstPlot *, float *, float *, int * );
+static int CGScalesWrapper( AstPlot *, float *, float *, int * );
+static int CGTextWrapper( AstPlot *, const char *, float, float, const char *, float, float, int * );
+static int CGTxExtWrapper( AstPlot *, const char *, float, float, const char *, float, float, float *, float *, int * );
+static int CheckLabels( AstPlot *, AstFrame *, int, double *, int, int, char **, double, int * );
+static int ChrLen( const char *, int * );
 static int Compare_LL( const void *, const void * );
 static int Compared( const void *, const void * );
-static int CountGood( int, double * );
-static int Cross( float, float, float, float, float, float, float, float );
-static int CvBrk( AstPlot *, int, double *, double *, double * );
-static void Mirror( AstPlot *, int );
-static AstPointSet *GetDrawnTicks( AstPlot *, int, int );
-static void SetTickValues( AstPlot *, int, int, double *, int, double * );
-static int EdgeCrossings( AstPlot *, int, int, double, double *, double **, const char *, const char * );
-static int EdgeLabels( AstPlot *, int, TickInfo **, CurveData **, int, const char *, const char * );
-static int FindDPTZ( AstFrame *, int, const char *, const char *, int *, int * );
-static int FindMajTicks( AstMapping *, AstFrame *, int, double, double, double , double *, int, double *, double ** );
-static int FindMajTicks2( int, double, double, int, double *, double ** );
-static int FindString( int, const char *[], const char *, const char *, const char *, const char * );
-static int FullForm( const char *, const char *, const char *, const char *, const char * );
-static int GCap( AstPlot *, int, int );
-static int GVec( AstPlot *, AstMapping *, double *, int, double, AstPointSet **, AstPointSet **, double *, double *, double *, double *, int *, const char *, const char *);
-static int GetUseColour( AstPlot *, int );
-static int GetUseFont( AstPlot *, int );
-static int GetUseStyle( AstPlot *, int );
-static int HasEscapes( const char * );
-static int IdFind( int, int, int *, int *, int * );
-static int Inside( int, float *, float *, float, float);
-static int IsASkyAxis( AstFrame *, int );
-static int IsASkyFrame( AstObject * );
-static int Overlap( AstPlot *, int, int, const char *, float, float, const char *, float, float, float **, const char *, const char *);
-static int PopGat( AstPlot *, float *, const char *, const char * );
-static int TestUseColour( AstPlot *, int );
-static int TestUseFont( AstPlot *, int );
-static int TestUseSize( AstPlot *, int );
-static int TestUseStyle( AstPlot *, int );
-static int TestUseWidth( AstPlot *, int );
-static int ToggleLogLin( AstPlot *, int, int, const char * );
-static int Ustrcmp( const char *, const char * );
-static int Ustrncmp( const char *, const char *, size_t );
-static int swapEdges( AstPlot *, TickInfo **, CurveData ** );
-static void AddCdt( CurveData *, CurveData *, const char *, const char * );
-static void Apoly( AstPlot *, float, float, const char *, const char * );
-static void AxPlot( AstPlot *, int, const double *, double, int, CurveData *, const char *, const char * );
-static void BoundingBox( AstPlot *, float[2], float[2] );
-static void Bpoly( AstPlot *, float, float, const char *, const char * );
-static void Clip( AstPlot *, int, const double [], const double [] );
-static void Copy( const AstObject *, AstObject * );
-static void CopyPlotDefaults( AstPlot *, int, AstPlot *, int );
-static void Crv( AstPlot *this, double *, double *, double *, int, double *, const char *, const char * );
-static void CrvLine( AstPlot *this, double, double, double, double, const char *, const char * );
-static void Curve( AstPlot *, const double [], const double [] );
-static void CurvePlot( AstPlot *, const double *, const double *, int , CurveData *, const char *, const char * );
-static void Delete( AstObject * );
-static void DrawAxis( AstPlot *, TickInfo **, double *, double *, const char *, const char *);
-static void DrawText( AstPlot *, int, int, const char *, float, float, const char *, float, float, float *, float *, float *, const char *, const char * );
-static void DrawTicks( AstPlot *, TickInfo **, int, double *, double *, const char *, const char * );
-static void Dump( AstObject *, AstChannel * );
-static void GAttr( AstPlot *, int, double, double *, int, const char *, const char * );
-static void GFlush( AstPlot *, const char *, const char * );
-static void GLine( AstPlot *, int, const float *, const float *, const char *, const char * );
-static void GMark( AstPlot *, int, const float *, const float *, int, const char *, const char * );
-static void GQch( AstPlot *, float *, float *, const char *, const char *  );
-static void GScales( AstPlot *, float *, float *, const char *, const char *  );
-static void GText( AstPlot *, const char *, float, float, const char *, float, float, const char *, const char * );
-static void GTxExt( AstPlot *, const char *, float , float, const char *, float, float, float *, float *, const char *, const char * );
-static void GenCurve( AstPlot *, AstMapping * );
-static int GraphGrid( int, int, double, double, double, double, double ** );
-static void GrfPop( AstPlot * );
-static void GrfPush( AstPlot * );
-static void GrfSet( AstPlot *, const char *,  AstGrfFun );
-static void GrfWrapper( AstPlot *, const char *,  AstGrfWrap );
-static void Grid( AstPlot * );
-static void GridLine( AstPlot *, int, const double [], double );
-static void InterpEscape( AstPlot *, int, double, float *, float *, float, float, float, float, const char *, float *, double, double, double, double, double, const char *, const char * );
-static void Labelat( AstPlot *, TickInfo **, CurveData **, double *, const char *, const char * );
-static void Labels( AstPlot *, TickInfo **, CurveData **, double *, double *, const char *, const char * );
-static void LinePlot( AstPlot *, double, double, double, double, int, CurveData *, const char *, const char * );
-static void Map1( int, double *, double *, double *, const char *, const char * );
-static void Map2( int, double *, double *, double *, const char *, const char * );
-static void Map3( int, double *, double *, double *, const char *, const char * );
-static void Map4( int, double *, double *, double *, const char *, const char * );
-static void Mark( AstPlot *, int, int, int, const double *, int );
-static void Norm1( AstMapping *, int, int, double *, double, double );
-static void Opoly( AstPlot *, const char *, const char * );
-static void PlotLabels( AstPlot *, int, AstFrame *, int, LabelList *, char *, int, float **, const char *, const char *);
-static void PolyCurve( AstPlot *, int, int, int, const double * );
-static void PurgeCdata( CurveData * );
-static void PushGat( AstPlot *, float, const char *, const char * );
-static void RemoveFrame( AstFrameSet *, int );
-static void RightVector( AstPlot *, float *, float *, float *, float *, const char *, const char * );
-static void SaveTick( AstPlot *, int, double, double, int );
-static void Text( AstPlot *, const char *, const double [], const float [], const char *);
-static void TextLabels( AstPlot *, int, int *, const char *, const char *);
-static void Ticker( AstPlot *, int, int, double, double *, double, int, int, const char *, const char *);
-static void TraceBorder( AstPlot *, double **, double **, int, int *, const char *, const char * );
-static void UpdateConcat( float *, float *, float, float, float, float, float *, float *, float, float, float *, float *, float *, float * );
+static int CountGood( int, double *, int * );
+static int Cross( float, float, float, float, float, float, float, float, int * );
+static int CvBrk( AstPlot *, int, double *, double *, double *, int * );
+static void Mirror( AstPlot *, int, int * );
+static AstPointSet *GetDrawnTicks( AstPlot *, int, int, int * );
+static void SetTickValues( AstPlot *, int, int, double *, int, double *, int * );
+static int EdgeCrossings( AstPlot *, int, int, double, double *, double **, EdgeCrossingsStatics **, const char *, const char *, int * );
+static int EdgeLabels( AstPlot *, int, TickInfo **, AstPlotCurveData **, int, const char *, const char *, int * );
+static int FindDPTZ( AstFrame *, int, const char *, const char *, int *, int *, int * );
+static int FindMajTicks( AstMapping *, AstFrame *, int, double, double, double , double *, int, double *, double **, int * );
+static int FindMajTicks2( int, double, double, int, double *, double **, int * );
+static int FindString( int, const char *[], const char *, const char *, const char *, const char *, int * );
+static int FullForm( const char *, const char *, const char *, const char *, const char *, int * );
+static int GCap( AstPlot *, int, int, int * );
+static int GVec( AstPlot *, AstMapping *, double *, int, double, AstPointSet **, AstPointSet **, double *, double *, double *, double *, int *, const char *, const char *, int * );
+static int GetUseColour( AstPlot *, int, int * );
+static int GetUseFont( AstPlot *, int, int * );
+static int GetUseStyle( AstPlot *, int, int * );
+static int HasEscapes( const char *, int * );
+static int IdFind( int, int, int *, int *, int *, int * );
+static int Inside( int, float *, float *, float, float, int * );
+static int IsASkyAxis( AstFrame *, int, int * );
+static int IsASkyFrame( AstObject *, int * );
+static int Overlap( AstPlot *, int, int, const char *, float, float, const char *, float, float, float **, const char *, const char *, int * );
+static int PopGat( AstPlot *, float *, const char *, const char *, int * );
+static int TestUseColour( AstPlot *, int, int * );
+static int TestUseFont( AstPlot *, int, int * );
+static int TestUseSize( AstPlot *, int, int * );
+static int TestUseStyle( AstPlot *, int, int * );
+static int TestUseWidth( AstPlot *, int, int * );
+static int ToggleLogLin( AstPlot *, int, int, const char *, int * );
+static int Ustrcmp( const char *, const char *, int * );
+static int Ustrncmp( const char *, const char *, size_t, int * );
+static int swapEdges( AstPlot *, TickInfo **, AstPlotCurveData **, int * );
+static void AddCdt( AstPlotCurveData *, AstPlotCurveData *, const char *, const char *, int * );
+static void Apoly( AstPlot *, float, float, const char *, const char *, int * );
+static void AxPlot( AstPlot *, int, const double *, double, int, AstPlotCurveData *, const char *, const char *, int * );
+static void BoundingBox( AstPlot *, float[2], float[2], int * );
+static void Bpoly( AstPlot *, float, float, const char *, const char *, int * );
+static void Clip( AstPlot *, int, const double [], const double [], int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void CopyPlotDefaults( AstPlot *, int, AstPlot *, int, int * );
+static void Crv( AstPlot *this, double *, double *, double *, int, double *, CrvStatics *, const char *, const char *, int * );
+static void CrvLine( AstPlot *this, double, double, double, double, const char *, const char *, int * );
+static void Curve( AstPlot *, const double [], const double [], int * );
+static void CurvePlot( AstPlot *, const double *, const double *, int , AstPlotCurveData *, const char *, const char *, int * );
+static void Delete( AstObject *, int * );
+static void DrawAxis( AstPlot *, TickInfo **, double *, double *, const char *, const char *, int * );
+static void DrawText( AstPlot *, int, int, const char *, float, float, const char *, float, float, float *, float *, float *, const char *, const char *, int * );
+static void DrawTicks( AstPlot *, TickInfo **, int, double *, double *, const char *, const char *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void GAttr( AstPlot *, int, double, double *, int, const char *, const char *, int * );
+static void GFlush( AstPlot *, const char *, const char *, int * );
+static void GLine( AstPlot *, int, const float *, const float *, const char *, const char *, int * );
+static void GMark( AstPlot *, int, const float *, const float *, int, const char *, const char *, int * );
+static void GQch( AstPlot *, float *, float *, const char *, const char *, int * );
+static void GScales( AstPlot *, float *, float *, const char *, const char *, int * );
+static void GText( AstPlot *, const char *, float, float, const char *, float, float, const char *, const char *, int * );
+static void GTxExt( AstPlot *, const char *, float , float, const char *, float, float, float *, float *, const char *, const char *, int * );
+static void GenCurve( AstPlot *, AstMapping *, int * );
+static int GraphGrid( int, int, double, double, double, double, double **, int * );
+static void GrfPop( AstPlot *, int * );
+static void GrfPush( AstPlot *, int * );
+static void GrfSet( AstPlot *, const char *,  AstGrfFun, int * );
+static void GrfWrapper( AstPlot *, const char *,  AstGrfWrap, int * );
+static void Grid( AstPlot *, int * );
+static void GridLine( AstPlot *, int, const double [], double, int * );
+static void InterpEscape( AstPlot *, int, double, float *, float *, float, float, float, float, const char *, float *, double, double, double, double, double, const char *, const char *, int * );
+static void Labelat( AstPlot *, TickInfo **, AstPlotCurveData **, double *, const char *, const char *, int * );
+static void Labels( AstPlot *, TickInfo **, AstPlotCurveData **, double *, double *, const char *, const char *, int * );
+static void LinePlot( AstPlot *, double, double, double, double, int, AstPlotCurveData *, const char *, const char *, int * );
+static void Map1( int, double *, double *, double *, const char *, const char *, int * GLOBALS_PROTO );
+static void Map2( int, double *, double *, double *, const char *, const char *, int * GLOBALS_PROTO );
+static void Map3( int, double *, double *, double *, const char *, const char *, int * GLOBALS_PROTO );
+static void Map4( int, double *, double *, double *, const char *, const char *, int * GLOBALS_PROTO );
+static void Mark( AstPlot *, int, int, int, const double *, int, int * );
+static void Norm1( AstMapping *, int, int, double *, double, double, int * );
+static void Opoly( AstPlot *, const char *, const char *, int * );
+static void PlotLabels( AstPlot *, int, AstFrame *, int, LabelList *, char *, int, float **, const char *, const char *, int * );
+static void PolyCurve( AstPlot *, int, int, int, const double *, int * );
+static void PurgeCdata( AstPlotCurveData *, int * );
+static void PushGat( AstPlot *, float, const char *, const char *, int * );
+static void RemoveFrame( AstFrameSet *, int, int * );
+static void RightVector( AstPlot *, float *, float *, float *, float *, const char *, const char *, int * );
+static void SaveTick( AstPlot *, int, double, double, int, int * );
+static void Text( AstPlot *, const char *, const double [], const float [], const char *, int * );
+static void TextLabels( AstPlot *, int, int *, const char *, const char *, int * );
+static void Ticker( AstPlot *, int, int, double, double *, double, int, int, EdgeCrossingsStatics **, const char *, const char *, int * );
+static void TraceBorder( AstPlot *, double **, double **, int, int *, const char *, const char *, int * );
+static void UpdateConcat( float *, float *, float, float, float, float, float *, float *, float, float, float *, float *, float *, float *, int * );
+
+#if defined(THREAD_SAFE)
+static int ManageLock( AstObject *, int, int, int * );
+#endif
 
 /* Functions which access class attributes. */
 /* =======================================  */
@@ -2237,7 +2518,7 @@ f     The AST_CLIP routine
 astMAKE_CLEAR(Plot,Clip,clip,-1)
 astMAKE_GET(Plot,Clip,int,0,(this->clip == -1 ? 1 : this->clip))
 astMAKE_TEST(Plot,Clip,( this->clip != -1 ))
-astMAKE_SET(Plot,Clip,int,clip,((value>=0&&value<=3)?value:(astError( AST__ATTIN, "astSetClip(Plot): Invalid value %d supplied for Clip attribute", value ), this->clip)))
+astMAKE_SET(Plot,Clip,int,clip,((value>=0&&value<=3)?value:(astError( AST__ATTIN, "astSetClip(Plot): Invalid value %d supplied for Clip attribute", status, value ), this->clip)))
 
 /* ClipOp */
 /* ------ */
@@ -3873,7 +4154,7 @@ MAKE_SET(Colour,int,colour,value,AST__NPID)
 MAKE_CLEAR(Width,width,AST__BAD,AST__NPID)
 MAKE_GET(Width,double,1.0,( this->width[axis] == AST__BAD ? 1.0 : this->width[axis] ),AST__NPID)
 MAKE_TEST(Width,( this->width[axis] != AST__BAD ),AST__NPID)
-MAKE_SET(Width,double,width,(value!=0.00)?value:(astError(AST__ATTIN,"astSetWidth(Plot):Invalid zero value supplied for Width(%s) attribute",GrfItem(axis,NULL,NULL)),this->width[axis]),AST__NPID)
+MAKE_SET(Width,double,width,(value!=0.00)?value:(astError(AST__ATTIN,"astSetWidth(Plot):Invalid zero value supplied for Width(%s) attribute", status,GrfItem(axis,NULL,NULL, status )),this->width[axis]),AST__NPID)
 
 /* Size. */
 /* ----- */
@@ -3923,27 +4204,27 @@ MAKE_SET(Width,double,width,(value!=0.00)?value:(astError(AST__ATTIN,"astSetWidt
 MAKE_CLEAR(Size,size,AST__BAD,AST__NPID)
 MAKE_GET(Size,double,1.0,( this->size[axis] == AST__BAD ? 1.0 : this->size[axis] ),AST__NPID)
 MAKE_TEST(Size,( this->size[axis] != AST__BAD ),AST__NPID)
-MAKE_SET(Size,double,size,(value!=0.00)?value:(astError(AST__ATTIN,"astSetSize(Plot): Invalid zero value supplied for Size(%s) attribute",GrfItem(axis,NULL,NULL)),this->size[axis]),AST__NPID)
+MAKE_SET(Size,double,size,(value!=0.00)?value:(astError(AST__ATTIN,"astSetSize(Plot): Invalid zero value supplied for Size(%s) attribute", status,GrfItem(axis,NULL,NULL, status )),this->size[axis]),AST__NPID)
 
 /* Member functions. */
 /* ================= */
-static void AddCdt( CurveData *cdt1, CurveData *cdt2, const char *method, 
-                    const char *class ){
+static void AddCdt( AstPlotCurveData *cdt1, AstPlotCurveData *cdt2, const char *method, 
+                    const char *class, int *status ){
 /*
 *
 *  Name:
 *     AddCdt
 
 *  Purpose:
-*     Append one CurveData structure to another.
+*     Append one AstPlotCurveData structure to another.
 
 *  Type:
 *     Private function.
 
 *  Synopsis:
 *     #include "plot.h"
-*     void AddCdt( CurveData *cdt1, CurveData *cdt2, const char *method, 
-*                  const char *class )
+*     void AddCdt( AstPlotCurveData *cdt1, AstPlotCurveData *cdt2, const char *method, 
+*                  const char *class, int *status )
 
 *  Class Membership:
 *     Plot private function.
@@ -3954,15 +4235,17 @@ static void AddCdt( CurveData *cdt1, CurveData *cdt2, const char *method,
 
 *  Parameters:
 *     cdt1
-*        Pointer to the CurveData structure to be modified.
+*        Pointer to the AstPlotCurveData structure to be modified.
 *     cdt2
-*        Pointer to the CurveData structure to be appended to cdt1.
+*        Pointer to the AstPlotCurveData structure to be appended to cdt1.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     -  An error is reported if there is insufficient room in "cdt1" to
@@ -3979,11 +4262,11 @@ static void AddCdt( CurveData *cdt1, CurveData *cdt2, const char *method,
 /* Get the total number of breaks described by both structures. */
    nbrk = cdt1->nbrk + cdt2->nbrk;
 
-/* Report an error if this number of breaks cannot be stored in a CurveData
+/* Report an error if this number of breaks cannot be stored in a AstPlotCurveData
    structure. */
    if( nbrk > AST__MXBRK ){
       astError( AST__CVBRK, "%s(%s): Number of breaks in curve "
-                "exceeds %d.", method, class, AST__MXBRK );
+                "exceeds %d.", status, method, class, AST__MXBRK );
 
 /* Otherwise, append the information. */
    } else {
@@ -4020,7 +4303,7 @@ static void AddCdt( CurveData *cdt1, CurveData *cdt2, const char *method,
 
 }
 
-static void Apoly( AstPlot *this, float x, float y, const char *method, const char *class ){
+static void Apoly( AstPlot *this, float x, float y, const char *method, const char *class, int *status ){
 /*
 *  Name:
 *     Apoly
@@ -4033,7 +4316,7 @@ static void Apoly( AstPlot *this, float x, float y, const char *method, const ch
 
 *  Synopsis:
 *     #include "plot.h"
-*     void Apoly( AstPlot *this, float x, float y, const char *method, const char *class )
+*     void Apoly( AstPlot *this, float x, float y, const char *method, const char *class, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -4054,18 +4337,26 @@ static void Apoly( AstPlot *this, float x, float y, const char *method, const ch
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 */
+
+/* Local Variables: */
+   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
 
 /* Check the global status. */
    if( !astOK ) return;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
+
 /* If the buffer is already full, output it to the screen and re-initialise 
    it to hold just the final point. */      
-   if( Poly_n == POLY_MAX ){
-      Opoly( this, method, class );
-      Poly_x[ 0 ] = Poly_x[ POLY_MAX - 1 ];
-      Poly_y[ 0 ] = Poly_y[ POLY_MAX - 1 ];
+   if( Poly_n == AST__PLOT_POLY_MAX ){
+      Opoly( this, method, class, status );
+      Poly_x[ 0 ] = Poly_x[ AST__PLOT_POLY_MAX - 1 ];
+      Poly_y[ 0 ] = Poly_y[ AST__PLOT_POLY_MAX - 1 ];
       Poly_n = 1;
    }
 
@@ -4081,11 +4372,11 @@ static void Apoly( AstPlot *this, float x, float y, const char *method, const ch
 
 }
 
-static void PurgeCdata( CurveData *cdata ){
+static void PurgeCdata( AstPlotCurveData *cdata, int *status ){
 /*
 *
 *  Name:
-*     CurveData
+*     AstPlotCurveData
 
 *  Purpose:
 *     Remove any zero length sections from the description of a curve.
@@ -4095,14 +4386,14 @@ static void PurgeCdata( CurveData *cdata ){
 
 *  Synopsis:
 *     #include "plot.h"
-*     void PurgeCdata( CurveData *cdata )
+*     void PurgeCdata( AstPlotCurveData *cdata )
 
 *  Class Membership:
 *     Plot member function.
 
 *  Description:
 *     This function removes any zero length sections from the supplied
-*     CurveData struture, which describes a multi-section curve.
+*     AstPlotCurveData struture, which describes a multi-section curve.
 
 *  Parameters:
 *     cdata
@@ -4145,7 +4436,7 @@ static void PurgeCdata( CurveData *cdata ){
 }
 
 static void AxPlot( AstPlot *this, int axis, const double *start, double length,
-                    int ink, CurveData *cdata, const char *method, const char *class ){
+                    int ink, AstPlotCurveData *cdata, const char *method, const char *class, int *status ){
 /*
 *
 *  Name:
@@ -4160,7 +4451,7 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
 *  Synopsis:
 *     #include "plot.h"
 *     void AxPlot( AstPlot *this, int axis, const double *start, double length,
-*                  int ink, CurveData *cdata, const char *method, const char *class )
+*                  int ink, AstPlotCurveData *cdata, const char *method, const char *class, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -4172,7 +4463,7 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
 *     discontinuities in the Mapping between the current Frame and graphics 
 *     coordinates, and information describing any breaks in the curve 
 *     (including the start and end of the curve) are returned in the supplied 
-*     CurveData structure. 
+*     AstPlotCurveData structure. 
 
 *  Parameters:
 *     this
@@ -4198,6 +4489,8 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     -  No curve is draw if the "start" array contains any bad values
@@ -4207,6 +4500,7 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
    double d[ CRV_NPNT ];   /* Offsets to evenly spaced points along curve */
    double x[ CRV_NPNT ];   /* X coords at evenly spaced points along curve */
    double y[ CRV_NPNT ];   /* Y coords at evenly spaced points along curve */
@@ -4218,6 +4512,9 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
 
 #ifdef CRV_TRACE
    printf("AXPLOT: axis %d, start (%.*g,%.*g), length %.*g\n",
@@ -4286,8 +4583,8 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
       Map1_axis = axis;
 
 /* Decide whether to omit points not in their normal ranges. */
-      Map1_norm = !IsASkyAxis( Map1_frame, 0 ) && 
-                  !IsASkyAxis( Map1_frame, 1 );
+      Map1_norm = !IsASkyAxis( Map1_frame, 0, status ) && 
+                  !IsASkyAxis( Map1_frame, 1, status );
 
 /* Convert the tolerance from relative to absolute graphics coordinates. */
       tol = astGetTol( this )*MAX( this->xhi - this->xlo, 
@@ -4318,16 +4615,16 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
       }
 
 /* Map these points into graphics coordinates. */
-      Map1( CRV_NPNT, d, x, y, method, class );
+      Map1( CRV_NPNT, d, x, y, method, class, status GLOBALS_NAME );
 
 /* Use Crv and Map1 to draw the curve. */
-      Crv( this, d, x, y, 0, NULL, method, class );
+      Crv( this, d, x, y, 0, NULL, NULL, method, class, status );
 
 /* End the current poly line. */
-      Opoly( this, method, class );
+      Opoly( this, method, class, status );
 
 /* Tidy up the static data used by Map1. */
-      Map1( 0, NULL, NULL, NULL, method, class );
+      Map1( 0, NULL, NULL, NULL, method, class, status GLOBALS_NAME );
 
 /* If no part of the curve could be drawn, set the number of breaks and the 
    length of the drawn curve to zero. */
@@ -4339,9 +4636,9 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
    the last point to be plotted. */
       } else {
          Crv_nbrk++;
-         if( Crv_nbrk > CRV_MXBRK ){
+         if( Crv_nbrk > AST__PLOT_CRV_MXBRK ){
             astError( AST__CVBRK, "%s(%s): Number of breaks in curve "
-                      "exceeds %d.", method, class, CRV_MXBRK );
+                      "exceeds %d.", status, method, class, AST__PLOT_CRV_MXBRK );
          } else {
             *(Crv_xbrk++) = (float) Crv_xl;
             *(Crv_ybrk++) = (float) Crv_yl;
@@ -4356,7 +4653,7 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
          cdata->length = Crv_len;
          cdata->out = Crv_out;
          cdata->nbrk = Crv_nbrk;
-         PurgeCdata( cdata );
+         PurgeCdata( cdata, status );
       }
 
 /* Annul the Frame and Mapping. */
@@ -4373,7 +4670,7 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
 
 }
 
-static int Boundary( AstPlot *this, const char *method, const char *class ){
+static int Boundary( AstPlot *this, const char *method, const char *class, int *status ){
 /*
 *  Name:
 *     Boundary
@@ -4386,7 +4683,7 @@ static int Boundary( AstPlot *this, const char *method, const char *class ){
 
 *  Synopsis:
 *     #include "plot.h"
-*     int Boundary( AstPlot *this, const char *method, const char *class  )
+*     int Boundary( AstPlot *this, const char *method, const char *class, int *status  )
 
 *  Class Membership:
 *     Plot method.
@@ -4429,6 +4726,8 @@ static int Boundary( AstPlot *this, const char *method, const char *class ){
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A flag indicating if any regions containing invalid physical
@@ -4512,7 +4811,7 @@ static int Boundary( AstPlot *this, const char *method, const char *class ){
 
 /* Create the grid. */
    ptr2 = MakeGrid( this, NULL, map, 0, dim, this->xlo, this->xhi, this->ylo, 
-                    this->yhi, 2, &pset1, &pset2, 0, method, class );
+                    this->yhi, 2, &pset1, &pset2, 0, method, class, status );
 
 /* Store the number of cells along each edge of the grid. */
    ncell = dim - 1;
@@ -4619,8 +4918,8 @@ static int Boundary( AstPlot *this, const char *method, const char *class ){
 
 /* Create two PointSets to hold the graphics and physical coordinates for 
    the refined grids for all boundary cells. */
-            pset3 = astPointSet( rsize*nbndry, 2, "" );
-            pset4 = astPointSet( rsize*nbndry, 2, "" );
+            pset3 = astPointSet( rsize*nbndry, 2, "", status );
+            pset4 = astPointSet( rsize*nbndry, 2, "", status );
 
 /* Get a pointer to the graphics coordinate PointSet data arrays, and
    store the starting address of each axis. */
@@ -4651,7 +4950,7 @@ static int Boundary( AstPlot *this, const char *method, const char *class ){
                      if( *( flag++ ) == flag_value ){
                         (void) GraphGrid( rdim, 0, ptr1[ 0 ][ c0 ], 
                                           ptr1[ 0 ][ c2 ], ptr1[ 1 ][ c0 ], 
-                                          ptr1[ 1 ][ c2 ], ptr3b );
+                                          ptr1[ 1 ][ c2 ], ptr3b, status );
 
 /* Increment the pointers to the next values to be added to the PointSet
    arrays. */
@@ -4668,7 +4967,7 @@ static int Boundary( AstPlot *this, const char *method, const char *class ){
 
 /* Transform the graphics coordinates to get the corresponding physical
    coordinates. */
-            (void) Trans( this, NULL, map, pset3, 1, pset4, 0, method, class ); 
+            (void) Trans( this, NULL, map, pset3, 1, pset4, 0, method, class, status ); 
 
 /* Get a pointer to the physical coordinate PointSet data array. */
             ptr4 = astGetPoints( pset4 );         
@@ -4702,7 +5001,7 @@ static int Boundary( AstPlot *this, const char *method, const char *class ){
 /* If this cell is a boundary cell with the current flag value, trace the 
    boundary through it using the refined grid. */
                      if( *( flag++ ) == flag_value ){
-                        TraceBorder( this, ptr3b, ptr4b, rdim, edge, method, class );
+                        TraceBorder( this, ptr3b, ptr4b, rdim, edge, method, class, status );
 
 /* Increment the pointers to the next values to be read from the PointSet
    arrays. */
@@ -4784,7 +5083,7 @@ static int Boundary( AstPlot *this, const char *method, const char *class ){
 
 }
 
-static int Border( AstPlot *this_nd ){
+static int Border( AstPlot *this_nd, int *status ){
 /*
 *++
 *  Name:
@@ -4857,8 +5156,9 @@ f     with STATUS set to an error value, or if it should fail for any
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
    AstPlot *this;          /* Plot with no more than 2 current axes */
-   CurveData cdata;        /* Structure to receive break information */
+   AstPlotCurveData cdata; /* Structure to receive break information */
    const char *class;      /* Object class */
    const char *method;     /* Current method */
    int inval;              /* Were any bad regions found? */
@@ -4866,6 +5166,9 @@ f     with STATUS set to an error value, or if it should fail for any
 
 /* Check the global error status. */
    if ( !astOK ) return 0;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this_nd);
 
 /* Store the current method, and the class of the supplied object for use 
    in error messages.*/
@@ -4885,18 +5188,18 @@ f     with STATUS set to an error value, or if it should fail for any
    if( naxes != 2 && astOK ){
       astError( AST__NAXIN, "%s(%s): Number of axes (%d) in the base "
                 "Frame of the supplied %s is invalid - this number should "
-                "be 2.", method, class, naxes, class );
+                "be 2.", status, method, class, naxes, class );
    } 
 
 /* Get a Plot with a 2D (or 1D) current Frame. */
-   this = (AstPlot *) Fset2D( (AstFrameSet *) this_nd, AST__CURRENT );
+   this = (AstPlot *) Fset2D( (AstFrameSet *) this_nd, AST__CURRENT, status );
 
 /* Check the current Frame of the Plot is 2-D. */
    naxes = astGetNout( this );
    if( naxes != 2 && astOK ){
       astError( AST__NAXIN, "%s(%s): Number of axes (%d) in the current "
                 "Frame of the supplied %s is invalid - this number should "
-                "be 2.", method, class, naxes, class );
+                "be 2.", status, method, class, naxes, class );
    } 
 
 /* Establish the correct graphical attributes as defined by attributes
@@ -4907,23 +5210,23 @@ f     with STATUS set to an error value, or if it should fail for any
    physical coordinates with the edges of the plotting area. First do
    the bottom edge. */
    LinePlot( this, this->xlo, this->ylo, this->xhi, this->ylo,
-             1, &cdata, method, class );
+             1, &cdata, method, class, status );
 
 /* Now do the right-hand edge. */
    LinePlot( this, this->xhi, this->ylo, this->xhi, this->yhi, 
-             1, &cdata, method, class );
+             1, &cdata, method, class, status );
 
 /* Now do the top edge. */
    LinePlot( this, this->xhi, this->yhi, this->xlo, this->yhi, 
-             1, &cdata, method, class );
+             1, &cdata, method, class, status );
 
 /* Now do the left-hand edge. */
    LinePlot( this, this->xlo, this->yhi, this->xlo, this->ylo, 
-             1, &cdata, method, class );
+             1, &cdata, method, class, status );
 
 /* Now draw a curve following the boundary through the interior of the 
    plotting area. */
-   inval = Boundary( this, method, class );
+   inval = Boundary( this, method, class, status );
 
 /* Re-establish the original graphical attributes. */
    astGrfAttrs( this, AST__BORDER_ID, 0, GRF__LINE, method, class );
@@ -4936,7 +5239,7 @@ f     with STATUS set to an error value, or if it should fail for any
 
 }
 
-static void BoundingBox( AstPlot *this, float lbnd[2], float ubnd[2] ){
+static void BoundingBox( AstPlot *this, float lbnd[2], float ubnd[2], int *status ){
 /*
 *++
 *  Name:
@@ -4990,11 +5293,15 @@ f        The global status.
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
    AstFrameSet *fset;      /* Pointer to the Plot's FrameSet */
    int naxes;              /* No. of axes in the base Frame */
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
 
 /* Get a pointer to the FrameSet at the start of the Plot. */
    fset = (AstFrameSet *) this;
@@ -5004,7 +5311,7 @@ f        The global status.
    if( naxes != 2 && astOK ){
       astError( AST__NAXIN, "astBoundingBox(%s): Number of axes (%d) in the "
                 "base Frame of the supplied %s is invalid - this number "
-                "should be 2.", astGetClass( this ), naxes,  
+                "should be 2.", status, astGetClass( this ), naxes,  
                 astGetClass( this ) );
    } 
 
@@ -5019,7 +5326,7 @@ f        The global status.
 
 }
 
-static int BoxCheck( float *bx, float *by, float *cx, float *cy ) {
+static int BoxCheck( float *bx, float *by, float *cx, float *cy, int *status ) {
 /*
 *  Name:
 *     BoxCheck
@@ -5032,7 +5339,7 @@ static int BoxCheck( float *bx, float *by, float *cx, float *cy ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int BoxCheck( float *bx, float *by, float *cx, float *cy )
+*     int BoxCheck( float *bx, float *by, float *cx, float *cy, int *status )
 
 *  Class Membership:
 *     Plot method.
@@ -5054,6 +5361,8 @@ static int BoxCheck( float *bx, float *by, float *cx, float *cy ) {
 *     cy
 *        Pointer to an array holding the Y coordinates at the 4 corners
 *        of box "c".
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Zero is returned if the boxes do not overlap or an error has
@@ -5078,12 +5387,12 @@ static int BoxCheck( float *bx, float *by, float *cx, float *cy ) {
 
 /* Check each corner of box b to see if it is inside box c. */
    for( j = 0; j < 4 && ret == 0; j++ ){
-      if( Inside( 4, cx, cy, bx[ j ], by[ j ] ) ) ret = 1;
+      if( Inside( 4, cx, cy, bx[ j ], by[ j ], status ) ) ret = 1;
    }
 
 /* Now check each corner of box c to see if it is inside box b. */
    for( j = 0; j < 4 && ret == 0; j++ ){
-      if( Inside( 4, bx, by, cx[ j ], cy[ j ] ) ) ret = 1;
+      if( Inside( 4, bx, by, cx[ j ], cy[ j ], status ) ) ret = 1;
    }
 
 /* If no overlap has yet been found, we need to see if any of the edges
@@ -5099,7 +5408,7 @@ static int BoxCheck( float *bx, float *by, float *cx, float *cy ) {
    corners 3 and 0. If either of these conditions is not met swap the 
    corners around to correct it. First do box b. */
       if( Cross( bx[0], by[0], bx[1], by[1],
-                 bx[2], by[2], bx[3], by[3] ) ) {
+                 bx[2], by[2], bx[3], by[3], status ) ) {
          x2 = bx[2];
          y2 = by[2];
          bx[2] = bx[1];
@@ -5108,7 +5417,7 @@ static int BoxCheck( float *bx, float *by, float *cx, float *cy ) {
          by[1] = y2;
 
       } else if( Cross( bx[1], by[1], bx[2], by[2],
-                        bx[3], by[3], bx[0], by[0] ) ) {
+                        bx[3], by[3], bx[0], by[0], status ) ) {
          x2 = bx[2];
          y2 = by[2];
          bx[2] = bx[3];
@@ -5119,7 +5428,7 @@ static int BoxCheck( float *bx, float *by, float *cx, float *cy ) {
 
 /* Now do box c. */
       if( Cross( cx[0], cy[0], cx[1], cy[1],
-                 cx[2], cy[2], cx[3], cy[3] ) ) {
+                 cx[2], cy[2], cx[3], cy[3], status ) ) {
          x2 = cx[2];
          y2 = cy[2];
          cx[2] = cx[1];
@@ -5128,7 +5437,7 @@ static int BoxCheck( float *bx, float *by, float *cx, float *cy ) {
          cy[1] = y2;
 
       } else if( Cross( cx[1], cy[1], cx[2], cy[2],
-                        cx[3], cy[3], cx[0], cy[0] ) ) {
+                        cx[3], cy[3], cx[0], cy[0], status ) ) {
          x2 = cx[2];
          y2 = cy[2];
          cx[2] = cx[3];
@@ -5151,7 +5460,7 @@ static int BoxCheck( float *bx, float *by, float *cx, float *cy ) {
             if( ip == 4 ) ip = 0;
 
             ret = Cross( bx[j], by[j], bx[jp], by[jp],
-                         cx[i], cy[i], cx[ip], cy[ip] );
+                         cx[i], cy[i], cx[ip], cy[ip], status );
 
          }
       }
@@ -5160,7 +5469,7 @@ static int BoxCheck( float *bx, float *by, float *cx, float *cy ) {
    return ret;
 }
 
-static void Bpoly( AstPlot *this, float x, float y, const char *method, const char *class ){
+static void Bpoly( AstPlot *this, float x, float y, const char *method, const char *class, int *status ){
 /*
 *  Name:
 *     Bpoly
@@ -5173,7 +5482,7 @@ static void Bpoly( AstPlot *this, float x, float y, const char *method, const ch
 
 *  Synopsis:
 *     #include "plot.h"
-*     void Bpoly( AstPlot *this, float x, float y, const char *method, const char *class )
+*     void Bpoly( AstPlot *this, float x, float y, const char *method, const char *class, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -5193,6 +5502,8 @@ static void Bpoly( AstPlot *this, float x, float y, const char *method, const ch
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -5200,15 +5511,15 @@ static void Bpoly( AstPlot *this, float x, float y, const char *method, const ch
    if( !astOK ) return;
 
 /* Draw any existing poly line. */
-   Opoly( this, method, class );
+   Opoly( this, method, class, status );
 
 /* Add the supplied point into the buffer. */
-   Apoly( this, x, y, method, class );
+   Apoly( this, x, y, method, class, status );
 
 }
 
 
-static int CGCapWrapper( AstPlot *this, int cap, int value ) {
+static int CGCapWrapper( AstPlot *this, int cap, int value, int *status ) {
 /*
 *
 *  Name:
@@ -5222,7 +5533,7 @@ static int CGCapWrapper( AstPlot *this, int cap, int value ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int CGCapWrapper( AstPlot *this, int cap, int value )
+*     int CGCapWrapper( AstPlot *this, int cap, int value, int *status )
 
 *  Class Membership:
 *     Plot private function.
@@ -5238,6 +5549,8 @@ static int CGCapWrapper( AstPlot *this, int cap, int value ) {
 *        The capability to be inquired aboue.
 *     value
 *        The value ot assign to the capability.
+*     status
+*        Pointer to the inherited status value.
 
 *  Returned Value:
 *     Non-zero if the grf module is capabale of performing the action
@@ -5249,7 +5562,7 @@ static int CGCapWrapper( AstPlot *this, int cap, int value ) {
 }
 
 static int CGAttrWrapper( AstPlot *this, int attr, double value, 
-                          double *old_value, int prim ) {
+                          double *old_value, int prim, int *status ) {
 /*
 *
 *  Name:
@@ -5264,7 +5577,7 @@ static int CGAttrWrapper( AstPlot *this, int attr, double value,
 *  Synopsis:
 *     #include "plot.h"
 *     int CGAttrWrapper( AstPlot *this, int attr, double value, 
-*                        double *old_value, int prim )
+*                        double *old_value, int prim, int *status )
 
 *  Class Membership:
 *     Plot private function.
@@ -5297,13 +5610,15 @@ static int CGAttrWrapper( AstPlot *this, int attr, double value,
 *           GRF__LINE
 *           GRF__MARK
 *           GRF__TEXT
+*     status
+*        Pointer to the inherited status value.
 
 */
    if( !astOK ) return 0;
    return ( (AstGAttrFun) this->grffun[ AST__GATTR ] )( astGrfConID(this), attr, value, old_value, prim );
 }
 
-static int CGFlushWrapper( AstPlot *this ) {
+static int CGFlushWrapper( AstPlot *this, int *status ) {
 /*
 *
 *  Name:
@@ -5329,6 +5644,8 @@ static int CGFlushWrapper( AstPlot *this ) {
 *  Parameters:
 *     this
 *        The Plot.
+*     status
+*        Pointer to the inherited status value.
 
 */
    if( !astOK ) return 0;
@@ -5336,7 +5653,7 @@ static int CGFlushWrapper( AstPlot *this ) {
 }
 
 static int CGLineWrapper( AstPlot *this, int n, const float *x, 
-                          const float *y ) {
+                          const float *y, int *status ) {
 /*
 *
 *  Name:
@@ -5351,7 +5668,7 @@ static int CGLineWrapper( AstPlot *this, int n, const float *x,
 *  Synopsis:
 *     #include "plot.h"
 *     int CGLineWrapper( AstPlot *this, int n, const float *x, 
-*                        const float *y )
+*                        const float *y, int *status )
 
 *  Class Membership:
 *     Plot private function.
@@ -5369,6 +5686,8 @@ static int CGLineWrapper( AstPlot *this, int n, const float *x,
 *        A pointer to an array holding the "n" x values.
 *     y 
 *        A pointer to an array holding the "n" y values.
+*     status
+*        Pointer to the inherited status variable.
 
 */
    if( !astOK ) return 0;
@@ -5376,7 +5695,7 @@ static int CGLineWrapper( AstPlot *this, int n, const float *x,
 }
 
 static int CGMarkWrapper( AstPlot *this, int n, const float *x, 
-                          const float *y, int type ) {
+                          const float *y, int type, int *status ) {
 /*
 *
 *  Name:
@@ -5391,7 +5710,7 @@ static int CGMarkWrapper( AstPlot *this, int n, const float *x,
 *  Synopsis:
 *     #include "plot.h"
 *     int CGMarkWrapper( AstPlot *this, int n, const float *x, 
-*                        const float *y, int type ) {
+*                        const float *y, int type, int *status ) {
 
 *  Class Membership:
 *     Plot private function.
@@ -5412,6 +5731,8 @@ static int CGMarkWrapper( AstPlot *this, int n, const float *x,
 *     type
 *        An integer which can be used to indicate the type of marker symbol
 *        required.
+*     status
+*        Pointer to the inherited status value.
 
 */
    if( !astOK ) return 0;
@@ -5419,7 +5740,7 @@ static int CGMarkWrapper( AstPlot *this, int n, const float *x,
 }
 
 static int CGTextWrapper( AstPlot *this, const char *text, float x, float y,
-                          const char *just, float upx, float upy ) {
+                          const char *just, float upx, float upy, int *status ) {
 /*
 *
 *  Name:
@@ -5434,7 +5755,7 @@ static int CGTextWrapper( AstPlot *this, const char *text, float x, float y,
 *  Synopsis:
 *     #include "plot.h"
 *     int CGTextWrapper( AstPlot *this, const char *text, float x, float y,
-*                        const char *just, float upx, float upy )
+*                        const char *just, float upx, float upy, int *status )
 
 *  Class Membership:
 *     Plot private function.
@@ -5474,6 +5795,8 @@ static int CGTextWrapper( AstPlot *this, const char *text, float x, float y,
 *        coordinates. If necessary the supplied value should be negated
 *        to ensure that positive values always refer to displacements from 
 *        bottom to top on the screen.
+*     status
+*        Pointer to the inherited status value.
 
 */
    if( !astOK ) return 0;
@@ -5482,7 +5805,7 @@ static int CGTextWrapper( AstPlot *this, const char *text, float x, float y,
 
 static int CGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
                            const char *just, float upx, float upy, float *xb, 
-                           float *yb ) {
+                           float *yb, int *status ) {
 /*
 *
 *  Name:
@@ -5498,7 +5821,7 @@ static int CGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
 *     #include "plot.h"
 *     int CGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
 *                         const char *just, float upx, float upy, float *xb, 
-*                         float *yb )
+*                         float *yb, int *status )
 
 *  Class Membership:
 *     Plot private function.
@@ -5544,13 +5867,15 @@ static int CGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
 *     yb
 *        An array of 4 elements in which to return the y coordinate of
 *        each corner of the bounding box.
+*     status
+*        Pointer to the inherited status variable.
 
 */
    if( !astOK ) return 0;
    return ( (AstGTxExtFun) this->grffun[ AST__GTXEXT ])( astGrfConID(this), text, x, y, just, upx, upy, xb, yb );
 }
 
-static int CGQchWrapper( AstPlot *this, float *chv, float *chh ) {
+static int CGQchWrapper( AstPlot *this, float *chv, float *chh, int *status ) {
 /*
 *
 *  Name:
@@ -5564,7 +5889,7 @@ static int CGQchWrapper( AstPlot *this, float *chv, float *chh ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int CGQchWrapper( AstPlot *this, float *chv, float *chh )
+*     int CGQchWrapper( AstPlot *this, float *chv, float *chh, int *status )
 
 *  Class Membership:
 *     Plot private function.
@@ -5584,12 +5909,14 @@ static int CGQchWrapper( AstPlot *this, float *chv, float *chh ) {
 *        A pointer to the double which is to receive the height of
 *        characters drawn vertically. This will be an increment in the Y
 *        axis
+*     status
+*        Pointer to the inherited status value.
 */
    if( !astOK ) return 0;
    return ( (AstGQchFun) this->grffun[ AST__GQCH ])( astGrfConID(this), chv, chh );
 }
 
-static int CGScalesWrapper( AstPlot *this, float *alpha, float *beta ) {
+static int CGScalesWrapper( AstPlot *this, float *alpha, float *beta, int *status ) {
 /*
 *
 *  Name:
@@ -5603,7 +5930,7 @@ static int CGScalesWrapper( AstPlot *this, float *alpha, float *beta ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int CGScalesWrapper( AstPlot *this, float *alpha, float *beta )
+*     int CGScalesWrapper( AstPlot *this, float *alpha, float *beta, int *status )
 
 *  Class Membership:
 *     Plot private function.
@@ -5621,6 +5948,8 @@ static int CGScalesWrapper( AstPlot *this, float *alpha, float *beta ) {
 *     beta
 *        A pointer to the location at which to return the scale for the
 *        Y axis (i.e. Ynorm = beta*Yworld).
+*     status
+*        Pointer to the inherited status value.
 */
    if( !astOK ) return 0;
    return ( (AstGScalesFun) this->grffun[ AST__GSCALES ])( astGrfConID(this), alpha, beta );
@@ -5628,7 +5957,7 @@ static int CGScalesWrapper( AstPlot *this, float *alpha, float *beta ) {
 
 static int CheckLabels( AstPlot *this, AstFrame *frame, int axis, 
                         double *ticks, int nticks, int force, char **list, 
-                        double refval ){
+                        double refval, int *status ){
 /*
 *  Name:
 *     CheckLabels
@@ -5642,7 +5971,7 @@ static int CheckLabels( AstPlot *this, AstFrame *frame, int axis,
 *  Synopsis:
 *     #include "plot.h"
 *     int CheckLabels( AstPlot *this, AstFrame *frame, int axis, double *ticks,
-*                      int nticks, int force, char **list, double refval )
+*                      int nticks, int force, char **list, double refval, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -5676,6 +6005,8 @@ static int CheckLabels( AstPlot *this, AstFrame *frame, int axis,
 *        astFree when no longer needed.
 *     refval
 *        A value to use for the other axis when normalizing.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Zero if any pairs of identical adjacent labels were found. One
@@ -5768,7 +6099,7 @@ static int CheckLabels( AstPlot *this, AstFrame *frame, int axis,
 
 static char **CheckLabels2( AstPlot *this, AstFrame *frame, int axis, 
                             double *ticks, int nticks, char **old_list, 
-                            double refval ){
+                            double refval, int *status ){
 /*
 *  Name:
 *     CheckLabels2
@@ -5783,7 +6114,7 @@ static char **CheckLabels2( AstPlot *this, AstFrame *frame, int axis,
 *     #include "plot.h"
 *     char **CheckLabels2( AstPlot *this, AstFrame *frame, int axis, 
 *                          double *ticks, int nticks, char **old_list, 
-*                          double refval )
+*                          double refval, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -5817,6 +6148,8 @@ static char **CheckLabels2( AstPlot *this, AstFrame *frame, int axis,
 *        formatted label. 
 *     refval
 *        A value to use for the other axis when normalizing.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to an array of pointers. Each of these pointers points to
@@ -5897,7 +6230,7 @@ static char **CheckLabels2( AstPlot *this, AstFrame *frame, int axis,
 
 }
 
-static int ChrLen( const char *string ){
+static int ChrLen( const char *string, int *status ){
 /*
 *  Name:
 *     ChrLen
@@ -5909,7 +6242,7 @@ static int ChrLen( const char *string ){
 *     Private function.
 
 *  Synopsis:
-*     int ChrLen( const char *string )
+*     int ChrLen( const char *string, int *status )
 
 *  Class Membership:
 *     Plot
@@ -5921,6 +6254,8 @@ static int ChrLen( const char *string ){
 *  Parameters:
 *     string
 *        Pointer to the string.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The length of a string excluding any trailing white space.
@@ -5959,7 +6294,7 @@ static int ChrLen( const char *string ){
 
 }
 
-static CurveData **CleanCdata( CurveData **cdata ){
+static AstPlotCurveData **CleanCdata( AstPlotCurveData **cdata, int *status ){
 /*
 *  Name:
 *     CleanCdata
@@ -5972,7 +6307,7 @@ static CurveData **CleanCdata( CurveData **cdata ){
 
 *  Synopsis:
 *     #include "plot.h"
-*     CurveData **CleanCdata( CurveData **cdata )
+*     AstPlotCurveData **CleanCdata( AstPlotCurveData **cdata, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -5984,6 +6319,8 @@ static CurveData **CleanCdata( CurveData **cdata ){
 *  Parameters:
 *     cdata
 *        Pointer to the information to be freed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A NULL pointer.
@@ -6001,7 +6338,7 @@ static CurveData **CleanCdata( CurveData **cdata ){
    (void) astFree( (void *) cdata[ 0 ] );
    (void) astFree( (void *) cdata[ 1 ] );
 
-/* Release the memory used to hold the two CurveData pointers. */
+/* Release the memory used to hold the two AstPlotCurveData pointers. */
    (void) astFree( (void *) cdata );
 
 /* Return. */
@@ -6009,7 +6346,7 @@ static CurveData **CleanCdata( CurveData **cdata ){
 
 }
 
-static TickInfo **CleanGrid( TickInfo **grid ){
+static TickInfo **CleanGrid( TickInfo **grid, int *status ){
 /*
 *  Name:
 *     CleanGrid
@@ -6097,7 +6434,7 @@ static TickInfo **CleanGrid( TickInfo **grid ){
 
 }
 
-static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     ClearAttrib
@@ -6110,7 +6447,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     void ClearAttrib( AstObject *this, const char *attrib )
+*     void ClearAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     Plot member function (over-rides the astClearAttrib protected
@@ -6127,6 +6464,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -6277,8 +6616,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
                && ( nc >= len ) ) {
       class =  astGetClass( this );
 
-      nid = IdFind( FullForm( GrfLabels, label, attrib, "astClear", class ),
-                    nax, &id1, &id2, &id3 );
+      nid = IdFind( FullForm( GrfLabels, label, attrib, "astClear", class, status ),
+                    nax, &id1, &id2, &id3, status );
       astClearStyle( this, id1 );
       if( nid > 1 ) astClearStyle( this, id2 );
       if( nid > 2 ) astClearStyle( this, id3 );
@@ -6295,8 +6634,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
                && ( nc >= len ) ) {
       class =  astGetClass( this );
 
-      nid = IdFind( FullForm( GrfLabels, label, attrib, "astClear", class ),
-                    nax, &id1, &id2, &id3 );
+      nid = IdFind( FullForm( GrfLabels, label, attrib, "astClear", class, status ),
+                    nax, &id1, &id2, &id3, status );
       astClearFont( this, id1 );
       if( nid > 1 ) astClearFont( this, id2 );
       if( nid > 2 ) astClearFont( this, id3 );
@@ -6313,9 +6652,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
                && ( nc >= len ) ) {
       class =  astGetClass( this );
 
-      nid = IdFind( FullForm( GrfLabels, label, attrib, "astClear", class
-),
-                    nax, &id1, &id2, &id3 );
+      nid = IdFind( FullForm( GrfLabels, label, attrib, "astClear", class, status ),
+                    nax, &id1, &id2, &id3, status );
       astClearColour( this, id1 );
       if( nid > 1 ) astClearColour( this, id2 );
       if( nid > 2 ) astClearColour( this, id3 );
@@ -6332,8 +6670,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
                && ( nc >= len ) ) {
       class =  astGetClass( this );
 
-      nid = IdFind( FullForm( GrfLabels, label, attrib, "astClear", class ),
-                    nax, &id1, &id2, &id3 );
+      nid = IdFind( FullForm( GrfLabels, label, attrib, "astClear", class, status ),
+                    nax, &id1, &id2, &id3, status );
       astClearColour( this, id1 );
       if( nid > 1 ) astClearColour( this, id2 );
       if( nid > 2 ) astClearColour( this, id3 );
@@ -6350,8 +6688,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
                && ( nc >= len ) ) {
       class =  astGetClass( this );
 
-      nid = IdFind( FullForm( GrfLabels, label, attrib, "astClear", class ),
-                    nax, &id1, &id2, &id3 );
+      nid = IdFind( FullForm( GrfLabels, label, attrib, "astClear", class, status ),
+                    nax, &id1, &id2, &id3, status );
 
       astClearWidth( this, id1 );
       if( nid > 1 ) astClearWidth( this, id2 );
@@ -6369,8 +6707,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
                && ( nc >= len ) ) {
       class =  astGetClass( this );
 
-      nid = IdFind( FullForm( GrfLabels, label, attrib, "astClear", class ),
-                    nax, &id1, &id2, &id3 );
+      nid = IdFind( FullForm( GrfLabels, label, attrib, "astClear", class, status ),
+                    nax, &id1, &id2, &id3, status );
       astClearSize( this, id1 );
       if( nid > 1 ) astClearSize( this, id2 );
       if( nid > 2 ) astClearSize( this, id3 );
@@ -6548,11 +6886,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      (*parent_clearattrib)( this_object, attrib );
+      (*parent_clearattrib)( this_object, attrib, status );
    }
 }
 
-static void ClearLogPlot( AstPlot *this, int axis ){
+static void ClearLogPlot( AstPlot *this, int axis, int *status ){
 /*
 *
 *  Name:
@@ -6566,7 +6904,7 @@ static void ClearLogPlot( AstPlot *this, int axis ){
 
 *  Synopsis:
 *     #include "plot.h"
-*     void ClearLogPlot( AstPlot *this, int axis )
+*     void ClearLogPlot( AstPlot *this, int axis, int *status )
 
 *  Class Membership:
 *     Plot member function 
@@ -6580,6 +6918,8 @@ static void ClearLogPlot( AstPlot *this, int axis ){
 *        The Plot.
 *     axis
 *        Zero based axis index.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -6593,7 +6933,7 @@ static void ClearLogPlot( AstPlot *this, int axis ){
 /* Validate the axis index. */ 
    if( axis < 0 || axis >= 2 ){ 
       astError( AST__AXIIN, "astClearLogPlot(%s): Index (%d) is invalid for "
-                "attribute LogPlot - it should be in the range 1 to 2.", 
+                "attribute LogPlot - it should be in the range 1 to 2.", status, 
                 astGetClass( this ), axis + 1 ); 
 
 /* Do nothing if the attribute is not currently set. */
@@ -6608,7 +6948,7 @@ static void ClearLogPlot( AstPlot *this, int axis ){
 /* If the effective value has changed, attempt to remap the axis. If this
    fails, re-instate the original value. */
       if( ( oldval != 0 ) != ( newval != 0 ) ) {
-         if( !ToggleLogLin( this, axis, oldval, "astClearLogPlot" ) ) {
+         if( !ToggleLogLin( this, axis, oldval, "astClearLogPlot", status ) ) {
             this->logplot[ axis ] = oldval;
          }
       }
@@ -6616,7 +6956,7 @@ static void ClearLogPlot( AstPlot *this, int axis ){
 } 
 
 static void Clip( AstPlot *this, int iframe, const double lbnd[], 
-                  const double ubnd[] ){
+                  const double ubnd[], int *status ){
 /*
 *++
 *  Name:
@@ -6749,7 +7089,7 @@ f     (e.g. using AST_TRAN2), any clipped output points are assigned
    if( naxes != 2 && astOK ){
       astError( AST__NAXIN, "astClip(%s): Number of axes (%d) in the "
                 "base Frame of the supplied %s is invalid - this number "
-                "should be 2.", astGetClass( this ), naxes,  
+                "should be 2.", status, astGetClass( this ), naxes,  
                 astGetClass( this ) );
    } 
 
@@ -6761,11 +7101,11 @@ f     (e.g. using AST_TRAN2), any clipped output points are assigned
       if( !lbnd ){
          astError( AST__CLPAX, "astClip(%s): A NULL pointer was "
                    "supplied for the array holding the lower bounds of "
-                   "the clipping volume.", astGetClass( this ) );
+                   "the clipping volume.", status, astGetClass( this ) );
       } else if( !ubnd ){
          astError( AST__CLPAX, "astClip(%s): A NULL pointer was "
                    "supplied for the array holding the upper bounds of "
-                   "the clipping volume.", astGetClass( this ) );
+                   "the clipping volume.", status, astGetClass( this ) );
       }
 
 /* Validate the clipping frame index. */
@@ -6932,6 +7272,8 @@ static int Compare_LL( const void *elem1, const void *elem2 ){
 *        Pointer to the first LabelList.
 *     elem2
 *        Pointer to the second LabelList. 
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Zero is returned if the values are equal. If the first is larger
@@ -6968,7 +7310,7 @@ static int Compare_LL( const void *elem1, const void *elem2 ){
 }
 
 static void CopyPlotDefaults( AstPlot *this, int axis, AstPlot *dplot, 
-                             int daxis ){
+                             int daxis, int *status ){
 /*
 *+
 *  Name:
@@ -7031,7 +7373,7 @@ static void CopyPlotDefaults( AstPlot *this, int axis, AstPlot *dplot,
    dplot->uborder = this->uborder;
 }
 
-static int CountGood( int n, double *data ){
+static int CountGood( int n, double *data, int *status ){
 /*
 *  Name:
 *     CountGood
@@ -7044,7 +7386,7 @@ static int CountGood( int n, double *data ){
 
 *  Synopsis:
 *     #include "plot.h"
-*     int CountGood( int n, double *data )
+*     int CountGood( int n, double *data, int *status )
 
 *  Class Membership:
 *     Plot method.
@@ -7058,6 +7400,8 @@ static int CountGood( int n, double *data ){
 *        The total number of elements in the array.
 *     data
 *        Pointer to the start of the array.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The number of good points in the array.
@@ -7091,7 +7435,7 @@ static int CountGood( int n, double *data ){
 }
 
 static int Cross( float ax, float ay, float bx, float by, 
-                  float cx, float cy, float dx, float dy ){
+                  float cx, float cy, float dx, float dy, int *status ){
 /*
 *  Name:
 *     Cross
@@ -7105,7 +7449,7 @@ static int Cross( float ax, float ay, float bx, float by,
 *  Synopsis:
 *     #include "plot.h"
 *     int Cross( float ax, float ay, float bx, float by, 
-*                float cx, float cy, float dx, float dy )
+*                float cx, float cy, float dx, float dy, int *status )
 
 *  Class Membership:
 *     Plot method.
@@ -7123,6 +7467,8 @@ static int Cross( float ax, float ay, float bx, float by,
 *        The coordinates of C.
 *     dx, dy
 *        The coordinates of D.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Zero if the line segments do not cross or if an error has already
@@ -7187,7 +7533,8 @@ static int Cross( float ax, float ay, float bx, float by,
 }
 
 static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad, 
-                 double *box, const char *method, const char *class ){
+                 double *box, CrvStatics *pstatics, const char *method, 
+                 const char *class, int *status ){
 /*
 *  Name:
 *     Crv
@@ -7201,7 +7548,8 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
 *  Synopsis:
 *     #include "plot.h"
 *     void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
-*               double *box, const char *method, const char *class  )
+*               double *box, CrvStatics *pstatics, const char *method, 
+*               const char *class, int *status  )
 
 *  Class Membership:
 *     Plot member function.
@@ -7260,12 +7608,19 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
 *        which the current segment must reside if it is to be sub-divided.
 *        Supplied in the order xlo, xhi, ylo, yhi. May be NULL in which
 *        case, no check is made on the bounding box.
+*     pstatics
+*        Pointer to a structure holding values for variables which were
+*        statically defined within this function prior to the thread-safe
+*        version of AST. If a NULL pointer is supplied, a new structure
+*        is created in dynamic memory and initialised.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  External Variables:
 *     Crv_nent = int (Read/Write)
@@ -7306,6 +7661,8 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;    /* Pointer to thread-specific global data */
+   CrvStatics *statics;   /* Pointer to structure holding static values */
    double *dd;            /* Pointer to array holding sub-segment distances */
    double *pd;            /* Pointer to next sub-segment distance */
    double *px;            /* Pointer to next sub-segment x coord. */
@@ -7320,52 +7677,29 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
    int seg_ok[ CRV_NSEG ];/* Flags indicating which segments can be drawn */
    int subdivide;         /* Flag indicating if segments can be subdivided */
 
-   static double *pdl2;   /* Pointer to next squared segment length */
-   static double *pdx;    /* Pointer to next segment X increment */
-   static double *pdy;    /* Pointer to next segment Y increment */
-   static double cosang;  /* Cosine of angle between adjacent segments */
-   static double d0;      /* Distance to start of first sub-segment */
-   static double delta;   /* Distance between adjacent sub-segments */
-   static double dl;      /* Segment length in graphics coordinates */
-   static double dll;     /* Segment length for previous segment */
-   static double last_x;  /* Graphics X at the end of the previous segment */
-   static double last_y;  /* Graphics Y at the end of the previous segment */
-   static double limit2;  /* Shortest acceptable squared segment length */
-   static double t1;      /* Increment in X */
-   static double t2;      /* Increment in Y */
-   static double t3;      /* Squared segment length */
-   static double vx;      /* X component of unit vector for current segment */
-   static double vxl;     /* X component of unit vector for previous segment */
-   static double vy;      /* Y component of unit vector for current segment */
-   static double vyl;     /* Y component of unit vector for previous segment */
-   static int *seg0;      /* Pointer to current segment OK flag */
-   static int *segm;      /* Pointer to previous segment OK flag */
-   static int *segp;      /* Pointer to next segment OK flag */
-   static int all_bad;    /* Are all supplied positions bad or clipped?  */
-   static int el;         /* Total sub-segment count */
-   static int j;          /* Sub-segment index */
-   static int last_ok;    /* Was the previous position defined? */
-   static int nel;        /* Total number of sub-segments */
-   static int nlong;      /* No.of segments longer than limit2 */
-   static int nseg;       /* Number of segments being sub-divided */
-   static int nshort;     /* No.of segments shorter than limit2 */
-
-#ifdef CRV_TRACE
-   static int levels[100];
-#endif
-
 /* Check inherited status */
    if( !astOK ) return;                 
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
+
+/* If required, allocate memory for a structure to hold the static
+   variables need by this function. */
+   if( ! pstatics ) {
+      statics = astMalloc( sizeof( CrvStatics ) );
+   } else {
+      statics = pstatics;
+   }
 
 /* If this is the first entry, set up the minimum length for a 
    sub-segment in graphics coordinates. If any segment is less than
    this minimum length, then recursion will stop and the curve will
    be assumed to be dis-continuous. */
    if( !Crv_nent ) {
-      limit2 = 20.0*Crv_limit/(CRV_NSEG*CRV_NSEG);
+      statics->limit2 = 20.0*Crv_limit/(CRV_NSEG*CRV_NSEG);
 
 #ifdef CRV_TRACE
-      levels[ 0 ] = 0;
+      statics->levels[ 0 ] = 0;
 #endif
    }
 
@@ -7375,7 +7709,7 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
 
 #ifdef CRV_TRACE
    for( i = 0; i < Crv_nent; i++ ) {
-      printf("%d ",levels[ i ] );
+      printf("%d ",statics->levels[ i ] );
    }
    printf("\n");
 
@@ -7383,8 +7717,8 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
       float ffx,ffy;
       for( i = 0; i < CRV_NPNT; i++ ) {
          ffx = x[i]; ffy = y[i];
-         GMark( this, 1, &ffx, &ffy, 2, method, class );
-         GFlush( this, method, class );
+         GMark( this, 1, &ffx, &ffy, 2, method, class, status );
+         GFlush( this, method, class, status );
       }
    }
 #endif
@@ -7403,14 +7737,14 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
    the current segment). Also set a flag ("all_bad") to indicate if all
    points looked at so far have been bad, or outside the plotting area. */
    if( *x != AST__BAD && *y != AST__BAD ){
-      last_ok = 1;
-      last_x = *x;
-      last_y = *y;
-      all_bad = ( *x < Crv_xlo || *x > Crv_xhi || 
+      statics->last_ok = 1;
+      statics->last_x = *x;
+      statics->last_y = *y;
+      statics->all_bad = ( *x < Crv_xlo || *x > Crv_xhi || 
                   *y < Crv_ylo || *y > Crv_yhi ) && Crv_clip;
    } else {
-      last_ok = 0;
-      all_bad = 1;
+      statics->last_ok = 0;
+      statics->all_bad = 1;
    }
 
 /* Initialise the bouding box for the this segment. */
@@ -7427,13 +7761,13 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
 
 /* Store pointers to the increments and squared length for the current 
    segment. */
-   pdx = dx;
-   pdy = dy;
-   pdl2 = dl2;
+   statics->pdx = dx;
+   statics->pdy = dy;
+   statics->pdl2 = dl2;
 
 /* Initialise the number of long and short segments. */
-   nlong = 0;
-   nshort = 0;
+   statics->nlong = 0;
+   statics->nshort = 0;
 
 /* Loop round each segment. */
    for( i = 0; i < CRV_NSEG; i++ ){
@@ -7447,54 +7781,54 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
          if( *py < bbox[ 2 ] ) bbox[ 2 ] = *py;
          if( *py > bbox[ 3 ] ) bbox[ 3 ] = *py;
 
-/* If the point is within the plotting area, set the "all_bad" flag to
+/* If the point is within the plotting area, set the "statics->all_bad" flag to
    indicate that at least 1 point is within the plotting area. */
          if( !Crv_clip || ( *px >= Crv_xlo && *px <= Crv_xhi &&
-                            *py >= Crv_ylo && *py <= Crv_yhi ) ) all_bad = 0;
+                            *py >= Crv_ylo && *py <= Crv_yhi ) ) statics->all_bad = 0;
 
 /* If the point marking the start of the segment was also good, find and 
    store the increments and squared length for the segment, incrementing 
    the pointers ready for the next segment. */
-         if( last_ok ){
-            t1 = *px - last_x;
-            t2 = *py - last_y;
-            t3 = t1*t1 + t2*t2;
-            *(pdx++) = t1;
-            *(pdy++) = t2;
-            *(pdl2++) = t3;
+         if( statics->last_ok ){
+            statics->t1 = *px - statics->last_x;
+            statics->t2 = *py - statics->last_y;
+            statics->t3 = statics->t1*statics->t1 + statics->t2*statics->t2;
+            *(statics->pdx++) = statics->t1;
+            *(statics->pdy++) = statics->t2;
+            *(statics->pdl2++) = statics->t3;
 
 /* Count the number of segments which are, and are not, shorter than the
    minimum significant length. */
-            if( t3 > limit2 ) {
-               nlong++;
+            if( statics->t3 > statics->limit2 ) {
+               statics->nlong++;
             } else {
-               nshort++;
+               statics->nshort++;
             }
 
 /* If the start was bad, the length of the segment is not defined so store 
    bad values. */
          } else {
-            *(pdx++) = AST__BAD;
-            *(pdy++) = AST__BAD;
-            *(pdl2++) = AST__BAD;
+            *(statics->pdx++) = AST__BAD;
+            *(statics->pdy++) = AST__BAD;
+            *(statics->pdl2++) = AST__BAD;
          }
 
 /* The point at the end of the current segment becomes the point at the 
    start of the next segment. */
-         last_ok = 1;
-         last_x = *(px++);
-         last_y = *(py++);
+         statics->last_ok = 1;
+         statics->last_x = *(px++);
+         statics->last_y = *(py++);
 
 /* If the tabulated point marking the end of the current segment is bad, 
    the segment length is undefined so store bad values. */
       } else {
-         *(pdx++) = AST__BAD;
-         *(pdy++) = AST__BAD;
-         *(pdl2++) = AST__BAD;
+         *(statics->pdx++) = AST__BAD;
+         *(statics->pdy++) = AST__BAD;
+         *(statics->pdl2++) = AST__BAD;
 
 /* The point at the end of the current segment becomes the point at the 
    start of the next segment. */
-         last_ok = 0;
+         statics->last_ok = 0;
          px++;
          py++;
       }
@@ -7509,17 +7843,17 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
 /* The unit vector along the previous segment is supplied in external
    variables Crv_ux0 and Crv_uy0. These will be AST__BAD if the direction
    of the previous segment is undefined. */
-   vxl = Crv_ux0;
-   vyl = Crv_uy0;
+   statics->vxl = Crv_ux0;
+   statics->vyl = Crv_uy0;
 
 /* The length of the previous segment is initially bad. */
-   dll = AST__BAD;
+   statics->dll = AST__BAD;
 
 /* Set up some pointers used to walk through the arrays holding the lengths
    of each segment. */
-   pdl2 = dl2;
-   pdx = dx;
-   pdy = dy;
+   statics->pdl2 = dl2;
+   statics->pdx = dx;
+   statics->pdy = dy;
 
 /* Check each segment in turn to see if it can be drawn as a single
    straight line. */
@@ -7527,24 +7861,24 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
 
 /* A segment can only be drawn as a single line if both ends are good
    and the distance between them is not zero. */
-      if( *pdl2 != AST__BAD && *pdl2 > 0.0 ){
+      if( *statics->pdl2 != AST__BAD && *statics->pdl2 > 0.0 ){
 
 /* Get a unit vector in the direction of the current segment. */
-         dl = sqrt( *pdl2 );
-         vx = *pdx/dl;
-         vy = *pdy/dl; 
+         statics->dl = sqrt( *statics->pdl2 );
+         statics->vx = *statics->pdx/statics->dl;
+         statics->vy = *statics->pdy/statics->dl; 
 
 /* If a unit vector in the direction of the previous segment is available, 
    we check that the angle between the previous segment and the current 
    segment is not too high. */
-         if( vxl != AST__BAD ){
-            cosang = vxl*vx + vyl*vy;
+         if( statics->vxl != AST__BAD ){
+            statics->cosang = statics->vxl*statics->vx + statics->vyl*statics->vy;
 
 /* If the angle is too high, set a flag to indicate that the segment cannot
    be drawn as a single line. Also, set the flag for the previous segment as
    well. */
-            if( cosang < 0.8 ||
-                ( *pdl2 )*( 1.0 - cosang*cosang ) > Crv_limit ) {
+            if( statics->cosang < 0.8 ||
+                ( *statics->pdl2 )*( 1.0 - statics->cosang*statics->cosang ) > Crv_limit ) {
                seg_ok[ i ] = 0;
                if( i > 0 ) seg_ok[ i - 1 ] = 0;
 
@@ -7556,7 +7890,7 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
 /* If the scale (=vector length) has changed a lot, set a flag to indicate
    that the segment cannot be drawn as a single line. Also, set the flag for 
    the previous segment as well. */
-               if( dll != AST__BAD && ( dl < dll/Crv_scerr || dl > dll*Crv_scerr ) ) {
+               if( statics->dll != AST__BAD && ( statics->dl < statics->dll/Crv_scerr || statics->dl > statics->dll*Crv_scerr ) ) {
                   seg_ok[ i ] = 0;
                   if( i > 0 ) seg_ok[ i - 1 ] = 0;
 
@@ -7575,45 +7909,45 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
          }
 
 /* Save the unit vector along the current segment for use next time. */
-         vxl = vx;
-         vyl = vy;      
+         statics->vxl = statics->vx;
+         statics->vyl = statics->vy;      
 
 /* Save the length if the current segment for use next time. */
-         dll = dl;
+         statics->dll = statics->dl;
 
 /* If the length of the current segment is undefined, or zero, we cannot
    draw it as a single line. Also, there is no direction vector to pass
    on to the next time, so set them bad. */
       } else {
          seg_ok[ i ] = 0;
-         vxl = AST__BAD;
-         vyl = AST__BAD;      
-         dll = AST__BAD;
+         statics->vxl = AST__BAD;
+         statics->vyl = AST__BAD;      
+         statics->dll = AST__BAD;
       }
 
 /* Point to the next segment. */
-      pdl2++;
-      pdx++;
-      pdy++;
+      statics->pdl2++;
+      statics->pdx++;
+      statics->pdy++;
    
    }
 
 /* Do not allow isolated segments to be OK. If a segment is flagged as being 
    OK, but both its neighbours are not OK, set the segment not OK as well. */
-   seg0 = seg_ok + 1;
-   segm = seg_ok;
-   segp = seg_ok + 2;
+   statics->seg0 = seg_ok + 1;
+   statics->segm = seg_ok;
+   statics->segp = seg_ok + 2;
 
-   if( !(*seg0) ) *segm = 0;
+   if( !(*statics->seg0) ) *statics->segm = 0;
 
    for( i = 1; i < CRV_NSEG - 1; i++ ){
-      if( !(*segm) && !(*segp) ) *seg0 = 0;
-      seg0++;
-      segm++;
-      segp++;
+      if( !(*statics->segm) && !(*statics->segp) ) *statics->seg0 = 0;
+      statics->seg0++;
+      statics->segm++;
+      statics->segp++;
    }
 
-   if( !(*segm) ) *seg0 = 0;
+   if( !(*statics->segm) ) *statics->seg0 = 0;
 
 /* ======================================================================
    The next section of this function draws the curve. Each segment is drawn
@@ -7624,7 +7958,7 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
 
 /* Get the parametric length (i.e. the increment in "d") of the sub-segments
    within each subdivided segment. */
-   delta = ( d[ CRV_NSEG ] - d[ 0 ] )/(double)( CRV_NSEG*CRV_NSEG );
+   statics->delta = ( d[ CRV_NSEG ] - d[ 0 ] )/(double)( CRV_NSEG*CRV_NSEG );
 
 /* If we have made the maximum number of recursive entries into this
    function, or if every supplied point was bad or outside the plotting
@@ -7634,8 +7968,8 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
    restriction which says that we must have some good points (since we
    may find some good poits by a further sub-division). */
    subdivide = ( Crv_nent < CRV_MXENT && 
-                 ( !all_bad || !skipbad ) &&
-                 nlong > nshort );
+                 ( !statics->all_bad || !skipbad ) &&
+                 statics->nlong > statics->nshort );
 
 /* We do not sub-divide if the bounding box of the supplied points
    is not at least 10% smaller than the supplied bouding box on either axis. */
@@ -7656,7 +7990,7 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
    if( subdivide ){
 
 /* Initialise the number of segments being subdivided. */
-      nseg = 0;
+      statics->nseg = 0;
    
 /* Loop round each segment. */
       for( i = 0; i < CRV_NSEG; i++ ){
@@ -7667,16 +8001,16 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
 
 /* Increment the number of segments being subdivided, and let the array
    of subsegment offsets grow to accomodate it. */
-            nseg++;
-            dd = (double *) astGrow( dd, nseg, sizeof(double)*( CRV_NSEG + 1 ) );
+            statics->nseg++;
+            dd = (double *) astGrow( dd, statics->nseg, sizeof(double)*( CRV_NSEG + 1 ) );
             if( !astOK ) break;
 
 /* Append the offset to each new subsegment to the "dd" array. */
-            el = ( nseg - 1 )*( CRV_NSEG + 1 );
-            d0 = d[ i ];
-            for( j = 0; j <= CRV_NSEG; j++ ){
-               dd[ el++ ] = d0;
-               d0 += delta;
+            statics->el = ( statics->nseg - 1 )*( CRV_NSEG + 1 );
+            statics->d0 = d[ i ];
+            for( statics->j = 0; statics->j <= CRV_NSEG; statics->j++ ){
+               dd[ statics->el++ ] = statics->d0;
+               statics->d0 += statics->delta;
             }
          }
       }
@@ -7684,11 +8018,11 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
 /* If any segments needed subdividing, get room to store the graphics
    coordinates at each point, and then fill these arrays by calling 
    Crv_map to map the offsets in "dd" into graphics coordinates. */
-      if( nseg > 0 ){
-         nel = nseg*( CRV_NSEG + 1 );
-         xx = (double *) astMalloc( sizeof(double)*(size_t)nel );
-         yy = (double *) astMalloc( sizeof(double)*(size_t)nel );
-         Crv_map( nel, dd, xx, yy, method, class );             
+      if( statics->nseg > 0 ){
+         statics->nel = statics->nseg*( CRV_NSEG + 1 );
+         xx = (double *) astMalloc( sizeof(double)*(size_t)statics->nel );
+         yy = (double *) astMalloc( sizeof(double)*(size_t)statics->nel );
+         Crv_map( statics->nel, dd, xx, yy, method, class, status GLOBALS_NAME );             
       }
    }
 
@@ -7706,10 +8040,10 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
    unit vector along the line in the appropriate external variables for
    use by the next invocation of this function. */
          if( seg_ok[ i ] ){
-            CrvLine( this, x[ i ], y[ i ], x[ i + 1 ], y[ i + 1 ], method, class );   
-            dl = sqrt( dl2[ i ] );
-            Crv_ux0 = dx[ i ]/dl;
-            Crv_uy0 = dy[ i ]/dl; 
+            CrvLine( this, x[ i ], y[ i ], x[ i + 1 ], y[ i + 1 ], method, class, status );   
+            statics->dl = sqrt( dl2[ i ] );
+            Crv_ux0 = dx[ i ]/statics->dl;
+            Crv_uy0 = dy[ i ]/statics->dl; 
 
 /* Otherwise, if we are subdividing, and if the current segment is
    not very short, we call this function recursively to draw the segment.
@@ -7722,10 +8056,11 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
          } else if( subdivide ) {
 
 #ifdef CRV_TRACE
-            levels[ Crv_nent ] = i;
+            statics->levels[ Crv_nent ] = i;
 #endif
 
-            Crv( this, pd, px, py, all_bad, bbox, method, class );
+            Crv( this, pd, px, py, statics->all_bad, bbox, statics, method, 
+                 class, status );
             pd += CRV_NSEG + 1;
             px += CRV_NSEG + 1;
             py += CRV_NSEG + 1;
@@ -7748,13 +8083,16 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
 /* Decrement the number of recursive entries into this function. */
    Crv_nent--;                 
 
+/* Free the memory holding the static data values if we are leaving the
+   final entry. */
+   if( ! pstatics ) statics = astFree( statics );
+
 /* Return. */
    return;
-                    
 }
 
 static int CvBrk( AstPlot *this, int ibrk, double *brk, double *vbrk, 
-                     double *len ){
+                     double *len, int *status ){
 /*
 *+
 *  Name:
@@ -7830,10 +8168,14 @@ static int CvBrk( AstPlot *this, int ibrk, double *brk, double *vbrk,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;  /* Pointer to thread-specific global data */
    int ret;             /* The number of breaks in the curve. */
 
 /* Check the global status. */
    if( !astOK ) return 0;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
 
 /* Information about the most recent curve drawn by astGridLine or astCurve is 
    stored in the external structure "Curve_data". Get the number of breaks 
@@ -7863,12 +8205,12 @@ static int CvBrk( AstPlot *this, int ibrk, double *brk, double *vbrk,
       } else if( ibrk ){
          if( ret > 0 ){
             astError( AST__BDBRK, "astCvBrk(%s): The supplied break index "
-                      "(%d) should be in the range [1,%d].", astGetClass(this),
+                      "(%d) should be in the range [1,%d].", status, astGetClass(this),
                       ibrk, ret );      
             ret = 0;
          } else {
             astError( AST__BDBRK, "astCvBrk(%s): The most recent curve "
-                      "plotted by method astGridLine or astCurve had no breaks.", 
+                      "plotted by method astGridLine or astCurve had no breaks.", status, 
                       astGetClass(this) );
          }
       }
@@ -7883,7 +8225,7 @@ static int CvBrk( AstPlot *this, int ibrk, double *brk, double *vbrk,
 }
 
 static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
-                     const char *method, const char *class ){
+                     const char *method, const char *class, int *status ){
 /*                     
 *  Name:
 *     CrvLine
@@ -7946,23 +8288,23 @@ static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
 *        Returned as zero if the line intersects the plotting space.
 *        Unchanged otherwise.
 *     Crv_xbrk = float * (Read/Write)
-*        Pointer to the next available element in an array of CRV_MXBRK 
+*        Pointer to the next available element in an array of AST__PLOT_CRV_MXBRK 
 *        values containing the graphics X coordinates at which each break 
 *        in the plotted curve occurred. A break is recorded if the starting
 *        point of the current line is not the same as the end point of
 *        the previous line. 
 *     Crv_ybrk = float * (Read/Write)
-*        Pointer to the next available element in an array of CRV_MXBRK 
+*        Pointer to the next available element in an array of AST__PLOT_CRV_MXBRK 
 *        values containing the graphics Y coordinates at which each break 
 *        in the plotted curve occurred. 
 *     Crv_vxbrk = float * (Read/Write)
-*        Pointer to the next available element in an array of CRV_MXBRK 
+*        Pointer to the next available element in an array of AST__PLOT_CRV_MXBRK 
 *        values containing the X component of the unit vector (within the 
 *        graphics coordinate system) parallel to the tangent to the curve 
 *        at each break. The sense is such that the vector always points back 
 *        along the plotted section of the curve. 
 *     Crv_vybrk = float * (Read/Write)
-*        Pointer to the next available element in an array of CRV_MXBRK 
+*        Pointer to the next available element in an array of AST__PLOT_CRV_MXBRK 
 *        values containing the Y component of the unit vector parallel to 
 *        the tangent to the curve at each break. 
 *     Crv_nbrk = int (Write)
@@ -7982,6 +8324,7 @@ static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
 */
 
 /* local Variables: */
+   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
    double a1;    /* Distance from B to the lower x boundary */
    double a2;    /* Distance from B to the upper x boundary */
    double a3;    /* Distance from B to the lower y boundary */
@@ -8000,6 +8343,9 @@ static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
 
 /* Check inherited global status. */
    if( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
 
 /* Initialise variables to avoid "used of uninitialised variable"
    messages from dumb compilers. */
@@ -8147,7 +8493,7 @@ static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
          Crv_len = (float) dl;
 
 /* Start a poly line. */
-         if( Crv_ink ) Bpoly( this, (float) xam,  (float) yam, method, class );
+         if( Crv_ink ) Bpoly( this, (float) xam,  (float) yam, method, class, status );
 
 /* If this is not the first line to be plotted... */
       } else {
@@ -8163,9 +8509,9 @@ static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
          if( fabs( xam - Crv_xl ) > Crv_tol || 
              fabs( yam - Crv_yl ) > Crv_tol ){
             Crv_nbrk += 2;
-             if( Crv_nbrk > CRV_MXBRK ){
+             if( Crv_nbrk > AST__PLOT_CRV_MXBRK ){
                astError( AST__CVBRK, "%s(%s): Number of breaks in plotted "
-                         "curve exceeds %d.", method, class, CRV_MXBRK );
+                         "curve exceeds %d.", status, method, class, AST__PLOT_CRV_MXBRK );
             } else {
                *(Crv_xbrk++) = (float) Crv_xl;
                *(Crv_ybrk++) = (float) Crv_yl;
@@ -8178,12 +8524,12 @@ static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
             }
 
 /* Start a poly line. */
-            if( Crv_ink ) Bpoly( this, (float) xam,  (float) yam, method, class );
+            if( Crv_ink ) Bpoly( this, (float) xam,  (float) yam, method, class, status );
           }
       }
 
 /* Append a section to the current poly line. */
-      if( Crv_ink ) Apoly( this, (float) xbm,  (float) ybm, method, class );
+      if( Crv_ink ) Apoly( this, (float) xbm,  (float) ybm, method, class, status );
 
 /* Save the position and vector at the end of the current line. */
       Crv_xl = xbm;
@@ -8198,7 +8544,7 @@ static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
 
 
 static void Curve( AstPlot *this, const double start[],
-                                  const double finish[] ){
+                                  const double finish[], int *status ){
 /*
 *++
 *  Name:
@@ -8283,12 +8629,16 @@ f     contains any coordinates with the value AST__BAD.
 *--
 */
 /* Local Variables: */
+   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
    const char *class;      /* Object class */
    const char *method;     /* Current method */
    int naxes;              /* No. of axes in the base Frame */
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
 
 /* Store the current method, and the class of the supplied object for use 
    in error messages.*/
@@ -8300,7 +8650,7 @@ f     contains any coordinates with the value AST__BAD.
    if( naxes != 2 && astOK ){
       astError( AST__NAXIN, "%s(%s): Number of axes (%d) in the base "
                 "Frame of the supplied %s is invalid - this number should "
-                "be 2.", method, class, naxes, class );
+                "be 2.", status, method, class, naxes, class );
    } 
 
 /* Initialise the bounding box for primitives produced by this call. */
@@ -8314,7 +8664,7 @@ f     contains any coordinates with the value AST__BAD.
 /* Draw the curve. The break information is stored in an external structure
    where it can be accessed by public methods which return information
    about the most recently drawn curve. */
-   CurvePlot( this, start, finish, 1, &Curve_data, method, class );
+   CurvePlot( this, start, finish, 1, &Curve_data, method, class, status );
 
 /* Return. */
    return;
@@ -8322,8 +8672,8 @@ f     contains any coordinates with the value AST__BAD.
 }
 
 static void CurvePlot( AstPlot *this, const double *start, const double *finish, 
-                     int ink, CurveData *cdata, const char *method, 
-                     const char *class ){
+                     int ink, AstPlotCurveData *cdata, const char *method, 
+                     const char *class, int *status ){
 /*
 *
 *  Name:
@@ -8338,8 +8688,8 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
 *  Synopsis:
 *     #include "plot.h"
 *     void CurvePlot( AstPlot *this, const double *start, const double *finish, 
-*                   int ink, CurveData *cdata, const char *method, 
-*                   const char *class )
+*                   int ink, AstPlotCurveData *cdata, const char *method, 
+*                   const char *class, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -8349,7 +8699,7 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
 *     finishing positions. The algorithm used can handle discontinuities in the
 *     Mapping between the current Frame and graphics coordinates, and 
 *     information describing any breaks in the curve (including the start and
-*     end of the curve) are returned in the supplied CurveData structure. 
+*     end of the curve) are returned in the supplied AstPlotCurveData structure. 
 
 *  Parameters:
 *     this
@@ -8372,6 +8722,8 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     -  No curve is draw if the "start" or "finish" arrays contains any bad 
@@ -8380,6 +8732,7 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
    double d[ CRV_NPNT ];   /* Offsets to evenly spaced points along curve */
    double x[ CRV_NPNT ];   /* X coords at evenly spaced points along curve */
    double y[ CRV_NPNT ];   /* Y coords at evenly spaced points along curve */
@@ -8390,6 +8743,9 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
 
 /* Get the number of axes in the current Frame. */
    naxes = astGetNout( this );
@@ -8461,16 +8817,16 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
       }
 
 /* Map these points into graphics coordinates. */
-      Map3( CRV_NPNT, d, x, y, method, class );
+      Map3( CRV_NPNT, d, x, y, method, class, status GLOBALS_NAME );
 
 /* Use Crv and Map3 to draw the curve. */
-      Crv( this, d, x, y, 0, NULL, method, class );
+      Crv( this, d, x, y, 0, NULL, NULL, method, class, status );
 
 /* End the current poly line. */
-      Opoly( this, method, class );
+      Opoly( this, method, class, status );
 
 /* Tidy up the static data used by Map3. */
-      Map3( 0, NULL, NULL, NULL, method, class );
+      Map3( 0, NULL, NULL, NULL, method, class, status GLOBALS_NAME );
 
 /* If no part of the curve could be drawn, set the number of breaks and the 
    length of the drawn curve to zero. */
@@ -8482,9 +8838,9 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
    the last point to be plotted. */
       } else {
          Crv_nbrk++;
-         if( Crv_nbrk > CRV_MXBRK ){
+         if( Crv_nbrk > AST__PLOT_CRV_MXBRK ){
             astError( AST__CVBRK, "%s(%s): Number of breaks in curve "
-                      "exceeds %d.", method, class, CRV_MXBRK );
+                      "exceeds %d.", status, method, class, AST__PLOT_CRV_MXBRK );
          } else {
             *(Crv_xbrk++) = (float) Crv_xl;
             *(Crv_ybrk++) = (float) Crv_yl;
@@ -8499,7 +8855,7 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
          cdata->length = Crv_len;
          cdata->out = Crv_out;
          cdata->nbrk = Crv_nbrk;
-         PurgeCdata( cdata );
+         PurgeCdata( cdata, status );
       }
 
 /* Annul the Frame and Mapping. */
@@ -8519,7 +8875,7 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
 
 static AstPointSet *DefGap( AstPlot *this, double *gaps, int *ngood, 
                             double *frac, int *inval, const char *method, 
-                            const char *class  ){
+                            const char *class, int *status ){
 /*
 *  Name:
 *     DefGap
@@ -8535,7 +8891,7 @@ static AstPointSet *DefGap( AstPlot *this, double *gaps, int *ngood,
 *     #include "plot.h"
 *     AstPointSet *DefGap( AstPlot *this, double *gaps, int *ngood, 
 *                          double *frac, int *inval, const char *method, 
-*                          const char *class  )
+*                          const char *class, int *status  )
 
 *  Class Membership:
 *     Plot method.
@@ -8577,6 +8933,8 @@ static AstPointSet *DefGap( AstPlot *this, double *gaps, int *ngood,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to a PointSet holding the physical coordinate values at a
@@ -8627,7 +8985,7 @@ static AstPointSet *DefGap( AstPlot *this, double *gaps, int *ngood,
    and one holding the corresponding (non-normalized) physical 
    coordinates. */
    dim = 0;
-   *frac = GoodGrid( this, &dim, &pset1, &pset2, method, class );
+   *frac = GoodGrid( this, &dim, &pset1, &pset2, method, class, status );
 
 /* Get pointers to the data values in each PointSet. */
    ptr1 = astGetPoints( pset1 );
@@ -8644,7 +9002,7 @@ static AstPointSet *DefGap( AstPlot *this, double *gaps, int *ngood,
       qsort( (void *) ptr2[ j ], (size_t) psize, sizeof(double), Compared );
 
 /* Count the number of non-bad values returned. */
-      ngood[ j ] = CountGood( psize, ptr2[ j ] );
+      ngood[ j ] = CountGood( psize, ptr2[ j ], status );
 
 /* Set the returned flag to indicate if any bad values were found. */
       if( ngood[ j ] < psize ) *inval = 1;
@@ -8652,7 +9010,7 @@ static AstPointSet *DefGap( AstPlot *this, double *gaps, int *ngood,
 /* Report an error if there are too few good points. */
       if( ngood[ j ] < MAJTICKS_OPT ){
          astError( AST__VSMAL, "%s(%s): The range of coordinate values "
-                   "covered by axis %d is too small to plot.", method, 
+                   "covered by axis %d is too small to plot.", status, method, 
                    class, j + 1 );
          break;
       }
@@ -8702,7 +9060,7 @@ static AstPointSet *DefGap( AstPlot *this, double *gaps, int *ngood,
             gaps[ j ] = ( ptr2[ j ][ ngood[ j ] - 1 ] - ptr2[ j ][ 0 ] )/MAJTICKS_OPT;;
             if( gaps[ j ] <= 0.0 ){
                astError( AST__VSMAL, "%s(%s): The range of coordinate values "
-                         "covered by axis %d is too small to plot.", method, 
+                         "covered by axis %d is too small to plot.", status, method, 
                          class, j + 1 );
             }
          }
@@ -8716,12 +9074,12 @@ static AstPointSet *DefGap( AstPlot *this, double *gaps, int *ngood,
          if( maxv*minv <= 0.0 ) {               
             astError( AST__ZERAX, "%s(%s): The range of coordinate values "
                          "covered by axis %d includes the origin and so "
-                         "logarithmic ticks cannot be produced.", method, 
+                         "logarithmic ticks cannot be produced.", status, method, 
                          class, j + 1 );
 
          } else if( maxv == minv ) {               
             astError( AST__VSMAL, "%s(%s): The range of coordinate values "
-                      "covered by axis %d is too small to plot.", method, 
+                      "covered by axis %d is too small to plot.", status, method, 
                       class, j + 1 );
 
 /* Otherwise find the gap to use. */
@@ -8761,7 +9119,7 @@ static AstPointSet *DefGap( AstPlot *this, double *gaps, int *ngood,
 }
 
 static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
-                      double *gap, const char *method, const char *class ){
+                      double *gap, const char *method, const char *class, int *status ){
 /*
 *
 *  Name:
@@ -8776,7 +9134,7 @@ static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
 *  Synopsis:
 *     #include "plot.h"
 *     void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
-*                    double *gap, const char *method, const char *class )
+*                    double *gap, const char *method, const char *class, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -8808,6 +9166,8 @@ static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     -  This function assumes the current Frame of the Plot is 2
@@ -8817,7 +9177,7 @@ static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
 
 /* Local Variables: */
    AstFrame *frm;         /* Pointer to current Frame */
-   CurveData cdata;       /* Somewhere to put the unneeded curve information */
+   AstPlotCurveData cdata;/* Somewhere to put the unneeded curve information */
    TickInfo *info;        /* Pointer to the TickInfo for the current axis */
    double *value;         /* Current tick value */
    double bot;            /* Lowest axis value to be displayed */
@@ -8897,7 +9257,7 @@ static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
                   if( udiff > diff ) udiff = diff;
                   if( udiff > 0.0 ) {
                      AxPlot( this, axis, start, -udiff, 1, &cdata, method, 
-                             class );
+                             class, status );
                   }
                }
 
@@ -8912,7 +9272,7 @@ static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
    with length equal to the gap between tick marks. Do not draw sections
    of the curve which are outside the primary domains of the physical axes. */
                   AxPlot( this, axis, start, udiff, 1, &cdata, method, 
-                          class );
+                          class, status );
                }
 
             }
@@ -8924,7 +9284,7 @@ static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
             if( udiff > diff ) udiff = diff;
             if( udiff > 0.0 ) {
                AxPlot( this, axis, start, udiff, 1, &cdata, method, 
-                       class );
+                       class, status );
             }
          }
       }
@@ -8943,8 +9303,8 @@ static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
 }
 
 
-static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
-                             const char *method, const char *class ){ 
+static AstPlotCurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
+                             const char *method, const char *class, int *status ){ 
 /*
 *  Name:
 *     DrawGrid
@@ -8957,7 +9317,7 @@ static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
 
 *  Synopsis:
 *     #include "plot.h"
-*     CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
+*     AstPlotCurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
 *                           const char *method, const char *class )
 
 *  Class Membership:
@@ -8990,8 +9350,8 @@ static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
 *        This is only for use in constructing error messages.
 
 *  Returned Value:
-*     A pointer to an array of two CurveData pointers (one for each axis),
-*     each pointing to an array of CurveData structures (one for each tick 
+*     A pointer to an array of two AstPlotCurveData pointers (one for each axis),
+*     each pointing to an array of AstPlotCurveData structures (one for each tick 
 *     value).
 
 *  Notes:
@@ -9003,9 +9363,9 @@ static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
 */
 
 /* Local Variables: */
-   CurveData **cdata;       /* The returned pointer */
-   CurveData *cdt;          /* Pointer to break info. for current tick mark */
-   CurveData tcdt;          /* Pointer to break info. for current curve section */
+   AstPlotCurveData **cdata;/* The returned pointer */
+   AstPlotCurveData *cdt;   /* Pointer to break info. for current tick mark */
+   AstPlotCurveData tcdt;   /* Pointer to break info. for current curve section */
    TickInfo *info;          /* Tick mark information for a single axis */
    double start[ 2 ];       /* Strting position for current curve section */
    double total_length;     /* Total curve length for all axis ticks */
@@ -9017,8 +9377,8 @@ static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
    if( !astOK ) return NULL;
 
 /* Allocate memory to hold two pointers, each pointing to an array of
-   CurveData structure. */
-   cdata = (CurveData **) astMalloc( 2*sizeof( CurveData *) );
+   AstPlotCurveData structure. */
+   cdata = (AstPlotCurveData **) astMalloc( 2*sizeof( AstPlotCurveData *) );
 
 /* If succesful, initialise the pointers. */
    if( astOK ){
@@ -9036,15 +9396,15 @@ static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
          info = grid[ i ];
 
 /* Allocate memory to hold information describing the breaks in each tick
-   mark curve. This takes the form of an array of CurveData structures,
+   mark curve. This takes the form of an array of AstPlotCurveData structures,
    one for each tick mark. */
-         cdata[ i ] = (CurveData *) astMalloc( sizeof(CurveData)*
+         cdata[ i ] = (AstPlotCurveData *) astMalloc( sizeof(AstPlotCurveData)*
                                                (size_t) info->nmajor );
 
 /* Check the pointer can be used. */
          if( astOK ){
 
-/* Initialise a pointer to the first CurveData structure for this axis. */
+/* Initialise a pointer to the first AstPlotCurveData structure for this axis. */
             cdt = cdata[ i ];
             total_length = 0.0;
 
@@ -9060,7 +9420,7 @@ static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
    structure. We use invisible ink if short tick marks are required instead 
    of a grid of curves. */
                AxPlot( this, 1 - i, start, (info->length)[ 0 ],
-                       drawgrid, cdt, method, class );
+                       drawgrid, cdt, method, class, status );
 
 /* Now draw any other sections in the curve. */
                for( k = 1; k < info->nsect; k++ ){
@@ -9072,18 +9432,18 @@ static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
 /* Draw the curve, the information describing the breaks goes into
    temporary storage in the local structure "tcdt". */
                   AxPlot( this, 1 - i, start, (info->length)[ k ],
-                          drawgrid, &tcdt, method, class );
+                          drawgrid, &tcdt, method, class, status );
 
 /* Concatenate the break information for this section with the break
    information describing the previous sections. */
-                  AddCdt( cdt, &tcdt, method, class );
+                  AddCdt( cdt, &tcdt, method, class, status );
 
                }
 
 /* Increment the total length of curves drawn for all ticks on this axis. */
                total_length += cdt->length;
 
-/* Point to the CurveData structure for the next tick mark. */
+/* Point to the AstPlotCurveData structure for the next tick mark. */
                cdt++;
 
             }
@@ -9093,7 +9453,7 @@ static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
    major tick values (which may cause AST__BAD tick mark values). */
             if( total_length == 0.0 && astOK ) {
                astError( AST__INTER, "%s(%s): No grid curves can be drawn for "
-                         "axis %d.", method, class, i + 1 );
+                         "axis %d.", status, method, class, i + 1 );
             }
 
          }
@@ -9103,7 +9463,7 @@ static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
    }
 
 /* If an error has occurred, clean up the returned structures. */
-   if( !astOK ) cdata = CleanCdata( cdata );
+   if( !astOK ) cdata = CleanCdata( cdata, status );
 
 /* Return. */
    return cdata;   
@@ -9113,7 +9473,7 @@ static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
 static void DrawText( AstPlot *this, int ink, int esc, const char *text, 
                       float x, float y, const char *just, float upx, 
                       float upy, float *xbn, float *ybn, float *drop,
-                      const char *method, const char *class ){
+                      const char *method, const char *class, int *status ){
 /*
 *  Name:
 *     DrawText
@@ -9127,7 +9487,7 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
 *     void DrawText( AstPlot *this, int ink, int esc, const char *text, 
 *                    float x, float y, const char *just, float upx, 
 *                    float upy, float *xbn, float *ybn, float *drop,
-*                    const char *method, const char *class )
+*                    const char *method, const char *class, int *status )
 
 *  Description:
 *     This function displays a character string at a given position
@@ -9183,6 +9543,8 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     -  The "B" option for the justification in the "up" direction refers
@@ -9198,6 +9560,7 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
 
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;
    char *a;
    char *lt;
    char cc;
@@ -9249,6 +9612,9 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
    if ( !astOK || !text || !text[ 0 ] ||  x == AST__BAD || y == AST__BAD ||
         ( upx == 0.0 && upy == 0.0 ) ) return;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
+
 /* Initialise variables to avoid compiler warnings. */
    rx = 0.0f;
    ry = 0.0f;
@@ -9266,7 +9632,7 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
    and y axes (is possible). This also scales the up vector so that it 
    has a length equal to the height of normal text, and scales the right 
    vector to have the same length (on the screen) as the up vector. */ 
-   RightVector( this, &ux, &uy, &rx, &ry, method, class );
+   RightVector( this, &ux, &uy, &rx, &ry, method, class, status );
 
 /* Create a unit right vector. */
    rlen = sqrt( rx*rx + ry*ry ); 
@@ -9286,7 +9652,7 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
    lx = x;
    ly = y;
    lj = JustMB( this, esc, text, &lx, &ly, upx, upy, just, uxu, uyu, rxu,
-                ryu, &x0, &y0, method, class );
+                ryu, &x0, &y0, method, class, status );
 
 /* Initialise the horizontal and verical limits of the total bounding box. */
    alpha_lo = FLT_MAX;
@@ -9297,7 +9663,7 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
 /* Tell the grf module whether or not to interpret escape sequences,and
    also note if the grf module is capable of interpreting escape
    sequences. */
-   grfcap = GCap( this, GRF__ESC, esc );
+   grfcap = GCap( this, GRF__ESC, esc, status );
 
 /* Forget the horizontal position remembered by any "%h+" escape sequences 
    from any previous string. */
@@ -9309,7 +9675,7 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
    split the supplied text up into sub-strings delimited by escape sequences 
    and plot each sub-string individually, modifying the reference point and 
    graphics attributes as indicated by the escape sequences. */
-   if( esc && HasEscapes( text ) && !grfcap ) {   
+   if( esc && HasEscapes( text, status ) && !grfcap ) {   
 
 /* Take a copy of the supplied text so that we can temporarily terminate
    each sub-string by poking a null (0) character into it. */
@@ -9319,11 +9685,11 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
       rise = 0.0;
 
 /* Get the graphical attribute values for normal text. */
-      GAttr( this, GRF__SIZE, AST__BAD, &nsize, GRF__TEXT, method, class );
-      GAttr( this, GRF__WIDTH, AST__BAD, &nwidth, GRF__TEXT, method, class );
-      GAttr( this, GRF__FONT, AST__BAD, &nfont, GRF__TEXT, method, class );
-      GAttr( this, GRF__STYLE, AST__BAD, &nstyle, GRF__TEXT, method, class );
-      GAttr( this, GRF__COLOUR, AST__BAD, &ncol, GRF__TEXT, method, class );
+      GAttr( this, GRF__SIZE, AST__BAD, &nsize, GRF__TEXT, method, class, status );
+      GAttr( this, GRF__WIDTH, AST__BAD, &nwidth, GRF__TEXT, method, class, status );
+      GAttr( this, GRF__FONT, AST__BAD, &nfont, GRF__TEXT, method, class, status );
+      GAttr( this, GRF__STYLE, AST__BAD, &nstyle, GRF__TEXT, method, class, status );
+      GAttr( this, GRF__COLOUR, AST__BAD, &ncol, GRF__TEXT, method, class, status );
 
 /* The "concatenation point" (cx,cy) is the point where the normal baseline 
    crosses the left hand edge of the substring bounding box. Initialise
@@ -9354,7 +9720,7 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
          if( got_esc ) {
             InterpEscape( this, estype, (double) esval, &cx, &cy, ux, uy, 
                           rx, ry, lj, &rise, nsize, nstyle, nwidth, ncol, 
-                          nfont, method, class );
+                          nfont, method, class, status );
 
 /* If the remaining string starts with normal text, draw it. */
          } else {
@@ -9392,7 +9758,7 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
                hmy = this->hmarky;
 
                DrawText( this, 0, esc, a, cx, cy, "BL", upx, upy, txbn, tybn, 
-                         &tdrop, method, class );
+                         &tdrop, method, class, status );
 
                this->hmarkx = hmx;
                this->hmarky = hmy;
@@ -9435,8 +9801,8 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
 
 /* Draw it, and then find its real bounding box (i.e. using the correct
    reference position found above). */
-            if( ink ) GText( this, a, lx, ly, lj, upx, upy, method, class );
-            GTxExt( this, a, lx, ly, lj, upx, upy, txbn, tybn, method, class );
+            if( ink ) GText( this, a, lx, ly, lj, upx, upy, method, class, status );
+            GTxExt( this, a, lx, ly, lj, upx, upy, txbn, tybn, method, class, status );
 
 /* Re-instate the orignal value of the terminator character.*/
             a[ nc ] = cc;
@@ -9445,7 +9811,7 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
    baseline) by an amount equal to the width of the bounding box. Also 
    update the total bounding box limits.*/
             UpdateConcat( txbn, tybn, ux, uy, rx, ry, &cx, &cy, 
-                           x0, y0, &alpha_lo, &alpha_hi, &beta_lo, &beta_hi );
+                           x0, y0, &alpha_lo, &alpha_hi, &beta_lo, &beta_hi, status );
          }
 
 /* Move on to the next character. */
@@ -9456,17 +9822,17 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
       lt = astFree( lt );
 
 /* Reset all attributes to their normal values. */
-      GAttr( this, GRF__SIZE, nsize, NULL, GRF__TEXT, method, class );
-      GAttr( this, GRF__WIDTH, nwidth, NULL, GRF__TEXT, method, class );
-      GAttr( this, GRF__COLOUR, ncol, NULL, GRF__TEXT, method, class );
-      GAttr( this, GRF__FONT, nfont, NULL, GRF__TEXT, method, class );
-      GAttr( this, GRF__STYLE, nstyle, NULL, GRF__TEXT, method, class );
+      GAttr( this, GRF__SIZE, nsize, NULL, GRF__TEXT, method, class, status );
+      GAttr( this, GRF__WIDTH, nwidth, NULL, GRF__TEXT, method, class, status );
+      GAttr( this, GRF__COLOUR, ncol, NULL, GRF__TEXT, method, class, status );
+      GAttr( this, GRF__FONT, nfont, NULL, GRF__TEXT, method, class, status );
+      GAttr( this, GRF__STYLE, nstyle, NULL, GRF__TEXT, method, class, status );
 
 /* If any escape sequences can be interpreted by the grf module, just pass 
    the text string on to the grf module. */
    } else {
-      if( ink ) GText( this, text, lx, ly, lj, upx, upy, method, class );
-      GTxExt( this, text, lx, ly, lj, upx, upy, txbn, tybn, method, class );
+      if( ink ) GText( this, text, lx, ly, lj, upx, upy, method, class, status );
+      GTxExt( this, text, lx, ly, lj, upx, upy, txbn, tybn, method, class, status );
 
 /* The corners in the bounding box returned by GTxExt are in no
    particular order. But this function is contracted to return them 
@@ -9475,7 +9841,7 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
    the correct order. UpdateConcat will also update the concatenation point,
    but that is irrelevant in this context. */
       UpdateConcat( txbn, tybn, ux, uy, rx, ry, &lx, &ly, x0, y0, &alpha_lo, 
-                     &alpha_hi, &beta_lo, &beta_hi );
+                     &alpha_hi, &beta_lo, &beta_hi, status );
    }
 
 /* Return the total bounding box,in the order bottom left, topleft, top
@@ -9511,7 +9877,7 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
 
 static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid, 
                        double *labelat, double *gap, const char *method, 
-                       const char *class ){
+                       const char *class, int *status ){
 /*
 *
 *  Name:
@@ -9527,7 +9893,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 *     #include "plot.h"
 *     void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid, 
 *                     double *labelat, double *gap, const char *method, 
-*                     const char *class )
+*                     const char *class, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -9578,6 +9944,8 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     -  This function assumes the current Frame of the Plot is 2
@@ -9590,6 +9958,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
    AstPointSet *pset1;    /* Pointer to PointSet holding physical coords. */
    AstPointSet *pset2;    /* Pointer to PointSet holding graphics coords. */
    AstPointSet *pset3;    /* Pointer to PointSet holding clipped graphics coords. */
+   EdgeCrossingsStatics *ecstatics = NULL; /* For static data structure */
    TickInfo *info;        /* Pointer to the TickInfo for the current axis */
    double *ptr1[2];       /* Pointer to physical data */
    double **ptr2;         /* Pointer to graphics data */
@@ -9666,7 +10035,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 /* Information about the drawn tick marks is saved in the Plot structure.
    Reset this information now so that we are ready to store information
    about the new ticks that will be drawn by this function invocation. */
-   SaveTick( this, -1, 0.0, 0.0, 0 );
+   SaveTick( this, -1, 0.0, 0.0, 0, status );
 
 /* If ticks are to be put round the edges of the plotting area... */
 /* ============================================================== */
@@ -9732,7 +10101,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 /* Draw tick marks at all occurrences of the current major tick value on 
    the selected edge of the plotting area. */
                Ticker( this, edge, axis, *value, gap, mjtklen,
-                       1, ( ed == 0 ), method, class );
+                       1, ( ed == 0 ), &ecstatics, method, class, status );
 
 /* If minor tick mark values were not supplied, calculate them as even
    intervals between the major tick values. */
@@ -9774,7 +10143,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
    with index zero, since this corresponds to the position of the major 
    tick mark. */
                      if( i ) Ticker( this, edge, axis, minval, gap, mntklen,
-                                     0, ( ed == 0 ), method, class );
+                                     0, ( ed == 0 ), &ecstatics, method, class, status );
 
 /* Get the axis value at the next minor tick mark. */
                      minval += ( i < 0 ) ? delta2 : delta1;
@@ -9791,7 +10160,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
                value = info->minticks;
                for( tick = 0; tick < info->nminor; tick++, value++ ){
                   Ticker( this, edge, axis, *value, gap, mntklen, 0, 
-                          ( ed == 0 ), method, class );
+                          ( ed == 0 ), &ecstatics, method, class, status );
                }
             }
 
@@ -9805,7 +10174,8 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 
 /* Free the static resources allocated within EdgeCrossings (called
    by Ticker). */
-      (void) EdgeCrossings( NULL, 0, 0, 0.0, NULL, NULL, method, class );
+      (void) EdgeCrossings( NULL, 0, 0, 0.0, NULL, NULL, &ecstatics, method, 
+                            class, status );
 
 /* If ticks are to put within the interior of the plotting area... */
 /* ============================================================== */
@@ -10031,7 +10401,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
                                                   sizeof(double)*nel );
 
 /* Create a pointset holding these coordinates. */
-            pset1 = astPointSet( nel, 2, "" );
+            pset1 = astPointSet( nel, 2, "", status );
             astSetPoints( pset1, ptr1 );
 
 /* Transform these physical coordinates into graphics coordinates, without
@@ -10041,7 +10411,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
             ptr2 = astGetPoints( pset2 );
 
 /* Transform them again this time with clipping. */
-            pset3 = Trans( this, NULL, mapping, pset1, 0, NULL, 0, method, class );
+            pset3 = Trans( this, NULL, mapping, pset1, 0, NULL, 0, method, class, status );
             ptr3 = astGetPoints( pset3 );
 
 /* Check the pointers can be used.*/
@@ -10158,11 +10528,11 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
                         }
 
 /* Save and draw the tick mark. */
-                        SaveTick( this, axis, x0, y0, *majflag );
+                        SaveTick( this, axis, x0, y0, *majflag, status );
                         if( x0 != x1 || y0 != y1 ) {
-                           Bpoly( this, (float) x0, (float) y0, method, class );
-                           Apoly( this, (float) x1, (float) y1, method, class );
-                           Opoly( this, method, class );
+                           Bpoly( this, (float) x0, (float) y0, method, class, status );
+                           Apoly( this, (float) x1, (float) y1, method, class, status );
+                           Opoly( this, method, class, status );
                         }
                      }
                   }
@@ -10202,8 +10572,8 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 }
 
 static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid, 
-                       CurveData **cdata, int force, const char *method, 
-                       const char *class ){
+                       AstPlotCurveData **cdata, int force, const char *method, 
+                       const char *class, int *status ){
 /*
 *
 *  Name:
@@ -10219,8 +10589,8 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
 *  Synopsis:
 *     #include "plot.h"
 *     int EdgeLabels( AstPlot *this, int ink, TickInfo **grid, 
-*                     CurveData **cdata, int force, const char *method, 
-*                     const char *class )
+*                     AstPlotCurveData **cdata, int force, const char *method, 
+*                     const char *class, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -10247,8 +10617,8 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
 *        each pointing to a TickInfo structure holding information about
 *        tick marks on the axis. See function GridLines.
 *     cdata
-*        A pointer to an array of two CurveData pointers (one for each axis), 
-*        each pointing to an array of CurveData structure (one for each
+*        A pointer to an array of two AstPlotCurveData pointers (one for each axis), 
+*        each pointing to an array of AstPlotCurveData structure (one for each
 *        major tick value on the axis), holding information about breaks
 *        in the curves drawn to mark the major tick values. See function 
 *        DrawGrid. 
@@ -10261,6 +10631,8 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     If edge labels were drawn, 1 is returned. Otherwise 0 is returned.
@@ -10272,7 +10644,7 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
 
 /* Local Variables: */
    AstFrame *frame;       /* Pointer to current Frame */
-   CurveData *cdt;        /* Pointer to the CurveData for the next tick */
+   AstPlotCurveData *cdt; /* Pointer to the AstPlotCurveData for the next tick */
    LabelList *labellist;  /* Pointer to a ingle list of labels to be plotted */
    LabelList *ll;         /* Pointer to next label to be plotted */
    LabelList *llist[2];   /* Pointers to both lists of labels to be plotted */
@@ -10645,7 +11017,7 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
 /* Plot them. */
          info = grid[ axis ];
          PlotLabels( this, esc, frame, axis, llist[ axis ], info->fmt, 
-                     nedge[ axis ], &box, method, class );
+                     nedge[ axis ], &box, method, class, status );
 
 /* Re-establish the original graphical attributes. */
          astGrfAttrs( this, gelid, 0, GRF__TEXT, method, class );
@@ -10681,8 +11053,9 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
 }
 
 static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval, 
-                          double *gap, double **cross, const char *method, 
-                          const char *class ){
+                          double *gap, double **cross,
+                          EdgeCrossingsStatics **pstatics, const char *method, 
+                          const char *class, int *status ){
 /*
 *
 *  Name:
@@ -10698,8 +11071,9 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
 *  Synopsis:
 *     #include "plot.h"
 *     int EdgeCrossings( AstPlot *this, int edge, int axis, double axval, 
-*                        double *gap, double **cross, const char *method, 
-*                        const char *class )
+*                        double *gap, double **cross, 
+*                        EdgeCrossingsStatics **pstatics, 
+*                        const char *method, const char *class, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -10746,7 +11120,7 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
 
 *  Parameters:
 *     this
-*        A pointer to the Plot.
+*        A pointer to the Plot. Supply a NULL pointer to release resources.
 *     edge
 *        The edge of the plotting area to be used. Edge 0 is the left hand 
 *        edge. Edge 1 is the top edge. Edge 2 is the right-hand edge. Edge 3 
@@ -10768,12 +11142,20 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
 *        crossing. The memory allocated within this function to hold this
 *        data should be freed using astFree when no longer needed. If no
 *        crossings are found a NULL pointer is returned.
+*     pstatics
+*        Address of a pointer to a structure holding values for variables 
+*        which were statically defined within this function prior to the 
+*        thread-safe version of AST. If the pointer is supplied as NULL,
+*        then a new structure is allocated and initialised. Any supplied
+*        structure is freed if a NULL pointer is supplied for "this".
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Return Value:
 *     The number of crossings found.
@@ -10793,22 +11175,7 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
 */
 
 /* Local Variables: */
-   static AstFrame *frame = NULL;   /* Pointer to current Frame in Plot */
-   static AstPointSet *pset1 = NULL;/* Graphics cooords at edge samples */
-   static AstPointSet *pset2 = NULL;/* Physical cooords at edge samples */
-   static AstPointSet *pset4 = NULL;/* Graphics cooords at offset edge samples */
-   static double **ptr1 = NULL;     /* Pointer to graphics coord. data */
-   static double **ptr2 = NULL;     /* Pointer to physical coord. data */
-   static double **ptr4 = NULL;     /* Pointer to graphics coord. data */
-   static double edgehi;            /* High bound on varying graphics axis */
-   static double edgelo;            /* Low bound on varying graphics axis */
-   static double edgeval;           /* Constant graphics axis value along edge */
-   static double limit;             /* Three times the RMS step size */
-   static int dim;                  /* Extended number of samples */
-   static int edgeax;               /* Graphics axis to which edgeval refers */
-   static int paxis = -1;           /* Axis used in first invocation */
-   static int pedge = -1;           /* Edge used in first invocation */
-
+   EdgeCrossingsStatics *statics; /* Structure holding static data */
    AstMapping *mapping;       /* Pointer to graphics->physical mapping */
    AstPointSet *pset1a;       /* Physical cooords at offset edge samples */
    AstPointSet *pset2a;       /* Physical cooords at offset edge samples */
@@ -10857,15 +11224,19 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
    int nsum;                  /* Number of values summed in "sum" */
    int plarger;               /* Was previous axis value larger than target? */
 
+/* Get a pointer to the supplied statics object. */
+   statics = *pstatics;
+
 /* If a NULL Plot pointer has been supplied, release the static
    resources, and return. */
    if( !this ){
-      if( pset1 ) pset1 = astAnnul( pset1 );
-      if( pset2 ) pset2 = astAnnul( pset2 );
-      if( pset4 ) pset4 = astAnnul( pset4 );
-      if( frame ) frame = astAnnul( frame );
-      paxis = -1; 
-      pedge = -1; 
+      if( statics ){
+         if( statics->pset1 ) statics->pset1 = astAnnul( statics->pset1 );
+         if( statics->pset2 ) statics->pset2 = astAnnul( statics->pset2 );
+         if( statics->pset4 ) statics->pset4 = astAnnul( statics->pset4 );
+         if( statics->frame ) statics->frame = astAnnul( statics->frame );
+         *pstatics = astFree( statics );
+      }
       return 0;
    }
 
@@ -10876,6 +11247,23 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
 
 /* Check the global status. */
    if( !astOK ) return 0;
+
+/* If no statics structure was supplied, create one now and initialise it. */
+   if( !statics ) {
+      statics = astMalloc( sizeof( EdgeCrossingsStatics ) );
+      if( statics ) {
+         statics->frame = NULL;
+         statics->pset1 = NULL;
+         statics->pset2 = NULL;
+         statics->pset4 = NULL;
+         statics->ptr1 = NULL; 
+         statics->ptr2 = NULL; 
+         statics->ptr4 = NULL; 
+         statics->paxis = -1;  
+         statics->pedge = -1;  
+         *pstatics = statics;
+      }
+   }
 
 /* Initialise variables to avoid "used of uninitialised variable"
    messages from dumb compilers. */
@@ -10895,66 +11283,68 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
 /* If the edge or axis has changed since the last invocation, or if this is 
    the first invocation, initialise some static data. */
 /* ======================================================================*/
-   if( pedge == -1 || pedge != edge || paxis != axis ){
-      pedge = edge;
-      paxis = axis;
+   if( statics->pedge == -1 || statics->pedge != edge || statics->paxis != axis ){
+
+/* Save the edge and axis. */
+      statics->pedge = edge;
+      statics->paxis = axis;
 
 /* Annull any previous static data objects */
-      if( pset1 ) pset1 = astAnnul( pset1 );
-      if( pset2 ) pset2 = astAnnul( pset2 );
-      if( pset4 ) pset4 = astAnnul( pset4 );
-      if( frame ) frame = astAnnul( frame );
+      if( statics->pset1 ) statics->pset1 = astAnnul( statics->pset1 );
+      if( statics->pset2 ) statics->pset2 = astAnnul( statics->pset2 );
+      if( statics->pset4 ) statics->pset4 = astAnnul( statics->pset4 );
+      if( statics->frame ) statics->frame = astAnnul( statics->frame );
 
 /* Store some values so that the code does not need to consider each edge
    separately. First deal with the left hand edge. */
       if( edge == 0 ){
-         edgeax = 0;       
+         statics->edgeax = 0;       
          if( this->xrev ){      
-            edgeval = this->xhi;
+            statics->edgeval = this->xhi;
          } else {
-            edgeval = this->xlo;
+            statics->edgeval = this->xlo;
          }
-         edgehi = this->yhi;
-         edgelo = this->ylo;
+         statics->edgehi = this->yhi;
+         statics->edgelo = this->ylo;
  
 /* Now deal with the right hand edge. */
       } else if( edge == 2 ){
-         edgeax = 0;       
+         statics->edgeax = 0;       
          if( this->xrev ){      
-            edgeval = this->xlo;
+            statics->edgeval = this->xlo;
          } else {
-            edgeval = this->xhi;
+            statics->edgeval = this->xhi;
          }
-         edgehi = this->yhi;
-         edgelo = this->ylo;
+         statics->edgehi = this->yhi;
+         statics->edgelo = this->ylo;
 
 /* Now deal with the bottom edge. */
       } else if( edge == 3 ){
-         edgeax = 1;       
+         statics->edgeax = 1;       
          if( this->yrev ){      
-            edgeval = this->yhi;
+            statics->edgeval = this->yhi;
          } else {
-            edgeval = this->ylo;
+            statics->edgeval = this->ylo;
          }
-         edgehi = this->xhi;
-         edgelo = this->xlo;
+         statics->edgehi = this->xhi;
+         statics->edgelo = this->xlo;
 
 
 /* Finally deal with the top edge. */
       } else {
-         edgeax = 1;       
+         statics->edgeax = 1;       
          if( this->yrev ){      
-            edgeval = this->ylo;
+            statics->edgeval = this->ylo;
          } else {
-            edgeval = this->yhi;
+            statics->edgeval = this->yhi;
          }
-         edgehi = this->xhi;
-         edgelo = this->xlo;
+         statics->edgehi = this->xhi;
+         statics->edgelo = this->xlo;
 
       }
 
 /* Get a pointer to the current Frame in the supplied Plot. */
-      frame = astGetFrame( this, AST__CURRENT );
+      statics->frame = astGetFrame( this, AST__CURRENT );
 
 /* Get a pointer to the mapping from base to current Frame in the supplied 
    Plot. */
@@ -10962,25 +11352,25 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
 
 /* Create a PointSet to hold the graphics coordinates at a set of
    regularly spaced points along the specified edge of the plotting area. */
-      pset1a = astPointSet( EDGETICKS_DIM, 2, "" );
+      pset1a = astPointSet( EDGETICKS_DIM, 2, "", status );
       ptr1a = astGetPoints( pset1a );
 
 /* Create a PointSet to hold the corresponding physical coordinates. */
-      pset2a = astPointSet( EDGETICKS_DIM, 2, "" );
+      pset2a = astPointSet( EDGETICKS_DIM, 2, "", status );
       ptr2a = astGetPoints( pset2a );
 
 /* Check they can be used. */
       if( astOK ){
 
 /* Set up the graphics coordinates. */
-         dd = ( edgehi - edgelo )/(double)( EDGETICKS_DIM - 1 );
-         value = edgelo;
+         dd = ( statics->edgehi - statics->edgelo )/(double)( EDGETICKS_DIM - 1 );
+         value = statics->edgelo;
    
-         p1 = ptr1a[ edgeax ];
-         p2 = ptr1a[ 1 - edgeax ];
+         p1 = ptr1a[ statics->edgeax ];
+         p2 = ptr1a[ 1 - statics->edgeax ];
 
          for( i = 0; i < EDGETICKS_DIM; i++ ){
-            *(p1++) = edgeval;
+            *(p1++) = statics->edgeval;
             *(p2++) = value;
             value += dd;
          }
@@ -10988,11 +11378,11 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
 
 /* Transform the graphics coordinates to physical coordinates,
    *without* normalising them into their normal ranges. */
-      (void) Trans( this, frame, mapping, pset1a, 1, pset2a, 0, method, class );
+      (void) Trans( this, statics->frame, mapping, pset1a, 1, pset2a, 0, method, class, status );
 
 /* Find the RMS step size along the axis. This is used to locate
    discontinuities along the edge.  Do three rejection iterations. */
-      limit = DBL_MAX;
+      statics->limit = DBL_MAX;
       for( iter = 0; iter < 3; iter ++ ){
          q1 = ptr2a[ axis ];
          pq1 = AST__BAD;
@@ -11002,7 +11392,7 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
          for( i = 0; i < EDGETICKS_DIM; i++ ){
             if( *q1 != AST__BAD && pq1 != AST__BAD ){
                diff = *q1 - pq1;
-               if( fabs( diff ) < limit ){   
+               if( fabs( diff ) < statics->limit ){   
                   sum += diff*diff;
                   nsum++;
                }
@@ -11011,7 +11401,7 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
          }
  
          if( nsum == 0 ) break;
-         limit = 3.0*sqrt( sum/(double)nsum );
+         statics->limit = 3.0*sqrt( sum/(double)nsum );
       }
 
 /* Now create another PointSet holding positions slightly offset from the
@@ -11019,11 +11409,11 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
    of the other physical axis. These positions are used to determine the
    vector at the crossings. */
       if( nsum > 0 ){
-         pset3 = astPointSet( EDGETICKS_DIM, 2, "" );
+         pset3 = astPointSet( EDGETICKS_DIM, 2, "", status );
          ptr3 = astGetPoints( pset3 );
 
 /* Create a PointSet to hold the corresponding graphics coordinates. */
-         pset4a = astPointSet( EDGETICKS_DIM, 2, "" );
+         pset4a = astPointSet( EDGETICKS_DIM, 2, "", status );
          ptr4a = astGetPoints( pset4a );
 
 /* Check they can be used. */
@@ -11056,7 +11446,7 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
          }
 
 /* Transform the physical coordinates to graphics coordinates. */
-         (void) Trans( this, NULL, mapping, pset3, 0, pset4a, 0, method, class );
+         (void) Trans( this, NULL, mapping, pset3, 0, pset4a, 0, method, class, status );
 
 /* Check they can be used. */
          if( astOK ){
@@ -11117,45 +11507,45 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
    size. */
          q1 = ptr2a[ axis ];
          pq1 = AST__BAD;
-         limit *= 3.0;
+         statics->limit *= 3.0;
          ndisc = 0;
 
          for( i = 0; i < EDGETICKS_DIM; i++ ){
             if( *q1 != AST__BAD && pq1 != AST__BAD ){
-               if( fabs( *q1 - pq1 ) > limit ) ndisc++;
+               if( fabs( *q1 - pq1 ) > statics->limit ) ndisc++;
             }
             pq1 = *(q1++);
          }
 
 /* Store the size of the new PointSets holding the extra samples. */
-         dim = EDGETICKS_DIM + 3*ndisc;         
+         statics->dim = EDGETICKS_DIM + 3*ndisc;         
  
 /* If there are no discontinuities, just clone the existing PointSets. */
          if( !ndisc ){
-            pset1 = astClone( pset1a );
-            pset2 = astClone( pset2a );
-            pset4 = astClone( pset4a );
-            ptr1 = astGetPoints( pset1 );
-            ptr2 = astGetPoints( pset2 );
-            ptr4 = astGetPoints( pset4 );
+            statics->pset1 = astClone( pset1a );
+            statics->pset2 = astClone( pset2a );
+            statics->pset4 = astClone( pset4a );
+            statics->ptr1 = astGetPoints( statics->pset1 );
+            statics->ptr2 = astGetPoints( statics->pset2 );
+            statics->ptr4 = astGetPoints( statics->pset4 );
 
 /* Otherwise, create new PointSets. */
          } else {
-            pset1 = astPointSet( dim, 2, "" );
-            ptr1 = astGetPoints( pset1 );
-            pset2 = astPointSet( dim, 2, "" );
-            ptr2 = astGetPoints( pset2 );
-            pset4 = astPointSet( dim, 2, "" );
-            ptr4 = astGetPoints( pset4 );
+            statics->pset1 = astPointSet( statics->dim, 2, "", status );
+            statics->ptr1 = astGetPoints( statics->pset1 );
+            statics->pset2 = astPointSet( statics->dim, 2, "", status );
+            statics->ptr2 = astGetPoints( statics->pset2 );
+            statics->pset4 = astPointSet( statics->dim, 2, "", status );
+            statics->ptr4 = astGetPoints( statics->pset4 );
 
 /* Set up pointers used to walk through the arrays in the original
    PointSets and the new PointSets. */
-            p1 = ptr1[ 0 ];
-            p2 = ptr1[ 1 ];
-            q1 = ptr2[ axis ];
-            q2 = ptr2[ 1 - axis ];
-            v1 = ptr4[ 0 ];
-            v2 = ptr4[ 1 ];
+            p1 = statics->ptr1[ 0 ];
+            p2 = statics->ptr1[ 1 ];
+            q1 = statics->ptr2[ axis ];
+            q2 = statics->ptr2[ 1 - axis ];
+            v1 = statics->ptr4[ 0 ];
+            v2 = statics->ptr4[ 1 ];
 
             p1a = ptr1a[ 0 ];
             p2a = ptr1a[ 1 ];
@@ -11172,7 +11562,7 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
 
 /* If this is the first point after a discontinuity... */
                if( *q1a != AST__BAD && pq1 != AST__BAD ){
-                  if( fabs( *q1a - pq1 ) > limit ) {
+                  if( fabs( *q1a - pq1 ) > statics->limit ) {
 
 /* Insert an extra sample with the coordinates of the previous sample, 
    but with an axis value which is linearly extrapolated from the previous 
@@ -11238,7 +11628,7 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
 /* If all the physical coordinates are bad, indicate this by setting the
    limiting step size bad. */
       } else {
-         limit = AST__BAD;
+         statics->limit = AST__BAD;
       }
       
 /* Annul the pointer to the mapping from base to current Frame. */
@@ -11249,25 +11639,25 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
 /* ======================================================================*/
 /* The initialisation has now been done. Check the physical coordinate data 
    can be used. */
-   if( astOK && limit != AST__BAD ){
+   if( astOK && statics->limit != AST__BAD ){
 
 /* Store pointers to the graphics and physical coordinates at the first
    edge sample. */
-      p1 = ptr1[ edgeax ];     /* Graphics axis with constant value */
-      p2 = ptr1[ 1 - edgeax ]; /* Graphics axis with varying value */
-      q1 = ptr2[ axis ];       /* Physical axis values to be searched */
-      q2 = ptr2[ 1 - axis ];   /* The other physical axis */
+      p1 = statics->ptr1[ statics->edgeax ];     /* Graphics axis with constant value */
+      p2 = statics->ptr1[ 1 - statics->edgeax ]; /* Graphics axis with varying value */
+      q1 = statics->ptr2[ axis ];       /* Physical axis values to be searched */
+      q2 = statics->ptr2[ 1 - axis ];   /* The other physical axis */
  
 /* Store pointers to the components of the unit vector at the first
    edge sample. */
-      v1 = ptr4[ 0 ];
-      v2 = ptr4[ 1 ];
+      v1 = statics->ptr4[ 0 ];
+      v2 = statics->ptr4[ 1 ];
 
 /* Inidicate that there is currently no "previous sample". */
       pq1 = AST__BAD;
 
 /* Check each point in turn... */
-      for( i = 0; i < dim; i++ ){
+      for( i = 0; i < statics->dim; i++ ){
 
 /* Skip this point if the physical coordinates are undefined. */
          if( *q1 != AST__BAD && *q2 != AST__BAD ){
@@ -11325,11 +11715,11 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
                  if( astOK ) {
   
                     data = *cross + 4*( ncross - 1 );
-                    if( edgeax ){
+                    if( statics->edgeax ){
                        *(data++) = z;
-                       *(data++) = edgeval;
+                       *(data++) = statics->edgeval;
                     } else {
-                       *(data++) = edgeval;
+                       *(data++) = statics->edgeval;
                        *(data++) = z;
                     }
                     *(data++) = vx;
@@ -11377,7 +11767,7 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
 
 }
 
-int astFindEscape_( const char *text, int *type, int *value, int *nc ){
+int astFindEscape_( const char *text, int *type, int *value, int *nc, int *status ){
 /*
 *+
 *  Name:
@@ -11639,7 +12029,7 @@ int astFindEscape_( const char *text, int *type, int *value, int *nc ){
 
 static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis, 
                          double refval, double width, double gap, double *cen, int ngood, 
-                         double *data, double **tick_data ){
+                         double *data, double **tick_data, int *status ){
 /*
 *  Name:
 *     FindMajTicks
@@ -11774,7 +12164,7 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
 
 /* Find the number of candidate tick marks assuming an nfill value of 0. */
    nfill = 0;
-   nticks = FindMajTicks2( nfill, gap, centre, ngood, data, &ticks );
+   nticks = FindMajTicks2( nfill, gap, centre, ngood, data, &ticks, status );
 
 /* Loop round increasing the nfill value until an unreasonably large value 
    of nfill is reached. The loop will exit early via a break statement when 
@@ -11789,7 +12179,7 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
 
 /* Form a new set of tick mark values using this new nfill value */
       ticks = (double *) astFree( (void *) ticks );
-      ntnew = FindMajTicks2( nfill, gap, centre, ngood, data, &ticks );
+      ntnew = FindMajTicks2( nfill, gap, centre, ngood, data, &ticks, status );
 
 /* We need to know if the rate of increase of nticks has settled down to
    a constant value. Inititially increasing nfill will cause the total
@@ -11816,7 +12206,7 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
    loop. */
       if( nsame == 3 ) {
          ticks = (double *) astFree( (void *) ticks );
-         nticks = FindMajTicks2( use_nfill, gap, centre, ngood, data, &ticks );
+         nticks = FindMajTicks2( use_nfill, gap, centre, ngood, data, &ticks, status );
          break;         
       }
 
@@ -11853,7 +12243,7 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
 /* Use the Mapping to place each tick mark value in its primary domain.
    This is a sort of normalization, similar but different to that performed
    by the astNorm method. */
-   Norm1( map, axis, nticks, ticks, refval, width ); 
+   Norm1( map, axis, nticks, ticks, refval, width, status ); 
 
 /* Check for success. */
    if( astOK ){
@@ -11911,7 +12301,7 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
 
 }
 static int FindMajTicks2( int nfill, double gap, double centre, int ngood, 
-                          double *data, double **tick_data ){
+                          double *data, double **tick_data, int *status ){
 /*
 *  Name:
 *     FindMajTicks2
@@ -11925,7 +12315,7 @@ static int FindMajTicks2( int nfill, double gap, double centre, int ngood,
 *  Synopsis:
 *     #include "plot.h"
 *     int FindMajTicks2( int nfill, double gap, double centre, int ngood, 
-*                        double *data, double **tick_data )
+*                        double *data, double **tick_data, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -11949,6 +12339,8 @@ static int FindMajTicks2( int nfill, double gap, double centre, int ngood,
 *     tick_data
 *        A pointer to a place at which to store a pointer to an array
 *        holding the returned tick mark values for the axis.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The number of major tick mark values stored in the array pointer to
@@ -12058,7 +12450,7 @@ static int FindMajTicks2( int nfill, double gap, double centre, int ngood,
 }
 
 static int FindDPTZ( AstFrame *fr, int axis, const char *fmt, 
-                      const char *text, int *ndp, int *ntz ) {
+                      const char *text, int *ndp, int *ntz, int *status ) {
 /*
 *  Name:
 *     FindDPTZ
@@ -12072,7 +12464,7 @@ static int FindDPTZ( AstFrame *fr, int axis, const char *fmt,
 *  Synopsis:
 *     #include "plot.h"
 *     int FindDPTZ( AstFrame *fr, int axis, const char *fmt, 
-*                   const char *text, int *ndp, int *ntz ) 
+*                   const char *text, int *ndp, int *ntz, int *status ) 
 
 *  Class Membership:
 *     Plot member function.
@@ -12097,6 +12489,8 @@ static int FindDPTZ( AstFrame *fr, int axis, const char *fmt,
 *        places in the final field.
 *     ntz
 *        Pointer to an int in which to return the number of trailing zeros.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Non-zero if and only if a non-zero digit is found in any field.
@@ -12178,7 +12572,7 @@ static int FindDPTZ( AstFrame *fr, int axis, const char *fmt,
 
 static int FindString( int n, const char *list[], const char *test, 
                        const char *text, const char *method, 
-                       const char *class ){
+                       const char *class, int *status ){
 /*
 *  Name:
 *     FindString
@@ -12192,7 +12586,7 @@ static int FindString( int n, const char *list[], const char *test,
 *  Synopsis:
 *     #include "plot.h"
 *     int FindString( int n, const char *list[], const char *test, 
-*                     const char *text, const char *method, const char *class )
+*                     const char *text, const char *method, const char *class, int *status )
 
 *  Class Membership:
 *     Plot method.
@@ -12221,6 +12615,8 @@ static int FindString( int n, const char *list[], const char *test,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The index of the identified string within the supplied array, starting
@@ -12242,13 +12638,13 @@ static int FindString( int n, const char *list[], const char *test,
 /* Compare the test string with each element of the supplied list. Leave
    the loop when a match is found. */
    for( ret = 0; ret < n; ret++ ) {
-      if( !Ustrcmp( test, list[ ret ] ) ) break;
+      if( !Ustrcmp( test, list[ ret ], status ) ) break;
    }
 
 /* Report an error if the supplied test string does not match any element
    in the supplied list. */
    if( ret >= n ) {
-      astError( AST__OPT, "%s(%s): Illegal value '%s' supplied for %s.",
+      astError( AST__OPT, "%s(%s): Illegal value '%s' supplied for %s.", status,
                 method, class, test, text );
       ret = -1;
    }
@@ -12257,7 +12653,7 @@ static int FindString( int n, const char *list[], const char *test,
    return ret;
 }
 
-static char *FindWord( char *ptr, const char *d, const char **p ) {
+static char *FindWord( char *ptr, const char *d, const char **p, int *status ) {
 /*
 *  Name:
 *     FindWord
@@ -12270,7 +12666,7 @@ static char *FindWord( char *ptr, const char *d, const char **p ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     char *FindWord( char *ptr, const char *d, const char **p )
+*     char *FindWord( char *ptr, const char *d, const char **p, int *status )
 
 *  Class Membership:
 *     Plot method.
@@ -12298,6 +12694,8 @@ static char *FindWord( char *ptr, const char *d, const char **p ) {
 *        identifies the start of the string to be searched. On exit, it is
 *        modified to point to the start of the following word. It is
 *        returned NULL if there are no more words.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated character string holding the 
@@ -12353,7 +12751,7 @@ static char *FindWord( char *ptr, const char *d, const char **p ) {
 }
 
 static const char *SplitValue( AstPlot *this, const char *value, int axis,
-                               int *split ) {
+                               int *split, int *status ) {
 /*
 *  Name:
 *     FormatValue
@@ -12366,7 +12764,7 @@ static const char *SplitValue( AstPlot *this, const char *value, int axis,
 
 *  Synopsis:
 *     #include "plot.h"
-*     static const char *SplitValue( AstPlot *this, const char *value, 
+*     const char *SplitValue( AstPlot *this, const char *value, 
 *                                    int axis, int *split )
 
 *  Class Membership:
@@ -12407,6 +12805,7 @@ static const char *SplitValue( AstPlot *this, const char *value, int axis,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;
    char *d;    
    const char *result;    
    float rsp;         
@@ -12424,7 +12823,6 @@ static const char *SplitValue( AstPlot *this, const char *value, int axis,
    int nlong;
    int nshort;
    int nsp;       
-   static char buf[ 200 ];
 
 /* Initialise */
    result = value;
@@ -12432,10 +12830,13 @@ static const char *SplitValue( AstPlot *this, const char *value, int axis,
 /* Check the global error status. */
    if ( !astOK ) return result;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
+
 /* Do nothing more if the formatted value already contains graphical
    escape sequences, or if graphical escapes sequences are not being
    interpreted. */
-   if( value && astGetEscape( this ) && !HasEscapes( value ) ) {
+   if( value && astGetEscape( this ) && !HasEscapes( value, status ) ) {
 
 /* We split the line if the line is long or if *split was non-zero on
    entry. In this case always return *split equal to 1. */
@@ -12458,7 +12859,7 @@ static const char *SplitValue( AstPlot *this, const char *value, int axis,
 
 /* Initialse the pointer into the returned buffer at which the next
    character will be placed. */
-         d = buf;
+         d = splitvalue_buff;
 
 /* If no spaces were found... */
          if( imin == -1 ) {
@@ -12541,7 +12942,7 @@ static const char *SplitValue( AstPlot *this, const char *value, int axis,
          *d = 0;         
 
 /* Return a pointer to the buffer. */
-         result = buf;         
+         result = splitvalue_buff;         
       }
    }
 
@@ -12552,7 +12953,7 @@ static const char *SplitValue( AstPlot *this, const char *value, int axis,
    return result;
 }
 
-static AstFrameSet *Fset2D( AstFrameSet *fset, int ifrm ) {
+static AstFrameSet *Fset2D( AstFrameSet *fset, int ifrm, int *status ) {
 /*
 *  Name:
 *     Fset2D
@@ -12565,7 +12966,7 @@ static AstFrameSet *Fset2D( AstFrameSet *fset, int ifrm ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*      AstFrameSet *Fset2D( AstFrameSet *fset, int ifrm )
+*      AstFrameSet *Fset2D( AstFrameSet *fset, int ifrm, int *status )
 
 *  Class Membership:
 *     Plot method.
@@ -12592,6 +12993,8 @@ static AstFrameSet *Fset2D( AstFrameSet *fset, int ifrm ) {
 *     ifrm
 *        The index of the Frame to check. This should be AST__BASE or
 *        AST_CURRENT.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to a FrameSet in which the Frame with index given by ifrm
@@ -12640,7 +13043,7 @@ static AstFrameSet *Fset2D( AstFrameSet *fset, int ifrm ) {
          inperm[ 1 ] = 1;
          for( i = 2; i < nax; i++ ) inperm[ i ] = -1;
          zero = 0.0;
-         map = astPermMap( nax, inperm, 2, axes, &zero, "" );
+         map = astPermMap( nax, inperm, 2, axes, &zero, "", status );
          inperm = (int *) astFree( (void *) inperm );
       }
 
@@ -12673,7 +13076,7 @@ static AstFrameSet *Fset2D( AstFrameSet *fset, int ifrm ) {
 }
 
 static int FullForm( const char *list, const char *test, const char *text,
-                     const char *method, const char *class ){
+                     const char *method, const char *class, int *status ){
 /*
 *  Name:
 *     FullForm
@@ -12687,7 +13090,7 @@ static int FullForm( const char *list, const char *test, const char *text,
 *  Synopsis:
 *     #include "plot.h"
 *     int FullForm( const char *list, const char *test, const char *text,
-*                   const char *method, const char *class )
+*                   const char *method, const char *class, int *status )
 
 *  Class Membership:
 *     Plot method.
@@ -12713,6 +13116,8 @@ static int FullForm( const char *list, const char *test, const char *text,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The index of the identified option within the supplied list, starting
@@ -12742,13 +13147,13 @@ static int FullForm( const char *list, const char *test, const char *text,
 
 /* Save the number of characters in the supplied test option (excluding
    trailing spaces). */
-   len = ChrLen( test );
+   len = ChrLen( test, status );
 
 /* Compare the supplied test option against each of the known options in 
    turn. Count the number of matches. */
    nmatch = 0;
    p = list;
-   option = FindWord( NULL, " ", &p );
+   option = FindWord( NULL, " ", &p, status );
    i = 0;
    while( option ){
 
@@ -12761,9 +13166,9 @@ static int FullForm( const char *list, const char *test, const char *text,
    and the current option are identical (including length), use the 
    current option. */
 
-      if( !Ustrncmp( test, option, len ) ) {
+      if( !Ustrncmp( test, option, len, status ) ) {
          ret = i;
-         if( ChrLen( option ) == len ) {
+         if( ChrLen( option, status ) == len ) {
             nmatch = 1;
             option = astFree( option );
             break;
@@ -12773,20 +13178,20 @@ static int FullForm( const char *list, const char *test, const char *text,
       }
 
 /* Get a pointer to the next option. */
-      option = FindWord( option, " ", &p );
+      option = FindWord( option, " ", &p, status );
       i++;
    }
 
 /* Report an error if no match was found, and return -1. */
    if( !nmatch ){
-      astError( AST__OPT, "%s(%s): Option '%.*s' is unknown in '%.*s'.",
-                method, class, len, test, ChrLen( text ), text );
+      astError( AST__OPT, "%s(%s): Option '%.*s' is unknown in '%.*s'.", status,
+                method, class, len, test, ChrLen( text, status ), text );
       ret = -1;
 
 /* Report an error if the label was ambiguous, and return -1. */
    } else if( nmatch > 1 ){
-      astError( AST__OPT, "%s(%s): Option '%.*s' is ambiguous in '%.*s'.",
-                method, class, len, test, ChrLen( text ), text );
+      astError( AST__OPT, "%s(%s): Option '%.*s' is ambiguous in '%.*s'.", status,
+                method, class, len, test, ChrLen( text, status ), text );
       ret = -1;
    }
 
@@ -12795,7 +13200,7 @@ static int FullForm( const char *list, const char *test, const char *text,
 }
 
 static void GAttr( AstPlot *this, int attr, double value, double *old_value, 
-                   int prim, const char *method, const char *class ) {
+                   int prim, const char *method, const char *class, int *status ) {
 /*
 *
 *  Name:
@@ -12810,7 +13215,7 @@ static void GAttr( AstPlot *this, int attr, double value, double *old_value,
 *  Synopsis:
 *     #include "plot.h"
 *     void GAttr( AstPlot *this, int attr, double value, double *old_value, 
-*                 int prim, const char *method, const char *class )
+*                 int prim, const char *method, const char *class, int *status )
 
 *  Class Membership:
 *     Plot private function.
@@ -12852,37 +13257,47 @@ static void GAttr( AstPlot *this, int attr, double value, double *old_value,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
 /* Local Variables: */
-   int status;          /* Status retruned from Grf function */
+   int grf_status;          /* Status retruned from Grf function */
 
 /* Check the global error status. Also return if there is nothing to do. */
    if ( !astOK || ( !old_value && value == AST__BAD ) ) return;
+
+/* Since we are about to call an external function which may not be
+   thread safe, prevent any other thread from executing the following code
+   until the current thread has finished executing it. */
+   LOCK_MUTEX2;
 
 /* If the Grf attribute is set to a non-zero value, use the Grf function
    registered using astGrfSet (so long as a function has been supplied).
    This called via a wrapper which adapts the interface to suit the
    language in which the function is written. */
    if( astGetGrf( this ) && this->grffun[ AST__GATTR ] ) {
-      status = ( *( this->GAttr ) )( this, attr, value, old_value, prim );
+      grf_status = ( *( this->GAttr ) )( this, attr, value, old_value, prim, status );
 
 /* Otherwise, use the function in the external Grf module, selected at
    link-time using ast_link options.*/
    } else {
-      status = astGAttr( attr, value, old_value, prim );
+      grf_status = astGAttr( attr, value, old_value, prim );
    }
 
+/* Allow the next thread to proceed. */
+   UNLOCK_MUTEX2;
+
 /* Report an error if anything went wrong. */
-   if( !status ) {
-      astError( AST__GRFER, "%s(%s): Graphics error in astGAttr. ", method, 
+   if( !grf_status ) {
+      astError( AST__GRFER, "%s(%s): Graphics error in astGAttr. ", status, method, 
                 class );
    }
 
 }
 
-static AstKeyMap *GetGrfContext( AstPlot *this ){
+static AstKeyMap *GetGrfContext( AstPlot *this, int *status ){
 /*
 *++
 *  Name:
@@ -12941,7 +13356,7 @@ f     AST_GETGRFCONTEXT = INTEGER
    return astClone( this->grfcontext );
 }
 
-AstKeyMap *astGrfConID_( AstPlot *this ) {
+AstKeyMap *astGrfConID_( AstPlot *this, int *status ) {
 /*
 *+
 *
@@ -12975,7 +13390,7 @@ AstKeyMap *astGrfConID_( AstPlot *this ) {
 *-
 */
    if( !this->grfcontext ) {
-      this->grfcontext = astKeyMap("");
+      this->grfcontext = astKeyMap("", status );
       this->grfcontextID = astMakeId( astClone( this->grfcontext ) );
       astExempt( this->grfcontextID );
    }
@@ -12983,7 +13398,7 @@ AstKeyMap *astGrfConID_( AstPlot *this ) {
 }
 
 static void GScales( AstPlot *this, float *alpha, float *beta,
-                      const char *method, const char *class ) {
+                      const char *method, const char *class, int *status ) {
 /*
 *
 *  Name:
@@ -12998,7 +13413,7 @@ static void GScales( AstPlot *this, float *alpha, float *beta,
 *  Synopsis:
 *     #include "plot.h"
 *     void GScales( AstPlot *this, float *alpha, float *beta,
-*                    const char *method, const char *class )
+*                    const char *method, const char *class, int *status )
 
 *  Class Membership:
 *     Plot private function.
@@ -13024,38 +13439,48 @@ static void GScales( AstPlot *this, float *alpha, float *beta,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
 /* Local Variables: */
-   int status;          /* Status retruned from Grf function */
+   int grf_status;          /* Status retruned from Grf function */
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Since we are about to call an external function which may not be
+   thread safe, prevent any other thread from executing the following code
+   until the current thread has finished executing it. */
+   LOCK_MUTEX2;
 
 /* If the Grf attribute is set to a non-zero value, use the Grf function
    registered using astGrfSet (so long as a function has been supplied).
    This is called via a wrapper which adapts the interface to suit the
    language in which the function is written. */
    if( astGetGrf( this ) && this->grffun[ AST__GSCALES ] ) {
-      status = ( *( this->GScales ) )( this, alpha, beta );
+      grf_status = ( *( this->GScales ) )( this, alpha, beta, status );
 
 /* Otherwise, use the function in the external Grf module, selected at
    link-time using ast_link options.*/
    } else {
-      status = astGScales( alpha, beta );
+      grf_status = astGScales( alpha, beta );
    }
 
+/* Allow the next thread to proceed. */
+   UNLOCK_MUTEX2;
+
 /* Check neither value is zero. */
-   if( status && ( *alpha == 0.0 || *beta == 0.0 ) ) {
+   if( grf_status && ( *alpha == 0.0 || *beta == 0.0 ) ) {
       astError( AST__GRFER, "astGScales: Returned axis scales are %g and %g " 
-                "but zero is illegal!", *alpha, *beta );
-      status = 0;
+                "but zero is illegal!", status, *alpha, *beta );
+      grf_status = 0;
    }
 
 /* Report an error if anything went wrong, and return safe values. */
-   if( !status ) {
-      astError( AST__GRFER, "%s(%s): Graphics error in astGScales. ", method, 
+   if( !grf_status ) {
+      astError( AST__GRFER, "%s(%s): Graphics error in astGScales. ", status, method, 
                 class );
       *alpha = 1.0;
       *beta = 1.0;      
@@ -13063,7 +13488,7 @@ static void GScales( AstPlot *this, float *alpha, float *beta,
 
 }
 
-static int GCap( AstPlot *this, int cap, int value ){
+static int GCap( AstPlot *this, int cap, int value, int *status ){
 /*
 *
 *  Name:
@@ -13077,7 +13502,7 @@ static int GCap( AstPlot *this, int cap, int value ){
 
 *  Synopsis:
 *     #include "plot.h"
-*     int GCap( AstPlot *this, int cap, int value )
+*     int GCap( AstPlot *this, int cap, int value, int *status )
 
 *  Class Membership:
 *     Plot private function.
@@ -13096,6 +13521,8 @@ static int GCap( AstPlot *this, int cap, int value ){
 *        The capability to be inquired aboue.
 *     value
 *        The value ot assign to the capability.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Non-zero if the grf module is capabale of performing the action
@@ -13109,12 +13536,17 @@ static int GCap( AstPlot *this, int cap, int value ){
 /* Check the global error status. */
    if ( !astOK ) return 0;
 
+/* Since we are about to call an external function which may not be
+   thread safe, prevent any other thread from executing the following code
+   until the current thread has finished executing it. */
+   LOCK_MUTEX2;
+
 /* If the Grf attribute is set to a non-zero value, use the Grf function
    registered using astGrfSet (so long as a function has been supplied).
    This is called via a wrapper which adapts the interface to suit the
    language in which the function is written. */
    if( astGetGrf( this ) && this->grffun[ AST__GCAP ] ) {
-      result = ( *( this->GCap ) )( this, cap, value );
+      result = ( *( this->GCap ) )( this, cap, value, status );
 
 /* Otherwise, use the function in the external Grf module, selected at
    link-time using ast_link options.*/
@@ -13123,11 +13555,14 @@ static int GCap( AstPlot *this, int cap, int value ){
 
    }
 
+/* Allow the next thread to proceed. */
+   UNLOCK_MUTEX2;
+
 /* Return the result. */
    return result;
 }
 
-static void GenCurve( AstPlot *this, AstMapping *map ){
+static void GenCurve( AstPlot *this, AstMapping *map, int *status ){
 /*
 *++
 *  Name:
@@ -13191,6 +13626,7 @@ f        The global status.
 *--
 */
 /* Local Variables: */
+   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
    const char *class;      /* Object class */
    const char *method;     /* Current method */
    double d[ CRV_NPNT ];   /* Offsets to evenly spaced points along curve */
@@ -13203,6 +13639,9 @@ f        The global status.
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
+
 /* Store the current method, and the class of the supplied object for use 
    in error messages.*/
    method = "astGenCurve";
@@ -13213,7 +13652,7 @@ f        The global status.
    if( naxes != 2 && astOK ){
       astError( AST__NAXIN, "%s(%s): Number of axes (%d) in the base "
                 "Frame of the supplied %s is invalid - this number should "
-                "be 2.", method, class, naxes, class );
+                "be 2.", status, method, class, naxes, class );
    } 
 
 /* Only proceed if there has been no error. */
@@ -13266,16 +13705,16 @@ f        The global status.
       }
 
 /* Map these points into graphics coordinates. */
-      Map4( CRV_NPNT, d, x, y, method, class );
+      Map4( CRV_NPNT, d, x, y, method, class, status GLOBALS_NAME );
 
 /* Use Crv and Map4 to draw the curve. */
-      Crv( this, d, x, y, 0, NULL, method, class );
+      Crv( this, d, x, y, 0, NULL, NULL, method, class, status );
 
 /* End the current poly line. */
-      Opoly( this, method, class );
+      Opoly( this, method, class, status );
 
 /* Tidy up the static data used by Map4. */
-      Map4( 0, NULL, NULL, NULL, method, class );
+      Map4( 0, NULL, NULL, NULL, method, class, status GLOBALS_NAME );
 
 /* If no part of the curve could be drawn, set the number of breaks and the 
    length of the drawn curve to zero. */
@@ -13287,9 +13726,9 @@ f        The global status.
    the last point to be plotted. */
       } else {
          Crv_nbrk++;
-         if( Crv_nbrk > CRV_MXBRK ){
+         if( Crv_nbrk > AST__PLOT_CRV_MXBRK ){
             astError( AST__CVBRK, "%s(%s): Number of breaks in curve "
-                      "exceeds %d.", method, class, CRV_MXBRK );
+                      "exceeds %d.", status, method, class, AST__PLOT_CRV_MXBRK );
          } else {
             *(Crv_xbrk++) = (float) Crv_xl;
             *(Crv_ybrk++) = (float) Crv_yl;
@@ -13303,7 +13742,7 @@ f        The global status.
       Curve_data.length = Crv_len;
       Curve_data.out = Crv_out;
       Curve_data.nbrk = Crv_nbrk;
-      PurgeCdata( &Curve_data );
+      PurgeCdata( &Curve_data, status );
 
 /* Annul the Mapping. */
       Map4_map = astAnnul( Map4_map );
@@ -13318,7 +13757,7 @@ f        The global status.
 
 }
 
-static int GetLabelUnits( AstPlot *this, int axis ) {
+static int GetLabelUnits( AstPlot *this, int axis, int *status ) {
 /*
 *  Name:
 *     GetLabelUnits
@@ -13331,7 +13770,7 @@ static int GetLabelUnits( AstPlot *this, int axis ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int GetLabelUnits( AstPlot *this, int axis ) 
+*     int GetLabelUnits( AstPlot *this, int axis, int *status ) 
 
 *  Class Membership:
 *     Plot method.
@@ -13345,6 +13784,8 @@ static int GetLabelUnits( AstPlot *this, int axis ) {
 *        The Plot.
 *     axis
 *        The axis index (zero based).
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The attribute value.
@@ -13383,7 +13824,7 @@ static int GetLabelUnits( AstPlot *this, int axis ) {
    galactic or supergalactic coords, use a default of "no" for LabelUnits.
    Otherwise use a default of "yes". */
       ret = 1;
-      if( IsASkyFrame( (AstObject *) primframe ) ) {
+      if( IsASkyFrame( (AstObject *) primframe, status ) ) {
         system = astGetSystem( primframe );
         if( system == AST__ICRS ||
             system == AST__FK4 ||
@@ -13405,7 +13846,7 @@ static int GetLabelUnits( AstPlot *this, int axis ) {
 }
 
 static void GFlush( AstPlot *this, const char *method, 
-                   const char *class ) {
+                   const char *class, int *status ) {
 /*
 *
 *  Name:
@@ -13420,7 +13861,7 @@ static void GFlush( AstPlot *this, const char *method,
 *  Synopsis:
 *     #include "plot.h"
 *     void GFlush( AstPlot *this, const char *method, 
-*                  const char *class ) {
+*                  const char *class, int *status ) {
 
 *  Class Membership:
 *     Plot private function.
@@ -13441,31 +13882,41 @@ static void GFlush( AstPlot *this, const char *method,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
 /* Local Variables: */
-   int status;          /* Status retruned from Grf function */
+   int grf_status;          /* Status retruned from Grf function */
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Since we are about to call an external function which may not be
+   thread safe, prevent any other thread from executing the following code
+   until the current thread has finished executing it. */
+   LOCK_MUTEX2;
 
 /* If the Grf attribute is set to a non-zero value, use the Grf function
    registered using astGrfSet (so long as a function has been supplied).
    This called via a wrapper which adapts the interface to suit the
    language in which the function is written. */
    if( astGetGrf( this ) && this->grffun[ AST__GFLUSH ] ) {
-      status = ( *( this->GFlush ) )( this );
+      grf_status = ( *( this->GFlush ) )( this, status );
 
 /* Otherwise, use the function in the external Grf module, selected at
    link-time using ast_link options.*/
    } else {
-      status = astGFlush();
+      grf_status = astGFlush();
    }
 
+/* Allow the next thread to proceed. */
+   UNLOCK_MUTEX2;
+
 /* Report an error if anything went wrong. */
-   if( !status ) {
-      astError( AST__GRFER, "%s(%s): Graphics error in astGFlush. ", method, 
+   if( !grf_status ) {
+      astError( AST__GRFER, "%s(%s): Graphics error in astGFlush. ", status, method, 
                 class );
    }
 
@@ -13473,7 +13924,7 @@ static void GFlush( AstPlot *this, const char *method,
 
 static void GLine( AstPlot *this, int n, const float *x, 
                    const float *y, const char *method, 
-                   const char *class ) {
+                   const char *class, int *status ) {
 /*
 *
 *  Name:
@@ -13489,7 +13940,7 @@ static void GLine( AstPlot *this, int n, const float *x,
 *     #include "plot.h"
 *     void GLine( AstPlot *this, int n, const float *x, 
 *                 const float *y, const char *method, 
-*                 const char *class ) {
+*                 const char *class, int *status ) {
 
 *  Class Membership:
 *     Plot private function.
@@ -13516,36 +13967,50 @@ static void GLine( AstPlot *this, int n, const float *x,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;  /* Pointer to thread-specific global data */
    int i;               /* Loop count */
-   int status;          /* Status retruned from Grf function */
+   int grf_status;      /* Status retruned from Grf function */
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
+
+/* Since we are about to call an external function which may not be
+   thread safe, prevent any other thread from executing the following code
+   until the current thread has finished executing it. */
+   LOCK_MUTEX2;
+
 /* Do not draw anything if we are using "invisible ink". */
    if( astGetInvisible( this ) ) {
-      status = 1;
+      grf_status = 1;
 
 /* If the Grf attribute is set to a non-zero value, use the Grf function
    registered using astGrfSet (so long as a function has been supplied).
    This is called via a wrapper which adapts the interface to suit the
    language in which the function is written. */
    } else if( astGetGrf( this ) && this->grffun[ AST__GLINE ] ) {
-      status = ( *( this->GLine ) )( this, n, x, y );
+      grf_status = ( *( this->GLine ) )( this, n, x, y, status );
 
 /* Otherwise, use the function in the external Grf module, selected at
    link-time using ast_link options.*/
    } else {
-      status = astGLine( n, x, y );
+      grf_status = astGLine( n, x, y );
    }
 
+/* Allow the next thread to proceed. */
+   UNLOCK_MUTEX2;
+
 /* Report an error if anything went wrong. */
-   if( !status ) {
-      astError( AST__GRFER, "%s(%s): Graphics error in astGLine. ", method, 
+   if( !grf_status ) {
+      astError( AST__GRFER, "%s(%s): Graphics error in astGLine. ", status, method, 
                 class );
 
 /* Otherwise, update the box containing all drawn graphics primitives. */
@@ -13562,7 +14027,7 @@ static void GLine( AstPlot *this, int n, const float *x,
 
 static void GMark( AstPlot *this, int n, const float *x, 
                    const float *y, int type, const char *method, 
-                   const char *class ) {
+                   const char *class, int *status ) {
 /*
 *
 *  Name:
@@ -13578,7 +14043,7 @@ static void GMark( AstPlot *this, int n, const float *x,
 *     #include "plot.h"
 *     void GMark( AstPlot *this, int n, const float *x, 
 *                 const float *y, int type, const char *method, 
-*                 const char *class ) {
+*                 const char *class, int *status ) {
 
 *  Class Membership:
 *     Plot private function.
@@ -13608,36 +14073,50 @@ static void GMark( AstPlot *this, int n, const float *x,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;  /* Pointer to thread-specific global data */
    int i;               /* Loop count */
-   int status;          /* Status retruned from Grf function */
+   int grf_status;      /* Status retruned from Grf function */
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
+
+/* Since we are about to call an external function which may not be
+   thread safe, prevent any other thread from executing the following code
+   until the current thread has finished executing it. */
+   LOCK_MUTEX2;
+
 /* Do not draw anything if we are using "invisible ink". */
    if( astGetInvisible( this ) ) {
-      status = 1;
+      grf_status = 1;
 
 /* If the Grf attribute is set to a non-zero value, use the Grf function
    registered using astGrfSet (so long as a function has been supplied).
    This is called via a wrapper which adapts the interface to suit the
    language in which the function is written. */
    } else if( astGetGrf( this ) && this->grffun[ AST__GMARK ] ) {
-      status = ( *( this->GMark ) )( this, n, x, y, type );
+      grf_status = ( *( this->GMark ) )( this, n, x, y, type, status );
 
 /* Otherwise, use the function in the external Grf module, selected at
    link-time using ast_link options.*/
    } else {
-      status = astGMark( n, x, y, type );
+      grf_status = astGMark( n, x, y, type );
    }
 
+/* Allow the next thread to proceed. */
+   UNLOCK_MUTEX2;
+
 /* Report an error if anything went wrong. */
-   if( !status ) {
-      astError( AST__GRFER, "%s(%s): Graphics error in astGMark. ", method, 
+   if( !grf_status ) {
+      astError( AST__GRFER, "%s(%s): Graphics error in astGMark. ", status, method, 
                 class );
 
 /* Otherwise, update the box containing all drawn graphics primitives. */
@@ -13653,7 +14132,7 @@ static void GMark( AstPlot *this, int n, const float *x,
 }
 
 static void GQch( AstPlot *this, float *chv, float *chh, const char *method, 
-                  const char *class ) {
+                  const char *class, int *status ) {
 /*
 *
 *  Name:
@@ -13668,7 +14147,7 @@ static void GQch( AstPlot *this, float *chv, float *chh, const char *method,
 *  Synopsis:
 *     #include "plot.h"
 *     void GQch( AstPlot *this, float *chv, float *chh, const char *method, 
-*                const char *class )
+*                const char *class, int *status )
 
 *  Class Membership:
 *     Plot private function.
@@ -13696,38 +14175,48 @@ static void GQch( AstPlot *this, float *chv, float *chh, const char *method,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
 /* Local Variables: */
-   int status;          /* Status retruned from Grf function */
+   int grf_status;          /* Status retruned from Grf function */
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Since we are about to call an external function which may not be
+   thread safe, prevent any other thread from executing the following code
+   until the current thread has finished executing it. */
+   LOCK_MUTEX2;
 
 /* If the Grf attribute is set to a non-zero value, use the Grf function
    registered using astGrfSet (so long as a function has been supplied).
    This is called via a wrapper which adapts the interface to suit the
    language in which the function is written. */
    if( astGetGrf( this ) && this->grffun[ AST__GQCH ] ) {
-      status = ( *( this->GQch ) )( this, chv, chh );
+      grf_status = ( *( this->GQch ) )( this, chv, chh, status );
 
 /* Otherwise, use the function in the external Grf module, selected at
    link-time using ast_link options.*/
    } else {
-      status = astGQch( chv, chh );
+      grf_status = astGQch( chv, chh );
    }
 
+/* Allow the next thread to proceed. */
+   UNLOCK_MUTEX2;
+
 /* Check neither value is zero. */
-   if( status && ( *chh == 0.0 || *chv == 0.0 ) ) {
+   if( grf_status && ( *chh == 0.0 || *chv == 0.0 ) ) {
       astError( AST__GRFER, "astGQch: Returned text heights are %g and %g " 
-                "but zero is illegal!", *chv, *chh );
-      status = 0;
+                "but zero is illegal!", status, *chv, *chh );
+      grf_status = 0;
    }
 
 /* Report an error if anything went wrong, and return safe values. */
-   if( !status ) {
-      astError( AST__GRFER, "%s(%s): Graphics error in astGQch. ", method, 
+   if( !grf_status ) {
+      astError( AST__GRFER, "%s(%s): Graphics error in astGQch. ", status, method, 
                 class );
       *chh = 1.0;
       *chv = 1.0;
@@ -13737,7 +14226,7 @@ static void GQch( AstPlot *this, float *chv, float *chh, const char *method,
 
 static void GText( AstPlot *this, const char *text, float x, float y,      
                    const char *just, float upx, float upy,
-                   const char *method, const char *class ) {
+                   const char *method, const char *class, int *status ) {
 /*
 *
 *  Name:
@@ -13753,7 +14242,7 @@ static void GText( AstPlot *this, const char *text, float x, float y,
 *     #include "plot.h"
 *     void GText( AstPlot *this, const char *text, float x, float y,      
 *                 const char *just, float upx, float upy,
-*                 const char *method, const char *class ) {
+*                 const char *method, const char *class, int *status ) {
 
 *  Class Membership:
 *     Plot private function.
@@ -13802,35 +14291,45 @@ static void GText( AstPlot *this, const char *text, float x, float y,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
 /* Local Variables: */
-   int status;          /* Status retruned from Grf function */
+   int grf_status;          /* Status retruned from Grf function */
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Since we are about to call an external function which may not be
+   thread safe, prevent any other thread from executing the following code
+   until the current thread has finished executing it. */
+   LOCK_MUTEX2;
+
 /* Do not draw anything if we are using "invisible ink". */
    if( astGetInvisible( this ) ) {
-      status = 1;
+      grf_status = 1;
 
 /* If the Grf attribute is set to a non-zero value, use the Grf function
    registered using astGrfSet (so long as a function has been supplied).
    This is called via a wrapper which adapts the interface to suit the
    language in which the function is written. */
    } else if( astGetGrf( this ) && this->grffun[ AST__GTEXT ] ) {
-      status = ( *( this->GText ) )( this, text, x, y, just, upx, upy );
+      grf_status = ( *( this->GText ) )( this, text, x, y, just, upx, upy, status );
 
 /* Otherwise, use the function in the external Grf module, selected at
    link-time using ast_link options.*/
    } else {
-      status = astGText( text, x, y, just, upx, upy );
+      grf_status = astGText( text, x, y, just, upx, upy );
    }
 
+/* Allow the next thread to proceed. */
+   UNLOCK_MUTEX2;
+
 /* Report an error if anything went wrong. */
-   if( !status ) {
-      astError( AST__GRFER, "%s(%s): Graphics error in astGText. ", method, 
+   if( !grf_status ) {
+      astError( AST__GRFER, "%s(%s): Graphics error in astGText. ", status, method, 
                 class );
    }
 
@@ -13838,7 +14337,7 @@ static void GText( AstPlot *this, const char *text, float x, float y,
 
 static void GTxExt( AstPlot *this, const char *text, float x, float y,      
                     const char *just, float upx, float upy, float *xbn, 
-                    float *ybn, const char *method, const char *class ) {
+                    float *ybn, const char *method, const char *class, int *status ) {
 /*
 *
 *  Name:
@@ -13854,7 +14353,7 @@ static void GTxExt( AstPlot *this, const char *text, float x, float y,
 *     #include "plot.h"
 *     void GTxExt( AstPlot *this, const char *text, float x, float y,      
 *                 const char *just, float upx, float upy, float *xbn, 
-*                 float *ybn, const char *method, const char *class )
+*                 float *ybn, const char *method, const char *class, int *status )
 
 *  Class Membership:
 *     Plot private function.
@@ -13909,6 +14408,8 @@ static void GTxExt( AstPlot *this, const char *text, float x, float y,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - The corners are returned in no particular order.
@@ -13916,33 +14417,41 @@ static void GTxExt( AstPlot *this, const char *text, float x, float y,
 */
 
 /* Local Variables: */
-   int status;          /* Status retruned from Grf function */
+   int grf_status;          /* Status retruned from Grf function */
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Since we are about to call an external function which may not be
+   thread safe, prevent any other thread from executing the following code
+   until the current thread has finished executing it. */
+   LOCK_MUTEX2;
 
 /* If the Grf attribute is set to a non-zero value, use the Grf function
    registered using astGrfSet (so long as a function has been supplied).
    This is called via a wrapper which adapts the interface to suit the
    language in which the function is written. */
    if( astGetGrf( this ) && this->grffun[ AST__GTXEXT ] ) {
-      status = ( *( this->GTxExt ) )( this, text, x, y, just, upx, upy,
-                                      xbn, ybn );
+      grf_status = ( *( this->GTxExt ) )( this, text, x, y, just, upx, upy,
+                                          xbn, ybn, status );
 
 /* Otherwise, use the function in the external Grf module, selected at
    link-time using ast_link options.*/
    } else {
-      status = astGTxExt( text, x, y, just, upx, upy, xbn, ybn );
+      grf_status = astGTxExt( text, x, y, just, upx, upy, xbn, ybn );
    }
 
+/* Allow the next thread to proceed. */
+   UNLOCK_MUTEX2;
+
 /* Report an error if anything went wrong. */
-   if( !status ) {
-      astError( AST__GRFER, "%s(%s): Graphics error in astGTxExt. ", method, 
+   if( !grf_status ) {
+      astError( AST__GRFER, "%s(%s): Graphics error in astGTxExt. ", status, method, 
                 class );
    }
 }
 
-static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+static const char *GetAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     GetAttrib
@@ -13955,7 +14464,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     const char *GetAttrib( AstObject *this, const char *attrib )
+*     const char *GetAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     Plot member function (over-rides the protected astGetAttrib
@@ -13988,6 +14497,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null terminated string containing the name of
 *        the attribute whose value is required. This name should be in
 *        lower case, with all white space removed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     - Pointer to a null terminated string containing the attribute
@@ -14005,10 +14516,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *     reason.
 */
 
-/* Local Constants: */
-#define BUFF_LEN 50              /* Max. characters in result buffer */
-
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstPlot *this;                /* Pointer to the Plot structure */
    const char *result;           /* Pointer value to return */
    char label[21];               /* Graphics item label */
@@ -14018,13 +14527,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    int len;                      /* Length of attrib string */
    int nax;                      /* Number of base Frame axes */
    int nc;                       /* No. characters read by astSscanf */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
    result = NULL;
 
 /* Check the global error status. */   
    if ( !astOK ) return result;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this_object);
 
 /* Obtain a pointer to the Plot structure. */
    this = (AstPlot *) this_object;
@@ -14042,7 +14553,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Compare "attrib" with each recognised attribute name in turn,
    obtaining the value of the required attribute. If necessary, write
-   the value into "buff" as a null terminated string in an appropriate
+   the value into "getattrib_buff" as a null terminated string in an appropriate
    format.  Set "result" to point at the result string. */
 
 /* Tol. */
@@ -14050,17 +14561,17 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    if ( !strcmp( attrib, "tol" ) ) {
       dval = astGetTol( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* Grid. */
 /* ----- */
    } else if ( !strcmp( attrib, "grid" ) ) {
-      ival = GetUsedGrid( this );
+      ival = GetUsedGrid( this, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* TickAll. */
@@ -14068,8 +14579,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "tickall" ) ) {
       ival = astGetTickAll( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* ForceExterior. */
@@ -14077,8 +14588,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "forceexterior" ) ) {
       ival = astGetForceExterior( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Invisible. */
@@ -14086,17 +14597,17 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "invisible" ) ) {
       ival = astGetInvisible( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Border. */
 /* ------- */
    } else if ( !strcmp( attrib, "border" ) ) {
-      ival = GetUsedBorder( this );
+      ival = GetUsedBorder( this, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* ClipOp. */
@@ -14104,8 +14615,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "clipop" ) ) {
       ival = astGetClipOp( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Clip. */
@@ -14113,8 +14624,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "clip" ) ) {
       ival = astGetClip( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Grf. */
@@ -14122,8 +14633,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "grf" ) ) {
       ival = astGetGrf( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* DrawTitle. */
@@ -14131,8 +14642,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "drawtitle" ) ) {
       ival = astGetDrawTitle( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Escape. */
@@ -14140,8 +14651,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "escape" ) ) {
       ival = astGetEscape( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* LabelAt(axis). */
@@ -14149,10 +14660,10 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "labelat(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
-      dval = GetUsedLabelAt( this, axis - 1 );
+      dval = GetUsedLabelAt( this, axis - 1, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* Centre(axis). */
@@ -14160,19 +14671,19 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "centre(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
-      dval = GetUsedCentre( this, axis - 1 );
+      dval = GetUsedCentre( this, axis - 1, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* Gap. */
 /* ---- */
    } else if ( !strcmp( attrib, "gap" ) ) {
-      dval = GetUsedGap( this, 0 );
+      dval = GetUsedGap( this, 0, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* Gap(axis). */
@@ -14180,19 +14691,19 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "gap(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
-      dval = GetUsedGap( this, axis - 1 );
+      dval = GetUsedGap( this, axis - 1, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* LogGap. */
 /* ---- */
    } else if ( !strcmp( attrib, "loggap" ) ) {
-      dval = GetUsedLogGap( this, 0 );
+      dval = GetUsedLogGap( this, 0, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* LogGap(axis). */
@@ -14200,10 +14711,10 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "loggap(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
-      dval = GetUsedLogGap( this, axis - 1 );
+      dval = GetUsedLogGap( this, axis - 1, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* NumLabGap. */
@@ -14211,8 +14722,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "numlabgap" ) ) {
       dval = astGetNumLabGap( this, 0 );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* NumLabGap(axis). */
@@ -14222,8 +14733,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
                && ( nc >= len ) ) {
       dval = astGetNumLabGap( this, axis - 1 );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* TextLabGap. */
@@ -14231,8 +14742,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "textlabgap" ) ) {
       dval = astGetTextLabGap( this, 0 );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* TextLabGap(axis). */
@@ -14242,8 +14753,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
                && ( nc >= len ) ) {
       dval = astGetTextLabGap( this, axis - 1 );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* LabelUp. */
@@ -14251,8 +14762,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "labelup" ) ) {
       ival = astGetLabelUp( this, 0 );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* LabelUp(axis). */
@@ -14262,8 +14773,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
                && ( nc >= len ) ) {
       ival = astGetLabelUp( this, axis - 1 );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* LogPlot. */
@@ -14271,8 +14782,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "logplot" ) ) {
       ival = astGetLogPlot( this, 0 );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* LogPlot(axis). */
@@ -14282,17 +14793,17 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
                && ( nc >= len ) ) {
       ival = astGetLogPlot( this, axis - 1 );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* LogLabel. */
 /* -------- */
    } else if ( !strcmp( attrib, "loglabel" ) ) {
-      ival = GetUsedLogLabel( this, 0 );
+      ival = GetUsedLogLabel( this, 0, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* LogLabel(axis). */
@@ -14300,19 +14811,19 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "loglabel(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
-      ival = GetUsedLogLabel( this, axis - 1 );
+      ival = GetUsedLogLabel( this, axis - 1, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* LogTicks. */
 /* -------- */
    } else if ( !strcmp( attrib, "logticks" ) ) {
-      ival = GetUsedLogTicks( this, 0 );
+      ival = GetUsedLogTicks( this, 0, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* LogTicks(axis). */
@@ -14320,10 +14831,10 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "logticks(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
-      ival = GetUsedLogTicks( this, axis - 1 );
+      ival = GetUsedLogTicks( this, axis - 1, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* NumLab. */
@@ -14331,8 +14842,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "numlab" ) ) {
       ival = astGetNumLab( this, 0 );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* NumLab(axis). */
@@ -14342,17 +14853,17 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
                && ( nc >= len ) ) {
       ival = astGetNumLab( this, axis - 1 );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* MinTick. */
 /* -------- */
    } else if ( !strcmp( attrib, "mintick" ) ) {
-      ival = GetUsedMinTick( this, 0 );
+      ival = GetUsedMinTick( this, 0, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* MinTick(axis). */
@@ -14360,19 +14871,19 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "mintick(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
-      ival = GetUsedMinTick( this, axis - 1 );
+      ival = GetUsedMinTick( this, axis - 1, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* TextLab. */
 /* ---------- */
    } else if ( !strcmp( attrib, "textlab" ) ) {
-      ival = GetUsedTextLab( this, 0 );
+      ival = GetUsedTextLab( this, 0, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* TextLab(axis). */
@@ -14380,10 +14891,10 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "textlab(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
-      ival = GetUsedTextLab( this, axis - 1 );
+      ival = GetUsedTextLab( this, axis - 1, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* DrawAxes. */
@@ -14391,8 +14902,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "drawaxes" ) ) {
       ival = astGetDrawAxes( this, 0 );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* DrawAxes(axis). */
@@ -14400,10 +14911,10 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "drawaxes(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
-      ival = GetDrawAxes( this, axis - 1 );
+      ival = GetDrawAxes( this, axis - 1, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Abbrev. */
@@ -14411,8 +14922,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "abbrev" ) ) {
       ival = astGetAbbrev( this, 0 );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Abbrev(axis). */
@@ -14420,19 +14931,19 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "abbrev(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
-      ival = GetAbbrev( this, axis - 1 );
+      ival = GetAbbrev( this, axis - 1, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* LabelUnits. */
 /* ----------- */
    } else if ( !strcmp( attrib, "labelunits" ) ) {
-      ival = GetUsedLabelUnits( this, 0 );
+      ival = GetUsedLabelUnits( this, 0, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* LabelUnits(axis). */
@@ -14440,19 +14951,19 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "labelunits(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
-      ival = GetUsedLabelUnits( this, axis - 1 );
+      ival = GetUsedLabelUnits( this, axis - 1, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Style. */
 /* ------ */
    } else if ( !strcmp( attrib, "style" ) ) {
-      ival = GetUseStyle( this, AST__BORDER_ID );
+      ival = GetUseStyle( this, AST__BORDER_ID, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Style(label). */
@@ -14460,19 +14971,19 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "style(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      ival = GetUseStyle( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
+      ival = GetUseStyle( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ), status ), status );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Font. */
 /* ----- */
    } else if ( !strcmp( attrib, "font" ) ) {
-      ival = GetUseFont( this, AST__TEXTLABS_ID );
+      ival = GetUseFont( this, AST__TEXTLABS_ID, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Font(label). */
@@ -14480,19 +14991,19 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "font(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      ival = GetUseFont( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
+      ival = GetUseFont( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ), status ), status );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Colour. */
 /* ------- */
    } else if ( !strcmp( attrib, "colour" ) ) {
-      ival = GetUseColour( this, AST__TEXTLABS_ID );
+      ival = GetUseColour( this, AST__TEXTLABS_ID, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Colour(label). */
@@ -14500,19 +15011,19 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "colour(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      ival = GetUseColour( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
+      ival = GetUseColour( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ), status ), status );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Color. */
 /* ------ */
    } else if ( !strcmp( attrib, "color" ) ) {
-      ival = GetUseColour( this, AST__TEXTLABS_ID );
+      ival = GetUseColour( this, AST__TEXTLABS_ID, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Color(label). */
@@ -14520,19 +15031,19 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "color(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      ival = GetUseColour( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
+      ival = GetUseColour( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ), status ), status );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Width. */
 /* ------ */
    } else if ( !strcmp( attrib, "width" ) ) {
-      dval = GetUseWidth( this, AST__BORDER_ID );
+      dval = GetUseWidth( this, AST__BORDER_ID, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 
@@ -14541,19 +15052,19 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "width(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      dval = GetUseWidth( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
+      dval = GetUseWidth( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ), status ), status );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* Size. */
 /* ----- */
    } else if ( !strcmp( attrib, "size" ) ) {
-      dval = GetUseSize( this, AST__TEXTLABS_ID );
+      dval = GetUseSize( this, AST__TEXTLABS_ID, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* Size(label). */
@@ -14561,10 +15072,10 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "size(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      dval = GetUseSize( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
+      dval = GetUseSize( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ), status ), status );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* TitleGap. */
@@ -14572,17 +15083,17 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "titlegap" ) ) {
       dval = astGetTitleGap( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* MajTickLen. */
 /* ----------- */
    } else if ( !strcmp( attrib, "majticklen" ) ) {
-      dval = GetUsedMajTickLen( this, 0 );
+      dval = GetUsedMajTickLen( this, 0, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* MajTickLen(axis). */
@@ -14590,10 +15101,10 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "majticklen(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
-      dval = GetUsedMajTickLen( this, axis - 1 );
+      dval = GetUsedMajTickLen( this, axis - 1, status );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* MinTickLen. */
@@ -14601,8 +15112,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "minticklen" ) ) {
       dval = astGetMinTickLen( this, 0 );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* MinTickLen(axis). */
@@ -14612,14 +15123,14 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
                && ( nc >= len ) ) {
       dval = astGetMinTickLen( this, axis - 1 );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* Labelling. */
 /* ---------- */
    } else if ( !strcmp( attrib, "labelling" ) ) {
-      ival = GetUsedLabelling( this );
+      ival = GetUsedLabelling( this, status );
       if ( astOK ) {
          result = ival ? xlbling[0] : xlbling[1];
       }
@@ -14629,7 +15140,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "edge(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
-      ival = GetUsedEdge( this, axis - 1 );
+      ival = GetUsedEdge( this, axis - 1, status );
       if ( astOK ) {
          if( ival == LEFT ){
             result = "left";
@@ -14647,7 +15158,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_getattrib)( this_object, attrib );
+      result = (*parent_getattrib)( this_object, attrib, status );
    }
 
 /* Unfreeze the bound box so that it may be updated by subsequent
@@ -14656,12 +15167,9 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Return the result. */
    return result;
-
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
 
-static AstPointSet *GetDrawnTicks( AstPlot *this, int axis, int major ){
+static AstPointSet *GetDrawnTicks( AstPlot *this, int axis, int major, int *status ){
 /*
 *+
 *  Name:
@@ -14718,7 +15226,7 @@ static AstPointSet *GetDrawnTicks( AstPlot *this, int axis, int major ){
    if( axis < 0 || axis > 1 ) {
       astError( AST__INTER, "astGetDrawnTicks(Plot): Supplied \"axis\" "
                 "value is %d - should 0 or 1 (internal AST programming "
-                "error).", axis );
+                "error).", status, axis );
       n = 0;
 
 /* If OK, get the number of stored tick marks. */
@@ -14730,7 +15238,7 @@ static AstPointSet *GetDrawnTicks( AstPlot *this, int axis, int major ){
    if( n > 0 && astOK ) {
 
 /* Create a PointSet with the required size. */
-      result = astPointSet( n, 2, "" );
+      result = astPointSet( n, 2, "", status );
 
 /* Store pointers to the arrays within the Plot that hold the required
    tick marks positions and types. */
@@ -14746,7 +15254,8 @@ static AstPointSet *GetDrawnTicks( AstPlot *this, int axis, int major ){
 static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks, 
                         int *nmajor, double **minticks, int *nminor, 
                         int format_set, int *inval, double *refval, 
-                        const char *method, const char *class ){
+                        GetTicksStatics **pstatics, const char *method, 
+                        const char *class, int *status ){
 /*
 *  Name:
 *     GetTicks
@@ -14763,7 +15272,8 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
 *     double GetTicks( AstPlot *this, int axis, double *cen, double **ticks, 
 *                      int *nmajor, double **minticks, int *nminor, 
 *                      int format_set, int *inval, double *refval, 
-*                      const char *method, const char *class )
+*                      GetTicksStatics **pstatics, const char *method, 
+*                      const char *class, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -14786,7 +15296,8 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
 
 *  Parameters:
 *     this
-*        The Plot.
+*        The Plot. Supplying a NULL pointer will cause statics resources
+*        to be released.
 *     axis
 *        The zero-based index of the axis to use.
 *     cen
@@ -14836,12 +15347,20 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
 *        A pointer to a location at which to return a value for the other
 *        axis which can be used when normalizing the returned tick mark
 *        values.
+*     pstatics
+*        Address of a pointer to a structure holding static data values 
+*        used within this function. A NULL pointer should be supplied on
+*        the first invocation (dynamic memory will then be allocated to
+*        hold ths structure). The memory is freed when a NULL value for
+*        "this" is supplied.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The used gap size.
@@ -14861,6 +15380,7 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
 */
 
 /* Local Variables: */
+   GetTicksStatics *statics; /* Pointer to statics structure */
    double *tick;             /* Pointer to next tick value */
    double cen0;              /* Supplied value of cen */
    double dran;              /* Dynamic range of axis values */
@@ -14882,35 +15402,38 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
    int ilo;                  /* Lowest tick mark index */
    int nochange;             /* No. of ineffective attempts to change gap size */
 
-   static AstFrame *frame;          /* Pointer to the current Frame */
-   static AstMapping *map;          /* Pointer to Base->Current Mapping */
-   static AstPointSet *pset=NULL;   /* Pointer to a PointSet holding physical coords */
-   static double **ptr;             /* Pointer to physical coordinate values */
-   static double defgaps[ 2 ];      /* Initial test gaps for each axis */
-   static double typval[ 2 ];       /* Typical value on each axis */
-   static double width[ 2 ];        /* Range of used axis values */
-   static int maxticks;             /* Max. number of ticks on each axis */
-   static int mintick;              /* Min. number of ticks on each axis */
-   static int ngood[ 2 ];           /* No. of good physical values on each axis */
-   static int bad;                  /* Were any bad pixels found? */
-
 /* Initialise the returned information. */
    *ticks = NULL;
    *minticks = NULL;
    *nmajor = 0;
    *nminor = 0;
 
+/* Get a pointer to the supplied statics object. */
+   statics = *pstatics;
+
 /* If a NULL pointer has been supplied for "this", release the resources
    allocated on the first call to this function, and return. */
    if( !this ){
-      if( map ) map = astAnnul( map );
-      if( pset ) pset = astAnnul( pset );
-      if( frame ) frame = astAnnul( frame );
+      if( statics ) {
+         if( statics->map ) statics->map = astAnnul( statics->map );
+         if( statics->pset ) statics->pset = astAnnul( statics->pset );
+         if( statics->frame ) statics->frame = astAnnul( statics->frame );
+         *pstatics = astFree( statics );
+      }
       return 0.0;
    }
 
 /* Check the global error status. */
    if ( !astOK ) return 0.0;
+
+/* If no statics structure was supplied, create one now and initialise it. */
+   if( !statics ) {
+      statics = astMalloc( sizeof( GetTicksStatics ) );
+      if( statics ) {
+         statics->pset=NULL;  
+         *pstatics = statics;
+      }
+   }
 
 /* Initialise variables to avoid "used of uninitialised variable"
    messages from dumb compilers. */
@@ -14922,44 +15445,44 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
    ilo = 0;
 
 /* If this is the first call to this function, do some initialisation. */
-   if( !pset ){
+   if( !statics->pset ){
 
 /* Get the Mapping from Base to Current Frame in the Plot. */
-      map = astGetMapping( this, AST__BASE, AST__CURRENT );
+      statics->map = astGetMapping( this, AST__BASE, AST__CURRENT );
 
 /* Get a pointer to the current Frame from the Plot. */
-      frame = astGetFrame( this, AST__CURRENT );
+      statics->frame = astGetFrame( this, AST__CURRENT );
 
 /* Get initial guesses at suitable gaps for each axis. A PointSet is
    returned holding sorted values (non-normalized) for the physical axes. */
-      pset = DefGap( this, defgaps, ngood, &frac, &bad, method, class );
+      statics->pset = DefGap( this, statics->defgaps, statics->ngood, &frac, &statics->bad, method, class, status );
 
 /* Store the maximum and minimum number of major tick marks along each
    axis. These numbers are reduced if only a small part of the plotting
    area contains valid coordinates, so that the tick marks do not end up
    to close together. */
-      maxticks = (int) ( 0.5 + MAJTICKS_MAX*sqrt( frac ) );
-      mintick = (int) ( 0.5 + MAJTICKS_MIN*sqrt( frac ) );
-      if( mintick < 3 ) mintick = 3;
-      if( maxticks < 8 ) maxticks = 8;
-      if( maxticks < mintick ) maxticks = mintick;
+      statics->maxticks = (int) ( 0.5 + MAJTICKS_MAX*sqrt( frac ) );
+      statics->mintick = (int) ( 0.5 + MAJTICKS_MIN*sqrt( frac ) );
+      if( statics->mintick < 3 ) statics->mintick = 3;
+      if( statics->maxticks < 8 ) statics->maxticks = 8;
+      if( statics->maxticks < statics->mintick ) statics->maxticks = statics->mintick;
 
 /* Get a pointer to the data in the PointSet. */
-      ptr = astGetPoints( pset );
+      statics->ptr = astGetPoints( statics->pset );
 
 /* Find a typical value on each axis. */
       for( i = 0; i < 2 && astOK; i++ ){
-         typval[ i ] = Typical( ngood[ i ], ptr[ i ], -DBL_MAX, DBL_MAX,
-                                width + i );
+         statics->typval[ i ] = Typical( statics->ngood[ i ], statics->ptr[ i ], -DBL_MAX, DBL_MAX,
+                                statics->width + i, status );
       }
    }
 
 /* Return the flag indicating if any regions of invalid physical coordinates 
    were found. */
-   *inval = bad;
+   *inval = statics->bad;
 
 /* Return the typical value on the other axis. */
-   *refval = typval[ 1 - axis ];
+   *refval = statics->typval[ 1 - axis ];
 
 /* See if any tick marks values have been stored in the Plot structure
    using astSetTickValues. If so, copy the tick mark values to the
@@ -14997,8 +15520,8 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
 /* Find the maximum and minimum value in the plotting area. DefGap will
    have reported an error if minv*maxv is negative or zero. */
    if( astOK ) {
-      maxv = ptr[ axis ][ ngood[ axis ] - 1 ];
-      minv = ptr[ axis ][ 0 ];
+      maxv = statics->ptr[ axis ][ statics->ngood[ axis ] - 1 ];
+      minv = statics->ptr[ axis ][ 0 ];
    }
 
 /* First deal with logarithmically spaced ticks. */
@@ -15011,7 +15534,7 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
       if( dran < 10.0 && dran > 0.1 ) {
          astError( AST__VSMAL, "%s(%s): Cannot produce logarithmically "
                    "spaced major tick marks on axis %d since the dynamic "
-                   "range of the axis is too small.", method, class, axis + 1 );
+                   "range of the axis is too small.", status, method, class, axis + 1 );
       }
 
 /* Should we find a new value for "cen"? */
@@ -15022,7 +15545,7 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
       if( gap == AST__BAD && astOK ){
 
 /* Start off using the default gap found during the initialisation. */
-         test_gap = defgaps[ axis ];
+         test_gap = statics->defgaps[ axis ];
 
 /* Loop round until a gap size is found which gives an acceptable number
    of tick marks. Upto 10 gap sizes are tried. */
@@ -15075,13 +15598,13 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
 
 /* If there were some ticks, but not enough, decrease the gap size in
    proportion to the shortfall. */
-            } else if( *nmajor < mintick ){
-               test_gap = pow( test_gap, (double)( *nmajor )/(double)( mintick ) );
+            } else if( *nmajor < statics->mintick ){
+               test_gap = pow( test_gap, (double)( *nmajor )/(double)( statics->mintick ) );
 
 /* If there were too many ticks, increase the gap size in proportion to the 
    excess. */
-            } else if( *nmajor > maxticks ){
-               test_gap = pow( test_gap, (double)( *nmajor )/(double)( maxticks ) );
+            } else if( *nmajor > statics->maxticks ){
+               test_gap = pow( test_gap, (double)( *nmajor )/(double)( statics->maxticks ) );
 
 /* If the number of ticks is acceptable, break out of the loop early.*/
             } else {
@@ -15100,11 +15623,11 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
 /* Check it is usable. */
          if( gap == 0.0 && astOK ) {
             astError( AST__ATTIN, "%s(%s): Invalid value zero given for "
-                      "attribute LogGap(%d).", method, class, axis + 1 );
+                      "attribute LogGap(%d).", status, method, class, axis + 1 );
 
          } else if( gap < 0.0 && astOK ) {
             astError( AST__ATTIN, "%s(%s): Invalid negative value %f given for "
-                      "attribute LogGap(%d).", method, class, gap, axis + 1 );
+                      "attribute LogGap(%d).", status, method, class, gap, axis + 1 );
 
 /* If necessary, take its reciprocal in order to ensure that the absolute
    tick mark values get smaller or larger as required. */
@@ -15158,7 +15681,7 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
             *nmajor = ihi - ilo + 1;
             if( *nmajor < 2 && astOK ) {
                astError( AST__ATTIN, "%s(%s): Unusable value %f given for "
-                      "attribute LogGap(%d).", method, class, gap, axis + 1 );
+                      "attribute LogGap(%d).", status, method, class, gap, axis + 1 );
 
             }
          }
@@ -15193,7 +15716,7 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
          old_used_gap = AST__BAD;
 
 /* Start of using the default gap found during the initialisation. */
-         test_gap = defgaps[ axis ];
+         test_gap = statics->defgaps[ axis ];
          used_gap = 0.0;
 
 /* Initialise flags saying the test gap is too large or too small */
@@ -15210,7 +15733,7 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
 
 /* Find a "nice" gap size close to the current test gap size. Also find
    the number of minor tick marks to use with the nice gap size. */
-            new_used_gap = astGap( frame, axis, test_gap, nminor );
+            new_used_gap = astGap( statics->frame, axis, test_gap, nminor );
 
 /* Find the number and positions of major tick marks which would result
    from using this gap size. Annul the memory used to hold any previous tick 
@@ -15223,9 +15746,9 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
                used_gap = new_used_gap;
                if( *ticks ) *ticks = astFree( *ticks );
                if( cen ) *cen = cen0;
-               *nmajor = FindMajTicks( map, frame, axis, *refval, width[ 1-axis ], 
-                                       used_gap, cen, ngood[ axis ], 
-                                       ptr[ axis ], ticks );
+               *nmajor = FindMajTicks( statics->map, statics->frame, axis, *refval, statics->width[ 1-axis ], 
+                                       used_gap, cen, statics->ngood[ axis ], 
+                                       statics->ptr[ axis ], ticks, status );
 
 /* If the gap size has not changed do an extra pass through this loop,
    but only do this a maximum of 25 times in succession. */
@@ -15236,8 +15759,8 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
             } else if( astOK ){
                astError( AST__VSMAL, "%s(%s): Cannot produce enough major "
                          "tick marks on axis %d using the current axis "
-                         "format (\"%s\").", method, class, axis + 1, 
-                         astGetFormat( frame, axis ) );
+                         "format (\"%s\").", status, method, class, axis + 1, 
+                         astGetFormat( statics->frame, axis ) );
                break;
             }
 
@@ -15249,7 +15772,7 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
                gap_too_small = 0;
 
 /* If there were some ticks, but not enough... */
-            } else if( *nmajor < mintick ){
+            } else if( *nmajor < statics->mintick ){
 
 /* If the previous test gap produced too many ticks, use the current gap
    size. */
@@ -15258,13 +15781,13 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
 
 /* Otherwise, decrease the gap size in proportion to the shortfall. */
                } else {
-                  test_gap *= (double)( *nmajor )/(double)( mintick );
+                  test_gap *= (double)( *nmajor )/(double)( statics->mintick );
                   gap_too_large = 1;
                   gap_too_small = 0;
                }
 
 /* If there were too many ticks... */
-            } else if( *nmajor > maxticks ){
+            } else if( *nmajor > statics->maxticks ){
 
 /* If the previous test gap produced too few ticks, use the previous gap
    size. */
@@ -15272,14 +15795,14 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
                   used_gap = old_used_gap;
                   if( *ticks ) *ticks = astFree( *ticks );
                   if( cen ) *cen = cen0;
-                  *nmajor = FindMajTicks( map, frame, axis, *refval, width[ 1-axis ], 
-                                          used_gap, cen, ngood[ axis ], 
-                                          ptr[ axis ], ticks );
+                  *nmajor = FindMajTicks( statics->map, statics->frame, axis, *refval, statics->width[ 1-axis ], 
+                                          used_gap, cen, statics->ngood[ axis ], 
+                                          statics->ptr[ axis ], ticks, status );
                   break;
 
 /* Otherwise, increase the gap size in proportion to the excess. */
                } else {
-                  test_gap *= (double)( *nmajor )/(double)( maxticks );
+                  test_gap *= (double)( *nmajor )/(double)( statics->maxticks );
                   gap_too_small = 1;
                   gap_too_large = 0;
                }
@@ -15298,22 +15821,22 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
    been set). */
          if( format_set ){
             used_gap = gap;
-            (void) astGap( frame, axis, used_gap, nminor );
+            (void) astGap( statics->frame, axis, used_gap, nminor );
          } else {
-            used_gap = astGap( frame, axis, gap, nminor );
+            used_gap = astGap( statics->frame, axis, gap, nminor );
          }
 
 /* Find where the major ticks should be put. */
          if( cen ) *cen = cen0;
-         *nmajor = FindMajTicks( map, frame, axis, *refval, width[ 1-axis ],
-                                 used_gap, cen, ngood[ axis ], ptr[ axis ], 
-                                 ticks );
+         *nmajor = FindMajTicks( statics->map, statics->frame, axis, *refval, statics->width[ 1-axis ],
+                                 used_gap, cen, statics->ngood[ axis ], statics->ptr[ axis ], 
+                                 ticks, status );
       }
    }
 
 /* Report an error if no ticks can be found. */
    if( *nmajor == 0 && astOK ) {
-      astError( AST__GRFER, "%s(%s): Cannot find any usable tick mark values. ", method, 
+      astError( AST__GRFER, "%s(%s): Cannot find any usable tick mark values. ", status, method, 
                 class );
    }
 
@@ -15332,7 +15855,7 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
 
 static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1, 
                         AstPointSet **pset2, const char *method, 
-                        const char *class ){
+                        const char *class, int *status ){
 /*
 *  Name:
 *     GoodGrid
@@ -15348,7 +15871,7 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
 *     #include "plot.h"
 *     double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1, 
 *                      AstPointSet **pset2, const char *method, 
-*                      const char *class )
+*                      const char *class, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -15378,6 +15901,8 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The fraction of the plotting area containing good physical
@@ -15450,7 +15975,7 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
 /* Report an error if the grid is now too big. */
       if( *dim >= 512 ){
          astError( AST__VSMAL, "%s(%s): The area of the plot containing "
-                   "usable coordinates on both axes is too small.", method, 
+                   "usable coordinates on both axes is too small.", status, method, 
                    class );
          break;
       }
@@ -15460,7 +15985,7 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
    covers the entire plotting area with the current grid dimension. A
    pointer to the physical axis values is returned. */
       ptr2 = MakeGrid( this, frm, map, 1, *dim, this->xlo, this->xhi, this->ylo, 
-                       this->yhi, 2, pset1, pset2, 0, method, class );
+                       this->yhi, 2, pset1, pset2, 0, method, class, status );
 
 /* Get the number of graphics axis values. */
       size = astGetNpoint( *pset1 );
@@ -15536,7 +16061,7 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
 /* Create the new grid covering the region containing good physical
    coordinates. */
          (void) MakeGrid( this, frm, map, 1, *dim, xmin, xmax, ymin, ymax, 2,
-                          pset1, pset2, 0, method, class );
+                          pset1, pset2, 0, method, class, status );
       }
    }
 
@@ -15559,7 +16084,7 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
 }
 
 static int GraphGrid( int dim, int disk, double xlo, double xhi, double ylo, 
-                      double yhi, double **ptr1 ){
+                      double yhi, double **ptr1, int *status ){
 /*
 *  Name:
 *     GraphGrid
@@ -15573,7 +16098,7 @@ static int GraphGrid( int dim, int disk, double xlo, double xhi, double ylo,
 *  Synopsis:
 *     #include "plot.h"
 *     int GraphGrid( int dim, int disk, double xlo, double xhi, double ylo, 
-*                    double yhi, double **ptr1 )
+*                    double yhi, double **ptr1, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -15608,6 +16133,8 @@ static int GraphGrid( int dim, int disk, double xlo, double xhi, double ylo,
 *        A pointer to an array of two pointers giving the start of the two 
 *        arrays to receive the values for each of the two axes of the graphics
 *        coordinate data.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The number of points in the grid. If "disk" is zero, this will be
@@ -15681,7 +16208,7 @@ static int GraphGrid( int dim, int disk, double xlo, double xhi, double ylo,
    return (int)( px - ptr1[ 0 ] );
 }
 
-static void GrfPop( AstPlot *this ) {
+static void GrfPop( AstPlot *this, int *status ) {
 /*
 *++
 *  Name:
@@ -15767,7 +16294,7 @@ c     - This function returns without action if there are no snapshots to
    }
 }
 
-static void GrfPush( AstPlot *this ) {
+static void GrfPush( AstPlot *this, int *status ) {
 /*
 *++
 *  Name:
@@ -15857,7 +16384,7 @@ f        The global status.
    }
 }
 
-static void GrfSet( AstPlot *this, const char *name, AstGrfFun fun ){
+static void GrfSet( AstPlot *this, const char *name, AstGrfFun fun, int *status ){
 /*
 *++
 *  Name:
@@ -16317,14 +16844,14 @@ f     - YB( 4 ) = REAL (Returned) - Returned holding the y coordinate of
 
       } else if( astOK ) {
          astError( AST__INTER, "%s(%s): AST internal programming error - "
-                   "Grf function id %d not yet supported.", method, class,
+                   "Grf function id %d not yet supported.", status, method, class,
                    ifun );
       }
       astGrfWrapper( this, name, wrapper );
    }
 }
 
-int astGrfFunID_( const char *name, const char *method, const char *class ) {
+int astGrfFunID_( const char *name, const char *method, const char *class, int *status ) {
 /*
 *  Name:
 *     astGrfFunID
@@ -16367,10 +16894,10 @@ int astGrfFunID_( const char *name, const char *method, const char *class ) {
 /* Note that the list of identifiers here must be in the same order as the
    sorted values of the constants AST__GATTR, AST__GFLUSH, etc */
    return FullForm( "Attr Flush Line Mark Text TxExt Scales Qch Cap", name, 
-                    "Grf function name (programming error)", method, class );
+                    "Grf function name (programming error)", method, class, status );
 }
 
-static char *GrfItem( int item, const char *text, int *axis ){
+static char *GrfItem( int item, const char *text, int *axis, int *status ){
 /*
 *  Name:
 *     GrfItem
@@ -16384,7 +16911,7 @@ static char *GrfItem( int item, const char *text, int *axis ){
 
 *  Synopsis:
 *     #include "plot.h"
-*     char *GrfItem( int item, const char *text, int *axis )
+*     char *GrfItem( int item, const char *text, int *axis, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -16403,6 +16930,8 @@ static char *GrfItem( int item, const char *text, int *axis ){
 *        Pointer to a place in which to return the index (0,1, or 2) of
 *        the axis to which the attribute refers, If the attribute does
 *        not refer to a specific axis, -1 is returned.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated string holding the textual 
@@ -16516,7 +17045,7 @@ static char *GrfItem( int item, const char *text, int *axis ){
       desc = NULL;
       if( astOK ){
          astError( AST__INTER, "GrfItem: AST internal programming error - "
-                   "Invalid graphical item index %d supplied to GrfItem.",
+                   "Invalid graphical item index %d supplied to GrfItem.", status,
                    item );
       }
    }
@@ -16539,7 +17068,7 @@ static char *GrfItem( int item, const char *text, int *axis ){
    return ret;
 }
 
-static void GrfWrapper( AstPlot *this, const char *name, AstGrfWrap wrapper ) {
+static void GrfWrapper( AstPlot *this, const char *name, AstGrfWrap wrapper, int *status ) {
 /*
 *+
 *  Name:
@@ -16623,12 +17152,12 @@ static void GrfWrapper( AstPlot *this, const char *name, AstGrfWrap wrapper ) {
 
    } else if( astOK ) {
       astError( AST__INTER, "%s(%s): AST internal programming error - "
-                "Grf function id %d not yet supported.", method, class,
+                "Grf function id %d not yet supported.", status, method, class,
                 ifun );
    }
 }
 
-static void Grid( AstPlot *this_nd ){
+static void Grid( AstPlot *this_nd, int *status ){
 /*
 *++
 *  Name:
@@ -16681,8 +17210,9 @@ f        The global status.
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
    AstPlot *this;          /* Plot with 2d current Frame */
-   CurveData **cdata;      /* Pointer to info. about breaks in curves */
+   AstPlotCurveData **cdata;/* Pointer to info. about breaks in curves */
    TickInfo **grid;        /* Pointer to info. about tick marks */
    const char *class;      /* Object class */
    const char *method;     /* Current method */
@@ -16708,6 +17238,9 @@ f        The global status.
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this_nd);
+
 /* Store the current method and class for inclusion in error messages
    generated by lower level functions. */
    method = "astGrid";
@@ -16718,7 +17251,7 @@ f        The global status.
    if( naxes != 2 && astOK ){
       astError( AST__NAXIN, "%s(%s): Number of axes (%d) in the base "
                 "Frame of the supplied %s is invalid - this number should "
-                "be 2.", method, class, naxes, class );
+                "be 2.", status, method, class, naxes, class );
    } 
 
 /* Ensure AST functions included graphical escape sequences in any
@@ -16733,14 +17266,14 @@ f        The global status.
    loglabelset[1] = astTestLogLabel( this_nd, 1 );
 
 /* Get a Plot with a 2D (or 1D) current Frame. */
-   this = (AstPlot *) Fset2D( (AstFrameSet *) this_nd, AST__CURRENT );
+   this = (AstPlot *) Fset2D( (AstFrameSet *) this_nd, AST__CURRENT, status );
 
 /* Check the current Frame of the Plot is 2-D. */
    naxes = astGetNout( this );
    if( naxes != 2 && astOK ){
       astError( AST__NAXIN, "%s(%s): Number of axes (%d) in the current "
                 "Frame of the supplied %s is invalid - this number should "
-                "be 2.", method, class, naxes, class );
+                "be 2.", status, method, class, naxes, class );
    } 
 
 /* Ensure that all lines are clipped at the plot boundary.*/
@@ -16769,7 +17302,7 @@ f        The global status.
    }
 
 /* Determine where to put the major axis values. */
-   grid = GridLines( this, cen, gap, &inval, method, class );
+   grid = GridLines( this, cen, gap, &inval, method, class, status );
 
 /* If the user has set an explicit value for Grid, use it. */
    if( astTestGrid( this ) ){
@@ -16786,7 +17319,7 @@ f        The global status.
 
 /* Draw the curves marking the major tick values on each axis. Information
    is returned describing the positions of the breaks in these curves. */
-   cdata = DrawGrid( this, grid, ( ink && drawgrid ), method, class );
+   cdata = DrawGrid( this, grid, ( ink && drawgrid ), method, class, status );
 
 /* See if labels and tick marks will be drawn round the edges of the
    plotting area, rather than within it (no labels are actually drawn
@@ -16798,7 +17331,7 @@ f        The global status.
    if( astGetLabelling( this ) ){
       edgeticks = 0;
    } else {
-      edgeticks = EdgeLabels( this, 0, grid, cdata, 0, method, class );
+      edgeticks = EdgeLabels( this, 0, grid, cdata, 0, method, class, status );
 
 /* If the external labelling was requested, but could not be produced... */
       if( !edgeticks ) {
@@ -16814,7 +17347,7 @@ f        The global status.
             astSetEdge( this, 1, oldedge0 );
 
 /* See if exterior labels could be drawn with these new edges. */
-            edgeticks = EdgeLabels( this, 0, grid, cdata, 0, method, class );
+            edgeticks = EdgeLabels( this, 0, grid, cdata, 0, method, class, status );
 
 /* If this would allow us to use the requested labelling scheme, retain
    the new Edge values, setting a flag to indicate that they will need to be
@@ -16834,14 +17367,14 @@ f        The global status.
    has a non-zero value, attempt to create exterior labels even though it 
    looks like there may be insufficient of them to justify their use. */
    if( !edgeticks && astGetForceExterior( this ) ) {
-      edgeticks = EdgeLabels( this, 0, grid, cdata, 1, method, class );
+      edgeticks = EdgeLabels( this, 0, grid, cdata, 1, method, class, status );
    }
 
 /* We may also need to swap edge values when using interior labelling in
    order to ensure that the text labels are placed on appropriate edges of
    the plotting box. */
    if( !edgeticks && !astTestEdge( this, 0 ) && !astTestEdge( this, 1 ) ) {
-      if( swapEdges( this, grid, cdata ) ) {
+      if( swapEdges( this, grid, cdata, status ) ) {
          oldedge0 = astGetEdge( this, 0 );
          oldedge1 = astGetEdge( this, 1 );
          astSetEdge( this, 0, oldedge1 );
@@ -16860,7 +17393,7 @@ f        The global status.
 /* Otherwise, see where interior labels and tick marks should go (the axis
    values are put in "labelat"). */
    } else {
-      Labelat( this, grid, cdata, labelat, method, class );
+      Labelat( this, grid, cdata, labelat, method, class, status );
    }
 
 /* See if a border is required. By default, a border is drawn only when
@@ -16879,38 +17412,38 @@ f        The global status.
    if( ink ) {
 
 /* Draw tick marks (major and minor). */
-      DrawTicks( this, grid, drawgrid, labelat, gap, method, class );
+      DrawTicks( this, grid, drawgrid, labelat, gap, method, class, status );
 
 /* If required, ensure that curves through the tick marks have been drawn */
-      DrawAxis( this, grid, labelat, gap, method, class );
+      DrawAxis( this, grid, labelat, gap, method, class, status );
 
 /* If required, draw a curve around the edge of the area containing valid 
    physical coordinates. */
       if( border ) (void) astBorder( this );
 
 /* Draw the numerical labels at the major tick values. */
-      Labels( this, grid, cdata, gap, labelat, method, class );
+      Labels( this, grid, cdata, gap, labelat, method, class, status );
 
 /* Draw the textual labels for each axis and a title. */
-      TextLabels( this, edgeticks, dounits, method, class );
+      TextLabels( this, edgeticks, dounits, method, class, status );
    }
 
 /* Store the actual values used for all attributes which have dynamic 
    defaults. Check the global status to ensure the pointer "grid" can be
    used without the possibility of a segmentation violation. */
    for( axis = 0; axis < 2 && astOK ; axis++ ) {
-      SetUsedLogTicks( this_nd, axis, astGetLogTicks( this, axis ) );
-      SetUsedLogLabel( this_nd, axis, astGetLogLabel( this, axis ) );
+      SetUsedLogTicks( this_nd, axis, astGetLogTicks( this, axis ), status );
+      SetUsedLogLabel( this_nd, axis, astGetLogLabel( this, axis ), status );
 
       if( astGetLogTicks( this, axis ) ) {
-         SetUsedLogGap( this_nd, axis, gap[ axis ] );
+         SetUsedLogGap( this_nd, axis, gap[ axis ], status );
       } else {
-         SetUsedGap( this_nd, axis, gap[ axis ] );
+         SetUsedGap( this_nd, axis, gap[ axis ], status );
       }
-      SetUsedCentre( this_nd, axis, cen[ axis ] );
-      SetUsedEdge( this_nd, axis, astGetEdge( this, axis ) );
-      SetUsedLabelAt( this_nd, axis, labelat[ axis ] );
-      SetUsedLabelUnits( this_nd, axis, dounits[ axis ] );
+      SetUsedCentre( this_nd, axis, cen[ axis ], status );
+      SetUsedEdge( this_nd, axis, astGetEdge( this, axis ), status );
+      SetUsedLabelAt( this_nd, axis, labelat[ axis ], status );
+      SetUsedLabelUnits( this_nd, axis, dounits[ axis ], status );
 
 /* If explicit minor tick values were supplied using astSetTickValues,
    then set MinTick to the average number of minor tick divisions per major
@@ -16918,35 +17451,35 @@ f        The global status.
       if( grid[ axis ]->minticks ) {
          SetUsedMinTick( this_nd, axis, 
                          ( grid[ axis ]->nminor + grid[ axis ]->nmajor )/
-                         ( grid[ axis ]->nmajor - 1 ) );
+                         ( grid[ axis ]->nmajor - 1 ), status );
       } else {
-         SetUsedMinTick( this_nd, axis, grid[ axis ]->nminor );
+         SetUsedMinTick( this_nd, axis, grid[ axis ]->nminor, status );
       }
 
       if( astTestTextLab( this, axis ) ) {
-         SetUsedTextLab( this_nd, axis, astGetTextLab( this, axis ) );
+         SetUsedTextLab( this_nd, axis, astGetTextLab( this, axis ), status );
       } else {
-         SetUsedTextLab( this_nd, axis, edgeticks );
+         SetUsedTextLab( this_nd, axis, edgeticks, status );
       }
       
       if( astTestMajTickLen( this, axis ) ) {
-         SetUsedMajTickLen( this_nd, axis, astGetMajTickLen( this, axis ) );
+         SetUsedMajTickLen( this_nd, axis, astGetMajTickLen( this, axis ), status );
       } else {
          SetUsedMajTickLen( this_nd, axis, drawgrid ? 0.0 : 
-                                           astGetMajTickLen( this, axis ) );
+                                           astGetMajTickLen( this, axis ), status );
       }
 
    }
 
-   SetUsedGrid( this_nd, drawgrid );
-   SetUsedLabelling( this_nd, edgeticks ? 0 : 1 );
-   SetUsedBorder( this_nd, border );
+   SetUsedGrid( this_nd, drawgrid, status );
+   SetUsedLabelling( this_nd, edgeticks ? 0 : 1, status );
+   SetUsedBorder( this_nd, border, status );
 
 /* Free the memory used to hold information about the curves. */
-   cdata = CleanCdata( cdata );
+   cdata = CleanCdata( cdata, status );
 
 /* Free the memory used to hold information about the tick marks. */
-   grid = CleanGrid( grid );
+   grid = CleanGrid( grid, status );
 
 /* If required clear attributes. */
    if( clredge ) {
@@ -16984,7 +17517,7 @@ f        The global status.
 }
 
 static void GridLine( AstPlot *this, int axis, const double start[], 
-                      double length ){
+                      double length, int *status ){
 /*
 *++
 *  Name:
@@ -17056,12 +17589,16 @@ f     coordinates with the value AST__BAD, nor if LENGTH has this value.
 *--
 */
 /* Local Variables: */
+   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
    const char *class;      /* Object class */
    const char *method;     /* Current method */
    int naxes;              /* No. of axes in the base Frame */
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
 
 /* Store the current method, and the class of the supplied object for use 
    in error messages.*/
@@ -17073,7 +17610,7 @@ f     coordinates with the value AST__BAD, nor if LENGTH has this value.
    if( naxes != 2 && astOK ){
       astError( AST__NAXIN, "%s(%s): Number of axes (%d) in the base "
                 "Frame of the supplied %s is invalid - this number should "
-                "be 2.", method, class, naxes, class );
+                "be 2.", status, method, class, naxes, class );
    } 
 
 /* Initialise the bounding box for primatives produced by this call. */
@@ -17090,7 +17627,7 @@ f     coordinates with the value AST__BAD, nor if LENGTH has this value.
 /* Draw the curve. The break information is stored in an external structure
    where it can be accessed by public methods which return information
    about the most recently drawn curve. */
-   AxPlot( this, axis - 1, start, length, 1, &Curve_data, method, class );
+   AxPlot( this, axis - 1, start, length, 1, &Curve_data, method, class, status );
 
 /* Return. */
    return;
@@ -17098,7 +17635,7 @@ f     coordinates with the value AST__BAD, nor if LENGTH has this value.
 }
 
 static TickInfo **GridLines( AstPlot *this, double *cen, double *gap, 
-                             int *inval, const char *method, const char *class ){
+                             int *inval, const char *method, const char *class, int *status ){
 /*
 *  Name:
 *     GridLines
@@ -17113,7 +17650,7 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
 *  Synopsis:
 *     #include "plot.h"
 *     TickInfo **GridLines( AstPlot *this, double *cen, double *gap, 
-*                           int *inval, const char *method, const char *class )
+*                           int *inval, const char *method, const char *class, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -17147,6 +17684,8 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to an array of two TickInfo pointers.
@@ -17191,13 +17730,13 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
    each axis. */
       for( j = 0; j < 2; j++ ){
          info[ j ] = TickMarks( this, j, cen + j, gap + j, inval, method, 
-                                class );
+                                class, status );
          logticks[ j ] = astGetLogTicks( this, j );
       }
 
 /* Release the resources allocated in the first call to TickMarks. */
       for( j = 0; j < 2; j++ ){
-         (void) TickMarks( NULL, j, NULL, gap, NULL, method, class );
+         (void) TickMarks( NULL, j, NULL, gap, NULL, method, class, status );
       }
 
 /* Each major tick value for axis "j" may be marked with a curve parallel
@@ -17350,14 +17889,14 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
    }
 
 /* If an error has occurred, clean up the returned TickInfo structures. */
-   if( !astOK ) info = CleanGrid( info );
+   if( !astOK ) info = CleanGrid( info, status );
 
 /* Return. */
    return info;   
 
 }
 
-void astGrfAttrs_( AstPlot *this, int id, int set, int prim, const char *method, const char *class ){
+void astGrfAttrs_( AstPlot *this, int id, int set, int prim, const char *method, const char *class, int *status ){
 /*
 *+
 *  Name:
@@ -17419,39 +17958,41 @@ void astGrfAttrs_( AstPlot *this, int id, int set, int prim, const char *method,
 */
 
 /* Local Variables: */
-   static double attrs[ GRF__NATTR ]; /* Saved attribute values */
+   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
    double *attr;           /* Pointer to the next attribute value */
    double dval;            /* Floating point attribute value */
    int ival;               /* Integer attribute value */
-   static int nesting=0;   /* Nesting level. */
 
 /* Check the global status. */
    if( !astOK ) return;
 
-/* Set up a pointer to the next element in "attrs". */
-   attr = attrs;
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
+
+/* Set up a pointer to the next element in "grfattrs_attrs". */
+   attr = grfattrs_attrs;
 
 /* If we are setting new values, increment the nesting level, otherwise
    decrement it. */
    if( set ){
-      nesting++;
+      grfattrs_nesting++;
    } else {
-      nesting--;
+      grfattrs_nesting--;
    } 
 
 /* First deal with cases where we are establishing new values for the
    graphics attributes by setting them to the values of the corresponding
    Plot attributes. Only do this if we are at nesting level one. */
-   if( set && nesting == 1 ){
+   if( set && grfattrs_nesting == 1 ){
 
 /* See if a value has been set in the Plot for the line style attribute for 
    the specified object, If so, use the value. */
-      if( TestUseStyle( this, id ) ) {
-         ival = GetUseStyle( this, id );      
+      if( TestUseStyle( this, id, status ) ) {
+         ival = GetUseStyle( this, id, status );      
 
 /* Save the current value, and establish the new value. */
          GAttr( this, GRF__STYLE, (double) ival, attr++, prim, method,
-                class );
+                class, status );
 
 /* If no style was specified, retain the current value. Indicate that no
    new value has been established by setting the old value bad. */
@@ -17460,34 +18001,34 @@ void astGrfAttrs_( AstPlot *this, int id, int set, int prim, const char *method,
       }
 
 /* Do the same for the line width attribute. */
-      if( TestUseWidth( this, id ) ){
-         dval = GetUseWidth( this, id );      
-         GAttr( this, GRF__WIDTH, dval, attr++, prim, method, class );
+      if( TestUseWidth( this, id, status ) ){
+         dval = GetUseWidth( this, id, status );      
+         GAttr( this, GRF__WIDTH, dval, attr++, prim, method, class, status );
       } else {
          *(attr++) = AST__BAD;
       }
 
 /* Do the same for the character size attribute. */
-      if( TestUseSize( this, id ) ) {
-         dval = GetUseSize( this, id );      
-         GAttr( this, GRF__SIZE, dval, attr++, prim, method, class );
+      if( TestUseSize( this, id, status ) ) {
+         dval = GetUseSize( this, id, status );      
+         GAttr( this, GRF__SIZE, dval, attr++, prim, method, class, status );
       } else {
          *(attr++) = AST__BAD;
       }
 
 /* Do the same for the character font attribute. */
-      if( TestUseFont( this, id ) ){
-         ival = GetUseFont( this, id );      
-         GAttr( this, GRF__FONT, (double) ival, attr++, prim, method, class );
+      if( TestUseFont( this, id, status ) ){
+         ival = GetUseFont( this, id, status );      
+         GAttr( this, GRF__FONT, (double) ival, attr++, prim, method, class, status );
       } else {
          *(attr++) = AST__BAD;
       }
 
 /* Do the same for the colour attribute. */
-      if( TestUseColour( this, id ) ) {
-         ival = GetUseColour( this, id );      
+      if( TestUseColour( this, id, status ) ) {
+         ival = GetUseColour( this, id, status );      
          GAttr( this, GRF__COLOUR, (double) ival, attr++, prim, method,
-                class );
+                class, status );
       } else {
          *(attr++) = AST__BAD;
       }
@@ -17497,12 +18038,12 @@ void astGrfAttrs_( AstPlot *this, int id, int set, int prim, const char *method,
 /* Now deal with cases where we are re-establishing old values saved on a
    previous call to this function. Only do this if we are at nesting
    level zero. */
-   if( !set && !nesting ){
-      GAttr( this, GRF__STYLE, *(attr++), NULL, prim, method, class );
-      GAttr( this, GRF__WIDTH, *(attr++), NULL, prim, method, class );
-      GAttr( this, GRF__SIZE, *(attr++), NULL, prim, method, class );
-      GAttr( this, GRF__FONT, *(attr++), NULL, prim, method, class );
-      GAttr( this, GRF__COLOUR, *(attr++), NULL, prim, method, class );
+   if( !set && !grfattrs_nesting ){
+      GAttr( this, GRF__STYLE, *(attr++), NULL, prim, method, class, status );
+      GAttr( this, GRF__WIDTH, *(attr++), NULL, prim, method, class, status );
+      GAttr( this, GRF__SIZE, *(attr++), NULL, prim, method, class, status );
+      GAttr( this, GRF__FONT, *(attr++), NULL, prim, method, class, status );
+      GAttr( this, GRF__COLOUR, *(attr++), NULL, prim, method, class, status );
    }
 
 /* Return. */
@@ -17514,7 +18055,7 @@ static int GVec( AstPlot *this, AstMapping *mapping, double *phy,
                  int axis, double delta, AstPointSet **pset1, 
                  AstPointSet **pset2, double *gx, double *gy, 
                  double *dx, double *dy, int *flag, const char *method, 
-                 const char *class ){
+                 const char *class, int *status ){
 /*
 *  Name:
 *     GVec
@@ -17531,7 +18072,7 @@ static int GVec( AstPlot *this, AstMapping *mapping, double *phy,
 *               int axis, double delta, AstPointSet **pset1, 
 *               AstPointSet **pset2, double *gx, double *gy, 
 *               double *dx, double *dy, int *flag, const char *method, 
-*               const char *class )
+*               const char *class, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -17617,6 +18158,8 @@ static int GVec( AstPlot *this, AstMapping *mapping, double *phy,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One is returned if the vector was found succesfully, Zero is returned
@@ -17661,8 +18204,8 @@ static int GVec( AstPlot *this, AstMapping *mapping, double *phy,
 /* If no PointSets have been supplied, create some now. PointSet 1 
    contains physical coordinates, PointSet 2 contains graphics 
    coordinates. */
-   if( !(*pset1) ) *pset1 = astPointSet( 3, nphy, "" );
-   if( !(*pset2) ) *pset2 = astPointSet( 3, 2, "" );
+   if( !(*pset1) ) *pset1 = astPointSet( 3, nphy, "", status );
+   if( !(*pset2) ) *pset2 = astPointSet( 3, 2, "", status );
 
 /* Get pointers to the PointSet data. */     
    ptr1 = astGetPoints( *pset1 );
@@ -17686,7 +18229,7 @@ static int GVec( AstPlot *this, AstMapping *mapping, double *phy,
       }
 
 /* Find the corresponding graphics coordinates. */
-      (void) Trans( this, NULL, mapping, *pset1, 0, *pset2, 0, method, class );
+      (void) Trans( this, NULL, mapping, *pset1, 0, *pset2, 0, method, class, status );
 
 /* Check the central position is OK. */
       *gx = ptr2[ 0 ][ 1 ];
@@ -17811,7 +18354,7 @@ static int GVec( AstPlot *this, AstMapping *mapping, double *phy,
 
 }
 
-static int HasEscapes( const char *text ) {
+static int HasEscapes( const char *text, int *status ) {
 /*
 *  Name:
 *     HasEscapes
@@ -17824,7 +18367,7 @@ static int HasEscapes( const char *text ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int HasEscapes( const char *text ) 
+*     int HasEscapes( const char *text, int *status ) 
 
 *  Class Membership:
 *     Plot member function.
@@ -17836,6 +18379,8 @@ static int HasEscapes( const char *text ) {
 *  Parameters:
 *     text 
 *        The text to check.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned:
 *     Non-zero if any escape sequences are found in the text. Zero
@@ -17870,7 +18415,7 @@ static int HasEscapes( const char *text ) {
    return result;
 }
 
-static int IdFind( int id, int nax, int *id1, int *id2, int *id3 ) {
+static int IdFind( int id, int nax, int *id1, int *id2, int *id3, int *status ) {
 /*
 *  Name:
 *     IdFind
@@ -17883,7 +18428,7 @@ static int IdFind( int id, int nax, int *id1, int *id2, int *id3 ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int IdFind( int id, int nax, int *id1, int *id2, int *id3  )
+*     int IdFind( int id, int nax, int *id1, int *id2, int *id3, int *status  )
 
 *  Class Membership:
 *     Plot member function.
@@ -17922,6 +18467,8 @@ static int IdFind( int id, int nax, int *id1, int *id2, int *id3 ) {
 *        Pointer to the int at which to return the third genuine
 *        identifier corresponding to "id" (or -1 if "id" has no third 
 *        genuine identifier).
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The number of genuine identifiers corresponding to the supplied
@@ -17978,7 +18525,7 @@ static int IdFind( int id, int nax, int *id1, int *id2, int *id3 ) {
    } else if( id >= AST__NPID ) {
       astError( AST__INTER, "AST internal programming error - "
                 "function IdFind in class Plot does not yet support "
-                "pseudo-identifier value %d", id );
+                "pseudo-identifier value %d", status, id );
    }
 
 /* Return the answer. */
@@ -17986,7 +18533,7 @@ static int IdFind( int id, int nax, int *id1, int *id2, int *id3 ) {
 
 }
 
-void astInitPlotVtab_(  AstPlotVtab *vtab, const char *name ) {
+void astInitPlotVtab_(  AstPlotVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -18023,12 +18570,16 @@ void astInitPlotVtab_(  AstPlotVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstFrameSetVtab *fset;        /* Pointer to FrameSet component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -18038,7 +18589,7 @@ void astInitPlotVtab_(  AstPlotVtab *vtab, const char *name ) {
    used (by astIsAPlot) to determine if an object belongs to this class.
    We can conveniently use the address of the (static) class_init variable to
    generate this unique value. */
-   vtab->check = &class_init;
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -18236,6 +18787,11 @@ void astInitPlotVtab_(  AstPlotVtab *vtab, const char *name ) {
    parent_testattrib = object->TestAttrib;
    object->TestAttrib = TestAttrib;
 
+#if defined(THREAD_SAFE)
+   parent_managelock = object->ManageLock;
+   object->ManageLock = ManageLock;
+#endif
+
    parent_transform = mapping->Transform;
    mapping->Transform = Transform;
 
@@ -18249,17 +18805,13 @@ void astInitPlotVtab_(  AstPlotVtab *vtab, const char *name ) {
 /* Declare the class dump function. */
    astSetDump( vtab, Dump, "Plot", "Provide facilities for 2D graphical output" );
 
-/* Initialise the external structure used to store information about the 
-   most recent curve drawn by astGridLine. The number of breaks in the curve 
-   set to -1 to indicate that no curve has yet been drawn. */
-   Curve_data.nbrk = -1;
-
-/* Return. */
-   return;
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
 
 }
 
-static int Inside( int n, float *cx, float *cy, float x, float y ){
+static int Inside( int n, float *cx, float *cy, float x, float y, int *status ){
 /*
 *  Name:
 *     Inside
@@ -18272,7 +18824,7 @@ static int Inside( int n, float *cx, float *cy, float x, float y ){
 
 *  Synopsis:
 *     #include "plot.h"
-*     int Inside( int n, float *cx, float *cy, float x, float y )
+*     int Inside( int n, float *cx, float *cy, float x, float y, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -18293,6 +18845,8 @@ static int Inside( int n, float *cx, float *cy, float x, float y ){
 *        The x coordinate of the test point.
 *     y
 *        The y coordinate of the test point.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A boolean flag indicating if the test point is inside the polygon.
@@ -18369,7 +18923,7 @@ static void InterpEscape( AstPlot *this, int type, double value, float *x,
                           float *y, float ux, float uy, float rx, float ry, 
                           const char *just, float *rise, double nsize, 
                           double nstyle, double nwidth, double ncol, 
-                          double nfont, const char *method, const char *class ){
+                          double nfont, const char *method, const char *class, int *status ){
 /*
 *  Name:
 *     InterpEscape
@@ -18384,7 +18938,7 @@ static void InterpEscape( AstPlot *this, int type, double value, float *x,
 *                        float *y, float ux, float uy, float rx, float ry, 
 *                        const char *just, float *rise, double nsize, 
 *                        double nstyle, double nwidth, double ncol, 
-*                        double nfont, const char *method, const char *class )
+*                        double nfont, const char *method, const char *class, int *status )
 
 *  Description:
 *     This function modifies the current graphics attributes, the supplied 
@@ -18449,6 +19003,8 @@ static void InterpEscape( AstPlot *this, int type, double value, float *x,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -18515,43 +19071,43 @@ static void InterpEscape( AstPlot *this, int type, double value, float *x,
    } else if( type == GRF__ESSIZ ) {
       if( value < 0 ) value = 100.0;
       GAttr( this, GRF__SIZE, 0.01*value*nsize, NULL, GRF__TEXT, 
-             method, class );
+             method, class, status );
 
 /* Type GRF__ESWID: Change the text width. */
    } else if( type == GRF__ESWID ) {
       if( value < 0 ) value = 100.0;
       GAttr( this, GRF__WIDTH, 0.01*value*nwidth, NULL, GRF__TEXT, 
-             method, class );
+             method, class, status );
 
 /* Type GRF__ESFON: Change the text font. */
    } else if( type == GRF__ESFON ) {
       if( value < 0 ) value = nfont;
-      GAttr( this, GRF__FONT, value, NULL, GRF__TEXT, method, class );
+      GAttr( this, GRF__FONT, value, NULL, GRF__TEXT, method, class, status );
 
 /* Type GRF__ESCOL: Change the text colour. */
    } else if( type == GRF__ESCOL ) {
       if( value < 0 ) value = ncol;
-      GAttr( this, GRF__COLOUR, value, NULL, GRF__TEXT, method, class );
+      GAttr( this, GRF__COLOUR, value, NULL, GRF__TEXT, method, class, status );
 
 /* Type GRF__ESSTY: Change the text style. */
    } else if( type == GRF__ESSTY ) {
       if( value < 0 ) value = nstyle;
-      GAttr( this, GRF__STYLE, value, NULL, GRF__TEXT, method, class );
+      GAttr( this, GRF__STYLE, value, NULL, GRF__TEXT, method, class, status );
 
 /* Type GRF__ESPSH: Push current attributes onto a stack. */
    } else if( type == GRF__ESPSH ) {
-      PushGat( this, *rise, method, class );
+      PushGat( this, *rise, method, class, status );
 
 /* Type GRF__ESSTY: Reset everything to normal. */
    } else if( type == GRF__ESPOP ) {
 
-      if( !PopGat( this, &new_rise, method, class ) ) {
+      if( !PopGat( this, &new_rise, method, class, status ) ) {
          new_rise = 0.0;
-         GAttr( this, GRF__SIZE, nsize, NULL, GRF__TEXT, method, class );
-         GAttr( this, GRF__WIDTH, nwidth, NULL, GRF__TEXT, method, class );
-         GAttr( this, GRF__COLOUR, ncol, NULL, GRF__TEXT, method, class );
-         GAttr( this, GRF__FONT, nfont, NULL, GRF__TEXT, method, class );
-         GAttr( this, GRF__STYLE, nstyle, NULL, GRF__TEXT, method, class );
+         GAttr( this, GRF__SIZE, nsize, NULL, GRF__TEXT, method, class, status );
+         GAttr( this, GRF__WIDTH, nwidth, NULL, GRF__TEXT, method, class, status );
+         GAttr( this, GRF__COLOUR, ncol, NULL, GRF__TEXT, method, class, status );
+         GAttr( this, GRF__FONT, nfont, NULL, GRF__TEXT, method, class, status );
+         GAttr( this, GRF__STYLE, nstyle, NULL, GRF__TEXT, method, class, status );
       }
 
       *x -= 0.01*ux*( *rise - new_rise );
@@ -18561,7 +19117,7 @@ static void InterpEscape( AstPlot *this, int type, double value, float *x,
    }
 }
 
-static int IsASkyAxis( AstFrame *frm, int axis ) {
+static int IsASkyAxis( AstFrame *frm, int axis, int *status ) {
 /*
 *  Name:
 *     IsASkyAxis
@@ -18574,7 +19130,7 @@ static int IsASkyAxis( AstFrame *frm, int axis ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int IsASkyAxis( AstFrame *frm, int axis )
+*     int IsASkyAxis( AstFrame *frm, int axis, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -18588,6 +19144,8 @@ static int IsASkyAxis( AstFrame *frm, int axis ) {
 *        The Frame.
 *     axis
 *        The zero-based axis index.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A boolean flag indicating if the axis is a  SkyAxis.
@@ -18615,7 +19173,7 @@ static int IsASkyAxis( AstFrame *frm, int axis ) {
 
 }
 
-static int IsASkyFrame( AstObject *obj ) {
+static int IsASkyFrame( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     IsASkyFrame
@@ -18628,7 +19186,7 @@ static int IsASkyFrame( AstObject *obj ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int IsASkyFrame( AstObject *obj )
+*     int IsASkyFrame( AstObject *obj, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -18640,6 +19198,8 @@ static int IsASkyFrame( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        The object.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A boolean flag indicating if the Object can be treated as SkyFrame.
@@ -18664,7 +19224,7 @@ static int IsASkyFrame( AstObject *obj ) {
    using this method. */
    } else if( astIsAFrameSet( obj ) ) {
       frm = astGetFrame( (AstFrameSet *) obj, AST__CURRENT );
-      ret = IsASkyFrame( (AstObject *) frm );
+      ret = IsASkyFrame( (AstObject *) frm, status );
       frm = astAnnul( frm );
    }
 
@@ -18677,7 +19237,7 @@ static const char *JustMB( AstPlot *this, int esc, const char *text, float *x,
                            float *y, float upx, float upy, const char *just, 
                            float uxu, float uyu, float rxu, float ryu, 
                            float *x0, float *y0, const char *method, 
-                           const char *class ){
+                           const char *class, int *status ){
 /*
 *  Name:
 *     JustMB
@@ -18692,7 +19252,7 @@ static const char *JustMB( AstPlot *this, int esc, const char *text, float *x,
 *                         float *y, float upx, float upy, const char *just, 
 *                         float uxu, float uyu, float rxu, float ryu, 
 *                         float *x0, float *y0, const char *method, 
-*                         const char *class )
+*                         const char *class, int *status )
 
 *  Description:
 *     This function is used to modify the reference point and justification 
@@ -18771,6 +19331,8 @@ static const char *JustMB( AstPlot *this, int esc, const char *text, float *x,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated string which contains the 
@@ -18825,12 +19387,12 @@ static const char *JustMB( AstPlot *this, int esc, const char *text, float *x,
 /* The justfication need not be changed unless the requested vertical 
    justification is "bottom" (m), AND the grf module does not support "M" 
    justification. */
-      if( ( result[ 0 ] == 'M' ) && !GCap( this, GRF__MJUST, 1 ) ){
+      if( ( result[ 0 ] == 'M' ) && !GCap( this, GRF__MJUST, 1, status ) ){
 
 /* Find the bounding box which would result from putting the left end of
    the baseline at the specified position. */
          DrawText( this, 0, esc, text, *x, *y, "BL", upx, upy, xbn, ybn, 
-                   &drop, method, class );
+                   &drop, method, class, status );
 
 /* Indicate that DrawText has not been called. */
          called = 1;
@@ -18857,7 +19419,7 @@ static const char *JustMB( AstPlot *this, int esc, const char *text, float *x,
       } else {
          if( ! called ) {
             DrawText( this, 0, esc, text, *x, *y, "BL", upx, upy, xbn, ybn, 
-                      &drop, method, class );
+                      &drop, method, class, status );
          }
 
 /* Find the height and width of the bounding box. */
@@ -18911,8 +19473,8 @@ static const char *JustMB( AstPlot *this, int esc, const char *text, float *x,
    return result;
 }
 
-static void Labelat( AstPlot *this, TickInfo **grid, CurveData **cdata, 
-                     double *labelat, const char *method, const char *class ){
+static void Labelat( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata, 
+                     double *labelat, const char *method, const char *class, int *status ){
 /*
 *
 *  Name:
@@ -18927,7 +19489,7 @@ static void Labelat( AstPlot *this, TickInfo **grid, CurveData **cdata,
 
 *  Synopsis:
 *     #include "plot.h"
-*     void Labelat( AstPlot *this, TickInfo **grid, CurveData **cdata, 
+*     void Labelat( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata, 
 *                   double *labelat, const char *method, const char *class )
 
 *  Class Membership:
@@ -18953,8 +19515,8 @@ static void Labelat( AstPlot *this, TickInfo **grid, CurveData **cdata,
 *        each pointing to a TickInfo structure holding information about
 *        tick values on the axis. See function GridLines.
 *     cdata
-*        A pointer to an array of two CurveData pointers (one for each axis), 
-*        each pointing to an array of CurveData structure (one for each
+*        A pointer to an array of two AstPlotCurveData pointers (one for each axis), 
+*        each pointing to an array of AstPlotCurveData structure (one for each
 *        major tick value on the axis), holding information about breaks
 *        in the curves drawn to mark the major tick values. See function 
 *        DrawGrid. 
@@ -18980,7 +19542,7 @@ static void Labelat( AstPlot *this, TickInfo **grid, CurveData **cdata,
    AstMapping *mapping;   /* Mapping from graphics to physical coords */
    AstPointSet *pset2;    /* Pointset for graphical tick positions */
    AstPointSet *pset[ 2 ];/* Pointsets for physical tick positions */
-   CurveData *cdt;        /* Pointer to the CurveData for the next tick */
+   AstPlotCurveData *cdt; /* Pointer to the AstPlotCurveData for the next tick */
    TickInfo *info;        /* Pointer to the TickInfo for the current axis */
    double **ptr2;         /* Pointers to graphics pointset data */
    double *ptr1[ 2 ];     /* Pointers to physical pointset data */
@@ -19010,7 +19572,7 @@ static void Labelat( AstPlot *this, TickInfo **grid, CurveData **cdata,
    each axis create an array to hold values for the "other" axis. */
    for( axis = 0; axis < 2; axis++ ){
       info = grid[ axis ];
-      pset[ axis ] = astPointSet( info->nmajor, 2, "" );
+      pset[ axis ] = astPointSet( info->nmajor, 2, "", status );
       tvals[ axis ] = (double *) astMalloc( sizeof(double)*(size_t)(info->nmajor) );
    }
 
@@ -19084,7 +19646,7 @@ static void Labelat( AstPlot *this, TickInfo **grid, CurveData **cdata,
    coordinates) to the base frame (i.e. graphics coordinates) using 
    the inverse Mapping. */
             pset2 = Trans( this, NULL, mapping, pset[ axis ], 0, NULL, 0, 
-                           method, class );
+                           method, class, status );
 
 /* Get pointers to the graphics coordinates. */
             ptr2 = astGetPoints( pset2 );
@@ -19145,9 +19707,9 @@ static void Labelat( AstPlot *this, TickInfo **grid, CurveData **cdata,
 
 }
 
-static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata, 
+static void Labels( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata, 
                     double *gap, double *labelat, const char *method, 
-                    const char *class ){
+                    const char *class, int *status ){
 /*
 *
 *  Name:
@@ -19161,9 +19723,9 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
 
 *  Synopsis:
 *     #include "plot.h"
-*     void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata, 
+*     void Labels( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata, 
 *                  double *gap, double *labelat, const char *method, 
-*                  const char *class )
+*                  const char *class, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -19185,8 +19747,8 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
 *        each pointing to a TickInfo structure holding information about
 *        tick values on the axis. See function GridLines.
 *     cdata
-*        A pointer to an array of two CurveData pointers (one for each axis), 
-*        each pointing to an array of CurveData structure (one for each
+*        A pointer to an array of two AstPlotCurveData pointers (one for each axis), 
+*        each pointing to an array of AstPlotCurveData structure (one for each
 *        major tick value on the axis), holding information about breaks
 *        in the curves drawn to mark the major tick values. See function 
 *        DrawGrid. 
@@ -19207,6 +19769,8 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     -  This function assumes the current Frame of the Plot is 2
@@ -19218,7 +19782,7 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
    AstMapping *mapping;   /* Pointer to graphics->physical Mapping */
    AstPointSet *pset1;    /* Pointer to PointSet holding physical coords. */
    AstPointSet *pset2;    /* Pointer to PointSet holding graphics coords. */
-   CurveData *cdt;        /* Pointer to the CurveData for the next tick */
+   AstPlotCurveData *cdt; /* Pointer to the AstPlotCurveData for the next tick */
    LabelList *labellist;  /* Pointer to list of labels to be plotted */
    LabelList *ll;         /* Pointer to next label to be plotted */
    TickInfo *info;        /* Pointer to the TickInfo for the current axis */
@@ -19268,12 +19832,12 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
 
 /* Empty the list of bounding boxes kept by the Overlap function. */
    (void) Overlap( this, 0, 0, NULL, 0.0, 0.0, NULL, 0.0, 0.0, NULL, 
-                   method, class );
+                   method, class, status );
 
 /* If required, draw the labels around the edges of the plotting area. */
    if( labelat[ 0 ] == AST__BAD || labelat[ 1 ] == AST__BAD ){
       (void) EdgeLabels( this, 1, grid, cdata, astGetForceExterior( this ), 
-                         method, class );
+                         method, class, status );
 
 /* Otherwise, draw labels within the interior of the plotting area. */
    } else {
@@ -19408,7 +19972,7 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
    to the axis being labelled. If the tangent vector is not defined, then 
    the tangent vector used for the previous label is re-used. */
                   GVec( this, mapping, val, axis, 0.01*diff, &pset1, 
-                        &pset2, &gx, &gy, &dx, &dy, &flag, method, class );
+                        &pset2, &gx, &gy, &dx, &dy, &flag, method, class, status );
 
 /* If we now have a tangent vector and good graphics coordinates for the 
    label's reference position... */
@@ -19515,7 +20079,7 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
    memory used to hold the text, etc. */
             if( nlab > 0 ) {
                PlotLabels( this, esc, frame, axis, labellist, info->fmt, nlab, 
-                           &box, method, class );
+                           &box, method, class, status );
                ll = labellist;
                for( tick = 0; tick < nlab; tick ++ ) {
                   ll->text = (char *) astFree( (void *) ll->text );
@@ -19557,8 +20121,8 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
 }
 
 static void LinePlot( AstPlot *this, double xa, double ya, double xb, 
-                      double yb, int ink, CurveData *cdata, 
-                      const char *method, const char *class ){
+                      double yb, int ink, AstPlotCurveData *cdata, 
+                      const char *method, const char *class, int *status ){
 /*
 *
 *  Name:
@@ -19573,8 +20137,8 @@ static void LinePlot( AstPlot *this, double xa, double ya, double xb,
 *  Synopsis:
 *     #include "plot.h"
 *     void LinePlot( AstPlot *this, double xa, double ya, double xb, 
-*                    double yb, int ink, CurveData *cdata, 
-*                    const char *method, const char *class )
+*                    double yb, int ink, AstPlotCurveData *cdata, 
+*                    const char *method, const char *class, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -19607,6 +20171,8 @@ static void LinePlot( AstPlot *this, double xa, double ya, double xb,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     -  No curve is draw if any of the start or end positions are bad
@@ -19615,6 +20181,7 @@ static void LinePlot( AstPlot *this, double xa, double ya, double xb,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
    double d[ CRV_NPNT ];   /* Offsets to evenly spaced points along curve */
    double x[ CRV_NPNT ];   /* X coords at evenly spaced points along curve */
    double y[ CRV_NPNT ];   /* Y coords at evenly spaced points along curve */
@@ -19623,6 +20190,9 @@ static void LinePlot( AstPlot *this, double xa, double ya, double xb,
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
 
 /* Check the supplied values are usable. */
    if( xa == AST__BAD || ya == AST__BAD || 
@@ -19685,17 +20255,17 @@ static void LinePlot( AstPlot *this, double xa, double ya, double xb,
 
 /* Get the graphics coordinates corresponding to the initial set of
    offsets. */
-   Map2( CRV_NPNT, d, x, y, method, class );
+   Map2( CRV_NPNT, d, x, y, method, class, status GLOBALS_NAME );
 
 /* Use Crv and Map2 to draw the intersection of the straight line with
    the region containing valid physical coordinates. */
-   Crv( this, d, x, y, 0, NULL, method, class );
+   Crv( this, d, x, y, 0, NULL, NULL, method, class, status );
 
 /* End the current poly line. */
-   Opoly( this, method, class );
+   Opoly( this, method, class, status );
 
 /* Tidy up the static data used by Map2. */
-   Map2( 0, NULL, NULL, NULL, method, class );
+   Map2( 0, NULL, NULL, NULL, method, class, status GLOBALS_NAME );
 
 /* If no part of the curve could be drawn, set the number of breaks and the 
    length of the drawn curve to zero. */
@@ -19707,9 +20277,9 @@ static void LinePlot( AstPlot *this, double xa, double ya, double xb,
    the last point to be plotted. */
    } else {
       Crv_nbrk++;
-      if( Crv_nbrk > CRV_MXBRK ){
+      if( Crv_nbrk > AST__PLOT_CRV_MXBRK ){
          astError( AST__CVBRK, "%s(%s): Number of breaks in curve "
-                   "exceeds %d.", method, class, CRV_MXBRK );
+                   "exceeds %d.", status, method, class, AST__PLOT_CRV_MXBRK );
       } else {
          *(Crv_xbrk++) = (float) Crv_xl;
          *(Crv_ybrk++) = (float) Crv_yl;
@@ -19724,7 +20294,7 @@ static void LinePlot( AstPlot *this, double xa, double ya, double xb,
       cdata->length = Crv_len;
       cdata->out = Crv_out;
       cdata->nbrk = Crv_nbrk;
-      PurgeCdata( cdata );
+      PurgeCdata( cdata, status );
    }
 
 /* Annul the Mapping. */
@@ -19739,7 +20309,7 @@ static double **MakeGrid( AstPlot *this, AstFrame *frm, AstMapping *map,
                           int disk, int dim, double xlo, double xhi, 
                           double ylo, double yhi, int nphy, AstPointSet **pset1,
                           AstPointSet **pset2, int norm, const char *method, 
-                          const char *class ){
+                          const char *class, int *status ){
 /*
 *  Name:
 *     MakeGrid
@@ -19757,7 +20327,7 @@ static double **MakeGrid( AstPlot *this, AstFrame *frm, AstMapping *map,
 *                        int disk, int dim, double xlo, double xhi, double ylo,
 *                        double yhi, int nphy, AstPointSet **pset1, 
 *                        AstPointSet **pset2, int norm, const char *method, 
-*                        const char *class ){
+*                        const char *class, int *status ){
 
 *  Class Membership:
 *     Plot member function.
@@ -19816,6 +20386,8 @@ static double **MakeGrid( AstPlot *this, AstFrame *frm, AstMapping *map,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to the physical coordinate data stored in the PointSet
@@ -19843,15 +20415,15 @@ static double **MakeGrid( AstPlot *this, AstFrame *frm, AstMapping *map,
 /* Create two PointSets. We assume for the moment that they cover the
    full grid, including corners. */
    size = dim*dim;
-   *pset1 = astPointSet( size, 2, "" );
-   *pset2 = astPointSet( size, nphy, "" );
+   *pset1 = astPointSet( size, 2, "", status );
+   *pset2 = astPointSet( size, nphy, "", status );
 
 /* Get pointers to the data arrays for the two PointSets. */
    ptr1 = astGetPoints( *pset1 );
    ptr2 = astGetPoints( *pset2 );
 
 /* Create a grid covering the supplied area. */
-   size = GraphGrid( dim, disk, xlo, xhi, ylo, yhi, ptr1 );
+   size = GraphGrid( dim, disk, xlo, xhi, ylo, yhi, ptr1, status );
 
 /* If the corners are being omitted, reduce the number of points in the 
    two PointSets. */
@@ -19861,7 +20433,7 @@ static double **MakeGrid( AstPlot *this, AstFrame *frm, AstMapping *map,
    }
 
 /* Transform these graphics positions to physical coordinates. */
-   Trans( this, frm, map, *pset1, 1, *pset2, norm, method, class ); 
+   Trans( this, frm, map, *pset1, 1, *pset2, norm, method, class, status ); 
 
 /* If an error has occurred, annul the two pointsets. */
    if( !astOK ){
@@ -19875,8 +20447,95 @@ static double **MakeGrid( AstPlot *this, AstFrame *frm, AstMapping *map,
 
 }
 
+
+#if defined(THREAD_SAFE)
+static int ManageLock( AstObject *this_object, int mode, int extra, int *status ) {
+/*
+*  Name:
+*     ManageLock
+
+*  Purpose:
+*     Manage the thread lock on an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "object.h"
+*     AstObject *ManageLock( AstObject *this, int mode, int extra, int *status ) 
+
+*  Class Membership:
+*     Plot member function (over-rides the astManageLock protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function manages the thread lock on the supplied Object. The
+*     lock can be locked, unlocked or checked by this function as 
+*     deteremined by parameter "mode". See astLock for details of the way
+*     these locks are used.
+
+*  Parameters:
+*     this
+*        Pointer to the Object.
+*     mode
+*        An integer flag indicating what the function should do:
+*
+*        AST__LOCK: Lock the Object for exclusive use by the calling
+*        thread. The "extra" value indicates what should be done if the
+*        Object is already locked (wait or report an error - see astLock).
+*
+*        AST__UNLOCK: Unlock the Object for use by other threads.
+*
+*        AST__CHECKLOCK: Check that the object is locked for use by the
+*        calling thread (report an error if not).
+*     extra
+*        Extra mode-specific information. 
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*    A local status value: 
+*        0 - Success
+*        1 - Could not lock or unlock the object because it was already 
+*            locked by another thread.
+*        2 - Failed to lock a POSIX mutex
+*        3 - Failed to unlock a POSIX mutex
+*        4 - Bad "mode" value supplied.
+
+*  Notes:
+*     - This function attempts to execute even if an error has already
+*     occurred.
+*/
+
+/* Local Variables: */
+   AstPlot *this;    /* Pointer to Plot structure */
+   int result;       /* Returned status value */
+
+/* Initialise */
+   result = 0;
+
+/* Check the supplied pointer is not NULL. */
+   if( !this_object ) return result;
+
+/* Obtain a pointers to the Plot structure. */
+   this = (AstPlot *) this_object;
+
+/* Invoke the astManageLock method on any Objects contained within
+   the supplied Object. */
+   if( !result ) result = astManageLock( this->grfcontext, mode, extra );
+   if( !result ) result = astManageLock( this->grfcontextID, mode, extra );
+
+/* Invoke the ManageLock method inherited from the parent class, and
+   return the resulting status value. */
+   if( !result ) result = (*parent_managelock)( this_object, mode, extra, status );
+   return result;
+
+}
+#endif
+
 static void Map1( int n, double *dist, double *x, double *y, 
-                  const char *method, const char *class  ){
+                  const char *method, const char *class, 
+                  int *status GLOBALS_ARG ){
 /*
 *  Name:
 *     Map1
@@ -19891,7 +20550,8 @@ static void Map1( int n, double *dist, double *x, double *y,
 *  Synopsis:
 *     #include "plot.h"
 *     void Map1( int n, double *dist, double *x, double *y,
-*                const char *method, const char *class )
+*                const char *method, const char *class, 
+*                int *status [,AstGlobals *AST__GLOBALS] )
 
 *  Class Membership:
 *     Plot member function.
@@ -19925,6 +20585,16 @@ static void Map1( int n, double *dist, double *x, double *y,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
+*     AST__GLOBALS
+*        Only present if compiled with -DTHREAD_SAFE. It is a pointer to
+*        the structure holding the global data for the executing thread.
+*        It is passed as a function parameter, rather than being accessed
+*        within this function using the astGET_GLOBALS(NULL) macro (as
+*        other Object-less functions do) in order to avoid the time
+*        overheads of calling astGET_GLOBALS(NULL) . This function is
+*        time-critical.
 
 *  External Variables:
 *     Map1_log = int (Read)
@@ -19935,6 +20605,8 @@ static void Map1( int n, double *dist, double *x, double *y,
 *     Map1_axis = int (Read)
 *        The zero-based index of the axis which the curve follows (i.e.
 *        the axis which changes value along the curve).
+*     Map1_statics = Map1Statics * (Read and Write)
+*        Pointer to a structure holding other static data used by Map1.
 *     Map1_origin = const double * (Read)
 *        A pointer to an array holding the physical coordinate value on 
 *        each axis at the start of the curve (i.e. at dist = 0.0).
@@ -19967,69 +20639,81 @@ static void Map1( int n, double *dist, double *x, double *y,
 */
 
 /* Local Constants: */
-   double *p;                        /* Pointer to next value */
-   double axval;                     /* Axis origin value */
-   int i, j;                         /* Loop counts */
-   static AstPointSet *pset1 = NULL; /* PointSet holding physical coords */
-   static AstPointSet *pset2 = NULL; /* PointSet holding graphics coords */
-   static double **ptr1 = NULL;      /* Pointer to physical coord data */
-   static double *pax = NULL;        /* Pointer to start of axis data */
-   static double *ptr2[ 2 ] = {NULL,NULL}; /* Pointers to graphics coord data */
-   static double *work1 = NULL;      /* Pointer to work space */
-   static double *work2 = NULL;      /* Pointer to work space */
-   static double axorig;             /* Distance offset */
-   static double axscale;            /* Distance scale */
-   static int neg;                   /* Negate axis values? */
-   static int nl = 0;                /* No. of points in pset1 and pset2 */
+   Map1Statics *statics;     /* Pointer to structure holding static data */
+   double *p;                /* Pointer to next value */
+   double axval;             /* Axis origin value */
+   int i, j;                 /* Loop counts */
 
-/* If zero points were supplied, release any PointSets and work space which 
-   have been used and return. */
+/* Convert the global "void *" pointer to a Map1Statics pointer */
+   statics = (Map1Statics *) Map1_statics;
+
+/* If zero points were supplied, release static resources and return. */
    if( n == 0 ){
-      nl = 0;       
-      if( pset1 ) pset1 = astAnnul( pset1 );
-      if( pset2 ) pset2 = astAnnul( pset2 );
-      if( work1 ) work1 = (double *) astFree( (void *) work1 );
-      if( work2 ) work2 = (double *) astFree( (void *) work2 );
+      if( statics ) {
+         if( statics->pset1 ) statics->pset1 = astAnnul( statics->pset1 );
+         if( statics->pset2 ) statics->pset2 = astAnnul( statics->pset2 );
+         if( statics->work1 ) statics->work1 = (double *) astFree( (void *) statics->work1 );
+         if( statics->work2 ) statics->work2 = (double *) astFree( (void *) statics->work2 );
+         Map1_statics = astFree( statics );
+      }
       return;
    }
    
 /* Otherwise, check the inherited global status. */
    if( !astOK ) return;
 
+/* Create and initialise a structure to hold extra static information if 
+   this has not already been done. */
+   if( !statics ) {
+      statics = astMalloc( sizeof( Map1Statics ) );
+      if( statics ) {    
+         statics->pset1 = NULL; 
+         statics->pset2 = NULL; 
+         statics->ptr1 = NULL;  
+         statics->pax = NULL;   
+         statics->ptr2[ 0 ] = NULL; 
+         statics->ptr2[ 1 ] = NULL; 
+         statics->work1 = NULL; 
+         statics->work2 = NULL; 
+         statics->nl = 0;       
+         Map1_statics = statics;
+      }
+   }
+
 /* If the number of points to be mapped is different to last time, 
    set up some PointSets to store the specified number of points. */
-   if( n != nl ){
-      nl = n;
+   if( n != statics->nl ){
+      statics->nl = n;
 
 /* Create a PointSet to hold the physical coordinates corresponding to
    the supplied offsets. First annul any existing PointSet. */
-      if( pset1 ) pset1 = astAnnul( pset1 );
-      pset1 = astPointSet( n, Map1_ncoord, "" );   
-      ptr1 = astGetPoints( pset1 );
+      if( statics->pset1 ) statics->pset1 = astAnnul( statics->pset1 );
+      statics->pset1 = astPointSet( n, Map1_ncoord, "", status );   
+      statics->ptr1 = astGetPoints( statics->pset1 );
 
 /* Create a PointSet to hold the corresponding graphics coordinates. 
    The supplied "x" and "y" arrays will be used to store the data 
    so we do not need to get pointers to the data using astGetPoints. First 
    annul any existing PointSet. */
-      if( pset2 ) pset2 = astAnnul( pset2 );
-      pset2 = astPointSet( n, 2, "" );   
+      if( statics->pset2 ) statics->pset2 = astAnnul( statics->pset2 );
+      statics->pset2 = astPointSet( n, 2, "", status );   
 
 /* Get work space to hold two positions. */
-      work1 = (double *) astMalloc( sizeof(double)*(size_t)Map1_ncoord );
-      work2 = (double *) astMalloc( sizeof(double)*(size_t)Map1_ncoord );
+      statics->work1 = (double *) astMalloc( sizeof(double)*(size_t)Map1_ncoord );
+      statics->work2 = (double *) astMalloc( sizeof(double)*(size_t)Map1_ncoord );
 
 /* Check the pointer can be used. */
       if( astOK ){
 
 /* Store a pointer to the start of the memory which will be used to store 
    the physical data for the axis being drawn. */
-         pax = ptr1[ Map1_axis ]; 
+         statics->pax = statics->ptr1[ Map1_axis ]; 
          
 /* Fill the PointSet which is used to hold physical data with the physical 
    coordinates at the start of the curve. */
          for( i = 0; i < Map1_ncoord; i++ ){
             axval = Map1_origin[ i ];
-            p = ptr1[ i ];
+            p = statics->ptr1[ i ];
             for( j = 0; j < n; j++ ) *(p++) = axval;
          }           
 
@@ -20038,13 +20722,13 @@ static void Map1( int n, double *dist, double *x, double *y,
    If Map1_log is non-zero (log axes) then applying these values gives
    log10( axis value). */
          if( Map1_log ) {
-            neg = ( Map1_origin[ Map1_axis ] < 0 );
-            axorig = log10( fabs( Map1_origin[ Map1_axis ] ) );
-            axscale = log10( fabs( Map1_origin[ Map1_axis ] + 
-                                   Map1_length ) ) - axorig;
+            statics->neg = ( Map1_origin[ Map1_axis ] < 0 );
+            statics->axorig = log10( fabs( Map1_origin[ Map1_axis ] ) );
+            statics->axscale = log10( fabs( Map1_origin[ Map1_axis ] + 
+                                   Map1_length ) ) - statics->axorig;
          } else {
-            axorig = Map1_origin[ Map1_axis ];
-            axscale = Map1_length;
+            statics->axorig = Map1_origin[ Map1_axis ];
+            statics->axscale = Map1_length;
          }
        }
     }
@@ -20054,24 +20738,24 @@ static void Map1( int n, double *dist, double *x, double *y,
 
 /* Loop round each offset along the curve, converting the normalised offset 
    in the range [0,1] to a physical coordinate and storing in PointSet 1. */
-      p = pax;
+      p = statics->pax;
       for( i = 0; i < n; i++){
-         *(p++) = axorig + axscale*dist[ i ];
+         *(p++) = statics->axorig + statics->axscale*dist[ i ];
       }
       if( Map1_log ) {
-         p = pax;
+         p = statics->pax;
          for( i = 0; i < n; i++,p++ ){
-            *p = neg ? -pow( 10.0, *p ) : pow( 10.0, *p );
+            *p = statics->neg ? -pow( 10.0, *p ) : pow( 10.0, *p );
          }
       }
 
 /* Store pointers to the results arrays in PointSet 2. */
-      ptr2[ 0 ] = x;
-      ptr2[ 1 ] = y;   
-      astSetPoints( pset2, ptr2 );
+      statics->ptr2[ 0 ] = x;
+      statics->ptr2[ 1 ] = y;   
+      astSetPoints( statics->pset2, statics->ptr2 );
 
 /* Map all the positions into graphics coordinates. */
-      (void) Trans( Map1_plot, NULL, Map1_map, pset1, 0, pset2, 1, method, class );
+      (void) Trans( Map1_plot, NULL, Map1_map, statics->pset1, 0, statics->pset2, 1, method, class, status );
 
 /* If points not in their normal ranges are to be set bad... */
       if( Map1_norm ) { 
@@ -20079,12 +20763,12 @@ static void Map1( int n, double *dist, double *x, double *y,
 /* The following code simply normalizes the physical position, and if this
    produces any change, the graphics positions are set bad. */
          for( i = 0; i < n; i++){
-            for( j = 0; j < Map1_ncoord; j++) work1[j] = ptr1[j][i];
-            astNorm( Map1_frame, work1 );
+            for( j = 0; j < Map1_ncoord; j++) statics->work1[j] = statics->ptr1[j][i];
+            astNorm( Map1_frame, statics->work1 );
             for( j = 0; j < Map1_ncoord; j++) {
-               if( !EQUAL( work1[j], ptr1[j][i] ) ) {
-                  ptr2[0][i] = AST__BAD;
-                  ptr2[1][i] = AST__BAD;
+               if( !EQUAL( statics->work1[j], statics->ptr1[j][i] ) ) {
+                  statics->ptr2[0][i] = AST__BAD;
+                  statics->ptr2[1][i] = AST__BAD;
                   break;
                }
             }
@@ -20098,7 +20782,8 @@ static void Map1( int n, double *dist, double *x, double *y,
 }
 
 static void Map2( int n, double *dist, double *x, double *y, 
-                  const char *method, const char *class ){
+                  const char *method, const char *class, 
+                  int *status GLOBALS_ARG ){
 /*
 *  Name:
 *     Map2
@@ -20113,7 +20798,8 @@ static void Map2( int n, double *dist, double *x, double *y,
 *  Synopsis:
 *     #include "plot.h"
 *     void Map2( int n, double *dist, double *x, double *y, 
-*                const char *method, const char *class )
+*                const char *method, const char *class, 
+*                int *status [,AstGlobals *AST__GLOBALS] )
 
 *  Class Membership:
 *     Plot member function.
@@ -20150,6 +20836,16 @@ static void Map2( int n, double *dist, double *x, double *y,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
+*     AST__GLOBALS
+*        Only present if compiled with -DTHREAD_SAFE. It is a pointer to
+*        the structure holding the global data for the executing thread.
+*        It is passed as a function parameter, rather than being accessed
+*        within this function using the astGET_GLOBALS(NULL) macro (as
+*        other Object-less functions do) in order to avoid the time
+*        overheads of calling astGET_GLOBALS(NULL) . This function is
+*        time-critical.
 
 *  External Variables:
 *     Map2_ncoord = int (Read)
@@ -20172,6 +20868,8 @@ static void Map2( int n, double *dist, double *x, double *y,
 *     Map2_map = AstMapping * (Read)
 *        A pointer to the mapping from graphics cordinates to physical 
 *        coordinates, extracted from the Plot.
+*     Map2_statics = Map2Statics * (Read and Write)
+*        Pointer to a structure holding other static data used by Map2.
 
 *  Notes:
 *     -  On the first call, this function allocates static resources which 
@@ -20185,44 +20883,59 @@ static void Map2( int n, double *dist, double *x, double *y,
 
 */
 /* Local Constants: */
-   static AstPointSet *pset1=NULL; /* PointSet holding graphics coords */
-   static AstPointSet *pset2=NULL; /* PointSet holding physical coords */
-   static double **ptr2=NULL;      /* Pointer to physical coord data */
-   static double *ptr1[ 2 ]={NULL,NULL}; /* Pointers to graphics coord data */
-   static int nl=0;                /* No. of points in pset1 and pset2 */
+   Map2Statics *statics;           /* Pointer to structure holding static data */
    int i, j;                       /* Loop counts */
    double *p;                      /* Pointer to next physical value */
    double *px;                     /* Pointer to next x graphics value */
    double *py;                     /* Pointer to next y graphics value */
 
-/* If zero points were supplied, release any PointSets which have
-   been created and return. */
+/* Convert the global "void *" pointer to a Map2Statics pointer */
+   statics = (Map2Statics *) Map2_statics;
+
+/* If zero points were supplied, release static resources and return. */
    if( n == 0 ){
-      nl = 0;       
-      if( pset1 ) pset1 = astAnnul( pset1 );
-      if( pset2 ) pset2 = astAnnul( pset2 );
+      if( statics ) {
+         if( statics->pset1 ) statics->pset1 = astAnnul( statics->pset1 );
+         if( statics->pset2 ) statics->pset2 = astAnnul( statics->pset2 );
+         Map2_statics = astFree( statics );
+      }
       return;
    }
    
 /* Otherwise, check the inherited global status. */
    if( !astOK ) return;
 
+/* Create and initialise a structure to hold extra static information if 
+   this has not already been done. */
+   if( !statics ) {
+      statics = astMalloc( sizeof( Map2Statics ) );
+      if( statics ) {    
+         statics->pset1 = NULL; 
+         statics->pset2 = NULL; 
+         statics->ptr2 = NULL;  
+         statics->ptr1[ 0 ] = NULL; 
+         statics->ptr1[ 1 ] = NULL; 
+         statics->nl = 0;       
+         Map2_statics = statics;
+      }
+   }
+
 /* If the number of points to be mapped is different to last time, 
    set up some PointSets to store the specified number of points. */
-   if( n != nl ){
-      nl = n;
+   if( n != statics->nl ){
+      statics->nl = n;
 
 /* Create a PointSet to hold the graphics coordinates corresponding to
    the supplied offsets. The supplied arrays will be used to hold the
    data for this PointSet, and so astGetPoints is not called. */
-      if( pset1 ) pset1 = astAnnul( pset1 );
-      pset1 = astPointSet( n, 2, "" );   
+      if( statics->pset1 ) statics->pset1 = astAnnul( statics->pset1 );
+      statics->pset1 = astPointSet( n, 2, "", status );   
 
 /* Create a PointSet to hold the corresponding physical coordinates, and
    get pointers to the associated axis values. */
-      if( pset2 ) pset2 = astAnnul( pset2 );
-      pset2 = astPointSet( n, Map2_ncoord, "" );   
-      ptr2 = astGetPoints( pset2 );
+      if( statics->pset2 ) statics->pset2 = astAnnul( statics->pset2 );
+      statics->pset2 = astPointSet( n, Map2_ncoord, "", status );   
+      statics->ptr2 = astGetPoints( statics->pset2 );
     }
 
 
@@ -20230,9 +20943,9 @@ static void Map2( int n, double *dist, double *x, double *y,
    if( astOK ){
 
 /* Store pointers to the results arrays in PointSet 1. */
-      ptr1[ 0 ] = x;
-      ptr1[ 1 ] = y;   
-      astSetPoints( pset1, ptr1 );
+      statics->ptr1[ 0 ] = x;
+      statics->ptr1[ 1 ] = y;   
+      astSetPoints( statics->pset1, statics->ptr1 );
 
 /* Loop round each offset along the curve, converting the normalised offset 
       in the range [0,1] to graphics coordinate and storing in PointSet 1. */
@@ -20244,12 +20957,12 @@ static void Map2( int n, double *dist, double *x, double *y,
       }
 
 /* Map all the positions into physical coordinates. */
-      (void) Trans( Map2_plot, NULL, Map2_map, pset1, 1, pset2, 0, method, class );
+      (void) Trans( Map2_plot, NULL, Map2_map, statics->pset1, 1, statics->pset2, 0, method, class, status );
 
 /* Check the physical coordinates for bad values, setting the corresponding
    graphics coordinates bad. */
       for( j = 0; j < Map2_ncoord; j++ ){
-         p = ptr2[ j ];   
+         p = statics->ptr2[ j ];   
          px = x;
          py = y;
    
@@ -20271,7 +20984,8 @@ static void Map2( int n, double *dist, double *x, double *y,
 }
 
 static void Map3( int n, double *dist, double *x, double *y, 
-                  const char *method, const char *class  ){
+                  const char *method, const char *class,
+                  int *status GLOBALS_ARG ){
 /*
 *  Name:
 *     Map3
@@ -20286,7 +21000,8 @@ static void Map3( int n, double *dist, double *x, double *y,
 *  Synopsis:
 *     #include "plot.h"
 *     void Map3( int n, double *dist, double *x, double *y,
-*                const char *method, const char *class )
+*                const char *method, const char *class, 
+*                int *status [,AstGlobals *AST__GLOBALS] )
 
 *  Class Membership:
 *     Plot member function.
@@ -20318,6 +21033,16 @@ static void Map3( int n, double *dist, double *x, double *y,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
+*     AST__GLOBALS
+*        Only present if compiled with -DTHREAD_SAFE. It is a pointer to
+*        the structure holding the global data for the executing thread.
+*        It is passed as a function parameter, rather than being accessed
+*        within this function using the astGET_GLOBALS(NULL) macro (as
+*        other Object-less functions do) in order to avoid the time
+*        overheads of calling astGET_GLOBALS(NULL) . This function is
+*        time-critical.
 
 *  External Variables:
 *     Map3_ncoord = int (Read)
@@ -20331,6 +21056,8 @@ static void Map3( int n, double *dist, double *x, double *y,
 *     Map3_scale = double (Read)
 *        The scale factor to convert "dist" values into physical offsets 
 *        along the geodesic curve.
+*     Map3_statics = Map3Statics * (Read and Write)
+*        Pointer to a structure holding other static data used by Map3.
 *     Map3_plot = AstPlot * (Read)
 *        A pointer to the Plot defining the mapping from graphics cordinates
 *        to physical coordinates.
@@ -20353,54 +21080,68 @@ static void Map3( int n, double *dist, double *x, double *y,
 */
 
 /* Local Constants: */
-   static AstPointSet *pset1 = NULL; /* PointSet holding physical coords */
-   static AstPointSet *pset2 = NULL; /* PointSet holding graphics coords */
-   static double **ptr1 = NULL;      /* Pointer to physical coord data */
-   static double *ptr2[ 2 ] = {NULL,NULL}; /* Pointers to graphics coord data */
-   static int nc = 0;                /* No. of physical axes */
-   static int nl = 0;                /* No. of points in pset1 and pset2 */
-   static double *pos = NULL;        /* Pointer to memory for a single position */
+   Map3Statics *statics;             /* Pointer to structure holding static data */
    int i, j;                         /* Loop counts */
 
-/* If zero points were supplied, release any PointSets which have
-   been created and return. */
+/* Convert the global "void *" pointer to a Map3Statics pointer */
+   statics = (Map3Statics *) Map3_statics;
+
+/* If zero points were supplied, release static resources and return. */
    if( n == 0 ){
-      nl = 0;       
-      nc = 0;
-      if( pset1 ) pset1 = astAnnul( pset1 );
-      if( pset2 ) pset2 = astAnnul( pset2 );
-      if( pos ) pos = (double *) astFree( (void *) pos );
+      if( statics ) {
+         if( statics->pset1 ) statics->pset1 = astAnnul( statics->pset1 );
+         if( statics->pset2 ) statics->pset2 = astAnnul( statics->pset2 );
+         if( statics->pos ) statics->pos = (double *) astFree( (void *) statics->pos );
+         Map3_statics = astFree( statics );
+      }
       return;
    }
    
 /* Otherwise, check the inherited global status. */
    if( !astOK ) return;
 
+/* Create and initialise a structure to hold extra static information if 
+   this has not already been done. */
+   if( !statics ) {
+      statics = astMalloc( sizeof( Map3Statics ) );
+      if( statics ) {    
+         statics->pset1 = NULL;
+         statics->pset2 = NULL;
+         statics->ptr1 = NULL; 
+         statics->ptr2[ 0 ] = NULL;
+         statics->ptr2[ 1 ] = NULL;
+         statics->nc = 0;      
+         statics->nl = 0;      
+         statics->pos = NULL;  
+         Map3_statics = statics;
+      }
+   }
+
 /* If the number of points to be mapped is different to last time, 
    set up some PointSets to store the specified number of points. */
-   if( n != nl ){
-      nl = n;
+   if( n != statics->nl ){
+      statics->nl = n;
 
 /* Create a PointSet to hold the physical coordinates corresponding to
    the supplied offsets. First annul any existing PointSet. */
-      if( pset1 ) pset1 = astAnnul( pset1 );
-      pset1 = astPointSet( n, Map3_ncoord, "" );   
-      ptr1 = astGetPoints( pset1 );
+      if( statics->pset1 ) statics->pset1 = astAnnul( statics->pset1 );
+      statics->pset1 = astPointSet( n, Map3_ncoord, "", status );   
+      statics->ptr1 = astGetPoints( statics->pset1 );
 
 /* Create a PointSet to hold the corresponding graphics coordinates. 
    The supplied "x" and "y" arrays will be used to store the data 
    so we do not need to get pointers to the data using astGetPoints. First 
    annul any existing PointSet. */
-      if( pset2 ) pset2 = astAnnul( pset2 );
-      pset2 = astPointSet( n, 2, "" );   
+      if( statics->pset2 ) statics->pset2 = astAnnul( statics->pset2 );
+      statics->pset2 = astPointSet( n, 2, "", status );   
 
    }
 
 /* If the number of physical axes is different to last time,  allocate
    memory to hold a single physical position. */
-   if( nc != Map3_ncoord ){
-      nc = Map3_ncoord;
-      pos = (double *) astMalloc( sizeof(double)*(size_t)Map3_ncoord );
+   if( statics->nc != Map3_ncoord ){
+      statics->nc = Map3_ncoord;
+      statics->pos = (double *) astMalloc( sizeof(double)*(size_t)Map3_ncoord );
    }
 
 /* Check the initialisation went OK (if done). */
@@ -20411,21 +21152,21 @@ static void Map3( int n, double *dist, double *x, double *y,
    position, and store in PointSet 1. */
       for( i = 0; i < n; i++){
          astOffset( Map3_frame, Map3_origin, Map3_end, Map3_scale*dist[ i ],
-                    pos );
+                    statics->pos );
 
          for( j = 0; j < Map3_ncoord; j++ ){
-            ptr1[ j ][ i ] = pos[ j ];
+            statics->ptr1[ j ][ i ] = statics->pos[ j ];
          }
 
       }
 
 /* Store pointers to the results arrays in PointSet 2. */
-      ptr2[ 0 ] = x;
-      ptr2[ 1 ] = y;   
-      astSetPoints( pset2, ptr2 );
+      statics->ptr2[ 0 ] = x;
+      statics->ptr2[ 1 ] = y;   
+      astSetPoints( statics->pset2, statics->ptr2 );
 
 /* Map all the positions into graphics coordinates. */
-      (void) Trans( Map3_plot, NULL, Map3_map, pset1, 0, pset2, 1, method, class );
+      (void) Trans( Map3_plot, NULL, Map3_map, statics->pset1, 0, statics->pset2, 1, method, class, status );
    }
    
 /* Return. */
@@ -20434,7 +21175,8 @@ static void Map3( int n, double *dist, double *x, double *y,
 }
 
 static void Map4( int n, double *dist, double *x, double *y, 
-                  const char *method, const char *class  ){
+                  const char *method, const char *class, 
+                  int *status GLOBALS_ARG ){
 /*
 *  Name:
 *     Map4
@@ -20449,7 +21191,8 @@ static void Map4( int n, double *dist, double *x, double *y,
 *  Synopsis:
 *     #include "plot.h"
 *     void Map4( int n, double *dist, double *x, double *y,
-*                const char *method, const char *class )
+*                const char *method, const char *class, 
+*                int *status [,AstGlobals *AST__GLOBALS] )
 
 *  Class Membership:
 *     Plot member function.
@@ -20480,6 +21223,16 @@ static void Map4( int n, double *dist, double *x, double *y,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
+*     AST__GLOBALS
+*        Only present if compiled with -DTHREAD_SAFE. It is a pointer to
+*        the structure holding the global data for the executing thread.
+*        It is passed as a function parameter, rather than being accessed
+*        within this function using the astGET_GLOBALS(NULL) macro (as
+*        other Object-less functions do) in order to avoid the time
+*        overheads of calling astGET_GLOBALS(NULL) . This function is
+*        time-critical.
 
 *  External Variables:
 *     Map4_ncoord = int (Read)
@@ -20490,6 +21243,8 @@ static void Map4( int n, double *dist, double *x, double *y,
 *     Map4_map = AstMapping * (Read)
 *        A pointer to the mapping from graphics cordinates to physical 
 *        coordinates extracted from the Plot.
+*     Map4_statics = Map4Statics * (Read and Write)
+*        Pointer to a structure holding other static data used by Map4.
 *     Map4_umap = AstMapping * (Read)
 *        A pointer to the mapping from distance along the curve to physical 
 *        coordinates.
@@ -20507,45 +21262,59 @@ static void Map4( int n, double *dist, double *x, double *y,
 */
 
 /* Local Variables: */
+   Map4Statics *statics;             /* Pointer to structure holding static data */
    double *ptr1[ 1 ];                /* Pointer to distances data */
    double *ptr3[ 2 ];                /* Pointers to graphics coord data */
-   static AstPointSet *pset1 = NULL; /* PointSet holding distances */
-   static AstPointSet *pset2 = NULL; /* PointSet holding physical coords */
-   static AstPointSet *pset3 = NULL; /* PointSet holding graphics coords */
-   static int nl = 0;                /* No. of points in pset1 and pset2 */
 
-/* If zero points were supplied, release any PointSets which have
-   been created and return. */
+/* Convert the global "void *" pointer to a Map4Statics pointer */
+   statics = (Map4Statics *) Map4_statics;
+
+/* If zero points were supplied, release static resources and return. */
    if( n == 0 ){
-      nl = 0;       
-      if( pset1 ) pset1 = astAnnul( pset1 );
-      if( pset2 ) pset2 = astAnnul( pset2 );
-      if( pset3 ) pset3 = astAnnul( pset3 );
+      if( statics ) {
+         if( statics->pset1 ) statics->pset1 = astAnnul( statics->pset1 );
+         if( statics->pset2 ) statics->pset2 = astAnnul( statics->pset2 );
+         if( statics->pset3 ) statics->pset3 = astAnnul( statics->pset3 );
+         Map4_statics = astFree( statics );
+      }
       return;
    }
    
 /* Otherwise, check the inherited global status. */
    if( !astOK ) return;
 
+/* Create and initialise a structure to hold extra static information if 
+   this has not already been done. */
+   if( !statics ) {
+      statics = astMalloc( sizeof( Map4Statics ) );
+      if( statics ) {    
+         statics->pset1 = NULL; 
+         statics->pset2 = NULL; 
+         statics->pset3 = NULL; 
+         statics->nl = 0;       
+         Map4_statics = statics;
+      }
+   }
+
 /* If the number of points to be mapped is different to last time, 
    set up some PointSets to store the specified number of points. */
-   if( n != nl ){
-      nl = n;
+   if( n != statics->nl ){
+      statics->nl = n;
 
 /* Create a PointSet to hold the distances along the curve. First annul any 
    existing PointSet. */
-      if( pset1 ) pset1 = astAnnul( pset1 );
-      pset1 = astPointSet( n, 1, "" );   
+      if( statics->pset1 ) statics->pset1 = astAnnul( statics->pset1 );
+      statics->pset1 = astPointSet( n, 1, "", status );   
 
 /* Create a PointSet to hold the physical coordinates corresponding to
    the supplied distances. First annul any existing PointSet. */
-      if( pset2 ) pset2 = astAnnul( pset2 );
-      pset2 = astPointSet( n, Map4_ncoord, "" );   
+      if( statics->pset2 ) statics->pset2 = astAnnul( statics->pset2 );
+      statics->pset2 = astPointSet( n, Map4_ncoord, "", status );   
 
 /* Create a PointSet to hold the corresponding graphics coordinates. 
    First annul any existing PointSet. */
-      if( pset3 ) pset3 = astAnnul( pset3 );
-      pset3 = astPointSet( n, 2, "" );   
+      if( statics->pset3 ) statics->pset3 = astAnnul( statics->pset3 );
+      statics->pset3 = astPointSet( n, 2, "", status );   
 
    }
 
@@ -20555,17 +21324,17 @@ static void Map4( int n, double *dist, double *x, double *y,
 /* Use Map4_umap to convert the supplied distances into physical coords
    (i.e. coords in the current Frame of the Plot). */
       ptr1[ 0 ] = dist;
-      astSetPoints( pset1, ptr1 );
-      (void) astTransform( Map4_umap, pset1, 1, pset2 );
+      astSetPoints( statics->pset1, ptr1 );
+      (void) astTransform( Map4_umap, statics->pset1, 1, statics->pset2 );
 
 /* Store pointers to the results arrays in PointSet 2. */
       ptr3[ 0 ] = x;
       ptr3[ 1 ] = y;   
-      astSetPoints( pset3, ptr3 );
+      astSetPoints( statics->pset3, ptr3 );
 
 /* Now transform these physical coords into graphical coords,
    incorporating clipping. */
-      (void) Trans( Map4_plot, NULL, Map4_map, pset2, 0, pset3, 1, method, class );
+      (void) Trans( Map4_plot, NULL, Map4_map, statics->pset2, 0, statics->pset3, 1, method, class, status );
    }
    
 /* Return. */
@@ -20574,7 +21343,7 @@ static void Map4( int n, double *dist, double *x, double *y,
 }
 
 static void Mark( AstPlot *this, int nmark, int ncoord, int indim, 
-                  const double *in, int type ){
+                  const double *in, int type, int *status ){
 /*
 *++
 *  Name:
@@ -20663,6 +21432,7 @@ f     - If any marker position is clipped (see AST_CLIP), then the
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
    AstMapping *mapping;    /* Pointer to graphics->physical mapping */
    AstPointSet *pset1;     /* PointSet holding physical positions */
    AstPointSet *pset2;     /* PointSet holding graphics positions */
@@ -20687,6 +21457,9 @@ f     - If any marker position is clipped (see AST_CLIP), then the
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
+
 /* Store the current method and class for inclusion in error messages
    generated by lower level functions. */
    method = "astMark";
@@ -20697,15 +21470,15 @@ f     - If any marker position is clipped (see AST_CLIP), then the
    if( naxes != 2 && astOK ){
       astError( AST__NAXIN, "%s(%s): Number of axes (%d) in the base "
                 "Frame of the supplied %s is invalid - this number should "
-                "be 2.", method, class, naxes, class );
+                "be 2.", status, method, class, naxes, class );
    } 
 
 /* Also validate the input array dimension argument. */
    if ( astOK && ( indim < nmark ) ) {
       astError( AST__DIMIN, "%s(%s): The input array dimension value "
-                "(%d) is invalid.", method, class, indim );
+                "(%d) is invalid.", status, method, class, indim );
       astError( AST__DIMIN, "This should not be less than the number of "
-                "markers being drawn (%d).", nmark );
+                "markers being drawn (%d).", status, nmark );
    }
 
 /* Initialise the bounding box for primatives produced by this call. */
@@ -20721,7 +21494,7 @@ f     - If any marker position is clipped (see AST_CLIP), then the
    astGrfAttrs( this, AST__MARKS_ID, 1, GRF__MARK, method, class );
 
 /* Create a PointSet to hold the supplied physical coordinates. */
-   pset1 = astPointSet( nmark, ncoord, "" );
+   pset1 = astPointSet( nmark, ncoord, "", status );
 
 /* Allocate memory to hold pointers to the first value on each axis. */
    ptr1 = (const double **) astMalloc( sizeof( const double * )*
@@ -20742,7 +21515,7 @@ f     - If any marker position is clipped (see AST_CLIP), then the
    coordinates) to the base frame (i.e. graphics coordinates) using 
    the inverse Mapping defined by the Plot. */
    mapping = astGetMapping( this, AST__BASE, AST__CURRENT );
-   pset2 = Trans( this, NULL, mapping, pset1, 0, NULL, 0, method, class );
+   pset2 = Trans( this, NULL, mapping, pset1, 0, NULL, 0, method, class, status );
    mapping = astAnnul( mapping );
 
 /* Get pointers to the graphics coordinates. */
@@ -20785,7 +21558,7 @@ f     - If any marker position is clipped (see AST_CLIP), then the
       }
 
 /* Draw the remaining markers. */
-      GMark( this, nn, x, y, type, method, class );
+      GMark( this, nn, x, y, type, method, class, status );
 
    }
 
@@ -20807,7 +21580,7 @@ f     - If any marker position is clipped (see AST_CLIP), then the
    return;
 }
 
-static void Mirror( AstPlot *this, int axis ){
+static void Mirror( AstPlot *this, int axis, int *status ){
 /*
 *+
 *  Name:
@@ -20850,12 +21623,12 @@ static void Mirror( AstPlot *this, int axis ){
 
    } else {
       astError( AST__INTER, "astMirror(%s): Illegal axis index (%d) "
-                "supplied (internal AST programming error).", axis );
+                "supplied (internal AST programming error).", status, axis );
    }   
 }
 
 static void Norm1( AstMapping *map, int axis, int nv, double *vals, 
-                   double refval, double width ){
+                   double refval, double width, int *status ){
 /*
 *  Name:
 *     Norm1
@@ -20869,7 +21642,7 @@ static void Norm1( AstMapping *map, int axis, int nv, double *vals,
 *  Synopsis:
 *     #include "plot.h"
 *     void Norm1( AstMapping *map, int axis, int nv, double *vals, 
-*                 double refval, double width )
+*                 double refval, double width, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -20919,6 +21692,8 @@ static void Norm1( AstMapping *map, int axis, int nv, double *vals,
 *        normalizing the values in "vals".
 *     width
 *        The range of used values for the other axis.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -20937,7 +21712,7 @@ static void Norm1( AstMapping *map, int axis, int nv, double *vals,
    if( !astOK ) return;
 
 /* Store the supplied positions in a PointSet. */
-   pset1 = astPointSet( nv, 2, "" );
+   pset1 = astPointSet( nv, 2, "", status );
    ptr1 = astGetPoints( pset1 );
    if( astOK ) {
       a = ptr1[ axis ];
@@ -21051,7 +21826,7 @@ static void Norm1( AstMapping *map, int axis, int nv, double *vals,
 
 }
 
-static void Opoly( AstPlot *this, const char *method, const char *class ){
+static void Opoly( AstPlot *this, const char *method, const char *class, int *status ){
 /*
 *  Name:
 *     Opoly
@@ -21064,7 +21839,7 @@ static void Opoly( AstPlot *this, const char *method, const char *class ){
 
 *  Synopsis:
 *     #include "plot.h"
-*     void Opoly( AstPlot *this, const char *method, const char *class )
+*     void Opoly( AstPlot *this, const char *method, const char *class, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -21079,15 +21854,22 @@ static void Opoly( AstPlot *this, const char *method, const char *class ){
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 */
+
+   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
 
 /* Check the global status. */
    if( !astOK ) return;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
+
 /* Draw the poly-line if needed. */
    if( Poly_n > 0 ) {
-      GLine( this, Poly_n, Poly_x, Poly_y, method, class );
+      GLine( this, Poly_n, Poly_x, Poly_y, method, class, status );
 
 /* Indicate that the poly-line buffer is now empty. */
       Poly_n = 0;
@@ -21096,7 +21878,7 @@ static void Opoly( AstPlot *this, const char *method, const char *class ){
 
 static int Overlap( AstPlot *this, int mode, int esc, const char *text, float x, 
                     float y, const char *just, float upx, float upy, 
-                    float **work, const char *method, const char *class  ){
+                    float **work, const char *method, const char *class, int *status ){
 /*
 *  Name:
 *     Overlap
@@ -21112,7 +21894,7 @@ static int Overlap( AstPlot *this, int mode, int esc, const char *text, float x,
 *     #include "plot.h"
 *     int Overlap( AstPlot *this, int mode, int esc, const char *text, float x, 
 *                  float y, const char *just, float upx, float upy, 
-*                  float **work, const char *method, const char *class )
+*                  float **work, const char *method, const char *class, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -21180,6 +21962,8 @@ static int Overlap( AstPlot *this, int mode, int esc, const char *text, float x,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     See parameter "mode." 
@@ -21191,6 +21975,7 @@ static int Overlap( AstPlot *this, int mode, int esc, const char *text, float x,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;    /* Pointer to thread-specific global data */
    int nbox = 0;          /* Number of boxes stored in "work" */
    int ret;               /* Does the new label overlap a previous label? */
    int i;                 /* Box index */
@@ -21198,6 +21983,9 @@ static int Overlap( AstPlot *this, int mode, int esc, const char *text, float x,
    float *cy;             /* Pointer to next corner's Y value */
    float xbn[ 4 ];        /* X coords at corners of new label's bounding box */
    float ybn[ 4 ];        /* Y coords at corners of new label's bounding box */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
 
 /* Initialise the returned value to indicate no overlap has been found. */
    ret = 0;
@@ -21240,7 +22028,7 @@ static int Overlap( AstPlot *this, int mode, int esc, const char *text, float x,
 
 /* Get the bounds of the box containing the new label. */
    DrawText( this, 0, esc, text, x, y, just, upx, upy, 
-             xbn, ybn, NULL, method, class );
+             xbn, ybn, NULL, method, class, status );
 
 /* If the bounding box was obtained succesfully... */
    if( astOK ) {
@@ -21250,7 +22038,7 @@ static int Overlap( AstPlot *this, int mode, int esc, const char *text, float x,
       cy = cx + 4;
       for( i = 0; i < nbox; i++ ){
 
-         if( BoxCheck( xbn, ybn, cx, cy ) ) {
+         if( BoxCheck( xbn, ybn, cx, cy, status ) ) {
             ret = 1;
             break;
          }
@@ -21293,7 +22081,7 @@ static int Overlap( AstPlot *this, int mode, int esc, const char *text, float x,
 
 static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis, 
                         LabelList *list, char *fmt, int nlab, float **box, 
-                        const char *method, const char *class ) {
+                        const char *method, const char *class, int *status ) {
 /*
 *
 *  Name:
@@ -21309,7 +22097,7 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
 *     #include "plot.h"
 *     void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis, 
 *                      LabelList *list, char *fmt, int nlab, float **box, 
-*                      const char *method, const char *class ) 
+*                      const char *method, const char *class, int *status ) 
 
 *  Class Membership:
 *     Plot member function.
@@ -21350,6 +22138,8 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -21398,7 +22188,7 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
 /* Get the number of bounding boxes describing the labels already drawn
    (this will be non-zero only if this is the second axis to be labelled). */
    nbox = Overlap( this, -2, 0, NULL, 0.0, 0.0, NULL, 0.0, 0.0, box, method, 
-                   class );
+                   class, status );
 
 /* Ensure the labels are sorted into increasing index order. */
    qsort( (void *) list, (size_t) nlab, sizeof(LabelList), Compare_LL );
@@ -21435,7 +22225,7 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
    ll = list - 1;
    for( i = 0; i < nlab; i++ ) {
       ll++;
-      FindDPTZ( frame, axis, fmt, ll->text, &dp, &nz );
+      FindDPTZ( frame, axis, fmt, ll->text, &dp, &nz, status );
       if( dp > mxdp ) mxdp = dp;
    }
 
@@ -21465,7 +22255,7 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
 
 /* Find the number of decimal places and the number of trailing zeros in
    this label. Note if a non-zero digit was found in the label. */
-         found = FindDPTZ( frame, axis, fmt, text, &dp, &nz );
+         found = FindDPTZ( frame, axis, fmt, text, &dp, &nz, status );
 
 /* Add on some extra trailing zeros to make the number of decimal places
    up to the maximum value. */
@@ -21504,11 +22294,11 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
 
                if( axis == 0 || !Overlap( this, -1, esc, 
                                           SplitValue( this, ll->text,
-                                                      axis, &split ), 
+                                                      axis, &split, status ), 
                                           (float) ll->x, (float) ll->y, 
                                           ll->just, (float) ll->upx, 
                                           (float) ll->upy, box, method, 
-                                          class ) ) {
+                                          class, status ) ) {
                   root = i;
                   rootoff = abs( i - lab0 );
 
@@ -21519,7 +22309,7 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
 
 /* Reset the list of bounding boxes to exclude any box added above. */
                Overlap( this, nbox, esc, NULL, 0.0, 0.0, NULL, 0.0, 0.0, box, 
-                        method, class );
+                        method, class, status );
 
             }
          }
@@ -21665,9 +22455,9 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
       nleft = 1;
       ll = list + root;
       olap = Overlap( this, -1, esc, 
-                      SplitValue( this, ll->atext, axis, &split ), 
+                      SplitValue( this, ll->atext, axis, &split, status ), 
                       (float) ll->x, (float) ll->y, ll->just, (float) ll->upx, 
-                      (float) ll->upy, box, method, class );
+                      (float) ll->upy, box, method, class, status );
 
 /* Now look for labels which would overlap. First, check labels above the root 
    label. Do not count overlaps where the two abbreviated labels have the same text. */
@@ -21678,10 +22468,10 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
          if( ll->priority >= 0 ) {
             if( strcmp( ll->atext, latext ) ) {
                if( Overlap( this, -1, esc, 
-                            SplitValue( this, ll->atext, axis, &split ),
+                            SplitValue( this, ll->atext, axis, &split, status ),
                             (float) ll->x, (float) ll->y, ll->just, 
                             (float) ll->upx, (float) ll->upy, box, method, 
-                            class ) ){
+                            class, status ) ){
                   olap++;
                } else {
                   nleft++;
@@ -21699,10 +22489,10 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
          if( ll->priority >= 0 ) {
             if( strcmp( ll->atext, latext ) ) {
                if( Overlap( this, -1, esc, 
-                            SplitValue( this, ll->atext, axis, &split ),
+                            SplitValue( this, ll->atext, axis, &split, status ),
                             (float) ll->x, (float) ll->y, ll->just, 
                             (float) ll->upx, (float) ll->upy, box, method, 
-                            class ) ){
+                            class, status ) ){
                   olap++;
                } else {
                   nleft++;
@@ -21764,7 +22554,7 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
 
 /* Rest the list of bounding boxes to exclude the boxes added above. */
       Overlap( this, nbox, esc, NULL, 0.0, 0.0, NULL, 0.0, 0.0, box, method, 
-               class );
+               class, status );
    }
  
 /* We can now draw the abbreviated labels (ignoring rejected labels). */
@@ -21777,24 +22567,24 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
    axes (we know from the above processing that it will not overlap any
    other label on the current axis). */
          if( !Overlap( this, -1, esc, 
-                       SplitValue( this, ll->atext, axis, &split ), 
+                       SplitValue( this, ll->atext, axis, &split, status ), 
                        (float) ll->x, (float) ll->y, ll->just, (float) ll->upx,
-                       (float) ll->upy, box, method, class ) ) {
+                       (float) ll->upy, box, method, class, status ) ) {
 
 /* Draw the abbreviated label text, and get the bounds of the box containing 
    the new label, splitting long formatted values (such as produced by 
    TimeFrames) into two lines. */
             DrawText( this, 1, esc, 
-                      SplitValue( this, ll->atext, axis, &split ), 
+                      SplitValue( this, ll->atext, axis, &split, status ), 
                       (float) ll->x, (float) ll->y, ll->just, (float) ll->upx, 
-                      (float) ll->upy, xbn, ybn, NULL, method, class );
+                      (float) ll->upy, xbn, ybn, NULL, method, class, status );
          }
       }
    }
 }
 
 static void PolyCurve( AstPlot *this, int npoint, int ncoord, int indim, 
-                       const double *in ){
+                       const double *in, int *status ){
 /*
 *++
 *  Name:
@@ -21886,6 +22676,7 @@ f        The global status.
 *--
 */
 /* Local Variables: */
+   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
    const char *class;      /* Object class */
    const char *method;     /* Current method */
    const double **in_ptr;  /* Pointer to array of data pointers */
@@ -21903,6 +22694,9 @@ f        The global status.
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
+
 /* Store the current method, and the class of the supplied object for use 
    in error messages.*/
    method = "astPolyCurve";
@@ -21913,7 +22707,7 @@ f        The global status.
    if( naxes != 2 && astOK ){
       astError( AST__NAXIN, "%s(%s): Number of axes (%d) in the base "
                 "Frame of the supplied %s is invalid - this number should "
-                "be 2.", method, class, naxes, class );
+                "be 2.", status, method, class, naxes, class );
    } 
 
 /* Initialise the bounding box for primatives produced by this call. */
@@ -21929,16 +22723,16 @@ f        The global status.
    if( naxes != ncoord && astOK ){
       astError( AST__NAXIN, "%s(%s): Number of axes (%d) in the current "
                 "Frame of the supplied %s is invalid - this number should "
-                "be %d (possible programming error).", method, class, naxes,
+                "be %d (possible programming error).", status, method, class, naxes,
                 class, ncoord );
    } 
 
 /* Check the array dimension argument. */
    if ( astOK && ( indim < npoint ) ) {
       astError( AST__DIMIN, "%s(%s): The array dimension value "
-                "(%d) is invalid.", method, class, indim );
+                "(%d) is invalid.", status, method, class, indim );
       astError( AST__DIMIN, "This should not be less than the number of "
-                "points being drawn (%d).", npoint );
+                "points being drawn (%d).", status, npoint );
    }
 
 /* Allocate memory to hold the array of data pointers, the start position,
@@ -22046,10 +22840,10 @@ f        The global status.
 
 /* Map the evenly spread distances between "start" and "finish" into graphics 
    coordinates. */
-               Map3( CRV_NPNT, d, x, y, method, class );
+               Map3( CRV_NPNT, d, x, y, method, class, status GLOBALS_NAME );
 
 /* Use Crv and Map3 to draw the curve segment. */
-               Crv( this, d, x, y, 0, NULL, method, class );
+               Crv( this, d, x, y, 0, NULL, NULL, method, class, status );
 
 /* If no part of the curve could be drawn, set the number of breaks and the 
    length of the drawn curve to zero. */
@@ -22061,9 +22855,9 @@ f        The global status.
    the last point to be plotted. */
                } else {
                   Crv_nbrk++;
-                  if( Crv_nbrk > CRV_MXBRK ){
+                  if( Crv_nbrk > AST__PLOT_CRV_MXBRK ){
                      astError( AST__CVBRK, "%s(%s): Number of breaks in curve "
-                               "exceeds %d.", method, class, CRV_MXBRK );
+                               "exceeds %d.", status, method, class, AST__PLOT_CRV_MXBRK );
                   } else {
                      *(Crv_xbrk++) = (float) Crv_xl;
                      *(Crv_ybrk++) = (float) Crv_yl;
@@ -22077,15 +22871,15 @@ f        The global status.
                Curve_data.length = Crv_len;
                Curve_data.out = Crv_out;
                Curve_data.nbrk = Crv_nbrk;
-               PurgeCdata( &Curve_data );
+               PurgeCdata( &Curve_data, status );
             }
          }
 
 /* End the last poly line. */
-         Opoly( this, method, class );
+         Opoly( this, method, class, status );
 
 /* Tidy up the static data used by Map3. */
-         Map3( 0, NULL, NULL, NULL, method, class );
+         Map3( 0, NULL, NULL, NULL, method, class, status GLOBALS_NAME );
 
 /* Re-establish the original graphical attributes. */
          astGrfAttrs( this, AST__CURVE_ID, 0, GRF__LINE, method, class );
@@ -22108,7 +22902,7 @@ f        The global status.
 }
 
 static int PopGat( AstPlot *this, float *rise, const char *method, 
-                   const char *class  ) {
+                   const char *class, int *status ) {
 /*
 *  Name:
 *     PopGat
@@ -22122,7 +22916,7 @@ static int PopGat( AstPlot *this, float *rise, const char *method,
 *  Synopsis:
 *     #include "plot.h"
 *     int PopGat( AstPlot *this, float *rise, const char *method, 
-*                 const char *class )
+*                 const char *class, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -22145,6 +22939,8 @@ static int PopGat( AstPlot *this, float *rise, const char *method,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Returns zero if the stack is empty, and 1 otherwise.
@@ -22171,11 +22967,11 @@ static int PopGat( AstPlot *this, float *rise, const char *method,
 
 /* Restore the values in the AstGat structure */
       *rise = gat->rise;
-      GAttr( this, GRF__SIZE, gat->size, NULL, GRF__TEXT, method, class );
-      GAttr( this, GRF__WIDTH, gat->width, NULL, GRF__TEXT, method, class );
-      GAttr( this, GRF__COLOUR, gat->col, NULL, GRF__TEXT, method, class );
-      GAttr( this, GRF__FONT, gat->font, NULL, GRF__TEXT, method, class );
-      GAttr( this, GRF__STYLE, gat->style, NULL, GRF__TEXT, method, class );
+      GAttr( this, GRF__SIZE, gat->size, NULL, GRF__TEXT, method, class, status );
+      GAttr( this, GRF__WIDTH, gat->width, NULL, GRF__TEXT, method, class, status );
+      GAttr( this, GRF__COLOUR, gat->col, NULL, GRF__TEXT, method, class, status );
+      GAttr( this, GRF__FONT, gat->font, NULL, GRF__TEXT, method, class, status );
+      GAttr( this, GRF__STYLE, gat->style, NULL, GRF__TEXT, method, class, status );
 
 /* Free the AstGat structure. */
       gat = astFree( gat );
@@ -22191,7 +22987,7 @@ static int PopGat( AstPlot *this, float *rise, const char *method,
 
 
 static void PushGat( AstPlot *this, float rise, const char *method, 
-                     const char *class ) {
+                     const char *class, int *status ) {
 /*
 *  Name:
 *     PushGat
@@ -22205,7 +23001,7 @@ static void PushGat( AstPlot *this, float rise, const char *method,
 *  Synopsis:
 *     #include "plot.h"
 *     void PushGat( AstPlot *this, float rise, const char *method, 
-*                   const char *class )
+*                   const char *class, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -22226,6 +23022,8 @@ static void PushGat( AstPlot *this, float rise, const char *method,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -22245,11 +23043,11 @@ static void PushGat( AstPlot *this, float rise, const char *method,
       new_gat->rise = rise;
 
 /* Store the current graphical attribute values. */
-      GAttr( this, GRF__SIZE, AST__BAD, &(new_gat->size), GRF__TEXT, method, class );
-      GAttr( this, GRF__WIDTH, AST__BAD, &(new_gat->width), GRF__TEXT, method, class );
-      GAttr( this, GRF__FONT, AST__BAD, &(new_gat->font), GRF__TEXT, method, class );
-      GAttr( this, GRF__STYLE, AST__BAD, &(new_gat->style), GRF__TEXT, method, class );
-      GAttr( this, GRF__COLOUR, AST__BAD, &(new_gat->col), GRF__TEXT, method, class );
+      GAttr( this, GRF__SIZE, AST__BAD, &(new_gat->size), GRF__TEXT, method, class, status );
+      GAttr( this, GRF__WIDTH, AST__BAD, &(new_gat->width), GRF__TEXT, method, class, status );
+      GAttr( this, GRF__FONT, AST__BAD, &(new_gat->font), GRF__TEXT, method, class, status );
+      GAttr( this, GRF__STYLE, AST__BAD, &(new_gat->style), GRF__TEXT, method, class, status );
+      GAttr( this, GRF__COLOUR, AST__BAD, &(new_gat->col), GRF__TEXT, method, class, status );
 
 /* Increment the number of AstGat structures on the stack.*/
       this->ngat++;
@@ -22266,7 +23064,7 @@ static void PushGat( AstPlot *this, float rise, const char *method,
    }
 }
 
-static void RemoveFrame( AstFrameSet *this_fset, int iframe ) {
+static void RemoveFrame( AstFrameSet *this_fset, int iframe, int *status ) {
 /*
 *  Name:
 *     RemoveFrame
@@ -22279,7 +23077,7 @@ static void RemoveFrame( AstFrameSet *this_fset, int iframe ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     void RemoveFrame( AstFrameSet *this_fset, int iframe )
+*     void RemoveFrame( AstFrameSet *this_fset, int iframe, int *status )
 
 *  Class Membership:
 *     Plot member function (over-rides the astRemoveFrame public
@@ -22301,6 +23099,8 @@ static void RemoveFrame( AstFrameSet *this_fset, int iframe ) {
 *        The index within the Plot of the Frame to be removed.
 *        This value should lie in the range from 1 to the number of
 *        Frames in the Plot (as given by its Nframe attribute).
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -22318,7 +23118,7 @@ static void RemoveFrame( AstFrameSet *this_fset, int iframe ) {
    ifrm = astValidateFrameIndex( this_fset, iframe, "astRemoveFrame" );
 
 /* Invoke the parent astRemoveFrame method to remove the Frame. */
-   (*parent_removeframe)( this_fset, iframe );
+   (*parent_removeframe)( this_fset, iframe, status );
 
 /* If the index of the removed Frame is smaller than the clipping Frame
    index, then decrement the clipping Frame index so that the same Frame 
@@ -22336,7 +23136,7 @@ static void RemoveFrame( AstFrameSet *this_fset, int iframe ) {
 }
 
 static void RightVector( AstPlot *this, float *ux, float *uy, float *rx, 
-                         float *ry, const char *method, const char *class ){
+                         float *ry, const char *method, const char *class, int *status ){
 /*
 *  Name:
 *     RightVector
@@ -22347,7 +23147,7 @@ static void RightVector( AstPlot *this, float *ux, float *uy, float *rx,
 *  Synopsis:
 *     #include "plot.h"
 *     void RightVector( AstPlot *this, float *ux, float *uy, float *rx, 
-*                       float *ry, const char *method, const char *class )
+*                       float *ry, const char *method, const char *class, int *status )
 
 *  Description:
 *     This function returns a vector which points from left to right along 
@@ -22379,6 +23179,8 @@ static void RightVector( AstPlot *this, float *ux, float *uy, float *rx,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -22403,8 +23205,8 @@ static void RightVector( AstPlot *this, float *ux, float *uy, float *rx,
    If the grf moduleis not capable of giving us this information, then
    just assume the the axes are equally scaled, except for any axis
    reversal indicated in the supplied Plot. */
-   if( GCap( this, GRF__SCALES, 1 ) ) {
-      GScales( this, &alpha, &beta, method, class );
+   if( GCap( this, GRF__SCALES, 1, status ) ) {
+      GScales( this, &alpha, &beta, method, class, status );
    } else {
       alpha = ( this->xrev ) ? -1.0 : 1.0;
       beta = ( this->yrev ) ? -1.0 : 1.0;
@@ -22427,7 +23229,7 @@ static void RightVector( AstPlot *this, float *ux, float *uy, float *rx,
 
 /* Find the height in "standard" coordinates of "normal" text draw with the 
    requested up-vector. */
-   GQch( this, &chv, &chh, method, class );
+   GQch( this, &chv, &chh, method, class, status );
    a = (*ux)/(chv*alpha);
    b = (*uy)/(chh*beta);
    nl = 1.0/sqrt( a*a + b*b );
@@ -22451,7 +23253,7 @@ static void RightVector( AstPlot *this, float *ux, float *uy, float *rx,
 }
 
 static void SaveTick( AstPlot *this, int axis, double gx, double gy, 
-                      int major ){
+                      int major, int *status ){
 /*
 *  Name:
 *     SaveTick
@@ -22465,7 +23267,7 @@ static void SaveTick( AstPlot *this, int axis, double gx, double gy,
 *  Synopsis:
 *     #include "plot.h"
 *     void SaveTick( AstPlot *this, int axis, double gx, double gy,
-*                    int major )
+*                    int major, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -22487,6 +23289,8 @@ static void SaveTick( AstPlot *this, int axis, double gx, double gy,
 *        The graphics Y position at the start of the tick mark.
 *     major
 *        Non-zero if the tick mark is a major tick.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -22548,7 +23352,7 @@ static void SaveTick( AstPlot *this, int axis, double gx, double gy,
    }
 }
 
-static void SetAttrib( AstObject *this_object, const char *setting ) {
+static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
 *     SetAttrib
@@ -22561,7 +23365,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     void SetAttrib( AstObject *this, const char *setting )
+*     void SetAttrib( AstObject *this, const char *setting, int *status )
 
 *  Class Membership:
 *     Plot member function (over-rides the astSetAttrib protected
@@ -22587,6 +23391,8 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 *     setting
 *        Pointer to a null terminated string specifying the new attribute
 *        value.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -22737,7 +23543,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                ( 1 == astSscanf( setting, "edge(%d)= %n%*s %n", &axis, &ival, &nc ) )
                && ( nc >= len ) ) {
       edge = FullForm( "left right top bottom", setting + ival, setting, 
-                       "astSet", astGetClass( this ) );
+                       "astSet", astGetClass( this ), status );
       if( edge == 0 ) {
          astSetEdge( this, axis - 1, LEFT );
       } else if( edge == 1 ) {
@@ -22959,8 +23765,8 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                && ( nc >= len ) ) {
       class =  astGetClass( this );
 
-      nid = IdFind( FullForm( GrfLabels, label, "Style", "astSet", class ),
-                    nax, &id1, &id2, &id3 );
+      nid = IdFind( FullForm( GrfLabels, label, "Style", "astSet", class, status ),
+                    nax, &id1, &id2, &id3, status );
       astSetStyle( this, id1, ival );
       if( nid > 1 ) astSetStyle( this, id2, ival );
       if( nid > 2 ) astSetStyle( this, id3, ival );
@@ -22980,8 +23786,8 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                && ( nc >= len ) ) {
       class =  astGetClass( this );
 
-      nid = IdFind( FullForm( GrfLabels, label, "Font", "astSet", class ),
-                    nax, &id1, &id2, &id3 );
+      nid = IdFind( FullForm( GrfLabels, label, "Font", "astSet", class, status ),
+                    nax, &id1, &id2, &id3, status );
       astSetFont( this, id1, ival );
       if( nid > 1 ) astSetFont( this, id2, ival );
       if( nid > 2 ) astSetFont( this, id3, ival );
@@ -23001,8 +23807,8 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                && ( nc >= len ) ) {
       class =  astGetClass( this );
 
-      nid = IdFind( FullForm( GrfLabels, label, "Colour", "astSet", class ),
-                    nax, &id1, &id2, &id3 );
+      nid = IdFind( FullForm( GrfLabels, label, "Colour", "astSet", class, status ),
+                    nax, &id1, &id2, &id3, status );
       astSetColour( this, id1, ival );
       if( nid > 1 ) astSetColour( this, id2, ival );
       if( nid > 2 ) astSetColour( this, id3, ival );
@@ -23022,8 +23828,8 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                && ( nc >= len ) ) {
       class =  astGetClass( this );
 
-      nid = IdFind( FullForm( GrfLabels, label, "Color", "astSet", class ),
-                    nax, &id1, &id2, &id3 );
+      nid = IdFind( FullForm( GrfLabels, label, "Color", "astSet", class, status ),
+                    nax, &id1, &id2, &id3, status );
       astSetColour( this, id1, ival );
       if( nid > 1 ) astSetColour( this, id2, ival );
       if( nid > 2 ) astSetColour( this, id3, ival );
@@ -23043,8 +23849,8 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                && ( nc >= len ) ) {
       class =  astGetClass( this );
 
-      nid = IdFind( FullForm( GrfLabels, label, "Width", "astSet", class ),
-                    nax, &id1, &id2, &id3 );
+      nid = IdFind( FullForm( GrfLabels, label, "Width", "astSet", class, status ),
+                    nax, &id1, &id2, &id3, status );
       astSetWidth( this, id1, dval );
       if( nid > 1 ) astSetWidth( this, id2, dval );
       if( nid > 2 ) astSetWidth( this, id3, dval );
@@ -23064,8 +23870,8 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                && ( nc >= len ) ) {
       class =  astGetClass( this );
 
-      nid = IdFind( FullForm( GrfLabels, label, "Size", "astSet", class ),
-                    nax, &id1, &id2, &id3 );
+      nid = IdFind( FullForm( GrfLabels, label, "Size", "astSet", class, status ),
+                    nax, &id1, &id2, &id3, status );
       astSetSize( this, id1, dval );
       if( nid > 1 ) astSetSize( this, id2, dval );
       if( nid > 2 ) astSetSize( this, id3, dval );
@@ -23114,20 +23920,20 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                && ( nc >= len ) ) {
       astSetLabelling( this, FullForm( "exterior interior", 
                                         setting + ival, setting, 
-                                        "astSet", astGetClass( this ) )
+                                        "astSet", astGetClass( this ), status )
                       );
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      (*parent_setattrib)( this_object, setting );
+      (*parent_setattrib)( this_object, setting, status );
    }
 
 /* Undefine macros local to this function. */
 #undef MATCH
 }
 
-static void SetLogPlot( AstPlot *this, int axis, int ival ){
+static void SetLogPlot( AstPlot *this, int axis, int ival, int *status ){
 /*
 *
 *  Name:
@@ -23141,7 +23947,7 @@ static void SetLogPlot( AstPlot *this, int axis, int ival ){
 
 *  Synopsis:
 *     #include "plot.h"
-*     void SetLogPlot( AstPlot *this, int axis, int ival )
+*     void SetLogPlot( AstPlot *this, int axis, int ival, int *status )
 
 *  Class Membership:
 *     Plot member function 
@@ -23157,6 +23963,8 @@ static void SetLogPlot( AstPlot *this, int axis, int ival ){
 *        Zero based axis index.
 *     ival
 *        The new value for the ogPlot attribute.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -23169,7 +23977,7 @@ static void SetLogPlot( AstPlot *this, int axis, int ival ){
 /* Validate the axis index. */ 
    if( axis < 0 || axis >= 2 ){ 
       astError( AST__AXIIN, "astSetLogPlot(%s): Index (%d) is invalid for "
-                "attribute LogPlot - it should be in the range 1 to 2.", 
+                "attribute LogPlot - it should be in the range 1 to 2.", status, 
                 astGetClass( this ), axis + 1 ); 
 
 /* If the axis index is OK, store the original attribute value. We use
@@ -23182,7 +23990,7 @@ static void SetLogPlot( AstPlot *this, int axis, int ival ){
 /* If the current attribute value will change, attempt to re-map the plot 
    axis. If the attempt succeeds, toggle the current attribute value. */
       if( ( ival != 0 ) != ( oldval != 0 ) ){
-         if( ToggleLogLin( this, axis, oldval, "astSetLogPlot" ) ){
+         if( ToggleLogLin( this, axis, oldval, "astSetLogPlot", status ) ){
             this->logplot[ axis ] = ( !oldval );
          }
 
@@ -23196,7 +24004,7 @@ static void SetLogPlot( AstPlot *this, int axis, int ival ){
 } 
 
 static void SetTickValues( AstPlot *this, int axis, int nmajor, double *major,
-                           int nminor, double *minor ){
+                           int nminor, double *minor, int *status ){
 /*
 *+
 *  Name:
@@ -23251,7 +24059,7 @@ static void SetTickValues( AstPlot *this, int axis, int nmajor, double *major,
    if( axis < 0 || axis >= astGetNin( this ) ) {
       astError( AST__INTER, "astSetTickValues(Plot): Supplied \"axis\" "
                 "value is %d - should in the range 0 to %d (internal AST "
-                "programming error).", axis, astGetNin( this ) - 1 );
+                "programming error).", status, axis, astGetNin( this ) - 1 );
 
 /* Otherwise store or clear the values. */
    } else if( nmajor > 0 ){
@@ -23277,7 +24085,7 @@ static void SetTickValues( AstPlot *this, int axis, int nmajor, double *major,
    }
 }
 
-const char *astStripEscapes_( const char *text ) {
+const char *astStripEscapes_( const char *text, int *status ) {
 /*
 *++
 *  Name:
@@ -23329,10 +24137,8 @@ f        The modified string. If the AST_ESCAPES routine
 *--
 */
 
-/* Local Constants: */
-#define BUFF_LEN 50              /* Max. characters in result buffer */
-
 /* Local Variables: */
+   astDECLARE_GLOBALS;
    const char *a;
    char *b;
    int nc;
@@ -23340,15 +24146,17 @@ f        The modified string. If the AST_ESCAPES routine
    int type;
    int value;
    const char *result;
-   static char buff[ BUFF_LEN + 1 ];
 
 /* Initialise */
    result= text;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
 /* Check inherited status and supplied pointer. Also return if the 
    string contains no escape sequences or if stripping of escapes has
    been supressed. */
-   if( !astOK || astEscapes( -1 ) || !text || !HasEscapes( text ) ) return result;
+   if( !astOK || astEscapes( -1 ) || !text || !HasEscapes( text, status ) ) return result;
 
 /* Initialise a pointer to the next character to be read from the
    supplied string. */
@@ -23356,10 +24164,10 @@ f        The modified string. If the AST_ESCAPES routine
 
 /* Initialise a pointer to the next character to be written to the
    returned string. */
-   b = buff;
+   b = stripescapes_buff;
 
 /* Note the available space left in the buffer. */
-   ncc = BUFF_LEN;
+   ncc = AST__PLOT_STRIPESCAPES_BUFF_LEN;
 
 /* Loop until all the string has been read, or the buffer is full. */
    while( *a && ncc > 0 ){
@@ -23385,13 +24193,10 @@ f        The modified string. If the AST_ESCAPES routine
    *b = 0;
 
 /* Return the result.*/
-   return buff;
-
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
+   return stripescapes_buff;
 }
 
-static int swapEdges( AstPlot *this, TickInfo **grid, CurveData **cdata ) {
+static int swapEdges( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata, int *status ) {
 /*
 *  Name:
 *     swapEdges
@@ -23404,7 +24209,7 @@ static int swapEdges( AstPlot *this, TickInfo **grid, CurveData **cdata ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int swapEdges( AstPlot *this, TickInfo **grid, CurveData **cdata )
+*     int swapEdges( AstPlot *this, TickInfo **grid, AstPlotCurveData **cdata, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -23429,11 +24234,13 @@ static int swapEdges( AstPlot *this, TickInfo **grid, CurveData **cdata ) {
 *        each pointing to a TickInfo structure holding information about
 *        tick marks on the axis. See function GridLines.
 *     cdata
-*        A pointer to an array of two CurveData pointers (one for each axis), 
-*        each pointing to an array of CurveData structure (one for each
+*        A pointer to an array of two AstPlotCurveData pointers (one for each axis), 
+*        each pointing to an array of AstPlotCurveData structure (one for each
 *        major tick value on the axis), holding information about breaks
 *        in the curves drawn to mark the major tick values. See function 
 *        DrawGrid. 
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if the edges should be swapped, otherwise zero.
@@ -23444,7 +24251,7 @@ static int swapEdges( AstPlot *this, TickInfo **grid, CurveData **cdata ) {
 */
 
 /* Local Variables: */
-   CurveData *cdt;        /* Pointer to the CurveData for the next tick */
+   AstPlotCurveData *cdt; /* Pointer to the AstPlotCurveData for the next tick */
    TickInfo *info;        /* Pointer to the TickInfo for the current axis */
    float xmax;            /* Max graphics X value */
    float xmin;            /* Min graphics X value */
@@ -23511,7 +24318,7 @@ static int swapEdges( AstPlot *this, TickInfo **grid, CurveData **cdata ) {
    return result;
 }
 
-static int TestAttrib( AstObject *this_object, const char *attrib ) {
+static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     TestAttrib
@@ -23524,7 +24331,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int TestAttrib( AstObject *this, const char *attrib )
+*     int TestAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     Plot member function (over-rides the astTestAttrib protected
@@ -23541,6 +24348,8 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if a value has been set, otherwise zero.
@@ -23816,74 +24625,74 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Style. */
 /* ------ */
    } else if ( !strcmp( attrib, "style" ) ) {
-      result = TestUseStyle( this, AST__BORDER_ID );
+      result = TestUseStyle( this, AST__BORDER_ID, status );
 
 /* Style(label). */
 /* ------------- */
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "style(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      result = TestUseStyle( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
+      result = TestUseStyle( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ), status ), status );
 
 /* Font. */
 /* ----- */
    } else if ( !strcmp( attrib, "font" ) ) {
-      result = TestUseFont( this, AST__TEXTLABS_ID );
+      result = TestUseFont( this, AST__TEXTLABS_ID, status );
 
 /* Font(label). */
 /* ------------ */
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "font(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      result = TestUseFont( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
+      result = TestUseFont( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ), status ), status );
 
 /* Colour. */
 /* ------- */
    } else if ( !strcmp( attrib, "colour" ) ) {
-      result = TestUseColour( this, AST__TEXTLABS_ID );
+      result = TestUseColour( this, AST__TEXTLABS_ID, status );
 
 /* Color. */
 /* ------- */
    } else if ( !strcmp( attrib, "color" ) ) {
-      result = TestUseColour( this, AST__TEXTLABS_ID );
+      result = TestUseColour( this, AST__TEXTLABS_ID, status );
 
 /* Colour(label). */
 /* -------------- */
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "colour(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      result = TestUseColour( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
+      result = TestUseColour( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ), status ), status );
 
 /* Color(label). */
 /* ------------- */
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "color(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      result = TestUseColour( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
+      result = TestUseColour( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ), status ), status );
 
 /* Width. */
 /* ------ */
    } else if ( !strcmp( attrib, "width" ) ) {
-      result = TestUseWidth( this, AST__BORDER_ID );
+      result = TestUseWidth( this, AST__BORDER_ID, status );
 
 /* Width(label). */
 /* ------------- */
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "width(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      result = TestUseWidth( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
+      result = TestUseWidth( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ), status ), status );
 
 /* Size. */
 /* ----- */
    } else if ( !strcmp( attrib, "size" ) ) {
-      result = TestUseSize( this, AST__TEXTLABS_ID );
+      result = TestUseSize( this, AST__TEXTLABS_ID, status );
 
 /* Size(label). */
 /* ------------ */
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "size(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      result = TestUseSize( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
+      result = TestUseSize( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ), status ), status );
 
 /* TitleGap. */
 /* --------- */
@@ -23922,7 +24731,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_testattrib)( this_object, attrib );
+      result = (*parent_testattrib)( this_object, attrib, status );
    }
 
 /* Return the result, */
@@ -23930,7 +24739,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 }
 
 static void Text( AstPlot *this, const char *text, const double pos[], 
-                  const float up[], const char *just ){
+                  const float up[], const char *just, int *status ){
 /*
 *++
 *  Name:
@@ -24020,6 +24829,7 @@ f     - If the plotting position is clipped (see AST_CLIP), then no
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
    AstMapping *mapping;    /* Pointer to graphics->physical mapping */
    AstPointSet *pset1;     /* PointSet holding physical positions */
    AstPointSet *pset2;     /* PointSet holding graphics positions */
@@ -24040,6 +24850,9 @@ f     - If the plotting position is clipped (see AST_CLIP), then no
 /* Check the global error status. */
    if ( !astOK || !text ) return;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
+
 /* Store the current method and class for inclusion in error messages
    generated by lower level functions. */
    method = "astText";
@@ -24050,7 +24863,7 @@ f     - If the plotting position is clipped (see AST_CLIP), then no
    if( naxes != 2 && astOK ){
       astError( AST__NAXIN, "%s(%s): Number of axes (%d) in the base "
                 "Frame of the supplied %s is invalid - this number should "
-                "be 2.", method, class, naxes, class );
+                "be 2.", status, method, class, naxes, class );
    } 
 
 /* Ensure AST functions included graphical escape sequences in any
@@ -24073,7 +24886,7 @@ f     - If the plotting position is clipped (see AST_CLIP), then no
    ncoord = astGetNout( this );   
 
 /* Create a PointSet to hold the supplied physical coordinates. */
-   pset1 = astPointSet( 1, ncoord, "" );
+   pset1 = astPointSet( 1, ncoord, "", status );
 
 /* Allocate memory to hold pointers to the first value on each axis. */
    ptr1 = (const double **) astMalloc( sizeof( const double * )*
@@ -24094,14 +24907,14 @@ f     - If the plotting position is clipped (see AST_CLIP), then no
    coordinates) to the base frame (i.e. graphics coordinates) using 
    the inverse Mapping defined by the Plot. */
    mapping = astGetMapping( this, AST__BASE, AST__CURRENT );
-   pset2 = Trans( this, NULL, mapping, pset1, 0, NULL, 0, method, class );
+   pset2 = Trans( this, NULL, mapping, pset1, 0, NULL, 0, method, class, status );
    mapping = astAnnul( mapping );
 
 /* Get pointers to the graphics coordinates. */
    ptr2 = astGetPoints( pset2 );
 
 /* Take a copy of the string excluding any trailing white space. */
-   ulen = ChrLen( text );
+   ulen = ChrLen( text, status );
    ltext = (char *) astStore( NULL, (void *) text, ulen + 1 );
 
 /* Check the pointers can be used. */
@@ -24122,7 +24935,7 @@ f     - If the plotting position is clipped (see AST_CLIP), then no
 /* Draw the text string. */
          DrawText( this, 1, astGetEscape( this ), ltext, (float) ptr2[0][0],
                    (float) ptr2[1][0], ljust, up[ 0 ], up[ 1 ], xbn, ybn,
-                   NULL, method, class );
+                   NULL, method, class, status );
       }
 
 /* Free the local copy of the string. */
@@ -24149,7 +24962,7 @@ f     - If the plotting position is clipped (see AST_CLIP), then no
 }
 
 static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
-                        const char *method, const char *class ){
+                        const char *method, const char *class, int *status ){
 /*
 *
 *  Name:
@@ -24164,7 +24977,7 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
 *  Synopsis:
 *     #include "plot.h"
 *     void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
-*                      const char *method, const char *class )
+*                      const char *method, const char *class, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -24190,10 +25003,13 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
    char *new_text;         /* Pointer to complete text string (inc. units) */
    char *just;             /* Pointer to axis label justification string */
    const char *text;       /* Pointer to text string to be displayed */
@@ -24219,6 +25035,9 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
 
 /* Check the global status. */
    if( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
 
 /* Get the minimum dimension of the plotting area. */
    xrange = this->xhi - this->xlo;
@@ -24266,14 +25085,14 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
 /* If so get the label. */
       if( draw ){
          text = astGetLabel( this, axis );
-         tlen = ChrLen( text );
+         tlen = ChrLen( text, status );
 
 /* If required, get the units string and concatenate it with the label (inside 
    parenthesise). Ignore trailing spaces. */
          if( dounits[ axis ] ){
             units = astGetUnit( this, axis );
             if( units && units[0] ){
-               ulen = ChrLen( units );
+               ulen = ChrLen( units, status );
                new_text = astMalloc( tlen + ulen + 4 );
                if( new_text ) memcpy( new_text, text, tlen );
                
@@ -24383,7 +25202,7 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
 
 /* Display the label. */
          DrawText( this, 1, esc, text, xref, yref, just,
-                   upx, upy, xbn, ybn, NULL, method, class );
+                   upx, upy, xbn, ybn, NULL, method, class, status );
 
 /* Release the memory allocated to store the axis label;. */
          new_text = (char *) astFree( (void *) new_text );
@@ -24406,7 +25225,7 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
       text = astGetTitle( this );
 
 /* Create a copy from which trailing spaces have been removed. */
-      tlen = ChrLen( text );
+      tlen = ChrLen( text, status );
       new_text = (char *) astStore( NULL, (void *) text, tlen + 1 );
       new_text[ tlen ] = 0;
       text = new_text;
@@ -24448,7 +25267,7 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
 /* Display the title. Justify the bottom of the whole bounding box (not 
    just the text base-line). */
       DrawText( this, 1, esc, text, xref, yref, "MC", 0.0F, 1.0F,
-                xbn, ybn, NULL, method, class );
+                xbn, ybn, NULL, method, class, status );
 
 /* Re-establish the original graphical attributes. */
       astGrfAttrs( this, AST__TITLE_ID, 0, GRF__TEXT, method, class );
@@ -24480,7 +25299,7 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
 static void UpdateConcat( float *xbn, float *ybn, float ux, float uy,
                            float rx, float ry, float *x, float *y,
                            float x0, float y0, float *alpha_lo, 
-                           float *alpha_hi, float *beta_lo, float *beta_hi ){
+                           float *alpha_hi, float *beta_lo, float *beta_hi, int *status ){
 
 /*
 *  Name:
@@ -24495,7 +25314,7 @@ static void UpdateConcat( float *xbn, float *ybn, float ux, float uy,
 *     void UpdateConcat( float *xbn, float *ybn, float ux, float uy,
 *                         float rx, float ry, float *x, float *y,
 *                         float x0, float y0, float *alpha_lo, 
-*                         float *alpha_hi, float *beta_lo, float *beta_hi )
+*                         float *alpha_hi, float *beta_lo, float *beta_hi, int *status )
 
 *  Description:
 *     This function modifies the supplied concatenation point (x,y) by moving
@@ -24559,6 +25378,8 @@ static void UpdateConcat( float *xbn, float *ybn, float ux, float uy,
 *        (x0,y0) + beta_hi*(rx,ry) is a point on the right edge of the
 *        total bounding box. The returned value is updated so that the
 *        total bounding box includes the supplied sub-string bounding box.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -24666,7 +25487,8 @@ static void UpdateConcat( float *xbn, float *ybn, float ux, float uy,
 
 static void Ticker( AstPlot *this, int edge, int axis, double value,
                     double *gap, double tklen, int majtick, int save,
-                    const char *method, const char *class ){
+                    EdgeCrossingsStatics **pstatics, const char *method, 
+                    const char *class, int *status ){
 /*
 *
 *  Name:
@@ -24682,7 +25504,8 @@ static void Ticker( AstPlot *this, int edge, int axis, double value,
 *     #include "plot.h"
 *     void Ticker( AstPlot *this, int edge, int axis, double value,
 *                  double *gap, double tklen, int majtick, int save,
-*                  const char *method, const char *class ){
+*                  EdgeCrossingsStatics **pstatics, const char *method, 
+*                  const char *class, int *status ){
 
 *  Class Membership:
 *     Plot member function.
@@ -24713,12 +25536,19 @@ static void Ticker( AstPlot *this, int edge, int axis, double value,
 *        if it is a minor tick.
 *     save
 *        If non-zero, the tick mark position will be saved in the Plot structure.
+*     pstatics
+*        Address of a pointer to a structure holding values for variables 
+*        which were statically defined within this function prior to the 
+*        thread-safe version of AST. If the pointer is supplied as NULL,
+*        then a new structure is allocated and initialised. 
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -24737,8 +25567,8 @@ static void Ticker( AstPlot *this, int edge, int axis, double value,
    if( !astOK ) return;
 
 /* See where the current major tick value crosses the edge. */
-   ncross = EdgeCrossings( this, edge, axis, value, gap, &cross, method, 
-                           class );
+   ncross = EdgeCrossings( this, edge, axis, value, gap, &cross, pstatics, 
+                           method, class, status );
 
 /* Do nothing if the supplied axis value does not occur on the specified
    edge of the plotting area. */
@@ -24813,11 +25643,11 @@ static void Ticker( AstPlot *this, int edge, int axis, double value,
                }
 
 /* Draw the tick mark as a straight line of the specified length. */
-               if( save ) SaveTick( this, axis, *x, *y, majtick );
+               if( save ) SaveTick( this, axis, *x, *y, majtick, status );
                if( *x != xe || *y != ye ) {
-                  Bpoly( this, (float) *x, (float) *y, method, class );
-                  Apoly( this, (float) xe, (float) ye, method, class );
-                  Opoly( this, method, class );
+                  Bpoly( this, (float) *x, (float) *y, method, class, status );
+                  Apoly( this, (float) xe, (float) ye, method, class, status );
+                  Opoly( this, method, class, status );
                }
             }
                
@@ -24840,7 +25670,7 @@ static void Ticker( AstPlot *this, int edge, int axis, double value,
 }
 
 static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap, 
-                            int *inval, const char *method, const char *class ){
+                            int *inval, const char *method, const char *class, int *status ){
 /*
 *  Name:
 *     TickMarks
@@ -24855,7 +25685,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 *  Synopsis:
 *     #include "plot.h"
 *     TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap, 
-*                          int *inval, const char *method, const char *class )
+*                          int *inval, const char *method, const char *class, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -24893,6 +25723,8 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to a TickInfo structure holding information about the tick
@@ -24922,6 +25754,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 /* Local Variables: */
    AstAxis *ax;        /* Pointer to the axis. */
    AstFrame *frame;    /* Pointer to the current Frame in the Plot */
+   GetTicksStatics *statics = NULL; /* Pointer to static data for GetTicks */
    TickInfo *ret;      /* Pointer to the returned structure. */
    char **labels;      /* Pointer to list of formatted labels */
    char **newlabels;   /* Pointer to new list of shortened formatted labels */
@@ -24954,7 +25787,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    allocated within GetTicks, and return. */
    if( !this ){
       (void) GetTicks( NULL, axis, NULL, &ticks, &nmajor, &minticks, &nminor, 
-                       0, inval, &refval, method, class );
+                       0, inval, &refval, &statics, method, class, status );
       return NULL;
    }      
 
@@ -24991,13 +25824,13 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    LogTicks and LogLabel attributes, and so must be done before the
    following block which uses the LogLabel attribute. */
    used_gap = GetTicks( this, axis, cen, &ticks, &nmajor, &minticks, &nminor, 
-                        fmtset, inval, &refval, method, class );
+                        fmtset, inval, &refval, &statics, method, class, status );
 
 /* See if exponential labels using superscript powers are required.  */
    old_format = NULL;
    reset_fmt = 0;
    if( astGetLogLabel( this, axis ) && astGetEscape( this ) &&
-       GCap( this, GRF__SCALES, 1 ) ) {
+       GCap( this, GRF__SCALES, 1, status ) ) {
 
 /* Save a copy of the Frame's Format value, if set. It will be
    re-instated at the end of this function. */
@@ -25062,7 +25895,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    in order not to foil the users choice of format. That is, "ok" is set
    non-zero by the call to CheckLabels, even if some identical adjacent
    labels are found. */
-      ok = CheckLabels( this, frame, axis, ticks, nmajor, 1, labels, refval );
+      ok = CheckLabels( this, frame, axis, ticks, nmajor, 1, labels, refval, status );
 
 /* Note the format used. */
       fmt = astGetFormat( frame, axis );
@@ -25078,7 +25911,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
       labels = (char **) astMalloc( sizeof(char *)*(size_t)nmajor );
 
 /* Produce these default labels. */
-      CheckLabels( this, frame, axis, ticks, nmajor, 1, labels, refval );
+      CheckLabels( this, frame, axis, ticks, nmajor, 1, labels, refval, status );
 
 /* The first task is to decide what the smallest usable number of digits 
    is. Starting at the default number of digits used above to produce the
@@ -25096,7 +25929,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    are longer than the corresponding old labels, then a null pointer is
    returned. Otherwise, a pointer is returned to the new set of labels. */
          newlabels = CheckLabels2( this, frame, axis, ticks, nmajor, 
-                                   oldlabels, refval );
+                                   oldlabels, refval, status );
 
 /* Free the old labels unless they are the orignal labels (which are
    needed below). */
@@ -25147,7 +25980,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    in all adjacent labels being different. Note the format used (we know 
    the Format attribute is currently unset, but the default Format string
    reflects the current value of the Digits attribute). */
-         if( CheckLabels( this, frame, axis, ticks, nmajor, 0, labels, refval ) ) {
+         if( CheckLabels( this, frame, axis, ticks, nmajor, 0, labels, refval, status ) ) {
             ok = 1;
             fmt = astGetFormat( frame, axis );
             used_fmt = (char *) astStore( NULL, (void *) fmt, strlen( fmt ) + 1 );
@@ -25206,12 +26039,12 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    } else if( astOK ){
       if( fmtset ){
          astError( AST__PLFMT, "%s(%s): No numerical labels can be produced "
-                   "for axis %d using the supplied %s format string '%s'.",
+                   "for axis %d using the supplied %s format string '%s'.", status,
                    method, class, axis + 1, astGetClass( frame ), 
                    astGetFormat( frame, axis ) );
       } else {      
          astError( AST__PLFMT, "%s(%s): No suitable format can be found to "
-                   "produce numerical labels for axis %d of a %s.",
+                   "produce numerical labels for axis %d of a %s.", status,
                    method, class, axis + 1, astGetClass( frame ) );
       }
    }
@@ -25243,7 +26076,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 }
 
 static void TraceBorder( AstPlot *this, double **ptr1, double **ptr2, int dim, int *edge,
-                         const char *method, const char *class ){
+                         const char *method, const char *class, int *status ){
 /*
 *  Name:
 *     TraceBorder
@@ -25258,7 +26091,7 @@ static void TraceBorder( AstPlot *this, double **ptr1, double **ptr2, int dim, i
 *  Synopsis:
 *     #include "plot.h"
 *     void TraceBorder( AstPlot *this, double **ptr1, double **ptr2, int dim, int *edge,
-*                      const char *method, const char *class )
+*                      const char *method, const char *class, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -25298,6 +26131,8 @@ static void TraceBorder( AstPlot *this, double **ptr1, double **ptr2, int dim, i
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -25553,7 +26388,7 @@ static void TraceBorder( AstPlot *this, double **ptr1, double **ptr2, int dim, i
    if( ed0 != -1 ){
 
 /* Start the polyline at the recorded edge crossing. */
-      Bpoly( this, (float) x0, (float) y0, method, class );
+      Bpoly( this, (float) x0, (float) y0, method, class, status );
 
 /* Initialise the row and column of the starting cell, and the edge
    through which the curve enters the starting cell. */
@@ -25613,7 +26448,7 @@ static void TraceBorder( AstPlot *this, double **ptr1, double **ptr2, int dim, i
             if( lbad != bad && test_edge != ed ){
                Apoly( this, (float) ( 0.5*( *( gx[ ca ] ) + *( gx[ cb ] ) ) ),
                       (float) ( 0.5*( *( gy[ ca ] ) + *( gy[ cb ] ) ) ),
-                      method, class );
+                      method, class, status );
 
 /* Indicate that the curve has not been lost, save the index of the edge 
    through which the curve leaves the cell, and leave the loop. */
@@ -25675,7 +26510,7 @@ static void TraceBorder( AstPlot *this, double **ptr1, double **ptr2, int dim, i
 
 /* We have now reached the edge of the grid, or the curve has been lost.
    In either case end the poly line. */
-      Opoly( this, method, class );
+      Opoly( this, method, class, status );
 
    }
 
@@ -25686,7 +26521,7 @@ static void TraceBorder( AstPlot *this, double **ptr1, double **ptr2, int dim, i
 
 static AstPointSet *Trans( AstPlot *this, AstFrame *frm, AstMapping *mapping, 
                            AstPointSet *in, int forward, AstPointSet *out, 
-                           int norm, const char *method, const char *class ) {
+                           int norm, const char *method, const char *class, int *status ) {
 /*
 *  Name:
 *     Trans
@@ -25855,7 +26690,7 @@ static AstPointSet *Trans( AstPlot *this, AstFrame *frm, AstMapping *mapping,
       if( astOK && naxes != this->clip_axes ){
          astError( AST__CLPAX, "%s%s): The supplied %s specifies clipping "
                    "in %d dimensions, but the clipping Frame ('%s') has "
-                   "%d axes.", method, class, class, this->clip_axes, 
+                   "%d axes.", status, method, class, class, this->clip_axes, 
                    astGetTitle( fr ), naxes );
       }
 
@@ -26017,7 +26852,7 @@ static AstPointSet *Trans( AstPlot *this, AstFrame *frm, AstMapping *mapping,
 }
 
 static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-                               int forward, AstPointSet *out ) {
+                               int forward, AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     Transform
@@ -26093,7 +26928,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 /* Do the transformation. */
    result = Trans( plot, NULL, map, in, forward, out, 1, "astTransform",
-                   astGetClass( this ) );
+                   astGetClass( this ), status );
 
 /* Annul the mapping. */
    map = astAnnul( map );
@@ -26107,7 +26942,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 }
 
 static double Typical( int n, double *value, double lolim, double hilim,
-                       double *width ) {
+                       double *width, int *status ) {
 /*
 *  Name:
 *     Typical
@@ -26121,7 +26956,7 @@ static double Typical( int n, double *value, double lolim, double hilim,
 *  Synopsis:
 *     #include "plot.h"
 *     double Typical( int n, double *value, double lolim, double hilim,
-*                     double *width  )
+*                     double *width, int *status  )
 
 *  Class Membership:
 *     Plot member function.
@@ -26146,6 +26981,8 @@ static double Typical( int n, double *value, double lolim, double hilim,
 *        Pointer to a double in which to return the width (i,e, data range)
 *        of the non-empty histogram cells. This is an estimate of the
 *        range of used values in the supplied array. NULL may be supplied.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A typical value from the supplied array. AST__BAD is returned only
@@ -26299,7 +27136,7 @@ static double Typical( int n, double *value, double lolim, double hilim,
             if( maxcnt < nc && ibin*delta > 1000.0*DBL_EPSILON*fabs(maxval) ) {
                minval += ibin*delta;
                maxval = minval + delta;
-               result = Typical( n, value, minval, maxval, NULL );
+               result = Typical( n, value, minval, maxval, NULL, status );
             }
          }
       }
@@ -26309,7 +27146,7 @@ static double Typical( int n, double *value, double lolim, double hilim,
    return result;
 }
 
-static int GetUseColour( AstPlot *this, int id ) {
+static int GetUseColour( AstPlot *this, int id, int *status ) {
 /*
 *  Name:
 *     GetUseColour
@@ -26322,7 +27159,7 @@ static int GetUseColour( AstPlot *this, int id ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int GetUseColour( AstPlot *this, int id )
+*     int GetUseColour( AstPlot *this, int id, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -26342,6 +27179,8 @@ static int GetUseColour( AstPlot *this, int id ) {
 *        Pointer to the Plot.
 *     id
 *        An integer specifying the graphical element to be drawn.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Colour value to use.
@@ -26360,7 +27199,7 @@ static int GetUseColour( AstPlot *this, int id ) {
 /* See if the supplied identifier is a psuedo-identifier representing two 
    or three other genuine identifiers. If so, return the value of the first 
    set genuine identifier. */
-   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3 );
+   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3, status );
    if( nid > 1 ) {
       if(  astTestColour( this, id1 ) ) {
          id = id1;
@@ -26381,7 +27220,7 @@ static int GetUseColour( AstPlot *this, int id ) {
 
 }
 
-static int GetUseFont( AstPlot *this, int id ) {
+static int GetUseFont( AstPlot *this, int id, int *status ) {
 /*
 *  Name:
 *     GetUseFont
@@ -26394,7 +27233,7 @@ static int GetUseFont( AstPlot *this, int id ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int GetUseFont( AstPlot *this, int id )
+*     int GetUseFont( AstPlot *this, int id, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -26414,6 +27253,8 @@ static int GetUseFont( AstPlot *this, int id ) {
 *        Pointer to the Plot.
 *     id
 *        An integer specifying the graphical element to be drawn.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Font value to use.
@@ -26432,7 +27273,7 @@ static int GetUseFont( AstPlot *this, int id ) {
 /* See if the supplied identifier is a psuedo-identifier representing two 
    or three other genuine identifiers. If so, return the value of the first set
    genuine identifier. */
-   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3 );
+   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3, status );
    if( nid > 1 ) {
       if(  astTestFont( this, id1 ) ) {
          id = id1;
@@ -26453,7 +27294,7 @@ static int GetUseFont( AstPlot *this, int id ) {
 
 }
 
-static double GetUseSize( AstPlot *this, int id ) {
+static double GetUseSize( AstPlot *this, int id, int *status ) {
 /*
 *  Name:
 *     GetUseSize
@@ -26466,7 +27307,7 @@ static double GetUseSize( AstPlot *this, int id ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     double GetUseSize( AstPlot *this, int id )
+*     double GetUseSize( AstPlot *this, int id, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -26486,6 +27327,8 @@ static double GetUseSize( AstPlot *this, int id ) {
 *        Pointer to the Plot.
 *     id
 *        An integer specifying the graphical element to be drawn.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Size value to use.
@@ -26504,7 +27347,7 @@ static double GetUseSize( AstPlot *this, int id ) {
 /* See if the supplied identifier is a psuedo-identifier representing two 
    or three other genuine identifiers. If so, return the value of the first set
    genuine identifier. */
-   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3 );
+   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3, status );
    if( nid > 1 ) {
       if(  astTestSize( this, id1 ) ) {
          id = id1;
@@ -26525,7 +27368,7 @@ static double GetUseSize( AstPlot *this, int id ) {
 
 }
 
-static int GetUseStyle( AstPlot *this, int id ) {
+static int GetUseStyle( AstPlot *this, int id, int *status ) {
 /*
 *  Name:
 *     GetUseStyle
@@ -26538,7 +27381,7 @@ static int GetUseStyle( AstPlot *this, int id ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int GetUseStyle( AstPlot *this, int id )
+*     int GetUseStyle( AstPlot *this, int id, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -26558,6 +27401,8 @@ static int GetUseStyle( AstPlot *this, int id ) {
 *        Pointer to the Plot.
 *     id
 *        An integer specifying the graphical element to be drawn.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Style value to use.
@@ -26576,7 +27421,7 @@ static int GetUseStyle( AstPlot *this, int id ) {
 /* See if the supplied identifier is a psuedo-identifier representing two 
    or three other genuine identifiers. If so, return the value of the first set
    genuine identifier. */
-   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3 );
+   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3, status );
    if( nid > 1 ) {
       if(  astTestStyle( this, id1 ) ) {
          id = id1;
@@ -26597,7 +27442,7 @@ static int GetUseStyle( AstPlot *this, int id ) {
 
 }
 
-static double GetUseWidth( AstPlot *this, int id ) {
+static double GetUseWidth( AstPlot *this, int id, int *status ) {
 /*
 *  Name:
 *     GetUseWidth
@@ -26610,7 +27455,7 @@ static double GetUseWidth( AstPlot *this, int id ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     double GetUseWidth( AstPlot *this, int id )
+*     double GetUseWidth( AstPlot *this, int id, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -26630,6 +27475,8 @@ static double GetUseWidth( AstPlot *this, int id ) {
 *        Pointer to the Plot.
 *     id
 *        An integer specifying the graphical element to be drawn.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Width value to use.
@@ -26648,7 +27495,7 @@ static double GetUseWidth( AstPlot *this, int id ) {
 /* See if the supplied identifier is a psuedo-identifier representing two 
    or three other genuine identifiers. If so, return the value of the first set
    genuine identifier. */
-   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3 );
+   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3, status );
    if( nid > 1 ) {
       if(  astTestWidth( this, id1 ) ) {
          id = id1;
@@ -26669,7 +27516,7 @@ static double GetUseWidth( AstPlot *this, int id ) {
 
 }
 
-static int TestUseColour( AstPlot *this, int id ) {
+static int TestUseColour( AstPlot *this, int id, int *status ) {
 /*
 *  Name:
 *     TestUseColour
@@ -26682,7 +27529,7 @@ static int TestUseColour( AstPlot *this, int id ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int TestUseColour( AstPlot *this, int id )
+*     int TestUseColour( AstPlot *this, int id, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -26699,6 +27546,8 @@ static int TestUseColour( AstPlot *this, int id ) {
 *        Pointer to the Plot.
 *     id
 *        An integer specifying the graphical element to be drawn.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Colour value state (1 if set, zero otherwise).
@@ -26720,7 +27569,7 @@ static int TestUseColour( AstPlot *this, int id ) {
 /* See if the supplied identifier is a psuedo-identifier representing two 
    or three other genuine identifiers. If so, return the logical AND of the 
    test flags for the genuine identifiers. */
-   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3 );
+   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3, status );
    ret = astTestColour( this, id1 );
    if( nid > 1 ) ret = ret && astTestColour( this, id2 );
    if( nid > 2 ) ret = ret && astTestColour( this, id3 );
@@ -26730,7 +27579,7 @@ static int TestUseColour( AstPlot *this, int id ) {
 
 }
 
-static int TestUseFont( AstPlot *this, int id ) {
+static int TestUseFont( AstPlot *this, int id, int *status ) {
 /*
 *  Name:
 *     TestUseFont
@@ -26743,7 +27592,7 @@ static int TestUseFont( AstPlot *this, int id ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int TestUseFont( AstPlot *this, int id )
+*     int TestUseFont( AstPlot *this, int id, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -26760,6 +27609,8 @@ static int TestUseFont( AstPlot *this, int id ) {
 *        Pointer to the Plot.
 *     id
 *        An integer specifying the graphical element to be drawn.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Font value state (1 if set, zero otherwise).
@@ -26781,7 +27632,7 @@ static int TestUseFont( AstPlot *this, int id ) {
 /* See if the supplied identifier is a psuedo-identifier representing two 
    or three other genuine identifiers. If so, return the logical AND of the 
    test flags for the genuine identifiers. */
-   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3 );
+   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3, status );
    ret = astTestFont( this, id1 );
    if( nid > 1 ) ret = ret && astTestFont( this, id2 );
    if( nid > 2 ) ret = ret && astTestFont( this, id3 );
@@ -26791,7 +27642,7 @@ static int TestUseFont( AstPlot *this, int id ) {
 
 }
 
-static int TestUseSize( AstPlot *this, int id ) {
+static int TestUseSize( AstPlot *this, int id, int *status ) {
 /*
 *  Name:
 *     TestUseSize
@@ -26804,7 +27655,7 @@ static int TestUseSize( AstPlot *this, int id ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int TestUseSize( AstPlot *this, int id )
+*     int TestUseSize( AstPlot *this, int id, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -26821,6 +27672,8 @@ static int TestUseSize( AstPlot *this, int id ) {
 *        Pointer to the Plot.
 *     id
 *        An integer specifying the graphical element to be drawn.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Size value state (1 if set, zero otherwise).
@@ -26842,7 +27695,7 @@ static int TestUseSize( AstPlot *this, int id ) {
 /* See if the supplied identifier is a psuedo-identifier representing two 
    or three other genuine identifiers. If so, return the logical AND of the 
    test flags for the genuine identifiers. */
-   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3 );
+   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3, status );
    ret = astTestSize( this, id1 );
    if( nid > 1 ) ret = ret && astTestSize( this, id2 );
    if( nid > 2 ) ret = ret && astTestSize( this, id3 );
@@ -26852,7 +27705,7 @@ static int TestUseSize( AstPlot *this, int id ) {
 
 }
 
-static int TestUseStyle( AstPlot *this, int id ) {
+static int TestUseStyle( AstPlot *this, int id, int *status ) {
 /*
 *  Name:
 *     TestUseStyle
@@ -26865,7 +27718,7 @@ static int TestUseStyle( AstPlot *this, int id ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int TestUseStyle( AstPlot *this, int id )
+*     int TestUseStyle( AstPlot *this, int id, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -26882,6 +27735,8 @@ static int TestUseStyle( AstPlot *this, int id ) {
 *        Pointer to the Plot.
 *     id
 *        An integer specifying the graphical element to be drawn.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Style value state (1 if set, zero otherwise).
@@ -26903,7 +27758,7 @@ static int TestUseStyle( AstPlot *this, int id ) {
 /* See if the supplied identifier is a psuedo-identifier representing two 
    or three other genuine identifiers. If so, return the logical AND of the 
    test flags for the genuine identifiers. */
-   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3 );
+   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3, status );
    ret = astTestStyle( this, id1 );
    if( nid > 1 ) ret = ret && astTestStyle( this, id2 );
    if( nid > 2 ) ret = ret && astTestStyle( this, id3 );
@@ -26913,7 +27768,7 @@ static int TestUseStyle( AstPlot *this, int id ) {
 
 }
 
-static int TestUseWidth( AstPlot *this, int id ) {
+static int TestUseWidth( AstPlot *this, int id, int *status ) {
 /*
 *  Name:
 *     TestUseWidth
@@ -26926,7 +27781,7 @@ static int TestUseWidth( AstPlot *this, int id ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int TestUseWidth( AstPlot *this, int id )
+*     int TestUseWidth( AstPlot *this, int id, int *status )
 
 *  Class Membership:
 *     Plot member function.
@@ -26943,6 +27798,8 @@ static int TestUseWidth( AstPlot *this, int id ) {
 *        Pointer to the Plot.
 *     id
 *        An integer specifying the graphical element to be drawn.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Width value state (1 if set, zero otherwise).
@@ -26964,7 +27821,7 @@ static int TestUseWidth( AstPlot *this, int id ) {
 /* See if the supplied identifier is a psuedo-identifier representing two 
    or three other genuine identifiers. If so, return the logical AND of the 
    test flags for the genuine identifiers. */
-   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3 );
+   nid = IdFind( id, astGetNin( this ), &id1, &id2, &id3, status );
    ret = astTestWidth( this, id1 );
    if( nid > 1 ) ret = ret && astTestWidth( this, id2 );
    if( nid > 2 ) ret = ret && astTestWidth( this, id3 );
@@ -26975,7 +27832,7 @@ static int TestUseWidth( AstPlot *this, int id ) {
 }
 
 static int ToggleLogLin( AstPlot *this, int axis, int islog, 
-                         const char *method ){
+                         const char *method, int *status ){
 /*
 *
 *  Name:
@@ -26990,7 +27847,7 @@ static int ToggleLogLin( AstPlot *this, int axis, int islog,
 *  Synopsis:
 *     #include "plot.h"
 *     int ToggleLogLin( AstPlot *this, int axis, int islog, 
-*                       const char *method )
+*                       const char *method, int *status )
 
 *  Class Membership:
 *     Plot member function 
@@ -27018,6 +27875,8 @@ static int ToggleLogLin( AstPlot *this, int axis, int islog,
 *     method
 *        Pointer to a null-terminated string holding the name of the calling 
 *        method (only used within error mesages).
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Non-zero if the attempt to re-map the graphics Frame was succesful,
@@ -27083,7 +27942,7 @@ static int ToggleLogLin( AstPlot *this, int axis, int islog,
 
 /* Form the 1D Mapping which maps the specified axis linearly onto the plotting
    surface. The forward transformation goes from graphics to base Frame. */
-      linmap = astWinMap( 1, &g1, &g2, &b1, &b2, "" );
+      linmap = astWinMap( 1, &g1, &g2, &b1, &b2, "", status );
 
 /* Form the 1D Mapping which maps the specified axis logarithmically onto the 
    plotting surface. The forward transformation goes from graphics to base 
@@ -27104,14 +27963,14 @@ static int ToggleLogLin( AstPlot *this, int axis, int islog,
 
       fwd[ 0 ] = (const char *) fwdexp;
       inv[ 0 ] = (const char *) invexp;
-      logmap = astMathMap( 1, 1, 1, fwd, 1, inv, "SimpFI=1,SimpIF=1" );
+      logmap = astMathMap( 1, 1, 1, fwd, 1, inv, "SimpFI=1,SimpIF=1", status );
 
 /* If the axis was previously logarithmic, get the Mapping with which to remap 
    the graphics Frame so that it becomes linearly related to the base Frame 
    in the FrameSet supplied when the Plot was constructed. */
       if( islog ) {
          astInvert( linmap );
-         remap1 = astCmpMap( logmap, linmap, 1, "" );
+         remap1 = astCmpMap( logmap, linmap, 1, "", status );
 
 /* If the axis was previously linear, store the new value and get the Mapping 
    with which to remap the graphics Frame so that it becomes logarithmically 
@@ -27119,15 +27978,15 @@ static int ToggleLogLin( AstPlot *this, int axis, int islog,
    constructed. */
       } else {
          astInvert( logmap );
-         remap1 = astCmpMap( linmap, logmap, 1, "" );
+         remap1 = astCmpMap( linmap, logmap, 1, "", status );
       }
 
 /* Add a 1D UnitMap to map the unaltered mapping. */
-      unitmap = astUnitMap( 1, "" );
+      unitmap = astUnitMap( 1, "", status );
       if( axis == 0 ) {
-         remap2 = astCmpMap( remap1, unitmap, 0, "" );
+         remap2 = astCmpMap( remap1, unitmap, 0, "", status );
       } else {
-         remap2 = astCmpMap( unitmap, remap1, 0, "" );
+         remap2 = astCmpMap( unitmap, remap1, 0, "", status );
       }     
       
 /* Remap the base (graphics) Frame in the Plot. */
@@ -27149,7 +28008,7 @@ static int ToggleLogLin( AstPlot *this, int axis, int islog,
    return result;
 } 
 
-static int Ustrcmp( const char *a, const char *b ){
+static int Ustrcmp( const char *a, const char *b, int *status ){
 /*
 *  Name:
 *     Ustrncmp
@@ -27162,7 +28021,7 @@ static int Ustrcmp( const char *a, const char *b ){
 
 *  Synopsis:
 *     #include "plot.h"
-*     static int Ustrcmp( const char *a, const char *b )
+*     int Ustrcmp( const char *a, const char *b )
 
 *  Class Membership:
 *     Plot member function.
@@ -27232,7 +28091,7 @@ static int Ustrcmp( const char *a, const char *b ){
 
 }
 
-static int Ustrncmp( const char *a, const char *b, size_t n ){
+static int Ustrncmp( const char *a, const char *b, size_t n, int *status ){
 /*
 *  Name:
 *     Ustrncmp
@@ -27245,7 +28104,7 @@ static int Ustrncmp( const char *a, const char *b, size_t n ){
 
 *  Synopsis:
 *     #include "plot.h"
-*     static int Ustrncmp( const char *a, const char *b, size_t n )
+*     int Ustrncmp( const char *a, const char *b, size_t n )
 
 *  Class Membership:
 *     Plot member function.
@@ -27322,7 +28181,7 @@ static int Ustrncmp( const char *a, const char *b, size_t n ){
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -27334,7 +28193,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for Plot objects.
@@ -27342,6 +28201,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the object to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     This function attempts to execute even if the global error status is
@@ -27382,12 +28243,12 @@ static void Delete( AstObject *obj ) {
    }
 
 /* Free the information about the drawn tick marks. */
-   SaveTick( this, -1, 0.0, 0.0, 0 );
+   SaveTick( this, -1, 0.0, 0.0, 0, status );
 }
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -27399,7 +28260,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for Plot objects.
@@ -27409,6 +28270,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the object to be copied.
 *     objout
 *        Pointer to the object being constructed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     -  This constructor makes a deep copy.
@@ -27489,13 +28352,13 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
       out->clip_lbnd = (double *) astFree( out->clip_lbnd );     
       out->clip_ubnd = (double *) astFree( out->clip_ubnd );
       out->grfstack = (AstGrfPtrs *) astFree( out->grfstack );
-      SaveTick( out, -1, 0.0, 0.0, 0 );
+      SaveTick( out, -1, 0.0, 0.0, 0, status );
     }
 }
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -27507,7 +28370,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -27518,6 +28381,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the Plot whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 #define KEY_LEN 50               /* Maximum length of a keyword */
@@ -27563,50 +28428,50 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Tol. */
 /* ---- */
-   set = TestTol( this );
-   dval = set ? GetTol( this ) : astGetTol( this );
+   set = TestTol( this, status );
+   dval = set ? GetTol( this, status ) : astGetTol( this );
    astWriteDouble( channel, "Tol", set, 0, dval, "Plotting tolerance" );
 
 /* Grid. */
 /* ----- */
-   set = TestGrid( this );
-   ival = set ? GetGrid( this ) : astGetGrid( this );
+   set = TestGrid( this, status );
+   ival = set ? GetGrid( this, status ) : astGetGrid( this );
    astWriteInt( channel, "Grid", set, 0, ival, "Is a grid required?" );
 
 /* TickAll. */
 /* -------- */
-   set = TestTickAll( this );
-   ival = set ? GetTickAll( this ) : astGetTickAll( this );
+   set = TestTickAll( this, status );
+   ival = set ? GetTickAll( this, status ) : astGetTickAll( this );
    astWriteInt( channel, "TckAll", set, 1, ival, "Put ticks on all edges?" );
 
 /* ForceExterior. */
 /* -------------- */
-   set = TestForceExterior( this );
-   ival = set ? GetForceExterior( this ) : astGetForceExterior( this );
+   set = TestForceExterior( this, status );
+   ival = set ? GetForceExterior( this, status ) : astGetForceExterior( this );
    astWriteInt( channel, "FrcExt", set, 1, ival, "Force exterior labelling?" );
 
 /* Invisible. */
 /* ---------- */
-   set = TestInvisible( this );
-   ival = set ? GetInvisible( this ) : astGetInvisible( this );
+   set = TestInvisible( this, status );
+   ival = set ? GetInvisible( this, status ) : astGetInvisible( this );
    astWriteInt( channel, "Invsbl", set, 1, ival, "Use invisible ink?" );
 
 /* Border. */
 /* ------- */
-   set = TestBorder( this );
-   ival = set ? GetBorder( this ) : astGetBorder( this );
+   set = TestBorder( this, status );
+   ival = set ? GetBorder( this, status ) : astGetBorder( this );
    astWriteInt( channel, "Border", set, 0, ival, "Draw a border round the grid?" );
 
 /* ClipOp. */
 /* ------- */
-   set = TestClipOp( this );
-   ival = set ? GetClipOp( this ) : astGetClipOp( this );
+   set = TestClipOp( this, status );
+   ival = set ? GetClipOp( this, status ) : astGetClipOp( this );
    astWriteInt( channel, "ClpOp", set, 0, ival, "Clip using logical OR?" );
 
 /* Clip. */
 /* ----- */
-   set = TestClip( this );
-   ival = set ? GetClip( this ) : astGetClip( this );
+   set = TestClip( this, status );
+   ival = set ? GetClip( this, status ) : astGetClip( this );
    astWriteInt( channel, "Clip", set, 0, ival, 
                 ((ival == 0)?"Do not clip at plot edges": 
                 ((ival == 1)?"Clip curves at plot edges": 
@@ -27615,15 +28480,15 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* DrawTitle. */
 /* --------- */
-   set = TestDrawTitle( this );
-   ival = set ? GetDrawTitle( this ) : astGetDrawTitle( this );
+   set = TestDrawTitle( this, status );
+   ival = set ? GetDrawTitle( this, status ) : astGetDrawTitle( this );
    astWriteInt( channel, "DrwTtl", set, 1, ival, "Add a title to the grid?" );
 
 /* DrawAxesUnits(axis). */
 /* ----------------- */
    for( axis = 0; axis < nax; axis++ ){
-      set = TestDrawAxes( this, axis );
-      ival = set ? GetDrawAxes( this, axis ) : astGetDrawAxes( this, axis );
+      set = TestDrawAxes( this, axis, status );
+      ival = set ? GetDrawAxes( this, axis, status ) : astGetDrawAxes( this, axis );
       (void) sprintf( buff, "DrwAxs%d", axis + 1 );
       astWriteInt( channel, buff, set, 0, ival, "Draw axis through ticks?" );
    }
@@ -27631,23 +28496,23 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* Abbrev(axis). */
 /* ------------- */
    for( axis = 0; axis < nax; axis++ ){
-      set = TestAbbrev( this, axis );
-      ival = set ? GetAbbrev( this, axis ) : astGetAbbrev( this, axis );
+      set = TestAbbrev( this, axis, status );
+      ival = set ? GetAbbrev( this, axis, status ) : astGetAbbrev( this, axis );
       (void) sprintf( buff, "Abbrv%d", axis + 1 );
       astWriteInt( channel, buff, set, 0, ival, "Abbreviate numerical axis labels?" );
    }
 
 /* Escape. */
 /* ------- */
-   set = TestEscape( this );
-   ival = set ? GetEscape( this ) : astGetEscape( this );
+   set = TestEscape( this, status );
+   ival = set ? GetEscape( this, status ) : astGetEscape( this );
    astWriteInt( channel, "Escape", set, 1, ival, "Interpret escape sequences?" );
 
 /* LabelAt(axis). */
 /* -------------- */
    for( axis = 0; axis < nax; axis++ ){
-      set = TestLabelAt( this, axis );
-      dval = set ? GetLabelAt( this, axis ) : astGetLabelAt( this, axis );
+      set = TestLabelAt( this, axis, status );
+      dval = set ? GetLabelAt( this, axis, status ) : astGetLabelAt( this, axis );
       if( dval != AST__BAD ){
          (void) sprintf( buff, "LblAt%d", axis + 1 );
          astWriteDouble( channel, buff, set, 0, dval, "Put numerical labels at" );
@@ -27657,8 +28522,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* Centre(axis). */
 /* ------------ */
    for( axis = 0; axis < nax; axis++ ){
-      set = TestCentre( this, axis );
-      dval = set ? GetCentre( this, axis ) : astGetCentre( this, axis );
+      set = TestCentre( this, axis, status );
+      dval = set ? GetCentre( this, axis, status ) : astGetCentre( this, axis );
       if( dval != AST__BAD ){
          (void) sprintf( buff, "Cen%d", axis + 1 );
          astWriteDouble( channel, buff, set, 0, dval, "Tick mark origin" );
@@ -27696,8 +28561,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* NumLabGap(axis). */
 /* ---------------- */
    for( axis = 0; axis < nax; axis++ ){
-      set = TestNumLabGap( this, axis );
-      dval = set ? GetNumLabGap( this, axis ) : astGetNumLabGap( this, axis );
+      set = TestNumLabGap( this, axis, status );
+      dval = set ? GetNumLabGap( this, axis, status ) : astGetNumLabGap( this, axis );
       if( dval != AST__BAD ) {
          (void) sprintf( buff, "NmGap%d", axis + 1 );
          astWriteDouble( channel, buff, set, 1, dval, "Spacing of numerical labels" );
@@ -27707,8 +28572,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* TextLabGap(axis). */
 /* ----------------- */
    for( axis = 0; axis < nax; axis++ ){
-      set = TestTextLabGap( this, axis );
-      dval = set ? GetTextLabGap( this, axis ) : astGetTextLabGap( this, axis );
+      set = TestTextLabGap( this, axis, status );
+      dval = set ? GetTextLabGap( this, axis, status ) : astGetTextLabGap( this, axis );
       if( dval != AST__BAD ) {
          (void) sprintf( buff, "TxGap%d", axis + 1 );
          astWriteDouble( channel, buff, set, 1, dval, "Spacing of descriptive labels" );
@@ -27718,8 +28583,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* LabelUp(axis). */
 /* -------------- */
    for( axis = 0; axis < nax; axis++ ){
-      set = TestLabelUp( this, axis );
-      ival = set ? GetLabelUp( this, axis ) : astGetLabelUp( this, axis );
+      set = TestLabelUp( this, axis, status );
+      ival = set ? GetLabelUp( this, axis, status ) : astGetLabelUp( this, axis );
       (void) sprintf( buff, "LblUp%d", axis + 1 );
       astWriteInt( channel, buff, set, 1, ival, "Draw numerical labels upright?" );
    }
@@ -27727,8 +28592,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* LogPlot(axis). */
 /* -------------- */
    for( axis = 0; axis < nax; axis++ ){
-      set = TestLogPlot( this, axis );
-      ival = set ? GetLogPlot( this, axis ) : astGetLogPlot( this, axis );
+      set = TestLogPlot( this, axis, status );
+      ival = set ? GetLogPlot( this, axis, status ) : astGetLogPlot( this, axis );
       (void) sprintf( buff, "LgPlt%d", axis + 1 );
       astWriteInt( channel, buff, set, 1, ival, "Map plot axis logarithmically?" );
    }
@@ -27736,8 +28601,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* LogTicks(axis). */
 /* -------------- */
    for( axis = 0; axis < nax; axis++ ){
-      set = TestLogTicks( this, axis );
-      ival = set ? GetLogTicks( this, axis ) : astGetLogTicks( this, axis );
+      set = TestLogTicks( this, axis, status );
+      ival = set ? GetLogTicks( this, axis, status ) : astGetLogTicks( this, axis );
       (void) sprintf( buff, "LgTck%d", axis + 1 );
       astWriteInt( channel, buff, set, 1, ival, "Space ticks logarithmically?" );
    }
@@ -27745,8 +28610,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* LogLabel(axis). */
 /* -------------- */
    for( axis = 0; axis < nax; axis++ ){
-      set = TestLogLabel( this, axis );
-      ival = set ? GetLogLabel( this, axis ) : astGetLogLabel( this, axis );
+      set = TestLogLabel( this, axis, status );
+      ival = set ? GetLogLabel( this, axis, status ) : astGetLogLabel( this, axis );
       (void) sprintf( buff, "LgLbl%d", axis + 1 );
       astWriteInt( channel, buff, set, 1, ival, "Scientific notation for labels?" );
    }
@@ -27754,8 +28619,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* NumLab(axis). */
 /* -------------- */
    for( axis = 0; axis < nax; axis++ ){
-      set = TestNumLab( this, axis );
-      ival = set ? GetNumLab( this, axis ) : astGetNumLab( this, axis );
+      set = TestNumLab( this, axis, status );
+      ival = set ? GetNumLab( this, axis, status ) : astGetNumLab( this, axis );
       (void) sprintf( buff, "NmLbl%d", axis + 1 );
       astWriteInt( channel, buff, set, 1, ival, "Draw numerical labels?" );
    }
@@ -27763,8 +28628,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* MinTick(axis). */
 /* -------------- */
    for( axis = 0; axis < nax; axis++ ){
-      set = TestMinTick( this, axis );
-      ival = set ? GetMinTick( this, axis ) : astGetMinTick( this, axis );
+      set = TestMinTick( this, axis, status );
+      ival = set ? GetMinTick( this, axis, status ) : astGetMinTick( this, axis );
       (void) sprintf( buff, "MnTks%d", axis + 1 );
       astWriteInt( channel, buff, set, 0, ival, "No. of sub-divisions "
                    "between major tick marks" );
@@ -27773,8 +28638,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* TextLab(axis). */
 /* -------------- */
    for( axis = 0; axis < nax; axis++ ){
-      set = TestTextLab( this, axis );
-      ival = set ? GetTextLab( this, axis ) : astGetTextLab( this, axis );
+      set = TestTextLab( this, axis, status );
+      ival = set ? GetTextLab( this, axis, status ) : astGetTextLab( this, axis );
       (void) sprintf( buff, "TxLbl%d", axis + 1 );
       astWriteInt( channel, buff, set, 0, ival, "Draw textual label?" );
    }
@@ -27782,8 +28647,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* LabelUnits(axis). */
 /* ----------------- */
    for( axis = 0; axis < nax; axis++ ){
-      set = TestLabelUnits( this, axis );
-      ival = set ? GetLabelUnits( this, axis ) : astGetLabelUnits( this, axis );
+      set = TestLabelUnits( this, axis, status );
+      ival = set ? GetLabelUnits( this, axis, status ) : astGetLabelUnits( this, axis );
       (void) sprintf( buff, "LbUnt%d", axis + 1 );
       astWriteInt( channel, buff, set, 0, ival, "Add units to axis label?" );
    }
@@ -27791,10 +28656,10 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* Style(object). */
 /* -------------- */
    for( id = 0; id < AST__NPID; id++ ){
-      set = TestStyle( this, id );
-      ival = set ? GetStyle( this, id ) : astGetStyle( this, id );
+      set = TestStyle( this, id, status );
+      ival = set ? GetStyle( this, id, status ) : astGetStyle( this, id );
       (void) sprintf( buff, "Style%d", id + 1 );
-      comment = GrfItem( id, " line style", &ax );
+      comment = GrfItem( id, " line style", &ax, status );
       if( ax < nax - 1 ) astWriteInt( channel, buff, set, 0, ival, comment );
       comment = (char *) astFree( (void *) comment );
    }
@@ -27802,10 +28667,10 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* Font(object). */
 /* ------------- */
    for( id = 0; id < AST__NPID; id++ ){
-      set = TestFont( this, id );
-      ival = set ? GetFont( this, id ) : astGetFont( this, id );
+      set = TestFont( this, id, status );
+      ival = set ? GetFont( this, id, status ) : astGetFont( this, id );
       (void) sprintf( buff, "Font%d", id + 1 );
-      comment = GrfItem( id, " character font", &ax );
+      comment = GrfItem( id, " character font", &ax, status );
       if( ax < nax - 1 ) astWriteInt( channel, buff, set, 0, ival, comment );
       comment = (char *) astFree( (void *) comment );
    }
@@ -27813,10 +28678,10 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* Colour(object). */
 /* --------------- */
    for( id = 0; id < AST__NPID; id++ ){
-      set = TestColour( this, id );
-      ival = set ? GetColour( this, id ) : astGetColour( this, id );
+      set = TestColour( this, id, status );
+      ival = set ? GetColour( this, id, status ) : astGetColour( this, id );
       (void) sprintf( buff, "Col%d", id + 1 );
-      comment = GrfItem( id, " colour index", &ax );
+      comment = GrfItem( id, " colour index", &ax, status );
       if( ax < nax - 1 ) astWriteInt( channel, buff, set, 0, ival, comment );
       comment = (char *) astFree( (void *) comment );
    }
@@ -27824,11 +28689,11 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* Width(object). */
 /* -------------- */
    for( id = 0; id < AST__NPID; id++ ){
-      set = TestWidth( this, id );
-      dval = set ? GetWidth( this, id ) : astGetWidth( this, id );
+      set = TestWidth( this, id, status );
+      dval = set ? GetWidth( this, id, status ) : astGetWidth( this, id );
       if( dval != AST__BAD ) {
          (void) sprintf( buff, "Width%d", id + 1 );
-         comment = GrfItem( id, " line width", &ax );
+         comment = GrfItem( id, " line width", &ax, status );
          if( ax < nax - 1 ) astWriteDouble( channel, buff, set, 0, dval, comment );
          comment = (char *) astFree( (void *) comment );
       }
@@ -27837,11 +28702,11 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* Size(object). */
 /* ------------- */
    for( id = 0; id < AST__NPID; id++ ){
-      set = TestSize( this, id );
-      dval = set ? GetSize( this, id ) : astGetSize( this, id );
+      set = TestSize( this, id, status );
+      dval = set ? GetSize( this, id, status ) : astGetSize( this, id );
       if( dval != AST__BAD ) {
          (void) sprintf( buff, "Size%d", id + 1 );
-         comment = GrfItem( id, " character size", &ax );
+         comment = GrfItem( id, " character size", &ax, status );
          if( ax < nax - 1 ) astWriteDouble( channel, buff, set, 0, dval, comment );
          comment = (char *) astFree( (void *) comment );
       }
@@ -27849,16 +28714,16 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* TitleGap. */
 /* --------- */
-   set = TestTitleGap( this );
-   dval = set ? GetTitleGap( this ) : astGetTitleGap( this );
+   set = TestTitleGap( this, status );
+   dval = set ? GetTitleGap( this, status ) : astGetTitleGap( this );
    if( dval != AST__BAD ) astWriteDouble( channel, "TtlGap", set, 1, dval, 
                                          "Gap between title and edge" );
 
 /* MajTickLen(axis). */
 /* ----------------- */
    for( axis = 0; axis < nax; axis++ ){
-      set = TestMajTickLen( this, axis );
-      dval = set ? GetMajTickLen( this, axis ) : astGetMajTickLen( this, axis );
+      set = TestMajTickLen( this, axis, status );
+      dval = set ? GetMajTickLen( this, axis, status ) : astGetMajTickLen( this, axis );
       if( dval != AST__BAD ) {
          (void) sprintf( buff, "MjTkLn%d", axis + 1 );
          astWriteDouble( channel, buff, set, 0, dval, "Major tick length" );
@@ -27868,8 +28733,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* MinTickLen(axis). */
 /* ----------------- */
    for( axis = 0; axis < nax; axis++ ){
-      set = TestMinTickLen( this, axis );
-      dval = set ? GetMinTickLen( this, axis ) : astGetMinTickLen( this, axis );
+      set = TestMinTickLen( this, axis, status );
+      dval = set ? GetMinTickLen( this, axis, status ) : astGetMinTickLen( this, axis );
       if( dval != AST__BAD ) {
          (void) sprintf( buff, "MnTkLn%d", axis + 1 );
          astWriteDouble( channel, buff, set, 1, dval, "Minor tick length" );
@@ -27878,16 +28743,16 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Labelling. */
 /* ---------- */
-   set = TestLabelling( this );
-   ival = set ? GetLabelling( this ) : astGetLabelling( this );
+   set = TestLabelling( this, status );
+   ival = set ? GetLabelling( this, status ) : astGetLabelling( this );
    comment = "Labelling scheme";
    astWriteString( channel, "Lbling", set, 0, xlbling[ival], comment );
 
 /* Edge(axis). */
 /* ----------- */
    for( axis = 0; axis < nax; axis++ ){
-      set = TestEdge( this, axis );
-      ival = set ? GetEdge( this, axis ) : astGetEdge( this, axis );
+      set = TestEdge( this, axis, status );
+      ival = set ? GetEdge( this, axis, status ) : astGetEdge( this, axis );
       (void) sprintf( buff, "Edge%d", axis + 1 );
       comment = "Edge used to label an axis";
       astWriteString( channel, buff, set, 0, xedge[ival], comment );
@@ -27990,11 +28855,11 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* Implement the astIsAPlot and astCheckPlot functions using
    the macros defined for this purpose in the "object.h" header
    file. */
-astMAKE_ISA(Plot,FrameSet,check,&class_init)
+astMAKE_ISA(Plot,FrameSet,check,&class_check)
 astMAKE_CHECK(Plot)
 
 AstPlot *astPlot_( void *frame_void, const float *graphbox, 
-                   const double *basebox, const char *options, ... ) {
+                   const double *basebox, const char *options, int *status, ...) {
 /*
 *+
 *  Name:
@@ -28009,7 +28874,7 @@ AstPlot *astPlot_( void *frame_void, const float *graphbox,
 *  Synopsis:
 *     #include "plot.h"
 *     AstPlot *astPlot( AstFrame *frame, const float *graphbox, 
-*                       const double *basebox, const char *options, ... ) 
+*                       const double *basebox, const char *options, ..., int *status ) 
 
 *  Class Membership:
 *     Plot constructor.
@@ -28051,6 +28916,8 @@ AstPlot *astPlot_( void *frame_void, const float *graphbox,
 *        initialising the new Plot. The syntax used is the same as
 *        for the astSet method and may include "printf" format
 *        specifiers identified by "%" symbols in the normal way.
+*     status
+*        Pointer to the inherited status variable.
 *     ...
 *        If the "options" string contains "%" format specifiers, then
 *        an optional list of arguments may follow it in order to
@@ -28088,9 +28955,13 @@ AstPlot *astPlot_( void *frame_void, const float *graphbox,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstPlot *new;                 /* Pointer to new Plot */
    va_list args;                 /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -28123,7 +28994,7 @@ AstPlot *astPlot_( void *frame_void, const float *graphbox,
 /* Obtain the variable argument list and pass it along with the
    options string to the astVSet method to initialise the new
    Plot's attributes. */
-         va_start( args, options );
+         va_start( args, status );
          astVSet( new, options, NULL, args );
          va_end( args );
 
@@ -28138,7 +29009,7 @@ AstPlot *astPlot_( void *frame_void, const float *graphbox,
 
 AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab, 
                        const char *name, AstFrame *frame, const float *graphbox, 
-                       const double *basebox ) {
+                       const double *basebox, int *status ) {
 /*
 *+
 *  Name:
@@ -28224,6 +29095,7 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstFrame *baseframe;         /* Pointer to base frame */
    AstFrame *graphicsframe;     /* Pointer to graphics frame */
    AstFrameSet *fset0;          /* The n-D FrameSet to be annotated */
@@ -28271,8 +29143,8 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    message which can be used to describe the object within error 
    messages. */
    if( !frame ){
-      baseframe = astFrame( 2, "" );
-      fset = astFrameSet( baseframe, "" );
+      baseframe = astFrame( 2, "", status );
+      fset = astFrameSet( baseframe, "", status );
       mess = "default 2-d Frame";
 
 /* If an object was supplied, report an error if it is not a Frame or 
@@ -28280,7 +29152,7 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    } else if( !astIsAFrame( frame ) ){
       if( astOK ){
          astError( AST__BDOBJ, "astInitPlot(%s): Supplied Object (class '%s') "
-                   "is not a Frame.", name, astGetClass( frame ) );
+                   "is not a Frame.", status, name, astGetClass( frame ) );
       }
 
 /* If the supplied object is a Plot or an object derived from a Plot (a Plot 
@@ -28288,7 +29160,7 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    FrameSet from the Plot, and clear the Domain attribute for any existing 
    Frames which have Domain GRAPHICS. */
    } else if( astIsAPlot( frame ) ){
-      fset0 = astFrameSet( frame, "" );
+      fset0 = astFrameSet( frame, "", status );
       fset = astCopy( fset0 );
       fset0 = astAnnul( fset0 );
 
@@ -28308,9 +29180,9 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    included in the FrameSet derived from axes 1 and 2 of the supplied
    Frame. This new Frame becomes the base Frame. */
    } else if( !astIsAFrameSet( frame ) ){
-      fset0 = astFrameSet( frame, "" );
+      fset0 = astFrameSet( frame, "", status );
       mess = "supplied Frame";
-      fset = Fset2D( fset0, AST__BASE );      
+      fset = Fset2D( fset0, AST__BASE, status );      
       fset0 = astAnnul( fset0 );
       baseframe = astGetFrame( fset, astGetBase( fset ) );
 
@@ -28319,7 +29191,7 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    inserted into it which is derived from axes 1 and 2 of the 
    original base Frame. */
    } else {
-      fset = Fset2D( (AstFrameSet *) frame, AST__BASE );      
+      fset = Fset2D( (AstFrameSet *) frame, AST__BASE, status );      
       baseframe = astGetFrame( fset, astGetBase( fset ) );
       mess = "base Frame of the supplied FrameSet";
    }
@@ -28328,35 +29200,35 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    naxes = astGetNaxes( baseframe );
    if ( naxes != 2 && astOK ) {
       astError( AST__NAXIN, "astInitPlot(%s): Number of axes (%d) in the %s "
-                "is invalid - this number should be 2.", name, naxes, mess );
+                "is invalid - this number should be 2.", status, name, naxes, mess );
    } 
 
 /* Check that neither dimension of the graphbox is zero. */
    if( ( graphbox[ 2 ] == graphbox[ 0 ] ||
          graphbox[ 3 ] == graphbox[ 1 ] ) && astOK ){
       astError( AST__BADBX, "astInitPlot(%s): The plotting area has zero size "
-                "in the graphics world coordinate system.", name );
+                "in the graphics world coordinate system.", status, name );
    }
 
 /* Check that neither dimension of the graphbox is bad. */
    if( astISBAD(graphbox[0]) || astISBAD(graphbox[1]) ||
        astISBAD(graphbox[2]) || astISBAD(graphbox[3]) ) {
       astError( AST__BADBX, "astInitPlot(%s): The plotting area has undefined limits "
-                "in the graphics world coordinate system.", name );
+                "in the graphics world coordinate system.", status, name );
    }
 
 /* Check that neither dimension of the basebox is zero. */
    if( astISBAD(basebox[2]) || astISBAD(basebox[0]) ) {
       astError( AST__BADBX, "astInitPlot(%s): The limits of the horizontal "
-                "axis of the %s are undefined or bad.", name, name );
+                "axis of the %s are undefined or bad.", status, name, name );
    } else if( astISBAD(basebox[3]) || astISBAD(basebox[1]) ) {
       astError( AST__BADBX, "astInitPlot(%s): The limits of the vertical "
-                "axis of the %s are undefined or bad.", name, name );
+                "axis of the %s are undefined or bad.", status, name, name );
    }
 
 /* Create a Frame which describes the graphics world coordinate system. */
    graphicsframe = astFrame( 2,
-                             "Domain=GRAPHICS,Title=Graphical Coordinates" );
+                             "Domain=GRAPHICS,Title=Graphical Coordinates", status );
 
 /* Initialise a FrameSet structure (the parent class) as the first
    component within the Plot structure, allocating memory if necessary. 
@@ -28414,7 +29286,7 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    assigning values to the LogPlot attributes. Create a WinMap which 
    maps the base box (within the base Frame of the supplied FrameSet) 
    onto the graphics box. */
-      map = astWinMap( 2, gbox, gbox + 2, basebox, basebox + 2, "" );
+      map = astWinMap( 2, gbox, gbox + 2, basebox, basebox + 2, "", status );
 
 /* Get the index of the current (physical) and base (pixel) Frames in 
    the supplied FrameSet. */
@@ -28658,7 +29530,7 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
 
 AstPlot *astLoadPlot_( void *mem, size_t size,
                        AstPlotVtab *vtab, const char *name,
-                       AstChannel *channel ) {
+                       AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -28735,6 +29607,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstPlot *new;                 /* Pointer to the new Plot */
    char buff[ KEY_LEN + 1 ];     /* Buffer for keyword string */
    char *text;                   /* Textual version of integer value */
@@ -28750,6 +29623,9 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 
 /* Check the global error status. */
    if ( !astOK ) return new;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* If a NULL virtual function table has been supplied, then this is
    the first loader to be invoked for this Plot. In this case the
@@ -28796,55 +29672,55 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 /* Tol. */
 /* ---- */
       new->tol = astReadDouble( channel, "tol", -1.0 );
-      if ( TestTol( new ) ) SetTol( new, new->tol );
+      if ( TestTol( new, status ) ) SetTol( new, new->tol, status );
 
 /* Grid. */
 /* ----- */
       new->grid = astReadInt( channel, "grid", -1 );
-      if ( TestGrid( new ) ) SetGrid( new, new->grid );
+      if ( TestGrid( new, status ) ) SetGrid( new, new->grid, status );
 
 /* TickAll. */
 /* -------- */
       new->tickall = astReadInt( channel, "tckall", -1 );
-      if ( TestTickAll( new ) ) SetTickAll( new, new->tickall );
+      if ( TestTickAll( new, status ) ) SetTickAll( new, new->tickall, status );
 
 /* ForceExterior. */
 /* -------- */
       new->forceexterior = astReadInt( channel, "frcext", -1 );
-      if ( TestForceExterior( new ) ) SetForceExterior( new, new->forceexterior );
+      if ( TestForceExterior( new, status ) ) SetForceExterior( new, new->forceexterior, status );
 
 /* Invisible. */
 /* ---------- */
       new->invisible = astReadInt( channel, "invsbl", -1 );
-      if ( TestInvisible( new ) ) SetInvisible( new, new->invisible );
+      if ( TestInvisible( new, status ) ) SetInvisible( new, new->invisible, status );
 
 /* Border. */
 /* -------- */
       new->border = astReadInt( channel, "border", -1 );
-      if ( TestBorder( new ) ) SetBorder( new, new->border );
+      if ( TestBorder( new, status ) ) SetBorder( new, new->border, status );
 
 /* ClipOp. */
 /* ------- */
       new->clipop = astReadInt( channel, "clpop", -1 );
-      if ( TestClipOp( new ) ) SetClipOp( new, new->clipop );
+      if ( TestClipOp( new, status ) ) SetClipOp( new, new->clipop, status );
 
 /* Clip. */
 /* ----- */
       new->clip = astReadInt( channel, "clip", -1 );
-      if ( TestClip( new ) ) SetClip( new, new->clip );
+      if ( TestClip( new, status ) ) SetClip( new, new->clip, status );
 
 /* DrawTitle. */
 /* --------- */
       new->drawtitle = astReadInt( channel, "drwttl", -1 );
-      if ( TestDrawTitle( new ) ) SetDrawTitle( new, new->drawtitle );
+      if ( TestDrawTitle( new, status ) ) SetDrawTitle( new, new->drawtitle, status );
 
 /* LabelUp(axis). */
 /* -------------- */
       for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "lblup%d", axis + 1 );
          new->labelup[ axis ] = astReadInt( channel, buff, -1 );
-         if ( TestLabelUp( new, axis ) ) SetLabelUp( new, axis,
-                                                     new->labelup[ axis ] );
+         if ( TestLabelUp( new, axis, status ) ) SetLabelUp( new, axis,
+                                                     new->labelup[ axis ], status );
       }
 
 /* LogPlot(axis). */
@@ -28852,8 +29728,8 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "lgplt%d", axis + 1 );
          new->logplot[ axis ] = astReadInt( channel, buff, -1 );
-         if ( TestLogPlot( new, axis ) ) SetLogPlot( new, axis,
-                                                     new->logplot[ axis ] );
+         if ( TestLogPlot( new, axis, status ) ) SetLogPlot( new, axis,
+                                                     new->logplot[ axis ], status );
       }
 
 /* LogTicks(axis). */
@@ -28861,8 +29737,8 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "lgtck%d", axis + 1 );
          new->logticks[ axis ] = astReadInt( channel, buff, -1 );
-         if ( TestLogTicks( new, axis ) ) SetLogTicks( new, axis,
-                                                       new->logticks[ axis ] );
+         if ( TestLogTicks( new, axis, status ) ) SetLogTicks( new, axis,
+                                                       new->logticks[ axis ], status );
       }
 
 /* LogLabel(axis). */
@@ -28870,8 +29746,8 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "lglbl%d", axis + 1 );
          new->loglabel[ axis ] = astReadInt( channel, buff, -1 );
-         if ( TestLogLabel( new, axis ) ) SetLogLabel( new, axis,
-                                                       new->loglabel[ axis ] );
+         if ( TestLogLabel( new, axis, status ) ) SetLogLabel( new, axis,
+                                                       new->loglabel[ axis ], status );
       }
 
 /* DrawAxes. */
@@ -28880,15 +29756,15 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 
       if(  new->drawaxes[ 0 ] != -1 ) {
          new->drawaxes[ 1 ] = new->drawaxes[ 0 ];
-         if ( TestDrawAxes( new, 0 ) ) SetDrawAxes( new, 0, new->drawaxes[ 0 ] );
-         if ( TestDrawAxes( new, 1 ) ) SetDrawAxes( new, 1, new->drawaxes[ 1 ] );
+         if ( TestDrawAxes( new, 0, status ) ) SetDrawAxes( new, 0, new->drawaxes[ 0 ], status );
+         if ( TestDrawAxes( new, 1, status ) ) SetDrawAxes( new, 1, new->drawaxes[ 1 ], status );
 
       } else {
          for( axis = 0; axis < nax; axis++ ){
             (void) sprintf( buff, "drwaxs%d", axis + 1 );
             new->drawaxes[ axis ] = astReadInt( channel, buff, -1 );
-            if ( TestDrawAxes( new, axis ) ) SetDrawAxes( new, axis,
-                                                       new->drawaxes[ axis ] );
+            if ( TestDrawAxes( new, axis, status ) ) SetDrawAxes( new, axis,
+                                                       new->drawaxes[ axis ], status );
          }
       }
 
@@ -28898,15 +29774,15 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 
       if(  new->abbrev[ 0 ] != -1 ) {
          new->abbrev[ 1 ] = new->abbrev[ 0 ];
-         if ( TestAbbrev( new, 0 ) ) SetAbbrev( new, 0, new->abbrev[ 0 ] );
-         if ( TestAbbrev( new, 1 ) ) SetAbbrev( new, 1, new->abbrev[ 1 ] );
+         if ( TestAbbrev( new, 0, status ) ) SetAbbrev( new, 0, new->abbrev[ 0 ], status );
+         if ( TestAbbrev( new, 1, status ) ) SetAbbrev( new, 1, new->abbrev[ 1 ], status );
 
       } else {
          for( axis = 0; axis < nax; axis++ ){
             (void) sprintf( buff, "abbrv%d", axis + 1 );
             new->abbrev[ axis ] = astReadInt( channel, buff, -1 );
-            if ( TestAbbrev( new, axis ) ) SetAbbrev( new, axis,
-                                                       new->abbrev[ axis ] );
+            if ( TestAbbrev( new, axis, status ) ) SetAbbrev( new, axis,
+                                                       new->abbrev[ axis ], status );
          }
       }
 
@@ -28914,15 +29790,15 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 /* Escape. */
 /* ------- */
       new->escape = astReadInt( channel, "escape", -1 );
-      if ( TestEscape( new ) ) SetEscape( new, new->escape );
+      if ( TestEscape( new, status ) ) SetEscape( new, new->escape, status );
 
 /* LabelAt(axis). */
 /* -------------- */
       for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "lblat%d", axis + 1 );
          new->labelat[ axis ] = astReadDouble( channel, buff, AST__BAD );
-         if ( TestLabelAt( new, axis ) ) SetLabelAt( new, axis,
-                                                     new->labelat[ axis ] );
+         if ( TestLabelAt( new, axis, status ) ) SetLabelAt( new, axis,
+                                                     new->labelat[ axis ], status );
       }
 
 /* Centre(axis). */
@@ -28930,8 +29806,8 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "cen%d", axis + 1 );
          new->centre[ axis ] = astReadDouble( channel, buff, AST__BAD );
-         if ( TestCentre( new, axis ) ) SetCentre( new, axis,
-                                                   new->centre[ axis ] );
+         if ( TestCentre( new, axis, status ) ) SetCentre( new, axis,
+                                                   new->centre[ axis ], status );
       }
 
 /* Gap(axis). */
@@ -28939,7 +29815,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "gap%d", axis + 1 );
          new->gap[ axis ] = astReadDouble( channel, buff, AST__BAD );
-         if ( TestGap( new, axis ) ) SetGap( new, axis, new->gap[ axis ] );
+         if ( TestGap( new, axis, status ) ) SetGap( new, axis, new->gap[ axis ], status );
       }
 
 /* LogGap(axis). */
@@ -28947,7 +29823,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "lggap%d", axis + 1 );
          new->loggap[ axis ] = astReadDouble( channel, buff, AST__BAD );
-         if ( TestLogGap( new, axis ) ) SetLogGap( new, axis, new->loggap[ axis ] );
+         if ( TestLogGap( new, axis, status ) ) SetLogGap( new, axis, new->loggap[ axis ], status );
       }
 
 /* NumLabGap(axis). */
@@ -28955,8 +29831,8 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "nmgap%d", axis + 1 );
          new->numlabgap[ axis ] = astReadDouble( channel, buff, AST__BAD );
-         if ( TestNumLabGap( new, axis ) ) SetNumLabGap( new, axis,
-                                                     new->numlabgap[ axis ] );
+         if ( TestNumLabGap( new, axis, status ) ) SetNumLabGap( new, axis,
+                                                     new->numlabgap[ axis ], status );
       }
 
 /* TextLabGap(axis). */
@@ -28964,8 +29840,8 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "txgap%d", axis + 1 );
          new->textlabgap[ axis ] = astReadDouble( channel, buff, AST__BAD );
-         if ( TestTextLabGap( new, axis ) ) SetTextLabGap( new, axis,
-                                                     new->textlabgap[ axis ] );
+         if ( TestTextLabGap( new, axis, status ) ) SetTextLabGap( new, axis,
+                                                     new->textlabgap[ axis ], status );
       }
 
 /* NumLab(axis). */
@@ -28973,8 +29849,8 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "nmlbl%d", axis + 1 );
          new->numlab[ axis ] = astReadInt( channel, buff, -1 );
-         if ( TestNumLab( new, axis ) ) SetNumLab( new, axis,
-                                                     new->numlab[ axis ] );
+         if ( TestNumLab( new, axis, status ) ) SetNumLab( new, axis,
+                                                     new->numlab[ axis ], status );
       }
 
 /* MinTick(axis). */
@@ -28982,8 +29858,8 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "mntks%d", axis + 1 );
          new->mintick[ axis ] = astReadInt( channel, buff, -1 );
-         if ( TestMinTick( new, axis ) ) SetMinTick( new, axis,
-                                                       new->mintick[ axis ] );
+         if ( TestMinTick( new, axis, status ) ) SetMinTick( new, axis,
+                                                       new->mintick[ axis ], status );
       }
 
 /* TextLab(axis). */
@@ -28991,8 +29867,8 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "txlbl%d", axis + 1 );
          new->textlab[ axis ] = astReadInt( channel, buff, -1 );
-         if ( TestTextLab( new, axis ) ) SetTextLab( new, axis,
-                                                      new->textlab[ axis ] );
+         if ( TestTextLab( new, axis, status ) ) SetTextLab( new, axis,
+                                                      new->textlab[ axis ], status );
       }
 
 /* LabelUnits(axis). */
@@ -29000,8 +29876,8 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       for( axis = 0; axis < nax; axis++ ){
          (void) sprintf( buff, "lbunt%d", axis + 1 );
          new->labelunits[ axis ] = astReadInt( channel, buff, -1 );
-         if ( TestLabelUnits( new, axis ) ) SetLabelUnits( new, axis,
-                                                      new->labelunits[ axis ] );
+         if ( TestLabelUnits( new, axis, status ) ) SetLabelUnits( new, axis,
+                                                      new->labelunits[ axis ], status );
       }
 
 /* Style(object). */
@@ -29009,7 +29885,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       for( id = 0; id < AST__NPID; id++ ){
          (void) sprintf( buff, "style%d", id + 1 );
          new->style[ id ] = astReadInt( channel, buff, -1 );
-         if ( TestStyle( new, id ) ) SetStyle( new, id, new->style[ id ] );
+         if ( TestStyle( new, id, status ) ) SetStyle( new, id, new->style[ id ], status );
       }
 
 /* Font(object). */
@@ -29017,7 +29893,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       for( id = 0; id < AST__NPID; id++ ){
          (void) sprintf( buff, "font%d", id + 1 );
          new->font[ id ] = astReadInt( channel, buff, -1 );
-         if ( TestFont( new, id ) ) SetFont( new, id, new->font[ id ] );
+         if ( TestFont( new, id, status ) ) SetFont( new, id, new->font[ id ], status );
       }
 
 /* Colour(object). */
@@ -29025,7 +29901,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       for( id = 0; id < AST__NPID; id++ ){
          (void) sprintf( buff, "col%d", id + 1 );
          new->colour[ id ] = astReadInt( channel, buff, -1 );
-         if ( TestColour( new, id ) ) SetColour( new, id, new->colour[ id ] );
+         if ( TestColour( new, id, status ) ) SetColour( new, id, new->colour[ id ], status );
       }
 
 /* Width(object). */
@@ -29033,7 +29909,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       for( id = 0; id < AST__NPID; id++ ){
          (void) sprintf( buff, "width%d", id + 1 );
          new->width[ id ] = astReadDouble( channel, buff, AST__BAD );
-         if ( TestWidth( new, id ) ) SetWidth( new, id, new->width[ id ] );
+         if ( TestWidth( new, id, status ) ) SetWidth( new, id, new->width[ id ], status );
       }
 
 /* Size(object). */
@@ -29041,13 +29917,13 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       for( id = 0; id < AST__NPID; id++ ){
          (void) sprintf( buff, "size%d", id + 1 );
          new->size[ id ] = astReadDouble( channel, buff, AST__BAD );
-         if ( TestSize( new, id ) ) SetSize( new, id, new->size[ id ] );
+         if ( TestSize( new, id, status ) ) SetSize( new, id, new->size[ id ], status );
       }
 
 /* TitleGap. */
 /* --------- */
       new->titlegap = astReadDouble( channel, "ttlgap", AST__BAD );
-      if ( TestTitleGap( new ) ) SetTitleGap( new, new->titlegap );
+      if ( TestTitleGap( new, status ) ) SetTitleGap( new, new->titlegap, status );
 
 /* MajTickLen. */
 /* ----------- */
@@ -29055,8 +29931,8 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       new->majticklen[ 0 ] = astReadDouble( channel, "mjtkln", AST__BAD );
       if( new->majticklen[ 0 ] != AST__BAD ) {
          new->majticklen[ 1 ] = new->majticklen[ 0 ];
-         if ( TestMajTickLen( new, 0 ) ) SetMajTickLen( new, 0, new->majticklen[ 0 ] );
-         if ( TestMajTickLen( new, 1 ) ) SetMajTickLen( new, 1, new->majticklen[ 1 ] );
+         if ( TestMajTickLen( new, 0, status ) ) SetMajTickLen( new, 0, new->majticklen[ 0 ], status );
+         if ( TestMajTickLen( new, 1, status ) ) SetMajTickLen( new, 1, new->majticklen[ 1 ], status );
 
 /* MajTickLen(axis). */
 /* ----------------- */
@@ -29064,8 +29940,8 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
          for( axis = 0; axis < nax; axis++ ){
             (void) sprintf( buff, "mjtkln%d", axis + 1 );
             new->majticklen[ axis ] = astReadDouble( channel, buff, AST__BAD );
-            if ( TestMajTickLen( new, axis ) ) SetMajTickLen( new, axis,
-                                                        new->majticklen[ axis ] );
+            if ( TestMajTickLen( new, axis, status ) ) SetMajTickLen( new, axis,
+                                                        new->majticklen[ axis ], status );
          }
       }
 
@@ -29075,8 +29951,8 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       new->minticklen[ 0 ] = astReadDouble( channel, "mntkln", AST__BAD );
       if( new->minticklen[ 0 ] != AST__BAD ) {
          new->minticklen[ 1 ] = new->minticklen[ 0 ];
-         if ( TestMinTickLen( new, 0 ) ) SetMinTickLen( new, 0, new->minticklen[ 0 ] );
-         if ( TestMinTickLen( new, 1 ) ) SetMinTickLen( new, 1, new->minticklen[ 1 ] );
+         if ( TestMinTickLen( new, 0, status ) ) SetMinTickLen( new, 0, new->minticklen[ 0 ], status );
+         if ( TestMinTickLen( new, 1, status ) ) SetMinTickLen( new, 1, new->minticklen[ 1 ], status );
 
 /* MinTickLen(axis). */
 /* ----------------- */
@@ -29084,8 +29960,8 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
          for( axis = 0; axis < nax; axis++ ){
             (void) sprintf( buff, "mntkln%d", axis + 1 );
             new->minticklen[ axis ] = astReadDouble( channel, buff, AST__BAD );
-            if ( TestMinTickLen( new, axis ) ) SetMinTickLen( new, axis,
-                                                        new->minticklen[ axis ] );
+            if ( TestMinTickLen( new, axis, status ) ) SetMinTickLen( new, axis,
+                                                        new->minticklen[ axis ], status );
          }
       }
 
@@ -29095,11 +29971,11 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       if( astOK && strcmp( text, " " ) ) {
          new->labelling = FindString( 2, xlbling, text, 
                                       "the Plot component 'Lbling'", 
-                                      "astRead", astGetClass( channel ) );
+                                      "astRead", astGetClass( channel ), status );
       } else {
          new->labelling = -9999;
       }
-      if ( TestLabelling( new ) ) SetLabelling( new, new->labelling );
+      if ( TestLabelling( new, status ) ) SetLabelling( new, new->labelling, status );
       text = astFree( text );
 
 /* Edge(axis). */
@@ -29110,12 +29986,12 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
          if( astOK && strcmp( text, " " ) ) {
             new->edge[ axis ] = FindString( 4, xedge, text, 
                                             "the Plot component 'Edge'", 
-                                            "astRead", astGetClass( channel ) );
+                                            "astRead", astGetClass( channel ), status );
          } else {
             new->edge[ axis ] = -1;
          }
-         if ( TestEdge( new, axis ) ) SetEdge( new, axis,
-                                               new->edge[ axis ] );
+         if ( TestEdge( new, axis, status ) ) SetEdge( new, axis,
+                                               new->edge[ axis ], status );
          text = astFree( text );
       }
 
@@ -29258,126 +30134,126 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
 
-int astBorder_( AstPlot *this ){
+int astBorder_( AstPlot *this, int *status ){
    if( !astOK ) return 0;
-   return (**astMEMBER(this,Plot,Border))(this);
+   return (**astMEMBER(this,Plot,Border))(this, status );
 }
 
-void astBoundingBox_( AstPlot *this, float lbnd[2], float ubnd[2] ){
+void astBoundingBox_( AstPlot *this, float lbnd[2], float ubnd[2], int *status ){
    if( !astOK ) return;
-   (**astMEMBER(this,Plot,BoundingBox))(this,lbnd,ubnd);
+   (**astMEMBER(this,Plot,BoundingBox))(this,lbnd,ubnd, status );
 }
 
 void astClip_( AstPlot *this, int iframe, const double lbnd[], 
-const double ubnd[] ){
+const double ubnd[], int *status ){
    if( !astOK ) return;
-   (**astMEMBER(this,Plot,Clip))(this,iframe,lbnd,ubnd);
+   (**astMEMBER(this,Plot,Clip))(this,iframe,lbnd,ubnd, status );
 }
 
-void astGrid_( AstPlot *this ){
+void astGrid_( AstPlot *this, int *status ){
    if( !astOK ) return;
-   (**astMEMBER(this,Plot,Grid))(this);
+   (**astMEMBER(this,Plot,Grid))(this, status );
 }
 
 int astCvBrk_( AstPlot *this, int ibrk, double *brk, double *vbrk,
-                   double *len ){
+                   double *len, int *status ){
    if( !astOK ) return 0;
-   return (**astMEMBER(this,Plot,CvBrk))(this,ibrk,brk,vbrk,len);
+   return (**astMEMBER(this,Plot,CvBrk))(this,ibrk,brk,vbrk,len, status );
 }
 
-void astMirror_( AstPlot *this, int axis ){
+void astMirror_( AstPlot *this, int axis, int *status ){
    if( !astOK ) return;
-   (**astMEMBER(this,Plot,Mirror))(this,axis);
+   (**astMEMBER(this,Plot,Mirror))(this,axis, status );
 }
 
-AstPointSet *astGetDrawnTicks_( AstPlot *this, int axis, int major ){
+AstPointSet *astGetDrawnTicks_( AstPlot *this, int axis, int major, int *status ){
    if( !astOK ) return NULL;
-   return (**astMEMBER(this,Plot,GetDrawnTicks))(this,axis,major);
+   return (**astMEMBER(this,Plot,GetDrawnTicks))(this,axis,major, status );
 }
 
 void astSetTickValues_( AstPlot *this, int axis, int nmajor, double *major,
-                           int nminor, double *minor ){
+                           int nminor, double *minor, int *status ){
    if( !astOK ) return;
-   (**astMEMBER(this,Plot,SetTickValues))(this,axis,nmajor,major,nminor,minor);
+   (**astMEMBER(this,Plot,SetTickValues))(this,axis,nmajor,major,nminor,minor, status );
 }
 
 void astCopyPlotDefaults_( AstPlot *this, int axis, AstPlot *dplot, 
-                           int daxis ){
+                           int daxis, int *status ){
    if( !astOK ) return;
-   (**astMEMBER(this,Plot,CopyPlotDefaults))(this,axis,dplot,daxis);
+   (**astMEMBER(this,Plot,CopyPlotDefaults))(this,axis,dplot,daxis, status );
 }
 
-int astGetLabelUnits_( AstPlot *this, int axis ){
+int astGetLabelUnits_( AstPlot *this, int axis, int *status ){
    if( !astOK ) return 0;
-   return (**astMEMBER(this,Plot,GetLabelUnits))(this,axis);
+   return (**astMEMBER(this,Plot,GetLabelUnits))(this,axis, status );
 }
 
 void astMark_( AstPlot *this, int nmark, int ncoord, int indim,
-               const double *in, int type ) {
+               const double *in, int type, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,Plot,Mark))( this, nmark, ncoord, indim, in, type );
+   (**astMEMBER(this,Plot,Mark))( this, nmark, ncoord, indim, in, type, status );
 }
 
 void astText_( AstPlot *this, const char *text, const double pos[], 
-               const float up[], const char *just ){
+               const float up[], const char *just, int *status ){
    if ( !astOK ) return;
-   (**astMEMBER(this,Plot,Text))( this, text, pos, up, just );
+   (**astMEMBER(this,Plot,Text))( this, text, pos, up, just, status );
 }
 
-void astGridLine_( AstPlot *this, int axis, const double start[], double length ){
+void astGridLine_( AstPlot *this, int axis, const double start[], double length, int *status ){
    if( !astOK ) return;
-   (**astMEMBER(this,Plot,GridLine))(this,axis,start,length);
+   (**astMEMBER(this,Plot,GridLine))(this,axis,start,length, status );
 }
 
-void astCurve_( AstPlot *this, const double start[], const double finish[] ){
+void astCurve_( AstPlot *this, const double start[], const double finish[], int *status ){
    if( !astOK ) return;
-   (**astMEMBER(this,Plot,Curve))(this,start,finish);
+   (**astMEMBER(this,Plot,Curve))(this,start,finish, status );
 }
 
-void astGenCurve_( AstPlot *this, AstMapping *map ){
+void astGenCurve_( AstPlot *this, AstMapping *map, int *status ){
    if( !astOK ) return;
-   (**astMEMBER(this,Plot,GenCurve))(this,map);
+   (**astMEMBER(this,Plot,GenCurve))(this,map, status );
 }
 
 void astPolyCurve_( AstPlot *this, int npoint, int ncoord, int dim, 
-                    const double *in ){
+                    const double *in, int *status ){
    if( !astOK ) return;
-   (**astMEMBER(this,Plot,PolyCurve))(this,npoint,ncoord,dim,in);
+   (**astMEMBER(this,Plot,PolyCurve))(this,npoint,ncoord,dim,in, status );
 }
 
-void astGrfSet_( AstPlot *this, const char *name, AstGrfFun fun ){
+void astGrfSet_( AstPlot *this, const char *name, AstGrfFun fun, int *status ){
    if( !astOK ) return;
-   (**astMEMBER(this,Plot,GrfSet))(this,name,fun);
+   (**astMEMBER(this,Plot,GrfSet))(this,name,fun, status );
 }
 
-void astGrfPush_( AstPlot *this ){
+void astGrfPush_( AstPlot *this, int *status ){
    if( !astOK ) return;
-   (**astMEMBER(this,Plot,GrfPush))(this);
+   (**astMEMBER(this,Plot,GrfPush))(this, status );
 }
 
-void astGrfPop_( AstPlot *this ){
+void astGrfPop_( AstPlot *this, int *status ){
    if( !astOK ) return;
-   (**astMEMBER(this,Plot,GrfPop))(this);
+   (**astMEMBER(this,Plot,GrfPop))(this, status );
 }
 
-void astGrfWrapper_( AstPlot *this, const char *name, AstGrfWrap wrapper ){
+void astGrfWrapper_( AstPlot *this, const char *name, AstGrfWrap wrapper, int *status ){
    if( !astOK ) return;
-   (**astMEMBER(this,Plot,GrfWrapper))(this,name,wrapper);
+   (**astMEMBER(this,Plot,GrfWrapper))(this,name,wrapper, status );
 }
 
-void astSetLogPlot_( AstPlot *this, int axis, int value ) { 
+void astSetLogPlot_( AstPlot *this, int axis, int value, int *status ) { 
    if ( !astOK ) return; 
-   (**astMEMBER(this,Plot,SetLogPlot))( this, axis, value ); 
+   (**astMEMBER(this,Plot,SetLogPlot))( this, axis, value, status ); 
 }
 
-void astClearLogPlot_( AstPlot *this, int axis ) { 
+void astClearLogPlot_( AstPlot *this, int axis, int *status ) { 
    if ( !astOK ) return; 
-   (**astMEMBER(this,Plot,ClearLogPlot))( this, axis ); 
+   (**astMEMBER(this,Plot,ClearLogPlot))( this, axis, status ); 
 }
 
-AstKeyMap *astGetGrfContext_( AstPlot *this ) {
+AstKeyMap *astGetGrfContext_( AstPlot *this, int *status ) {
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Plot,GetGrfContext))( this );
+   return (**astMEMBER(this,Plot,GetGrfContext))( this, status );
 }
 
 /* Special public interface functions. */
@@ -29585,12 +30461,20 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstPlot *new;                 /* Pointer to new Plot */
    va_list args;                 /* Variable argument list */
+   int *status;                  /* Pointer to inherited status value */
+
+/* Get apointer to the inherited status value. */
+   status = astGetStatusPtr;
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialise variables to avoid "used of uninitialised variable"
    messages from dumb compilers. */
@@ -29635,21 +30519,6 @@ f     function is invoked with STATUS set to an error value, or if it
    return astMakeId( new );
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

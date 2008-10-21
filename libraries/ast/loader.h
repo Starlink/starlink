@@ -38,9 +38,12 @@
 #if defined(astCLASS)            /* Protected */
 
 typedef AstObject *(AstLoaderType)( void *, size_t, AstObjectVtab *,
-                                    const char *, AstChannel * );
+                                    const char *, AstChannel *, int * );
 
-AstLoaderType *astGetLoader( const char * );
+AstLoaderType *astGetLoader( const char *, int * );
 
 #endif
 #endif
+
+
+

@@ -100,6 +100,24 @@ typedef struct AstNormMapVtab {
    int *check;                   /* Check value */
 
 } AstNormMapVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstNormMapGlobals {
+   AstNormMapVtab Class_Vtab;
+   int Class_Init;
+} AstNormMapGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitNormMapGlobals_( AstNormMapGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -111,7 +129,7 @@ astPROTO_ISA(NormMap)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstNormMap *astNormMap_( void *, const char *, ... );
+AstNormMap *astNormMap_( void *, const char *, int *, ...);
 #else
 AstNormMap *astNormMapId_( void *, const char *, ... );
 #endif
@@ -120,14 +138,14 @@ AstNormMap *astNormMapId_( void *, const char *, ... );
 
 /* Initialiser. */
 AstNormMap *astInitNormMap_( void *, size_t, int, AstNormMapVtab *,
-                             const char *, AstFrame * );
+                             const char *, AstFrame *, int * );
 
 /* Vtab initialiser. */
-void astInitNormMapVtab_( AstNormMapVtab *, const char * );
+void astInitNormMapVtab_( AstNormMapVtab *, const char *, int * );
 
 /* Loader. */
 AstNormMap *astLoadNormMap_( void *, size_t, AstNormMapVtab *,
-                             const char *, AstChannel * );
+                             const char *, AstChannel *, int * );
 #endif
 
 /* Prototypes for member functions. */
@@ -165,13 +183,13 @@ AstNormMap *astLoadNormMap_( void *, size_t, AstNormMapVtab *,
 
 /* Initialiser. */
 #define astInitNormMap(mem,size,init,vtab,name,frame) \
-astINVOKE(O,astInitNormMap_(mem,size,init,vtab,name,frame))
+astINVOKE(O,astInitNormMap_(mem,size,init,vtab,name,frame,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitNormMapVtab(vtab,name) astINVOKE(V,astInitNormMapVtab_(vtab,name))
+#define astInitNormMapVtab(vtab,name) astINVOKE(V,astInitNormMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadNormMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadNormMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadNormMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -183,3 +201,7 @@ astINVOKE(O,astLoadNormMap_(mem,size,vtab,name,astCheckChannel(channel)))
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif
+
+
+
+

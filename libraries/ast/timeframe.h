@@ -58,6 +58,12 @@
 
 /* Macros. */
 /* ======= */
+#if defined(astCLASS) || defined(astFORTRAN77)
+#define STATUS_PTR status
+#else
+#define STATUS_PTR astGetStatusPtr
+#endif
+
 
 #if defined(astCLASS)            /* Protected */
 
@@ -80,6 +86,13 @@
 #define AST__TCB          9
 #define AST__TCG         10
 #define AST__LT          11
+
+/* Define constants used to size global arrays in this module. */
+#define AST__TIMEFRAME_FORMAT_BUFF_LEN 200
+#define AST__TIMEFRAME_GETATTRIB_BUFF_LEN 50
+#define AST__TIMEFRAME_GETLABEL_BUFF_LEN 200
+#define AST__TIMEFRAME_GETSYMBOL_BUFF_LEN 20
+#define AST__TIMEFRAME_GETTITLE_BUFF_LEN 200
 
 #endif
 
@@ -119,29 +132,46 @@ typedef struct AstTimeFrameVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   double (* CurrentTime)( AstTimeFrame * );
+   double (* CurrentTime)( AstTimeFrame *, int * );
 
-   double (* GetLTOffset)( AstTimeFrame * );
-   int (* TestLTOffset)( AstTimeFrame * );
-   void (* ClearLTOffset)( AstTimeFrame * );
-   void (* SetLTOffset)( AstTimeFrame *, double );
+   double (* GetLTOffset)( AstTimeFrame *, int * );
+   int (* TestLTOffset)( AstTimeFrame *, int * );
+   void (* ClearLTOffset)( AstTimeFrame *, int * );
+   void (* SetLTOffset)( AstTimeFrame *, double, int * );
 
-   double (* GetTimeOrigin)( AstTimeFrame * );
-   int (* TestTimeOrigin)( AstTimeFrame * );
-   void (* ClearTimeOrigin)( AstTimeFrame * );
-   void (* SetTimeOrigin)( AstTimeFrame *, double );
+   double (* GetTimeOrigin)( AstTimeFrame *, int * );
+   int (* TestTimeOrigin)( AstTimeFrame *, int * );
+   void (* ClearTimeOrigin)( AstTimeFrame *, int * );
+   void (* SetTimeOrigin)( AstTimeFrame *, double, int * );
 
-   AstTimeScaleType (* GetTimeScale)( AstTimeFrame * );
-   int (* TestTimeScale)( AstTimeFrame * );
-   void (* ClearTimeScale)( AstTimeFrame * );
-   void (* SetTimeScale)( AstTimeFrame *, AstTimeScaleType );
+   AstTimeScaleType (* GetTimeScale)( AstTimeFrame *, int * );
+   int (* TestTimeScale)( AstTimeFrame *, int * );
+   void (* ClearTimeScale)( AstTimeFrame *, int * );
+   void (* SetTimeScale)( AstTimeFrame *, AstTimeScaleType, int * );
 
-   AstTimeScaleType (* GetAlignTimeScale)( AstTimeFrame * );
-   int (* TestAlignTimeScale)( AstTimeFrame * );
-   void (* ClearAlignTimeScale)( AstTimeFrame * );
-   void (* SetAlignTimeScale)( AstTimeFrame *, AstTimeScaleType );
+   AstTimeScaleType (* GetAlignTimeScale)( AstTimeFrame *, int * );
+   int (* TestAlignTimeScale)( AstTimeFrame *, int * );
+   void (* ClearAlignTimeScale)( AstTimeFrame *, int * );
+   void (* SetAlignTimeScale)( AstTimeFrame *, AstTimeScaleType, int * );
 
 } AstTimeFrameVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstTimeFrameGlobals {
+   AstTimeFrameVtab Class_Vtab;
+   int Class_Init;
+   char Format_Buff[ AST__TIMEFRAME_FORMAT_BUFF_LEN + 1 ];
+   char GetAttrib_Buff[ AST__TIMEFRAME_GETATTRIB_BUFF_LEN + 1 ];
+   char GetLabel_Buff[ AST__TIMEFRAME_GETLABEL_BUFF_LEN + 1 ];
+   char GetSymbol_Buff[ AST__TIMEFRAME_GETSYMBOL_BUFF_LEN + 1 ];
+   char GetTitle_Buff[ AST__TIMEFRAME_GETTITLE_BUFF_LEN + 1 ];
+} AstTimeFrameGlobals;
+
+#endif
+
 #endif
 
 /* Function prototypes. */
@@ -153,7 +183,7 @@ astPROTO_ISA(TimeFrame)           /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected */
-AstTimeFrame *astTimeFrame_( const char *, ... );
+AstTimeFrame *astTimeFrame_( const char *, int *, ...);
 #else
 AstTimeFrame *astTimeFrameId_( const char *, ... );
 #endif
@@ -162,41 +192,47 @@ AstTimeFrame *astTimeFrameId_( const char *, ... );
 
 /* Initialiser. */
 AstTimeFrame *astInitTimeFrame_( void *, size_t, int, AstTimeFrameVtab *,
-                                 const char * );
+                                 const char *, int * );
 
 /* Vtab initialiser. */
-void astInitTimeFrameVtab_( AstTimeFrameVtab *, const char * );
+void astInitTimeFrameVtab_( AstTimeFrameVtab *, const char *, int * );
 
 /* Loader. */
 AstTimeFrame *astLoadTimeFrame_( void *, size_t, AstTimeFrameVtab *,
-                                 const char *, AstChannel *channel );
+                                 const char *, AstChannel *channel, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitTimeFrameGlobals_( AstTimeFrameGlobals * );
+#endif
+
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-double astCurrentTime_( AstTimeFrame * );
+double astCurrentTime_( AstTimeFrame *, int * );
 
 #if defined(astCLASS)            /* Protected */
 
-double astGetLTOffset_( AstTimeFrame * );
-int astTestLTOffset_( AstTimeFrame * );
-void astClearLTOffset_( AstTimeFrame * );
-void astSetLTOffset_( AstTimeFrame *, double );
+double astGetLTOffset_( AstTimeFrame *, int * );
+int astTestLTOffset_( AstTimeFrame *, int * );
+void astClearLTOffset_( AstTimeFrame *, int * );
+void astSetLTOffset_( AstTimeFrame *, double, int * );
 
-double astGetTimeOrigin_( AstTimeFrame * );
-int astTestTimeOrigin_( AstTimeFrame * );
-void astClearTimeOrigin_( AstTimeFrame * );
-void astSetTimeOrigin_( AstTimeFrame *, double );
+double astGetTimeOrigin_( AstTimeFrame *, int * );
+int astTestTimeOrigin_( AstTimeFrame *, int * );
+void astClearTimeOrigin_( AstTimeFrame *, int * );
+void astSetTimeOrigin_( AstTimeFrame *, double, int * );
 
-AstTimeScaleType astGetTimeScale_( AstTimeFrame * );
-int astTestTimeScale_( AstTimeFrame * );
-void astClearTimeScale_( AstTimeFrame * );
-void astSetTimeScale_( AstTimeFrame *, AstTimeScaleType );
+AstTimeScaleType astGetTimeScale_( AstTimeFrame *, int * );
+int astTestTimeScale_( AstTimeFrame *, int * );
+void astClearTimeScale_( AstTimeFrame *, int * );
+void astSetTimeScale_( AstTimeFrame *, AstTimeScaleType, int * );
 
-AstTimeScaleType astGetAlignTimeScale_( AstTimeFrame * );
-int astTestAlignTimeScale_( AstTimeFrame * );
-void astClearAlignTimeScale_( AstTimeFrame * );
-void astSetAlignTimeScale_( AstTimeFrame *, AstTimeScaleType );
+AstTimeScaleType astGetAlignTimeScale_( AstTimeFrame *, int * );
+int astTestAlignTimeScale_( AstTimeFrame *, int * );
+void astClearAlignTimeScale_( AstTimeFrame *, int * );
+void astSetAlignTimeScale_( AstTimeFrame *, AstTimeScaleType, int * );
 #endif
 
 /* Function interfaces. */
@@ -229,13 +265,13 @@ void astSetAlignTimeScale_( AstTimeFrame *, AstTimeScaleType );
 
 /* Initialiser. */
 #define astInitTimeFrame(mem,size,init,vtab,name) \
-astINVOKE(O,astInitTimeFrame_(mem,size,init,vtab,name))
+astINVOKE(O,astInitTimeFrame_(mem,size,init,vtab,name,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitTimeFrameVtab(vtab,name) astINVOKE(V,astInitTimeFrameVtab_(vtab,name))
+#define astInitTimeFrameVtab(vtab,name) astINVOKE(V,astInitTimeFrameVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadTimeFrame(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadTimeFrame_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadTimeFrame_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 
 #endif
 
@@ -250,29 +286,33 @@ astINVOKE(O,astLoadTimeFrame_(mem,size,vtab,name,astCheckChannel(channel)))
    before use. This provides a contextual error report if a pointer to
    the wrong sort of object is supplied. */
 
-#define astCurrentTime(this) astINVOKE(V,astCurrentTime_(astCheckTimeFrame(this)))
+#define astCurrentTime(this) astINVOKE(V,astCurrentTime_(astCheckTimeFrame(this),STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 
-#define astGetTimeOrigin(this) astINVOKE(V,astGetTimeOrigin_(astCheckTimeFrame(this)))
-#define astTestTimeOrigin(this) astINVOKE(V,astTestTimeOrigin_(astCheckTimeFrame(this)))
-#define astClearTimeOrigin(this) astINVOKE(V,astClearTimeOrigin_(astCheckTimeFrame(this)))
-#define astSetTimeOrigin(this,value) astINVOKE(V,astSetTimeOrigin_(astCheckTimeFrame(this),value))
+#define astGetTimeOrigin(this) astINVOKE(V,astGetTimeOrigin_(astCheckTimeFrame(this),STATUS_PTR))
+#define astTestTimeOrigin(this) astINVOKE(V,astTestTimeOrigin_(astCheckTimeFrame(this),STATUS_PTR))
+#define astClearTimeOrigin(this) astINVOKE(V,astClearTimeOrigin_(astCheckTimeFrame(this),STATUS_PTR))
+#define astSetTimeOrigin(this,value) astINVOKE(V,astSetTimeOrigin_(astCheckTimeFrame(this),value,STATUS_PTR))
 
-#define astGetLTOffset(this) astINVOKE(V,astGetLTOffset_(astCheckTimeFrame(this)))
-#define astTestLTOffset(this) astINVOKE(V,astTestLTOffset_(astCheckTimeFrame(this)))
-#define astClearLTOffset(this) astINVOKE(V,astClearLTOffset_(astCheckTimeFrame(this)))
-#define astSetLTOffset(this,value) astINVOKE(V,astSetLTOffset_(astCheckTimeFrame(this),value))
+#define astGetLTOffset(this) astINVOKE(V,astGetLTOffset_(astCheckTimeFrame(this),STATUS_PTR))
+#define astTestLTOffset(this) astINVOKE(V,astTestLTOffset_(astCheckTimeFrame(this),STATUS_PTR))
+#define astClearLTOffset(this) astINVOKE(V,astClearLTOffset_(astCheckTimeFrame(this),STATUS_PTR))
+#define astSetLTOffset(this,value) astINVOKE(V,astSetLTOffset_(astCheckTimeFrame(this),value,STATUS_PTR))
 
-#define astGetTimeScale(this) astINVOKE(V,astGetTimeScale_(astCheckTimeFrame(this)))
-#define astTestTimeScale(this) astINVOKE(V,astTestTimeScale_(astCheckTimeFrame(this)))
-#define astClearTimeScale(this) astINVOKE(V,astClearTimeScale_(astCheckTimeFrame(this)))
-#define astSetTimeScale(this,value) astINVOKE(V,astSetTimeScale_(astCheckTimeFrame(this),value))
+#define astGetTimeScale(this) astINVOKE(V,astGetTimeScale_(astCheckTimeFrame(this),STATUS_PTR))
+#define astTestTimeScale(this) astINVOKE(V,astTestTimeScale_(astCheckTimeFrame(this),STATUS_PTR))
+#define astClearTimeScale(this) astINVOKE(V,astClearTimeScale_(astCheckTimeFrame(this),STATUS_PTR))
+#define astSetTimeScale(this,value) astINVOKE(V,astSetTimeScale_(astCheckTimeFrame(this),value,STATUS_PTR))
 
-#define astGetAlignTimeScale(this) astINVOKE(V,astGetAlignTimeScale_(astCheckTimeFrame(this)))
-#define astTestAlignTimeScale(this) astINVOKE(V,astTestAlignTimeScale_(astCheckTimeFrame(this)))
-#define astClearAlignTimeScale(this) astINVOKE(V,astClearAlignTimeScale_(astCheckTimeFrame(this)))
-#define astSetAlignTimeScale(this,value) astINVOKE(V,astSetAlignTimeScale_(astCheckTimeFrame(this),value))
+#define astGetAlignTimeScale(this) astINVOKE(V,astGetAlignTimeScale_(astCheckTimeFrame(this),STATUS_PTR))
+#define astTestAlignTimeScale(this) astINVOKE(V,astTestAlignTimeScale_(astCheckTimeFrame(this),STATUS_PTR))
+#define astClearAlignTimeScale(this) astINVOKE(V,astClearAlignTimeScale_(astCheckTimeFrame(this),STATUS_PTR))
+#define astSetAlignTimeScale(this,value) astINVOKE(V,astSetAlignTimeScale_(astCheckTimeFrame(this),value,STATUS_PTR))
 
 #endif
 #endif
+
+
+
+

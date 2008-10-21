@@ -115,6 +115,12 @@
 
 /* Macros. */
 /* ======= */
+#if defined(astCLASS) || defined(astFORTRAN77)
+#define STATUS_PTR status
+#else
+#define STATUS_PTR astGetStatusPtr
+#endif
+
 
 #if defined(astCLASS)            /* Protected */
 
@@ -131,6 +137,14 @@
 #define AST__J2000         10
 #define AST__UNKNOWN       11
 #define AST__AZEL          12
+
+/* Define constants used to size global arrays in this module. */
+/* Define other numerical constants for use in this module. */
+#define AST__SKYFRAME_GETATTRIB_BUFF_LEN 200   
+#define AST__SKYFRAME_GETFORMAT_BUFF_LEN 50    
+#define AST__SKYFRAME_GETLABEL_BUFF_LEN 40
+#define AST__SKYFRAME_GETSYMBOL_BUFF_LEN 20
+#define AST__SKYFRAME_GETTITLE_BUFF_LEN 200
 
 #endif
 
@@ -173,47 +187,73 @@ typedef struct AstSkyFrameVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   const char *(* GetProjection)( AstSkyFrame * );
-   double (* GetEquinox)( AstSkyFrame * );
-   int (* GetNegLon)( AstSkyFrame * );
-   int (* GetAsTime)( AstSkyFrame *, int );
-   int (* GetLatAxis)( AstSkyFrame * );
-   int (* GetLonAxis)( AstSkyFrame * );
-   int (* TestAsTime)( AstSkyFrame *, int );
-   int (* TestEquinox)( AstSkyFrame * );
-   int (* TestNegLon)( AstSkyFrame * );
-   int (* TestProjection)( AstSkyFrame * );
-   void (* ClearAsTime)( AstSkyFrame *, int );
-   void (* ClearEquinox)( AstSkyFrame * );
-   void (* ClearNegLon)( AstSkyFrame * );
-   void (* ClearProjection)( AstSkyFrame * );
-   void (* SetAsTime)( AstSkyFrame *, int, int );
-   void (* SetEquinox)( AstSkyFrame *, double );
-   void (* SetNegLon)( AstSkyFrame *, int );
-   void (* SetProjection)( AstSkyFrame *, const char * );
+   const char *(* GetProjection)( AstSkyFrame *, int * );
+   double (* GetEquinox)( AstSkyFrame *, int * );
+   int (* GetNegLon)( AstSkyFrame *, int * );
+   int (* GetAsTime)( AstSkyFrame *, int, int * );
+   int (* GetLatAxis)( AstSkyFrame *, int * );
+   int (* GetLonAxis)( AstSkyFrame *, int * );
+   int (* TestAsTime)( AstSkyFrame *, int, int * );
+   int (* TestEquinox)( AstSkyFrame *, int * );
+   int (* TestNegLon)( AstSkyFrame *, int * );
+   int (* TestProjection)( AstSkyFrame *, int * );
+   void (* ClearAsTime)( AstSkyFrame *, int, int * );
+   void (* ClearEquinox)( AstSkyFrame *, int * );
+   void (* ClearNegLon)( AstSkyFrame *, int * );
+   void (* ClearProjection)( AstSkyFrame *, int * );
+   void (* SetAsTime)( AstSkyFrame *, int, int, int * );
+   void (* SetEquinox)( AstSkyFrame *, double, int * );
+   void (* SetNegLon)( AstSkyFrame *, int, int * );
+   void (* SetProjection)( AstSkyFrame *, const char *, int * );
 
-   int (* GetSkyRefIs)( AstSkyFrame * );
-   int (* TestSkyRefIs)( AstSkyFrame * );
-   void (* ClearSkyRefIs)( AstSkyFrame * );
-   void (* SetSkyRefIs)( AstSkyFrame *, int );
+   int (* GetSkyRefIs)( AstSkyFrame *, int * );
+   int (* TestSkyRefIs)( AstSkyFrame *, int * );
+   void (* ClearSkyRefIs)( AstSkyFrame *, int * );
+   void (* SetSkyRefIs)( AstSkyFrame *, int, int * );
 
-   double (* GetSkyRef)( AstSkyFrame *, int );
-   int (* TestSkyRef)( AstSkyFrame *, int );
-   void (* ClearSkyRef)( AstSkyFrame *, int );
-   void (* SetSkyRef)( AstSkyFrame *, int, double );
+   double (* GetSkyRef)( AstSkyFrame *, int, int * );
+   int (* TestSkyRef)( AstSkyFrame *, int, int * );
+   void (* ClearSkyRef)( AstSkyFrame *, int, int * );
+   void (* SetSkyRef)( AstSkyFrame *, int, double, int * );
 
-   double (* GetSkyRefP)( AstSkyFrame *, int );
-   int (* TestSkyRefP)( AstSkyFrame *, int );
-   void (* ClearSkyRefP)( AstSkyFrame *, int );
-   void (* SetSkyRefP)( AstSkyFrame *, int, double );
+   double (* GetSkyRefP)( AstSkyFrame *, int, int * );
+   int (* TestSkyRefP)( AstSkyFrame *, int, int * );
+   void (* ClearSkyRefP)( AstSkyFrame *, int, int * );
+   void (* SetSkyRefP)( AstSkyFrame *, int, double, int * );
 
-   int (* GetAlignOffset)( AstSkyFrame * );
-   int (* TestAlignOffset)( AstSkyFrame * );
-   void (* ClearAlignOffset)( AstSkyFrame * );
-   void (* SetAlignOffset)( AstSkyFrame *, int );
+   int (* GetAlignOffset)( AstSkyFrame *, int * );
+   int (* TestAlignOffset)( AstSkyFrame *, int * );
+   void (* ClearAlignOffset)( AstSkyFrame *, int * );
+   void (* SetAlignOffset)( AstSkyFrame *, int, int * );
 
 
 } AstSkyFrameVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* The AstSkyFrameGlobals structure makes a forward reference to the
+   AstTimeFrame structure which is not defined here (since the
+   timeframe.h file includes skyframe.h). Hence make a preliminary 
+   definition available now. */
+struct AstTimeFrame;
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstSkyFrameGlobals {
+   AstSkyFrameVtab Class_Vtab;
+   int Class_Init;
+   char GetAttrib_Buff[ AST__SKYFRAME_GETATTRIB_BUFF_LEN + 1 ];
+   char GetFormat_Buff[ AST__SKYFRAME_GETFORMAT_BUFF_LEN + 1 ];
+   char GetLabel_Buff[ AST__SKYFRAME_GETLABEL_BUFF_LEN + 1 ];
+   char GetSymbol_Buff[ AST__SKYFRAME_GETSYMBOL_BUFF_LEN + 1 ];
+   char GetTitle_Buff[ AST__SKYFRAME_GETTITLE_BUFF_LEN + 1 ];
+   char GetTitle_Buff2[ AST__SKYFRAME_GETTITLE_BUFF_LEN + 1 ];
+   struct AstTimeFrame *TDBFrame;
+   struct AstTimeFrame *LASTFrame;
+} AstSkyFrameGlobals;
+
+#endif
+
 #endif
 
 /* Function prototypes. */
@@ -225,7 +265,7 @@ astPROTO_ISA(SkyFrame)           /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected */
-AstSkyFrame *astSkyFrame_( const char *, ... );
+AstSkyFrame *astSkyFrame_( const char *, int *, ...);
 #else
 AstSkyFrame *astSkyFrameId_( const char *, ... );
 #endif
@@ -234,57 +274,62 @@ AstSkyFrame *astSkyFrameId_( const char *, ... );
 
 /* Initialiser. */
 AstSkyFrame *astInitSkyFrame_( void *, size_t, int, AstSkyFrameVtab *,
-                               const char * );
+                               const char *, int * );
 
 /* Vtab initialiser. */
-void astInitSkyFrameVtab_( AstSkyFrameVtab *, const char * );
+void astInitSkyFrameVtab_( AstSkyFrameVtab *, const char *, int * );
 
 /* Loader. */
 AstSkyFrame *astLoadSkyFrame_( void *, size_t, AstSkyFrameVtab *,
-                               const char *, AstChannel *channel );
+                               const char *, AstChannel *channel, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitSkyFrameGlobals_( AstSkyFrameGlobals * );
+#endif
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
 #if defined(astCLASS)            /* Protected */
-const char *astGetProjection_( AstSkyFrame * );
-double astGetEquinox_( AstSkyFrame * );
-int astGetNegLon_( AstSkyFrame * );
-int astGetAsTime_( AstSkyFrame *, int );
-int astGetLatAxis_( AstSkyFrame * );
-int astGetLonAxis_( AstSkyFrame * );
-int astTestAsTime_( AstSkyFrame *, int );
-int astTestEquinox_( AstSkyFrame * );
-int astTestNegLon_( AstSkyFrame * );
-int astTestProjection_( AstSkyFrame * );
-void astClearAsTime_( AstSkyFrame *, int );
-void astClearEquinox_( AstSkyFrame * );
-void astClearNegLon_( AstSkyFrame * );
-void astClearProjection_( AstSkyFrame * );
-void astSetAsTime_( AstSkyFrame *, int, int );
-void astSetEquinox_( AstSkyFrame *, double );
-void astSetNegLon_( AstSkyFrame *, int );
-void astSetProjection_( AstSkyFrame *, const char * );
+const char *astGetProjection_( AstSkyFrame *, int * );
+double astGetEquinox_( AstSkyFrame *, int * );
+int astGetNegLon_( AstSkyFrame *, int * );
+int astGetAsTime_( AstSkyFrame *, int, int * );
+int astGetLatAxis_( AstSkyFrame *, int * );
+int astGetLonAxis_( AstSkyFrame *, int * );
+int astTestAsTime_( AstSkyFrame *, int, int * );
+int astTestEquinox_( AstSkyFrame *, int * );
+int astTestNegLon_( AstSkyFrame *, int * );
+int astTestProjection_( AstSkyFrame *, int * );
+void astClearAsTime_( AstSkyFrame *, int, int * );
+void astClearEquinox_( AstSkyFrame *, int * );
+void astClearNegLon_( AstSkyFrame *, int * );
+void astClearProjection_( AstSkyFrame *, int * );
+void astSetAsTime_( AstSkyFrame *, int, int, int * );
+void astSetEquinox_( AstSkyFrame *, double, int * );
+void astSetNegLon_( AstSkyFrame *, int, int * );
+void astSetProjection_( AstSkyFrame *, const char *, int * );
 
-int astGetAlignOffset_( AstSkyFrame * );
-int astTestAlignOffset_( AstSkyFrame * );
-void astClearAlignOffset_( AstSkyFrame * );
-void astSetAlignOffset_( AstSkyFrame *, int );
+int astGetAlignOffset_( AstSkyFrame *, int * );
+int astTestAlignOffset_( AstSkyFrame *, int * );
+void astClearAlignOffset_( AstSkyFrame *, int * );
+void astSetAlignOffset_( AstSkyFrame *, int, int * );
 
-int astGetSkyRefIs_( AstSkyFrame * );
-int astTestSkyRefIs_( AstSkyFrame * );
-void astClearSkyRefIs_( AstSkyFrame * );
-void astSetSkyRefIs_( AstSkyFrame *, int );
+int astGetSkyRefIs_( AstSkyFrame *, int * );
+int astTestSkyRefIs_( AstSkyFrame *, int * );
+void astClearSkyRefIs_( AstSkyFrame *, int * );
+void astSetSkyRefIs_( AstSkyFrame *, int, int * );
 
-double astGetSkyRef_( AstSkyFrame *, int );
-int astTestSkyRef_( AstSkyFrame *, int );
-void astClearSkyRef_( AstSkyFrame *, int );
-void astSetSkyRef_( AstSkyFrame *, int, double );
+double astGetSkyRef_( AstSkyFrame *, int, int * );
+int astTestSkyRef_( AstSkyFrame *, int, int * );
+void astClearSkyRef_( AstSkyFrame *, int, int * );
+void astSetSkyRef_( AstSkyFrame *, int, double, int * );
 
-double astGetSkyRefP_( AstSkyFrame *, int );
-int astTestSkyRefP_( AstSkyFrame *, int );
-void astClearSkyRefP_( AstSkyFrame *, int );
-void astSetSkyRefP_( AstSkyFrame *, int, double );
+double astGetSkyRefP_( AstSkyFrame *, int, int * );
+int astTestSkyRefP_( AstSkyFrame *, int, int * );
+void astClearSkyRefP_( AstSkyFrame *, int, int * );
+void astSetSkyRefP_( AstSkyFrame *, int, double, int * );
 
 
 #endif
@@ -319,13 +364,13 @@ void astSetSkyRefP_( AstSkyFrame *, int, double );
 
 /* Initialiser. */
 #define astInitSkyFrame(mem,size,init,vtab,name) \
-astINVOKE(O,astInitSkyFrame_(mem,size,init,vtab,name))
+astINVOKE(O,astInitSkyFrame_(mem,size,init,vtab,name,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitSkyFrameVtab(vtab,name) astINVOKE(V,astInitSkyFrameVtab_(vtab,name))
+#define astInitSkyFrameVtab(vtab,name) astINVOKE(V,astInitSkyFrameVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadSkyFrame(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadSkyFrame_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadSkyFrame_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 
 #endif
 
@@ -342,61 +387,65 @@ astINVOKE(O,astLoadSkyFrame_(mem,size,vtab,name,astCheckChannel(channel)))
 
 #if defined(astCLASS)            /* Protected */
 #define astClearAsTime(this,axis) \
-astINVOKE(V,astClearAsTime_(astCheckSkyFrame(this),axis))
+astINVOKE(V,astClearAsTime_(astCheckSkyFrame(this),axis,STATUS_PTR))
 #define astClearEquinox(this) \
-astINVOKE(V,astClearEquinox_(astCheckSkyFrame(this)))
+astINVOKE(V,astClearEquinox_(astCheckSkyFrame(this),STATUS_PTR))
 #define astClearNegLon(this) \
-astINVOKE(V,astClearNegLon_(astCheckSkyFrame(this)))
+astINVOKE(V,astClearNegLon_(astCheckSkyFrame(this),STATUS_PTR))
 #define astClearProjection(this) \
-astINVOKE(V,astClearProjection_(astCheckSkyFrame(this)))
+astINVOKE(V,astClearProjection_(astCheckSkyFrame(this),STATUS_PTR))
 #define astGetAsTime(this,axis) \
-astINVOKE(V,astGetAsTime_(astCheckSkyFrame(this),axis))
+astINVOKE(V,astGetAsTime_(astCheckSkyFrame(this),axis,STATUS_PTR))
 #define astGetEquinox(this) \
-astINVOKE(V,astGetEquinox_(astCheckSkyFrame(this)))
+astINVOKE(V,astGetEquinox_(astCheckSkyFrame(this),STATUS_PTR))
 #define astGetNegLon(this) \
-astINVOKE(V,astGetNegLon_(astCheckSkyFrame(this)))
+astINVOKE(V,astGetNegLon_(astCheckSkyFrame(this),STATUS_PTR))
 #define astGetLatAxis(this) \
-astINVOKE(V,astGetLatAxis_(astCheckSkyFrame(this)))
+astINVOKE(V,astGetLatAxis_(astCheckSkyFrame(this),STATUS_PTR))
 #define astGetLonAxis(this) \
-astINVOKE(V,astGetLonAxis_(astCheckSkyFrame(this)))
+astINVOKE(V,astGetLonAxis_(astCheckSkyFrame(this),STATUS_PTR))
 #define astGetProjection(this) \
-astINVOKE(V,astGetProjection_(astCheckSkyFrame(this)))
+astINVOKE(V,astGetProjection_(astCheckSkyFrame(this),STATUS_PTR))
 #define astSetAsTime(this,axis,value) \
-astINVOKE(V,astSetAsTime_(astCheckSkyFrame(this),axis,value))
+astINVOKE(V,astSetAsTime_(astCheckSkyFrame(this),axis,value,STATUS_PTR))
 #define astSetEquinox(this,value) \
-astINVOKE(V,astSetEquinox_(astCheckSkyFrame(this),value))
+astINVOKE(V,astSetEquinox_(astCheckSkyFrame(this),value,STATUS_PTR))
 #define astSetNegLon(this,value) \
-astINVOKE(V,astSetNegLon_(astCheckSkyFrame(this),value))
+astINVOKE(V,astSetNegLon_(astCheckSkyFrame(this),value,STATUS_PTR))
 #define astSetProjection(this,value) \
-astINVOKE(V,astSetProjection_(astCheckSkyFrame(this),value))
+astINVOKE(V,astSetProjection_(astCheckSkyFrame(this),value,STATUS_PTR))
 #define astTestAsTime(this,axis) \
-astINVOKE(V,astTestAsTime_(astCheckSkyFrame(this),axis))
+astINVOKE(V,astTestAsTime_(astCheckSkyFrame(this),axis,STATUS_PTR))
 #define astTestEquinox(this) \
-astINVOKE(V,astTestEquinox_(astCheckSkyFrame(this)))
+astINVOKE(V,astTestEquinox_(astCheckSkyFrame(this),STATUS_PTR))
 #define astTestNegLon(this) \
-astINVOKE(V,astTestNegLon_(astCheckSkyFrame(this)))
+astINVOKE(V,astTestNegLon_(astCheckSkyFrame(this),STATUS_PTR))
 #define astTestProjection(this) \
-astINVOKE(V,astTestProjection_(astCheckSkyFrame(this)))
+astINVOKE(V,astTestProjection_(astCheckSkyFrame(this),STATUS_PTR))
 
-#define astClearAlignOffset(this) astINVOKE(V,astClearAlignOffset_(astCheckSkyFrame(this)))
-#define astGetAlignOffset(this) astINVOKE(V,astGetAlignOffset_(astCheckSkyFrame(this)))
-#define astSetAlignOffset(this,value) astINVOKE(V,astSetAlignOffset_(astCheckSkyFrame(this),value))
-#define astTestAlignOffset(this) astINVOKE(V,astTestAlignOffset_(astCheckSkyFrame(this)))
+#define astClearAlignOffset(this) astINVOKE(V,astClearAlignOffset_(astCheckSkyFrame(this),STATUS_PTR))
+#define astGetAlignOffset(this) astINVOKE(V,astGetAlignOffset_(astCheckSkyFrame(this),STATUS_PTR))
+#define astSetAlignOffset(this,value) astINVOKE(V,astSetAlignOffset_(astCheckSkyFrame(this),value,STATUS_PTR))
+#define astTestAlignOffset(this) astINVOKE(V,astTestAlignOffset_(astCheckSkyFrame(this),STATUS_PTR))
 
-#define astClearSkyRefIs(this) astINVOKE(V,astClearSkyRefIs_(astCheckSkyFrame(this)))
-#define astGetSkyRefIs(this) astINVOKE(V,astGetSkyRefIs_(astCheckSkyFrame(this)))
-#define astSetSkyRefIs(this,value) astINVOKE(V,astSetSkyRefIs_(astCheckSkyFrame(this),value))
-#define astTestSkyRefIs(this) astINVOKE(V,astTestSkyRefIs_(astCheckSkyFrame(this)))
+#define astClearSkyRefIs(this) astINVOKE(V,astClearSkyRefIs_(astCheckSkyFrame(this),STATUS_PTR))
+#define astGetSkyRefIs(this) astINVOKE(V,astGetSkyRefIs_(astCheckSkyFrame(this),STATUS_PTR))
+#define astSetSkyRefIs(this,value) astINVOKE(V,astSetSkyRefIs_(astCheckSkyFrame(this),value,STATUS_PTR))
+#define astTestSkyRefIs(this) astINVOKE(V,astTestSkyRefIs_(astCheckSkyFrame(this),STATUS_PTR))
 
-#define astClearSkyRef(this,axis) astINVOKE(V,astClearSkyRef_(astCheckSkyFrame(this),axis))
-#define astGetSkyRef(this,axis) astINVOKE(V,astGetSkyRef_(astCheckSkyFrame(this),axis))
-#define astSetSkyRef(this,axis,value) astINVOKE(V,astSetSkyRef_(astCheckSkyFrame(this),axis,value))
-#define astTestSkyRef(this,axis) astINVOKE(V,astTestSkyRef_(astCheckSkyFrame(this),axis))
+#define astClearSkyRef(this,axis) astINVOKE(V,astClearSkyRef_(astCheckSkyFrame(this),axis,STATUS_PTR))
+#define astGetSkyRef(this,axis) astINVOKE(V,astGetSkyRef_(astCheckSkyFrame(this),axis,STATUS_PTR))
+#define astSetSkyRef(this,axis,value) astINVOKE(V,astSetSkyRef_(astCheckSkyFrame(this),axis,value,STATUS_PTR))
+#define astTestSkyRef(this,axis) astINVOKE(V,astTestSkyRef_(astCheckSkyFrame(this),axis,STATUS_PTR))
 
-#define astClearSkyRefP(this,axis) astINVOKE(V,astClearSkyRefP_(astCheckSkyFrame(this),axis))
-#define astGetSkyRefP(this,axis) astINVOKE(V,astGetSkyRefP_(astCheckSkyFrame(this),axis))
-#define astSetSkyRefP(this,axis,value) astINVOKE(V,astSetSkyRefP_(astCheckSkyFrame(this),axis,value))
-#define astTestSkyRefP(this,axis) astINVOKE(V,astTestSkyRefP_(astCheckSkyFrame(this),axis))
+#define astClearSkyRefP(this,axis) astINVOKE(V,astClearSkyRefP_(astCheckSkyFrame(this),axis,STATUS_PTR))
+#define astGetSkyRefP(this,axis) astINVOKE(V,astGetSkyRefP_(astCheckSkyFrame(this),axis,STATUS_PTR))
+#define astSetSkyRefP(this,axis,value) astINVOKE(V,astSetSkyRefP_(astCheckSkyFrame(this),axis,value,STATUS_PTR))
+#define astTestSkyRefP(this,axis) astINVOKE(V,astTestSkyRefP_(astCheckSkyFrame(this),axis,STATUS_PTR))
 
 #endif
 #endif
+
+
+
+

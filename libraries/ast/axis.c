@@ -93,8 +93,6 @@ f     only within textual output (e.g. from AST_WRITE).
    "protected" symbols available. */
 #define astCLASS Axis
 
-/* Define numerical constants for use in thie module. */
-#define FORMAT_BUFF_LEN 50       /* Max length of default Format string */
 
 /* Header files. */
 /* ============= */
@@ -102,6 +100,8 @@ f     only within textual output (e.g. from AST_WRITE).
 
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
 #include "object.h"              /* Object interface (parent class) */
@@ -109,6 +109,7 @@ f     only within textual output (e.g. from AST_WRITE).
 #include "channel.h"             /* I/O channels */
 #include "axis.h"                /* Interface definition for this class */
 #include "unit.h"                /* Definitions of physical units */
+#include "globals.h"             /* Thread-safe global data access */
 
 /* C header files. */
 /* --------------- */
@@ -125,17 +126,17 @@ f     only within textual output (e.g. from AST_WRITE).
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstAxisVtab class_vtab;   /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject * );
-static const char *(* parent_getattrib)( AstObject *, const char * );
-static int (* parent_testattrib)( AstObject *, const char * );
-static void (* parent_clearattrib)( AstObject *, const char * );
-static void (* parent_setattrib)( AstObject *, const char * );
+static int (* parent_getobjsize)( AstObject *, int * );
+static const char *(* parent_getattrib)( AstObject *, const char *, int * );
+static int (* parent_testattrib)( AstObject *, const char *, int * );
+static void (* parent_clearattrib)( AstObject *, const char *, int * );
+static void (* parent_setattrib)( AstObject *, const char *, int * );
 
 /* Strings used as field delimiters when producing graphical labels.
    These strings include escape sequences which the Plot class interprets
@@ -145,8 +146,46 @@ static const char *log_esc  = "10%-%^50+%s70+";
 /* Plain text equivalents. */
 static const char *log_txt  = "10^";     
 
-/* Define other static variables. */
-static char format_buff[ FORMAT_BUFF_LEN + 1 ]; /* Default Format string */
+/* Define macros for accessing each item of thread specific global data. */
+#ifdef THREAD_SAFE
+
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; \
+   globals->GetDefaultFormat_Buff[ 0 ] = 0; \
+   globals->AxisFormat_Buff[ 0 ] = 0; \
+   globals->GetAxisNormUnit_Buff[ 0 ] = 0; \
+   globals->GetAttrib_Buff[ 0 ] = 0;
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(Axis)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(Axis,Class_Init)
+#define class_vtab astGLOBAL(Axis,Class_Vtab)
+#define getdefaultformat_buff astGLOBAL(Axis,GetDefaultFormat_Buff)
+#define axisformat_buff astGLOBAL(Axis,AxisFormat_Buff)
+#define getaxisnormunit_buff astGLOBAL(Axis,GetAxisNormUnit_Buff)
+#define getattrib_buff astGLOBAL(Axis,GetAttrib_Buff)
+
+
+
+/* If thread safety is not needed, declare and initialise globals at static 
+   variables. */ 
+#else
+
+static char getdefaultformat_buff[ AST__AXIS_GETDEFAULTFORMAT_BUFF_LEN + 1 ]; 
+static char axisformat_buff[ AST__AXIS_GETDEFAULTFORMAT_BUFF_LEN + 1 ]; 
+static char getaxisnormunit_buff[ AST__AXIS_GETAXISNORMUNIT_BUFF_LEN + 1 ]; 
+static char getattrib_buff[ AST__AXIS_GETATTRIB_BUFF_LEN + 1 ];
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstAxisVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -157,67 +196,68 @@ AstAxis *astAxisId_( const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static const char *AxisAbbrev( AstAxis *, const char *, const char *, const char * );
-static const char *AxisFormat( AstAxis *, double );
-static int GetObjSize( AstObject * );
-static const char *GetAttrib( AstObject *, const char * );
-static const char *GetAxisFormat( AstAxis * );
-static const char *GetAxisLabel( AstAxis * );
-static const char *GetAxisSymbol( AstAxis * );
-static const char *GetAxisUnit( AstAxis * );
-static const char *GetAxisNormUnit( AstAxis * );
-static char *ParseAxisFormat( const char *, int, int *, int *, int *, int * );
-static double AxisDistance( AstAxis *, double, double );
-static double AxisGap( AstAxis *, double, int * );
-static double AxisOffset( AstAxis *, double, double );
-static int AxisFields( AstAxis *, const char *, const char *, int, char **, int *, double * );
-static int AxisIn( AstAxis *, double, double, double, int );
-static int AxisUnformat( AstAxis *, const char *, double * );
-static int GetAxisDigits( AstAxis * );
-static int GetAxisDirection( AstAxis * );
-static int TestAttrib( AstObject *, const char * );
-static int TestAxisDigits( AstAxis * );
-static int TestAxisDirection( AstAxis * );
-static int TestAxisFormat( AstAxis * );
-static int TestAxisLabel( AstAxis * );
-static int TestAxisSymbol( AstAxis * );
-static int TestAxisUnit( AstAxis * );
-static int TestAxisNormUnit( AstAxis * );
-static void AxisNorm( AstAxis *, double * );
-static void AxisOverlay( AstAxis *, AstAxis * );
-static void ClearAttrib( AstObject *, const char * );
-static void ClearAxisDigits( AstAxis * );
-static void ClearAxisDirection( AstAxis * );
-static void ClearAxisFormat( AstAxis * );
-static void ClearAxisLabel( AstAxis * );
-static void ClearAxisSymbol( AstAxis * );
-static void ClearAxisUnit( AstAxis * );
-static void Copy( const AstObject *, AstObject * );
-static void Delete( AstObject * );
-static void Dump( AstObject *, AstChannel * );
-static void SetAttrib( AstObject *, const char * );
-static void SetAxisDigits( AstAxis *, int );
-static void SetAxisDirection( AstAxis *, int );
-static void SetAxisFormat( AstAxis *, const char * );
-static void SetAxisLabel( AstAxis *, const char * );
-static void SetAxisSymbol( AstAxis *, const char * );
-static void SetAxisUnit( AstAxis *, const char * );
+static const char *AxisAbbrev( AstAxis *, const char *, const char *, const char *, int * );
+static const char *AxisFormat( AstAxis *, double, int * );
+static int GetObjSize( AstObject *, int * );
+static const char *GetAttrib( AstObject *, const char *, int * );
+static const char *GetAxisFormat( AstAxis *, int * );
+static const char *GetAxisLabel( AstAxis *, int * );
+static const char *GetAxisSymbol( AstAxis *, int * );
+static const char *GetAxisUnit( AstAxis *, int * );
+static const char *GetAxisNormUnit( AstAxis *, int * );
+static const char *GetDefaultFormat( AstAxis *, int * );
+static char *ParseAxisFormat( const char *, int, int *, int *, int *, int *, int * );
+static double AxisDistance( AstAxis *, double, double, int * );
+static double AxisGap( AstAxis *, double, int *, int * );
+static double AxisOffset( AstAxis *, double, double, int * );
+static int AxisFields( AstAxis *, const char *, const char *, int, char **, int *, double *, int * );
+static int AxisIn( AstAxis *, double, double, double, int, int * );
+static int AxisUnformat( AstAxis *, const char *, double *, int * );
+static int GetAxisDigits( AstAxis *, int * );
+static int GetAxisDirection( AstAxis *, int * );
+static int TestAttrib( AstObject *, const char *, int * );
+static int TestAxisDigits( AstAxis *, int * );
+static int TestAxisDirection( AstAxis *, int * );
+static int TestAxisFormat( AstAxis *, int * );
+static int TestAxisLabel( AstAxis *, int * );
+static int TestAxisSymbol( AstAxis *, int * );
+static int TestAxisUnit( AstAxis *, int * );
+static int TestAxisNormUnit( AstAxis *, int * );
+static void AxisNorm( AstAxis *, double *, int * );
+static void AxisOverlay( AstAxis *, AstAxis *, int * );
+static void ClearAttrib( AstObject *, const char *, int * );
+static void ClearAxisDigits( AstAxis *, int * );
+static void ClearAxisDirection( AstAxis *, int * );
+static void ClearAxisFormat( AstAxis *, int * );
+static void ClearAxisLabel( AstAxis *, int * );
+static void ClearAxisSymbol( AstAxis *, int * );
+static void ClearAxisUnit( AstAxis *, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Delete( AstObject *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void SetAttrib( AstObject *, const char *, int * );
+static void SetAxisDigits( AstAxis *, int, int * );
+static void SetAxisDirection( AstAxis *, int, int * );
+static void SetAxisFormat( AstAxis *, const char *, int * );
+static void SetAxisLabel( AstAxis *, const char *, int * );
+static void SetAxisSymbol( AstAxis *, const char *, int * );
+static void SetAxisUnit( AstAxis *, const char *, int * );
 
-static double GetAxisTop( AstAxis * );
-static int TestAxisTop( AstAxis * );
-static void ClearAxisTop( AstAxis * );
-static void SetAxisTop( AstAxis *, double );
+static double GetAxisTop( AstAxis *, int * );
+static int TestAxisTop( AstAxis *, int * );
+static void ClearAxisTop( AstAxis *, int * );
+static void SetAxisTop( AstAxis *, double, int * );
 
-static double GetAxisBottom( AstAxis * );
-static int TestAxisBottom( AstAxis * );
-static void ClearAxisBottom( AstAxis * );
-static void SetAxisBottom( AstAxis *, double );
+static double GetAxisBottom( AstAxis *, int * );
+static int TestAxisBottom( AstAxis *, int * );
+static void ClearAxisBottom( AstAxis *, int * );
+static void SetAxisBottom( AstAxis *, double, int * );
 
 
 /* Member functions. */
 /* ================= */
 static const char *AxisAbbrev( AstAxis *this, const char *fmt,
-                               const char *str1, const char *str2 ) {
+                               const char *str1, const char *str2, int *status ) {
 /*
 *+
 *  Name:
@@ -296,7 +336,7 @@ static const char *AxisAbbrev( AstAxis *this, const char *fmt,
    return result;
 }
 
-static double AxisDistance( AstAxis *this, double v1, double v2 ) {
+static double AxisDistance( AstAxis *this, double v1, double v2, int *status ) {
 /*
 *+
 *  Name:
@@ -358,7 +398,7 @@ static double AxisDistance( AstAxis *this, double v1, double v2 ) {
 }
 
 static int AxisFields( AstAxis *this, const char *fmt0, const char *str, 
-                       int maxfld, char **fields, int *nc, double *val ) {
+                       int maxfld, char **fields, int *nc, double *val, int *status ) {
 /*
 *  Name:
 *     astAxisFields
@@ -465,7 +505,7 @@ static int AxisFields( AstAxis *this, const char *fmt0, const char *str,
    which indicates if a leading space should be included infronyt of "10" if
    no sign is included. */
    fmt = ParseAxisFormat( fmt0, astGetAxisDigits( this ), &log, &sign,
-                          &space, &integ );
+                          &space, &integ, status );
    fmt = astFree( (void *) fmt );
 
    if( astOK ) {
@@ -573,7 +613,7 @@ static int AxisFields( AstAxis *this, const char *fmt0, const char *str,
    return result;
 }
 
-static const char *AxisFormat( AstAxis *this, double value ) {
+static const char *AxisFormat( AstAxis *this, double value, int *status ) {
 /*
 *+
 *  Name:
@@ -620,9 +660,11 @@ static const char *AxisFormat( AstAxis *this, double value ) {
 */
 
 /* Local Constants: */
-#define BUFF_LEN 127            /* Maximum characters in result */
+#define ERRBUF_LEN 80
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;          /* Pointer to thread-specific global data */
+   char errbuf[ ERRBUF_LEN ];   /* Buffer for system error message */
    const char *fmt0;            /* Pointer to original Format string */
    const char *fmt;             /* Pointer to parsed Format string */
    const char *result;          /* Pointer to formatted value */
@@ -634,10 +676,12 @@ static const char *AxisFormat( AstAxis *this, double value ) {
    int sign;                    /* Include leading sign in front of "10**x"? */
    int space;                   /* Include leading space in front of "10**x"? */
    int stat;                    /* Value of errno after error */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for result string */
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
 
 /* Initialise. */
    result = NULL;
@@ -660,7 +704,7 @@ static const char *AxisFormat( AstAxis *this, double value ) {
    the Axis astOverlay method when overlaying attributes on to another Axis
    object. */
    } else {
-      fmt0 = GetAxisFormat( this );
+      fmt0 = GetAxisFormat( this, status );
 
 /* Parse the Format string. This returns a collection of flags indicating
    if any AST specific formatting features are specified in the Format
@@ -674,7 +718,7 @@ static const char *AxisFormat( AstAxis *this, double value ) {
    if no sign is included. It also modifies ".*" precision fields by
    replacing the "*" by the current vale of the Digits attribute. */
       fmt = ParseAxisFormat( fmt0, astGetAxisDigits( this ), &log, &sign, 
-                             &space, &integ );
+                             &space, &integ, status );
       if( astOK ) {
 
 /* Format zero normally. */
@@ -687,11 +731,11 @@ static const char *AxisFormat( AstAxis *this, double value ) {
          if( log ) {
    
             if( sign ) {
-               buff[ 0 ] ='+';
+               axisformat_buff[ 0 ] ='+';
                nc = 1;
    
             } else if( space ) {
-               buff[ 0 ] =' ';
+               axisformat_buff[ 0 ] =' ';
                nc = 1;
             }
    
@@ -700,11 +744,11 @@ static const char *AxisFormat( AstAxis *this, double value ) {
    
             } else {
                x = log10( integ ? (int) -value : -value );
-               buff[ 0 ] ='-';
+               axisformat_buff[ 0 ] ='-';
                nc = 1;
             }
 
-            nc += sprintf( buff + nc, "%s", 
+            nc += sprintf( axisformat_buff + nc, "%s", 
                            astEscapes( -1 ) ? log_esc : log_txt );
 
 /* Round small exponents to zero. */
@@ -717,41 +761,45 @@ static const char *AxisFormat( AstAxis *this, double value ) {
       if ( astOK ) {
          errno = 0;
          if( integ ) {
-            ncc = sprintf( buff + nc, fmt, (int) x );
+            ncc = sprintf( axisformat_buff + nc, fmt, (int) x );
          } else {
-            ncc = sprintf( buff + nc, fmt, x );
+            ncc = sprintf( axisformat_buff + nc, fmt, x );
          }
          nc += ncc;
 
 /* If log format is being used, terminate the string with an escape
    sequence which resets the graphical attributes to what they were at the
    start of the string. */
-         if( log ) nc += sprintf( buff + nc, "%%+" );
+         if( log ) nc += sprintf( axisformat_buff + nc, "%%+" );
 
 /* The possibilities for error detection are limited here, but check if an
    error value was returned and report an error. Include information from
    errno if it was set. */
          if ( ncc < 0 ) {
             stat = errno;
+            if( stat ) {
+               strerror_r( stat, errbuf, ERRBUF_LEN );
+            } else {
+               *errbuf = 0;
+            }
             astError( AST__FMTER, "astAxisFormat(%s): Error formatting a "
-                      "coordinate value of %1.*G%s%s.", astGetClass( this ),
-                      DBL_DIG, value, stat? " - " : "",
-                      stat ? strerror( stat ) : "" );
-            astError( AST__FMTER, "The format string was \"%s\".", fmt );
+                      "coordinate value of %1.*G%s%s.", status, astGetClass( this ),
+                      DBL_DIG, value, stat? " - " : "", errbuf );
+            astError( AST__FMTER, "The format string was \"%s\".", status, fmt );
 
 /* Also check that the result buffer did not overflow. If it did, memory will
    probably have been corrupted but this cannot be prevented with "sprintf".
    Report the error and abort. */
-         } else if ( nc > BUFF_LEN ) {
+         } else if ( nc > AST__AXIS_AXISFORMAT_BUFF_LEN ) {
             astError( AST__FMTER, "astAxisFormat(%s): Internal buffer "
                       "overflow while formatting a coordinate value of %1.*G "
-                      "- result exceeds %d characters.", astGetClass( this ),
-                      DBL_DIG, value, BUFF_LEN );
-            astError( AST__FMTER, "The format string was \"%s\".", fmt );
+                      "- result exceeds %d characters.", status, astGetClass( this ),
+                      DBL_DIG, value, AST__AXIS_AXISFORMAT_BUFF_LEN );
+            astError( AST__FMTER, "The format string was \"%s\".", status, fmt );
 
 /* If succesfull, return a pointer to the buffer. */
          } else {
-            result = buff;
+            result = axisformat_buff;
          }
       }
 
@@ -763,11 +811,10 @@ static const char *AxisFormat( AstAxis *this, double value ) {
 /* Return the result. */
    return result;
 
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
+#undef ERRBUF_LEN
 
-static double AxisGap( AstAxis *this, double gap, int *ntick ) {
+static double AxisGap( AstAxis *this, double gap, int *ntick, int *status ) {
 /*
 *+
 *  Name:
@@ -864,7 +911,7 @@ static double AxisGap( AstAxis *this, double gap, int *ntick ) {
    return result;
 }
 
-static int AxisIn( AstAxis *this, double lo, double hi, double val, int closed ){
+static int AxisIn( AstAxis *this, double lo, double hi, double val, int closed, int *status ){
 /*
 *  Name:
 *     astAxisIn
@@ -920,7 +967,7 @@ static int AxisIn( AstAxis *this, double lo, double hi, double val, int closed )
    }
 }
 
-static void AxisNorm( AstAxis *this, double *value ) {
+static void AxisNorm( AstAxis *this, double *value, int *status ) {
 /*
 *+
 *  Name:
@@ -965,7 +1012,7 @@ static void AxisNorm( AstAxis *this, double *value ) {
    return;
 }
 
-static double AxisOffset( AstAxis *this, double v1, double dist ) {
+static double AxisOffset( AstAxis *this, double v1, double dist, int *status ) {
 /*
 *+
 *  Name:
@@ -1026,7 +1073,7 @@ static double AxisOffset( AstAxis *this, double v1, double dist ) {
    return result;
 }
 
-static void AxisOverlay( AstAxis *template, AstAxis *result ) {
+static void AxisOverlay( AstAxis *template, AstAxis *result, int *status ) {
 /*
 *  Name:
 *     astAxisOverlay
@@ -1085,15 +1132,15 @@ static void AxisOverlay( AstAxis *template, AstAxis *result ) {
    function to obtain it. This is necessary in case derived classes have
    extended the string syntax (see the AxisFormat function for more
    details). */
-   if ( TestAxisFormat( template ) ) {
-      SetAxisFormat( result, GetAxisFormat( template ) );  
+   if ( TestAxisFormat( template, status ) ) {
+      SetAxisFormat( result, GetAxisFormat( template, status ), status );  
    }
 
 /* Undefine macros local to this function. */
 #undef OVERLAY
 }
 
-static int AxisUnformat( AstAxis *this, const char *string, double *value ) {
+static int AxisUnformat( AstAxis *this, const char *string, double *value, int *status ) {
 /*
 *+
 *  Name:
@@ -1183,7 +1230,7 @@ static int AxisUnformat( AstAxis *this, const char *string, double *value ) {
    return nc;
 }
 
-static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     ClearAttrib
@@ -1196,7 +1243,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "axis.h"
-*     void ClearAttrib( AstObject *this, const char *attrib )
+*     void ClearAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     Axis member function (over-rides the astClearAttrib protected
@@ -1213,6 +1260,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -1272,17 +1321,17 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    of this class. If it does, then report an error. */
    } else if ( !strcmp( attrib, "normunit" ) ) {
       astError( AST__NOWRT, "astClear: Invalid attempt to clear the \"%s\" "
-                "value for a %s.", attrib, astGetClass( this ) );
-      astError( AST__NOWRT, "This is a read-only attribute." );
+                "value for a %s.", status, attrib, astGetClass( this ) );
+      astError( AST__NOWRT, "This is a read-only attribute." , status);
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      (*parent_clearattrib)( this_object, attrib );
+      (*parent_clearattrib)( this_object, attrib, status );
    }
 }
 
-static const char *GetAxisNormUnit( AstAxis *this ){
+static const char *GetAxisNormUnit( AstAxis *this, int *status ){
 /*
 *+
 *  Name:
@@ -1323,16 +1372,17 @@ static const char *GetAxisNormUnit( AstAxis *this ){
 *     reason.
 *-
 */
-/* Local Constants: */
-#define BUFF_LEN 127         /* Maximum characters in result */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;       /* Pointer to thread-specific global data */
    const char *result;       /* Pointer to dynamic memory holding returned text */
    int nc;                   /* Length of normalised Unit string */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for result string */
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
 
 /* Get the Axis Unit attrribute and normalise it. */
    result = astUnitNormaliser( astGetAxisUnit( this ) );
@@ -1341,32 +1391,28 @@ static const char *GetAxisNormUnit( AstAxis *this ){
    If not, report an error. */
    if( result ) {
       nc = strlen( result );
-      if( nc > BUFF_LEN ) {
+      if( nc > AST__AXIS_GETAXISNORMUNIT_BUFF_LEN ) {
          astError( AST__FMTER, "astGetAxisNormUnit(%s): Internal buffer "
                       "overflow while normalising the units string '%s' "
-                      "- result exceeds %d characters.", astGetClass( this ),
-                      result, BUFF_LEN );
-
+                      "- result exceeds %d characters.", status, astGetClass( this ),
+                      result, AST__AXIS_GETAXISNORMUNIT_BUFF_LEN );
          result = astFree( (void *) result );
 
 /* If so, copy it into the static buffer and free the dynamic memory returned 
    by astUnitNormaliser. */
       } else {
-         strcpy( buff, result );
+         strcpy( getaxisnormunit_buff, result );
       }
       astFree( (void *) result );
 
-      result = buff;
+      result = getaxisnormunit_buff;
    }
 
 /* Return the answer. */
    return result;
-
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
 
-static int GetObjSize( AstObject *this_object ) {
+static int GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -1379,7 +1425,7 @@ static int GetObjSize( AstObject *this_object ) {
 
 *  Synopsis:
 *     #include "axis.h"
-*     int GetObjSize( AstObject *this ) 
+*     int GetObjSize( AstObject *this, int *status ) 
 
 *  Class Membership:
 *     Axis member function (over-rides the astGetObjSize protected
@@ -1392,6 +1438,8 @@ static int GetObjSize( AstObject *this_object ) {
 *  Parameters:
 *     this
 *        Pointer to the Axis.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Object size, in bytes.
@@ -1417,7 +1465,7 @@ static int GetObjSize( AstObject *this_object ) {
 /* Invoke the GetObjSize method inherited from the parent class, and then
    add on any components of the class structure defined by thsi class
    which are stored in dynamically allocated memory. */
-   result = (*parent_getobjsize)( this_object );
+   result = (*parent_getobjsize)( this_object, status );
 
    result += astTSizeOf( this->label );
    result += astTSizeOf( this->format );
@@ -1431,7 +1479,7 @@ static int GetObjSize( AstObject *this_object ) {
    return result;
 }
 
-static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+static const char *GetAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     GetAttrib
@@ -1444,7 +1492,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "axis.h"
-*     const char *GetAttrib( AstObject *this, const char *attrib )
+*     const char *GetAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     Axis member function (over-rides the protected astGetAttrib
@@ -1461,6 +1509,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string containing the name of
 *        the attribute whose value is required. This name should be in
 *        lower case, with all white space removed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     - Pointer to a null-terminated string containing the attribute
@@ -1478,16 +1528,13 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *     reason.
 */
 
-/* Local Constants: */
-#define BUFF_LEN 50              /* Max. characters in result buffer */
-
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstAxis*this;                 /* Pointer to the Axis structure */
    const char *result;           /* Pointer value to return */
    double dval;                  /* Double attribute value */
    int digits;                   /* Digits attribute value */
    int direction;                /* Direction attribute value */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
    result = NULL;
@@ -1495,21 +1542,24 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Check the global error status. */   
    if ( !astOK ) return result;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this_object);
+
 /* Obtain a pointer to the Axis structure. */
    this = (AstAxis *) this_object;
 
 /* Compare "attrib" with each recognised attribute name in turn,
    obtaining the value of the required attribute. If necessary, write
-   the value into "buff" as a null-terminated string in an appropriate
-   format.  Set "result" to point at the result string. */
+   the value into "getattrib_buff" as a null-terminated string in an 
+   appropriate format.  Set "result" to point at the result string. */
 
 /* Digits. */
 /* ------- */
    if ( !strcmp( attrib, "digits" ) ) {
       digits = astGetAxisDigits( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", digits );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", digits );
+         result = getattrib_buff;
       }
 
 /* Direction. */
@@ -1517,8 +1567,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "direction" ) ) {
       direction = astGetAxisDirection( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", direction );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", direction );
+         result = getattrib_buff;
       }
 
 /* Top. */
@@ -1526,8 +1576,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "top" ) ) {
       dval = astGetAxisTop( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* Bottom. */
@@ -1535,8 +1585,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "bottom" ) ) {
       dval = astGetAxisBottom( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* Format. */
@@ -1567,17 +1617,70 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_getattrib)( this_object, attrib );
+      result = (*parent_getattrib)( this_object, attrib, status );
    }
 
 /* Return the result. */
    return result;
 
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
 
-void astInitAxisVtab_(  AstAxisVtab *vtab, const char *name ) {
+static const char *GetDefaultFormat( AstAxis *this, int *status ){
+/*
+*  Name:
+*     GetDefaultFormat
+
+*  Purpose:
+*     Return a pointer to a string holding the default Format value.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "axis.h"
+*     const char *GetDefaultFormat( AstAxis *this, int *status )
+
+*  Class Membership:
+*     Axis member function 
+
+*  Description:
+*     This function returns a pointer to a string holding the default
+*     Format value, which is based on the current Digits value.
+
+*  Parameters:
+*     this 
+*        A pointer to the Axis structure.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     - Pointer to a static null-terminated character string containing 
+*     the default Format string. 
+
+*  Notes:
+*     - A null string will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   astDECLARE_GLOBALS;        /* Pointer to thread-specific global data */
+
+/* Check the global error status. */   
+   if ( !astOK ) return "";
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this);
+
+/* Create the default format value and store it in the "format_buff"
+   static variable. */
+   (void) sprintf( getdefaultformat_buff, "%%1.%dG", astGetAxisDigits( this ) );
+
+/* Return a pointer to the "format_buff" static variable. */
+   return getdefaultformat_buff;
+}
+
+void astInitAxisVtab_(  AstAxisVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -1614,10 +1717,14 @@ void astInitAxisVtab_(  AstAxisVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -1626,8 +1733,8 @@ void astInitAxisVtab_(  AstAxisVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAAxis) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -1699,10 +1806,15 @@ void astInitAxisVtab_(  AstAxisVtab *vtab, const char *name ) {
    astSetDelete( vtab, Delete );
    astSetCopy( vtab, Copy );
    astSetDump( vtab, Dump, "Axis", "Coordinate axis" );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
 static char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign,
-                              int *lspace, int *integ ){
+                              int *lspace, int *integ, int *status ){
 /*
 *  Name:
 *     ParseAxisFormat
@@ -1716,7 +1828,7 @@ static char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign,
 *  Synopsis:
 *     #include "axis.h"
 *     char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign, 
-*                            int *lspace, int *integ )
+*                            int *lspace, int *integ, int *status )
 
 *  Class Membership:
 *     Axis member function 
@@ -1764,6 +1876,8 @@ static char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign,
 *        Pointer to an integer in which to store a flag indicating if the
 *        returned format specifier includes an integer conversion code
 *        (e.g. %d) or floating point conversion code (e.g. "%.7G").
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     - Pointer to a dynamically allocated null-terminated string containing 
@@ -1923,7 +2037,7 @@ static char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign,
 
 }
 
-static void SetAttrib( AstObject *this_object, const char *setting ) {
+static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
 *     SetAttrib
@@ -1936,7 +2050,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 *  Synopsis:
 *     #include "axis.h"
-*     void SetAttrib( AstObject *this, const char *setting )
+*     void SetAttrib( AstObject *this, const char *setting, int *status )
 
 *  Class Membership:
 *     Axis member function (over-rides the protected astSetAttrib
@@ -1962,6 +2076,8 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 *     setting
 *        Pointer to a null terminated string specifying the new
 *        attribute value.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -2058,21 +2174,21 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Use this macro to report an error if a read-only attribute has been
    specified. */
    } else if ( MATCH( "normunit" ) ) {
-      astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.",
+      astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.", status,
                 setting, astGetClass( this ) );
-      astError( AST__NOWRT, "This is a read-only attribute." );
+      astError( AST__NOWRT, "This is a read-only attribute." , status);
 
 /* Pass any unrecognised attribute setting to the parent method for further
    interpretation. */
    } else {
-      (*parent_setattrib)( this_object, setting );
+      (*parent_setattrib)( this_object, setting, status );
    }
 
 /* Undefine macros local to this function. */
 #undef MATCH
 }
 
-static int TestAttrib( AstObject *this_object, const char *attrib ) {
+static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     TestAttrib
@@ -2085,7 +2201,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "axis.h"
-*     int TestAttrib( AstObject *this, const char *attrib )
+*     int TestAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     Axis member function (over-rides the astTestAttrib protected
@@ -2102,6 +2218,8 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if a value has been set, otherwise zero.
@@ -2174,14 +2292,14 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_testattrib)( this_object, attrib );
+      result = (*parent_testattrib)( this_object, attrib, status );
    }
 
 /* Return the result, */
    return result;
 }
 
-static int TestAxisNormUnit( AstAxis *this ){
+static int TestAxisNormUnit( AstAxis *this, int *status ){
 /*
 *  Name:
 *     TestAxisNormUnit
@@ -2194,7 +2312,7 @@ static int TestAxisNormUnit( AstAxis *this ){
 
 *  Synopsis:
 *     #include "axis.h"
-*     int TestAxisNormUnit( AstAxis *this )
+*     int TestAxisNormUnit( AstAxis *this, int *status )
 
 *  Class Membership:
 *     Axis member function 
@@ -2206,6 +2324,8 @@ static int TestAxisNormUnit( AstAxis *this ){
 *  Parameters:
 *     this
 *        Pointer to the Axis.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if a value has been set, otherwise zero.
@@ -2290,13 +2410,10 @@ astMAKE_TEST(Axis,AxisBottom,( this->bottom != AST__BAD ))
    pointer. */
 astMAKE_CLEAR(Axis,AxisFormat,format,astFree( this->format ))
 
-/* If the Format value is not set, supply a default value by writing a C format
-   specifier into the static "format_buff" buffer and returning a pointer to
-   this. Base the number of digits in the format on the value obtained from
-   the astGetAxisDigits method. */
+/* If the Format value is not set, return a pointer to a default Format
+   string. */
 astMAKE_GET(Axis,AxisFormat,const char *,NULL,( this->format ? this->format :
-         ( (void) sprintf( format_buff, "%%1.%dG", astGetAxisDigits( this ) ),
-         format_buff ) ))
+            GetDefaultFormat( this, status ) ) )
 
 /* Set a Format value by freeing any previously allocated memory, allocating
    new memory, storing the string and saving the pointer to the copy. */
@@ -2364,7 +2481,7 @@ astMAKE_TEST(Axis,AxisUnit,( this->unit != NULL ))
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -2376,7 +2493,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for Axis objects.
@@ -2386,6 +2503,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the object to be copied.
 *     objout
 *        Pointer to the object being constructed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -2433,7 +2552,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -2445,7 +2564,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for Axis objects.
@@ -2453,6 +2572,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the object to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -2477,7 +2598,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -2489,7 +2610,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -2500,6 +2621,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the Axis whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -2535,20 +2658,20 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Label. */
 /* ------ */
-   set = TestAxisLabel( this );
-   sval = set ? GetAxisLabel( this ) : astGetAxisLabel( this );
+   set = TestAxisLabel( this, status );
+   sval = set ? GetAxisLabel( this, status ) : astGetAxisLabel( this );
    astWriteString( channel, "Label", set, 1, sval, "Axis Label" );
 
 /* Symbol. */
 /* ------- */
-   set = TestAxisSymbol( this );
-   sval = set ? GetAxisSymbol( this ) : astGetAxisSymbol( this );
+   set = TestAxisSymbol( this, status );
+   sval = set ? GetAxisSymbol( this, status ) : astGetAxisSymbol( this );
    astWriteString( channel, "Symbol", set, 1, sval, "Axis symbol" );
 
 /* Unit. */
 /* ----- */
-   set = TestAxisUnit( this );
-   sval = set ? GetAxisUnit( this ) : astGetAxisUnit( this );
+   set = TestAxisUnit( this, status );
+   sval = set ? GetAxisUnit( this, status ) : astGetAxisUnit( this );
 
 /* Get any label associated with the unit string. */
    lab = astUnitLabel( sval );
@@ -2566,34 +2689,34 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Digits. */
 /* ------- */
-   set = TestAxisDigits( this );
-   ival = set ? GetAxisDigits( this ) : astGetAxisDigits( this );
+   set = TestAxisDigits( this, status );
+   ival = set ? GetAxisDigits( this, status ) : astGetAxisDigits( this );
    astWriteInt( channel, "Digits", set, 0, ival,
                 "Default formatting precision" );
 
 /* Format. */
 /* ------- */
-   set = TestAxisFormat( this );
-   sval = set ? GetAxisFormat( this ) : astGetAxisFormat( this );
+   set = TestAxisFormat( this, status );
+   sval = set ? GetAxisFormat( this, status ) : astGetAxisFormat( this );
    astWriteString( channel, "Format", set, 0, sval, "Format specifier" );
 
 /* Direction. */
 /* ---------- */
-   set = TestAxisDirection( this );
-   ival = set ? GetAxisDirection( this ) : astGetAxisDirection( this );
+   set = TestAxisDirection( this, status );
+   ival = set ? GetAxisDirection( this, status ) : astGetAxisDirection( this );
    astWriteInt( channel, "Dirn", set, 0, ival,
                 ival ? "Plot in conventional direction (hint)" :
                        "Plot in reverse direction (hint)" );
 /* Top. */
 /* ---- */
-   set = TestAxisTop( this );
-   dval = set ? GetAxisTop( this ) : astGetAxisTop( this );
+   set = TestAxisTop( this, status );
+   dval = set ? GetAxisTop( this, status ) : astGetAxisTop( this );
    astWriteDouble( channel, "Top", set, 0, dval, "Maximum legal axis value" );
 
 /* Bottom. */
 /* ------- */
-   set = TestAxisBottom( this );
-   dval = set ? GetAxisBottom( this ) : astGetAxisBottom( this );
+   set = TestAxisBottom( this, status );
+   dval = set ? GetAxisBottom( this, status ) : astGetAxisBottom( this );
    astWriteDouble( channel, "Bottom", set, 0, dval, "Minimum legal axis value" );
 }
 
@@ -2601,10 +2724,10 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsAAxis and astCheckAxis functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(Axis,Object,check,&class_init)
+astMAKE_ISA(Axis,Object,check,&class_check)
 astMAKE_CHECK(Axis)
 
-AstAxis *astAxis_( const char *options, ... ) {
+AstAxis *astAxis_( const char *options, int *status, ...) {
 /*
 *+
 *  Name:
@@ -2618,7 +2741,7 @@ AstAxis *astAxis_( const char *options, ... ) {
 
 *  Synopsis:
 *     #include "axis.h"
-*     AstAxis *astAxis( const char *options, ... )
+*     AstAxis *astAxis( const char *options, int *status, ... )
 
 *  Class Membership:
 *     Axis constructor.
@@ -2634,6 +2757,8 @@ AstAxis *astAxis_( const char *options, ... ) {
 *        initialising the new Axis. The syntax used is the same as for the
 *        astSet method and may include "printf" format specifiers identified
 *        by "%" symbols in the normal way.
+*     status
+*        Pointer to the inherited status variable.
 *     ...
 *        If the "options" string contains "%" format specifiers, then an
 *        optional list of arguments may follow it in order to supply values to
@@ -2651,8 +2776,12 @@ AstAxis *astAxis_( const char *options, ... ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstAxis *new;                 /* Pointer to new Axis */
    va_list args;                 /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
@@ -2670,7 +2799,7 @@ AstAxis *astAxis_( const char *options, ... ) {
 /* Obtain the variable argument list and pass it along with the
    options string to the astVSet method to initialise the new Axis'
    attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -2721,8 +2850,17 @@ AstAxis *astAxisId_( const char *options, ... ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstAxis *new;                 /* Pointer to new Axis */
    va_list args;                 /* Variable argument list */
+
+   int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
@@ -2753,7 +2891,7 @@ AstAxis *astAxisId_( const char *options, ... ) {
 }
 
 AstAxis *astInitAxis_( void *mem, size_t size, int init,
-                       AstAxisVtab *vtab, const char *name ) {
+                       AstAxisVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -2855,7 +2993,7 @@ AstAxis *astInitAxis_( void *mem, size_t size, int init,
 
 AstAxis *astLoadAxis_( void *mem, size_t size,
                        AstAxisVtab *vtab, const char *name,
-                       AstChannel *channel ) {
+                       AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -2930,6 +3068,7 @@ AstAxis *astLoadAxis_( void *mem, size_t size,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstAxis *new;                 /* Pointer to the new Axis */
 
 /* Initialise. */
@@ -2937,6 +3076,9 @@ AstAxis *astLoadAxis_( void *mem, size_t size,
 
 /* Check the global error status. */
    if ( !astOK ) return new;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* If a NULL virtual function table has been supplied, then this is
    the first loader to be invoked for this Axis. In this case the
@@ -2992,7 +3134,7 @@ AstAxis *astLoadAxis_( void *mem, size_t size,
 /* Digits. */
 /* ------- */
       new->digits = astReadInt( channel, "digits", -INT_MAX );
-      if ( TestAxisDigits( new ) ) SetAxisDigits( new, new->digits );
+      if ( TestAxisDigits( new, status ) ) SetAxisDigits( new, new->digits, status );
       
 /* Format. */
 /* ------- */
@@ -3001,17 +3143,17 @@ AstAxis *astLoadAxis_( void *mem, size_t size,
 /* Direction. */
 /* ---------- */
       new->direction = astReadInt( channel, "dirn", -INT_MAX );
-      if ( TestAxisDirection( new ) ) SetAxisDirection( new, new->direction );
+      if ( TestAxisDirection( new, status ) ) SetAxisDirection( new, new->direction, status );
 
 /* Top. */
 /* ---- */
       new->top = astReadDouble( channel, "top", AST__BAD );
-      if ( TestAxisTop( new ) ) SetAxisTop( new, new->top );
+      if ( TestAxisTop( new, status ) ) SetAxisTop( new, new->top, status );
 
 /* Bottom. */
 /* ---- */
       new->bottom = astReadDouble( channel, "bottom", AST__BAD );
-      if ( TestAxisBottom( new ) ) SetAxisBottom( new, new->bottom );
+      if ( TestAxisBottom( new, status ) ) SetAxisBottom( new, new->bottom, status );
 
 /* If an error occurred, clean up by deleting the new Axis. */
       if ( !astOK ) new = astDelete( new );
@@ -3038,55 +3180,60 @@ AstAxis *astLoadAxis_( void *mem, size_t size,
    Hence, we need only provide external interfaces for a few additional
    functions here. */
 const char *astAxisAbbrev_( AstAxis *this, const char *fmt,
-                            const char *str1, const char *str2 ) {
+                            const char *str1, const char *str2, int *status ) {
    if ( !astOK ) return str2;
-   return (**astMEMBER(this,Axis,AxisAbbrev))( this, fmt, str1, str2 );
+   return (**astMEMBER(this,Axis,AxisAbbrev))( this, fmt, str1, str2, status );
 }
-const char *astAxisFormat_( AstAxis *this, double value ) {
+const char *astAxisFormat_( AstAxis *this, double value, int *status ) {
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Axis,AxisFormat))( this, value );
+   return (**astMEMBER(this,Axis,AxisFormat))( this, value, status );
 }
-double astAxisDistance_( AstAxis *this, double v1, double v2 ) {
+double astAxisDistance_( AstAxis *this, double v1, double v2, int *status ) {
    if ( !astOK ) return AST__BAD;
-   return (**astMEMBER(this,Axis,AxisDistance))( this, v1, v2 );
+   return (**astMEMBER(this,Axis,AxisDistance))( this, v1, v2, status );
 }
-double astAxisOffset_( AstAxis *this, double v1, double dist ) {
+double astAxisOffset_( AstAxis *this, double v1, double dist, int *status ) {
    if ( !astOK ) return AST__BAD;
-   return (**astMEMBER(this,Axis,AxisOffset))( this, v1, dist );
+   return (**astMEMBER(this,Axis,AxisOffset))( this, v1, dist, status );
 }
-double astAxisGap_( AstAxis *this, double gap, int *ntick ) {
+double astAxisGap_( AstAxis *this, double gap, int *ntick, int *status ) {
    if ( !astOK ) return 0.0;
-   return (**astMEMBER(this,Axis,AxisGap))( this, gap, ntick );
+   return (**astMEMBER(this,Axis,AxisGap))( this, gap, ntick, status );
 }
-void astAxisNorm_( AstAxis *this, double *value ) {
+void astAxisNorm_( AstAxis *this, double *value, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,Axis,AxisNorm))( this, value );
+   (**astMEMBER(this,Axis,AxisNorm))( this, value, status );
 }
-void astAxisOverlay_( AstAxis *template, AstAxis *result ) {
+void astAxisOverlay_( AstAxis *template, AstAxis *result, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(template,Axis,AxisOverlay))( template, result );
+   (**astMEMBER(template,Axis,AxisOverlay))( template, result, status );
 }
-int astAxisUnformat_( AstAxis *this, const char *string, double *value ) {
+int astAxisUnformat_( AstAxis *this, const char *string, double *value, int *status ) {
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Axis,AxisUnformat))( this, string, value );
+   return (**astMEMBER(this,Axis,AxisUnformat))( this, string, value, status );
 }
 int astAxisFields_( AstAxis *this, const char *fmt, const char *str, 
-                    int maxfld, char **fields, int *nc, double *val ) {
+                    int maxfld, char **fields, int *nc, double *val, int *status ) {
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Axis,AxisFields))( this, fmt, str, maxfld, fields, nc, val );
+   return (**astMEMBER(this,Axis,AxisFields))( this, fmt, str, maxfld, fields, nc, val, status );
 }
-int astAxisIn_( AstAxis *this, double lo, double hi, double val, int closed ){
+int astAxisIn_( AstAxis *this, double lo, double hi, double val, int closed, int *status ){
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Axis,AxisIn))( this, lo, hi, val, closed );
+   return (**astMEMBER(this,Axis,AxisIn))( this, lo, hi, val, closed, status );
 }
-const char *astGetAxisNormUnit_( AstAxis *this ) {
+const char *astGetAxisNormUnit_( AstAxis *this, int *status ) {
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Axis,GetAxisNormUnit))( this );
+   return (**astMEMBER(this,Axis,GetAxisNormUnit))( this, status );
 }
-int astTestAxisNormUnit_( AstAxis *this ) {
+int astTestAxisNormUnit_( AstAxis *this, int *status ) {
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Axis,TestAxisNormUnit))( this );
+   return (**astMEMBER(this,Axis,TestAxisNormUnit))( this, status );
 }
+
+
+
+
+
 
 
 

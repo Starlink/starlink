@@ -110,6 +110,24 @@ typedef struct AstPointListVtab {
 
 /* Properties (e.g. methods) specific to this class. */
 } AstPointListVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstPointListGlobals {
+   AstPointListVtab Class_Vtab;
+   int Class_Init;
+} AstPointListGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitPointListGlobals_( AstPointListGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -121,7 +139,7 @@ astPROTO_ISA(PointList)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstPointList *astPointList_( void *, int, int, int, const double *, AstRegion *, const char *, ... );
+AstPointList *astPointList_( void *, int, int, int, const double *, AstRegion *, const char *, int *, ...);
 #else
 AstPointList *astPointListId_( void *, int, int, int, const double *, AstRegion *, const char *, ... );
 #endif
@@ -129,14 +147,14 @@ AstPointList *astPointListId_( void *, int, int, int, const double *, AstRegion 
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
-AstPointList *astInitPointList_( void *, size_t, int, AstPointListVtab *, const char *, AstFrame *, int, int, int, const double *, AstRegion * );
+AstPointList *astInitPointList_( void *, size_t, int, AstPointListVtab *, const char *, AstFrame *, int, int, int, const double *, AstRegion *, int * );
 
 /* Vtab initialiser. */
-void astInitPointListVtab_( AstPointListVtab *, const char * );
+void astInitPointListVtab_( AstPointListVtab *, const char *, int * );
 
 /* Loader. */
 AstPointList *astLoadPointList_( void *, size_t, AstPointListVtab *,
-                                 const char *, AstChannel * );
+                                 const char *, AstChannel *, int * );
 
 #endif
 
@@ -175,14 +193,14 @@ AstPointList *astLoadPointList_( void *, size_t, AstPointListVtab *,
 
 /* Initialiser. */
 #define astInitPointList(mem,size,init,vtab,name,frame,npnt,ncoord,indim,points,unc) \
-astINVOKE(O,astInitPointList_(mem,size,init,vtab,name,frame,npnt,ncoord,indim,points,unc))
+astINVOKE(O,astInitPointList_(mem,size,init,vtab,name,frame,npnt,ncoord,indim,points,unc,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitPointListVtab(vtab,name) astINVOKE(V,astInitPointListVtab_(vtab,name))
+#define astInitPointListVtab(vtab,name) astINVOKE(V,astInitPointListVtab_(vtab,name,STATUS_PTR))
 
 /* Loader. */
 #define astLoadPointList(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadPointList_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadPointList_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -194,3 +212,7 @@ astINVOKE(O,astLoadPointList_(mem,size,vtab,name,astCheckChannel(channel)))
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif
+
+
+
+

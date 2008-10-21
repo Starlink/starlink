@@ -184,6 +184,20 @@ typedef struct AstCmpMapVtab {
 /* Properties (e.g. methods) specific to this class. */
 /* None. */
 } AstCmpMapVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstCmpMapGlobals {
+   AstCmpMapVtab Class_Vtab;
+   int Class_Init;
+   int Simplify_Depth;
+   AstMapping **Simplify_Stackmaps; 
+} AstCmpMapGlobals;
+
+#endif
+
 #endif
 
 /* Function prototypes. */
@@ -195,7 +209,7 @@ astPROTO_ISA(CmpMap)             /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstCmpMap *astCmpMap_( void *, void *, int, const char *, ... );
+AstCmpMap *astCmpMap_( void *, void *, int, const char *, int *, ...);
 #else
 AstCmpMap *astCmpMapId_( void *, void *, int, const char *, ... );
 #endif
@@ -204,14 +218,20 @@ AstCmpMap *astCmpMapId_( void *, void *, int, const char *, ... );
 
 /* Initialiser. */
 AstCmpMap *astInitCmpMap_( void *, size_t, int, AstCmpMapVtab *,
-                           const char *, AstMapping *, AstMapping *, int );
+                           const char *, AstMapping *, AstMapping *, int, int * );
 
 /* Vtab initialiser. */
-void astInitCmpMapVtab_( AstCmpMapVtab *, const char * );
+void astInitCmpMapVtab_( AstCmpMapVtab *, const char *, int * );
 
 /* Loader. */
 AstCmpMap *astLoadCmpMap_( void *, size_t, AstCmpMapVtab *,
-                           const char *, AstChannel * );
+                           const char *, AstChannel *, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitCmpMapGlobals_( AstCmpMapGlobals * );
+#endif
+
 #endif
 
 /* Prototypes for member functions. */
@@ -248,13 +268,13 @@ AstCmpMap *astLoadCmpMap_( void *, size_t, AstCmpMapVtab *,
 
 /* Initialiser. */
 #define astInitCmpMap(mem,size,init,vtab,name,map1,map2,series) \
-astINVOKE(O,astInitCmpMap_(mem,size,init,vtab,name,astCheckMapping(map1),astCheckMapping(map2),series))
+astINVOKE(O,astInitCmpMap_(mem,size,init,vtab,name,astCheckMapping(map1),astCheckMapping(map2),series,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitCmpMapVtab(vtab,name) astINVOKE(V,astInitCmpMapVtab_(vtab,name))
+#define astInitCmpMapVtab(vtab,name) astINVOKE(V,astInitCmpMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadCmpMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadCmpMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadCmpMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -264,3 +284,7 @@ astINVOKE(O,astLoadCmpMap_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 /* None. */
 #endif
+
+
+
+

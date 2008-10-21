@@ -268,6 +268,12 @@
 
 /* Macros. */
 /* ------- */
+#if defined(astCLASS) || defined(astFORTRAN77)
+#define STATUS_PTR status
+#else
+#define STATUS_PTR astGetStatusPtr
+#endif
+
 #if defined(astCLASS)            /* Protected */
 
 /* The legal System values recognized by this class of Frame. */
@@ -308,6 +314,23 @@ typedef struct AstCmpFrameVtab {
 /* Properties (e.g. methods) specific to this class. */
 
 } AstCmpFrameVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstCmpFrameGlobals {
+   AstCmpFrameVtab Class_Vtab;
+   int Class_Init;
+   int *qsort_axes;
+   char Label_Buff[ 101 ];
+   char Symbol_Buff[ 51 ];
+   char GetDomain_Buff[ 101 ];
+   char GetTitle_Buff[ 101 ];
+} AstCmpFrameGlobals;
+
+#endif
+
 #endif
 
 /* Function prototypes. */
@@ -319,7 +342,7 @@ astPROTO_ISA(CmpFrame)           /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstCmpFrame *astCmpFrame_( void *, void *, const char *, ... );
+AstCmpFrame *astCmpFrame_( void *, void *, const char *, int *, ...);
 #else
 AstCmpFrame *astCmpFrameId_( void *, void *, const char *, ... );
 #endif
@@ -328,14 +351,19 @@ AstCmpFrame *astCmpFrameId_( void *, void *, const char *, ... );
 
 /* Initialiser. */
 AstCmpFrame *astInitCmpFrame_( void *, size_t, int, AstCmpFrameVtab *,
-                               const char *, AstFrame *, AstFrame * );
+                               const char *, AstFrame *, AstFrame *, int * );
 
 /* Vtab initialiser. */
-void astInitCmpFrameVtab_( AstCmpFrameVtab *, const char * );
+void astInitCmpFrameVtab_( AstCmpFrameVtab *, const char *, int * );
 
 /* Loader. */
 AstCmpFrame *astLoadCmpFrame_( void *, size_t, AstCmpFrameVtab *,
-                               const char *, AstChannel * );
+                               const char *, AstChannel *, int * );
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitCmpFrameGlobals_( AstCmpFrameGlobals * );
+#endif
+
 #endif
 
 /* Prototypes for member functions. */
@@ -371,13 +399,13 @@ AstCmpFrame *astLoadCmpFrame_( void *, size_t, AstCmpFrameVtab *,
 
 /* Initialiser. */
 #define astInitCmpFrame(mem,size,init,vtab,name,frame1,frame2) \
-astINVOKE(O,astInitCmpFrame_(mem,size,init,vtab,name,astCheckFrame(frame1),astCheckFrame(frame2)))
+astINVOKE(O,astInitCmpFrame_(mem,size,init,vtab,name,astCheckFrame(frame1),astCheckFrame(frame2),STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitCmpFrameVtab(vtab,name) astINVOKE(V,astInitCmpFrameVtab_(vtab,name))
+#define astInitCmpFrameVtab(vtab,name) astINVOKE(V,astInitCmpFrameVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadCmpFrame(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadCmpFrame_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadCmpFrame_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -387,3 +415,7 @@ astINVOKE(O,astLoadCmpFrame_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 
 #endif
+
+
+
+

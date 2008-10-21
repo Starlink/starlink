@@ -117,6 +117,8 @@ F77_SUBROUTINE(ast_begin)( INTEGER(STATUS) ) {
 
    astAt( "AST_BEGIN", NULL, 0 );
    astWatchSTATUS(
+      int dummy = *status; /* Avoid "unused variable 'status'" messages */
+      *status = dummy;   
       astBegin;
    )
 }
@@ -150,6 +152,9 @@ F77_INTEGER_FUNCTION(ast_clone)( INTEGER(THIS),
 }
 
 F77_INTEGER_FUNCTION(ast_version)( ) {
+   int status_value = 0;
+   int *STATUS = &status_value;
+   int *status = &status_value;
    astAt( "AST_VERSION", NULL, 0 );
    return astVersion;
 }

@@ -81,6 +81,12 @@
 /* Macros. */
 /* ------- */
 /* Boolean operators */
+
+#if defined(astCLASS) || defined(astFORTRAN77)
+#define STATUS_PTR status
+#else
+#define STATUS_PTR astGetStatusPtr
+#endif
 #define AST__AND 1
 #define AST__OR 2
 
@@ -117,6 +123,24 @@ typedef struct AstCmpRegionVtab {
 
 /* Properties (e.g. methods) specific to this class. */
 } AstCmpRegionVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstCmpRegionGlobals {
+   AstCmpRegionVtab Class_Vtab;
+   int Class_Init;
+} AstCmpRegionGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitCmpRegionGlobals_( AstCmpRegionGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -128,7 +152,7 @@ astPROTO_ISA(CmpRegion)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstCmpRegion *astCmpRegion_( void *, void *, int, const char *, ... );
+AstCmpRegion *astCmpRegion_( void *, void *, int, const char *, int *, ...);
 #else
 AstCmpRegion *astCmpRegionId_( void *, void *, int, const char *, ... );
 #endif
@@ -137,14 +161,14 @@ AstCmpRegion *astCmpRegionId_( void *, void *, int, const char *, ... );
 
 /* Initialiser. */
 AstCmpRegion *astInitCmpRegion_( void *, size_t, int, AstCmpRegionVtab *,
-                     const char *, AstRegion *, AstRegion *, int );
+                     const char *, AstRegion *, AstRegion *, int, int * );
 
 /* Vtab initialiser. */
-void astInitCmpRegionVtab_( AstCmpRegionVtab *, const char * );
+void astInitCmpRegionVtab_( AstCmpRegionVtab *, const char *, int * );
 
 /* Loader. */
 AstCmpRegion *astLoadCmpRegion_( void *, size_t, AstCmpRegionVtab *,
-                                 const char *, AstChannel * );
+                                 const char *, AstChannel *, int * );
 
 #endif
 
@@ -183,13 +207,13 @@ AstCmpRegion *astLoadCmpRegion_( void *, size_t, AstCmpRegionVtab *,
 
 /* Initialiser. */
 #define astInitCmpRegion(mem,size,init,vtab,name,reg1,reg2,oper) \
-astINVOKE(O,astInitCmpRegion_(mem,size,init,vtab,name,reg1,reg2,oper))
+astINVOKE(O,astInitCmpRegion_(mem,size,init,vtab,name,reg1,reg2,oper,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitCmpRegionVtab(vtab,name) astINVOKE(V,astInitCmpRegionVtab_(vtab,name))
+#define astInitCmpRegionVtab(vtab,name) astINVOKE(V,astInitCmpRegionVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadCmpRegion(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadCmpRegion_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadCmpRegion_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -201,3 +225,7 @@ astINVOKE(O,astLoadCmpRegion_(mem,size,vtab,name,astCheckChannel(channel)))
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif
+
+
+
+

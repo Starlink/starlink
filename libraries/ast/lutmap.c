@@ -113,6 +113,8 @@ f     The LutMap class does not define any new routines beyond those
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory management facilities */
 #include "object.h"              /* Base Object class */
@@ -122,6 +124,7 @@ f     The LutMap class does not define any new routines beyond those
 #include "channel.h"             /* I/O channels */
 #include "unitmap.h"             /* Unit mappings */
 #include "lutmap.h"              /* Interface definition for this class */
+#include "globals.h"             /* Thread-safe global data access */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -139,17 +142,49 @@ f     The LutMap class does not define any new routines beyond those
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstLutMapVtab class_vtab; /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
-static const char *(* parent_getattrib)( AstObject *, const char * );
-static int (* parent_testattrib)( AstObject *, const char * );
-static void (* parent_clearattrib)( AstObject *, const char * );
-static void (* parent_setattrib)( AstObject *, const char * );
+static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static const char *(* parent_getattrib)( AstObject *, const char *, int * );
+static int (* parent_testattrib)( AstObject *, const char *, int * );
+static void (* parent_clearattrib)( AstObject *, const char *, int * );
+static void (* parent_setattrib)( AstObject *, const char *, int * );
+
+/* Define macros for accessing each item of thread specific global data. */
+#ifdef THREAD_SAFE
+
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; \
+   globals->GetAttrib_Buff[ 0 ] = 0;
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(LutMap)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(LutMap,Class_Init)
+#define class_vtab astGLOBAL(LutMap,Class_Vtab)
+#define getattrib_buff astGLOBAL(LutMap,GetAttrib_Buff)
+
+
+
+/* If thread safety is not needed, declare and initialise globals at static 
+   variables. */ 
+#else
+
+static char getattrib_buff[ 101 ];
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstLutMapVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -160,27 +195,27 @@ AstLutMap *astLutMapId_( int, const double [], double, double, const char *, ...
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static int GetLinear( AstMapping * );
-static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
-static void Copy( const AstObject *, AstObject * );
-static void Delete( AstObject * );
-static void Dump( AstObject *, AstChannel * );
-static int Equal( AstObject *, AstObject * );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static int GetLinear( AstMapping *, int * );
+static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Delete( AstObject *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static int Equal( AstObject *, AstObject *, int * );
 
-static const char *GetAttrib( AstObject *, const char * );
-static int TestAttrib( AstObject *, const char * );
-static void ClearAttrib( AstObject *, const char * );
-static void SetAttrib( AstObject *, const char * );
+static const char *GetAttrib( AstObject *, const char *, int * );
+static int TestAttrib( AstObject *, const char *, int * );
+static void ClearAttrib( AstObject *, const char *, int * );
+static void SetAttrib( AstObject *, const char *, int * );
 
-static int GetLutInterp( AstLutMap * );
-static int TestLutInterp( AstLutMap * );
-static void ClearLutInterp( AstLutMap * );
-static void SetLutInterp( AstLutMap *, int );
+static int GetLutInterp( AstLutMap *, int * );
+static int TestLutInterp( AstLutMap *, int * );
+static void ClearLutInterp( AstLutMap *, int * );
+static void SetLutInterp( AstLutMap *, int, int * );
 
 /* Member functions. */
 /* ================= */
-static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     ClearAttrib
@@ -193,7 +228,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "lutmap.h"
-*     void ClearAttrib( AstObject *this, const char *attrib )
+*     void ClearAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     LutMap member function (over-rides the astClearAttrib protected
@@ -210,6 +245,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -231,11 +268,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      (*parent_clearattrib)( this_object, attrib );
+      (*parent_clearattrib)( this_object, attrib, status );
    }
 }
 
-static int Equal( AstObject *this_object, AstObject *that_object ) {
+static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
 *  Name:
 *     Equal
@@ -248,7 +285,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 *  Synopsis:
 *     #include "lutmap.h"
-*     int Equal( AstObject *this, AstObject *that ) 
+*     int Equal( AstObject *this, AstObject *that, int *status ) 
 
 *  Class Membership:
 *     LutMap member function (over-rides the astEqual protected
@@ -263,6 +300,8 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *        Pointer to the first Object (a LutMap).
 *     that
 *        Pointer to the second Object.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if the LutMaps are equivalent, zero otherwise.
@@ -337,7 +376,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
    return result;
 }
 
-static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+static const char *GetAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     GetAttrib
@@ -350,7 +389,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "lutmap.h"
-*     const char *GetAttrib( AstObject *this, const char *attrib )
+*     const char *GetAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     LutMap member function (over-rides the protected astGetAttrib
@@ -367,6 +406,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string containing the name of
 *        the attribute whose value is required. This name should be in
 *        lower case, with all white space removed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     - Pointer to a null-terminated string containing the attribute
@@ -384,14 +425,11 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *     reason.
 */
 
-/* Local Constants: */
-#define BUFF_LEN 50              /* Max. characters in result buffer */
-
 /* Local Variables: */
+   astDECLARE_GLOBALS;          /* Pointer to thread-specific global data */
    AstLutMap *this;             /* Pointer to the LutMap structure */
    const char *result;          /* Pointer value to return */
    int lutinterp;               /* LutInterp attribute value */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
    result = NULL;
@@ -399,12 +437,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Check the global error status. */   
    if ( !astOK ) return result;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this_object);
+
 /* Obtain a pointer to the LutMap structure. */
    this = (AstLutMap *) this_object;
 
 /* Compare "attrib" with each recognised attribute name in turn,
    obtaining the value of the required attribute. If necessary, write
-   the value into "buff" as a null-terminated string in an appropriate
+   the value into "getattrib_buff" as a null-terminated string in an appropriate
    format.  Set "result" to point at the result string. */
 
 /* LutInterp. */
@@ -412,24 +453,22 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    if ( !strcmp( attrib, "lutinterp" ) ) {
       lutinterp = astGetLutInterp( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", lutinterp );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", lutinterp );
+         result = getattrib_buff;
       }
 
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_getattrib)( this_object, attrib );
+      result = (*parent_getattrib)( this_object, attrib, status );
    }
 
 /* Return the result. */
    return result;
 
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
 
-static int GetLinear( AstMapping *this_mapping ) {
+static int GetLinear( AstMapping *this_mapping, int *status ) {
 /*
 *  Name:
 *     GetLinear
@@ -442,7 +481,7 @@ static int GetLinear( AstMapping *this_mapping ) {
 
 *  Synopsis:
 *     #include "lutmap.h"
-*     int GetLinear( AstMapping *this )
+*     int GetLinear( AstMapping *this, int *status )
 
 *  Class Membership:
 *     LutMap member function.
@@ -456,6 +495,8 @@ static int GetLinear( AstMapping *this_mapping ) {
 *  Parameters:
 *     this
 *        Pointer to the LutMap.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *    - A value of zero will be returned if this function is invoked
@@ -542,7 +583,7 @@ static int GetLinear( AstMapping *this_mapping ) {
    return linear;
 }
 
-void astInitLutMapVtab_(  AstLutMapVtab *vtab, const char *name ) {
+void astInitLutMapVtab_(  AstLutMapVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -579,11 +620,15 @@ void astInitLutMapVtab_(  AstLutMapVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -592,8 +637,8 @@ void astInitLutMapVtab_(  AstLutMapVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsALutMap) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -631,10 +676,15 @@ void astInitLutMapVtab_(  AstLutMapVtab *vtab, const char *name ) {
                "Map 1-d coordinates using a lookup table" );
    astSetCopy( (AstObjectVtab *) vtab, Copy );
    astSetDelete( (AstObjectVtab *) vtab, Delete );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
 static int MapMerge( AstMapping *this, int where, int series, int *nmap,
-                     AstMapping ***map_list, int **invert_list ) {
+                     AstMapping ***map_list, int **invert_list, int *status ) {
 /*
 *  Name:
 *     MapMerge
@@ -648,7 +698,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *  Synopsis:
 *     #include "mapping.h"
 *     int MapMerge( AstMapping *this, int where, int series, int *nmap,
-*                   AstMapping ***map_list, int **invert_list )
+*                   AstMapping ***map_list, int **invert_list, int *status )
 
 *  Class Membership:
 *     LutMap method (over-rides the protected astMapMerge method
@@ -751,6 +801,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *        length, the "*invert_list" array will be extended (and its
 *        pointer updated) if necessary to accommodate any new
 *        elements.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     If simplification was possible, the function returns the index
@@ -791,7 +843,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* See if the LutMap is linear. If so, it can probably be
    simplified. */
-   simpler = GetLinear( (AstMapping *) map );
+   simpler = GetLinear( (AstMapping *) map, status );
    if ( simpler ) {
 
 /* Obtain the range of input values corresponding to the first and
@@ -808,9 +860,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Create a new WinMap that implements an equivalent linear Mapping,
    allowing for the invert flag associated with the LutMap. */
          if ( !( *invert_list )[ where ] ) {
-            new = (AstMapping *) astWinMap( 1, &a1, &a2, &b1, &b2, "" );
+            new = (AstMapping *) astWinMap( 1, &a1, &a2, &b1, &b2, "", status );
          } else {
-            new = (AstMapping *) astWinMap( 1, &b1, &b2, &a1, &a2, "" );
+            new = (AstMapping *) astWinMap( 1, &b1, &b2, &a1, &a2, "", status );
          }
 
 /* If OK, annul the original LutMap pointer and substitute the new
@@ -863,7 +915,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* If the two LutMaps are equal but opposite, annul the first of the two 
    Mappings, and replace it with a UnitMap. Also set the invert flag. */ 
          if( equal ) {
-            new = (AstMapping *) astUnitMap( 1, "" );
+            new = (AstMapping *) astUnitMap( 1, "", status );
             (void) astAnnul( ( *map_list )[ ilo ] );
             ( *map_list )[ ilo ] = new;
             ( *invert_list )[ ilo ] = 0;
@@ -895,7 +947,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static void SetAttrib( AstObject *this_object, const char *setting ) {
+static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
 *     astSetAttrib
@@ -967,11 +1019,11 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      (*parent_setattrib)( this_object, setting );
+      (*parent_setattrib)( this_object, setting, status );
    }
 }
 
-static int TestAttrib( AstObject *this_object, const char *attrib ) {
+static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     TestAttrib
@@ -984,7 +1036,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "lutmap.h"
-*     int TestAttrib( AstObject *this, const char *attrib )
+*     int TestAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     LutMap member function (over-rides the astTestAttrib protected
@@ -1001,6 +1053,8 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if a value has been set, otherwise zero.
@@ -1033,7 +1087,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_testattrib)( this_object, attrib );
+      result = (*parent_testattrib)( this_object, attrib, status );
    }
 
 /* Return the result, */
@@ -1041,7 +1095,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 }
 
 static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-                               int forward, AstPointSet *out ) {
+                               int forward, AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     Transform
@@ -1055,7 +1109,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *  Synopsis:
 *     #include "lutmap.h"
 *     AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-*                             int forward, AstPointSet *out )
+*                             int forward, AstPointSet *out, int *status )
 
 *  Class Membership:
 *     LutMap member function (over-rides the astTransform protected
@@ -1080,6 +1134,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *        (output) coordinate values. A NULL value may also be given,
 *        in which case a new PointSet will be created by this
 *        function.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the output (possibly new) PointSet.
@@ -1130,7 +1186,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    function validates all arguments and generates an output PointSet
    if necessary, but does not actually transform any coordinate
    values. */
-   result = (*parent_transform)( this, in, forward, out );
+   result = (*parent_transform)( this, in, forward, out, status );
 
 /* We will now extend the parent astTransform method by performing the
    calculations needed to generate the output coordinate values. */
@@ -1370,7 +1426,7 @@ astMAKE_TEST(LutMap,LutInterp,( this->lutinterp != -INT_MAX ))
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -1382,7 +1438,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for LutMap objects.
@@ -1392,6 +1448,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the LutMap to be copied.
 *     objout
 *        Pointer to the LutMap being constructed.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -1412,7 +1470,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -1424,7 +1482,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for LutMap objects.
@@ -1432,6 +1490,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the LutMap to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -1446,7 +1506,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -1458,7 +1518,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -1469,6 +1529,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the LutMap whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Constants: */
@@ -1504,8 +1566,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
                    "Input value increment between elements" );
 
 /* Interpolation method */
-   set = TestLutInterp( this );
-   ival = set ? GetLutInterp( this ) : astGetLutInterp( this );
+   set = TestLutInterp( this, status );
+   ival = set ? GetLutInterp( this, status ) : astGetLutInterp( this );
    astWriteInt( channel, "LutInt", set, 1, ival, "Interpolation method" );
 
 /* Lookup table contents. */
@@ -1525,12 +1587,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsALutMap and astCheckLutMap functions using the
    macros defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(LutMap,Mapping,check,&class_init)
+astMAKE_ISA(LutMap,Mapping,check,&class_check)
 astMAKE_CHECK(LutMap)
 
 AstLutMap *astLutMap_( int nlut, const double lut[],
                        double start, double inc,
-                       const char *options, ... ) {
+                       const char *options, int *status, ...) {
 /*
 *++
 *  Name:
@@ -1631,12 +1693,23 @@ f     AST_LUTMAP = INTEGER
 c     function is invoked with the AST error status set, or if it
 f     function is invoked with STATUS set to an error value, or if it
 *     should fail for any reason.
+
+*  Status Handling:
+*     The protected interface to this function includes an extra
+*     parameter at the end of the parameter list descirbed above. This
+*     parameter is a pointer to the integer inherited status
+*     variable: "int *status".
+
 *--
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstLutMap *new;               /* Pointer to new LutMap */
    va_list args;                 /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -1654,7 +1727,7 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Obtain the variable argument list and pass it along with the
    options string to the astVSet method to initialise the new
    LutMap's attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -1709,8 +1782,17 @@ AstLutMap *astLutMapId_( int nlut, const double lut[],
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstLutMap *new;               /* Pointer to new LutMap */
    va_list args;                 /* Variable argument list */
+
+   int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -1743,7 +1825,7 @@ AstLutMap *astLutMapId_( int nlut, const double lut[],
 AstLutMap *astInitLutMap_( void *mem, size_t size, int init,
                            AstLutMapVtab *vtab, const char *name,
                            int nlut, const double lut[],
-                           double start, double inc ) {
+                           double start, double inc, int *status ) {
 /*
 *+
 *  Name:
@@ -1843,13 +1925,13 @@ AstLutMap *astInitLutMap_( void *mem, size_t size, int init,
 /* Check that the number of lookup table elements is valid. */
    if ( nlut < 2 ) {
       astError( AST__LUTIN, "astInitLutMap(%s): Invalid number of lookup "
-                "table elements (%d).", name, nlut );
-      astError( AST__LUTIN, "This value should be at least 2." );
+                "table elements (%d).", status, name, nlut );
+      astError( AST__LUTIN, "This value should be at least 2." , status);
 
 /* Also check that the input value increment is not zero. */
    } else if ( inc == 0.0 ) {
       astError( AST__LUTII, "astInitLutMap(%s): An input value increment of "
-                "zero between lookup table elements is not allowed.", name );
+                "zero between lookup table elements is not allowed.", status, name );
 
 /* Determine if the element values are all good, distinct and increase 
    or decrease monotonically. We can only implement the inverse
@@ -1919,7 +2001,7 @@ AstLutMap *astInitLutMap_( void *mem, size_t size, int init,
 
 AstLutMap *astLoadLutMap_( void *mem, size_t size,
                            AstLutMapVtab *vtab, const char *name,
-                           AstChannel *channel ) {
+                           AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -1994,12 +2076,16 @@ AstLutMap *astLoadLutMap_( void *mem, size_t size,
 */
 
 /* Local Constants: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
    AstLutMap *new;               /* Pointer to the new LutMap */
    char buff[ KEY_LEN + 1 ];     /* Buffer for keyword string */
-   int ilut;                     /* Loop counter for table elements */
+   int ilut;                     /* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
+
+/* Loop counter for table elements */
 
 /* Initialise. */
    new = NULL;
@@ -2051,7 +2137,7 @@ AstLutMap *astLoadLutMap_( void *mem, size_t size,
 
 /* Interpolation method */
       new->lutinterp = astReadInt( channel, "lutint", LINEAR );
-      if ( TestLutInterp( new ) ) SetLutInterp( new, new->lutinterp );
+      if ( TestLutInterp( new, status ) ) SetLutInterp( new, new->lutinterp, status );
 
 /* Allocate memory to hold the lookup table elements. */
       new->lut = astMalloc( sizeof( double ) * (size_t) new->nlut );
@@ -2093,3 +2179,8 @@ AstLutMap *astLoadLutMap_( void *mem, size_t size,
    Note that the member function may not be the one defined here, as
    it may have been over-ridden by a derived class. However, it should
    still have the same interface. */
+
+
+
+
+

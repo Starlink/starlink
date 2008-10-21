@@ -268,7 +268,7 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 
 /* Define the macro. */
 #define MAKE_CLEAR(attribute) \
-static void Clear##attribute( AstFrame *this_frame ) { \
+static void Clear##attribute( AstFrame *this_frame, int *status ) { \
 \
 /* Local Variables: */ \
    AstFrame *fr;                 /* Pointer to current Frame */ \
@@ -322,7 +322,7 @@ static void Clear##attribute( AstFrame *this_frame ) { \
 
 /* Define the macro. */
 #define MAKE_CLEAR_AXIS(attribute) \
-static void Clear##attribute( AstFrame *this_frame, int axis ) { \
+static void Clear##attribute( AstFrame *this_frame, int axis, int *status ) { \
 \
 /* Local Variables: */ \
    AstFrame *fr;                 /* Pointer to current Frame */ \
@@ -380,7 +380,7 @@ static void Clear##attribute( AstFrame *this_frame, int axis ) { \
 
 /* Define the macro. */
 #define MAKE_GET(attribute,type) \
-static type Get##attribute( AstFrame *this_frame ) { \
+static type Get##attribute( AstFrame *this_frame, int *status ) { \
 \
 /* Local Variables: */ \
    AstFrame *fr;                 /* Pointer to current Frame */ \
@@ -443,7 +443,7 @@ static type Get##attribute( AstFrame *this_frame ) { \
 
 /* Define the macro. */
 #define MAKE_GET_AXIS(attribute,type) \
-static type Get##attribute( AstFrame *this_frame, int axis ) { \
+static type Get##attribute( AstFrame *this_frame, int axis, int *status ) { \
 \
 /* Local Variables: */ \
    AstFrame *fr;                 /* Pointer to current Frame */ \
@@ -508,7 +508,7 @@ static type Get##attribute( AstFrame *this_frame, int axis ) { \
 
 /* Define the macro. */
 #define MAKE_SET(attribute,type) \
-static void Set##attribute( AstFrame *this_frame, type value ) { \
+static void Set##attribute( AstFrame *this_frame, type value, int *status ) { \
 \
 /* Local Variables: */ \
    AstFrame *fr;                 /* Pointer to current Frame */ \
@@ -564,7 +564,7 @@ static void Set##attribute( AstFrame *this_frame, type value ) { \
 
 /* Define the macro. */
 #define MAKE_SET_AXIS(attribute,type) \
-static void Set##attribute( AstFrame *this_frame, int axis, type value ) { \
+static void Set##attribute( AstFrame *this_frame, int axis, type value, int *status ) { \
 \
 /* Local Variables: */ \
    AstFrame *fr;                 /* Pointer to current Frame */ \
@@ -621,7 +621,7 @@ static void Set##attribute( AstFrame *this_frame, int axis, type value ) { \
 
 /* Define the macro. */
 #define MAKE_TEST(attribute) \
-static int Test##attribute( AstFrame *this_frame ) { \
+static int Test##attribute( AstFrame *this_frame, int *status ) { \
 \
 /* Local Variables: */ \
    AstFrame *fr;                 /* Pointer to current Frame */ \
@@ -683,7 +683,7 @@ static int Test##attribute( AstFrame *this_frame ) { \
 
 /* Define the macro. */
 #define MAKE_TEST_AXIS(attribute) \
-static int Test##attribute( AstFrame *this_frame, int axis ) { \
+static int Test##attribute( AstFrame *this_frame, int axis, int *status ) { \
 \
 /* Local Variables: */ \
    AstFrame *fr;                 /* Pointer to current Frame */ \
@@ -716,6 +716,8 @@ static int Test##attribute( AstFrame *this_frame, int axis ) { \
 /* ============= */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
 #include "object.h"              /* Base Object class */
@@ -725,6 +727,7 @@ static int Test##attribute( AstFrame *this_frame, int axis ) { \
 #include "cmpmap.h"              /* Compound Mappings */
 #include "frame.h"               /* Parent Frame class */
 #include "frameset.h"            /* Interface definition for this class */
+#include "globals.h"             /* Thread-safe global data access */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -741,206 +744,252 @@ static int Test##attribute( AstFrame *this_frame, int axis ) { \
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag as
-   static variables. */
-static AstFrameSetVtab class_vtab; /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
 
-/* Variables associated with preserving FrameSet integrity. */
-static AstFrame *integrity_frame = NULL; /* Pointer to copy of current Frame */
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
+
+/* Pointers to parent class methods which are extended by this class. */
+static int (* parent_getobjsize)( AstObject *, int * );
+static void (* parent_clear)( AstObject *, const char *, int * );
+static int (* parent_getusedefs)( AstObject *, int * );
+static void (* parent_vset)( AstObject *, const char *, char **, va_list, int * );
+
+#if defined(THREAD_SAFE)
+static int (* parent_managelock)( AstObject *, int, int, int * );
+#endif
+
+/* Define macros for accessing each item of thread specific global data. */
+#ifdef THREAD_SAFE
+
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; \
+   globals->GetAttrib_Buff[ 0 ] = 0; \
+   globals->Integrity_Frame = NULL; \
+   globals->Integrity_Method = ""; \
+   globals->Integrity_Lost = 0; \
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(FrameSet)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(FrameSet,Class_Init)
+#define class_vtab astGLOBAL(FrameSet,Class_Vtab)
+#define getattrib_buff astGLOBAL(FrameSet,GetAttrib_Buff)
+#define integrity_frame astGLOBAL(FrameSet,Integrity_Frame)
+#define integrity_method astGLOBAL(FrameSet,Integrity_Method)
+#define integrity_lost astGLOBAL(FrameSet,Integrity_Lost)
+
+
+
+/* If thread safety is not needed, declare and initialise globals at static 
+   variables. */ 
+#else
+
+/* Buffer returned by GetAttrib. */ 
+static char getattrib_buff[ 51 ];
+
+/* Variables associated with preserving FrameSet integrity. */ 
+static AstFrame *integrity_frame = NULL; /* Pointer to copy of current Frame */ 
 static const char *integrity_method = ""; /* Name of method being used */
 static int integrity_lost = 0;   /* Current Frame modified? */
 
-/* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject * );
-static void (* parent_clear)( AstObject *, const char * );
-static int (* parent_getusedefs)( AstObject * );
-static void (* parent_vset)( AstObject *, const char *, char **, va_list );
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstFrameSetVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
+
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static int GetObjSize( AstObject * );
-static AstAxis *GetAxis( AstFrame *, int );
-static AstFrame *GetFrame( AstFrameSet *, int );
-static AstFrame *PickAxes( AstFrame *, int, const int[], AstMapping ** );
-static AstFrameSet *Convert( AstFrame *, AstFrame *, const char * );
-static AstFrameSet *ConvertX( AstFrame *, AstFrame *, const char * );
-static AstFrameSet *FindFrame( AstFrame *, AstFrame *, const char * );
-static AstMapping *CombineMaps( AstMapping *, int, AstMapping *, int, int );
-static AstMapping *GetMapping( AstFrameSet *, int, int );
-static AstMapping *Simplify( AstMapping * );
-static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet * );
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static const char *Abbrev( AstFrame *, int, const char *, const char *, const char * );
-static const char *Format( AstFrame *, int, double );
-static const char *GetAttrib( AstObject *, const char * );
-static const char *GetDomain( AstFrame * );
-static const char *GetFormat( AstFrame *, int );
-static const char *GetLabel( AstFrame *, int );
-static const char *GetSymbol( AstFrame *, int );
-static const char *GetTitle( AstFrame * );
-static const char *GetUnit( AstFrame *, int );
-static const int *GetPerm( AstFrame * );
-static double Angle( AstFrame *, const double[], const double[], const double[] );
-static double AxAngle( AstFrame *, const double[], const double[], int );
-static double AxDistance( AstFrame *, int, double, double );
-static double AxOffset( AstFrame *, int, double, double );
-static double Offset2( AstFrame *, const double[2], double, double, double[2] );
-static double Rate( AstMapping *, double *, int, int );
-static AstSystemType ValidateSystem( AstFrame *, AstSystemType, const char * );
-static AstSystemType SystemCode( AstFrame *, const char * );
-static const char *SystemString( AstFrame *, AstSystemType );
-static void CheckPerm( AstFrame *, const int *, const char * );
-static void Resolve( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
-static void ValidateAxisSelection( AstFrame *, int, const int *, const char * );
-static AstLineDef *LineDef( AstFrame *, const double[2], const double[2] );
-static int Equal( AstObject *, AstObject * );
-static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double ** );
-static int LineContains( AstFrame *, AstLineDef *, int, double * );
-static void LineOffset( AstFrame *, AstLineDef *, double, double, double[2] );
+static int GetObjSize( AstObject *, int * );
+static AstAxis *GetAxis( AstFrame *, int, int * );
+static AstFrame *GetFrame( AstFrameSet *, int, int * );
+static AstFrame *PickAxes( AstFrame *, int, const int[], AstMapping **, int * );
+static AstFrameSet *Convert( AstFrame *, AstFrame *, const char *, int * );
+static AstFrameSet *ConvertX( AstFrame *, AstFrame *, const char *, int * );
+static AstFrameSet *FindFrame( AstFrame *, AstFrame *, const char *, int * );
+static AstMapping *CombineMaps( AstMapping *, int, AstMapping *, int, int, int * );
+static AstMapping *GetMapping( AstFrameSet *, int, int, int * );
+static AstMapping *Simplify( AstMapping *, int * );
+static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet *, int * );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static const char *Abbrev( AstFrame *, int, const char *, const char *, const char *, int * );
+static const char *Format( AstFrame *, int, double, int * );
+static const char *GetAttrib( AstObject *, const char *, int * );
+static const char *GetDomain( AstFrame *, int * );
+static const char *GetFormat( AstFrame *, int, int * );
+static const char *GetLabel( AstFrame *, int, int * );
+static const char *GetSymbol( AstFrame *, int, int * );
+static const char *GetTitle( AstFrame *, int * );
+static const char *GetUnit( AstFrame *, int, int * );
+static const int *GetPerm( AstFrame *, int * );
+static double Angle( AstFrame *, const double[], const double[], const double[], int * );
+static double AxAngle( AstFrame *, const double[], const double[], int, int * );
+static double AxDistance( AstFrame *, int, double, double, int * );
+static double AxOffset( AstFrame *, int, double, double, int * );
+static double Offset2( AstFrame *, const double[2], double, double, double[2], int * );
+static double Rate( AstMapping *, double *, int, int, int * );
+static AstSystemType ValidateSystem( AstFrame *, AstSystemType, const char *, int * );
+static AstSystemType SystemCode( AstFrame *, const char *, int * );
+static const char *SystemString( AstFrame *, AstSystemType, int * );
+static void CheckPerm( AstFrame *, const int *, const char *, int * );
+static void Resolve( AstFrame *, const double [], const double [], const double [], double [], double *, double *, int * );
+static void ValidateAxisSelection( AstFrame *, int, const int *, const char *, int * );
+static AstLineDef *LineDef( AstFrame *, const double[2], const double[2], int * );
+static int Equal( AstObject *, AstObject *, int * );
+static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double **, int * );
+static int LineContains( AstFrame *, AstLineDef *, int, double *, int * );
+static void LineOffset( AstFrame *, AstLineDef *, double, double, double[2], int * );
 
-static double Distance( AstFrame *, const double[], const double[] );
-static double Gap( AstFrame *, int, double, int * );
-static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
-static int Fields( AstFrame *, int, const char *, const char *, int, char **, int *, double * );
-static int ForceCopy( AstFrameSet *, int );
-static int GetBase( AstFrameSet * );
-static int GetCurrent( AstFrameSet * );
-static int GetDigits( AstFrame * );
-static int GetDirection( AstFrame *, int );
-static int GetActiveUnit( AstFrame * );
-static int GetIsLinear( AstMapping * );
-static int GetMatchEnd( AstFrame * );
-static int GetMaxAxes( AstFrame * );
-static int GetMinAxes( AstFrame * );
-static int GetNaxes( AstFrame * );
-static int GetNframe( AstFrameSet * );
-static int GetNin( AstMapping * );
-static int GetNout( AstMapping * );
-static int GetPermute( AstFrame * );
-static int GetPreserveAxes( AstFrame * );
-static int GetTranForward( AstMapping * );
-static int GetTranInverse( AstMapping * );
-static int IsUnitFrame( AstFrame * );
-static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
-static int Span( AstFrameSet *, AstFrame **, int, int, int, AstMapping **, int * );
-static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
-static int TestAttrib( AstObject *, const char * );
-static int TestBase( AstFrameSet * );
-static int TestCurrent( AstFrameSet * );
-static int TestDigits( AstFrame * );
-static int TestDirection( AstFrame *, int );
-static int TestDomain( AstFrame * );
-static int TestFormat( AstFrame *, int );
-static int TestLabel( AstFrame *, int );
-static int TestActiveUnit( AstFrame * );
-static int TestMatchEnd( AstFrame * );
-static int TestMaxAxes( AstFrame * );
-static int TestMinAxes( AstFrame * );
-static int TestPermute( AstFrame * );
-static int TestPreserveAxes( AstFrame * );
-static int TestSymbol( AstFrame *, int );
-static int TestTitle( AstFrame * );
-static int TestUnit( AstFrame *, int );
-static int Unformat( AstFrame *, int, const char *, double * );
-static int ValidateAxis( AstFrame *, int, const char * );
-static int ValidateFrameIndex( AstFrameSet *, int, const char * );
-static void AddFrame( AstFrameSet *, int, AstMapping *, AstFrame * );
-static void Clear( AstObject *, const char * );
-static void ClearAttrib( AstObject *, const char * );
-static void ClearBase( AstFrameSet * );
-static void ClearCurrent( AstFrameSet * );
-static void ClearDigits( AstFrame * );
-static void ClearDirection( AstFrame *, int );
-static void ClearDomain( AstFrame * );
-static void ClearFormat( AstFrame *, int );
-static void ClearLabel( AstFrame *, int );
-static void ClearMatchEnd( AstFrame * );
-static void ClearMaxAxes( AstFrame * );
-static void ClearMinAxes( AstFrame * );
-static void ClearPermute( AstFrame * );
-static void ClearPreserveAxes( AstFrame * );
-static void ClearSymbol( AstFrame *, int );
-static void ClearTitle( AstFrame * );
-static void ClearUnit( AstFrame *, int );
-static void Copy( const AstObject *, AstObject * );
-static void Delete( AstObject * );
-static void Dump( AstObject *, AstChannel * );
-static void Norm( AstFrame *, double[] );
-static void NormBox( AstFrame *, double[], double[], AstMapping * );
-static void Offset( AstFrame *, const double[], const double[], double, double[] );
-static void Overlay( AstFrame *, const int *, AstFrame * );
-static void PermAxes( AstFrame *, const int[] );
-static void PrimaryFrame( AstFrame *, int, AstFrame **, int * );
-static void RecordIntegrity( AstFrameSet * );
-static void RemapFrame( AstFrameSet *, int, AstMapping * );
-static void RemoveFrame( AstFrameSet *, int );
-static void ReportPoints( AstMapping *, int, AstPointSet *, AstPointSet * );
-static void RestoreIntegrity( AstFrameSet * );
-static void SetAttrib( AstObject *, const char * );
-static void SetAxis( AstFrame *, int, AstAxis * );
-static void SetBase( AstFrameSet *, int );
-static void SetCurrent( AstFrameSet *, int );
-static void SetDigits( AstFrame *, int );
-static void SetDirection( AstFrame *, int, int );
-static void SetDomain( AstFrame *, const char * );
-static void SetFormat( AstFrame *, int, const char * );
-static void SetLabel( AstFrame *, int, const char * );
-static void SetActiveUnit( AstFrame *, int );
-static void SetMatchEnd( AstFrame *, int );
-static void SetMaxAxes( AstFrame *, int );
-static void SetMinAxes( AstFrame *, int );
-static void SetPermute( AstFrame *, int );
-static void SetPreserveAxes( AstFrame *, int );
-static void SetSymbol( AstFrame *, int, const char * );
-static void SetTitle( AstFrame *, const char * );
-static void SetUnit( AstFrame *, int, const char * );
-static void TidyNodes( AstFrameSet * );
-static void VSet( AstObject *, const char *, char **, va_list );
+static double Distance( AstFrame *, const double[], const double[], int * );
+static double Gap( AstFrame *, int, double, int *, int * );
+static int *MapSplit( AstMapping *, int, int *, AstMapping **, int * );
+static int Fields( AstFrame *, int, const char *, const char *, int, char **, int *, double *, int * );
+static int ForceCopy( AstFrameSet *, int, int * );
+static int GetBase( AstFrameSet *, int * );
+static int GetCurrent( AstFrameSet *, int * );
+static int GetDigits( AstFrame *, int * );
+static int GetDirection( AstFrame *, int, int * );
+static int GetActiveUnit( AstFrame *, int * );
+static int GetIsLinear( AstMapping *, int * );
+static int GetMatchEnd( AstFrame *, int * );
+static int GetMaxAxes( AstFrame *, int * );
+static int GetMinAxes( AstFrame *, int * );
+static int GetNaxes( AstFrame *, int * );
+static int GetNframe( AstFrameSet *, int * );
+static int GetNin( AstMapping *, int * );
+static int GetNout( AstMapping *, int * );
+static int GetPermute( AstFrame *, int * );
+static int GetPreserveAxes( AstFrame *, int * );
+static int GetTranForward( AstMapping *, int * );
+static int GetTranInverse( AstMapping *, int * );
+static int IsUnitFrame( AstFrame *, int * );
+static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame **, int * );
+static int Span( AstFrameSet *, AstFrame **, int, int, int, AstMapping **, int *, int * );
+static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
+static int TestAttrib( AstObject *, const char *, int * );
+static int TestBase( AstFrameSet *, int * );
+static int TestCurrent( AstFrameSet *, int * );
+static int TestDigits( AstFrame *, int * );
+static int TestDirection( AstFrame *, int, int * );
+static int TestDomain( AstFrame *, int * );
+static int TestFormat( AstFrame *, int, int * );
+static int TestLabel( AstFrame *, int, int * );
+static int TestActiveUnit( AstFrame *, int * );
+static int TestMatchEnd( AstFrame *, int * );
+static int TestMaxAxes( AstFrame *, int * );
+static int TestMinAxes( AstFrame *, int * );
+static int TestPermute( AstFrame *, int * );
+static int TestPreserveAxes( AstFrame *, int * );
+static int TestSymbol( AstFrame *, int, int * );
+static int TestTitle( AstFrame *, int * );
+static int TestUnit( AstFrame *, int, int * );
+static int Unformat( AstFrame *, int, const char *, double *, int * );
+static int ValidateAxis( AstFrame *, int, const char *, int * );
+static int ValidateFrameIndex( AstFrameSet *, int, const char *, int * );
+static void AddFrame( AstFrameSet *, int, AstMapping *, AstFrame *, int * );
+static void Clear( AstObject *, const char *, int * );
+static void ClearAttrib( AstObject *, const char *, int * );
+static void ClearBase( AstFrameSet *, int * );
+static void ClearCurrent( AstFrameSet *, int * );
+static void ClearDigits( AstFrame *, int * );
+static void ClearDirection( AstFrame *, int, int * );
+static void ClearDomain( AstFrame *, int * );
+static void ClearFormat( AstFrame *, int, int * );
+static void ClearLabel( AstFrame *, int, int * );
+static void ClearMatchEnd( AstFrame *, int * );
+static void ClearMaxAxes( AstFrame *, int * );
+static void ClearMinAxes( AstFrame *, int * );
+static void ClearPermute( AstFrame *, int * );
+static void ClearPreserveAxes( AstFrame *, int * );
+static void ClearSymbol( AstFrame *, int, int * );
+static void ClearTitle( AstFrame *, int * );
+static void ClearUnit( AstFrame *, int, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Delete( AstObject *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void Norm( AstFrame *, double[], int * );
+static void NormBox( AstFrame *, double[], double[], AstMapping *, int * );
+static void Offset( AstFrame *, const double[], const double[], double, double[], int * );
+static void Overlay( AstFrame *, const int *, AstFrame *, int * );
+static void PermAxes( AstFrame *, const int[], int * );
+static void PrimaryFrame( AstFrame *, int, AstFrame **, int *, int * );
+static void RecordIntegrity( AstFrameSet *, int * );
+static void RemapFrame( AstFrameSet *, int, AstMapping *, int * );
+static void RemoveFrame( AstFrameSet *, int, int * );
+static void ReportPoints( AstMapping *, int, AstPointSet *, AstPointSet *, int * );
+static void RestoreIntegrity( AstFrameSet *, int * );
+static void SetAttrib( AstObject *, const char *, int * );
+static void SetAxis( AstFrame *, int, AstAxis *, int * );
+static void SetBase( AstFrameSet *, int, int * );
+static void SetCurrent( AstFrameSet *, int, int * );
+static void SetDigits( AstFrame *, int, int * );
+static void SetDirection( AstFrame *, int, int, int * );
+static void SetDomain( AstFrame *, const char *, int * );
+static void SetFormat( AstFrame *, int, const char *, int * );
+static void SetLabel( AstFrame *, int, const char *, int * );
+static void SetActiveUnit( AstFrame *, int, int * );
+static void SetMatchEnd( AstFrame *, int, int * );
+static void SetMaxAxes( AstFrame *, int, int * );
+static void SetMinAxes( AstFrame *, int, int * );
+static void SetPermute( AstFrame *, int, int * );
+static void SetPreserveAxes( AstFrame *, int, int * );
+static void SetSymbol( AstFrame *, int, const char *, int * );
+static void SetTitle( AstFrame *, const char *, int * );
+static void SetUnit( AstFrame *, int, const char *, int * );
+static void TidyNodes( AstFrameSet *, int * );
+static void VSet( AstObject *, const char *, char **, va_list, int * );
 
-static double GetBottom( AstFrame *, int );
-static int TestBottom( AstFrame *, int );
-static void ClearBottom( AstFrame *, int );
-static void SetBottom( AstFrame *, int, double );
+static double GetBottom( AstFrame *, int, int * );
+static int TestBottom( AstFrame *, int, int * );
+static void ClearBottom( AstFrame *, int, int * );
+static void SetBottom( AstFrame *, int, double, int * );
 
-static double GetTop( AstFrame *, int );
-static int TestTop( AstFrame *, int );
-static void ClearTop( AstFrame *, int );
-static void SetTop( AstFrame *, int, double );
+static double GetTop( AstFrame *, int, int * );
+static int TestTop( AstFrame *, int, int * );
+static void ClearTop( AstFrame *, int, int * );
+static void SetTop( AstFrame *, int, double, int * );
 
-static double GetEpoch( AstFrame * );
-static int TestEpoch( AstFrame * );
-static void ClearEpoch( AstFrame * );
-static void SetEpoch( AstFrame *, double );
+static double GetEpoch( AstFrame *, int * );
+static int TestEpoch( AstFrame *, int * );
+static void ClearEpoch( AstFrame *, int * );
+static void SetEpoch( AstFrame *, double, int * );
 
-static double GetObsLat( AstFrame * );
-static int TestObsLat( AstFrame * );
-static void ClearObsLat( AstFrame * );
-static void SetObsLat( AstFrame *, double );
+static double GetObsLat( AstFrame *, int * );
+static int TestObsLat( AstFrame *, int * );
+static void ClearObsLat( AstFrame *, int * );
+static void SetObsLat( AstFrame *, double, int * );
 
-static double GetObsLon( AstFrame * );
-static int TestObsLon( AstFrame * );
-static void ClearObsLon( AstFrame * );
-static void SetObsLon( AstFrame *, double );
+static double GetObsLon( AstFrame *, int * );
+static int TestObsLon( AstFrame *, int * );
+static void ClearObsLon( AstFrame *, int * );
+static void SetObsLon( AstFrame *, double, int * );
 
-static int GetUseDefs( AstObject * );
+static int GetUseDefs( AstObject *, int * );
 
-static AstSystemType GetSystem( AstFrame * );
-static int TestSystem( AstFrame * );
-static void ClearSystem( AstFrame * );
-static void SetSystem( AstFrame *, AstSystemType );
+static AstSystemType GetSystem( AstFrame *, int * );
+static int TestSystem( AstFrame *, int * );
+static void ClearSystem( AstFrame *, int * );
+static void SetSystem( AstFrame *, AstSystemType, int * );
 
-static AstSystemType GetAlignSystem( AstFrame * );
-static int TestAlignSystem( AstFrame * );
-static void ClearAlignSystem( AstFrame * );
-static void SetAlignSystem( AstFrame *, AstSystemType );
+static AstSystemType GetAlignSystem( AstFrame *, int * );
+static int TestAlignSystem( AstFrame *, int * );
+static void ClearAlignSystem( AstFrame *, int * );
+static void SetAlignSystem( AstFrame *, AstSystemType, int * );
 
-
+#if defined(THREAD_SAFE)
+static int ManageLock( AstObject *, int, int, int * );
+#endif
 
 /* Member functions. */
 /* ================= */
 static const char *Abbrev( AstFrame *this_frame, int axis, const char *fmt,
-                           const char *str1, const char *str2 ) {
+                           const char *str1, const char *str2, int *status ) {
 /*
 *  Name:
 *     Abbrev
@@ -954,7 +1003,7 @@ static const char *Abbrev( AstFrame *this_frame, int axis, const char *fmt,
 *  Synopsis:
 *     #include "frameset.h"
 *     const char *Abbrev( AstFrame *this, int axis, const char *fmt,
-*                         const char *str1, const char *str2 )
+*                         const char *str1, const char *str2, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astAbbrev
@@ -984,6 +1033,8 @@ static const char *Abbrev( AstFrame *this_frame, int axis, const char *fmt,
 *     str2
 *        Pointer to a constant null-terminated string containing the
 *        second formatted value.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer into the "str2" string which locates the first
@@ -1033,7 +1084,7 @@ static const char *Abbrev( AstFrame *this_frame, int axis, const char *fmt,
 }
 
 static void AddFrame( AstFrameSet *this, int iframe, AstMapping *map,
-                      AstFrame *frame ) {
+                      AstFrame *frame, int *status ) {
 /*
 *++
 *  Name:
@@ -1182,10 +1233,10 @@ f     Frame of the FRAME FrameSet. This latter Frame becomes the
       ncoord = astGetNin( map );
       if ( astOK && ( naxes != ncoord ) ) {
          astError( AST__NCPIN, "astAddFrame(%s): Bad number of %s input "
-                   "coordinate values (%d).", astGetClass( this ),
+                   "coordinate values (%d).", status, astGetClass( this ),
                    astGetClass( map ), ncoord );
          astError( AST__NCPIN, "The %s given should accept %d coordinate "
-                   "value%s for each input point.", astGetClass( map ), naxes,
+                   "value%s for each input point.", status, astGetClass( map ), naxes,
                    ( naxes == 1 ) ? "" : "s" );
       }
    }
@@ -1198,10 +1249,10 @@ f     Frame of the FRAME FrameSet. This latter Frame becomes the
       naxes = astGetNaxes( frame );
       if ( astOK && ( ncoord != naxes ) ) {
          astError( AST__NCPIN, "astAddFrame(%s): Bad number of %s output "
-                   "coordinate values (%d).", astGetClass( this ),
+                   "coordinate values (%d).", status, astGetClass( this ),
                    astGetClass( map ), ncoord );
          astError( AST__NCPIN, "The %s given should generate %d "
-                   "coordinate value%s for each output point.",
+                   "coordinate value%s for each output point.", status,
                    astGetClass( map ), naxes, ( naxes == 1 ) ? "" : "s" );
       }
    }
@@ -1435,7 +1486,7 @@ f     Frame of the FRAME FrameSet. This latter Frame becomes the
 }
 
 static double Angle( AstFrame *this_frame, const double a[],
-                     const double b[], const double c[] ) {
+                     const double b[], const double c[], int *status ) {
 /*
 *  Name:
 *     Angle
@@ -1449,7 +1500,7 @@ static double Angle( AstFrame *this_frame, const double a[],
 *  Synopsis:
 *     #include "frameset.h"
 *     double Angle( AstFrame *this, const double a[], const double b[],
-*                   const double c[] )
+*                   const double c[], int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astAngle
@@ -1473,6 +1524,8 @@ static double Angle( AstFrame *this_frame, const double a[],
 *     c
 *        An array of double, with one element for each Frame axis
 *        (Naxes attribute) containing the coordinates of the third point.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     astAngle
@@ -1515,7 +1568,7 @@ static double Angle( AstFrame *this_frame, const double a[],
    return result;
 }
 
-static double AxAngle( AstFrame *this_frame, const double a[], const double b[], int axis ) {
+static double AxAngle( AstFrame *this_frame, const double a[], const double b[], int axis, int *status ) {
 /*
 *  Name:
 *     AxAngle
@@ -1528,7 +1581,7 @@ static double AxAngle( AstFrame *this_frame, const double a[], const double b[],
 
 *  Synopsis:
 *     #include "frameset.h"
-*     double AxAngle( AstFrame *this, const double a[], const double b[], int axis )
+*     double AxAngle( AstFrame *this, const double a[], const double b[], int axis, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astAxAngle
@@ -1551,6 +1604,8 @@ static double AxAngle( AstFrame *this_frame, const double a[], const double b[],
 *     axis
 *        The number of the Frame axis from which the angle is to be
 *        measured (one-based).
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *        The angle in radians, from the positive direction of the
@@ -1598,7 +1653,7 @@ static double AxAngle( AstFrame *this_frame, const double a[], const double b[],
    return result;
 }
 
-static double AxDistance( AstFrame *this_frame, int axis, double v1, double v2 ) {
+static double AxDistance( AstFrame *this_frame, int axis, double v1, double v2, int *status ) {
 /*
 *  Name:
 *     AxDistance
@@ -1611,7 +1666,7 @@ static double AxDistance( AstFrame *this_frame, int axis, double v1, double v2 )
 
 *  Synopsis:
 *     #include "frameset.h"
-*     double AxDistance( AstFrame *this, int axis, double v1, double v2 )
+*     double AxDistance( AstFrame *this, int axis, double v1, double v2, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astAxDistance
@@ -1635,6 +1690,8 @@ static double AxDistance( AstFrame *this_frame, int axis, double v1, double v2 )
 *        The first axis value.
 *     v2
 *        The second axis value.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The distance between the two axis values.
@@ -1675,7 +1732,7 @@ static double AxDistance( AstFrame *this_frame, int axis, double v1, double v2 )
    return result;
 }
 
-static double AxOffset( AstFrame *this_frame, int axis, double v1, double dist ) {
+static double AxOffset( AstFrame *this_frame, int axis, double v1, double dist, int *status ) {
 /*
 *  Name:
 *     AxOffset
@@ -1688,7 +1745,7 @@ static double AxOffset( AstFrame *this_frame, int axis, double v1, double dist )
 
 *  Synopsis:
 *     #include "frameset.h"
-*     double AxOffset( AstFrame *this, int axis, double v1, double dist )
+*     double AxOffset( AstFrame *this, int axis, double v1, double dist, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astAxOffset
@@ -1712,6 +1769,8 @@ static double AxOffset( AstFrame *this_frame, int axis, double v1, double dist )
 *        The original axis value.
 *     dist
 *        The axis increment to add to the original axis value.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The incremented axis value.
@@ -1752,7 +1811,7 @@ static double AxOffset( AstFrame *this_frame, int axis, double v1, double dist )
    return result;
 }
 
-static void CheckPerm( AstFrame *this_frame, const int *perm, const char *method ) {
+static void CheckPerm( AstFrame *this_frame, const int *perm, const char *method, int *status ) {
 /*
 *  Name:
 *     CheckPerm
@@ -1765,7 +1824,7 @@ static void CheckPerm( AstFrame *this_frame, const int *perm, const char *method
 
 *  Synopsis:
 *     #include "frameset.h"
-*     void CheckPerm( AstFrame *this, const int *perm, const char *method )
+*     void CheckPerm( AstFrame *this, const int *perm, const char *method, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astCheckPerm
@@ -1795,6 +1854,8 @@ static void CheckPerm( AstFrame *this_frame, const int *perm, const char *method
 *        containing the name of the method that invoked this function
 *        to validate a permutation array. This method name is used
 *        solely for constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - Error messages issued by this function refer to the external
@@ -1820,7 +1881,7 @@ static void CheckPerm( AstFrame *this_frame, const int *perm, const char *method
 
 }
 
-static void Clear( AstObject *this_object, const char *attrib ) {
+static void Clear( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     Clear
@@ -1833,7 +1894,7 @@ static void Clear( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     void Clear( AstObject *this, const char *attrib )
+*     void Clear( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the public astClear method
@@ -1854,6 +1915,8 @@ static void Clear( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated character string containing a
 *        comma-separated list of the names of the attributes to be
 *        cleared.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - This function preserves the integrity of the FrameSet (if
@@ -1862,6 +1925,7 @@ static void Clear( AstObject *this_object, const char *attrib ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    AstFrame *save_frame;         /* Saved pointer to integrity Frame */
    AstFrameSet *this;            /* Pointer to FrameSet structure */
    const char *save_method;      /* Saved pointer to method name */
@@ -1870,6 +1934,9 @@ static void Clear( AstObject *this_object, const char *attrib ) {
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this_object);
 
 /* Obtain a pointer to the FrameSet structure. */
    this = (AstFrameSet *) this_object;
@@ -1885,21 +1952,21 @@ static void Clear( AstObject *this_object, const char *attrib ) {
    integrity_method = "astClear";
 
 /* Record the initial integrity state of the FrameSet. */
-   RecordIntegrity( this );
+   RecordIntegrity( this, status );
 
 /* Invoke the parent astClear method to clear the FrameSet's attribute
    values and note if this succeeds. */
-   (*parent_clear)( this_object, attrib );
+   (*parent_clear)( this_object, attrib, status );
    ok = astOK;
 
 /* Restore the FrameSet's integrity. */
-   RestoreIntegrity( this );
+   RestoreIntegrity( this, status );
 
 /* If integrity could not be restored, then add contextual error
    information. */
    if ( !astOK && ok ) {
       astError( astStatus, "Unable to accommodate clearing the \"%s\" "
-                           "attribute(s).", attrib );
+                           "attribute(s).", status, attrib );
    }
 
 /* Restore any saved FrameSet integrity information. */
@@ -1908,7 +1975,7 @@ static void Clear( AstObject *this_object, const char *attrib ) {
    integrity_method = save_method;
 }
 
-static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     ClearAttrib
@@ -1941,12 +2008,16 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    AstFrame *fr;                 /* Pointer to current Frame */
    AstFrameSet *this;            /* Pointer to the FrameSet structure */
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
+
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this_object);
 /* Obtain a pointer to the FrameSet structure. */
    this = (AstFrameSet *) this_object;
 
@@ -1966,9 +2037,9 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    the integrity state of the FrameSet before changing this attribute
    and record the new integrity state afterwards. */
    } else if ( !strcmp( attrib, "current" ) ) {
-      RestoreIntegrity( this );
+      RestoreIntegrity( this, status );
       astClearCurrent( this );
-      RecordIntegrity( this );
+      RecordIntegrity( this, status );
 
 /* ID. */
 /* --- */
@@ -1981,9 +2052,9 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    integrity state of the FrameSet before changing this attribute and
    record the new integrity state afterwards. */
    } else if ( !strcmp( attrib, "invert" ) ) {
-      RestoreIntegrity( this );
+      RestoreIntegrity( this, status );
       astClearInvert( this );
-      RecordIntegrity( this );
+      RecordIntegrity( this, status );
 
 /* Report. */
 /* ------- */
@@ -2002,8 +2073,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
                !strcmp( attrib, "tranforward" ) ||
                !strcmp( attrib, "traninverse" ) ) {
       astError( AST__NOWRT, "astClear: Invalid attempt to clear the \"%s\" "
-                "value for a %s.", attrib, astGetClass( this ) );
-      astError( AST__NOWRT, "This is a read-only attribute." );
+                "value for a %s.", status, attrib, astGetClass( this ) );
+      astError( AST__NOWRT, "This is a read-only attribute." , status);
 
 /* Pass unrecognised attributes on to the FrameSet's current Frame for
    further interpretation. */
@@ -2011,7 +2082,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Force a copy to be made of the current Frame, if needed, to make it
    independent of other Frames within the FrameSet. */
-      (void) ForceCopy( this, AST__CURRENT );
+      (void) ForceCopy( this, AST__CURRENT, status );
 
 /* Obtain a pointer to the current Frame and invoke its astClearAttrib
    method. Annul the Frame pointer afterwards. */
@@ -2024,7 +2095,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    }
 }
 
-static void ClearBase( AstFrameSet *this ) {
+static void ClearBase( AstFrameSet *this, int *status ) {
 /*
 *+
 *  Name:
@@ -2068,7 +2139,7 @@ static void ClearBase( AstFrameSet *this ) {
    if ( astOK ) *( invert ? &this->current : &this->base ) = -INT_MAX;
 }
 
-static void ClearCurrent( AstFrameSet *this ) {
+static void ClearCurrent( AstFrameSet *this, int *status ) {
 /*
 *+
 *  Name:
@@ -2114,7 +2185,7 @@ static void ClearCurrent( AstFrameSet *this ) {
 
 static AstMapping *CombineMaps( AstMapping *mapping1, int invert1,
                                 AstMapping *mapping2, int invert2,
-                                int series ) {
+                                int series, int *status ) {
 /*
 *  Name:
 *     CombineMaps
@@ -2227,7 +2298,7 @@ static AstMapping *CombineMaps( AstMapping *mapping1, int invert1,
    }
 
 /* Combine the two Mappings into a CmpMap. */
-   result = (AstMapping *) astCmpMap( map1, map2, series, "" );
+   result = (AstMapping *) astCmpMap( map1, map2, series, "", status );
    
 /* If the first Mapping's Invert value was changed, restore it to its
    original state. */
@@ -2261,7 +2332,7 @@ static AstMapping *CombineMaps( AstMapping *mapping1, int invert1,
 }
 
 static AstFrameSet *Convert( AstFrame *from, AstFrame *to,
-                             const char *domainlist ) {
+                             const char *domainlist, int *status ) {
 /*
 *  Name:
 *     Convert
@@ -2275,7 +2346,7 @@ static AstFrameSet *Convert( AstFrame *from, AstFrame *to,
 *  Synopsis:
 *     #include "frameset.h"
 *     AstFrameSet *Convert( AstFrame *from, AstFrame *to,
-*                           const char *domainlist )
+*                           const char *domainlist, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the public astConvert
@@ -2317,6 +2388,8 @@ static AstFrameSet *Convert( AstFrame *from, AstFrame *to,
 *        commas) indicates that all Frames should be considered,
 *        regardless of their Domain attributes. The list is
 *        case-insensitive and all white space is ignored.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *        If the requested coordinate conversion is possible, the
@@ -2353,11 +2426,11 @@ static AstFrameSet *Convert( AstFrame *from, AstFrame *to,
 
 /* Invoke the private "ConvertX" member function with the first two
    arguments swapped. */
-   return ConvertX( to, from, domainlist );
+   return ConvertX( to, from, domainlist, status );
 }
 
 static AstFrameSet *ConvertX( AstFrame *to, AstFrame *from,
-                              const char *domainlist ) {
+                              const char *domainlist, int *status ) {
 /*
 *  Name:
 *     ConvertX
@@ -2563,7 +2636,7 @@ static AstFrameSet *ConvertX( AstFrame *to, AstFrame *from,
                   if ( from_index != from_current ) {
                      from_map = astGetMapping( from, AST__CURRENT,
                                                from_index );
-                     tmp = (AstMapping *) astCmpMap( from_map, map, 1, "" );
+                     tmp = (AstMapping *) astCmpMap( from_map, map, 1, "", status );
                      from_map = astAnnul( from_map );
                      map = astAnnul( map );
                      map = tmp;
@@ -2573,7 +2646,7 @@ static AstFrameSet *ConvertX( AstFrame *to, AstFrame *from,
    "to" Frame and the "to" current Frame. */
                   if ( to_index != to_current ) {
                      to_map = astGetMapping( to, to_index, AST__CURRENT );
-                     tmp = (AstMapping *) astCmpMap( map, to_map, 1, "" );
+                     tmp = (AstMapping *) astCmpMap( map, to_map, 1, "", status );
                      to_map = astAnnul( to_map );
                      map = astAnnul( map );
                      map = tmp;
@@ -2638,7 +2711,7 @@ static AstFrameSet *ConvertX( AstFrame *to, AstFrame *from,
    if ( result_map ) {
       from_frame = from_isframe ? astClone( from ) :
                                   astGetFrame( from, AST__CURRENT );
-      result = astFrameSet( from_frame, "" );
+      result = astFrameSet( from_frame, "", status );
       from_frame = astAnnul( from_frame );
 
 /* Similarly. obtain a pointer to the current "to" frame and add it to
@@ -2669,7 +2742,7 @@ static AstFrameSet *ConvertX( AstFrame *to, AstFrame *from,
 }
 
 static double Distance( AstFrame *this_frame,
-                        const double point1[], const double point2[] ) {
+                        const double point1[], const double point2[], int *status ) {
 /*
 *  Name:
 *     Distance
@@ -2683,7 +2756,7 @@ static double Distance( AstFrame *this_frame,
 *  Synopsis:
 *     #include "frameset.h"
 *     double Distance( AstFrame *this,
-*                      const double point1[], const double point2[] )
+*                      const double point1[], const double point2[], int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astDistance
@@ -2703,6 +2776,8 @@ static double Distance( AstFrame *this_frame,
 *     point2
 *        An array of double, with one element for each FrameSet axis
 *        containing the coordinates of the second point.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The distance between the two points.
@@ -2739,7 +2814,7 @@ static double Distance( AstFrame *this_frame,
    return result;
 }
 
-static int Equal( AstObject *this_object, AstObject *that_object ) {
+static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
 *  Name:
 *     Equal
@@ -2752,7 +2827,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     int Equal( AstObject *this, AstObject *that ) 
+*     int Equal( AstObject *this, AstObject *that, int *status ) 
 
 *  Class Membership:
 *     FrameSet member function (over-rides the astEqual protected
@@ -2767,6 +2842,8 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *        Pointer to the first FrameSet.
 *     that
 *        Pointer to the second FrameSet.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if the FrameSets are equivalent, zero otherwise.
@@ -2837,7 +2914,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 static int Fields( AstFrame *this_frame, int axis, const char *fmt, 
                    const char *str, int maxfld, char **fields, 
-                   int *nc, double *val ) {
+                   int *nc, double *val, int *status ) {
 /*
 *+
 *  Name:
@@ -2942,7 +3019,7 @@ static int Fields( AstFrame *this_frame, int axis, const char *fmt,
 }
 
 static AstFrameSet *FindFrame( AstFrame *target_frame, AstFrame *template,
-                               const char *domainlist ) {
+                               const char *domainlist, int *status ) {
 /*
 *  Name:
 *     FindFrame
@@ -2956,7 +3033,7 @@ static AstFrameSet *FindFrame( AstFrame *target_frame, AstFrame *template,
 *  Synopsis:
 *     #include "frameset.h"
 *     AstFrameSet *FindFrame( AstFrame *target, AstFrame *template,
-*                             const char *domainlist )
+*                             const char *domainlist, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the astFindFrame method
@@ -2997,6 +3074,8 @@ static AstFrameSet *FindFrame( AstFrame *target_frame, AstFrame *template,
 *        This list is case-insensitive and all white space is ignored.
 *        If you do not wish to restrict the domain in this way, you
 *        should supply an empty string.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     If the search is successful, the function returns a pointer to a
@@ -3124,7 +3203,7 @@ static AstFrameSet *FindFrame( AstFrame *target_frame, AstFrame *template,
    the selected target Frame, and prefix this Mapping to the one
    obtained above. */
                prefix = astGetMapping( target, AST__BASE, target_index );
-               tmp = (AstMapping *) astCmpMap( prefix, map, 1, "" );
+               tmp = (AstMapping *) astCmpMap( prefix, map, 1, "", status );
                prefix = astAnnul( prefix );
                map = astAnnul( map );
                map = tmp;
@@ -3137,7 +3216,7 @@ static AstFrameSet *FindFrame( AstFrame *target_frame, AstFrame *template,
 /* Obtain a pointer to the target base Frame, and use this to start
    building the result FrameSet. */
                base_frame = astGetFrame( target, AST__BASE );
-               result = astFrameSet( base_frame, "" );
+               result = astFrameSet( base_frame, "", status );
                base_frame = astAnnul( base_frame );
 
 /* Add the result Frame, which is related to the base Frame by the
@@ -3172,7 +3251,7 @@ static AstFrameSet *FindFrame( AstFrame *target_frame, AstFrame *template,
    return result;
 }
 
-static int ForceCopy( AstFrameSet *this, int iframe ) {
+static int ForceCopy( AstFrameSet *this, int iframe, int *status ) {
 /*
 *  Name:
 *     ForceCopy
@@ -3185,7 +3264,7 @@ static int ForceCopy( AstFrameSet *this, int iframe ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     int ForceCopy( AstFrameSet *this, int iframe )
+*     int ForceCopy( AstFrameSet *this, int iframe, int *status )
 
 *  Class Membership:
 *     FrameSet member function.
@@ -3206,6 +3285,8 @@ static int ForceCopy( AstFrameSet *this, int iframe ) {
 *        Pointer to the FrameSet.
 *     iframe
 *        The index of the Frame to be examined.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if a copy of the nominated Frame was made, otherwise zero.
@@ -3219,6 +3300,7 @@ static int ForceCopy( AstFrameSet *this, int iframe ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    AstFrame *frame;             /* Pointer to Frame */
    AstFrame *tmp;               /* Temporary Frame pointer */
    int ifr;                     /* Loop counter for Frames */
@@ -3229,6 +3311,9 @@ static int ForceCopy( AstFrameSet *this, int iframe ) {
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this);
 
 /* Validate and translate the Frame index supplied. */
    iframe = astValidateFrameIndex( this, iframe, integrity_method );
@@ -3264,7 +3349,7 @@ static int ForceCopy( AstFrameSet *this, int iframe ) {
    return result;
 }
 
-static const char *Format( AstFrame *this_frame, int axis, double value ) {
+static const char *Format( AstFrame *this_frame, int axis, double value, int *status ) {
 /*
 *  Name:
 *     Format
@@ -3277,7 +3362,7 @@ static const char *Format( AstFrame *this_frame, int axis, double value ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     const char *Format( AstFrame *this, int axis, double value )
+*     const char *Format( AstFrame *this, int axis, double value, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the astFormat method
@@ -3298,6 +3383,8 @@ static const char *Format( AstFrame *this_frame, int axis, double value ) {
 *        to be performed.
 *     value
 *        The coordinate value to be formatted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to a null-terminated string containing the formatted
@@ -3343,7 +3430,7 @@ static const char *Format( AstFrame *this_frame, int axis, double value ) {
    return result;
 }
 
-static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick ) {
+static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick, int *status ) {
 /*
 *  Name:
 *     Gap
@@ -3356,7 +3443,7 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     double Gap( AstFrame *this, int axis, double gap, int *ntick )
+*     double Gap( AstFrame *this, int axis, double gap, int *ntick, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astGap method
@@ -3379,6 +3466,8 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick ) {
 *     ntick
 *        Address of an int in which to return a convenient number of
 *        divisions into which the gap can be divided.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The nice gap size.
@@ -3419,7 +3508,7 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick ) {
    return result;
 }
 
-static int GetObjSize( AstObject *this_object ) {
+static int GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -3432,7 +3521,7 @@ static int GetObjSize( AstObject *this_object ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     int GetObjSize( AstObject *this ) 
+*     int GetObjSize( AstObject *this, int *status ) 
 
 *  Class Membership:
 *     FrameSet member function (over-rides the astGetObjSize protected
@@ -3445,6 +3534,8 @@ static int GetObjSize( AstObject *this_object ) {
 *  Parameters:
 *     this
 *        Pointer to the FrameSet.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Object size, in bytes.
@@ -3472,7 +3563,7 @@ static int GetObjSize( AstObject *this_object ) {
 /* Invoke the GetObjSize method inherited from the parent class, and then
    add on any components of the class structure defined by thsi class
    which are stored in dynamically allocated memory. */
-   result = (*parent_getobjsize)( this_object );
+   result = (*parent_getobjsize)( this_object, status );
 
    for ( iframe = 0; iframe < this->nframe; iframe++ ) {
       result += astGetObjSize( this->frame[ iframe ] );
@@ -3495,7 +3586,7 @@ static int GetObjSize( AstObject *this_object ) {
    return result;
 }
 
-static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+static const char *GetAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     GetAttrib
@@ -3508,7 +3599,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     const char *GetAttrib( AstObject *this, const char *attrib )
+*     const char *GetAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astGetAttrib
@@ -3525,6 +3616,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string containing the name of
 *        the attribute whose value is required. This name should be in
 *        lower case, with all white space removed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     - Pointer to a null-terminated string containing the attribute
@@ -3542,10 +3635,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *     reason.
 */
 
-/* Local Constants: */
-#define BUFF_LEN 50              /* Max. characters in result buffer */
-
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    AstFrame *fr;                 /* Pointer to current Frame */
    AstFrameSet *this;            /* Pointer to the FrameSet structure */
    const char *result;           /* Pointer value to return */
@@ -3560,7 +3651,6 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    int report;                   /* Report attribute value */
    int tranforward;              /* TranForward attribute value */
    int traninverse;              /* TranInverse attribute value */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
    result = NULL;
@@ -3568,12 +3658,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Check the global error status. */   
    if ( !astOK ) return result;
 
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this_object);
+
 /* Obtain a pointer to the FrameSet structure. */
    this = (AstFrameSet *) this_object;
 
 /* Compare "attrib" with each recognised attribute name in turn,
    obtaining the value of the required attribute. If necessary, write
-   the value into "buff" as a null-terminated string in an appropriate
+   the value into "getattrib_buff" as a null-terminated string in an appropriate
    format.  Set "result" to point at the result string. */
 
 /* We first handle attributes that apply to the FrameSet as a whole
@@ -3584,8 +3677,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    if ( !strcmp( attrib, "base" ) ) {
       base = astGetBase( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", base );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", base );
+         result = getattrib_buff;
       }
 
 /* Class. */
@@ -3598,8 +3691,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "current" ) ) {
       current = astGetCurrent( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", current );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", current );
+         result = getattrib_buff;
       }
 
 /* ID. */
@@ -3612,8 +3705,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "invert" ) ) {
       invert = astGetInvert( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", invert );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", invert );
+         result = getattrib_buff;
       }
 
 /* Nframe. */
@@ -3621,8 +3714,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "nframe" ) ) {
       nframe = astGetNframe( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", nframe );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", nframe );
+         result = getattrib_buff;
       }
 
 /* Nin. */
@@ -3630,8 +3723,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "nin" ) ) {
       nin = astGetNin( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", nin );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", nin );
+         result = getattrib_buff;
       }
 
 /* Nobject. */
@@ -3639,8 +3732,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "nobject" ) ) {
       nobject = astGetNobject( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", nobject );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", nobject );
+         result = getattrib_buff;
       }
 
 /* Nout. */
@@ -3648,8 +3741,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "nout" ) ) {
       nout = astGetNout( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", nout );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", nout );
+         result = getattrib_buff;
       }
 
 /* RefCount. */
@@ -3657,8 +3750,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "refcount" ) ) {
       ref_count = astGetRefCount( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ref_count );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ref_count );
+         result = getattrib_buff;
       }
 
 /* Report. */
@@ -3666,8 +3759,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "report" ) ) {
       report = astGetReport( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", report );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", report );
+         result = getattrib_buff;
       }
 
 /* TranForward. */
@@ -3675,8 +3768,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "tranforward" ) ) {
       tranforward = astGetTranForward( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", tranforward );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", tranforward );
+         result = getattrib_buff;
       }
 
 /* TranInverse. */
@@ -3684,8 +3777,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "traninverse" ) ) {
       traninverse = astGetTranInverse( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", traninverse );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", traninverse );
+         result = getattrib_buff;
       }
 
 /* Pass unrecognised attributes on to the FrameSet's current Frame for
@@ -3704,12 +3797,9 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Return the result. */
    return result;
-
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
 
-static AstAxis *GetAxis( AstFrame *this_frame, int axis ) {
+static AstAxis *GetAxis( AstFrame *this_frame, int axis, int *status ) {
 /*
 *  Name:
 *     GetAxis
@@ -3722,7 +3812,7 @@ static AstAxis *GetAxis( AstFrame *this_frame, int axis ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     AstAxis *GetAxis( AstFrame *this, int axis )
+*     AstAxis *GetAxis( AstFrame *this, int axis, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the astGetAxis method
@@ -3740,6 +3830,8 @@ static AstAxis *GetAxis( AstFrame *this_frame, int axis ) {
 *     axis
 *        The number of the axis (zero-based) for which an Axis pointer
 *        is required.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to the requested Axis object.
@@ -3781,7 +3873,7 @@ static AstAxis *GetAxis( AstFrame *this_frame, int axis ) {
    return result;
 }
 
-static int GetBase( AstFrameSet *this ) {
+static int GetBase( AstFrameSet *this, int *status ) {
 /*
 *+
 *  Name:
@@ -3850,7 +3942,7 @@ static int GetBase( AstFrameSet *this ) {
    return result;
 }
 
-static int GetCurrent( AstFrameSet *this ) {
+static int GetCurrent( AstFrameSet *this, int *status ) {
 /*
 *+
 *  Name:
@@ -3919,7 +4011,7 @@ static int GetCurrent( AstFrameSet *this ) {
    return result;
 }
 
-static AstFrame *GetFrame( AstFrameSet *this, int iframe ) {
+static AstFrame *GetFrame( AstFrameSet *this, int iframe, int *status ) {
 /*
 *++
 *  Name:
@@ -3994,7 +4086,7 @@ f     function is invoked with STATUS set to an error value, or if it
    return result;
 }
 
-static int GetIsLinear( AstMapping *this_mapping ){
+static int GetIsLinear( AstMapping *this_mapping, int *status ){
 /*
 *  Name:
 *     GetIsLinear
@@ -4007,7 +4099,7 @@ static int GetIsLinear( AstMapping *this_mapping ){
 
 *  Synopsis:
 *     #include "mapping.h"
-*     void GetIsLinear( AstMapping *this )
+*     void GetIsLinear( AstMapping *this, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astGetIsLinear
@@ -4020,6 +4112,8 @@ static int GetIsLinear( AstMapping *this_mapping ){
 *  Parameters:
 *     this
 *        Pointer to the Frame.
+*     status
+*        Pointer to the inherited status variable.
 */
 /* Local Variables: */
    AstMapping *map;
@@ -4042,7 +4136,7 @@ static int GetIsLinear( AstMapping *this_mapping ){
    return result;
 }
 
-static AstMapping *GetMapping( AstFrameSet *this, int iframe1, int iframe2 ) {
+static AstMapping *GetMapping( AstFrameSet *this, int iframe1, int iframe2, int *status ) {
 /*
 *++
 *  Name:
@@ -4168,14 +4262,14 @@ f     function is invoked with STATUS set to an error value, or if it
    coordinates between the nodes associated with the two specified  
    Frames. */
       npath = Span( this, frames, this->node[ iframe1 - 1 ],
-                    this->node[ iframe2 - 1 ], -1, path, forward ) - 1;
+                    this->node[ iframe2 - 1 ], -1, path, forward, status ) - 1;
 
 /* If this failed, it indicates a corrupt FrameSet object, so report
    an error. */
       if ( npath < 0 ) {
          astError( AST__FRSIN, "astGetMapping(%s): Invalid or corrupt "
                    "%s - could not find conversion path between Frames "
-                   "%d and %d.", astGetClass( this ), astGetClass( this ),
+                   "%d and %d.", status, astGetClass( this ), astGetClass( this ),
                    iframe1, iframe2 );
 
 /* If the conversion path is of zero length (i.e. the two Frames are
@@ -4189,7 +4283,7 @@ f     function is invoked with STATUS set to an error value, or if it
       } else if ( npath == 0 ) {
          fr = astGetFrame( this, iframe1 );
          if( astIsUnitFrame( fr ) ){
-            result = (AstMapping *) astUnitMap( astGetNaxes( fr ), "" );
+            result = (AstMapping *) astUnitMap( astGetNaxes( fr ), "", status );
          } else {
             result = (AstMapping *) astClone( fr );
          }
@@ -4210,7 +4304,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Concatenate the copy with the result so far, then annul the pointer
    to the copy and save the pointer to the new result. */
-            tmp = (AstMapping *) astCmpMap( result, copy, 1, "" );
+            tmp = (AstMapping *) astCmpMap( result, copy, 1, "", status );
             result = astAnnul( result );
             copy = astAnnul( copy );
             result = tmp;
@@ -4230,7 +4324,7 @@ f     function is invoked with STATUS set to an error value, or if it
    return result;
 }
 
-static int GetNaxes( AstFrame *this_frame ) {
+static int GetNaxes( AstFrame *this_frame, int *status ) {
 /*
 *  Name:
 *     GetNaxes
@@ -4243,7 +4337,7 @@ static int GetNaxes( AstFrame *this_frame ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     int GetNaxes( AstFrame *this )
+*     int GetNaxes( AstFrame *this, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the astGetNaxes method
@@ -4256,6 +4350,8 @@ static int GetNaxes( AstFrame *this_frame ) {
 *  Parameters:
 *     this
 *        Pointer to the FrameSet.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The number of FrameSet axes (zero or more).
@@ -4293,7 +4389,7 @@ static int GetNaxes( AstFrame *this_frame ) {
    return result;
 }
 
-static int GetNframe( AstFrameSet *this ) {
+static int GetNframe( AstFrameSet *this, int *status ) {
 /*
 *+
 *  Name:
@@ -4335,7 +4431,7 @@ static int GetNframe( AstFrameSet *this ) {
    return this->nframe;
 }
 
-static int GetNin( AstMapping *this_mapping ) {
+static int GetNin( AstMapping *this_mapping, int *status ) {
 /*
 *  Name:
 *     GetNin
@@ -4348,7 +4444,7 @@ static int GetNin( AstMapping *this_mapping ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     int GetNin( AstMapping *this )
+*     int GetNin( AstMapping *this, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the astGetNin method
@@ -4366,6 +4462,8 @@ static int GetNin( AstMapping *this_mapping ) {
 *  Parameters:
 *     this
 *        Pointer to the FrameSet.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Number of coordinate values required.
@@ -4403,7 +4501,7 @@ static int GetNin( AstMapping *this_mapping ) {
    return result;
 }
 
-static int GetNout( AstMapping *this_mapping ) {
+static int GetNout( AstMapping *this_mapping, int *status ) {
 /*
 *  Name:
 *     GetNout
@@ -4416,7 +4514,7 @@ static int GetNout( AstMapping *this_mapping ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     int GetNout( AstMapping *this )
+*     int GetNout( AstMapping *this, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the astGetNout method
@@ -4434,6 +4532,8 @@ static int GetNout( AstMapping *this_mapping ) {
 *  Parameters:
 *     this
 *        Pointer to the FrameSet.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Number of coordinate values generated.
@@ -4448,10 +4548,10 @@ static int GetNout( AstMapping *this_mapping ) {
    if ( !astOK ) return 0;
 
 /* Return the number of axes in the FrameSet's current Frame. */
-   return GetNaxes( (AstFrame *) this_mapping );
+   return GetNaxes( (AstFrame *) this_mapping, status );
 }
 
-static const int *GetPerm( AstFrame *this_frame ) {
+static const int *GetPerm( AstFrame *this_frame, int *status ) {
 /*
 *  Name:
 *     GetPerm
@@ -4464,7 +4564,7 @@ static const int *GetPerm( AstFrame *this_frame ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     const int *GetPerm( AstFrame *this )
+*     const int *GetPerm( AstFrame *this, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the astGetPerm protected
@@ -4480,6 +4580,8 @@ static const int *GetPerm( AstFrame *this_frame ) {
 *  Parameters:
 *     this
 *        Pointer to the FrameSet.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the current Frame's axis permutation array (a
@@ -4525,7 +4627,7 @@ static const int *GetPerm( AstFrame *this_frame ) {
    return result;
 }
 
-static int GetTranForward( AstMapping *this_mapping ) {
+static int GetTranForward( AstMapping *this_mapping, int *status ) {
 /*
 *  Name:
 *     astGetTranForward
@@ -4592,7 +4694,7 @@ static int GetTranForward( AstMapping *this_mapping ) {
    return result;
 }
 
-static int GetTranInverse( AstMapping *this_mapping ) {
+static int GetTranInverse( AstMapping *this_mapping, int *status ) {
 /*
 *  Name:
 *     astGetTranInverse
@@ -4659,7 +4761,7 @@ static int GetTranInverse( AstMapping *this_mapping ) {
    return result;
 }
 
-static int GetUseDefs( AstObject *this_object ) {
+static int GetUseDefs( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetUseDefs
@@ -4672,7 +4774,7 @@ static int GetUseDefs( AstObject *this_object ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     int GetUseDefs( AstObject *this_object ) {
+*     int GetUseDefs( AstObject *this_object, int *status ) {
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astGetUseDefs
@@ -4685,6 +4787,8 @@ static int GetUseDefs( AstObject *this_object ) {
 *  Parameters:
 *     this
 *        Pointer to the FrameSet.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     - The USeDefs value.
@@ -4707,7 +4811,7 @@ static int GetUseDefs( AstObject *this_object ) {
 /* If the UseDefs value for the FrameSet has been set explicitly, use the
    Get method inherited from the parent Frame class to get its value> */
    if( astTestUseDefs( this ) ) {
-      result = (*parent_getusedefs)( this_object );
+      result = (*parent_getusedefs)( this_object, status );
 
 /* Otherwise, supply a default value equal to the UseDefs value of the
    current Frame. */   
@@ -4721,7 +4825,7 @@ static int GetUseDefs( AstObject *this_object ) {
    return result;
 }
 
-void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
+void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -4758,12 +4862,16 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstFrameVtab *frame;          /* Pointer to Frame component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -4772,8 +4880,8 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAFrameSet) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -4809,6 +4917,11 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
 
    parent_getusedefs = object->GetUseDefs;
    object->GetUseDefs = GetUseDefs;
+
+#if defined(THREAD_SAFE)
+   parent_managelock = object->ManageLock;
+   object->ManageLock = ManageLock;
+#endif
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
@@ -4972,9 +5085,14 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
    astSetCopy( vtab, Copy );
    astSetDump( vtab, Dump, "FrameSet",
                "Set of inter-related coordinate systems" );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
-static int IsUnitFrame( AstFrame *this_frame ){
+static int IsUnitFrame( AstFrame *this_frame, int *status ){
 /*
 *  Name:
 *     IsUnitFrame
@@ -4987,7 +5105,7 @@ static int IsUnitFrame( AstFrame *this_frame ){
 
 *  Synopsis:
 *     #include "frameset.h"
-*     int IsUnitFrame( AstFrame *this )
+*     int IsUnitFrame( AstFrame *this, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astIsUnitFrame
@@ -5001,6 +5119,8 @@ static int IsUnitFrame( AstFrame *this_frame ){
 *  Parameters:
 *     this 
 *        Pointer to the Frame.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A non-zero value is returned if the supplied Frame is equivalent to
@@ -5039,7 +5159,7 @@ static int IsUnitFrame( AstFrame *this_frame ){
    return result;
 }
 
-static int LineContains( AstFrame *this_frame, AstLineDef *l, int def, double *point ) {
+static int LineContains( AstFrame *this_frame, AstLineDef *l, int def, double *point, int *status ) {
 /*
 *  Name:
 *     LineContains
@@ -5052,7 +5172,7 @@ static int LineContains( AstFrame *this_frame, AstLineDef *l, int def, double *p
 
 *  Synopsis:
 *     #include "frameset.h"
-*     int LineContains( AstFrame *this, AstLineDef *l, int def, double *point )
+*     int LineContains( AstFrame *this, AstLineDef *l, int def, double *point, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astLineContains
@@ -5074,6 +5194,8 @@ static int LineContains( AstFrame *this_frame, AstLineDef *l, int def, double *p
 *     point
 *        Point to an array containing the axis values of the point to be 
 *        tested, possibly followed by extra cached information (see "def").
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A non-zero value is returned if the line contains the point. 
@@ -5106,7 +5228,7 @@ static int LineContains( AstFrame *this_frame, AstLineDef *l, int def, double *p
 }
 
 static int LineCrossing( AstFrame *this_frame, AstLineDef *l1, AstLineDef *l2, 
-                         double **cross ) {
+                         double **cross, int *status ) {
 /*
 *  Name:
 *     LineCrossing
@@ -5120,7 +5242,7 @@ static int LineCrossing( AstFrame *this_frame, AstLineDef *l1, AstLineDef *l2,
 *  Synopsis:
 *     #include "frameset.h"
 *     int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2, 
-*                       double **cross )
+*                       double **cross, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astLineCrossing
@@ -5153,6 +5275,8 @@ static int LineCrossing( AstFrame *this_frame, AstLineDef *l1, AstLineDef *l2,
 *        sub-classes such as SkyFrame may append extra values to the end
 *        of the basic frame axis values. A NULL pointer is returned if an
 *        error occurs.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A non-zero value is returned if the lines cross at a point which is
@@ -5189,7 +5313,7 @@ static int LineCrossing( AstFrame *this_frame, AstLineDef *l1, AstLineDef *l2,
 }
 
 static AstLineDef *LineDef( AstFrame *this_frame, const double start[2], 
-                            const double end[2] ) {
+                            const double end[2], int *status ) {
 /*
 *  Name:
 *     LineDef
@@ -5203,7 +5327,7 @@ static AstLineDef *LineDef( AstFrame *this_frame, const double start[2],
 *  Synopsis:
 *     #include "frameset.h"
 *     AstLineDef *LineDef( AstFrame *this, const double start[2], 
-*                             const double end[2] ) 
+*                             const double end[2], int *status ) 
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astLineDef
@@ -5223,6 +5347,8 @@ static AstLineDef *LineDef( AstFrame *this_frame, const double start[2],
 *        An array of 2 doubles marking the start of the line segment.
 *     end
 *        An array of 2 doubles marking the end of the line segment.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the memory structure containing the description of the
@@ -5254,7 +5380,7 @@ static AstLineDef *LineDef( AstFrame *this_frame, const double start[2],
 }
 
 static void LineOffset( AstFrame *this_frame, AstLineDef *line, double par, 
-                        double prp, double point[2] ){
+                        double prp, double point[2], int *status ){
 /*
 *  Name:
 *     LineOffset
@@ -5268,7 +5394,7 @@ static void LineOffset( AstFrame *this_frame, AstLineDef *line, double par,
 *  Synopsis:
 *     #include "frame.h"
 *     void LineOffset( AstFrame *this, AstLineDef *line, double par, 
-*                      double prp, double point[2] )
+*                      double prp, double point[2], int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astLineOffset
@@ -5289,6 +5415,8 @@ static void LineOffset( AstFrame *this_frame, AstLineDef *line, double par,
 *        The distance to move at right angles to the line. Positive
 *        values result in movement to the left of the line, as seen from
 *        the outside when moving from start towards the end.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - The pointer supplied for "line" should have been created using the 
@@ -5309,7 +5437,98 @@ static void LineOffset( AstFrame *this_frame, AstLineDef *line, double par,
    fr = astAnnul( fr );
 }
 
-static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map ){
+#if defined(THREAD_SAFE)
+static int ManageLock( AstObject *this_object, int mode, int extra, int *status ) {
+/*
+*  Name:
+*     ManageLock
+
+*  Purpose:
+*     Manage the thread lock on an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "object.h"
+*     AstObject *ManageLock( AstObject *this, int mode, int extra, int *status ) 
+
+*  Class Membership:
+*     FrameSet member function (over-rides the astManageLock protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function manages the thread lock on the supplied Object. The
+*     lock can be locked, unlocked or checked by this function as 
+*     deteremined by parameter "mode". See astLock for details of the way
+*     these locks are used.
+
+*  Parameters:
+*     this
+*        Pointer to the Object.
+*     mode
+*        An integer flag indicating what the function should do:
+*
+*        AST__LOCK: Lock the Object for exclusive use by the calling
+*        thread. The "extra" value indicates what should be done if the
+*        Object is already locked (wait or report an error - see astLock).
+*
+*        AST__UNLOCK: Unlock the Object for use by other threads.
+*
+*        AST__CHECKLOCK: Check that the object is locked for use by the
+*        calling thread (report an error if not).
+*     extra
+*        Extra mode-specific information. 
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*    A local status value: 
+*        0 - Success
+*        1 - Could not lock or unlock the object because it was already 
+*            locked by another thread.
+*        2 - Failed to lock a POSIX mutex
+*        3 - Failed to unlock a POSIX mutex
+*        4 - Bad "mode" value supplied.
+
+*  Notes:
+*     - This function attempts to execute even if an error has already
+*     occurred.
+*/
+
+/* Local Variables: */
+   AstFrameSet *this;    /* Pointer to FrameSet structure */
+   int i;                /* Loop count */
+   int result;           /* Returned status value */
+
+/* Initialise */
+   result = 0;
+
+/* Check the supplied pointer is not NULL. */
+   if( !this_object ) return result;
+
+/* Obtain a pointers to the FrameSet structure. */
+   this = (AstFrameSet *) this_object;
+
+/* Invoke the astManageLock method on any Objects contained within
+   the supplied Object. */
+   for( i = 0; i < this->nframe; i++ ) {
+      if( !result ) result = astManageLock( this->frame[ i ], mode, extra );
+   }
+
+   for ( i = 0; i < this->nnode - 1; i++ ) {
+      if( !result ) result = astManageLock( this->map[ i ], mode, extra );
+   }
+
+/* Invoke the ManageLock method inherited from the parent class, and
+   return the resulting status value. */
+   if( !result ) result = (*parent_managelock)( this_object, mode, extra, status );
+   return result;
+
+}
+#endif
+
+static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, int *status ){
 /*
 *  Name:
 *     MapSplit
@@ -5323,7 +5542,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 
 *  Synopsis:
 *     #include "frameset.h"
-*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map )
+*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map, int *status )
 
 *  Class Membership:
 *     FrameSet method (over-rides the protected astMapSplit method
@@ -5355,6 +5574,8 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 *        outputs may be different to "nin"). A NULL pointer will be
 *        returned if the supplied FrameSet has no subset of outputs which 
 *        depend only on the selected inputs.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated array of ints. The number of
@@ -5398,7 +5619,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 
 static int Match( AstFrame *this_frame, AstFrame *target,
                   int **template_axes, int **target_axes,
-                  AstMapping **map, AstFrame **result ) {
+                  AstMapping **map, AstFrame **result, int *status ) {
 /*
 *  Name:
 *     Match
@@ -5413,7 +5634,7 @@ static int Match( AstFrame *this_frame, AstFrame *target,
 *     #include "frameset.h"
 *     int Match( AstFrame *template, AstFrame *target,
 *                int **template_axes, int **target_axes,
-*                AstMapping **map, AstFrame **result )
+*                AstMapping **map, AstFrame **result, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astMatch
@@ -5484,6 +5705,8 @@ static int Match( AstFrame *this_frame, AstFrame *target,
 *        template allows the possibility of transformaing to any one
 *        of a set of alternative coordinate systems, the "result"
 *        Frame will indicate which of the alternatives was used.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A non-zero value is returned if the requested coordinate
@@ -5537,7 +5760,7 @@ static int Match( AstFrame *this_frame, AstFrame *target,
    return match;
 }
 
-static void Norm( AstFrame *this_frame, double value[] ) {
+static void Norm( AstFrame *this_frame, double value[], int *status ) {
 /*
 *  Name:
 *     Norm
@@ -5550,7 +5773,7 @@ static void Norm( AstFrame *this_frame, double value[] ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     void Norm( AstAxis *this, double value[] )
+*     void Norm( AstAxis *this, double value[], int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the astNorm method
@@ -5577,6 +5800,8 @@ static void Norm( AstFrame *this_frame, double value[] ) {
 *        An array of double, with one element for each FrameSet axis.
 *        This should contain the initial set of coordinate values,
 *        which will be modified in place.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -5598,7 +5823,7 @@ static void Norm( AstFrame *this_frame, double value[] ) {
 }
 
 static void NormBox( AstFrame *this_frame, double lbnd[], double ubnd[],
-                     AstMapping *reg ) {
+                     AstMapping *reg, int *status ) {
 /*
 *  Name:
 *     NormBox
@@ -5612,7 +5837,7 @@ static void NormBox( AstFrame *this_frame, double lbnd[], double ubnd[],
 *  Synopsis:
 *     #include "frameset.h"
 *     void astNormBox( AstFrame *this, double lbnd[], double ubnd[],
-*                      AstMapping *reg )
+*                      AstMapping *reg, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the astNormBox method inherited
@@ -5644,6 +5869,8 @@ static void NormBox( AstFrame *this_frame, double lbnd[], double ubnd[],
 *        inside or outside the box. The Mapping should leave an input
 *        position unchanged if the point is inside the box, and should
 *        set all bad if the point is outside the box.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -5665,7 +5892,7 @@ static void NormBox( AstFrame *this_frame, double lbnd[], double ubnd[],
 }
 
 static void Offset( AstFrame *this_frame, const double point1[],
-                    const double point2[], double offset, double point3[] ) {
+                    const double point2[], double offset, double point3[], int *status ) {
 /*
 *  Name:
 *     Offset
@@ -5680,7 +5907,7 @@ static void Offset( AstFrame *this_frame, const double point1[],
 *     #include "frameset.h"
 *     void Offset( AstFrame *this,
 *                  const double point1[], const double point2[],
-*                  double offset, double point3[] )
+*                  double offset, double point3[], int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astOffset
@@ -5713,6 +5940,8 @@ static void Offset( AstFrame *this_frame, const double point1[],
 *        An array of double, with one element for each FrameSet axis
 *        in which the coordinates of the required point will be
 *        returned.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - The geodesic curve used by this function is the path of
@@ -5743,7 +5972,7 @@ static void Offset( AstFrame *this_frame, const double point1[],
 }
 
 static double Offset2( AstFrame *this_frame, const double point1[2], 
-                       double angle, double offset, double point2[2] ){
+                       double angle, double offset, double point2[2], int *status ){
 /*
 *  Name:
 *     Offset2
@@ -5757,7 +5986,7 @@ static double Offset2( AstFrame *this_frame, const double point1[2],
 *  Synopsis:
 *     #include "frameset.h"
 *     double Offset2( AstFrame *this, const double point1[2], double angle,
-*                     double offset, double point2[2] );
+*                     double offset, double point2[2], int *status );
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astOffset2
@@ -5795,6 +6024,8 @@ static double Offset2( AstFrame *this_frame, const double point1[2],
 *     point2
 *        An array of double, with one element for each Frame axis
 *        in which the coordinates of the required point will be returned.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The direction of the geodesic curve at the end point. That is, the
@@ -5837,7 +6068,7 @@ static double Offset2( AstFrame *this_frame, const double point1[2],
 }
 
 static void Overlay( AstFrame *template_frame, const int *template_axes,
-                     AstFrame *result ) {
+                     AstFrame *result, int *status ) {
 /*
 *  Name:
 *     Overlay
@@ -5851,7 +6082,7 @@ static void Overlay( AstFrame *template_frame, const int *template_axes,
 *  Synopsis:
 *     #include "frameset.h"
 *     void Overlay( AstFrame *template, const int *template_axes,
-*                   AstFrame *result )
+*                   AstFrame *result, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astOverlay
@@ -5886,6 +6117,8 @@ static void Overlay( AstFrame *template_frame, const int *template_axes,
 *        should be set to -1.
 *     result
 *        Pointer to the Frame which is to receive the new attribute values.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -5906,7 +6139,7 @@ static void Overlay( AstFrame *template_frame, const int *template_axes,
    fr = astAnnul( fr );
 }
 
-static void PermAxes( AstFrame *this_frame, const int perm[] ) {
+static void PermAxes( AstFrame *this_frame, const int perm[], int *status ) {
 /*
 *  Name:
 *     PermAxes
@@ -5919,7 +6152,7 @@ static void PermAxes( AstFrame *this_frame, const int perm[] ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     void PermAxes( AstFrame *this, const int perm[] )
+*     void PermAxes( AstFrame *this, const int perm[], int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the astPermAxes method
@@ -5938,6 +6171,8 @@ static void PermAxes( AstFrame *this_frame, const int perm[] ) {
 *        order. Each element of this array should be a (zero-based)
 *        axis index identifying the axes according to their old
 *        (un-permuted) order.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - Only genuine permutations of the axis order are permitted, so
@@ -5983,7 +6218,7 @@ static void PermAxes( AstFrame *this_frame, const int perm[] ) {
 
 /* Create a PermMap that will permute coordinate values in the same way as
    the current Frame's axes have been permuted. */
-      map = astPermMap( naxes, invperm, naxes, perm, NULL, "" );
+      map = astPermMap( naxes, invperm, naxes, perm, NULL, "", status );
 
 /* Modify the Frame's relationship to the rest of the Frames in the
    FrameSet so that the correct coordinate values remain associated
@@ -5997,7 +6232,7 @@ static void PermAxes( AstFrame *this_frame, const int perm[] ) {
 }
 
 static AstFrame *PickAxes( AstFrame *this_frame, int naxes, const int axes[],
-                           AstMapping **map ) {
+                           AstMapping **map, int *status ) {
 /*
 *  Name:
 *     PickAxes
@@ -6011,7 +6246,7 @@ static AstFrame *PickAxes( AstFrame *this_frame, int naxes, const int axes[],
 *  Synopsis:
 *     #include "frameset.h"
 *     AstFrame *PickAxes( AstFrame *this, int naxes, const int axes[],
-*                         AstMapping **map )
+*                         AstMapping **map, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the astPickAxes protected
@@ -6052,6 +6287,8 @@ static AstFrame *PickAxes( AstFrame *this_frame, int naxes, const int axes[],
 *
 *        If this Mapping is not required, a NULL value may be supplied
 *        for this parameter.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the new Frame.
@@ -6108,7 +6345,7 @@ static AstFrame *PickAxes( AstFrame *this_frame, int naxes, const int axes[],
 }
 
 static void PrimaryFrame( AstFrame *this_frame, int axis1,
-                          AstFrame **frame, int *axis2 ) {
+                          AstFrame **frame, int *axis2, int *status ) {
 /*
 *  Name:
 *     PrimaryFrame
@@ -6122,7 +6359,7 @@ static void PrimaryFrame( AstFrame *this_frame, int axis1,
 *  Synopsis:
 *     #include "frameset.h"
 *     void PrimaryFrame( AstFrame *this, int axis1, AstFrame **frame,
-*                        int *axis2 )
+*                        int *axis2, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected
@@ -6152,6 +6389,8 @@ static void PrimaryFrame( AstFrame *this_frame, int axis1,
 *        subsequent axis pemutations and the effects of combining
 *        Frames, in order to reveal the original underlying axis
 *        order).
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - This protected method is provided so that class
@@ -6195,7 +6434,7 @@ static void PrimaryFrame( AstFrame *this_frame, int axis1,
    }
 }
 
-static double Rate( AstMapping *this_mapping, double *at, int ax1, int ax2 ){
+static double Rate( AstMapping *this_mapping, double *at, int ax1, int ax2, int *status ){
 /*
 *  Name:
 *     Rate
@@ -6208,7 +6447,7 @@ static double Rate( AstMapping *this_mapping, double *at, int ax1, int ax2 ){
 
 *  Synopsis:
 *     #include "frameset.h"
-*     result = Rate( AstMapping *this, double *at, int ax1, int ax2 )
+*     result = Rate( AstMapping *this, double *at, int ax1, int ax2, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the astRate method
@@ -6239,6 +6478,8 @@ static double Rate( AstMapping *this_mapping, double *at, int ax1, int ax2 ){
 *        The index of the Mapping input which is to be varied in order to
 *        find the rate of change (input numbering starts at 0 for the first 
 *        input).
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     astRate()
@@ -6279,7 +6520,7 @@ static double Rate( AstMapping *this_mapping, double *at, int ax1, int ax2 ){
    return result;
 }
 
-static void RecordIntegrity( AstFrameSet *this ) {
+static void RecordIntegrity( AstFrameSet *this, int *status ) {
 /*
 *+
 *  Name:
@@ -6293,7 +6534,7 @@ static void RecordIntegrity( AstFrameSet *this ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     void RecordIntegrity( AstFrameSet *this )
+*     void RecordIntegrity( AstFrameSet *this, int *status )
 
 *  Class Membership:
 *     FrameSet member function.
@@ -6310,10 +6551,16 @@ static void RecordIntegrity( AstFrameSet *this ) {
 *     this
 *        Pointer to the FrameSet.
 *-
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    AstFrame *current;            /* Pointer to current Frame */
+
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this);
 
 /* Initialise the record of the FrameSet's integrity. */
    integrity_frame = NULL;
@@ -6332,7 +6579,7 @@ static void RecordIntegrity( AstFrameSet *this ) {
    current = astAnnul( current );
 }
 
-static void RemapFrame( AstFrameSet *this, int iframe, AstMapping *map ) {
+static void RemapFrame( AstFrameSet *this, int iframe, AstMapping *map, int *status ) {
 /*
 *++
 *  Name:
@@ -6440,20 +6687,20 @@ f     (AST_REMOVEFRAME).
    if ( astOK ) {
       if ( nin != naxes ) {
          astError( AST__NCPIN, "astRemapFrame(%s): Bad number of %s input "
-                   "coordinate values (%d).", astGetClass( this ),
+                   "coordinate values (%d).", status, astGetClass( this ),
                    astGetClass( map ), nin );
          astError( AST__NCPIN, "The %s given should accept %d coordinate "
-                   "value%s for each input point.", astGetClass( map ), naxes,
+                   "value%s for each input point.", status, astGetClass( map ), naxes,
                    ( naxes == 1 ) ? "" : "s" );
 
 /* Similarly, check that the number of output coordinates matches the
    number of Frame axes. */
       } else if ( nout != naxes ) {
          astError( AST__NCPIN, "astRemapFrame(%s): Bad number of %s output "
-                   "coordinate values (%d).", astGetClass( this ),
+                   "coordinate values (%d).", status, astGetClass( this ),
                    astGetClass( map ), nout );
          astError( AST__NCPIN, "The %s given should generate %d "
-                   "coordinate value%s for each output point.",
+                   "coordinate value%s for each output point.", status,
                    astGetClass( map ), naxes, ( naxes == 1 ) ? "" : "s" );
       }
    }
@@ -6485,13 +6732,13 @@ f     (AST_REMOVEFRAME).
    referenced by the Frame may no longer be needed. This also
    simplifies any compound Mapping which may result if this node is
    removed. */
-            TidyNodes( this );
+            TidyNodes( this, status );
          }
       }
    }
 }
 
-static void RemoveFrame( AstFrameSet *this, int iframe ) {
+static void RemoveFrame( AstFrameSet *this, int iframe, int *status ) {
 /*
 *++
 *  Name:
@@ -6566,7 +6813,7 @@ f     IFRAME argument to specify the base Frame or the current
 /* Reject any attempt to remove the final Frame from the FrameSet. */
       if ( this->nframe == 1 ) {
          astError( AST__REMIN, "astRemoveFrame(%s): Invalid attempt to "
-                   "remove the only Frame in a %s.", astGetClass( this ),
+                   "remove the only Frame in a %s.", status, astGetClass( this ),
                    astGetClass( this ) );
 
 /* If OK, annul the pointer to the selected Frame. */
@@ -6587,7 +6834,7 @@ f     IFRAME argument to specify the base Frame or the current
          this->nframe--;
 
 /* Tidy the nodes in the FrameSet. */
-         TidyNodes( this );
+         TidyNodes( this, status );
 
 /* If the Base attribute is set and the removed Frame was the base
    Frame, then clear the attribute value so that a new base Frame will
@@ -6619,7 +6866,7 @@ f     IFRAME argument to specify the base Frame or the current
 }
 
 static void ReportPoints( AstMapping *this_mapping, int forward,
-                          AstPointSet *in_points, AstPointSet *out_points ) {
+                          AstPointSet *in_points, AstPointSet *out_points, int *status ) {
 /*
 *  Name:
 *     ReportPoints
@@ -6633,7 +6880,7 @@ static void ReportPoints( AstMapping *this_mapping, int forward,
 *  Synopsis:
 *     #include "mapping.h"
 *     void ReportPoints( AstMapping *this, int forward,
-*                        AstPointSet *in_points, AstPointSet *out_points )
+*                        AstPointSet *in_points, AstPointSet *out_points, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astReportPoints
@@ -6659,6 +6906,8 @@ static void ReportPoints( AstMapping *this_mapping, int forward,
 *        Pointer to a PointSet which is associated with the
 *        coordinates of the same set of points after the FrameSet has
 *        been applied.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -6736,7 +6985,7 @@ static void ReportPoints( AstMapping *this_mapping, int forward,
 
 static void Resolve( AstFrame *this_frame, const double point1[],
                      const double point2[], const double point3[],
-                     double point4[], double *d1, double *d2 ){
+                     double point4[], double *d1, double *d2, int *status ){
 /*
 *  Name:
 *     Resolve
@@ -6751,7 +7000,7 @@ static void Resolve( AstFrame *this_frame, const double point1[],
 *     #include "frameset.h"
 *     void Resolve( AstFrame *this, const double point1[],
 *                   const double point2[], const double point3[],
-*                   double point4[], double *d1, double *d2 );
+*                   double point4[], double *d1, double *d2, int *status );
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astResolve
@@ -6792,6 +7041,8 @@ static void Resolve( AstFrame *this_frame, const double point1[],
 *        The address of a location at which to return the distance from
 *        point 4 to point 3 (that is, the length of the component
 *        perpendicular to the basis vector). The value is always positive.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - Each vector used in this function is the path of
@@ -6822,7 +7073,7 @@ static void Resolve( AstFrame *this_frame, const double point1[],
 
 static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[],
                                    const double point2[], AstPointSet *in,
-                                   AstPointSet *out ) {
+                                   AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     astResolvePoints
@@ -6914,7 +7165,7 @@ static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[],
 
 }
 
-static void RestoreIntegrity( AstFrameSet *this ) {
+static void RestoreIntegrity( AstFrameSet *this, int *status ) {
 /*
 *+
 *  Name:
@@ -6954,10 +7205,14 @@ static void RestoreIntegrity( AstFrameSet *this ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    AstFrame *current;            /* Pointer to current Frame */
    AstFrameSet *cvt;             /* Pointer to conversion FrameSet */
    AstMapping *map;              /* Pointer to conversion Mapping */
    int flags;                    /* Flags associated with current frame */
+
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this);
 
 /* Check that a previous record of the FrameSet's integrity state has
    been made. Do not modify the FrameSet if it appears that the
@@ -6999,7 +7254,7 @@ static void RestoreIntegrity( AstFrameSet *this ) {
    state cannot be restored, so report an error. */
       if ( !cvt ) {
          if( astOK ) {
-            astError( AST__ILOST, "%s(%s): Cannot maintain %s integrity.",
+            astError( AST__ILOST, "%s(%s): Cannot maintain %s integrity.", status,
                       integrity_method, astGetClass( this ),
                       astGetClass( this ) );
          }
@@ -7027,7 +7282,7 @@ static void RestoreIntegrity( AstFrameSet *this ) {
    integrity_lost = 0;
 }
 
-static void SetAttrib( AstObject *this_object, const char *setting ) {
+static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
 *     SetAttrib
@@ -7040,7 +7295,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     void SetAttrib( AstObject *this, const char *setting )
+*     void SetAttrib( AstObject *this, const char *setting, int *status )
 
 *  Class Membership:
 *     FrameSet member function (extends the astSetAttrib method
@@ -7066,6 +7321,8 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 *     setting
 *        Pointer to a null terminated string specifying the new
 *        attribute value.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Attributes:
 *     The set of attribute values is not fixed and is determined by
@@ -7084,6 +7341,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    AstFrame *fr;                 /* Pointer to current Frame */
    AstFrameSet *this;            /* Pointer to the FrameSet structure */
    int base;                     /* Base attribute value */
@@ -7098,6 +7356,9 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this_object);
 
 /* Obtain a pointer to the FrameSet structure. */
    this = (AstFrameSet *) this_object;
@@ -7140,7 +7401,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Report an error if the value wasn't recognised. */
       } else {
          astError( AST__ATTIN, "astSetAttrib(%s): Invalid index value for "
-                   "Base Frame \"%s\".",
+                   "Base Frame \"%s\".", status,
                    astGetClass( this ),  setting + base_off );
       }
 
@@ -7154,9 +7415,9 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( setting, "current= %d %n", &current, &nc ) )
                  && ( nc >= len ) ) {
-      RestoreIntegrity( this );
+      RestoreIntegrity( this, status );
       astSetCurrent( this, current );
-      RecordIntegrity( this );
+      RecordIntegrity( this, status );
 
 /* Also allow a string. */
    } else if ( nc = 0,
@@ -7167,9 +7428,9 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Check for "AST__BASE" or "Base". */
       if ( astChrMatch( "AST__BASE", setting + current_off ) ||
            astChrMatch( "Base", setting + current_off ) ) {
-         RestoreIntegrity( this );
+         RestoreIntegrity( this, status );
          astSetCurrent( this, AST__BASE );
-         RecordIntegrity( this );
+         RecordIntegrity( this, status );
 
 /* Check for "AST__CURRENT" or "Current" (possible, although not very
    useful). */
@@ -7179,7 +7440,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Report an error if the value wasn't recognised. */
       } else {
          astError( AST__ATTIN, "astSetAttrib(%s): Invalid index value for "
-                   "Current Frame \"%s\".",
+                   "Current Frame \"%s\".", status,
                    astGetClass( this ),  setting + current_off );
       }
 
@@ -7197,9 +7458,9 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else if ( nc = 0,
         ( 1 == astSscanf( setting, "invert= %d %n", &invert, &nc ) )
         && ( nc >= len ) ) {
-      RestoreIntegrity( this );
+      RestoreIntegrity( this, status );
       astSetInvert( this, invert );
-      RecordIntegrity( this );
+      RecordIntegrity( this, status );
 
 /* Report. */
 /* ------- */
@@ -7224,9 +7485,9 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                MATCH( "refcount" ) ||
                MATCH( "tranforward" ) ||
                MATCH( "traninverse" ) ) {
-      astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.",
+      astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.", status,
                 setting, astGetClass( this ) );
-      astError( AST__NOWRT, "This is a read-only attribute." );
+      astError( AST__NOWRT, "This is a read-only attribute." , status);
 
 /* Pass unrecognised settings on to the FrameSet's current Frame for
    further interpretation. */
@@ -7234,7 +7495,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Force a copy to be made of the current Frame, if needed, to make it
    independent of other Frames within the FrameSet. */
-      (void) ForceCopy( this, AST__CURRENT );
+      (void) ForceCopy( this, AST__CURRENT, status );
 
 /* Obtain a pointer to the current Frame and invoke its astSetAttrib
    method. Annul the Frame pointer afterwards. */
@@ -7250,7 +7511,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 #undef MATCH
 }
 
-static void SetAxis( AstFrame *this_frame, int axis, AstAxis *newaxis ) {
+static void SetAxis( AstFrame *this_frame, int axis, AstAxis *newaxis, int *status ) {
 /*
 *  Name:
 *     SetAxis
@@ -7263,7 +7524,7 @@ static void SetAxis( AstFrame *this_frame, int axis, AstAxis *newaxis ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     void SetAxis( AstFrame *this, int axis, AstAxis *newaxis )
+*     void SetAxis( AstFrame *this, int axis, AstAxis *newaxis, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the astSetAxis method
@@ -7285,6 +7546,8 @@ static void SetAxis( AstFrame *this_frame, int axis, AstAxis *newaxis ) {
 *        object is to be replaced.
 *     newaxis
 *        Pointer to the new Axis object.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -7308,7 +7571,7 @@ static void SetAxis( AstFrame *this_frame, int axis, AstAxis *newaxis ) {
    fr = astAnnul( fr );
 }
 
-static void SetBase( AstFrameSet *this, int iframe ) {
+static void SetBase( AstFrameSet *this, int iframe, int *status ) {
 /*
 *+
 *  Name:
@@ -7361,7 +7624,7 @@ static void SetBase( AstFrameSet *this, int iframe ) {
    if ( astOK ) *( invert ? &this->current : &this->base ) = iframe;
 }
 
-static void SetCurrent( AstFrameSet *this, int iframe ) {
+static void SetCurrent( AstFrameSet *this, int iframe, int *status ) {
 /*
 *+
 *  Name:
@@ -7415,7 +7678,7 @@ static void SetCurrent( AstFrameSet *this, int iframe ) {
    if ( astOK ) *( invert ? &this->base : &this->current ) = iframe;
 }
 
-static AstMapping *Simplify( AstMapping *this_mapping ) {
+static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /*
 *  Name:
 *     Simplify
@@ -7428,7 +7691,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     AstMapping *Simplify( AstMapping *this )
+*     AstMapping *Simplify( AstMapping *this, int *status )
 
 *  Class Membership:
 *     FrameSet method (over-rides the astSimplify method inherited
@@ -7442,6 +7705,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 *  Parameters:
 *     this
 *        Pointer to the original FrameSet.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A new pointer to the (possibly simplified) FrameSet. If
@@ -7543,7 +7808,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 }
 
 static int Span( AstFrameSet *this, AstFrame **frames, int inode1, int inode2, 
-                 int avoid, AstMapping **map, int *forward ) {
+                 int avoid, AstMapping **map, int *forward, int *status ) {
 /*
 *  Name:
 *     Span
@@ -7557,7 +7822,7 @@ static int Span( AstFrameSet *this, AstFrame **frames, int inode1, int inode2,
 *  Synopsis:
 *     #include "frameset.h"
 *     int Span( AstFrameSet *this, AstFrame **frames, int inode1, int inode2, 
-*               int avoid, AstMapping **map, int *forward )
+*               int avoid, AstMapping **map, int *forward, int *status )
 
 *  Class Membership:
 *     FrameSet member function.
@@ -7606,6 +7871,8 @@ static int Span( AstFrameSet *this, AstFrame **frames, int inode1, int inode2,
 *        each Mapping returned in order to effect the transformation
 *        between the starting and ending nodes. This array should be the
 *        same size as the "map" array.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The function returns one more than the number of Mappings
@@ -7708,7 +7975,7 @@ static int Span( AstFrameSet *this, AstFrame **frames, int inode1, int inode2,
    direction information in the arrays supplied, but leave extra space to 
    insert information about the Mapping between nodes inode1 and inode. */
                result = Span( this, frames, inode, inode2, inode1,
-                              map + nextra, forward + nextra );
+                              map + nextra, forward + nextra, status );
 
 /* If a path was found, increment the Mapping count to account for the
    one that transforms between nodes inode1 and inode and insert
@@ -7758,7 +8025,7 @@ static int Span( AstFrameSet *this, AstFrame **frames, int inode1, int inode2,
 static int SubFrame( AstFrame *this_frame, AstFrame *template,
                      int result_naxes,
                      const int *target_axes, const int *template_axes,
-                     AstMapping **map, AstFrame **result ) {
+                     AstMapping **map, AstFrame **result, int *status ) {
 /*
 *  Name:
 *     SubFrame
@@ -7773,7 +8040,7 @@ static int SubFrame( AstFrame *this_frame, AstFrame *template,
 *     #include "frameset.h"
 *     int SubFrame( AstFrame *target, AstFrame *template, int result_naxes,
 *                   const int *target_axes, const int *template_axes,
-*                   AstMapping **map, AstFrame **result )
+*                   AstMapping **map, AstFrame **result, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astSubFrame
@@ -7834,6 +8101,8 @@ static int SubFrame( AstFrame *this_frame, AstFrame *template,
 *        transformation will convert in the opposite direction.
 *     result
 *        Address of a location to receive a pointer to the result Frame.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A non-zero value is returned if coordinate conversion is
@@ -7888,7 +8157,7 @@ static int SubFrame( AstFrame *this_frame, AstFrame *template,
    return match;
 }
 
-static AstSystemType SystemCode( AstFrame *this_frame, const char *system ) {
+static AstSystemType SystemCode( AstFrame *this_frame, const char *system, int *status ) {
 /*
 *  Name:
 *     SystemCode
@@ -7901,7 +8170,7 @@ static AstSystemType SystemCode( AstFrame *this_frame, const char *system ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     AstSystemType SystemCode( AstFrame *this, const char *system )
+*     AstSystemType SystemCode( AstFrame *this, const char *system, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astSystemCode
@@ -7918,6 +8187,8 @@ static AstSystemType SystemCode( AstFrame *this_frame, const char *system ) {
 *     system
 *        Pointer to a constant null-terminated string containing the
 *        external description of the coordinate system.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The System type code.
@@ -7957,7 +8228,7 @@ static AstSystemType SystemCode( AstFrame *this_frame, const char *system ) {
    return result;
 }
 
-static const char *SystemString( AstFrame *this_frame, AstSystemType system ) {
+static const char *SystemString( AstFrame *this_frame, AstSystemType system, int *status ) {
 /*
 *  Name:
 *     SystemString
@@ -7970,7 +8241,7 @@ static const char *SystemString( AstFrame *this_frame, AstSystemType system ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     const char *SystemString( AstFrame *this, AstSystemType system )
+*     const char *SystemString( AstFrame *this, AstSystemType system, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astSystemString
@@ -7986,6 +8257,8 @@ static const char *SystemString( AstFrame *this_frame, AstSystemType system ) {
 *        Pointer to the Frame.
 *     system
 *        The coordinate system type code.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to a constant null-terminated string containing the
@@ -8028,7 +8301,7 @@ static const char *SystemString( AstFrame *this_frame, AstSystemType system ) {
 
 }
 
-static int TestAttrib( AstObject *this_object, const char *attrib ) {
+static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     TestAttrib
@@ -8041,7 +8314,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     int TestAttrib( AstObject *this, const char *attrib )
+*     int TestAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the astTestAttrib protected
@@ -8058,6 +8331,8 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if a value has been set, otherwise zero.
@@ -8142,7 +8417,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    return result;
 }
 
-static int TestBase( AstFrameSet *this ) {
+static int TestBase( AstFrameSet *this, int *status ) {
 /*
 *+
 *  Name:
@@ -8207,7 +8482,7 @@ static int TestBase( AstFrameSet *this ) {
    return result;
 }
 
-static int TestCurrent( AstFrameSet *this ) {
+static int TestCurrent( AstFrameSet *this, int *status ) {
 /*
 *+
 *  Name:
@@ -8272,7 +8547,7 @@ static int TestCurrent( AstFrameSet *this ) {
    return result;
 }
 
-static void TidyNodes( AstFrameSet *this ) {
+static void TidyNodes( AstFrameSet *this, int *status ) {
 /*
 *  Name:
 *     TidyNodes
@@ -8285,7 +8560,7 @@ static void TidyNodes( AstFrameSet *this ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     void TidyNodes( AstFrameSet *this )
+*     void TidyNodes( AstFrameSet *this, int *status )
 
 *  Class Membership:
 *     FrameSet member function.
@@ -8300,6 +8575,8 @@ static void TidyNodes( AstFrameSet *this ) {
 *  Parameters:
 *     this
 *        Pointer to the FrameSet.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -8382,7 +8659,7 @@ static void TidyNodes( AstFrameSet *this ) {
                tmpmap = CombineMaps( this->map[ remove - 1 ],
                                      this->invert[ remove - 1 ] != !suspect,
                                      this->map[ next - 1 ],
-                                     this->invert[ next - 1 ], 1 );
+                                     this->invert[ next - 1 ], 1, status );
 
 /* Simplify this compound Mapping. */
                newmap = astSimplify( tmpmap );
@@ -8447,7 +8724,7 @@ static void TidyNodes( AstFrameSet *this ) {
 }
 
 static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
-                               int forward, AstPointSet *out ) {
+                               int forward, AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     Transform
@@ -8461,7 +8738,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 *  Synopsis:
 *     #include "frameset.h"
 *     AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-*                             int forward, AstPointSet *out )
+*                             int forward, AstPointSet *out, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the astTransform method
@@ -8488,6 +8765,8 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 *        Pointer to a PointSet which will hold the transformed (output)
 *        coordinate values. A NULL value may also be given, in which case a
 *        new PointSet will be created by this function.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the output (possibly new) PointSet.
@@ -8547,7 +8826,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 }
 
 static int Unformat( AstFrame *this_frame, int axis, const char *string,
-                     double *value ) {
+                     double *value, int *status ) {
 /*
 *  Name:
 *     Unformat
@@ -8561,7 +8840,7 @@ static int Unformat( AstFrame *this_frame, int axis, const char *string,
 *  Synopsis:
 *     #include "frameset.h"
 *     int Unformat( AstFrame *this, int axis, const char *string,
-*                   double *value )
+*                   double *value, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the public astUnformat
@@ -8586,6 +8865,8 @@ static int Unformat( AstFrame *this_frame, int axis, const char *string,
 *     value
 *        Pointer to a double in which the coordinate value read will be
 *        returned.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The number of characters read from the string to obtain the
@@ -8646,7 +8927,7 @@ static int Unformat( AstFrame *this_frame, int axis, const char *string,
    return nc;
 }
 
-static int ValidateAxis( AstFrame *this_frame, int axis, const char *method ) {
+static int ValidateAxis( AstFrame *this_frame, int axis, const char *method, int *status ) {
 /*
 *  Name:
 *     ValidateAxis
@@ -8659,7 +8940,7 @@ static int ValidateAxis( AstFrame *this_frame, int axis, const char *method ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     int ValidateAxis( AstFrame *this, int axis, const char *method )
+*     int ValidateAxis( AstFrame *this, int axis, const char *method, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected
@@ -8688,6 +8969,8 @@ static int ValidateAxis( AstFrame *this_frame, int axis, const char *method ) {
 *        containing the name of the method that invoked this function
 *        to validate an axis index. This method name is used solely
 *        for constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The permuted axis index.
@@ -8721,14 +9004,14 @@ static int ValidateAxis( AstFrame *this_frame, int axis, const char *method ) {
    axis numbering for the benefit of the public interface). */
       if ( naxes == 0 ) {
          astError( AST__AXIIN, "%s(%s): Invalid attempt to use an axis index "
-                   "(%d) for a %s which has no axes.", method,
+                   "(%d) for a %s which has no axes.", status, method,
                    astGetClass( this ), axis + 1, astGetClass( this ) );
 
 /* Otherwise, check the axis index for validity and report an error if
    it is not valid (again, convert to 1-based axis numbering). */
       } else if ( ( axis < 0 ) || ( axis >= naxes ) ) {
          astError( AST__AXIIN, "%s(%s): Axis index (%d) invalid - it should "
-                   "be in the range 1 to %d.", method, astGetClass( this ),
+                   "be in the range 1 to %d.", status, method, astGetClass( this ),
                    axis + 1, naxes );
 
 /* If the axis index was valid, obtain a pointer to the FrameSet's
@@ -8750,7 +9033,7 @@ static int ValidateAxis( AstFrame *this_frame, int axis, const char *method ) {
 }
 
 static void ValidateAxisSelection( AstFrame *this_frame, int naxes, 
-                                   const int *axes, const char *method ) {
+                                   const int *axes, const char *method, int *status ) {
 /*
 *  Name:
 *     ValidateAxisSelection
@@ -8764,7 +9047,7 @@ static void ValidateAxisSelection( AstFrame *this_frame, int naxes,
 *  Synopsis:
 *     #include "frameset.h"
 *     void ValidateAxisSelection( AstFrame *this, int naxes,
-*                                 const int *axes, const char *method )
+*                                 const int *axes, const char *method, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astValidateAxisSelection
@@ -8794,6 +9077,8 @@ static void ValidateAxisSelection( AstFrame *this_frame, int naxes,
 *        containing the name of the method that invoked this function
 *        to validate an axis selection. This method name is used
 *        solely for constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -8816,7 +9101,7 @@ static void ValidateAxisSelection( AstFrame *this_frame, int naxes,
 }
 
 static int ValidateFrameIndex( AstFrameSet *this, int iframe,
-                               const char *method ) {
+                               const char *method, int *status ) {
 /*
 *+
 *  Name:
@@ -8893,10 +9178,10 @@ static int ValidateFrameIndex( AstFrameSet *this, int iframe,
 /* Check that the supplied index is within range and report an error
    if it is not. */
          if ( ( iframe < 1 ) || ( iframe > nframe ) ) {
-            astError( AST__FRMIN, "%s(%s): Invalid Frame index (%d) given.",
+            astError( AST__FRMIN, "%s(%s): Invalid Frame index (%d) given.", status,
                       method, astGetClass( this ), iframe );
             astError( AST__FRMIN, "This value should be in the range 1 to "
-                      "%d (or AST__CURRENT or AST__BASE).", nframe );
+                      "%d (or AST__CURRENT or AST__BASE).", status, nframe );
 
 /* If OK, return the validated index value. */
          } else {
@@ -8909,7 +9194,7 @@ static int ValidateFrameIndex( AstFrameSet *this, int iframe,
    return result;
 }
 
-static int ValidateSystem( AstFrame *this_frame, AstSystemType system, const char *method ) {
+static int ValidateSystem( AstFrame *this_frame, AstSystemType system, const char *method, int *status ) {
 /*
 *  Name:
 *     ValidateSystem
@@ -8923,7 +9208,7 @@ static int ValidateSystem( AstFrame *this_frame, AstSystemType system, const cha
 *  Synopsis:
 *     #include "frameset.h"
 *     int ValidateSystem( AstFrame *this, AstSystemType system,
-*                         const char *method )
+*                         const char *method, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astValidateSystem
@@ -8944,6 +9229,8 @@ static int ValidateSystem( AstFrame *this_frame, AstSystemType system, const cha
 *        containing the name of the method that invoked this function
 *        to validate an axis index. This method name is used solely
 *        for constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The validated system value.
@@ -8984,7 +9271,7 @@ static int ValidateSystem( AstFrame *this_frame, AstSystemType system, const cha
 }
 
 static void VSet( AstObject *this_object, const char *settings,
-                  char **text, va_list args ) {
+                  char **text, va_list args, int *status ) {
 /*
 *  Name:
 *     VSet
@@ -8998,7 +9285,7 @@ static void VSet( AstObject *this_object, const char *settings,
 *  Synopsis:
 *     #include "frameset.h"
 *     void VSet( AstObject *this, const char *settings, char **text, 
-*                va_list args )
+*                va_list args, int *status )
 
 *  Class Membership:
 *     FrameSet member function (over-rides the protected astVSet
@@ -9038,6 +9325,8 @@ static void VSet( AstObject *this_object, const char *settings,
 *        The variable argument list which contains values to be
 *        substituted for any "printf"-style format specifiers that
 *        appear in the "settings" string.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - This function preserves the integrity of the FrameSet (if
@@ -9046,6 +9335,7 @@ static void VSet( AstObject *this_object, const char *settings,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    AstFrame *save_frame;         /* Saved pointer to integrity Frame */
    AstFrameSet *this;            /* Pointer to FrameSet structure */
    char *fulltext;               /* Pointer to expanded text string */
@@ -9059,6 +9349,9 @@ static void VSet( AstObject *this_object, const char *settings,
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this_object);
 
 /* Obtain the length of the "settings" string and test it is not
    zero. If it is, there is nothing more to do. */
@@ -9081,15 +9374,15 @@ static void VSet( AstObject *this_object, const char *settings,
       integrity_method = "astSet";
 
 /* Record the initial integrity state of the FrameSet. */
-      RecordIntegrity( this );
+      RecordIntegrity( this, status );
 
 /* Invoke the parent astVSet method to set the FrameSet's attribute
    values and note if this succeeds. */
-      (*parent_vset)( this_object, settings, &fulltext, args );
+      (*parent_vset)( this_object, settings, &fulltext, args, status );
       ok = astOK;
 
 /* Restore the FrameSet's integrity. */
-      RestoreIntegrity( this );
+      RestoreIntegrity( this, status );
 
 /* If integrity could not be restored, then add contextual error
    information. */
@@ -9097,7 +9390,7 @@ static void VSet( AstObject *this_object, const char *settings,
 
 /* Display the message. */
          astError( astStatus, "Unable to accommodate the attribute setting "
-                               "\"%s\".", fulltext );
+                               "\"%s\".", status, fulltext );
       }
 
 /* Restore any saved FrameSet integrity information. */
@@ -9311,7 +9604,7 @@ MAKE_CLEAR_AXIS(Top)
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -9323,7 +9616,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for FrameSet objects.
@@ -9333,6 +9626,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the object to be copied.
 *     objout
 *        Pointer to the object being constructed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     -  This constructor makes a deep copy.
@@ -9405,7 +9700,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -9417,7 +9712,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for FrameSet objects.
@@ -9425,6 +9720,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the object to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     This function attempts to execute even if the global error status is
@@ -9464,7 +9761,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -9476,7 +9773,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -9487,6 +9784,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the FrameSet whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Constants: */
@@ -9638,10 +9937,10 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* Implement the astIsAFrameSet and astCheckFrameSet functions using
    the macros defined for this purpose in the "object.h" header
    file. */
-astMAKE_ISA(FrameSet,Object,check,&class_init)
+astMAKE_ISA(FrameSet,Object,check,&class_check)
 astMAKE_CHECK(FrameSet)
 
-AstFrameSet *astFrameSet_( void *frame_void, const char *options, ... ) {
+AstFrameSet *astFrameSet_( void *frame_void, const char *options, int *status, ...) {
 /*
 *+
 *  Name:
@@ -9655,7 +9954,7 @@ AstFrameSet *astFrameSet_( void *frame_void, const char *options, ... ) {
 
 *  Synopsis:
 *     #include "frameset.h"
-*     AstFrameSet *astFrameSet( AstFrame *frame, const char *options, ... )
+*     AstFrameSet *astFrameSet( AstFrame *frame, const char *options, int *status, ... )
 
 *  Class Membership:
 *     FrameSet constructor.
@@ -9681,6 +9980,8 @@ AstFrameSet *astFrameSet_( void *frame_void, const char *options, ... ) {
 *        initialising the new FrameSet. The syntax used is the same as
 *        for the astSet method and may include "printf" format
 *        specifiers identified by "%" symbols in the normal way.
+*     status
+*        Pointer to the inherited status variable.
 *     ...
 *        If the "options" string contains "%" format specifiers, then
 *        an optional list of arguments may follow it in order to
@@ -9710,12 +10011,16 @@ AstFrameSet *astFrameSet_( void *frame_void, const char *options, ... ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstFrameSet *new;             /* Pointer to new FrameSet */
    va_list args;                 /* Variable argument list */
 
 /* Initialise. */
    new = NULL;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return new;
@@ -9737,7 +10042,7 @@ AstFrameSet *astFrameSet_( void *frame_void, const char *options, ... ) {
 /* Obtain the variable argument list and pass it along with the
    options string to the astVSet method to initialise the new
    FrameSet's attributes. */
-         va_start( args, options );
+         va_start( args, status );
          astVSet( new, options, NULL, args );
          va_end( args );
 
@@ -9752,7 +10057,7 @@ AstFrameSet *astFrameSet_( void *frame_void, const char *options, ... ) {
 
 AstFrameSet *astInitFrameSet_( void *mem, size_t size, int init,
                                AstFrameSetVtab *vtab, const char *name,
-                               AstFrame *frame ) {
+                               AstFrame *frame, int *status ) {
 /*
 *+
 *  Name:
@@ -9959,7 +10264,7 @@ AstFrameSet *astInitFrameSet_( void *mem, size_t size, int init,
 
 AstFrameSet *astLoadFrameSet_( void *mem, size_t size,
                                AstFrameSetVtab *vtab, const char *name,
-                               AstChannel *channel ) {
+                               AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -10029,12 +10334,16 @@ AstFrameSet *astLoadFrameSet_( void *mem, size_t size,
 */
 
 /* Local Constants: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
    AstFrameSet *new;             /* Pointer to the new FrameSet */
    char key[ KEY_LEN + 1 ];      /* Buffer for keyword string */
-   int ifr;                      /* Loop counter for Frames */
+   int ifr;                      /* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
+
+/* Loop counter for Frames */
    int inode;                    /* Loop counter for nodes */
 
 /* Initialise. */
@@ -10186,67 +10495,67 @@ AstFrameSet *astLoadFrameSet_( void *mem, size_t size,
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
 void astAddFrame_( AstFrameSet *this, int iframe, AstMapping *map,
-                   AstFrame *frame ) {
+                   AstFrame *frame, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,FrameSet,AddFrame))( this, iframe, map, frame );
+   (**astMEMBER(this,FrameSet,AddFrame))( this, iframe, map, frame, status );
 }
-void astClearBase_( AstFrameSet *this ) {
+void astClearBase_( AstFrameSet *this, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,FrameSet,ClearBase))( this );
+   (**astMEMBER(this,FrameSet,ClearBase))( this, status );
 }
-void astClearCurrent_( AstFrameSet *this ) {
+void astClearCurrent_( AstFrameSet *this, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,FrameSet,ClearCurrent))( this );
+   (**astMEMBER(this,FrameSet,ClearCurrent))( this, status );
 }
-int astGetBase_( AstFrameSet *this ) {
+int astGetBase_( AstFrameSet *this, int *status ) {
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,FrameSet,GetBase))( this );
+   return (**astMEMBER(this,FrameSet,GetBase))( this, status );
 }
-int astGetCurrent_( AstFrameSet *this ) {
+int astGetCurrent_( AstFrameSet *this, int *status ) {
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,FrameSet,GetCurrent))( this );
+   return (**astMEMBER(this,FrameSet,GetCurrent))( this, status );
 }
-AstFrame *astGetFrame_( AstFrameSet *this, int iframe ) {
+AstFrame *astGetFrame_( AstFrameSet *this, int iframe, int *status ) {
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,FrameSet,GetFrame))( this, iframe );
+   return (**astMEMBER(this,FrameSet,GetFrame))( this, iframe, status );
 }
-AstMapping *astGetMapping_( AstFrameSet *this, int iframe1, int iframe2 ) {
+AstMapping *astGetMapping_( AstFrameSet *this, int iframe1, int iframe2, int *status ) {
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,FrameSet,GetMapping))( this, iframe1, iframe2 );
+   return (**astMEMBER(this,FrameSet,GetMapping))( this, iframe1, iframe2, status );
 }
-int astGetNframe_( AstFrameSet *this ) {
+int astGetNframe_( AstFrameSet *this, int *status ) {
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,FrameSet,GetNframe))( this );
+   return (**astMEMBER(this,FrameSet,GetNframe))( this, status );
 }
-void astRemapFrame_( AstFrameSet *this, int iframe, AstMapping *map ) {
+void astRemapFrame_( AstFrameSet *this, int iframe, AstMapping *map, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,FrameSet,RemapFrame))( this, iframe, map );
+   (**astMEMBER(this,FrameSet,RemapFrame))( this, iframe, map, status );
 }
-void astRemoveFrame_( AstFrameSet *this, int iframe ) {
+void astRemoveFrame_( AstFrameSet *this, int iframe, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,FrameSet,RemoveFrame))( this, iframe );
+   (**astMEMBER(this,FrameSet,RemoveFrame))( this, iframe, status );
 }
-void astSetBase_( AstFrameSet *this, int ibase ) {
+void astSetBase_( AstFrameSet *this, int ibase, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,FrameSet,SetBase))( this, ibase );
+   (**astMEMBER(this,FrameSet,SetBase))( this, ibase, status );
 }
-void astSetCurrent_( AstFrameSet *this, int icurrent ) {
+void astSetCurrent_( AstFrameSet *this, int icurrent, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,FrameSet,SetCurrent))( this, icurrent );
+   (**astMEMBER(this,FrameSet,SetCurrent))( this, icurrent, status );
 }
-int astTestBase_( AstFrameSet *this ) {
+int astTestBase_( AstFrameSet *this, int *status ) {
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,FrameSet,TestBase))( this );
+   return (**astMEMBER(this,FrameSet,TestBase))( this, status );
 }
-int astTestCurrent_( AstFrameSet *this ) {
+int astTestCurrent_( AstFrameSet *this, int *status ) {
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,FrameSet,TestCurrent))( this );
+   return (**astMEMBER(this,FrameSet,TestCurrent))( this, status );
 }
 int astValidateFrameIndex_( AstFrameSet *this, int iframe,
-                            const char *method) {
+                            const char *method, int *status ) {
    if ( !astOK ) return 0;
    return (**astMEMBER(this,FrameSet,ValidateFrameIndex))( this, iframe,
-                                                           method );
+                                                           method, status );
 }
 
 /* Special public interface functions. */
@@ -10409,6 +10718,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstFrameSet *new;             /* Pointer to new FrameSet */
    va_list args;                 /* Variable argument list */
@@ -10416,6 +10726,14 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Initialise. */
    new = NULL;
+
+   int *status;                  /* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
+/* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
 
 /* Check the global status. */
    if ( !astOK ) return new;
@@ -10450,3 +10768,8 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Return an ID value for the new FrameSet. */
    return astMakeId( new );
 }
+
+
+
+
+

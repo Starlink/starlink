@@ -7,7 +7,7 @@ dnl   1.5.  It should work with autoconf versions 2.50 or better, and
 dnl   automake 1.6 or better.
 
 dnl   Initialisation: package name and version number
-AC_INIT(ast, 4.6-2, ussc@star.rl.ac.uk)
+AC_INIT(ast, 5.0-1, ussc@star.rl.ac.uk)
 
 dnl   Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -47,6 +47,21 @@ AC_PROG_LN_S
 
 #   If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
+
+#  Conditional defining whether we build with POSIX thread support.
+AC_ARG_WITH([pthreads],
+            [ --without-pthreads   Build package without POSIX threads support],
+        if test "$withval" = "yes"; then
+           use_pthreads="yes"
+        else
+           use_pthreads="no"
+        fi,
+        use_pthreads="yes")
+if test "$use_pthreads" = "yes"; then
+AC_CHECK_LIB([pthread], [pthread_create], ,[use_pthreads="no"])
+fi
+AM_CONDITIONAL(NOTHREADS, test x$use_pthreads = xno)
+AC_SUBST(THREADS, $use_pthreads)
 
 #  See if we have long doubles (used by the Mapping and Region classes)
 AC_CHECK_TYPES([long double])
@@ -126,7 +141,7 @@ STAR_CHECK_PROGS(prolat, sst)   # prolat is part of SST
 
 AC_CONFIG_HEADERS(config.h)
 
-AC_CONFIG_FILES(Makefile component.xml ast_link f77.h)
+AC_CONFIG_FILES(Makefile component.xml ast_link object.h f77.h)
 AC_CONFIG_FILES([ast_cpp], [chmod +x ast_cpp])
 #   Following are files which are substituted by the Makefile at
 #   distribution time, rather than by configure.  They are not distributed.

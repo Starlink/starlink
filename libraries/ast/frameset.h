@@ -448,6 +448,12 @@
 
 /* Macros. */
 /* ======= */
+
+#if defined(astCLASS) || defined(astFORTRAN77)
+#define STATUS_PTR status
+#else
+#define STATUS_PTR astGetStatusPtr
+#endif
 #define AST__BASE (0)            /* Identify base Frame */
 #define AST__CURRENT (-1)        /* Identify current Frame */
 #define AST__NOFRAME (-99)       /* An invalid Frame index */
@@ -489,22 +495,38 @@ typedef struct AstFrameSetVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   AstFrame *(* GetFrame)( AstFrameSet *, int );
-   AstMapping *(* GetMapping)( AstFrameSet *, int, int );
-   int (* GetBase)( AstFrameSet * );
-   int (* GetCurrent)( AstFrameSet * );
-   int (* GetNframe)( AstFrameSet * );
-   int (* TestBase)( AstFrameSet * );
-   int (* TestCurrent)( AstFrameSet * );
-   int (* ValidateFrameIndex)( AstFrameSet *, int, const char *);
-   void (* AddFrame)( AstFrameSet *, int, AstMapping *, AstFrame * );
-   void (* ClearBase)( AstFrameSet * );
-   void (* ClearCurrent)( AstFrameSet * );
-   void (* RemapFrame)( AstFrameSet *, int, AstMapping * );
-   void (* RemoveFrame)( AstFrameSet *, int );
-   void (* SetBase)( AstFrameSet *, int );
-   void (* SetCurrent)( AstFrameSet *, int );
+   AstFrame *(* GetFrame)( AstFrameSet *, int, int * );
+   AstMapping *(* GetMapping)( AstFrameSet *, int, int, int * );
+   int (* GetBase)( AstFrameSet *, int * );
+   int (* GetCurrent)( AstFrameSet *, int * );
+   int (* GetNframe)( AstFrameSet *, int * );
+   int (* TestBase)( AstFrameSet *, int * );
+   int (* TestCurrent)( AstFrameSet *, int * );
+   int (* ValidateFrameIndex)( AstFrameSet *, int, const char *, int * );
+   void (* AddFrame)( AstFrameSet *, int, AstMapping *, AstFrame *, int * );
+   void (* ClearBase)( AstFrameSet *, int * );
+   void (* ClearCurrent)( AstFrameSet *, int * );
+   void (* RemapFrame)( AstFrameSet *, int, AstMapping *, int * );
+   void (* RemoveFrame)( AstFrameSet *, int, int * );
+   void (* SetBase)( AstFrameSet *, int, int * );
+   void (* SetCurrent)( AstFrameSet *, int, int * );
 } AstFrameSetVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstFrameSetGlobals {
+   AstFrameSetVtab Class_Vtab;
+   int Class_Init;
+   char GetAttrib_Buff[ 51 ];
+   AstFrame *Integrity_Frame;    
+   const char *Integrity_Method; 
+   int Integrity_Lost;           
+} AstFrameSetGlobals;
+
+#endif
+
 #endif
 
 /* Function prototypes. */
@@ -516,7 +538,7 @@ astPROTO_ISA(FrameSet)           /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected */
-AstFrameSet *astFrameSet_( void *, const char *, ... );
+AstFrameSet *astFrameSet_( void *, const char *, int *, ...);
 #else
 AstFrameSet *astFrameSetId_( void *, const char *, ... );
 #endif
@@ -525,35 +547,41 @@ AstFrameSet *astFrameSetId_( void *, const char *, ... );
 
 /* Initialiser. */
 AstFrameSet *astInitFrameSet_( void *, size_t, int, AstFrameSetVtab *,
-                               const char *, AstFrame * );
+                               const char *, AstFrame *, int * );
 
 /* Vtab initialiser. */
-void astInitFrameSetVtab_( AstFrameSetVtab *, const char * );
+void astInitFrameSetVtab_( AstFrameSetVtab *, const char *, int * );
 
 /* Loader. */
 AstFrameSet *astLoadFrameSet_( void *, size_t, AstFrameSetVtab *,
-                               const char *, AstChannel * );
+                               const char *, AstChannel *, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitFrameSetGlobals_( AstFrameSetGlobals * );
+#endif
+
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-AstFrame *astGetFrame_( AstFrameSet *, int );
-AstMapping *astGetMapping_( AstFrameSet *, int, int );
-void astAddFrame_( AstFrameSet *, int , AstMapping *, AstFrame * );
-void astRemapFrame_( AstFrameSet *, int, AstMapping * );
-void astRemoveFrame_( AstFrameSet *, int );
+AstFrame *astGetFrame_( AstFrameSet *, int, int * );
+AstMapping *astGetMapping_( AstFrameSet *, int, int, int * );
+void astAddFrame_( AstFrameSet *, int , AstMapping *, AstFrame *, int * );
+void astRemapFrame_( AstFrameSet *, int, AstMapping *, int * );
+void astRemoveFrame_( AstFrameSet *, int, int * );
 
 #if defined(astCLASS)            /* Protected */
-int astGetBase_( AstFrameSet * );
-int astGetCurrent_( AstFrameSet * );
-int astGetNframe_( AstFrameSet * );
-int astTestBase_( AstFrameSet * );
-int astTestCurrent_( AstFrameSet * );
-int astValidateFrameIndex_( AstFrameSet *, int, const char *);
-void astClearBase_( AstFrameSet * );
-void astClearCurrent_( AstFrameSet * );
-void astSetBase_( AstFrameSet *, int );
-void astSetCurrent_( AstFrameSet *, int );
+int astGetBase_( AstFrameSet *, int * );
+int astGetCurrent_( AstFrameSet *, int * );
+int astGetNframe_( AstFrameSet *, int * );
+int astTestBase_( AstFrameSet *, int * );
+int astTestCurrent_( AstFrameSet *, int * );
+int astValidateFrameIndex_( AstFrameSet *, int, const char *, int * );
+void astClearBase_( AstFrameSet *, int * );
+void astClearCurrent_( AstFrameSet *, int * );
+void astSetBase_( AstFrameSet *, int, int * );
+void astSetCurrent_( AstFrameSet *, int, int * );
 #endif
 
 /* Function interfaces. */
@@ -585,13 +613,13 @@ void astSetCurrent_( AstFrameSet *, int );
 
 /* Initialiser. */
 #define astInitFrameSet(mem,size,init,vtab,name,frame) \
-astINVOKE(O,astInitFrameSet_(mem,size,init,vtab,name,astCheckFrame(frame)))
+astINVOKE(O,astInitFrameSet_(mem,size,init,vtab,name,astCheckFrame(frame),STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitFrameSetVtab(vtab,name) astINVOKE(V,astInitFrameSetVtab_(vtab,name))
+#define astInitFrameSetVtab(vtab,name) astINVOKE(V,astInitFrameSetVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadFrameSet(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadFrameSet_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadFrameSet_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -600,38 +628,42 @@ astINVOKE(O,astLoadFrameSet_(mem,size,vtab,name,astCheckChannel(channel)))
    use. This provides a contextual error report if a pointer to the wrong sort
    of object is supplied. */
 #define astAddFrame(this,iframe,map,frame) \
-astINVOKE(V,astAddFrame_(astCheckFrameSet(this),iframe,astCheckMapping(map),astCheckFrame(frame)))
+astINVOKE(V,astAddFrame_(astCheckFrameSet(this),iframe,astCheckMapping(map),astCheckFrame(frame),STATUS_PTR))
 #define astGetFrame(this,iframe) \
-astINVOKE(O,astGetFrame_(astCheckFrameSet(this),iframe))
+astINVOKE(O,astGetFrame_(astCheckFrameSet(this),iframe,STATUS_PTR))
 #define astGetMapping(this,iframe1,iframe2) \
-astINVOKE(O,astGetMapping_(astCheckFrameSet(this),iframe1,iframe2))
+astINVOKE(O,astGetMapping_(astCheckFrameSet(this),iframe1,iframe2,STATUS_PTR))
 #define astRemapFrame(this,iframe,map) \
-astINVOKE(V,astRemapFrame_(astCheckFrameSet(this),iframe,astCheckMapping(map)))
+astINVOKE(V,astRemapFrame_(astCheckFrameSet(this),iframe,astCheckMapping(map),STATUS_PTR))
 #define astRemoveFrame(this,iframe) \
-astINVOKE(V,astRemoveFrame_(astCheckFrameSet(this),iframe))
+astINVOKE(V,astRemoveFrame_(astCheckFrameSet(this),iframe,STATUS_PTR))
 
 /* Interfaces to protected member functions. */
 /* ----------------------------------------- */
 #if defined(astCLASS)            /* Protected */
 #define astClearBase(this) \
-astINVOKE(V,astClearBase_(astCheckFrameSet(this)))
+astINVOKE(V,astClearBase_(astCheckFrameSet(this),STATUS_PTR))
 #define astClearCurrent(this) \
-astINVOKE(V,astClearCurrent_(astCheckFrameSet(this)))
+astINVOKE(V,astClearCurrent_(astCheckFrameSet(this),STATUS_PTR))
 #define astGetBase(this) \
-astINVOKE(V,astGetBase_(astCheckFrameSet(this)))
+astINVOKE(V,astGetBase_(astCheckFrameSet(this),STATUS_PTR))
 #define astGetCurrent(this) \
-astINVOKE(V,astGetCurrent_(astCheckFrameSet(this)))
+astINVOKE(V,astGetCurrent_(astCheckFrameSet(this),STATUS_PTR))
 #define astGetNframe(this) \
-astINVOKE(V,astGetNframe_(astCheckFrameSet(this)))
+astINVOKE(V,astGetNframe_(astCheckFrameSet(this),STATUS_PTR))
 #define astSetBase(this,ibase) \
-astINVOKE(V,astSetBase_(astCheckFrameSet(this),ibase))
+astINVOKE(V,astSetBase_(astCheckFrameSet(this),ibase,STATUS_PTR))
 #define astSetCurrent(this,icurrent) \
-astINVOKE(V,astSetCurrent_(astCheckFrameSet(this),icurrent))
+astINVOKE(V,astSetCurrent_(astCheckFrameSet(this),icurrent,STATUS_PTR))
 #define astTestBase(this) \
-astINVOKE(V,astTestBase_(astCheckFrameSet(this)))
+astINVOKE(V,astTestBase_(astCheckFrameSet(this),STATUS_PTR))
 #define astTestCurrent(this) \
-astINVOKE(V,astTestCurrent_(astCheckFrameSet(this)))
+astINVOKE(V,astTestCurrent_(astCheckFrameSet(this),STATUS_PTR))
 #define astValidateFrameIndex(this,iframe,method) \
-astINVOKE(V,astValidateFrameIndex_(astCheckFrameSet(this),iframe,method))
+astINVOKE(V,astValidateFrameIndex_(astCheckFrameSet(this),iframe,method,STATUS_PTR))
 #endif
 #endif
+
+
+
+

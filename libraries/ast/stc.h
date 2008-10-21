@@ -84,6 +84,12 @@
 /* Macros. */
 /* ======= */
 
+
+#if defined(astCLASS) || defined(astFORTRAN77)
+#define STATUS_PTR status
+#else
+#define STATUS_PTR astGetStatusPtr
+#endif
 #define AST__STCNAME  "Name"
 #define AST__STCVALUE "Value"
 #define AST__STCERROR "Error"
@@ -123,12 +129,30 @@ typedef struct AstStcVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   const char *(* GetRegionClass)( AstStc * );
-   AstRegion *(* GetStcRegion)( AstStc * );
-   AstKeyMap *(* GetStcCoord)( AstStc *, int );
-   int (* GetStcNCoord)( AstStc * );
+   const char *(* GetRegionClass)( AstStc *, int * );
+   AstRegion *(* GetStcRegion)( AstStc *, int * );
+   AstKeyMap *(* GetStcCoord)( AstStc *, int, int * );
+   int (* GetStcNCoord)( AstStc *, int * );
 
 } AstStcVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstStcGlobals {
+   AstStcVtab Class_Vtab;
+   int Class_Init;
+} AstStcGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitStcGlobals_( AstStcGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -142,25 +166,25 @@ astPROTO_ISA(Stc)            /* Test class membership */
 
 /* Initialiser. */
 AstStc *astInitStc_( void *, size_t, int, AstStcVtab *, const char *, 
-                     AstRegion *, int, AstKeyMap ** );
+                     AstRegion *, int, AstKeyMap **, int * );
 
 /* Vtab initialiser. */
-void astInitStcVtab_( AstStcVtab *, const char * );
+void astInitStcVtab_( AstStcVtab *, const char *, int * );
 
 /* Loader. */
 AstStc *astLoadStc_( void *, size_t, AstStcVtab *,
-                     const char *, AstChannel * );
+                     const char *, AstChannel *, int * );
 
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-AstRegion *astGetStcRegion_( AstStc * );
-AstKeyMap *astGetStcCoord_( AstStc *, int );
-int astGetStcNCoord_( AstStc * );
+AstRegion *astGetStcRegion_( AstStc *, int * );
+AstKeyMap *astGetStcCoord_( AstStc *, int, int * );
+int astGetStcNCoord_( AstStc *, int * );
 
 # if defined(astCLASS)           /* Protected */
-const char *astGetRegionClass_( AstStc * );
+const char *astGetRegionClass_( AstStc *, int * );
 #endif
 
 /* Function interfaces. */
@@ -186,13 +210,13 @@ const char *astGetRegionClass_( AstStc * );
 
 /* Initialiser. */
 #define astInitStc(mem,size,init,vtab,name,reg,ncoords,coords) \
-astINVOKE(O,astInitStc_(mem,size,init,vtab,name,reg,ncoords,coords))
+astINVOKE(O,astInitStc_(mem,size,init,vtab,name,reg,ncoords,coords,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitStcVtab(vtab,name) astINVOKE(V,astInitStcVtab_(vtab,name))
+#define astInitStcVtab(vtab,name) astINVOKE(V,astInitStcVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadStc(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadStc_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadStc_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -201,10 +225,14 @@ astINVOKE(O,astLoadStc_(mem,size,vtab,name,astCheckChannel(channel)))
    before use.  This provides a contextual error report if a pointer
    to the wrong sort of Object is supplied. */
 
-#define astGetStcRegion(this) astINVOKE(O,astGetStcRegion_(astCheckStc(this)))
-#define astGetStcCoord(this,icoord) astINVOKE(O,astGetStcCoord_(astCheckStc(this),icoord))
-#define astGetStcNCoord(this) astINVOKE(V,astGetStcNCoord_(astCheckStc(this)))
+#define astGetStcRegion(this) astINVOKE(O,astGetStcRegion_(astCheckStc(this),STATUS_PTR))
+#define astGetStcCoord(this,icoord) astINVOKE(O,astGetStcCoord_(astCheckStc(this),icoord,STATUS_PTR))
+#define astGetStcNCoord(this) astINVOKE(V,astGetStcNCoord_(astCheckStc(this),STATUS_PTR))
 #if defined(astCLASS)            /* Protected */
-#define astGetRegionClass(this) astINVOKE(V,astGetRegionClass_(astCheckStc(this)))
+#define astGetRegionClass(this) astINVOKE(V,astGetRegionClass_(astCheckStc(this),STATUS_PTR))
 #endif
 #endif
+
+
+
+

@@ -63,7 +63,7 @@
 
 /* Function implementations. */
 /* ========================= */
-void astPutErr_( int status, const char *message ) {
+void astPutErr_( int status_value, const char *message ) {
 /*
 *+
 *  Name:
@@ -77,7 +77,7 @@ void astPutErr_( int status, const char *message ) {
 
 *  Synopsis:
 *     #include "err.h"
-*     void astPutErr( int status, const char *message )
+*     void astPutErr( int status_value, const char *message )
 
 *  Description:
 *     This function delivers an error message and (optionally) an
@@ -86,7 +86,7 @@ void astPutErr_( int status, const char *message ) {
 *     to the environment in which the AST library is being used.
 
 *  Parameters:
-*     status
+*     status_value
 *        The error status value.
 *     message
 *        A pointer to a null-terminated character string containing
@@ -100,7 +100,9 @@ void astPutErr_( int status, const char *message ) {
 *-
 */
 
+
 /* This is the default implementation. Simply write the message to
    standard error with a newline appended. Ignore the status value. */
+   int *status = astGetStatusPtr;
    (void) fprintf( stderr, "%s%s\n", astOK ? "!! " : "!  ", message );
 }

@@ -89,8 +89,11 @@ f     The SphMap class does not define any new routines beyond those
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory management facilities */
+#include "globals.h"             /* Thread-safe global data access */
 #include "object.h"              /* Base Object class */
 #include "pointset.h"            /* Sets of points/coordinates */
 #include "mapping.h"             /* Coordinate mappings (parent class) */
@@ -114,51 +117,83 @@ f     The SphMap class does not define any new routines beyond those
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstSphMapVtab class_vtab; /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
-static const char *(* parent_getattrib)( AstObject *, const char * );
-static int (* parent_testattrib)( AstObject *, const char * );
-static void (* parent_clearattrib)( AstObject *, const char * );
-static void (* parent_setattrib)( AstObject *, const char * );
+static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static const char *(* parent_getattrib)( AstObject *, const char *, int * );
+static int (* parent_testattrib)( AstObject *, const char *, int * );
+static void (* parent_clearattrib)( AstObject *, const char *, int * );
+static void (* parent_setattrib)( AstObject *, const char *, int * );
+
+/* Define macros for accessing each item of thread specific global data. */
+#ifdef THREAD_SAFE
+
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; \
+   globals->GetAttrib_Buff[ 0 ] = 0;
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(SphMap)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(SphMap,Class_Init)
+#define class_vtab astGLOBAL(SphMap,Class_Vtab)
+#define getattrib_buff astGLOBAL(SphMap,GetAttrib_Buff)
+
+
+
+/* If thread safety is not needed, declare and initialise globals at static 
+   variables. */ 
+#else
+
+static char getattrib_buff[ 101 ];
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstSphMapVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
 /* The following functions have public prototypes only (i.e. no
    protected prototypes), so we must provide local prototypes for use
    within this module. */
-AstSphMap *astSphMapId_( const char *, ... );
+AstSphMap *astSphMapId_( const char *, ...);
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static int GetUnitRadius( AstSphMap * );
-static int TestUnitRadius( AstSphMap * );
-static void ClearUnitRadius( AstSphMap * );
-static void SetUnitRadius( AstSphMap *, int );
+static int GetUnitRadius( AstSphMap *, int * );
+static int TestUnitRadius( AstSphMap *, int * );
+static void ClearUnitRadius( AstSphMap *, int * );
+static void SetUnitRadius( AstSphMap *, int, int * );
 
-static double GetPolarLong( AstSphMap * );
-static int TestPolarLong( AstSphMap * );
-static void ClearPolarLong( AstSphMap * );
-static void SetPolarLong( AstSphMap *, double );
+static double GetPolarLong( AstSphMap *, int * );
+static int TestPolarLong( AstSphMap *, int * );
+static void ClearPolarLong( AstSphMap *, int * );
+static void SetPolarLong( AstSphMap *, double, int * );
 
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static const char *GetAttrib( AstObject *, const char * );
-static int Equal( AstObject *, AstObject * );
-static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
-static int TestAttrib( AstObject *, const char * );
-static void ClearAttrib( AstObject *, const char * );
-static void Copy( const AstObject *, AstObject * );
-static void Delete( AstObject * );
-static void Dump( AstObject *, AstChannel * );
-static void SetAttrib( AstObject *, const char * );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static const char *GetAttrib( AstObject *, const char *, int * );
+static int Equal( AstObject *, AstObject *, int * );
+static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
+static int TestAttrib( AstObject *, const char *, int * );
+static void ClearAttrib( AstObject *, const char *, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Delete( AstObject *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void SetAttrib( AstObject *, const char *, int * );
 
 /* Member functions. */
 /* ================= */
-static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     ClearAttrib
@@ -171,7 +206,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "sphmap.h"
-*     void ClearAttrib( AstObject *this, const char *attrib )
+*     void ClearAttrib( AstObject *this, const char *attrib, int *status, int *status )
 
 *  Class Membership:
 *     SphMap member function (over-rides the astClearAttrib protected
@@ -188,6 +223,10 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -212,11 +251,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      (*parent_clearattrib)( this_object, attrib );
+      (*parent_clearattrib)( this_object, attrib, status );
    }
 }
 
-static int Equal( AstObject *this_object, AstObject *that_object ) {
+static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
 *  Name:
 *     Equal
@@ -229,7 +268,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 *  Synopsis:
 *     #include "sphmap.h"
-*     int Equal( AstObject *this, AstObject *that ) 
+*     int Equal( AstObject *this, AstObject *that, int *status, int *status ) 
 
 *  Class Membership:
 *     SphMap member function (over-rides the astEqual protected
@@ -244,6 +283,10 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *        Pointer to the first Object (a SphMap).
 *     that
 *        Pointer to the second Object.
+*     status
+*        Pointer to the inherited status variable.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if the SphMaps are equivalent, zero otherwise.
@@ -309,7 +352,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
    return result;
 }
 
-static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+static const char *GetAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     GetAttrib
@@ -322,7 +365,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "sphmap.h"
-*     const char *GetAttrib( AstObject *this, const char *attrib )
+*     const char *GetAttrib( AstObject *this, const char *attrib, int *status, int *status )
 
 *  Class Membership:
 *     SphMap member function (over-rides the protected astGetAttrib
@@ -339,6 +382,10 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string containing the name of
 *        the attribute whose value is required. This name should be in
 *        lower case, with all white space removed.
+*     status
+*        Pointer to the inherited status variable.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     - Pointer to a null-terminated string containing the attribute
@@ -356,21 +403,21 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *     reason.
 */
 
-/* Local Constants: */
-#define BUFF_LEN 10              /* Max. characters in result buffer */
-
 /* Local Variables: */
+   astDECLARE_GLOBALS;          /* Pointer to thread-specific global data */
    AstSphMap *this;              /* Pointer to the SphMap structure */
    const char *result;           /* Pointer value to return */
    double dval;                  /* Double precision attribute value */
    int ival;                     /* Int attribute value */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
    result = NULL;
 
 /* Check the global error status. */   
    if ( !astOK ) return result;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this_object);
 
 /* Obtain a pointer to the SphMap structure. */
    this = (AstSphMap *) this_object;
@@ -380,8 +427,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    if ( !strcmp( attrib, "unitradius" ) ) {
       ival = astGetUnitRadius( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* PolarLong */
@@ -389,24 +436,21 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "polarlong" ) ) {
       dval = astGetPolarLong( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_getattrib)( this_object, attrib );
+      result = (*parent_getattrib)( this_object, attrib, status );
    }
    
 /* Return the result. */
    return result;
-
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
 
-void astInitSphMapVtab_(  AstSphMapVtab *vtab, const char *name ) {
+void astInitSphMapVtab_(  AstSphMapVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -443,11 +487,15 @@ void astInitSphMapVtab_(  AstSphMapVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -456,8 +504,8 @@ void astInitSphMapVtab_(  AstSphMapVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsASphMap) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -500,10 +548,14 @@ void astInitSphMapVtab_(  AstSphMapVtab *vtab, const char *name ) {
    astSetCopy( (AstObjectVtab *) vtab, Copy );
    astSetDelete( (AstObjectVtab *) vtab, Delete );
 
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
 static int MapMerge( AstMapping *this, int where, int series, int *nmap,
-                     AstMapping ***map_list, int **invert_list ) {
+                     AstMapping ***map_list, int **invert_list, int *status ) {
 /*
 *  Name:
 *     MapMerge
@@ -517,7 +569,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *  Synopsis:
 *     #include "sphmap.h"
 *     int MapMerge( AstMapping *this, int where, int series, int *nmap,
-*                   AstMapping ***map_list, int **invert_list )
+*                   AstMapping ***map_list, int **invert_list, int *status, int *status )
 
 *  Class Membership:
 *     SphMap method (over-rides the protected astMapMerge method
@@ -620,6 +672,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *        length, the "*invert_list" array will be extended (and its
 *        pointer updated) if necessary to accommodate any new
 *        elements.
+*     status
+*        Pointer to the inherited status variable.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     If simplification was possible, the function returns the index
@@ -685,7 +741,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* If the two SphMaps can be simplified, create a UnitMap to replace
    them. */
       if ( simpler ) {
-         new = (AstMapping *) astUnitMap( 2, "" );
+         new = (AstMapping *) astUnitMap( 2, "", status );
 
 /* Annul the pointers to the SphMaps. */
          if ( astOK ) {
@@ -723,7 +779,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static void SetAttrib( AstObject *this_object, const char *setting ) {
+static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
 *     astSetAttrib
@@ -797,11 +853,11 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      (*parent_setattrib)( this_object, setting );
+      (*parent_setattrib)( this_object, setting, status );
    }
 }
 
-static int TestAttrib( AstObject *this_object, const char *attrib ) {
+static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     TestAttrib
@@ -814,7 +870,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "sphmap.h"
-*     int TestAttrib( AstObject *this, const char *attrib )
+*     int TestAttrib( AstObject *this, const char *attrib, int *status, int *status )
 
 *  Class Membership:
 *     SphMap member function (over-rides the astTestAttrib protected
@@ -831,6 +887,10 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if a value has been set, otherwise zero.
@@ -866,7 +926,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_testattrib)( this_object, attrib );
+      result = (*parent_testattrib)( this_object, attrib, status );
    }
 
 /* Return the result, */
@@ -874,7 +934,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 }
 
 static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-                               int forward, AstPointSet *out ) {
+                               int forward, AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     Transform
@@ -888,7 +948,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *  Synopsis:
 *     #include "sphmap.h"
 *     AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-*                             int forward, AstPointSet *out )
+*                             int forward, AstPointSet *out, int *status, int *status )
 
 *  Class Membership:
 *     SphMap member function (over-rides the astTransform protected
@@ -912,6 +972,10 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *        Pointer to a PointSet which will hold the transformed (output)
 *        coordinate values. A NULL value may also be given, in which case a
 *        new PointSet will be created by this function.
+*     status
+*        Pointer to the inherited status variable.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the output (possibly new) PointSet.
@@ -952,7 +1016,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    function inherited from the parent Mapping class. This function validates
    all arguments and generates an output PointSet if necessary, but does not
    actually transform any coordinate values. */
-   result = (*parent_transform)( this, in, forward, out );
+   result = (*parent_transform)( this, in, forward, out, status );
 
 /* We will now extend the parent astTransform method by performing the
    calculations needed to generate the output coordinate values. */
@@ -1171,7 +1235,7 @@ astMAKE_TEST(SphMap,PolarLong,( this->polarlong != AST__BAD ))
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -1183,7 +1247,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status, int *status, int *status )
 
 *  Description:
 *     This function implements the copy constructor for SphMap objects.
@@ -1193,6 +1257,12 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the SphMap to be copied.
 *     objout
 *        Pointer to the SphMap being constructed.
+*     status
+*        Pointer to the inherited status variable.
+*     status
+*        Pointer to the inherited status variable.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -1200,7 +1270,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -1212,7 +1282,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status, int *status )
 
 *  Description:
 *     This function implements the destructor for SphMap objects.
@@ -1220,6 +1290,10 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the SphMap to be deleted.
+*     status
+*        Pointer to the inherited status variable.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - This destructor does nothing and exists only to maintain a
@@ -1232,7 +1306,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -1244,7 +1318,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status, int *status, int *status, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -1255,6 +1329,14 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the SphMap whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
+*     status
+*        Pointer to the inherited status variable.
+*     status
+*        Pointer to the inherited status variable.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -1287,8 +1369,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* UnitRadius. */
 /* ------- */
-   set = TestUnitRadius( this );
-   ival = set ? GetUnitRadius( this ) : astGetUnitRadius( this );
+   set = TestUnitRadius( this, status );
+   ival = set ? GetUnitRadius( this, status ) : astGetUnitRadius( this );
    if( ival ) {
       astWriteInt( channel, "UntRd", set, 0, ival, "All input vectors have unit length" );
    } else {
@@ -1297,8 +1379,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* PolarLong. */
 /* ---------- */
-   set = TestPolarLong( this );
-   dval = set ? GetPolarLong( this ) : astGetPolarLong( this );
+   set = TestPolarLong( this, status );
+   dval = set ? GetPolarLong( this, status ) : astGetPolarLong( this );
    astWriteDouble( channel, "PlrLg", set, 1, dval, "Polar longitude (rad.s)" );
 
 }
@@ -1307,10 +1389,10 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsASphMap and astCheckSphMap functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(SphMap,Mapping,check,&class_init)
+astMAKE_ISA(SphMap,Mapping,check,&class_check)
 astMAKE_CHECK(SphMap)
 
-AstSphMap *astSphMap_( const char *options, ... ) {
+AstSphMap *astSphMap_( const char *options, int *status, ...) {
 /*
 *++
 *  Name:
@@ -1385,12 +1467,37 @@ f     AST_SPHMAP = INTEGER
 c     function is invoked with the AST error status set, or if it
 f     function is invoked with STATUS set to an error value, or if it
 *     should fail for any reason.
+
+*  Status Handling:
+*     The protected interface to this function includes an extra
+*     parameter at the end of the parameter list descirbed above. This
+*     parameter is a pointer to the integer inherited status
+*     variable: "int *status".
+
+
+*  Status Handling:
+*     The protected interface to this function includes an extra
+*     parameter at the end of the parameter list descirbed above. This
+*     parameter is a pointer to the integer inherited status
+*     variable: "int *status".
+
+
+*  Status Handling:
+*     The protected interface to this function includes an extra
+*     parameter at the end of the parameter list descirbed above. This
+*     parameter is a pointer to the integer inherited status
+*     variable: "int *status".
+
 *--
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstSphMap *new;              /* Pointer to new SphMap */
    va_list args;                /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -1407,7 +1514,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Obtain the variable argument list and pass it along with the options string
    to the astVSet method to initialise the new SphMap's attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -1419,7 +1526,7 @@ f     function is invoked with STATUS set to an error value, or if it
    return new;
 }
 
-AstSphMap *astSphMapId_( const char *options, ... ) {
+AstSphMap *astSphMapId_( const char *options, ...) {
 /*
 *  Name:
 *     astSphMapId_
@@ -1458,8 +1565,16 @@ AstSphMap *astSphMapId_( const char *options, ... ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstSphMap *new;              /* Pointer to new SphMap */
    va_list args;                /* Variable argument list */
+   int *status;                 /* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -1489,7 +1604,7 @@ AstSphMap *astSphMapId_( const char *options, ... ) {
 }
 
 AstSphMap *astInitSphMap_( void *mem, size_t size, int init,
-                           AstSphMapVtab *vtab, const char *name ) {
+                           AstSphMapVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -1590,7 +1705,7 @@ AstSphMap *astInitSphMap_( void *mem, size_t size, int init,
 
 AstSphMap *astLoadSphMap_( void *mem, size_t size,
                            AstSphMapVtab *vtab, const char *name,
-                           AstChannel *channel ) {
+                           AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -1667,13 +1782,17 @@ AstSphMap *astLoadSphMap_( void *mem, size_t size,
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
-   AstSphMap *new;              /* Pointer to the new SphMap */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   AstSphMap *new;               /* Pointer to the new SphMap */
 
 /* Initialise. */
    new = NULL;
 
 /* Check the global error status. */
-   if ( !astOK ) return new;
+   if( !astOK ) return new;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* If a NULL virtual function table has been supplied, then this is
    the first loader to be invoked for this SphMap. In this case the
@@ -1716,12 +1835,12 @@ AstSphMap *astLoadSphMap_( void *mem, size_t size,
 /* UnitRadius. */
 /* ----------- */
       new->unitradius = astReadInt( channel, "untrd", -1 );
-      if ( TestUnitRadius( new ) ) SetUnitRadius( new, new->unitradius );
+      if ( TestUnitRadius( new, status ) ) SetUnitRadius( new, new->unitradius, status );
 
 /* PolarLong. */
 /* ---------- */
       new->polarlong = astReadDouble( channel, "plrlg", AST__BAD );
-      if ( TestPolarLong( new ) ) SetPolarLong( new, new->polarlong );
+      if ( TestPolarLong( new, status ) ) SetPolarLong( new, new->polarlong, status );
 
    }
 
@@ -1743,3 +1862,8 @@ AstSphMap *astLoadSphMap_( void *mem, size_t size,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
+
+
+
+
+

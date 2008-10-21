@@ -156,6 +156,8 @@ f     The DSBSpecFrame class does not define any new routines beyond those
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory management facilities */
 #include "object.h"              /* Base Object class */
@@ -166,6 +168,7 @@ f     The DSBSpecFrame class does not define any new routines beyond those
 #include "unitmap.h"             /* Unit Mappings */
 #include "winmap.h"              /* Window Mappings */
 #include "dsbspecframe.h"        /* Interface definition for this class */
+#include "globals.h"             /* Thread-safe global data access */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -181,21 +184,61 @@ f     The DSBSpecFrame class does not define any new routines beyond those
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstDSBSpecFrameVtab class_vtab; /* Virtual function table */
-static int class_init = 0;             /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static const char *(* parent_getattrib)( AstObject *, const char * );
-static const char *(* parent_getlabel)( AstFrame *, int );
-static int (* parent_match)( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
-static int (* parent_subframe)( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
-static int (* parent_testattrib)( AstObject *, const char * );
-static void (* parent_clearattrib)( AstObject *, const char * );
-static void (* parent_setattrib)( AstObject *, const char * );
-static void (* parent_overlay)( AstFrame *, const int *, AstFrame * );
-static const char *(* parent_getdomain)( AstFrame * );
+static const char *(* parent_getattrib)( AstObject *, const char *, int * );
+static const char *(* parent_getlabel)( AstFrame *, int, int * );
+static int (* parent_match)( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame **, int * );
+static int (* parent_subframe)( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
+static int (* parent_testattrib)( AstObject *, const char *, int * );
+static void (* parent_clearattrib)( AstObject *, const char *, int * );
+static void (* parent_setattrib)( AstObject *, const char *, int * );
+static void (* parent_overlay)( AstFrame *, const int *, AstFrame *, int * );
+static const char *(* parent_getdomain)( AstFrame *, int * );
+
+/* Define macros for accessing each item of thread specific global data. */
+#ifdef THREAD_SAFE
+
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; \
+   globals->GetAttrib_Buff[ 0 ] = 0; \
+   globals->GetLabel_Buff[ 0 ] = 0; \
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(DSBSpecFrame)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(DSBSpecFrame,Class_Init)
+#define class_vtab astGLOBAL(DSBSpecFrame,Class_Vtab)
+#define getattrib_buff astGLOBAL(DSBSpecFrame,GetAttrib_Buff)
+#define getlabel_buff astGLOBAL(DSBSpecFrame,GetLabel_Buff)
+
+
+
+/* If thread safety is not needed, declare and initialise globals at static 
+   variables. */ 
+#else
+
+/* Define the thread-specific globals for this class. */ 
+
+/* Buffer returned by GetAttrib. */
+static char getattrib_buff[ 101 ];
+
+/* Default Label string buffer */
+static char getlabel_buff[ 101 ]; 
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstDSBSpecFrameVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -207,47 +250,47 @@ AstDSBSpecFrame *astDSBSpecFrameId_( const char *, ... );
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 
-static AstMapping *TopoMap( AstDSBSpecFrame *, int, const char * );
-static AstMapping *ToLOMapping( AstDSBSpecFrame *, const char * );
-static AstMapping *ToLSBMapping( AstDSBSpecFrame *, const char * );
-static AstMapping *ToUSBMapping( AstDSBSpecFrame *, const char * );
-static const char *GetAttrib( AstObject *, const char * );
-static const char *GetLabel( AstFrame *, int );
-static double GetImagFreq( AstDSBSpecFrame * );
-static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
-static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
-static int TestAttrib( AstObject *, const char * );
-static void ClearAttrib( AstObject *, const char * );
-static void Dump( AstObject *, AstChannel * );
-static void Overlay( AstFrame *, const int *, AstFrame * );
-static void SetAttrib( AstObject *, const char * );
-static void VerifyAttrs( AstDSBSpecFrame *, const char *, const char *, const char * );
-static const char *GetDomain( AstFrame * );
+static AstMapping *TopoMap( AstDSBSpecFrame *, int, const char *, int * );
+static AstMapping *ToLOMapping( AstDSBSpecFrame *, const char *, int * );
+static AstMapping *ToLSBMapping( AstDSBSpecFrame *, const char *, int * );
+static AstMapping *ToUSBMapping( AstDSBSpecFrame *, const char *, int * );
+static const char *GetAttrib( AstObject *, const char *, int * );
+static const char *GetLabel( AstFrame *, int, int * );
+static double GetImagFreq( AstDSBSpecFrame *, int * );
+static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame **, int * );
+static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
+static int TestAttrib( AstObject *, const char *, int * );
+static void ClearAttrib( AstObject *, const char *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void Overlay( AstFrame *, const int *, AstFrame *, int * );
+static void SetAttrib( AstObject *, const char *, int * );
+static void VerifyAttrs( AstDSBSpecFrame *, const char *, const char *, const char *, int * );
+static const char *GetDomain( AstFrame *, int * );
 
-static double GetIF( AstDSBSpecFrame * );
-static int TestIF( AstDSBSpecFrame * );
-static void ClearIF( AstDSBSpecFrame * );
-static void SetIF( AstDSBSpecFrame *, double );
+static double GetIF( AstDSBSpecFrame *, int * );
+static int TestIF( AstDSBSpecFrame *, int * );
+static void ClearIF( AstDSBSpecFrame *, int * );
+static void SetIF( AstDSBSpecFrame *, double, int * );
 
-static double GetDSBCentre( AstDSBSpecFrame * );
-static int TestDSBCentre( AstDSBSpecFrame * );
-static void ClearDSBCentre( AstDSBSpecFrame * );
-static void SetDSBCentre( AstDSBSpecFrame *, double );
+static double GetDSBCentre( AstDSBSpecFrame *, int * );
+static int TestDSBCentre( AstDSBSpecFrame *, int * );
+static void ClearDSBCentre( AstDSBSpecFrame *, int * );
+static void SetDSBCentre( AstDSBSpecFrame *, double, int * );
 
-static int GetSideBand( AstDSBSpecFrame * );
-static int TestSideBand( AstDSBSpecFrame * );
-static void ClearSideBand( AstDSBSpecFrame * );
-static void SetSideBand( AstDSBSpecFrame *, int );
+static int GetSideBand( AstDSBSpecFrame *, int * );
+static int TestSideBand( AstDSBSpecFrame *, int * );
+static void ClearSideBand( AstDSBSpecFrame *, int * );
+static void SetSideBand( AstDSBSpecFrame *, int, int * );
 
-static int GetAlignSideBand( AstDSBSpecFrame * );
-static int TestAlignSideBand( AstDSBSpecFrame * );
-static void ClearAlignSideBand( AstDSBSpecFrame * );
-static void SetAlignSideBand( AstDSBSpecFrame *, int );
+static int GetAlignSideBand( AstDSBSpecFrame *, int * );
+static int TestAlignSideBand( AstDSBSpecFrame *, int * );
+static void ClearAlignSideBand( AstDSBSpecFrame *, int * );
+static void SetAlignSideBand( AstDSBSpecFrame *, int, int * );
 
 
 /* Member functions. */
 /* ================= */
-static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     ClearAttrib
@@ -260,7 +303,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "dsbspecframe.h"
-*     void ClearAttrib( AstObject *this, const char *attrib )
+*     void ClearAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     DSBSpecFrame member function (over-rides the astClearAttrib protected
@@ -277,6 +320,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -316,18 +361,18 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    of this class. If it does, then report an error. */
    } else if ( !strcmp( attrib, "imagfreq" ) ) {
       astError( AST__NOWRT, "astClear: Invalid attempt to clear the \"%s\" "
-                "value for a %s.", attrib, astGetClass( this ) );
-      astError( AST__NOWRT, "This is a read-only attribute." );
+                "value for a %s.", status, attrib, astGetClass( this ) );
+      astError( AST__NOWRT, "This is a read-only attribute." , status);
 
 /* If the attribute is not recognised, pass it on to the parent method
    for further interpretation. */
    } else {
-      (*parent_clearattrib)( this_object, attrib );
+      (*parent_clearattrib)( this_object, attrib, status );
    }
 }
 
 
-static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+static const char *GetAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     GetAttrib
@@ -340,7 +385,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "dsbspecframe.h"
-*     const char *GetAttrib( AstObject *this, const char *attrib )
+*     const char *GetAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     DSBSpecFrame member function (over-rides the protected astGetAttrib
@@ -357,6 +402,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string containing the name of
 *        the attribute whose value is required. This name should be in
 *        lower case, with all white space removed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     - Pointer to a null-terminated string containing the attribute
@@ -374,17 +421,14 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *     reason.
 */
 
-/* Local Constants: */
-#define BUFF_LEN 50              /* Max. characters in result buffer */
-
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    AstDSBSpecFrame *this;        /* Pointer to the DSBSpecFrame structure */
    AstMapping *tmap;             /* Ptr to Mapping from topofreq to this */
    const char *result;           /* Pointer value to return */
    double dval;                  /* Attribute value */
    double dtemp;                 /* Attribute value */
    int ival;                     /* Attribute value */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
    result = NULL;
@@ -392,12 +436,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Check the global error status. */
    if ( !astOK ) return result;
 
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this_object);
+
 /* Obtain a pointer to the SpecFrame structure. */
    this = (AstDSBSpecFrame *) this_object;
 
 /* Compare "attrib" with each recognised attribute name in turn,
    obtaining the value of the required attribute. If necessary, write
-   the value into "buff" as a null-terminated string in an appropriate
+   the value into "getattrib_buff" as a null-terminated string in an appropriate
    format.  Set "result" to point at the result string. */
 
 /* DSBCentre */
@@ -409,7 +456,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Find the Mapping from topocentric frequency in Hz to the spectral system 
    described by this SpecFrame. */
-      tmap = TopoMap( this, 0, "astGetAttrib" );         
+      tmap = TopoMap( this, 0, "astGetAttrib", status );         
       if ( astOK ) {
 
 /* Transform the internal value from topocentric frequency into the required 
@@ -418,12 +465,12 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
          if( dtemp == AST__BAD ) {
             astError( AST__INTER, "astGetAttrib(%s): Cannot convert DSBCentre "
                       "value from topocentric frequency to the required "
-                      "system.", astGetClass( this ) );
+                      "system.", status, astGetClass( this ) );
          } else {
 
 /* Format it. */
-            (void) sprintf( buff, "%.*g", DBL_DIG, dtemp );
-            result = buff;
+            (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dtemp );
+            result = getattrib_buff;
          }
          tmap = astAnnul( tmap );
       }
@@ -433,8 +480,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "if" ) ) {
       dval = astGetIF( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval*1.0E-9 );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval*1.0E-9 );
+         result = getattrib_buff;
       }
 
 /* ImagFreq */
@@ -442,8 +489,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "imagfreq" ) ) {
       dval = astGetImagFreq( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval*1.0E-9 );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval*1.0E-9 );
+         result = getattrib_buff;
       }
 
 /* SideBand */
@@ -459,24 +506,22 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "alignsideband" ) ) {
       ival = astGetAlignSideBand( this ) ? 1 : 0;
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_getattrib)( this_object, attrib );
+      result = (*parent_getattrib)( this_object, attrib, status );
    }
 
 /* Return the result. */
    return result;
 
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
 
-static const char *GetDomain( AstFrame *this_frame ) {
+static const char *GetDomain( AstFrame *this_frame, int *status ) {
 /*
 *  Name:
 *     GetDomain
@@ -489,7 +534,7 @@ static const char *GetDomain( AstFrame *this_frame ) {
 
 *  Synopsis:
 *     #include "dsbspecframe.h"
-*     const char *GetDomain( AstFrame *this )
+*     const char *GetDomain( AstFrame *this, int *status )
 
 *  Class Membership:
 *     DSBSpecFrame member function (over-rides the astGetDomain protected
@@ -502,6 +547,8 @@ static const char *GetDomain( AstFrame *this_frame ) {
 *  Parameters:
 *     this
 *        Pointer to the DSBSpecFrame.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to a constant null-terminated string containing the
@@ -531,7 +578,7 @@ static const char *GetDomain( AstFrame *this_frame ) {
 /* If a Domain attribute string has been set, invoke the parent method
    to obtain a pointer to it. */
    if ( astTestDomain( this ) ) {
-      result = (*parent_getdomain)( this_frame );
+      result = (*parent_getdomain)( this_frame, status );
 
 /* Otherwise, provide a pointer to a suitable default string. */
    } else {
@@ -542,7 +589,7 @@ static const char *GetDomain( AstFrame *this_frame ) {
    return result;
 }
 
-static double GetImagFreq( AstDSBSpecFrame *this ) {
+static double GetImagFreq( AstDSBSpecFrame *this, int *status ) {
 /*
 *+
 *  Name:
@@ -603,15 +650,15 @@ static double GetImagFreq( AstDSBSpecFrame *this ) {
    image sideband. */
    sb = astGetSideBand( rf_frame );
    if( sb == USB ) {
-      map = ToLSBMapping( rf_frame, "astGetImagFreq" );
+      map = ToLSBMapping( rf_frame, "astGetImagFreq", status );
 
    } else if( sb == LSB ) {
-      map = ToUSBMapping( rf_frame, "astGetImagFreq" );
+      map = ToUSBMapping( rf_frame, "astGetImagFreq", status );
 
    } else {
       map = NULL;
       astError( AST__INTER, "astGetImagFreq(%s): Illegal sideband value "
-                "(%d) encountered (internal AST programming error).", 
+                "(%d) encountered (internal AST programming error).", status, 
                 astGetClass( this ), sb );
    }
 
@@ -631,7 +678,7 @@ static double GetImagFreq( AstDSBSpecFrame *this ) {
 
 }
 
-static const char *GetLabel( AstFrame *this, int axis ) {
+static const char *GetLabel( AstFrame *this, int axis, int *status ) {
 /*
 *  Name:
 *     GetLabel
@@ -644,7 +691,7 @@ static const char *GetLabel( AstFrame *this, int axis ) {
 
 *  Synopsis:
 *     #include "dsbspecframe.h"
-*     const char *GetLabel( AstFrame *this, int axis )
+*     const char *GetLabel( AstFrame *this, int axis, int *status )
 
 *  Class Membership:
 *     DSBSpecFrame member function (over-rides the astGetLabel method inherited
@@ -660,6 +707,8 @@ static const char *GetLabel( AstFrame *this, int axis ) {
 *     axis
 *        Axis index (zero-based) identifying the axis for which information is
 *        required.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to a constant null-terminated character string containing the
@@ -670,15 +719,15 @@ static const char *GetLabel( AstFrame *this, int axis ) {
 *     global error status set, or if it should fail for any reason.
 */
 
-/* Local Constants: */
-#define BUFF_LEN 200             /* Max characters in result string */
-
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    const char *result;           /* Pointer to label string */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for result string */
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
+
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this);
 
 /* Initialise. */
    result = NULL;
@@ -687,26 +736,23 @@ static const char *GetLabel( AstFrame *this, int axis ) {
    astValidateAxis( this, axis, "astGetLabel" );
 
 /* Invoke the parent astGetLabel method to obtain a pointer to it. */
-   result = (*parent_getlabel)( this, axis );
+   result = (*parent_getlabel)( this, axis, status );
 
 /* Check if this is a default value. If so, append a string indicating
    the sideband. */
    if ( !astTestLabel( this, axis ) ) {
 
 /* If OK, supply a pointer to a suitable default label string. */
-      sprintf( buff, "%s (%s)", result, astGetAttrib( this, "sideband" ) );
-      result = buff;
+      sprintf( getlabel_buff, "%s (%s)", result, astGetAttrib( this, "sideband" ) );
+      result = getlabel_buff;
    }
 
 /* Return the result. */
    return result;
 
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
-
 }
 
-void astInitDSBSpecFrameVtab_(  AstDSBSpecFrameVtab *vtab, const char *name ) {
+void astInitDSBSpecFrameVtab_(  AstDSBSpecFrameVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -743,11 +789,15 @@ void astInitDSBSpecFrameVtab_(  AstDSBSpecFrameVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstFrameVtab *frame;          /* Pointer to Frame component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -756,8 +806,8 @@ void astInitDSBSpecFrameVtab_(  AstDSBSpecFrameVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsADSBSpecFrame) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -820,11 +870,15 @@ void astInitDSBSpecFrameVtab_(  AstDSBSpecFrameVtab *vtab, const char *name ) {
 /* Declare the class delete function.*/
    astSetDump( vtab, Dump, "DSBSpecFrame", "Dual sideband spectral axis" );
 
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
 static int Match( AstFrame *template_frame, AstFrame *target,
                   int **template_axes, int **target_axes, AstMapping **map,
-                  AstFrame **result ) {
+                  AstFrame **result, int *status ) {
 /*
 *  Name:
 *     Match
@@ -839,7 +893,7 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 *     #include "dsbspecframe.h"
 *     int Match( AstFrame *template, AstFrame *target,
 *                int **template_axes, int **target_axes,
-*                AstMapping **map, AstFrame **result )
+*                AstMapping **map, AstFrame **result, int *status )
 
 *  Class Membership:
 *     DSBSpecFrame member function (over-rides the protected astMatch method
@@ -902,6 +956,8 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 *        particular, when the template allows the possibility of transformaing
 *        to any one of a set of alternative coordinate systems, the "result"
 *        Frame will indicate which of the alternatives was used.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A non-zero value is returned if the requested coordinate conversion is
@@ -943,7 +999,7 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    domain, class, etc. of the target Frame are suitable. Invoke the parent
    "astMatch" method to verify this. */
    match = (*parent_match)( template_frame, target,
-                            template_axes, target_axes, map, result );
+                            template_axes, target_axes, map, result, status );
 
 /* If a match was found, the target Frame must be (or contain) a SpecFrame,
    but this target SpecFrame may be a simple SpecFrame rather than a 
@@ -995,7 +1051,7 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 }
 
 static void Overlay( AstFrame *template, const int *template_axes,
-                     AstFrame *result ) {
+                     AstFrame *result, int *status ) {
 /*
 *  Name:
 *     Overlay
@@ -1009,7 +1065,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
 *  Synopsis:
 *     #include "specframe.h"
 *     void Overlay( AstFrame *template, const int *template_axes,
-*                   AstFrame *result )
+*                   AstFrame *result, int *status )
 
 *  Class Membership:
 *     DSBSpecFrame member function (over-rides the protected astOverlay method
@@ -1047,6 +1103,8 @@ static void Overlay( AstFrame *template, const int *template_axes,
 *        axis, the corresponding element of this array should be set to -1.
 *     result
 *        Pointer to the Frame which is to receive the new attribute values.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -1063,7 +1121,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
 
 /* Invoke the parent class astOverlay method to transfer attributes inherited
    from the parent class. */
-   (*parent_overlay)( template, template_axes, result );
+   (*parent_overlay)( template, template_axes, result, status );
 
 /* Check if the result Frame is a DSBSpecFrame or from a class derived from
    DSBSpecFrame. If not, we cannot transfer DSBSpecFrame attributes to it as it is
@@ -1088,7 +1146,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
 #undef OVERLAY
 }
 
-static void SetAttrib( AstObject *this_object, const char *setting ) {
+static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
 *     astSetAttrib
@@ -1184,7 +1242,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
          } else if( astOK ) {
             astError( AST__ATTIN, "astSetAttrib(%s): Value supplied for "
                       "attribute \"DSBCentre\" (%s) uses units which are "
-                      "inappropriate for the current spectral system (%s).", 
+                      "inappropriate for the current spectral system (%s).", status, 
                        astGetClass( this ), setting + 10, 
                        astGetTitle( this ) );
          }
@@ -1196,14 +1254,14 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Find the Mapping from the spectral system described by this SpecFrame to 
    topocentric frequency in Hz. */
-         tmap = TopoMap( this, 1, "astSetAttrib" );         
+         tmap = TopoMap( this, 1, "astSetAttrib", status );         
          if ( astOK ) {
 
 /* Transform the supplied value to topocentric frequency. */
             astTran1( tmap, 1, &dval, 1, &dtemp );
             if( dtemp == AST__BAD ) {
                astError( AST__ATTIN, "astSetAttrib(%s): The setting \"%s\" is "
-                         "invalid for a %s.", astGetClass( this ), setting,
+                         "invalid for a %s.", status, astGetClass( this ), setting,
                          astGetClass( this ) );
             } else {
 
@@ -1216,7 +1274,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
       } else if( astOK ) {
          astError( AST__ATTIN, "astSetAttrib(%s): The setting \"%s\" is "
-                   "invalid for a %s.", astGetClass( this ), setting,
+                   "invalid for a %s.", status, astGetClass( this ), setting,
                    astGetClass( this ) );
       }
 
@@ -1242,7 +1300,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Otherwise report an error. */
       } else if( astOK ) {
          astError( AST__ATTIN, "astSetAttrib(%s): Intermediate frequency given "
-                   "in an inappropriate system of units \"%g %s\".", 
+                   "in an inappropriate system of units \"%g %s\".", status, 
                    astGetClass( this ), dval, setting + off );
       }
 
@@ -1272,7 +1330,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
       } else {
          astError( AST__ATTIN, "astSetAttrib(%s): The setting \"%s\" is "
-                   "invalid for a %s.", astGetClass( this ), setting,
+                   "invalid for a %s.", status, astGetClass( this ), setting,
                    astGetClass( this ) );
       }
 
@@ -1294,21 +1352,21 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Use this macro to report an error if a read-only attribute has been
    specified. */
    } else if ( MATCH( "imagfreq" ) ) {
-      astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.",
+      astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.", status,
                 setting, astGetClass( this ) );
-      astError( AST__NOWRT, "This is a read-only attribute." );
+      astError( AST__NOWRT, "This is a read-only attribute." , status);
 
 /* Pass any unrecognised setting to the parent method for further
    interpretation. */
    } else {
-      (*parent_setattrib)( this_object, setting );
+      (*parent_setattrib)( this_object, setting, status );
    }
 }
 
 static int SubFrame( AstFrame *target_frame, AstFrame *template,
                      int result_naxes, const int *target_axes,
                      const int *template_axes, AstMapping **map,
-                     AstFrame **result ) {
+                     AstFrame **result, int *status ) {
 /*
 *  Name:
 *     SubFrame
@@ -1325,7 +1383,7 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
 *     int SubFrame( AstFrame *target, AstFrame *template,
 *                   int result_naxes, const int *target_axes,
 *                   const int *template_axes, AstMapping **map,
-*                   AstFrame **result )
+*                   AstFrame **result, int *status )
 
 *  Class Membership:
 *     DSBSpecFrame member function (over-rides the protected astSubFrame 
@@ -1381,6 +1439,8 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
 *        transformation will convert in the opposite direction.
 *     result
 *        Address of a location to receive a pointer to the result Frame.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A non-zero value is returned if coordinate conversion is possible
@@ -1441,7 +1501,7 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
    of any differences in the values of the attributes specific to the 
    DSBSpecFrame class. */
    match = (*parent_subframe)( target_frame, template, result_naxes, 
-                               target_axes, template_axes, map, result );
+                               target_axes, template_axes, map, result, status );
 
 /* If a match occurred, and the result and template Frames are both
    DSBSpecFrames, we now modify the Mapping to take account of 
@@ -1487,15 +1547,15 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
    observed (USB or LSB) sideband. This will be a UnitMap if the target 
    already represents the observed sideband. */
          if( obs_sb == USB ) {
-            map1 = ToUSBMapping( dsbtarget, "astSubFrame" );
+            map1 = ToUSBMapping( dsbtarget, "astSubFrame", status );
    
          } else if( obs_sb == LSB ) {
-            map1 = ToLSBMapping( dsbtarget, "astSubFrame" );
+            map1 = ToLSBMapping( dsbtarget, "astSubFrame", status );
    
          } else {
             map1 = NULL;
             astError( AST__INTER, "astGetImagFreq(%s): Illegal sideband value "
-                      "(%d) encountered (internal AST programming error).", 
+                      "(%d) encountered (internal AST programming error).", status, 
                       astGetClass( target_frame ), obs_sb );
          }  
 
@@ -1511,15 +1571,15 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
    obserfed sideband. This will be a UnitMap if the target already represents
    the observed sideband. */
          if( obs_sb == USB ) {
-            map2 = ToUSBMapping( dsbresult, "astSubFrame" );
+            map2 = ToUSBMapping( dsbresult, "astSubFrame", status );
    
          } else if( obs_sb == LSB ) {
-            map2 = ToLSBMapping( dsbresult, "astSubFrame" );
+            map2 = ToLSBMapping( dsbresult, "astSubFrame", status );
    
          } else {
             map2 = NULL;
             astError( AST__INTER, "astGetImagFreq(%s): Illegal sideband value "
-                      "(%d) encountered (internal AST programming error).", 
+                      "(%d) encountered (internal AST programming error).", status, 
                       astGetClass( target_frame ), obs_sb );
          }  
 
@@ -1530,10 +1590,10 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
    then applies the Mapping returned by the parent SubFrame method in
    order to convert between spectral systems, and then converts from the 
    observed sideband to the SideBand of the result. */
-         map3 = (AstMapping *) astCmpMap( map1, *map, 1, "" );
+         map3 = (AstMapping *) astCmpMap( map1, *map, 1, "", status );
          map1 = astAnnul( map1 );
          *map = astAnnul( *map );
-         map1 = (AstMapping *) astCmpMap( map3, map2, 1, "" );
+         map1 = (AstMapping *) astCmpMap( map3, map2, 1, "", status );
          map3 = astAnnul( map3 );
          map2 = astAnnul( map2 );
 
@@ -1556,7 +1616,7 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
 
 }
 
-static int TestAttrib( AstObject *this_object, const char *attrib ) {
+static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     TestAttrib
@@ -1569,7 +1629,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "dsbspecframe.h"
-*     int TestAttrib( AstObject *this, const char *attrib )
+*     int TestAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     DSBSpecFrame member function (over-rides the astTestAttrib protected
@@ -1586,6 +1646,8 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if a value has been set, otherwise zero.
@@ -1640,14 +1702,14 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is not recognised, pass it on to the parent method
    for further interpretation. */
    } else {
-      result = (*parent_testattrib)( this_object, attrib );
+      result = (*parent_testattrib)( this_object, attrib, status );
    }
 
 /* Return the result, */
    return result;
 }
 
-static AstMapping *ToLOMapping( AstDSBSpecFrame *this, const char *method ){
+static AstMapping *ToLOMapping( AstDSBSpecFrame *this, const char *method, int *status ){
 /*
 *  Name:
 *     ToLOMapping
@@ -1661,7 +1723,7 @@ static AstMapping *ToLOMapping( AstDSBSpecFrame *this, const char *method ){
 
 *  Synopsis:
 *     #include "dsbspecframe.h"
-*     AstMapping *ToLOMapping( AstDSBSpecFrame *this, const char *method )
+*     AstMapping *ToLOMapping( AstDSBSpecFrame *this, const char *method, int *status )
 
 *  Class Membership:
 *     DSBSpecFrame member function 
@@ -1679,6 +1741,8 @@ static AstMapping *ToLOMapping( AstDSBSpecFrame *this, const char *method ){
 *        Pointer to a null-terminated string containing the name of the
 *        public invoking method. This is only used in the construction of
 *        error messages. 
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to a new Mapping.
@@ -1711,18 +1775,18 @@ static AstMapping *ToLOMapping( AstDSBSpecFrame *this, const char *method ){
 /* If the DSBSpecFrame already represents LO offset, return a UnitMap.*/
    sb = astGetSideBand( this );
    if( sb == LO ) {
-      result = (AstMapping *) astUnitMap( 1, "" );
+      result = (AstMapping *) astUnitMap( 1, "", status );
 
 /* If the DSBSpecFrame represents the USB or LSB, create a suitable WinMap. */
    } else {
 
 /* Find the Mapping from the spectral system described by this SpecFrame to 
    topocentric frequency in Hz. */
-      tmap = TopoMap( this, 1, method );         
+      tmap = TopoMap( this, 1, method, status );         
 
 /* Calculate the local oscillator frequency (topocentric in Hertz). */
       VerifyAttrs( this, "create a Mapping to upper sideband", 
-                   "IF DSBCentre", "astGetImagFreq" );
+                   "IF DSBCentre", "astGetImagFreq", status );
       f_lo = astGetDSBCentre( this ) + astGetIF( this );
 
 /* Create a 1D WinMap which converts f_in to f_out. */
@@ -1738,12 +1802,12 @@ static AstMapping *ToLOMapping( AstDSBSpecFrame *this, const char *method ){
          f_out_b = 0.0;
       }
 
-      fmap = (AstMapping *) astWinMap( 1, &f_in_a, &f_in_b, &f_out_a, &f_out_b, "" );
+      fmap = (AstMapping *) astWinMap( 1, &f_in_a, &f_in_b, &f_out_a, &f_out_b, "", status );
       
 /* Construct the Mapping: input to f_in, f_in to f_out, f_out to input */
-      map1 = (AstMapping *) astCmpMap( tmap, fmap, 1, "" );
+      map1 = (AstMapping *) astCmpMap( tmap, fmap, 1, "", status );
       astInvert( tmap );
-      map2 = (AstMapping *) astCmpMap( map1, tmap, 1, "" );
+      map2 = (AstMapping *) astCmpMap( map1, tmap, 1, "", status );
 
 /* Simplify */
       result = astSimplify( map2 );
@@ -1763,7 +1827,7 @@ static AstMapping *ToLOMapping( AstDSBSpecFrame *this, const char *method ){
 
 }
 
-static AstMapping *ToLSBMapping( AstDSBSpecFrame *this, const char *method ){
+static AstMapping *ToLSBMapping( AstDSBSpecFrame *this, const char *method, int *status ){
 /*
 *  Name:
 *     ToLSBMapping
@@ -1777,7 +1841,7 @@ static AstMapping *ToLSBMapping( AstDSBSpecFrame *this, const char *method ){
 
 *  Synopsis:
 *     #include "dsbspecframe.h"
-*     AstMapping *ToLSBMapping( AstDSBSpecFrame *this, const char *method )
+*     AstMapping *ToLSBMapping( AstDSBSpecFrame *this, const char *method, int *status )
 
 *  Class Membership:
 *     DSBSpecFrame member function 
@@ -1795,6 +1859,8 @@ static AstMapping *ToLSBMapping( AstDSBSpecFrame *this, const char *method ){
 *        Pointer to a null-terminated string containing the name of the
 *        public invoking method. This is only used in the construction of
 *        error messages. 
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to a new Mapping.
@@ -1827,7 +1893,7 @@ static AstMapping *ToLSBMapping( AstDSBSpecFrame *this, const char *method ){
 /* If the DSBSpecFrame already represents the LSB, return a UnitMap.*/
    sb = astGetSideBand( this );
    if( sb == LSB ) {
-      result = (AstMapping *) astUnitMap( 1, "" );
+      result = (AstMapping *) astUnitMap( 1, "", status );
 
 /* If the DSBSpecFrame represents the USB or LO offset, create a suitable 
    WinMap. */
@@ -1835,11 +1901,11 @@ static AstMapping *ToLSBMapping( AstDSBSpecFrame *this, const char *method ){
 
 /* Find the Mapping from the spectral system described by this SpecFrame to 
    topocentric frequency in Hz. */
-      tmap = TopoMap( this, 1, method );         
+      tmap = TopoMap( this, 1, method, status );         
 
 /* Calculate the local oscillator frequency (topocentric in Hertz). */
       VerifyAttrs( this, "create a Mapping to lower sideband", 
-                   "IF DSBCentre", "astGetImagFreq" );
+                   "IF DSBCentre", "astGetImagFreq", status );
       f_lo = astGetDSBCentre( this ) + astGetIF( this );
 
 /* Create a 1D WinMap which converts USB or LO to LSB. */
@@ -1855,12 +1921,12 @@ static AstMapping *ToLSBMapping( AstDSBSpecFrame *this, const char *method ){
          f_out_b = 0.0;
       }
 
-      fmap = (AstMapping *) astWinMap( 1, &f_in_a, &f_in_b, &f_out_a, &f_out_b, "" );
+      fmap = (AstMapping *) astWinMap( 1, &f_in_a, &f_in_b, &f_out_a, &f_out_b, "", status );
       
 /* Construct the Mapping: input to f_in, f_in to f_out, f_out to input */
-      map1 = (AstMapping *) astCmpMap( tmap, fmap, 1, "" );
+      map1 = (AstMapping *) astCmpMap( tmap, fmap, 1, "", status );
       astInvert( tmap );
-      map2 = (AstMapping *) astCmpMap( map1, tmap, 1, "" );
+      map2 = (AstMapping *) astCmpMap( map1, tmap, 1, "", status );
 
 /* Simplify */
       result = astSimplify( map2 );
@@ -1881,7 +1947,7 @@ static AstMapping *ToLSBMapping( AstDSBSpecFrame *this, const char *method ){
 }
 
 static AstMapping *TopoMap( AstDSBSpecFrame *this, int forward, 
-                            const char *method ){
+                            const char *method, int *status ){
 /*
 *  Name:
 *     TopoMap
@@ -1896,7 +1962,7 @@ static AstMapping *TopoMap( AstDSBSpecFrame *this, int forward,
 *  Synopsis:
 *     #include "dsbspecframe.h"
 *     AstMapping *TopoMap( AstDSBSpecFrame *this, int forward, 
-*                          const char *method )
+*                          const char *method, int *status )
 
 *  Class Membership:
 *     DSBSpecFrame member function 
@@ -1915,6 +1981,8 @@ static AstMapping *TopoMap( AstDSBSpecFrame *this, int forward,
 *        Pointer to a null-terminated string containing the name of the
 *        public invoking method. This is only used in the construction of
 *        error messages. 
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to a new Mapping.
@@ -1941,9 +2009,9 @@ static AstMapping *TopoMap( AstDSBSpecFrame *this, int forward,
 /* Make a SpecFrame and then overlay the SpecFrame attributes of this 
    DSBSpecFrame onto the new SpecFrame. This means it inherits the current 
    values of things like ObsLon and ObsLat. */
-   tf1 = astSpecFrame( "" );
+   tf1 = astSpecFrame( "", status );
    template_axis = 0;
-   (*parent_overlay)( (AstFrame *) this, &template_axis, (AstFrame *) tf1 );
+   (*parent_overlay)( (AstFrame *) this, &template_axis, (AstFrame *) tf1, status );
 
 /* Copy this new SpecFrame and set its attributes to describe topocentric
    frequency in Hz. Ensure that alignment occurs in the topocentric Frame. */
@@ -1960,7 +2028,7 @@ static AstMapping *TopoMap( AstDSBSpecFrame *this, int forward,
       if( !fs ) {
          astError( AST__INTER, "%s(%s): Cannot convert DSBCentre "
                    "value from the supplied system to topocentric frequency "
-                   "(internal AST programming error).", method, 
+                   "(internal AST programming error).", status, method, 
                    astGetClass( this ) );
       } else {
          result = astGetMapping( fs, AST__BASE, AST__CURRENT );
@@ -1981,7 +2049,7 @@ static AstMapping *TopoMap( AstDSBSpecFrame *this, int forward,
 
 }
 
-static AstMapping *ToUSBMapping( AstDSBSpecFrame *this, const char *method ){
+static AstMapping *ToUSBMapping( AstDSBSpecFrame *this, const char *method, int *status ){
 /*
 *  Name:
 *     ToUSBMapping
@@ -1995,7 +2063,7 @@ static AstMapping *ToUSBMapping( AstDSBSpecFrame *this, const char *method ){
 
 *  Synopsis:
 *     #include "dsbspecframe.h"
-*     AstMapping *ToUSBMapping( AstDSBSpecFrame *this, const char *method )
+*     AstMapping *ToUSBMapping( AstDSBSpecFrame *this, const char *method, int *status )
 
 *  Class Membership:
 *     DSBSpecFrame member function 
@@ -2013,6 +2081,8 @@ static AstMapping *ToUSBMapping( AstDSBSpecFrame *this, const char *method ){
 *        Pointer to a null-terminated string containing the name of the
 *        public invoking method. This is only used in the construction of
 *        error messages. 
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to a new Mapping.
@@ -2045,7 +2115,7 @@ static AstMapping *ToUSBMapping( AstDSBSpecFrame *this, const char *method ){
 /* If the DSBSpecFrame already represents the USB, return a UnitMap.*/
    sb = astGetSideBand( this );
    if( sb == USB ) {
-      result = (AstMapping *) astUnitMap( 1, "" );
+      result = (AstMapping *) astUnitMap( 1, "", status );
 
 /* If the DSBSpecFrame represents the LSB, or LO offset, create a suitable 
    WinMap. */
@@ -2053,11 +2123,11 @@ static AstMapping *ToUSBMapping( AstDSBSpecFrame *this, const char *method ){
 
 /* Find the Mapping from the spectral system described by this SpecFrame to 
    topocentric frequency in Hz. */
-      tmap = TopoMap( this, 1, method );         
+      tmap = TopoMap( this, 1, method, status );         
 
 /* Calculate the local oscillator frequency (topocentric in Hertz). */
       VerifyAttrs( this, "create a Mapping to upper sideband", 
-                   "IF DSBCentre", "astGetImagFreq" );
+                   "IF DSBCentre", "astGetImagFreq", status );
       f_lo = astGetDSBCentre( this ) + astGetIF( this );
 
 /* Create a 1D WinMap which converts f_in to f_out. */
@@ -2073,12 +2143,12 @@ static AstMapping *ToUSBMapping( AstDSBSpecFrame *this, const char *method ){
          f_out_b = 0.0;
       }
 
-      fmap = (AstMapping *) astWinMap( 1, &f_in_a, &f_in_b, &f_out_a, &f_out_b, "" );
+      fmap = (AstMapping *) astWinMap( 1, &f_in_a, &f_in_b, &f_out_a, &f_out_b, "", status );
       
 /* Construct the Mapping: input to f_in, f_in to f_out, f_out to input */
-      map1 = (AstMapping *) astCmpMap( tmap, fmap, 1, "" );
+      map1 = (AstMapping *) astCmpMap( tmap, fmap, 1, "", status );
       astInvert( tmap );
-      map2 = (AstMapping *) astCmpMap( map1, tmap, 1, "" );
+      map2 = (AstMapping *) astCmpMap( map1, tmap, 1, "", status );
 
 /* Simplify */
       result = astSimplify( map2 );
@@ -2099,7 +2169,7 @@ static AstMapping *ToUSBMapping( AstDSBSpecFrame *this, const char *method ){
 }
 
 static void VerifyAttrs( AstDSBSpecFrame *this, const char *purp, 
-                         const char *attrs, const char *method ) {
+                         const char *attrs, const char *method, int *status ) {
 /*
 *  Name:
 *     VerifyAttrs
@@ -2113,7 +2183,7 @@ static void VerifyAttrs( AstDSBSpecFrame *this, const char *purp,
 *  Synopsis:
 *     #include "dsbspecframe.h"
 *     void VerifyAttrs( AstDSBSpecFrame *this, const char *purp, 
-*                       const char *attrs, const char *method  )
+*                       const char *attrs, const char *method, int *status  )
 
 *  Class Membership:
 *     DSBSpecFrame member function 
@@ -2139,6 +2209,8 @@ static void VerifyAttrs( AstDSBSpecFrame *this, const char *purp,
 *     method
 *        A string holding the name of the calling method for use in error
 *        messages.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -2195,15 +2267,15 @@ static void VerifyAttrs( AstDSBSpecFrame *this, const char *purp,
                   } else {
                      astError( AST__INTER, "VerifyAttrs(DSBSpecFrame): "
                                "Unknown attribute name \"%.*s\" supplied (AST "
-                               "internal programming error).", len, a );
+                               "internal programming error).", status, len, a );
                   }
 
 /* If the attribute does not have a set value, report an error. */
                   if( !set && astOK ) {
-                     astError( AST__NOVAL, "%s(%s): Cannot %s.", method,
+                     astError( AST__NOVAL, "%s(%s): Cannot %s.", status, method,
                                astGetClass( this ), purp );
                      astError( AST__NOVAL, "No value has been set for "
-                               "the AST \"%.*s\" attribute (%s).", len, a,
+                               "the AST \"%.*s\" attribute (%s).", status, len, a,
                                desc );
                   }
 
@@ -2503,7 +2575,7 @@ astMAKE_SET(DSBSpecFrame,AlignSideBand,int,alignsideband,(value?1:0))
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -2515,7 +2587,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -2526,6 +2598,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the DSBSpecFrame whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -2556,20 +2630,20 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* DSBCentre */
 /* --------- */
-   set = TestDSBCentre( this );
-   dval = set ? GetDSBCentre( this ) : astGetDSBCentre( this );
+   set = TestDSBCentre( this, status );
+   dval = set ? GetDSBCentre( this, status ) : astGetDSBCentre( this );
    astWriteDouble( channel, "DSBCen", set, 1, dval, "Central frequency (Hz topo)" );
 
 /* IF */
 /* -- */
-   set = TestIF( this );
-   dval = set ? GetIF( this ) : astGetIF( this );
+   set = TestIF( this, status );
+   dval = set ? GetIF( this, status ) : astGetIF( this );
    astWriteDouble( channel, "IF", set, 1, dval, "Intermediate frequency (Hz)" );
 
 /* SideBand */
 /* -------- */
-   set = TestSideBand( this );
-   ival = set ? GetSideBand( this ) : astGetSideBand( this );
+   set = TestSideBand( this, status );
+   ival = set ? GetSideBand( this, status ) : astGetSideBand( this );
    if( ival == LSB ) {
       cval = "LSB";
       comm = "Represents lower sideband";
@@ -2586,8 +2660,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* AlignSideBand */
 /* ------------- */
-   set = TestAlignSideBand( this );
-   ival = set ? GetAlignSideBand( this ) : astGetAlignSideBand( this );
+   set = TestAlignSideBand( this, status );
+   ival = set ? GetAlignSideBand( this, status ) : astGetAlignSideBand( this );
    astWriteInt( channel, "AlSdBn", set, 1, ival, "Align sidebands?" );
 }
 
@@ -2595,10 +2669,10 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsADSBSpecFrame and astCheckDSBSpecFrame functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(DSBSpecFrame,SpecFrame,check,&class_init)
+astMAKE_ISA(DSBSpecFrame,SpecFrame,check,&class_check)
 astMAKE_CHECK(DSBSpecFrame)
 
-AstDSBSpecFrame *astDSBSpecFrame_( const char *options, ... ) {
+AstDSBSpecFrame *astDSBSpecFrame_( const char *options, int *status, ...) {
 /*
 *++
 *  Name:
@@ -2683,8 +2757,12 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstDSBSpecFrame *new;        /* Pointer to new DSBSpecFrame */
    va_list args;                /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -2701,7 +2779,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Obtain the variable argument list and pass it along with the options string
    to the astVSet method to initialise the new DSBSpecFrame's attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -2752,8 +2830,17 @@ AstDSBSpecFrame *astDSBSpecFrameId_( const char *options, ... ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstDSBSpecFrame *new;        /* Pointer to new DSBSpecFrame */
    va_list args;                /* Variable argument list */
+
+   int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -2783,7 +2870,7 @@ AstDSBSpecFrame *astDSBSpecFrameId_( const char *options, ... ) {
 }
 
 AstDSBSpecFrame *astInitDSBSpecFrame_( void *mem, size_t size, int init,
-                                       AstDSBSpecFrameVtab *vtab, const char *name ) {
+                                       AstDSBSpecFrameVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -2883,7 +2970,7 @@ AstDSBSpecFrame *astInitDSBSpecFrame_( void *mem, size_t size, int init,
 
 AstDSBSpecFrame *astLoadDSBSpecFrame_( void *mem, size_t size,
                            AstDSBSpecFrameVtab *vtab, const char *name,
-                           AstChannel *channel ) {
+                           AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -2958,11 +3045,15 @@ AstDSBSpecFrame *astLoadDSBSpecFrame_( void *mem, size_t size,
 */
 
 /* Local Constants. */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
    AstDSBSpecFrame *new;         /* Pointer to the new DSBSpecFrame */
    char *text;                   /* Pointer to string value */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* Initialise. */
    new = NULL;
@@ -3010,12 +3101,12 @@ AstDSBSpecFrame *astLoadDSBSpecFrame_( void *mem, size_t size,
 /* DSBCentre */
 /* --------- */
       new->dsbcentre = astReadDouble( channel, "dsbcen", AST__BAD );
-      if ( TestDSBCentre( new ) ) SetDSBCentre( new, new->dsbcentre );
+      if ( TestDSBCentre( new, status ) ) SetDSBCentre( new, new->dsbcentre, status );
 
 /* IF */
 /* -- */
       new->ifr = astReadDouble( channel, "if", AST__BAD );
-      if ( TestIF( new ) ) SetIF( new, new->ifr );
+      if ( TestIF( new, status ) ) SetIF( new, new->ifr, status );
 
 /* SideBand */
 /* -------- */
@@ -3031,16 +3122,16 @@ AstDSBSpecFrame *astLoadDSBSpecFrame_( void *mem, size_t size,
             new->sideband = LO;
          } else {
             astError( AST__ATTIN, "astRead(%s): Invalid SideBand description "
-                      "\"%s\".", astGetClass( channel ), text );
+                      "\"%s\".", status, astGetClass( channel ), text );
          }
-         if ( TestSideBand( new ) ) SetSideBand( new, new->sideband );
+         if ( TestSideBand( new, status ) ) SetSideBand( new, new->sideband, status );
          text = astFree( text );
       }
 
 /* AlignSideBand */
 /* ------------- */
       new->alignsideband = astReadInt( channel, "alsdbn", -1 );
-      if( TestAlignSideBand( new ) ) SetAlignSideBand( new, new->alignsideband );
+      if( TestAlignSideBand( new, status ) ) SetAlignSideBand( new, new->alignsideband, status );
 
 /* If an error occurred, clean up by deleting the new DSBSpecFrame. */
       if ( !astOK ) new = astDelete( new );
@@ -3062,8 +3153,13 @@ AstDSBSpecFrame *astLoadDSBSpecFrame_( void *mem, size_t size,
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
 
-double astGetImagFreq_( AstDSBSpecFrame *this ) {
+double astGetImagFreq_( AstDSBSpecFrame *this, int *status ) {
    if ( !astOK ) return AST__BAD;
-   return (**astMEMBER(this,DSBSpecFrame,GetImagFreq))( this );
+   return (**astMEMBER(this,DSBSpecFrame,GetImagFreq))( this, status );
 }
+
+
+
+
+
 

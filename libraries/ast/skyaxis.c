@@ -125,12 +125,15 @@ f     only within textual output (e.g. from AST_WRITE).
 
 /* Interface definitions. */
 /* ---------------------- */
-#include "pal.h"              /* SLALIB interface */
+#include "pal.h"                 /* SLALIB interface */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
 #include "pointset.h"            /* Sets of points (for AST__BAD) */
 #include "axis.h"                /* Axis (parent) class interface */
 #include "skyaxis.h"             /* Interface definition for this class */
+#include "globals.h"             /* Thread-safe global data access */
 
 /* C header files. */
 /* --------------- */
@@ -145,35 +148,34 @@ f     only within textual output (e.g. from AST_WRITE).
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag as
-   static variables. */
-static AstSkyAxisVtab class_vtab; /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject * );
-static const char *(* parent_getattrib)( AstObject *, const char * );
-static const char *(* parent_getaxislabel)( AstAxis * );
-static const char *(* parent_getaxissymbol)( AstAxis * );
-static const char *(* parent_getaxisunit)( AstAxis * );
-static int (* parent_testattrib)( AstObject *, const char * );
-static int (*parent_getaxisdirection)( AstAxis *this );
-static void (* parent_axisoverlay)( AstAxis *, AstAxis * );
-static void (* parent_clearattrib)( AstObject *, const char * );
-static void (* parent_setattrib)( AstObject *, const char * );
-static double (*parent_getaxisbottom)( AstAxis *this );
-static double (*parent_getaxistop)( AstAxis *this );
-static const char *(* parent_axisformat)( AstAxis *, double );
-static double (*parent_axisgap)( AstAxis *, double, int * );
-static int (*parent_axisunformat)( AstAxis *, const char *, double * );
-static int (*parent_axisfields)( AstAxis *, const char *, const char *, int, char **, int *, double * );
+static int (* parent_getobjsize)( AstObject *, int * );
+static const char *(* parent_getattrib)( AstObject *, const char *, int * );
+static const char *(* parent_getaxislabel)( AstAxis *, int * );
+static const char *(* parent_getaxissymbol)( AstAxis *, int * );
+static const char *(* parent_getaxisunit)( AstAxis *, int * );
+static int (* parent_testattrib)( AstObject *, const char *, int * );
+static int (*parent_getaxisdirection)( AstAxis *this, int * );
+static void (* parent_axisoverlay)( AstAxis *, AstAxis *, int * );
+static void (* parent_clearattrib)( AstObject *, const char *, int * );
+static void (* parent_setattrib)( AstObject *, const char *, int * );
+static double (*parent_getaxisbottom)( AstAxis *this, int * );
+static double (*parent_getaxistop)( AstAxis *this, int * );
+static const char *(* parent_axisformat)( AstAxis *, double, int * );
+static double (*parent_axisgap)( AstAxis *, double, int *, int * );
+static int (*parent_axisunformat)( AstAxis *, const char *, double *, int * );
+static int (*parent_axisfields)( AstAxis *, const char *, const char *, int, char **, int *, double *, int * );
 
 /* Factors for converting between hours, degrees and radians. */
 static double hr2rad;
 static double deg2rad;
 static double pi;
 static double piby2;
-
 
 /* Strings used as field delimiters when producing graphical labels.
    These strings include escape sequences which the Plot class interprets
@@ -185,6 +187,55 @@ static char *gd_delim  = "%-%^53+%s60+o%+";    /* Deg.s separator */
 static char *gam_delim = "%-%^20+%s85+'%+";    /* Arc-min.s separator */
 static char *gas_delim = "%-%^20+%s85+\"%+";   /* Arc-sec.s separator */
 
+/* Define macros for accessing each item of thread specific global data. */
+#ifdef THREAD_SAFE
+
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; \
+   globals->DHmsFormat_Buff[ 0 ] = 0; \
+   globals->DHmsUnit_Buff[ 0 ] = 0; \
+   globals->GetAttrib_Buff[ 0 ] = 0; \
+   globals->GetAxisFormat_Buff[ 0 ] = 0; \
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(SkyAxis)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(SkyAxis,Class_Init)
+#define class_vtab astGLOBAL(SkyAxis,Class_Vtab)
+#define dhmsformat_buff astGLOBAL(SkyAxis,DHmsFormat_Buff)
+#define dhmsunit_buff astGLOBAL(SkyAxis,DHmsUnit_Buff)
+#define getattrib_buff astGLOBAL(SkyAxis,GetAttrib_Buff)
+#define getaxisformat_buff astGLOBAL(SkyAxis,GetAxisFormat_Buff)
+
+
+
+static pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
+#define LOCK_MUTEX2 pthread_mutex_lock( &mutex2 ); 
+#define UNLOCK_MUTEX2 pthread_mutex_unlock( &mutex2 ); 
+
+/* If thread safety is not needed, declare and initialise globals at static 
+   variables. */ 
+#else
+
+static char dhmsformat_buff[ AST__SKYAXIS_DHMSFORMAT_BUFF_LEN + 1 ]; 
+static char dhmsunit_buff[ AST__SKYAXIS_DHMSUNIT_BUFF_LEN + 1 ]; 
+static char getattrib_buff[ AST__SKYAXIS_GETATTRIB_BUFF_LEN + 1 ];
+static char getaxisformat_buff[ AST__SKYAXIS_GETAXISFORMAT_BUFF_LEN + 1 ];
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstSkyAxisVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#define LOCK_MUTEX2
+#define UNLOCK_MUTEX2
+
+#endif
+
+
 /* External Interface Function Prototypes. */
 /* ======================================= */
 /* The following functions have public prototypes only (i.e. no
@@ -194,55 +245,55 @@ AstSkyAxis *astSkyAxisId_( const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static const char *AxisAbbrev( AstAxis *, const char *, const char *, const char * );
-static const char *AxisFormat( AstAxis *, double );
-static int GetObjSize( AstObject * );
-static const char *GetAttrib( AstObject *, const char * );
-static const char *GetAxisFormat( AstAxis * );
-static const char *GetAxisLabel( AstAxis * );
-static const char *GetAxisSymbol( AstAxis * );
-static const char *GetAxisUnit( AstAxis * );
-static const char *DHmsFormat( const char *, int, double );
-static const char *DHmsUnit( const char *, int, int );
-static double AxisGap( AstAxis *, double, int * );
-static double AxisDistance( AstAxis *, double, double );
-static double AxisOffset( AstAxis *, double, double );
-static double DHmsGap( const char *, int, double, int * );
-static double GetAxisTop( AstAxis * );
-static double GetAxisBottom( AstAxis * );
-static int AxisIn( AstAxis *, double, double, double, int );
-static int AxisFields( AstAxis *, const char *, const char *, int, char **, int *, double * );
-static int AxisUnformat( AstAxis *, const char *, double * );
-static int GetAxisAsTime( AstSkyAxis * );
-static int GetAxisDirection( AstAxis * );
-static int GetAxisIsLatitude( AstSkyAxis * );
-static int GetAxisCentreZero( AstSkyAxis * );
-static int TestAttrib( AstObject *, const char * );
-static int TestAxisAsTime( AstSkyAxis * );
-static int TestAxisFormat( AstAxis * );
-static int TestAxisIsLatitude( AstSkyAxis * );
-static int TestAxisCentreZero( AstSkyAxis * );
-static void AxisNorm( AstAxis *, double * );
-static void AxisOverlay( AstAxis *, AstAxis * );
-static void ClearAttrib( AstObject *, const char * );
-static void ClearAxisAsTime( AstSkyAxis * );
-static void ClearAxisFormat( AstAxis * );
-static void ClearAxisIsLatitude( AstSkyAxis * );
-static void ClearAxisCentreZero( AstSkyAxis * );
-static void Copy( const AstObject *, AstObject * );
-static void Delete( AstObject * );
-static void Dump( AstObject *, AstChannel * );
-static void ParseDHmsFormat( const char *, int, char *, int *, int *, int *, int *, int *, int *, int * );
-static void SetAttrib( AstObject *, const char * );
-static void SetAxisAsTime( AstSkyAxis *, int );
-static void SetAxisFormat( AstAxis *, const char * );
-static void SetAxisIsLatitude( AstSkyAxis *, int );
-static void SetAxisCentreZero( AstSkyAxis *, int );
+static const char *AxisAbbrev( AstAxis *, const char *, const char *, const char *, int * );
+static const char *AxisFormat( AstAxis *, double, int * );
+static int GetObjSize( AstObject *, int * );
+static const char *GetAttrib( AstObject *, const char *, int * );
+static const char *GetAxisFormat( AstAxis *, int * );
+static const char *GetAxisLabel( AstAxis *, int * );
+static const char *GetAxisSymbol( AstAxis *, int * );
+static const char *GetAxisUnit( AstAxis *, int * );
+static const char *DHmsFormat( const char *, int, double, int * );
+static const char *DHmsUnit( const char *, int, int, int * );
+static double AxisGap( AstAxis *, double, int *, int * );
+static double AxisDistance( AstAxis *, double, double, int * );
+static double AxisOffset( AstAxis *, double, double, int * );
+static double DHmsGap( const char *, int, double, int *, int * );
+static double GetAxisTop( AstAxis *, int * );
+static double GetAxisBottom( AstAxis *, int * );
+static int AxisIn( AstAxis *, double, double, double, int, int * );
+static int AxisFields( AstAxis *, const char *, const char *, int, char **, int *, double *, int * );
+static int AxisUnformat( AstAxis *, const char *, double *, int * );
+static int GetAxisAsTime( AstSkyAxis *, int * );
+static int GetAxisDirection( AstAxis *, int * );
+static int GetAxisIsLatitude( AstSkyAxis *, int * );
+static int GetAxisCentreZero( AstSkyAxis *, int * );
+static int TestAttrib( AstObject *, const char *, int * );
+static int TestAxisAsTime( AstSkyAxis *, int * );
+static int TestAxisFormat( AstAxis *, int * );
+static int TestAxisIsLatitude( AstSkyAxis *, int * );
+static int TestAxisCentreZero( AstSkyAxis *, int * );
+static void AxisNorm( AstAxis *, double *, int * );
+static void AxisOverlay( AstAxis *, AstAxis *, int * );
+static void ClearAttrib( AstObject *, const char *, int * );
+static void ClearAxisAsTime( AstSkyAxis *, int * );
+static void ClearAxisFormat( AstAxis *, int * );
+static void ClearAxisIsLatitude( AstSkyAxis *, int * );
+static void ClearAxisCentreZero( AstSkyAxis *, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Delete( AstObject *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void ParseDHmsFormat( const char *, int, char *, int *, int *, int *, int *, int *, int *, int *, int * );
+static void SetAttrib( AstObject *, const char *, int * );
+static void SetAxisAsTime( AstSkyAxis *, int, int * );
+static void SetAxisFormat( AstAxis *, const char *, int * );
+static void SetAxisIsLatitude( AstSkyAxis *, int, int * );
+static void SetAxisCentreZero( AstSkyAxis *, int, int * );
 
 /* Member functions. */
 /* ================= */
 static const char *AxisAbbrev( AstAxis *this_axis, const char *fmt,
-                               const char *str1, const char *str2 ) {
+                               const char *str1, const char *str2, int *status ) {
 /*
 *  Name:
 *     astAxisAbbrev
@@ -352,7 +403,7 @@ static const char *AxisAbbrev( AstAxis *this_axis, const char *fmt,
    return result;
 }
 
-static double AxisDistance( AstAxis *this_axis, double v1, double v2 ) {
+static double AxisDistance( AstAxis *this_axis, double v1, double v2, int *status ) {
 /*
 *  Name:
 *     astAxisDistance
@@ -414,7 +465,7 @@ static double AxisDistance( AstAxis *this_axis, double v1, double v2 ) {
 }
 
 static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str, 
-                       int maxfld, char **fields, int *nc, double *val ) {
+                       int maxfld, char **fields, int *nc, double *val, int *status ) {
 /*
 *  Name:
 *     astAxisFields
@@ -512,7 +563,7 @@ static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
    the parent Axis class. */
    if( fmt[ 0 ] == '%' ) {
       return (*parent_axisfields)( this_axis, fmt, str, maxfld, fields, nc, 
-                                   val );
+                                   val, status );
    }   
 
 /* Initialise. */
@@ -525,7 +576,7 @@ static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
 
 /* Parse the format specifier. */
    ParseDHmsFormat( fmt, astGetAxisDigits( this_axis ), &sep, &plus, &lead_zero,
-                    &as_time, &dh, &min, &sec, &ndp );
+                    &as_time, &dh, &min, &sec, &ndp, status );
 
 /* Only proceed if the format was parsed succesfully, and the supplied arrays 
    are not of zero size. */
@@ -733,7 +784,7 @@ static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
    return result;
 }
 
-static const char *AxisFormat( AstAxis *this_axis, double value ) {
+static const char *AxisFormat( AstAxis *this_axis, double value, int *status ) {
 /*
 *  Name:
 *     AxisFormat
@@ -746,7 +797,7 @@ static const char *AxisFormat( AstAxis *this_axis, double value ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     const char *AxisFormat( AstAxis *this, double value )
+*     const char *AxisFormat( AstAxis *this, double value, int *status )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the astAxisFormat method inherited
@@ -764,6 +815,8 @@ static const char *AxisFormat( AstAxis *this_axis, double value ) {
 *        Pointer to the SkyAxis.
 *     value
 *        The coordinate value to be formatted (in radians).
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to a null-terminated string containing the formatted value.
@@ -795,16 +848,16 @@ static const char *AxisFormat( AstAxis *this_axis, double value ) {
 /* Obtain a pointer to the format specifier to be used. Note we use a private
    member function to obtain this (not a method) in case derived classes have
    extended the syntax of this string. */
-   fmt = GetAxisFormat( this_axis );
+   fmt = GetAxisFormat( this_axis, status );
 
 /* If the format string starts with a percent, use the AxisFormat method
    inherited from the parent Axis class. Otherwise, format using the
    syntax of this class. */
    if ( astOK ) {
       if( fmt[ 0 ] == '%' ) {
-         result = (*parent_axisformat)( this_axis, value );
+         result = (*parent_axisformat)( this_axis, value, status );
       } else { 
-         result = DHmsFormat( fmt, astGetAxisDigits( this ), value );
+         result = DHmsFormat( fmt, astGetAxisDigits( this ), value, status );
       }
    }
 
@@ -812,7 +865,7 @@ static const char *AxisFormat( AstAxis *this_axis, double value ) {
    return result;
 }
 
-static double AxisGap( AstAxis *this_axis, double gap, int *ntick ) {
+static double AxisGap( AstAxis *this_axis, double gap, int *ntick, int *status ) {
 /*
 *  Name:
 *     AxisGap
@@ -825,7 +878,7 @@ static double AxisGap( AstAxis *this_axis, double gap, int *ntick ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     double AxisGap( AstAxis *this, double gap, int *ntick ) 
+*     double AxisGap( AstAxis *this, double gap, int *ntick, int *status ) 
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the protected astAxisGap
@@ -846,6 +899,8 @@ static double AxisGap( AstAxis *this_axis, double gap, int *ntick ) {
 *     ntick
 *        Address of an int in which to return a convenient number of
 *        divisions into which the gap can be divided.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The nice gap size.
@@ -879,19 +934,19 @@ static double AxisGap( AstAxis *this_axis, double gap, int *ntick ) {
 /* Obtain a pointer to the format string to be used. Note we use a
    private member function to obtain this (not a method) in case
    derived classes have extended the syntax of this string. */
-   fmt = GetAxisFormat( this_axis );
+   fmt = GetAxisFormat( this_axis, status );
 
 /* Obtain the closest "nice" gap size. */
-   if ( astOK ) result = DHmsGap( fmt, astGetAxisDigits( this ), gap, ntick );
+   if ( astOK ) result = DHmsGap( fmt, astGetAxisDigits( this ), gap, ntick, status );
 
 /* If the format string starts with a percent, use the AxisGap method
    inherited from the parent Axis class. Otherwise, use the method
    provided by this class. */
    if ( astOK ) {
       if( fmt[ 0 ] == '%' ) {
-         result = (*parent_axisgap)( this_axis, gap, ntick );
+         result = (*parent_axisgap)( this_axis, gap, ntick, status );
       } else { 
-         result = DHmsGap( fmt, astGetAxisDigits( this ), gap, ntick );
+         result = DHmsGap( fmt, astGetAxisDigits( this ), gap, ntick, status );
       }
    }
 
@@ -899,7 +954,7 @@ static double AxisGap( AstAxis *this_axis, double gap, int *ntick ) {
    return result;
 }
 
-static int AxisIn( AstAxis *this, double lo, double hi, double val, int closed ){
+static int AxisIn( AstAxis *this, double lo, double hi, double val, int closed, int *status ){
 /*
 *  Name:
 *     AxisIn
@@ -912,7 +967,7 @@ static int AxisIn( AstAxis *this, double lo, double hi, double val, int closed )
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     int AxisIn( AstAxis *this, double lo, double hi, double val, int closed )
+*     int AxisIn( AstAxis *this, double lo, double hi, double val, int closed, int *status )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the astAxisIn method inherited
@@ -942,6 +997,8 @@ static int AxisIn( AstAxis *this, double lo, double hi, double val, int closed )
 *     closed
 *        If non-zero, then the lo and hi axis values are themselves
 *        considered to be within the interval. Otherwise they are outside.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Non-zero if the test value is inside the interval. 
@@ -981,7 +1038,7 @@ static int AxisIn( AstAxis *this, double lo, double hi, double val, int closed )
    }
 }
 
-static void AxisNorm( AstAxis *this_axis, double *value ) {
+static void AxisNorm( AstAxis *this_axis, double *value, int *status ) {
 /*
 *  Name:
 *     AxisNorm
@@ -994,7 +1051,7 @@ static void AxisNorm( AstAxis *this_axis, double *value ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     void AxisNorm( AstAxis *this, double *value )
+*     void AxisNorm( AstAxis *this, double *value, int *status )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the astAxisNorm method inherited
@@ -1017,6 +1074,8 @@ static void AxisNorm( AstAxis *this_axis, double *value ) {
 *     value
 *        Pointer to the coordinate value to be normalised, which will
 *        be modified in place.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -1040,7 +1099,7 @@ static void AxisNorm( AstAxis *this_axis, double *value ) {
    }
 }
 
-static double AxisOffset( AstAxis *this_axis, double v1, double dist ) {
+static double AxisOffset( AstAxis *this_axis, double v1, double dist, int *status ) {
 /*
 *
 *  Name:
@@ -1097,14 +1156,14 @@ static double AxisOffset( AstAxis *this_axis, double v1, double dist ) {
 /* Check both axis values are OK, and form the returned axis value. */
    if( v1 != AST__BAD && dist != AST__BAD ) {
       result = v1 + dist;
-      AxisNorm( this_axis, &result );
+      AxisNorm( this_axis, &result, status );
    }
 
 /* Return the result. */
    return result;
 }
 
-static void AxisOverlay( AstAxis *template_axis, AstAxis *result ) {
+static void AxisOverlay( AstAxis *template_axis, AstAxis *result, int *status ) {
 /*
 *  Name:
 *     AxisOverlay
@@ -1117,7 +1176,7 @@ static void AxisOverlay( AstAxis *template_axis, AstAxis *result ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     void AxisOverlay( AstAxis *template, AstAxis *result )
+*     void AxisOverlay( AstAxis *template, AstAxis *result, int *status )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the astAxisOverlay method inherited
@@ -1138,6 +1197,8 @@ static void AxisOverlay( AstAxis *template_axis, AstAxis *result ) {
 *        explicitly set for any attribute which is to be transferred.
 *     result
 *        Pointer to the Axis which is to receive the new attribute values.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -1153,7 +1214,7 @@ static void AxisOverlay( AstAxis *template_axis, AstAxis *result ) {
    template = (AstSkyAxis *) template_axis;
 
 /* Invoke the parent astAstOverlay method to overlay inherited attributes. */
-   (*parent_axisoverlay)( template_axis, result );
+   (*parent_axisoverlay)( template_axis, result, status );
 
 /* Test if the "result" Axis is a SkyAxis (if not, it cannot acquire any
    further attributes, so there is nothing more to do). */
@@ -1163,8 +1224,8 @@ static void AxisOverlay( AstAxis *template_axis, AstAxis *result ) {
    use private member functions (not methods) to access the Format value, since
    derived classes may extend the syntax of this string and we should not
    overlay a string whose syntax cannot be interpreted by the result Axis. */
-      if ( TestAxisFormat( template_axis ) ) {
-         SetAxisFormat( result, GetAxisFormat( template_axis ) );
+      if ( TestAxisFormat( template_axis, status ) ) {
+         SetAxisFormat( result, GetAxisFormat( template_axis, status ), status );
       }
 
 /* Overlay the AsTime attribute in the same way, but this time using methods
@@ -1185,7 +1246,7 @@ static void AxisOverlay( AstAxis *template_axis, AstAxis *result ) {
    }
 }
 
-static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     ClearAttrib
@@ -1198,7 +1259,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     void ClearAttrib( AstObject *this, const char *attrib )
+*     void ClearAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the astClearAttrib protected
@@ -1215,6 +1276,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -1246,11 +1309,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      (*parent_clearattrib)( this_object, attrib );
+      (*parent_clearattrib)( this_object, attrib, status );
    }
 }
 
-static void ClearAxisFormat( AstAxis *this_axis ) {
+static void ClearAxisFormat( AstAxis *this_axis, int *status ) {
 /*
 *  Name:
 *     ClearAxisFormat
@@ -1263,7 +1326,7 @@ static void ClearAxisFormat( AstAxis *this_axis ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     void ClearAxisFormat( AstAxis *this )
+*     void ClearAxisFormat( AstAxis *this, int *status )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the astClearAxisFormat method
@@ -1276,6 +1339,8 @@ static void ClearAxisFormat( AstAxis *this_axis ) {
 *  Parameters:
 *     this
 *        Pointer to the SkyAxis.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -1295,7 +1360,7 @@ static void ClearAxisFormat( AstAxis *this_axis ) {
    this->skyformat = astFree( this->skyformat );
 }
 
-static const char *DHmsFormat( const char *fmt, int digs, double value ) {
+static const char *DHmsFormat( const char *fmt, int digs, double value, int *status ) {
 /*
 *  Name:
 *     DHmsFormat
@@ -1308,7 +1373,7 @@ static const char *DHmsFormat( const char *fmt, int digs, double value ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     const char *DHmsFormat( const char *fmt, int digs, double value )
+*     const char *DHmsFormat( const char *fmt, int digs, double value, int *status )
 
 *  Class Membership:
 *     SkyAxis member function.
@@ -1331,6 +1396,8 @@ static const char *DHmsFormat( const char *fmt, int digs, double value ) {
 *        of digits of precision is equal to "digs". 
 *     double
 *        The value to be formatted (in radians).
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to a null terminated character string containing the
@@ -1420,10 +1487,8 @@ static const char *DHmsFormat( const char *fmt, int digs, double value ) {
 *     results are rounded to a specified number of decimal places.
 */
 
-/* Local Constants: */
-#define BUFF_LEN 70              /* Max. characters in result string */
-
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    char sep;                     /* Field separator character */
    const char *result;           /* Pointer to result string */
    double absvalue;              /* Absolute value in radians */
@@ -1443,10 +1508,12 @@ static const char *DHmsFormat( const char *fmt, int digs, double value ) {
    int pos;                      /* Position to add next character */
    int positive;                 /* Value is positive (or zero)? */
    int sec;                      /* Seconds field required? */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for result string */
-
+ 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialise. */
    result = NULL;
@@ -1461,7 +1528,7 @@ static const char *DHmsFormat( const char *fmt, int digs, double value ) {
 
 /* Parse the format specifier. */
       ParseDHmsFormat( fmt, digs, &sep, &plus, &lead_zero, 
-                       &as_time, &dh, &min, &sec, &ndp );
+                       &as_time, &dh, &min, &sec, &ndp, status );
 
 /* Break the value into fields. */
 /* ---------------------------- */
@@ -1469,7 +1536,7 @@ static const char *DHmsFormat( const char *fmt, int digs, double value ) {
    that under the worst case the buffer for the result string is not
    likely to overflow. */
       if ( astOK ) {
-         if ( ( ndp + 11 ) > BUFF_LEN ) ndp = BUFF_LEN - 11;
+         if ( ( ndp + 11 ) > AST__SKYAXIS_DHMSFORMAT_BUFF_LEN ) ndp = AST__SKYAXIS_DHMSFORMAT_BUFF_LEN - 11;
 
 /* Some operating systems have a "minus zero" value (for instance 
    "-1.2*0" would give "-0"). This value is numerically equivalent to
@@ -1608,9 +1675,9 @@ static const char *DHmsFormat( const char *fmt, int digs, double value ) {
    added. Insert a leading '+' or '-' sign if required. */
          pos = 0;
          if ( !positive ) {
-            buff[ pos++ ] = '-';
+            dhmsformat_buff[ pos++ ] = '-';
          } else if ( plus ) {
-            buff[ pos++ ] = '+';
+            dhmsformat_buff[ pos++ ] = '+';
          }
 
 /* Use "sprintf" to format the degrees/hours field, if required. Set
@@ -1618,16 +1685,16 @@ static const char *DHmsFormat( const char *fmt, int digs, double value ) {
    zeros is required and whether the value represents hours (2 digits)
    or degrees (3 digits). */
          if ( dh ) {
-            pos += sprintf( buff + pos, "%0*.0f",
+            pos += sprintf( dhmsformat_buff + pos, "%0*.0f",
                             lead_zero ? ( as_time ? 2 : 3 ) : 1, idh );
 
 /* If letters are being used as field separators, and there are more
    fields to follow, append "d" or "h" as necessary. */
             if ( min || sec ) {
                if ( sep == 'l' ) {
-                  buff[ pos++ ] = ( as_time ? 'h' : 'd' );
+                  dhmsformat_buff[ pos++ ] = ( as_time ? 'h' : 'd' );
                } else if( sep == 'g' ) {
-                  pos += sprintf( buff + pos, "%s", as_time ? gh_delim : gd_delim );
+                  pos += sprintf( dhmsformat_buff + pos, "%s", as_time ? gh_delim : gd_delim );
                } 
             }
          }
@@ -1635,20 +1702,20 @@ static const char *DHmsFormat( const char *fmt, int digs, double value ) {
 /* If a minutes field is required, first add an appropriate non-letter
    field separator if needed. */
          if ( min ) {
-            if ( ( sep != 'l' && sep != 'g' ) && dh ) buff[ pos++ ] = sep;
+            if ( ( sep != 'l' && sep != 'g' ) && dh ) dhmsformat_buff[ pos++ ] = sep;
 
 /* Then format the minutes field with a leading zero to make it two
    digits if necessary. */
-            pos += sprintf( buff + pos, "%0*.0f", ( dh || lead_zero ) ? 2 : 1,
+            pos += sprintf( dhmsformat_buff + pos, "%0*.0f", ( dh || lead_zero ) ? 2 : 1,
                             imin );
 
 /* If letters are being used as field separators, and there is another
    field to follow, append the separator. */
             if ( sec ) {
                if ( sep == 'l' ) {
-                  buff[ pos++ ] = 'm';
+                  dhmsformat_buff[ pos++ ] = 'm';
                } else if( sep == 'g' ) {
-                  pos += sprintf( buff + pos, "%s", as_time ? gm_delim : gam_delim );
+                  pos += sprintf( dhmsformat_buff + pos, "%s", as_time ? gm_delim : gam_delim );
                }
             }
          }
@@ -1656,11 +1723,11 @@ static const char *DHmsFormat( const char *fmt, int digs, double value ) {
 /* Similarly, if a seconds field is required, first add an appropriate
    non-letter field separator if needed. */
          if ( sec ) {
-            if ( ( sep != 'l' && sep != 'g' ) && ( dh || min ) ) buff[ pos++ ] = sep;
+            if ( ( sep != 'l' && sep != 'g' ) && ( dh || min ) ) dhmsformat_buff[ pos++ ] = sep;
 
 /* Then format the seconds field with a leading zero to make it two
    digits if necessary. */
-            pos += sprintf( buff + pos, "%0*.0f",
+            pos += sprintf( dhmsformat_buff + pos, "%0*.0f",
                             ( dh || min || lead_zero ) ? 2 : 1, isec );
          }
 
@@ -1668,35 +1735,32 @@ static const char *DHmsFormat( const char *fmt, int digs, double value ) {
    integer representation of the correctly rounded fractional part,
    padded with leading zeros if necessary. */
          if ( ndp > 0 ) {
-            buff[ pos++ ] = '.';
-            pos += sprintf( buff + pos, "%0*.0f", ndp, ifract );
+            dhmsformat_buff[ pos++ ] = '.';
+            pos += sprintf( dhmsformat_buff + pos, "%0*.0f", ndp, ifract );
          }
 
 /* If letters are being used as separators, append the appropriate one
    to the final field. */
          if ( sep == 'l' ) {
-            buff[ pos++ ] = ( sec ? 's' : ( min ? 'm' :
+            dhmsformat_buff[ pos++ ] = ( sec ? 's' : ( min ? 'm' :
                                                   ( as_time ? 'h' : 'd' ) ) );
          } else if ( sep == 'g' ) {
-            pos += sprintf( buff + pos, "%s", 
+            pos += sprintf( dhmsformat_buff + pos, "%s", 
                 as_time ? ( sec ? gs_delim : ( min ? gm_delim : gh_delim ) ) : 
                           ( sec ? gas_delim : ( min ? gam_delim : gd_delim ) ) );
          }
 
 /* Terminate the result string and return a pointer to it. */
-         buff[ pos ] = '\0';
-         result = buff;
+         dhmsformat_buff[ pos ] = '\0';
+         result = dhmsformat_buff;
       }
    }
 
 /* Return the result. */
    return result;
-
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
 
-static double DHmsGap( const char *fmt, int digs, double gap, int *ntick ) {
+static double DHmsGap( const char *fmt, int digs, double gap, int *ntick, int *status ) {
 /*
 *  Name:
 *     DHmsGap
@@ -1709,7 +1773,7 @@ static double DHmsGap( const char *fmt, int digs, double gap, int *ntick ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     double DHmsGap( const char *fmt, int digs, double gap, int *ntick )
+*     double DHmsGap( const char *fmt, int digs, double gap, int *ntick, int *status )
 
 *  Class Membership:
 *     SkyAxis member function.
@@ -1737,6 +1801,8 @@ static double DHmsGap( const char *fmt, int digs, double gap, int *ntick ) {
 *     ntick
 *        Address of an int in which to return a convenient number of
 *        divisions into which the gap can be divided.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The nice gap size.
@@ -1802,7 +1868,7 @@ static double DHmsGap( const char *fmt, int digs, double gap, int *ntick ) {
    
 /* Parse the format specifier. */
       ParseDHmsFormat( fmt, digs, &sep, &plus, &lead_zero, &as_time, &dh, &min,
-                       &sec, &ndp );
+                       &sec, &ndp, status );
 
 /* If OK, calculate the value of each formatted field in radians. */
       if ( astOK ) {
@@ -2002,7 +2068,7 @@ static double DHmsGap( const char *fmt, int digs, double gap, int *ntick ) {
 #undef BUFF_LEN
 }
 
-static const char *DHmsUnit( const char *fmt, int digs, int output ) {
+static const char *DHmsUnit( const char *fmt, int digs, int output, int *status ) {
 /*
 *  Name:
 *     DHmsUnit
@@ -2015,7 +2081,7 @@ static const char *DHmsUnit( const char *fmt, int digs, int output ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     const char *DHmsUnit( const char *fmt, int digs, int output )
+*     const char *DHmsUnit( const char *fmt, int digs, int output, int *status )
 
 *  Class Membership:
 *     SkyAxis member function.
@@ -2046,6 +2112,8 @@ static const char *DHmsUnit( const char *fmt, int digs, int output ) {
 *        If zero, the returned string will be in a form suitable for
 *        describing a suggested input format, which will subsequently
 *        be read using AxisUnformat.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to a null terminated string containing the unit description.
@@ -2060,10 +2128,8 @@ static const char *DHmsUnit( const char *fmt, int digs, int output ) {
 *     reason.
 */
 
-/* Local Constants: */
-#define BUFF_LEN 17              /* Max. characters in result string */
-
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    char dpchar;                  /* Character to indicate decimal places */
    char sep;                     /* Field separator character */
    const char *result;           /* Pointer to result string */
@@ -2077,7 +2143,6 @@ static const char *DHmsUnit( const char *fmt, int digs, int output ) {
    int plus;                     /* Leading plus sign required? */
    int pos;                      /* Position to add next character */
    int sec;                      /* Seconds field required? */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for result string */
 
 /* Initialise. */
    result = NULL;
@@ -2085,9 +2150,12 @@ static const char *DHmsUnit( const char *fmt, int digs, int output ) {
 /* Check the global error status. */
    if ( !astOK ) return result;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
 /* Parse the format specifier. */
    ParseDHmsFormat( fmt, digs, &sep, &plus, &lead_zero, &as_time, &dh, &min, 
-                    &sec, &ndp );
+                    &sec, &ndp, status );
 
 /* If the units string is required to describe formatted output and
    the field separators are letters (e.g. giving "01h23m45s" or
@@ -2125,24 +2193,24 @@ static const char *DHmsUnit( const char *fmt, int digs, int output ) {
 /* Start with the "ddd" or "hh" field, if required, and update the
    decimal places character appropriately. */
          if ( dh ) {
-            pos += sprintf( buff, "%s", as_time ? "hh" : "ddd" );
+            pos += sprintf( dhmsunit_buff, "%s", as_time ? "hh" : "ddd" );
             dpchar = as_time ? 'h' : 'd';
          }
 
 /* If a minutes field is present, add a separator if necessary and
    "mm" and update the decimal places character. */
          if ( min ) {
-            if ( dh ) buff[ pos++ ] = sep;
-            buff[ pos++ ] = 'm';
-            buff[ pos++ ] = 'm';
+            if ( dh ) dhmsunit_buff[ pos++ ] = sep;
+            dhmsunit_buff[ pos++ ] = 'm';
+            dhmsunit_buff[ pos++ ] = 'm';
             dpchar = 'm';
          }
 
 /* Repeat this process for the seconds field, if present. */
          if ( sec ) {
-            if ( dh || min ) buff[ pos++ ] = sep;
-            buff[ pos++ ] = 's';
-            buff[ pos++ ] = 's';
+            if ( dh || min ) dhmsunit_buff[ pos++ ] = sep;
+            dhmsunit_buff[ pos++ ] = 's';
+            dhmsunit_buff[ pos++ ] = 's';
             dpchar = 's';
          }
 
@@ -2150,36 +2218,33 @@ static const char *DHmsUnit( const char *fmt, int digs, int output ) {
    add further instances of the decimal places character to represent
    the digits that follow. */
          if ( ndp > 0 ) {
-            buff[ pos++ ] = '.';
+            dhmsunit_buff[ pos++ ] = '.';
             for ( dp = 0; dp < ndp; dp++ ) {
                if ( dp < maxdp ) {
-                  buff[ pos++ ] = dpchar;
+                  dhmsunit_buff[ pos++ ] = dpchar;
 
 /* After showing the maximum number of decimal places, simply add an
    ellipsis and quit (otherwise the result gets boring to look at). */
                } else {
-                  buff[ pos - 1 ] = '.';
-                  buff[ pos - 2 ] = '.';
-                  buff[ pos - 3 ] = '.';
+                  dhmsunit_buff[ pos - 1 ] = '.';
+                  dhmsunit_buff[ pos - 2 ] = '.';
+                  dhmsunit_buff[ pos - 3 ] = '.';
                   break;
                }
 	    }
          }
 
 /* Terminate the result string and return a pointer to it. */
-         buff[ pos ] = '\0';
-         result = buff;
+         dhmsunit_buff[ pos ] = '\0';
+         result = dhmsunit_buff;
       }
    }
 
 /* Return the result. */
    return result;
-
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
 
-static int GetObjSize( AstObject *this_object ) {
+static int GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -2192,7 +2257,7 @@ static int GetObjSize( AstObject *this_object ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     int GetObjSize( AstObject *this ) 
+*     int GetObjSize( AstObject *this, int *status ) 
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the astGetObjSize protected
@@ -2205,6 +2270,8 @@ static int GetObjSize( AstObject *this_object ) {
 *  Parameters:
 *     this
 *        Pointer to the SkyAxis.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Object size, in bytes.
@@ -2230,7 +2297,7 @@ static int GetObjSize( AstObject *this_object ) {
 /* Invoke the GetObjSize method inherited from the parent class, and then
    add on any components of the class structure defined by thsi class
    which are stored in dynamically allocated memory. */
-   result = (*parent_getobjsize)( this_object );
+   result = (*parent_getobjsize)( this_object, status );
    result += astTSizeOf( this->skyformat );
 
 /* If an error occurred, clear the result value. */
@@ -2240,7 +2307,7 @@ static int GetObjSize( AstObject *this_object ) {
    return result;
 }
 
-static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+static const char *GetAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     GetAttrib
@@ -2253,7 +2320,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     const char *GetAttrib( AstObject *this, const char *attrib )
+*     const char *GetAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the protected astGetAttrib
@@ -2270,6 +2337,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string containing the name of
 *        the attribute whose value is required. This name should be in
 *        lower case, with all white space removed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     - Pointer to a null-terminated string containing the attribute
@@ -2287,16 +2356,13 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *     reason.
 */
 
-/* Local Constants: */
-#define BUFF_LEN 50              /* Max. characters in result buffer */
-
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstSkyAxis *this;             /* Pointer to the SkyAxis structure */
    const char *result;           /* Pointer value to return */
    int as_time;                  /* AsTime attribute value */
    int centrezero;               /* CentreZero attribute value */
    int is_latitude;              /* IsLatitude attribute value */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
    result = NULL;
@@ -2304,12 +2370,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Check the global error status. */   
    if ( !astOK ) return result;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this_object);
+
 /* Obtain a pointer to the SkyAxis structure. */
    this = (AstSkyAxis *) this_object;
 
 /* Compare "attrib" with each recognised attribute name in turn,
    obtaining the value of the required attribute. If necessary, write
-   the value into "buff" as a null-terminated string in an appropriate
+   the value into "getattrib_buff" as a null-terminated string in an appropriate
    format.  Set "result" to point at the result string. */
 
 /* AsTime. */
@@ -2317,8 +2386,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    if ( !strcmp( attrib, "astime" ) ) {
       as_time = astGetAxisAsTime( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", as_time );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", as_time );
+         result = getattrib_buff;
       }
 
 /* IsLatitude. */
@@ -2326,8 +2395,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "islatitude" ) ) {
       is_latitude = astGetAxisIsLatitude( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", is_latitude );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", is_latitude );
+         result = getattrib_buff;
       }
 
 /* CentreZero. */
@@ -2335,24 +2404,21 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "centrezero" ) ) {
       centrezero= astGetAxisCentreZero( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", centrezero );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", centrezero );
+         result = getattrib_buff;
       }
 
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_getattrib)( this_object, attrib );
+      result = (*parent_getattrib)( this_object, attrib, status );
    }
 
 /* Return the result. */
    return result;
-
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
 
-static double GetAxisBottom( AstAxis *this_axis ) {
+static double GetAxisBottom( AstAxis *this_axis, int *status ) {
 /*
 *  Name:
 *     GetAxisBottom
@@ -2365,7 +2431,7 @@ static double GetAxisBottom( AstAxis *this_axis ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     double GetAxisBottom( AstAxis *this )
+*     double GetAxisBottom( AstAxis *this, int *status )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the astGetAxisBottom method
@@ -2378,6 +2444,8 @@ static double GetAxisBottom( AstAxis *this_axis ) {
 *  Parameters:
 *     this
 *        Pointer to the SkyAxis.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The atribute value. A suitable default value is supplied if necessary.
@@ -2400,7 +2468,7 @@ static double GetAxisBottom( AstAxis *this_axis ) {
 /* Check if a value has been set for the Bottom attribute. If so, obtain
    this value. */
    if ( astTestAxisBottom( this ) ) {
-      result = (*parent_getaxisbottom)( this_axis );
+      result = (*parent_getaxisbottom)( this_axis, status );
 
 /* Otherwise, supply a default of -pi/2 for latitude axes, and -DBL_MAX
    for longitude axes. */
@@ -2415,7 +2483,7 @@ static double GetAxisBottom( AstAxis *this_axis ) {
    return result;
 }
 
-static double GetAxisTop( AstAxis *this_axis ) {
+static double GetAxisTop( AstAxis *this_axis, int *status ) {
 /*
 *  Name:
 *     GetAxisTop
@@ -2428,7 +2496,7 @@ static double GetAxisTop( AstAxis *this_axis ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     double GetAxisTop( AstAxis *this )
+*     double GetAxisTop( AstAxis *this, int *status )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the astGetAxisTop method
@@ -2441,6 +2509,8 @@ static double GetAxisTop( AstAxis *this_axis ) {
 *  Parameters:
 *     this
 *        Pointer to the SkyAxis.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The atribute value. A suitable default value is supplied if necessary.
@@ -2463,7 +2533,7 @@ static double GetAxisTop( AstAxis *this_axis ) {
 /* Check if a value has been set for the Top attribute. If so, obtain
    this value. */
    if ( astTestAxisTop( this ) ) {
-      result = (*parent_getaxistop)( this_axis );
+      result = (*parent_getaxistop)( this_axis, status );
 
 /* Otherwise, supply a default of pi/2 for latitude axes, and DBL_MAX
    for longitude axes. */
@@ -2478,7 +2548,7 @@ static double GetAxisTop( AstAxis *this_axis ) {
    return result;
 }
  
-static int GetAxisDirection( AstAxis *this_axis ) {
+static int GetAxisDirection( AstAxis *this_axis, int *status ) {
 /*
 *  Name:
 *     GetAxisDirection
@@ -2491,7 +2561,7 @@ static int GetAxisDirection( AstAxis *this_axis ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     int GetAxisDirection( AstAxis *this )
+*     int GetAxisDirection( AstAxis *this, int *status )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the astGetAxisDirection method
@@ -2506,6 +2576,8 @@ static int GetAxisDirection( AstAxis *this_axis ) {
 *  Parameters:
 *     this
 *        Pointer to the SkyAxis.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Zero or one, according to the attribute setting. A suitable default
@@ -2529,7 +2601,7 @@ static int GetAxisDirection( AstAxis *this_axis ) {
 /* Check if a value has been set for the Direction attribute. If so, obtain
    this value. */
    if ( astTestAxisDirection( this ) ) {
-      result = (*parent_getaxisdirection)( this_axis );
+      result = (*parent_getaxisdirection)( this_axis, status );
 
 /* Otherwise, supply a default of 1 unless the SkyAxis values are being
    formatted as times (instead of angles) by default. */
@@ -2544,7 +2616,7 @@ static int GetAxisDirection( AstAxis *this_axis ) {
    return result;
 }
 
-static const char *GetAxisFormat( AstAxis *this_axis ) {
+static const char *GetAxisFormat( AstAxis *this_axis, int *status ) {
 /*
 *  Name:
 *     GetAxisFormat
@@ -2557,7 +2629,7 @@ static const char *GetAxisFormat( AstAxis *this_axis ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     const char *GetAxisFormat( AstAxis *this )
+*     const char *GetAxisFormat( AstAxis *this, int *status )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the astGetAxisFormat method inherited
@@ -2574,6 +2646,8 @@ static const char *GetAxisFormat( AstAxis *this_axis ) {
 *  Parameters:
 *     this
 *        Pointer to the SkyAxis.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the Format string (null terminated).
@@ -2589,18 +2663,18 @@ static const char *GetAxisFormat( AstAxis *this_axis ) {
 *     global error status set, or if it should fail for any reason.
 */
 
-/* Local Constants: */
-#define BUFF_LEN 50              /* Max. characters in result string */
-
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstSkyAxis *this;             /* Pointer to the SkyAxis structure */
    const char *result;           /* Pointer to result string */
    int as_time;                  /* Format SkyAxis values as times? */
    int digits;                   /* Number of digits of precision */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for result string */
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this_axis);
 
 /* Initialise. */
    result = NULL;
@@ -2638,8 +2712,8 @@ static const char *GetAxisFormat( AstAxis *this_axis ) {
 
 /* Construct the Format string in a buffer if necessary. */
             } else {
-               (void) sprintf( buff, "hms.%d", digits - 6 );
-               result = buff;
+               (void) sprintf( getaxisformat_buff, "hms.%d", digits - 6 );
+               result = getaxisformat_buff;
    	    }
 
 /* Similarly, select a Format for expressing an angle if necessary. */
@@ -2655,8 +2729,8 @@ static const char *GetAxisFormat( AstAxis *this_axis ) {
    	    } else if ( digits == 7 ) {
                result = "dms";
             } else {
-               (void) sprintf( buff, "dms.%d", digits - 7 );
-               result = buff;
+               (void) sprintf( getaxisformat_buff, "dms.%d", digits - 7 );
+               result = getaxisformat_buff;
    	    }
 	 }
       }
@@ -2664,12 +2738,9 @@ static const char *GetAxisFormat( AstAxis *this_axis ) {
 
 /* Return the result. */
    return result;   
-
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
 
-static const char *GetAxisLabel( AstAxis *this_axis ) {
+static const char *GetAxisLabel( AstAxis *this_axis, int *status ) {
 /*
 *  Name:
 *     GetAxisLabel
@@ -2682,7 +2753,7 @@ static const char *GetAxisLabel( AstAxis *this_axis ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     const char *GetAxisLabel( AstAxis *this )
+*     const char *GetAxisLabel( AstAxis *this, int *status )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the astGetAxisLabel method inherited
@@ -2698,6 +2769,8 @@ static const char *GetAxisLabel( AstAxis *this_axis ) {
 *  Parameters:
 *     this
 *        Pointer to the SkyAxis.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the Label string (null terminated).
@@ -2730,7 +2803,7 @@ static const char *GetAxisLabel( AstAxis *this_axis ) {
 /* Test if the Label attribute is set. If so, use the parent astGetAxisLabel
    method to get a pointer to it. */
    if ( astTestAxisLabel( this ) ) {
-      result = (*parent_getaxislabel)( this_axis );
+      result = (*parent_getaxislabel)( this_axis, status );
 
 /* Otherwise, return a pointer to a suitable default string, using the result
    of the astGetAxisAsTime method to determine whether a string describing
@@ -2756,7 +2829,7 @@ static const char *GetAxisLabel( AstAxis *this_axis ) {
    return result;
 }
 
-static const char *GetAxisSymbol( AstAxis *this_axis ) {
+static const char *GetAxisSymbol( AstAxis *this_axis, int *status ) {
 /*
 *  Name:
 *     GetAxisSymbol
@@ -2769,7 +2842,7 @@ static const char *GetAxisSymbol( AstAxis *this_axis ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     const char *GetAxisSymbol( AstAxis *this )
+*     const char *GetAxisSymbol( AstAxis *this, int *status )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the astGetAxisSymbol method inherited
@@ -2785,6 +2858,8 @@ static const char *GetAxisSymbol( AstAxis *this_axis ) {
 *  Parameters:
 *     this
 *        Pointer to the SkyAxis.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the Symbol string (null terminated).
@@ -2816,7 +2891,7 @@ static const char *GetAxisSymbol( AstAxis *this_axis ) {
 /* Test if the Symbol attribute is set. If so, use the parent astGetAxisSymbol
    method to get a pointer to it. */
    if ( astTestAxisSymbol( this ) ) {
-      result = (*parent_getaxissymbol)( this_axis );
+      result = (*parent_getaxissymbol)( this_axis, status );
 
 /* If a value has been set for the IsLatitude attribute, use it to decide
    whether to use "delta" (for latitude) or "alpha" (for longitude). */
@@ -2837,7 +2912,7 @@ static const char *GetAxisSymbol( AstAxis *this_axis ) {
    return result;
 }
 
-static const char *GetAxisUnit( AstAxis *this_axis ) {
+static const char *GetAxisUnit( AstAxis *this_axis, int *status ) {
 /*
 *  Name:
 *     GetAxisUnit
@@ -2850,7 +2925,7 @@ static const char *GetAxisUnit( AstAxis *this_axis ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     const char *GetAxisUnit( AstAxis *this )
+*     const char *GetAxisUnit( AstAxis *this, int *status )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the astGetAxisUnit method inherited
@@ -2865,6 +2940,8 @@ static const char *GetAxisUnit( AstAxis *this_axis ) {
 *  Parameters:
 *     this
 *        Pointer to the SkyAxis.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the Unit string (null terminated).
@@ -2897,14 +2974,14 @@ static const char *GetAxisUnit( AstAxis *this_axis ) {
 /* Test if the Unit attribute is set. If so, invoke the parent astGetAxisUnit
    method to obtain a pointer to it. */
    if ( astTestAxisUnit( this ) ) {
-      result = (*parent_getaxisunit)( this_axis );
+      result = (*parent_getaxisunit)( this_axis, status );
 
 /* If we must provide a default, obtain a pointer to the format specifier used
    to format SkyAxis values. Use a private member function (not a method) to
    access this, in case derived classes have extended the syntax of this
    string. */
    } else {
-      fmt = GetAxisFormat( this_axis );
+      fmt = GetAxisFormat( this_axis, status );
 
 /* If the format string starts with a percent, use "rad" as the default units 
    string. Otherwise, use the format specifier to generate a matching
@@ -2913,7 +2990,7 @@ static const char *GetAxisUnit( AstAxis *this_axis ) {
          if( fmt[ 0 ] == '%' ) {
             result = "rad";
          } else { 
-            result = DHmsUnit( fmt, astGetAxisDigits( this_axis ), 1 );
+            result = DHmsUnit( fmt, astGetAxisDigits( this_axis ), 1, status );
          }
       }
    }
@@ -2922,7 +2999,7 @@ static const char *GetAxisUnit( AstAxis *this_axis ) {
    return result;
 }
 
-void astInitSkyAxisVtab_(  AstSkyAxisVtab *vtab, const char *name ) {
+void astInitSkyAxisVtab_(  AstSkyAxisVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -2959,12 +3036,16 @@ void astInitSkyAxisVtab_(  AstSkyAxisVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstAxisVtab *axis;            /* Pointer to Axis component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    int stat;                     /* SLALIB status */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -2973,8 +3054,8 @@ void astInitSkyAxisVtab_(  AstSkyAxisVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsASkyAxis) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -3055,17 +3136,23 @@ void astInitSkyAxisVtab_(  AstSkyAxisVtab *vtab, const char *name ) {
    astSetCopy( vtab, Copy );
    astSetDump( vtab, Dump, "SkyAxis", "Celestial coordinate axis" );
 
-/* Initialize constants for converting between hours, degrees and
-   radians. */
+/* Initialize constants for converting between hours, degrees and radians. */
+   LOCK_MUTEX2
    palSlaDtf2r( 1, 0, 0.0, &hr2rad, &stat );
    palSlaDaf2r( 1, 0, 0.0, &deg2rad, &stat );
    palSlaDaf2r( 180, 0, 0.0, &pi, &stat );
    piby2 = 0.5*pi;
+   UNLOCK_MUTEX2
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
 static void ParseDHmsFormat( const char *fmt, int digs, char *sep, int *plus,
                              int *lead_zero, int *as_time, int *dh, int *min,
-                             int *sec, int *ndp ) {
+                             int *sec, int *ndp, int *status ) {
 /*
 *  Name:
 *     ParseDHmsFormat
@@ -3080,7 +3167,7 @@ static void ParseDHmsFormat( const char *fmt, int digs, char *sep, int *plus,
 *     #include "skyaxis.h"
 *     void ParseDHmsFormat( const char *fmt, int digs, char *sep, int *plus,
 *                           int *lead_zero, int *as_time, int *dh, int *min,
-*                           int *sec, int *ndp )
+*                           int *sec, int *ndp, int *status )
 
 *  Class Membership:
 *     SkyAxis member function.
@@ -3138,6 +3225,8 @@ static void ParseDHmsFormat( const char *fmt, int digs, char *sep, int *plus,
 *        required following the decimal point in the final field. A
 *        value of zero indicates that the decimal point should be
 *        omitted. See parameter "digs".
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -3272,7 +3361,7 @@ static void ParseDHmsFormat( const char *fmt, int digs, char *sep, int *plus,
    }
 }
 
-static void SetAttrib( AstObject *this_object, const char *setting ) {
+static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
 *     SetAttrib
@@ -3285,7 +3374,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     void SetAttrib( AstObject *this, const char *setting )
+*     void SetAttrib( AstObject *this, const char *setting, int *status )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the astSetAttrib method
@@ -3311,6 +3400,8 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 *     setting
 *        Pointer to a null terminated string specifying the new
 *        attribute value.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -3360,11 +3451,11 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Pass any unrecognised attribute setting to the parent method for further
    interpretation. */
    } else {
-      (*parent_setattrib)( this_object, setting );
+      (*parent_setattrib)( this_object, setting, status );
    }
 }
 
-static void SetAxisFormat( AstAxis *this_axis, const char *format ) {
+static void SetAxisFormat( AstAxis *this_axis, const char *format, int *status ) {
 /*
 *  Name:
 *     SetAxisFormat
@@ -3414,7 +3505,7 @@ static void SetAxisFormat( AstAxis *this_axis, const char *format ) {
                                strlen( format ) + (size_t) 1 );
 }
 
-static int TestAttrib( AstObject *this_object, const char *attrib ) {
+static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     TestAttrib
@@ -3427,7 +3518,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     int TestAttrib( AstObject *this, const char *attrib )
+*     int TestAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the astTestAttrib protected
@@ -3444,6 +3535,8 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if a value has been set, otherwise zero.
@@ -3486,14 +3579,14 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_testattrib)( this_object, attrib );
+      result = (*parent_testattrib)( this_object, attrib, status );
    }
 
 /* Return the result, */
    return result;
 }
 
-static int TestAxisFormat( AstAxis *this_axis ) {
+static int TestAxisFormat( AstAxis *this_axis, int *status ) {
 /*
 *  Name:
 *     TestAxisFormat
@@ -3506,7 +3599,7 @@ static int TestAxisFormat( AstAxis *this_axis ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     int TestAxisFormat( AstAxis *this )
+*     int TestAxisFormat( AstAxis *this, int *status )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the astTestAxisFormat method
@@ -3519,6 +3612,8 @@ static int TestAxisFormat( AstAxis *this_axis ) {
 *  Parameters:
 *     this
 *        Pointer to the SkyAxis.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Zero if no Format value has been set, otherwise one.
@@ -3546,7 +3641,7 @@ static int TestAxisFormat( AstAxis *this_axis ) {
 }
 
 static int AxisUnformat( AstAxis *this_axis, const char *string,
-                         double *value ) {
+                         double *value, int *status ) {
 /*
 *  Name:
 *     AxisUnformat
@@ -3559,7 +3654,7 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     int AxisUnformat( AstAxis *axis, const char *string, double *value )
+*     int AxisUnformat( AstAxis *axis, const char *string, double *value, int *status )
 
 *  Class Membership:
 *     SkyAxis member function (over-rides the astAxisUnformat method
@@ -3580,6 +3675,8 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
 *     value
 *        Pointer to a double in which the coordinate value read will be
 *        returned (in radians).
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The number of characters read from the string to obtain the
@@ -3676,15 +3773,15 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
    the parent AxisUnformat method inherited from the Axis class. Use 
    a private method to obtain the Format string, in case the syntax has been 
    over-ridden by a derived class. */
-   fmt = GetAxisFormat( this_axis );
+   fmt = GetAxisFormat( this_axis, status );
    if( fmt && fmt[0] == '%' ) {
-      nc = (*parent_axisunformat)( this_axis, string, value );
+      nc = (*parent_axisunformat)( this_axis, string, value, status );
    
 /* Otherwise, parse it to determine the default choice of input format. */
    } else if( astOK ){
       digs = astGetAxisDigits( this_axis );
       ParseDHmsFormat( fmt, digs, &fmtsep, &plus, &lead_zero, &as_time, &dh,
-                       &min, &sec, &ndp );
+                       &min, &sec, &ndp, status );
 
 /* Initialise a pointer into the string and advance it to the first
    non-white space character. Save a copy of this pointer. */
@@ -4041,7 +4138,7 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
                            }
                         }
                         astError( AST__UNFER, "Invalid %s%s value in sky "
-                                  "coordinate \"%.*s\".", as_time ? "" : "arc",
+                                  "coordinate \"%.*s\".", status, as_time ? "" : "arc",
                                   ( field_id[ ifield ] == 2 ) ? "minutes" :
                                                                 "seconds",
                                   len, string_start );
@@ -4123,7 +4220,7 @@ astMAKE_TEST(SkyAxis,AxisCentreZero,( this->centrezero != -INT_MAX ))
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -4135,7 +4232,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for SkyAxis objects.
@@ -4145,6 +4242,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the object to be copied.
 *     objout
 *        Pointer to the object being constructed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -4180,7 +4279,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -4192,7 +4291,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for SkyAxis objects.
@@ -4200,6 +4299,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the object to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -4221,7 +4322,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -4233,7 +4334,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -4244,6 +4345,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the SkyAxis whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -4280,30 +4383,30 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* We must write out the Format value stored locally as it over-rides
    that provided by the Axis class. */
    this_axis = (AstAxis *) this;
-   set = TestAxisFormat( this_axis );
-   sval = set ? GetAxisFormat( this_axis ) : astGetAxisFormat( this );
+   set = TestAxisFormat( this_axis, status );
+   sval = set ? GetAxisFormat( this_axis, status ) : astGetAxisFormat( this );
    astWriteString( channel, "Format", set, 0, sval, "Format specifier" );
 
 /* IsLatitude. */
 /* ----------- */
-   set = TestAxisIsLatitude( this );
-   ival = set ? GetAxisIsLatitude( this ) : astGetAxisIsLatitude( this );
+   set = TestAxisIsLatitude( this, status );
+   ival = set ? GetAxisIsLatitude( this, status ) : astGetAxisIsLatitude( this );
    astWriteInt( channel, "IsLat", set, 0, ival,
                 ival ? "Latitude axis (not longitude)" :
                        "Longitude axis (not latitude)" );
 
 /* CentreZero. */
 /* ----------- */
-   set = TestAxisCentreZero( this );
-   ival = set ? GetAxisCentreZero( this ) : astGetAxisCentreZero( this );
+   set = TestAxisCentreZero( this, status );
+   ival = set ? GetAxisCentreZero( this, status ) : astGetAxisCentreZero( this );
    astWriteInt( channel, "CnZer", set, 0, ival,
                 ival ? "Display axis values in range -PI -> +PI" :
                        "Display axis values in range 0 -> 2.PI" );
 
 /* AsTime. */
 /* ------- */
-   set = TestAxisAsTime( this );
-   ival = set ? GetAxisAsTime( this ) : astGetAxisAsTime( this );
+   set = TestAxisAsTime( this, status );
+   ival = set ? GetAxisAsTime( this, status ) : astGetAxisAsTime( this );
    astWriteInt( channel, "AsTime", set, 0, ival,
                 ival ? "Display values as times (not angles)" :
                        "Display values as angles (not times)" );
@@ -4313,10 +4416,10 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsASkyAxis and astCheckSkyAxis functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(SkyAxis,Axis,check,&class_init)
+astMAKE_ISA(SkyAxis,Axis,check,&class_check)
 astMAKE_CHECK(SkyAxis)
 
-AstSkyAxis *astSkyAxis_( const char *options, ... ) {
+AstSkyAxis *astSkyAxis_( const char *options, int *status, ...) {
 /*
 *+
 *  Name:
@@ -4330,7 +4433,7 @@ AstSkyAxis *astSkyAxis_( const char *options, ... ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     AstSkyAxis *astSkyAxis( const char *options, ... )
+*     AstSkyAxis *astSkyAxis( const char *options, int *status, ... )
 
 *  Class Membership:
 *     SkyAxis constructor.
@@ -4346,6 +4449,8 @@ AstSkyAxis *astSkyAxis_( const char *options, ... ) {
 *        initialising the new SkyAxis. The syntax used is the same as for the
 *        astSet method and may include "printf" format specifiers identified
 *        by "%" symbols in the normal way.
+*     status
+*        Pointer to the inherited status variable.
 *     ...
 *        If the "options" string contains "%" format specifiers, then an
 *        optional list of arguments may follow it in order to supply values to
@@ -4363,8 +4468,12 @@ AstSkyAxis *astSkyAxis_( const char *options, ... ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstSkyAxis *new;              /* Pointer to new SkyAxis */
    va_list args;                 /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
@@ -4382,7 +4491,7 @@ AstSkyAxis *astSkyAxis_( const char *options, ... ) {
 /* Obtain the variable argument list and pass it along with the
    options string to the astVSet method to initialise the new SkyAxis'
    attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -4433,8 +4542,17 @@ AstSkyAxis *astSkyAxisId_( const char *options, ... ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstSkyAxis *new;              /* Pointer to new SkyAxis */
    va_list args;                 /* Variable argument list */
+
+   int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
@@ -4465,7 +4583,7 @@ AstSkyAxis *astSkyAxisId_( const char *options, ... ) {
 }
 
 AstSkyAxis *astInitSkyAxis_( void *mem, size_t size, int init,
-                             AstSkyAxisVtab *vtab, const char *name ) {
+                             AstSkyAxisVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -4563,7 +4681,7 @@ AstSkyAxis *astInitSkyAxis_( void *mem, size_t size, int init,
 
 AstSkyAxis *astLoadSkyAxis_( void *mem, size_t size,
                              AstSkyAxisVtab *vtab, const char *name,
-                             AstChannel *channel ) {
+                             AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -4638,6 +4756,7 @@ AstSkyAxis *astLoadSkyAxis_( void *mem, size_t size,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstSkyAxis *new;              /* Pointer to the new SkyAxis */
 
 /* Initialise. */
@@ -4645,6 +4764,9 @@ AstSkyAxis *astLoadSkyAxis_( void *mem, size_t size,
 
 /* Check the global error status. */
    if ( !astOK ) return new;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* If a NULL virtual function table has been supplied, then this is
    the first loader to be invoked for this SkyAxis. In this case the
@@ -4691,21 +4813,21 @@ AstSkyAxis *astLoadSkyAxis_( void *mem, size_t size,
 /* IsLatitude. */
 /* ----------- */
       new->is_latitude = astReadInt( channel, "islat", -INT_MAX );
-      if ( TestAxisIsLatitude( new ) ) {
-         SetAxisIsLatitude( new, new->is_latitude );
+      if ( TestAxisIsLatitude( new, status ) ) {
+         SetAxisIsLatitude( new, new->is_latitude, status );
       }
 
 /* CentreZero. */
 /* ----------- */
       new->centrezero = astReadInt( channel, "cnzer", -INT_MAX );
-      if ( TestAxisCentreZero( new ) ) {
-         SetAxisCentreZero( new, new->centrezero );
+      if ( TestAxisCentreZero( new, status ) ) {
+         SetAxisCentreZero( new, new->centrezero, status );
       }
 
 /* AsTime. */
 /* ------- */
       new->as_time = astReadInt( channel, "astime", -INT_MAX );
-      if ( TestAxisAsTime( new ) ) SetAxisAsTime( new, new->as_time );
+      if ( TestAxisAsTime( new, status ) ) SetAxisAsTime( new, new->as_time, status );
 
 /* If an error occurred, clean up by deleting the new SkyAxis. */
       if ( !astOK ) new = astDelete( new );
@@ -4728,3 +4850,8 @@ AstSkyAxis *astLoadSkyAxis_( void *mem, size_t size,
    same interface. */
 
 /* (No more to define at present.) */
+
+
+
+
+

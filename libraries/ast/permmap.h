@@ -177,11 +177,29 @@ typedef struct AstPermMapVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   double *(* GetConstants)( AstPermMap * );
-   int *(* GetInPerm)( AstPermMap * );
-   int *(* GetOutPerm)( AstPermMap * );
+   double *(* GetConstants)( AstPermMap *, int * );
+   int *(* GetInPerm)( AstPermMap *, int * );
+   int *(* GetOutPerm)( AstPermMap *, int * );
 
 } AstPermMapVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstPermMapGlobals {
+   AstPermMapVtab Class_Vtab;
+   int Class_Init;
+} AstPermMapGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitPermMapGlobals_( AstPermMapGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -194,7 +212,7 @@ astPROTO_ISA(PermMap)            /* Test class membership */
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
 AstPermMap *astPermMap_( int, const int [], int, const int [],
-                         const double [], const char *, ... );
+                         const double [], const char *, int *, ...);
 #else
 AstPermMap *astPermMapId_( int, const int [], int, const int [],
                            const double [], const char *, ... );
@@ -205,22 +223,22 @@ AstPermMap *astPermMapId_( int, const int [], int, const int [],
 /* Initialiser. */
 AstPermMap *astInitPermMap_( void *, size_t, int, AstPermMapVtab *,
                              const char *, int, const int [], int,
-                             const int [], const double [] );
+                             const int [], const double [], int * );
 
 /* Vtab initialiser. */
-void astInitPermMapVtab_( AstPermMapVtab *, const char * );
+void astInitPermMapVtab_( AstPermMapVtab *, const char *, int * );
 
 /* Loader. */
 AstPermMap *astLoadPermMap_( void *, size_t, AstPermMapVtab *,
-                             const char *, AstChannel * );
+                             const char *, AstChannel *, int * );
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
-double *astGetConstants_( AstPermMap * );
-int *astGetInPerm_( AstPermMap * );
-int *astGetOutPerm_( AstPermMap * );
+double *astGetConstants_( AstPermMap *, int * );
+int *astGetInPerm_( AstPermMap *, int * );
+int *astGetOutPerm_( AstPermMap *, int * );
 #endif
 
 /* Function interfaces. */
@@ -253,13 +271,13 @@ int *astGetOutPerm_( AstPermMap * );
 
 /* Initialiser. */
 #define astInitPermMap(mem,size,init,vtab,name,nin,inperm,nout,outperm,constant) \
-astINVOKE(O,astInitPermMap_(mem,size,init,vtab,name,nin,inperm,nout,outperm,constant))
+astINVOKE(O,astInitPermMap_(mem,size,init,vtab,name,nin,inperm,nout,outperm,constant,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitPermMapVtab(vtab,name) astINVOKE(V,astInitPermMapVtab_(vtab,name))
+#define astInitPermMapVtab(vtab,name) astINVOKE(V,astInitPermMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadPermMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadPermMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadPermMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -269,9 +287,13 @@ astINVOKE(O,astLoadPermMap_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 
 #if defined(astCLASS)            /* Protected */
-#define astGetConstants(this) astINVOKE(V,astGetConstants_(astCheckPermMap(this)))
-#define astGetInPerm(this) astINVOKE(V,astGetInPerm_(astCheckPermMap(this)))
-#define astGetOutPerm(this) astINVOKE(V,astGetOutPerm_(astCheckPermMap(this)))
+#define astGetConstants(this) astINVOKE(V,astGetConstants_(astCheckPermMap(this),STATUS_PTR))
+#define astGetInPerm(this) astINVOKE(V,astGetInPerm_(astCheckPermMap(this),STATUS_PTR))
+#define astGetOutPerm(this) astINVOKE(V,astGetOutPerm_(astCheckPermMap(this),STATUS_PTR))
 #endif
 
 #endif
+
+
+
+

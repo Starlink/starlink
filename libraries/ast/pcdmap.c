@@ -94,8 +94,11 @@ f     The PcdMap class does not define any new routines beyond those
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory management facilities */
+#include "globals.h"             /* Thread-safe global data access */
 #include "object.h"              /* Base Object class */
 #include "pointset.h"            /* Sets of points/coordinates */
 #include "unitmap.h"             /* Unit mappings */
@@ -120,17 +123,49 @@ f     The PcdMap class does not define any new routines beyond those
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstPcdMapVtab class_vtab; /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
-static const char *(* parent_getattrib)( AstObject *, const char * );
-static int (* parent_testattrib)( AstObject *, const char * );
-static void (* parent_clearattrib)( AstObject *, const char * );
-static void (* parent_setattrib)( AstObject *, const char * );
+static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static const char *(* parent_getattrib)( AstObject *, const char *, int * );
+static int (* parent_testattrib)( AstObject *, const char *, int * );
+static void (* parent_clearattrib)( AstObject *, const char *, int * );
+static void (* parent_setattrib)( AstObject *, const char *, int * );
+
+/* Define macros for accessing each item of thread specific global data. */
+#ifdef THREAD_SAFE
+
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; \
+   globals->GetAttrib_Buff[ 0 ] = 0;
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(PcdMap)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(PcdMap,Class_Init)
+#define class_vtab astGLOBAL(PcdMap,Class_Vtab)
+#define getattrib_buff astGLOBAL(PcdMap,GetAttrib_Buff)
+
+
+
+/* If thread safety is not needed, declare and initialise globals at static 
+   variables. */ 
+#else
+
+static char getattrib_buff[ 101 ];
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstPcdMapVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -142,27 +177,27 @@ AstPcdMap *astPcdMapId_( double, const double [2], const char *, ... );
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static const char *GetAttrib( AstObject *, const char * );
-static double GetDisco( AstPcdMap * );
-static double GetPcdCen( AstPcdMap *, int );
-static int CanMerge( AstMapping *, AstMapping *, int, int );
-static int CanSwap( AstMapping *, AstMapping *, int, int );
-static int Equal( AstObject *, AstObject * );
-static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
-static int TestAttrib( AstObject *, const char * );
-static int TestDisco( AstPcdMap * );
-static int TestPcdCen( AstPcdMap *, int );
-static void ClearAttrib( AstObject *, const char * );
-static void ClearDisco( AstPcdMap * );
-static void ClearPcdCen( AstPcdMap *, int );
-static void Dump( AstObject *, AstChannel * );
-static void PcdPerm( AstMapping **, int *, int );
-static void PcdZoom( AstMapping **, int *, int );
-static void PermGet( AstPermMap *, int **, int **, double ** );
-static void SetAttrib( AstObject *, const char * );
-static void SetDisco( AstPcdMap *, double );
-static void SetPcdCen( AstPcdMap *, int, double );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static const char *GetAttrib( AstObject *, const char *, int * );
+static double GetDisco( AstPcdMap *, int * );
+static double GetPcdCen( AstPcdMap *, int, int * );
+static int CanMerge( AstMapping *, AstMapping *, int, int, int * );
+static int CanSwap( AstMapping *, AstMapping *, int, int, int * );
+static int Equal( AstObject *, AstObject *, int * );
+static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
+static int TestAttrib( AstObject *, const char *, int * );
+static int TestDisco( AstPcdMap *, int * );
+static int TestPcdCen( AstPcdMap *, int, int * );
+static void ClearAttrib( AstObject *, const char *, int * );
+static void ClearDisco( AstPcdMap *, int * );
+static void ClearPcdCen( AstPcdMap *, int, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void PcdPerm( AstMapping **, int *, int, int * );
+static void PcdZoom( AstMapping **, int *, int, int * );
+static void PermGet( AstPermMap *, int **, int **, double **, int * );
+static void SetAttrib( AstObject *, const char *, int * );
+static void SetDisco( AstPcdMap *, double, int * );
+static void SetPcdCen( AstPcdMap *, int, double, int * );
 
 /* Function Macros */
 /* =============== */
@@ -232,7 +267,7 @@ exceptions, so bad values are dealt with explicitly. */
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static void Clear##attr( AstPcdMap *this, int axis ) { \
+static void Clear##attr( AstPcdMap *this, int axis, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -240,7 +275,7 @@ static void Clear##attr( AstPcdMap *this, int axis ) { \
 /* Validate the axis index. */ \
    if( axis < 0 || axis >= nval ){ \
       astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
-                #attr " - it should be in the range 1 to %d.", \
+                #attr " - it should be in the range 1 to %d.", status, \
                 "astClear" #attr, astGetClass( this ), \
                 axis + 1, nval ); \
 \
@@ -252,13 +287,13 @@ static void Clear##attr( AstPcdMap *this, int axis ) { \
 \
 /* External interface. */ \
 /* ------------------- */ \
-void astClear##attr##_( AstPcdMap *this, int axis ) { \
+void astClear##attr##_( AstPcdMap *this, int axis, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
 \
 /* Invoke the required method via the virtual function table. */ \
-   (**astMEMBER(this,PcdMap,Clear##attr))( this, axis ); \
+   (**astMEMBER(this,PcdMap,Clear##attr))( this, axis, status ); \
 }   
 
 
@@ -321,7 +356,7 @@ void astClear##attr##_( AstPcdMap *this, int axis ) { \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static type Get##attr( AstPcdMap *this, int axis ) { \
+static type Get##attr( AstPcdMap *this, int axis, int *status ) { \
    type result;                  /* Result to be returned */ \
 \
 /* Initialise */ \
@@ -333,7 +368,7 @@ static type Get##attr( AstPcdMap *this, int axis ) { \
 /* Validate the axis index. */ \
    if( axis < 0 || axis >= nval ){ \
       astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
-                #attr " - it should be in the range 1 to %d.", \
+                #attr " - it should be in the range 1 to %d.", status, \
                 "astGet" #attr, astGetClass( this ), \
                 axis + 1, nval ); \
 \
@@ -350,13 +385,13 @@ static type Get##attr( AstPcdMap *this, int axis ) { \
 } \
 /* External interface. */ \
 /* ------------------- */  \
-type astGet##attr##_( AstPcdMap *this, int axis ) { \
+type astGet##attr##_( AstPcdMap *this, int axis, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return (bad_value); \
 \
 /* Invoke the required method via the virtual function table. */ \
-   return (**astMEMBER(this,PcdMap,Get##attr))( this, axis ); \
+   return (**astMEMBER(this,PcdMap,Get##attr))( this, axis, status ); \
 }
 
 /*
@@ -418,7 +453,7 @@ type astGet##attr##_( AstPcdMap *this, int axis ) { \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static void Set##attr( AstPcdMap *this, int axis, type value ) { \
+static void Set##attr( AstPcdMap *this, int axis, type value, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -426,7 +461,7 @@ static void Set##attr( AstPcdMap *this, int axis, type value ) { \
 /* Validate the axis index. */ \
    if( axis < 0 || axis >= nval ){ \
       astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
-                #attr " - it should be in the range 1 to %d.", \
+                #attr " - it should be in the range 1 to %d.", status, \
                 "astSet" #attr, astGetClass( this ), \
                 axis + 1, nval ); \
 \
@@ -438,13 +473,13 @@ static void Set##attr( AstPcdMap *this, int axis, type value ) { \
 \
 /* External interface. */ \
 /* ------------------- */ \
-void astSet##attr##_( AstPcdMap *this, int axis, type value ) { \
+void astSet##attr##_( AstPcdMap *this, int axis, type value, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
 \
 /* Invoke the required method via the virtual function table. */ \
-   (**astMEMBER(this,PcdMap,Set##attr))( this, axis, value ); \
+   (**astMEMBER(this,PcdMap,Set##attr))( this, axis, value, status ); \
 }
 
 /*
@@ -503,7 +538,7 @@ void astSet##attr##_( AstPcdMap *this, int axis, type value ) { \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static int Test##attr( AstPcdMap *this, int axis ) { \
+static int Test##attr( AstPcdMap *this, int axis, int *status ) { \
    int result;                   /* Value to return */ \
 \
 /* Initialise */ \
@@ -516,7 +551,7 @@ static int Test##attr( AstPcdMap *this, int axis ) { \
 /* Validate the axis index. */ \
    if( axis < 0 || axis >= nval ){ \
       astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
-                #attr " - it should be in the range 1 to %d.", \
+                #attr " - it should be in the range 1 to %d.", status, \
                 "astTest" #attr, astGetClass( this ), \
                 axis + 1, nval ); \
 \
@@ -533,18 +568,18 @@ static int Test##attr( AstPcdMap *this, int axis ) { \
 } \
 /* External interface. */ \
 /* ------------------- */ \
-int astTest##attr##_( AstPcdMap *this, int axis ) { \
+int astTest##attr##_( AstPcdMap *this, int axis, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return 0; \
 \
 /* Invoke the required method via the virtual function table. */ \
-   return (**astMEMBER(this,PcdMap,Test##attr))( this, axis ); \
+   return (**astMEMBER(this,PcdMap,Test##attr))( this, axis, status ); \
 }
 
 /* Member functions. */
 /* ================= */
-static int CanMerge( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
+static int CanMerge( AstMapping *map1, AstMapping *map2, int inv1, int inv2, int *status ){
 /*
 *
 *  Name:
@@ -558,7 +593,7 @@ static int CanMerge( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
 
 *  Synopsis:
 *     #include "pcdmap.h"
-*     int CanMerge( AstMapping *map1, AstMapping *map2, int inv1, int inv2 )
+*     int CanMerge( AstMapping *map1, AstMapping *map2, int inv1, int inv2, int *status )
 
 *  Class Membership:
 *     PcdMap internal utility function.
@@ -576,6 +611,8 @@ static int CanMerge( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
 *        The invert flag to use with the first mapping.
 *     inv2
 *        The invert flag to use with the second mapping.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     1 if the Mappings can be merged, zero otherwise.
@@ -664,7 +701,7 @@ static int CanMerge( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
    return astOK ? ret : 0;
 }
 
-static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
+static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2, int *status ){
 /*
 *  Name:
 *     CanSwap
@@ -677,7 +714,7 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
 
 *  Synopsis:
 *     #include "pcdmap.h"
-*     int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 )
+*     int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2, int *status )
 
 *  Class Membership:
 *     PcdMap member function 
@@ -700,6 +737,8 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
 *        mapping to be used.
 *     inv2
 *        The invert flag to use with map2. 
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     1 if the Mappings could be swapped, 0 otherwise.
@@ -772,7 +811,7 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
          if( nin == 2 && nout == 2 ) {
 
 /* Get the axis permutation arrays and constants array for the PermMap. */
-            PermGet( (AstPermMap *) nopcd, &outperm, &inperm, &consts );
+            PermGet( (AstPermMap *) nopcd, &outperm, &inperm, &consts, status );
             if( astOK ) {
 
 /* If the PermMap simply swaps the 2 axes (in both direction) we can
@@ -798,7 +837,7 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
    return astOK ? ret : 0;
 }
 
-static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     ClearAttrib
@@ -811,7 +850,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "pcdmap.h"
-*     void ClearAttrib( AstObject *this, const char *attrib )
+*     void ClearAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     PcdMap member function (over-rides the astClearAttrib protected
@@ -828,6 +867,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -868,11 +909,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      (*parent_clearattrib)( this_object, attrib );
+      (*parent_clearattrib)( this_object, attrib, status );
    }
 }
 
-static int Equal( AstObject *this_object, AstObject *that_object ) {
+static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
 *  Name:
 *     Equal
@@ -885,7 +926,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 *  Synopsis:
 *     #include "pcdmap.h"
-*     int Equal( AstObject *this, AstObject *that ) 
+*     int Equal( AstObject *this, AstObject *that, int *status ) 
 
 *  Class Membership:
 *     PcdMap member function (over-rides the astEqual protected
@@ -900,6 +941,8 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *        Pointer to the first Object (a PcdMap).
 *     that
 *        Pointer to the second Object.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if the PcdMaps are equivalent, zero otherwise.
@@ -948,7 +991,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
    return result;
 }
 
-static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+static const char *GetAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     GetAttrib
@@ -961,7 +1004,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "pcdmap.h"
-*     const char *GetAttrib( AstObject *this, const char *attrib )
+*     const char *GetAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     PcdMap member function (over-rides the protected astGetAttrib
@@ -978,6 +1021,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null terminated string containing the name of
 *        the attribute whose value is required. This name should be in
 *        lower case, with all white space removed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     - Pointer to a null terminated string containing the attribute
@@ -995,23 +1040,23 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *     reason.
 */
 
-/* Local Constants: */
-#define BUFF_LEN 50              /* Max. characters in result buffer */
-
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstPcdMap *this;              /* Pointer to the PcdMap structure */
    const char *result;           /* Pointer value to return */
    double dval;                  /* Double attribute value */
    int axis;                     /* Axis number */
    int len;                      /* Length of attrib string */
    int nc;                       /* No. characters read by astSscanf */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
    result = NULL;
 
 /* Check the global error status. */   
    if ( !astOK ) return result;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this_object);
 
 /* Obtain a pointer to the PcdMap structure. */
    this = (AstPcdMap *) this_object;
@@ -1021,7 +1066,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Compare "attrib" with each recognised attribute name in turn,
    obtaining the value of the required attribute. If necessary, write
-   the value into "buff" as a null terminated string in an appropriate
+   the value into "getattrib_buff" as a null terminated string in an appropriate
    format.  Set "result" to point at the result string. */
 
 /* Disco. */
@@ -1029,8 +1074,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    if ( !strcmp( attrib, "disco" ) ) {
       dval = astGetDisco( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* PcdCen(axis). */
@@ -1040,8 +1085,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
                && ( nc >= len ) ) {
       dval = astGetPcdCen( this, axis - 1 );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* PcdCen. */
@@ -1049,25 +1094,21 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "pcdcen" ) ) {
       dval = astGetPcdCen( this, 0 );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_getattrib)( this_object, attrib );
+      result = (*parent_getattrib)( this_object, attrib, status );
    }
 
 /* Return the result. */
    return result;
-
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
 
-
-void astInitPcdMapVtab_(  AstPcdMapVtab *vtab, const char *name ) {
+void astInitPcdMapVtab_(  AstPcdMapVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -1104,11 +1145,15 @@ void astInitPcdMapVtab_(  AstPcdMapVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -1117,8 +1162,8 @@ void astInitPcdMapVtab_(  AstPcdMapVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAPcdMap) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -1158,10 +1203,14 @@ void astInitPcdMapVtab_(  AstPcdMapVtab *vtab, const char *name ) {
 /* Declare the class dump function.*/
    astSetDump( vtab, Dump, "PcdMap", "Apply pincushion distortion" );
 
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
 static int MapMerge( AstMapping *this, int where, int series, int *nmap,
-                     AstMapping ***map_list, int **invert_list ) {
+                     AstMapping ***map_list, int **invert_list, int *status ) {
 /*
 *  Name:
 *     MapMerge
@@ -1175,7 +1224,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *  Synopsis:
 *     #include "mapping.h"
 *     int MapMerge( AstMapping *this, int where, int series, int *nmap,
-*                   AstMapping ***map_list, int **invert_list )
+*                   AstMapping ***map_list, int **invert_list, int *status )
 
 *  Class Membership:
 *     PcdMap method (over-rides the protected astMapMerge method
@@ -1278,6 +1327,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *        length, the "*invert_list" array will be extended (and its
 *        pointer updated) if necessary to accommodate any new
 *        elements.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     If simplification was possible, the function returns the index
@@ -1342,7 +1393,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    pointer, and indicate that the forward transformation of the returned
    UnitMap should be used. */
       (void) astAnnul( ( *map_list )[ where ] );
-      ( *map_list )[ where ] = (AstMapping *) astUnitMap( 2, "" );
+      ( *map_list )[ where ] = (AstMapping *) astUnitMap( 2, "", status );
       ( *invert_list )[ where ] = 0;
 
 /* Return the index of the first modified element. */
@@ -1367,7 +1418,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          if( class1 && CanMerge(  ( *map_list )[ where - 1 ], 
                                   ( *map_list )[ where ],
                                   ( *invert_list )[ where - 1 ], 
-                                  ( *invert_list )[ where ] ) ){
+                                  ( *invert_list )[ where ], status ) ){
             nclass = class1;
             i1 = where - 1;
             i2 = where;
@@ -1375,7 +1426,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          } else if( class2 && CanMerge(  ( *map_list )[ where ], 
                                   ( *map_list )[ where + 1 ],
                                   ( *invert_list )[ where ], 
-                                  ( *invert_list )[ where + 1 ] ) ){
+                                  ( *invert_list )[ where + 1 ], status ) ){
             nclass = class2;
             i1 = where;
             i2 = where + 1;
@@ -1391,7 +1442,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* If the neighbour is a PcdMap, it must be the inverse of the nominated
    Mapping, and so they merge to form a UnitMap. */
             if( !strcmp( nclass, "PcdMap" ) ){
-               newmap = (AstMapping *) astUnitMap( 2, "" );
+               newmap = (AstMapping *) astUnitMap( 2, "", status );
                invert = 0;
 
 /* If the neighbour is a UnitMap, they merge to form a clone of the
@@ -1445,7 +1496,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                swaphi = CanSwap(  ( *map_list )[ where ], 
                                   ( *map_list )[ where + 1 ],
                                   ( *invert_list )[ where ], 
-                                  ( *invert_list )[ where + 1 ] );
+                                  ( *invert_list )[ where + 1 ], status );
             } else {
                swaphi = 0;
             }
@@ -1488,7 +1539,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                swaplo = CanSwap(  ( *map_list )[ where - 1 ], 
                                   ( *map_list )[ where ],
                                   ( *invert_list )[ where - 1 ], 
-                                  ( *invert_list )[ where ] );
+                                  ( *invert_list )[ where ], status );
             } else {
                swaplo = 0;
             }
@@ -1562,10 +1613,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                } else {
 
                   if( !strcmp( nclass, "ZoomMap" ) ){
-                     PcdZoom( (*map_list) + i1, (*invert_list) + i1, where - i1 );
+                     PcdZoom( (*map_list) + i1, (*invert_list) + i1, where - i1, status );
 
                   } else if( !strcmp( nclass, "PermMap" ) ){
-                     PcdPerm( (*map_list) + i1, (*invert_list) + i1, where - i1 );
+                     PcdPerm( (*map_list) + i1, (*invert_list) + i1, where - i1, status );
                   }
 
 /* Store the index of the first modified Mapping. */
@@ -1608,9 +1659,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Swap these Mappings. */
                      if( !strcmp( nclass, "ZoomMap" ) ){
-                        PcdZoom( mc, ic, where - i1 );
+                        PcdZoom( mc, ic, where - i1, status );
                      } else if( !strcmp( nclass, "PermMap" ) ){
-                        PcdPerm( mc, ic, where - i1 );
+                        PcdPerm( mc, ic, where - i1, status );
                      }
 
 /* If neither of the swapped Mappings can be simplified further, then there
@@ -1661,7 +1712,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 }
 
 static void PermGet( AstPermMap *map, int **outperm, int **inperm, 
-                     double **consts ){
+                     double **consts, int *status ){
 /*
 *  Name:
 *     PermGet
@@ -1675,7 +1726,7 @@ static void PermGet( AstPermMap *map, int **outperm, int **inperm,
 *  Synopsis:
 *     #include "pcdmap.h"
 *     void PermGet( AstPermMap *map, int **outperm, int **inperm, 
-*                   double **const )
+*                   double **const, int *status )
 
 *  Class Membership:
 *     PcdMap member function 
@@ -1699,6 +1750,8 @@ static void PermGet( AstPermMap *map, int **outperm, int **inperm,
 *        An address at which to return a popinter to an array of doubles
 *        holding the constants array. The array should be released using 
 *        astFree when no longer needed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     -  NULL pointers are returned if an error has already occurred, or if
@@ -1749,8 +1802,8 @@ static void PermGet( AstPermMap *map, int **outperm, int **inperm,
 
 /* Create two PointSets, each holding two points, which can be used for
    input and output positions with the PermMap. */
-   pset1 = astPointSet( 2, nin, "" );
-   pset2 = astPointSet( 2, nout, "" );
+   pset1 = astPointSet( 2, nin, "", status );
+   pset2 = astPointSet( 2, nout, "", status );
 
 /* Set up the two input positions to be [0,1,2...] and [-1,-1,-1,...]. The
    first position is used to enumerate the axes, and the second is used to 
@@ -1843,7 +1896,7 @@ static void PermGet( AstPermMap *map, int **outperm, int **inperm,
    return;
 }
 
-static void SetAttrib( AstObject *this_object, const char *setting ) {
+static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
 *     SetAttrib
@@ -1856,7 +1909,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 *  Synopsis:
 *     #include "pcdmap.h"
-*     void SetAttrib( AstObject *this, const char *setting )
+*     void SetAttrib( AstObject *this, const char *setting, int *status )
 
 *  Class Membership:
 *     PcdMap member function (over-rides the astSetAttrib protected
@@ -1882,6 +1935,8 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 *     setting
 *        Pointer to a null terminated string specifying the new attribute
 *        value.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -1932,12 +1987,12 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      (*parent_setattrib)( this_object, setting );
+      (*parent_setattrib)( this_object, setting, status );
    }
 
 }
 
-static int TestAttrib( AstObject *this_object, const char *attrib ) {
+static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     TestAttrib
@@ -1950,7 +2005,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "pcdmap.h"
-*     int TestAttrib( AstObject *this, const char *attrib )
+*     int TestAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     PcdMap member function (over-rides the astTestAttrib protected
@@ -1967,6 +2022,8 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if a value has been set, otherwise zero.
@@ -2017,7 +2074,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_testattrib)( this_object, attrib );
+      result = (*parent_testattrib)( this_object, attrib, status );
    }
 
 /* Return the result, */
@@ -2025,7 +2082,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 }
 
 static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-                               int forward, AstPointSet *out ) {
+                               int forward, AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     Transform
@@ -2039,7 +2096,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *  Synopsis:
 *     #include "pcdmap.h"
 *     AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-*                             int forward, AstPointSet *out )
+*                             int forward, AstPointSet *out, int *status )
 
 *  Class Membership:
 *     PcdMap member function (over-rides the astTransform protected
@@ -2063,6 +2120,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *        Pointer to a PointSet which will hold the transformed (output)
 *        coordinate values. A NULL value may also be given, in which case a
 *        new PointSet will be created by this function.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the output (possibly new) PointSet.
@@ -2110,7 +2169,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    function inherited from the parent Mapping class. This function validates
    all arguments and generates an output PointSet if necessary, but does not
    actually transform any coordinate values. */
-   result = (*parent_transform)( this, in, forward, out );
+   result = (*parent_transform)( this, in, forward, out, status );
 
 /* We will now extend the parent astTransform method by performing the
    calculations needed to generate the output coordinate values. */
@@ -2215,7 +2274,7 @@ c               }
    return result;
 }
 
-static void PcdZoom( AstMapping **maps, int *inverts, int ipc  ){
+static void PcdZoom( AstMapping **maps, int *inverts, int ipc, int *status ){
 /*
 *  Name:
 *     PcdZoom 
@@ -2228,7 +2287,7 @@ static void PcdZoom( AstMapping **maps, int *inverts, int ipc  ){
 
 *  Synopsis:
 *     #include "pcdmap.h"
-*     void PcdZoom( AstMapping **maps, int *inverts, int ipc )
+*     void PcdZoom( AstMapping **maps, int *inverts, int ipc, int *status )
 
 *  Class Membership:
 *     PcdMap member function 
@@ -2247,6 +2306,8 @@ static void PcdZoom( AstMapping **maps, int *inverts, int ipc  ){
 *        A pointer to an array of two invert flags.
 *     ipc
 *        The index within "maps" of the PcdMap.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -2295,7 +2356,7 @@ static void PcdZoom( AstMapping **maps, int *inverts, int ipc  ){
    astSetInvert( zm, old_zinv );
 
 /* Create the returned ZoomMap. */
-   zm2 = astZoomMap( 2, zoom, "" );
+   zm2 = astZoomMap( 2, zoom, "", status );
 
 /* Find the attributes of the returned PcdMap. If the PCD map is applied 
    first... */
@@ -2312,7 +2373,7 @@ static void PcdZoom( AstMapping **maps, int *inverts, int ipc  ){
    }
 
 /* Create the returned PcdMap. */
-   pm2 = astPcdMap( disc, cen, "" );
+   pm2 = astPcdMap( disc, cen, "", status );
    if( inverts[ ipc ] ) astInvert( pm2 );
 
 /* Replace the supplied Mappings with the ones created above, swapping the
@@ -2333,7 +2394,7 @@ static void PcdZoom( AstMapping **maps, int *inverts, int ipc  ){
    return;
 }
 
-static void PcdPerm( AstMapping **maps, int *inverts, int ipc  ){
+static void PcdPerm( AstMapping **maps, int *inverts, int ipc, int *status ){
 /*
 *  Name:
 *     PcdPerm
@@ -2346,7 +2407,7 @@ static void PcdPerm( AstMapping **maps, int *inverts, int ipc  ){
 
 *  Synopsis:
 *     #include "pcdmap.h"
-*     void PcdPerm( AstMapping **maps, int *inverts, int ipc )
+*     void PcdPerm( AstMapping **maps, int *inverts, int ipc, int *status )
 
 *  Class Membership:
 *     PcdMap member function 
@@ -2365,6 +2426,8 @@ static void PcdPerm( AstMapping **maps, int *inverts, int ipc  ){
 *        A pointer to an array of two invert flags.
 *     ipc
 *        The index within "maps" of the PcdMap.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     -  It should have been checked previously that the PermMap simply
@@ -2417,7 +2480,7 @@ static void PcdPerm( AstMapping **maps, int *inverts, int ipc  ){
 /* Create the returned PcdMap. */
    cen[ 0 ] = ycen;
    cen[ 1 ] = xcen;
-   pm2 = astPcdMap( disco, cen, "" );
+   pm2 = astPcdMap( disco, cen, "", status );
    if( inverts[ ipc ] ) astInvert( pm2 );
 
 /* Replace the supplied Mappings with the ones created above, swapping the
@@ -2544,7 +2607,7 @@ MAKE_GET(PcdCen,double,0.0,(( this->pcdcen[axis] == AST__BAD ) ?
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -2556,7 +2619,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -2567,6 +2630,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the PcdMap whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -2598,20 +2663,20 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* PcdCen(0). */
 /* ---------- */
-   set = TestPcdCen( this, 0 );
-   dval = set ? GetPcdCen( this, 0 ) : astGetPcdCen( this, 0 );
+   set = TestPcdCen( this, 0, status );
+   dval = set ? GetPcdCen( this, 0, status ) : astGetPcdCen( this, 0 );
    astWriteDouble( channel, "PcdCn0", set, 1, dval, "Distortion centre on first axis" );
 
 /* PcdCen(1). */
 /* ---------- */
-   set = TestPcdCen( this, 1 );
-   dval = set ? GetPcdCen( this, 1 ) : astGetPcdCen( this, 1 );
+   set = TestPcdCen( this, 1, status );
+   dval = set ? GetPcdCen( this, 1, status ) : astGetPcdCen( this, 1 );
    astWriteDouble( channel, "PcdCn1", set, 1, dval, "Distortion centre on second axis" );
 
 /* Disco. */
 /* ------ */
-   set = TestDisco( this );
-   dval = set ? GetDisco( this ) : astGetDisco( this );
+   set = TestDisco( this, status );
+   dval = set ? GetDisco( this, status ) : astGetDisco( this );
    astWriteDouble( channel, "Disco", set, 1, dval, "Distortion coefficient" );
 
 }
@@ -2620,11 +2685,11 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsAPcdMap and astCheckPcdMap functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(PcdMap,Mapping,check,&class_init)
+astMAKE_ISA(PcdMap,Mapping,check,&class_check)
 astMAKE_CHECK(PcdMap)
 
 AstPcdMap *astPcdMap_( double disco, const double pcdcen[2],
-                       const char *options, ... ) {
+                       const char *options, int *status, ...) {
 /*
 *++
 *  Name:
@@ -2724,12 +2789,23 @@ f     AST_PCDMAP = INTEGER
 c     function is invoked with the AST error status set, or if it
 f     function is invoked with STATUS set to an error value, or if it
 *     should fail for any reason.
+
+*  Status Handling:
+*     The protected interface to this function includes an extra
+*     parameter at the end of the parameter list descirbed above. This
+*     parameter is a pointer to the integer inherited status
+*     variable: "int *status".
+
 *--
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstPcdMap *new;              /* Pointer to new PcdMap */
    va_list args;                /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -2746,7 +2822,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Obtain the variable argument list and pass it along with the options string
    to the astVSet method to initialise the new PcdMap's attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -2799,8 +2875,17 @@ AstPcdMap *astPcdMapId_( double disco, const double pcdcen[2],
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstPcdMap *new;              /* Pointer to new PcdMap */
    va_list args;                /* Variable argument list */
+
+   int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -2831,7 +2916,7 @@ AstPcdMap *astPcdMapId_( double disco, const double pcdcen[2],
 
 AstPcdMap *astInitPcdMap_( void *mem, size_t size, int init,
                            AstPcdMapVtab *vtab, const char *name,
-                           double disco, const double pcdcen[2] ){
+                           double disco, const double pcdcen[2], int *status ){
 /*
 *+
 *  Name:
@@ -2938,7 +3023,7 @@ AstPcdMap *astInitPcdMap_( void *mem, size_t size, int init,
 
 AstPcdMap *astLoadPcdMap_( void *mem, size_t size,
                            AstPcdMapVtab *vtab, const char *name,
-                           AstChannel *channel ) {
+                           AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -3013,6 +3098,7 @@ AstPcdMap *astLoadPcdMap_( void *mem, size_t size,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstPcdMap *new;              /* Pointer to the new PcdMap */
 
 /* Initialise. */
@@ -3020,6 +3106,9 @@ AstPcdMap *astLoadPcdMap_( void *mem, size_t size,
 
 /* Check the global error status. */
    if ( !astOK ) return new;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* If a NULL virtual function table has been supplied, then this is
    the first loader to be invoked for this PcdMap. In this case the
@@ -3062,17 +3151,17 @@ AstPcdMap *astLoadPcdMap_( void *mem, size_t size,
 /* PcdCen(0). */
 /* ---------- */
       new->pcdcen[0] = astReadDouble( channel, "pcdcn0", AST__BAD );
-      if ( TestPcdCen( new, 0 ) ) SetPcdCen( new, 0, new->pcdcen[0] );
+      if ( TestPcdCen( new, 0, status ) ) SetPcdCen( new, 0, new->pcdcen[0], status );
 
 /* PcdCen(1). */
 /* ---------- */
       new->pcdcen[1] = astReadDouble( channel, "pcdcn1", AST__BAD );
-      if ( TestPcdCen( new, 1 ) ) SetPcdCen( new, 1, new->pcdcen[1] );
+      if ( TestPcdCen( new, 1, status ) ) SetPcdCen( new, 1, new->pcdcen[1], status );
 
 /* Disco. */
 /* ------ */
       new->disco = astReadDouble( channel, "disco", AST__BAD );
-      if ( TestDisco( new ) ) SetDisco( new, new->disco );
+      if ( TestDisco( new, status ) ) SetDisco( new, new->disco, status );
 
 /* If an error occurred, clean up by deleting the new PcdMap. */
       if ( !astOK ) new = astDelete( new );
@@ -3093,3 +3182,8 @@ AstPcdMap *astLoadPcdMap_( void *mem, size_t size,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
+
+
+
+
+

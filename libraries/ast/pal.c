@@ -296,13 +296,11 @@ palSlaNutc(q0,&Q3,&q4,&Baz);return Q3*cos(Baz)+FOO*(0.00264*sin
 #undef Q1 
 #undef FOO
 
-void palSlaEqgal(double FOO,double bar,double*Baz,double*Q0){
-double fobar[3],Q1[3];static double FOOBAR[3][3];FOOBAR[0][0
-]=-0.054875539726;FOOBAR[0][1]=-0.873437108010;FOOBAR[0][2]=
--0.483834985808;FOOBAR[1][0]=0.494109453312;FOOBAR[1][1]=-
-0.444829589425;FOOBAR[1][2]=0.746982251810;FOOBAR[2][0]=-
-0.867666135858;FOOBAR[2][1]=-0.198076386122;FOOBAR[2][2]=
-0.455983795705;palSlaDcs2c(FOO,bar,fobar);palSlaDmxv(FOOBAR,fobar,
+void palSlaEqgal(double FOO,double bar,double*Baz,double*Q0){ double
+fobar[3],Q1[3]; static double FOOBAR[3][3] = { {-0.054875539726,
+-0.873437108010, -0.483834985808}, {0.494109453312, -0.444829589425,
+0.746982251810}, {-0.867666135858, -0.198076386122, 0.455983795705}};
+palSlaDcs2c(FOO,bar,fobar);palSlaDmxv(FOOBAR,fobar,
 Q1);palSlaDcc2s(Q1,Baz,Q0);*Baz=palSlaDranrm(*Baz);*Q0=palSlaDrange(*
 Q0);}
 

@@ -139,16 +139,20 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
    value is exceeded the hash table will be doubled in size. */
 #define MAX_ENTRIES_PER_TABLE_ENTRY 10
 
+
 /* Include files. */
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory management facilities */
 #include "object.h"              /* Base Object class */
 #include "pointset.h"            /* For AST__BAD */
 #include "channel.h"             /* I/O channels */
 #include "keymap.h"              /* Interface definition for this class */
+#include "globals.h"             /* Thread-safe global data access */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -240,17 +244,87 @@ typedef struct Entry1P {
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstKeyMapVtab class_vtab; /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject * );
-static const char *(* parent_getattrib)( AstObject *, const char * );
-static int (* parent_testattrib)( AstObject *, const char * );
-static void (* parent_clearattrib)( AstObject *, const char * );
-static void (* parent_setattrib)( AstObject *, const char * );
+static int (* parent_getobjsize)( AstObject *, int * );
+static const char *(* parent_getattrib)( AstObject *, const char *, int * );
+static int (* parent_testattrib)( AstObject *, const char *, int * );
+static void (* parent_clearattrib)( AstObject *, const char *, int * );
+static void (* parent_setattrib)( AstObject *, const char *, int * );
+
+#if defined(THREAD_SAFE)
+static int (* parent_managelock)( AstObject *, int, int, int * );
+#endif
+
+/* Define macros for accessing each item of thread specific global data. */
+#ifdef THREAD_SAFE
+
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; \
+   globals->GetAttrib_Buff[ 0 ] = 0; \
+   globals->ConvertValue_Init = 0; \
+   globals->ConvertValue_Istr = 0; \
+   globals->ConvertValue_Buff[ 0 ] = 0; \
+   globals->MapKey_Init = 0; \
+   globals->MapKey_Istr = 0; 
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(KeyMap)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(KeyMap,Class_Init)
+#define class_vtab astGLOBAL(KeyMap,Class_Vtab)
+#define getattrib_buff astGLOBAL(KeyMap,GetAttrib_Buff)
+#define convertvalue_strings astGLOBAL(KeyMap,ConvertValue_Strings)
+#define convertvalue_istr astGLOBAL(KeyMap,ConvertValue_Istr)
+#define convertvalue_init astGLOBAL(KeyMap,ConvertValue_Init)
+#define convertvalue_buff astGLOBAL(KeyMap,ConvertValue_Buff)
+#define mapkey_strings astGLOBAL(KeyMap,MapKey_Strings)
+#define mapkey_istr astGLOBAL(KeyMap,MapKey_Istr)
+#define mapkey_init astGLOBAL(KeyMap,MapKey_Init)
+
+
+
+/* If thread safety is not needed, declare and initialise globals at static 
+   variables. */ 
+#else
+
+/* Buffer returned by GetAttrib. */ \
+static char getattrib_buff[ AST__KEYMAP_GETATTRIB_BUFF_LEN + 1 ];
+
+/* Strings returned by ConvertValue */ \
+static char *convertvalue_strings[ AST__KEYMAP_CONVERTVALUE_MAX_STRINGS ];
+
+/* Offset of next string in "ConvertValue_Strings" */ \
+static int convertvalue_istr;
+
+/* "ConvertValue_Strings" array initialised? */ \
+static int convertvalue_init;
+
+/* ConvertValue string buffer */ \
+static char convertvalue_buff[ AST__KEYMAP_CONVERTVALUE_BUFF_LEN + 1 ]; 
+
+/* Strings returned by MapKey */ \
+static char *mapkey_strings[ AST__KEYMAP_MAPKEY_MAX_STRINGS ];
+
+/* Offset of next string in "MapKey_Strings" */ \
+static int mapkey_istr;
+
+/* "MapKey_Strings" array initialised? */ \
+static int mapkey_init;
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstKeyMapVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -261,71 +335,75 @@ AstKeyMap *astKeyMapId_( const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static AstMapEntry *AddTableEntry( AstKeyMap *, int, AstMapEntry * );
-static AstMapEntry *CopyMapEntry( AstMapEntry * );
-static AstMapEntry *FreeMapEntry( AstMapEntry * );
-static AstMapEntry *SearchTableEntry( AstKeyMap *, int, const char * );
-static const char *GetKey( AstKeyMap *, int index );
-static const char *MapKey( AstKeyMap *, int index );
-static int ConvertValue( void *, int, void *, int );
-static int GetObjSize( AstObject * );
-static int HashFun( const char *, int, unsigned long * );
-static int KeyCmp( const char *, const char * );
-static int MapGet0P( AstKeyMap *, const char *, void ** );
-static int MapGet0A( AstKeyMap *, const char *, AstObject ** );
-static int MapGet0C( AstKeyMap *, const char *, const char ** );
-static int MapGet0D( AstKeyMap *, const char *, double * );
-static int MapGet0F( AstKeyMap *, const char *, float * );
-static int MapGet0I( AstKeyMap *, const char *, int * );
-static int MapGet1A( AstKeyMap *, const char *, int, int *, AstObject ** );
-static int MapGet1P( AstKeyMap *, const char *, int, int *, void ** );
-static int MapGet1C( AstKeyMap *, const char *, int, int, int *, char * );
-static int MapGet1D( AstKeyMap *, const char *, int, int *, double * );
-static int MapGet1F( AstKeyMap *, const char *, int, int *, float * );
-static int MapGet1I( AstKeyMap *, const char *, int, int *, int * );
-static int MapHasKey( AstKeyMap *, const char *);
-static int MapLenC( AstKeyMap *, const char *);
-static int MapLength( AstKeyMap *, const char *);
-static int MapSize( AstKeyMap *);
-static int MapType( AstKeyMap *, const char *);
-static size_t SizeOfEntry( AstMapEntry * );
-static void CheckCircle( AstKeyMap *, AstObject *, const char * );
-static void Copy( const AstObject *, AstObject * );
-static void CopyTableEntry( AstKeyMap *, AstKeyMap *, int );
-static void Delete( AstObject * );
-static void DoubleTableSize( AstKeyMap * );
-static void Dump( AstObject *, AstChannel * );
-static void DumpEntry( AstMapEntry *, AstChannel *, int );
-static void FreeTableEntry( AstKeyMap *, int itab );
-static void MapPut0A( AstKeyMap *, const char *, AstObject *, const char * );
-static void MapPut0P( AstKeyMap *, const char *, void *, const char * );
-static void MapPut0C( AstKeyMap *, const char *, const char *, const char * );
-static void MapPut0D( AstKeyMap *, const char *, double, const char * );
-static void MapPut0F( AstKeyMap *, const char *, float, const char * );
-static void MapPut0I( AstKeyMap *, const char *, int, const char * );
-static void MapPut1P( AstKeyMap *, const char *, int, void *[], const char * );
-static void MapPut1A( AstKeyMap *, const char *, int, AstObject *[], const char * );
-static void MapPut1C( AstKeyMap *, const char *, int, const char *[], const char * );
-static void MapPut1D( AstKeyMap *, const char *, int, double *, const char * );
-static void MapPut1F( AstKeyMap *, const char *, int, float *, const char * );
-static void MapPut1I( AstKeyMap *, const char *, int, int *, const char * );
-static void MapRemove( AstKeyMap *, const char *);
-static void NewTable( AstKeyMap *, int );
-static void RemoveTableEntry( AstKeyMap *, int, const char * );
+static AstMapEntry *AddTableEntry( AstKeyMap *, int, AstMapEntry *, int * );
+static AstMapEntry *CopyMapEntry( AstMapEntry *, int * );
+static AstMapEntry *FreeMapEntry( AstMapEntry *, int * );
+static AstMapEntry *SearchTableEntry( AstKeyMap *, int, const char *, int * );
+static const char *GetKey( AstKeyMap *, int index, int * );
+static const char *MapKey( AstKeyMap *, int index, int * );
+static int ConvertValue( void *, int, void *, int, int * );
+static int GetObjSize( AstObject *, int * );
+static int HashFun( const char *, int, unsigned long *, int * );
+static int KeyCmp( const char *, const char *, int * );
+static int MapGet0P( AstKeyMap *, const char *, void **, int * );
+static int MapGet0A( AstKeyMap *, const char *, AstObject **, int * );
+static int MapGet0C( AstKeyMap *, const char *, const char **, int * );
+static int MapGet0D( AstKeyMap *, const char *, double *, int * );
+static int MapGet0F( AstKeyMap *, const char *, float *, int * );
+static int MapGet0I( AstKeyMap *, const char *, int *, int * );
+static int MapGet1A( AstKeyMap *, const char *, int, int *, AstObject **, int * );
+static int MapGet1P( AstKeyMap *, const char *, int, int *, void **, int * );
+static int MapGet1C( AstKeyMap *, const char *, int, int, int *, char *, int * );
+static int MapGet1D( AstKeyMap *, const char *, int, int *, double *, int * );
+static int MapGet1F( AstKeyMap *, const char *, int, int *, float *, int * );
+static int MapGet1I( AstKeyMap *, const char *, int, int *, int *, int * );
+static int MapHasKey( AstKeyMap *, const char *, int * );
+static int MapLenC( AstKeyMap *, const char *, int * );
+static int MapLength( AstKeyMap *, const char *, int * );
+static int MapSize( AstKeyMap *, int * );
+static int MapType( AstKeyMap *, const char *, int * );
+static size_t SizeOfEntry( AstMapEntry *, int * );
+static void CheckCircle( AstKeyMap *, AstObject *, const char *, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void CopyTableEntry( AstKeyMap *, AstKeyMap *, int, int * );
+static void Delete( AstObject *, int * );
+static void DoubleTableSize( AstKeyMap *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void DumpEntry( AstMapEntry *, AstChannel *, int, int * );
+static void FreeTableEntry( AstKeyMap *, int itab, int * );
+static void MapPut0A( AstKeyMap *, const char *, AstObject *, const char *, int * );
+static void MapPut0P( AstKeyMap *, const char *, void *, const char *, int * );
+static void MapPut0C( AstKeyMap *, const char *, const char *, const char *, int * );
+static void MapPut0D( AstKeyMap *, const char *, double, const char *, int * );
+static void MapPut0F( AstKeyMap *, const char *, float, const char *, int * );
+static void MapPut0I( AstKeyMap *, const char *, int, const char *, int * );
+static void MapPut1P( AstKeyMap *, const char *, int, void *[], const char *, int * );
+static void MapPut1A( AstKeyMap *, const char *, int, AstObject *[], const char *, int * );
+static void MapPut1C( AstKeyMap *, const char *, int, const char *[], const char *, int * );
+static void MapPut1D( AstKeyMap *, const char *, int, double *, const char *, int * );
+static void MapPut1F( AstKeyMap *, const char *, int, float *, const char *, int * );
+static void MapPut1I( AstKeyMap *, const char *, int, int *, const char *, int * );
+static void MapRemove( AstKeyMap *, const char *, int * );
+static void NewTable( AstKeyMap *, int, int * );
+static void RemoveTableEntry( AstKeyMap *, int, const char *, int * );
 
-static const char *GetAttrib( AstObject *, const char * );
-static int TestAttrib( AstObject *, const char * );
-static void ClearAttrib( AstObject *, const char * );
-static void SetAttrib( AstObject *, const char * );
+static const char *GetAttrib( AstObject *, const char *, int * );
+static int TestAttrib( AstObject *, const char *, int * );
+static void ClearAttrib( AstObject *, const char *, int * );
+static void SetAttrib( AstObject *, const char *, int * );
 
-static int GetSizeGuess( AstKeyMap * );
-static int TestSizeGuess( AstKeyMap * );
-static void ClearSizeGuess( AstKeyMap * );
-static void SetSizeGuess( AstKeyMap *, int );
+static int GetSizeGuess( AstKeyMap *, int * );
+static int TestSizeGuess( AstKeyMap *, int * );
+static void ClearSizeGuess( AstKeyMap *, int * );
+static void SetSizeGuess( AstKeyMap *, int, int * );
+
+#if defined(THREAD_SAFE)
+static int ManageLock( AstObject *, int, int, int * );
+#endif
 
 /* Member functions. */
 /* ================= */
-static AstMapEntry *AddTableEntry( AstKeyMap *this, int itab, AstMapEntry *entry ){
+static AstMapEntry *AddTableEntry( AstKeyMap *this, int itab, AstMapEntry *entry, int *status ){
 /*
 *  Name:
 *     AddTableEntry
@@ -338,7 +416,7 @@ static AstMapEntry *AddTableEntry( AstKeyMap *this, int itab, AstMapEntry *entry
 
 *  Synopsis:
 *     #include "keymap.h"
-*     AstMapEntry *AddTableEntry( AstKeyMap *this, int itab, AstMapEntry *entry )
+*     AstMapEntry *AddTableEntry( AstKeyMap *this, int itab, AstMapEntry *entry, int *status )
 
 *  Class Membership:
 *     KeyMap member function.
@@ -357,6 +435,8 @@ static AstMapEntry *AddTableEntry( AstKeyMap *this, int itab, AstMapEntry *entry
 *        Index of the hash table element to be searched.
 *     entry 
 *        Pointer to the MapEntry to be added.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A NULL pointer.
@@ -381,14 +461,14 @@ static AstMapEntry *AddTableEntry( AstKeyMap *this, int itab, AstMapEntry *entry
    of the table, moving the table entries to appropriate places in the
    new larger table. */
    if( this->nentry[ itab ] > MAX_ENTRIES_PER_TABLE_ENTRY ) {
-      DoubleTableSize( this );
+      DoubleTableSize( this, status );
    }
 
 /* Return a NULL pointer. */
    return NULL;
 }
 
-static void CheckCircle( AstKeyMap *this, AstObject *obj, const char *method ) {
+static void CheckCircle( AstKeyMap *this, AstObject *obj, const char *method, int *status ) {
 /*
 *  Name:
 *     CheckCircle
@@ -401,7 +481,7 @@ static void CheckCircle( AstKeyMap *this, AstObject *obj, const char *method ) {
 
 *  Synopsis:
 *     #include "keymap.h"
-*     void CheckCircle( AstKeyMap *this, AstObject *obj, const char *method )
+*     void CheckCircle( AstKeyMap *this, AstObject *obj, const char *method, int *status )
 
 *  Class Membership:
 *     KeyMap member function.
@@ -417,6 +497,8 @@ static void CheckCircle( AstKeyMap *this, AstObject *obj, const char *method ) {
 *        Pointer to the AstObject to be inserted into the KeyMap, or NULL.
 *     method
 *        Name of method to include in error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -461,13 +543,13 @@ static void CheckCircle( AstKeyMap *this, AstObject *obj, const char *method ) {
                      if( vec[ j ] == (AstObject *) this ) {
                         astError( AST__KYCIR, "%s(%s): Cannot add a KeyMap "
                                   "into another KeyMap because the first "
-                                  "KeyMap contains the second KeyMap.",
+                                  "KeyMap contains the second KeyMap.", status,
                                   method, astGetClass( this ) );
                         break;
 
 /* Otherwise, see if it contains "this". */
                      } else {
-                        CheckCircle( this, vec[ j ], method );
+                        CheckCircle( this, vec[ j ], method, status );
                      }
                   }
 
@@ -481,7 +563,7 @@ static void CheckCircle( AstKeyMap *this, AstObject *obj, const char *method ) {
    }
 }
 
-static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     ClearAttrib
@@ -494,7 +576,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "keymap.h"
-*     void ClearAttrib( AstObject *this, const char *attrib )
+*     void ClearAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     KeyMap member function (over-rides the astClearAttrib protected
@@ -511,6 +593,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -532,11 +616,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      (*parent_clearattrib)( this_object, attrib );
+      (*parent_clearattrib)( this_object, attrib, status );
    }
 }
 
-static void ClearSizeGuess( AstKeyMap *this ) {
+static void ClearSizeGuess( AstKeyMap *this, int *status ) {
 /*
 *+
 *  Name:
@@ -585,17 +669,17 @@ static void ClearSizeGuess( AstKeyMap *this ) {
 /* If not report an error. */
    if( !empty ) {
       astError( AST__NOWRT, "astClearAttrib(KeyMap): Illegal attempt to "
-                "clear the SizeGuess attribute of a non-empty KeyMap." );
+                "clear the SizeGuess attribute of a non-empty KeyMap." , status);
 
 /* Otherwise, store the "cleared" value and change the size of the hash
    table. */
    } else {
       this->sizeguess = INT_MAX;
-      NewTable( this, MIN_TABLE_SIZE );
+      NewTable( this, MIN_TABLE_SIZE, status );
    }
 }
 
-static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
+static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *status ) {
 /*
 *  Name:
 *     ConvertValue
@@ -608,7 +692,7 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
 
 *  Synopsis:
 *     #include "keymap.h"
-*     int ConvertValue( void *raw, int raw_type, void *out, int out_type )
+*     int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *status )
 
 *  Class Membership:
 *     KeyMap member function.
@@ -628,6 +712,8 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
 *        possible, but the result of the conversion is thrown away.
 *     out_type
 *        The data type of the output value.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Non-zero if the conversion was performed succesfully, otherwise zero.
@@ -641,11 +727,8 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
 *     error status set, or if it should fail for any reason.
 */
 
-/* Local Constants: */
-#define MAX_STRINGS 50           /* Number of string values to buffer */
-#define BUFF_LEN 50              /* Max. characters in result buffer */
-
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    AstObject *aval;              /* AstObject pointer value */
    const char *cval;             /* Pointer to string value */ 
    const char *cvalue;           /* Pointer to output string value */ 
@@ -656,10 +739,6 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
    int nc;                       /* Number of characters read from string */ 
    int nval;                     /* Number of values read from string */ 
    int result;                   /* Returned flag */
-   static char *strings[ MAX_STRINGS ]; /* Pointers to string buffers */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
-   static int init = 0;          /* "strings" array initialised? */
-   static int istr = 0;          /* Offset of next string in "strings" */
 
 /* Initialise. */
    result = 0;
@@ -667,11 +746,14 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
 /* Check the global error status and the supplied pointers. */
    if( !astOK || !raw ) return result;
 
-/* If the "strings" array has not been initialised, fill it with
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(NULL);
+
+/* If the "convertvalue_strings" array has not been initialised, fill it with
    NULL pointers. */
-   if( !init ) {
-      init = 1;
-      for( i = 0; i < MAX_STRINGS; i++ ) strings[ i ] = NULL;
+   if( !convertvalue_init ) {
+      convertvalue_init = 1;
+      for( i = 0; i < AST__KEYMAP_CONVERTVALUE_MAX_STRINGS; i++ ) convertvalue_strings[ i ] = NULL;
    }
 
 /* Assume conversion is possible */
@@ -696,8 +778,8 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
 
 /* Consider conversion to "const char *". */
       } else if( out_type == AST__STRINGTYPE ) {
-         (void) sprintf( buff, "%d", ival );
-         cvalue = buff;
+         (void) sprintf( convertvalue_buff, "%d", ival );
+         cvalue = convertvalue_buff;
 
 /* Consider conversion to "AstObject *". */
       } else if( out_type == AST__OBJECTTYPE ) {
@@ -711,7 +793,7 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
       } else {
          result = 0;
          astError( AST__INTER, "ConvertValue(KeyMap): Illegal map entry data "
-                   "type %d encountered (internal AST programming error).",
+                   "type %d encountered (internal AST programming error).", status,
                    out_type );
       }
 
@@ -733,8 +815,8 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
 
 /* Consider conversion to "const char *". */
       } else if( out_type == AST__STRINGTYPE ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         cvalue = buff;
+         (void) sprintf( convertvalue_buff, "%.*g", DBL_DIG, dval );
+         cvalue = convertvalue_buff;
 
 /* Consider conversion to "AstObject *". */
       } else if( out_type == AST__OBJECTTYPE ) {
@@ -748,7 +830,7 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
       } else {
          result = 0;
          astError( AST__INTER, "ConvertValue(KeyMap): Illegal map entry data "
-                   "type %d encountered (internal AST programming error).",
+                   "type %d encountered (internal AST programming error).", status,
                    out_type );
       }
 
@@ -770,8 +852,8 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
 
 /* Consider conversion to "const char *". */
       } else if( out_type == AST__STRINGTYPE ) {
-         (void) sprintf( buff, "%.*g", FLT_DIG, fval );
-         cvalue = buff;
+         (void) sprintf( convertvalue_buff, "%.*g", FLT_DIG, fval );
+         cvalue = convertvalue_buff;
 
 /* Consider conversion to "AstObject *". */
       } else if( out_type == AST__OBJECTTYPE ) {
@@ -785,7 +867,7 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
       } else {
          result = 0;
          astError( AST__INTER, "ConvertValue(KeyMap): Illegal map entry data "
-                   "type %d encountered (internal AST programming error).",
+                   "type %d encountered (internal AST programming error).", status,
                    out_type );
       }
 
@@ -845,7 +927,7 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
       } else {
          result = 0;
          astError( AST__INTER, "ConvertValue(KeyMap): Illegal map entry data "
-                   "type %d encountered (internal AST programming error).",
+                   "type %d encountered (internal AST programming error).", status,
                    out_type );
       }
 
@@ -881,7 +963,7 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
       } else {
          result = 0;
          astError( AST__INTER, "ConvertValue(KeyMap): Illegal map entry data "
-                   "type %d encountered (internal AST programming error).",
+                   "type %d encountered (internal AST programming error).", status,
                    out_type );
       }
 
@@ -916,7 +998,7 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
       } else {
          result = 0;
          astError( AST__INTER, "ConvertValue(KeyMap): Illegal map entry data "
-                   "type %d encountered (internal AST programming error).",
+                   "type %d encountered (internal AST programming error).", status,
                    out_type );
       }
 
@@ -924,30 +1006,30 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
    } else {
       result = 0;
       astError( AST__INTER, "ConvertValue(KeyMap): Illegal map entry data "
-                "type %d encountered (internal AST programming error).",
+                "type %d encountered (internal AST programming error).", status,
                 raw_type );
    }
 
 /* If the output is a string, store a copy of the resulting string in 
    dynamically allocated memory, putting a pointer to the copy into the next
-   element of the "strings" array.  (This process also de-allocates
-   any previously allocated memory pointed at by this "strings"
+   element of the "convertvalue_strings" array.  (This process also de-allocates
+   any previously allocated memory pointed at by this "convertvalue_strings"
    element, so the earlier string is effectively replaced by the new
    one.) */
    if( out_type == AST__STRINGTYPE && astOK && result && cvalue ) {
       result = strlen( cvalue );
 
       astBeginPM;
-      strings[ istr ] = astStore( strings[ istr ], cvalue, 
+      convertvalue_strings[ convertvalue_istr ] = astStore( convertvalue_strings[ convertvalue_istr ], cvalue, 
                                   (size_t) ( result + 1 ) );
       astEndPM;
 
-/* If OK, return a pointer to the copy and increment "istr" to use the
-   next element of "strings" on the next invocation. Recycle "istr" to
+/* If OK, return a pointer to the copy and increment "convertvalue_istr" to use the
+   next element of "convertvalue_strings" on the next invocation. Recycle "convertvalue_istr" to
    zero when all elements have been used. */
       if ( astOK ) {
-         if( out ) *( (const char **) out ) = strings[ istr++ ];
-         if( istr == ( MAX_STRINGS - 1 ) ) istr = 0;
+         if( out ) *( (const char **) out ) = convertvalue_strings[ convertvalue_istr++ ];
+         if( convertvalue_istr == ( AST__KEYMAP_CONVERTVALUE_MAX_STRINGS - 1 ) ) convertvalue_istr = 0;
       }
    }
 
@@ -958,10 +1040,8 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
    return result;
 }
 
-/* Undefine macros local to this function. */
-#undef MAX_STRINGS
 
-static AstMapEntry *CopyMapEntry( AstMapEntry *in ){
+static AstMapEntry *CopyMapEntry( AstMapEntry *in, int *status ){
 /*
 *  Name:
 *     CopyMapEntry
@@ -974,7 +1054,7 @@ static AstMapEntry *CopyMapEntry( AstMapEntry *in ){
 
 *  Synopsis:
 *     #include "keymap.h"
-*     AstMapEntry *CopyMapEntry( AstMapEntry *in )
+*     AstMapEntry *CopyMapEntry( AstMapEntry *in, int *status )
 
 *  Class Membership:
 *     KeyMap member function.
@@ -986,6 +1066,8 @@ static AstMapEntry *CopyMapEntry( AstMapEntry *in ){
 *     in
 *        Pointer to the MapEntry to be copied. NULL may be supplied in
 *        which case NULL will be returned.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the new copy. The link to the next MapEntry in the
@@ -1015,7 +1097,7 @@ static AstMapEntry *CopyMapEntry( AstMapEntry *in ){
    if ( !astOK || !in ) return result;
 
 /* Get the size, data type and length of the MapEntry. */
-   size = SizeOfEntry( in );
+   size = SizeOfEntry( in, status );
    nel = in->nel;
    type = in->type;
 
@@ -1106,18 +1188,18 @@ static AstMapEntry *CopyMapEntry( AstMapEntry *in ){
 /* Report an error if the data type is unknown. */
    } else {
       astError( AST__INTER, "CopyMapEntry(KeyMap): Illegal map entry data "
-                "type %d encountered (internal AST programming error).",
+                "type %d encountered (internal AST programming error).", status,
                 type );
    }
 
 /* If an error has occurred, attempt to delete the returned MapEntry. */
-   if( !astOK ) result = FreeMapEntry( result );
+   if( !astOK ) result = FreeMapEntry( result, status );
 
 /* Return the result. */
    return result;
 }
 
-static void CopyTableEntry( AstKeyMap *in, AstKeyMap *out, int itab ){
+static void CopyTableEntry( AstKeyMap *in, AstKeyMap *out, int itab, int *status ){
 /*
 *  Name:
 *     CopyTableEntry
@@ -1130,7 +1212,7 @@ static void CopyTableEntry( AstKeyMap *in, AstKeyMap *out, int itab ){
 
 *  Synopsis:
 *     #include "keymap.h"
-*     void CopyTableEntry( AstKeyMap *in, AstKeyMap *out, int itab )
+*     void CopyTableEntry( AstKeyMap *in, AstKeyMap *out, int itab, int *status )
 
 *  Class Membership:
 *     KeyMap member function.
@@ -1146,6 +1228,8 @@ static void CopyTableEntry( AstKeyMap *in, AstKeyMap *out, int itab ){
 *        Pointer to the output KeyMap.
 *     itab
 *        Index of the hash table element to be copied.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -1178,7 +1262,7 @@ static void CopyTableEntry( AstKeyMap *in, AstKeyMap *out, int itab ){
 
 /* Copy the next entry, storing the resulting pointer at the position
    indicated by "link". */
-         *link = CopyMapEntry( next );
+         *link = CopyMapEntry( next, status );
 
 /* Update "link" and "next" */
          next = next->next;
@@ -1190,10 +1274,10 @@ static void CopyTableEntry( AstKeyMap *in, AstKeyMap *out, int itab ){
    out->nentry[ itab ] = in->nentry[ itab ];
 
 /* If an error has occurred, attempt to delete the returned MapEntry. */
-   if( !astOK ) FreeTableEntry( out, itab );
+   if( !astOK ) FreeTableEntry( out, itab, status );
 }
 
-static void DoubleTableSize( AstKeyMap *this ) {
+static void DoubleTableSize( AstKeyMap *this, int *status ) {
 /*
 *  Name:
 *     DoubleTableSize
@@ -1206,7 +1290,7 @@ static void DoubleTableSize( AstKeyMap *this ) {
 
 *  Synopsis:
 *     #include "keymap.h"
-*     void DoubleTableSize( AstKeyMap *this )
+*     void DoubleTableSize( AstKeyMap *this, int *status )
 
 *  Class Membership:
 *     KeyMap member function.
@@ -1219,6 +1303,8 @@ static void DoubleTableSize( AstKeyMap *this ) {
 *  Parameters:
 *     this
 *        The KeyMap pointer.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -1305,7 +1391,7 @@ static void DoubleTableSize( AstKeyMap *this ) {
    }
 }
 
-static void DumpEntry( AstMapEntry *entry, AstChannel *channel, int nentry ) {
+static void DumpEntry( AstMapEntry *entry, AstChannel *channel, int nentry, int *status ) {
 /*
 *  Name:
 *     DumpEntry
@@ -1378,7 +1464,7 @@ static void DumpEntry( AstMapEntry *entry, AstChannel *channel, int nentry ) {
    } else {
       com = "";
       astError( AST__INTER, "DumpEntry(KeyMap): Illegal map entry data "
-                "type %d encountered (internal AST programming error).",
+                "type %d encountered (internal AST programming error).", status,
                 type );
    }
    (void) sprintf( buff, "Typ%d", nentry );
@@ -1472,17 +1558,17 @@ static void DumpEntry( AstMapEntry *entry, AstChannel *channel, int nentry ) {
    } else if( type == AST__POINTERTYPE ) {
       astError( AST__INTER, "DumpEntry(KeyMap): Cannot dump KeyMaps in "
                 "which the values are arbitrary C pointers (possible "
-                "programming error)." );
+                "programming error)." , status);
 
 /* Report an error if the data type is unknown. */
    } else if( astOK ) {
       astError( AST__INTER, "DumpEntry(KeyMap): Illegal map entry data "
-                "type %d encountered (internal AST programming error).",
+                "type %d encountered (internal AST programming error).", status,
                 type );
    }
 }
 
-static AstMapEntry *FreeMapEntry( AstMapEntry *in ){
+static AstMapEntry *FreeMapEntry( AstMapEntry *in, int *status ){
 /*
 *  Name:
 *     FreeMapEntry
@@ -1495,7 +1581,7 @@ static AstMapEntry *FreeMapEntry( AstMapEntry *in ){
 
 *  Synopsis:
 *     #include "keymap.h"
-*     AstMapEntry *FreeMapEntry( AstMapEntry *in )
+*     AstMapEntry *FreeMapEntry( AstMapEntry *in, int *status )
 
 *  Class Membership:
 *     KeyMap member function.
@@ -1508,6 +1594,8 @@ static AstMapEntry *FreeMapEntry( AstMapEntry *in ){
 *     in
 *        Pointer to the MapEntry to be freed. NULL may be supplied in
 *        which the function returns without action.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A NULL pointer.
@@ -1588,7 +1676,7 @@ static AstMapEntry *FreeMapEntry( AstMapEntry *in ){
 /* Report an error if the data type is unknown. */
    } else {
       astError( AST__INTER, "FreeMapEntry(KeyMap): Illegal map entry data "
-                "type %d encountered (internal AST programming error).",
+                "type %d encountered (internal AST programming error).", status,
                 type );
    }
 
@@ -1604,7 +1692,7 @@ static AstMapEntry *FreeMapEntry( AstMapEntry *in ){
    return NULL;
 }
 
-static void FreeTableEntry( AstKeyMap *this, int itab ){
+static void FreeTableEntry( AstKeyMap *this, int itab, int *status ){
 /*
 *  Name:
 *     FreeTableEntry
@@ -1618,7 +1706,7 @@ static void FreeTableEntry( AstKeyMap *this, int itab ){
 
 *  Synopsis:
 *     #include "keymap.h"
-*     void FreeTableEntry( AstKeyMap *this, int itab )
+*     void FreeTableEntry( AstKeyMap *this, int itab, int *status )
 
 *  Class Membership:
 *     KeyMap member function.
@@ -1633,6 +1721,8 @@ static void FreeTableEntry( AstKeyMap *this, int itab ){
 *        Pointer to the KeyMap
 *     itab
 *        Index of the hash table element to free.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - This function attempts to execute even if it is invoked with the 
@@ -1656,7 +1746,7 @@ static void FreeTableEntry( AstKeyMap *this, int itab ){
          link = next->next;
 
 /* Free this MapEntry */
-         FreeMapEntry( next );
+         FreeMapEntry( next, status );
 
 /* Set up the next MapEntry to be freed. */
          next = link;
@@ -1670,7 +1760,7 @@ static void FreeTableEntry( AstKeyMap *this, int itab ){
    }
 }
 
-static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+static const char *GetAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     GetAttrib
@@ -1683,7 +1773,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "keymap.h"
-*     const char *GetAttrib( AstObject *this, const char *attrib )
+*     const char *GetAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     KeyMap member function (over-rides the protected astGetAttrib
@@ -1700,6 +1790,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string containing the name of
 *        the attribute whose value is required. This name should be in
 *        lower case, with all white space removed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     - Pointer to a null-terminated string containing the attribute
@@ -1717,14 +1809,11 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *     reason.
 */
 
-/* Local Constants: */
-#define BUFF_LEN 50              /* Max. characters in result buffer */
-
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    AstKeyMap *this;              /* Pointer to the KeyMap structure */
    const char *result;           /* Pointer value to return */
    int ival;                     /* Attribute value */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
    result = NULL;
@@ -1732,12 +1821,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Check the global error status. */   
    if ( !astOK ) return result;
 
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this_object);
+
 /* Obtain a pointer to the KeyMap structure. */
    this = (AstKeyMap *) this_object;
 
 /* Compare "attrib" with each recognised attribute name in turn,
    obtaining the value of the required attribute. If necessary, write
-   the value into "buff" as a null-terminated string in an appropriate
+   the value into "getattrib_buff" as a null-terminated string in an appropriate
    format.  Set "result" to point at the result string. */
 
 /* SizeGuess. */
@@ -1745,24 +1837,22 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    if ( !strcmp( attrib, "sizeguess" ) ) {
       ival = astGetSizeGuess( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_getattrib)( this_object, attrib );
+      result = (*parent_getattrib)( this_object, attrib, status );
    }
 
 /* Return the result. */
    return result;
 
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
 
-static int GetObjSize( AstObject *this_object ) {
+static int GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -1775,7 +1865,7 @@ static int GetObjSize( AstObject *this_object ) {
 
 *  Synopsis:
 *     #include "keymap.h"
-*     int GetObjSize( AstObject *this ) 
+*     int GetObjSize( AstObject *this, int *status ) 
 
 *  Class Membership:
 *     KeyMap member function (over-rides the astGetObjSize protected
@@ -1788,6 +1878,8 @@ static int GetObjSize( AstObject *this_object ) {
 *  Parameters:
 *     this
 *        Pointer to the KeyMap.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Object size, in bytes.
@@ -1821,7 +1913,7 @@ static int GetObjSize( AstObject *this_object ) {
 /* Invoke the GetObjSize method inherited from the parent class, and then
    add on any components of the class structure defined by thsi class
    which are stored in dynamically allocated memory. */
-   result = (*parent_getobjsize)( this_object );
+   result = (*parent_getobjsize)( this_object, status );
 
    for( itab = 0; itab < this->mapsize; itab++ ) {
       next = this->table[ itab ];
@@ -1870,7 +1962,7 @@ static int GetObjSize( AstObject *this_object ) {
 
          } else {
             astError( AST__INTER, "astGetObjSize(KeyMap): Illegal map entry data "
-                      "type %d encountered (internal AST programming error).",
+                      "type %d encountered (internal AST programming error).", status,
                       type );
          }
 
@@ -1889,7 +1981,7 @@ static int GetObjSize( AstObject *this_object ) {
    return result;
 }
 
-static const char *GetKey( AstKeyMap *this, int index ) {
+static const char *GetKey( AstKeyMap *this, int index, int *status ) {
 /*
 *  Name:
 *     GetKey
@@ -1902,7 +1994,7 @@ static const char *GetKey( AstKeyMap *this, int index ) {
 
 *  Synopsis:
 *     #include "keymap.h"
-*     const char *GetKey( AstKeyMap *this, int index )
+*     const char *GetKey( AstKeyMap *this, int index, int *status )
 
 *  Class Membership:
 *     KeyMap method.
@@ -1919,6 +2011,8 @@ static const char *GetKey( AstKeyMap *this, int index ) {
 *        has index "size-1", where "size" is the value returned by the 
 *        astMapSize function. An error is reported if the supplied index is
 *        out of bounds.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *        A pointer to a null-terminated string containing the key.
@@ -1975,7 +2069,7 @@ static const char *GetKey( AstKeyMap *this, int index ) {
 /* Report an error if the element was not found. */
    if( !result && astOK ) {
       astError( AST__MPIND, "astMapKey(%s): Cannot find element "
-                "%d (zero-based) of the %s.", astGetClass( this ), 
+                "%d (zero-based) of the %s.", status, astGetClass( this ), 
                 index, astGetClass( this ) );
    } 
 
@@ -1983,7 +2077,7 @@ static const char *GetKey( AstKeyMap *this, int index ) {
    return result;
 }
 
-static int GetSizeGuess( AstKeyMap *this ) {
+static int GetSizeGuess( AstKeyMap *this, int *status ) {
 /*
 *+
 *  Name:
@@ -2034,7 +2128,7 @@ static int GetSizeGuess( AstKeyMap *this ) {
            MIN_TABLE_SIZE*MAX_ENTRIES_PER_TABLE_ENTRY : this->sizeguess;
 }
 
-static int HashFun( const char *key, int bitmask, unsigned long *hash ){
+static int HashFun( const char *key, int bitmask, unsigned long *hash, int *status ){
 /*
 *  Name:
 *     HashFun
@@ -2047,7 +2141,7 @@ static int HashFun( const char *key, int bitmask, unsigned long *hash ){
 
 *  Synopsis:
 *     #include "keymap.h"
-*     int HashFun( const char *key, int bitmask, int *hash )
+*     int HashFun( const char *key, int bitmask, int *hash, int *status )
 
 *  Class Membership:
 *     KeyMap member function.
@@ -2066,6 +2160,8 @@ static int HashFun( const char *key, int bitmask, unsigned long *hash ){
 *        should be one less than the length of the hash table.
 *     hash
 *        Pointer to a location at which to put the full width hash value.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     An integer in the range zero to ( mapsize - 1 ).
@@ -2094,7 +2190,7 @@ static int HashFun( const char *key, int bitmask, unsigned long *hash ){
    return ( *hash & bitmask );
 }
 
-void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name ) {
+void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -2131,10 +2227,14 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -2143,8 +2243,8 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAKeyMap) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -2206,13 +2306,23 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name ) {
    parent_testattrib = object->TestAttrib;
    object->TestAttrib = TestAttrib;
 
+#if defined(THREAD_SAFE)
+   parent_managelock = object->ManageLock;
+   object->ManageLock = ManageLock;
+#endif
+
 /* Declare the destructor, copy constructor and dump function. */
    astSetDelete( vtab, Delete );
    astSetCopy( vtab, Copy );
    astSetDump( vtab, Dump, "KeyMap", "Map of key/value pairs" );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
-static int KeyCmp( const char *key1, const char *key2 ) {
+static int KeyCmp( const char *key1, const char *key2, int *status ) {
 /*
 *  Name:
 *     KeyCmp
@@ -2225,7 +2335,7 @@ static int KeyCmp( const char *key1, const char *key2 ) {
 
 *  Synopsis:
 *     #include "keymap.h"
-*     int KeyCmp( const char *key1, const char *key2 )
+*     int KeyCmp( const char *key1, const char *key2, int *status )
 
 *  Class Membership:
 *     KeyMap member function.
@@ -2239,6 +2349,8 @@ static int KeyCmp( const char *key1, const char *key2 ) {
 *        Pointer to first string.
 *     key2
 *        Pointer to second string.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if the keys differ. Zero if they are identical (except for
@@ -2289,7 +2401,116 @@ static int KeyCmp( const char *key1, const char *key2 ) {
    return result;
 }
 
-static const char *MapKey( AstKeyMap *this, int index ) {
+#if defined(THREAD_SAFE)
+static int ManageLock( AstObject *this_object, int mode, int extra, int *status ) {
+/*
+*  Name:
+*     ManageLock
+
+*  Purpose:
+*     Manage the thread lock on an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "object.h"
+*     AstObject *ManageLock( AstObject *this, int mode, int extra, int *status ) 
+
+*  Class Membership:
+*     KeyMap member function (over-rides the astManageLock protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function manages the thread lock on the supplied Object. The
+*     lock can be locked, unlocked or checked by this function as 
+*     deteremined by parameter "mode". See astLock for details of the way
+*     these locks are used.
+
+*  Parameters:
+*     this
+*        Pointer to the Object.
+*     mode
+*        An integer flag indicating what the function should do:
+*
+*        AST__LOCK: Lock the Object for exclusive use by the calling
+*        thread. The "extra" value indicates what should be done if the
+*        Object is already locked (wait or report an error - see astLock).
+*
+*        AST__UNLOCK: Unlock the Object for use by other threads.
+*
+*        AST__CHECKLOCK: Check that the object is locked for use by the
+*        calling thread (report an error if not).
+*     extra
+*        Extra mode-specific information. 
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*    A local status value: 
+*        0 - Success
+*        1 - Could not lock or unlock the object because it was already 
+*            locked by another thread.
+*        2 - Failed to lock a POSIX mutex
+*        3 - Failed to unlock a POSIX mutex
+*        4 - Bad "mode" value supplied.
+
+*  Notes:
+*     - This function attempts to execute even if an error has already
+*     occurred.
+*/
+
+/* Local Variables: */
+   AstKeyMap *this;       /* Pointer to KeyMap structure */
+   AstMapEntry *next;     /* Pointer the next MapEntry */
+   AstObject **alist;     /* Pointer to list of AST object pointers */
+   AstObject *obj;        /* Pointer to AST object */
+   int i;                 /* Loop count */
+   int itab;              /* Table entry index */
+   int nel;               /* No. of values in entry vector (0 => scalar) */
+   int result;            /* Returned status value */
+
+/* Initialise */
+   result = 0;
+
+/* Check the supplied pointer is not NULL. */
+   if( !this_object ) return result;
+
+/* Obtain a pointers to the KeyMap structure. */
+   this = (AstKeyMap *) this_object;
+
+/* Invoke the astManageLock method on any Objects contained within
+   the supplied Object. */
+   for( itab = 0; itab < this->mapsize; itab++ ) {
+      next = this->table[ itab ];
+      while( next ) {
+         if( next->type == AST__OBJECTTYPE ) {
+            nel = next->nel;
+            if( nel == 0 ) {
+               obj = ( (Entry0A *) next )->value;
+               if( !result ) result = astManageLock( obj, mode, extra );
+            } else {
+               alist = ( (Entry1A *) next )->value;
+               if( alist ) {
+                  for( i = 0; i < nel; i++ ) {
+                     if( !result ) result = astManageLock( alist[ i ], mode, extra );
+                  }
+               }
+            }
+         } 
+         next = next->next;
+      }
+   }
+
+/* Invoke the ManageLock method inherited from the parent class, and
+   return the resulting status value. */
+   if( !result ) result = (*parent_managelock)( this_object, mode, extra, status );
+   return result;
+
+}
+#endif
+
+static const char *MapKey( AstKeyMap *this, int index, int *status ) {
 /*
 *++
 *  Name:
@@ -2362,16 +2583,11 @@ f     reason.
 *--
 */
 
-/* Local Constants: */
-#define MAX_STRINGS 50           /* Number of string values to buffer */
-
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
    const char *result;           /* Pointer value to return */
    const char *value;            /* Pointer to key value */
    int i;                        /* Loop counter for initialisation */
-   static char *strings[ MAX_STRINGS ]; /* Pointers to string buffers */
-   static int init = 0;          /* "strings" array initialised? */
-   static int istr = 0;          /* Offset of next string in "strings" */
 
 /* Initialise. */
    result = NULL;
@@ -2379,42 +2595,43 @@ f     reason.
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* If the "strings" array has not been initialised, fill it with
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this);
+
+/* If the "mapkey_strings" array has not been initialised, fill it with
    NULL pointers. */
-   if ( !init ) {
-      init = 1;
-      for ( i = 0; i < MAX_STRINGS; i++ ) strings[ i ] = NULL;
+   if ( !mapkey_init ) {
+      mapkey_init = 1;
+      for ( i = 0; i < AST__KEYMAP_MAPKEY_MAX_STRINGS; i++ ) mapkey_strings[ i ] = NULL;
    }
 
 /* Obtain a pointer to the required key value. */
-   value = GetKey( this, index );
+   value = GetKey( this, index, status );
 
 /* If OK, store a copy of the resulting string in dynamically
    allocated memory, putting a pointer to the copy into the next
-   element of the "strings" array.  (This process also de-allocates
-   any previously allocated memory pointed at by this "strings"
+   element of the "mapkey_strings" array.  (This process also de-allocates
+   any previously allocated memory pointed at by this "mapkey_strings"
    element, so the earlier string is effectively replaced by the new
    one.) */
    if ( astOK ) {
       astBeginPM;
-      strings[ istr ] = astStore( strings[ istr ], value,
+      mapkey_strings[ mapkey_istr ] = astStore( mapkey_strings[ mapkey_istr ], value,
                                   strlen( value ) + (size_t) 1 );
       astEndPM;
 
-/* If OK, return a pointer to the copy and increment "istr" to use the
-   next element of "strings" on the next invocation. Recycle "istr" to
+/* If OK, return a pointer to the copy and increment "mapkey_istr" to use the
+   next element of "mapkey_strings" on the next invocation. Recycle "mapkey_istr" to
    zero when all elements have been used. */
       if ( astOK ) {
-         result = strings[ istr++ ];
-         if ( istr == ( MAX_STRINGS - 1 ) ) istr = 0;
+         result = mapkey_strings[ mapkey_istr++ ];
+         if ( mapkey_istr == ( AST__KEYMAP_MAPKEY_MAX_STRINGS - 1 ) ) mapkey_istr = 0;
       }
    }
 
 /* Return the result. */
    return result;
 
-/* Undefine macros local to this function. */
-#undef MAX_STRINGS
 }
 
 /*
@@ -2513,7 +2730,7 @@ c     this is attempted.
 /* Define a macro to implement the function for a specific data type. */
 #define MAKE_MAPPUT0(X,Xtype,Itype,ValExp) \
 static void MapPut0##X( AstKeyMap *this, const char *key, Xtype value, \
-                        const char *comment ) { \
+                        const char *comment, int *status ) { \
 \
 /* Local Variables: */ \
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */ \
@@ -2561,19 +2778,19 @@ static void MapPut0##X( AstKeyMap *this, const char *key, Xtype value, \
 \
 /* Use the hash function to determine the element of the hash table in \
    which to store the new entry. */ \
-      itab = HashFun( mapentry->key, this->mapsize - 1, &(mapentry->hash) ); \
+      itab = HashFun( mapentry->key, this->mapsize - 1, &(mapentry->hash), status ); \
 \
 /* Remove any existing entry with the given key from the table element. */ \
-      RemoveTableEntry( this, itab, mapentry->key ); \
+      RemoveTableEntry( this, itab, mapentry->key, status ); \
 \
 /* If all has gone OK, store the new entry at the head of the linked list \
    associated with the selected table entry. */ \
       if( astOK ) { \
-         mapentry = AddTableEntry( this, itab, mapentry ); \
+         mapentry = AddTableEntry( this, itab, mapentry, status ); \
 \
 /* If anything went wrong, try to delete the new entry. */ \
       } else { \
-         mapentry = FreeMapEntry( mapentry ); \
+         mapentry = FreeMapEntry( mapentry, status ); \
       } \
    } \
 } 
@@ -2582,7 +2799,7 @@ static void MapPut0##X( AstKeyMap *this, const char *key, Xtype value, \
    to be stored. For Object entries, check that we are not adding a KeyMap 
    which already contains "this". This avoids circular dependencies.
    Other types do not need any checks. */ 
-#define CHECK_A CheckCircle( this, value, "astMapPut0A" );
+#define CHECK_A CheckCircle( this, value, "astMapPut0A", status );
 #define CHECK_I
 #define CHECK_D
 #define CHECK_F
@@ -2706,7 +2923,7 @@ c     this is attempted.
 /* Define a macro to implement the function for a specific data type. */
 #define MAKE_MAPPUT1(X,Xtype,Itype,ValExp) \
 static void MapPut1##X( AstKeyMap *this, const char *key, int size, Xtype value[], \
-                        const char *comment ) { \
+                        const char *comment, int *status ) { \
 \
 /* Local Variables: */ \
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */ \
@@ -2759,19 +2976,19 @@ static void MapPut1##X( AstKeyMap *this, const char *key, int size, Xtype value[
 \
 /* Use the hash function to determine the element of the hash table in \
    which to store the new entry. */ \
-      itab = HashFun( mapentry->key, this->mapsize - 1, &(mapentry->hash) ); \
+      itab = HashFun( mapentry->key, this->mapsize - 1, &(mapentry->hash), status ); \
 \
 /* Remove any existing entry with the given key from the table element. */ \
-      RemoveTableEntry( this, itab, mapentry->key ); \
+      RemoveTableEntry( this, itab, mapentry->key, status ); \
 \
 /* If all has gone OK, store the new entry at the head of the linked list \
    associated with the selected table entry. */ \
       if( astOK ) { \
-         mapentry = AddTableEntry( this, itab, mapentry ); \
+         mapentry = AddTableEntry( this, itab, mapentry, status ); \
 \
 /* If anything went wrong, try to delete the new entry. */ \
       } else { \
-         mapentry = FreeMapEntry( mapentry ); \
+         mapentry = FreeMapEntry( mapentry, status ); \
       } \
    } \
 } 
@@ -2782,7 +2999,7 @@ static void MapPut1##X( AstKeyMap *this, const char *key, int size, Xtype value[
    Other types do not need any checks. */ 
 #define CHECK_A \
 for( i = 0; i < size; i++ ) { \
-   CheckCircle( this, value[ i ], "astMapPut1A" ); \
+   CheckCircle( this, value[ i ], "astMapPut1A", status ); \
 }
 #define CHECK_I
 #define CHECK_D
@@ -2809,7 +3026,7 @@ MAKE_MAPPUT1(P,void *,AST__POINTERTYPE,value[i])
 #undef CHECK_P
 
 void astMapPut1AId_( AstKeyMap *this, const char *key, int size, AstObject *value[],
-                     const char *comment ) {
+                     const char *comment, int *status ) {
 /*
 *  Name:
 *     astMapPut1AId_
@@ -2888,19 +3105,19 @@ void astMapPut1AId_( AstKeyMap *this, const char *key, int size, AstObject *valu
 
 /* Use the hash function to determine the element of the hash table in
    which to store the new entry. */
-      itab = HashFun( mapentry->key, this->mapsize - 1, &(mapentry->hash) );
+      itab = HashFun( mapentry->key, this->mapsize - 1, &(mapentry->hash), status );
 
 /* Remove any existing entry with the given key from the table element. */
-      RemoveTableEntry( this, itab, mapentry->key );
+      RemoveTableEntry( this, itab, mapentry->key, status );
 
 /* If all has gone OK, store the new entry at the head of the linked list
    associated with the selected table entry. */
       if( astOK ) {
-         mapentry = AddTableEntry( this, itab, mapentry );
+         mapentry = AddTableEntry( this, itab, mapentry, status );
 
 /* If anything went wrong, try to delete the new entry. */
       } else {
-         mapentry = FreeMapEntry( mapentry );
+         mapentry = FreeMapEntry( mapentry, status );
       }
    }
 } 
@@ -3019,7 +3236,7 @@ f     while AST_MAPGET0I would be used to get an INTEGER, etc.
 */
 /* Define a macro to implement the function for a specific data type. */
 #define MAKE_MAPGET0(X,Xtype,Itype) \
-static int MapGet0##X( AstKeyMap *this, const char *key, Xtype *value ) { \
+static int MapGet0##X( AstKeyMap *this, const char *key, Xtype *value, int *status ) { \
 \
 /* Local Variables: */ \
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */ \
@@ -3037,10 +3254,10 @@ static int MapGet0##X( AstKeyMap *this, const char *key, Xtype *value ) { \
 \
 /* Use the hash function to determine the element of the hash table in \
    which the key will be stored. */ \
-   itab = HashFun( key, this->mapsize - 1, &hash ); \
+   itab = HashFun( key, this->mapsize - 1, &hash, status ); \
 \
 /* Search the relevent table entry for the required MapEntry. */ \
-   mapentry = SearchTableEntry( this, itab, key ); \
+   mapentry = SearchTableEntry( this, itab, key, status ); \
 \
 /* Skip rest if the key was not found. */ \
    if( mapentry ) { \
@@ -3092,16 +3309,16 @@ static int MapGet0##X( AstKeyMap *this, const char *key, Xtype *value ) { \
       } else { \
          raw = NULL; \
          astError( AST__INTER, "astMapGet0<X>(KeyMap): Illegal map entry data " \
-                   "type %d encountered (internal AST programming error).", \
+                   "type %d encountered (internal AST programming error).", status, \
                    raw_type ); \
       } \
 \
 /* Convert the value, storing the result the supplied buffer. Report an \
    error if conversion is not possible. */ \
-      if( !ConvertValue( raw, raw_type, value, Itype ) && astOK ){ \
+      if( !ConvertValue( raw, raw_type, value, Itype, status ) && astOK ){ \
          astError( AST__MPGER, "astMapGet0" #X "(%s): The value of KeyMap key " \
                    "\"%s\" cannot be read using the requested data " \
-                   "type.",astGetClass( this ), key ); \
+                   "type.", status,astGetClass( this ), key ); \
       } else { \
          result = 1; \
       } \
@@ -3126,7 +3343,7 @@ MAKE_MAPGET0(P,void *,AST__POINTERTYPE)
 /* Undefine the macro. */
 #undef MAKE_MAPGET0
 
-int astMapGet0AId_( AstKeyMap *this, const char *key, AstObject **value ) {
+int astMapGet0AId_( AstKeyMap *this, const char *key, AstObject **value, int *status ) {
 /*
 *  Name:
 *     astMapGet0AId_
@@ -3172,10 +3389,10 @@ int astMapGet0AId_( AstKeyMap *this, const char *key, AstObject **value ) {
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
-   itab = HashFun( key, this->mapsize - 1, &hash );
+   itab = HashFun( key, this->mapsize - 1, &hash, status );
 
 /* Search the relevent table entry for the required MapEntry. */
-   mapentry = SearchTableEntry( this, itab, key );
+   mapentry = SearchTableEntry( this, itab, key, status );
 
 /* Skip rest if the key was not found. */
    if( mapentry ) {
@@ -3227,16 +3444,16 @@ int astMapGet0AId_( AstKeyMap *this, const char *key, AstObject **value ) {
       } else {
          raw = NULL;
          astError( AST__INTER, "astMapGet0<X>(KeyMap): Illegal map entry data "
-                   "type %d encountered (internal AST programming error).",
+                   "type %d encountered (internal AST programming error).", status,
                    raw_type );
       }
 
 /* Convert the value, storing the result the supplied buffer. Report an
    error if conversion is not possible. */
-      if( !ConvertValue( raw, raw_type, value, AST__OBJECTTYPE ) && astOK ){
+      if( !ConvertValue( raw, raw_type, value, AST__OBJECTTYPE, status ) && astOK ){
          astError( AST__MPGER, "astMapGet0A(%s): The value of KeyMap key "
                    "\"%s\" cannot be read using the requested data "
-                   "type.", astGetClass( this ), key );
+                   "type.", status, astGetClass( this ), key );
       } else {
          result = 1;
       }
@@ -3382,7 +3599,7 @@ f     while AST_MAPGET1I would be used to get INTEGER values, etc.
 /* Define a macro to implement the function for a specific data type
 (excluding "C" since that needs an extra parameter). */
 #define MAKE_MAPGET1(X,Xtype,Itype) \
-static int MapGet1##X( AstKeyMap *this, const char *key, int mxval, int *nval, Xtype *value ) { \
+static int MapGet1##X( AstKeyMap *this, const char *key, int mxval, int *nval, Xtype *value, int *status ) { \
 \
 /* Local Variables: */ \
    AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */ \
@@ -3404,10 +3621,10 @@ static int MapGet1##X( AstKeyMap *this, const char *key, int mxval, int *nval, X
 \
 /* Use the hash function to determine the element of the hash table in \
    which the key will be stored. */ \
-   itab = HashFun( key, this->mapsize - 1, &hash ); \
+   itab = HashFun( key, this->mapsize - 1, &hash, status ); \
 \
 /* Search the relevent table entry for the required MapEntry. */ \
-   mapentry = SearchTableEntry( this, itab, key ); \
+   mapentry = SearchTableEntry( this, itab, key, status ); \
 \
 /* Skip rest if the key was not found. */ \
    if( mapentry ) { \
@@ -3469,7 +3686,7 @@ static int MapGet1##X( AstKeyMap *this, const char *key, int mxval, int *nval, X
          raw_size = 0; \
          raw = NULL; \
          astError( AST__INTER, "astMapGet1<X>(KeyMap): Illegal map entry data " \
-                   "type %d encountered (internal AST programming error).", \
+                   "type %d encountered (internal AST programming error).", status, \
                    raw_type ); \
       } \
 \
@@ -3487,10 +3704,10 @@ static int MapGet1##X( AstKeyMap *this, const char *key, int mxval, int *nval, X
 \
 /* Convert the value, storing the result in the supplied buffer. Report an \
    error if conversion is not possible. */ \
-         if( !ConvertValue( raw, raw_type, value + i, Itype ) && astOK ){ \
+         if( !ConvertValue( raw, raw_type, value + i, Itype, status ) && astOK ){ \
             astError( AST__MPGER, "astMapGet0" #X "(%s): The value of " \
                       "element %d of KeyMap key \"%s\" cannot be read using " \
-                      "the requested data type.",astGetClass( this ), i + 1, key ); \
+                      "the requested data type.", status,astGetClass( this ), i + 1, key ); \
          } \
 \
 /* Increment the pointers to the next raw value. */ \
@@ -3518,7 +3735,7 @@ MAKE_MAPGET1(P,void *,AST__POINTERTYPE)
 
 
 static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval, 
-                     int *nval, char *value ) { 
+                     int *nval, char *value, int *status ) { 
 /*
 *  Name:
 *     MapGet1C
@@ -3532,7 +3749,7 @@ static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval,
 *  Synopsis:
 *     #include "ast.h"
 *     int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval, 
-*                   int *nval, char *value )
+*                   int *nval, char *value, int *status )
 
 *  Class Membership:
 *     KeyMap method.
@@ -3545,6 +3762,8 @@ static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval,
 
 *  Parameters:
 *     (see astMapGet1<X>)
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */ 
@@ -3569,10 +3788,10 @@ static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval,
 
 /* Use the hash function to determine the element of the hash table in 
    which the key will be stored. */ 
-   itab = HashFun( key, this->mapsize - 1, &hash ); 
+   itab = HashFun( key, this->mapsize - 1, &hash, status ); 
 
 /* Search the relevent table entry for the required MapEntry. */ 
-   mapentry = SearchTableEntry( this, itab, key ); 
+   mapentry = SearchTableEntry( this, itab, key, status ); 
 
 /* Skip rest if the key was not found. */ 
    if( mapentry ) { 
@@ -3634,7 +3853,7 @@ static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval,
          raw_size = 0; 
          raw = NULL; 
          astError( AST__INTER, "astMapGet1C(KeyMap): Illegal map entry data " 
-                   "type %d encountered (internal AST programming error).", 
+                   "type %d encountered (internal AST programming error).", status, 
                    raw_type ); 
       } 
 
@@ -3653,10 +3872,10 @@ static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval,
 
 /* Convert the value, storing the result in the supplied buffer. Report an 
    error if conversion is not possible. */ 
-         if( !ConvertValue( raw, raw_type, &cvalue, AST__STRINGTYPE ) && astOK ){ 
+         if( !ConvertValue( raw, raw_type, &cvalue, AST__STRINGTYPE, status ) && astOK ){ 
             astError( AST__MPGER, "astMapGet0C(%s): The value of " 
                       "element %d of KeyMap key \"%s\" cannot be read using " 
-                      "the requested data type.",astGetClass( this ), i + 1, key ); 
+                      "the requested data type.", status,astGetClass( this ), i + 1, key ); 
 
 /* If succesful, copy the string into the supplied buffer, or as much of
    it as will fit. Leave room for a trailing null character. */
@@ -3680,7 +3899,7 @@ static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval,
 }
 
 int astMapGet1AId_( AstKeyMap *this, const char *key, int mxval, int *nval, 
-                    AstObject **value ) { 
+                    AstObject **value, int *status ) { 
 /*
 *  Name:
 *     astMapGet1AId_
@@ -3732,10 +3951,10 @@ int astMapGet1AId_( AstKeyMap *this, const char *key, int mxval, int *nval,
 
 /* Use the hash function to determine the element of the hash table in 
    which the key will be stored. */ 
-   itab = HashFun( key, this->mapsize - 1, &hash ); 
+   itab = HashFun( key, this->mapsize - 1, &hash, status ); 
 
 /* Search the relevent table entry for the required MapEntry. */ 
-   mapentry = SearchTableEntry( this, itab, key ); 
+   mapentry = SearchTableEntry( this, itab, key, status ); 
 
 /* Skip rest if the key was not found. */ 
    if( mapentry ) { 
@@ -3797,7 +4016,7 @@ int astMapGet1AId_( AstKeyMap *this, const char *key, int mxval, int *nval,
          raw_size = 0; 
          raw = NULL; 
          astError( AST__INTER, "astMapGet1<X>(KeyMap): Illegal map entry data " 
-                   "type %d encountered (internal AST programming error).", 
+                   "type %d encountered (internal AST programming error).", status, 
                    raw_type ); 
       } 
 
@@ -3815,10 +4034,10 @@ int astMapGet1AId_( AstKeyMap *this, const char *key, int mxval, int *nval,
 
 /* Convert the value, storing the result in the supplied buffer. Report an 
    error if conversion is not possible. */ 
-         if( !ConvertValue( raw, raw_type, &avalue, AST__OBJECTTYPE ) && astOK ){ 
+         if( !ConvertValue( raw, raw_type, &avalue, AST__OBJECTTYPE, status ) && astOK ){ 
             astError( AST__MPGER, "astMapGet0A(%s): The value of " 
                       "element %d of KeyMap key \"%s\" cannot be read using " 
-                      "the requested data type.",astGetClass( this ), i + 1, key ); 
+                      "the requested data type.", status,astGetClass( this ), i + 1, key ); 
 
 /* If succesful, return an ID value for the Object. */
          } else {
@@ -3837,7 +4056,7 @@ int astMapGet1AId_( AstKeyMap *this, const char *key, int mxval, int *nval,
    return result; 
 }
 
-static int MapHasKey( AstKeyMap *this, const char *key ) {
+static int MapHasKey( AstKeyMap *this, const char *key, int *status ) {
 /*
 *++
 *  Name:
@@ -3903,10 +4122,10 @@ f     .FALSE.
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
-   itab = HashFun( key, this->mapsize - 1, &hash );
+   itab = HashFun( key, this->mapsize - 1, &hash, status );
 
 /* Search the relevent table entry for the required MapEntry. */
-   mapentry = SearchTableEntry( this, itab, key );
+   mapentry = SearchTableEntry( this, itab, key, status );
 
 /* Set a non-zero return value if the key was found. */
    if( mapentry ) result = 1;
@@ -3919,7 +4138,7 @@ f     .FALSE.
 
 }
 
-static void MapRemove( AstKeyMap *this, const char *key ) {
+static void MapRemove( AstKeyMap *this, const char *key, int *status ) {
 /*
 *++
 *  Name:
@@ -3968,14 +4187,14 @@ f        The global status.
 
 /* Use the hash function to determine the element of the hash table in 
    which the key will be stored. */
-   itab = HashFun( key, this->mapsize - 1, &hash );
+   itab = HashFun( key, this->mapsize - 1, &hash, status );
 
 /* Search the relevent table entry for the required MapEntry and remove it. */
-   RemoveTableEntry( this, itab, key );
+   RemoveTableEntry( this, itab, key, status );
 
 }
 
-static int MapSize( AstKeyMap *this ) {
+static int MapSize( AstKeyMap *this, int *status ) {
 /*
 *++
 *  Name:
@@ -4036,7 +4255,7 @@ f     AST_MAPSIZE = INTEGER
 
 }
 
-static int MapLenC( AstKeyMap *this, const char *key ) {
+static int MapLenC( AstKeyMap *this, const char *key, int *status ) {
 /*
 *++
 *  Name:
@@ -4111,10 +4330,10 @@ c        This does not include the trailing null character.
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
-   itab = HashFun( key, this->mapsize - 1, &hash );
+   itab = HashFun( key, this->mapsize - 1, &hash, status );
 
 /* Search the relevent table entry for the required MapEntry. */
-   mapentry = SearchTableEntry( this, itab, key );
+   mapentry = SearchTableEntry( this, itab, key, status );
 
 /* Skip rest if the key was not found. */
    if( mapentry ) {
@@ -4175,7 +4394,7 @@ c        This does not include the trailing null character.
          raw_size = 0; 
          raw = NULL; 
          astError( AST__INTER, "astMapLenC(KeyMap): Illegal map entry data " 
-                   "type %d encountered (internal AST programming error).", 
+                   "type %d encountered (internal AST programming error).", status, 
                    raw_type ); 
       } 
 
@@ -4191,7 +4410,7 @@ c        This does not include the trailing null character.
 /* Go through the motions of formatting the value. We do not actually
    need the formatted string (just its length) so we provide a NULL pointer
    for the output buffer. The entry is ignored if it cannot be formatted. */
-         l = ConvertValue( raw, raw_type, NULL, AST__STRINGTYPE );
+         l = ConvertValue( raw, raw_type, NULL, AST__STRINGTYPE, status );
          if( l > result ) result = l;
 
 /* Increment the pointer to the next raw value. */
@@ -4207,7 +4426,7 @@ c        This does not include the trailing null character.
 
 }
 
-static int MapLength( AstKeyMap *this, const char *key ) {
+static int MapLength( AstKeyMap *this, const char *key, int *status ) {
 /*
 *++
 *  Name:
@@ -4271,10 +4490,10 @@ f     AST_MAPLENGTH = INTEGER
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
-   itab = HashFun( key, this->mapsize - 1, &hash );
+   itab = HashFun( key, this->mapsize - 1, &hash, status );
 
 /* Search the relevent table entry for the required MapEntry. */
-   mapentry = SearchTableEntry( this, itab, key );
+   mapentry = SearchTableEntry( this, itab, key, status );
 
 /* Skip rest if the key was not found. */
    if( mapentry ) {
@@ -4295,7 +4514,7 @@ f     AST_MAPLENGTH = INTEGER
 
 }
 
-static int MapType( AstKeyMap *this, const char *key ) {
+static int MapType( AstKeyMap *this, const char *key, int *status ) {
 /*
 *++
 *  Name:
@@ -4362,10 +4581,10 @@ f     AST_MAPTYPE = INTEGER
 
 /* Use the hash function to determine the element of the hash table in
    which the key will be stored. */
-   itab = HashFun( key, this->mapsize - 1, &hash );
+   itab = HashFun( key, this->mapsize - 1, &hash, status );
 
 /* Search the relevent table entry for the required MapEntry. */
-   mapentry = SearchTableEntry( this, itab, key );
+   mapentry = SearchTableEntry( this, itab, key, status );
 
 /* Store the type if found. */
    if( mapentry ) result = mapentry->type;
@@ -4378,7 +4597,7 @@ f     AST_MAPTYPE = INTEGER
 
 }
 
-static void NewTable( AstKeyMap *this, int size ){
+static void NewTable( AstKeyMap *this, int size, int *status ){
 /*
 *  Name:
 *     NewTable
@@ -4391,7 +4610,7 @@ static void NewTable( AstKeyMap *this, int size ){
 
 *  Synopsis:
 *     #include "keymap.h"
-*     void NewTable( AstKeyMap *this, int size )
+*     void NewTable( AstKeyMap *this, int size, int *status )
 
 *  Class Membership:
 *     KeyMap member function.
@@ -4407,6 +4626,8 @@ static void NewTable( AstKeyMap *this, int size ){
 *        Pointer to the KeyMap.
 *     size
 *        The reuqired size of the hash table.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -4424,7 +4645,7 @@ static void NewTable( AstKeyMap *this, int size ){
    }
 
 /* Remove any existing entries. */
-   for( i = 0; i < this->mapsize; i++ ) FreeTableEntry( this, i );
+   for( i = 0; i < this->mapsize; i++ ) FreeTableEntry( this, i, status );
 
 /* Do nothing more if the table size is not changing. */
    if( size != this->mapsize ) {
@@ -4444,7 +4665,7 @@ static void NewTable( AstKeyMap *this, int size ){
    }
 }
 
-static void RemoveTableEntry( AstKeyMap *this, int itab, const char *key ){
+static void RemoveTableEntry( AstKeyMap *this, int itab, const char *key, int *status ){
 /*
 *  Name:
 *     RemoveTableEntry
@@ -4457,7 +4678,7 @@ static void RemoveTableEntry( AstKeyMap *this, int itab, const char *key ){
 
 *  Synopsis:
 *     #include "keymap.h"
-*     void RemoveTableEntry( AstKeyMap *this, int itab, const char *key )
+*     void RemoveTableEntry( AstKeyMap *this, int itab, const char *key, int *status )
 
 *  Class Membership:
 *     KeyMap member function.
@@ -4475,6 +4696,8 @@ static void RemoveTableEntry( AstKeyMap *this, int itab, const char *key ){
 *        Index of the hash table element to be searched.
 *     key
 *        The key string to be searched for. Trailing spaces are ignored.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -4499,14 +4722,14 @@ static void RemoveTableEntry( AstKeyMap *this, int itab, const char *key ){
    while( next && astOK ) {
 
 /* If the key for the current entry macthes the supplied key... */
-      if( !KeyCmp( next->key, key ) ) {
+      if( !KeyCmp( next->key, key, status ) ) {
       
 /* Store a pointer to the next MapEntry in the list, replacing the
    original pointer to the MapEntry which is being deleted. */
          *link = next->next;
 
 /* Free this MapEntry */
-         FreeMapEntry( next );
+         FreeMapEntry( next, status );
 
 /* Decrement the number of entries in the linked list. */
          this->nentry[ itab ]--;
@@ -4527,7 +4750,7 @@ static void RemoveTableEntry( AstKeyMap *this, int itab, const char *key ){
    }
 }
 
-static AstMapEntry *SearchTableEntry( AstKeyMap *this, int itab, const char *key ){
+static AstMapEntry *SearchTableEntry( AstKeyMap *this, int itab, const char *key, int *status ){
 /*
 *  Name:
 *     SearchTableEntry
@@ -4540,7 +4763,7 @@ static AstMapEntry *SearchTableEntry( AstKeyMap *this, int itab, const char *key
 
 *  Synopsis:
 *     #include "keymap.h"
-*     AstMapEntry *SearchTableEntry( AstKeyMap *this, int itab, const char *key )
+*     AstMapEntry *SearchTableEntry( AstKeyMap *this, int itab, const char *key, int *status )
 
 *  Class Membership:
 *     KeyMap member function.
@@ -4558,6 +4781,8 @@ static AstMapEntry *SearchTableEntry( AstKeyMap *this, int itab, const char *key
 *        The index of the hash table to be searched.
 *     key
 *        The key string to be searched for. Trailing spaces are ignored.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The address of the first MapEntry in the linked list which refers
@@ -4584,7 +4809,7 @@ static AstMapEntry *SearchTableEntry( AstKeyMap *this, int itab, const char *key
 
 /* If the key for the current entry matches the supplied key, store the
    MapEntry pointer and break. */
-      if( !KeyCmp( next->key, key ) ) {
+      if( !KeyCmp( next->key, key, status ) ) {
          result = next;
          break;
       }
@@ -4598,7 +4823,7 @@ static AstMapEntry *SearchTableEntry( AstKeyMap *this, int itab, const char *key
    return result;
 }
 
-static void SetAttrib( AstObject *this_object, const char *setting ) {
+static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
 *     astSetAttrib
@@ -4670,11 +4895,11 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      (*parent_setattrib)( this_object, setting );
+      (*parent_setattrib)( this_object, setting, status );
    }
 }
 
-static void SetSizeGuess( AstKeyMap *this, int sizeguess ) {
+static void SetSizeGuess( AstKeyMap *this, int sizeguess, int *status ) {
 /*
 *+
 *  Name:
@@ -4725,17 +4950,17 @@ static void SetSizeGuess( AstKeyMap *this, int sizeguess ) {
 /* If not report an error. */
    if( !empty ) {
       astError( AST__NOWRT, "astSetAttrib(KeyMap): Illegal attempt to "
-                "change the SizeGuess attribute of a non-empty KeyMap." );
+                "change the SizeGuess attribute of a non-empty KeyMap." , status);
 
 /* Otherwise, store the new value and change the size of the hash
    table. */
    } else {
       this->sizeguess = sizeguess;
-      NewTable( this, sizeguess/MAX_ENTRIES_PER_TABLE_ENTRY );
+      NewTable( this, sizeguess/MAX_ENTRIES_PER_TABLE_ENTRY, status );
    }
 }
 
-static size_t SizeOfEntry( AstMapEntry *entry ){
+static size_t SizeOfEntry( AstMapEntry *entry, int *status ){
 /*
 *  Name:
 *     SizeOfEntry
@@ -4748,7 +4973,7 @@ static size_t SizeOfEntry( AstMapEntry *entry ){
 
 *  Synopsis:
 *     #include "keymap.h"
-*     size_t SizeOfEntry( AstMapEntry *entry )
+*     size_t SizeOfEntry( AstMapEntry *entry, int *status )
 
 *  Class Membership:
 *     KeyMap member function.
@@ -4759,6 +4984,8 @@ static size_t SizeOfEntry( AstMapEntry *entry ){
 *  Parameters:
 *     entry
 *        Pointer to the MapEntry.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The size of the MapEntry structure. This does not include the size
@@ -4807,7 +5034,7 @@ static size_t SizeOfEntry( AstMapEntry *entry ){
 /* Report an error if the data type is unknown. */
    } else {
       astError( AST__INTER, "SizeOfEntry(KeyMap): Illegal map entry data "
-                "type %d encountered (internal AST programming error).",
+                "type %d encountered (internal AST programming error).", status,
                 type );
    }
 
@@ -4815,7 +5042,7 @@ static size_t SizeOfEntry( AstMapEntry *entry ){
    return result;
 }
 
-static int TestAttrib( AstObject *this_object, const char *attrib ) {
+static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     TestAttrib
@@ -4828,7 +5055,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "keymap.h"
-*     int TestAttrib( AstObject *this, const char *attrib )
+*     int TestAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     KeyMap member function (over-rides the astTestAttrib protected
@@ -4845,6 +5072,8 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if a value has been set, otherwise zero.
@@ -4877,14 +5106,14 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_testattrib)( this_object, attrib );
+      result = (*parent_testattrib)( this_object, attrib, status );
    }
 
 /* Return the result, */
    return result;
 }
 
-static int TestSizeGuess( AstKeyMap *this ) {
+static int TestSizeGuess( AstKeyMap *this, int *status ) {
 /*
 *+
 *  Name:
@@ -4974,7 +5203,7 @@ static int TestSizeGuess( AstKeyMap *this ) {
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -4986,7 +5215,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for KeyMap objects.
@@ -4996,6 +5225,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the object to be copied.
 *     objout
 *        Pointer to the object being constructed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -5025,11 +5256,11 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
    out->table = astMalloc( sizeof( AstMapEntry * )*( out->mapsize ) );
    out->nentry = astMalloc( sizeof( int )*( out->mapsize ) );
 
-   for( i = 0; i < out->mapsize; i++ ) CopyTableEntry( in, out, i );
+   for( i = 0; i < out->mapsize; i++ ) CopyTableEntry( in, out, i, status );
 
 /* If an error occurred, clean up by freeing all memory allocated above. */
    if ( !astOK ) {
-      for( i = 0; i < out->mapsize; i++ ) FreeTableEntry( out, i );
+      for( i = 0; i < out->mapsize; i++ ) FreeTableEntry( out, i, status );
       out->table = astFree( out->table );
       out->nentry = astFree( out->nentry );
    }
@@ -5037,7 +5268,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -5049,7 +5280,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for KeyMap objects.
@@ -5057,6 +5288,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the object to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -5074,7 +5307,7 @@ static void Delete( AstObject *obj ) {
    this = (AstKeyMap *) obj;
 
 /* Free all allocated memory. */
-   for( i = 0; i < this->mapsize; i++ ) FreeTableEntry( this, i );
+   for( i = 0; i < this->mapsize; i++ ) FreeTableEntry( this, i, status );
 
 /* Free memory used to hold tables. */
    this->table = astFree( this->table );
@@ -5083,7 +5316,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -5095,7 +5328,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -5106,6 +5339,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the KeyMap whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -5127,8 +5362,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* SizeGuess. */
 /* ---------- */
-   set = TestSizeGuess( this );
-   ival = set ? GetSizeGuess( this ) : astGetSizeGuess( this );
+   set = TestSizeGuess( this, status );
+   ival = set ? GetSizeGuess( this, status ) : astGetSizeGuess( this );
    astWriteInt( channel, "SzGss", set, 0, ival, "Guess at KeyMap size" );
 
 /* MapSize. */
@@ -5143,7 +5378,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Loop round dumping all KeyMap entries in this element of the hash table. */
       while( next && astOK ) {
-         DumpEntry( next, channel, ++nentry  );
+         DumpEntry( next, channel, ++nentry, status );
 
 /* Get a pointer to the next entry to dump. */
          next = next->next;
@@ -5156,10 +5391,10 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsAKeyMap and astCheckKeyMap functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(KeyMap,Object,check,&class_init)
+astMAKE_ISA(KeyMap,Object,check,&class_check)
 astMAKE_CHECK(KeyMap)
 
-AstKeyMap *astKeyMap_( const char *options, ... ) {
+AstKeyMap *astKeyMap_( const char *options, int *status, ...) {
 /*
 *++
 *  Name:
@@ -5230,12 +5465,23 @@ f     AST_MAP = INTEGER
 c     function is invoked with the AST error status set, or if it
 f     function is invoked with STATUS set to an error value, or if it
 *     should fail for any reason.
+
+*  Status Handling:
+*     The protected interface to this function includes an extra
+*     parameter at the end of the parameter list descirbed above. This
+*     parameter is a pointer to the integer inherited status
+*     variable: "int *status".
+
 *--
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstKeyMap *new;                 /* Pointer to new KeyMap */
    va_list args;                /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -5251,7 +5497,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Obtain the variable argument list and pass it along with the options string
    to the astVSet method to initialise the new KeyMap's attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -5302,8 +5548,17 @@ AstKeyMap *astKeyMapId_( const char *options, ... ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstKeyMap *new;                 /* Pointer to new KeyMap */
    va_list args;                /* Variable argument list */
+
+   int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -5332,7 +5587,7 @@ AstKeyMap *astKeyMapId_( const char *options, ... ) {
 }
 
 AstKeyMap *astInitKeyMap_( void *mem, size_t size, int init, AstKeyMapVtab *vtab, 
-                     const char *name ) {
+                     const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -5420,7 +5675,7 @@ AstKeyMap *astInitKeyMap_( void *mem, size_t size, int init, AstKeyMapVtab *vtab
       new->table = NULL;
       new->nentry = NULL;
 
-      NewTable( new, MIN_TABLE_SIZE );
+      NewTable( new, MIN_TABLE_SIZE, status );
 
 /* If an error occurred, clean up by deleting the new KeyMap. */
       if ( !astOK ) new = astDelete( new );
@@ -5431,7 +5686,7 @@ AstKeyMap *astInitKeyMap_( void *mem, size_t size, int init, AstKeyMapVtab *vtab
 }
 
 AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab, 
-                           const char *name, AstChannel *channel ) {
+                           const char *name, AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -5505,11 +5760,15 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstKeyMap *new;              /* Pointer to the new KeyMap */
    AstObject **alist;        /* Pointer to vector of entry values */
    AstObject *aval;          /* AST Object value for an entry */
    char buff[ 30 ];          /* Buffer for key names */
-   char *key;                /* Pointer to key string for an entry */
+   char *key;                /* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
+
+/* Pointer to key string for an entry */
    char *com;                /* Pointer to comment string for an entry */
    const char **slist;       /* Pointer to vector of entry values */
    char *sval;               /* String value for an entry */
@@ -5570,12 +5829,12 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
 /* SizeGuess. */
 /* ---------- */
       new->sizeguess = astReadInt( channel, "szgss", INT_MAX );
-      if ( TestSizeGuess( new ) ) SetSizeGuess( new, new->sizeguess );
+      if ( TestSizeGuess( new, status ) ) SetSizeGuess( new, new->sizeguess, status );
 
 /* MapSize. */
 /* -------- */
       mapsize = astReadInt( channel, "mapsz", MIN_TABLE_SIZE );
-      NewTable( new, mapsize );
+      NewTable( new, mapsize, status );
 
 /* Entries... */
 /* ---------- */
@@ -5604,7 +5863,7 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
 
          if( type == AST__BADTYPE && astOK ) {
             astError( AST__BDFTS, "astLoadKeyMap(%s): No data type code found "
-                      "whilst reading a %s.", name, name );
+                      "whilst reading a %s.", status, name, name );
 
          }
 
@@ -5716,7 +5975,7 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
 /* Report an error if the data type is unknown. */
          } else if( astOK ) {
             astError( AST__BDFTS, "astLoadKeyMap(%s): Unknown data type code "
-                      "(%d) encountered whilst reading a %s.", name, type, 
+                      "(%d) encountered whilst reading a %s.", status, name, type, 
                       name );
          }
 
@@ -5748,9 +6007,9 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
 
 #define MAKE_MAPPUT0_(X,Xtype) \
 void astMapPut0##X##_( AstKeyMap *this, const char *key, Xtype value, \
-                      const char *comment ){ \
+                      const char *comment, int *status ){ \
    if ( !astOK ) return; \
-   (**astMEMBER(this,KeyMap,MapPut0##X))(this,key,value,comment ); \
+   (**astMEMBER(this,KeyMap,MapPut0##X))(this,key,value,comment, status ); \
 }
 MAKE_MAPPUT0_(D,double)
 MAKE_MAPPUT0_(F,float)
@@ -5762,9 +6021,9 @@ MAKE_MAPPUT0_(P,void *)
 
 #define MAKE_MAPPUT1_(X,Xtype) \
 void astMapPut1##X##_( AstKeyMap *this, const char *key, int size, Xtype value[], \
-                      const char *comment ){ \
+                      const char *comment, int *status ){ \
    if ( !astOK ) return; \
-   (**astMEMBER(this,KeyMap,MapPut1##X))(this,key,size,value,comment ); \
+   (**astMEMBER(this,KeyMap,MapPut1##X))(this,key,size,value,comment, status ); \
 }
 MAKE_MAPPUT1_(D,double)
 MAKE_MAPPUT1_(F,float)
@@ -5775,9 +6034,9 @@ MAKE_MAPPUT1_(P,void *)
 #undef MAKE_MAPPUT1_
 
 #define MAKE_MAPGET0_(X,Xtype) \
-int astMapGet0##X##_( AstKeyMap *this, const char *key, Xtype *value ){ \
+int astMapGet0##X##_( AstKeyMap *this, const char *key, Xtype *value, int *status ){ \
    if ( !astOK ) return 0; \
-   return (**astMEMBER(this,KeyMap,MapGet0##X))(this,key,value); \
+   return (**astMEMBER(this,KeyMap,MapGet0##X))(this,key,value, status ); \
 }
 MAKE_MAPGET0_(D,double)
 MAKE_MAPGET0_(F,float)
@@ -5790,9 +6049,9 @@ MAKE_MAPGET0_(P,void *)
 
 #define MAKE_MAPGET1_(X,Xtype) \
 int astMapGet1##X##_( AstKeyMap *this, const char *key, int mxval, int *nval, \
-                      Xtype *value ){ \
+                      Xtype *value, int *status ){ \
    if ( !astOK ) return 0; \
-   return (**astMEMBER(this,KeyMap,MapGet1##X))(this,key,mxval,nval,value); \
+   return (**astMEMBER(this,KeyMap,MapGet1##X))(this,key,mxval,nval,value, status ); \
 }
 MAKE_MAPGET1_(D,double)
 MAKE_MAPGET1_(F,float)
@@ -5802,52 +6061,57 @@ MAKE_MAPGET1_(P,void *)
 #undef MAKE_MAPGET1_
 
 int astMapGet1C_( AstKeyMap *this, const char *key, int l, int mxval, int *nval,
-                  char *value ){ 
+                  char *value, int *status ){ 
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,KeyMap,MapGet1C))(this,key,l,mxval,nval,value);
+   return (**astMEMBER(this,KeyMap,MapGet1C))(this,key,l,mxval,nval,value, status );
 }
 
-void astMapRemove_( AstKeyMap *this, const char *key ){ 
+void astMapRemove_( AstKeyMap *this, const char *key, int *status ){ 
    if ( !astOK ) return;
-   (**astMEMBER(this,KeyMap,MapRemove))(this,key); 
+   (**astMEMBER(this,KeyMap,MapRemove))(this,key, status ); 
 }
-int astMapSize_( AstKeyMap *this ){ 
+int astMapSize_( AstKeyMap *this, int *status ){ 
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,KeyMap,MapSize))(this); 
+   return (**astMEMBER(this,KeyMap,MapSize))(this, status ); 
 }
-int astMapLenC_( AstKeyMap *this, const char *key ){ 
+int astMapLenC_( AstKeyMap *this, const char *key, int *status ){ 
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,KeyMap,MapLenC))(this,key); 
+   return (**astMEMBER(this,KeyMap,MapLenC))(this,key, status ); 
 }
-int astMapLength_( AstKeyMap *this, const char *key ){ 
+int astMapLength_( AstKeyMap *this, const char *key, int *status ){ 
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,KeyMap,MapLength))(this,key); 
+   return (**astMEMBER(this,KeyMap,MapLength))(this,key, status ); 
 }
-int astMapType_( AstKeyMap *this, const char *key ){ 
+int astMapType_( AstKeyMap *this, const char *key, int *status ){ 
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,KeyMap,MapType))(this,key); 
+   return (**astMEMBER(this,KeyMap,MapType))(this,key, status ); 
 }
-int astMapHasKey_( AstKeyMap *this, const char *key ){ 
+int astMapHasKey_( AstKeyMap *this, const char *key, int *status ){ 
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,KeyMap,MapHasKey))(this,key); 
+   return (**astMEMBER(this,KeyMap,MapHasKey))(this,key, status ); 
 }
-const char *astMapKey_( AstKeyMap *this, int index ){ 
+const char *astMapKey_( AstKeyMap *this, int index, int *status ){ 
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,KeyMap,MapKey))(this,index); 
+   return (**astMEMBER(this,KeyMap,MapKey))(this,index, status ); 
 }
-int astGetSizeGuess_( AstKeyMap *this ){
+int astGetSizeGuess_( AstKeyMap *this, int *status ){
    if( !astOK ) return 0;
-   return (**astMEMBER(this,KeyMap,GetSizeGuess))(this); 
+   return (**astMEMBER(this,KeyMap,GetSizeGuess))(this, status ); 
 }
-int astTestSizeGuess_( AstKeyMap *this ){
+int astTestSizeGuess_( AstKeyMap *this, int *status ){
    if( !astOK ) return 0;
-   return (**astMEMBER(this,KeyMap,TestSizeGuess))(this); 
+   return (**astMEMBER(this,KeyMap,TestSizeGuess))(this, status ); 
 }
-void astClearSizeGuess_( AstKeyMap *this ){
+void astClearSizeGuess_( AstKeyMap *this, int *status ){
    if( !astOK ) return;
-   (**astMEMBER(this,KeyMap,ClearSizeGuess))(this); 
+   (**astMEMBER(this,KeyMap,ClearSizeGuess))(this, status ); 
 }
-void astSetSizeGuess_( AstKeyMap *this, int sizeguess ){
+void astSetSizeGuess_( AstKeyMap *this, int sizeguess, int *status ){
    if( !astOK ) return;
-   (**astMEMBER(this,KeyMap,SetSizeGuess))(this,sizeguess); 
+   (**astMEMBER(this,KeyMap,SetSizeGuess))(this,sizeguess, status ); 
 }
+
+
+
+
+

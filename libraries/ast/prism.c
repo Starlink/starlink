@@ -93,6 +93,8 @@ f     The Prism class does not define any new routines beyond those
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
 #include "object.h"              /* Base Object class */
@@ -122,28 +124,59 @@ f     The Prism class does not define any new routines beyond those
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstPrismVtab class_vtab; /* Virtual function table */
-static int class_init = 0;          /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject * );
-static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
-static AstRegion *(* parent_getuncfrm)( AstRegion *, int );
-static void (* parent_clearunc)( AstRegion * );
-static int (* parent_testunc)( AstRegion * );
-static void (* parent_setregfs)( AstRegion *, AstFrame * );
-static AstMapping *(* parent_simplify)( AstMapping * );
-static int (* parent_equal)( AstObject *, AstObject * );
-static void (* parent_setclosed)( AstRegion *, int );
-static void (* parent_setmeshsize)( AstRegion *, int );
-static void (* parent_clearclosed)( AstRegion * );
-static void (* parent_clearmeshsize)( AstRegion * );
-static double (*parent_getfillfactor)( AstRegion * );
-static int (* parent_overlap)( AstRegion *, AstRegion * );
-static void (*parent_regsetattrib)( AstRegion *, const char *, char ** );
-static void (*parent_regclearattrib)( AstRegion *, const char *, char ** );
+static int (* parent_getobjsize)( AstObject *, int * );
+static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static AstRegion *(* parent_getuncfrm)( AstRegion *, int, int * );
+static void (* parent_clearunc)( AstRegion *, int * );
+static int (* parent_testunc)( AstRegion *, int * );
+static void (* parent_setregfs)( AstRegion *, AstFrame *, int * );
+static AstMapping *(* parent_simplify)( AstMapping *, int * );
+static int (* parent_equal)( AstObject *, AstObject *, int * );
+static void (* parent_setclosed)( AstRegion *, int, int * );
+static void (* parent_setmeshsize)( AstRegion *, int, int * );
+static void (* parent_clearclosed)( AstRegion *, int * );
+static void (* parent_clearmeshsize)( AstRegion *, int * );
+static double (*parent_getfillfactor)( AstRegion *, int * );
+static int (* parent_overlap)( AstRegion *, AstRegion *, int * );
+static void (*parent_regsetattrib)( AstRegion *, const char *, char **, int * );
+static void (*parent_regclearattrib)( AstRegion *, const char *, char **, int * );
+
+#if defined(THREAD_SAFE)
+static int (* parent_managelock)( AstObject *, int, int, int * );
+#endif
+
+
+#ifdef THREAD_SAFE
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; 
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(Prism)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(Prism,Class_Init)
+#define class_vtab astGLOBAL(Prism,Class_Vtab)
+
+
+#include <pthread.h>
+
+
+#else
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstPrismVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -154,38 +187,42 @@ AstPrism *astPrismId_( void *, void *, const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static AstMapping *Simplify( AstMapping * );
-static AstPointSet *RegBaseMesh( AstRegion * );
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static AstRegion *EquivPrism( AstPrism *, AstRegion * );
-static int GetObjSize( AstObject * );
-static AstRegion *GetUncFrm( AstRegion *, int );
-static double *RegCentre( AstRegion *this, double *, double **, int, int );
-static double GetFillFactor( AstRegion * );
-static int Equal( AstObject *, AstObject * );
-static int GetBounded( AstRegion * );
-static int Overlap( AstRegion *, AstRegion * );
-static int OverlapX( AstRegion *, AstRegion * );
-static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int ** );
-static int TestUnc( AstRegion * );
-static void ClearClosed( AstRegion * );
-static void ClearMeshSize( AstRegion * );
-static void ClearUnc( AstRegion * );
-static void Copy( const AstObject *, AstObject * );
-static void Delete( AstObject * );
-static void Dump( AstObject *, AstChannel * );
-static void GetRegions( AstPrism *, AstRegion **, AstRegion **, int * );
-static void RegBaseBox( AstRegion *, double *, double * );
-static void RegClearAttrib( AstRegion *, const char *, char ** );
-static void RegSetAttrib( AstRegion *, const char *, char ** );
-static void SetClosed( AstRegion *, int );
-static void SetMeshSize( AstRegion *, int );
-static void SetRegFS( AstRegion *, AstFrame * );
+static AstMapping *Simplify( AstMapping *, int * );
+static AstPointSet *RegBaseMesh( AstRegion *, int * );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static AstRegion *EquivPrism( AstPrism *, AstRegion *, int * );
+static int GetObjSize( AstObject *, int * );
+static AstRegion *GetUncFrm( AstRegion *, int, int * );
+static double *RegCentre( AstRegion *this, double *, double **, int, int, int * );
+static double GetFillFactor( AstRegion *, int * );
+static int Equal( AstObject *, AstObject *, int * );
+static int GetBounded( AstRegion *, int * );
+static int Overlap( AstRegion *, AstRegion *, int * );
+static int OverlapX( AstRegion *, AstRegion *, int * );
+static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
+static int TestUnc( AstRegion *, int * );
+static void ClearClosed( AstRegion *, int * );
+static void ClearMeshSize( AstRegion *, int * );
+static void ClearUnc( AstRegion *, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Delete( AstObject *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void GetRegions( AstPrism *, AstRegion **, AstRegion **, int *, int * );
+static void RegBaseBox( AstRegion *, double *, double *, int * );
+static void RegClearAttrib( AstRegion *, const char *, char **, int * );
+static void RegSetAttrib( AstRegion *, const char *, char **, int * );
+static void SetClosed( AstRegion *, int, int * );
+static void SetMeshSize( AstRegion *, int, int * );
+static void SetRegFS( AstRegion *, AstFrame *, int * );
+
+#if defined(THREAD_SAFE)
+static int ManageLock( AstObject *, int, int, int * );
+#endif
 
 
 /* Member functions. */
 /* ================= */
-static void ClearUnc( AstRegion *this_region ){
+static void ClearUnc( AstRegion *this_region, int *status ){
 /*
 *  Name:
 *     ClearUnc
@@ -198,7 +235,7 @@ static void ClearUnc( AstRegion *this_region ){
 
 *  Synopsis:
 *     #include "prism.h"
-*     void ClearUnc( AstRegion *this )
+*     void ClearUnc( AstRegion *this, int *status )
 
 *  Class Membership:
 *     Prism member function (over-rides the astClearUnc protected
@@ -211,6 +248,8 @@ static void ClearUnc( AstRegion *this_region ){
 *  Parameters:
 *     this
 *        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -222,7 +261,7 @@ static void ClearUnc( AstRegion *this_region ){
 
 /* Invoke the implementation inherited form the parent Region class to 
    clear any default uncertainty information. */
-   (* parent_clearunc)( this_region );
+   (* parent_clearunc)( this_region, status );
 
 /* Get a pointer to the Prism structure. */
    this = (AstPrism *) this_region;
@@ -233,7 +272,7 @@ static void ClearUnc( AstRegion *this_region ){
 
 }
 
-static int Equal( AstObject *this_object, AstObject *that_object ) {
+static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
 *  Name:
 *     Equal
@@ -246,7 +285,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 *  Synopsis:
 *     #include "prism.h"
-*     int Equal( AstObject *this_object, AstObject *that_object ) 
+*     int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 *  Class Membership:
 *     Prism member function (over-rides the astEqual protected
@@ -261,6 +300,8 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *        Pointer to the first Prism.
 *     that
 *        Pointer to the second Prism.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if the Prisms are equivalent, zero otherwise.
@@ -287,7 +328,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 /* Invoke the Equal method inherited from the parent Region class. This checks
    that the Objects are both of the same class, and have the same Negated
    and Closed flags (amongst other things). */
-   if( (*parent_equal)( this_object, that_object ) ) {
+   if( (*parent_equal)( this_object, that_object, status ) ) {
 
 /* Obtain pointers to the two Prism structures. */
       this = (AstPrism *) this_object;
@@ -308,7 +349,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
    return result;
 }
 
-static AstRegion *EquivPrism( AstPrism *this, AstRegion *region ) {
+static AstRegion *EquivPrism( AstPrism *this, AstRegion *region, int *status ) {
 /*
 *  Name:
 *     EquivPrism
@@ -321,7 +362,7 @@ static AstRegion *EquivPrism( AstPrism *this, AstRegion *region ) {
 
 *  Synopsis:
 *     #include "prism.h"
-*     AstRegion *EquivPrism( AstPrism *this, AstRegion *region )
+*     AstRegion *EquivPrism( AstPrism *this, AstRegion *region, int *status )
 
 *  Class Membership:
 *     Prism method 
@@ -339,6 +380,8 @@ static AstRegion *EquivPrism( AstPrism *this, AstRegion *region ) {
 *        Pointer to a Prism.
 *     region
 *        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to the equivalent Prism or a clone of the supplied
@@ -410,8 +453,8 @@ static AstRegion *EquivPrism( AstPrism *this, AstRegion *region ) {
                                AST__CURRENT );
          map3 = astGetMapping( region->frameset, AST__CURRENT, AST__BASE );
 
-         map4 = (AstMapping *) astCmpMap( map1, map2, 1, "" );
-         map5 = (AstMapping *) astCmpMap( map4, map3, 1, "" );
+         map4 = (AstMapping *) astCmpMap( map1, map2, 1, "", status );
+         map5 = (AstMapping *) astCmpMap( map4, map3, 1, "", status );
          map = astSimplify( map5 );
 
 /* Get pointers to the base and current Frames in the Box or Interval. */
@@ -455,7 +498,7 @@ static AstRegion *EquivPrism( AstPrism *this, AstRegion *region ) {
             sfrm2 = astPickAxes( bfrm, nax2, outax2, NULL );
 
 /* Create an Interval describing the extrusion axes. */
-            sreg2 = astInterval( sfrm2, lbndt, ubndt, NULL, "" );
+            sreg2 = astInterval( sfrm2, lbndt, ubndt, NULL, "", status );
 
 /* Determine which outputs from this Mapping correspond to the base
    axes of the supplied Prism. These are just the axes which are *not*
@@ -483,10 +526,10 @@ static AstRegion *EquivPrism( AstPrism *this, AstRegion *region ) {
                   sfrm1 = astPickAxes( bfrm, nax1, outax1, NULL );
    
 /* Create an Interval describing the base axes. */
-                  sreg1 = astInterval( sfrm1, lbndt, ubndt, NULL, "" );
+                  sreg1 = astInterval( sfrm1, lbndt, ubndt, NULL, "", status );
    
 /* Create a Prism from these two regions. */
-                  prism = astPrism( sreg1, sreg2, "" );
+                  prism = astPrism( sreg1, sreg2, "", status );
    
 /* The axes in this Prism are in the order defined by the structure of
       the suppied Prism (all the base axes followed by all the extrusion axes).
@@ -497,12 +540,12 @@ static AstRegion *EquivPrism( AstPrism *this, AstRegion *region ) {
                   if( inperm ) {
                      for( i = 0; i < nax1; i++ ) inperm[ i ] = outax1[ i ];
                      for( i = 0; i < nax2; i++ ) inperm[ i + nax1 ] = outax2[ i ];
-                     pmap = astPermMap( naxb, inperm, naxb, NULL, NULL, "" );
+                     pmap = astPermMap( naxb, inperm, naxb, NULL, NULL, "", status );
    
 /* Combine this with the Mapping from the original base Frame to the
    original current Frame, and simplify it. */
                      astInvert( map3 );
-                     map6 = (AstMapping *) astCmpMap( pmap, map3, 1, "" );
+                     map6 = (AstMapping *) astCmpMap( pmap, map3, 1, "", status );
                      map7 = astSimplify( map6 );            
    
 /* If this is not a UnitMap, use it to remap the prism into the Region's 
@@ -611,7 +654,7 @@ static AstRegion *EquivPrism( AstPrism *this, AstRegion *region ) {
 
 /* Define the macro. */
 #define MAKE_SET(attribute,lattribute,type) \
-static void Set##attribute( AstRegion *this_region, type value ) { \
+static void Set##attribute( AstRegion *this_region, type value, int *status ) { \
 \
 /* Local Variables: */ \
    AstPrism *this;         /* Pointer to the Prism structure */ \
@@ -620,7 +663,7 @@ static void Set##attribute( AstRegion *this_region, type value ) { \
    if ( !astOK ) return; \
 \
 /* Use the parent method to set the value in the parent Region structure. */ \
-   (*parent_set##lattribute)( this_region, value ); \
+   (*parent_set##lattribute)( this_region, value, status ); \
 \
 /* Also set the value in the two component Regions. */ \
    this = (AstPrism *) this_region; \
@@ -671,7 +714,7 @@ MAKE_SET(Closed,closed,int)
 
 /* Define the macro. */
 #define MAKE_CLEAR(attribute,lattribute) \
-static void Clear##attribute( AstRegion *this_region ) { \
+static void Clear##attribute( AstRegion *this_region, int *status ) { \
 \
 /* Local Variables: */ \
    AstPrism *this;         /* Pointer to the Prism structure */ \
@@ -680,7 +723,7 @@ static void Clear##attribute( AstRegion *this_region ) { \
    if ( !astOK ) return; \
 \
 /* Use the parent method to clear the value in the parent Region structure. */ \
-   (*parent_clear##lattribute)( this_region ); \
+   (*parent_clear##lattribute)( this_region, status ); \
 \
 /* Also clear the value in the two component Regions. */ \
    this = (AstPrism *) this_region; \
@@ -696,7 +739,7 @@ MAKE_CLEAR(Closed,closed)
 /* Undefine the macro. */
 #undef MAKE_CLEAR
 
-static int GetObjSize( AstObject *this_object ) {
+static int GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -709,7 +752,7 @@ static int GetObjSize( AstObject *this_object ) {
 
 *  Synopsis:
 *     #include "prism.h"
-*     int GetObjSize( AstObject *this ) 
+*     int GetObjSize( AstObject *this, int *status ) 
 
 *  Class Membership:
 *     Prism member function (over-rides the astGetObjSize protected
@@ -722,6 +765,8 @@ static int GetObjSize( AstObject *this_object ) {
 *  Parameters:
 *     this
 *        Pointer to the Prism.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Object size, in bytes.
@@ -747,7 +792,7 @@ static int GetObjSize( AstObject *this_object ) {
 /* Invoke the GetObjSize method inherited from the parent class, and then
    add on any components of the class structure defined by thsi class
    which are stored in dynamically allocated memory. */
-   result = (*parent_getobjsize)( this_object );
+   result = (*parent_getobjsize)( this_object, status );
    result += astGetObjSize( this->region1 );
    result += astGetObjSize( this->region2 );
 
@@ -758,7 +803,7 @@ static int GetObjSize( AstObject *this_object ) {
    return result;
 }
 
-static int GetBounded( AstRegion *this_region ) {
+static int GetBounded( AstRegion *this_region, int *status ) {
 /*
 *  Name:
 *     GetBounded
@@ -771,7 +816,7 @@ static int GetBounded( AstRegion *this_region ) {
 
 *  Synopsis:
 *     #include "prism.h"
-*     int GetBounded( AstRegion *this ) 
+*     int GetBounded( AstRegion *this, int *status ) 
 
 *  Class Membership:
 *     Prism method (over-rides the astGetBounded method inherited from
@@ -788,6 +833,8 @@ static int GetBounded( AstRegion *this_region ) {
 *  Parameters:
 *     this
 *        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Non-zero if the Region is bounded. Zero otherwise.
@@ -815,7 +862,7 @@ static int GetBounded( AstRegion *this_region ) {
 /* Get the component Regions, and the Negated value for the Prism. The 
    returned Regions represent a region within the base Frame of the FrameSet 
    encapsulated by the parent Region structure. */
-   GetRegions( this, &reg1, &reg2, &neg );
+   GetRegions( this, &reg1, &reg2, &neg, status );
 
 /* If the Prism has been inverted, temporarily invert the components. */
    if( neg ) {
@@ -848,7 +895,7 @@ static int GetBounded( AstRegion *this_region ) {
    return result;
 }
 
-static double GetFillFactor( AstRegion *this_region ) {
+static double GetFillFactor( AstRegion *this_region, int *status ) {
 /*
 *  Name:
 *     GetFillFactor
@@ -861,7 +908,7 @@ static double GetFillFactor( AstRegion *this_region ) {
 
 *  Synopsis:
 *     #include "prism.h"
-*     double GetFillFactor( AstRegion *this )
+*     double GetFillFactor( AstRegion *this, int *status )
 
 *  Class Membership:
 *     Prism member function (over-rides the astGetFillFactor method inherited
@@ -875,6 +922,8 @@ static double GetFillFactor( AstRegion *this_region ) {
 *  Parameters:
 *     this
 *        Pointer to the Prism.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The FillFactor value to use.
@@ -899,7 +948,7 @@ static double GetFillFactor( AstRegion *this_region ) {
 /* See if a FillFactor value has been set. If so, use the parent
    astGetFillFactor  method to obtain it. */
    if ( astTestFillFactor( this ) ) {
-      result = (*parent_getfillfactor)( this_region );
+      result = (*parent_getfillfactor)( this_region, status );
 
 /* Otherwise, we will generate a default value equal to the product of
    the FillFactor values of the two component Regions. */
@@ -917,7 +966,7 @@ static double GetFillFactor( AstRegion *this_region ) {
 }
 
 static void GetRegions( AstPrism *this, AstRegion **reg1, AstRegion **reg2,
-                        int *neg ) {
+                        int *neg, int *status ) {
 /*
 *
 *  Name:
@@ -932,7 +981,7 @@ static void GetRegions( AstPrism *this, AstRegion **reg1, AstRegion **reg2,
 *  Synopsis:
 *     #include "region.h"
 *     void GetRegions( AstPrism *this, AstRegion **reg1, AstRegion **reg2,
-*                      int *neg )
+*                      int *neg, int *status )
 
 *  Class Membership:
 *     Prism member function 
@@ -958,6 +1007,8 @@ static void GetRegions( AstPrism *this, AstRegion **reg1, AstRegion **reg2,
 *     neg
 *        Pointer to an int in which to return the value of the Negated 
 *        attribute of the Prism.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - The returned pointers should be annuled using astAnnul when no
@@ -984,7 +1035,7 @@ static void GetRegions( AstPrism *this, AstRegion **reg1, AstRegion **reg2,
    *neg = astGetNegated( (AstRegion *) this );
 }
 
-static AstRegion *GetUncFrm( AstRegion *this_region, int ifrm ) {
+static AstRegion *GetUncFrm( AstRegion *this_region, int ifrm, int *status ) {
 /*
 *  Name:
 *     GetUncFrm
@@ -997,7 +1048,7 @@ static AstRegion *GetUncFrm( AstRegion *this_region, int ifrm ) {
 
 *  Synopsis:
 *     #include "prism.h"
-*     AstRegion *GetUncFrm( AstRegion *this, int ifrm ) 
+*     AstRegion *GetUncFrm( AstRegion *this, int ifrm, int *status ) 
 
 *  Class Membership:
 *     Prism method (over-rides the astGetUncFrm method inherited from
@@ -1020,6 +1071,8 @@ static AstRegion *GetUncFrm( AstRegion *this_region, int ifrm ) {
 *        The index of a Frame within the FrameSet encapsulated by "this".
 *        The returned Region will refer to the requested Frame. It should
 *        be either AST__CURRENT or AST__BASE.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to the Region. This should be annulled (using astAnnul)
@@ -1054,8 +1107,8 @@ static AstRegion *GetUncFrm( AstRegion *this_region, int ifrm ) {
 /* If the parent Region structure contains explicit uncertainty information, 
    use it in preference to any uncertainty Region stored in the component 
    Regions. */
-   if( (* parent_testunc)( this_region ) ) {
-      bunc = (* parent_getuncfrm)( this_region, AST__BASE );
+   if( (* parent_testunc)( this_region, status ) ) {
+      bunc = (* parent_getuncfrm)( this_region, AST__BASE, status );
 
 /* Otherwise construct an uncertainty Region from the uncertainty Regions
    in the two component Regions. The current Frames in the component
@@ -1067,7 +1120,7 @@ static AstRegion *GetUncFrm( AstRegion *this_region, int ifrm ) {
       bunc2 = astGetUncFrm( this->region2, AST__CURRENT );
 
 /* Combine them into a Prism. */
-      bunc = (AstRegion *) astPrism( bunc1, bunc2, "" );
+      bunc = (AstRegion *) astPrism( bunc1, bunc2, "", status );
 
 /* Free resources. */
       bunc1 = astAnnul( bunc1 );
@@ -1112,7 +1165,7 @@ static AstRegion *GetUncFrm( AstRegion *this_region, int ifrm ) {
    return result;
 }
 
-void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name ) {
+void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -1149,6 +1202,7 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstFrameVtab *frame;          /* Pointer to Frame component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
@@ -1157,6 +1211,9 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name ) {
 /* Check the local error status. */
    if ( !astOK ) return;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
 /* Initialize the component of the virtual function table used by the
    parent class. */
    astInitRegionVtab( (AstRegionVtab *) vtab, name );
@@ -1164,8 +1221,8 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAPrism) to determine if an object belongs to
    this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -1178,10 +1235,16 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name ) {
    replace them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
-   parent_getobjsize = object->GetObjSize;
-   object->GetObjSize = GetObjSize;
    region = (AstRegionVtab *) vtab;
    frame = (AstFrameVtab *) vtab;
+
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
+
+#if defined(THREAD_SAFE)
+   parent_managelock = object->ManageLock;
+   object->ManageLock = ManageLock;
+#endif
 
    parent_transform = mapping->Transform;
    mapping->Transform = Transform;
@@ -1241,9 +1304,99 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name ) {
    astSetCopy( vtab, Copy );
    astSetDelete( vtab, Delete );
    astSetDump( vtab, Dump, "Prism", "Region extrusion into higher dimensions" );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
-static int Overlap( AstRegion *this, AstRegion *that ){
+#if defined(THREAD_SAFE)
+static int ManageLock( AstObject *this_object, int mode, int extra, int *status ) {
+/*
+*  Name:
+*     ManageLock
+
+*  Purpose:
+*     Manage the thread lock on an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "object.h"
+*     AstObject *ManageLock( AstObject *this, int mode, int extra, int *status ) 
+
+*  Class Membership:
+*     CmpRegion member function (over-rides the astManageLock protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function manages the thread lock on the supplied Object. The
+*     lock can be locked, unlocked or checked by this function as 
+*     deteremined by parameter "mode". See astLock for details of the way
+*     these locks are used.
+
+*  Parameters:
+*     this
+*        Pointer to the Object.
+*     mode
+*        An integer flag indicating what the function should do:
+*
+*        AST__LOCK: Lock the Object for exclusive use by the calling
+*        thread. The "extra" value indicates what should be done if the
+*        Object is already locked (wait or report an error - see astLock).
+*
+*        AST__UNLOCK: Unlock the Object for use by other threads.
+*
+*        AST__CHECKLOCK: Check that the object is locked for use by the
+*        calling thread (report an error if not).
+*     extra
+*        Extra mode-specific information. 
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*    A local status value: 
+*        0 - Success
+*        1 - Could not lock or unlock the object because it was already 
+*            locked by another thread.
+*        2 - Failed to lock a POSIX mutex
+*        3 - Failed to unlock a POSIX mutex
+*        4 - Bad "mode" value supplied.
+
+*  Notes:
+*     - This function attempts to execute even if an error has already
+*     occurred.
+*/
+
+/* Local Variables: */
+   AstPrism *this;       /* Pointer to Prism structure */
+   int result;           /* Returned status value */
+
+/* Initialise */
+   result = 0;
+
+/* Check the supplied pointer is not NULL. */
+   if( !this_object ) return result;
+
+/* Obtain a pointers to the Prism structure. */
+   this = (AstPrism *) this_object;
+
+/* Invoke the astManageLock method on any Objects contained within
+   the supplied Object. */
+   if( !result ) result = astManageLock( this->region1, mode, extra );
+   if( !result ) result = astManageLock( this->region2, mode, extra );
+
+/* Invoke the ManageLock method inherited from the parent class, and
+   return the resulting status value. */
+   if( !result ) result = (*parent_managelock)( this_object, mode, extra, status );
+   return result;
+
+}
+#endif
+
+static int Overlap( AstRegion *this, AstRegion *that, int *status ){
 /*
 *  Name:
 *     Overlap
@@ -1256,7 +1409,7 @@ static int Overlap( AstRegion *this, AstRegion *that ){
 
 *  Synopsis:
 *     #include "prism.h"
-*     int Overlap( AstRegion *this, AstRegion *that ) 
+*     int Overlap( AstRegion *this, AstRegion *that, int *status ) 
 
 *  Class Membership:
 *     Prism member function (over-rides the astOverlap method inherited 
@@ -1275,6 +1428,8 @@ static int Overlap( AstRegion *this, AstRegion *that ){
 *        Pointer to the first Region.
 *     that
 *        Pointer to the second Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     astOverlap()
@@ -1356,7 +1511,7 @@ static int Overlap( AstRegion *this, AstRegion *that ){
 
 /* We know that "this" is a Prism. See if we can find a prism equivalent
    to "that". If not, a clone of "that" is returned. */
-   that_prism = EquivPrism( (AstPrism *) this, that );
+   that_prism = EquivPrism( (AstPrism *) this, that, status );
 
 /* If both Regions are Prisms, we provide a specialised implementation.
    The implementation in the parent Region class assumes that at least one of 
@@ -1369,8 +1524,8 @@ static int Overlap( AstRegion *this, AstRegion *that ){
 /* Get the component Regions, and the Negated value for the two Prisms. The 
    returned Regions represent a region within the base Frame of the FrameSet 
    encapsulated by the parent Region structure. */
-      GetRegions( (AstPrism *) this, &this_reg1, &this_reg2, &this_neg );
-      GetRegions( (AstPrism *) that_prism, &that_reg1, &that_reg2, &that_neg );
+      GetRegions( (AstPrism *) this, &this_reg1, &this_reg2, &this_neg, status );
+      GetRegions( (AstPrism *) that_prism, &that_reg1, &that_reg2, &that_neg, status );
 
 /* Check that the component Regions have the same number of axes in both 
    Prisms. */
@@ -1399,8 +1554,8 @@ static int Overlap( AstRegion *this, AstRegion *that ){
 
 /* Combine these Mappings to get the Mapping from the base Frame of the
    second Prism to the base Frame of the first Prism. */
-            tmap = (AstMapping *) astCmpMap( map1, map2, 1, "" );
-            map = (AstMapping *) astCmpMap( tmap, map3, 1, "" );
+            tmap = (AstMapping *) astCmpMap( map1, map2, 1, "", status );
+            map = (AstMapping *) astCmpMap( tmap, map3, 1, "", status );
 
 /* Simplify this Mapping. */
             smap = astSimplify( map );
@@ -1499,7 +1654,7 @@ static int Overlap( AstRegion *this, AstRegion *that ){
 
 /* If overlap could not be determined using the above implementation, try 
    using the implementation inherited from the parent Region class. */
-   if( !result ) result = (*parent_overlap)( this, that );
+   if( !result ) result = (*parent_overlap)( this, that, status );
 
 /* If not OK, return zero. */
    if( !astOK ) result = 0;
@@ -1508,7 +1663,7 @@ static int Overlap( AstRegion *this, AstRegion *that ){
    return result;
 }
 
-static int OverlapX( AstRegion *that, AstRegion *this ){
+static int OverlapX( AstRegion *that, AstRegion *this, int *status ){
 /*
 *  Name:
 *     OverlapX
@@ -1546,7 +1701,7 @@ static int OverlapX( AstRegion *that, AstRegion *this ){
 /* We know that "that" is a Prism, so call the private Overlap method,
    and then modify the returned value to take account of the fact that the
    two Regions are swapped. */
-   result = Overlap( that, this );
+   result = Overlap( that, this, status );
 
    if( result == 2 ){
       result = 3;
@@ -1558,7 +1713,7 @@ static int OverlapX( AstRegion *that, AstRegion *this ){
 }
 
 
-static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
+static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int *status ){
 /*
 *  Name:
 *     RegBaseBox
@@ -1572,7 +1727,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 
 *  Synopsis:
 *     #include "prism.h"
-*     void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd )
+*     void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd, int *status )
 
 *  Class Membership:
 *     Prism member function (over-rides the astRegBaseBox protected
@@ -1597,6 +1752,8 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 *        covered by the Region in the base Frame of the encapsulated
 *        FrameSet. It should have at least as many elements as there are 
 *        axes in the base Frame.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -1614,7 +1771,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
    this = (AstPrism *) this_region;
 
 /* Get pointers to the component Regions. */
-   GetRegions( this, &reg1, &reg2, &neg );
+   GetRegions( this, &reg1, &reg2, &neg, status );
 
 /* The base Frame of the parent Region structure is equivalent to a
    CmpFrame containing the current Frames of the component Regions. 
@@ -1631,7 +1788,7 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
    reg2 = astAnnul( reg2 );
 }
 
-static AstPointSet *RegBaseMesh( AstRegion *this_region ){
+static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
 /*
 *  Name:
 *     RegBaseMesh
@@ -1645,7 +1802,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
 
 *  Synopsis:
 *     #include "prism.h"
-*     AstPointSet *astRegBaseMesh( AstRegion *this )
+*     AstPointSet *astRegBaseMesh( AstRegion *this, int *status )
 
 *  Class Membership:
 *     Prism member function (over-rides the astRegBaseMesh protected
@@ -1659,6 +1816,8 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
 *  Parameters:
 *     this
 *        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the PointSet. Annul the pointer using astAnnul when it 
@@ -1744,7 +1903,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
       if( !hasMesh1 || !hasMesh2 ) {
          if( astOK ) astError( AST__INTER, "astRegBaseMesh(%s): No mesh "
                    "can be produced for the %s bacause one of its component "
-                   "Regions is unbounded.", astGetClass( this ), astGetClass( this ) );
+                   "Regions is unbounded.", status, astGetClass( this ), astGetClass( this ) );
 
 /* Otherwise we can create a mesh for the Prism. */
       } else {
@@ -1810,7 +1969,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
 /* Create the returned PointSet. */
          msz = gsz1*msz2 + msz1*gsz2;
          nax= astGetNaxes( this );
-         result = astPointSet( msz, nax, "" );
+         result = astPointSet( msz, nax, "", status );
 
 /* Get pointers to the data in all 5 PointSets. */
          ptr = astGetPoints( result );
@@ -1873,7 +2032,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
 }
 
 static double *RegCentre( AstRegion *this_region, double *cen, double **ptr, 
-                          int index, int ifrm ){
+                          int index, int ifrm, int *status ){
 /*
 *  Name:
 *     RegCentre
@@ -1887,7 +2046,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 *  Synopsis:
 *     #include "prism.h"
 *     double *RegCentre( AstRegion *this, double *cen, double **ptr, 
-*                        int index, int ifrm )
+*                        int index, int ifrm, int *status )
 
 *  Class Membership:
 *     Prism member function (over-rides the astRegCentre protected
@@ -1917,6 +2076,8 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 *        Should be AST__BASE or AST__CURRENT. Indicates whether the centre 
 *        position is supplied and returned in the base or current Frame of 
 *        the FrameSet encapsulated within "this".
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     If both "cen" and "ptr" are NULL then a pointer to a newly
@@ -1960,7 +2121,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
    this = (AstPrism *) this_region;
 
 /* Get the component Regions, and the Negated flag for the Prism. */
-   GetRegions( this, &reg1, &reg2, &neg );
+   GetRegions( this, &reg1, &reg2, &neg, status );
 
 /* Get the number of current Frame axes in each component Region. The sum
    of these will equal the number of base Frame axes in the parent Region
@@ -2047,7 +2208,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 }
 
 static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
-                    int **mask ){
+                    int **mask, int *status ){
 /*
 *  Name:
 *     RegPins
@@ -2061,7 +2222,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 *  Synopsis:
 *     #include "prism.h"
 *     int RegPins( AstRegion *this, AstPointSet *pset, AstRegion *unc,
-*                  int **mask )
+*                  int **mask, int *status )
 
 *  Class Membership:
 *     Prism member function (over-rides the astRegPins protected
@@ -2095,6 +2256,8 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 *        and is set to zero otherwise. A NULL value may be supplied
 *        in which case no array is created. If created, the array should
 *        be freed using astFree when no longer needed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Non-zero if the points all fall on the boundary of the given
@@ -2158,7 +2321,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    which relate to the first component Region. */
    np = astGetNpoint( pset );
    nax1 = astGetNaxes( reg1 );
-   ps1 = astPointSet( np, nax1, "" );
+   ps1 = astPointSet( np, nax1, "", status );
    astSetSubPoints( pset, 0, 0, ps1 );
 
 /* Get a mask which indicates if each supplied point is on or off the 
@@ -2177,7 +2340,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 
 /* Do the same for the second component Region */
    nax2 = astGetNaxes( reg2 );
-   ps2 = astPointSet( np, nax2, "" );
+   ps2 = astPointSet( np, nax2, "", status );
    astSetSubPoints( pset, 0, nax1, ps2 );
    ps2b = astRegTransform( reg2, ps2, 0, NULL, NULL );
    unc2 = astGetUncFrm( reg2, AST__BASE );
@@ -2283,7 +2446,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 }
 
 static void RegClearAttrib( AstRegion *this_region, const char *attrib, 
-                            char **base_attrib ) {
+                            char **base_attrib, int *status ) {
 /*
 *  Name:
 *     RegClearAttrib
@@ -2297,10 +2460,10 @@ static void RegClearAttrib( AstRegion *this_region, const char *attrib,
 *  Synopsis:
 *     #include "prism.h"
 *     void RegClearAttrib( AstRegion *this, const char *attrib, 
-*                          char **base_attrib ) 
+*                          char **base_attrib, int *status ) 
 
 *  Class Membership:
-*     CmpRegion member function (over-rides the astRegClearAttrib method 
+*     Prism member function (over-rides the astRegClearAttrib method 
 *     inherited from the Region class).
 
 *  Description:
@@ -2326,6 +2489,8 @@ static void RegClearAttrib( AstRegion *this_region, const char *attrib,
 *        axis permutation. The returned pointer should be freed using
 *        astFree when no longer needed. A NULL pointer may be supplied in 
 *        which case no pointer is returned.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -2350,7 +2515,7 @@ static void RegClearAttrib( AstRegion *this_region, const char *attrib,
 /* Use the RegClearAttrib method inherited from the parent class to clear the 
    attribute in the current and base Frames in the FrameSet encapsulated by 
    the parent Region structure. */
-   (*parent_regclearattrib)( this_region, attrib, &batt );
+   (*parent_regclearattrib)( this_region, attrib, &batt, status );
 
 /* We now propagate the setting down to the component Regions. The current 
    Frames in the component Regions together form a CmpFrame which is 
@@ -2406,7 +2571,7 @@ static void RegClearAttrib( AstRegion *this_region, const char *attrib,
 }
 
 static void RegSetAttrib( AstRegion *this_region, const char *setting, 
-                          char **base_setting ) {
+                          char **base_setting, int *status ) {
 /*
 *  Name:
 *     RegSetAttrib
@@ -2420,7 +2585,7 @@ static void RegSetAttrib( AstRegion *this_region, const char *setting,
 *  Synopsis:
 *     #include "prism.h"
 *     void RegSetAttrib( AstRegion *this, const char *setting, 
-*                        char **base_setting )
+*                        char **base_setting, int *status )
 
 *  Class Membership:
 *     Prism method (over-rides the astRegSetAttrib method inherited from
@@ -2456,6 +2621,8 @@ static void RegSetAttrib( AstRegion *this_region, const char *setting,
 *        axis permutation. The returned pointer should be freed using
 *        astFree when no longer needed. A NULL pointer may be supplied in 
 *        which case no pointer is returned.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -2481,7 +2648,7 @@ static void RegSetAttrib( AstRegion *this_region, const char *setting,
 /* Use the RegSetAttrib method inherited from the parent class to apply the 
    setting to the current and base Frames in the FrameSet encapsulated by the 
    parent Region structure. */
-   (*parent_regsetattrib)( this_region, setting, &bset );
+   (*parent_regsetattrib)( this_region, setting, &bset, status );
 
 /* We now propagate the setting down to the component Regions. The current 
    Frames in the component Regions together form a CmpFrame which is 
@@ -2536,7 +2703,7 @@ static void RegSetAttrib( AstRegion *this_region, const char *setting,
 
 }
 
-static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
+static void SetRegFS( AstRegion *this_region, AstFrame *frm, int *status ) {
 /*
 *  Name:
 *     SetRegFS
@@ -2549,7 +2716,7 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
 
 *  Synopsis:
 *     #include "prism.h"
-*     void SetRegFS( AstRegion *this_region, AstFrame *frm )
+*     void SetRegFS( AstRegion *this_region, AstFrame *frm, int *status )
 
 *  Class Membership:
 *     Prism method (over-rides the astSetRegFS method inherited from
@@ -2565,6 +2732,8 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
 *        Pointer to the Region.
 *     frm
 *        The Frame to use.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -2581,7 +2750,7 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
 
 /* Invoke the parent method to store the FrameSet in the parent Region
    structure. */
-   (* parent_setregfs)( this_region, frm );
+   (* parent_setregfs)( this_region, frm, status );
 
 /* If either component Region has a dummy FrameSet use this method
    recursively to give them a FrameSet containing the corresponding axes
@@ -2615,7 +2784,7 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
 
 }
 
-static AstMapping *Simplify( AstMapping *this_mapping ) {
+static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /*
 *  Name:
 *     Simplify
@@ -2628,7 +2797,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     AstMapping *Simplify( AstMapping *this )
+*     AstMapping *Simplify( AstMapping *this, int *status )
 
 *  Class Membership:
 *     Prism method (over-rides the astSimplify method inherited from
@@ -2642,6 +2811,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 *  Parameters:
 *     this
 *        Pointer to the original Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A new pointer to the (possibly simplified) Region.
@@ -2712,7 +2883,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    reg = (AstRegion *) this_mapping;
 
 /* Get the component Regions, and the Negated flag for the Prism. */
-   GetRegions( (AstPrism *) this_mapping, &reg1, &reg2, &neg );
+   GetRegions( (AstPrism *) this_mapping, &reg1, &reg2, &neg, status );
 
 /* Get the number of axes in each component Region. */
    nax1 = astGetNaxes( reg1 );
@@ -2779,7 +2950,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
                   bfrm = astGetFrame( fs, AST__BASE );
                   unc = astTestUnc( reg ) ? astGetUncFrm( reg, AST__BASE ) : NULL;
                   newpl = astPointList( bfrm, np, nax1 + nax2, np, points, 
-                                        unc, "" );
+                                        unc, "", status );
 
 /* Finally map it into the current Frame of "this" and simplify it. */
                   newpl2 = astMapRegion( newpl, bcmap, cfrm );
@@ -2914,7 +3085,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    simplified Regions. */
          if( snewreg1 != newreg1 || snewreg2 != newreg2 ) {
             (void) astAnnul( new );
-            new = astPrism( snewreg1, snewreg2, "" );
+            new = astPrism( snewreg1, snewreg2, "", status );
    
 /* Ensure the new Prism has the same Negated attribute as the original. */
             if( neg ) astNegate( new );
@@ -2958,7 +3129,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
             newreg1 = cpr->region1;
             newreg2 = astMergeInterval( new->region2, cpr->region2 );
             if( newreg2 ) {
-               new2 = (AstRegion *) astPrism( newreg1, newreg2, "" );
+               new2 = (AstRegion *) astPrism( newreg1, newreg2, "", status );
                (void) astAnnul( new );
                new = astSimplify( new2 );
                new2 = astAnnul( new2 );
@@ -2969,7 +3140,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    
 /* Now invoke the parent Simplify method inherited from the Region class. 
    This will simplify the encapsulated FrameSet and uncertainty Region. */
-      result = (*parent_simplify)( (AstMapping *) new );
+      result = (*parent_simplify)( (AstMapping *) new, status );
    
 /* Free resources. */
       new = astAnnul( new );
@@ -2996,7 +3167,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    return result;
 }
 
-static int TestUnc( AstRegion *this_region ) {
+static int TestUnc( AstRegion *this_region, int *status ) {
 /*
 *  Name:
 *     TestUnc
@@ -3009,7 +3180,7 @@ static int TestUnc( AstRegion *this_region ) {
 
 *  Synopsis:
 *     include "prism.h"
-*     int astTestUnc( AstRegion *this )
+*     int astTestUnc( AstRegion *this, int *status )
 
 *  Class Membership:
 *     Prism member function (over-rides the astTestUnc protected
@@ -3023,6 +3194,8 @@ static int TestUnc( AstRegion *this_region ) {
 *  Parameters:
 *     this
 *        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Non-zero if the uncertainty Region was supplied explicitly.
@@ -3043,7 +3216,7 @@ static int TestUnc( AstRegion *this_region ) {
 /* See if the parent Region structure contains explicit uncertainty
    information. If so this will be used in preference to any uncertainty
    info in the component Regions. */
-   result = (* parent_testunc)( this_region );
+   result = (* parent_testunc)( this_region, status );
 
 /* If not see if either of the two component Regions contains explicit 
    uncertainty information. */
@@ -3057,7 +3230,7 @@ static int TestUnc( AstRegion *this_region ) {
 }
 
 static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
-                               int forward, AstPointSet *out ) {
+                               int forward, AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     Transform
@@ -3071,7 +3244,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 *  Synopsis:
 *     #include "prism.h"
 *     AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-*                             int forward, AstPointSet *out )
+*                             int forward, AstPointSet *out, int *status )
 
 *  Class Membership:
 *     Prism member function (over-rides the astTransform method inherited
@@ -3096,6 +3269,8 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 *        Pointer to a PointSet which will hold the transformed (output)
 *        coordinate values. A NULL value may also be given, in which case a
 *        new PointSet will be created by this function.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the output (possibly new) PointSet.
@@ -3138,13 +3313,13 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    this = (AstPrism *) this_mapping;
 
 /* Get the component Regions, and the Negated value for the Prism. */
-   GetRegions( this, &reg1, &reg2, &neg );
+   GetRegions( this, &reg1, &reg2, &neg, status );
 
 /* Apply the parent mapping using the stored pointer to the Transform member
    function inherited from the parent Region class. This function validates
    all arguments and generates an output PointSet if necessary, containing 
    a copy of the input PointSet. */
-   result = (*parent_transform)( this_mapping, in, forward, out );
+   result = (*parent_transform)( this_mapping, in, forward, out, status );
 
 /* We will now extend the parent astTransform method by performing the
    calculations needed to generate the output coordinate values. */
@@ -3158,7 +3333,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    pset_tmp = astRegTransform( this, in, 0, NULL, NULL );
 
 /* Form a parallel CmpMap from the two component Regions. */
-   map = astCmpMap( reg1, reg2, 0, "" );
+   map = astCmpMap( reg1, reg2, 0, "", status );
 
 /* Apply the Mapping to the PointSet containing positions in the base Frame 
    of the parent Region structure (which is the same as the combination of
@@ -3217,7 +3392,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -3229,7 +3404,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for Prism objects.
@@ -3239,6 +3414,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the object to be copied.
 *     objout
 *        Pointer to the object being constructed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -3272,7 +3449,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -3284,7 +3461,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for Prism objects.
@@ -3292,6 +3469,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the object to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     void
@@ -3314,7 +3493,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -3326,7 +3505,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -3337,6 +3516,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the Prism whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -3379,11 +3560,11 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsAPrism and astCheckPrism functions using the
    macros defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(Prism,Region,check,&class_init)
+astMAKE_ISA(Prism,Region,check,&class_check)
 astMAKE_CHECK(Prism)
 
 AstPrism *astPrism_( void *region1_void, void *region2_void, 
-                     const char *options, ... ) {
+                     const char *options, int *status, ...) {
 /*
 *+
 *  Name:
@@ -3398,7 +3579,7 @@ AstPrism *astPrism_( void *region1_void, void *region2_void,
 *  Synopsis:
 *     #include "prism.h"
 *     AstPrism *astPrism( AstRegion *region1, AstInterval *region2, 
-*                         const char *options, ... )
+*                         const char *options, ..., int *status )
 
 *  Class Membership:
 *     Prism constructor.
@@ -3418,6 +3599,8 @@ AstPrism *astPrism_( void *region1_void, void *region2_void,
 *        initialising the new Prism. The syntax used is the same as for the
 *        astSet method and may include "printf" format specifiers identified
 *        by "%" symbols in the normal way.
+*     status
+*        Pointer to the inherited status variable.
 *     ...
 *        If the "options" string contains "%" format specifiers, then an
 *        optional list of arguments may follow it in order to supply values to
@@ -3447,6 +3630,7 @@ AstPrism *astPrism_( void *region1_void, void *region2_void,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstPrism *new;                  /* Pointer to new Prism */
    AstRegion *region1;             /* Pointer to first Region structure */
    AstRegion *region2;             /* Pointer to second Region structure */
@@ -3454,6 +3638,9 @@ AstPrism *astPrism_( void *region1_void, void *region2_void,
 
 /* Initialise. */
    new = NULL;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return new;
@@ -3476,7 +3663,7 @@ AstPrism *astPrism_( void *region1_void, void *region2_void,
 /* Obtain the variable argument list and pass it along with the
    options string to the astVSet method to initialise the new Prism's
    attributes. */
-         va_start( args, options );
+         va_start( args, status );
          astVSet( new, options, NULL, args );
          va_end( args );
 
@@ -3591,13 +3778,22 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstPrism *new;                  /* Pointer to new Prism */
    AstRegion *region1;             /* Pointer to first Region structure */
    AstRegion *region2;             /* Pointer to second Region structure */
    va_list args;                   /* Variable argument list */
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
 /* Initialise. */
    new = NULL;
+
+   int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
 
 /* Check the global status. */
    if ( !astOK ) return new;
@@ -3635,7 +3831,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 AstPrism *astInitPrism_( void *mem, size_t size, int init,
                          AstPrismVtab *vtab, const char *name,
-                         AstRegion *region1, AstRegion *region2 ) {
+                         AstRegion *region1, AstRegion *region2, int *status ) {
 /*
 *+
 *  Name:
@@ -3737,15 +3933,15 @@ AstPrism *astInitPrism_( void *mem, size_t size, int init,
 /* Otherwise, report an error. */
    } else if( astOK ) {
       astError( AST__BADIN, "astInitPrism(%s): Bad extrusion Region "
-                "class (%s) supplied.", name, astGetClass( region2 ) );
+                "class (%s) supplied.", status, name, astGetClass( region2 ) );
       astError( AST__NCPIN, "The extrusion Region must be a Box or "
-                "Interval." );
+                "Interval." , status);
    }
 
 /* Form a CmpFrame representing the combined Frame of these two Regions. */
    frm1 = astRegFrame( reg1 );
    frm2 = astRegFrame( reg2 );
-   frm = (AstFrame *) astCmpFrame( frm1, frm2, "" );
+   frm = (AstFrame *) astCmpFrame( frm1, frm2, "", status );
    
 /* Initialise a Region structure (the parent class) as the first component
    within the Prism structure, allocating memory if necessary. A NULL
@@ -3794,7 +3990,7 @@ AstPrism *astInitPrism_( void *mem, size_t size, int init,
 }
 
 AstPrism *astLoadPrism_( void *mem, size_t size, AstPrismVtab *vtab, 
-                         const char *name, AstChannel *channel ) {
+                         const char *name, AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -3868,11 +4064,15 @@ AstPrism *astLoadPrism_( void *mem, size_t size, AstPrismVtab *vtab,
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstFrame *cfrm;         /* Frame containing required axes */
    AstFrame *f1;           /* Base Frame in parent Region */
    AstPrism *new;          /* Pointer to the new Prism */
    AstRegion *creg;        /* Pointer to component Region */
-   int *axes;              /* Pointer to array of axis indices */
+   int *axes;              /* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
+
+/* Pointer to array of axis indices */
    int i;                  /* Loop count */
    int nax1;               /* No.of axes in 1st component Frame */
    int nax2;               /* No.of axes in 2nd component Frame */
@@ -3987,4 +4187,8 @@ AstPrism *astLoadPrism_( void *mem, size_t size, AstPrismVtab *vtab,
    same interface. */
 
 /* None. */
+
+
+
+
 

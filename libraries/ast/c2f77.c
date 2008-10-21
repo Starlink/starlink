@@ -105,6 +105,10 @@ void astStringExport_( const char *source_c, char *dest_f, int dest_len ) {
 
 /* Local Variables:*/
    int i;                        /* Loop counter for characters */
+   int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
 
 /* Check the global error status. */
    if ( !astOK ) return;

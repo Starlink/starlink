@@ -172,6 +172,24 @@ typedef struct AstUnitMapVtab {
 /* Properties (e.g. methods) specific to this class. */
 /* None. */
 } AstUnitMapVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstUnitMapGlobals {
+   AstUnitMapVtab Class_Vtab;
+   int Class_Init;
+} AstUnitMapGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitUnitMapGlobals_( AstUnitMapGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -185,7 +203,7 @@ astPROTO_ISA(UnitMap)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstUnitMap *astUnitMap_( int, const char *, ... );
+AstUnitMap *astUnitMap_( int, const char *, int *, ...);
 #else
 AstUnitMap *astUnitMapId_( int, const char *, ... );
 #endif
@@ -194,14 +212,14 @@ AstUnitMap *astUnitMapId_( int, const char *, ... );
 
 /* Initialiser. */
 AstUnitMap *astInitUnitMap_( void *, size_t, int, AstUnitMapVtab *,
-                             const char *, int );
+                             const char *, int, int * );
 
 /* Vtab initialiser. */
-void astInitUnitMapVtab_( AstUnitMapVtab *, const char * );
+void astInitUnitMapVtab_( AstUnitMapVtab *, const char *, int * );
 
 /* Loader. */
 AstUnitMap *astLoadUnitMap_( void *, size_t, AstUnitMapVtab *,
-                             const char *, AstChannel * );
+                             const char *, AstChannel *, int * );
 #endif
 
 /* Prototypes for member functions. */
@@ -238,13 +256,13 @@ AstUnitMap *astLoadUnitMap_( void *, size_t, AstUnitMapVtab *,
 
 /* Initialiser. */
 #define astInitUnitMap(mem,size,init,vtab,name,ncoord) \
-astINVOKE(O,astInitUnitMap_(mem,size,init,vtab,name,ncoord))
+astINVOKE(O,astInitUnitMap_(mem,size,init,vtab,name,ncoord,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitUnitMapVtab(vtab,name) astINVOKE(V,astInitUnitMapVtab_(vtab,name))
+#define astInitUnitMapVtab(vtab,name) astINVOKE(V,astInitUnitMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadUnitMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadUnitMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadUnitMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -254,3 +272,7 @@ astINVOKE(O,astLoadUnitMap_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 /* None. */
 #endif
+
+
+
+

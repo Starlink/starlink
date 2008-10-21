@@ -228,6 +228,12 @@
 
 /* Define AST__BAD to be the most negative (normalised) double
    value. */
+
+#if defined(astCLASS) || defined(astFORTRAN77)
+#define STATUS_PTR status
+#else
+#define STATUS_PTR astGetStatusPtr
+#endif
 #define AST__BAD (-(DBL_MAX))
 
 #if defined(astCLASS)            /* Protected */
@@ -385,21 +391,34 @@ typedef struct AstPointSetVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   double **(* GetPoints)( AstPointSet * );
-   int (* GetNcoord)( const AstPointSet * );
-   int (* GetNpoint)( const AstPointSet * );
-   void (* PermPoints)( AstPointSet *, int, const int[] );
-   void (* SetPoints)( AstPointSet *, double ** );
-   void (* SetNpoint)( AstPointSet *, int );
-   void (* SetSubPoints)( AstPointSet *, int, int, AstPointSet * );
-   AstPointSet *(* AppendPoints)( AstPointSet *, AstPointSet * );
+   double **(* GetPoints)( AstPointSet *, int * );
+   int (* GetNcoord)( const AstPointSet *, int * );
+   int (* GetNpoint)( const AstPointSet *, int * );
+   void (* PermPoints)( AstPointSet *, int, const int[], int * );
+   void (* SetPoints)( AstPointSet *, double **, int * );
+   void (* SetNpoint)( AstPointSet *, int, int * );
+   void (* SetSubPoints)( AstPointSet *, int, int, AstPointSet *, int * );
+   AstPointSet *(* AppendPoints)( AstPointSet *, AstPointSet *, int * );
 
-   double (* GetPointAccuracy)( AstPointSet *, int );
-   int (* TestPointAccuracy)( AstPointSet *, int );
-   void (* ClearPointAccuracy)( AstPointSet *, int );
-   void (* SetPointAccuracy)( AstPointSet *, int, double );
+   double (* GetPointAccuracy)( AstPointSet *, int, int * );
+   int (* TestPointAccuracy)( AstPointSet *, int, int * );
+   void (* ClearPointAccuracy)( AstPointSet *, int, int * );
+   void (* SetPointAccuracy)( AstPointSet *, int, double, int * );
 
 } AstPointSetVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstPointSetGlobals {
+   AstPointSetVtab Class_Vtab;
+   int Class_Init;
+   char GetAttrib_Buff[ 101 ];
+} AstPointSetGlobals;
+
+#endif
+
 #endif
 
 /* Function prototypes. */
@@ -411,7 +430,7 @@ astPROTO_ISA(PointSet)           /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstPointSet *astPointSet_( int, int, const char *, ... );
+AstPointSet *astPointSet_( int, int, const char *, int *, ...);
 #else
 AstPointSet *astPointSetId_( int, int, const char *, ... );
 #endif
@@ -420,33 +439,39 @@ AstPointSet *astPointSetId_( int, int, const char *, ... );
 
 /* Initialiser. */
 AstPointSet *astInitPointSet_( void *, size_t, int, AstPointSetVtab *,
-                               const char *, int, int );
+                               const char *, int, int, int * );
 
 /* Vtab initialiser. */
-void astInitPointSetVtab_( AstPointSetVtab *, const char * );
+void astInitPointSetVtab_( AstPointSetVtab *, const char *, int * );
 
 /* Loader. */
 AstPointSet *astLoadPointSet_( void *, size_t, AstPointSetVtab *,
-                               const char *, AstChannel * );
+                               const char *, AstChannel *, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitPointSetGlobals_( AstPointSetGlobals * );
+#endif
+
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-double **astGetPoints_( AstPointSet * );
-void astPermPoints_( AstPointSet *, int, const int[] );
-void astSetPoints_( AstPointSet *, double ** );
-void astSetNpoint_( AstPointSet *, int );
-void astSetSubPoints_( AstPointSet *, int, int, AstPointSet * );
-AstPointSet *astAppendPoints_( AstPointSet *, AstPointSet * );
+double **astGetPoints_( AstPointSet *, int * );
+void astPermPoints_( AstPointSet *, int, const int[], int * );
+void astSetPoints_( AstPointSet *, double **, int * );
+void astSetNpoint_( AstPointSet *, int, int * );
+void astSetSubPoints_( AstPointSet *, int, int, AstPointSet *, int * );
+AstPointSet *astAppendPoints_( AstPointSet *, AstPointSet *, int * );
 
 # if defined(astCLASS)           /* Protected */
-int astGetNcoord_( const AstPointSet * );
-int astGetNpoint_( const AstPointSet * );
+int astGetNcoord_( const AstPointSet *, int * );
+int astGetNpoint_( const AstPointSet *, int * );
 
-double astGetPointAccuracy_( AstPointSet *, int );
-int astTestPointAccuracy_( AstPointSet *, int );
-void astClearPointAccuracy_( AstPointSet *, int );
-void astSetPointAccuracy_( AstPointSet *, int, double );
+double astGetPointAccuracy_( AstPointSet *, int, int * );
+int astTestPointAccuracy_( AstPointSet *, int, int * );
+void astClearPointAccuracy_( AstPointSet *, int, int * );
+void astSetPointAccuracy_( AstPointSet *, int, double, int * );
 
 #endif
 
@@ -480,13 +505,13 @@ void astSetPointAccuracy_( AstPointSet *, int, double );
 
 /* Initialiser. */
 #define astInitPointSet(mem,size,init,vtab,name,npoint,ncoord) \
-astINVOKE(O,astInitPointSet_(mem,size,init,vtab,name,npoint,ncoord))
+astINVOKE(O,astInitPointSet_(mem,size,init,vtab,name,npoint,ncoord,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitPointSetVtab(vtab,name) astINVOKE(V,astInitPointSetVtab_(vtab,name))
+#define astInitPointSetVtab(vtab,name) astINVOKE(V,astInitPointSetVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadPointSet(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadPointSet_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadPointSet_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -496,32 +521,36 @@ astINVOKE(O,astLoadPointSet_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 
 #define astGetPoints(this) \
-astINVOKE(V,astGetPoints_(astCheckPointSet(this)))
+astINVOKE(V,astGetPoints_(astCheckPointSet(this),STATUS_PTR))
 #define astPermPoints(this,forward,perm) \
-astINVOKE(V,astPermPoints_(astCheckPointSet(this),forward,perm))
+astINVOKE(V,astPermPoints_(astCheckPointSet(this),forward,perm,STATUS_PTR))
 #define astSetPoints(this,ptr) \
-astINVOKE(V,astSetPoints_(astCheckPointSet(this),ptr))
+astINVOKE(V,astSetPoints_(astCheckPointSet(this),ptr,STATUS_PTR))
 #define astSetNpoint(this,np) \
-astINVOKE(V,astSetNpoint_(astCheckPointSet(this),np))
+astINVOKE(V,astSetNpoint_(astCheckPointSet(this),np,STATUS_PTR))
 #define astSetSubPoints(point1,point,coord,point2) \
-astINVOKE(V,astSetSubPoints_(astCheckPointSet(point1),point,coord,astCheckPointSet(point2)))
+astINVOKE(V,astSetSubPoints_(astCheckPointSet(point1),point,coord,astCheckPointSet(point2),STATUS_PTR))
 #define astAppendPoints(this,that) \
-astINVOKE(O,astAppendPoints_(astCheckPointSet(this),astCheckPointSet(that)))
+astINVOKE(O,astAppendPoints_(astCheckPointSet(this),astCheckPointSet(that),STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 #define astGetNpoint(this) \
-astINVOKE(V,astGetNpoint_(astCheckPointSet(this)))
+astINVOKE(V,astGetNpoint_(astCheckPointSet(this),STATUS_PTR))
 #define astGetNcoord(this) \
-astINVOKE(V,astGetNcoord_(astCheckPointSet(this)))
+astINVOKE(V,astGetNcoord_(astCheckPointSet(this),STATUS_PTR))
 
 #define astClearPointAccuracy(this,axis) \
-astINVOKE(V,astClearPointAccuracy_(astCheckPointSet(this),axis))
+astINVOKE(V,astClearPointAccuracy_(astCheckPointSet(this),axis,STATUS_PTR))
 #define astGetPointAccuracy(this,axis) \
-astINVOKE(V,astGetPointAccuracy_(astCheckPointSet(this),axis))
+astINVOKE(V,astGetPointAccuracy_(astCheckPointSet(this),axis,STATUS_PTR))
 #define astSetPointAccuracy(this,axis,value) \
-astINVOKE(V,astSetPointAccuracy_(astCheckPointSet(this),axis,value))
+astINVOKE(V,astSetPointAccuracy_(astCheckPointSet(this),axis,value,STATUS_PTR))
 #define astTestPointAccuracy(this,axis) \
-astINVOKE(V,astTestPointAccuracy_(astCheckPointSet(this),axis))
+astINVOKE(V,astTestPointAccuracy_(astCheckPointSet(this),axis,STATUS_PTR))
 
 #endif
 #endif
+
+
+
+

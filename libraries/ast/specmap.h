@@ -167,8 +167,26 @@ typedef struct AstSpecMapVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   void (* SpecAdd)( AstSpecMap *, const char *, const double[] );
+   void (* SpecAdd)( AstSpecMap *, const char *, const double[], int * );
 } AstSpecMapVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstSpecMapGlobals {
+   AstSpecMapVtab Class_Vtab;
+   int Class_Init;
+} AstSpecMapGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitSpecMapGlobals_( AstSpecMapGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -180,7 +198,7 @@ astPROTO_ISA(SpecMap)             /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstSpecMap *astSpecMap_( int, int, const char *, ... );
+AstSpecMap *astSpecMap_( int, int, const char *, int *, ...);
 #else
 AstSpecMap *astSpecMapId_( int, int, const char *, ... );
 #endif
@@ -189,19 +207,19 @@ AstSpecMap *astSpecMapId_( int, int, const char *, ... );
 
 /* Initialiser. */
 AstSpecMap *astInitSpecMap_( void *, size_t, int, AstSpecMapVtab *,
-                             const char *, int, int );
+                             const char *, int, int, int * );
 
 /* Vtab initialiser. */
-void astInitSpecMapVtab_( AstSpecMapVtab *, const char * );
+void astInitSpecMapVtab_( AstSpecMapVtab *, const char *, int * );
 
 /* Loader. */
 AstSpecMap *astLoadSpecMap_( void *, size_t, AstSpecMapVtab *,
-                           const char *, AstChannel * );
+                           const char *, AstChannel *, int * );
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-void astSpecAdd_( AstSpecMap *, const char *, const double[] );
+void astSpecAdd_( AstSpecMap *, const char *, const double[], int * );
 
 /* Function interfaces. */
 /* ==================== */
@@ -233,13 +251,13 @@ void astSpecAdd_( AstSpecMap *, const char *, const double[] );
 
 /* Initialiser. */
 #define astInitSpecMap(mem,size,init,vtab,name,nin,flags) \
-astINVOKE(O,astInitSpecMap_(mem,size,init,vtab,name,nin,flags))
+astINVOKE(O,astInitSpecMap_(mem,size,init,vtab,name,nin,flags,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitSpecMapVtab(vtab,name) astINVOKE(V,astInitSpecMapVtab_(vtab,name))
+#define astInitSpecMapVtab(vtab,name) astINVOKE(V,astInitSpecMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadSpecMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadSpecMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadSpecMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -248,6 +266,10 @@ astINVOKE(O,astLoadSpecMap_(mem,size,vtab,name,astCheckChannel(channel)))
    before use.  This provides a contextual error report if a pointer
    to the wrong sort of Object is supplied. */
 #define astSpecAdd(this,cvt,args) \
-astINVOKE(V,astSpecAdd_(astCheckSpecMap(this),cvt,args))
+astINVOKE(V,astSpecAdd_(astCheckSpecMap(this),cvt,args,STATUS_PTR))
 
 #endif
+
+
+
+

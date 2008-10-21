@@ -222,7 +222,7 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 
 /* Define the macro. */
 #define MAKE_CLEAR(attribute) \
-static void Clear##attribute( AstFrame *this_frame ) { \
+static void Clear##attribute( AstFrame *this_frame, int *status ) { \
 \
 /* Local Variables: */ \
    AstRegion *this;            /* Pointer to the Region structure */ \
@@ -275,7 +275,7 @@ static void Clear##attribute( AstFrame *this_frame ) { \
 
 /* Define the macro. */
 #define MAKE_CLEAR_AXIS(attribute) \
-static void Clear##attribute( AstFrame *this_frame, int axis ) { \
+static void Clear##attribute( AstFrame *this_frame, int axis, int *status ) { \
 \
 /* Local Variables: */ \
    AstRegion *this;            /* Pointer to the Region structure */ \
@@ -338,7 +338,7 @@ static void Clear##attribute( AstFrame *this_frame, int axis ) { \
 
 /* Define the macro. */
 #define MAKE_GET(attribute,type) \
-static type Get##attribute( AstFrame *this_frame ) { \
+static type Get##attribute( AstFrame *this_frame, int *status ) { \
 \
 /* Local Variables: */ \
    AstRegion *this;            /* Pointer to the Region structure */ \
@@ -398,7 +398,7 @@ static type Get##attribute( AstFrame *this_frame ) { \
 
 /* Define the macro. */
 #define MAKE_GET_AXIS(attribute,type) \
-static type Get##attribute( AstFrame *this_frame, int axis ) { \
+static type Get##attribute( AstFrame *this_frame, int axis, int *status ) { \
 \
 /* Local Variables: */ \
    AstRegion *this;            /* Pointer to the Region structure */ \
@@ -458,7 +458,7 @@ static type Get##attribute( AstFrame *this_frame, int axis ) { \
 
 /* Define the macro. */
 #define MAKE_SET_SYSTEM(attribute) \
-static void Set##attribute( AstFrame *this_frame, AstSystemType value ) { \
+static void Set##attribute( AstFrame *this_frame, AstSystemType value, int *status ) { \
 \
 /* Local Variables: */ \
    AstRegion *this;            /* Pointer to the Region structure */ \
@@ -519,7 +519,7 @@ static void Set##attribute( AstFrame *this_frame, AstSystemType value ) { \
 
 /* Define the macro. */
 #define MAKE_SET(attribute,type,x) \
-static void Set##attribute( AstFrame *this_frame, type value ) { \
+static void Set##attribute( AstFrame *this_frame, type value, int *status ) { \
 \
 /* Local Variables: */ \
    AstRegion *this;            /* Pointer to the Region structure */ \
@@ -576,7 +576,7 @@ static void Set##attribute( AstFrame *this_frame, type value ) { \
 
 /* Define the macro. */
 #define MAKE_SET_AXIS(attribute,type,x) \
-static void Set##attribute( AstFrame *this_frame, int axis, type value ) { \
+static void Set##attribute( AstFrame *this_frame, int axis, type value, int *status ) { \
 \
 /* Local Variables: */ \
    AstRegion *this;            /* Pointer to the Region structure */ \
@@ -636,7 +636,7 @@ static void Set##attribute( AstFrame *this_frame, int axis, type value ) { \
 
 /* Define the macro. */
 #define MAKE_TEST(attribute) \
-static int Test##attribute( AstFrame *this_frame ) { \
+static int Test##attribute( AstFrame *this_frame, int *status ) { \
 \
 /* Local Variables: */ \
    AstRegion *this;            /* Pointer to Region structure */ \
@@ -695,7 +695,7 @@ static int Test##attribute( AstFrame *this_frame ) { \
 
 /* Define the macro. */
 #define MAKE_TEST_AXIS(attribute) \
-static int Test##attribute( AstFrame *this_frame, int axis ) { \
+static int Test##attribute( AstFrame *this_frame, int axis, int *status ) { \
 \
 /* Local Variables: */ \
    AstRegion *this;              /* Pointer to the Region structure */ \
@@ -725,6 +725,8 @@ static int Test##attribute( AstFrame *this_frame, int axis ) { \
 /* ============= */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
 #include "object.h"              /* Base Object class */
@@ -733,11 +735,14 @@ static int Test##attribute( AstFrame *this_frame, int axis ) { \
 #include "permmap.h"             /* Coordinate permutation Mappings */
 #include "cmpmap.h"              /* Compound Mappings */
 #include "frame.h"               /* Parent Frame class */
+#include "frameset.h"            /* Interconnected coordinate systems */
 #include "region.h"              /* Interface definition for this class */
 #include "circle.h"              /* Circular regions */
 #include "box.h"                 /* Box regions */
 #include "cmpregion.h"           /* Compound regions */
 #include "ellipse.h"             /* Elliptical regions */
+#include "pointset.h"            /* Sets of points */
+#include "globals.h"             /* Thread-safe global data access */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -756,267 +761,305 @@ static int Test##attribute( AstFrame *this_frame, int axis ) { \
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag as
-   static variables. */
-static AstRegionVtab class_vtab; /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject * );
-static int (* parent_getnaxes)( AstFrame * );
-static int (* parent_getusedefs)( AstObject * );
+static int (* parent_getobjsize)( AstObject *, int * );
+static int (* parent_getusedefs)( AstObject *, int * );
+
+#if defined(THREAD_SAFE)
+static int (* parent_managelock)( AstObject *, int, int, int * );
+#endif
+
+/* Define macros for accessing each item of thread specific global data. */
+#ifdef THREAD_SAFE
+
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; \
+   globals->GetAttrib_Buff[ 0 ] = 0;
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(Region)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(Region,Class_Init)
+#define class_vtab astGLOBAL(Region,Class_Vtab)
+#define getattrib_buff astGLOBAL(Region,GetAttrib_Buff)
+
+
+
+/* If thread safety is not needed, declare and initialise globals at static 
+   variables. */ 
+#else
+
+static char getattrib_buff[ 101 ];
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstRegionVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
-static int MaskLD( AstRegion *, AstMapping *, int, int, const int[], const int ubnd[], long double [], long double );
+static int MaskLD( AstRegion *, AstMapping *, int, int, const int[], const int ubnd[], long double [], long double, int * );
 #endif
-static int MaskB( AstRegion *, AstMapping *, int, int, const int[], const int[], signed char[], signed char );
-static int MaskD( AstRegion *, AstMapping *, int, int, const int[], const int[], double[], double );
-static int MaskF( AstRegion *, AstMapping *, int, int, const int[], const int[], float[], float );
-static int MaskI( AstRegion *, AstMapping *, int, int, const int[], const int[], int[], int );
-static int MaskL( AstRegion *, AstMapping *, int, int, const int[], const int[], long int[], long int );
-static int MaskS( AstRegion *, AstMapping *, int, int, const int[], const int[], short int[], short int );
-static int MaskUB( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned char[], unsigned char );
-static int MaskUI( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned int[], unsigned int );
-static int MaskUL( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned long int[], unsigned long int );
-static int MaskUS( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned short int[], unsigned short int );
+static int MaskB( AstRegion *, AstMapping *, int, int, const int[], const int[], signed char[], signed char, int * );
+static int MaskD( AstRegion *, AstMapping *, int, int, const int[], const int[], double[], double, int * );
+static int MaskF( AstRegion *, AstMapping *, int, int, const int[], const int[], float[], float, int * );
+static int MaskI( AstRegion *, AstMapping *, int, int, const int[], const int[], int[], int, int * );
+static int MaskL( AstRegion *, AstMapping *, int, int, const int[], const int[], long int[], long int, int * );
+static int MaskS( AstRegion *, AstMapping *, int, int, const int[], const int[], short int[], short int, int * );
+static int MaskUB( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned char[], unsigned char, int * );
+static int MaskUI( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned int[], unsigned int, int * );
+static int MaskUL( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned long int[], unsigned long int, int * );
+static int MaskUS( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned short int[], unsigned short int, int * );
 
-static int GetObjSize( AstObject * );
-static AstAxis *GetAxis( AstFrame *, int );
-static AstFrame *GetRegionFrame( AstRegion * );
-static AstFrame *PickAxes( AstFrame *, int, const int[], AstMapping ** );
-static AstFrameSet *Conv( AstFrameSet *, AstFrameSet * );
-static AstFrameSet *Convert( AstFrame *, AstFrame *, const char * );
-static AstFrameSet *ConvertX( AstFrame *, AstFrame *, const char * );
-static AstFrameSet *FindFrame( AstFrame *, AstFrame *, const char * );
-static AstFrame *RegFrame( AstRegion *this );
-static AstMapping *RegMapping( AstRegion *this );
-static AstMapping *Simplify( AstMapping * );
-static AstPointSet *RegBaseGrid( AstRegion * );
-static AstPointSet *RegBaseMesh( AstRegion * );
-static AstPointSet *BndBaseMesh( AstRegion *, double *, double * );
-static AstPointSet *BndMesh( AstRegion *, double *, double * );
-static AstPointSet *RegGrid( AstRegion * );
-static AstPointSet *RegMesh( AstRegion * );
-static AstPointSet *BTransform( AstRegion *, AstPointSet *, int, AstPointSet * );
-static AstPointSet *RegTransform( AstRegion *, AstPointSet *, int, AstPointSet *, AstFrame ** );
-static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet * );
-static AstPointSet *GetSubMesh( int *, AstPointSet * );
-static AstRegion *MapRegion( AstRegion *, AstMapping *, AstFrame * );
-static AstSystemType SystemCode( AstFrame *, const char * );
-static AstSystemType ValidateSystem( AstFrame *, AstSystemType, const char * );
-static const char *Abbrev( AstFrame *, int, const char *, const char *, const char * );
-static const char *Format( AstFrame *, int, double );
-static const char *SystemString( AstFrame *, AstSystemType );
-static const int *GetPerm( AstFrame * );
-static double *RegCentre( AstRegion *this, double *, double **, int, int );
-static double Angle( AstFrame *, const double[], const double[], const double[] );
-static double AxAngle( AstFrame *, const double[], const double[], int );
-static double AxDistance( AstFrame *, int, double, double );
-static double AxOffset( AstFrame *, int, double, double );
-static double Distance( AstFrame *, const double[], const double[] );
-static double Gap( AstFrame *, int, double, int * );
-static double Offset2( AstFrame *, const double[2], double, double, double[2] );
-static int DumpUnc( AstRegion * );
-static int TestUnc( AstRegion * );
-static int Equal( AstObject *, AstObject * );
-static int GetNaxes( AstFrame * );
-static int GetUseDefs( AstObject * );
-static int IsUnitFrame( AstFrame * );
-static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
-static int Overlap( AstRegion *, AstRegion * );
-static int OverlapX( AstRegion *, AstRegion * );
-static int RegDummyFS( AstRegion * );
-static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int ** );
-static void ResetCache( AstRegion * );
-static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
-static int Unformat( AstFrame *, int, const char *, double * );
-static int ValidateAxis( AstFrame *, int, const char * );
-static void CheckPerm( AstFrame *, const int *, const char * );
-static void Copy( const AstObject *, AstObject * );
-static void Delete( AstObject * );
-static void Dump( AstObject *, AstChannel * );
-static void Negate( AstRegion * );
-static void Norm( AstFrame *, double[] );
-static void NormBox( AstFrame *, double[], double[], AstMapping * );
-static void Offset( AstFrame *, const double[], const double[], double, double[] );
-static void Overlay( AstFrame *, const int *, AstFrame * );
-static void PermAxes( AstFrame *, const int[] );
-static void RegBaseBox( AstRegion *this, double *, double * );
-static void RegBaseBox2( AstRegion *this, double *, double * );
-static void RegSetAttrib( AstRegion *, const char *, char ** );
-static void ShowMesh( AstRegion *this, int, const char * );
-static void GetRegionBounds( AstRegion *this, double *, double * );
-static void GetUncBounds( AstRegion *this, double *, double * );
-static void GetRegionBounds2( AstRegion *this, double *, double * );
-static void RegOverlay( AstRegion *, AstRegion * );
-static void ReportPoints( AstMapping *, int, AstPointSet *, AstPointSet * );
-static void Resolve( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
-static void SetAxis( AstFrame *, int, AstAxis * );
-static void ValidateAxisSelection( AstFrame *, int, const int *, const char * );
-static void SetRegFS( AstRegion *, AstFrame * );
-static AstFrameSet *GetRegFS( AstRegion * );
-static AstLineDef *LineDef( AstFrame *, const double[2], const double[2] );
-static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double ** );
-static int LineContains( AstFrame *, AstLineDef *, int, double * );
-static void LineOffset( AstFrame *, AstLineDef *, double, double, double[2] );
-static void RegClearAttrib( AstRegion *, const char *, char ** );
+static int GetObjSize( AstObject *, int * );
+static AstAxis *GetAxis( AstFrame *, int, int * );
+static AstFrame *GetRegionFrame( AstRegion *, int * );
+static AstFrame *PickAxes( AstFrame *, int, const int[], AstMapping **, int * );
+static AstFrameSet *Conv( AstFrameSet *, AstFrameSet *, int * );
+static AstFrameSet *Convert( AstFrame *, AstFrame *, const char *, int * );
+static AstFrameSet *ConvertX( AstFrame *, AstFrame *, const char *, int * );
+static AstFrameSet *FindFrame( AstFrame *, AstFrame *, const char *, int * );
+static AstFrame *RegFrame( AstRegion *this, int * );
+static AstMapping *RegMapping( AstRegion *this, int * );
+static AstMapping *Simplify( AstMapping *, int * );
+static AstPointSet *RegBaseGrid( AstRegion *, int * );
+static AstPointSet *RegBaseMesh( AstRegion *, int * );
+static AstPointSet *BndBaseMesh( AstRegion *, double *, double *, int * );
+static AstPointSet *BndMesh( AstRegion *, double *, double *, int * );
+static AstPointSet *RegGrid( AstRegion *, int * );
+static AstPointSet *RegMesh( AstRegion *, int * );
+static AstPointSet *BTransform( AstRegion *, AstPointSet *, int, AstPointSet *, int * );
+static AstPointSet *RegTransform( AstRegion *, AstPointSet *, int, AstPointSet *, AstFrame **, int * );
+static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet *, int * );
+static AstPointSet *GetSubMesh( int *, AstPointSet *, int * );
+static AstRegion *MapRegion( AstRegion *, AstMapping *, AstFrame *, int * );
+static AstSystemType SystemCode( AstFrame *, const char *, int * );
+static AstSystemType ValidateSystem( AstFrame *, AstSystemType, const char *, int * );
+static const char *Abbrev( AstFrame *, int, const char *, const char *, const char *, int * );
+static const char *Format( AstFrame *, int, double, int * );
+static const char *SystemString( AstFrame *, AstSystemType, int * );
+static const int *GetPerm( AstFrame *, int * );
+static double *RegCentre( AstRegion *this, double *, double **, int, int, int * );
+static double Angle( AstFrame *, const double[], const double[], const double[], int * );
+static double AxAngle( AstFrame *, const double[], const double[], int, int * );
+static double AxDistance( AstFrame *, int, double, double, int * );
+static double AxOffset( AstFrame *, int, double, double, int * );
+static double Distance( AstFrame *, const double[], const double[], int * );
+static double Gap( AstFrame *, int, double, int *, int * );
+static double Offset2( AstFrame *, const double[2], double, double, double[2], int * );
+static int DumpUnc( AstRegion *, int * );
+static int Equal( AstObject *, AstObject *, int * );
+static int GetNaxes( AstFrame *, int * );
+static int GetUseDefs( AstObject *, int * );
+static int IsUnitFrame( AstFrame *, int * );
+static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame **, int * );
+static int Overlap( AstRegion *, AstRegion *, int * );
+static int OverlapX( AstRegion *, AstRegion *, int * );
+static int RegDummyFS( AstRegion *, int * );
+static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
+static void ResetCache( AstRegion *, int * );
+static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
+static int Unformat( AstFrame *, int, const char *, double *, int * );
+static int ValidateAxis( AstFrame *, int, const char *, int * );
+static void CheckPerm( AstFrame *, const int *, const char *, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Delete( AstObject *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void Negate( AstRegion *, int * );
+static void Norm( AstFrame *, double[], int * );
+static void NormBox( AstFrame *, double[], double[], AstMapping *, int * );
+static void Offset( AstFrame *, const double[], const double[], double, double[], int * );
+static void Overlay( AstFrame *, const int *, AstFrame *, int * );
+static void PermAxes( AstFrame *, const int[], int * );
+static void RegBaseBox( AstRegion *this, double *, double *, int * );
+static void RegBaseBox2( AstRegion *this, double *, double *, int * );
+static void RegSetAttrib( AstRegion *, const char *, char **, int * );
+static void ShowMesh( AstRegion *this, int, const char *, int * );
+static void GetRegionBounds( AstRegion *this, double *, double *, int * );
+static void GetUncBounds( AstRegion *this, double *, double *, int * );
+static void GetRegionBounds2( AstRegion *this, double *, double *, int * );
+static void RegOverlay( AstRegion *, AstRegion *, int * );
+static void ReportPoints( AstMapping *, int, AstPointSet *, AstPointSet *, int * );
+static void Resolve( AstFrame *, const double [], const double [], const double [], double [], double *, double *, int * );
+static void SetAxis( AstFrame *, int, AstAxis *, int * );
+static void ValidateAxisSelection( AstFrame *, int, const int *, const char *, int * );
+static void SetRegFS( AstRegion *, AstFrame *, int * );
+static AstFrameSet *GetRegFS( AstRegion *, int * );
+static AstLineDef *LineDef( AstFrame *, const double[2], const double[2], int * );
+static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double **, int * );
+static int LineContains( AstFrame *, AstLineDef *, int, double *, int * );
+static void LineOffset( AstFrame *, AstLineDef *, double, double, double[2], int * );
+static void RegClearAttrib( AstRegion *, const char *, char **, int * );
 
-static int GetBounded( AstRegion * );
-static AstRegion *GetDefUnc( AstRegion * );
+static int GetBounded( AstRegion *, int * );
+static AstRegion *GetDefUnc( AstRegion *, int * );
 
-static AstRegion *GetUncFrm( AstRegion *, int );
-static AstRegion *GetUnc( AstRegion *, int );
-static int TestUnc( AstRegion * );
-static void ClearUnc( AstRegion * );
-static void SetUnc( AstRegion *, AstRegion * );
+static AstRegion *GetUncFrm( AstRegion *, int, int * );
+static AstRegion *GetUnc( AstRegion *, int, int * );
+static int TestUnc( AstRegion *, int * );
+static void ClearUnc( AstRegion *, int * );
+static void SetUnc( AstRegion *, AstRegion *, int * );
 
-static const char *GetDomain( AstFrame * );
-static int TestDomain( AstFrame * );
-static void ClearDomain( AstFrame * );
-static void SetDomain( AstFrame *, const char * );
+static const char *GetDomain( AstFrame *, int * );
+static int TestDomain( AstFrame *, int * );
+static void ClearDomain( AstFrame *, int * );
+static void SetDomain( AstFrame *, const char *, int * );
 
-static const char *GetFormat( AstFrame *, int );
-static int TestFormat( AstFrame *, int );
-static void ClearFormat( AstFrame *, int );
-static void SetFormat( AstFrame *, int, const char * );
+static const char *GetFormat( AstFrame *, int, int * );
+static int TestFormat( AstFrame *, int, int * );
+static void ClearFormat( AstFrame *, int, int * );
+static void SetFormat( AstFrame *, int, const char *, int * );
 
-static const char *GetLabel( AstFrame *, int );
-static int TestLabel( AstFrame *, int );
-static void ClearLabel( AstFrame *, int );
-static void SetLabel( AstFrame *, int, const char * );
+static const char *GetLabel( AstFrame *, int, int * );
+static int TestLabel( AstFrame *, int, int * );
+static void ClearLabel( AstFrame *, int, int * );
+static void SetLabel( AstFrame *, int, const char *, int * );
 
-static const char *GetSymbol( AstFrame *, int );
-static int TestSymbol( AstFrame *, int );
-static void ClearSymbol( AstFrame *, int );
-static void SetSymbol( AstFrame *, int, const char * );
+static const char *GetSymbol( AstFrame *, int, int * );
+static int TestSymbol( AstFrame *, int, int * );
+static void ClearSymbol( AstFrame *, int, int * );
+static void SetSymbol( AstFrame *, int, const char *, int * );
 
-static const char *GetTitle( AstFrame * );
-static void SetTitle( AstFrame *, const char * );
-static void ClearTitle( AstFrame * );
-static int TestTitle( AstFrame * );
+static const char *GetTitle( AstFrame *, int * );
+static void SetTitle( AstFrame *, const char *, int * );
+static void ClearTitle( AstFrame *, int * );
+static int TestTitle( AstFrame *, int * );
 
-static const char *GetUnit( AstFrame *, int );
-static int TestUnit( AstFrame *, int );
-static void ClearUnit( AstFrame *, int );
-static void SetUnit( AstFrame *, int, const char * );
+static const char *GetUnit( AstFrame *, int, int * );
+static int TestUnit( AstFrame *, int, int * );
+static void ClearUnit( AstFrame *, int, int * );
+static void SetUnit( AstFrame *, int, const char *, int * );
 
-static int GetDigits( AstFrame * );
-static int TestDigits( AstFrame * );
-static void ClearDigits( AstFrame * );
-static void SetDigits( AstFrame *, int );
+static int GetDigits( AstFrame *, int * );
+static int TestDigits( AstFrame *, int * );
+static void ClearDigits( AstFrame *, int * );
+static void SetDigits( AstFrame *, int, int * );
 
-static int GetDirection( AstFrame *, int );
-static int TestDirection( AstFrame *, int );
-static void ClearDirection( AstFrame *, int );
-static void SetDirection( AstFrame *, int, int );
+static int GetDirection( AstFrame *, int, int * );
+static int TestDirection( AstFrame *, int, int * );
+static void ClearDirection( AstFrame *, int, int * );
+static void SetDirection( AstFrame *, int, int, int * );
 
-static int GetActiveUnit( AstFrame * );
-static int TestActiveUnit( AstFrame * );
-static void SetActiveUnit( AstFrame *, int );
+static int GetActiveUnit( AstFrame *, int * );
+static int TestActiveUnit( AstFrame *, int * );
+static void SetActiveUnit( AstFrame *, int, int * );
 
-static int GetMatchEnd( AstFrame * );
-static int TestMatchEnd( AstFrame * );
-static void ClearMatchEnd( AstFrame * );
-static void SetMatchEnd( AstFrame *, int );
+static int GetMatchEnd( AstFrame *, int * );
+static int TestMatchEnd( AstFrame *, int * );
+static void ClearMatchEnd( AstFrame *, int * );
+static void SetMatchEnd( AstFrame *, int, int * );
 
-static int GetMaxAxes( AstFrame * );
-static int TestMaxAxes( AstFrame * );
-static void ClearMaxAxes( AstFrame * );
-static void SetMaxAxes( AstFrame *, int );
+static int GetMaxAxes( AstFrame *, int * );
+static int TestMaxAxes( AstFrame *, int * );
+static void ClearMaxAxes( AstFrame *, int * );
+static void SetMaxAxes( AstFrame *, int, int * );
 
-static int GetMinAxes( AstFrame * );
-static int TestMinAxes( AstFrame * );
-static void ClearMinAxes( AstFrame * );
-static void SetMinAxes( AstFrame *, int );
+static int GetMinAxes( AstFrame *, int * );
+static int TestMinAxes( AstFrame *, int * );
+static void ClearMinAxes( AstFrame *, int * );
+static void SetMinAxes( AstFrame *, int, int * );
 
-static int GetPermute( AstFrame * );
-static int TestPermute( AstFrame * );
-static void ClearPermute( AstFrame * );
-static void SetPermute( AstFrame *, int );
+static int GetPermute( AstFrame *, int * );
+static int TestPermute( AstFrame *, int * );
+static void ClearPermute( AstFrame *, int * );
+static void SetPermute( AstFrame *, int, int * );
 
-static int GetPreserveAxes( AstFrame * );
-static int TestPreserveAxes( AstFrame * );
-static void ClearPreserveAxes( AstFrame * );
-static void SetPreserveAxes( AstFrame *, int );
+static int GetPreserveAxes( AstFrame *, int * );
+static int TestPreserveAxes( AstFrame *, int * );
+static void ClearPreserveAxes( AstFrame *, int * );
+static void SetPreserveAxes( AstFrame *, int, int * );
 
-static double GetBottom( AstFrame *, int );
-static int TestBottom( AstFrame *, int );
-static void ClearBottom( AstFrame *, int );
-static void SetBottom( AstFrame *, int, double );
+static double GetBottom( AstFrame *, int, int * );
+static int TestBottom( AstFrame *, int, int * );
+static void ClearBottom( AstFrame *, int, int * );
+static void SetBottom( AstFrame *, int, double, int * );
 
-static double GetTop( AstFrame *, int );
-static int TestTop( AstFrame *, int );
-static void ClearTop( AstFrame *, int );
-static void SetTop( AstFrame *, int, double );
+static double GetTop( AstFrame *, int, int * );
+static int TestTop( AstFrame *, int, int * );
+static void ClearTop( AstFrame *, int, int * );
+static void SetTop( AstFrame *, int, double, int * );
 
-static double GetEpoch( AstFrame * );
-static int TestEpoch( AstFrame * );
-static void ClearEpoch( AstFrame * );
-static void SetEpoch( AstFrame *, double );
+static double GetEpoch( AstFrame *, int * );
+static int TestEpoch( AstFrame *, int * );
+static void ClearEpoch( AstFrame *, int * );
+static void SetEpoch( AstFrame *, double, int * );
 
-static double GetObsLat( AstFrame * );
-static int TestObsLat( AstFrame * );
-static void ClearObsLat( AstFrame * );
-static void SetObsLat( AstFrame *, double );
+static double GetObsLat( AstFrame *, int * );
+static int TestObsLat( AstFrame *, int * );
+static void ClearObsLat( AstFrame *, int * );
+static void SetObsLat( AstFrame *, double, int * );
 
-static double GetObsLon( AstFrame * );
-static int TestObsLon( AstFrame * );
-static void ClearObsLon( AstFrame * );
-static void SetObsLon( AstFrame *, double );
+static double GetObsLon( AstFrame *, int * );
+static int TestObsLon( AstFrame *, int * );
+static void ClearObsLon( AstFrame *, int * );
+static void SetObsLon( AstFrame *, double, int * );
 
-static AstSystemType GetSystem( AstFrame * );
-static int TestSystem( AstFrame * );
-static void ClearSystem( AstFrame * );
-static void SetSystem( AstFrame *, AstSystemType );
+static AstSystemType GetSystem( AstFrame *, int * );
+static int TestSystem( AstFrame *, int * );
+static void ClearSystem( AstFrame *, int * );
+static void SetSystem( AstFrame *, AstSystemType, int * );
 
-static AstSystemType GetAlignSystem( AstFrame * );
-static int TestAlignSystem( AstFrame * );
-static void ClearAlignSystem( AstFrame * );
-static void SetAlignSystem( AstFrame *, AstSystemType );
+static AstSystemType GetAlignSystem( AstFrame *, int * );
+static int TestAlignSystem( AstFrame *, int * );
+static void ClearAlignSystem( AstFrame *, int * );
+static void SetAlignSystem( AstFrame *, AstSystemType, int * );
 
-static const char *GetAttrib( AstObject *, const char * );
-static int TestAttrib( AstObject *, const char * );
-static void ClearAttrib( AstObject *, const char * );
-static void SetAttrib( AstObject *, const char * );
+static const char *GetAttrib( AstObject *, const char *, int * );
+static int TestAttrib( AstObject *, const char *, int * );
+static void ClearAttrib( AstObject *, const char *, int * );
+static void SetAttrib( AstObject *, const char *, int * );
 
-static int GetNegated( AstRegion * );
-static int TestNegated( AstRegion * );
-static void ClearNegated( AstRegion * );
-static void SetNegated( AstRegion *, int );
+static int GetNegated( AstRegion *, int * );
+static int TestNegated( AstRegion *, int * );
+static void ClearNegated( AstRegion *, int * );
+static void SetNegated( AstRegion *, int, int * );
 
-static int GetClosed( AstRegion * );
-static int TestClosed( AstRegion * );
-static void ClearClosed( AstRegion * );
-static void SetClosed( AstRegion *, int );
+static int GetClosed( AstRegion *, int * );
+static int TestClosed( AstRegion *, int * );
+static void ClearClosed( AstRegion *, int * );
+static void SetClosed( AstRegion *, int, int * );
 
-static int GetMeshSize( AstRegion * );
-static int TestMeshSize( AstRegion * );
-static void ClearMeshSize( AstRegion * );
-static void SetMeshSize( AstRegion *, int );
+static int GetMeshSize( AstRegion *, int * );
+static int TestMeshSize( AstRegion *, int * );
+static void ClearMeshSize( AstRegion *, int * );
+static void SetMeshSize( AstRegion *, int, int * );
 
-static double GetFillFactor( AstRegion * );
-static int TestFillFactor( AstRegion * );
-static void ClearFillFactor( AstRegion * );
-static void SetFillFactor( AstRegion *, double );
+static double GetFillFactor( AstRegion *, int * );
+static int TestFillFactor( AstRegion *, int * );
+static void ClearFillFactor( AstRegion *, int * );
+static void SetFillFactor( AstRegion *, double, int * );
 
-static int GetRegionFS( AstRegion * );
-static int TestRegionFS( AstRegion * );
-static void ClearRegionFS( AstRegion * );
-static void SetRegionFS( AstRegion *, int );
+static int GetRegionFS( AstRegion *, int * );
+static int TestRegionFS( AstRegion *, int * );
+static void ClearRegionFS( AstRegion *, int * );
+static void SetRegionFS( AstRegion *, int, int * );
 
-static int GetAdaptive( AstRegion * );
-static int TestAdaptive( AstRegion * );
-static void ClearAdaptive( AstRegion * );
-static void SetAdaptive( AstRegion *, int );
+static int GetAdaptive( AstRegion *, int * );
+static int TestAdaptive( AstRegion *, int * );
+static void ClearAdaptive( AstRegion *, int * );
+static void SetAdaptive( AstRegion *, int, int * );
+
+#if defined(THREAD_SAFE)
+static int ManageLock( AstObject *, int, int, int * );
+#endif
 
 
 /* Member functions. */
 /* ================= */
 
 static const char *Abbrev( AstFrame *this_frame, int axis, const char *fmt,
-                           const char *str1, const char *str2 ) {
+                           const char *str1, const char *str2, int *status ) {
 /*
 *  Name:
 *     Abbrev
@@ -1030,7 +1073,7 @@ static const char *Abbrev( AstFrame *this_frame, int axis, const char *fmt,
 *  Synopsis:
 *     #include "region.h"
 *     const char *Abbrev( AstFrame *this, int axis, const char *fmt,
-*                         const char *str1, const char *str2 )
+*                         const char *str1, const char *str2, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected astAbbrev
@@ -1059,6 +1102,8 @@ static const char *Abbrev( AstFrame *this_frame, int axis, const char *fmt,
 *     str1
 *        Pointer to a constant null-terminated string containing the
 *        second formatted value.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer into the "str2" string which locates the first
@@ -1108,7 +1153,7 @@ static const char *Abbrev( AstFrame *this_frame, int axis, const char *fmt,
 }
 
 static double Angle( AstFrame *this_frame, const double a[],
-                     const double b[], const double c[] ) {
+                     const double b[], const double c[], int *status ) {
 /*
 *  Name:
 *     Angle
@@ -1122,7 +1167,7 @@ static double Angle( AstFrame *this_frame, const double a[],
 *  Synopsis:
 *     #include "region.h"
 *     double Angle( AstFrame *this, const double a[], const double b[],
-*                   const double c[] )
+*                   const double c[], int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected astAngle
@@ -1146,6 +1191,8 @@ static double Angle( AstFrame *this_frame, const double a[],
 *     c
 *        An array of double, with one element for each Frame axis
 *        (Naxes attribute) containing the coordinates of the third point.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     astAngle
@@ -1188,7 +1235,7 @@ static double Angle( AstFrame *this_frame, const double a[],
    return result;
 }
 
-static double AxAngle( AstFrame *this_frame, const double a[], const double b[], int axis ) {
+static double AxAngle( AstFrame *this_frame, const double a[], const double b[], int axis, int *status ) {
 /*
 *  Name:
 *     AxAngle
@@ -1201,7 +1248,7 @@ static double AxAngle( AstFrame *this_frame, const double a[], const double b[],
 
 *  Synopsis:
 *     #include "region.h"
-*     double AxAngle( AstFrame *this, const double a[], const double b[], int axis )
+*     double AxAngle( AstFrame *this, const double a[], const double b[], int axis, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected astAxAngle
@@ -1224,6 +1271,8 @@ static double AxAngle( AstFrame *this_frame, const double a[], const double b[],
 *     axis
 *        The number of the Frame axis from which the angle is to be
 *        measured (one-based)
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *        The angle in radians, from the positive direction of the
@@ -1271,7 +1320,7 @@ static double AxAngle( AstFrame *this_frame, const double a[], const double b[],
    return result;
 }
 
-static double AxDistance( AstFrame *this_frame, int axis, double v1, double v2 ) {
+static double AxDistance( AstFrame *this_frame, int axis, double v1, double v2, int *status ) {
 /*
 *  Name:
 *     AxDistance
@@ -1284,7 +1333,7 @@ static double AxDistance( AstFrame *this_frame, int axis, double v1, double v2 )
 
 *  Synopsis:
 *     #include "region.h"
-*     double AxDistance( AstFrame *this, int axis, double v1, double v2 )
+*     double AxDistance( AstFrame *this, int axis, double v1, double v2, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected astAxDistance
@@ -1308,6 +1357,8 @@ static double AxDistance( AstFrame *this_frame, int axis, double v1, double v2 )
 *        The first axis value.
 *     v2
 *        The second axis value.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The distance between the two axis values.
@@ -1348,7 +1399,7 @@ static double AxDistance( AstFrame *this_frame, int axis, double v1, double v2 )
    return result;
 }
 
-static double AxOffset( AstFrame *this_frame, int axis, double v1, double dist ) {
+static double AxOffset( AstFrame *this_frame, int axis, double v1, double dist, int *status ) {
 /*
 *  Name:
 *     AxOffset
@@ -1361,7 +1412,7 @@ static double AxOffset( AstFrame *this_frame, int axis, double v1, double dist )
 
 *  Synopsis:
 *     #include "region.h"
-*     double AxOffset( AstFrame *this, int axis, double v1, double dist )
+*     double AxOffset( AstFrame *this, int axis, double v1, double dist, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected astAxOffset
@@ -1385,6 +1436,8 @@ static double AxOffset( AstFrame *this_frame, int axis, double v1, double dist )
 *        The original axis value.
 *     dist
 *        The axis increment to add to the original axis value.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The incremented axis value.
@@ -1425,7 +1478,7 @@ static double AxOffset( AstFrame *this_frame, int axis, double v1, double dist )
    return result;
 }
 
-static AstPointSet *BndBaseMesh( AstRegion *this, double *lbnd, double *ubnd ){
+static AstPointSet *BndBaseMesh( AstRegion *this, double *lbnd, double *ubnd, int *status ){
 /*
 *+
 *  Name:
@@ -1490,14 +1543,14 @@ static AstPointSet *BndBaseMesh( AstRegion *this, double *lbnd, double *ubnd ){
    if ( !astOK ) return NULL;
 
 /* Form a Box describing the required box. */
-   box = astBox( this, 1, lbnd, ubnd, NULL, "" );
+   box = astBox( this, 1, lbnd, ubnd, NULL, "", status );
 
 /* Check there is partial overlap between the Regions.*/
    if( astOverlap( this, box ) > 3 ) {
 
 /* Form a CmpRegion representing the intersection between the supplied
    Region and the above box. */
-      cmpreg = astCmpRegion( this, box, AST__AND, "" );
+      cmpreg = astCmpRegion( this, box, AST__AND, "", status );
 
 /* Get the boundary mesh. */
       result = astRegBaseMesh( cmpreg );
@@ -1509,7 +1562,7 @@ static AstPointSet *BndBaseMesh( AstRegion *this, double *lbnd, double *ubnd ){
    return a PointSet containing a single bad position. */
    } else {
       nc = astGetNin( this->frameset );
-      result = astPointSet( 1, nc, "" );
+      result = astPointSet( 1, nc, "", status );
       ptr = astGetPoints( result );
       if( ptr ) {
          for( ic = 0; ic < nc; ic++ ) ptr[ ic ][ 0 ] = AST__BAD;
@@ -1526,7 +1579,7 @@ static AstPointSet *BndBaseMesh( AstRegion *this, double *lbnd, double *ubnd ){
    return result;
 }
 
-static AstPointSet *BndMesh( AstRegion *this, double *lbnd, double *ubnd ){
+static AstPointSet *BndMesh( AstRegion *this, double *lbnd, double *ubnd, int *status ){
 /*
 *+
 *  Name:
@@ -1613,7 +1666,7 @@ static AstPointSet *BndMesh( AstRegion *this, double *lbnd, double *ubnd ){
 }
 
 static AstPointSet *BTransform( AstRegion *this, AstPointSet *in,
-                                int forward, AstPointSet *out ) {
+                                int forward, AstPointSet *out, int *status ) {
 /*
 *
 *  Name:
@@ -1687,7 +1740,7 @@ static AstPointSet *BTransform( AstRegion *this, AstPointSet *in,
    return result;
 }
 
-static void CheckPerm( AstFrame *this_frame, const int *perm, const char *method ) {
+static void CheckPerm( AstFrame *this_frame, const int *perm, const char *method, int *status ) {
 /*
 *  Name:
 *     CheckPerm
@@ -1700,7 +1753,7 @@ static void CheckPerm( AstFrame *this_frame, const int *perm, const char *method
 
 *  Synopsis:
 *     #include "region.h"
-*     void CheckPerm( AstFrame *this, const int *perm, const char *method )
+*     void CheckPerm( AstFrame *this, const int *perm, const char *method, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected astCheckPerm
@@ -1730,6 +1783,8 @@ static void CheckPerm( AstFrame *this_frame, const int *perm, const char *method
 *        containing the name of the method that invoked this function
 *        to validate a permutation array. This method name is used
 *        solely for constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - Error messages issued by this function refer to the external
@@ -1755,7 +1810,7 @@ static void CheckPerm( AstFrame *this_frame, const int *perm, const char *method
 
 }
 
-static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     ClearAttrib
@@ -1768,7 +1823,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     void ClearAttrib( AstObject *this, const char *attrib )
+*     void ClearAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the astClearAttrib protected
@@ -1785,6 +1840,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -1867,8 +1924,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
                !strcmp( attrib, "tranforward" ) ||
                !strcmp( attrib, "traninverse" ) ) {
       astError( AST__NOWRT, "astClear: Invalid attempt to clear the \"%s\" "
-                "value for a %s.", attrib, astGetClass( this ) );
-      astError( AST__NOWRT, "This is a read-only attribute." );
+                "value for a %s.", status, attrib, astGetClass( this ) );
+      astError( AST__NOWRT, "This is a read-only attribute." , status);
 
 /* Pass unrecognised attributes on to the Region's encapsulated FrameSet for
    further interpretation. Do not pass on FrameSet attributes since we
@@ -1894,7 +1951,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    }
 }
 
-static AstFrameSet *Conv( AstFrameSet *from, AstFrameSet *to ){
+static AstFrameSet *Conv( AstFrameSet *from, AstFrameSet *to, int *status ){
 /*
 *  Name:
 *     Conv
@@ -1907,7 +1964,7 @@ static AstFrameSet *Conv( AstFrameSet *from, AstFrameSet *to ){
 
 *  Synopsis:
 *     #include "region.h"
-*     AstFrameSet *Conv( AstFrameSet *from, AstFrameSet *to );
+*     AstFrameSet *Conv( AstFrameSet *from, AstFrameSet *to, int *status );
 
 *  Class Membership:
 *     Region member function 
@@ -1922,6 +1979,8 @@ static AstFrameSet *Conv( AstFrameSet *from, AstFrameSet *to ){
 *        Pointer to the source FrameSet.
 *     to
 *        Pointer to the source FrameSet.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *        The conversion FrameSet (see astConvert).
@@ -1952,7 +2011,7 @@ static AstFrameSet *Conv( AstFrameSet *from, AstFrameSet *to ){
 }
 
 static AstFrameSet *Convert( AstFrame *from, AstFrame *to,
-                             const char *domainlist ) {
+                             const char *domainlist, int *status ) {
 /*
 *  Name:
 *     Convert
@@ -1966,7 +2025,7 @@ static AstFrameSet *Convert( AstFrame *from, AstFrame *to,
 *  Synopsis:
 *     #include "region.h"
 *     AstFrameSet *Convert( AstFrame *from, AstFrame *to,
-*                           const char *domainlist )
+*                           const char *domainlist, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the public astConvert
@@ -2004,6 +2063,8 @@ static AstFrameSet *Convert( AstFrame *from, AstFrame *to,
 *        commas) indicates that all Frames should be considered,
 *        regardless of their Domain attributes. The list is
 *        case-insensitive and all white space is ignored.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *        If the requested coordinate conversion is possible, the
@@ -2063,7 +2124,7 @@ static AstFrameSet *Convert( AstFrame *from, AstFrame *to,
 }
 
 static AstFrameSet *ConvertX( AstFrame *to, AstFrame *from,
-                              const char *domainlist ) {
+                              const char *domainlist, int *status ) {
 /*
 *  Name:
 *     astConvertX
@@ -2128,7 +2189,7 @@ static AstFrameSet *ConvertX( AstFrame *to, AstFrame *from,
 }
 
 static double Distance( AstFrame *this_frame, const double point1[], 
-                        const double point2[] ) {
+                        const double point2[], int *status ) {
 /*
 *  Name:
 *     Distance
@@ -2142,7 +2203,7 @@ static double Distance( AstFrame *this_frame, const double point1[],
 *  Synopsis:
 *     #include "region.h"
 *     double Distance( AstFrame *this, const double point1[], 
-*                      const double point2[] )
+*                      const double point2[], int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected astDistance
@@ -2162,6 +2223,8 @@ static double Distance( AstFrame *this_frame, const double point1[],
 *     point2
 *        An array of double, with one element for each Region axis
 *        containing the coordinates of the second point.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The distance between the two points.
@@ -2198,7 +2261,7 @@ static double Distance( AstFrame *this_frame, const double point1[],
    return result;
 }
 
-static int DumpUnc( AstRegion *this ) {
+static int DumpUnc( AstRegion *this, int *status ) {
 /*
 *+
 *  Name:
@@ -2240,7 +2303,7 @@ static int DumpUnc( AstRegion *this ) {
    return ( this->unc && astTestUnc( this ) );
 }
 
-static int Equal( AstObject *this_object, AstObject *that_object ) {
+static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
 *  Name:
 *     Equal
@@ -2253,7 +2316,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     int Equal( AstObject *this_object, AstObject *that_object ) 
+*     int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 *  Class Membership:
 *     Region member function (over-rides the astEqual protected
@@ -2268,6 +2331,8 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *        Pointer to the first Region.
 *     that
 *        Pointer to the second Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if the Regions are equivalent, zero otherwise.
@@ -2354,7 +2419,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
    return result;
 }
 
-static void ClearUnc( AstRegion *this ){
+static void ClearUnc( AstRegion *this, int *status ){
 /*
 *+
 *  Name:
@@ -2395,7 +2460,7 @@ static void ClearUnc( AstRegion *this ){
 }
 
 static AstFrameSet *FindFrame( AstFrame *target_frame, AstFrame *template,
-                               const char *domainlist ) {
+                               const char *domainlist, int *status ) {
 /*
 *  Name:
 *     FindFrame
@@ -2409,7 +2474,7 @@ static AstFrameSet *FindFrame( AstFrame *target_frame, AstFrame *template,
 *  Synopsis:
 *     #include "region.h"
 *     AstFrameSet *FindFrame( AstFrame *target, AstFrame *template,
-*                             const char *domainlist )
+*                             const char *domainlist, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the astFindFrame method
@@ -2446,6 +2511,8 @@ static AstFrameSet *FindFrame( AstFrame *target_frame, AstFrame *template,
 *        This list is case-insensitive and all white space is ignored.
 *        If you do not wish to restrict the domain in this way, you
 *        should supply an empty string.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     If the search is successful, the function returns a pointer to a
@@ -2489,7 +2556,7 @@ static AstFrameSet *FindFrame( AstFrame *target_frame, AstFrame *template,
    return result;
 }
 
-static const char *Format( AstFrame *this_frame, int axis, double value ) {
+static const char *Format( AstFrame *this_frame, int axis, double value, int *status ) {
 /*
 *  Name:
 *     Format
@@ -2502,7 +2569,7 @@ static const char *Format( AstFrame *this_frame, int axis, double value ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     const char *Format( AstFrame *this, int axis, double value )
+*     const char *Format( AstFrame *this, int axis, double value, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the astFormat method
@@ -2523,6 +2590,8 @@ static const char *Format( AstFrame *this_frame, int axis, double value ) {
 *        to be performed.
 *     value
 *        The coordinate value to be formatted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to a null-terminated string containing the formatted
@@ -2568,7 +2637,7 @@ static const char *Format( AstFrame *this_frame, int axis, double value ) {
    return result;
 }
 
-static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick ) {
+static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick, int *status ) {
 /*
 *  Name:
 *     Gap
@@ -2581,7 +2650,7 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     double Gap( AstFrame *this, int axis, double gap, int *ntick )
+*     double Gap( AstFrame *this, int axis, double gap, int *ntick, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected astGap method
@@ -2604,6 +2673,8 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick ) {
 *     ntick
 *        Address of an int in which to return a convenient number of
 *        divisions into which the gap can be divided.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The nice gap size.
@@ -2644,7 +2715,7 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick ) {
    return result;
 }
 
-static int GetObjSize( AstObject *this_object ) {
+static int GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -2657,7 +2728,7 @@ static int GetObjSize( AstObject *this_object ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     int GetObjSize( AstObject *this ) 
+*     int GetObjSize( AstObject *this, int *status ) 
 
 *  Class Membership:
 *     Region member function (over-rides the astGetObjSize protected
@@ -2670,6 +2741,8 @@ static int GetObjSize( AstObject *this_object ) {
 *  Parameters:
 *     this
 *        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Object size, in bytes.
@@ -2695,7 +2768,7 @@ static int GetObjSize( AstObject *this_object ) {
 /* Invoke the GetObjSize method inherited from the parent class, and then
    add on any components of the class structure defined by thsi class
    which are stored in dynamically allocated memory. */
-   result = (*parent_getobjsize)( this_object );
+   result = (*parent_getobjsize)( this_object, status );
 
    result += astGetObjSize( this->frameset );
    result += astGetObjSize( this->points );
@@ -2710,7 +2783,7 @@ static int GetObjSize( AstObject *this_object ) {
    return result;
 }
 
-static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+static const char *GetAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     GetAttrib
@@ -2723,7 +2796,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     const char *GetAttrib( AstObject *this, const char *attrib )
+*     const char *GetAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected astGetAttrib
@@ -2740,6 +2813,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string containing the name of
 *        the attribute whose value is required. This name should be in
 *        lower case, with all white space removed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     - Pointer to a null-terminated string containing the attribute
@@ -2757,22 +2832,22 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *     reason.
 */
 
-/* Local Constants: */
-#define BUFF_LEN 50              /* Max. characters in result buffer */
-
 /* Local Variables: */
+   astDECLARE_GLOBALS;          /* Pointer to thread-specific global data */
    AstRegion *this;              /* Pointer to the Region structure */
    const char *result;           /* Pointer value to return */
    double dval;                  /* Floating point attribute value */
    int ival;                     /* Integer attribute value */
    int len;                      /* Length of attrib string */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
    result = NULL;
 
 /* Check the global error status. */   
    if ( !astOK ) return result;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this_object);
 
 /* Obtain a pointer to the Region structure. */
    this = (AstRegion *) this_object;
@@ -2782,7 +2857,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Compare "attrib" with each recognised attribute name in turn,
    obtaining the value of the required attribute. If necessary, write
-   the value into "buff" as a null-terminated string in an appropriate
+   the value into "getattrib_buff" as a null-terminated string in an appropriate
    format.  Set "result" to point at the result string. */
 
 /* We first handle attributes that apply to the Region as a whole
@@ -2793,8 +2868,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    if ( !strcmp( attrib, "negated" ) ) {
       ival = astGetNegated( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Closed */
@@ -2802,8 +2877,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "closed" ) ) {
       ival = astGetClosed( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Adaptive */
@@ -2811,8 +2886,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "adaptive" ) ) {
       ival = astGetAdaptive( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* FillFactor */
@@ -2820,8 +2895,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "fillfactor" ) ) {
       dval = astGetFillFactor( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* MeshSize */
@@ -2829,8 +2904,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "meshsize" ) ) {
       ival = astGetMeshSize( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Bounded */
@@ -2838,8 +2913,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "bounded" ) ) {
       ival = astGetBounded( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Now get the values of attributes inherited from parent classes. We do
@@ -2866,8 +2941,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "invert" ) ) {
       ival = astGetInvert( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Nin. */
@@ -2875,8 +2950,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "nin" ) ) {
       ival = astGetNin( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Nobject. */
@@ -2884,8 +2959,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "nobject" ) ) {
       ival = astGetNobject( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Nout. */
@@ -2893,8 +2968,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "nout" ) ) {
       ival = astGetNout( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* RefCount. */
@@ -2902,8 +2977,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "refcount" ) ) {
       ival = astGetRefCount( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Report. */
@@ -2911,8 +2986,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "report" ) ) {
       ival = astGetReport( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* TranForward. */
@@ -2920,8 +2995,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "tranforward" ) ) {
       ival = astGetTranForward( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* TranInverse. */
@@ -2929,8 +3004,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "traninverse" ) ) {
       ival = astGetTranInverse( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
       }
 
 /* Pass unrecognised attributes on to the Region's encapsulated FrameSet for
@@ -2948,12 +3023,9 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Return the result. */
    return result;
-
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
 
-static int GetBounded( AstRegion *this ) {
+static int GetBounded( AstRegion *this, int *status ) {
 /*
 *+
 *  Name:
@@ -2995,7 +3067,7 @@ static int GetBounded( AstRegion *this ) {
    return !astGetNegated( this );
 }
 
-static AstAxis *GetAxis( AstFrame *this_frame, int axis ) {
+static AstAxis *GetAxis( AstFrame *this_frame, int axis, int *status ) {
 /*
 *  Name:
 *     GetAxis
@@ -3008,7 +3080,7 @@ static AstAxis *GetAxis( AstFrame *this_frame, int axis ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     AstAxis *GetAxis( AstFrame *this, int axis )
+*     AstAxis *GetAxis( AstFrame *this, int axis, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the astGetAxis method
@@ -3026,6 +3098,8 @@ static AstAxis *GetAxis( AstFrame *this_frame, int axis ) {
 *     axis
 *        The number of the axis (zero-based) for which an Axis pointer
 *        is required.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to the requested Axis object.
@@ -3064,7 +3138,7 @@ static AstAxis *GetAxis( AstFrame *this_frame, int axis ) {
    return result;
 }
 
-static AstRegion *GetDefUnc( AstRegion *this ) {
+static AstRegion *GetDefUnc( AstRegion *this, int *status ) {
 /*
 *+
 *  Name:
@@ -3150,7 +3224,7 @@ static AstRegion *GetDefUnc( AstRegion *this ) {
             lbnd[ i ] = 0.0;
          }
       }
-      result = (AstRegion *) astBox( bfrm, 1, lbnd, ubnd, NULL, "" );
+      result = (AstRegion *) astBox( bfrm, 1, lbnd, ubnd, NULL, "", status );
    }
 
 /* Free resources. */
@@ -3165,7 +3239,7 @@ static AstRegion *GetDefUnc( AstRegion *this ) {
    return result;
 }
 
-static AstFrameSet *GetRegFS( AstRegion *this ) {
+static AstFrameSet *GetRegFS( AstRegion *this, int *status ) {
 /*
 *+
 *  Name:
@@ -3210,7 +3284,7 @@ static AstFrameSet *GetRegFS( AstRegion *this ) {
    return astClone( this->frameset );
 }
 
-static AstPointSet *GetSubMesh( int *mask, AstPointSet *in ) {
+static AstPointSet *GetSubMesh( int *mask, AstPointSet *in, int *status ) {
 /*
 *  Name:
 *     GetSubMesh
@@ -3223,7 +3297,7 @@ static AstPointSet *GetSubMesh( int *mask, AstPointSet *in ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     AstPointSet *GetSubMesh( int *mask, AstPointSet *in )
+*     AstPointSet *GetSubMesh( int *mask, AstPointSet *in, int *status )
 
 *  Class Membership:
 *     Region member function 
@@ -3240,6 +3314,8 @@ static AstPointSet *GetSubMesh( int *mask, AstPointSet *in ) {
 *        be copied if the mask value is zero.
 *     in
 *        Pointer to the PointSet holding the input positions.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the output PointSet. 
@@ -3281,7 +3357,7 @@ static AstPointSet *GetSubMesh( int *mask, AstPointSet *in ) {
 
 /* Create the output PointSet and get pointers to its data arrays. */
    nc = astGetNcoord( in );
-   result = astPointSet( npout, nc, "" );
+   result = astPointSet( npout, nc, "", status );
    ptr_in = astGetPoints( in );
    ptr_out = astGetPoints( result );
 
@@ -3304,7 +3380,7 @@ static AstPointSet *GetSubMesh( int *mask, AstPointSet *in ) {
 
 }
 
-static AstRegion *GetUnc( AstRegion *this, int def ){
+static AstRegion *GetUnc( AstRegion *this, int def, int *status ){
 /*
 *++
 *  Name:
@@ -3421,7 +3497,7 @@ c     function is invoked with the AST error status set, or if it
 
 }
 
-static AstRegion *GetUncFrm( AstRegion *this, int ifrm ) {
+static AstRegion *GetUncFrm( AstRegion *this, int ifrm, int *status ) {
 /*
 *+
 *  Name:
@@ -3530,7 +3606,7 @@ static AstRegion *GetUncFrm( AstRegion *this, int ifrm ) {
    return result;
 }
 
-static int GetUseDefs( AstObject *this_object ) {
+static int GetUseDefs( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetUseDefs
@@ -3543,7 +3619,7 @@ static int GetUseDefs( AstObject *this_object ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     int GetUseDefs( AstObject *this_object ) {
+*     int GetUseDefs( AstObject *this_object, int *status ) {
 
 *  Class Membership:
 *     Region member function (over-rides the protected astGetUseDefs
@@ -3556,6 +3632,8 @@ static int GetUseDefs( AstObject *this_object ) {
 *  Parameters:
 *     this
 *        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     - The USeDefs value.
@@ -3578,7 +3656,7 @@ static int GetUseDefs( AstObject *this_object ) {
 /* If the UseDefs value for the Region has been set explicitly, use the
    Get method inherited from the parent Frame class to get its value. */
    if( astTestUseDefs( this ) ) {
-      result = (*parent_getusedefs)( this_object );
+      result = (*parent_getusedefs)( this_object, status );
 
 /* Otherwise, supply a default value equal to the UseDefs value of the
    encapsulated Frame. */   
@@ -3592,7 +3670,7 @@ static int GetUseDefs( AstObject *this_object ) {
    return result;
 }
 
-static int TestUnc( AstRegion *this ) {
+static int TestUnc( AstRegion *this, int *status ) {
 /*
 *+
 *  Name:
@@ -3634,7 +3712,7 @@ static int TestUnc( AstRegion *this ) {
    return this->unc && !this->defunc;
 }
 
-static AstFrame *RegFrame( AstRegion *this ) {
+static AstFrame *RegFrame( AstRegion *this, int *status ) {
 /*
 *+
 *  Name:
@@ -3679,7 +3757,7 @@ static AstFrame *RegFrame( AstRegion *this ) {
    return astGetFrame( this->frameset, AST__CURRENT );
 }
 
-static AstMapping *RegMapping( AstRegion *this ) {
+static AstMapping *RegMapping( AstRegion *this, int *status ) {
 /*
 *  Name:
 *     RegMapping
@@ -3692,7 +3770,7 @@ static AstMapping *RegMapping( AstRegion *this ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     AstMapping *RegMapping( AstRegion *this ) 
+*     AstMapping *RegMapping( AstRegion *this, int *status ) 
 
 *  Class Membership:
 *     Region member function 
@@ -3705,6 +3783,8 @@ static AstMapping *RegMapping( AstRegion *this ) {
 *  Parameters:
 *     this
 *        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to the Mapping.
@@ -3728,7 +3808,7 @@ static AstMapping *RegMapping( AstRegion *this ) {
 /* If the "nomap" flag is set in the Region structure, re return a
    UnitMap. */
    if( this->nomap ) { 
-      result = (AstMapping *) astUnitMap( astGetNin( this->frameset ), "" );
+      result = (AstMapping *) astUnitMap( astGetNin( this->frameset ), "", status );
 
 /* Otherwise use the Mapping from the Region's FrameSet. */
    } else {
@@ -3747,7 +3827,7 @@ static AstMapping *RegMapping( AstRegion *this ) {
    return result;
 }
 
-static int GetNaxes( AstFrame *this_frame ) {
+static int GetNaxes( AstFrame *this_frame, int *status ) {
 /*
 *  Name:
 *     GetNaxes
@@ -3760,7 +3840,7 @@ static int GetNaxes( AstFrame *this_frame ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     int GetNaxes( AstFrame *this )
+*     int GetNaxes( AstFrame *this, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the astGetNaxes method
@@ -3773,6 +3853,8 @@ static int GetNaxes( AstFrame *this_frame ) {
 *  Parameters:
 *     this
 *        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The number of Region axes (zero or more).
@@ -3810,7 +3892,7 @@ static int GetNaxes( AstFrame *this_frame ) {
    return result;
 }
 
-static const int *GetPerm( AstFrame *this_frame ) {
+static const int *GetPerm( AstFrame *this_frame, int *status ) {
 /*
 *  Name:
 *     GetPerm
@@ -3823,7 +3905,7 @@ static const int *GetPerm( AstFrame *this_frame ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     const int *GetPerm( AstFrame *this )
+*     const int *GetPerm( AstFrame *this, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the astGetPerm protected
@@ -3839,6 +3921,8 @@ static const int *GetPerm( AstFrame *this_frame ) {
 *  Parameters:
 *     this
 *        Pointer to the Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the current Frame's axis permutation array (a
@@ -3884,7 +3968,7 @@ static const int *GetPerm( AstFrame *this_frame ) {
    return result;
 }
 
-static AstFrame *GetRegionFrame( AstRegion *this ) {
+static AstFrame *GetRegionFrame( AstRegion *this, int *status ) {
 /*
 *++
 *  Name:
@@ -3955,7 +4039,7 @@ f     function is invoked with STATUS set to an error value, or if it
    return result;
 }
 
-void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name ) {
+void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -3992,12 +4076,16 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstFrameVtab *frame;          /* Pointer to Frame component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -4006,8 +4094,8 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsARegion) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -4100,14 +4188,18 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name ) {
    functions implemented here. */
    object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
-   parent_getobjsize = object->GetObjSize;
-   object->GetObjSize = GetObjSize;
    frame = (AstFrameVtab *) vtab;
 
-   parent_getnaxes = frame->GetNaxes;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
 
    parent_getusedefs = object->GetUseDefs;
    object->GetUseDefs = GetUseDefs;
+
+#if defined(THREAD_SAFE)
+   parent_managelock = object->ManageLock;
+   object->ManageLock = ManageLock;
+#endif
 
    object->Equal = Equal;
    object->ClearAttrib = ClearAttrib;
@@ -4254,9 +4346,14 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name ) {
    astSetCopy( vtab, Copy );
    astSetDump( vtab, Dump, "Region",
                "An area within a coordinate system" );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
-static int IsUnitFrame( AstFrame *this ){
+static int IsUnitFrame( AstFrame *this, int *status ){
 /*
 *  Name:
 *     IsUnitFrame
@@ -4269,7 +4366,7 @@ static int IsUnitFrame( AstFrame *this ){
 
 *  Synopsis:
 *     #include "region.h"
-*     int IsUnitFrame( AstFrame *this )
+*     int IsUnitFrame( AstFrame *this, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected astIsUnitFrame
@@ -4283,6 +4380,8 @@ static int IsUnitFrame( AstFrame *this ){
 *  Parameters:
 *     this 
 *        Pointer to the Frame.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A non-zero value is returned if the supplied Frame is equivalent to
@@ -4298,7 +4397,7 @@ static int IsUnitFrame( AstFrame *this ){
    return 0;
 }
 
-static int LineContains( AstFrame *this_frame, AstLineDef *l, int def, double *point ) {
+static int LineContains( AstFrame *this_frame, AstLineDef *l, int def, double *point, int *status ) {
 /*
 *  Name:
 *     LineContains
@@ -4311,7 +4410,7 @@ static int LineContains( AstFrame *this_frame, AstLineDef *l, int def, double *p
 
 *  Synopsis:
 *     #include "region.h"
-*     int LineContains( AstFrame *this, AstLineDef *l, int def, double *point )
+*     int LineContains( AstFrame *this, AstLineDef *l, int def, double *point, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected astLineContains
@@ -4338,6 +4437,8 @@ static int LineContains( AstFrame *this_frame, AstLineDef *l, int def, double *p
 *     point
 *        Point to an array containing the axis values of the point to be 
 *        tested, possibly followed by extra cached information (see "def").
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A non-zero value is returned if the line contains the point. 
@@ -4370,7 +4471,7 @@ static int LineContains( AstFrame *this_frame, AstLineDef *l, int def, double *p
 }
 
 static int LineCrossing( AstFrame *this_frame, AstLineDef *l1, AstLineDef *l2, 
-                         double **cross ) {
+                         double **cross, int *status ) {
 /*
 *  Name:
 *     LineCrossing
@@ -4384,7 +4485,7 @@ static int LineCrossing( AstFrame *this_frame, AstLineDef *l1, AstLineDef *l2,
 *  Synopsis:
 *     #include "region.h"
 *     int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2, 
-*                       double **cross ) 
+*                       double **cross, int *status ) 
 
 *  Class Membership:
 *     Region member function (over-rides the protected astLineCrossing
@@ -4417,6 +4518,8 @@ static int LineCrossing( AstFrame *this_frame, AstLineDef *l1, AstLineDef *l2,
 *        sub-classes such as SkyFrame may append extra values to the end
 *        of the basic frame axis values. A NULL pointer is returned if an
 *        error occurs.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A non-zero value is returned if the lines cross at a point which is
@@ -4453,7 +4556,7 @@ static int LineCrossing( AstFrame *this_frame, AstLineDef *l1, AstLineDef *l2,
 }
 
 static AstLineDef *LineDef( AstFrame *this_frame, const double start[2], 
-                            const double end[2] ) {
+                            const double end[2], int *status ) {
 /*
 *  Name:
 *     LineDef
@@ -4467,7 +4570,7 @@ static AstLineDef *LineDef( AstFrame *this_frame, const double start[2],
 *  Synopsis:
 *     #include "region.h"
 *     AstLineDef *LineDef( AstFrame *this, const double start[2], 
-*                             const double end[2] ) 
+*                             const double end[2], int *status ) 
 
 *  Class Membership:
 *     Region member function (over-rides the protected astLineDef
@@ -4487,6 +4590,8 @@ static AstLineDef *LineDef( AstFrame *this_frame, const double start[2],
 *        An array of 2 doubles marking the start of the line segment.
 *     end
 *        An array of 2 doubles marking the end of the line segment.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the memory structure containing the description of the
@@ -4518,7 +4623,7 @@ static AstLineDef *LineDef( AstFrame *this_frame, const double start[2],
 }
 
 static void LineOffset( AstFrame *this_frame, AstLineDef *line, double par, 
-                        double prp, double point[2] ){
+                        double prp, double point[2], int *status ){
 /*
 *  Name:
 *     LineOffset
@@ -4532,7 +4637,7 @@ static void LineOffset( AstFrame *this_frame, AstLineDef *line, double par,
 *  Synopsis:
 *     #include "region.h"
 *     void LineOffset( AstFrame *this, AstLineDef *line, double par, 
-*                      double prp, double point[2] )
+*                      double prp, double point[2], int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected astLineOffset
@@ -4553,6 +4658,8 @@ static void LineOffset( AstFrame *this_frame, AstLineDef *line, double par,
 *        The distance to move at right angles to the line. Positive
 *        values result in movement to the left of the line, as seen from
 *        the outside when moving from start towards the end.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - The pointer supplied for "line" should have been created using the 
@@ -4573,8 +4680,97 @@ static void LineOffset( AstFrame *this_frame, AstLineDef *line, double par,
    fr = astAnnul( fr );
 }
 
+
+#if defined(THREAD_SAFE)
+static int ManageLock( AstObject *this_object, int mode, int extra, int *status ) {
+/*
+*  Name:
+*     ManageLock
+
+*  Purpose:
+*     Manage the thread lock on an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "object.h"
+*     AstObject *ManageLock( AstObject *this, int mode, int extra, int *status ) 
+
+*  Class Membership:
+*     Region member function (over-rides the astManageLock protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function manages the thread lock on the supplied Object. The
+*     lock can be locked, unlocked or checked by this function as 
+*     deteremined by parameter "mode". See astLock for details of the way
+*     these locks are used.
+
+*  Parameters:
+*     this
+*        Pointer to the Object.
+*     mode
+*        An integer flag indicating what the function should do:
+*
+*        AST__LOCK: Lock the Object for exclusive use by the calling
+*        thread. The "extra" value indicates what should be done if the
+*        Object is already locked (wait or report an error - see astLock).
+*
+*        AST__UNLOCK: Unlock the Object for use by other threads.
+*
+*        AST__CHECKLOCK: Check that the object is locked for use by the
+*        calling thread (report an error if not).
+*     extra
+*        Extra mode-specific information. 
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*    A local status value: 
+*        0 - Success
+*        1 - Could not lock or unlock the object because it was already 
+*            locked by another thread.
+*        2 - Failed to lock a POSIX mutex
+*        3 - Failed to unlock a POSIX mutex
+*        4 - Bad "mode" value supplied.
+
+*  Notes:
+*     - This function attempts to execute even if an error has already
+*     occurred.
+*/
+
+/* Local Variables: */
+   AstRegion *this;       /* Pointer to Region structure */
+   int result;            /* Returned status value */
+
+/* Initialise */
+   result = 0;
+
+/* Check the supplied pointer is not NULL. */
+   if( !this_object ) return result;
+
+/* Obtain a pointers to the Region structure. */
+   this = (AstRegion *) this_object;
+
+/* Invoke the astManageLock method on any Objects contained within
+   the supplied Object. */
+   if( !result ) result = astManageLock( this->frameset, mode, extra );
+   if( !result ) result = astManageLock( this->points, mode, extra );
+   if( !result ) result = astManageLock( this->unc, mode, extra );
+   if( !result ) result = astManageLock( this->basemesh, mode, extra );
+   if( !result ) result = astManageLock( this->basegrid, mode, extra );
+
+/* Invoke the ManageLock method inherited from the parent class, and
+   return the resulting status value. */
+   if( !result ) result = (*parent_managelock)( this_object, mode, extra, status );
+   return result;
+
+}
+#endif
+
 static AstRegion *MapRegion( AstRegion *this, AstMapping *map,
-                             AstFrame *frame ) {
+                             AstFrame *frame, int *status ) {
 /*
 *+
 *  Name:
@@ -4660,11 +4856,11 @@ static AstRegion *MapRegion( AstRegion *this, AstMapping *map,
    and an inverse Mapping. */
    if( !astGetTranInverse( map ) ) {
       astError( AST__NODEF, "astMapRegion(%s): The supplied %s does not "
-                "define an inverse transformation.", astGetClass( this ),
+                "define an inverse transformation.", status, astGetClass( this ),
                 astGetClass( map ) );
    } else if( !astGetTranForward( map ) ) {
       astError( AST__NODEF, "astMapRegion(%s): The supplied %s does not "
-                "define a forward transformation.", astGetClass( this ),
+                "define a forward transformation.", status, astGetClass( this ),
                 astGetClass( map ) );
    }
 
@@ -4702,7 +4898,7 @@ static AstRegion *MapRegion( AstRegion *this, AstMapping *map,
                if( !ok ) {
                   astError( AST__NODEF, "astMapRegion(%s): The region which "
                             "results from using the supplied %s to transform "
-                            "the supplied %s is undefined.", astGetClass( this ),
+                            "the supplied %s is undefined.", status, astGetClass( this ),
                             astGetClass( map ), astGetClass( this ) );
                }
             }
@@ -4948,7 +5144,7 @@ f     only in the Fortran interface to AST).
 #define MAKE_MASK(X,Xtype) \
 static int Mask##X( AstRegion *this, AstMapping *map, int inside, int ndim, \
                     const int lbnd[], const int ubnd[], \
-                    Xtype in[], Xtype val ) { \
+                    Xtype in[], Xtype val, int *status ) { \
 \
 /* Local Variables: */ \
    AstFrame *grid_frame;         /* Pointer to Frame describing grid coords */ \
@@ -4988,9 +5184,9 @@ static int Mask##X( AstRegion *this, AstMapping *map, int inside, int ndim, \
    number of axes in the Region. Report an error if necessary. */ \
       if ( astOK && ( nax != nin ) ) { \
          astError( AST__NGDIN, "astMask"#X"(%s): Bad number of mapping " \
-                   "inputs (%d).", astGetClass( this ), nin ); \
+                   "inputs (%d).", status, astGetClass( this ), nin ); \
          astError( AST__NGDIN, "The %s given requires %d coordinate value%s " \
-                   "to specify a position.", \
+                   "to specify a position.", status, \
                    astGetClass( this ), nax, ( nax == 1 ) ? "" : "s" ); \
       } \
 \
@@ -4998,15 +5194,15 @@ static int Mask##X( AstRegion *this, AstMapping *map, int inside, int ndim, \
    number of grid dimensions. Report an error if necessary. */ \
       if ( astOK && ( ndim != nout ) ) { \
          astError( AST__NGDIN, "astMask"#X"(%s): Bad number of mapping " \
-                   "outputs (%d).", astGetClass( this ), nout ); \
+                   "outputs (%d).", status, astGetClass( this ), nout ); \
          astError( AST__NGDIN, "The pixel grid requires %d coordinate value%s " \
-                   "to specify a position.", \
+                   "to specify a position.", status, \
                    ndim, ( ndim == 1 ) ? "" : "s" ); \
       } \
 \
 /* Create a new Region by mapping the supplied Region with the supplied \
    Mapping. The resulting Region represents a region in grid coordinates. */ \
-      grid_frame = astFrame( ndim, "Domain=grid" ); \
+      grid_frame = astFrame( ndim, "Domain=grid", status ); \
       used_region = astMapRegion( this, map, grid_frame ); \
       grid_frame = astAnnul( grid_frame ); \
 \
@@ -5015,10 +5211,10 @@ static int Mask##X( AstRegion *this, AstMapping *map, int inside, int ndim, \
    } else if ( astOK && ( ( ndim != nax ) || ( ndim < 1 ) ) ) { \
       used_region = NULL; \
       astError( AST__NGDIN, "astMask"#X"(%s): Bad number of input grid " \
-                "dimensions (%d).", astGetClass( this ), ndim ); \
+                "dimensions (%d).", status, astGetClass( this ), ndim ); \
       if ( ndim != nax ) { \
          astError( AST__NGDIN, "The %s given requires %d coordinate value%s " \
-                   "to specify an input position.", \
+                   "to specify an input position.", status, \
                    astGetClass( this ), nax, ( nax == 1 ) ? "" : "s" ); \
       } \
 \
@@ -5035,9 +5231,9 @@ static int Mask##X( AstRegion *this, AstMapping *map, int inside, int ndim, \
          if ( lbnd[ idim ] > ubnd[ idim ] ) { \
             astError( AST__GBDIN, "astMask"#X"(%s): Lower bound of " \
                       "input grid (%d) exceeds corresponding upper bound " \
-                      "(%d).", astGetClass( this ), \
+                      "(%d).", status, astGetClass( this ), \
                       lbnd[ idim ], ubnd[ idim ] ); \
-            astError( AST__GBDIN, "Error in input dimension %d.", \
+            astError( AST__GBDIN, "Error in input dimension %d.", status, \
                       idim + 1 ); \
             break; \
          } \
@@ -5163,7 +5359,7 @@ MAKE_MASK(F,float)
 
 static int Match( AstFrame *this_frame, AstFrame *target,
                   int **template_axes, int **target_axes,
-                  AstMapping **map, AstFrame **result ) {
+                  AstMapping **map, AstFrame **result, int *status ) {
 /*
 *  Name:
 *     Match
@@ -5178,7 +5374,7 @@ static int Match( AstFrame *this_frame, AstFrame *target,
 *     #include "region.h"
 *     int Match( AstFrame *template, AstFrame *target,
 *                int **template_axes, int **target_axes,
-*                AstMapping **map, AstFrame **result )
+*                AstMapping **map, AstFrame **result, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected astMatch
@@ -5249,6 +5445,8 @@ static int Match( AstFrame *this_frame, AstFrame *target,
 *        template allows the possibility of transformaing to any one
 *        of a set of alternative coordinate systems, the "result"
 *        Frame will indicate which of the alternatives was used.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A non-zero value is returned if the requested coordinate
@@ -5278,14 +5476,14 @@ static int Match( AstFrame *this_frame, AstFrame *target,
 /* Invoke the parent astMatch method on the current Frame within the
    encapsulated FrameSet within the Region. */
    fr = astGetFrame( ((AstRegion *) this_frame)->frameset, AST__CURRENT );
-   match = Match( fr, target, template_axes, target_axes, map, result );
+   match = Match( fr, target, template_axes, target_axes, map, result, status );
    fr = astAnnul( fr );
 
 /* Return the result. */
    return match;
 }
 
-static void Negate( AstRegion *this ) {
+static void Negate( AstRegion *this, int *status ) {
 /*
 *++
 *  Name:
@@ -5331,7 +5529,7 @@ f        The global status.
 
 }
 
-static void Norm( AstFrame *this_frame, double value[] ) {
+static void Norm( AstFrame *this_frame, double value[], int *status ) {
 /*
 *  Name:
 *     Norm
@@ -5344,7 +5542,7 @@ static void Norm( AstFrame *this_frame, double value[] ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     void Norm( AstAxis *this, double value[] )
+*     void Norm( AstAxis *this, double value[], int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the astNorm method
@@ -5371,6 +5569,8 @@ static void Norm( AstFrame *this_frame, double value[] ) {
 *        An array of double, with one element for each Region axis.
 *        This should contain the initial set of coordinate values,
 *        which will be modified in place.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -5392,7 +5592,7 @@ static void Norm( AstFrame *this_frame, double value[] ) {
 }
 
 static void NormBox( AstFrame *this_frame, double lbnd[], double ubnd[],
-                     AstMapping *reg ) {
+                     AstMapping *reg, int *status ) {
 /*
 *  Name:
 *     NormBox
@@ -5406,7 +5606,7 @@ static void NormBox( AstFrame *this_frame, double lbnd[], double ubnd[],
 *  Synopsis:
 *     #include "region.h"
 *     void astNormBox( AstFrame *this, double lbnd[], double ubnd[],
-*                      AstMapping *reg )
+*                      AstMapping *reg, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the astNormBox method inherited
@@ -5438,6 +5638,8 @@ static void NormBox( AstFrame *this_frame, double lbnd[], double ubnd[],
 *        inside or outside the box. The Mapping should leave an input
 *        position unchanged if the point is inside the box, and should
 *        set all bad if the point is outside the box.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -5459,7 +5661,7 @@ static void NormBox( AstFrame *this_frame, double lbnd[], double ubnd[],
 }
 
 static void Offset( AstFrame *this_frame, const double point1[],
-                    const double point2[], double offset, double point3[] ) {
+                    const double point2[], double offset, double point3[], int *status ) {
 /*
 *  Name:
 *     Offset
@@ -5474,7 +5676,7 @@ static void Offset( AstFrame *this_frame, const double point1[],
 *     #include "region.h"
 *     void Offset( AstFrame *this,
 *                  const double point1[], const double point2[],
-*                  double offset, double point3[] )
+*                  double offset, double point3[], int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected astOffset
@@ -5507,6 +5709,8 @@ static void Offset( AstFrame *this_frame, const double point1[],
 *        An array of double, with one element for each Region axis
 *        in which the coordinates of the required point will be
 *        returned.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - The geodesic curve used by this function is the path of
@@ -5537,7 +5741,7 @@ static void Offset( AstFrame *this_frame, const double point1[],
 }
 
 static double Offset2( AstFrame *this_frame, const double point1[2], 
-                       double angle, double offset, double point2[2] ){
+                       double angle, double offset, double point2[2], int *status ){
 /*
 *  Name:
 *     Offset2
@@ -5551,7 +5755,7 @@ static double Offset2( AstFrame *this_frame, const double point1[2],
 *  Synopsis:
 *     #include "region.h"
 *     double Offset2( AstFrame *this, const double point1[2], double angle,
-*                     double offset, double point2[2] );
+*                     double offset, double point2[2], int *status );
 
 *  Class Membership:
 *     Region member function (over-rides the protected astOffset2
@@ -5589,6 +5793,8 @@ static double Offset2( AstFrame *this_frame, const double point1[2],
 *     point2
 *        An array of double, with one element for each Frame axis
 *        in which the coordinates of the required point will be returned.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The direction of the geodesic curve at the end point. That is, the
@@ -5630,7 +5836,7 @@ static double Offset2( AstFrame *this_frame, const double point1[2],
    return result;
 }
 
-static int Overlap( AstRegion *this, AstRegion *that ){
+static int Overlap( AstRegion *this, AstRegion *that, int *status ){
 /*
 *++
 *  Name:
@@ -5714,7 +5920,7 @@ f     AST_OVERLAP = INTEGER
    return astOverlapX( that, this );
 }
 
-static int OverlapX( AstRegion *that, AstRegion *this ){
+static int OverlapX( AstRegion *that, AstRegion *this, int *status ){
 /*
 *+
 *  Name:
@@ -5843,10 +6049,10 @@ static int OverlapX( AstRegion *that, AstRegion *this ){
    if( !bnd_this && !bnd_that && astOK ) {
       astError( AST__INTER, "astOverlap(Region): Neither of the two "
                 "supplied Regions (classes %s and %s) has a finite "
-                "boundary.", astGetClass(this), astGetClass(that) );
+                "boundary.", status, astGetClass(this), astGetClass(that) );
       astError( AST__INTER, "The current implementation of astOverlap "
                 "cannot determine the overlap between two Regions "
-                "unless at least one of them has a finite boundary." );
+                "unless at least one of them has a finite boundary." , status);
    }
 
 /* If only one of the two Regions has a finite boundary, we must use its
@@ -5887,7 +6093,7 @@ L1:
 
 /* Combine these Mappings to get the Mapping from current Frame of the
    second region to the base Frame of the first Region. */
-      map = (AstMapping *) astCmpMap( cmap, map_reg1, 1, "" );
+      map = (AstMapping *) astCmpMap( cmap, map_reg1, 1, "", status );
 
 /* Get a mesh of points covering the second Region. These points are
    within the current Frame of the second Region. */
@@ -5968,7 +6174,7 @@ L1:
 /* Create a new PointSet containing those points from the mesh which are
    not on the boundary of the first Region. These points are identified by 
    the mask array created by the astRegPins method above. */
-         reg2_submesh = GetSubMesh( mask, reg2_mesh );
+         reg2_submesh = GetSubMesh( mask, reg2_mesh, status );
 
 /* Transform the points in the submesh of the second Region into the
    current Frame of the first Region. */
@@ -6036,7 +6242,7 @@ L1:
                if( astOK ) {
                   astError( AST__INTER, "astOverlap(Region): The first "
                             "Region is bounded but has not got a finite "
-                            "boundary (AST programming error)." );
+                            "boundary (AST programming error)." , status);
                }
 
 /* Since the first Region is bounded, we have two possibilities - the 
@@ -6119,7 +6325,7 @@ L1:
 }
 
 static void Overlay( AstFrame *template_frame, const int *template_axes,
-                     AstFrame *result ) {
+                     AstFrame *result, int *status ) {
 /*
 *  Name:
 *     Overlay
@@ -6133,7 +6339,7 @@ static void Overlay( AstFrame *template_frame, const int *template_axes,
 *  Synopsis:
 *     #include "region.h"
 *     void Overlay( AstFrame *template, const int *template_axes,
-*                   AstFrame *result )
+*                   AstFrame *result, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected astOverlay
@@ -6168,6 +6374,8 @@ static void Overlay( AstFrame *template_frame, const int *template_axes,
 *        should be set to -1.
 *     result
 *        Pointer to the Frame which is to receive the new attribute values.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -6184,7 +6392,7 @@ static void Overlay( AstFrame *template_frame, const int *template_axes,
    fr = astAnnul( fr );
 }
 
-static void PermAxes( AstFrame *this_frame, const int perm[] ) {
+static void PermAxes( AstFrame *this_frame, const int perm[], int *status ) {
 /*
 *  Name:
 *     PermAxes
@@ -6197,7 +6405,7 @@ static void PermAxes( AstFrame *this_frame, const int perm[] ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     void PermAxes( AstFrame *this, const int perm[] )
+*     void PermAxes( AstFrame *this, const int perm[], int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the astPermAxes method
@@ -6216,6 +6424,8 @@ static void PermAxes( AstFrame *this_frame, const int perm[] ) {
 *        order. Each element of this array should be a (zero-based)
 *        axis index identifying the axes according to their old
 *        (un-permuted) order.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - Only genuine permutations of the axis order are permitted, so
@@ -6261,7 +6471,7 @@ static void PermAxes( AstFrame *this_frame, const int perm[] ) {
 
 /* Create a PermMap that will permute coordinate values in the same way as
    the current Frame's axes have been permuted. */
-      map = astPermMap( naxes, invperm, naxes, perm, NULL, "" );
+      map = astPermMap( naxes, invperm, naxes, perm, NULL, "", status );
 
 /* Modify the Frame's relationship to the base Frame in the Region so that 
    the correct coordinate values remain associated with the permuted axes. */
@@ -6274,7 +6484,7 @@ static void PermAxes( AstFrame *this_frame, const int perm[] ) {
 }
 
 static AstFrame *PickAxes( AstFrame *this_frame, int naxes, const int axes[],
-                           AstMapping **map ) {
+                           AstMapping **map, int *status ) {
 /*
 *  Name:
 *     PickAxes
@@ -6288,7 +6498,7 @@ static AstFrame *PickAxes( AstFrame *this_frame, int naxes, const int axes[],
 *  Synopsis:
 *     #include "region.h"
 *     AstFrame *PickAxes( AstFrame *this, int naxes, const int axes[],
-*                         AstMapping **map )
+*                         AstMapping **map, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the astPickAxes protected
@@ -6329,6 +6539,8 @@ static AstFrame *PickAxes( AstFrame *this_frame, int naxes, const int axes[],
 *
 *        If this Mapping is not required, a NULL value may be supplied
 *        for this parameter.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the new Frame.
@@ -6380,7 +6592,7 @@ static AstFrame *PickAxes( AstFrame *this_frame, int naxes, const int axes[],
    return frame;
 }
 
-static void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd ){
+static void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd, int *status ){
 /*
 *+
 *  Name:
@@ -6430,11 +6642,11 @@ static void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd ){
    Region should over-ride this to return appropriate values. */
    astError( AST__INTER, "astRegBaseBox(%s): The %s class does not implement "
              "the astRegBaseBox method inherited from the Region class "
-             "(internal AST programming error).", astGetClass( this ), 
+             "(internal AST programming error).", status, astGetClass( this ), 
              astGetClass( this ) );
 }
 
-static void RegBaseBox2( AstRegion *this, double *lbnd, double *ubnd ){
+static void RegBaseBox2( AstRegion *this, double *lbnd, double *ubnd, int *status ){
 /*
 *+
 *  Name:
@@ -6485,7 +6697,7 @@ static void RegBaseBox2( AstRegion *this, double *lbnd, double *ubnd ){
 
 }
 
-static AstPointSet *RegBaseGrid( AstRegion *this ){
+static AstPointSet *RegBaseGrid( AstRegion *this, int *status ){
 /*
 *+
 *  Name:
@@ -6564,7 +6776,7 @@ static AstPointSet *RegBaseGrid( AstRegion *this ){
 
 /* Create a Box covering this bounding box. */
       frmb = astGetFrame( this->frameset, AST__BASE );
-      box = astBox( frmb, 1, lbnd, ubnd, NULL, "" );
+      box = astBox( frmb, 1, lbnd, ubnd, NULL, "", status );
 
 /* Copy the MeshSize attribute to the new Box since this will be used by
    the invocation of astRegBaseGrid below. */
@@ -6588,7 +6800,7 @@ static AstPointSet *RegBaseGrid( AstRegion *this ){
    PointSet, keeping a record of the number of points copied. */
       ptr2 = astGetPoints( ps2 );
       npnt2 = astGetNpoint( ps2 );
-      result = astPointSet( npnt2, naxb, "" );
+      result = astPointSet( npnt2, naxb, "", status );
       ptr = astGetPoints( result );
       if( astOK ) {
 
@@ -6641,7 +6853,7 @@ static AstPointSet *RegBaseGrid( AstRegion *this ){
    return result;
 }
 
-static AstPointSet *RegBaseMesh( AstRegion *this ){
+static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
 /*
 *+
 *  Name:
@@ -6692,13 +6904,13 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
    Report an error if this null imlementation is called.*/
    astError( AST__INTER, "astRegBaseMesh(%s): The %s class does not implement "
              "the astRegBaseMesh method inherited from the Region class "
-             "(internal AST programming error).", astGetClass( this ), 
+             "(internal AST programming error).", status, astGetClass( this ), 
              astGetClass( this ) );
    return NULL;
 }
 
 static double *RegCentre( AstRegion *this, double *cen, double **ptr, 
-                          int index, int ifrm ){
+                          int index, int ifrm, int *status ){
 /*
 *+
 *  Name:
@@ -6776,14 +6988,14 @@ static double *RegCentre( AstRegion *this, double *cen, double **ptr,
    if( ptr || cen ) astError( AST__INTER, "astRegCentre(%s): The %s "
                        "class does not implement the astRegCentre method "
                        "inherited from the Region class (internal AST "
-                       "programming error).", astGetClass( this ), 
+                       "programming error).", status, astGetClass( this ), 
                        astGetClass( this ) );
 
    return NULL;
 }
 
 static void RegClearAttrib( AstRegion *this, const char *aattrib, 
-                            char **base_attrib ) {
+                            char **base_attrib, int *status ) {
 /*
 *  Name:
 *     astRegClearAttrib
@@ -6891,10 +7103,10 @@ static void RegClearAttrib( AstRegion *this, const char *aattrib,
    current Frame axis, report an error. */
       } else if( astOK ) {
          astError( AST__INTER, "astRegClearAttrib(%s): Unable to clear "
-                   "attribute \"%s\" in the base Frame of the %s",
+                   "attribute \"%s\" in the base Frame of the %s", status,
                    astGetClass( this ), attrib, astGetClass( this ) );
          astError( AST__INTER, "There is no base Frame axis corresponding "
-                   "to current Frame axis %d\n", axis + 1 );
+                   "to current Frame axis %d\n", status, axis + 1 );
       }
 
 /* Free resources */
@@ -6942,7 +7154,7 @@ static void RegClearAttrib( AstRegion *this, const char *aattrib,
 
 }
 
-static AstPointSet *RegGrid( AstRegion *this ){
+static AstPointSet *RegGrid( AstRegion *this, int *status ){
 /*
 *+
 *  Name:
@@ -7003,7 +7215,7 @@ static AstPointSet *RegGrid( AstRegion *this ){
    if( !this->basegrid ) this->basegrid = astRegBaseGrid( this );
 
 /* Get the simplified base->current Mapping */
-   map = RegMapping( this );
+   map = RegMapping( this, status );
 
 /* If the Mapping is a UnitMap, just return a clone of the PointSet
    pointer stored in the Region structure. */
@@ -7026,7 +7238,7 @@ static AstPointSet *RegGrid( AstRegion *this ){
    return result;
 }
 
-static AstPointSet *RegMesh( AstRegion *this ){
+static AstPointSet *RegMesh( AstRegion *this, int *status ){
 /*
 *+
 *  Name:
@@ -7085,7 +7297,7 @@ static AstPointSet *RegMesh( AstRegion *this ){
    bmesh = astRegBaseMesh( this );
 
 /* Get the simplified base->current Mapping */
-   map = RegMapping( this );
+   map = RegMapping( this, status );
 
 /* If the Mapping is a UnitMap, just return a clone of the mesh PointSet
    pointer. */
@@ -7109,7 +7321,7 @@ static AstPointSet *RegMesh( AstRegion *this ){
    return result;
 }
 
-static int RegDummyFS( AstRegion *this ){
+static int RegDummyFS( AstRegion *this, int *status ){
 /*
 *+
 *  Name:
@@ -7175,7 +7387,7 @@ static int RegDummyFS( AstRegion *this ){
 }
 
 static int RegPins( AstRegion *this, AstPointSet *pset, AstRegion *unc, 
-                    int **mask ){
+                    int **mask, int *status ){
 /*
 *+
 *  Name:
@@ -7238,12 +7450,12 @@ static int RegPins( AstRegion *this, AstPointSet *pset, AstRegion *unc,
    Region should over-ride this to return appropriate values. */
    astError( AST__INTER, "astRegPins(%s): The %s class does not implement "
              "the astRegPins method inherited from the Region class "
-             "(internal AST programming error).", astGetClass( this ), 
+             "(internal AST programming error).", status, astGetClass( this ), 
              astGetClass( this ) );
    return 0;
 }
 
-static void GetRegionBounds( AstRegion *this, double *lbnd, double *ubnd ){
+static void GetRegionBounds( AstRegion *this, double *lbnd, double *ubnd, int *status ){
 /*
 *++
 *  Name:
@@ -7329,7 +7541,7 @@ f        The global status.
    astRegBaseBox( this, lbndb, ubndb );      
 
 /* Get the simplified base to current Mapping. */
-   smap = RegMapping( this );
+   smap = RegMapping( this, status );
 
 /* Check pointers can be used safely. */
    if( smap ) {
@@ -7358,7 +7570,7 @@ f        The global status.
    ubndb = astFree( ubndb );
 }
 
-static void GetRegionBounds2( AstRegion *this, double *lbnd, double *ubnd ){
+static void GetRegionBounds2( AstRegion *this, double *lbnd, double *ubnd, int *status ){
 /*
 *+
 *  Name:
@@ -7427,7 +7639,7 @@ static void GetRegionBounds2( AstRegion *this, double *lbnd, double *ubnd ){
    astRegBaseBox2( this, lbndb, ubndb );      
 
 /* Get the simplified base to current Mapping. */
-   smap = RegMapping( this );
+   smap = RegMapping( this, status );
 
 /* Check pointers can be used safely. */
    if( smap ) {
@@ -7456,7 +7668,7 @@ static void GetRegionBounds2( AstRegion *this, double *lbnd, double *ubnd ){
    ubndb = astFree( ubndb );
 }
 
-static void GetUncBounds( AstRegion *this, double *lbnd, double *ubnd ){
+static void GetUncBounds( AstRegion *this, double *lbnd, double *ubnd, int *status ){
 /*
 *+
 *  Name:
@@ -7546,7 +7758,7 @@ static void GetUncBounds( AstRegion *this, double *lbnd, double *ubnd ){
    astRegBaseBox( this, lbndb, ubndb );      
 
 /* Get the simplified base to current Mapping. */
-   smap = RegMapping( this );
+   smap = RegMapping( this, status );
 
 /* Check pointers can be used safely. */
    if( smap ) {
@@ -7599,7 +7811,7 @@ static void GetUncBounds( AstRegion *this, double *lbnd, double *ubnd ){
    ubndb = astFree( ubndb );
 }
 
-static void RegOverlay( AstRegion *this, AstRegion *that ){
+static void RegOverlay( AstRegion *this, AstRegion *that, int *status ){
 /*
 *+
 *  Name:
@@ -7653,7 +7865,7 @@ static void RegOverlay( AstRegion *this, AstRegion *that ){
 }
 
 static void RegSetAttrib( AstRegion *this, const char *asetting, 
-                          char **base_setting ) {
+                          char **base_setting, int *status ) {
 /*
 *  Name:
 *     astRegSetAttrib
@@ -7771,10 +7983,10 @@ static void RegSetAttrib( AstRegion *this, const char *asetting,
    current Frame axis, report an error. */
       } else if( astOK ) {
          astError( AST__INTER, "astRegSetAttrib(%s): Unable to apply "
-                   "attribute setting \"%s\" to the base Frame in the %s",
+                   "attribute setting \"%s\" to the base Frame in the %s", status,
                    astGetClass( this ), setting, astGetClass( this ) );
          astError( AST__INTER, "There is no base Frame axis corresponding "
-                   "to current Frame axis %d\n", axis + 1 );
+                   "to current Frame axis %d\n", status, axis + 1 );
       }
 
 /* Free resources */
@@ -7823,7 +8035,7 @@ static void RegSetAttrib( AstRegion *this, const char *asetting,
 }
 
 static void ReportPoints( AstMapping *this_mapping, int forward,
-                          AstPointSet *in_points, AstPointSet *out_points ) {
+                          AstPointSet *in_points, AstPointSet *out_points, int *status ) {
 /*
 *  Name:
 *     ReportPoints
@@ -7837,7 +8049,7 @@ static void ReportPoints( AstMapping *this_mapping, int forward,
 *  Synopsis:
 *     #include "region.h"
 *     void ReportPoints( AstMapping *this, int forward,
-*                        AstPointSet *in_points, AstPointSet *out_points )
+*                        AstPointSet *in_points, AstPointSet *out_points, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected astReportPoints
@@ -7863,6 +8075,8 @@ static void ReportPoints( AstMapping *this_mapping, int forward,
 *        Pointer to a PointSet which is associated with the
 *        coordinates of the same set of points after the Region has
 *        been applied.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -7883,7 +8097,7 @@ static void ReportPoints( AstMapping *this_mapping, int forward,
 
 }
 
-static void ResetCache( AstRegion *this ){
+static void ResetCache( AstRegion *this, int *status ){
 /*
 *+
 *  Name:
@@ -7920,7 +8134,7 @@ static void ResetCache( AstRegion *this ){
 
 static void Resolve( AstFrame *this_frame, const double point1[],
                      const double point2[], const double point3[],
-                     double point4[], double *d1, double *d2 ){
+                     double point4[], double *d1, double *d2, int *status ){
 /*
 *  Name:
 *     Resolve
@@ -7935,7 +8149,7 @@ static void Resolve( AstFrame *this_frame, const double point1[],
 *     #include "region.h"
 *     void Resolve( AstFrame *this, const double point1[],
 *                   const double point2[], const double point3[],
-*                   double point4[], double *d1, double *d2 );
+*                   double point4[], double *d1, double *d2, int *status );
 
 *  Class Membership:
 *     Region member function (over-rides the protected astResolve
@@ -7976,6 +8190,8 @@ static void Resolve( AstFrame *this_frame, const double point1[],
 *        The address of a location at which to return the distance from
 *        point 4 to point 3 (that is, the length of the component
 *        perpendicular to the basis vector). The value is always positive.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - Each vector used in this function is the path of
@@ -8006,7 +8222,7 @@ static void Resolve( AstFrame *this_frame, const double point1[],
 
 static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[],
                                    const double point2[], AstPointSet *in,
-                                   AstPointSet *out ) {
+                                   AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     astResolvePoints
@@ -8098,7 +8314,7 @@ static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[],
 
 }
 
-static void SetAttrib( AstObject *this_object, const char *setting ) {
+static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
 *     SetAttrib
@@ -8111,7 +8327,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     void SetAttrib( AstObject *this, const char *setting )
+*     void SetAttrib( AstObject *this, const char *setting, int *status )
 
 *  Class Membership:
 *     Region member function (extends the astSetAttrib method
@@ -8137,6 +8353,8 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 *     setting
 *        Pointer to a null terminated string specifying the new
 *        attribute value.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - This protected method is intended to be invoked by the Object
@@ -8253,9 +8471,9 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                MATCH( "refcount" ) ||
                MATCH( "tranforward" ) ||
                MATCH( "traninverse" ) ) {
-      astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.",
+      astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.", status,
                 setting, astGetClass( this ) );
-      astError( AST__NOWRT, "This is a read-only attribute." );
+      astError( AST__NOWRT, "This is a read-only attribute." , status);
 
 /* Pass unrecognised attributes on to the Region's encapsulated FrameSet for
    further interpretation. Do not pass on FrameSet attributes since we
@@ -8269,7 +8487,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    astSet method so that the current Frame in the encapsulated FrameSet will 
    be re-mapped if the attribute changes require it. */
       if( astGetAdaptive( this ) ) {
-         astSet( this->frameset, setting );
+         astSet( this->frameset, setting, status );
 
 /* If the Region is not to adapt to coordinate system chanmges, use the 
    astRegSetAttrib method which assigns the attribute setting to both
@@ -8284,7 +8502,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 #undef MATCH
 }
 
-static void SetAxis( AstFrame *this_frame, int axis, AstAxis *newaxis ) {
+static void SetAxis( AstFrame *this_frame, int axis, AstAxis *newaxis, int *status ) {
 /*
 *  Name:
 *     SetAxis
@@ -8297,7 +8515,7 @@ static void SetAxis( AstFrame *this_frame, int axis, AstAxis *newaxis ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     void SetAxis( AstFrame *this, int axis, AstAxis *newaxis )
+*     void SetAxis( AstFrame *this, int axis, AstAxis *newaxis, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the astSetAxis method
@@ -8319,6 +8537,8 @@ static void SetAxis( AstFrame *this_frame, int axis, AstAxis *newaxis ) {
 *        object is to be replaced.
 *     newaxis
 *        Pointer to the new Axis object.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -8342,7 +8562,7 @@ static void SetAxis( AstFrame *this_frame, int axis, AstAxis *newaxis ) {
    fr = astAnnul( fr );
 }
 
-static void SetRegFS( AstRegion *this, AstFrame *frm ) {
+static void SetRegFS( AstRegion *this, AstFrame *frm, int *status ) {
 /*
 *+
 *  Name:
@@ -8393,8 +8613,8 @@ static void SetRegFS( AstRegion *this, AstFrame *frm ) {
    done to one will also appear in the other. Then construct the FrameSet 
    containing the two Frame copies connected by a UnitMap. */
    f2 = astCopy( f1 );
-   fs = astFrameSet( f1, "" );
-   um = astUnitMap( astGetNaxes( f1 ), "" );
+   fs = astFrameSet( f1, "", status );
+   um = astUnitMap( astGetNaxes( f1 ), "", status );
    astAddFrame( fs, AST__BASE, um, f2 );
    um = astAnnul( um );
    f2 = astAnnul( f2 );
@@ -8417,7 +8637,7 @@ static void SetRegFS( AstRegion *this, AstFrame *frm ) {
 
 }
 
-static void SetUnc( AstRegion *this, AstRegion *unc ){
+static void SetUnc( AstRegion *this, AstRegion *unc, int *status ){
 /*
 *++
 *  Name:
@@ -8503,7 +8723,7 @@ f        The global status.
    the supplied Region. */
       fs = this->frameset;
       astInvert( fs );
-      fs2 = Conv( unc->frameset, fs );
+      fs2 = Conv( unc->frameset, fs, status );
       astInvert( fs );
 
       if( fs2 ) {
@@ -8551,23 +8771,23 @@ f        The global status.
 /* Report error if conversion between Frames is not possible. */
       } else if( astOK ) {
          astError( AST__BADIN, "astSetUnc(%s): Bad %d dimensional "
-                   "uncertainty Frame (%s %s) supplied.", astGetClass(this), 
+                   "uncertainty Frame (%s %s) supplied.", status, astGetClass(this), 
                    astGetNaxes(unc), astGetDomain(unc), astGetTitle(unc) );
          astError( AST__NCPIN, "Cannot convert it to the Frame of the "
-                   "new %s.", astGetClass( this ) );
+                   "new %s.", status, astGetClass( this ) );
       }      
 
 /* Report an error if it is not of a usable class. */
    } else if( unc && astOK ){
       astError( AST__BADIN, "astSetUnc(%s): Bad uncertainty shape "
-                "(%s) supplied.", astGetClass( this ), astGetClass(unc) );
+                "(%s) supplied.", status, astGetClass( this ), astGetClass(unc) );
       astError( AST__NCPIN, "The uncertainty Region must be an instance of "
                 "a centro-symetric subclass of Region (e.g. Box, Circle, "
-                "Ellipse, etc)." );
+                "Ellipse, etc)." , status);
    }
 }
 
-static void ShowMesh( AstRegion *this, int format, const char *ttl ){
+static void ShowMesh( AstRegion *this, int format, const char *ttl, int *status ){
 /*
 *++
 *  Name:
@@ -8690,7 +8910,7 @@ f        The global status.
    }
 }
 
-static AstMapping *Simplify( AstMapping *this_mapping ) {
+static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /*
 *  Name:
 *     Simplify
@@ -8703,7 +8923,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     AstMapping *Simplify( AstMapping *this )
+*     AstMapping *Simplify( AstMapping *this, int *status )
 
 *  Class Membership:
 *     Region method (over-rides the astSimplify method inherited
@@ -8718,6 +8938,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 *  Parameters:
 *     this
 *        Pointer to the original Region.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to the simplified Region. A cloned pointer to the
@@ -8819,7 +9041,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
          cen = astRegCentre( unc, NULL, NULL, 0, AST__CURRENT );
 
 /* Store it in a PointSet so it can be transformed. */
-         pset1 = astPointSet( 1, nin, "" );
+         pset1 = astPointSet( 1, nin, "", status );
          ptr1 = astGetPoints( pset1 );
          if( astOK ) for( ic = 0; ic < nin; ic++ ) ptr1[ ic ][ 0 ] = cen[ ic ];
     
@@ -8980,7 +9202,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 static int SubFrame( AstFrame *this_frame, AstFrame *template,
                      int result_naxes,
                      const int *target_axes, const int *template_axes,
-                     AstMapping **map, AstFrame **result ) {
+                     AstMapping **map, AstFrame **result, int *status ) {
 /*
 *  Name:
 *     SubFrame
@@ -8995,7 +9217,7 @@ static int SubFrame( AstFrame *this_frame, AstFrame *template,
 *     #include "region.h"
 *     int SubFrame( AstFrame *target, AstFrame *template, int result_naxes,
 *                   const int *target_axes, const int *template_axes,
-*                   AstMapping **map, AstFrame **result )
+*                   AstMapping **map, AstFrame **result, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected astSubFrame
@@ -9056,6 +9278,8 @@ static int SubFrame( AstFrame *this_frame, AstFrame *template,
 *        transformation will convert in the opposite direction.
 *     result
 *        Address of a location to receive a pointer to the result Frame.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A non-zero value is returned if coordinate conversion is
@@ -9095,7 +9319,7 @@ static int SubFrame( AstFrame *this_frame, AstFrame *template,
    return match;
 }
 
-static AstSystemType SystemCode( AstFrame *this_frame, const char *system ) {
+static AstSystemType SystemCode( AstFrame *this_frame, const char *system, int *status ) {
 /*
 *  Name:
 *     SystemCode
@@ -9108,7 +9332,7 @@ static AstSystemType SystemCode( AstFrame *this_frame, const char *system ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     AstSystemType SystemCode( AstFrame *this, const char *system )
+*     AstSystemType SystemCode( AstFrame *this, const char *system, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected astSystemCode
@@ -9125,6 +9349,8 @@ static AstSystemType SystemCode( AstFrame *this_frame, const char *system ) {
 *     system
 *        Pointer to a constant null-terminated string containing the
 *        external description of the coordinate system.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The System type code.
@@ -9164,7 +9390,7 @@ static AstSystemType SystemCode( AstFrame *this_frame, const char *system ) {
    return result;
 }
 
-static const char *SystemString( AstFrame *this_frame, AstSystemType system ) {
+static const char *SystemString( AstFrame *this_frame, AstSystemType system, int *status ) {
 /*
 *  Name:
 *     SystemString
@@ -9177,7 +9403,7 @@ static const char *SystemString( AstFrame *this_frame, AstSystemType system ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     const char *SystemString( AstFrame *this, AstSystemType system )
+*     const char *SystemString( AstFrame *this, AstSystemType system, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected astSystemString
@@ -9193,6 +9419,8 @@ static const char *SystemString( AstFrame *this_frame, AstSystemType system ) {
 *        Pointer to the Frame.
 *     system
 *        The coordinate system type code.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to a constant null-terminated string containing the
@@ -9235,7 +9463,7 @@ static const char *SystemString( AstFrame *this_frame, AstSystemType system ) {
 
 }
 
-static int TestAttrib( AstObject *this_object, const char *attrib ) {
+static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     TestAttrib
@@ -9248,7 +9476,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     int TestAttrib( AstObject *this, const char *attrib )
+*     int TestAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the astTestAttrib protected
@@ -9265,6 +9493,8 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if a value has been set, otherwise zero.
@@ -9370,7 +9600,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    return result;
 }
 
-double *astRegTranPoint_( AstRegion *this, double *in, int np, int forward ){
+double *astRegTranPoint_( AstRegion *this, double *in, int np, int forward, int *status ){
 /*
 *+
 *  Name:
@@ -9462,7 +9692,7 @@ double *astRegTranPoint_( AstRegion *this, double *in, int np, int forward ){
    naxout = astGetNout( map );
 
 /* Create a pointSet holding the supplied axis values. */
-   pset_in = astPointSet( np, naxin, "" );
+   pset_in = astPointSet( np, naxin, "", status );
 
 /* Get pointers to the memory used to store axis values within this
    PointSet. */
@@ -9516,7 +9746,7 @@ double *astRegTranPoint_( AstRegion *this, double *in, int np, int forward ){
 }
 
 static AstPointSet *RegTransform( AstRegion *this, AstPointSet *in,
-                                  int forward, AstPointSet *out, AstFrame **frm ) {
+                                  int forward, AstPointSet *out, AstFrame **frm, int *status ) {
 /*
 *+
 *  Name:
@@ -9610,12 +9840,12 @@ static AstPointSet *RegTransform( AstRegion *this, AstPointSet *in,
       } else {
          astError( AST__INTER, "astRegTransform(%s): No PointSet supplied "
                    "and the supplied %s has no PointSet (internal AST "
-                   "programming error)", astGetClass( this ),astGetClass( this ) );
+                   "programming error)", status, astGetClass( this ),astGetClass( this ) );
       }
    }
 
 /* Get the simplified Mapping from base to current Frame. */
-   smap = RegMapping( this );
+   smap = RegMapping( this, status );
 
 /* If it is a UnitMap, return a clone of the input PointSet unless an
    explicit output PointSet has been supplied. */
@@ -9638,7 +9868,7 @@ static AstPointSet *RegTransform( AstRegion *this, AstPointSet *in,
 }
 
 static int Unformat( AstFrame *this_frame, int axis, const char *string,
-                     double *value ) {
+                     double *value, int *status ) {
 /*
 *  Name:
 *     Unformat
@@ -9652,7 +9882,7 @@ static int Unformat( AstFrame *this_frame, int axis, const char *string,
 *  Synopsis:
 *     #include "region.h"
 *     int Unformat( AstFrame *this, int axis, const char *string,
-*                   double *value )
+*                   double *value, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the public astUnformat
@@ -9677,6 +9907,8 @@ static int Unformat( AstFrame *this_frame, int axis, const char *string,
 *     value
 *        Pointer to a double in which the coordinate value read will be
 *        returned.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The number of characters read from the string to obtain the
@@ -9737,7 +9969,7 @@ static int Unformat( AstFrame *this_frame, int axis, const char *string,
    return nc;
 }
 
-static int ValidateAxis( AstFrame *this_frame, int axis, const char *method ) {
+static int ValidateAxis( AstFrame *this_frame, int axis, const char *method, int *status ) {
 /*
 *  Name:
 *     ValidateAxis
@@ -9750,7 +9982,7 @@ static int ValidateAxis( AstFrame *this_frame, int axis, const char *method ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     int ValidateAxis( AstFrame *this, int axis, const char *method )
+*     int ValidateAxis( AstFrame *this, int axis, const char *method, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected
@@ -9779,6 +10011,8 @@ static int ValidateAxis( AstFrame *this_frame, int axis, const char *method ) {
 *        containing the name of the method that invoked this function
 *        to validate an axis index. This method name is used solely
 *        for constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The permuted axis index.
@@ -9812,14 +10046,14 @@ static int ValidateAxis( AstFrame *this_frame, int axis, const char *method ) {
    axis numbering for the benefit of the public interface). */
       if ( naxes == 0 ) {
          astError( AST__AXIIN, "%s(%s): Invalid attempt to use an axis index "
-                   "(%d) for a %s which has no axes.", method,
+                   "(%d) for a %s which has no axes.", status, method,
                    astGetClass( this ), axis + 1, astGetClass( this ) );
 
 /* Otherwise, check the axis index for validity and report an error if
    it is not valid (again, convert to 1-based axis numbering). */
       } else if ( ( axis < 0 ) || ( axis >= naxes ) ) {
          astError( AST__AXIIN, "%s(%s): Axis index (%d) invalid - it should "
-                   "be in the range 1 to %d.", method, astGetClass( this ),
+                   "be in the range 1 to %d.", status, method, astGetClass( this ),
                    axis + 1, naxes );
 
 /* If the axis index was valid, obtain a pointer to the Region's
@@ -9841,7 +10075,7 @@ static int ValidateAxis( AstFrame *this_frame, int axis, const char *method ) {
 }
 
 static void ValidateAxisSelection( AstFrame *this_frame, int naxes, 
-                                   const int *axes, const char *method ) {
+                                   const int *axes, const char *method, int *status ) {
 /*
 *  Name:
 *     ValidateAxisSelection
@@ -9855,7 +10089,7 @@ static void ValidateAxisSelection( AstFrame *this_frame, int naxes,
 *  Synopsis:
 *     #include "region.h"
 *     void ValidateAxisSelection( AstFrame *this, int naxes,
-*                                 const int *axes, const char *method )
+*                                 const int *axes, const char *method, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected astValidateAxisSelection
@@ -9885,6 +10119,8 @@ static void ValidateAxisSelection( AstFrame *this_frame, int naxes,
 *        containing the name of the method that invoked this function
 *        to validate an axis selection. This method name is used
 *        solely for constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -9906,7 +10142,7 @@ static void ValidateAxisSelection( AstFrame *this_frame, int naxes,
 
 }
 
-static int ValidateSystem( AstFrame *this_frame, AstSystemType system, const char *method ) {
+static int ValidateSystem( AstFrame *this_frame, AstSystemType system, const char *method, int *status ) {
 /*
 *  Name:
 *     ValidateSystem
@@ -9920,7 +10156,7 @@ static int ValidateSystem( AstFrame *this_frame, AstSystemType system, const cha
 *  Synopsis:
 *     #include "region.h"
 *     int ValidateSystem( AstFrame *this, AstSystemType system,
-*                         const char *method )
+*                         const char *method, int *status )
 
 *  Class Membership:
 *     Region member function (over-rides the protected astValidateSystem
@@ -9941,6 +10177,8 @@ static int ValidateSystem( AstFrame *this_frame, AstSystemType system, const cha
 *        containing the name of the method that invoked this function
 *        to validate an axis index. This method name is used solely
 *        for constructing error messages.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The validated system value.
@@ -10225,8 +10463,8 @@ astMAKE_GET(Region,FillFactor,double,1.0,( ( this->fillfactor == AST__BAD ) ?
 astMAKE_TEST(Region,FillFactor,( this->fillfactor != AST__BAD ))
 astMAKE_SET(Region,FillFactor,double,fillfactor,((value<0.0||value>1.0)?(
        astError(AST__ATSER,"astSetFillFactor(%s): Invalid value (%g) supplied "
-                "for attribute FillFactor.",astGetClass(this),value),
-       astError(AST__ATSER,"FillFactor values should be in the range 0.0 to 1.0"), 
+                "for attribute FillFactor.", status,astGetClass(this),value),
+       astError(AST__ATSER,"FillFactor values should be in the range 0.0 to 1.0", status), 
        this->fillfactor):value))
 
 /* 
@@ -10428,7 +10666,7 @@ MAKE_CLEAR_AXIS(Top)
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -10440,7 +10678,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for Region objects.
@@ -10450,6 +10688,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the object to be copied.
 *     objout
 *        Pointer to the object being constructed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     -  This constructor makes a deep copy.
@@ -10485,7 +10725,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -10497,7 +10737,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for Region objects.
@@ -10505,6 +10745,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the object to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     This function attempts to execute even if the global error status is
@@ -10527,7 +10769,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -10539,7 +10781,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -10550,6 +10792,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the Region whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Constants: */
@@ -10590,35 +10834,35 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Negated. */
 /* -------- */
-   set = TestNegated( this );
-   ival = set ? GetNegated( this ) : astGetNegated( this );
+   set = TestNegated( this, status );
+   ival = set ? GetNegated( this, status ) : astGetNegated( this );
    astWriteInt( channel, "Negate", (ival != 0), 0, ival,
                 ival ? "Region negated" : "Region not negated" );
 
 /* FillFactor */
 /* ---------- */
-   set = TestFillFactor( this );
-   dval = set ? GetFillFactor( this ) : astGetFillFactor( this );
+   set = TestFillFactor( this, status );
+   dval = set ? GetFillFactor( this, status ) : astGetFillFactor( this );
    astWriteDouble( channel, "Fill", set, 0, dval,"Region fill factor" );
 
 /* MeshSize. */
 /* --------- */
-   set = TestMeshSize( this );
-   ival = set ? GetMeshSize( this ) : astGetMeshSize( this );
+   set = TestMeshSize( this, status );
+   ival = set ? GetMeshSize( this, status ) : astGetMeshSize( this );
    astWriteInt( channel, "MeshSz", set, 0, ival,
                 "No. of points used to represent boundary" );
 
 /* Closed. */
 /* ------- */
-   set = TestClosed( this );
-   ival = set ? GetClosed( this ) : astGetClosed( this );
+   set = TestClosed( this, status );
+   ival = set ? GetClosed( this, status ) : astGetClosed( this );
    astWriteInt( channel, "Closed", set, 0, ival,
                 ival ? "Boundary is inside" : "Boundary is outside" );
 
 /* Adaptive */
 /* -------- */
-   set = TestAdaptive( this );
-   ival = set ? GetAdaptive( this ) : astGetAdaptive( this );
+   set = TestAdaptive( this, status );
+   ival = set ? GetAdaptive( this, status ) : astGetAdaptive( this );
    astWriteInt( channel, "Adapt", (ival != 0), 0, ival,
                 ival ? "Region adapts to coord sys changes" : "Region does not adapt to coord sys changes" );
 
@@ -10633,7 +10877,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    within another Region the parent Region will define the current Frame).
    Otherwise, dump the whole FrameSet. */
    ival = astGetRegionFS( this );
-   smap = RegMapping( this );
+   smap = RegMapping( this, status );
    if( ( unit = astIsAUnitMap( smap ) ) ){
       set = 0;
       if( ival ) {
@@ -10690,13 +10934,13 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* Implement the astIsARegion and astCheckRegion functions using
    the macros defined for this purpose in the "object.h" header
    file. */
-astMAKE_ISA(Region,Frame,check,&class_init)
+astMAKE_ISA(Region,Frame,check,&class_check)
 astMAKE_CHECK(Region)
 
 AstRegion *astInitRegion_( void *mem, size_t size, int init,
                            AstRegionVtab *vtab, const char *name,
                            AstFrame *frame, AstPointSet *pset,
-                           AstRegion *unc ){
+                           AstRegion *unc, int *status ){
 /*
 *+
 *  Name:
@@ -10813,9 +11057,9 @@ AstRegion *astInitRegion_( void *mem, size_t size, int init,
    of axes in the Frame. Report an error if these numbers do not match. */
       if ( astOK && ( ncoord != nax ) ) {
          astError( AST__NCPIN, "astInitRegion(%s): Bad number of coordinate "
-                   "values per point (%d).", name, ncoord );
+                   "values per point (%d).", status, name, ncoord );
          astError( AST__NCPIN, "The %s given requires %d coordinate value(s) "
-                   "for each point.", astGetClass( frame ), nax );
+                   "for each point.", status, astGetClass( frame ), nax );
       }
    }
 
@@ -10876,12 +11120,12 @@ AstRegion *astInitRegion_( void *mem, size_t size, int init,
                          ptr[ ii ][ jj ] != DBL_MAX &&
                          ptr[ ii ][ jj ] != -DBL_MAX ) {
                         astError( AST__INTER, "astInitRegion(%s): suspicious "
-                          "axis value (%g) supplied.", name, ptr[ ii ][ jj ] );
+                          "axis value (%g) supplied.", status, name, ptr[ ii ][ jj ] );
                         break;
                      }
                   } else {
                      astError( AST__INTER, "astInitRegion(%s): suspicious "
-                            "axis value (%g) supplied.", name, 
+                            "axis value (%g) supplied.", status, name, 
                             ptr[ ii ][ jj ] );
                      break;
                   }
@@ -10900,14 +11144,14 @@ AstRegion *astInitRegion_( void *mem, size_t size, int init,
    astSetRegFS. If this were the case, then the implementation of
    astSetRegFS provided by the subclass may access information within the
    subclass structure which has not yet been initialised. */
-      SetRegFS( new, f0 );
+      SetRegFS( new, f0, status );
       f0 = astAnnul( f0 );
 
 /* Store any uncertainty Region. Use the private SetUnc rather than
    astSetUnc to avoid subclass implementations using subclass data which
    has not yet been initialised. */
       new->unc = NULL;
-      SetUnc( new, unc );
+      SetUnc( new, unc, status );
 
 /* If an error occurred, clean up by deleting the new object. */
       if ( !astOK ) new = astDelete( new );
@@ -10919,7 +11163,7 @@ AstRegion *astInitRegion_( void *mem, size_t size, int init,
 
 AstRegion *astLoadRegion_( void *mem, size_t size,
                            AstRegionVtab *vtab, const char *name,
-                           AstChannel *channel ) {
+                           AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -10989,12 +11233,16 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
 */
 
 /* Local Constants: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
    AstFrame *f1;                  /* Base Frame for encapsulated FrameSet */
    AstRegion *new;                /* Pointer to the new Region */
-   int nax;                       /* No. of axes in Frame */
+   int nax;                       /* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
+
+/* No. of axes in Frame */
    int naxpt;                     /* No. of axes in per point */
 
 /* Initialise. */
@@ -11044,27 +11292,27 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
 /* Negated */
 /* ------- */
       new->negated = astReadInt( channel, "negate", -INT_MAX );
-      if ( TestNegated( new ) ) SetNegated( new, new->negated );
+      if ( TestNegated( new, status ) ) SetNegated( new, new->negated, status );
 
 /* FillFactor */
 /* ---------- */
       new->fillfactor = astReadDouble( channel, "fill", AST__BAD );
-      if ( TestFillFactor( new ) ) SetFillFactor( new, new->fillfactor );
+      if ( TestFillFactor( new, status ) ) SetFillFactor( new, new->fillfactor, status );
 
 /* MeshSize */
 /* -------- */
       new->meshsize = astReadInt( channel, "meshsz", -INT_MAX );
-      if ( TestMeshSize( new ) ) SetMeshSize( new, new->meshsize );
+      if ( TestMeshSize( new, status ) ) SetMeshSize( new, new->meshsize, status );
 
 /* Closed */
 /* ------ */
       new->closed = astReadInt( channel, "closed", -INT_MAX );
-      if ( TestClosed( new ) ) SetClosed( new, new->closed );
+      if ( TestClosed( new, status ) ) SetClosed( new, new->closed, status );
 
 /* Adaptive */
 /* -------- */
       new->adaptive = astReadInt( channel, "adapt", -INT_MAX );
-      if ( TestAdaptive( new ) ) SetAdaptive( new, new->adaptive );
+      if ( TestAdaptive( new, status ) ) SetAdaptive( new, new->adaptive, status );
 
 /* Points */
 /* ------ */
@@ -11078,7 +11326,7 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
          } else {
             naxpt = 0;
             astError( AST__REGIN, "astLoadRegion(%s): Corrupt %s specifies points "
-                      "using a %s (should be a PointSet).", astGetClass( new ),
+                      "using a %s (should be a PointSet).", status, astGetClass( new ),
                       astGetClass( new ), astGetClass( new->points ) );
          }
 
@@ -11115,7 +11363,7 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
 /* If a FrameSet was found, the value of the RegionFS attribute is still
    unknown and so we must read it from an attribute as normal. */
             new->regionfs = astReadInt( channel, "regfs", 1 );
-            if ( TestRegionFS( new ) ) SetRegionFS( new, new->regionfs );
+            if ( TestRegionFS( new, status ) ) SetRegionFS( new, new->regionfs, status );
 
          } else {
             nax = 0;
@@ -11127,8 +11375,8 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
    should not be used. */
       if( !new->frameset ){
          nax = naxpt ? naxpt : 1;
-         f1 = astFrame( nax, "" );
-         new->frameset = astFrameSet( f1, "" );
+         f1 = astFrame( nax, "", status );
+         new->frameset = astFrameSet( f1, "", status );
          astSetIdent( new->frameset, DUMMY_FS );
          f1 = astAnnul( f1 );
          new->regionfs = 0;
@@ -11138,10 +11386,10 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
    incorrect. */
       if ( astOK && new->points && ( naxpt != nax ) ) {
          astError( AST__REGIN, "astLoadRegion(%s): Corrupt %s contains "
-                   " incorrect number of coordinate values per point (%d).", 
+                   " incorrect number of coordinate values per point (%d).", status, 
                    astGetClass( new ), astGetClass( new ), naxpt );
          astError( AST__REGIN, "The %s requires %d coordinate value(s) "
-                   "for each point.", astGetClass( new ), nax );
+                   "for each point.", status, astGetClass( new ), nax );
       }
    
 /* Initialise other fields which are used as caches for values derived
@@ -11172,168 +11420,168 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
 
-void astRegClearAttrib_( AstRegion *this, const char *attrib, char **base_attrib ) {
+void astRegClearAttrib_( AstRegion *this, const char *attrib, char **base_attrib, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,Region,RegClearAttrib))( this, attrib, base_attrib );
+   (**astMEMBER(this,Region,RegClearAttrib))( this, attrib, base_attrib, status );
 }
-void astRegSetAttrib_( AstRegion *this, const char *setting, char **base_setting ) {
+void astRegSetAttrib_( AstRegion *this, const char *setting, char **base_setting, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,Region,RegSetAttrib))( this, setting, base_setting );
+   (**astMEMBER(this,Region,RegSetAttrib))( this, setting, base_setting, status );
 }
-void astNegate_( AstRegion *this ){
+void astNegate_( AstRegion *this, int *status ){
    if ( !astOK ) return;
-   (**astMEMBER(this,Region,Negate))( this );
+   (**astMEMBER(this,Region,Negate))( this, status );
 }
-AstFrame *astGetRegionFrame_( AstRegion *this ){
+AstFrame *astGetRegionFrame_( AstRegion *this, int *status ){
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Region,GetRegionFrame))( this );
+   return (**astMEMBER(this,Region,GetRegionFrame))( this, status );
 }
-AstRegion *astMapRegion_( AstRegion *this, AstMapping *map, AstFrame *frame ){
+AstRegion *astMapRegion_( AstRegion *this, AstMapping *map, AstFrame *frame, int *status ){
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Region,MapRegion))( this, map, frame );
+   return (**astMEMBER(this,Region,MapRegion))( this, map, frame, status );
 }
-int astOverlap_( AstRegion *this, AstRegion *that ){
+int astOverlap_( AstRegion *this, AstRegion *that, int *status ){
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Region,Overlap))( this, that );
+   return (**astMEMBER(this,Region,Overlap))( this, that, status );
 }
-int astOverlapX_( AstRegion *that, AstRegion *this ){
+int astOverlapX_( AstRegion *that, AstRegion *this, int *status ){
    if ( !astOK ) return 0;
-   return (**astMEMBER(that,Region,OverlapX))( that, this );
+   return (**astMEMBER(that,Region,OverlapX))( that, this, status );
 }
-AstFrame *astRegFrame_( AstRegion *this ){
+AstFrame *astRegFrame_( AstRegion *this, int *status ){
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Region,RegFrame))( this );
+   return (**astMEMBER(this,Region,RegFrame))( this, status );
 }
 AstPointSet *astBTransform_( AstRegion *this, AstPointSet *in,
-                             int forward, AstPointSet *out ) {
+                             int forward, AstPointSet *out, int *status ) {
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Region,BTransform))( this, in, forward, out );
+   return (**astMEMBER(this,Region,BTransform))( this, in, forward, out, status );
 }
 AstPointSet *astRegTransform_( AstRegion *this, AstPointSet *in,
                                int forward, AstPointSet *out,
-                               AstFrame **frm ) {
+                               AstFrame **frm, int *status ) {
    if( frm ) *frm = NULL;
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Region,RegTransform))( this, in, forward, out, frm );
+   return (**astMEMBER(this,Region,RegTransform))( this, in, forward, out, frm, status );
 }
-int astRegPins_( AstRegion *this, AstPointSet *pset, AstRegion *unc, int **mask ){
+int astRegPins_( AstRegion *this, AstPointSet *pset, AstRegion *unc, int **mask, int *status ){
    if( mask ) *mask = NULL;
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Region,RegPins))( this, pset, unc, mask );
+   return (**astMEMBER(this,Region,RegPins))( this, pset, unc, mask, status );
 }
-int astRegDummyFS_( AstRegion *this ){
+int astRegDummyFS_( AstRegion *this, int *status ){
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Region,RegDummyFS))( this );
+   return (**astMEMBER(this,Region,RegDummyFS))( this, status );
 }
-int astDumpUnc_( AstRegion *this ){
+int astDumpUnc_( AstRegion *this, int *status ){
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Region,DumpUnc))( this );
+   return (**astMEMBER(this,Region,DumpUnc))( this, status );
 }
-int astGetBounded_( AstRegion *this ){
+int astGetBounded_( AstRegion *this, int *status ){
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Region,GetBounded))( this );
+   return (**astMEMBER(this,Region,GetBounded))( this, status );
 }
-int astTestUnc_( AstRegion *this ){
+int astTestUnc_( AstRegion *this, int *status ){
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Region,TestUnc))( this );
+   return (**astMEMBER(this,Region,TestUnc))( this, status );
 }
-void astClearUnc_( AstRegion *this ){
+void astClearUnc_( AstRegion *this, int *status ){
    if ( !astOK ) return;
-   (**astMEMBER(this,Region,ClearUnc))( this );
+   (**astMEMBER(this,Region,ClearUnc))( this, status );
 }
-void astRegBaseBox_( AstRegion *this, double *lbnd, double *ubnd ){
+void astRegBaseBox_( AstRegion *this, double *lbnd, double *ubnd, int *status ){
    if ( !astOK ) return;
-   (**astMEMBER(this,Region,RegBaseBox))( this, lbnd, ubnd );
+   (**astMEMBER(this,Region,RegBaseBox))( this, lbnd, ubnd, status );
 }
-void astRegBaseBox2_( AstRegion *this, double *lbnd, double *ubnd ){
+void astRegBaseBox2_( AstRegion *this, double *lbnd, double *ubnd, int *status ){
    if ( !astOK ) return;
-   (**astMEMBER(this,Region,RegBaseBox2))( this, lbnd, ubnd );
+   (**astMEMBER(this,Region,RegBaseBox2))( this, lbnd, ubnd, status );
 }
-void astResetCache_( AstRegion *this ){
+void astResetCache_( AstRegion *this, int *status ){
    if ( !astOK ) return;
-   (**astMEMBER(this,Region,ResetCache))( this );
+   (**astMEMBER(this,Region,ResetCache))( this, status );
 }
-void astGetRegionBounds_( AstRegion *this, double *lbnd, double *ubnd ){
+void astGetRegionBounds_( AstRegion *this, double *lbnd, double *ubnd, int *status ){
    if ( !astOK ) return;
-   (**astMEMBER(this,Region,GetRegionBounds))( this, lbnd, ubnd );
+   (**astMEMBER(this,Region,GetRegionBounds))( this, lbnd, ubnd, status );
 }
-void astShowMesh_( AstRegion *this, int format, const char *ttl ){
+void astShowMesh_( AstRegion *this, int format, const char *ttl, int *status ){
    if ( !astOK ) return;
-   (**astMEMBER(this,Region,ShowMesh))( this, format,ttl );
+   (**astMEMBER(this,Region,ShowMesh))( this, format,ttl, status );
 }
-void astGetUncBounds_( AstRegion *this, double *lbnd, double *ubnd ){
+void astGetUncBounds_( AstRegion *this, double *lbnd, double *ubnd, int *status ){
    if ( !astOK ) return;
-   (**astMEMBER(this,Region,GetUncBounds))( this, lbnd, ubnd );
+   (**astMEMBER(this,Region,GetUncBounds))( this, lbnd, ubnd, status );
 }
-void astGetRegionBounds2_( AstRegion *this, double *lbnd, double *ubnd ){
+void astGetRegionBounds2_( AstRegion *this, double *lbnd, double *ubnd, int *status ){
    if ( !astOK ) return;
-   (**astMEMBER(this,Region,GetRegionBounds2))( this, lbnd, ubnd );
+   (**astMEMBER(this,Region,GetRegionBounds2))( this, lbnd, ubnd, status );
 }
-void astRegOverlay_( AstRegion *this, AstRegion *that ){
+void astRegOverlay_( AstRegion *this, AstRegion *that, int *status ){
    if ( !astOK ) return;
-   (**astMEMBER(this,Region,RegOverlay))( this, that );
+   (**astMEMBER(this,Region,RegOverlay))( this, that, status );
 }
-AstPointSet *astRegGrid_( AstRegion *this ){
+AstPointSet *astRegGrid_( AstRegion *this, int *status ){
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Region,RegGrid))( this );
+   return (**astMEMBER(this,Region,RegGrid))( this, status );
 }
-AstPointSet *astRegMesh_( AstRegion *this ){
+AstPointSet *astRegMesh_( AstRegion *this, int *status ){
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Region,RegMesh))( this );
+   return (**astMEMBER(this,Region,RegMesh))( this, status );
 }
 double *astRegCentre_( AstRegion *this, double *cen, double **ptr, int index,
-                       int ifrm ){
+                       int ifrm, int *status ){
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Region,RegCentre))( this, cen, ptr, index, ifrm );
+   return (**astMEMBER(this,Region,RegCentre))( this, cen, ptr, index, ifrm, status );
 }
-AstRegion *astGetUncFrm_( AstRegion *this, int ifrm ){
+AstRegion *astGetUncFrm_( AstRegion *this, int ifrm, int *status ){
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Region,GetUncFrm))( this, ifrm );
+   return (**astMEMBER(this,Region,GetUncFrm))( this, ifrm, status );
 }
-AstRegion *astGetDefUnc_( AstRegion *this ){
+AstRegion *astGetDefUnc_( AstRegion *this, int *status ){
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Region,GetDefUnc))( this );
+   return (**astMEMBER(this,Region,GetDefUnc))( this, status );
 }
-AstRegion *astGetUnc_( AstRegion *this, int def ){
+AstRegion *astGetUnc_( AstRegion *this, int def, int *status ){
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Region,GetUnc))( this, def );
+   return (**astMEMBER(this,Region,GetUnc))( this, def, status );
 }
-void astSetUnc_( AstRegion *this, AstRegion *unc ){
+void astSetUnc_( AstRegion *this, AstRegion *unc, int *status ){
    if ( !astOK ) return;
-   (**astMEMBER(this,Region,SetUnc))( this, unc );
+   (**astMEMBER(this,Region,SetUnc))( this, unc, status );
 }
-AstFrameSet *astGetRegFS_( AstRegion *this ){
+AstFrameSet *astGetRegFS_( AstRegion *this, int *status ){
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Region,GetRegFS))( this );
+   return (**astMEMBER(this,Region,GetRegFS))( this, status );
 }
-void astSetRegFS_( AstRegion *this, AstFrame *frm ){
+void astSetRegFS_( AstRegion *this, AstFrame *frm, int *status ){
    if ( !astOK ) return;
-   (**astMEMBER(this,Region,SetRegFS))( this, frm );
+   (**astMEMBER(this,Region,SetRegFS))( this, frm, status );
 }
-AstPointSet *astRegBaseMesh_( AstRegion *this ){
+AstPointSet *astRegBaseMesh_( AstRegion *this, int *status ){
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Region,RegBaseMesh))( this );
+   return (**astMEMBER(this,Region,RegBaseMesh))( this, status );
 }
-AstPointSet *astRegBaseGrid_( AstRegion *this ){
+AstPointSet *astRegBaseGrid_( AstRegion *this, int *status ){
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Region,RegBaseGrid))( this );
+   return (**astMEMBER(this,Region,RegBaseGrid))( this, status );
 }
-AstPointSet *astBndBaseMesh_( AstRegion *this, double *lbnd, double *ubnd ){
+AstPointSet *astBndBaseMesh_( AstRegion *this, double *lbnd, double *ubnd, int *status ){
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Region,BndBaseMesh))( this, lbnd, ubnd );
+   return (**astMEMBER(this,Region,BndBaseMesh))( this, lbnd, ubnd, status );
 }
-AstPointSet *astBndMesh_( AstRegion *this, double *lbnd, double *ubnd ){
+AstPointSet *astBndMesh_( AstRegion *this, double *lbnd, double *ubnd, int *status ){
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Region,BndMesh))( this, lbnd, ubnd );
+   return (**astMEMBER(this,Region,BndMesh))( this, lbnd, ubnd, status );
 }
 
 #define MAKE_MASK_(X,Xtype) \
 int astMask##X##_( AstRegion *this, AstMapping *map, int inside, int ndim, \
                    const int lbnd[], const int ubnd[], Xtype in[], \
-                   Xtype val ) { \
+                   Xtype val, int *status ) { \
    if ( !astOK ) return 0; \
    return (**astMEMBER(this,Region,Mask##X))( this, map, inside, ndim, lbnd, \
-                                              ubnd, in, val ); \
+                                              ubnd, in, val, status ); \
 }
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_MASK_(LD,long double)
@@ -11368,7 +11616,7 @@ MAKE_MASK_(UB,unsigned char)
 /* ------------------------------------------- */
 
 
-AstRegion *astMapRegionId_( AstRegion *this, AstMapping *map, AstFrame *frame ) {
+AstRegion *astMapRegionId_( AstRegion *this, AstMapping *map, AstFrame *frame, int *status ) {
 /*
 *++
 *  Name:
@@ -11474,6 +11722,11 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Return the result. */
    return result;
 }
+
+
+
+
+
 
 
 

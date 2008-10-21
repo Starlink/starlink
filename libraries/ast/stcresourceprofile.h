@@ -108,6 +108,24 @@ typedef struct AstStcResourceProfileVtab {
 
 /* Properties (e.g. methods) specific to this class. */
 } AstStcResourceProfileVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within the
+   object.c file. */
+
+typedef struct AstStcResourceProfileGlobals {
+   AstStcResourceProfileVtab Class_Vtab;
+   int Class_Init;
+} AstStcResourceProfileGlobals;
+
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitStcResourceProfileGlobals_( AstStcResourceProfileGlobals * );
+
+#endif
+
+
 #endif
 
 /* Function prototypes. */
@@ -119,7 +137,7 @@ astPROTO_ISA(StcResourceProfile)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstStcResourceProfile *astStcResourceProfile_( void *, int, AstKeyMap **, const char *, ... );
+AstStcResourceProfile *astStcResourceProfile_( void *, int, AstKeyMap **, const char *, int *, ...);
 #else
 AstStcResourceProfile *astStcResourceProfileId_( void *, int, AstKeyMap **, const char *, ... );
 #endif
@@ -127,14 +145,14 @@ AstStcResourceProfile *astStcResourceProfileId_( void *, int, AstKeyMap **, cons
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
-AstStcResourceProfile *astInitStcResourceProfile_( void *, size_t, int, AstStcResourceProfileVtab *, const char *, AstRegion *, int, AstKeyMap ** );
+AstStcResourceProfile *astInitStcResourceProfile_( void *, size_t, int, AstStcResourceProfileVtab *, const char *, AstRegion *, int, AstKeyMap **, int * );
 
 /* Vtab initialiser. */
-void astInitStcResourceProfileVtab_( AstStcResourceProfileVtab *, const char * );
+void astInitStcResourceProfileVtab_( AstStcResourceProfileVtab *, const char *, int * );
 
 /* Loader. */
 AstStcResourceProfile *astLoadStcResourceProfile_( void *, size_t, AstStcResourceProfileVtab *,
-                                   const char *, AstChannel * );
+                                   const char *, AstChannel *, int * );
 
 #endif
 
@@ -171,13 +189,13 @@ AstStcResourceProfile *astLoadStcResourceProfile_( void *, size_t, AstStcResourc
 
 /* Initialiser. */
 #define astInitStcResourceProfile(mem,size,init,vtab,name,region,ncoords,coords) \
-astINVOKE(O,astInitStcResourceProfile_(mem,size,init,vtab,name,region,ncoords,coords))
+astINVOKE(O,astInitStcResourceProfile_(mem,size,init,vtab,name,region,ncoords,coords,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitStcResourceProfileVtab(vtab,name) astINVOKE(V,astInitStcResourceProfileVtab_(vtab,name))
+#define astInitStcResourceProfileVtab(vtab,name) astINVOKE(V,astInitStcResourceProfileVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadStcResourceProfile(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadStcResourceProfile_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadStcResourceProfile_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -189,3 +207,7 @@ astINVOKE(O,astLoadStcResourceProfile_(mem,size,vtab,name,astCheckChannel(channe
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif
+
+
+
+

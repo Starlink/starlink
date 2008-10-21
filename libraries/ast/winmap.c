@@ -120,6 +120,8 @@ f     The WinMap class does not define any new routines beyond those
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory management facilities */
 #include "object.h"              /* Base Object class */
@@ -149,18 +151,45 @@ f     The WinMap class does not define any new routines beyond those
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstWinMapVtab class_vtab; /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject * );
-static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
-static const char *(* parent_getattrib)( AstObject *, const char * );
-static int (* parent_testattrib)( AstObject *, const char * );
-static void (* parent_clearattrib)( AstObject *, const char * );
-static void (* parent_setattrib)( AstObject *, const char * );
+static int (* parent_getobjsize)( AstObject *, int * );
+static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static const char *(* parent_getattrib)( AstObject *, const char *, int * );
+static int (* parent_testattrib)( AstObject *, const char *, int * );
+static void (* parent_clearattrib)( AstObject *, const char *, int * );
+static void (* parent_setattrib)( AstObject *, const char *, int * );
+
+
+#ifdef THREAD_SAFE
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; 
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(WinMap)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(WinMap,Class_Init)
+#define class_vtab astGLOBAL(WinMap,Class_Vtab)
+
+
+#include <pthread.h>
+
+
+#else
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstWinMapVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -173,29 +202,29 @@ AstWinMap *astWinMapId_( int, const double [], const double [],
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static AstWinMap *WinUnit( AstWinMap *, AstUnitMap *, int, int );
-static AstWinMap *WinWin( AstMapping *, AstMapping *, int, int, int );
-static AstWinMap *WinZoom( AstWinMap *, AstZoomMap *, int, int, int, int );
-static int GetObjSize( AstObject * );
-static const char *GetAttrib( AstObject *, const char * );
-static double Rate( AstMapping *, double *, int, int );
-static int CanSwap( AstMapping *, AstMapping *, int, int, int * );
-static int Equal( AstObject *, AstObject * );
-static int GetIsLinear( AstMapping * );
-static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
-static int TestAttrib( AstObject *, const char * );
-static int WinTerms( AstWinMap *, double **, double ** );
-static void ClearAttrib( AstObject *, const char * );
-static void Copy( const AstObject *, AstObject * );
-static void Delete( AstObject * );
-static void Dump( AstObject *, AstChannel * );
-static void PermGet( AstPermMap *, int **, int **, double ** );
-static void SetAttrib( AstObject *, const char * );
-static void WinMat( AstMapping **, int *, int );
-static void WinPerm( AstMapping **, int *, int );
-static void WinWcs( AstMapping **, int *, int );
-static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static AstWinMap *WinUnit( AstWinMap *, AstUnitMap *, int, int, int * );
+static AstWinMap *WinWin( AstMapping *, AstMapping *, int, int, int, int * );
+static AstWinMap *WinZoom( AstWinMap *, AstZoomMap *, int, int, int, int, int * );
+static int GetObjSize( AstObject *, int * );
+static const char *GetAttrib( AstObject *, const char *, int * );
+static double Rate( AstMapping *, double *, int, int, int * );
+static int CanSwap( AstMapping *, AstMapping *, int, int, int *, int * );
+static int Equal( AstObject *, AstObject *, int * );
+static int GetIsLinear( AstMapping *, int * );
+static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
+static int TestAttrib( AstObject *, const char *, int * );
+static int WinTerms( AstWinMap *, double **, double **, int * );
+static void ClearAttrib( AstObject *, const char *, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Delete( AstObject *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void PermGet( AstPermMap *, int **, int **, double **, int * );
+static void SetAttrib( AstObject *, const char *, int * );
+static void WinMat( AstMapping **, int *, int, int * );
+static void WinPerm( AstMapping **, int *, int, int * );
+static void WinWcs( AstMapping **, int *, int, int * );
+static int *MapSplit( AstMapping *, int, int *, AstMapping **, int * );
 
 /* Function Macros */
 /* =============== */
@@ -211,7 +240,7 @@ exceptions, so bad values are dealt with explicitly. */
 /* Member functions. */
 /* ================= */
 static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
-                    int *simpler ){
+                    int *simpler, int *status ){
 /*
 *  Name:
 *     CanSwap
@@ -225,7 +254,7 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
 *  Synopsis:
 *     #include "winmap.h"
 *     int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
-*                  int *simpler )
+*                  int *simpler, int *status )
 
 *  Class Membership:
 *     WinMap member function 
@@ -252,6 +281,8 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
 *        Addresss of a location at which to return a flag indicating if
 *        the swapped Mappings would be intrinsically simpler than the
 *        original Mappings.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     1 if the Mappings could be swapped, 0 otherwise.
@@ -341,7 +372,7 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
 
 /* We need to know the axis permutation arrays and constants array for
    the PermMap. */
-         PermGet( (AstPermMap *) nowin, &outperm, &inperm, &consts );
+         PermGet( (AstPermMap *) nowin, &outperm, &inperm, &consts, status );
          if( astOK ) {
 
 /* Indicate we can swap with the PermMap. */
@@ -396,7 +427,7 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2,
    return astOK ? ret : 0;
 }
 
-static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     ClearAttrib
@@ -409,7 +440,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "winmap.h"
-*     void ClearAttrib( AstObject *this, const char *attrib )
+*     void ClearAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     WinMap member function (over-rides the astClearAttrib protected
@@ -426,6 +457,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -439,11 +472,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 /* At the moment the WinMap class has no attributes, so pass it on to the 
    parent method for further interpretation. */
-   (*parent_clearattrib)( this_object, attrib );
+   (*parent_clearattrib)( this_object, attrib, status );
 
 }
 
-static int Equal( AstObject *this_object, AstObject *that_object ) {
+static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
 *  Name:
 *     Equal
@@ -456,7 +489,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 *  Synopsis:
 *     #include "winmap.h"
-*     int Equal( AstObject *this, AstObject *that ) 
+*     int Equal( AstObject *this, AstObject *that, int *status ) 
 
 *  Class Membership:
 *     WinMap member function (over-rides the astEqual protected
@@ -471,6 +504,8 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *        Pointer to the first Object (a WinMap).
 *     that
 *        Pointer to the second Object.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if the WinMaps are equivalent, zero otherwise.
@@ -563,7 +598,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
    return result;
 }
 
-static int GetIsLinear( AstMapping *this_mapping ){
+static int GetIsLinear( AstMapping *this_mapping, int *status ){
 /*
 *  Name:
 *     GetIsLinear
@@ -576,7 +611,7 @@ static int GetIsLinear( AstMapping *this_mapping ){
 
 *  Synopsis:
 *     #include "mapping.h"
-*     void GetIsLinear( AstMapping *this )
+*     void GetIsLinear( AstMapping *this, int *status )
 
 *  Class Membership:
 *     WinMap member function (over-rides the protected astGetIsLinear
@@ -589,11 +624,13 @@ static int GetIsLinear( AstMapping *this_mapping ){
 *  Parameters:
 *     this
 *        Pointer to the WinMap.
+*     status
+*        Pointer to the inherited status variable.
 */
    return 1;
 }
 
-static int GetObjSize( AstObject *this_object ) {
+static int GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
 *     GetObjSize
@@ -606,7 +643,7 @@ static int GetObjSize( AstObject *this_object ) {
 
 *  Synopsis:
 *     #include "winmap.h"
-*     int GetObjSize( AstObject *this ) 
+*     int GetObjSize( AstObject *this, int *status ) 
 
 *  Class Membership:
 *     WinMap member function (over-rides the astGetObjSize protected
@@ -619,6 +656,8 @@ static int GetObjSize( AstObject *this_object ) {
 *  Parameters:
 *     this
 *        Pointer to the WinMap.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The Object size, in bytes.
@@ -644,7 +683,7 @@ static int GetObjSize( AstObject *this_object ) {
 /* Invoke the GetObjSize method inherited from the parent class, and then
    add on any components of the class structure defined by thsi class
    which are stored in dynamically allocated memory. */
-   result = (*parent_getobjsize)( this_object );
+   result = (*parent_getobjsize)( this_object, status );
    result += astTSizeOf( this->a );
    result += astTSizeOf( this->b );
 
@@ -655,7 +694,7 @@ static int GetObjSize( AstObject *this_object ) {
    return result;
 }
 
-static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+static const char *GetAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     GetAttrib
@@ -668,7 +707,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "winmap.h"
-*     const char *GetAttrib( AstObject *this, const char *attrib )
+*     const char *GetAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     WinMap member function (over-rides the protected astGetAttrib
@@ -685,6 +724,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string containing the name of
 *        the attribute whose value is required. This name should be in
 *        lower case, with all white space removed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     - Pointer to a null-terminated string containing the attribute
@@ -720,7 +761,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* At the moment the WinMap class has no attributes, so pass it on to the 
    parent method for further interpretation. */
-   result = (*parent_getattrib)( this_object, attrib );
+   result = (*parent_getattrib)( this_object, attrib, status );
 
 /* Return the result. */
    return result;
@@ -729,7 +770,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 #undef BUFF_LEN
 }
 
-void astInitWinMapVtab_(  AstWinMapVtab *vtab, const char *name ) {
+void astInitWinMapVtab_(  AstWinMapVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -766,11 +807,15 @@ void astInitWinMapVtab_(  AstWinMapVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -779,8 +824,8 @@ void astInitWinMapVtab_(  AstWinMapVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAWinMap) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -820,10 +865,14 @@ void astInitWinMapVtab_(  AstWinMapVtab *vtab, const char *name ) {
    astSetCopy( (AstObjectVtab *) vtab, Copy );
    astSetDelete( (AstObjectVtab *) vtab, Delete );
 
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
 static int MapMerge( AstMapping *this, int where, int series, int *nmap,
-                     AstMapping ***map_list, int **invert_list ) {
+                     AstMapping ***map_list, int **invert_list, int *status ) {
 /*
 *  Name:
 *     MapMerge
@@ -837,7 +886,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *  Synopsis:
 *     #include "mapping.h"
 *     int MapMerge( AstMapping *this, int where, int series, int *nmap,
-*                   AstMapping ***map_list, int **invert_list )
+*                   AstMapping ***map_list, int **invert_list, int *status )
 
 *  Class Membership:
 *     WinMap method (over-rides the protected astMapMerge method
@@ -940,6 +989,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *        length, the "*invert_list" array will be extended (and its
 *        pointer updated) if necessary to accommodate any new
 *        elements.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     If simplification was possible, the function returns the index
@@ -1042,7 +1093,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       astWinTerms( newwm, NULL, &b );   
 
 /* Create a diagonal MatrixMap holding the scale terms. */   
-      mtr = astMatrixMap( nin, nin, 1, b, "" );
+      mtr = astMatrixMap( nin, nin, 1, b, "", status );
 
 /* Restore the Invert attribute of the supplied WinMap. */
       astSetInvert( newwm, old_winv );
@@ -1101,18 +1152,18 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
             if( !strcmp( nclass, "WinMap" ) ){
                newwm = WinWin( ( *map_list )[ i1 ], ( *map_list )[ i2 ],
                                ( *invert_list )[ i1 ], ( *invert_list )[ i2 ],
-                               1 );
+                               1, status );
                invert = 0;
 
             } else if( !strcmp( nclass, "ZoomMap" ) ){
                if( i1 == where ){
                   newwm = WinZoom( (AstWinMap *)( *map_list )[ i1 ], 
                                    (AstZoomMap *)( *map_list )[ i2 ],
-                           ( *invert_list )[ i1 ], ( *invert_list )[ i2 ], 1, 1 );
+                           ( *invert_list )[ i1 ], ( *invert_list )[ i2 ], 1, 1, status );
                } else {
                   newwm = WinZoom( (AstWinMap *)( *map_list )[ i2 ], 
                                    (AstZoomMap *)( *map_list )[ i1 ],
-                           ( *invert_list )[ i2 ], ( *invert_list )[ i1 ], 0, 1 );
+                           ( *invert_list )[ i2 ], ( *invert_list )[ i1 ], 0, 1, status );
                }
                invert = 0;
 
@@ -1205,7 +1256,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    component of the CmpMap, depending on whether the CmpMap is upper or lower
    neighbour. */
                nin = cmlow ? astGetNout( mc[ 0 ] ):astGetNin( mc[ 0 ] );
-               newwm = astWinMap( nin, NULL, NULL, NULL, NULL, "" );
+               newwm = astWinMap( nin, NULL, NULL, NULL, NULL, "", status );
                if( astOK ) {
 
 /* Store the first "nin" scale and zero terms from the nominated WinMap
@@ -1219,7 +1270,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Now create the second WinMap in the same way, which transforms the
    remaining outputs of the CmpMap. */
                nin2 = cmlow ? astGetNout( mc[ 1 ] ):astGetNin( mc[ 1 ] );
-               newwm2 = astWinMap( nin2, NULL, NULL, NULL, NULL, "" );
+               newwm2 = astWinMap( nin2, NULL, NULL, NULL, NULL, "", status );
                if( astOK ) {
 
 /* Store the remaining scale and zero terms from the nominated WinMap
@@ -1234,11 +1285,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    CmpMap, and likewise combine the two corresponding upper component
    Mappings into a series CmpMap. */
                if( cmlow ) {
-                  nc[ 0 ] = (AstMapping *) astCmpMap( mc[ 0 ], newwm, 1, "" );
-                  nc[ 1 ] = (AstMapping *) astCmpMap( mc[ 1 ], newwm2, 1, "" );
+                  nc[ 0 ] = (AstMapping *) astCmpMap( mc[ 0 ], newwm, 1, "", status );
+                  nc[ 1 ] = (AstMapping *) astCmpMap( mc[ 1 ], newwm2, 1, "", status );
                } else {
-                  nc[ 0 ] = (AstMapping *) astCmpMap( newwm, mc[ 0 ], 1, "" );
-                  nc[ 1 ] = (AstMapping *) astCmpMap( newwm2, mc[ 1 ], 1, "" );
+                  nc[ 0 ] = (AstMapping *) astCmpMap( newwm, mc[ 0 ], 1, "", status );
+                  nc[ 1 ] = (AstMapping *) astCmpMap( newwm2, mc[ 1 ], 1, "", status );
                }
                newwm = astAnnul( newwm );
                newwm2 = astAnnul( newwm2 );
@@ -1259,7 +1310,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* If either CmpMap was simplified, then combine the two series CmpMap into 
    a single parallel CmpMap. */
                if( simpler ) {
-                  map2 = (AstMapping *) astCmpMap( simp1, simp2, 0, "" );
+                  map2 = (AstMapping *) astCmpMap( simp1, simp2, 0, "", status );
                }
 
 /* Re-instate the original Invert attributes in the two component Mappings. */
@@ -1321,7 +1372,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                swaphi = CanSwap(  ( *map_list )[ where ], 
                                   ( *map_list )[ where + 1 ],
                                   ( *invert_list )[ where ], 
-                                  ( *invert_list )[ where + 1 ], &do2 );
+                                  ( *invert_list )[ where + 1 ], &do2, status );
             } else {
                swaphi = 0;
                do2 = 0;
@@ -1366,7 +1417,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                swaplo = CanSwap(  ( *map_list )[ where - 1 ], 
                                   ( *map_list )[ where ],
                                   ( *invert_list )[ where - 1 ], 
-                                  ( *invert_list )[ where ], &do1 );
+                                  ( *invert_list )[ where ], &do1, status );
             } else {
                swaplo = 0;
                do1 = 0;
@@ -1442,13 +1493,13 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                } else {
 
                   if( !strcmp( nclass, "MatrixMap" ) ){
-                     WinMat( (*map_list) + i1, (*invert_list) + i1, where - i1 );
+                     WinMat( (*map_list) + i1, (*invert_list) + i1, where - i1, status );
 
                   } else if( !strcmp( nclass, "PermMap" ) ){
-                     WinPerm( (*map_list) + i1, (*invert_list) + i1, where - i1 );
+                     WinPerm( (*map_list) + i1, (*invert_list) + i1, where - i1, status );
 
                   } else if( !strcmp( nclass, "WcsMap" ) ){
-                     WinWcs( (*map_list) + i1, (*invert_list) + i1, where - i1 );
+                     WinWcs( (*map_list) + i1, (*invert_list) + i1, where - i1, status );
                   }
 
 /* Store the index of the first modified Mapping. */
@@ -1493,11 +1544,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Swap these Mappings. */
                      if( !strcmp( nclass, "MatrixMap" ) ){
-                        WinMat( mc, ic, where - i1 );
+                        WinMat( mc, ic, where - i1, status );
                      } else if( !strcmp( nclass, "PermMap" ) ){
-                        WinPerm( mc, ic, where - i1 );
+                        WinPerm( mc, ic, where - i1, status );
                      } else if( !strcmp( nclass, "WcsMap" ) ){
-                        WinWcs( mc, ic, where - i1 );
+                        WinWcs( mc, ic, where - i1, status );
                      }
 
 /* See if the two neighbouring Mappings can merge now that the nominated
@@ -1613,18 +1664,18 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
             if( !strcmp( nclass, "WinMap" ) ){
                newwm = WinWin( ( *map_list )[ i1 ], ( *map_list )[ i2 ],
                                ( *invert_list )[ i1 ], ( *invert_list )[ i2 ],
-                               0 );
+                               0, status );
                invert = 0;
 
             } else if( !strcmp( nclass, "ZoomMap" ) ){
                if( i1 == where ){
                   newwm = WinZoom( (AstWinMap *)( *map_list )[ i1 ], 
                                    (AstZoomMap *)( *map_list )[ i2 ],
-                           ( *invert_list )[ i1 ], ( *invert_list )[ i2 ], 1, 0 );
+                           ( *invert_list )[ i1 ], ( *invert_list )[ i2 ], 1, 0, status );
                } else {
                   newwm = WinZoom( (AstWinMap *)( *map_list )[ i2 ], 
                                    (AstZoomMap *)( *map_list )[ i1 ],
-                           ( *invert_list )[ i2 ], ( *invert_list )[ i1 ], 0, 0 );
+                           ( *invert_list )[ i2 ], ( *invert_list )[ i1 ], 0, 0, status );
                }
                invert = 0;
 
@@ -1632,11 +1683,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                if( i1 == where ){
                   newwm = WinUnit( (AstWinMap *)( *map_list )[ i1 ], 
                                    (AstUnitMap *)( *map_list )[ i2 ],
-                                   ( *invert_list )[ i1 ], 1 );
+                                   ( *invert_list )[ i1 ], 1, status );
                } else {
                   newwm = WinUnit( (AstWinMap *)( *map_list )[ i2 ], 
                                    (AstUnitMap *)( *map_list )[ i1 ],
-                                   ( *invert_list )[ i2 ], 0 );
+                                   ( *invert_list )[ i2 ], 0, status );
                }
                invert = 0;
 
@@ -1677,7 +1728,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map ){
+static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, int *status ){
 /*
 *  Name:
 *     MapSplit
@@ -1691,7 +1742,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 
 *  Synopsis:
 *     #include "winmap.h"
-*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map )
+*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map, int *status )
 
 *  Class Membership:
 *     WinMap method (over-rides the protected astMapSplit method
@@ -1723,6 +1774,8 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 *        outputs may be different to "nin"). A NULL pointer will be
 *        returned if the supplied WinMap has no subset of outputs which 
 *        depend only on the selected inputs.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated array of ints. The number of
@@ -1762,7 +1815,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 /* Allocate memory for the returned array and create a WinMap with the
    required number of axes and undefined corners. */
    result = astMalloc( sizeof( int )*(size_t) nin );
-   newwm = astWinMap( nin, NULL, NULL, NULL, NULL, "" );
+   newwm = astWinMap( nin, NULL, NULL, NULL, NULL, "", status );
    *map = (AstMapping *) newwm;
 
 /* Now get pointers to the scale and zero terms of the supplied WinMap
@@ -1812,7 +1865,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
 }
 
 static void PermGet( AstPermMap *map, int **outperm, int **inperm, 
-                     double **consts ){
+                     double **consts, int *status ){
 /*
 *  Name:
 *     PermGet
@@ -1826,7 +1879,7 @@ static void PermGet( AstPermMap *map, int **outperm, int **inperm,
 *  Synopsis:
 *     #include "winmap.h"
 *     void PermGet( AstPermMap *map, int **outperm, int **inperm, 
-*                   double **const )
+*                   double **const, int *status )
 
 *  Class Membership:
 *     WinMap member function 
@@ -1850,6 +1903,8 @@ static void PermGet( AstPermMap *map, int **outperm, int **inperm,
 *        An address at which to return a popinter to an array of doubles
 *        holding the constants array. The array should be released using 
 *        astFree when no longer needed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     -  NULL pointers are returned if an error has already occurred, or if
@@ -1900,8 +1955,8 @@ static void PermGet( AstPermMap *map, int **outperm, int **inperm,
 
 /* Create two PointSets, each holding two points, which can be used for
    input and output positions with the PermMap. */
-   pset1 = astPointSet( 2, nin, "" );
-   pset2 = astPointSet( 2, nout, "" );
+   pset1 = astPointSet( 2, nin, "", status );
+   pset2 = astPointSet( 2, nout, "", status );
 
 /* Set up the two input positions to be [0,1,2...] and [-1,-1,-1,...]. The
    first position is used to enumerate the axes, and the second is used to 
@@ -1994,7 +2049,7 @@ static void PermGet( AstPermMap *map, int **outperm, int **inperm,
    return;
 }
 
-static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
+static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status ){
 /*
 *  Name:
 *     Rate
@@ -2007,7 +2062,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
 
 *  Synopsis:
 *     #include "winmap.h"
-*     result = Rate( AstMapping *this, double *at, int ax1, int ax2 )
+*     result = Rate( AstMapping *this, double *at, int ax1, int ax2, int *status )
 
 *  Class Membership:
 *     WinMap member function (overrides the astRate method inherited
@@ -2033,6 +2088,8 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
 *        The index of the Mapping input which is to be varied in order to
 *        find the rate of change (input numbering starts at 0 for the first 
 *        input).
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The rate of change of Mapping output "ax1" with respect to input 
@@ -2072,7 +2129,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
    return result;
 }
 
-static void SetAttrib( AstObject *this_object, const char *setting ) {
+static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
 *     astSetAttrib
@@ -2128,11 +2185,11 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* The WinMap class currently has no attributes, so pass it on to the parent
    method for further interpretation. */
-   (*parent_setattrib)( this_object, setting );
+   (*parent_setattrib)( this_object, setting, status );
 
 }
 
-static int TestAttrib( AstObject *this_object, const char *attrib ) {
+static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     TestAttrib
@@ -2145,7 +2202,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "winmap.h"
-*     int TestAttrib( AstObject *this, const char *attrib )
+*     int TestAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     WinMap member function (over-rides the astTestAttrib protected
@@ -2162,6 +2219,8 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if a value has been set, otherwise zero.
@@ -2186,14 +2245,14 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 /* The WinMap class currently has no attributes, so pass it on to the parent
    method for further interpretation. */
-   result = (*parent_testattrib)( this_object, attrib );
+   result = (*parent_testattrib)( this_object, attrib, status );
 
 /* Return the result, */
    return result;
 }
 
 static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-                               int forward, AstPointSet *out ) {
+                               int forward, AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     Transform
@@ -2207,7 +2266,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *  Synopsis:
 *     #include "winmap.h"
 *     AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-*                             int forward, AstPointSet *out )
+*                             int forward, AstPointSet *out, int *status )
 
 *  Class Membership:
 *     WinMap member function (over-rides the astTransform protected
@@ -2231,6 +2290,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *        Pointer to a PointSet which will hold the transformed (output)
 *        coordinate values. A NULL value may also be given, in which case a
 *        new PointSet will be created by this function.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the output (possibly new) PointSet.
@@ -2278,7 +2339,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    function inherited from the parent Mapping class. This function validates
    all arguments and generates an output PointSet if necessary, but does not
    actually transform any coordinate values. */
-   result = (*parent_transform)( this, in, forward, out );
+   result = (*parent_transform)( this, in, forward, out, status );
 
 /* We will now extend the parent astTransform method by performing the
    calculations needed to generate the output coordinate values. */
@@ -2299,7 +2360,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    if( !(map->a && map->b) && astOK ){
       class = astGetClass( this );
       astError( AST__BADWM, "astTransform(%s): The supplied %s does not "
-                "contain any window information.", class, class );
+                "contain any window information.", status, class, class );
    }
 
 /* Perform coordinate arithmetic. */
@@ -2372,7 +2433,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    return result;
 }
 
-static void WinMat( AstMapping **maps, int *inverts, int iwm  ){
+static void WinMat( AstMapping **maps, int *inverts, int iwm, int *status ){
 /*
 *  Name:
 *     WinMat
@@ -2385,7 +2446,7 @@ static void WinMat( AstMapping **maps, int *inverts, int iwm  ){
 
 *  Synopsis:
 *     #include "winmap.h"
-*     void WinMat( AstMapping **maps, int *inverts, int iwm )
+*     void WinMat( AstMapping **maps, int *inverts, int iwm, int *status )
 
 *  Class Membership:
 *     WinMap member function 
@@ -2407,6 +2468,8 @@ static void WinMat( AstMapping **maps, int *inverts, int iwm  ){
 *        A pointer to an array of two invert flags.
 *     iwm
 *        The index within "maps" of the WinMap.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -2453,11 +2516,11 @@ static void WinMat( AstMapping **maps, int *inverts, int iwm  ){
 
 /* Create a diagonal MatrixMap holding the scale factors from the
    supplied WinMap. */
-   m1 = astMatrixMap( nin, nin, 1, b, "" );
+   m1 = astMatrixMap( nin, nin, 1, b, "", status );
 
 /* Create a PointSet holding a single position given by the shift terms
    in the supplied WinMap. */
-   pset1 = astPointSet( 1, nin, "" );
+   pset1 = astPointSet( 1, nin, "", status );
    ptr1 = astGetPoints( pset1 );
    if( astOK ){
       aa = a;
@@ -2505,7 +2568,7 @@ static void WinMat( AstMapping **maps, int *inverts, int iwm  ){
 /* Create the returned WinMap, initially with undefined corners. The number of
    axes in the WinMap must equal the number of shift terms. */
    nout = astGetNcoord( pset2 );
-   w1 = astWinMap( nout, NULL, NULL, NULL, NULL, "" );
+   w1 = astWinMap( nout, NULL, NULL, NULL, NULL, "", status );
 
 /* If succesful, store the scale and shift terms in the WinMap. The scale
    terms are always unity. */
@@ -2550,7 +2613,7 @@ static void WinMat( AstMapping **maps, int *inverts, int iwm  ){
    return;
 }
 
-static void WinWcs( AstMapping **maps, int *inverts, int iwm  ){
+static void WinWcs( AstMapping **maps, int *inverts, int iwm, int *status ){
 /*
 *  Name:
 *     WinWcs
@@ -2563,7 +2626,7 @@ static void WinWcs( AstMapping **maps, int *inverts, int iwm  ){
 
 *  Synopsis:
 *     #include "winmap.h"
-*     void WinWcs( AstMapping **maps, int *inverts, int iwm )
+*     void WinWcs( AstMapping **maps, int *inverts, int iwm, int *status )
 
 *  Class Membership:
 *     WinMap member function 
@@ -2579,6 +2642,8 @@ static void WinWcs( AstMapping **maps, int *inverts, int iwm  ){
 *        A pointer to an array of two invert flags.
 *     iwm
 *        The index within "maps" of the WinMap.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -2603,7 +2668,7 @@ static void WinWcs( AstMapping **maps, int *inverts, int iwm  ){
    return;
 }
 
-static void WinPerm( AstMapping **maps, int *inverts, int iwm  ){
+static void WinPerm( AstMapping **maps, int *inverts, int iwm, int *status ){
 /*
 *  Name:
 *     WinPerm
@@ -2616,7 +2681,7 @@ static void WinPerm( AstMapping **maps, int *inverts, int iwm  ){
 
 *  Synopsis:
 *     #include "winmap.h"
-*     void WinPerm( AstMapping **maps, int *inverts, int iwm )
+*     void WinPerm( AstMapping **maps, int *inverts, int iwm, int *status )
 
 *  Class Membership:
 *     WinMap member function 
@@ -2635,6 +2700,8 @@ static void WinPerm( AstMapping **maps, int *inverts, int iwm  ){
 *        A pointer to an array of two invert flags.
 *     iwm
 *        The index within "maps" of the WinMap.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     -  All links between input and output axes in the PermMap must 
@@ -2695,7 +2762,7 @@ static void WinPerm( AstMapping **maps, int *inverts, int iwm  ){
    PermMap. Note, no constants are used more than once in the returned
    arrays (i.e. duplicate constants are returned in "consts" if more than
    one axis uses a given constant). */
-   PermGet( pm, &outperm, &inperm, &consts );
+   PermGet( pm, &outperm, &inperm, &consts, status );
 
    if( astOK ) {
 
@@ -2709,7 +2776,7 @@ static void WinPerm( AstMapping **maps, int *inverts, int iwm  ){
 
 /* Create the new WinMap, initially with undefined corners. Its number 
    of axes will equal the number of output axes of the PermMap. */
-         w1 = astWinMap( npout, NULL, NULL, NULL, NULL, "" );
+         w1 = astWinMap( npout, NULL, NULL, NULL, NULL, "", status );
 
 /* Get pointers to the scale and shift terms for the new WinMap. */
          bb = w1->b;
@@ -2772,7 +2839,7 @@ static void WinPerm( AstMapping **maps, int *inverts, int iwm  ){
 
 /* Create the new WinMap, initially with undefined corners. Its number 
    of axes will equal the number of input axes of the PermMap. */
-         w1 = astWinMap( npin, NULL, NULL, NULL, NULL, "" );
+         w1 = astWinMap( npin, NULL, NULL, NULL, NULL, "", status );
 
 /* Get pointers to the scale and shift terms for the new WinMap. */
          bb = w1->b;
@@ -2831,7 +2898,7 @@ static void WinPerm( AstMapping **maps, int *inverts, int iwm  ){
       }
 
 /* Create a new PermMap (since the constants may have changed). */
-      p1 = astPermMap( npin, inperm, npout, outperm, consts, "" );
+      p1 = astPermMap( npin, inperm, npout, outperm, consts, "", status );
 
 /* Free the axis permutation and constants arrays. */
       outperm = (int *) astFree( (void *) outperm );
@@ -2871,7 +2938,7 @@ static void WinPerm( AstMapping **maps, int *inverts, int iwm  ){
    return;
 }
 
-static int WinTerms( AstWinMap *this, double **shift, double **scale ){
+static int WinTerms( AstWinMap *this, double **shift, double **scale, int *status ){
 /*
 *+
 *  Name:
@@ -3002,7 +3069,7 @@ static int WinTerms( AstWinMap *this, double **shift, double **scale ){
 }
 
 static AstWinMap *WinUnit( AstWinMap *wm, AstUnitMap *um, int winv, 
-                           int win1 ){
+                           int win1, int *status ){
 /*
 *  Name:
 *     WinUnit
@@ -3015,7 +3082,7 @@ static AstWinMap *WinUnit( AstWinMap *wm, AstUnitMap *um, int winv,
 
 *  Synopsis:
 *     #include "winmap.h"
-*     AstWinMap *WinUnit( AstWinMap *wm, AstUnitMap *um, int winv, int win1 )
+*     AstWinMap *WinUnit( AstWinMap *wm, AstUnitMap *um, int winv, int win1, int *status )
 
 *  Class Membership:
 *     WinMap member function 
@@ -3045,6 +3112,8 @@ static AstWinMap *WinUnit( AstWinMap *wm, AstUnitMap *um, int winv,
 *        If win1 is zero:
 *           "um" applies to the lower axis indices and "wm" to the upper
 *           axis indices.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the new WinMap.
@@ -3089,7 +3158,7 @@ static AstWinMap *WinUnit( AstWinMap *wm, AstUnitMap *um, int winv,
    ninu = astGetNin( um );
 
 /* Create the merged WinMap with unspecified corners. */
-   result = astWinMap( ninw + ninu, NULL, NULL, NULL, NULL, "" );
+   result = astWinMap( ninw + ninu, NULL, NULL, NULL, NULL, "", status );
 
 /* Check the pointers can be used. */
    if( astOK ){
@@ -3157,7 +3226,7 @@ static AstWinMap *WinUnit( AstWinMap *wm, AstUnitMap *um, int winv,
 }
 
 static AstWinMap *WinWin( AstMapping *map1, AstMapping *map2, int inv1, 
-                          int inv2, int series ){
+                          int inv2, int series, int *status ){
 /*
 *  Name:
 *     WinWin
@@ -3171,7 +3240,7 @@ static AstWinMap *WinWin( AstMapping *map1, AstMapping *map2, int inv1,
 *  Synopsis:
 *     #include "winmap.h"
 *     AstWinMap *WinWin( AstMapping *map1, AstMapping *map2, int inv1, 
-*                        int inv2, int series )
+*                        int inv2, int series, int *status )
 
 *  Class Membership:
 *     WinMap member function 
@@ -3198,6 +3267,8 @@ static AstWinMap *WinWin( AstMapping *map1, AstMapping *map2, int inv1,
 *     series
 *        If non-zero, then the supplied WinMaps are combined in series.
 *        Otherwise, they are combined in parallel.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the new WinMap.
@@ -3288,7 +3359,7 @@ static AstWinMap *WinWin( AstMapping *map1, AstMapping *map2, int inv1,
          }
 
 /* Create the merged WinMap with unspecified corners. */
-         result = astWinMap( nin[ 0 ], NULL, NULL, NULL, NULL, "" );
+         result = astWinMap( nin[ 0 ], NULL, NULL, NULL, NULL, "", status );
 
 /* Store the merged scale and shift terms in the new WinMap. The forward 
    transformation of this WinMap then corresponds to the combination of the 
@@ -3307,7 +3378,7 @@ static AstWinMap *WinWin( AstMapping *map1, AstMapping *map2, int inv1,
       } else {
 
 /* Create the merged WinMap with unspecified corners. */
-         result = astWinMap( nin[ 0 ] + nin[ 1 ], NULL, NULL, NULL, NULL, "" );
+         result = astWinMap( nin[ 0 ] + nin[ 1 ], NULL, NULL, NULL, NULL, "", status );
 
 /* Copy the scale and shift terms into the new WinMap. */
          a0 = a[ 0 ];
@@ -3348,7 +3419,7 @@ static AstWinMap *WinWin( AstMapping *map1, AstMapping *map2, int inv1,
 }
 
 static AstWinMap *WinZoom( AstWinMap *wm, AstZoomMap *zm, int winv, 
-                           int zinv, int win1, int series ){
+                           int zinv, int win1, int series, int *status ){
 /*
 *  Name:
 *     WinZoom
@@ -3362,7 +3433,7 @@ static AstWinMap *WinZoom( AstWinMap *wm, AstZoomMap *zm, int winv,
 *  Synopsis:
 *     #include "winmap.h"
 *     AstWinMap *WinZoom( AstWinMap *wm, AstZoomMap *zm, int winv, 
-*                         int zinv, int win1, int series )
+*                         int zinv, int win1, int series, int *status )
 
 *  Class Membership:
 *     WinMap member function 
@@ -3403,6 +3474,8 @@ static AstWinMap *WinZoom( AstWinMap *wm, AstZoomMap *zm, int winv,
 *     series
 *        Should be supplied non-zero if the Mappings are to be combined in 
 *        series.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the new WinMap.
@@ -3479,7 +3552,7 @@ static AstWinMap *WinZoom( AstWinMap *wm, AstZoomMap *zm, int winv,
          }
 
 /* Create the merged WinMap with unspecified corners. */
-         result = astWinMap( ninw, NULL, NULL, NULL, NULL, "" );
+         result = astWinMap( ninw, NULL, NULL, NULL, NULL, "", status );
 
 /* Store the merged scale and shift terms in the new WinMap. The forward 
    transformation of this WinMap then corresponds to the combination of the 
@@ -3500,7 +3573,7 @@ static AstWinMap *WinZoom( AstWinMap *wm, AstZoomMap *zm, int winv,
          ninz = astGetNin( zm );
 
 /* Create the merged WinMap with unspecified corners. */
-         result = astWinMap( ninw + ninz, NULL, NULL, NULL, NULL, "" );
+         result = astWinMap( ninw + ninz, NULL, NULL, NULL, NULL, "", status );
 
 /* If the WinMap applies to the lower axis indices... */
          if( win1 ) {
@@ -3575,7 +3648,7 @@ static AstWinMap *WinZoom( AstWinMap *wm, AstZoomMap *zm, int winv,
 
 /* Copy constructor. */
 /* ----------------- */
-static void Copy( const AstObject *objin, AstObject *objout ) {
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /*
 *  Name:
 *     Copy
@@ -3587,7 +3660,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *     Private function.
 
 *  Synopsis:
-*     void Copy( const AstObject *objin, AstObject *objout )
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
 
 *  Description:
 *     This function implements the copy constructor for WinMap objects.
@@ -3597,6 +3670,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 *        Pointer to the WinMap to be copied.
 *     objout
 *        Pointer to the WinMap being constructed.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -3632,7 +3707,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Destructor. */
 /* ----------- */
-static void Delete( AstObject *obj ) {
+static void Delete( AstObject *obj, int *status ) {
 /*
 *  Name:
 *     Delete
@@ -3644,7 +3719,7 @@ static void Delete( AstObject *obj ) {
 *     Private function.
 
 *  Synopsis:
-*     void Delete( AstObject *obj )
+*     void Delete( AstObject *obj, int *status )
 
 *  Description:
 *     This function implements the destructor for WinMap objects.
@@ -3652,6 +3727,8 @@ static void Delete( AstObject *obj ) {
 *  Parameters:
 *     obj
 *        Pointer to the WinMap to be deleted.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Notes:
 *     - This destructor does nothing and exists only to maintain a
@@ -3673,7 +3750,7 @@ static void Delete( AstObject *obj ) {
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -3685,7 +3762,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -3696,6 +3773,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the WinMap whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Constants: */
@@ -3743,12 +3822,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsAWinMap and astCheckWinMap functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(WinMap,Mapping,check,&class_init)
+astMAKE_ISA(WinMap,Mapping,check,&class_check)
 astMAKE_CHECK(WinMap)
 
 AstWinMap *astWinMap_( int ncoord, const double c1_in[], const double c2_in[], 
                        const double c1_out[], const double c2_out[], 
-                       const char *options, ... ) {
+                       const char *options, int *status, ...) {
 /*
 *++
 *  Name:
@@ -3847,12 +3926,23 @@ f     AST_WINMAP = INTEGER
 c     function is invoked with the AST error status set, or if it
 f     function is invoked with STATUS set to an error value, or if it
 *     should fail for any reason.
+
+*  Status Handling:
+*     The protected interface to this function includes an extra
+*     parameter at the end of the parameter list descirbed above. This
+*     parameter is a pointer to the integer inherited status
+*     variable: "int *status".
+
 *--
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstWinMap *new;              /* Pointer to new WinMap */
    va_list args;                /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -3869,7 +3959,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Obtain the variable argument list and pass it along with the options string
    to the astVSet method to initialise the new WinMap's attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -3925,8 +4015,16 @@ AstWinMap *astWinMapId_( int ncoord, const double c1_in[], const double c2_in[],
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstWinMap *new;              /* Pointer to new WinMap */
    va_list args;                /* Variable argument list */
+   int *status;                 /* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -3959,7 +4057,7 @@ AstWinMap *astInitWinMap_( void *mem, size_t size, int init,
                            AstWinMapVtab *vtab, const char *name,
                            int ncoord, const double *c1_in, 
                            const double *c2_in, const double *c1_out, 
-                           const double *c2_out ) {
+                           const double *c2_out, int *status ) {
 /*
 *+
 *  Name:
@@ -4108,7 +4206,7 @@ AstWinMap *astInitWinMap_( void *mem, size_t size, int init,
 
 AstWinMap *astLoadWinMap_( void *mem, size_t size,
                            AstWinMapVtab *vtab, const char *name,
-                           AstChannel *channel ) {
+                           AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -4183,12 +4281,16 @@ AstWinMap *astLoadWinMap_( void *mem, size_t size,
 */
 
 /* Local Constants. */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
    AstWinMap *new;              /* Pointer to the new WinMap */
    char buff[ KEY_LEN + 1 ];    /* Buffer for keyword string */
-   int axis;                    /* Axis index */
+   int axis;                    /* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
+
+/* Axis index */
    int ncoord;                  /* The number of coordinate axes */
 
 /* Initialise. */
@@ -4268,7 +4370,11 @@ AstWinMap *astLoadWinMap_( void *mem, size_t size,
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
 
-int astWinTerms_( AstWinMap *this, double **scale, double **shift ){
+int astWinTerms_( AstWinMap *this, double **scale, double **shift, int *status ){
    if( !astOK ) return 0;
-   return (**astMEMBER(this,WinMap,WinTerms))( this, scale, shift );
+   return (**astMEMBER(this,WinMap,WinTerms))( this, scale, shift, status );
 }
+
+
+
+

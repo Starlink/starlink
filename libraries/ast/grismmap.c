@@ -109,11 +109,11 @@ f     The GrismMap class does not define any new routines beyond those
 *     This macro expands to an implementation of a private member function of
 *     the form:
 *
-*        static void Clear<Attribute>( Ast<Class> *this )
+*        static void Clear<Attribute>( AstGrismMap *this )
 *
 *     and an external interface function of the form:
 *
-*        void astClear<Attribute>_( Ast<Class> *this )
+*        void astClear<Attribute>_( AstGrismMap *this )
 *
 *     which implement a method for clearing a specified attribute value for
 *     a class. The derived constants stored in the GrismMap structure are
@@ -142,7 +142,7 @@ f     The GrismMap class does not define any new routines beyond those
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static void Clear##attribute( Ast##class *this ) { \
+static void Clear##attribute( Ast##class *this, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -151,18 +151,18 @@ static void Clear##attribute( Ast##class *this ) { \
    this->component = (assign); \
 \
 /* Update the derived constants. */ \
-   UpdateConstants( this ); \
+   UpdateConstants( this, status ); \
 } \
 \
 /* External interface. */ \
 /* ------------------- */ \
-void astClear##attribute##_( Ast##class *this ) { \
+void astClear##attribute##_( Ast##class *this, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
 \
 /* Invoke the required method via the virtual function table. */ \
-   (**astMEMBER(this,class,Clear##attribute))( this ); \
+   (**astMEMBER(this,class,Clear##attribute))( this, status ); \
 }   
 
 /*
@@ -186,11 +186,11 @@ void astClear##attribute##_( Ast##class *this ) { \
 *     This macro expands to an implementation of a private member function of
 *     the form:
 *
-*        static void Set<Attribute>( Ast<Class> *this, <Type> value )
+*        static void Set<Attribute>( AstGrismMap *this, <Type> value )
 *
 *     and an external interface function of the form:
 *
-*        void astSet<Attribute>_( Ast<Class> *this, <Type> value )
+*        void astSet<Attribute>_( AstGrismMap *this, <Type> value )
 *
 *     which implement a method for setting a specified attribute value for a
 *     GrismMap. The derived constants stored in the GrismMap structure are
@@ -221,7 +221,7 @@ void astClear##attribute##_( Ast##class *this ) { \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static void Set##attribute( Ast##class *this, type value ) { \
+static void Set##attribute( Ast##class *this, type value, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -230,18 +230,18 @@ static void Set##attribute( Ast##class *this, type value ) { \
    this->component = (assign); \
 \
 /* Update the derived constants. */ \
-   UpdateConstants( this ); \
+   UpdateConstants( this, status ); \
 } \
 \
 /* External interface. */ \
 /* ------------------- */ \
-void astSet##attribute##_( Ast##class *this, type value ) { \
+void astSet##attribute##_( Ast##class *this, type value, int *status ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
 \
 /* Invoke the required method via the virtual function table. */ \
-   (**astMEMBER(this,class,Set##attribute))( this, value ); \
+   (**astMEMBER(this,class,Set##attribute))( this, value, status ); \
 }
 
 
@@ -249,8 +249,11 @@ void astSet##attribute##_( Ast##class *this, type value ) { \
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
+
+#include "globals.h"             /* Thread-safe global data access */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory management facilities */
+#include "globals.h"             /* Thread-safe global data access */
 #include "object.h"              /* Base Object class */
 #include "pointset.h"            /* Sets of points/coordinates */
 #include "mapping.h"             /* Coordinate mappings (parent class) */
@@ -287,17 +290,49 @@ void astSet##attribute##_( Ast##class *this, type value ) { \
 
 /* Module Variables. */
 /* ================= */
-/* Define the class virtual function table and its initialisation flag
-   as static variables. */
-static AstGrismMapVtab class_vtab; /* Virtual function table */
-static int class_init = 0;       /* Virtual function table initialised? */
+
+/* Address of this static variable is used as a unique identifier for
+   member of this class. */
+static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
-static const char *(* parent_getattrib)( AstObject *, const char * );
-static int (* parent_testattrib)( AstObject *, const char * );
-static void (* parent_clearattrib)( AstObject *, const char * );
-static void (* parent_setattrib)( AstObject *, const char * );
+static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static const char *(* parent_getattrib)( AstObject *, const char *, int * );
+static int (* parent_testattrib)( AstObject *, const char *, int * );
+static void (* parent_clearattrib)( AstObject *, const char *, int * );
+static void (* parent_setattrib)( AstObject *, const char *, int * );
+
+/* Define macros for accessing each item of thread specific global data. */
+#ifdef THREAD_SAFE
+
+/* Define how to initialise thread-specific globals. */ 
+#define GLOBAL_inits \
+   globals->Class_Init = 0; \
+   globals->GetAttrib_Buff[ 0 ] = 0;
+
+/* Create the function that initialises global data for this module. */
+astMAKE_INITGLOBALS(GrismMap)
+
+/* Define macros for accessing each item of thread specific global data. */
+#define class_init astGLOBAL(GrismMap,Class_Init)
+#define class_vtab astGLOBAL(GrismMap,Class_Vtab)
+#define getattrib_buff astGLOBAL(GrismMap,GetAttrib_Buff)
+
+
+
+/* If thread safety is not needed, declare and initialise globals at static 
+   variables. */ 
+#else
+
+static char getattrib_buff[ 101 ];
+
+
+/* Define the class virtual function table and its initialisation flag
+   as static variables. */
+static AstGrismMapVtab class_vtab;   /* Virtual function table */
+static int class_init = 0;       /* Virtual function table initialised? */
+
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -308,61 +343,61 @@ AstGrismMap *astGrismMapId_( const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static const char *GetAttrib( AstObject *, const char * );
-static AstMapping *CanMerge( AstMapping *, int, AstMapping *, int );
-static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
-static int TestAttrib( AstObject *, const char * );
-static void ClearAttrib( AstObject *, const char * );
-static void Dump( AstObject *, AstChannel * );
-static int Equal( AstObject *, AstObject * );
-static void SetAttrib( AstObject *, const char * );
-static void UpdateConstants( AstGrismMap * );
+static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static const char *GetAttrib( AstObject *, const char *, int * );
+static AstMapping *CanMerge( AstMapping *, int, AstMapping *, int, int * );
+static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
+static int TestAttrib( AstObject *, const char *, int * );
+static void ClearAttrib( AstObject *, const char *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static int Equal( AstObject *, AstObject *, int * );
+static void SetAttrib( AstObject *, const char *, int * );
+static void UpdateConstants( AstGrismMap *, int * );
 
-static double GetGrismNR( AstGrismMap * );
-static int TestGrismNR( AstGrismMap * );
-static void ClearGrismNR( AstGrismMap * );
-static void SetGrismNR( AstGrismMap *, double );
+static double GetGrismNR( AstGrismMap *, int * );
+static int TestGrismNR( AstGrismMap *, int * );
+static void ClearGrismNR( AstGrismMap *, int * );
+static void SetGrismNR( AstGrismMap *, double, int * );
 
-static double GetGrismNRP( AstGrismMap * );
-static int TestGrismNRP( AstGrismMap * );
-static void ClearGrismNRP( AstGrismMap * );
-static void SetGrismNRP( AstGrismMap *, double );
+static double GetGrismNRP( AstGrismMap *, int * );
+static int TestGrismNRP( AstGrismMap *, int * );
+static void ClearGrismNRP( AstGrismMap *, int * );
+static void SetGrismNRP( AstGrismMap *, double, int * );
 
-static double GetGrismWaveR( AstGrismMap * );
-static int TestGrismWaveR( AstGrismMap * );
-static void ClearGrismWaveR( AstGrismMap * );
-static void SetGrismWaveR( AstGrismMap *, double );
+static double GetGrismWaveR( AstGrismMap *, int * );
+static int TestGrismWaveR( AstGrismMap *, int * );
+static void ClearGrismWaveR( AstGrismMap *, int * );
+static void SetGrismWaveR( AstGrismMap *, double, int * );
 
-static double GetGrismAlpha( AstGrismMap * );
-static int TestGrismAlpha( AstGrismMap * );
-static void ClearGrismAlpha( AstGrismMap * );
-static void SetGrismAlpha( AstGrismMap *, double );
+static double GetGrismAlpha( AstGrismMap *, int * );
+static int TestGrismAlpha( AstGrismMap *, int * );
+static void ClearGrismAlpha( AstGrismMap *, int * );
+static void SetGrismAlpha( AstGrismMap *, double, int * );
 
-static double GetGrismG( AstGrismMap * );
-static int TestGrismG( AstGrismMap * );
-static void ClearGrismG( AstGrismMap * );
-static void SetGrismG( AstGrismMap *, double );
+static double GetGrismG( AstGrismMap *, int * );
+static int TestGrismG( AstGrismMap *, int * );
+static void ClearGrismG( AstGrismMap *, int * );
+static void SetGrismG( AstGrismMap *, double, int * );
 
-static int GetGrismM( AstGrismMap * );
-static int TestGrismM( AstGrismMap * );
-static void ClearGrismM( AstGrismMap * );
-static void SetGrismM( AstGrismMap *, int );
+static int GetGrismM( AstGrismMap *, int * );
+static int TestGrismM( AstGrismMap *, int * );
+static void ClearGrismM( AstGrismMap *, int * );
+static void SetGrismM( AstGrismMap *, int, int * );
 
-static double GetGrismEps( AstGrismMap * );
-static int TestGrismEps( AstGrismMap * );
-static void ClearGrismEps( AstGrismMap * );
-static void SetGrismEps( AstGrismMap *, double );
+static double GetGrismEps( AstGrismMap *, int * );
+static int TestGrismEps( AstGrismMap *, int * );
+static void ClearGrismEps( AstGrismMap *, int * );
+static void SetGrismEps( AstGrismMap *, double, int * );
 
-static double GetGrismTheta( AstGrismMap * );
-static int TestGrismTheta( AstGrismMap * );
-static void ClearGrismTheta( AstGrismMap * );
-static void SetGrismTheta( AstGrismMap *, double );
+static double GetGrismTheta( AstGrismMap *, int * );
+static int TestGrismTheta( AstGrismMap *, int * );
+static void ClearGrismTheta( AstGrismMap *, int * );
+static void SetGrismTheta( AstGrismMap *, double, int * );
 
 /* Member functions. */
 /* ================= */
 static AstMapping *CanMerge( AstMapping *map1, int inv1, AstMapping *map2, 
-                             int inv2 ){
+                             int inv2, int *status ){
 /*
 *
 *  Name:
@@ -377,7 +412,7 @@ static AstMapping *CanMerge( AstMapping *map1, int inv1, AstMapping *map2,
 *  Synopsis:
 *     #include "grismmap.h"
 *     AstMapping *CanMerge( AstMapping *map1, int inv1, AstMapping *map2, 
-*                           int inv2 )
+*                           int inv2, int *status )
 
 *  Class Membership:
 *     GrismMap internal utility function.
@@ -397,6 +432,8 @@ static AstMapping *CanMerge( AstMapping *map1, int inv1, AstMapping *map2,
 *        The invert flag to use with the first mapping.
 *     inv2
 *        The invert flag to use with the second mapping.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to the merged Mapping if the supplied Mappings can be merged, 
@@ -450,7 +487,7 @@ static AstMapping *CanMerge( AstMapping *map1, int inv1, AstMapping *map2,
 
 /* If so, check that the GrismMaps are applied in opposite senses. If so 
    we can cancel the two GrismMaps, so return a UnitMap. */
-            if( inv1 != inv2 ) ret = (AstMapping *) astUnitMap( 1, "" );
+            if( inv1 != inv2 ) ret = (AstMapping *) astUnitMap( 1, "", status );
          }
 
 /* If the first Mapping is a GrismMap but the second one is not... */
@@ -541,7 +578,7 @@ static AstMapping *CanMerge( AstMapping *map1, int inv1, AstMapping *map2,
    return ret;
 }
 
-static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     ClearAttrib
@@ -554,7 +591,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "grismmap.h"
-*     void ClearAttrib( AstObject *this, const char *attrib )
+*     void ClearAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     GrismMap member function (over-rides the astClearAttrib protected
@@ -571,6 +608,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -610,11 +649,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      (*parent_clearattrib)( this_object, attrib );
+      (*parent_clearattrib)( this_object, attrib, status );
    }
 }
 
-static int Equal( AstObject *this_object, AstObject *that_object ) {
+static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
 /*
 *  Name:
 *     Equal
@@ -627,7 +666,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 *  Synopsis:
 *     #include "grismmap.h"
-*     int Equal( AstObject *this, AstObject *that ) 
+*     int Equal( AstObject *this, AstObject *that, int *status ) 
 
 *  Class Membership:
 *     GrismMap member function (over-rides the astEqual protected
@@ -642,6 +681,8 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 *        Pointer to the first Object (a GrismMap).
 *     that
 *        Pointer to the second Object.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if the GrismMaps are equivalent, zero otherwise.
@@ -716,7 +757,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
    return result;
 }
 
-static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+static const char *GetAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     GetAttrib
@@ -729,7 +770,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "grismmap.h"
-*     const char *GetAttrib( AstObject *this, const char *attrib )
+*     const char *GetAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     GrismMap member function (over-rides the protected astGetAttrib
@@ -746,6 +787,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string containing the name of
 *        the attribute whose value is required. This name should be in
 *        lower case, with all white space removed.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     - Pointer to a null-terminated string containing the attribute
@@ -763,14 +806,12 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 *     reason.
 */
 
-/* Local Constants: */
-#define BUFF_LEN 50              /* Max. characters in result buffer */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstGrismMap *this;            /* Pointer to the GrismMap structure */
    const char *result;           /* Pointer value to return */
    double dval;                  /* Attribute value */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
    result = NULL;
@@ -778,84 +819,84 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Check the global error status. */   
    if ( !astOK ) return result;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this_object);
+
 /* Obtain a pointer to the GrismMap structure. */
    this = (AstGrismMap *) this_object;
 
 /* Compare "attrib" with each recognised attribute name in turn,
    obtaining the value of the required attribute. If necessary, write
-   the value into "buff" as a null-terminated string in an appropriate
+   the value into "getattrib_buff" as a null-terminated string in an appropriate
    format.  Set "result" to point at the result string. */
 
    if ( !strcmp( attrib, "grismnr" ) ) { 
       dval = astGetGrismNR( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
    } else if ( !strcmp( attrib, "grismnrp" ) ) { 
       dval = astGetGrismNRP( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
    } else if ( !strcmp( attrib, "grismwaver" ) ) { 
       dval = astGetGrismWaveR( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
    } else if ( !strcmp( attrib, "grismalpha" ) ) { 
       dval = astGetGrismAlpha( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
    } else if ( !strcmp( attrib, "grismg" ) ) { 
       dval = astGetGrismG( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
    } else if ( !strcmp( attrib, "grismm" ) ) { 
       dval = astGetGrismM( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
    } else if ( !strcmp( attrib, "grismeps" ) ) { 
       dval = astGetGrismEps( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
    } else if ( !strcmp( attrib, "grismtheta" ) ) { 
       dval = astGetGrismTheta( this );
       if ( astOK ) {
-         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
-         result = buff;
+         (void) sprintf( getattrib_buff, "%.*g", DBL_DIG, dval );
+         result = getattrib_buff;
       }
 
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_getattrib)( this_object, attrib );
+      result = (*parent_getattrib)( this_object, attrib, status );
    }
 
 /* Return the result. */
    return result;
-
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
 
-void astInitGrismMapVtab_(  AstGrismMapVtab *vtab, const char *name ) {
+void astInitGrismMapVtab_(  AstGrismMapVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -892,11 +933,15 @@ void astInitGrismMapVtab_(  AstGrismMapVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialize the component of the virtual function table used by the
    parent class. */
@@ -905,8 +950,8 @@ void astInitGrismMapVtab_(  AstGrismMapVtab *vtab, const char *name ) {
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAGrismMap) to determine if an object belongs
    to this class.  We can conveniently use the address of the (static)
-   class_init variable to generate this unique value. */
-   vtab->check = &class_init;
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -977,10 +1022,15 @@ void astInitGrismMapVtab_(  AstGrismMapVtab *vtab, const char *name ) {
 /* Declare the class dump, copy and delete functions.*/
    astSetDump( vtab, Dump, "GrismMap",
                "Map 1-d coordinates using a spectral disperser" );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
 }
 
 static int MapMerge( AstMapping *this, int where, int series, int *nmap,
-                     AstMapping ***map_list, int **invert_list ) {
+                     AstMapping ***map_list, int **invert_list, int *status ) {
 /*
 *  Name:
 *     MapMerge
@@ -994,7 +1044,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *  Synopsis:
 *     #include "grismmap.h"
 *     int MapMerge( AstMapping *this, int where, int series, int *nmap,
-*                   AstMapping ***map_list, int **invert_list )
+*                   AstMapping ***map_list, int **invert_list, int *status )
 
 *  Class Membership:
 *     GrismMap method (over-rides the protected astMapMerge method
@@ -1097,6 +1147,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 *        length, the "*invert_list" array will be extended (and its
 *        pointer updated) if necessary to accommodate any new
 *        elements.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     If simplification was possible, the function returns the index
@@ -1150,7 +1202,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          i2 = where;
          neighbour = ( *map_list )[ i1 ];
          merged_map = CanMerge( ( *map_list )[ i1 ], (* invert_list)[ i1 ],
-                                ( *map_list )[ i2 ], (* invert_list)[ i2 ] );
+                                ( *map_list )[ i2 ], (* invert_list)[ i2 ], status );
       }
 
 /* If the GrismMap can not be merged with its lower neighbour, check its
@@ -1160,7 +1212,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          i2 = where + 1;
          neighbour = ( *map_list )[ i2 ];
          merged_map = CanMerge( ( *map_list )[ i1 ], (* invert_list)[ i1 ],
-                                ( *map_list )[ i2 ], (* invert_list)[ i2 ] );
+                                ( *map_list )[ i2 ], (* invert_list)[ i2 ], status );
       }
 
 /* If either neighbour has passed these checks, replace the pair of
@@ -1200,7 +1252,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static void SetAttrib( AstObject *this_object, const char *setting ) {
+static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
 *     astSetAttrib
@@ -1289,11 +1341,11 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      (*parent_setattrib)( this_object, setting );
+      (*parent_setattrib)( this_object, setting, status );
    }
 }
 
-static int TestAttrib( AstObject *this_object, const char *attrib ) {
+static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
 /*
 *  Name:
 *     TestAttrib
@@ -1306,7 +1358,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 *  Synopsis:
 *     #include "grismmap.h"
-*     int TestAttrib( AstObject *this, const char *attrib )
+*     int TestAttrib( AstObject *this, const char *attrib, int *status )
 
 *  Class Membership:
 *     GrismMap member function (over-rides the astTestAttrib protected
@@ -1323,6 +1375,8 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 *        Pointer to a null-terminated string specifying the attribute
 *        name.  This should be in lower case with no surrounding white
 *        space.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     One if a value has been set, otherwise zero.
@@ -1373,7 +1427,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
-      result = (*parent_testattrib)( this_object, attrib );
+      result = (*parent_testattrib)( this_object, attrib, status );
    }
 
 /* Return the result, */
@@ -1381,7 +1435,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 }
 
 static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-                               int forward, AstPointSet *out ) {
+                               int forward, AstPointSet *out, int *status ) {
 /*
 *  Name:
 *     Transform
@@ -1395,7 +1449,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *  Synopsis:
 *     #include "grismmap.h"
 *     AstPointSet *Transform( AstMapping *this, AstPointSet *in,
-*                             int forward, AstPointSet *out )
+*                             int forward, AstPointSet *out, int *status )
 
 *  Class Membership:
 *     GrismMap member function (over-rides the astTransform protected
@@ -1420,6 +1474,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 *        (output) coordinate values. A NULL value may also be given,
 *        in which case a new PointSet will be created by this
 *        function.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     Pointer to the output (possibly new) PointSet.
@@ -1456,7 +1512,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    function validates all arguments and generates an output PointSet
    if necessary, but does not actually transform any coordinate
    values. */
-   result = (*parent_transform)( this, in, forward, out );
+   result = (*parent_transform)( this, in, forward, out, status );
 
 /* We will now extend the parent astTransform method by performing the
    calculations needed to generate the output coordinate values. */
@@ -1536,7 +1592,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 }
 
 
-static void UpdateConstants( AstGrismMap *this ){
+static void UpdateConstants( AstGrismMap *this, int *status ){
 /*
 *  Name:
 *     UpdateConstants
@@ -1549,7 +1605,7 @@ static void UpdateConstants( AstGrismMap *this ){
 
 *  Synopsis:
 *     #include "grismmap.h"
-*     void UpdateConstants( AstGrismMap *this )
+*     void UpdateConstants( AstGrismMap *this, int *status )
 
 *  Class Membership:
 *     GrismMap member function 
@@ -1563,6 +1619,8 @@ static void UpdateConstants( AstGrismMap *this ){
 *  Parameters:
 *     this
 *        Pointer to the GrismMap.
+*     status
+*        Pointer to the inherited status variable.
 
 */
 
@@ -1885,7 +1943,7 @@ astMAKE_TEST(GrismMap,GrismTheta,( this->theta != AST__BAD ))
 
 /* Dump function. */
 /* -------------- */
-static void Dump( AstObject *this_object, AstChannel *channel ) {
+static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /*
 *  Name:
 *     Dump
@@ -1897,7 +1955,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     Private function.
 
 *  Synopsis:
-*     void Dump( AstObject *this, AstChannel *channel )
+*     void Dump( AstObject *this, AstChannel *channel, int *status )
 
 *  Description:
 *     This function implements the Dump function which writes out data
@@ -1908,6 +1966,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *        Pointer to the GrismMap whose data are being written.
 *     channel
 *        Pointer to the Channel to which the data are being written.
+*     status
+*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */
@@ -1937,36 +1997,36 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    actual default attribute value.  Since "set" will be zero, these
    values are for information only and will not be read back. */
 
-   set = TestGrismNR( this );
-   dval = set ? GetGrismNR( this ) : astGetGrismNR( this );
+   set = TestGrismNR( this, status );
+   dval = set ? GetGrismNR( this, status ) : astGetGrismNR( this );
    astWriteDouble( channel, "GrmNR", set, 1, dval, "Refractive index at the ref. wavelength" );
 
-   set = TestGrismNRP( this );
-   dval = set ? GetGrismNRP( this ) : astGetGrismNRP( this );
+   set = TestGrismNRP( this, status );
+   dval = set ? GetGrismNRP( this, status ) : astGetGrismNRP( this );
    astWriteDouble( channel, "GrmNRP", set, 1, dval, "Rate of change of refractive index" );
 
-   set = TestGrismWaveR( this );
-   dval = set ? GetGrismWaveR( this ) : astGetGrismWaveR( this );
+   set = TestGrismWaveR( this, status );
+   dval = set ? GetGrismWaveR( this, status ) : astGetGrismWaveR( this );
    astWriteDouble( channel, "GrmWR", set, 1, dval, "Ref. wavelength" );
 
-   set = TestGrismAlpha( this );
-   dval = set ? GetGrismAlpha( this ) : astGetGrismAlpha( this );
+   set = TestGrismAlpha( this, status );
+   dval = set ? GetGrismAlpha( this, status ) : astGetGrismAlpha( this );
    astWriteDouble( channel, "GrmAlp", set, 1, dval, "Angle of incidence of incoming light" );
 
-   set = TestGrismG( this );
-   dval = set ? GetGrismG( this ) : astGetGrismG( this );
+   set = TestGrismG( this, status );
+   dval = set ? GetGrismG( this, status ) : astGetGrismG( this );
    astWriteDouble( channel, "GrmG", set, 1, dval, "Grating ruling density" );
 
-   set = TestGrismM( this );
-   dval = set ? GetGrismM( this ) : astGetGrismM( this );
+   set = TestGrismM( this, status );
+   dval = set ? GetGrismM( this, status ) : astGetGrismM( this );
    astWriteDouble( channel, "GrmM", set, 1, dval, "The interference order" );
 
-   set = TestGrismEps( this );
-   dval = set ? GetGrismEps( this ) : astGetGrismEps( this );
+   set = TestGrismEps( this, status );
+   dval = set ? GetGrismEps( this, status ) : astGetGrismEps( this );
    astWriteDouble( channel, "GrmEps", set, 1, dval, "Angle between grating normal and dispersion plane" );
 
-   set = TestGrismTheta( this );
-   dval = set ? GetGrismTheta( this ) : astGetGrismTheta( this );
+   set = TestGrismTheta( this, status );
+   dval = set ? GetGrismTheta( this, status ) : astGetGrismTheta( this );
    astWriteDouble( channel, "GrmTh", set, 1, dval, "Angle between detector normal and reference ray" );
 
 }
@@ -1976,10 +2036,10 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ========================= */
 /* Implement the astIsAGrismMap and astCheckGrismMap functions using the
    macros defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(GrismMap,Mapping,check,&class_init)
+astMAKE_ISA(GrismMap,Mapping,check,&class_check)
 astMAKE_CHECK(GrismMap)
 
-AstGrismMap *astGrismMap_( const char *options, ... ) {
+AstGrismMap *astGrismMap_( const char *options, int *status, ...) {
 /*
 *++
 *  Name:
@@ -2057,8 +2117,12 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstGrismMap *new;             /* Pointer to new GrismMap */
    va_list args;                 /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -2076,7 +2140,7 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Obtain the variable argument list and pass it along with the
    options string to the astVSet method to initialise the new
    GrismMap's attributes. */
-      va_start( args, options );
+      va_start( args, status );
       astVSet( new, options, NULL, args );
       va_end( args );
 
@@ -2101,7 +2165,7 @@ AstGrismMap *astGrismMapId_( const char *options, ... ) {
 
 *  Synopsis:
 *     #include "grismmap.h"
-*     AstGrismMap *astGrismMapId( const char *options, ... )
+*     AstGrismMap *astGrismMapId( const char *options, int *status, ... )
 
 *  Class Membership:
 *     GrismMap constructor.
@@ -2121,14 +2185,25 @@ AstGrismMap *astGrismMapId_( const char *options, ... ) {
 
 *  Parameters:
 *     As for astGrismMap_.
+*     status
+*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The ID value associated with the new GrismMap.
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    AstGrismMap *new;             /* Pointer to new GrismMap */
    va_list args;                 /* Variable argument list */
+
+   int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -2159,7 +2234,7 @@ AstGrismMap *astGrismMapId_( const char *options, ... ) {
 }
 
 AstGrismMap *astInitGrismMap_( void *mem, size_t size, int init,
-                               AstGrismMapVtab *vtab, const char *name ) {
+                               AstGrismMapVtab *vtab, const char *name, int *status ) {
 /*
 *+
 *  Name:
@@ -2255,7 +2330,7 @@ AstGrismMap *astInitGrismMap_( void *mem, size_t size, int init,
       new->theta = AST__BAD;
 
 /* Set up the other required derived constants. */
-      UpdateConstants( new );
+      UpdateConstants( new, status );
 
 /* If an error occurred, clean up by deleting the new GrismMap. */
       if ( !astOK ) new = astDelete( new );
@@ -2267,7 +2342,7 @@ AstGrismMap *astInitGrismMap_( void *mem, size_t size, int init,
 
 AstGrismMap *astLoadGrismMap_( void *mem, size_t size,
                            AstGrismMapVtab *vtab, const char *name,
-                           AstChannel *channel ) {
+                           AstChannel *channel, int *status ) {
 /*
 *+
 *  Name:
@@ -2342,6 +2417,7 @@ AstGrismMap *astLoadGrismMap_( void *mem, size_t size,
 */
 
 /* Local Constants: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
@@ -2349,6 +2425,9 @@ AstGrismMap *astLoadGrismMap_( void *mem, size_t size,
 
 /* Initialise. */
    new = NULL;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* Check the global error status. */
    if ( !astOK ) return new;
@@ -2387,31 +2466,31 @@ AstGrismMap *astLoadGrismMap_( void *mem, size_t size,
    initialise the appropriate instance variable(s) for this class. */
 
       new->nr = astReadDouble( channel, "grmnr", AST__BAD );
-      if ( TestGrismNR( new ) ) SetGrismNR( new, new->nr );
+      if ( TestGrismNR( new, status ) ) SetGrismNR( new, new->nr, status );
 
       new->nrp = astReadDouble( channel, "grmnrp", AST__BAD );
-      if ( TestGrismNRP( new ) ) SetGrismNRP( new, new->nrp );
+      if ( TestGrismNRP( new, status ) ) SetGrismNRP( new, new->nrp, status );
 
       new->waver = astReadDouble( channel, "grmwr", AST__BAD );
-      if ( TestGrismWaveR( new ) ) SetGrismWaveR( new, new->waver );
+      if ( TestGrismWaveR( new, status ) ) SetGrismWaveR( new, new->waver, status );
 
       new->alpha = astReadDouble( channel, "grmalp", AST__BAD );
-      if ( TestGrismAlpha( new ) ) SetGrismAlpha( new, new->alpha );
+      if ( TestGrismAlpha( new, status ) ) SetGrismAlpha( new, new->alpha, status );
 
       new->g = astReadDouble( channel, "grmg", AST__BAD );
-      if ( TestGrismG( new ) ) SetGrismG( new, new->g );
+      if ( TestGrismG( new, status ) ) SetGrismG( new, new->g, status );
 
       new->m = astReadInt( channel, "grmm", INT_MAX );
-      if ( TestGrismM( new ) ) SetGrismM( new, new->m );
+      if ( TestGrismM( new, status ) ) SetGrismM( new, new->m, status );
 
       new->eps = astReadDouble( channel, "grmeps", AST__BAD );
-      if ( TestGrismEps( new ) ) SetGrismEps( new, new->eps );
+      if ( TestGrismEps( new, status ) ) SetGrismEps( new, new->eps, status );
 
       new->theta = astReadDouble( channel, "grmth", AST__BAD );
-      if ( TestGrismTheta( new ) ) SetGrismTheta( new, new->theta );
+      if ( TestGrismTheta( new, status ) ) SetGrismTheta( new, new->theta, status );
 
 /* Set up the other required derived constants. */
-      UpdateConstants( new );
+      UpdateConstants( new, status );
    }
 
 /* If an error occurred, clean up by deleting the new GrismMap. */
@@ -2436,3 +2515,8 @@ AstGrismMap *astLoadGrismMap_( void *mem, size_t size,
    Note that the member function may not be the one defined here, as
    it may have been over-ridden by a derived class. However, it should
    still have the same interface. */
+
+
+
+
+

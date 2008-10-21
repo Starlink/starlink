@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V4.6) of the Starlink AST (astrometry) library is
+   A new release (V5.0) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,6 +15,10 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+
+-  AST is now thread-safe. Many of the macro definitions in the "ast.h"
+header file have changed, and so all source code that include "ast.h"
+should be re-compiled. 
 
 -  The TimeFrame class now support Local Time as a time scale. The offset
 from UTC to Local Time is specified by a new TimeFrame attribute called 
@@ -31,6 +35,14 @@ geodetic latitude of the observer).
 -  A bug has been fixed which caused the DUT1 attribute to be ignored
 by the SkyFrame class when finding conversions between AZEL and other
 celestial coordinate systems.
+
+-  The Channel class has a new attribute called Strict which controls
+whether or not to report an error if unexpected data items are found
+within an AST Object description read from an external data source. Note,
+the default behaviour is now not to report such errors. This differs from
+previous versions of AST which always reported an error is unexpected
+input items were encountered.
+
 
 
 Main Changes in Version 4.5

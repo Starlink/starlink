@@ -205,15 +205,33 @@ typedef struct AstPcdMapVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   double (*GetDisco)( AstPcdMap * );
-   int (* TestDisco)( AstPcdMap * );
-   void (* ClearDisco)( AstPcdMap * );
-   void (* SetDisco)( AstPcdMap *, double );
-   double (*GetPcdCen)( AstPcdMap *, int );
-   int (* TestPcdCen)( AstPcdMap *, int );
-   void (* ClearPcdCen)( AstPcdMap *, int );
-   void (* SetPcdCen)( AstPcdMap *, int, double );
+   double (*GetDisco)( AstPcdMap *, int * );
+   int (* TestDisco)( AstPcdMap *, int * );
+   void (* ClearDisco)( AstPcdMap *, int * );
+   void (* SetDisco)( AstPcdMap *, double, int * );
+   double (*GetPcdCen)( AstPcdMap *, int, int * );
+   int (* TestPcdCen)( AstPcdMap *, int, int * );
+   void (* ClearPcdCen)( AstPcdMap *, int, int * );
+   void (* SetPcdCen)( AstPcdMap *, int, double, int * );
 } AstPcdMapVtab;
+
+#if defined(THREAD_SAFE) 
+
+/* Define a structure holding all data items that are global within this
+   class. */
+typedef struct AstPcdMapGlobals {
+
+/* Define the thread-specific globals. */ 
+   char GetAttrib_Buff[ 101 ];
+   AstPcdMapVtab Class_Vtab;
+   int Class_Init;
+} AstPcdMapGlobals;
+
+/* Thread-safe initialiser for all global data used by this module. */
+void astInitPcdMapGlobals_( AstPcdMapGlobals * );
+
+#endif
+
 #endif
 
 /* Function prototypes. */
@@ -225,7 +243,7 @@ astPROTO_ISA(PcdMap)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstPcdMap *astPcdMap_( double, const double [2], const char *, ... );
+AstPcdMap *astPcdMap_( double, const double [2], const char *, int *, ...);
 #else
 AstPcdMap *astPcdMapId_( double, const double [2], const char *, ... );
 #endif
@@ -234,27 +252,33 @@ AstPcdMap *astPcdMapId_( double, const double [2], const char *, ... );
 
 /* Initialiser. */
 AstPcdMap *astInitPcdMap_( void *, size_t, int, AstPcdMapVtab *,
-                           const char *, double, const double [2] );
+                           const char *, double, const double [2], int * );
 
 /* Vtab initialiser. */
-void astInitPcdMapVtab_( AstPcdMapVtab *, const char * );
+void astInitPcdMapVtab_( AstPcdMapVtab *, const char *, int * );
 
 /* Loader. */
 AstPcdMap *astLoadPcdMap_( void *, size_t, AstPcdMapVtab *,
-                           const char *, AstChannel * );
+                           const char *, AstChannel *, int * );
+
+/* Thread-safe initialiser for all global data used by this module. */
+#if defined(THREAD_SAFE) 
+void astInitPcdMapGlobals_( AstPcdMapGlobals * );
+#endif
+
 #endif
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
-double astGetDisco_( AstPcdMap * );
-int astTestDisco_( AstPcdMap * );
-void astClearDisco_( AstPcdMap * );
-void astSetDisco_( AstPcdMap *, double );
-double astGetPcdCen_( AstPcdMap *, int );
-int astTestPcdCen_( AstPcdMap *, int );
-void astClearPcdCen_( AstPcdMap *, int );
-void astSetPcdCen_( AstPcdMap *, int, double );
+double astGetDisco_( AstPcdMap *, int * );
+int astTestDisco_( AstPcdMap *, int * );
+void astClearDisco_( AstPcdMap *, int * );
+void astSetDisco_( AstPcdMap *, double, int * );
+double astGetPcdCen_( AstPcdMap *, int, int * );
+int astTestPcdCen_( AstPcdMap *, int, int * );
+void astClearPcdCen_( AstPcdMap *, int, int * );
+void astSetPcdCen_( AstPcdMap *, int, double, int * );
 #endif
 
 /* Function interfaces. */
@@ -287,13 +311,13 @@ void astSetPcdCen_( AstPcdMap *, int, double );
 
 /* Initialiser. */
 #define astInitPcdMap(mem,size,init,vtab,name,disco,pcdcen) \
-astINVOKE(O,astInitPcdMap_(mem,size,init,vtab,name,disco,pcdcen))
+astINVOKE(O,astInitPcdMap_(mem,size,init,vtab,name,disco,pcdcen,STATUS_PTR))
 
 /* Vtab Initialiser. */
-#define astInitPcdMapVtab(vtab,name) astINVOKE(V,astInitPcdMapVtab_(vtab,name))
+#define astInitPcdMapVtab(vtab,name) astINVOKE(V,astInitPcdMapVtab_(vtab,name,STATUS_PTR))
 /* Loader. */
 #define astLoadPcdMap(mem,size,vtab,name,channel) \
-astINVOKE(O,astLoadPcdMap_(mem,size,vtab,name,astCheckChannel(channel)))
+astINVOKE(O,astLoadPcdMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #endif
 
 /* Interfaces to public member functions. */
@@ -303,20 +327,24 @@ astINVOKE(O,astLoadPcdMap_(mem,size,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 
 #if defined(astCLASS)            /* Protected */
-#define astClearDisco(this) astINVOKE(V,astClearDisco_(astCheckPcdMap(this)))
-#define astGetDisco(this) astINVOKE(V,astGetDisco_(astCheckPcdMap(this)))
+#define astClearDisco(this) astINVOKE(V,astClearDisco_(astCheckPcdMap(this),STATUS_PTR))
+#define astGetDisco(this) astINVOKE(V,astGetDisco_(astCheckPcdMap(this),STATUS_PTR))
 #define astSetDisco(this,value) \
-astINVOKE(V,astSetDisco_(astCheckPcdMap(this),value))
-#define astTestDisco(this) astINVOKE(V,astTestDisco_(astCheckPcdMap(this)))
+astINVOKE(V,astSetDisco_(astCheckPcdMap(this),value,STATUS_PTR))
+#define astTestDisco(this) astINVOKE(V,astTestDisco_(astCheckPcdMap(this),STATUS_PTR))
 
 #define astClearPcdCen(this,axis) \
-astINVOKE(V,astClearPcdCen_(astCheckPcdMap(this),axis))
+astINVOKE(V,astClearPcdCen_(astCheckPcdMap(this),axis,STATUS_PTR))
 #define astGetPcdCen(this,axis) \
-astINVOKE(V,astGetPcdCen_(astCheckPcdMap(this),axis))
+astINVOKE(V,astGetPcdCen_(astCheckPcdMap(this),axis,STATUS_PTR))
 #define astSetPcdCen(this,axis,value) \
-astINVOKE(V,astSetPcdCen_(astCheckPcdMap(this),axis,value))
+astINVOKE(V,astSetPcdCen_(astCheckPcdMap(this),axis,value,STATUS_PTR))
 #define astTestPcdCen(this,axis) \
-astINVOKE(V,astTestPcdCen_(astCheckPcdMap(this),axis))
+astINVOKE(V,astTestPcdCen_(astCheckPcdMap(this),axis,STATUS_PTR))
 
 #endif
 #endif
+
+
+
+

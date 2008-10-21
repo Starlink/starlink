@@ -10,10 +10,61 @@
 *     for handling error conditions in the AST library.  For a
 *     description of the module and its interface, see the .h file of
 *     the same name.
+*
+*     Since its initial release, AST has used a global status variable
+*     rather than adding an explicit status parameter to the argument
+*     list of each AST function. This caused problems for the thread-safe
+*     version of AST since each thread needs its own status value. Whilst
+*     it would have been possible for each function to access a global 
+*     status value via the pthreads "thread speific data key" mechanism, 
+*     the huge number of status checks performed within AST caused this
+*     option to be slow. Instead AST has been modified so that every
+*     function has an explicit status pointer parameter. This though
+*     causes problems in that we cannot change the public interface to
+*     AST because doing so would break large amounts of external software. 
+*     To get round this, the macros that define the public interface to
+*     AST have been modified so that they provide a status pointer
+*     automatically to the function that is being invoked. This is how
+*     the system works...
+*
+*     All AST functions have an integer inherited status pointer parameter
+*     called "status". This parameter is "hidden" in AST functions that
+*     are invoked via macros (typically public and protected functions).
+*     This means that whilst "int *status" appears explicitly at the end
+*     of the function argument list (in both prototype and definition), it
+*     is not included in the prologue documentation, and is not included
+*     explicitly in the argument list when invoking the function. Instead,
+*     the macro that is used to invoke the function adds in the required
+*     status parameter to the function invocation.
+*
+*     Macros which are invoked within AST (the protected interface) expand 
+*     to include ", status" at the end of the function parameter list. For
+*     backward compatability with previous versions of AST, macros which 
+*     are invoked from outside AST (the public interface) expand to include 
+*     ", astGetStatusPtr" at the end of the function parameter list. The 
+*     astGetStatusPtr function returns a pointer to the interbal AST
+*     status variable or to the external variable specified via astWatch.
+*
+*     Parameter lists for functions that have variable argument lists 
+*     (such as astError) cannot be handled in this way, since macros cannot 
+*     have variable numbers of arguments. Instead, separate public and
+*     protected implementations of such functions are provided within AST.
+*     Protected implementations include an explicit, documented status
+*     pointer parameter that must be given explicitly when invoking the 
+*     function. Public implementations do not have a status pointer 
+*     parameter. Instead they obtain the status pointer internally using
+*     astGetStatusPtr.
+*
+*     Private functions are called directly rather than via macros, and so
+*     they have a documented status pointer parameter that should be
+*     included explicitly in the parameter list when invoking the
+*     function.
 
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -66,15 +117,13 @@
 *        Improve efficiency by replacing the astOK_ function with a macro
 *        which tests the value of status variable. The pointer which points 
 *        to the AST status variable are now global rather than static. 
+*     19-SEP-2008 (DSB):
+*        Big changes for the thread-safe version of AST.
 */
 
 /* Define the astCLASS macro (even although this is not a class
    implementation) to obtain access to protected interfaces. */
 #define astCLASS
-
-/* Max number of messages which can be deferred when reporting is
-   switched off. */
-#define MSTACK_SIZE 100
 
 /* Include files. */
 /* ============== */
@@ -82,6 +131,7 @@
 /* ---------------------- */
 #include "err.h"                 /* Interface to the err module */
 #include "error.h"               /* Interface to this module */
+#include "globals.h"             /* Thread-safe global data access */
 
 /* C header files. */
 /* --------------- */
@@ -90,8 +140,67 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* Configuration results. */
+/* ---------------------- */
+#include <config.h>
+
+/* Select the appropriate memory management functions. These will be the
+   system's malloc, free and realloc unless AST was configured with the
+   "--with-starmem" option, in which case they will be the starmem
+   malloc, free and realloc. */
+#ifdef HAVE_STAR_MEM_H
+#  include <star/mem.h>
+#  define MALLOC starMalloc
+#  define FREE starFree
+#  define REALLOC starRealloc
+#else
+#  define MALLOC malloc
+#  define FREE free
+#  define REALLOC realloc
+#endif
+
 /* Module Variables. */
 /* ================= */
+
+/* Define macros for accessing all items of thread-safe global data 
+   used by this module. */
+#ifdef THREAD_SAFE
+
+#define reporting astGLOBAL(Error,Reporting)
+#define current_file astGLOBAL(Error,Current_File)
+#define current_routine astGLOBAL(Error,Current_Routine)
+#define current_line astGLOBAL(Error,Current_Line)
+#define foreign_set astGLOBAL(Error,Foreign_Set)
+#define message_stack astGLOBAL(Error,Message_Stack)
+#define mstack_size astGLOBAL(Error,Mstack_Size)
+
+/* Since the external astPutErr function may not be thread safe, we need 
+   to ensure that it cannot be invoked simultaneously from two different
+   threads. So we lock a mutex before each call to astPutErr. */
+static pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
+
+#define INVOKE_ASTPUTERR( status, buff ) \
+   ( pthread_mutex_lock( &mutex1 ), \
+     astPutErr( (status), (buff) ), \
+     (void) pthread_mutex_unlock( &mutex1 ) )
+
+/* Define the initial values for the global data for this module. */
+#define GLOBAL_inits \
+   globals->Reporting = 1; \
+   globals->Current_File = NULL;  \
+   globals->Current_Routine = NULL;  \
+   globals->Current_Line = 0; \
+   globals->Foreign_Set = 0; \
+   globals->Mstack_Size = 0; \
+
+/* Create the global initialisation function. */
+astMAKE_INITGLOBALS(Error)
+
+
+/* If thread safety is not needed, declare globals at static variables. */ 
+/* -------------------------------------------------------------------- */ 
+#else
+
 /* Status variable. */
 static int internal_status = 0;  /* Internal error status */
 int *starlink_ast_status_ptr = &internal_status; /* Pointer to status variable */
@@ -106,18 +215,25 @@ static int current_line = 0;     /* Current line number */
 static int foreign_set = 0;      /* Have foreign values been set? */
 
 /* Un-reported message stack */
-static char *message_stack[ MSTACK_SIZE ];
+static char *message_stack[ AST__ERROR_MSTACK_SIZE ];
 static int mstack_size = 0;
+
+/* If thread-safety is not needed, we can invoke the external astPutErr 
+   function directly. */
+#define INVOKE_ASTPUTERR( status, buff ) \
+   astPutErr( (status), (buff) ); 
+
+#endif
 
 
 /* Function prototypes. */
 /* ==================== */
-void EmptyStack( int );
-
+static void EmptyStack( int, int * );
 
 /* Function implementations. */
 /* ========================= */
-void astAt_( const char *routine, const char *file, int line, int forn) {
+void astAt_( const char *routine, const char *file, int line, int forn,
+             int *status) {
 /*
 *+
 *  Name:
@@ -167,8 +283,14 @@ void astAt_( const char *routine, const char *file, int line, int forn) {
 *-
 */
 
+/* Local Variables: */
+   astDECLARE_GLOBALS;            /* Pointer to thread-specific global data */
+
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* If needed, get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* If the values refer to a foreign interface, or if no foreign values
    have yet been set, store the supplied values. */
@@ -183,7 +305,7 @@ void astAt_( const char *routine, const char *file, int line, int forn) {
    foreign_set = forn;
 }
 
-void astClearStatus_( void ) {
+void astClearStatus_( int *status ) {
 /*
 c++
 *  Name:
@@ -213,13 +335,65 @@ c--
 
 /* Empty the deferred error stack without displaying the messages on the
    stack. */
-   EmptyStack( 0 );
+   EmptyStack( 0, status );
 
 /* Reset the error status value. */
-   astSetStatus( 0 );
+   *status = 0;
 }
 
-void astError_( int status, const char *fmt, ... ) {
+static void EmptyStack( int display, int *status ) {
+/*
+*  Name:
+*     EmptyStack
+
+*  Purpose:
+*     Empty the stack of deferred error messages, optionally displaying
+*     them.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "error.h"
+*     void EmptyStack( int display, int *status ) 
+
+*  Description:
+*     This function removes all messages from the stack of deferred error
+*     messages. If "display" is non-zero it reports them using astPutErr
+*     before deleting them.
+
+*  Parameters:
+*     display
+*        Report messages before deleting them?
+*     status
+*        Pointer to the integer holding the inherited status value.
+
+*/
+
+/* Local variables; */
+   astDECLARE_GLOBALS;        /* Pointer to thread-specific global data */
+   int i;
+
+/* If needed, get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
+/* Loop round all messages on the stack. */
+   for( i = 0; i < mstack_size; i++ ) {
+
+/* Display the message if required. */
+      if( display ) INVOKE_ASTPUTERR( astStatus, message_stack[ i ] );
+
+/* Free the memory used to hold the message. */
+      FREE( message_stack[ i ] );
+      message_stack[ i ] = NULL;
+   }
+
+/* Reset the stack size to zero. */
+   mstack_size = 0;
+
+}
+
+void astErrorPublic_( int status_value, const char *fmt, ... ) {
 /*
 *+
 *  Name:
@@ -233,15 +407,15 @@ void astError_( int status, const char *fmt, ... ) {
 
 *  Synopsis:
 *     #include "error.h"
-*     void astError( int status, const char *fmt, ... )
+*     void astError( int status_value, const char *fmt, ... )
 
 *  Description:
 *     This function sets the AST error status to a specified value and
 *     reports an associated error message.
 
 *  Parameters:
-*     status
-*        The error status value to be set.
+*     status_value
+*        The new error status value to be set.
 *     fmt
 *        Pointer to a null-terminated character string containing the
 *        format specification for the error message, in the same way
@@ -262,19 +436,40 @@ void astError_( int status, const char *fmt, ... ) {
 *     external C interface so that it may be used when writing (e.g.)
 *     foreign language or graphics interfaces.
 *-
+
+*  This is the public implementation of astError. It does not have an
+   status pointer parameter, but instead obtains the status pointer
+   explicitly using the astGetStatusPtr function.  This is different to
+   other public functions, which typically have a status pointer parameter
+   that is supplied via a call to astGetStatusPtr within the associated 
+   interface macro. The benefit of doing it the usual way is that the
+   public and protected implementations are the same, with the
+   differences between public and protecte dinterfaces wrapped up in the
+   associated interface macro. We cannot do this with this function
+   because of the variale argument list. The prologue for the astError_ 
+   function defines the interface for use internally within AST. 
+
 */
 
 /* Local Constants: */
 #define BUFF_LEN 1023            /* Max. length of an error message */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
    char buff[ BUFF_LEN + 1 ];    /* Message buffer */
+   int *status;                  /* Pointer to inherited status value */
    int imess;                    /* Index into deferred message stack */
    int nc;                       /* Number of characters written */
    va_list args;                 /* Variable argument list pointer */
 
 /* Initialise the variable argument list pointer. */
    va_start( args, fmt );
+
+/* If needed, get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);   
+
+/* Get a pointer to the integer holding the inherited status value. */
+   status = astGetStatusPtr;
 
 /* If this is the first report of an error (the global status has not
    previously been set) and error context information is available,
@@ -296,17 +491,17 @@ void astError_( int status, const char *fmt, ... ) {
 /* Deliver the error message unless reporting has been switched off using
    astReporting. In which case store them in a static array. */
       if( reporting ) {
-         astPutErr( status, buff );
-      } else if( mstack_size < MSTACK_SIZE ){
+         INVOKE_ASTPUTERR( status_value, buff );
+      } else if( mstack_size < AST__ERROR_MSTACK_SIZE ){
          imess = mstack_size++;
-         message_stack[ imess ] = malloc( strlen( buff ) + 1 );
+         message_stack[ imess ] = MALLOC( strlen( buff ) + 1 );
          if( message_stack[ imess ] ) {
             strcpy( message_stack[ imess ], buff );                 
          }
       }
 
 /* Set the global status. */
-      astSetStatus( status );
+      astSetStatus( status_value );
    }
 
 /* Write the error message supplied to the formatting buffer. */
@@ -318,20 +513,193 @@ void astError_( int status, const char *fmt, ... ) {
 /* Deliver the error message unless reporting has been switched off using
    astReporting. */
    if( reporting ) {
-      astPutErr( status, buff );
-   } else if( mstack_size < MSTACK_SIZE ){
+      INVOKE_ASTPUTERR( status_value, buff );
+   } else if( mstack_size < AST__ERROR_MSTACK_SIZE ){
       imess = mstack_size++;
-      message_stack[ imess ] = malloc( strlen( buff ) + 1 );
+      message_stack[ imess ] = MALLOC( strlen( buff ) + 1 );
       if( message_stack[ imess ] ) {
          strcpy( message_stack[ imess ], buff );                 
       }
    }
 
 /* Set the error status value. */
-   astSetStatus( status );
+   astSetStatus( status_value );
 
 /* Undefine macros local to this function. */
 #undef BUFF_LEN
+}
+
+void astError_( int status_value, const char *fmt, int *status, ... ) {
+/*
+*+
+*  Name:
+*     astError
+
+*  Purpose:
+*     Set the AST error status and report an error message.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "error.h"
+*     void astError( int status_value, const char *fmt, int *status, ... )
+
+*  Description:
+*     This function sets the AST error status to a specified value and
+*     reports an associated error message.
+
+*  Parameters:
+*     status_value
+*        The error status value to be set.
+*     fmt
+*        Pointer to a null-terminated character string containing the
+*        format specification for the error message, in the same way
+*        as for a call to the C "printf" family of functions.
+*     status
+*        Pointer to the integer holding the inherited status value.
+*     ...
+*        Additional optional arguments (as used by e.g. "printf")
+*        which specify values which are to appear in the error
+*        message.
+
+*  Notes:
+*     This function operates just like "printf", except that:
+*     - The first argument is an error status.
+*     - The return value is void.
+*     - A newline is automatically appended to the error message
+*     (there is no need to add one).
+*     - This function is documented as protected because it should not
+*     be invoked by external code. However, it is available via the
+*     external C interface so that it may be used when writing (e.g.)
+*     foreign language or graphics interfaces.
+*-
+
+*  This is the protected implementation of astError. It has a status
+   pointer parameter that is not present in the public form. Different
+   implementations for protected and public interfaces are required
+   because of the variable argument list. 
+
+*/
+
+/* Local Constants: */
+#define BUFF_LEN 1023            /* Max. length of an error message */
+
+/* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   char buff[ BUFF_LEN + 1 ];    /* Message buffer */
+   int imess;                    /* Index into deferred message stack */
+   int nc;                       /* Number of characters written */
+   va_list args;                 /* Variable argument list pointer */
+
+/* Initialise the variable argument list pointer. */
+   va_start( args, status );
+
+/* If needed, get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);   
+
+/* If this is the first report of an error (the global status has not
+   previously been set) and error context information is available,
+   then construct an error context message. */
+   if ( astOK &&
+        ( current_routine || current_file || current_line ) ) {
+      nc = sprintf( buff, "AST: Error" );
+      if ( current_routine ) {
+         nc += sprintf( buff + nc, " in routine %s", current_routine );
+      }
+      if ( current_line ) {
+         nc += sprintf( buff + nc, " at line %d", current_line );
+      }
+      if ( current_file ) {
+         nc += sprintf( buff + nc, " in file %s", current_file );
+      }
+      nc += sprintf( buff + nc, "." );
+
+/* Deliver the error message unless reporting has been switched off using
+   astReporting. In which case store them in a static array. */
+      if( reporting ) {
+         INVOKE_ASTPUTERR( status_value, buff );
+      } else if( mstack_size < AST__ERROR_MSTACK_SIZE ){
+         imess = mstack_size++;
+         message_stack[ imess ] = MALLOC( strlen( buff ) + 1 );
+         if( message_stack[ imess ] ) {
+            strcpy( message_stack[ imess ], buff );                 
+         }
+      }
+
+/* Set the global status. */
+      astSetStatus( status_value );
+   }
+
+/* Write the error message supplied to the formatting buffer. */
+   nc = vsprintf( buff, fmt, args );
+
+/* Tidy up the argument pointer. */
+   va_end( args );
+
+/* Deliver the error message unless reporting has been switched off using
+   astReporting. */
+   if( reporting ) {
+      INVOKE_ASTPUTERR( status_value, buff );
+   } else if( mstack_size < AST__ERROR_MSTACK_SIZE ){
+      imess = mstack_size++;
+      message_stack[ imess ] = MALLOC( strlen( buff ) + 1 );
+      if( message_stack[ imess ] ) {
+         strcpy( message_stack[ imess ], buff );                 
+      }
+   }
+
+/* Set the error status value. */
+   astSetStatus( status_value );
+
+/* Undefine macros local to this function. */
+#undef BUFF_LEN
+}
+
+int *astGetStatusPtr_(){ 
+/*
+*+
+*  Name:
+*     astGetStatusPtr
+
+*  Purpose:
+*     Return a pointer to the integer holding the inherited status value.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "error.h"
+*     int *astGetStatusPtr;
+
+*  Description:
+*     This macro returns a pointer to the integer holding the inherited
+*     status pointer. This will either be an internal global integer 
+*     (possibly stored as thread specific data), or an ineger specified
+*     via the astWatch function.
+
+*  Returned Value:
+*      A pointer to the integer holding the inherited status value.
+
+*-
+*/
+
+/* The thread-safe version of AST stores the status pointer in thread
+   specific data, using the key stored in the global variable
+   "starlink_ast_status_key". */
+#if defined(THREAD_SAFE)
+   astDECLARE_GLOBALS;        
+   AstStatusBlock *sb;
+
+   astGET_GLOBALS(NULL);
+   sb = (AstStatusBlock *) pthread_getspecific(starlink_ast_status_key);
+   return sb->status_ptr;
+
+/* The non thread-safe version of AST stores the status pointer in the
+   global variable "starlink_ast_status_ptr". */
+#else
+   return starlink_ast_status_ptr;
+#endif
 }
 
 /*
@@ -369,7 +737,7 @@ c--
 */
 
 
-int astReporting_( int report ) {
+int astReporting_( int report, int *status ) {
 /*
 c+
 *  Name:
@@ -408,14 +776,26 @@ c+
 *     - The Reporting flag is initially set to 1.
 c-
 */
-   int oldval;
+
+/* Local Variables: */
+   astDECLARE_GLOBALS;        /* Pointer to thread-specific global data */
+   int oldval;                /* Original "reporting" value */
+
+/* If needed, get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
+/* Save the original reporting value, and then store the new value. */
    oldval = reporting;
    reporting = report;
-   if( reporting ) EmptyStack( 1 );
+
+/* If we are now reporting errors, flush any messages on the error stack.
+   This causes the messages to be displayed and the stack emptied. */
+   if( reporting ) EmptyStack( 1, status );
+
+/* Return the original reporting value. */
    return oldval;
 }
 
-void astSetStatus_( int status ) {
 /*
 c++
 *  Name:
@@ -429,7 +809,7 @@ c++
 
 *  Synopsis:
 *     #include "error.h"
-*     void astSetStatus( int status )
+*     void astSetStatus( int status_value )
 
 *  Description:
 *     This function sets the AST error status to the value supplied.
@@ -444,7 +824,7 @@ c++
 *     terminating the current read or write operation.
 
 *  Parameters:
-*     status
+*     status_value
 *        The new error status value to be set.
 
 *  Notes:
@@ -455,11 +835,6 @@ c++
 c--
 */
 
-/* Set the error status value. */
-   *starlink_ast_status_ptr = status;
-}
-
-int astStatus_( void ) {
 /*
 c++
 *  Name:
@@ -469,14 +844,14 @@ c++
 *     Obtain the current AST error status value.
 
 *  Type:
-*     Public macro.
+*     Public function.
 
 *  Synopsis:
 *     #include "error.h"
 *     int astStatus
 
 *  Description:
-*     This macro returns the current value of the AST error status.
+*     This function returns the current value of the AST error status.
 
 *  Returned Value:
 *     astStatus
@@ -490,11 +865,7 @@ c++
 c--
 */
 
-/* Return the error status value. */
-   return *starlink_ast_status_ptr;
-}
-
-int *astWatch_( int *status_address ) {
+int *astWatch_( int *status_ptr ) {
 /*
 c++
 *  Name:
@@ -508,7 +879,7 @@ c++
 
 *  Synopsis:
 *     #include "error.h"
-*     int *astWatch( int *status_address )
+*     int *astWatch( int *status_ptr )
 
 *  Description:
 *     This function allows a new error status variable to be accessed
@@ -527,10 +898,10 @@ c++
 *     and astClearStatus).
 
 *  Parameters:
-*     status_address
-*        Address of an int whose value is to be used subsequently as
-*        the AST error status. If a NULL pointer is supplied, the AST
-*        library will revert to using its own internal error status.
+*     status_ptr
+*        Pointer to an int whose value is to be used subsequently as
+*        the AST inherited status value. If a NULL pointer is supplied, 
+*        the AST library will revert to using its own internal error status.
 
 *  Returned Value:
 *     astWatch()
@@ -547,62 +918,24 @@ c--
 */
 
 /* Local Variables: */
-   int *result;                  /* Value to be returned */
+   int *result;               /* Value to be returned */
+   astDECLARE_GLOBALS;        /* Pointer to thread-specific global data */
 
-/* Save the old status variable address. */
+/* Ensure that the thread-specific status block has been created and
+   ininitialised. */
+   astGET_GLOBALS(NULL);
+
+#if defined(THREAD_SAFE)
+   AstStatusBlock *sb = (AstStatusBlock *) pthread_getspecific( starlink_ast_status_key );
+   result = sb->status_ptr;
+   sb->status_ptr = status_ptr ? status_ptr : &(sb->internal_status);
+#else
    result = starlink_ast_status_ptr;
-
-/* Replace it with the new one. */
-   starlink_ast_status_ptr = status_address ? status_address : &internal_status;
+   starlink_ast_status_ptr = status_ptr ? status_ptr : &internal_status;
+#endif
 
 /* Return the old address. */
    return result;
-}
-
-void EmptyStack( int display ) {
-/*
-*  Name:
-*     EmptyStack
-
-*  Purpose:
-*     Empty the stack of deferred error messages, optionally displaying
-*     them.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "error.h"
-*     void EmptyStack( int display ) 
-
-*  Description:
-*     This function removes all messages from the stack of deferred error
-*     messages. If "display" is non-zero it reports them using astPutErr
-*     before deleting them.
-
-*  Parameters:
-*     display
-*        Report messages before deleting them?
-
-*/
-
-/* Local variables; */
-   int i;
-
-/* Loop round all messages on the stack. */
-   for( i = 0; i < mstack_size; i++ ) {
-
-/* Display the message if required. */
-      if( display ) astPutErr( astStatus, message_stack[ i ] );
-
-/* Free the memory used to hold the message. */
-      free( message_stack[ i ] );
-      message_stack[ i ] = NULL;
-   }
-
-/* Reset the stack size to zero. */
-   mstack_size = 0;
-
 }
 
 

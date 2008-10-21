@@ -61,10 +61,10 @@
 /* ==================== */
 #if defined(astCLASS)            /* Protected  */
 AstMapping *astUnitMapper_( const char *, const char *, const char *,
-                            char ** );
-const char *astUnitLabel_( const char * );
-double astUnitAnalyser_( const char *, double[9] );
-const char *astUnitNormaliser_( const char * );
+                            char **, int * );
+const char *astUnitLabel_( const char *, int * );
+double astUnitAnalyser_( const char *, double[9], int * );
+const char *astUnitNormaliser_( const char *, int * );
 #endif
 
 /* Function interfaces. */
@@ -72,9 +72,12 @@ const char *astUnitNormaliser_( const char * );
 /* These wrap up the functions defined by this module. */
 
 #if defined(astCLASS)            /* Protected */
-#define astUnitMapper(in,out,inlab,outlab) astINVOKE(O,astUnitMapper_(in,out,inlab,outlab))
-#define astUnitAnalyser(in,powers) astUnitAnalyser_(in,powers) 
-#define astUnitNormaliser(in) astUnitNormaliser_(in) 
-#define astUnitLabel(sym) astINVOKE(O,astUnitLabel_(sym))
+#define astUnitMapper(in,out,inlab,outlab) astINVOKE(O,astUnitMapper_(in,out,inlab,outlab,STATUS_PTR))
+#define astUnitAnalyser(in,powers) astUnitAnalyser_(in,powers,STATUS_PTR) 
+#define astUnitNormaliser(in) astUnitNormaliser_(in,STATUS_PTR) 
+#define astUnitLabel(sym) astINVOKE(O,astUnitLabel_(sym,STATUS_PTR))
 #endif
 #endif
+
+
+
