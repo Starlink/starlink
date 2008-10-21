@@ -389,7 +389,7 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
 
             /* Free the old TSWCS if it exists, and insert the new TSWCS */
             if( retdata->hdr->tswcs ) {
-              retdata->hdr->tswcs = astFree(retdata->hdr->tswcs);
+              retdata->hdr->tswcs = astAnnul(retdata->hdr->tswcs);
             }
             retdata->hdr->tswcs = tswcs;
           }
