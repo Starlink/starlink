@@ -354,7 +354,8 @@
 #define STATUS_PTR astGetStatusPtr
 #endif
 
-#define AST__THREADSAFE yes
+/* Set to "yes" or "no" to indicate if AST was build with threads support. */
+#define AST__THREADSAFE @THREADS@
 
 #if defined(astCLASS )
 #define AST__GETATTRIB_BUFF_LEN 50 /* Length of string returned by GetAttrib. */
@@ -580,7 +581,7 @@ astINVOKE(V,astIsA##class##_((const Ast##class *)astEnsurePointer_(this),astGetS
 /* Declare the function (see the object.c file for a prologue). */ \
 Ast##class *astCheck##class##_( Ast##class *this, int *status ) { \
 \
-/* Check the global error status. */ \
+/* Check the inherited error status. */ \
    if ( !astOK ) return this; \
 \
 /* Check if the object is a class member. */ \
@@ -609,7 +610,7 @@ Ast##class *astCheck##class##_( Ast##class *this, int *status ) { \
 \
    char buf[100]; \
 \
-/* Check the global error status. */ \
+/* Check the inherited error status. */ \
    if ( !astOK ) return this; \
 \
 /* Check if the object is a class member. */ \
@@ -701,7 +702,7 @@ Ast##class *astCheck##class##_( Ast##class *this, int *status ) { \
 /* ------------------------ */ \
 static void Clear##attribute( Ast##class *this, int *status ) { \
 \
-/* Check the global error status. */ \
+/* Check the inherited error status. */ \
    if ( !astOK ) return; \
 \
 /* Assign the "clear" value. */ \
@@ -712,7 +713,7 @@ static void Clear##attribute( Ast##class *this, int *status ) { \
 /* ------------------- */ \
 void astClear##attribute##_( Ast##class *this, int *status ) { \
 \
-/* Check the global error status. */ \
+/* Check the inherited error status. */ \
    if ( !astOK ) return; \
 \
 /* Invoke the required method via the virtual function table. */ \
@@ -761,7 +762,7 @@ void astClear##attribute##_( Ast##class *this, int *status ) { \
 *     type
 *        The C type of the attribute.
 *     bad_value
-*        A constant value to return if the global error status is set, or if
+*        A constant value to return if the inherited error status is set, or if
 *        the function fails.
 *     assign
 *        An expression that evaluates to the value to be returned.
@@ -787,7 +788,7 @@ void astClear##attribute##_( Ast##class *this, int *status ) { \
 static type Get##attribute( Ast##class *this, int *status ) { \
    type result;                  /* Result to be returned */ \
 \
-/* Check the global error status. */ \
+/* Check the inherited error status. */ \
    if ( !astOK ) return (bad_value); \
 \
 /* Assign the result value. */ \
@@ -803,7 +804,7 @@ static type Get##attribute( Ast##class *this, int *status ) { \
 /* ------------------- */  \
 type astGet##attribute##_( Ast##class *this, int *status ) { \
 \
-/* Check the global error status. */ \
+/* Check the inherited error status. */ \
    if ( !astOK ) return (bad_value); \
 \
 /* Invoke the required method via the virtual function table. */ \
@@ -957,7 +958,7 @@ int astIsA##class##_( const Ast##class *this, int *status ) { \
 /* ------------------------ */ \
 static void Set##attribute( Ast##class *this, type value, int *status ) { \
 \
-/* Check the global error status. */ \
+/* Check the inherited error status. */ \
    if ( !astOK ) return; \
 \
 /* Store the new value in the structure component. */ \
@@ -968,7 +969,7 @@ static void Set##attribute( Ast##class *this, type value, int *status ) { \
 /* ------------------- */ \
 void astSet##attribute##_( Ast##class *this, type value, int *status ) { \
 \
-/* Check the global error status. */ \
+/* Check the inherited error status. */ \
    if ( !astOK ) return; \
 \
 /* Invoke the required method via the virtual function table. */ \
@@ -1038,7 +1039,7 @@ void astSet##attribute##_( Ast##class *this, type value, int *status ) { \
 static int Test##attribute( Ast##class *this, int *status ) { \
    int result;                   /* Value to return */ \
 \
-/* Check the global error status. */ \
+/* Check the inherited error status. */ \
    if ( !astOK ) return 0; \
 \
 /* Assign the result value. */ \
@@ -1054,7 +1055,7 @@ static int Test##attribute( Ast##class *this, int *status ) { \
 /* ------------------- */ \
 int astTest##attribute##_( Ast##class *this, int *status ) { \
 \
-/* Check the global error status. */ \
+/* Check the inherited error status. */ \
    if ( !astOK ) return 0; \
 \
 /* Invoke the required method via the virtual function table. */ \
@@ -1281,7 +1282,6 @@ typedef struct AstObjectVtab {
 
 #if defined(THREAD_SAFE)
    int (* ManageLock)( AstObject *, int, int, int * );
-   pthread_mutex_t mutex;        /* Mutex for this Vtab */
 #endif
 
 } AstObjectVtab;
@@ -1293,6 +1293,8 @@ typedef struct AstObjectVtab {
    object.c file. */
 
 typedef struct AstObjectGlobals {
+   AstObjectVtab Class_Vtab; 
+   int Class_Init;
    int Retain_Esc; 
    int Context_Level; 
    int *Active_Handles; 
@@ -1300,6 +1302,8 @@ typedef struct AstObjectGlobals {
    char *AstGetC_Strings[ AST__ASTGETC_MAX_STRINGS ];  
    int AstGetC_Istr;           
    int AstGetC_Init; 
+   int Nvtab;
+   AstObjectVtab **Known_Vtabs;
 } AstObjectGlobals;
 
 #endif
