@@ -31,6 +31,7 @@
 #include "mers.h"
 #include "prm_par.h"
 #include "star/mem.h"
+#include "cnf.h"
 
 /* Local includes */
 #include "jcmt/state.h"
