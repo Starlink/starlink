@@ -15,7 +15,7 @@
 *  Invocation:
 *     smf_bolonoise( smfData *data, size_t window, double f_low, 
 *                    double f_white1, double f_white2, double flagratio,
-*                    double *whitenoise, double *fratio, int *status )
+*                    double *whitenoise, double *fratio, int nep, int *status )
 
 *  Arguments:
 *     data = smfData * (Given)
@@ -31,10 +31,13 @@
 *     flagratio = double (Given)
 *        If nonzero, limit for fratio below which bolo is flagged as bad
 *     whitenoise = double* (Given)
-*        Array containing white noise level for each bolometer. Can be NULL.
+*        Estimate of variance in bolo signals produced by white noise. 
+*        Can be NULL.
 *     fratio = double* (Given)
 *        Array containing ratio of noise at f_low to the average from
 *        f_white1 to f_white2. Can be NULL.
+*     nep = int (Given)
+*        If set, calculate whitenoise in 1 second of averaged time-series data.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -50,7 +53,11 @@
 *     or no optical power from the sky reaches them so they have relatively
 *     flat power spectra. Arrays containing the white noise level (whitenoise)
 *     and low-to-high frequency power ratio (fratio) can also be returned
-*     containing values for each bolometer.
+*     containing values for each bolometer. Whitenoise by default estimates
+*     the variance in the time-domain samples caused by the "white" part of
+*     the spectrum (i.e. on a per-sample basis). Setting the "NEP" flag
+*     calculates the effective variance expected in an average of 1 second
+*     of time stream data (i.e. appropriate for calculating NEP and NEFD). 
 
 *  Notes:
 
@@ -61,6 +68,8 @@
 *  History:
 *     2008-09-06 (EC):
 *        Initial version
+*     2008-10-22 (EC):
+*        Added NEP flag
 
 *  Copyright:
 *     Copyright (C) 2008 University of British Columbia.
@@ -103,10 +112,10 @@
 
 void smf_bolonoise( smfData *data, size_t window, double f_low, 
                     double f_white1, double f_white2, double flagratio,
-                    double *whitenoise, double *fratio, int *status ) {
+                    double *whitenoise, double *fratio, int nep, int *status ) {
 
   double *base=NULL;       /* Pointer to base coordinates of array */
-  double df=0;             /* Frequency step size in Hz */
+  double df=1;             /* Frequency step size in Hz */
   double fr;               /* Ratio of p_low to p_white */
   size_t i;                /* Loop counter */
   size_t i_low;            /* Index in power spectrum to f_low */
@@ -123,7 +132,7 @@ void smf_bolonoise( smfData *data, size_t window, double f_low,
   double p_white;          /* Average power from f_white1 to f_white2 */
   smfData *pow=NULL;       /* Pointer to power spectrum data */
   unsigned char *qua=NULL; /* Pointer to quality component */
-  double steptime;         /* Length of a sample in seconds */
+  double steptime=1;       /* Length of a sample in seconds */
 
   if (*status != SAI__OK) return;
 
@@ -143,10 +152,16 @@ void smf_bolonoise( smfData *data, size_t window, double f_low,
     return;
   }
 
+  if( !data->hdr ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": smfData has no header", status );
+    return;
+  }
+
   /* Obtain dimensions */
   smf_get_dims( data, &nbolo, &ntslice, &ndata, status );
 
-  if( data->hdr && (*status==SAI__OK) ) {
+  if( *status==SAI__OK ) {
     steptime = data->hdr->steptime;
     if( steptime < VAL__SMLD ) {
       *status = SAI__ERROR;
@@ -156,7 +171,7 @@ void smf_bolonoise( smfData *data, size_t window, double f_low,
       /* Frequency steps in the FFT */
       df = 1. / (steptime * (double) ntslice );
     }
-  }
+  } 
 
   qua = data->pntr[2];
   isTordered = data->isTordered;
@@ -191,7 +206,7 @@ void smf_bolonoise( smfData *data, size_t window, double f_low,
     /* Measure the power */
     if( *status == SAI__OK ) {
       p_low = base[i_low];
-      smf_stats1( base, i_w1, i_w2-i_w1, NULL, 0, &p_white, NULL, &ngood,
+      smf_stats1( base, i_w1, i_w2-i_w1+1, NULL, 0, &p_white, NULL, &ngood,
                   status );
 
       /* It's OK if bad status was generated as long as a mean was calculated */
@@ -226,7 +241,15 @@ void smf_bolonoise( smfData *data, size_t window, double f_low,
       }
 
       /* Store values */
-      if( whitenoise ) whitenoise[i] = p_white;
+      if( whitenoise ) {
+        /* Multiply average by bandwidth to get estimate of signal variance */
+        whitenoise[i] = p_white * 2 * (i_w2-i_w1+1);
+        /* If NEP set, scale this to variance in 1-second average by dividing
+           by the number of samples per second */
+        if( nep ) {
+          whitenoise[i] /= (1./steptime);
+        }
+      }
       if( fratio ) fratio[i] = fr;
     }
 
