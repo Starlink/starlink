@@ -354,6 +354,9 @@ void smurf_sc2clean( int *status ) {
     /* Ensure that the data is ICD ordered before closing */
     smf_dataOrder( ffdata, 1, status );
 
+    /* Synchronize BAD values to QUALITY */
+    smf_update_valbad( ffdata, ~SMF__Q_JUMP, status );
+
     /* Free resources for output data */
     smf_close_file( &ffdata, status );
   }
