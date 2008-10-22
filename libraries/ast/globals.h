@@ -106,6 +106,7 @@
 /* Otherwise, ensure that the thread specific data key has been created. */ \
    } else if( pthread_once( &starlink_ast_globals_initialised, \
                             astGlobalsCreateKey_ ) ) { \
+      AST__GLOBALS = NULL; \
       fprintf( stderr, "Starlink AST package initialisation failed." ); \
 \
 /* If the current thread does not yet have a structure to hold \

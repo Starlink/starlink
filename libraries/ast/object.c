@@ -2811,6 +2811,9 @@ AstObject *astCast_( AstObject *this, AstObject *obj, int *status ) {
    AstObjectVtab *old_vtab;
    AstObject *new;
 
+/* Initialise */
+   new = NULL;
+
 /* Check pointer have been supplied. */
    if( this && obj ) {
 

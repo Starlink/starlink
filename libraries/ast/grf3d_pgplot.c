@@ -2212,8 +2212,9 @@ static int TxExt( int *list, int nlist, float ref[3], const char *just,
    gylo = INT_MAX;
    gyhi = -INT_MAX;
 
-/* initialise the width of the string. */
+/* Initialise things. */
    width = 0;
+   tm = 1.0;
 
 /* Loop round each symbol. */
    for( i = 0; i < nlist; i++ ) {
@@ -3128,6 +3129,8 @@ F77_INTEGER_FUNCTION(ast_g3dtext)( CHARACTER(TEXT),
       
    if( astOK ) {
       RESULT = (F77_INTEGER_TYPE) astG3DText( text, REF, just, UP, NORM );
+   } else {
+      RESULT = 0;
    }
 
    (void) astFree( text );
@@ -3165,6 +3168,8 @@ F77_INTEGER_FUNCTION(ast_g3dtxext)( CHARACTER(TEXT),
    if( astOK ) {
       RESULT = (F77_INTEGER_TYPE) astG3DTxExt( text, REF, just, UP, NORM,
                                                XB, YB, ZB, BL );
+   } else {
+      RESULT = 0;
    }
 
    (void) astFree( text );

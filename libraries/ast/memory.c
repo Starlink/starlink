@@ -1994,6 +1994,7 @@ static char *ChrMatcher( const char *test, const char *template,
 
 /* Initialisation. */
    if( mres ) *mlen = 0;
+   aaa = NULL;
 
 /* Check the global error status. */
    if( !astOK ) return NULL;

@@ -14370,6 +14370,9 @@ AstXmlChan *astLoadXmlChan_( void *mem, size_t size,
 /* Check the global error status. */
    if( !astOK ) return new;
 
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
+
 /* If a NULL virtual function table has been supplied, then this is
    the first loader to be invoked for this XmlChan. In this case the
    XmlChan belongs to this class, so supply appropriate values to be
