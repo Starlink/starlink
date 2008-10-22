@@ -134,12 +134,13 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   unsigned char *qua_data=NULL; /* Pointer to RES at chunk */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
-  double sigma;                 /* Bolometer white level */
   size_t spikeiter=0;           /* Number of iterations for spike detection */
   int spikeiter_s;              /* signed version of spikeiter */
   double spikethresh;           /* Threshold for spike detection */
-  double var;                   /* Sample variance */
-                                   
+  double *var=NULL;             /* Sample variance */
+   
+  double sigma;
+                                
   /* Main routine */
   if (*status != SAI__OK) return;
 
@@ -244,8 +245,13 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 
       if( flags & SMF__DIMM_FIRSTITER ) {
 
+        /* Measure the noise from power spectra */
+        var = smf_malloc( nbolo, sizeof(*var), 0, status );
+        smf_bolonoise( res->sdata[idx], 0, 0.5, SMF__F_WHITELO, SMF__F_WHITEHI,
+                       0, var, NULL, 0, status );
+        
 	for( i=0; i<nbolo; i++ ) if( !(qua_data[i*ntslice]&SMF__Q_BADB) ) {
-
+            
 	  /* Measure the sample standard deviation for each bolometer
 	     assuming it is stationary in time. Use smf_quick_noise to
 	     measure the rms in short intervals as a better estimate of the
@@ -253,30 +259,34 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 	     stream. The real way to do this is to examine the flat portion
 	     of the power spectrum. */
 
-	  sigma = smf_quick_noise( res->sdata[idx], i, nsamp, nchunk, 
-				   qua_data, mask, status );
+          
+            /*
+            sigma = smf_quick_noise( res->sdata[idx], i, nsamp, nchunk, 
+                                     qua_data, mask, status );
 	
-	  if( *status == SMF__INSMP ) {
-	    errAnnul( status );
-	  } else if( (*status == SAI__OK) && (sigma > 0) ) {
-	    var = sigma*sigma;
-	    base = i*ntslice; 
-	    /* Loop over time and store the variance for each sample */
-	    for( j=0; j<ntslice; j++ ) {
-	      model_data[base+j] = var;
-	    }
-	  }
-	}
+            if( *status == SMF__INSMP ) {
+              errAnnul( status );
+            } else if( (*status == SAI__OK) && (sigma > 0) ) {
+              var[0] = sigma*sigma;
+              base = i*ntslice; 
+            */
+              
+            /* Loop over time and store the variance for each sample */
+            base = i*ntslice; 
+            for( j=0; j<ntslice; j++ ) {
+              model_data[base+j] = var[i];
+            }
+          }
       }
-
+      
       /* Now calculate contribution to chi^2 */
       if( *status == SAI__OK ) {
 	for( i=0; i<ndata; i++ ) if( !(qua_data[i]&SMF__Q_BADB) &&
 				     (model_data[i] > 0) ) {
-
-	  dat->chisquared[chunk] += res_data[i]*res_data[i]/model_data[i];
-	  nchisq++;
-	}
+            
+            dat->chisquared[chunk] += res_data[i]*res_data[i]/model_data[i];
+            nchisq++;
+          }
       }
     }
   }
@@ -285,6 +295,9 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   if( (*status == SAI__OK) && (nchisq >0) ) {
     dat->chisquared[chunk] /= (double) nchisq;
   }
+  
+  /* Clean Up */
+  if( var ) var = smf_free(var, status);
 }
 
 
