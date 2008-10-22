@@ -668,11 +668,11 @@ void smf_open_related( const smfGroup *group, const dim_t subindex, const char *
 void * smf_realloc( void * pntr, size_t nelem, size_t bytes_per_elem,
 		    int * status );
 
-void smf_rebinmap( smfData *data, int index, int size, 
-                   AstFrameSet *outframeset, int spread, const double params[], 
-		   int moving, int genvar, int *lbnd_out, int *ubnd_out,
-                   double *map, double *variance,
-		   double *weights, int *status );
+void smf_rebinmap( smfData *data, double *bolovar, int index, int size, 
+	           AstFrameSet *outfset, int spread, const double params[], 
+		   int moving, int genvar, int *lbnd_out, int *ubnd_out, 
+                   double *map, double *variance, double *weights, 
+                   int *status );
 
 double smf_scale_tau ( const double tauwvm, const char *filter, int *status);
 

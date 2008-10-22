@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_rebinmap( smfData *data, int index, int size, 
+*     smf_rebinmap( smfData *data, double *bolovar, int index, int size, 
 *                   AstFrameSet *outfset, int spread, const double params[], 
 *                   int moving, int *lbnd_out, int *ubnd_out, 
 *                   double *map, double *variance, double *weights,
@@ -22,6 +22,8 @@
 *  Arguments:
 *     data = smfData* (Given)
 *        Pointer to smfData struct
+*     bolovar = double* (Given)
+*        Pointer to array giving variance of each bolometer. Can be NULL.
 *     index = int (Given)
 *        Index of element in igrp
 *     size = int (Given)
@@ -98,6 +100,8 @@
 *        Set lbnd to 1,1
 *     2008-06-04 (TIMJ):
 *        astRebinSeq requires GRID output bounds not PIXEL
+*     2008-10-21 (EC):
+*        Added bolovar to interface
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -145,10 +149,11 @@
 
 #define FUNC_NAME "smf_rebinmap"
 
-void smf_rebinmap( smfData *data, int index, int size, 
-		   AstFrameSet *outfset, int spread, const double params[], 
-		   int moving, int genvar, int *lbnd_out, int *ubnd_out, double *map, 
-		   double *variance, double *weights, int *status ) {
+void smf_rebinmap( smfData *data, double *bolovar, int index, int size, 
+	           AstFrameSet *outfset, int spread, const double params[], 
+		   int moving, int genvar, int *lbnd_out, int *ubnd_out, 
+                   double *map, double *variance, double *weights, 
+                   int *status ) {
 
   /* Local Variables */
   AstSkyFrame *abskyfrm = NULL; /* Output SkyFrame (always absolute) */
@@ -164,6 +169,7 @@ void smf_rebinmap( smfData *data, int index, int size,
   AstMapping *sky2map=NULL;     /* Mapping from celestial->map coordinates */
   int ubnd_in[2];               /* Upper pixel bounds for input maps */
   int udim[ 2 ];                /* Output array upper GRID bounds */
+  double *vardata = NULL;       /* Pointer to bolometer data */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -204,12 +210,14 @@ void smf_rebinmap( smfData *data, int index, int size,
 
   /* Check that there really is valid data */
   boldata = (data->pntr)[0];
+
   if ( boldata == NULL ) {
     if ( *status == SAI__OK ) {
       *status = SAI__ERROR;
       errRep( "", "Input data to rebinmap is NULL", status );
     }
   }
+
   /* Calculate bounds in the input array */
   nbol = (data->dims)[0] * (data->dims)[1];
   lbnd_in[0] = 1;
@@ -237,13 +245,17 @@ void smf_rebinmap( smfData *data, int index, int size,
     if( (index == size) && (i == (data->dims)[2]-1) )
       rebinflags = rebinflags | AST__REBINEND;
 
+    /* Use input data variances as weights if supplied */
+    if( bolovar ) 
+      rebinflags |= AST__VARWGT;
+
     /* Generate VARIANCE if requested */
     if ( genvar )
       rebinflags = rebinflags | AST__GENVAR;
  
     /* Rebin this time slice */
     astRebinSeqD( bolo2map, 0.0, 2, lbnd_in, ubnd_in, &(boldata[i*nbol]),
-		  NULL, spread, params, rebinflags, 0.1, 1000000, 
+		  bolovar, spread, params, rebinflags, 0.1, 1000000, 
 		  VAL__BADD, 2, ldim, udim, lbnd_in, ubnd_in,
 		  map, variance, weights, &nused );
 

@@ -253,6 +253,7 @@
 void smurf_qlmakemap( int *status ) {
 
   /* Local Variables */
+  double *bolonoise=NULL;    /* Noise estimate for each detector */
   smfArray *darks = NULL;    /* Dark data */
   smfData *data = NULL;      /* Pointer to input SCUBA2 data struct */
   char data_units[SMF__CHARLABEL+1]; /* Units string */
@@ -268,6 +269,7 @@ void smurf_qlmakemap( int *status ) {
   size_t mapsize;            /* Number of pixels in output image */
   double meansky;            /* Mean sky level for current file */
   int moving = 0;            /* Flag to denote a moving object */
+  dim_t nbolo;               /* Number of bolometers */
   int nparam = 0;            /* Number of extra parameters for pixel spreading scheme*/
   size_t nweights;           /* Number of elements in weights array */
   smfData *odata=NULL;       /* Pointer to output SCUBA2 data struct */
@@ -426,6 +428,13 @@ void smurf_qlmakemap( int *status ) {
     tau = smf_calc_meantau( data->hdr, status );
     smf_correct_extinction( data, "CSOTAU", 1, tau, NULL, status );
 
+    /* Calculate Noise */
+    msgOutif(MSG__VERB, " ", "SMURF_QLMAKEMAP: Measuring Noise",
+             status);
+    smf_get_dims( data, &nbolo, NULL, NULL, status );
+    bolonoise = smf_malloc( nbolo, sizeof(*bolonoise), 1, status );
+    smf_bolonoise( data, 10, 0.2, 10, 40, 0, bolonoise, NULL, status );
+
     /* Propagate provenace */
     smf_accumulate_prov( data, igrp, i, odata->file->ndfid,
                          "SMURF:QLMAKEMAP", status );
@@ -434,8 +443,9 @@ void smurf_qlmakemap( int *status ) {
              status);
 
     /* Rebin the data onto the output grid */
-    smf_rebinmap( data, i, size, outframeset, spread, params, moving, genvar,
-		  lbnd_out, ubnd_out, map, variance, weights, status );
+    smf_rebinmap( data, bolonoise, i, size, outframeset, spread, params, 
+                  moving, genvar, lbnd_out, ubnd_out, map, variance, weights, 
+                  status );
 
     smf_close_file( &data, status );
 
@@ -472,8 +482,9 @@ void smurf_qlmakemap( int *status ) {
 
   /* Tidy up and close the output file */  
   smf_close_file ( &odata, status );
-  if ( ogrp != NULL ) grpDelet( &ogrp, status );
-  if (darks) smf_close_related( &darks, status );
+  if( ogrp ) grpDelet( &ogrp, status );
+  if( darks ) smf_close_related( &darks, status );
+  if( bolonoise ) bolonoise = smf_free(bolonoise, status);
   grpDelet( &igrp, status );
   
   ndfEnd( status );

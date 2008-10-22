@@ -981,8 +981,9 @@ void smurf_makemap( int *status ) {
 
           /* Rebin the data onto the output grid */
       
-          smf_rebinmap(data, (first ? 1 : ifile), ilast, wcstile2d, spread, params, moving, 1,
-                       tile->elbnd, tile->eubnd, map, variance, weights3d, status );
+          smf_rebinmap(data, NULL, (first ? 1 : ifile), ilast, wcstile2d, 
+                       spread, params, moving, 1, tile->elbnd, tile->eubnd, 
+                       map, variance, weights3d, status );
           first = 0;
 
           /* Close the data file */

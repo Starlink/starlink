@@ -173,7 +173,7 @@ void smf_bolonoise( smfData *data, size_t window, double f_low,
   /* Check for reasonble frequencies, and integer offsets in the array */
   i_low = smf_get_findex( f_low, df, nf, status );
   i_w1 = smf_get_findex( f_white1, df, nf, status );
-  i_w1 = smf_get_findex( f_white2, df, nf, status );
+  i_w2 = smf_get_findex( f_white2, df, nf, status );
 
   /* Loop over detectors */
   for( i=0; (*status==SAI__OK)&&(i<nbolo); i++ ) 
