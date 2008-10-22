@@ -342,8 +342,9 @@ void smurf_qlmakemap( int *status ) {
   if ( nparam > 0 ) parExacd( "PARAMS", nparam, params, status );
 
   /* Calculate the map bounds - from the FIRST FILE only! */
-  msgOutif( MSG__VERB," ", 
-	   "SMURF_QLMAKEMAP: Determine approx map bounds from first file", status );
+  msgOutif( MSG__VERB," ",
+	   "SMURF_QLMAKEMAP: Determine approx map bounds from first file", 
+            status );
   smf_mapbounds_approx( igrp, 1, system, pixsize, lbnd_out, ubnd_out, 
 			&outframeset, &moving, status );
  
@@ -392,9 +393,15 @@ void smurf_qlmakemap( int *status ) {
   for ( i=1; i<=size && *status == SAI__OK; i++ ) {
     /* Read data from the ith input file in the group */
     smf_open_and_flatfield( igrp, NULL, i, darks, &data, status );
+  
+    msgOutif( MSG__VERB," ", "SMURF_QLMAKEMAP: Cleaning bolometer data.", 
+              status );
+  
+    /* Update quality array */
+    smf_update_quality( data, NULL, 1, NULL, 0.05, status );
 
     /* Flag bolometers with DC steps as bad */
-    smf_correct_steps( data, NULL, 150, 400, 1, status );
+    /*smf_correct_steps( data, NULL, 1000, 150, 1, status );*/
 
     /* Clean off the dark squid signals */
     smf_clean_dksquid( data, NULL, 0, 100, NULL, 0, 0, status );
@@ -405,8 +412,8 @@ void smurf_qlmakemap( int *status ) {
     /* Handle output FITS header creation */
     smf_fits_outhdr( data->hdr->fitshdr, &fchan, NULL, status );
 
-    /* Remove bolometer drifts if a fit is present */
-    /* smf_subtract_poly( data, NULL, 1, status ); */
+    /* Synchronize bad values with QUALITY */
+    smf_update_valbad( data, ~SMF__Q_JUMP, status );
 
     /* Remove a mean sky level - call low-level 1-D routine */
     smf_subtract_plane1( data, "MEAN", &meansky, status );
