@@ -433,7 +433,8 @@ void smurf_qlmakemap( int *status ) {
              status);
     smf_get_dims( data, &nbolo, NULL, NULL, status );
     bolonoise = smf_malloc( nbolo, sizeof(*bolonoise), 1, status );
-    smf_bolonoise( data, 10, 0.2, 10, 40, 0, bolonoise, NULL, status );
+    smf_bolonoise( data, 0, 0.5, SMF__F_WHITELO, SMF__F_WHITEHI, 0, bolonoise, 
+                   NULL, status );
 
     /* Propagate provenace */
     smf_accumulate_prov( data, igrp, i, odata->file->ndfid,
