@@ -169,6 +169,11 @@
     labels of these two fields to display in blue. Several issues 
     have also been fixed that should make this work more reliably.
 
+    When a new astrometry has been created by the GAIA fit to reference
+    stars an existing DATE-OBS or MJD-OBS value will now be preserved,
+    when an EPOCH is not required as part of the system. Previously
+    these values were set to the year 2000.
+
   Humu Release
   ============
 

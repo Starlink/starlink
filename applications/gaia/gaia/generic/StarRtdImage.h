@@ -464,7 +464,7 @@ class StarRtdImage : public Skycat
 
    //  Create and store a FITS card in a FITS channel.
    void storeCard( AstFitsChan *channel, const char *keyword, const char *value,
-                   const char *comment, int overwrite = 1 );
+                   const char *comment, int isString, int overwrite = 1 );
 
    //  Create and initialise a new FITS channel.
    void initChannel( int slot );

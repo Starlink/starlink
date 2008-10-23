@@ -297,7 +297,7 @@ public:
     { "astreset",        &StarRtdImage::astresetCmd,        1, 1 },
     { "astrestore",      &StarRtdImage::astrestoreCmd,      0, 1 },
     { "astset",          &StarRtdImage::astsetCmd,          2, 2 },
-    { "aststore",        &StarRtdImage::aststoreCmd,        2, 4 },
+    { "aststore",        &StarRtdImage::aststoreCmd,        3, 5 },
     { "astsystem",       &StarRtdImage::astsystemCmd,       2, 4 },
     { "asttran2",        &StarRtdImage::asttran2Cmd,        2, 2 },
     { "astwarnings",     &StarRtdImage::astwarningsCmd,     0, 0 },
@@ -1801,14 +1801,16 @@ int StarRtdImage::astsetCmd( int argc, char *argv[] )
 //   StarRtdImage::aststoreCmd
 //
 //   Purpose:
-//      Stores a value and keyword in a FITS channel. The channel
-//      can later be used to create an AST FrameSet that describes
-//      the WCS system. It is the responsibility of the caller to
-//      ensure that a FITS channel contains the correct information.
+//      Stores a value and keyword in a FITS channel. 
+//      The channel can later be used to create an AST FrameSet 
+//      that describes the WCS system. It is the responsibility 
+//      of the caller to ensure that a FITS channel contains the 
+//      correct information.
 //
 //    Notes:
-//      The arguments are the channel number, keyword, value and
-//      comment. The comment is optional.
+//      The arguments are the channel number, keyword, value,
+//      comment and if the value is a string. The comment and
+//      type are optional, unless the value is a string.
 //
 //    Return:
 //       TCL status and result.
@@ -1824,11 +1826,20 @@ int StarRtdImage::aststoreCmd( int argc, char *argv[] )
     int slot = 0;
     if ( Tcl_GetInt( interp_, argv[0], &slot ) != TCL_OK ) {
         return error( argv[0], " is not an integer");
-    } else {
+    } 
+    else {
+        char *comment = NULL;
+        int isString = 0;
+        if ( argc > 3 ) { 
+            comment = argv[3];
+            if ( argc > 4 ) {
+                Tcl_GetBoolean( interp_, argv[4], &isString );
+            }
+        }
 
         // Enter the value into the channel.
         slot--;
-        storeCard( channels_[slot], argv[1], argv[2], argv[3] );
+        storeCard( channels_[slot], argv[1], argv[2], comment, isString );
         if ( astOK ) {
             return TCL_OK;
         }
@@ -1842,19 +1853,31 @@ int StarRtdImage::aststoreCmd( int argc, char *argv[] )
 //
 //   Purpose:
 //      Creates and stores a FITS card in a FITS channel given the
-//      keyword name, value and comment.
+//      keyword name, value and comment. If this is a string then
+//      the value will be placed in quotes.
 //-
 void StarRtdImage::storeCard( AstFitsChan *channel, const char *keyword,
                               const char *value, const char *comment,
-                              int overwrite )
+                              int isString, int overwrite )
 {
     char card[FITSCARD];
     const char *dummy = "No comment";
     if ( comment == NULL ) comment = dummy;
-    if ( strlen(value) > 21 ) {
-        sprintf( card, "%-8.8s=%s /%s", keyword, value, comment );
-    } else {
-        sprintf( card, "%-8.8s=%21.21s /%s", keyword, value, comment );
+    if ( isString ) {
+        if ( strlen(value) > 19 ) {
+            sprintf( card, "%-8.8s='%s' /%s", keyword, value, comment );
+        } 
+        else {
+            sprintf( card, "%-8.8s='%19.19s' /%s", keyword, value, comment );
+        }
+    }
+    else {
+        if ( strlen(value) > 21 ) {
+            sprintf( card, "%-8.8s=%s /%s", keyword, value, comment );
+        } 
+        else {
+            sprintf( card, "%-8.8s=%21.21s /%s", keyword, value, comment );
+        }
     }
     astPutFits( channel, card, overwrite );
 }
@@ -1974,11 +1997,11 @@ void StarRtdImage::initChannel( int slot )
 {
     char buffer[FITSCARD];
     channels_[slot] = astFitsChan( NULL, NULL, "" );
-    storeCard( channels_[slot], "NAXIS", "2", "Number of axes" );
+    storeCard( channels_[slot], "NAXIS", "2", "Number of axes", 0 );
     sprintf( buffer, "%d", image_->width() );
-    storeCard( channels_[slot], "NAXIS1", buffer, "Dimension 1" );
+    storeCard( channels_[slot], "NAXIS1", buffer, "Dimension 1", 0 );
     sprintf( buffer, "%d", image_->height() );
-    storeCard( channels_[slot], "NAXIS2", buffer, "Dimension 2" );
+    storeCard( channels_[slot], "NAXIS2", buffer, "Dimension 2", 0 );
 }
 
 //+

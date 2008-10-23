@@ -21,7 +21,7 @@
 #     to the X and Y positions actually given. Note that little
 #     control over the linear fit is given (needs at least an offset and
 #     magnification anyway), except to exclude shear terms or define
-#     that the axes are already aligned (hence no PC matrix). 
+#     that the axes are already aligned (hence no PC matrix).
 #
 #     Note that the celestial coordinate system of the fit is
 #     restricted to being that of the reference positions (which are
@@ -83,7 +83,7 @@
 #     19-DEC-1997 (PWD):
 #        Original version.
 #     20-JAN-1998 (PWD):
-#        Rewrite to separate image coordinate system information from 
+#        Rewrite to separate image coordinate system information from
 #        image related stuff.
 #     23-MAY-2000 (PWD):
 #        Changed name to GaiaAstReference.
@@ -212,7 +212,7 @@ itcl::class gaia::GaiaAstReference {
             -variable [scope values_($this,maxshift)] \
             -command [code $this configure -maxshift $i]
       }
-      
+
       #  Allow the user to define the less useful values.
       $m add command -label {Additional parameters...   } \
 	      -command [code $this show_additional_] \
@@ -539,7 +539,7 @@ itcl::class gaia::GaiaAstReference {
       $itk_component(proj) configure -value -TAN
 
       set_equinox_ 2000
-      set_epoch_ 2000
+      set_epoch_ {}
       set_system_ FK5 1 0
 
       set values_($this,projp1) {}
@@ -548,9 +548,9 @@ itcl::class gaia::GaiaAstReference {
       $itk_component(projp2) configure -value {}
 
       set values_($this,crpix1) [expr [$itk_option(-rtdimage) width]/2]
-      $add_.crpix1 configure -value $values_($this,crpix1) 
+      $add_.crpix1 configure -value $values_($this,crpix1)
       set values_($this,crpix2) [expr [$itk_option(-rtdimage) height]/2]
-      $add_.crpix2 configure -value $values_($this,crpix2) 
+      $add_.crpix2 configure -value $values_($this,crpix2)
 
       set values_($this,longpole) {}
       $add_.longpole configure -value {}
@@ -579,7 +579,7 @@ itcl::class gaia::GaiaAstReference {
       #  Method is simple. Read all the values and construct a FITS
       #  channel filled with cards. Then attempt to create an AST
       #  object which can be used to replace the existing WCS system.
-      #  Then refine it a couple of times more to get an accurate 
+      #  Then refine it a couple of times more to get an accurate
       #  reference pixel position.
       set nrows [$itk_component(table) total_rows]
       if { $itk_option(-rtdimage) != {} && $nrows > 0 } {
@@ -616,7 +616,7 @@ itcl::class gaia::GaiaAstReference {
    }
 
 
-   #  Create a WCS from the FITS description that we've got and some 
+   #  Create a WCS from the FITS description that we've got and some
    #  initial values.
    protected method create_wcs_ {reversed crval1 crval2 xscale yscale angle} {
       set image $itk_option(-rtdimage)
@@ -638,11 +638,11 @@ itcl::class gaia::GaiaAstReference {
       }
       $image aststore $chan CDELT1 $xscale_
       $image aststore $chan CDELT2 $yscale_
-      
+
       #  Add the reference point (usually approximate).
       $image aststore $chan CRPIX1 $values_($this,crpix1)
       $image aststore $chan CRPIX2 $values_($this,crpix2)
-      
+
       #  Only record a RADECSYS if needed.
       if { $values_($this,system) != {} } {
          if { $values_($this,ctype) == "Equatorial" } {
@@ -660,10 +660,26 @@ itcl::class gaia::GaiaAstReference {
       }
 
       #  And a MJD to go with it (note conversion of B/J/G date to MJD).
-      if { $values_($this,epoch) != {} } {
+      if { $values_($this,epoch) != {} && 
+           [$itk_component(epoch) cget -state] != "disabled" } {
          $image aststore $chan MJD-OBS [find_epoch_ $values_($this,epoch)]
+      } else {
+         #  No epoch specified, or none applicable to the astrometry. 
+         #  Preserve the MJD-OBS or DATE-OBS if present, otherwise we get the
+         #  AST default of 2000.0. If both are present they are supposed to be
+         #  the same value, so don't worry about that.
+         set mjdobs [$image fits get MJD-OBS]
+         if { $mjdobs != {} } {
+            $image aststore $chan MJD-OBS "$mjdobs"
+         } else {
+            set dateobs [$image fits get DATE-OBS]
+            if { $dateobs != {} } {
+               $image aststore $chan DATE-OBS "$dateobs" \
+                  "Date of observation" 1
+            }
+         }
       }
-      
+
       #  If needed for this projection, and available add the PROJP
       #  values.
       if { $projpmap_($values_($this,proj),1) } {
@@ -676,7 +692,7 @@ itcl::class gaia::GaiaAstReference {
             $image aststore $chan PROJP2 $values_($this,projp2)
          }
       }
-      
+
       #  If set add LONGPOLE and LATPOLE.
       if { $values_($this,longpole) != {} } {
          $image aststore $chan LONGPOLE $values_($this,longpole)
@@ -684,7 +700,7 @@ itcl::class gaia::GaiaAstReference {
       if { $values_($this,latpole) != {} } {
          $image aststore $chan LATPOLE $values_($this,latpole)
       }
-      
+
       #  Read the channel to create an AST object and then replace
       #  the current WCS using it.
       $image astread $chan
@@ -730,7 +746,7 @@ itcl::class gaia::GaiaAstReference {
                set xscale_ [expr $xscale_/[lindex $errmsg 9]]
                set yscale_ [expr $yscale_/[lindex $errmsg 10]]
                set angle_  [expr [lindex $errmsg 12]+$angle_]
-               if { $update } { 
+               if { $update } {
                   set fitqual [$itk_component(table) update_x_and_y 1]
                   set xs [expr $xscale_*3600.0]
                   set ys [expr $yscale_*3600.0]
@@ -779,7 +795,7 @@ itcl::class gaia::GaiaAstReference {
    #  system selection unless the type is Equatorial (this means we
    #  should also check the equinox and epoch fields for dependency).
    protected method set_ctype_ {value} {
-      
+
       #  Get the ctypes associated with this system.
       set ctype1 [lindex $ctypemap_ [expr [lsearch $ctypemap_ $value]+1]]
       set ctype2 [lindex $ctypemap_ [expr [lsearch $ctypemap_ $value]+2]]
@@ -789,7 +805,7 @@ itcl::class gaia::GaiaAstReference {
       if { $value == "Equatorial" } {
          $itk_component(system) configure -state normal
          set text [[$itk_component(system) component mb] cget -text]
-         if { $text == "Ecliptic" || $text == "Galactic" } { 
+         if { $text == "Ecliptic" || $text == "Galactic" } {
             set_system_ FK5 1 0
          }
       } else {
@@ -824,14 +840,14 @@ itcl::class gaia::GaiaAstReference {
          set julian 1
       } elseif {[regexp {B(.*)} $value all decyears]} {
          set julian 0
-      } elseif { $value < 1984.0 } { 
+      } elseif { $value < 1984.0 } {
          set julian 0
          set decyears $value
       } else {
          set julian 1
          set decyears $value
       }
-      if { $julian } { 
+      if { $julian } {
          return  [expr 51544.5+($decyears-2000.0)*365.25]
       } else {
          return  [expr 15019.81352+($decyears-1900.0)*365.242198781]
@@ -1051,7 +1067,7 @@ itcl::class gaia::GaiaAstReference {
       }
       $add_ add_short_help $add_.close {Close window}
 
-      pack $add_.space1 -side top -pady 1 -padx 1 -fill x 
+      pack $add_.space1 -side top -pady 1 -padx 1 -fill x
       pack $add_.crpix1 -side top -pady 1 -padx 1 -anchor w
       pack $add_.crpix2 -side top -pady 1 -padx 1 -anchor w
       pack $add_.longpole -side top -pady 1 -padx 1 -anchor w
@@ -1061,7 +1077,7 @@ itcl::class gaia::GaiaAstReference {
 
    #  Show the additional parameters window.
    protected method show_additional_ {} {
-      if { ! [winfo exists $add_] } { 
+      if { ! [winfo exists $add_] } {
          make_additional_
       }
       $add_ configure -center 1
@@ -1069,7 +1085,7 @@ itcl::class gaia::GaiaAstReference {
 
    #  Hide the additional parameters window.
    protected method hide_additional_ {} {
-      if { [winfo exists $add_] } { 
+      if { [winfo exists $add_] } {
          wm withdraw $add_
       }
    }
@@ -1087,7 +1103,7 @@ itcl::class gaia::GaiaAstReference {
    #  Start transfer dialog.
    protected method start_transfer_ {} {
       blt::busy hold $w_
-      if { ! [winfo exists $trantop_] } { 
+      if { ! [winfo exists $trantop_] } {
          set trantop_ [GaiaAstTransfer $w_.trantop \
                           -rtdimage $itk_option(-rtdimage) \
                           -canvas $itk_option(-canvas) \
@@ -1108,7 +1124,7 @@ itcl::class gaia::GaiaAstReference {
 
    #  Transfer completed.
    protected method stop_transfer_ {args} {
-      if { $args != {{}} } { 
+      if { $args != {{}} } {
          $itk_component(table) clear_table
          eval $itk_component(table) set_contents $args
       }
@@ -1139,23 +1155,23 @@ itcl::class gaia::GaiaAstReference {
    itk_option define -isize isize Isize 9 {
       set itk_option(-isize) [expr min(21,max(3,$itk_option(-isize)))]
       set values_($this,isize) $itk_option(-isize)
-      if { [info exists itk_component(table) ] } { 
+      if { [info exists itk_component(table) ] } {
          $itk_component(table) configure -isize $itk_option(-isize)
       }
-      if { $trantop_ != {} && [winfo exists $trantop_] } { 
+      if { $trantop_ != {} && [winfo exists $trantop_] } {
          $trantop_ configure -isize $itk_option(-isize)
       }
    }
-   
+
    #  Need to be 3.5->21.5, steps of 1.
    itk_option define -maxshift maxshift Maxshift 5.5 {
       set maxshift [expr min(21.5,max(3.5,$itk_option(-maxshift)))]
       set itk_option(-maxshift) [expr int($maxshift)+0.5]
       set values_($this,maxshift) $itk_option(-maxshift)
-      if { [info exists itk_component(table) ] } { 
+      if { [info exists itk_component(table) ] } {
          $itk_component(table) configure -maxshift $itk_option(-maxshift)
       }
-      if { $trantop_ != {} && [winfo exists $trantop_] } { 
+      if { $trantop_ != {} && [winfo exists $trantop_] } {
          $trantop_ configure -maxshift $itk_option(-maxshift)
       }
    }
