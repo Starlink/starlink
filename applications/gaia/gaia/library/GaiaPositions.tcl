@@ -374,7 +374,7 @@ itcl::class gaia::GaiaPositions {
       }
       pack $itk_component(fwhmx) -fill x -side top -pady 2 -padx 2
       add_short_help $itk_component(fwhmx) \
-         {Mean FWHM in X direction (range) in pixels/arcsec}
+         {Mean FWHM in X direction in pixels/arcsec (range pixels/arcsec)}
 
       itk_component add fwhmy {
          LabelValue $w_.fwhmy -text {FwhmY:} \
@@ -383,7 +383,7 @@ itcl::class gaia::GaiaPositions {
       }
       pack $itk_component(fwhmy) -fill x -side top -pady 2 -padx 2
       add_short_help $itk_component(fwhmy) \
-         {Mean FWHM in Y direction (range) in pixels/arcsec}
+         {Mean FWHM in Y direction in pixels/arcsec (range pixels/arcsec)}
 
       itk_component add angle {
          LabelValue $w_.angle -text {Angle:} \
