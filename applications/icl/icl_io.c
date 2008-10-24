@@ -26,6 +26,8 @@
  *       Make ringbelll ring bell not flash screen
  *     01-JUL-2004 (TIMJ):
  *       Now use autoconf test for atexit. GLOB_NOMATCH is not standard.
+ *     24-OCT-2008 (PWD):
+ *       Increase a buffer from 255 to the standard 256 in keyboard_input.
  *
  * Source file for the basic ICL input/output subsystem. This is a separate
  * processs forked by ICL which handles terminal I/O. It does this by
@@ -1261,7 +1263,7 @@ void
 keyboard_input(void)
 {
     int status, ams_value_len, readret, inputavailable, worker, worker1;
-    char readbuff[255], *w;
+    char readbuff[256], *w;
     char combuff[256];
     char *cp;
     char *result;
