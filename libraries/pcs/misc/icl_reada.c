@@ -133,6 +133,25 @@
 /* forward reference function declarations */
 void initscreen(int);
 char *shell_command( char* );
+void initrecall(void);
+void addtorecall(char *line);
+char *prevline(void);
+char *nextline(void);
+int codespecialkey(void);
+int noisechar(char ch);
+int spacechar(char ch);
+int normalcharacter(char ch);
+void ringbell(void);
+void posbol( int del, int prlen, int cpos, int epos );
+void redoline(int complete, int prlen, int cpos, int epos, int forwd);
+void filename_complete(void);
+void keyboard_input(void);
+void resize_handler(int signo);
+void cntlc_handler(int signo);
+void cont_handler(int signo);
+void exit_handler(void);
+void sig_handler(int signo);
+
 /*
  * Global variables
  */
@@ -350,7 +369,7 @@ nextline(void)
 
 #define NUMKEYS 26
 
-char *keyseq[NUMKEYS+4] = 
+const char *keyseq[NUMKEYS+4] = 
 {"\033[A",    /* up-history */
  "\033[B",    /* down-history */
  "\033[C",    /* forward-char */
@@ -439,13 +458,14 @@ int controlcodes[26] =
 int 
 codespecialkey(void)
 {
-    char *w, wch;
+    const char *w;
+    char wch;
     int i=0, wi;
 
     wi = inbuf_cpos;
 /* Match the current input against the key sequences in 'keys' */
     while ( i < NUMKEYS ) {
-	if ((w = keyseq[i]) == CHARNIL) {
+        if ((w = keyseq[i]) == CHARNIL) {
 	    i++;
 	} else {
 	    while ((wch = *(w++)) != '\0') {
@@ -710,22 +730,22 @@ int cline,  /* line number which cursor is on (start at 0) */
  * the current character and inpl_epos pointing at the end.
  ******************************************************************************
  */
-void filename_complete( ) {
-size_t expanded_len;
-int status;
-char combuff[256];
-char tbuff[256];
-glob_t filelist;
-int globflags=0;
-int nfiles, nmatch;
-char *result;
-char *adam_extn;
-char *extn;
-char *extns[11];
-int lenext;
-int trunc;
-int istart, i;
-int nexts;
+void filename_complete(void) {
+    size_t expanded_len;
+    int status;
+    char combuff[INPUTLINELENGTH];
+    char tbuff[INPUTLINELENGTH];
+    glob_t filelist;
+    int globflags=0;
+    int nfiles, nmatch;
+    char *result;
+    char *adam_extn;
+    char *extn;
+    char *extns[11];
+    int lenext;
+    int trunc;
+    int istart, i;
+    int nexts;
 
 /* Find beginning of word */
 /* Get word into filename */
@@ -885,8 +905,8 @@ void
 keyboard_input(void)
 {
     int readret, inputavailable, worker, worker1;
-    char readbuff[255], *w;
-    char combuff[256];
+    char readbuff[INPUTBUFFERLENGTH+1], *w;
+    char combuff[INPUTLINELENGTH];
     char *result;
     fd_set infds;
     struct timeval time;
@@ -903,10 +923,20 @@ keyboard_input(void)
 	if(!select(2, &infds, NULL, NULL, &time))	/* non-blocking */
 	    break;
 	if(FD_ISSET(fileno(stdin), &infds)) {
-	    readret = read(fileno(stdin), readbuff,
-			   ((inbuf_rpos >= inbuf_cpos) ?
- (INPUTBUFFERLENGTH - (inbuf_rpos-inbuf_cpos)) : (inbuf_cpos-inbuf_rpos-2)));
-	    w = readbuff;
+            
+            if (inbuf_rpos >= inbuf_cpos) {
+                readret = 
+                    read( fileno(stdin),
+                          readbuff,
+                          INPUTBUFFERLENGTH - inbuf_rpos - inbuf_cpos );
+            }
+            else {
+                readret = 
+                    read( fileno(stdin),
+                          readbuff,
+                          inbuf_cpos - inbuf_rpos - 2 );
+            }
+            w = readbuff;
 	    while (readret > 0) {
 		    inbuff[inbuf_rpos] = *w;
 		    incinbuf_rpos();
@@ -919,7 +949,7 @@ keyboard_input(void)
 
     if (!expectinginput) {
 	return;
-}
+    }
 
     inputavailable = (inbuf_rpos != inbuf_cpos);
     while (inputavailable) {
@@ -1438,7 +1468,7 @@ cont_handler(int signo)
  ******************************************************************************
  */
 void
-exit_handler()
+exit_handler(void)
 {
     tcsetattr(fileno(stdin), TCSANOW, &init_tty);
     return;
@@ -1617,14 +1647,14 @@ char
 		close(fd[1]);
                 close(fde[1]);
 
-                result = (char *)malloc(256);
-                resultsize = 256;
+                result = (char *)malloc(INPUTLINELENGTH);
+                resultsize = INPUTLINELENGTH;
                 resp = 0;
                 nchars = 1;
                 while ( nchars>0 ) {
                    if ( result != NULL ) {
                       if ( resp == resultsize-1 ) {
-                         resultsize+=256;
+                         resultsize+=INPUTLINELENGTH;
                          result = (char *)realloc((void *)result,resultsize);
                       }
                       if ( (nchars = 
