@@ -185,6 +185,9 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *        astGrow to extend the vtab free list.
 *     22-APR-2008 (DSB):
 *        Added astSame.
+*     24-OCT-2008 (DSB):
+*        Prevent a mutex deadlock that could occur when annulling an
+*        Object ID.
 *class--
 */
 
@@ -4788,6 +4791,7 @@ static void AnnulHandle( int ihandle, int *status ) {
 
 /* Local Variables: */
    astDECLARE_GLOBALS;           /* Thread-specific global data */
+   AstObject *ptr;               /* Object pointer */
    int context;                  /* Context level where Handle was issued */
 
 /* Get a pointer to Thread-specific global data. */
@@ -4821,9 +4825,18 @@ static void AnnulHandle( int ihandle, int *status ) {
 
 /* If the Handle is active, annul its Object pointer and reset its
    "context" value (making it inactive) and its "check" value (so it
-   is no longer associated with an identifier value). */
+   is no longer associated with an identifier value). The astAnnul
+   function may call Delete functions supplied by any class, and these
+   Delete functions may involve annulling external Object IDs, which in 
+   turn requires access to the handles array. For this reason, we release 
+   the mutex that protects access to the handles arrays so that it can 
+   potentially be re-aquired within astAnnul without causing deadlock. */
       } else {
-         handles[ ihandle ].ptr = astAnnul( handles[ ihandle ].ptr );
+         ptr = handles[ ihandle ].ptr;
+         UNLOCK_MUTEX2;
+         ptr = astAnnul( ptr );
+         LOCK_MUTEX2;
+         handles[ ihandle ].ptr = ptr;
          handles[ ihandle ].context = INVALID_CONTEXT;
          handles[ ihandle ].check = 0;
 
@@ -5368,9 +5381,6 @@ f     depth.
 /* Get a pointer to Thread-specific global data. */
    astGET_GLOBALS(NULL);
 
-/* Gain exclusive access to the handles array. */
-   LOCK_MUTEX2;
-
 /* Check that the current context level is at least 1, otherwise there
    has been no matching use of astBegin, so report an error (unless
    the global status has already been set). */
@@ -5381,8 +5391,10 @@ f     depth.
       }
 
 /* If OK, loop while there are still active Handles associated with
-   the current context level. */
+   the current context level. First gain exclusive access to the handles
+   array. */
    } else if ( active_handles ) {
+      LOCK_MUTEX2;
       while ( ( ihandle = active_handles[ context_level ] ) != -1 ) {
 
 /* Annul the Handle at the head of the active Handles list. */
@@ -5402,9 +5414,11 @@ f     depth.
 /* Ensure the context level is decremented unless it was zero to start
    with. */
       context_level--;
+
+/* Relinquish access to the handles array. */
+      UNLOCK_MUTEX2;
    }
 
-   UNLOCK_MUTEX2;
 }
 
 void astExemptId_( AstObject *this_id, int *status ) {
