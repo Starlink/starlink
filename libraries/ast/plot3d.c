@@ -1257,15 +1257,15 @@ static int Border( AstPlot *, int * );
 static int Element2D( AstPlot3D *, int, int *, int *, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int GetObjSize( AstObject *, int * );
-static int Plot3DAttr( AstKeyMap *, int, double, double *, int, int * );
-static int Plot3DCap( AstKeyMap *, int, int, int * );
-static int Plot3DFlush( AstKeyMap *, int * );
-static int Plot3DLine( AstKeyMap *, int, const float *, const float *, int * );
-static int Plot3DMark( AstKeyMap *, int, const float *, const float *, int, int * );
-static int Plot3DQch( AstKeyMap *, float *, float *, int * );
-static int Plot3DScales( AstKeyMap *, float *, float *, int * );
-static int Plot3DText( AstKeyMap *, const char *, float, float, const char *, float, float, int * );
-static int Plot3DTxExt( AstKeyMap *, const char *, float, float, const char *, float, float, float *, float *, int * );
+static int Plot3DAttr( AstKeyMap *, int, double, double *, int );
+static int Plot3DCap( AstKeyMap *, int, int );
+static int Plot3DFlush( AstKeyMap * );
+static int Plot3DLine( AstKeyMap *, int, const float *, const float * );
+static int Plot3DMark( AstKeyMap *, int, const float *, const float *, int );
+static int Plot3DQch( AstKeyMap *, float *, float * );
+static int Plot3DScales( AstKeyMap *, float *, float * );
+static int Plot3DText( AstKeyMap *, const char *, float, float, const char *, float, float );
+static int Plot3DTxExt( AstKeyMap *, const char *, float, float, const char *, float, float, float *, float * );
 static int RootCornerInt( const char *, int * );
 static void BoundingBox( AstPlot *, float[2], float[2], int * );
 static void ChangeRootCorner( AstPlot3D *, int, int, int * );
@@ -4000,7 +4000,7 @@ static void Mark( AstPlot *this_plot, int nmark, int ncoord, int indim,
 }
 
 static int Plot3DAttr( AstKeyMap *grfconID, int attr, double value, 
-                       double *old_value, int prim, int *status ){
+                       double *old_value, int prim ){
 /*
 *  Name:
 *     Plot3DAttr
@@ -4014,7 +4014,7 @@ static int Plot3DAttr( AstKeyMap *grfconID, int attr, double value,
 *  Synopsis:
 *     #include "plot3d.h"
 *     int Plot3DAttr( AstKeyMap *grfconID, int attr, double value, 
-*                     double *old_value, int prim, int *status )
+*                     double *old_value, int prim )
 
 *  Class Membership:
 *     Plot3D member function.
@@ -4041,8 +4041,6 @@ static int Plot3DAttr( AstKeyMap *grfconID, int attr, double value,
 *     prim 
 *       The sort of graphics primitive to be drawn with the new attribute.
 *       Identified by one of the values defined in grf.h.
-*     status
-*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     An integer value of 0 is returned if an error occurs, and 1 otherwise. 
@@ -4051,6 +4049,10 @@ static int Plot3DAttr( AstKeyMap *grfconID, int attr, double value,
 
 /* Local Variables: */
    int result;
+   int *status;
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
 
 /* Check the inherited status. */
    if( !astOK ) return 0;
@@ -4072,7 +4074,7 @@ static int Plot3DAttr( AstKeyMap *grfconID, int attr, double value,
    return result;
 }
 
-static int Plot3DCap( AstKeyMap *grfconID, int cap, int value, int *status ){
+static int Plot3DCap( AstKeyMap *grfconID, int cap, int value ){
 /*
 *  Name:
 *     Plot3DCap
@@ -4085,7 +4087,7 @@ static int Plot3DCap( AstKeyMap *grfconID, int cap, int value, int *status ){
 
 *  Synopsis:
 *     #include "plot3d.h"
-*     int Plot3DAttr( AstKeyMap *grfconID, int cap, int value )
+*     int Plot3DCap( AstKeyMap *grfconID, int cap, int value )
 
 *  Class Membership:
 *     Plot3D member function.
@@ -4118,6 +4120,10 @@ static int Plot3DCap( AstKeyMap *grfconID, int cap, int value, int *status ){
 
 /* Local Variables: */
    int result;
+   int *status;
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
 
 /* Check the inherited status. */
    if( !astOK ) return 0;
@@ -4150,7 +4156,7 @@ static int Plot3DCap( AstKeyMap *grfconID, int cap, int value, int *status ){
    return result;
 }
 
-static int Plot3DFlush( AstKeyMap *grfconID, int *status ){
+static int Plot3DFlush( AstKeyMap *grfconID ){
 /*
 *  Name:
 *     Plot3DFlush
@@ -4163,7 +4169,7 @@ static int Plot3DFlush( AstKeyMap *grfconID, int *status ){
 
 *  Synopsis:
 *     #include "plot3d.h"
-*     int Plot3DFlush( AstKeyMap *grfconID, int *status )
+*     int Plot3DFlush( AstKeyMap *grfconID )
 
 *  Class Membership:
 *     Plot3D member function.
@@ -4179,8 +4185,6 @@ static int Plot3DFlush( AstKeyMap *grfconID, int *status ){
 *     grfconID
 *       The Plot's GrfContext KeyMap. This is
 *       used to identify which of the three Plots is calling this function.
-*     status
-*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     An integer value of 0 is returned if an error occurs, and 1 otherwise. 
@@ -4189,6 +4193,10 @@ static int Plot3DFlush( AstKeyMap *grfconID, int *status ){
 
 /* Local Variables: */
    int result;
+   int *status;
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
 
 /* Check the inherited status. */
    if( !astOK ) return 0;
@@ -4209,7 +4217,7 @@ static int Plot3DFlush( AstKeyMap *grfconID, int *status ){
    return result;
 }
 
-static int Plot3DLine( AstKeyMap *grfconID, int n, const float *x, const float *y, int *status ){
+static int Plot3DLine( AstKeyMap *grfconID, int n, const float *x, const float *y ){
 /*
 *  Name:
 *     Plot3DLine
@@ -4222,7 +4230,8 @@ static int Plot3DLine( AstKeyMap *grfconID, int n, const float *x, const float *
 
 *  Synopsis:
 *     #include "plot3d.h"
-*     int Plot3DLine( AstKeyMap *grfconID, int n, const float *x, const float *y, int *status )
+*     int Plot3DLine( AstKeyMap *grfconID, int n, const float *x, 
+*                     const float *y )
 
 *  Class Membership:
 *     Plot3D member function.
@@ -4243,8 +4252,6 @@ static int Plot3DLine( AstKeyMap *grfconID, int n, const float *x, const float *
 *       A pointer to an array holding the "n" x values.
 *     y 
 *       A pointer to an array holding the "n" y values.
-*     status
-*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     An integer value of 0 is returned if an error occurs, and 1 otherwise. 
@@ -4261,6 +4268,10 @@ static int Plot3DLine( AstKeyMap *grfconID, int n, const float *x, const float *
    int i;
    int plane;
    int result = 0;
+   int *status;
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
 
 /* Check the inherited status. */
    if( !astOK ) return result;
@@ -4342,7 +4353,7 @@ static int Plot3DLine( AstKeyMap *grfconID, int n, const float *x, const float *
 }
 
 static int Plot3DMark( AstKeyMap *grfconID, int n, const float *x, 
-                       const float *y, int type, int *status ){
+                       const float *y, int type ){
 /*
 *  Name:
 *     Plot3DMark
@@ -4356,7 +4367,7 @@ static int Plot3DMark( AstKeyMap *grfconID, int n, const float *x,
 *  Synopsis:
 *     #include "plot3d.h"
 *     int Plot3DMark( AstKeyMap *grfconID, int n, const float *x, 
-*                     const float *y, int type, int *status )
+*                     const float *y, int type )
 
 *  Class Membership:
 *     Plot3D member function.
@@ -4380,8 +4391,6 @@ static int Plot3DMark( AstKeyMap *grfconID, int n, const float *x,
 *     type 
 *       An integer which can be used to indicate the type of marker symbol 
 *       required.
-*     status
-*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     An integer value of 0 is returned if an error occurs, and 1 otherwise. 
@@ -4400,6 +4409,10 @@ static int Plot3DMark( AstKeyMap *grfconID, int n, const float *x,
    int plane;
    int rc;
    int result = 0;
+   int *status;
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
 
 /* Check the inherited status. */
    if( !astOK ) return result;
@@ -4495,7 +4508,7 @@ static int Plot3DMark( AstKeyMap *grfconID, int n, const float *x,
    return result;
 }
 
-static int Plot3DQch( AstKeyMap *grfconID, float *chv, float *chh, int *status ){
+static int Plot3DQch( AstKeyMap *grfconID, float *chv, float *chh ){
 /*
 *  Name:
 *     Plot3DQch
@@ -4545,6 +4558,10 @@ static int Plot3DQch( AstKeyMap *grfconID, float *chv, float *chh, int *status )
 /* Local Variables: */
    int result;
    float ch;
+   int *status;
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
 
 /* Check the inherited status. */
    if( !astOK ) return 0;
@@ -4570,10 +4587,10 @@ static int Plot3DQch( AstKeyMap *grfconID, float *chv, float *chh, int *status )
    return result;
 }
 
-static int Plot3DScales( AstKeyMap *grfconID, float *alpha, float *beta, int *status ){
+static int Plot3DScales( AstKeyMap *grfconID, float *alpha, float *beta ){
 /*
 *  Name:
-*     Plot3DQch
+*     Plot3DScales
 
 *  Purpose:
 *     Get the 2D axis scales.
@@ -4615,8 +4632,8 @@ static int Plot3DScales( AstKeyMap *grfconID, float *alpha, float *beta, int *st
    return 1;
 }
 
-static int Plot3DText( AstKeyMap *grfconID, const char *text, float x, float y, 
-                       const char *just, float upx, float upy, int *status ){
+static int Plot3DText( AstKeyMap *grfconID, const char *text, float x, float y,
+                       const char *just, float upx, float upy ){
 /*
 *  Name:
 *     Plot3DText
@@ -4630,7 +4647,7 @@ static int Plot3DText( AstKeyMap *grfconID, const char *text, float x, float y,
 *  Synopsis:
 *     #include "plot3d.h"
 *     int Plot3DText( AstKeyMap *grfconID, const char *text, float x, float y, 
-*                     const char *just, float upx, float upy, int *status )
+*                     const char *just, float upx, float upy )
 
 *  Class Membership:
 *     Plot3D member function.
@@ -4659,8 +4676,6 @@ static int Plot3DText( AstKeyMap *grfconID, const char *text, float x, float y,
 *        The x component of the up-vector for the text. 
 *     upy 
 *        The y component of the up-vector for the text.
-*     status
-*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     An integer value of 0 is returned if an error occurs, and 1 otherwise. 
@@ -4676,6 +4691,10 @@ static int Plot3DText( AstKeyMap *grfconID, const char *text, float x, float y,
    int plane;
    int rc;
    int result = 0;
+   int *status;
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
 
 /* Check the inherited status. */
    if( !astOK ) return result;
@@ -4768,7 +4787,7 @@ static int Plot3DText( AstKeyMap *grfconID, const char *text, float x, float y,
 
 static int Plot3DTxExt( AstKeyMap *grfconID, const char *text, float x, float y, 
                         const char *just, float upx, float upy, float *xb,  
-                        float *yb, int *status ){
+                        float *yb ){
 /*
 *  Name:
 *     Plot3DTxExt
@@ -4781,9 +4800,9 @@ static int Plot3DTxExt( AstKeyMap *grfconID, const char *text, float x, float y,
 
 *  Synopsis:
 *     #include "plot3d.h"
-*     int Plot3DTxExt( AstKeyMap *grfconID, const char *text, float x, float y, 
-*                     const char *just, float upx, float upy, float *xb,
-*                     float *yb )
+*     int Plot3DTxExt( AstKeyMap *grfconID, const char *text, float x, 
+*                      float y, const char *just, float upx, float upy, 
+*                      float *xb, float *yb )
 
 *  Class Membership:
 *     Plot3D member function.
@@ -4838,6 +4857,10 @@ static int Plot3DTxExt( AstKeyMap *grfconID, const char *text, float x, float y,
    int plane;
    int rc;
    int result = 0;
+   int *status;
+
+/* Get a pointer to the inherited status value. */
+   status = astGetStatusPtr;
 
 /* Check the inherited status. */
    if( !astOK ) return result;
@@ -8165,7 +8188,6 @@ f     function is invoked with STATUS set to an error value, or if it
    AstFrame *frame;              /* Pointer to Frame structure */
    AstPlot3D *new;               /* Pointer to new Plot3D */
    va_list args;                 /* Variable argument list */
-
    int *status;                  /* Pointer to inherited status value */
 
 /* Get a pointer to the thread specific global data structure. */

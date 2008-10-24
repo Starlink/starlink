@@ -1666,6 +1666,7 @@ static const char *xlbling[2] = { "interior", "exterior" };
    globals->Map4_map_t = NULL; \
    globals->Map4_umap_t = NULL; \
    globals->Map4_statics_t = NULL; \
+   globals->Poly_n_t = 0; \
    globals->Curve_data_t.nbrk = -1; \
    globals->GetAttrib_Buff[ 0 ] = 0; \
    globals->SplitValue_Buff[ 0 ] = 0; \
@@ -1802,7 +1803,7 @@ static int Boxp_freeze = 0;
    and Apoly). */
 static float Poly_x[ AST__PLOT_POLY_MAX ];
 static float Poly_y[ AST__PLOT_POLY_MAX ];
-static int   Poly_n;
+static int   Poly_n = 0;
 
 /* Variables used by function Map1. See the prologue of Map1 for details. */
 static int           Map1_ncoord;       
