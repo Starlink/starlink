@@ -2855,9 +2855,6 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
                uerr = ures;
                serr = astGetSystem( result );
             }
-
-astShow( map2 );
-
             astError( AST__BADUN, "astMatch(SpecFrame): Inappropriate units (%s) "
                       "specified for a %s axis.", status, uerr, SystemLabel( serr, status ) );
          }
