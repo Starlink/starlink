@@ -155,25 +155,21 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
 
   /* Decide if we need the DA extension or not */
   if( (!model) || (model && calcdk) ) {
-
     needDA = 1;
-    
-    /* Check for NULL smfDA */
     if( !indata->da) {
+      /* Check for NULL smfDA */
       *status = SAI__ERROR;
       errRep( " ", FUNC_NAME 
               ": possible programming error, no smfDA struct in smfData", 
               status);
       return;
-      
+    } else if( !indata->da->dksquid) {
       /* Check for NULL dksquid */
-      if( !indata->da->dksquid) {
         *status = SAI__ERROR;
         errRep( " ", FUNC_NAME 
                 ": possible programming error, no dksquid array in smfData", 
                 status);
         return;
-      }
     }
   }
 
