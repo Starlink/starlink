@@ -317,8 +317,8 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
   if( mtype == SMF__RES ) {
     /* Propagate input if RES */
     copyinput = 1;
-  } else {
-    /* For all remaining types don't need data array */
+  } else if( mtype != SMF__DKS ) {
+    /* For all remaining types (other than DKS) don't need data array */
     oflag |= SMF__NOCREATE_DATA;
   }
 	
@@ -382,10 +382,10 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
           if( idx > 0 ) {
 	  
             /* Open the template file - flags are set above depending
-               on the type of model. If we're propagating input, then
+               on the type of model. If we're reading data, then
                do an open_and_flatfield */
 
-            if( copyinput ) {
+            if( !(oflag&SMF__NOCREATE_DATA) ) {
               smf_open_and_flatfield( igroup->grp, NULL, idx, NULL,
                                       &idata, status );
             } else {
@@ -528,6 +528,11 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
 
           /* Set the data-ordering flag in the header */
           head.data.isTordered = idata->isTordered;
+
+          /* Other info from the header */
+          if( idata->hdr ) {
+            head.hdr.steptime = idata->hdr->steptime;
+          }
 
           /* Calculate the size of the data buffer. Format:
 
