@@ -94,9 +94,9 @@ noinst_INCLUDES = smf.h smf_typ.h
 # fac files must be installed
 noinst_MESSAGES = smf_err.h
 
-BUILT_SOURCES = smf_err.h $(BUILT_C_ROUTINES)
+BUILT_SOURCES = smf_err.h smf.h $(BUILT_C_ROUTINES)
 
-$(C_ROUTINES:.c=.o): ../smf.h
+$(C_ROUTINES:.c=.o): smf.h
 
 smf.h: smf.h.source make_h
 	./make_h 
@@ -138,4 +138,7 @@ $(CGENERIC_ROUTINES:.cgen=.c):
 	echo "" >> $@
 
 # Need to distribute the generic files
-EXTRA_DIST = $(CGENERIC_ROUTINES)
+EXTRA_DIST = $(CGENERIC_ROUTINES) smf.h.source
+
+MAINTAINERCLEANFILES = smf.h
+CLEANFILES = smf.h
