@@ -89,6 +89,8 @@
 *        Remove debugging printf statements.
 *     2008-5-01 (DSB):
 *        Display any warnings placed in the FitsChan by AST.
+*     2008-6-30 (DSB):
+*        Free the sc2ast cache.
 *     2008-07-10 (TIMJ):
 *        Free dark squid information.
 *     {enter_further_changes_here}
@@ -136,6 +138,7 @@
 #include "ndf.h"
 #include "mers.h"
 #include "sc2da/sc2store.h"
+#include "sc2da/sc2ast.h"
 
 #define ERRFUNC "smf_close_file"
 
@@ -265,6 +268,8 @@ void smf_close_file( smfData ** data, int * status ) {
     if (hdr->wcs != NULL) hdr->wcs = astAnnul( hdr->wcs );
     if (hdr->tswcs != NULL) hdr->tswcs = astAnnul( hdr->tswcs );
     if (hdr->fitshdr != NULL) hdr->fitshdr = astAnnul( hdr->fitshdr );
+    hdr->cache = sc2ast_createwcs2( -1, NULL, NULL, NULL, NULL, hdr->cache, 
+                                    status );
     if (!hdr->isCloned) {
       /* We are responsible for this memory - although what happens
 	 when we are cloned and the original is freed first? Need

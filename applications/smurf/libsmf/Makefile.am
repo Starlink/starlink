@@ -87,9 +87,12 @@ smf_select_pntr.c smf_get_dims.c smf_flat_standardpow.c \
 smf_flat_responsivity.c smf_flat_write.c smf_clean_dksquid.c \
 smf_fft_cart2pol.c smf_calcmodel_dks.c smf_model_createtswcs.c \
 smf_model_stripsuffix.c smf_bolonoise.c smf_get_findex.c smf_update_valbad.c \
+smf_rebinslices.c smf_spreadwidth.c smf_rebincube_seqf.c smf_rebinseq_thread.c \
+smf_threads.c smf_get_nthread.c smf_rebincube_paste_thread.c smf_ndf_sbnd.c \
+smf_lock_data.c \
 $(BUILT_C_ROUTINES)
 
-noinst_INCLUDES = smf.h smf_typ.h
+noinst_INCLUDES = smf.h smf_typ.h smf_threads.h
 
 # fac files must be installed
 noinst_MESSAGES = smf_err.h

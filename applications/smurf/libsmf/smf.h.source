@@ -376,6 +376,7 @@
 #include "ast.h"
 #include "jcmt/state.h"  /* for inst_t */
 #include "smurf_typ.h"
+#include "smf_threads.h"
 #include "smurf_par.h"
 #include "star/grp.h"
 #include "smf_typ.h"
@@ -668,10 +669,10 @@ void smf_open_related( const smfGroup *group, const dim_t subindex, const char *
 void * smf_realloc( void * pntr, size_t nelem, size_t bytes_per_elem,
 		    int * status );
 
-void smf_rebinmap( smfData *data, double *bolovar, int index, int size, 
-	           AstFrameSet *outfset, int spread, const double params[], 
-		   int moving, int genvar, int *lbnd_out, int *ubnd_out, 
-                   double *map, double *variance, double *weights, 
+void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar, 
+                   int index, int size, AstFrameSet *outfset, int spread, 
+                   const double params[], int moving, int genvar, int *lbnd_out,
+                   int *ubnd_out, double *map, double *variance, double *weights,
                    int *status );
 
 double smf_scale_tau ( const double tauwvm, const char *filter, int *status);
@@ -714,35 +715,38 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                      int ubnd[ 3 ], AstFrameSet **wcsout, int *npos, 
                      int *hasoffexp, smfBox **boxes, int *polobs, int *status );
 
-void smf_rebincube( smfData *data, int first, int last, int *ptime, int badmask, int is2d,
-                    AstSkyFrame *abskyfrm, AstMapping *oskymap, 
-                    AstFrame *ospecfrm, AstMapping *ospecmap, Grp *detgrp,
-                    int moving, int usewgt, 
-                    int lbnd_out[ 3 ], int ubnd_out[ 3 ], 
-                    int spread, const double params[], 
-                    int genvar, float *data_array, float *var_array, 
-                    double *wgt_array, float *texp_array, float *teff_array, 
-                    double *fcon, int *nused, int *nreject, int *naccept, int *status );
+void smf_rebincube( smfWorkForce *wf, smfData *data, int first, int last,  
+                    int *ptime, int badmask, int is2d, AstSkyFrame *abskyfrm, 
+                    AstMapping *oskymap, AstFrame *ospecfrm, 
+                    AstMapping *ospecmap, Grp *detgrp, int moving, int usewgt, 
+                    int lbnd_out[ 3 ], int ubnd_out[ 3 ], int spread, 
+                    const double params[], int genvar, float *data_array, 
+                    float *var_array, double *wgt_array, float *texp_array, 
+                    float *teff_array, double *fcon, int *nused, int *nreject, 
+                    int *naccept, int *status );
 
-void smf_rebincube_ast( smfData *data, int first, int last, int *ptime, dim_t nchan,
-                        dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy, 
-                        dim_t nout, dim_t dim[3], AstMapping *ssmap,
-                        AstSkyFrame *abskyfrm, AstMapping *oskymap, 
-                        Grp *detgrp, int moving, int usewgt, int spread, 
-                        const double params[], int genvar, double tfac, 
-                        double fcon, float *data_array, float *var_array, 
+void smf_rebincube_ast( smfWorkForce *wf, smfData *data, int first, int last, 
+                        int *ptime, dim_t nchan, dim_t ndet, dim_t nslice, 
+                        dim_t nel, dim_t nxy, dim_t nout, dim_t dim[3], 
+                        AstMapping *ssmap, AstSkyFrame *abskyfrm, 
+                        AstMapping *oskymap, Grp *detgrp, int moving, 
+                        int usewgt, int spread, const double params[], 
+                        int genvar, double tfac, double fcon, 
+                        float *data_array, float *var_array, 
                         double *wgt_array, float *texp_array, 
-                        float *teff_array, int *good_tsys, int *nused, int *status );
+                        float *teff_array, int *good_tsys, int *nused, 
+                        int *status );
 
-void smf_rebincube_nn( smfData *data, int first, int last, int *ptime, dim_t nchan,
-                       dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy,
-                       dim_t nout, dim_t dim[3], int badmask, int is2d,
-                       AstMapping *ssmap, AstSkyFrame *abskyfrm, 
-                       AstMapping *oskymap, Grp *detgrp, int moving, 
-                       int usewgt, int genvar, double tcon, double fcon, 
-                       float *data_array, float *var_array, double *wgt_array, 
-                       float *texp_array, float *teff_array, int *nused, 
-                       int *nreject, int *naccept, int *good_tsys, int *status );
+void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last, 
+                       int *ptime, dim_t nchan, dim_t ndet, dim_t nslice, 
+                       dim_t nel, dim_t nxy, dim_t nout, dim_t dim[3], 
+                       int badmask, int is2d, AstMapping *ssmap, 
+                       AstSkyFrame *abskyfrm, AstMapping *oskymap, 
+                       Grp *detgrp, int moving, int usewgt, int genvar, 
+                       double tcon, double fcon, float *data_array, 
+                       float *var_array, double *wgt_array, float *texp_array, 
+                       float *teff_array, int *nused, int *nreject, 
+                       int *naccept, int *good_tsys, int *status );
 
 void smf_rebincube_paste2d( int badmask, dim_t nchan, int nchanout, 
                             int *spectab, int *specpop, dim_t iv0, 
@@ -890,30 +894,20 @@ void smf_fits_setL( const smfHead *hdr, const char *name, int value,
 void smf_getrefwcs( const char *param, AstFrameSet **specwcs,
                     AstFrameSet **spacewcs, int *status );
 
-
-void smf_resampcube( smfData *data, int index, int size, 
-                     AstSkyFrame *abskyfrm, AstMapping *iskymap, 
-                     AstFrame *ispecfrm, AstMapping *ispecmap, 
-                     Grp *detgrp, int moving, int slbnd[ 3 ], 
-                     int subnd[ 3 ], int interp, const double params[], 
-                     float *in_data, float *out_data, int *overlap, 
-                     int *status );
-
-
-void smf_resampcube_copy( dim_t nchan, dim_t nsky, int *spectab, 
+void smf_resampcube_copy( dim_t nchan, int *spectab, 
                           dim_t iv0, dim_t nxy, float *ddata, 
                           float *in_data, int *status );
 
-void smf_resampcube_nn( smfData *data, int index, int size, dim_t nchan, 
-                   dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy, 
-                   dim_t nsky, dim_t dim[3], AstMapping *ssmap, 
-                   AstSkyFrame *abskyfrm, AstMapping *iskymap, 
-                   Grp *detgrp, int moving, float *in_data, 
-                   float *out_data, int *overlap, int *status );
+void smf_resampcube_nn( smfData *data, dim_t nchan, 
+                        dim_t ndet, dim_t nslice, dim_t nxy, 
+                        dim_t dim[3], AstMapping *ssmap, 
+                        AstSkyFrame *abskyfrm, AstMapping *iskymap, 
+                        Grp *detgrp, int moving, float *in_data, 
+                        float *out_data, int *overlap, int *status );
 
-void smf_resampcube_ast( smfData *data, int index, int size, dim_t nchan,
-                         dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy, 
-                         dim_t nsky, dim_t dim[3], AstMapping *ssmap,
+void smf_resampcube_ast( smfData *data, dim_t nchan,
+                         dim_t ndet, dim_t nslice, dim_t nel, 
+                         dim_t dim[3], AstMapping *ssmap,
                          AstSkyFrame *abskyfrm, AstMapping *iskymap, 
                          Grp *detgrp, int moving, int interp, 
                          const double params[], float *in_data, 
@@ -1133,3 +1127,24 @@ void smf_bolonoise( smfData *data, size_t window, double f_low,
 size_t smf_get_findex( double f, double df, dim_t nf, int *status );
 
 void smf_update_valbad( smfData *data, unsigned char mask, int *status );
+
+int smf_spreadwidth( int spread, const double params[], int *status );
+
+void smf_rebincube_seqf( smfWorkForce *workforce, int nthreads, 
+                         double *blk_bot, AstMapping *this, double wlim, 
+                         int ndim_in, const int lbnd_in[], const int ubnd_in[],
+                         const float in[], const float in_var[], int spread, 
+                         const double params[], int flags, double tol, int maxpix, 
+                         float badval, int ndim_out, const int lbnd_out[], 
+                         const int ubnd_out[], const int lbnd[], const int ubnd[], 
+                         float out[], float out_var[], double weights[], 
+                         int *nused, int *status );
+
+void smf_rebinseq_thread( void *data_ptr, int *status );
+void smf_rebinslices( void *job_data_ptr, int *status );
+int smf_get_nthread( int *status );
+void smf_rebincube_paste_thread( void *data, int *status );
+void smf_ndf_sbnd( int ndim, int *lbnd, int *ubnd, smfData *data, int *status );
+void smf_lock_data( smfData *data, int lock, int *status );
+
+

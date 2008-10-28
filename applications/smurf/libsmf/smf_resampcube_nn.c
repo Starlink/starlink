@@ -14,9 +14,9 @@
 *     C function
 
 *  Invocation:
-*     void smf_resampcube_nn( smfData *data, int index, int size, dim_t nchan, 
-*                             dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy, 
-*                             dim_t nsky, dim_t dim[3], AstMapping *ssmap, 
+*     void smf_resampcube_nn( smfData *data, dim_t nchan, 
+*                             dim_t ndet, dim_t nslice, dim_t nxy, 
+*                             dim_t dim[3], AstMapping *ssmap, 
 *                             AstSkyFrame *abskyfrm, AstMapping *iskymap, 
 *                             Grp *detgrp, int moving, float *in_data, 
 *                             float *out_data, int overlap, int *status );
@@ -24,22 +24,14 @@
 *  Arguments:
 *     data = smfData * (Given)
 *        Pointer to the template smfData structure.
-*     index = int (Given)
-*        Index of the current template within the group of templates.
-*     size = int (Given)
-*        Index of the last template within the group of templates.
 *     nchan = dim_t (Given)
 *        Number of spectral channels in template.
 *     ndet = dim_t (Given)
 *        Number of detectors in template.
 *     nslice = dim_t (Given)
 *        Number of time slices in template.
-*     nel = dim_t (Given)
-*        Total number of elements in template.
 *     nxy = dim_t (Given)
 *        Number of elements in one spatial plane of the sky cube.
-*     nsky = dim_t (Given)
-*        Total number of elements in the sky cube.
 *     dim[ 3 ] = dim_t (Given)
 *        The dimensions of the sky cube.
 *     ssmap = AstMapping * (Given)
@@ -134,9 +126,9 @@
 
 #define FUNC_NAME "smf_resampcube_nn"
 
-void smf_resampcube_nn( smfData *data, int index, int size, dim_t nchan, 
-                        dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy, 
-                        dim_t nsky, dim_t dim[3], AstMapping *ssmap, 
+void smf_resampcube_nn( smfData *data, dim_t nchan, 
+                        dim_t ndet, dim_t nslice, dim_t nxy, 
+                        dim_t dim[3], AstMapping *ssmap, 
                         AstSkyFrame *abskyfrm, AstMapping *iskymap, 
                         Grp *detgrp, int moving, float *in_data, 
                         float *out_data, int *overlap, int *status ){
@@ -153,10 +145,10 @@ void smf_resampcube_nn( smfData *data, int index, int size, dim_t nchan,
    float *tdata = NULL;        /* Pointer to start of sky cube time slice data */
    int *spectab = NULL;        /* Template->sky cube channel number conversion table */
    int found;                  /* Was current detector name found in detgrp? */
-   int gxsky;                  /* Sky cube X grid index */
-   int gysky;                  /* Sky cube Y grid index */
-   int idet;                   /* Detector index */
-   int itime;                  /* Index of current time slice */
+   dim_t gxsky;                /* Sky cube X grid index */
+   dim_t gysky;                /* Sky cube Y grid index */
+   dim_t idet;                 /* Detector index */
+   dim_t itime;                /* Index of current time slice */
    int iv0;                    /* Offset for pixel in 1st sky cube spectral channel */
    smfHead *hdr = NULL;        /* Pointer to data header for this time slice */
 
@@ -258,7 +250,7 @@ void smf_resampcube_nn( smfData *data, int index, int size, dim_t nchan,
 /* Copy the sky cube spectrum into the output time series cube. */
                *overlap = 1;
                if( in_data ) {
-                  smf_resampcube_copy( nchan, nsky, spectab, iv0, nxy, 
+                  smf_resampcube_copy( nchan, spectab, iv0, nxy, 
                                        ddata, in_data, status );
                } else {
                   break;

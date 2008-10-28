@@ -515,6 +515,7 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
 #include "smurf_typ.h"
+#include "libsmf/smf_threads.h"
 
 #include "sc2da/sc2store_par.h"
 #include "sc2da/sc2math.h"
@@ -603,6 +604,7 @@ void smurf_makemap( int *status ) {
   double *weights3d = NULL;  /* Pointer to 3-D weights array */
   AstFrameSet *wcstile2d = NULL;/* WCS Frameset describing 2D spatial axes */
   int wndf = NDF__NOID;      /* NDF identifier for WEIGHTS */
+  smfWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
 
   struct timeval tv1, tv2;
 
@@ -613,6 +615,10 @@ void smurf_makemap( int *status ) {
 
   /* Main routine */
   ndfBegin();
+
+  /* Find the number of cores/processors available and create a pool of 
+     threads of the same size. */
+  wf = smf_create_workforce( smf_get_nthread( status ), status );
 
   /* Get group of input files */
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
@@ -838,7 +844,7 @@ void smurf_makemap( int *status ) {
    
       /* Store the initial number of pixels per spatial plane in the output tile. */
       nxy = ( tile->eubnd[ 0 ] - tile->elbnd[ 0 ] + 1 )*
-        ( tile->eubnd[ 1 ] - tile->elbnd[ 1 ] + 1 );
+            ( tile->eubnd[ 1 ] - tile->elbnd[ 1 ] + 1 );
 
       /* Add the name of this output NDF to the group holding the names of the
          output NDFs that have actually been created. */
@@ -846,11 +852,11 @@ void smurf_makemap( int *status ) {
       grpGet( ogrp, iout, 1, &pname, GRP__SZNAM, status );
       grpPut1( igrp4, basename, 0, status );
 
-      /* Create the output NDF for this tile */
+      /* Create the 2D output NDF for this tile. */
       smfflags = 0;
       smfflags |= SMF__MAP_VAR;
-      smf_open_newfile ( ogrp, iout++, SMF__DOUBLE, 2, tile->elbnd, tile->eubnd, smfflags, 
-                         &odata, status );
+      smf_open_newfile ( ogrp, iout++, SMF__DOUBLE, 2, tile->elbnd, tile->eubnd, 
+                         smfflags, &odata, status );
 
       /* Abort if an error has occurred. */
       if( *status != SAI__OK ) goto L999;
@@ -858,10 +864,6 @@ void smurf_makemap( int *status ) {
       /* Convenience pointers */
       file = odata->file;
       ondf = file->ndfid;
-
-      /* Map the data and variance arrays */
-      map = (odata->pntr)[0];
-      variance = (odata->pntr)[1];
 
       /* Create SMURF extension in the output file and map pointers to
          WEIGHTS and EXP_TIME arrays */
@@ -888,8 +890,24 @@ void smurf_makemap( int *status ) {
 
       /* Now allocate memory for 3-d work array used by smf_rebinmap -
          plane 2 of this 3-D array is stored in the weights component
-         later. Initialize to zero. */
-      weights3d = smf_malloc( 2*nxy, sizeof(double), 1, status);
+         later. Initialize to zero. We need one such weights array for
+         each thread, so we actually allocate a 4D array. */
+      weights3d = smf_malloc( 2*nxy*wf->nworker, sizeof(double), 1, status);
+
+      /* Each worker thread needs its own output array. This is needed since
+         otherwise different threads may attempt to write to the same output
+         pixel at the same time. We create a 3D array now in which the
+         first 2 axes match the 2D output NDF dimensions, and the third axis 
+         has dimension equal to the number of worker threads. Once the 
+         rebinning is complete, these multiple output arrays are combined 
+         into one, and copied into the output NDF. */
+      if( wf->nworker > 1 ) {
+         map = smf_malloc( nxy*wf->nworker, sizeof(double), 0, status);
+         variance = smf_malloc( nxy*wf->nworker, sizeof(double), 0, status);
+      } else {
+         map = (odata->pntr)[0];
+         variance = (odata->pntr)[1];
+      }
 
       /* Simple Regrid of the data */
       msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using REBIN method", 
@@ -979,16 +997,12 @@ void smurf_makemap( int *status ) {
                       status );
           }
 
-          /* Rebin the data onto the output grid */
-      
-          smf_rebinmap(data, NULL, (first ? 1 : ifile), ilast, wcstile2d, 
-                       spread, params, moving, 1, tile->elbnd, tile->eubnd, 
-                       map, variance, weights3d, status );
+          /* Rebin the data onto the output grid. This also closes the
+             data file.  */
+          smf_rebinmap( wf, data, NULL, (first ? 1 : ifile), ilast, wcstile2d,
+                        spread, params, moving, 1, tile->elbnd, tile->eubnd, 
+                        map, variance, weights3d, status );
           first = 0;
-
-          /* Close the data file */
-          smf_close_file( &data, status);
-
           blank = 0;
       
           /* Break out of loop over data files if bad status */
@@ -999,6 +1013,18 @@ void smurf_makemap( int *status ) {
         }
       }
     L999:
+
+      /* If required, copy the data and variance arrays from the 3D work
+         arrays into the output NDF, free the work arrays, and use the
+         NDF arrays from here on. */
+      if( wf->nworker > 1 ) {
+         memcpy( (odata->pntr)[0], map, sizeof(double)*nxy );
+         memcpy( (odata->pntr)[1], variance, sizeof(double)*nxy );
+         (void) smf_free( map, status );
+         (void) smf_free( variance, status );
+         map = (odata->pntr)[0];
+         variance = (odata->pntr)[1];
+      }
 
       /* Calculate exposure time per output pixel from weights array -
          note even if weights is a 3-D array we only use the first
@@ -1239,6 +1265,7 @@ void smurf_makemap( int *status ) {
 
   /* Arrive here if no output NDF is being created. */
  L998:;
+  if( wf ) wf = smf_destroy_workforce( wf );
   if( spacerefwcs ) spacerefwcs = astAnnul( spacerefwcs );
   if( outfset != NULL ) outfset = astAnnul( outfset );
   if( igrp != NULL ) grpDelet( &igrp, status);

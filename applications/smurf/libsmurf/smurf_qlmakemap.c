@@ -444,7 +444,7 @@ void smurf_qlmakemap( int *status ) {
              status);
 
     /* Rebin the data onto the output grid */
-    smf_rebinmap( data, bolonoise, i, size, outframeset, spread, params, 
+    smf_rebinmap( NULL, data, bolonoise, i, size, outframeset, spread, params, 
                   moving, genvar, lbnd_out, ubnd_out, map, variance, weights, 
                   status );
 

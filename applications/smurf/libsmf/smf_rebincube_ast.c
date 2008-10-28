@@ -13,18 +13,21 @@
 *     C function
 
 *  Invocation:
-*     smf_rebincube_ast( smfData *data, int first, int last, int *ptime, 
-*                        dim_t nchan, dim_t ndet, dim_t nslice, dim_t nel, 
-*                        dim_t nxy, dim_t nout, dim_t dim[3], AstMapping *ssmap,
-*                        AstSkyFrame *abskyfrm, AstMapping *oskymap, 
-*                        Grp *detgrp, int moving, int usewgt, int spread, 
-*                        const double params[], int genvar, double tfac, 
-*                        double fcon, float *data_array, float *var_array, 
+*     smf_rebincube_ast( smfWorkForce *wf, smfData *data, int first, int last, 
+*                        int *ptime, dim_t nchan, dim_t ndet, dim_t nslice, 
+*                        dim_t nel, dim_t nxy, dim_t nout, dim_t dim[3], 
+*                        AstMapping *ssmap, AstSkyFrame *abskyfrm, 
+*                        AstMapping *oskymap, Grp *detgrp, int moving, 
+*                        int usewgt, int spread, const double params[], 
+*                        int genvar, double tfac, double fcon, 
+*                        float *data_array, float *var_array, 
 *                        double *wgt_array, float *texp_array, 
 *                        float *teff_array, int *good_tsys, int *nused,
 *                        int *status );
 
 *  Arguments:
+*     wf = smfWorkForce * (Given)
+*        Pointer to a pool of worker threads that will do the re-binning.
 *     data = smfData * (Given)
 *        Pointer to the input smfData structure.
 *     first = int (Given)
@@ -194,6 +197,7 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
 /* Starlink includes */
@@ -206,19 +210,24 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
+#include "libsmf/smf_threads.h"
 
 #define FUNC_NAME "smf_rebincube_ast"
 
-void smf_rebincube_ast( smfData *data, int first, int last, int *ptime, 
-                        dim_t nchan, dim_t ndet, dim_t nslice, dim_t nel, 
-                        dim_t nxy, dim_t nout, dim_t dim[3], AstMapping *ssmap,
-                        AstSkyFrame *abskyfrm, AstMapping *oskymap, 
-                        Grp *detgrp, int moving, int usewgt, int spread, 
-                        const double params[], int genvar, double tfac,
-                        double fcon, float *data_array, float *var_array, 
-                        double *wgt_array, float *texp_array, 
-                        float *teff_array, int *good_tsys, int *nused,
-                        int *status ){
+#define MAXTHREADS 20
+
+
+void smf_rebincube_ast( smfWorkForce *wf, smfData *data, int first, int last, 
+                      int *ptime, dim_t nchan, dim_t ndet, dim_t nslice, 
+                      dim_t nel, dim_t nxy, dim_t nout, dim_t dim[3], 
+                      AstMapping *ssmap, AstSkyFrame *abskyfrm, 
+                      AstMapping *oskymap, Grp *detgrp, int moving, 
+                      int usewgt, int spread, const double params[], 
+                      int genvar, double tfac, double fcon, 
+                      float *data_array, float *var_array, 
+                      double *wgt_array, float *texp_array, 
+                      float *teff_array, int *good_tsys, int *nused,
+                      int *status ){
 
 /* Local Variables */
    AstCmpMap *detmap = NULL;   /* Mapping from 1D det. index to 2D i/p "grid" coords */
@@ -233,26 +242,33 @@ void smf_rebincube_ast( smfData *data, int first, int last, int *ptime,
    const double *tsys = NULL;  /* Pointer to Tsys value for first detector */
    dim_t iv;                   /* Vector index into output 3D array */
    double *detlut = NULL;      /* Work space for detector mask */
+   double blk_bot[ 2*MAXTHREADS + 1 ]; /* First o/p channel no. in each block */
    double con;                 /* Constant value */
-   double invar;               /* Input variance */
+   double dtemp;               /* Temporary value */
    double tcon;                /* Variance factor for whole time slice */
    float *detwork = NULL;      /* Work array for detector values */
    float *tdata = NULL;        /* Pointer to start of input time slice data */
    float *varwork = NULL;      /* Work array holding variances for 1 slice/channel */
    float *vp = NULL;           /* Pointer to next "varwork" element */
+   float invar;                /* Input variance */
    float teff;                 /* Effective integration time */
    float texp;                 /* Total time ( = ton + toff ) */
    int *nexttime;              /* Pointer to next time slice index to use */
    int ast_flags;              /* Basic flags to use with astRebinSeq */
+   int blk_size;               /* Number of channels processed by a single thread */
    int found;                  /* Was current detector name found in detgrp? */
-   int ichan;                  /* Index of current channel */
-   int idet;                   /* detector index */
+   int iblock;                 /* Index of current spectral block */
+   dim_t ichan;                /* Index of current channel */
+   dim_t idet;                 /* detector index */
    int ignore;                 /* Ignore this time slice? */
    int inperm[ 3 ];            /* Input axis permutation array */
-   int itime;                  /* Index of current time slice */
+   dim_t itime;                /* Index of current time slice */
    int junk;                   /* Unused parameter */
    int lbnd_in[ 2 ];           /* Lower input bounds on receptor axis */
    int ldim[ 3 ];              /* Output array lower GRID bounds */
+   int maxthreads;             /* Max no. of threads to use when re-binning */
+   int nblock;                 /* Number of spectral blocks */
+   int nthreads;               /* Number of threads to use when re-binning */
    int outperm[ 3 ];           /* Output axis permutation array */
    int timeslice_size;         /* Number of elements in a time slice */
    int ubnd_in[ 2 ];           /* Upper input bounds on receptor axis */
@@ -381,6 +397,90 @@ void smf_rebincube_ast( smfData *data, int first, int last, int *ptime,
    inperm[ 2 ] = 2;
    pmap = astPermMap( 3, inperm, 3, outperm, NULL, "" );
 
+/* If we are using multiple threads to rebin spectral blocks in parallel, 
+   calculate the number of channels that are processed by each thread,
+   and the number of threads to use. The whole output spectrum is divided 
+   up into blocks. The number of blocks is two times the number of
+   threads, and each thread rebins two adjacent blocks. Alternate blocks 
+   are re-binned simultanously. First, the odd numbered blocks are re-binned 
+   (one by each thread). When all odd numbered blocks have been re-binned, 
+   the even numbered blocks are re-binned. We ensure that the number of
+   threads used results in a block size that is larger than the spreading
+   width produced by the requested spreading scheme. This means that no
+   pair of simultanously executing threads will ever try to write to the
+   same channel of the output spectrum. */
+   maxthreads = wf ? wf->nworker : 1;
+   if( maxthreads > MAXTHREADS ) maxthreads = MAXTHREADS;
+   if( maxthreads > 1 ) {
+   
+/* Find the largest number of threads into which each output spectrum can
+   be split. The limit is imposes by the requirement that each block is
+   larger than the pixel spreading produced by the requested spreading
+   scheme. */
+      nthreads = ( ( dim[ 2 ] + 1 )/2 )/smf_spreadwidth( spread, params, 
+                                                         status );
+ 
+/* If the spectral range is less than twice the spreading width, we
+   cannot use multiple threads. */
+      if( nthreads > 1 ) {
+
+/* Restrict the number of threads to be no more than the number of workers
+   available in the work force. */
+         if( nthreads > maxthreads ) nthreads = maxthreads;
+
+/* Find the number of output channels in each spectral block. */
+         blk_size = ( dim[ 2 ] - 1 )/( 2*nthreads ) + 1;
+
+/* Set up the first output channel number within each block. */
+         nblock = 2*nthreads;
+         for( iblock = 0; iblock < nblock; iblock++ ) {
+            blk_bot[ iblock ] = (double) ( iblock*blk_size + 1 );
+         }
+
+/* Add in the first channel number beyond the last block. */
+         blk_bot[ nblock ] = blk_bot[ nblock - 1 ] + blk_size;
+
+/* If the output spectrum is too short to guarantee that there are any 
+   independent blocks of output channels, we process the whole spectrum
+   in a single thread. */
+      } else {
+         nthreads = 1;
+         nblock = 1;
+         blk_bot[ 0 ] = 1.0;
+         blk_bot[ 1 ] = (double) ( dim[ 2 ] + 1 );
+      }
+
+/* If multiple threads are not available, we process the whole spectrum
+   in a single thread. */
+   } else {
+      nthreads = 1;
+      nblock = 1;
+      blk_bot[ 0 ] = 1.0;
+      blk_bot[ 1 ] = (double) ( dim[ 2 ] + 1 );
+   }
+
+/* Convert the block boundaries from output channel numbers into input 
+   channel numbers. */
+   astTran1( ssmap, nblock + 1, blk_bot, 0, blk_bot );
+
+/* Ensure they are in increasing order, and are not outside the bounds of
+   the input array. */
+   if( blk_bot[ 0 ] > blk_bot[ 1 ] ) {
+      for( iblock = 0; iblock < ( nblock + 1 )/2; iblock++ ) {
+         dtemp = blk_bot[ nblock - iblock ];
+         blk_bot[ nblock - iblock ] = blk_bot[ iblock ];
+         blk_bot[ iblock ] = dtemp;
+      }
+   }
+
+   for( iblock = 0; iblock <= nblock; iblock++ ) {
+      if( blk_bot[ iblock ] < 1 ) {
+         blk_bot[ iblock ] = 1.0;
+      } else if( blk_bot[ iblock ] > nchan ) {
+         blk_bot[ iblock ] = nchan;
+      } 
+   }
+
 /* Initialise a pointer to the next time slice index to be used. */
    nexttime = ptime;
 
@@ -392,7 +492,7 @@ void smf_rebincube_ast( smfData *data, int first, int last, int *ptime,
 
 /* If this time slice is not being pasted into the output cube, pass on. */
       if( nexttime ){
-         if( *nexttime != itime ) continue;
+         if( *nexttime != (int) itime ) continue;
          nexttime++;
       }
 
@@ -459,12 +559,16 @@ void smf_rebincube_ast( smfData *data, int first, int last, int *ptime,
          }
       }
 
-/* Unless we are ignoring this time slice, paste it into the 3D output cube. */
+/* Unless we are ignoring this time slice, paste it into the 3D output
+   cube. The smf_rebincube_seqf function is a wrapper for astRebinSeqF
+   that splits the total job up between "nthreads" threads running in
+   parallel. */
       if( !ignore ) {
-         astRebinSeqF( fullmap, 0.0, 2, lbnd_in, ubnd_in, tdata, varwork, 
-                       spread, params, ast_flags, 0.0, 50, VAL__BADR, 3, 
-                       ldim, udim, lbnd_in, ubnd_in, data_array, 
-                       var_array, wgt_array, nused );
+         smf_rebincube_seqf( wf, nthreads, blk_bot, fullmap, 0.0, 2, lbnd_in, 
+                             ubnd_in, tdata, varwork, spread, params, 
+                             ast_flags, 0.0, 50, VAL__BADR, 3, ldim, udim, 
+                             lbnd_in, ubnd_in, data_array, var_array, 
+                             wgt_array, nused, status );
 
 /* Now we update the total exposure time array. Scale the exposure time
    of this time slice in order to reduce its influence on the output
@@ -510,12 +614,12 @@ void smf_rebincube_ast( smfData *data, int first, int last, int *ptime,
       if( genvar == 1 ) ast_flags = ast_flags | AST__GENVAR;
 
 /* Normalise the data values. */
-      astRebinSeqF( fullmap, 0.0, 2, lbnd_in, ubnd_in, NULL, NULL, spread, 
-                    params, AST__REBINEND | ast_flags, 0.0, 50, VAL__BADR, 
-                    3, ldim, udim, lbnd_in, ubnd_in, data_array, var_array, 
-                    wgt_array, nused );
-
-      if (fullmap) fullmap = astAnnul(fullmap);
+      astRebinSeqF( fullmap, 0.0, 2, lbnd_in, 
+                    ubnd_in, NULL, NULL, spread, params, 
+                    AST__REBINEND | ast_flags, 0.0, 50, VAL__BADR, 3,  
+                    ldim, udim, lbnd_in, ubnd_in, data_array, var_array, 
+                    wgt_array, nused ); 
+      fullmap = astAnnul(fullmap);
    }
 
 /* Free resources. */

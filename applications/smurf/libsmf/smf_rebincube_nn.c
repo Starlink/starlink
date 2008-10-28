@@ -15,8 +15,8 @@
 *     C function
 
 *  Invocation:
-*     smf_rebincube_nn( smfData *data, int first, int last, int *ptime, 
-*                       dim_t nchan, dim_t ndet, dim_t nslice, 
+*     smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last, 
+*                       int *ptime, dim_t nchan, dim_t ndet, dim_t nslice, 
 *                       dim_t nel, dim_t nxy, dim_t nout, dim_t dim[3], 
 *                       int badmask, int is2d, AstMapping *ssmap, 
 *                       AstSkyFrame *abskyfrm, AstMapping *oskymap, 
@@ -28,6 +28,8 @@
 *                       int *status );
 
 *  Arguments:
+*     wf = smfWorkForce * (Given)
+*        Pointer to a pool of worker threads that will do the re-binning.
 *     data = smfData * (Given)
 *        Pointer to the input smfData structure.
 *     first = int (Given)
@@ -224,10 +226,11 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
+#include "libsmf/smf_threads.h"
 
 #define FUNC_NAME "smf_rebincube_nn"
 
-void smf_rebincube_nn( smfData *data, int first, int last, 
+void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last, 
                        int *ptime, dim_t nchan, dim_t ndet, dim_t nslice, 
                        dim_t nel, dim_t nxy, dim_t nout, dim_t dim[3], 
                        int badmask, int is2d, AstMapping *ssmap, 
@@ -265,14 +268,21 @@ void smf_rebincube_nn( smfData *data, int first, int last,
    int *nexttime;              /* Pointer to next time slice index to use */
    int *specpop = NULL;        /* Input channels per output channel */
    int *spectab = NULL;        /* I/p->o/p channel number conversion table */
+   int first_ts;               /* Is this the first time slice? */
    int found;                  /* Was current detector name found in detgrp? */
    int ignore;                 /* Ignore this time slice? */
+   int init_detector_data;     /* Should detector_data be initialised? */
    int iv0;                    /* Offset for pixel in 1st o/p spectral channel */
+   int jdet;                   /* Detector index */
    int naccept_old;            /* Previous number of accepted spectra */
    int ochan;                  /* Output channel index */
+   int use_threads;            /* Use multiple threads? */
    smfHead *hdr = NULL;        /* Pointer to data header for this time slice */
 
+   static smfRebincubeNNArgs1 *common_data = NULL; /* Holds data common to all detectors */
+   static smfRebincubeNNArgs2 *detector_data = NULL; /* Holds data for each detector */
    static int *pop_array = NULL;/* I/p spectra pasted into each output spectrum */
+   static dim_t ndet_max = 0;  /* Max number of detectors */
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
@@ -300,11 +310,6 @@ void smf_rebincube_nn( smfData *data, int first, int last,
          ochan = spectab[ ichan ];
          if( ochan != -1 ) specpop[ ochan ]++;
       }
-
-/* We also need an extra work array for 2D weighting that can hold a
-   single output spectrum. This is used as a staging post for each input
-   spectrum prior to pasting it into the output cube. */
-      work = astMalloc( nchanout*sizeof( float ) );
    }
 
 /* If this is the first pass through this file, initialise the arrays. */
@@ -368,6 +373,8 @@ void smf_rebincube_nn( smfData *data, int first, int last,
    smf_reportprogress( itime, status );
 
 /* Loop round all time slices in the input NDF. */
+   use_threads = 0;
+   first_ts = 1;
    for( itime = 0; itime < nslice && *status == SAI__OK; itime++ ) {
 
 /* If this time slice is not being pasted into the output cube, pass on. */
@@ -405,9 +412,102 @@ void smf_rebincube_nn( smfData *data, int first, int last,
    detector. */
       astTran2( totmap, ndet, detxin, detyin, 1, detxout, detyout );
 
+/* If this is the first time slice from the current input file to be pasted 
+   into the output, see if any of the spectra will end up being pasted on 
+   top of each other in the output. If not we can use a separate thread to 
+   paste each spectrum. Otherwise, we cannot use multiple threads since they 
+   may end up trying to write to the same output pixel at the same time. */
+      if( first_ts ) {
+         first_ts = 0;
+         use_threads = wf ? 1 : 0;
+         for( idet = 0; idet < ndet - 1 && use_threads; idet++ ) {
+            if( detxout[ idet ] != AST__BAD && detyout[ idet ] != AST__BAD ){
+
+               gxout = floor( detxout[ idet ] + 0.5 );
+               gyout = floor( detyout[ idet ] + 0.5 );
+
+               if( gxout >= 1 && gxout <= dim[ 0 ] &&
+                   gyout >= 1 && gyout <= dim[ 1 ] ) {
+
+                  for( jdet = idet + 1; idet < ndet; idet++ ) {
+                     if( detxout[ jdet ] != AST__BAD && 
+                         detyout[ jdet ] != AST__BAD ){
+   
+                        if( floor( detxout[ jdet ] + 0.5 ) == gxout && 
+                            floor( detyout[ jdet ] + 0.5 ) == gyout ) {
+                           use_threads = 0;
+                           break;
+                        }
+                     }
+                  }
+
+               }
+            }
+         }
+
+/* If we will be using mutiple threads, do some preparation. */
+         if( use_threads ) {
+
+/* Ensure we have a structure holding information which is common to all
+   detectors and time slices. */
+            common_data = astGrow( common_data, sizeof( smfRebincubeNNArgs1 ), 1 );
+            if( astOK ) {
+               common_data->badmask = badmask;
+               common_data->nchan = nchan;
+               common_data->nchanout = nchanout;
+               common_data->spectab = spectab;
+               common_data->specpop = specpop;
+               common_data->nxy = nxy;
+               common_data->genvar = genvar;
+               common_data->data_array = data_array;
+               common_data->var_array = var_array;
+               common_data->wgt_array = wgt_array;
+               common_data->pop_array = pop_array;
+               common_data->nout = nout;
+               common_data->is2d = is2d;
+            }
+
+/* Ensure we have a structure for each detector to hold the detector-specific 
+   data, plus a pointer to the common data. */
+            init_detector_data = ( detector_data == NULL );
+            if( init_detector_data ) ndet_max = 0;
+
+            detector_data = astGrow( detector_data, sizeof( smfRebincubeNNArgs2 ), 
+                                     ndet ) ;
+            if( ndet > ndet_max ) ndet_max = ndet;
+
+/* Allocate work space for each detector and store the common data
+   pointer. */
+            if( astOK ) {
+               for( idet = 0; idet < ndet; idet++ ) {
+                  detector_data[ idet ].common = common_data;
+                  if( init_detector_data ) {
+                     detector_data[ idet ].work = astMalloc( nchanout*sizeof( float ) );
+                  } else {
+                     detector_data[ idet ].work = astGrow( detector_data[ idet ].work, 
+                                                        sizeof( float ), nchanout );
+                  }
+               }
+            }
+
+/* If we are using a single threads, do some alternative preparation. */
+         } else {
+
+/* We need an extra work array for 2D weighting that can hold a single 
+   output spectrum. This is used as a staging post for each input
+   spectrum prior to pasting it into the output cube. */
+            work = astMalloc( nchanout*sizeof( float ) );
+
+         }
+      }
+
 /* Loop round each detector, pasting its spectral values into the output
    cube. */
       for( idet = 0; idet < ndet; idet++ ) {
+      
+/* If multi-threaded, initialise a bad value for the detector's weight
+   to indicate that it is not being used. */
+         if( use_threads ) detector_data[ idet ].wgt = VAL__BADD;
 
 /* See if any good tsys values are present. */
          if( ((float) tsys[ idet ]) != VAL__BADR ) *good_tsys = 1;
@@ -459,22 +559,26 @@ void smf_rebincube_nn( smfData *data, int first, int last,
    either the 2D or 3D algorithm. */
                if( !ignore ) {
                   ddata = tdata + idet*nchan;
-                  naccept_old = *naccept;
 
-                  if( is2d ) {
-                     smf_rebincube_paste2d( badmask, nchan, nchanout, spectab, 
-                                            specpop, iv0, nxy, wgt, genvar, 
-                                            invar, ddata, data_array, 
-                                            var_array, wgt_array, pop_array, 
-                                            nused, nreject, naccept, work, 
-                                            status );
-                  } else {
-                     smf_rebincube_paste3d( nchan, nout, spectab, iv0, nxy, 
-                                            wgt, genvar, invar, ddata, 
-                                            data_array, var_array, 
-                                            wgt_array, nused, status );
-                     (*naccept)++;
-                  }
+/* First deal with cases where we are using a single thread (the current
+   thread). */
+                  if( !use_threads ) {
+                     naccept_old = *naccept;
+
+                     if( is2d ) {
+                        smf_rebincube_paste2d( badmask, nchan, nchanout, spectab, 
+                                               specpop, iv0, nxy, wgt, genvar, 
+                                               invar, ddata, data_array, 
+                                               var_array, wgt_array, pop_array, 
+                                               nused, nreject, naccept, work, 
+                                               status );
+                     } else {
+                        smf_rebincube_paste3d( nchan, nout, spectab, iv0, nxy, 
+                                               wgt, genvar, invar, ddata, 
+                                               data_array, var_array, 
+                                               wgt_array, nused, status );
+                        (*naccept)++;
+                     }
 
 /* Now we update the total and effective exposure time arrays for the
    output spectrum that receives this input spectrum. Scale the exposure 
@@ -482,10 +586,48 @@ void smf_rebincube_nn( smfData *data, int first, int last,
    output expsoure times if it does not have much spectral overlap with
    the output cube. Only update the exposure time arrays if the spectrum
    was used (as shown by an increase in the number of accepted spectra). */
-                  if( texp != VAL__BADR && *naccept > naccept_old ) {
-                     texp_array[ iv0 ] += texp*tfac;
-                     teff_array[ iv0 ] += teff*tfac;
+                     if( texp != VAL__BADR && *naccept > naccept_old ) {
+                        texp_array[ iv0 ] += texp*tfac;
+                        teff_array[ iv0 ] += teff*tfac;
+                     }
+
+/* Now deal with cases where we are using several threads. */
+                  } else {
+
+/* Set up the detector specific data. */
+                     detector_data[ idet ].iv0 = iv0;
+                     detector_data[ idet ].wgt = wgt;
+                     detector_data[ idet ].invar = invar;
+                     detector_data[ idet ].ddata = ddata;
+                     detector_data[ idet ].nused = 0;
+                     detector_data[ idet ].nreject = 0;
+                     detector_data[ idet ].naccept = 0;
+
+/* Add a job to the workforce's job list. This job calls smf_rebincube_paste2d 
+   or smf_rebincube_paste3d to paste the detector input spectrum into the 
+   output cube. */
+                     smf_add_job( wf, 0, detector_data + idet,
+                                  smf_rebincube_paste_thread, NULL, status );
                   }
+               }
+            }
+         }
+      }
+
+/* If using multiple threads, wait until all spectra for this time slice 
+   have been pasted into the output cube. Then transfer the output values
+   from the detector data structures to the returned variables. */
+      if( use_threads ) {
+         smf_wait( wf, status );
+         for( idet = 0; idet < ndet; idet++ ) {
+            if( detector_data[ idet ].wgt != VAL__BADD ) {
+               (*nused) += detector_data[ idet ].nused;
+               (*nreject) += detector_data[ idet ].nreject;
+               (*naccept) += detector_data[ idet ].naccept;
+
+               if( texp != VAL__BADR && detector_data[ idet ].naccept > 0 ) {
+                  texp_array[ detector_data[ idet ].iv0 ] += texp*tfac;
+                  teff_array[ detector_data[ idet ].iv0 ] += teff*tfac;
                }
             }
          }
@@ -512,6 +654,13 @@ void smf_rebincube_nn( smfData *data, int first, int last,
 
       pop_array = astFree( pop_array );
 
+      if( use_threads ) {
+         common_data = astFree( common_data );
+         for( idet = 0; idet < ndet_max; idet++ ) {
+            detector_data[ idet ].work = astFree( detector_data[ idet ].work );
+         }
+         detector_data = astFree( detector_data );
+      }
    }
 
 /* Free non-static resources. */

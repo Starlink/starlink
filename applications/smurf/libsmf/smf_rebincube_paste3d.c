@@ -131,7 +131,7 @@ void smf_rebincube_paste3d( dim_t nchan, dim_t nout, int *spectab, dim_t iv0,
 
 /* Local Variables */
    dim_t iv;                   /* Vector index into output 3D array */
-   int ichan;                  /* Index of current channel */
+   dim_t ichan;                /* Index of current channel */
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;

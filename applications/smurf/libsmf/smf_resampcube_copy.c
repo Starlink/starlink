@@ -14,15 +14,13 @@
 *     C function
 
 *  Invocation:
-*     void smf_resampcube_copy( dim_t nchan, dim_t nsky, int *spectab, 
+*     void smf_resampcube_copy( dim_t nchan, int *spectab, 
 *                               dim_t iv0, dim_t nxy, float *ddata, 
 *                               float *in_data, int *status );
 
 *  Arguments:
 *     nchan = dim_t (Given)
 *        Number of spectral channels in the template time series cube.
-*     nsky = dim_t (Given)
-*        Number of elements in the sky cube.
 *     spectab = int * (Given)
 *        This array should have "nchan" elements, and each element should
 *        hold the integer index (zero-based) of the nearest neighbouring 
@@ -90,7 +88,7 @@
 
 #define FUNC_NAME "smf_resampcube_copy"
 
-void smf_resampcube_copy( dim_t nchan, dim_t nsky, int *spectab, 
+void smf_resampcube_copy( dim_t nchan, int *spectab, 
                           dim_t iv0, dim_t nxy, float *ddata, 
                           float *in_data, int *status ){
 

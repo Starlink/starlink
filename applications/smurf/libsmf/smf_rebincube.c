@@ -14,7 +14,7 @@
 *     C function
 
 *  Invocation:
-*     smf_rebincube( smfData *data, int first, int last, 
+*     smf_rebincube( smfWorkForce *wf, smfData *data, int first, int last, 
 *                    int *ptime, int badmask, int is2d, 
 *                    AstSkyFrame *abskyfrm, AstMapping *oskymap, 
 *                    AstFrame *ospecfrm, AstMapping *ospecmap, 
@@ -26,6 +26,8 @@
 *                    int *nreject, int *naccept, int *status );
 
 *  Arguments:
+*     wf = smfWorkForce * (Given)
+*        Pointer to a pool of worker threads that will do the re-binning.
 *     data = smfData * (Given)
 *        Pointer to the input smfData structure.
 *     first = int (Given)
@@ -225,10 +227,11 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
+#include "libsmf/smf_threads.h"
 
 #define FUNC_NAME "smf_rebincube"
 
-void  smf_rebincube( smfData *data, int first, int last, 
+void  smf_rebincube( smfWorkForce *wf, smfData *data, int first, int last, 
                      int *ptime, int badmask, int is2d, 
                      AstSkyFrame *abskyfrm, AstMapping *oskymap, 
                      AstFrame *ospecfrm, AstMapping *ospecmap, 
@@ -301,7 +304,7 @@ void  smf_rebincube( smfData *data, int first, int last,
 
    } else if( fcon2 != *fcon && *fcon != VAL__BADD) {
 
-/* fcon can be different by small amount and still be accurate enough 
+/* fcon can be different by fraction of a percent and still be accurate enough 
    for our purposes */
       double percent = 100.0 * fabs(*fcon - fcon2 ) / *fcon;
       if ( percent > 1.0 ) {
@@ -346,7 +349,7 @@ void  smf_rebincube( smfData *data, int first, int last,
 /* If we are using nearest neighbour rebinning, we can use specialist
    code that is faster than AST. */
    if( spread == AST__NEAREST ) {
-      smf_rebincube_nn( data, first, last, ptime, nchan, ndet, nslice, 
+      smf_rebincube_nn( wf, data, first, last, ptime, nchan, ndet, nslice, 
                         nel, nxy, nout, dim, badmask, is2d, (AstMapping *) ssmap, 
                         abskyfrm, oskymap, detgrp, moving, usewgt, genvar, 
                         tfac, fcon2, data_array, var_array, wgt_array, 
@@ -355,7 +358,7 @@ void  smf_rebincube( smfData *data, int first, int last,
 
 /* For all other spreading schemes, we use AST. */
    } else {
-      smf_rebincube_ast( data, first, last, ptime, nchan, ndet, nslice, 
+      smf_rebincube_ast( wf, data, first, last, ptime, nchan, ndet, nslice, 
                          nel, nxy, nout, dim, (AstMapping *) ssmap, abskyfrm, 
                          oskymap, detgrp, moving, usewgt, spread, params, 
                          genvar, tfac, fcon2, data_array, var_array, wgt_array,

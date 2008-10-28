@@ -19,7 +19,7 @@ static char errmess[132];              /* For DRAMA error messages */
 #define PIX2MM 1.135                   /* pixel interval in mm */
 const double RAD2DEG = 90.0 / PIBY2;   /* Convert Radians to degrees */
 
-/*+ sc2ast_createwcs - create WCS description */
+/*+ sc2ast_createwcs - create WCS description using a static cache */
 
 void sc2ast_createwcs
 (
@@ -42,6 +42,108 @@ int *status             /* global status (given and returned) */
      "subnum" set to -1. In this is done, the cached resources are freed
      and this function returns without further action, returning a NULL 
      pointer in "*fset".
+
+     If telescope state is NULL, a focal plane frameset will be returned.
+
+   Notes :
+     - Because of its use of a static cache, this function should be used 
+     only when thread-safety is not an issue. For threaded applications,
+     use sc2ast_createwcs2 instead.
+
+     - After the first call the cached part of the frameset contains information
+     specific to the SCUBA-2 instrument, observatory location etc. If you
+     wish to subsequently calculate framesets for a different instrument
+     or observatory location ensure that you first clear the cache by
+     setting subnum=-1.
+
+   Authors :
+     B.D.Kelly (bdk@roe.ac.uk)
+     Tim Jenness (timj@jach.hawaii.edu)
+     D.S. Berry (dsb@ast.man.ac.uk)
+     E.Chapin (echapin@phas.ubc.ca)
+
+   History :
+     01Apr2005 : original (bdk)
+     21Apr2005 : update comments and add labels to some of the frames
+                 (bdk)
+     25Apr2005 : revise polynomials and plate scale (bdk)
+     27Apr2005 : put in subarray orientations (bdk)
+     10May2005 : remember xoff and yoff are in pixel units (bdk)
+     10May2005 : fix syntax error in xoff and add more frame names (bdk)
+     18May2005 : Check subnam range (timj)
+     20Jun2005 : add zpixelframe (bdk)
+     23Aug2005 : De-projection (Az,El) rather than (RA,Dec), and leave
+                 final SkyFrame describing (Az,El). Also, replace supplied 
+                 (ra,dec) parameters by (az,el,tai). (dsb)
+     07Nov2005 : Remove duplicate elevation argument (timj)
+                 Remove unused parallactic angle argument (timj)
+     08Nov2005 : Use RAD2DEG global rather than 90*PIBY2 (timj)
+     27Jan2006 : Use ErsRep rather than printf (timj)
+     28Jan2006 : Annul all the mappings/frames to fix terrible leak (timj)
+     07Feb2006 : Cache Mappings which do not depend on "az", "el" or "tai".
+                 Do not create extra Frames unless specifically requested.
+                 Use AST contexts for handling the annulling of AST objects.
+                 Avoid use of FitsChans for extra speed. (dsb)
+     17Feb2006 : Combine Nasmyth->Cassegrain rotation with the rotations
+                    performed after the tangent plane->spherical projection.
+                 Cache the SkyFrame used to represent AzEl coords.
+                 Cache the FrameSets returned for each subnum
+                 Do away with the facility for including intermediate
+                    Frames (dsb)
+     1Mar2006  : Check for (subnum==-1) before checking inherited status (dsb)
+     2Mar2006  : const constant arrays (timj)
+     12Apr2006 : added jig_az_x/y, remove extra_frames from interface (ec)
+     18Apr2006 : Use a ShiftMap to apply jig_az_x/y (dsb)
+     19Apr2006 : Only use shiftmap if non-zero jig_az_x/y (ec)
+     7Aug2006  : Correct rotation matrix in sc2ast_maketanmap (dsb)
+     7Aug2006  : Removed sc2ast_createwcs_compat + related kludges (ec)
+     10Aug2006 : More corrections to the rotation matrix in sc2ast_maketanmap (dsb)
+     10Aug2006 : Added "rot" parameter to sc2ast_maketanmap (dsb)
+     07Sep2006 : Added "telpos" and "instap" arguments 
+                 JCMTState now used for time/pointing (EC)
+     19Dec2006 : If "state" is NULL return the focal plane frameset (TJ)
+     20Feb2007 : Clear the cache if instap is changed.
+     23Jul2008 : Set SkyRef (TJ)
+     10Sep2008 : Renamed as sc2ast_createwcs2. This function is now just
+                 a wrapper for sc2ast_createwcs2. (dsb)
+*/
+{
+   static sc2astCache *cache = NULL;
+   cache = sc2ast_createwcs2( subnum, state, instap, telpos, fset,     
+                              cache, status );
+}
+
+
+
+/*+ sc2ast_createwcs2 - create WCS description using a supplied cache. */
+
+sc2astCache *sc2ast_createwcs2
+(
+int subnum,             /* subarray number, 0-7 (given). If -1 is
+                           supplied the cached AST objects will be freed. */
+const JCMTState *state, /* Current telescope state (time, pointing etc.) */
+const double instap[2], /* Offset of subarray in the focal plane */ 
+const double telpos[3], /* Geodetic W Lon/Lat/Alt of telescope (deg/deg/ign.)*/
+AstFrameSet **fset,     /* constructed frameset (returned) */
+sc2astCache *cache,     /* A pointer to a structure holding cached info */
+int *status             /* global status (given and returned) */
+)
+/* Method :
+     Build an AST frameset containing mappings from the original GRID
+     coordinates of the bolometers to celestial coordinates. This
+     includes the rotations and reflections relevant to each subarray and
+     the distortion imposed by the SCUBA-2 optics.
+ 
+     This function uses a supplied structure to hold a cache of information 
+     that does not change between invocations. If "cache" is supplied as
+     NULL, then memory for a new structure is allocated and initialised, and 
+     a pointer to it is returned. The contents of the returned structure
+     should not be changed outside this function.
+
+     The cache should be freed by calling this function with "subnum" set  
+     to -1. In this is done, the cached resources are freed and this 
+     function returns without further action, returning a NULL pointer in 
+     "*fset", and a NULL pointer for the function value.
 
      If telescope state is NULL, a focal plane frameset will be returned.
 
@@ -100,6 +202,7 @@ int *status             /* global status (given and returned) */
      19Dec2006 : If "state" is NULL return the focal plane frameset (TJ)
      20Feb2007 : Clear the cache if instap is changed.
      23Jul2008 : Set SkyRef (TJ)
+     10Sep2008 : Original created by renaming sc2ast_createwcs (dsb)
 */
 
 {
@@ -116,7 +219,8 @@ int *status             /* global status (given and returned) */
    double shifts[ 2 ];
    AstShiftMap *instapmap;     
    AstShiftMap *jigglemap;
-
+   sc2astCache *result;
+   int isub;
 
    double a;                       /* subarray angle */
    const double rotangle[8] =
@@ -134,11 +238,12 @@ int *status             /* global status (given and returned) */
    const double xoff[8] =
       { -41.5,  33.5,  41.5, -33.5, -41.5,  33.5,  41.5, -33.5 };
    const double yoff[8] =
-     {  33.5,  41.5, -33.5, -41.5,  33.5,  41.5, -33.5, -41.5 };
+      {  33.5,  41.5, -33.5, -41.5,  33.5,  41.5, -33.5, -41.5 };
 
    const double flip[8] =
-   /*{ 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0 };*/
-   { -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0 };
+    /*{ 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0 };*/
+      { -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0 };
+
 
 /* Distortion mappings. X and Y are in the distorted image, x and y are
    undistorted (Nasmyth). All units are mm.
@@ -202,86 +307,82 @@ int *status             /* global status (given and returned) */
                1.221e-6,    2.0, 0.0, 3.0
                };
 
-
-/* A cache containing, for each sub-array, a FrameSet and a Mapping. The 
-   FrameSet will contai a single Frame representing GRID coords in the 
-   sub-array. The result of applying the Mapping to this Frame will be 
-   Cartesian (i.e. in the tangent plane) Nasmyth coords in rads. The 
-   AST pointers in this cache are exempted from AST context handling, and
-   so need to be released explicitly using astAnnul. This is done by 
-   calling this function with the sub-frame number set to -1. */
-   static AstMapping *map_cache[ 8 ] = { NULL, NULL, NULL, NULL, NULL, NULL, 
-                                         NULL, NULL };
-   static AstFrameSet *frameset_cache[ 8 ] = { NULL, NULL, NULL, NULL, NULL, 
-					       NULL, NULL, NULL };
-
-/* Cache the SkyFrame used to represent final spherical (Az,El) coords */
-   static AstSkyFrame *skyframe = NULL;
-
-/* Cache used to hold Mappings needed in the tangent plane to celestial
-   longitude,latitude Mapping. */
-   static AstMapping *azel_cache[ 2 ] = { NULL, NULL };
-
-/* Cache used to hold the instap values which were hatrd-wired into the
-   cached Mapping for each subarray. */
-   static double instap_x[ 8 ] = { AST__BAD, AST__BAD, AST__BAD, AST__BAD, 
-                                   AST__BAD, AST__BAD, AST__BAD, AST__BAD };
-   static double instap_y[ 8 ] = { AST__BAD, AST__BAD, AST__BAD, AST__BAD, 
-                                   AST__BAD, AST__BAD, AST__BAD, AST__BAD };
-      
 /* Check the sub-array number. If it is -1, free the cached AST objects and 
-   return. Otherwise, report an error if the value is illegal. We do
-   this before checking the inherited status so that the memory is freed
-   even if an error has occurred. */
+   the cache structure itself, and then return. Otherwise, report an error 
+   if the value is illegal. We do this before checking the inherited status 
+   so that the memory is freed even if an error has occurred. */
    if( subnum == -1 ) {
-
-      for( subnum = 0; subnum < 8; subnum++ ) {
-         if( map_cache[ subnum ] ) {
-            map_cache[ subnum ] = astAnnul( map_cache[ subnum ] );
+      if( cache ) {
+         for( subnum = 0; subnum < 8; subnum++ ) {
+            if( cache->map[ subnum ] ) {
+               cache->map[ subnum ] = astAnnul( cache->map[ subnum ] );
+            }
+            if( cache->frameset[ subnum ] ) {
+               cache->frameset[ subnum ] = astAnnul( cache->frameset[ subnum ] );
+            }
          }
-         if( frameset_cache[ subnum ] ) {
-            frameset_cache[ subnum ] = astAnnul( frameset_cache[ subnum ] );
-         }
-      }
+   
+         if( cache->azel[ 0 ] ) cache->azel[ 0 ] = astAnnul( cache->azel[ 0 ] );
+         if( cache->azel[ 1 ] ) cache->azel[ 1 ] = astAnnul( cache->azel[ 1 ] );
+         if( cache->skyframe ) cache->skyframe = astAnnul( cache->skyframe );
 
-      if( azel_cache[ 0 ] ) azel_cache[ 0 ] = astAnnul( azel_cache[ 0 ] );
-      if( azel_cache[ 1 ] ) azel_cache[ 1 ] = astAnnul( azel_cache[ 1 ] );
-      if( skyframe ) skyframe = astAnnul( skyframe );
+         cache = astFree( cache );
+      } 
 
-      return;
+
+      return NULL;
 
    } else if ( subnum < 0 || subnum > 7 ) {
      *status = SAI__ERROR;
      sprintf( errmess, "Sub array number '%d' out of range\n", subnum );
      ErsRep( 0, status, errmess );
-     return;
+     return cache;
 
    }
 
-
-
-/* Now initialise the returned pointer and check the inherited status */
+/* Now initialise the returned pointers and check the inherited status */
    *fset = AST__NULL;
-   if ( *status != SAI__OK ) return;
+   result = cache;
+   if ( *status != SAI__OK ) return result;
 
 /* Start an AST context. This means we do not need to worry about
    annulling AST objects. Note, there should be no "return" statements
    before the matching call to astEnd. */
    astBegin;
 
+/* If no cache was supplied, allocate memory for a new cache and
+   initialise it. */
+   if( ! cache ) {
+      cache = astMalloc( sizeof( sc2astCache ) );
+      if( !cache ) return result;
+      for( isub = 0; isub < 8; isub++ ) {
+         cache->map[ isub ] = NULL;
+         cache->frameset[ isub ] = NULL;
+         cache->instap_x[ isub ] = AST__BAD;   
+         cache->instap_y[ isub ] = AST__BAD;   
+      }
+      cache->azel[ 0 ] = NULL;
+      cache->azel[ 1 ] = NULL;
+      cache->skyframe = NULL;
+
+/* When this function exits, return a pointer to the newly allocated cache 
+   structure. */
+      result = cache;
+   }
+
 /* See if either of the instap values has changed. If so, clear the cache
    for the requested subarray since the cached Mapping will have the old
    instap values hard-wired into it. */
-   if( ( instap && ( instap[ 0 ] != instap_x[ subnum ] ||
-                     instap[ 1 ] != instap_y[ subnum ] ) ) ||
-       ( !instap && ( 0.0 != instap_x[ subnum ] || 
-                      0.0 != instap_y[ subnum ] ) ) ){
+   if( ( instap && ( instap[ 0 ] != cache->instap_x[ subnum ] ||
+                     instap[ 1 ] != cache->instap_y[ subnum ] ) ) ||
+       ( !instap && ( 0.0 != cache->instap_x[ subnum ] || 
+                      0.0 != cache->instap_y[ subnum ] ) ) ){
 
-      if( map_cache[ subnum ] ) {
-         map_cache[ subnum ] = astAnnul( map_cache[ subnum ] );
+      if( cache->map[ subnum ] ) {
+         cache->map[ subnum ] = astAnnul( cache->map[ subnum ] );
       }
-      if( frameset_cache[ subnum ] ) {
-         frameset_cache[ subnum ] = astAnnul( frameset_cache[ subnum ] );
+      if( cache->frameset[ subnum ] ) {
+         cache->frameset[ subnum ] = astAnnul( cache->frameset[ subnum ] );
       }
    }
 
@@ -297,17 +398,17 @@ int *status             /* global status (given and returned) */
    been created. The cached Mapping transforms positions within the Frame
    encapsulated within the cached FrameSet into Cartesian Nasmyth coords in
    radians. */
-   if( !map_cache[ subnum ] ) {
+   if( !cache->map[ subnum ] ) {
 
 /* Create an AST frame describing GRID coordinates within the subarray
    and put it into the cached FrameSet for this subarray. The centre of
    the first pixel has coords (1.0,1.0) in the GRID Frame. */
-      frameset_cache[ subnum ] = astFrameSet( astFrame ( 2, "Domain=GRID" ), 
+      cache->frameset[ subnum ] = astFrameSet( astFrame ( 2, "Domain=GRID" ), 
                                               "" );   
 
 /* We add a dummy 2D Frame to the FrameSet so that there is a Frame to
    remove on the first call to astRemoveFrame below. */
-      astAddFrame( frameset_cache[ subnum ], AST__BASE, 
+      astAddFrame( cache->frameset[ subnum ], AST__BASE, 
                    astUnitMap( 2, "" ), astFrame( 2, "" ) );
 
 /* The GRID domain locates the [0][0] pixel at coordinates (1,1). Shift
@@ -316,14 +417,14 @@ int *status             /* global status (given and returned) */
       zshift[0] = -1.0;
       zshift[1] = -1.0;
       zshiftmap = astShiftMap ( 2, zshift, "" );
-      map_cache[ subnum ] = (AstMapping *) zshiftmap;
+      cache->map[ subnum ] = (AstMapping *) zshiftmap;
 
 /* The mapping from pixel numbers to millimetres is a simple scaling,
    because the pixel separation is the same in both coordinates and is
    accurately constant. A ZoomMap can be used for this. */
       zoommap = astZoomMap ( 2, PIX2MM, "" );
 
-      map_cache[ subnum ] = (AstMapping *) astCmpMap( map_cache[ subnum ], 
+      cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
 						      zoommap, 1, "" );
 
 /* The mm coords now have to be rotated through an angle approximating
@@ -334,7 +435,7 @@ int *status             /* global status (given and returned) */
       rot[ 2 ] = sin( a );
       rot[ 3 ] = cos( a );
       rotmap = astMatrixMap ( 2, 2, 0, rot, "" );
-      map_cache[ subnum ] = (AstMapping *) astCmpMap( map_cache[ subnum ], 
+      cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
                                                       rotmap, 1, "" );
 
 /* The Y coordinate now has to be reversed */
@@ -343,7 +444,7 @@ int *status             /* global status (given and returned) */
       rev[ 2 ] = 0;
       rev[ 3 ] = reverse[ subnum ];
       revmap = astMatrixMap ( 2, 2, 0, rev, "" );
-      map_cache[ subnum ] = (AstMapping *) astCmpMap( map_cache[ subnum ], 
+      cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
                                                       revmap, 1, "" );
 
 /* For each 450/850 subarray, the next Mapping creates FRAME450/FRAME850
@@ -354,7 +455,7 @@ int *status             /* global status (given and returned) */
       shift[ 0 ] = xoff[ subnum ] * PIX2MM;
       shift[ 1 ] = yoff[ subnum ] * PIX2MM;
       shiftmap = astShiftMap( 2, shift, "" );
-      map_cache[ subnum ] = (AstMapping *) astCmpMap( map_cache[ subnum ], 
+      cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
                                                       shiftmap, 1, "" );
 
 /* The final step into Frame850 coordinates is only needed for the 450
@@ -363,46 +464,45 @@ int *status             /* global status (given and returned) */
       rev[ 1 ] = 0;
       rev[ 2 ] = 0;
       rev[ 3 ] = flip[ subnum ];
-
       flipmap = astMatrixMap( 2, 2, 0, rev, "" );
-      map_cache[ subnum ] = (AstMapping *) astCmpMap( map_cache[ subnum ], 
+      cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
                                                       flipmap, 1, "" );
 
 /* Correct for polynomial distortion */      
 
       polymap = astPolyMap( 2, 2, 14, coeff_f, 14, coeff_i, "" );
-      map_cache[ subnum ] = (AstMapping *) astCmpMap( map_cache[ subnum ], 
+      cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
 						      polymap, 1, "" );
       
 /* Convert from mm to radians (but these coords are still cartesian (x,y)
    (i.e. measured in the tangent plane) rather than spherical (lon,lat)
    measured on the sky. */
       radmap = astZoomMap ( 2, MM2RAD, "" );
-      map_cache[ subnum ] = (AstMapping *) astCmpMap( map_cache[ subnum ], 
+      cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
                                                       radmap, 1, "" );
 
 /* Apply focal plane offsets - if supplied. Note the effective values in
    the cache so that we can spot if they are changed. */
       if (instap) {
 	instapmap = astShiftMap( 2, instap, "" );
-	map_cache[ subnum ] = (AstMapping *) astCmpMap( map_cache[ subnum ], 
+	cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
 							instapmap, 1, "" );
-        instap_x[ subnum ] = instap[ 0 ];
-        instap_y[ subnum ] = instap[ 1 ];
+        cache->instap_x[ subnum ] = instap[ 0 ];
+        cache->instap_y[ subnum ] = instap[ 1 ];
       } else {
-        instap_x[ subnum ] = 0.0;
-        instap_y[ subnum ] = 0.0;
+        cache->instap_x[ subnum ] = 0.0;
+        cache->instap_y[ subnum ] = 0.0;
       }
 
 /* Simplify the Cached Mapping. */
-      map_cache[ subnum ] = astSimplify( map_cache[ subnum ] );
+      cache->map[ subnum ] = astSimplify( cache->map[ subnum ] );
 
 /* Exempt the cached AST objects from AST context handling. This means
    that the pointers will not be annulled as a result of calling astEnd. 
    Therefore the objects need to be annulled explicitly when no longer
-   needed. this is done by calling this function with "subnum" set to -1. */
-      astExempt( map_cache[ subnum ] );
-      astExempt( frameset_cache[ subnum ] );
+   needed. This is done by calling this function with "subnum" set to -1. */
+      astExempt( cache->map[ subnum ] );
+      astExempt( cache->frameset[ subnum ] );
    }
 
 
@@ -410,20 +510,20 @@ int *status             /* global status (given and returned) */
       frames */
    if (!state) {
      AstFrame * fp_pos_frame;
-     *fset = astClone( frameset_cache[ subnum ] );
+     *fset = astClone( cache->frameset[ subnum ] );
      astRemoveFrame( *fset, AST__CURRENT );
      fp_pos_frame = astFrame( 2, 
 			      "Unit(1)=rad,Unit(2)=rad,Domain=FPLANE"
 			      ",label(1)=FplaneX,label(2)=FplaneY" );
      astSetActiveUnit( fp_pos_frame, 1 );
-     astAddFrame( *fset, AST__BASE, map_cache[ subnum ],
+     astAddFrame( *fset, AST__BASE, cache->map[ subnum ],
 		  fp_pos_frame );
      astSet( *fset, "unit(1)=arcsec,unit(2)=arcsec" );
      /* Return early rather than embed the subsequent code in a big else.
 	A bit dangerous if more is added at the end */
      astExport( *fset );
      astEnd;
-     return;
+     return result;
    }
 
 
@@ -431,7 +531,7 @@ int *status             /* global status (given and returned) */
    AzEl coords (in rads). */
 
    azelmap = sc2ast_maketanmap( state->tcs_az_ac1, state->tcs_az_ac2,
-				azel_cache, state->tcs_az_ac2, status );
+				cache->azel, state->tcs_az_ac2, status );
 
 /* Calculate final mapping with SMU position correction only if needed */
    if( (!state->smu_az_jig_x)  && (!state->smu_az_jig_y) &&
@@ -441,7 +541,7 @@ int *status             /* global status (given and returned) */
    to Tanplane Nasmyth coords in rads), to get total Mapping from GRID 
    coords to spherical AzEl in rads. */
 
-      mapping = (AstMapping *) astCmpMap( map_cache[ subnum ], azelmap, 1, 
+      mapping = (AstMapping *) astCmpMap( cache->map[ subnum ], azelmap, 1, 
 					  "" );
 
    } else {
@@ -452,7 +552,7 @@ int *status             /* global status (given and returned) */
       jigglemap = astShiftMap( 2, shifts, "" );
 
 
-      mapping = (AstMapping *) astCmpMap( map_cache[ subnum ], 
+      mapping = (AstMapping *) astCmpMap( cache->map[ subnum ], 
 					  astCmpMap( jigglemap, azelmap, 1, 
 						     "" ), 1, "" );
    }
@@ -463,40 +563,40 @@ int *status             /* global status (given and returned) */
    since the difference is only 1-2 milliseconds. We cache the created 
    SkyFrame to avoid the overhead of constantly re-creating it. The Epoch 
    is set every time though since this will vary from call to call. */
-   if( !skyframe ) {
-      skyframe = astSkyFrame ( "system=AzEl" );
+   if( !cache->skyframe ) {
+      cache->skyframe = astSkyFrame ( "system=AzEl" );
       
       /* Ast assumes longitude increases eastward, so change sign to
 	 be consistent with smf_calc_telpos here */
-      astSetD( skyframe, "ObsLon", -telpos[0] );
-      astSetD( skyframe, "ObsLat", telpos[1] );
+      astSetD( cache->skyframe, "ObsLon", -telpos[0] );
+      astSetD( cache->skyframe, "ObsLat", telpos[1] );
 
       /* can not set SkyRefIs for now */
-      astSetD( skyframe, "SkyRef(1)", state->tcs_az_bc1 );
-      astSetD( skyframe, "SkyRef(2)", state->tcs_az_bc2 );
+      astSetD( cache->skyframe, "SkyRef(1)", state->tcs_az_bc1 );
+      astSetD( cache->skyframe, "SkyRef(2)", state->tcs_az_bc2 );
 
-      astExempt( skyframe );
+      astExempt( cache->skyframe );
    } else {
      /* Set SkyRef but only if we are moving */
      if (strcmp(state->tcs_tr_sys, "AZEL") == 0 ||
          strcmp(state->tcs_tr_sys, "APP") == 0 ) {
-       astSetD( skyframe, "SkyRef(1)", state->tcs_az_bc1 );
-       astSetD( skyframe, "SkyRef(2)", state->tcs_az_bc2 );
+       astSetD( cache->skyframe, "SkyRef(1)", state->tcs_az_bc1 );
+       astSetD( cache->skyframe, "SkyRef(2)", state->tcs_az_bc2 );
      }
    }
-   astSet( skyframe, "Epoch=MJD %.*g", DBL_DIG, state->tcs_tai + 32.184/SC2AST_SPD );
+   astSet( cache->skyframe, "Epoch=MJD %.*g", DBL_DIG, state->tcs_tai + 32.184/SC2AST_SPD );
 
 /* Now modify the cached FrameSet to use the new Mapping and SkyFrame.
    First remove the existing current Frame and then add in the new one.
    Note, we add a copy of the SkyFrame rather than the cached SkyFrame 
    itself since the SkyFrame contained in the FrameSet will be modified 
    by later functions.  */
-   astRemoveFrame( frameset_cache[ subnum ], AST__CURRENT );
-   astAddFrame( frameset_cache[ subnum ], AST__BASE, mapping, 
-                astCopy( skyframe ) );
+   astRemoveFrame( cache->frameset[ subnum ], AST__CURRENT );
+   astAddFrame( cache->frameset[ subnum ], AST__BASE, mapping, 
+                astCopy( cache->skyframe ) );
 
 /* Return the final FrameSet. */
-   *fset = astClone( frameset_cache[ subnum ] );
+   *fset = astClone( cache->frameset[ subnum ] );
 
 /* Export the returned FrameSet pointer, and then end the AST context. This 
    will annul all AST objects created since the matching call to astBegin,
@@ -507,10 +607,10 @@ int *status             /* global status (given and returned) */
    context. */
    astExport( *fset );
    astEnd;
+
+/* Return a pointer to the cache. */
+   return result;
 }
-
-
-
 
 
 /*+ sc2ast_getdomain - select a domain within a frameset */

@@ -61,6 +61,8 @@
 *        Add tsys
 *     2008-04-30 (TIMJ):
 *        Add units, title and dlabel.
+*     2008-06-30 (DSB):
+*        Add "cache".
 *     2008-07-24 (TIMJ):
 *        initialise obsmode and obstype
 *     2008-07-28 (TIMJ):
@@ -132,6 +134,7 @@ smf_create_smfHead( int * status ) {
   hdr->wcs = NULL;
   hdr->tswcs = NULL;
   hdr->fitshdr = NULL;
+  hdr->cache = NULL;
   hdr->curframe = 0;
   hdr->nframes = 0;
   hdr->state = NULL;

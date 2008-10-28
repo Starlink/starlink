@@ -1,5 +1,3 @@
-
-
 /*
 *+
 *  Name:
@@ -194,6 +192,10 @@ void smurf_mon( int * status ) {
   /* Read the input error message stack level */
   emsLevel( &emslev1 );
 
+  /* Initialise AST */
+  astBegin;
+  memory_caching = astTune( "MemoryCaching", 1 ); 
+
   /* Register our status variable with AST */
   astWatch( status );
 
@@ -214,10 +216,6 @@ void smurf_mon( int * status ) {
 	    taskname, PACKAGE_UPCASE, PACKAGE_VERSION);
   ndfHappn( appname, status );
   msgIfget("MSG_FILTER", status);
-
-  /* Initialise AST */
-  memory_caching = astTune( "MemoryCaching", 1 ); 
-  astBegin;
 
   /* Call the subroutine associated with the requested task */
   if (strcmp( taskname, "EXTINCTION" ) == 0 ) {
@@ -286,8 +284,8 @@ void smurf_mon( int * status ) {
   smf_detpos_wcs( NULL, -1, NULL, NULL, status );
 
   /* Free AST resources */
-  astEnd;
   astTune( "MemoryCaching", memory_caching );
+  astEnd;
 
   /* Check for GRP leaks Do this in a new error reporting context so
    * that we get the correct value even if an error has occurred. */

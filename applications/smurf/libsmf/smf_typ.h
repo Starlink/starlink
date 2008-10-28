@@ -180,6 +180,7 @@
 #include "jcmt/state.h"
 #include "sc2da/sc2store_par.h"
 #include "sc2da/dream_par.h"
+#include "sc2da/sc2ast.h"
 #include "ast.h"
 #include "ndf.h"
 #include "star/grp.h"
@@ -323,6 +324,7 @@ typedef struct smfHead {
   AstFrameSet * wcs;        /* Frameset for a particular time slice (frame) */
   AstFrameSet * tswcs;      /* Frameset for full time series (if tseries) */
   AstFitsChan * fitshdr;    /* FITS header from the file */
+  sc2astCache * cache;      /* Cached info used by sc2ast */
   dim_t curframe;           /* Index corresponding to current frame */
   dim_t nframes;            /* Number of frames in smfData */
   smf_obstype obstype;      /* Observation type */
@@ -481,5 +483,83 @@ typedef struct smfDIMMHead {
   smfData data;
   smfHead hdr;
 } smfDIMMHead;
+
+/* Structure used to pass argument values to astRebinSeqF/D running in a 
+   different thread. */
+typedef struct smfRebinSeqArgs {
+   int is_double;
+   AstMapping *this; 
+   double wlim; 
+   int ndim_in; 
+   const int *lbnd_in; 
+   const int *ubnd_in;
+   void *in; 
+   void *in_var; 
+   int spread; 
+   const double *params; 
+   int flags; 
+   double tol; 
+   int maxpix; 
+   float badval_f; 
+   double badval_d; 
+   int ndim_out; 
+   const int *lbnd_out; 
+   const int *ubnd_out; 
+   int *lbnd; 
+   int *ubnd; 
+   void *out; 
+   void *out_var; 
+   double *weights; 
+   int nused; 
+   int ijob;
+} smfRebinSeqArgs;
+
+/* Structure used to pass detector-independent data to smf_rebincube_paste2d/3d
+   running in a different thread. */
+typedef struct smfRebincubeNNArgs1 {
+   int badmask;
+   dim_t nchan;
+   dim_t nchanout;
+   int *spectab;
+   int *specpop;
+   dim_t nxy;
+   int genvar;
+   float *data_array;
+   float *var_array;
+   double *wgt_array;
+   int *pop_array;
+   dim_t nout;
+   int is2d;
+} smfRebincubeNNArgs1;
+
+/* Structure used to pass detector-dependent data to smf_rebincube_paste2d/3d
+   running in a different thread. */
+typedef struct smfRebincubeNNArgs2 {
+   smfRebincubeNNArgs1 *common;
+   float *work;
+   int iv0;
+   double wgt;
+   double invar;
+   float *ddata;
+   int nused;
+   int nreject;
+   int naccept;
+} smfRebincubeNNArgs2;
+
+typedef struct smfRebinMapData {
+   smfData *data;
+   int rebinflags;
+   AstSkyFrame *abskyfrm;
+   AstMapping *sky2map;
+   int moving;
+   int spread;
+   const double *params;
+   int udim[ 2 ];
+   double *map;
+   double *variance;
+   double *weights;
+   int ijob;
+   double *bolovar;
+} smfRebinMapData;
 
 #endif /* SMF_TYP_DEFINED */

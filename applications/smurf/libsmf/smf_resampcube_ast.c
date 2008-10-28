@@ -13,9 +13,9 @@
 *     C function
 
 *  Invocation:
-*     void smf_resampcube_ast( smfData *data, int index, int size, dim_t nchan,
-*                              dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy, 
-*                              dim_t nsky, dim_t dim[3], AstMapping *ssmap,
+*     void smf_resampcube_ast( smfData *data, dim_t nchan,
+*                              dim_t ndet, dim_t nslice, dim_t nel, 
+*                              dim_t dim[3], AstMapping *ssmap,
 *                              AstSkyFrame *abskyfrm, AstMapping *iskymap, 
 *                              Grp *detgrp, int moving, int interp, 
 *                              const double params[], float *in_data, 
@@ -133,9 +133,9 @@
 
 #define FUNC_NAME "smf_resampcube_ast"
 
-void smf_resampcube_ast( smfData *data, int index, int size, dim_t nchan,
-                         dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy, 
-                         dim_t nsky, dim_t dim[3], AstMapping *ssmap,
+void smf_resampcube_ast( smfData *data, dim_t nchan,
+                         dim_t ndet, dim_t nslice, dim_t nel, 
+                         dim_t dim[3], AstMapping *ssmap,
                          AstSkyFrame *abskyfrm, AstMapping *iskymap, 
                          Grp *detgrp, int moving, int interp, 
                          const double params[], float *in_data, 
@@ -156,8 +156,8 @@ void smf_resampcube_ast( smfData *data, int index, int size, dim_t nchan,
    float *tdata = NULL;        /* Pointer to start of output time slice data */
    int ast_flags;              /* Basic flags to use with astResample */
    int found;                  /* Was current detector name found in detgrp? */
-   int idet;                   /* Detector index */
-   int itime;                  /* Index of current time slice */
+   dim_t idet;                 /* Detector index */
+   dim_t itime;                /* Index of current time slice */
    int lbnd_out[ 2 ];          /* Lower bounds on receptor axis */
    int ldim[ 3 ];              /* Sky cube array lower GRID bounds */
    int skyperm[ 3 ];           /* Sky cube axis permutation array */

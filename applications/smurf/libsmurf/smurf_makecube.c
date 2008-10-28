@@ -817,6 +817,7 @@
 #include "smurflib.h"
 #include "libsmf/smf.h"
 #include "libsmf/smf_typ.h"
+#include "libsmf/smf_threads.h"
 
 #define FUNC_NAME "smurf_makecube"
 #define TASK_NAME "MAKECUBE"
@@ -938,6 +939,7 @@ void smurf_makecube( int *status ) {
    smfFile *file = NULL;      /* Pointer to data file struct */
    smfTile *tile = NULL;      /* Pointer to next output tile description */
    smfTile *tiles = NULL;     /* Pointer to array of output tile descriptions */
+   smfWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
    void *data_array = NULL;   /* Pointer to the rebinned map data */
    void *wgt_array = NULL;    /* Pointer to the weights map */
 
@@ -955,6 +957,10 @@ void smurf_makecube( int *status ) {
 /* Begin an NDF context (we do not begin an AST context since this is
    done within the calling monolith routine). */
    ndfBegin();
+
+/* Find the number of cores/processors available and create a pool of 
+   threads of the same size. */
+   wf = smf_create_workforce( smf_get_nthread( status ), status );
 
 /* Get a group of input files */ 
    ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
@@ -1626,7 +1632,7 @@ void smurf_makecube( int *status ) {
          
 /* Rebin the data into the output grid. */
                if( !sparse ) {
-                  smf_rebincube( data, first, (ifile == ilast ), pt, badmask, 
+                  smf_rebincube( wf, data, first, (ifile == ilast ), pt, badmask, 
                                  is2d, abskyfrm, tskymap, ospecfrm, ospecmap, 
                                  detgrp, moving, use_wgt, tile->elbnd, 
                                  tile->eubnd, spread, params, genvar, data_array, 
@@ -1950,6 +1956,7 @@ L998:;
    if( boxes ) boxes = astFree( boxes );
    if( tiles ) tiles = smf_freetiles( tiles, ntile, status );
    ptime = smf_freepolbins( size, npbin, &pangle, ptime, status ); 
+   wf = smf_destroy_workforce( wf );
 
 /* End the NDF context. */
    ndfEnd( status );

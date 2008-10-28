@@ -254,14 +254,14 @@ void smf_resampcube( smfData *data, int index, int size,
    code that is faster than AST. We also use this code if we are just
    checking if the time series and sky cube have any overlap. */
    if( interp == AST__NEAREST || ! in_data ) {
-      smf_resampcube_nn( data, index, size, nchan, ndet, nslice, nel, nxy, 
-                         nout, dim, (AstMapping *) ssmap, abskyfrm, iskymap, 
+      smf_resampcube_nn( data, nchan, ndet, nslice, nxy, 
+                         dim, (AstMapping *) ssmap, abskyfrm, iskymap, 
                          detgrp, moving, in_data, out_data, overlap, status );
 
 /* For all other interpolation schemes, we use AST. */
    } else {
-      smf_resampcube_ast( data, index, size, nchan, ndet, nslice, nel, nxy, 
-                          nout, dim, (AstMapping *) ssmap, abskyfrm, iskymap, 
+      smf_resampcube_ast( data, nchan, ndet, nslice, nel, dim, 
+                          (AstMapping *) ssmap, abskyfrm, iskymap, 
                           detgrp, moving, interp, params, in_data, out_data, 
                           status );
    }

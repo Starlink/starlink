@@ -403,9 +403,11 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
       yout = astGrow( yout, (data->dims)[ 1 ], sizeof( double ) );
 
 /* Store the input GRID coords of the detectors. */
-      for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
-         xin[ irec ] = irec + 1.0;
-         yin[ irec ] = 1.0;
+      if( *status == SAI__OK ) {
+         for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
+            xin[ irec ] = irec + 1.0;
+            yin[ irec ] = 1.0;
+         }
       }
 
 /* Extend the memory used to hold the list of all receptor positions.

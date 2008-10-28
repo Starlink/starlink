@@ -102,7 +102,7 @@
 #-
 
 # Now find the necessary libraries
-      echo `ndf_link_adam` `fio_link_adam` \
+      echo `ast_link_adam` `ndf_link_adam` `fio_link_adam` \
            `sla_link_adam` `shl_link_adam` `pda_link_adam` \
            `prm_link_adam` `ard_link_adam` \
            `grp_link_adam` `ndg_link_adam` `kaplibs_link_adam -nogrf` \

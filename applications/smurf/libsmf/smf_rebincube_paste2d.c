@@ -170,7 +170,7 @@ void smf_rebincube_paste2d( int badmask, dim_t nchan, int nchanout,
    dim_t iv;                   /* Vector index into output 3D array */
    float *qdata = NULL;        /* Pointer to next input data value */
    float swdd;                 /* Sum of squared input data value times weight */
-   int ichan;                  /* Index of input channel */
+   dim_t ichan;                /* Index of input channel */
    int ochan;                  /* Index of output channel */
    int ignore;                 /* Ignore this time slice? */
    int nspecused;              /* No of input values pasted into output spectrum */

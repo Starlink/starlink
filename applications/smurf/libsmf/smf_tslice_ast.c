@@ -237,9 +237,9 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
     case INST__SCUBA2:
       /* Need to get the subarray number */
       smf_find_subarray( hdr, NULL, 0, &subsysnum, status );
-
-      sc2ast_createwcs( subsysnum, tmpState, hdr->instap, hdr->telpos,
-			&(hdr->wcs), status );
+      hdr->cache = sc2ast_createwcs2( subsysnum, tmpState, hdr->instap, 
+                                      hdr->telpos, &(hdr->wcs),
+                                      hdr->cache, status );
       break;
       
     case INST__AZTEC:
