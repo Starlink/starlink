@@ -213,14 +213,13 @@ char *astChrSub_( const char *, const char *, const char *[], int, int * );
 #ifdef MEM_DEBUG
 void astActiveMemory_( const char * );
 void astWatchMemory_( int );
-void astFlushMemory_( int );
-int astMemoryTune_( const char *, int );
-int astMemoryID_( void * );
+void astFlushMemory_( int, int * );
+int astMemoryTune_( const char *, int, int * );
 void *astMemoryPtr_( int );
 void astMemoryAlarm_( const char * );
-void astMemoryUse_( void *, const char * );
-void astBeginPM_( void );
-void astEndPM_( void );
+void astMemoryUse_( void *, const char *, int * );
+void astBeginPM_( int * );
+void astEndPM_( int * );
 #endif
 
 #endif
@@ -260,15 +259,14 @@ void astEndPM_( void );
 #ifdef MEM_DEBUG
 
 #define astActiveMemory(label) astERROR_INVOKE(astActiveMemory_(label))
-#define astMemoryTune(name,value) astERROR_INVOKE(astMemoryTune_(name,value))
+#define astMemoryTune(name,value) astERROR_INVOKE(astMemoryTune_(name,value,STATUS_PTR))
 #define astWatchMemory(id) astERROR_INVOKE(astWatchMemory_(id))
-#define astFlushMemory(leak) astERROR_INVOKE(astFlushMemory_(leak))
-#define astBeginPM astERROR_INVOKE(astBeginPM_())
-#define astEndPM astERROR_INVOKE(astEndPM_())
-#define astMemoryID(ptr) astERROR_INVOKE(astMemoryID_(ptr))
+#define astFlushMemory(leak) astERROR_INVOKE(astFlushMemory_(leak,STATUS_PTR))
+#define astBeginPM astERROR_INVOKE(astBeginPM_(STATUS_PTR))
+#define astEndPM astERROR_INVOKE(astEndPM_(STATUS_PTR))
 #define astMemoryPtr(id) astERROR_INVOKE(astMemoryPtr_(id))
 #define astMemoryAlarm(text) astERROR_INVOKE(astMemoryAlarm_(text))
-#define astMemoryUse(ptr,text) astERROR_INVOKE(astMemoryUse_(ptr,text))
+#define astMemoryUse(ptr,text) astERROR_INVOKE(astMemoryUse_(ptr,text,STATUS_PTR))
 
 #else
 
@@ -278,7 +276,6 @@ void astEndPM_( void );
 #define astFlushMemory(leak) 
 #define astBeginPM 
 #define astEndPM
-#define astMemoryID(ptr) 0
 #define astMemoryPtr(id) NULL
 #define astMemoryAlarm(text)
 #define astMemoryUse(ptr,text) 

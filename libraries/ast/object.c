@@ -4139,17 +4139,9 @@ f     - A value of .FALSE. will be returned if this function should fail
 /* If it is not a valid Object, then report an error (but only if the
    global error status has not already been set). */
       if ( astOK ) {
-
-#ifdef MEM_DEBUG
-         astError( AST__OBJIN, "astIsAObject(%s): Invalid Object pointer "
-                   "given (points at address %p id %d).", status, astGetClass( this ),
-                   (void *) this, astMemoryID( (void *) this ) );
-#else
          astError( AST__OBJIN, "astIsAObject(%s): Invalid Object pointer "
                    "given (points at address %p).", status, astGetClass( this ),
                    (void *) this );
-#endif
-
       }
 
 /* Otherwise, note that the Object is valid. */

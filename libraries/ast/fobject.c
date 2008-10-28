@@ -451,17 +451,20 @@ F77_LOGICAL_FUNCTION(ast_same)( INTEGER(THIS),
 #ifdef MEM_DEBUG
 
 F77_SUBROUTINE(ast_beginpm)( void ) {
-   astBeginPM;
+   int status = 0;
+   astBeginPM_( &status );
 }
 
 F77_SUBROUTINE(ast_endpm)( void ) {
-   astEndPM;
+   int status = 0;
+   astEndPM_( &status );
 }
 
 F77_SUBROUTINE(ast_activememory)( CHARACTER(TEXT)
                                   TRAIL(TEXT) ) {
    GENPTR_CHARACTER(TEXT)
    char *text;
+   int *status = 0;
 
    astBeginPM;
    text = astString( TEXT, TEXT_length );
@@ -477,7 +480,8 @@ F77_SUBROUTINE(ast_watchmemory)( INTEGER(ID) ) {
 
 F77_SUBROUTINE(ast_flushmemory)( INTEGER(LEAK) ) {
    GENPTR_INTEGER(LEAK)
-   astFlushMemory( *LEAK );
+   int status = 0;
+   astFlushMemory_( *LEAK, &status );
 }
 
 #else

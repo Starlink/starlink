@@ -425,8 +425,8 @@ static char *ChrMatcher( const char *, const char *, const char *, const char *[
 static char *ChrSuber( const char *, const char *, const char *[], int, char ***, int *, int * );
 
 #ifdef MEM_DEBUG
-static void Issue( Memory * );
-static void DeIssue( Memory * );
+static void Issue( Memory *, int * );
+static void DeIssue( Memory *, int * );
 #endif
 
 /* Function implementations. */
@@ -1576,7 +1576,7 @@ void *astFree_( void *ptr, int *status ) {
       mem = (Memory *) ( (char *) ptr - SIZEOF_MEMORY );
 
 #ifdef MEM_DEBUG
-      DeIssue( mem );
+      DeIssue( mem, status );
 #endif
 
 /* If the memory block is small enough, and the cache is being used, put it 
@@ -1879,7 +1879,7 @@ void *astMalloc_( size_t size, int *status ) {
       if( mem ) {
 
 #ifdef MEM_DEBUG
-      Issue( mem );
+      Issue( mem, status );
 #endif
 
 /* Increment the memory pointer to the start of the region of
@@ -2633,7 +2633,7 @@ void *astRealloc_( void *ptr, size_t size, int *status ) {
                } else {
 
 #ifdef MEM_DEBUG
-                  DeIssue( mem );
+                  DeIssue( mem, status );
 #endif
 
                   mem = REALLOC( mem, SIZEOF_MEMORY + size );
@@ -2655,7 +2655,7 @@ void *astRealloc_( void *ptr, size_t size, int *status ) {
                      mem->next = NULL;
 #ifdef MEM_DEBUG
                      mem->id = -1;
-                     Issue( mem );
+                     Issue( mem, status );
 #endif
                      result = mem;
                      result = (char *) result + SIZEOF_MEMORY;
@@ -3621,75 +3621,6 @@ void astWatchMemory_( int id ) {
    Watched_ID = id;
 }
 
-int astMemoryID_( void *ptr ){
-/*
-*+
-*  Name:
-*     astMemoryID
-
-*  Purpose:
-*     Return the unique identifier associated with a given memory block.
-
-*  Type:
-*     Protected function.
-
-*  Synopsis:
-*     #include "memory.h"
-*     int astMemoryID( void *ptr )
-
-*  Description:
-*     This function returns the integer identifier associated with the
-*     given memory block, which should have been allocated using one of
-*     the AST memory management function defined in this module.
-
-*  Parameters:
-*     ptr
-*        Pointer to the memory block, or a public pointer to an AST Object.
-
-*  Returned Value:
-*     The integer identifier for the supplied memory block.
-
-*  Notes:
-*     - This function attempts to execute even if an error has occurred.
-*     - An invalid identifier of -1 is returned if an error occurs.
-*-
-*/
-/* Local Variables: */
-   Memory *mem;                  /* Pointer to memory header */
-   int result;                   /* The returned identifier value */
-   int status;                   /* Local status */
-   int rep;                      /* Original value of error reporting flag */
-
-   result = -1;
-   if ( ptr ) {
-
-      status = astStatus;
-      astSetStatus( 0 );
-      rep = astReporting( 0 );
-
-/* If the supplied pointer is an Object handle, get the corresponding
-   pointer. This will set status if the pointer is not for an Object
-   (i.e. is a direct pointer to a memory block allocated by asyMalloc).
-   Therefore temporarily switch off error reporting so that we can test
-   for this. */
-      mem = (Memory *) ( astMakePointer( (AstObject *) ptr ) - SIZEOF_MEMORY );
-
-      if( !astOK ) {
-         mem = (Memory *) ( ptr - SIZEOF_MEMORY );
-         astClearStatus;
-      }
-
-      astReporting( rep );
-      astSetStatus( status );
-      
-/* Return the id */
-      if( mem ) result = mem->id;
-
-   }
-
-   return result;
-}
-
 void *astMemoryPtr_( int id ){
 /*
 *+
@@ -3763,7 +3694,7 @@ void astMemoryAlarm_( const char *verb ){
    printf( "astMemoryAlarm: Memory id %d has been %s.\n", Watched_ID, verb );
 }
 
-void astMemoryUse_( void *ptr, const char *verb ){
+void astMemoryUse_( void *ptr, const char *verb, int *status ){
 /*
 *+
 *  Name:
@@ -3794,6 +3725,10 @@ void astMemoryUse_( void *ptr, const char *verb ){
 *        A verb indicating what is being done to the pointer.
 *-
 */
+
+   astDECLARE_GLOBALS;
+   astGET_GLOBALS(NULL);
+
    if( ptr && ((Memory *)(ptr-SIZEOF_MEMORY))->id == Watched_ID ) {
       if( !Quiet_Use || !strcmp( verb, ISSUED ) || 
                         !strcmp( verb, FREED ) ) {
@@ -3802,7 +3737,7 @@ void astMemoryUse_( void *ptr, const char *verb ){
    }
 }
 
-int astMemoryTune_( const char *name, int value ){
+int astMemoryTune_( const char *name, int value, int *status ){
 /*
 *+
 *  Name:
@@ -3879,7 +3814,7 @@ int astMemoryTune_( const char *name, int value ){
    return result;
 }
 
-void astBeginPM_( void ) {
+void astBeginPM_( int *status ) {
 /*
 *+
 *  Name:
@@ -3930,7 +3865,7 @@ void astBeginPM_( void ) {
    UNLOCK_DEBUG_MUTEX;
 }
 
-void astEndPM_( void ) {
+void astEndPM_( int *status ) {
 /*
 *+
 *  Name:
@@ -3972,7 +3907,7 @@ void astEndPM_( void ) {
    UNLOCK_DEBUG_MUTEX;
 }
 
-void astFlushMemory_( int leak ) {
+void astFlushMemory_( int leak, int *status ) {
 /*
 *+
 *  Name:
@@ -4042,7 +3977,7 @@ void astFlushMemory_( int leak ) {
    }
 }
 
-static void Issue( Memory *mem ) {
+static void Issue( Memory *mem, int *status ) {
 /*
 *  Name:
 *     Issue
@@ -4055,7 +3990,7 @@ static void Issue( Memory *mem ) {
 
 *  Synopsis:
 *     #include "memory.h"
-*     void Issue( Memeory *mem );
+*     void Issue( Memeory *mem, int *status );
 
 *  Description:
 *     Initialises the extra debug items in the Memory header, and adds the
@@ -4064,12 +3999,18 @@ static void Issue( Memory *mem ) {
 *  Parameters:
 *     mem
 *        Pointer to the Memory structure.
+*     status
+*        Pointer to the inherited status value.
 */
+
+/* Local Variables: */
+   astDECLARE_GLOBALS;
 
 /* Return if no pointer was supplied. */
    if( !mem ) return;
 
    LOCK_DEBUG_MUTEX;
+   astGET_GLOBALS(NULL);
 
 /* Store a unique identifier for this pointer. Unless global Keep_ID is
    non-zero, a new identifier is used each time the pointer becomes active 
@@ -4092,7 +4033,7 @@ static void Issue( Memory *mem ) {
    UNLOCK_DEBUG_MUTEX;
 }
 
-static void DeIssue( Memory *mem ) {
+static void DeIssue( Memory *mem, int *status ) {
 /*
 *  Name:
 *     DeIssue
@@ -4105,7 +4046,7 @@ static void DeIssue( Memory *mem ) {
 
 *  Synopsis:
 *     #include "memory.h"
-*     void DeIssue( Memeory *mem );
+*     void DeIssue( Memeory *mem, int *status );
 
 *  Description:
 *     Initialises the extra debug items in the Memory header, and adds the
@@ -4114,9 +4055,12 @@ static void DeIssue( Memory *mem ) {
 *  Parameters:
 *     mem
 *        Pointer to the Memory structure.
+*     status
+*        Pointer to the inherited status value.
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;
    Memory *next;
    Memory *prev;
 
@@ -4124,6 +4068,7 @@ static void DeIssue( Memory *mem ) {
    if( !mem ) return;
 
    LOCK_DEBUG_MUTEX;
+   astGET_GLOBALS(NULL);
 
 /* Report that the pointer is being freed. */
    astMemoryUse( (void *) mem + SIZEOF_MEMORY, FREED );
