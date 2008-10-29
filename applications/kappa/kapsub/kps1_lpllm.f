@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_LPLLM( EL, ILO, IHI, DAT, USEVAR, GOTSIG, VAR, 
-     :                       NSIGMA, MAP1, MAP2, IAX, CEN, BAR, HI, 
+      SUBROUTINE KPS1_LPLLM( EL, ILO, IHI, DAT, USEVAR, GOTSIG, CUTNEG,
+     :                       VAR, NSIGMA, MAP1, MAP2, IAX, CEN, BAR, HI, 
      :                       LO, MONO, BAD, STATUS )
 
 *+
@@ -13,8 +13,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_LPLLM( EL, ILO, IHI, DAT, USEVAR, GOTSIG, VAR, NSIGMA, 
-*                      MAP1, MAP2, IAX, CEN, BAR, HI, LO, MONO, BAD, STATUS )
+*     CALL KPS1_LPLLM( EL, ILO, IHI, DAT, USEVAR, GOTSIG, CUTNEG, VAR, 
+*                      NSIGMA, MAP1, MAP2, IAX, CEN, BAR, HI, LO, MONO, 
+*                      BAD, STATUS )
 
 *  Description:
 *     This routine finds the ends of a set of error bars, maps them into
@@ -40,6 +41,9 @@
 *     GOTSIG = LOGICAL (Given)
 *        If .TRUE., the values supplied in VAR( EL ) are standard
 *        deviations instead of variances.
+*     CUTNEG = LOGICAL (Given)
+*        If .TRUE., then central data values less than or equal to zero
+*        are ignored (they are treated like bad values).
 *     VAR( EL ) = DOUBLE PRECISION (Given)
 *        The supplied variance values. Only accessed if USEVAR is .TRUE.
 *     NSIGMA = REAL (Given)
@@ -80,6 +84,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -105,6 +110,8 @@
 *  History:
 *     21-SEP-1998 (DSB):
 *        Original version.
+*     29-OCT-2008 (DSB):
+*        Added CUTNEG argument.
 *     {enter_further_changes_here}
 
 *-
@@ -125,6 +132,7 @@
       DOUBLE PRECISION DAT( EL )
       LOGICAL USEVAR
       LOGICAL GOTSIG
+      LOGICAL CUTNEG
       DOUBLE PRECISION VAR( EL )
       REAL NSIGMA
       INTEGER MAP1
@@ -214,8 +222,14 @@
 *  Do each point.
       DO I = 1, EL
 
-*  Only include good positions.
-         IF( CEN( I ) .NE. AST__BAD ) THEN
+*  Set the central value bad if the data value is not positive and we
+*  are cutting such values.
+         IF( DAT( I ) .LE. 0.0 .AND. CUTNEG ) THEN
+            CEN( I ) = AST__BAD
+            BAD = .TRUE.
+
+*  Only include good positions. 
+         ELSE IF( CEN( I ) .NE. AST__BAD ) THEN
 
 *  If this element is within the specified bounds, find the mapped limits.
             IF( I .GE. ILO .AND. I .LE. IHI ) THEN
@@ -263,7 +277,11 @@
 
 *  Store the unmapped limits in BAR.
          DO I = 1, EL
-            IF( DAT( I ) .NE. AST__BAD .AND. 
+
+*  Ignore this data value if it is bad, or if it is not positive and
+*  CUTNEG is true.
+            IF( ( DAT( I ) .NE. AST__BAD .AND.
+     :          ( .NOT. CUTNEG .OR. DAT( I ) .GT. 0.0 ) ) .AND.
      :          VAR( I ) .NE. AST__BAD ) THEN
 
                IF( GOTSIG ) THEN
