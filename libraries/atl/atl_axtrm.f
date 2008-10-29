@@ -125,7 +125,12 @@
 *        Attempt to split the existing Mapping first, then only use the
 *        old method of appending a permmap in series with the original
 *        Mapping if the mapping cannot be split.
-*     {enter_further_changes_here}
+*     29-OCT-2008 (DSB):
+*        Do not supply a Frame to ATL_MKLUT so that the tabulated are
+*        not normalised. Normalisation could prevent LutMaps being
+*        created for longslit images if the ra value passes through 
+*        zero (normalisation introduces a discontinutity by adding 2.PI
+*        to negative RAs).
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -397,8 +402,9 @@
                                      END IF
            
                                      CALL ATL_MKLUT( KS, JU, NX, N, 
-     :                                  SFRM, %VAL( CNF_PVAL( IPOUT ) ),
-     :                                         LUTMAP( IU ), STATUS )
+     :                                        AST__NULL, 
+     :                                        %VAL( CNF_PVAL( IPOUT ) ),
+     :                                        LUTMAP( IU ), STATUS )
    
 *  Note the index of the selected axis which feeds the unselected 
 *  current frame axis.
