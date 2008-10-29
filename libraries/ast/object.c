@@ -258,7 +258,6 @@ static AstObject *zero_ptr;
    caching is switched off via the astTune function. */
 static int object_caching = 0;
 
-
 /* Set up global data access, mutexes, etc, needed for thread safety. */
 #ifdef THREAD_SAFE
 
@@ -2196,7 +2195,7 @@ AstObject *astCheckLock_( AstObject *this, int *status ) {
 *     astCheckLock
 
 *  Purpose:
-*     Check that suypplied Object is locked by the calling thread.
+*     Check that supplied Object is locked by the calling thread.
 
 *  Type:
 *     Protected function.
@@ -6110,6 +6109,10 @@ static void InsertHandle( int ihandle, int *head, int *status ) {
    CheckInList( ihandle, *head, 0 );
 #endif
 
+/* Check a head pointer was supplied (may not be if an error has
+   occurred). */
+   if( ! head ) return;
+
 /* If the list is empty, the sole new element points at itself. */
    if ( *head == -1 ) {
       handles[ ihandle ].flink = ihandle;
@@ -6446,6 +6449,10 @@ static void RemoveHandle( int ihandle, int *head, int *status ) {
    CheckList( *head );
    CheckInList( ihandle, *head, 1 );
 #endif
+
+/* Check a head pointer was supplied (may not be if an error has
+   occurred). */
+   if( ! head ) return;
 
 /* Remove the Handle from the list by re-establishing links between
    the elements on either side of it. */
