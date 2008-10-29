@@ -22,7 +22,7 @@
          <xs:element name="Search">
            <xs:complexType>
              <xs:sequence>
-               <xs:element ref="tns:Where" minOccurs="1" maxOccurs="1" />
+               <xs:element ref="Where" minOccurs="1" maxOccurs="1" />
                <xs:element name="from" type="xs:positiveInteger" 
                            minOccurs="0" maxOccurs="1" />
                <xs:element name="max" type="xs:positiveInteger" 
@@ -317,12 +317,10 @@
      -       where rh maps to this WSDL's target namespace
      -->
 
-<!--
    <service name="RegistryInterfaceService">
       <port name="RegistrySearchPort" binding="tns:RegistrySearchSOAP">
          <soap:address location="http://myhost.org/ws/RegistrySearch"/>
       </port>
    </service>
-  -->
 
 </definitions>
