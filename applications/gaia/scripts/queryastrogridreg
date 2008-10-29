@@ -1,0 +1,186 @@
+#!/bin/sh
+# The next line is executed by /bin/sh, but not Tcl \
+exec $GAIA_DIR/gaiavo_tcl $0 ${1+"$@"}
+#+
+#   Name:
+#      queryastrogridreg
+
+#   Purpose:
+#      Query an astrogrid VO registry
+
+#   Usage:
+#      queryastrogridreg registry capability column substring outfile
+
+#   Description:
+#      Queries a astrogrid VO registry for all known services with 
+#      capability with additional constraint, defined as a column
+#      name and substring (which define a predicate). The results 
+#      of the query are written to a VOTable "outfile" (rather
+#      than an XML file with the standard registry response). 
+#      An example is:
+#
+#        queryastrogridreg \
+#             "http://registry.astrogrid.org/astrogrid-registry/services/RegistryQueryv1_0" \
+#             "sia:SimpleImageAccess" "title" "infrared" \
+#             query.vot
+#
+#      which will query for all known SIAP servers known to the registry
+#      that also have the substring "infra" in their titles.
+
+#   Authors:
+#      Peter W. Draper (PWD):
+
+#  Copyright:
+#     Copyright (C) 2008 Science and Technology Facilties Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of the
+#     License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+#     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#   History:
+#      29-OCT-2008 (PWD):
+#         Original version.
+#-
+#.
+
+#lappend auto_path [pwd]
+
+#source Utilities.tcl
+#source ClientSide.tcl
+
+#package require WS::Client
+#package require dict
+#package require Tclx
+
+#  Check the command-line arguments.
+if { $argc == 5 } {
+   set registry [lindex $argv 0]
+   set capability [lindex $argv 1]
+   set column [lindex $argv 2]
+   set substring [lindex $argv 3]
+   set outfile [lindex $argv 4]
+} else {
+   puts stderr {Usage: queryastrogridreg registry capability column substring outfile}
+   exit
+}
+
+#  Establish the standard proxy define using http_proxy.
+#cat::ProxyDialog::check_proxies $::env(HOME)/.skycat/proxies
+set proxy {}
+set port {}
+if { [info exists ::env(http_proxy)] } {
+   if { [scan $::env(http_proxy) {http://%[^:/]:%d} proxy port] != 2 } {
+      scan $::env(http_proxy) {http://%[^:/]} proxy
+   }
+}
+::http::config -proxyhost $proxy
+::http::config -proxyport $port
+
+#  The service is defined using the standard WSDL for a version 1 registry.
+#  Need to add the given registry to the WSDL before parsing it.
+if { [catch "::open $gaiavo_library/RegistrySearch-v1.0.wsdl r" wsdlfid] } {
+   puts stderr "Failed to open standard registry WSDL file"
+   exit 1
+}
+set wsdlcontent [::read $wsdlfid]
+::close $wsdlfid
+::regsub {http://myhost.org/ws/RegistrySearch} $wsdlcontent "$registry" wsdlcontent
+
+#  Parse the WSDL description.
+::WS::Client::ParseWsdl $wsdlcontent -serviceAlias VORegistry
+
+#  Construct the ADQL fragment needed as the query. This is in two forms
+#  with and without an addition constraint based on a column substring.
+if { $column == {} } {
+
+#  WHERE capability/@xsi:type = 'sia:SimpleImageAccess' like query.
+set where "\
+<Condition xmlns=\"http://www.ivoa.net/xml/ADQL/v1.0\" xsi:type=\"comparisonPredType\" Comparison=\"=\">
+  <Arg xsi:type=\"columnReferenceType\" Name=\"capability/@xsi:type\"/>
+  <Arg xsi:type=\"atomType\">
+     <Literal xsi:type=\"stringType\" Value=\"${capability}\"/>
+  </Arg>
+</Condition>
+"
+
+} else {
+
+#  WHERE capability/@xsi:type = 'sia:SimpleImageAccess' AND title like '%infra%'
+set where " \
+  <Condition xmlns=\"http://www.ivoa.net/xml/ADQL/v1.0\" xsi:type=\"intersectionSearchType\">
+    <Condition xsi:type=\"comparisonPredType\" Comparison=\"=\">
+      <Arg xsi:type=\"columnReferenceType\" Name=\"capability/@xsi:type\"/>
+      <Arg xsi:type=\"characterValueExpressionType\">
+        <Literal xsi:type=\"stringType\" Value=\"${capability}\"/>
+      </Arg>
+    </Condition>
+    <Condition xsi:type=\"likePredType\">
+       <Arg xsi:type=\"characterValueExpressionType\">
+         <CharacterFactor xsi:type=\"columnReferenceType\" Name=\"${column}\"/>
+       </Arg>
+       <Pattern xsi:type=\"characterValueExpressionType\">
+         <CharacterFactor xsi:type=\"atomType\">
+           <Literal xsi:type=\"stringType\" Value=\"%${substring}%\"/>
+         </CharacterFactor>
+       </Pattern>
+     </Condition>
+  </Condition>
+"
+}
+
+#  Set query dictionary.
+set inputs [list "Where" "$where"]
+
+#  Do the query.
+set results [::WS::Client::DoRawCall VORegistry "Search" $inputs]
+
+#  Parse results and access the SOAP message body.
+::dom parse -keepEmpties $results doc
+$doc documentElement top
+set xns {
+   ENV "http://schemas.xmlsoap.org/soap/envelope/"
+   xsi "http://www.w3.org/2001/XMLSchema-instance"
+   xs "http://www.w3.org/2001/XMLSchema"
+}
+$doc selectNodesNamespaces $xns
+set body [$top selectNodes ENV:Body]
+
+#  Check body for the Registry content and transform into a VOTable
+#  with the same format as the NVO VOTables.
+if { $body != {} } {
+   if { [catch "::open $outfile w" fid] } {
+      puts stderr "Failed to open output file: $outfile ($fid)"
+      exit 1
+   }
+
+   if { [ catch "::open $gaiavo_library/RegistryResults_vot3.xsl r" xsltfid] } {
+      puts stderr "Failed to open XSLT file"
+      exit 1
+   }
+
+   #  Do the transformation from VOResources to VOTable.
+   ::dom parse -channel $xsltfid xsltdoc
+   $body xslt $xsltdoc votable
+   $votable asXML -channel $fid
+
+   close $fid
+   close $xsltfid
+   puts stdout "Results written to file: $outfile"
+   exit 0
+}
+
+puts stderr "No services like: $service && $capability"
+exit 1

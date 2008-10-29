@@ -6,7 +6,7 @@ exec $GAIA_DIR/gaiavo_tcl $0 ${1+"$@"}
 #      querysiap
 
 #   Purpose:
-#      Query a SIAP server for images.
+#      Query a SIAP server for FITS images.
 
 #   Usage:
 #      querysiap endpoint ra dec size outfile
@@ -17,7 +17,8 @@ exec $GAIA_DIR/gaiavo_tcl $0 ${1+"$@"}
 #      containing the response.
 #
 #      The RA and Dec values are in FK5/J2000 and must be in decimal
-#      degrees. The size should also be degrees.
+#      degrees. The size should also be degrees and may be a comma
+#      delimetered list, width and height.
 
 #   Authors:
 #      Peter W. Draper (PWD):
@@ -81,14 +82,22 @@ if { [info exists ::env(http_proxy)] } {
 #  Construct the query. Endpoint can terminate in & or ?
 switch -glob $endpoint {
     *& {
-        set query ${endpoint}POS=${ra},${dec}&SIZE=${size}
+        set query ${endpoint}POS=${ra},${dec}&SIZE=${size}&FORMAT=image/fits
     }
     default {
-        set query ${endpoint}&POS=${ra},${dec}&SIZE=${size}
+        set query ${endpoint}&POS=${ra},${dec}&SIZE=${size}&FORMAT=image/fits
     }
 }
 
 #  Download the response.
-::http::geturl $query -channel $fid
+if { [catch { ::http::geturl $query -channel $fid } msg] } {
+   #  Failed, so delete file and exit with an error.
+   ::close $fid
+   ::file delete $outfile
+   puts stderr "$msg"
+   exit 1
+}
+
 ::close $fid
 exit
+
