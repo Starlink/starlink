@@ -233,7 +233,7 @@ void astThrowException ( int status, AV* errorstack ) {
    reference counting or keeping copies of the function around.
  */
 
-static char *sourceWrap( const char *(*source)() ) {
+static char *sourceWrap( const char *(*source)(), int *status ) {
   dSP;
   SV * cb;
   SV * myobject;
@@ -300,7 +300,7 @@ static char *sourceWrap( const char *(*source)() ) {
   return retval;
 }
 
-static void sinkWrap( void (*sink)(const char *), const char *line ) {
+static void sinkWrap( void (*sink)(const char *), const char *line, int *status ) {
   dSP;
   SV * cb;
   SV * myobject;
