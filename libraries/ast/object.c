@@ -258,6 +258,10 @@ static AstObject *zero_ptr;
    caching is switched off via the astTune function. */
 static int object_caching = 0;
 
+/* A flag that indicates if a check should be made by each public AST
+   function to ensure that any supplied Objects have been locked for use
+   by the calling thread. */
+static int check_threads = 1;
 
 /* Set up global data access, mutexes, etc, needed for thread safety. */
 #ifdef THREAD_SAFE
@@ -2196,7 +2200,7 @@ AstObject *astCheckLock_( AstObject *this, int *status ) {
 *     astCheckLock
 
 *  Purpose:
-*     Check that suypplied Object is locked by the calling thread.
+*     Check that supplied Object is locked by the calling thread.
 
 *  Type:
 *     Protected function.
@@ -2230,8 +2234,9 @@ AstObject *astCheckLock_( AstObject *this, int *status ) {
 /* This function does nothing in the non-threads version of libast. */
 #if defined(THREAD_SAFE)
 
-/* Check the supplied pointer. */
-   if( this ) {
+/* Check the supplied pointer. Also check that lock checking has not been
+   disabled via the CheckThreads tuning parameter (see astTune). */
+   if( this && check_threads ) {
 
 /* We use the private ManageLock function rather than the virtual 
    astManageLock method to avoid the unnecessary overhead of checking 
@@ -3411,6 +3416,15 @@ f     AST_DELETE).
 *     that it controls caching of all memory blocks of less than 300 bytes
 *     allocated by AST (whether for internal or external use), not just 
 *     memory used to store AST Objects. 
+c     - CheckThreads: A boolean flag which indicates whether or not a
+c     check should be made by each AST function to ensure that any
+c     supplied Objects are locked for use by the calling thread. If
+c     this flag is non-zero (the default), such checks are made. See 
+c     See functions astLock and astUnlock. Note, this flag should only be
+c     set to zero if it is known that multiple threads will never try to
+c     modify the same AST Object at the same time. Any sort of strange
+c     behaviour is possible if different threads modify an Object at the
+c     same time.
 
 *  Notes:
 c     - This function attempts to execute even if the AST error
@@ -3434,6 +3448,10 @@ f     error value
             object_caching = value;
             if( !object_caching ) EmptyObjectCache( status );
          }
+         
+      } else if( astChrMatch( name, "CheckThreads" ) ) {
+         result = check_threads;
+         if( value != AST__TUNULL ) check_threads = value;
          
       } else if( astChrMatch( name, "MemoryCaching" ) ) {
          result = astMemCaching( value );
@@ -6110,6 +6128,10 @@ static void InsertHandle( int ihandle, int *head, int *status ) {
    CheckInList( ihandle, *head, 0 );
 #endif
 
+/* Check a head pointer was supplied (may not be if an error has
+   occurred). */
+   if( ! head ) return;
+
 /* If the list is empty, the sole new element points at itself. */
    if ( *head == -1 ) {
       handles[ ihandle ].flink = ihandle;
@@ -6446,6 +6468,10 @@ static void RemoveHandle( int ihandle, int *head, int *status ) {
    CheckList( *head );
    CheckInList( ihandle, *head, 1 );
 #endif
+
+/* Check a head pointer was supplied (may not be if an error has
+   occurred). */
+   if( ! head ) return;
 
 /* Remove the Handle from the list by re-establishing links between
    the elements on either side of it. */
