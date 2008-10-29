@@ -326,7 +326,7 @@ stringCtof77 (char*c, int len) {
 
 /* Source function to deliver the text lines to AST */
 /* The source is an AV*. Returns NULL when no more lines */
-static char *astsource( const char *(*source)() ) {
+static char *astsource( const char *(*source)(), int *status ) {
   AV * buffer = (AV*)source;
   SV * nextline;
   char * RETVAL = NULL;
@@ -354,7 +354,7 @@ static char *astsource( const char *(*source)() ) {
 /* Sink function to receive the lines from the AST object.
  * Called for each line.
  */
-static void astsink(  void (*sink)(const char *), const char *line ) {
+static void astsink(  void (*sink)(const char *), const char *line, int *status ) {
 
   /* recast the buffer */
   SV * buffer = (SV*) sink;
