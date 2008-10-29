@@ -652,6 +652,8 @@
 *     19-MAR-2007 (DSB):
 *        Use both STYLE and TEMPSTYLE parameters within the call to 
 *        KPG1_PLTLN that plots the data curve.
+*     29-OCT-2008 (DSB):
+*        Ignore negative or zero values if an axis map is set to LOG.
 *     {enter_further_changes_here}
 
 *-
@@ -1320,9 +1322,8 @@
                
 *  Data values and vertical error bar limits.
                CALL KPS1_LPLLM( EL, 1, EL, %VAL( CNF_PVAL( IPYDAT ) ), 
-     :                          YVAR,
-     :                          .FALSE.,%VAL( CNF_PVAL( IPYVAR ) ), 
-     :                          YSIGMA,
+     :                          YVAR, .FALSE., ( YMAP .EQ. 'LOG' ), 
+     :                          %VAL( CNF_PVAL( IPYVAR ) ), YSIGMA,
      :                          AST__NULL, MAP,2, 
      :                          %VAL( CNF_PVAL( IPYCEN ) ),
      :                          %VAL( CNF_PVAL( IPYBAR ) ), 
@@ -1331,8 +1332,8 @@
 
 *  The X-axis central values and horizontal error bar limits.
                CALL KPS1_LPLLM( EL, 1, EL, %VAL( CNF_PVAL( IPXDAT ) ), 
-     :                          XVAR,
-     :                          .FALSE., %VAL( CNF_PVAL( IPXVAR ) ), 
+     :                          XVAR, .FALSE., ( XMAP .EQ. 'LOG' ),
+     :                          %VAL( CNF_PVAL( IPXVAR ) ), 
      :                          XSIGMA, AXMAP,
      :                          MAP, 1, %VAL( CNF_PVAL( IPXCEN ) ), 
      :                          %VAL( CNF_PVAL( IPXBAR ) ),
@@ -1342,7 +1343,8 @@
                IF( IMODE .EQ. 4 ) THEN
                   CALL KPS1_LPLLM( EL, 1, EL, 
      :                             %VAL( CNF_PVAL( IPXDAT ) ), .TRUE.,
-     :                             .TRUE., %VAL( CNF_PVAL( IPAWID ) ), 
+     :                             .TRUE., ( XMAP .EQ. 'LOG' ),
+     :                             %VAL( CNF_PVAL( IPAWID ) ), 
      :                             0.5, AXMAP,
      :                             MAP, 1, %VAL( CNF_PVAL( IPXCEN ) ),
      :                             %VAL( CNF_PVAL( IPSTEP ) ), 
@@ -1401,7 +1403,7 @@
 *  and extreme X-axis values for each error bar in the "what we want"
 *  Frame.
          CALL KPS1_LPLLM( EL, 1, EL, %VAL( CNF_PVAL( IPXDAT ) ), 
-     :                    XVAR, .FALSE.,
+     :                    XVAR, .FALSE., ( XMAP .EQ. 'LOG' ), 
      :                    %VAL( CNF_PVAL( IPXVAR ) ), 
      :                    XSIGMA, AXMAP, MAP, 1,
      :                    %VAL( CNF_PVAL( IPXCEN ) ), 
@@ -1425,7 +1427,7 @@
 *  This returns the central and extreme X-axis values for each step in 
 *  the "what we want" Frame.
             CALL KPS1_LPLLM( EL, 1, EL, %VAL( CNF_PVAL( IPXDAT ) ), 
-     :                       .TRUE., .TRUE.,
+     :                       .TRUE., .TRUE., ( YMAP .EQ. 'LOG' ), 
      :                       %VAL( CNF_PVAL( IPAWID ) ), 
      :                       0.5, AXMAP, MAP, 1,
      :                       %VAL( CNF_PVAL( IPXCEN ) ), 
@@ -1462,6 +1464,12 @@
             END IF
          END IF
 
+* If using a LOG x axis mapping, use a lower limit of 
+         IF( XMAP .EQ. 'LOG' .AND. BL( 1 ) .LE. 0.0 ) THEN
+            BL( 1 ) = 1.0E-6*( TR( 1 ) - BL( 1 ) )
+            IF( TR( 1 ) .LE. BL( 1 ) ) TR( 1 ) =  BL( 1 ) + 1.0
+         END IF
+
 *  We now have the limits of the data on the X axis of the "what we 
 *  want" Frame.  Allow the user to override these limits. 
          CALL KPG1_GTAXV( 'XLEFT', 1, .TRUE., FSET, 1, BL( 1 ), NVAL, 
@@ -1486,7 +1494,7 @@
 *  want" Frame.  The returned limits only include the data in the grid
 *  index range covered by the X axis.
          CALL KPS1_LPLLM( EL, ILO, IHI, %VAL( CNF_PVAL( IPYDAT ) ), 
-     :                    YVAR, .FALSE.,
+     :                    YVAR, .FALSE., ( YMAP .EQ. 'LOG' ), 
      :                    %VAL( CNF_PVAL( IPYVAR ) ), 
      :                    YSIGMA, AST__NULL, MAP, 2,
      :                    %VAL( CNF_PVAL( IPYCEN ) ), 
@@ -1517,6 +1525,12 @@
             ELSE
                TR( 2 ) = 1.0D0
             END IF
+         END IF
+
+* If using a LOG y axis mapping, use a lower limit of 
+         IF( YMAP .EQ. 'LOG' .AND. BL( 2 ) .LE. 0.0 ) THEN
+            BL( 2 ) = 1.0E-6*( TR( 2 ) - BL( 2 ) )
+            IF( TR( 2 ) .LE. BL( 2 ) ) TR( 2 ) =  BL( 2 ) + 1.0
          END IF
 
 *  We now have the limits of the data on the Y axis of the "what we
