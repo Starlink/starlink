@@ -56,6 +56,8 @@
 *        Calculate WCS for 4-d transformed data.
 *     2008-07-29 (TIMJ):
 *        Steptime is now in smfHead.
+*     2008-10-17 (AGG):
+*        Set NaN and Inf to VAL__BADD when normalizing
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -174,12 +176,12 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
   if( data->ndims == 3 ) {
     nbolo = data->dims[1]*data->dims[2];
     ntslice = data->dims[0];
-    nf = ntslice/2+1;
+    nf = ntslice/2 + 1;
     isFFT = 0;
   } else if( data->ndims == 1 ) {
     /* If 1-d data, only one axis to choose from */
     ntslice = data->dims[0];
-    nf = ntslice/2+1;
+    nf = ntslice/2 + 1;
     nbolo=1;
     isFFT = 0;
   } else if( (data->ndims==2) && (data->dims[1]==2) ) {
@@ -324,7 +326,12 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
         
         val = retdata->pntr[0];
         for( i=0; i<nf*nbolo*2; i++ ) {
-          *val *= norm;
+	  /* Set NaN or +/-Inf to a bad value */
+	  if ( *val != *val || *val < VAL__MIND || *val > VAL__MAXD ) {
+	    *val = VAL__BADD;
+	  } else {
+	    *val *= norm;
+	  }
           val++;
         }
 
