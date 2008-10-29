@@ -872,8 +872,13 @@ proc ::WS::Utils::convertDictToType {mode service doc parent dict type} {
                 ##
                 ## Non-simple non-array
                 ##
-                $parent appendChild [$doc createElement $xns:$itemName retnode]
-                convertDictToType $mode $service $doc $retnode [dict get $dict $itemName] $itemType
+                #$parent appendChild [$doc createElement $xns:$itemName retnode]
+                #convertDictToType $mode $service $doc $retnode [dict get $dict $itemName] $itemType
+
+                ## Assume XML.
+                $parent appendChild [$doc createElement $xns:$itemName retNode]
+                set resultValue [dict get $dict $itemName]
+                $retNode appendXML $resultValue
             }
             {1 1} {
                 ##

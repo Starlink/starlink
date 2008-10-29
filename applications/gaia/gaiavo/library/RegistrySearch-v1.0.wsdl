@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="IVOARegistrySearch" 
+             xmlns="http://schemas.xmlsoap.org/wsdl/" 
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+             xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+             xmlns:adql="http://www.ivoa.net/xml/ADQL/v1.0"              
+             xmlns:ri="http://www.ivoa.net/xml/RegistryInterface/v1.0" 
+             xmlns:tns="http://www.ivoa.net/wsdl/RegistrySearch/v1.0"
+             targetNamespace="http://www.ivoa.net/wsdl/RegistrySearch/v1.0">
+   <types>
+      <xs:schema xmlns="http://www.w3.org/2001/XMLSchema" 
+                 xmlns:tns="http://www.ivoa.net/wsdl/RegistrySearch/v1.0" 
+                 targetNamespace="http://www.ivoa.net/wsdl/RegistrySearch/v1.0">
+         
+         <xs:import namespace="http://www.ivoa.net/xml/RegistryInterface/v1.0"
+             schemaLocation="http://www.ivoa.net/xml/RegistryInterface/v1.0"/>                       
+         <xs:import namespace="http://www.ivoa.net/xml/ADQL/v1.0" 
+                    schemaLocation="http://www.ivoa.net/xml/ADQL/v1.0" />
+                 
+         <xs:element name="Where" type="adql:whereType" />
+
+         <xs:element name="Search">
+           <xs:complexType>
+             <xs:sequence>
+               <xs:element ref="tns:Where" minOccurs="1" maxOccurs="1" />
+               <xs:element name="from" type="xs:positiveInteger" 
+                           minOccurs="0" maxOccurs="1" />
+               <xs:element name="max" type="xs:positiveInteger" 
+                           minOccurs="0" maxOccurs="1" />
+               <xs:element name="identifiersOnly" type="xs:boolean" 
+                           minOccurs="0" maxOccurs="1" />
+             </xs:sequence>
+           </xs:complexType>
+         </xs:element>
+
+         <xs:element name="SearchResponse">
+           <xs:complexType>
+             <xs:sequence>
+               <xs:element ref="ri:VOResources" minOccurs="1" maxOccurs="1" />
+             </xs:sequence>
+           </xs:complexType>
+         </xs:element>
+      
+         <xs:element name="GetResource">
+           <xs:complexType>
+             <xs:sequence>
+               <xs:element name="identifier" type="xs:string" 
+                           minOccurs="1" maxOccurs="1" />
+             </xs:sequence>
+           </xs:complexType>
+         </xs:element>      
+      
+         <xs:element name="ResolveResponse">
+           <xs:complexType>
+             <xs:sequence>
+               <xs:element ref="ri:Resource" 
+                           minOccurs="1" maxOccurs="1" />
+             </xs:sequence>
+           </xs:complexType>
+         </xs:element>
+      
+         <xs:element name="GetIdentity" />
+         
+         <xs:element name="XQuerySearch">
+           <xs:complexType>
+             <xs:sequence>
+               <xs:element name="xquery" type="xs:string" 
+                           minOccurs="1" maxOccurs="1" />
+             </xs:sequence>
+           </xs:complexType>
+         </xs:element>      
+
+         <xs:element name="XQuerySearchResponse">
+           <xs:complexType>
+             <xs:sequence>
+               <xs:any minOccurs="0"/>
+             </xs:sequence>
+           </xs:complexType>
+         </xs:element>
+         
+
+         <xs:element name="KeywordSearch">
+           <xs:complexType>
+             <xs:sequence>
+               <xs:element name="keywords" type="xs:string" 
+                           minOccurs="1" maxOccurs="1" />
+               <xs:element name="orValues" type="xs:boolean" 
+                           minOccurs="1" maxOccurs="1" />
+               <xs:element name="from" type="xs:positiveInteger" 
+                           minOccurs="0" maxOccurs="1" />
+               <xs:element name="max" type="xs:positiveInteger" 
+                           minOccurs="0" maxOccurs="1" />
+               <xs:element name="identifiersOnly" type="xs:boolean" 
+                           minOccurs="0" maxOccurs="1" />            
+             </xs:sequence>
+           </xs:complexType>
+         </xs:element>      
+      
+         <xs:element name="ErrorResponse">
+           <xs:complexType>
+             <xs:sequence>
+               <xs:element name="errorMessage" type="xs:string" 
+                           minOccurs="1" maxOccurs="1" />
+             </xs:sequence>
+           </xs:complexType>
+         </xs:element>      
+      
+         <xs:element name="UnsupportedOperation">
+           <xs:complexType>
+             <xs:sequence>
+               <xs:element name="errorMessage" type="xs:string" 
+                           minOccurs="0" maxOccurs="1" />
+             </xs:sequence>
+           </xs:complexType>
+         </xs:element>      
+      
+         <xs:element name="NotFound">
+           <xs:complexType>
+             <xs:sequence>
+               <xs:element name="errorMessage" type="xs:string" 
+                           minOccurs="0" maxOccurs="1" />
+             </xs:sequence>
+           </xs:complexType>
+         </xs:element>      
+      
+      </xs:schema>      
+   </types>
+
+   <message name="empty"/>
+   
+   <message name="ErrorResp">
+      <part name="ErrorResp"  element="tns:ErrorResponse"/>
+   </message>   
+
+   <message name="SearchReq">
+      <part name="Search" element="tns:Search" />
+   </message>
+   
+   <message name="SearchResp">
+      <part name="VOResources" element="tns:SearchResponse" />
+   </message>
+   
+   <message name="GetResourceReq">
+      <part name="GetResource" element="tns:GetResource" />
+   </message>
+   
+   <message name="GetIdentityReq">
+      <part name="GetIdentity" element="tns:GetIdentity" />
+   </message>
+         
+   <message name="KeywordSearchReq">
+      <part name="KeywordSearch" element="tns:KeywordSearch" />
+   </message>
+   
+   <message name="XQuerySearchReq">
+      <part name="XQuerySearch" element="tns:XQuerySearch" />
+   </message>
+   
+   <message name="XQuerySearchResp">
+      <part name="XQuerySearchResp" element="tns:XQuerySearchResponse" />
+   </message>  
+   
+   <message name="OpUnsupportedResp">
+      <part name="OpUnsupportedResp"  element="tns:UnsupportedOperation"/>
+   </message>   
+
+   <message name="NotFoundResp">
+      <part name="NotFoundResp"  element="tns:NotFound"/>
+   </message>   
+   
+   <message name="ResolveResp">
+      <part name="Resource" element="tns:ResolveResponse" />
+   </message>
+   
+   <portType name="RegistrySearchPortType">
+      <operation name="Search">
+         <input message="tns:SearchReq" />
+         <output message="tns:SearchResp" />
+         <fault name="SearchError" message="tns:ErrorResp"/>         
+      </operation>
+      <operation name="KeywordSearch">
+         <input message="tns:KeywordSearchReq" />
+         <output message="tns:SearchResp" />
+         <fault name="KeywordSearchError" message="tns:ErrorResp"/>         
+      </operation>      
+      
+      <operation name="GetResource">
+         <input message="tns:GetResourceReq" />
+         <output message="tns:ResolveResp" />
+         <fault name="GetResourceError" message="tns:ErrorResp"/>
+         <fault name="NotFound" message="tns:NotFoundResp"/>
+      </operation>      
+
+      <operation name="GetIdentity">
+         <input message="tns:GetIdentityReq" />
+         <output message="tns:ResolveResp" />
+         <fault name="GetIdentityError" message="tns:ErrorResp"/>
+      </operation>      
+
+      <operation name="XQuerySearch">
+         <input message="tns:XQuerySearchReq" />
+         <output message="tns:XQuerySearchResp" />
+         <fault name="XQuerySearchError" message="tns:ErrorResp"/>
+         <fault name="OpUnsupported" message="tns:OpUnsupportedResp"/>
+      </operation>
+   </portType>
+
+   <binding name="RegistrySearchSOAP" type="tns:RegistrySearchPortType">
+      <soap:binding style="document" 
+                    transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <operation name="Search">
+         <soap:operation style="document" 
+             soapAction="http://www.ivoa.net/wsdl/RegistrySearch/v1.0#Search"/>
+         <input>
+            <soap:body use="literal" 
+                  namespace="http://www.ivoa.net/wsdl/RegistrySearch/v1.0"/>
+         </input>
+         <output>
+            <soap:body use="literal" 
+                  namespace="http://www.ivoa.net/wsdl/RegistrySearch/v1.0" />
+         </output>
+         <fault name="SearchError">
+            <soap:fault name="SearchError" use="literal" 
+                  namespace="http://www.ivoa.net/wsdl/RegistrySearch/v1.0"/>
+         </fault>         
+      </operation>
+
+      <operation name="KeywordSearch">
+         <soap:operation style="document" 
+               soapAction=
+                "http://www.ivoa.net/wsdl/RegistrySearch/v1.0#KeywordSearch"/>
+         <input>
+            <soap:body use="literal" 
+                  namespace="http://www.ivoa.net/wsdl/RegistrySearch/v1.0"/>
+         </input>
+         <output>
+            <soap:body use="literal" 
+                  namespace="http://www.ivoa.net/wsdl/RegistrySearch/v1.0"/>
+         </output>
+         <fault name="KeywordSearchError">
+            <soap:fault name="KeywordSearchError" use="literal" 
+                  namespace="http://www.ivoa.net/wsdl/RegistrySearch/v1.0"/>
+         </fault>             
+      </operation>      
+      
+      <operation name="GetResource">
+         <soap:operation style="document" 
+             soapAction=
+                 "http://www.ivoa.net/wsdl/RegistrySearch/v1.0#GetResource" />
+         <input>
+            <soap:body use="literal" 
+                  namespace="http://www.ivoa.net/wsdl/RegistrySearch/v1.0"/>
+         </input>
+         <output>
+            <soap:body use="literal" 
+                  namespace="http://www.ivoa.net/wsdl/RegistrySearch/v1.0"/>
+         </output>
+         <fault name="GetResourceError">
+            <soap:fault name="GetResourceError" use="literal" 
+                  namespace="http://www.ivoa.net/wsdl/RegistrySearch/v1.0"/>
+         </fault>          
+         <fault name="NotFound">
+            <soap:fault name="NotFound" use="literal" 
+                  namespace="http://www.ivoa.net/wsdl/RegistrySearch/v1.0"/>
+         </fault>         
+      </operation>       
+      
+      <operation name="GetIdentity">
+         <soap:operation style="document" 
+             soapAction=
+                 "http://www.ivoa.net/wsdl/RegistrySearch/v1.0#GetIdentity" />
+         <input>
+            <soap:body use="literal" 
+                  namespace="http://www.ivoa.net/wsdl/RegistrySearch/v1.0"/>
+         </input>
+         <output>
+            <soap:body use="literal" 
+                  namespace="http://www.ivoa.net/wsdl/RegistrySearch/v1.0"/>
+         </output>
+         <fault name="GetIdentityError">
+            <soap:fault name="GetIdentityError" use="literal" 
+                  namespace="http://www.ivoa.net/wsdl/RegistrySearch/v1.0"/>
+         </fault>          
+      </operation>       
+      
+      <operation name="XQuerySearch">
+         <soap:operation style="document" 
+               soapAction=
+                  "http://www.ivoa.net/wsdl/RegistrySearch/v1.0#XQuerySearch"/>
+         <input>
+            <soap:body use="literal" 
+                  namespace="http://www.ivoa.net/wsdl/RegistrySearch/v1.0"/>
+         </input>
+         <output>
+            <soap:body use="literal" 
+                  namespace="http://www.ivoa.net/wsdl/RegistrySearch/v1.0" />
+         </output>
+         <fault name="XQuerySearchError">
+            <soap:fault name="XQuerySearchError" use="literal" 
+                  namespace="http://www.ivoa.net/wsdl/RegistrySearch/v1.0"/>
+         </fault>         
+         <fault name="OpUnsupported">
+            <soap:fault name="OpUnsupported" use="literal" 
+                  namespace="http://www.ivoa.net/wsdl/RegistrySearch/v1.0"/>
+         </fault>         
+      </operation>
+      
+   </binding>
+
+   <!--
+     - To use this WSDL to declare a particular implementation of this 
+     - service, you can either uncomment and edit the service section below,
+     - OR create another WSDL document that 
+     -   1.  imports this WSDL using an <import> element
+     -   2.  contains a <service> element with binding="rh:RegistrySearchSOAP",
+     -       where rh maps to this WSDL's target namespace
+     -->
+
+<!--
+   <service name="RegistryInterfaceService">
+      <port name="RegistrySearchPort" binding="tns:RegistrySearchSOAP">
+         <soap:address location="http://myhost.org/ws/RegistrySearch"/>
+      </port>
+   </service>
+  -->
+
+</definitions>
