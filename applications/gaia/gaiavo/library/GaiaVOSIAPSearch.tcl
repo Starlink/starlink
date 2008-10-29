@@ -11,7 +11,7 @@
 #  Description:
 #     Provides controls for constructing and doing a query of a SIAP version
 #     1 server. The server is defined by an accessURL, which will be qualified
-#     by a position and size on the sky.
+#     by a position and sizes on the sky.
 
 #  Invocations:
 #
@@ -130,16 +130,27 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
       pack $itk_component(dec) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(dec) {Dec centre of images, degrees or DD:MM:SS}
 
-      itk_component add size {
-         LabelEntry $w_.size \
-            -text "Size:" \
+      itk_component add size1 {
+         LabelEntry $w_.size1 \
+            -text "Width:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
-            -value $size_ \
-            -textvariable [scope size_]
+            -value $size1_ \
+            -textvariable [scope size1_]
       }
-      pack $itk_component(size) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(size) {Size of images, arcminutes}
+      pack $itk_component(size1) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(size1) {Width of images, arcminutes}
+
+      itk_component add size2 {
+         LabelEntry $w_.size2 \
+            -text "Height:" \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
+            -value $size2_ \
+            -textvariable [scope size2_]
+      }
+      pack $itk_component(size2) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(size2) {Height of images, arcminutes}
 
       #  Additional options. Set search region from the displayed
       #  image, mark region by dragging.
@@ -191,10 +202,11 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
          eval $itk_option(-feedbackcommand) on
       }
 
-      #  Transform RA and Dec values into degrees, if needed. The search size
-      #  is in arcminutes, transform that.
+      #  Transform RA and Dec values into degrees, if needed. The search sizes
+      #  are in arcminutes, transform those.
       lassign [skycat::.wcs hmstod $ra_ $dec_] ra dec
-      set size [expr $size_/60.0]
+      set size1 [expr $size1_/60.0]
+      set size2 [expr $size2_/60.0]
 
       #  Establish object to run the query script.
       if { $querytask_ == {} } {
@@ -204,7 +216,7 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
       }
       set votable_ [$tempcats_ get_typed_name ".vot"]
       set interrupted_ 0
-      $querytask_ runwith $itk_option(-accessURL) $ra $dec $size $votable_
+      $querytask_ runwith $itk_option(-accessURL) $ra $dec "$size1,$size2" $votable_
    }
 
    #  Interrupt the query.
@@ -306,7 +318,8 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
    public method set_from_image {} {
       set list [get_image_center_radius]
       if { [llength $list] > 2 } {
-         lassign $list ra_ dec_ size_
+         lassign $list ra_ dec_ size1_
+         set size2_ $size1_
       }
    }
 
@@ -331,7 +344,8 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
    public method select_area {} {
       set list [select_image_area]
       if { [llength $list] > 2 } {
-         lassign $list ra_ dec_ size_
+         lassign $list ra_ dec_ size1_
+         set size2_ $size1_
       }
    }
 
@@ -402,10 +416,11 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
    #  Set true when a query is being interrupted.
    protected variable interrupted_ 0
 
-   #  SIAP RA, Dec and size.
+   #  SIAP RA, Dec and sizes.
    protected variable ra_ 00:00:00
    protected variable dec_ 00:00:00
-   protected variable size_ 10
+   protected variable size1_ 10
+   protected variable size2_ 10
 
    #  Batch job handler.
    protected variable batch_ {}
