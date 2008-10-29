@@ -18,7 +18,7 @@
   -  http://trac.us-vo.org/nvo/browser/registry/STReg/trunk/src/dev/nvonew/xsl/RegistryResults_vot3.xsl?rev=466
   -->
 
-   <xsl:template match="/">
+   <xsl:template match="SearchResponse">
       <xsl:apply-templates select="ri:VOResources" />
    </xsl:template>
 
