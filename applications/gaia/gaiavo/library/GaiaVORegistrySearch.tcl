@@ -184,8 +184,6 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       set votable_ [$tempcats_ get_typed_name ".vot"]
       set interrupted_ 0
 
-      puts "running up $itk_option(-registry)"
-
       if { $itk_option(-registry) == "NVO" } { 
          set predicate {}
          if { $itk_option(-column) != {} && $itk_option(-substring) != {} } {
@@ -196,13 +194,12 @@ itcl::class gaiavo::GaiaVORegistrySearch {
 
          set querytask_ $nvoquerytask_
       } else {
-         puts "$astroquerytask_ runwith [get_registry_] [get_service_] $itk_option(-column) $itk_option(-substring) $votable_"
-
          if { $itk_option(-column) != {} && $itk_option(-substring) != {} } {
             $astroquerytask_ runwith [get_registry_] [get_service_] \
                "$itk_option(-column)" "$itk_option(-substring)" "$votable_"
          } else {
-            $astroquerytask_ runwith [get_registry_] [get_service_] "" "" "$votable_"
+            $astroquerytask_ runwith [get_registry_] [get_service_] \
+               "" "" "$votable_"
          }
          set querytask_ $astroquerytask_
       }

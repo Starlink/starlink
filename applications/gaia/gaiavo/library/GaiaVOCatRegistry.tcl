@@ -89,7 +89,9 @@ itcl::class gaiavo::GaiaVOCatRegistry {
    public method init {} {
       GaiaVOCat::init
       puts "debug: loading siap_query.vot..."
-      after idle [code $itk_component(registry) read_query siap_query.vot]
+      if { [::file exists siap_query.vot] } {
+         after idle [code $itk_component(registry) read_query siap_query.vot]
+      }
    }
 
    #  Add the component that will control the registry query.
