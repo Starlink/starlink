@@ -132,6 +132,7 @@ itcl::class gaiavo::GaiaVOCatSIAP {
       itk_component add siap {
          gaiavo::GaiaVOSIAPSearch $w_.siap \
             -accessURL $itk_option(-accessURL) \
+            -shortname $itk_option(-shortname) \
             -feedbackcommand  [code $this set_feedback] \
             -astrocat [code $w_.cat] \
             -command [code $this query_done] \
@@ -204,6 +205,9 @@ itcl::class gaiavo::GaiaVOCatSIAP {
 
    #  Configuration options: (public variables)
    #  ----------------------
+
+   #  The shortname of the service.
+   itk_option define -shortname shortname ShortName {}
 
    #  The accessURL for the SIAP server.
    itk_option define -accessURL accessURL AccessURL {}

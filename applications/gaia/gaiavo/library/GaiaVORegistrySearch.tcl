@@ -9,15 +9,13 @@
 #     Class for querying a VO registry.
 
 #  Description:
-#     This class defines the access methods for querying the NVO version 1
-#     registry. This should probably be generalised to offer the list of
-#     registry of registries held by the IVOA at http://rofr.ivoa.net and
-#     work with standard methods and any registry, but currently it is
-#     fixed. XXX review this when version 1 stabilizes.
+#     This class defines the access methods for querying the NVO
+#     registry and astrogrid registries.
 #
-#     The query is defined using a service type like SimpleImageAccess, and an
-#     ADQL predicate to refine the search and the results is returned as 
-#     a VOTable (rather than the more generalised XML of a registry response).
+#     The basic query to a service type (like sia:SimpleImageAccess) can be
+#     refined by adding a ADQL where clause that looks for a specified
+#     substring in one of the known columns (these must match the meta-data
+#     definitions for a VOResource).
 
 #  Invocations:
 #
@@ -87,46 +85,64 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       set tempcats_ [gaia::GaiaTempName \#auto -prefix GaiaVORegistry \
                         -exists 0 -type ".TAB"]
 
-      #  Display the registry.
+      #  Display the registry. Offer two symbolic types. NVO and AstroGrid.
       set lwidth 10
       set vwidth 50
       itk_component add registry {
-         LabelValue $w_.registry \
+         LabelMenu $w_.registry \
             -text "Registry:" \
             -labelwidth $lwidth \
-            -valuewidth $vwidth \
-            -value $itk_option(-registry) \
-            -textvariable [scope itk_option(-registry)]
+            -valuewidth $vwidth
       }
       pack $itk_component(registry) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(registry) {VO Registry}
 
-      #  Display the type of service.
+      foreach {name value} [array get registries_] {
+         $itk_component(registry) add \
+            -command [code $this set_registry_ $name] \
+            -label $name \
+            -value $name
+      }
+      $itk_component(registry) configure -value $itk_option(-registry)
+
+      #  Display the type of service. This is fixed.
       itk_component add service {
          LabelValue $w_.service \
             -text "Service:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
-            -value $service_ \
-            -textvariable [scope service_]
+            -value $services_($itk_option(-service))
       }
       pack $itk_component(service) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(service) {Service type}
+      add_short_help $itk_component(service) {Type of service being queried}
 
-      #  Simple predicate.
-      itk_component add predicate {
-         LabelEntry $w_.predicate \
-            -text "Predicate:" \
+      #  Simple column and substring to form predicate.
+      #  XXX enumerate some column names (xpath form for AQDL query, bit much
+      #  for the typical end-user).
+      itk_component add column {
+         LabelEntry $w_.column \
+            -text "Column:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
-            -value $itk_option(-predicate) \
-            -textvariable [scope itk_option(-predicate)] \
+            -value $itk_option(-column) \
+            -textvariable [scope itk_option(-column)] \
             -command [code $this start_query_]
       }
-      pack $itk_component(predicate) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(predicate)  \
-         {Simple predicate to qualify query, e.g. "title LIKE '%%galex%%'"}
-   }
+      pack $itk_component(column) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(column)  {Registry column to qualify query}
+ 
+      itk_component add substring {
+         LabelEntry $w_.substring \
+            -text "Substring:" \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
+            -value $itk_option(-substring) \
+            -textvariable [scope itk_option(-substring)] \
+            -command [code $this start_query_]
+      }
+      pack $itk_component(substring) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(substring)  {Substring to search in column value}
+  }
 
    #  Destructor:
    #  -----------
@@ -153,29 +169,55 @@ itcl::class gaiavo::GaiaVORegistrySearch {
          eval $itk_option(-feedbackcommand) on
       }
 
-      #  Establish object to run the query script.
-      if { $querytask_ == {} } {
-         set querytask_ [gaia::GaiaForeignExec \#auto \
-                            -application $::gaia_dir/queryvoreg \
-                            -notify [code $this query_done_]]
+      #  Establish objects to run the query scripts.
+      if { $nvoquerytask_ == {} } {
+         set nvoquerytask_ [gaia::GaiaForeignExec \#auto \
+                               -application $::gaia_dir/querynvoreg \
+                               -notify [code $this query_done_]]
       }
+      if { $astroquerytask_ == {} } {
+         set astroquerytask_ [gaia::GaiaForeignExec \#auto \
+                                 -application $::gaia_dir/queryastrogridreg \
+                                 -notify [code $this query_done_]]
+      }
+
       set votable_ [$tempcats_ get_typed_name ".vot"]
       set interrupted_ 0
-      $querytask_ runwith $itk_option(-registry) $service_ \
-         $itk_option(-predicate) $itk_option(-endmethod) $votable_
+
+      puts "running up $itk_option(-registry)"
+
+      if { $itk_option(-registry) == "NVO" } { 
+         set predicate {}
+         if { $itk_option(-column) != {} && $itk_option(-substring) != {} } {
+            set predicate "$itk_option(-column) LIKE \'%$itk_option(-substring)%\'"
+         }
+         $nvoquerytask_ runwith [get_registry_] [get_service_] \
+            "$predicate" "$nvoendmethod_" "$votable_"
+
+         set querytask_ $nvoquerytask_
+      } else {
+         puts "$astroquerytask_ runwith [get_registry_] [get_service_] $itk_option(-column) $itk_option(-substring) $votable_"
+
+         if { $itk_option(-column) != {} && $itk_option(-substring) != {} } {
+            $astroquerytask_ runwith [get_registry_] [get_service_] \
+               "$itk_option(-column)" "$itk_option(-substring)" "$votable_"
+         } else {
+            $astroquerytask_ runwith [get_registry_] [get_service_] "" "" "$votable_"
+         }
+         set querytask_ $astroquerytask_
+      }
    }
 
-   #  Interrupt the query.
+   #  Interrupt the query for the current task.
    public method interrupt {} {
       if { $querytask_ != {} } {
          set interrupted_ 1
-         catch {$querytask_ delete_now}
+         catch {$nvoquerytask_ delete_now}
          set querytask_ {}
       }
       if { $itk_option(-feedbackcommand) != {} } {
          eval $itk_option(-feedbackcommand) off
       }
-
    }
 
    #  Called when the query completes.
@@ -201,11 +243,27 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       read_query $votable_
    }
 
+   #  Set the registry.
+   protected method set_registry_ {registry} {
+      configure -registry $registry
+   }
+
+   #  Get the registry endpoint.
+   protected method get_registry_ {} {
+      return $registries_($itk_option(-registry))
+   }
+
+   #  Set the service.
+   protected method set_service_ {service} {
+      configure -service $service
+   }
+
    #  Translate a service type to its full description.
-   protected method set_service_ {} {
-      if { [info exists services_($itk_option(-service))] } {
-         set service_ $services_($itk_option(-service))
+   protected method get_service_ {} {
+      if { $itk_option(-registry) == "NVO" } { 
+         return $services_($itk_option(-service))
       }
+      return $v1services_($itk_option(-service))
    }
 
    #  Save the result of a query to an external VOTable.
@@ -236,20 +294,11 @@ itcl::class gaiavo::GaiaVORegistrySearch {
    #  Configuration options: (public variables)
    #  ----------------------
 
-   #  The VO registry to query. End point that returns the WSDL.
-   itk_option define -registry registry Registry \
-      "http://nvo.stsci.edu/vor10/NVORegInt.asmx?WSDL"
-
-   #  The method of the registry to use.
-   itk_option define -endmethod endmethod EndMethod "VOTCapabilityPredicate"
+   #  The type of VO registry to query, NVO or AstroGrid.
+   itk_option define -registry registry Registry "NVO"
 
    #  The type of query, SIAP, SSAP or CONE.
-   itk_option define -service service Service SIAP {
-      set_service_
-   }
-
-   #  The query predicate.
-   itk_option define -predicate predicate Predicate {}
+   itk_option define -service service Service "SIAP"
 
    #  Command to execute when a list of servers is accepted.
    itk_option define -command command Command {}
@@ -262,14 +311,17 @@ itcl::class gaiavo::GaiaVORegistrySearch {
 
    #  Command to execute to inititate a query externally (that's use this to
    #  do the same job as the "Query" button). Issued when return is pressed in
-   #  the predicate entry.
+   #  the substring entry.
    itk_option define -query_cmd query_cmd Query_Cmd {}
+
+   #  Name of a column to qualify query.
+   itk_option define -column column Column {title}
+
+   #  Substring to search for in column.
+   itk_option define -substring substring Substring {}
 
    #  Protected variables: (available to instance)
    #  --------------------
-
-   #  The full name of the service.
-   protected variable service_ {}
 
    #  Temporary files.
    protected variable tempcats_ {}
@@ -277,7 +329,9 @@ itcl::class gaiavo::GaiaVORegistrySearch {
    #  Name of the VOTable from query.
    protected variable votable_ {}
 
-   #  Task controlling querys.
+   #  Tasks controlling querys.
+   protected variable nvoquerytask_ {}
+   protected variable astroquerytask_ {}
    protected variable querytask_ {}
 
    #  Set true when a query is being interrupted.
@@ -286,11 +340,29 @@ itcl::class gaiavo::GaiaVORegistrySearch {
    #  Common variables: (shared by all instances)
    #  -----------------
 
+   #  The known registries.
+   protected common registries_
+   set registries_(NVO) "http://nvo.stsci.edu/vor10/NVORegInt.asmx?wsdl"
+   set registries_(AstroGrid) \
+      "http://registry.astrogrid.org/astrogrid-registry/services/RegistryQueryv1_0"
+
    #  Mapping for short to full names of services.
    protected common services_
    set services_(SIAP) "SimpleImageAccess"
    set services_(SSAP) "SimpleSpectralAccess"
-   set services_(CONE) "conesearch"
+   set services_(CONE) "ConeSearch"
+
+   protected common v1services_
+   set v1services_(SIAP) "sia:SimpleImageAccess"
+   set v1services_(SSAP) "ssa:SimpleSpectralAccess"
+   set v1services_(CONE) "cs:ConeSearch"
+
+   #  The endmethod of the NVO registry.
+   protected common nvoendmethod_ "VOTCapabilityPredicate"
+
+   #  Possible columns for adding a predicate.
+   protected common columns_ "title shortName"
+
 
 #  End of class definition.
 }

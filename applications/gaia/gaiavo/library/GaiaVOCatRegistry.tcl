@@ -101,7 +101,8 @@ itcl::class gaiavo::GaiaVOCatRegistry {
             -feedbackcommand  [code $this set_feedback] \
             -astrocat [code $w_.cat] \
             -command [code $this query_done] \
-            -query_cmd [code $this query]
+            -query_cmd [code $this query] \
+            -service $itk_option(-service)
       }
       pack $itk_component(registry) -side top -fill x
       add_short_help $itk_component(registry) {Controls to set registry query}
@@ -120,6 +121,9 @@ itcl::class gaiavo::GaiaVOCatRegistry {
 
    #  Configuration options: (public variables)
    #  ----------------------
+
+   #  The type of service to query. SSAP, SIAP, ConeSearch.
+   itk_option define -service service Service SIAP
 
    #  Protected variables: (available to instance)
    #  --------------------

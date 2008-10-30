@@ -81,19 +81,23 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
       set tempcats_ [gaia::GaiaTempName \#auto -prefix GaiaVOSIAP \
                         -exists 0 -type ".TAB"]
 
-      #  Display the SIAP accessURL.
+      #  Display the SIAP shortname and/or access URL.
       set lwidth 10
       set vwidth 50
+      if { $itk_option(-shortname) != {} } {
+         set name "$itk_option(-shortname) ($itk_option(-accessURL))"
+      } else {
+         set name $itk_option(-accessURL)
+      }
       itk_component add server {
          LabelValue $w_.server \
             -text "Server:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
-            -value $itk_option(-accessURL) \
-            -textvariable [scope itk_option(-accessURL)]
+            -value $name
       }
       pack $itk_component(server) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(server) {SIAP server URL}
+      add_short_help $itk_component(server) "The SIAP server"
 
       #  Get the position from an object name lookup.
       itk_component add object {
@@ -382,6 +386,9 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
 
    #  Configuration options: (public variables)
    #  ----------------------
+
+   #  The shortname of the service.
+   itk_option define -shortname shortname ShortName {}
 
    #  The SIAP accessURL.
    itk_option define -accessURL accessURL AccessURL {}

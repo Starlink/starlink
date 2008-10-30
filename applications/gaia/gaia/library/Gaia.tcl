@@ -2361,6 +2361,7 @@ window gives you access to this."
    protected method vo_find_siap_ {m index} {
       if { [gaia::GaiaVOTableAccess::check_for_gaiavo] } {
          utilReUseWidget gaiavo::GaiaVOCatRegistry $w_.voregistry \
+            -service SIAP \
             -show_cols {shortName title} \
             -activate_cmd [code $this vo_query_siap_]
       } else {
@@ -2379,7 +2380,8 @@ window gives you access to this."
          if { $accessURL != {} } {
             set name [gaiavo::GaiaVOCatSIAP::getName $headers $row]
             gaiavo::GaiaVOCatSIAP $w_.siapquery\#auto \
-               -accessURL $accessURL -gaia $this -title "$name SIAP service"
+               -accessURL $accessURL -shortname $name -gaia $this \
+               -title "$name SIAP service"
          } else {
             warning_dialog "SIAP service does not specify an accessURL" $w_
          }
