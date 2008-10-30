@@ -89,7 +89,7 @@ F77_INTEGER_FUNCTION(ast_sphmap)( CHARACTER(OPTIONS),
             if ( options[ i ] == ',' ) options[ i ] = '\n';
          }
       }
-      RESULT = astP2I( astSphMap( "%s", status, options ) );
+      RESULT = astP2I( astSphMap( "%s", options ) );
       astFree( options );
    )
    return RESULT;
