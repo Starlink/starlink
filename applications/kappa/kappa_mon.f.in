@@ -508,6 +508,10 @@
          ELSE IF ( NAME .EQ. 'PSF' ) THEN
             CALL PSF ( STATUS )
 
+*  Uses an AST Region to set some pixels of an NDF to be bad.
+         ELSE IF ( NAME .EQ. 'REGIONMASK' ) THEN
+            CALL REGIONMASK ( STATUS )
+
 *  Transforms an NDF.
          ELSE IF ( NAME .EQ. 'REGRID' ) THEN
             CALL REGRID ( STATUS )
