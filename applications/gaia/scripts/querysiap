@@ -49,6 +49,8 @@ exec $GAIA_DIR/gaiavo_tcl $0 ${1+"$@"}
 #-
 #.
 
+package require uri
+
 #  Check the command-line arguments.
 if { $argc == 5 } {
    set endpoint [lindex $argv 0]
@@ -61,11 +63,12 @@ if { $argc == 5 } {
    exit 1
 }
 
-#  Open the output file.
+#  Open the output file, just a test.
 if { [catch "::open $outfile w" fid] } {
    puts stderr "Failed to open output file: $outfile"
    exit 1
 }
+::close $fid
 
 #  Establish the standard proxy define using http_proxy.
 #cat::ProxyDialog::check_proxies $::env(HOME)/.skycat/proxies
@@ -79,25 +82,57 @@ if { [info exists ::env(http_proxy)] } {
 ::http::config -proxyhost $proxy
 ::http::config -proxyport $port
 
-#  Construct the query. Endpoint can terminate in & or ?
-switch -glob $endpoint {
-    *& {
-        set query ${endpoint}POS=${ra},${dec}&SIZE=${size}&FORMAT=image/fits
-    }
-    default {
-        set query ${endpoint}&POS=${ra},${dec}&SIZE=${size}&FORMAT=image/fits
-    }
+#  Proc to do the query. Needed as can be recursive if redirected.
+proc get {query outfile} {
+
+   #  Open the result file.
+   set fid [::open $outfile w]
+
+   #  Download the response.
+   if { [catch {set response [::http::geturl $query -channel $fid] } msg] } {
+
+      #  Failed, so delete file and exit with an error.
+      catch {
+         ::close $fid
+         ::file delete $outfile
+      }
+      puts stderr "$msg"
+      return 1
+   }
+
+   #  Check for a moved response and handle the re-direct.
+   if { [::http::ncode $response] == 302 } {
+      array set meta [eval set $response\(meta\)]
+      set location $meta(Location)
+
+      #  Rebuild the query.
+      array set parts [::uri::split $query]
+      if { $parts(port) != {} } {
+         set newquery "$parts(scheme)://$parts(host):$parts(port)${location}"
+      } else {
+         set newquery "$parts(scheme)://$parts(host)${location}"
+      }
+      puts "Redirected to: $newquery"
+      catch {::close $fid}
+      get $newquery $outfile
+   }
+   catch {::close $fid}
+   return 0
 }
 
-#  Download the response.
-if { [catch { ::http::geturl $query -channel $fid } msg] } {
-   #  Failed, so delete file and exit with an error.
-   ::close $fid
-   ::file delete $outfile
-   puts stderr "$msg"
+#  Construct the initial query from the endpoint and parameters.
+#  Endpoint can terminate in & or ?
+switch -glob $endpoint {
+   *& {
+      set query ${endpoint}POS=${ra},${dec}&SIZE=${size}
+   }
+   default {
+      set query ${endpoint}&POS=${ra},${dec}&SIZE=${size}
+   }
+}
+
+#  Do it.
+if { [get $query $outfile] == 1 } {
    exit 1
 }
-
-::close $fid
 exit
-

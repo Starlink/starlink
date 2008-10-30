@@ -209,8 +209,13 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
       #  Transform RA and Dec values into degrees, if needed. The search sizes
       #  are in arcminutes, transform those.
       lassign [skycat::.wcs hmstod $ra_ $dec_] ra dec
-      set size1 [expr $size1_/60.0]
-      set size2 [expr $size2_/60.0]
+      set size {}
+      if { $size1_ != {} } {
+         set size "[expr $size1_/60.0]"
+      }
+      if { $size2_ != {} } {
+         set size "$size,[expr $size2_/60.0]"
+      }
 
       #  Establish object to run the query script.
       if { $querytask_ == {} } {
@@ -220,7 +225,7 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
       }
       set votable_ [$tempcats_ get_typed_name ".vot"]
       set interrupted_ 0
-      $querytask_ runwith $itk_option(-accessURL) $ra $dec "$size1,$size2" $votable_
+      $querytask_ runwith $itk_option(-accessURL) $ra $dec "$size" $votable_
    }
 
    #  Interrupt the query.
