@@ -38,6 +38,7 @@
 *  Copyright:
 *     Copyright (C) 1992, 1993 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1998 Central Laboratory of the Research Councils.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -59,6 +60,7 @@
 *  Authors:
 *     JAB: J A  Bailey  (AAO)
 *     AJC: A J Chipperfield (STARLINK)
+*     DSB: David S Berry (JAC,UCLan)
  
 *  History:
 *     15-JUL-1992 (AJC):
@@ -75,6 +77,10 @@
 *        Move DATA statement to comply with standard
 *     20-MAY-1998 (AJC):
 *        Use stated length (SLEN) of STRING (Linux problem).
+*     30-OCT-2008 (DSB):
+*        Do not annul the error caused by hitting the end of string
+*        (LEX__ENDPARSE) as this indicates that the end of the array has
+*        not been located correctly.
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -252,10 +258,19 @@
 
 *  Repeat for next element
       END DO
- 
 
-*  Finished parsing array  -  ignore LEX__ENDPARSE
-      IF ( STATUS .EQ. LEX__ENDPARSE ) CALL EMS_ANNUL( STATUS )
+*  Finished parsing array . ACTION should be LEX__ENDARR and status
+*  should be SAI__OK. if we have hit thend of the command line, then
+*  there must have been some problem parsing the array. Annul the 
+*  LEX__ENDPARSE (since higher routines annul LEX__ENDPARSE errors), and 
+*  re-report it using a "command line syntax error" error code.
+      IF ( STATUS .EQ. LEX__ENDPARSE ) THEN
+         CALL EMS_ANNUL(STATUS)
+         STATUS = SUBPAR__CMDSYER
+         CALL EMS_SETC( 'PARM', PARKEY(NAMECODE) )
+         CALL EMS_REP( 'SUP_ARRAY4', 'Failed to read array of values '//
+     :                 'supplied for parameter ^PARM.', STATUS )
+      END IF
 
 *  and, if all is OK, copy the array values into the parameter
       IF ( STATUS .EQ. SAI__OK ) THEN
