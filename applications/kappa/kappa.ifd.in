@@ -15044,6 +15044,57 @@ iraf! {
 
       }
 
+      action regionmask {
+         alias {ardm(ask)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter region {
+            position 2
+            type FILENAME
+            access READ
+            vpath PROMPT
+            prompt {Text file holding Region}
+            ppath CURRENT DEFAULT
+            helpkey *
+          }
+         parameter const {
+            type LITERAL
+            vpath DEFAULT
+            prompt {New value for masked pixels}
+            ppath CURRENT DEFAULT
+            default BAD
+            helpkey *
+          }
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            prompt {NDF to be masked}
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            help "*"
+          }
+         parameter inside {
+            type _LOGICAL
+            vpath DEFAULT
+            prompt {Mask the inside of the region?}
+            ppath CURRENT DEFAULT
+            default TRUE
+            helpkey *
+          }
+         parameter out {
+            position 3
+            type NDF
+            access WRITE
+            vpath PROMPT
+            prompt {Masked NDF}
+            association ->GLOBAL.DATA_ARRAY
+            helpkey *
+          }
+      }
+
       action regrid {
          alias {regr(id)}
 
