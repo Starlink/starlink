@@ -24265,7 +24265,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    char *watmem;                  /* Pointer to total WAT string */
    char bj;                       /* Besselian/Julian indicator */
    char format[ 50 ];             /* scanf format string */
-   char keyname[ FITSNAMLEN + 1 ];/* General keyword name */
+   char keyname[ FITSNAMLEN + 5 ];/* General keyword name + formats */
    char template[ FITSNAMLEN + 1 ];/* General keyword name template */
    char lattype[MXCTYPELEN];      /* CTYPE value for latitude axis */
    char lontype[MXCTYPELEN];      /* CTYPE value for longitude axis */
