@@ -1147,4 +1147,5 @@ void smf_rebincube_paste_thread( void *data, int *status );
 void smf_ndf_sbnd( int ndim, int *lbnd, int *ubnd, smfData *data, int *status );
 void smf_lock_data( smfData *data, int lock, int *status );
 
+void smf_convert_bad( smfData *data, int *status );
 

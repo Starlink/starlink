@@ -58,6 +58,8 @@
 *        Steptime is now in smfHead.
 *     2008-10-17 (AGG):
 *        Set NaN and Inf to VAL__BADD when normalizing
+*     2008-11-03 (EC):
+*        Move conversion of NaN/Inf-->VAL__BADD to smf_convert_bad.c
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -144,15 +146,15 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
   /* Check for NULL pointer */
   if( indata == NULL ) {
     *status = SAI__ERROR;
-    errRep( FUNC_NAME, "smfData pointer is NULL", status );
+    errRep( "", FUNC_NAME ": smfData pointer is NULL", status );
     return NULL;
   }
 
   /* Check for double-precision data */
   if( indata->dtype != SMF__DOUBLE ) {
     *status = SAI__ERROR;
-    errRep( FUNC_NAME, 
-            "Data is not double precision, must be flat-fielded first", 
+    errRep( "", FUNC_NAME 
+            ": Data is not double precision, must be flat-fielded first", 
             status );
     return NULL;
   }
@@ -192,7 +194,7 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
     isFFT = smf_isfft( data, &ntslice, &nbolo, &nf, status );
   } else {
     *status = SAI__ERROR;
-    errRep( FUNC_NAME, "smfData has strange dimensions", status );
+    errRep( "", FUNC_NAME ": smfData has strange dimensions", status );
   }
 
   /* If the data are already transformed to the requested domain return
@@ -271,8 +273,8 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
 
       if( !plan ) {
         *status = SAI__ERROR;
-        errRep(FUNC_NAME, 
-               "FFTW3 could not create plan for inverse transformation",
+        errRep("", FUNC_NAME 
+               ": FFTW3 could not create plan for inverse transformation",
                status);
       }
 
@@ -303,8 +305,8 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
 
       if( !plan ) {
         *status = SAI__ERROR;
-        errRep(FUNC_NAME, 
-               "FFTW3 could not create plan for inverse transformation",
+        errRep( "", FUNC_NAME 
+               ": FFTW3 could not create plan for inverse transformation",
                status);
       }
 
@@ -325,13 +327,9 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
         norm = 1. / (double) ntslice; 
         
         val = retdata->pntr[0];
+
         for( i=0; i<nf*nbolo*2; i++ ) {
-	  /* Set NaN or +/-Inf to a bad value */
-	  if ( *val != *val || *val < VAL__MIND || *val > VAL__MAXD ) {
-	    *val = VAL__BADD;
-	  } else {
-	    *val *= norm;
-	  }
+          *val *= norm;
           val++;
         }
 
@@ -341,8 +339,8 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
           steptime = retdata->hdr->steptime;
           if( steptime < VAL__SMLD ) {
             *status = SAI__ERROR;
-            errRep(FUNC_NAME, 
-                   "FITS header error: STEPTIME must be > 0",
+            errRep( "", FUNC_NAME 
+                   ": FITS header error: STEPTIME must be > 0",
                    status);
           }
 

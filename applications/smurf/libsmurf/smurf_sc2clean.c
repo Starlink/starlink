@@ -346,7 +346,8 @@ void smurf_sc2clean( int *status ) {
       }
       
       smf_filter_execute( ffdata, filt, status );
-      
+      smf_convert_bad( ffdata, status );      
+
       filt = smf_free_smfFilter( filt, status );
     }
 
