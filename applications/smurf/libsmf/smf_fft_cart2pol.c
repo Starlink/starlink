@@ -86,6 +86,7 @@
 #include "sae_par.h"
 #include "mers.h"
 #include "ndf.h"
+#include "prm_par.h"
 #include "star/ndg.h"
 #include "star/grp.h"
 #include "msg_par.h"
@@ -137,7 +138,8 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
     baseI = baseR + nf*nbolo;
 
     if( inverse ) {
-      for( j=0; (*status==SAI__OK)&&(j<nf); j++ ) {
+      for( j=0; (*status==SAI__OK)&&(j<nf); j++ ) if( (baseR[j]!=VAL__BADD)&&
+                                                      (baseI[j]!=VAL__BADD) ) {
         if( fabs(baseI[j]) > AST__DPI ) {
           /* Check for valid argument */
           *status = SAI__ERROR;
@@ -167,7 +169,8 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ) {
         }
       }
     } else {
-      for( j=0; j<nf; j++ ) {
+      for( j=0; j<nf; j++ ) if( (baseR[j]!=VAL__BADD)&&
+                                (baseI[j]!=VAL__BADD) ) {
         /* Convert cartesian --> polar */
         amp = baseR[j]*baseR[j] + baseI[j]*baseI[j];
         if( !power ) amp = sqrt(amp);
