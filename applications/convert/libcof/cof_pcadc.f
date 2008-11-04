@@ -41,6 +41,10 @@
 *     The above headers are prefaced by a blank header and a title
 *     "Provenance:" comment.
 
+*     The PRODUCT keyword's value is modified for FITS extensions.  It
+*     has '_<extname>' appended where <extname> is the lowercase name of
+*     the standard EXTNAME keyword.
+
 *  Arguments:
 *     NDF = INTEGER (Given)
 *        The identifier of the NDF whose PROVENANCE is to be written to
@@ -84,6 +88,8 @@
 *        Fix some valgrind warnings. FNAME used incorrectly for PATH.
 *     2008 August 6 (MJC):
 *        Only record unique OBSIDSS values.
+*     2008 October 2 (MJC):
+*        Edit the PRODUCT keyowrd for extensions.
 *     {enter_further_changes_here}
 
 *-
@@ -117,7 +123,11 @@
       CHARACTER*47 ANCCOM        ! Ancestor header comment
       CHARACTER*( DAT__SZLOC ) ANCLOC ! Locator to an ancestor
       CHARACTER*80 CARD          ! FITS header card
+      CHARACTER*47 COMENT        ! FITS header comment
       INTEGER CPOS               ! Current string position
+      CHARACTER*47 EXTCOM        ! EXTNAM header comment
+      CHARACTER*68 EXTNAM        ! Name of the extension
+      CHARACTER*256 FNAME        ! Output file name
       INTEGER FSTAT              ! FITSIO status
       LOGICAL HASID              ! Is the OBSIDSS key already present?
       LOGICAL IDPRS              ! Index to root present?
@@ -131,20 +141,26 @@
       CHARACTER*( DAT__SZLOC ) MORLOC ! Locator to MORE component
       CHARACTER*68 NAME          ! Path to ancestor
       INTEGER NCNAME             ! Character length of the name
+      INTEGER NHDU               ! HDU number
       INTEGER NIDS               ! Number of indices
       INTEGER NOBSID             ! Number of OBSn headers written
       INTEGER NPAR               ! Number of parents
       INTEGER NROOT              ! Number of root ancestors
       CHARACTER*30 OBIDSS        ! MORE.OBSIDSS value
       LOGICAL OBIPRS             ! OBSIDSS present?
-      INTEGER PIPNTR             ! Pointer to indices of the parents
-      CHARACTER*256 FNAME        ! Output file name
-      LOGICAL PRVPRS             ! PROVENANCE present?
-      CHARACTER*( DAT__SZLOC ) PARLOC ! Locator to PARENTS component
       CHARACTER*256 PATH         ! Path to ancestor
+      CHARACTER*( DAT__SZLOC ) PARLOC ! Locator to PARENTS component
+      INTEGER PIPNTR             ! Pointer to indices of the parents
+      CHARACTER*68 PRODUC        ! Value PRODUCT keyword
       CHARACTER*( DAT__SZLOC ) PRVLOC ! Locator to PROVENANCE component
+      LOGICAL PRVPRS             ! PROVENANCE present?
       INTEGER SOE                ! Character position of file extension
       LOGICAL THERE              ! Component is present
+
+*  The PRODUCT keyword may only exist in the primary HDU, so save its
+*  value and comment when this routine is called for writing the FITS 
+*  extension headers.
+      SAVE COMENT, PRODUC
 
 *.
 
@@ -253,7 +269,7 @@
          NOBSID = 0
 
 *  Create a KeyMap to record the OBSIDSS values as keys.  The default
-*  is 300 elements, which ought to be plentyby a large factor, hence
+*  is 300 elements, which ought to be plenty by a large factor, hence
 *  to resizing.
          KMIDSS = AST_KEYMAP( ' ', STATUS )
 
@@ -277,7 +293,7 @@
                   CALL CMP_GET0C( MORLOC, 'OBSIDSS', OBIDSS, STATUS )
                   IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-*  Test whether or not this OBSIDSS is uniqwe within this NDF.
+*  Test whether or not this OBSIDSS is unique within this NDF.
                   HASID = AST_MAPHASKEY( KMIDSS, OBIDSS, STATUS )
                   IF ( .NOT. HASID ) THEN
                      NOBSID = NOBSID + 1
@@ -350,6 +366,35 @@
          CALL FTPREC( FUNIT, CARD, FSTAT )
       END IF
 
+*  PRODUCT header
+*  ==============
+
+*  The PRODUCT keyword retians its value in the primary HDU, but
+*  has the extension name appended in extensions, of the form
+*  <PRODUCT>_<extname>, where <extname> is the value iof EXTNAM in
+*  lowercase.
+      CALL FTGHDN( FUNIT, NHDU )
+
+      IF ( NHDU .EQ. 1 ) THEN
+         CALL FTGKYS( FUNIT, 'PRODUCT', PRODUC, COMENT, FSTAT )
+
+      ELSE IF ( NHDU .GT. 1 ) THEN
+
+* Obtain the two relevant headers.
+         CALL FTGKYS( FUNIT, 'EXTNAME', EXTNAM, EXTCOM, FSTAT )
+
+* Form the required string.
+         CALL CHR_LCASE( EXTNAM )
+         CPOS = CHR_LEN( PRODUC )
+         CALL CHR_APPND( '_', PRODUC, CPOS )
+         CALL CHR_APPND( EXTNAM, PRODUC, CPOS )
+
+*  Write the PRODUCT keyword's new value leaving the comment unchanged.
+*  A new keyword is written should the PRODUCT keywoerd not exist in
+*  the extension.
+         CALL FTUKYS( FUNIT, 'PRODUCT', PRODUC( :CPOS ), COMENT, 
+     :                 FSTAT )
+      END IF
 
 *  Come here is there has been an error.
   999 CONTINUE

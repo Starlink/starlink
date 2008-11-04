@@ -1,3 +1,10 @@
+1 CONVERT_Version_1.5-15
+
+ The CADC provenance processing now also modifies the PRODUCT 
+ keyword's value in FITS extensions to the original PRODUCT string
+ followed by underscore and the extension name in lowercase.  Also
+ the CADC provenance now only records unique OBSIDD values.
+
 1 CONVERT_Version_1.5-14
 
  The creation of AXIS structures by SPECX2NDF can now be suppressed 

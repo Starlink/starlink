@@ -84,6 +84,8 @@
 *        "CADC" -- The CADC headers are written.  These record the
 *        number and paths of both the direct parents of the NDF being
 *        converted, and its root ancestors (the ones without parents).
+*        Also modify the PRODUCT keyword to be unique for each FITS
+*        extension.
 *
 *        "GENERIC" -- Encapsulates the entire PROVENANCE structure in 
 *        FITS headers in sets of five character-value indexed headers.
@@ -206,6 +208,12 @@
 *        OBSCNT --- is the number of root ancestor OBSm headers.
 *        OBSm --- is mth root ancestor identifier from its
 *          MORE.OBSIDSS component.
+*        FILEID --- is the name of the output FITS file, omitting any
+*          file extension.
+*
+*        PRODUCT is modified or added to each extension's header to
+*        be the primary header's value of PRODUCT with a '_<extnam>' 
+*        suffix, where <extnam> is the extension name in lowercase.
 *
 *     -  There are additional rules if a multi-NDF container file is 
 *     being converted.  This excludes the case where there are but two 
@@ -311,6 +319,8 @@
 *        Add PROVEN argument and invoke its CADC option.
 *     2008 February 6 (MJC):
 *        Invoke and document PROVEN argument's GENERIC option.
+*     2008 October 9 (MJC):
+*        Update documentation on the CADC provenance.
 *     {enter_further_changes_here}
 
 *-

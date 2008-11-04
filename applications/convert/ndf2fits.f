@@ -194,6 +194,8 @@
 *        "CADC" -- The CADC headers are written.  These record the
 *        number and paths of both the direct parents of the NDF being
 *        converted, and its root ancestors (the ones without parents).
+*        It also modifies the PRODUCT keyword to be unique for each FITS
+*        extension.
 *
 *        "Generic" -- Encapsulates the entire PROVENANCE structure in 
 *        FITS headers in sets of five character-value indexed headers.
@@ -488,6 +490,10 @@
 *        FILEID --- is the name of the output FITS file, omitting any
 *          file extension.
 *
+*        PRODUCT is modified or added to each extension's header to
+*        be the primary header's value of PRODUCT with a '_<extnam>' 
+*        suffix, where <extnam> is the extension name in lowercase.
+*
 *     When PROFITS is TRUE any existing provenance keywords in the FITS
 *     airlock are not copied to the FITS file.
 
@@ -628,6 +634,8 @@
 *        Added PROVENANCE header.
 *     2008 February 6 (MJC):
 *        Document PROVENANCE parameter's Generic option.
+*     2008 October 9 (MJC):
+*        Document the CADC-provenance PRODUCT keyword.
 *     {enter_further_changes_here}
 
 *  Bugs:
