@@ -289,6 +289,7 @@ void smurf_qlmakemap( int *status ) {
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   void *variance = NULL;     /* Pointer to the variance map */
   double *weights = NULL;    /* Pointer to the weights array */
+  smfWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
 
   if (*status != SAI__OK) return;
 
@@ -298,6 +299,10 @@ void smurf_qlmakemap( int *status ) {
   /* Main routine */
   ndfBegin();
   
+  /* Find the number of cores/processors available and create a pool of 
+     threads of the same size. */
+  wf = smf_create_workforce( smf_get_nthread( status ), status );
+
   /* Get group of input files */
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
@@ -433,6 +438,7 @@ void smurf_qlmakemap( int *status ) {
              status);
     smf_get_dims( data, &nbolo, NULL, NULL, status );
     bolonoise = smf_malloc( nbolo, sizeof(*bolonoise), 1, status );
+
     smf_bolonoise( data, 0, 0.5, SMF__F_WHITELO, SMF__F_WHITEHI, 0, bolonoise, 
                    NULL, 0, status );
 
@@ -443,12 +449,10 @@ void smurf_qlmakemap( int *status ) {
     msgOutif(MSG__VERB, " ", "SMURF_QLMAKEMAP: Beginning the REBIN step",
              status);
 
-    /* Rebin the data onto the output grid */
-    smf_rebinmap( NULL, data, bolonoise, i, size, outframeset, spread, params, 
+    /* Rebin the data onto the output grid. This also closes the input file. */
+    smf_rebinmap( wf, data, bolonoise, i, size, outframeset, spread, params, 
                   moving, genvar, lbnd_out, ubnd_out, map, variance, weights, 
                   status );
-
-    smf_close_file( &data, status );
 
     if (*status != SAI__OK) break;
   }
@@ -487,7 +491,8 @@ void smurf_qlmakemap( int *status ) {
   if( darks ) smf_close_related( &darks, status );
   if( bolonoise ) bolonoise = smf_free(bolonoise, status);
   grpDelet( &igrp, status );
-  
+  if( wf ) wf = smf_destroy_workforce( wf );
+ 
   ndfEnd( status );
   
   msgOutif( MSG__VERB," ", "Output map written", status );
