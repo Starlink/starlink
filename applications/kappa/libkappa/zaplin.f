@@ -308,8 +308,8 @@
 *     and second dimensions of the NDF as a whole.  See the "Examples".
 
 *  Related Applications:
-*     KAPPA: ARDMASK, CHPIX, FILLBAD, GLITCH, NOMAGIC, SEGMENT,
-*     SETMAGIC; Figaro: CSET, ICSET, NCSET, TIPPEX.
+*     KAPPA: ARDMASK, CHPIX, FILLBAD, GLITCH, NOMAGIC, REGIONMASK,
+*     SEGMENT, SETMAGIC; Figaro: CSET, ICSET, NCSET, TIPPEX.
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
