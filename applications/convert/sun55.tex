@@ -17,16 +17,16 @@
 {Copyright \copyright\ 2005 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {55.23}
+\newcommand{\stardocnumber}    {55.24}
 \newcommand{\stardocauthors}   {Malcolm J. Currie\\
                                 G.J.Privett\\
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2008 May 19}
+\newcommand{\stardocdate}      {2008 October 9}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
-\newcommand{\stardocversion}   {Version 1.5-14}
+\newcommand{\stardocversion}   {Version 1.5-15}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {
 The \CONVERT\ package contains utilities for converting data files
@@ -4417,7 +4417,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
             \texttt{"CADC"} --- The CADC headers are written.  These
 	    record the number and paths of both the direct parents
 	    of the NDF being converted, and its root ancestors (the
-	    ones without parents).
+	    ones without parents).  It also modifies the PRODUCT 
+            keyword to be unique for each FITS extension.
  
             \sstitem
             \texttt{"Generic"} --- Encapsulates the entire
@@ -4856,7 +4857,14 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          \sstitem
          FILEID --- is the name of the output FITS file, omitting any
           file extension.
+
+         \sstitem
+          PRODUCT is modified or added to each extension's header to
+          be the primary header's value of PRODUCT with a 
+          \texttt{\_$<$extnam$>$} suffix, where \texttt{$<$extnam$>$}
+          is the extension name in lowercase.
       }
+
 
        When PROFITS is \texttt{TRUE} any existing provenance keywords in the
        FITS airlock are not copied to the FITS file.
@@ -7162,7 +7170,7 @@ Early release-note sections have been removed.
 On installation, only a link to the installed \LaTeX\ document is now retained
 in the source directory.
 
-\section{Release Notes -- V1.3-5}
+\subsection{Release Notes -- V1.3-5}
 \htmlref{FITS2NDF}{FITS2NDF}
 now creates a component of type FITS\_HEADER, not NDF, in the container
 file for multi-extension FITS files if the FITS HDU does not contain a data
@@ -7181,7 +7189,7 @@ This document has been updated to include this section and to update the
 description of the CONTAINER parameter of
 \htmlref{FITS2NDF}{FITS2NDF}.
 
-\section{Release Notes -- V1.3-6}
+\subsection{Release Notes -- V1.3-6}
 \htmlref{FITS2NDF}{FITS2NDF}
 \begin{itemize}
 \item Improve error reporting if no WCS encoding can be used.
@@ -7194,7 +7202,7 @@ description of the CONTAINER parameter of
 \section{Release Notes -- V1.4}
 Added application \htmlref{MTFITS2NDF}{MTFITS2NDF} to convert FITS tapes to NDFs.
 
-\section{Release Notes -- V1.4-1}
+\subsubsection{Release Notes -- V1.4-1}
 Updated the IDL converters to work with IDL 5.5. Fix a problem causing a crash
 on Linux and document the fact that the Starlink IDL converters cannot be used
 with the 64-bit Solaris version of IDL.
@@ -7203,18 +7211,18 @@ Corrected an error in the section of this document describing the easy
 way to do IDL/NDF conversions.  \htmlref{WRITE\_NDF}{WRITE_NDF} was
 described as if it were a function rather than a procedure.
 
-\section{Release Notes -- V1.4-2}
+\subsection{Release Notes -- V1.4-2}
 Parameter WCSATTRS is added to \htmlref{FITS2NDF}{FITS2NDF}.
 This enables users to modify the way WCS information is extracted from the
 FITS headers. This can be useful when the headers do not conform to conventions. 
 
-\section{Release Notes -- V1.4-3}
+\subsection{Release Notes -- V1.4-3}
 Fixed a problem in \htmlref{NDF2FITS}{NDF2FITS} caused by a mismatch of
 conventions used in the TFORM\textit{n} and TDIM\textit{n} header cards for
 multi-dimensional character arrays.  A corresponding fix was required for
 \htmlref{FITS2NDF}{FITS2NDF}.
 
-\section{Release Notes -- V1.4-4}
+\subsection{Release Notes -- V1.4-4}
 Fixed a bug in \htmlref{FITS2NDF}{FITS2NDF} caused by a missing END card on a
 merged header.
   
@@ -7244,7 +7252,7 @@ preserved where values have not changed significantly.
 The references to the old VMS-only tasks have been removed from the
 documentation because the residual VMS service no longer exists.
 
-\section{Release Notes -- V1.5-4}
+\subsection{Release Notes -- V1.5-4}
 Added IRAF compatibility libs for Linux systems.  CONVERT should now
 build on any ix86 Linux platform. 
 
@@ -7279,7 +7287,7 @@ BITPIX, or BSCALE and BZERO precision when FMTCNV is \texttt{TRUE}.
 \htmlref{NDF2FITS}{NDF2FITS} now supports multi-NDFs HDS container files
 through the new CONTAINER and MERGE parameters.
 
-\section{Release Notes -- V1.5-8}
+\subsection{Release Notes -- V1.5-8}
 
 \htmlref{FITS2NDF}{FITS2NDF} Parameter FMTCNV has a new allowed value
 of \texttt{"Native"} requesting that there is no format conversion, and
@@ -7303,7 +7311,7 @@ value of \texttt{"FITS-WCS(CD)"}.  This is the same as
 \texttt{"FITS-WCS"} except that it uses the old CD matrix formalism 
 to describe the data array's rotation and scaling.
 
-\section{Release Notes -- V1.5-10}
+\subsection{Release Notes -- V1.5-10}
 
 \htmlref{FITS2NDF}{FITS2NDF} supports externally and internally compressed
 FITS files.
@@ -7322,7 +7330,7 @@ There is a new DUPLEX parameter.  When set \texttt{TRUE} (and PROFITS
 is also \texttt{TRUE}), it permits the FITS airlock headers to appear
 also in the IMAGE extensions for the VARIANCE and QUALITY arrays.
 
-\section{Release Notes -- V1.5-12}
+\subsection{Release Notes -- V1.5-12}
 
 \htmlref{NDF2FITS}{NDF2FITS} now makes special provision for the JCMT
 SMURF-package extension.  It treats the extension contents as NDFs
@@ -7351,5 +7359,12 @@ now be suppressed using its new AXIS parameter.
 
 \htmlref{NDF2FITS}{NDF2FITS} is now much quicker when writing out WCS
 information that includes a large table of values.
+
+\section{Release Notes -- V1.5-15}
+
+The CADC provenance processing now also modifies the PRODUCT keyword's
+value in FITS extensions to the original PRODUCT string followed by 
+underscore and the extension name in lowercase.  Also the CADC 
+provenance now only records unique OBSIDD values.
 
 \end{document}
