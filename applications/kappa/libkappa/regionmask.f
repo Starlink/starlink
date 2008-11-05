@@ -4,7 +4,7 @@
 *     REGIONMASK
 
 *  Purpose:
-*     Apply a mask to a region of an NDF.
+*     Applies a mask to a region of an NDF.
 
 *  Language:
 *     Starlink Fortran 77
@@ -19,12 +19,12 @@
 *  Description:
 *     This routine masks out a region of an NDF by setting pixels to 
 *     the bad value, or to a specified constant value. The region to 
-*     be masked is specified within a text file (see parameter REGION) 
+*     be masked is specified within a text file (see Parameter REGION) 
 *     that should contain a description of the region in the form of an 
 *     "AST Region". This is the system used by the AST library for 
 *     describing regions (see SUN/211 or SUN/210). Such text files can, 
-*     for instance, be created using the Starlink ATOOLS package (a high 
-*     level interface to the facilities of the AST library).
+*     for instance, be created using the Starlink ATOOLS package (a
+*     high-level interface to the facilities of the AST library).
 
 *  Usage:
 *     regionmask in region out
@@ -33,16 +33,16 @@
 *     REGION = FILENAME (Read)
 *        The name of the text file containing a text dump of an AST 
 *        Region. Any sub-class of Region may be supplied (e.g. Box, 
-*        Polygon, CmpRegion, Prism, etc).
+*        Polygon, CmpRegion, Prism, etc.).
 *     CONST = LITERAL (Given)
 *        The constant numerical value to assign to the region, or the 
-*        string "bad". ["bad"]
+*        string "Bad".  ["Bad"]
 *     IN = NDF (Read)
 *        The name of the input NDF.
 *     INSIDE = _LOGICAL (Read)
 *        If a TRUE value is supplied, the constant value is assigned 
 *        to the inside of the region. Otherwise, it is assigned to the 
-*        outside. [TRUE]
+*        outside.  [TRUE]
 *     OUT = NDF (Write)
 *        The name of the output NDF.
 
@@ -53,7 +53,7 @@
 *        specified in text file "galaxies.txt".
 
 *  Related Applications:
-*     KAPPA: ARDMASK.
+*     KAPPA: ARDMASK;
 *     ATOOLS: ASTBOX, ASTCMPREGION, ASTELLIPSE, ASTINTERVAL, ASTPOLYGON.
 
 *  Implementation Status:
@@ -62,7 +62,6 @@
 *     data structure and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
-*     -  Bad pixels and automatic quality masking are supported.
 *     -  All non-complex numeric data types can be handled.
 
 *  Copyright:
@@ -72,7 +71,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -82,8 +81,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (JAC, UCLan)
@@ -121,7 +120,7 @@
       INTEGER IWCS               ! NDF WCS FrameSet
       LOGICAL BAD                ! Assign bad values to the region?
       LOGICAL INSIDE             ! Assign value to inside of region?
-      LOGICAL VAR                ! Does the NDF Variance component exist?
+      LOGICAL VAR                ! Does NDF VARIANCE component exist?
 *.
 
 *  Check the inherited global status.
@@ -137,15 +136,15 @@
       CALL LPG_ASSOC( 'IN', 'READ', INDF1, STATUS )
 
 *  Get an AST Region.
-      CALL KPG1_GTOBJ( 'REGION', 'Region', AST_ISAREGION, IREG, STATUS )  
+      CALL KPG1_GTOBJ( 'REGION', 'Region', AST_ISAREGION, IREG, STATUS )
 
 *  Get the WCS FrameSet from the NDF.
       CALL KPG1_GTWCS( INDF1, IWCS, STATUS )
 
-*  We need a Mapping from the co-ordinate system represented by the Region 
-*  to the pixel co-ordinate system of the NDF. The AST_COVNERT routine
-*  converts between current Frames, so we need to make the PIXEL Frame the
-*  current Frame in the NDFs WCS FrameSet. 
+*  We need a Mapping from the co-ordinate system represented by the 
+*  Region to the pixel co-ordinate system of the NDF. The AST_COVNERT 
+*  routine converts between current Frames, so we need to make the PIXEL
+*  Frame the current Frame in the NDFs WCS FrameSet. 
       CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
       CALL AST_SETI( IWCS, 'Current', IPIX, STATUS )
       FSET = AST_CONVERT( IREG, IWCS, ' ', STATUS ) 
@@ -176,8 +175,8 @@
          CALL CHR_CTOD( CONTXT, CONST, STATUS )
       END IF
 
-*  See if the value is to be assigned to the inside or the outside of the 
-*  region.
+*  See if the value is to be assigned to the inside or the outside of
+*  the region.
       CALL PAR_GET0L( 'INSIDE', INSIDE, STATUS )
 
 *  First mask the Data array.
