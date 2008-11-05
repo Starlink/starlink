@@ -14,7 +14,7 @@ exportndf = 0
 #  com = remove common-mode signal
 #  ext = apply extinction correction
 #  noi = estimate time-domain variance
-modelorder = dks com noi
+modelorder = dks com ext noi
 
 # low-pass boxcar filter on COM (samples) to assist with convergence
 # if boxfact set reduce width of boxcar by this factor each iteration
@@ -54,10 +54,10 @@ maxlen = 0
 badfrac = 0.05
 
 # S/N threshold to detect DC steps
-dcthresh = 150
+#dcthresh = 150
 
 # box size over which to measure rms for DC step finder
-dcbox = 400
+#dcbox = 400
 
 # subtract a baseline polynomial of this order
 # order = 1
