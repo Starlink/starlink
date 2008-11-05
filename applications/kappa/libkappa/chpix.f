@@ -90,8 +90,8 @@
 *        the output NDF called zzcha_c.
 
 *  Related Applications:
-*     KAPPA: ARDMASK, FILLBAD, GLITCH, NOMAGIC, SEGMENT, SETMAGIC
-*     SUBSTITUTE, ZAPLIN; Figaro: CSET, ICSET, NCSET, TIPPEX.
+*     KAPPA: ARDMASK, FILLBAD, GLITCH, NOMAGIC, REGIONMASK, SEGMENT, 
+*     SETMAGIC SUBSTITUTE, ZAPLIN; Figaro: CSET, ICSET, NCSET, TIPPEX.
 
 *  Implementation Status:
 *     -  The routine correctly processes the AXIS, DATA, QUALITY, LABEL,
@@ -109,7 +109,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -119,8 +119,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)

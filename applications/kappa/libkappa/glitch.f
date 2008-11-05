@@ -111,8 +111,8 @@
 *     before being used.
 
 *  Related Applications:
-*     KAPPA: ARDMASK, CHPIX, FILLBAD, ZAPLIN, NOMAGIC, SEGMENT,
-*     SETMAGIC; Figaro: CSET, ICSET, NCSET, TIPPEX.
+*     KAPPA: ARDMASK, CHPIX, FILLBAD, ZAPLIN, NOMAGIC, REGIONMASK,
+*     SEGMENT, SETMAGIC; Figaro: CSET, ICSET, NCSET, TIPPEX.
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,

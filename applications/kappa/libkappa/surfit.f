@@ -192,7 +192,7 @@
 *        seven knots along each axis is used to fit the surface.
 
 *  Related Applications:
-*     KAPPA: ARDMASK, FITSURFACE, MAKESURFACE.
+*     KAPPA: ARDMASK, FITSURFACE, MAKESURFACE, REGIONMASK.
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY, 

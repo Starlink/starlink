@@ -84,6 +84,7 @@
 *                      care!  If strange things happen, use "Mean".
 *
 *          "Absdev" -- Mean absolute deviation from the unweighted mean.
+*          "Csigma" -- Sigma-clipped standard deviation.
 *          "Comax"  -- Co-ordinate of the maximum value.
 *          "Comin"  -- Co-ordinate of the minimum value.
 *          "Integ"  -- Integrated value, being the sum of the products 
@@ -405,6 +406,8 @@
 *        Trim trailing blanks from output NDF character components.
 *     2008 September 11 (MJC):
 *        Add COMP parameter.
+*     2008 September 24 (MJC):
+*        Add Clsig estimator.
 *     {enter_further_changes_here}
 
 *-
@@ -931,11 +934,12 @@
       IF ( PROVAR ) THEN
          CALL PAR_CHOIC( 'ESTIMATOR', 'Mean','Mean,Mode,Median,Max,'/
      :                   /'Min,Comax,Comin,Absdev,RMS,Sigma,Sum,Iwc,'/
-     :                   /'Iwd,Integ', .FALSE., ESTIM, STATUS )
+     :                   /'Iwd,Integ,Csigma', .FALSE., ESTIM, STATUS )
       ELSE
          CALL PAR_CHOIC( 'ESTIMATOR', 'Mean','Mean,WMean,Mode,Median,'/
      :                   /'Max,Min,Comax,Comin,Absdev,RMS,Sigma,Sum,'/
-     :                   /'Iwc,Iwd,Integ', .FALSE., ESTIM, STATUS )
+     :                   /'Iwc,Iwd,Integ,Csigma', .FALSE., ESTIM,
+     :                   STATUS )
       END IF
 
       CALL PAR_GDR0R( 'WLIM', 0.3, 0.0, 1.0, .FALSE., WLIM, STATUS )

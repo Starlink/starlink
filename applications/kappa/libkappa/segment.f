@@ -307,8 +307,8 @@
 *     pixel array. 
 
 *  Related Applications:
-*     KAPPA: ARDMASK, ERRCLIP, FILLBAD, FFCLEAN, PASTE, SETMAGIC,
-*     THRESH.
+*     KAPPA: ARDMASK, ERRCLIP, FILLBAD, FFCLEAN, PASTE, REGIONMASK,
+*     SETMAGIC, THRESH.
 
 *  Implementation Status:
 *     -  This routine will propagate VARIANCE component values so long
