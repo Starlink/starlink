@@ -1,6 +1,6 @@
 1 KAPPA_Version_1.9
 
-   A new release of KAPPA (V1.9) is under development,  The main changes
+   A new release of KAPPA (V1.9-11) is available.  The main changes
    so far are listed below.  For complete details of all changes, see
    the "Release Notes" appendix in SUN/95.
 
@@ -15,15 +15,15 @@
    Ancestors can be removed by their indices or by pattern matching
    against their names.
 
+   o  REGIONMASK masks an NDF using an AST Region description held 
+   in a text file.  Such descriptions can be generated, for instance,
+   using the commands within the ATOOLS package.
+
    o  WCSSLIDE applies a translational correction to the World
    Co-ordinate System (WCS) of an NDF so that the WCS position of
    a given pixel is moved by a specified amount along each WCS axis.
    Thus it could be used to correct pointing errors.
 
-   o  REGIONMASK masks an NDF using an AST Region description held in a
-   text file. Such descriptions can be generated, for instance, using the
-   commands within the ATOOLS package.
- 
 2 Modified_applications
 
    o  COLLAPSE
