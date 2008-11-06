@@ -199,7 +199,7 @@ void smf_calcmodel_dks( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
               for( k=0; k<ntslice; k++ ) {
                 /* If this isn't first iteration, put the previous iteration
                    back into the signal */                
-                if( !(qua_data[index+k]&mask) ) {
+                if( (res_data[index+k]!=VAL__BADD) && (dksquid[k]!=VAL__BADD)) {
                   res_data[index+k] += dksquid[k]*gainbuf[j] + offsetbuf[j]; 
                 }
 
