@@ -129,7 +129,7 @@ void smf_flag_spikes( smfData *data, unsigned char *quality,
   size_t nflag;                 /* Number of samples flagged */
   dim_t ngood;                  /* How many good samples in measurement */
   dim_t ntslice=0;              /* Number of time slices */
-  double sig;                   /* Bolometer signal mean */
+  double sig;                   /* Bolometer signal rms */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -192,13 +192,14 @@ void smf_flag_spikes( smfData *data, unsigned char *quality,
       base = i*ntslice;
 
       /* Calculate mean and rms of the bolometer */
-      smf_stats1( &dat[base], 0, ntslice, qua, mask, &mean,
+      smf_stats1( &dat[base], 0, ntslice, &qua[base], mask, &mean,
                   &sig, &ngood, status );
 
       if( *status == SMF__INSMP ) {
 	/* Insufficient samples for this bolometer. Annul the error. */
 	errAnnul( status );
       } else if( (*status == SAI__OK) && (sig > 0) ) {
+
 	/* Size of excursion for significant event */
 	dist = thresh*sig;
 	
