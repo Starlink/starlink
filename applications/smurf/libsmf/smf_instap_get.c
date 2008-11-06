@@ -97,9 +97,6 @@ void smf_instap_get( smfHead * hdr, int * status ) {
   smf_fits_getD( hdr, "INSTAP_X", &instapx, status );
   smf_fits_getD( hdr, "INSTAP_Y", &instapy, status );
 
-  /* KLUDGE: flip sign of INSTAP_Y! */
-  instapy = -instapy;
-  
   /* annul error due to INSTAP keywords not being specified */
   if( *status == SMF__NOKWRD ) {
      errAnnul( status );
