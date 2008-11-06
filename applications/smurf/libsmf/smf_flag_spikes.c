@@ -148,20 +148,19 @@ void smf_flag_spikes( smfData *data, unsigned char *quality,
 
   if( !qua ) {
     *status = SAI__ERROR;
-    errRep( FUNC_NAME, "No valid QUALITY array was provided", status );
+    errRep( "", FUNC_NAME ": No valid QUALITY array was provided", status );
     return;
   }
 
   if( !dat ) {
     *status = SAI__ERROR;
-    errRep( FUNC_NAME, "smfData does not contain a DATA component", status );
+    errRep( "", FUNC_NAME ": smfData does not contain a DATA component",status);
     return;
   }
 
   if( data->dtype != SMF__DOUBLE ) {
     *status = SAI__ERROR;
-    errRep(FUNC_NAME, 
-	   "Data is not double-precision", status);
+    errRep("", FUNC_NAME ": smfData is not double-precision", status);
     return;
   }
 
@@ -173,7 +172,7 @@ void smf_flag_spikes( smfData *data, unsigned char *quality,
     if( thresh <= 0 ) {
       *status = SAI__ERROR;
       msgSetd("THRESH",thresh);
-      errRep(FUNC_NAME, "Can't find spikes: thresh=^THRESH, must be > 0",
+      errRep( "", FUNC_NAME ": Can't find spikes: thresh=^THRESH, must be > 0",
 	     status);
     }
 

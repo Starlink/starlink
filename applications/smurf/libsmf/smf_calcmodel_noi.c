@@ -166,7 +166,7 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   } else {
     if( spikeiter_s < 0 ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "spikeiter cannot be < 0.", status );
+      errRep("", FUNC_NAME ": spikeiter cannot be < 0.", status );
     } else {
       spikeiter = (size_t) spikeiter_s;
     }
@@ -179,7 +179,7 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   } else {
     if( nsamp_s <= 0 ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "NOISAMP must be > 0.", status );
+      errRep( "", FUNC_NAME ": NOISAMP must be > 0.", status );
     } else {
       nsamp = (dim_t) nsamp_s;
     }
@@ -190,7 +190,7 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   } else {
     if( nchunk_s <= 0 ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "NOICHUNK must be > 0.", status );
+      errRep( "", FUNC_NAME ": NOICHUNK must be > 0.", status );
     } else {
       nchunk = (dim_t) nchunk_s;
     }
@@ -216,7 +216,7 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 
     if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Null data in inputs", status);      
+      errRep( "", FUNC_NAME ": Null data in inputs", status);      
     } else {
     
       /* Get the raw data dimensions */
