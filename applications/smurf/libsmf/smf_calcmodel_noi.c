@@ -139,8 +139,6 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   double spikethresh;           /* Threshold for spike detection */
   double *var=NULL;             /* Sample variance */
    
-  double sigma;
-                                
   /* Main routine */
   if (*status != SAI__OK) return;
 
@@ -222,62 +220,47 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
       /* Get the raw data dimensions */
       smf_get_dims( res->sdata[idx], &nbolo, &ntslice, &ndata, status );
 
-      /* Flag spikes in the residual */
-      if( spikethresh ) {
-	/* Now re-flag */
-	smf_flag_spikes( res->sdata[idx], qua_data, mask_spike,
-			 spikethresh, spikeiter, 
-			 100, &aiter, &nflag, status );
-
-	msgSeti("THRESH",spikethresh);
-	msgSeti("NFLAG",nflag);
-	msgSeti("AITER",aiter);
-	msgOutif(MSG__VERB," ", 
-	       "   flagged ^NFLAG new ^THRESH-sig spikes in ^AITER iterations",
-	       status); 
-      } 
-
       /* Only estimate the white noise level once at the beginning - the
 	 reason for this is to make measurements of the convergence 
-	 easier (basically we think the map-maker has converged when the
-         rms of the entire data stream approaches that of a small segment
-         of data) */
+	 easier. */
+
+      var = smf_malloc( nbolo, sizeof(*var), 0, status );
 
       if( flags & SMF__DIMM_FIRSTITER ) {
-
         /* Measure the noise from power spectra */
-        var = smf_malloc( nbolo, sizeof(*var), 0, status );
         smf_bolonoise( res->sdata[idx], 0, 0.5, SMF__F_WHITELO, SMF__F_WHITEHI,
                        0, var, NULL, 0, status );
         
 	for( i=0; i<nbolo; i++ ) if( !(qua_data[i*ntslice]&SMF__Q_BADB) ) {
-            
-	  /* Measure the sample standard deviation for each bolometer
-	     assuming it is stationary in time. Use smf_quick_noise to
-	     measure the rms in short intervals as a better estimate of the
-	     white level unaffected by residual 1/f than the whole data
-	     stream. The real way to do this is to examine the flat portion
-	     of the power spectrum. */
-
-          
-            /*
-            sigma = smf_quick_noise( res->sdata[idx], i, nsamp, nchunk, 
-                                     qua_data, mask, status );
-	
-            if( *status == SMF__INSMP ) {
-              errAnnul( status );
-            } else if( (*status == SAI__OK) && (sigma > 0) ) {
-              var[0] = sigma*sigma;
-              base = i*ntslice; 
-            */
-              
             /* Loop over time and store the variance for each sample */
             base = i*ntslice; 
             for( j=0; j<ntslice; j++ ) {
               model_data[base+j] = var[i];
             }
           }
+      } else {
+        for( i=0; i<nbolo; i++ ) {
+          base = i*ntslice;
+          var[i] = model_data[base];
+        }
       }
+
+      /* Flag spikes in the residual */
+      if( spikethresh ) {
+	/* Now re-flag */
+	smf_flag_spikes( res->sdata[idx], var, qua_data, mask_spike,
+			 spikethresh, spikeiter, 
+			 100, &aiter, &nflag, status );
+        
+	msgSeti("THRESH",spikethresh);
+	msgSeti("NFLAG",nflag);
+	msgSeti("AITER",aiter);
+	msgOutif(MSG__VERB," ", 
+                 "   flagged ^NFLAG new ^THRESH-sig spikes in ^AITER "
+                 "iterations", status); 
+      } 
+
+
       
       /* Now calculate contribution to chi^2 */
       if( *status == SAI__OK ) {

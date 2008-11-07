@@ -14,7 +14,7 @@
 
 *  Invocation:
 
-*     smf_flag_spikes( smfData *data, unsigned char *quality, 
+*     smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality, 
 *                      unsigned char mask, double thresh, size_t niter, 
 *                      size_t maxiter, size_t *aiter, size_t *nflagged,
 *                      int *status )
@@ -22,6 +22,9 @@
 *  Arguments:
 *     data = smfData * (Given and Returned)
 *        The data that will be flagged
+*     bolvar = double * (Given)
+*        If supplied, an array of externally supplied estimates of bolo 
+*        variance. Can be NULL in which case the variance is measured.
 *     quality = unsigned char * (Given and Returned)
 *        If set, use this buffer instead of QUALITY associated with data.
 *        If NULL, use the QUALITY associated with data. Locations of spikes
@@ -110,7 +113,7 @@
 
 #define FUNC_NAME "smf_flag_spikes"
 
-void smf_flag_spikes( smfData *data, unsigned char *quality, 
+void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality, 
                       unsigned char mask, double thresh, size_t niter, 
                       size_t maxiter, size_t *aiter, size_t *nflagged,
                       int *status ) {
@@ -191,15 +194,26 @@ void smf_flag_spikes( smfData *data, unsigned char *quality,
       
       base = i*ntslice;
 
-      /* Calculate mean and rms of the bolometer */
-      smf_stats1( &dat[base], 0, ntslice, &qua[base], mask, &mean,
-                  &sig, &ngood, status );
+      if( bolovar ) {
+        /* User-supplied variance */
+        if( bolovar[i] > 0 ) {
+          sig = sqrt(bolovar[i]);
+        } else {
+          errRep( "", FUNC_NAME ": error, bolovar <= 0.", status );
+        }
+      } else {
+        /* Calculate mean and rms of the bolometer */
+        smf_stats1( &dat[base], 0, ntslice, &qua[base], mask, &mean,
+                    &sig, &ngood, status );
 
-      if( *status == SMF__INSMP ) {
-	/* Insufficient samples for this bolometer. Annul the error. */
-	errAnnul( status );
-      } else if( (*status == SAI__OK) && (sig > 0) ) {
+        if( *status == SMF__INSMP ) {
+          /* Insufficient samples for this bolometer. Annul the error. */
+          errAnnul( status );
+          sig = 0;
+        }
+      }
 
+      if( (*status == SAI__OK) && (sig > 0) ) {
 	/* Size of excursion for significant event */
 	dist = thresh*sig;
 	

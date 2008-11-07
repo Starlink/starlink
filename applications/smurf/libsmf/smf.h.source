@@ -941,7 +941,7 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
 			unsigned char *quality, unsigned char mask, 
 			int *status );
 
-void smf_flag_spikes( smfData *data, unsigned char *quality, 
+void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality, 
                       unsigned char mask, double thresh, size_t niter, 
                       size_t maxiter, size_t *aiter, size_t *nflagged,
                       int *status );

@@ -960,7 +960,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
 
               if( spikethresh ) {
                 msgOutif(MSG__VERB," ", "  flag spikes...", status);
-                smf_flag_spikes( data, qua_data, ~SMF__Q_JUMP,
+                smf_flag_spikes( data, NULL, qua_data, ~SMF__Q_JUMP,
                                  spikethresh, spikeiter, 100, 
                                  &aiter, NULL, status );
                 msgSeti("AITER",aiter);
