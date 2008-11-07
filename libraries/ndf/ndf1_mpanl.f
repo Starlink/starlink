@@ -35,7 +35,7 @@
 *     HASINV( NDF__MXDIM ) = LOGICAL (Returned)
 *        An array of "NMAP" returned flags. Each one is set TRUE if the
 *        correspnding Mapping in MAPS has an inverse transformation that
-*        was inherited from the suppllied Mapping, or FALSE if the
+*        was inherited from the supplied Mapping, or FALSE if the
 *        inverse transformation was created by this routine.
 *     INMAP( NDF__MXDIM ) = INTEGER (Returned)
 *        Element "i" is returned holding the index into the "MAPS" array
@@ -94,6 +94,9 @@
 *     23-NOV-2007 (DSB):
 *        Ensure MAP is returned holding a valid Mapping even if the
 *        supplied Mapping cannot be split.
+*     7-NOV-2008 (DSB):
+*        Take account of the possibility that the supplied Mapping may
+*        have some constant-valued outputs.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -127,6 +130,8 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      DOUBLE PRECISION CONOUT( NDF__MXDIM )
+      DOUBLE PRECISION ZERO( NDF__MXDIM )
       INTEGER I
       INTEGER IIN
       INTEGER IMAP
@@ -357,15 +362,15 @@
 
             END DO
 
-*  Update the array holding the output input that corresponds to each
+*  Update the array holding the output index that corresponds to each
 *  output of the current total Mapping. Loop round each output of the
 *  returned Mapping just added into the total Mapping.
             TNOUT = AST_GETI( MAPS( IMAP ), 'Nout', STATUS )
             DO I = 1, TNOUT
 
-*  Search through all the outputs, looking for the one that is fed by 
-*  output "I" of Mapping "IMAP". When found, store its index in the OUTPRM
-*  array.
+*  Search through all the outputs of the supplied Mapping, looking for the 
+*  one that corresponds to output "I" of Mapping "IMAP". When found, store 
+*  its index in the OUTPRM array.
                DO J = 1, NOUT
                   IF( OUTMAP( J ) .EQ. IMAP .AND. 
      :                OUTIND( J ) .EQ. I ) THEN
@@ -386,14 +391,6 @@
                CALL MSG_SETI( 'NP', NIN + 1 )
                CALL ERR_REP( ' ', 'NDF1_MPANL: IIN (^IIN) is not '//
      :                       'NIN+1 (^NP) (internal programming '//
-     :                       'error).', STATUS )
-
-            ELSE IF( IOUT .NE. NOUT + 1 ) THEN
-               STATUS = NDF__FATIN
-               CALL MSG_SETI( 'IOUT', IOUT )
-               CALL MSG_SETI( 'NW', NOUT + 1 )
-               CALL ERR_REP( ' ', 'NDF1_MPANL: IOUT (^IOUT) is not '//
-     :                       'NOUT+1 (^NW) (internal programming '//
      :                       'error).', STATUS )
             END IF
          END IF
@@ -420,18 +417,62 @@
 
 *  If required, add a PermMap to the end of the total Mapping that
 *  permutes the output indices from the order produced by the total
-*  Mapping to the order in the supplied Mapping.
-         NEEDPM = .FALSE.
+*  Mapping to the order in the supplied Mapping. Also, add in constants 
+*  values for any outputs which are not created by any of the returned
+*  Mappings. First check if the returned Mappings do not have the same
+*  number of outputs as the supplied Mapping...
+         IF( IOUT - 1 .NE. NOUT ) THEN
 
-         DO I = 1, NOUT
+*  If so, we will definitely require a PermMap.
+            NEEDPM = .TRUE.
+
+*  Initialise the PermMap inputs corresponding to each PermMap output.
+            DO I = 1, NOUT
+               PERM( I ) = 0
+            END DO
+
+*  Transform the input position (0,0,0,...) into the output using the 
+*  supplied Mapping. This gives us the constant values to use for the
+*  missing outputs (in CONOUT).
+            DO I = 1, NIN
+               ZERO( I ) = 0.0
+            END DO
+            CALL AST_TRANN( MAPIN, 1, NIN, 1, ZERO, .TRUE., NOUT, 1,
+     :                      CONOUT, STATUS )
+
+*  If we have got the right number of outputs, assume we do not need to
+*  use the PermMap.
+         ELSE
+            NEEDPM = .FALSE.
+         ENDIF
+
+*  Now check each output from each of the returned Mappings.
+         DO I = 1, IOUT - 1
+
+*  Set up a one to one correspondance between the PermMap input and the
+*  required PermMap output.
             PERM( OUTPRM( I ) ) = I
+
+*  If the corresponding input and output do not both have the same index,
+*  we will need to use the PermMap.
             IF( OUTPRM( I ) .NE. I ) NEEDPM = .TRUE.
+
          END DO
 
+*  Only proceed if we need to use the PermMap.
          IF( NEEDPM ) THEN
-            PMAP = AST_PERMMAP( NOUT, OUTPRM, NOUT, PERM, 0.0D0, ' ', 
-     :                          STATUS )
+
+*  Replace any zero axis indices with the (negated) index of the 
+*  corresponding constant output value.
+            DO I = 1, NOUT
+               IF( PERM( I ) .EQ. 0 ) PERM( I ) = -I
+            END DO
+
+*  Create the PermMap.
+            PMAP = AST_PERMMAP( IOUT - 1, OUTPRM, NOUT, PERM, CONOUT,
+     :                          ' ', STATUS )
 	    
+*  Put in series with the returned Mapping.
             TMAP = AST_CMPMAP( MAP, PMAP, .TRUE., ' ', STATUS )
             CALL AST_ANNUL( PMAP, STATUS )         
             CALL AST_ANNUL( MAP, STATUS )         
