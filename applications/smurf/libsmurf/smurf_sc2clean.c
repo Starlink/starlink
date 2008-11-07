@@ -308,8 +308,8 @@ void smurf_sc2clean( int *status ) {
                  "iterations", status);
       }
 
-      smf_flag_spikes( ffdata, NULL, mask, spikethresh, spikeiter, 100, &aiter, 
-                       &nflag, status );
+      smf_flag_spikes( ffdata, NULL, NULL, mask, spikethresh, spikeiter, 100, 
+                       &aiter, &nflag, status );
 
       if( *status == SAI__OK ) {
 	msgSeti("AITER",aiter);
