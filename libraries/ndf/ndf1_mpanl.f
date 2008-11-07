@@ -166,6 +166,7 @@
          ININD( J ) = 0
          OUTMAP( J ) = 0 
          OUTIND( J ) = 0 
+         OUTPRM( J ) = 0
       END DO
       MAP = AST__NULL
 
