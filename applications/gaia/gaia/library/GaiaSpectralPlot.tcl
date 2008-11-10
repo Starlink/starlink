@@ -205,6 +205,15 @@ itcl::class gaia::GaiaSpectralPlot {
          {Try to use a log scale for X axis (fails when range includes zero)}
 
       $Options add checkbutton \
+         -label {Positive X only} \
+         -variable [scope itk_option(-xpositive)] \
+         -onvalue 1 \
+         -offvalue 0 \
+         -command [code $this set_xpositive]
+      add_menu_short_help $Options {Positive X only}  \
+         {Only range positive X coordinates (useful when Log X axis enabled)}
+
+      $Options add checkbutton \
          -label {Log Y axis} \
          -variable [scope itk_option(-log_y_axis)] \
          -onvalue 1 \
@@ -637,7 +646,8 @@ itcl::class gaia::GaiaSpectralPlot {
                            -linecolour $linecolour_ \
                            -linewidth $linewidth_ \
                            -gridoptions $gridoptions_ \
-                           -showaxes 1 -xminmax $itk_option(-xminmax)\
+                           -showaxes 1 -xminmax $itk_option(-xminmax) \
+                           -xpositive $itk_option(-xpositive) \
                            -reflinecolour $refspeccolour_\
                            -fixdatarange $itk_option(-fix_data_range) \
                            -ytop $itk_option(-data_high) \
@@ -1101,6 +1111,12 @@ itcl::class gaia::GaiaSpectralPlot {
          $spectrum_ -xminmax $itk_option(-xminmax)
    }
 
+   #  Set the xpostive value of spectrum.
+   public method set_xpositive {} {
+      $itk_component(canvas) itemconfigure \
+         $spectrum_ -xpositive $itk_option(-xpositive)
+   }
+
    #  Resize the canvas to fit the size of enclosing frame.
    public method resize {cw ch} {
 
@@ -1129,7 +1145,7 @@ itcl::class gaia::GaiaSpectralPlot {
 
          #  Check if the log settings are sensible, if not issue a warning,
          #  leave these set as autoscaling might change the limits.
-         if { $itk_option(-log_x_axis) == 1 } {
+         if { $itk_option(-log_x_axis) == 1 && ! $itk_option(-xpositive) } {
             lassign [$itk_component(canvas) coords $spectrum_ limits] x0 y0 x1 y1
             if { $x0 <= 0.0 || $x1 <= 0.0 } {
                warning_dialog "Spectral coordinates include zero or less so \
@@ -1383,6 +1399,9 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Whether to log coordinate axis.
    itk_option define -log_x_axis log_x_axis Log_X_Axis 0
+
+   #  Whether to just use positive X coordinates (used with log_x_axis).
+   itk_option define -xpositive xpositive Xpositive 0
 
    #  Whether to log data axis.
    itk_option define -log_y_axis log_y_axis Log_Y_Axis 0

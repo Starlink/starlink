@@ -137,6 +137,7 @@ typedef struct SPItem  {
     int showaxes;               /* Whether to show the grid */
     int showerrorbars;          /* Whether to show error bars */
     int xminmax;                /* If true then use min->max X coordinates */
+    int xpositive;              /* If true only positive X coordinates will be used. */
 } SPItem;
 
 static int tagCounter = 0;      /* Counter for creating unique tags */
@@ -250,6 +251,9 @@ static Tk_ConfigSpec configSpecs[] = {
 
     {TK_CONFIG_BOOLEAN, "-xminmax", (char *) NULL, (char *) NULL,
      "1", Tk_Offset(SPItem, xminmax), TK_CONFIG_DONT_SET_DEFAULT, NULL},
+
+    {TK_CONFIG_BOOLEAN, "-xpositive", (char *) NULL, (char *) NULL,
+     "1", Tk_Offset(SPItem, xpositive), TK_CONFIG_DONT_SET_DEFAULT, NULL},
 
     {TK_CONFIG_DOUBLE, "-y", (char *) NULL, (char *) NULL,
      "0.0", Tk_Offset(SPItem, y), TK_CONFIG_DONT_SET_DEFAULT, NULL},
@@ -414,6 +418,7 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     spPtr->x = 0.0;
     spPtr->xborder = 0.07;
     spPtr->xminmax = 1;
+    spPtr->xpositive = 0;
     spPtr->y = 0.0;
     spPtr->yborder = 0.25;
     spPtr->ybot = DBL_MAX;
@@ -937,11 +942,11 @@ static void SPDelete( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display )
     spPtr->numPoints = 0;
 
     if ( spPtr->framesets[0] != NULL ) {
-        astAnnul( spPtr->framesets[0] );
+        (void) astAnnul( spPtr->framesets[0] );
     }
 
     if ( spPtr->mapping != NULL ) {
-        astAnnul( spPtr->mapping );
+        (void) astAnnul( spPtr->mapping );
     }
 
     if ( spPtr->polyline != NULL ) {
@@ -1024,7 +1029,7 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
 #endif
 
         if ( spPtr->framesets[1] != NULL ) {
-            astAnnul( spPtr->framesets[1] );
+            (void) astAnnul( spPtr->framesets[1] );
         }
         GeneratePlotFrameSet( spPtr );
 
@@ -1589,9 +1594,9 @@ static int FrameSetParseProc( ClientData clientData, Tcl_Interp *interp,
 
     /* Release old frameset, before accepting new */
     if ( spPtr->framesets[0] != NULL ) {
-        astAnnul( spPtr->framesets[0] );
+        (void) astAnnul( spPtr->framesets[0] );
         if ( spPtr->mapping != NULL ) {
-            astAnnul( spPtr->mapping );
+            (void) astAnnul( spPtr->mapping );
         }
     }
 
@@ -1614,7 +1619,7 @@ static int FrameSetParseProc( ClientData clientData, Tcl_Interp *interp,
             spPtr->isDSB = 0;
         }
     }
-    astAnnul( picked );
+    (void) astAnnul( picked );
 
     return TCL_OK;
 }
@@ -1658,7 +1663,7 @@ static int MappingParseProc( ClientData clientData, Tcl_Interp *interp,
 
     /* Release old mapping, before accepting new */
     if ( spPtr->mapping != NULL ) {
-        astAnnul( spPtr->mapping );
+        (void) astAnnul( spPtr->mapping );
     }
 
     spPtr->mapping = (AstMapping *) astClone((AstMapping *)longResult);
@@ -1727,24 +1732,45 @@ static void GeneratePlotFrameSet( SPItem *spPtr )
     astTran1( spPtr->mapping, spPtr->numPoints, tmpPtr, 1,
               spPtr->coordPtr );
 
-    /* Set the axis range, pick first non-BAD values from ends (spectrum must
-     * be monotonic, so this is OK and keeps the natural order which can be
-     * actually be min to max or max to min). Then apply the xminmax
-     * preference. */
+    /* Set the axis range, pick first non-BAD values and possibly only
+     * positive values from ends (spectrum must be monotonic, so this is OK
+     * and keeps the natural order which can be actually be min to max or max
+     * to min). Then apply the xminmax preference. 
+     */
     spPtr->xleft = DBL_MAX;
     spPtr->xright = -DBL_MAX;
-    for ( i = 0; i < spPtr->numPoints; i++ ) {
-        if ( spPtr->coordPtr[i] != spPtr->badvalue ) {
-            spPtr->xleft = spPtr->coordPtr[i];
-            break;
+
+    if ( spPtr->xpositive ) {
+        for ( i = 0; i < spPtr->numPoints; i++ ) {
+            if ( spPtr->coordPtr[i] != spPtr->badvalue &&
+                 spPtr->coordPtr[i] > 0.0 ) {
+                spPtr->xleft = spPtr->coordPtr[i];
+                break;
+            }
+        }
+        for ( i = spPtr->numPoints - 1; i >= 0; i-- ) {
+            if ( spPtr->coordPtr[i] != spPtr->badvalue &&
+                 spPtr->coordPtr[i] > 0.0 ) {
+                spPtr->xright = spPtr->coordPtr[i];
+                break;
+            }
         }
     }
-    for ( i = spPtr->numPoints - 1; i >= 0; i-- ) {
-        if ( spPtr->coordPtr[i] != spPtr->badvalue ) {
-            spPtr->xright = spPtr->coordPtr[i];
-            break;
+    else {
+        for ( i = 0; i < spPtr->numPoints; i++ ) {
+            if ( spPtr->coordPtr[i] != spPtr->badvalue ) {
+                spPtr->xleft = spPtr->coordPtr[i];
+                break;
+            }
+        }
+        for ( i = spPtr->numPoints - 1; i >= 0; i-- ) {
+            if ( spPtr->coordPtr[i] != spPtr->badvalue ) {
+                spPtr->xright = spPtr->coordPtr[i];
+                break;
+            }
         }
     }
+
     if ( spPtr->xminmax ) {
         double tmp;
         tmp = MIN( spPtr->xleft, spPtr->xright );
