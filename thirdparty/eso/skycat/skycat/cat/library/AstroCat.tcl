@@ -13,6 +13,7 @@
 #                        store for my catalogue handling commands.
 #            03 Mar 08   Remove check in new_catalog, opened file is
 #                        never closed (and can leave a temporary file).
+#            10 Nov 08   Add command to local catalogues menu to clear the list.
 
 
 itk::usual AstroCat {}
@@ -390,6 +391,12 @@ itcl::class cat::AstroCat {
 	    {Open a local catalog file} \
 	    -command [code cat::AstroCat::local_catalog $id $classname $debug $w] \
 		-accelerator "Control-O"
+
+        # clear the local catalogs (handy when many local catalogs have been
+        # opened).
+        $w add_menuitem $m.local command "Clear local catalogs" \
+           {Clear all local catalogs from the list} \
+           -command [code clear_local_catalogs]
 
 	$m add separator
 
@@ -1342,6 +1349,25 @@ itcl::class cat::AstroCat {
 	cat::CatalogInfo::save "" $w 0
 	update_catalog_menus
 	return 1
+    }
+
+    # remove all local catalogues from the list.
+    public proc clear_local_catalogs {} {
+
+       if {[catch {set catalog_list [lsort [$astrocat_ info local]]} msg]} {
+          error_dialog $msg
+          return
+       }
+       
+       if {[llength $catalog_list]} {
+          foreach i $catalog_list {
+             set name [$astrocat_ longname $i]
+             puts "name = $name ($astrocat_)"
+             $astrocat_ entry remove $name
+          }
+          cat::CatalogInfo::save "" "" 0
+          update_catalog_menus
+       }
     }
 
     
