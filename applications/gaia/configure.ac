@@ -28,7 +28,6 @@ STAR_MONOLITHS
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
-AC_PROG_CXX
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
@@ -42,9 +41,6 @@ AC_FC_MAIN
 
 dnl    Need the generic compiler.
 STAR_CHECK_PROGS([fgeneric])
-
-dnl    Functions checks.
-AC_CHECK_FUNCS([setenv])
 
 dnl    Look for a Tcl installation. Prefer the Starlink one as we require
 dnl    itcl, tclx and BLT, but they are not supported by this command.
