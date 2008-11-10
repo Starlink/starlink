@@ -1801,10 +1801,10 @@ int StarRtdImage::astsetCmd( int argc, char *argv[] )
 //   StarRtdImage::aststoreCmd
 //
 //   Purpose:
-//      Stores a value and keyword in a FITS channel. 
-//      The channel can later be used to create an AST FrameSet 
-//      that describes the WCS system. It is the responsibility 
-//      of the caller to ensure that a FITS channel contains the 
+//      Stores a value and keyword in a FITS channel.
+//      The channel can later be used to create an AST FrameSet
+//      that describes the WCS system. It is the responsibility
+//      of the caller to ensure that a FITS channel contains the
 //      correct information.
 //
 //    Notes:
@@ -1826,11 +1826,11 @@ int StarRtdImage::aststoreCmd( int argc, char *argv[] )
     int slot = 0;
     if ( Tcl_GetInt( interp_, argv[0], &slot ) != TCL_OK ) {
         return error( argv[0], " is not an integer");
-    } 
+    }
     else {
         char *comment = NULL;
         int isString = 0;
-        if ( argc > 3 ) { 
+        if ( argc > 3 ) {
             comment = argv[3];
             if ( argc > 4 ) {
                 Tcl_GetBoolean( interp_, argv[4], &isString );
@@ -1866,7 +1866,7 @@ void StarRtdImage::storeCard( AstFitsChan *channel, const char *keyword,
     if ( isString ) {
         if ( strlen(value) > 19 ) {
             sprintf( card, "%-8.8s='%s' /%s", keyword, value, comment );
-        } 
+        }
         else {
             sprintf( card, "%-8.8s='%19.19s' /%s", keyword, value, comment );
         }
@@ -1874,7 +1874,7 @@ void StarRtdImage::storeCard( AstFitsChan *channel, const char *keyword,
     else {
         if ( strlen(value) > 21 ) {
             sprintf( card, "%-8.8s=%s /%s", keyword, value, comment );
-        } 
+        }
         else {
             sprintf( card, "%-8.8s=%21.21s /%s", keyword, value, comment );
         }
@@ -5753,7 +5753,7 @@ int StarRtdImage::isfits()
     if ( strcmp( imio.rep()->classname(), "StarFitsIO" ) == 0 ||
          strcmp( imio.rep()->classname(), "FitsIO" ) == 0 ) {
         isfits = 1;
-    } 
+    }
     else {
         isfits = 0;
     }
@@ -5955,9 +5955,10 @@ int StarRtdImage::globalstatsCmd( int argc, char *argv[] )
     double minFwhmY = DBL_MAX, maxFwhmY = -DBL_MIN;
     double fwhmX = 0.0, sumFwhmX = 0.0;
     double fwhmY = 0.0, sumFwhmY = 0.0;
-    double angle = 0.0, sumAngle = 0.0;
+    double angle = 0.0;
     double objectPeak = 0.0, sumObjectPeak = 0.0;
     double meanBackground = 0.0, sumMeanBackground = 0.0;
+    double *angles = new double[npoints];
 
     //  And get the image statistics sums.
     int ncount = 0;
@@ -5973,7 +5974,7 @@ int StarRtdImage::globalstatsCmd( int argc, char *argv[] )
             ncount++;
             sumFwhmX += fwhmX;
             sumFwhmY += fwhmY;
-            sumAngle += angle;
+            angles[i] = angle;                  //  Record angles.
             sumObjectPeak += objectPeak;
             sumMeanBackground += meanBackground;
             minFwhmX = min( minFwhmX, fwhmX );
@@ -5987,16 +5988,38 @@ int StarRtdImage::globalstatsCmd( int argc, char *argv[] )
     if ( ncount == 0 ) {
         delete [] x;
         delete [] y;
+        delete [] angles;
         Tcl_Free( (char *) listArgv );
         return error( "failed to get statistics for any objects" );
     }
+
+    //  Angles need special handling, since a straight average doesn't make a
+    //  lot of sense. Form the mean difference from the first angle,
+    //  normalised as a PA, that's in the range +/-90.
+    double diffsum = 0.0;
+    double diff = 0.0;
+    for ( int i = 1; i < npoints; i++ ) {
+
+        //  Difference in angle from first position, in range +/- 90.0.
+        diff = fmod( ( angles[i] - angles[0] ), 180.0 );
+        if ( diff >= 90.0 ) {
+            diff = diff - 180.0;
+        }
+        else if ( diff <= -90.0 ) {
+            diff =  diff + 180.0;
+        }
+        diffsum += diff;
+    }
+    double meanAngle = angles[0] + ( diffsum /(double) ncount );
+    fflush( stdout );
+
     char result[TCL_DOUBLE_SPACE*5 + 6];
     sprintf( result, "%f %f %f %f %f %f %f %d",
              sumFwhmX / (double) ncount,
              (maxFwhmX - minFwhmX),
              sumFwhmY / (double) ncount,
              (maxFwhmY - minFwhmY),
-             sumAngle / (double) ncount,
+             meanAngle,
              sumObjectPeak / (double) ncount,
              sumMeanBackground / (double) ncount,
              ncount );
@@ -6571,7 +6594,7 @@ void StarRtdImage::processMotionEvent()
 
     //  Report NDF integer pixel indices rather than GRID coordinates.
     if ( pixel_indices() ) {
-        
+
         //  Get the NDF origin information. Values default to 1. Note we
         //  always do this, once requested we need the PX and PY values to be
         //  set.
@@ -6588,7 +6611,7 @@ void StarRtdImage::processMotionEvent()
 
         //  The global variables var(X) and var(Y) have already been set
         //  to the GRID coordinates. Use those values to set related
-        //  globals. Note do not reuse the var(X) and var(Y) these 
+        //  globals. Note do not reuse the var(X) and var(Y) these
         //  values are used to also pick values.
         char *var = ( viewMaster_ ? viewMaster_->name() : instname_ );
         char buf[100];
