@@ -1,3 +1,14 @@
+    
+    Version 4.3-0
+    =============
+
+    The mean angles reported by the select positions toolbox are now
+    normalised as position angles. Previously they were just the arithmetic
+    mean.
+
+
+  Lehuakona Release
+  =================
 
     Version 4.2-2
     =============
