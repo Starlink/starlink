@@ -1121,7 +1121,7 @@ itcl::class gaia::GaiaSpectralPlot {
          $spectrum_ -xminmax $itk_option(-xminmax)
    }
 
-   #  Set the xpositive value of spectrum.
+   #  Set the xpostive value of spectrum.
    public method set_xpositive {} {
       $itk_component(canvas) itemconfigure \
          $spectrum_ -xpositive $itk_option(-xpositive)
