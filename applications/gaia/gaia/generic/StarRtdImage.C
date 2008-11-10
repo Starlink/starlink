@@ -6003,15 +6003,22 @@ int StarRtdImage::globalstatsCmd( int argc, char *argv[] )
         //  Difference in angle from first position, in range +/- 90.0.
         diff = fmod( ( angles[i] - angles[0] ), 180.0 );
         if ( diff >= 90.0 ) {
-            diff = diff - 180.0;
+            diff -= 180.0;
         }
         else if ( diff <= -90.0 ) {
-            diff =  diff + 180.0;
+            diff += 180.0;
         }
         diffsum += diff;
     }
     double meanAngle = angles[0] + ( diffsum /(double) ncount );
-    fflush( stdout );
+
+    //  Normalize this as well.
+    if ( meanAngle >= 180.0 ) {
+        meanAngle -= 180.0;
+    }
+    else if ( meanAngle <= -180.0 ) {
+        meanAngle += 180.0;
+    }
 
     char result[TCL_DOUBLE_SPACE*5 + 6];
     sprintf( result, "%f %f %f %f %f %f %f %d",
