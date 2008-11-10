@@ -1,23 +1,55 @@
+1 DATACUBE_Version_1.2
+
+  A new release of DATACUBE (V1.2) has been made.  Further
+  details can be found in SUN/237.  This can be viewed with 
+  the commands "showme sun237".  The main changes are:
+
+2 New_Commands
+ The following script has been added:
+
+   o trendview
+     Plots multiple spectra from a cube overlaying fitted trends
+     and spectral-feature mask.  It enables assessment of baseline
+     subtraction and feature masking.
+
+2 Modified_Commands
+ The following scripts have been modified:
+
+   o  peakmap and velmap both now have a -a option to inspect and 
+   approve the fit at each spatial pixel.  They also have a -l 
+   option to log the Gaussian fit parameters and their errors in a
+   Small Text List file.  
+
+   Both permit case-insensitive responses to prompts except where 
+   a prompt requires a file name. 
+
+   o  peakmap inteprets a non-positive number of contours to mean
+   no contour overlay required.  There is a new -ci option to 
+   specify the colour index of contours.
+
+   o  velmap now recognises DSBSPECTRUM as a valid spectral domain.  
+
+
 1 DATACUBE_Version_1.1
 
-  A new release of DATACUBE (v1.1) has been made.  Further
+  A new release of DATACUBE (V1.1) has been made.  Further
   details can be found in SUN/237.  This can be viewed with 
   the commands "showme sun237".  The main changes are:
 
 2 New_Commands
 
-The following new scripts have been added:
+ The following new scripts have been added:
 
-   o gridspec
-     Averages groups of spatially neighbouring spectra of a 
-     three-dimensional IFU NDF and then plots these averaged spectra
-     in a grid.
-   o velmoment
-     Builds a velocity map from the collapsed intensity-weighted 
-     spectral co-ordinates.  It supports spatial compression.
+   o  gridspec
+      Averages groups of spatially neighbouring spectra of a 
+      three-dimensional IFU NDF and then plots these averaged spectra
+      in a grid.
+   o  velmoment
+      Builds a velocity map from the collapsed intensity-weighted 
+      spectral co-ordinates.  It supports spatial compression.
 
 2 Modified_Commands
-The following applications have been modified:
+ The following applications have been modified:
 
    o  compare has a -i option for input filename for non-interactive
       scripting.
