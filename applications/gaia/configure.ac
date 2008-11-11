@@ -2,6 +2,9 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
+dnl    *** After changing this value make sure that bootstrap is
+dnl    run and gaia/configure and gaia3d/configure scripts have
+dnl    been updated.
 AC_INIT(gaia, 4.3-0, gaia@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
