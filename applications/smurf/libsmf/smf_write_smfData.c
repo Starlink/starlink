@@ -216,7 +216,13 @@ void smf_write_smfData ( const smfData * data, void *variance,
                                            "Label", status );
 
       /* WCS */
-      if( inhdr->tswcs ) ndfPtwcs( inhdr->tswcs, outfile->ndfid, status );
+      if( inhdr->tswcs ) {
+        ndfPtwcs( inhdr->tswcs, outfile->ndfid, status );
+        /* annul bad status caused by dimension mismatch */
+        if( *status == NDF__NAXIN ) {
+          errAnnul( status );
+        }
+      }
 
       /* JCMT State -- if ntslice is known */
       if( inhdr->allState && haventslice ) {
