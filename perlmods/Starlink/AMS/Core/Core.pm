@@ -207,7 +207,7 @@ sub adamtask_message {
   $command eq "inform" && do {
 
     # Check for error messages
-    if ($message[6] =~ /^\a+!/) {
+    if ($message[6] =~ /^\a?!/) {
       print $ERRHAND "$message[6]\n" unless $err_hide;
     } else {
       print $MSGHAND "$message[6]\n" unless $msg_hide;
