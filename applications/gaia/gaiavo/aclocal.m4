@@ -57,7 +57,7 @@ changequote([, ])
 
 gaia_headers=`cd ${srcdir}; echo generic/*.h generic/*.icc generic/*.hxx`
 gaia_includes="-I. -I${srcdir}/generic -I${prefix}/include/cat -I${prefix}/include/astrotcl -I${prefix}/include/tclutil"
-tclsources=`cd ${srcdir}; echo library/*.tcl`
+tclsources=`cd ${srcdir}; echo library/*.tcl library/*.wsdl library/*.xsl`
 
 ]) 
 #  GAIAVO_CONFIG
