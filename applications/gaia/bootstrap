@@ -162,7 +162,7 @@ fi
 for d in gaia gaia3d
 do
   echo "Additional bootstrap: $d"
-  (cd $d && test -f configure.in.in && /bin/sh ./bootstrap)
+  (cd $d && test -f configure.in && /bin/sh ./bootstrap)
 done
 
 exit 0
