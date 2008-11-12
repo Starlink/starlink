@@ -38,10 +38,13 @@
 *  History:
 *     2008-08-22 (TIMJ):
 *        Initial version.
+*     2008-11-12 (AGG)
+*        Check status before beginning loop
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008 Science and Technology Facilities Council,
+*     the University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -117,12 +120,10 @@ void smurf_calcdark( int *status ) {
   kpg1Wgndf( "OUT", dgrp, size, size, "More output files required...",
              &ogrp, &outsize, status );
 
-  for (i=1; i<=size; i++ ) {
+  for (i=1; i<=size && *status == SAI__OK; i++ ) {
     smfData * dark = (darks->sdata)[i-1]; /* This dark */
     char *pname = NULL;
     char filename[GRP__SZNAM+1];
-
-    if (*status != SAI__OK) break;
 
     /* Open input file and create output file. Do not propagate
        since we do not want to get a large file the wrong size */
