@@ -221,13 +221,15 @@ itcl::class gaia::GaiaXYProfile {
       pack $itk_component(uppertableframe) -fill none -expand 0
 
       #  Readout coordinate from current graph.
+      set lwidth 12
+      set vwidth 8
       itk_component add uppercoord {
          util::LabelValue $itk_component(uppertableframe).coord \
             -text "Readout coord:" \
             -labelfont $itk_option(-labelfont) \
             -valuefont $itk_option(-valuefont) \
-            -labelwidth $itk_option(-labelwidth) \
-            -valuewidth $itk_option(-valuewidth) \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
             -relief groove \
             -anchor e
       }
@@ -238,8 +240,8 @@ itcl::class gaia::GaiaXYProfile {
             -text "value:" \
             -labelfont $itk_option(-labelfont) \
             -valuefont $itk_option(-valuefont) \
-            -labelwidth $itk_option(-labelwidth) \
-            -valuewidth $itk_option(-valuewidth) \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
             -relief groove \
             -anchor e
       }
@@ -254,8 +256,8 @@ itcl::class gaia::GaiaXYProfile {
             -text "Peak coord:" \
             -labelfont $itk_option(-labelfont) \
             -valuefont $itk_option(-valuefont) \
-            -labelwidth $itk_option(-labelwidth) \
-            -valuewidth $itk_option(-valuewidth) \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
             -relief flat \
             -anchor e
       }
@@ -266,8 +268,8 @@ itcl::class gaia::GaiaXYProfile {
             -text "value:" \
             -labelfont $itk_option(-labelfont) \
             -valuefont $itk_option(-valuefont) \
-            -labelwidth $itk_option(-labelwidth) \
-            -valuewidth $itk_option(-valuewidth) \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
             -relief flat \
             -anchor e
       }
@@ -306,8 +308,8 @@ itcl::class gaia::GaiaXYProfile {
             -text "Readout coord:" \
             -labelfont $itk_option(-labelfont) \
             -valuefont $itk_option(-valuefont) \
-            -labelwidth $itk_option(-labelwidth) \
-            -valuewidth $itk_option(-valuewidth) \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
             -relief groove \
             -anchor e
       }
@@ -318,8 +320,8 @@ itcl::class gaia::GaiaXYProfile {
             -text "value:" \
             -labelfont $itk_option(-labelfont) \
             -valuefont $itk_option(-valuefont) \
-            -labelwidth $itk_option(-labelwidth) \
-            -valuewidth $itk_option(-valuewidth) \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
             -relief groove \
             -anchor e
       }
@@ -334,8 +336,8 @@ itcl::class gaia::GaiaXYProfile {
             -text "Peak coord:" \
             -labelfont $itk_option(-labelfont) \
             -valuefont $itk_option(-valuefont) \
-            -labelwidth $itk_option(-labelwidth) \
-            -valuewidth $itk_option(-valuewidth) \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
             -relief flat \
             -anchor e
       }
@@ -346,8 +348,8 @@ itcl::class gaia::GaiaXYProfile {
             -text "value:" \
             -labelfont $itk_option(-labelfont) \
             -valuefont $itk_option(-valuefont) \
-            -labelwidth $itk_option(-labelwidth) \
-            -valuewidth $itk_option(-valuewidth) \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
             -relief flat \
             -anchor e
       }
@@ -383,7 +385,6 @@ itcl::class gaia::GaiaXYProfile {
 
       #  Do the initial profile plot.
       add_notify_
-      notify_cmd
 
       #  Add BLT features.
       ::Blt_ZoomStack $xgraph_
@@ -506,15 +507,111 @@ itcl::class gaia::GaiaXYProfile {
 
    #  Add buttons to close window and make a hardcopy of the profiles.
    protected method make_buttons_ {} {
+
       itk_component add bframe {
-         frame $w_.buttons -borderwidth 2 -relief groove
+         frame $w_.buttons -borderwidth 4 -relief flat
+      }
+      itk_component add rframe {
+         frame $w_.range -borderwidth 4 -relief flat
+      }
+      itk_component add lframe {
+         frame $w_.logfile -borderwidth 4 -relief flat
       }
 
+      #  Display coordinates of the region.
+      set lwidth 5
+      set vwidth 6
+      itk_component add xmin {
+         util::LabelValue $itk_component(rframe).xmin \
+            -text "X min:" \
+            -labelfont $itk_option(-labelfont) \
+            -valuefont $itk_option(-valuefont) \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
+            -relief flat \
+            -anchor e \
+            -value $x0_ \
+            -textvariable [scope x0_]
+      }
+      itk_component add xmax {
+         util::LabelValue $itk_component(rframe).xmax \
+            -text "X max:" \
+            -labelfont $itk_option(-labelfont) \
+            -valuefont $itk_option(-valuefont) \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
+            -relief flat \
+            -anchor e \
+            -value $x1_ \
+            -textvariable [scope x1_]
+      }
+      itk_component add ymin {
+         util::LabelValue $itk_component(rframe).ymin \
+            -text "Y min:" \
+            -labelfont $itk_option(-labelfont) \
+            -valuefont $itk_option(-valuefont) \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
+            -relief flat \
+            -anchor e \
+            -value $y0_ \
+            -textvariable [scope y0_]
+      }
+      itk_component add ymax {
+         util::LabelValue $itk_component(rframe).ymax \
+            -text "Y max:" \
+            -labelfont $itk_option(-labelfont) \
+            -valuefont $itk_option(-valuefont) \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
+            -relief flat \
+            -anchor e \
+            -value $y1_ \
+            -textvariable [scope y1_]
+      }
+
+      #  Logfile controls. Only for UKIRT.
+      if { $itk_option(-ukirt_options) } {
+         set lwidth 7
+         itk_component add logfile {
+            LabelFileChooser $itk_component(lframe).logfile \
+               -labelwidth $lwidth \
+               -text "Logfile:" \
+               -anchor e \
+               -textvariable [scope logfile_] \
+               -value "$logfile_"
+         }
+         add_short_help $itk_component(logfile) \
+            {Filename for saving window values, created if doesn't exist}
+
+         #  And the comment field.
+         itk_component add comment {
+            LabelEntry $itk_component(lframe).comment \
+               -labelwidth $lwidth \
+               -text "Comment:" \
+               -anchor e \
+         }
+         add_short_help $itk_component(comment) \
+            {Comment to add with results in log file}
+
+         #  Add a save/append button.
+         itk_component add save {
+            button $itk_component(lframe).save  \
+               -text "Save/Append" \
+               -width 12 \
+               -command [code $this save_log]
+         }
+         add_short_help $itk_component(save) \
+            {Append values to log file, created if doesn't exist}
+      }
+
+      #  Action buttons.
       itk_component add fix {
          StarLabelCheck $itk_component(bframe).fix \
             -text "Fix data range:" \
             -onvalue 1 -offvalue 0 \
             -variable [scope fixed_] \
+            -anchor e \
             -command [code $this toggle_fix_data_range_]
       }
       add_short_help $itk_component(fix) {Fix data range to the current limits}
@@ -533,8 +630,24 @@ itcl::class gaia::GaiaXYProfile {
       add_short_help $itk_component(close) \
          {Close window}
 
+      blt::table $itk_component(rframe) $itk_component(xmin) 0,0 -fill both
+      blt::table $itk_component(rframe) $itk_component(xmax) 0,1 -fill both
+      blt::table $itk_component(rframe) $itk_component(ymin) 0,2 -fill both
+      blt::table $itk_component(rframe) $itk_component(ymax) 0,3 -fill both
+
+      if { $itk_option(-ukirt_options) } {
+         pack $itk_component(logfile) -side top -fill x -expand 1 
+         pack $itk_component(comment) -side left -fill x -expand 1 
+         pack $itk_component(save) -side right -expand 0 -fill x -padx 1m -pady 1m 
+      }
+
       pack $itk_component(fix) $itk_component(print) $itk_component(close) \
-         -side left -expand 1 -padx 2m -pady 2m
+         -side left -expand 1 -padx 1m -pady 1m
+
+      pack $itk_component(rframe) -side top -fill x
+      if { $itk_option(-ukirt_options) } {
+         pack $itk_component(lframe) -side top -fill x
+      }
       pack $itk_component(bframe) -side bottom -fill x
    }
 
@@ -543,6 +656,40 @@ itcl::class gaia::GaiaXYProfile {
    public method print {} {
       utilReUseWidget gaia::MultiGraphPrint $w_.print \
          -graphs [list $xgraph_ $ygraph_]
+   }
+
+   #  Save current settings to a log file. Appends if the file already exists.
+   public method save_log {} {
+      set init 0
+      if { ! [file exists "$logfile_"] } {
+         set init 1
+      }
+      if { [catch {set fd [::open "$logfile_" a+]} msg] } {
+         error_dialog $msg
+         return
+      }
+
+      #  If new file then add headers.
+      if { $init } {
+         puts $fd "# x0 \t x1 \t y0 \t y1 \t X peak \t X peak pos \t Y peak \t Y peak pos"
+      }
+
+      #  Add the comment and time stamp.
+      set comment [$itk_component(comment) get]
+      if { "$comment" != "" } {
+         puts $fd "# $comment"
+      }
+      set time [clock format [clock seconds] -format {%A %B %d %Y - %H:%M:%S}]
+      puts $fd "# $time"
+
+      #  Write values.
+      set xpeakvalue [$itk_component(xpeakvalue) get]
+      set xpeakcoord [$itk_component(xpeakcoord) get]
+      set ypeakvalue [$itk_component(ypeakvalue) get]
+      set ypeakcoord [$itk_component(ypeakcoord) get]
+      puts $fd "$x0_ \t $x1_ \t $y0_ \t $y1_ \t $xpeakvalue \t $xpeakcoord \t $ypeakvalue \t $ypeakcoord"
+
+      ::close $fd
    }
 
    #  Restore the graphics rectangle.
@@ -658,10 +805,6 @@ itcl::class gaia::GaiaXYProfile {
    itk_option define -labelfont labelFont LabelFont -Adobe-helvetica-bold-r-normal-*-12*
    itk_option define -valuefont valueFont ValueFont -Adobe-helvetica-medium-r-normal-*-12*
 
-   # set the width for displaying labels and values
-   itk_option define -labelwidth labelWidth LabelWidth 12
-   itk_option define -valuewidth valueWidth ValueWidth 8
-
    #  Protected variables: (available to instance)
    #  --------------------
 
@@ -697,6 +840,9 @@ itcl::class gaia::GaiaXYProfile {
 
    #  Canvas coordinate of the UKIRT column shown in image.
    protected variable column_ 0
+
+   #  Name of logfile.
+   protected variable logfile_ "GaiaXYProfile.log"
 
    #  Common variables: (shared by all instances)
    #  -----------------
