@@ -197,6 +197,7 @@ Options:
  -transient_tools <bool>  - toolboxes are transient windows. (default: 0)
  -transient_spectralplot <bool>  - spectral plot is a transient window. (default: 1)
  -ukirt_ql <bool>         - show UKIRT Quick Look Facilities (default: 0).
+ -ukirt_xy <bool>         - show XY profile UKIRT Quick Look Facilities (default: 0).
  -use_zoom_view <bool>    - use a "view" of the image for the zoom window (default).
  -usexshm <bool>          - use X shared mem, if available (default).
  -verbose <bool>          - print diagnostic messages.
@@ -725,7 +726,7 @@ itcl::class gaia::Gaia {
       }
 
       #  UKIRT quick look likes to attach to camera immediately.
-      if { $itk_option(-ukirt_ql) } {
+      if { $itk_option(-ukirt_ql) || $itk_option(-ukirt_xy) } {
          attach_camera
       }
    }
@@ -881,7 +882,7 @@ itcl::class gaia::Gaia {
          {Show X and Y averaged profiles of a rectangular region} \
          -command [code $this make_toolbox xyprofile 0 1] \
 	 -accelerator {Control-e}
-      bind $w_ <Control-e> [code $this make_xyprofile_toolbox 0 0 0]
+      bind $w_ <Control-e> [code $this make_xyprofile_toolbox xyprofile 0 0]
 
       add_menuitem $m command "Polarimetry toolbox... " \
          {Display and manipulate POLPACK vector maps} \
@@ -1239,11 +1240,25 @@ itcl::class gaia::Gaia {
          warning_dialog "No image is currently loaded" $w_
          return
       }
-      set proceed 0
+
+      #  If the window exists then just raise it. Can happen if control-e is
+      #  pressed repeatably.
+      if { [info exists itk_component(xyprofile)] &&
+           [winfo exists $itk_component(xyprofile)] } {
+         wm deiconify $itk_component(xyprofile)
+         raise $itk_component(xyprofile)
+         if { $itk_option(-ukirt_xy) } {
+            $itk_component(xyprofile) restore
+         }
+         return
+      }
+
       if { $prompt } {
          if {[action_dialog "Press OK and then drag out a \
                              rectangle over the image with button 1" $w_]} {
             set proceed 1
+         } else {
+            set proceed 0
          }
       } else {
          set proceed 1
@@ -1262,7 +1277,8 @@ itcl::class gaia::Gaia {
             -transient 1 \
             -number $clone_ \
             -clone_cmd [code $this make_toolbox xyprofile 1] \
-            -rect_id $rect_id
+            -rect_id $rect_id \
+            -ukirt_options $itk_option(-ukirt_xy)
       }
 
       #  Trap real-time events for this tool.
@@ -1469,6 +1485,13 @@ itcl::class gaia::Gaia {
       if { [info exists itk_component(contour) ] } {
          if { [winfo exists $itk_component(contour) ] } {
             $itk_component(contour) remove_contours
+         }
+      }
+
+      #  XY toolbox can be persistent.
+      if { [info exists itk_component(xyprofile) ] } {
+         if { [winfo exists $itk_component(xyprofile) ] } {
+            $itk_component(xyprofile) restore
          }
       }
 
@@ -2362,6 +2385,17 @@ window gives you access to this."
    #  Whether to enable the UKIRT quick look parts of the interface.
    itk_option define -ukirt_ql ukirt_ql UKIRT_QL 0 {
       if { $itk_option(-ukirt_ql) } {
+         configure -rtd 1
+         configure -subsample 0
+         set appname_ "UKIRT::Quick Look"
+      }
+   }
+
+   #  Whether to enable the UKIRT quick look xy profile changes of the
+   #  interface. These are later developments to the ATC ones. Not
+   #  sure if there is a relationship or not.
+   itk_option define -ukirt_xy ukirt_xy UKIRT_XY 0 {
+      if { $itk_option(-ukirt_xy) } {
          configure -rtd 1
          configure -subsample 0
          set appname_ "UKIRT::Quick Look"

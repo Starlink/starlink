@@ -132,7 +132,7 @@ itcl::class gaia::GaiaXYProfile {
          {Change profiles during rectangle motion}
 
       #  Set the initial corner coordinates of the rectangle.
-      lassign [$itk_option(-canvas) coords $itk_option(-rect_id)] x0 y0 x1 y1
+      lassign [$itk_option(-canvas) coords $itk_option(-rect_id)] x0_ y0_ x1_ y1_
 
       #  Create the BLT graphs that display the profiles.
       make_graphs_
@@ -161,9 +161,16 @@ itcl::class gaia::GaiaXYProfile {
    #  Methods:
    #  --------
 
-   #  Close the window. Always destroy.
+   #  Close the window. Always destroy, unless in UKIRT mode, in which case we
+   #  just withdraw.
    public method close {} {
-      destroy $w_
+      if { $itk_option(-ukirt_options) } {
+         catch {$itk_option(-canvasdraw) delete_object $itk_option(-rect_id)}
+         configure -rect_id {}
+         wm withdraw $w_
+      } else {
+         destroy $w_
+      } 
    }
 
    #  Create a clone of this window.
@@ -178,7 +185,7 @@ itcl::class gaia::GaiaXYProfile {
 
       #  Create a panedwindow to display the two graphs.
       itk_component add pane {
-         ::panedwindow $w_.pane -width 5i -height 6i -orient vertical
+         ::panedwindow $w_.pane -width 400 -height 600 -orient vertical
       } {
       }
       pack $itk_component(pane) -fill both -expand 1 -padx 1m -pady 1m
@@ -194,8 +201,8 @@ itcl::class gaia::GaiaXYProfile {
       #  Create the X graph and add it to the upper pane.
       itk_component add xgraph {
          blt::graph $itk_component(xpane).xgraph \
-            -width 5i \
-            -height 3i \
+            -width 400 \
+            -height 225 \
             -borderwidth 3 \
             -relief groove \
             -title "Mean X Profile"
@@ -205,11 +212,76 @@ itcl::class gaia::GaiaXYProfile {
       add_short_help $itk_component(xgraph) \
          {Graph: average values along X, {bitmap dragb1} = zoom, {bitmap b2} = restore}
 
+      #  Readouts for this graph.
+      #  Table for current values.
+      itk_component add uppertableframe {
+         frame $itk_component(xpane).uppertableframe \
+            -relief flat -borderwidth 1
+      }
+      pack $itk_component(uppertableframe) -fill none -expand 0
+
+      #  Readout coordinate from current graph.
+      itk_component add uppercoord {
+         util::LabelValue $itk_component(uppertableframe).coord \
+            -text "Readout coord:" \
+            -labelfont $itk_option(-labelfont) \
+            -valuefont $itk_option(-valuefont) \
+            -labelwidth $itk_option(-labelwidth) \
+            -valuewidth $itk_option(-valuewidth) \
+            -relief groove \
+            -anchor e
+      }
+
+      #  Readout value from current graph.
+      itk_component add uppervalue {
+         util::LabelValue $itk_component(uppertableframe).value \
+            -text "value:" \
+            -labelfont $itk_option(-labelfont) \
+            -valuefont $itk_option(-valuefont) \
+            -labelwidth $itk_option(-labelwidth) \
+            -valuewidth $itk_option(-valuewidth) \
+            -relief groove \
+            -anchor e
+      }
+      blt::table $itk_component(uppertableframe) $itk_component(uppercoord) \
+            0,0 -fill both
+      blt::table $itk_component(uppertableframe) $itk_component(uppervalue) \
+            0,1 -fill both
+
+      #  Display X peak coordinate.
+      itk_component add xpeakcoord {
+         util::LabelValue $itk_component(uppertableframe).xpeakcoord \
+            -text "Peak coord:" \
+            -labelfont $itk_option(-labelfont) \
+            -valuefont $itk_option(-valuefont) \
+            -labelwidth $itk_option(-labelwidth) \
+            -valuewidth $itk_option(-valuewidth) \
+            -relief flat \
+            -anchor e
+      }
+
+      #  X peak value.
+      itk_component add xpeakvalue {
+         util::LabelValue $itk_component(uppertableframe).xpeakvalue \
+            -text "value:" \
+            -labelfont $itk_option(-labelfont) \
+            -valuefont $itk_option(-valuefont) \
+            -labelwidth $itk_option(-labelwidth) \
+            -valuewidth $itk_option(-valuewidth) \
+            -relief flat \
+            -anchor e
+      }
+
+      blt::table $itk_component(uppertableframe) $itk_component(xpeakcoord) \
+            1,0 -fill both
+      blt::table $itk_component(uppertableframe) $itk_component(xpeakvalue) \
+            1,1 -fill both
+
       #  Create the Y graph and add it to the lower pane.
       itk_component add ygraph {
          blt::graph $itk_component(ypane).ygraph \
-            -width 3i \
-            -height 5i \
+            -width 400 \
+            -height 225 \
             -borderwidth 3 \
             -relief groove \
             -title "Mean Y Profile" \
@@ -220,6 +292,71 @@ itcl::class gaia::GaiaXYProfile {
       add_short_help $itk_component(ygraph) \
          {Graph: average values along Y, {bitmap dragb1} = zoom, {bitmap b2} = restore}
 
+      #  Readouts for this graph.
+      #  Table for current values.
+      itk_component add lowertableframe {
+         frame $itk_component(ypane).lowertableframe \
+            -relief flat -borderwidth 1
+      }
+      pack $itk_component(lowertableframe) -fill none -expand 0
+
+      #  Readout coordinate from current graph.
+      itk_component add lowercoord {
+         util::LabelValue $itk_component(lowertableframe).coord \
+            -text "Readout coord:" \
+            -labelfont $itk_option(-labelfont) \
+            -valuefont $itk_option(-valuefont) \
+            -labelwidth $itk_option(-labelwidth) \
+            -valuewidth $itk_option(-valuewidth) \
+            -relief groove \
+            -anchor e
+      }
+
+      #  Readout value from current graph.
+      itk_component add lowervalue {
+         util::LabelValue $itk_component(lowertableframe).value \
+            -text "value:" \
+            -labelfont $itk_option(-labelfont) \
+            -valuefont $itk_option(-valuefont) \
+            -labelwidth $itk_option(-labelwidth) \
+            -valuewidth $itk_option(-valuewidth) \
+            -relief groove \
+            -anchor e
+      }
+      blt::table $itk_component(lowertableframe) $itk_component(lowercoord) \
+            0,0 -fill both
+      blt::table $itk_component(lowertableframe) $itk_component(lowervalue) \
+            0,1 -fill both
+
+      #  Y peak coordinate.
+      itk_component add ypeakcoord {
+         util::LabelValue $itk_component(lowertableframe).ypeakcoord \
+            -text "Peak coord:" \
+            -labelfont $itk_option(-labelfont) \
+            -valuefont $itk_option(-valuefont) \
+            -labelwidth $itk_option(-labelwidth) \
+            -valuewidth $itk_option(-valuewidth) \
+            -relief flat \
+            -anchor e
+      }
+
+      #  Y peak value.
+      itk_component add ypeakvalue {
+         util::LabelValue $itk_component(lowertableframe).ypeakvalue \
+            -text "value:" \
+            -labelfont $itk_option(-labelfont) \
+            -valuefont $itk_option(-valuefont) \
+            -labelwidth $itk_option(-labelwidth) \
+            -valuewidth $itk_option(-valuewidth) \
+            -relief flat \
+            -anchor e
+      }
+
+      blt::table $itk_component(lowertableframe) $itk_component(ypeakcoord) \
+            1,0 -fill both
+      blt::table $itk_component(lowertableframe) $itk_component(ypeakvalue) \
+            1,1 -fill both
+
       #  Set axes labels.
       $xgraph_ yaxis configure -title {}
       $xgraph_ xaxis configure -title {Distance along X}
@@ -227,22 +364,18 @@ itcl::class gaia::GaiaXYProfile {
       $ygraph_ xaxis configure -title {Distance along Y}
 
       #  Create vectors that contain profile coordinates.
-      #  Vector names must start with a letter.
-      regsub -all {\.} v$xgraph_.xxVector _ xxVector_
-      regsub -all {\.} v$xgraph_.xiVector _ xiVector_
-      regsub -all {\.} v$xgraph_.xdVector _ xdVector_
-
-      regsub -all {\.} v$ygraph_.yyVector _ yyVector_
-      regsub -all {\.} v$ygraph_.yiVector _ yiVector_
-      regsub -all {\.} v$ygraph_.ydVector _ ydVector_
-
       $xgraph_ legend config -hide 1
       $ygraph_ legend config -hide 1
       if { ! [info exists $xxVector_] && ! [info exists $xiVector_] &&
            ! [info exists $xdVector_] && ! [info exists $yyVector_] &&
            ! [info exists $yiVector_] && ! [info exists $ydVector_] } {
-         blt::vector create $xxVector_ $xiVector_ $xdVector_
-         blt::vector create $yyVector_ $yiVector_ $ydVector_
+
+         set xxVector_ [blt::vector create \#auto]
+         set xiVector_ [blt::vector create \#auto]
+         set xdVector_ [blt::vector create \#auto]
+         set yyVector_ [blt::vector create \#auto]
+         set yiVector_ [blt::vector create \#auto]
+         set ydVector_ [blt::vector create \#auto]
       }
       set symbol {}
       $xgraph_ element create elem -xdata $xiVector_ -ydata $xdVector_ -symbol $symbol
@@ -267,24 +400,8 @@ itcl::class gaia::GaiaXYProfile {
       bind bltCrosshairs$this <Any-Motion> [code $this dispXY %W %x %y]
       blt::AddBindTag $ygraph_ bltCrosshairs$this
 
-      # Tk frame for position and data value readout.
-      itk_component add fpos {
-         frame $w_.fpos -relief flat
-      }
-
-      # Tk label for coordinate position.
-      itk_component add coord {
-         label $itk_component(fpos).coord -width 15 -anchor w
-      }
-
-      # Tk label for data value.
-      itk_component add value {
-         label $itk_component(fpos).value -width 15 -anchor w
-      }
-
-      pack $itk_component(coord) $itk_component(value) \
-         -fill x -expand 1 -side left
-      pack $itk_component(fpos) -fill none -expand 0
+      #  Initialise first values.
+      notify_cmd
    }
 
    #  Set/reset the notification call back on the rectangle.
@@ -296,17 +413,22 @@ itcl::class gaia::GaiaXYProfile {
 
    #  Deal with notification that rectangle has changed position. If
    #  the operation is "delete" (i.e. the rectangle has been removed)
-   #  then the whole toolbox is deleted.
+   #  then the whole toolbox is deleted, unless we're in UKIRT mode.
+   #  In that case we do nothing and the interface should be woken 
+   #  by a call to restore when a new image (or image event) happens.
    public method notify_cmd {{op update}} {
       if { "$op" == "delete" } {
-         destroy $w_
+         configure -rect_id {}
+         if { ! $itk_option(-ukirt_options) } {
+            destroy $w_
+         }
          return 0
       }
-      lassign [$itk_option(-canvas) coords $itk_option(-rect_id)] x0 y0 x1 y1
+      lassign [$itk_option(-canvas) coords $itk_option(-rect_id)] x0_ y0_ x1_ y1_
 
       #  Get the X and Y profile distributions.
       set nvals [$itk_option(-rtdimage) xyprofile $xgraph_ $ygraph_ elem \
-                    $x0 $y0 $x1 $y1 canvas \
+                    $x0_ $y0_ $x1_ $y1_ canvas \
                     $xxVector_ $xiVector_ $xdVector_ \
                     $yyVector_ $yiVector_ $ydVector_]
       set numXValues_ [lindex $nvals 0]
@@ -314,11 +436,36 @@ itcl::class gaia::GaiaXYProfile {
 
       $xgraph_ xaxis configure -max $numXValues_
       $ygraph_ xaxis configure -max $numYValues_
+
+      #  Update the simple statistics. Peak value and position.
+      if { ! [info exists itk_component(xpeakcoord)] } {
+         return 0
+      }
+      $xdVector_ variable vec
+      set xpeakvalue $vec(max)
+      set index [lindex [$xdVector_ search $xpeakvalue] 0]
+      set xpeakcoord [$xxVector_ range $index $index]
+
+      $ydVector_ variable vec
+      set ypeakvalue $vec(max)
+      set index [lindex [$ydVector_ search $ypeakvalue] 0]
+      set ypeakcoord [$yyVector_ range $index $index]
+
+      $itk_component(xpeakcoord) config -value "$xpeakcoord"
+      $itk_component(xpeakvalue) config -value "$xpeakvalue"
+      $itk_component(ypeakcoord) config -value "$ypeakcoord"
+      $itk_component(ypeakvalue) config -value "$ypeakvalue"
+
+      #  In UKIRT mode the peak column is shown in the main image as a line
+      #  graphic.
+      if { $itk_option(-ukirt_options) } {
+         draw_image_line_ $xpeakcoord
+      }
       return 0
    }
 
    #  Display the original X or Y position and the data value,
-   #  depending on which graph were moving around in.
+   #  depending on which graph we're moving around in.
    method dispXY {w x y} {
 
       #  Update crosshair position.
@@ -341,8 +488,8 @@ itcl::class gaia::GaiaXYProfile {
          catch {
             set x [$xxVector_ range $index $index]
             set y [$xdVector_ range $index $index]
-            $itk_component(coord) config -text "X: $x"
-            $itk_component(value) config -text "Data: $y"
+            $itk_component(uppercoord) config -value "$x"
+            $itk_component(uppervalue) config -value "$y"
          }
       } else {
          if {$index < 0 || $index >= $numYValues_} {
@@ -351,8 +498,8 @@ itcl::class gaia::GaiaXYProfile {
          catch {
             set x [$yyVector_ range $index $index]
             set y [$ydVector_ range $index $index]
-            $itk_component(coord) config -text "Y: $x"
-            $itk_component(value) config -text "Data: $y"
+            $itk_component(lowercoord) config -value "$x"
+            $itk_component(lowervalue) config -value "$y"
          }
       }
    }
@@ -362,6 +509,16 @@ itcl::class gaia::GaiaXYProfile {
       itk_component add bframe {
          frame $w_.buttons -borderwidth 2 -relief groove
       }
+
+      itk_component add fix {
+         StarLabelCheck $itk_component(bframe).fix \
+            -text "Fix data range:" \
+            -onvalue 1 -offvalue 0 \
+            -variable [scope fixed_] \
+            -command [code $this toggle_fix_data_range_]
+      }
+      add_short_help $itk_component(fix) {Fix data range to the current limits}
+
       itk_component add print {
          button $itk_component(bframe).print -text "Print..." \
             -command [code $this print]
@@ -376,7 +533,7 @@ itcl::class gaia::GaiaXYProfile {
       add_short_help $itk_component(close) \
          {Close window}
 
-      pack $itk_component(print) $itk_component(close) \
+      pack $itk_component(fix) $itk_component(print) $itk_component(close) \
          -side left -expand 1 -padx 2m -pady 2m
       pack $itk_component(bframe) -side bottom -fill x
    }
@@ -386,6 +543,91 @@ itcl::class gaia::GaiaXYProfile {
    public method print {} {
       utilReUseWidget gaia::MultiGraphPrint $w_.print \
          -graphs [list $xgraph_ $ygraph_]
+   }
+
+   #  Restore the graphics rectangle.
+   public method restore {} {
+
+      #  Do nothing if currently withdrawn.
+      if { [wm state $w_] == "withdrawn" } {
+         return
+      }
+
+      #  If rect_id is still drawn, just need to update. 
+      if { $itk_option(-rect_id) != {} } {
+         if { [$itk_option(-canvas) gettags $itk_option(-rect_id)] != {} } {
+            notify_cmd
+            return
+         }
+      }
+
+      #  Else re-create the rectangle.
+      $itk_option(-canvasdraw) set_drawing_mode rectangle [code $this restored_]
+      $itk_option(-canvasdraw) create_object $x0_ $y0_
+      $itk_option(-canvasdraw) create_done $x0_ $y0_
+   }
+
+   #  Restore of graphics object completed. Finish up by setting to the
+   #  correct size and adding bindings.
+   protected method restored_ {id args} {
+      $itk_option(-canvasdraw) set_drawing_mode anyselect
+      $itk_option(-canvas) coords $id $x0_ $y0_ $x1_ $y1_
+      configure -rect_id $id
+      add_notify_
+      notify_cmd
+   }
+
+   #  Toggle whether to fix the Y axes ranges to the current limits.
+   protected method toggle_fix_data_range_ {} {
+      if { $fixed_ } {
+         $xdVector_ variable vec
+         set xmin $vec(min)
+         set xmax $vec(max)
+         $ydVector_ variable vec
+         set ymin $vec(min)
+         set ymax $vec(max)
+
+         $xgraph_ yaxis configure -min $xmin -max $xmax
+         $ygraph_ yaxis configure -min $ymin -max $ymax
+      } else {
+         $xgraph_ yaxis configure -min {} -max {}
+         $ygraph_ yaxis configure -min {} -max {}
+      }
+   }
+
+   #  Draw or update the line drawn in the main image that represents the
+   #  UKIRT peakrow. "coord" should be in image coordinates.
+   protected method draw_image_line_ {coord} {
+
+      #  Do nothing if currently withdrawn.
+      if { [wm state $w_] == "withdrawn" } {
+         return
+      }
+
+      #  Get the canvas coordinates of this column in the image.
+      $itk_option(-rtdimage) convert coords $coord 1 image column_ dummy canvas
+
+      #  If line_id_ is still drawn, just need to update. 
+      if { $line_id_ != {} } {
+         if { [$itk_option(-canvas) gettags $line_id_] != {} } {
+            $itk_option(-canvas) coords $line_id_ $column_ $y0_ $column_ $y1_
+            return
+         }
+      }
+
+      #  Else re-create the line.
+      $itk_option(-canvasdraw) set_drawing_mode line [code $this drawn_image_line_]
+      $itk_option(-canvasdraw) create_object $column_ $column_
+      $itk_option(-canvasdraw) create_done $column_ $column_
+   }
+
+   #  Restore of image line completed. Finish up by setting to the
+   #  correct column.
+   protected method drawn_image_line_ {id args} {
+      $itk_option(-canvasdraw) set_drawing_mode anyselect
+      $itk_option(-canvas) coords $id $column_ $y0_ $column_ $y1_
+      $itk_option(-canvas) itemconfigure $id -fill red
+      set line_id_ $id
    }
 
    #  Configuration options: (public variables)
@@ -405,21 +647,20 @@ itcl::class gaia::GaiaXYProfile {
    #  Canvas identifier of rectangle.
    itk_option define -rect_id rect_id Rect_Id {}
 
-   #  Canvas coordinate of the upper left-hand corner.
-   itk_option define -x0 x0 X0 0
-
-   #  Canvas coordinate of the upper left-hand corner.
-   itk_option define -y0 y0 Y0 0
-
-   #  Canvas coordinate of the lower right-hand corner.
-   itk_option define -x1 x1 X1 0
-
-   #  Canvas coordinate of the lower right-hand corner.
-   itk_option define -y1 y1 Y1 0
-
    #  Whether changes in position of rectangle are continuous.
    itk_option define -continuous_updates continuous_updates \
       Continuous_updates 1
+
+   #  Include the UKIRT quick look facilities.
+   itk_option define -ukirt_options ukirt_options Ukirt_Options 0
+
+   #  Fonts used
+   itk_option define -labelfont labelFont LabelFont -Adobe-helvetica-bold-r-normal-*-12*
+   itk_option define -valuefont valueFont ValueFont -Adobe-helvetica-medium-r-normal-*-12*
+
+   # set the width for displaying labels and values
+   itk_option define -labelwidth labelWidth LabelWidth 12
+   itk_option define -valuewidth valueWidth ValueWidth 8
 
    #  Protected variables: (available to instance)
    #  --------------------
@@ -441,6 +682,21 @@ itcl::class gaia::GaiaXYProfile {
    #  Number of positions in X and Y vectors.
    protected variable numXValues_ 0
    protected variable numYValues_ 0
+
+   #  Canvas coordinates of rectangle.
+   protected variable x0_ 0
+   protected variable x1_ 0
+   protected variable y0_ 0
+   protected variable y1_ 0
+
+   #  Whether to fix data ranges.
+   protected variable fixed_ 0
+
+   #  Canvas identifier of the UKIRT column shown in image.
+   protected variable line_id_ {}
+
+   #  Canvas coordinate of the UKIRT column shown in image.
+   protected variable column_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------
