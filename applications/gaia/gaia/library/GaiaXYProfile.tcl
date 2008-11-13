@@ -140,6 +140,9 @@ itcl::class gaia::GaiaXYProfile {
 
       #  Add the control panel and buttons.
       make_buttons_
+
+      #  Update the interface.
+      notify_cmd
    }
 
    #  Destructor:
@@ -157,21 +160,25 @@ itcl::class gaia::GaiaXYProfile {
          $itk_option(-canvasdraw) remove_notify_cmd $itk_option(-rect_id)
          $itk_option(-canvasdraw) delete_object $itk_option(-rect_id)
       }
+
+      #  Remove column and row lines.
+      catch {
+         if { $xline_id_ != {} } {
+            $itk_option(-canvasdraw) delete_object $xline_id_
+         }
+         if { $yline_id_ != {} } {
+            $itk_option(-canvasdraw) delete_object $yline_id_
+         }
+      }
    }
 
    #  Methods:
    #  --------
 
-   #  Close the window. Always destroy, unless in UKIRT mode, in which case we
-   #  just withdraw.
+   #  Close the window. Always destroy so that the rectangle will be redrawn
+   #  on the next open.
    public method close {} {
-      if { $itk_option(-ukirt_options) } {
-         catch {$itk_option(-canvasdraw) delete_object $itk_option(-rect_id)}
-         configure -rect_id {}
-         wm withdraw $w_
-      } else {
-         destroy $w_
-      } 
+      destroy $w_
    }
 
    #  Create a clone of this window.
@@ -287,8 +294,7 @@ itcl::class gaia::GaiaXYProfile {
             -height 225 \
             -borderwidth 3 \
             -relief groove \
-            -title "Mean Y Profile" \
-            -invertxy 1
+            -title "Mean Y Profile"
       } {}
       set ygraph_ $itk_component(ygraph)
       pack $itk_component(ygraph) -fill both -expand 1 -padx 1m -pady 1m
@@ -363,8 +369,9 @@ itcl::class gaia::GaiaXYProfile {
       #  Set axes labels.
       $xgraph_ yaxis configure -title {}
       $xgraph_ xaxis configure -title {X coordinate}
-      $ygraph_ yaxis configure -title {}
-      $ygraph_ xaxis configure -title {Y coordinate}
+
+      $ygraph_ yaxis configure -title {Y coordinate}
+      $ygraph_ xaxis configure -title {}
 
       #  Create vectors that contain profile coordinates.
       $xgraph_ legend config -hide 1
@@ -382,7 +389,7 @@ itcl::class gaia::GaiaXYProfile {
       }
       set symbol {}
       $xgraph_ element create elem -xdata $xxVector_ -ydata $xdVector_ -symbol $symbol
-      $ygraph_ element create elem -xdata $yyVector_ -ydata $ydVector_ -symbol $symbol
+      $ygraph_ element create elem -xdata $ydVector_ -ydata $yyVector_ -symbol $symbol
 
       #  Do the initial profile plot.
       add_notify_
@@ -401,9 +408,6 @@ itcl::class gaia::GaiaXYProfile {
       ::Blt_ClosestPoint $ygraph_
       bind bltCrosshairs$this <Any-Motion> [code $this dispXY %W %x %y]
       blt::AddBindTag $ygraph_ bltCrosshairs$this
-
-      #  Initialise first values.
-      notify_cmd
    }
 
    #  Set/reset the notification call back on the rectangle.
@@ -455,10 +459,10 @@ itcl::class gaia::GaiaXYProfile {
       $itk_component(ypeakcoord) config -value "$ypeakcoord"
       $itk_component(ypeakvalue) config -value "$ypeakvalue"
 
-      #  In UKIRT mode the peak column is shown in the main image as a line
-      #  graphic.
+      #  In UKIRT mode the peak column and row are shown in the main image as
+      #  line graphics.
       if { $itk_option(-ukirt_options) } {
-         draw_image_line_ $xpeakcoord
+         draw_image_lines_ $xpeakcoord $ypeakcoord
       }
       return 0
    }
@@ -477,20 +481,35 @@ itcl::class gaia::GaiaXYProfile {
       #  Update crosshair position.
       $w crosshairs configure -position @$x,$y
       
-      #  Find the closest position and hence the current data value.
-      #  If off the graph then do nothing.
-      if { ![$w element closest $x $y "" -interpolate 1 -halo 10000]} {
-         return
-      }
-      lassign [$w invtransform $x $y] index value
-
       #  Update the values according to which is the current graph.
       if { $w == $xgraph_ } {
-         $itk_component(uppercoord) config -value "$index"
-         $itk_component(uppervalue) config -value "$value"
+         
+         #  Find the closest position and hence the current data value.
+         #  If off the graph then do nothing.
+         if { ![$w element closest $x $y result -interpolate 1 -halo 10000 -along x]} {
+            return
+         }
+         set index $result(index)
+
+         set x [$xxVector_ range $index $index]
+         set y [$xdVector_ range $index $index]
+
+         $itk_component(uppercoord) config -value "$x"
+         $itk_component(uppervalue) config -value "$y"
       } else {
-         $itk_component(lowercoord) config -value "$index"
-         $itk_component(lowervalue) config -value "$value"
+
+         #  Find the closest position and hence the current data value.
+         #  If off the graph then do nothing.
+         if { ![$w element closest $x $y result -interpolate 1 -halo 10000 -along y]} {
+            return
+         }
+         set index $result(index)
+
+         set x [$yyVector_ range $index $index]
+         set y [$ydVector_ range $index $index]
+
+         $itk_component(lowercoord) config -value "$x"
+         $itk_component(lowervalue) config -value "$y"
       }
    }
 
@@ -684,11 +703,6 @@ itcl::class gaia::GaiaXYProfile {
    #  Restore the graphics rectangle.
    public method restore {} {
 
-      #  Do nothing if currently withdrawn.
-      if { [wm state $w_] == "withdrawn" } {
-         return
-      }
-
       #  If rect_id is still drawn, just need to update. 
       if { $itk_option(-rect_id) != {} } {
          if { [$itk_option(-canvas) gettags $itk_option(-rect_id)] != {} } {
@@ -707,6 +721,11 @@ itcl::class gaia::GaiaXYProfile {
    #  correct size and adding bindings.
    protected method restored_ {id args} {
       $itk_option(-canvasdraw) set_drawing_mode anyselect
+
+      #  Assume the image has changed, so restore from image coordinates.
+      $itk_option(-rtdimage) convert coords $x0_ $y0_ image cx0_ cy0_ canvas
+      $itk_option(-rtdimage) convert coords $x1_ $y1_ image cx1_ cy1_ canvas
+
       $itk_option(-canvas) coords $id $cx0_ $cy0_ $cx1_ $cy1_
       configure -rect_id $id
       add_notify_
@@ -724,46 +743,59 @@ itcl::class gaia::GaiaXYProfile {
          set ymax $vec(max)
 
          $xgraph_ yaxis configure -min $xmin -max $xmax
-         $ygraph_ yaxis configure -min $ymin -max $ymax
+         $ygraph_ xaxis configure -min $ymin -max $ymax
       } else {
          $xgraph_ yaxis configure -min {} -max {}
-         $ygraph_ yaxis configure -min {} -max {}
+         $ygraph_ xaxis configure -min {} -max {}
       }
    }
 
    #  Draw or update the line drawn in the main image that represents the
    #  UKIRT peakrow. "coord" should be in image coordinates.
-   protected method draw_image_line_ {coord} {
+   protected method draw_image_lines_ {xcoord ycoord} {
 
-      #  Do nothing if currently withdrawn.
-      if { [wm state $w_] == "withdrawn" } {
-         return
-      }
+      #  Get the canvas coordinates of this column and row in the image.
+      $itk_option(-rtdimage) convert coords $xcoord $ycoord image column_ row_ canvas
 
-      #  Get the canvas coordinates of this column in the image.
-      $itk_option(-rtdimage) convert coords $coord 1 image column_ dummy canvas
-
-      #  If line_id_ is still drawn, just need to update. 
-      if { $line_id_ != {} } {
-         if { [$itk_option(-canvas) gettags $line_id_] != {} } {
-            $itk_option(-canvas) coords $line_id_ $column_ $cy0_ $column_ $cy1_
+      #  If the lines are drawn, just need to update. 
+      if { $xline_id_ != {} } {
+         if { [$itk_option(-canvas) gettags $xline_id_] != {} } {
+            $itk_option(-canvas) coords $xline_id_ $column_ $cy0_ $column_ $cy1_
+            if { $yline_id_ != {} } {
+               if { [$itk_option(-canvas) gettags $yline_id_] != {} } {
+                  $itk_option(-canvas) coords $yline_id_ $cx0_ $row_ $cx1_ $row_
+               }
+            }
             return
          }
       }
 
-      #  Else re-create the line.
-      $itk_option(-canvasdraw) set_drawing_mode line [code $this drawn_image_line_]
+      #  Else re-create the lines.
+      $itk_option(-canvasdraw) set_drawing_mode line [code $this drawn_ximage_line_]
       $itk_option(-canvasdraw) create_object $column_ $column_
       $itk_option(-canvasdraw) create_done $column_ $column_
+
+      $itk_option(-canvasdraw) set_drawing_mode line [code $this drawn_yimage_line_]
+      $itk_option(-canvasdraw) create_object $row_ $row_
+      $itk_option(-canvasdraw) create_done $row_ $row_
    }
 
-   #  Restore of image line completed. Finish up by setting to the
+   #  Restore of x image line completed. Finish up by setting to the
    #  correct column.
-   protected method drawn_image_line_ {id args} {
+   protected method drawn_ximage_line_ {id args} {
       $itk_option(-canvasdraw) set_drawing_mode anyselect
       $itk_option(-canvas) coords $id $column_ $cy0_ $column_ $cy1_
       $itk_option(-canvas) itemconfigure $id -fill red
-      set line_id_ $id
+      set xline_id_ $id
+   }
+
+   #  Restore of y image line completed. Finish up by setting to the
+   #  correct column.
+   protected method drawn_yimage_line_ {id args} {
+      $itk_option(-canvasdraw) set_drawing_mode anyselect
+      $itk_option(-canvas) coords $id $cx0_ $row_ $cx1_ $row_ 
+      $itk_option(-canvas) itemconfigure $id -fill red
+      set yline_id_ $id
    }
 
    #  Configuration options: (public variables)
@@ -830,11 +862,13 @@ itcl::class gaia::GaiaXYProfile {
    #  Whether to fix data ranges.
    protected variable fixed_ 0
 
-   #  Canvas identifier of the UKIRT column shown in image.
-   protected variable line_id_ {}
+   #  Canvas identifier of the UKIRT column and row lines shown in image.
+   protected variable xline_id_ {}
+   protected variable yline_id_ {}
 
-   #  Canvas coordinate of the UKIRT column shown in image.
+   #  Canvas coordinate of the UKIRT column and row shown in image.
    protected variable column_ 0
+   protected variable row_ 0
 
    #  Name of logfile.
    protected variable logfile_ "GaiaXYProfile.log"
