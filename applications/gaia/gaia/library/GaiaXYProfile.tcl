@@ -40,6 +40,7 @@
 #  Copyright:
 #     Copyright (C) 2000-2005 Central Laboratory of the Research Councils.
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2008 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -132,7 +133,7 @@ itcl::class gaia::GaiaXYProfile {
          {Change profiles during rectangle motion}
 
       #  Set the initial corner coordinates of the rectangle.
-      lassign [$itk_option(-canvas) coords $itk_option(-rect_id)] x0_ y0_ x1_ y1_
+      set_bounds_
 
       #  Create the BLT graphs that display the profiles.
       make_graphs_
@@ -361,9 +362,9 @@ itcl::class gaia::GaiaXYProfile {
 
       #  Set axes labels.
       $xgraph_ yaxis configure -title {}
-      $xgraph_ xaxis configure -title {Distance along X}
+      $xgraph_ xaxis configure -title {X coordinate}
       $ygraph_ yaxis configure -title {}
-      $ygraph_ xaxis configure -title {Distance along Y}
+      $ygraph_ xaxis configure -title {Y coordinate}
 
       #  Create vectors that contain profile coordinates.
       $xgraph_ legend config -hide 1
@@ -380,8 +381,8 @@ itcl::class gaia::GaiaXYProfile {
          set ydVector_ [blt::vector create \#auto]
       }
       set symbol {}
-      $xgraph_ element create elem -xdata $xiVector_ -ydata $xdVector_ -symbol $symbol
-      $ygraph_ element create elem -xdata $yiVector_ -ydata $ydVector_ -symbol $symbol
+      $xgraph_ element create elem -xdata $xxVector_ -ydata $xdVector_ -symbol $symbol
+      $ygraph_ element create elem -xdata $yyVector_ -ydata $ydVector_ -symbol $symbol
 
       #  Do the initial profile plot.
       add_notify_
@@ -425,18 +426,15 @@ itcl::class gaia::GaiaXYProfile {
          }
          return 0
       }
-      lassign [$itk_option(-canvas) coords $itk_option(-rect_id)] x0_ y0_ x1_ y1_
+      set_bounds_
 
       #  Get the X and Y profile distributions.
       set nvals [$itk_option(-rtdimage) xyprofile $xgraph_ $ygraph_ elem \
-                    $x0_ $y0_ $x1_ $y1_ canvas \
+                    $x0_ $y0_ $x1_ $y1_ image \
                     $xxVector_ $xiVector_ $xdVector_ \
                     $yyVector_ $yiVector_ $ydVector_]
       set numXValues_ [lindex $nvals 0]
       set numYValues_ [lindex $nvals 1]
-
-      $xgraph_ xaxis configure -max $numXValues_
-      $ygraph_ xaxis configure -max $numYValues_
 
       #  Update the simple statistics. Peak value and position.
       if { ! [info exists itk_component(xpeakcoord)] } {
@@ -465,6 +463,13 @@ itcl::class gaia::GaiaXYProfile {
       return 0
    }
 
+   #  Set the bounds to those of the rectangle. Image coordinates.
+   protected method set_bounds_ {} {
+      lassign [$itk_option(-canvas) coords $itk_option(-rect_id)] cx0_ cy0_ cx1_ cy1_
+      $itk_option(-rtdimage) convert coords $cx0_ $cy0_ canvas x0_ y1_ image
+      $itk_option(-rtdimage) convert coords $cx1_ $cy1_ canvas x1_ y0_ image
+   }
+
    #  Display the original X or Y position and the data value,
    #  depending on which graph we're moving around in.
    method dispXY {w x y} {
@@ -474,34 +479,18 @@ itcl::class gaia::GaiaXYProfile {
       
       #  Find the closest position and hence the current data value.
       #  If off the graph then do nothing.
-      set ret 0
       if { ![$w element closest $x $y "" -interpolate 1 -halo 10000]} {
          return
       }
       lassign [$w invtransform $x $y] index value
-      set index [expr int(round($index))]
 
       #  Update the values according to which is the current graph.
       if { $w == $xgraph_ } {
-         if {$index < 0 || $index >= $numXValues_} {
-            return
-         }
-         catch {
-            set x [$xxVector_ range $index $index]
-            set y [$xdVector_ range $index $index]
-            $itk_component(uppercoord) config -value "$x"
-            $itk_component(uppervalue) config -value "$y"
-         }
+         $itk_component(uppercoord) config -value "$index"
+         $itk_component(uppervalue) config -value "$value"
       } else {
-         if {$index < 0 || $index >= $numYValues_} {
-            return
-         }
-         catch {
-            set x [$yyVector_ range $index $index]
-            set y [$ydVector_ range $index $index]
-            $itk_component(lowercoord) config -value "$x"
-            $itk_component(lowervalue) config -value "$y"
-         }
+         $itk_component(lowercoord) config -value "$index"
+         $itk_component(lowervalue) config -value "$value"
       }
    }
 
@@ -710,15 +699,15 @@ itcl::class gaia::GaiaXYProfile {
 
       #  Else re-create the rectangle.
       $itk_option(-canvasdraw) set_drawing_mode rectangle [code $this restored_]
-      $itk_option(-canvasdraw) create_object $x0_ $y0_
-      $itk_option(-canvasdraw) create_done $x0_ $y0_
+      $itk_option(-canvasdraw) create_object $cx0_ $cy0_
+      $itk_option(-canvasdraw) create_done $cx0_ $cy0_
    }
 
    #  Restore of graphics object completed. Finish up by setting to the
    #  correct size and adding bindings.
    protected method restored_ {id args} {
       $itk_option(-canvasdraw) set_drawing_mode anyselect
-      $itk_option(-canvas) coords $id $x0_ $y0_ $x1_ $y1_
+      $itk_option(-canvas) coords $id $cx0_ $cy0_ $cx1_ $cy1_
       configure -rect_id $id
       add_notify_
       notify_cmd
@@ -757,7 +746,7 @@ itcl::class gaia::GaiaXYProfile {
       #  If line_id_ is still drawn, just need to update. 
       if { $line_id_ != {} } {
          if { [$itk_option(-canvas) gettags $line_id_] != {} } {
-            $itk_option(-canvas) coords $line_id_ $column_ $y0_ $column_ $y1_
+            $itk_option(-canvas) coords $line_id_ $column_ $cy0_ $column_ $cy1_
             return
          }
       }
@@ -772,7 +761,7 @@ itcl::class gaia::GaiaXYProfile {
    #  correct column.
    protected method drawn_image_line_ {id args} {
       $itk_option(-canvasdraw) set_drawing_mode anyselect
-      $itk_option(-canvas) coords $id $column_ $y0_ $column_ $y1_
+      $itk_option(-canvas) coords $id $column_ $cy0_ $column_ $cy1_
       $itk_option(-canvas) itemconfigure $id -fill red
       set line_id_ $id
    }
@@ -826,11 +815,17 @@ itcl::class gaia::GaiaXYProfile {
    protected variable numXValues_ 0
    protected variable numYValues_ 0
 
-   #  Canvas coordinates of rectangle.
+   #  Image coordinates of rectangle.
    protected variable x0_ 0
    protected variable x1_ 0
    protected variable y0_ 0
    protected variable y1_ 0
+
+   #  Canvas coordinates of rectangle.
+   protected variable cx0_ 0
+   protected variable cx1_ 0
+   protected variable cy0_ 0
+   protected variable cy1_ 0
 
    #  Whether to fix data ranges.
    protected variable fixed_ 0
