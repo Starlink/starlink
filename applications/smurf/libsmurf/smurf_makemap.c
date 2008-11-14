@@ -283,12 +283,6 @@
 *          written to this output parameter even if a null value is supplied 
 *          for parameter OUT.
 
-*  Iterative MapMaker Configuration Parameters:
-*     The following configuration parameters are available for the iterative
-*     map maker:
-*          - "NUMITER"
-*          - "MODELORDER"
-
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
 *     Andy Gibb (UBC)
