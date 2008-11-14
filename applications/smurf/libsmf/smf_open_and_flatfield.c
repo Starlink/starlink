@@ -275,7 +275,7 @@ void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
         }
         msgOutif(MSG__VERB," ", "Dark subtracting ^FILE."
                  " Prior dark: ^PRIOR  Following dark: ^POST", status);
-        smf_subtract_dark( data, dkdata1, dkdata2, SMF__DKSUB_PREV, status );
+        smf_subtract_dark( data, dkdata1, dkdata2, SMF__DKSUB_CHOOSE, status );
       } else {
         msgSetc( "FILE", file->name );
         msgOutif(MSG__QUIET, " ",
