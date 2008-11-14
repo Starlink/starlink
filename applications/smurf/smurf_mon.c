@@ -272,6 +272,8 @@ void smurf_mon( int * status ) {
     smurf_calcdark( status );
   } else if (strcmp( taskname, "CALCFLAT" ) == 0 ) {
     smurf_calcflat( status );
+  } else if (strcmp( taskname, "SC2THREADTEST" ) == 0 ) {
+    smurf_sc2threadtest( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );

@@ -120,5 +120,6 @@ void smurf_sc2fft( int * );
 void smurf_smurfcopy( int * );
 void smurf_calcdark( int * );
 void smurf_calcflat( int * );
+void smurf_sc2threadtest( int * );
 
 #endif /* SMURF_LIB_DEFINED */
