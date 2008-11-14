@@ -52,6 +52,10 @@
 *        Allow for lower-case SAM_MODE
 *     2008-07-24 (TIMJ):
 *        Use hdr->obsmode instead of SAM_MODE.
+*     2008-11-13 (AGG):
+*        - Warn user if number of frames to average is not an integer
+*          factor of the number of time slices
+*        - Recalculate number of frames to average if necessary
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -106,8 +110,13 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
   smfHead *hdr;                    /* Header information */
   int j;                           /* Loop counter */
   size_t npts;                     /* Number of points in the averaged data */
+  int numaver;                     /* Number of samples to average */
   int numimages;                   /* Number of output STARE images */
+  int numsamples;                  /* Number of time slices (samples) */
+  int remainder;                   /* Remainder from dividing no of timeslices 
+				      by number of frames to average */
   HDSLoc *scu2redloc = NULL;       /* Locator to SCU2RED extension */
+  double steptime;                 /* Step time per sample, sec */
   double *zero = NULL;             /* Bolometer zero points */
 
   if ( *status != SAI__OK ) return;
@@ -141,7 +150,40 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
     }
 
     /* Number of output STARE images */
-    numimages = (data->dims)[2] / naver;
+    numsamples = (data->dims)[2];
+
+    /* If naver < 0 then re-calculate to give 1-second images */
+    if ( naver < 0 ) {
+      smf_fits_getD(hdr, "STEPTIME", &steptime, status);
+      numaver = 1.0 / steptime;
+    } else if ( naver > numsamples ) {
+      msgOutif(MSG__NORM, "", "Warning: NAVER exceeds the number of samples - will average entire time stream to create a single image", status);
+      numaver = numsamples;
+    } else {
+      numaver = naver;
+    }
+
+    numimages = numsamples / numaver;
+
+    /* Warn user if the number to average is not a factor of the
+       number of time slices  */
+    remainder = numsamples % numaver;
+    if ( remainder != 0 ) {
+      msgSeti("R", remainder);
+      msgSeti("N", numaver);
+      msgSeti("T", numsamples);
+      msgOutif(MSG__NORM, "", "Warning: NAVER (^N) is not a factor of the number of time slices (^T): final ^R samples will not be included in an image", status);
+    }
+
+    /* Helpful info for the user */
+    msgSeti("N",numimages);
+    if ( numimages == 1 ) {
+      msgSetc("IM","image");
+    } else {
+      msgSetc("IM","images");
+    }
+    msgOutif( MSG__VERB, "", "Calculating ^N STARE ^IM", status );
+
     /* Obtain a locator for the extension where for the images will
        be stored */
     scu2redloc = smf_get_xloc(data, "SCU2RED", "SCUBA2_MAP_ARR", "WRITE", 
@@ -155,13 +197,13 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
     /* Loop over the number of output images */
     for ( j=0; j<numimages; j++) {
       /* Average the time stream data over the desired interval */
-      smf_average_dataD( data, j*naver, naver, 1, &avdata, &npts, status );
+      smf_average_dataD( data, j*numaver, numaver, 1, &avdata, &npts, status );
 
       /* Temporary */
       zero = smf_malloc( npts, sizeof(double), 1, status );
 
       /* Store the averaged data as an image */
-      smf_store_image( data, scu2redloc, j, 2, dims, naver, 0, 0, avdata, zero, 
+      smf_store_image( data, scu2redloc, j, 2, dims, numaver, 0, 0, avdata, zero, 
 		       status);
 
       avdata = smf_free( avdata, status );
