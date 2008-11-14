@@ -1149,3 +1149,5 @@ void smf_lock_data( smfData *data, int lock, int *status );
 
 void smf_convert_bad( smfData *data, int *status );
 
+void smf_find_seqcount ( const smfHead * hdr,
+                         int *seqcount, int *status );
