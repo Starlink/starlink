@@ -73,14 +73,8 @@
 #include <stdio.h>
 
 /* Starlink includes */
-#include "ast.h"
 #include "mers.h"
-#include "ndf.h"
 #include "sae_par.h"
-#include "star/one.h"
-#include "prm_par.h"
-#include "par_par.h"
-#include "kpg_err.h"
 #include "star/one.h"
 
 /* SMURF includes */
