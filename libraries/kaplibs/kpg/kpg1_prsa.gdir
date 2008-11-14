@@ -33,7 +33,10 @@
 
 *  Notes:
 *     -  There is a routine for each numeric data type: replace "x"
-*        in the routine name by D, R, I, W, UW, B or UB as appropriate.
+*        in the routine name by D, I, or R as appropriate.  The
+*     array returned from the routine must have the data type specified.
+*     The limitation on other integer types is because there are no
+*     conversion routines between them and character in the CHR library.
 
 *  Copyright:
 *     Copyright (C) 1990 Science & Engineering Research Council.
