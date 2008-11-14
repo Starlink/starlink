@@ -33,9 +33,9 @@
 
 *  Notes:
 *     -  There is a routine for each numeric data type: replace "x"
-*        in the routine name by D, I, or R as appropriate.  The
-*     array returned from the routine must have the data type specified.
-*     The limitation on other integer types is because there are no
+*     in the routine name by D, I, or R as appropriate.  The array 
+*     returned from the routine must have the data type specified.  The 
+*     limitation on other integer types is because there are no
 *     conversion routines between them and character in the CHR library.
 
 *  Copyright:
@@ -67,9 +67,6 @@
 *        Original version.
 *     {enter_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
       
 *  Type Definitions:
@@ -80,85 +77,68 @@
       INCLUDE 'CHR_ERR'          ! CHR error codes
 
 *  Arguments Given:
-      INTEGER
-     :  MAXVAL
-
-      CHARACTER * ( * )
-     :  BUFFER
+      INTEGER MAXVAL
+      CHARACTER * ( * ) BUFFER
 
 *  Arguments Returned:
-      <TYPE>
-     :  VALUES( MAXVAL )
-      INTEGER
-     :  NVAL
+      <TYPE> VALUES( MAXVAL )
+      INTEGER NVAL
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  External References:
-      INTEGER
-     :  CHR_LEN                  ! Length of the string less trailing
+      INTEGER CHR_LEN            ! Length of the string less trailing
                                  ! blanks
 
 *  Local Variables:
-      INTEGER
-     :  INDEXE,                  ! Location within the string of the end
+      INTEGER INDEXE             ! Location within the string of the end
                                  ! of the current word
-     :  INDEXS,                  ! Location within the string of the
+      INTEGER INDEXS             ! Location within the string of the
                                  ! start of the current word
-     :  NCOM                     ! Length of the input string less
+      INTEGER NCOM               ! Length of the input string less
                                  ! trailing blanks
 
 *.
 
-*    Check inherited global status.
-
+*  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Start a new error context.
-
+*  Start a new error context.
       CALL ERR_MARK
 
-*    Get the length of the string.
-
+*  Get the length of the string.
       NCOM = CHR_LEN( BUFFER )
       NVAL = 0
       INDEXE = -1
 
-*    Loop until the end of the buffer.
-
+*  Loop until the end of the buffer.
       DO WHILE ( INDEXE .LT. NCOM .AND. NVAL .LE. MAXVAL .AND.
      :           STATUS .EQ. SAI__OK )
 
-*       Shift the search to the next value.
-
+*  Shift the search to the next value.
          INDEXS = INDEXE + 1
 
-*       Find the start and end indices of the value.
-
+*  Find the start and end indices of the value.
          CALL CHR_FIWS( BUFFER, INDEXS, STATUS )
          INDEXE = INDEXS
          CALL CHR_FIWE( BUFFER, INDEXE, STATUS )
 
-*       Watch for the case where the word terminates the line. 
-*       Since this is quite normal the error should be annulled.
-
+*  Watch for the case where the word terminates the line.  Since this 
+*  is quite normal, the error should be annulled.
          IF ( STATUS .EQ. CHR__ENDOFSENT ) CALL ERR_ANNUL( STATUS )
 
-*       Extract the value required and convert to <COMM> type.
-
+*  Extract the value required and convert to <COMM> type.
          NVAL = NVAL + 1
          CALL CHR_CTO<T>( BUFFER( INDEXS:INDEXE ), VALUES( NVAL ),
      :                    STATUS )
       END DO
 
-*    Should an error have occurred in extracting the data values, it
-*    either came from finding the value or converting it from
-*    characters.  If it was the latter then number of values is correct,
-*    otherwise if the word was not found and therefore the number
-*    of values must be decremented since it is not an abnormal way to
-*    exit the loop.
-
+*  Should an error have occurred in extracting the data values, it 
+*  either came from finding the value or converting it from characters. 
+*  If it was the latter then number of values is correct, otherwise if 
+*  the word was not found and therefore the number of values must be 
+*  decremented since it is not an abnormal way to exit the loop.
       IF ( STATUS .NE. SAI__OK ) THEN
          IF ( STATUS .EQ. CHR__WRDNOTFND )  THEN
             NVAL = NVAL - 1
@@ -172,8 +152,7 @@
          END IF
       END IF
  
-*    Release the error context.
-
+* Release the error context.
       CALL ERR_RLSE
 
       END
