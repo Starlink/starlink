@@ -132,6 +132,16 @@ itcl::class gaia::GaiaXYProfile {
          {Continuous updates} \
          {Change profiles during rectangle motion}
 
+      #  Display peak lines.
+      $Options add checkbutton -label {Display peak lines} \
+         -variable [scope itk_option(-show_peak_lines)] \
+         -onvalue 1 \
+         -offvalue 0 \
+         -command [code $this toggle_peak_lines_]
+      $short_help_win_ add_menu_short_help $Options \
+         {Display peak lines} \
+         {Display the position of the peak values on main image}
+
       #  Set the initial corner coordinates of the rectangle.
       set_image_bounds_
 
@@ -482,14 +492,14 @@ itcl::class gaia::GaiaXYProfile {
       $itk_component(ypeakcoord) config -value "$ypeakcoord"
       $itk_component(ypeakvalue) config -value "$ypeakvalue"
 
-      #  In UKIRT mode the peak column and row are shown in the main image as
-      #  line graphics. When a realtime event is received, this set the
-      #  row.
-      if { $itk_option(-ukirt_options) } {
+      #  If requested he peak column and row are shown in the main image as
+      #  line graphics. When a realtime event is received, this may also set
+      #  the row.
+      if { $itk_option(-show_peak_lines) } {
          if { "$op" == "realtime" && $rowcut != {} } {
-            draw_image_lines_ $xpeakcoord $rowcut
+            draw_peak_lines_ $xpeakcoord $rowcut
          } else {
-            draw_image_lines_ $xpeakcoord $ypeakcoord
+            draw_peak_lines_ $xpeakcoord $ypeakcoord
          }
       }
       return 0
@@ -788,7 +798,7 @@ itcl::class gaia::GaiaXYProfile {
 
    #  Draw or update the line drawn in the main image that represents the
    #  UKIRT peakrow. "coord" should be in image coordinates.
-   protected method draw_image_lines_ {xcoord ycoord} {
+   protected method draw_peak_lines_ {xcoord ycoord} {
 
       #  Get the canvas coordinates of this column and row in the image.
       $itk_option(-rtdimage) convert coords $xcoord $ycoord image column_ row_ canvas
@@ -814,6 +824,24 @@ itcl::class gaia::GaiaXYProfile {
       $itk_option(-canvasdraw) set_drawing_mode line [code $this drawn_yimage_line_]
       $itk_option(-canvasdraw) create_object $row_ $row_
       $itk_option(-canvasdraw) create_done $row_ $row_
+   }
+
+   #  Toggle display of peak lines.
+   protected method toggle_peak_lines_ {} {
+      if { $itk_option(-show_peak_lines) } {
+         #  Cause an update with will redraw.
+         notify_cmd
+      } else {
+         #  Remove lines.
+         if { $xline_id_ != {} } {
+            $itk_option(-canvasdraw) delete_object $xline_id_
+         }
+         if { $yline_id_ != {} } {
+            $itk_option(-canvasdraw) delete_object $yline_id_
+         }
+         set xline_id_ {}
+         set yline_id_ {}
+      }
    }
 
    #  Restore of x image line completed. Finish up by setting to the
@@ -855,8 +883,15 @@ itcl::class gaia::GaiaXYProfile {
    itk_option define -continuous_updates continuous_updates \
       Continuous_updates 1
 
-   #  Include the UKIRT quick look facilities.
-   itk_option define -ukirt_options ukirt_options Ukirt_Options 0
+   #  Include the UKIRT quick look facilities. Changes show peaks lines,
+   #  whether the log saving is shown and what happens when the
+   #  rectangle is deleted (nothing if true).
+   itk_option define -ukirt_options ukirt_options Ukirt_Options 0 {
+      configure -show_peak_lines $itk_option(-ukirt_options)
+   }
+
+   #  Whether to show the peak lines.
+   itk_option define -show_peak_lines show_peak_lines Show_Peak_Lines 0
 
    #  Fonts used
    itk_option define -labelfont labelFont LabelFont -Adobe-helvetica-bold-r-normal-*-12*
