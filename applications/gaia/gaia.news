@@ -6,9 +6,9 @@
     normalised as position angles. Previously they were just the arithmetic
     mean.
 
-    A new option in the spectral extraction window now forces the X
-    coordinates selected to be positive. This is useful when drawing
-    the X axis with log scaling.
+    New options in the spectral extraction window now forces the X
+    and Y coordinates to be positive. This is useful when drawing
+    the with log scaling.
 
 
   Lehuakona Release

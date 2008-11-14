@@ -138,6 +138,7 @@ typedef struct SPItem  {
     int showerrorbars;          /* Whether to show error bars */
     int xminmax;                /* If true then use min->max X coordinates */
     int xpositive;              /* If true only positive X coordinates will be used. */
+    int ypositive;              /* If true only positive data values will be used. */
 } SPItem;
 
 static int tagCounter = 0;      /* Counter for creating unique tags */
@@ -263,6 +264,9 @@ static Tk_ConfigSpec configSpecs[] = {
 
     {TK_CONFIG_DOUBLE, "-ybot", (char *) NULL, (char *) NULL,
      "0.0", Tk_Offset(SPItem, ybot), TK_CONFIG_DONT_SET_DEFAULT, NULL},
+
+    {TK_CONFIG_BOOLEAN, "-ypositive", (char *) NULL, (char *) NULL,
+     "1", Tk_Offset(SPItem, ypositive), TK_CONFIG_DONT_SET_DEFAULT, NULL},
 
     {TK_CONFIG_DOUBLE, "-ytop", (char *) NULL, (char *) NULL,
      "0.0", Tk_Offset(SPItem, ytop), TK_CONFIG_DONT_SET_DEFAULT, NULL},
@@ -422,6 +426,7 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     spPtr->y = 0.0;
     spPtr->yborder = 0.25;
     spPtr->ybot = DBL_MAX;
+    spPtr->ypositive = 0;
     spPtr->ytop = -DBL_MAX;
 
     /* Create a unique tag for AST graphic elements */
@@ -588,21 +593,21 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
 
     optionPtr = Tcl_GetString( objv[0] );
     if ( objc == 0 ) {
-	/*
+        /*
 	 * Print the coordinate and data values as pairs. BAD values are
          * just ignored.
 	 */
-	Tcl_Obj *subobj, *obj = Tcl_NewObj();
-	for ( i = 0; i < spPtr->numPoints; i++ ) {
+        Tcl_Obj *subobj, *obj = Tcl_NewObj();
+        for ( i = 0; i < spPtr->numPoints; i++ ) {
             if ( spPtr->dataPtr[i] != spPtr->badvalue ) {
                 subobj = Tcl_NewDoubleObj( spPtr->coordPtr[i] );
                 Tcl_ListObjAppendElement( interp, obj, subobj );
                 subobj = Tcl_NewDoubleObj( spPtr->dataPtr[i] );
                 Tcl_ListObjAppendElement( interp, obj, subobj );
             }
-	}
-	Tcl_SetObjResult( interp, obj );
-	return TCL_OK;
+        }
+        Tcl_SetObjResult( interp, obj );
+        return TCL_OK;
     }
     else if ( strcmp( optionPtr, "convert" ) == 0 ) {
         /*  Look for a request to convert a coordinate or return the limits */
@@ -797,9 +802,20 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                                        &spPtr->dataPtr[i] ) != TCL_OK ) {
                 return TCL_ERROR;
             }
-            if ( spPtr->dataPtr[i] != spPtr->badvalue ) {
-                spPtr->ymin = MIN( spPtr->ymin, spPtr->dataPtr[i] );
-                spPtr->ymax = MAX( spPtr->ymax, spPtr->dataPtr[i] );
+
+            /* Ignore negative values, if requested. */
+            if ( spPtr->ypositive ) {
+                if ( spPtr->dataPtr[i] != spPtr->badvalue && 
+                     spPtr->dataPtr[i] > 0.0 ) {
+                    spPtr->ymin = MIN( spPtr->ymin, spPtr->dataPtr[i] );
+                    spPtr->ymax = MAX( spPtr->ymax, spPtr->dataPtr[i] );
+                }
+            }
+            else {
+                if ( spPtr->dataPtr[i] != spPtr->badvalue ) {
+                    spPtr->ymin = MIN( spPtr->ymin, spPtr->dataPtr[i] );
+                    spPtr->ymax = MAX( spPtr->ymax, spPtr->dataPtr[i] );
+                }
             }
         }
     }
@@ -822,9 +838,20 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
             /* Get range of data */
             dataPtr = spPtr->dataPtr;
             for ( i = 0; i < nel; i++ ) {
-                if ( *dataPtr != spPtr->badvalue ) {
-                    spPtr->ymin = MIN( spPtr->ymin, *dataPtr );
-                    spPtr->ymax = MAX( spPtr->ymax, *dataPtr );
+
+                /* Ignore negative values, if requested. */
+                if ( spPtr->ypositive ) {
+                    if ( *dataPtr != spPtr->badvalue && 
+                         *dataPtr > 0.0 ) {
+                        spPtr->ymin = MIN( spPtr->ymin, *dataPtr );
+                        spPtr->ymax = MAX( spPtr->ymax, *dataPtr );
+                    }
+                } 
+                else {
+                    if ( *dataPtr != spPtr->badvalue ) {
+                        spPtr->ymin = MIN( spPtr->ymin, *dataPtr );
+                        spPtr->ymax = MAX( spPtr->ymax, *dataPtr );
+                    }
                 }
                 dataPtr++;
             }

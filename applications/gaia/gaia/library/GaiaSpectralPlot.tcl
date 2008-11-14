@@ -222,6 +222,15 @@ itcl::class gaia::GaiaSpectralPlot {
       add_menu_short_help $Options {Log Y axis}  \
          {Try to use a log scale for Y axis (fails when range includes zero)}
 
+      $Options add checkbutton \
+         -label {Positive Y only} \
+         -variable [scope itk_option(-ypositive)] \
+         -onvalue 1 \
+         -offvalue 0 \
+         -command [code $this set_ypositive]
+      add_menu_short_help $Options {Positive Y only}  \
+         {Only range positive Y coordinates (useful when Log Y axis enabled)}
+
       #   Display cordinate label.
       $Options add checkbutton \
          -label {Coordinate label} \
@@ -648,6 +657,7 @@ itcl::class gaia::GaiaSpectralPlot {
                            -gridoptions $gridoptions_ \
                            -showaxes 1 -xminmax $itk_option(-xminmax) \
                            -xpositive $itk_option(-xpositive) \
+                           -ypositive $itk_option(-ypositive) \
                            -reflinecolour $refspeccolour_\
                            -fixdatarange $itk_option(-fix_data_range) \
                            -ytop $itk_option(-data_high) \
@@ -1111,10 +1121,16 @@ itcl::class gaia::GaiaSpectralPlot {
          $spectrum_ -xminmax $itk_option(-xminmax)
    }
 
-   #  Set the xpostive value of spectrum.
+   #  Set the xpositive value of spectrum.
    public method set_xpositive {} {
       $itk_component(canvas) itemconfigure \
          $spectrum_ -xpositive $itk_option(-xpositive)
+   }
+
+   #  Set the ypositive value of spectrum.
+   public method set_ypositive {} {
+      $itk_component(canvas) itemconfigure \
+         $spectrum_ -ypositive $itk_option(-ypositive)
    }
 
    #  Resize the canvas to fit the size of enclosing frame.
@@ -1152,7 +1168,7 @@ itcl::class gaia::GaiaSpectralPlot {
                                will not use logarithmic scaling" $w_
             }
          }
-         if { $itk_option(-log_y_axis) == 1 } {
+         if { $itk_option(-log_y_axis) == 1 && ! $itk_option(-ypositive) } {
             lassign [$itk_component(canvas) coords $spectrum_ limits] x0 y0 x1 y1
             if { $y0 <= 0.0 || $y1 <= 0.0 } {
                warning_dialog "The range of data values include zero or \
@@ -1402,6 +1418,9 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Whether to just use positive X coordinates (used with log_x_axis).
    itk_option define -xpositive xpositive Xpositive 0
+
+   #  Whether to just use positive Y coordinates (used with log_y_axis).
+   itk_option define -ypositive ypositive Ypositive 0
 
    #  Whether to log data axis.
    itk_option define -log_y_axis log_y_axis Log_Y_Axis 0
