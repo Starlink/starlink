@@ -22,16 +22,20 @@
 *  Description:
 *     This is the main routine for reconstructing 2-D images from
 *     STARE observations. Files containing data not taken in STARE
-*     mode are ignored.
-
-*  Notes:
-*     The averaging window, naver, should be calculated automatically.
+*     mode are ignored. The user has the option to specify the number
+*     of frames to be averaged together, but the default is to
+*     automatically calculate that number to give 1-second averages.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
-*          Name of input data file
+*          Name of input data files
 *     OUT = NDF (Write)
 *          Name of output file containing STARE images
+*     NAVER = _INTEGER (Read)
+*          Number of frames to average together in output images. If a
+*          NULL value is given, NAVER is calculated dynamically for
+*          each input file to give output images which are 1-second
+*          averages. [!]
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -43,11 +47,13 @@
 *        Clone from smurf_dreamsolve
 *     2008-07-22 (TIMJ):
 *        Use kaplibs and support dark subtraction.
+*     2008-11-13 (AGG):
+*        Add NAVER as a parameter
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 2006 University of British Columbia. All Rights
+*     Copyright (C) 2006-2008 University of British Columbia. All Rights
 *     Reserved.
 
 *  Licence:
@@ -108,15 +114,15 @@
 void smurf_starecalc ( int *status ) {
 
   /* Local Variables */
-  smfArray *darks = NULL;   /* Dark data */
-  Grp *fgrp = NULL;          /* Filtered group, no darks */
-  size_t i;                        /* Loop counter */
-  Grp *igrp = NULL;                /* Input files */
-  Grp *ogrp = NULL;                /* Output files */
+  smfArray *darks = NULL;         /* Dark data */
+  smfData *data = NULL;           /* Input data */
+  Grp *fgrp = NULL;               /* Filtered group, no darks */
+  size_t i;                       /* Loop counter */
+  Grp *igrp = NULL;               /* Input files */
+  int naver;                      /* Averaging window, frames */
+  Grp *ogrp = NULL;               /* Output files */
+  size_t outsize;                 /* Size of output Grp */
   size_t size;                    /* Size of input Grp */
-  int naver;                       /* Averaging window */
-  size_t outsize;                    /* Size of output Grp */
-  smfData *data = NULL;            /* Input data */
 
   /* Main routine */
   ndfBegin();
@@ -143,12 +149,24 @@ void smurf_starecalc ( int *status ) {
        " nothing to do", status );
   }
 
+  /* Get number of frames to average over */
+  if ( *status == SAI__OK ) {
+    parGet0i( "NAVER", &naver, status );
+    if ( *status == PAR__NULL ) {
+      /* If the user has given us ! then we calculate the number of
+	 frames to create 1-second images - smf_calc_stareimage knows
+	 how to interpret a negative value */
+      naver = -1;
+      errAnnul( status );
+      msgOutif(MSG__VERB, "", "Autocalculating NAVER to give 1-second images", 
+	       status);
+    }
+  }
+
   /* Loop over number of files */
   for ( i=1; i<=size; i++) {
     /* Open file and flatfield the data */
     smf_open_and_flatfield( igrp, ogrp, i, darks, &data, status );
-
-    naver = 200; /* Average every 1 second */
 
     smf_calc_stareimage( data, naver, status );
 
@@ -159,10 +177,6 @@ void smurf_starecalc ( int *status ) {
       msgSeti("N",size);
       errRep(FUNC_NAME, 
 	     "Unable to produce STARE images for data from file ^I of ^N", status);
-    } else {
-      msgSeti("N",naver);
-      msgOutif(MSG__VERB," ", 
-	       "STARE images written, averaged over ^N frames", status);
     }
     /* Free resources for output data */
     smf_close_file( &data, status );

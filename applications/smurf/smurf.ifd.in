@@ -190,6 +190,8 @@
 #         Add SC2FFT
 #     27-JUL-2008 (EC):
 #         Add OUT parameter to SC2CONCAT
+#     13-NOV-2008 (AGG):
+#         Add NAVER parameter to STARECALC
 #     {enter_changes_here}
 
 #  Bugs:
@@ -1085,6 +1087,15 @@ package @PACKAGE@ {
                 prompt {Output data file(s)}
                 helpkey *
             }
+            parameter naver {
+                type _INTEGER
+                prompt {Number of samples to average together to produce an image}
+                vpath DEFAULT
+		default !
+                ppath GLOBAL CURRENT
+                helpkey *
+            }
+
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
@@ -1128,7 +1139,8 @@ package @PACKAGE@ {
                 position 4
                 type _INTEGER
                 prompt {Number of samples to write in output file}
-                vpath {PROMPT}
+                vpath DEFAULT
+		default 12000
                 ppath GLOBAL CURRENT
                 helpkey *
             }
