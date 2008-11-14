@@ -55,6 +55,8 @@
 *        Logic tidy up
 *     03-SEP-2008 (TIMJ):
 *        Fix issue with 2d input files
+*     11-NOV-2008 (TIMJ):
+*        Add CHOOSE method.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -174,6 +176,28 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
 
   /* calculate number of bolometers */
   nbols = (indata->dims)[0] * (indata->dims)[1];
+
+  /* if we are choosing based on dark1 and dark2 existence then do it
+     here */
+  if (method == SMF__DKSUB_CHOOSE) {
+    if (dark1 && dark2) {
+      method = SMF__DKSUB_MEAN;
+      msgSetc( "METH", "mean");
+    } else if (dark1) {
+      method = SMF__DKSUB_PREV;
+      msgSetc( "METH", "previous");
+    } else if (dark2) {
+      method = SMF__DKSUB_NEXT;
+      msgSetc( "METH", "following");
+    } else {
+      *status = SAI__ERROR;
+      errRep(" ", "Could not choose a valid subtraction method", status );
+      return;
+    }
+    msgOutif( MSG__VERB, " ", "Choosing to subtract the ^METH dark",
+              status );
+  }
+
 
   /* now do some sanity checks */
   switch (method) {

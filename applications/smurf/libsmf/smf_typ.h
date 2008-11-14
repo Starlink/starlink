@@ -254,7 +254,8 @@ typedef enum smf_dark_sub_meth {
   SMF__DKSUB_MEAN,        /* Use mean of previous and next dark */
   SMF__DKSUB_INTERP,      /* Interpolate dark over time */
   SMF__DKSUB_PREV,        /* Use previous dark */
-  SMF__DKSUB_NEXT         /* Use following dark */
+  SMF__DKSUB_NEXT,        /* Use following dark */
+  SMF__DKSUB_CHOOSE       /* Use one of mean, prev or next */
 } smf_dark_sub_meth;
 
 /* Indicate a bad array index */
