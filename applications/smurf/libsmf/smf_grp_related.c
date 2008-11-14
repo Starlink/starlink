@@ -101,6 +101,8 @@
  *        Steptime is now in smfHead.
  *     2008-08-20 (EC):
  *        Establish continuity based on OBSIDSS, SEQCOUNT and NSUBSCAN
+ *     2008-11-14 (TIMJ):
+ *        Use smf_find_seqcount
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -375,7 +377,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
 
     /* Read the SEQCOUNT and NSUBSCAN header values */
     hdr = data->hdr;
-    smf_fits_getI( hdr, "SEQCOUNT", &seqcount, status );
+    smf_find_seqcount( hdr, &seqcount, status );
     smf_fits_getI( hdr, "NSUBSCAN", &nsubscan, status );
 
     if( *status == SAI__OK ) {
