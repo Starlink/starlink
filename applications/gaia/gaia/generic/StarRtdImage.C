@@ -6572,6 +6572,11 @@ int StarRtdImage::autosetcutlevelsCmd( int argc, char *argv[] )
  *
  * Which makes use of 5 of the 9 reserved integers in the
  * rtdIMAGE_INFO structure.
+ * 
+ * For the UKIRT XY profile extensions these members are reused with 
+ * much the same meaning. However, these are updated for each realtime
+ * event and do not also require a motion event (not sure why the
+ * old ones do either).
  */
 int StarRtdImage::displayImageEvent( const rtdIMAGE_INFO& info,
                                      const Mem& data )
@@ -6579,12 +6584,29 @@ int StarRtdImage::displayImageEvent( const rtdIMAGE_INFO& info,
     //  Extract the UKIRT quick look region. These are passed in the
     //  reserved region so that we can retain the rtdIMAGE_INFO size
     //  at the current values.
-    if ( ukirt_ql() ) {
+    if ( ukirt_ql() || ukirt_xy() ) {
         ql_x0 = info.reserved[0];
         ql_y0 = info.reserved[1];
         ql_x1 = info.reserved[2];
         ql_y1 = info.reserved[3];
         ql_rowcut = info.reserved[4];
+        if ( ukirt_xy() ) {
+
+            //  Write out the data limits now to variables var(X0),
+            //  var(X1), var(Y0), var(Y1) and var(ROWCUT).
+            char *var = ( viewMaster_ ? viewMaster_->name() : instname_ );
+            char buffer[36];
+            sprintf( buffer, "%d", ql_x0 );
+            Tcl_SetVar2( interp_, var, "X0", buffer, TCL_GLOBAL_ONLY );
+            sprintf( buffer, "%d", ql_x1 );
+            Tcl_SetVar2( interp_, var, "X1", buffer, TCL_GLOBAL_ONLY );
+            sprintf( buffer, "%d", ql_y0 );
+            Tcl_SetVar2( interp_, var, "Y0", buffer, TCL_GLOBAL_ONLY );
+            sprintf( buffer, "%d", ql_y1 );
+            Tcl_SetVar2( interp_, var, "Y1", buffer, TCL_GLOBAL_ONLY );
+            sprintf( buffer, "%d", ql_rowcut );
+            Tcl_SetVar2( interp_, var, "ROWCUT", buffer, TCL_GLOBAL_ONLY );
+        }
     }
     return RtdImage::displayImageEvent( info, data );
 }

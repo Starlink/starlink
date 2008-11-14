@@ -95,6 +95,7 @@ typedef struct Gaia_Options : Rtd_Options
     int deep_search;    // Look for NDFs in extensions
     int plot_wcs;       // Scale and orient plot symbols using WCS system if available
     int ukirt_ql;       // Whether ukirt quick look stats are enabled.
+    int ukirt_xy;       // Whether ukirt quick look XY profiles are enabled.
     int pixel_indices;  // Whether X,Y coordinates are pixel indices.
 } Gaia_Options;
 
@@ -122,6 +123,7 @@ class StarRtdImageOptions : public RtdImageOptions
         gaia_options_.deep_search = 1;
         gaia_options_.plot_wcs = 1;
         gaia_options_.ukirt_ql = 0;
+        gaia_options_.ukirt_xy = 0;
         gaia_options_.pixel_indices = 0;
     }
 };
@@ -147,6 +149,9 @@ static int Gaia_Options_Offset( const char* member )
         return (char *)&ptr->plot_wcs - (char *)ptr;
     }
     if ( member[0] == 'u' && member[1] == 'k' ) {
+        if ( member[6] == 'x' ) {
+            return (char *)&ptr->ukirt_xy - (char *)ptr;
+        }
         return (char *)&ptr->ukirt_ql - (char *)ptr;
     }
     if ( member[0] == 'p' && member[1] == 'i' ) {
@@ -163,6 +168,7 @@ static int Gaia_Options_Offset( const char* member )
 {TK_CONFIG_INT,    "-deep_search",    NULL, NULL, "1",           GAIA_OPTION("deep_search"),   0, NULL}, \
 {TK_CONFIG_INT,    "-plot_wcs",       NULL, NULL, "1",           GAIA_OPTION("plot_wcs"),      0, NULL}, \
 {TK_CONFIG_INT,    "-ukirt_ql",       NULL, NULL, "0",           GAIA_OPTION("ukirt_ql"),      0, NULL}, \
+{TK_CONFIG_INT,    "-ukirt_xy",       NULL, NULL, "0",           GAIA_OPTION("ukirt_xy"),      0, NULL}, \
 {TK_CONFIG_INT,    "-pixel_indices",  NULL, NULL, "0",           GAIA_OPTION("pixel_indices"), 0, NULL}
 #else
 
@@ -174,6 +180,7 @@ static int Gaia_Options_Offset( const char* member )
 {TK_CONFIG_INT,    "-deep_search",    NULL, NULL, "1",           GAIA_OPTION(deep_search),   0, NULL}, \
 {TK_CONFIG_INT,    "-plot_wcs",       NULL, NULL, "1",           GAIA_OPTION(plot_wcs),      0, NULL}, \
 {TK_CONFIG_INT,    "-ukirt_ql",       NULL, NULL, "0",           GAIA_OPTION(ukirt_ql),      0, NULL}, \
+{TK_CONFIG_INT,    "-ukirt_xy",       NULL, NULL, "0",           GAIA_OPTION(ukirt_xy),      0, NULL}, \
 {TK_CONFIG_INT,    "-pixel_indices",  NULL, NULL, "0",           GAIA_OPTION(pixel_indices), 0, NULL}
 #endif
 
@@ -420,6 +427,11 @@ class StarRtdImage : public Skycat
    //  Return whether UKIRT quick look statistics are available.
    int ukirt_ql() const {
        return ((StarRtdImageOptions* )options_)->gaia_options_.ukirt_ql;
+   }
+
+   //  Return whether UKIRT quick look XY profiles are being used.
+   int ukirt_xy() const {
+       return ((StarRtdImageOptions* )options_)->gaia_options_.ukirt_xy;
    }
 
    //  Return whether pixel indices are calculated by processMotionEvent.

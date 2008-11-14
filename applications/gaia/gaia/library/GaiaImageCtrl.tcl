@@ -164,8 +164,9 @@ itcl::class gaia::GaiaImageCtrl {
       bind $canvas_ <Control-Button> [code $this handle_control_button_ %b]
       bind $canvas_ <Shift-Button> [code $this handle_shift_button_ %W %b]
 
-      #  Pass on UKIRT quick look config.
-      $image_ configure -ukirt_ql $itk_option(-ukirt_ql)
+      #  Pass on UKIRT quick look configs.
+      $image_ configure -ukirt_ql $itk_option(-ukirt_ql) 
+      $image_ configure -ukirt_xy $itk_option(-ukirt_xy)
 
       #  Same for pixel indices request.
       $image_ configure -pixel_indices $itk_option(-pixel_indices)
@@ -289,6 +290,9 @@ itcl::class gaia::GaiaImageCtrl {
    # PWD: back again the CDE window manager is really naff at
    # controlling transients, which allows the main window to
    # autoraise above them! Add <1> binding to get focus back to image.
+   public method focus_in {} {
+      focus_ in
+   }
    protected method focus_ {way} {
       global ::$w_.focus
       set top [winfo toplevel $w_]
@@ -1354,8 +1358,13 @@ move any overlapping windows and try again"
    #  Define the HDU initially displayed from each FITS file that is loaded.
    itk_option define -hdu hdu Hdu 0
 
-   #  Whether to enable the UKIRT quick look parts of the interface.
+   #  Whether to enable the UKIRT quick look realtime events and the
+   #  interface (ATC version).
    itk_option define -ukirt_ql ukirt_ql UKIRT_QL 0
+   
+   #  Whether to enable the UKIRT quick look realtime events only
+   #  (JAC version).
+   itk_option define -ukirt_xy ukirt_xy UKIRT_XY 0
 
    #  Whether to enable display of pixel indices in preference to grid indices.
    itk_option define -pixel_indices pixel_indices Pixel_Indices 0

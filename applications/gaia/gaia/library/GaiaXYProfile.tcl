@@ -133,7 +133,7 @@ itcl::class gaia::GaiaXYProfile {
          {Change profiles during rectangle motion}
 
       #  Set the initial corner coordinates of the rectangle.
-      set_bounds_
+      set_image_bounds_
 
       #  Create the BLT graphs that display the profiles.
       make_graphs_
@@ -205,7 +205,7 @@ itcl::class gaia::GaiaXYProfile {
          ::frame $w_.ypane
       }
       $itk_component(pane) add $itk_component(xpane) $itk_component(ypane)
-      
+
       #  Create the X graph and add it to the upper pane.
       itk_component add xgraph {
          blt::graph $itk_component(xpane).xgraph \
@@ -420,8 +420,13 @@ itcl::class gaia::GaiaXYProfile {
    #  Deal with notification that rectangle has changed position. If
    #  the operation is "delete" (i.e. the rectangle has been removed)
    #  then the whole toolbox is deleted, unless we're in UKIRT mode.
-   #  In that case we do nothing and the interface should be woken 
+   #  In that case we do nothing and the interface should be woken
    #  by a call to restore when a new image (or image event) happens.
+   #
+   #  If the op is "realtime" (should only be used when in UKIRT mode)
+   #  then we check the appropriate members for the realtime position of the
+   #  rectangle and the rowcut.
+   #
    public method notify_cmd {{op update}} {
       if { "$op" == "delete" } {
          configure -rect_id {}
@@ -430,7 +435,25 @@ itcl::class gaia::GaiaXYProfile {
          }
          return 0
       }
-      set_bounds_
+
+      set rowcut {}
+      if { "$op" == "realtime" } {
+         catch {
+            set var $itk_option(-rtdimage)
+            global ::$var
+            set x0_ [set ${var}(X0)]
+            set x1_ [set ${var}(X1)]
+            set y0_ [set ${var}(Y0)]
+            set y1_ [set ${var}(Y1)]
+            set rowcut [set ${var}(ROWCUT)]
+
+            #  Set bounds of rectangle, and transform to canvas coordinates.
+            set_canvas_bounds_
+         }
+      } else {
+         #  Set bounds of rectangle in image coordinates.
+         set_image_bounds_
+      }
 
       #  Get the X and Y profile distributions.
       set nvals [$itk_option(-rtdimage) xyprofile $xgraph_ $ygraph_ elem \
@@ -460,18 +483,31 @@ itcl::class gaia::GaiaXYProfile {
       $itk_component(ypeakvalue) config -value "$ypeakvalue"
 
       #  In UKIRT mode the peak column and row are shown in the main image as
-      #  line graphics.
+      #  line graphics. When a realtime event is received, this set the
+      #  row.
       if { $itk_option(-ukirt_options) } {
-         draw_image_lines_ $xpeakcoord $ypeakcoord
+         if { "$op" == "realtime" && $rowcut != {} } {
+            draw_image_lines_ $xpeakcoord $rowcut
+         } else {
+            draw_image_lines_ $xpeakcoord $ypeakcoord
+         }
       }
       return 0
    }
 
    #  Set the bounds to those of the rectangle. Image coordinates.
-   protected method set_bounds_ {} {
+   protected method set_image_bounds_ {} {
       lassign [$itk_option(-canvas) coords $itk_option(-rect_id)] cx0_ cy0_ cx1_ cy1_
       $itk_option(-rtdimage) convert coords $cx0_ $cy0_ canvas x0_ y1_ image
       $itk_option(-rtdimage) convert coords $cx1_ $cy1_ canvas x1_ y0_ image
+   }
+
+   #  Set the canvas bounds to those of the current image region.
+   protected method set_canvas_bounds_ {} {
+      $itk_option(-canvasdraw) deselect_objects
+      $itk_option(-rtdimage) convert coords $x0_ $y0_ image cx0_ cy1_ canvas
+      $itk_option(-rtdimage) convert coords $x1_ $y1_ image cx1_ cy0_ canvas
+      $itk_option(-canvas) coords $itk_option(-rect_id) $cx0_ $cy0_ $cx1_ $cy1_
    }
 
    #  Display the original X or Y position and the data value,
@@ -480,10 +516,10 @@ itcl::class gaia::GaiaXYProfile {
 
       #  Update crosshair position.
       $w crosshairs configure -position @$x,$y
-      
+
       #  Update the values according to which is the current graph.
       if { $w == $xgraph_ } {
-         
+
          #  Find the closest position and hence the current data value.
          #  If off the graph then do nothing.
          if { ![$w element closest $x $y result -interpolate 1 -halo 10000 -along x]} {
@@ -644,9 +680,9 @@ itcl::class gaia::GaiaXYProfile {
       blt::table $itk_component(rframe) $itk_component(ymax) 0,3 -fill both
 
       if { $itk_option(-ukirt_options) } {
-         pack $itk_component(logfile) -side top -fill x -expand 1 
-         pack $itk_component(comment) -side left -fill x -expand 1 
-         pack $itk_component(save) -side right -expand 0 -fill x -padx 1m -pady 1m 
+         pack $itk_component(logfile) -side top -fill x -expand 1
+         pack $itk_component(comment) -side left -fill x -expand 1
+         pack $itk_component(save) -side right -expand 0 -fill x -padx 1m -pady 1m
       }
 
       pack $itk_component(fix) $itk_component(print) $itk_component(close) \
@@ -703,7 +739,7 @@ itcl::class gaia::GaiaXYProfile {
    #  Restore the graphics rectangle.
    public method restore {} {
 
-      #  If rect_id is still drawn, just need to update. 
+      #  If rect_id is still drawn, just need to update.
       if { $itk_option(-rect_id) != {} } {
          if { [$itk_option(-canvas) gettags $itk_option(-rect_id)] != {} } {
             notify_cmd
@@ -757,7 +793,7 @@ itcl::class gaia::GaiaXYProfile {
       #  Get the canvas coordinates of this column and row in the image.
       $itk_option(-rtdimage) convert coords $xcoord $ycoord image column_ row_ canvas
 
-      #  If the lines are drawn, just need to update. 
+      #  If the lines are drawn, just need to update.
       if { $xline_id_ != {} } {
          if { [$itk_option(-canvas) gettags $xline_id_] != {} } {
             $itk_option(-canvas) coords $xline_id_ $column_ $cy0_ $column_ $cy1_
@@ -793,7 +829,7 @@ itcl::class gaia::GaiaXYProfile {
    #  correct column.
    protected method drawn_yimage_line_ {id args} {
       $itk_option(-canvasdraw) set_drawing_mode anyselect
-      $itk_option(-canvas) coords $id $cx0_ $row_ $cx1_ $row_ 
+      $itk_option(-canvas) coords $id $cx0_ $row_ $cx1_ $row_
       $itk_option(-canvas) itemconfigure $id -fill red
       set yline_id_ $id
    }

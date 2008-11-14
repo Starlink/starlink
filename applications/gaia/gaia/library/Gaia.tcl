@@ -425,7 +425,7 @@ itcl::class gaia::Gaia {
       }
 
       #  Start the internal debug logging, if required.
-      if { $itk_option(-debug) } {
+      if { $itk_option(-debuglog) } {
          cmdtrace on notruncate [::open "GaiaDebug.log" w]
       }
 
@@ -561,6 +561,7 @@ itcl::class gaia::Gaia {
             -pick_zoom_factor $itk_option(-pick_zoom_factor) \
             -hdu $itk_option(-hdu) \
             -ukirt_ql $itk_option(-ukirt_ql) \
+            -ukirt_xy $itk_option(-ukirt_xy) \
             -pixel_indices $itk_option(-pixel_indices) \
             -appname $appname_ \
             -extended_precision $itk_option(-extended_precision) \
@@ -575,6 +576,12 @@ itcl::class gaia::Gaia {
       #  Keep a list of SkyCat/GAIA instances.
       global ::skycat_images
       lappend skycat_images $itk_component(image)
+
+      #  Some modes require realtime events immediately (not just when
+      #  the toolboxes are ready).
+      if { $itk_option(-ukirt_xy) } {
+         $image_ configure -real_time_command [code $this real_time_event_]
+      }
    }
 
    #  Make changes to Skycat menus that we require.
@@ -1236,7 +1243,7 @@ itcl::class gaia::Gaia {
    #  Make XY profiles toolbox. Slightly different as need to get
    #  rectangle on canvas first. Note don't need a backing image.
    public method make_xyprofile_toolbox {name {cloned 0} {prompt 1}} {
-      if {[$image_ isclear]} {
+      if { [$image_ isclear] } {
          warning_dialog "No image is currently loaded" $w_
          return
       }
@@ -1450,11 +1457,28 @@ itcl::class gaia::Gaia {
    protected method real_time_event_ {} {
       if { [info exists itk_component(xyprofile) ] &&
            [winfo exists $itk_component(xyprofile) ] } {
-         $itk_component(xyprofile) notify_cmd
+         $itk_component(xyprofile) notify_cmd realtime
       } else {
 
-         #  Failed so remove the command (only way to trap this).
-         $image_ configure -real_time_command {}
+         #  If this is from UKIRT we need to startup the XY profile.
+         if { $itk_option(-ukirt_xy) } {
+
+            #  Create a dummy rectangle on the image, without interaction.
+            set draw [$image_ component draw]
+            set canvas [$image_ get_canvas]
+            set id [$canvas create rectangle 0 0 10 10]
+            $canvas itemconfigure $id -fill white -outline grey90 -stipple pat7
+            $canvas addtag $draw.objects withtag $id
+            $draw add_object_bindings $id
+            $draw select_object $id
+
+            #  Now create the toolbox and send the realtime event again.
+            make_xyprofile_ xyprofile 0 $id 0 0 0 0
+            after 0 [code $this real_time_event_]
+         } else {
+            #  Some failure so remove the command (only way to trap this).
+            $image_ configure -real_time_command {}
+         }
       }
    }
 
@@ -2525,6 +2549,9 @@ window gives you access to this."
    itk_option define -deep_search deep_search Deep_Search 1 {
       gaia::GaiaNDAccess::set_deep_search $itk_option(-deep_search)
    }
+
+   #  Create debugging log.
+   itk_option define -debuglog debuglog DebugLog 0
 
    #  Protected variables: (available to instance)
    #  --------------------
