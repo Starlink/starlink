@@ -1,0 +1,2510 @@
+\documentclass[twoside,11pt]{article}
+
+\usepackage{longtable}
+% ? Specify used packages
+% \usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+% Fixed part
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun\stardocnumber}
+\newcommand{\stardoccopyright} 
+{Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
+
+% Variable part - replace [xxx] as appropriate.
+\newcommand{\stardocnumber}    {259.1}
+\newcommand{\stardocauthors}   {Jen Balfour}
+\newcommand{\stardocdate}      {9th April 2008}
+\newcommand{\stardoctitle}     {GSD2ACSIS}
+\newcommand{\stardocversion}   {Version 1.1}
+\newcommand{\stardocmanual}    {Programmer's Guide}
+\newcommand{\stardocabstract}  {
+GSD2ACSIS is a SMURF routine used to convert DAS and AOSC data stored in the GSD file format into the format used for ACSIS data.
+}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sun.tex
+%
+%  Purpose:
+%     Template for Starlink User Note (SUN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%      1-FEB-2000 (AJC):
+%        Add Copyright statement in LaTeX
+%     {Add further history here}
+%
+% -
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\renewcommand{\_}{\texttt{\symbol{95}}}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+
+
+\newcommand{\telName}{TEL\_NAME (C1TEL)}
+\newcommand{\project}{PROJECT (C1PID)}
+\newcommand{\projectObsA}{PROJECT\_OBS\_1 (C1OBS)}
+\newcommand{\projectObsB}{PROJECT\_OBS\_2 (C1ONA1)}
+\newcommand{\projectObsC}{PROJECT\_OBS\_3 (C1ONA2)}
+\newcommand{\objectA}{CENTRE\_NAME\_1 (C1SNA1)}
+\newcommand{\objectB}{CENTRE\_NAME\_2 (C1SNA2)}
+\newcommand{\centreCoords}{CENTRE\_COORDS (C4CSC)}
+\newcommand{\centreCode}{CENTRE\_CODE (C4CECO)}
+\newcommand{\epochType}{EPOCH\_TYPE (C4EPT)}
+\newcommand{\centreMoving}{CENTRE\_MOVING (C4MCF)}
+\newcommand{\centreEpoch}{CENTRE\_EPOCH (C4EPH)}
+\newcommand{\centreRARB}{CENTRE\_RA1950 (C4ERA)}
+\newcommand{\centreDecRB}{CENTRE\_DEC1950 (C4EDEC)}
+\newcommand{\centreRA}{CENTRE\_RA (C4RADATE)}
+\newcommand{\centreDec}{CENTRE\_DEC (C4DECDATE)}
+\newcommand{\centreRARJ}{CENTRE\_RA2000 (C4RA2000)}
+\newcommand{\centreDecRJ}{CENTRE\_DEC2000 (C4EDEC2000)}
+\newcommand{\centreGL}{CENTRE\_GL (C4GL)}
+\newcommand{\centreGB}{CENTRE\_GB (C4GB)}
+\newcommand{\centreAz}{CENTRE\_AZ (C4AZ)}
+\newcommand{\centreEl}{CENTRE\_EL (C4EL)}
+\newcommand{\cellCoords}{CELL\_COORDS (C4LSC)}
+\newcommand{\cellCode}{CELL\_CODE (C6FC)}
+\newcommand{\cellUnit}{CELL\_UNIT (C4ODCO)}
+\newcommand{\cellX}{CELL\_X (C6DX)}
+\newcommand{\cellY}{CELL\_Y (C6DY)}
+\newcommand{\cellVX}{CELL\_V2X (C6MSA)}
+\newcommand{\cellVY}{CELL\_V2Y (CELL\_V2Y)}
+\newcommand{\cellXY}{CELL\_X2Y (C4AXY)}
+\newcommand{\centreOffsetX}{CENTRE\_OFFSET\_X (C4SX)}
+\newcommand{\centreOffsetY}{CENTRE\_OFFSET\_Y (C4SY)}
+\newcommand{\referenceX}{REFERENCE\_X (C4RX)}
+\newcommand{\referenceY}{REFERENCE\_Y (C4RY)}
+\newcommand{\telHeight}{TEL\_HEIGHT (C1HGT)}
+\newcommand{\telLongitude}{TEL\_LONGITUDE (C1LONG)}
+\newcommand{\telLatitude}{TEL\_LATITUDE (C1LAT)}
+\newcommand{\nObs}{NOBS (C1SNO)}
+\newcommand{\obsType}{OBS\_TYPE (C6ST)}
+\newcommand{\frontend}{FRONTEND (C1RCV)}
+\newcommand{\FEType}{FE\_TYPE (C1FTYP)}
+\newcommand{\backend}{BACKEND (C1BKE)}
+\newcommand{\BEType}{BE\_TYPE (C1BTYP)}
+\newcommand{\obsUTd}{OBS\_UT1D (C3DAT)}
+\newcommand{\obsUTh}{OBS\_UT1H (C3UT)}
+\newcommand{\obsUTC}{OBS\_UT1C (C3UT1C)}
+\newcommand{\obsLST}{OBS\_LST (C3LST)}
+\newcommand{\obsCalibration}{OBS\_CALIBRATION (C3CAL)}
+\newcommand{\obsCentre}{OBS\_CENTRE (C3CEN)}
+\newcommand{\obsContinuous}{OBS\_CONTINUOUS (C3FLY)}
+\newcommand{\obsFocus}{OBS\_FOCUS (C3FOCUS)}
+\newcommand{\obsMap}{OBS\_MAP (C3MAP)}
+\newcommand{\nMapDims}{NO\_MAP\_DIMS (C3NPP)}
+\newcommand{\nMapPts}{NO\_MAP\_PNTS (C3NMAP)}
+\newcommand{\nMapPtsX}{NO\_X\_MAP\_PNTS (C6XNP)}
+\newcommand{\nMapPtsY}{NO\_Y\_MAP\_PNTS (C6YNP)}
+\newcommand{\mapStartX}{X\_MAP\_START (C6XGC)}
+\newcommand{\mapStartY}{Y\_MAP\_START (C6YGC)}
+\newcommand{\scanRev}{SCAN\_REVERSAL (C6REV)}
+\newcommand{\obsDirection}{OBS\_DIRECTION (C6SD)}
+\newcommand{\mapPosX}{X\_MAP\_POSITIVE (C6XPOS)}
+\newcommand{\mapPosY}{Y\_MAP\_POSITIVE (C6YPOS)}
+\newcommand{\noScans}{NO\_SCANS (C3NIS)}
+\newcommand{\nScan}{NSCAN (C3NSAMPLE)}
+\newcommand{\nScanVarsA}{NO\_SCAN\_VARS1 (C3NO\_SCAN\_VARS1)}
+\newcommand{\nScanVarsB}{NO\_SCAN\_VARS2 (C3NO\_SCAN\_VARS2)}
+\newcommand{\scanTime}{SCAN\_TIME (C3SRT)}
+\newcommand{\nScanPts}{NO\_SCAN\_PNTS (C3MXP)}
+\newcommand{\noCycles}{NO\_CYCLES (C3NCI)}
+\newcommand{\nCycle}{NCYCLE (C3NCYCLE)}
+\newcommand{\cycleTime}{CYCLE\_TIME (C3CL)}
+\newcommand{\noCyclePts}{NO\_CYCLE\_PNTS (C3NCP)}
+\newcommand{\nCyclePts}{NCYCLE\_PNTS (C6NP)}
+\newcommand{\nPhaseVars}{NO\_PHASE\_VARS (C3NSV)}
+\newcommand{\nPhases}{NO\_PHASES (C3PPC)}
+\newcommand{\tamb}{TAMB (C5AT)}
+\newcommand{\pamb}{PAMB (C5PRS)}
+\newcommand{\hamb}{HAMB (C5RH)}
+\newcommand{\errAz}{SDIS(7) (C4AZERR)}
+\newcommand{\errEl}{SDIS(8) (C4ELERR)}
+\newcommand{\userAz}{SDIS(36) (UAZ)}
+\newcommand{\userEl}{SDIS(37) (UEL)}
+\newcommand{\nVRad}{SZVRAD (C7SZVRAD)}
+\newcommand{\apertureEff}{APERTURE\_EFF (C8AAE)}
+\newcommand{\beamEff}{BEAM\_EFF (C8ABE)}
+\newcommand{\antennaGain}{ANTENNA\_GAIN (C8GN)}
+\newcommand{\etal}{ETAL (C8EL)}
+\newcommand{\etafss}{ETAFSS (C8EF)}
+\newcommand{\chopping}{CHOPPING (C4SM)}
+\newcommand{\chopWaveform}{WAVEFORM (C4FUN)}
+\newcommand{\chopFrequency}{FREQUENCY (C4FRQ)}
+\newcommand{\chopCoords}{COORDS (C4SMCO)}
+\newcommand{\chopThrow}{THROW (C4THROW)}
+\newcommand{\chopPA}{POSANG (C4POSANG)}
+\newcommand{\smuOffsEW}{OFFS\_EW (C4OFFS\_EW)}
+\newcommand{\smuOffsNS}{OFFS\_NS (C4OFFS\_NS)}
+\newcommand{\smuX}{X (C4X)}
+\newcommand{\smuY}{Y (C4Y)}
+\newcommand{\smuZ}{Z (C4Z)}
+\newcommand{\smuEWScale}{EW\_AMPL\_SCALE (C4EW\_SCALE)}
+\newcommand{\smuNSScale}{NS\_AMPL\_SCALE (C4NS\_SCALE)}
+\newcommand{\smuEWEnc}{AMPL\_E\_SET (C4EW\_ENCODER)}
+\newcommand{\smuNSEnc}{AMPL\_N\_SET (C4NS\_ENCODER)}
+\newcommand{\smuDX}{DX (C2FV)}
+\newcommand{\smuDY}{DY (C2FL)}
+\newcommand{\smuDZ}{DZ (C2FR)}
+\newcommand{\telCoords}{TEL\_COORDS (C4MOCO)}
+\newcommand{\nFEChans}{NO\_FE\_O\_CH (C3NFOC)}
+\newcommand{\velocity}{VELOCITY (C7VR)}
+\newcommand{\tCold}{T\_COLD (C12TCOLD)}
+\newcommand{\tHot}{T\_HOT (C12TAMB)}
+\newcommand{\velDefn}{VEL\_DEFN (C12VDEF)}
+\newcommand{\velRef}{VEL\_REF (C12VREF)}
+\newcommand{\nBEChansIn}{NO\_BE\_I\_CH (C3NRC)}
+\newcommand{\nBEChansOut}{NO\_BE\_O\_CH (C3NCH)}
+\newcommand{\nBESections}{NO\_BES (C3NRS)}
+\newcommand{\badVal}{BAD\_CHANNEL (C7BCV)}
+\newcommand{\dataUnits}{DATA\_UNITS (C12CAL)}
+\newcommand{\swMode}{SWITCH\_MODE (C6MODE)}
+\newcommand{\calInstrument}{BE\_CAL\_TASK (C12CALTASK)}
+\newcommand{\calType}{BE\_CAL\_TYPE (C12CALTYPE)}
+\newcommand{\calmode}{BE\_RED\_MODE (C12REDMODE)}
+\newcommand{\IFPerSection}{NO\_IF\_PER\_BES (C3NOIFPBES)}
+\newcommand{\BEConfig}{DAS\_CONF\_NR (C3CONFIGNR)}
+\newcommand{\dataOutput}{DAS\_OUTPUT (C3DASOUTPUT)}
+\newcommand{\calSource}{DAS\_CAL\_SOURCE (C3DASCALSRC)}
+\newcommand{\shiftFrac}{DAS\_SHIFT\_FRAC (C3DASSHFTFRAC)}
+\newcommand{\tauCSO}{CSO\_TAU (C7TAU225)}
+\newcommand{\tauRMS}{CSO\_TAU\_RMS (C7TAURMS)}
+\newcommand{\tauTime}{CSO\_YYMMDDHHMM (C7TAUTIME)}
+\newcommand{\seeing}{SAO\_SEEING (C7SEEING)}
+\newcommand{\seeTime}{SAO\_YYMMDDHHMM (C7SEETIME)}
+\newcommand{\polarity}{C3POLARITY (C3POLARITY)}
+\newcommand{\sbMode}{C3SBMODE (C3SBMODE)}
+\newcommand{\IFONPhase}{DAS\_NO\_PHASE (C55NPH)}
+\newcommand{\IFONCycle}{DAS\_NO\_CYCLES (C55NCYC)}
+\newcommand{\IFONIntCycle}{DAS\_NINTCYCLE (C55NINT)}
+\newcommand{\nCorrCycle}{DAS\_NCORRCYCLE (C55NCORR)}
+\newcommand{\procBits}{DAS\_PROC\_BITS (C55DASPRBIT)}
+\newcommand{\procLoc}{DAS\_PROC\_LOC (C55DASPRLOC)}
+\newcommand{\RXJLengthX}{RXJ.LX (C55LX)}
+\newcommand{\RXJLengthY}{RXJ.LY (C55LY)}
+\newcommand{\RXJLengthZ}{RXJ.LZ (C55LZ)}
+\newcommand{\RXJSin}{RXJ.A (C55A)}
+\newcommand{\RXJCos}{RXJ.B (C55B)}
+\newcommand{\RXJConstant}{RXJ.C (C55C)}
+\newcommand{\RXJCSOSwitch}{RXJ.CSO\_SWITCH (C55CSOSW)}
+\newcommand{\RXJJCMTSwitch}{RXJ.JCMT\_SWITCH (C55JCMTSW)}
+\newcommand{\RXJNSecs}{RXJ.NSECS (C55SECOND)}
+\newcommand{\CSOAbsorb}{RXJ.ABSORB (C55ABSORB)}
+\newcommand{\CSOTAU}{RXJ.CSO\_TAU (C55TAU)}
+\newcommand{\CSODAz}{RXJ.DAZ (C55DAZ)}
+\newcommand{\CSODEl}{RXJ.DEL (C55DEL)}
+\newcommand{\CSORA}{RXJ.RA (C55RA)}
+\newcommand{\CSODec}{RXJ.DEC (C55DEC)}
+\newcommand{\CSOEpoch}{RXJ.EPOCH (C55EPOCH)}
+\newcommand{\CSOPAz}{RXJ.PAZ (C55PAZ)}
+\newcommand{\CSOPEl}{RXJ.PEL (C55PEL)}
+\newcommand{\CSOTrack}{RXJ.TRACK (C55TRACK)}
+\newcommand{\CSOFocus}{RXJ.FMODE (C55FMODE)}
+\newcommand{\CSOFocusX}{RXJ.FX (C55FX)}
+\newcommand{\CSOFocusY}{RXJ.FY (C55FY)}
+\newcommand{\CSOFocusZ}{RXJ.FZ (C55FZ)}
+\newcommand{\CSOVelocity}{RXJ.VLSR (C55VLSR)}
+\newcommand{\CSOVelOffset}{RXJ.COFF (C55VOFF)}
+\newcommand{\CSORadVel}{RXJ.VRAD (C55VRAD)}
+\newcommand{\CSOPhaseLock}{RXJ.PLOCK (C55PLOCK)}
+\newcommand{\CSORestFreq}{RXJ.RFREQ (C55RFREQ)}
+\newcommand{\CSOIFFreq}{RXJ.IFFREQ (C55IFFREQ)}
+\newcommand{\CSOLOFreq}{RXJ.LOFREQ (C55LOFREQ)}
+\newcommand{\CSOFreqOffset}{RXJ.FREQOFF (C55FREQOFF)}
+\newcommand{\CSOSideband}{RXJ.SIDEBAND (C55SIDEBAND)}
+\newcommand{\CSOMultHarm}{RXJ.MHN (C55MHN)}
+\newcommand{\CSOStatus}{RXJ.CSO\_STATUS (C55CSOSTATUS)}
+\newcommand{\telAz}{TEL.SDIS(9) (C55TELAZ)}
+\newcommand{\telEl}{TEL.SDIS(10) (C55TELEL)}
+\newcommand{\FEFreqs}{FE\_NUOBS (C55FENUOBS)}
+\newcommand{\FESBSigns}{FE\_SB\_SIGN (C55FESBSIGN)}
+\newcommand{\FELOFreqs}{FE\_NULO (C55FENULO)}
+\newcommand{\vRadial}{C7VRADIAL (C7VRADIAL)}
+\newcommand{\scanVarsA}{SCAN\_VARS1 (C12SCAN\_VARS1)}
+\newcommand{\scanVarsB}{SCAN\_VARS2 (C12SCAN\_VARS2)}
+\newcommand{\scanTableA}{SCAN\_TABLE1 (C12SCAN\_TABLE\_1)}
+\newcommand{\scanTableB}{SCAN\_TABLE2 (C12SCAN\_TABLE\_2)}
+\newcommand{\mapTable}{MAP\_TABLE (C14PHIST)}
+\newcommand{\phaseVars}{PHASE\_VARS (C11VD)}
+\newcommand{\phaseTable}{PHASE\_TABLE (C11PHA)}
+\newcommand{\corrModes}{BES\_CORR\_MODE (C12CM)}
+\newcommand{\bitmodes}{BES\_BITMODE (C12BM)}
+\newcommand{\sbOverlaps}{BES\_OVERLAP (C3OVERLAP)}
+\newcommand{\mixNums}{DAS\_MIXER (C3MIXNUM)}
+\newcommand{\BEInputChans}{BES\_CONN (C3BESCONN)}
+\newcommand{\BEConnChans}{BE\_IN\_CONN (C3BEINCON)}
+\newcommand{\BEChans}{NO\_BES\_O\_CH (C3LSPC)}
+\newcommand{\BESubsys}{BES\_SPECTRUM (C3BESSPEC)}
+\newcommand{\centreFreqs}{BES\_NUOBS (C12CF)}
+\newcommand{\restFreqs}{BES\_NUREST (C12RF)}
+\newcommand{\LOFreqs}{BES\_FE\_NULO (C3BEFENULO)}
+\newcommand{\totIFs}{BES\_TOT\_IF (C3BETOTIF)}
+\newcommand{\sbSigns}{BES\_FE\_SB\_SIGN (C3BEFESB)}
+\newcommand{\BEInputFreqs}{BE\_NUIN (C12INFREQ)}
+\newcommand{\freqRes}{BES\_DELTANU (C12FR)}
+\newcommand{\bandwidths}{BES\_BANDWIDTH (C12BW)}
+\newcommand{\recTemps}{BES\_T\_REC (C12RT)}
+\newcommand{\sourceSysTemps}{BES\_T\_SYS (C12SST)}
+\newcommand{\skyTemps}{BES\_T\_SKY (C12TSKY)}
+\newcommand{\telTemps}{BES\_T\_TEL (C12TTEL)}
+\newcommand{\gains}{BES\_GAIN (C12GAINS)}
+\newcommand{\caltemps}{BES\_T\_TEL (C12CT)}
+\newcommand{\opacities}{BES\_T\_TEL (C12WO)}
+\newcommand{\skyTrans}{BES\_ETA\_SKY (C12ETASKY)}
+\newcommand{\alphas}{BES\_ALPHA (C12ALPHA)}
+\newcommand{\sbGainNorms}{BES\_G\_S (C12GS)}
+\newcommand{\telTrans}{BES\_ETA\_TEL (C12ETATEL)}
+\newcommand{\FETSkyIm}{BES\_T\_SKY\_IM (C12TSKYIM)}
+\newcommand{\FESkyTrans}{BES\_ETA\_SKY\_IM (C12ETASKYIM)}
+\newcommand{\FETSysIm}{BES\_T\_SYS\_IM (C12TSYSIM)}
+\newcommand{\sbRatios}{BES\_TA\_SKY (C12TASKY)}
+\newcommand{\intTimes}{INTGRN\_TIME (C3INTT)}
+\newcommand{\data}{DATA (C13DAT)}
+\newcommand{\hotPower}{DAS\_HOT\_POWER (C55HOTPOWER)}
+\newcommand{\skyPower}{DAS\_SKY\_POWER (C55SKYPOWER)}
+\newcommand{\samples}{SAMPLES (C55SAM)}
+\newcommand{\totPower}{DAS\_POWER (C55POWER)}
+
+
+
+\begin{htmlonly}
+\newcommand{\telName}{TEL\_NAME (C1TEL)\ref{GSDVars:telName}}
+\newcommand{\project}{PROJECT (C1PID)\ref{GSDVars:project}}
+\newcommand{\projectObsA}{PROJECT\_OBS\_1 (C1OBS)\ref{GSDVars:projectObsA}}
+\newcommand{\projectObsB}{PROJECT\_OBS\_2 (C1ONA1)\ref{GSDVars:projectObsB}}
+\newcommand{\projectObsC}{PROJECT\_OBS\_3 (C1ONA2)\ref{GSDVars:projectObsC}}
+\newcommand{\objectA}{CENTRE\_NAME\_1 (C1SNA1)\ref{GSDVars:objectA}}
+\newcommand{\objectB}{CENTRE\_NAME\_2 (C1SNA2)\ref{GSDVars:objectB}}
+\newcommand{\centreCoords}{CENTRE\_COORDS (C4CSC)\ref{GSDVars:centreCoords}}
+\newcommand{\centreCode}{CENTRE\_CODE (C4CECO)\ref{GSDVars:centreCode}}
+\newcommand{\epochType}{EPOCH\_TYPE (C4EPT)\ref{GSDVars:epochType}}
+\newcommand{\centreMoving}{CENTRE\_MOVING (C4MCF)\ref{GSDVars:centreMoving}}
+\newcommand{\centreEpoch}{CENTRE\_EPOCH (C4EPH)\ref{GSDVars:centreEpoch}}
+\newcommand{\centreRARB}{CENTRE\_RA1950 (C4ERA)\ref{GSDVars:centreRARB}}
+\newcommand{\centreDecRB}{CENTRE\_DEC1950 (C4EDEC)\ref{GSDVars:centreDecRB}}
+\newcommand{\centreRA}{CENTRE\_RA (C4RADATE)\ref{GSDVars:centreRA}}
+\newcommand{\centreDec}{CENTRE\_DEC (C4DECDATE)\ref{GSDVars:centreDec}}
+\newcommand{\centreRARJ}{CENTRE\_RA2000 (C4RA2000)\ref{GSDVars:centreRARJ}}
+\newcommand{\centreDecRJ}{CENTRE\_DEC2000 (C4EDEC2000)\ref{GSDVars:centreDecRJ}}
+\newcommand{\centreGL}{CENTRE\_GL (C4GL)\ref{GSDVars:centreGL}}
+\newcommand{\centreGB}{CENTRE\_GB (C4GB)\ref{GSDVars:centreGB}}
+\newcommand{\centreAz}{CENTRE\_AZ (C4AZ)\ref{GSDVars:centreAz}}
+\newcommand{\centreEl}{CENTRE\_EL (C4EL)\ref{GSDVars:centreEl}}
+\newcommand{\cellCoords}{CELL\_COORDS (C4LSC)\ref{GSDVars:cellCoords}}
+\newcommand{\cellCode}{CELL\_CODE (C6FC)\ref{GSDVars:cellCode}}
+\newcommand{\cellUnit}{CELL\_UNIT (C4ODCO)\ref{GSDVars:cellUnit}}
+\newcommand{\cellX}{CELL\_X (C6DX)\ref{GSDVars:cellX}}
+\newcommand{\cellY}{CELL\_Y (C6DY)\ref{GSDVars:cellY}}
+\newcommand{\cellVX}{CELL\_V2X (C6MSA)\ref{GSDVars:cellVX}}
+\newcommand{\cellVY}{CELL\_V2Y (CELL\_V2Y)\ref{GSDVars:cellVY}}
+\newcommand{\cellXY}{CELL\_X2Y (C4AXY)\ref{GSDVars:cellXY}}
+\newcommand{\centreOffsetX}{CENTRE\_OFFSET\_X (C4SX)\ref{GSDVars:centreOffsetX}}
+\newcommand{\centreOffsetY}{CENTRE\_OFFSET\_Y (C4SY)\ref{GSDVars:centreOffsetY}}
+\newcommand{\referenceX}{REFERENCE\_X (C4RX)\ref{GSDVars:referenceX}}
+\newcommand{\referenceY}{REFERENCE\_Y (C4RY)\ref{GSDVars:referenceY}}
+\newcommand{\telHeight}{TEL\_HEIGHT (C1HGT)\ref{GSDVars:telHeight}}
+\newcommand{\telLongitude}{TEL\_LONGITUDE (C1LONG)\ref{GSDVars:telLongitude}}
+\newcommand{\telLatitude}{TEL\_LATITUDE (C1LAT)\ref{GSDVars:telLatitude}}
+\newcommand{\nObs}{NOBS (C1SNO)\ref{GSDVars:nObs}}
+\newcommand{\obsType}{OBS\_TYPE (C6ST)\ref{GSDVars:obsType}}
+\newcommand{\frontend}{FRONTEND (C1RCV)\ref{GSDVars:frontend}}
+\newcommand{\FEType}{FE\_TYPE (C1FTYP)\ref{GSDVars:FEType}}
+\newcommand{\backend}{BACKEND (C1BKE)\ref{GSDVars:backend}}
+\newcommand{\BEType}{BE\_TYPE (C1BTYP)\ref{GSDVars:BEType}}
+\newcommand{\obsUTd}{OBS\_UT1D (C3DAT)\ref{GSDVars:obsUTd}}
+\newcommand{\obsUTh}{OBS\_UT1H (C3UT)\ref{GSDVars:obsUTh}}
+\newcommand{\obsUTC}{OBS\_UT1C (C3UT1C)\ref{GSDVars:obsUTC}}
+\newcommand{\obsLST}{OBS\_LST (C3LST)\ref{GSDVars:obsLST}}
+\newcommand{\obsCalibration}{OBS\_CALIBRATION (C3CAL)\ref{GSDVars:obsCalibration}}
+\newcommand{\obsCentre}{OBS\_CENTRE (C3CEN)\ref{GSDVars:obsCentre}}
+\newcommand{\obsContinuous}{OBS\_CONTINUOUS (C3FLY)\ref{GSDVars:obsContinuous}}
+\newcommand{\obsFocus}{OBS\_FOCUS (C3FOCUS)\ref{GSDVars:obsFocus}}
+\newcommand{\obsMap}{OBS\_MAP (C3MAP)\ref{GSDVars:obsMap}}
+\newcommand{\nMapDims}{NO\_MAP\_DIMS (C3NPP)\ref{GSDVars:nMapDims}}
+\newcommand{\nMapPts}{NO\_MAP\_PNTS (C3NMAP)\ref{GSDVars:nMapPts}}
+\newcommand{\nMapPtsX}{NO\_X\_MAP\_PNTS (C6XNP)\ref{GSDVars:nMapPtsX}}
+\newcommand{\nMapPtsY}{NO\_Y\_MAP\_PNTS (C6YNP)\ref{GSDVars:nMapPtsY}}
+\newcommand{\mapStartX}{X\_MAP\_START (C6XGC)\ref{GSDVars:mapStartX}}
+\newcommand{\mapStartY}{Y\_MAP\_START (C6YGC)\ref{GSDVars:mapStartY}}
+\newcommand{\scanRev}{SCAN\_REVERSAL (C6REV)\ref{GSDVars:scanRev}}
+\newcommand{\obsDirection}{OBS\_DIRECTION (C6SD)\ref{GSDVars:obsDirection}}
+\newcommand{\mapPosX}{X\_MAP\_POSITIVE (C6XPOS)\ref{GSDVars:mapPosX}}
+\newcommand{\mapPosY}{Y\_MAP\_POSITIVE (C6YPOS)\ref{GSDVars:mapPosY}}
+\newcommand{\noScans}{NO\_SCANS (C3NIS)\ref{GSDVars:noScans}}
+\newcommand{\nScan}{NSCAN (C3NSAMPLE)\ref{GSDVars:nScan}}
+\newcommand{\nScanVarsA}{NO\_SCAN\_VARS1 (C3NO\_SCAN\_VARS1)\ref{GSDVars:nScanVarsA}}
+\newcommand{\nScanVarsB}{NO\_SCAN\_VARS2 (C3NO\_SCAN\_VARS2)\ref{GSDVars:nScanVarsB}}
+\newcommand{\scanTime}{SCAN\_TIME (C3SRT)\ref{GSDVars:scanTime}}
+\newcommand{\nScanPts}{NO\_SCAN\_PNTS (C3MXP)\ref{GSDVars:nScanPts}}
+\newcommand{\noCycles}{NO\_CYCLES (C3NCI)\ref{GSDVars:noCycles}}
+\newcommand{\nCycle}{NCYCLE (C3NCYCLE)\ref{GSDVars:nCycle}}
+\newcommand{\cycleTime}{CYCLE\_TIME (C3CL)\ref{GSDVars:cycleTime}}
+\newcommand{\noCyclePts}{NO\_CYCLE\_PNTS (C3NCP)\ref{GSDVars:noCyclePts}}
+\newcommand{\nCyclePts}{NCYCLE\_PNTS (C6NP)\ref{GSDVars:nCyclePts}}
+\newcommand{\nPhaseVars}{NO\_PHASE\_VARS (C3NSV)\ref{GSDVars:nPhaseVars}}
+\newcommand{\nPhases}{NO\_PHASES (C3PPC)\ref{GSDVars:nPhases}}
+\newcommand{\tamb}{TAMB (C5AT)\ref{GSDVars:tamb}}
+\newcommand{\pamb}{PAMB (C5PRS)\ref{GSDVars:pamb}}
+\newcommand{\hamb}{HAMB (C5RH)\ref{GSDVars:hamb}}
+\newcommand{\errAz}{SDIS(7) (C4AZERR)\ref{GSDVars:errAz}}
+\newcommand{\errEl}{SDIS(8) (C4ELERR)\ref{GSDVars:errEl}}
+\newcommand{\userAz}{SDIS(36) (UAZ)\ref{GSDVars:userAz}}
+\newcommand{\userEl}{SDIS(37) (UEL)\ref{GSDVars:userEl}}
+\newcommand{\nVRad}{SZVRAD (C7SZVRAD)\ref{GSDVars:nVRad}}
+\newcommand{\apertureEff}{APERTURE\_EFF (C8AAE)\ref{GSDVars:apertureEff}}
+\newcommand{\beamEff}{BEAM\_EFF (C8ABE)\ref{GSDVars:beamEff}}
+\newcommand{\antennaGain}{ANTENNA\_GAIN (C8GN)\ref{GSDVars:antennaGain}}
+\newcommand{\etal}{ETAL (C8EL)\ref{GSDVars:etal}}
+\newcommand{\etafss}{ETAFSS (C8EF)\ref{GSDVars:etafss}}
+\newcommand{\chopping}{CHOPPING (C4SM)\ref{GSDVars:chopping}}
+\newcommand{\chopWaveform}{WAVEFORM (C4FUN)\ref{GSDVars:chopWaveform}}
+\newcommand{\chopFrequency}{FREQUENCY (C4FRQ)\ref{GSDVars:chopFrequency}}
+\newcommand{\chopCoords}{COORDS (C4SMCO)\ref{GSDVars:chopCoords}}
+\newcommand{\chopThrow}{THROW (C4THROW)\ref{GSDVars:chopThrow}}
+\newcommand{\chopPA}{POSANG (C4POSANG)\ref{GSDVars:chopPA}}
+\newcommand{\smuOffsEW}{OFFS\_EW (C4OFFS\_EW)\ref{GSDVars:smuOffsEW}}
+\newcommand{\smuOffsNS}{OFFS\_NS (C4OFFS\_NS)\ref{GSDVars:smuOffsNS}}
+\newcommand{\smuX}{X (C4X)\ref{GSDVars:smuX}}
+\newcommand{\smuY}{Y (C4Y)\ref{GSDVars:smuY}}
+\newcommand{\smuZ}{Z (C4Z)\ref{GSDVars:smuZ}}
+\newcommand{\smuEWScale}{EW\_AMPL\_SCALE (C4EW\_SCALE)\ref{GSDVars:smuEWScale}}
+\newcommand{\smuNSScale}{NS\_AMPL\_SCALE (C4NS\_SCALE)\ref{GSDVars:smuNSScale}}
+\newcommand{\smuEWEnc}{AMPL\_E\_SET (C4EW\_ENCODER)\ref{GSDVars:smuEWEnc}}
+\newcommand{\smuNSEnc}{AMPL\_N\_SET (C4NS\_ENCODER)\ref{GSDVars:smuNSEnc}}
+\newcommand{\smuDX}{DX (C2FV)\ref{GSDVars:smuDX}}
+\newcommand{\smuDY}{DY (C2FL)\ref{GSDVars:smuDY}}
+\newcommand{\smuDZ}{DZ (C2FR)\ref{GSDVars:smuDZ}}
+\newcommand{\telCoords}{TEL\_COORDS (C4MOCO)\ref{GSDVars:telCoords}}
+\newcommand{\nFEChans}{NO\_FE\_O\_CH (C3NFOC)\ref{GSDVars:nFEChans}}
+\newcommand{\velocity}{VELOCITY (C7VR)\ref{GSDVars:velocity}}
+\newcommand{\tCold}{T\_COLD (C12TCOLD)\ref{GSDVars:tCold}}
+\newcommand{\tHot}{T\_HOT (C12TAMB)\ref{GSDVars:tHot}}
+\newcommand{\velDefn}{VEL\_DEFN (C12VDEF)\ref{GSDVars:velDefn}}
+\newcommand{\velRef}{VEL\_REF (C12VREF)\ref{GSDVars:velRef}}
+\newcommand{\nBEChansIn}{NO\_BE\_I\_CH (C3NRC)\ref{GSDVars:nBEChansIn}}
+\newcommand{\nBEChansOut}{NO\_BE\_O\_CH (C3NCH)\ref{GSDVars:nBEChansOut}}
+\newcommand{\nBESections}{NO\_BES (C3NRS)\ref{GSDVars:nBESections}}
+\newcommand{\badVal}{BAD\_CHANNEL (C7BCV)\ref{GSDVars:badVal}}
+\newcommand{\dataUnits}{DATA\_UNITS (C12CAL)\ref{GSDVars:dataUnits}}
+\newcommand{\swMode}{SWITCH\_MODE (C6MODE)\ref{GSDVars:swMode}}
+\newcommand{\calInstrument}{BE\_CAL\_TASK (C12CALTASK)\ref{GSDVars:calInstrument}}
+\newcommand{\calType}{BE\_CAL\_TYPE (C12CALTYPE)\ref{GSDVars:calType}}
+\newcommand{\calmode}{BE\_RED\_MODE (C12REDMODE)\ref{GSDVars:calmode}}
+\newcommand{\IFPerSection}{NO\_IF\_PER\_BES (C3NOIFPBES)\ref{GSDVars:IFPerSection}}
+\newcommand{\BEConfig}{DAS\_CONF\_NR (C3CONFIGNR)\ref{GSDVars:BEConfig}}
+\newcommand{\dataOutput}{DAS\_OUTPUT (C3DASOUTPUT)\ref{GSDVars:dataOutput}}
+\newcommand{\calSource}{DAS\_CAL\_SOURCE (C3DASCALSRC)\ref{GSDVars:calSource}}
+\newcommand{\shiftFrac}{DAS\_SHIFT\_FRAC (C3DASSHFTFRAC)\ref{GSDVars:shiftFrac}}
+\newcommand{\tauCSO}{CSO\_TAU (C7TAU225)\ref{GSDVars:tauCSO}}
+\newcommand{\tauRMS}{CSO\_TAU\_RMS (C7TAURMS)\ref{GSDVars:tauRMS}}
+\newcommand{\tauTime}{CSO\_YYMMDDHHMM (C7TAUTIME)\ref{GSDVars:tauTime}}
+\newcommand{\seeing}{SAO\_SEEING (C7SEEING)\ref{GSDVars:seeing}}
+\newcommand{\seeTime}{SAO\_YYMMDDHHMM (C7SEETIME)\ref{GSDVars:seeTime}}
+\newcommand{\polarity}{C3POLARITY (C3POLARITY)\ref{GSDVars:polarity}}
+\newcommand{\sbMode}{C3SBMODE (C3SBMODE)\ref{GSDVars:sbMode}}
+\newcommand{\IFONPhase}{DAS\_NO\_PHASE (C55NPH)\ref{GSDVars:IFONPhase}}
+\newcommand{\IFONCycle}{DAS\_NO\_CYCLES (C55NCYC)\ref{GSDVars:IFONCycle}}
+\newcommand{\IFONIntCycle}{DAS\_NINTCYCLE (C55NINT)\ref{GSDVars:IFONIntCycle}}
+\newcommand{\nCorrCycle}{DAS\_NCORRCYCLE (C55NCORR)\ref{GSDVars:nCorrCycle}}
+\newcommand{\procBits}{DAS\_PROC\_BITS (C55DASPRBIT)\ref{GSDVars:procBits}}
+\newcommand{\procLoc}{DAS\_PROC\_LOC (C55DASPRLOC)\ref{GSDVars:procLoc}}
+\newcommand{\RXJLengthX}{RXJ.LX (C55LX)\ref{GSDVars:RXJLengthX}}
+\newcommand{\RXJLengthY}{RXJ.LY (C55LY)\ref{GSDVars:RXJLengthY}}
+\newcommand{\RXJLengthZ}{RXJ.LZ (C55LZ)\ref{GSDVars:RXJLengthZ}}
+\newcommand{\RXJSin}{RXJ.A (C55A)\ref{GSDVars:RXJSin}}
+\newcommand{\RXJCos}{RXJ.B (C55B)\ref{GSDVars:RXJCos}}
+\newcommand{\RXJConstant}{RXJ.C (C55C)\ref{GSDVars:RXJConstant}}
+\newcommand{\RXJCSOSwitch}{RXJ.CSO\_SWITCH (C55CSOSW)\ref{GSDVars:RXJCSOSwitch}}
+\newcommand{\RXJJCMTSwitch}{RXJ.JCMT\_SWITCH (C55JCMTSW)\ref{GSDVars:RXJJCMTSwitch}}
+\newcommand{\RXJNSecs}{RXJ.NSECS (C55SECOND)\ref{GSDVars:RXJNSecs}}
+\newcommand{\CSOAbsorb}{RXJ.ABSORB (C55ABSORB)\ref{GSDVars:CSOAbsorb}}
+\newcommand{\CSOTAU}{RXJ.CSO\_TAU (C55TAU)\ref{GSDVars:CSOTAU}}
+\newcommand{\CSODAz}{RXJ.DAZ (C55DAZ)\ref{GSDVars:CSODAz}}
+\newcommand{\CSODEl}{RXJ.DEL (C55DEL)\ref{GSDVars:CSODEl}}
+\newcommand{\CSORA}{RXJ.RA (C55RA)\ref{GSDVars:CSORA}}
+\newcommand{\CSODec}{RXJ.DEC (C55DEC)\ref{GSDVars:CSODec}}
+\newcommand{\CSOEpoch}{RXJ.EPOCH (C55EPOCH)\ref{GSDVars:CSOEpoch}}
+\newcommand{\CSOPAz}{RXJ.PAZ (C55PAZ)\ref{GSDVars:CSOPAz}}
+\newcommand{\CSOPEl}{RXJ.PEL (C55PEL)\ref{GSDVars:CSOPEl}}
+\newcommand{\CSOTrack}{RXJ.TRACK (C55TRACK)\ref{GSDVars:CSOTrack}}
+\newcommand{\CSOFocus}{RXJ.FMODE (C55FMODE)\ref{GSDVars:CSOFocus}}
+\newcommand{\CSOFocusX}{RXJ.FX (C55FX)\ref{GSDVars:CSOFocusX}}
+\newcommand{\CSOFocusY}{RXJ.FY (C55FY)\ref{GSDVars:CSOFocusY}}
+\newcommand{\CSOFocusZ}{RXJ.FZ (C55FZ)\ref{GSDVars:CSOFocusZ}}
+\newcommand{\CSOVelocity}{RXJ.VLSR (C55VLSR)\ref{GSDVars:CSOVelocity}}
+\newcommand{\CSOVelOffset}{RXJ.COFF (C55VOFF)\ref{GSDVars:CSOVelOffset}}
+\newcommand{\CSORadVel}{RXJ.VRAD (C55VRAD)\ref{GSDVars:CSORadVel}}
+\newcommand{\CSOPhaseLock}{RXJ.PLOCK (C55PLOCK)\ref{GSDVars:CSOPhaseLock}}
+\newcommand{\CSORestFreq}{RXJ.RFREQ (C55RFREQ)\ref{GSDVars:CSORestFreq}}
+\newcommand{\CSOIFFreq}{RXJ.IFFREQ (C55IFFREQ)\ref{GSDVars:CSOIFFreq}}
+\newcommand{\CSOLOFreq}{RXJ.LOFREQ (C55LOFREQ)\ref{GSDVars:CSOLOFreq}}
+\newcommand{\CSOFreqOffset}{RXJ.FREQOFF (C55FREQOFF)\ref{GSDVars:CSOFreqOffset}}
+\newcommand{\CSOSideband}{RXJ.SIDEBAND (C55SIDEBAND)\ref{GSDVars:CSOSideband}}
+\newcommand{\CSOMultHarm}{RXJ.MHN (C55MHN)\ref{GSDVars:CSOMultHarm}}
+\newcommand{\CSOStatus}{RXJ.CSO\_STATUS (C55CSOSTATUS)\ref{GSDVars:CSOStatus}}
+\newcommand{\telAz}{TEL.SDIS(9) (C55TELAZ)\ref{GSDVars:telAz}}
+\newcommand{\telEl}{TEL.SDIS(10) (C55TELEL)\ref{GSDVars:telEl}}
+\newcommand{\FEFreqs}{FE\_NUOBS (C55FENUOBS)\ref{GSDVars:FEFreqs}}
+\newcommand{\FESBSigns}{FE\_SB\_SIGN (C55FESBSIGN)\ref{GSDVars:FESBSigns}}
+\newcommand{\FELOFreqs}{FE\_NULO (C55FENULO)\ref{GSDVars:FELOFreqs}}
+\newcommand{\vRadial}{C7VRADIAL (C7VRADIAL)\ref{GSDVars:vRadial}}
+\newcommand{\scanVarsA}{SCAN\_VARS1 (C12SCAN\_VARS1)\ref{GSDVars:scanVarsA}}
+\newcommand{\scanVarsB}{SCAN\_VARS2 (C12SCAN\_VARS2)\ref{GSDVars:scanVarsB}}
+\newcommand{\scanTableA}{SCAN\_TABLE1 (C12SCAN\_TABLE\_1)\ref{GSDVars:scanTableA}}
+\newcommand{\scanTableB}{SCAN\_TABLE2 (C12SCAN\_TABLE\_2)\ref{GSDVars:scanTableB}}
+\newcommand{\mapTable}{MAP\_TABLE (C14PHIST)\ref{GSDVars:mapTable}}
+\newcommand{\phaseVars}{PHASE\_VARS (C11VD)\ref{GSDVars:phaseVars}}
+\newcommand{\phaseTable}{PHASE\_TABLE (C11PHA)\ref{GSDVars:phaseTable}}
+\newcommand{\corrModes}{BES\_CORR\_MODE (C12CM)\ref{GSDVars:corrModes}}
+\newcommand{\bitmodes}{BES\_BITMODE (C12BM)\ref{GSDVars:bitmodes}}
+\newcommand{\sbOverlaps}{BES\_OVERLAP (C3OVERLAP)\ref{GSDVars:sbOverlaps}}
+\newcommand{\mixNums}{DAS\_MIXER (C3MIXNUM)\ref{GSDVars:mixNums}}
+\newcommand{\BEInputChans}{BES\_CONN (C3BESCONN)\ref{GSDVars:BEInputChans}}
+\newcommand{\BEConnChans}{BE\_IN\_CONN (C3BEINCON)\ref{GSDVars:BEConnChans}}
+\newcommand{\BEChans}{NO\_BES\_O\_CH (C3LSPC)\ref{GSDVars:BEChans}}
+\newcommand{\BESubsys}{BES\_SPECTRUM (C3BESSPEC)\ref{GSDVars:BESubsys}}
+\newcommand{\centreFreqs}{BES\_NUOBS (C12CF)\ref{GSDVars:centreFreqs}}
+\newcommand{\restFreqs}{BES\_NUREST (C12RF)\ref{GSDVars:restFreqs}}
+\newcommand{\LOFreqs}{BES\_FE\_NULO (C3BEFENULO)\ref{GSDVars:LOFreqs}}
+\newcommand{\totIFs}{BES\_TOT\_IF (C3BETOTIF)\ref{GSDVars:totIFs}}
+\newcommand{\sbSigns}{BES\_FE\_SB\_SIGN (C3BEFESB)\ref{GSDVars:sbSigns}}
+\newcommand{\BEInputFreqs}{BE\_NUIN (C12INFREQ)\ref{GSDVars:BEInputFreqs}}
+\newcommand{\freqRes}{BES\_DELTANU (C12FR)\ref{GSDVars:freqRes}}
+\newcommand{\bandwidths}{BES\_BANDWIDTH (C12BW)\ref{GSDVars:bandwidths}}
+\newcommand{\recTemps}{BES\_T\_REC (C12RT)\ref{GSDVars:recTemps}}
+\newcommand{\sourceSysTemps}{BES\_T\_SYS (C12SST)\ref{GSDVars:sourceSysTemps}}
+\newcommand{\skyTemps}{BES\_T\_SKY (C12TSKY)\ref{GSDVars:skyTemps}}
+\newcommand{\telTemps}{BES\_T\_TEL (C12TTEL)\ref{GSDVars:telTemps}}
+\newcommand{\gains}{BES\_GAIN (C12GAINS)\ref{GSDVars:gains}}
+\newcommand{\caltemps}{BES\_T\_TEL (C12CT)\ref{GSDVars:caltemps}}
+\newcommand{\opacities}{BES\_T\_TEL (C12WO)\ref{GSDVars:opacities}}
+\newcommand{\skyTrans}{BES\_ETA\_SKY (C12ETASKY)\ref{GSDVars:skyTrans}}
+\newcommand{\alphas}{BES\_ALPHA (C12ALPHA)\ref{GSDVars:alphas}}
+\newcommand{\sbGainNorms}{BES\_G\_S (C12GS)\ref{GSDVars:sbGainNorms}}
+\newcommand{\telTrans}{BES\_ETA\_TEL (C12ETATEL)\ref{GSDVars:telTrans}}
+\newcommand{\FETSkyIm}{BES\_T\_SKY\_IM (C12TSKYIM)\ref{GSDVars:FETSkyIm}}
+\newcommand{\FESkyTrans}{BES\_ETA\_SKY\_IM (C12ETASKYIM)\ref{GSDVars:FESkyTrans}}
+\newcommand{\FETSysIm}{BES\_T\_SYS\_IM (C12TSYSIM)\ref{GSDVars:FETSysIm}}
+\newcommand{\sbRatios}{BES\_TA\_SKY (C12TASKY)\ref{GSDVars:sbRatios}}
+\newcommand{\intTimes}{INTGRN\_TIME (C3INTT)\ref{GSDVars:intTimes}}
+\newcommand{\data}{DATA (C13DAT)\ref{GSDVars:data}}
+\newcommand{\hotPower}{DAS\_HOT\_POWER (C55HOTPOWER)\ref{GSDVars:hotPower}}
+\newcommand{\skyPower}{DAS\_SKY\_POWER (C55SKYPOWER)\ref{GSDVars:skyPower}}
+\newcommand{\samples}{SAMPLES (C55SAM)\ref{GSDVars:samples}}
+\newcommand{\totPower}{DAS\_POWER (C55POWER)\ref{GSDVars:totPower}}
+\end{htmlonly}
+
+
+
+
+
+
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
+   {\LARGE\textbf{\stardocversion \\ [4ex]}}
+   {\Huge\textbf{\stardocmanual}}
+   \end{center}
+   \vspace{5mm}
+
+% ? Add picture here if required for the LaTeX version.
+%   e.g. \includegraphics[scale=0.3]{filename.ps}
+% ? End of picture
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\textbf{Abstract}}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
+
+% ? Add picture here if required for the hypertext version.
+%   e.g. \includegraphics[scale=0.7]{filename.ps}
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory\ \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+
+% -----------------------------------------------------------------------------
+% ? Latex Copyright Statement
+%  =========================
+\begin{latexonly}
+\newpage
+\vspace*{\fill}
+\stardoccopyright
+\end{latexonly}
+% ? End of Latex copyright statement
+
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+  \newpage
+  \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \tableofcontents
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
+  \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+% ? Main text
+
+\section{\xlabel{introduction}Introduction}
+GSD2ACSIS has the task of mapping the GSD data, stored in headers and arrays, into the ACSIS format output file(s).  Due to the differences in the two file formats, there is not a one-to-one mapping between the two.  This document provides the mapping used to obtain the various headers and arrays found in the ACSIS format files, from those given in the GSD input file.
+
+\section{\xlabel{ACSIS_file_format}ACSIS File Format}
+ACSIS files use the \xref{NDF}{sun33} file format and consist of three primary extensions, the MORE extension (with the ACSIS, JCMTSTATE, and FITS extensions), the WCS extension (world coordinates of RA/Dec and frequency) and the data array.
+
+See the ACSIS File Format interface Control Document (\htmladdnormallink{OCS/ICD/022}{http://docs.jach.hawaii.edu/JCMT/OCS/ICD/022/ocs_icd_022.pdf}) for more details.
+
+\section{\xlabel{GSD_file_format}GSD File Format}
+The DAS and AOSC backends wrote files in the GSD file format.  GSD files contain lists of scalar and array data elements, prefaced by a prolog which describes the data and is used to retrieve it.  The Starlink GSD library contains routines for accessing the data within GSD format files.
+
+See \htmladdnormallink{GSD - Global Section Datafile System}{http://docs.jach.hawaii.edu/JCMT/MT/IN/033/mtin033.txt} and \xref{The Global Section Datafile(GSD) access library}{sun229} for more details.
+
+For a full list of scalar and array data stored in DAS and AOSC GSD files see the Appendix of this document.
+
+\section{\xlabel{ACSIS_extension}ACSIS NDF Extension}
+
+{\bf RECEPTORS}
+
+The receptors array contains the names of the frontend receptors.  These names can be determined by checking the name of the frontend and the number of receptors used.  The name of the frontend is stored in the \frontend{} header, and the number of receptors is determined from the values found in the \mixNums{} array.  Some GSD input files do not contain a \mixNums{} array.  In these cases, a guess at the number of receptors is made from examining the contents of the \centreFreqs{} array.  If the second half of the \centreFreqs{} array contains the same values as those found in the first half, it is likely that two receptors were used.
+
+The receptor naming convention used by GSD2ACSIS is to use a single letter name for single-receptor observations:
+
+\begin{itemize}
+\item {\bf Receptor RXA:} 'A'
+\item {\bf Receptor RXB:} 'B'
+\item {\bf Receptor RXW and \centreFreqs{} $<$ 600 :} 'C'
+\item {\bf Receptor RXW and \centreFreqs{} $>$ 600 :} 'D'
+\item {\bf Receptor MPI:} 'E'
+\end{itemize}
+
+For observations with two receptors, the single letter is followed by either 'A' or 'B' to indicate the different receptors (e.g. 'BA' and 'BB').
+
+{\bf FOCAL STATION}
+
+`DIRECT' (default).
+
+{\bf FPLANEX}
+
+0.0 (default).
+
+{\bf FPLANEY}
+
+0.0 (default).
+
+{\bf RECEPPOS\_SYS}
+
+The system for the receptor positions defaults to `TRACKING' except when the \cellCoords{} is `AZEL', in which case the RECEPPOS\_SYS is also `AZEL'.
+
+{\bf RECEPPOS}
+
+The absolute positions of the receptors are the tracking coordinates, and so the values for RECEPPOS are copied from TCS\_TR\_AC1 and TCS\_TR\_AC2.
+
+{\bf TSYS}
+
+For continuous calibration observations the \sourceSysTemps{} array contains temperatures for each backend section at each time step, for other observations this array contains one temperature per backend section.  In continuous calibration observations the TSYS for each receptor \& time step is the corresponding value from the \sourceSysTemps{} array, for other observations the values are copied for each time step.
+
+{\bf TRX}
+
+The receiver temperatures for each backend section are retrieved from the \recTemps{} array.
+
+\section{\xlabel{JCMTSTATE_extension}JCMTSTATE NDF Extension}
+
+The JCMTSTATE extension contains stores the timestep-specific data.
+
+{\bf RTS\_NUM}
+
+The RTS sequence number increments at each time step of the observation, beginning with RTS\_NUM = 1 for the first time step.  The total number of RTS steps is:
+\begin{equation} 
+NSCAN \times NO\_SCAN\_PNTS
+\end{equation}
+
+(\nScan, \nScanPts)
+
+{\bf RTS\_END}
+
+The GSD format files recorded one LST time for each time step, as well as a scan time.  Assuming that the recorded LSTs represent the middle of the time step, the RTS\_END can be calculated by adding half the length of the time step to the TCS\_TAI of this step (see below for TCS\_TAI calculation).
+
+For rasters, the \scanTime{} is the entire time for one raster across the sky, so the RTS\_END in this case is:
+\begin{equation}
+RTS\_END \,=\, TCS\_TAI \,\, + \,\, \left( SCAN\_TIME / \left( NO\_SCAN\_PNTS \times 2\right) \right)
+\end{equation}
+
+For grids, the RTS\_END is simply:
+\begin{equation}
+RTS\_END \,=\, TCS\_TAI \,\, + \,\, \left( SCAN\_TIME / 2 \right)
+\end{equation}
+
+(\scanTime, \nScanPts)
+
+{\bf RTS\_TASKS}
+
+For each time step this defaults to 'PTCS FE\_X DAS' where X is A, B, C, D or E depending on the frontend (see RECEPTORS in the ACSIS extension).
+
+{\bf SMU\_X, SMU\_Y, SMU\_Z}
+
+0.0 (default).
+
+{\bf SMU\_CHOP\_PHASE}
+
+'M' (default).
+
+{\bf SMU\_JIG\_INDEX}
+
+Set to VAL\_\_BADI (integer bad value).
+
+{\bf SMU\_AZ\_JIG\_X, SMU\_AZ\_JIG\_Y, SMU\_AZ\_CHOP\_X, SMU\_AZ\_CHOP\_Y, SMU\_TR\_JIG\_X, SMU\_TR\_JIG\_Y, SMU\_TR\_CHOP\_X, SMU\_TR\_CHOP\_Y}
+
+0.0 (default).
+
+{\bf TCS\_TAI}
+
+The TCS\_TAI records the TAI for each time step.  The GSD format files record the starting LST time, as well as the LST time for each time step (assumed to be the LST at the middle of the time step).  To calculate the TAI for each step, we first convert the starting LST to a TAI, then add the TAI time offset for each time step by converting the 'dLST' (difference between the LST of this step and the starting LST) to a TAI offset.
+
+To obtain the starting TAI, the following headers from the GSD file are used:
+
+\begin{itemize}
+\item \obsUTd: UT1 date of observation
+\item \obsUTh: UT1 hour of observation
+\item \obsUTC: UT1-UTC correction
+\item \telLongitude: telescope longitude
+\item \telLatitude: telescope latitude
+\end{itemize}
+
+The LSTs for each time step are stored in the \scanTableA{} array.
+
+For rasters, only the LST of the beginning of the scan is recorded in \scanTableA{}.  In this case, the 'dLST' can be calculated from the LST of the beginning of the scan, the total time for the scan (\scanTime{}) and the number of points in the scan (\nScanPts{}).  This assumes that the time between each spectrum in the scan is equal (scanning at a constant velocity).
+
+{\bf TCS\_AIRMAS}
+
+The airmass at each time step is determined from the elevation (TCS\_AZ\_AC1) using Hardie's (1962) polynomial fit to Bemporad's data for the relative air mass in units of thickness at the zenith as tabulated by Schoenberg (1929).
+
+{\bf TCS\_AZ\_ANG}
+
+The angle between PA=0 in the focal plane and PA=0 in AZEL defaults to 0.0 because all instruments are in the receiver cabin.
+
+{\bf TCS\_AZ\_AC1/TCS\_AZ\_AC2}
+
+The actual coordinates in AZEL are determined from the CELL setup of the GSD input file and the WCS Frameset which maps CELL offsets to RA/Dec and Az/El offsets (see WCS NDF Extension).
+
+{\bf TCS\_AZ\_DC1/TCS\_AZ\_DC2}
+
+The demand coordinates are assumed to be the same as the actual coordinates.
+
+{\bf TCS\_AZ\_BC1/TCS\_AZ\_BC2}
+
+The base coordinates are calculated as are the TCS\_AZ\_AC1 and TCS\_AZ\_AC2 above, but with an XY cell offset corresponding to the centre of the grid of cells (0,0).
+
+{\bf TCS\_BEAM}
+
+`M' (default).
+
+{\bf TCS\_INDEX}
+
+The index into the observing area for grids is the offset into the \mapTable{} of the current observation.  For rasters, the index increments at the beginning of each scan, so the value of TCS\_INDEX is the offset into the \mapTable{} divided by the number of points per scan.  TCS\_INDEX begins counting at 1.
+
+{\bf TCS\_SOURCE}
+
+`SCIENCE' (default).
+
+{\bf TCS\_TR\_SYS}
+
+The name of the tracking coordinate frame is identified by the GSD \centreCode and translated into a string representation of the coordinate system as follows:
+
+\begin{itemize}
+\item 1: 'AZEL'
+\item 3: 'HADEC' (Currently unsupported)
+\item 4: 'APP'
+\item 6: 'B1950'
+\item 7: 'J2000'
+\item 8: 'GAL'
+\end{itemize}
+
+{\bf TCS\_TR\_ANG}
+
+The angle between the focal plane and PA=0 and PA=0 in the tracking coordinate frame is calculated as follows:
+
+\begin{equation}
+SQSZ \,=\, \cos(PHI)\times\sin(HA)
+\end{equation}
+
+\begin{equation}
+CQSZ \,=\, \sin(PHI)\times\cos(DEC) - \cos(PHI)\times\sin(DEC)\times\cos(HA)
+\end{equation}
+
+If both SQSZ and CQSZ are equal to 0, then CQSZ is set to 1.  Then,
+
+\begin{equation}
+TCS\_TR\_ANG \,=\, \arctan(SQSZ/CQSZ)
+\end{equation}
+
+{\bf TCS\_TR\_AC1/TCS\_TR\_AC2}
+
+The actual coordinates in RA/Dec are determined from the CELL setup of the GSD input file and the WCS Frameset which maps CELL offsets to RA/Dec and Az/El offsets (see WCS NDF Extension).
+
+{\bf TCS\_TR\_DC1/TCS\_TR\_DC2}
+
+The demand coordinates are assumed to be the same as the actual coordinates.
+
+{\bf TCS\_TR\_BC1/TCS\_TR\_BC2}
+
+The base coordinates are calculated as are the TCS\_TR\_AC1 and TCS\_TR\_AC2 above, but with an XY cell offset corresponding to the centre of the grid of cells (0,0).
+
+{\bf JOS\_DRCONTROL}
+
+0 (default).
+
+{\bf ENVIRO\_REL\_HUM}
+
+The relative humidity is assumed to be equal to the value stored in \hamb.
+
+{\bf ENVIRO\_PRESSURE}
+
+The relative humidity is assumed to be equal to the value stored in \pamb.
+
+{\bf ENVIRO\_AIR\_TEMP}
+
+The air temperature is assumed to be equal to the value stored in \tamb.
+
+{\bf ACS\_SOURCE\_RO}
+
+'SPECTRUM\_RESULT' (default).
+
+{\bf ACS\_NO\_PREV\_REF, ACS\_NO\_NEXT\_REF, ACS\_NO\_ONS}
+
+Set to VAL\_\_BADI (integer bad value).
+
+{\bf ACS\_EXPOSURE}
+
+The on-source integration times for rasters is given by:
+
+\begin{equation}
+ACS\_EXPOSURE \,=\, SCAN\_TIME / NO\_SCAN\_PNTS
+\end{equation}
+
+(\scanTime, \nScanPts)
+
+For other observations, the \intTimes{} array stores integration times for each time step.
+
+{\bf ACS\_OFFEXPOSURE}
+
+The off-source integration times for rasters is given by:
+
+\begin{equation}
+ACS\_OFFEXPOSURE \,=\, ACS\_EXPOSURE\times\sqrt{NO\_SCAN\_PNTS}
+\end{equation}
+
+(\nScanPts)
+
+For other observations, the ACS\_OFFEXPOSURE time is equal to the ACS\_EXPOSURE time.
+
+{\bf POL\_ANG}
+
+Set to VAL\_\_BADD (float bad value).
+
+{\bf FE\_LOFREQ}
+
+The frontend LO frequencies for each subband are stored in the \LOFreqs{} array.
+
+{\bf FE\_DOPPLER}
+
+The rest frequencies, LO frequencies and IF for each subband are stored in the \restFreqs, \LOFreqs, and \totIFs{} arrays, respectively.  From these, the frontend doppler correction can be calculated:
+
+\begin{equation}
+FE\_DOPPLER \,=\, REST\_FREQ / \left(LOFREQ + TOT\_IF\right)
+\end{equation}
+
+\section{\xlabel{FITS_headers}FITS headers}
+
+The FITS headers give additional information about the observation required for ORAC-DR to reduce the data.  In many cases there is an equivalent header in the original GSD data file.
+
+\subsection{\xlabel{FITS_Telescope}Telescope Specific}
+
+{\bf TELESCOP}
+
+\telName.
+
+{\bf ORIGIN}
+
+'Joint Astronomy Centre' (default).
+
+{\bf OBSGEO-X, OBSGEO-Y, OBSGEO-Z}
+
+The cartesian coordinates of the telescope are calculated using the values stored in \telLatitude, \telLongitude, and \telHeight.
+
+{\bf ALT-OBS}
+
+Convert \telHeight{} from km to m.
+
+{\bf LAT-OBS}
+
+\telLatitude.
+
+{\bf LONG-OBS}
+
+\telLongitude.
+
+{\bf ETAL}
+
+Convert \etal{} from percentage to decimal.
+
+\subsection{\xlabel{FITS_OMP_ORACDR}OMP and ORAC-DR Specific}
+
+{\bf PROJECT}
+
+\project.
+
+{\bf RECIPE}
+
+'REDUCE\_SCIENCE' (default).
+
+{\bf DRGROUP}
+
+AST\_\_UNDEFS (string bad value).
+
+{\bf MSBID}
+
+AST\_\_UNDEFS (string bad value).
+
+{\bf SURVEY}
+
+AST\_\_UNDEFS (string bad value).
+
+{\bf RMTAGENT}
+
+AST\_\_UNDEFS (string bad value).
+
+{\bf AGENTID}
+
+AST\_\_UNDEFS (string bad value).
+
+\subsection{\xlabel{FITS_Observation_Date_Pointing}Observation, Date and Pointing Specific}
+
+{\bf OBSID}
+
+The OBSID is generated using the \backend{} header, the observation number, and the date of the observation.  For observations after February 2nd, 2003, the observation number found in the GSD file's \nObs{} header can be used, prior to this date the user provides the observation number as an input to GSD2ACSIS (see OBSNUM).  The date of the observation provided by \obsUTd{} and \obsUTh{} headers are stored in UT1 time and must be converted to UTC time using \obsUTC.
+
+{\bf OBSIDSS}
+
+The OBSIDSS header simply appends the subsystem number to the OBSID.
+
+{\bf OBJECT}
+
+GSD files store two strings for the source name: \objectA{} and \objectB.  These two names are concatenated to produce the OBJECT header.  
+
+{\bf STANDARD}
+
+The STANDARD flag indicates whether or not the observation was of a spectral line standard.  The OBJECT name is compared with a lookup table of standards to determine if STANDARD is true.
+
+{\bf OBSNUM}
+
+Prior to Feb 2nd, 2003, observation numbers were assigned to individual projects which could span several nights, and data files are stored in subdirectories according to project name.  After Feb 2nd, 2003, observation numbers changed from night to night, and data files are stored in subdirectories by date.  The observation number for data collected prior to Feb 2nd, 2003 should be determined from the project name and date, and must be supplied as a user input to GSD2ACSIS, whereas for later observations the GSD file's \nObs{} header can be used.
+
+{\bf NSUBSCAN}
+
+For longer observations split over several files, the NSUBSCAN would represent this file's place in the sequence of data.  For GSD2ACSIS converted files we would expect this number to always be 1 as only one output file per subsystem would be written. 
+
+{\bf OBSEND}
+
+The OBSEND flag indicates whether or not the file is the last in the current observation.  For GSD2ACSIS converted files we would expect this number to always be 1 as only one output file per subsystem would be written.
+
+{\bf UTDATE}
+
+The UTDATE is a 8 digit integer represnting the UT date of the observation in YYYYMMDD format.  It is obtained from the \obsUTd{} header.
+
+{\bf DATE-OBS}
+
+The DATE-OBS header is a string representation of the UTC datetime of the start of the observation in the format YYYY-MM-DDTHH:MM:SS (eg. 2004-01-01T01:01:01).  
+The GSD \obsUTd{} and \obsUTh{} headers are used to create the DATE-OBS header, but as these GSD headers are in UT1 time, the \obsUTC{} header is used to convert to a UTC datetime.
+
+{\bf DATE-END}
+
+The DATE-END is derived by adding the length of the observation to the DATE-OBS.  The observation length is estimated by finding the difference between the recorded LSTs of the first and last time steps in the \scanTableA{} array.
+
+{\bf DUT1}
+
+\obsUTC.
+
+{\bf INSTAP}
+
+AST\_\_UNDEFS (string bad value).  
+
+**NOTE: Possibly this should be the same as the value stored in REFRECEP.
+
+{\bf INSTAP\_X}
+
+0.0 (default).
+
+{\bf INSTAP\_Y}
+
+0.0 (default).
+
+{\bf AMSTART}
+
+The airmass at observation start corresponds to the JCMTSTATE TCS\_AIRMAS of the first time step.
+
+{\bf AMEND}
+
+The airmass at observation end corresponds to the JCMTSTATE TCS\_AIRMAS of the last time step.
+
+{\bf AZSTART}
+
+The azimuth at observation start corresponds to the JCMTSTATE TCS\_AZ\_AC1 of the first time step.
+
+{\bf AZEND}
+
+The azimuth at observation end corresponds to the JCMTSTATE TCS\_AZ\_AC1 of the last time step.
+
+{\bf ELSTART}
+
+The elevation at observation start corresponds to the JCMTSTATE TCS\_AZ\_AC2 of the first time step.
+
+{\bf ELEND}
+
+The elevation at observation end correspond to the JCMTSTATE TCS\_AZ\_AC2 of the last time step.
+
+{\bf HSTSTART}
+
+The HST at observation start is simply the DATE-OBS converted to HST.
+
+{\bf HSTEND}
+
+The HST at observation end is simply the DATE-END converted to HST.
+
+{\bf LSTSTART}
+
+The LST of the start of the observation is the first LST stored in the \scanTableA.
+
+{\bf LSTEND}
+
+The LST of the end of the observation is the last LST stored in the \scanTableA.
+
+\subsection{\xlabel{FITS_Integration_Time}Integration Time Specific}
+
+{\bf INT\_TIME}
+
+For rasters, the total integration time is the time per scan, \scanTime{} multiplied by the number of complete scans, \nScan.  For other observations, the total integration time is the sum of the integration times found in the \intTimes{} array.
+
+\subsection{\xlabel{FITS_ACSIS}ACSIS Specific}
+
+{\bf BACKEND}
+
+\backend.
+
+{\bf MOLCULE, TRANSITI}
+
+The MOLECULE and TRANSITI headers are found by comparing the rest frequency against a lookup table of molecular transition lines.
+
+{\bf DRRECIPE}
+
+AST\_\_UNDEFS (string bad value).
+
+{\bf BWMODE}
+
+The bandwidth mode takes the format '$<$BANDWIDTH$>$MHzx$<$CHANNELS$>$' (e.g. '250MHzx2048') where BANDWIDTH is the value for this subsystem in the \bandwidths{} array, and CHANNELS is the value for this subsystem in the \BEChans{} array.
+
+{\bf SUBSYSNR}
+
+The number of the current subsystem.
+
+{\bf SUBBANDS}
+
+Same as BWMODE.
+
+{\bf NSUBBAND}
+
+1 (default).
+
+{\bf SUBREFP1}
+
+Same as REFCHAN (see below).
+
+{\bf SUBREFP2}
+
+AST\_\_UNDEFF (float bad value).
+
+{\bf NCHNSUBS}
+
+The number of channels for this subband in the \BEChans{} array.
+
+{\bf REFCHAN}
+
+The reference channel is calculated as follows:
+\begin{equation}
+REFCHAN \,=\, \left( NUMCHANNELS / 2 \right) \,\, + \,\, \left( \left( IF \,\, - \,\, TOTIF \right) / \left( |FREQ\_RESOLUTION| / 1000.0 \right) \right);
+\end{equation}
+
+where NUMCHANNELS, TOTIF, and FREQ\_RESOLUTION are the values for this subband in the \BEChans, \totIFs{} and \freqRes{} arrays, respectively, and IF is as defined in IFFREQ below.
+
+{\bf IFCHANSP}
+
+Value from the \freqRes{} array for this subband.
+
+{\bf FFT\_WIN}
+
+'truncate' (string bad value).
+
+{\bf BEDEGFAC}
+
+For the DAS backend, BEDEGFAC is 1.15, for AOSC it is 1.0.
+
+{\bf MSROOT}
+
+AST\_\_UNDEFS (string bad value).
+
+\subsection{\xlabel{FITS_Frontend}Front End Specific}
+
+{\bf INSTRUME}
+
+\frontend{}.
+
+**NOTE: Receiver RxG is not currently supported by GSD2ACSIS.
+
+{\bf SB\_MODE}
+
+\sbMode.
+
+{\bf IFFREQ}
+
+The IF for special observations for each group of subbands to be merged is defined to be the average of the values in the \totIFs{} array for those subbands.  **NOTE** currently GSD2ACSIS treats each subband in a special observation separately and so each subband uses its corresponding value in \totIFs{} for its IF.  For non-special observations, the IF is 4.0 GHz, with the exception of the MRI frontend which used an IF of 3.5 GHz.
+
+{\bf N\_MIX}
+
+The number of mixers can be determined from the frontend.  For RxB and RxW frontends, the N\_MIX is 2, for all others N\_MIX is 1.
+
+{\bf OBS\_SB}
+
+If the sideband sign found in the \sbSigns{} array for this subband is positive, OBS\_SB = 'USB', otherwise OBS\_SB = 'LSB'.
+
+{\bf LOFREQS, LOFREQE}
+
+The value found in the \LOFreqs{} array for this subband.
+
+Because the GSD data does not record both a starting and ending LO frequency, the same value is used for LOFREQE as for LOFREQS.
+
+{\bf RECPTORS}
+
+Receptor names come from the name of the FRONTEND, and the mixers used in the observation as listed for each subband in the \mixNums{} array.  All receptors used in the observation are listed in a comma separated list in RECEPTORS (eg. 'BA, BB' would indicate that both receptors of an RXB frontend were used).
+
+**NOTE: Receiver RxG is not currently supported by GSD2ACSIS.
+
+{\bf REFRECEP}
+
+REFRECEP is the first of the receptors listed in RECPTORS.
+
+{\bf MEDTSYS}
+
+For sample observations, MEDTSYS is AST\_\_UNDEFF (float bad value), for all other observations it is the value stored in the \sourceSysTemps{} array for this subsystem.
+
+{\bf TEMPSCAL}
+
+'TA*' (default).
+
+{\bf DOPPLER}
+
+\velDefn.
+
+{\bf SSYSOBS}
+
+'TOPOCENT' (default).
+
+\subsection{\xlabel{FITS_Environment}Environment Specific}
+
+{\bf ATSTART, ATEND}
+
+\tamb.
+
+Because the GSD data does not record both a starting and ending air temperature, the same value is used for ATEND as for ATSTART.
+
+{\bf HUMSTART, HUMEND}
+
+\hamb.
+
+Because the GSD data does not record both a starting and ending relative humidity, the same value is used for HUMEND as for HUMSTART.
+
+{\bf BPSTART, BPEND}
+
+\pamb.
+
+**NOTE: GSD files state that \pamb{} is in units of mmHg, although it is actually in mbar, so no conversion is required.
+
+Because the GSD data does not record both a starting and ending air pressure, the same value is used for BPEND as for BPSTART.
+
+{\bf WNDSPDST}
+
+AST\_\_UNDEFF (float bad value).
+
+{\bf WNDSPDEN}
+
+AST\_\_UNDEFF (float bad value).
+
+{\bf WNDDIRST}
+
+AST\_\_UNDEFF (float bad value).
+
+{\bf WNDDIREN}
+
+AST\_\_UNDEFF (float bad value).
+
+{\bf TAU225ST, TAU225EN}
+
+\tauCSO.
+
+Because the GSD data does not record both a starting and ending TAU225 value, the same value is used for TAU225EN as for TAU225ST.
+
+{\bf TAUDATST, TAUDATEN}
+
+\tauTime.
+
+Because the GSD data does not record both a starting and ending TAU225 value, the same value is used for TAUDATEN as for TAUDATST.
+
+{\bf TAUSRC}
+
+'CSO225GHZ' (default).
+
+{\bf WVMTAUST}
+
+AST\_\_UNDEFF (float bad value).
+
+{\bf WVMTAUEN}
+
+AST\_\_UNDEFF (float bad value).
+
+{\bf WVMDATST}
+
+AST\_\_UNDEFF (float bad value).
+
+{\bf WVMDATEN}
+
+AST\_\_UNDEFF (float bad value).
+
+{\bf SEEINGST, SEEINGEN}
+
+\seeing.
+
+Because the GSD data does not record both a starting and ending seeing, the same value is used for SEEINGEN as for SEEINGST.
+
+{\bf SEEDATST, SEEDATEN}
+
+\seeTime.
+
+Because the GSD data does not record both a starting and ending seeing, the same value is used for SEEINGEN as for SEEINGST.
+
+{\bf FRLEGTST}
+
+AST\_\_UNDEFF (float bad value).
+
+{\bf FRLEGTEN}
+
+AST\_\_UNDEFF (float bad value).
+
+{\bf BKLEGTST}
+
+AST\_\_UNDEFF (float bad value).
+
+{\bf BKLEGTEN}
+
+AST\_\_UNDEFF (float bad value).
+
+\subsection{\xlabel{FITS_Switching_Mapping}Switching and Mapping Details}
+
+{\bf SAM\_MODE}
+
+If the GSD header \obsType{} is 'RASTER', SAM\_MODE is 'raster'.  If \obsType{} is 'SAMPLE', SAM\_MODE is 'sample'.  In all other cases, SAM\_MODE is 'grid'.
+
+{\bf SW\_MODE}
+
+The Switch Mode header is generated by checking the following GSD headers:
+
+\swMode\\
+\chopping\\
+\referenceX\\
+\referenceY
+
+\begin {center}
+
+\begin{latexonly}
+\begin {tabular}{|p{45mm}|p{15mm}|p{25mm}|p{20mm}|p{41mm}|}
+\hline
+\textit{C6MODE} & \textit{C4SM} & \textit{C4RX = C4RY = 0} & \textit{SW\_MODE} & \textit{Warnings}\\
+\hline'POSITION\_SWITCH' & TRUE & TRUE & 'freq' & -\\
+\hline'POSITION\_SWITCH' & TRUE & FALSE & 'pssw' & -\\
+\hline'POSITION\_SWITCH' & FALSE & TRUE & 'freq' & 'Likely intended to be a frequency switch.'\\
+\hline'POSITION\_SWITCH' & FALSE & FALSE & 'pssw' & -\\
+\hline'BEAMSWITCH' & TRUE & TRUE/FALSE & 'chop' & -\\
+\hline'BEAMSWITCH' & FALSE & TRUE/FALSE & 'none' & 'May be an error.'\\
+\hline'CHOPPING' & TRUE & TRUE/FALSE & 'freq' & 'May be a misconfigured frequency switch.'\\
+\hline'CHOPPING' & FALSE & TRUE/FALSE & 'freq' & -\\
+\hline'NO\_SWITCH' & TRUE & TRUE/FALSE & 'none' & 'May be an error.'\\
+\hline'NO\_SWITCH' & FALSE & TRUE/FALSE & 'none' & -\\
+\hline
+\end {tabular}
+\end{latexonly}
+
+\begin{htmlonly}
+\begin {tabular}{||l|l|l|l|l||}
+\hline
+\textit{C6MODE} & \textit{C4SM} & \textit{C4RX = C4RY = 0} & \textit{SW\_MODE} & \textit{Warnings}\\
+\hline
+'POSITION\_SWITCH' & TRUE & TRUE & 'freq' & -\\
+'POSITION\_SWITCH' & TRUE & FALSE & 'pssw' & -\\
+'POSITION\_SWITCH' & FALSE & TRUE & 'freq' & 'Likely intended to be a frequency switch.'\\
+'POSITION\_SWITCH' & FALSE & FALSE & 'pssw' & -\\
+'BEAMSWITCH' & TRUE & TRUE/FALSE & 'chop' & -\\
+'BEAMSWITCH' & FALSE & TRUE/FALSE & 'none' & 'May be an error.'\\
+'CHOPPING' & TRUE & TRUE/FALSE & 'freq' & 'May be a misconfigured frequency switch.'\\
+'CHOPPING' & FALSE & TRUE/FALSE & 'freq' & -\\
+'NO\_SWITCH' & TRUE & TRUE/FALSE & 'none' & 'May be an error.'\\
+'NO\_SWITCH' & FALSE & TRUE/FALSE & 'none' & -\\
+
+\hline
+\end {tabular}
+\end{htmlonly}
+
+\end {center}
+
+
+{\bf SKYREFX}
+
+SKYREFX takes the form '[OFFSET] $<$REFX$>$ [LOCL\_CRD]' (eg. [OFFSET] 180 [J2000]') where REFX is the value found in \referenceX{} and LOCL\_CRD is the value from the FITS LOCL\_CRD header.
+
+{\bf SKYREFY}
+
+SKYREFY takes the form '[OFFSET] $<$REFY$>$ [LOCL\_CRD]' (eg. [OFFSET] 0 [J2000]') where REFY is the value found in \referenceY{} and LOCL\_CRD is the value from the FITS LOCL\_CRD header.
+
+{\bf OBS\_TYPE}
+
+If the GSD \obsType{} is 'FIVEPOINT', the ACSIS OBS\_TYPE is 'pointing'.  If the GSD \obsType is 'FOCUS', the ACSIS OBS\_TYPE is 'focus'.  For all other observations, the ACSIS OBS\_TYPE is 'science'.
+
+{\bf The following 4 headers are only defined for observations where SAM\_MODE is 'grid' and SW\_MODE is either 'chop' or 'sample'. }
+
+{\bf CHOP\_CRD}
+
+The name of the chopping coordinate is translated to the modern name from the value stored in \chopCoords.
+
+\begin{itemize}
+\item 'AZ': 'AZEL'
+\item 'EQ': 'HADEC'
+\item 'RB': 'B1950'
+\item 'RJ': 'J2000'
+\item 'RD': 'APP'
+\item 'GA': 'GAL'
+\end{itemize}
+
+{\bf CHOP\_FRQ}
+
+\chopFrequency.
+
+{\bf CHOP\_PA}
+
+\chopPA.
+
+{\bf CHOP\_THR}
+
+\chopThrow.
+
+{\bf ROT\_CRD}
+
+AST\_\_UNDEFS (string bad value).
+
+{\bf ROT\_PA}
+
+AST\_\_UNDEFF (float bad value).
+
+{\bf JIGL\_CNT}
+
+AST\_\_UNDEFI (integer bad value).
+
+{\bf JIGL\_NAM}
+
+AST\_\_UNDEFS (string bad value).
+
+{\bf JIG\_PA}
+
+AST\_\_UNDEFF (float bad value).
+
+{\bf JIG\_CRD}
+
+AST\_\_UNDEFS (string bad value).
+
+{\bf JIG\_SCAL}
+
+AST\_\_UNDEFF (float bad value).
+
+{\bf The following 11 headers are only defined for observations where SAM\_MODE is 'raster' and SW\_MODE is 'pssw'. }
+
+{\bf MAP\_HGHT}
+
+The map height is:
+
+\begin{equation} 
+MAP\_HGHT \,=\, NO\_X\_MAP\_PNTS \times CELL\_X
+\end{equation}
+
+(\nMapPtsX, \cellX)
+
+{\bf MAP\_PA}
+
+The MAP\_PA is defined to be the SCAN\_PA - 90.0$^{\circ}$.
+
+{\bf MAP\_WDTH}
+
+The map width is:
+
+\begin{equation} 
+MAP\_WDTH \,=\, NO\_Y\_MAP\_PNTS \times CELL\_Y
+\end{equation}
+
+(\nMapPtsY, \cellY)
+
+{\bf LOCL\_CRD}
+
+The name of the local offset coordinate frame is identified by the GSD \cellCode{} and translated into the modern name:
+
+\begin{itemize}
+\item 1: 'AZEL'
+\item 3: 'HADEC' (Currently unsupported)
+\item 4: 'APP'
+\item 6: 'B1950'
+\item 7: 'J2000'
+\item 8: 'GAL'
+\end{itemize}
+
+{\bf MAP\_X}
+
+\centreOffsetX.
+
+{\bf MAP\_Y}
+
+\centreOffsetY.
+
+{\bf SCAN\_CRD}
+
+Same as LOCL\_CRD.
+
+{\bf SCAN\_VEL}
+
+For observations where the \obsDirection{} is 'HORIZONTAL', the SCAN\_VEL is:
+
+\begin{equation} 
+SCAN\_VEL \,=\, CELL\_X \times NO\_X\_MAP\_PNTS / SCAN\_TIME
+\end{equation}
+
+For observations where the \obsDirection{} is 'VERTICAL', the SCAN\_VEL is:
+
+\begin{equation} 
+SCAN\_VEL \,=\, CELL\_Y \times NO\_Y\_MAP\_PNTS / SCAN\_TIME
+\end{equation}
+
+(\cellX, \cellY, \nMapPtsX, \nMapPtsY, \scanTime)
+
+{\bf SCAN\_DY}
+
+For observations where the \obsDirection{} is 'HORIZONTAL', the SCAN\_DY is \cellY.
+For observations where the \obsDirection{} is 'VERTICAL', the SCAN\_DY is \cellX.
+
+{\bf SCAN\_PA}
+
+\cellVX.
+
+{\bf SCAN\_PAT}
+
+If \scanRev{} is 1 (true), SCAN\_PAT is 'BOUSTROPHEDON', otherwise SCAN\_PAT is 'RASTER'.
+
+\subsection{\xlabel{FITS_SMU}Secondary Mirror Specific}
+
+{\bf ALIGN\_DX}
+
+\smuDX.
+
+{\bf ALIGN\_DY}
+
+ \smuDY.
+
+{\bf FOCUS\_DZ}
+
+\smuDZ.
+
+{\bf DAZ}
+
+\smuOffsEW.
+
+{\bf DEL}
+
+\smuOffsNS.
+
+{\bf UAZ}
+
+\userAz.
+
+{\bf UEL}
+
+\userEl.
+
+\subsection{\xlabel{FITS_JOS}JOS Parameters}
+
+{\bf STEPTIME}
+
+For observations where SAM\_MODE is 'raster' and \obsDirection{} is 'HORIZONTAL', STEPTIME is:
+
+\begin{equation} 
+STEPTIME \,=\,SCAN\_TIME / NO\_X\_MAP\_PNTS
+\end{equation}
+
+For observations where SAM\_MODE is 'raster' and \obsDirection{} is 'VERTICAL', STEPTIME is:
+
+\begin{equation} 
+STEPTIME \,=\, SCAN\_TIME / NO\_Y\_MAP\_PNTS
+\end{equation}
+
+For all other observations, STEPTIME is \scanTime{}.
+
+(\scanTime, \nMapPtsX, \nMapPtsY)
+
+{\bf NUM\_CYC}
+
+\nCycle.
+
+{\bf NUM\_NODS}
+
+1 (default).
+
+{\bf JOS\_MULT}
+
+AST\_\_UNDEFI (integer bad value).
+
+{\bf JOS\_MIN}
+
+For observations where SAM\_MODE is 'sample', JOS\_MIN is \nScan.  For all other observations, JOS\_MIN is 1.
+
+{\bf NCALSTEP}
+
+AST\_\_UNDEFI (integer bad value).
+
+{\bf NREFSTEP}
+
+When \obsContinuous{} is 1, NREFSTEP is calculated as follows:
+
+\begin{equation}
+NREFSTEP \,=\, \sqrt{NO\_SCAN\_PNTS} \times SCANTIME / NO\_SCAN\_PNTS
+\end{equation}
+
+For all other observations, NREFSTEP is the value found in \scanTime.
+
+(\nScanPts, \scanTime)
+
+{\bf STBETREF}
+
+If SW\_MODE is 'chop', STBETREF is undefined (AST\_\_UNDEFI).
+
+When \obsContinuous{} is 1, STBETREF is \nScanPts{}.  For all other observations, STBETREF is 1.
+
+{\bf STBETCAL}
+
+AST\_\_UNDEFI (integer bad value).
+
+{\bf STARTIDX}
+
+For observations where SAM\_MODE is 'sample' or 'raster', STARTIDX is 1.  In 'grid' observations, the STARTIDX is the index into the grid of the first pair of coordinates found in the \mapTable{}.  
+
+{\bf FOCAXIS}
+
+AST\_\_UNDEFS (string bad value).
+
+{\bf NFOCSTEP}
+
+AST\_\_UNDEFI (integer bad value).
+
+{\bf FOCSTEP}
+
+AST\_\_UNDEFF (float bad value).
+
+\subsection{\xlabel{FITS_Miscellaneous}Miscellaneous}
+
+{\bf OCSCFG}
+
+AST\_\_UNDEFS (string bad value).
+
+{\bf SIMULATE}
+
+0 (default).
+
+{\bf SIM\_CORR}
+
+0 (default).
+
+{\bf SIM\_SMU}
+
+0 (default).
+
+{\bf SIM\_TCS}
+
+0 (default).
+
+{\bf SIM\_RT}
+
+0 (default).
+
+{\bf SIM\_IF}
+
+0 (default).
+
+{\bf STATUS}
+
+'NORMAL' (default).
+
+\subsection{\xlabel{FITS_ROVER}ROVER Polarimeter Specific}
+
+{\bf POL\_CONN}
+
+0 (default).
+
+{\bf POL\_MODE}
+
+AST\_\_UNDEFS (string bad value).
+
+{\bf ROTAFREQ}
+
+AST\_\_UNDEFF (float bad value).
+
+{\bf POL\_CRD}
+
+AST\_\_UNDEFS (string bad value).
+
+{\bf POLFAXIS}
+
+AST\_\_UNDEFF (float bad value).
+
+\section{\xlabel{WCS_extension}WCS NDF Extension}
+
+The world coordinate frameset used to map the spatial and frequency coordinates of the observation are written to an NDF extension in the output file(s).  The frameset consists of a mapping from the GSD CELL coordinates to both tracking RA/Dec and Az/El coordinates.  The third axis represents the frequency scale of the observation.
+
+The mapping from GSD CELLs to ACSIS TCS tracking and AZEL coordinates is created using the frameset from the GSD CELL headers and the GSD CENTRE coordinates given for the source's position at the time of the observation, in combination with the LST and CELL offsets of each time step.
+
+In order to create this frameset, several components from the original GSD file are required:
+
+\begin{itemize}
+\item Source RA/Dec, telescope location, and observation time.
+\item Cell definition.
+\item Frequency scale.
+\item Velocity definition.
+\end{itemize}
+
+GSD's CELL coordinates describe a grid placed upon the sky with a centre cooresponding to the location described in the \centreRARB{}, \centreDecRB{}, \centreRA{}, \centreDec{}, \centreRARJ{}, \centreDecRJ{}, \centreGL{}, \centreGB{}, \centreAz{}, and \centreEl{} coordinates.  These pairs of coordinates are assumed to correspond with the time given in the \obsUTd{} and \obsUTh{} headers.
+
+The \centreCode{} (coordinate system of the tracking frame) along with the corresponding coordinate pair from those listed above is used as the RA/Dec input, along with the \telLongitude{} and \telLatitude{} to create the frameset.
+
+\subsection{\xlabel{WCS_RADEC}Source RA/Dec, telescope location, and observation time}
+
+The description of the CELL coordinate frame comes from the GSD CELL headers:
+
+\begin{itemize}
+\item \cellCoords{} and \cellCode{}: cell coordinate system
+\item \cellX{}: size of cell in x dimension (arcsec)
+\item \cellY{}: size of cell in y dimension (arcsec)
+\item \cellVY{}: position angle of cell y axis (degrees counterclockwise)
+\end{itemize}
+
+\subsection{\xlabel{WCS_FREQUENCY}Frequency scale}
+
+The third axis of the WCS frameset is the frequency scale.  The GSD values used to generate this frameset are:
+
+\begin{itemize}
+\item Frequency of the transition line for this subband (for special observations, this is the value for this subband in \restFreqs{}, for all other observations this is the value for this subband in \centreFreqs{}.
+\item \centreFreqs{}: Centre frequency for this subband.
+\item \freqRes{}: Frequency resolution for this subband.
+\item IF for this subband.  The IF should correspond with the definition of the REFCHAN.
+\end{itemize}
+
+\subsection{\xlabel{WCS_VELOCITY}Velocity definition}
+
+The WCS frameset requires two further inputs in order to be created.  These are the velocity and the velocity definition ('LSRFLG').  For total power and cross correlation observations, the velocity is assumed to be 0, while for other observations the value in \velocity{} is used.  The velocity definition is a flag which defines both the rest frame of the source velocity (topocentric, kinematic LSR, heliocentric, or geocentric, given by the bottom 4 bits of 'LSRFLG') and the source velocity definition (radio, optical, or relativistic, given by bits 5 and 6 of 'LSRFLG').
+
+\subsection{\xlabel{WCS_USING}Using the WCS frameset}
+
+The WCS frameset is used to generate the TCS tracking and AZEL base and offset coordinates found in the JCMTState NDF extension.  
+At each time step of the observation, the time can be obtained from the \scanTableA array (see TCS\_TAI
+\begin{htmlonly}
+\ref{tcstai}
+\end{htmlonly}
+).  The current cell offset is found in the list of xy coordinates stored for each scan in the \mapTable array.  Base coordinates are generated using a cell offset of 0, 0.
+
+\section{\xlabel{GSDexamples}Suggested example GSD files}
+
+These are a selection of .gsd files used to test GSD2ACSIS.  These files can be found in the \htmladdnormallink{JCMT archive}{http://www.cadc.hia.nrc.gc.ca/jcmt/search/scan}.
+
+\begin{itemize}
+\item RXA 125 MHz single subband : 24 Jul 2005 scan 17 (m05au25)
+\item RXA 3x3 grid : 14 Jan 2004 scan 10 (m03bec06)
+\item RXA pattern : 08 Jul 2005 scan 64 (m05an11)
+\item RXA Raster in Galactic coordinates : 19 Aug 2002 scan 49 (m02bn13)
+\item RXA Special Configuration : 11 Jul 2005 scan 22 (m05bn27b)
+\item RXB raster : 08 Oct 2005 scan 20 (m05bu72)
+\item RXB wideband observation : 19 Oct 2004 scan 18 (m04bn10)
+\end{itemize}
+
+\appendix
+
+\section{\xlabel{GSDvariables}Headers and Arrays in GSD DAS files}
+
+The following is a list of the headers and arrays found in GSD format (version 5.3) files in the order in which they appear in the file.  Listed is the NRAO name, JCMT name, data type, description for each element.  In addition, the dimensionality of the arrays for various observation types (Normal, Total Power, Continuous Calibration, Cross Correlation) is given (for scalar headers, the table indicates for which observation types the headers were used).
+
+
+\newpage
+\subsection{\xlabel{GSDheaders}GSD Headers}
+
+\begin{latexonly}
+
+\begin {longtable}{|p{38mm}|p{42mm}|p{11mm}|p{55mm}|}
+
+\hline
+\textit{NRAO name} & \textit{JCMT name} & \textit{Data type} & \textit{Description}\\
+
+\hline \label{GSDVars:telName}C1TEL & TEL\_NAME & char* & Telescope name\\
+\hline \label{GSDVars:project}C1PID & PROJECT & char* & Identifies the observing program\\
+\hline \label{GSDVars:projectObs1}C1OBS & PROJECT\_OBS\_1 & char* & Name of the primary observer\\
+\hline \label{GSDVars:projectObs2}C1ONA1 & PROJECT\_OBS\_2 & char* & Name of the support scientist\\
+\hline \label{GSDVars:projectObs3}C1ONA2 & PROJECT\_OBS\_3 & char* & Name of the telescope operator\\
+\hline \label{GSDVars:object1}C1SNA1 & CENTRE\_NAME\_1 & char* & Source name part 1\\
+\hline \label{GSDVars:object2}C1SNA2 & CENTRE\_NAME\_2 & char* & Source name part 2 or altern. name\\
+\hline \label{GSDVars:centreCoords}C4CSC & CENTRE\_COORDS & char* & Character code of commanded centre or source coordinate system\\
+\hline \label{GSDVars:centreCode}C4CECO & CENTRE\_CODE & int & Centre coords. AZ=1; EQ=3; RD=4; RB=6; RJ=7; GA=8\\
+\hline \label{GSDVars:epochType}C4EPT & EPOCH\_TYPE & char* & Type of epoch, JULIAN, BESSELIAN or APPARENT\\
+\hline \label{GSDVars:centreMoving}C4MCF & CENTRE\_MOVING & char & Centre moving flag (solar system object)\\
+\hline \label{GSDVars:centreEpoch}C4EPH & CENTRE\_EPOCH & double & Date of the RA\\
+\hline \label{GSDVars:centreRA1950}C4ERA & CENTRE\_RA1950 & double & Right ascension of source for EPOCH\\
+\hline \label{GSDVars:centreDec1950}C4EDEC & CENTRE\_DEC1950 & double & Declination of source for EPOCH\\
+\hline \label{GSDVars:centreRA}C4RADATE & CENTRE\_RA & double & Right Ascension of date\\
+\hline \label{GSDVars:centreDec}C4DECDATE & CENTRE\_DEC & double & Declination of date\\
+\hline \label{GSDVars:centreRA2000}C4RA2000 & CENTRE\_RA2000 & double & Right ascension J2000\\
+\hline \label{GSDVars:centreDec2000}C4EDEC2000 & CENTRE\_DEC2000 & double & Declination J2000\\
+\hline \label{GSDVars:centreGL}C4GL & CENTRE\_GL & double & Galactic longitude\\
+\hline \label{GSDVars:centreGB}C4GB & CENTRE\_GB & double & Galactic latitude\\
+\hline \label{GSDVars:centreAz}C4AZ & CENTRE\_AZ & double & Azimuth at observation date\\
+\hline \label{GSDVars:centreEl}C4EL & CENTRE\_EL & double & Elevation at observation date\\
+\hline \label{GSDVars:cellCoords}C4LSC & CELL\_COORDS & char* & har. code for local x-y coord.system\\
+\hline \label{GSDVars:cellCode}C6FC & CELL\_CODE & int & Local x-y AZ=1; EQ=3; RD=4; RB=6; RJ=7; GA=8\\
+\hline \label{GSDVars:cellUnit}C4ODCO & CELL\_UNIT & char* & Units of cell and mapping coordinates;offset definition code\\
+\hline \label{GSDVars:cellX}C6DX & CELL\_X & double & Cell x dim,; descriptive origin item 1\\
+\hline \label{GSDVars:cellY}C6DY & CELL\_Y & double & Cell y dimension; descriptive origin item 2\\
+\hline \label{GSDVars:cellV2X}C6MSA & CELL\_V2X & double & Scanning angle - angle from local vertical to x axis measured CW\\
+\hline \label{GSDVars:cellV2Y}CELL\_V2Y & CELL\_V2Y & double & Position angle of cell y axis (CCW)\\
+\hline \label{GSDVars:cellX2Y}C4AXY & CELL\_X2Y & double & Angle between cell y axis and x-axis (CCW)\\
+\hline \label{GSDVars:centreOffsetX}C4SX & CENTRE\_OFFSET\_X & double & Commanded x centre position (JCMT cells wrt to centre; NRAO abs. degrees)\\
+\hline \label{GSDVars:centreOffsetY}C4SY & CENTRE\_OFFSET\_Y & double & Commanded y centre position (JCMT cells wrt to centre; NRAO abs. degrees)\\
+\hline \label{GSDVars:referenceX}C4RX & REFERENCE\_X & double & Reference x position (JCMT cells wrt to centre; NRAO abs. degrees)\\
+\hline \label{GSDVars:referenceY}C4RY & REFERENCE\_Y & double & Reference y position (JCMT cells wrt to centre; NRAO abs. degrees)\\
+\hline \label{GSDVars:telHeight}C1HGT & TEL\_HEIGHT & double & Height of telescope above sea level\\
+\hline \label{GSDVars:telLongitude}C1LONG & TEL\_LONGITUDE & double & Geographical longitude of telescope (West +ve)\\
+\hline \label{GSDVars:telLatitude}C1LAT & TEL\_LATITUDE & double & Geodetic latitude of telescope (North +ve)\\
+\hline \label{GSDVars:nObs}C1SNO & NOBS & double & Observation number\\
+\hline \label{GSDVars:obsType}C6ST & OBS\_TYPE & char* & Type of observation\\
+\hline \label{GSDVars:frontend}C1RCV & FRONTEND & char* & Name of the frontend\\
+\hline \label{GSDVars:FEType}C1FTYP & FE\_TYPE & char* & Type of frontend\\
+\hline \label{GSDVars:backend}C1BKE & BACKEND & char* & Name of the backend\\
+\hline \label{GSDVars:BEType}C1BTYP & BE\_TYPE & char* & Type of backend\\
+\hline \label{GSDVars:obsUT1d}C3DAT & OBS\_UT1D & double & UT1 date of observation\\
+\hline \label{GSDVars:obsUT1h}C3UT & OBS\_UT1H & double & UT1 hour of observation\\
+\hline \label{GSDVars:obsUT1C}C3UT1C & OBS\_UT1C & double & UT1-UTC correction interpolated from time service telex (in days)\\
+\hline \label{GSDVars:obsLST}C3LST & OBS\_LST & double & Local sidereal time at the start of the observation\\
+\hline \label{GSDVars:obsCalibration}C3CAL & OBS\_CALIBRATION & char & Calibration observation?\\
+\hline \label{GSDVars:obsCentre}C3CEN & OBS\_CENTRE & char & Centre moves between scans?\\
+\hline \label{GSDVars:obsContinuous}C3FLY & OBS\_CONTINUOUS & char & Data taken on the fly or in discrete mode?\\
+\hline \label{GSDVars:obsFocus}C3FOCUS & OBS\_FOCUS & char & Focus observation?\\
+\hline \label{GSDVars:obsMap}C3MAP & OBS\_MAP & char & Map observation?\\
+\hline \label{GSDVars:nMapDims}C3NPP & NO\_MAP\_DIMS & int & Number of dimension in the map table\\
+\hline \label{GSDVars:nMapPts}C3NMAP & NO\_MAP\_PNTS & int & Number of map points\\
+\hline \label{GSDVars:nMapPtsX}C6XNP & NO\_X\_MAP\_PNTS & int & X map dimension; number of points in the x-direction\\
+\hline \label{GSDVars:nMapPtsY}C6YNP & NO\_Y\_MAP\_PNTS & int & Y map dimension; number of points in the y-direction\\
+\hline \label{GSDVars:mapStartX}C6XGC & X\_MAP\_START & float & X coordinate of the first map point\\
+\hline \label{GSDVars:mapStartY}C6YGC & Y\_MAP\_START & float & Y coordinate of the first map point\\
+\hline \label{GSDVars:scanRev}C6REV & SCAN\_REVERSAL & char & Map rows scanned in alternate directions?\\
+\hline \label{GSDVars:obsDirection}C6SD & OBS\_DIRECTION & char* & Map rows are in X (horizontal) or Y(vertical) direction\\
+\hline \label{GSDVars:mapPosX}C6XPOS & X\_MAP\_POSITIVE & char & In first row x increases (TRUE) or decreases (FALSE)\\
+\hline \label{GSDVars:mapPosY}C6YPOS & Y\_MAP\_POSITIVE & char & In first row y increases (TRUE) or decreases (FALSE)\\
+\hline \label{GSDVars:noScans}C3NIS & NO\_SCANS & int & Number of scans\\
+\hline \label{GSDVars:nScan}C3NSAMPLE & NSCAN & int & Number of scans done\\
+\hline \label{GSDVars:nScanVars1}C3NO\_SCAN\_VARS1 & NO\_SCAN\_VARS1 & int & Number of scan table 1 variables\\
+\hline \label{GSDVars:nScanVars2}C3NO\_SCAN\_VARS2 & NO\_SCAN\_VARS2 & int & Number of scan table 2 variables\\
+\hline \label{GSDVars:scanTime}C3SRT & SCAN\_TIME & int & Total time of scan (=total integration time if OBS\_CONTINUOUS = .FALSE.)\\
+\hline \label{GSDVars:nScanPts}C3MXP & NO\_SCAN\_PNTS & int & Maximum number of map points done in a phase\\
+\hline \label{GSDVars:noCycles}C3NCI & NO\_CYCLES & int & Maximum number of cycles in the scan\\
+\hline \label{GSDVars:nCycle}C3NCYCLE & NCYCLE & int & Number of cycles done in the scan\\
+\hline \label{GSDVars:cycleTime}C3CL & CYCLE\_TIME & int & Duration of each cycle\\
+\hline \label{GSDVars:noCyclePts}C3NCP & NO\_CYCLE\_PNTS & int & Total number of xy positions observed during a cycle\\
+\hline \label{GSDVars:nCyclePts}C6NP & NCYCLE\_PNTS & int & Number of sky points completed in the observation\\
+\hline \label{GSDVars:nPhaseVars}C3NSV & NO\_PHASE\_VARS & int & Number of phase table variables\\
+\hline \label{GSDVars:nPhases}C3PPC & NO\_PHASES & int & Number of phases per cycle\\
+\hline \label{GSDVars:tamb}C5AT & TAMB & double & Ambient temperature\\
+\hline \label{GSDVars:pamb}C5PRS & PAMB & double & Mean atmospheric pressure\\
+\hline \label{GSDVars:hamb}C5RH & HAMB & double & Mean atmospheric relative humidity\\
+\hline \label{GSDVars:errAz}C4AZERR & SDIS(7) & double & DAZ:Net Az offset at start (inc.tracker ball setting and user correction)\\
+\hline \label{GSDVars:errEl}C4ELERR & SDIS(8) & double & DEL:Net El offset at start (inc.tracker ball setting and user correction)\\
+\hline \label{GSDVars:userAz}UAZ & SDIS(36) & double & User az correction\\
+\hline \label{GSDVars:userEl}UEL & SDIS(37) & double & User el correction\\
+\hline \label{GSDVars:nVRad}C7SZVRAD & SZVRAD & int & Number of elements of vradial array\\
+\hline \label{GSDVars:apertureEff}C8AAE & APERTURE\_EFF & double & Ratio total power observed\\
+\hline \label{GSDVars:beamEff}C8ABE & BEAM\_EFF & double & Fraction of beam in diffraction limited main beam\\
+\hline \label{GSDVars:antennaGain}C8GN & ANTENNA\_GAIN & double & Antenna gain\\
+\hline \label{GSDVars:etal}C8EL & ETAL & double & Rear spillover and scattering efficiency\\
+\hline \label{GSDVars:etafss}C8EF & ETAFSS & double & Forward spillover and scattering efficiency\\
+\hline \label{GSDVars:chopping}C4SM & CHOPPING & char & Secondary mirror is chopping\\
+\hline \label{GSDVars:chopWaveform}C4FUN & WAVEFORM & char* & Secondary mirror chopping waveform\\
+\hline \label{GSDVars:chopFrequency}C4FRQ & FREQUENCY & float & Secondary mirror chopping period\\
+\hline \label{GSDVars:chopCoords}C4SMCO & COORDS & char* & Secondary mirror chopping coordinate system\\
+\hline \label{GSDVars:chopThrow}C4THROW & THROW & float & Secondary mirror chop throw\\
+\hline \label{GSDVars:chopPA}C4POSANG & POSANG & float & Secondary mirror chop position angle\\
+\hline \label{GSDVars:smuOffsEW}C4OFFS\_EW & OFFS\_EW & float & Secondary mirror offset parallel to lower axis (East-West Tilt)\\
+\hline \label{GSDVars:smuOffsNS}C4OFFS\_NS & OFFS\_NS & float & Secondary mirror offset parallel to upper axis (North-South Tilt)\\
+\hline \label{GSDVars:smuX}C4X & X & float & Secondary mirror absolute X position at observation start\\
+\hline \label{GSDVars:smuY}C4Y & Y & float & Secondary mirror absolute Y position at observation start\\
+\hline \label{GSDVars:smuZ}C4Z & Z & float & Secondary mirror absolute Z position at observation start\\
+\hline \label{GSDVars:smuEWScale}C4EW\_SCALE & EW\_AMPL\_SCALE & float & Secondary mirror ew chop scale\\
+\hline \label{GSDVars:smuNSScale}C4NS\_SCALE & NS\_AMPL\_SCALE & float & Secondary mirror ns chop scale\\
+\hline \label{GSDVars:smuEWEnc}C4EW\_ENCODER & AMPL\_E\_SET & int & Secondary mirror ew encoder value\\
+\hline \label{GSDVars:smuNSEnc}C4NS\_ENCODER & AMPL\_N\_SET & int & Secondary mirror ns encoder value\\
+\hline \label{GSDVars:smuDX}C2FV & DX & float & Secondary mirror x displacement from nominal at observation start\\
+\hline \label{GSDVars:smuDY}C2FL & DY & float & Secondary mirror y displacement from nominal at observation start\\
+\hline \label{GSDVars:smuDZ}C2FR & DZ & float & Secondary mirror z displacement from nominal at observation start\\
+\hline \label{GSDVars:telCoords}C4MOCO & TEL\_COORDS & char* & Mounting of telescope; defined as LOWER\\
+\hline \label{GSDVars:nFEChans}C3NFOC & NO\_FE\_O\_CH & int & NO\_FE\_O\_CH:No. of frontend output channels\\
+\hline \label{GSDVars:velocity}C7VR & VELOCITY & double & Radial velocity of the source\\
+\hline \label{GSDVars:tCold}C12TCOLD & T\_COLD & float & Cold load temperature\\
+\hline \label{GSDVars:tHot}C12TAMB & T\_HOT & float & Ambient load temperature\\
+\hline \label{GSDVars:velDefn}C12VDEF & VEL\_DEFN & char* & Velocity definition code - radio, optical, or relativistic\\
+\hline \label{GSDVars:velRef}C12VREF & VEL\_REF & char* & Velocity frame of reference - LSR, Bary-, Helio-, or Geo- centric\\
+\hline \label{GSDVars:nBEChansIn}C3NRC & NO\_BE\_I\_CH & int & Number of backend input channels\\
+\hline \label{GSDVars:nBEChansOut}C3NCH & NO\_BE\_O\_CH & int & Number of backend output channels\\
+\hline \label{GSDVars:nBESections}C3NRS & NO\_BES & int & Number of backend sections\\
+\hline \label{GSDVars:badVal}C7BCV & BAD\_CHANNEL & float & Bad channel value\\
+\hline \label{GSDVars:dataUnits}C12CAL & DATA\_UNITS & char* & Units of spectrum data\\
+\hline \label{GSDVars:swMode}C6MODE & SWITCH\_MODE & char* & Observation mode\\
+\hline \label{GSDVars:calInstrument}C12CALTASK & BE\_CAL\_TASK & char* & Calibration instrument used (FE, BE, or USER)\\
+\hline \label{GSDVars:calType}C12CALTYPE & BE\_CAL\_TYPE & char* & Type of calibration (THREELOADS or TWOLOADS)\\
+\hline \label{GSDVars:calmode}C12REDMODE & BE\_RED\_MODE & char* & Way of calibrating the data (RATIO or DIFFERENCE)\\
+\hline \label{GSDVars:IFPerSection}C3NOIFPBES & NO\_IF\_PER\_BES & int & Number of IF inputs to each section (2 for correlator, 1 for AOS)\\
+\hline \label{GSDVars:BEConfig}C3CONFIGNR & DAS\_CONF\_NR & int & Backend configuration\\
+\hline \label{GSDVars:dataOutput}C3DASOUTPUT & DAS\_OUTPUT & char* & Description of output in DAS DATA (SPECTRUM, T\_REC, T\_SYS, etc.)\\
+\hline \label{GSDVars:calSource}C3DASCALSRC & DAS\_CAL\_SOURCE & char* & DAS calibration source for backend calibration (POWER or DATA)\\
+\hline \label{GSDVars:shiftFrac}C3DASSHFTFRAC & DAS\_SHIFT\_FRAC & float & DAS calibration source for backend calibration (POWER or DATA)\\
+\hline \label{GSDVars:tau225}C7TAU225 & CSO\_TAU & float & CSO tau at 225GHz\\
+\hline \label{GSDVars:tauRMS}C7TAURMS & CSO\_TAU\_RMS & float & CSO tau rms\\
+\hline \label{GSDVars:tauTime}C7TAUTIME & CSO\_YYMMDDHHMM & char* & CSO tau time (YYMMDDHHMM)\\
+\hline \label{GSDVars:seeing}C7SEEING & SAO\_SEEING & float & Seeing at JCMT\\
+\hline \label{GSDVars:seeTime}C7SEETIME & SAO\_YYMMDDHHMM & char* & SAO seeing time (YYMMDDHHMM)\\
+\hline \label{GSDVars:polarity}C3POLARITY & C3POLARITY & char* & Frontend Polarity\\
+\hline \label{GSDVars:sbMode}C3SBMODE & C3SBMODE & char* & Sideband mode\\
+\hline \label{GSDVars:IFONPhase}C55NPH & DAS\_NO\_PHASE & int & DAS number of phases for interferometry observing\\
+\hline \label{GSDVars:IFONCycle}C55NCYC & DAS\_NO\_CYCLES & int & DAS number of phases for interferometry observing\\
+\hline \label{GSDVars:IFONIntCycle}C55NINT & DAS\_NINTCYCLE & int & DAS number of phases for interferometry observing\\
+\hline \label{GSDVars:nCorrCycle}C55NCORR & DAS\_NCORRCYCLE & int & DAS number of correlation cycles\\
+\hline \label{GSDVars:procBits}C55DASPRBIT & DAS\_PROC\_BITS & int & DAS data processing done\\
+\hline \label{GSDVars:procLoc}C55DASPRLOC & DAS\_PROC\_LOC & char* & Description of where processing is done\\
+\hline \label{GSDVars:RXJLengthX}C55LX & RXJ.LX & double & RXJ X length of projected baseline in metres\\
+\hline \label{GSDVars:RXJLengthY}C55LY & RXJ.LY & double & RXJ Y length of projected baseline in metres\\
+\hline \label{GSDVars:RXJLengthZ}C55LZ & RXJ.LZ & double & RXJ Z length of projected baseline in metres\\
+\hline \label{GSDVars:RXJSin}C55A & RXJ.A & double & RXJ Coefficient of sin term in expression for fringe rate (metres)\\
+\hline \label{GSDVars:RXJCos}C55B & RXJ.B & double & RXJ Coefficient of cos term in expression for fringe rate (metres)\\
+\hline \label{GSDVars:RXJConstant}C55C & RXJ.C & double & RXJ Coefficient of constant term in expression for fringe rate (metres)\\
+\hline \label{GSDVars:RXJCSOSwitch}C55CSOSW & RXJ.CSO\_SWITCH & int & RXJ Delay setting of RXJ micro for CSO side\\
+\hline \label{GSDVars:RXJJCMTSwitch}C55JCMTSW & RXJ.JCMT\_SWITCH & int & RXJ Delay setting of RXJ micro for JCMT side\\
+\hline \label{GSDVars:RXJNSecs}C55SECOND & RXJ.NSECS & int & RXJ Number of the tick on which integration started\\
+\hline \label{GSDVars:CSOAbsorb}C55ABSORB & RXJ.ABSORB & char* & CSO Position of absorber IN or OUT\\
+\hline \label{GSDVars:CSOTAU}C55TAU & RXJ.CSO\_TAU & float & CSO TAU value\\
+\hline \label{GSDVars:CSODAz}C55DAZ & RXJ.DAZ & float & CSO Position offset in az (arcsec)\\
+\hline \label{GSDVars:CSODEl}C55DEL & RXJ.DEL & float & CSO Position offset in elevation (arcsec)\\
+\hline \label{GSDVars:CSORA}C55RA & RXJ.RA & double & CSO RA\\
+\hline \label{GSDVars:CSODec}C55DEC & RXJ.DEC & double & CSO Dec\\
+\hline \label{GSDVars:CSOEpoch}C55EPOCH & RXJ.EPOCH & double & CSO Epoch of CSO RA and Dec\\
+\hline \label{GSDVars:CSOPAz}C55PAZ & RXJ.PAZ & float & CSO Pointing offset in az (arcsec)\\
+\hline \label{GSDVars:CSOPEl}C55PEL & RXJ.PEL & float & CSO Pointing offset in el (arcsec)\\
+\hline \label{GSDVars:CSOTrack}C55TRACK & RXJ.TRACK & char* & CSO Track mode of telescope Y or N\\
+\hline \label{GSDVars:CSOFocus}C55FMODE & RXJ.FMODE & char* & CSO Focus mode of CSO\\
+\hline \label{GSDVars:CSOFocusX}C55FX & RXJ.FX & float & CSO X position of focus\\
+\hline \label{GSDVars:CSOFocusY}C55FY & RXJ.FY & float & CSO Y position of focus\\
+\hline \label{GSDVars:CSOFocusZ}C55FZ & RXJ.FZ & float & CSO Z position of focus\\
+\hline \label{GSDVars:CSOVelocity}C55VLSR & RXJ.VLSR & float & CSO LSR velocity of source (km/s)\\
+\hline \label{GSDVars:CSOVelOffset}C55VOFF & RXJ.COFF & float & CSO velocity offset (km/s)\\
+\hline \label{GSDVars:CSORadVel}C55VRAD & RXJ.VRAD & float & CSO radial velocity (km/s)\\
+\hline \label{GSDVars:CSOPhaseLock}C55PLOCK & RXJ.PLOCK & char* & CSO Phase lock status L or U\\
+\hline \label{GSDVars:CSORestFreq}C55RFREQ & RXJ.RFREQ & double & CSO Rest frequency of line (GHz)\\
+\hline \label{GSDVars:CSOIFFreq}C55IFFREQ & RXJ.IFFREQ & double & CSO IF frequency (GHz)\\
+\hline \label{GSDVars:CSOLOFreq}C55LOFREQ & RXJ.LOFREQ & double & CSO LO frequency (GHz)\\
+\hline \label{GSDVars:CSOFreqOffset}C55FREQOFF & RXJ.FREQOFF & double & CSO frequency offset (GHz)\\
+\hline \label{GSDVars:CSOSideband}C55SIDEBAND & RXJ.SIDEBAND & char* & CSO Sideband U or L\\
+\hline \label{GSDVars:CSOMultHarm}C55MHN & RXJ.MHN & int & CSO Multiplier Harmonic number\\
+\hline \label{GSDVars:CSOStatus}C55CSOSTATUS & RXJ.CSO\_STATUS & int & CSO overall status 0 = bad 1 = good\\
+\hline \label{GSDVars:telAz}C55TELAZ & TEL.SDIS(9) & double & CENTRE\_AZ from tel sdis array\\
+\hline \label{GSDVars:telEl}C55TELEL & TEL.SDIS(10) & double & CENTRE\_EL from tel sdis array\\
+
+\hline
+\end {longtable}
+
+\end{latexonly}
+
+
+
+
+\begin{htmlonly}
+
+\begin {longtable}{|l|l|l|l|}
+
+\hline
+\textit{NRAO name} & \textit{JCMT name} & \textit{Data type} & \textit{Description}\\
+
+\hline \label{GSDVars:telName}C1TEL & TEL\_NAME & char* & Telescope name\\
+\hline \label{GSDVars:project}C1PID & PROJECT & char* & Identifies the observing program\\
+\hline \label{GSDVars:projectObs1}C1OBS & PROJECT\_OBS\_1 & char* & Name of the primary observer\\
+\hline \label{GSDVars:projectObs2}C1ONA1 & PROJECT\_OBS\_2 & char* & Name of the support scientist\\
+\hline \label{GSDVars:projectObs3}C1ONA2 & PROJECT\_OBS\_3 & char* & Name of the telescope operator\\
+\hline \label{GSDVars:object1}C1SNA1 & CENTRE\_NAME\_1 & char* & Source name part 1\\
+\hline \label{GSDVars:object2}C1SNA2 & CENTRE\_NAME\_2 & char* & Source name part 2 or altern. name\\
+\hline \label{GSDVars:centreCoords}C4CSC & CENTRE\_COORDS & char* & Character code of commanded centre or source coordinate system\\
+\hline \label{GSDVars:centreCode}C4CECO & CENTRE\_CODE & int & Centre coords. AZ=1; EQ=3; RD=4; RB=6; RJ=7; GA=8\\
+\hline \label{GSDVars:epochType}C4EPT & EPOCH\_TYPE & char* & Type of epoch, JULIAN, BESSELIAN or APPARENT\\
+\hline \label{GSDVars:centreMoving}C4MCF & CENTRE\_MOVING & char & Centre moving flag (solar system object)\\
+\hline \label{GSDVars:centreEpoch}C4EPH & CENTRE\_EPOCH & double & Date of the RA\\
+\hline \label{GSDVars:centreRA1950}C4ERA & CENTRE\_RA1950 & double & Right ascension of source for EPOCH\\
+\hline \label{GSDVars:centreDec1950}C4EDEC & CENTRE\_DEC1950 & double & Declination of source for EPOCH\\
+\hline \label{GSDVars:centreRA}C4RADATE & CENTRE\_RA & double & Right Ascension of date\\
+\hline \label{GSDVars:centreDec}C4DECDATE & CENTRE\_DEC & double & Declination of date\\
+\hline \label{GSDVars:centreRA2000}C4RA2000 & CENTRE\_RA2000 & double & Right ascension J2000\\
+\hline \label{GSDVars:centreDec2000}C4EDEC2000 & CENTRE\_DEC2000 & double & Declination J2000\\
+\hline \label{GSDVars:centreGL}C4GL & CENTRE\_GL & double & Galactic longitude\\
+\hline \label{GSDVars:centreGB}C4GB & CENTRE\_GB & double & Galactic latitude\\
+\hline \label{GSDVars:centreAz}C4AZ & CENTRE\_AZ & double & Azimuth at observation date\\
+\hline \label{GSDVars:centreEl}C4EL & CENTRE\_EL & double & Elevation at observation date\\
+\hline \label{GSDVars:cellCoords}C4LSC & CELL\_COORDS & char* & har. code for local x-y coord.system\\
+\hline \label{GSDVars:cellCode}C6FC & CELL\_CODE & int & Local x-y AZ=1; EQ=3; RD=4; RB=6; RJ=7; GA=8\\
+\hline \label{GSDVars:cellUnit}C4ODCO & CELL\_UNIT & char* & Units of cell and mapping coordinates;offset definition code\\
+\hline \label{GSDVars:cellX}C6DX & CELL\_X & double & Cell x dim,; descriptive origin item 1\\
+\hline \label{GSDVars:cellY}C6DY & CELL\_Y & double & Cell y dimension; descriptive origin item 2\\
+\hline \label{GSDVars:cellV2X}C6MSA & CELL\_V2X & double & Scanning angle - angle from local vertical to x axis measured CW\\
+\hline \label{GSDVars:cellV2Y}CELL\_V2Y & CELL\_V2Y & double & Position angle of cell y axis (CCW)\\
+\hline \label{GSDVars:cellX2Y}C4AXY & CELL\_X2Y & double & Angle between cell y axis and x-axis (CCW)\\
+\hline \label{GSDVars:centreOffsetX}C4SX & CENTRE\_OFFSET\_X & double & Commanded x centre position (JCMT cells wrt to centre; NRAO abs. degrees)\\
+\hline \label{GSDVars:centreOffsetY}C4SY & CENTRE\_OFFSET\_Y & double & Commanded y centre position (JCMT cells wrt to centre; NRAO abs. degrees)\\
+\hline \label{GSDVars:referenceX}C4RX & REFERENCE\_X & double & Reference x position (JCMT cells wrt to centre; NRAO abs. degrees)\\
+\hline \label{GSDVars:referenceY}C4RY & REFERENCE\_Y & double & Reference y position (JCMT cells wrt to centre; NRAO abs. degrees)\\
+\hline \label{GSDVars:telHeight}C1HGT & TEL\_HEIGHT & double & Height of telescope above sea level\\
+\hline \label{GSDVars:telLongitude}C1LONG & TEL\_LONGITUDE & double & Geographical longitude of telescope (West +ve)\\
+\hline \label{GSDVars:telLatitude}C1LAT & TEL\_LATITUDE & double & Geodetic latitude of telescope (North +ve)\\
+\hline \label{GSDVars:nObs}C1SNO & NOBS & double & Observation number\\
+\hline \label{GSDVars:obsType}C6ST & OBS\_TYPE & char* & Type of observation\\
+\hline \label{GSDVars:frontend}C1RCV & FRONTEND & char* & Name of the frontend\\
+\hline \label{GSDVars:FEType}C1FTYP & FE\_TYPE & char* & Type of frontend\\
+\hline \label{GSDVars:backend}C1BKE & BACKEND & char* & Name of the backend\\
+\hline \label{GSDVars:BEType}C1BTYP & BE\_TYPE & char* & Type of backend\\
+\hline \label{GSDVars:obsUT1d}C3DAT & OBS\_UT1D & double & UT1 date of observation\\
+\hline \label{GSDVars:obsUT1h}C3UT & OBS\_UT1H & double & UT1 hour of observation\\
+\hline \label{GSDVars:obsUT1C}C3UT1C & OBS\_UT1C & double & UT1-UTC correction interpolated from time service telex (in days)\\
+\hline \label{GSDVars:obsLST}C3LST & OBS\_LST & double & Local sidereal time at the start of the observation\\
+\hline \label{GSDVars:obsCalibration}C3CAL & OBS\_CALIBRATION & char & Calibration observation?\\
+\hline \label{GSDVars:obsCentre}C3CEN & OBS\_CENTRE & char & Centre moves between scans?\\
+\hline \label{GSDVars:obsContinuous}C3FLY & OBS\_CONTINUOUS & char & Data taken on the fly or in discrete mode?\\
+\hline \label{GSDVars:obsFocus}C3FOCUS & OBS\_FOCUS & char & Focus observation?\\
+\hline \label{GSDVars:obsMap}C3MAP & OBS\_MAP & char & Map observation?\\
+\hline \label{GSDVars:nMapDims}C3NPP & NO\_MAP\_DIMS & int & Number of dimension in the map table\\
+\hline \label{GSDVars:nMapPts}C3NMAP & NO\_MAP\_PNTS & int & Number of map points\\
+\hline \label{GSDVars:nMapPtsX}C6XNP & NO\_X\_MAP\_PNTS & int & X map dimension; number of points in the x-direction\\
+\hline \label{GSDVars:nMapPtsY}C6YNP & NO\_Y\_MAP\_PNTS & int & Y map dimension; number of points in the y-direction\\
+\hline \label{GSDVars:mapStartX}C6XGC & X\_MAP\_START & float & X coordinate of the first map point\\
+\hline \label{GSDVars:mapStartY}C6YGC & Y\_MAP\_START & float & Y coordinate of the first map point\\
+\hline \label{GSDVars:scanRev}C6REV & SCAN\_REVERSAL & char & Map rows scanned in alternate directions?\\
+\hline \label{GSDVars:obsDirection}C6SD & OBS\_DIRECTION & char* & Map rows are in X (horizontal) or Y(vertical) direction\\
+\hline \label{GSDVars:mapPosX}C6XPOS & X\_MAP\_POSITIVE & char & In first row x increases (TRUE) or decreases (FALSE)\\
+\hline \label{GSDVars:mapPosY}C6YPOS & Y\_MAP\_POSITIVE & char & In first row y increases (TRUE) or decreases (FALSE)\\
+\hline \label{GSDVars:noScans}C3NIS & NO\_SCANS & int & Number of scans\\
+\hline \label{GSDVars:nScan}C3NSAMPLE & NSCAN & int & Number of scans done\\
+\hline \label{GSDVars:nScanVars1}C3NO\_SCAN\_VARS1 & NO\_SCAN\_VARS1 & int & Number of scan table 1 variables\\
+\hline \label{GSDVars:nScanVars2}C3NO\_SCAN\_VARS2 & NO\_SCAN\_VARS2 & int & Number of scan table 2 variables\\
+\hline \label{GSDVars:scanTime}C3SRT & SCAN\_TIME & int & Total time of scan (=total integration time if OBS\_CONTINUOUS = .FALSE.)\\
+\hline \label{GSDVars:nScanPts}C3MXP & NO\_SCAN\_PNTS & int & Maximum number of map points done in a phase\\
+\hline \label{GSDVars:noCycles}C3NCI & NO\_CYCLES & int & Maximum number of cycles in the scan\\
+\hline \label{GSDVars:nCycle}C3NCYCLE & NCYCLE & int & Number of cycles done in the scan\\
+\hline \label{GSDVars:cycleTime}C3CL & CYCLE\_TIME & int & Duration of each cycle\\
+\hline \label{GSDVars:noCyclePts}C3NCP & NO\_CYCLE\_PNTS & int & Total number of xy positions observed during a cycle\\
+\hline \label{GSDVars:nCyclePts}C6NP & NCYCLE\_PNTS & int & Number of sky points completed in the observation\\
+\hline \label{GSDVars:nPhaseVars}C3NSV & NO\_PHASE\_VARS & int & Number of phase table variables\\
+\hline \label{GSDVars:nPhases}C3PPC & NO\_PHASES & int & Number of phases per cycle\\
+\hline \label{GSDVars:tamb}C5AT & TAMB & double & Ambient temperature\\
+\hline \label{GSDVars:pamb}C5PRS & PAMB & double & Mean atmospheric pressure\\
+\hline \label{GSDVars:hamb}C5RH & HAMB & double & Mean atmospheric relative humidity\\
+\hline \label{GSDVars:errAz}C4AZERR & SDIS(7) & double & DAZ:Net Az offset at start (inc.tracker ball setting and user correction)\\
+\hline \label{GSDVars:errEl}C4ELERR & SDIS(8) & double & DEL:Net El offset at start (inc.tracker ball setting and user correction)\\
+\hline \label{GSDVars:userAz}UAZ & SDIS(36) & double & User az correction\\
+\hline \label{GSDVars:userEl}UEL & SDIS(37) & double & User el correction\\
+\hline \label{GSDVars:nVRad}C7SZVRAD & SZVRAD & int & Number of elements of vradial array\\
+\hline \label{GSDVars:apertureEff}C8AAE & APERTURE\_EFF & double & Ratio total power observed\\
+\hline \label{GSDVars:beamEff}C8ABE & BEAM\_EFF & double & Fraction of beam in diffraction limited main beam\\
+\hline \label{GSDVars:antennaGain}C8GN & ANTENNA\_GAIN & double & Antenna gain\\
+\hline \label{GSDVars:etal}C8EL & ETAL & double & Rear spillover and scattering efficiency\\
+\hline \label{GSDVars:etafss}C8EF & ETAFSS & double & Forward spillover and scattering efficiency\\
+\hline \label{GSDVars:chopping}C4SM & CHOPPING & char & Secondary mirror is chopping\\
+\hline \label{GSDVars:chopWaveform}C4FUN & WAVEFORM & char* & Secondary mirror chopping waveform\\
+\hline \label{GSDVars:chopFrequency}C4FRQ & FREQUENCY & float & Secondary mirror chopping period\\
+\hline \label{GSDVars:chopCoords}C4SMCO & COORDS & char* & Secondary mirror chopping coordinate system\\
+\hline \label{GSDVars:chopThrow}C4THROW & THROW & float & Secondary mirror chop throw\\
+\hline \label{GSDVars:chopPA}C4POSANG & POSANG & float & Secondary mirror chop position angle\\
+\hline \label{GSDVars:smuOffsEW}C4OFFS\_EW & OFFS\_EW & float & Secondary mirror offset parallel to lower axis (East-West Tilt)\\
+\hline \label{GSDVars:smuOffsNS}C4OFFS\_NS & OFFS\_NS & float & Secondary mirror offset parallel to upper axis (North-South Tilt)\\
+\hline \label{GSDVars:smuX}C4X & X & float & Secondary mirror absolute X position at observation start\\
+\hline \label{GSDVars:smuY}C4Y & Y & float & Secondary mirror absolute Y position at observation start\\
+\hline \label{GSDVars:smuZ}C4Z & Z & float & Secondary mirror absolute Z position at observation start\\
+\hline \label{GSDVars:smuEWScale}C4EW\_SCALE & EW\_AMPL\_SCALE & float & Secondary mirror ew chop scale\\
+\hline \label{GSDVars:smuNSScale}C4NS\_SCALE & NS\_AMPL\_SCALE & float & Secondary mirror ns chop scale\\
+\hline \label{GSDVars:smuEWEnc}C4EW\_ENCODER & AMPL\_E\_SET & int & Secondary mirror ew encoder value\\
+\hline \label{GSDVars:smuNSEnc}C4NS\_ENCODER & AMPL\_N\_SET & int & Secondary mirror ns encoder value\\
+\hline \label{GSDVars:smuDX}C2FV & DX & float & Secondary mirror x displacement from nominal at observation start\\
+\hline \label{GSDVars:smuDY}C2FL & DY & float & Secondary mirror y displacement from nominal at observation start\\
+\hline \label{GSDVars:smuDZ}C2FR & DZ & float & Secondary mirror z displacement from nominal at observation start\\
+\hline \label{GSDVars:telCoords}C4MOCO & TEL\_COORDS & char* & Mounting of telescope; defined as LOWER\\
+\hline \label{GSDVars:nFEChans}C3NFOC & NO\_FE\_O\_CH & int & NO\_FE\_O\_CH:No. of frontend output channels\\
+\hline \label{GSDVars:velocity}C7VR & VELOCITY & double & Radial velocity of the source\\
+\hline \label{GSDVars:tCold}C12TCOLD & T\_COLD & float & Cold load temperature\\
+\hline \label{GSDVars:tHot}C12TAMB & T\_HOT & float & Ambient load temperature\\
+\hline \label{GSDVars:velDefn}C12VDEF & VEL\_DEFN & char* & Velocity definition code - radio, optical, or relativistic\\
+\hline \label{GSDVars:velRef}C12VREF & VEL\_REF & char* & Velocity frame of reference - LSR, Bary-, Helio-, or Geo- centric\\
+\hline \label{GSDVars:nBEChansIn}C3NRC & NO\_BE\_I\_CH & int & Number of backend input channels\\
+\hline \label{GSDVars:nBEChansOut}C3NCH & NO\_BE\_O\_CH & int & Number of backend output channels\\
+\hline \label{GSDVars:nBESections}C3NRS & NO\_BES & int & Number of backend sections\\
+\hline \label{GSDVars:badVal}C7BCV & BAD\_CHANNEL & float & Bad channel value\\
+\hline \label{GSDVars:dataUnits}C12CAL & DATA\_UNITS & char* & Units of spectrum data\\
+\hline \label{GSDVars:swMode}C6MODE & SWITCH\_MODE & char* & Observation mode\\
+\hline \label{GSDVars:calInstrument}C12CALTASK & BE\_CAL\_TASK & char* & Calibration instrument used (FE, BE, or USER)\\
+\hline \label{GSDVars:calType}C12CALTYPE & BE\_CAL\_TYPE & char* & Type of calibration (THREELOADS or TWOLOADS)\\
+\hline \label{GSDVars:calmode}C12REDMODE & BE\_RED\_MODE & char* & Way of calibrating the data (RATIO or DIFFERENCE)\\
+\hline \label{GSDVars:IFPerSection}C3NOIFPBES & NO\_IF\_PER\_BES & int & Number of IF inputs to each section (2 for correlator, 1 for AOS)\\
+\hline \label{GSDVars:BEConfig}C3CONFIGNR & DAS\_CONF\_NR & int & Backend configuration\\
+\hline \label{GSDVars:dataOutput}C3DASOUTPUT & DAS\_OUTPUT & char* & Description of output in DAS DATA (SPECTRUM, T\_REC, T\_SYS, etc.)\\
+\hline \label{GSDVars:calSource}C3DASCALSRC & DAS\_CAL\_SOURCE & char* & DAS calibration source for backend calibration (POWER or DATA)\\
+\hline \label{GSDVars:shiftFrac}C3DASSHFTFRAC & DAS\_SHIFT\_FRAC & float & DAS calibration source for backend calibration (POWER or DATA)\\
+\hline \label{GSDVars:tau225}C7TAU225 & CSO\_TAU & float & CSO tau at 225GHz\\
+\hline \label{GSDVars:tauRMS}C7TAURMS & CSO\_TAU\_RMS & float & CSO tau rms\\
+\hline \label{GSDVars:tauTime}C7TAUTIME & CSO\_YYMMDDHHMM & char* & CSO tau time (YYMMDDHHMM)\\
+\hline \label{GSDVars:seeing}C7SEEING & SAO\_SEEING & float & Seeing at JCMT\\
+\hline \label{GSDVars:seeTime}C7SEETIME & SAO\_YYMMDDHHMM & char* & SAO seeing time (YYMMDDHHMM)\\
+\hline \label{GSDVars:polarity}C3POLARITY & C3POLARITY & char* & Frontend Polarity\\
+\hline \label{GSDVars:sbMode}C3SBMODE & C3SBMODE & char* & Sideband mode\\
+\hline \label{GSDVars:IFONPhase}C55NPH & DAS\_NO\_PHASE & int & DAS number of phases for interferometry observing\\
+\hline \label{GSDVars:IFONCycle}C55NCYC & DAS\_NO\_CYCLES & int & DAS number of phases for interferometry observing\\
+\hline \label{GSDVars:IFONIntCycle}C55NINT & DAS\_NINTCYCLE & int & DAS number of phases for interferometry observing\\
+\hline \label{GSDVars:nCorrCycle}C55NCORR & DAS\_NCORRCYCLE & int & DAS number of correlation cycles\\
+\hline \label{GSDVars:procBits}C55DASPRBIT & DAS\_PROC\_BITS & int & DAS data processing done\\
+\hline \label{GSDVars:procLoc}C55DASPRLOC & DAS\_PROC\_LOC & char* & Description of where processing is done\\
+\hline \label{GSDVars:RXJLengthX}C55LX & RXJ.LX & double & RXJ X length of projected baseline in metres\\
+\hline \label{GSDVars:RXJLengthY}C55LY & RXJ.LY & double & RXJ Y length of projected baseline in metres\\
+\hline \label{GSDVars:RXJLengthZ}C55LZ & RXJ.LZ & double & RXJ Z length of projected baseline in metres\\
+\hline \label{GSDVars:RXJSin}C55A & RXJ.A & double & RXJ Coefficient of sin term in expression for fringe rate (metres)\\
+\hline \label{GSDVars:RXJCos}C55B & RXJ.B & double & RXJ Coefficient of cos term in expression for fringe rate (metres)\\
+\hline \label{GSDVars:RXJConstant}C55C & RXJ.C & double & RXJ Coefficient of constant term in expression for fringe rate (metres)\\
+\hline \label{GSDVars:RXJCSOSwitch}C55CSOSW & RXJ.CSO\_SWITCH & int & RXJ Delay setting of RXJ micro for CSO side\\
+\hline \label{GSDVars:RXJJCMTSwitch}C55JCMTSW & RXJ.JCMT\_SWITCH & int & RXJ Delay setting of RXJ micro for JCMT side\\
+\hline \label{GSDVars:RXJNSecs}C55SECOND & RXJ.NSECS & int & RXJ Number of the tick on which integration started\\
+\hline \label{GSDVars:CSOAbsorb}C55ABSORB & RXJ.ABSORB & char* & CSO Position of absorber IN or OUT\\
+\hline \label{GSDVars:CSOTAU}C55TAU & RXJ.CSO\_TAU & float & CSO TAU value\\
+\hline \label{GSDVars:CSODAz}C55DAZ & RXJ.DAZ & float & CSO Position offset in az (arcsec)\\
+\hline \label{GSDVars:CSODEl}C55DEL & RXJ.DEL & float & CSO Position offset in elevation (arcsec)\\
+\hline \label{GSDVars:CSORA}C55RA & RXJ.RA & double & CSO RA\\
+\hline \label{GSDVars:CSODec}C55DEC & RXJ.DEC & double & CSO Dec\\
+\hline \label{GSDVars:CSOEpoch}C55EPOCH & RXJ.EPOCH & double & CSO Epoch of CSO RA and Dec\\
+\hline \label{GSDVars:CSOPAz}C55PAZ & RXJ.PAZ & float & CSO Pointing offset in az (arcsec)\\
+\hline \label{GSDVars:CSOPEl}C55PEL & RXJ.PEL & float & CSO Pointing offset in el (arcsec)\\
+\hline \label{GSDVars:CSOTrack}C55TRACK & RXJ.TRACK & char* & CSO Track mode of telescope Y or N\\
+\hline \label{GSDVars:CSOFocus}C55FMODE & RXJ.FMODE & char* & CSO Focus mode of CSO\\
+\hline \label{GSDVars:CSOFocusX}C55FX & RXJ.FX & float & CSO X position of focus\\
+\hline \label{GSDVars:CSOFocusY}C55FY & RXJ.FY & float & CSO Y position of focus\\
+\hline \label{GSDVars:CSOFocusZ}C55FZ & RXJ.FZ & float & CSO Z position of focus\\
+\hline \label{GSDVars:CSOVelocity}C55VLSR & RXJ.VLSR & float & CSO LSR velocity of source (km/s)\\
+\hline \label{GSDVars:CSOVelOffset}C55VOFF & RXJ.COFF & float & CSO velocity offset (km/s)\\
+\hline \label{GSDVars:CSORadVel}C55VRAD & RXJ.VRAD & float & CSO radial velocity (km/s)\\
+\hline \label{GSDVars:CSOPhaseLock}C55PLOCK & RXJ.PLOCK & char* & CSO Phase lock status L or U\\
+\hline \label{GSDVars:CSORestFreq}C55RFREQ & RXJ.RFREQ & double & CSO Rest frequency of line (GHz)\\
+\hline \label{GSDVars:CSOIFFreq}C55IFFREQ & RXJ.IFFREQ & double & CSO IF frequency (GHz)\\
+\hline \label{GSDVars:CSOLOFreq}C55LOFREQ & RXJ.LOFREQ & double & CSO LO frequency (GHz)\\
+\hline \label{GSDVars:CSOFreqOffset}C55FREQOFF & RXJ.FREQOFF & double & CSO frequency offset (GHz)\\
+\hline \label{GSDVars:CSOSideband}C55SIDEBAND & RXJ.SIDEBAND & char* & CSO Sideband U or L\\
+\hline \label{GSDVars:CSOMultHarm}C55MHN & RXJ.MHN & int & CSO Multiplier Harmonic number\\
+\hline \label{GSDVars:CSOStatus}C55CSOSTATUS & RXJ.CSO\_STATUS & int & CSO overall status 0 = bad 1 = good\\
+\hline \label{GSDVars:telAz}C55TELAZ & TEL.SDIS(9) & double & CENTRE\_AZ from tel sdis array\\
+\hline \label{GSDVars:telEl}C55TELEL & TEL.SDIS(10) & double & CENTRE\_EL from tel sdis array\\
+
+\hline
+\end {longtable}
+
+\end{htmlonly}
+
+
+
+
+
+
+
+
+\newpage
+\subsection{\xlabel{GSDarrays}GSD Arrays}
+
+\begin{latexonly}
+
+\begin {longtable}{|p{38mm}|p{42mm}|p{11mm}|p{55mm}|}
+\hline
+\textit{NRAO name} & \textit{JCMT name} & \textit{Data type} & \textit{Description}\\
+
+\hline \label{GSDVars:FEFreqs}C55FENUOBS & FE\_NUOBS & double & Observing frequencies\\
+\hline \label{GSDVars:FESBSigns}C55FESBSIGN & FE\_SB\_SIGN & int & FE sideband signs\\
+\hline \label{GSDVars:FELOFreqs}C55FENULO & FE\_NULO & double & FE LO frequencies\\
+\hline \label{GSDVars:vRadial}C7VRADIAL & C7VRADIAL & double & Array for computer radial velocities\\
+\hline \label{GSDVars:scanVars1}C12SCAN\_VARS1 & SCAN\_VARS1 & char* & Names of the cols. of scan table1\\
+\hline \label{GSDVars:scanVars2}C12SCAN\_VARS2 & SCAN\_VARS2 & char* & Names of the cols. of scan table2\\
+\hline \label{GSDVars:scanTable1}C12SCAN\_TABLE\_1 & SCAN\_TABLE1 & float & Begin scan table\\
+\hline \label{GSDVars:scanTable2}C12SCAN\_TABLE\_2 & SCAN\_TABLE2 & float & End scan table\\
+\hline \label{GSDVars:mapTable}C14PHIST & MAP\_TABLE & float & List of xy offsets for each scan\\
+\hline \label{GSDVars:phaseVars}C11VD & PHASE\_VARS & char* & Names of the cols. of phase table\\
+\hline \label{GSDVars:phaseTable}C11PHA & PHASE\_TABLE & float & Phase table: switching scheme dependent\\
+\hline \label{GSDVars:corrModes}C12CM & BES\_CORR\_MODE & int & Correlation function mode\\
+\hline \label{GSDVars:bitmodes}C12BM & BES\_BITMODE & int & Correlation bit mode\\
+\hline \label{GSDVars:sbOverlaps}C3OVERLAP & BES\_OVERLAP & float & Subband overlap\\
+\hline \label{GSDVars:mixNums}C3MIXNUM & DAS\_MIXER & int & \\
+\hline \label{GSDVars:BEInputChans}C3BESCONN & BES\_CONN & int & BE input channels connected to this section\\
+\hline \label{GSDVars:BEConnChans}C3BEINCON & BE\_IN\_CONN & int & IF output channels connected to BE input channels\\
+\hline \label{GSDVars:BEChans}C3LSPC & NO\_BES\_O\_CH & int & Number of channels per backend section\\
+\hline \label{GSDVars:BESubsys}C3BESSPEC & BES\_SPECTRUM & int & Subsystem nr to which each backend section belongs.\\
+\hline \label{GSDVars:centreFreqs}C12CF & BES\_NUOBS & double & Centre frequencies (rest frame of source) [GHz]\\
+\hline \label{GSDVars:restFreqs}C12RF & BES\_NUREST & double & Rest frequency [GHz]\\
+\hline \label{GSDVars:LOFreqs}C3BEFENULO & BES\_FE\_NULO & double & Copy of frontend LO frequency per backend section\\
+\hline \label{GSDVars:totIFs}C3BETOTIF & BES\_TOT\_IF & double & Total IF per backend section\\
+\hline \label{GSDVars:sbSigns}C3BEFESB & BES\_FE\_SB\_SIGN & int & Copy of frontend sideband sign per backend section\\
+\hline \label{GSDVars:BEInputFreqs}C12INFREQ & BE\_NUIN & double & BE input frequencies [GHz]\\
+\hline \label{GSDVars:freqRes}C12FR & BES\_DELTANU & float & Frequency resolution [MHz]\\
+\hline \label{GSDVars:bandwidths}C12BW & BES\_BANDWIDTH & float & Bandwidth [MHz]\\
+\hline \label{GSDVars:recTemps}C12RT & BES\_T\_REC & float & Receiver temperature\\
+\hline \label{GSDVars:sourceSysTemps}C12SST & BES\_T\_SYS & float & System temperature\\
+\hline \label{GSDVars:skyTemps}C12TSKY & BES\_T\_SKY & float & Sky temperature at last calibration\\
+\hline \label{GSDVars:telTemps}C12TTEL & BES\_T\_TEL & float & Telescope temp. from last skydip\\
+\hline \label{GSDVars:gains}C12GAINS & BES\_GAIN & float & Gain value (kelvins per volt or equivalent)\\
+\hline \label{GSDVars:caltemps}C12CT & BES\_T\_TEL & float & Calibration temperature\\
+\hline \label{GSDVars:opacities}C12WO & BES\_T\_TEL & float & Water opacity\\
+\hline \label{GSDVars:skyTrans}C12ETASKY & BES\_ETA\_SKY & float & Sky transmission from last calibration\\
+\hline \label{GSDVars:alphas}C12ALPHA & BES\_ALPHA & float & Ratio of signal sideband to image sideband sky transmission\\
+\hline \label{GSDVars:sbGainNorms}C12GS & BES\_G\_S & float & Normalizes signal sideband gain\\
+\hline \label{GSDVars:telTrans}C12ETATEL & BES\_ETA\_TEL & float & Telescope transmission\\
+\hline \label{GSDVars:FETSkyIm}C12TSKYIM & BES\_T\_SKY\_IM & float & Frontend-derived Tsky, image sideband\\
+\hline \label{GSDVars:FESkyTrans}C12ETASKYIM & BES\_ETA\_SKY\_IM & float & Frontend-derived sky transmission\\
+\hline \label{GSDVars:FETSysIm}C12TSYSIM & BES\_T\_SYS\_IM & float & Frontend-derived Tsys, image sideband\\
+\hline \label{GSDVars:sbRatios}C12TASKY & BES\_TA\_SKY & float & Ratio of signal sideband to image sideband sky transmission\\
+\hline \label{GSDVars:intTimes}C3INTT & INTGRN\_TIME & int & Scan integration time\\
+\hline \label{GSDVars:data}C13DAT & DATA & float & Spectrum data\\
+\hline \label{GSDVars:hotPower}C55HOTPOWER & DAS\_HOT\_POWER & float & Total power measurement on hot load\\
+\hline \label{GSDVars:skyPower}C55SKYPOWER & DAS\_SKY\_POWER & float & Total power measurement on hot load (??)\\
+\hline \label{GSDVars:samples}C55SAM & SAMPLES & float & Samples to store for cross\_correlation mode\\
+\hline \label{GSDVars:totPower}C55POWER & DAS\_POWER & float & Total power measurement per subband per integration\\
+
+\hline
+\end {longtable}
+
+\end{latexonly}
+
+\begin{htmlonly}
+
+\begin {longtable}{|l|l|l|l|}
+\hline
+\textit{NRAO name} & \textit{JCMT name} & \textit{Data type} & \textit{Description}\\
+
+\hline \label{GSDVars:FEFreqs}C55FENUOBS & FE\_NUOBS & double & Observing frequencies\\
+\hline \label{GSDVars:FESBSigns}C55FESBSIGN & FE\_SB\_SIGN & int & FE sideband signs\\
+\hline \label{GSDVars:FELOFreqs}C55FENULO & FE\_NULO & double & FE LO frequencies\\
+\hline \label{GSDVars:vRadial}C7VRADIAL & C7VRADIAL & double & Array for computer radial velocities\\
+\hline \label{GSDVars:scanVars1}C12SCAN\_VARS1 & SCAN\_VARS1 & char* & Names of the cols. of scan table1\\
+\hline \label{GSDVars:scanVars2}C12SCAN\_VARS2 & SCAN\_VARS2 & char* & Names of the cols. of scan table2\\
+\hline \label{GSDVars:scanTable1}C12SCAN\_TABLE\_1 & SCAN\_TABLE1 & float & Begin scan table\\
+\hline \label{GSDVars:scanTable2}C12SCAN\_TABLE\_2 & SCAN\_TABLE2 & float & End scan table\\
+\hline \label{GSDVars:mapTable}C14PHIST & MAP\_TABLE & float & List of xy offsets for each scan\\
+\hline \label{GSDVars:phaseVars}C11VD & PHASE\_VARS & char* & Names of the cols. of phase table\\
+\hline \label{GSDVars:phaseTable}C11PHA & PHASE\_TABLE & float & Phase table: switching scheme dependent\\
+\hline \label{GSDVars:corrModes}C12CM & BES\_CORR\_MODE & int & Correlation function mode\\
+\hline \label{GSDVars:bitmodes}C12BM & BES\_BITMODE & int & Correlation bit mode\\
+\hline \label{GSDVars:sbOverlaps}C3OVERLAP & BES\_OVERLAP & float & Subband overlap\\
+\hline \label{GSDVars:mixNums}C3MIXNUM & DAS\_MIXER & int & \\
+\hline \label{GSDVars:BEInputChans}C3BESCONN & BES\_CONN & int & BE input channels connected to this section\\
+\hline \label{GSDVars:BEConnChans}C3BEINCON & BE\_IN\_CONN & int & IF output channels connected to BE input channels\\
+\hline \label{GSDVars:BEChans}C3LSPC & NO\_BES\_O\_CH & int & Number of channels per backend section\\
+\hline \label{GSDVars:BESubsys}C3BESSPEC & BES\_SPECTRUM & int & Subsystem nr to which each backend section belongs.\\
+\hline \label{GSDVars:centreFreqs}C12CF & BES\_NUOBS & double & Centre frequencies (rest frame of source) [GHz]\\
+\hline \label{GSDVars:restFreqs}C12RF & BES\_NUREST & double & Rest frequency [GHz]\\
+\hline \label{GSDVars:LOFreqs}C3BEFENULO & BES\_FE\_NULO & double & Copy of frontend LO frequency per backend section\\
+\hline \label{GSDVars:totIFs}C3BETOTIF & BES\_TOT\_IF & double & Total IF per backend section\\
+\hline \label{GSDVars:sbSigns}C3BEFESB & BES\_FE\_SB\_SIGN & int & Copy of frontend sideband sign per backend section\\
+\hline \label{GSDVars:BEInputFreqs}C12INFREQ & BE\_NUIN & double & BE input frequencies [GHz]\\
+\hline \label{GSDVars:freqRes}C12FR & BES\_DELTANU & float & Frequency resolution [MHz]\\
+\hline \label{GSDVars:bandwidths}C12BW & BES\_BANDWIDTH & float & Bandwidth [MHz]\\
+\hline \label{GSDVars:recTemps}C12RT & BES\_T\_REC & float & Receiver temperature\\
+\hline \label{GSDVars:sourceSysTemps}C12SST & BES\_T\_SYS & float & System temperature\\
+\hline \label{GSDVars:skyTemps}C12TSKY & BES\_T\_SKY & float & Sky temperature at last calibration\\
+\hline \label{GSDVars:telTemps}C12TTEL & BES\_T\_TEL & float & Telescope temp. from last skydip\\
+\hline \label{GSDVars:gains}C12GAINS & BES\_GAIN & float & Gain value (kelvins per volt or equivalent)\\
+\hline \label{GSDVars:caltemps}C12CT & BES\_T\_TEL & float & Calibration temperature\\
+\hline \label{GSDVars:opacities}C12WO & BES\_T\_TEL & float & Water opacity\\
+\hline \label{GSDVars:skyTrans}C12ETASKY & BES\_ETA\_SKY & float & Sky transmission from last calibration\\
+\hline \label{GSDVars:alphas}C12ALPHA & BES\_ALPHA & float & Ratio of signal sideband to image sideband sky transmission\\
+\hline \label{GSDVars:sbGainNorms}C12GS & BES\_G\_S & float & Normalizes signal sideband gain\\
+\hline \label{GSDVars:telTrans}C12ETATEL & BES\_ETA\_TEL & float & Telescope transmission\\
+\hline \label{GSDVars:FETSkyIm}C12TSKYIM & BES\_T\_SKY\_IM & float & Frontend-derived Tsky, image sideband\\
+\hline \label{GSDVars:FESkyTrans}C12ETASKYIM & BES\_ETA\_SKY\_IM & float & Frontend-derived sky transmission\\
+\hline \label{GSDVars:FETSysIm}C12TSYSIM & BES\_T\_SYS\_IM & float & Frontend-derived Tsys, image sideband\\
+\hline \label{GSDVars:sbRatios}C12TASKY & BES\_TA\_SKY & float & Ratio of signal sideband to image sideband sky transmission\\
+\hline \label{GSDVars:intTimes}C3INTT & INTGRN\_TIME & int & Scan integration time\\
+\hline \label{GSDVars:data}C13DAT & DATA & float & Spectrum data\\
+\hline \label{GSDVars:hotPower}C55HOTPOWER & DAS\_HOT\_POWER & float & Total power measurement on hot load\\
+\hline \label{GSDVars:skyPower}C55SKYPOWER & DAS\_SKY\_POWER & float & Total power measurement on hot load (??)\\
+\hline \label{GSDVars:samples}C55SAM & SAMPLES & float & Samples to store for cross\_correlation mode\\
+\hline \label{GSDVars:totPower}C55POWER & DAS\_POWER & float & Total power measurement per subband per integration\\
+
+\hline
+\end {longtable}
+
+\end{htmlonly}
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
+\subsection{\xlabel{GSDarraysDims}Dimensionality of GSD Arrays}
+
+
+\begin{latexonly}
+\begin {longtable}{|p{42mm}|p{26mm}|p{26mm}|p{26mm}|p{26mm}|}
+\hline
+\textit{NRAO name} & \textit{Dims (normal)} & \textit{Dims (total power)} & \textit{Dims (cont. cal)} & \textit{Dims (cross corr.)}\\
+
+
+\hline C55FENUOBS & \multicolumn{3}{|c|}{N/A} & C3NFOC\\
+\hline C55FESBSIGN & \multicolumn{3}{|c|}{N/A} & C3NFOC\\
+\hline C55FENULO & \multicolumn{3}{|c|}{N/A} & C3NFOC\\
+\hline C7VRADIAL & C7SZVRAD & N/A & C7SZVRAD & N/A\\
+\hline C12SCAN\_VARS1 & \multicolumn{4}{|c|}{C3NO\_SCAN\_VARS1}\\
+\hline C12SCAN\_VARS2 & \multicolumn{4}{|c|}{C3NO\_SCAN\_VARS2}\\
+\hline C12SCAN\_TABLE\_1 & \multicolumn{4}{|c|}{C3NO\_SCAN\_VARS1 $\times$ C3NIS}\\
+\hline C12SCAN\_TABLE\_2 & \multicolumn{4}{|c|}{C3NO\_SCAN\_VARS2 $\times$ C3NIS}\\
+\hline C14PHIST & \multicolumn{4}{|c|}{C3NPP $\times$ C3NMAP}\\
+\hline C11VD & \multicolumn{4}{|c|}{C3NSV}\\
+\hline C11PHA & \multicolumn{4}{|c|}{C3NSV $\times$ C3PPC}\\
+\hline C12CM & \multicolumn{4}{|c|}{C3NRS}\\
+\hline C12BM & \multicolumn{4}{|c|}{C3NRS}\\
+\hline C3OVERLAP & \multicolumn{4}{|c|}{C3NRS}\\
+\hline C3MIXNUM & \multicolumn{4}{|c|}{C3NRS}\\
+\hline C3BESCONN & \multicolumn{4}{|c|}{C3NRS}\\
+\hline C3BEINCON & \multicolumn{4}{|c|}{C3NRC}\\
+\hline C3LSPC & \multicolumn{4}{|c|}{C3NRS}\\
+\hline C3BESSPEC & \multicolumn{4}{|c|}{C3NRS}\\
+\hline C12CF & \multicolumn{4}{|c|}{C3NRS}\\
+\hline C12RF & \multicolumn{4}{|c|}{C3NRS}\\
+\hline C3BEFENULO & \multicolumn{4}{|c|}{C3NRS}\\
+\hline C3BETOTIF & \multicolumn{4}{|c|}{C3NRS}\\
+\hline C3BEFESB & \multicolumn{4}{|c|}{C3NRS}\\
+\hline C12INFREQ & \multicolumn{4}{|c|}{C3NRC}\\
+\hline C12FR & \multicolumn{4}{|c|}{C3NRS}\\
+\hline C12BW & \multicolumn{4}{|c|}{C3NRS}\\
+\hline C12RT & \multicolumn{4}{|c|}{C3NRS}\\
+\hline C12SST & \multicolumn{2}{|c|}{C3NRS} & C3NRS $\times$ C3NIS & C3NRS\\
+\hline C12TSKY & \multicolumn{2}{|c|}{C3NRS} & C3NRS $\times$ C3NIS & C3NRS\\
+\hline C12TTEL & \multicolumn{4}{|c|}{C3NRS}\\
+\hline C12GAINS & \multicolumn{4}{|c|}{C3NRS}\\
+\hline C12CT & \multicolumn{4}{|c|}{C3NRS}\\
+\hline C12WO & \multicolumn{4}{|c|}{C3NRS}\\
+\hline C12ETASKY & \multicolumn{2}{|c|}{C3NRS} & C3NRS $\times$ C3NIS & C3NRS\\
+\hline C12ALPHA & \multicolumn{4}{|c|}{C3NRS}\\
+\hline C12GS & \multicolumn{4}{|c|}{C3NRS}\\
+\hline C12ETATEL & \multicolumn{4}{|c|}{C3NRS}\\
+\hline C12TSKYIM & \multicolumn{2}{|c|}{C3NRS} & C3NRS $\times$ C3NIS & C3NRS\\
+\hline C12ETASKYIM & \multicolumn{2}{|c|}{C3NRS} & C3NRS $\times$ C3NIS & C3NRS\\
+\hline C12TSYSIM & \multicolumn{2}{|c|}{C3NRS} & C3NRS $\times$ C3NIS & C3NRS\\
+\hline C12TASKY & \multicolumn{2}{|c|}{C3NRS} & C3NRS $\times$ C3NIS & C3NRS\\
+\hline C3INTT & \multicolumn{4}{|c|}{C3NIS}\\
+\hline C13DAT & \multicolumn{4}{|c|}{C3NCH $\times$ C3MXP $\times$ C3NIS}\\
+\hline C55HOTPOWER & \multicolumn{3}{|c|}{N/A} & C3NRS $\times$ C3NOIFPBES\\
+\hline C55SKYPOWER & \multicolumn{3}{|c|}{N/A} & C3NRS $\times$ C3NOIFPBES\\
+\hline C55SAM & \multicolumn{3}{|c|}{N/A} & C3NCH $\times$ C55NPH $\times$ C3NCI\\
+\hline C55POWER & N/A & C3NRS C3NOIFPBES C55NPH C3PPC C3NCI & N/A & C3NRS $\times$ C3NOIFPBES $\times$ C55NPH $\times$ C3NCI\\
+
+
+\hline
+\end {longtable}
+\end{latexonly}
+
+
+\begin{htmlonly}
+\begin {longtable}{|l|c|c|c|c|}
+\hline
+\textit{NRAO name} & \textit{Dims (normal)} & \textit{Dims (total power)} & \textit{Dims (cont. cal)} & \textit{Dims (cross corr.)}\\
+
+\hline C55FENUOBS\ref{GSDVars:FEFreqs} & \multicolumn{3}{|c|}{N/A} & C3NFOC\ref{GSDVars:nFEChans}\\
+\hline C55FESBSIGN\ref{GSDVars:FESBSigns} & \multicolumn{3}{|c|}{N/A} & C3NFOC\ref{GSDVars:nFEChans}\\
+\hline C55FENULO\ref{GSDVars:FELOFreqs} & \multicolumn{3}{|c|}{N/A} & C3NFOC\ref{GSDVars:nFEChans}\\
+\hline C7VRADIAL\ref{GSDVars:vRadial} & C7SZVRAD\ref{GSDVars:nVRad} & N/A & C7SZVRAD\ref{GSDVars:nVRad} & N/A\\
+\hline C12SCAN\_VARS1\ref{GSDVars:scanVarsA} & \multicolumn{4}{|c|}{C3NO\_SCAN\_VARS1\ref{GSDVars:nScanVars1}}\\
+\hline C12SCAN\_VARS2\ref{GSDVars:scanVarsB} & \multicolumn{4}{|c|}{C3NO\_SCAN\_VARS2\ref{GSDVars:nScanVars2}}\\
+\hline C12SCAN\_TABLE\_1\ref{GSDVars:scanTableA} & \multicolumn{4}{|c|}{C3NO\_SCAN\_VARS1\ref{GSDVars:nScanVars1} $\times$ C3NIS\ref{GSDVars:noScans}}\\
+\hline C12SCAN\_TABLE\_2\ref{GSDVars:scanTableB} & \multicolumn{4}{|c|}{C3NO\_SCAN\_VARS2\ref{GSDVars:nScanVars2} $\times$ C3NIS\ref{GSDVars:noScans}}\\
+\hline C14PHIST\ref{GSDVars:mapTable} & \multicolumn{4}{|c|}{C3NPP\ref{GSDVars:nMapDims} $\times$ C3NMAP\ref{GSDVars:nMapPts}}\\
+\hline C11VD\ref{GSDVars:phaseVars} & \multicolumn{4}{|c|}{C3NSV\ref{GSDVars:nPhaseVars}}\\
+\hline C11PHA\ref{GSDVars:phaseTable} & \multicolumn{4}{|c|}{C3NSV\ref{GSDVars:nPhaseVars} $\times$ C3PPC\ref{GSDVars:nPhases}}\\
+\hline C12CM\ref{GSDVars:corrModes} & \multicolumn{4}{|c|}{C3NRS\ref{GSDVars:nBESections}}\\
+\hline C12BM\ref{GSDVars:bitmodes} & \multicolumn{4}{|c|}{C3NRS\ref{GSDVars:nBESections}}\\
+\hline C3OVERLAP\ref{GSDVars:sbOverlaps} & \multicolumn{4}{|c|}{C3NRS\ref{GSDVars:nBESections}}\\
+\hline C3MIXNUM\ref{GSDVars:mixNums} & \multicolumn{4}{|c|}{C3NRS\ref{GSDVars:nBESections}}\\
+\hline C3BESCONN\ref{GSDVars:BEInputChans} & \multicolumn{4}{|c|}{C3NRS\ref{GSDVars:nBESections}}\\
+\hline C3BEINCON\ref{GSDVars:BEConnChans} & \multicolumn{4}{|c|}{C3NRC\ref{GSDVars:nBEChansIn}}\\
+\hline C3LSPC\ref{GSDVars:BEChans} & \multicolumn{4}{|c|}{C3NRS\ref{GSDVars:nBESections}}\\
+\hline C3BESSPEC\ref{GSDVars:BESubsys} & \multicolumn{4}{|c|}{C3NRS\ref{GSDVars:nBESections}}\\
+\hline C12CF\ref{GSDVars:centreFreqs} & \multicolumn{4}{|c|}{C3NRS\ref{GSDVars:nBESections}}\\
+\hline C12RF\ref{GSDVars:restFreqs} & \multicolumn{4}{|c|}{C3NRS\ref{GSDVars:nBESections}}\\
+\hline C3BEFENULO\ref{GSDVars:LOFreqs} & \multicolumn{4}{|c|}{C3NRS\ref{GSDVars:nBESections}}\\
+\hline C3BETOTIF\ref{GSDVars:totIFs} & \multicolumn{4}{|c|}{C3NRS\ref{GSDVars:nBESections}}\\
+\hline C3BEFESB\ref{GSDVars:sbSigns} & \multicolumn{4}{|c|}{C3NRS\ref{GSDVars:nBESections}}\\
+\hline C12INFREQ\ref{GSDVars:BEInputFreqs} & \multicolumn{4}{|c|}{C3NRC\ref{GSDVars:nBEChansIn}}\\
+\hline C12FR\ref{GSDVars:freqRes} & \multicolumn{4}{|c|}{C3NRS\ref{GSDVars:nBESections}}\\
+\hline C12BW\ref{GSDVars:bandwidths} & \multicolumn{4}{|c|}{C3NRS\ref{GSDVars:nBESections}}\\
+\hline C12RT\ref{GSDVars:recTemps} & \multicolumn{4}{|c|}{C3NRS\ref{GSDVars:nBESections}}\\
+\hline C12SST\ref{GSDVars:sourceSysTemps} & \multicolumn{2}{|c|}{C3NRS\ref{GSDVars:nBESections}} & C3NRS\ref{GSDVars:nBESections} $\times$ C3NIS\ref{GSDVars:noScans} & C3NRS\ref{GSDVars:nBESections}\\
+\hline C12TSKY\ref{GSDVars:skyTemps} & \multicolumn{2}{|c|}{C3NRS\ref{GSDVars:nBESections}} & C3NRS\ref{GSDVars:nBESections} $\times$ C3NIS\ref{GSDVars:noScans} & C3NRS\ref{GSDVars:nBESections}\\
+\hline C12TTEL\ref{GSDVars:telTemps} & \multicolumn{4}{|c|}{C3NRS\ref{GSDVars:nBESections}}\\
+\hline C12GAINS\ref{GSDVars:gains} & \multicolumn{4}{|c|}{C3NRS\ref{GSDVars:nBESections}}\\
+\hline C12CT\ref{GSDVars:caltemps} & \multicolumn{4}{|c|}{C3NRS\ref{GSDVars:nBESections}}\\
+\hline C12WO\ref{GSDVars:opacities} & \multicolumn{4}{|c|}{C3NRS\ref{GSDVars:nBESections}}\\
+\hline C12ETASKY\ref{GSDVars:skyTrans} & \multicolumn{2}{|c|}{C3NRS\ref{GSDVars:nBESections}} & C3NRS\ref{GSDVars:nBESections} $\times$ C3NIS\ref{GSDVars:noScans} & C3NRS\ref{GSDVars:nBESections}\\
+\hline C12ALPHA\ref{GSDVars:alphas} & \multicolumn{4}{|c|}{C3NRS\ref{GSDVars:nBESections}}\\
+\hline C12GS\ref{GSDVars:sbGainNorms} & \multicolumn{4}{|c|}{C3NRS\ref{GSDVars:nBESections}}\\
+\hline C12ETATEL\ref{GSDVars:telTrans} & \multicolumn{4}{|c|}{C3NRS\ref{GSDVars:nBESections}}\\
+\hline C12TSKYIM\ref{GSDVars:FETSkyIm} & \multicolumn{2}{|c|}{C3NRS\ref{GSDVars:nBESections}} & C3NRS\ref{GSDVars:nBESections} $\times$ C3NIS\ref{GSDVars:noScans} & C3NRS\ref{GSDVars:nBESections}\\
+\hline C12ETASKYIM\ref{GSDVars:FESkyTrans} & \multicolumn{2}{|c|}{C3NRS\ref{GSDVars:nBESections}} & C3NRS\ref{GSDVars:nBESections} $\times$ C3NIS\ref{GSDVars:noScans} & C3NRS\ref{GSDVars:nBESections}\\
+\hline C12TSYSIM\ref{GSDVars:FETSysIm} & \multicolumn{2}{|c|}{C3NRS\ref{GSDVars:nBESections}} & C3NRS\ref{GSDVars:nBESections} $\times$ C3NIS\ref{GSDVars:noScans} & C3NRS\ref{GSDVars:nBESections}\\
+\hline C12TASKY\ref{GSDVars:sbRatios} & \multicolumn{2}{|c|}{C3NRS\ref{GSDVars:nBESections}} & C3NRS\ref{GSDVars:nBESections} $\times$ C3NIS\ref{GSDVars:noScans} & C3NRS\ref{GSDVars:nBESections}\\
+\hline C3INTT\ref{GSDVars:intTimes} & \multicolumn{4}{|c|}{C3NIS\ref{GSDVars:noScans}}\\
+\hline C13DAT\ref{GSDVars:data} & \multicolumn{4}{|c|}{C3NCH\ref{GSDVars:nBEChansOut} $\times$ C3MXP\ref{GSDVars:nScanPts} $\times$ C3NIS\ref{GSDVars:noScans}}\\
+\hline C55HOTPOWER\ref{GSDVars:hotPower} & \multicolumn{3}{|c|}{N/A} & C3NRS\ref{GSDVars:nBESections} $\times$ C3NOIFPBES\ref{GSDVars:IFPerSection}\\
+\hline C55SKYPOWER\ref{GSDVars:skyPower} & \multicolumn{3}{|c|}{N/A} & C3NRS\ref{GSDVars:nBESections} $\times$ C3NOIFPBES\ref{GSDVars:IFPerSection}\\
+\hline C55SAM\ref{GSDVars:samples} & \multicolumn{3}{|c|}{N/A} & C3NCH\ref{GSDVars:nBEChansOut} $\times$ C55NPH\ref{GSDVars:IFONPhase} $\times$ C3NCI\ref{GSDVars:noCycles}\\
+\hline C55POWER\ref{GSDVars:totPower} & N/A & C3NRS C3NOIFPBES C55NPH C3PPC C3NCI & N/A & C3NRS\ref{GSDVars:nBESections} $\times$ C3NOIFPBES\ref{GSDVars:IFPerSection} $\times$ C55NPH\ref{GSDVars:IFONPhase} $\times$ C3NCI\ref{GSDVars:noCycles}\\
+
+
+\hline
+\end {longtable}
+\end{htmlonly}
+
+
+% ? End of main text
+\end{document}
