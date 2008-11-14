@@ -31,7 +31,7 @@
 *     would be the smallest (non-bad) and largest integers. *-4
 *     would specify a range from the smallest integer to 4 inclusive.
 
-*     Arguments:
+*  Arguments:
 *      NOS = CHARACTER * ( * ) (Given)
 *          Number specification.
 *      FIRST = INTEGER (Returned)
@@ -41,23 +41,22 @@
 *      STATUS = INTEGER (Given and Returned)
 *          Global status value.
 
-*     Algorithm:
-*        - Find character position of the number separator and wildcard
-*        if present. Report an error if the first character is a
-*        separator.
-*        - If there is no separator and no wildcard convert from
-*        character to integer the single value and use for the upper
-*        and lower limits.
-*        - If there is a separator and the wildcard comes before it
-*        set the lower limit to the minimum integer and convert the
-*        upper limit.
-*        - If there is a separator and the wildcard comes after it
-*        set the upper limit to the largest positive integer and
-*        convert the lower limit.
-*        - If there is a separator and no wildcard determine the first
-*        and last numbers either side of the separator by type
-*        conversion.  If the first is greater than the last then swap
-*        them.
+*  Algorithm:
+*     - Find character position of the number separator and wildcard
+*     if present. Report an error if the first character is a
+*     separator.
+*     - If there is no separator and no wildcard convert from
+*     character to integer the single value and use for the upper
+*     and lower limits.
+*     - If there is a separator and the wildcard comes before it set
+*     the lower limit to the minimum integer and convert the upper 
+*     limit.
+*     - If there is a separator and the wildcard comes after it set the 
+*     upper limit to the largest positive integer and convert the lower 
+*     limit.
+*     - If there is a separator and no wildcard determine the first and
+*     last numbers either side of the separator by type conversion.  If 
+*     the first is greater than the last then swap them.
 
 *  Copyright:
 *     Copyright (C) 1980, 1988, 1990 Science & Engineering Research
@@ -120,7 +119,6 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-
 *  External References:
       INTEGER CHR_INDEX          ! Index of substring in string
       INTEGER CHR_LEN            ! Used length of a string
@@ -159,12 +157,14 @@
          IF ( NSEP .EQ. 0 ) THEN
             IF ( WILD .EQ. 0 ) THEN
 
-*  Convert the number.  Upper and lower limits are identical.
+*  Convert the string to an integer.  Upper and lower limits are 
+*  identical.
                CALL CHR_CTOI( NOS, FIRST, STATUS )
                IF ( STATUS .EQ. SAI__OK ) LAST = FIRST
             ELSE
 
-*  All numbers are required.
+*  All numbers are required so set the limits to minimum and maximum
+*  integers.
                FIRST = VAL__MINI
                LAST = VAL__MAXI
             END IF
@@ -175,7 +175,7 @@
 *  Does it have a wildcard before the delimiter?
             IF ( WILD .GE. 1 .AND. WILD .LE. NSEP - 1 ) THEN
 
-*  Start from the smallest non-bad integer
+*  Start from the smallest non-bad integer.
                FIRST = VAL__MINI
 
 *  Extract the last number.
@@ -187,7 +187,7 @@
 *  Extract the first number.
                CALL CHR_CTOI( NOS( :NSEP-1 ), FIRST, STATUS )
 
-*  Go to the end.
+*  Go to the end because of the wildcard delimiter.
                LAST = VAL__MAXI
             ELSE
 
@@ -195,7 +195,7 @@
                CALL CHR_CTOI( NOS( :NSEP-1 ), FIRST, STATUS )
                CALL CHR_CTOI( NOS( NSEP+1: ), LAST, STATUS )
 
-*  If misordered, swap the values around.
+*  If the values are misordered, swap them around.
                IF ( FIRST .GT. LAST ) THEN
                   DUMMY = FIRST
                   FIRST = LAST
