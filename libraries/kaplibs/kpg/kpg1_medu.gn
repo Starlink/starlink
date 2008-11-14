@@ -1,7 +1,7 @@
       SUBROUTINE KPG1_MEDU<T>( BAD, EL, ARRAY, MEDIAN, NELUSE, STATUS )
 *+
 *  Name:
-*     KPG1_MEDU<T>
+*     KPG1_MEDUx
  
 *  Purpose:
 *     Derives the unweighted median of a vector.
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
  
 *  Invocation:
-*     CALL KPG1_MEDU<T>( BAD, EL, ARRAY, MEDIAN, NELUSE, STATUS )
+*     CALL KPG1_MEDUx( BAD, EL, ARRAY, MEDIAN, NELUSE, STATUS )
  
 *  Description:
 *     This routine derives the unweighted median of an array.  If there
@@ -24,10 +24,10 @@
 *        for bad values.
 *     EL = INTEGER (Given)
 *        The number of elements within the array to sort.
-*     ARRAY( EL ) = <TYPE> (Given and Returned)
+*     ARRAY( EL ) = ? (Given and Returned)
 *        The array whose median is to be found.  On exit the array is
 *        partially sorted.
-*     MEDIAN = <TYPE> (Returned)
+*     MEDIAN = ? (Returned)
 *        The median of the array.
 *     NELUSE = INTEGER (Returned)
 *        The number of elements actually used after bad values have been
@@ -36,8 +36,11 @@
 *        The global status.
  
 *  Notes:
-*     -  There is a routine for each numeric data type.
- 
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+*     array and MEDIAN arguments supplied to the routine must have the 
+*     data type specified.
+
 *  Implementation Deficiencies:
 *     The routine could be made more efficient by using a partial
 *     Quicksort, stopping once the median is found.  The current version
@@ -75,7 +78,7 @@
 *     14-DEC-2001: (DSB):
 *        Regenerated generic source.      
 *     9-FEB-2007: (DSB):
-*        Handles cases where all inpout values are bad.
+*        Handles cases where all input values are bad.
 *     {enter_changes_here}
  
 *  Bugs:
@@ -107,7 +110,7 @@
 *  Local Variables:
       INTEGER CURR               ! Index to current smallest value
                                  ! during sorting
-      <TYPE> CURVAL          ! Current smallest value during sorting
+      <LTYPE> CURVAL             ! Current smallest value during sorting
       INTEGER ELEM               ! Sum of weights used to locate median
                                  ! during sort
       INTEGER MEDPOS             ! The position of the median in the
@@ -169,7 +172,7 @@
 *  ===============
 
 *  If no usable values were found, return a bad median value.
-         IF( NELUSE .EQ. 0 ) THEN
+         IF ( NELUSE .EQ. 0 ) THEN
             MEDIAN = VAL__BAD<T>
 
 *  Otherwise, find the median value.
@@ -203,7 +206,7 @@
     
 *  A smaller value than the test value was found so swap the values.
                   ARRAY( CURR ) = ARRAY( TEST )
-                  ARRAY( TEST )  = CURVAL
+                  ARRAY( TEST ) = CURVAL
                END IF
     
 *  Increment the sort-position index.

@@ -2,22 +2,22 @@
 *+
 *  Name:
 *     KPG1_SSAZx
- 
+
 *  Purpose:
 *     Applies a simple scaling and base-line shift to create the
 *     output vector.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPG1_SSAZx( EL, FACTOR, OFFSET, OUT, STATUS )
- 
+
 *  Description:
 *     Pixel indices are multiplied by the given factor and
 *     the given offset is then added on, to form the output data.
 *     The first pixel has a value equal to the offset.
- 
+
 *  Arguments:
 *     EL = INTEGER (Given)
 *        The number elements in the returned array.
@@ -29,14 +29,14 @@
 *        The output data vector.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Notes:
 *     -  There is a routine for the data types real or double precision:
 *     replace "x" in the routine name by R or D respectively, as
 *     appropriate.  The returned array should be of the same type.
 *     - There is no exception handler if the evaluated value exceeds the
 *     machine floating-point range.
- 
+
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council.
 *     Copyright (C) 2004 Central Laboratory of the Research Councils.
@@ -47,12 +47,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
@@ -62,60 +62,54 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1992 July 15 (MJC):
 *        Original version based on KPG1_SSCOF.
-*     2004 Oct 1 (TIMJ):
-*        Recreate generic version from type fortran
-*        NUM_CMN is not required
+*     2004 October 1 (TIMJ):
+*        NUM_CMN is not required.
 *     {enter_further_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
- 
-*  Global Variables:
- 
+
 *  Arguments Given:
       INTEGER  EL
       DOUBLE PRECISION FACTOR
       DOUBLE PRECISION OFFSET
- 
+
 *  Arguments Returned:
       <TYPE> OUT( EL )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local variables:
       INTEGER  ELEM              ! The element counter
- 
+
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
- 
+
 *.
- 
-*    Check inherited global status.
- 
+
+*  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
-*    Loop round all the elements of the vector.
- 
+
+*  Loop round all the elements of the vector.
       DO ELEM = 1, EL
- 
-*       Evaluate the scale and offset for each array element.
- 
+
+*  Evaluate the scale and offset for each array element.
          OUT( ELEM ) = NUM_DTO<T>( FACTOR * DBLE( ELEM - 1 ) + OFFSET )
- 
+
       END DO
- 
+
       END
