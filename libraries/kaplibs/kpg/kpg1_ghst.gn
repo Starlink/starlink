@@ -33,13 +33,13 @@
 *     CUMUL = LOGICAL (Given)
 *        Is a cumulative histogram required?
 *     VALMAX = ? (Given and Returned)
-*        Maximum data value included in the array. If this is supplied as 
-*        VAL__BAD<T>, then the actual maximum value in the ARRAY is found
-*        and used, and returned on exit.
+*        Maximum data value included in the array.  If this is supplied 
+*        as VAL__BAD<T>, then the actual maximum value in the ARRAY is 
+*        found and used, and returned on exit.
 *     VALMIN = ? (Given and Returned)
-*        Minimum data value included in the array. If this is supplied as 
-*        VAL__BAD<T>, then the actual minimum value in the ARRAY is found
-*        and used, and returned on exit.
+*        Minimum data value included in the array.  If this is supplied
+*        as VAL__BAD<T>, then the actual minimum value in the ARRAY is 
+*        found and used, and returned on exit.
 *     HIST( NUMBIN ) = INTEGER (Returned)
 *        Array containing the histogram.
 *     STATUS = INTEGER (Given and Returned)
@@ -103,7 +103,8 @@
 *        Report an error if VALMAX/MIN are supplied bad, and all data
 *        values are bad.
 *     15-MAY-2008 (DSB):
-*        Guard against cases where all values are equal and THRESH is zero.
+*        Guard against cases where all values are equal and THRESH is 
+*        zero.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -164,15 +165,15 @@
       END DO
 
 *  If either max or min values were not supplied, find them now. 
-      IF( VALMAX .EQ. VAL__BAD<T> .OR. 
-     :    VALMIN .EQ. VAL__BAD<T> ) THEN
+      IF ( VALMAX .EQ. VAL__BAD<T> .OR. 
+     :     VALMIN .EQ. VAL__BAD<T> ) THEN
 
          VLMAX = VAL__MIN<T>
          VLMIN = VAL__MAX<T>
 
-         IF( BAD ) THEN
+         IF ( BAD ) THEN
             DO  K = 1, DIM
-               IF( ARRAY( K ) .NE. VAL__BAD<T> ) THEN
+               IF ( ARRAY( K ) .NE. VAL__BAD<T> ) THEN
                   VLMAX = MAX( VLMAX, ARRAY( K ) )
                   VLMIN = MIN( VLMIN, ARRAY( K ) )
                END IF
@@ -186,15 +187,15 @@
 
          END IF
 
-         IF( VLMAX .EQ. VAL__MIN<T> .OR. VLMIN .EQ. VAL__MAX<T> ) THEN
+         IF ( VLMAX .EQ. VAL__MIN<T> .OR. VLMIN .EQ. VAL__MAX<T> ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'No good data values found in the '//
      :                    'array. No histogram formed', STATUS )
             GO TO 999
          END IF
 
-         IF( VALMAX .EQ. VAL__BAD<T> ) VALMAX = VLMAX
-         IF( VALMIN .EQ. VAL__BAD<T> ) VALMIN = VLMIN
+         IF ( VALMAX .EQ. VAL__BAD<T> ) VALMAX = VLMAX
+         IF ( VALMIN .EQ. VAL__BAD<T> ) VALMIN = VLMIN
 
       END IF
 
@@ -347,8 +348,8 @@
 
       END IF
 
-*  If required, convert to a cumulative histogam.
-      IF( CUMUL ) THEN
+*  If required, convert to a cumulative histogram.
+      IF ( CUMUL ) THEN
          DO  K = 2, NUMBIN
             HIST( K ) = HIST( K ) + HIST( K - 1 )
          END DO

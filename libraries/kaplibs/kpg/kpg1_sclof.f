@@ -105,8 +105,7 @@
 
 *.
 
-*  Check inherited global status.
-
+*  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 * Initialise BAD to indicate that no bad pixels have yet been found.
