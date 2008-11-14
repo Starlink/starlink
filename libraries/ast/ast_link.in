@@ -39,6 +39,11 @@
 #     Message Service) library (Starlink System Note SSN/4). By default,
 #     error messages are simply written to standard error.
 #
+#     - ``-drama'': Requests that the program be linked so that error messages
+#     produced by the AST library are delivered via the DRAMA Ers (Error
+#     Reporting Service) library. By default, error messages are simply
+#     written to standard error.
+#
 #     - ``-grf'': Requests that no arguments be generated to specify which
 #     2D graphics system is used to display output from the AST library. You
 #     should use this option only if you have implemented an interface to a
@@ -159,12 +164,13 @@
 
 #  Copyright:
 #     Copyright (C) 1997-2006 Council for the Central Laboratory of the Research Councils
-#     Copyright (C) 2007 Science & Technology Facilities Council.
+#     Copyright (C) 2007-2008 Science & Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Authors:
 #     RFWS: R.F. Warren-Smith (STARLINK)
 #     DSB: David S. Berry (STARLINK)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -192,6 +198,8 @@
 #        Ignore "-fsla" and "-clsa" options, and always use PAL.
 #     26-JUN-2007 (DSB):
 #        Added "-grf3d", "-pgplot3d" and "-pgp3d" flags.
+#     13-NOV-2008 (TIMJ):
+#        Add -drama option for DRAMA Ers support.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -240,6 +248,11 @@
 #  -ems - Requests error reporting through EMS.
          -ems)
             err='ems'
+            shift;;
+
+#  -drama - Requests error reporting through DRAMA Ers.
+         -drama)
+            err='drama'
             shift;;
 
 #  -myerr - Requests no error reporting.
@@ -404,6 +417,10 @@
 #  If using EMS, link with the AST EMS interface and the EMS library via the
 #  link script (if found).
       ems) args="${args} -last_ems `\`find ems_link\``";;
+
+#  If using DRAMA, link with the AST DRAMA interface and the DRAMA Ers library
+#  via the link script (if found).
+      drama) args="${args} -last_drama -lers";;
 
 #  If using own error reporting, do not produce any arguments.
       my) :;;

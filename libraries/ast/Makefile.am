@@ -301,6 +301,7 @@ lib_LTLIBRARIES = \
     libast.la \
     libast_err.la \
     libast_ems.la \
+    libast_drama.la \
     libast_grf3d.la \
     libast_grf_2.0.la \
     libast_grf_3.2.la \
@@ -336,6 +337,7 @@ endif
 if !NOPIC
 libast_err_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_ems_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
+libast_drama_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_grf3d_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_grf_2.0_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libast_grf_3.2_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
@@ -363,6 +365,9 @@ libast_err_la_SOURCES = err_null.c
 
 #  The error reporting module that uses EMS to deliver errors.
 libast_ems_la_SOURCES = err_ems.c
+
+#  The error reporting module that uses DRAMA Ers to deliver errors.
+libast_drama_la_SOURCES = err_drama.c
 
 #  The module containing null implementations of the 3D graphics routines 
 #  required by AST 
