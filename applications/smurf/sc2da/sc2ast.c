@@ -576,24 +576,15 @@ int *status             /* global status (given and returned) */
       astSetD( cache->skyframe, "ObsLon", -telpos[0] );
       astSetD( cache->skyframe, "ObsLat", telpos[1] );
 
-   astSetD( cache->skyframe, "SkyRef(1)", state->tcs_az_bc1 );
-   astSetD( cache->skyframe, "SkyRef(2)", state->tcs_az_bc2 );
-
       astExempt( cache->skyframe );
-   } else {
-     if (strcmp(state->tcs_tr_sys, "AZEL") == 0 ||	 
-          strcmp(state->tcs_tr_sys, "APP") == 0 ) {
-        astSetD( cache->skyframe, "SkyRef(1)", state->tcs_az_bc1 );
-   astSetD( cache->skyframe, "SkyRef(2)", state->tcs_az_bc2 );
-     }
    }
 
    astSet( cache->skyframe, "Epoch=MJD %.*g", DBL_DIG, state->tcs_tai + 32.184/SC2AST_SPD );
 
 /* Call this every time since we can not ensure that we will always
    have cleared the cache when a new observation starts */
-//   astSetD( cache->skyframe, "SkyRef(1)", state->tcs_az_bc1 );
-   //  astSetD( cache->skyframe, "SkyRef(2)", state->tcs_az_bc2 );
+   astSetD( cache->skyframe, "SkyRef(1)", state->tcs_az_bc1 );
+   astSetD( cache->skyframe, "SkyRef(2)", state->tcs_az_bc2 );
 
 /* Now modify the cached FrameSet to use the new Mapping and SkyFrame.
    First remove the existing current Frame and then add in the new one.
