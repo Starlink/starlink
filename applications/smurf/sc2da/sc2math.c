@@ -1312,6 +1312,7 @@ int *status               /* global status (given and returned) */
     03Sep2007 : allow for bad values in linear coeffs (bdk)
     31Oct2007 : use const for appropriate arguments (bdk)
     26Aug2008 : trap for bad value in input data (timj)
+    14Nov2008 : rearrange TABLE processing to make it a bit faster (timj)
 */
 
 {
@@ -1347,7 +1348,8 @@ int *status               /* global status (given and returned) */
     }
   else if ( strcmp ( "TABLE", flatname ) == 0 )
     {
-      temp = calloc ( nframes, sizeof(double) );
+      /* do not need to use calloc since we immediately fill the array */
+      temp = malloc ( nframes * sizeof(*temp) );
 
       for ( i=0; i<nboll; i++ )
         {
@@ -1365,24 +1367,41 @@ int *status               /* global status (given and returned) */
           sc2math_setcal ( nboll, i, nframes, temp, nflat, fpar, fcal,
                            lincal, status );
 
-          /* apply flatfield for this bolometer in each frame */
+          /* Note that we are going to flatfield the temp[] array and
+             then copy it back into the raw data. This is more
+             efficient than examining and then modifying inptr[] since
+             you don't have to keep jumping around in memory (temp[]
+             is contiguous). */
 
-          for ( j=0; j<nframes; j++ )
+          /* if the calibration is bad then we can set the output array to bad directly */
+          if ( (lincal[0] == VAL__BADD) ||
+               (lincal[1] == VAL__BADD) )
             {
-              if (inptr[j*nboll+i] != VAL__BADD)
+              for ( j=0; j<nframes; j++ )
                 {
-                  if ( ( lincal[0] == VAL__BADD ) ||
-                       ( lincal[1] == VAL__BADD ) )
+                  temp[j] = VAL__BADD;
+                }
+            }
+          else
+            {
+
+              /* apply flatfield for this bolometer in each frame */
+
+              for ( j=0; j<nframes; j++ )
+                {
+                  if (temp[j] != VAL__BADD)
                     {
-                      inptr[j*nboll+i] = VAL__BADD;
-                    }
-                  else
-                    {
-                      inptr[j*nboll+i] = inptr[j*nboll+i] * lincal[1]
+                      temp[j] = temp[j] * lincal[1]
                         + lincal[0];
                     }
                 }
             }
+          /* now copy the answer back into the raw data cube */
+          for ( j = 0; j<nframes; j++)
+            {
+              inptr[j*nboll+i] = temp[j];
+            }
+
         }
       free ( temp );
     }
