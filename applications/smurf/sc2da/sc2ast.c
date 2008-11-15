@@ -562,7 +562,12 @@ int *status             /* global status (given and returned) */
    Epoch value should be TDB, but we supply TT (=TAI+32.184 sec) instead 
    since the difference is only 1-2 milliseconds. We cache the created 
    SkyFrame to avoid the overhead of constantly re-creating it. The Epoch 
-   is set every time though since this will vary from call to call. */
+   is set every time though since this will vary from call to call. Also,
+   the SkyRef is set every time even though it only changes between
+   observations. We have to do this because the cache does not (yet) get cleared
+   between observations, especially in the DA. Benchmarking indicates that
+   there is no penalty in calling this every time for non-moving objects.
+*/
    if( !cache->skyframe ) {
       cache->skyframe = astSkyFrame ( "system=AzEl" );
       
@@ -571,20 +576,15 @@ int *status             /* global status (given and returned) */
       astSetD( cache->skyframe, "ObsLon", -telpos[0] );
       astSetD( cache->skyframe, "ObsLat", telpos[1] );
 
-      /* can not set SkyRefIs for now */
-      astSetD( cache->skyframe, "SkyRef(1)", state->tcs_az_bc1 );
-      astSetD( cache->skyframe, "SkyRef(2)", state->tcs_az_bc2 );
-
       astExempt( cache->skyframe );
-   } else {
-     /* Set SkyRef but only if we are moving */
-     if (strcmp(state->tcs_tr_sys, "AZEL") == 0 ||
-         strcmp(state->tcs_tr_sys, "APP") == 0 ) {
-       astSetD( cache->skyframe, "SkyRef(1)", state->tcs_az_bc1 );
-       astSetD( cache->skyframe, "SkyRef(2)", state->tcs_az_bc2 );
-     }
    }
+
    astSet( cache->skyframe, "Epoch=MJD %.*g", DBL_DIG, state->tcs_tai + 32.184/SC2AST_SPD );
+
+/* Call this every time since we can not ensure that we will always
+   have cleared the cache when a new observation starts */
+   astSetD( cache->skyframe, "SkyRef(1)", state->tcs_az_bc1 );
+   astSetD( cache->skyframe, "SkyRef(2)", state->tcs_az_bc2 );
 
 /* Now modify the cached FrameSet to use the new Mapping and SkyFrame.
    First remove the existing current Frame and then add in the new one.
