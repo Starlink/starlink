@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="smurf">
+  <version>0.4.1</version>
+  <path>applications/smurf</path>
+  <description>SURF2 - SCUBA-2 User Reduction Facility</description>
+  <abstract><p>
+SURF2 is a set of ADAM tasks necessary for reducing raw
+Submillimetre Common-User Bolometer Array 2 (SCUBA-2) data obtained from
+the James Clerk Maxwell Telescope. The tasks allows one to completely
+reduce your SCUBA-2 data.
+  </p></abstract>
+  <dependencies >
+    <build>pcs</build><sourceset>messgen</sourceset><build>ast</build><build>sae</build><build>pcs</build><build>mers</build><build>ndf</build><build>shl</build><build>gsl</build><build>ndg</build><build>fftw</build><build>ard</build><build>kaplibs</build><build>pda</build><build>gsd</build><link>ndf</link><link>ast</link><link>hlp</link><link>ndg</link><link>shl</link><link>pda</link><link>gsd</link><sourceset>sst</sourceset><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Tim Jenness</name>
+      <uname>timj</uname>
+    </person>
+  </developers>
+  <documentation> sun258 sun259</documentation>
+  <bugreports>t.jenness@jach.hawaii.edu</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
