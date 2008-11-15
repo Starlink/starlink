@@ -25,7 +25,7 @@
 *     uniform spatial grid and plotted on the current graphics device.
 *     The vertical axis of each line plot represents array value, and
 *     the horizontal axis represents position along a chosen axis (see
-*     parameter USEAXIS).  All the line plots have the same axis
+*     Parameter USEAXIS).  All the line plots have the same axis
 *     limits.
 *
 *     This application will typically be used to display a grid of
@@ -37,7 +37,7 @@
 *     references to "spectral" and "spatial" axes should be
 *     interpreted appropriately.
 *
-*     A rectangular grid of NX by NY points (see parameters NX and NY)
+*     A rectangular grid of NX by NY points (see Parameters NX and NY)
 *     is defined over the spatial extent of the cube, and a spectrum
 *     is drawn at each such point. If NX and NY equal the spatial
 *     dimensions of the cube (which is the default for spatial axes of
@@ -48,25 +48,30 @@
 *     the line plot.
 *
 *     Annotated axes for the spatial co-ordinates may be drawn around
-*     the grid of line plots (see parameter AXES).  The appearance of
+*     the grid of line plots (see Parameter AXES).  The appearance of
 *     these and the space they occupy may be controlled in detail (see
-*     parameters STYLE and MARGIN).
+*     Parameters STYLE and MARGIN).
+*
+*     The plot may take several different forms such as a
+*     "join-the-dots" plot, a "staircase" plot, a "chain" plot (see 
+*     Parameter MODE).  The plotting style (colour, founts, text size, 
+*     etc.) may be specified in detail using Parameter SPECSTYLE.
 *
 *     The data value at the top and bottom of each line plot can be
-*     specified using parameters YBOT and YTOP.  The defaults can be
-*     selected in several ways including percentiles (see parameter
+*     specified using Parameters YBOT and YTOP.  The defaults can be
+*     selected in several ways including percentiles (see Parameter
 *     LMODE).
 *
 *     The current picture is usually cleared before plotting the new
-*     picture, but parameter CLEAR can be used to prevent this,
+*     picture, but Parameter CLEAR can be used to prevent this,
 *     allowing the plot (say) to be drawn over the top of a previously
 *     displayed grey scale image.
 *
 *     The range and nature of the vertical and horizontal axes in each
 *     line plot can be displayed in a key to the right of the main
-*     plot (see parameter KEY).  Also, an option exists to add
+*     plot (see Parameter KEY).  Also, an option exists to add
 *     numerical labels to the first (i.e. bottom left) line plot, see
-*     parameter REFLABEL.  However, due to the nature of the plot, the
+*     Parameter REFLABEL.  However, due to the nature of the plot, the
 *     text used may often be too small to read.
 
 *  Usage:
@@ -88,8 +93,8 @@
 *        drawing a grid of spectra over the top of a picture that
 *        includes annotated axes. The dynamic default is TRUE if and
 *        only if the graphics device is not being cleared (i.e.
-*        parameter CLEAR is FALSE) and no spatial axes are being drawn
-*        (i.e. parameter AXES is FALSE). []
+*        Parameter CLEAR is FALSE) and no spatial axes are being drawn
+*        (i.e. Parameter AXES is FALSE). []
 *     CLEAR = _LOGICAL (Read)
 *        If TRUE the current picture is cleared before the plot is
 *        drawn.  IF FALSE, then the display is left uncleared and an
@@ -122,8 +127,8 @@
 *        horizontal axes of the line plots, including the maximum and
 *        minimum value covered by the axis and the quantity
 *        represented by the axis. The appearance of this key can be
-*        controlled using parameter KEYSTYLE, and its position can be
-*        controlled using parameter KEYPOS.  [TRUE]
+*        controlled using Parameter KEYSTYLE, and its position can be
+*        controlled using Parameter KEYPOS.  [TRUE]
 *     KEYPOS() = _REAL (Read)
 *        Two values giving the position of the key.  The first value
 *        gives the gap between the right-hand edge of the grid plot
@@ -134,10 +139,10 @@
 *        top of the key is placed level with the top of the grid
 *        plot.  Both values should be in the range 0.0 to 1.0.  If a
 *        key is produced, then the right-hand margin specified by
-*        parameter MARGIN is ignored.  [current value]
+*        Parameter MARGIN is ignored.  [current value]
 *     KEYSTYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style
-*        to use for the key (see parameter KEY).
+*        to use for the key (see Parameter KEY).
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text 
@@ -164,7 +169,7 @@
 *        setting new values for the attributes Colour(Strings),
 *        Font(Strings), etc. [current value]
 *     LMODE = LITERAL (Read)
-*        LMODE specifies how the defaults for parameters YBOT and YTOP
+*        LMODE specifies how the defaults for Parameters YBOT and YTOP
 *        (the lower and upper limit of the vertical axis of each line
 *        plot) should be found.  The supplied string should consist of
 *        up to three sub-strings, separated by commas.  The first
@@ -222,6 +227,33 @@
 *        If a null (!) value is supplied, the value used is (for all
 *        edges); 0.15 if annotated axes are being produced; and 0.0
 *        otherwise.  The initial default is null.  [current value]
+*     MARKER = _INTEGER (Read)
+*        This parameter is only accessed if Parameter MODE is set to
+*        "Chain" or "Mark".  It specifies the symbol with which each
+*        position should be marked, and should be given as an integer 
+*        PGPLOT marker type.  For instance, 0 gives a box, 1 gives a 
+*        dot, 2 gives a cross, 3 gives an asterisk, 7 gives a triangle.
+*        The value must be larger than or equal to -31.  [current value]
+*     MODE = LITERAL (Read)
+*        Specifies the way in which data values are represented.  MODE
+*        can take the following values.
+*
+*        - "Histogram" -- An histogram of the points is plotted in the
+*        style of a "staircase" (with vertical lines only joining the Y 
+*        values and not extending to the base of the plot).  The
+*        vertical lines are placed midway between adjacent X positions.
+*
+*        - "Line" -- The points are joined by straight lines.
+*
+*        - "Point" -- A dot is plotted at each point.
+*
+*        - "Mark" -- Each point is marker with a symbol specified by 
+*        Parameter MARKER.
+*
+*        - "Chain" -- A combination of "Line" and "Mark". 
+*
+*        The initial default is "Line".
+*        [current value]
 *     NDF = NDF (Read)
 *        The input NDF structure containing the data to be displayed.
 *        It should have three significant axes, i.e. whose dimensions
@@ -280,7 +312,7 @@
 *        Lines may be used in place of Curves).  [current value]
 *     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to
-*        use for the annotated outer spatial axes (see parameter AXES). 
+*        use for the annotated outer spatial axes (see Parameter AXES). 
 * 
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text 
@@ -323,11 +355,11 @@
 *        axis found in the current Frame of the NDF.  []
 *     YBOT = _REAL (Read)
 *        The data value for the bottom edge of each line plot. The
-*        dynamic default is chosen in a manner determined by parameter
+*        dynamic default is chosen in a manner determined by Parameter
 *        LMODE.  []
 *     YTOP = _REAL (Read)
 *        The data value for the top edge of each line plot. The dynamic
-*        default is chosen in a manner determined by parameter LMODE. []
+*        default is chosen in a manner determined by Parameter LMODE. []
 
 *  Examples:
 *     clinplot cube useaxis=3
@@ -347,10 +379,10 @@
 *        Plots data values versus position for the central 5-by-5
 *        pixel region of the three-dimensional NDF called map on the
 *        current graphics device.  No spatial axes are drawn.
-*     clinplot map(~5,~5,) useaxis=3 noaxes device=ps_l
+*     clinplot map(~5,~5,) useaxis=3 noaxes device=ps_l mode=hist
 *        As the previous example but now the output goes to a text
 *        file (pgplot.ps) which can be printed on a PostScript
-*        printer.
+*        printer and the data are plotted in histogram form.
 *     clinplot nearc v style="'title=Ne Arc variance'" useaxis=1 
 *               reflabel=f
 *        Plots variance values versus position along axis 1, for each
@@ -387,7 +419,8 @@
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics & Astronomy Research
-*     Council. All Rights Reserved.
+*     Council.  (C) 2008 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -418,6 +451,10 @@
 *        the spatial axes.
 *     5-DEC-2006 (DSB):
 *        Allow input NDFs to have degenerate pixel axes.
+*     2008 November 12 (MJC):
+*        Added MODE and MARKER parameters, and mention SPECSTYLE in the 
+*        Description.  This required the viewport and window limits to
+*        be set for each cell.
 *     {enter_further_changes_here}
 
 *-
@@ -426,12 +463,12 @@
       IMPLICIT NONE            
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'         ! Standard SAE constants
-      INCLUDE 'PAR_ERR'         ! PAR error constants
-      INCLUDE 'AST_PAR'         ! AST constants
-      INCLUDE 'NDF_PAR'         ! NDF constants
-      INCLUDE 'PRM_PAR'         ! VAL constants
-      INCLUDE 'CNF_PAR'         ! CNF constants
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PAR_ERR'          ! PAR error constants
+      INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'PRM_PAR'          ! VAL constants
+      INCLUDE 'CNF_PAR'          ! CNF constants
 
 *  Status:
       INTEGER STATUS
@@ -440,150 +477,161 @@
       EXTERNAL KPG1_ASPLN
 
 *  Local Constants:
-      INTEGER NDIM              ! Dimensionality of input array
+      INTEGER NDIM               ! Dimensionality of input array
       PARAMETER( NDIM = 3 )    
 
-      INTEGER MXSPEC            ! Max. no. of spectra per row or column
+      INTEGER MXSPEC             ! Max. no. of spectra per row or column
       PARAMETER( MXSPEC = 100 )    
 
-      REAL KW                   ! Width of KEY picture as a fraction of
-      PARAMETER( KW = 0.18 )    ! current picture width
+      REAL KW                    ! Width of KEY picture as a fraction of
+      PARAMETER( KW = 0.18 )     ! current picture width
 
 *  Local Variables:
-      CHARACTER ATTR*20         ! AST attribute name
-      CHARACTER COMP*8          ! Component to be displayed
-      CHARACTER LABEL*40        ! NDF Label component
-      CHARACTER MAPKEY*20       ! Key for next polyline description
-      CHARACTER MCOMP*8         ! Component to be mapped
-      CHARACTER NDFNAM*255      ! Full NDF specification 
-      CHARACTER UNIT*20         ! NDF Unit component
+      CHARACTER ATTR*20          ! AST attribute name
+      CHARACTER COMP*8           ! Component to be displayed
+      CHARACTER LABEL*40         ! NDF Label component
+      CHARACTER MAPKEY*20        ! Key for next polyline description
+      CHARACTER MCOMP*8          ! Component to be mapped
+      CHARACTER NDFNAM*255       ! Full NDF specification 
+      CHARACTER TEXT*255         ! A general text string
+      CHARACTER UNIT*20          ! NDF Unit component
       DOUBLE PRECISION ATTRS( 5 )! Original plotting attribute values
-      DOUBLE PRECISION BBOX( 4 )! Bounds in base Frame of new Plot
-      DOUBLE PRECISION BOX( 4 ) ! Bounds of image in pixel co-ordinates
-      DOUBLE PRECISION CON( 2 ) ! Constants for axis permutations
-      DOUBLE PRECISION DGLB( 2 )! Lower bounds of GRAPHICS region
-      DOUBLE PRECISION DGUB( 2 )! Upper bounds of GRAPHICS region
-      DOUBLE PRECISION DX       ! Width of each spectrum cell in mm
-      DOUBLE PRECISION DY       ! Height of each spectrum cell in mm
-      DOUBLE PRECISION IN( 2 )  ! GRID coords
-      DOUBLE PRECISION INA( 2 ) ! Corner A of window in input coords
-      DOUBLE PRECISION INB( 2 ) ! Corner B of window in input coords
-      DOUBLE PRECISION KEYX     ! Horizontal key offset (in mm)
-      DOUBLE PRECISION OUTA( 2 )! Corner A of window in output coords
-      DOUBLE PRECISION OUTB( 2 )! Corner B of window in output coords
+      DOUBLE PRECISION BBOX( 4 ) ! Bounds in base Frame of new Plot
+      DOUBLE PRECISION BOX( 4 )  ! Bounds of image in pixel co-ordinates
+      DOUBLE PRECISION CON( 2 )  ! Constants for axis permutations
+      DOUBLE PRECISION DGLB( 2 ) ! Lower bounds of GRAPHICS region
+      DOUBLE PRECISION DGUB( 2 ) ! Upper bounds of GRAPHICS region
+      DOUBLE PRECISION DX        ! Width of each spectrum cell in mm
+      DOUBLE PRECISION DY        ! Height of each spectrum cell in mm
+      DOUBLE PRECISION IN( 2 )   ! GRID coords
+      DOUBLE PRECISION INA( 2 )  ! Corner A of window in input coords
+      DOUBLE PRECISION INB( 2 )  ! Corner B of window in input coords
+      DOUBLE PRECISION KEYX      ! Horizontal key offset (in mm)
+      DOUBLE PRECISION OUTA( 2 ) ! Corner A of window in output coords
+      DOUBLE PRECISION OUTB( 2 ) ! Corner B of window in output coords
       DOUBLE PRECISION SHIFTS( 2 ) ! Shifts from G2D Frame to P2D Frame
       DOUBLE PRECISION SPBND( 2 )! Bounds of spctral WCS value
-      INTEGER BFRM              ! Pointer to base Frame in Plot
-      INTEGER CBMAP             ! Pointer to current->base Mapping
-      INTEGER CFRM              ! Pointer to current Frame in Plot
-      INTEGER CGX               ! X GRID index at spectrum
-      INTEGER CGY               ! Y GRID index at spectrum
+      INTEGER BFRM               ! Pointer to base Frame in Plot
+      INTEGER CBMAP              ! Pointer to current->base Mapping
+      INTEGER CFRM               ! Pointer to current Frame in Plot
+      INTEGER CGX                ! X GRID index at spectrum
+      INTEGER CGY                ! Y GRID index at spectrum
       INTEGER CMAP( MXSPEC*MXSPEC )! GRAPHICS->GRID Mapping for a cell
-      INTEGER CPM               ! A CmpMap
+      INTEGER CPM                ! A CmpMap
       INTEGER CREG( MXSPEC*MXSPEC )! GRAPHICS Interval for a cell
-      INTEGER DATF              ! The data value Frame
-      INTEGER DIM( NDIM )       ! The pixel NDF axis dimensions
-      INTEGER DPF               ! DATAPLOT Frame
-      INTEGER DPMAP             ! 1st cell GRAPHICS->DATAPLOT Mapping 
-      INTEGER EL                ! No. of mapped elements
-      INTEGER FS                ! FrameSet describing cell coords
-      INTEGER G2D               ! Pointer to 2D celestial GRID Frame
-      INTEGER GDMAP             ! Mapping from GRAPHICS to DPF 
-      INTEGER GF                ! Data value / grid Frame
-      INTEGER GRFRM             ! GRAPHICS Frame
-      INTEGER I                 ! Loop count
-      INTEGER IAT               ! Used length of a string
-      INTEGER INDF              ! NDF id. for input NDF
-      INTEGER INP( 2 )          ! Input axis permutation array
-      INTEGER IPD               ! Pointer to NDF data array
-      INTEGER IPICD             ! AGI id. for DATA picture
-      INTEGER IPICF             ! AGI id. for new FRAME picture
-      INTEGER IPICK             ! AGI id. for the KEY picture
-      INTEGER IPLOT             ! Pointer to AST Plot for DATA picture
-      INTEGER IPLOT2            ! Plot for current cell
-      INTEGER IPLOT3            ! Plot for plotting line curves
-      INTEGER IPLOT4            ! Plot for spatial axes
-      INTEGER IPLOTD            ! Plot stored with DATA picture
-      INTEGER IPLOTK            ! P'nter to AST Plot for KEY picture
-      INTEGER IPN               ! P'nter to no. of pointers per polyline
-      INTEGER IPW1              ! P'nter to work array 1
-      INTEGER IPW2              ! P'nter to work array 2
-      INTEGER IPW3              ! P'nter to work array 3
-      INTEGER IPX               ! P'nter to array of graphics X values
-      INTEGER IPY               ! P'nter to array of graphics Y values
-      INTEGER IWCS              ! P'nter to the WCS FrameSet from NDF
-      INTEGER IX                ! Index of cell in row
-      INTEGER IY                ! Index of cell in column
-      INTEGER KM                ! Subsiduary KeyMap for polyline info
-      INTEGER NCELL             ! Number of cells in plot
-      INTEGER NCU               ! Number of characters in the units
-      INTEGER NFRM              ! Increment in Frame index      
-      INTEGER NK                ! Number of celestial axes
-      INTEGER NKP               ! No. of values supplied for KEYPOS
-      INTEGER NMARG             ! No. of margin values given
-      INTEGER NP                ! No. of points in polyline
-      INTEGER NPOLY             ! No. of poly lines described in KeyMap
-      INTEGER NPTOT             ! Total no. of points in all tick marks
-      INTEGER NS                ! Number of spectral axes
-      INTEGER NSAMP             ! No. of samples along a spectrum
-      INTEGER NX                ! No. of spectra per row
-      INTEGER NY                ! No. of spectra per column
-      INTEGER OUTP( 4 )         ! Output axis permutation array
-      INTEGER P2D               ! 2D PIXEL Frame
-      INTEGER PM                ! A PermMap
-      INTEGER PMAP              ! Mapping from 2D GRID to PIXEL Frame
-      INTEGER SDIM( NDIM )      ! The significant NDF axes
-      INTEGER SKAX( NDF__MXDIM )! Indices of celestial WCS axes
+      INTEGER DATF               ! The data value Frame
+      INTEGER DIM( NDIM )        ! The pixel NDF axis dimensions
+      INTEGER DPF                ! DATAPLOT Frame
+      INTEGER DPMAP              ! 1st cell GRAPHICS->DATAPLOT Mapping 
+      INTEGER EL                 ! No. of mapped elements
+      INTEGER FS                 ! FrameSet describing cell coords
+      INTEGER G2D                ! Pointer to 2D celestial GRID Frame
+      INTEGER GDMAP              ! Mapping from GRAPHICS to DPF 
+      INTEGER GF                 ! Data value / grid Frame
+      INTEGER GRFRM              ! GRAPHICS Frame
+      INTEGER I                  ! Loop count
+      INTEGER IAT                ! Used length of a string
+      INTEGER INDF               ! NDF id. for input NDF
+      INTEGER INP( 2 )           ! Input axis permutation array
+      INTEGER IPD                ! Pointer to NDF data array
+      INTEGER IPICD              ! AGI id. for DATA picture
+      INTEGER IPICF              ! AGI id. for new FRAME picture
+      INTEGER IPICK              ! AGI id. for the KEY picture
+      INTEGER IPLOT              ! Pointer to AST Plot for DATA picture
+      INTEGER IPLOT2             ! Plot for current cell
+      INTEGER IPLOT3             ! Plot for plotting line curves
+      INTEGER IPLOT4             ! Plot for spatial axes
+      INTEGER IPLOTD             ! Plot stored with DATA picture
+      INTEGER IPLOTK             ! Pointer to AST Plot for KEY picture
+      INTEGER IPN                ! P'nter to no. of p'nters per polyline
+      INTEGER IPW1               ! Pointer to work array 1
+      INTEGER IPW2               ! Pointer to work array 2
+      INTEGER IPW3               ! Pointer to work array 3
+      INTEGER IPX                ! Pointer to array of graphics X values
+      INTEGER IPY                ! Pointer to array of graphics Y values
+      INTEGER IWCS               ! Pointer to the WCS FrameSet from NDF
+      INTEGER IX                 ! Index of cell in row
+      INTEGER IY                 ! Index of cell in column
+      INTEGER KM                 ! Subsiduary KeyMap for polyline info
+      INTEGER MODE               ! Mode identifier
+      INTEGER MTYPE              ! PGPLOT marker type
+      INTEGER NCELL              ! Number of cells in plot
+      INTEGER NCU                ! Number of characters in the units
+      INTEGER NFRM               ! Increment in Frame index      
+      INTEGER NK                 ! Number of celestial axes
+      INTEGER NKP                ! No. of values supplied for KEYPOS
+      INTEGER NMARG              ! No. of margin values given
+      INTEGER NP                 ! No. of points in polyline
+      INTEGER NPOLY              ! No. of poly lines described in KeyMap
+      INTEGER NPTOT              ! Total no. of points in all tick marks
+      INTEGER NS                 ! Number of spectral axes
+      INTEGER NSAMP              ! No. of samples along a spectrum
+      INTEGER NX                 ! No. of spectra per row
+      INTEGER NY                 ! No. of spectra per column
+      INTEGER OUTP( 4 )          ! Output axis permutation array
+      INTEGER P2D                ! 2D PIXEL Frame
+      INTEGER PM                 ! A PermMap
+      INTEGER PMAP               ! Mapping from 2D GRID to PIXEL Frame
+      INTEGER SDIM( NDIM )       ! The significant NDF axes
+      INTEGER SKAX( NDF__MXDIM ) ! Indices of celestial WCS axes
       INTEGER SKBAX( NDF__MXDIM )! Indices of celestial GRID axes
-      INTEGER SKMAP             ! Celestial WCS->grid Mapping
-      INTEGER SKWCS             ! P'nter to WCS FrameSet for sky axes
-      INTEGER SKYF              ! Pointer to 2D celestial WCS Frame
-      INTEGER SLBND( NDIM )     ! Significant lower bounds of the image
-      INTEGER SLM               ! A SelectorMap
-      INTEGER SPAX              ! Index of spectral WCS axis
+      INTEGER SKMAP              ! Celestial WCS->grid Mapping
+      INTEGER SKWCS              ! Pointer to WCS FrameSet for sky axes
+      INTEGER SKYF               ! Pointer to 2D celestial WCS Frame
+      INTEGER SLBND( NDIM )      ! Significant lower bounds of the image
+      INTEGER SLM                ! A SelectorMap
+      INTEGER SPAX               ! Index of spectral WCS axis
       INTEGER SPBAX( NDF__MXDIM )! Indices of spectral GRID axes
-      INTEGER SPFRM             ! Pointer to spectral WCS Frame
-      INTEGER SPMAP             ! Spectral WCS->grid Mapping
-      INTEGER SUBND( NDIM )     ! Significant upper bounds of the image
-      INTEGER SWM               ! A SwitchMap
-      INTEGER TICKMAP           ! KeyMap holding details of tick marks
-      INTEGER TMAP              ! Temporary Mapping
-      INTEGER WCF               ! Final Frame
-      INTEGER WCM               ! Final Mapping
-      INTEGER WM                ! A WinMap
-      LOGICAL ALIGN             ! DATA pic aligned with a previous pic?
-      LOGICAL AXES              ! Annotated axes are to be drawn?
-      LOGICAL BLEDGE            ! Leaves edge spec plots bare?
+      INTEGER SPFRM              ! Pointer to spectral WCS Frame
+      INTEGER SPMAP              ! Spectral WCS->grid Mapping
+      INTEGER SUBND( NDIM )      ! Significant upper bounds of the image
+      INTEGER SWM                ! A SwitchMap
+      INTEGER TICKMAP            ! KeyMap holding details of tick marks
+      INTEGER TMAP               ! Temporary Mapping
+      INTEGER WCF                ! Final Frame
+      INTEGER WCM                ! Final Mapping
+      INTEGER WM                 ! A WinMap
+      LOGICAL ALIGN              ! DATA pic aligned with a previous pic?
+      LOGICAL AXES               ! Annotated axes are to be drawn?
+      LOGICAL BLEDGE             ! Leaves edge spec plots bare?
       LOGICAL CGOOD( MXSPEC, MXSPEC )! Was a spectrum drawn in the cell?
-      LOGICAL CLEAR             ! Is screen to be cleared on opening?
-      LOGICAL FIRST             ! Is the first cell yet to be annotated?
-      LOGICAL KEY               ! Make a key of the grid co-ordinates?
-      LOGICAL REFLAB            ! Draw labels around the first spectrum?
-      REAL ASPECT               ! Aspect ratio of the input array
-      REAL DUMMY                ! Un-required argument value
-      REAL DX1                  ! Unused
-      REAL DX2                  ! Width of viewport in device pixels
-      REAL DY1                  ! Unused
-      REAL DY2                  ! Height of viewport in device pixels
-      REAL GBOX( 4 )            ! Bounds in GRAPHICS Frame of new Plot
-      REAL GLB( 2 )             ! Lower bounds of GRAPHICS region
-      REAL GUB( 2 )             ! Upper bounds of GRAPHICS region
-      REAL KEYOFF               ! Offset to top of key 
-      REAL KEYPOS( 2 )          ! Key position
-      REAL MARGIN( 4 )          ! Width of margins round DATA picture
-      REAL MINDIM               ! Minimum dimension of plot in mm
-      REAL OFFX                 ! X offset from 1st to current cell
-      REAL OFFY                 ! Y offset from 1st to current cell
-      REAL RHOPIC               ! Plot density for scaling ref. axes 
-      REAL SMARGX               ! X margin used by spectral annotation
-      REAL SMARGY               ! Y margin used by spectral annotation
-      REAL TL                   ! MajTickLen value
-      REAL X1                   ! GRAPHICS X at left hand of Plot
-      REAL X2                   ! GRAPHICS X at right hand of Plot
-      REAL Y1                   ! GRAPHICS Y at bottom of Plot
-      REAL Y2                   ! GRAPHICS Y at top of Plot
-      REAL YBOT                 ! Min data value to be displayed
-      REAL YTOP                 ! Max data value to be displayed
+      LOGICAL CLEAR              ! Is screen to be cleared on opening?
+      LOGICAL FIRST              ! Is first cell yet to be annotated?
+      LOGICAL KEY                ! Make a key of the grid co-ordinates?
+      LOGICAL REFLAB             ! Draw labels around first spectrum?
+      REAL ASPECT                ! Aspect ratio of the input array
+      REAL DUMMY                 ! Un-required argument value
+      REAL DX1                   ! Unused
+      REAL DX2                   ! Width of viewport in device pixels
+      REAL DY1                   ! Unused
+      REAL DY2                   ! Height of viewport in device pixels
+      REAL GBOX( 4 )             ! Bounds in GRAPHICS Frame of new Plot
+      REAL GLB( 2 )              ! Lower bounds of GRAPHICS region
+      REAL GUB( 2 )              ! Upper bounds of GRAPHICS region
+      REAL KEYOFF                ! Offset to top of key 
+      REAL KEYPOS( 2 )           ! Key position
+      REAL MARGIN( 4 )           ! Width of margins round DATA picture
+      REAL MINDIM                ! Minimum dimension of plot in mm
+      REAL OFFX                  ! X offset from 1st to current cell
+      REAL OFFY                  ! Y offset from 1st to current cell
+      REAL RHOPIC                ! Plot density for scaling ref. axes 
+      REAL SMARGX                ! X margin used by spectral annotation
+      REAL SMARGY                ! Y margin used by spectral annotation
+      REAL TL                    ! MajTickLen value
+      REAL VBOX( 4 )             ! Bounds in NDC of new Plot
+      REAL VDX                   ! Width of each spectrum cell in NDC
+      REAL VDY                   ! Height of each spectrum cell in NDC
+      REAL VX1                   ! NDC X at left hand of current cell
+      REAL VX2                   ! NDC X at right hand of current cell
+      REAL VY1                   ! NDC Y at bottom of current cell
+      REAL VY2                   ! NDC Y at top of current cell
+      REAL X1                    ! GRAPHICS X at left hand of Plot
+      REAL X2                    ! GRAPHICS X at right hand of Plot
+      REAL Y1                    ! GRAPHICS Y at bottom of Plot
+      REAL Y2                    ! GRAPHICS Y at top of Plot
+      REAL YBOT                  ! Min. data value to be displayed
+      REAL YTOP                  ! Max. data value to be displayed
+
 *.
 
 *  Check the inherited global status.
@@ -788,6 +836,30 @@
          MARGIN( I ) = MARGIN( 1 )
       END DO
 
+*  Get the plotting mode.
+      CALL PAR_CHOIC( 'MODE', 'Line', 
+     :                'Histogram,Line,Point,Mark,Chain',
+     :                .FALSE., TEXT, STATUS )
+
+*  Get an identifier for the mode, and get the marker type if required.
+      IF( TEXT .EQ. 'HISTOGRAM' ) THEN
+         MODE = 1
+      ELSE IF( TEXT .EQ. 'LINE' ) THEN
+         MODE = 2
+      ELSE IF( TEXT .EQ. 'POINT' ) THEN
+         MODE = 3
+         MTYPE = -1
+      ELSE IF( TEXT .EQ. 'MARK' ) THEN
+         MODE = 3
+         CALL PAR_GET0I( 'MARKER', MTYPE, STATUS )
+      ELSE 
+         MODE = 5
+         CALL PAR_GET0I( 'MARKER', MTYPE, STATUS )
+      END IF
+
+*  Ensure marker type (if used) is legal.
+      MTYPE = MAX( -31, MTYPE )
+
 *  Store the pixel co-ordinates bounds for the new DATA picture.  These
 *  are only used if the new DATA picture is not based on an existing 
 *  DATA picture.  Note, the corresponding PGPLOT window created by 
@@ -874,6 +946,13 @@
          DX = DBLE( X2 - X1 )/DBLE( NX )
          DY = DBLE( Y2 - Y1 )/DBLE( NY )
 
+*  Obtain the viewport bounds in NDC.
+         CALL PGQVP( 0, VX1, VX2, VY1, VY2 )
+
+*  Find the width and height of each spectrum's cell in NDC.
+         VDX = ( VX2 - VX1 ) / REAL( NX )
+         VDY = ( VY2 - VY1 ) / REAL( NY )
+
 *  Note the minimum dimension of the plotting area.
          MINDIM = X2 - X1
          IF( Y2 - Y1 .LT. MINDIM ) MINDIM = Y2 - Y1
@@ -905,9 +984,15 @@
 
 *  Decide on the number of spectral samples to use for each line plot. 
 *  There is no point in using more than the number of device pixels 
-*  across a single cell.
+*  across a single cell.  Reduce it even further for histogram-style
+*  to demand at least four device pixels per sample point.
          NSAMP = DIM( 3 )
-         IF( NSAMP .GT. NINT( DX2/NX ) ) NSAMP = NINT( DX2/NX )
+         IF ( MODE .EQ. 2 ) THEN
+            IF ( NSAMP .GT. NINT( DX2 / NX / 4 ) )
+     :        NSAMP = NINT( DX2 / NX / 4 )
+         ELSE IF( NSAMP .GT. NINT( DX2/NX ) ) THEN
+            NSAMP = NINT( DX2/NX )
+         END IF
  
 *  Draw all the spectra (but not the axes or borders).
 *  ===================================================
@@ -932,12 +1017,35 @@
             CGY = NINT( 0.5 + ( REAL( IY ) - 0.5 )*
      :                        REAL( DIM( 2 ) )/REAL( NY ) ) 
             INA( 2 ) = DBLE( Y1 + ( IY - 1 )*DY )
+
+*  Get the Y bounds of the cell in GRAPHICS co-ordinates.
+            GBOX( 2 ) = Y1 + REAL( IY - 1 ) * REAL( DY )
+            GBOX( 4 ) = GBOX( 2 ) + REAL( DY )
+
+*  Get the Y bounds of the cell in NDC.
+            VBOX( 2 ) = VY1 + REAL( IY - 1 ) * REAL( VDY )
+            VBOX( 4 ) = VBOX( 2 ) + REAL( VDY )
+
             CALL PGBBUF
 
             DO IX = 1, NX
                CGX = NINT( 0.5 + ( REAL( IX ) - 0.5 )*
      :                           REAL( DIM( 1 ) )/REAL( NX ) )
                INA( 1 ) = DBLE( X1 + ( IX - 1 )*DX )
+
+*  Get the X bounds of the cell in GRAPHICS co-ordinates.
+               GBOX( 1 ) = X1 + REAL( IX - 1 ) * REAL( DX )
+               GBOX( 3 ) = GBOX( 1 ) + REAL( DX )
+
+*  Get the X bounds of the cell in NDC.
+               VBOX( 1 ) = VX1 + REAL( IX - 1 ) * REAL( VDX )
+               VBOX( 3 ) = VBOX( 1 ) + REAL( VDX )
+
+*  KPG1_PLTLN assumes that it is dealing with the full viewport and
+*  corresponding GRAPHICS co-ordinates.  So we have to reset the
+*  viewport to match the current cell.
+               CALL PGSVP( VBOX( 1 ), VBOX( 3 ), VBOX( 2 ), VBOX( 4 ) )
+               CALL PGSWIN( GBOX( 1 ), GBOX( 3 ), GBOX( 2 ), GBOX( 4 ) )
 
 *  Copy the required samples from the spectral axis into the work 
 *  arrays.
@@ -955,8 +1063,8 @@
      :                            %VAL( CNF_PVAL( IPW1 ) ),
      :                            %VAL( CNF_PVAL( IPW2 ) ),
      :                            .FALSE., .FALSE., 0.0D0, 0.0D0, 0.0D0,
-     :                            'SPECSTYLE', IPLOT3, 2, 0, 0, 0, 
-     :                            'KAPPA_CLINPLOT', STATUS )
+     :                            'SPECSTYLE', IPLOT3, MODE, MTYPE, 0, 
+     :                            0, 'KAPPA_CLINPLOT', STATUS )
 
 *  Increment the number of cells done so far.
                   NCELL = NCELL + 1
@@ -1010,7 +1118,11 @@
          CALL PSX_FREE( IPW1, STATUS )
          CALL PSX_FREE( IPW2, STATUS )
          CALL PSX_FREE( IPW3, STATUS )
- 
+
+*  Reset the viewport and window to the full area.
+         CALL PGSVP( VX1, VX2, VY1, VY2 )
+         CALL PGSWIN( X1, X2, Y1, Y2 )
+
 *  Now draw all annotated axes, borders, etc.
 *  ==========================================
 
@@ -1277,7 +1389,7 @@
          IF ( KEY ) THEN
 
 *  If no value was supplied for the vertical position of the KEY using 
-*  parameter KEYPOS, find the value which puts the top of the key level 
+*  Parameter KEYPOS, find the value which puts the top of the key level 
 *  with the top of the DATA picture.
             IF ( NKP .LT. 2 ) THEN
 
@@ -1310,7 +1422,7 @@
                CALL PGQVP( 2, DUMMY, DUMMY, Y1, Y2 )
                KEYOFF = ( KEYOFF - Y1 )/( Y2 - Y1 )
 
-*  If the horizontal positions was given using parameter KEYPOS, just 
+*  If the horizontal positions was given using Parameter KEYPOS, just 
 *  activate the KEY picture. 
             ELSE
                KEYOFF = KEYPOS( 2 )

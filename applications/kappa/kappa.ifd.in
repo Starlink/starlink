@@ -3740,6 +3740,24 @@ package kappa {
             helpkey *
           }
 
+         parameter marker {
+            type _INTEGER
+            prompt {PGPLOT marker type}
+            vpath CURRENT { DEFAULT}
+            ppath CURRENT DEFAULT
+            default 11
+            helpkey *
+          }
+
+         parameter mode {
+            type LITERAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Method for displaying the data curves}
+            default Line
+            helpkey *
+          }
+
          parameter ndf {
             position 1
             type NDF

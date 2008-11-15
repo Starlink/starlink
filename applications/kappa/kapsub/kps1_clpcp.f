@@ -7,7 +7,7 @@
 *     KPS1_CLPCP
 
 *  Purpose:
-*     Extract the spatral data to be plotted in a single CLINPLOT cell.
+*     Extracts the spatral data to be plotted in a single CLINPLOT cell.
 
 *  Language:
 *     Starlink Fortran 77
@@ -19,10 +19,10 @@
 
 *  Description:
 *     This routine extracts the spatral data to be plotted in a single 
-*     CLINPLOT cell. This will be one row of pixels within the supplied
-*     data array, binned up to produce the required number of samples. The 
-*     data is returned in two array representing graphics X and Y values 
-*     along the polyline that represents the spectrum.
+*     CLINPLOT cell.  This will be one row of pixels within the supplied
+*     data array, binned up to produce the required number of samples. 
+*     The data are returned in two arrays representing graphics X and Y 
+*     values along the polyline that represents the spectrum.
 
 *  Arguments:
 *     SLBND( 3 ) = INTEGER (Given)
@@ -30,33 +30,33 @@
 *     SUBND( 3 ) = INTEGER (Given)
 *        The upper pixel bounds of the supplied NDF cube.
 *     SKBAX( 2 ) = INTEGER (Given)
-*        The indices of the two pixels axes that correspond to the spatial
-*        WCS axes.
+*        The indices of the two pixels axes that correspond to the
+*        spatial WCS axes.
 *     SPBAX = INTEGER (Given)
-*        The index of the pixelaxes that corresponds to the spectral WCS
-*        axis.
+*        The index of the pixel axes that corresponds to the spectral
+*        WCS axis.
 *     CGX = INTEGER (Given)
-*        The GRID axis value on the first spatial pixel axis at which the
-*        spectrum is to be extracted.
+*        The GRID-axis value on the first spatial pixel axis at which
+*        the spectrum is to be extracted.
 *     CGY = INTEGER (Given)
-*        The GRID axis value on the second spatial pixel axis at which the
-*        spectrum is to be extracted.
+*        The GRID-axis value on the second spatial pixel axis at which
+*        the spectrum is to be extracted.
 *     NSAMP = INTEGER (Given)
 *        The number of spectral samples to return.
 *     ARRAY( * ) = REAL (Given)
 *        The vectorised data cube.
 *     X0 = REAL (Given)
-*        The GRAPHICS X axis value at the bottom left of the cell in
+*        The GRAPHICS X-axis value at the bottom left of the cell in
 *        which the spectrum will be drawn.
 *     Y0 = REAL (Given)
-*        The GRAPHICS Y axis value at the bottom left of the cell in
+*        The GRAPHICS Y-axis value at the bottom left of the cell in
 *        which the spectrum will be drawn.
 *     DX = REAL (Given)
 *        The width (in GRAPHICS units) of the cell in which the spectrum
 *        will be drawn.
 *     DY = REAL (Given)
-*        The height (in GRAPHICS units) of the cell in which the spectrum
-*        will be drawn.
+*        The height (in GRAPHICS units) of the cell in which the
+*        spectrum will be drawn.
 *     YTOP = REAL (Given)
 *        The maximum data value to be displayed in a cell.
 *     YBOT = REAL (Given)
@@ -65,10 +65,10 @@
 *        Returned .TRUE. if the returned spectrum contains any good 
 *        data values.
 *     WORK1( NSAMP ) = DOUBLE PRECISION (Returned)
-*        Returned holding a series of X axis values in the GRAPHICS
+*        Returned holding a series of X-axis values in the GRAPHICS
 *        coordinate system that represents the polyline to be displayed.
 *     WORK2( NSAMP ) = DOUBLE PRECISION (Returned)
-*        Returned holding a series of Y axis values in the GRAPHICS
+*        Returned holding a series of Y-axis values in the GRAPHICS
 *        coordinate system that represents the polyline to be displayed.
 *     WORK3( NSAMP ) = INTEGER (Returned)
 *        Work space.
@@ -76,13 +76,14 @@
 *        Global status value.
 
 *  Copyright:
-*     Councils. Copyright (C) 2006 Particle Physics & Astronomy
-*     Research Council. All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council. 
+*     Copyright (C) 2008 Science & Technology Facilities Council. 
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -92,27 +93,33 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     MJC: MAlcolm J. Currie (STARLIMNK)
 *     {enter_new_authors_here}
 
 *  History:
 *     6-JUN-2006 (DSB):
 *        Original version.
+*     2008 November 14 (MJC):
+*        No longer return bad values in WORK2 when the ARRAY values lie
+*        outside the bounds of the cell.  Clipping to prevent plotting
+*        in a vertically adjacent cell is now handled by redefining the 
+*        viewport and window bounds for each cell in CLINPLOT itself.
 *     {enter_further_changes_here}
 
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            
+      IMPLICIT NONE
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants 
-      INCLUDE 'PRM_PAR'          ! VAL__ constants 
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Arguments Given:
       INTEGER SLBND( 3 )
@@ -166,7 +173,7 @@
          GO TO 999
       END IF
 
-*  Get the GRID coords at the first pixel in the spectrum.
+*  Get the GRID co-ordinates at the first pixel in the spectrum.
       ROOT( SKBAX( 1 ) ) = CGX
       ROOT( SKBAX( 2 ) ) = CGY
       ROOT( SPBAX ) = 1
@@ -177,7 +184,7 @@
       DIM( 3 ) = SUBND( 3 ) - SLBND( 3 ) + 1
 
 *  Get the step between adjacent elements of the data array on the
-*  spectral axis
+*  spectral axis.
       IF( SPBAX .EQ. 1 ) THEN
          STEP = 1
 
@@ -193,8 +200,8 @@
       IV = ROOT( 1 ) + DIM( 1 )*( ROOT( 2 ) - 1 + 
      :                 DIM( 2 )*( ROOT( 3 ) - 1 ) )
 
-*  In WORK1, store the GRAPHICS X value at the centre of each of the NSAMP
-*  spectral samples.
+*  In WORK1, store the GRAPHICS X value at the centre of each of the
+*  NSAMP spectral samples.
       SX = DX/NSAMP
       X = X0 - 0.5*SX
       DO I = 1, NSAMP
@@ -202,7 +209,8 @@
          WORK1( I ) = X
       END DO
 
-*  Get the scale and zero for converting data value into GRAPHICS Y value.
+*  Get the scale and zero for converting data value into GRAPHICS Y
+*  value.
       B = DY/( YTOP - YBOT )
       A = Y0 - B*YBOT
 
@@ -210,11 +218,10 @@
 *  no binning to be done.
       IF( NSAMP .EQ. DIM( SPBAX ) ) THEN
 
-*  Copy the data values from the supplied array to the returned work array.
+*  Copy the data values from the supplied array to the returned work
+*  array.
          DO I = 1, NSAMP
-            IF( ARRAY( IV ) .NE. VAL__BADR .AND.
-     :          ARRAY( IV ) .LE. YTOP .AND.
-     :          ARRAY( IV ) .GE. YBOT ) THEN
+            IF( ARRAY( IV ) .NE. VAL__BADR ) THEN
                GOOD = .TRUE.
                WORK2( I ) = A + B*ARRAY( IV )
             ELSE
@@ -223,8 +230,8 @@
             IV = IV + STEP
          END DO
         
-*  If the number of samples is less than the spectral axis dimension, there is
-*  some binning to be done.
+*  If the number of samples is fewer than the spectral axis dimension, 
+*  there is some binning to be done.
       ELSE IF( NSAMP .LT. DIM( SPBAX ) ) THEN
 
 *  Initialise the work arrays to hold zero.
@@ -238,9 +245,7 @@
 
 *  If the data value is good, determine which bin to put it in, and then
 *  increment the bin sum and count.
-            IF( ARRAY( IV ) .NE. VAL__BADR .AND.
-     :          ARRAY( IV ) .LE. YTOP .AND.
-     :          ARRAY( IV ) .GE. YBOT ) THEN
+            IF( ARRAY( IV ) .NE. VAL__BADR ) THEN
                J = NINT( 0.5 + NSAMP*( I - 0.5 )/DIM( SPBAX ) )
                WORK2( J ) = WORK2( J ) + ARRAY( IV )
                WORK3( J ) = WORK3( J ) + 1

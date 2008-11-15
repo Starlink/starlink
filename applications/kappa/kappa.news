@@ -1,8 +1,23 @@
+1 KAPPA_Version_1.10
+
+   A new release of KAPPA (V1.10) is under development.  The main 
+   changes so far are listed below.  For complete details of all 
+   changes, see the "Release Notes" appendix in SUN/95.
+
+2 Modified_applications
+
+   o CLINPLOT
+
+     -  New MODE and MARKER parameters permit different ways to 
+     show the loci of data values including the histogram
+     `staircase', dots or markers at each point, and lines 
+     connecting data points (the only available mode previously).
+
 1 KAPPA_Version_1.9
 
    A new release of KAPPA (V1.9-11) is available.  The main changes
-   so far are listed below.  For complete details of all changes, see
-   the "Release Notes" appendix in SUN/95.
+   are listed below.  For complete details of all changes, see the 
+   "Release Notes" appendix in SUN/95.
 
 2 New_applications
 

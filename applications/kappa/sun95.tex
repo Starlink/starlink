@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.35}
 \newcommand{\stardocnumber}    {95.35}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2008 October 31}
+\newcommand{\stardocdate}      {2008 November 14}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.9-11}
+\newcommand{\stardocversion}   {1.10}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -3352,7 +3352,7 @@ You then print {\tt myplot.ps} to the colour PostScript printer.
 Many different aspects of the appearance of line graphics produced by 
 \KAPPA\ applications can be controlled by specifying a
 {\em plotting style} when running the application.  This includes things
-like the colour, line width, line style, character size, and font, each
+like the colour, line width, line style, character size, and fount, each
 of which can be specified individually for different components of a plot
 (\emph{e.g.} the tick marks, numerical labels, border, textual labels, 
 \emph{etc.}).
@@ -3386,7 +3386,7 @@ each.  Full descriptions are included \hyperref{later}{in Section~}{}{se:plottin
 {\att DrawTitle}: Draw a title?\\
 {\att Edge(axis)}: Which edges to label\\
 {\att FileInTitle}: Include the NDF name as a second line in the title?\\
-{\att Font(element)}: Character font for a plot element\\
+{\att Font(element)}: Character fount for a plot element\\
 {\att Gap(axis)}: Interval between major axis values\\
 {\att Grid}: Draw grid lines?\\
 {\att LabelAt(axis)}: Where to place numerical labels\\
@@ -4097,23 +4097,23 @@ It is often useful to specify values for some of the attributes of the current
 \sstattribute{
    Font(element)
 }{
-   Character font for a plot element
+   Character fount for a plot element
 }{
    \sstdescription{
-      This attribute determines the character font index used when
+      This attribute determines the character fount index used when
       drawing each element of a plot.  It takes a separate value for
       graphical element so that, for instance, the setting 
-      {\tt Font(title)=2}~ causes the title to be drawn using font number 2.
+      {\tt Font(title)=2}~ causes the title to be drawn using fount number 2.
 
-      The range of integer font indices available and the appearance
+      The range of integer fount indices available and the appearance
       of the resulting text is determined by the \PGPLOT\  graphics package,
       but include:
 
       \begin{enumerate}
-      \item A simple single-stroke font (the default)
-      \item A roman font
-      \item An italic font
-      \item A script font
+      \item A simple single-stroke fount (the default)
+      \item A roman fount
+      \item An italic fount
+      \item A script fount
       \end{enumerate}
 
    }
@@ -16913,6 +16913,12 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
       these and the space they occupy may be controlled in detail (see
       Parameters STYLE and MARGIN).
 
+      The plot may take several different forms such as a 
+      {\tt "join-the-dots"} plot, a {\tt "staircase"} plot, a 
+      {\tt "chain"} plot (see Parameter MODE).  The plotting style 
+      (colour, founts, text size, \emph{etc.}) may be specified in 
+      detail using Parameter SPECSTYLE.
+
       The data value at the top and bottom of each line plot can be
       specified using Parameters YBOT and YTOP.  The defaults can be
       selected in several ways including percentiles (see Parameter
@@ -17127,6 +17133,47 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          otherwise.  The initial default is null.  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
+         MARKER = \_INTEGER (Read)
+      }{
+         This parameter is only accessed if Parameter MODE is set to
+         {\tt "Chain"} or {\tt "Mark"}.  It specifies the symbol with which each
+         position should be marked, and should be given as an integer
+         \PGPLOT\  marker type.  For instance, {\tt 0} gives a box, 
+         {\tt 1} gives a dot, {\tt 2} gives a cross, {\tt 3} gives an asterisk,
+         {\tt 7} gives a triangle.  The value must be larger than or equal
+         to $-$31.   {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         MODE = \htmlref{LITERAL}{se:parmenu} (Read)
+      }{
+         Specifies the way in which data values are represented.  MODE
+         can take the following values.
+
+         \ssthitemlist{
+
+            \sstitem
+            {\tt "Histogram"} --- An histogram of the points is plotted in the
+            style of a `staircase' (with vertical lines only joining the \textit{y}
+            values and not extending to the base of the plot).  The vertical
+            lines are placed midway between adjacent \textit{x} positions.
+
+            \sstitem
+            {\tt "Line"} --- The points are joined by straight lines.
+
+            \sstitem
+            {\tt "Point"} --- A dot is plotted at each point.
+
+            \sstitem
+            {\tt "Mark"} --- Each point is marker with a symbol specified by
+            Parameter MARKER.
+
+            \sstitem
+            {\tt "Chain"} --- A combination of {\tt "Line"} and {\tt "Mark"}.
+
+         }
+         The initial default is {\tt "Line"}.  {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
          NDF = NDF (Read)
       }{
          The input NDF structure containing the data to be displayed.
@@ -17301,11 +17348,11 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          current graphics device.  No spatial axes are drawn.
       }
       \sstexamplesubsection{
-         clinplot map($\sim$5,$\sim$5,) useaxis=3 noaxes device=ps\_l
+         clinplot map($\sim$5,$\sim$5,) useaxis=3 noaxes device=ps\_l mode=hist
       }{
          As the previous example but now the output goes to a text
          file ({\tt{pgplot.ps}}) which can be printed on a PostScript
-         printer.
+         printer and the data are plotted in histogram form.
       }
       \sstexamplesubsection{
          clinplot nearc v style="title=Ne Arc variance" useaxis=1 reflabel=f
@@ -19234,7 +19281,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          and 16 are drawn.  A key is plotted using the style specified
          in the text file {\tt keysty}.  This file could, for instance, contain
          the two lines {\tt "font=3"} and {\tt "digits(2)=4"} to cause all text in
-         the key to be drawn using \PGPLOT\  font 3 (an italic font), and
+         the key to be drawn using \PGPLOT\  font 3 (an italic fount), and
          4 digits to be used when formatting the contour values.
       }
       \sstexamplesubsection{
@@ -27334,7 +27381,7 @@ scaling limits are used for both images.
          {\tt TRUE} if labelled and annotated axes are to be drawn around the
          plot.  The width of the margins left for the annotation may be
          controlled using Parameter MARGIN.  The appearance of the axes
-         (colours, fonts, \emph{etc.}) can be controlled using the Parameter
+         (colours, founts, \emph{etc.}) can be controlled using the Parameter
          STYLE.  {\tt [TRUE]}
       }
       \sstsubsection{
@@ -28353,7 +28400,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
       plot, a {\tt "staircase"} plot, a {\tt "chain"} plot (see Parameter MODE).
       Errors on both the data values and the data positions may be represented
       in several different ways (see Parameters ERRBAR and SHAPE).  The
-      plotting style (colour, fonts, text size, \emph{etc.}) may be specified in
+      plotting style (colour, founts, text size, \emph{etc.}) may be specified in
       detail using Parameter STYLE.
 
       The bounds of the plot on both axes can be specified using
@@ -28649,7 +28696,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
             length is specified by the axis width of the pixel.
 
          }
-           {\tt [}current value{\tt{]}}
+         The initial default is {\tt "Line"}.  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          NDF = NDF (Read)
@@ -40665,7 +40712,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          {\tt TRUE} if labelled and annotated axes are to be drawn around the
          plot.  The width of the margins left for the annotation may be
          controlled using Parameter MARGIN.  The appearance of the axes
-         (colours, fonts, \emph{etc.}) can be controlled using the Parameter
+         (colours, founts, \emph{etc.}) can be controlled using the Parameter
          STYLE.  {\tt [TRUE]}
       }
       \sstsubsection{
@@ -42331,7 +42378,7 @@ KAPPA: \htmlref{FLIP}{FLIP},
          {\tt TRUE} if labelled and annotated axes are to be drawn around the
          plot.  The width of the margins left for the annotation may be
          controlled using Parameter MARGIN.  The appearance of the axes
-         (colours, fonts, \emph{etc.}) can be controlled using the Parameter
+         (colours, founts, \emph{etc.}) can be controlled using the Parameter
          STYLE. {\tt [TRUE]}
       }
       \sstsubsection{
@@ -55482,7 +55529,7 @@ The following applications have been modified:
 
 \end{itemize}
 
-\section{\xlabel{se_changes}Release Notes---V1.9\label{se:changes}}
+\section{Release Notes---V1.9}
 
 \subsection{New Commands}
 The following new applications have been added:
@@ -55660,6 +55707,22 @@ The following applications have been modified:
    truncated.
 
 \end{itemize}
+
+\section{\xlabel{se_changes}Release Notes---V1.10\label{se:changes}}
+
+\subsection{Modified Commands}
+The following applications have been modified:
+
+\begin{description}
+
+   \item [\htmlref{CLINPLOT}{CLINPLOT}] \mbox{}
+      \begin{itemize}
+         \item New MODE and MARKER parameters permit different ways to 
+         show the loci of data values including the histogram
+         `staircase', dots or markers at each point, and lines connecting 
+         data points (the only available mode previously).
+      \end{itemize}
+\end{description}
 
 
 \begin{latexonly}
