@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_accumulate_prov( const smfData * data, const Grp * igrp,
-*                    int index, int ondf, const char * creator, int * status );
+*                    size_t index, int ondf, const char * creator, int * status );
 
 *  Arguments:
 *     data = const smfData* (Given)
@@ -84,7 +84,7 @@
 #include "sae_par.h"
 
 void
-smf_accumulate_prov( const smfData * data, const Grp* igrp, int index, 
+smf_accumulate_prov( const smfData * data, const Grp* igrp, size_t index, 
                      int ondf, const char *creator, int * status ) {
 
   int indf = NDF__NOID;  /* input NDF identifier */

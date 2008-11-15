@@ -542,7 +542,7 @@ void smf_fit_poly(const smfData *data, unsigned char *quality,
 		  const int order, double *poly, int *status);
 
 void
-smf_accumulate_prov( const smfData * data, const Grp* igrp, int index, 
+smf_accumulate_prov( const smfData * data, const Grp* igrp, size_t index, 
                      int ondf, const char *creator, int * status );
 
 void smf_fits_crchan( size_t nfits, const char * headrec, AstFitsChan ** fits, 
