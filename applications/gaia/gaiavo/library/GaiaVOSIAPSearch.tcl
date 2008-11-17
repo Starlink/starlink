@@ -274,24 +274,32 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
    public method read_query {filename} {
 
       #  Convert to a TST file so we can open it up as usual.
-      set vot [gaiavotable::open $filename]
-
-      #  Check the STATUS return.
-      set status [gaiavotable::info $vot "QUERY_STATUS"]
-      if { $status != "ERROR" } {
-         set tempname [$tempcats_ get_name]
-         set tst [gaiavotable::save $vot 0 $tempname]
-         gaiavotable::close $vot
-
-         #  This is the current VOTable now.
-         set votable_ $filename
-
-         #  Do command so that something happens.
-         if { $itk_option(-command) != {} } {
-            eval $itk_option(-command) $tempname
-         }
+      if { [catch {set vot [gaiavotable::open $filename]} msg] } {
+         set status 0
+         set tempname "$msg ($filename)"
       } else {
-         warning_dialog "Query returned an error ($status)"
+
+         #  Check the STATUS return.
+         lassign [gaiavotable::info $vot "QUERY_STATUS"] query_status errmsg
+         if { $query_status != "ERROR" } {
+            set status 1
+            set tempname [$tempcats_ get_name]
+            set tst [gaiavotable::save $vot 0 $tempname]
+            gaiavotable::close $vot
+            
+            #  This is the current VOTable now.
+            set votable_ $filename
+            
+         } else {
+            set status 0
+            set tempname "Query returned an error ($query_status: $errmsg)"
+         }
+      }
+
+      #  Do the user command (always done as something may be waiting
+      #  for the query to complete, tempname may be an error message).
+      if { $itk_option(-command) != {} } {
+         eval $itk_option(-command) \$status \$tempname
       }
    }
 
@@ -398,7 +406,9 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
    #  The SIAP accessURL.
    itk_option define -accessURL accessURL AccessURL {}
 
-   #  Command to execute when a list of images is accepted.
+   #  Command to execute when a list of images is accepted. The command
+   #  will be trailed by a status flag (1 for OK) and either a filename
+   #  or an error message.
    itk_option define -command command Command {}
 
    #  Command to execute when batch jobs starts and stops.
@@ -432,7 +442,7 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
    protected variable ra_ 00:00:00
    protected variable dec_ 00:00:00
    protected variable size1_ 10
-   protected variable size2_ 10
+   protected variable size2_ {}
 
    #  Batch job handler.
    protected variable batch_ {}

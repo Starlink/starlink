@@ -73,13 +73,13 @@ int GaiaVOTable_Init( Tcl_Interp *interp )
     Tcl_CreateObjCommand( interp, "gaiavotable::close", GaiaVOTableTclClose,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
-    Tcl_CreateObjCommand( interp, "gaiavotable::numtables", 
+    Tcl_CreateObjCommand( interp, "gaiavotable::numtables",
                           GaiaVOTableTclNumTables, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
     Tcl_CreateObjCommand( interp, "gaiavotable::list", GaiaVOTableTclList,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
-    Tcl_CreateObjCommand( interp, "gaiavotable::listheadings", 
+    Tcl_CreateObjCommand( interp, "gaiavotable::listheadings",
                           GaiaVOTableTclListHeadings,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
@@ -235,7 +235,7 @@ static int GaiaVOTableTclList( ClientData clientData, Tcl_Interp *interp,
     /*  Import the table. */
     if ( importVOTableHandle( interp, objv[1], table ) == TCL_OK ) {
         table->list( str );
-        Tcl_SetResult( interp, const_cast<char *>( str.str().c_str() ), 
+        Tcl_SetResult( interp, const_cast<char *>( str.str().c_str() ),
                        TCL_VOLATILE );
         return TCL_OK;
     }
@@ -249,7 +249,7 @@ static int GaiaVOTableTclList( ClientData clientData, Tcl_Interp *interp,
 static int GaiaVOTableTclListHeadings( ClientData clientData, Tcl_Interp *interp,
                                        int objc, Tcl_Obj *CONST objv[] )
 {
-    char *headings = 
+    char *headings =
         const_cast<char *>( "Table Name Description ID Rows(est) Columns" );
     Tcl_SetResult( interp, headings, TCL_VOLATILE );
     return TCL_OK;
@@ -302,7 +302,7 @@ static int GaiaVOTableTclSave( ClientData clientData, Tcl_Interp *interp,
             if ( table->saveAsTST( ntable, file ) ) {
                 return TCL_OK;
             }
-            Tcl_SetResult( interp, const_cast<char *>( "Failed to save TABLE" ), 
+            Tcl_SetResult( interp, const_cast<char *>( "Failed to save TABLE" ),
                            TCL_VOLATILE );
         }
     }
@@ -311,13 +311,15 @@ static int GaiaVOTableTclSave( ClientData clientData, Tcl_Interp *interp,
 
 /**
  *  Get an INFO value from a VOTable. The INFO is identified by it's name.
- *  (e.q. "QUERY_STATUS" for <INFO name="QUERY_STATUS">).
+ *  (e.q. "QUERY_STATUS" for <INFO name="QUERY_STATUS">). Returns the 
+ *  value attribute and any text content.
  */
 static int GaiaVOTableTclInfo( ClientData clientData, Tcl_Interp *interp,
                                int objc, Tcl_Obj *CONST objv[] )
 {
     VOTable *table;
-    string str;
+    string value;
+    string content;
 
     /*  Check arguments, only allow two, the address of the VOTable and the
      *  name of the INFO element. */
@@ -329,14 +331,17 @@ static int GaiaVOTableTclInfo( ClientData clientData, Tcl_Interp *interp,
     /*  Import the table. */
     if ( importVOTableHandle( interp, objv[1], table ) == TCL_OK ) {
 
-        /*  Get the value. */
-        if ( table->infoValue( Tcl_GetString( objv[2] ), str ) ) {
-            Tcl_SetResult( interp, const_cast<char *>( str.c_str() ), 
-                           TCL_VOLATILE );
+        /*  Get the values. */
+        if ( table->infoValue( Tcl_GetString( objv[2] ), value, content ) ) {
+            Tcl_AppendElement( interp, 
+                               const_cast<char *>( value.c_str() ) );
+            Tcl_AppendElement( interp, 
+                               const_cast<char *>( content.c_str() ) );
             return TCL_OK;
         }
         else {
-            Tcl_SetResult( interp, const_cast<char *>( "Failed to locate INFO value" ), 
+            Tcl_SetResult( interp, 
+                           const_cast<char *>( "Failed to locate INFO value" ),
                            TCL_VOLATILE );
         }
     }

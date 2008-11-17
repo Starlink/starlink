@@ -232,6 +232,8 @@ itcl::class gaia::GaiaUrlGet {
       set_feedback off
 
       $itk_component(label) configure -text ""
+      set filename {}
+      set type {}
 
       if { $status } {
          error_dialog $result $w_
@@ -245,9 +247,13 @@ itcl::class gaia::GaiaUrlGet {
                #  Check if this is a compressed file. If so change the suffix
                #  so that it will be opened correctly.
                set filename [check_compressed_ $filename]
-               eval $itk_option(-notify_cmd) $filename $type
             }
          }
+      }
+
+      #  Always perform notify command (so that blocks can be released).
+      if { $itk_option(-notify_cmd) != {} } {
+         eval $itk_option(-notify_cmd) \$filename \$type
       }
       catch {wm withdraw $w_}
    }

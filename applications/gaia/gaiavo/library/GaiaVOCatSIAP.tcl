@@ -170,10 +170,12 @@ itcl::class gaiavo::GaiaVOCatSIAP {
       }
    }
 
-   #  Display an image.
+   #  Display an image, if it exists.
    protected method display_image_ {filename type} {
       blt::busy release $w_
-      $itk_option(-gaia) open $filename
+      if { [::file exists $filename] } {
+         $itk_option(-gaia) open $filename
+      }
       if { $urlget_ != {} } {
          catch {delete object $urlget_}
       }

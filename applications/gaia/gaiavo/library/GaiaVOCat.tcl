@@ -374,15 +374,21 @@ itcl::class gaiavo::GaiaVOCat {
    }
 
    # This method is called when the background query is done.
-   public method query_done {result} {
+   public method query_done {status result} {
 
       set_state normal
 
-      if { ! [file exists $result] } {
+      #  If status is bad result is a message, otherwise it should be
+      #  the name of a VOTable file.
+      if { ! $status } {
+         warning_dialog $result $w_
+         after 0 [list $itk_component(progressbar) config -text $result]
+      } elseif { ! [file exists $result] } {
          error_dialog $result $w_
          after 0 [list $itk_component(progressbar) config -text $result]
       } else {
 
+         #  Got a VOTable.
          busy {
             $w_.cat open $result
             

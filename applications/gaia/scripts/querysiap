@@ -105,13 +105,22 @@ proc get {query outfile} {
       array set meta [eval set $response\(meta\)]
       set location $meta(Location)
 
-      #  Rebuild the query.
-      array set parts [::uri::split $query]
-      if { $parts(port) != {} } {
-         set newquery "$parts(scheme)://$parts(host):$parts(port)${location}"
+      if { [string first "http://" $location] == -1 } {
+
+         #  Need to rebuild the query (usual case).
+         array set parts [::uri::split $query]
+         if { $parts(port) != {} } {
+            set newquery "$parts(scheme)://$parts(host):$parts(port)${location}"
+         } else {
+            set newquery "$parts(scheme)://$parts(host)${location}"
+         }
       } else {
-         set newquery "$parts(scheme)://$parts(host)${location}"
+
+         #  Funny location is already a URL, probably broken, but try it
+         #  anyway.
+         set newquery $location.
       }
+
       puts "Redirected to: $newquery"
       catch {::close $fid}
       get $newquery $outfile

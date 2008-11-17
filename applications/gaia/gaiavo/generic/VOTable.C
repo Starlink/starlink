@@ -431,13 +431,13 @@ namespace gaia {
     /** 
      *  Get the value of a named INFO element.
      */
-    int VOTable::infoValue( const char *name, string& value )
+    int VOTable::infoValue( const char *name, string& value, string &content )
     {
         if ( votable1_ ) {
-            return votable_info_value( *votable1_, name, value );
+            return votable_info_value( *votable1_, name, value, content );
         }
         else if ( votable2_ ) {
-            return votable_info_value( *votable2_, name, value );
+            return votable_info_value( *votable2_, name, value, content );
         }
         return 0;
     }

@@ -82,5 +82,5 @@ int data_fitsdata( const NS::FITS& fdata, ofstream& out, int& id_index,
 int field_arraysize( const NS::FIELD& field );
 
 int votable_info_value( NS::VOTABLE& votable, const char *namevalue,
-                        string &value );
+                        string &value , string &content );
 

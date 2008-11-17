@@ -102,7 +102,7 @@ namespace gaia
         int readTST( AstroCatalog *cat );
 
         //  Get the value of a named INFO element.
-        int infoValue( const char *name, string& value );
+        int infoValue( const char *name, string& value, string& content );
 
     protected:
 

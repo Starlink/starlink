@@ -171,15 +171,15 @@ void VOTable::table_description( NS::TABLE& table, string& description )
 }
 
 /**
- *  Return the value of a named INFO element in the VOTable. Uses the
- *  underlying DOM to navigate the document.
+ *  Return the value of the attribute value and the text content of a named
+ *  INFO element in the VOTable. Uses the underlying DOM to navigate the
+ *  document. Not having an element is not an error and the value return is
+ *  the string "OK".
  */
 int VOTable::votable_info_value( NS::VOTABLE& votable, const char *namevalue,
-                                 string &value )
+                                 string &value, string &content )
 {
     using namespace NS;
-
-    value = "";
 
     DOMNode *node = votable._node();
     DOMElement *element = static_cast<DOMElement*>( node );
@@ -208,13 +208,25 @@ int VOTable::votable_info_value( NS::VOTABLE& votable, const char *namevalue,
             if ( XMLString::compareString( element->getAttribute( namestr ),
                                            namevaluestr ) == 0 ) {
                 
-                //  Get value= value.
-                const XMLCh *content = element->getAttribute( valuestr );
-                value = XMLString::transcode( content );
+                //  Get value of the value attribute.
+                const XMLCh *attribute = element->getAttribute( valuestr );
+                value = XMLString::transcode( attribute );
+
+                //  And the text content.
+                const XMLCh *contentChars = element->getTextContent();
+                content = XMLString::transcode( contentChars );
+
+                //  Note it is an error to have an element with no value.
                 ok = 1;
                 break;
             }
         }
+    } 
+    else {
+        //  No element, sadly many tables are incomplete, so not an error.
+        value = "OK";
+        content = "";
+        ok = 1;
     }
     return ok;
 }

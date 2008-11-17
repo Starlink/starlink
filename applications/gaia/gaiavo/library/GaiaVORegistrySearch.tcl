@@ -275,16 +275,26 @@ itcl::class gaiavo::GaiaVORegistrySearch {
 
       #  Convert to a TST file so we can open it up as usual.
       set vot [gaiavotable::open $filename]
-      set tempname [$tempcats_ get_name]
-      set tst [gaiavotable::save $vot 0 $tempname]
-      gaiavotable::close $vot
 
-      #  This is the current VOTable now.
-      set votable_ $filename
+      #  Check the STATUS return.
+      lassign [gaiavotable::info $vot "QUERY_STATUS"] query_status errmsg
+      if { $query_status != "ERROR" } {
+         set status 1
+         set tempname [$tempcats_ get_name]
+         set tst [gaiavotable::save $vot 0 $tempname]
+         gaiavotable::close $vot
+
+         #  This is the current VOTable now.
+         set votable_ $filename
+      } else {
+         set status 0
+         set tempname \
+            "Failed to open registry query result ($query_status: $errmsg)"
+      }
 
       #  Do command so that something happens.
       if { $itk_option(-command) != {} } {
-         eval $itk_option(-command) $tempname
+         eval $itk_option(-command) \$status \$tempname
       }
    }
 
