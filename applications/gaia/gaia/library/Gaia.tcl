@@ -795,9 +795,9 @@ itcl::class gaia::Gaia {
 
       add_menuitem $m command "Overlay axes grid..." \
          {Draw axes over image } \
-         -command [code $this make_toolbox astgrid] \
+         -command [code $this make_toolbox astgrid 0 1] \
          -accelerator {Control-t}
-      bind $w_ <Control-t> [code $this make_toolbox astgrid]
+      bind $w_ <Control-t> [code $this make_toolbox astgrid 0 1]
 
       add_menuitem $m cascade "Astrometry calibration" \
          {Create and manipulate astrometry information} \
