@@ -224,6 +224,8 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *        formatting an error message).
 *     11-JAN-2008 (DSB):
 *        Override the astRate method.
+*     17-NOV-2008 (DSB):
+*        Correct parent class in invocation of astMAKE_ISA.
 *class--
 */
 
@@ -9937,7 +9939,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* Implement the astIsAFrameSet and astCheckFrameSet functions using
    the macros defined for this purpose in the "object.h" header
    file. */
-astMAKE_ISA(FrameSet,Object,check,&class_check)
+astMAKE_ISA(FrameSet,Frame,check,&class_check)
 astMAKE_CHECK(FrameSet)
 
 AstFrameSet *astFrameSet_( void *frame_void, const char *options, int *status, ...) {

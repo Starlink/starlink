@@ -246,6 +246,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        In Clear/Get/Set/TestAttrib, include any appropriate axis index in 
 *        the attribute name when attempting to get the attribute value from 
 *        the primary frame
+*     17-NOV-2008 (DSB):
+*        Correct parent class in invocation of astMAKE_ISA.
 *class--
 */
 
@@ -12783,7 +12785,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 /* ========================= */
 /* Implement the astIsAFrame and astCheckFrame functions using the macros
    defined for this purpose in the "object.h" header file. */
-astMAKE_ISA(Frame,Object,check,&class_check)
+astMAKE_ISA(Frame,Mapping,check,&class_check)
 astMAKE_CHECK(Frame)
 
 AstFrame *astFrame_( int naxes, const char *options, int *status, ...) {
