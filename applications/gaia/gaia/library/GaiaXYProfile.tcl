@@ -409,14 +409,14 @@ itcl::class gaia::GaiaXYProfile {
       ::Blt_ActiveLegend $xgraph_
       ::Blt_Crosshairs $xgraph_
       ::Blt_ClosestPoint $xgraph_
-      bind bltCrosshairs$this <Any-Motion> [code $this dispXY %W %x %y]
+      bind bltCrosshairs$this <Any-Motion> [code $this dispXY_ %W %x %y]
       blt::AddBindTag $xgraph_ bltCrosshairs$this
 
       ::Blt_ZoomStack $ygraph_
       ::Blt_ActiveLegend $ygraph_
       ::Blt_Crosshairs $ygraph_
       ::Blt_ClosestPoint $ygraph_
-      bind bltCrosshairs$this <Any-Motion> [code $this dispXY %W %x %y]
+      bind bltCrosshairs$this <Any-Motion> [code $this dispXY_ %W %x %y]
       blt::AddBindTag $ygraph_ bltCrosshairs$this
    }
 
@@ -522,7 +522,7 @@ itcl::class gaia::GaiaXYProfile {
 
    #  Display the original X or Y position and the data value,
    #  depending on which graph we're moving around in.
-   method dispXY {w x y} {
+   protected method dispXY_ {w x y} {
 
       #  Update crosshair position.
       $w crosshairs configure -position @$x,$y
@@ -532,30 +532,20 @@ itcl::class gaia::GaiaXYProfile {
 
          #  Find the closest position and hence the current data value.
          #  If off the graph then do nothing.
-         if { ![$w element closest $x $y result -interpolate 1 -halo 10000 -along x]} {
+         if { ![$w element closest $x $y result -interpolate no -halo 2i -along x]} {
             return
          }
-         set index $result(index)
-
-         set x [$xxVector_ range $index $index]
-         set y [$xdVector_ range $index $index]
-
-         $itk_component(uppercoord) config -value "$x"
-         $itk_component(uppervalue) config -value "$y"
+         $itk_component(uppercoord) config -value "$result(x)"
+         $itk_component(uppervalue) config -value "$result(y)"
       } else {
 
          #  Find the closest position and hence the current data value.
          #  If off the graph then do nothing.
-         if { ![$w element closest $x $y result -interpolate 1 -halo 10000 -along y]} {
+         if { ![$w element closest $x $y result -interpolate no -halo 2i -along y]} {
             return
          }
-         set index $result(index)
-
-         set x [$yyVector_ range $index $index]
-         set y [$ydVector_ range $index $index]
-
-         $itk_component(lowercoord) config -value "$x"
-         $itk_component(lowervalue) config -value "$y"
+         $itk_component(lowercoord) config -value "$result(y)"
+         $itk_component(lowervalue) config -value "$result(x)"
       }
    }
 
@@ -796,20 +786,35 @@ itcl::class gaia::GaiaXYProfile {
       }
    }
 
-   #  Draw or update the line drawn in the main image that represents the
-   #  UKIRT peakrow. "coord" should be in image coordinates.
+   #  Draw or update the lines drawn in the main image that represent the
+   #  positions of the peak values, also updates the line markers showing
+   #  these positions in the graphs. When in UKIRT mode ycoord will be
+   #  the peakrow value. Both coordinates should be in image coordinates.
    protected method draw_peak_lines_ {xcoord ycoord} {
 
-      #  Get the canvas coordinates of this column and row in the image.
-      $itk_option(-rtdimage) convert coords $xcoord $ycoord image column_ row_ canvas
+      #  Update the marker lines.
+      if { $xgraph_max_line_ == {} } {
+         set xgraph_max_line_ [$xgraph_ marker create line -outline red]
+         set ygraph_max_line_ [$ygraph_ marker create line -outline red]
+      }
+      $xgraph_ marker configure $xgraph_max_line_ \
+         -coords "$xcoord -Inf $xcoord +Inf"
+      $ygraph_ marker configure $ygraph_max_line_ \
+         -coords "-Inf $ycoord +Inf $ycoord"
 
-      #  If the lines are drawn, just need to update.
+      #  Get the canvas coordinates of this column and row in the image.
+      $itk_option(-rtdimage) convert coords \
+         $xcoord $ycoord image column_ row_ canvas
+
+      #  If the image lines are drawn, just need to update.
       if { $xline_id_ != {} } {
          if { [$itk_option(-canvas) gettags $xline_id_] != {} } {
-            $itk_option(-canvas) coords $xline_id_ $column_ $cy0_ $column_ $cy1_
+            $itk_option(-canvas) coords \
+               $xline_id_ $column_ $cy0_ $column_ $cy1_
             if { $yline_id_ != {} } {
                if { [$itk_option(-canvas) gettags $yline_id_] != {} } {
-                  $itk_option(-canvas) coords $yline_id_ $cx0_ $row_ $cx1_ $row_
+                  $itk_option(-canvas) coords \
+                     $yline_id_ $cx0_ $row_ $cx1_ $row_
                }
             }
             return
@@ -913,6 +918,10 @@ itcl::class gaia::GaiaXYProfile {
    protected variable yyVector_ {}
    protected variable yiVector_ {}
    protected variable ydVector_ {}
+
+   #  Max and min graph lines.
+   protected variable xgraph_max_line_ {}
+   protected variable ygraph_max_line_ {}
 
    #  Number of positions in X and Y vectors.
    protected variable numXValues_ 0
