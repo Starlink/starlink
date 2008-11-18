@@ -4272,8 +4272,8 @@ AstFrameSet* StarRtdImage::makeGridWCS( ImageData *image )
 
     //  Define limits of window in pixel indices.
     ina[0] = ina[1] = 1.0;
-    inb[0] = width;
-    inb[1] = height;
+    inb[0] = width + 1.0;
+    inb[1] = height + 1.0;
 
     //  Get the NDF origin information and set up the limits of the
     //  same window as above in pixel coordinates.
