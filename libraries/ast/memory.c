@@ -109,6 +109,9 @@
 *        Added "{nnn}" quantifier to astChrSub.
 *     27-MAR-2008 (DSB):
 *        Added astChrSplitRE, and re-structured regexp functions.
+*     18-NOV-2008 (DSB):
+*        In astFlushMemory, do not release permanent memory blocks as
+*        they may still be needed.
 */
 
 /* Configuration results. */
@@ -3957,14 +3960,15 @@ void astFlushMemory_( int leak, int *status ) {
 /* Empty the cache. */
    astMemCaching( astMemCaching( AST__TUNULL ) );
 
-/* Free all permanent memory, counting the number of non-permanent
-   pointers still on the active list. */
+/* Free and count all non-permanent memory blocks. */
    nact = 0;
    next = Active_List;
    while( Active_List ) {
       next = Active_List->next;
-      if( !Active_List->perm ) nact++;
-      FREE( Active_List );
+      if( !Active_List->perm ) {
+         nact++;
+         FREE( Active_List );
+      }
       Active_List = next;
    } 
 
