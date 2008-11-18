@@ -396,6 +396,11 @@ itcl::class gaia::GaiaXYProfile {
          set yyVector_ [blt::vector create \#auto]
          set yiVector_ [blt::vector create \#auto]
          set ydVector_ [blt::vector create \#auto]
+
+         #  Dummies.
+         set dxVector_ [blt::vector create \#auto]
+         set diVector_ [blt::vector create \#auto]
+         set ddVector_ [blt::vector create \#auto]
       }
       set symbol {}
       $xgraph_ element create elem -xdata $xxVector_ -ydata $xdVector_ -symbol $symbol
@@ -435,7 +440,8 @@ itcl::class gaia::GaiaXYProfile {
    #
    #  If the op is "realtime" (should only be used when in UKIRT mode)
    #  then we check the appropriate members for the realtime position of the
-   #  rectangle and the rowcut.
+   #  rectangle and the rowcut. When the rowcut is set the X profile
+   #  displayed is just from that row, not the mean profile.
    #
    public method notify_cmd {{op update}} {
       if { "$op" == "delete" } {
@@ -479,6 +485,21 @@ itcl::class gaia::GaiaXYProfile {
                     $yyVector_ $yiVector_ $ydVector_]
       set numXValues_ [lindex $nvals 0]
       set numYValues_ [lindex $nvals 1]
+
+      #  If we have a rowcut, then UKIRT just wants that row as the X profile,
+      #  not the collapsed version. Y profile is just emptied into dummy
+      #  vectors.
+      if { "$op" == "realtime" && $rowcut != {} } {
+         set nvals [$itk_option(-rtdimage) xyprofile $xgraph_ $ygraph_ elem \
+                       $x0_ $rowcut $x1_ $rowcut image \
+                       $xxVector_ $xiVector_ $xdVector_ \
+                       $dxVector_ $diVector_ $ddVector_]
+
+         #  Change graph title to make this clear.
+         $xgraph_ configure -title "X Profile at Row: $rowcut"
+      } else {
+         $xgraph_ configure -title "Mean X Profile"
+      }
 
       #  Update the simple statistics. Peak value and position.
       if { ! [info exists itk_component(xpeakcoord)] } {
@@ -932,10 +953,15 @@ itcl::class gaia::GaiaXYProfile {
    protected variable xiVector_ {}
    protected variable xdVector_ {}
 
-   # Y profile BLT vectors.
+   #  Y profile BLT vectors.
    protected variable yyVector_ {}
    protected variable yiVector_ {}
    protected variable ydVector_ {}
+
+   #  Dummy vectors.
+   protected variable dxVector_ {}
+   protected variable diVector_ {}
+   protected variable ddVector_ {}
 
    #  Max and min graph lines.
    protected variable xgraph_max_line_ {}
