@@ -55,7 +55,7 @@ void XYProfile::extractNativeImage( const DATA_TYPE *image, const int nx,
     DATA_TYPE value;
     int w = x1 - x0 + 1;
     int h = y1 - y0 + 1;
-    if ( w <= 1 || h <= 1 ) {
+    if ( w < 1 || h < 1 ) {
        numValues[0] = 0;
        numValues[1] = 0;
        return;
@@ -164,7 +164,7 @@ void XYProfile::extractSwapImage( const DATA_TYPE *image, const int nx,
     DATA_TYPE value;
     int w = x1 - x0 + 1;
     int h = y1 - y0 + 1;
-    if ( w <= 1 || h <= 1 ) {
+    if ( w < 1 || h < 1 ) {
        numValues[0] = 0;
        numValues[1] = 0;
        return;
