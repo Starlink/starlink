@@ -3198,9 +3198,9 @@ ClosestPoint(linePtr, searchPtr)
 	if (searchPtr->along == SEARCH_BOTH) {
 	    dist = hypot(dx, dy);
 	} else if (searchPtr->along == SEARCH_X) {
-	    dist = dx;
+	    dist = fabs( dx );
 	} else if (searchPtr->along == SEARCH_Y) {
-	    dist = dy;
+	    dist = fabs( dy );
 	} else {
 	    /* This can't happen */
 	    continue;
