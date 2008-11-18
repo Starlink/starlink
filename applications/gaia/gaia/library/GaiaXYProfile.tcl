@@ -457,6 +457,13 @@ itcl::class gaia::GaiaXYProfile {
             set y1_ [set ${var}(Y1)]
             set rowcut [set ${var}(ROWCUT)]
 
+            #  Nearest image pixels.
+            set x0_ [expr round($x0_)]
+            set y0_ [expr round($y0_)]
+            set x1_ [expr round($x1_)]
+            set y1_ [expr round($y1_)]
+            set rowcut [expr round($rowcut)]
+
             #  Set bounds of rectangle, and transform to canvas coordinates.
             set_canvas_bounds_
          }
@@ -505,11 +512,17 @@ itcl::class gaia::GaiaXYProfile {
       return 0
    }
 
-   #  Set the bounds to those of the rectangle. Image coordinates.
+   #  Set the image bounds to those of the current rectangle.
    protected method set_image_bounds_ {} {
       lassign [$itk_option(-canvas) coords $itk_option(-rect_id)] cx0_ cy0_ cx1_ cy1_
       $itk_option(-rtdimage) convert coords $cx0_ $cy0_ canvas x0_ y1_ image
       $itk_option(-rtdimage) convert coords $cx1_ $cy1_ canvas x1_ y0_ image
+
+      #  Nearest image pixels.
+      set x0_ [expr round($x0_)]
+      set y0_ [expr round($y0_)]
+      set x1_ [expr round($x1_)]
+      set y1_ [expr round($y1_)]
    }
 
    #  Set the canvas bounds to those of the current image region.
@@ -794,8 +807,10 @@ itcl::class gaia::GaiaXYProfile {
 
       #  Update the marker lines.
       if { $xgraph_max_line_ == {} } {
-         set xgraph_max_line_ [$xgraph_ marker create line -outline red]
-         set ygraph_max_line_ [$ygraph_ marker create line -outline red]
+         set xgraph_max_line_ \
+            [$xgraph_ marker create line -outline $itk_option(-outline)]
+         set ygraph_max_line_ \
+            [$ygraph_ marker create line -outline $itk_option(-outline)]
       }
       $xgraph_ marker configure $xgraph_max_line_ \
          -coords "$xcoord -Inf $xcoord +Inf"
@@ -854,7 +869,7 @@ itcl::class gaia::GaiaXYProfile {
    protected method drawn_ximage_line_ {id args} {
       $itk_option(-canvasdraw) set_drawing_mode anyselect
       $itk_option(-canvas) coords $id $column_ $cy0_ $column_ $cy1_
-      $itk_option(-canvas) itemconfigure $id -fill red
+      $itk_option(-canvas) itemconfigure $id -fill $itk_option(-outline)
       set xline_id_ $id
    }
 
@@ -863,7 +878,7 @@ itcl::class gaia::GaiaXYProfile {
    protected method drawn_yimage_line_ {id args} {
       $itk_option(-canvasdraw) set_drawing_mode anyselect
       $itk_option(-canvas) coords $id $cx0_ $row_ $cx1_ $row_
-      $itk_option(-canvas) itemconfigure $id -fill red
+      $itk_option(-canvas) itemconfigure $id -fill $itk_option(-outline)
       set yline_id_ $id
    }
 
@@ -901,6 +916,9 @@ itcl::class gaia::GaiaXYProfile {
    #  Fonts used
    itk_option define -labelfont labelFont LabelFont -Adobe-helvetica-bold-r-normal-*-12*
    itk_option define -valuefont valueFont ValueFont -Adobe-helvetica-medium-r-normal-*-12*
+
+   #  Colour for image and peak lines.
+   itk_option define -outline outline OutLine green
 
    #  Protected variables: (available to instance)
    #  --------------------

@@ -80,8 +80,8 @@ void XYProfile::extractNativeImage( const DATA_TYPE *image, const int nx,
     int ix;
     int iy;
     int j;
-    for ( j = y0, iy = 0; j < y1; j++, iy++ ) {
-        for ( i = x0, ix = 0; i < x1; i++, ix++ ) {
+    for ( j = y0, iy = 0; j <= y1; j++, iy++ ) {
+        for ( i = x0, ix = 0; i <= x1; i++, ix++ ) {
             if ( ! badpix( image, nx, i, j ) ) {
                 value = arrayVal( image, nx, i, j );
                 xsum[ix] += value;
@@ -189,8 +189,8 @@ void XYProfile::extractSwapImage( const DATA_TYPE *image, const int nx,
     int ix;
     int iy;
     int j;
-    for ( j = y0, iy = 0; j < y1; j++, iy++ ) {
-        for ( i = x0, ix = 0; i < x1; i++, ix++ ) {
+    for ( j = y0, iy = 0; j <= y1; j++, iy++ ) {
+        for ( i = x0, ix = 0; i <= x1; i++, ix++ ) {
             if ( ! swapBadpix( image, nx, i, j ) ) {
                 value = swapArrayVal( image, nx, i, j );
                 xsum[ix] += value;

@@ -6326,10 +6326,11 @@ int StarRtdImage::xyProfileCmd(int argc, char *argv[])
            status = resetBltVector( numValues[1], ycoords, argv[11] );
         }
     }
-    delete xcoords;
-    delete ycoords;
-    delete xvalues;
-    delete yvalues;
+
+    delete[] xcoords;
+    delete[] ycoords;
+    delete[] xvalues;
+    delete[] yvalues;
 
     set_result( numValues[0] );
     append_element( numValues[1] );
