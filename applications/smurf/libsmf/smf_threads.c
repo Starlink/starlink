@@ -64,6 +64,9 @@
 *  History:
 *     11-JUN-2008 (DSB):
 *        Original version.
+*     18-NOV-2008 (DSB):
+*        Changed smf_destroy_workforce so that the worker threads are
+*        terminated correctly.
 */
 
 
@@ -386,16 +389,41 @@ smfWorkForce *smf_destroy_workforce( smfWorkForce *workforce ) {
 *  Description:
 *     This function frees all resources used by a work force. This
 *     includes cancelling the worker threads, and freeing memory
-*     structures.
+*     structures. The calling thread blocks until any busy workers have
+*     completed their jobs. The worker threads themselves are then
+*     terminated.
 
 */
 
 /* Local Variables: */
    smfJob *job;
    int status = SAI__OK;
+   int nloop;
 
 /* Check a workforce was supplied. */
    if( workforce ) {
+
+/* Wait until we have exclusive access to the job desk. */
+      pthread_mutex_lock( &( workforce->jd_mutex ) );
+
+/* Set a flag indicating that the workers should terminate, and then
+   broadcast a signal requesting all idle workers to return to the job 
+   desk. */
+      workforce->kill = workforce->nworker;
+      pthread_cond_broadcast( &(workforce->page) );
+
+/* Now wait until all workers have terminated. Spurious wake-ups can occur 
+   so put this in a loop. The call to pthread_cond_wait (within smf_cond_wait)
+   will release the specified mutex (the job desk mutex) before blocking
+   this thread. This enables worker threads to access the job deks to 
+   report completion of jobs, etc. */
+      nloop = 0;
+      while( workforce->kill && ++nloop < 1000 ){
+         pthread_cond_wait( &( workforce->all_done ), &( workforce->jd_mutex ) );
+      }
+
+/* Unlock the job desk mutex prior to dstroying it. */
+      pthread_mutex_unlock( &( workforce->jd_mutex ) );
 
 /* Free the mutex and condition variables used by the workforce. */
       pthread_mutex_destroy( &( workforce->jd_mutex ) );
@@ -991,8 +1019,7 @@ static void *smf_run_worker( void *wf_ptr ) {
    block until you reach the head of the queue. */
    smf_mutex_lock( &(wf->jd_mutex), &status );
 
-/* Loop until an error occurs in the threading infrastructure. The thread
-   will be killed if smf_destroy_workforce is called. */
+/* Loop until an error occurs in the threading infrastructure. */
    while( status == SAI__OK ) {
 
 /* You are now at the job desk and have exclusive access to all the 
@@ -1043,6 +1070,16 @@ static void *smf_run_worker( void *wf_ptr ) {
 
 /* Indicate you now have no associated job. */
          job = NULL;
+      }
+
+/* If the workforce is being killed, decrement the number of workers that
+   remain to be terminated. If this is  the last worker, signal the
+   "all_done" condition. Then release the job queue mutex, and quit the 
+   main loop. */
+      if( wf->kill ) {
+         if( --(wf->kill) == 0 ) smf_cond_signal( &(wf->all_done), &status );
+         smf_mutex_unlock( &(wf->jd_mutex), &status );
+         break;
       }
 
 /* Now attempt to aquire a new job from the list of available jobs.

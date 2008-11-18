@@ -73,6 +73,7 @@ struct smfWorkForce {
    pthread_cond_t page;           /* Signals worker to return to job desk */
    pthread_mutex_t jd_mutex;      /* Mutex controlling access to the job desk */
    int status;                    /* Inherited status value for the workforce */
+   int kill;                      /* No. of workers still to be terminated */
 };
 
 
