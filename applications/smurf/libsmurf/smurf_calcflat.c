@@ -68,6 +68,8 @@
 *        Original version.
 *     2008-09-03 (TIMJ):
 *        First version ready for testing.
+*     2008-11-18 (TIMJ):
+*        Trap erroneous final dark.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -142,6 +144,7 @@ void smurf_calcflat( int *status ) {
   size_t nbols;             /* Number of bolometers */
   int ncols;                /* Number of columns */
   int nrows;                /* Number of rows */
+  size_t ndarks;            /* Number of darks to process */
   Grp *igrp = NULL;         /* Input group of files */
   int obsnum;               /* Observation number */
   Grp *ogrp = NULL;         /* Output group of files */
@@ -168,10 +171,10 @@ void smurf_calcflat( int *status ) {
   /* Find darks (might be all) */
   smf_find_darks( igrp, &fgrp, &dkgrp, 1, SMF__DOUBLE, &darks, status );
 
-  if (!darks || darks->ndat <= 2) {
+  if (!darks || darks->ndat < 3) {
     if (*status == SAI__OK) {
       *status = SAI__ERROR;
-      errRep( " ","Flatfield observation must include at least two darks",
+      errRep( " ","Flatfield observation must include at least three darks",
               status);
     }
     goto CLEANUP;
@@ -297,10 +300,19 @@ void smurf_calcflat( int *status ) {
     /* this smfArray does not own the data */
     bbhtframe->owndata = 0;
 
+    /* Need odd number of darks */
+    ndarks = darks->ndat;
+    if (darks->ndat % 2 == 0) {
+      msgOutif( MSG__NORM, " ",
+                "Observed an even number of darks. Dropping last dark from processing.",
+                status);
+      ndarks--;
+    }
+
     /* Loop over every other frame. Assumes start and end on dark
        but note that this branch assumes all files are darks but with
        varying PIXHEAT */
-    for (i = 1; i < darks->ndat; i+=2) {
+    for (i = 1; i < ndarks; i+=2) {
       double heater;
       double ref1;
       double ref2;
