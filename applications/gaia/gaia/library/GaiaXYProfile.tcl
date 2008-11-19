@@ -1172,14 +1172,14 @@ itcl::class gaia::GaiaXYProfile {
    itk_option define -profile_width profile_width Profile_Width 1
 
    #  Colour for graph peak lines.
-   itk_option define -peak_colour peak_colour Peak_Colour green
+   itk_option define -peak_colour peak_colour Peak_Colour black
 
    #  Width for graph peak lines.
    itk_option define -peak_width peak_width Peak_Width 1
 
    #  Colour for image peak lines.
    itk_option define -image_peak_colour image_peak_colour \
-      Image_Peak_Colour green
+      Image_Peak_Colour blue
 
    #  Width for image peak lines.
    itk_option define -image_peak_width image_peak_width \
