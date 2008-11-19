@@ -1810,7 +1810,8 @@ sub solve {
 
       open my $bestfit_fh, ">", $self->bestfitlog or croak "Could not open " . $self->bestfitlog . " for writing: $!";
       print $bestfit_fh "    n nterms         centre        prms       q FITS-WCS\n";
-      foreach my $k ( 0..$#{@$results} ) {
+      my $numresults = scalar(@$results);
+      foreach my $k ( 0 .. $numresults - 1 ) {
         if( $results->[$k]->{STATUS} ) {
           next if $results->[$k]->{nterms} > $self->maxfit;
           printf $bestfit_fh ("%5d %3d %11.11s %12.12s %4.1f %7.7s %s\n",
@@ -1831,19 +1832,19 @@ sub solve {
           printf $bestfit_fh ( "%5d NO FIT\n", $k );
         }
       }
-      for ( my $k = $#{@$results}; $k >= 0; $k-- ) {
+      for ( my $k = $numresults - 1; $k >= 0; $k-- ) {
         my %lastastrom = %{$results->[$k]};
         if( $lastastrom{STATUS} ) {
           next if $lastastrom{nterms} > $self->maxfit;
           printf $bestfit_fh ( "Astrom: best fit: %d of %d\n",
-                               $k+1, $#{@$results}+1 );
+                               $k+1, $numresults );
           foreach my $kw ( sort keys %lastastrom ) {
             printf $bestfit_fh "\t%s => %s\n", $kw, $lastastrom{$kw};
           }
           last;
         } else {
           printf $bestfit_fh ("Astrom: Fit %d of %d rejected",
-                              $k+1, $#{@$results} + 1 );
+                              $k+1, $numresults );
           print $bestfit_fh " (", $lastastrom{nterms}, " terms)"
             if defined( $lastastrom{nterms} );
           print $bestfit_fh "\n";
