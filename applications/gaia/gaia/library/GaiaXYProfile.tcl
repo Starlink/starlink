@@ -142,6 +142,16 @@ itcl::class gaia::GaiaXYProfile {
          {Display peak lines} \
          {Display the position of the peak values on main image}
 
+      #  Display the previous profiles.
+      $Options add checkbutton -label {Display previous profile} \
+         -variable [scope itk_option(-show_last_profiles)] \
+         -onvalue 1 \
+         -offvalue 0 \
+         -command [code $this toggle_show_last_profiles_]
+      $short_help_win_ add_menu_short_help $Options \
+         {Display previous profile} \
+         {Display the previous profiles, not much use for interactive work}
+
       #  Set the initial corner coordinates of the rectangle.
       set_image_bounds_
 
@@ -163,6 +173,13 @@ itcl::class gaia::GaiaXYProfile {
       catch {
          blt::vector destroy $xxVector_ $xiVector_ $xdVector_
          blt::vector destroy $yyVector_ $yiVector_ $ydVector_
+      }
+      catch {
+         blt::vector destroy $last_xxVector_ $last_xdVector_
+         blt::vector destroy $last_yyVector_ $last_ydVector_
+      }
+      catch {
+         blt::vector destroy $dxVector_ $diVector_ $ddVector_
       }
 
       #  Remove rectangle.
@@ -397,14 +414,32 @@ itcl::class gaia::GaiaXYProfile {
          set yiVector_ [blt::vector create \#auto]
          set ydVector_ [blt::vector create \#auto]
 
-         #  Dummies.
+         #  Copies for displaying last extractions as well.
+         set last_xxVector_ [blt::vector create \#auto]
+         set last_xdVector_ [blt::vector create \#auto]
+         set last_yyVector_ [blt::vector create \#auto]
+         set last_ydVector_ [blt::vector create \#auto]
+
+         #  Dummies for throwing away.
          set dxVector_ [blt::vector create \#auto]
          set diVector_ [blt::vector create \#auto]
          set ddVector_ [blt::vector create \#auto]
       }
       set symbol {}
-      $xgraph_ element create elem -xdata $xxVector_ -ydata $xdVector_ -symbol $symbol
-      $ygraph_ element create elem -xdata $ydVector_ -ydata $yyVector_ -symbol $symbol
+      $xgraph_ element create elem \
+         -xdata $xxVector_ -ydata $xdVector_ -symbol $symbol \
+         -color $itk_option(-profile_colour)
+      $ygraph_ element create elem \
+         -xdata $ydVector_ -ydata $yyVector_ -symbol $symbol \
+         -color $itk_option(-profile_colour)
+
+      #  Last vectors for comparison. Only enabled when requested.
+      $xgraph_ element create last_elem \
+         -xdata $last_xxVector_ -ydata $last_xdVector_ -symbol $symbol \
+         -color $itk_option(-last_profile_colour)
+      $ygraph_ element create last_elem \
+         -xdata $last_ydVector_ -ydata $last_yyVector_ -symbol $symbol \
+         -color $itk_option(-last_profile_colour)
 
       #  Do the initial profile plot.
       add_notify_
@@ -444,12 +479,22 @@ itcl::class gaia::GaiaXYProfile {
    #  displayed is just from that row, not the mean profile.
    #
    public method notify_cmd {{op update}} {
+
       if { "$op" == "delete" } {
          configure -rect_id {}
          if { ! $itk_option(-ukirt_options) } {
             destroy $w_
          }
          return 0
+      }
+
+      #  Previous vectors become last ones.
+      if { $itk_option(-show_last_profiles) } {
+         $xxVector_ dup $last_xxVector_
+         $xdVector_ dup $last_xdVector_
+
+         $yyVector_ dup $last_yyVector_
+         $ydVector_ dup $last_ydVector_
       }
 
       set rowcut {}
@@ -885,6 +930,18 @@ itcl::class gaia::GaiaXYProfile {
       }
    }
 
+   #  Toggle display of the last profiles.
+   protected method toggle_show_last_profiles_ {} {
+      if { $itk_option(-show_last_profiles) } {
+         notify_cmd
+      } else {
+         $last_xxVector_ clear
+         $last_xdVector_ clear
+         $last_yyVector_ clear
+         $last_ydVector_ clear
+      }
+   }
+
    #  Restore of x image line completed. Finish up by setting to the
    #  correct column.
    protected method drawn_ximage_line_ {id args} {
@@ -925,21 +982,36 @@ itcl::class gaia::GaiaXYProfile {
       Continuous_updates 1
 
    #  Include the UKIRT quick look facilities. Changes show peaks lines,
-   #  whether the log saving is shown and what happens when the
-   #  rectangle is deleted (nothing if true).
+   #  whether the log saving is shown, what happens when the
+   #  rectangle is deleted (nothing if true) and the display of the
+   #  last profiles.
    itk_option define -ukirt_options ukirt_options Ukirt_Options 0 {
       configure -show_peak_lines $itk_option(-ukirt_options)
+      configure -show_last_profiles $itk_option(-ukirt_options)
    }
 
    #  Whether to show the peak lines.
    itk_option define -show_peak_lines show_peak_lines Show_Peak_Lines 0
 
    #  Fonts used
-   itk_option define -labelfont labelFont LabelFont -Adobe-helvetica-bold-r-normal-*-12*
-   itk_option define -valuefont valueFont ValueFont -Adobe-helvetica-medium-r-normal-*-12*
+   itk_option define -labelfont labelFont LabelFont \
+      -Adobe-helvetica-bold-r-normal-*-12*
+   itk_option define -valuefont valueFont ValueFont \
+      -Adobe-helvetica-medium-r-normal-*-12*
+
+   #  Colour for the profiles.
+   itk_option define -profile_colour profile_colour Profile_Colour blue
 
    #  Colour for image and peak lines.
    itk_option define -outline outline OutLine green
+
+   #  Colour for the previous profiles.
+   itk_option define -last_profile_colour last_profile_colour \
+      Last_Profile_Colour red
+
+   #  Whether to display the previous profiles for reference.
+   itk_option define -show_last_profiles show_last_profiles \
+      Show_Last__Profiles 0
 
    #  Protected variables: (available to instance)
    #  --------------------
@@ -953,10 +1025,16 @@ itcl::class gaia::GaiaXYProfile {
    protected variable xiVector_ {}
    protected variable xdVector_ {}
 
+   protected variable last_xxVector_ {}
+   protected variable last_xdVector_ {}
+
    #  Y profile BLT vectors.
    protected variable yyVector_ {}
    protected variable yiVector_ {}
    protected variable ydVector_ {}
+
+   protected variable last_yyVector_ {}
+   protected variable last_ydVector_ {}
 
    #  Dummy vectors.
    protected variable dxVector_ {}
