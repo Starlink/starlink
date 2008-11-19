@@ -13,6 +13,8 @@ summarise-commits - Summarise commits in a subversion repository
 Create an HTML page of changes made to a repository since the last
 time this program was run (or from the supplied revision number).
 
+=head1 OPTIONS
+
 =over 4
 
 =item B<-help>
@@ -125,6 +127,24 @@ my %SETTINGS = (
 			   reportdir => '/web/starlink',
 			   # Name of report web file
 			   reportfile => 'summarize-commits.html',
+			   # Filter used to restrict report to specific part of repository tree
+			   file_filter => '',
+			   # indicates that the viewvc has root requirement
+			   hasviewvcroot => 0,
+			  },
+		starjava => {
+			   # Base URL for viewvc links
+			   viewvchome => "http://starjava.jach.hawaii.edu/viewvc/",
+			   # Directory name of the subversion tree relative to root path
+			   svnroot => "starjava",
+			   # URL root dir where report web page will appear
+			   reporturlroot => "http://starlink.jach.hawaii.edu/",
+			   # Where mail message will be sent
+			   reportmail => 'stardev@jiscmail.ac.uk',
+			   # Local directory on the web server for web page and .revision file
+			   reportdir => '/web/starlink',
+			   # Name of report web file
+			   reportfile => 'summarize-commits-starjava.html',
 			   # Filter used to restrict report to specific part of repository tree
 			   file_filter => '',
 			   # indicates that the viewvc has root requirement
