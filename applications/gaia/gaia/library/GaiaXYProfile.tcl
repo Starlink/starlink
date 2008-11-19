@@ -152,6 +152,108 @@ itcl::class gaia::GaiaXYProfile {
          {Display previous profile} \
          {Display the previous profiles, not much use for interactive work}
 
+      #  Colour options.
+      $Options add cascade -label {Profile color} \
+         -menu [menu $Options.profile]
+      foreach colour $simplecolours_ {
+         $Options.profile add radiobutton \
+             -background $colour \
+             -variable [scope itk_option(-profile_colour)] \
+             -value $colour \
+             -label {    } \
+             -command [code $this set_profile_colour_ $colour]
+      }
+      add_menu_short_help $Options {Profile color} \
+         {Change the colour of the profiles}
+
+      $Options add cascade -label {Previous profile color} \
+         -menu [menu $Options.lastprofile]
+      foreach colour $simplecolours_ {
+         $Options.lastprofile add radiobutton \
+             -background $colour \
+             -variable [scope itk_option(-last_profile_colour)] \
+             -value $colour \
+             -label {    } \
+             -command [code $this set_last_profile_colour_ $colour]
+      }
+      add_menu_short_help $Options {Previous profile color} \
+         {Change the colour of the previous profiles}
+
+      $Options add cascade -label {Peak line color} \
+         -menu [menu $Options.peakcolour]
+      foreach colour $simplecolours_ {
+         $Options.peakcolour add radiobutton \
+             -background $colour \
+             -variable [scope itk_option(-peak_colour)] \
+             -value $colour \
+             -label {    } \
+             -command [code $this set_peak_colour_ $colour]
+      }
+      add_menu_short_help $Options {Peak line color} \
+         {Change the colour of peak lines}
+
+      $Options add cascade -label {Image peak line color} \
+         -menu [menu $Options.imagepeakcolour]
+      foreach colour $simplecolours_ {
+         $Options.imagepeakcolour add radiobutton \
+             -background $colour \
+             -variable [scope itk_option(-image_peak_colour)] \
+             -value $colour \
+             -label {    } \
+             -command [code $this set_image_peak_colour_ $colour]
+      }
+      add_menu_short_help $Options {Image peak line color} \
+         {Change the colour of peak lines shown in image display}
+
+      #  Line width options.
+      $Options add cascade -label {Profile width} \
+         -menu [menu $Options.profilewidth]
+      foreach i {1 2 3 4} {
+         $Options.profilewidth add radiobutton \
+            -value $i \
+            -bitmap width$i \
+            -variable [scope itk_option(-profile_width)] \
+            -command [code $this set_profile_width_ $i]
+      }
+      add_menu_short_help $Options {Profile width} \
+         {Set width of lines used to draw profiles}
+
+      $Options add cascade -label {Previous profile width} \
+         -menu [menu $Options.lastwidth]
+      foreach i {1 2 3 4} {
+         $Options.lastwidth add radiobutton \
+            -value $i \
+            -bitmap width$i \
+            -variable [scope itk_option(-last_profile_width)] \
+            -command [code $this set_last_profile_width_ $i]
+      }
+      add_menu_short_help $Options {Previous profile width} \
+         {Set width of lines used to draw previous profiles}
+
+      $Options add cascade -label {Peak line width} \
+         -menu [menu $Options.peakwidth]
+      foreach i {1 2 3 4} {
+         $Options.peakwidth add radiobutton \
+            -value $i \
+            -bitmap width$i \
+            -variable [scope itk_option(-peak_width)] \
+            -command [code $this set_peak_width_ $i]
+      }
+      add_menu_short_help $Options {Peak line width} \
+         {Set width of peak lines drawn in graphs}
+
+      $Options add cascade -label {Image peak line width} \
+         -menu [menu $Options.imagepeakwidth]
+      foreach i {1 2 3 4} {
+         $Options.imagepeakwidth add radiobutton \
+            -value $i \
+            -bitmap width$i \
+            -variable [scope itk_option(-image_peak_width)] \
+            -command [code $this set_image_peak_width_ $i]
+      }
+      add_menu_short_help $Options {Image peak line width} \
+         {Set width of peak lines drawn in main image}
+
       #  Set the initial corner coordinates of the rectangle.
       set_image_bounds_
 
@@ -492,7 +594,6 @@ itcl::class gaia::GaiaXYProfile {
       if { $itk_option(-show_last_profiles) } {
          $xxVector_ dup $last_xxVector_
          $xdVector_ dup $last_xdVector_
-
          $yyVector_ dup $last_yyVector_
          $ydVector_ dup $last_ydVector_
       }
@@ -874,9 +975,9 @@ itcl::class gaia::GaiaXYProfile {
       #  Update the marker lines.
       if { $xgraph_max_line_ == {} } {
          set xgraph_max_line_ \
-            [$xgraph_ marker create line -outline $itk_option(-outline)]
+            [$xgraph_ marker create line -outline $itk_option(-peak_colour)]
          set ygraph_max_line_ \
-            [$ygraph_ marker create line -outline $itk_option(-outline)]
+            [$ygraph_ marker create line -outline $itk_option(-peak_colour)]
       }
       $xgraph_ marker configure $xgraph_max_line_ \
          -coords "$xcoord -Inf $xcoord +Inf"
@@ -932,14 +1033,13 @@ itcl::class gaia::GaiaXYProfile {
 
    #  Toggle display of the last profiles.
    protected method toggle_show_last_profiles_ {} {
-      if { $itk_option(-show_last_profiles) } {
-         notify_cmd
-      } else {
-         $last_xxVector_ clear
-         $last_xdVector_ clear
-         $last_yyVector_ clear
-         $last_ydVector_ clear
+      if { ! $itk_option(-show_last_profiles) } {
+         $last_xxVector_ length 0
+         $last_xdVector_ length 0
+         $last_yyVector_ length 0
+         $last_ydVector_ length 0
       }
+      notify_cmd
    }
 
    #  Restore of x image line completed. Finish up by setting to the
@@ -947,7 +1047,8 @@ itcl::class gaia::GaiaXYProfile {
    protected method drawn_ximage_line_ {id args} {
       $itk_option(-canvasdraw) set_drawing_mode anyselect
       $itk_option(-canvas) coords $id $column_ $cy0_ $column_ $cy1_
-      $itk_option(-canvas) itemconfigure $id -fill $itk_option(-outline)
+      $itk_option(-canvas) itemconfigure $id \
+         -fill $itk_option(-image_peak_colour)
       set xline_id_ $id
    }
 
@@ -956,8 +1057,73 @@ itcl::class gaia::GaiaXYProfile {
    protected method drawn_yimage_line_ {id args} {
       $itk_option(-canvasdraw) set_drawing_mode anyselect
       $itk_option(-canvas) coords $id $cx0_ $row_ $cx1_ $row_
-      $itk_option(-canvas) itemconfigure $id -fill $itk_option(-outline)
+      $itk_option(-canvas) itemconfigure $id \
+         -fill $itk_option(-image_peak_colour)
       set yline_id_ $id
+   }
+
+   #  Set the colour of the profiles.
+   protected method set_profile_colour_ {colour} {
+      configure -profile_colour $colour
+      $xgraph_ element configure elem -color $colour
+      $ygraph_ element configure elem -color $colour
+   }
+
+   #  Set the line width of the profiles.
+   protected method set_profile_width_ {width} {
+      configure -profile_width $width
+      $xgraph_ element configure elem -linewidth $width
+      $ygraph_ element configure elem -linewidth $width
+   }
+
+   #  Set the colour of the last profiles.
+   protected method set_last_profile_colour_ {colour} {
+      configure -last_profile_colour $colour
+      $xgraph_ element configure last_elem -color $colour
+      $ygraph_ element configure last_elem -color $colour
+   }
+
+   #  Set the line width of the last profiles.
+   protected method set_last_profile_width_ {width} {
+      configure -last_profile_width $width
+      $xgraph_ element configure last_elem -linewidth $width
+      $ygraph_ element configure last_elem -linewidth $width
+   }
+
+   #  Set the colour of the graph peak lines.
+   protected method set_peak_colour_ {colour} {
+      configure -peak_colour $colour
+      if { $xgraph_max_line_ != {} } {
+         $xgraph_ marker configure $xgraph_max_line_ -outline $colour
+         $ygraph_ marker configure $ygraph_max_line_ -outline $colour
+      }
+   }
+
+   #  Set the line width of the graph peak lines.
+   protected method set_peak_width_ {width} {
+      configure -peak_width $width
+      if { $xgraph_max_line_ != {} } {
+         $xgraph_ marker configure $xgraph_max_line_ -linewidth $width
+         $ygraph_ marker configure $ygraph_max_line_ -linewidth $width
+      }
+   }
+
+   #  Set the colour of the image peak lines.
+   protected method set_image_peak_colour_ {colour} {
+      configure -image_peak_colour $colour
+      if { $xline_id_ != {} } {
+         $itk_option(-canvas) itemconfigure $xline_id_ -fill $colour
+         $itk_option(-canvas) itemconfigure $yline_id_ -fill $colour
+      }
+   }
+
+   #  Set the width of the image peak lines.
+   protected method set_image_peak_width_ {width} {
+      configure -image_peak_width $width
+      if { $xline_id_ != {} } {
+         $itk_option(-canvas) itemconfigure $xline_id_ -width $width
+         $itk_option(-canvas) itemconfigure $yline_id_ -width $width
+      }
    }
 
    #  Configuration options: (public variables)
@@ -1002,16 +1168,34 @@ itcl::class gaia::GaiaXYProfile {
    #  Colour for the profiles.
    itk_option define -profile_colour profile_colour Profile_Colour blue
 
-   #  Colour for image and peak lines.
-   itk_option define -outline outline OutLine green
+   #  Line width for the profiles.
+   itk_option define -profile_width profile_width Profile_Width 1
+
+   #  Colour for graph peak lines.
+   itk_option define -peak_colour peak_colour Peak_Colour green
+
+   #  Width for graph peak lines.
+   itk_option define -peak_width peak_width Peak_Width 1
+
+   #  Colour for image peak lines.
+   itk_option define -image_peak_colour image_peak_colour \
+      Image_Peak_Colour green
+
+   #  Width for image peak lines.
+   itk_option define -image_peak_width image_peak_width \
+      Image_Peak_Width 1
 
    #  Colour for the previous profiles.
    itk_option define -last_profile_colour last_profile_colour \
       Last_Profile_Colour red
 
+   #  Line width for the previous profiles.
+   itk_option define -last_profile_width last_profile_width \
+         Last_Profile_Width 1
+
    #  Whether to display the previous profiles for reference.
    itk_option define -show_last_profiles show_last_profiles \
-      Show_Last__Profiles 0
+      Show_Last_Profiles 0
 
    #  Protected variables: (available to instance)
    #  --------------------
@@ -1074,6 +1258,13 @@ itcl::class gaia::GaiaXYProfile {
 
    #  Name of logfile.
    protected variable logfile_ "GaiaXYProfile.log"
+
+   #  Possible colours.
+   protected variable simplecolours_ {
+      "white" "black" "red" "green" "blue" "#0ff" "#f0f"
+      "#ff0" "#f80" "#8f0" "#0f8" "#08f" "#80f"
+      "#f08" "#512751275127" "#a8b4a8b4a8b4"
+   }
 
    #  Common variables: (shared by all instances)
    #  -----------------
