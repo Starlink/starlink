@@ -60,6 +60,8 @@
 *        Set NaN and Inf to VAL__BADD when normalizing
 *     2008-11-03 (EC):
 *        Move conversion of NaN/Inf-->VAL__BADD to smf_convert_bad.c
+*     2008-11-20 (TIMJ):
+*        "Close" the smfData instead of "free".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -404,7 +406,7 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
   }
   
  CLEANUP:
-  if( data ) data = smf_free( data, status );
+  if( data ) smf_close_file( &data, status );
 
   return retdata;
 
