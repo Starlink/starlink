@@ -62,7 +62,8 @@
 *  Notes:
 
 *  Authors:
-*     Ed Chapin (UBC)
+*     EC: Ed Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -70,9 +71,12 @@
 *        Initial version
 *     2008-10-22 (EC):
 *        Added NEP flag
+*     2008-11-19 (TIMJ):
+*        Close pow smfData rather than just freeing it.
 
 *  Copyright:
 *     Copyright (C) 2008 University of British Columbia.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -256,5 +260,5 @@ void smf_bolonoise( smfData *data, size_t window, double f_low,
   }
   
   /* Clean up */
-  if( pow ) pow = smf_free( pow, status );
+  if( pow ) smf_close_file( &pow, status );
 }
