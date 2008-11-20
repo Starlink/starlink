@@ -342,7 +342,8 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
   /* If NDF associated with data, modify dimensions of the data */
   if( data->file ) {
     if( data->file->ndfid != NDF__NOID ) {
-
+      fprintf(stderr,
+              "Do not yet handle changing dimensions of NDF on reorder\n");
     }
   }
 
