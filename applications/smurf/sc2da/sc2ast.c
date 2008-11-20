@@ -159,6 +159,7 @@ int *status             /* global status (given and returned) */
      Tim Jenness (timj@jach.hawaii.edu)
      D.S. Berry (dsb@ast.man.ac.uk)
      E.Chapin (echapin@phas.ubc.ca)
+     P.Friberg (friberg@jach.hawaii.edu)
 
    History :
      01Apr2005 : original (bdk)
@@ -203,13 +204,13 @@ int *status             /* global status (given and returned) */
      20Feb2007 : Clear the cache if instap is changed.
      23Jul2008 : Set SkyRef (TJ)
      10Sep2008 : Original created by renaming sc2ast_createwcs (dsb)
+     20081119  : Modified the conversion for in the Nasmyth coordinate
+                 definitions. (PF)
 */
 
 {
    AstMapping *azelmap;
    AstMapping *mapping;
-   AstMatrixMap *flipmap;
-   AstMatrixMap *revmap;
    AstMatrixMap *rotmap;
    AstPolyMap *polymap;
    AstShiftMap *shiftmap;
@@ -222,13 +223,10 @@ int *status             /* global status (given and returned) */
    sc2astCache *result;
    int isub;
 
-   double a;                       /* subarray angle */
+   double r;                       /* subarray angle */
+   double rot[4];                  /* rotation matrix */
    const double rotangle[8] =
-      { 0.0, PIBY2, 2*PIBY2, 3*PIBY2, 0.0, PIBY2, 2*PIBY2, 3*PIBY2 };
-   double rot[4];
-   const double reverse[8] =
-      { -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0 };
-   double rev[4];
+     { 0.0, PIBY2, 2*PIBY2, 3*PIBY2, 3*PIBY2, 2*PIBY2, PIBY2, 0.0 };
    double shift[2];
    double zshift[2];
 
@@ -236,14 +234,10 @@ int *status             /* global status (given and returned) */
    to the [0][0] pixel in a subarray */
 
    const double xoff[8] =
-      { -41.5,  33.5,  41.5, -33.5, -41.5,  33.5,  41.5, -33.5 };
+   /*    s8a    s8b     s8c   s8d    s4a    s4b    s4c    s4d */
+      { -41.5,   33.5, 41.5, -33.5, -41.5,  33.5,  41.5, -33.5 };
    const double yoff[8] =
-      {  33.5,  41.5, -33.5, -41.5,  33.5,  41.5, -33.5, -41.5 };
-
-   const double flip[8] =
-    /*{ 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0 };*/
-      { -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0 };
-
+      { -33.5,  -41.5, 33.5,  41.5,  33.5,  41.5, -33.5, -41.5 };
 
 /* Distortion mappings. X and Y are in the distorted image, x and y are
    undistorted (Nasmyth). All units are mm.
@@ -419,6 +413,39 @@ int *status             /* global status (given and returned) */
       zshiftmap = astShiftMap ( 2, zshift, "" );
       cache->map[ subnum ] = (AstMapping *) zshiftmap;
 
+/* The mm coords now have to be rotated through an angle approximating
+   a multiple of 90 degrees */
+      r = rotangle[ subnum ];
+      if( subnum < 4 ) {
+        /* 850 arrays */
+        rot[ 0 ] =  cos( r );
+        rot[ 1 ] = -sin( r );
+        rot[ 2 ] =  sin( r );
+        rot[ 3 ] =  cos( r );
+      } else {
+        /* 450 arrays */
+        rot[ 0 ] = -sin( r );
+        rot[ 1 ] =  cos( r );
+        rot[ 2 ] =  cos( r );
+        rot[ 3 ] =  sin( r );
+      }
+      rotmap = astMatrixMap ( 2, 2, 0, rot, "" );
+      cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
+                                                      rotmap, 1, "" );
+
+/* For each 450/850 subarray, the next Mapping creates FRAME450/FRAME850
+   coordinates, which are coordinates in millimetres with origin at the
+   center of the focal plane. */
+
+      shift[ 0 ] = xoff[ subnum ];
+      shift[ 1 ] = yoff[ subnum ];
+      shiftmap = astShiftMap( 2, shift, "" );
+      cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
+                                                      shiftmap, 1, "" );
+
+      printf("Setting up subarray %d coordinates: (%f,%f) rot %f\n",
+             subnum, shift[0], shift[1], r);
+
 /* The mapping from pixel numbers to millimetres is a simple scaling,
    because the pixel separation is the same in both coordinates and is
    accurately constant. A ZoomMap can be used for this. */
@@ -426,47 +453,6 @@ int *status             /* global status (given and returned) */
 
       cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
 						      zoommap, 1, "" );
-
-/* The mm coords now have to be rotated through an angle approximating
-   a multiple of 90 degrees */
-      a = rotangle[ subnum ];
-      rot[ 0 ] = cos( a );
-      rot[ 1 ] = -sin( a );
-      rot[ 2 ] = sin( a );
-      rot[ 3 ] = cos( a );
-      rotmap = astMatrixMap ( 2, 2, 0, rot, "" );
-      cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
-                                                      rotmap, 1, "" );
-
-/* The Y coordinate now has to be reversed */
-      rev[ 0 ] = 1;
-      rev[ 1 ] = 0;
-      rev[ 2 ] = 0;
-      rev[ 3 ] = reverse[ subnum ];
-      revmap = astMatrixMap ( 2, 2, 0, rev, "" );
-      cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
-                                                      revmap, 1, "" );
-
-/* For each 450/850 subarray, the next Mapping creates FRAME450/FRAME850
-   coordinates, which are coordinates in millimetres with origin at the
-   optical axis. For a 450 subarray the axes are chosen such that the
-   first axis maps onto Frame850 North and the second onto the inverted
-   Focus850 UP once the dichroic reflection is taken into account. */
-      shift[ 0 ] = xoff[ subnum ] * PIX2MM;
-      shift[ 1 ] = yoff[ subnum ] * PIX2MM;
-      shiftmap = astShiftMap( 2, shift, "" );
-      cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
-                                                      shiftmap, 1, "" );
-
-/* The final step into Frame850 coordinates is only needed for the 450
-   subarrays. */
-      rev[ 0 ] = 1;
-      rev[ 1 ] = 0;
-      rev[ 2 ] = 0;
-      rev[ 3 ] = flip[ subnum ];
-      flipmap = astMatrixMap( 2, 2, 0, rev, "" );
-      cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
-                                                      flipmap, 1, "" );
 
 /* Correct for polynomial distortion */      
 
@@ -484,11 +470,17 @@ int *status             /* global status (given and returned) */
 /* Apply focal plane offsets - if supplied. Note the effective values in
    the cache so that we can spot if they are changed. */
       if (instap) {
-	instapmap = astShiftMap( 2, instap, "" );
-	cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
-							instapmap, 1, "" );
+        double totinstap[2];
         cache->instap_x[ subnum ] = instap[ 0 ];
         cache->instap_y[ subnum ] = instap[ 1 ];
+        /* Should be XML X & Y and might be different
+           for 850 and 450 focal plane. The offset of the instrument centre
+           from centre of rotation. */
+        totinstap[ 0 ] = instap[0] - 0.0;
+        totinstap[ 1 ] = instap[1] - 0.0;   
+        instapmap = astShiftMap( 2, totinstap, "" );
+        cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
+                                                         instapmap, 1, "" );
       } else {
         cache->instap_x[ subnum ] = 0.0;
         cache->instap_y[ subnum ] = 0.0;
