@@ -67,6 +67,8 @@
 *     18-NOV-2008 (DSB):
 *        Changed smf_destroy_workforce so that the worker threads are
 *        terminated correctly.
+*     20-NOV-2008 (DSB):
+*        Initialise result->kill in smf_create_workforce.
 */
 
 
@@ -246,7 +248,7 @@ smfWorkForce *smf_create_workforce( int nworker, int *status ) {
 *     smf_create_workforce
 
 *  Purpose:
-*     Create a thread pool creating a specified number of threads.
+*     Create a thread pool holding a specified number of threads.
 
 *  Language:
 *     Starlink ANSI C
@@ -266,14 +268,14 @@ smfWorkForce *smf_create_workforce( int nworker, int *status ) {
 
 *  Returned Value:
 *     A pointer to a structure describing the new thread pool. The
-*     returned pool should be freed using smf_destroyworkforce when 
+*     returned pool should be freed using smf_destroy_workforce when 
 *     no longer needed.
 
 *  Description:
 *     This function creates a new "workforce" - a pool of threads that
 *     can be used to execute tasks in parallel. Each task should be 
 *     split into two or more jobs, and a description of each job should
-*     be given to the work force using smf_add_job. As each job is added, 
+*     be given to the workforce using smf_add_job. As each job is added, 
 *     any available worker thread claims the job and executes it. If all 
 *     workers are busy, the jobs will be claimed by workers once they 
 *     have completed their current jobs. Once all jobs have been added,
@@ -341,6 +343,7 @@ smfWorkForce *smf_create_workforce( int nworker, int *status ) {
       result->available_jobs = NULL;
       result->waiting_jobs = NULL;
       result->status = *status;
+      result->kill = 0;
       smf_cond_init( &( result->all_done ), status );
       smf_cond_init( &( result->job_done ), status );
       smf_cond_init( &( result->page ), status );
@@ -413,13 +416,14 @@ smfWorkForce *smf_destroy_workforce( smfWorkForce *workforce ) {
       pthread_cond_broadcast( &(workforce->page) );
 
 /* Now wait until all workers have terminated. Spurious wake-ups can occur 
-   so put this in a loop. The call to pthread_cond_wait (within smf_cond_wait)
-   will release the specified mutex (the job desk mutex) before blocking
-   this thread. This enables worker threads to access the job deks to 
-   report completion of jobs, etc. */
+   so put this in a loop. The call to pthread_cond_wait will release the 
+   specified mutex (the job desk mutex) before blocking this thread. This 
+   enables worker threads to access the job deks to report completion of 
+   jobs, etc. */
       nloop = 0;
       while( workforce->kill && ++nloop < 1000 ){
-         pthread_cond_wait( &( workforce->all_done ), &( workforce->jd_mutex ) );
+         pthread_cond_wait( &( workforce->all_done ), 
+                            &( workforce->jd_mutex ) );
       }
 
 /* Unlock the job desk mutex prior to dstroying it. */
