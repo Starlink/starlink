@@ -93,9 +93,9 @@
 *        propagates the title from the base NDF to the output NDF. [!]
 *     TRANSP = _LOGICAL (Read)
 *        If TRANSP is TRUE, bad values within the pasted NDFs are not
-*        copied to the output NDF as the bad values were transparent.
+*        copied to the output NDF as if the bad values were transparent.
 *        If TRANSP is FALSE, all values are copied during the paste
-*        and a bad value will obscured an underlying value.  [TRUE]
+*        and a bad value will obscure an underlying value.  [TRUE]
 
 *  Examples:
 *     paste aa inset out=bb
