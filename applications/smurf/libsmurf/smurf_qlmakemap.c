@@ -193,6 +193,8 @@
 *        file and set attributes for moving sources accordingly
 *     2008-08-27 (AGG):
 *        Factor out WCS check for moving sources to smf_set_moving
+*     2008-11-21 (DSB):
+*        Modify to use one output array per worker thread.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -364,7 +366,7 @@ void smurf_qlmakemap( int *status ) {
   mapsize = (ubnd_out[0] - lbnd_out[0] + 1) * (ubnd_out[1] - lbnd_out[1] + 1);
 
   /* Now allocate memory for weights array used by smf_rebinmap and
-     initialize to zero */
+     initialize to zero. We need one such weights array for each thread. */
   if ( genvar ) {
     nweights = 2*mapsize;
     /* Generate variances in output file */
@@ -372,8 +374,8 @@ void smurf_qlmakemap( int *status ) {
   } else {
     nweights = mapsize;
   }
-  weights = smf_malloc( nweights, sizeof(double), 1, status);
-
+  weights = smf_malloc( nweights*wf->nworker, sizeof(double), 1, status);
+  
   /* Create an output smfData */
   kpg1Wgndf( "OUT", igrp, 1, 1, "More output files required...",
              &ogrp, &outsize, status );
@@ -388,9 +390,21 @@ void smurf_qlmakemap( int *status ) {
   if ( *status == SAI__OK ) {
     file = odata->file;
     ondf = file->ndfid;
-    /* Map the data array */
-    map = (odata->pntr)[0];
-    variance = (odata->pntr)[1];
+
+  /* Each worker thread needs its own output array. This is needed since
+     otherwise different threads may attempt to write to the same output
+     pixel at the same time. We create a 3D array now in which the
+     first 2 axes match the 2D output NDF dimensions, and the third axis 
+     has dimension equal to the number of worker threads. Once the 
+     rebinning is complete, these multiple output arrays are combined 
+     into one, and copied into the output NDF. */
+    if( wf->nworker > 1 ) {
+      map = smf_malloc( mapsize*wf->nworker, sizeof(double), 0, status);
+      variance = smf_malloc( mapsize*wf->nworker, sizeof(double), 0, status);
+    } else {
+      map = (odata->pntr)[0];
+      variance = (odata->pntr)[1];
+    }
   }
 
   /* Loop over each input file, subtracting bolometer drifts, a mean
@@ -459,6 +473,18 @@ void smurf_qlmakemap( int *status ) {
 
   overallmeansky /= (double)size;
   parPut0d("MEANSKY", overallmeansky, status);
+
+  /* If required, copy the data and variance arrays from the 3D work
+     arrays into the output NDF, free the work arrays, and use the
+     NDF arrays from here on. */
+  if( wf->nworker > 1 ) {
+    memcpy( (odata->pntr)[0], map, sizeof(double)*mapsize );
+    memcpy( (odata->pntr)[1], variance, sizeof(double)*mapsize );
+    (void) smf_free( map, status );
+    (void) smf_free( variance, status );
+    map = (odata->pntr)[0];
+    variance = (odata->pntr)[1];
+  }
 
   /* Write WCS FrameSet to output file */
   smf_set_moving( outframeset, status );
