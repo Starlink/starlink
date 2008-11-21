@@ -10,10 +10,12 @@
     and Y coordinates to be positive. This is useful when drawing
     the with log scaling.
 
+    Several problems when determining the min/max values and percentile
+    cuts displayed in the main window have been fixed.
+
     A bug in the pick object toolbox has been fixed. Previously if you
     opted for RA and Dec in degrees this setting would be ignored
     when zooming.
-
 
   Lehuakona Release
   =================
