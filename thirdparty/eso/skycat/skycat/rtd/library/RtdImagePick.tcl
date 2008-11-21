@@ -21,7 +21,8 @@
 # pbiereic          14/12/99  Apply transformations when a picked object is zoomed
 # pbiereic          04/11/03  Workaround bug in tcl 8.4.3 (SourceForge Request ID 835020)
 # Peter W. Draper   21/05/08  Add FWHM estimates in arcseconds.
-
+#                   21/11/08  Add get_stats_ method to make access to image
+#                             statistics uniform for subclassing.
 
 
 itk::usual RtdImagePick {}
@@ -443,7 +444,7 @@ itcl::class rtd::RtdImagePick {
         # display busy cursor in image and pick window...
         $itk_option(-target_image) busy {
             busy {
-                if {[catch {set list [$image_ statistics]} msg]} {
+                if {[catch {set list [get_stats_]} msg]} {
                     error_dialog $msg
                     cancel_pick
                 } else {
@@ -521,7 +522,7 @@ itcl::class rtd::RtdImagePick {
 	}
         $itk_option(-target_image) busy {
             busy {
-                if {! [catch {set list_ [$image_ statistics]} msg]} {
+                if {! [catch {set list_ [get_stats_]} msg]} {
                     if {[llength $list_] == 12} {
                         set_values $list_ 0
                     }
@@ -715,7 +716,7 @@ itcl::class rtd::RtdImagePick {
         # display busy cursor in image and pick window...
         $itk_option(-target_image) busy {
             busy {
-                if {[catch {set list [$image_ statistics]} msg]} {
+                if {[catch {set list [get_stats_]} msg]} {
                     error_dialog $msg
                     cancel_pick
                 } else {
@@ -751,7 +752,7 @@ itcl::class rtd::RtdImagePick {
             if {"[set $w_.picked]" == ""} { return }
         }
         set waiting_ 0
-        if {[catch {set list [$image_ statistics]} msg]} {
+        if {[catch {set list [get_stats_]} msg]} {
             return
         }
         $canvas_ delete mark
@@ -763,6 +764,11 @@ itcl::class rtd::RtdImagePick {
 
     public method get_pickVar {} {
 	return $w_.picked
+    }
+
+    # return the image statistics.
+    protected method get_stats_ {} {
+       return [$image_ statistics]
     }
 
     # -- options --
