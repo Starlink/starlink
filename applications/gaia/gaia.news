@@ -10,6 +10,10 @@
     and Y coordinates to be positive. This is useful when drawing
     the with log scaling.
 
+    A bug in the pick object toolbox has been fixed. Previously if you
+    opted for RA and Dec in degrees this setting would be ignored
+    when zooming.
+
 
   Lehuakona Release
   =================
