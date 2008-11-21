@@ -60,6 +60,10 @@
 *        - Fix bug and optimize when nel == 1
 *        - Report error if result can not be allocated
 *        - Use size_t in API
+*     21-NOV-2008 (TIMJ):
+*        Sort data if the number of data points are below a threshold.
+*        Do this since it is more accurate than histogram techniques
+*        but is too slow for large data arrays.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -98,6 +102,8 @@
 int *smf_find_median( float *farray, double *darray, size_t nel, 
                       int *hist, float *median, int *status ){
 
+  const size_t threshold = 10000;  /* point at which we abandon sorting */
+
 /* Local Variables */
    double dmedian;
    double dsum;
@@ -132,6 +138,20 @@ int *smf_find_median( float *farray, double *darray, size_t nel,
        if (darray[0] != VAL__BADD) *median = darray[0];
      }
      return hist;
+   }
+
+/* see if we should use sort to find the median */
+   if (nel <= threshold) {
+     int neluse;
+     if ( farray ) {
+       kpg1Medur( 1, nel, farray, median, &neluse, status );
+     } else {
+       double dmedian;
+       kpg1Medud( 1, nel, darray, &dmedian, &neluse, status );
+       *median = ( dmedian != VAL__BADD ) ? dmedian : VAL__BADR;
+
+     }
+     return NULL;
    }
 
 /* Decide on the number of bins in the histogram. This is chosen so that
