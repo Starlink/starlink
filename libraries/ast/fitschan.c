@@ -840,6 +840,9 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        When reading a FITS-WCS header, spurious PVi_j keywords no
 *        longer generate an error. Instead they generate warnings via the
 *        new "BadPV" warning type.
+*     21-NOV-2008 (DSB):
+*        Do not remove keywords from read headers if they may be of
+*        relevance to things other than WCS (e.g. MJD-OBS, OBSGEO, etc).
 *class--
 */
 
@@ -28262,6 +28265,7 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
    int fld[2];        /* Integer field values from keyword name */
    int jm;            /* Pixel axis or projection parameter index */
    int i;             /* Intermediate axis index */
+   int mark;          /* Non-zero if card should be removed once used */
    int nfld;          /* Number of integer fields in test string */
    int ok;            /* Was value converted succesfully? */
    int type;          /* Keyword data type */
@@ -28282,6 +28286,14 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
    type = AST__NOTYPE;
    while( (keynam = CardName( fc, status )) ){
       item = NULL;
+
+/* Assume the card is to be consumed by the reading process. This means
+   the card will be marked as used and effectively excluded from the header. 
+   Keywords which supply observation details that do not depend on the
+   mapping from pixel to WCS axes, or on the nature of the WCS axes, 
+   are not removed as they may be needed for other, non-WCS related,
+   purposes. */
+      mark = 1;
 
 /* Is this a primary CRVAL keyword? */
       if( Match( keynam, "CRVAL%d", 1, fld, &nfld, method, class, status ) ){
@@ -28495,6 +28507,7 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
 
 /* Is this a primary DUT1 keyword? */
       } else if( Match( keynam, "DUT1", 0, fld, &nfld, method, class, status ) ){
+         mark = 0;
          item = &(store->dut1);
          type = AST__FLOAT;
          i = 0;
@@ -28503,6 +28516,7 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
 
 /* Is this a primary MJD-OBS keyword? */
       } else if( Match( keynam, "MJD-OBS", 0, fld, &nfld, method, class, status ) ){
+         mark = 0;
          item = &(store->mjdobs);
          type = AST__FLOAT;
          i = 0;
@@ -28631,6 +28645,7 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
 
 /* Is this a MJD-AVG keyword? */
       } else if( Match( keynam, "MJD-AVG", 0, fld, &nfld, method, class, status ) ){
+         mark = 0;
          item = &(store->mjdavg);
          type = AST__FLOAT;
          i = 0;
@@ -28639,6 +28654,7 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
 
 /* Is this a OBSGEO-X keyword? */
       } else if( Match( keynam, "OBSGEO-X", 0, fld, &nfld, method, class, status ) ){
+         mark = 0;
          item = &(store->obsgeox);
          type = AST__FLOAT;
          i = 0;
@@ -28647,6 +28663,7 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
 
 /* Is this a OBSGEO-Y keyword? */
       } else if( Match( keynam, "OBSGEO-Y", 0, fld, &nfld, method, class, status ) ){
+         mark = 0;
          item = &(store->obsgeoy);
          type = AST__FLOAT;
          i = 0;
@@ -28655,6 +28672,7 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
 
 /* Is this a OBSGEO-Z keyword? */
       } else if( Match( keynam, "OBSGEO-Z", 0, fld, &nfld, method, class, status ) ){
+         mark = 0;
          item = &(store->obsgeoz);
          type = AST__FLOAT;
          i = 0;
@@ -28752,14 +28770,14 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
          if( type == AST__FLOAT ){
             if( CnvValue( fc, AST__FLOAT, &dval, method, status ) ) {
                SetItem( (double ****) item, i, jm, s, dval, status );
-               MarkCard( fc, status );
+               if( mark ) MarkCard( fc, status );
             } else {
                ok = 0;
             }
          } else {
             if( CnvValue( fc, AST__STRING, &cval, method, status ) ) {
                SetItemC( (char ****) item, i, s, cval, status );
-               MarkCard( fc, status );
+               if( mark ) MarkCard( fc, status );
             } else {
               ok = 0;
             }
