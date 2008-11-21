@@ -17,6 +17,13 @@
     opted for RA and Dec in degrees this setting would be ignored
     when zooming.
 
+    Many changes to the XY profile toolbox have been made. This now
+    displays the position along the X and Y axes (previously an offset
+    was shown), along with the value and position of the peaks and the
+    coordinate ranges of each profile. It is also possible to display
+    the peak values using lines drawn in the profiles and on the main
+    image.
+
   Lehuakona Release
   =================
 

@@ -1,28 +1,65 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <html>
-<head>
-<title>Mean XY Profiles Toolbox</title>
-</head>
+  <head>
+    <title>Mean XY Profiles Toolbox</title>
+  </head>
 
-<body>
-<a name="xref_xyprofileusage"></a>
-<h2 align=center><font color=red>Mean XY Profiles Toolbox</font></h2>
-<p>This window displays the mean X and Y profiles of the image data
-bounded by the rectangle that you have drawn on the image.
+  <body>
+    <a name="xref_xyprofileusage"></a>
+    <h2 align=center><font color=red>Mean XY Profiles Toolbox</font></h2>
 
-<p>The only interesting options are the ability to stop the profiles
-from being constantly updated when you move the rectangle, which is
-the "continuous updates" item in the "Options" menu (when this is
-switched off the profiles are only updated when you release the
-rectangle) and the ability to change the amount of display surface
-used for the two profiles. The later being done by selecting the
-little square on the line between the profiles and dragging it to a
-new position.
+    <p>This window displays the mean X and Y profiles of the image data
+      bounded by the rectangle that you have drawn on the image.
+      It also displays the value and position of the peak found in the
+      profiles and the limits of the rectangle drawn over the main image, as
+      well as providing an interactive readout of the coordinate and data
+      value in the profile.
+    </p>
+    <p>
+      The peak lines can be displayed in the graphs and as lines in the main
+      image. These are enabled by selecting the <tt>Display peak lines</tt>
+      item in the <tt>Options</tt> menu.
+    </p>
 
-<p>The "Print..." option will produce a dialog which allows you to
-print a two page document to either a file or the printer.
+    <p>Other options include the ability to stop the profiles from being
+      constantly updated when you move the rectangle, which is the 
+      <tt>continuous updates</tt> item (when this is switched off the profiles
+      are only updated when you release the rectangle) and the ability to
+      change the amount of display surface used for the two profiles. The
+      later being done by selecting the little square on the line between the
+      profiles and dragging it to a new position.
+    </p>
 
-<p>If you want to have more than one set of profiles choose the "New
-window" item in the "File" menu.
-</body>
+    <p>The <tt>Print...</tt> option will produce a dialog which allows you to
+       print a two page document to either a file or the printer. 
+    </p>
+    <p>The <tt>Fix data range:</tt> button fixes the data range to that
+      currently displayed, so you can inter-compare regions more easily.
+      To go back to auto-ranging just untick this and move the rectangle.
+    </p>
+    <p>
+      There are various colour and line thickness items in the
+      <tt>Options</tt> menu.
+    </p>
+
+    <p>If you want to have more than one set of profiles choose the 
+      <tt>New window</tt> item in the <tt>File</tt> menu.
+    </p>
+
+    <h3 align=center><font color=red>UKIRT options</font></h2>
+    <p>
+      When GAIA is started using the <tt>-ukirt_xy</tt> command-line option,
+      this modifies the behaviour of this toolbox. The most significant changes
+      are that the peak lines are displayed by default and when you display a
+      new image the toolbox remains open and profiles of the new image are
+      displayed (at the same image coordinates as before). Additional controls
+      are also displayed for saving the positions of the rectangle and the
+      peaks, as well as adding a comment to a log file.
+    </p>
+    <p>
+      When a realtime event is received the peak position of the Y profile is
+      set and a single row of values is extracted and displayed as the X
+      profile. The previous profiles are also shown for comparison. When this
+      happens the X profile title is changed to <tt>X Profile at Row:</tt>.
+  </body>
 </html>
