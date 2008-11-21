@@ -177,8 +177,8 @@ void CLASS_NAME::getMinMax()
     int xmargin = 0, ymargin = 0;
     if (w == width_)
 	xmargin = int(w * 0.02);
-    if ( h == height_ )
-	ymargin = int(h * 0.02);  // PWD: change here, test was y0_ == 0
+    if ( h == height_ )           // PWD: change here, test was y0_ == 0
+	ymargin = int(h * 0.02);  
 
     int x0 = x0_ + xmargin;
     int y0 = y0_ + ymargin;

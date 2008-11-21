@@ -62,6 +62,10 @@
  *                 08/07/08  When clearing in updateOffset (for zoomed images)
  *                           clear to black, not the blank color, which
  *                           can be another color.
+ *                 21/11/08  In flip do not apply the xScale>1 fudge. In fact
+ *                           the limits are zero-based in getMinMax(). In
+ *                           getDist treat bin width factor differently for
+ *                           integers and others. Wasn't right for either case.
  */
 static const char* const rcsId="@(#) $Id: ImageData.C,v 1.1.1.1 2006/01/12 16:38:59 abrighto Exp $";
 
@@ -754,15 +758,19 @@ void ImageData::flip(double& x, double& y, int width, int height)
  */
 void ImageData::flip(int& x0, int& y0, int& x1, int& y1)
 {
-    int c = (xScale_ > 1) ? 0 : 1;
+    //  PWD: note these bounds remain in a 0,0 based system, which is
+    //  different to what is used elsewhere.
 
     if (!flipY_) {		// raw image has y axis reversed
-	int y = y0, h = height_ - c;
+	int y = y0;
+        int h = height_ - 1;
 	y0 = h - y1;
 	y1 = h - y;
     }
+
     if (flipX_) {
-	int x = x0, w = width_ - c;
+	int x = x0; 
+        int w = width_ - 1;
 	x0 = w - x1;
 	x1 = w - x;
     }
@@ -1069,9 +1077,9 @@ void ImageData::autoSetCutLevels(double percent)
     }
     if ( npixels > 0 ) {
 
-	// change to  percent to cut off and split between low and high
+	// change percent to cut off and split between low and high
 	int cutoff = int((double(npixels)*(100.0-percent)/100.0)/2.0);
-
+        
 	// set low cut value
 	npixels = 0;
 	int nprev = 0;
@@ -1092,7 +1100,7 @@ void ImageData::autoSetCutLevels(double percent)
 	// set high cut value
 	npixels = 0;
 	nprev = 0;
-	for (i=numValues-1 ; i>0; i--) {
+	for (i=numValues-1 ; i>=0; i--) {
 	    nprev = npixels;
 	    npixels += (int)(xyvalues[i*2+1]);
 	    if (npixels >= cutoff) {
@@ -1477,15 +1485,21 @@ void ImageData::getDist(int& numValues, double* xyvalues)
 	return;
     }
 
+    //  PWD: for integers we have a bin per-value, that requires n+1.
+    double factor;
     if (n < numValues &&
         ( dataType() != FLOAT_IMAGE &&
-          dataType() != DOUBLE_IMAGE ) )
-        numValues = int(n);
-
-    register float m = minValue_;
-    double factor = n/numValues;
+          dataType() != DOUBLE_IMAGE ) ) {
+        numValues = int(n + 1);
+        factor = (n + 1)/numValues;
+    }
+    else {
+        //  PWD: for floating point values to get from min to max.
+        factor = n/(numValues-1);
+    }
 
     // the X values are the pixel values
+    double m = minValue_;
     for (int i=0; i<numValues; i++, m+=factor) {
 	xyvalues[i*2] = scaleValue(m);
 	xyvalues[i*2+1] = 0;
