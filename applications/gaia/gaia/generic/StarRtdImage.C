@@ -6321,7 +6321,7 @@ int StarRtdImage::xyProfileCmd(int argc, char *argv[])
                                        argv[12], argv[13] );
         }
 
-        //  Transfer X coordinates into BLT vector.
+        //  Transfer Y coordinates into BLT vector.
         if ( status == TCL_OK ) {
            status = resetBltVector( numValues[1], ycoords, argv[11] );
         }
