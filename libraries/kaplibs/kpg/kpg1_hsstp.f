@@ -74,6 +74,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -84,6 +85,8 @@
 *     1996 March 11 (MJC):
 *        Recorrected bug in calculation of the mean (first done in
 *        c.1992).
+*     2008 November 20 (TIMJ):
+*        Handle case where 50% of data points are in the last bin.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -156,7 +159,7 @@
 *  The median is derived by looking for the halfway numbered pixel, and
 *  calculating its corresponding data value.
       DO WHILE( ( HALFNM .LT. ( NUMBER / 2.0 ) ) .AND.
-     :          ( J .LT. NUMBIN ) )
+     :          ( J .LE. NUMBIN ) )
          HALFNM = HALFNM + DBLE( HIST( J ) )
          J = J + 1
       END DO
