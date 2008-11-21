@@ -116,8 +116,8 @@ itcl::class gaia::GaiaImagePick {
       #  And the comment field.
       itk_component add comment {
          LabelEntry $w_.comment \
-	    -labelwidth 8 \
-	    -text "Comment:"
+            -labelwidth 8 \
+            -text "Comment:"
       }
       pack $itk_component(comment) \
          -side top -fill x -padx 2m -pady 1m -before $itk_component(buttons)
@@ -140,8 +140,8 @@ itcl::class gaia::GaiaImagePick {
       #  Add a save/append button.
       itk_component add save {
          button $w_.save  \
-	    -text "Save/Append" \
-	    -command [code $this save]
+            -text "Save/Append" \
+            -command [code $this save]
       }
       pack $itk_component(save) \
          -side left -expand 1 -padx 2m -pady 1m -in $itk_component(buttons)
@@ -216,30 +216,12 @@ itcl::class gaia::GaiaImagePick {
       return [format {%.2f} $val]
    }
 
-   #  Override method called when the user clicks in the image to select an
-   #  object or star for the "pick_object" method. Added ability to report
-   #  world coordinates in degrees.
-   public method picked_object {} {
-      # display busy cursor in image and pick window...
-      $itk_option(-target_image) busy {
-         busy {
-            if { $show_degrees_ } {
-               if {[catch {set list [$image_ statistics degrees]} msg]} {
-                  error_dialog $msg
-                  cancel_pick
-               } else {
-                  picked_wcs_object $list
-               }
-            } else {
-               if {[catch {set list [$image_ statistics]} msg]} {
-                  error_dialog $msg
-                  cancel_pick
-               } else {
-                  picked_wcs_object $list
-               }
-            }
-         }
+   #  Return the image statistics. Overrriden for degrees function.
+   protected method get_stats_ {} {
+      if { $show_degrees_ } {
+         return [$image_ statistics degrees]
       }
+      return [$image_ statistics]
    }
 
    #  Protected variables.
