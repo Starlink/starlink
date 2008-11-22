@@ -195,6 +195,8 @@
 *        Factor out WCS check for moving sources to smf_set_moving
 *     2008-11-21 (DSB):
 *        Modify to use one output array per worker thread.
+*     2008-11-21 (TIMJ):
+*        Test for GENVAR when copying data.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -400,7 +402,9 @@ void smurf_qlmakemap( int *status ) {
      into one, and copied into the output NDF. */
     if( wf->nworker > 1 ) {
       map = smf_malloc( mapsize*wf->nworker, sizeof(double), 0, status);
-      variance = smf_malloc( mapsize*wf->nworker, sizeof(double), 0, status);
+      if (genvar) {
+        variance = smf_malloc( mapsize*wf->nworker, sizeof(double), 0, status);
+      }
     } else {
       map = (odata->pntr)[0];
       variance = (odata->pntr)[1];
@@ -479,11 +483,9 @@ void smurf_qlmakemap( int *status ) {
      NDF arrays from here on. */
   if( wf->nworker > 1 ) {
     memcpy( (odata->pntr)[0], map, sizeof(double)*mapsize );
-    memcpy( (odata->pntr)[1], variance, sizeof(double)*mapsize );
-    (void) smf_free( map, status );
-    (void) smf_free( variance, status );
-    map = (odata->pntr)[0];
-    variance = (odata->pntr)[1];
+    if (variance) memcpy( (odata->pntr)[1], variance, sizeof(double)*mapsize );
+    if (map) map = smf_free( map, status );
+    if (variance) variance = smf_free( variance, status );
   }
 
   /* Write WCS FrameSet to output file */
