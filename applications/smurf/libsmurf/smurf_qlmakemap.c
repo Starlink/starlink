@@ -472,6 +472,8 @@ void smurf_qlmakemap( int *status ) {
                   moving, genvar, lbnd_out, ubnd_out, map, variance, weights, 
                   status );
 
+    if( bolonoise ) bolonoise = smf_free(bolonoise, status);
+
     if (*status != SAI__OK) break;
   }
 
@@ -517,7 +519,6 @@ void smurf_qlmakemap( int *status ) {
   smf_close_file ( &odata, status );
   if( ogrp ) grpDelet( &ogrp, status );
   if( darks ) smf_close_related( &darks, status );
-  if( bolonoise ) bolonoise = smf_free(bolonoise, status);
   grpDelet( &igrp, status );
   if( wf ) wf = smf_destroy_workforce( wf );
  
