@@ -35,6 +35,8 @@
 *  History:
 *     27-JUN-2008 (DSB):
 *        Initial version.
+*     24-NOV-2008 (DSB):
+*        Update astRebinSeq argument "nused" correctly.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -89,10 +91,10 @@ void smf_rebinslices( void *job_data_ptr, int *status ){
    int lbnd_in[ 2 ];             /* Lower pixel bounds for input maps */
    int moving;                   /* Are we tracking a moving source? */
    int nslice;                   /* No. of time slices */
-   int nused;                    /* No. of input values used */
    int rebinflags;               /* Control the rebinning procedure */
    int spread;                   /* Pixel spreading scheme */
    int ubnd_in[ 2 ];             /* Upper pixel bounds for input maps */
+   int *nused;                   /* Point to count of i/p samples used */
    int *udim;                    /* Output array upper GRID bounds */
    smfData *data;                /* Smurf data description */
    smfRebinMapData *job_data;     /* Pointer to data structure */
@@ -115,6 +117,9 @@ void smf_rebinslices( void *job_data_ptr, int *status ){
    map = job_data->map;
    variance = job_data->variance;
    weights = job_data->weights;
+   nused = &(job_data->nused);
+
+/* Initialise the number of input samples used. */
 
 /* Lock the supplied AST object pointers for exclusive use by this thread.
    The invoking thread should have unlocked them before creating starting
@@ -151,7 +156,7 @@ void smf_rebinslices( void *job_data_ptr, int *status ){
       astRebinSeqD( bolo2map, 0.0, 2, lbnd_in, ubnd_in, boldata,
                     bolovar, spread, params, rebinflags, 0.1, 1000000, 
                     VAL__BADD, 2, ldim, udim, lbnd_in, ubnd_in,
-                    map, variance, weights, &nused );
+                    map, variance, weights, nused );
 
 /* Free AST objects created in this loop. */
       bolo2map = astAnnul( bolo2map );

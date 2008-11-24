@@ -197,6 +197,8 @@
 *        Modify to use one output array per worker thread.
 *     2008-11-21 (TIMJ):
 *        Test for GENVAR when copying data.
+*     2008-11-24 (DSB):
+*        Supply value for new smf_rebinmap argument "nused".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -275,6 +277,7 @@ void smurf_qlmakemap( int *status ) {
   int moving = 0;            /* Flag to denote a moving object */
   dim_t nbolo;               /* Number of bolometers */
   int nparam = 0;            /* Number of extra parameters for pixel spreading scheme*/
+  int nused;                 /* Number of used input samples */
   size_t nweights;           /* Number of elements in weights array */
   smfData *odata=NULL;       /* Pointer to output SCUBA2 data struct */
   Grp *ogrp = NULL;          /* Group containing output file */
@@ -470,7 +473,7 @@ void smurf_qlmakemap( int *status ) {
     /* Rebin the data onto the output grid. This also closes the input file. */
     smf_rebinmap( wf, data, bolonoise, i, size, outframeset, spread, params, 
                   moving, genvar, lbnd_out, ubnd_out, map, variance, weights, 
-                  status );
+                  &nused, status );
 
     if( bolonoise ) bolonoise = smf_free(bolonoise, status);
 

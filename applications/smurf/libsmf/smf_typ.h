@@ -561,6 +561,7 @@ typedef struct smfRebinMapData {
    double *weights;
    int ijob;
    double *bolovar;
+   int nused;
 } smfRebinMapData;
 
 #endif /* SMF_TYP_DEFINED */

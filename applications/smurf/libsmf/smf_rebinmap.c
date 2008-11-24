@@ -17,7 +17,7 @@
 *                   int index, int size, AstFrameSet *outfset, int spread, 
 *                   const double params[], int moving, int genvar, 
 *                   int *lbnd_out, int *ubnd_out, double *map, *variance, 
-*                   double *weights, int *status );
+*                   double *weights, int *nused, int *status );
 
 *  Arguments:
 *     wf = smfWorkForce * (Given)
@@ -58,6 +58,9 @@
 *        of the relative weighting for each pixel in the output map. If
 *        "genvar" is non-zero, two doubles are needed for each output pixel.
 *        Otherwise, only one double is needed for each output pixel.
+*     nused = int * (Given and Returned)
+*        A pointer to an integer that is updated to hold the total number
+*        of input samples that have been pasted into the output array so far.
 *     status = int * (Given and Returned)
 *        Pointer to global status.
 
@@ -118,6 +121,8 @@
 *        Re-written to use threads.
 *     2008-10-21 (EC):
 *        Added bolovar to interface
+*     2008-11-24 (DSB):
+*        Added nused to interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -164,7 +169,7 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
                    int index, int size, AstFrameSet *outfset, int spread, 
                    const double params[], int moving, int genvar, 
                    int *lbnd_out, int *ubnd_out, double *map, double *variance,
-                   double *weights, int *status ) {
+                   double *weights, int *nused, int *status ) {
 
 /* Local Variables */
    AstMapping *dummy = NULL;     /* A dummy Mapping */
@@ -178,7 +183,6 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
    int ijob;                     /* Job identifier */
    int j;                        /* Worker index */
    int ldim[ 2 ];                /* Output array lower GRID bounds */
-   int nused;                    /* No. of input values used */
    int nw;                       /* Number of worker threads */
    smfRebinMapData *pdata = NULL;/* Pointer to data for a single thread */
 
@@ -229,11 +233,11 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
       nel = udim[ 0 ]*udim[ 1 ];
 
 /* Calculate number of elements in the final weights array. */
-      nelw = ( genvar ? 2 : 1 )*nel;
+      nelw = ( genvar && variance ? 2 : 1 )*nel;
 
 /* Store flags for astRebinSeqD. */
       rebinflags = AST__USEBAD;
-      if( genvar ) rebinflags |= AST__GENVAR;
+      if( genvar && variance ) rebinflags |= AST__GENVAR;
       if( bolovar ) rebinflags |= AST__VARWGT;
 
 /* The worker threads in the work force perform descrete jobs. In the 
@@ -272,7 +276,7 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
             pdata->udim[ 0 ] = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1;
             pdata->udim[ 1 ] = ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1;
             pdata->map = map + nel*j;
-            pdata->variance = variance + nel*j;
+            pdata->variance = variance ? variance + nel*j : NULL;
             pdata->weights = weights + nelw*j;
             pdata->ijob = -1;
          }
@@ -297,6 +301,9 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
       oskyfrm = astAnnul( oskyfrm );
       sky2map = astAnnul( sky2map );
       abskyfrm = astAnnul( abskyfrm );
+
+/* Initialise the number of input samples used so far. */
+      *nused = 0;
    }
 
 /* Attempt to find a smfRebinMapData that is not currently being used by
@@ -316,13 +323,15 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
 /* Find the smfRebinMapData that was used by the job that has just
    completed, and indicate it is no longer being used by setting its job
    identifier to -1. Also lock all AST objects within the smfData for use
-   by this thread, and close then the corresponding smfData. */
+   by this thread, close then the corresponding smfData, and update the
+   total number of input samples that have been pasted into the output. */
       for( j = 0; j < nw; j++ ) {
          pdata = job_data + j;
          if( pdata->ijob == ijob ) {
             pdata->ijob = -1;
             smf_lock_data( pdata->data, 1, status );
             smf_close_file( &(pdata->data), status );
+            *nused += pdata->nused;
             break;
          }
       }
@@ -347,6 +356,7 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
    smf_rebinslices function can lock them. They will be re-locked when
    the job completes. */
    smf_lock_data( data, 0, status );
+   pdata->nused = 0;
    pdata->data = data;  
    pdata->bolovar = bolovar;  
    pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smf_rebinslices, 
@@ -366,6 +376,7 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
          if( pdata->data ) {
             smf_lock_data( pdata->data, 1, status );
             smf_close_file( &(pdata->data), status );
+            *nused += pdata->nused;
          }
 
          astLock( pdata->abskyfrm, 0 );
@@ -412,8 +423,7 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
       astRebinSeqD( dummy, 0.0, 2, NULL, NULL, NULL, NULL, spread, 
                     params, AST__REBINEND | rebinflags, 0.1, 1000000, 
                     VAL__BADD, 2, ldim, udim, NULL, NULL, map, 
-                    variance, weights, &nused ); 
+                    variance, weights, nused ); 
       dummy = astAnnul( dummy );
    }
-
 }
