@@ -673,7 +673,7 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
                    int index, int size, AstFrameSet *outfset, int spread, 
                    const double params[], int moving, int genvar, int *lbnd_out,
                    int *ubnd_out, double *map, double *variance, double *weights,
-                   int *status );
+                   int *nused, int *status );
 
 double smf_scale_tau ( const double tauwvm, const char *filter, int *status);
 
