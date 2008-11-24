@@ -3218,14 +3218,16 @@ int *status              /* global status (given and returned) */
 
     Authors :
      B.D.Kelly (ROE)
+     D.S.Berry (JAC,UClan)
     History :
      12Aug2005:  original (bdk@roe.ac.uk)
      03Sep2007:  allow for increasing and decreasing data numbers (bdk)
      31Oct2007:  use const for appropriate arguments (bdk)
+     24Nov2008:  check for vald values (dsb)
 */
 
 {
-   int j;
+   int count, j;
    double mean;
 
    if ( !StatusOkP(status) ) return;
@@ -3233,12 +3235,20 @@ int *status              /* global status (given and returned) */
 /* calculate mean of current measurements */
 
    mean = 0.0;
+   count = 0;
 
    for ( j=0; j<numsamples; j++ )
    {
-      mean += values[j];
+      if( values[j] != VAL__BADD ) {
+         mean += values[j];
+        count++;
+     }
    }
-   mean /= (double)numsamples;
+   if( count > 0 ) {
+      mean /= (double)count;
+   } else {
+      mean = VAL__BADD;
+   }
 
 /* Choose interpolation point from calibration tables */
 
