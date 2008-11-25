@@ -92,13 +92,17 @@ End of Trace.
 /* STARLINK includes */
 #include "ast.h"
 #include "star/hds.h"
+#include "sae_par.h"
 
 /* SMURF includes */
 #include "libsmf/smf_typ.h"
 #include "libsmf/smf.h"
+#include "libsmf/smf_err.h"
 
 /* FTS-2 includes */
 #include "sc2fts_common.h"
+
+#define FUNC_NAME "sc2fts_transcorr"
 
 void sc2fts_transcorr
 (
@@ -134,7 +138,6 @@ int *status          /* global status (given and returned) */
   int bolcol;                   /* Col of bolometer array */
   float intensity;              /* intensity for a specified wavenumber of a pixel */
 
-  printf("TransCorr operation!\n");
  
   /* get the TAU file name */
   if(astMapHasKey( parKeymap, "TAU" ) ==0)
@@ -177,12 +180,24 @@ int *status          /* global status (given and returned) */
   datFind(loc_more, "WET", &loc_wet, status);
   datFind(loc_more, "FACTOR", &loc_wn_factor, status);
 
+  /* verify that everything was found */
+  if(*status != SAI__OK)
+  {
+	errRep(FUNC_NAME,	"Tau file format incorrect", status);
+	/* close TAU file */
+	 datAnnul(&loc_wn_factor, status);
+	 datAnnul(&loc_wet,  status);
+	 datAnnul(&loc_dry,  status);
+	 datAnnul(&loc_more, status);
+	 datAnnul(&loc_tau, status);
+	return;
+  }
   /* get wavenumber */
   datGet0D(loc_wn_factor, &tau_wnfactor, status);
 
   /* get dry/wet components */
   datSize(loc_dry, &drywet_size, status);
-
+    
   dry_ptr = smf_malloc(drywet_size, sizeof(float), 0, status);
   wet_ptr = smf_malloc(drywet_size, sizeof(float), 0, status);
 
@@ -204,7 +219,7 @@ int *status          /* global status (given and returned) */
   smf_free(dry_ptr, status);
   smf_free(wet_ptr, status);
 
-  /* close THETA file */
+  /* close TAU file */
   datAnnul(&loc_wn_factor, status);
   datAnnul(&loc_wet,  status);
   datAnnul(&loc_dry,  status);
@@ -228,6 +243,13 @@ int *status          /* global status (given and returned) */
   /* Annual HDSLoc */
   datAnnul( &ftswnloc, status );
   datAnnul( &fts2drloc, status );
+  /* verify that everything was found */
+  if(*status != SAI__OK)
+  {
+	errRep(FUNC_NAME,	"Input file structure error", status);
+
+	return;
+  }
 
   if(data->ndims != 3)
   {
@@ -271,7 +293,7 @@ int *status          /* global status (given and returned) */
 
   /* release memories */
   smf_free(tau_ptr, status);
- 
+ printf("status = %d\n", *status);
   /* NDF end */
   ndfEnd(status);
 }

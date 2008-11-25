@@ -90,9 +90,12 @@
 #include "libsmf/smf_typ.h"
 #include "smurf_par.h"
 #include "libsmf/smf.h"
+#include "libsmf/smf_err.h"
 
 #include "sc2da/sc2ast.h"
 #include "sc2fts_entry.h"
+
+#define FUNC_NAME "sc2fts_addwcs"
 
 void sc2fts_addwcs 
 (
@@ -143,6 +146,12 @@ int   *status          /* global status (given and returned) */
   /* Annual HDSLoc */
   datAnnul( &ftswnloc, status );
   datAnnul( &fts2drloc, status );
+  if(*status != SAI__OK)
+  {
+	errRep(FUNC_NAME,	"Input file structure error", status);
+
+	return;
+  }
   /* AST begin */
   astBegin;
 

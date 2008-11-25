@@ -81,15 +81,19 @@ End of Trace.
 /* STARLINK includes */
 #include "ast.h"
 #include "star/hds.h"
+#include "sae_par.h"
 
 /* SMURF includes */
 #include "libsmf/smf_typ.h"
 #include "libsmf/smf.h"
+#include "libsmf/smf_err.h"
 
 #include "libsc2sim/sc2sim.h"   /* for constants: BOLCOL, BOLROW */
 
 /* FTS-2 includes */
 #include "sc2fts_common.h"
+
+#define FUNC_NAME "sc2fts_freqcorr"
 
 void sc2fts_freqcorr 
 (
@@ -139,6 +143,13 @@ int *status          /* global status (given and returned) */
    datAnnul(&loc_data,  status);
    datAnnul(&loc_da,    status);
    datAnnul(&loc_theta, status); 
+  /* verify that everything was found */
+  if(*status != SAI__OK)
+  {
+	errRep(FUNC_NAME,	"Theta file format incorrect", status);
+
+	return;
+  }
 
    /* open spectrumcube file */
    smf_open_file( ogrp, 1, "UPDATE", SMF__NOCREATE_QUALITY, &data, status );
