@@ -119,6 +119,8 @@ typedef struct smfTimeChunkData {
    range for a single thread -- uses parallel processing of different
    time chunks */
 
+void smfParallelTime( void *job_data_ptr, int *status );
+
 void smfParallelTime( void *job_data_ptr, int *status ) {
   smfArray **array=NULL;       /* array of smfArrays that we're working on */
   smfTimeChunkData *data=NULL; /* Pointer to job data */
@@ -129,6 +131,7 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
   dim_t ndata;                 /* Size of DATA component in smfData */
   dim_t nsub;                  /* Number of subarrays */
   double *val=NULL;            /* Pointer to DATA component of smfData */
+  double temp;
 
   if( *status != SAI__OK ) return;
 
@@ -170,7 +173,7 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
 
       for( k=0; (*status==SAI__OK)&&(k<ndata); k++ ) {
         val[k] = k; /* Stick a value into the array */
-        for( l=0; l<10; l++ ) {
+        for( l=0; l<1; l++ ) {
           val[k] = sqrt(k);
         }
       }
@@ -292,7 +295,7 @@ void smurf_sc2threadtest( int *status ) {
     pdata->ijob = -1;               /* Flag job as available to do work */
 
     /* The last thread has to pick up the remainder of chunks */
-    if( i==(nthread-1) ) pdata->chunk2=nchunks-1;
+    if( i==(size_t)(nthread-1) ) pdata->chunk2=nchunks-1;
     else pdata->chunk2 = (i+1)*joblen-1; /* Index of last chunk for job */
 
     /* Ensure a valid chunk range, or set to a length that we know to ignore */
