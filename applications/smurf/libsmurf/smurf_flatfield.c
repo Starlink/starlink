@@ -161,7 +161,7 @@ void smurf_flatfield( int *status ) {
     if (*status != SAI__OK) break;
 
     /* Call flatfield routine */
-    smf_open_and_flatfield(igrp, ogrp, i, darks, &ffdata, status);
+    smf_open_and_flatfield(igrp, ogrp, i, darks, NULL, &ffdata, status);
 
     /* Check status to see if data are already flatfielded */
     if (*status == SMF__FLATN) {

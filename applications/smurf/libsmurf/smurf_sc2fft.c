@@ -169,7 +169,7 @@ void smurf_sc2fft( int *status ) {
   for( i=1; (*status==SAI__OK)&&(i<=size); i++ ) {
 
     /* Open the file */
-    smf_open_and_flatfield( igrp, NULL, i, darks, &idata, status );
+    smf_open_and_flatfield( igrp, NULL, i, darks, NULL, &idata, status );
 
     /* Check whether we need to transform the data at all */
     if( smf_isfft(idata,NULL,NULL,NULL,status) == inverse ) {

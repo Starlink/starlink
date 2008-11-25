@@ -262,6 +262,8 @@
 void smurf_qlmakemap( int *status ) {
 
   /* Local Variables */
+  Grp *bpmgrp = NULL;        /* Group of bad pixel masks */
+  smfArray *bpms = NULL;     /* Bad pixel masks */
   double *bolonoise=NULL;    /* Noise estimate for each detector */
   smfArray *darks = NULL;    /* Dark data */
   smfData *data = NULL;      /* Pointer to input SCUBA2 data struct */
@@ -331,6 +333,10 @@ void smurf_qlmakemap( int *status ) {
              " nothing from which to make a map", status );
     goto CLEANUP;
   }
+
+  /* Get group of pixel masks and read them into a smfArray */
+  kpg1Rgndf( "BPM", 0, 1, "", &bpmgrp, &size, status );
+  smf_open_group( bpmgrp, NULL, &bpms, status );
 
   /* Get the celestial coordinate system for the output image. */
   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
@@ -423,7 +429,7 @@ void smurf_qlmakemap( int *status ) {
   msgOutif( MSG__VERB," ", "SMURF_QLMAKEMAP: Process data files", status );
   for ( i=1; i<=size && *status == SAI__OK; i++ ) {
     /* Read data from the ith input file in the group */
-    smf_open_and_flatfield( igrp, NULL, i, darks, &data, status );
+    smf_open_and_flatfield( igrp, NULL, i, darks, NULL, &data, status );
   
     msgOutif( MSG__VERB," ", "SMURF_QLMAKEMAP: Cleaning bolometer data.", 
               status );

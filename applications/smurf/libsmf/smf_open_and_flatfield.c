@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     smf_open_and_flatfield( const Grp *igrp, const Grp *ogrp, size_t index,
-*                             const smfArray* darks,smfData **data,
-*                             int *status );
+*                             const smfArray* darks, const smfArray *bpms,
+*                             smfData **data, int *status );
 
 *  Arguments:
 *     igrp = const Grp* (Given)
@@ -26,6 +26,8 @@
 *        Index into the group
 *     darks = const smfArray* (Given)
 *        Set of darks that could be applied. Can be NULL.
+*     bpms = const smfArray * (Given)
+*        Bad pixel masks that could be applied. Can be NULL.
 *     data = smfData** (Returned)
 *        Pointer to a pointer to smfData struct containing flatfielded data.
 *        Will be created by this routine, or NULL on error.
@@ -91,6 +93,8 @@
 *     2008-07-18 (TIMJ):
 *        Use size_t and const.
 *        Pass in smfArray of darks.
+*     2008-11-24 (TIMJ):
+*        Pass in smfArray of bad pixel masks.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -146,7 +150,8 @@
 #define FUNC_NAME "smf_open_and_flatfield"
 
 void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
-                              const smfArray *darks, smfData **ffdata, int *status) {
+                              const smfArray *darks, const smfArray *bpms,
+                              smfData **ffdata, int *status) {
 
   smfData *data = NULL;     /* Pointer to input data struct */
   smfFile *file = NULL;     /* Pointer to input file struct */

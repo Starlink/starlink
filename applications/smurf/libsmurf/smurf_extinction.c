@@ -214,7 +214,7 @@ void smurf_extinction( int * status ) {
   for (i=1; i<=size && ( *status == SAI__OK ); i++) {
 
     /* Flatfield - if necessary */
-    smf_open_and_flatfield( igrp, ogrp, i, darks, &odata, status );
+    smf_open_and_flatfield( igrp, ogrp, i, darks, NULL, &odata, status );
 
     if (*status != SAI__OK) {
       /* Error flatfielding: tell the user which file it was */
