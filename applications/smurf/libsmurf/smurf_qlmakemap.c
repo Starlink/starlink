@@ -1,3 +1,6 @@
+#define _GNU_SOURCE
+#include <fenv.h>
+
 /*
 *+
 *  Name:
@@ -199,6 +202,9 @@
 *        Test for GENVAR when copying data.
 *     2008-11-24 (DSB):
 *        Supply value for new smf_rebinmap argument "nused".
+*     2008-11-25 (DSB):
+*        Free the bolonoise array within smf_rebinmap rather than in this
+*        function.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -297,6 +303,8 @@ void smurf_qlmakemap( int *status ) {
   void *variance = NULL;     /* Pointer to the variance map */
   double *weights = NULL;    /* Pointer to the weights array */
   smfWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
+
+   feenableexcept(FE_DIVBYZERO|FE_INVALID|FE_OVERFLOW);
 
   if (*status != SAI__OK) return;
 
@@ -470,12 +478,11 @@ void smurf_qlmakemap( int *status ) {
     msgOutif(MSG__VERB, " ", "SMURF_QLMAKEMAP: Beginning the REBIN step",
              status);
 
-    /* Rebin the data onto the output grid. This also closes the input file. */
+    /* Rebin the data onto the output grid. This also closes the input file
+       and frees the bolonoise array once the rebin is complete. */
     smf_rebinmap( wf, data, bolonoise, i, size, outframeset, spread, params, 
                   moving, genvar, lbnd_out, ubnd_out, map, variance, weights, 
                   &nused, status );
-
-    if( bolonoise ) bolonoise = smf_free(bolonoise, status);
 
     if (*status != SAI__OK) break;
   }

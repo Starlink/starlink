@@ -23,9 +23,13 @@
 *     wf = smfWorkForce * (Given)
 *        Pointer to a pool of worker threads that will do the re-binning.
 *     data = smfData * (Given)
-*        Pointer to smfData struct holding input data
+*        Pointer to smfData struct holding input data. The smfData will
+*        be closed when the job has completed.
 *     bolovar = double * (Given)
 *        Pointer to array giving variance of each bolometer. Can be NULL.
+*        If not NULL, it should be a pointer to a dynamically allocated
+*        array. This array will be freed using smf_free when the job has
+*        completed.
 *     index = int (Given)
 *        Index of element in igrp
 *     size = int (Given)
@@ -123,6 +127,8 @@
 *        Added bolovar to interface
 *     2008-11-24 (DSB):
 *        Added nused to interface
+*     2008-11-25 (DSB):
+*        Free the bolovar array once the job has completed.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -179,7 +185,6 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
    dim_t i;                      /* Loop counter */
    double *p1;                   /* Pointer to next data value */
    double *p;                    /* Pointer to next data value */
-   double *vardata = NULL;       /* Pointer to bolometer data */
    int ijob;                     /* Job identifier */
    int j;                        /* Worker index */
    int ldim[ 2 ];                /* Output array lower GRID bounds */
@@ -331,6 +336,7 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
             pdata->ijob = -1;
             smf_lock_data( pdata->data, 1, status );
             smf_close_file( &(pdata->data), status );
+            pdata->bolovar = smf_free( pdata->bolovar, status );
             *nused += pdata->nused;
             break;
          }
@@ -376,6 +382,7 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
          if( pdata->data ) {
             smf_lock_data( pdata->data, 1, status );
             smf_close_file( &(pdata->data), status );
+            pdata->bolovar = smf_free( pdata->bolovar, status );
             *nused += pdata->nused;
          }
 
