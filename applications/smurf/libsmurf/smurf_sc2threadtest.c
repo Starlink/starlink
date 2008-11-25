@@ -103,6 +103,83 @@
 #define FUNC_NAME "smurf_sc2threadtest"
 #define TASK_NAME "SC2THREADTEST"
 
+/* --------------------------------------------------------------------------*/
+
+/* Structure used to pass data divided into time-chunks to different threads */
+typedef struct smfTimeChunkData {
+  size_t chunk1;            /* Index of first chunk handled by this thread */
+  size_t chunk2;            /* Index of last chunk handled by this thread */
+  smfArray **data;          /* Pointer to master array of smfArrays */
+  int ijob;                 /* Job identifier */
+  size_t nchunks;           /* Total number of chunks in data */
+} smfTimeChunkData;
+
+
+/* Function that does some simple math on every sample within the relevant
+   range for a single thread -- uses parallel processing of different
+   time chunks */
+
+void smfParallelTime( void *job_data_ptr, int *status ) {
+  smfArray **array=NULL;       /* array of smfArrays that we're working on */
+  smfTimeChunkData *data=NULL; /* Pointer to job data */
+  size_t i;                    /* Loop counter */
+  size_t j;                    /* Loop counter */
+  size_t k;                    /* Loop counter */
+  dim_t ndata;                 /* Size of DATA component in smfData */
+  dim_t nsub;                  /* Number of subarrays */
+  double *val=NULL;            /* Pointer to DATA component of smfData */
+
+  if( *status != SAI__OK ) return;
+
+  /* Pointer to the data that this thread will process */
+  data = job_data_ptr;
+
+  /* Check for valid inputs */
+  if( !data ) {
+    *status = SAI__ERROR;
+    errRep( "", "smfParallelTime: job_data_ptr is NULL.", status );
+    return;
+  }
+
+  if( !(array=data->data) ) {
+    *status = SAI__ERROR;
+    errRep( "", "smfParallelTime: data array is NULL.", status );
+    return;
+  }
+
+  /* Message indicating the thread started */
+  msgSeti( "W", data->ijob);
+  msgSeti( "C1", data->chunk1);
+  msgSeti( "C2", data->chunk2);
+  msgOutif( MSG__VERB, "",  
+            "-- parallel time: thread ^W started on chunks ^C1 -- ^C2", 
+            status );
+
+  /* Loop over time chunk. Some chunks may be flagged to skip if 
+     chunk1=nchunks */
+  for( i=data->chunk1; (i<=data->chunk2)&&(i<data->nchunks)&&(*status==SAI__OK);
+       i++ ) {
+
+    nsub = array[i]->ndat;
+
+    /* Loop over subarray */
+    for( j=0; (j<nsub)&&(*status==SAI__OK); j++ ) {
+      smf_get_dims( array[i]->sdata[j], NULL, NULL, &ndata, status );
+      val = array[i]->sdata[j]->pntr[0];
+
+      for( k=0; (*status==SAI__OK)&&(k<ndata); k++ ) {
+        val[k] = k; /* Stick a value into the array */
+      }
+    }
+  }
+
+  /* Message indicating the thread started */
+  msgSeti( "W", data->ijob);
+  msgOutif( MSG__DEBUG, "", "-- parallel time: thread ^W finished", status );
+}
+
+/* --------------------------------------------------------------------------*/
+
 void smurf_sc2threadtest( int *status ) {
 
   /* Local Variables */
@@ -111,10 +188,13 @@ void smurf_sc2threadtest( int *status ) {
   dim_t datalen;             /* Number of data points */
   size_t i;                  /* Loop counter */
   size_t j;                  /* Loop counter */
+  smfTimeChunkData *job_data=NULL; /* Array of pointers for job data */
+  size_t joblen;             /* Number of chunks per job */
   size_t k;                  /* Loop counter */
   size_t nchunks;            /* Number of chunks */
   size_t nsub;               /* Number of subarrays */
   int nthread;               /* Number of threads */
+  smfTimeChunkData *pdata=NULL; /* Pointer to data for single job */
   int temp;                  /* Temporary integer */
   size_t tsteps;             /* How many time steps in chunk */
   struct timeval tv1, tv2;   /* Timers */
@@ -168,23 +248,62 @@ void smurf_sc2threadtest( int *status ) {
         data->pntr[0] = smf_malloc( datalen, smf_dtype_sz(data->dtype,status),
                                     1, status ); 
       }
-    }
 
-    smf_addto_smfArray( res[k], data, status );
+      smf_addto_smfArray( res[k], data, status );
+    }
   }
   
 
   /* Create a pool of threads. */
   wf = smf_create_workforce( nthread, status );
 
+  /* Work out number of chunks per thread */
+  joblen = nchunks/nthread;
+  if( joblen == 0 ) joblen = 1; /* At least one chunk per thread */
+    
+  /* The first test will process separate time chunks of data in
+     parallel: all subarrays and an integer number of input file
+     chunks all go into a single thread. Start by allocating and
+     initializing a number of smfTimeChunkData's that hold the
+     information required for each thread */
+
+  job_data = smf_malloc( nthread, sizeof(*job_data), 1, status );
+
+  for( i=0; (i<nthread) && (*status==SAI__OK); i++ ) {
+    pdata = job_data + i;
+
+    pdata->data = res;              /* Pointer to main data array */
+    pdata->chunk1 = i*joblen;       /* Index of first chunk for job */
+    pdata->chunk2 = (i+1)*joblen-1; /* Index of last chunk for job */
+    pdata->nchunks = nchunks;       /* Total number of time chunks in data */
+    pdata->ijob = -1;               /* Flag job as available to do work */
+
+    /* Ensure a valid chunk range, or set to a length that we know to ignore */
+    if( pdata->chunk1 >= nchunks ) {
+      pdata->chunk1 = nchunks;
+      pdata->chunk2 = nchunks;
+    } else if( pdata->chunk2 >= nchunks ) {
+      pdata->chunk2 = nchunks-1;
+    }
+
+    /* Since we know there is one job_data per thread, just submit jobs
+       immediately */
+    pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfParallelTime,
+                               NULL, status );
+  }
+
+  /* Wait until all of the submitted jobs have completed */
+  smf_wait( wf, status );
 
   /* Clean up */
   if( res ) {
     for( i=0; i<nchunks; i++ ) {
-      if( res[i] ) smf_close_related( &res[i], status );
+      if( res[i] ) {
+        smf_close_related( &res[i], status );
+      }
     }
     res = smf_free( res, status );
   }
   if( wf ) wf = smf_destroy_workforce( wf );
-
+  if( job_data ) job_data = smf_free( job_data, status );
 }
