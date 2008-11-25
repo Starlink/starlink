@@ -125,6 +125,7 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
   size_t i;                    /* Loop counter */
   size_t j;                    /* Loop counter */
   size_t k;                    /* Loop counter */
+  size_t l;                    /* Loop counter */
   dim_t ndata;                 /* Size of DATA component in smfData */
   dim_t nsub;                  /* Number of subarrays */
   double *val=NULL;            /* Pointer to DATA component of smfData */
@@ -169,7 +170,9 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
 
       for( k=0; (*status==SAI__OK)&&(k<ndata); k++ ) {
         val[k] = k; /* Stick a value into the array */
-        val[k] = sqrt(k);
+        for( l=0; l<10; l++ ) {
+          val[k] = sqrt(k);
+        }
       }
     }
   }
@@ -285,9 +288,12 @@ void smurf_sc2threadtest( int *status ) {
 
     pdata->data = res;              /* Pointer to main data array */
     pdata->chunk1 = i*joblen;       /* Index of first chunk for job */
-    pdata->chunk2 = (i+1)*joblen-1; /* Index of last chunk for job */
     pdata->nchunks = nchunks;       /* Total number of time chunks in data */
     pdata->ijob = -1;               /* Flag job as available to do work */
+
+    /* The last thread has to pick up the remainder of chunks */
+    if( i==(nthread-1) ) pdata->chunk2=nchunks-1;
+    else pdata->chunk2 = (i+1)*joblen-1; /* Index of last chunk for job */
 
     /* Ensure a valid chunk range, or set to a length that we know to ignore */
     if( pdata->chunk1 >= nchunks ) {
@@ -297,10 +303,18 @@ void smurf_sc2threadtest( int *status ) {
       pdata->chunk2 = nchunks-1;
     }
 
-    /* Since we know there is one job_data per thread, just submit jobs
-       immediately */
-    pdata->ijob = smf_add_job( wf, 0, pdata, smfParallelTime,
-                               NULL, status );
+    if( pdata->chunk1 >= nchunks ) {
+      /* Nothing for this thread to do */
+      msgSeti( "W", i+1);
+      msgOutif( MSG__VERB, "",  
+                "-- parallel time: skipping thread ^W, nothing to do",
+                status);
+    } else {
+      /* Since we know there is one job_data per thread, just submit jobs
+         immediately */
+      pdata->ijob = smf_add_job( wf, 0, pdata, smfParallelTime,
+                                 NULL, status );
+    }
   }
 
   /* Wait until all of the submitted jobs have completed */
