@@ -1151,3 +1151,6 @@ void smf_convert_bad( smfData *data, int *status );
 
 void smf_find_seqcount ( const smfHead * hdr,
                          int *seqcount, int *status );
+
+void smf_open_group( const Grp * igrp, const dim_t refdims[],
+                     smfArray **files, int *status );
