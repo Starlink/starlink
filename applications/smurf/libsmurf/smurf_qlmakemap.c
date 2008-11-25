@@ -1,6 +1,3 @@
-#define _GNU_SOURCE
-#include <fenv.h>
-
 /*
 *+
 *  Name:
@@ -303,8 +300,6 @@ void smurf_qlmakemap( int *status ) {
   void *variance = NULL;     /* Pointer to the variance map */
   double *weights = NULL;    /* Pointer to the weights array */
   smfWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
-
-   feenableexcept(FE_DIVBYZERO|FE_INVALID|FE_OVERFLOW);
 
   if (*status != SAI__OK) return;
 
