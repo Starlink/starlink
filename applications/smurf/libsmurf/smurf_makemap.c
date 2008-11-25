@@ -693,8 +693,7 @@ void smurf_makemap( int *status ) {
   gettimeofday( &tv2, NULL );
   msgBlank( status );
 
-  msgSetd("TDIFF",((double)(tv2.tv_sec-tv1.tv_sec) +
-                   (1.0E-6*(double)(tv2.tv_usec-tv1.tv_usec))));
+  msgSetd("TDIFF", smf_difftime(&tv1,&tv2,status));
   msgOutif( MSG__DEBUG, " ", "Mapbounds took ^TDIFF s", status);
 
   /* Write WCS bounds */
