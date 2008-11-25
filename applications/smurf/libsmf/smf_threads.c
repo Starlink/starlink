@@ -475,6 +475,9 @@ smfWorkForce *smf_destroy_workforce( smfWorkForce *workforce ) {
       workforce = astFree( workforce );
    }
 
+/* Close any log file. */
+   if( fd ) fclose( fd );
+
    return NULL;
 }
 
