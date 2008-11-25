@@ -373,6 +373,8 @@
 #ifndef SMF_DEFINED
 #define SMF_DEFINED
 
+#include <sys/time.h>    /* for struct timeval */
+
 #include "ast.h"
 #include "jcmt/state.h"  /* for inst_t */
 #include "smurf_typ.h"
@@ -1154,3 +1156,7 @@ void smf_find_seqcount ( const smfHead * hdr,
 
 void smf_open_group( const Grp * igrp, const dim_t refdims[],
                      smfArray **files, int *status );
+
+double smf_difftime( struct timeval *tv1, struct timeval *tv2, int *status);
+
+void smf_lock_related( smfArray *data, int lock, int *status );

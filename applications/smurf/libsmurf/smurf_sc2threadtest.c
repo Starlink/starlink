@@ -169,6 +169,7 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
 
       for( k=0; (*status==SAI__OK)&&(k<ndata); k++ ) {
         val[k] = k; /* Stick a value into the array */
+        val[k] = sqrt(k);
       }
     }
   }
@@ -203,7 +204,7 @@ void smurf_sc2threadtest( int *status ) {
   if (*status != SAI__OK) return;
 
   /* Get input parameters */
-  parGet0i( "NTHREAD", &nthread, status );
+  parGdr0i( "NTHREAD", 1, 1, NUM__MAXI, 1, &nthread, status );
   parGdr0i( "TSTEPS", 6000, 0, NUM__MAXI, 1, &temp, status );
   tsteps = (size_t) temp;
   parGdr0i( "NCHUNKS", 1, 1, NUM__MAXI, 1, &temp, status );
@@ -213,6 +214,9 @@ void smurf_sc2threadtest( int *status ) {
 
   msgSeti("N",nthread);
   msgOut( "", TASK_NAME ": Running test with ^N threads", status );
+
+  /*** TIMER ***/
+  gettimeofday( &tv1, NULL ); 
 
   /* Create some fake test data in the form of an array of smfArrays */
 
@@ -252,7 +256,14 @@ void smurf_sc2threadtest( int *status ) {
       smf_addto_smfArray( res[k], data, status );
     }
   }
-  
+
+  /*** TIMER ***/
+  gettimeofday( &tv2, NULL ); 
+  msgSetd("D", smf_difftime(&tv1,&tv2,status));
+  msgOut("","** ^D seconds generating data",status);
+
+  msgOut( "", TASK_NAME 
+          ": Starting first test __parallel time__", status );
 
   /* Create a pool of threads. */
   wf = smf_create_workforce( nthread, status );
@@ -269,7 +280,7 @@ void smurf_sc2threadtest( int *status ) {
 
   job_data = smf_malloc( nthread, sizeof(*job_data), 1, status );
 
-  for( i=0; (i<nthread) && (*status==SAI__OK); i++ ) {
+  for( i=0; (i<(size_t)nthread) && (*status==SAI__OK); i++ ) {
     pdata = job_data + i;
 
     pdata->data = res;              /* Pointer to main data array */
@@ -288,12 +299,17 @@ void smurf_sc2threadtest( int *status ) {
 
     /* Since we know there is one job_data per thread, just submit jobs
        immediately */
-    pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfParallelTime,
+    pdata->ijob = smf_add_job( wf, 0, pdata, smfParallelTime,
                                NULL, status );
   }
 
   /* Wait until all of the submitted jobs have completed */
   smf_wait( wf, status );
+
+  /*** TIMER ***/
+  gettimeofday( &tv1, NULL ); 
+  msgSetd("D", smf_difftime(&tv2,&tv1,status));
+  msgOut("","** ^D seconds to complete test",status);
 
   /* Clean up */
   if( res ) {
