@@ -159,14 +159,14 @@ set gaia_usage {
 Usage: gaia ?NDF/fitsFile? ?-option value ...?
 
 Options:
- -autoscale <bool>        - scale image to fit window (disables zoom).
- -autofit <bool>          - scale new image to fit window (keeps zoom).
  -always_merge <bool>     - always merge primary & extension headers (MEFs).
+ -autofit <bool>          - scale new image to fit window (keeps zoom).
+ -autoscale <bool>        - scale image to fit window (disables zoom).
  -cat <bool>              - include ESO/Archive catalog extensions (default).
  -catalog  "<c1> <c2> .." - open windows for the given catalogs on startup.
+ -check_for_cubes <bool>  - Check input files to see if they are cubes (default: 1) \\
  -colorramp_height <n>    - height of colorramp window (default: 12).
  -component <component>   - NDF component to display (one of: data, variance)
- -check_for_cubes <bool>  - Check input files to see if they are cubes (default: 1) \\
  -debug <bool>            - debug flag: run bg processes in fg.
  -deep_search <bool>      - search NDF extensions for related NDFs
  -default_cmap <cmap>     - default colormap.
@@ -176,17 +176,18 @@ Options:
  -float_panel <bool>      - put info panel in a popup window (default: 0).
  -focus_follows_mouse <bool> - entry focus follows mouse (default: 0).
  -geometry <wxh+x+y>      - geometry of the main window (default: last session).
- -linear_cartesian <bool> - assuming CAR projections are a linear mapping (default: 1).
+ -hdu <n>                 - HDU to display (default: 1)
  -ident <string>          - identifying string that will be prefixed to the window title.
  -interop_menu <bool>     - reveal interop menu for PLASTIC interactions (default: 1).
  -isize <n>               - search box for centroiding (default: 9).
+ -linear_cartesian <bool> - assuming CAR projections are a linear mapping (default: 1).
  -max_scale <n>           - maximum scale for magnification menu (default: 20).
  -maxshift <n.5>          - maximum shift when centroiding (default: 5.5).
  -min_scale <n>           - minimum scale for magnification menu (default: -10).
  -panel_layout <layout>   - panel layout, one of: "saoimage", "reverse" or "default" .
  -panel_orient <orient>   - panel orientation, one of: "horizontal", "vertical"
- -pickobjectorient <v>    - orientation for pick object win: "horizontal", "vertical"
  -pick_zoom_factor <n>    - scale factor used in pick object zoom window.
+ -pickobjectorient <v>    - orientation for pick object win: "horizontal", "vertical"
  -pixel_indices <bool>    - show NDF pixel indices as X,Y readout values (default: 0).
  -port <port>             - listen for remote cmds on port (default: 0 = choose port).
  -remote <bool>           - use existing skycat process, if available, with Tk send.
@@ -194,8 +195,8 @@ Options:
  -scrollbars <bool>       - display scrollbars (not displayed by default).
  -shm_data <bool>         - put image data in sysV shared memory.
  -shm_header <bool>       - put image header in sysV shared memory.
- -transient_tools <bool>  - toolboxes are transient windows. (default: 0)
  -transient_spectralplot <bool>  - spectral plot is a transient window. (default: 1)
+ -transient_tools <bool>  - toolboxes are transient windows. (default: 0)
  -ukirt_ql <bool>         - show UKIRT Quick Look Facilities (default: 0).
  -ukirt_xy <bool>         - show XY profile UKIRT Quick Look Facilities (default: 0).
  -use_zoom_view <bool>    - use a "view" of the image for the zoom window (default).
