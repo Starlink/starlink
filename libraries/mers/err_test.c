@@ -44,13 +44,16 @@
 */
 #include <sae_par.h>
 #include <mers.h>
-err_test(int *status) {
+
+void err_test(int *status) {
 
 const char MSG[]="MSG1";
 
 /* Call msgOut */
 msgBell( status );
 msgOut( MSG, "MSG C Interface is installed and working.", status );
+msgOut(" ", "STATUS: token check: ^STATUS- hello ^STUB", status);
+msgOut(" ", "^STATUS: at start ^STATUS hello ^STUB", status);
 
 /* Call ERR_REP and ERR_FLUSH. */
 *status = SAI__ERROR;
