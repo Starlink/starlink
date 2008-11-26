@@ -107,6 +107,8 @@
 *        Correct finding ^STATUS if previous token in message
 *     05-SEP-2008 (TIMJ):
 *        Rewrite in C.
+*     26-NOV-2008 (TIMJ):
+*        Fix ^STATUS expansion.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -206,8 +208,12 @@ void msg1Form ( const char * param, const char * text, int clean,
 
     while (token) {
 
-      /* Is it STATUS?  - noting that ^STATUSX will also match */
-      if (strncmp( token, STATSTR, szst ) == 0) {
+      /* Is it STATUS?  - noting that ^STATUSX will also match.
+       Note that first time round the loop strtok will return the start
+       of string so we have to check that we do not match a bare STATUS
+       at the start (there can never be a token as first character since
+       a ^ would point us to the second character). */
+      if (token != texst1 && strncmp( token, STATSTR, szst ) == 0) {
 
         /*       It is STATUS
          *       Find the associated message */
@@ -218,11 +224,16 @@ void msg1Form ( const char * param, const char * text, int clean,
 
         /* Need to put this text back into original */
 
-        /* Save the text that follows ^STATUS */
-        star_strlcpy( texst2, &(token[szst]), sizeof(texst2) );
+        /* Save the text that follows ^STATUS - it has to be copied
+         from texst0 since token aka texst1 is modified by strok on the
+         first call. */
+        offset = token - texst1 + szst;
+        star_strlcpy( texst2, &(texst0[offset]), sizeof(texst2) );
 
-        /* Work out how far into the buffer this ^STATUS was found */
-        offset = token - texst1;
+        /* Work out how far into the buffer this ^STATUS was found, accounting
+         for the fact that "token" reports a value one larger than the position
+         of the ^ */
+        offset = token - texst1 - 1;
         
         /* Append the text from the STATUS token and the subsequent text */
         texst0[offset] = '\0';
