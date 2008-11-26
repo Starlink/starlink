@@ -335,8 +335,15 @@ void smurf_qlmakemap( int *status ) {
   }
 
   /* Get group of pixel masks and read them into a smfArray */
-  kpg1Rgndf( "BPM", 0, 1, "", &bpmgrp, &size, status );
-  smf_open_group( bpmgrp, NULL, &bpms, status );
+  if (*status == SAI__OK) {
+    kpg1Rgndf( "BPM", 0, 1, "", &bpmgrp, &size, status );
+    if (*status == PAR__NULL) {
+      bpms = NULL;
+      errAnnul( status );
+    } else {
+      smf_open_group( bpmgrp, NULL, &bpms, status );
+    }
+  }
 
   /* Get the celestial coordinate system for the output image. */
   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
@@ -494,7 +501,7 @@ void smurf_qlmakemap( int *status ) {
   /* If required, copy the data and variance arrays from the 3D work
      arrays into the output NDF, free the work arrays, and use the
      NDF arrays from here on. */
-  if( wf->nworker > 1 ) {
+  if( *status == SAI__OK && wf->nworker > 1 ) {
     memcpy( (odata->pntr)[0], map, sizeof(double)*mapsize );
     if (variance) memcpy( (odata->pntr)[1], variance, sizeof(double)*mapsize );
     if (map) map = smf_free( map, status );
