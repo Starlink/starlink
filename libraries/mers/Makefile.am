@@ -101,25 +101,27 @@ msg_blank.c err_out.c err_load.c msg_iflev.c msg_ifset.c err_fioer.c \
 err_tune.c msg_tune.c
 
 #  The installation test source
-TEST_SOURCE = err_test.f err_test.c err_test.ifl
+TEST_SOURCE = err_ftest.f err_test.c err_test.ifl mers_test.c
 
 BUILT_SOURCES = $(include_MESSAGES)
 
 CLEANFILES = err_err.h msg_err.h ERR_ERR MSG_ERR
 
 # Testing
-TESTS = err_ftest
+TESTS = err_ftest mers_test
 
-check_PROGRAMS = err_ftest
+check_PROGRAMS = err_ftest mers_test
 err_ftest_SOURCES = err_ftest.f
 err_ftest_LDADD = liberr_standalone.la `chr_link` `cnf_link` `ems_link` `starutil_link`
 
+mers_test_SOURCES = mers_test.c
+mers_test_LDADD = liberr_standalone.la `chr_link` `cnf_link` `ems_link` `starutil_link`
+
 # Monoliths with C main do compile but we do not want a build dependency
 # on PCS
-#check_MONOLITHS = err_test
-#err_test_TASKS =
-#err_test_SOURCES = err_test.c
-#err_test_LDADD = liberr_adam.la `chr_link_adam` `ems_link_adam` `cnf_link_adam`
+check_MONOLITHS = err_test
+err_test_SOURCES = err_test.c
+err_test_LDADD = liberr_adam.la `chr_link_adam` `ems_link_adam` `cnf_link_adam`
 
 dist_starnews_DATA = mers.news
 dist_pkgdata_DATA = LICENCE
