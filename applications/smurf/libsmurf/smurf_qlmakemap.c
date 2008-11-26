@@ -336,7 +336,8 @@ void smurf_qlmakemap( int *status ) {
 
   /* Get group of pixel masks and read them into a smfArray */
   if (*status == SAI__OK) {
-    kpg1Rgndf( "BPM", 0, 1, "", &bpmgrp, &size, status );
+    size_t nbpm;
+    kpg1Rgndf( "BPM", 0, 1, "", &bpmgrp, &nbpm, status );
     if (*status == PAR__NULL) {
       bpms = NULL;
       errAnnul( status );
