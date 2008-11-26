@@ -637,6 +637,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter bpm {
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath CURRENT
+                prompt {Bad pixel masks}
+                helpkey *
+            }
+
             parameter params {
                 size *
                 type _DOUBLE
