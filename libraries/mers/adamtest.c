@@ -65,9 +65,9 @@ void adamtest ( int * status ) {
 
   errRep( "MSG1", "This text should not appear", status );
 
-  errRep( " ", "Should be expanded: %ET as 'EXPOSURE_TIME", status);
+  errRep( " ", "Should be expanded: %ET as 'EXPOSURE_TIME'", status);
 
-  errRep( " ", "Object $TESTOBJ should be somewhere", status );
+  errRep( " ", "Object $TESTOBJ %s %XX should be somewhere", status );
 
   errRep( " ", "Multiple %ET and ^STATUS and %TESTOBJ and %BLAH", status );
 
