@@ -90,13 +90,13 @@
 void smf_open_group( const Grp * igrp, const dim_t refdims[],
                      smfArray **files, int *status ) {
 
-  size_t i = 0;        /* Loop counter */
-  size_t nfiles = 0;     /* Number of files in group */
-  dim_t dims[2];       /* reference dimension for comparison */
+  size_t i = 0;            /* Loop counter */
+  size_t nfiles = 0;       /* Number of files in group */
+  dim_t dims[2] = { 0, 0 };/* reference dimension for comparison */
 
   if (files) *files = NULL;
 
-  if (*status == SAI__OK) return;
+  if (*status != SAI__OK) return;
 
   *files = smf_create_smfArray( status );
 
@@ -139,7 +139,6 @@ void smf_open_group( const Grp * igrp, const dim_t refdims[],
 
   }
 
- CLEANUP:
   if (*status != SAI__OK) {
     smf_close_related( files, status );
   }
