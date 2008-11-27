@@ -344,6 +344,7 @@ void smurf_qlmakemap( int *status ) {
     } else {
       smf_open_group( bpmgrp, NULL, &bpms, status );
     }
+    if (bpmgrp) grpDelet( &bpmgrp, status );
   }
 
   /* Get the celestial coordinate system for the output image. */
@@ -437,7 +438,7 @@ void smurf_qlmakemap( int *status ) {
   msgOutif( MSG__VERB," ", "SMURF_QLMAKEMAP: Process data files", status );
   for ( i=1; i<=size && *status == SAI__OK; i++ ) {
     /* Read data from the ith input file in the group */
-    smf_open_and_flatfield( igrp, NULL, i, darks, NULL, &data, status );
+    smf_open_and_flatfield( igrp, NULL, i, darks, bpms, &data, status );
   
     msgOutif( MSG__VERB," ", "SMURF_QLMAKEMAP: Cleaning bolometer data.", 
               status );
@@ -538,6 +539,7 @@ void smurf_qlmakemap( int *status ) {
   smf_close_file ( &odata, status );
   if( ogrp ) grpDelet( &ogrp, status );
   if( darks ) smf_close_related( &darks, status );
+  if( bpms ) smf_close_related( &bpms, status );
   grpDelet( &igrp, status );
   if( wf ) wf = smf_destroy_workforce( wf );
  
