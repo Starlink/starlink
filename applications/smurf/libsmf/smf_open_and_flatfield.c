@@ -257,10 +257,13 @@ void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
       }
     }
 
-    /* Apply any bad pixel mask */
+    /* Apply any bad pixel mask - we can apply this to the raw data since
+       the data are not read only. */
     smf_apply_mask( data, bpms, status );
 
-    /* Handle darks */
+    /* Handle darks - note that "data" read from a raw file 
+     is actually a malloced data array and not a mmapped array. This means
+     that it is not read-only despite the call to smf_open_file above. */
     smf_apply_dark( data, darks, status );
 
     /* Flatfield the data */
@@ -283,6 +286,10 @@ void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
     } else {    
       memcpy( ((*ffdata)->pntr)[0], (data->pntr)[0], npts * sizeof (double) );
     }
+
+    /* Apply any bad pixel mask - has to be applied to the output data
+       array rather than the input because of READ only issues. */
+    smf_apply_mask( *ffdata, bpms, status );
 
   }
 
