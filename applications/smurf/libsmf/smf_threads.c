@@ -69,6 +69,11 @@
 *        terminated correctly.
 *     20-NOV-2008 (DSB):
 *        Initialise result->kill in smf_create_workforce.
+*     27-NOV-2008 (DSB):
+*        - Correct places where the workforce status was accessed by a 
+*        thread that did not hold the job-desk mutex.
+*        - Correct releasing of the job-desk mutex in smf_run_worker when 
+*        the worker thread is killed.
 */
 
 
@@ -426,15 +431,6 @@ smfWorkForce *smf_destroy_workforce( smfWorkForce *workforce ) {
                             &( workforce->jd_mutex ) );
       }
 
-/* Unlock the job desk mutex prior to dstroying it. */
-      pthread_mutex_unlock( &( workforce->jd_mutex ) );
-
-/* Free the mutex and condition variables used by the workforce. */
-      pthread_mutex_destroy( &( workforce->jd_mutex ) );
-      pthread_cond_destroy( &( workforce->all_done ) );
-      pthread_cond_destroy( &( workforce->job_done ) );
-      pthread_cond_destroy( &( workforce->page ) );
-
 /* Free the job description structures. */
       job = smf_pop_list_head( &(workforce->active_jobs), &status );
       while( job ) {
@@ -470,6 +466,15 @@ smfWorkForce *smf_destroy_workforce( smfWorkForce *workforce ) {
          job = astFree( job );
          job = smf_pop_list_head( &(workforce->waiting_jobs), &status );
       }
+
+/* Unlock the job desk mutex prior to dstroying it. */
+      pthread_mutex_unlock( &( workforce->jd_mutex ) );
+
+/* Free the mutex and condition variables used by the workforce. */
+      pthread_mutex_destroy( &( workforce->jd_mutex ) );
+      pthread_cond_destroy( &( workforce->all_done ) );
+      pthread_cond_destroy( &( workforce->job_done ) );
+      pthread_cond_destroy( &( workforce->page ) );
 
 /* Free the memory holding the workforce. */
       workforce = astFree( workforce );
@@ -618,6 +623,7 @@ void smf_wait( smfWorkForce *workforce, int *status ) {
 
 /* Local Variables: */
    smfJob *job;
+   int wf_status;
 
 /* Start a new error reporting context. */
    emsBegin( status );
@@ -656,6 +662,9 @@ void smf_wait( smfWorkForce *workforce, int *status ) {
       job = smf_pop_list_head( &(workforce->finished_jobs), status );
    }
 
+/* Note the workforce status whilst we still have the job desk mutex. */
+   wf_status = workforce->status;
+
 /* Once the condition is signalled, the pthread_cond_wait will continue
    to wait until it can lock the specified mutex (the job desk mutex). So
    unlock it now so that other threads can get to the job desk. */
@@ -663,7 +672,7 @@ void smf_wait( smfWorkForce *workforce, int *status ) {
    smf_thread_log( "wait: Leaving desk", ACTIVE, njob );
 
 /* Return the workforce status. */
-   if( *status == SAI__OK ) *status = workforce->status;
+   if( *status == SAI__OK ) *status = wf_status;
 
 /* End the error reporting context. */
    emsEnd( status );
@@ -1081,11 +1090,9 @@ static void *smf_run_worker( void *wf_ptr ) {
 
 /* If the workforce is being killed, decrement the number of workers that
    remain to be terminated. If this is  the last worker, signal the
-   "all_done" condition. Then release the job queue mutex, and quit the 
-   main loop. */
+   "all_done" condition. Then quit the main loop. */
       if( wf->kill ) {
          if( --(wf->kill) == 0 ) smf_cond_signal( &(wf->all_done), &status );
-         smf_mutex_unlock( &(wf->jd_mutex), &status );
          break;
       }
 
