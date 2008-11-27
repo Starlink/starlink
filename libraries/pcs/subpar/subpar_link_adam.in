@@ -52,6 +52,7 @@
 #     BLY:  M.J. Bly (Starlink, RAL)
 #     AJC:  A.J. Chipperfield (Starlink, RAL)
 #     TIMJ: Tim Jenness (JAC, Hawaii)
+#     DSB: David S. Bery (JAC, UCLan)
 #     {enter_new_authors_here}
 
 #  History:
@@ -69,6 +70,8 @@
 #        Remove -ladam_adam -lmessys_adam 
 #     28-MAR-2005 (TIMJ):
 #        Curses library inserted by autoconf
+#     27-NOV-2008 (DSB):
+#        Add autoconf LIBS to include pthread when needed.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -87,7 +90,7 @@
            -lstring_adam \
            `hds_link_adam` \
            `hlp_link_adam` \
-           `psx_link_adam` \
+           `psx_link_adam` @LIBS@ \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

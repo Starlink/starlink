@@ -31,11 +31,15 @@
 
  *  Authors:
  *     TIMJ: Tim Jenness (JAC, Hawaii)
+ *     DSB: David S Berry (JAC, UCLan)
  *     {enter_new_authors_here}
 
  *  History:
  *     19-JUL-2008 (TIMJ):
  *        Initial version. Don't worry about MUTEXes.
+ *     27-NOV-2008 (DSB):
+ *        Use a mutex to prevent more than one Fortran routine being run
+ *        at any one time.
 
  *  Bugs:
  *     {note_any_bugs_here}
@@ -47,6 +51,23 @@
 
 #include "subpar.h"
 
+/* If the pthreads library is available we use a mutex to ensure that
+   only one Fortran routine is running at any one time. */
+#if USE_PTHREADS
+
+#include <pthread.h>
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+#define LOCK_MUTEX pthread_mutex_lock( &mutex );
+#define UNLOCK_MUTEX pthread_mutex_unlock( &mutex ); 
+
+#else
+
+#define LOCK_MUTEX
+#define UNLOCK_MUTEX
+
+#endif
+
+
 F77_SUBROUTINE(subpar_findpar)( CHARACTER(NAME), INTEGER(NAMECODE),
 				INTEGER(STATUS) TRAIL(NAME) );
 
@@ -55,6 +76,8 @@ void subParFindpar( const char * name, size_t * namecode, int * status ) {
   DECLARE_CHARACTER_DYN(NAME);
   DECLARE_INTEGER(NAMECODE);
   DECLARE_INTEGER(STATUS);
+
+  LOCK_MUTEX;
 
   F77_CREATE_EXPORT_CHARACTER(name, NAME);
   F77_EXPORT_INTEGER( *status, STATUS );
@@ -67,6 +90,8 @@ void subParFindpar( const char * name, size_t * namecode, int * status ) {
   F77_FREE_CHARACTER(NAME);
   F77_IMPORT_INTEGER( NAMECODE, *namecode );
   F77_IMPORT_INTEGER( STATUS, *status );
+
+  UNLOCK_MUTEX;
 
   return;
 }
@@ -81,6 +106,8 @@ void subParGet0c( size_t namecode, char *cvalue, size_t cvalue_length,
   DECLARE_CHARACTER_DYN(CVALUE);
   DECLARE_INTEGER(STATUS);
 
+  LOCK_MUTEX;
+
   F77_EXPORT_INTEGER( namecode, NAMECODE );
   F77_CREATE_CHARACTER( CVALUE, cvalue_length - 1 );
   F77_EXPORT_INTEGER( *status, STATUS );
@@ -91,6 +118,8 @@ void subParGet0c( size_t namecode, char *cvalue, size_t cvalue_length,
   F77_IMPORT_CHARACTER( CVALUE, CVALUE_length, cvalue );
   F77_FREE_CHARACTER( CVALUE );
   F77_IMPORT_INTEGER( STATUS, *status );
+
+  UNLOCK_MUTEX;
 
   return;
 }
@@ -105,6 +134,8 @@ void subParGetkey( size_t namecode, char *keyword, size_t keyword_length,
   DECLARE_CHARACTER_DYN(KEYWORD);
   DECLARE_INTEGER(STATUS);
 
+  LOCK_MUTEX;
+
   F77_EXPORT_INTEGER( namecode, NAMECODE );
   F77_CREATE_CHARACTER( KEYWORD, keyword_length - 1 );
   F77_EXPORT_INTEGER( *status, STATUS );
@@ -115,6 +146,8 @@ void subParGetkey( size_t namecode, char *keyword, size_t keyword_length,
   F77_IMPORT_CHARACTER( KEYWORD, KEYWORD_length, keyword );
   F77_FREE_CHARACTER( KEYWORD );
   F77_IMPORT_INTEGER( STATUS, *status );
+
+  UNLOCK_MUTEX;
 
   return;
 }
@@ -130,6 +163,8 @@ int subParGref( size_t namecode, char * refstr, size_t reflen ) {
   DECLARE_INTEGER(REFLEN);
   int retval = 0;
 
+  LOCK_MUTEX;
+
   F77_EXPORT_INTEGER( namecode, NAMECODE );
   F77_CREATE_CHARACTER( REFSTR, reflen - 1 );
 
@@ -140,6 +175,9 @@ int subParGref( size_t namecode, char * refstr, size_t reflen ) {
 
   F77_IMPORT_CHARACTER( REFSTR, REFSTR_length, refstr );
   F77_FREE_CHARACTER( REFSTR );
+
+  UNLOCK_MUTEX;
+
   return retval;
 }
 
@@ -147,9 +185,13 @@ F77_SUBROUTINE(subpar_sync)(INTEGER(STATUS));
 
 void subParSync( int * status ) {
   DECLARE_INTEGER(STATUS);
+  LOCK_MUTEX;
+
   F77_EXPORT_INTEGER( *status, STATUS );
   F77_CALL(subpar_sync)( INTEGER_ARG(&STATUS) );
   F77_IMPORT_INTEGER( STATUS, *status );
+
+  UNLOCK_MUTEX;
 
   return;
 }
@@ -159,6 +201,8 @@ F77_SUBROUTINE(subpar_wrerr)(CHARACTER(STRING),INTEGER(STATUS) TRAIL(STRING));
 void subParWrerr( const char * string, int * status ) {
   DECLARE_CHARACTER_DYN(STRING);
   DECLARE_INTEGER(STATUS);
+
+  LOCK_MUTEX;
 
   F77_CREATE_EXPORT_CHARACTER(string, STRING);
   F77_EXPORT_INTEGER( *status, STATUS );
@@ -170,6 +214,8 @@ void subParWrerr( const char * string, int * status ) {
   F77_FREE_CHARACTER(STRING);
   F77_IMPORT_INTEGER( STATUS, *status );
 
+  UNLOCK_MUTEX;
+
   return;
 }
 
@@ -178,6 +224,8 @@ F77_SUBROUTINE(subpar_wrmsg)(CHARACTER(STRING),INTEGER(STATUS) TRAIL(STRING));
 void subParWrmsg( const char * string, int * status ) {
   DECLARE_CHARACTER_DYN(STRING);
   DECLARE_INTEGER(STATUS);
+
+  LOCK_MUTEX;
 
   F77_CREATE_EXPORT_CHARACTER(string, STRING);
   F77_EXPORT_INTEGER( *status, STATUS );
@@ -188,6 +236,8 @@ void subParWrmsg( const char * string, int * status ) {
 
   F77_FREE_CHARACTER(STRING);
   F77_IMPORT_INTEGER( STATUS, *status );
+
+  UNLOCK_MUTEX;
 
   return;
 }

@@ -118,6 +118,23 @@ STAR_MESSGEN([atimer/atimer_err.msg
               sock/sock_err.msg subpar/subpar_err.msg task/task_err.msg])
 
 
+dnl    Conditional defining whether we build with POSIX thread support.
+dnl    We do this by default.
+AC_ARG_WITH([pthreads],
+            [ --with-pthreads   Build package with POSIX threads support],
+            [if test "$withval" = "yes"; then
+               use_pthreads="yes"
+             else
+               use_pthreads="no"
+             fi],
+            [use_pthreads="yes"])
+if test "$use_pthreads" = "yes"; then
+   AC_CHECK_LIB([pthread], [pthread_create], ,[use_pthreads="no"])
+   if test "$use_pthreads" = "yes"; then
+      AC_DEFINE([USE_PTHREADS], [1], [Build with POSIX threads support])
+   fi
+fi
+
 dnl    The documentation is kept in a separate directory, and configured
 dnl    separately.  The Makefile.am does not use the @subdirs@ variable.
 AC_CONFIG_SUBDIRS(pcs-docs)
