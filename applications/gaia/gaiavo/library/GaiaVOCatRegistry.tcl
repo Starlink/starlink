@@ -84,14 +84,28 @@ itcl::class gaiavo::GaiaVOCatRegistry {
    #  Methods:
    #  --------
 
-   #  XXX debug method, remove before release (or make last query
-   #  persistent and reload that).
+   #  Make the interface conform to our usage. The "Open" button should 
+   #  be "Accept" and "Close" should be "Cancel".
    public method init {} {
       GaiaVOCat::init
-      puts "debug: loading siap_query.vot..."
-      if { [::file exists siap_query.vot] } {
-         after idle [code $itk_component(registry) read_query siap_query.vot]
+
+      $itk_component(open) configure -text "Accept"
+      add_short_help $itk_component(open) {Accept list of services}
+
+      $itk_component(close) configure -text "Cancel"
+      add_short_help $itk_component(close) {Cancel changes and close window}
+
+      #  Read the catalogue.
+      if { $itk_option(-catalog) != {} } {
+         $itk_component(registry) read_query $itk_option(-catalog)
       }
+   }
+
+   #  User pressed the accept button. Override to not require selected row
+   #  and close window.
+   public method open {} {
+      open_service_
+      close
    }
 
    #  Add the component that will control the registry query.
@@ -112,19 +126,21 @@ itcl::class gaiavo::GaiaVOCatRegistry {
       set query_component_ $itk_component(registry)
    }
 
-   #  Open a service, "args" is a list of values from a row of the current
-   #  table.
+   #  Open a service. In this case it means accept the whole catalogue.
+   #  The first job is to update the disk catalogue.
    protected method open_service_ {args} {
+      if { $itk_option(-catalog) != {} } {
+         $itk_component(registry) save_query $itk_option(-catalog)
+      }
       if { $itk_option(-activate_cmd) != {} } {
-         set headings [$itk_component(results) get_headings]
-         eval $itk_option(-activate_cmd) "\$headings" "\$args"
+         eval $itk_option(-activate_cmd)
       }
    }
 
    #  Configuration options: (public variables)
    #  ----------------------
 
-   #  The type of service to query. SSAP, SIAP, ConeSearch.
+   #  The type of services to query for - SSAP, SIAP, ConeSearch.
    itk_option define -service service Service SIAP
 
    #  Protected variables: (available to instance)

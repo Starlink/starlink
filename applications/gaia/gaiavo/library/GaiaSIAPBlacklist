@@ -1,0 +1,5 @@
+#  Backlisted SIAP servers. These will never be queried.
+#
+#  Bonn 1420 MHz Survey
+ivo://nasa.heasarc/skyview/1420mhz
+

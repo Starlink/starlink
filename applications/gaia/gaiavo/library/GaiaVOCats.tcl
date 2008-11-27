@@ -1,23 +1,22 @@
 #+
 #  Name:
-#     GaiaVOCat
+#     GaiaVOCats
 
 #  Type of Module:
 #     [incr Tcl] class
 
 #  Purpose:
-#     Query a VO service and display the result.
+#     Query set of VO services and display the results.
 
 #  Description:
-#     This class defines a standard basic UI for containing the query
-#     elements specific to a particular VO service. It controls the query and
-#     displays the resultant VOTable. Subclasses should be created that
-#     specialise the query itself and what actions to take when activating
-#     a response.
+#     This class defines a standard basic UI for containing queries to a set
+#     of VO services. It controls the queries and displays the resultant
+#     VOTables. Subclasses should be created that specialise the queries (to
+#     the same class) and what actions to take when activating a response.
 
 #  Invocations:
 #
-#        GaiaVOCat object_name [configuration options]
+#        GaiaVOCats object_name [configuration options]
 #
 #     This creates an instance of a GaiaVOCat object. The return is
 #     the name of the object.
@@ -56,7 +55,7 @@
 #     {enter_new_authors_here}
 
 #  History:
-#     31-JUL-2008 (PWD):
+#     17-NOV-2008 (PWD):
 #        Original version.
 #     {enter_further_changes_here}
 
@@ -64,9 +63,9 @@
 
 #.
 
-itk::usual GaiaVOCat {}
+itk::usual GaiaVOCats {}
 
-itcl::class gaiavo::GaiaVOCat {
+itcl::class gaiavo::GaiaVOCats {
 
    #  Inheritances:
    #  -------------
@@ -77,7 +76,7 @@ itcl::class gaiavo::GaiaVOCat {
    constructor {args} {
       eval itk_initialize $args
 
-      #  Catalogue handler.
+      #  Catalog server for general use and for opening the list of servers.
       astrocat $w_.cat
 
       #  Add a short help window.
@@ -88,35 +87,12 @@ itcl::class gaiavo::GaiaVOCat {
 
       #  File menu.
       set m [add_menubutton File]
-      
-      #  Read old query from disk.
-      add_menuitem $m command "Open..." \
-         {Read previous query results from a VOTable} \
-         -command [code $this read_query]
 
-      #  Save query to disk.
-      add_menuitem $m command "Save as..." \
-         {Save query results to a VOTable} \
-         -command [code $this save_query]
+      #  XXX need save and restore functions for current service responses.
 
       add_menuitem $m command "Close" \
          {Close this window} \
          -command [code $this close]
-
-      #  Edit menu.
-      set m [add_menubutton Edit]
-
-      add_menuitem $m command "Remove selected" \
-         {Remove selected rows from the results} \
-         -command [code $this remove_selected]
-
-      add_menuitem $m command "Add new row..." \
-         {Enter the data for a new row of results} \
-         -command [code $this enter_new_object]
-
-      add_menuitem $m command "Edit selected row..." \
-         {Edit the data for the selected row} \
-         -command [code $this edit_selected_object]
 
       #  Options menu.
       set m [add_menubutton Options]
@@ -140,6 +116,11 @@ itcl::class gaiavo::GaiaVOCat {
    #  Destructor:
    #  -----------
    destructor {
+      #  Delete all instances of astrocat.
+      $w_.cat delete
+      for { set i 0 } { $i < npages_ } { incr i } {
+         $w_.cat$i delete
+      }
    }
 
    #  Methods:
@@ -150,7 +131,8 @@ itcl::class gaiavo::GaiaVOCat {
    public method init {} {
 
       #  Add the query component. Usually has some controls
-      #  for establishing the query context and initiating it.
+      #  for establishing the query context (SIAP/Registry etc.) and
+      #  initiating it.
       add_query_component_
 
       #  Controls for the query.
@@ -162,11 +144,11 @@ itcl::class gaiavo::GaiaVOCat {
       itk_component add query {
          button $itk_component(querybuttons).query \
             -text "Query" \
-            -command [code $this query]
+            -command [code $this start_queries]
       }
       pack $itk_component(query) -side left -expand 1 -pady 2m
       add_short_help $itk_component(query) \
-         {Start query}
+         {Start queries to the current servers}
 
       itk_component add interrupt {
          button $itk_component(querybuttons).interrupt \
@@ -176,32 +158,31 @@ itcl::class gaiavo::GaiaVOCat {
       }
       pack $itk_component(interrupt) -side left -expand 1 -pady 2m
       add_short_help $itk_component(interrupt) \
-         {Interrupt the query}
+         {Interrupt the queries}
 
-      #  Add the table for displaying the query results.
-      itk_component add results {
-         GaiaQueryResult $w_.results \
-            -astrocat [code $w_.cat] \
-            -title "Query Results" \
-            -hscroll 1 \
-            -height 12 \
-            -sortcommand [code $this set_sort_cols] \
-            -layoutcommand [code $this set_show_cols] \
-            -selectmode extended \
-            -exportselection 0
-      } {
+      #  Menu for switching between the various results pages in the
+      #  notebook. We do not use a tabnotebook as that is limited to one
+      #  row of tabs.
+      itk_component add bookmenu {
+         LabelMenu $w_.bookmenu \
+            -text "SIAP server results:" \
+            -labelwidth 18 \
+            -valuewidth 30 \
+            -valueanchor w
       }
-      pack $itk_component(results) -side top -fill both -expand 1
-      add_short_help $itk_component(results) {Results of query to repository}
+      pack $itk_component(bookmenu) -side top -fill none -pady 2m
 
-      #  Double click is same as "Open".
-      bind $itk_component(results).listbox <Double-1> [code $this open]
+      #  Notebook for displaying the results.
+      itk_component add notebook {
+         iwidgets::notebook $w_.book -height 250
+      }
+      pack $itk_component(notebook) -side top -fill both -expand 1
 
       #  Add the dialog button frame and the action buttons.
       itk_component add buttons {
          frame $w_.buttons -borderwidth 2 -relief raised
       }
-      pack  $itk_component(buttons) -side top -fill x
+      pack $itk_component(buttons) -side top -fill x
 
       itk_component add open {
          button $itk_component(buttons).open \
@@ -226,9 +207,6 @@ itcl::class gaiavo::GaiaVOCat {
       pack $itk_component(progressbar) -side top -fill x
       add_short_help itk_component(progressbar) \
          {Progress bar: displays status of work in progress}
-
-      #  Display the catalogue, if set.
-      open_catalog
    }
 
    #  Close this window.
@@ -236,130 +214,70 @@ itcl::class gaiavo::GaiaVOCat {
       wm withdraw $w_
    }
 
-   #  Save query to a VOTable.
-   public method save_query {} {
-      set w [FileSelect .\#auto -title "Save query to a local file"]
-      if {[$w activate]} {
-         set filename [$w get]
-         if {[file exists $filename]} {
-            if {! [confirm_dialog \
-                      "File `[file tail $filename]' exists. Overwrite it?" $w_]} {
-               return
-            }
-         }
-         $query_component_ save_query $filename
-      }
-   }
-
-   #  Read query from a VOTable.
-   public method read_query {} {
-      set w [FileSelect .\#auto -title "Read old query from a local file"]
-      if { [$w activate] } {
-         set filename [$w get]
-         if {[file exists $filename]} {
-            $query_component_ read_query [$w get]
-         } else {
-            warning_dialog "File '$filename' doesn't exist" $w_
-         }
-      }
-   }
-
    #  Open services for the selected rows. Depends on the type of service query
    #  as to what will happen. For SIAP we should open a window to download an
-   #  image. 
+   #  image.
    public method open {} {
-      foreach row [$itk_component(results) get_selected] { 
+      foreach row [$itk_component(results$current_) get_selected] {
          open_service_ $row
       }
    }
 
-   #  Pop up a dialog to sort the list.
+   #  Switch to the page selected in the "Query Results" option menu.
+   protected method view_page_ {page} {
+      $itk_component(notebook) view $page
+      set current_ $page
+   }
+
+   #  Pop up a dialog to sort the all the lists of results.
    public method sort_dialog {} {
-      $itk_component(results) sort_dialog
+      $itk_component(results$current_) sort_dialog
    }
 
    #  Called when the user has selected columns to sort the results by.
    #  The first arg is the sort columns, the second arg is the order
    #  (increasing, decreasing).
    public method set_sort_cols {sort_cols sort_order} {
-      if { "[$w_.cat sortcols]" != "$sort_cols" \
-              || "[$w_.cat sortorder]" != "$sort_order"} {
-         $w_.cat sortcols $sort_cols
-         $w_.cat sortorder $sort_order
+      if { "[$w_.cat$current_ sortcols]" != "$sort_cols" ||
+           "[$w_.cat$current_ sortorder]" != "$sort_order" } {
+         $w_.cat$current_ sortcols $sort_cols
+         $w_.cat$current_ sortorder $sort_order
          cat::CatalogInfo::save {} $w_ 0
-         $itk_component(results) config -sort_cols $sort_cols \
+         $itk_component(results$current_) config -sort_cols $sort_cols \
             -sort_order $sort_order
-         query
+
+         #  Update the table.
+         $itk_component(results$current_) new_info
       }
    }
 
    #  Pop up a dialog to select table columns to display.
    public method select_columns {} {
-      $itk_component(results) select_columns
+      $itk_component(results$current_) select_columns
    }
 
    #  Called when the user has selected columns to show.
    public method set_show_cols {cols} {
-      set show [$w_.cat showcols]
+      set show [$w_.cat$current_ showcols]
       if { "$show" == {} } {
-         set show [$itk_component(results) get_headings]
+         set show [$itk_component(results$current_) get_headings]
       }
       if { "$show" != "$cols" } {
-         $w_.cat showcols $cols
+         $w_.cat$current_ showcols $cols
          cat::CatalogInfo::save {} $w_ 0
       }
    }
 
-   #  Clear the table listing.
+   #  Clear the current table listing.
    public method clear {} {
-      catch {$itk_component(results) clear}
-   }
-
-   #  Remove the currently selected rows.
-   public method remove_selected {} {
-      $itk_component(results) remove_selected
-      set info_ [$w_.cat content]
-      $itk_component(results) config -info $info_
-
-      puts "It must be possible to do this!"
-   }
-
-   #  Pop up a dialog to enter the data for a new row.
-   public method enter_new_object {} {
-      $itk_component(results) enter_new_object [code $this query]
-   }
-
-   #  Pop up a window so that the user can edit the selected object(s).
-   public method edit_selected_object {} {
-      $itk_component(results) edit_selected_object [code $this query]
-   }
-
-   #  Open the catalogue for this window.
-   public method open_catalog {} {
-
-      #  Normally -catalog should be specified when creating this widget
-      #  if not, choose a default...
-      if { $itk_option(-catalog) == {} } {
-         return
-      }
-
-      #  Open the catalogue.
-      set name $itk_option(-catalog)
-      if { [catch {$w_.cat open $name $itk_option(-catalogdir)} msg] } {
-         error_dialog $msg $w_
-         return -code error
-      }
-
-      #  Display catalogue name in header and icon.
-      wm title $w_ "[$w_.cat longname $name $itk_option(-catalogdir)] ($itk_option(-number))"
-      wm iconname $w_ [$w_.cat shortname $name $itk_option(-catalogdir)]
+      $itk_component(results$current_) clear
    }
 
    #  Interrupt the current query.
    public method interrupt {} {
       $query_component_ interrupt
       set_feedback off
-      catch {$itk_component(results) config -title "Query Results"}
+      catch {$itk_component(results$current_) config -title "Query Results"}
       set_state normal
    }
 
@@ -376,7 +294,8 @@ itcl::class gaiavo::GaiaVOCat {
       $itk_component(progressbar) reset
    }
 
-   # This method is called when the background query is done.
+   #  This method is called when a background query is done. Should
+   #  be the current query.
    public method query_done {status result} {
 
       set_state normal
@@ -384,60 +303,134 @@ itcl::class gaiavo::GaiaVOCat {
       #  If status is bad result is a message, otherwise it should be
       #  the name of a VOTable file.
       if { ! $status } {
-         warning_dialog $result $w_
+         warning_dialog "$names_($current_): $result" $w_
          after 0 [list $itk_component(progressbar) config -text $result]
       } elseif { ! [file exists $result] } {
-         error_dialog $result $w_
+         error_dialog "$names_($current_): $result" $w_
          after 0 [list $itk_component(progressbar) config -text $result]
       } else {
 
          #  Got a VOTable.
          busy {
-            $w_.cat open $result
-            
+            $w_.cat$current_ open $result
+
             #  Need to update GaiaQueryResult with content.
             #  Update table headings.
             set prev_headings $headings_
-            set headings_ [$w_.cat headings]
-            $itk_component(results) config -headings $headings_
+            set headings_ [$w_.cat$current_ headings]
+            $itk_component(results$current_) config -headings $headings_
 
             #  Initial show columns.
             if { $itk_option(-show_cols) != {} } {
-               $itk_component(results) \
+               $itk_component(results$current_) \
                   set_options $headings_ Show 0
-               $itk_component(results) \
+               $itk_component(results$current_) \
                   set_options $itk_option(-show_cols) Show 1
             }
 
             if { "$prev_headings" != "$headings_" } {
-               $itk_component(results) update_options
+               $itk_component(results$current_) update_options
             }
 
             #  Update content.
-            set info_ [$w_.cat content]
-            $itk_component(results) config -info $info_
+            set info_ [$w_.cat$current_ content]
+            $itk_component(results$current_) config -info $info_
 
-            $itk_component(results) config \
-               -title "Returned [$itk_component(results) total_rows] rows"
+            $itk_component(results$current_) config \
+               -title "Returned [$itk_component(results$current_) total_rows] rows"
 
+            #  Make sure results are visible.
+            $itk_component(bookmenu) configure -value $current_
+            view_page_ $current_
          }
       }
    }
 
+   #  Start the queries.
+   public method start_queries {args} {
+
+      #  Clear any existing queries.
+      clear_query_results_
+
+      #  Now invoke method to start the queries in sub-classes.
+      start_queries_
+   }
+
+   #  Start the queries. The implementation of this method should call query
+   #  once for each server. 
+   protected method start_queries_ {} {
+      puts "you must implement a start_queries_ method"
+   }
+
+   #  Clear all the existing queries so that a new set can be done.
+   protected method clear_query_results_ {} {
+      for { set i 0 } { $i < $npages_ } { incr i } {
+         delete object $itk_component(results$i)
+      }
+      $itk_component(bookmenu) clear
+      set npages_ 0
+      set current_ 0
+   }
+
    #  Start the catalogue query based on the current query options and
-   #  display the results in the table.
-   public method query {args} {
+   #  display the results in a page of the results book. The url will
+   #  be passed to the query component and the name used in a menu.
+   protected method query_ {url name} {
+
+      #  Create a page for the query results.
+      add_query_result_ $name
+
       #  Start the query in the background.
       catch {
-         $itk_component(results) config -title "Querying..."
-         $itk_component(results) clear
+         $itk_component(results$current_) config -title "Querying... $name"
+         $itk_component(results$current_) clear
       }
 
       set_state disabled
-      $itk_component(progressbar) config -text "Querying..."
+      $itk_component(progressbar) config -text "Querying... $url"
       $itk_component(progressbar) look_busy
 
-      $query_component_ query
+      $query_component_ query $url
+   }
+
+   #  Add a GaiaQueryResult to the notebook.
+   protected method add_query_result_ {title} {
+
+      #  Create a new page and make it current.
+      $itk_component(notebook) add -label $title
+      set site [$itk_component(notebook) childsite $title]
+      set current_ $npages_
+      incr npages_
+
+      if { ![ info exists $w_.cat$current_] } {
+         astrocat $w_.cat$current_
+      }
+
+      itk_component add results$current_ {
+         GaiaQueryResult $site.results \
+            -astrocat [code $w_.cat$current_] \
+            -title "Query Results" \
+            -hscroll 1 \
+            -height 12 \
+            -sortcommand [code $this set_sort_cols] \
+            -layoutcommand [code $this set_show_cols] \
+            -selectmode extended \
+            -exportselection 0
+      } {
+      }
+      pack $itk_component(results$current_) -side top -fill both -expand 1
+      add_short_help $itk_component(results$current_) \
+         {Results of query to repository}
+
+      #  Double click is same as "Open".
+      bind $itk_component(results$current_).listbox <Double-1> \
+         [code $this open]
+
+      #  Add to "Query Results:" menu.
+      $itk_component(bookmenu) add \
+         -command [code $this view_page_ $current_] \
+         -label $title \
+         -value $current_
    }
 
    #  Respond to feedback about query progress (stop and start).
@@ -449,12 +442,13 @@ itcl::class gaiavo::GaiaVOCat {
 
    #  Add the component that will control the query parameters.
    protected method add_query_component_ {} {
-      puts stderr "Must implement an add_query_component_ method"
+      puts stderr "you must implement an add_query_component_ method"
    }
 
-   #  Open a service, "args" is a list of values from a row of the current table.
+   #  Open a service, "args" is a list of values from a row of the
+   #  current table.
    protected method open_service_ {args} {
-      puts stderr "Must implemenent an open_service_ method"
+      puts stderr "you must implemenent an open_service_ method"
    }
 
    #  Check for a file ~/.skycat/proxies, once each session, and use it to
@@ -476,13 +470,6 @@ itcl::class gaiavo::GaiaVOCat {
    #  Configuration options: (public variables)
    #  ----------------------
 
-   #  Name of catalogue.
-   itk_option define -catalog catalog Catalog {}
-
-   #  Name of catalogue directory, or a tcl list forming the path to it (empty
-   #  means root).
-   itk_option define -catalogdir catalogDir CatalogDir {}
-
    #  Columns to show. Defined once during initialisation.
    itk_option define -show_cols show_cols Show_Cols {}
 
@@ -500,9 +487,19 @@ itcl::class gaiavo::GaiaVOCat {
    #  Result from most recent query (list of rows).
    protected variable info_ {}
 
-   #  Component that will perform the query. Must be defined in add_query_component_.
+   #  Component that will perform the query. 
+   #  Must be defined in add_query_component_.
    protected variable query_component_ {}
 
+   #  Number of pages in notebook.
+   protected variable npages_ 0
+
+   #  Current page of notebook.
+   protected variable current_ 0
+
+   #  Names of pages for error dialogs etc.
+   protected variable names_
+   
    #  Common variables: (shared by all instances)
    #  -----------------
 

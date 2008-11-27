@@ -751,7 +751,7 @@ itcl::class gaia::Gaia {
       set index [$m index "Reload config file..."]
       insert_menuitem $m $index command "Query VO image servers..." \
          {Find VO image servers and query for images} \
-         -command [code $this vo_find_siap_ $m $index]
+         -command [code $this vo_siap_query_ $m $index]
    }
 
    #  Add a menubutton with the GAIA options.
@@ -2357,34 +2357,24 @@ window gives you access to this."
    #  VO support
    #  ----------
 
-   #  Find SIAP VO servers and query for images.
-   protected method vo_find_siap_ {m index} {
+   #  Open a dialog for querying SIAP services for any images.
+   protected method vo_siap_query_ {m index} {
       if { [gaia::GaiaVOTableAccess::check_for_gaiavo] } {
-         utilReUseWidget gaiavo::GaiaVOCatRegistry $w_.voregistry \
-            -service SIAP \
-            -show_cols {shortName title} \
-            -activate_cmd [code $this vo_query_siap_]
+
+         #  Find and open the current list of servers.
+         set siap_file [utilGetConfigFilename .skycat GaiaSIAPServers.vot]
+         if { ! [::file exists $siap_file] } {
+            #  Use builtin defaults.
+            ::file copy -force $::gaiavo_library/GaiaSIAPServers.vot $siap_file
+         }
+
+         #  Open dialog.
+         utilReUseWidget gaiavo::GaiaVOCatsSIAP $w_.siapquery \
+            -siap_catalog $siap_file -gaia [scope $this] -title "SIAP services"
+
       } else {
          #  Grey out menu, no GaiaVO.
          $m entryconfigure $index -state disabled
-      }
-   }
-
-   #  Open a dialog for querying a SIAP server.
-   protected method vo_query_siap_ {headers row} {
-      if { [gaia::GaiaVOTableAccess::check_for_gaiavo] } {
-
-         #  See if the given headers and row data specify a SIAP
-         #  server. Need a accessURL field for that.
-         set accessURL [gaiavo::GaiaVOCatSIAP::getAccessURL $headers $row]
-         if { $accessURL != {} } {
-            set name [gaiavo::GaiaVOCatSIAP::getName $headers $row]
-            gaiavo::GaiaVOCatSIAP $w_.siapquery\#auto \
-               -accessURL $accessURL -shortname $name -gaia $this \
-               -title "$name SIAP service"
-         } else {
-            warning_dialog "SIAP service does not specify an accessURL" $w_
-         }
       }
    }
 
