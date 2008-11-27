@@ -95,6 +95,9 @@
 *        Pass in smfArray of darks.
 *     2008-11-24 (TIMJ):
 *        Pass in smfArray of bad pixel masks.
+*     2008-11-26 (TIMJ):
+*        - Factor out dark subtraction code into smf_apply_dark
+*        - Call smf_apply_mask
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -254,40 +257,11 @@ void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
       }
     }
 
-    if (darks) {
-      size_t dark1;
-      size_t dark2;
-      smfData * dkdata1 = NULL;
-      smfData * dkdata2 = NULL;
+    /* Apply any bad pixel mask */
+    smf_apply_mask( data, bpms, status );
 
-      /* work out which darks are suitable */
-      smf_choose_darks( darks, *ffdata, &dark1, &dark2, status );
-
-      /* and correct for dark */
-      if (dark1 != SMF__BADIDX) dkdata1 = darks->sdata[dark1];
-      if (dark2 != SMF__BADIDX) dkdata2 = darks->sdata[dark2];
-      if (dkdata1 || dkdata2) {
-        msgSetc("FILE", file->name);
-        if (dkdata1) {
-          msgSetc("PRIOR", "yes");
-        } else {
-          msgSetc("PRIOR", "no");
-        }
-        if (dkdata2) {
-          msgSetc("POST", "yes");
-        } else {
-          msgSetc("POST", "no");
-        }
-        msgOutif(MSG__VERB," ", "Dark subtracting ^FILE."
-                 " Prior dark: ^PRIOR  Following dark: ^POST", status);
-        smf_subtract_dark( data, dkdata1, dkdata2, SMF__DKSUB_CHOOSE, status );
-      } else {
-        msgSetc( "FILE", file->name );
-        msgOutif(MSG__QUIET, " ",
-                 "Warning: File ^FILE has no suitable dark frame",
-                 status);
-      }
-    }
+    /* Handle darks */
+    smf_apply_dark( data, darks, status );
 
     /* Flatfield the data */
     smf_flatfield( data, ffdata, flags, status );
