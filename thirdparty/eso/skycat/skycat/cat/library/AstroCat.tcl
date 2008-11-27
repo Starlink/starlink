@@ -1362,7 +1362,6 @@ itcl::class cat::AstroCat {
        if {[llength $catalog_list]} {
           foreach i $catalog_list {
              set name [$astrocat_ longname $i]
-             puts "name = $name ($astrocat_)"
              $astrocat_ entry remove $name
           }
           cat::CatalogInfo::save "" "" 0
