@@ -13,7 +13,7 @@
 *     Library routine
 
 *  Invocation:
-*     smf_filter_execute( smfData *data, double srate, int *status )
+*     smf_filter_execute( smfData *data, smfFilter *filt, int *status )
 
 *  Arguments:
 *     data = smfData * (Given and Returned)
@@ -79,6 +79,9 @@
 *-
 */
 
+/* System includes */
+#include <pthread.h>
+
 /* Starlink includes */
 #include "mers.h"
 #include "ndf.h"
@@ -89,7 +92,13 @@
 #include "fftw3.h"
 
 /* SMURF includes */
+#include "libsmf/smf_typ.h"
 #include "libsmf/smf.h"
+
+/* Module variables  */
+/* ----------------- */
+pthread_mutex_t plan_mutex = PTHREAD_MUTEX_INITIALIZER;
+/* ----------------- */
 
 #define FUNC_NAME "smf_filter_execute"
 
@@ -116,12 +125,12 @@ void smf_filter_execute( smfData *data, smfFilter *filt, int *status ) {
   /* Check for NULL pointers */
   if( !data ) {
     *status = SAI__ERROR;
-    errRep( FUNC_NAME, "NULL smfData pointer", status );
+    errRep( "", FUNC_NAME ": NULL smfData pointer", status );
   }
 
   if( !filt ) {
     *status = SAI__ERROR;
-    errRep( FUNC_NAME, "NULL smfFilter pointer", status );
+    errRep( "", FUNC_NAME ": NULL smfFilter pointer", status );
   }
 
   /* Ensure that the smfData is ordered correctly (bolo ordered) */
@@ -143,7 +152,7 @@ void smf_filter_execute( smfData *data, smfFilter *filt, int *status ) {
       /* Can't handle other dimensions */
       *status = SAI__ERROR;
       msgSeti("NDIMS",data->ndims);
-      errRep(FUNC_NAME, "Can't handle ^NDIMS dimensions.", status);
+      errRep( "", FUNC_NAME ": Can't handle ^NDIMS dimensions.", status);
     }
 
     /* Check that the filter dimensions are appropriate for the data */
@@ -151,8 +160,8 @@ void smf_filter_execute( smfData *data, smfFilter *filt, int *status ) {
       *status = SAI__ERROR;
       msgSeti("DATALEN",ntslice);
       msgSeti("FILTLEN",filt->ntslice);
-      errRep(FUNC_NAME, 
-             "Filter for length ^FILTLEN doesn't match data length ^FILTLEN",
+      errRep( "", FUNC_NAME 
+             ": Filter for length ^FILTLEN doesn't match data length ^FILTLEN",
              status);
     }
   }
@@ -171,30 +180,35 @@ void smf_filter_execute( smfData *data, smfFilter *filt, int *status ) {
   iodim.is = 1;
   iodim.os = 1;
 
-  /* Setup forward FFT plan using guru interface */
+  /* Setup forward FFT plan using guru interface. Requires protection
+   with a mutex */
+  smf_mutex_lock( &plan_mutex, status );
   plan_forward = fftw_plan_guru_split_dft_r2c( 1, &iodim, 0, NULL,
                                                data->pntr[0], data_fft_r, 
                                                data_fft_i, 
                                                FFTW_ESTIMATE | 
-                                               FFTW_UNALIGNED);
-  
+                                               FFTW_UNALIGNED );
+  smf_mutex_unlock( &plan_mutex, status );
+
   if( !plan_forward ) {
     *status = SAI__ERROR;
-    errRep(FUNC_NAME, 
-           "FFTW3 could not create plan for forward transformation",
+    errRep( "", FUNC_NAME 
+           ": FFTW3 could not create plan for forward transformation",
            status);
   }
 
   /* Setup inverse FFT plan using guru interface */
+  smf_mutex_lock( &plan_mutex, status );
   plan_inverse = fftw_plan_guru_split_dft_c2r( 1, &iodim, 0, NULL,
                                                data_fft_r, data_fft_i, 
                                                data->pntr[0], FFTW_ESTIMATE | 
                                                FFTW_UNALIGNED);
-  
+  smf_mutex_unlock( &plan_mutex, status );
+
   if( !plan_inverse ) {
     *status = SAI__ERROR;
-    errRep(FUNC_NAME, 
-           "FFTW3 could not create plan for inverse transformation",
+    errRep( "", FUNC_NAME 
+           ": FFTW3 could not create plan for inverse transformation",
            status);
   }
    
