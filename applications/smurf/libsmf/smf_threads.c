@@ -519,6 +519,11 @@ int smf_job_wait( smfWorkForce *workforce, int *status ) {
 *     Note, only jobs which had the SMF__REPORT_JOB flag set when calling
 *     smf_add_job are included in the list of returned jobs.
 
+*  Returned Value:
+*     The integer identifier for the completed job. This can be compared
+*     with the job identifiers returned by smf_add_job to determine which
+*     job has finished.
+
 *  Notes:
 *     - This function attempts to execute even if an error has already
 *     occurred.
