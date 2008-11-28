@@ -95,13 +95,13 @@ void smf_filter_ident( smfFilter *filt, int complex, int *status ) {
 
   if( !filt ) {
     *status = SAI__ERROR;
-    errRep( FUNC_NAME, "NULL smfFilter supplied.", status );
+    errRep("",  FUNC_NAME ": NULL smfFilter supplied.", status );
     return;
   }
 
   if( !filt->ntslice ) {
     *status = SAI__ERROR;
-    errRep( FUNC_NAME, "0-length smfFilter supplied.", status );
+    errRep( "", FUNC_NAME ": 0-length smfFilter supplied.", status );
     return;
   }
 
