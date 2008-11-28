@@ -108,6 +108,23 @@ itcl::class gaia::GaiaQueryResult {
       }
    }
 
+   #  Save the currently selected rows the local catalog file
+   public method save_selected {} {
+      set file [$astrocat url]
+      set info [get_selected]
+
+      if {[llength $info] == 0} {
+         error_dialog "No rows are selected" $w_
+         return;
+      }
+
+      if {! [confirm_dialog "Save selected rows?" $w_]} {
+         return
+      }
+
+      save_to_file $file $info $headings_ 0
+   }
+
    #  This method is called with the data for a new object to add to a
    #  local catalog. The row is added to the local catalog file and the
    #  command is evaluated.
