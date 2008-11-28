@@ -11,6 +11,8 @@
  * Allan Brighton  26 Sep 95  Created
  * pbiereic        26/08/99   Changed Cat_Init()
  * Peter W. Draper 17/09/08   Added VO support meta-data access.
+ *                 28/11/08   Change removeQueryResult to use the id_col
+ *                            value rather than 0.
  */
 static const char* const rcsId="@(#) $Id: TclAstroCat.C,v 1.3 2006/03/26 13:22:33 abrighto Exp $";
 
@@ -513,11 +515,14 @@ int TclAstroCat::removeQueryResult(const char* filename, int numCols, char** col
     // create a QueryResult object from the headings and data and
     // remove rows matching it from the file
     QueryResult r;
-    if (cat_)
+    int id_col = 0;
+    if (cat_) {
 	r.entry(cat_->entry());
+        id_col = cat_->entry()->id_col();
+    }
     if (getQueryResult(numCols, colNames, info, equinoxStr, r) != TCL_OK)
 	return TCL_ERROR;
-    return r.remove(filename, 0);
+    return r.remove(filename, id_col);
 }
 
 
