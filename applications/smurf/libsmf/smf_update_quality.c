@@ -126,7 +126,7 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
     } else {
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "smfData does not contain a QUALITY component", 
-	      status);
+              status);
       return;
     }
   }
@@ -143,14 +143,14 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
     *status = SAI__ERROR;
     msgSeti("NDIMS",data->ndims);
     errRep(FUNC_NAME, 
-	   "Don't know how to handle ^NDIMS dimensions, should be 3.", status);
+           "Don't know how to handle ^NDIMS dimensions, should be 3.", status);
     return;
   }
 
   if( data->dtype !=  SMF__DOUBLE) {
     *status = SAI__ERROR;
     errRep(FUNC_NAME, 
-	   "Data is not double-precision", status);
+           "Data is not double-precision", status);
     return;
   }
 
@@ -158,7 +158,7 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
   if( (badfrac < 0) || (badfrac > 1) ) {
     msgSeti( "BADFRAC", badfrac );
     errRep(FUNC_NAME, 
-	   "Invalid badfrac: ^BADFRAC. Must be in range (0 -- 1).", status);
+           "Invalid badfrac: ^BADFRAC. Must be in range (0 -- 1).", status);
   }
 
   /* Calculate data dimensions */
@@ -178,8 +178,8 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
     /* Synchronize SMF__Q_BADS quality and VAL__BADD in data array */
     if( syncbad ) {
       for( i=0; i<ndata; i++ ) {    /* Loop over all samples */
-	qual[i] |= 
-	  (SMF__Q_BADS & (((double *)data->pntr[0])[i] == VAL__BADD) );
+        qual[i] |= 
+          (SMF__Q_BADS & (((double *)data->pntr[0])[i] == VAL__BADD) );
       }
     }
     
@@ -189,34 +189,34 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
       /* Loop over detector */
       for( i=0; i<nbolo; i++ ) {
 
-	/* Update badmask if badfrac specified */
-	if( badfrac && !badm[i] ) {
-	  nbad = 0;
+        /* Update badmask if badfrac specified */
+        if( badfrac && !badm[i] ) {
+          nbad = 0;
 
-	  /* Loop over samples and count the number with SMF__Q_BADS set */
-	  for( j=0; j<ntslice; j++ ) {
-	    if( data->isTordered ) {
-	      if( qual[nbolo*j + i] & SMF__Q_BADS ) nbad ++;
-	    } else {
-	      if( qual[j + i*ntslice] & SMF__Q_BADS ) nbad ++;
-	    }
-	  }
+          /* Loop over samples and count the number with SMF__Q_BADS set */
+          for( j=0; j<ntslice; j++ ) {
+            if( data->isTordered ) {
+              if( qual[nbolo*j + i] & SMF__Q_BADS ) nbad ++;
+            } else {
+              if( qual[j + i*ntslice] & SMF__Q_BADS ) nbad ++;
+            }
+          }
 
-	  if( ((double) nbad / (double) ntslice) > badfrac ) {
-	    badm[i] = 1;
-	  }
-	}
+          if( ((double) nbad / (double) ntslice) > badfrac ) {
+            badm[i] = 1;
+          }
+        }
 
-	/* Now apply the badmask */
-	if( badm[i] ) {
-	  for( j=0; j<ntslice; j++ ) {
-	    if( data->isTordered ) {
-	      qual[nbolo*j + i] |= SMF__Q_BADB;
-	    } else {
-	      qual[j + i*ntslice] |= SMF__Q_BADB;
-	    }
-	  }
-	}
+        /* Now apply the badmask */
+        if( badm[i] ) {
+          for( j=0; j<ntslice; j++ ) {
+            if( data->isTordered ) {
+              qual[nbolo*j + i] |= SMF__Q_BADB;
+            } else {
+              qual[j + i*ntslice] |= SMF__Q_BADB;
+            }
+          }
+        }
       }
     }
   }
