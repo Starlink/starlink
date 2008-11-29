@@ -250,6 +250,8 @@
 *     14-JUN-2008 (TIMJ):
 *        - Calculate merged output fits header from inputs
 *        - Write WCS to TIMES and WEIGHTS extensions.
+*     28-NOV-2008 (TIMJ):
+*        Initialise OUTWCS such that CALCSKY works properly.
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
@@ -848,6 +850,7 @@ c
       ISNEWPV = .FALSE.
       ISNEWPR = .FALSE.
       ISNEWPC = .FALSE.
+      OUTWCS = AST__NULL
 
       CALL AST_BEGIN( STATUS )
 
