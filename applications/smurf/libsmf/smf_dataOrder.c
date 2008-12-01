@@ -39,9 +39,11 @@
 *     it simply returns. If the smfData was memory mapped then the
 *     routine changes the data order in-place (slightly
 *     slower). Otherwise a new buffer is allocated with the re-ordered
-*     data, and the old buffer is free'd. If flags set to SMF__NOCREATE_FILE
-*     and a file is associated with the data, don't write anything 
-*     (workaround for cases where it was opened read-only).
+*     data, and the old buffer is free'd. If flags set to
+*     SMF__NOCREATE_FILE and a file is associated with the data, don't
+*     write anything (workaround for cases where it was opened
+*     read-only). The pointing LUT will only be re-ordered if it is
+*     already open (e.g. from a previous call to smf_open_mapcoord).
 
 *
 *  Authors:
@@ -73,6 +75,7 @@
 *     bolo-ordered data produced with this routine.
 
 *  Copyright:
+*     Copyright (C) 2005-2008 University of British Columbia.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -141,14 +144,14 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
   if( (isTordered != 0) && (isTordered != 1) ) {
     *status = SAI__ERROR;
     msgSeti("ISTORDERED",isTordered);
-    errRep(FUNC_NAME, "Invalid isTordered (0/1): ^ISTORDERED", status);
+    errRep( "", FUNC_NAME ": Invalid isTordered (0/1): ^ISTORDERED", status);
     return;
   }
 
   /* Check for a valid data */
   if( !data ) {
     *status = SAI__ERROR;
-    errRep(FUNC_NAME, "NULL data supplied", status);
+    errRep( "", FUNC_NAME ": NULL data supplied", status);
     return;
   }
 
@@ -159,8 +162,9 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
   if( data->ndims != 3 ) {
     *status = SMF__WDIM;
     msgSeti("NDIMS",data->ndims);
-    errRep(FUNC_NAME, 
-           "Don't know how to handle ^NDIMS dimensions, should be 3.", status);
+    errRep( "", FUNC_NAME 
+           ": Don't know how to handle ^NDIMS dimensions, should be 3.", 
+            status);
     return;
   }
 
@@ -260,7 +264,8 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
           default:
             msgSetc("DTYPE",smf_dtype_string(data, status));
             *status = SAI__ERROR;
-            errRep(FUNC_NAME, "Don't know how to handle ^DTYPE type.", status);
+            errRep( "", FUNC_NAME 
+                    ": Don't know how to handle ^DTYPE type.", status);
           }
 
         } else {          /* Converting time ordered -> bolo ordered */
@@ -316,7 +321,8 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
           default:
             msgSetc("DTYPE",smf_dtype_string(data, status));
             *status = SAI__ERROR;
-            errRep(FUNC_NAME, "Don't know how to handle ^DTYPE type.", status);
+            errRep( "", FUNC_NAME 
+                    ": Don't know how to handle ^DTYPE type.", status);
           }
         }
 
@@ -347,22 +353,8 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
     }
   }
 
-  /* Check for the existence of a pointing LUT in the MAPCOORD extension */
+  /* If there is a LUT re-order it here */
   oldlut = data->lut;
-  if( oldlut == NULL ) { 
-    /* If there is a MAPCOORD xtension it's not open. Try opening here. */
-    smf_open_mapcoord( data, "UPDATE", status );
-    
-    if( *status == SAI__OK ) {
-      /* Good status so the LUT is now mapped */
-      oldlut = data->lut;
-    } else if( *status == SMF__NOLUT ) {
-      /* There is no extension to map. Annul the error and continue. */
-      errAnnul( status );
-    }
-  }
-
-  /* If there is a mapped LUT re-order it here */
   if( oldlut ) {
 
     newlut = smf_malloc( ndata, sizeof(*newlut), 0, status );
