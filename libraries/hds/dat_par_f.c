@@ -132,7 +132,7 @@
 \n\
 *  Root locator value.\n\
       CHARACTER * ( DAT__SZLOC ) DAT__ROOT\n\
-      PARAMETER ( DAT__ROOT = \'%s\' )\n\
+      PARAMETER ( DAT__ROOT  = \'%s\' )\n\
 \n\
 *  Size of group name.\n\
       INTEGER DAT__SZGRP\n\
