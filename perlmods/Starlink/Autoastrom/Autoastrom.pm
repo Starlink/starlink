@@ -1697,19 +1697,19 @@ sub solve {
     $self->printstd( "--I Matching position lists...\n" ) if $self->starlink_output;
 
 # Perform the correlation.
-    my $corr = new Astro::Correlate( catalog1 => $filtered_querycat,
-                                     catalog2 => $filtered_ndfcat,
+    my $corr = new Astro::Correlate( catalog1 => $filtered_ndfcat,
+                                     catalog2 => $filtered_querycat,
                                      keeptemps => $self->keeptemps,
                                      messages => $self->messages,
                                      method => $self->match,
                                      temp => $self->temp,
                                      verbose => $self->verbose,
-                                     cat1magtype => 'mag',
-                                     cat2magtype => 'mag_iso',
+                                     cat1magtype => 'mag_iso',
+                                     cat2magtype => 'mag',
                                    );
     $filtered_querycat->calc_xy( $frameset );
 
-    ( my $corrquerycat, my $corrndfcat ) = $corr->correlate;
+    ( my $corrndfcat, my $corrquerycat ) = $corr->correlate;
 
 # And yes, croak if the correlation resulted in fewer than 2 matches.
     if( $corrndfcat->sizeof < 2 ) {
