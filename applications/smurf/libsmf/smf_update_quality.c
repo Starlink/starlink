@@ -66,6 +66,7 @@
 *        - input mask is now const and also an int array
 *        - sense of badness for mask has changed. BAD now means bad rather
 *          than non-zero.
+*        - remove requirement for DOUBLE
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -174,9 +175,24 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
     
     /* Synchronize SMF__Q_BADS quality and VAL__BADD in data array */
     if( syncbad ) {
-      for( i=0; i<ndata; i++ ) {    /* Loop over all samples */
-        qual[i] |= 
-          (SMF__Q_BADS & (((double *)data->pntr[0])[i] == VAL__BADD) );
+      if (data->dtype == SMF__DOUBLE) {
+        for( i=0; i<ndata; i++ ) {    /* Loop over all samples */
+          if (((double *)data->pntr[0])[i] == VAL__BADD) {
+            qual[i] |= SMF__Q_BADS;
+          }
+        }
+      } else if (data->dtype == SMF__INTEGER) {
+        for( i=0; i<ndata; i++ ) {    /* Loop over all samples */
+          if (((int *)data->pntr[0])[i] == VAL__BADI) {
+            qual[i] |= SMF__Q_BADS;
+          }
+        }
+      } else {
+        msgSetc( "TYP", smf_dtype_string( data, status ));
+        *status = SAI__ERROR;
+        errRep( "",FUNC_NAME " data is of unsupported type (^TYP)",
+                status);
+        return;
       }
     }
     
