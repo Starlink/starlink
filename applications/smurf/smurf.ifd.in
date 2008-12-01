@@ -2386,7 +2386,7 @@ package @PACKAGE@ {
                 type _INTEGER
                 vpath  {DEFAULT}
                 prompt {Number of threads to use}
-                default 1
+                default 2
                 helpkey *
             }
 
@@ -2402,7 +2402,7 @@ package @PACKAGE@ {
                 type _INTEGER
                 vpath  {DEFAULT}
                 prompt {Number of time chunks}
-                default 1
+                default 2
                 helpkey *
             }
 
@@ -2411,7 +2411,7 @@ package @PACKAGE@ {
                 type _INTEGER
                 vpath  {DEFAULT}
                 prompt {Number of subarrays}
-                default 1
+                default 4
                 helpkey *
             }
 
