@@ -13,7 +13,8 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs, int *status );
+*     smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs, 
+*                          int *status );
 
 *  Arguments:
 *     mode = const char* (Given)
@@ -110,7 +111,8 @@ static int smf_get_fixbit ( int myqual, int *status ) {
   if ( myqual < 1 || myqual > 128 ) {
     msgSeti("M",myqual);
     *status = SAI__ERROR;
-    errRep("", "Integer out of range, ^M - must be 2**N where N is in the range (0,7). Possible programming error?", status);
+    errRep("", "Integer out of range, ^M - must be 2**N where N is in the range"
+           " (0,7). Possible programming error?", status);
     return -1;
   } else {
     while ( myqual >> mybit) {
@@ -122,7 +124,8 @@ static int smf_get_fixbit ( int myqual, int *status ) {
 
 #define FUNC_NAME "smf_create_qualname"
 
-void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs, int *status ) {
+void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs, 
+                          int *status ) {
 
   int fixbit;                /* Value of bit to be fixed in named quality */
   int fixed;                 /* Flag to denote whether quality bit is fixed */
@@ -135,7 +138,8 @@ void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs, int *stat
   /* Check for access mode */
   if (strncmp(mode,"READ",4) == 0 ) {
     msgOutif(MSG__DEBUG, "", 
-	     "Input file is read-only - unable to create quality names extension",
+	     "Input file is read-only - unable to create quality names "
+             "extension",
 	     status);
     return;
   }
@@ -155,13 +159,13 @@ void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs, int *stat
   irqAddqn( *qlocs, "BADSAM", 0, 
 	    "Set iff a bolometer is flagged by the DA", status );
   irqAddqn( *qlocs, "BADBOL", 0, 
-	    "Set iff all data from a bolometer is to be ignored", 
+	    "Set iff all data from a bolometer are to be ignored", 
 	    status );
   irqAddqn( *qlocs, "SPIKE", 0, "Set iff a spike is detected", 
 	    status );
   irqAddqn( *qlocs, "DCJUMP", 0, "Set iff a DC jump is present", 
 	    status );
-  irqAddqn( *qlocs, "PAD", 0, "Set iff data is padding", 
+  irqAddqn( *qlocs, "PAD", 0, "Set iff data are padding", 
 	    status );
 
   /* Now fix the bits to the desired values */
