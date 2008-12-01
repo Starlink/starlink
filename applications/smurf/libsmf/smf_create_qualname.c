@@ -157,15 +157,17 @@ void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs,
   /* Add SMURF quality names */
   msgOutif(MSG__DEBUG, "", "Adding SMURF quality names", status);
   irqAddqn( *qlocs, "BADSAM", 0, 
-	    "Set iff a bolometer is flagged by the DA", status );
+	    "Set iff a sample is flagged by the DA", status );
   irqAddqn( *qlocs, "BADBOL", 0, 
-	    "Set iff all data from a bolometer are to be ignored", 
+	    "Set iff all data from bolo to be ignored", 
 	    status );
   irqAddqn( *qlocs, "SPIKE", 0, "Set iff a spike is detected", 
 	    status );
   irqAddqn( *qlocs, "DCJUMP", 0, "Set iff a DC jump is present", 
 	    status );
   irqAddqn( *qlocs, "PAD", 0, "Set iff data are padding", 
+	    status );
+  irqAddqn( *qlocs, "APOD", 0, "Set iff data are apodized/boundary", 
 	    status );
 
   /* Now fix the bits to the desired values */
@@ -179,6 +181,8 @@ void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs,
   irqFxbit( *qlocs, "DCJUMP", fixbit, &fixed, status );
   fixbit = smf_get_fixbit(SMF__Q_PAD, status);
   irqFxbit( *qlocs, "PAD", fixbit, &fixed, status );
+  fixbit = smf_get_fixbit(SMF__Q_APOD, status);
+  irqFxbit( *qlocs, "APOD", fixbit, &fixed, status );
 
   /* Set names to read only */
   irqRwqn( *qlocs, "BADSAM", 1, 1, &value, status );
@@ -186,6 +190,7 @@ void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs,
   irqRwqn( *qlocs, "SPIKE",  1, 1, &value, status );
   irqRwqn( *qlocs, "DCJUMP", 1, 1, &value, status );
   irqRwqn( *qlocs, "PAD", 1, 1, &value, status );
+  irqRwqn( *qlocs, "APOD", 1, 1, &value, status );
 
   if ( smurfloc ) datAnnul( &smurfloc, status);
 

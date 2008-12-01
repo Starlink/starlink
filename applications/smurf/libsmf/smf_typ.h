@@ -286,6 +286,7 @@ static const size_t SMF__BADIDX = (size_t)-1;
 #define SMF__Q_SPIKE 4    /* Location of a spike */ 
 #define SMF__Q_JUMP 8     /* Location of a DC jump */
 #define SMF__Q_PAD 16     /* Padded data */
+#define SMF__Q_APOD 32    /* Apodized/boundary data */
 
 /* Flags for smf_open_newfile
    Must be individual bits in a single integer
