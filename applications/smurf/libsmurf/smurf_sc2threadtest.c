@@ -36,7 +36,7 @@
 *        Initial version -- copy thread infrastructure from makemap
 
 *  Copyright:
-*     Council. Copyright (C) 2005-2008 University of British Columbia.
+*     Copyright (C) 2005-2008 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
