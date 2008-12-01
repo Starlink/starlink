@@ -916,8 +916,8 @@ void smf_resampcube_ast( smfData *data, dim_t nchan,
                          float *out_data, int *status );
 
 void smf_update_quality( smfData *data, unsigned char *target, int syncbad, 
-			 unsigned char *badmask, double badfrac,
-			 int *status );
+                         const int *badmask, double badfrac,
+                         int *status );
 void smf_correct_steps( smfData *data, unsigned char *quality,
                         double dcthresh, dim_t dcbox, int flagbolo, 
                         int *status );

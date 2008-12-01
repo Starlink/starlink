@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     smf_update_quality( smfData *data, unsigned char *target, int syncbad,
-*                         unsigned char *badmask, double badfrac,
+*                         const int *badmask, double badfrac,
 *                         int *status );
 
 *  Arguments:
@@ -25,13 +25,12 @@
 *        If defined update this buffer instead of the QUALITY in data
 *     syncbad = int (Given)
 *        If set synchronize SMF__Q_BADS quality flag with VAL__BADD in data
-*     badmask = unsigned char* (Given and Returned)
-*        If given, points to byte array with same dimensions as bolometers.
-*        Each position that is non-zero will set SMF__Q_BAD for all data
-*        for that detector. 
+*     badmask = const int* (Given)
+*        Integer array with same dimensions as bolometers.
+*        Each position that is bad will set SMF__Q_BAD for all data
+*        for that detector. Can be NULL.
 *     badfrac = double (Given)
 *        If nonzero, fraction of samples for entire bolo to be flagged as bad.
-*        If badmask specified, it is updated.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -49,7 +48,8 @@
 *  Notes:
 
 *  Authors:
-*     Ed Chapin (UBC)
+*     EC: Ed Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -59,6 +59,13 @@
 *        Added target to interface
 *     2008-03-25 (EC):
 *        Added syncbad to interface
+*     2008-12-01 (TIMJ):
+*        - rewrite masking loop to use less code, especially in tordered
+*          vs bolordered switching.
+*        - no longer malloc a local mask array
+*        - input mask is now const and also an int array
+*        - sense of badness for mask has changed. BAD now means bad rather
+*          than non-zero.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -103,10 +110,9 @@
 #define FUNC_NAME "smf_update_quality"
 
 void smf_update_quality( smfData *data, unsigned char *target, int syncbad, 
-			 unsigned char *badmask, double badfrac, 
+			 const int *badmask, double badfrac, 
 			 int *status ) {
 
-  unsigned char *badm=NULL;     /* The bad bolo mask */
   dim_t i;                      /* loop counter */
   dim_t j;                      /* loop counter */
   dim_t nbolo;                  /* Number of bolometers */
@@ -164,15 +170,6 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
   /* Calculate data dimensions */
   smf_get_dims( data, &nbolo, &ntslice, &ndata, status );
 
-  /* Check for input badmask */
-  if( badmask ) {
-    badm = badmask;
-  } else if( badfrac ) {
-    /* Allocate a badm buffer if using fractional threshold and an external
-       badmask was not specified */
-    badm = smf_malloc( nbolo, sizeof(*badm), 1, status );
-  }
-
   if( *status == SAI__OK ) {
     
     /* Synchronize SMF__Q_BADS quality and VAL__BADD in data array */
@@ -184,46 +181,58 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
     }
     
     /* Apply badmask if available */
-    if( badm ) {
+    if( badmask || badfrac ) {
+
+      /* calculate the badfraction threshold in terms of number of bad
+         found so that we do not have to continually divide to calculate
+         the current fraction */
+      dim_t badthresh = ntslice;
+      /* special case 0 */
+      if (badfrac) badthresh = badfrac * (double)ntslice;
+
 
       /* Loop over detector */
       for( i=0; i<nbolo; i++ ) {
+        dim_t c;  /* constant offset */
+        dim_t m;  /* "stride" in y = mx+c */
+        int isbad = 0;
+
+        /* calculate the isTordered vs non-Tordered offseting */
+        if (data->isTordered) {
+          c = i;
+          m = nbolo;
+        } else {
+          c = i * ntslice;
+          m = 1;
+        }
+
+        /* preset bad flag based on mask (if defined) */
+        if (badmask && badmask[i] == VAL__BADI) {
+          isbad = 1;
+        }
 
         /* Update badmask if badfrac specified */
-        if( badfrac && !badm[i] ) {
+        if( badfrac && !isbad ) {
           nbad = 0;
 
           /* Loop over samples and count the number with SMF__Q_BADS set */
           for( j=0; j<ntslice; j++ ) {
-            if( data->isTordered ) {
-              if( qual[nbolo*j + i] & SMF__Q_BADS ) nbad ++;
-            } else {
-              if( qual[j + i*ntslice] & SMF__Q_BADS ) nbad ++;
-            }
+            if( qual[m*j + c] & SMF__Q_BADS ) nbad ++;
           }
 
-          if( ((double) nbad / (double) ntslice) > badfrac ) {
-            badm[i] = 1;
+          if( nbad > badthresh ) {
+            isbad = 1;
           }
         }
 
         /* Now apply the badmask */
-        if( badm[i] ) {
+        if( isbad ) {
           for( j=0; j<ntslice; j++ ) {
-            if( data->isTordered ) {
-              qual[nbolo*j + i] |= SMF__Q_BADB;
-            } else {
-              qual[j + i*ntslice] |= SMF__Q_BADB;
-            }
+            qual[m*j + c] |= SMF__Q_BADB;
           }
         }
       }
     }
-  }
-
-  /* Free badm if local */
-  if( badm && !badmask ) {
-    badm = smf_free( badm, status );
   }
 
 }
