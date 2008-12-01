@@ -48,7 +48,7 @@
 *     status is set to SMF__NOLUT
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2008 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -88,11 +88,6 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
 
-/* Module variables  */
-/* ----------------- */
-pthread_mutex_t f_mutex = PTHREAD_MUTEX_INITIALIZER;
-/* ----------------- */
-
 #define FUNC_NAME "smf_open_mapcoord"
 
 void smf_open_mapcoord( smfData *data, const char *mode, int *status ) {
@@ -110,9 +105,7 @@ void smf_open_mapcoord( smfData *data, const char *mode, int *status ) {
   /* Check for existence of extension */
   if( (*status==SAI__OK) && data->file ) {
     if( data->file->ndfid != NDF__NOID ) {
-      smf_mutex_lock( &f_mutex, status );
       ndfXstat( data->file->mapcoordid, "MAPCOORD", &there, status );
-      smf_mutex_unlock( &f_mutex, status );
     }
   }
 
@@ -127,43 +120,35 @@ void smf_open_mapcoord( smfData *data, const char *mode, int *status ) {
     ubnd[0] = nbolo*(data->dims)[2]-1;
 
     /* Get HDS locator for the MAPCOORD extension  */
-    smf_mutex_lock( &f_mutex, status );
     mapcoordloc = smf_get_xloc( data, "MAPCOORD", "MAPCOORD_Calculations",
 				mode, 0, 0, status );
-    smf_mutex_unlock( &f_mutex, status );
 
     /* Get NDF identifier if not already opened */
     if( (data->file)->mapcoordid == NDF__NOID ) {
-      smf_mutex_lock( &f_mutex, status );
       (data->file)->mapcoordid = smf_get_ndfid( mapcoordloc, 
 						"LUT", mode, "UNKNOWN",
 						"_INTEGER", 1, lbnd, ubnd, 
 						status );
-      smf_mutex_unlock( &f_mutex, status );
     }
      
     if( data->lut == NULL ) {
-      smf_mutex_lock( &f_mutex, status );
       ndfMap( (data->file)->mapcoordid, "DATA", "_INTEGER", mode, mapptr, 
 	      &nmap, status );    
-      smf_mutex_unlock( &f_mutex, status );
 
       if( *status == SAI__OK ) {
 	data->lut = mapptr[0];
       } else {
-	errRep( FUNC_NAME, "Unable to map LUT in MAPCOORD extension",
+	errRep( "", FUNC_NAME ": Unable to map LUT in MAPCOORD extension",
 		status);
       }
     }
   
     /* Annul the HDS locator to the extension */
-    smf_mutex_lock( &f_mutex, status );
     datAnnul( &mapcoordloc , status );
-    smf_mutex_unlock( &f_mutex, status );
   } else {
     *status = SMF__NOLUT;
-    errRep( FUNC_NAME, 
-            "Couldn't get locator for MAPCOORD extension",
+    errRep( "", FUNC_NAME 
+            ": Couldn't get locator for MAPCOORD extension",
             status);
   }
 
