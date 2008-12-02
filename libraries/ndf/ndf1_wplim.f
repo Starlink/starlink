@@ -104,6 +104,8 @@
 *        Avoid compiler warnings.
 *     23-NOV-2007 (DSB):
 *        Correction to the 20-NOV-2007 fix.
+*     2-DEC-2008 (DSB):
+*        Avoid integer truncation when modifying pixel coordinate bounds.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -189,7 +191,7 @@
       LOGICAL ALLWCS
       LOGICAL MIXED
 
-C      integer kk
+       integer kk
 *.
 
 *  Check inherited global status.
@@ -378,12 +380,12 @@ C      integer kk
 
       END DO
 
-C      write(*,*) 'A:'
-C      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NAX)
-C      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NAX)
-C      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NAX)
-C      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NAX)
-C      write(*,*) '   '
+c      write(*,*) 'A:'
+c      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NAX)
+c      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NAX)
+c      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NAX)
+c      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NAX)
+c      write(*,*) '   '
 
 *  If any centre/values bounds were specified in which the centre is
 *  given as a pixel value and the width as a WCS value, then we need 
@@ -449,12 +451,12 @@ C      write(*,*) '   '
          END DO
       END IF
 
-C      write(*,*) 'B:'
-C      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NAX)
-C      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NAX)
-C      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NAX)
-C      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NAX)
-C      write(*,*) '   '
+c      write(*,*) 'B:'
+c      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NAX)
+c      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NAX)
+c      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NAX)
+c      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NAX)
+c      write(*,*) '   '
 
 *  If all bounds are now specified using pixel indices, then we can pass
 *  on to cut the required section from the NDF. If some bounds were
@@ -565,9 +567,13 @@ C      write(*,*) '   '
                            ISPIX1( I ) = .TRUE.
                            VALUE1( I ) = CENPIX( I )
    
-                           DELTA = DBLE( NINT( VALUE2( I ) )/2 )
-                           PLBND( I ) = VALUE1( I )  - 1.0D0 - DELTA
+                           DELTA = VALUE2( I )/2.0D0
+                           PLBND( I ) = VALUE1( I ) - DELTA
                            PUBND( I ) = PLBND( I ) + VALUE2( I )
+
+c                           DELTA = DBLE( NINT( VALUE2( I ) )/2 )
+c                           PLBND( I ) = VALUE1( I )  - 1.0D0 - DELTA
+c                           PUBND( I ) = PLBND( I ) + VALUE2( I )
 
                         ELSE IF( STATUS .EQ. SAI__OK ) THEN
                            STATUS = NDF__BNDIN
@@ -589,12 +595,12 @@ C      write(*,*) '   '
             END DO
          END IF
 
-C      write(*,*) 'D:'
-C      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NAX)
-C      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NAX)
-C      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NAX)
-C      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NAX)
-C      write(*,*) '   '
+c      write(*,*) 'D:'
+c      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NAX)
+c      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NAX)
+c      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NAX)
+c      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NAX)
+c      write(*,*) '   '
 
 *  If we still need to find the overlap of the WCS and PIXEL boxes, do it
 *  now.
@@ -684,12 +690,12 @@ C      write(*,*) '   '
                PBOX = AST_INTERVAL( PFRM, PLBND, PUBND, AST__NULL, ' ', 
      :                              STATUS )
 
-C      write(*,*) 'F:'
-C      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NAX)
-C      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NAX)
-C      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NAX)
-C      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NAX)
-C      write(*,*) '   '
+c      write(*,*) 'F:'
+c      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NAX)
+c      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NAX)
+c      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NAX)
+c      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NAX)
+c      write(*,*) '   '
 
 *  Now form a compound region that is the intersection of the two aboves
 *  Boxes (both now defined in the PIXEL Frame).
@@ -700,12 +706,12 @@ C      write(*,*) '   '
 *  PLBND/PUBND. 
                CALL AST_GETREGIONBOUNDS( CMPREG, PLBND, PUBND, STATUS )
 
-C      write(*,*) 'G:'
-C      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NAX)
-C      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NAX)
-C      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NAX)
-C      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NAX)
-C      write(*,*) '   '
+c      write(*,*) 'G:'
+c      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NAX)
+c      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NAX)
+c      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NAX)
+c      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NAX)
+c      write(*,*) '   '
 
 *  Report an error if the pixel and WCS boxes do not overlap.
                DO I = 1, NAX
@@ -720,6 +726,11 @@ C      write(*,*) '   '
             END IF
          END IF
       END IF
+
+c      write(*,*) 'H:'
+c      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NAX)
+c      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NAX)
+c      write(*,*) '   '
 
 *  Convert the pixel coordinate box to pixel indices.
       IF( STATUS .EQ. SAI__OK ) THEN
