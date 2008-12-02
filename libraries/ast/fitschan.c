@@ -141,10 +141,14 @@ c     - astPutCards: Stores a set of FITS header card in a FitsChan
 f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 c     - astRetainFits: Ensure current card is retained in a FitsChan
 f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
+c     - astTestFits: Test if a keyword has a defined value in a FitsChan
+f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -843,6 +847,11 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *     21-NOV-2008 (DSB):
 *        Do not remove keywords from read headers if they may be of
 *        relevance to things other than WCS (e.g. MJD-OBS, OBSGEO, etc).
+*     2-DEC-2008 (DSB):
+*        - astGetFits<X> now reports an error if the keyword value is undefined.
+*        - Add new functions astTestFits and astSetFitsU.
+*        - Remove use of AST__UNDEF<X> constants.
+*        - Remove "undefread" warning.
 *class--
 */
 
@@ -948,7 +957,7 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 #define LATAX              1
 #define NDESC              9
 #define MXCTYPELEN        81
-#define ALLWARNINGS       " distortion noequinox noradesys nomjd-obs nolonpole nolatpole tnx zpx badcel noctype badlat badmat badval badctype undefread badpv "
+#define ALLWARNINGS       " distortion noequinox noradesys nomjd-obs nolonpole nolatpole tnx zpx badcel noctype badlat badmat badval badctype badpv "
 #define NPFIT             10
 #define SPD               86400.0
 
@@ -1141,7 +1150,7 @@ static int (* parent_managelock)( AstObject *, int, int, int * );
 static const char *type_names[] = {"comment", "integer", "floating point",
                                    "string", "complex floating point",
                                    "complex integer", "logical",
-                                   "continuation string", "undefined" };
+                                   "continuation string" };
 
 /* Text values used to represent Encoding values externally. */
 static const char *xencod[8] = { NATIVE_STRING, FITSPC_STRING,
@@ -1450,7 +1459,6 @@ static int FindFits( AstFitsChan *, const char *, char[ AST__FITSCHAN_FITSCARDLE
 static int ComBlock( AstFitsChan *, int, const char *, const char *, int * );
 static int CountFields( const char *, char, const char *, const char *, int * );
 static int DSSFromStore( AstFitsChan *, FitsStore *, const char *, const char *, int * );
-static int DataDefined( int, void *, int * );
 static int EncodeFloat( char *, int, int, int, double, int * );
 static int EncodeValue( AstFitsChan *, char *, int, int, const char *, int * );
 static int FindBasisVectors( AstMapping *, int, int, double *, AstPointSet *, AstPointSet *, int * );
@@ -1471,7 +1479,6 @@ static int GetFitsF( AstFitsChan *, const char *, double *, int * );
 static int GetFitsI( AstFitsChan *, const char *, int *, int * );
 static int GetFitsL( AstFitsChan *, const char *, int *, int * );
 static int GetFitsS( AstFitsChan *, const char *, char **, int * );
-static int GetFitsU( AstFitsChan *, const char *, int *, int * );
 static int GetFull( AstChannel *, int * );
 static int GetMaxI( double ****item, char, int * );
 static int GetMaxJM( double ****item, char, int * );
@@ -1501,6 +1508,7 @@ static int SplitMap( AstMapping *, int, int, int, AstMapping **, AstWcsMap **, A
 static int SplitMap2( AstMapping *, int, AstMapping **, AstWcsMap **, AstMapping **, int * );
 static int SplitMat( int , double *, double *, int * );
 static int TestAttrib( AstObject *, const char *, int * );
+static int TestFits( AstFitsChan *, const char *, int *, int * );
 static int Use( AstFitsChan *, int, int, int * );
 static int Ustrcmp( const char *, const char *, int * );
 static int Ustrncmp( const char *, const char *, size_t, int * );
@@ -1555,7 +1563,7 @@ static void SetFitsF( AstFitsChan *, const char *, double, const char *, int, in
 static void SetFitsI( AstFitsChan *, const char *, int, const char *, int, int * );
 static void SetFitsL( AstFitsChan *, const char *, int, const char *, int, int * );
 static void SetFitsS( AstFitsChan *, const char *, const char *, const char *, int, int * );
-static void SetFitsU( AstFitsChan *, const char *, int, const char *, int, int * );
+static void SetFitsU( AstFitsChan *, const char *, const char *, int, int * );
 static void SetItem( double ****, int, int, char, double, int * );
 static void SetItemC( char ****, int, char, const char *, int * );
 static void SetValue( AstFitsChan *, const char *, void *, int, char *, int * );
@@ -5500,11 +5508,7 @@ static int CnvValue( AstFitsChan *this, int type, void *buff,
 *     imaginary part is ignored.
 *     -  Zero is returned if an error has occurred, or if this function
 *     should fail for any reason.
-*     - If the supplied value is undefined the returned value will also
-*     be undefined. Undefined values are flagged by the magic values stored 
-*     in the AST__UNDEF<X> constants. Note, the logical type has no
-*     facility for representing a third state and so an error is reported
-*     if an attempt is made to convert an undefined value to a logical type.
+*     - If the supplied value is undefined an error will be reported.
 */
 
 /* Local Variables: */
@@ -5585,11 +5589,7 @@ static int CnvType( int otype, void *odata, size_t osize, int type,
 *     reported), one otherwise.
 
 *  Notes: 
-*     - If the supplied value is undefined the returned value will also
-*     be undefined. Undefined values are flagged by the magic values stored 
-*     in the AST__UNDEF<X> constants. Note, the logical type has no
-*     facility for representing a third state and so an error is reported
-*     if an attempt is made to convert an undefined value to a logical type.
+*     -  If the supplied value is undefined an error will be reported.
 *     -  When converting from floating point to integer, the  floating
 *     point value is truncated using a C cast.
 *     -  Non-zero numerical values are considered TRUE, and zero
@@ -5636,36 +5636,13 @@ static int CnvType( int otype, void *odata, size_t osize, int type,
 /* Assume success. */
    ret = 1;
 
-/* If the supplied data type is undefined, the returned value is also 
-   undefined. */
+/* If the supplied data type is undefined, report an error unless the
+   returned data type is also undefined. */
    if( otype == AST__UNDEF ) {
-
-      if( type == AST__FLOAT ){
-         *((double *) buff ) = AST__UNDEFF;
-
-      } else if( type == AST__STRING || type == AST__CONTINUE  ){
-         *( (char **) buff ) = AST__UNDEFS;
-
-      } else if( type == AST__INT      ){
-         *( (int *) buff ) = AST__UNDEFI;
-
-      } else if( type == AST__LOGICAL  ){
+      if( type != AST__UNDEF ) {
          ret = 0;
-         astError( AST__INTER, "CnvType: Cannot convert an undefined "
-                   "FITS keyword value to a logical type." , status);
-
-      } else if( type == AST__COMPLEXF ){
-         ( (double *) buff )[ 0 ] = AST__UNDEFF;
-         ( (double *) buff )[ 1 ] = AST__UNDEFF;
-
-      } else if( type == AST__COMPLEXI ){
-         ( (int *) buff )[ 0 ] = AST__UNDEFI;
-         ( (int *) buff )[ 1 ] = AST__UNDEFI;
-
-      } else if( type != AST__UNDEF && astOK ){
-         ret = 0;
-         astError( AST__INTER, "CnvType: AST internal programming error - "
-                   "FITS data-type no. %d not yet supported.", status, type );
+         astError( AST__FUNDEF, "The FITS keyword value has an undefined "
+                   "value.", status);
       }
 
 /* If the returned data type is undefined, the returned value is
@@ -5679,21 +5656,9 @@ static int CnvType( int otype, void *odata, size_t osize, int type,
               ( !odata && otype != AST__COMMENT ) ) {
       ret = 0;
 
-/* If there is no data (and therefore this is a comment card), return a
-   undefined buffer value. */
-   } else if( !odata ) {
-      if( type == AST__STRING || type == AST__CONTINUE ||
-                 type == AST__COMMENT ){
-         *( (char **) buff ) = AST__UNDEFS;
-   
-      } else if( astOK ) {
-         ret = 0;
-         astError( AST__INTER, "CnvType: Cannot convert an undefined "
-                   "FITS keyword value to type '%s'.", status, type_names[ otype ] );
-      }
-
-/* If there is data... */
-   } else {
+/* If there is no data (and therefore this is a comment card), leave the 
+   supplied buffers unchanged. */
+   } else if( odata ) {
 
 /* Do each possible combination of supplied and stored data types... */
 
@@ -5701,36 +5666,7 @@ static int CnvType( int otype, void *odata, size_t osize, int type,
       if( otype == AST__FLOAT ){
          odouble = *( (double *) odata );
 
-         if( odouble == AST__UNDEFF ) {
-            if( type == AST__FLOAT ){
-               *( (double *) buff ) = AST__UNDEFF;
-      
-            } else if( type == AST__STRING || type == AST__CONTINUE  ){
-               *( (char **) buff ) = AST__UNDEFS;
-   
-            } else if( type == AST__INT      ){
-               *( (int *) buff ) = AST__UNDEFI;
-   
-            } else if( type == AST__LOGICAL ){
-               ret = 0;
-               astError( AST__INTER, "CnvType: Cannot convert an undefined "
-                         "FITS keyword value to a logical type." , status);
-      
-            } else if( type == AST__COMPLEXF ){
-               ( (double *) buff )[ 0 ] = AST__UNDEFF;
-               ( (double *) buff )[ 1 ] = AST__UNDEFF;
-      
-            } else if( type == AST__COMPLEXI ){
-               ( (int *) buff )[ 0 ] = AST__UNDEFI;
-               ( (int *) buff )[ 1 ] = AST__UNDEFI;
-      
-            } else if( astOK ){
-               ret = 0;
-               astError( AST__INTER, "CnvType: AST internal programming error - "
-                         "FITS data-type no. %d not yet supported.", status, type );
-            }
-
-         } else if( type == AST__FLOAT ){
+         if( type == AST__FLOAT ){
             (void) memcpy( buff, odata, osize );
    
          } else if( type == AST__STRING || type == AST__CONTINUE  ){
@@ -5763,36 +5699,7 @@ static int CnvType( int otype, void *odata, size_t osize, int type,
          ostring = (char *) odata;
          len = (int) strlen( ostring );
 
-         if( !strcmp( ostring, AST__UNDEFS ) ) {
-            if( type == AST__FLOAT ){
-               *( (double *) buff ) = AST__UNDEFF;
-      
-            } else if( type == AST__STRING || type == AST__CONTINUE  ){
-               *( (char **) buff ) = AST__UNDEFS;
-   
-            } else if( type == AST__INT      ){
-               *( (int *) buff ) = AST__UNDEFI;
-   
-            } else if( type == AST__LOGICAL ){
-               ret = 0;
-               astError( AST__INTER, "CnvType: Cannot convert an undefined "
-                         "FITS keyword value to a logical type." , status);
-      
-            } else if( type == AST__COMPLEXF ){
-               ( (double *) buff )[ 0 ] = AST__UNDEFF;
-               ( (double *) buff )[ 1 ] = AST__UNDEFF;
-      
-            } else if( type == AST__COMPLEXI ){
-               ( (int *) buff )[ 0 ] = AST__UNDEFI;
-               ( (int *) buff )[ 1 ] = AST__UNDEFI;
-      
-            } else if( astOK ){
-               ret = 0;
-               astError( AST__INTER, "CnvType: AST internal programming error - "
-                         "FITS data-type no. %d not yet supported.", status, type );
-            }
-
-         } else if( type == AST__FLOAT ){
+         if( type == AST__FLOAT ){
             if( nc = 0, 
                      ( 1 != astSscanf( ostring, "%lf %n", (double *) buff, &nc ) )
                   || (nc < len ) ){
@@ -5876,36 +5783,7 @@ static int CnvType( int otype, void *odata, size_t osize, int type,
       } else if( otype == AST__INT      ){
          oint = *( (int *) odata );
 
-         if( oint == AST__UNDEFI ) {
-            if( type == AST__FLOAT ){
-               *( (double *) buff ) = AST__UNDEFF;
-      
-            } else if( type == AST__STRING || type == AST__CONTINUE  ){
-               *( (char **) buff ) = AST__UNDEFS;
-   
-            } else if( type == AST__INT      ){
-               *( (int *) buff ) = AST__UNDEFI;
-   
-            } else if( type == AST__LOGICAL ){
-               ret = 0;
-               astError( AST__INTER, "CnvType: Cannot convert an undefined "
-                         "FITS keyword value to a logical type." , status);
-      
-            } else if( type == AST__COMPLEXF ){
-               ( (double *) buff )[ 0 ] = AST__UNDEFF;
-               ( (double *) buff )[ 1 ] = AST__UNDEFF;
-      
-            } else if( type == AST__COMPLEXI ){
-               ( (int *) buff )[ 0 ] = AST__UNDEFI;
-               ( (int *) buff )[ 1 ] = AST__UNDEFI;
-      
-            } else if( astOK ){
-               ret = 0;
-               astError( AST__INTER, "CnvType: AST internal programming error - "
-                         "FITS data-type no. %d not yet supported.", status, type );
-            }
-
-         } else if( type == AST__FLOAT ){
+         if( type == AST__FLOAT ){
             *( (double *) buff ) = (double) oint;
 
          } else if( type == AST__STRING || type == AST__CONTINUE  ){
@@ -5971,36 +5849,7 @@ static int CnvType( int otype, void *odata, size_t osize, int type,
       } else if( otype == AST__COMPLEXF ){
          odouble = ( (double *) odata )[ 0 ];
 
-         if( odouble == AST__UNDEFF ) {
-            if( type == AST__FLOAT ){
-               *( (double *) buff ) = AST__UNDEFF;
-      
-            } else if( type == AST__STRING || type == AST__CONTINUE  ){
-               *( (char **) buff ) = AST__UNDEFS;
-   
-            } else if( type == AST__INT      ){
-               *( (int *) buff ) = AST__UNDEFI;
-   
-            } else if( type == AST__LOGICAL ){
-               ret = 0;
-               astError( AST__INTER, "CnvType: Cannot convert an undefined "
-                         "FITS keyword value to a logical type." , status);
-      
-            } else if( type == AST__COMPLEXF ){
-               ( (double *) buff )[ 0 ] = AST__UNDEFF;
-               ( (double *) buff )[ 1 ] = AST__UNDEFF;
-      
-            } else if( type == AST__COMPLEXI ){
-               ( (int *) buff )[ 0 ] = AST__UNDEFI;
-               ( (int *) buff )[ 1 ] = AST__UNDEFI;
-      
-            } else if( astOK ){
-               ret = 0;
-               astError( AST__INTER, "CnvType: AST internal programming error - "
-                         "FITS data-type no. %d not yet supported.", status, type );
-            }
-
-         } else if( type == AST__FLOAT ){
+         if( type == AST__FLOAT ){
             *( (double *) buff ) = odouble;
    
          } else if( type == AST__STRING || type == AST__CONTINUE  ){
@@ -6034,36 +5883,7 @@ static int CnvType( int otype, void *odata, size_t osize, int type,
       } else if( otype == AST__COMPLEXI ){
          oint = ( (int *) odata )[ 0 ];
 
-         if( oint == AST__UNDEFI ) {
-            if( type == AST__FLOAT ){
-               *( (double *) buff ) = AST__UNDEFF;
-      
-            } else if( type == AST__STRING || type == AST__CONTINUE  ){
-               *( (char **) buff ) = AST__UNDEFS;
-   
-            } else if( type == AST__INT      ){
-               *( (int *) buff ) = AST__UNDEFI;
-   
-            } else if( type == AST__LOGICAL ){
-               ret = 0;
-               astError( AST__INTER, "CnvType: Cannot convert an undefined "
-                         "FITS keyword value to a logical type." , status);
-      
-            } else if( type == AST__COMPLEXF ){
-               ( (double *) buff )[ 0 ] = AST__UNDEFF;
-               ( (double *) buff )[ 1 ] = AST__UNDEFF;
-      
-            } else if( type == AST__COMPLEXI ){
-               ( (int *) buff )[ 0 ] = AST__UNDEFI;
-               ( (int *) buff )[ 1 ] = AST__UNDEFI;
-      
-            } else if( astOK ){
-               ret = 0;
-               astError( AST__INTER, "CnvType: AST internal programming error - "
-                         "FITS data-type no. %d not yet supported.", status, type );
-            }
-
-         } else if( type == AST__FLOAT ){
+         if( type == AST__FLOAT ){
             *( (double *) buff ) = (double) oint;
 
          } else if( type == AST__STRING || type == AST__CONTINUE  ){
@@ -6509,79 +6329,6 @@ static void CreateKeyword( AstFitsChan *this, const char *name,
       astMapPut0I( this->keyseq, keyword, seq, NULL );
       keyword[ nc ] = seq_char;
    }
-}
-
-static int DataDefined( int type, void *data, int *status ){
-/*
-*  Name:
-*     DataDefined
-
-*  Purpose:
-*     See if a data value is defined.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "fitschan.h"
-*     int DataDefined( int type, void *data, int *status )
-
-*  Class Membership:
-*     FitsChan member function.
-
-*  Description:
-*     Returns non-zero if and only if the supplied data value represents
-*     a defined FITS value.
-
-*  Parameters:
-*     type
-*        The FITS data type.
-*     data
-*        Pointer to buffer containing the data value (if any).
-*     status
-*        Pointer to the inherited status variable.
-
-*  Returned Value:
-*     Non-zero if and only if the supplied data value represents
-*     a defined FITS value.
-
-*  Notes:
-*     -  This function attempts to execute even if an error has occurred.
-*/
-
-/* Local Variables: */
-   int def;
-
-   def = 0;
-   if( data && type != AST__UNDEF ) {
-
-      if( type == AST__FLOAT ){
-         def = ( *( (double *) data ) != AST__UNDEFF );
-
-      } else if( type == AST__STRING || type == AST__CONTINUE ){
-         def = strcmp( (char *) data, AST__UNDEFS );
-
-      } else if( type == AST__INT ){
-         def = ( *( (int *) data ) != AST__UNDEFI );
-
-      } else if( type == AST__COMPLEXF ){
-         def = ( ( (double *) data )[ 0 ] != AST__UNDEFF );
-
-      } else if( type == AST__COMPLEXI ){
-         def = ( ( (int *) data )[ 0 ] != AST__UNDEFI );
-
-      } else if( type == AST__LOGICAL ){
-         def = 1;
-
-      } else if( astOK ){
-         astError( AST__INTER, "DataDefined: AST internal programming error - "
-                   "FITS data-type %d not yet supported.", status, type );
-      }
-   }
-
-/* Return the answer. */
-   return def;
-
 }
 
 static double DateObs( const char *dateobs, int *status ) {
@@ -8156,7 +7903,7 @@ static int EncodeValue( AstFitsChan *this, char *buf, int col, int digits,
 
 /* Return if there is no defined value associated with the keyword in the 
    current card. */
-   if( DataDefined( type, data, status ) ) {
+   if( type != AST__UNDEF ) {
 
 /* Get the name of the keyword. */
       name = CardName( this, status );
@@ -12795,8 +12542,8 @@ c     astGetFits<X><X>()
 f     AST_GETFITS<X> = LOGICAL
 c        A value of zero 
 f        .FALSE.
-*        is returned if the keyword was not found (no error is reported). 
-*        Otherwise, a value of 
+*        is returned if the keyword was not found in the FitsChan (no error 
+*        is reported). Otherwise, a value of 
 c        one 
 f        .TRUE.
 *        is returned. 
@@ -12811,9 +12558,12 @@ f        .TRUE.
 *     otherwise the current card is left pointing at the "end-of-file".
 *     -  If the stored keyword value is not of the requested type, it is
 *     converted into the requested type.
-*     -  If there is no keyword value stored for the card, the returned
-*     value is one of AST__UNDEFF, AST__UNDEFS or AST__UNDEFI (as
-*     appropriate for the data type being used).
+*     -  If the keyword is found in the FitsChan, but has no associated
+*     value, an error is reported. If necessary, the
+c     astTestFits
+f     AST_TESTFITS
+*     function can be used to determine if the keyword has a defined
+*     value in the FitsChan prior to calling this function.
 *     -  An error will be reported if the keyword name does not conform
 *     to FITS requirements.
 c     -  Zero 
@@ -12839,7 +12589,6 @@ f     AST_GETFITSS
 static int GetFits##code( AstFitsChan *this, const char *name, ctype value, int *status ){ \
 \
 /* Local Variables: */ \
-   char wbuf[ 80 ];       /* Buffer for warning message */ \
    const char *class;     /* Object class */ \
    const char *method;    /* Calling method */ \
    char *lcom;            /* Supplied keyword comment */ \
@@ -12849,7 +12598,6 @@ static int GetFits##code( AstFitsChan *this, const char *name, ctype value, int 
    char *c;               /* Pointer to next character */ \
    int cl;                /* Length of string value */ \
    int ret;               /* The returned value */ \
-   size_t nwrite;         /* number of characters written to wbuf */ \
    size_t sz;             /* Data size */ \
 \
 /* Check the global error status. */ \
@@ -12900,22 +12648,6 @@ static int GetFits##code( AstFitsChan *this, const char *name, ctype value, int 
 \
    } \
 \
-/* Issue a warning if the returned value is undefined. */ \
-   if( ret ) { \
-      if( ( ftype == AST__STRING && *value && !strcmp( *((char **) value), AST__UNDEFS ) ) || \
-          ( ftype == AST__FLOAT && *((double *) value) == AST__UNDEFF ) || \
-          ( ftype == AST__INT && *((int *) value) == AST__UNDEFI ) || \
-          ( ftype == AST__COMPLEXF && ( *((double *) value) == AST__UNDEFF || \
-                                        *(((double *) value)+1) == AST__UNDEFF ) ) || \
-          ( ftype == AST__COMPLEXI && ( *((int *) value) == AST__UNDEFI || \
-                                        *(((int *) value)+1) == AST__UNDEFI ) ) ){ \
-         nwrite = snprintf( wbuf, sizeof(wbuf), \
-  	                   "The %s keyword has an undefined value.", lname ); \
-         wbuf[sizeof(wbuf)-1] = '\0'; \
-         Warn( this, "undefread", wbuf, method, class, status ); \
-      } \
-   } \
-\
 /* Release the memory used to hold keyword name, value and comment strings. */ \
    lname = (char *) astFree( (void *) lname ); \
    lvalue = (char *) astFree( (void *) lvalue ); \
@@ -12936,7 +12668,6 @@ MAKE_FGET(I,int *,AST__INT)
 MAKE_FGET(L,int *,AST__LOGICAL)
 MAKE_FGET(S,char **,AST__STRING)
 MAKE_FGET(CN,char **,AST__CONTINUE)
-MAKE_FGET(U,int *,AST__UNDEF)
 
 #undef MAKE_FGET
 
@@ -13252,11 +12983,10 @@ static int SetFits( AstFitsChan *this, const char *keyname, void *value,
 
 
    } else if( type == AST__UNDEF ){
-      ival = 1;
       if( overwrite && CardType( this, status ) == AST__UNDEF && CardComm( this, status ) ) {
          comment = NULL;
       }
-      astSetFitsU( this, keyname, ival, comment, overwrite );
+      astSetFitsU( this, keyname, comment, overwrite );
 
    } 
 
@@ -13341,10 +13071,7 @@ f        A character string
 c     value
 f     VALUE = <X>type (Given)
 *        The keyword value to store with the named keyword. The data type
-*        of this parameter depends on <X> as described above. The value
-*        AST__UNDEFF, AST__UNDEFS or AST__UNDEFI (depending on the data
-*        type being used) can be supplied to indicate that no value is 
-*        associated with the keyword.
+*        of this parameter depends on <X> as described above. 
 c     comment
 f     COMMENT = CHARACTER * ( * ) (Given)
 c        A pointer to a null terminated string 
@@ -13376,6 +13103,10 @@ f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
 *  Notes:
+*     - The function
+c     astSetFitsU
+f     AST_SETFITSU
+*     can be used to indicate that no value is associated with a keyword.
 *     -  To assign a new value for an existing keyword within a FitsChan,
 c     first find the card describing the keyword using astFindFits, and
 c     then use one of the astSetFits<X> family to over-write the old value.
@@ -13457,10 +13188,139 @@ MAKE_FSET(CN,const char *,AST__CONTINUE,(void *)value)
 MAKE_FSET(CF,double *,AST__COMPLEXF,(void *)value)
 MAKE_FSET(CI,int *,AST__COMPLEXI,(void *)value)
 MAKE_FSET(L,int,AST__LOGICAL,(void *)&value)
-MAKE_FSET(U,int,AST__UNDEF,(void *)&value)
 
 #undef MAKE_FSET
 
+static void SetFitsU( AstFitsChan *this, const char *name, const char *comment,
+                      int overwrite, int *status ) { 
+/*
+*++
+*  Name:
+c     astSetFitsU
+f     AST_SETFITSU
+
+*  Purpose:
+*     Store an undefined keyword value in a FitsChan.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "fitschan.h"
+c     void astSetFitsU( AstFitsChan *this, const char *name, 
+c                       const char *comment, int overwrite )
+f     CALL AST_SETFITSU( THIS, NAME, COMMENT, OVERWRITE, STATUS )
+
+*  Description:
+*     This 
+c     function 
+f     routine
+*     stores an undefined value for a named keyword within 
+*     a FitsChan at the current card position. The new undefined value
+*     can either over-write an existing keyword value, or can be inserted 
+*     as a new header card into the FitsChan.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the FitsChan.
+c     name
+f     NAME = CHARACTER * ( * ) (Given)
+c        Pointer to a null-terminated character string
+f        A character string 
+*        containing the FITS keyword name. This may be a complete FITS
+*        header card, in which case the keyword to use is extracted from 
+*        it. No more than 80 characters are read from this string.
+c     comment
+f     COMMENT = CHARACTER * ( * ) (Given)
+c        A pointer to a null terminated string 
+f        A string 
+*        holding a comment to associated with the keyword. 
+c        If a NULL pointer or 
+f        If 
+*        a blank string is supplied, then any comment included in the string 
+*        supplied for the 
+c        "name" parameter is used instead. If "name" 
+f        NAME parameter is used instead. If NAME
+*        contains no comment, then any existing comment in the card being 
+*        over-written is retained. Otherwise, no comment is stored with
+*        the card.
+c     overwrite
+f     OVERWRITE = LOGICAL (Given)
+c        If non-zero, 
+f        If .TRUE.,
+*        the new card formed from the supplied keyword name and comment 
+*        string over-writes the current card, and the current card is 
+*        incremented to refer to the next card (see the "Card" attribute). If 
+c        zero, 
+f        .FALSE.,
+*        the new card is inserted in front of the current card and the current 
+*        card is left unchanged. In either case, if the current card on entry 
+*        points to the "end-of-file", the new card is appended to the end of 
+*        the list. 
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     -  If, on exit, there are no cards following the card written by
+*     this function, then the current card is left pointing at the 
+*     "end-of-file".
+*     -  An error will be reported if the keyword name does not conform
+*     to FITS requirements.
+*--
+*/
+
+/* Local variables: */ 
+   const char *class;     /* Object class */ 
+   const char *method;    /* Calling method */ 
+   const char *com;       /* Comment to use */ 
+   char *lcom;            /* Supplied keyword comment */ 
+   char *lname;           /* Supplied keyword name */ 
+   char *lvalue;          /* Supplied keyword value */ 
+   int free_com;          /* Should com be freed before returned? */ 
+
+/* Check the global error status. */ 
+   if ( !astOK ) return; 
+
+/* Store the object clas and calling method. */ 
+   class = astGetClass( this ); 
+   method = "astSetFitsU";
+
+/* Extract the keyword name from the supplied string. */ 
+   (void) Split( name, &lname, &lvalue, &lcom, method, class, status ); 
+
+/* Initialise a pointer to the comment to be stored. If the supplied 
+   comment is blank, use the comment given with "name". */ 
+   com = ChrLen( comment, status ) ? comment : lcom; 
+
+/* If the comment is still blank, use the existing comment if we are 
+   over-writing, or a NULL pointer otherwise. */ 
+   free_com = 0; 
+   if( !ChrLen( com, status ) ) { 
+      com = NULL; 
+      if( overwrite ) { 
+         if( CardComm( this, status ) ){ 
+            com = (const char *) astStore( NULL, (void *) CardComm( this, status ), 
+                                           strlen( CardComm( this, status ) ) + 1 ); 
+            free_com = 1; 
+         } 
+      } 
+   } 
+
+/* Insert the new card. */ 
+   InsCard( this, overwrite, lname, AST__UNDEF, NULL, com, method, class, 
+            status ); 
+
+/* Release the memory used to hold keyword name, value and comment strings. */ 
+   lname = (char *) astFree( (void *) lname ); 
+   lvalue = (char *) astFree( (void *) lvalue ); 
+   lcom = (char *) astFree( (void *) lcom ); 
+
+/* Release the memory holding the stored comment string, so long as it was 
+   allocated within this function. */ 
+   if( free_com ) com = (const char *) astFree( (void *) com ); 
+
+}
 
 static void SetFitsCom( AstFitsChan *this, const char *name, 
                         const char *comment, int overwrite, int *status ){
@@ -15156,10 +15016,10 @@ static int GetValue( AstFitsChan *this, const char *keyname, int type,
          if( mark ) MarkCard( this, status );
 
 /* If the value is undefined, report an error if "report" is non-zero. */
-         if( !DataDefined( type, value, status ) && report && astOK ) {
+         if( type == AST__UNDEF && report && astOK ) {
             ret = 0;
-            astError( AST__BDFTS, "%s(%s): FITS keyword \"%s\" has no value.", status, 
-                      method, class, keyname );
+            astError( AST__FUNDEF, "%s(%s): FITS keyword \"%s\" has no value.",
+                      status, method, class, keyname );
          }
     
 /* If the value could not be converted to the requested data, type report
@@ -15485,7 +15345,7 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name, int *status
    vtab->GetFitsF = GetFitsF;
    vtab->GetFitsI = GetFitsI;
    vtab->GetFitsL = GetFitsL;
-   vtab->GetFitsU = GetFitsU;
+   vtab->TestFits = TestFits;
    vtab->GetFitsS = GetFitsS;
    vtab->GetFitsCN = GetFitsCN;
    vtab->FitsGetCom = FitsGetCom;
@@ -18940,7 +18800,8 @@ static double NearestPix( AstMapping *map, double val, int axis, int *status ){
 }
 
 static void NewCard( AstFitsChan *this, const char *name, int type, 
-                     const void *data, const char *comment, int flags, int *status ){
+                     const void *data, const char *comment, int flags, 
+                     int *status ){
 /*
 *  Name:
 *     NewCard
@@ -18954,7 +18815,8 @@ static void NewCard( AstFitsChan *this, const char *name, int type,
 *  Synopsis:
 *     #include "fitschan.h"
 *     void NewCard( AstFitsChan *this, const char *name, int type, 
-*                   const void *data, const char *comment, int flags, int *status )
+*                   const void *data, const char *comment, int flags, 
+*                   int *status )
 
 *  Class Membership:
 *     FitsChan member function.
@@ -20894,7 +20756,7 @@ f        The global status.
 
 /* Read and store undefined values from the value string. */
       } else if( type == AST__UNDEF ){
-         astSetFitsU( this, name, 1, comment, overwrite );
+         astSetFitsU( this, name, comment, overwrite );
 
 /* Read and store complex floating point values from the value string. */
       } else if( type == AST__COMPLEXF ){
@@ -25555,9 +25417,9 @@ int Split( const char *card, char **name, char **value,
 
 *  Returned value:
 *     -  An integer identifying the data type of the keyword value. This
-*     will be one of the values AST__COMMENT, AST__INT, AST__STRING, 
-*     AST__CONTINUE, AST__FLOAT, AST__COMPLEXI or AST__COMPLEXF defined in 
-*     fitschan.h.
+*     will be one of the values AST__UNDEF, AST__COMMENT, AST__INT, 
+*     AST__STRING, AST__CONTINUE, AST__FLOAT, AST__COMPLEXI or AST__COMPLEXF 
+*     defined in fitschan.h.
 
 *  Notes:
 *     -  If the keyword value is a string, then the returned value does not
@@ -26896,6 +26758,144 @@ static int TestCard( AstFitsChan *this, int *status ){
 /* Return the flag. */
    return ret;
 
+}
+
+static int TestFits( AstFitsChan *this, const char *name, int *there, 
+                     int *status ){ 
+/*
+*++
+*  Name:
+c     astTestFits
+f     AST_TESTFITS
+
+*  Purpose:
+*     See if a named keyword has a defined value in a FitsChan.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "fitschan.h"
+c     int astTestFits<X>( AstFitsChan *this, const char *name, int *there )
+f     RESULT = AST_TESTFITS<X>( THIS, NAME, THERE, STATUS )
+
+*  Class Membership:
+*     FitsChan method.
+
+*  Description:
+*     This function serches for a named keyword in a FitsChan. If found,
+*     and if the keyword has a value associated with it, a
+c     non-zero
+f     .TRUE.
+*     value is returned. If the keyword is not found, or if it does not
+*     have an associated value, a
+c     zero
+f     .FALSE. 
+*     value is returned.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the FitsChan.
+c     name
+f     NAME = CHARACTER * ( * ) (Given)
+c        Pointer to a null-terminated character string
+f        A character string 
+*        containing the FITS keyword name. This may be a complete FITS
+*        header card, in which case the keyword to use is extracted from 
+*        it. No more than 80 characters are read from this string.
+c     there
+f     THERE = LOGICAL (Returned)
+c        Pointer to an integer which will be returned holding a non-zero
+c        value if the keyword was found in the header, and zero otherwise.
+f        A value of .TRUE. will be returned if the keyword was found in the 
+f        header, and .FALSE. otherwise.
+*        This parameter allows a distinction to be made between the case
+*        where a keyword is not present, and the case where a keyword is 
+*        present but has no associated value.
+c        A NULL pointer may be supplied if this information is not
+c        required.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astTestFits()
+f     AST_TESTFITS = LOGICAL
+*        A value of zero 
+f        .FALSE.
+*        is returned if the keyword was not found in the FitsChan or has
+*        no associated value. Otherwise, a value of 
+c        one 
+f        .TRUE.
+*        is returned. 
+
+*  Notes:
+*     -  The current card is left unchanged by this function.
+*     -  The card following the current card is checked first. If this is
+*     not the required card, then the rest of the FitsChan is searched,
+*     starting with the first card added to the FitsChan. Therefore cards
+*     should be accessed in the order they are stored in the FitsChan (if
+*     possible) as this will minimise the time spent searching for cards. 
+*     -  An error will be reported if the keyword name does not conform
+*     to FITS requirements.
+c     -  Zero 
+*     -  .FALSE.
+*     is returned as the function value if an error has already occurred, 
+*     or if this function should fail for any reason.
+*--
+*/
+
+
+/* Local Variables: */ 
+   const char *class;     /* Object class */ 
+   const char *method;    /* Calling method */ 
+   char *lcom;            /* Supplied keyword comment */ 
+   char *lname;           /* Supplied keyword name */ 
+   char *lvalue;          /* Supplied keyword value */ 
+   int icard;             /* Current card index on entry */
+   int ret;               /* The returned value */ 
+
+/* Initialise */
+   if( there ) *there = 0;
+
+/* Check the global error status. */ 
+   if ( !astOK ) return 0; 
+
+/* Store the calling method and object class. */ 
+   method = "astTestFits"; 
+   class = astGetClass( this ); 
+
+/* Initialise the returned value. */ 
+   ret = 0; 
+
+/* Extract the keyword name from the supplied string. */ 
+   (void) Split( name, &lname, &lvalue, &lcom, method, class, status ); 
+
+/* Store the current card index. */
+   icard = astGetCard( this );
+
+/* Attempt to find a card in the FitsChan refering to this keyword, 
+   and make it the current card. Only proceed if a card was found. */ 
+   if( SearchCard( this, lname, method, class, status ) ){ 
+
+/* Indicate the card has been found. */
+      if( there ) *there = 1;
+
+/* If the cards data type is no undefined, return 1. */
+      if( CardType( this, status ) != AST__UNDEF ) ret = 1;
+
+   } 
+
+/* Re-instate the original current card index. */
+   astSetCard( this, icard );
+
+/* Release the memory used to hold keyword name, value and comment strings. */ 
+   lname = (char *) astFree( (void *) lname ); 
+   lvalue = (char *) astFree( (void *) lvalue ); 
+   lcom = (char *) astFree( (void *) lcom ); 
+
+/* Return the answer. */ 
+   return ret; 
 }
 
 static AstTimeScaleType TimeSysToAst( AstFitsChan *this, const char *timesys, 
@@ -34035,12 +34035,6 @@ f     the date of observation within AST_READ, due to no value being present
 *     not supproted by AST. Such terms are ignored and so the resulting
 *     FrameSet may be inaccurate.
 *
-*     - "UndefRead": This condition arises when a keyword with an undefined
-*     value is accessed by any of the 
-c     astGetFits<X>
-f     AST_GETFITS<X>
-*     functions.
-*
 *     - "Zpx": This condition arises if a FrameSet is read from a FITS
 *     header containing an IRAF "ZPX" projection which includes "lngcor" 
 *     or "latcor" correction terms. These terms are not supported by AST
@@ -34372,7 +34366,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 
 /* Write out the data value, if defined, using the appropriate data type. */
       data = CardData( this, NULL, status );
-      if( data && DataDefined( type, data, status ) ){
+      if( data && type != AST__UNDEF ){
 
          if( type == AST__FLOAT ){
             (void) sprintf( buff, "Dt%d", ncard );
@@ -35567,10 +35561,10 @@ void astSetFitsL_( AstFitsChan *this, const char *name, int value,
    (**astMEMBER(this,FitsChan,SetFitsL))( this, name, value, comment, overwrite, status );
 }
 
-void astSetFitsU_( AstFitsChan *this, const char *name, int value, 
-                         const char *comment, int overwrite, int *status ) {
+void astSetFitsU_( AstFitsChan *this, const char *name, const char *comment, 
+                   int overwrite, int *status ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,FitsChan,SetFitsU))( this, name, value, comment, overwrite, status );
+   (**astMEMBER(this,FitsChan,SetFitsU))( this, name, comment, overwrite, status );
 }
 
 void astClearCard_( AstFitsChan *this, int *status ){
@@ -35633,9 +35627,10 @@ int astGetFitsL_( AstFitsChan *this, const char *name, int *value, int *status )
    return (**astMEMBER(this,FitsChan,GetFitsL))( this, name, value, status );
 }
 
-int astGetFitsU_( AstFitsChan *this, const char *name, int *value, int *status ){
+int astTestFits_( AstFitsChan *this, const char *name, int *there, int *status ){
+   if( there ) *there = 0;
    if( !astOK ) return 0;
-   return (**astMEMBER(this,FitsChan,GetFitsU))( this, name, value, status );
+   return (**astMEMBER(this,FitsChan,TestFits))( this, name, there, status );
 }
 
 int astGetFitsS_( AstFitsChan *this, const char *name, char **value, int *status ){

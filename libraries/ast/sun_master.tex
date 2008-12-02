@@ -18,13 +18,13 @@
 
 % Variable part - replace [xxx] as appropriate.
 c+
-\newcommand{\stardocnumber}    {211.23}
+\newcommand{\stardocnumber}    {211.24}
 c-
 f+
-\newcommand{\stardocnumber}    {210.23}
+\newcommand{\stardocnumber}    {210.24}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {19th May 2008}
+\newcommand{\stardocdate}      {2nd December 2008}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -21522,12 +21522,10 @@ celestial coordinate systems.
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V5.0}
+\subsection{Changes Introduced in V5.0}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V4.6 and V5.0 (the
-current version):
+The following describes the most significant changes which 
+occurred in the AST library between versions V4.6 and V5.0:
 
 \begin{enumerate}
 
@@ -21550,6 +21548,43 @@ within an AST Object description read from an external data source. Note,
 the default behaviour is now not to report such errors. This differs from
 previous versions of AST which always reported an error is unexpected
 input items were encountered.
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V5.1}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V5.0 and V5.1 (the
+current version):
+
+\begin{enumerate}
+
+
+\item A new function called
+c+
+astTestFits
+c-
+f+
+AST\_TESTFITS
+f-
+has been added to the FitsChan class. This function tests a FitsChan to
+see if it contains a defined value for specified FITS keyword.
+
+\item The AST__UNDEF<X> parameters used to flag undefined FITS keyword values
+have been removed. Use the new 
+c+
+astTestFits
+c-
+f+
+AST\_TESTFITS
+f-
+function instead.
+
+c+
+\item The astIsUndef<X> functions used to test FITS keyword values
+have been removed. Use the new astTestFits function instead.
+c-
 
 \end{enumerate}
 

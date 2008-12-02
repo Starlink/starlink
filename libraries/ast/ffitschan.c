@@ -425,6 +425,31 @@ F77_SUBROUTINE(ast_setfitsf)( INTEGER(THIS),
    )
 }
 
+F77_SUBROUTINE(ast_setfitsu)( INTEGER(THIS),
+                              CHARACTER(NAME),
+                              CHARACTER(COMMENT),
+                              LOGICAL(OVERWRITE),
+                              INTEGER(STATUS)
+                              TRAIL(NAME)
+                              TRAIL(COMMENT) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(NAME)
+   GENPTR_CHARACTER(COMMENT)
+   GENPTR_LOGICAL(OVERWRITE)
+   int overwrite;
+   char *name, *comment;
+
+   astAt( "AST_SETFITSU", NULL, 0 );
+   astWatchSTATUS(
+      name = astString( NAME, NAME_length );
+      comment = astString( COMMENT, COMMENT_length );
+      overwrite = F77_ISTRUE( *OVERWRITE );
+      astSetFitsU( astI2P( *THIS ), name, comment, overwrite );   
+      (void) astFree( (void *) name );
+      (void) astFree( (void *) comment );
+   )
+}
+
 
 F77_SUBROUTINE(ast_setfitsi)( INTEGER(THIS),
                               CHARACTER(NAME),
@@ -631,6 +656,31 @@ MAKE_AST_GETFITS(i,I,INTEGER,I,int)
 MAKE_AST_GETFITS(l,L,LOGICAL,L,int)
 #undef MAKE_AST_GETFITS
 
+
+F77_LOGICAL_FUNCTION(ast_testfits)( INTEGER(THIS), 
+                                    CHARACTER(NAME), 
+                                    LOGICAL(THERE),
+                                    INTEGER(STATUS) 
+                                    TRAIL(NAME) ){ 
+   GENPTR_INTEGER(THIS) 
+   GENPTR_CHARACTER(NAME) 
+   GENPTR_LOGICAL(THERE)
+   GENPTR_INTEGER(STATUS) 
+   F77_LOGICAL_TYPE(RESULT); 
+
+   char *name; 
+   int there;
+
+   astAt( "AST_TESTFITS", NULL, 0 ); 
+   astWatchSTATUS( 
+      name = astString( NAME, NAME_length ); 
+      RESULT = astTestFits( astI2P( *THIS ), name, &there ) ? 
+               F77_TRUE : F77_FALSE; 
+      (void) astFree( (void *) name ); 
+   ) 
+   *THERE = there ? F77_TRUE : F77_FALSE;
+   return RESULT; 
+}
 
 
 #define MAKE_AST_GETFITS(f,F,Ftype,X,Xtype) \

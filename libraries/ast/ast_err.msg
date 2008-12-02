@@ -165,5 +165,6 @@ BADFLG          <Incompatible flags for re-sampling or re-binning>
 
 ! New codes introduced for V5.0
 LCKERR          <Error locking or unlocking an AST Object>
+FUNDEF          <FITS keyword had undefined value>
 
 .END
