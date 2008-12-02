@@ -17,9 +17,9 @@
 *     arc-seconds to radians, and store in the supplied smfHead.
 
 *  Arguments:
-*     hdr = smfHead* (Given & Returned)
+*     hdr = smfHead * (Given & Returned)
 *        Header information.
-*     status = int* (Given & Returned)
+*     status = int * (Given & Returned)
 *        Inherited status.
 
 *  Notes:
@@ -33,6 +33,8 @@
 *        Original version.
 *     24-APR-2008 (DSB)
 *        Check that the INSTAP keywords have a defined value.
+*     2-DEC-2008 (DSB)
+*        Modified to use smf_getfitsd.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
@@ -93,18 +95,24 @@ void smf_instap_get( smfHead * hdr, int * status ) {
   /* if we do not have a Fits header */
   if( !hdr->fitshdr ) return;
 
-  /* Try getting INSTAP keywords */
-  smf_fits_getD( hdr, "INSTAP_X", &instapx, status );
-  smf_fits_getD( hdr, "INSTAP_Y", &instapy, status );
+  /* Use the old instap values as the defaults for the new values. These
+     defaults will be used if the FITS keywords have undefined values in the
+     header. */
+  instapx = hdr->instap[ 0 ]/DAS2R;
+  instapy = hdr->instap[ 0 ]/DAS2R;
 
-  /* annul error due to INSTAP keywords not being specified */
-  if( *status == SMF__NOKWRD ) {
-     errAnnul( status );
+  /* Try getting INSTAP keywords. An error is reported (but then annulled) 
+     if either keyword is not present in the header. The values in instapx 
+     and instapy are left unchanged if the keywords are not present, or
+     are present but have undefined values. */
+  smf_getfitsd( hdr, "INSTAP_X", &instapx, status );
+  if( *status == SMF__NOKWRD ) errAnnul( status );
 
-  /* Otherwise, store the values in the smfHead. */
-  } else {
-    if( !astIsUndefF(instapx) ) hdr->instap[ 0 ] = instapx*DAS2R;
-    if( !astIsUndefF(instapy) ) hdr->instap[ 1 ] = instapy*DAS2R;
-  }
+  smf_getfitsd( hdr, "INSTAP_Y", &instapy, status );
+  if( *status == SMF__NOKWRD ) errAnnul( status );
+
+  /* Convert from arc-secs to rads and store the values in the smfHead. */
+  hdr->instap[ 0 ] = instapx*DAS2R;
+  hdr->instap[ 1 ] = instapy*DAS2R;
 
 }

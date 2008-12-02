@@ -567,6 +567,9 @@ void smf_fits_getF( const smfHead * hdr, const char * cardname,
 void smf_fits_getS( const smfHead * hdr, const char * cardname, 
                     char result[70], size_t len, int * status );
 
+void smf_getfitsd( const smfHead *hdr, const char *cardname, 
+                   double *result, int *status );
+
 void
 smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
 		 AstKeyMap ** obsidmap, int * status );

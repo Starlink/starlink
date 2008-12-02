@@ -179,6 +179,8 @@
  *        Calculate and store steptime
  *     2008-07-31 (TIMJ):
  *        Free any resources if there is an error opening the file.
+ *     2008-12-02 (DSB):
+ *        Avoid use of astIsUndef functions.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -526,10 +528,6 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
         /* and work out the observing mode */
         if (hdr->fitshdr) smf_calc_mode( hdr, status );
-
-        /* Ensure we get warnings about undefined values read by
-           astGetFits. */
-        if( hdr->fitshdr ) astSet( hdr->fitshdr, "Warnings=UndefRead" );   
 
         /* Determine and store the telescope location in hdr->telpos */
         smf_telpos_get( hdr, status );
@@ -880,9 +878,9 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
   /* Get the step time from the header if we have a hdr */
   if (hdr && (hdr->instrument!=INST__NONE) ) {
-    smf_fits_getD( hdr, "STEPTIME", &steptime, status );
-    if (*status == SMF__NOKWRD || astIsUndefF(steptime) ||
-        steptime == VAL__BADD ) {
+    steptime = VAL__BADD;
+    smf_getfitsd( hdr, "STEPTIME", &steptime, status );
+    if (*status == SMF__NOKWRD || steptime == VAL__BADD ) {
       if (*status != SAI__OK) errAnnul( status );
       /* Attempt to calculate it from adjacent entries */
       tmpState = hdr->allState;

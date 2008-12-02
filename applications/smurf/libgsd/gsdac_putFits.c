@@ -121,6 +121,8 @@
 *        Correct FFT_WIN and BEDEFAC.
 *     2008-06-24 (TIMJ):
 *        Fix compiler warnings.
+*     2008-12-02 (DSB):
+*        Use astSetFitsU to set undefined values.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -209,6 +211,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   int standard;               /* true for spectral line standards */
   int startIdx;               /* index in pattern at start of observation */
   int stBetRef;               /* max number of steps between refs */
+  int stBetRef_defined;       /* Use the stBetRef value? */
   double stepTime;            /* RTS step time */
   char subBands[SZFITSCARD];  /* ACSIS sub-band set-up */
   char tauDatSt[SZFITSCARD];  /* time of tau225St observation in 
@@ -409,7 +412,11 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
     josMin = 1;
 
   /* Get the length of time in the reference, and the number
-     of steps between references. */
+     of steps between references. set up defaults first to avoid compiler
+     warnings. */
+  nRefStep = (double)(gsdVars->scanTime);
+  stBetRef = 1;
+
   if ( gsdVars->obsContinuous ) {
 
     /* For rasters, determine the number of time scanning
@@ -421,17 +428,11 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
            ( (double)(gsdVars->scanTime) / (double)(gsdVars->nScanPts) );
 
     stBetRef = gsdVars->nScanPts;
-   
-  } else { 
-
-    nRefStep = (double)(gsdVars->scanTime);
-
-    stBetRef = 1;
 
   }  
 
-  if ( strcmp ( mapVars->swMode, "chop" ) == 0 )
-    stBetRef = AST__UNDEFI;
+  /* Set a flag indicating if the stBetRef value is defined. */
+  stBetRef_defined =   ( strcmp ( mapVars->swMode, "chop" ) != 0 );
 
   /* Get the starting index into the pattern. */
   gsdac_getStartIdx ( gsdVars, samMode, &startIdx, status );
@@ -481,23 +482,17 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsS ( fitschan, "RECIPE", "REDUCE_SCIENCE", 
 	        "ORAC-DR recipe", 0 );
 
-  astSetFitsS ( fitschan, "DRGROUP", AST__UNDEFS, 
-	        "Data Reduction group ID", 0 );
+  astSetFitsU ( fitschan, "DRGROUP", "Data Reduction group ID", 0 );
 
-  astSetFitsS ( fitschan, "MSBID", AST__UNDEFS, 
-	        "ID of minimum schedulable block", 0 );
+  astSetFitsU ( fitschan, "MSBID", "ID of minimum schedulable block", 0 );
 
-  astSetFitsS ( fitschan, "MSBTID", AST__UNDEFS, 
-	        "Transaction ID of MSB", 0 );
+  astSetFitsU ( fitschan, "MSBTID", "Transaction ID of MSB", 0 );
 
-  astSetFitsS ( fitschan, "SURVEY", AST__UNDEFS, 
-	        "Survey Name", 0 );
+  astSetFitsU ( fitschan, "SURVEY", "Survey Name", 0 );
 
-  astSetFitsS ( fitschan, "RMTAGENT", AST__UNDEFS, 
-	        "name of Remote Agent", 0 );
+  astSetFitsU ( fitschan, "RMTAGENT", "name of Remote Agent", 0 );
 
-  astSetFitsS ( fitschan, "AGENTID", AST__UNDEFS, 
-	        "Unique identifier for remote agent", 0 );
+  astSetFitsU ( fitschan, "AGENTID", "Unique identifier for remote agent", 0 );
 
 
   /* Obs Id, Date, Pointing Info */
@@ -538,8 +533,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
                 "Unique observation + subsystem ID", 0 );
 
 /***** NOTE: possibly same as REFRECEP *****/
-  astSetFitsS ( fitschan, "INSTAP", AST__UNDEFS,
-                "Receptor at tracking centre (if any)", 0 );
+  astSetFitsU ( fitschan, "INSTAP", "Receptor at tracking centre (if any)", 0 );
 
   astSetFitsF ( fitschan, "INSTAP_X", 0.0,
                 "[arcsec] Aperture X off. rel. to instr centre", 0 );
@@ -549,23 +543,17 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   /* The following 6 cards are just placeholders and will be
      updated later. */
-  astSetFitsF ( fitschan, "AMSTART", AST__UNDEFF,
-                "Airmass at start of observation", 0 );
+  astSetFitsU ( fitschan, "AMSTART", "Airmass at start of observation", 0 );
 
-  astSetFitsF ( fitschan, "AMEND", AST__UNDEFF,
-                "Airmass at end of observation", 0 );
+  astSetFitsU ( fitschan, "AMEND", "Airmass at end of observation", 0 );
 
-  astSetFitsF ( fitschan, "AZSTART", AST__UNDEFF,
-                "[deg] Azimuth at start of observation", 0 );
+  astSetFitsU ( fitschan, "AZSTART", "[deg] Azimuth at start of observation", 0 );
 
-  astSetFitsF ( fitschan, "AZEND", AST__UNDEFF,
-                "[deg] Azimuth at end of observation", 0 );
+  astSetFitsU ( fitschan, "AZEND", "[deg] Azimuth at end of observation", 0 );
 
-  astSetFitsF ( fitschan, "ELSTART", AST__UNDEFF,
-                "[deg] Elevation at start of observation", 0 );
+  astSetFitsU ( fitschan, "ELSTART", "[deg] Elevation at start of observation", 0 );
 
-  astSetFitsF ( fitschan, "ELEND", AST__UNDEFF,
-                "[deg] Elevation at end of observation", 0 );
+  astSetFitsU ( fitschan, "ELEND", "[deg] Elevation at end of observation", 0 );
 
   astSetFitsS ( fitschan, "HSTSTART", dateVars->HSTstart,
                 "HST at start of observation", 0 );
@@ -600,8 +588,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsS ( fitschan, "TRANSITI", transiti,
                 "Target transition for MOLECULE", 0 );
 
-  astSetFitsS ( fitschan, "DRRECIPE", AST__UNDEFS,
-                "ACSIS-DR recipe name", 0 );
+  astSetFitsU ( fitschan, "DRRECIPE", "ACSIS-DR recipe name", 0 );
 
   astSetFitsS ( fitschan, "BWMODE", bwMode,
                 "Bandwidth setup", 0 );
@@ -618,8 +605,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsF ( fitschan, "SUBREFP1", refChan, 
                 "Reference channel for subband1", 0 );
 
-  astSetFitsF ( fitschan, "SUBREFP2", AST__UNDEFF,
-                "Reference channel for subband2", 0 );
+  astSetFitsU ( fitschan, "SUBREFP2", "Reference channel for subband2", 0 );
 
   astSetFitsI ( fitschan, "NCHNSUBS", gsdVars->BEChans[subBandNum], 
                 "Number of subbands", 0 );
@@ -645,13 +631,11 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   } else {
 
-    astSetFitsF ( fitschan, "BEDEGFAC", AST__UNDEFF, 
-	         "Backend degradation factor", 0 ); 
+    astSetFitsU ( fitschan, "BEDEGFAC", "Backend degradation factor", 0 ); 
 
   }
 
-  astSetFitsS ( fitschan, "MSROOT", AST__UNDEFS, 
-	        "Root name of raw measurement sets", 0 ); 
+  astSetFitsU ( fitschan, "MSROOT", "Root name of raw measurement sets", 0 ); 
 
 
   /* FE Specific. */
@@ -686,8 +670,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
                 "Receptor with unit sensitivity", 0 );
 
   if ( strcmp ( samMode, "sample" ) == 0 ) {
-    astSetFitsF ( fitschan, "MEDTSYS", AST__UNDEFF,
-		  "[K] Median of the T-sys across all receptors", 0 );
+    astSetFitsU ( fitschan, "MEDTSYS", "[K] Median of the T-sys across all receptors", 0 );
   } else {
     astSetFitsF ( fitschan, "MEDTSYS", 
                   gsdVars->sourceSysTemps[subBandNum],
@@ -726,17 +709,13 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsF ( fitschan, "BPEND", gsdVars->pamb, 
                 "[mbar] Pressure at observation end", 0 );
 
-  astSetFitsF ( fitschan, "WNDSPDST", AST__UNDEFF, 
-                "[km/h] Wind Speed at obs start", 0 );
+  astSetFitsU ( fitschan, "WNDSPDST", "[km/h] Wind Speed at obs start", 0 );
   
-  astSetFitsF ( fitschan, "WNDSPDEN", AST__UNDEFF, 
-                "[km/h] Wind Speed at obs end", 0 );
+  astSetFitsU ( fitschan, "WNDSPDEN", "[km/h] Wind Speed at obs end", 0 );
 
-  astSetFitsF ( fitschan, "WNDDIRST", AST__UNDEFF, 
-                "[deg] Wind direction, azimuth at obs start", 0 );
+  astSetFitsU ( fitschan, "WNDDIRST", "[deg] Wind direction, azimuth at obs start", 0 );
 
-  astSetFitsF ( fitschan, "WNDDIREN", AST__UNDEFF, 
-                "[deg] Wind direction, azimuth at obs end", 0 );
+  astSetFitsU ( fitschan, "WNDDIREN", "[deg] Wind direction, azimuth at obs end", 0 );
 
   astSetFitsF ( fitschan, "TAU225ST", gsdVars->tau225,
 		"Tau at 225 GHz from CSO at start", 0 );
@@ -753,17 +732,13 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsS ( fitschan, "TAUSRC", "CSO225GHZ",
 		"Source of the TAU225 value", 0 );
 
-  astSetFitsF ( fitschan, "WVMTAUST", AST__UNDEFF,
-		"186GHz Tau from JCMT WVM at start", 0 );
+  astSetFitsU ( fitschan, "WVMTAUST", "186GHz Tau from JCMT WVM at start", 0 );
 
-  astSetFitsF ( fitschan, "WVMTAUEN", AST__UNDEFF,
-		"185GHz Tau from JCMT WVM at end", 0 );
+  astSetFitsU ( fitschan, "WVMTAUEN", "185GHz Tau from JCMT WVM at end", 0 );
 
-  astSetFitsS ( fitschan, "WVMDATST", AST__UNDEFS,
-		"Time of WVMTAUST", 0 );
+  astSetFitsU ( fitschan, "WVMDATST", "Time of WVMTAUST", 0 );
 
-  astSetFitsS ( fitschan, "WVMDATEN", AST__UNDEFS,
-		"Time of WVMTAUEN", 0 );
+  astSetFitsU ( fitschan, "WVMDATEN", "Time of WVMTAUEN", 0 );
 
   astSetFitsF ( fitschan, "SEEINGST", gsdVars->seeing,
 		"[arcsec] SAO atmospheric seeing (start)", 0 );
@@ -777,17 +752,13 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsS ( fitschan, "SEEDATEN", seeDatSt,
 		"Date/Time of SEEINGEN", 0 );
 
-  astSetFitsF ( fitschan, "FRLEGTST", AST__UNDEFF,
-		"[degC] Mean Front leg temperature - Start", 0 );
+  astSetFitsU ( fitschan, "FRLEGTST", "[degC] Mean Front leg temperature - Start", 0 );
 
-  astSetFitsF ( fitschan, "FRLEGTEN", AST__UNDEFF,
-		"[degC] Mean Front leg temperature - End", 0 );
+  astSetFitsU ( fitschan, "FRLEGTEN", "[degC] Mean Front leg temperature - End", 0 );
 
-  astSetFitsF ( fitschan, "BKLEGTST", AST__UNDEFF,
-		"[degC] Mean Back leg temperature - Start", 0 );
+  astSetFitsU ( fitschan, "BKLEGTST", "[degC] Mean Back leg temperature - Start", 0 );
 
-  astSetFitsF ( fitschan, "BKLEGTEN", AST__UNDEFF,
-		"[degC] Mean Back leg temperature - End", 0 );
+  astSetFitsU ( fitschan, "BKLEGTEN", "[degC] Mean Back leg temperature - End", 0 );
 
 
   /* Switching and Map setup for the observation. */
@@ -827,40 +798,29 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   } else {
 
-    astSetFitsS ( fitschan, "CHOP_CRD", AST__UNDEFS,
-                  "Chopping co-ordinate system", 0 );
+    astSetFitsU ( fitschan, "CHOP_CRD", "Chopping co-ordinate system", 0 );
 
-    astSetFitsF ( fitschan, "CHOP_FRQ", AST__UNDEFF,
-		  "[Hz] Chop frequency", 0 );
+    astSetFitsU ( fitschan, "CHOP_FRQ", "[Hz] Chop frequency", 0 );
 
-    astSetFitsF ( fitschan, "CHOP_PA", AST__UNDEFF,
-		  "[deg] Chop PA; 0=in lat, 90=in long", 0 );
+    astSetFitsU ( fitschan, "CHOP_PA", "[deg] Chop PA; 0=in lat, 90=in long", 0 );
 
-    astSetFitsF ( fitschan, "CHOP_THR", AST__UNDEFF,
-		  "[arcsec] Chop throw", 0 );
+    astSetFitsU ( fitschan, "CHOP_THR", "[arcsec] Chop throw", 0 );
 
   }
 
-  astSetFitsS ( fitschan, "ROT_CRD", AST__UNDEFS,
-		"Coordinate frame of image rotator", 0 );
+  astSetFitsU ( fitschan, "ROT_CRD", "Coordinate frame of image rotator", 0 );
 
-  astSetFitsF ( fitschan, "ROT_PA", AST__UNDEFF,
-		"[[deg] Angle of image rotator", 0 );
+  astSetFitsU ( fitschan, "ROT_PA", "[[deg] Angle of image rotator", 0 );
 
-  astSetFitsI ( fitschan, "JIGL_CNT", AST__UNDEFI,
-		"Number of offsets in jiggle pattern", 0 );
+  astSetFitsU ( fitschan, "JIGL_CNT", "Number of offsets in jiggle pattern", 0 );
 
-  astSetFitsS ( fitschan, "JIGL_NAM", AST__UNDEFS,
-		"File containing the jiggle offsets", 0 );
+  astSetFitsU ( fitschan, "JIGL_NAM", "File containing the jiggle offsets", 0 );
 
-  astSetFitsF ( fitschan, "JIG_PA", AST__UNDEFF,
-		"[deg] Jiggle PA; 0=in lat, 90=in long", 0 );
+  astSetFitsU ( fitschan, "JIG_PA", "[deg] Jiggle PA; 0=in lat, 90=in long", 0 );
 
-  astSetFitsS ( fitschan, "JIG_CRD", AST__UNDEFS,
-		"Jiggling co-ordinate system", 0 );
+  astSetFitsU ( fitschan, "JIG_CRD", "Jiggling co-ordinate system", 0 );
 
-  astSetFitsF ( fitschan, "JIG_SCAL", AST__UNDEFF,
-		"Scale size of jiggle pattern", 0 );
+  astSetFitsU ( fitschan, "JIG_SCAL", "Scale size of jiggle pattern", 0 );
 
   if ( strcmp ( samMode, "raster" ) == 0
        && strcmp ( mapVars->swMode, "pssw" ) == 0 ) {
@@ -897,35 +857,25 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   } else {
 
-    astSetFitsF ( fitschan, "MAP_HGHT", AST__UNDEFF,
-		  "[arcsec] Requested height of map", 0 );
+    astSetFitsU ( fitschan, "MAP_HGHT", "[arcsec] Requested height of map", 0 );
 
-    astSetFitsF ( fitschan, "MAP_PA", AST__UNDEFF,
-		  "[deg] Requested PA of map", 0 );
+    astSetFitsU ( fitschan, "MAP_PA", "[deg] Requested PA of map", 0 );
 
-    astSetFitsF ( fitschan, "MAP_WDTH", AST__UNDEFF,
-		  "[arcsec] Requested width of map", 0 );
+    astSetFitsU ( fitschan, "MAP_WDTH",  "[arcsec] Requested width of map", 0 );
 
-    astSetFitsS ( fitschan, "LOCL_CRD", AST__UNDEFS,
-		  "Local offset/map PA co-ordinate system", 0 );
+    astSetFitsU ( fitschan, "LOCL_CRD", "Local offset/map PA co-ordinate system", 0 );
 
-    astSetFitsF ( fitschan, "MAP_X", AST__UNDEFF,
-		  "[arcsec] Requested map offset from telescope centre", 0 );
+    astSetFitsU ( fitschan, "MAP_X", "[arcsec] Requested map offset from telescope centre", 0 );
 
-    astSetFitsF ( fitschan, "MAP_Y", AST__UNDEFF,
-		  "[arcsec] Requested map offset from telescope centre", 0 );  
+    astSetFitsU ( fitschan, "MAP_Y", "[arcsec] Requested map offset from telescope centre", 0 );  
 
-    astSetFitsS ( fitschan, "SCAN_CRD", AST__UNDEFS,
-		  "Co-ordinate system for scan", 0 );
+    astSetFitsU ( fitschan, "SCAN_CRD", "Co-ordinate system for scan", 0 );
 
-    astSetFitsF ( fitschan, "SCAN_VEL", AST__UNDEFF,
-		  "[arcsec/sec] Scan velocity along scan direction", 0 );
+    astSetFitsU ( fitschan, "SCAN_VEL", "[arcsec/sec] Scan velocity along scan direction", 0 );
 
-    astSetFitsF ( fitschan, "SCAN_DY", AST__UNDEFF,
-		  "[arcsec] Scan spacing perp. to scan", 0 );
+    astSetFitsU ( fitschan, "SCAN_DY", "[arcsec] Scan spacing perp. to scan", 0 );
 
-    astSetFitsS ( fitschan, "SCAN_PAT", AST__UNDEFS,
-		  "Scan pattern name", 0 );
+    astSetFitsU ( fitschan, "SCAN_PAT", "Scan pattern name", 0 );
 
   }
 
@@ -969,41 +919,39 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsI ( fitschan, "NUM_NODS", 1, 
                 "Number of times to repeat nod set", 0 );
 
-  astSetFitsI ( fitschan, "JOS_MULT", AST__UNDEFI, "", 0 );//k description
+  astSetFitsU ( fitschan, "JOS_MULT", "", 0 );//k description
 
   astSetFitsI ( fitschan, "JOS_MIN", josMin, "", 0 );//k description
 
-  astSetFitsI ( fitschan, "NCALSTEP", AST__UNDEFI,
-		"Number of RTS steps for each CAL", 0 );
+  astSetFitsU ( fitschan, "NCALSTEP", "Number of RTS steps for each CAL", 0 );
 
   astSetFitsF ( fitschan, "NREFSTEP", nRefStep,
 		"Mean no. of RTS steps for each REF", 0 );
 
-  astSetFitsI ( fitschan, "STBETREF", stBetRef, 
-		"Target number of RTS steps between REFs", 0 );
+  if( stBetRef_defined ) {
+     astSetFitsI ( fitschan, "STBETREF", stBetRef, 
+   		   "Target number of RTS steps between REFs", 0 );
+  } else {
+     astSetFitsU ( fitschan, "STBETREF", "Target number of RTS steps between REFs", 0 );
+  }
 
-  astSetFitsI ( fitschan, "STBETCAL", AST__UNDEFI,
-		"Target number of RTS steps between CALs",0 );
+  astSetFitsU ( fitschan, "STBETCAL", "Target number of RTS steps between CALs",0 );
 
   astSetFitsI ( fitschan, "STARTIDX", startIdx,
 		"Index into pattern at start of obs", 0 );
 
-  astSetFitsS ( fitschan, "FOCAXIS", AST__UNDEFS,
-		"Focus Axis to move (X, Y, Z)", 0 );
+  astSetFitsU ( fitschan, "FOCAXIS", "Focus Axis to move (X, Y, Z)", 0 );
 
-  astSetFitsI ( fitschan, "NFOCSTEP", AST__UNDEFI,
-		"Number of focal position steps", 0 );
+  astSetFitsU ( fitschan, "NFOCSTEP", "Number of focal position steps", 0 );
 
-  astSetFitsF ( fitschan, "FOCSTEP", AST__UNDEFF,
-		"Distance between focal steps", 0 );
+  astSetFitsU ( fitschan, "FOCSTEP", "Distance between focal steps", 0 );
 
 
   /* Miscellaneous parameters */
   astSetFitsCN ( fitschan, "COMMENT", "", 
                  "---- Miscellaneous ----", 0 );
 
-  astSetFitsS ( fitschan, "OCSCFG", AST__UNDEFS,
-	       "OCS config filename", 0 );
+  astSetFitsU ( fitschan, "OCSCFG", "OCS config filename", 0 );
 
   astSetFitsL ( fitschan, "SIMULATE", 0,
 		"True if any data are simulated", 0 );
@@ -1034,17 +982,13 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsL ( fitschan, "POL_CONN", 0,
 		"True if ROVER is connected", 0 );
 
-  astSetFitsS ( fitschan, "POL_MODE", AST__UNDEFS,
-		"Step-and-integrate (STEPINT) or spinning (SPIN)", 0 );
+  astSetFitsU ( fitschan, "POL_MODE", "Step-and-integrate (STEPINT) or spinning (SPIN)", 0 );
 
-  astSetFitsF ( fitschan, "ROTAFREQ", AST__UNDEFF,
-		"[Hz] Spin frequency (if spinning)", 0 );
+  astSetFitsU ( fitschan, "ROTAFREQ", "[Hz] Spin frequency (if spinning)", 0 );
 
-  astSetFitsS ( fitschan, "POL_CRD", AST__UNDEFS,
-		"Coordinate frame of polarimeter angles", 0 );
+  astSetFitsU ( fitschan, "POL_CRD", "Coordinate frame of polarimeter angles", 0 );
 
-  astSetFitsF ( fitschan, "POL_PA", AST__UNDEFF,
-		"[[deg] Angle of pol fast axis", 0 );
+  astSetFitsU ( fitschan, "POL_PA", "[[deg] Angle of pol fast axis", 0 );
 
   astSetFitsS ( fitschan, "BUNIT", "K", "", 0 );
 

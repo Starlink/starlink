@@ -109,6 +109,9 @@
 *        Use astIsUndefF macro. Realise that instap is already in smfHead.
 *     2008-08-11 (TIMJ):
 *        Remove instrument aperture checks. Refuse to reduce non-scan.
+*     2008-12-2 (DSB):
+*        Use smf_getfitsd instead of smf_fits_getD in order to avoid use
+*        of astIsUndef.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -249,12 +252,12 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
     /* Retrieve input SkyFrame */
     skyin = astGetFrame( swcsin, AST__CURRENT );
 
-    /* Retrieve map height and width from header - will be undef for non-scan */
-    smf_fits_getD( hdr, "MAP_WDTH", &mapwdth, status );
-    smf_fits_getD( hdr, "MAP_HGHT", &maphght, status );
-
-    if (astIsUndefF(mapwdth)) mapwdth = 0.0;
-    if (astIsUndefF(maphght)) maphght = 0.0;
+    /* Retrieve map height and width from header - will be undef for 
+       non-scan so set up defaults first. */
+    mapwdth = 0.0;
+    maphght = 0.0;
+    smf_getfitsd( hdr, "MAP_WDTH", &mapwdth, status );
+    smf_getfitsd( hdr, "MAP_HGHT", &maphght, status );
 
     /* Make an approximation if map height and width are not set -
        note that this should ONLY apply for non-scan mode data */
@@ -265,15 +268,15 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
         goto CLEANUP;
       }
     }    
-    smf_fits_getD( hdr, "MAP_X", &mapx, status );
-    smf_fits_getD( hdr, "MAP_Y", &mapy, status );
-    /* Undefs are a problem for non-scan maps if we have got this far */
-    if (astIsUndefF(mapx)) mapx = 0.0;
-    if (astIsUndefF(mapy)) mapy = 0.0;
+
+    mapx = 0.0;   /* Used if the FITS keyword values are undefed */
+    mapy = 0.0;
+    smf_getfitsd( hdr, "MAP_X", &mapx, status );
+    smf_getfitsd( hdr, "MAP_Y", &mapy, status );
 
     /* Convert map Position Angle to radians */
+    mappa = 0.0;
     smf_fits_getD( hdr, "MAP_PA", &mappa, status );
-    if (astIsUndefF(mappa)) mappa = 0.0;
     mappa *= AST__DD2R;
 
     /* Calculate size of output map in pixels */

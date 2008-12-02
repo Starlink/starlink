@@ -50,6 +50,8 @@
 *        Prevent warnings from being issued about undefined MAP_PA values.
 *     29-JUL-2008 (TIMJ):
 *        Use astIsUndefF macro.
+*     2-DEC-2008 (DSB):
+*        Avoid use of astIsUndefF macro.
 
 *  Copyright:
 *     Copyright (C) 2008 Science & Technology Facilities Council.
@@ -93,7 +95,6 @@ double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf,
    const char *oldsys = NULL; /* Original System value for supplied Frame */
    const char *trsys = NULL;  /* AST tracking system */
    const char *usesys = NULL; /* AST system for output cube */
-   const char *warnings = NULL;/* List of conditions reported by FitsChan */
    double map_pa;             /* MAP_PA in tracking system (degs) */
    double p1[ 2 ];            /* Base pointing position */
    double p2[ 2 ];            /* A point on the map vertical axis */
@@ -126,19 +127,10 @@ double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf,
    p1[ 1 ] = hdr->state->tcs_az_bc2;
 
 /* Move along the map "vertical" axis (as specified by the MAP_PA FITS
-   header) for 1 arc-minute from the base pointing position. It is legal
-   for the MAP_PA value to be udnefined, so stop the FitsChan from
-   issuing warnings about undefined values before we access it. We do
-   this by clearing the Warnings attribute before accessing the keyword, 
-   and then re-instating its original value afterwards. */
-   if( astTest( hdr->fitshdr, "Warnings" ) ) {
-      warnings = astGetC( hdr->fitshdr, "Warnings" );
-      astClear( hdr->fitshdr, "Warnings" );
-   } 
-   smf_fits_getD( hdr, "MAP_PA", &map_pa, status );
-   if( warnings ) astSetC( hdr->fitshdr, "Warnings", warnings );
-
-   if( astIsUndefF(map_pa) ) map_pa = 0.0;
+   header) for 1 arc-minute from the base pointing position. Set up a
+   suitable default first in case the MAP_PA value is undefined. */
+   map_pa = 0.0;
+   smf_getfitsd( hdr, "MAP_PA", &map_pa, status );
    (void) astOffset2( sf, p1, map_pa*AST__DD2R, AST__DD2R/60.0, p2 );
 
 /* Take a copy of the Frame and set its System value to the requested
