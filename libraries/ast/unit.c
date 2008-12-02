@@ -83,6 +83,8 @@
 *        - Correct error reporting in astUNitNormaliser.
 *        - Fix bug in CleanExp that caused (for example) "-2" to be
 *        converted to "^-2".
+*     2-DEC-2008 (DSB):
+*        Correct memory allocation bug in CleanExp.
 */
 
 /* Module Macros. */
@@ -432,9 +434,9 @@ static const char *CleanExp( const char *exp, int *status ) {
                w += s - t;
             }
             strcpy( w, "m*1.0E-6)" );
+            l = s - t + 11;
             t = astFree( t );
          }
-         l = s - t + 11;
 
 /* Convert "STER" to "sr". */
       } else if( !Ustrcmp( t, "STER", status ) ) {
