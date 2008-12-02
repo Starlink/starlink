@@ -915,6 +915,14 @@ void smf_resampcube_ast( smfData *data, dim_t nchan,
                          const double params[], float *in_data, 
                          float *out_data, int *status );
 
+void smf_resampcube( smfData *data, int index, int size, 
+                     AstSkyFrame *abskyfrm, AstMapping *iskymap, 
+                     AstFrame *ispecfrm, AstMapping *ispecmap, 
+                     Grp *detgrp, int moving, int slbnd[ 3 ], 
+                     int subnd[ 3 ], int interp, const double params[], 
+                     float *in_data, float *out_data, int *overlap,
+                     int *status );
+
 void smf_update_quality( smfData *data, unsigned char *target, int syncbad, 
                          const int *badmask, double badfrac,
                          int *status );
