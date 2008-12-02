@@ -2074,11 +2074,18 @@ package @PACKAGE@ {
                 prompt {Cleaned timeseries}
                 helpkey *
             }
+            parameter apod {
+                type _INTEGER
+                vpath {DEFAULT}
+                prompt {Number of samples over which to apodize}
+                default 0
+                helpkey *
+            }
             parameter badfrac {
                 type _DOUBLE
                 vpath {DEFAULT}
                 prompt {Fraction of bad samples to flag entire bolo bad}
-                default 0.05
+                default 0.0
                 helpkey *
             }
             parameter dcthresh {
@@ -2092,7 +2099,7 @@ package @PACKAGE@ {
                 type _INTEGER
                 vpath {DEFAULT}
                 prompt {Size of box (samples) to measure means for DC step-finding}
-                default 400
+                default 0
                 helpkey *
             }
             parameter dcbad {

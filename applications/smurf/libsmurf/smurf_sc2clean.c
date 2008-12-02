@@ -38,12 +38,15 @@
 *          Input files to be uncompressed and flatfielded
 *     OUT = NDF (Write)
 *          Output file
+*     APOD = _INTEGER (Read)
+*          Apodize time series start and end with trif function that rolls off
+*          in APOD samples.
 *     BADFRAC = _DOUBLE (Read)
 *          Fraction of bad samples in order for entire bolometer to be
 *          flagged as bad
 *     DCTHRESH = _DOUBLE (Read)
 *          N-sigma threshold at which to detect DC steps
-*     DCBOX = INTEGER (Read)
+*     DCBOX = _INTEGER (Read)
 *          Width of the box (samples) over which to estimate the mean
 *          signal level for DC step detection
 *     DCBAD - _LOGICAL (Read)
@@ -62,7 +65,7 @@
 *          Fit and remove polynomial baselines of this order
 *     SPIKETHRESH = _DOUBLE (Read)
 *          Flag spikes SPIKETHRESH-sigma away from mean
-*     SPIKEITER = INTEGER (Read)
+*     SPIKEITER = _INTEGER (Read)
 *          If 0 iteratively find spikes until convergence. Otherwise 
 *          execute precisely this many iterations.
 
@@ -133,11 +136,11 @@
 void smurf_sc2clean( int *status ) {
 
   size_t aiter;             /* Number of iterations in sigma-clipper */
+  size_t apod=0;            /* Length of apodization window */
   double badfrac=0;         /* Fraction of bad samples to flag bad bolo */
-  smfArray *darks = NULL;          /* Dark data */
+  smfArray *darks = NULL;   /* Dark data */
   int dcbad;                /* Flag bolometers with steps as bad */
   dim_t dcbox=0;            /* width of box for measuring DC steps */
-  int dcbox_s=0;            /* signed int version of dcbox */
   double dcthresh=0;        /* n-sigma threshold for DC steps */
   int dkclean;              /* Flag for dark squid cleaning */
   smfData *ffdata = NULL;   /* Pointer to output data struct */
@@ -153,8 +156,7 @@ void smurf_sc2clean( int *status ) {
   size_t size;              /* Number of files in input group */
   double spikethresh;       /* Threshold for finding spikes */
   size_t spikeiter=0;       /* Number of iterations for spike finder */
-  int spikeiter_s;          /* Signed int version of spikeiter_s */
-
+  int sval;                 /* Temporary signed value */
   int dofft=0;              /* Set if freq. domain filtering the data */
   double f_edgelow;         /* Freq. cutoff for low-pass edge filter */
   double f_edgehigh;        /* Freq. cutoff for high-pass edge filter */
@@ -189,14 +191,20 @@ void smurf_sc2clean( int *status ) {
        " nothing to do", status );
   }
 
+  /* Apodization length */
+  parGdr0i( "APOD", 0, 0, NUM__MAXI, 1, &sval, status );
+  if( *status == SAI__OK ) {
+    apod = (size_t) sval;
+  }
+
   /* Check for badfrac threshold for flagging bad bolos */
   parGet0d( "BADFRAC", &badfrac, status );
 
   /* Check for DC step correction paramaters */
   parGet0d( "DCTHRESH", &dcthresh, status );
-  parGdr0i( "DCBOX", 1000, 0, NUM__MAXI, 1, &dcbox_s, status );
+  parGdr0i( "DCBOX", 1000, 0, NUM__MAXI, 1, &sval, status );
   if( *status == SAI__OK ) {
-    dcbox = (dim_t) dcbox_s;
+    dcbox = (dim_t) sval;
   }
   parGet0l( "DKCLEAN", &dkclean, status );
 
@@ -205,9 +213,9 @@ void smurf_sc2clean( int *status ) {
 
   /* Spike flagging */
   parGet0d( "SPIKETHRESH", &spikethresh, status );
-  parGdr0i( "SPIKEITER", 0, 0, NUM__MAXI, 1, &spikeiter_s, status );
+  parGdr0i( "SPIKEITER", 0, 0, NUM__MAXI, 1, &sval, status );
   if( *status == SAI__OK ) {
-    spikeiter = (size_t) spikeiter_s;
+    spikeiter = (size_t) sval;
   }
   parGet0l( "DKCLEAN", &dcbad, status );
 
@@ -326,6 +334,14 @@ void smurf_sc2clean( int *status ) {
       smf_clean_dksquid( ffdata, NULL, 0, 100, NULL, 0, 0, status );
     }
 
+    /* Apodization */
+    if( apod ) {
+      msgOutif(MSG__VERB," ",
+               "Apodizing data.",
+               status);
+      smf_apodize( ffdata, apod, status );
+    }
+
     /* frequency-domain filtering */
     if( dofft ) {
       msgOutif( MSG__VERB," ", "Apply frequency domain filter", status );
@@ -354,9 +370,6 @@ void smurf_sc2clean( int *status ) {
 
     /* Ensure that the data is ICD ordered before closing */
     smf_dataOrder( ffdata, 1, status );
-
-    /* Synchronize BAD values to QUALITY */
-    smf_update_valbad( ffdata, ~SMF__Q_JUMP, status );
 
     /* Free resources for output data */
     smf_close_file( &ffdata, status );
