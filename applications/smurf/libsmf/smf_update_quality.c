@@ -175,15 +175,19 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
     
     /* Synchronize SMF__Q_BADS quality and VAL__BADD in data array */
     if( syncbad ) {
+      double * ddata = NULL;
+      int * idata = NULL;
+      smf_select_pntr( data->pntr, data->dtype, &ddata, NULL,
+                       &idata, NULL, status);
       if (data->dtype == SMF__DOUBLE) {
         for( i=0; i<ndata; i++ ) {    /* Loop over all samples */
-          if (((double *)data->pntr[0])[i] == VAL__BADD) {
+          if (ddata[i] == VAL__BADD) {
             qual[i] |= SMF__Q_BADS;
           }
         }
       } else if (data->dtype == SMF__INTEGER) {
         for( i=0; i<ndata; i++ ) {    /* Loop over all samples */
-          if (((int *)data->pntr[0])[i] == VAL__BADI) {
+          if (idata[i] == VAL__BADI) {
             qual[i] |= SMF__Q_BADS;
           }
         }
