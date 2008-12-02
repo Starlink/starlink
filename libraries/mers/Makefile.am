@@ -119,9 +119,9 @@ mers_test_LDADD = liberr_standalone.la `chr_link` `cnf_link` `ems_link` `staruti
 
 # Monoliths with C main do compile but we do not want a build dependency
 # on PCS
-check_MONOLITHS = err_test
-err_test_SOURCES = err_test.c
-err_test_LDADD = liberr_adam.la `chr_link_adam` `ems_link_adam` `cnf_link_adam`
+#check_MONOLITHS = err_test
+#err_test_SOURCES = err_test.c
+#err_test_LDADD = liberr_adam.la `chr_link_adam` `ems_link_adam` `cnf_link_adam`
 
 dist_starnews_DATA = mers.news
 dist_pkgdata_DATA = LICENCE
