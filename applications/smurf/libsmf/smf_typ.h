@@ -307,6 +307,32 @@ static const size_t SMF__BADIDX = (size_t)-1;
 #define SMF__COL_INDEX 1
 
 
+/* Define a structure used to hold information cached by smf_create_lutwcs. */
+typedef struct smfCreateLutwcsCache { 
+   AstMapping *map;
+   AstFrameSet *frameset; 
+
+/* The SkyFrame used to represent final spherical (Az,El) coords */
+   AstSkyFrame *skyframe;
+
+/* Mappings needed in the tangent plane to celestial longitude,latitude 
+   Mapping. */
+   AstMapping *azel[ 2 ];
+
+/* The instap values which were hard-wired into the cached Mapping. */
+   double instap[ 2 ];
+
+} smfCreateLutwcsCache;
+
+/* Define a structure used to hold information cached by smf_detpos_wcs. */
+typedef struct smfDetposWcsCache { 
+   double *latlut;
+   double *lonlut;
+   AstPermMap *pmap;
+   AstFrame *grid;
+   AstSkyFrame *sky;
+} smfDetposWcsCache;
+
 /* Global information about the data file itself */
 
 typedef struct smfFile {
@@ -326,7 +352,9 @@ typedef struct smfHead {
   AstFrameSet * wcs;        /* Frameset for a particular time slice (frame) */
   AstFrameSet * tswcs;      /* Frameset for full time series (if tseries) */
   AstFitsChan * fitshdr;    /* FITS header from the file */
-  sc2astCache * cache;      /* Cached info used by sc2ast */
+  sc2astCache * cache1;     /* Cached info used by sc2ast_createwcs. */
+  smfCreateLutwcsCache * cache2; /* Cached info used by smf_create_lutwcs. */
+  smfDetposWcsCache * cache3; /* Cached info used by smf_detpow_wcs. */
   dim_t curframe;           /* Index corresponding to current frame */
   dim_t nframes;            /* Number of frames in smfData */
   smf_obstype obstype;      /* Observation type */
@@ -564,5 +592,6 @@ typedef struct smfRebinMapData {
    double *bolovar;
    int nused;
 } smfRebinMapData;
+
 
 #endif /* SMF_TYP_DEFINED */

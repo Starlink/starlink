@@ -93,6 +93,8 @@
 *        - Handle bolo-ordered data
 *     2008-07-18 (TIMJ):
 *        Use smf_find_subarray
+*     2008-12-2 (DSB):
+*        Manage caches for smf_create_wcs and smf_detpos_wcs.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -237,29 +239,30 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
     case INST__SCUBA2:
       /* Need to get the subarray number */
       smf_find_subarray( hdr, NULL, 0, &subsysnum, status );
-      hdr->cache = sc2ast_createwcs2( subsysnum, tmpState, hdr->instap, 
-                                      hdr->telpos, &(hdr->wcs),
-                                      hdr->cache, status );
+      hdr->cache1 = sc2ast_createwcs2( subsysnum, tmpState, hdr->instap, 
+                                       hdr->telpos, &(hdr->wcs),
+                                       hdr->cache1, status );
       break;
       
     case INST__AZTEC:
 
-      smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney, hdr->ndet, 
-			 tmpState, hdr->instap, hdr->telpos,
-			 &(hdr->wcs), status );
+      hdr->cache2 = smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney, hdr->ndet,
+              			       tmpState, hdr->instap, hdr->telpos,
+ 			               &(hdr->wcs), hdr->cache2, status );
       break;
       
 /* For ACSIS data, use the .MORE.ACSIS.RECEPPOS values if they are
    still available in the smfHead. Otherwise, use the FPLANEX/Y values. */
     case INST__ACSIS:
       if( hdr->detpos ) {
-         smf_detpos_wcs( hdr, index, hdr->telpos, &(hdr->wcs), 
-                         status );
+         hdr->cache3 = smf_detpos_wcs( hdr, index, hdr->telpos, &(hdr->wcs), 
+                                       hdr->cache3, status );
 
       } else {
-         smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney, hdr->ndet, 
-     			    tmpState, hdr->instap, hdr->telpos,
-			    &(hdr->wcs), status );
+         hdr->cache2 = smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney, 
+                                          hdr->ndet, tmpState, hdr->instap, 
+                                          hdr->telpos, &(hdr->wcs), hdr->cache2, 
+                                          status );
       }
 
       break;

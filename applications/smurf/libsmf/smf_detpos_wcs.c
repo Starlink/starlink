@@ -14,22 +14,34 @@
 *     C function
 
 *  Invocation:
-*     smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3], 
-*                     AstFrameSet **fset, int *status );
+*     smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, 
+*                                 const double telpos[3], AstFrameSet **fset, 
+*                                 smfDetposWcsCache *cache, int *status );
 
 *  Arguments:
 *     hdr = smfHead * (Given & Returned)
 *        The smfHead structure containing the detector positions.
 *     index = int (Given)
 *        Index into the time series data (the 3rd dimension). Call with a
-*        negative index value to free cached resources.
+*        negative index value to free cached resources (a NULL pointer
+*        will then be returned as the function value).
 *     telpos = double[ 3 ] (Given)
 *        Geodetic lon / lat / altitude of the telscope (deg/deg/metres)
 *     fset = AstFrameSet ** (Given)
 *        Address of a location at which to put the returned FrameSet
 *        pointer. Ignored if "index" is negative.
+*     cache = smfDetposWcsCache * (Given)
+*        Pointer to a structure holding cached information created by a
+*        previous call to this function, or a NULL pointer if this is the
+*        first invocation of this function.
 *     status = int * (Given and Returned)
 *        Pointer to global status.
+
+*  Returned Value:
+*     A pointer to  structure holding cached information used by this
+*     function. If a non-Null value is supplied for "cache", then the
+*     returned function value will be the supplied "cache" pointer.
+*     Otherwise, it will be a pointer to a newly allocated cache structure.
 
 *  Description:
 *     This function is used to create an AST FrameSet for the
@@ -58,6 +70,8 @@
 *        number of receptors changes.
 *     20-JUN-2008 (DSB):
 *        Tidy up use of astGrow.
+*     3-DEC-2008 (DSB):
+*        Avoid use of static cache.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -103,40 +117,58 @@
 /* Seconds per day */
 #define SPD 86400.0                    
 
-void smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3], 
-                     AstFrameSet **fset, int *status ) {
+smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3],
+                                 AstFrameSet **fset, smfDetposWcsCache *cache, 
+                                 int *status ) {
 
+/* Local Variables: */
+   AstCmpMap *cmap1 = NULL;    /* Parallel CmpMap holding both LutMaps */
+   AstLutMap *latmap = NULL;   /* LutMap holding latitude values */
+   AstLutMap *lonmap = NULL;   /* LutMap holding longitude values */
+   AstMapping *map = NULL;     /* GRID->SKY Mapping */
+   AstSkyFrame *csky = NULL;   /* SkyFrame to put in returned FrameSet */
    const double *p1;           /* Pointer to next lon or lat value to copy */
    double *p2;                 /* Pointer to next lon value */
    double *p3;                 /* Pointer to next lat value */
-   int nrec;                   /* Number of detectors */
    int i;                      /* Index of current detector */
-   AstLutMap *lonmap = NULL;   /* LutMap holding longitude values */
-   AstLutMap *latmap = NULL;   /* LutMap holding latitude values */
-   AstCmpMap *cmap1 = NULL;    /* Parallel CmpMap holding both LutMaps */
-   AstMapping *map = NULL;     /* GRID->SKY Mapping */
+   int nrec;                   /* Number of detectors */
    int outperm[ 2 ];           /* Axis permutation */
-   AstSkyFrame *csky = NULL;   /* SkyFrame to put in returned FrameSet */
-
-   static double *latlut = NULL;
-   static double *lonlut = NULL;
-   static AstPermMap *pmap = NULL;
-   static AstFrame *grid = NULL;
-   static AstSkyFrame *sky = NULL;
+   smfDetposWcsCache *result;  /* Pointer to returned cache structure */
 
 /* If a negative index was supplied just free the allocated resources and
    return. */
-   if( index < 0 ) {
-      if( latlut ) latlut = astFree( latlut );
-      if( lonlut ) lonlut = astFree( lonlut );
-      if( pmap ) pmap = astAnnul( pmap );
-      if( grid ) grid = astAnnul( grid );
-      if( sky ) sky = astAnnul( sky );
-      return;
+   if( index < 0 && cache ) {
+      if( cache->latlut ) cache->latlut = astFree( cache->latlut );
+      if( cache->lonlut ) cache->lonlut = astFree( cache->lonlut );
+      if( cache->pmap ) cache->pmap = astAnnul( cache->pmap );
+      if( cache->grid ) cache->grid = astAnnul( cache->grid );
+      if( cache->sky ) cache->sky = astAnnul( cache->sky );
+      cache = astFree( cache );
+      return NULL;
    }
 
 /* Check inherited status */
-   if( *status != SAI__OK) return;
+   result = cache;
+   if( *status != SAI__OK) return result;
+
+/* If no cache structure was supplied, allocate and initialise one now. */
+   if( !cache ) {
+      cache = astMalloc( sizeof( *cache ) );
+      if( cache ) {
+         cache->latlut = NULL;
+         cache->lonlut = NULL;
+         cache->pmap = NULL;
+         cache->grid = NULL;
+         cache->sky = NULL;
+         result = cache;
+
+      } else {
+         *status = SAI__ERROR;
+         errRep( FUNC_NAME, FUNC_NAME": Can't allocate memory for cache.",
+                 status);
+         return NULL;
+      }
+   }
 
 /* Get the number of detectors. */
    nrec = hdr->ndet;
@@ -154,16 +186,16 @@ void smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3],
 
 /* If required, allocate memory to hold the individual look up tables for
    lon and lat vaues. */
-      lonlut = astGrow( lonlut, nrec, sizeof( double ) );
-      latlut = astGrow( latlut, nrec, sizeof( double ) );
+      cache->lonlut = astGrow( cache->lonlut, nrec, sizeof( double ) );
+      cache->latlut = astGrow( cache->latlut, nrec, sizeof( double ) );
 
 /* Check the memory was allocated succesfully. */
-      if( lonlut && latlut ) {
+      if( cache->lonlut && cache->latlut ) {
   
 /* Copy the lon and lat values for the requested time slice from the
    smfHead structure to the local lut arrays. */
-         p2 = lonlut;
-         p3 = latlut;
+         p2 = cache->lonlut;
+         p3 = cache->latlut;
          for( i = 0; i < nrec; i++ ) {
             *(p2++) = *(p1++);
             *(p3++) = *(p1++);
@@ -173,22 +205,22 @@ void smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3],
    duplicate the detector index, followed by 2 LutMaps in parallel to
    generate the lon and lat values. Set the LutInterpattribute in these
    LutMaps so that they use nearest neighbour interpolation. */
-         lonmap = astLutMap( nrec, lonlut, 1.0, 1.0, "LutInterp=1" );
-         latmap = astLutMap( nrec, latlut, 1.0, 1.0, "LutInterp=1" );
+         lonmap = astLutMap( nrec, cache->lonlut, 1.0, 1.0, "LutInterp=1" );
+         latmap = astLutMap( nrec, cache->latlut, 1.0, 1.0, "LutInterp=1" );
          cmap1 = astCmpMap( lonmap, latmap, 0, "" );
 
          latmap = astAnnul( latmap );
          lonmap = astAnnul( lonmap );
 
-         if( !pmap ) {
+         if( !cache->pmap ) {
             outperm[ 0 ] = 1;
             outperm[ 1 ] = 1;
-            pmap = astPermMap( 2, NULL, 2, outperm, NULL, "" );
-            astExempt( pmap );
+            cache->pmap = astPermMap( 2, NULL, 2, outperm, NULL, "" );
+            astExempt( cache->pmap );
          }
-         map = (AstMapping *) astCmpMap( pmap, cmap1, 1, "" );
+         map = (AstMapping *) astCmpMap( cache->pmap, cmap1, 1, "" );
 
-         pmap = astAnnul( pmap );
+         cache->pmap = astAnnul( cache->pmap );
          cmap1 = astAnnul( cmap1 );
       }
 
@@ -202,21 +234,21 @@ void smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3],
    }
 
 /* Create two Frames to put in the FrameSet. */
-   if( !grid ) {
-      grid = astFrame( 2, "Domain=GRID" );
-      astExempt( grid );
+   if( !cache->grid ) {
+      cache->grid = astFrame( 2, "Domain=GRID" );
+      astExempt( cache->grid );
    }
 
-   if( !sky ) {
-      sky = astSkyFrame( "System=AzEl" );
-      astSetD( sky, "ObsLon", -telpos[ 0 ] );
-      astSetD( sky, "ObsLat", telpos[ 1 ] );
-      astExempt( sky );
+   if( !cache->sky ) {
+      cache->sky = astSkyFrame( "System=AzEl" );
+      astSetD( cache->sky, "ObsLon", -telpos[ 0 ] );
+      astSetD( cache->sky, "ObsLat", telpos[ 1 ] );
+      astExempt( cache->sky );
 
 /* If the detpos positions are referred to the TRACKING frame, change
    the SkyFrame from AZEL to the AST equivalent of the TRACKING Frame. */
       if( !hdr->dpazel ) {
-         astSetC( sky, "System", sc2ast_convert_system( hdr->state->tcs_tr_sys,
+         astSetC( cache->sky, "System", sc2ast_convert_system( hdr->state->tcs_tr_sys,
                                                      status ) ); 
       }
    }
@@ -227,12 +259,12 @@ void smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3],
    Always use TCS_TAI. smf_open_file corrects the JCMTState structure
    if TCS_TAI is missing. Remember to convert from TAI to TDB (as required by 
    the Epoch attribute). */
-   csky = astCopy( sky );
+   csky = astCopy( cache->sky );
    astSet( csky, "Epoch=MJD %.*g", DBL_DIG, hdr->state->tcs_tai + 
                                             32.184/SPD ); 
 
 /* Create the FrameSet */
-   *fset = astFrameSet( grid, "" );
+   *fset = astFrameSet( cache->grid, "" );
    astAddFrame( *fset, AST__BASE, map, csky );
 
 /* Free resources */
@@ -244,4 +276,5 @@ void smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3],
    annulled either in smf_tslice_ast or in smf_close_file. */
    astExempt( *fset );
 
+   return result;
 }

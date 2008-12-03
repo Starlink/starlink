@@ -14,11 +14,11 @@
 *     Library routine
 
 *  Invocation:
-*     smf_create_lutwcs( int clearcache, const double *fplane_x, 
-*                        const double *fplane_y, const int n_pix, 
-*        		 const JCMTState *state, const double instap[2], 
-*                   	 const double telpos[3],
-*                        AstFrameSet **fset, int *status )
+*     result = smf_create_lutwcs( int clearcache, const double *fplane_x, 
+*                                 const double *fplane_y, const int n_pix, 
+*        		          const JCMTState *state, const double instap[2],
+*                   	          const double telpos[3], AstFrameSet **fset, 
+*                                 CreateLutwcsCache *cache, int *status )
 
 *  Arguments:
 *     clearcache = int (Given)
@@ -40,8 +40,18 @@
 *        LON / Lat / altitude of the telscope (deg/deg/metres)
 *     fset = AstFrameSet** (Returned)
 *        Constructed frameset.
+*     cache = smfCreateLutwcsCache * (Given)
+*        Pointer to a structure holding cached information created by a
+*        previous call to this function, or a NULL pointer if this is the
+*        first invocation of this function.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
+
+*  Returned Value:
+*     A pointer to  structure holding cached information used by this
+*     function. If a non-Null value is supplied for "cache", then the
+*     returned function value will be the supplied "cache" pointer.
+*     Otherwise, it will be a pointer to a newly allocated cache structure.
 
 *  Description:
 *     Build an AST frameset containing mappings from JCMT instrument
@@ -99,6 +109,8 @@
 *        Clear the cache if the INSTAP values change.
 *     2008-04-09 (TIMJ):
 *        No longer need steptime (tcs_tai vs rts_end handled elsewhere)
+*     2008-12-3 (DSB):
+*        Avoid use of static cache.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -153,11 +165,11 @@
 
 #define FUNC_NAME "smf_create_lutwcs"
 
-void smf_create_lutwcs( int clearcache, const double *fplane_x, 
-			const double *fplane_y, const int n_pix, 
-			const JCMTState *state, const double instap[2], 
-                        const double telpos[3],
-                        AstFrameSet **fset, int *status ) {
+smfCreateLutwcsCache *smf_create_lutwcs( int clearcache, const double *fplane_x,
+      			       const double *fplane_y, const int n_pix, 
+		               const JCMTState *state, const double instap[2], 
+                               const double telpos[3], AstFrameSet **fset, 
+                               smfCreateLutwcsCache *cache, int *status ) {
 
   /* Local Variables */
   AstMapping *azelmap;            /* tangent plane to spherical azel mapping */
@@ -166,6 +178,7 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
   AstShiftMap *jigglemap;         /* account for offsets in tangent plane */
   AstMapping *mapping;            /* total pixel -> azel mapping */
   double shifts[ 2 ];             /* size of shifts for jigglemap */ 
+  smfCreateLutwcsCache *result;   /* Returned cache pointer */
 
   double temp_jig_x=0;            /* SMU x-offset */
   double temp_jig_y=0;            /* SMU y-offset */
@@ -183,29 +196,6 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
   int inperm[2];
   int outperm[2];
 
-  /* A cache containing a FrameSet and a Mapping. The 
-     FrameSet will contain a single Frame representing BOLO # in the 
-     array. The result of applying the Mapping to this Frame will be 
-     Cartesian (i.e. in the tangent plane) AzEl coords in rads. The 
-     AST pointers in this cache are exempted from AST context handling, and
-     so need to be released explicitly using astAnnul. This is done by 
-     calling this function with the sub-frame number set to -1. 
-  */
-
-
-  static AstMapping *map_cache = NULL;
-  static AstFrameSet *frameset_cache = NULL; 
-
-  /* Cache the SkyFrame used to represent final spherical (Az,El) coords */
-  static AstSkyFrame *skyframe = NULL;
-
-  /* Cache used to hold Mappings needed in the tangent plane to celestial
-     longitude,latitude Mapping. */
-  static AstMapping *azel_cache[ 2 ] = { NULL, NULL };
-
-  /* Cache used to hold the instap values which were hard-wired into the
-     cached Mapping. */
-  static double instap_cache[ 2 ];
 
 
   /* Main routine */
@@ -217,45 +207,73 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
     haveLUT = 0;
   }
 
-  /* Check the clearcache flag. If it is 1, free the cached AST object. 
-     Otherwise, report an error if the value is illegal. We do
-     this before checking the inherited status so that the memory is freed
-     even if an error has occurred. */
+  /* Check the clearcache flag. If it is 1, free the cached AST objects
+     and then free the cache itself. Otherwise, report an error if the value 
+     is illegal. We do this before checking the inherited status so that the 
+     memory is freed even if an error has occurred. */
 
-  if( clearcache ) {
-    if( map_cache ) map_cache = astAnnul( map_cache );
-    if( frameset_cache ) frameset_cache = astAnnul( frameset_cache );
-    if( azel_cache[ 0 ] ) azel_cache[ 0 ] = astAnnul( azel_cache[ 0 ] );
-    if( azel_cache[ 1 ] ) azel_cache[ 1 ] = astAnnul( azel_cache[ 1 ] );
-    if( skyframe ) skyframe = astAnnul( skyframe );
+  if( clearcache && cache ) {
+    if( cache->map ) cache->map = astAnnul( cache->map );
+    if( cache->frameset ) cache->frameset = astAnnul( cache->frameset );
+    if( cache->azel[ 0 ] ) cache->azel[ 0 ] = astAnnul( cache->azel[ 0 ] );
+    if( cache->azel[ 1 ] ) cache->azel[ 1 ] = astAnnul( cache->azel[ 1 ] );
+    if( cache->skyframe ) cache->skyframe = astAnnul( cache->skyframe );
+    cache = astFree( cache );
 
     /* If the LUT information is NULL, just return here because the purpose
        of the call was only to clear the cache */
 
-    if( !haveLUT ) return;
+    if( !haveLUT ) return NULL;
   } 
 
-  /* Now initialise the returned pointer and check the inherited status */
-  *fset = AST__NULL;
-  if ( *status != SAI__OK ) return;
+  /* Now initialise the returned pointers and check the inherited status */
+  result = cache;
+  if( fset ) *fset = AST__NULL;
+  if ( *status != SAI__OK || !fset ) return result;
 
   /* Start an AST context. This means we do not need to worry about
      annulling AST objects. Note, there should be no "return" statements
      before the matching call to astEnd. */
   astBegin;
 
-  /* See if either of the instap values has changed. If so, clear the
-     cache since the old instap values were hard-wired into it. */
-  if( ( instap && ( instap[ 0 ] != instap_cache[ 0 ] ||
-                     instap[ 1 ] != instap_cache[ 1 ] ) ) ||
-      ( !instap && ( 0.0 != instap_cache[ 0 ] || 
-                     0.0 != instap_cache[ 1 ] ) ) ){
+/* If no cache was supplied, allocate memory for one now and initialise it. 
+   The cache contains a FrameSet and a Mapping. The FrameSet will contain a 
+   single Frame representing BOLO # in the array. The result of applying 
+   the Mapping to this Frame will be Cartesian (i.e. in the tangent plane) 
+   AzEl coords in rads. The AST pointers in this cache are exempted from 
+   AST context handling, and so need to be released explicitly using 
+   astAnnul. This is done by calling this function with "clearcache"
+   set non-zero. */
+   if( !cache ) {
+      cache = astMalloc( sizeof( *cache ) );
+      if( cache ) {
+         cache->map = NULL;
+         cache->frameset = NULL; 
+         cache->skyframe = NULL;
+         cache->azel[ 0 ] = NULL;
+         cache->azel[ 1 ] = NULL;
+         result = cache;
 
-    if( map_cache ) map_cache = astAnnul( map_cache );
-    if( frameset_cache ) frameset_cache = astAnnul( frameset_cache );
-    if( azel_cache[ 0 ] ) azel_cache[ 0 ] = astAnnul( azel_cache[ 0 ] );
-    if( azel_cache[ 1 ] ) azel_cache[ 1 ] = astAnnul( azel_cache[ 1 ] );
-    if( skyframe ) skyframe = astAnnul( skyframe );
+      } else {
+         *status = SAI__ERROR;
+         errRep( FUNC_NAME, FUNC_NAME": Can't allocate memory for cache.",
+	         status);
+         return NULL;
+      }
+   }
+
+  /* See if either of the instap values has changed. If so, clear the
+     cache contents since the old instap values were hard-wired into it. */
+  if( ( instap && ( instap[ 0 ] != cache->instap[ 0 ] ||
+                     instap[ 1 ] != cache->instap[ 1 ] ) ) ||
+      ( !instap && ( 0.0 != cache->instap[ 0 ] || 
+                     0.0 != cache->instap[ 1 ] ) ) ){
+
+    if( cache->map ) cache->map = astAnnul( cache->map );
+    if( cache->frameset ) cache->frameset = astAnnul( cache->frameset );
+    if( cache->azel[ 0 ] ) cache->azel[ 0 ] = astAnnul( cache->azel[ 0 ] );
+    if( cache->azel[ 1 ] ) cache->azel[ 1 ] = astAnnul( cache->azel[ 1 ] );
+    if( cache->skyframe ) cache->skyframe = astAnnul( cache->skyframe );
   }
 
   /* The Mapping from pixel number to AzEl coords can be thought of as
@@ -271,7 +289,7 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
      encapsulated within the cached FrameSet into Tanplane focal
      plane offsets in radians. */
 
-  if( !map_cache ) {
+  if( !cache->map ) {
 
     /* Check that the LUTs were specified! */
     if( haveLUT ) {
@@ -279,12 +297,12 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
       /* Create an AST frame describing GRID coordinates within the instrument
          and put it into the cached FrameSet for this subarray. The centre of
          the first pixel has coords (1.0,1.0) in the GRID Frame. */
-      frameset_cache = astFrameSet( astFrame ( 2, "Domain=GRID" ), 
+      cache->frameset = astFrameSet( astFrame ( 2, "Domain=GRID" ), 
                                     "" );   
     
       /* We add a dummy 2D Frame to the FrameSet so that there is a Frame to
          remove on the first call to astRemoveFrame below. */
-      astAddFrame( frameset_cache, AST__BASE, 
+      astAddFrame( cache->frameset, AST__BASE, 
                    astUnitMap( 2, "" ), astFrame( 2, "" ) );
 
       /* Start LUT-specific code */    
@@ -297,7 +315,7 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
       outperm[0] = 1;
       outperm[1] = 1;
       permmap = astPermMap( 2, inperm, 2, outperm, NULL, "" );
-      map_cache = (AstMapping *) permmap;
+      cache->map = (AstMapping *) permmap;
     
       /* LUTs give the focal plane Tanplane offsets based on pixel number.
          Connect two LUTs in parallel with a cmpMap to add after the permmap.
@@ -316,7 +334,7 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
          azellutmap = (AstMapping *) astPermMap( 2, NULL, 2, outperm, 
                                                  constants, "" );
       }
-      map_cache = (AstMapping *) astCmpMap( map_cache, azellutmap, 1, "" );
+      cache->map = (AstMapping *) astCmpMap( cache->map, azellutmap, 1, "" );
 
       /* End LUT-specific code */
 
@@ -324,25 +342,25 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
       if( instap ) {
 	instapmap = astShiftMap( 2, instap, "" );
         astInvert( instapmap );
-	map_cache = (AstMapping *) astCmpMap( map_cache, instapmap, 1, "" );
+	cache->map = (AstMapping *) astCmpMap( cache->map, instapmap, 1, "" );
 
-        instap_cache[ 0 ] = instap[ 0 ];
-        instap_cache[ 1 ] = instap[ 1 ];
+        cache->instap[ 0 ] = instap[ 0 ];
+        cache->instap[ 1 ] = instap[ 1 ];
       } else {
-        instap_cache[ 0 ] = 0.0;
-        instap_cache[ 1 ] = 0.0;
+        cache->instap[ 0 ] = 0.0;
+        cache->instap[ 1 ] = 0.0;
       }
 
       /* Simplify the Cached Mapping. */
-      map_cache = astSimplify( map_cache );
+      cache->map = astSimplify( cache->map );
       
       /* Exempt the cached AST objects from AST context handling. This means
          that the pointers will not be annulled as a result of calling astEnd. 
          Therefore the objects need to be annulled explicitly when no longer
          needed. this is done by calling this function with "subnum" set to 
          -1.*/
-      astExempt( map_cache );
-      astExempt( frameset_cache );
+      astExempt( cache->map );
+      astExempt( cache->frameset );
 
     } else {
       *status = SAI__ERROR;
@@ -368,7 +386,7 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
        AzEl coords (in rads). */
 
     azelmap = sc2ast_maketanmap( state->tcs_az_ac1, state->tcs_az_ac2,
-				 azel_cache, 0, status );
+				 cache->azel, 0, status );
   
 
     /* Get the SMU positional values. Any "bad" value gets set to 0 before
@@ -395,7 +413,7 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
          to Tanplane Nasmyth coords in rads), to get total Mapping from GRID 
          coords to spherical AzEl in rads. */
 
-      mapping = (AstMapping *) astCmpMap( map_cache, 
+      mapping = (AstMapping *) astCmpMap( cache->map, 
                                           astCmpMap( rmap, azelmap, 1, "" ),
                                           1, "" );    
 
@@ -408,7 +426,7 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
       shifts[ 1 ] = temp_jig_y + temp_chop_y;
       jigglemap = astShiftMap( 2, shifts, "" );
     
-      mapping = (AstMapping *) astCmpMap( map_cache, 
+      mapping = (AstMapping *) astCmpMap( cache->map, 
                                           astCmpMap( rmap,
                                                      astCmpMap( jigglemap, azelmap, 
                                                                 1, "" ), 
@@ -422,22 +440,22 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
        since the difference is only 1-2 milliseconds. We cache the created 
        SkyFrame to avoid the overhead of constantly re-creating it. The Epoch 
        is set every time though since this will vary from call to call. */
-    if( !skyframe ) {
-      skyframe = astSkyFrame ( "system=AzEl" );
+    if( !cache->skyframe ) {
+      cache->skyframe = astSkyFrame ( "system=AzEl" );
 
       /* Ast assumes longitude increases eastward, so change sign to
 	 be consistent with smf_calc_telpos here */
-      astSetD( skyframe, "ObsLon", -telpos[0] );
-      astSetD( skyframe, "ObsLat", telpos[1] );
+      astSetD( cache->skyframe, "ObsLon", -telpos[0] );
+      astSetD( cache->skyframe, "ObsLat", telpos[1] );
 
-      astExempt( skyframe );
+      astExempt( cache->skyframe );
     }
 
     /* Set the date and time at the middle of the observation. Use TCS_TAI 
        values corresponding to the centre of the integration and corresponding
        to the astrometry calculation. Remember to convert from TAI to TDB (as
        required by the Epoch attribute). */
-    astSet( skyframe, "Epoch=MJD %.*g", DBL_DIG, state->tcs_tai + 
+    astSet( cache->skyframe, "Epoch=MJD %.*g", DBL_DIG, state->tcs_tai + 
                                             32.184/SPD ); 
 
     /* Now modify the cached FrameSet to use the new Mapping and SkyFrame.
@@ -445,12 +463,12 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
        Note, we add a copy of the SkyFrame rather than the cached SkyFrame 
        itself since the SkyFrame contained in the FrameSet will be modified 
        by later functions.  */
-    astRemoveFrame( frameset_cache, AST__CURRENT );
-    astAddFrame( frameset_cache, AST__BASE, mapping, 
-                 astCopy( skyframe ) );
+    astRemoveFrame( cache->frameset, AST__CURRENT );
+    astAddFrame( cache->frameset, AST__BASE, mapping, 
+                 astCopy( cache->skyframe ) );
 
     /* Return the final FrameSet. */
-    *fset = astClone( frameset_cache );
+    *fset = astClone( cache->frameset );
   }
 
   /* Exempt the returned FrameSet pointer, and then end the AST context. This
@@ -466,4 +484,5 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
   astExempt( *fset );
   astEnd;
 
+  return result;
 }

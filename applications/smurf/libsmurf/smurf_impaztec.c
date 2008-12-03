@@ -94,6 +94,8 @@
 *        - Attempt to calculate the time error
 *     2008-04-09 (TIMJ):
 *        API change to create_lutwcs
+*     2008-12-03 (DSB):
+*        Another API change to smf_create_lutwcs.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -720,6 +722,12 @@ void smurf_impaztec( int *status ) {
 	}
 
 	i_good++;
+
+        /* Free cache */
+        cache = smf_create_lutwcs( -1, hdr.fplanex, hdr.fplaney, hdr.ndet, 
+                           &(head[i_good]), hdr.instap, telpos, cache,
+                           &(hdr.wcs), status );
+
       }
     }
     if(i_good != ngframes) {

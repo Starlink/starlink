@@ -38,6 +38,9 @@
 *  History:
 *     27-JUN-2008 (DSB):
 *        Initial version.
+*     3-DEC-2008 (DSB):
+*        Include cached objects used by smf_create_lutwcs and
+*        smf_detpos_wcs.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -80,7 +83,9 @@ void smf_lock_data( smfData *data, int lock, int *status ){
 /* Local Variables */
    int subnum;
    smfHead *hdr = NULL;
-   sc2astCache *cache = NULL;
+   sc2astCache *cache1 = NULL;
+   smfCreateLutwcsCache *cache2 = NULL;
+   smfDetposWcsCache *cache3 = NULL;
 
 /* Start a new error reporting context. */
    emsBegin( status );
@@ -95,15 +100,35 @@ void smf_lock_data( smfData *data, int lock, int *status ){
          if( hdr->fitshdr ) astLock( hdr->fitshdr, 0 );
          if( hdr->wcs ) astLock( hdr->wcs, 0 );
          if( hdr->tswcs ) astLock( hdr->tswcs, 0 );
-         cache = hdr->cache;
-         if( cache ) {
+
+/* Cache used by sc2ast_createwcs */
+         cache1 = hdr->cache1;
+         if( cache1 ) {
             for( subnum = 0; subnum < 8; subnum++ ) {
-               if( cache->map[ subnum ] ) astLock( cache->map[ subnum ], 0 );
-               if( cache->frameset[ subnum ] ) astLock( cache->frameset[ subnum ], 0 );
+               if( cache1->map[ subnum ] ) astLock( cache1->map[ subnum ], 0 );
+               if( cache1->frameset[ subnum ] ) astLock( cache1->frameset[ subnum ], 0 );
             }
-            if( cache->azel[ 0 ] ) astLock( cache->azel[ 0 ], 0 );
-            if( cache->azel[ 1 ] ) astLock( cache->azel[ 1 ], 0 );
-            if( cache->skyframe ) astLock( cache->skyframe, 0 );
+            if( cache1->azel[ 0 ] ) astLock( cache1->azel[ 0 ], 0 );
+            if( cache1->azel[ 1 ] ) astLock( cache1->azel[ 1 ], 0 );
+            if( cache1->skyframe ) astLock( cache1->skyframe, 0 );
+         }
+
+/* Cache used by smf_create_lutwcs */
+         cache2 = hdr->cache2;
+         if( cache2 ) {
+            if( cache2->map ) astLock( cache2->map, 0 );
+            if( cache2->frameset ) astLock( cache2->frameset, 0 );
+            if( cache2->skyframe ) astLock( cache2->skyframe, 0 );
+            if( cache2->azel[ 0 ] ) astLock( cache2->azel[ 0 ], 0 );
+            if( cache2->azel[ 1 ] ) astLock( cache2->azel[ 1 ], 0 );
+         }
+
+/* Cache used by smf_detpos_wcs */
+         cache3 = hdr->cache3;
+         if( cache3 ) {
+            if( cache3->pmap ) astLock( cache3->pmap, 0 );
+            if( cache3->grid ) astLock( cache3->grid, 0 );
+            if( cache3->sky ) astLock( cache3->sky, 0 );
          }
       }
 
@@ -115,15 +140,35 @@ void smf_lock_data( smfData *data, int lock, int *status ){
          if( hdr->fitshdr ) astUnlock( hdr->fitshdr );
          if( hdr->wcs ) astUnlock( hdr->wcs );
          if( hdr->tswcs ) astUnlock( hdr->tswcs );
-         cache = hdr->cache;
-         if( cache ) {
+
+/* Cache used by sc2ast_createwcs */
+         cache1 = hdr->cache1;
+         if( cache1 ) {
             for( subnum = 0; subnum < 8; subnum++ ) {
-               if( cache->map[ subnum ] ) astUnlock( cache->map[ subnum ] );
-               if( cache->frameset[ subnum ] ) astUnlock( cache->frameset[ subnum ] );
+               if( cache1->map[ subnum ] ) astUnlock( cache1->map[ subnum ] );
+               if( cache1->frameset[ subnum ] ) astUnlock( cache1->frameset[ subnum ] );
             }
-            if( cache->azel[ 0 ] ) astUnlock( cache->azel[ 0 ] );
-            if( cache->azel[ 1 ] ) astUnlock( cache->azel[ 1 ] );
-            if( cache->skyframe ) astUnlock( cache->skyframe );
+            if( cache1->azel[ 0 ] ) astUnlock( cache1->azel[ 0 ] );
+            if( cache1->azel[ 1 ] ) astUnlock( cache1->azel[ 1 ] );
+            if( cache1->skyframe ) astUnlock( cache1->skyframe );
+         }
+
+/* Cache used by smf_create_lutwcs */
+         cache2 = hdr->cache2;
+         if( cache2 ) {
+            if( cache2->map ) astUnlock( cache2->map );
+            if( cache2->frameset ) astUnlock( cache2->frameset );
+            if( cache2->skyframe ) astUnlock( cache2->skyframe );
+            if( cache2->azel[ 0 ] ) astUnlock( cache2->azel[ 0 ] );
+            if( cache2->azel[ 1 ] ) astUnlock( cache2->azel[ 1 ] );
+         }
+
+/* Cache used by smf_detpos_wcs */
+         cache3 = hdr->cache3;
+         if( cache3 ) {
+            if( cache3->pmap ) astUnlock( cache3->pmap );
+            if( cache3->grid ) astUnlock( cache3->grid );
+            if( cache3->sky ) astUnlock( cache3->sky );
          }
       }
    }

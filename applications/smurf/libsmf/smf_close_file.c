@@ -93,6 +93,8 @@
 *        Free the sc2ast cache.
 *     2008-07-10 (TIMJ):
 *        Free dark squid information.
+*     2008-12-03 (DSB):
+*        Free caches used by smf_create_lutwcs and smf_detpos_wcs.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -268,8 +270,14 @@ void smf_close_file( smfData ** data, int * status ) {
     if (hdr->wcs != NULL) hdr->wcs = astAnnul( hdr->wcs );
     if (hdr->tswcs != NULL) hdr->tswcs = astAnnul( hdr->tswcs );
     if (hdr->fitshdr != NULL) hdr->fitshdr = astAnnul( hdr->fitshdr );
-    hdr->cache = sc2ast_createwcs2( -1, NULL, NULL, NULL, NULL, hdr->cache, 
-                                    status );
+
+    if( hdr->cache1 ) hdr->cache1 = sc2ast_createwcs2( -1, NULL, NULL, NULL, NULL, 
+                                                       hdr->cache1, status );
+    if( hdr->cache2 ) hdr->cache2 = smf_create_lutwcs( 1, NULL, NULL, 0, NULL, NULL, 
+                                                       NULL, NULL, hdr->cache2, status );
+    if( hdr->cache3 ) hdr->cache3 = smf_detpos_wcs( NULL, -1, NULL, NULL, hdr->cache3, 
+                                                    status );
+
     if (!hdr->isCloned) {
       /* We are responsible for this memory - although what happens
 	 when we are cloned and the original is freed first? Need

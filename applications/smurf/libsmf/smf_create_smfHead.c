@@ -67,6 +67,8 @@
 *        initialise obsmode and obstype
 *     2008-07-28 (TIMJ):
 *        initialise steptime
+*     2008-12-03 (DSB):
+*        Add rename cache as cache1, and add cache2 and cache3.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -134,7 +136,9 @@ smf_create_smfHead( int * status ) {
   hdr->wcs = NULL;
   hdr->tswcs = NULL;
   hdr->fitshdr = NULL;
-  hdr->cache = NULL;
+  hdr->cache1 = NULL;
+  hdr->cache2 = NULL;
+  hdr->cache3 = NULL;
   hdr->curframe = 0;
   hdr->nframes = 0;
   hdr->state = NULL;

@@ -280,10 +280,8 @@ void smurf_mon( int * status ) {
     errRep( "smurf_mon", "Unrecognized taskname: ^TASK", status);
   }
 
-  /* Clear all possible cached info from the different createwcs routines */
+  /* Clear cached info from sc2ast_createwcs. */
   sc2ast_createwcs(-1, NULL, NULL, NULL, NULL, status);
-  smf_create_lutwcs(1, NULL, NULL, 0, NULL, NULL, NULL, NULL, status );
-  smf_detpos_wcs( NULL, -1, NULL, NULL, status );
 
   /* Free AST resources */
   astTune( "MemoryCaching", memory_caching );
