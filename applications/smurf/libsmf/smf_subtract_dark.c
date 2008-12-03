@@ -215,7 +215,7 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
     break;
 
   case SMF__DKSUB_NEXT:
-    if (dark1 == NULL) {
+    if (dark2 == NULL) {
       *status = SAI__ERROR;
       errRep( " ", "Requested subtraction of following dark but it is NULL",
               status );
