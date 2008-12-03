@@ -12648,6 +12648,12 @@ static int GetFits##code( AstFitsChan *this, const char *name, ctype value, int 
 \
    } \
 \
+/* Context error message. */ \
+   if( !astOK && lname && *lname ) { \
+      astError( astStatus, "%s(%s): Cannot get value for FITS keyword " \
+                   "'%s'.", status, method, class, lname ); \
+   } \
+\
 /* Release the memory used to hold keyword name, value and comment strings. */ \
    lname = (char *) astFree( (void *) lname ); \
    lvalue = (char *) astFree( (void *) lvalue ); \
