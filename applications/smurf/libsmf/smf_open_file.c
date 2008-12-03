@@ -880,7 +880,8 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
   if (hdr && (hdr->instrument!=INST__NONE) ) {
     steptime = VAL__BADD;
     smf_getfitsd( hdr, "STEPTIME", &steptime, status );
-    if (*status == SMF__NOKWRD || steptime == VAL__BADD ) {
+    if (*status == SMF__NOKWRD || ( *status == SAI__OK && 
+                                    steptime == VAL__BADD ) ) {
       if (*status != SAI__OK) errAnnul( status );
       /* Attempt to calculate it from adjacent entries */
       tmpState = hdr->allState;
