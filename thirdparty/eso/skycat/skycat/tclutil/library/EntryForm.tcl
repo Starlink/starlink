@@ -7,7 +7,7 @@
 # --------     ---------   ----------------------------------------------
 # A.Brighton   26 Jun 96   created
 # P.Biereichel 04/08/99    Added option -scroll
-# P.W.Draper   03/12/08    Scroll for width as well as height.
+
 
 itk::usual EntryForm {}
 
@@ -108,13 +108,8 @@ itcl::class util::EntryForm {
 	if {$fh < $ch} {
 	    $canvas configure -height $fh
 	}
-        set fw [winfo width $frame]
- 	if {$fw < $cw} {
-	    $canvas configure -width $fw
-	}
-
-	$canvas itemconfigure frame -width $fw -height $fh
-	$canvas configure -scrollregion "0 0 $fw $fh"
+	$canvas itemconfigure frame -width $cw -height $fh
+	$canvas configure -scrollregion "0 0 $cw $fh"
     }
 
 
