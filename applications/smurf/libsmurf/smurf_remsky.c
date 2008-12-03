@@ -164,6 +164,8 @@ void smurf_remsky( int * status ) {
        " nothing to sky remove", status );
   }
 
+  if (*status != SAI__OK) goto CLEANUP;
+
   /* Get sky subtraction METHOD */
   parChoic( "METHOD", "PLANE", "Plane, Polynomial", 1,  method, 
 	    LEN__METHOD, status);
@@ -177,6 +179,8 @@ void smurf_remsky( int * status ) {
     parChoic( "FIT", "SLOPE", "Mean, Slope, Plane", 
 	      1, fittype, LEN__METHOD, status);
   }
+
+  if (*status != SAI__OK) goto CLEANUP;
 
   if ( group ) {
     /* Propagate input files to output */
@@ -231,6 +235,7 @@ void smurf_remsky( int * status ) {
   }
 
   /* Tidy up after ourselves: release the resources used by the grp routines  */
+ CLEANUP:
   if (darks) smf_close_related( &darks, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
