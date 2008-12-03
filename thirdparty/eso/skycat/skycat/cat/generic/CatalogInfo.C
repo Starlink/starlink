@@ -131,6 +131,10 @@
  *                            set (after ra_col and dec_col).
  *                 04 Jul 08  Add additional meta-data support (ucd, utype,
  *                            unit and datatype), required for VO world.
+ *                 03 Dec 08  Always output ra_col, dec_col, x_col and y_col.
+ *                            This is needed for catalogues that are saved
+ *                            and do not have this information set (otherwise
+ *                            when read back the default columns are assumed).
  */
 static const char* const rcsId="@(#) $Id: CatalogInfo.C,v 1.1.1.1 2006/01/12 16:36:24 abrighto Exp $";
 
@@ -1154,17 +1158,17 @@ ostream& operator<<(ostream& os, const CatalogInfoEntry& e)
     if (e.id_col() > 0)
 	os << "id_col: " << e.id_col() << endl;
 
-    // PWD: do need to output default order of: id, ra, dec, x and y.
-    if (e.ra_col() >= 0 )  
+    // PWD: always write these values if defined.
+    if (e.ra_col() != undef_col_ )  
 	os << "ra_col: " << e.ra_col() << endl;
     
-    if (e.dec_col() >= 0 )
+    if (e.dec_col() != undef_col_ )
 	os << "dec_col: " << e.dec_col() << endl;
 
-    if (e.x_col() >= 0)
+    if (e.x_col() != undef_col_ )
 	os << "x_col: " << e.x_col() << endl;
 
-    if (e.y_col() >= 0)
+    if (e.y_col() != undef_col_ )
 	os << "y_col: " << e.y_col() << endl;
 
     if (e.is_tcs())
