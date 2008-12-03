@@ -201,14 +201,14 @@ void smurf_remsky( int * status ) {
     }
     smf_close_smfGroup( &ogroup, status );
   } else {
-    for (i=1; i<=size; i++) {
+    for (i=1; i<=size && *status == SAI__OK; i++) {
       /* Flatfield - if necessary */
       smf_open_and_flatfield( igrp, ogrp, i, darks, NULL, &odata, status );
 
       if (*status != SAI__OK) {
         /* Tell the user which file it was... */
         msgSeti("I",i);
-        errRep(TASK_NAME, "Unable to open the ^I th file", status);
+        errRep(TASK_NAME, "Unable to open file ^I", status);
       }
       if ( *status == SAI__OK ) {
         if ( strncmp( method, "POLY", 4 ) == 0 ) {
