@@ -1180,6 +1180,6 @@ void smf_apply_dark( smfData *indata, const smfArray *darks,
                      int *status);
 
 void smf_apply_mask( smfData *indata, const smfArray *bpms,
-                     int *status);
+                     smf_dark_sub_meth method, int *status);
 
 void smf_apodize( smfData *data, size_t len, int *status );
