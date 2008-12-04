@@ -237,8 +237,8 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
     msgSeti( "WHICHCHUNK", whichchunk );
     msgSeti( "MAXCHUNK", igrp->chunk[igrp->ngroups-1] );
     *status = SAI__ERROR;
-    errRep( FUNC_NAME, 
-            "Invalid whichchunk: ^WHICHCHUNK. Must be 0 - ^MAXCHUNK", 
+    errRep( "", FUNC_NAME 
+            ": Invalid whichchunk: ^WHICHCHUNK. Must be 0 - ^MAXCHUNK", 
             status );
   } else {
     /* Find the range of indices */
@@ -262,8 +262,8 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
   /* Check that a valid range was actually found */
   if( (!foundfirst) || (!foundlast) ) {
     *status = SAI__ERROR;
-    errRep( FUNC_NAME, 
-            "Possible programming error, couldn't find valid chunk range", 
+    errRep( "", FUNC_NAME 
+            ": Possible programming error, couldn't find valid chunk range", 
             status );
     return;
   }
@@ -311,7 +311,8 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
 
             if( refdata->ndims != 3 ) {
               *status = SAI__ERROR;
-              errRep( FUNC_NAME, "^FILE does not contain 3-dimensional data!", 
+              errRep( "", FUNC_NAME 
+                      ": ^FILE does not contain 3-dimensional data!", 
                       status );
             }
           }
@@ -321,7 +322,8 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
 
           if( (*status == SAI__OK) && (refdata->isTordered == 0) ) {
             *status = SAI__ERROR;
-            errRep(FUNC_NAME, "^FILE contains bolo-ordered data (unsupported)",
+            errRep( "", FUNC_NAME 
+                    ": ^FILE contains bolo-ordered data (unsupported)",
                    status);
           }
 
@@ -356,7 +358,8 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
                 msgSeti( "X", refdata->dims[0] );
                 msgSeti( "Y", refdata->dims[1] );
 		
-                errRep( FUNC_NAME, "Detector dimensions (^X,^Y) in ^FILE do not match reference (^XREF,^YREF)", status );
+                errRep( "", FUNC_NAME ": Detector dimensions (^X,^Y) in "
+                        "^FILE do not match reference (^XREF,^YREF)", status );
               }
 	      
               /* Check existence of DATA/QUALITY/VARIANCE */
@@ -365,21 +368,23 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
                 *status = SAI__ERROR;
                 if( havearray[0] ) msgSetc( "FLAG", "is missing" );
                 else msgSetc( "FLAG", "has extra" );
-                errRep( FUNC_NAME, "^FILE ^FLAG component DATA", status );
+                errRep( "", FUNC_NAME ": ^FILE ^FLAG component DATA", status );
               }
 
               if( (refdata->pntr[1] != NULL) != havearray[1] ) {
                 *status = SAI__ERROR;
                 if( havearray[1] ) msgSetc( "FLAG", "is missing" );
                 else msgSetc( "FLAG", "has extra" );
-                errRep( FUNC_NAME, "^FILE ^FLAG component VARIANCE", status );
+                errRep( "", FUNC_NAME 
+                        ": ^FILE ^FLAG component VARIANCE", status );
               }
 
               if( (refdata->pntr[2] != NULL) != havearray[2] ) {
                 *status = SAI__ERROR;
                 if( havearray[2] ) msgSetc( "FLAG", "is missing" );
                 else msgSetc( "FLAG", "has extra" );
-                errRep( FUNC_NAME, "^FILE ^FLAG component QUALITY", status );
+                errRep( "", FUNC_NAME 
+                        ": ^FILE ^FLAG component QUALITY", status );
               }
             }
           }
@@ -537,7 +542,7 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
                   if (!astOK) {
                     if (*status == SAI__OK) {
                       *status = SAI__ERROR;
-                      errRep( FUNC_NAME, "AST error copying FITS header", 
+                      errRep( "", FUNC_NAME ": AST error copying FITS header", 
                               status);
                     }
                   }
@@ -549,8 +554,8 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
                   if (!astOK) {
                     if (*status == SAI__OK) {
                       *status = SAI__ERROR;
-                      errRep( FUNC_NAME, 
-                              "AST error copying time series WCS", 
+                      errRep( "", FUNC_NAME 
+                              ": AST error copying time series WCS", 
                               status);
                     }
                   }
@@ -735,8 +740,8 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
         /* Trap AST errors */
         if( !astOK ) {
           *status = SAI__ERROR;
-          errRep( FUNC_NAME, 
-                  "AST error correcting TimeOrigin in concatenated data.", 
+          errRep( "", FUNC_NAME 
+                  ": AST error correcting TimeOrigin in concatenated data.", 
                   status );
         }
       }
