@@ -136,13 +136,8 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
     return retval;
   }
 
-  /* Check for double-precision / 3-dimensional data */
-  if( data->dtype != SMF__DOUBLE ) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, 
-	   "Data is not double-precision", status);
-    return retval;
-  }
+  /* Check for double-precision data */
+  smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status );
 
   /* Check for QUALITY arrays */
   if( quality ) {

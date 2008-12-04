@@ -121,7 +121,7 @@ void smf_dtype_check_fatal(const smfData* data, const char * type, smf_dtype ity
         }
       }
       *status = SMF__BDTYP;
-      errRep(FUNC_NAME, "Data type not as requested. Expected ^TYP,"
+      errRep( "", FUNC_NAME ": Data type not as requested. Expected ^TYP,"
              "got ^ACTYP", status);
     }
   }

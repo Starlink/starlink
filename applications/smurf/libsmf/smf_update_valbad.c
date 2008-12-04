@@ -90,6 +90,9 @@ void smf_update_valbad( smfData *data, unsigned char mask, int *status ) {
 
   if ( *status != SAI__OK ) return;
 
+  /* Verify double precision*/
+  smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status );
+
   /* Check for QUALITY */
   if( data->pntr[2] ) {
     qual = (unsigned char *) data->pntr[2]; /* QUALITY given by smfData */
@@ -105,23 +108,6 @@ void smf_update_valbad( smfData *data, unsigned char mask, int *status ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": smfData does not contain a DATA component", 
             status );
-    return;
-  }
-
-  /* Verify double precision / 3-dimensional (time-domain) data */
-  if( data->ndims != 3 ) {
-    *status = SAI__ERROR;
-    msgSeti("NDIMS",data->ndims);
-    errRep("", FUNC_NAME 
-           ": Don't know how to handle ^NDIMS dimensions, should be 3.", 
-           status);
-    return;
-  }
-
-  if( data->dtype !=  SMF__DOUBLE) {
-    *status = SAI__ERROR;
-    errRep("", FUNC_NAME 
-	   ": Data is not double-precision", status);
     return;
   }
 

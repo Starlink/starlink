@@ -130,6 +130,8 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
   /* Main routine */
   if (*status != SAI__OK) return;
 
+  smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status );
+
   /* Assert bolo-ordered data to make life easier */
   smf_dataOrder( data, 0, status );
 
@@ -151,12 +153,6 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": smfData does not contain a DATA component", 
             status );
-    return;
-  }
-
-  if( data->dtype != SMF__DOUBLE ) {
-    *status = SAI__ERROR;
-    errRep("", FUNC_NAME ": Data is not double-precision", status);
     return;
   }
 

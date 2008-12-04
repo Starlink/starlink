@@ -107,12 +107,7 @@ void smf_apodize( smfData *data, size_t len, int *status ) {
   if ( *status != SAI__OK ) return;
 
   /* Check input parameters */
-
-  if( !data ) {
-    *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": NULL smfData pointer supplied.", status );
-    return;
-  }
+  smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status );
 
   if( !data->pntr[0] ) {
     *status = SAI__ERROR;
@@ -121,27 +116,12 @@ void smf_apodize( smfData *data, size_t len, int *status ) {
     return;
   }
 
-  if( data->ndims != 3 ) {
-    *status = SAI__ERROR;
-    msgSeti("NDIMS",data->ndims);
-    errRep( "", FUNC_NAME 
-           ": Don't know how to handle ^NDIMS dimensions, should be 3.", 
-            status);
-    return;
-  }
-
-  if( data->dtype !=  SMF__DOUBLE) {
-    *status = SAI__ERROR;
-    errRep("", FUNC_NAME ": smfData  not double-precision", status);
-    return;
-  }
+  /* Calculate data dimensions */
+  smf_get_dims( data, &nbolo, &ntslice, &ndata, &bstride, &tstride, status );
 
   /* Obtain pointer to data and quality components */
   dat = data->pntr[0];
   qua = data->pntr[2];
-
-  /* Calculate data dimensions */
-  smf_get_dims( data, &nbolo, &ntslice, &ndata, &bstride, &tstride, status );
 
   /* Set the quality bitmask to decide which samples to apodize */
   mask = ~(SMF__Q_JUMP | SMF__Q_SPIKE);

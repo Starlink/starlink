@@ -140,21 +140,8 @@ void smf_bolonoise( smfData *data, size_t window, double f_low,
 
   if (*status != SAI__OK) return;
 
-  /* Check for good smfData pointer */
-  if( !data ) {
-    *status = SAI__ERROR;
-    errRep( " ", FUNC_NAME 
-            ": possible programming error, smfData pointer is NULL", status );
-    return;
-  }
-
-  if( data->dtype != SMF__DOUBLE ) {
-    *status = SAI__ERROR;
-    errRep( "", FUNC_NAME
-            ": Data is not double precision, must be flat-fielded first", 
-            status );
-    return;
-  }
+  /* Check inputs */
+  smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status );
 
   if( !data->hdr ) {
     *status = SAI__ERROR;

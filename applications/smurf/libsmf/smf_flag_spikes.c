@@ -137,8 +137,9 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
   /* Main routine */
   if (*status != SAI__OK) return;
 
-  /* Assert bolo-ordered data to make life easier */
+  smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status );
 
+  /* Assert bolo-ordered data to make life easier */
   smf_dataOrder( data, 0, status );
 
   /* Pointers to data and quality */
@@ -161,12 +162,6 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
     return;
   }
 
-  if( data->dtype != SMF__DOUBLE ) {
-    *status = SAI__ERROR;
-    errRep("", FUNC_NAME ": smfData is not double-precision", status);
-    return;
-  }
-
   if( *status == SAI__OK ) {
     /* obtain data dimensions */
     smf_get_dims( data, &nbolo, &ntslice, NULL, NULL, NULL, status );
@@ -178,7 +173,6 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
       errRep( "", FUNC_NAME ": Can't find spikes: thresh=^THRESH, must be > 0",
 	     status);
     }
-
   }
 
   /* Iteratively find spikes */
@@ -189,7 +183,6 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
     iter++;
 
     /* Loop over bolometer */
-
     for( i=0; i<nbolo; i++ ) if( !(qua[i*ntslice] & SMF__Q_BADB) ) {
       
       base = i*ntslice;

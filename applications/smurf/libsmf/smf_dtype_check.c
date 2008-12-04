@@ -103,8 +103,8 @@ int smf_dtype_check(const smfData* data, const char * type, smf_dtype itype,
   /* check that we have a smfData */
   if ( data == NULL ) {
     *status = SAI__ERROR;
-    errRep( FUNC_NAME,
-	    "Supplied smfData is a NULL pointer. Possible programming error.",
+    errRep( "", FUNC_NAME
+	    ": Supplied smfData is a NULL pointer. Possible programming error.",
 	    status);
     return 0;
   }
