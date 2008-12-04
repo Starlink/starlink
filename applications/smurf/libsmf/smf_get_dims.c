@@ -108,7 +108,7 @@ void smf_get_dims( const smfData *data, dim_t *nbolo, dim_t *ntslice,
      *status = SMF__WDIM;
      msgSeti("NDIMS",data->ndims);
      errRep(" ", FUNC_NAME 
-            "Input data have ^NDIMS dimensions, should be 3.", status);
+            ": Input data have ^NDIMS dimensions, should be 3.", status);
     return;
    }
 
