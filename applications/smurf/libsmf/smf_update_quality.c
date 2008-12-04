@@ -150,15 +150,6 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
     return;
   }
 
-  /* Verify double precision / 3-dimensional (time-domain) data */
-  if( data->ndims != 3 ) {
-    *status = SAI__ERROR;
-    msgSeti("NDIMS",data->ndims);
-    errRep(FUNC_NAME, 
-           "Don't know how to handle ^NDIMS dimensions, should be 3.", status);
-    return;
-  }
-
   if( data->dtype !=  SMF__DOUBLE) {
     *status = SAI__ERROR;
     errRep(FUNC_NAME, 
