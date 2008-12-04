@@ -113,6 +113,8 @@
 *        Steptime is now in smfHead.
 *     2008-09-09 (EC):
 *        Concat dark squid signals.
+*     2008-12-04 (EC):
+*        Padded JCMTState filled with first/last real values.
 
 *  Notes:
 *     If projection information supplied, pointing LUT will not be
@@ -215,6 +217,7 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
   smfHead *refhdr=NULL;         /* pointer to smfHead in ref data */
   dim_t refndata;               /* Number data points in reference file */
   dim_t reftlen;                /* Number of time slices in reference file */
+  JCMTState *sourceState=NULL;  /* temporary JCMTState pointer */
   double steptime;              /* Length of a sample in seconds */
   dim_t tchunk = 0;             /* Time offset in concat. array this chunk */
   dim_t tend;                   /* Time at start of padded region */
@@ -696,7 +699,8 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
                 qual |= ((char *)data->pntr[2])[k*tlen+padStart] & SMF__Q_BADB;
 
                 /* Use memset for bolo-ordered data */
-                memset( (char *)data->pntr[2]+k*tlen+tstart, qual, tend-tstart+1);
+                memset( (char *)data->pntr[2]+k*tlen+tstart, qual, 
+                        tend-tstart+1);
               }
             
             }
@@ -718,7 +722,20 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
                 }
               }
             }
-          }        
+          }
+
+          /* If smfHead->allState present, pad with start/finish values */
+          if( (data->hdr) && (data->hdr->allState) ) {
+            /* Pointer to first/last real JCMTState */
+            if( j==0 ) sourceState = data->hdr->allState + padStart;
+            else sourceState = data->hdr->allState + tlen - padEnd - 1;
+
+            /* Loop Over Time slice */
+            for( l=tstart; l<=tend; l++ ) {
+              memcpy( &(data->hdr->allState[l]), 
+                      sourceState, sizeof(*sourceState) );
+            }
+          }
         }
       }
 
