@@ -240,6 +240,14 @@ void smurf_sc2threadtest( int *status ) {
   struct timeval tv1, tv2;   /* Timers */
   smfWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
 
+  double *dat=NULL;
+  dim_t nbolo;
+  dim_t ntslice;
+  dim_t ndata;
+  size_t bstride;
+  size_t tstride;
+  dim_t offset;
+
   if (*status != SAI__OK) return;
 
   /* Get input parameters */
@@ -427,6 +435,48 @@ void smurf_sc2threadtest( int *status ) {
   /*** TIMER ***/
   gettimeofday( &tv1, NULL ); 
   msgSetd("D", smf_difftime(&tv2,&tv1,status));
+  msgOut("","** ^D seconds to complete test",status);
+
+  /* Series of short single-thread array index tests */
+  data = res[0]->sdata[0];
+  dat = data->pntr[0];
+
+  smf_get_dims( data, &nbolo, &ntslice, &ndata, &bstride, &tstride, status );
+
+  msgOut("","Array index test #1: two multiplies in inner loop",status);
+  gettimeofday( &tv1, NULL ); 
+  for( i=0; i<nbolo; i++ ) {
+    for( j=0; j<ntslice; j++ ) {
+      dat[i*bstride + j*tstride] += 5;
+    }
+  }
+  gettimeofday( &tv2, NULL ); 
+  msgSetd("D", smf_difftime(&tv1,&tv2,status));
+  msgOut("","** ^D seconds to complete test",status);
+
+  msgOut("","Array index test #2: only index increments",status);
+  gettimeofday( &tv1, NULL ); 
+  for( i=0; i<nbolo*bstride; i+=bstride ) {
+    for( j=i; j<(i+ntslice*tstride); j+=tstride ) {
+      dat[j] += 5;
+    }
+  }
+  gettimeofday( &tv2, NULL ); 
+  msgSetd("D", smf_difftime(&tv1,&tv2,status));
+  msgOut("","** ^D seconds to complete test",status);
+
+  msgOut("","Array index test #3: one multiply in outer loop",status);
+  gettimeofday( &tv1, NULL ); 
+  offset = 0;
+  for( i=0; i<nbolo; i++ ) {
+    offset = i*bstride;
+    for( j=0; j<ntslice; j++ ) {
+      dat[offset] += 5;
+      offset += tstride;
+    }
+  }
+  gettimeofday( &tv2, NULL ); 
+  msgSetd("D", smf_difftime(&tv1,&tv2,status));
   msgOut("","** ^D seconds to complete test",status);
 
   /* Clean up */
