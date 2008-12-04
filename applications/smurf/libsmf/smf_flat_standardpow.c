@@ -133,7 +133,7 @@ smf_flat_standardpow( const smfArray * heatframes, double refohms,
   /* Store pointers to data array for each frame */
   for ( j=0; j<nheat; j++) {
     smfData * fr = (heatframes->sdata)[j];
-    smf_dtype_check_fatal( fr, NULL, SMF__DOUBLE, status );
+    if (!smf_dtype_check_fatal( fr, NULL, SMF__DOUBLE, status )) break;
     heatframe[j] = (fr->pntr)[0];
   }
 

@@ -137,6 +137,9 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
   /* Check status */
   if (*status != SAI__OK) return;
 
+  /* Should check data type for double */
+  if (!smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status)) return;
+
   if ( smf_history_check( data, FUNC_NAME, status) ) {
     msgSetc("F", FUNC_NAME);
     msgOutif(MSG__VERB," ", 
@@ -147,10 +150,6 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
 
   /* Get the dimensions */
   smf_get_dims( data, &nbol, &nframes, NULL, NULL, NULL, status);
-
-  /* Should check data type for double */
-  smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status);
-  if ( *status != SAI__OK) return;
 
   /* Check that poly is not a NULL pointer */
   if ( poly == NULL ) {

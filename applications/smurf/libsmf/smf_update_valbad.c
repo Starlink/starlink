@@ -91,7 +91,7 @@ void smf_update_valbad( smfData *data, unsigned char mask, int *status ) {
   if ( *status != SAI__OK ) return;
 
   /* Verify double precision*/
-  smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status );
+  if (!smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status )) return;
 
   /* Check for QUALITY */
   if( data->pntr[2] ) {

@@ -141,7 +141,7 @@ void smf_bolonoise( smfData *data, size_t window, double f_low,
   if (*status != SAI__OK) return;
 
   /* Check inputs */
-  smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status );
+  if (!smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status )) return;
 
   if( !data->hdr ) {
     *status = SAI__ERROR;

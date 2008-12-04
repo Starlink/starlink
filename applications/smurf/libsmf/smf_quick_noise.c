@@ -137,7 +137,7 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
   }
 
   /* Check for double-precision data */
-  smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status );
+  if (!smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status )) return retval;
 
   /* Check for QUALITY arrays */
   if( quality ) {

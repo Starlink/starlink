@@ -235,8 +235,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
 
   /* Should check data type for double if not allextcorr case */
   if( !allextcorr ) {
-    smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status);
-    if ( *status != SAI__OK) return;
+    if (!smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status)) return;
   }
 
   /* Check desired optical depth method */

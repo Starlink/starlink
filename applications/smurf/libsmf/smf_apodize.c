@@ -107,7 +107,7 @@ void smf_apodize( smfData *data, size_t len, int *status ) {
   if ( *status != SAI__OK ) return;
 
   /* Check input parameters */
-  smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status );
+  if ( !smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status )) return;
 
   if( !data->pntr[0] ) {
     *status = SAI__ERROR;

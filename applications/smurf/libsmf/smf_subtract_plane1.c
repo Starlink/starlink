@@ -253,8 +253,7 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
   }
 
   /* Should check data type for double */
-  smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status);
-  if ( *status != SAI__OK) return;
+  if (!smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status)) return;
 
   /* Assign pointer to input data array */
   /* of course, check status on return... */

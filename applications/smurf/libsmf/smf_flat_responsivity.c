@@ -119,10 +119,8 @@ void smf_flat_responsivity ( smfData *respmap, size_t nheat,
 
   if (*status != SAI__OK) return;
 
-  smf_dtype_check_fatal( respmap, NULL, SMF__DOUBLE, status );
+  if (!smf_dtype_check_fatal( respmap, NULL, SMF__DOUBLE, status )) return;
   
-  if (*status != SAI__OK) return;
-
   respdata = (respmap->pntr)[0];
   respvar  = (respmap->pntr)[1];
 
