@@ -69,6 +69,7 @@
 #include "sae_par.h"
 #include "ast.h"
 #include "ems.h"
+#include "mers.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
