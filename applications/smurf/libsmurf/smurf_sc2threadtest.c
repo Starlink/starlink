@@ -471,7 +471,7 @@ void smurf_sc2threadtest( int *status ) {
   for( i=0; i<nbolo; i++ ) {
     offset = i*bstride;
     for( j=0; j<ntslice; j++ ) {
-      dat[offset +j] += 5;
+      dat[offset] += 5;
       offset += tstride;
     }
   }
