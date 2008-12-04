@@ -141,21 +141,12 @@ void smf_apodize( smfData *data, size_t len, int *status ) {
   qua = data->pntr[2];
 
   /* Calculate data dimensions */
-  smf_get_dims( data, &nbolo, &ntslice, &ndata, status );
-
-  /* Determine array strides */
-  if( data->isTordered ) {
-    bstride=1;
-    tstride=nbolo;
-  } else {
-    bstride=ntslice;
-    tstride=1;
-  }
+  smf_get_dims( data, &nbolo, &ntslice, &ndata, &bstride, &tstride, status );
 
   /* Set the quality bitmask to decide which samples to apodize */
   mask = ~(SMF__Q_JUMP | SMF__Q_SPIKE);
 
-  /* Loop over bolometer */
+  /* Loop over bolometer start index */
   for( i=0; (*status==SAI__OK)&&(i<nbolo*bstride); i+=bstride ) {
 
     /* Determine the first and last samples to apodize (after padding) */
@@ -193,9 +184,7 @@ void smf_apodize( smfData *data, size_t len, int *status ) {
 
       /* Quality checking version */
       if( qua && !(qua[i]&SMF__Q_BADB)) {
-
         off = 0; /* Time slice offset from first/last  */
-
         for( j=0; (*status==SAI__OK)&&(j<len); j++ ) {
           ap = sin( AST__DPI/2. * (double) j / len );
 

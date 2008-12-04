@@ -223,7 +223,7 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 
     /* Obtain dimensions of the data */
     smf_get_dims( res->sdata[idx], &thisnbolo, &thisntslice, &thisndata,
-                  status);
+                  NULL, NULL, status);
       
     if( idx == 0 ) {
       /* Store dimensions of the first file */

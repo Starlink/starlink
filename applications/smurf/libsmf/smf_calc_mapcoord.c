@@ -179,7 +179,7 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
   smf_dataOrder( data, 1, status );
 
   /* Get the data dimensions */
-  smf_get_dims( data, &nbolo, &ntslice, NULL, status );
+  smf_get_dims( data, &nbolo, &ntslice, NULL, NULL, NULL, status );
 
   /* If SMF__NOCREATE_FILE is not set, and file associated with an NDF,
      map a new MAPCOORD extension (or verify an existing one) */ 

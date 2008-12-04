@@ -139,7 +139,8 @@ void smf_calcmodel_dks( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   for( idx=0; (*status==SAI__OK)&&(idx<res->ndat); idx++ ) {
 
     /* Obtain dimensions of the data */
-    smf_get_dims( res->sdata[idx], &nbolo, &ntslice, &ndata, status);
+    smf_get_dims( res->sdata[idx], &nbolo, &ntslice, &ndata, NULL, NULL, 
+                  status);
     ncol = res->sdata[idx]->dims[1+SMF__COL_INDEX];
     nrow = res->sdata[idx]->dims[1+SMF__ROW_INDEX];  
 

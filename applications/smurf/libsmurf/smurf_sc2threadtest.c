@@ -185,7 +185,8 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
         smf_dataOrder( array[i]->sdata[j], 0, status );
       }
       
-      smf_get_dims( array[i]->sdata[j], &nbolo, &ntslice, &ndata, status );
+      smf_get_dims( array[i]->sdata[j], &nbolo, &ntslice, &ndata, NULL, 
+                    NULL, status );
       
       if( data->type == 1 ) {
         /* --- Boxcar smooth the data --- */

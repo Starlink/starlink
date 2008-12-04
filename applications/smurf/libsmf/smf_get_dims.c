@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     smf_get_dims( const smfData *data, dim_t *nbolo, dim_t *ntslice, 
-*                   dim_t *ndata, int *status )
+*                   dim_t *ndata, size_t *bstride, size_t *tstride, 
+*                   int *status )
 
 *  Arguments:
 *     data = const smfData *data (Given)
@@ -25,6 +26,12 @@
 *        Number of time slices
 *     ndata = dim_t* (Returned)
 *        Total number of data points (nbolo*ntslice)
+*     bstride = size_t* (Returned)
+*        How many elements to skip to get to the next bolometer at a given
+*        time slice.
+*     tstride - size_t* (Returned)
+*        How many elements to skip to get to the next time slice for the 
+*        current bolometer.
 *     status = int * (Given and Returned)
 *        Pointer to inherited status.
 
@@ -35,7 +42,9 @@
 *     first or last dimension. Check the order and calculate total numbers
 *     of detectors, the number of time slices, and the total number of
 *     data points. This routine will also set SMF__WDIM if the input smfData
-*     is not 3-dimensional.
+*     are not 3-dimensional. The bstride and tstride parameters can be used to
+*     help index the data array. To index the i'th bolometer and the j'th
+*     tslice: value = data[i*bstride + j*tstride]
 
 *  Authors:
 *     Edward Chapin (UBC)
@@ -80,11 +89,14 @@
 #define FUNC_NAME "smf_get_dims"
 
 void smf_get_dims( const smfData *data, dim_t *nbolo, dim_t *ntslice, 
-                   dim_t *ndata, int *status ) {
+                   dim_t *ndata, size_t *bstride, size_t *tstride, 
+                   int *status ) {
 
+  size_t bs;
   dim_t nb;
   dim_t nt;
   dim_t nd;
+  size_t ts;
 
    /* Check the inherited status */
    if ( *status != SAI__OK ) return;
@@ -102,14 +114,20 @@ void smf_get_dims( const smfData *data, dim_t *nbolo, dim_t *ntslice,
    if( data->isTordered ) {
      nb = (data->dims)[0]*(data->dims)[1];
      nt = (data->dims)[2];
+     bs = 1;
+     ts = nb;
    } else {
      nt = (data->dims)[0];
      nb = (data->dims)[1]*(data->dims)[2];
+     bs=nt;
+     ts=1;
    }
    nd = nb*nt;
 
    if( nbolo ) *nbolo = nb;
    if( ntslice ) *ntslice = nt;
    if( ndata ) *ndata = nd;
+   if( bstride ) *bstride = bs;
+   if( tstride ) *tstride = ts;
 }
 

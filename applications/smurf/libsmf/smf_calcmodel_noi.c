@@ -218,7 +218,8 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     } else {
     
       /* Get the raw data dimensions */
-      smf_get_dims( res->sdata[idx], &nbolo, &ntslice, &ndata, status );
+      smf_get_dims( res->sdata[idx], &nbolo, &ntslice, &ndata, NULL, NULL, 
+                    status );
 
       /* Only estimate the white noise level once at the beginning - the
 	 reason for this is to make measurements of the convergence 

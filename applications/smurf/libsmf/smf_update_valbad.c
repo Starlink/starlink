@@ -126,7 +126,7 @@ void smf_update_valbad( smfData *data, unsigned char mask, int *status ) {
   }
 
   /* Calculate data dimensions */
-  smf_get_dims( data, &nbolo, &ntslice, &ndata, status );
+  smf_get_dims( data, &nbolo, &ntslice, &ndata, NULL, NULL, status );
 
   if( *status == SAI__OK ) { 
     /* Synchronize VAL__BADD with QUALITY matching any mask bits */

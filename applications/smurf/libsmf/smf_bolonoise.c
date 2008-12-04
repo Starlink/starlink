@@ -163,7 +163,7 @@ void smf_bolonoise( smfData *data, size_t window, double f_low,
   }
 
   /* Obtain dimensions */
-  smf_get_dims( data, &nbolo, &ntslice, &ndata, status );
+  smf_get_dims( data, &nbolo, &ntslice, &ndata, NULL, NULL, status );
 
   if( *status==SAI__OK ) {
     steptime = data->hdr->steptime;
