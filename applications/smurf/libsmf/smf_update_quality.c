@@ -150,13 +150,6 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
     return;
   }
 
-  if( data->dtype !=  SMF__DOUBLE) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, 
-           "Data is not double-precision", status);
-    return;
-  }
-
   /* Check for valid badfrac */
   if( (badfrac < 0) || (badfrac > 1) ) {
     msgSeti( "BADFRAC", badfrac );
