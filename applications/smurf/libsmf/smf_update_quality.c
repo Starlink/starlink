@@ -67,11 +67,14 @@
 *        - sense of badness for mask has changed. BAD now means bad rather
 *          than non-zero.
 *        - remove requirement for DOUBLE
+*     2008-12-03 (TIMJ):
+*        Use modified smf_get_dims
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2008 Science and Technology Faciltiies Council.
+*     Copyright (C) 2008 University of British Columbia.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -120,6 +123,8 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
   dim_t ndata;                  /* Number of data points */
   dim_t nbad;                   /* Bad samples counter */
   dim_t ntslice;                /* Number of time slices */
+  size_t bstride;               /* bol stride */
+  size_t tstride;               /* time slice stride */
   unsigned char *qual=NULL;     /* Pointer to the QUALITY array */
 
   if ( *status != SAI__OK ) return;
@@ -169,7 +174,7 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
   }
 
   /* Calculate data dimensions */
-  smf_get_dims( data, &nbolo, &ntslice, &ndata, NULL, NULL, status );
+  smf_get_dims( data, &nbolo, &ntslice, &ndata, &bstride, &tstride, status );
 
   if( *status == SAI__OK ) {
     
@@ -213,18 +218,8 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
 
       /* Loop over detector */
       for( i=0; i<nbolo; i++ ) {
-        dim_t c;  /* constant offset */
-        dim_t m;  /* "stride" in y = mx+c */
+        dim_t c = bstride * i;  /* constant offset for this bolometer */
         int isbad = 0;
-
-        /* calculate the isTordered vs non-Tordered offseting */
-        if (data->isTordered) {
-          c = i;
-          m = nbolo;
-        } else {
-          c = i * ntslice;
-          m = 1;
-        }
 
         /* preset bad flag based on mask (if defined) */
         if (badmask && badmask[i] == VAL__BADI) {
@@ -237,7 +232,7 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
 
           /* Loop over samples and count the number with SMF__Q_BADS set */
           for( j=0; j<ntslice; j++ ) {
-            if( qual[m*j + c] & SMF__Q_BADS ) nbad ++;
+            if( qual[tstride*j + c] & SMF__Q_BADS ) nbad ++;
           }
 
           if( nbad > badthresh ) {
@@ -248,7 +243,7 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
         /* Now apply the badmask */
         if( isbad ) {
           for( j=0; j<ntslice; j++ ) {
-            qual[m*j + c] |= SMF__Q_BADB;
+            qual[tstride*j + c] |= SMF__Q_BADB;
           }
         }
       }
