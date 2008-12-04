@@ -105,9 +105,9 @@ double smf_calc_covar ( const smfData *data, const int i, const int j,
   /* Local variables */
   double *indata = NULL;      /* Pointer to input data array */
   size_t k;                   /* Loop counter */
-  int nframes;                /* Max number of data points*/
+  dim_t nframes;              /* Max number of data points*/
   int npts;                   /* Number of points in timeseries */
-  int nbol;                   /* Number of bolometers */
+  dim_t nbol;                 /* Number of bolometers */
   double *idata = NULL;       /* Pointer to array for bolometer 1 data */
   double *jdata = NULL;       /* Pointer to array for bolometer 2 data */
   int temp;                   /* Temporary variable */
@@ -116,25 +116,12 @@ double smf_calc_covar ( const smfData *data, const int i, const int j,
   /* Check status */
   if (*status != SAI__OK) return covar;
 
-  /* Do we have 2-D image or 3-D timeseries data? */
-  if ( data->ndims != 3 ) {
-    /* Abort with an error if the number of dimensions is not  3 */
-    if ( *status == SAI__OK) {
-      *status = SAI__ERROR;
-      msgSeti("ND", data->ndims);
-      errRep(FUNC_NAME,
-	     "Number of dimensions of input file is ^ND: should be 3. Meaningless to compute statistics for 2-D data.",
-	     status);
-      return covar;
-    }
-  } else {
-    nframes = (data->dims)[2];
-    nbol =  (data->dims)[0] * (data->dims)[1];
-  }
-
   /* Should check data type for double */
-  smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status);
-  if ( *status != SAI__OK) return covar;
+  if (!smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status)) return covar;
+
+  /* Do we have 2-D image or 3-D timeseries data? */
+  smf_get_dims( data, &nbol, &nframes, NULL, NULL, NULL, status);
+  if (*status != SAI__OK) return covar;
 
   /* Check bolometer indices are in range */
   if ( i > nframes || i < 0 ) {
