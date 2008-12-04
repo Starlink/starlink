@@ -56,10 +56,13 @@
 *        - on exit, data->poly contains fitted coeff
 *     2008-04-03 (EC):
 *        - Added quality to interface
+*     2008-12-03 (TIMJ):
+*        Use smf_get_dims
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2006-2008 University of British Columbia. All Rights
 *     Reserved.
 
 *  Licence:
@@ -119,9 +122,9 @@ void smf_scanfit( smfData *data, unsigned char *quality, int order,
   int cliptype;             /* Type of sigma clipping */
   int i;                    /* Loop counter */
   int lbnd[3];              /* Lower bound for coeff array (poly) */
-  int nbol = 0;             /* Number of bolometers */
+  dim_t nbol = 0;           /* Number of bolometers */
   int ncoeff;               /* Number of coefficients in baseline fit */
-  int nframes = 1;          /* Number of frames in a scan */
+  dim_t nframes = 1;        /* Number of frames in a scan */
   int npts;                 /* Number of data points in coefficient array */
   HDSLoc *ploc = NULL;      /* Locator for SCANFIT coeffs */
   void *pntr[3];            /* Pointers to mapped data */
@@ -149,22 +152,8 @@ void smf_scanfit( smfData *data, unsigned char *quality, int order,
     return;
   }
 
-  /* Check we have 3-d timeseries data */
-  if ( data->ndims == 3) {
-    if( data->isTordered ) {
-      nframes = (data->dims)[2];
-      nbol = (data->dims)[0] * (data->dims)[1];
-    } else {
-      nframes = (data->dims)[0];
-      nbol = (data->dims)[1]*(data->dims)[2];
-    }
-  } else {
-    if ( *status == SAI__OK ) {
-      *status = SAI__ERROR;
-      msgSeti("N", data->ndims );
-      errRep(FUNC_NAME, "Input data does ^N dimensions, should be 3", status );
-    }
-  }
+  /* Get the dimensions */
+  smf_get_dims( data, &nbol, &nframes, NULL, NULL, NULL, status);
 
   /* Return with error if order is greater than the number of data
      points */
