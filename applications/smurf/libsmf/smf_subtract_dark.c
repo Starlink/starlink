@@ -57,6 +57,8 @@
 *        Fix issue with 2d input files
 *     11-NOV-2008 (TIMJ):
 *        Add CHOOSE method.
+*     03-DEC-2008 (TIMJ):
+*        Add additional sanity check for time ordered data.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -136,6 +138,13 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
   if ( (indata->pntr)[0] == NULL) {
     *status = SAI__ERROR;
     errRep( " ", "Input data array for dark subtraction is a null pointer",
+            status);
+    return;
+  }
+
+  if ( ! indata->isTordered ) {
+    *status = SAI__ERROR;
+    errRep( " ", "Can not subtract dark from bolometer ordered data",
             status);
     return;
   }
