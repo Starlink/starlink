@@ -529,7 +529,7 @@ void smf_dreamsolve( smfData *data, int *status );
 int smf_dtype_check( const smfData* data, const char * type, smf_dtype itype,
 		     int *status );
 
-void smf_dtype_check_fatal( const smfData* data, const char * type, 
+int smf_dtype_check_fatal( const smfData* data, const char * type, 
                             smf_dtype itype, int *status );
 
 smf_dtype smf_dtype_fromstring( const char * dtype, int * status );

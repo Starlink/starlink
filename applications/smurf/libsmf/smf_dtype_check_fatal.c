@@ -13,8 +13,8 @@
 *     C function
 
 *  Invocation:
-*     smf_dtype_check_fatal( const smfData * data, const char * type,
-*                          smf_dtype itype, int *status );
+*     int smf_dtype_check_fatal( const smfData * data, const char * type,
+*                                smf_dtype itype, int *status );
 
 *  Arguments:
 *     data = const smfData* (Given)
@@ -34,6 +34,11 @@
 *  Description:
 *     This function compares the data type of the struct with a string
 *     form. Sets status to SMF__BDTYP if the check fails.
+
+*  Return Value:
+*     Returns true if the data type is okay, otherwise false. This matches
+*     smf_dtype_check behaviour and so allows you to easily abort from a routine
+*     with bad status.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -90,14 +95,14 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_dtype_check_fatal"
 
-void smf_dtype_check_fatal(const smfData* data, const char * type, smf_dtype itype,
-		    int * status ) {
+int smf_dtype_check_fatal(const smfData* data, const char * type,
+                          smf_dtype itype, int * status ) {
 
   /* Set a default value */
   int retval = 0;
   
   /* Check entry status */
-  if (*status != SAI__OK) return;
+  if (*status != SAI__OK) return retval;
 
   retval = smf_dtype_check( data, type, itype, status);
 
@@ -126,4 +131,5 @@ void smf_dtype_check_fatal(const smfData* data, const char * type, smf_dtype ity
     }
   }
 
+  return retval;
 }
