@@ -112,7 +112,7 @@
 #define FUNC_NAME "smf_fit_poly"
 
 void smf_fit_poly( const smfData *data, unsigned char *quality, 
-		   const int order, double *poly, int *status) {
+                   const int order, double *poly, int *status) {
 
   /* Local variables */
   double chisq;            /* Chi-squared from the linear regression fit */
@@ -140,8 +140,8 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
   if ( smf_history_check( data, FUNC_NAME, status) ) {
     msgSetc("F", FUNC_NAME);
     msgOutif(MSG__VERB," ", 
-	      "^F has already been run on these data, returning to caller", 
-	     status);
+             "^F has already been run on these data, returning to caller", 
+             status);
     return;
   }
 
@@ -213,57 +213,57 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
   mask = ~SMF__Q_JUMP;
 
   /* Loop over bolometers. Only fit this bolometer if it is not
-   flagged SMF__Q_BADB */
+     flagged SMF__Q_BADB */
   for ( j=0; j<nbol; j++) 
     if( (data->isTordered && !(qual[j] & SMF__Q_BADB) ) ||
-	(!data->isTordered && !(qual[j*nframes] & SMF__Q_BADB)) ) {
+        (!data->isTordered && !(qual[j*nframes] & SMF__Q_BADB)) ) {
 
-    /* Fill the matrix, vectors and weights arrays */
-    for ( i=0; i<nframes; i++) {
-      /* Matrix elements */
-      for ( k=0; k<ncoeff; k++) {
-	xik = (double)pow(i,k);
-	gsl_matrix_set( X, i, k, xik );
-      }
+      /* Fill the matrix, vectors and weights arrays */
+      for ( i=0; i<nframes; i++) {
+        /* Matrix elements */
+        for ( k=0; k<ncoeff; k++) {
+          xik = (double)pow(i,k);
+          gsl_matrix_set( X, i, k, xik );
+        }
 
-      /* Fill vectors for fitting */
+        /* Fill vectors for fitting */
 
-      if( data->isTordered ) { /* ICD time-ordered data */
+        if( data->isTordered ) { /* ICD time-ordered data */
 
-	/* data */
-	gsl_vector_set( psky, i, indata[j + nbol*i] );
+          /* data */
+          gsl_vector_set( psky, i, indata[j + nbol*i] );
 
-	/* weights */	
-	if( !(qual[nbol*i + j]&mask) && (indata[j + nbol*i] != VAL__BADD) ) {
-	  gsl_vector_set( weight, i, 1.0); /* Good QUALITY */
-	} else {
-	  gsl_vector_set( weight, i, 0.0); /* Bad QUALITY */
-	}
+          /* weights */	
+          if( !(qual[nbol*i + j]&mask) && (indata[j + nbol*i] != VAL__BADD) ) {
+            gsl_vector_set( weight, i, 1.0); /* Good QUALITY */
+          } else {
+            gsl_vector_set( weight, i, 0.0); /* Bad QUALITY */
+          }
 	
-      } else {                 /* bolo-ordered */
+        } else {                 /* bolo-ordered */
 
-	/* data */
-	gsl_vector_set( psky, i, indata[j*nframes + i] );
+          /* data */
+          gsl_vector_set( psky, i, indata[j*nframes + i] );
 
-	/* weights */	
-	if( !(qual[j*nframes + i]&mask) && (indata[j*nframes + i] != 
-					    VAL__BADD) ) {
-	  gsl_vector_set( weight, i, 1.0); /* Good QUALITY */
-	} else {
-	  gsl_vector_set( weight, i, 0.0); /* Bad QUALITY */
-	}
+          /* weights */	
+          if( !(qual[j*nframes + i]&mask) && (indata[j*nframes + i] != 
+                                              VAL__BADD) ) {
+            gsl_vector_set( weight, i, 1.0); /* Good QUALITY */
+          } else {
+            gsl_vector_set( weight, i, 0.0); /* Bad QUALITY */
+          }
+        }
       }
+
+      /* Carry out fit */
+      gsl_multifit_wlinear( X, weight, psky, coeffs, mcov, &chisq, work );
+
+      /* Store coefficients in the polynomial array */
+      for ( k=0; k<ncoeff; k++) {
+        poly[j + k*nbol] = gsl_vector_get ( coeffs, k );
+      }
+
     }
-
-    /* Carry out fit */
-    gsl_multifit_wlinear( X, weight, psky, coeffs, mcov, &chisq, work );
-
-    /* Store coefficients in the polynomial array */
-    for ( k=0; k<ncoeff; k++) {
-      poly[j + k*nbol] = gsl_vector_get ( coeffs, k );
-    }
-
-  }
   /* Free up workspace */
   gsl_multifit_linear_free( work );
   gsl_matrix_free( X );
