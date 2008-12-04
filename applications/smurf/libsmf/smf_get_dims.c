@@ -52,7 +52,9 @@
 
 *  History:
 *     2008-08-27 (EC)
-*        Initial version. 
+*        Initial version.
+*     2008-12-03 (EC):
+*        Add stride to API
 *     {enter_further_changes_here}
 
 *  Copyright:
