@@ -688,9 +688,9 @@ void smurf_impaztec( int *status ) {
 
 	/* Create frameset */
 
-	smf_create_lutwcs( 0, hdr.fplanex, hdr.fplaney, hdr.ndet, 
-			   &(head[i_good]), hdr.instap, telpos,
-			   &(hdr.wcs), status );
+	hdr.cache2 = smf_create_lutwcs( 0, hdr.fplanex, hdr.fplaney, hdr.ndet, 
+                                  &(head[i_good]), hdr.instap, telpos,
+                                  &(hdr.wcs), hdr.cache2, status );
 
 	if (i_good == 0) {
 	  double radiff;
@@ -724,9 +724,9 @@ void smurf_impaztec( int *status ) {
 	i_good++;
 
         /* Free cache */
-        cache = smf_create_lutwcs( -1, hdr.fplanex, hdr.fplaney, hdr.ndet, 
-                           &(head[i_good]), hdr.instap, telpos, cache,
-                           &(hdr.wcs), status );
+        hdr.cache2 = smf_create_lutwcs( -1, hdr.fplanex, hdr.fplaney, hdr.ndet, 
+                                        &(head[i_good]), hdr.instap, telpos,
+                                        hdr.cache2, &(hdr.wcs), status );
 
       }
     }
