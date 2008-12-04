@@ -202,7 +202,7 @@ void smurf_impaztec( int *status ) {
   int date_status;             /* status of date conversion */
   char date_str[MAXSTRING];    /* string rep. of date (MM/DD/YYYY) */
   char dateobs[20];            /* string of date YYYY/MM/DDThh:mm:ss
-				  for fits header */
+                                  for fits header */
   int day;                     /* day of beginning of observation */
   int *dbuf=NULL;              /* simulated data  */
   double dec=0;                /* dec of observation in radians  */
@@ -228,7 +228,7 @@ void smurf_impaztec( int *status ) {
   int leng=0;                  /* used to count the length of a string */
   int lbnd[3];                 /* Dimensions of the DATA component */
   double lst_coord=0;          /* LST derived from the coordinates ra,az,el
-			          for the current frame */
+                                  for the current frame */
   double lst_coord_prev=0;     /* as above for the frame previous */
   double map_hght;             /* Map height in arcsec */
   double map_wdth;             /* Map width in arcsec  */
@@ -244,7 +244,7 @@ void smurf_impaztec( int *status ) {
   int ncid;                    /* id of netCDF file */
   int ncol;                    /* number of bolometers in column  */
   int nconst=0;                /* number of sequential frames with constant
-				  pointing data */
+                                  pointing data */
   char ndffile[MAXSTRING];     /* output NDF file name */
   int nflat;                   /* number of flat coeffs per bol  */
   int nframes;                 /* number of time steps in netCDF data format */
@@ -338,7 +338,7 @@ void smurf_impaztec( int *status ) {
     atend      = 0;
 
     msgOutif(MSG__VERB," ", 
-	     "Reading netcdf file", status); 
+             "Reading netcdf file", status); 
 
     /* Get the data dimensionality */
     nc_inq_dimlen(ncid,0,&nbolos);    
@@ -518,7 +518,7 @@ void smurf_impaztec( int *status ) {
 
     /* and correct the UTC values */
     for (i=0; i < nframes; i++) {
-           mjuldate[i] += lst_err;
+      mjuldate[i] += lst_err;
     }
 
 
@@ -538,15 +538,15 @@ void smurf_impaztec( int *status ) {
 
       len = strlen(ra_str);
       for (i=0; i <len; i++) {
-	if (ra_str[i] == ':') {
-	  ra_str[i] = ' ';
-	}
+        if (ra_str[i] == ':') {
+          ra_str[i] = ' ';
+        }
       }
       len = strlen(dec_str);
       for (i=0; i <len; i++) {
-	if (dec_str[i] == ':') {
-	  dec_str[i] = ' ';
-	}
+        if (dec_str[i] == ':') {
+          dec_str[i] = ' ';
+        }
       }
 
       /* convert to radians */
@@ -558,19 +558,19 @@ void smurf_impaztec( int *status ) {
 
       /* store base position in ra/dec and calculate apparent */
       for (i = 0; i < nframes ; i++ ) {
-	trackbasec1[i] = ra;
-	trackbasec2[i] = dec;
+        trackbasec1[i] = ra;
+        trackbasec2[i] = dec;
 
-	slaMap( ra, dec, 0., 0., 0., 0., 2000., mjuldate[i],
-		&(ra_app[i]), &(dec_app[i]));
+        slaMap( ra, dec, 0., 0., 0., 0., 2000., mjuldate[i],
+                &(ra_app[i]), &(dec_app[i]));
 
       }
 
     }
 
     /* now convert base RA/Dec to azel - there will be a slight
-     error because AST and TCS take into account more effects 
-     than are handled by slaDe2h */
+       error because AST and TCS take into account more effects 
+       than are handled by slaDe2h */
     
     
     for (i=0; i< nframes; i++) {
@@ -607,33 +607,33 @@ void smurf_impaztec( int *status ) {
 
       lst_coord_prev = lst_coord;
       slaDh2e( azelactc1[i], azelactc2[i], telpos[1]*2*3.1415926536/360.0,
-	       &ha, &tmp);
+               &ha, &tmp);
       lst_coord = ha + trackactc1[i]; /* LST derived from coordinates */
       /* (az, el, and ra) */
 
       if( (lst_coord - lst_coord_prev)>0.0 && i!=0) {
 
-	if(ngframes==0) { startframe=i; }
-	quality[i]=1;
-	ngframes++;
-	/* printf("IMPAZTEC i: %5i nconst: %5i\n", i, nconst); */
-	nconst=0;
+        if(ngframes==0) { startframe=i; }
+        quality[i]=1;
+        ngframes++;
+        /* printf("IMPAZTEC i: %5i nconst: %5i\n", i, nconst); */
+        nconst=0;
 
       }
       else {
-	nconst++;
+        nconst++;
 
-	if(ngframes>0 && nconst<=20) {
-	  quality[i]=1;
-	  ngframes++;
-	}
+        if(ngframes>0 && nconst<=20) {
+          quality[i]=1;
+          ngframes++;
+        }
 
       }
 
     }
 
     printf("IMPAZTEC n_frames: %i n_good_frames: %i startframe: %i\n",
-	   nframes, ngframes, startframe);
+           nframes, ngframes, startframe);
 
     if (ngframes == 0) {
       printf("This file contains no good frames? LST(coords) is constant.\n");
@@ -644,84 +644,84 @@ void smurf_impaztec( int *status ) {
     double tel_lat, lst, ha_azel, ha_tr, dec_fr_azel;
     tel_lat = telpos[1]*2*3.1415926536/360.0; /* telescope lat in radians */
     slaDh2e(azelactc1[startframe], azelactc2[startframe], tel_lat,
-	    &ha_azel, &dec_fr_azel);
+            &ha_azel, &dec_fr_azel);
     lst = tempbuff[startframe];
     ha_tr = lst - trackactc1[startframe];
     printf("IMPAZTEC ha(az,el): %g ha(lst,ra): %g\n", ha_azel, ha_tr);
     printf("IMPAZTEC dec(az,el): %g dec: %g\n",
-	   dec_fr_azel, trackactc2[startframe]);
+           dec_fr_azel, trackactc2[startframe]);
 
     i_good=0;
     for( i=0; i<nframes; i++) {
 
       if(quality[i]==1) {
 
-	head[i_good].rts_num = i_good;   
-	head[i_good].rts_end = mjuldate[i];
-	head[i_good].tcs_tai = mjuldate[i];
-	head[i_good].tcs_airmass = airmass[i];
-	strcpy( head[i_good].tcs_tr_sys, tracksys );
-	head[i_good].tcs_tr_ac1 = trackactc1[i];
-	head[i_good].tcs_tr_ac2 = trackactc2[i];
-	head[i_good].tcs_tr_dc1 = trackdemandc1[i];
-	head[i_good].tcs_tr_dc2 = trackdemandc2[i];
+        head[i_good].rts_num = i_good;   
+        head[i_good].rts_end = mjuldate[i];
+        head[i_good].tcs_tai = mjuldate[i];
+        head[i_good].tcs_airmass = airmass[i];
+        strcpy( head[i_good].tcs_tr_sys, tracksys );
+        head[i_good].tcs_tr_ac1 = trackactc1[i];
+        head[i_good].tcs_tr_ac2 = trackactc2[i];
+        head[i_good].tcs_tr_dc1 = trackdemandc1[i];
+        head[i_good].tcs_tr_dc2 = trackdemandc2[i];
 
-	/*head[i_good].tcs_tr_bc1 = trackactc1[startframe];*/
-	/*head[i_good].tcs_tr_bc2 = trackactc2[startframe];*/
-	head[i_good].tcs_tr_bc1 = trackbasec1[i]; 
-	head[i_good].tcs_tr_bc2 = trackbasec2[i]; 
+        /*head[i_good].tcs_tr_bc1 = trackactc1[startframe];*/
+        /*head[i_good].tcs_tr_bc2 = trackactc2[startframe];*/
+        head[i_good].tcs_tr_bc1 = trackbasec1[i]; 
+        head[i_good].tcs_tr_bc2 = trackbasec2[i]; 
 
-	head[i_good].tcs_az_ac1 = azelactc1[i];
-	head[i_good].tcs_az_ac2 = azelactc2[i];  
-	head[i_good].tcs_az_dc1 = azeldemandc1[i];
-	head[i_good].tcs_az_dc2 = azeldemandc2[i];
+        head[i_good].tcs_az_ac1 = azelactc1[i];
+        head[i_good].tcs_az_ac2 = azelactc2[i];  
+        head[i_good].tcs_az_dc1 = azeldemandc1[i];
+        head[i_good].tcs_az_dc2 = azeldemandc2[i];
 
-	/*head[i_good].tcs_az_bc1 = azelactc1[startframe];*/
-	/*head[i_good].tcs_az_bc2 = azelactc2[startframe];*/
+        /*head[i_good].tcs_az_bc1 = azelactc1[startframe];*/
+        /*head[i_good].tcs_az_bc2 = azelactc2[startframe];*/
 
-	head[i_good].tcs_az_bc1 = azelbasec1[i];
-	head[i_good].tcs_az_bc2 = azelbasec2[i]; 
+        head[i_good].tcs_az_bc1 = azelbasec1[i];
+        head[i_good].tcs_az_bc2 = azelbasec2[i]; 
       
-	posptr[2*i_good +0] = azelactc1[i];
-	posptr[2*i_good +1] = azelactc2[i];
+        posptr[2*i_good +0] = azelactc1[i];
+        posptr[2*i_good +1] = azelactc2[i];
 
 
-	/* Create frameset */
+        /* Create frameset */
 
-	hdr.cache2 = smf_create_lutwcs( 0, hdr.fplanex, hdr.fplaney, hdr.ndet, 
-                                  &(head[i_good]), hdr.instap, telpos,
-                                  &(hdr.wcs), hdr.cache2, status );
+        hdr.cache2 = smf_create_lutwcs( 0, hdr.fplanex, hdr.fplaney, hdr.ndet, 
+                                        &(head[i_good]), hdr.instap, telpos,
+                                        &(hdr.wcs), hdr.cache2, status );
 
-	if (i_good == 0) {
-	  double radiff;
-	  double decdiff;
-	  astSet( hdr.wcs, "SYSTEM=FK5" );
-	  xtemp = 3.;
-	  ytemp = 1.;
+        if (i_good == 0) {
+          double radiff;
+          double decdiff;
+          astSet( hdr.wcs, "SYSTEM=FK5" );
+          xtemp = 3.;
+          ytemp = 1.;
 	  
-	  astTran2( hdr.wcs, 1, &xtemp, &ytemp, 1, &xout, &yout ); 
+          astTran2( hdr.wcs, 1, &xtemp, &ytemp, 1, &xout, &yout ); 
 
-	  printf("RADEC head: %f %f out: %f %f\n", 
-		 head[i_good].tcs_tr_ac1, head[i_good].tcs_tr_ac2,
-		 xout, yout );
+          printf("RADEC head: %f %f out: %f %f\n", 
+                 head[i_good].tcs_tr_ac1, head[i_good].tcs_tr_ac2,
+                 xout, yout );
 
-	  radiff = head[i_good].tcs_tr_ac1 - xout ;
-	  radiff *= cos(head[i_good].tcs_tr_ac2) * DR2AS;
-	  decdiff = head[i_good].tcs_tr_ac2 - yout ;
-	  decdiff *= DR2AS;
+          radiff = head[i_good].tcs_tr_ac1 - xout ;
+          radiff *= cos(head[i_good].tcs_tr_ac2) * DR2AS;
+          decdiff = head[i_good].tcs_tr_ac2 - yout ;
+          decdiff *= DR2AS;
 
-	  printf("Diff = %f , %f \n", radiff, decdiff);
+          printf("Diff = %f , %f \n", radiff, decdiff);
 
-	  astSet( hdr.wcs, "SYSTEM=AZEL" );
+          astSet( hdr.wcs, "SYSTEM=AZEL" );
 	  
-	  astTran2( hdr.wcs, 1, &xtemp, &ytemp, 1, &xout, &yout ); 
+          astTran2( hdr.wcs, 1, &xtemp, &ytemp, 1, &xout, &yout ); 
 
-	  printf("AZEL head: %f %f out: %f %f\n", 
-		 head[i_good].tcs_az_ac1, head[i_good].tcs_az_ac2,
-		 xout, yout );
-	}
+          printf("AZEL head: %f %f out: %f %f\n", 
+                 head[i_good].tcs_az_ac1, head[i_good].tcs_az_ac2,
+                 xout, yout );
+        }
 
-	i_good++;
+        i_good++;
 
         /* Free cache */
         hdr.cache2 = smf_create_lutwcs( -1, hdr.fplanex, hdr.fplaney, hdr.ndet, 
@@ -732,7 +732,7 @@ void smurf_impaztec( int *status ) {
     }
     if(i_good != ngframes) {
       printf("IMPAZTEC i_good after filling JCMTState != ngframes, i_good: %i\n",
-	     i_good);
+             i_good);
     }
 
     /* Additional FITS header information */
@@ -745,7 +745,7 @@ void smurf_impaztec( int *status ) {
   }
 
   msgOutif(MSG__VERB," ", 
-	   "Writing NDF file", status); 
+           "Writing NDF file", status); 
 
   ndfBegin();
 
@@ -766,7 +766,7 @@ void smurf_impaztec( int *status ) {
 
   /* Map the data array */  
   ndfMap( indf, "DATA", "_DOUBLE", "WRITE", &pntr, &nmap, 
-	   status );
+          status );
 
   full_bolosig = pntr;
 
@@ -779,10 +779,10 @@ void smurf_impaztec( int *status ) {
     if( *status == SAI__OK ) {
       i_good=0;
       for(i=0;i<nframes;i++) {
-	if(quality[i]==1) {
-	  full_bolosig[i_good*nbolos + j] = bolosig[i_good];
-	  i_good++;
-	}
+        if(quality[i]==1) {
+          full_bolosig[i_good*nbolos + j] = bolosig[i_good];
+          i_good++;
+        }
       }
     } else {
       /* Exit if bad status was set */
@@ -791,7 +791,7 @@ void smurf_impaztec( int *status ) {
   }
   if(*status == SAI__OK && i_good != ngframes) {
     printf("IMPAZTEC i_good after filling bolo signals != ngframes,  i_good: %i\n",
-	   i_good);
+           i_good);
   }
 
   /* Format the FITS headers */
@@ -817,10 +817,10 @@ void smurf_impaztec( int *status ) {
     for ( i=0; i<numsamples; i++ ) {
     
       if( i == 0 ) {
-	x_min = posptr[0];
-	x_max = posptr[0];
-	y_min = posptr[1];
-	y_max = posptr[1];
+        x_min = posptr[0];
+        x_max = posptr[0];
+        y_min = posptr[1];
+        y_max = posptr[1];
       }
     
       if( posptr[i*2] < x_min ) x_min = posptr[i*2];
@@ -901,7 +901,7 @@ void smurf_impaztec( int *status ) {
 
   if ( *status == SAI__OK ) {
     msgOutif(MSG__VERB," ", 
-	   "Impaztec complete, NDF file written", status); 
+             "Impaztec complete, NDF file written", status); 
 
   }
 
@@ -909,8 +909,8 @@ void smurf_impaztec( int *status ) {
 
   *status = SAI__ERROR;
   errRep(FUNC_NAME, 
-	 "SMURF built without libnetcdf. IMPAZTEC task not supported.", 
-	 status);
+         "SMURF built without libnetcdf. IMPAZTEC task not supported.", 
+         status);
 #endif
 
 
