@@ -56,10 +56,13 @@
 *        - handle both time- and bolo-ordered data
 *     2008-04-03 (EC):
 *        - Added quality to interface
+*     2008-12-03 (TIMJ):
+*        Use smf_get_dims
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2006-2008 University of British Columbia. All Rights
 *     Reserved.
 
 *  Licence:
@@ -120,9 +123,9 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
   dim_t k;                 /* Loop counter */
   unsigned char mask;      /* QUALITY bit mask */
   gsl_matrix *mcov=NULL;   /* Covariance matrix */
-  size_t nbol=0;           /* Number of bolometers */
+  dim_t nbol=0;           /* Number of bolometers */
   size_t ncoeff = 2;       /* Number of coefficients to fit for; def. line */
-  size_t nframes = 0;      /* Number of frames */
+  dim_t nframes = 0;      /* Number of frames */
   gsl_vector *psky=NULL;   /* Vector containing sky brightness */
   unsigned char *qual=NULL;/* Pointer to QUALITY component */
   double xik;              /* */
@@ -142,27 +145,8 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
     return;
   }
 
-  /* Do we have 2-D image or 3-D timeseries data? */
-  if (data->ndims == 3 ) {
-
-    /* Data dimensions */
-    if( data->isTordered ) {
-      nbol = (data->dims)[0]*(data->dims)[1];
-      nframes = (data->dims)[2];
-    } else {
-      nframes = (data->dims)[0];
-      nbol = (data->dims)[1]*(data->dims)[2];
-    }
-  } else {
-    /* Abort with an error if the number of dimensions is not  3 */
-    if ( *status == SAI__OK) {
-      *status = SAI__ERROR;
-      msgSeti("ND", data->ndims);
-      errRep(FUNC_NAME,
-	     "Number of dimensions of input file is ^ND: should be 3",
-	     status);
-    }
-  }
+  /* Get the dimensions */
+  smf_get_dims( data, &nbol, &nframes, NULL, NULL, NULL, status);
 
   /* Should check data type for double */
   smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status);
