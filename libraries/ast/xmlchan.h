@@ -70,13 +70,13 @@
 /* Macros. */
 /* ------- */
 
-/* URI defining the starlink AST XML namespace */
-
 #if defined(astCLASS) || defined(astFORTRAN77)
 #define STATUS_PTR status
 #else
 #define STATUS_PTR astGetStatusPtr
 #endif
+
+/* URI defining the starlink AST XML namespace */
 #define AST__XMLNS  "http://www.starlink.ac.uk/ast/xml/"
 
 #if defined(astCLASS)            /* Protected */
