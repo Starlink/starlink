@@ -38,6 +38,7 @@ EXAMPLE_FILES = \
 examples/README \
 examples/atm.sdf \
 examples/candycanes.sdf \
+examples/dimmconfig.lis \
 examples/heatrunobs.lis \
 examples/heatrunsim.lis \
 examples/obspar.lis \
@@ -47,15 +48,14 @@ examples/obspar_pong.lis \
 examples/obspar_stare.lis \
 examples/pongobs.lis \
 examples/pongsim.lis \
+examples/resist.cfg \
 examples/simpar.lis \
 examples/simpar_dream.lis \
 examples/simpar_heatrun.lis \
 examples/simpar_pong.lis \
 examples/simpar_stare.lis \
 examples/stareobs.lis \
-examples/staresim.lis \
-examples/resist.cfg
-
+examples/staresim.lis
 
 # Linking
 
