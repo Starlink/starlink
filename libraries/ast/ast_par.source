@@ -61,6 +61,8 @@
 *        Added AST_ESCAPES.
 *     9-FEB-2007 (DSB):
 *        Use a double precision constant to initialise AST__UNDEFF.
+*     4-DEC-2008 (TIMJ):
+*        Add AST_TESTFITS. Remove AST__UNDEF<X>
 *-
 
 *  Length of character string returned by a character function.
@@ -114,12 +116,7 @@
       LOGICAL AST_GETFITSL
       LOGICAL AST_GETFITSS
       LOGICAL AST_GETFITSCN
-      CHARACTER AST__UNDEFS*11  
-      PARAMETER ( AST__UNDEFS  = '<undefined>' )
-      DOUBLE PRECISION AST__UNDEFF
-      PARAMETER ( AST__UNDEFF = -123456789.0D0 )
-      INTEGER AST__UNDEFI
-      PARAMETER ( AST__UNDEFI = -123456789 )
+      LOGICAL AST_TESTFITS
 
 *  Mapping Class.
       INTEGER AST__URESAMP1
