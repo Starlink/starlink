@@ -26782,8 +26782,8 @@ f     AST_TESTFITS
 
 *  Synopsis:
 c     #include "fitschan.h"
-c     int astTestFits<X>( AstFitsChan *this, const char *name, int *there )
-f     RESULT = AST_TESTFITS<X>( THIS, NAME, THERE, STATUS )
+c     int astTestFits( AstFitsChan *this, const char *name, int *there )
+f     RESULT = AST_TESTFITS( THIS, NAME, THERE, STATUS )
 
 *  Class Membership:
 *     FitsChan method.
