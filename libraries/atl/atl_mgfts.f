@@ -86,6 +86,9 @@
 *        Fix typo for method 2
 *     26-JUN-2008 (DSB):
 *        Correct AST_SET to AST_SETI.
+*     4-DEC-2008 (TIMJ):
+*        Rewrite to use AST_TESTFITS now that AST_GETFITSS no longer
+*        allows undef values.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -117,7 +120,13 @@
       CHARACTER VALUE3*80
       INTEGER ICARD1
       INTEGER ICARD2
+      LOGICAL DUMMY
       LOGICAL FLAG
+      LOGICAL ISDEF2
+      LOGICAL ISDEF3
+      LOGICAL ISTHERE2
+      LOGICAL ISTHERE3
+      LOGICAL MATCH23
 *.
 
 *  Initialise.
@@ -153,7 +162,7 @@
 
 
 *  Method 2: Append FC2 to the end of FC1, excluding FC1 keywords that are
-*  also present in FC2 (even iof they have different values).
+*  also present in FC2 (even if they have different values).
 *  --------------------------------------------------------------------
       ELSE IF( METHOD .EQ. 2 ) THEN
 
@@ -172,7 +181,8 @@
 
 *  See if FC2 contains a card for the same keyword used by the current
 *  card in FC3.
-               IF( AST_GETFITSS( FC2, CARD, VALUE2, STATUS ) ) THEN
+               ISDEF2 = AST_TESTFITS( FC2, CARD, ISTHERE2, STATUS )
+               IF( ISTHERE2 ) THEN
 
 *  If so, move backwards by one card in FC3 (this is because the above
 *  call to AST_FINDFITS advances the curent card on each invocation, so
@@ -216,15 +226,41 @@
 *  not have an equals sign in column 10 )
             IF( CARD( 9 : 10 ) .EQ. '= ' ) THEN
 
-*  See if there is a card in FC2 for the keyword just read from FC1.
-*  If so the keyword value from FC2 is returned in VALUE2. We also get
-*  the keyword value from FC3 (in VALUE3).
-               IF( AST_GETFITSS( FC2, CARD, VALUE2, STATUS ) .AND.
-     :             AST_GETFITSS( FC3, CARD, VALUE3, STATUS ) ) THEN
+*  Determine whether the keyword is there in FC2 and whether it has
+*  a defined value or not
+               ISDEF2 = AST_TESTFITS( FC2, CARD, ISTHERE2, STATUS )
+
+*  We know the card exists in FC3 but if it exists in FC2 we need to compare
+*  If both cards exist we can compare them
+               IF( ISTHERE2 ) THEN
+
+*  See if FC3 has a defined value
+                  ISDEF3 = AST_TESTFITS( FC3, CARD, ISTHERE3, STATUS )
+
+*  Decide whether we have a match. Default to no match. If both are
+*  undefined that is a match.
+                  MATCH23 = .FALSE.
+                  IF (ISDEF2 .AND. ISDEF3) THEN
+
+*  Get the values for comparison and store in VALUE2 and VALUE3
+                     DUMMY = AST_GETFITSS( FC2, CARD, VALUE2, STATUS )
+                     DUMMY = AST_GETFITSS( FC3, CARD, VALUE3, STATUS ) 
+
+*  See if we have a match
+                     IF ( VALUE2 .EQ. VALUE3 ) THEN
+                        MATCH23 = .TRUE.
+                     END IF
+
+*  Now see if both are undef (if only one is undef that is not a match)
+                  ELSE IF ( (.NOT.ISDEF2) .AND. (.NOT.ISDEF3) ) THEN
+
+                     MATCH23 = .TRUE.
+
+                  END IF
 
 *  If the keyword values in the FC1 and FC2 differ, delete the current
 *  card in FC3.
-                  IF( VALUE2 .NE. VALUE3 ) THEN
+                  IF( .NOT. MATCH23 ) THEN
                      CALL AST_DELFITS( FC3, STATUS )
 
 * Otherwise, move on to the next card in FC3
