@@ -28,8 +28,11 @@
 *        in which case the keyword to use is extracted from it. No more 
 *        than 80 characters are read from this string.
 *     VALUE = CHARACTER * ( * ) (Given)
-*        The new keyword value. If this is AST__UNDEFS, then an UNDEF value
-*        will be stored in ther FitsChan.
+*        The new keyword value. If this is ATL__BADC, then an undefined
+*        value will be stored in the FitsChan. Note, the ATL__BADC string
+*        is defined in include file ATL_PAR, together with the integer
+*        constant ATL_SZBADC, which is equal to the length of the ATL__BADC 
+*        string.
 *     COMMNT = CHARACTER * ( * ) (Given)
 *        A new comment for the keyword. If this is blank, any comment in
 *        the NAME string is used. If the NAME string contains no comment, 
@@ -73,6 +76,8 @@
 *        Modified to check that the stored keyword value can be
 *        formatted. A warning message is issued if not, and the 
 *        card is deleted.
+*     5-DEC-2008 (DSB):
+*        Modified to avoid use of AST__UNDEF constants.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -85,7 +90,8 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'AST_PAR'          ! AST functions
+      INCLUDE 'ATL_PAR'          ! ATL constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Arguments Given:
@@ -116,11 +122,15 @@
 
 *  Store the new keyword value, over-writing the current card (or
 *  appending to the end of the FitsChan if the FitsChan is at end-of-file.)
-      CALL AST_SETFITSS( THIS, NAME, VALUE, COMMNT, .TRUE., STATUS )
+      IF( VALUE .NE. ATL__BADC ) THEN
+         CALL AST_SETFITSS( THIS, NAME, VALUE, COMMNT, .TRUE., STATUS )
+      ELSE
+         CALL AST_SETFITSU( THIS, NAME, COMMNT, .TRUE., STATUS )
+      END IF
 
 *  Format the new keyword value. If this fails, annul the error, issue a
 *  warning, and delete the card from the FitsChan. 
-      IF( STATUS .EQ. SAI__OK ) THEN
+      IF( STATUS .EQ. SAI__OK .AND. VALUE .NE. ATL__BADC ) THEN
          CALL AST_CLEAR( THIS, 'Card', STATUS )
          FOUND = AST_FINDFITS( THIS, NAME, CARD, .FALSE., STATUS )
 

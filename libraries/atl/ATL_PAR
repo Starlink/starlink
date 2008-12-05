@@ -43,6 +43,8 @@
 *  History:
 *     26-MAY-2006 (DSB):
 *        Original version
+*     5-DEC-2008 (DSB):
+*        Added ATL__BADC and ATL__SZBADC.
 *     {enter_further_changes_here}
 
 *-
@@ -54,4 +56,14 @@
 *  NDF__MXDIM.
       INTEGER ATL__MXDIM
       PARAMETER ( ATL__MXDIM = 7 )
+
+*  An string value indicating an undefined value (sort of like a string 
+*  equivalent of VAL__BADR, etc)
+      CHARACTER ATL__BADC*9
+      PARAMETER ( ATL__BADC = 'ATL__BADC' )
+
+*  The length of the above bad string.
+      INTEGER ATL__SZBADC
+      PARAMETER ( ATL__SZBADC = 9 )
+
 

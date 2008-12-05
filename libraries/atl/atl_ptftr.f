@@ -28,8 +28,8 @@
 *        in which case the keyword to use is extracted from it. No more 
 *        than 80 characters are read from this string.
 *     VALUE = REAL (Given)
-*        The new keyword value. If this is VAL__BADR, then an UNDEF value
-*        will be stored in ther FitsChan.
+*        The new keyword value. If this is VAL__BADR, then an undefined 
+*        value will be stored in the FitsChan.
 *     COMMNT = CHARACTER * ( * ) (Given)
 *        A new comment for the keyword. If this is blank, any comment in
 *        the NAME string is used. If the NAME string contains no comment, 
@@ -72,6 +72,8 @@
 *        Modified to check that the stored keyword value can be
 *        formatted. A warning message is issued if not, and the 
 *        card is deleted.
+*     5-DEC-2008 (DSB):
+*        Avoid use of AST__UNDEF constants.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -98,7 +100,6 @@
 
 *  Local Variables:
       CHARACTER CARD*80
-      DOUBLE PRECISION DVAL
       LOGICAL FOUND
 *.
 
@@ -117,11 +118,11 @@
 *  Store the new keyword value, over-writing the current card (or
 *  appending to the end of the FitsChan if the FitsChan is at end-of-file.)
       IF( VALUE .NE. VAL__BADR ) THEN
-         DVAL = DBLE( VALUE )
+         CALL AST_SETFITSF( THIS, NAME, DBLE( VALUE ), COMMNT, .TRUE., 
+     :                      STATUS )
       ELSE
-         DVAL = AST__UNDEFF
+         CALL AST_SETFITSU( THIS, NAME, COMMNT, .TRUE., STATUS )
       END IF
-      CALL AST_SETFITSF( THIS, NAME, DVAL, COMMNT, .TRUE., STATUS )
 
 *  Format the new keyword value. If this fails, annul the error, issue a
 *  warning, and delete the card from the FitsChan. 
