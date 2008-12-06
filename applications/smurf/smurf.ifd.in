@@ -957,6 +957,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter ngood {
+                type _INTEGER
+                access WRITE
+                vpath INTERNAL
+                prompt {Number of good responsivities}
+                default 0
+                helpkey *
+            }
+
             parameter refres {
                 type _DOUBLE
                 access READ

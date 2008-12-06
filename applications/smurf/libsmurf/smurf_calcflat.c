@@ -40,6 +40,8 @@
 *     MSG_FILTER = _CHAR (Read)
 *          Control the verbosity of the application. Values can be
 *          QUIET (minimal messages), NORMAL, VERBOSE or DEBUG [NORMAL]
+*     NGOOD = _INTEGER (Write)
+*          Number of bolometers with good responsivities.
 *     OUT = NDF (Write)
 *          Output flatfield file. The primary data array contains the
 *          dark subtracted measurements for each heater setting. The
@@ -431,6 +433,24 @@ void smurf_calcflat( int *status ) {
 
     smf_flat_responsivity( respmap, bbhtframe->ndat, powref, bolref, status );
 
+    /* Report the number of good responsivities */
+    if (respmap) {
+      double *respdata = (respmap->pntr)[0];
+      size_t ngood = 0;
+      size_t ntotal = 0;
+      for (i = 0; i < nbols; i++) {
+        if (respdata[i] != VAL__BADD) {
+          ngood++;
+        }
+        ntotal++;
+      }
+      msgSeti( "NG", ngood );
+      msgSeti( "NTOT", ntotal );
+      msgOutif( MSG__NORM, "",
+                "Number of good responsivities: ^NG out of ^NTOT", status);
+      parPut0i( "NGOOD", ngood, status );
+    }
+
     /* Optionally discard the calibration if the responsivity is bad */
     parGet0l( "RESPMASK", &respmask, status );
     if (respmask) {
@@ -450,7 +470,8 @@ void smurf_calcflat( int *status ) {
         }
       }
       msgSeti( "NM", nmask);
-      msgOutif( MSG__NORM, "", "Responsivity mask has removed an additional ^NM bolometers",
+      msgOutif( MSG__NORM, "",
+                "Responsivity mask has removed an additional ^NM bolometers",
                 status);
     }
 
