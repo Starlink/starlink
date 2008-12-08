@@ -24,6 +24,9 @@
     the peak values using lines drawn in the profiles and on the main
     image.
 
+    The blank pixel colour is now preserved when new colour tables are
+    loaded.
+
   Lehuakona Release
   =================
 
