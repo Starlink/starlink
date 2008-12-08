@@ -11,6 +11,9 @@
  * Allan Brighton  05/10/95  Created
  * Peter W. Draper 05/03/98  Added full support for X visuals in addition
  *                           to pseudocolor (merged my changes from GAIA).
+ *                 08/12/08  Don't overwrite pixelval_[0] in storeColors, 
+ *                           that's the background colour (black or a
+ *                           user-defined value).
  */
 static const char* const rcsId="@(#) $Id: ImageColor.C,v 1.1.1.1 2006/01/12 16:39:04 abrighto Exp $";
 
@@ -276,7 +279,7 @@ int ImageColor::storeColors(XColor* colors)
     ErrorHandler errorHandler(display_); // catch X errors
 
     if (readOnly_) {
-	for (int i = 0; i < colorCount_; i++) {
+	for (int i = 1; i < colorCount_; i++) {
 	    if (!XAllocColor(display_, colormap_, colors+i))
 		return fmt_error("can't allocate %d read-only colors (only %d)", 
 				 colorCount_, i);
