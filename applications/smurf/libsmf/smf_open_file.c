@@ -418,7 +418,8 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
                    "the SCANFIT coefficients", status);
           } else {
             /* Read and store the polynomial coefficients */
-            ndfMap( gndf, "DATA", "_DOUBLE", "READ", &tpoly[0], &npoly, status );
+            ndfMap( gndf, "DATA", "_DOUBLE", "READ", &tpoly[0], &npoly, 
+                    status );
             poly = tpoly[0];
             ndfDim( gndf, NDF__MXDIM, pdims, &npdims, status );
             (*data)->ncoeff = pdims[2];
@@ -554,31 +555,41 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           /* Need to get the location of the extension for STATE parsing */
           ndfXloc( indf, JCMT__EXTNAME, "READ", &tloc, status );
 
-          /* Re-size the arrays in the JCMTSTATE extension to match the
-             pixel index bounds of the NDF. The resized arrays are stored in
-             a new temporary HDS object, and the old locator is annull. */
-          sc2store_resize_head( indf, &tloc, &xloc, status );
+          /* Only read the state header if available */
+          if( *status == SAI__OK ) {
+            /* Re-size the arrays in the JCMTSTATE extension to match the
+               pixel index bounds of the NDF. The resized arrays are stored in
+               a new temporary HDS object, and the old locator is annull. */
+            sc2store_resize_head( indf, &tloc, &xloc, status );
 
-          /* And need to map the header making sure we have the right components
-             for this instrument. */
-          nframes = ndfdims[2];
-          sc2store_headrmap( xloc, nframes, hdr->instrument, status );
+            /* And need to map the header making sure we have the right 
+               components for this instrument. */
+            nframes = ndfdims[2];
+            sc2store_headrmap( xloc, nframes, hdr->instrument, status );
 
-          /* Malloc some memory to hold all the time series data */
-          hdr->allState = smf_malloc( nframes, sizeof(*(hdr->allState)),
-                                      1, status );
+            /* Malloc some memory to hold all the time series data */
+            hdr->allState = smf_malloc( nframes, sizeof(*(hdr->allState)),
+                                        1, status );
 
-          /* Loop over each element, reading in the information */
-          tmpState = hdr->allState;
-          for (i=0; i<nframes; i++) {
-            sc2store_headget(i, &(tmpState[i]), status);
+            /* Loop over each element, reading in the information */
+            tmpState = hdr->allState;
+            for (i=0; i<nframes; i++) {
+              sc2store_headget(i, &(tmpState[i]), status);
+            }
+            hdr->nframes = nframes;
+            /* Unmap the headers */
+            sc2store_headunmap( status );
+          } else if (*status==NDF__NOEXT) {
+            /* If the header just wasn't there, annul status and continue */
+            errAnnul( status );
+            msgOutif( MSG__DEBUG, "", 
+                      FUNC_NAME 
+                      ": File has not JCMTState information continuing anyways",
+                      status );
           }
-          hdr->nframes = nframes;
-          /* Unmap the headers */
-          sc2store_headunmap( status );
 
-          /* Annul the locator */
-          datAnnul( &xloc, status );
+          /* Annul the locator in any case */
+          if( xloc ) datAnnul( &xloc, status );
         }
 
         /* On the basis of the instrument, we know need to fill in some
