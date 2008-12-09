@@ -194,19 +194,19 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
     for ( i=0; i<array->ndat; i++ ) {
       data = (array->sdata)[i];
       if ( data != NULL ) {
-	/* If this has been run before just return to caller and allow
-	   to continue to next set of related data files */
-	if ( smf_history_check( data, FUNC_NAME, status) ) {
-	  msgSetc("F", FUNC_NAME);
-	  msgOutif(MSG__VERB," ", 
-		    "^F has already been run on these data, returning to caller", 
-		    status);
-	  return;
-	}
-	nptsdat = (data->dims)[0] * (data->dims)[1];
-	npts += nptsdat;
-	nframes = (data->dims)[2];
-	ndat++;
+        /* If this has been run before just return to caller and allow
+           to continue to next set of related data files */
+        if ( smf_history_check( data, FUNC_NAME, status) ) {
+          msgSetc("F", FUNC_NAME);
+          msgOutif(MSG__VERB," ", 
+                   "^F has already been run on these data, returning to caller", 
+                   status);
+          return;
+        }
+        nptsdat = (data->dims)[0] * (data->dims)[1];
+        npts += nptsdat;
+        nframes = (data->dims)[2];
+        ndat++;
       }
     }
   }
@@ -217,49 +217,49 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
       sky0 = 0.0;
       /* Loop over smfDatas in smfArray */
       for ( kk=0; kk<ndat; kk++) {
-	data = (array->sdata)[kk];
-	/* Retrieve data array */
-	indata = (data->pntr)[0];
-	/* Offset into 3d data array */
-	base = nptsdat * k; 
-	/* Calculate sum of all pixels in current timeslice */
-	for (i=0; i < nptsdat; i++ ) {
-	  index = base + i;
-	  if (indata[index] != VAL__BADD) {
-	    sky0 += indata[index];
-	    numgood++;
-	  }
-	}
+        data = (array->sdata)[kk];
+        /* Retrieve data array */
+        indata = (data->pntr)[0];
+        /* Offset into 3d data array */
+        base = nptsdat * k; 
+        /* Calculate sum of all pixels in current timeslice */
+        for (i=0; i < nptsdat; i++ ) {
+          index = base + i;
+          if (indata[index] != VAL__BADD) {
+            sky0 += indata[index];
+            numgood++;
+          }
+        }
       }
       /* Calculate mean sky level across all related data for this
-	 timeslice */
+         timeslice */
       sky0 /= (double)numgood;
       /* Now to subtract fitted sky from data. Loop over the smfDatas in
-	 the smfArray, select each one in turn and subtract sky */
+         the smfArray, select each one in turn and subtract sky */
       for ( kk=0; kk<ndat; kk++) {
-	data = (array->sdata)[kk];
-	indata = (data->pntr)[0];
-	/* Subtract fit from timeslice */
-	base = nptsdat * k; 
-	for (i=0; i < nptsdat; i++ ) {
-	  index = i + base;
-	  if (indata[index] != VAL__BADD) {
-	    /* Subtract sky value; no need to update variance */
-	    indata[index] -= sky0;
-	  }
-	}
+        data = (array->sdata)[kk];
+        indata = (data->pntr)[0];
+        /* Subtract fit from timeslice */
+        base = nptsdat * k; 
+        for (i=0; i < nptsdat; i++ ) {
+          index = i + base;
+          if (indata[index] != VAL__BADD) {
+            /* Subtract sky value; no need to update variance */
+            indata[index] -= sky0;
+          }
+        }
       }
       *meansky = sky0;
       /* Debugging info */
       msgIflev( &curlevel );
       if (curlevel >= MSG__DEBUG) {
-	msgSeti("K",k+1);
-	msgSetc("F",fittype);
-	msgOutif(MSG__DEBUG," ", 
-		 " Fit results for timeslice ^K (fit type = ^F)", status );
-	msgSetd("DS",sky0);
-	msgOutif(MSG__DEBUG," ", 
-		 "              Sky0   = ^DS, ", status );
+        msgSeti("K",k+1);
+        msgSetc("F",fittype);
+        msgOutif(MSG__DEBUG," ", 
+                 " Fit results for timeslice ^K (fit type = ^F)", status );
+        msgSetd("DS",sky0);
+        msgOutif(MSG__DEBUG," ", 
+                 "              Sky0   = ^DS, ", status );
       }
     }
   } else if ( needast ) {
@@ -286,8 +286,8 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
     for (j = 0; j < (data->dims)[1]; j++) {
       base = j *(data->dims)[0];
       for (i = 0; i < (data->dims)[0]; i++) {
-	indices[z] = base + i; /* Index into data array */
-	z++;
+        indices[z] = base + i; /* Index into data array */
+        z++;
       }
     }
     /* Array bounds for astTranGrid call */
@@ -308,52 +308,52 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
     for ( k=0; k<nframes; k++) {
       /* Loop over smfDatas in smfArray */
       for ( kk=0; kk<ndat; kk++) {
-	data = (array->sdata)[kk];
-	/* Build WCS and set to AzEl */
-	smf_tslice_ast( data, k, 1, status );
-	hdr = data->hdr;
-	wcs = hdr->wcs;
-	if (wcs != NULL) {
-    origsystem = astGetC( wcs, "SYSTEM");
-    if (strcmp(origsystem, "AZEL") != 0) {	  
-      astSet( wcs, "SYSTEM=AZEL" );
-    }
-	} else {
-	  if ( *status == SAI__OK ) {
-	    *status = SAI__ERROR;
-	    errRep( FUNC_NAME, 
-		    "Plane removal method requires WCS but input is NULL", 
-		    status);
-	  }
-	}
-	/* Transform pixels to AzEl frame */
-	astTranGrid( wcs, 2, lbnd, ubnd, 0.1, 1000000, 1, 2, nptsdat, azel );
-	/* Retrieve data array */
-	indata = (data->pntr)[0];
-	/* Offset into 3d data array */
-	base = nptsdat * k; 
-	/* Offset into azelmatx array */
-	offset = kk*nptsdat;
-	/* Copy new AzEl elements into GSL arrays */
-	for ( i=0; i<nptsdat; i++) {
-	  index = indices[i] + base;
-	  /* Calculate index into azelmatx array */
-	  ioff = i + offset;
-	  gsl_matrix_set( azelmatx, ioff, 0, 1.0 );
-	  gsl_matrix_set( azelmatx, ioff, 1, azel[i+nptsdat] );
-	  if ( fitplane ) {
-	    gsl_matrix_set( azelmatx, ioff, 2, azel[i] );
-	  }
-	  gsl_vector_set( psky, ioff, indata[index] );
-	  /* Set weights - currently only a switch if data
-	     good/bad. Future versions should probably use the
-	     variance. */
-	  if (indata[index] != VAL__BADD) {
-	    gsl_vector_set( weight, ioff, 1.0);
-	  } else {
-	    gsl_vector_set( weight, ioff, 0.0);
-	  }
-	}
+        data = (array->sdata)[kk];
+        /* Build WCS and set to AzEl */
+        smf_tslice_ast( data, k, 1, status );
+        hdr = data->hdr;
+        wcs = hdr->wcs;
+        if (wcs != NULL) {
+          origsystem = astGetC( wcs, "SYSTEM");
+          if (strcmp(origsystem, "AZEL") != 0) {	  
+            astSet( wcs, "SYSTEM=AZEL" );
+          }
+        } else {
+          if ( *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            errRep( FUNC_NAME, 
+                    "Plane removal method requires WCS but input is NULL", 
+                    status);
+          }
+        }
+        /* Transform pixels to AzEl frame */
+        astTranGrid( wcs, 2, lbnd, ubnd, 0.1, 1000000, 1, 2, nptsdat, azel );
+        /* Retrieve data array */
+        indata = (data->pntr)[0];
+        /* Offset into 3d data array */
+        base = nptsdat * k; 
+        /* Offset into azelmatx array */
+        offset = kk*nptsdat;
+        /* Copy new AzEl elements into GSL arrays */
+        for ( i=0; i<nptsdat; i++) {
+          index = indices[i] + base;
+          /* Calculate index into azelmatx array */
+          ioff = i + offset;
+          gsl_matrix_set( azelmatx, ioff, 0, 1.0 );
+          gsl_matrix_set( azelmatx, ioff, 1, azel[i+nptsdat] );
+          if ( fitplane ) {
+            gsl_matrix_set( azelmatx, ioff, 2, azel[i] );
+          }
+          gsl_vector_set( psky, ioff, indata[index] );
+          /* Set weights - currently only a switch if data
+             good/bad. Future versions should probably use the
+             variance. */
+          if (indata[index] != VAL__BADD) {
+            gsl_vector_set( weight, ioff, 1.0);
+          } else {
+            gsl_vector_set( weight, ioff, 0.0);
+          }
+        }
       } /* End loop over smfDatas */
 
       /* Carry out fit */
@@ -364,55 +364,55 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
       /* Slope in El */
       dskyel = gsl_vector_get(skyfit, 1);
       if ( ncoeff == 3 ) {
-	/* Slope in Az */
-	dskyaz = gsl_vector_get(skyfit, 2);
+        /* Slope in Az */
+        dskyaz = gsl_vector_get(skyfit, 2);
       } else {
-	dskyaz = 0.0;
+        dskyaz = 0.0;
       }
 
       /* Now to subtract fitted sky from data. Loop over the smfDatas in
-	 the smfArray, select each one in turn and subtract sky */
+         the smfArray, select each one in turn and subtract sky */
       numgood = 0;
       *meansky = 0.0;
       for ( kk=0; kk<ndat; kk++) {
-	data = (array->sdata)[kk];
-	indata = (data->pntr)[0];
-	/* Subtract fit from timeslice */
-	base = nptsdat * k; 
-	for (i=0; i < nptsdat; i++ ) {
-	  index = i + base;
-	  if (indata[index] != VAL__BADD) {
-	    /* Subtract sky value; no need to update variance */
-	    sky = (sky0 + dskyel*azel[i+nptsdat] + dskyaz*azel[i]);
-	    numgood++;
-	    *meansky += sky;
-	    indata[index] -= sky;
-	  }
-	}
+        data = (array->sdata)[kk];
+        indata = (data->pntr)[0];
+        /* Subtract fit from timeslice */
+        base = nptsdat * k; 
+        for (i=0; i < nptsdat; i++ ) {
+          index = i + base;
+          if (indata[index] != VAL__BADD) {
+            /* Subtract sky value; no need to update variance */
+            sky = (sky0 + dskyel*azel[i+nptsdat] + dskyaz*azel[i]);
+            numgood++;
+            *meansky += sky;
+            indata[index] -= sky;
+          }
+        }
       }
       *meansky /= (double)numgood;
 
       /* Debugging info */
       msgIflev( &curlevel );
       if (curlevel >= MSG__DEBUG) {
-	msgSeti("K",k+1);
-	msgSetc("F",fittype);
-	msgOutif(MSG__DEBUG," ", 
-		 " Fit results for timeslice ^K (fit type = ^F)", status );
-	msgSetd("DS",sky0);
-	msgOutif(MSG__DEBUG," ", 
-		 "              Sky0   = ^DS, ", status );
-	msgSetd("DE",dskyel);
-	msgOutif(MSG__DEBUG," ", 
-		 "              Dskyel = ^DE, ", status );
-	if ( dskyaz != 0 ) {
-	  msgSetd("DA",dskyaz);
-	  msgOutif(MSG__DEBUG," ", 
-		   "              Dskyaz = ^DA", status );
-	}
-	msgSetd("X",chisq);
-	msgOutif(MSG__DEBUG," ", 
-		 "              X^2 = ^X", status );
+        msgSeti("K",k+1);
+        msgSetc("F",fittype);
+        msgOutif(MSG__DEBUG," ", 
+                 " Fit results for timeslice ^K (fit type = ^F)", status );
+        msgSetd("DS",sky0);
+        msgOutif(MSG__DEBUG," ", 
+                 "              Sky0   = ^DS, ", status );
+        msgSetd("DE",dskyel);
+        msgOutif(MSG__DEBUG," ", 
+                 "              Dskyel = ^DE, ", status );
+        if ( dskyaz != 0 ) {
+          msgSetd("DA",dskyaz);
+          msgOutif(MSG__DEBUG," ", 
+                   "              Dskyaz = ^DA", status );
+        }
+        msgSetd("X",chisq);
+        msgOutif(MSG__DEBUG," ", 
+                 "              X^2 = ^X", status );
       }
       
     } /* End of loop over timeslice frame */
@@ -426,16 +426,14 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
     gsl_matrix_free( mcov );
 
   CLEANUP:
-    if ( needast ) {
-      azel = smf_free(azel, status);
-    }
-    indices = smf_free(indices, status);
+    if (azel) azel = smf_free(azel, status);
+    if (indices) indices = smf_free(indices, status);
   }
 
   /* Write history entry if we finish with good status. */
   for ( kk=0; kk<ndat; kk++) {
     data = (array->sdata)[kk];
     smf_history_add( data, FUNC_NAME, 
-		     "Plane sky subtraction successful", status);
+                     "Plane sky subtraction successful", status);
   }
 }
