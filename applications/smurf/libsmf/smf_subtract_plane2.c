@@ -49,7 +49,8 @@
 *     - See also smf_subtract_plane1.c
 
 *  Authors:
-*     Andy Gibb (UBC)
+*     AGG: Andy Gibb (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -60,10 +61,14 @@
 *        Update to use new smf_free behaviour
 *     2008-04-28 (AGG):
 *        Return mean sky level subtracted
+*     2008-12-09 (TIMJ):
+*        Only set system to AZEL if it is not already AZEL. Do not reset
+*        system.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2006-2008 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -144,7 +149,7 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
   dim_t nptsdat = 0;       /* Number of points per data file */
   size_t numgood = 0;      /* Number of good values for calculating mean */
   dim_t offset;            /* Offset into azelmatx array */
-  const char *origsystem = '\0';  /* Character string to store the coordinate
+  const char *origsystem = NULL;  /* Character string to store the coordinate
 			      system on entry */
   gsl_vector *psky = NULL; /* Vector containing sky brightness */
   double sky;              /* Fitted sky level for current bolometer */
@@ -308,9 +313,11 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
 	smf_tslice_ast( data, k, 1, status );
 	hdr = data->hdr;
 	wcs = hdr->wcs;
-	origsystem = astGetC( wcs, "SYSTEM");
 	if (wcs != NULL) {
-	  astSetC( wcs, "SYSTEM", "AZEL" );
+    origsystem = astGetC( wcs, "SYSTEM");
+    if (strcmp(origsystem, "AZEL") != 0) {	  
+      astSet( wcs, "SYSTEM=AZEL" );
+    }
 	} else {
 	  if ( *status == SAI__OK ) {
 	    *status = SAI__ERROR;
@@ -382,8 +389,6 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
 	    indata[index] -= sky;
 	  }
 	}
-	/* Reset coordinates to original system on entry */
-	astSetC( wcs, "SYSTEM", origsystem );
       }
       *meansky /= (double)numgood;
 
