@@ -376,7 +376,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
           one_strlcpy( origsystem, astGetC(wcs,"SYSTEM"),
                        sizeof(origsystem), status);
           if (strcmp(origsystem, "AZEL") != 0) {
-            astSet( wcs, "SYSTEM=%s", "AZEL" );
+            astSet( wcs, "SYSTEM=AZEL"  );
           }
           /* Transfrom from pixels to AZEL */
           astTranGrid( wcs, 2, lbnd, ubnd, 0.1, 1000000, 1, 2, npts, azel );
