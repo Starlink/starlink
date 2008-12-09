@@ -137,6 +137,8 @@ f     - AST_CURRENTTIME: Return the current system time
 *        the parent overlay method.
 *     2-OCT-2007 (DSB):
 *        Added "LT" (Local Time) time scale.
+*     9-DEC-2008 (DSB):
+*        Ensure Format string pointer is used correctly.
 *class--
 */
 
@@ -2035,6 +2037,7 @@ static const char *GetLabel( AstFrame *this, int axis, int *status ) {
 
 /* Save the Format attribute, and then temporarily set it to give a date/time 
    string. */
+               fmt = astStore( NULL, fmt, strlen( fmt ) + 1 );
                fmtSet = astTestFormat( this, 0 );
                astSetFormat( this, 0, "iso.0" );
 
@@ -2050,6 +2053,9 @@ static const char *GetLabel( AstFrame *this, int axis, int *status ) {
                } else {
                   astClearFormat( this, 0 );
                }
+
+/* Free the memory holding the copy of the format string. */
+               fmt = astFree( (char *) fmt );
 
 /* If the time of day is "00:00:00", remove it. */
                if( !strcmp( getlabel_buff + strlen( getlabel_buff ) - 8, "00:00:00" ) ) {
@@ -2577,6 +2583,7 @@ static const char *GetTitle( AstFrame *this_frame, int *status ) {
 
 /* Save the Format attribute, and then temporarily set it to give a date/time 
    string. */
+            fmt = astStore( NULL, fmt, strlen( fmt ) + 1 );
             fmtSet = astTestFormat( this, 0 );
             astSetFormat( this, 0, "iso.0" );
 
@@ -2593,6 +2600,10 @@ static const char *GetTitle( AstFrame *this_frame, int *status ) {
             } else {
                astClearFormat( this, 0 );
             }
+
+/* Free the Format string copy. */
+            fmt = astFree( (char *) fmt );
+
          }
       }
    }
