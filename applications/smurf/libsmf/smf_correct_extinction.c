@@ -102,6 +102,9 @@
 *     2008-06-12 (TIMJ):
 *        - fix compiler warnings. origsystem must be copied in case
 *        another call to astGetC is inserted in the code without thought.
+*     2008-12-08 (TIMJ):
+*        simplify smf_tslice_ast call logic
+*        use sizeof(*var)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -281,10 +284,10 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   /* It is more efficient to call astTran2 with all the points
      rather than one point at a time */
   if (!quick) {
-    xin = smf_malloc( npts, sizeof(double), 0, status );
-    yin = smf_malloc( npts, sizeof(double), 0, status );
-    xout = smf_malloc( npts, sizeof(double), 0, status );
-    yout = smf_malloc( npts, sizeof(double), 0, status );
+    xin = smf_malloc( npts, sizeof(*xin), 0, status );
+    yin = smf_malloc( npts, sizeof(*yin), 0, status );
+    xout = smf_malloc( npts, sizeof(*xout), 0, status );
+    yout = smf_malloc( npts, sizeof(*yout), 0, status );
   }
   indices = smf_malloc( npts, sizeof(size_t), 0, status );
 
@@ -312,11 +315,8 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   for ( k=0; k<nframes && (*status == SAI__OK) ; k++) {
     /* Call tslice_ast to update the header for the particular
        timeslice. If we're in QUICK mode then we don't need the WCS */
-    if (quick) {
-      smf_tslice_ast( data, k, 0, status );
-    } else {
-      smf_tslice_ast( data, k, 1, status );
-    }
+    smf_tslice_ast( data, k, !quick, status );
+
     /* Retrieve header info */
     hdr = data->hdr;
     if( hdr == NULL ) {
