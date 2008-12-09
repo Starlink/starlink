@@ -105,6 +105,11 @@
 *     2008-12-08 (TIMJ):
 *        simplify smf_tslice_ast call logic
 *        use sizeof(*var)
+*     2008-12-09 (TIMJ):
+*        - Use astTranGrid rather than astTran2
+*        - Do not set system in frameset if it is already AZEL
+*        - Do not bother resetting system on a frameset that is about to be
+*          annulled.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -160,6 +165,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
 
   /* Local variables */
   double airmass;          /* Airmass */
+  double *azel = NULL;     /* AZEL coordinates */
   size_t base;             /* Offset into 3d data array */
   dim_t indexb;            /* bolo-ordered array offset */
   double extcorr = 1.0;    /* Extinction correction factor */
@@ -172,6 +178,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   int isTordered;          /* data order of input data */
   dim_t j;                 /* Loop counter */
   dim_t k;                 /* Loop counter */
+  int lbnd[2];             /* Lower bound */
   size_t ndims;            /* Number of dimensions in input data */
   size_t newtau = 0;       /* Flag to denote whether to calculate a
                               new tau from the WVM data */
@@ -182,14 +189,11 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   dim_t ny = 0;            /* # pixels in y-direction */
   double oldtwvm[3] = {0.0, 0.0, 0.0}; /* Cached value of WVM temperatures */
   char origsystem[10];  /* Character string to store the coordinate system */
+  int ubnd[2];             /* Upper bound */
   double *vardata = NULL;  /* Pointer to variance array */
   AstFrameSet *wcs = NULL; /* Pointer to AST WCS frameset */
   int wvmr = 0;            /* Flag to denote whether the WVMRAW method
                               is to be used */
-  double *xin = NULL;      /* X coordinates of input mapping */
-  double *xout = NULL;     /* X coordinates of output */
-  double *yin = NULL;      /* Y coordinates of input */
-  double *yout = NULL;     /* Y coordinates of output */
   int z;                   /* Counter for number of data points */
   double zd;               /* Zenith distance */
 
@@ -281,15 +285,11 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
     }
     npts = nx*ny;
   }
-  /* It is more efficient to call astTran2 with all the points
-     rather than one point at a time */
+  /* It is more efficient to call astTranGrid than astTran2 */
   if (!quick) {
-    xin = smf_malloc( npts, sizeof(*xin), 0, status );
-    yin = smf_malloc( npts, sizeof(*yin), 0, status );
-    xout = smf_malloc( npts, sizeof(*xout), 0, status );
-    yout = smf_malloc( npts, sizeof(*yout), 0, status );
+    azel = smf_malloc( 2*npts, sizeof(*azel), 0, status );
   }
-  indices = smf_malloc( npts, sizeof(size_t), 0, status );
+  indices = smf_malloc( npts, sizeof(*indices), 0, status );
 
   /* Jump to the cleanup section if status is bad by this point
      since we need to free memory */
@@ -300,14 +300,15 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   for (j = 0; j < ny; j++) {
     base = j * nx;
     for (i = 0; i < nx; i++) {
-      if (!quick) {
-        xin[z] = (double)i + 1.0;
-        yin[z] = (double)j + 1.0;
-      }
       indices[z] = base + i; /* index into data array */
       z++;
     }
   }
+  /* Array bounds for astTranGrid call */
+  lbnd[0] = 1;
+  lbnd[1] = 1;
+  ubnd[0] = nx;
+  ubnd[1] = ny;
 
   /* Loop over number of time slices/frames */
 
@@ -374,9 +375,11 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
         if (wcs != NULL) {
           one_strlcpy( origsystem, astGetC(wcs,"SYSTEM"),
                        sizeof(origsystem), status);
-          astSetC( wcs, "SYSTEM", "AZEL" );
+          if (strcmp(origsystem, "AZEL") != 0) {
+            astSet( wcs, "SYSTEM=%s", "AZEL" );
+          }
           /* Transfrom from pixels to AZEL */
-          astTran2(wcs, npts, xin, yin, 1, xout, yout );
+          astTranGrid( wcs, 2, lbnd, ubnd, 0.1, 1000000, 1, 2, npts, azel );
           if (!astOK) {
             if (*status == SAI__OK) {
               *status = SAI__ERROR;
@@ -401,7 +404,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
         index = indices[i] + base;
 
         if (!quick) {
-          zd = M_PI_2 - yout[indices[i]];
+          zd = M_PI_2 - azel[npts+i];
           airmass = slaAirmas( zd );
           extcorr = exp(airmass*tau);
         }
@@ -436,20 +439,10 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
         /* Incremeber bolo-ordered data index */
         indexb += nframes;
       }
-      
-      if (!quick) {
-        /* Restore coordinate frame to original */
-        if ( *status == SAI__OK) {
-          astSetC( wcs, "SYSTEM", origsystem );
-          /* Check AST status */
-          if (!astOK) {
-            if (*status == SAI__OK) {
-              *status = SAI__ERROR;
-              errRep( FUNC_NAME, "Error from AST when attempting to return to input coordinate system", status);
-            }
-          }
-        }
-      }
+    
+      /* Note that we do not need to free "wcs" or revert its SYSTEM
+         since smf_tslice_ast will replace the object immediately. */
+  
     }    
   } /* End loop over timeslice */
 
@@ -461,10 +454,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
 
  CLEANUP:
   if (!quick) {
-    xin = smf_free(xin,status);
-    yin = smf_free(yin,status);
-    xout = smf_free(xout,status);
-    yout = smf_free(yout,status);
+    azel = smf_free(azel,status);
   }
   indices = smf_free(indices,status);
 }
