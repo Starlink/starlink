@@ -41,6 +41,7 @@
 #  Copyright:
 #     Copyright (C) 2000-2005 Central Laboratory of the Research Councils.
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2008 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -89,7 +90,7 @@ itcl::class gaia::GaiaAstDomain {
       eval itk_initialize $args
 
       #  Set the top-level window title.
-      wm title $w_ "GAIA: image built-in coordinate system ($itk_option(-number))"
+      wm title $w_ "GAIA: image built-in coordinate systems ($itk_option(-number))"
 
       #  Create the short help window.
       make_short_help
@@ -124,22 +125,19 @@ itcl::class gaia::GaiaAstDomain {
       #  Only one element is available. A dropdown box showing the AST
       #  domains for the current image.
       itk_component add rule {
-         LabelRule $w_.rule -text {Built-in image coordinate system:}
+         LabelRule $w_.rule -text {Built-in coordinate systems:}
       }
 
       #  System.
       itk_component add System {
          LabelMenu $w_.system \
-	       -text "System:" \
-	       -relief raised \
-	       -labelwidth 8 \
-               -valuewidth 18
+               -text "System:" \
+               -relief raised \
+               -labelwidth 8 \
+               -valuewidth 30
       }
       add_short_help $itk_component(System) \
-         {Select the built-in image coordinate system}
-
-      #  Set up the system menu. Also defines the default state.
-      set_system_menu_
+         {Select the built-in coordinate system}
 
       #  Add buttons to keep the change, reset it to the original or
       #  cancel the change.
@@ -148,30 +146,31 @@ itcl::class gaia::GaiaAstDomain {
       #  Add a button to close window and accept the new system.
       itk_component add accept {
          button $itk_component(actionframe).accept -text Accept \
-	       -command [code $this accept]
+               -command [code $this accept]
       }
       add_short_help $itk_component(accept) \
-	    {Accept new coordinate system and close window}
+            {Accept new coordinate system and close window}
 
       #  Add a button to close window and not accept the new WCS.
       itk_component add cancel {
          button $itk_component(actionframe).cancel -text Cancel \
-	       -command [code $this cancel]
+               -command [code $this cancel]
       }
       add_short_help $itk_component(cancel) \
-	    {Close window and restore original system}
+            {Close window and restore original system}
 
       #  Add a button to reset to the original image domain.
       itk_component add reset {
          button $itk_component(actionframe).reset -text Reset \
-	       -command [code $this reset_]
+               -command [code $this reset_]
       }
       add_short_help $itk_component(reset) \
-	    {Reset to default system}
+            {Reset to default system}
 
       #  Pack window.
       pack $itk_component(rule) -side top -fill x -ipadx 1m -ipady 1m
-      pack $itk_component(System) -side top -ipadx 1m -ipady 1m -anchor w
+      pack $itk_component(System) -side top -ipadx 1m -ipady 1m -anchor w \
+         -fill x -expand 1
 
       pack $itk_component(actionframe) -side bottom -fill x -pady 3 -padx 3
       pack $itk_component(accept) -side right -expand 1 -pady 1 -padx 1
@@ -187,6 +186,12 @@ itcl::class gaia::GaiaAstDomain {
    #  Methods:
    #  --------
 
+   #  Called after UI is completed. Do tweaks to help and labels.
+   public method init {} {
+      #  Set up the system menu. Also defines the default state.
+      set_system_menu_
+   }
+
    #  Create a new instance of this object.
    protected method clone_me_ {} {
       if { $itk_option(-clone_cmd) != {} } {
@@ -198,10 +203,8 @@ itcl::class gaia::GaiaAstDomain {
    public method cancel {} {
 
       #  Restore WCS system to the original (if available).
-      if { $itk_option(-rtdimage) != {} } {
-         reset_
-	 notify_
-      }
+      reset_
+      notify_
       if { $itk_option(-really_die) } {
          delete object $this
       } else {
@@ -218,67 +221,58 @@ itcl::class gaia::GaiaAstDomain {
       }
    }
 
-   #  Changed the domain. The iframe value is the index of the frame
+   #  Change the current domain. The iframe value is the index of the frame
    #  that is to be selected.
    public method set_domain {iframe} {
-      if { $itk_option(-rtdimage) != {} } {
-         catch {
-            $itk_option(-rtdimage) astset current $iframe
-            notify_
-         }
+      if { [catch {
+         set_current_domain_ $iframe
+         notify_
+      } msg ] } {
+         error_dialog "Failed to switch coordinates: $msg"
       }
    }
 
    #  Reset the domain back to the default.
    protected method reset_ {} {
-      if { $itk_option(-rtdimage) != {} } {
-         set_domain $original_
-         set_menu_default_
-      }
+      set_domain $original_
+      set_menu_default_
    }
 
    #  Set/reset system menu to the default value.
    protected method set_menu_default_ {} {
-      if { $itk_option(-rtdimage) != {} } {
-         $itk_component(System) configure -value $original_
-      }
+      $itk_component(System) configure -value $original_
    }
 
    #  Find out the available image domains and add these to the system
    #  choice menu (overrides any existing choices).
    protected method set_system_menu_ {} {
-      if { $itk_option(-rtdimage) != {} } {
 
-         #  Clear any existing values.
-         $itk_component(System) clear
+      #  Clear any existing values.
+      $itk_component(System) clear
 
-         #  Get the current domain.
-         set original_ [$itk_option(-rtdimage) astget current]
-         if { $original_ == "" } {
-            set original_ 1
-         }
+      #  Get the current domain.
+      get_current_domain_
 
-         #  Add the available domains. Do not pick duplicates and mark
-         #  the default.
-         set domains_ [$itk_option(-rtdimage) astdomains]
-         set ndomains [llength $domains_]
-         for {set i 0} {$i < $ndomains} {incr i} {
-            set system [lindex $domains_ $i]
-            set index [expr $i+1]
-            if { ! [info exists added($system)] } {
-               set label $system
-               if { $index == $original_ } {
-                  append label " (default)"
-               }
-               $itk_component(System) add \
-                  -command [code $this set_domain $index] \
-                  -label $label \
-                  -value $index
-               set added($system) 1
+      #  Add the available domains. Do not pick duplicates and mark
+      #  the default.
+      get_domains_
+      set ndomains [llength $domains_]
+      for {set i 0} {$i < $ndomains} {incr i} {
+         set system [lindex $domains_ $i]
+         set index [expr $i+1]
+         if { ! [info exists added($system)] } {
+            set label $system
+            if { $index == $original_ } {
+               append label " (default)"
             }
+            $itk_component(System) add \
+               -command [code $this set_domain $index] \
+               -label $label \
+               -value $index
+            set added($system) 1
          }
-         set_menu_default_
       }
+      set_menu_default_
    }
 
    #  Method to call when the displayed image changes.
@@ -293,14 +287,35 @@ itcl::class gaia::GaiaAstDomain {
       }
    }
 
+   #  Methods that should be overridden by subclasses not using an rtdimage.
+   #  ======================================================================
+
+   #  Set the current domain.
+   protected method set_current_domain_ {iframe} {
+      $itk_option(-rtdimage) astset current $iframe
+   }
+
+   #  Get the current domain and assign to original_
+   protected method get_current_domain_ {} {
+      set original_ [$itk_option(-rtdimage) astget current]
+      if { $original_ == {} } {
+         set original_ 1
+      }
+   }
+
+   #  Get a list of the currently available domains.
+   protected method get_domains_ {} {
+      set domains_ [$itk_option(-rtdimage) astdomains]
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
-   #  Name of starrtdimage widget.
-   itk_option define -rtdimage rtdimage Rtdimage {} {}
+   #  Name of rtdimage widget, must be defined.
+   itk_option define -rtdimage rtdimage Rtdimage {}
 
    #  Identifying number for toolbox (shown in () in window title).
-   itk_option define -number number Number 0 {}
+   itk_option define -number number Number 0
 
    #  Command to execute when the WCS is changed.
    itk_option define -notify_cmd notify_cmd Notify_Cmd {}
@@ -314,10 +329,10 @@ itcl::class gaia::GaiaAstDomain {
    #  Protected variables: (available to instance)
    #  --------------------
 
-   #  Domains that are available.
+   #  List of domains that are available.
    protected variable domains_ {}
 
-   #  The default domain.
+   #  The default domain AST index.
    protected variable original_ 1
 
    #  Common variables: (shared by all instances)
