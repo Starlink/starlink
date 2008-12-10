@@ -576,8 +576,8 @@ itcl::class gaia::GaiaNDAccess {
       return $accessor
    }
 
-   #  Current number of property changes. Use this value as a cheap 
-   #  datestamp for modifications to the WCS and FITS headers (by 
+   #  Current number of property changes. Use this value as a cheap
+   #  datestamp for modifications to the WCS and FITS headers (by
    #  comparing the value from the last access to the current one).
    public method getpropchanges {} {
       return $prop_changes_
@@ -595,7 +595,7 @@ itcl::class gaia::GaiaNDAccess {
       set wcs [${type_}::getwcs $handle_]
       return [gaiautils::astget $wcs $attrib]
    }
-   
+
    #  Clear the value of an AST attribute.
    public method astclear {attrib} {
       set wcs [${type_}::getwcs $handle_]
@@ -607,6 +607,12 @@ itcl::class gaia::GaiaNDAccess {
    public method asttest {attrib} {
       set wcs [${type_}::getwcs $handle_]
       return [gaiautils::asttest $wcs $attrib]
+   }
+
+   #  Return a list of the domains in the WCS component.
+   public method astdomains {} {
+      set wcs [${type_}::getwcs $handle_]
+      return [gaiautils::astdomains $wcs]
    }
 
    #  See if the axes of the dataset frameset is a known frametype. These
@@ -730,7 +736,7 @@ itcl::class gaia::GaiaNDAccess {
 
    #  Whether to map the variance array as standard deviations.
    public variable maperrors 0 {
-      #  Twist, if already mapped and this value toggles we need to release 
+      #  Twist, if already mapped and this value toggles we need to release
       #  the component.
       if { $maperrors != $last_maperrors_ && $addr_(VARIANCE) != 0 } {
          unmap "VARIANCE"
