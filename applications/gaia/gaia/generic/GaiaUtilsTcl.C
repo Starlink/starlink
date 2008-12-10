@@ -175,19 +175,19 @@ int GaiaUtils_Init( Tcl_Interp *interp )
     Tcl_CreateObjCommand( interp, "gaiautils::asttrann", GaiaUtilsAstTranN,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "gaiautils::describeaxes", 
-                          GaiaUtilsDescribeAxes, (ClientData) NULL, 
+    Tcl_CreateObjCommand( interp, "gaiautils::describeaxes",
+                          GaiaUtilsDescribeAxes, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::frameisa", GaiaUtilsFrameIsA,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "gaiautils::grfaddcolour", 
-                          GaiaUtilsGrfAddColour, (ClientData) NULL, 
+    Tcl_CreateObjCommand( interp, "gaiautils::grfaddcolour",
+                          GaiaUtilsGrfAddColour, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "gaiautils::grffontresize", 
-                          GaiaUtilsGrfFontResize, (ClientData) NULL, 
+    Tcl_CreateObjCommand( interp, "gaiautils::grffontresize",
+                          GaiaUtilsGrfFontResize, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::get2dwcs", GaiaUtilsGt2DWcs,
@@ -648,20 +648,20 @@ static int GaiaUtilsDescribeAxes( ClientData clientData, Tcl_Interp *interp,
 
     /*  Get the number of axes in the supplied Frame. */
     naxes = astGetI( wcs, "naxes" );
-    
+
     resultObj = Tcl_GetObjResult( interp );
 
     /*  For each axis get the domain. */
     for ( int i = 1; i <= naxes; i++ ) {
         sprintf( buffer, "domain(%d)", i );
         domain = astGetC( wcs, buffer );
-        if ( strcmp( domain, "SPECTRUM" ) == 0 || 
+        if ( strcmp( domain, "SPECTRUM" ) == 0 ||
              strcmp( domain, "DSBSPECTRUM" ) == 0 ) {
-            Tcl_ListObjAppendElement( interp, resultObj, 
+            Tcl_ListObjAppendElement( interp, resultObj,
                                       Tcl_NewStringObj( "spec", -1 ) );
         }
         else if ( strcmp( domain, "TIME" ) == 0 ) {
-            Tcl_ListObjAppendElement( interp, resultObj, 
+            Tcl_ListObjAppendElement( interp, resultObj,
                                       Tcl_NewStringObj( "time", -1 ) );
         }
         else if ( strcmp( domain, "SKY" ) == 0 ) {
@@ -670,16 +670,16 @@ static int GaiaUtilsDescribeAxes( ClientData clientData, Tcl_Interp *interp,
             sprintf( buffer, "lataxis(%d)", i );
             lataxis = astGetI( wcs, buffer );
             if ( i == lataxis ) {
-                Tcl_ListObjAppendElement( interp, resultObj, 
+                Tcl_ListObjAppendElement( interp, resultObj,
                                           Tcl_NewStringObj( "skylat", -1 ) );
             }
             else {
-                Tcl_ListObjAppendElement( interp, resultObj, 
+                Tcl_ListObjAppendElement( interp, resultObj,
                                           Tcl_NewStringObj( "skylon", -1 ) );
             }
         }
         else {
-            Tcl_ListObjAppendElement( interp, resultObj, 
+            Tcl_ListObjAppendElement( interp, resultObj,
                                       Tcl_NewStringObj( "unknown", -1 ) );
         }
     }
@@ -991,7 +991,7 @@ static int GaiaUtilsAstAxDistance( ClientData clientData, Tcl_Interp *interp,
  * Determine the axis aligned offsets between two 2D positions.
  *
  * There are five arguments, the address of an AstFrame (or subclass),
- * and the four coordinate values. Returns the offsets along the 
+ * and the four coordinate values. Returns the offsets along the
  * current frame's axes between the two points. Since both axes are
  * determined together any positional changes needed in the offsets
  * (like latitude corrections) are applied by AST.
@@ -1586,20 +1586,20 @@ static int GaiaUtilsAstLinearApprox( ClientData clientData, Tcl_Interp *interp,
 
 
 /*
- * Create a new AST FrameSet that represents a shift in base coordinates
- * of an existing FrameSet.
+ * Create a new AST FrameSet or modify an existing FrameSet that represents a
+ * shift in base coordinates.
  *
- * There are two arguments, the address of a FrameSet followed by the 
- * shifts (these are in the sense of NDF sections based on GRID coordinates).
- *
- * The result is a new FrameSet.
+ * There are three arguments, the address of a FrameSet, the shifts (these are
+ * in the sense of NDF sections based on GRID coordinates) followed by whether
+ * the given FrameSet should be modified or a copy returned.
  */
 static int GaiaUtilsShiftWcs( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] )
 {
-    /* Check arguments, only allow two. */
-    if ( objc != 3 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "frameset {shift1 shift2 ...} " );
+    /* Check arguments, only allow three. */
+    if ( objc != 4 ) {
+        Tcl_WrongNumArgs( interp, 1, objv,
+                          "frameset {shift1 shift2 ...} copy" );
         return TCL_ERROR;
     }
 
@@ -1612,7 +1612,7 @@ static int GaiaUtilsShiftWcs( ClientData clientData, Tcl_Interp *interp,
 
     /* Number of base coordinates. */
     int nin = astGetI( frameset, "Nin" );
-    
+
     /* Get the shifts. */
     Tcl_Obj **listObjv;
     int nvals;
@@ -1634,21 +1634,36 @@ static int GaiaUtilsShiftWcs( ClientData clientData, Tcl_Interp *interp,
         shifts[i] = -shifts[i];
     }
 
+    /* Copy or modify? */
+    int copy = 1;
+    if ( Tcl_GetBooleanFromObj( interp, objv[3], &copy ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
     /* Construct a mapping using the shifts. */
     AstShiftMap *shiftMap = astShiftMap( nvals, shifts, "" );
 
-    /* Create copies of the input FrameSet and remap then base frame. */
-    AstFrameSet *copy = (AstFrameSet *) astCopy( frameset );
-    astRemapFrame( copy, AST__BASE, shiftMap );
-    astAnnul( shiftMap );
-    
-    /* Export the new FrameSet. */
-    if ( astOK ) {
-        Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) copy ) );
+    if ( copy ) {
+
+        /* Create copies of the input FrameSet and remap then base frame. */
+        AstFrameSet *copy = (AstFrameSet *) astCopy( frameset );
+        astRemapFrame( copy, AST__BASE, shiftMap );
+        astAnnul( shiftMap );
+
+        /* Export the new FrameSet. */
+        if ( astOK ) {
+            Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) copy ) );
+            return TCL_OK;
+        }
+        Tcl_SetResult( interp, "Failed to apply shift to frameset",
+                       TCL_VOLATILE );
+    }
+    else {
+        /* Just remap the base frame. */
+        astRemapFrame( frameset, AST__BASE, shiftMap );
+        astAnnul( shiftMap );
         return TCL_OK;
     }
-    Tcl_SetResult( interp, "Failed to apply shift to frameset",
-                   TCL_VOLATILE );
     return TCL_ERROR;
 }
 
@@ -1672,7 +1687,7 @@ static int GaiaUtilsGrfAddColour( ClientData clientData, Tcl_Interp *interp,
         Tcl_WrongNumArgs( interp, 1, objv, "index colour" );
         return TCL_ERROR;
     }
-    
+
     /* Extract the index. */
     int index = 0;
     if ( Tcl_GetIntFromObj( interp, objv[1], &index ) != TCL_OK ) {
@@ -1698,7 +1713,7 @@ static int GaiaUtilsGrfFontResize( ClientData clientData, Tcl_Interp *interp,
         Tcl_WrongNumArgs( interp, 1, objv, "do_resize" );
         return TCL_ERROR;
     }
-    
+
     int resize = 0;
     if ( Tcl_GetBooleanFromObj( interp, objv[1], &resize ) != TCL_OK ) {
         return TCL_ERROR;
