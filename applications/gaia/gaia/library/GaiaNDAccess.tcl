@@ -293,7 +293,8 @@ itcl::class gaia::GaiaNDAccess {
       return [${type_}::getc $handle_ $what]
    }
 
-   #  Return a WCS describing the coordinates of the dataset.
+   #  Return a WCS describing the coordinates of the dataset. The backing
+   #  implementation should cache this as it may be modified.
    public method getwcs {} {
       return [${type_}::getwcs $handle_]
    }
@@ -593,6 +594,13 @@ itcl::class gaia::GaiaNDAccess {
    public method astget {attrib} {
       set wcs [${type_}::getwcs $handle_]
       return [gaiautils::astget $wcs $attrib]
+   }
+   
+   #  Clear the value of an AST attribute.
+   public method astclear {attrib} {
+      set wcs [${type_}::getwcs $handle_]
+      incr prop_changes_
+      return [gaiautils::astclear $wcs $attrib]
    }
 
    #  Test if the value of an AST attribute has been set.
