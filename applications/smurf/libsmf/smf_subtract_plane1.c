@@ -183,7 +183,7 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
   size_t npts;              /* Number of data points */
   size_t numgood;           /* Number of pixels with non-BAD values */
   const char *origsystem = '\0';  /* Character string to store the coordinate
-			      system on entry */
+                                     system on entry */
   gsl_vector *psky = NULL;  /* Vector containing sky brightness */
   double sinalpha;          /* Sine alpha */
   double sky;               /* Sky power to be subtracted */
@@ -209,7 +209,7 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
   if ( smf_history_check( data, FUNC_NAME, status) ) {
     msgSetc("F", FUNC_NAME);
     msgOutif(MSG__VERB," ", 
-	      "^F has already been run on these data, returning to caller", status);
+             "^F has already been run on these data, returning to caller", status);
     return;
   }
 
@@ -230,7 +230,7 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
     *status = SAI__ERROR;
     msgSetc("F", fittype);
     errRep(FUNC_NAME, "Unknown FIT type, ^F: programming error?", status);
-   }
+  }
 
   /* Tell user we're removing the sky */
   msgSetc("F", fittype);
@@ -247,8 +247,8 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
       *status = SAI__ERROR;
       msgSeti("ND", data->ndims);
       errRep(FUNC_NAME,
-	     "Number of dimensions of input file is ^ND: should be either 2 or 3",
-	     status);
+             "Number of dimensions of input file is ^ND: should be either 2 or 3",
+             status);
     }
   }
 
@@ -315,40 +315,40 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
       origsystem = astGetC( wcs, "SYSTEM");
       /* Then select the AZEL system */
       if (wcs != NULL) {
-	astSetC( wcs, "SYSTEM", "AZEL" );
+        astSetC( wcs, "SYSTEM", "AZEL" );
       } else {
-	if ( *status == SAI__OK ) {
-	  *status = SAI__ERROR;
-	  errRep( FUNC_NAME, "Plane removal method requires WCS but input is NULL", 
-		  status);
-	}
+        if ( *status == SAI__OK ) {
+          *status = SAI__ERROR;
+          errRep( FUNC_NAME, "Plane removal method requires WCS but input is NULL", 
+                  status);
+        }
       }
       /* Check if AST thinks all is well */
       if (!astOK) {
-	if (*status == SAI__OK) {
-	  *status = SAI__ERROR;
-	  errRep( FUNC_NAME, "Error from AST", status);
-	}
+        if (*status == SAI__OK) {
+          *status = SAI__ERROR;
+          errRep( FUNC_NAME, "Error from AST", status);
+        }
       }
       /* Transfrom from pixels to AZEL */
       /* This is done by picking the first two x,y pixel positions in
-	 the first frame and transforming them to AzEl */
+         the first frame and transforming them to AzEl */
       if (k == 0) {
-	x0[0] = xin[0];
-	x0[1] = xin[1];
-	y0[0] = yin[0];
-	y0[1] = yin[1];
-	astTran2(wcs, 2, x0, y0, 1, xout, yout );
-	/* Now we need to calculate the angle between the subarray
-	   long axis and the zenith */
-	a[0] = xout[0];
-	a[1] = yout[0];
-	b[0] = xout[1];
-	b[1] = yout[1];
-	c[0] = xout[1];
-	c[1] = M_PI_2;
-	alpha = astAngle( wcs, a, b, c);
-	angle0 = hdr->state->tcs_az_ang;
+        x0[0] = xin[0];
+        x0[1] = xin[1];
+        y0[0] = yin[0];
+        y0[1] = yin[1];
+        astTran2(wcs, 2, x0, y0, 1, xout, yout );
+        /* Now we need to calculate the angle between the subarray
+           long axis and the zenith */
+        a[0] = xout[0];
+        a[1] = yout[0];
+        b[0] = xout[1];
+        b[1] = yout[1];
+        c[0] = xout[1];
+        c[1] = M_PI_2;
+        alpha = astAngle( wcs, a, b, c);
+        angle0 = hdr->state->tcs_az_ang;
       }
       /* Retrieve current angle and calculate how much it's changed */
       dalpha = hdr->state->tcs_az_ang - angle0;
@@ -356,11 +356,11 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
       alpha += dalpha;
       delta = (alpha - hdr->state->tcs_az_ang) *180/M_PI;
       /* Calculate new `effective' elevation values. Factor sin/cos
-	 calculation outside loop */
+         calculation outside loop */
       cosalpha = cos( alpha );
       sinalpha = sin( alpha );
       for (i=0; i< npts; i++) {
-	ynew[i] = (xin[i] - 0.5) * cosalpha - (yin[i] - 0.5) * sinalpha;
+        ynew[i] = (xin[i] - 0.5) * cosalpha - (yin[i] - 0.5) * sinalpha;
       }
     } else {
       smf_tslice_ast( data, k, 0, status ); 
@@ -374,11 +374,11 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
       sky0 = 0;
       numgood = 0;
       for (i=0; i < npts; i++ ) {
-	index = indices[i] + base;
-	if (indata[index] != VAL__BADD) {
-	  sky0 += indata[index];
-	  numgood++;
-	}
+        index = indices[i] + base;
+        if (indata[index] != VAL__BADD) {
+          sky0 += indata[index];
+          numgood++;
+        }
       }
       sky0 /= (double)numgood;
       dskyaz = 0.0;
@@ -386,24 +386,24 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
     } else {
       /* Fill the matrix, vectors and weights arrays */
       for ( i=0; i<npts; i++) {
-	index = indices[i] + base;
-	gsl_matrix_set( azel, i, 0, 1.0 );
-	if ( fitslope ) {
-	  /* For the 1-D elevation fit, the X axis is the elevation =
-	     ynew */
-	  gsl_matrix_set( azel, i, 1, ynew[indices[i]] );
-	  /* For the 2-D fit, we don't need sky coordinates so the */
-	} else  if ( fitplane ) {
-	  gsl_matrix_set( azel, i, 1, yin[indices[i]] );
-	  gsl_matrix_set( azel, i, 2, xin[indices[i]] );
-	}
-	gsl_vector_set( psky, i, indata[index] );
-	/* Set weights accordingly */
-	if (indata[index] != VAL__BADD) {
-	  gsl_vector_set( weight, i, 1.0);
-	} else {
-	  gsl_vector_set( weight, i, 0.0);
-	}
+        index = indices[i] + base;
+        gsl_matrix_set( azel, i, 0, 1.0 );
+        if ( fitslope ) {
+          /* For the 1-D elevation fit, the X axis is the elevation =
+             ynew */
+          gsl_matrix_set( azel, i, 1, ynew[indices[i]] );
+          /* For the 2-D fit, we don't need sky coordinates so the */
+        } else  if ( fitplane ) {
+          gsl_matrix_set( azel, i, 1, yin[indices[i]] );
+          gsl_matrix_set( azel, i, 2, xin[indices[i]] );
+        }
+        gsl_vector_set( psky, i, indata[index] );
+        /* Set weights accordingly */
+        if (indata[index] != VAL__BADD) {
+          gsl_vector_set( weight, i, 1.0);
+        } else {
+          gsl_vector_set( weight, i, 0.0);
+        }
       }
       /* Carry out fit */
       gsl_multifit_wlinear( azel, weight, psky, skyfit, mcov, &chisq, work);
@@ -413,10 +413,10 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
       /* Slope in elevation (or Y if 2-D) */
       dskyel = gsl_vector_get(skyfit, 1);
       if ( ncoeff == 3 ) {
-	/* Slope in Az if 2-D fit */
-	dskyaz = gsl_vector_get(skyfit, 2);
+        /* Slope in Az if 2-D fit */
+        dskyaz = gsl_vector_get(skyfit, 2);
       } else {
-	dskyaz = 0.0;
+        dskyaz = 0.0;
       }
 
     }
@@ -427,16 +427,16 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
     for (i=0; i < npts; i++ ) {
       index = indices[i] + base;
       if (indata[index] != VAL__BADD) {
-	/* Calculate sky value as a function of position */
-	if (fitslope) {
-	  sky = sky0 + dskyel * ynew[indices[i]];
-	} else {
-	  sky = sky0 + dskyel * yin[indices[i]] + dskyaz * xin[indices[i]];
-	}
-	/* Subtract sky value; no need to update variance */
-	numgood++;
-	*meansky += sky;
-	indata[index] -= sky;
+        /* Calculate sky value as a function of position */
+        if (fitslope) {
+          sky = sky0 + dskyel * ynew[indices[i]];
+        } else {
+          sky = sky0 + dskyel * yin[indices[i]] + dskyaz * xin[indices[i]];
+        }
+        /* Subtract sky value; no need to update variance */
+        numgood++;
+        *meansky += sky;
+        indata[index] -= sky;
       }
     }
     *meansky /= (double)numgood;
@@ -448,32 +448,32 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
       msgSeti("K",k+1);
       msgSetc("F",fittype);
       msgOutif(MSG__DEBUG," ", 
-	       " Fit results for timeslice ^K (fit type = ^F)", status );
+               " Fit results for timeslice ^K (fit type = ^F)", status );
       msgSetd("DS",sky0);
       msgOutif(MSG__DEBUG," ", 
-	       "              Sky0   = ^DS, ", status );
+               "              Sky0   = ^DS, ", status );
       msgSetd("DE",dskyel);
       msgOutif(MSG__DEBUG," ", 
-	       "              Dskyel = ^DE, ", status );
+               "              Dskyel = ^DE, ", status );
       msgSetd("DA",dskyaz);
       msgOutif(MSG__DEBUG," ", 
-	       "              Dskyaz = ^DA", status );
+               "              Dskyaz = ^DA", status );
       msgSetd("X",chisq);
       msgOutif(MSG__DEBUG," ", 
-	       "              X^2 = ^X", status );
+               "              X^2 = ^X", status );
     } 
 
     /* Reset coordinate frame to that on entry if necessary */
     if (needast) {
       if ( *status == SAI__OK) {
-	astSetC( wcs, "SYSTEM", origsystem );
-	/* Check AST status */
-    	if (!astOK) {
-	  if (*status == SAI__OK) {
-	    *status = SAI__ERROR;
-	    errRep( FUNC_NAME, "Error from AST", status);
-	  }
-	}
+        astSetC( wcs, "SYSTEM", origsystem );
+        /* Check AST status */
+        if (!astOK) {
+          if (*status == SAI__OK) {
+            *status = SAI__ERROR;
+            errRep( FUNC_NAME, "Error from AST", status);
+          }
+        }
       }
     }
 
@@ -490,14 +490,14 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
   /* Write history entry */
   if ( *status == SAI__OK ) {
     smf_history_add( data, FUNC_NAME, 
-		       "Plane sky subtraction successful", status);
+                     "Plane sky subtraction successful", status);
   } else {
     errRep(FUNC_NAME, "Error: status set bad. Possible programming error.", 
-	   status);
+           status);
   }
 
   /* Free all resources in use */
-  CLEANUP:
+ CLEANUP:
   xin = smf_free(xin,status);
   yin = smf_free(yin,status);
   if ( needast ) {
