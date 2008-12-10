@@ -227,9 +227,6 @@ typedef struct AstPcdMapGlobals {
    int Class_Init;
 } AstPcdMapGlobals;
 
-/* Thread-safe initialiser for all global data used by this module. */
-void astInitPcdMapGlobals_( AstPcdMapGlobals * );
-
 #endif
 
 #endif
