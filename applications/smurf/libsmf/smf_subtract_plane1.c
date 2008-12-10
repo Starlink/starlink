@@ -267,19 +267,19 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
      rather than one point at a time */
 
   /* Allocate space for base pixel coordinates */
-  xin = smf_malloc( npts, sizeof(double), 0, status );
-  yin = smf_malloc( npts, sizeof(double), 0, status );
+  xin = smf_malloc( npts, sizeof(*xin), 0, status );
+  yin = smf_malloc( npts, sizeof(*yin), 0, status );
   /* For fits that need the astrometry, also allocate space for the
      sky coordinates corresponding to the pixel coords */
   if ( needast ) {
-    xout = smf_malloc( 2, sizeof(double), 0, status );
-    yout = smf_malloc( 2, sizeof(double), 0, status );
-    x0 = smf_malloc( 2, sizeof(double), 0, status );
-    y0 = smf_malloc( 2, sizeof(double), 0, status );
-    ynew = smf_malloc( npts, sizeof(double), 0, status );
+    xout = smf_malloc( 2, sizeof(*xout), 0, status );
+    yout = smf_malloc( 2, sizeof(*yout), 0, status );
+    x0 = smf_malloc( 2, sizeof(*x0), 0, status );
+    y0 = smf_malloc( 2, sizeof(*y0), 0, status );
+    ynew = smf_malloc( npts, sizeof(*ynew), 0, status );
   }
   /* Bolometer indices */
-  indices = smf_malloc( npts, sizeof(size_t), 0, status );
+  indices = smf_malloc( npts, sizeof(*indices), 0, status );
 
   /* Jump to the cleanup section if status is bad by this point
      since we need to free memory */
