@@ -497,6 +497,13 @@ void smurf_qlmakemap( int *status ) {
     if (*status != SAI__OK) break;
   }
 
+  /* Wait untill all jobs have finished. If an error has occurred we may
+     have aborted the above loop early leaving some threads still running. 
+     If we close down all NDFs now, etc, we may pull the carpet out from
+     underneath these running threds, resulting in them suffering a 
+     segmentation fault. */
+  smf_wait( wf, status );
+
   overallmeansky /= (double)size;
   parPut0d("MEANSKY", overallmeansky, status);
 
