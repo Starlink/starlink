@@ -223,6 +223,11 @@ itcl::class gaia::GaiaCube {
       #  share this).
       set SpectralCoords [add_menubutton "Coords" left]
       configure_menubutton "Coords" -underline 0
+      $SpectralCoords add command \
+         -label "Change coordinates..." \
+         -command [code $this show_builtin_toolbox_]
+
+      #  Spectral and time coordinates handler.
       set spec_coords_ [uplevel \#0 GaiaSpecCoords \#auto]
       $spec_coords_ configure -change_cmd [code $this coords_changed_]
       $spec_coords_ add_menu $SpectralCoords
@@ -547,7 +552,7 @@ itcl::class gaia::GaiaCube {
 
       #  If displaying a channel map remove the markers.
       $itk_component(chanmap) close
-      
+
       #  Permanently remove the coordinate label.
       delete_coord_label_
       configure -show_coord_label 0
@@ -859,7 +864,7 @@ itcl::class gaia::GaiaCube {
          #  the RtdImage) so that the data replacement happens on the file
          #  we've just loaded (can get out of sync when unexpected errors
          #  autoloading Tcl scripts occur, which defer the newImage acceptance
-         #  callbacks). Unset ndfname_ so that this method isn't called 
+         #  callbacks). Unset ndfname_ so that this method isn't called
          #  during the update.
          set temp $ndfname_
          set ndfname_ {}
@@ -1197,10 +1202,10 @@ itcl::class gaia::GaiaCube {
 
       #  Stop now if not drawing.
       if { ! $itk_option(-show_coord_label) } {
-	  return
+         return
       }
 
-      #  Determine a position inside the view, if we don't already have a 
+      #  Determine a position inside the view, if we don't already have a
       #  reference position.
       if { $xref_ == {} } {
          lassign [calc_label_pos_] xref_ yref_
@@ -1232,7 +1237,7 @@ itcl::class gaia::GaiaCube {
       }
    }
 
-   #  Delete the coordinate label, but first record position, if available 
+   #  Delete the coordinate label, but first record position, if available
    #  (used to restore).
    protected method delete_coord_label_ {} {
       lassign [$itk_option(-canvas) coords $coord_label_tag_] x y
@@ -1781,6 +1786,17 @@ itcl::class gaia::GaiaCube {
       }
    }
 
+   #  ===========================
+   #  Coordinate domain selection
+   #  ===========================
+   protected method show_builtin_toolbox_ {} {
+      if { $cubeaccessor_ != {} } {
+         utilReUseWidget GaiaCubeAstDomain $w_.domainchooser \
+            -gaiacube $this \
+            -notify_cmd [code $this coords_changed_]
+      }
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -1818,7 +1834,7 @@ itcl::class gaia::GaiaCube {
 
    #  Whether to show a label in the main window.
    itk_option define -show_coord_label show_coord_label Show_Coord_Label 0
-   
+
    #  Colour of coordinate label in main window.
    itk_option define -labelcolor labelcolor LabelColor blue {
       toggle_show_coord_label_
