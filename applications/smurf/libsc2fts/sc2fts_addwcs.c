@@ -85,6 +85,7 @@
 #include "ast.h"
 #include "sae_par.h"
 #include "star/hds.h"
+#include "mers.h"
 
 /* SMURF includes */
 #include "libsmf/smf_typ.h"

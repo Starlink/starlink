@@ -93,6 +93,7 @@ End of Trace.
 #include "ast.h"
 #include "star/hds.h"
 #include "sae_par.h"
+#include "mers.h"
 
 /* SMURF includes */
 #include "libsmf/smf_typ.h"
