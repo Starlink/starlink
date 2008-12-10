@@ -57,6 +57,9 @@
 *        - Include extra info in some error messages.
 *     1-MAR-2006 (DSB):
 *        Replace astSetPermMap within DEBUG blocks by astBeginPM/astEndPM.
+*     10-DEC-2008 (DSB):
+*        Allow a prefix to be included with the attribute name in
+*        astXmlGetAttributeValue.
 */
 
 
@@ -1711,7 +1714,11 @@ const char *astXmlGetAttributeValue_( AstXmlElement *this, const char *name, int
 *     this
 *        The pointer to the XmlElement.
 *     name
-*        Pointer to a string holding the name of the attribute.
+*        Pointer to a string holding the name of the attribute. The name
+*        may be preceeded with a "prefix:" string, in which case the
+*        prefix will also be matched. If no prefix is included, the first
+*        attribute with the specified name is returned, regardless of
+*        its prefix.
 
 *  Returned Value:
 *     Pointer to a string holding the value of the attribute within the
@@ -3808,7 +3815,8 @@ void *astXmlDelete_( void *obj_ptr, int *status ){
    return result;
 }
 
-static AstXmlAttribute *FindAttribute( AstXmlElement *this, const char *name, int *status ){
+static AstXmlAttribute *FindAttribute( AstXmlElement *this, const char *name0, 
+                                       int *status ){
 /*
 *  Name:
 *     FindAttribute
@@ -3821,7 +3829,8 @@ static AstXmlAttribute *FindAttribute( AstXmlElement *this, const char *name, in
 
 *  Synopsis:
 *     #include "xml.h"
-*     AstXmlAttribute *FindAttribute( AstXmlElement *this, const char *name, int *status )
+*     AstXmlAttribute *FindAttribute( AstXmlElement *this, const char *name0, 
+*                                     int *status )
 
 *  Description:
 *     This function searches the supplied XmlElement for an attribute
@@ -3831,8 +3840,12 @@ static AstXmlAttribute *FindAttribute( AstXmlElement *this, const char *name, in
 *  Parameters:
 *     this
 *        The pointer to the XmlElement.
-*     name
-*        Pointer to a string holding the name of the attribute.
+*     name0
+*        Pointer to a string holding the name of the attribute. The name
+*        may be preceeded with a "prefix:" string, in which case the
+*        prefix will also be matched. If no prefix is included, the first
+*        attribute with the specified name is returned, regardless of
+*        its prefix.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -3846,7 +3859,15 @@ static AstXmlAttribute *FindAttribute( AstXmlElement *this, const char *name, in
 
 /* Local Variables: */
    AstXmlAttribute *result;     /* Returned pointer */
+   char name_buffer[ 50 ];      /* Buffer for name */
+   char prefix_buffer[ 50 ];    /* Buffer for prefix */
+   const char *colon;           /* Pointer to colon in supplied string */
+   const char *name1;           /* Pointer to name to be checked */
+   const char *name;            /* Pointer to name to be searched for */
+   const char *prefix1;         /* Pointer to prefix to be checked */
+   const char *prefix;          /* Pointer to prefix to be searched for */
    int i;                       /* Loop count */
+   size_t len;                  /* Length of string */
 
 /* Initialise */
    result = NULL;
@@ -3854,12 +3875,44 @@ static AstXmlAttribute *FindAttribute( AstXmlElement *this, const char *name, in
 /* Check the global error status. */
    if( !astOK ) return result;
 
+/* If the supplied name string contains a colon, split it up into prefix
+   and name. */
+   if( ( colon = strchr( name0, ':' ) ) ) {
+      len = colon - name0;
+
+      if( len > 49 ) {
+         astError( AST__XMLNM, "%s: The XML prefix in \"%s\" is too long "
+                   "(> 49 characters).", status, name0 );
+      } else {
+         strncpy( prefix_buffer, name0, len );
+         prefix_buffer[ len ] = 0;
+         prefix = prefix_buffer;
+         len = strlen( colon + 1 );
+
+         if( len > 49 ) {
+            astError( AST__XMLNM, "%s: The XML attribute name in \"%s\" is "
+                      "too long (> 49 characters).", status, name0 );
+         } else {
+            strcpy( name_buffer, colon + 1 );
+            name = name_buffer;
+         }
+
+      }
+
+   } else {
+      name = name0;
+      prefix = NULL;
+   }      
+
 /* Loop round all the attributes in the element. */
    for( i = 0; i < this->nattr; i++ ) {
+      name1 = this->attrs[ i ]->name;
+      prefix1 = this->attrs[ i ]->prefix;
 
-/* Compare the attribute name with the supplied name (case sensitive).
-   Leave the loop if they match. */
-      if( !strcmp( this->attrs[ i ]->name, name ) ) {
+/* Compare the attribute name (and prefix) with the supplied name (and
+   prefix). Leave the loop if they match. */
+      if( !strcmp( name1, name ) && 
+          ( !prefix || ( prefix1 && !strcmp( prefix1, prefix ) ) ) ) {
          result = this->attrs[ i ];
          break;
       }
