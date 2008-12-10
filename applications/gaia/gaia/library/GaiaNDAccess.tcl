@@ -595,6 +595,13 @@ itcl::class gaia::GaiaNDAccess {
       set wcs [${type_}::getwcs $handle_]
       return [gaiautils::astget $wcs $attrib]
    }
+   
+   #  Clear the value of an AST attribute.
+   public method astclear {attrib} {
+      set wcs [${type_}::getwcs $handle_]
+      incr prop_changes_
+      return [gaiautils::astclear $wcs $attrib]
+   }
 
    #  Clear the value of an AST attribute.
    public method astclear {attrib} {
