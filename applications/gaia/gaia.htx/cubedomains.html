@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+<head>
+    <title>Cube Coordinate System Toolbox</title>
+  </head>
+
+  <body>
+    <a name="xref_cubedomain"></a>
+    <h2 align=center><font color=red>Image Coordinate System Toolbox</font></h2>
+
+    <p>
+      This window is designed to allow you to select the built-in coordinate
+      system used when reporting or displaying coordinates from the selected
+      axis of the cube.
+    </p>
+    <p>
+      Normally these will be spectral or time coordinates, but it can be
+      useful to also display simple pixel index values as well. This tool
+      allows you to do that.
+    </p>
+
+    <p>
+      The <tt>System:</tt> drop down menu shows all the systems that are
+      available to you. Just select one to make this the current coordinate
+      system. To make this change permanent just close the window using the
+      <tt>Accept</tt> button. The <tt>Reset</tt> button switches back to the
+      original system and <tt>Cancel</tt> closes the window after a reset.
+    </p>
+
+    <p>
+      NDF cubes have several coordinate systems associated with them:
+    </p>
+    <ul>
+      <li>
+        GRID: the base coordinates and are a continuous system that start at
+        1,1,1 for the pixel at the lower left.</li>
+
+      <li>
+        PIXEL: the same as GRID, except that the middle of the lower left hand
+        pixel is 0.5,0.5,0.5. These also have any NDF pixel origins added.</li>
+
+      <li>
+        AXIS: these coordinates are those defined by any axis structures in
+        the NDF. If none are present then these are the same as PIXEL.</li>
+
+      <li>
+        SKY-xxx: if present this defines a celestial coordinate system, plus
+        another system, usually a spectral (DSB/SPECTRUM) or time (TIME) axis,
+        but there can be other combinations, like DSBSPECTRUM-SPACEINDEX-TIME
+        for JCMT ACSIS raw cubes.</li>
+    </ul>
+  </body>
+</html>
