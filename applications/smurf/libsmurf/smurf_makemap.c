@@ -1008,6 +1008,13 @@ void smurf_makemap( int *status ) {
       }
     L999:
 
+   /* Wait untill all jobs have finished. If an error has occurred we may
+      have aborted the above loop early leaving some threads still running. 
+      If we close down all NDFs now, etc, we may pull the carpet out from
+      underneath these running threds, resulting in them suffering a 
+      segmentation fault. */
+      smf_wait( wf, status );
+
       /* If required, copy the data and variance arrays from the 3D work
          arrays into the output NDF, free the work arrays, and use the
          NDF arrays from here on. */
