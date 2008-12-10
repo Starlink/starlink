@@ -95,9 +95,12 @@
 *        Count number of good data points for determining mean
 *     2008-04-28 (AGG):
 *        Return mean sky level subtracted
+*     2008-12-09 (TIMJ):
+*        Remove astSet calls that are not needed.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 University of British Columbia.
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
@@ -182,7 +185,7 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
   size_t nframes = 0;       /* Number of frames */
   size_t npts;              /* Number of data points */
   size_t numgood;           /* Number of pixels with non-BAD values */
-  const char *origsystem = '\0';  /* Character string to store the coordinate
+  const char *origsystem = NULL;  /* Character string to store the coordinate
                                      system on entry */
   gsl_vector *psky = NULL;  /* Vector containing sky brightness */
   double sinalpha;          /* Sine alpha */
@@ -312,10 +315,12 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
       hdr = data->hdr;
       /* Set coordinate frame to AzEl: first check current frame and store it */
       wcs = hdr->wcs;
-      origsystem = astGetC( wcs, "SYSTEM");
       /* Then select the AZEL system */
       if (wcs != NULL) {
-        astSetC( wcs, "SYSTEM", "AZEL" );
+        origsystem = astGetC( wcs, "SYSTEM");
+        if (strcmp(origsystem, "AZEL") != 0) {
+          astSet( wcs, "SYSTEM=AZEL" );
+        }
       } else {
         if ( *status == SAI__OK ) {
           *status = SAI__ERROR;
@@ -462,20 +467,6 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
       msgOutif(MSG__DEBUG," ", 
                "              X^2 = ^X", status );
     } 
-
-    /* Reset coordinate frame to that on entry if necessary */
-    if (needast) {
-      if ( *status == SAI__OK) {
-        astSetC( wcs, "SYSTEM", origsystem );
-        /* Check AST status */
-        if (!astOK) {
-          if (*status == SAI__OK) {
-            *status = SAI__ERROR;
-            errRep( FUNC_NAME, "Error from AST", status);
-          }
-        }
-      }
-    }
 
   } /* End of loop over timeslice frame */
 
