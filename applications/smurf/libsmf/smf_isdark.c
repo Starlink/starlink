@@ -32,9 +32,11 @@
 *     {enter_new_authors_here}
 
 *  Notes:
-*     - The smfData must contain a smfHead and that must contain
-*       a fitshdr. This prevents us silently assuming that the file
-*       is not a dark.
+*     - If there is no smfHead or no smfHead.fitshdr the file is assumed not
+*       to be a dark.
+*     - If there is a fits header but no SHUTTER keyword, this will be an error.
+*     ie complete lack of knowledge indicates not a dark, but some knowledge
+*     indicates an error.
 
 *  History:
 *     2008-07-17 (TIMJ):
@@ -43,6 +45,8 @@
 *        SHUTTER is now a float.
 *     2008-07-31 (TIMJ):
 *        but leave in support for string.
+*     2008-12-09 (TIMJ):
+*        with no information at all, assume not a dark.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -94,8 +98,7 @@
 #include "smf_err.h"
 
 int smf_isdark( const smfData * indata, int * status ) {
-  smfHead * hdr;
-  double shutval;
+  double shutval = 0.0;
   char shutter[SZFITSCARD];
 
   if (*status != SAI__OK) return 0;
@@ -107,7 +110,10 @@ int smf_isdark( const smfData * indata, int * status ) {
     return 0;
   }
 
-  hdr = indata->hdr;
+  /* if we have no fitshdr assume we are not a dark. This allows Ed's 
+     model components to be processed. */
+  if (!indata->hdr) return 0;
+  if (!indata->hdr->fitshdr) return 0;
 
   /* Shutter is no a double. 0 indicates closed */
   smf_fits_getD( indata->hdr, "SHUTTER", &shutval, status );
@@ -124,7 +130,7 @@ int smf_isdark( const smfData * indata, int * status ) {
   }
 
 
-  if (shutval < 0.00001 ) {
+  if (*status == SAI__OK && shutval < 0.00001 ) {
     return 1;
   }
 

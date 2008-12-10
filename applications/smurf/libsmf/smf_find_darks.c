@@ -67,6 +67,8 @@
 *        Did not realise that ndgCpsup should be used to copy entries.
 *     2008-07-31 (TIMJ):
 *        Report observation details.
+*     2008-12-09 (TIMJ):
+*        Do not react badly if a fits header is missing.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -191,42 +193,48 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
     smf_open_file( ingrp, i, "READ", SMF__NOCREATE_DATA, &infile, status );
     if (*status != SAI__OK) break;
 
-    /* Get observation ID and see if we already have an entry in the map */
-    (void)smf_getobsidss( infile->hdr->fitshdr, obsid, sizeof(obsid), NULL, 0, status );
-    /* As of 20080718 OBSID is not unique per obs so chop off date*/
-    obsid[22] = '\0';
+    /* if there is no hdr we can not index it in the reported summary */
+    if (infile->hdr && infile->hdr->fitshdr) {
 
-    if (!astMapHasKey(obsmap, obsid )) {
-      int itemp;
+      /* Get observation ID and see if we already have an entry in the map */
+      (void)smf_getobsidss( infile->hdr->fitshdr, obsid, sizeof(obsid), NULL, 0, status );
+      /* As of 20080718 OBSID is not unique per obs so chop off date*/
+      obsid[22] = '\0';
 
-      /* Create a sub keymap and populate it */
-      obsinfo = astKeyMap( " " );
-      smf_fits_getS( infile->hdr, "OBJECT", object, sizeof(object), status );
-      astMapPut0C( obsinfo, "OBJECT", object, NULL );
-      astMapPut0I( obsinfo, "OBSMODE", infile->hdr->obsmode, NULL );
-      astMapPut0I( obsinfo, "OBSTYPE", infile->hdr->obstype, NULL );
-      smf_fits_getI( infile->hdr, "OBSNUM", &itemp, status );
-      astMapPut0I( obsinfo, "OBSNUM", itemp, NULL );
-      smf_fits_getI( infile->hdr, "UTDATE", &itemp, status );
-      astMapPut0I( obsinfo, "UTDATE", itemp, NULL );
+      if (!astMapHasKey(obsmap, obsid )) {
+        int itemp;
 
-      /* store information in the global observatio map
-	 and also track how many distinct objects we have */
-      astMapPut0A( obsmap, obsid, obsinfo, NULL );
-      astMapPut0I( objmap, object, 0, NULL );
+        /* Create a sub keymap and populate it */
+        obsinfo = astKeyMap( " " );
+        smf_fits_getS( infile->hdr, "OBJECT", object, sizeof(object), status );
+        astMapPut0C( obsinfo, "OBJECT", object, NULL );
+        astMapPut0I( obsinfo, "OBSMODE", infile->hdr->obsmode, NULL );
+        astMapPut0I( obsinfo, "OBSTYPE", infile->hdr->obstype, NULL );
+        smf_fits_getI( infile->hdr, "OBSNUM", &itemp, status );
+        astMapPut0I( obsinfo, "OBSNUM", itemp, NULL );
+        smf_fits_getI( infile->hdr, "UTDATE", &itemp, status );
+        astMapPut0I( obsinfo, "UTDATE", itemp, NULL );
+
+        /* store information in the global observatio map
+           and also track how many distinct objects we have */
+        astMapPut0A( obsmap, obsid, obsinfo, NULL );
+        astMapPut0I( objmap, object, 0, NULL );
+      }
     }
 
-    if (smf_isdark( infile, status ) ) {
+    if (smf_isdark( infile, status )) {
       /* Store the entry in the output group */
       ndgCpsup( ingrp, i, dgrp, status );
-      /* store the name and time in the struct */
-      sortinfo = &(alldarks[dkcount]);
-      one_strlcpy( sortinfo->name, infile->file->name, sizeof(sortinfo->name),
-                   status );
-      sortinfo->tai = (infile->hdr->allState)[0].tcs_tai;
-      msgSetc("F", infile->file->name);
-      msgOutif(MSG__DEBUG, " ", "Dark file: ^F",status);
-      dkcount++;
+      if (*status == SAI__OK) { /* protect against smf_isdark problem */
+        /* store the name and time in the struct */
+        sortinfo = &(alldarks[dkcount]);
+        one_strlcpy( sortinfo->name, infile->file->name, sizeof(sortinfo->name),
+                     status );
+        sortinfo->tai = (infile->hdr->allState)[0].tcs_tai;
+        msgSetc("F", infile->file->name);
+        msgOutif(MSG__DEBUG, " ", "Dark file: ^F",status);
+        dkcount++;
+      }
     } else {
       /* store the file in the output group */
       ndgCpsup( ingrp, i, ogrp, status );
