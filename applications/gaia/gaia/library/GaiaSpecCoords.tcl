@@ -17,7 +17,7 @@
 #
 #     The disposition of the menu items can be changed to match those of
 #     a new GaiaNDAccess instance, these will be greyed by setting to
-#     disabled when the axis of the FrameSet is not a SpecFrame or 
+#     disabled when the axis of the FrameSet is not a SpecFrame or
 #     TimeFrame. When a SpecFrame is available that doesn't have a
 #     rest frequency then the velocity items with be greyed.
 
@@ -180,7 +180,6 @@ itcl::class gaia::GaiaSpecCoords {
                   $menu entryconfigure "$descr" -state disabled
                }
             }
-
          }
       }
    }
@@ -190,10 +189,14 @@ itcl::class gaia::GaiaSpecCoords {
    public method set_system {system unit {quiet 0} } {
       if { $accessor != {} } {
          if { $system == "default" } {
-            
+
             #  If this isn't set then no specframe (or timeframe), so at
             #  default already and nothing to do.
             if { [info exists default_system_($axis)] } {
+               
+               #  If time_ is set then we're using offset time. Undo that.
+               undo_time_offset_
+
                $accessor astset $default_system_($axis)
             }
          } else {
@@ -215,10 +218,59 @@ itcl::class gaia::GaiaSpecCoords {
    #  we have one and it is requested (quiet false).
    public method set_timescale {timescale {quiet 0} } {
       if { $accessor != {} } {
-         $accessor astset "TimeScale($axis)=$timescale"
+
+         #  Displaying offset time requires a non iso date format. This will
+         #  then show time offset from the TimeOrigin.
+         if { $timescale == "OT" } {
+
+            #  Record defaults for things we change in offset time.
+            save_time_offset_
+
+            #  Need first coordinate of spectrum as new origin, so get pixel
+            #  coordinates of the first value and evaluate that position.
+            lassign [$accessor getbounds 0] l1 u1 l2 u2 l3 u3
+            set section [list [expr $l1-0.5] [expr $l2-0.5] [expr $l3-0.5]]
+            set value [$accessor getcoord $axis $section 0]
+            if { $value != {} } {
+
+               #  Adjust TimeOrigin to start at time of first coordinate
+               #  and to display offsets (requires non-iso format) in seconds.
+               set value [expr $time_(origin) + $value]
+               $accessor astset "TimeOrigin($axis)=$value"
+               $accessor astset "Unit($axis)=s"
+               $accessor astset "Format($axis)=%%.12g"
+            }
+         } else {
+
+            #  Restore defaults for formatting etc. if switched to offset time.
+            undo_time_offset_
+
+            $accessor astset "TimeScale($axis)=$timescale"
+         }
          if { ! $quiet && $change_cmd != {} } {
             eval $change_cmd
          }
+      }
+   }
+
+   #  Save defaults of attributes changed when switching to offset time. If
+   #  not already in effect.
+   protected method save_time_offset_ {} {
+      if { ! [info exists time_] } {
+         set time_(format) [$accessor astget Format($axis)]
+         set time_(origin) [$accessor astget TimeOrigin($axis)]
+         set time_(unit) [$accessor astget Unit($axis)]
+      }
+   }
+
+   #  Undo the changes made to the WCS when switching to offset time.
+   #  Note these are order sensitive.
+   protected method undo_time_offset_ {} {
+      if {  [info exists time_] } {
+         $accessor astset "Unit($axis)=$time_(unit)"
+         $accessor astset "Format($axis)=$time_(format)"
+         $accessor astset "TimeOrigin($axis)=$time_(origin)"
+         unset time_
       }
    }
 
@@ -231,7 +283,7 @@ itcl::class gaia::GaiaSpecCoords {
             set system [$accessor astget "System($axis)"]
             set units [$accessor astget "Unit($axis)"]
             set astatt "System($axis)=$system,Unit($axis)=$units"
-            if { [info exists default_system_] && 
+            if { [info exists default_system_] &&
                  $astatt != $default_system_($axis) } {
                return "$system $units"
             }
@@ -293,6 +345,9 @@ itcl::class gaia::GaiaSpecCoords {
    #  Note initially unset array indexed by $axis.
    protected variable default_system_
 
+   #  Default attributes for the time axis.
+   protected variable time_
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
@@ -323,17 +378,18 @@ itcl::class gaia::GaiaSpecCoords {
       "Redshift" "" "ZOPT"
    }
 
-   #  List of possible time scales.
+   #  List of possible time scales. Note "Offset Time" isn't known to AST.
    common timescales_ {
+      "Offset Time" "OT"
       "International Atomic Time (TAI)" "TAI"
       "Coordinated Universal Time (UTC)" "UTC"
       "Universal Time (UT1)" "UT1"
-      "Greenwich Mean Sidereal Time (GMST)" "GMST" 
-      "Local Apparent Sidereal Time (LAST)" "LAST" 
-      "Local Mean Sidereal Time (LMST)" "LMST" 
-      "Terrestrial Time (TT)" "TT" 
-      "Barycentric Dynamical Time (TDB)" "TDB" 
-      "Barycentric Coordinate Time (TCB)" "TCB" 
+      "Greenwich Mean Sidereal Time (GMST)" "GMST"
+      "Local Apparent Sidereal Time (LAST)" "LAST"
+      "Local Mean Sidereal Time (LMST)" "LMST"
+      "Terrestrial Time (TT)" "TT"
+      "Barycentric Dynamical Time (TDB)" "TDB"
+      "Barycentric Coordinate Time (TCB)" "TCB"
       "Geocentric Coordinate Time (TCG)" "TCG"
       "Local Time" "LT"
    }
