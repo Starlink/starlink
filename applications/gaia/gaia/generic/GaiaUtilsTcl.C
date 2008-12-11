@@ -698,6 +698,69 @@ static int GaiaUtilsDescribeAxes( ClientData clientData, Tcl_Interp *interp,
 }
 
 /**
+ * Return a list of the domains in a given FrameSet.
+ */
+static int GaiaUtilsAstDomains( ClientData clientData, Tcl_Interp *interp,
+                                int objc, Tcl_Obj *CONST objv[] )
+{
+    AstFrameSet *wcs;
+    Tcl_Obj *resultObj;
+    char buffer[16];
+    const char *domain;
+    int lataxis;
+    int nframes;
+    long adr;
+    int current;
+
+    /* Check arguments, only allow one, the frameset. */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "frameset" );
+        return TCL_ERROR;
+    }
+
+    /* Get the frameset */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    wcs = (AstFrameSet *) adr;
+
+    /* Get the number of domains. */
+    nframes = astGetI( wcs, "Nframe" );
+
+    /* Get current domain, need to restore this before exiting. */
+    current = astGetI( wcs, "Current" );
+
+    resultObj = Tcl_GetObjResult( interp );
+
+    for ( int i = 1; i <= nframes; i++ ) {
+
+        /* Switch current frame so we can query the domain. */
+        astSetI( wcs, "Current", i );
+        domain = astGetC( wcs, "Domain" );
+
+        /* If no domain, create one. */
+        if ( strlen( domain ) == 0 ) {
+            domain = buffer;
+            sprintf( buffer, "Domain%d", i );
+        }
+        Tcl_ListObjAppendElement( interp, resultObj,
+                                  Tcl_NewStringObj( domain, -1 ) );
+    }
+
+    /* Restore current frame. */
+    astSetI( wcs, "Current", current );
+
+    if ( ! astOK ) {
+        astClearStatus;
+        Tcl_SetResult( interp, "Failed to list coordinate domains",
+                       TCL_VOLATILE );
+        return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+
+
+/**
  * Extract a WCS for a two axes from a full WCS. The result is
  * the address of an AST FrameSet.
  *
