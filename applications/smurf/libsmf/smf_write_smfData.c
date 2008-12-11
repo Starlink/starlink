@@ -120,7 +120,6 @@ void smf_write_smfData ( const smfData * data, void *variance,
   HDSLoc *jcmtstateloc=NULL;    /* HDS Locator for JCMT headers */
   int lbnd[NDF__MXDIM];         /* Lower pixel bounds */
   dim_t ntslice=0;              /* Number of time slices */
-  int haventslice=0;            /* Flag indicating whether ntslice is known */
   Grp * ogrp = NULL;            /* Small group for output filename */
   smfData * outdata = NULL;     /* Mapped output file */
   char prvname[2*PAR__SZNAM+1]; /* provenance ID string */
@@ -155,12 +154,10 @@ void smf_write_smfData ( const smfData * data, void *variance,
   /* Get ntslice -- assume ICD ordered data, and only handle 1 & 3-d data */
   if( data->ndims == 1 ) {
     ntslice = data->dims[0];
-    haventslice = 1;
   }
 
   if( data->ndims == 3 ) {
     ntslice = data->dims[2];
-    haventslice = 1;
   }
 
   msgSetc( "NAME", filename );
@@ -225,16 +222,18 @@ void smf_write_smfData ( const smfData * data, void *variance,
       }
 
       /* JCMT State -- if ntslice is known */
-      if( inhdr->allState && haventslice ) {
+      if( inhdr->allState ) {
+
         /* Get an HDS locator */
         ndfXnew( outfile->ndfid, JCMT__EXTNAME, JCMT__EXTTYPE, 0, 0,
                  &jcmtstateloc, status );
         
         /* Map the header */
-        sc2store_headcremap( jcmtstateloc, ntslice, INST__SCUBA2, status  );
+        sc2store_headcremap( jcmtstateloc, inhdr->nframes, INST__SCUBA2, 
+                             status  );
         
         /* Write out the per-frame headers */
-        for( i=0; (*status==SAI__OK)&&(i<ntslice); i++ ) {
+        for( i=0; (*status==SAI__OK)&&(i<inhdr->nframes); i++ ) {
           sc2store_headput( i, inhdr->allState[i], status );
         }
       }
