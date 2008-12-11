@@ -339,7 +339,7 @@ void smurf_sc2clean( int *status ) {
       msgOutif(MSG__VERB," ",
                "Apodizing data.",
                status);
-      smf_apodize( ffdata, apod, status );
+      smf_apodize( ffdata, NULL, apod, status );
     }
 
     /* frequency-domain filtering */

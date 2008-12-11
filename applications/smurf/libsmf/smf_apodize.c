@@ -14,11 +14,16 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_apodize( smfData *data, size_t len, int *status );
+*     smf_apodize( smfData *data, unsigned char *quality, size_t len, 
+*                  int *status );
 
 *  Arguments:
 *     data = smfData* (Given)
 *        Pointer to smfData that will be modified.
+*     quality = unsigned char * (Given and Returned)
+*        If set, use this buffer instead of QUALITY associated with data.
+*        If NULL, use the QUALITY associated with data. Locations of spikes
+*        will have bit SMF__Q_SPIKE set. 
 *     len = size_t (Given)
 *        Number of samples over which to apply apodization.
 *     status = int* (Given and Returned)
@@ -87,7 +92,8 @@
 
 #define FUNC_NAME "smf_apodize"
 
-void smf_apodize( smfData *data, size_t len, int *status ) {
+void smf_apodize( smfData *data, unsigned char *quality, size_t len, 
+                  int *status ) {
 
   double ap;                    /* Apodization factor at this step */
   size_t bstride;               /* Bolometer stride in data array */
@@ -121,7 +127,12 @@ void smf_apodize( smfData *data, size_t len, int *status ) {
 
   /* Obtain pointer to data and quality components */
   dat = data->pntr[0];
-  qua = data->pntr[2];
+
+  if( quality ) {
+    qua = quality;
+  } else {
+    qua = data->pntr[2];
+  }
 
   /* Set the quality bitmask to decide which samples to apodize */
   mask = ~(SMF__Q_JUMP | SMF__Q_SPIKE);

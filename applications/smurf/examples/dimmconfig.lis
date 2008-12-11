@@ -50,6 +50,9 @@ maxlen = 0
 #padstart = 1000
 #padend = 1000
 
+# Apodize signals with a sin function roll-off across apod samples
+#apod = 1000
+
 # fraction of samples to be bad to flag entire bolo as dead
 badfrac = 0.05
 

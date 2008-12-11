@@ -224,6 +224,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
 
   /* Local Variables */
   size_t aiter;                 /* Actual iterations of sigma clipper */
+  size_t apod=0;                /* Length of apodization window */
   smfArray **ast=NULL;          /* Astronomical signal */
   double *ast_data=NULL;        /* Pointer to DATA component of ast */
   smfGroup *astgroup=NULL;      /* smfGroup of ast model files */
@@ -318,7 +319,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
     msgSeti("L1",lbnd_out[1]);
     msgSeti("U0",ubnd_out[0]);
     msgSeti("U1",ubnd_out[1]);
-    errRep(FUNC_NAME, "Invalid mapbounds: LBND=[^L0,^L1] UBND=[^U0,^U1]", 
+    errRep("", FUNC_NAME ": Invalid mapbounds: LBND=[^L0,^L1] UBND=[^U0,^U1]", 
            status);      
   }
 
@@ -338,7 +339,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
 
     if( numiter == 0 ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "NUMITER cannot be 0", status);      
+      errRep("", FUNC_NAME ": NUMITER cannot be 0", status);      
     } else {
       if( numiter < 0 ) {
         /* If negative, iterate to convergence or abs(numiter), whichever comes
@@ -401,6 +402,17 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
 
     /* Data-cleaning parameters (should match SC2CLEAN) */
     
+    if( astMapGet0I( keymap, "APOD", &temp ) ) {
+      if( temp < 0 ) {
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "apod cannot be < 0.", status );
+      } else {
+        apod = (size_t) temp;
+      }
+    } else {
+      apod = 0;
+    }
+
     if( !astMapGet0D( keymap, "BADFRAC", &badfrac ) ) {
       badfrac = 0;
     }
@@ -966,6 +978,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
                 msgSeti("AITER",aiter);
                 msgOutif(MSG__VERB," ", "  ...finished in ^AITER iterations",
                          status); 
+              }
+
+              if( apod ) {
+                msgOutif(MSG__VERB," ", "  apodizing data", status);
+                smf_apodize( data, qua_data, apod, status );
               }
 
               /* filter the data */
