@@ -1293,8 +1293,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
               }
 	      
               if( (res[i]->sdata[idx]->file->name)[0] ) {
-                smf_model_createtswcs( res[i]->sdata[idx], SMF__RES, hdr->tswcs,
-                                       status );
+                smf_model_createHdr( res[i]->sdata[idx], SMF__RES, hdr,
+                                     status );
                 smf_model_stripsuffix( res[i]->sdata[idx]->file->name, 
                                        name, status );
                 smf_write_smfData( res[i]->sdata[idx], var_data, 
@@ -1307,8 +1307,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
               }
 	      
               if( (ast[i]->sdata[idx]->file->name)[0] ) {
-                smf_model_createtswcs( ast[i]->sdata[idx], SMF__AST, hdr->tswcs,
-                                       status );
+                smf_model_createHdr( ast[i]->sdata[idx], SMF__AST, hdr,
+                                     status );
                 smf_model_stripsuffix( ast[i]->sdata[idx]->file->name, 
                                        name, status );
                 smf_write_smfData( ast[i]->sdata[idx], NULL, NULL, name, 
@@ -1327,8 +1327,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
               if( (*status == SAI__OK) && (modeltyps[j] != SMF__NOI) &&
                   model[j][i]->sdata[idx] ) {
                 if( (model[j][i]->sdata[idx]->file->name)[0] ) {
-                  smf_model_createtswcs( model[j][i]->sdata[idx], modeltyps[j], 
-                                         hdr->tswcs,status );
+                  smf_model_createHdr( model[j][i]->sdata[idx], modeltyps[j], 
+                                       hdr,status );
                   smf_model_stripsuffix( model[j][i]->sdata[idx]->file->name, 
                                          name, status );
                   smf_write_smfData( model[j][i]->sdata[idx], NULL, NULL, name, 

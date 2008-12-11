@@ -85,7 +85,7 @@ smf_obstype_str.c smf_obsmode_str.c smf_calc_mode.c smf_calc_meantau.c \
 smf_grpCopy.c smf_collapse_tseries.c smf_write_smfData.c smf_set_moving.c \
 smf_select_pntr.c smf_get_dims.c smf_flat_standardpow.c \
 smf_flat_responsivity.c smf_flat_write.c smf_clean_dksquid.c \
-smf_fft_cart2pol.c smf_calcmodel_dks.c smf_model_createtswcs.c \
+smf_fft_cart2pol.c smf_calcmodel_dks.c smf_model_createHdr.c \
 smf_model_stripsuffix.c smf_bolonoise.c smf_get_findex.c smf_update_valbad.c \
 smf_rebinslices.c smf_spreadwidth.c smf_rebincube_seqf.c smf_rebinseq_thread.c \
 smf_threads.c smf_get_nthread.c smf_rebincube_paste_thread.c smf_ndf_sbnd.c \
