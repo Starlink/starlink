@@ -13892,6 +13892,9 @@ static int FullForm( const char *list, const char *test, int abbrev, int *status
    identified. */
    ret = -1;
 
+/* Avoid compiler warnings. */
+   context = NULL;
+
 /* Check global status. */
    if( !astOK ) return ret;
 
@@ -31052,6 +31055,9 @@ static AstSkyFrame *WcsSkyFrame( AstFitsChan *this, FitsStore *store, char s,
 
 /* If a skyFrame was created... */
    if( ret ){
+
+   astSetIdent( ret, "ZZZ" );
+
 
 /* Store the projection description. */
       astSetProjection( ret, astWcsPrjDesc( prj )  );
