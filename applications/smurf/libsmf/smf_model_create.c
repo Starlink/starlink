@@ -227,6 +227,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
   const char *mname=NULL;       /* String model component name */
   size_t msize=0;               /* Number of files in model group */
   char name[GRP__SZNAM+1];      /* Name of container file without suffix */
+  size_t nbolo;                 /* Number of bolometers */
   size_t ndata=0;               /* Number of elements in data array */
   dim_t nrel=0;                 /* Number of related elements (subarrays) */
   int oflag=0;                  /* Flags for opening template file */
@@ -236,6 +237,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
   char suffix[] = SMF__DIMM_SUFFIX; /* String containing model suffix */
   double tau;                   /* 225 GHz optical depth */
   dim_t thisnrel;               /* Number of related items for this model */
+  double val;                   /* Temporary value */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -510,6 +512,19 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
             }
             break;
 
+          case SMF__GAI: /* Gain/offset for each bolometer */
+            head.data.dtype = SMF__DOUBLE;
+            head.data.ndims = 3;
+            head.data.dims[2] = 3; /* Gain, Offset, Correlation coefficient */
+            if( isTordered ) {
+              head.data.dims[SMF__ROW_INDEX] = (idata->dims)[SMF__ROW_INDEX];
+              head.data.dims[SMF__COL_INDEX] = (idata->dims)[SMF__COL_INDEX];
+            } else {
+              head.data.dims[SMF__ROW_INDEX] = (idata->dims)[1+SMF__ROW_INDEX];
+              head.data.dims[SMF__COL_INDEX] = (idata->dims)[1+SMF__COL_INDEX];
+            }
+            break;
+
           default:
             *status = SAI__ERROR;
             msgSetc( "TYPE", smf_model_getname(mtype, status) );
@@ -673,7 +688,17 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
               head.data.pntr[0] = dataptr;
               smf_clean_dksquid(idata, NULL, 0, 0, &(head.data), 1, 1, status);
               head.data.pntr[0] = NULL;
-
+            } else if( mtype == SMF__GAI ) {
+              nbolo = head.data.dims[SMF__ROW_INDEX]*
+                head.data.dims[SMF__COL_INDEX];
+              /* Initialize gain to 1, offset to 0, correlation to 0 */
+              for( k=0; k<3; k++ ) {
+                if( !k ) val = 1;
+                else val = 0;
+                for( l=0; l<nbolo; l++ ) {
+                  ((double *)dataptr)[nbolo*k + l] = val;
+                }
+              }
             } else {
               /* otherwise zero the buffer */
               memset( dataptr, 0, datalen );

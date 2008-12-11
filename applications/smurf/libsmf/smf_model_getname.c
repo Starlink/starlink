@@ -139,6 +139,10 @@ const char *smf_model_getname( smf_modeltype type, int *status ) {
     retval = "dks";
     break;
 
+  case SMF__GAI:
+    retval = "gai";
+    break;
+
   default:
     retval = "nul";
     *status = SAI__ERROR;

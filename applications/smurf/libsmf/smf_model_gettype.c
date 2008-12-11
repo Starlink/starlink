@@ -118,6 +118,8 @@ smf_modeltype smf_model_gettype( const char *modelname, int *status ) {
     return SMF__QUA;
   } else if( strncmp( tempstring, "DKS", 3 ) == 0 ) {
     return SMF__DKS;
+  } else if( strncmp( tempstring, "GAI", 3 ) == 0 ) {
+    return SMF__GAI;
   } else {
     *status = SAI__ERROR;
     msgSetc("MNAME",modelname);

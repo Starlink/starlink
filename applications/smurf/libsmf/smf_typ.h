@@ -226,7 +226,8 @@ typedef enum smf_modeltype {
   SMF__EXT=6,             /* Extinction correction */
   SMF__LUT=7,             /* Pointing LUT */
   SMF__QUA=8,             /* Quality flags */
-  SMF__DKS=9              /* Dark squid signals */  
+  SMF__DKS=9,             /* Dark squid signals */  
+  SMF__GAI=10             /* Relative Gain/Offset for each bolometer */ 
 } smf_modeltype;
 
 /* Observing mode and type */
