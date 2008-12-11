@@ -684,14 +684,13 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
                  Since we need to pass a smfData to clean_dksquid, kludge
                  head.data so that its pntr[0] temporarily points to the
                  model data array. */
-
               head.data.pntr[0] = dataptr;
               smf_clean_dksquid(idata, NULL, 0, 0, &(head.data), 1, 1, status);
               head.data.pntr[0] = NULL;
             } else if( mtype == SMF__GAI ) {
+              /* Initialize gain to 1, offset to 0, correlation to 0 */
               nbolo = head.data.dims[SMF__ROW_INDEX]*
                 head.data.dims[SMF__COL_INDEX];
-              /* Initialize gain to 1, offset to 0, correlation to 0 */
               for( k=0; k<3; k++ ) {
                 if( !k ) val = 1;
                 else val = 0;
