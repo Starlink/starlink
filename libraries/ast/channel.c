@@ -449,6 +449,7 @@ c++
 c--
 */
    astDECLARE_GLOBALS;
+   astGET_GLOBALS(NULL);
    return channel_data;
 }
 
