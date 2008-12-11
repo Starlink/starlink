@@ -652,6 +652,9 @@ int astG3DMark( int n, float *x, float *y, float *z, int type,
 /* Return if any of the coordinate pointers is NULL. */
    if( !x || !y || !z ) return 1;
 
+/* Initialise */
+   ns = 0;
+
 /* Unless the "norm" vector is parallel to the z axis, we use an up vector 
    that is parallel to the z axis. Otherwise we use an up vector paralle
    to the x axis. */

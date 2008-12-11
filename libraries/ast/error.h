@@ -165,11 +165,9 @@ void astError_( int, const char *, int *, ... );
 #if defined(THREAD_SAFE) 
 void astInitErrorGlobals_( AstErrorGlobals * );
 #endif
-
-#else                       /* Public only */
-void astErrorPublic_( int, const char *, ... );
-
 #endif
+
+void astErrorPublic_( int, const char *, ... );
 
 
 

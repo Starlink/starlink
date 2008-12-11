@@ -3021,12 +3021,15 @@ static double GetLAST( AstSkyFrame *this, int *status ) {
 /* Local Variables: */
    double result;                /* Result value to return */
    double delta_epoch;           /* Change in Epoch */
+   double epoch;
 
 /* Initialise. */
    result = 0;
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+printf("%p ", this );
 
 /* The "last" component of the SkyFrame structure holds the accurate 
    LAST at the moment in time given by the "eplast" (a TDB MJD) component 
@@ -3038,21 +3041,33 @@ static double GetLAST( AstSkyFrame *this, int *status ) {
    than a tenth of an arcsecond. If this approximation cannot be used, 
    invoke SetLast to recalculate the accurate LAST and update the "eplast" 
    and "last" values. */
-   if( this->eplast != AST__BAD ) {
-      delta_epoch = astGetEpoch( this ) - this->eplast;
 
-      if( fabs( delta_epoch ) < 0.4 ) {
+   if( this->eplast != AST__BAD ) {
+printf("%s: eplast=%.*g ", astGetIdent( this ), DBL_DIG, this->eplast);
+      epoch = astGetEpoch( this );
+printf("epoch=%.*g ", DBL_DIG, epoch);
+      delta_epoch = epoch - this->eplast;
+
+printf("delta_epoch=%.*g ", DBL_DIG, delta_epoch );
+
+      if( fabs( delta_epoch ) < 0.0003 ) {
          result = this->last + 2*AST__DPI*delta_epoch/0.997269566;
+printf("last=%.*g res(app)=%.*g ", DBL_DIG, this->last, DBL_DIG, result );
 
       } else {
          SetLast( this, status );
          result = this->last;
+printf("res(acc)=%.*g ", DBL_DIG, result );
       }
 
    } else {
+printf("%s: eplast=bad ",astGetIdent( this ) );
       SetLast( this, status );
       result = this->last;
+printf("res(acc)=%.*g ", DBL_DIG, result );
    }
+
+printf("\n");
 
 /* Return the result, */
    return result;

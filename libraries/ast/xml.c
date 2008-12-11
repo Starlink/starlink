@@ -3871,6 +3871,8 @@ static AstXmlAttribute *FindAttribute( AstXmlElement *this, const char *name0,
 
 /* Initialise */
    result = NULL;
+   name = name0;
+   prefix = NULL;
 
 /* Check the global error status. */
    if( !astOK ) return result;
@@ -3899,9 +3901,6 @@ static AstXmlAttribute *FindAttribute( AstXmlElement *this, const char *name0,
 
       }
 
-   } else {
-      name = name0;
-      prefix = NULL;
    }      
 
 /* Loop round all the attributes in the element. */
