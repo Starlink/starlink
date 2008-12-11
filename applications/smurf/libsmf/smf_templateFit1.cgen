@@ -161,60 +161,32 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, unsigned char *qual,
   if( offset ) *offset = VAL__BADD;
 
   if( qual ) {  /* QUALITY checking version */
-    if( stride > 1 ) {
-      /* Calculate sums in case of non-contiguous data */
-      off = 0;
-      for( i=0; i<n; i++ ) {
-        if( !(qual[off]&mask) && (template[i] != VAL__BADD) ) {
-          s_d += data[off];
-          s_dsq += data[off]*data[off];
-          s_dt += data[off]*template[i];
-          s_t += template[i];
-          s_tsq += template[i]*template[i];
-          ngood ++;        
-        }
-        off += stride;
+    /* Calculate sums in case of non-contiguous data */
+    off = 0;
+    for( i=0; i<n; i++ ) {
+      if( !(qual[off]&mask) && (template[i] != VAL__BADD) ) {
+        s_d += data[off];
+        s_dsq += data[off]*data[off];
+        s_dt += data[off]*template[i];
+        s_t += template[i];
+        s_tsq += template[i]*template[i];
+        ngood ++;        
       }
-    } else {
-      /* Calculate sums in case of contiguous data */
-      for( i=0; i<n; i++ ) {
-        if( !(qual[i]&mask) && (template[i] != VAL__BADD) ) {
-          s_d += data[i];
-          s_dsq += data[i]*data[i];
-          s_dt += data[i]*template[i];
-          s_t += template[i];
-          s_tsq += template[i]*template[i];
-          ngood ++;        
-        }
-      }
+      off += stride;
     }
   } else {      /* VAL__BAD checking version */
-    if( stride > 1 ) {
-      /* Calculate sums in case of non-contiguous data */
-      off = 0;
-      for( i=0; i<n; i++ ) {
-        if( (data[off] != CGEN_BAD) && (template[i] != VAL__BADD) ) {
-          s_d += data[off];
-          s_dsq += data[off]*data[off];
-          s_dt += data[off]*template[i];
-          s_t += template[i];
-          s_tsq += template[i]*template[i];
-          ngood ++;        
-        }
-        off += stride;
+    /* Calculate sums in case of non-contiguous data */
+    off = 0;
+    for( i=0; i<n; i++ ) {
+      if( (data[off] != CGEN_BAD) && (template[i] != VAL__BADD) ) {
+        s_d += data[off];
+        s_dsq += data[off]*data[off];
+        s_dt += data[off]*template[i];
+        s_t += template[i];
+        s_tsq += template[i]*template[i];
+        ngood ++;        
       }
-    } else {
-      /* Calculate sums in case of contiguous data */
-      for( i=0; i<n; i++ ) {
-        if( (data[i] != CGEN_BAD) && (template[i] != VAL__BADD) ) {
-          s_d += data[i];
-          s_dsq += data[i]*data[i];
-          s_dt += data[i]*template[i];
-          s_t += template[i];
-          s_tsq += template[i]*template[i];
-          ngood ++;        
-        }
-      }
+      off += stride;
     }
   }
 
