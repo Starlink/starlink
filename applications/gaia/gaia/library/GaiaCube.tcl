@@ -612,123 +612,127 @@ itcl::class gaia::GaiaCube {
             $history_ record_last_cube
          }
          return
+      }
+
+      #  Add last cube  to the back list, including temporary ones.
+      $history_ record_last_cube
+
+      #  Always start with the DATA component (essential).
+      set component_ "DATA"
+      set last_component_ "DATA"
+      if { [info exists itk_component(spectrum)] } {
+         $itk_component(spectrum) configure -component "DATA"
+      }
+
+      if { $cubeaccessor_ == {} } {
+         set cubeaccessor_ [uplevel \#0 GaiaNDAccess \#auto]
+      } elseif { $keeplimits } {
+
+         #  Existing cube accessor and keeping limits regardless, so we
+         #  need to save some properties before letting this go.
+         save_limits_
+      }
+
+      $namer_ absolute
+      set ndfname_ [$namer_ ndfname 0]
+      set fullname [$namer_ fullname]
+      set type_ [$namer_ type]
+
+      $cubeaccessor_ configure -dataset "$fullname"
+
+      set bounds_ [$cubeaccessor_ getbounds 0]
+      set ndims [expr [llength $bounds_]/2]
+
+      #  Allow fourth dimension, as long as it is redundant.
+      if { $ndims == 4 } {
+         if { [expr [lindex $bounds_ 7] - [lindex $bounds_ 6]] == 0 } {
+            set close_section_ ",1)"
+            set bounds_ [lrange $bounds_ 0 5]
+            set ndims 3
+         }
       } else {
-
-         #  Add last cube  to the back list, including temporary ones.
+         #  Sections just close with parenthesis.
+         set close_section_ ")"
+      }
+      if { $ndims != 3 } {
+         error_dialog \
+            "Not a cube, must have 3 significant dimensions (has $ndims)"
          $history_ record_last_cube
+         return
+      }
 
-         #  Always start with the DATA component (essential).
-         set component_ "DATA"
-         set last_component_ "DATA"
-         if { [info exists itk_component(spectrum)] } {
-            $itk_component(spectrum) configure -component "DATA"
+      #  Clear the iso and volume renderers before changing data.
+      renderers_clear_ 1
+
+      #  Map in all data, this makes it immediately available within
+      #  application
+      load_cube_ 1
+
+      #  Retain the TITLE value for creating new object values.
+      set object_ [$cubeaccessor_ getc "TITLE"]
+
+      #  Set axis and display the plane for first time. Try to pick
+      #  out a spectral axis.
+      if { [$cubeaccessor_ isaxisframetype 3 "specframe"] } {
+         set axis_ 2
+         set axis 3
+      } elseif { [$cubeaccessor_ isaxisframetype 2 "specframe"] } {
+         set axis_ 1
+         set axis 2
+      } elseif { [$cubeaccessor_ isaxisframetype 1 "specframe"] } {
+         set axis_ 2
+         set axis 1
+      } else {
+         set axis_ 2
+         set axis 3
+      }
+
+      #  And label the menu items helpfully.
+      $itk_component(axis) clear
+      set axisdesc [$cubeaccessor_ axisdescriptions]
+      set i 0
+      foreach {label value} { one 1 two 2 three 3 } {
+         set desc [lindex $axisdesc $i]
+         incr i
+         if { $desc != "unknown" } {
+            set label "$label : $desc"
          }
+         $itk_component(axis) add \
+            -command [code $this set_step_axis_ $value] \
+            -label $label \
+            -value $value
+      }
 
-         if { $cubeaccessor_ == {} } {
-            set cubeaccessor_ [uplevel \#0 GaiaNDAccess \#auto]
-         } elseif { $keeplimits } {
+      #  Set up object to control units. Do this before axis change
+      #  so that cube is available for units query.
+      $spec_coords_ configure -accessor $cubeaccessor_
 
-            #  Existing cube accessor and keeping limits regardless, so we
-            #  need to save some properties before letting this go.
-            save_limits_
-         }
+      #  Now apply axis change.
+      $spec_coords_ configure -axis $axis
+      $itk_component(axis) configure -value $axis
+      set_step_axis_ $axis
 
-         $namer_ absolute
-         set ndfname_ [$namer_ ndfname 0]
-         set fullname [$namer_ fullname]
-         set type_ [$namer_ type]
+      #  If the spectral plot is open, then close it. It will be
+      #  re-created on next image click.
+      $itk_component(spectrum) close_plot
 
-         $cubeaccessor_ configure -dataset "$fullname"
+      #  If keeping the limits, regardless, then attempt the restore.
+      if { $keeplimits } {
+         restore_limits_
+      }
 
-         set bounds_ [$cubeaccessor_ getbounds 0]
-         set ndims [expr [llength $bounds_]/2]
+      #  Add cube to history (and previous cube to back list).
+      $history_ add_history $itk_option(-cube)
 
-         #  Allow fourth dimension, as long as it is redundant.
-         if { $ndims == 4 } {
-            if { [expr [lindex $bounds_ 7] - [lindex $bounds_ 6]] == 0 } {
-               set close_section_ ",1)"
-               set bounds_ [lrange $bounds_ 0 5]
-               set ndims 3
-            }
-         } else {
-            #  Sections just close with parenthesis.
-            set close_section_ ")"
-         }
-         if { $ndims != 3 } {
-            error_dialog \
-               "Not a cube, must have 3 significant dimensions (has $ndims)"
-            $history_ record_last_cube
-            return
-         }
+      #  Update FITS headers, if viewed.
+      maybe_update_fitsheaders_
 
-         #  Clear the iso and volume renderers before changing data.
-         renderers_clear_ 1
+      #  Disable or enable NDF component menu.
+      configure_component_menu_
 
-         #  Map in all data, this makes it immediately available within
-         #  application
-         load_cube_ 1
-
-         #  Retain the TITLE value for creating new object values.
-         set object_ [$cubeaccessor_ getc "TITLE"]
-
-         #  Set axis and display the plane for first time. Try to pick
-         #  out a spectral axis.
-         if { [$cubeaccessor_ isaxisframetype 3 "specframe"] } {
-            set axis_ 2
-            set axis 3
-         } elseif { [$cubeaccessor_ isaxisframetype 2 "specframe"] } {
-            set axis_ 1
-            set axis 2
-         } elseif { [$cubeaccessor_ isaxisframetype 1 "specframe"] } {
-            set axis_ 2
-            set axis 1
-         } else {
-            set axis_ 2
-            set axis 3
-         }
-
-         #  And label the menu items helpfully.
-         $itk_component(axis) clear
-         set axisdesc [$cubeaccessor_ axisdescriptions]
-         set i 0
-         foreach {label value} { one 1 two 2 three 3 } {
-            set desc [lindex $axisdesc $i]
-            incr i
-            if { $desc != "unknown" } {
-               set label "$label : $desc"
-            }
-            $itk_component(axis) add \
-               -command [code $this set_step_axis_ $value] \
-               -label $label \
-               -value $value
-         }
-
-         #  Set up object to control units. Do this before axis change
-         #  so that cube is available for units query.
-         $spec_coords_ configure -accessor $cubeaccessor_
-
-         #  Now apply axis change.
-         $spec_coords_ configure -axis $axis
-         $itk_component(axis) configure -value $axis
-         set_step_axis_ $axis
-
-         #  If the spectral plot is open, then close it. It will be
-         #  re-created on next image click.
-         $itk_component(spectrum) close_plot
-
-         #  If keeping the limits, regardless, then attempt the restore.
-         if { $keeplimits } {
-            restore_limits_
-         }
-
-         #  Add cube to history (and previous cube to back list).
-         $history_ add_history $itk_option(-cube)
-
-         #  Update FITS headers, if viewed.
-         maybe_update_fitsheaders_
-
-         #  Disable or enable NDF component menu.
-         configure_component_menu_
+      #  Update the coordinate selection window, if open.
+      if { [winfo exists $w_.domainchooser] } {
+         $w_.domainchooser image_changed
       }
    }
 
