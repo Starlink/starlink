@@ -41,6 +41,7 @@ c     following functions may also be applied to all Channels:
 f     In addition to those routines applicable to all Objects, the
 f     following routines may also be applied to all Channels:
 *
+c     - astPutChannelData: Store data to pass to source or sink functions
 c     - astRead: Read an Object from a Channel
 c     - astWrite: Write an Object to a Channel
 f     - AST_READ: Read an Object from a Channel
@@ -93,6 +94,8 @@ f     - AST_WRITE: Write an Object to a Channel
 *        on a FitsChan.
 *     3-OCT-2008 (DSB):
 *        Added "Strict" attribute.
+*     11-DEC-2008 (DSB):
+*        Added astPutChannelData and astChannelData functions.
 *class--
 */
 
@@ -172,7 +175,8 @@ static void (* parent_setattrib)( AstObject *, const char *, int * );
    globals->Values_List = NULL; \
    globals->Values_Class = NULL; \
    globals->Values_OK = NULL; \
-   globals->End_Of_Object = NULL;
+   globals->End_Of_Object = NULL; \
+   globals->Channel_Data  = NULL;
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(Channel)
@@ -191,6 +195,7 @@ astMAKE_INITGLOBALS(Channel)
 #define values_class   astGLOBAL(Channel,Values_Class)
 #define values_ok      astGLOBAL(Channel,Values_OK)
 #define end_of_object  astGLOBAL(Channel,End_Of_Object)
+#define channel_data   astGLOBAL(Channel,Channel_Data)
 
 
 
@@ -225,6 +230,10 @@ static int nest = -1;
 
 /* The number of times astWrite has been invoked. */
 static int nwrite_invoc = 0;
+
+/* Pointer to a user-supplied block of memory to be made available to 
+   source or sink functions via the astChannelData function. */
+static void *channel_data = NULL;
 
 /***
    The following items are all pointers to dynamically allocated
@@ -314,6 +323,7 @@ static void ClearValues( AstChannel *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void GetNextData( AstChannel *, int, char **, char **, int * );
 static void OutputTextItem( AstChannel *, const char *, int * );
+static void PutChannelData( AstChannel *, void *, int * );
 static void PutNextText( AstChannel *, const char *, int * );
 static void ReadClassData( AstChannel *, const char *, int * );
 static void RemoveValue( AstChannelValue *, AstChannelValue **, int * );
@@ -393,6 +403,53 @@ static void AppendValue( AstChannelValue *value, AstChannelValue **head, int *st
       ( *head )->blink = value;
       value->blink->flink = value;
    }
+}
+
+void *astChannelData_( void ) {
+/*
+c++
+*  Name:
+*     astChannelData
+
+*  Purpose:
+*     Return a pointer to user-supplied data stored with a Channel.
+
+*  Type:
+*     Public macro.
+
+*  Synopsis:
+*     #include "channel.h"
+*     void *astChannelData
+
+*  Class Membership:
+*     Channel macro.
+
+*  Description:
+*     This macro is intended to be used within the source or sink 
+*     functions associated with a Channel. It returns any pointer 
+*     previously stored in the Channel (that is, the Channel that has
+*     invoked the source or sink function) using astPutChannelData. 
+*
+*     This mechanism is a thread-safe alternative to passing file
+*     descriptors, etc, via static global variables.
+
+*  Returned Value:
+*     astChannelData
+*        The pointer previously stored with the Channel using
+*        astPutChannelData. A NULL pointer will be returned if no such
+*        pointer has been stored with the Channel.
+
+*  Applicability:
+*     Channel
+*        This macro applies to all Channels.
+
+*  Notes:
+*     - This routine is not available in the Fortran 77 interface to
+*     the AST library.
+c--
+*/
+   astDECLARE_GLOBALS;
+   return channel_data;
 }
 
 static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
@@ -1366,6 +1423,7 @@ AstChannel *astInitChannel_( void *mem, size_t size, int init,
       new->full = -INT_MAX;
       new->skip = -INT_MAX;
       new->strict = -INT_MAX;
+      new->data = NULL;
 
 /* If an error occurred, clean up by deleting the new object. */
       if ( !astOK ) new = astDelete( new );
@@ -1468,6 +1526,7 @@ void astInitChannelVtab_(  AstChannelVtab *vtab, const char *name, int *status )
    vtab->WriteIsA = WriteIsA;
    vtab->WriteObject = WriteObject;
    vtab->WriteString = WriteString;
+   vtab->PutChannelData = PutChannelData;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -1747,6 +1806,56 @@ static void OutputTextItem( AstChannel *this, const char *line, int *status ) {
    if ( astOK ) items_written++;
 }
 
+static void PutChannelData( AstChannel *this, void *data, int *status ) {
+/*
+c++
+*  Name:
+*     astPutChannelData
+
+*  Purpose:
+*     Store arbitrary data to be passed to a source or sink function.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+*     #include "channel.h"
+*     void astPutChannelData( AstChannel *this, void *data )
+
+*  Class Membership:
+*     Channel method.
+
+*  Description:
+*     This function stores a supplied arbitrary pointer in the Channel.
+*     When a source or sink function is invoked by the Channel, the
+*     invoked function can use the astChannelData macro to retrieve the 
+*     pointer. This provides a thread-safe alternative to passing file
+*     descriptors, etc, via global static variables.
+
+*  Parameters:
+*     this
+*        Pointer to the Channel.
+*     data
+*        A pointer to be made available to the source and sink functions
+*        via the astChannelData macro. May be NULL.
+
+*  Applicability:
+*     Channel
+*        All Channels have this function.
+
+*  Notes:
+*     - This routine is not available in the Fortran 77 interface to
+*     the AST library.
+c--
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Store the pointer. */
+   this->data = data;
+}
+
 static void PutNextText( AstChannel *this, const char *line, int *status ) {
 /*
 *+
@@ -1847,7 +1956,7 @@ f     AST_READ = INTEGER
 *        belong is determined by the input data, so is not known in
 *        advance.
 
-*  Class Applicability:
+*  Applicability:
 *     FitsChan
 c        All successful use of astRead on a FitsChan is destructive, so that
 f        All successful use of AST_READ on a FitsChan is destructive, so that 
@@ -4749,6 +4858,10 @@ f     AST_CHANNEL = INTEGER
 *        A pointer to the new Channel.
 
 *  Notes:
+c     - Application code can pass arbitrary data (such as file
+c     descriptors, etc) to source and sink functions using the
+c     astPutChannelData function. The source or sink function should use
+c     the astChannelData macro to retrieve this data.
 f     - The names of the routines supplied for the SOURCE and SINK
 f     arguments should appear in EXTERNAL statements in the Fortran
 f     routine which invokes AST_CHANNEL. However, this is not generally
@@ -5127,6 +5240,9 @@ AstChannel *astLoadChannel_( void *mem, size_t size,
       new->sink = NULL;
       new->sink_wrap = NULL;
 
+/* We do not have any data to pass to the source and sink functions. */
+      new->data = NULL;
+
 /* Now read each individual data item from this list and use it to
    initialise the appropriate instance variable(s) for this class. */
 
@@ -5245,29 +5361,37 @@ void astWriteString_( AstChannel *this, const char *name, int set, int helpful,
    (**astMEMBER(this,Channel,WriteString))( this, name, set, helpful, value,
                                             comment, status );
 }
+void astPutChannelData_( AstChannel *this, void *data, int *status ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,Channel,PutChannelData))( this, data, status );
+}
 
 /* Count the number of times astWrite is invoked (excluding invocations
    made from within the astWriteObject method - see below). The count is 
    done here so that invocations of astWrite within a sub-class will be 
-   included. */
+   included. Also store pointer to channel data in a thread-specific global 
+   variable. */
 int astWrite_( AstChannel *this, AstObject *object, int *status ) {
    astDECLARE_GLOBALS;           
    if ( !astOK ) return 0;
    astGET_GLOBALS(this);
    nwrite_invoc++;
+   channel_data = this->data;
    return (**astMEMBER(this,Channel,Write))( this, object, status );
 }
 
 /* We do not want to count invocations of astWrite made from within the
    astWriteObject method. So decrement the number of invocations first
    (this assumes that each invocation of astWriteObject will only invoke
-   astWrite once). */
+   astWrite once). Also store pointer to channel data in a thread-specific 
+   global variable. */
 void astWriteObject_( AstChannel *this, const char *name, int set,
                       int helpful, AstObject *value, const char *comment, int *status ) {
    astDECLARE_GLOBALS;           
    if ( !astOK ) return;
    astGET_GLOBALS(this);
    nwrite_invoc--;
+   channel_data = this->data;
    (**astMEMBER(this,Channel,WriteObject))( this, name, set, helpful, value,
                                             comment, status );
 }

@@ -259,6 +259,7 @@ typedef struct AstChannel {
    int full;                     /* Set max/normal/min information level */
    int skip;                     /* Skip data between Objects? */
    int strict;                   /* Report unexpected data items? */
+   void *data;                   /* Data to pass to source/sink functions */
 } AstChannel;
 
 /* Virtual function table. */
@@ -295,6 +296,7 @@ typedef struct AstChannelVtab {
    void (* ClearSkip)( AstChannel *, int * );
    void (* ClearStrict)( AstChannel *, int * );
    void (* GetNextData)( AstChannel *, int, char **, char **, int * );
+   void (* PutChannelData)( AstChannel *, void *, int * );
    void (* PutNextText)( AstChannel *, const char *, int * );
    void (* ReadClassData)( AstChannel *, const char *, int * );
    void (* SetComment)( AstChannel *, int, int * );
@@ -341,6 +343,7 @@ typedef struct AstChannelGlobals {
    char **Values_Class;
    int *Values_OK;
    int *End_Of_Object;
+   void *Channel_Data;
 } AstChannelGlobals;
 
 #endif
@@ -400,6 +403,8 @@ void astInitChannelGlobals_( AstChannelGlobals * );
 /* -------------------------------- */
 AstObject *astRead_( AstChannel *, int * );
 int astWrite_( AstChannel *, AstObject *, int * );
+void astPutChannelData_( AstChannel *, void *, int * );
+void *astChannelData_( void );
 
 char *astSourceWrap_( const char *(*)( void ), int * );
 void astSinkWrap_( void (*)( const char * ), const char *, int * );
@@ -484,12 +489,16 @@ astINVOKE(O,astLoadChannel_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
    before use.  This provides a contextual error report if a pointer
    to the wrong sort of Object is supplied. */
 
-#define astRead(this) astINVOKE(O,astRead_(astCheckChannel(this),STATUS_PTR))
+#define astRead(this) \
+astINVOKE(O,astRead_(astCheckChannel(this),STATUS_PTR))
 #define astWrite(this,object) \
 astINVOKE(V,astWrite_(astCheckChannel(this),astCheckObject(object),STATUS_PTR))
+#define astPutChannelData(this,data) \
+astINVOKE(V,astPutChannelData_(astCheckChannel(this),data,STATUS_PTR))
 
 #define astSourceWrap astSourceWrap_
 #define astSinkWrap astSinkWrap_
+#define astChannelData astChannelData_()
 
 #if defined(astCLASS)            /* Protected */
 #define astClearComment(this) \
