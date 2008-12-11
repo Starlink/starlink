@@ -60,6 +60,8 @@
 *        Increase maximum line length to 300 characters.
 *     30-MAY-2006 (DSB):
 *        Moved into ATL library and changed prefix from "ATL1_" to "ATL_".
+*     11-DEC-2008 (DSB):
+*        Modified to call ATL_SHOW to do the work.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -72,7 +74,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
@@ -81,17 +82,8 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Global Variables.
-      INTEGER FD
-      COMMON /ATL1SNK/ FD
-
-*  External References:
-      EXTERNAL ATL_SNK
-
 *  Local Variables:
       CHARACTER FNAME*255
-      INTEGER CHAN
-      INTEGER NOBJ
 *.
 
 *  Check the inherited global status.
@@ -100,63 +92,13 @@
 *  Get the name of the output file.
       CALL PAR_GET0C( PARAM, FNAME, STATUS )
 
-*  We delete any pre-existing file first. 
-      CALL ATL_RM( FNAME, STATUS )
+*  Dump the object to the file.
+      CALL ATL_SHOW( IAST, FNAME, STATUS )
 
-*  Open a new file and get an FIO identifier for it.
-      CALL FIO_OPEN( FNAME, 'WRITE', 'LIST', 300, FD, STATUS )
-
-*  Create an AST Channel to write to the file.
-      CHAN = AST_CHANNEL( AST_NULL, ATL_SNK, ' ', STATUS )
-
-*  Write the Object to the Channel.
-      NOBJ = AST_WRITE( CHAN, IAST, STATUS )
-
-*  Report an error if no Object was written.      
-      IF( STATUS .EQ. SAI__OK .AND. NOBJ .EQ. 0 ) THEN
-         STATUS = SAI__ERROR
-         CALL MSG_SETC( 'F', FNAME )
-         CALL ERR_REP( 'ATL_CREAT_ERR1', 'Failed to write an AST '//
-     :                 'Object to file ''^F''.', STATUS )
-
-      ELSE
-         CALL MSG_SETC( 'F', FNAME )
-         CALL ATL_NOTIF( '   AST data written to text file ''^F''.', 
-     :                    STATUS )
-      END IF
-
-*  Annul the channel.
-      CALL AST_ANNUL( CHAN, STATUS )
-
-*  Close the file.
-      CALL FIO_CLOSE( FD, STATUS )
+*  Tell the user.
+      CALL MSG_SETC( 'F', FNAME )
+      CALL ATL_NOTIF( '   AST data written to text file ''^F''.', 
+     :                 STATUS )
 
       END
 
-
-      SUBROUTINE ATL_SNK( STATUS )
-
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'FIO_ERR'
-      
-*  Arguments:
-      INTEGER STATUS
-
-*  Global Variables.
-      INTEGER FD
-      COMMON /ATL1SNK/ FD
-
-*  Local Variables:
-      CHARACTER BUF*300
-      INTEGER NC
-
-*  Check the inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Read a line from the Channel.
-      CALL AST_GETLINE( BUF, NC, STATUS )
-
-*  If succesful, write it to the file.
-      IF( NC .GT. 0 ) CALL FIO_WRITE( FD, BUF( : NC ), STATUS )
-
-      END
