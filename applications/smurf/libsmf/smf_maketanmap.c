@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_maketanmap( double lon, double lat, AstMapping *cache[ 2 ],
-                      int *status )
+*                     int *status )
 
 *  Arguments:
 *     lon = double (Given)
@@ -84,7 +84,6 @@
 
 /* Starlink includes */
 #include "ast.h"
-#include "Ers.h"
 #include "ndf.h"
 #include "sae_par.h"
 
