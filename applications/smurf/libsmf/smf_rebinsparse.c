@@ -173,7 +173,7 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
 /* Local Variables */
    AstCmpMap *fmap = NULL;      /* Mapping from spectral grid to topo freq Hz */
    AstCmpMap *ssmap = NULL;     /* I/p GRID-> o/p PIXEL Mapping for spectral axis */
-   AstFitsChan *fc;             /* Storage for FITS headers */
+   AstFitsChan *fc = NULL;      /* Storage for FITS headers */
    AstFrame *specframe = NULL;  /* Spectral Frame in input FrameSet */
    AstFrame *specframe2 = NULL; /* Temporary copy of SpecFrame in input WCS */
    AstFrameSet *fs = NULL;      /* A general purpose FrameSet pointer */
@@ -182,8 +182,8 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
    AstMapping *specmap = NULL;  /* PIXEL -> Spec mapping in input FrameSet */
    char *fftwin = NULL;  /* Name of FFT windowing function */
    char *pname = NULL;   /* Name of currently opened data file */
-   const char *name;     /* Pointer to current detector name */
-   const double *tsys;   /* Pointer to Tsys value for first detector */
+   const char *name = NULL; /* Pointer to current detector name */
+   const double *tsys=NULL; /* Pointer to Tsys value for first detector */
    dim_t timeslice_size; /* No of detector values in one time slice */
    double *spectab = NULL;/* Workspace for spectral output grid positions */
    double *xin = NULL;   /* Workspace for detector input grid positions */
@@ -195,13 +195,13 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
    double fcon2;         /* Variance factor for whole file */
    double k;             /* Back-end degradation factor */
    double tcon;          /* Variance factor for whole time slice */
-   float *pdata;         /* Pointer to next data sample */
-   float *qdata;         /* Pointer to next data sample */
+   float *pdata = NULL;  /* Pointer to next data sample */
+   float *qdata = NULL;  /* Pointer to next data sample */
    float teff;           /* Effective integration time, times 4 */
    float texp;           /* Total time ( = ton + toff ) */
    float toff;           /* Off time */
    float ton;            /* On time */
-   int *nexttime;        /* Pointer to next time slice index to use */
+   int *nexttime = NULL; /* Pointer to next time slice index to use */
    int dim[ 3 ];         /* Output array dimensions */
    int found;            /* Was current detector name found in detgrp? */
    int good;             /* Are there any good detector samples? */
@@ -406,7 +406,7 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
       *fcon = VAL__BADD;
    }
 
-/* Initialise a pointer to the ntex time slice index to be used. */
+/* Initialise a pointer to the next time slice index to be used. */
    nexttime = ptime;
 
 /* Loop round all the time slices in the input file. */

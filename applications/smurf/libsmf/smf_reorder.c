@@ -183,10 +183,10 @@ void smf_reorderr( float *in, int ndim, int *dims_in, int axis, int *index,
    int i;
    int j;
    int plane_size;
-   int row_size;
+   int row_size = 0;
    size_t array_nbyte;
    size_t plane_nbyte;
-   size_t row_nbyte;
+   size_t row_nbyte = 0;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -325,10 +325,10 @@ void smf_reorderd( double *in, int ndim, int *dims_in, int axis, int *index,
    int i;
    int j;
    int plane_size;
-   int row_size;
+   int row_size = 0;
    size_t array_nbyte;
    size_t plane_nbyte;
-   size_t row_nbyte;
+   size_t row_nbyte = 0;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -466,10 +466,10 @@ void smf_reorderi( int *in, int ndim, int *dims_in, int axis, int *index,
    int i;
    int j;
    int plane_size;
-   int row_size;
+   int row_size = 0;
    size_t array_nbyte;
    size_t plane_nbyte;
-   size_t row_nbyte;
+   size_t row_nbyte = 0;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -608,10 +608,10 @@ void smf_reorderc( char *in, int len, int ndim, int *dims_in, int axis, int *ind
    int i;
    int j;
    int plane_size;
-   int row_size;
+   int row_size = 0;
    size_t array_nbyte;
    size_t plane_nbyte;
-   size_t row_nbyte;
+   size_t row_nbyte = 0;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;

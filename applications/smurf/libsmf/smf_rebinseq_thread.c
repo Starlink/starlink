@@ -68,6 +68,7 @@
 
 /* Smurf includes */
 #include "smf_typ.h"
+#include "smf.h"
 
 void smf_rebinseq_thread( void *data_ptr, int *status ){
 

@@ -78,6 +78,7 @@
 /* Starlink includes */
 #include "sae_par.h"
 #include "ast.h"
+#include "smf.h"
 
 int *smf_sorti( size_t nel, int *array, int *sorted, int *status ){
 
@@ -89,7 +90,7 @@ int *smf_sorti( size_t nel, int *array, int *sorted, int *status ){
    int *r = NULL;
    int *result = NULL;
    int done;
-   int i;
+   size_t i;
    int temp;
 
 /* Check the inherited status. */
