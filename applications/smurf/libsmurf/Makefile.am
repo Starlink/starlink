@@ -4,14 +4,35 @@ noinst_DATA = smurfmon.hlp
 
 libsmurf_la_SOURCES = $(C_ROUTINES)
 
-C_ROUTINES = smurf_extinction.c smurf_makemap.c smurf_flatfield.c smurf_remsky.c \
-smurf_qlmakemap.c smurf_scanfit.c smurf_sc2sim.c smurf_makecube.c \
-smurf_unmakecube.c \
-smurf_impaztec.c smurf_dreamweights.c smurf_dreamsolve.c smurf_badbolos.c \
-smurf_skynoise.c smurf_starecalc.c smurf_help.c smurf_rawunpress.c \
-smurf_timesort.c smurf_gsd2acsis.c smurf_sc2fts.c smurf_smurfcopy.c \
-smurf_sc2clean.c smurf_gsdshow.c smurf_sc2concat.c smurf_sc2fft.c \
-smurf_calcdark.c smurf_calcflat.c smurf_sc2threadtest.c
+C_ROUTINES = \
+smurf_badbolos.c \
+smurf_calcdark.c \
+smurf_calcflat.c \
+smurf_dreamsolve.c \
+smurf_dreamweights.c \
+smurf_extinction.c \
+smurf_flatfield.c \
+smurf_gsd2acsis.c \
+smurf_gsdshow.c \
+smurf_help.c \
+smurf_impaztec.c \
+smurf_makecube.c \
+smurf_makemap.c \
+smurf_qlmakemap.c \
+smurf_rawunpress.c \
+smurf_remsky.c \
+smurf_sc2clean.c \
+smurf_sc2concat.c \
+smurf_sc2fft.c \
+smurf_sc2fts.c \
+smurf_sc2sim.c \
+smurf_sc2threadtest.c \
+smurf_scanfit.c \
+smurf_skynoise.c \
+smurf_smurfcopy.c \
+smurf_starecalc.c \
+smurf_timesort.c \
+smurf_unmakecube.c
 
 noinst_INCLUDES = smurflib.h
 
