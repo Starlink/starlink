@@ -1187,3 +1187,5 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
 
 void smf_calcmodel_gai( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
 			smfArray **allmodel, int flags, int *status);
+
+void smf_request_mask( const char *param, smfArray ** bpms, int *status);
