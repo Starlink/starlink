@@ -13,9 +13,9 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_open_and_flatfield( const Grp *igrp, const Grp *ogrp, size_t index,
-*                             const smfArray* darks, smfData **data,
-*                             int *status );
+*     didflat = smf_open_and_flatfield( const Grp *igrp, const Grp *ogrp,
+*                             size_t index, const smfArray* darks,
+*                              smfData **data, int *status );
 
 *  Arguments:
 *     igrp = const Grp* (Given)
@@ -39,6 +39,10 @@
 *     where there is no output file, a copy is made of the relevant
 *     input data only, and the smfData is created with no smfFile
 *     struct.
+
+*  Returned Value:
+*     int = boolean
+*       True if data were flatfielded, false if the data were simply copied.
 
 *  Notes:
 
@@ -100,6 +104,8 @@
 *        Decide that masking should not be done by this routine since it does
 *        not have to be done prior to flatfielding and does not save much
 *        code in the caller (who just calls smf_apply_mask).
+*     2008-12-12 (TIMJ):
+*        Return boolean indicating whether the data were flatfielded or not.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -154,7 +160,7 @@
 
 #define FUNC_NAME "smf_open_and_flatfield"
 
-void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
+int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
                               const smfArray *darks, smfData **ffdata,
                               int *status) {
 
@@ -168,8 +174,9 @@ void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
   size_t npts = 0;          /* Number of data points */
   int flags = 0;            /* Flags for creating smfFile and smfHead */
   char prvname[2*PAR__SZNAM+1]; /* provenance ID string */
+  int retval = 0;           /* True if flatfielded */
 
-  if ( *status != SAI__OK ) return;
+  if ( *status != SAI__OK ) return retval;
 
   /* might be useful later on for provenance */
   smf_get_taskname( NULL, prvname, status );
@@ -240,7 +247,7 @@ void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
     if ( file != NULL ) {
       pname = file->name;
       msgSetc("FILE", pname);
-      msgOutif(MSG__VERB, " ", "Flatfielding file ^FILE", status);
+      msgOutif(MSG__VERB, " ", "Flatfielding file '^FILE'", status);
     }
     /* If ffdata is NULL then populate a struct to work with */
     if ( *ffdata == NULL ) {
@@ -267,6 +274,8 @@ void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
     /* Flatfield the data */
     smf_flatfield( data, ffdata, flags, status );
 
+    if (*status == SAI__OK) retval = 1;
+
     /* synchronize units and label with the new file */
     smf_write_clabels( *ffdata, status );
 
@@ -275,7 +284,8 @@ void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
     errAnnul( status );
 
     /* What if ffdata is NULL? */
-    msgOutif(MSG__DEBUG," ", "Data FF: Copying to output file ", status);
+    msgOutif(MSG__DEBUG," ", 
+             "Data already flatfielded. Copying to output file ", status);
     if ( *ffdata == NULL ) {
       /* Don't need the smfFile or smfDA components */
       flags |= SMF__NOCREATE_FILE;
@@ -301,4 +311,6 @@ void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
 
   /* Free resources for input data */
   smf_close_file( &data, status );
+
+  return retval;
 }
