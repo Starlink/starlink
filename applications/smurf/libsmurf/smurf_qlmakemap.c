@@ -442,7 +442,16 @@ void smurf_qlmakemap( int *status ) {
   
     msgOutif( MSG__VERB," ", "SMURF_QLMAKEMAP: Cleaning bolometer data.", 
               status );
-  
+
+    /* Apply bad pixel mask to the quality array - noting that 
+       smf_update_valbad will apply the mask to the data array.
+       Also note that this uses smf_update_quality to do the masking
+       which we call immediately afterwards to mask out dead bolometers.
+       Clearly would be more efficient if badfrac could be given to
+       smf_apply_mask.
+    */
+    smf_apply_mask( data, bpms, SMF__BPM_QUAL, status );
+
     /* Update quality array */
     smf_update_quality( data, NULL, 1, NULL, 0.05, status );
 
