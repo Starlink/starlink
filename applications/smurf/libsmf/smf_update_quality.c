@@ -24,15 +24,16 @@
 *     target = unsigned char* (Given)
 *        If defined update this buffer instead of the QUALITY in data
 *     syncbad = int (Given)
-*        If set ensure that every bad pixel (VAL__BADD) in the data array
+*        If set ensure that every bad pixel (VAL__BADx) in the data array
 *        has a corresponding quality of SMF__Q_BADS.
 *     badmask = const int* (Given)
 *        Integer array with same dimensions as bolometers.
-*        Each position that is bad will set SMF__Q_BAD for all data
+*        Each position that is bad will set SMF__Q_BADB for all data
 *        for that detector. Can be NULL. The value for non-bad pixels does
 *        not matter.
 *     badfrac = double (Given)
-*        If nonzero, fraction of samples for entire bolo to be flagged as bad.
+*        If nonzero, fraction of samples for entire bolo to be flagged as bad
+*        using SMF__Q_BADB.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -48,6 +49,8 @@
 *     status is set (SAI__ERROR) and the function returns.
 
 *  Notes:
+*     - If badfrac is true but syncbad is false, the data array will be checked
+*       for badness in addition to the quality array.
 
 *  Authors:
 *     EC: Ed Chapin (UBC)
@@ -71,6 +74,8 @@
 *        - remove requirement for DOUBLE
 *     2008-12-03 (TIMJ):
 *        Use modified smf_get_dims
+*     2008-12-12 (TIMJ):
+*        Check data array when badfrac is true buy syncbad is false.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -163,13 +168,19 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
   smf_get_dims( data, &nbolo, &ntslice, &ndata, &bstride, &tstride, status );
 
   if( *status == SAI__OK ) {
+    /* some pointers to the data array if needed */
+    double * ddata = NULL;
+    int * idata = NULL;
+
+    /* we will need the data array if we are checking it for bad values
+       or looking for bad fraction */
+    if (syncbad || badfrac) {
+      smf_select_pntr( data->pntr, data->dtype, &ddata, NULL,
+                       &idata, NULL, status);
+    }
     
     /* Synchronize SMF__Q_BADS quality and VAL__BADD in data array */
     if( syncbad ) {
-      double * ddata = NULL;
-      int * idata = NULL;
-      smf_select_pntr( data->pntr, data->dtype, &ddata, NULL,
-                       &idata, NULL, status);
       if (data->dtype == SMF__DOUBLE) {
         for( i=0; i<ndata; i++ ) {    /* Loop over all samples */
           if (ddata[i] == VAL__BADD) {
@@ -216,9 +227,19 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
         if( badfrac && !isbad ) {
           nbad = 0;
 
-          /* Loop over samples and count the number with SMF__Q_BADS set */
+          /* Loop over samples and count the number with SMF__Q_BADS set.
+             Note that if syncbad is false we also check the data array. */
           for( j=0; j<ntslice; j++ ) {
-            if( qual[tstride*j + c] & SMF__Q_BADS ) nbad ++;
+            size_t ind = tstride*j+c;
+            if( qual[ind] & SMF__Q_BADS ) {
+              nbad ++;
+            } else if (!syncbad) {
+              if (idata && idata[ind] == VAL__BADI) {
+                nbad++;
+              } else if (ddata && ddata[ind] == VAL__BADD) {
+                nbad++;
+              }
+            }
           }
 
           if( nbad > badthresh ) {
