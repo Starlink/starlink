@@ -1189,3 +1189,11 @@ void smf_calcmodel_gai( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 			smfArray **allmodel, int flags, int *status);
 
 void smf_request_mask( const char *param, smfArray ** bpms, int *status);
+
+AstMapping *smf_maketanmap( double lon, double lat, AstMapping *cache[ 2 ],
+                            int *status );
+
+void smf_model_createHdr( smfData *model, smf_modeltype type, 
+                          smfHead *refhdr, int *status );
+
+
