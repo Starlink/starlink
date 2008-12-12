@@ -49,6 +49,8 @@
 *        Initial version.
 *     2008-12-01 (TIMJ):
 *        Add QUALITY option
+*     2008-12-11 (TIMJ):
+*        Mask data before masking quality.
 
 *  Notes:
 *      - for efficiency use SMF__BPM_QQUAL alone. All other methods
@@ -202,7 +204,17 @@ void smf_apply_mask( smfData *indata, const smfArray *bpms,
       }
     }
 
-    /* mask the quality array */
+    /* mask the data array */
+    if (method & SMF__BPM_DATA) {
+      masked = 1;
+      smf_subtract_dark( indata, bpm, NULL, SMF__DKSUB_PREV, status );
+    }
+
+    /* mask the quality array after masking the data array. This results
+       in the bad values from the mask being set to SMF__Q_BADS as well
+       as SMF__Q_BADB if data array masking is enabled. This may or may
+       not be a good idea.
+    */
     if ( method & (SMF__BPM_QUAL | SMF__BPM_QQUAL) ) {
       masked = 1;
       if (indata->pntr[2]) {
@@ -233,12 +245,6 @@ void smf_apply_mask( smfData *indata, const smfArray *bpms,
                   status);
         }
       }
-    }
-
-    /* mask the data array */
-    if (method & SMF__BPM_DATA) {
-      masked = 1;
-      smf_subtract_dark( indata, bpm, NULL, SMF__DKSUB_PREV, status );
     }
 
     /* clean up resources */
