@@ -469,7 +469,8 @@ typedef struct smfDIMMData {
   smfArray **noi;            /* array of smfArray's of variance estimates */ 
   smfArray **qua;            /* array of smfArray's of quality flags */ 
   smfArray **lut;            /* array of smfArray's of pointing LUTs */ 
-  smfArray **ext;            /* array of smfArray's of extinction corrections*/
+  smfArray **ext;            /* array of smfArray's of extinction corrections */
+  smfArray **gai;            /* array of smfArray's of bolo gain corrections */
   double *map;               /* pointer to the current map estimate */
   double *mapvar;            /* pointer to the current map variance estimate */
   double *chisquared;        /* chisquared at each chunk */
