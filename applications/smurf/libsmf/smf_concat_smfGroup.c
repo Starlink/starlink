@@ -408,7 +408,7 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
              require flat-fielding. */
 
           smf_open_and_flatfield( igrp->grp, NULL, igrp->subgroups[j][i], 
-                                  darks, NULL, &refdata, status );
+                                  darks, &refdata, status );
 
           /* Calculate the pointing LUT if requested */
           if( !(flags & SMF__NOCREATE_LUT) && outfset ) {

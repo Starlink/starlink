@@ -186,7 +186,7 @@ void smurf_remsky( int * status ) {
     /* Propagate input files to output */
     for (i=1; i<=size; i++) {
       /* This seems inefficient but it works */
-      smf_open_and_flatfield( igrp, ogrp, i, darks, NULL, &odata, status );
+      smf_open_and_flatfield( igrp, ogrp, i, darks, &odata, status );
       smf_close_file( &odata, status);
     }
     /* Group output files together now that they exist */
@@ -203,7 +203,7 @@ void smurf_remsky( int * status ) {
   } else {
     for (i=1; i<=size && *status == SAI__OK; i++) {
       /* Flatfield - if necessary */
-      smf_open_and_flatfield( igrp, ogrp, i, darks, NULL, &odata, status );
+      smf_open_and_flatfield( igrp, ogrp, i, darks, &odata, status );
 
       if (*status != SAI__OK) {
         /* Tell the user which file it was... */
