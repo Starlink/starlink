@@ -91,7 +91,7 @@ smf_rebinslices.c smf_spreadwidth.c smf_rebincube_seqf.c smf_rebinseq_thread.c \
 smf_threads.c smf_get_nthread.c smf_rebincube_paste_thread.c smf_ndf_sbnd.c \
 smf_lock_data.c smf_convert_bad.c smf_open_group.c smf_difftime.c \
 smf_lock_related.c smf_choose_closest.c smf_apply_dark.c smf_apply_mask.c \
-smf_apodize.c \
+smf_apodize.c smf_calcmodel_gai.c \
 $(BUILT_C_ROUTINES)
 
 noinst_INCLUDES = smf.h smf_typ.h smf_threads.h
