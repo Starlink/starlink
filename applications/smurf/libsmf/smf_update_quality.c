@@ -24,11 +24,13 @@
 *     target = unsigned char* (Given)
 *        If defined update this buffer instead of the QUALITY in data
 *     syncbad = int (Given)
-*        If set synchronize SMF__Q_BADS quality flag with VAL__BADD in data
+*        If set ensure that every bad pixel (VAL__BADD) in the data array
+*        has a corresponding quality of SMF__Q_BADS.
 *     badmask = const int* (Given)
 *        Integer array with same dimensions as bolometers.
 *        Each position that is bad will set SMF__Q_BAD for all data
-*        for that detector. Can be NULL.
+*        for that detector. Can be NULL. The value for non-bad pixels does
+*        not matter.
 *     badfrac = double (Given)
 *        If nonzero, fraction of samples for entire bolo to be flagged as bad.
 *     status = int* (Given and Returned)
