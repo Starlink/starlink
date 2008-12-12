@@ -125,39 +125,10 @@ EOF
             $fproto =~ s/CGEN_TYPE/int/g;
             print OUTFILE "$fproto\n";
 
-            $denames = $enames;
-            $denames =~ s/:Xtype:/double/g;
-            $fenames = $enames;
-            $fenames =~ s/:Xtype:/float/g;
-            $ienames = $enames;
-            $ienames =~ s/:Xtype:/int/g;
-            
-            $pars = "type";
-            if( $names ) {
-               $pars .= ",$names";
-            }
-
-            if( $ftype =~ /\*/ ) {
-               $null = "NULL";
-            } else {
-               $null = "0";
-            }
-   
-            print OUTFILE <<EOF;
-#define $base($pars) \\
-   ( ( type == SMF__DOUBLE ) ? \\
-      ${base}D( $denames ) : \\
-   ( ( type == SMF__FLOAT ) ? \\
-      ${base}F( $fenames ) : \\
-   ( ( type == SMF__INTEGER ) ? \\
-      ${base}I( $ienames ) : ($ftype) \\
-   ( ( *status == SAI__OK ) ? \\
-      *status = SAI__ERROR, \\
-      msgSeti( "TYPE", type ), \\
-      errRep( "SMURF_BADTYPE", "Bad data type (^TYPE) used when invoking " \\
-              "name (internal SMURF programming error).", status),$null:$null ) ) )
-
-EOF
+            $fproto = $proto;
+            $fproto =~ s/<X>/B/g;
+            $fproto =~ s/CGEN_TYPE/char/g;
+            print OUTFILE "$fproto\n";
 
             last;
 

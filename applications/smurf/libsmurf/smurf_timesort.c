@@ -579,7 +579,7 @@ void smurf_timesort( int *status ) {
                if( there ) {
                   ndfMap( indf1, comp[ i ], "_REAL", "READ", &ipin, &el, status );
                   ndfMap( indf2, comp[ i ], "_REAL", "WRITE", &ipout, &el, status );
-                  smf_reorderr( (float *) ipin, ndim, dims, 2, index, 1, mask, 
+                  smf_reorderF( (float *) ipin,1,ndim, dims, 2, index, 1, mask, 
                                 (float *) ipout, status );
                }
             }
