@@ -202,6 +202,8 @@
 *     2008-11-25 (DSB):
 *        Free the bolonoise array within smf_rebinmap rather than in this
 *        function.
+*     2008-12-11 (TIMJ):
+*        Use smf_request_mask and smf_apply_mask
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -262,7 +264,6 @@
 void smurf_qlmakemap( int *status ) {
 
   /* Local Variables */
-  Grp *bpmgrp = NULL;        /* Group of bad pixel masks */
   smfArray *bpms = NULL;     /* Bad pixel masks */
   double *bolonoise=NULL;    /* Noise estimate for each detector */
   smfArray *darks = NULL;    /* Dark data */
@@ -335,17 +336,7 @@ void smurf_qlmakemap( int *status ) {
   }
 
   /* Get group of pixel masks and read them into a smfArray */
-  if (*status == SAI__OK) {
-    size_t nbpm;
-    kpg1Rgndf( "BPM", 0, 1, "", &bpmgrp, &nbpm, status );
-    if (*status == PAR__NULL) {
-      bpms = NULL;
-      errAnnul( status );
-    } else {
-      smf_open_group( bpmgrp, NULL, &bpms, status );
-    }
-    if (bpmgrp) grpDelet( &bpmgrp, status );
-  }
+  smf_request_mask( "BPM", &bpms, status );
 
   /* Get the celestial coordinate system for the output image. */
   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
@@ -552,7 +543,7 @@ void smurf_qlmakemap( int *status ) {
   }
 
   /* Tidy up and close the output file */  
-  smf_close_file ( &odata, status );
+  if (odata) smf_close_file ( &odata, status );
   if( ogrp ) grpDelet( &ogrp, status );
   if( darks ) smf_close_related( &darks, status );
   if( bpms ) smf_close_related( &bpms, status );

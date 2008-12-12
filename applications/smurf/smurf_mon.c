@@ -352,6 +352,7 @@ void smurf_mon( int * status ) {
    * with the MEM_DEBUG flag. If this is the case, then it frees all AST 
    * internal structures, and report the number of memory blocks that have 
    * not been freed (useful for identifying memory leaks). */
+  astActiveMemory( "at end" );
   astFlushMemory( 1 );
 }
 
