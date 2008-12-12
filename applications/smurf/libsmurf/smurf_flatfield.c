@@ -65,8 +65,10 @@
 *     2006-01-27 (TIMJ):
 *        Can now smf_close_file
 *     2008-07-18 (TIMJ):
-*        Use kaplibs routine to get in and out files so that the counts match properly.
-*        Locate darks in input list.
+*        Use kaplibs routine to get in and out files so that the counts match
+*        properly. Locate darks in input list.
+*     2008-12-12 (TIMJ):
+*        Fix reporting of whether or not the flatfield was applied.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -157,26 +159,27 @@ void smurf_flatfield( int *status ) {
   }
 
   for (i=1; i<=size; i++ ) {
+    int didflat;
 
     if (*status != SAI__OK) break;
 
     /* Call flatfield routine */
-    smf_open_and_flatfield(igrp, ogrp, i, darks, &ffdata, status);
+    didflat = smf_open_and_flatfield(igrp, ogrp, i, darks, &ffdata, status);
 
-    /* Check status to see if data are already flatfielded */
-    if (*status == SMF__FLATN) {
-      errAnnul( status );
-      msgOutif(MSG__VERB," ",
-	     "Data are already flatfielded", status);
-    } else if ( *status == SAI__OK) {
-      msgOutif(MSG__VERB," ", "Flat field applied", status);
-    } else {
-      /* Tell the user which file it was... */
-      /* Would be user-friendly to trap 1st etc... */
-      /*errFlush( status );*/
-      msgSeti("I",i);
+    /* Report failure by adding a message indicating which file failed */
+    msgSeti("I",i);
+    if (*status != SAI__OK) {
       msgSeti("N",size);
       errRep(FUNC_NAME,	"Unable to flatfield data from file ^I of ^N", status);
+      break;
+    }
+
+    /* in verbose mode report whether flatfielding occurred or not */
+    if (!didflat) {
+      msgOutif(MSG__VERB," ",
+	     "Data from file ^I are already flatfielded", status);
+    } else {
+      msgOutif(MSG__VERB," ", "Flat field applied to file ^I", status);
     }
     /* Free resources for output data */
     smf_close_file( &ffdata, status );
