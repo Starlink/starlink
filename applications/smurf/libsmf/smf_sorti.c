@@ -116,7 +116,7 @@ int *smf_sorti( size_t nel, int *array, int *sorted, int *status ){
    }
 
 /* Allocate the returned array. */
-   result = astMalloc( sizeof( int )*nel );
+   result = astMalloc( sizeof( *result )*nel );
    if( result ) {
 
 /* If the array is already sorted decreasing, set up a suitable index to

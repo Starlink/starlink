@@ -293,7 +293,7 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
 /* Create a table with one element for each channel in the input array,
    holding the index of the nearest corresponding output channel. */
    nchan = (data->dims)[ 0 ];
-   spectab = astMalloc( sizeof( double )*nchan );
+   spectab = astMalloc( sizeof( *spectab )*nchan );
    if( spectab ) {
       for( ichan = 0; ichan < nchan; ichan++ ) spectab[ ichan ] = ichan + 1;
       astTran1( ssmap, nchan, spectab, 1, spectab );
@@ -313,10 +313,10 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
 
 /* Allocate work arrays big enough to hold the coords of all the
    detectors in the current input file.*/
-   xin = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
-   yin = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
-   xout = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
-   yout = astMalloc( (data->dims)[ 1 ] * sizeof( double ) );
+   xin = astMalloc( (data->dims)[ 1 ] * sizeof( *xin ) );
+   yin = astMalloc( (data->dims)[ 1 ] * sizeof( *yin ) );
+   xout = astMalloc( (data->dims)[ 1 ] * sizeof( *xout ) );
+   yout = astMalloc( (data->dims)[ 1 ] * sizeof( *yout ) );
 
 /* Initialise a string to point to the name of the first detector for which 
    data is available */
