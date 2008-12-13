@@ -31,8 +31,10 @@
 *        Pointer to global status.
 
 *  Description:
-*     Presently this is a dummy routine since the actual calculation of this
-*     model occurs within smf_calcmodel_com.
+*     Presently this is mostly a dummy routine since the actual calculation of 
+*     this model occurs within smf_calcmodel_com. With the SMF__DIMM_INVERT
+*     flag, however, the gain correction applied in smf_calcmodel_com is
+*     undone to prepare for the next iteration.
 
 *  Notes:
 
@@ -43,6 +45,8 @@
 *  History:
 *     2008-12-11 (EC):
 *        Initial Version
+*     2008-12-12 (EC):
+*        Add inverse capability
 *     {enter_further_changes_here}
 
 
@@ -89,11 +93,75 @@ void smf_calcmodel_gai( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 			smfArray **allmodel, int flags, int *status) {
 
   /* Local Variables */
-                                   
-  /* Main routine */
-  if (*status != SAI__OK) return;
+  size_t bstride;               /* bolometer stride */
+  size_t gbstride;              /* GAIn bolo stride */
+  size_t gcstride;              /* GAIn coeff stride */
+  dim_t i;                      /* Loop counter */
+  dim_t idx=0;                  /* Index within subgroup */
+  dim_t j;                      /* Loop counter */
+  unsigned char mask;           /* Bitmask for quality */
+  smfArray *model=NULL;         /* Pointer to model at chunk */
+  double *model_data=NULL;      /* Pointer to DATA component of model */
+  dim_t nbolo;                  /* Number of bolometers */
+  dim_t ndata;                  /* Number of data points */
+  dim_t ntslice;                /* Number of time slices */
+  smfArray *qua=NULL;           /* Pointer to QUA at chunk */
+  unsigned char *qua_data=NULL; /* Pointer to quality data */
+  smfArray *res=NULL;           /* Pointer to RES at chunk */
+  double *res_data=NULL;        /* Pointer to DAT */
+  double scale;                 /* Scale factor */
+  size_t tstride;               /* time slice stride */
 
-  return;
+  /* Main routine */
+  if( *status != SAI__OK ) return;
+  if( !(flags&SMF__DIMM_INVERT) ) return;
+
+  /* Obtain pointers to relevant smfArrays for this chunk */
+  res = dat->res[chunk];
+  qua = dat->qua[chunk];
+  model = allmodel[chunk];
+
+  /* Loop over index in subgrp (subarray) */
+  for( idx=0; idx<res->ndat; idx++ ) {
+
+    /* Ensure everything is in bolo-order */
+    smf_dataOrder( res->sdata[idx], 0, status );
+    smf_dataOrder( qua->sdata[idx], 0, status );
+    smf_dataOrder( model->sdata[idx], 0, status );
+
+    /* Get pointers to DATA components */
+    res_data = (res->sdata[idx]->pntr)[0];
+    qua_data = (qua->sdata[idx]->pntr)[0];
+    model_data = (model->sdata[idx]->pntr)[0];
+
+    if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
+      *status = SAI__ERROR;
+      errRep("", FUNC_NAME ": Null data in inputs", status);      
+    } else {
+	
+      /* Get the raw data dimensions */
+      smf_get_dims( res->sdata[idx], &nbolo, &ntslice, &ndata,
+                    &bstride, &tstride, status);
+
+      smf_get_dims( model->sdata[idx], NULL, NULL, NULL,
+                    &gbstride, &gcstride, status);
+
+      /* Which QUALITY bits should be considered for ignoring data */
+      mask = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_APOD);
+
+      /* Undo the gain correction stored in GAI */
+      for( i=0; i<nbolo; i++ ) {
+        if( !(qua_data[i*bstride]&SMF__Q_BADB) && (model_data[i*gbstride]>0) ) {
+          scale = 1./model_data[i*gbstride];
+          for( j=0; j<ntslice; j++ ) {
+            if( !(qua_data[i*bstride + j*tstride]&mask) ) {
+              res_data[i*bstride + j*tstride] *= scale;
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 

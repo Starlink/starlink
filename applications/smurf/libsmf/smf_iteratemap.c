@@ -162,6 +162,8 @@
 *        Steptime is now in smfHead.
 *     2008-09-30 (EC):
 *        Use smf_write_smfData instead of smf_NDFexport
+*     2008-12-12 (EC):
+*        Extra re-normalization required for GAIn model
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -252,6 +254,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
   int f_nnotch=0;               /* Number of notch filters in array */
   int f_nnotch2=0;              /* Number of notch filters in array */
   int haveext=0;                /* Set if EXT is one of the models */
+  int havegai=0;                /* Set if GAI is one of the models */
   int havenoi=0;                /* Set if NOI is one of the models */
   smfHead *hdr=NULL;            /* Pointer to smfHead */
   dim_t i;                      /* Loop counter */
@@ -307,6 +310,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
   double *var_data=NULL;        /* Pointer to DATA component of NOI */
   int varmapmethod=0;           /* Method for calculating varmap */
   dim_t whichext=0;             /* Model index of EXT if present */
+  dim_t whichgai=0;             /* Model index of GAI if present */
   dim_t whichnoi=0;             /* Model index of NOI if present */
 
   /* Main routine */
@@ -582,6 +586,12 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
                 if( thismodel == SMF__EXT ) {
                   haveext = 1;
                   whichext = nmodels; 
+                }
+
+                /* set havegai/whichgai */
+                if( thismodel == SMF__GAI ) {
+                  havegai = 1;
+                  whichgai = nmodels; 
                 }
               }
               nmodels++;
@@ -902,7 +912,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
       } else {
         dat.ext = NULL;
       }
-
+      if( havegai ) {
+        dat.gai = model[whichgai];
+      } else {
+        dat.gai = NULL;
+      }
       quit = 0;
       iter = 0;
       while( !quit ) {
@@ -1161,10 +1175,13 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
               smf_open_related_model( resgroup, i, "UPDATE", &res[i], status );
               smf_open_related_model( lutgroup, i, "UPDATE", &lut[i], status );
               smf_open_related_model( quagroup, i, "UPDATE", &qua[i], status );
-	      
               if( haveext ) {
                 smf_open_related_model( modelgroups[whichext], i, "UPDATE", 
                                         &model[whichext][i], status );
+              }
+              if( havegai ) {
+                smf_open_related_model( modelgroups[whichgai], i, "UPDATE", 
+                                        &model[whichgai][i], status );
               }
             }
 
@@ -1179,10 +1196,15 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
             /* If EXTinction was applied during this iteration, AST and RES
                are currently in units of Jy. Un-do the EXTinction correction
                here so that RES is in the right units again before starting
-               the next iteration */
+               the next iteration. Ditto for GAIn. */
 
             if( haveext ) {
               smf_calcmodel_ext( &dat, i, keymap, model[whichext], 
+                                 SMF__DIMM_INVERT, status );
+            }
+
+            if( havegai ) {
+              smf_calcmodel_gai( &dat, i, keymap, model[whichgai], 
                                  SMF__DIMM_INVERT, status );
             }
 
@@ -1192,9 +1214,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
               smf_close_related( &res[i], status );
               smf_close_related( &lut[i], status );
               smf_close_related( &qua[i], status );
-
               if( haveext ) {
                 smf_close_related( &model[whichext][i], status );
+              }
+              if( havegai ) {
+                smf_close_related( &model[whichgai][i], status );
               }
             }
           }
