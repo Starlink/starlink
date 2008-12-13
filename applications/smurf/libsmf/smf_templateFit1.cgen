@@ -72,6 +72,8 @@
 *        Initial version
 *     2008-10-01 (EC):
 *        Added quality checking
+*     2008-12-12 (EC):
+*        Don't set values to BAD if there is no estimate when removing template
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -225,18 +227,14 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, unsigned char *qual,
           for( i=0; i<n; i++ ) {
             if( (data[off] != CGEN_BAD) && (template[i] != VAL__BADD) ) {
               data[off] -= (CGEN_TYPE) (a*template[i] + b);
-            } else {
-              data[off] = CGEN_BAD;
-            }
+            } 
             off += stride;
           }     
         } else {
           for( i=0; i<n; i++ ) {
             if( (data[i] != CGEN_BAD) && (template[i] != VAL__BADD) ) {
               data[i] -= (CGEN_TYPE) (a*template[i] + b);
-            } else {
-              data[i] = CGEN_BAD;
-            }
+            } 
           }
         }
       }
