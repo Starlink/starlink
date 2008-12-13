@@ -136,7 +136,7 @@ void smurf_remsky( int * status ) {
 
   smfArray *relfiles = NULL; /* Array of related files */
   int group = 0;             /* Parameter to determine whether or not
-				to group related files */
+                                to group related files */
   smfGroup *ogroup = NULL;   /* Group storing related files */
 
   /* Main routine */
@@ -161,14 +161,14 @@ void smurf_remsky( int * status ) {
                &ogrp, &outsize, status );
   } else {
     msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
-       " nothing to sky remove", status );
+             " nothing to sky remove", status );
   }
 
   if (*status != SAI__OK) goto CLEANUP;
 
   /* Get sky subtraction METHOD */
   parChoic( "METHOD", "PLANE", "Plane, Polynomial", 1,  method, 
-	    LEN__METHOD, status);
+            LEN__METHOD, status);
 
   /* Do we want to group related files? */
   parGet0l( "GROUP", &group, status);
@@ -177,7 +177,7 @@ void smurf_remsky( int * status ) {
   if ( strncmp( method, "PL", 2 ) == 0 ) {
     /* Timeslice-based sky removal */
     parChoic( "FIT", "SLOPE", "Mean, Slope, Plane", 
-	      1, fittype, LEN__METHOD, status);
+              1, fittype, LEN__METHOD, status);
   }
 
   if (*status != SAI__OK) goto CLEANUP;
@@ -194,9 +194,9 @@ void smurf_remsky( int * status ) {
     if ( *status == SAI__OK ) {
       /* Open and process related files */
       for (i=0; i<ogroup->ngroups; i++) {
-	smf_open_related( ogroup, i, "UPDATE", &relfiles, status );
-	smf_subtract_plane( NULL, relfiles, fittype, status );
-	smf_close_related( &relfiles, status );
+        smf_open_related( ogroup, i, "UPDATE", &relfiles, status );
+        smf_subtract_plane( NULL, relfiles, fittype, status );
+        smf_close_related( &relfiles, status );
       }
     }
     smf_close_smfGroup( &ogroup, status );
