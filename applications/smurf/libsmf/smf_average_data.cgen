@@ -13,18 +13,18 @@
 *     Library routine
 
 *  Invocation:
-*     void smf_average_data<X>( const smfData *data, int start,  int nslice, 
-*                       const int interval, CGEN_TYPE **avdata, size_t *nelem,
+*     void smf_average_data<X>( const smfData *data, dim_t start, dim_t nslice, 
+*                       const dim_t interval, CGEN_TYPE **avdata, size_t *nelem,
 *                       int *status);
 
 *  Arguments:
 *     data = const smfData * (Given)
 *        Input data
-*     start = int (Given)
+*     start = dim_t (Given)
 *        Index of starting time slice
-*     nslice = int (Given)
+*     nslice = dim_t (Given)
 *        Number of time slices to average together
-*     interval = const int (Given)
+*     interval = const dim_t (Given)
 *        Averaging interval
 *     avdata = CGEN_TYPE ** (Returned)
 *        Pointer to 2 or 3-D array of averaged data. Must be freed by
@@ -69,7 +69,7 @@
 *        Deal with bad values so that if all the input values are bad,
 *        the output is set bad as well.
 *     2008-12-12 (TIMJ):
-*        Generic version.
+*        Generic version. Use smf_get_dims and smf_dtype_check_fatal
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -117,59 +117,35 @@
 
 #define FUNC_NAME "smf_average_dataD"
 
-void CGEN_FUNCTION(smf_average_data)( const smfData *data, int start,  int nslice, 
-                                      const int interval, CGEN_TYPE **avdata,
+void CGEN_FUNCTION(smf_average_data)( const smfData *data, dim_t start,  dim_t nslice, 
+                                      const dim_t interval, CGEN_TYPE **avdata,
                                       size_t *nelem, int *status) {
 
   int base;                 /* Base index */
   CGEN_TYPE currentdata;    /* Value of current data point */
-  int i;                    /* Loop counter */
-  int j;                    /* Loop counter */
-  int k;                    /* Loop counter */
-  int lastslice;            /* Index of the last time slice in the current sum */
-  int nbad;		    /* Number of data points with a bad value */
-  int nbol;                 /* Number of data points per timeslice (bolometers) */
-  int nframes;              /* Number of time slices in input data */
-  int nsamples;             /* Number of time slices in the average */
-  int noutslice = 1;        /* Number of output time slices */
-  int offset;               /* Offset into output array for current data value */
+  dim_t i;                  /* Loop counter */
+  dim_t j;                  /* Loop counter */
+  dim_t k;                  /* Loop counter */
+  dim_t lastslice;          /* Index of the last time slice in the current sum */
+  size_t nbad;		          /* Number of data points with a bad value */
+  dim_t nbol;               /* Number of data points per timeslice (bolometers) */
+  dim_t nframes;            /* Number of time slices in input data */
+  dim_t nsamples;           /* Number of time slices in the average */
+  dim_t noutslice = 1;      /* Number of output time slices */
+  dim_t offset;             /* Offset into output array for current data value */
   CGEN_BIG_TYPE sum;        /* Sum of input data */
   CGEN_TYPE *tstream = NULL;/* Pointer to input data stream */
 
   if ( *status != SAI__OK ) return;
 
   /* Do we have 3-d time-series data? */
-  if ( data->ndims != 3 ) {
-    if ( *status == SAI__OK ) {
-      *status = SAI__ERROR;
-      msgSeti("N",data->ndims);
-      errRep( FUNC_NAME, 
-              "Input data not in time-series format (ndims = ^N, should be 3)", 
-              status );
-      return;
-    }
-  }
+  smf_get_dims(data, &nbol, &nframes, NULL, NULL, NULL, status );
 
   /* check type */
-  if (data->dtype != CGEN_SMF_TYPE) {
-    const char * typestr = NULL;
-    typestr = smf_dtype_str( data->dtype, status);
-    *status = SAI__ERROR;
-    if (typestr) {
-      msgSetc( "TYP", typestr );
-    } else {
-      msgSetc( "TYP", "UNDEF" );
-    }
-    msgSetc( "CTYP", CGEN_HDS_TYPE );
-    errRep(" ", FUNC_NAME ": This function averages ^CTYP only not ^TYP",
-           status );
-    return;
-  }
+  if ( !smf_dtype_check_fatal(data, NULL, CGEN_SMF_TYPE, status) ) return;
 
-  /* OK we have 3-D data so retrieve the number of time slices */
-  nframes = (data->dims)[2];
-  /* Check that the starting value is valid */
-  if ( start < 0 || start > nframes-1 ) {
+  /* Check that the starting value is valid - note we are using unsigned types */
+  if ( start > nframes-1 ) {
     if ( *status == SAI__OK ) {
       *status = SAI__ERROR;
       msgSeti("I",start);
@@ -236,13 +212,12 @@ void CGEN_FUNCTION(smf_average_data)( const smfData *data, int start,  int nslic
     noutslice = interval;
   }
 
-  nbol = (data->dims)[0] * (data->dims)[1];
   *nelem = nbol * noutslice;
 
   /* Retrieve pointer to the input data */
   tstream = (data->pntr)[0];
   /* Allocate space for output data */
-  *avdata = smf_malloc( *nelem, sizeof(double), 1, status );
+  *avdata = smf_malloc( *nelem, sizeof(*avdata), 1, status );
   if ( *status == SAI__OK ) {
     /* All's well so calculate average values */
     base = start + interval - 1;
