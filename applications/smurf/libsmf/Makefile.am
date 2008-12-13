@@ -229,8 +229,6 @@ smf_scanfit.c \
 smf_select_pntr.c \
 smf_set_clabels.c \
 smf_set_moving.c \
-smf_sortd.c \
-smf_sorti.c \
 smf_sparsebounds.c \
 smf_spreadwidth.c \
 smf_stats1.c \
