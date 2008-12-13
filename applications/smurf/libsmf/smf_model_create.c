@@ -204,6 +204,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
                        smfArray **mdata, int *status ) {
 
   /* Local Variables */
+  size_t bstride;               /* Bolometer stride in data array */
   void *buf=NULL;               /* Pointer to total container buffer */
   int copyinput=0;              /* If set, container is copy of input */
   smfData *data = NULL;         /* Data struct for file */
@@ -237,6 +238,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
   char suffix[] = SMF__DIMM_SUFFIX; /* String containing model suffix */
   double tau;                   /* 225 GHz optical depth */
   dim_t thisnrel;               /* Number of related items for this model */
+  size_t tstride;               /* Time slice stride in data array */
   double val;                   /* Temporary value */
 
   /* Main routine */
@@ -514,14 +516,17 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
 
           case SMF__GAI: /* Gain/offset for each bolometer */
             head.data.dtype = SMF__DOUBLE;
-            head.data.ndims = 3;
-            head.data.dims[2] = 3; /* Gain, Offset, Correlation coefficient */
+            head.data.ndims = 3; /* Gain, Offset, Correlation coefficient */
+
+            /* Note that we're using the time axis to store the coefficients */
             if( isTordered ) {
               head.data.dims[SMF__ROW_INDEX] = (idata->dims)[SMF__ROW_INDEX];
               head.data.dims[SMF__COL_INDEX] = (idata->dims)[SMF__COL_INDEX];
+              head.data.dims[2] = 3; 
             } else {
-              head.data.dims[SMF__ROW_INDEX] = (idata->dims)[1+SMF__ROW_INDEX];
-              head.data.dims[SMF__COL_INDEX] = (idata->dims)[1+SMF__COL_INDEX];
+              head.data.dims[0] = 3;
+              head.data.dims[1+SMF__ROW_INDEX]=(idata->dims)[1+SMF__ROW_INDEX];
+              head.data.dims[1+SMF__COL_INDEX]=(idata->dims)[1+SMF__COL_INDEX];
             }
             break;
 
@@ -689,13 +694,14 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
               head.data.pntr[0] = NULL;
             } else if( mtype == SMF__GAI ) {
               /* Initialize gain to 1, offset to 0, correlation to 0 */
-              nbolo = head.data.dims[SMF__ROW_INDEX]*
-                head.data.dims[SMF__COL_INDEX];
-              for( k=0; k<3; k++ ) {
-                if( !k ) val = 1;
+              smf_get_dims( &(head.data), &nbolo, NULL, NULL, &bstride, 
+                            &tstride, status);
+
+              for( k=0; k<3; k++ ) { /* planes along tslice axis */
+                if( k==0 ) val = 1;
                 else val = 0;
                 for( l=0; l<nbolo; l++ ) {
-                  ((double *)dataptr)[nbolo*k + l] = val;
+                  ((double *)dataptr)[l*bstride + k*tstride] = val;
                 }
               }
             } else {
