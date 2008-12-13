@@ -27,6 +27,7 @@
 *          -- CGEN_FUNCTION
 *          -- CGEN_HDS_TYPE
 *          -- CGEN_TYPE
+*          -- CGEN_BIG_TYPE
 *
 *          You need to use CGEN_FUNCTION as part of the normal function
 *          declaration so that generic forms of the function name can be
@@ -61,6 +62,11 @@
 *          The value of CGEN_HDS_TYPE will be set to the HDS type of the
 *          current type, one of "_DOUBLE", "_REAL", "_INTEGER", "_WORD"
 *          "_UWORD", "_BYTE" or "_UBYTE".
+*
+*          CGEN_BIG_TYPE is a type that is fundamentally the same type
+*          as CGEN_TYPE but can have more precision. For example, int vs
+*          long, or float vs double. Can be used when you need to accumulate
+*          values of type CGEN_TYPE.
 *
 *        - Create a C file that includes the generic code, once for each of
 *          the data types you want (this file can also contain related
