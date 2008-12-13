@@ -1126,9 +1126,6 @@ void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status );
 void smf_calcmodel_dks( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
 			smfArray **allmodel, int flags, int *status);
 
-void smf_model_createhdr( smfData *model, smf_modeltype type, 
-                          smfHead *refhdr, int *status );
-
 void smf_model_stripsuffix( const char *instr, char *outstr, int *status );
 
 void smf_bolonoise( smfData *data, size_t window, double f_low, 
