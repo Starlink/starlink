@@ -119,7 +119,7 @@
 #define FUNC_NAME "smf_average_data"
 
 void smf_average_dataI( const smfData *data, int start,  int nslice, 
-                       const int interval, int **avdata, size_t *nelem, int *status) {
+                        const int interval, int **avdata, size_t *nelem, int *status) {
 
   int base;                 /* Base index */
   int currentdata;       /* Value of current data point */
@@ -257,7 +257,7 @@ void smf_average_dataI( const smfData *data, int start,  int nslice,
       for ( j=0; j<nbol; j++ ) {
         sum = 0.0;
         nsamples = 0;
-	nbad = 0;
+        nbad = 0;
         /* Sum all the contributions from that element in the desired
            range of time slices */
         for ( k=base; k<lastslice; k++ ) {
@@ -266,16 +266,16 @@ void smf_average_dataI( const smfData *data, int start,  int nslice,
             sum += currentdata;
             nsamples++;
           } else {
-	    nbad++;
-	  }
+            nbad++;
+          }
         }
         /* Calculate the average and store it in the output array */
-	if ( nbad == (lastslice - base) ) {
-	  (*avdata)[j + offset] = VAL__BADI;
-	} else {
-	  sum /= nsamples;
-	  (*avdata)[j + offset] = sum;
-	}
+        if ( nbad == (lastslice - base) ) {
+          (*avdata)[j + offset] = VAL__BADI;
+        } else {
+          sum /= nsamples;
+          (*avdata)[j + offset] = sum;
+        }
       }
     }
   } else {
