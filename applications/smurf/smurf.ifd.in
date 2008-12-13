@@ -799,16 +799,6 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
-            parameter bpm {
-                type NDF
-                access READ
-                vpath DEFAULT
-                ppath CURRENT DEFAULT
-                prompt {Bad pixel masks}
-                default !
-                helpkey *
-            }
-
             parameter in {
                 position 1
                 type NDF
