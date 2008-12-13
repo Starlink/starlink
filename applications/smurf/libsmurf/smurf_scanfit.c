@@ -25,6 +25,13 @@
 *    of the fit added to the NDF.
 
 *  ADAM Parameters:
+*     BPM = NDF (Read)
+*          Group of files to be used as bad pixel masks. Each data file
+*          specified with the IN parameter will be masked. The corresponding
+*          previous mask for a subarray will be used. If there is no previous
+*          mask the closest following will be used. It is not an error for
+*          no mask to match. A NULL parameter indicates no mask files to be
+*          supplied. [!]
 *     IN = NDF (Read)
 *          Input file(s). Can include darks. If relevant darks are located
 *          they will be subtracted from the non-dark observations.
@@ -43,6 +50,8 @@
 *        Initial test version, modified from simulator written by BDK.
 *     2008-07-22 (TIMJ):
 *        Use kaplibs and do dark subtraction.
+*     2008-12-12 (TIMJ):
+*        Add bad pixel masking. Do not trap SMF__FLATN.
 
 *  Notes:
 
@@ -101,6 +110,7 @@
 
 void smurf_scanfit( int * status ) {
 
+  smfArray *bpms = NULL;     /* Bad pixel masks */
   smfArray *darks = NULL;   /* Dark data */
   smfData *ffdata = NULL;    /* Pointer to output data struct */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
@@ -139,24 +149,24 @@ void smurf_scanfit( int * status ) {
   /* Get order of polynomial */
   parGet0i( "ORDER", &order, status);
 
+  /* Get group of pixel masks and read them into a smfArray */
+  smf_request_mask( "BPM", &bpms, status );
+
   /* Loop over all files */
   for (i=1; i<=size; i++) {
-    /* Flatfield - if necessary */
+    if (*status != SAI__OK) break;
+
+    /* Flatfield if necessary */
     smf_open_and_flatfield( igrp, ogrp, i, darks, &ffdata, status );
-    if (*status == SMF__FLATN) {
-      errAnnul( status );
-      msgOutif(MSG__VERB, "",
-	     FUNC_NAME ": Data are already flatfielded", status);
-    } else if ( *status == SAI__OK) {
-      msgOutif(MSG__VERB," ","Flatfield applied", status);
-    } else {
-      /* Tell the user which file it was... */
-      /* Would be user-friendly to trap 1st etc... */
-      errFlush( status );
+
+    if (*status != SAI__OK) {
       msgSeti("I",i);
       msgSeti("N",size);
       errRep(FUNC_NAME, "Unable to flatfield data from file ^I of ^N", status);
     }
+
+    /* Mask out bad pixels - mask data array not quality array */
+    smf_apply_mask( ffdata, bpms, SMF__BPM_DATA, status );
 
     smf_scanfit( ffdata, NULL, order, status );
 
@@ -166,7 +176,9 @@ void smurf_scanfit( int * status ) {
 
   /* Tidy up after ourselves */
   if (darks) smf_close_related( &darks, status );
+  if (bpms) smf_close_related( &bpms, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
+
   ndfEnd( status );
 }

@@ -26,6 +26,13 @@
 *  Notes:
 
 *  ADAM Parameters:
+*     BPM = NDF (Read)
+*          Group of files to be used as bad pixel masks. Each data file
+*          specified with the IN parameter will be masked. The corresponding
+*          previous mask for a subarray will be used. If there is no previous
+*          mask the closest following will be used. It is not an error for
+*          no mask to match. A NULL parameter indicates no mask files to be
+*          supplied. [!]
 *     IN = NDF (Read)
 *          Input files to be processed. Non-darks will be filtered out.
 *     OUT = NDF (Write)
@@ -33,6 +40,7 @@
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
+*     Andy Gibb (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -40,6 +48,8 @@
 *        Initial version.
 *     2008-11-12 (AGG)
 *        Check status before beginning loop
+*     2008-12-12 (TIMJ):
+*        Allow BPM masking.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -94,6 +104,7 @@
 
 void smurf_calcdark( int *status ) {
 
+  smfArray *bpms = NULL;    /* Bad pixel masks */
   smfArray *darks = NULL;   /* set of processed darks */
   Grp *dgrp = NULL;         /* Group of darks */
   size_t i;                 /* Loop index */
@@ -120,6 +131,9 @@ void smurf_calcdark( int *status ) {
   kpg1Wgndf( "OUT", dgrp, size, size, "More output files required...",
              &ogrp, &outsize, status );
 
+  /* Get group of pixel masks and read them into a smfArray */
+  smf_request_mask( "BPM", &bpms, status );
+
   for (i=1; i<=size && *status == SAI__OK; i++ ) {
     smfData * dark = (darks->sdata)[i-1]; /* This dark */
     char *pname = NULL;
@@ -132,6 +146,7 @@ void smurf_calcdark( int *status ) {
     /* need the output filename */
     pname = filename;
     grpGet( ogrp, i, 1, &pname, sizeof(filename), status );
+    smf_apply_mask( dark, bpms, SMF__BPM_DATA, status );
     smf_write_smfData( dark, NULL, NULL, filename, indf, status );
     ndfAnnul( &indf, status);
   }
@@ -140,6 +155,7 @@ void smurf_calcdark( int *status ) {
   grpDelet( &dgrp, status);
   grpDelet( &ogrp, status);
   smf_close_related( &darks, status );
+  smf_close_related( &bpms, status );
 
   ndfEnd( status );
 }

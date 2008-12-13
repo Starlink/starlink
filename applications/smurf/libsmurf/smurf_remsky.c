@@ -23,6 +23,13 @@
 *     This is the main routine implementing the sky removal task.
 
 *  ADAM Parameters:
+*     BPM = NDF (Read)
+*          Group of files to be used as bad pixel masks. Each data file
+*          specified with the IN parameter will be masked. The corresponding
+*          previous mask for a subarray will be used. If there is no previous
+*          mask the closest following will be used. It is not an error for
+*          no mask to match. A NULL parameter indicates no mask files to be
+*          supplied. [!]
 *     IN = NDF (Read)
 *          Input file(s)
 *     METHOD = CHAR (Read)
@@ -58,6 +65,8 @@
 *        Update data file title.
 *     2008-07-22 (TIMJ):
 *        Use kaplibs for group param in/out. Handle darks.
+*     2008-12-12 (TIMJ):
+*        Add BPM masking.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -122,7 +131,8 @@
 void smurf_remsky( int * status ) {
 
   /* Local Variables */
-  smfArray *darks = NULL;   /* Dark data */
+  smfArray *bpms = NULL;     /* Bad pixel masks */
+  smfArray *darks = NULL;    /* Dark data */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
   size_t i;                  /* Loop counter */
   Grp *igrp = NULL;          /* Input group */
@@ -166,6 +176,9 @@ void smurf_remsky( int * status ) {
 
   if (*status != SAI__OK) goto CLEANUP;
 
+  /* Get group of pixel masks and read them into a smfArray */
+  smf_request_mask( "BPM", &bpms, status );
+
   /* Get sky subtraction METHOD */
   parChoic( "METHOD", "PLANE", "Plane, Polynomial", 1,  method, 
             LEN__METHOD, status);
@@ -187,6 +200,8 @@ void smurf_remsky( int * status ) {
     for (i=1; i<=size; i++) {
       /* This seems inefficient but it works */
       smf_open_and_flatfield( igrp, ogrp, i, darks, &odata, status );
+      /* Mask out bad pixels - mask data array not quality array */
+      smf_apply_mask( odata, bpms, SMF__BPM_DATA, status );
       smf_close_file( &odata, status);
     }
     /* Group output files together now that they exist */
@@ -204,6 +219,9 @@ void smurf_remsky( int * status ) {
     for (i=1; i<=size && *status == SAI__OK; i++) {
       /* Flatfield - if necessary */
       smf_open_and_flatfield( igrp, ogrp, i, darks, &odata, status );
+
+      /* Mask out bad pixels - mask data array not quality array */
+      smf_apply_mask( odata, bpms, SMF__BPM_DATA, status );
 
       if (*status != SAI__OK) {
         /* Tell the user which file it was... */
@@ -237,6 +255,7 @@ void smurf_remsky( int * status ) {
   /* Tidy up after ourselves: release the resources used by the grp routines  */
  CLEANUP:
   if (darks) smf_close_related( &darks, status );
+  if (bpms) smf_close_related( &bpms, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
 

@@ -23,6 +23,13 @@
 *     This is the main routine implementing the EXTINCTION task.
 
 *  ADAM Parameters:
+*     BPM = NDF (Read)
+*          Group of files to be used as bad pixel masks. Each data file
+*          specified with the IN parameter will be masked. The corresponding
+*          previous mask for a subarray will be used. If there is no previous
+*          mask the closest following will be used. It is not an error for
+*          no mask to match. A NULL parameter indicates no mask files to be
+*          supplied. [!]
 *     IN = NDF (Read)
 *          Input file(s)
 *     METHOD = CHAR (Read)
@@ -99,6 +106,8 @@
 *        Use kaplibs for group param in/out. Handle darks.
 *     2008-07-28 (TIMJ):
 *        Use smf_calc_meantau. use parGdr0d to handle NULL easier.
+*     2008-12-12 (TIMJ):
+*        Add bad pixel masking.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -161,7 +170,8 @@
 void smurf_extinction( int * status ) {
 
   /* Local Variables */
-  smfArray *darks = NULL;   /* Dark data */
+  smfArray *bpms = NULL;     /* Bad pixel masks */
+  smfArray *darks = NULL;    /* Dark data */
   double deftau = 0.0;       /* Default value for the zenith tau */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
   char filter[81];           /* Name of filter */
@@ -203,6 +213,9 @@ void smurf_extinction( int * status ) {
              " nothing to extinction correct", status );
   }
 
+  /* Get group of pixel masks and read them into a smfArray */
+  smf_request_mask( "BPM", &bpms, status );
+
   /* Get METHOD */
   parChoic( "METHOD", "CSOTAU", 
             "CSOtau, Filtertau, WVMraw", 1,
@@ -221,6 +234,9 @@ void smurf_extinction( int * status ) {
       msgSeti("I",i);
       errRep(TASK_NAME, "Unable to open the ^I th file", status);
     }
+
+    /* Mask out bad pixels - mask data array not quality array */
+    smf_apply_mask( odata, bpms, SMF__BPM_DATA, status );
 
     /* Now check that the data are sky-subtracted */
     if ( !smf_history_check( odata, "smf_subtract_plane", status ) ) {
@@ -277,6 +293,7 @@ void smurf_extinction( int * status ) {
   }
   /* Tidy up after ourselves: release the resources used by the grp routines  */
   if (darks) smf_close_related( &darks, status );
+  if (bpms) smf_close_related( &bpms, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
 

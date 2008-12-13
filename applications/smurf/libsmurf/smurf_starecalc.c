@@ -27,6 +27,13 @@
 *     automatically calculate that number to give 1-second averages.
 
 *  ADAM Parameters:
+*     BPM = NDF (Read)
+*          Group of files to be used as bad pixel masks. Each data file
+*          specified with the IN parameter will be masked. The corresponding
+*          previous mask for a subarray will be used. If there is no previous
+*          mask the closest following will be used. It is not an error for
+*          no mask to match. A NULL parameter indicates no mask files to be
+*          supplied. [!]
 *     IN = NDF (Read)
 *          Name of input data files
 *     OUT = NDF (Write)
@@ -49,6 +56,8 @@
 *        Use kaplibs and support dark subtraction.
 *     2008-11-13 (AGG):
 *        Add NAVER as a parameter
+*     2008-12-12 (TIMJ):
+*        Add BPM parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -114,6 +123,7 @@
 void smurf_starecalc ( int *status ) {
 
   /* Local Variables */
+  smfArray *bpms = NULL;          /* Bad pixel masks */
   smfArray *darks = NULL;         /* Dark data */
   smfData *data = NULL;           /* Input data */
   Grp *fgrp = NULL;               /* Filtered group, no darks */
@@ -149,6 +159,9 @@ void smurf_starecalc ( int *status ) {
        " nothing to do", status );
   }
 
+  /* Get group of pixel masks and read them into a smfArray */
+  smf_request_mask( "BPM", &bpms, status );
+
   /* Get number of frames to average over */
   if ( *status == SAI__OK ) {
     parGet0i( "NAVER", &naver, status );
@@ -168,6 +181,9 @@ void smurf_starecalc ( int *status ) {
     /* Open file and flatfield the data */
     smf_open_and_flatfield( igrp, ogrp, i, darks, &data, status );
 
+    /* Mask out bad pixels - mask data array not quality array */
+    smf_apply_mask( data, bpms, SMF__BPM_DATA, status );
+
     smf_calc_stareimage( data, naver, status );
 
     /* Check status to see if there was a problem */
@@ -184,6 +200,7 @@ void smurf_starecalc ( int *status ) {
 
   /* Free up resources */
   if (darks) smf_close_related( &darks, status );
+  if (bpms) smf_close_related( &bpms, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
 
