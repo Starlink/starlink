@@ -534,7 +534,7 @@ void smurf_timesort( int *status ) {
    
 /* Obtain a sorted index for the TCS_TAI values in the JCMTSTATE
    extension. */
-         index = smf_sortd( ntai, tai_ptr, &sorted, status );
+         index = smf_sortD( ntai, tai_ptr, &sorted, status );
    
 /* Free the TCS_TAI array now so that we can re-access the array later
    when we come to re-order each array in the JCMTSTATE extension. */
@@ -1056,7 +1056,7 @@ void smurf_timesort( int *status ) {
       
 /* Get an array holding an index of the "rts" and "file_index" arrays that 
    accesses the arrays in order of increasing rts_num value. */
-            index = smf_sorti( nts_in, rts, &sorted, status );
+            index = smf_sortI( nts_in, rts, &sorted, status );
       
 /* Note the number of unique RTS_NUM values. */
             nts_out = 0;
