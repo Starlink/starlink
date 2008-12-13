@@ -197,6 +197,9 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
           total += (maxlen + nrow*3)*ncol*smf_dtype_sz(SMF__DOUBLE,status) *
             nrelated;
           break;
+        case SMF__GAI:
+          total += 3*nrow*ncol*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
+          break;
 	default:
 	  *status = SAI__ERROR;
 	  errRep("", FUNC_NAME ": Invalid smf_modeltype given.", status);

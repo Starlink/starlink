@@ -212,6 +212,11 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
       /* Don't know how to make a particularly meaningful framset */
       fset = NULL;
       break;
+
+    case SMF__GAI:
+      /* Don't know how to make a particularly meaningful framset */
+      fset = NULL;
+      break;
       
     default:
       *status = SAI__ERROR;

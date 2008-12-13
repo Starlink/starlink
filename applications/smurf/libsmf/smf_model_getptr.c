@@ -114,6 +114,10 @@ smf_calcmodelptr smf_model_getptr( smf_modeltype type, int *status) {
     retval = (smf_calcmodelptr) &smf_calcmodel_dks;
     break;
 
+  case SMF__GAI:
+    retval = (smf_calcmodelptr) &smf_calcmodel_gai;
+    break;
+
   default:
     msgSetc( "NM", smf_model_getname(type, status) );
     *status = SAI__ERROR;
