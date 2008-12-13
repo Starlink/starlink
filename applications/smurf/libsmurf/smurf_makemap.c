@@ -32,6 +32,13 @@
 *        values of the input data positions being compared directly,
 *        disregarding the fact that a given AZEL will correspond to
 *        different positions on the sky at different times. [FALSE]
+*     BPM = NDF (Read)
+*          Group of files to be used as bad pixel masks. Each data file
+*          specified with the IN parameter will be masked. The corresponding
+*          previous mask for a subarray will be used. If there is no previous
+*          mask the closest following will be used. It is not an error for
+*          no mask to match. A NULL parameter indicates no mask files to be
+*          supplied. [!]
 *     CONFIG = GROUP (Read) 
 *        Specifies values for the configuration parameters used by the
 *        iterative map maker (METHOD=ITERATE). If the string "def"
@@ -449,6 +456,8 @@
 *        attempting string comparison
 *     2008-08-27 (AGG):
 *        Factor out WCS check for moving sources to smf_set_moving
+*     2008-12-12 (TIMJ):
+*        Add BPM parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -529,6 +538,7 @@ void smurf_makemap( int *status ) {
   char basename[ GRP__SZNAM + 1 ]; /* Output base file name */
   int blank=0;                 /* Was a blank line just output? */
   smfBox *boxes = NULL;      /* Pointer to array of i/p file bounding boxes */
+  smfArray *bpms = NULL;     /* Bad pixel masks */
   Grp *confgrp = NULL;       /* Group containing configuration file */
   smfArray *darks = NULL;   /* Dark data */
   smfData *data=NULL;        /* Pointer to SCUBA2 data struct */
@@ -633,6 +643,9 @@ void smurf_makemap( int *status ) {
              " nothing from which to make a map", status );
     goto L998;
   }
+
+  /* Get group of pixel masks and read them into a smfArray */
+  smf_request_mask( "BPM", &bpms, status );
 
   /* Get the celestial coordinate system for the output map */
   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
@@ -991,6 +1004,9 @@ void smurf_makemap( int *status ) {
                       status );
           }
 
+          /* Mask out bad pixels - mask data array not quality array */
+          smf_apply_mask( data, bpms, SMF__BPM_DATA, status );
+
           /* Rebin the data onto the output grid. This also closes the
              data file.  */
           smf_rebinmap( wf, data, NULL, (first ? 1 : ifile), ilast, wcstile2d,
@@ -1275,6 +1291,7 @@ void smurf_makemap( int *status ) {
   if( boxes ) boxes = smf_free( boxes, status );
   if( tiles ) tiles = smf_freetiles( tiles, ntile, status );
   if( darks ) smf_close_related( &darks, status );
+  if( bpms ) smf_close_related( &bpms, status );
 
   ndfEnd( status );
   
