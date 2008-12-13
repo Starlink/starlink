@@ -31,6 +31,13 @@
 *     the MEANWVM tau value (at 225 GHz) from the FITS header.
 
 *  ADAM Parameters:
+*     BPM = NDF (Read)
+*          Group of files to be used as bad pixel masks. Each data file
+*          specified with the IN parameter will be masked. The corresponding
+*          previous mask for a subarray will be used. If there is no previous
+*          mask the closest following will be used. It is not an error for
+*          no mask to match. A NULL parameter indicates no mask files to be
+*          supplied. [!]
 *     GENVAR = _LOGICAL (Read)
 *          Flag to denote whether or not variances are to be generated
 *          in the output file. The task runs slightly quicker if

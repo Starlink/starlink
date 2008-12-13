@@ -269,9 +269,10 @@ package @PACKAGE@ {
             parameter bpm {
                 type NDF
                 access READ
-                vpath {PROMPT }
-                ppath CURRENT
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
                 prompt {Bad pixel masks}
+                default !
                 helpkey *
             }
 
@@ -361,9 +362,10 @@ package @PACKAGE@ {
             parameter bpm {
                 type NDF
                 access READ
-                vpath {PROMPT }
-                ppath CURRENT
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
                 prompt {Bad pixel masks}
+                default !
                 helpkey *
             }
 
@@ -661,9 +663,10 @@ package @PACKAGE@ {
             parameter bpm {
                 type NDF
                 access READ
-                vpath {PROMPT }
-                ppath CURRENT
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
                 prompt {Bad pixel masks}
+                default !
                 helpkey *
             }
 
@@ -756,9 +759,10 @@ package @PACKAGE@ {
             parameter bpm {
                 type NDF
                 access READ
-                vpath {PROMPT }
-                ppath CURRENT
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
                 prompt {Bad pixel masks}
+                default !
                 helpkey *
             }
 
@@ -798,9 +802,10 @@ package @PACKAGE@ {
             parameter bpm {
                 type NDF
                 access READ
-                vpath {PROMPT }
-                ppath CURRENT
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
                 prompt {Bad pixel masks}
+                default !
                 helpkey *
             }
 
@@ -840,9 +845,10 @@ package @PACKAGE@ {
             parameter bpm {
                 type NDF
                 access READ
-                vpath {PROMPT }
-                ppath CURRENT
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
                 prompt {Bad pixel masks}
+                default !
                 helpkey *
             }
 
@@ -889,9 +895,10 @@ package @PACKAGE@ {
             parameter bpm {
                 type NDF
                 access READ
-                vpath {PROMPT }
-                ppath CURRENT
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
                 prompt {Bad pixel masks}
+                default !
                 helpkey *
             }
 
@@ -955,9 +962,10 @@ package @PACKAGE@ {
             parameter bpm {
                 type NDF
                 access READ
-                vpath {PROMPT }
-                ppath CURRENT
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
                 prompt {Bad pixel masks}
+                default !
                 helpkey *
             }
 
@@ -1154,9 +1162,10 @@ package @PACKAGE@ {
             parameter bpm {
                 type NDF
                 access READ
-                vpath {PROMPT }
-                ppath CURRENT
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
                 prompt {Bad pixel masks}
+                default !
                 helpkey *
             }
 
