@@ -78,6 +78,7 @@
 /* Starlink includes */
 #include "sae_par.h"
 #include "ast.h"
+
 #include "smf.h"
 
 int *smf_sorti( size_t nel, int *array, int *sorted, int *status ){
