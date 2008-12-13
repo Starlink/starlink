@@ -69,6 +69,7 @@
 *        properly. Locate darks in input list.
 *     2008-12-12 (TIMJ):
 *        Fix reporting of whether or not the flatfield was applied.
+*        Enable bad pixel masking.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -124,6 +125,7 @@
 
 void smurf_flatfield( int *status ) {
 
+  smfArray *bpms = NULL;     /* Bad pixel masks */
   smfArray *darks = NULL;   /* Dark data */
   smfData *ffdata = NULL;   /* Pointer to output data struct */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
@@ -158,6 +160,9 @@ void smurf_flatfield( int *status ) {
        " nothing to flatfield", status );
   }
 
+  /* Get group of pixel masks and read them into a smfArray */
+  smf_request_mask( "BPM", &bpms, status );
+
   for (i=1; i<=size; i++ ) {
     int didflat;
 
@@ -181,6 +186,10 @@ void smurf_flatfield( int *status ) {
     } else {
       msgOutif(MSG__VERB," ", "Flat field applied to file ^I", status);
     }
+
+    /* Mask out bad pixels - mask data array not quality array */
+    smf_apply_mask( ffdata, bpms, SMF__BPM_DATA, status );
+
     /* Free resources for output data */
     smf_close_file( &ffdata, status );
   }
@@ -189,6 +198,7 @@ void smurf_flatfield( int *status ) {
   if (igrp) grpDelet( &igrp, status);
   if (ogrp) grpDelet( &ogrp, status);
   smf_close_related( &darks, status );
+  smf_close_related( &bpms, status );
   ndfEnd( status );
 }
 

@@ -1,3 +1,4 @@
+# -*- tcl -*-
 #+
 #  Name:
 #     smurf.ifd
@@ -192,6 +193,8 @@
 #         Add OUT parameter to SC2CONCAT
 #     13-NOV-2008 (AGG):
 #         Add NAVER parameter to STARECALC
+#     12-DEC-2008 (TIMJ):
+#         Add BPM masking param
 #     {enter_changes_here}
 
 #  Bugs:
@@ -262,6 +265,15 @@ package @PACKAGE@ {
         action extinction {
 
             helplib {$SMURF_HELP}
+
+            parameter bpm {
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath CURRENT
+                prompt {Bad pixel masks}
+                helpkey *
+            }
 
             parameter in {
                 position 1
@@ -343,6 +355,15 @@ package @PACKAGE@ {
                 ppath CURRENT
                 prompt {Align data in the output spatial co-ordinate system?}
                 default FALSE
+                helpkey *
+            }
+
+            parameter bpm {
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath CURRENT
+                prompt {Bad pixel masks}
                 helpkey *
             }
 
@@ -732,6 +753,15 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
+            parameter bpm {
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath CURRENT
+                prompt {Bad pixel masks}
+                helpkey *
+            }
+
             parameter in {
                 position 1
                 type NDF
@@ -765,6 +795,15 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
+            parameter bpm {
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath CURRENT
+                prompt {Bad pixel masks}
+                helpkey *
+            }
+
             parameter in {
                 position 1
                 type NDF
@@ -797,6 +836,15 @@ package @PACKAGE@ {
         action scanfit {
 
             helplib {$SMURF_HELP}
+
+            parameter bpm {
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath CURRENT
+                prompt {Bad pixel masks}
+                helpkey *
+            }
 
             parameter in {
                 position 1
@@ -837,6 +885,15 @@ package @PACKAGE@ {
         action remsky {
 
             helplib {$SMURF_HELP}
+
+            parameter bpm {
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath CURRENT
+                prompt {Bad pixel masks}
+                helpkey *
+            }
 
             parameter in {
                 position 1
@@ -894,6 +951,15 @@ package @PACKAGE@ {
         action calcdark {
 
             helplib {$SMURF_HELP}
+
+            parameter bpm {
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath CURRENT
+                prompt {Bad pixel masks}
+                helpkey *
+            }
 
             parameter in {
                 position 1
@@ -1084,6 +1150,15 @@ package @PACKAGE@ {
         action starecalc {
 
             helplib {$SMURF_HELP}
+
+            parameter bpm {
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath CURRENT
+                prompt {Bad pixel masks}
+                helpkey *
+            }
 
             parameter in {
                 position 1
