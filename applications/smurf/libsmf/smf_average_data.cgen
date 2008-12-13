@@ -1,4 +1,4 @@
-/*
+/* -*- C -*-
 *+
 *  Name:
 *     smf_average_dataD
@@ -13,8 +13,8 @@
 *     Library routine
 
 *  Invocation:
-*     smf_average_dataD( const smfData *data, int start,  int nslice, 
-*                       const int interval, double **avdata, size_t *nelem,
+*     void smf_average_data<X>( const smfData *data, int start,  int nslice, 
+*                       const int interval, CGEN_TYPE **avdata, size_t *nelem,
 *                       int *status);
 
 *  Arguments:
@@ -26,7 +26,7 @@
 *        Number of time slices to average together
 *     interval = const int (Given)
 *        Averaging interval
-*     avdata = double ** (Returned)
+*     avdata = CGEN_TYPE ** (Returned)
 *        Pointer to 2 or 3-D array of averaged data. Must be freed by
 *        caller.
 *     nelem = size_t * (Returned)
@@ -46,13 +46,13 @@
 *     to 0, irrespective of the value of interval.
 
 *  Notes:
-*     - Should only be used on _DOUBLE (flatfielded) data.
-*     - See also smf_average_dataI
+*     - Can be used on multiple types.
 *     - The caller should free the memory allocated in avdata by this routine
 *     by using smf_free.
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -68,6 +68,8 @@
 *     2008-11-13 (AGG):
 *        Deal with bad values so that if all the input values are bad,
 *        the output is set bad as well.
+*     2008-12-12 (TIMJ):
+*        Generic version.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -100,6 +102,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 
 /* Starlink includes */
 #include "sae_par.h"
@@ -114,11 +117,12 @@
 
 #define FUNC_NAME "smf_average_dataD"
 
-void smf_average_dataD( const smfData *data, int start,  int nslice, 
-                        const int interval, double **avdata, size_t *nelem, int *status) {
+void CGEN_FUNCTION(smf_average_data)( const smfData *data, int start,  int nslice, 
+                                      const int interval, CGEN_TYPE **avdata,
+                                      size_t *nelem, int *status) {
 
   int base;                 /* Base index */
-  double currentdata;       /* Value of current data point */
+  CGEN_TYPE currentdata;    /* Value of current data point */
   int i;                    /* Loop counter */
   int j;                    /* Loop counter */
   int k;                    /* Loop counter */
@@ -129,8 +133,8 @@ void smf_average_dataD( const smfData *data, int start,  int nslice,
   int nsamples;             /* Number of time slices in the average */
   int noutslice = 1;        /* Number of output time slices */
   int offset;               /* Offset into output array for current data value */
-  double sum;               /* Sum of input data */
-  double *tstream = NULL;   /* Pointer to input data stream */
+  CGEN_BIG_TYPE sum;        /* Sum of input data */
+  CGEN_TYPE *tstream = NULL;/* Pointer to input data stream */
 
   if ( *status != SAI__OK ) return;
 
@@ -147,7 +151,7 @@ void smf_average_dataD( const smfData *data, int start,  int nslice,
   }
 
   /* check type */
-  if (data->dtype != SMF__DOUBLE) {
+  if (data->dtype != CGEN_SMF_TYPE) {
     const char * typestr = NULL;
     typestr = smf_dtype_str( data->dtype, status);
     *status = SAI__ERROR;
@@ -156,7 +160,8 @@ void smf_average_dataD( const smfData *data, int start,  int nslice,
     } else {
       msgSetc( "TYP", "UNDEF" );
     }
-    errRep(" ", FUNC_NAME ": This function averages _DOUBLE only not ^TYP",
+    msgSetc( "CTYP", CGEN_HDS_TYPE );
+    errRep(" ", FUNC_NAME ": This function averages ^CTYP only not ^TYP",
            status );
     return;
   }
@@ -258,7 +263,7 @@ void smf_average_dataD( const smfData *data, int start,  int nslice,
            range of time slices */
         for ( k=base; k<lastslice; k++ ) {
           currentdata = tstream[j + k*nbol];
-          if ( currentdata != VAL__BADD ) {
+          if ( currentdata != CGEN_BAD ) {
             sum += currentdata;
             nsamples++;
           } else {
@@ -267,7 +272,7 @@ void smf_average_dataD( const smfData *data, int start,  int nslice,
         }
         /* Calculate the average and store it in the output array */
         if ( nbad == (lastslice - base) ) {
-          (*avdata)[j + offset] = VAL__BADD;
+          (*avdata)[j + offset] = CGEN_BAD;
         } else {
           sum /= nsamples;
           (*avdata)[j + offset] = sum;

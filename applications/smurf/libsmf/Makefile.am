@@ -5,7 +5,8 @@ noinst_LTLIBRARIES = libsmf.la
 
 libsmf_la_SOURCES = $(C_ROUTINES)
 
-CGENERIC_ROUTINES = smf_boxcar1.cgen smf_templateFit1.cgen smf_sort.c
+CGENERIC_ROUTINES = smf_boxcar1.cgen smf_templateFit1.cgen smf_sort.cgen \
+	smf_average_data.cgen
 
 # The .c files which are built from the above .cgen files.
 BUILT_C_ROUTINES = $(CGENERIC_ROUTINES:.cgen=.c)
@@ -18,8 +19,6 @@ smf_addto_smfArray.c \
 smf_apodize.c \
 smf_apply_dark.c \
 smf_apply_mask.c \
-smf_average_dataD.c \
-smf_average_dataI.c \
 smf_bolonoise.c \
 smf_calc_covar.c \
 smf_calc_fcon.c \
@@ -284,18 +283,24 @@ $(CGENERIC_ROUTINES:.cgen=.c):
 	echo "#include \"cgeneric.h\"" >> $@
 	echo "" >> $@
 	echo "#define CGEN_CODE_TYPE CGEN_DOUBLE_TYPE" >> $@
+	echo "#define CGEN_SMF_TYPE SMF__DOUBLE" >> $@
 	echo "#include \"cgeneric_defs.h\"" >> $@
 	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_SMF_TYPE" >> $@
 	echo "#undef CGEN_CODE_TYPE" >> $@
 	echo "" >> $@
 	echo "#define CGEN_CODE_TYPE CGEN_FLOAT_TYPE" >> $@
+	echo "#define CGEN_SMF_TYPE SMF__FLOAT" >> $@
 	echo "#include \"cgeneric_defs.h\"" >> $@
 	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_SMF_TYPE" >> $@
 	echo "#undef CGEN_CODE_TYPE" >> $@
 	echo "" >> $@
 	echo "#define CGEN_CODE_TYPE CGEN_INT_TYPE" >> $@
+	echo "#define CGEN_SMF_TYPE SMF__INTEGER" >> $@
 	echo "#include \"cgeneric_defs.h\"" >> $@
 	echo "#include \"$(@:.c=.cgen)\"" >> $@
+	echo "#undef CGEN_SMF_TYPE" >> $@
 	echo "#undef CGEN_CODE_TYPE" >> $@
 	echo "" >> $@
 
