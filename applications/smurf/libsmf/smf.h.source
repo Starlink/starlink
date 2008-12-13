@@ -887,10 +887,6 @@ void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap, int mode, int *
 void smf_km2ext( int indf, const char *xname, AstKeyMap *keymap, int *timeout, int *status );
 
 void smf_reorder( const char *type, void *in, int len, int ndim, int *dims, int axis, int *index, int maxis, int *mask, void *out, int *status );
-void smf_reorderr( float *in, int ndim, int *dims, int axis, int *index, int maxis, int *mask, float *out, int *status );
-void smf_reorderi( int *in, int ndim, int *dims, int axis, int *index, int maxis, int *mask, int *out, int *status );
-void smf_reorderd( double *in, int ndim, int *dims, int axis, int *index, int maxis, int *mask, double *out, int *status );
-void smf_reorderc( char *in, int len, int ndim, int *dims, int axis, int *index, int maxis, int *mask, char *out, int *status );
 void smf_updateprov( int ondf, const smfData *data, int indf, const char *creator, int *status );
 
 void smf_fits_setL( const smfHead *hdr, const char *name, int value, 
