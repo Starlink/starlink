@@ -111,7 +111,7 @@
 *        - Do not bother resetting system on a frameset that is about to be
 *          annulled.
 *     2008-12-15 (TIMJ):
-*        - use smf_get_dims. Tidy up isTordered handling.
+*        - use smf_get_dims. Tidy up isTordered handling and index handling.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -169,15 +169,12 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   double airmass;          /* Airmass */
   double *azel = NULL;     /* AZEL coordinates */
   size_t base;             /* Offset into 3d data array */
-  dim_t indexb;            /* bolo-ordered array offset */
   double extcorr = 1.0;    /* Extinction correction factor */
   char filter[81];         /* Name of filter */
   smfHead *hdr = NULL;     /* Pointer to full header struct */
   dim_t i;                 /* Loop counter */
   double *indata = NULL;   /* Pointer to data array */
-  size_t *indices = NULL;  /* Index into data array */
   int isTordered;          /* data order of input data */
-  dim_t j;                 /* Loop counter */
   dim_t k;                 /* Loop counter */
   int lbnd[2];             /* Lower bound */
   size_t ndims;            /* Number of dimensions in input data */
@@ -189,14 +186,12 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   dim_t nx = 0;            /* # pixels in x-direction */
   dim_t ny = 0;            /* # pixels in y-direction */
   double oldtwvm[3] = {0.0, 0.0, 0.0}; /* Cached value of WVM temperatures */
-  char origsystem[10];  /* Character string to store the coordinate system */
   int ubnd[2];             /* Upper bound */
   double *vardata = NULL;  /* Pointer to variance array */
   AstFrameSet *wcs = NULL; /* Pointer to AST WCS frameset */
   int wvmr = 0;            /* Flag to denote whether the WVMRAW method
                               is to be used */
-  int z;                   /* Counter for number of data points */
-  double zd;               /* Zenith distance */
+  double zd = 0;           /* Zenith distance */
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -272,21 +267,11 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   if (!quick) {
     azel = smf_malloc( 2*npts, sizeof(*azel), 0, status );
   }
-  indices = smf_malloc( npts, sizeof(*indices), 0, status );
 
   /* Jump to the cleanup section if status is bad by this point
      since we need to free memory */
   if (*status != SAI__OK) goto CLEANUP;
 
-  /* Prefill with coordinates */
-  z = 0;
-  for (j = 0; j < ny; j++) {
-    base = j * nx;
-    for (i = 0; i < nx; i++) {
-      indices[z] = base + i; /* index into data array */
-      z++;
-    }
-  }
   /* Array bounds for astTranGrid call */
   lbnd[0] = 1;
   lbnd[1] = 1;
@@ -355,9 +340,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
         /* Check current frame, store it and then select the AZEL
            coordinate system */
         if (wcs != NULL) {
-          one_strlcpy( origsystem, astGetC(wcs,"SYSTEM"),
-                       sizeof(origsystem), status);
-          if (strcmp(origsystem, "AZEL") != 0) {
+          if (strcmp(astGetC(wcs,"SYSTEM"), "AZEL") != 0) {
             astSet( wcs, "SYSTEM=AZEL"  );
           }
           /* Transfrom from pixels to AZEL */
@@ -379,17 +362,15 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
       /* Loop over data in time slice. Start counting at 1 since this is
          the GRID coordinate frame */
       base = npts * k;  /* Offset into 3d data array (time-ordered) */
-      indexb = k;       /* Offset into 3d data array (bolo-ordered) */
 
       for (i=0; i < npts && ( *status == SAI__OK ); i++ ) {
-        /* update array indices */
-        dim_t index;             /* index into vectorized data array */
-        size_t thisind;          /* time ordered choice */
-        index = indices[i] + base;
+        /* calculate array indices - assumes that astTranGrid fills up
+           azel[] array in same order as bolometer data are aligned */
+        size_t index;
         if ( isTordered ) {
-          thisind = index;
+          index = base + i;
         } else {
-          thisind = indexb;
+          index = k + (nframes * i);
         }
 
         if (!quick) {
@@ -400,21 +381,19 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
 	
         if( allextcorr ) {
           /* Store extinction correction factor */
-          allextcorr[thisind] = extcorr;
+          allextcorr[index] = extcorr;
         } else {
           /* Otherwise Correct the data */
           if( indata && (indata[index] != VAL__BADD) ) {
-            indata[thisind] *= extcorr;
+            indata[index] *= extcorr;
           }
 
           /* Correct the variance */
           if( vardata && (vardata[index] != VAL__BADD) ) {
-            vardata[thisind] *= extcorr * extcorr;
+            vardata[index] *= extcorr * extcorr;
           }
         }
 
-        /* Incremeber bolo-ordered data index */
-        indexb += nframes;
       }
     
       /* Note that we do not need to free "wcs" or revert its SYSTEM
@@ -433,5 +412,4 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   if (!quick) {
     azel = smf_free(azel,status);
   }
-  indices = smf_free(indices,status);
 }
