@@ -694,8 +694,8 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
               head.data.pntr[0] = NULL;
             } else if( mtype == SMF__GAI ) {
               /* Initialize gain to 1, offset to 0, correlation to 0 */
-              smf_get_dims( &(head.data), &nbolo, NULL, NULL, &bstride, 
-                            &tstride, status);
+              smf_get_dims( &(head.data), NULL, NULL, &nbolo, NULL, NULL,
+                             &bstride, &tstride, status);
 
               for( k=0; k<3; k++ ) { /* planes along tslice axis */
                 if( k==0 ) val = 1;

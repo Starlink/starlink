@@ -165,7 +165,7 @@ void smf_update_quality( smfData *data, unsigned char *target, int syncbad,
   }
 
   /* Calculate data dimensions */
-  smf_get_dims( data, &nbolo, &ntslice, &ndata, &bstride, &tstride, status );
+  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, &ndata, &bstride, &tstride, status );
 
   if( *status == SAI__OK ) {
     /* some pointers to the data array if needed */

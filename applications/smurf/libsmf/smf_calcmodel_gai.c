@@ -140,10 +140,10 @@ void smf_calcmodel_gai( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     } else {
 	
       /* Get the raw data dimensions */
-      smf_get_dims( res->sdata[idx], &nbolo, &ntslice, &ndata,
+      smf_get_dims( res->sdata[idx],  NULL, NULL, &nbolo, &ntslice, &ndata,
                     &bstride, &tstride, status);
 
-      smf_get_dims( model->sdata[idx], NULL, NULL, NULL,
+      smf_get_dims( model->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
                     &gbstride, &gcstride, status);
 
       /* Which QUALITY bits should be considered for ignoring data */

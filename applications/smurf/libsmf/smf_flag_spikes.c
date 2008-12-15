@@ -164,7 +164,7 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
 
   if( *status == SAI__OK ) {
     /* obtain data dimensions */
-    smf_get_dims( data, &nbolo, &ntslice, NULL, NULL, NULL, status );
+    smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, NULL, NULL, status );
 
     /* Valid threshold check */
     if( thresh <= 0 ) {

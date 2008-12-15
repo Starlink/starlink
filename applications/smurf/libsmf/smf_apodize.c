@@ -123,7 +123,7 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
   }
 
   /* Calculate data dimensions */
-  smf_get_dims( data, &nbolo, &ntslice, &ndata, &bstride, &tstride, status );
+  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, &ndata, &bstride, &tstride, status );
 
   /* Obtain pointer to data and quality components */
   dat = data->pntr[0];

@@ -139,7 +139,7 @@ void CGEN_FUNCTION(smf_average_data)( const smfData *data, dim_t start,  dim_t n
   if ( *status != SAI__OK ) return;
 
   /* Do we have 3-d time-series data? */
-  smf_get_dims(data, &nbol, &nframes, NULL, NULL, NULL, status );
+  smf_get_dims(data, NULL, NULL, &nbol, &nframes, NULL, NULL, NULL, status );
 
   /* check type */
   if ( !smf_dtype_check_fatal(data, NULL, CGEN_SMF_TYPE, status) ) return;

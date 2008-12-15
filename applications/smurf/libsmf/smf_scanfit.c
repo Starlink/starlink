@@ -153,7 +153,7 @@ void smf_scanfit( smfData *data, unsigned char *quality, int order,
   }
 
   /* Get the dimensions */
-  smf_get_dims( data, &nbol, &nframes, NULL, NULL, NULL, status);
+  smf_get_dims( data,  NULL, NULL, &nbol, &nframes, NULL, NULL, NULL, status);
 
   /* Return with error if order is greater than the number of data
      points */

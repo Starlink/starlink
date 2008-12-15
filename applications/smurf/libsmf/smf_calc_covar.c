@@ -120,7 +120,7 @@ double smf_calc_covar ( const smfData *data, const int i, const int j,
   if (!smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status)) return covar;
 
   /* Do we have 2-D image or 3-D timeseries data? */
-  smf_get_dims( data, &nbol, &nframes, NULL, NULL, NULL, status);
+  smf_get_dims( data,  NULL, NULL, &nbol, &nframes, NULL, NULL, NULL, status);
   if (*status != SAI__OK) return covar;
 
   /* Check bolometer indices are in range */

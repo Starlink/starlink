@@ -149,7 +149,7 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
   }
 
   /* Get the dimensions */
-  smf_get_dims( data, &nbol, &nframes, NULL, NULL, NULL, status);
+  smf_get_dims( data,  NULL, NULL, &nbol, &nframes, NULL, NULL, NULL, status);
 
   /* Check that poly is not a NULL pointer */
   if ( poly == NULL ) {

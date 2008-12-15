@@ -174,7 +174,7 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
   }
 
   /* Check for 3-d data and get dimensions */
-  smf_get_dims( indata, &nbolo, &ntslice, &ndata, NULL, NULL, status );
+  smf_get_dims( indata,  NULL, NULL, &nbolo, &ntslice, &ndata, NULL, NULL, status );
 
   /* Obtain the number of rows and columns */
   isTordered = indata->isTordered;

@@ -232,11 +232,11 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   /* Loop over index in subgrp (subarray) */
   for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
     /* Obtain dimensions of the data */
-    smf_get_dims( res->sdata[idx], &thisnbolo, &thisntslice, &thisndata,
+    smf_get_dims( res->sdata[idx],  NULL, NULL, &thisnbolo, &thisntslice, &thisndata,
                   &bstride, &tstride, status);
       
     if(dat->gai) {
-      smf_get_dims( gai->sdata[idx], NULL, NULL, NULL,
+      smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
                     &gbstride, &gcstride, status);
     }
 
@@ -376,7 +376,7 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 
   /* remove common mode from residual */
   for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
-    smf_get_dims( res->sdata[idx], NULL, NULL, NULL, &bstride, &tstride, 
+    smf_get_dims( res->sdata[idx],  NULL, NULL, NULL, NULL, NULL, &bstride, &tstride, 
                   status );
 
     /* Get pointer to DATA component of residual */
@@ -386,7 +386,7 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     qua_data = (unsigned char *)(qua->sdata[idx]->pntr)[0];
     
     if( dat->gai ) {
-      smf_get_dims( gai->sdata[idx], NULL, NULL, NULL,
+      smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
                     &gbstride, &gcstride, status);
       gai_data = (gai->sdata[idx]->pntr)[0];
 

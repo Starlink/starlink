@@ -4,7 +4,7 @@
 *     smf_get_dims
 
 *  Purpose:
-*     Calculate nbolo, ntslice and ndata for a 3-d smfData
+*     Calculate nbolo, ntslice and other dimensional properties for a 3-d smfData
 
 *  Language:
 *     Starlink ANSI C
@@ -13,13 +13,17 @@
 *     C function
 
 *  Invocation:
-*     smf_get_dims( const smfData *data, dim_t *nbolo, dim_t *ntslice, 
-*                   dim_t *ndata, size_t *bstride, size_t *tstride, 
-*                   int *status )
+*     void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
+*                        dim_t *nbolo, dim_t *ntslice, dim_t *ndata,
+*                        size_t *bstride, size_t *tstride, int *status );
 
 *  Arguments:
 *     data = const smfData *data (Given)
 *        Pointer to a smfData
+*     nrows = dim_t* (Returned)
+*        Number of rows.
+*     ncols = dim_t* (Returned)
+*        Number of columns.
 *     nbolo = dim_t* (Returned)
 *        Number of bolometers
 *     ntslice = dim_t* (Returned)
@@ -90,15 +94,17 @@
 
 #define FUNC_NAME "smf_get_dims"
 
-void smf_get_dims( const smfData *data, dim_t *nbolo, dim_t *ntslice, 
-                   dim_t *ndata, size_t *bstride, size_t *tstride, 
-                   int *status ) {
+void smf_get_dims( const smfData *data, dim_t *nrows, dim_t *ncols,
+                   dim_t *nbolo, dim_t *ntslice, dim_t *ndata,
+                   size_t *bstride, size_t *tstride, int *status ) {
 
   size_t bs;
   dim_t nb;
   dim_t nt;
   dim_t nd;
   size_t ts;
+  dim_t nr;
+  dim_t nc;
 
    /* Check the inherited status */
    if ( *status != SAI__OK ) return;
@@ -114,11 +120,15 @@ void smf_get_dims( const smfData *data, dim_t *nbolo, dim_t *ntslice,
 
    /* Calculate Dimensions */
    if( data->isTordered ) {
+     nr = (data->dims)[SMF__ROW_INDEX];
+     nc = (data->dims)[SMF__COL_INDEX];
      nb = (data->dims)[0]*(data->dims)[1];
      nt = (data->dims)[2];
      bs = 1;
      ts = nb;
    } else {
+     nr = (data->dims)[SMF__ROW_INDEX+1];
+     nc = (data->dims)[SMF__COL_INDEX+1];
      nt = (data->dims)[0];
      nb = (data->dims)[1]*(data->dims)[2];
      bs=nt;
@@ -126,6 +136,8 @@ void smf_get_dims( const smfData *data, dim_t *nbolo, dim_t *ntslice,
    }
    nd = nb*nt;
 
+   if( nrows ) *nrows = nr;
+   if( ncols ) *ncols = nc;
    if( nbolo ) *nbolo = nb;
    if( ntslice ) *ntslice = nt;
    if( ndata ) *ndata = nd;
