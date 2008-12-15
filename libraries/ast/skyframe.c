@@ -233,6 +233,10 @@ f     The SkyFrame class does not define any new routines beyond those
 *        values.
 *        - Modify SubMatch so that a value of zero is assumed for
 *        AlignOffset when restoring thre integrity of a FrameSet.
+*     15-DEC-2008 (DSB):
+*        Improve calculation of approximate Local Apparent Sidereal time
+*        by finding and using the ratio of solar to sidereal time
+*        independently for each approximation period.
 *class--
 */
 
@@ -834,6 +838,7 @@ static const char *GetTitle( AstFrame *, int * );
 static const char *GetUnit( AstFrame *, int, int * );
 static const char *SystemString( AstFrame *, AstSystemType, int * );
 static double Angle( AstFrame *, const double[], const double[], const double[], int * );
+static double CalcLAST( AstSkyFrame *, double, double, double, double, int * );
 static double Distance( AstFrame *, const double[], const double[], int * );
 static double Gap( AstFrame *, int, double, int *, int * );
 static double GetBottom( AstFrame *, int, int * );
@@ -1041,6 +1046,104 @@ static double Angle( AstFrame *this_frame, const double a[],
 
 /* Return the result. */
    return result;
+}
+
+static double CalcLAST( AstSkyFrame *this, double epoch, double obslon,
+                        double obslat, double dut1, int *status ) {
+/*
+*  Name:
+*     CalcLAST
+
+*  Purpose:
+*     Calculate the Local Appearent Sidereal Time for a SkyFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     double CalcLAST( AstSkyFrame *this, double epoch, double obslon,
+*                      double obslat, double dut1, int *status ) 
+
+*  Class Membership:
+*     SkyFrame member function.
+
+*  Description:
+*     This function calculates and returns the Local Apparent Sidereal Time 
+*     at the given epoch, etc. 
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+*     epoch
+*        The epoch (MJD).
+*     obslon
+*        Observatory geodetic longitude (radians)
+*     obslat
+*        Observatory geodetic latitude (radians)
+*     dut1 
+*        The UT1-UTC correction, in seconds.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*    The Local Apparent Sidereal Time, in radians.
+
+*  Notes:
+*     -  A value of AST__BAD will be returned if this function is invoked 
+*     with the global error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   astDECLARE_GLOBALS;/* Declare the thread specific global data */
+   AstFrameSet *fs;   /* Mapping from TDB offset to LAST offset */
+
+/* Check the global error status. */
+   if ( !astOK ) return AST__BAD;
+
+/* Get a pointer to the structure holding thread-specific global data. */   
+   astGET_GLOBALS(this);
+
+/* If not yet done, create two TimeFrames. Note, this is done here 
+   rather than in astInitSkyFrameVtab in order to avoid infinite vtab
+   initialisation loops (caused by the TimeFrame class containing a 
+   static SkyFrame). */
+   if( ! tdbframe ) {
+      astBeginPM;
+      tdbframe = astTimeFrame( "system=mjd,timescale=tdb", status );
+      lastframe = astTimeFrame( "system=mjd,timescale=last", status );
+      astEndPM;
+   }
+
+/* For better accuracy, use this integer part of the epoch as the origin of 
+   the two TimeFrames. */
+   astSetTimeOrigin( tdbframe, (int) epoch );
+   astSetTimeOrigin( lastframe, (int) epoch );
+
+/* Convert the absolute Epoch value to an offset from the above origin. */
+   epoch -= (int) epoch;
+
+/* Store the observers position in the two TimeFrames. */
+   astSetObsLon( tdbframe, obslon );
+   astSetObsLon( lastframe, obslon );
+
+   astSetObsLat( tdbframe, obslat );
+   astSetObsLat( lastframe, obslat );
+
+/* Store the DUT1 value. */
+   astSetDut1( tdbframe, dut1 );
+   astSetDut1( lastframe, dut1 );
+
+/* Get the conversion from tdb mjd offset to last mjd offset. */
+   fs = astConvert( tdbframe, lastframe, "" );
+
+/* Use it to transform the SkyFrame Epoch from TDB offset to LAST offset. */
+   astTran1( fs, 1, &epoch, 1, &epoch );
+   fs = astAnnul( fs );
+
+/* Convert the LAST offset from days to radians, and return. */
+   return ( epoch - (int) epoch )*2*AST__DPI;
+   
 }
 
 static void ClearAsTime( AstSkyFrame *this, int axis, int *status ) {
@@ -3019,6 +3122,8 @@ static double GetLAST( AstSkyFrame *this, int *status ) {
 */
 
 /* Local Variables: */
+   double epoch;                 /* Epoch (TDB MJD) */
+   double last1;                 /* LAST at end of current interval */
    double result;                /* Result value to return */
    double delta_epoch;           /* Change in Epoch */
 
@@ -3039,16 +3144,39 @@ static double GetLAST( AstSkyFrame *this, int *status ) {
    invoke SetLast to recalculate the accurate LAST and update the "eplast" 
    and "last" values. */
    if( this->eplast != AST__BAD ) {
-      delta_epoch = astGetEpoch( this ) - this->eplast;
+      epoch = astGetEpoch( this );
+      delta_epoch = epoch - this->eplast;
 
-      if( fabs( delta_epoch ) < 0.4 ) {
-         result = this->last + 2*AST__DPI*delta_epoch/0.997269566;
+/* Return the current LAST value if the epoch has not changed. */
+      if( delta_epoch == 0.0 ) {
+         result = this->last;
 
+/* If the previous full calculation of LAST was less than 0.4 days ago,
+   use a linear approximation to LAST. */
+      } else if( fabs( delta_epoch ) < 0.4 ) {
+
+/* If we do not know the ratio of sidereal to solar time at the current
+   epoch, calculate it now. This involves a full calculation of LAST at
+   the end of the current linear approxcimation period. */
+         if( this->klast == AST__BAD ) {
+            last1 = CalcLAST( this, this->eplast + 0.4, astGetObsLon( this ),
+                              astGetObsLat( this ), astGetDut1( this ),
+                              status );
+            this->klast = 2*AST__DPI*0.4/( last1 - this->last );
+         }
+
+/* Now use the ratio of solar to sidereal time to calculate the linear 
+   approximation to LAST. */
+         result = this->last + 2*AST__DPI*delta_epoch/this->klast;
+
+/* If the last accurate calculation of LAST was more than 0.4 days ago,
+   do a full accurate calculation. */
       } else {
          SetLast( this, status );
          result = this->last;
       }
 
+/* If we have not yet done an accurate calculation of LAST, do one now. */
    } else {
       SetLast( this, status );
       result = this->last;
@@ -7618,62 +7746,27 @@ static void SetLast( AstSkyFrame *this, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;/* Declare the thread specific global data */
-   AstFrameSet *fs;   /* Mapping from TDB offset to LAST offset */
    double epoch;      /* Epoch as a TDB MJD */
-   double dut1;       /* DUT1 value at the SkyFrame's epoch */
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
-/* Get a pointer to the structure holding thread-specific global data. */   
-   astGET_GLOBALS(this);
-
 /* Get the SkyFrame Epoch as a TDB MJD. */
    epoch = astGetEpoch( this );
 
-/* If not yet done, create two TimeFrames. Note, this is done here 
-   rather than in astInitSkyFrameVtab in order to avoid infinite vtab
-   initialisation loops (caused by the TimeFrame class containing a 
-   static SkyFrame). */
-   if( ! tdbframe ) {
-      astBeginPM;
-      tdbframe = astTimeFrame( "system=mjd,timescale=tdb", status );
-      lastframe = astTimeFrame( "system=mjd,timescale=last", status );
-      astEndPM;
-   }
-
-/* For better accuracy, use this integer part of the epoch as the origin of the two         TimeFrames. */
-   astSetTimeOrigin( tdbframe, (int) epoch );
-   astSetTimeOrigin( lastframe, (int) epoch );
-
-/* Convert the absolute Epoch value to an offset from the above origin. */
-   epoch -= (int) epoch;
-
-/* Store the observers position in the two TimeFrames. */
-   astSetObsLon( tdbframe, astGetObsLon( this ) );
-   astSetObsLon( lastframe, astGetObsLon( this ) );
-
-   astSetObsLat( tdbframe, astGetObsLat( this ) );
-   astSetObsLat( lastframe, astGetObsLat( this ) );
-
-/* Store the DUT1 value. */
-   dut1 = astGetDut1( this );
-   astSetDut1( tdbframe, dut1 );
-   astSetDut1( lastframe, dut1 );
-
-/* Get the conversion from tdb mjd offset to last mjd offset. */
-   fs = astConvert( tdbframe, lastframe, "" );
-
-/* Use it to transform the SkyFrame Epoch from TDB offset to LAST offset. */
-   astTran1( fs, 1, &epoch, 1, &epoch );
-   fs = astAnnul( fs );
-
-/* Convert the LAST offset from days to radians. */
-   this->last = ( epoch - (int) epoch )*2*AST__DPI;
+/* Calculate the LAST value (in rads) and store in the SkyFrame structure. */
+   this->last = CalcLAST( this, epoch, astGetObsLon( this ),
+                          astGetObsLat( this ), astGetDut1( this ),
+                          status );
 
 /* Save the TDB MJD to which this LAST corresponds. */
-   this->eplast = astGetEpoch( this );
+   this->eplast = epoch;
+
+/* The ratio between solar and sidereal time is a slowly varying function
+   of epoch. The GetLAST function returns a fast approximation to LAST
+   by using the ratio between solar and sidereal time. Indicate that
+   getLAST should re-calculate the ratio by setting the ratio value bad. */
+   this->klast = AST__BAD;
 }
 
 static void SetObsLat( AstFrame *this, double val, int *status ) {
@@ -10233,6 +10326,7 @@ AstSkyFrame *astInitSkyFrame_( void *mem, size_t size, int init,
       new->skyrefp[ 1 ] = AST__BAD;
       new->last = AST__BAD;
       new->eplast = AST__BAD;
+      new->klast = AST__BAD;
       new->diurab = AST__BAD;
 
 /* Loop to replace the Axis object associated with each SkyFrame axis with
@@ -10489,6 +10583,7 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size,
 /* ------------ */
       new->last = AST__BAD;
       new->eplast = AST__BAD;
+      new->klast = AST__BAD;
       new->diurab = AST__BAD;
 
 /* If an error occurred, clean up by deleting the new SkyFrame. */
