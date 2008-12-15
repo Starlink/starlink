@@ -14,15 +14,15 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_stats1( double *data, dim_t start, dim_t nsamp, 
+*     smf_stats1( double *data, size_t stride, dim_t nsamp, 
 *                 unsigned char *qual, unsigned char mask, double *mean, 
 *                 double *sigma, dim_t *ngood, int *status )
 
 *  Arguments:
 *     data = double* (Given)
 *        Pointer to input dataarray
-*     start = dim_t (Given)
-*        Offset in data to the first element of the interval to analyze
+*     stride = dim_t (Given)
+*        Index stride between elements
 *     nsamp = dim_t (Given)
 *        Length of the interval to analyze
 *     qual = usigned char* (Given)
@@ -66,6 +66,8 @@
 *        Use SMF__MINSTATSAMP for sample length check
 *     2008-08-29 (TIMJ):
 *        Initialise return values even if status is bad on entry.
+*     2008-12-15 (EC):
+*        Remove initial time slice from interface, and add stride parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -113,7 +115,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_stats1"
 
-void smf_stats1( double *data, dim_t start, dim_t nsamp, 
+void smf_stats1( double *data, size_t stride, dim_t nsamp, 
                  unsigned char *qual, unsigned char mask, double *mean, 
                  double *sigma, dim_t *ngood, int *status ) {
 
@@ -132,6 +134,12 @@ void smf_stats1( double *data, dim_t start, dim_t nsamp,
   /* Check status */
   if (*status != SAI__OK) return;
 
+  if( !stride ) {
+    *status = SAI__ERROR;
+    errRep(" ", FUNC_NAME ": stride cannot be 0", status);
+    return;
+  }
+
   /* Initialization */
 
   if( qual ) {
@@ -139,7 +147,7 @@ void smf_stats1( double *data, dim_t start, dim_t nsamp,
 
     if( sigma ) {
       /* Standard deviation calculating version */
-      for( i=start; i<(start+nsamp); i++ ) {
+      for( i=0; i<nsamp*stride; i+=stride ) {
 
         if( !(qual[i] & mask) ) {
           sum += data[i];
@@ -149,7 +157,7 @@ void smf_stats1( double *data, dim_t start, dim_t nsamp,
       }
     } else {
       /* Mean only */
-      for( i=start; i<(start+nsamp); i++ ) if( !(qual[i] & mask) ) {
+      for( i=0; i<nsamp*stride; i+=stride ) if( !(qual[i] & mask) ) {
           sum += data[i];
           count++;
         }
@@ -160,14 +168,14 @@ void smf_stats1( double *data, dim_t start, dim_t nsamp,
 
     if( sigma ) {
       /* Standard deviation calculating version */
-      for( i=start; i<(start+nsamp); i++ ) if( data[i] != VAL__BADD ) {
+      for( i=0; i<nsamp*stride; i+=stride ) if( data[i] != VAL__BADD ) {
           sum += data[i];
           sumsq += data[i]*data[i];
           count++;
         }
     } else {
       /* Mean only */
-      for( i=start; i<(start+nsamp); i++ ) if( data[i] != VAL__BADD ) {
+      for( i=0; i<nsamp*stride; i+=stride ) if( data[i] != VAL__BADD ) {
           sum += data[i];
           count++;
         }

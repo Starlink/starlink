@@ -150,7 +150,8 @@ void smf_bolonoise( smfData *data, size_t window, double f_low,
   }
 
   /* Obtain dimensions */
-  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, &ndata, NULL, NULL, status );
+  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, &ndata, NULL, NULL, 
+                status );
 
   if( *status==SAI__OK ) {
     steptime = data->hdr->steptime;
@@ -197,7 +198,7 @@ void smf_bolonoise( smfData *data, size_t window, double f_low,
     /* Measure the power */
     if( *status == SAI__OK ) {
       p_low = base[i_low];
-      smf_stats1( base, i_w1, i_w2-i_w1+1, NULL, 0, &p_white, NULL, &ngood,
+      smf_stats1( base+i_w1, 1, i_w2-i_w1+1, NULL, 0, &p_white, NULL, &ngood,
                   status );
 
       /* It's OK if bad status was generated as long as a mean was calculated */

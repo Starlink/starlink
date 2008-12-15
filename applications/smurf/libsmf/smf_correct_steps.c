@@ -158,7 +158,8 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
 
   if( *status == SAI__OK ) {
     /* obtain data dimensions */
-    smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, NULL, NULL, status );
+    smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, NULL, NULL, 
+                  status );
 
     /* If data stream too short for box size generate error */
     if( (dcbox*2) > ntslice ) {
@@ -198,8 +199,9 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
       if( !(qua[base] & SMF__Q_BADB) && (*status == SAI__OK) ) {
 	
 	/* initial conditions for jump detection */
-	smf_stats1( dat, base, dcbox, qua, mask, &mean1, NULL, &nmean1, status);
-	smf_stats1( dat, base+dcbox, dcbox, qua, mask, &mean2, NULL, &nmean2, 
+	smf_stats1( dat+base, 1, dcbox, qua, mask, &mean1, NULL, &nmean1, 
+                    status);
+	smf_stats1( dat+base+dcbox, 1, dcbox, qua, mask, &mean2, NULL, &nmean2, 
                     status );
 	
 	/* Estimate rms in a box as the bolo rms divided by sqrt(dcbox) */
