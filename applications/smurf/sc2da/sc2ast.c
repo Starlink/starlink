@@ -206,6 +206,8 @@ int *status             /* global status (given and returned) */
      10Sep2008 : Original created by renaming sc2ast_createwcs (dsb)
      20081119  : Modified the conversion for in the Nasmyth coordinate
                  definitions. (PF)
+     15Dec2008 : Clone the cached SkyFrame instead of deep copying it
+                 (it's much faster). (DSB)
 */
 
 {
@@ -585,7 +587,7 @@ int *status             /* global status (given and returned) */
    by later functions.  */
    astRemoveFrame( cache->frameset[ subnum ], AST__CURRENT );
    astAddFrame( cache->frameset[ subnum ], AST__BASE, mapping, 
-                astCopy( cache->skyframe ) );
+                astClone( cache->skyframe ) );
 
 /* Return the final FrameSet. */
    *fset = astClone( cache->frameset[ subnum ] );
