@@ -174,17 +174,11 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
   }
 
   /* Check for 3-d data and get dimensions */
-  smf_get_dims( indata,  NULL, NULL, &nbolo, &ntslice, &ndata, NULL, NULL, status );
+  smf_get_dims( indata, &nrow, &ncol, &nbolo, &ntslice, &ndata, NULL, NULL,
+                status );
 
   /* Obtain the number of rows and columns */
   isTordered = indata->isTordered;
-  if( isTordered ) {
-    ncol = indata->dims[SMF__COL_INDEX];    /* x, y, t */
-    nrow = indata->dims[SMF__ROW_INDEX];
-  } else {
-    ncol = indata->dims[1+SMF__COL_INDEX];  /* t, x, y */
-    nrow = indata->dims[1+SMF__ROW_INDEX];
-  }
 
   if( model ) {
     /* Check for valid model dimensions if supplied */
