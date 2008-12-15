@@ -114,9 +114,11 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   /* Local Variables */
   size_t aiter;                 /* Actual iterations of sigma clipper */
   dim_t base;                   /* Base index of bolometer */
+  size_t bstride;               /* bolometer stride */
   dim_t i;                      /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
   dim_t j;                      /* Loop counter */
+  dim_t k;                      /* Loop counter */
   unsigned char mask;           /* Bitmask for quality */
   unsigned char mask_spike;     /* Bitmask for quality */
   smfArray *model=NULL;         /* Pointer to model at chunk */
@@ -137,6 +139,7 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   size_t spikeiter=0;           /* Number of iterations for spike detection */
   int spikeiter_s;              /* signed version of spikeiter */
   double spikethresh;           /* Threshold for spike detection */
+  size_t tstride;               /* time slice stride */
   double *var=NULL;             /* Sample variance */
    
   /* Main routine */
@@ -218,8 +221,8 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     } else {
     
       /* Get the raw data dimensions */
-      smf_get_dims( res->sdata[idx],  NULL, NULL, &nbolo, &ntslice, &ndata, NULL, NULL, 
-                    status );
+      smf_get_dims( res->sdata[idx], NULL, NULL, &nbolo, &ntslice, &ndata, 
+                    &bstride, &tstride, status );
 
       /* Only estimate the white noise level once at the beginning - the
 	 reason for this is to make measurements of the convergence 
@@ -260,17 +263,19 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
                  "   flagged ^NFLAG new ^THRESH-sig spikes in ^AITER "
                  "iterations", status); 
       } 
-
-
       
       /* Now calculate contribution to chi^2 */
       if( *status == SAI__OK ) {
-	for( i=0; i<ndata; i++ ) if( !(qua_data[i]&SMF__Q_BADB) &&
-				     (model_data[i] > 0) ) {
-            
-            dat->chisquared[chunk] += res_data[i]*res_data[i]/model_data[i];
-            nchisq++;
+
+        for( i=0; i<nbolo; i++ ) if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
+          for( j=0; j<ntslice; j++ ) {
+            k = i*bstride+j*tstride;
+            if(model_data[k]>0 && !(qua_data[k]&mask) ) {
+              dat->chisquared[chunk] += res_data[k]*res_data[k]/model_data[k];
+              nchisq++;
+            }
           }
+        }
       }
     }
   }

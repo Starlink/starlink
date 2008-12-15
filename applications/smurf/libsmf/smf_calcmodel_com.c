@@ -232,8 +232,8 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   /* Loop over index in subgrp (subarray) */
   for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
     /* Obtain dimensions of the data */
-    smf_get_dims( res->sdata[idx],  NULL, NULL, &thisnbolo, &thisntslice, &thisndata,
-                  &bstride, &tstride, status);
+    smf_get_dims( res->sdata[idx],  NULL, NULL, &thisnbolo, &thisntslice, 
+                  &thisndata, &bstride, &tstride, status);
       
     if(dat->gai) {
       smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
@@ -268,7 +268,8 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
       gai_data = (gai->sdata[idx]->pntr)[0];
     }
 
-    /* Which QUALITY bits should be checked for correcting samples */
+    /* Which QUALITY bits should be checked for correcting sample. Ensure that
+       this matched the mask used in smf_calcmodel_gai! */
     mask_cor = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_APOD);
 
     /* Which QUALITY bits should be checked for measuring the mean */
@@ -329,12 +330,12 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     }
   }
     
-  /* Re-normalize the model, or set model to VAL__BADD if no data. */
+  /* Re-normalize the model, or set model to 0 if no data. */
   for( i=0; i<ntslice; i++ ) {
     if( weight[i] ) {
       model_data[i] /= weight[i];
     } else {
-      model_data[i] = VAL__BADD;
+      model_data[i] = 0;
     }
   }
 
@@ -398,8 +399,9 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
       for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
         if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {          
           smf_templateFit1D( res_data+i*bstride, qua_data+i*bstride, 
-                             mask_cor, ntslice, tstride, model_data, 1,
-                             gai_data+i*gbstride, gai_data+gcstride+i*gbstride, 
+                             mask_meas, mask_cor, ntslice, tstride, model_data,
+                             1, gai_data+i*gbstride, 
+                             gai_data+gcstride+i*gbstride, 
                              gai_data+2*gcstride+i*gbstride, status );
           
           /* The calculated gain is the fit of the common mode to the data.

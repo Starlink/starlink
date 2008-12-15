@@ -280,14 +280,14 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
         switch( indata->dtype ) {
         case SMF__DOUBLE:
           smf_templateFit1D( &( ((double *)indata->pntr[0])[index] ), 
-                             &qua[index], mask,
+                             &qua[index], mask, mask,
                              ntslice, stride, dksquid, 1, &gain, &offset, 
                              &corr, status );
           break;
           
         case SMF__INTEGER:
           smf_templateFit1I( &( ((int *)indata->pntr[0])[index] ), 
-                             &qua[index], mask, 
+                             &qua[index], mask, mask,
                              ntslice, stride, dksquid, 1, &gain, &offset, 
                              &corr, status );
           break;
