@@ -185,8 +185,8 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
         smf_dataOrder( array[i]->sdata[j], 0, status );
       }
       
-      smf_get_dims( array[i]->sdata[j], &nbolo, &ntslice, &ndata, NULL, 
-                    NULL, status );
+      smf_get_dims( array[i]->sdata[j], NULL, NULL, &nbolo, &ntslice, &ndata,
+                    NULL, NULL, status );
       
       if( data->type == 1 ) {
         /* --- Boxcar smooth the data --- */
@@ -441,7 +441,8 @@ void smurf_sc2threadtest( int *status ) {
   data = res[0]->sdata[0];
   dat = data->pntr[0];
 
-  smf_get_dims( data, &nbolo, &ntslice, &ndata, &bstride, &tstride, status );
+  smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, &ndata, &bstride,
+                &tstride, status );
 
   msgOut("","Array index test #1: two multiplies in inner loop",status);
   gettimeofday( &tv1, NULL ); 

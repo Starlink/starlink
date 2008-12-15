@@ -482,7 +482,7 @@ void smurf_qlmakemap( int *status ) {
     /* Calculate Noise */
     msgOutif(MSG__VERB, " ", "SMURF_QLMAKEMAP: Measuring Noise",
              status);
-    smf_get_dims( data, &nbolo, NULL, NULL, NULL, NULL, status );
+    smf_get_dims( data, NULL, NULL, &nbolo, NULL, NULL, NULL, NULL, status );
     bolonoise = smf_malloc( nbolo, sizeof(*bolonoise), 1, status );
 
     smf_bolonoise( data, 0, 0.5, SMF__F_WHITELO, SMF__F_WHITEHI, 0, bolonoise, 
