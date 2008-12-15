@@ -110,6 +110,8 @@
 *        - Do not set system in frameset if it is already AZEL
 *        - Do not bother resetting system on a frameset that is about to be
 *          annulled.
+*     2008-12-15 (TIMJ):
+*        - use smf_get_dims. Tidy up isTordered handling.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -173,7 +175,6 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   smfHead *hdr = NULL;     /* Pointer to full header struct */
   dim_t i;                 /* Loop counter */
   double *indata = NULL;   /* Pointer to data array */
-  dim_t index;             /* index into vectorized data array */
   size_t *indices = NULL;  /* Index into data array */
   int isTordered;          /* data order of input data */
   dim_t j;                 /* Loop counter */
@@ -218,21 +219,12 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   ndims = data->ndims;
   if (ndims == 2) {
     nframes = 1;
-  } else if (ndims == 3 ) {
-    if( isTordered ) {
-      nframes = (data->dims)[2];
-    } else {
-      nframes = (data->dims)[0];
-    }
+    nx = (data->dims)[0];
+    ny = (data->dims)[1];
+    npts = nx*ny;
   } else {
-    /* Abort with an error if the number of dimensions is not 2 or 3 */
-    if ( *status == SAI__OK) {
-      *status = SAI__ERROR;
-      msgSeti("ND", data->ndims);
-      errRep(FUNC_NAME,
-             "Number of dimensions of input file is ^ND: should be either 2 or 3",
-             status);
-    }
+    /* this routine will also check for dimensionality */
+    smf_get_dims( data, &nx, &ny, &npts, &nframes, NULL, NULL, NULL, status );
   }
 
   /* Tell user we're correcting for extinction */
@@ -275,15 +267,6 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   if ( *status == SAI__OK ) {
     indata = (data->pntr)[0]; 
     vardata = (data->pntr)[1];
-
-    if( isTordered ) {
-      nx = (data->dims)[0];
-      ny = (data->dims)[1];
-    } else {
-      nx = (data->dims)[1];
-      ny = (data->dims)[2];
-    }
-    npts = nx*ny;
   }
   /* It is more efficient to call astTranGrid than astTran2 */
   if (!quick) {
@@ -312,7 +295,6 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
 
   /* Loop over number of time slices/frames */
 
-  indexb = 0;
   for ( k=0; k<nframes && (*status == SAI__OK) ; k++) {
     /* Call tslice_ast to update the header for the particular
        timeslice. If we're in QUICK mode then we don't need the WCS */
@@ -401,7 +383,14 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
 
       for (i=0; i < npts && ( *status == SAI__OK ); i++ ) {
         /* update array indices */
+        dim_t index;             /* index into vectorized data array */
+        size_t thisind;          /* time ordered choice */
         index = indices[i] + base;
+        if ( isTordered ) {
+          thisind = index;
+        } else {
+          thisind = indexb;
+        }
 
         if (!quick) {
           zd = M_PI_2 - azel[npts+i];
@@ -411,28 +400,16 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
 	
         if( allextcorr ) {
           /* Store extinction correction factor */
-          if( isTordered ) {
-            allextcorr[index] = extcorr;
-          } else {
-            allextcorr[indexb] = extcorr;
-          }
+          allextcorr[thisind] = extcorr;
         } else {
           /* Otherwise Correct the data */
           if( indata && (indata[index] != VAL__BADD) ) {
-            if( isTordered ) {
-              indata[index] *= extcorr;
-            } else {
-              indata[indexb] *= extcorr;
-            }
+            indata[thisind] *= extcorr;
           }
 
           /* Correct the variance */
           if( vardata && (vardata[index] != VAL__BADD) ) {
-            if( isTordered ) {
-              vardata[index] *= extcorr*extcorr;
-            } else {
-              vardata[indexb] *= extcorr*extcorr;
-            }
+            vardata[thisind] *= extcorr * extcorr;
           }
         }
 
