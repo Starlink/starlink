@@ -120,6 +120,7 @@
 *          annulled.
 *     2008-12-15 (TIMJ):
 *        - use smf_get_dims. Tidy up isTordered handling and index handling.
+*        - outline of adaptive mode.
 *     {enter_further_changes_here}
 
 *  Copyright:
