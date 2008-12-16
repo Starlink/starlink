@@ -3122,6 +3122,7 @@ static double GetLAST( AstSkyFrame *this, int *status ) {
 */
 
 /* Local Variables: */
+   double dlast;                 /* Change in LAST */
    double epoch;                 /* Epoch (TDB MJD) */
    double last1;                 /* LAST at end of current interval */
    double result;                /* Result value to return */
@@ -3162,7 +3163,11 @@ static double GetLAST( AstSkyFrame *this, int *status ) {
             last1 = CalcLAST( this, this->eplast + 0.4, astGetObsLon( this ),
                               astGetObsLat( this ), astGetDut1( this ),
                               status );
-            this->klast = 2*AST__DPI*0.4/( last1 - this->last );
+
+/* Ensure the change in LAST is positive so that we get a positive ratio. */
+            dlast = last1 - this->last;
+            if( dlast < 0.0 ) dlast += 2*AST__DPI;
+            this->klast = 2*AST__DPI*0.4/dlast;
          }
 
 /* Now use the ratio of solar to sidereal time to calculate the linear 
