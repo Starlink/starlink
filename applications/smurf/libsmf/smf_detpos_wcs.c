@@ -72,6 +72,8 @@
 *        Tidy up use of astGrow.
 *     3-DEC-2008 (DSB):
 *        Avoid use of static cache.
+*     16-DEC-2008 (DSB):
+*        For extra speed, clone the cached SkyFrame rather than copying it.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -259,7 +261,7 @@ smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, const double telpos[
    Always use TCS_TAI. smf_open_file corrects the JCMTState structure
    if TCS_TAI is missing. Remember to convert from TAI to TDB (as required by 
    the Epoch attribute). */
-   csky = astCopy( cache->sky );
+   csky = astClone( cache->sky );
    astSet( csky, "Epoch=MJD %.*g", DBL_DIG, hdr->state->tcs_tai + 
                                             32.184/SPD ); 
 

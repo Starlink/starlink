@@ -111,6 +111,8 @@
 *        No longer need steptime (tcs_tai vs rts_end handled elsewhere)
 *     2008-12-3 (DSB):
 *        Avoid use of static cache.
+*     2008-12-16 (DSB):
+*        For extra speed, clone the cached SkyFrame rather than copying it.
 *     {enter_further_changes_here}
 
 *  Notes:
