@@ -234,7 +234,10 @@ void smf_bolonoise( smfData *data, size_t window, double f_low,
 
       /* Store values */
       if( whitenoise ) {
-        /* Multiply average by bandwidth to get estimate of signal variance */
+        /* Multiply average by bandwidth to get estimate of signal variance.
+           The factor of "2" is there because half of the power in the FFT
+           of real data is below the Nyquist frequency, and the other half
+           is stored above the Nyquist frequency. */
         whitenoise[i] = p_white * 2 * (i_w2-i_w1+1);
         /* If NEP set, scale this to variance in 1-second average by dividing
            by the number of samples per second */
@@ -244,7 +247,6 @@ void smf_bolonoise( smfData *data, size_t window, double f_low,
       }
       if( fratio ) fratio[i] = fr;
     }
-
   }
   
   /* Clean up */
