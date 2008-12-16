@@ -13,19 +13,21 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_correct_extinction(smfData *data, const char *method, 
+*     smf_correct_extinction(smfData *data, const char *tausrc, 
 *                            const int quick, double tau, double *allextcorr, 
 *                            int *status) {
 
 *  Arguments:
 *     data = smfData* (Given)
 *        smfData struct
-*     method = const char* (Given)
-*        Extinction correction method
+*     tausrc = const char* (Given)
+*        Source of opacity value. Options are:
+*          CSOTAU: Use the supplied "tau" argument as if it is CSO tau.
+*          WVMRAW: Use the WVM time series data.
 *     quick = const int (Given)
 *        Flag to denote whether to use a single airmass for all measurements
 *     tau = double (Given)
-*        Optical depth
+*        Optical depth at 225 GHz. Only used if tausrc is "CSOTAU".
 *     allextcorr = double* (Given and Returned)
 *        If given, store calculated corrections for each bolo/time slice. Must
 *        have same dimensions as bolos in *data
@@ -36,6 +38,12 @@
 *     This is the main low-level routine implementing the EXTINCTION
 *     task. If allextcorr is specified, no correction is applied to
 *     the data (the correction factors are just stored). 
+
+*  Notes:
+*     Adaptive processing works on each time slice in turn. This is done because
+*     tau can change from time slice to time slice, which could lead to a change
+*     significant enough to cross the threshold. This is not important if a static
+*     correction method (eg CSO tau) is in use.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -162,7 +170,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_correct_extinction"
 
-void smf_correct_extinction(smfData *data, const char *method, const int quick,
+void smf_correct_extinction(smfData *data, const char *tausrc, const int quick,
                             double tau, double *allextcorr, int *status) {
 
   /* Local variables */
@@ -171,6 +179,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   size_t base;             /* Offset into 3d data array */
   double extcorr = 1.0;    /* Extinction correction factor */
   char filter[81];         /* Name of filter */
+  const double footprint = 10.0 * DD2R / 60.0;  /* 10 arcmin */
   smfHead *hdr = NULL;     /* Pointer to full header struct */
   dim_t i;                 /* Loop counter */
   double *indata = NULL;   /* Pointer to data array */
@@ -189,9 +198,10 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   int ubnd[2];             /* Upper bound */
   double *vardata = NULL;  /* Pointer to variance array */
   AstFrameSet *wcs = NULL; /* Pointer to AST WCS frameset */
-  int wvmr = 0;            /* Flag to denote whether the WVMRAW method
-                              is to be used */
+  int wvmr = 0;            /* Flag to denote whether the WVMRAW tau is to be used. */
   double zd = 0;           /* Zenith distance */
+  const double corrthresh = 0.01; /* threshold to switch from quick to slow as fraction */
+  int adaptive = 0;
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -223,9 +233,9 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   }
 
   /* Tell user we're correcting for extinction */
-  msgSetc("M", method);
+  msgSetc("M", tausrc);
   msgOutif(MSG__VERB," ", 
-           "Correcting for extinction with method ^M", status);
+           "Correcting for extinction with tau source ^M", status);
 
   /* Should check data type for double if not allextcorr case */
   if( !allextcorr ) {
@@ -233,7 +243,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   }
 
   /* Check desired optical depth method */
-  if ( strncmp( method, "WVMR", 4) == 0 ) {
+  if ( strncmp( tausrc, "WVMR", 4) == 0 ) {
     wvmr = 1;
   }
 
@@ -246,7 +256,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   }
 
   /* If we have a CSO Tau then convert it to the current filter */
-  if ( strncmp( method, "CSOT", 4) == 0 ) {
+  if ( strncmp( tausrc, "CSOT", 4) == 0 ) {
     hdr = data->hdr;
     if( hdr == NULL ) {
       if ( *status == SAI__OK ) {
@@ -263,8 +273,9 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
     indata = (data->pntr)[0]; 
     vardata = (data->pntr)[1];
   }
-  /* It is more efficient to call astTranGrid than astTran2 */
-  if (!quick) {
+  /* It is more efficient to call astTranGrid than astTran2
+     Allocate memory in adaptive mode just in case. */
+  if (!quick || adaptive) {
     azel = smf_malloc( 2*npts, sizeof(*azel), 0, status );
   }
 
@@ -277,10 +288,14 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   lbnd[1] = 1;
   ubnd[0] = nx;
   ubnd[1] = ny;
-
+  tau *= 10.0;
   /* Loop over number of time slices/frames */
 
   for ( k=0; k<nframes && (*status == SAI__OK) ; k++) {
+    /* Local copies of flags so that adaptive mode can update them locally */
+    int lquick = quick;
+    int ladaptive = adaptive;
+
     /* Call tslice_ast to update the header for the particular
        timeslice. If we're in QUICK mode then we don't need the WCS */
     smf_tslice_ast( data, k, !quick, status );
@@ -323,18 +338,41 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
 
       /* If we're using the QUICK application method, we assume a single
          airmass and tau for the whole array */
-      if (quick) {
+      if (lquick) {
         /* For 2-D data, get airmass from the FITS header rather than
            the state structure */
         if ( ndims == 2 ) {
           /* This may change depending on exact FITS keyword */
           smf_fits_getD( hdr, "AMSTART", &airmass, status );
+
+          /* speed is not an issue for a 2d image */
+          ladaptive = 0;
+
         } else {
           /* Else use airmass value in state structure */
           airmass = hdr->state->tcs_airmass;
         }
-        extcorr = exp(airmass*tau);
-      } else {
+
+        /* we have an airmass, see if we need to provide per-pixel correction */
+        if (ladaptive) {
+          /* get the elevation and add on the array footprint. Calculate the airmass
+           at the new location and find the difference to the reference airmass.
+           The fractional error in exp(Atau) is (delta Airmass)*tau.
+          */
+          double newel = hdr->state->tcs_az_ac2 - footprint; /* tend to small el, large am */
+          double newam  = slaAirmas( M_PI_2 - newel );
+          double delta  = fabs(airmass-newam) * tau;
+          if (delta > corrthresh) {
+            /* we need WCS if we disable quick mode */
+            lquick = 0;
+            smf_tslice_ast( data, k, 1, status );
+          }
+        }
+
+        if (lquick) extcorr = exp(airmass*tau);
+      }
+
+      if (!lquick) {
         /* Not using quick so retrieve WCS to obtain elevation info */
         wcs = hdr->wcs;
         /* Check current frame, store it and then select the AZEL
@@ -373,7 +411,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
           index = k + (nframes * i);
         }
 
-        if (!quick) {
+        if (!lquick) {
           zd = M_PI_2 - azel[npts+i];
           airmass = slaAirmas( zd );
           extcorr = exp(airmass*tau);
@@ -409,7 +447,6 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   }
 
  CLEANUP:
-  if (!quick) {
-    azel = smf_free(azel,status);
-  }
+  if (azel) azel = smf_free(azel,status);
+
 }
