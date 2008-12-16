@@ -192,6 +192,7 @@ Options:
  -port <port>             - listen for remote cmds on port (default: 0 = choose port).
  -remote <bool>           - use existing skycat process, if available, with Tk send.
  -rtd <bool>              - include ESO/VLT Real-Time Features.
+ -rtd_autocut <bool>      - whether to apply the default autocut to realtime images.
  -scrollbars <bool>       - display scrollbars (not displayed by default).
  -shm_data <bool>         - put image data in sysV shared memory.
  -shm_header <bool>       - put image header in sysV shared memory.
@@ -361,7 +362,7 @@ itcl::class gaia::Gaia {
       #  On openwindows iconwindows are displayed but do not
       #  redirect events, so add a fake deiconify binding.
       if {$itk_option(-disp_image_icon)} {
-	 bind $itk_component(icon) <Double-1> "wm deiconify $w_"
+         bind $itk_component(icon) <Double-1> "wm deiconify $w_"
       }
 
       #  Add the GAIA menubar.
@@ -580,7 +581,7 @@ itcl::class gaia::Gaia {
 
       #  Some modes require realtime events immediately (not just when
       #  the toolboxes are ready).
-      if { $itk_option(-ukirt_xy) } {
+      if { $itk_option(-ukirt_xy) || $itk_option(-rtd_autocut) } {
          $image_ configure -real_time_command [code $this real_time_event_]
       }
    }
@@ -613,9 +614,9 @@ itcl::class gaia::Gaia {
 
       #  Close also needs the command changing to delete the object.
       $m entryconfigure "Close" \
-	 -label "Close Window" \
-	 -accelerator {Control-d} \
-	 -command [code $this delete_window]
+         -label "Close Window" \
+         -accelerator {Control-d} \
+         -command [code $this delete_window]
       bind $w_  <Control-d> [code $this delete_window]
       add_menu_short_help $m "Close Window" \
          {Close this window, exit application if last}
@@ -856,18 +857,18 @@ itcl::class gaia::Gaia {
 
       add_menuitem $m.coords command "Celestial coordinates...  " \
          {Change the celestial coordinate system} \
-	 -command [code $this make_toolbox astsystem]
+         -command [code $this make_toolbox astsystem]
 
       add_menuitem $m command "Object detection...  " \
          {Automatically detect and parameterize objects} \
-	 -command [code $this make_toolbox sextractor] \
-	 -accelerator {Control-j}
+         -command [code $this make_toolbox sextractor] \
+         -accelerator {Control-j}
       bind $w_ <Control-j> [code $this make_toolbox sextractor]
 
       add_menuitem $m command "Contouring...  " \
          {Contour this or another image over the displayed image...} \
-	 -command [code $this make_toolbox contour] \
-	 -accelerator {Control-h}
+         -command [code $this make_toolbox contour] \
+         -accelerator {Control-h}
       bind $w_ <Control-h> [code $this make_toolbox contour]
 
       add_menuitem $m command "Surface photometry...  " \
@@ -889,7 +890,7 @@ itcl::class gaia::Gaia {
       add_menuitem $m command "Mean X & Y profiles...  " \
          {Show X and Y averaged profiles of a rectangular region} \
          -command [code $this make_toolbox xyprofile 0 1] \
-	 -accelerator {Control-e}
+         -accelerator {Control-e}
       bind $w_ <Control-e> [code $this make_xyprofile_toolbox xyprofile 0 0]
 
       add_menuitem $m command "Polarimetry toolbox... " \
@@ -897,9 +898,9 @@ itcl::class gaia::Gaia {
          -command [code $this make_toolbox polarimetry 0 1] \
 
       if { $itk_option(-demo_mode) } {
-	 add_menuitem $m command "Demonstration mode..." \
-	       {See a demonstration of GAIA (needs an empty directory)} \
-	       -command [code $this make_toolbox demo]
+         add_menuitem $m command "Demonstration mode..." \
+               {See a demonstration of GAIA (needs an empty directory)} \
+               -command [code $this make_toolbox demo]
       }
    }
 
@@ -1477,9 +1478,23 @@ itcl::class gaia::Gaia {
             make_xyprofile_ xyprofile 0 $id 0 0 0 0
             after 0 [code $this real_time_event_]
          } else {
-            #  Some failure so remove the command (only way to trap this).
-            $image_ configure -real_time_command {}
+            #  Some failure so remove the command (only way to trap this),
+            #  unless it is required for other purposes.
+            if { !$itk_option(-rtd_autocut) } {
+               $image_ configure -real_time_command {}
+            }
          }
+      }
+
+      #  When the rtd_autocut flag is true, we want to update the 
+      #  the image cuts.
+      if { $itk_option(-rtd_autocut) } { 
+         if { $itk_option(-default_cut) != 100 } {
+            [$image_ get_image] autocut -percent $itk_option(-default_cut)
+         } else {
+            [$image_ get_image] autocut
+         }
+         [$image_ component info] updateValues
       }
    }
 
@@ -1546,7 +1561,7 @@ itcl::class gaia::Gaia {
    public method open_file {args} {
       set file [get_file_]
       if { $file != {} } {
-	 open_image_ $file
+         open_image_ $file
       }
    }
 
@@ -1661,8 +1676,8 @@ itcl::class gaia::Gaia {
 
       if { "$args" != "" } {
          set imagename [lindex $args 0]
-	 set namer [GaiaImageName \#auto -imagename $imagename]
-	 if { [$namer exists] } {
+         set namer [GaiaImageName \#auto -imagename $imagename]
+         if { [$namer exists] } {
 
             #  Release any cubes before proceeding, otherwise this holds
             #  dataset open when we'd like to reopen if needed here (will
@@ -1671,7 +1686,7 @@ itcl::class gaia::Gaia {
                maybe_release_cube_
             }
 
-	    $namer absolute
+            $namer absolute
             set fullname [$namer fullname 0]
             set hdunum [$namer fitshdunum]
             configure -hdu $hdunum
@@ -1685,7 +1700,7 @@ itcl::class gaia::Gaia {
          } else {
             error_dialog "There is no file named '$imagename'" $w_
          }
-	 delete object $namer
+         delete object $namer
       } else {
          return $itk_option(-file)
       }
@@ -1709,7 +1724,7 @@ itcl::class gaia::Gaia {
       #  If given the file replaces the one in the command-line args or
       #  is added to the list.
       if { $file != "" } {
-	 replace_image_ $file
+         replace_image_ $file
       }
 
       #  If a clone number was given construct the related name.
@@ -1717,9 +1732,9 @@ itcl::class gaia::Gaia {
          if { $number == -1 } {
             set number [expr $clone_cnt_ + 1]
          }
-	 set name ".gaia$number"
+         set name ".gaia$number"
       } else {
-	 set name ""
+         set name ""
       }
 
       #  If named window already exists, just configure args and file 
@@ -1736,10 +1751,10 @@ itcl::class gaia::Gaia {
 
       #  If name is "" then create a new name.
       if { $name == "" } {
-	 set name "$prefix_[expr $clone_cnt_+1]"
-	 while { [winfo exists $name] } {
-	    set name "$prefix_[incr clone_cnt_]"
-	 }
+         set name "$prefix_[expr $clone_cnt_+1]"
+         while { [winfo exists $name] } {
+            set name "$prefix_[incr clone_cnt_]"
+         }
       }
 
       #  Start a new clone, do not wait for application to exit, when not
@@ -1750,15 +1765,15 @@ itcl::class gaia::Gaia {
       #  Actually we only arrive here if not blocking, except when
       #  application is exiting, so clone number is wrong.
       if { ! $block } {
-	 tkwait visibility $name
-	 if { $number != {} } {
+         tkwait visibility $name
+         if { $number != {} } {
 
-	    #  Number given, so update the title and make sure next
-	    #  clone doesn't try to have same name.
-	    $name configure -number $number
-	    $name.image update_title
-	    catch {set clone_cnt_ [max $clone_cnt_ $number]}
-	 }
+            #  Number given, so update the title and make sure next
+            #  clone doesn't try to have same name.
+            $name configure -number $number
+            $name.image update_title
+            catch {set clone_cnt_ [max $clone_cnt_ $number]}
+         }
       }
       return $name
    }
@@ -1800,32 +1815,32 @@ itcl::class gaia::Gaia {
       set index [lsearch -exact $argv "-file"]
       if { $index == -1 } {
 
-	 #  Filename may be unpaired with -file, so look for it.
-	 set newargv ""
-	 set seenfile 0
-	 for {set i 0} {$i < $argc} {incr i} {
-	    set opt [lindex $argv $i]
-	    if {"[string index $opt 0]" == "-" && "$opt" != "-"} {
-	       set arg [lindex $argv [incr i]]
-	    } else {
-	       set seenfile 1
-	       set arg "$filename"
-	       set opt "-file"
-	    }
-	    lappend newargv $opt $arg
-	 }
-	 if { ! $seenfile } {
+         #  Filename may be unpaired with -file, so look for it.
+         set newargv ""
+         set seenfile 0
+         for {set i 0} {$i < $argc} {incr i} {
+            set opt [lindex $argv $i]
+            if {"[string index $opt 0]" == "-" && "$opt" != "-"} {
+               set arg [lindex $argv [incr i]]
+            } else {
+               set seenfile 1
+               set arg "$filename"
+               set opt "-file"
+            }
+            lappend newargv $opt $arg
+         }
+         if { ! $seenfile } {
 
-	    #  No -file and no unpaired options.
-	    lappend newargv "-file" "$filename"
-	 }
-	 set argv $newargv
-	 set argc [llength $argv]
+            #  No -file and no unpaired options.
+            lappend newargv "-file" "$filename"
+         }
+         set argv $newargv
+         set argc [llength $argv]
       } else {
 
-	 #  Has "-file" so just replace associated value.
-	 incr index
-	 set argv [lreplace $argv $index $index $filename]
+         #  Has "-file" so just replace associated value.
+         incr index
+         set argv [lreplace $argv $index $index $filename]
       }
    }
 
@@ -2054,12 +2069,12 @@ window gives you access to this."
    #  Print a copy of the colorramp to postscript.
    private method print_ramp_ {} {
       utilReUseWidget gaia::GaiaRampPrint $w_.printramp \
-	 -image $image_.colorramp.image \
-	 -show_footer 0 \
-	 -whole_canvas 1 \
-	 -transient 1 \
-	 -mainimage [$image_ get_image] \
-	 -maincanvas [$image_ get_canvas]
+         -image $image_.colorramp.image \
+         -show_footer 0 \
+         -whole_canvas 1 \
+         -transient 1 \
+         -mainimage [$image_ get_image] \
+         -maincanvas [$image_ get_canvas]
    }
 
    #  Import a text file as a catalogue.
@@ -2450,6 +2465,9 @@ window gives you access to this."
 
    #  Check any images that are opened to see if they are cubes.
    itk_option define -check_for_cubes check_for_cubes Check_For_Cubes 1
+
+   #  Whether to autocut realtime images to the default cut.
+   itk_option define -rtd_autocut rtd_autocut Rtd_AutoCut 0
 
    #  Search box size when centroiding.
    itk_option define -isize isize Isize 9 {
