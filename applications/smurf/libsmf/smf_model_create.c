@@ -680,7 +680,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
                  (with only the header mapped) and store the gain coefficients
                  in the model bufffer */              
               tau = smf_calc_meantau( idata->hdr, status );
-              smf_correct_extinction( idata, SMF__TAUSRC_CSOTAU,
+              smf_correct_extinction( idata, SMF__TAUSRC_WVMRAW,
                                       SMF__EXTMETH_ADAPT, tau, 
                                       (double *) dataptr, status );
 
