@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     void smf_flat_responsivity ( smfData *respmap, size_t nheat,
+*     size_t smf_flat_responsivity ( smfData *respmap, size_t nheat,
 *                                  const double powval[], const double bolval[],
 *                                  int *status );
 
@@ -37,6 +37,9 @@
 *     power. Assume the response for a good bolometer should be nearly linear,
 *     and so analyse the set of responsivities to determine the mean and
 *     evaluate the quality. Write the results to a text file.
+
+*  Returned Value:
+*     size_t = number of good responsivities.
 
 *  Notes:
 *     - powval and bolval are calculated by smf_flat_standardpow.
@@ -100,9 +103,9 @@
 
 #include "gsl/gsl_fit.h"
 
-void smf_flat_responsivity ( smfData *respmap, size_t nheat,
-                             const double powval[], const double bolval[],
-                             int *status ) {
+size_t smf_flat_responsivity ( smfData *respmap, size_t nheat,
+                               const double powval[], const double bolval[],
+                               int *status ) {
 
   size_t bol;                  /* Bolometer offset into array */
   double * bolv = NULL;        /* Temp space for bol values */
@@ -117,9 +120,9 @@ void smf_flat_responsivity ( smfData *respmap, size_t nheat,
   double *resps = NULL;        /* responsivities for a bolometer at each step */
   double *respvar = NULL;      /* responsivity variance */
 
-  if (*status != SAI__OK) return;
+  if (*status != SAI__OK) return ngood;
 
-  if (!smf_dtype_check_fatal( respmap, NULL, SMF__DOUBLE, status )) return;
+  if (!smf_dtype_check_fatal(respmap, NULL, SMF__DOUBLE, status)) return ngood;
   
   respdata = (respmap->pntr)[0];
   respvar  = (respmap->pntr)[1];
@@ -176,11 +179,9 @@ void smf_flat_responsivity ( smfData *respmap, size_t nheat,
 
   }
 
-  msgSeti( "NG", ngood );
-  msgOut( " ", "Number of good responsivities: ^NG", status );
-
   if (resps) smf_free( resps, status );
   if (bolv) smf_free( bolv, status );
   if (powv) smf_free( powv, status );
 
+  return ngood;
 }

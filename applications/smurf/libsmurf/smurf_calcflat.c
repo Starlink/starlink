@@ -147,6 +147,7 @@ void smurf_calcflat( int *status ) {
   int ncols;                /* Number of columns */
   int nrows;                /* Number of rows */
   size_t ndarks;            /* Number of darks to process */
+  size_t ngood;             /* Number of good responsivities */
   Grp *igrp = NULL;         /* Input group of files */
   int obsnum;               /* Observation number */
   Grp *ogrp = NULL;         /* Output group of files */
@@ -431,25 +432,15 @@ void smurf_calcflat( int *status ) {
 
     /* Calculate the responsivity in Amps/Watt */
 
-    smf_flat_responsivity( respmap, bbhtframe->ndat, powref, bolref, status );
+    ngood = smf_flat_responsivity( respmap, bbhtframe->ndat, powref, bolref,
+                                   status );
 
     /* Report the number of good responsivities */
-    if (respmap) {
-      double *respdata = (respmap->pntr)[0];
-      size_t ngood = 0;
-      size_t ntotal = 0;
-      for (i = 0; i < nbols; i++) {
-        if (respdata[i] != VAL__BADD) {
-          ngood++;
-        }
-        ntotal++;
-      }
-      msgSeti( "NG", ngood );
-      msgSeti( "NTOT", ntotal );
-      msgOutif( MSG__NORM, "",
-                "Number of good responsivities: ^NG out of ^NTOT", status);
-      parPut0i( "NGOOD", ngood, status );
-    }
+    msgSeti( "NG", ngood );
+    msgSeti( "NTOT", nbols );
+    msgOutif( MSG__NORM, "",
+              "Number of good responsivities: ^NG out of ^NTOT", status);
+    parPut0i( "NGOOD", ngood, status );
 
     /* Optionally discard the calibration if the responsivity is bad */
     parGet0l( "RESPMASK", &respmask, status );
