@@ -148,6 +148,7 @@ smf_get_spread.c \
 smf_get_taskname.c \
 smf_get_xloc.c \
 smf_getfitsd.c \
+smf_getfitss.c \
 smf_getobsidss.c \
 smf_getrefwcs.c \
 smf_groupscans.c \

@@ -113,6 +113,7 @@
 #include "msg_par.h"
 #include "star/one.h"
 #include "ast.h"
+#include "star/one.h"
 
 /* SMURF routines */
 #include "smf.h"
@@ -206,7 +207,10 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
 
         /* Create a sub keymap and populate it */
         obsinfo = astKeyMap( " " );
-        smf_fits_getS( infile->hdr, "OBJECT", object, sizeof(object), status );
+        /* fill with default value in case undefined */
+        one_strlcpy( object, "<undefined>", sizeof(object), status );
+        smf_getfitss( infile->hdr, "OBJECT", object, sizeof(object),
+                      status );
         astMapPut0C( obsinfo, "OBJECT", object, NULL );
         astMapPut0I( obsinfo, "OBSMODE", infile->hdr->obsmode, NULL );
         astMapPut0I( obsinfo, "OBSTYPE", infile->hdr->obstype, NULL );
