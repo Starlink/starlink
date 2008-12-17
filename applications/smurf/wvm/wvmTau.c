@@ -6,27 +6,22 @@
 	Provides utility to convert millimeters of precipitable water
 	vapor content into a value representing the optical depth seen
 	at 225GHz relative to zenith. Otherwise known as 225Tau.
+         Also available is a function to convert optical depth seen at
+         225GHz relative to the zenith into a value representing
+         millimeters of water vapor.
 
   Functions:
 	double pwv2tau(double airMass, double mmH2O);
+         double tau2pwv(double tau);
 
   History:
 
-	$Log$
-	Revision 0.4  2006/09/01 18:19:22  jbalfour
-	Fixed commenting style
+	$Log: wvmTau.c,v $
+	Revision 1.8  2008/06/11 03:33:27  rkackley
+	Added tau2pwv function and tau_table lookup table (both supplied by J.Balfour).
 	
-	Revision 0.3  2006/07/04 17:09:50  jbalfour
-	Commenting on tau2pwv lookup table
-	
-	Revision 0.2  2006/06/30 18:22:59  jbalfour
-	Added tau2pwv routine.
-	
-	Revision 0.1  2006/02/07 22:29:50  agibb
-	WVM files necessary for calculating tau from the WVM temperature measurements
-	
-	Revision 0.1  2006/01/25 20:43:37  echapin
-	Initial version
+	Revision 1.7  2006/07/14 19:05:28  rkackley
+	Corrected a typo in the calculation of const_c (code was using coefs_m1 when it should have been using coefs_c). Note that this bug did not affect the final tau value since const_c is arithmetically eliminated when the correction value is computed.
 	
 	Revision 1.6  2003/07/02 22:20:47  berndw
 	Just more tests
@@ -96,7 +91,7 @@ double pwv2tau(double airMass, double mmH2O_a) {
   if (TAU_DEBUG > 5)
     printf("m1 is: %f\n", const_m1);
 
-  const_c = coefs_c[0] * pow(mmH2O_a, 2.0) + coefs_c[1] * mmH2O_a + coefs_m1[2];
+  const_c = coefs_c[0] * pow(mmH2O_a, 2.0) + coefs_c[1] * mmH2O_a + coefs_c[2];
   if (TAU_DEBUG > 5)
     printf("c is: %f\n", const_c);
 
@@ -128,36 +123,32 @@ double pwv2tau(double airMass, double mmH2O_a) {
     printf("mult is: %f\n", mult);
     printf("Final Tau is: %f\n", wvm_temp/mult);
   }
-
   return wvm_temp/mult;
 }
 
-/* 
-   Function:
-	tau2pwv converts the optical depth seen at 225GHz relative to
-        the zenith into a value representing millimeters of water vapor.
-        This is done using the look-up table tau_table found in 
-        wvmTau.h.  The values in the tau2pwv lookup table represent the 
-        tau values for pwvs ranging from 0.0 to 10.0 (incrementing by 0.1).  
-        The values were calculated using pwv2tau and an airmass of 1.0. 
+/*
+  Function:
+        tau2pwv converts the optical depth seen at 225GHz relative to
+       the zenith into a value representing millimeters of water vapor.
+       This is done using the look-up table tau_table found in
+       wvmTau.h.  The values in the tau2pwv lookup table represent the
+       tau values for pwvs ranging from 0.0 to 10.0 (incrementing by 0.1).
+       The values were calculated using pwv2tau and an airmass of 1.0.
 
-   Author:
-	J.Balfour: jbalfour@phas.ubc.ca
- */
+  Author:
+        J.Balfour: jbalfour@phas.ubc.ca
+*/
 double tau2pwv(double tau) {
 
-  int i = 0;
+ int i = 0;
 
-  /* Get the closest approximation to this tau, and return
-     the corresponding pwv */
+ /* Get the closest approximation to this tau, and return
+    the corresponding pwv */
 
-  while ( tau_table[i] <= tau ) {
-    i++;
-  }
+ while ( tau_table[i] <= tau ) {
+   i++;
+ }
 
-  return ( double ) i / 10.0;
+ return ( double ) i / 10.0;
 
 }
-  
-  
-
