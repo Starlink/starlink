@@ -513,7 +513,6 @@ static int is_large_delta_atau ( double airmass1, double elevation1, double tau,
   elevation2 = elevation1 - footprint;  /* want smaller el for larger am */
   airmass2 = slaAirmas( M_PI_2 - elevation2 );
   delta = fabs(airmass1-airmass2) * tau;
-  printf("Delta = %f Am1 =%f am2=%f tau=%f\n",delta,airmass1,airmass2,tau);
   if (delta > corrthresh) {
     return 1;
   } else {
