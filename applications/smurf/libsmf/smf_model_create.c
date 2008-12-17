@@ -236,7 +236,6 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
   char *pname=NULL;             /* Poiner to fname */
   long remainder=0;             /* Extra length beyond integer pagesize */
   char suffix[] = SMF__DIMM_SUFFIX; /* String containing model suffix */
-  double tau;                   /* 225 GHz optical depth */
   dim_t thisnrel;               /* Number of related items for this model */
   size_t tstride;               /* Time slice stride in data array */
   double val;                   /* Temporary value */

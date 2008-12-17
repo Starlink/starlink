@@ -305,7 +305,6 @@ void smurf_qlmakemap( int *status ) {
   int smfflags = 0;          /* Flags for creating a new smfData */
   int spread;                /* Code for pixel spreading scheme */
   char system[10];           /* Celestial coordinate system for output image */
-  double tau;                /* 225 GHz optical depth */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   void *variance = NULL;     /* Pointer to the variance map */
   double *weights = NULL;    /* Pointer to the weights array */
