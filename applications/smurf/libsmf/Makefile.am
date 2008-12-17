@@ -78,6 +78,7 @@ smf_create_smfDream.c \
 smf_create_smfFile.c \
 smf_create_smfFilter.c \
 smf_create_smfHead.c \
+smf_cso2filt_tau.c \
 smf_cubebounds.c \
 smf_cubegrid.c \
 smf_dataOrder.c \

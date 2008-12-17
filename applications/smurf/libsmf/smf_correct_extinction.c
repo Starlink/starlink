@@ -194,7 +194,6 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
   double *azel = NULL;     /* AZEL coordinates */
   size_t base;             /* Offset into 3d data array */
   double extcorr = 1.0;    /* Extinction correction factor */
-  char filter[81];         /* Name of filter */
   smfHead *hdr = NULL;     /* Pointer to full header struct */
   dim_t i;                 /* Loop counter */
   double *indata = NULL;   /* Pointer to data array */
@@ -271,8 +270,7 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
 
   /* If we have a CSO Tau then convert it to the current filter */
   if ( tausrc == SMF__TAUSRC_CSOTAU ) {
-    smf_fits_getS( hdr, "FILTER", filter, 81, status);
-    tau = smf_scale_tau( tau, filter, status);
+    tau = smf_cso2filt_tau( hdr, tau, status );
     /* The tau source is now a real tau */
     tausrc = SMF__TAUSRC_TAU;
   }

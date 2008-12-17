@@ -16,7 +16,7 @@
 *     smf_calc_wvm( const smfHead *hdr, int *status) {
 
 *  Arguments:
-*     hdr = smfHead* (Given)
+*     hdr = const smfHead* (Given)
 *        Header struct from data struct
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -44,6 +44,7 @@
 *     2008-12-16 (TIMJ):
 *        - Ambient temperature should be in kelvin
 *        - PWV should be converted to zenith value before calculating tau.
+*        - use smf_cso2filt_tau
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -96,7 +97,6 @@ double smf_calc_wvm( const smfHead *hdr, int *status ) {
 
   /* Local variables */
   double airmass;           /* Airmass of current observation */
-  char filter[80];          /* Current filter */
   float pwv;                /* Precipitable water vapour in mm */
   const JCMTState *state = NULL; /* STATE struct containing TCS info */
   double tau;               /* Zenith tau at current wavelength */
@@ -137,8 +137,7 @@ double smf_calc_wvm( const smfHead *hdr, int *status ) {
   }
 
   /* Scale from CSO to filter tau */
-  smf_fits_getS( hdr, "FILTER", filter, sizeof(filter), status);
-  tau = smf_scale_tau( tau225, filter, status);
+  tau = smf_cso2filt_tau( hdr, tau225, status );
 
   /*  printf("A = %g tau225 = %g tau = %g\n",airmass,tau225,tau);*/
 

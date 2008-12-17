@@ -180,7 +180,6 @@ void smurf_extinction( int * status ) {
   smfArray *bpms = NULL;     /* Bad pixel masks */
   smfArray *darks = NULL;    /* Dark data */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
-  char filter[81];           /* Name of filter */
   int has_been_sky_removed = 0;/* Data are sky-removed */
   size_t i;                  /* Loop counter */
   Grp *igrp = NULL;          /* Input group */
@@ -306,8 +305,7 @@ void smurf_extinction( int * status ) {
           param = "CSOTAU";
         } else if (tausrc == SMF__TAUSRC_TAU) {
           param = "FILTERTAU";
-          smf_fits_getS( ohdr, "FILTER", filter, 81, status);
-          deftau = smf_scale_tau( deftau, filter, status );
+          deftau = smf_cso2filt_tau( ohdr, deftau, status );
         }
         parGdr0d( param, deftau, 0.0,1.0, 1, &tau, status );
       } else if ( tausrc == SMF__TAUSRC_WVMRAW ) {
