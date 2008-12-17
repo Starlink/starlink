@@ -33,6 +33,10 @@
     The coordinate system used when handling a cube can now be changed to
     display pixel and grid coordinates, as well as spectral ones.
 
+    A new command-line option -rtd_autocut has been added. This applies
+    the -default_cut percentile to any images received by the realtime
+    interface.
+
   Lehuakona Release
   =================
 
