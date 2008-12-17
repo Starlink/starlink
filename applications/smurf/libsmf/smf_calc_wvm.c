@@ -41,9 +41,13 @@
 *        sc2head no longer used. Use JCMTState instead.
 *     2008-04-29 (AGG):
 *        Code tidy, add status check
+*     2008-12-16 (TIMJ):
+*        - Ambient temperature should be in kelvin
+*        - PWV should be converted to zenith value before calculating tau.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council.  Copyright (C) 2006-2008 University of British
 *     Columbia.  All Rights Reserved.
@@ -115,18 +119,25 @@ double smf_calc_wvm( const smfHead *hdr, int *status ) {
   wvm[2] = state->wvm_t78;
   airmass = state->tcs_airmass;
 
-  /* Retrieve the ambient temperature */
+  /* Retrieve the ambient temperature and convert to kelvin */
   /* FUTURE: interpolate to current timeslice */
   smf_fits_getD( hdr, "ATSTART", &tamb, status );
-  smf_fits_getS( hdr, "FILTER", filter, 81, status);
+  tamb += 273.15;
 
   if ( *status == SAI__OK ) {
 
+    /* Get the pwv for this airmass */
     wvmOpt( (float)airmass, (float)tamb, wvm, &pwv, &tau0, &twater);
+    
+    /* Convert to zenith pwv */
+    pwv /= airmass;
 
+    /* convert zenith pwv to zenith tau */
     tau225 = pwv2tau( airmass, pwv );
   }
 
+  /* Scale from CSO to filter tau */
+  smf_fits_getS( hdr, "FILTER", filter, sizeof(filter), status);
   tau = smf_scale_tau( tau225, filter, status);
 
   /*  printf("A = %g tau225 = %g tau = %g\n",airmass,tau225,tau);*/
