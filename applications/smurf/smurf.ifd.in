@@ -297,19 +297,19 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter method {
+            parameter tausrc {
                 position 3
                 type _CHAR
-                prompt {Optical depth method}
+                prompt {Source of opacity data}
                 helpkey *
             }
 
-            parameter quick {
-                type _LOGICAL
+            parameter method {
+                position 4
+                type _CHAR
                 vpath {PROMPT }
-                prompt {Apply the optical depth in quick fashion?}
-                ppath GLOBAL CURRENT
-                default FALSE
+                prompt {Method to use for airmass calculation}
+                ppath CURRENT
                 helpkey *
             }
 

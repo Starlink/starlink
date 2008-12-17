@@ -249,6 +249,23 @@ typedef enum smf_obstype {
   SMF__TYP_NOISE
 } smf_obstype;
 
+/* Source of tau for extinction correction */
+typedef enum smf_tausrc {
+  SMF__TAUSRC_NULL,     /* No correction */
+  SMF__TAUSRC_WVMRAW,   /* Use WVM raw time series */
+  SMF__TAUSRC_CSOTAU,   /* Use CSO tau scaled to filter */
+  SMF__TAUSRC_TAU       /* Use this tau number */
+} smf_tausrc;
+
+/* Method to use for extinction correction */
+typedef enum smf_extmeth {
+  SMF__EXTMETH_NONE,   /* No correction */
+  SMF__EXTMETH_SINGLE, /* Assume all bolometers at same airmass */
+  SMF__EXTMETH_FULL,   /* Calculate airmass of each bolometer */
+  SMF__EXTMETH_ADAPT   /* Switch between FAST and FULL dynamically */
+} smf_extmeth;
+
+
 /* Ways of removing dark */
 typedef enum smf_dark_sub_meth {
   SMF__DKSUB_NONE,        /* Ignore the dark */

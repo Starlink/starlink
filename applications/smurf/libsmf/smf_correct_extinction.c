@@ -13,21 +13,25 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_correct_extinction(smfData *data, const char *tausrc, 
-*                            const int quick, double tau, double *allextcorr, 
+*     smf_correct_extinction(smfData *data, smf_tausrc tausrc,
+*                            smf_extmeth method, double tau, double *allextcorr, 
 *                            int *status) {
 
 *  Arguments:
 *     data = smfData* (Given)
 *        smfData struct
-*     tausrc = const char* (Given)
+*     tausrc = smf_tausrc (Given)
 *        Source of opacity value. Options are:
-*          CSOTAU: Use the supplied "tau" argument as if it is CSO tau.
-*          WVMRAW: Use the WVM time series data.
-*     quick = const int (Given)
-*        Flag to denote whether to use a single airmass for all measurements
+*          SMF__TAUSRC_CSOTAU: Use the supplied "tau" argument as if it is CSO tau.
+*          SMF__TAUSRC_WVMRAW: Use the WVM time series data.
+*          SMF__TAUSRC_TAU: Use the tau value as if it is for this filter.
+*     method = smf_extmeth (Given)
+*        Flag to denote which method to use for calculating the airmass of a bolometer.
+*          SMF__EXTMETH_SINGLE: Use single airmass for each time slice.
+*          SMF__EXTMETH_FULL: Calculate airmass for each bolometer.
+*          SMF__EXTMETH_ADAPT: Use FULL only if warranted. Else use FAST.
 *     tau = double (Given)
-*        Optical depth at 225 GHz. Only used if tausrc is "CSOTAU".
+*        Optical depth at 225 GHz. Only used if tausrc is TAU or CSOTAU.
 *     allextcorr = double* (Given and Returned)
 *        If given, store calculated corrections for each bolo/time slice. Must
 *        have same dimensions as bolos in *data
@@ -37,13 +41,18 @@
 *  Description:
 *     This is the main low-level routine implementing the EXTINCTION
 *     task. If allextcorr is specified, no correction is applied to
-*     the data (the correction factors are just stored). 
+*     the data (the correction factors are just stored).
+*
+*     The adaptive method looks at the combination of Airmass and Tau to determine
+*     whether a full per-bolometer calculation is required or whether a single
+*     airmass is sufficient (as read from the telescope tracking position).
 
 *  Notes:
-*     Adaptive processing works on each time slice in turn. This is done because
+*     In WVM mode the adaptive mode checking occurs at each time slice. This is done because
 *     tau can change from time slice to time slice, which could lead to a change
 *     significant enough to cross the threshold. This is not important if a static
-*     correction method (eg CSO tau) is in use.
+*     correction method (eg CSO tau) is in use. For CSOTAU and TAU modes the check is
+*     performed once based on either the start or end airmass (since the tau is not changing).
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -121,6 +130,9 @@
 *     2008-12-15 (TIMJ):
 *        - use smf_get_dims. Tidy up isTordered handling and index handling.
 *        - outline of adaptive mode.
+*     2008-12-16 (TIMJ):
+*        - new API using integer constants rather than strings.
+*        - adaptive mode now working (inside and outside loop).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -168,10 +180,13 @@
 #include "smurf_par.h"
 #include "smurf_typ.h"
 
+/* internal prototype */
+static int is_large_delta_atau ( double airmass1, double elevation1, double tau, int *status);
+
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_correct_extinction"
 
-void smf_correct_extinction(smfData *data, const char *tausrc, const int quick,
+void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method,
                             double tau, double *allextcorr, int *status) {
 
   /* Local variables */
@@ -180,7 +195,6 @@ void smf_correct_extinction(smfData *data, const char *tausrc, const int quick,
   size_t base;             /* Offset into 3d data array */
   double extcorr = 1.0;    /* Extinction correction factor */
   char filter[81];         /* Name of filter */
-  const double footprint = 10.0 * DD2R / 60.0;  /* 10 arcmin */
   smfHead *hdr = NULL;     /* Pointer to full header struct */
   dim_t i;                 /* Loop counter */
   double *indata = NULL;   /* Pointer to data array */
@@ -199,10 +213,7 @@ void smf_correct_extinction(smfData *data, const char *tausrc, const int quick,
   int ubnd[2];             /* Upper bound */
   double *vardata = NULL;  /* Pointer to variance array */
   AstFrameSet *wcs = NULL; /* Pointer to AST WCS frameset */
-  int wvmr = 0;            /* Flag to denote whether the WVMRAW tau is to be used. */
   double zd = 0;           /* Zenith distance */
-  const double corrthresh = 0.01; /* threshold to switch from quick to slow as fraction */
-  int adaptive = 0;
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -221,6 +232,14 @@ void smf_correct_extinction(smfData *data, const char *tausrc, const int quick,
   /* Acquire the data order */
   isTordered = data->isTordered;
 
+  /* make sure we have a header */
+  hdr = data->hdr;
+  if( hdr == NULL ) {
+    *status = SAI__ERROR;
+    errRep( FUNC_NAME, "Input data has no header", status);
+    return;
+  }
+
   /* Do we have 2-D image data? */
   ndims = data->ndims;
   if (ndims == 2) {
@@ -234,22 +253,16 @@ void smf_correct_extinction(smfData *data, const char *tausrc, const int quick,
   }
 
   /* Tell user we're correcting for extinction */
-  msgSetc("M", tausrc);
   msgOutif(MSG__VERB," ", 
-           "Correcting for extinction with tau source ^M", status);
+           "Correcting for extinction.", status);
 
   /* Should check data type for double if not allextcorr case */
   if( !allextcorr ) {
     if (!smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status)) return;
   }
 
-  /* Check desired optical depth method */
-  if ( strncmp( tausrc, "WVMR", 4) == 0 ) {
-    wvmr = 1;
-  }
-
   /* Check that we're not trying to use the WVM for 2-D data */
-  if ( ndims == 2 && wvmr ) {
+  if ( ndims == 2 && tausrc == SMF__TAUSRC_WVMRAW ) {
     if ( *status == SAI__OK ) {
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "Method WVMRaw can not be used on 2-D image data", status );
@@ -257,16 +270,49 @@ void smf_correct_extinction(smfData *data, const char *tausrc, const int quick,
   }
 
   /* If we have a CSO Tau then convert it to the current filter */
-  if ( strncmp( tausrc, "CSOT", 4) == 0 ) {
-    hdr = data->hdr;
-    if( hdr == NULL ) {
-      if ( *status == SAI__OK ) {
-        *status = SAI__ERROR;
-        errRep( FUNC_NAME, "Input data has no header", status);
-      }
-    }
+  if ( tausrc == SMF__TAUSRC_CSOTAU ) {
     smf_fits_getS( hdr, "FILTER", filter, 81, status);
     tau = smf_scale_tau( tau, filter, status);
+    /* The tau source is now a real tau */
+    tausrc = SMF__TAUSRC_TAU;
+  }
+
+  /* if we are not doing WVM correction but are in adaptive mode we can determine
+     whether or not we will have to use full or single mode just by looking at the
+     airmass data. */
+  if (ndims == 3 && tausrc != SMF__TAUSRC_WVMRAW && method == SMF__EXTMETH_ADAPT) {
+    /* first and last is a good approximation given that most SCUBA-2 files will only
+       be a minute duration. */
+    double el1;
+    double am1;
+    double el2;
+    double am2;
+    smf_tslice_ast( data, 0, 0, status );
+    el1 = hdr->state->tcs_az_ac2;
+    am1 = hdr->state->tcs_airmass;
+    smf_tslice_ast( data, nframes-1, 0, status );
+    el2 = hdr->state->tcs_az_ac2;
+    am2 = hdr->state->tcs_airmass;
+
+    /* only need to examine the largest airmass */
+    if (am2 > am1) {
+      am1 = am2;
+      el1 = el2;
+    }
+
+    /* and choose a correction method */
+    if (is_large_delta_atau( am1, el1, tau, status) ) {
+      method = SMF__EXTMETH_FULL;
+      msgOutif(MSG__DEBUG, " ",
+               "Adaptive extinction algorithm selected per-bolometer airmass value "
+               "per time slice", status);
+    } else {
+      msgOutif(MSG__DEBUG, " ",
+               "Adaptive extinction algorithm selected single airmass value per time slice",
+               status);
+      method = SMF__EXTMETH_SINGLE;
+    }
+
   }
 
   /* Assign pointer to input data array if status is good */
@@ -276,7 +322,7 @@ void smf_correct_extinction(smfData *data, const char *tausrc, const int quick,
   }
   /* It is more efficient to call astTranGrid than astTran2
      Allocate memory in adaptive mode just in case. */
-  if (!quick || adaptive) {
+  if (method == SMF__EXTMETH_FULL || method == SMF__EXTMETH_ADAPT ) {
     azel = smf_malloc( 2*npts, sizeof(*azel), 0, status );
   }
 
@@ -289,156 +335,147 @@ void smf_correct_extinction(smfData *data, const char *tausrc, const int quick,
   lbnd[1] = 1;
   ubnd[0] = nx;
   ubnd[1] = ny;
-  tau *= 10.0;
+
   /* Loop over number of time slices/frames */
 
   for ( k=0; k<nframes && (*status == SAI__OK) ; k++) {
-    /* Local copies of flags so that adaptive mode can update them locally */
-    int lquick = quick;
-    int ladaptive = adaptive;
+    /* Flags to indicate which mode we are using for this time slice */
+    int quick = 0;  /* use single airmass */
+    int adaptive = 0; /* switch from quick to full if required */
+    if (method == SMF__EXTMETH_SINGLE) {
+      quick = 1;
+    } else if (method == SMF__EXTMETH_ADAPT) {
+      quick = 1;
+      adaptive = 1;
+    }
 
     /* Call tslice_ast to update the header for the particular
        timeslice. If we're in QUICK mode then we don't need the WCS */
     smf_tslice_ast( data, k, !quick, status );
 
-    /* Retrieve header info */
-    hdr = data->hdr;
-    if( hdr == NULL ) {
-      *status = SAI__ERROR;
-      errRep( FUNC_NAME, "Data has no header after attempt to update", status);
-    } else {
-      /* See if we have a new WVM value */
-      if (wvmr) {
-        newtwvm[0] = hdr->state->wvm_t12;
-        newtwvm[1] = hdr->state->wvm_t42;
-        newtwvm[2] = hdr->state->wvm_t78;
-        /* Have any of the temperatures changed? */
-        if ( (newtwvm[0] != oldtwvm[0]) || 
-             (newtwvm[1] != oldtwvm[1]) || 
-             (newtwvm[2] != oldtwvm[2]) ) {
-          newtau = 1;
-          oldtwvm[0] = newtwvm[0];
-          oldtwvm[1] = newtwvm[1];
-          oldtwvm[2] = newtwvm[2];
-        } else {
-          newtau = 0;
-        }
-        if (newtau) {
-          tau = smf_calc_wvm( hdr, status );
-          newtau = 0;
-          /* Check status and/or value of tau */
-          if ( tau == VAL__BADD ) {
-            if ( *status == SAI__OK ) {
-              *status = SAI__ERROR;
-              errRep("", "Error calculating tau from WVM temperatures", 
-                     status);
-            }
-          }
-        }
+    /* See if we have a new WVM value */
+    if (tausrc == SMF__TAUSRC_WVMRAW) {
+      newtwvm[0] = hdr->state->wvm_t12;
+      newtwvm[1] = hdr->state->wvm_t42;
+      newtwvm[2] = hdr->state->wvm_t78;
+      /* Have any of the temperatures changed? */
+      if ( (newtwvm[0] != oldtwvm[0]) || 
+           (newtwvm[1] != oldtwvm[1]) || 
+           (newtwvm[2] != oldtwvm[2]) ) {
+        newtau = 1;
+        oldtwvm[0] = newtwvm[0];
+        oldtwvm[1] = newtwvm[1];
+        oldtwvm[2] = newtwvm[2];
+      } else {
+        newtau = 0;
       }
-
-      /* If we're using the QUICK application method, we assume a single
-         airmass and tau for the whole array */
-      if (lquick) {
-        /* For 2-D data, get airmass from the FITS header rather than
-           the state structure */
-        if ( ndims == 2 ) {
-          /* This may change depending on exact FITS keyword */
-          smf_fits_getD( hdr, "AMSTART", &airmass, status );
-
-          /* speed is not an issue for a 2d image */
-          ladaptive = 0;
-
-        } else {
-          /* Else use airmass value in state structure */
-          airmass = hdr->state->tcs_airmass;
-        }
-
-        /* we have an airmass, see if we need to provide per-pixel correction */
-        if (ladaptive) {
-          /* get the elevation and add on the array footprint. Calculate the airmass
-           at the new location and find the difference to the reference airmass.
-           The fractional error in exp(Atau) is (delta Airmass)*tau.
-          */
-          double newel = hdr->state->tcs_az_ac2 - footprint; /* tend to small el, large am */
-          double newam  = slaAirmas( M_PI_2 - newel );
-          double delta  = fabs(airmass-newam) * tau;
-          if (delta > corrthresh) {
-            /* we need WCS if we disable quick mode */
-            lquick = 0;
-            smf_tslice_ast( data, k, 1, status );
-          }
-        }
-
-        if (lquick) extcorr = exp(airmass*tau);
-      }
-
-      if (!lquick) {
-        /* Not using quick so retrieve WCS to obtain elevation info */
-        wcs = hdr->wcs;
-        /* Check current frame, store it and then select the AZEL
-           coordinate system */
-        if (wcs != NULL) {
-          if (strcmp(astGetC(wcs,"SYSTEM"), "AZEL") != 0) {
-            astSet( wcs, "SYSTEM=AZEL"  );
-          }
-          /* Transfrom from pixels to AZEL */
-          astTranGrid( wcs, 2, lbnd, ubnd, 0.1, 1000000, 1, 2, npts, azel );
-          if (!astOK) {
-            if (*status == SAI__OK) {
-              *status = SAI__ERROR;
-              errRep( FUNC_NAME, "Error from AST when attempting to set SYSTEM to AZEL: WCS is NULL", status);
-            }
-          }
-        } else {
-          /* Throw an error if no WCS */
+      if (newtau) {
+        tau = smf_calc_wvm( hdr, status );
+        newtau = 0;
+        /* Check status and/or value of tau */
+        if ( tau == VAL__BADD ) {
           if ( *status == SAI__OK ) {
             *status = SAI__ERROR;
-            errRep("", "Error: input file has no WCS", status);
+            errRep("", "Error calculating tau from WVM temperatures", 
+                   status);
           }
         }
-      } 
-      /* Loop over data in time slice. Start counting at 1 since this is
-         the GRID coordinate frame */
-      base = npts * k;  /* Offset into 3d data array (time-ordered) */
-
-      for (i=0; i < npts && ( *status == SAI__OK ); i++ ) {
-        /* calculate array indices - assumes that astTranGrid fills up
-           azel[] array in same order as bolometer data are aligned */
-        size_t index;
-        if ( isTordered ) {
-          index = base + i;
-        } else {
-          index = k + (nframes * i);
-        }
-
-        if (!lquick) {
-          zd = M_PI_2 - azel[npts+i];
-          airmass = slaAirmas( zd );
-          extcorr = exp(airmass*tau);
-        }
-	
-        if( allextcorr ) {
-          /* Store extinction correction factor */
-          allextcorr[index] = extcorr;
-        } else {
-          /* Otherwise Correct the data */
-          if( indata && (indata[index] != VAL__BADD) ) {
-            indata[index] *= extcorr;
-          }
-
-          /* Correct the variance */
-          if( vardata && (vardata[index] != VAL__BADD) ) {
-            vardata[index] *= extcorr * extcorr;
-          }
-        }
-
       }
+    }
+
+    /* If we're using the FAST application method, we assume a single
+       airmass and tau for the whole array */
+    if (quick) {
+      /* For 2-D data, get airmass from the FITS header rather than
+         the state structure */
+      if ( ndims == 2 ) {
+        /* This may change depending on exact FITS keyword */
+        smf_fits_getD( hdr, "AMSTART", &airmass, status );
+
+        /* speed is not an issue for a 2d image */
+        adaptive = 0;
+
+      } else {
+        /* Else use airmass value in state structure */
+        airmass = hdr->state->tcs_airmass;
+      }
+
+      /* we have an airmass, see if we need to provide per-pixel correction */
+      if (adaptive) {
+        if (is_large_delta_atau( airmass, hdr->state->tcs_az_ac2, tau, status) ) {
+          /* we need WCS if we disable fast mode */
+          quick = 0;
+          smf_tslice_ast( data, k, 1, status );
+        }
+      }
+
+      if (quick) extcorr = exp(airmass*tau);
+    }
+
+    if (!quick) {
+      /* Not using quick so retrieve WCS to obtain elevation info */
+      wcs = hdr->wcs;
+      /* Check current frame, store it and then select the AZEL
+         coordinate system */
+      if (wcs != NULL) {
+        if (strcmp(astGetC(wcs,"SYSTEM"), "AZEL") != 0) {
+          astSet( wcs, "SYSTEM=AZEL"  );
+        }
+        /* Transfrom from pixels to AZEL */
+        astTranGrid( wcs, 2, lbnd, ubnd, 0.1, 1000000, 1, 2, npts, azel );
+        if (!astOK) {
+          if (*status == SAI__OK) {
+            *status = SAI__ERROR;
+            errRep( FUNC_NAME, "Error from AST when attempting to set SYSTEM to AZEL: WCS is NULL", status);
+          }
+        }
+      } else {
+        /* Throw an error if no WCS */
+        if ( *status == SAI__OK ) {
+          *status = SAI__ERROR;
+          errRep("", "Error: input file has no WCS", status);
+        }
+      }
+    } 
+    /* Loop over data in time slice. Start counting at 1 since this is
+       the GRID coordinate frame */
+    base = npts * k;  /* Offset into 3d data array (time-ordered) */
+
+    for (i=0; i < npts && ( *status == SAI__OK ); i++ ) {
+      /* calculate array indices - assumes that astTranGrid fills up
+         azel[] array in same order as bolometer data are aligned */
+      size_t index;
+      if ( isTordered ) {
+        index = base + i;
+      } else {
+        index = k + (nframes * i);
+      }
+
+      if (!quick) {
+        zd = M_PI_2 - azel[npts+i];
+        airmass = slaAirmas( zd );
+        extcorr = exp(airmass*tau);
+      }
+	
+      if( allextcorr ) {
+        /* Store extinction correction factor */
+        allextcorr[index] = extcorr;
+      } else {
+        /* Otherwise Correct the data */
+        if( indata && (indata[index] != VAL__BADD) ) {
+          indata[index] *= extcorr;
+        }
+
+        /* Correct the variance */
+        if( vardata && (vardata[index] != VAL__BADD) ) {
+          vardata[index] *= extcorr * extcorr;
+        }
+      }
+
+    }
     
-      /* Note that we do not need to free "wcs" or revert its SYSTEM
-         since smf_tslice_ast will replace the object immediately. */
-  
-    }    
+    /* Note that we do not need to free "wcs" or revert its SYSTEM
+       since smf_tslice_ast will replace the object immediately. */
   } /* End loop over timeslice */
 
   /* Add history entry if !allextcorr */
@@ -450,4 +487,36 @@ void smf_correct_extinction(smfData *data, const char *tausrc, const int quick,
  CLEANUP:
   if (azel) azel = smf_free(azel,status);
 
+}
+
+/* Add footprint to the reference elevation and compare it to the reference airmass.
+   Combine with tau and return true if some threshold is exceeded. */
+
+static int is_large_delta_atau ( double airmass1, double elevation1, double tau,
+                                 int *status) {
+  double elevation2; /* elevation at edge of array */
+  double airmass2;   /* airmass at edge of array */
+  double delta;      /* difference between airmass1 and airmass2 times the tau  */
+  const double footprint = 10.0 * DD2R / 60.0;  /* 10 arcmin */
+  const double corrthresh = 0.01; /* threshold to switch from quick to slow as fraction */
+  
+  if (*status != SAI__OK) return 0;
+
+  /* short circuit if tau is extremely small */
+  if (tau < 0.000001) return 0;
+
+  /* get the elevation and add on the array footprint. Calculate the airmass
+     at the new location and find the difference to the reference airmass.
+     The fractional error in exp(Atau) is (delta Airmass)*tau.
+  */
+
+  elevation2 = elevation1 - footprint;  /* want smaller el for larger am */
+  airmass2 = slaAirmas( M_PI_2 - elevation2 );
+  delta = fabs(airmass1-airmass2) * tau;
+  printf("Delta = %f Am1 =%f am2=%f tau=%f\n",delta,airmass1,airmass2,tau);
+  if (delta > corrthresh) {
+    return 1;
+  } else {
+    return 0;
+  }
 }

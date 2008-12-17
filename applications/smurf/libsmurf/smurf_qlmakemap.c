@@ -477,7 +477,8 @@ void smurf_qlmakemap( int *status ) {
     /* Correct for atmospheric extinction using the mean WVM-derived
        225-GHz optical depth */
     tau = smf_calc_meantau( data->hdr, status );
-    smf_correct_extinction( data, "CSOTAU", 1, tau, NULL, status );
+    smf_correct_extinction( data, SMF__TAUSRC_CSOTAU, SMF__EXTMETH_SINGLE,
+                            tau, NULL, status );
 
     /* Calculate Noise */
     msgOutif(MSG__VERB, " ", "SMURF_QLMAKEMAP: Measuring Noise",

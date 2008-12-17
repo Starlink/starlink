@@ -32,9 +32,11 @@
 *          supplied. [!]
 *     IN = NDF (Read)
 *          Input file(s)
-*     METHOD = CHAR (Read)
-*          Optical depth method. Valid methods are WVMRAW, CSOTAU,
-*          FILTERTAU.
+*     TAUSRC = CHAR (Read)
+*          Source of optical depth data. Options are:
+*             WVMRAW    - use the water vapour monitor time series data
+*             CSOTAU    - use a single 225GHz tau value
+*             FILTERTAU - use a single tau value for this wavelength
 *     QUICK = LOGICAL (Read)
 *          Flag for applying the Quick method
 *     CSOTAU = REAL (Read)
@@ -45,7 +47,9 @@
 *          value is used for all input files.
 *     FILTERTAU = REAL (Read)
 *          Value of the zenith optical depth for the current
-*          wavelength. Only used if METHOD = FILTERTAU.
+*          wavelength. Only used if METHOD = FILTERTAU. Note that no
+*          check is made to ensure that all the input files share the same
+*          filter.
 *     OUT = NDF (Write)
 *          Output file(s)
 *     HASSKYREM = LOGICAL (Read)
@@ -108,6 +112,9 @@
 *        Use smf_calc_meantau. use parGdr0d to handle NULL easier.
 *     2008-12-12 (TIMJ):
 *        Add bad pixel masking.
+*     2008-12-16 (TIMJ):
+*        Rename METHOD to TAUSRC. METHOD now controls airmass calculation
+*        method. Use new API for smf_correct_extinction.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -172,19 +179,18 @@ void smurf_extinction( int * status ) {
   /* Local Variables */
   smfArray *bpms = NULL;     /* Bad pixel masks */
   smfArray *darks = NULL;    /* Dark data */
-  double deftau = 0.0;       /* Default value for the zenith tau */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
   char filter[81];           /* Name of filter */
   int has_been_sky_removed = 0;/* Data are sky-removed */
   size_t i;                  /* Loop counter */
   Grp *igrp = NULL;          /* Input group */
-  char method[LEN__METHOD];  /* String for optical depth method */
+  smf_tausrc tausrc;         /* enum value of optical depth source */
+  smf_extmeth extmeth;       /* Extinction correction method */
+  char tausource[LEN__METHOD];  /* String for optical depth source */
+  char method[LEN__METHOD];  /* String for extinction airmass method */
   smfData *odata = NULL;     /* Output data struct */
   Grp *ogrp = NULL;          /* Output group */
-  smfHead *ohdr = NULL;      /* Pointer to header in odata */
   size_t outsize;            /* Total number of NDF names in the output group */
-  int quick;                 /* Flag to denote whether to assume a
-                                single airmass for all bolometers */
   size_t size;               /* Number of files in input group */
   double tau = 0.0;          /* Zenith tau at this wavelength */
 
@@ -216,13 +222,45 @@ void smurf_extinction( int * status ) {
   /* Get group of pixel masks and read them into a smfArray */
   smf_request_mask( "BPM", &bpms, status );
 
-  /* Get METHOD */
-  parChoic( "METHOD", "CSOTAU", 
+  /* Get tau source */
+  parChoic( "TAUSRC", "CSOTAU", 
             "CSOtau, Filtertau, WVMraw", 1,
-            method, LEN__METHOD, status);
+            tausource, sizeof(tausource), status);
 
-  /* Get QUICK flag */
-  parGet0l( "QUICK", &quick, status);
+  /* convert to flag - we can not ask derivative questions
+     until a data file is opened. */
+  switch (tausource[0]) {
+  case 'C':
+    tausrc = SMF__TAUSRC_CSOTAU;
+    break;
+  case 'F':
+    tausrc = SMF__TAUSRC_TAU;
+    break;
+  case 'W':
+    tausrc = SMF__TAUSRC_WVMRAW;
+    break;
+  default:
+    tausrc = SMF__TAUSRC_NULL;
+  }
+
+  /* Decide how the correction is to be applied - convert to flag */
+  parChoic( "METHOD", "ADAPTIVE",
+            "Adaptive,Quick,Full,", 1, method, sizeof(method), status);
+  switch( method[0] ) {
+  case 'A':
+    extmeth = SMF__EXTMETH_ADAPT;
+    break;
+  case 'Q':
+    extmeth = SMF__EXTMETH_SINGLE;
+    break;
+  case 'F':
+    extmeth = SMF__EXTMETH_FULL;
+    break;
+  default:
+    extmeth = SMF__EXTMETH_NONE;
+  }
+
+
 
   for (i=1; i<=size && ( *status == SAI__OK ); i++) {
 
@@ -251,38 +289,40 @@ void smurf_extinction( int * status ) {
       }
     }
 
-    /* If status is OK, make decisions on method keywords */
-    if ( *status == SAI__OK ) {
-      if ( strncmp( method, "CSOT", 4 ) == 0 ) {
-        /* Now ask for desired CSO tau */
-        /* Define the default value first time round */
-        if ( i == 1 ) {
-          ohdr = odata->hdr;
-          deftau = smf_calc_meantau( ohdr, status );
-          parGdr0d( "CSOTAU", deftau, 0.0,1.0, 1, &tau, status );
-        }
+    /* If status is OK, make decisions on source keywords the first
+       time through. */
+    if ( *status == SAI__OK && i == 1 ) {
+      if (tausrc == SMF__TAUSRC_CSOTAU ||
+          tausrc == SMF__TAUSRC_TAU) {
+        double deftau;
+        const char * param = NULL;
+        smfHead *ohdr = odata->hdr;
 
-      } else if ( strncmp( method, "FILT", 4) == 0 ) {
-        /* Now ask for desired Filter-based tau */
-        /* Define the default value first time round */
-        if ( i == 1 ) {
-          ohdr = odata->hdr;
+        /* get default CSO tau */
+        deftau = smf_calc_meantau( ohdr, status );
+
+        /* Now ask for desired CSO tau */
+        if ( tausrc == SMF__TAUSRC_CSOTAU ) {
+          param = "CSOTAU";
+        } else if (tausrc == SMF__TAUSRC_TAU) {
+          param = "FILTERTAU";
           smf_fits_getS( ohdr, "FILTER", filter, 81, status);
-          deftau = smf_calc_meantau( ohdr, status );
           deftau = smf_scale_tau( deftau, filter, status );
-          parGdr0d( "FILTERTAU", deftau, 0.0, 100.0, 1, &tau, status );
         }
-      } else if ( strncmp( method, "WVMR", 4) == 0 ) {
+        parGdr0d( param, deftau, 0.0,1.0, 1, &tau, status );
+      } else if ( tausrc == SMF__TAUSRC_WVMRAW ) {
         msgOutif(MSG__VERB," ", "Using Raw WVM data", status);
       } else {
         *status = SAI__ERROR;
-        errRep("", "Unsupported method. Possible programming error.", status);
+        errRep("", "Unsupported opacity source. Possible programming error.",
+               status);
       }
     }
+
     /* Apply extinction correction - note that a check is made to
        determine whether the data have already been extinction
        corrected */
-    smf_correct_extinction( odata, method, quick, tau, NULL, status );
+    smf_correct_extinction( odata, tausrc, extmeth, tau, NULL, status );
 
     /* Set character labels */
     smf_set_clabels( "Extinction corrected",NULL, NULL, odata->hdr, status);
