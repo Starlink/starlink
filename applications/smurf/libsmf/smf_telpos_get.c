@@ -34,8 +34,11 @@
 *        Original version.
 *     11-NOV-2006 (EC):
 *        Modified by DB, but small error fixed in case where OBSGEO undefined
+*     17-DEC-2008 (TIMJ):
+*        Allow for an undefined OBSGEO.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -102,7 +105,9 @@ void smf_telpos_get( smfHead * hdr, int * status ) {
   smf_fits_getF( hdr, "OBSGEO-Z", &obsgeoz, status );
 
   /* annul error due to OBSGEO keywords not being specified */
-  if( *status == SMF__NOKWRD ) {
+  /* undef headers are also trapped - if we were paranoid we could
+     check to make sure that the TCS was not involved */
+  if( *status == SMF__NOKWRD || *status == AST__FUNDEF) {
     obsgeo[0] = AST__BAD;
     obsgeo[1] = AST__BAD;
     obsgeo[2] = AST__BAD;
