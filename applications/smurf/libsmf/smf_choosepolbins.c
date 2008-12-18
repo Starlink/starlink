@@ -127,9 +127,7 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
-
-/* Seconds per day */
-#define SPD 86400.0
+#include "smurf_par.h"
 
 int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
                           AstFrameSet *wcsout2d, int *npbin, double **pangle, 
@@ -155,12 +153,12 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
    int ***result;        /* Returned array */
    int **r;              /* Pointer to an output array element */
    int *angcnt;          /* Pointer to array holding the bin counts */
-   int *ndftimes = NULL; /* Holds the no. of times slices in each NDF */
+   dim_t *ndftimes = NULL; /* Holds the no. of times slices in each NDF */
    int *pop;             /* Bin populations for a single NDF */
    int i;                /* Old bin index */
    int ibin;             /* Bin index */
    int ifile;            /* Index of current input file */
-   int itime;            /* Index of current time slice */
+   dim_t itime;          /* Index of current time slice */
    int j;                /* New bin index */
    int maxbin;           /* Max number of bins required */
    int nang;             /* No. of usable POL_ANG values */
@@ -195,7 +193,7 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
 
 /* Allocate an array to hold the pointers to the arrays of pol_ang
    values for each NDF. */
-   polang_ptr = astMalloc( sizeof( double * )*size );
+   polang_ptr = astMalloc( sizeof( *polang_ptr )*size );
    if( polang_ptr ) {
       for( ifile = 0; ifile < size; ifile++ ) polang_ptr[ ifile ] = NULL;
    }
@@ -211,7 +209,7 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
    rot = -1;
 
 /* Allocate memory to hold the number of time slices in each input NDF. */
-   ndftimes = astMalloc( size*sizeof( int ) );
+   ndftimes = astMalloc( size*sizeof(*ndftimes ) );
 
 /* Loop round all the input NDFs. */
    for( ifile = 0; ifile < size && *status == SAI__OK; ifile++ ) {
@@ -233,7 +231,7 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
           astChrLen( polcrd ) > 0 ) {
 
 /* Allocate an array to to store the POL_ANG values for each time slice. */
-         p = astMalloc( sizeof( double )*(data->dims)[ 2 ] );
+         p = astMalloc( sizeof( *p )*(data->dims)[ 2 ] );
          polang_ptr[ ifile ] = p;
 
 /* Loop round all the time slices in the input file. */
@@ -383,10 +381,10 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
       binsize = 2*AST__DPI/maxbin;
 
 /* Allocate memory to hold the sum of all angles in each bin. */
-      angsum = astMalloc( maxbin*sizeof( double ) );
+      angsum = astMalloc( maxbin*sizeof( *angsum ) );
 
 /* Allocate memory to hold the count of angles in each bin. */
-      angcnt = astMalloc( maxbin*sizeof( int ) );
+      angcnt = astMalloc( maxbin*sizeof( *angcnt ) );
 
 /* Initialise the above arrays. */
       if( angcnt ) {
@@ -439,17 +437,17 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
       *npbin = j;
 
 /* Allocate memory to hold the population of each used bin */
-      pop = astMalloc( sizeof( int )*( *npbin ) );
+      pop = astMalloc( sizeof( *pop )*( *npbin ) );
 
 /* Create the returned arrays. */
-      result = astMalloc( size*sizeof( int ** ) );
+      result = astMalloc( size*sizeof( *result ) );
 
 /* Loop round all the input NDFs one more time. */
       for( ifile = 0; ifile < size && *status == SAI__OK; ifile++ ) {
 
 /* Create an array for this input NDF that has one element for each
    angle bin. */
-         r = astMalloc( sizeof(int *) * (*npbin) );
+         r = astMalloc( sizeof(*r) * (*npbin) );
          result[ ifile ] = r;
 
 /* Initialise the pointers to the arrays that hold the time slices indices 
@@ -480,7 +478,7 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
 
 /* Extend the array holding the list of time slices indices allocated to
    this bin. */
-                  r[ ibin ] = astGrow( r[ ibin ], pop[ ibin ] + 1, sizeof( int ) );
+                  r[ ibin ] = astGrow( r[ ibin ], pop[ ibin ] + 1, sizeof( **r) );
 
 /* Store the current time slice index at the end of the list,
    incrementing the population at the same time. */
@@ -493,7 +491,7 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
    This marks the end of the list. */
          if( r ) {
             for( ibin = 0; ibin < *npbin; ibin++ ) {
-               r[ ibin ] = astGrow( r[ ibin ], pop[ ibin ] + 1, sizeof( int ) );
+               r[ ibin ] = astGrow( r[ ibin ], pop[ ibin ] + 1, sizeof( **r ) );
                if( r[ ibin ] ) r[ ibin ][ pop[ ibin ] ] = VAL__MAXI;
             }
          }
@@ -522,7 +520,7 @@ L999:;
    with angle value AST__BAD, and return a NULL pointer. */
    if( !result ){
       *npbin = 1;
-      *pangle = astMalloc( sizeof( double ) );
+      *pangle = astMalloc( sizeof( *pangle ) );
       if( *pangle ) **pangle = AST__BAD;
    }
 
