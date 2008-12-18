@@ -120,7 +120,6 @@ smf_fit_poly.c \
 smf_fits_crchan.c \
 smf_fits_export2DA.c \
 smf_fits_getD.c \
-smf_fits_getF.c \
 smf_fits_getI.c \
 smf_fits_getL.c \
 smf_fits_getS.c \
