@@ -74,15 +74,13 @@
 
 #define FUNC_NAME "smf_telpos_get"
 
-#define SZFITSCARD 81
-
 void smf_telpos_get( smfHead * hdr, int * status ) {
 
   /* Variables */
-  char telescop[SZFITSCARD];     /* contents of TELESCOP header */
-  float obsgeox;                 /* contents of OBSGEO-X header */
-  float obsgeoy;                 /* contents of OBSGEO-Y header */
-  float obsgeoz;                 /* contents of OBSGEO-Z header */
+  char telescop[81];             /* contents of TELESCOP header */
+  double obsgeox;                /* contents of OBSGEO-X header */
+  double obsgeoy;                /* contents of OBSGEO-Y header */
+  double obsgeoz;                /* contents of OBSGEO-Z header */
   double obsgeo[3];              /* array containing all OBSGEO* */
 
   /* Program logic */
@@ -100,9 +98,9 @@ void smf_telpos_get( smfHead * hdr, int * status ) {
   if (!hdr->fitshdr) return;
 
   /* Try getting OBSGEO keywords */
-  smf_fits_getF( hdr, "OBSGEO-X", &obsgeox, status );
-  smf_fits_getF( hdr, "OBSGEO-Y", &obsgeoy, status );
-  smf_fits_getF( hdr, "OBSGEO-Z", &obsgeoz, status );
+  smf_fits_getD( hdr, "OBSGEO-X", &obsgeox, status );
+  smf_fits_getD( hdr, "OBSGEO-Y", &obsgeoy, status );
+  smf_fits_getD( hdr, "OBSGEO-Z", &obsgeoz, status );
 
   /* annul error due to OBSGEO keywords not being specified */
   /* undef headers are also trapped - if we were paranoid we could
@@ -120,7 +118,7 @@ void smf_telpos_get( smfHead * hdr, int * status ) {
   }
 
   /* Try getting TELESCOP */
-  smf_fits_getS( hdr, "TELESCOP", telescop, SZFITSCARD, status );
+  smf_fits_getS( hdr, "TELESCOP", telescop, sizeof(telescop), status );
 
   /* annul error due to TELESCOP keyword not being specified */
   if( *status == SMF__NOKWRD ) errAnnul( status );
