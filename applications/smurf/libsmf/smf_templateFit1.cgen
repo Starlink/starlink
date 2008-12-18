@@ -231,6 +231,9 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, unsigned char *qual,
       if( corr ) {
         *corr = (ngood*s_dt - s_d*s_t) /
           ( sqrt(ngood*s_tsq - s_t*s_t) * sqrt(ngood*s_dsq - s_d*s_d) );
+
+        /* Trap very poor fits */
+        if( !isnormal(*corr) ) *corr=0; 
       }
       
       /* Remove fitted templated if requested */
