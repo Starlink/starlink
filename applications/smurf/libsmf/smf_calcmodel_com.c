@@ -79,6 +79,8 @@
 *     2008-12-17 (EC)
 *        - Look at spread in GAIn correlation coefficients to iteratively
 *          flag additional bad bolometers
+*     2008-12-18 (EC)
+*        - Additionally look at spread in gain coefficients to flag bad bolos 
 *     {enter_further_changes_here}
 
 
@@ -137,6 +139,10 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   double cmean;                 /* mean of common-mode correlation coeff */
   double *corr=NULL;            /* Array to hold correlation coefficients */
   double csig;                  /* standard deviation "                  */
+  double *gcoeff=NULL;          /* Array to hold gain coefficients */
+  dim_t ggood;                  /* Number of good gain. coeff. samples */
+  double gmean;                 /* mean of common-mode correlation gain */
+  double gsig;                  /* standard deviation "                  */
   double g;                     /* temporary gain */
   smfArray *gai=NULL;           /* Pointer to GAI at chunk */
   double *gai_data=NULL;        /* Pointer to DATA component of GAI */
@@ -153,6 +159,7 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   double *model_data_copy=NULL; /* Copy of model_data */
   dim_t nbolo=0;                /* Number of bolometers */
   dim_t ndata=0;                /* Total number of data points */
+  size_t newbad;                /* Number of new bolos being flagged as bad */
   dim_t ntslice=0;              /* Number of time slices */
   double off;                   /* Temporary offset */ 
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
@@ -405,35 +412,44 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
           }
         }
 
-        /* Calculate mean and r.m.s. of correlation coefficients to flag
-           outlier bolometers as bad */
-
+        /* Calculate mean and r.m.s. of correlation coefficients and
+           gains to flag outlier bolometers as bad */
+        gcoeff = smf_malloc( nbolo, sizeof(*gcoeff), 0, status );
         corr = smf_malloc( nbolo, sizeof(*corr), 0, status );
+
         for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
           /* Copy correlation coefficients into an array that has VAL__BADD
              set at locations of bad bolometers. Can't use the main quality
              array directly as the stride may be different */          
-          if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
+          if( !(qua_data[i*bstride]&SMF__Q_BADB) && (gai_data[i*gbstride]) ) {
+            gcoeff[i] = log(fabs(gai_data[i*gbstride]));
             corr[i] = gai_data[2*gcstride+i*gbstride];
-            /* Flag obviously bad fits here */
-            if( corr[i] <= 0 ) corr[i] = VAL__BADD;
           } else {
+            gcoeff[i] = VAL__BADD;
             corr[i] = VAL__BADD;
           }
         }
         
         smf_stats1( corr, 1, nbolo, NULL, 0, &cmean, &csig, &cgood, status );
+        msgSeti("N",cgood);
+        msgOutif( MSG__VERB, "", FUNC_NAME ": ^N good bolos", status );
         msgSetd("MEAN",cmean);
         msgSetd("SIG",csig);
-        msgSeti("N",cgood);
         msgOutif( MSG__DEBUG, " ", FUNC_NAME 
-                  ": ^N good bolos, correlation coefficient spread "
-                  "^MEAN +/- ^SIG", status );
+                  ": corr coeff ^MEAN +/- ^SIG", status );
 
-        /* Flag bad bolometers, count good ones */
+        smf_stats1( gcoeff, 1, nbolo, NULL, 0, &gmean, &gsig, &ggood, status );
+        msgSetd("MEAN",gmean);
+        msgSetd("SIG",gsig);
+        msgOutif( MSG__DEBUG, " ", FUNC_NAME 
+                  ": log(abs(gain coeff))  ^MEAN +/- ^SIG", status );
+
+        /* Flag new bad bolometers */
         quit = 1;
+        newbad = 0;
         for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
-          if( (corr[i]==VAL__BADD) || (fabs(corr[i]-cmean) > 5*csig) ) {
+          if( (corr[i]==VAL__BADD) || (fabs(corr[i]-cmean) > 5*csig) ||
+              (fabs(gcoeff[i]-gmean) > 5*gsig) || (fabs(gcoeff[i]-gmean)>3) ) {
             /* If this bolometer wasn't previously flagged as bad 
                do it here, and set quit=0 */
             if( !(qua_data[i*bstride]&SMF__Q_BADB) ) { 
@@ -443,9 +459,18 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
               gai_data[i*gbstride] = 1;              /* Set gain to 1 */
               gai_data[i*gbstride+gcstride] = 0;     /* offset to 0 */
               gai_data[i*gbstride+2*gcstride] = 0;   /* Zero correlation */
+              newbad++;
             }
           } 
         }
+
+        if( newbad ) {
+          msgSeti("NEW",newbad);
+          msgOutif( MSG__VERB, "", FUNC_NAME 
+                    ": flagged ^NEW new bad bolos", status );
+        }
+
+        gcoeff = smf_free( gcoeff, status );
         corr = smf_free( corr, status );
         
         if( quit ) {
