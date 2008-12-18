@@ -124,7 +124,6 @@ smf_fits_getI.c \
 smf_fits_getL.c \
 smf_fits_getS.c \
 smf_fits_outhdr.c \
-smf_fits_setL.c \
 smf_flag_spikes.c \
 smf_flat_responsivity.c \
 smf_flat_standardpow.c \

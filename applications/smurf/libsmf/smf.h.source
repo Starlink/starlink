@@ -879,9 +879,6 @@ void smf_km2ext( int indf, const char *xname, AstKeyMap *keymap, int *timeout, i
 void smf_reorder( const char *type, void *in, int len, int ndim, int *dims, int axis, int *index, int maxis, int *mask, void *out, int *status );
 void smf_updateprov( int ondf, const smfData *data, int indf, const char *creator, int *status );
 
-void smf_fits_setL( const smfHead *hdr, const char *name, int value, 
-		    const char *comment, int overwrite, int *status );
-
 void smf_getrefwcs( const char *param, AstFrameSet **specwcs,
                     AstFrameSet **spacewcs, int *status );
 
