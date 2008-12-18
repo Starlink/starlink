@@ -247,6 +247,7 @@ smf_tslice_ast.c \
 smf_update_quality.c \
 smf_update_valbad.c \
 smf_updateprov.c \
+smf_validate_smfHead.c \
 smf_write_clabels.c \
 smf_write_smfData.c \
 $(BUILT_C_ROUTINES)

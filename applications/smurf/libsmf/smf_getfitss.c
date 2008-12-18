@@ -60,6 +60,7 @@
 *        astGetFitsS does not trim trailing space.
 *     2008-12-17 (TIMJ):
 *        Handle undef values and rename function.
+*        Use smf_validate_smfHead.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -118,22 +119,7 @@ void smf_getfitss (const smfHead *hdr, const char * name, char * result,
 
   /* Check entry status */
   if (*status != SAI__OK) return;
-
-  if ( hdr == NULL ) {
-    *status = SAI__ERROR;
-    errRep( FUNC_NAME,
-	    "Supplied hdr is a NULL pointer. Possible programming error.",
-	    status);
-    return;
-  }
-
-  if ( hdr->fitshdr == NULL ) {
-    *status = SAI__ERROR;
-    errRep( FUNC_NAME,
-	    "No FitsChan associated with supplied header. Possible programming error.",
-	    status );
-    return;
-  }
+  if (!smf_validate_smfHead(hdr, 1, 0, status)) return;
 
   if ( astTestFits( hdr->fitshdr, name, &there ) ) {
     astGetFitsS( hdr->fitshdr, name, &astres );

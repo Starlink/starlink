@@ -47,6 +47,8 @@
 *  History:
 *     2-DEC-2008 (DSB):
 *        Initial version, based on smf_get_fitsD by TIMJ.
+*     17-DEC-2008 (TIMJ):
+*        Use smf_validate_smfHead.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -95,22 +97,11 @@ void smf_getfitsd( const smfHead *hdr, const char *name, double *result,
 
 /* Check the inherited status */
    if (*status != SAI__OK) return;
-
-/* Report an error if no smfHead was supplied. */
-   if ( hdr == NULL ) {
-      *status = SAI__ERROR;
-      errRep( FUNC_NAME, "Supplied hdr is a NULL pointer. Possible "
-              "programming error.", status);
-
-/* Report an error if the smfHead has no FitsChan. */
-   } else if( hdr->fitshdr == NULL ) {
-      *status = SAI__ERROR;
-      errRep( FUNC_NAME, "No FitsChan associated with supplied header. "
-              "Possible programming error.", status );
+   if (!smf_validate_smfHead(hdr, 1, 0, status)) return;
 
 /* If the header contains a defined value for the keyword, put it into
    the returned results buffer. */
-   } else if( astTestFits( hdr->fitshdr, name, &there ) ) {
+   if( astTestFits( hdr->fitshdr, name, &there ) ) {
       (void) astGetFitsF( hdr->fitshdr, name, result );
 
 /* Otherwise, if the keyword was not found, report an error. */
