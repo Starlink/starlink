@@ -144,7 +144,6 @@ void smf_stats1( double *data, size_t stride, dim_t nsamp,
 
   if( qual ) {
     /* Quality checking version */
-
     if( sigma ) {
       /* Standard deviation calculating version */
       for( i=0; i<nsamp*stride; i+=stride ) {
@@ -162,10 +161,8 @@ void smf_stats1( double *data, size_t stride, dim_t nsamp,
           count++;
         }
     }
-
   } else {
     /* VAL__BADD checking version */
-
     if( sigma ) {
       /* Standard deviation calculating version */
       for( i=0; i<nsamp*stride; i+=stride ) if( data[i] != VAL__BADD ) {
@@ -188,7 +185,6 @@ void smf_stats1( double *data, size_t stride, dim_t nsamp,
     if( mean ) *mean = mu;
     if( sigma ) *sigma = sqrt( (sumsq - count*mu*mu)/(count) );
   }
-
   if( ngood ) *ngood = count;
 
   /* Enough samples? */
