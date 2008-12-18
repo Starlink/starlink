@@ -1024,7 +1024,7 @@ package @PACKAGE@ {
             parameter ngood {
                 type _INTEGER
                 access WRITE
-                vpath INTERNAL
+                vpath DEFAULT
                 prompt {Number of good responsivities}
                 default 0
                 helpkey *
@@ -1052,7 +1052,9 @@ package @PACKAGE@ {
                 type NDF
                 access WRITE
                 vpath {PROMPT }
+                ppath CURRENT DEFAULT
                 prompt {Responsivity map}
+                default !
                 helpkey *
             }
 
