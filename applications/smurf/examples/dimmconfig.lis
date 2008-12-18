@@ -1,7 +1,7 @@
 # Number of iterations
 #  postive number  = fixed number of iterations
 #  negative number = maximum iterations if using chi^2 stopping criteria
-numiter = 3
+numiter = 5
 
 # chi^2 tolerance in negative-numiter case (requires noi model component)
 chitol = 1e-6
@@ -12,9 +12,10 @@ exportndf = 0
 # Model components/order (space delimited list)
 #  dks = fit and remove dark squid for the column
 #  com = remove common-mode signal
+#  gai = if com specified, fit gain/offset of common mode
 #  ext = apply extinction correction
 #  noi = estimate time-domain variance
-modelorder = dks com ext noi
+modelorder = com gai ext noi
 
 # low-pass boxcar filter on COM (samples) to assist with convergence
 # if boxfact set reduce width of boxcar by this factor each iteration
@@ -28,13 +29,13 @@ com_boxmin  = 100
 dks_boxcar = 100
 
 # additional despiking after each iteration within noi calculation
-noispikethresh = 10
-noispikeiter = 0
+#noispikethresh = 10
+#noispikeiter = 0
 
 # method of estimating variance map
 #  0 = propagate from the time-domain noise (requires noi model component)
 #  1 = samples variance of data that land in each pixel
-varmapmethod = 0
+varmapmethod = 1
 
 # Perform iterations in memory?
 memiter = 1
