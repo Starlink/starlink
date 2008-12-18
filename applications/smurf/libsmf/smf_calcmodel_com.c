@@ -126,7 +126,6 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 			smfArray **allmodel, int flags, int *status) {
 
   /* Local Variables */
-  dim_t base;                   /* Store base index for data array offsets */
   size_t bstride;               /* Bolometer stride in data array */
   int boxcar=0;                 /* width in samples of boxcar filter */ 
   double boxcard=0;             /* double precision version of boxcar */ 
@@ -296,7 +295,6 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
       /* Loop over time slice */
       for( i=0; i<ntslice; i++ ) {        
         lastmean = model_data_copy[i];
-        base = 0; /* Offset to the start of the j'th bolometer */
         for( j=0; j<nbolo; j++ ) {
           if( dat->gai ) {
             /* if GAIn model was fit, there is an additional offset (the gain
@@ -311,11 +309,9 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
           }
 
           /* Put the last iteration back in */
-          if( !(qua_data[base+i]&mask_cor) ) {
-            res_data[base+i] += g*lastmean+off;
+          if( !(qua_data[i*tstride+j*bstride]&mask_cor) ) {
+            res_data[i*tstride+j*bstride] += g*lastmean+off;
           }
-
-          base += ntslice;
         }
       }
     }
@@ -351,15 +347,12 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
         /* Loop over bolometers to put the previous common-mode
            signal back in at each time-slice, and calculate the sum of
            all the detectors with good data. */
-        base = 0;  /* Offset to the start of the j'th bolometer */
-        sum = 0;   /* Initialize sum to 0 */
-        
+        sum = 0;   /* Initialize sum to 0 */        
         for( j=0; j<nbolo; j++ ) {
-          if( !(qua_data[base+i]&mask_meas) ) {
-            sum += res_data[base+i];
+          if( !(qua_data[i*tstride+j*bstride]&mask_meas) ) {
+            sum += res_data[i*tstride+j*bstride];
             weight[i]++;
           }
-          base += ntslice;
         }
       
         /* Store the sum here. Init if first subarray, otherwise add to
