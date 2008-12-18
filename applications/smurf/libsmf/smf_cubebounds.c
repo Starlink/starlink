@@ -206,6 +206,8 @@
 *        changes the lower pixel bounds using parameter LBND.
 *     28-MAY-2008 (TIMJ):
 *        NINT now defined in smf.h
+*     18-DEC-2008 (TIMJ):
+*        Use smf_makefitschan
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -306,10 +308,10 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    int good;             /* Are there any good detector samples? */
    int ibasein;          /* Index of base Frame in input FrameSet */
    int ifile;            /* Index of current input file */
-   int irec;             /* Index of current input detector */
+   dim_t irec;           /* Index of current input detector */
    int ishift;           /* Shift to put pixel origin at centre */
-   int ispec;            /* Index of current spectral sample */
-   int itime;            /* Index of current time slice */
+   dim_t ispec;          /* Index of current spectral sample */
+   dim_t itime;          /* Index of current time slice */
    int itmp;             /* Temporary storage */
    int lbnd0[ 2 ];       /* Defaults for LBND parameter */
    int nval;             /* Number of values supplied */
@@ -345,10 +347,6 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* If spatial reference WCS was supplied, use its current frame rather
    than the supplied "oskyframe". */
    if( spacerefwcs ) oskyframe = astGetFrame( spacerefwcs, AST__CURRENT );   
-
-/* Create an empty FitsChan that can be used for creating mappings from a
-   given set of FITS-WCS keyword values. */
-   fct = astFitsChan ( NULL, NULL, "" );
 
 /* Create the array of returned smfBox structures, and store a pointer to
    the next one to be initialised. */
@@ -657,26 +655,13 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* Otherwise, get it from the "par" values using a FitsChan. */
             } else {
 
-/* Populate a FitsChan with FITS-WCS headers describing the required 
-   tan plane projection from interim grid coords to celestial longitude
-   and latitude. The longitude and latitude axis types are set to either 
-   (RA,Dec) or (AZ,EL) to get the correct handedness. The projection 
-   parameters are supplied in "par". Convert from radians to degrees as 
-   required by FITS. */
-               if( !strcmp( astGetC( oskyframe, "System" ), "AZEL" ) ){
-                  astSetFitsS( fct, "CTYPE1", "AZ---TAN", " ", 1 );
-                  astSetFitsS( fct, "CTYPE2", "EL---TAN", " ", 1 );
-               } else {
-                  astSetFitsS( fct, "CTYPE1", "RA---TAN", " ", 1 );
-                  astSetFitsS( fct, "CTYPE2", "DEC--TAN", " ", 1 );
-               }
-               astSetFitsF( fct, "CRPIX1", par[ 0 ], " ", 1 );
-               astSetFitsF( fct, "CRPIX2", par[ 1 ], " ", 1 );
-               astSetFitsF( fct, "CRVAL1", par[ 2 ]*AST__DR2D, " ", 1 );
-               astSetFitsF( fct, "CRVAL2", par[ 3 ]*AST__DR2D, " ", 1 );
-               astSetFitsF( fct, "CDELT1", par[ 4 ]*AST__DR2D, " ", 1 );
-               astSetFitsF( fct, "CDELT2", par[ 5 ]*AST__DR2D, " ", 1 );
-               astSetFitsF( fct, "CROTA2", par[ 6 ]*AST__DR2D, " ", 1 );
+/* Now populate a FitsChan with FITS-WCS headers describing
+   the required tan plane projection. The longitude and
+   latitude axis types are set to either (RA,Dec) or (AZ,EL)
+   to get the correct handedness. */
+               fct = astFitsChan ( NULL, NULL, "" );
+               smf_makefitschan( astGetC( oskyframe, "System"), &(par[0]),
+                                 &(par[2]), &(par[4]), par[6], fct, status );
    
 /* Read a FrameSet from this FitsChan. */
                astClear( fct, "Card" );
