@@ -142,12 +142,10 @@
 /* SMURF includes */
 #include "smf.h"
 #include "smf_typ.h"
+#include "smurf_par.h"
 
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_tslice_ast"
-
-/* Seconds per day */
-#define SPD 86400.0
 
 void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
 
