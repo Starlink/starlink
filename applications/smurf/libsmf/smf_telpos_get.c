@@ -35,7 +35,8 @@
 *     11-NOV-2006 (EC):
 *        Modified by DB, but small error fixed in case where OBSGEO undefined
 *     17-DEC-2008 (TIMJ):
-*        Allow for an undefined OBSGEO.
+*        Allow for an undefined OBSGEO. Retrieve obsgeo values as double
+*        rather than float.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
