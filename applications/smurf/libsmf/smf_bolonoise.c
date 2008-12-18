@@ -73,6 +73,9 @@
 *        Added NEP flag
 *     2008-11-19 (TIMJ):
 *        Close pow smfData rather than just freeing it.
+*     2008-12-17 (EC):
+*        -Use b/tstride
+*        -If no power detected, instead of bad status, set SMF__Q_BADB
 
 *  Copyright:
 *     Copyright (C) 2008 University of British Columbia.
@@ -119,6 +122,7 @@ void smf_bolonoise( smfData *data, size_t window, double f_low,
                     double *whitenoise, double *fratio, int nep, int *status ) {
 
   double *base=NULL;       /* Pointer to base coordinates of array */
+  size_t bstride;          /* bolometer index stride */
   double df=1;             /* Frequency step size in Hz */
   double fr;               /* Ratio of p_low to p_white */
   size_t i;                /* Loop counter */
@@ -137,6 +141,7 @@ void smf_bolonoise( smfData *data, size_t window, double f_low,
   smfData *pow=NULL;       /* Pointer to power spectrum data */
   unsigned char *qua=NULL; /* Pointer to quality component */
   double steptime=1;       /* Length of a sample in seconds */
+  size_t tstride;          /* time index stride */
 
   if (*status != SAI__OK) return;
 
@@ -150,7 +155,7 @@ void smf_bolonoise( smfData *data, size_t window, double f_low,
   }
 
   /* Obtain dimensions */
-  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, &ndata, NULL, NULL, 
+  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, &ndata, &bstride, &tstride,
                 status );
 
   if( *status==SAI__OK ) {
@@ -184,9 +189,7 @@ void smf_bolonoise( smfData *data, size_t window, double f_low,
 
   /* Loop over detectors */
   for( i=0; (*status==SAI__OK)&&(i<nbolo); i++ ) 
-    if( !qua || 
-        (isTordered && !(qua[i]&SMF__Q_BADB)) |
-        (!isTordered && !(qua[i*ntslice]&SMF__Q_BADB)) ) {
+    if( !qua || !(qua[i*bstride]&SMF__Q_BADB) ) {
 
     /* Pointer to start of power spectrum */
     base = pow->pntr[0];
@@ -206,29 +209,22 @@ void smf_bolonoise( smfData *data, size_t window, double f_low,
         errAnnul( status );
       }
 
-      /* Generate an error if power <= 0 */
+      /* Set bolometer to bad if no power detected */
       if( (*status==SAI__OK) && ( (p_low<=0) || (p_white<=0) ) ) {
-        *status = SAI__ERROR;
-        msgSeti("BOLO",i);
-        errRep( "", FUNC_NAME ": power <= 0 detected in bolometer ^BOLO", 
-                status);
+        for( j=0; j<ntslice; j++ ) {
+          qua[i*bstride + j*tstride] |= SMF__Q_BADB;
+        }
       }
     }
 
-    if( *status == SAI__OK ) {
+    if( (*status==SAI__OK) && !(qua[i*bstride]&SMF__Q_BADB) ) {
       /* Power ratio */
       fr = p_low/p_white;
 
       /* Flag bad bolometer */
       if( fratio && qua && (fr < flagratio) ) {
-        if( isTordered ) {
-          for( j=0; j<ntslice; j++ ) {
-            qua[nbolo*j + i] |= SMF__Q_BADB;
-          }
-        } else {
-          for( j=0; j<ntslice; j++ ) {
-            qua[j + i*ntslice] |= SMF__Q_BADB;
-          }
+        for( j=0; j<ntslice; j++ ) {
+          qua[i*bstride + j*tstride] |= SMF__Q_BADB;
         }
       }
 
