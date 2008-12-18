@@ -76,12 +76,14 @@
 *        - Added damping to boxcar smooth: COM_BOXFACT, COM_BOXMIN
 *     2008-12-12 (EC)
 *        - Solve for GAIn if requested
+*     2008-12-17 (EC)
+*        - Look at spread in GAIn correlation coefficients to iteratively
+*          flag additional bad bolometers
 *     {enter_further_changes_here}
 
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
+*     Copyright (C) 2006-2008 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -131,6 +133,10 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   int do_boxcar=0;              /* flag to do boxcar smooth */
   int do_boxfact=0;             /* flag to damp boxcar width */
   int do_boxmin=0;              /* flag for minimum boxcar */
+  dim_t cgood;                  /* Number of good corr. coeff. samples */
+  double cmean;                 /* mean of common-mode correlation coeff */
+  double *corr=NULL;            /* Array to hold correlation coefficients */
+  double csig;                  /* standard deviation "                  */
   double g;                     /* temporary gain */
   smfArray *gai=NULL;           /* Pointer to GAI at chunk */
   double *gai_data=NULL;        /* Pointer to DATA component of GAI */
@@ -150,14 +156,14 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   dim_t ntslice=0;              /* Number of time slices */
   double off;                   /* Temporary offset */ 
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
+  int quit;                     /* While loop quit flag */
   unsigned char *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
-  double sum=0;                 /* Array sum */
   dim_t thisnbolo=0;            /* Check each file same dims as first */
   dim_t thisndata=0;            /* "                                  */
   dim_t thisntslice=0;          /* "                                  */
-  double thissum;               /* Sum of data at current tslice */
+  double sum;                   /* Sum of data at current tslice */
   size_t tstride;               /* Time slice stride in data array */
   double *weight=NULL;          /* Weight at each point in model */
                                    
@@ -184,6 +190,14 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
       astMapPut0D( keymap, "COM_BOXCARD", (double) boxcar, NULL );
     }
 
+    if( !astMapGet0D( keymap, "COM_BOXCARD", &boxcard) ) {
+      *status = SAI__ERROR;
+      errRep( "", FUNC_NAME ": Failed to retrieve COM_BOXCARD from keymap", 
+              status);
+    } else {
+      /* Use damped boxcar for smoothing width */
+      boxcar = (int) boxcard;
+    }
   }
 
   /* Check for minimum boxcar width*/
@@ -191,6 +205,10 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     do_boxmin = 1;
   }
 
+  if( do_boxcar ) {
+    msgSeti("BOX",boxcar);
+    msgOutif(MSG__VERB, " ", "    boxcar width ^BOX",status);
+  } 
 
   /* Assert bolo-ordered data */
   for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
@@ -210,26 +228,27 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     /* Copy of model data array */
     model_data_copy = smf_malloc( (model->sdata[0]->dims)[0], 
 			  sizeof(*model_data_copy), 1, status );
-
     if( *status == SAI__OK ) {
       memcpy( model_data_copy, model_data, (model->sdata[0]->dims)[0] *
 	      sizeof(*model_data_copy) );
-
-      /* Set model_data to 0 now since it will now be re-calculated */
-      memset( model_data, 0, (model->sdata[0]->dims)[0] * 
-	      sizeof(*model_data_copy) );
-      
     }
-
     /* Temporary buffer to store weights */
-    weight = smf_malloc( (model->sdata[0]->dims)[0], sizeof(*weight), 1,
+    weight = smf_malloc( (model->sdata[0]->dims)[0], sizeof(*weight), 0,
 			 status );
   } else {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": Model smfData was not loaded!", status);      
   }
 
-  /* Loop over index in subgrp (subarray) */
+  /* Which QUALITY bits should be checked for correcting sample. Ensure that
+     this matches the mask used in smf_calcmodel_gai! */
+  mask_cor = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_APOD);
+
+  /* Which QUALITY bits should be checked for measuring the mean */
+  mask_meas = ~(SMF__Q_JUMP); 
+
+  /* Loop over index in subgrp (subarray) and put the previous iteration
+     of the common mode back into the signal */
   for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
     /* Obtain dimensions of the data */
     smf_get_dims( res->sdata[idx],  NULL, NULL, &thisnbolo, &thisntslice, 
@@ -239,7 +258,7 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
       smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
                     &gbstride, &gcstride, status);
     }
-
+      
     if( idx == 0 ) {
       /* Store dimensions of the first file */
       nbolo = thisnbolo;
@@ -248,193 +267,249 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     } else {
       /* Check that dimensions haven't changed */
       if( (thisnbolo != nbolo) || (thisntslice != ntslice) || 
-	  (thisndata != ndata) ) {
-	*status = SAI__ERROR;
-
-	errRep( "", FUNC_NAME 
+          (thisndata != ndata) ) {
+        *status = SAI__ERROR;        
+        errRep( "", FUNC_NAME 
                 ": smfData's in smfArray have different dimensions!", 
-	       status);      
+                status);      
       }
-
     }
 
-    /* Get pointer to DATA component of residual */
+    /* Get pointers to data/quality/model */
     res_data = (res->sdata[idx]->pntr)[0];
-
-    /* Geta pointer to the QUAlity array */
     qua_data = (qua->sdata[idx]->pntr)[0];
-
     if( dat->gai ) {
       gai_data = (gai->sdata[idx]->pntr)[0];
     }
-
-    /* Which QUALITY bits should be checked for correcting sample. Ensure that
-       this matched the mask used in smf_calcmodel_gai! */
-    mask_cor = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_APOD);
-
-    /* Which QUALITY bits should be checked for measuring the mean */
-    mask_meas = ~(SMF__Q_JUMP); 
 
     if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;
       errRep( "", FUNC_NAME ": Null data in inputs", status);      
     } else {
-    
       /* Loop over time slice */
-      for( i=0; i<ntslice; i++ ) {
-	
-	/* Loop over bolometers to put the previous common-mode
-	   signal back in at each time-slice, and calculate the sum of
-	   all the detectors with good data. */
-
-	lastmean = model_data_copy[i];
-	sum = 0;
-	base = 0; /* Offset to the start of the j'th bolometer in the buffer */
-        thissum = 0; /* Initialize sum to 0 */
-        
+      for( i=0; i<ntslice; i++ ) {        
+        lastmean = model_data_copy[i];
+        base = 0; /* Offset to the start of the j'th bolometer */
         for( j=0; j<nbolo; j++ ) {
           if( dat->gai ) {
             /* if GAIn model was fit, there is an additional offset (the gain
                has already been un-done in smf_iteratemap at the end of the
-               previous iteration. Offset is stored in the second plane of
-               the gain model. Don't use bstride/tstride here because they
-               refer to the whole ntslices data cube, but we know things
-               are in bolo order. */
+               previous iteration). Offset is stored in the second plane of
+               the gain model. */
             g = 1./gai_data[j*gbstride];
             off = gai_data[j*gbstride + gcstride];
           } else {
             off = 0;
             g = 1;
           }
-          
+
+          /* Put the last iteration back in */
           if( !(qua_data[base+i]&mask_cor) ) {
             res_data[base+i] += g*lastmean+off;
           }
-          
+
+          base += ntslice;
+        }
+      }
+    }
+  }    
+
+  /* Outer loop re-calculates common-mode until the list of "good" bolometers
+     converges. Without a fit for gain/offset this loop only happens once.
+     Otherwise it keeps going until the correlation coefficients of the
+     template fits settle down to a list with no N-sigma outliers */
+  
+  quit = 0;
+  while( !quit && (*status==SAI__OK) ) {
+    /* initialize model data and weights to 0 */
+    memset(model_data,0,(model->sdata[0]->dims)[0]*sizeof(*model_data));
+    memset(weight,0,(model->sdata[0]->dims)[0]*sizeof(*weight));
+
+    /* Loop over index in subgrp (subarray) */
+    for( idx=0; (idx<res->ndat)&&(*status==SAI__OK); idx++ ) {
+
+      /* Get pointers to data/quality/model */
+      res_data = (res->sdata[idx]->pntr)[0];
+      qua_data = (qua->sdata[idx]->pntr)[0];
+      if( dat->gai ) {
+        gai_data = (gai->sdata[idx]->pntr)[0];
+      }
+
+      /* Loop over time slice and calculate the average of all the good 
+         detectors at each time slice */
+      for( i=0; i<ntslice; i++ ) {
+        /* Loop over bolometers to put the previous common-mode
+           signal back in at each time-slice, and calculate the sum of
+           all the detectors with good data. */
+        base = 0;  /* Offset to the start of the j'th bolometer */
+        sum = 0;   /* Initialize sum to 0 */
+        
+        for( j=0; j<nbolo; j++ ) {
           if( !(qua_data[base+i]&mask_meas) ) {
-            thissum += res_data[base+i];
+            sum += res_data[base+i];
             weight[i]++;
           }
           base += ntslice;
         }
-
+      
         /* Store the sum here. Init if first subarray, otherwise add to
            sum from previous subarrays. */
 
         if( idx == 0 ) {
-          model_data[i] = thissum;
+          model_data[i] = sum;
         } else {
-          model_data[i] += thissum;
+          model_data[i] += sum;
         }
       }
     }
-  }
-    
-  /* Re-normalize the model, or set model to 0 if no data. */
-  for( i=0; i<ntslice; i++ ) {
-    if( weight[i] ) {
-      model_data[i] /= weight[i];
-    } else {
-      model_data[i] = 0;
-    }
-  }
-
-  /* boxcar smooth if desired */
-  if( do_boxcar ) {
-
-    if( do_boxfact ) {
-      if( !astMapGet0D( keymap, "COM_BOXCARD", &boxcard) ) {
-	*status = SAI__ERROR;
-	errRep( "", FUNC_NAME ": Failed to retrieve COM_BOXCARD from keymap", 
-	       status);
+  
+    /* Re-normalize the model, or set model to 0 if no data. */
+    for( i=0; i<ntslice; i++ ) {
+      if( weight[i] ) {
+        model_data[i] /= weight[i];
       } else {
-	/* Use damped boxcar for smoothing width */
-	boxcar = (int) boxcard;
+        model_data[i] = 0;
       }
-
-    } 
-
-    msgSeti("BOX",boxcar);
-    msgOutif(MSG__VERB, " ", "    boxcar width ^BOX",status);
-
-    /* Do the smooth */
-    smf_boxcar1D( model_data, ntslice, boxcar, NULL, 0, status );
-
-    /* If damping, apply it here */
-    if( do_boxfact && (*status == SAI__OK) ) {
-      boxcard = boxcard * boxfact;
-
-      /* Enforce minimum if available */
-      if( do_boxmin ) {
-	if( boxcard < boxmin ) boxcard = (double) boxmin;
-      }
-
-      /* Update value in the keymap */
-      astMapPut0D( keymap, "COM_BOXCARD", boxcard, NULL );
     }
 
+    /* boxcar smooth if desired */
+    if( do_boxcar ) {
+      /* Do the smooth */
+      smf_boxcar1D( model_data, ntslice, boxcar, NULL, 0, status );
+    }
+
+    /* remove common mode from residual */
+    for( idx=0; (idx<res->ndat)&&(*status==SAI__OK); idx++ ) {
+      smf_get_dims( res->sdata[idx],  NULL, NULL, NULL, NULL, NULL, &bstride,
+                    &tstride, status );
+
+      /* Get pointers */
+      res_data = (double *)(res->sdata[idx]->pntr)[0];
+      qua_data = (unsigned char *)(qua->sdata[idx]->pntr)[0];
+      if( dat->gai ) {
+        /* If GAIn model supplied, fit gain/offset of sky model to
+           each bolometer independently. It is stored as 3 planes of
+           nbolo samples: the first holds bolo gains, the second offsets, and
+           the third correlation coefficients. */
+        smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
+                      &gbstride, &gcstride, status);
+        gai_data = (gai->sdata[idx]->pntr)[0];
+        
+        for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
+          if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {          
+            smf_templateFit1D( res_data+i*bstride, qua_data+i*bstride, 
+                               mask_meas, mask_cor, ntslice, tstride, 
+                               model_data, 0, gai_data+i*gbstride, 
+                               gai_data+gcstride+i*gbstride, 
+                               gai_data+2*gcstride+i*gbstride, status ); 
+          }
+        }
+
+        /* Calculate mean and r.m.s. of correlation coefficients to flag
+           outlier bolometers as bad */
+
+        corr = smf_malloc( nbolo, sizeof(*corr), 0, status );
+        for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
+          /* Copy correlation coefficients into an array that has VAL__BADD
+             set at locations of bad bolometers. Can't use the main quality
+             array directly as the stride may be different */          
+          if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {
+            corr[i] = gai_data[2*gcstride+i*gbstride];
+            /* Flag obviously bad fits here */
+            if( corr[i] <= 0 ) corr[i] = VAL__BADD;
+          } else {
+            corr[i] = VAL__BADD;
+          }
+        }
+        
+        smf_stats1( corr, 1, nbolo, NULL, 0, &cmean, &csig, &cgood, status );
+        msgSetd("MEAN",cmean);
+        msgSetd("SIG",csig);
+        msgSeti("N",cgood);
+        msgOutif( MSG__DEBUG, " ", FUNC_NAME 
+                  ": ^N good bolos, correlation coefficient spread "
+                  "^MEAN +/- ^SIG", status );
+
+        /* Flag bad bolometers, count good ones */
+        quit = 1;
+        for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
+          if( (corr[i]==VAL__BADD) || (fabs(corr[i]-cmean) > 5*csig) ) {
+            /* If this bolometer wasn't previously flagged as bad 
+               do it here, and set quit=0 */
+            if( !(qua_data[i*bstride]&SMF__Q_BADB) ) { 
+              quit = 0;
+              for( j=0; j<ntslice; j++ )
+                qua_data[i*bstride + j*tstride] |= SMF__Q_BADB;
+              gai_data[i*gbstride] = 1;              /* Set gain to 1 */
+              gai_data[i*gbstride+gcstride] = 0;     /* offset to 0 */
+              gai_data[i*gbstride+2*gcstride] = 0;   /* Zero correlation */
+            }
+          } 
+        }
+        corr = smf_free( corr, status );
+        
+        if( quit ) {
+          /* We can quit if number of good bolos has converged. Also
+             remove the common-mode from the bolo signals now that things
+             have converged */
+
+          for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) 
+            if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {          
+            /* The calculated gain is the fit of the common mode to the data.
+               Calculate its inverse which gives the correction of the bolometer
+               to look like the common-mode signal */
+            g = gai_data[i*gbstride];
+            if( (g!=VAL__BADD) && (g!=0) ){
+              g = 1./g;
+              off = gai_data[i*gbstride+gcstride];
+              gai_data[i*gbstride] = g;
+
+              /* Remove the template */          
+              for( j=0; j<ntslice; j++ ) {
+                if( !(qua_data[i*bstride + j*tstride]&mask_cor) ) {
+                  res_data[i*bstride+j*tstride] = (res_data[i*bstride+j*tstride]
+                                                   - off)*g - model_data[j];
+                }
+              }
+            } else {
+              *status = SAI__ERROR;
+              msgSeti("BOLO",i);
+              errRep("", FUNC_NAME ": invalid gain encountered for bolo ^BOLO", 
+                     status);
+            }    
+          }
+        } else {
+          /* Otherwise around we go again... */
+          msgOutif( MSG__DEBUG, "", FUNC_NAME ": Common mode not yet converged",
+                    status );
+        }
+      } else {
+        quit = 1;
+        /* Otherwise assume a straight common-mode for all of the detectors */
+        for( i=0; i<nbolo; i++ ) {
+          for( j=0; j<ntslice; j++ ) {
+            /* update the residual */
+            if( !(qua_data[i*bstride + j*tstride]&mask_cor) ) {
+              res_data[i*bstride + j*tstride] -= model_data[j];
+            }
+          }
+        }    
+      }
+    }
   }
 
-  /* remove common mode from residual */
-  for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
-    smf_get_dims( res->sdata[idx],  NULL, NULL, NULL, NULL, NULL, &bstride, &tstride, 
-                  status );
-
-    /* Get pointer to DATA component of residual */
-    res_data = (double *)(res->sdata[idx]->pntr)[0];
-      
-    /* Geta pointer to the QUAlity array */
-    qua_data = (unsigned char *)(qua->sdata[idx]->pntr)[0];
-    
-    if( dat->gai ) {
-      smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
-                    &gbstride, &gcstride, status);
-      gai_data = (gai->sdata[idx]->pntr)[0];
-
-      /* If GAIn model supplied, fit gain/offset of sky model to
-         each bolometer independently. It is stored as 3 planes of
-         nbolo samples: the first holds bolo gains, the second offsets, and
-         the third correlation coefficients. */
-      
-      for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
-        if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {          
-          smf_templateFit1D( res_data+i*bstride, qua_data+i*bstride, 
-                             mask_meas, mask_cor, ntslice, tstride, model_data,
-                             1, gai_data+i*gbstride, 
-                             gai_data+gcstride+i*gbstride, 
-                             gai_data+2*gcstride+i*gbstride, status );
-          
-          /* The calculated gain is the fit of the common mode to the data.
-             Calculate its inverse which gives the correction of the bolometer
-             to look like the common-mode signal */
-          if( (gai_data[i*gbstride] != VAL__BADD) && (gai_data[i*gbstride]>0) ){
-            gai_data[i*gbstride] = 1./gai_data[i*gbstride];
-          }
-
-          /* Now scale the data by this gain correction */
-          if( *status==SAI__OK ) for( j=0; j<ntslice; j++ ) {
-              if( !(qua_data[i*bstride + j*tstride]&mask_cor) ) {
-                res_data[i*bstride + j*tstride] *= gai_data[i*gbstride];
-              }
-            }
-        }
-      }
-    } else {
-      /* Otherwise assume a straight common-mode for all of the detectors */    
-      for( i=0; i<nbolo; i++ ) {
-        for( j=0; j<ntslice; j++ ) {
-          /* update the residual */
-          if( !(qua_data[i*bstride + j*tstride]&mask_cor) ) {
-            res_data[i*bstride + j*tstride] -= model_data[j];
-          }
-        }
-      }    
+  /* If damping boxcar smooth, reduce window size here */
+  if( do_boxcar && do_boxfact && (*status == SAI__OK) ) {
+    boxcard = boxcard * boxfact;
+    /* Enforce minimum if available */
+    if( do_boxmin ) {
+      if( boxcard < boxmin ) boxcard = (double) boxmin;
     }
+    /* Update value in the keymap so we can read it next iteration */
+    astMapPut0D( keymap, "COM_BOXCARD", boxcard, NULL );
   }
   
   /* Clean up */
-  if( weight) 
-    weight = smf_free( weight, status );
-  if( model_data_copy ) 
-    model_data_copy = smf_free( model_data_copy, status );
+  if( weight)  weight = smf_free( weight, status );
+  if( model_data_copy ) model_data_copy = smf_free( model_data_copy, status );
 }
