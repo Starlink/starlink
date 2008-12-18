@@ -57,7 +57,10 @@
 *     the variance in the time-domain samples caused by the "white" part of
 *     the spectrum (i.e. on a per-sample basis). Setting the "NEP" flag
 *     calculates the effective variance expected in an average of 1 second
-*     of time stream data (i.e. appropriate for calculating NEP and NEFD). 
+*     of time stream data (i.e. appropriate for calculating NEP and NEFD). If
+*     either the low-frequency or white noise power are zero, and a quality
+*     array exists, the bolometer in question will have the SMF__Q_BADB
+*     flag set.
 
 *  Notes:
 
