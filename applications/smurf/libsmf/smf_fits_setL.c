@@ -37,17 +37,21 @@
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2007-11-27 (EC):
 *        Initial version
+*     2008-12-17 (TIMJ):
+*        Use smf_validate_smfHead.
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2007 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -88,22 +92,7 @@ void smf_fits_setL( const smfHead *hdr, const char *name, int value,
 		    const char *comment, int overwrite, int *status ) {
   
   if (*status != SAI__OK) return;
-
-  if ( hdr == NULL ) {
-    *status = SAI__ERROR;
-    errRep( FUNC_NAME,
-	    "Supplied hdr is a NULL pointer. Possible programming error.",
-	    status);
-    return;
-  }
-
-  if ( hdr->fitshdr == NULL ) {
-    *status = SAI__ERROR;
-    errRep( FUNC_NAME,
-	    "No FitsChan associated with supplied header. Possible programming error.",
-	    status );
-    return;
-  }
+  if (!smf_validate_smfHead(hdr, 1, 0, status)) return;
 
   /* If overwrite set, locate card with same keyword */
   if( overwrite ) {
