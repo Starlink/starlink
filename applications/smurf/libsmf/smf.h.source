@@ -703,7 +703,7 @@ void smf_subtract_poly( smfData *data, unsigned char *quality, int rel,
 
 void smf_telpos_get( smfHead * hdr, int * status );
 
-void smf_tslice_ast (smfData * data, int index, int needwcs, int * status );
+void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status );
 
 void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
                      int autogrid, int usedetpos, AstFrameSet *spacerefwcs, 

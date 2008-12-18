@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_tslice_ast( smfData * data, int index, int needwcs, int * status);
+*     smf_tslice_ast( smfData * data, dim_t index, int needwcs, int * status);
 
 *  Arguments:
 *     data = smfData* (Given & Returned)
@@ -21,7 +21,7 @@
 *        The smfHead item in the structure will be updated to receive
 *        the updated FrameSet. In addition, the sc2head will be populated
 *        if this is a time series data file.
-*     index = int (Given)
+*     index = dim_t (Given)
 *        Index into the time series data (the 3rd dimension).
 *        If the data structure does not contain the specified index
 *        a bad error is reported. Ignored for 2D data.
@@ -95,6 +95,8 @@
 *        Use smf_find_subarray
 *     2008-12-2 (DSB):
 *        Manage caches for smf_create_wcs and smf_detpos_wcs.
+*     2008-12-18 (TIMJ):
+*        Do not use an int for index API use dim_t
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -147,7 +149,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_tslice_ast"
 
-void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
+void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status ) {
 
   AstFrame *cfrm = NULL;     /* Pointer to current Frame */
   smfHead *hdr;              /* Local copy of the header structure */
@@ -205,7 +207,7 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
   }
 
   /* Check index bounds */
-  if ( index < 0 || index >= ntslice ) {
+  if ( index >= ntslice ) {
     if ( *status == SAI__OK ) {
       *status = SAI__ERROR;
       msgSeti( "I", index );
