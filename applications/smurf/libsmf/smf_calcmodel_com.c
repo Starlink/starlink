@@ -328,6 +328,9 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   
   quit = 0;
   while( !quit && (*status==SAI__OK) ) {
+    /* Initialize to assumption that we'll finish this iteration */
+    quit = 1;
+
     /* initialize model data and weights to 0 */
     memset(model_data,0,(model->sdata[0]->dims)[0]*sizeof(*model_data));
     memset(weight,0,(model->sdata[0]->dims)[0]*sizeof(*weight));
@@ -385,7 +388,7 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
       smf_boxcar1D( model_data, ntslice, boxcar, NULL, 0, status );
     }
 
-    /* remove common mode from residual */
+    /* Common mode is calculated. Now try to fit it. */
     for( idx=0; (idx<res->ndat)&&(*status==SAI__OK); idx++ ) {
       smf_get_dims( res->sdata[idx],  NULL, NULL, NULL, NULL, NULL, &bstride,
                     &tstride, status );
@@ -445,7 +448,6 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
                   ": log(abs(gain coeff))  ^MEAN +/- ^SIG", status );
 
         /* Flag new bad bolometers */
-        quit = 1;
         newbad = 0;
         for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
           if( (corr[i]==VAL__BADD) || (fabs(corr[i]-cmean) > 5*csig) ||
@@ -472,45 +474,10 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 
         gcoeff = smf_free( gcoeff, status );
         corr = smf_free( corr, status );
-        
-        if( quit ) {
-          /* We can quit if number of good bolos has converged. Also
-             remove the common-mode from the bolo signals now that things
-             have converged */
-
-          for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) 
-            if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {          
-            /* The calculated gain is the fit of the common mode to the data.
-               Calculate its inverse which gives the correction of the bolometer
-               to look like the common-mode signal */
-            g = gai_data[i*gbstride];
-            if( (g!=VAL__BADD) && (g!=0) ){
-              g = 1./g;
-              off = gai_data[i*gbstride+gcstride];
-              gai_data[i*gbstride] = g;
-
-              /* Remove the template */          
-              for( j=0; j<ntslice; j++ ) {
-                if( !(qua_data[i*bstride + j*tstride]&mask_cor) ) {
-                  res_data[i*bstride+j*tstride] = (res_data[i*bstride+j*tstride]
-                                                   - off)*g - model_data[j];
-                }
-              }
-            } else {
-              *status = SAI__ERROR;
-              msgSeti("BOLO",i);
-              errRep("", FUNC_NAME ": invalid gain encountered for bolo ^BOLO", 
-                     status);
-            }    
-          }
-        } else {
-          /* Otherwise around we go again... */
-          msgOutif( MSG__DEBUG, "", FUNC_NAME ": Common mode not yet converged",
-                    status );
-        }
       } else {
+        /* If we're not fitting a gain and offset, just remove common-mode
+           immediately and quit while loop. */
         quit = 1;
-        /* Otherwise assume a straight common-mode for all of the detectors */
         for( i=0; i<nbolo; i++ ) {
           for( j=0; j<ntslice; j++ ) {
             /* update the residual */
@@ -520,6 +487,54 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
           }
         }    
       }
+    }
+
+    if( !quit ) {
+      /* around we go again... */
+      msgOutif( MSG__DEBUG, "", FUNC_NAME ": Common mode not yet converged",
+                status );
+    }
+  }
+
+  if( dat->gai) {
+    /* Once the common mode converged and if we're fitting the common
+       mode gain and offset, remove scaled template here. */
+    for( idx=0; (idx<res->ndat)&&(*status==SAI__OK); idx++ ) {
+      smf_get_dims( res->sdata[idx],  NULL, NULL, NULL, NULL, NULL, &bstride,
+                    &tstride, status );
+      
+      /* Get pointers */
+      res_data = (double *)(res->sdata[idx]->pntr)[0];
+      qua_data = (unsigned char *)(qua->sdata[idx]->pntr)[0];
+      smf_get_dims( gai->sdata[idx],  NULL, NULL, NULL, NULL, NULL,
+                    &gbstride, &gcstride, status);
+      gai_data = (gai->sdata[idx]->pntr)[0];
+      
+      for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) 
+        if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {          
+          /* The calculated gain is the fit of the common mode to the data.
+             Calculate its inverse which gives the correction of the bolometer
+             to look like the common-mode signal */
+          g = gai_data[i*gbstride];
+          if( (g!=VAL__BADD) && (g!=0) ){
+            g = 1./g;
+            off = gai_data[i*gbstride+gcstride];
+            gai_data[i*gbstride] = g;
+            
+            /* Remove the template */          
+            for( j=0; j<ntslice; j++ ) {
+              if( !(qua_data[i*bstride + j*tstride]&mask_cor) ) {
+                res_data[i*bstride+j*tstride] = (res_data[i*bstride+j*tstride]
+                                                 - off)*g - model_data[j];
+              }
+            }
+          } else {
+            *status = SAI__ERROR;
+            msgSeti("BOLO",i);
+            errRep("", FUNC_NAME ": invalid gain encountered for bolo ^BOLO", 
+                   status);
+          }    
+        }
     }
   }
 
