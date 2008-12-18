@@ -5701,6 +5701,8 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 /* Initialise variables to avoid "used of uninitialised variable"
    messages from dumb compilers. */
    swap = 0;
+   target_axis0 = -1;  
+   target_axis1 = -1;  
 
 /* Obtain a pointer to the template SkyFrame structure. */
    template = (AstSkyFrame *) template_frame;
