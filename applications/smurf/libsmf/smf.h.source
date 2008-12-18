@@ -554,8 +554,6 @@ void smf_fits_getL( const smfHead * hdr, const char * cardname, int * result,
 		    int * status );
 void smf_fits_getD( const smfHead * hdr, const char * cardname, 
                     double * result, int * status );
-void smf_fits_getF( const smfHead * hdr, const char * cardname, 
-                    float * result, int * status );
 void smf_fits_getS( const smfHead * hdr, const char * cardname, 
                     char result[70], size_t len, int * status );
 
