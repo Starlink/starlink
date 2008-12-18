@@ -50,14 +50,17 @@
 *        Use SMF__NOKWRD error condition.
 *     2006-08-02 (TIMJ):
 *        astGetFitsS does not trim trailing space.
+*     2008-12-17 (TIMJ):
+*        use one_strlcpy
 *     {enter_further_changes_here}
 
 *  Notes:
 *     - if the supplied buffer is too small to receive the string, the
-*       result will be truncated and status will be set to SMF__STRUN.
+*       result will be truncated and status will be set to ONE__TRUNC.
 *     - See also smf_fits_getI and smf_fits_getD
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -89,6 +92,7 @@
 #include "ast.h"
 #include "sae_par.h"
 #include "mers.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "smf.h"
@@ -135,26 +139,16 @@ void smf_fits_getS (const smfHead *hdr, const char * name, char * result,
   }
 
   /* if status is good, copy the result into the output buffer */
+  one_strlcpy( result, astres, len, status );
   if (*status == SAI__OK) {
-    strncpy( result, astres, len - 1 );
-    result[len-1] = '\0'; /* terminate */
-    if ( len <= strlen(astres) ) {
-      *status = SMF__STRUN;
-      msgSetc("FITS", name);
-      msgSeti("LN", len - 1 );
-      msgSeti("SZ", strlen(astres));
-      errRep(FUNC_NAME, "String buffer too small to receive FITS item ^FITS"
-	     " (^LN < ^SZ)", status);
-    } else {
       /* AST does not seem to trim trailing spaces from FITS cards */
       for (i=strlen(astres); i >= 0; i--) {
-	/* if we are not at a space or nul break from loop */
-	if ( result[i] != ' ' && result[i] != '\0') {
-	  break;
-	}
-	result[i] = '\0';
+        /* if we are not at a space or nul break from loop */
+        if ( result[i] != ' ' && result[i] != '\0') {
+          break;
+        }
+        result[i] = '\0';
       }
-    }
   }
 
   return;
