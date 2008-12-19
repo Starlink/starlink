@@ -1181,3 +1181,5 @@ double smf_cso2filt_tau( const smfHead *hdr, double csotau, int *status);
 
 int smf_validate_smfHead( const smfHead * hdr, int hasfits, int hasstate,
                           int *status );
+int smf_validate_smfData( const smfData * data, int hashdr, int hasfile,
+                          int *status );

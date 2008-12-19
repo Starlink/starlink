@@ -159,24 +159,8 @@ void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status ) {
   int subsysnum;             /* Subsystem numeric id. 0 - 8 */
 
   if (*status != SAI__OK) return;
-
-  /* First need to determine what type of data we have */
-  /* Note that in this routine we return immediately if status is set to bad.
-     This means that we only need to check for goodness again once a routine
-     is called that may set status. */
-  if ( data == NULL ) {
-    *status = SAI__ERROR;
-    errRep( FUNC_NAME, "Supplied Data is a NULL pointer. Possible programming error.", status);
-    return;
-  }
-
-  /* Get the header struct since we need that early */
+  if (!smf_validate_smfData(data, 1, 0, status)) return;
   hdr = data->hdr;
-  if ( hdr == NULL ) {
-    *status = SAI__ERROR;
-    errRep( FUNC_NAME, "Supplied smfData->hdr is a NULL pointer. Possible programming error.", status);
-    return;
-  }
 
   /* 2-D case. Just check to see if we have a frameset */
   if (data->ndims == 2) {
