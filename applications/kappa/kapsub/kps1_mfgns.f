@@ -49,6 +49,7 @@
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council
+*     Copyright (C) 2008 Science & Technology Facilities Council
 *     All Rights Reserved.
 
 *  Licence:
@@ -74,6 +75,8 @@
 *  History:
 *     2006 June 1 (MJC):
 *        Original version.
+*     2008 December 18 (MJC):
+*        Allow for degenerate axes.
 *     {enter_further_changes_here}
 
 *-
@@ -110,19 +113,26 @@
       INTEGER SDIM               ! Automatic-masking sample dimension
       INTEGER STWORD( NDF__MXDIM ) ! Start positions of section elements
       CHARACTER * ( 40 ) WORDS( NDF__MXDIM ) ! NDF sections by axis
+      INTEGER UDIM               ! Number of useful dimensions
 
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Look for degenerate axes.
+      UDIM = 0
+      DO I = 1, NDF__MXDIM
+         IF ( DIMS( I ) .GT. 1 ) UDIM = UDIM + 1
+      END DO
+
 *  If the NDF is one-dimensional, there's no section to access, and we
-*  use a default.
-      DEFSEC = NDIM .EQ. 1
+*  set the null default, meaning use all the data.
       NCSECT = 0 
       SECT = ''
 
-      IF ( .NOT. DEFSEC ) THEN 
+      IF ( UDIM .GT. 1 ) THEN 
+         DEFSEC = .FALSE.
 
 *  Obtain the NDF section.  
          CALL PAR_GET0C( PARNAM, SECT, STATUS )
@@ -151,25 +161,25 @@
                IF ( I .LT. NDIM ) CALL CHR_APPND( ',', SECT, NCSECT ) 
             END DO
          END IF
-      END IF
 
 *  Form a default section.  It is arbitrary, but call a representative
 *  region the square root of the dimension along each pixel axis 
 *  located about its centre.  This does not apply to the axis whose
 *  lines are to be fitted.
-      IF ( DEFSEC ) THEN
-         SECT = ' '
-         NCSECT = 0
-         DO I = 1, NDIM
-            IF ( I .NE. AXIS ) THEN
-               SDIM = MAX( MIN( 10, DIMS( I ) ), 
-     :                     NINT( SQRT( REAL( DIMS( I ) ) ) ) )
-               CALL CHR_APPND( '~', SECT, NCSECT )
-               CALL CHR_PUTI( SDIM, SECT, NCSECT )
-            END IF
-            IF ( I .LT. NDIM ) CALL CHR_APPND( ',', SECT, NCSECT ) 
-         END DO
+         IF ( DEFSEC ) THEN
+            SECT = ' '
+            NCSECT = 0
+            DO I = 1, NDIM
+               IF ( I .NE. AXIS ) THEN
+                  SDIM = MAX( MIN( 10, DIMS( I ) ), 
+     :                        NINT( SQRT( REAL( DIMS( I ) ) ) ) )
+                  CALL CHR_APPND( '~', SECT, NCSECT )
+                  CALL CHR_PUTI( SDIM, SECT, NCSECT )
+               END IF
+               IF ( I .LT. NDIM ) CALL CHR_APPND( ',', SECT, NCSECT ) 
+            END DO
 
+         END IF
       END IF
 
       END
