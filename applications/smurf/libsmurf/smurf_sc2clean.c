@@ -49,7 +49,7 @@
 *     DCBOX = _INTEGER (Read)
 *          Width of the box (samples) over which to estimate the mean
 *          signal level for DC step detection
-*     DCBAD - _LOGICAL (Read)
+*     DCBAD = _LOGICAL (Read)
 *          If true, instead of repaiting DC steps, flag bolo as bad
 *     DKSQUID = _LOGICAL (Read)
 *          If true fit and remove dark squid signals
