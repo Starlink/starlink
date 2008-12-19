@@ -2,22 +2,8 @@
 #define HEADGEN____sc2ast_pro_h 
  
  
-/*+ sc2ast_createwcs2 - create WCS description using supplied cache */
+/*+ sc2ast_createwcs - create WCS description using a static cache */
 
-sc2astCache *sc2ast_createwcs2
-(
-int subnum,             /* subarray number, 0-7 (given). If -1 is supplied,
-                           the cache will be freed. */
-const JCMTState *state, /* Current telescope state (time, pointing etc.) */
-const double fplane_off[2], /* Offset of subarray in the focal plane */ 
-const double telpos[3], /* Geodetic Lon/Lat/Alt of telescope
-(deg/deg/ign.) */
-AstFrameSet **fset,     /* constructed frameset (returned) */
-sc2astCache *cache,     /* Structure holding cached information */
-int *status             /* global status (given and returned) */
-);
-
-/*+ sc2ast_createwcs - create WCS description using static cache */
 void sc2ast_createwcs
 (
 int subnum,             /* subarray number, 0-7 (given). If -1 is
@@ -29,6 +15,19 @@ AstFrameSet **fset,     /* constructed frameset (returned) */
 int *status             /* global status (given and returned) */
 );
 
+/*+ sc2ast_createwcs2 - create WCS description using a supplied cache. */
+
+sc2astCache *sc2ast_createwcs2
+(
+int subnum,             /* subarray number, 0-7 (given). If -1 is
+                           supplied the cached AST objects will be freed. */
+const JCMTState *state, /* Current telescope state (time, pointing etc.) */
+const double instap[2], /* Offset of subarray in the focal plane */ 
+const double telpos[3], /* Geodetic W Lon/Lat/Alt of telescope (deg/deg/ign.)*/
+AstFrameSet **fset,     /* constructed frameset (returned) */
+sc2astCache *cache,     /* A pointer to a structure holding cached info */
+int *status             /* global status (given and returned) */
+);
 
 /*+ sc2ast_getdomain - select a domain within a frameset */
 
