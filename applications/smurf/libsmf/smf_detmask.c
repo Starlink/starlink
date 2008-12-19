@@ -16,14 +16,6 @@
 *     smf_detmask( type, void *in, int len, int ndim, int *dims_in, 
 *                  int axis, int *index, int maxis, int *mask, void *out, 
 *                  int *status );
-*
-*     smf_detmask<x>( <type> *in, int ndim, int *dims_in, int axis, 
-*                     int *index, int maxis, int *mask, <type> *out, 
-*                     int *status );
-*
-*     smf_detmaskc( char *in, int len, int ndim, int *dims_in, int axis, 
-*                   int *index, int maxis, int *mask, char *out, 
-*                   int *status );
 
 *  Arguments:
 *     type = const char * (Given)
@@ -131,75 +123,25 @@ void smf_detmask( const char *type, const void *in, int len, int ndim, const int
 
 /* Call the correct function for the specified data type. */
    if( !strcmp( type, "_REAL" ) ) {
-      smf_detmaskF( (const float *) in, ndim, dims_in, maxis, mask, 
+      smf_detmaskF( (const float *) in, 1, ndim, dims_in, maxis, mask, 
                      (float *) out, status );
 
    } else if( !strcmp( type, "_DOUBLE" ) ) {
-      smf_detmaskD( (const double *) in, ndim, dims_in, maxis, mask, 
+      smf_detmaskD( (const double *) in, 1, ndim, dims_in, maxis, mask, 
                     (double *) out, status );
 
    } else if( !strcmp( type, "_INTEGER" ) ) {
-      smf_detmaskI( (const int *) in, ndim, dims_in, maxis, mask, 
+      smf_detmaskI( (const int *) in, 1, ndim, dims_in, maxis, mask, 
                     (int *) out, status );
 
    } else if( !strncmp( type, "_CHAR", 5 ) ) {
-      smf_detmaskc( (const char *) in, len, ndim, dims_in, maxis, mask, 
+      smf_detmaskB( (const char *) in, len, ndim, dims_in, maxis, mask, 
                     (char *) out, status );
 
    } else if( *status == SAI__OK ) {
       *status = SAI__ERROR;
       msgSetc( "TYPE", type );
       errRep( "", "SMF_DETMASK: ^TYPE data type not yet supported.", status );
-   }
-}
-
-void smf_detmaskc( const char *in, int len, int ndim, const int *dims_in, int maxis,
-                   const int *mask, char *out, int *status ){
-
-/* Local Variables */
-   const char *pin;
-   char *pout;
-   int i;
-   size_t ic[ NDF__MXDIM ];
-   size_t iel;
-   size_t nel;
-
-/* Check inherited status */
-   if( *status != SAI__OK ) return;
-
-/* Get the total number of elements in the input array, and initialise
-   the indices of the first pixel. */
-   nel = 1;
-   for( i = 0; i < ndim; i++ ) {
-      nel *= dims_in[ i ];
-      ic[ i ] = 0;
-   }
-
-/* Initialise pointers to the next input and output values. */
-   pin = in;    
-   pout = out;
-
-/* Loop round all pixels in the input array. */
-   for( iel = 0; iel < nel; iel++, pin += len ) {
-
-/* If the current input element has a zero value in the mask, ignore it.
-   Otherwise copy it to the output. */
-      if( mask[ ic[ maxis ] ] ) {
-         memcpy( pout, pin, len*sizeof( *pin ) );
-         pout += len;
-      }
-
-/* Get the indices of the next input element. */
-      i = 0;
-      ic[ i ]++;
-      while( ic[ i ] == dims_in[ i ] ) {
-         ic[ i++ ] = 0;
-         if( i < ndim ) {
-            ic[ i ]++;
-         } else {
-            break;
-         }          
-      }
    }
 }
 
@@ -222,3 +164,11 @@ void smf_detmaskc( const char *in, int len, int ndim, const int *dims_in, int ma
 #include "cgeneric_defs.h"
 #include "smf_detmaskx.cgen"
 #undef CGEN_CODE_TYPE
+
+/* Add special flag to be able to use generic code for string copying */
+#define CGEN_CODE_TYPE CGEN_BYTE_TYPE
+#include "cgeneric_defs.h"
+#define IS_BYTE_TYPE
+#include "smf_detmaskx.cgen"
+#undef CGEN_CODE_TYPE
+#undef IS_BYTE_TYPE

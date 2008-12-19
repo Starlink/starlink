@@ -13,14 +13,19 @@
 *     C function
 
 *  Invocation:
-*     void smf_detmask<X>( const CGEN_TYPE *in, int ndim, const int *dims_in,
-*                          int maxis, const int *mask, CGEN_TYPE *out, 
-*                          int *status );
+*     void smf_detmask<X>( const CGEN_TYPE *in, int len, int ndim,
+*                          const int *dims_in, int maxis, const int *mask,
+*                          CGEN_TYPE *out, int *status );
 
 *  Arguments:
 *     in = const <type> * (Given)
 *        Point to the vectorised input array. The elements are assumed to be
 *        stored in fortran order (i.e. the first axis varies fastest).
+*     len = int (Given)
+*        The length of each individual sub-string within the "in" and "out" 
+*        arrays. Note, this argument is only included in the interface for
+*        smf_detmask and smf_detmaskc. Only used for smf_detmaskB. Ignored
+*        otherwise.
 *     ndim = int (Given)
 *        Number of array axes in "in" and "out".
 *     dims_in = const int * (Given)
@@ -54,8 +59,8 @@
 *     values on that axis are copied form input to output.
 
 *  Notes:
-*     - <x> in the function name should be replaced by one of "r", "i",
-*     "d" and "c" for processing arrays of float, int, double and char
+*     - <x> in the function name should be replaced by one of "F", "I",
+*     "D" and "B" for processing arrays of float, int, double and char
 *     respectively. <type> above should also be changed to one of the
 *     "float", "int", "double" or "char".
 
@@ -107,7 +112,7 @@
 #include "mers.h"
 #include "smf.h"
 
-void CGEN_FUNCTION(smf_detmask)( const CGEN_TYPE *in, int ndim,
+void CGEN_FUNCTION(smf_detmask)( const CGEN_TYPE *in, int len, int ndim,
                                  const int *dims_in, int maxis,
                                  const int *mask, CGEN_TYPE *out, 
                                  int *status ){
@@ -119,6 +124,12 @@ void CGEN_FUNCTION(smf_detmask)( const CGEN_TYPE *in, int ndim,
    size_t ic[ NDF__MXDIM ];
    size_t iel;
    size_t nel;
+
+#ifndef IS_BYTE_TYPE
+   /* ensure that we only use len for CHAR type */
+   len = 1;
+#endif
+
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -136,13 +147,17 @@ void CGEN_FUNCTION(smf_detmask)( const CGEN_TYPE *in, int ndim,
    pout = out;
 
 /* Loop round all pixels in the input array. */
-   for( iel = 0; iel < nel; iel++, pin++ ) {
+   for( iel = 0; iel < nel; iel++, pin += len ) {
 
 /* If the current input element has a zero value in the mask, ignore it.
    Otherwise copy it to the output. */
      if( mask[ ic[ maxis ] ] ) {
+#ifdef IS_BYTE_TYPE
+       memcpy( pout, pin, len*sizeof( *pin ) );
+#else
        *pout = *pin;
-       pout++;
+#endif
+       pout += len;
      }
 
 /* Get the indices of the next input element. */
