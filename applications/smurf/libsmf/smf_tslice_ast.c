@@ -96,7 +96,7 @@
 *     2008-12-2 (DSB):
 *        Manage caches for smf_create_wcs and smf_detpos_wcs.
 *     2008-12-18 (TIMJ):
-*        Do not use an int for index API use dim_t
+*        Do not use an int for index API use dim_t. Use smf_get_dims.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -172,23 +172,8 @@ void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status ) {
     return;
   }
 
-
-  /* Work out the largest index we are allowed to have given that we have 2d data. */
-  if (data->ndims != 3) {
-    if (*status == SAI__OK) {
-      *status = SAI__ERROR;
-      msgSeti( "D", data->ndims );
-      errRep( FUNC_NAME, "Dimensionality of ^D is not the expected 3", status);
-      return;
-    }
-  }
-
-  /* Obtain number of time slices */
-  if( data->isTordered ) {
-    ntslice = data->dims[2];
-  } else {
-    ntslice = data->dims[0];
-  }
+  /* Obtain number of time slices - will also check for 3d-ness */
+  smf_get_dims( data, NULL, NULL, NULL, &ntslice, NULL, NULL, NULL, status );
 
   /* Check index bounds */
   if ( index >= ntslice ) {
@@ -196,8 +181,7 @@ void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status ) {
       *status = SAI__ERROR;
       msgSeti( "I", index );
       msgSeti( "TMX", ntslice );
-      msgSeti( "TMN", 0 );
-      errRep( FUNC_NAME, "Index out of bounds ( ^TMN <= ^I < ^TMX )", status );
+      errRep( FUNC_NAME, "Index out of bounds ( 0 <= ^I < ^TMX )", status );
       return;
     }
   }
