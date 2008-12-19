@@ -21,34 +21,30 @@
 *     type = const char * (Given)
 *        The HDS data type. Note, this argument is only included in the 
 *        interface for the generic "smf_detmask" function.
-*     in = <type> * (Given)
+*     in = const <type> * (Given)
 *        Point to the vectorised input array. The elements are assumed to be
 *        stored in fortran order (i.e. the first axis varies fastest).
 *     len = int (Given)
 *        The length of each individual sub-string within the "in" and "out" 
-*        arrays. Note, this argument is only included in the interface for
-*        smf_detmask and smf_detmaskc. The smf_detmask function ignores
-*        the supplied value if "type" indicates a non-character data type.
+*        arrays. Only used for smf_detmaskB. The supplied value is ignored
+*        otherwise, and a value of 1 is assumed.
 *     ndim = int (Given)
 *        Number of array axes in "in" and "out".
-*     dims_in = int * (Given)
+*     dims_in = const int * (Given)
 *        Pointer to an array of "ndim" values, each being the length of
 *        the corresponding dimension of the "in" array. The dimensions of
 *        the "out" array should be the same as those of the "in" array, 
-*        except that, if a mask is supplied, the "maxis" axis should be
-*        shorter in the "out" array, by the number of zero values in the 
-*        mask.
+*        except that the "maxis" axis should be shorter in the "out" array, 
+*        by the number of zero values in the mask.
 *     maxis = int (Given)
 *        The zero-based index of the dimension that is to be masked.
-*        Ignored if "mask" is NULL.
-*     mask = int * (Given)
+*     mask = const int * (Given)
 *        An array with one element for each input pixel on the dimension that 
 *        is being masked (i.e. it should have "dims_in[maxis]" elements). This 
-*        array should contain non-zero values for those hyper-rpows that
-*        are to be copied to "out". Other hyper-rows are not copied. If a
-*        NULL pointer is supplied, no masking is performed. The number of
-*        non-zero values in "mask" should equal the length of the "maxis" 
-*        axis in "out".
+*        array should contain non-zero values for those hyper-rows that
+*        are to be copied to "out". Other hyper-rows are not copied. The 
+*        number of non-zero values in "mask" should equal the length of the 
+*        "maxis" axis in "out".
 *     out = <type> * (Returned)
 *        Point to the vectorised output array. The elements are assumed to be
 *        stored in fortran order (i.e. the first axis varies fastest).
@@ -56,10 +52,15 @@
 *        Pointer to inherited status.
 
 *  Description:
-*     Masks out detectors.
+*     This function copies the input array to the output array, removing
+*     selected hyper-planes from the input array in the process. This
+*     results in the output array being smaller than the input array.
 *
-*     In addition, another axis can be masked, so that only selected
-*     values on that axis are copied form input to output.
+*     The hyper-planes removed are specified by an axis index and a 1D
+*     mask array. This array holds one element for each pixel along the
+*     specified axis of the input array. If an element is non-zero, the 
+*     corresponding hyper-plane is included in the output array.
+*     Otherwise it is excluded.
 
 *  Notes:
 *     - <x> in the function name should be replaced by one of "r", "i",
@@ -81,6 +82,8 @@
 *        Added "mask" and "maxis" arguments.
 *     3-APR-2008 (DSB):
 *        Added generic smf_detmask function.
+*     19-DEC-2008 (DSB):
+*        Correct argument and description sections in the prologue.
 *     {enter_further_changes_here}
 
 *  Copyright:
