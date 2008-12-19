@@ -15,7 +15,7 @@ exportndf = 0
 #  gai = if com specified, fit gain/offset of common mode
 #  ext = apply extinction correction
 #  noi = estimate time-domain variance
-modelorder = com gai ext noi
+modelorder = com gai dks ext noi
 
 # low-pass boxcar filter on COM (samples) to assist with convergence
 # if boxfact set reduce width of boxcar by this factor each iteration
