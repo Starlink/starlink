@@ -38,7 +38,9 @@
 *     specified.
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics & Astronomy Research Council
+*     Copyright (C) 2006-2006 Particle Physics & Astronomy Research 
+*                   Council.
+*     Copyright (C) 2007-2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -70,6 +72,8 @@
 *        Correct declared type of WORK1 array.
 *     2007 September 7 (MJC):
 *        Revised KPS1_LFTx argument list.
+*     2008 December 19 (MJC):
+*        Used revised (2008 May 15) API for KPS1_LFTx.
 *     {enter_further_changes_here}
 
 *-
@@ -172,7 +176,7 @@
       DO J = 1, NCLIP
 
 *  Fit a linear slope to all the data. 
-         CALL KPS1_LFT<T>( ORDER, AXIS, RANGES, MAXRNG, .FALSE., ARRAY,
+         CALL KPS1_LFT<T>( ORDER, AXIS, MAXRNG, RANGES, .FALSE., ARRAY,
      :                     .FALSE., ARRAY, DIMS, ARRAY, AS, COEFF, 
      :                     WORK1, WORK2, STATUS )
 
