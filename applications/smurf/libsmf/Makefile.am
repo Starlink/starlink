@@ -307,7 +307,8 @@ $(CGENERIC_ROUTINES:.cgen=.c):
 	echo "" >> $@
 
 # Need to distribute the generic files
-EXTRA_DIST = $(CGENERIC_ROUTINES) smf.h.source smf_reorderx.cgen
+EXTRA_DIST = $(CGENERIC_ROUTINES) smf.h.source smf_reorderx.cgen \
+	smf_detmaskx.cgen
 
 MAINTAINERCLEANFILES = smf.h
 CLEANFILES = smf.h

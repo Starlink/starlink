@@ -946,11 +946,11 @@ void smf_flag_spikes( smfData *data, double *bolovar, unsigned char *quality,
 int *smf_find_bad_dets( Grp *igrp,  int size, int *nbaddet, int *status );
 void smf_maskacsis( int indf, int *mask, int *status );
 
-void smf_detmask( const char *type, void *in, int len, int ndim, int *dims_in, int maxis, int *mask, void *out, int *status );
-void smf_detmaskr( float *in, int ndim, int *dims_in, int maxis, int *mask, float *out, int *status );
-void smf_detmaskd( double *in, int ndim, int *dims_in, int maxis, int *mask, double *out, int *status );
-void smf_detmaski( int *in, int ndim, int *dims_in, int maxis, int *mask, int *out, int *status );
-void smf_detmaskc( char *in, int len, int ndim, int *dims_in, int maxis, int *mask, char *out, int *status );
+void smf_detmask( const char *type, const void *in, int len, int ndim,
+                  const int *dims_in, int maxis, const int *mask,
+                  void *out, int *status );
+void smf_detmaskc( const char *in, int len, int ndim, const int *dims_in,
+                    int maxis, const int *mask, char *out, int *status );
 
 void smf_kmmerge( const char *xname, AstKeyMap *keymap, int from, int into, int ndet, int *mask, int nts, int rts_num, int *status );
 
