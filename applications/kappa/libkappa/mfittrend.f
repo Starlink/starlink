@@ -423,6 +423,8 @@
 *        Added POSKNOT parameter.
 *     2008 May 30 (MJC):
 *        Added smoothing spline and INTERPOL parameter.
+*     2008 December 19 (MJC):
+*        Issue automatic-mode caveats at verbose reporting level.
 *     {enter_further_changes_here}
 
 *-
@@ -721,14 +723,14 @@
       END DO
 
       IF ( AUTO ) THEN
-         CALL MSG_BLANK( STATUS )
-         CALL MSG_OUTIF( MSG__NORM, 'AUTOWARN1',
+         CALL MSG_OUTIF( MSG__VERB, 'AUTOWARNB', ' ', STATUS )
+         CALL MSG_OUTIF( MSG__VERB, 'AUTOWARN1',
      :     'WARNING: The automatic mode has undergone only moderate '//
      :     'testing.  Check that the regions used for fitting '//
      :     'reported below are sensible, i.e. avoid features like '//
      :     'spectral lines.', STATUS )
-         CALL MSG_BLANK( STATUS )
-         CALL MSG_OUTIF( MSG__NORM, 'AUTOWARN2',
+         CALL MSG_OUTIF( MSG__VERB, 'AUTOWARNB', ' ', STATUS )
+         CALL MSG_OUTIF( MSG__VERB, 'AUTOWARN2',
      :     'Feedback is welcome on the tuning of the CLIP '//
      :     'parameter''s default, the size of the default averaging '//
      :     'region, the binning resolution, and whether or not the '//
