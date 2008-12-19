@@ -119,6 +119,7 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
+#include "libsmf/smf_err.h"
 
 #define FUNC_NAME "smf_calcmodel_com"
 
@@ -405,6 +406,15 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
                                model_data, 0, gai_data+i*gbstride, 
                                gai_data+gcstride+i*gbstride, 
                                gai_data+2*gcstride+i*gbstride, status ); 
+            
+            /* If divide-by-zero detected, flag bolo as bad */
+            if( *status==SMF__DIVBZ ) {
+              for( j=0; j<ntslice; j++ ) {
+                qua_data[i*bstride+j*tstride] |= SMF__Q_BADB;
+              }
+              errAnnul( status );
+            }
+
           }
         }
 

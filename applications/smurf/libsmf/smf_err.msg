@@ -17,4 +17,5 @@ INSMP      <Insufficient samples for statistics>
 TORDB      <Time-ordered bolometer data>
 BORDB      <Bolo-ordered bolometer data>
 WDIM       <Wrong data dimensions>
+DIVBZ      <Divide-by-zero detected>
 .END

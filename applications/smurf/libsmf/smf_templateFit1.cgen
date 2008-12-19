@@ -208,7 +208,7 @@ void CGEN_FUNCTION(smf_templateFit1)( CGEN_TYPE *data, unsigned char *qual,
   /* Check for divide-by-zero */
   if( ngood >= 3 ) {
     if( (ngood*s_tsq==s_t*s_t) || (ngood*s_dsq==s_d*s_d) ) {
-      *status = SAI__ERROR;
+      *status = SMF__DIVBZ;
       errRep( "", FUNC_NAME ": divide-by-zero detected", status );
     } else {
       /* Calculate fit coefficients */
