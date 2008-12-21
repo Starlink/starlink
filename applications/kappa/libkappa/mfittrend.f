@@ -425,6 +425,9 @@
 *        Added smoothing spline and INTERPOL parameter.
 *     2008 December 19 (MJC):
 *        Issue automatic-mode caveats at verbose reporting level.
+*     2008 December 20 (MJC):
+*        Use NDF_CLONE instead of NDF_FIND for null sections for 
+*        METHOD="Region" in automatic mode.
 *     {enter_further_changes_here}
 
 *-
@@ -821,20 +824,22 @@
 *  Obtain a locator to the input NDF.
             CALL NDF_LOC( INNDF, 'Read', LOC, STATUS )
 
-*  Create the section in the input array.  Allow for a null string
-*  for a one-dimensional NDF.
+*  Create the section in the input array.  Allow for a null string, or
+*  for a one-dimensional NDF by continuing to use the input NDF, but
+*  cloned so that the NDF section can be released independent of how it
+*  was created.
             IF ( NCSECT .GT. 0 ) THEN
                CALL NDF_FIND( LOC, '(' // SECT( :NCSECT ) // ')', NDFS,
      :                        STATUS )
             ELSE
-               CALL NDF_FIND( LOC, '()', NDFS, STATUS )
-               CALL DAT_ANNUL( LOC, STATUS )
+               CALL NDF_CLONE( INNDF, NDFS, STATUS )
             END IF
 
 *  Form ranges by averaging the lines in the section, and then
 *  performing a fit, and rejecting outliers.
             CALL KPS1_MFAUR( NDFS, JAXIS, NCLIP, CLIP, NUMBIN, MAXRNG,
      :                       NRANGE, RANGES, STATUS )
+            CALL NDF_ANNUL( NDFS, STATUS )
 
 *  Ensure that we have valid ranges before attempting to use them.
             IF ( STATUS .NE. SAI__OK ) GOTO 999
