@@ -148,7 +148,7 @@
 *  axis, and reform the section string.  This step also removes surplus
 *  dimensions.
          ELSE
-	    CALL CHR_TRCHR( ',', ' ', SECT, STATUS )
+            CALL CHR_TRCHR( ',', ' ', SECT, STATUS )
             CALL CHR_DCWRD( SECT, NDF__MXDIM, NWORD, STWORD, ENWORD,
      :                      WORDS, STATUS )
                
