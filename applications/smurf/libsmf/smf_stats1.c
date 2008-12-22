@@ -14,7 +14,7 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_stats1( double *data, size_t stride, dim_t nsamp, 
+*     smf_stats1( double *data, dim_t stride, dim_t nsamp, 
 *                 unsigned char *qual, unsigned char mask, double *mean, 
 *                 double *sigma, dim_t *ngood, int *status )
 
@@ -115,7 +115,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_stats1"
 
-void smf_stats1( double *data, size_t stride, dim_t nsamp, 
+void smf_stats1( double *data, dim_t stride, dim_t nsamp, 
                  unsigned char *qual, unsigned char mask, double *mean, 
                  double *sigma, dim_t *ngood, int *status ) {
 
