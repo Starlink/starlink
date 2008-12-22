@@ -228,7 +228,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
   const char *mname=NULL;       /* String model component name */
   size_t msize=0;               /* Number of files in model group */
   char name[GRP__SZNAM+1];      /* Name of container file without suffix */
-  size_t nbolo;                 /* Number of bolometers */
+  dim_t nbolo;                  /* Number of bolometers */
   size_t ndata=0;               /* Number of elements in data array */
   dim_t nrel=0;                 /* Number of related elements (subarrays) */
   int oflag=0;                  /* Flags for opening template file */

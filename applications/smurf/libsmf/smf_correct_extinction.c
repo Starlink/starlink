@@ -204,8 +204,8 @@ void smf_correct_extinction(smfData *data, smf_tausrc tausrc, smf_extmeth method
   size_t newtau = 0;       /* Flag to denote whether to calculate a
                               new tau from the WVM data */
   double newtwvm[3];       /* Array of WVM temperatures */
-  size_t nframes = 0;      /* Number of frames */
-  size_t npts = 0;         /* Number of data points */
+  dim_t nframes = 0;       /* Number of frames */
+  dim_t npts = 0;          /* Number of data points */
   dim_t nx = 0;            /* # pixels in x-direction */
   dim_t ny = 0;            /* # pixels in y-direction */
   double oldtwvm[3] = {0.0, 0.0, 0.0}; /* Cached value of WVM temperatures */
