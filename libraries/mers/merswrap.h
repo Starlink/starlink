@@ -44,6 +44,11 @@
 #ifndef MERSWRAP_DEFINED
 #define MERSWRAP_DEFINED
 
+/* If we're not using GNU C, elide __attribute__ */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 void errAnnul( int *status );
 
 void errBegin( int *status );
@@ -98,14 +103,10 @@ void msgBell( int *status );
 
 void msgBlank( int *status );
 
+/* Gnu compiler can check for format consistency at compile time */
 void msgFmt( const char *token,
              const char *format,
-             ...)
-#ifdef __GNUC__
-/* Gnu compiler can check for format consistency at compile time */
-  __attribute__((format (printf, 2, 3 )))
-#endif
-;
+             ...) __attribute__((format (printf, 2, 3 )));
 
 void msgIfget( const char *pname,
                int *status );

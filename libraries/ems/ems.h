@@ -74,6 +74,11 @@
 /* EMS Major Version */
 #define EMS__VERSN 2
 
+/* If we're not using GNU C, elide __attribute__ */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Function Prototypes: */
 void emsAnnul( int *status );     
 
@@ -120,14 +125,10 @@ void emsRep( const char *err,
 
 void emsRlse( void );             
 
+/* Gnu compiler can check for format consistency at compile time */
 void emsSet( const char *token,
              const char *format,
-             ...)
-#ifdef __GNUC__
-/* Gnu compiler can check for format consistency at compile time */
-  __attribute__((format (printf, 2, 3 )))
-#endif
-;
+             ...) __attribute__((format (printf, 2, 3 )));
 
 void emsSetc( const char *token,  
               const char *cvalue );
