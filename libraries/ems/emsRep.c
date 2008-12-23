@@ -32,14 +32,6 @@
  *     status = int * (Given and Returned)
  *        The global status value.
 
- *  Notes:
- *     Using printf formatting can be useful for cases where a variable
- *     type has no corresponding emsSet routine and can result in less code
- *     for error message reporting. Note though that escape character parsing
- *     will be performed on the resulting string and an attempt to replace
- *     tokens will also be made. If there is a chance that the formatted
- *     string will include escape characters, tokens should be used.
-
  *  Copyright:
  *     Copyright (C) 1990, 1991 Science & Engineering Research Council.
  *     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
