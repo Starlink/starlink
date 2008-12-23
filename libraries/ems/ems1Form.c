@@ -250,7 +250,7 @@ void ems1Form( const char *text, const int maxlen,
     if ( clean ) {
         int i;
         for ( i = 0; i < *oplen; i++ ) {
-          if ( isgraph(opstr[ i ]) ) opstr[ i ] = ' ';
+          if ( !isgraph(opstr[ i ]) ) opstr[ i ] = ' ';
         }
     }
 
