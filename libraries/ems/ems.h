@@ -67,6 +67,7 @@
 
 /* ANSI types */
 #include <stddef.h>
+#include <stdarg.h>
 #include <inttypes.h>
 
 
@@ -119,6 +120,15 @@ void emsRep( const char *err,
 
 void emsRlse( void );             
 
+void emsSet( const char *token,
+             const char *format,
+             ...)
+#ifdef __GNUC__
+/* Gnu compiler can check for format consistency at compile time */
+  __attribute__((format (printf, 2, 3 )))
+#endif
+;
+
 void emsSetc( const char *token,  
               const char *cvalue );
 
@@ -146,6 +156,10 @@ void emsSetp( const char *token,
 
 void emsSetu( const char *token,  
               unsigned int ivalue );
+
+void emsSetv( const char *token,
+              const char *format,
+              va_list args);
 
 void emsStat( int *status );      
 

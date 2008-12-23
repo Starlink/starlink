@@ -17,6 +17,9 @@
    * emsSetc now prints "<Null>" when given a NULL pointer. Previously it
      was converted to a single space but that was hard to see in printouts.
 
+   * Add emsSet routine that can format tokens use printf-style format
+     specifiers. emsSetv is similar but takes a va_list.
+
 2.1-2
 
    * A memory overrun bug storing and retrieving parameter names has been 

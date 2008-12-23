@@ -154,9 +154,10 @@ int main( void ){
    emsSeti( "T2", 2 );
    emsSetc( "T3", "4" );
    emsSetc( "T3", " (concat)");
-   emsRep( "ERR1", "Error message: ^T1 + ^T2 != ^T3", &status );
+   emsSet( "T4","(%s)","fmttest");
+   emsRep( "ERR1", "Error message: ^T1 + ^T2 != ^T3 ^T4", &status );
    emsRenew();
-   emsRep( "ERR1", "Error message: ^T1 + ^T2 != ^T3", &status );
+   emsRep( "ERR1", "Error message: ^T1 + ^T2 != ^T3 ^T4", &status );
 
 
    /* Set and get some tuning values. */
