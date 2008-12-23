@@ -16,7 +16,7 @@
 *     Any message tokens which have been annulled by a call to msgOut,
 *     msgOutif, msgLoad, errRep, errAnnul or errLoad are renewed.
 *     If any new token value has been defined (using the msgSetx and 
-*     msgFmtx routines) since the previous tokens were annulled, no 
+*     msgFmt routines) since the previous tokens were annulled, no 
 *     action is taken. The intended use of msgRenew is to renew all message
 *     tokens immediately after a call msgOut, msgOutif, msgLoad,
 *     errRep, errAnnul or errLoad for re-use in a subsequent message.

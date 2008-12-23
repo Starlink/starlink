@@ -63,6 +63,10 @@ int main ( void ) {
   
   msgOut(" ", "STATUS token check: ^STATUS", &status);
 
+  msgFmt( "D", "%g", 536.7 );
+  msgFmt( "C", "%s", "formatted" );
+  msgOut(" ", "msgFmt: '^C' and '^D'", &status );
+
   return exstat;
 }
 

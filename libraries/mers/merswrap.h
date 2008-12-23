@@ -98,25 +98,14 @@ void msgBell( int *status );
 
 void msgBlank( int *status );
 
-void msgFmtc( const char *token,
-              const char *format,
-              const char *cvalue );
-
-void msgFmtd( const char *token,
-              const char *format,
-              double dvalue );
-
-void msgFmti( const char *token,
-              const char *format,
-              int ivalue );
-
-void msgFmtl( const char *token,
-              const char *format,
-              int lvalue );
-
-void msgFmtr( const char *token,
-              const char *format,
-              float rvalue );
+void msgFmt( const char *token,
+             const char *format,
+             ...)
+#ifdef __GNUC__
+/* Gnu compiler can check for format consistency at compile time */
+  __attribute__((format (printf, 2, 3 )))
+#endif
+;
 
 void msgIfget( const char *pname,
                int *status );
