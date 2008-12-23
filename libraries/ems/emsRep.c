@@ -9,11 +9,20 @@
  *     Starlink ANSI C
 
  *  Invocation:
- *     emsRep( err, text, status, ... )
+ *     emsRep( err, text, status )
 
  *  Description:
- *     This function provides a C interface for the Error Message 
- *     Service routine EMS_REP (written in Fortran).
+ *     Report an error message. According to the error context, the
+ *     error message is either sent to the user or retained in the
+ *     error table. The latter case allows the application to take
+ *     further action before deciding if the user should receive the
+ *     message. The values associated with any existing message tokens
+ *     are left undefined. On successful completion, the global status
+ *     is returned unchanged; if the status argument is set to SAI__OK
+ *     on entry, an error report to this effect is made on behalf of
+ *     the application and the status argument is returned set to
+ *     EMS__BADOK; if an output error occurs, the status argument is
+ *     returned set to EMS__OPTER.
 
  *  Arguments:
  *     err = const char * (Given)
@@ -22,13 +31,6 @@
  *        The error message text.
  *     status = int * (Given and Returned)
  *        The global status value.
- *     ... = arguments to printf (Given)
- *        If the "text" in the error message contains "%" C-style
- *        format specifiers then an optional list of additional arguments
- *        may follow it in in order to supply values to be substituted
- *        for these specifiers. This can sometimes remove the need for explicit
- *        tokens to be set using emsSetx. The rules for supplying these are
- *        as for the sprintf() C function.
 
  *  Notes:
  *     Using printf formatting can be useful for cases where a variable
