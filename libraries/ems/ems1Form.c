@@ -85,6 +85,9 @@
  *        Use starMem
  *     15-MAY-2008 (PWD):
  *        Remove ems_msgtb.h include, not needed.
+ *     23-DEC-2008 (TIMJ):
+ *        use isgraph() to filter out non-printable characters. Rather
+ *        than checking for char < 32.
  *     {enter_further_changes_here}
  
  *  Bugs:
@@ -94,6 +97,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #include "sae_par.h"                 /* Standard SAE constants */
 #include "ems_par.h"                 /* EMS_ public constants */
@@ -246,7 +250,7 @@ void ems1Form( const char *text, const int maxlen,
     if ( clean ) {
         int i;
         for ( i = 0; i < *oplen; i++ ) {
-            if ( opstr[ i ] < ' ' ) opstr[ i ] = ' ';
+          if ( isgraph(opstr[ i ]) ) opstr[ i ] = ' ';
         }
     }
 
