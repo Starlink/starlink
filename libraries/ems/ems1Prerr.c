@@ -85,6 +85,7 @@
 #include "ems_sys.h"                 /* EMS_ private constants */
 #include "ems1.h"                    /* EMS_ private functions prototypes */
 #include "ems_defs.h"                /* EMS_ message table */
+#include "ems.h"
 
 #define MAXTAB 6
 #define CONTAB "!     "
