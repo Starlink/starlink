@@ -98,14 +98,11 @@ void
 msgFmt( const char * token, const char *format, ... ) {
 
   va_list args;            /* Variable argument list */
-  char str[EMS__SZTOK+1];  /* somewhere to store the expanded string */
 
   /* read the arguments into a va_list so that we can pass them to
      the formatting function - ignore truncation */
   va_start( args, format );
-  vsnprintf( str, sizeof(str), format, args );
+  emsSetv( token, format, args );
   va_end( args );
 
-  /* set the token */
-  emsSetc( token, str );
 }
