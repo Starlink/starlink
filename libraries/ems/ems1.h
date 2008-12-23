@@ -42,6 +42,7 @@
 #ifndef EMS1_DEFINED
 #define EMS1_DEFINED
 
+#include <stdarg.h>
 #include "ems_sys.h"
 #include "ems_defs.h"
 
@@ -59,7 +60,8 @@ void ems1Estor( const char *param, int plen, const char *msg, int mlen,int *stat
 void ems1Estor1( ems_msgtab_t *msgtab, const char *param, int plen, const char *msg, int mlen,int *status);
 void ems1Fcerr( char *errstr, int *errnum_p );
 void ems1Flush( int *status );
-void ems1Form( const char *text, const int, Logical clean, char *opstr, int *oplen, int *status );
+void ems1Form( const char *text, const int, Logical esctokval, Logical clean,
+               char *opstr, int *oplen, int *status );
 void ems1Fthreaddata( void *ptr );
 void ems1Gesc( const char *escchr, const char *string, int *iposn );
 void ems1Gnam( const char *string, int *iposn, char *name, int *namlen, int *status);
@@ -74,6 +76,8 @@ void ems1Mrerr( const char *text, int *status );
 void ems1Mutc( const char *cvalue, char *string, int iposn, int *status );
 void ems1Prerr( const char *text, int *status );
 void ems1Putc( const char *cvalue, const int maxlen, char *string, int *iposn, int *status );
+void ems1Rep( const char * err, const char * text, Logical useformat,
+               va_list args, int *status);
 void ems1Serr( char *errstr, int errlen, int *errnum_p );
 void ems1Stok( const char *token, const char *string );
 void ems1Tblk( void );

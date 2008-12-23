@@ -123,6 +123,14 @@ void emsRep( const char *err,
              const char *text,
              int *status );
 
+void emsRepf( const char *err,
+              const char *text,
+              int *status, ... ) __attribute__((format (printf, 2, 4 )));
+
+void emsRepv( const char *err,
+              const char *text, va_list args,
+              int *status );
+
 void emsRlse( void );             
 
 /* Gnu compiler can check for format consistency at compile time */

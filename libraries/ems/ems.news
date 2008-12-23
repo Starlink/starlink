@@ -1,3 +1,18 @@
+2.3-0
+
+   * Add emsRepf routine to allow sprintf format specifiers to be used for
+     error messages. This allows for flexibility when formatting non-standard
+     variable types or just to make the code simpler (fewer calls to emsSetx).
+     Formatting occurs after token replacement. "%" in tokens is handled
+     correctly. Also an emsRepv routine is available if a va_list is to hand.
+
+   * Add emsSet routine that can format tokens use printf-style format
+     specifiers. emsSetv is similar but takes a va_list.
+
+   * Internals: ems1Form modified to support sprintf formatting.
+
+   * Note that emsRep is unaffected by the addition of emsRepf.
+
 2.2-0
 
    * Support for using EMS together with POSIX threads has been added.
@@ -16,9 +31,6 @@
 
    * emsSetc now prints "<Null>" when given a NULL pointer. Previously it
      was converted to a single space but that was hard to see in printouts.
-
-   * Add emsSet routine that can format tokens use printf-style format
-     specifiers. emsSetv is similar but takes a va_list.
 
 2.1-2
 

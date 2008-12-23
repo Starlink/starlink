@@ -45,7 +45,7 @@ C_ROUTINES = emsAnnul.c emsBegin.c emsEload.c emsEnd.c emsErrno.c \
 	     ems1Gthreadbuf.c ems1Iepnd.c ems1Imsgtab.c ems1Ithreaddata.c \
              ems1Itoktab.c ems1Kerr.c ems1Ktok.c ems1Mpop.c ems1Mpush.c \
              ems1Prerr.c ems1Putc.c ems1Rform.c ems1Serr.c ems1Starf.c \
-             ems1Stok.c ems1Tblk.c 
+             ems1Stok.c ems1Tblk.c ems1Rep.c emsRepv.c emsRepf.c
 
 #  C routines for Fortran interface.
 CF_ROUTINES = ems_annul.c ems_begin.c ems_eload.c ems_end.c ems_expnd.c \

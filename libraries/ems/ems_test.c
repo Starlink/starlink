@@ -105,7 +105,18 @@ int main( void ){
    emsRep( "ERR2", "Error message 2", &status );
    printf( "This should appear between the two error messages\n" );
    emsSetc( "NULL", NULL );
-   emsRep( "ERR6", "emsRep classic with inline % symbol", &status );
+   emsSetc( "PC", "per cent x2 % % in token" );
+   emsRep( "ERR6", "emsRep classic with inline % symbol and null ^NULL"
+           " with ^PC",
+           &status );
+
+   /* format */
+   emsSetc( "C", "> %% <" );
+   emsSetc( "CC", "> %d <" );
+   emsRepf( "ERR7", "emsRep formatted %d and %f and ^C (should be double"
+            " percent) ^CC (format specifier in token)",
+            &status, 42, -1234.567);
+
 
    emsRlse();
 

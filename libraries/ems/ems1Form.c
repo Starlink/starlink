@@ -10,7 +10,7 @@
  *     Starlink ANSI
 
  *  Invocation:
- *     ems1Form( text, maxlen, clean, opstr, oplen, status )
+ *     ems1Form( text, maxlen, esctokval, clean, opstr, oplen, status )
 
  *  Description:
  *     Construct the final text, OPSTR( 1 : OPLEN ), of a message
@@ -21,6 +21,10 @@
  *        The input message text, with any tokens.
  *     maxlen = const int (Given)
  *        Maximum length of output string
+ *     esctokval = Logical (Given)
+ *        if true, token values containing % will be escaped into %%
+ *        to enable sprintf processing to be performed on the expanded
+ *        string subsequently.
  *     clean = logical (Given)
  *        if the string is to be 'cleaned'
  *     opstr = char* (Returned)
@@ -35,6 +39,11 @@
  *     translations for token escapes.
  *     -  The message length is returned in OPLEN.
  
+ *  Notes:
+ *     The code assumes "%" is the escape character to be doubled up in
+ *     token values. This is done for simplicity and can easily be made
+ *     generic by changing esctokval to be a const char *.
+
  *  Copyright:
  *     Copyright (C) 1982 Science & Engineering Research Council.
  *     Copyright (C) 2001 Central Laboratory of the Research Councils.
@@ -87,7 +96,8 @@
  *        Remove ems_msgtb.h include, not needed.
  *     23-DEC-2008 (TIMJ):
  *        use isgraph() to filter out non-printable characters. Rather
- *        than checking for char < 32.
+ *        than checking for char < 32. Add argument to enable escaping
+ *        of % characters in token values. Required for safe sprintf processing.
  *     {enter_further_changes_here}
  
  *  Bugs:
@@ -105,7 +115,7 @@
 #include "ems1.h"                    /* EMS1 function prototypes */
 #include "star/mem.h"
 
-void ems1Form( const char *text, const int maxlen,
+void ems1Form( const char *text, const int maxlen, Logical esctokval,
                Logical clean, char *opstr, int *oplen, int *status ) 
 {
     Logical literl;              /* Whether a literal token escape */
@@ -118,10 +128,13 @@ void ems1Form( const char *text, const int maxlen,
     int pstat;                   /* Local status */
     int texlen;                  /* TEXSTR length */
     int tkvlen;                  /* TOKVAL length */
+    int j;
+    int i;
     
-    char namstr[ EMS__SZMSG ] = ""; /* Token name string */
-    char tokval[ EMS__SZTOK ] = ""; /* Token value string */
-    
+    char namstr[ EMS__SZMSG + 1 ] = ""; /* Token name string */
+    char tokval[ EMS__SZTOK + 1 ] = ""; /* Token value string */
+    char tstr[EMS__SZTOK + 1 ];  /* Escaped token value temp string buffer */
+    const char tokescval = '%';  /* Escape value to look for in token values */
     char *texbuf;                /* Ptr to temporary text buffer */
     
     TRACE("ems1Form");
@@ -212,9 +225,33 @@ void ems1Form( const char *text, const int maxlen,
                         /*  There is a name, so get the token value. */
                         if ( ems1Gtok( namstr, tokval, &tkvlen ) ) {
 
+                          /* if there is an escape character in the token
+                             itself we need to double it up. This is used
+                             to enable a % in the token to be retained
+                             after sprintf processing */
+                          if ( esctokval ) {
+                            j=0;
+                            for ( i = 0; i < tkvlen; i++) {
+                              /* if we have found the escape char we 
+                                 insert an additional one */
+                              if (tokval[i] == tokescval) {
+                                tstr[j] = tokescval;
+                                j++;
+                              }
+                              /* copy the character that was tested */
+                              tstr[j] = tokval[i];
+                              j++;
+                            }
+                            tkvlen = j;
+                            tstr[j] = '\0';
+                          } else {
+                            strncpy( tstr, tokval, sizeof(tstr));
+                            tstr[tkvlen] = '\0';
+                          }
+
                             /*  Append the token value to the expanded message
                              *  text. */
-                            ems1Putc( tokval, maxlen, opstr, &oppos, &pstat );
+                            ems1Putc( tstr, maxlen, opstr, &oppos, &pstat );
 
                         } else {
                             /*  The message token is not defined, so indicate
