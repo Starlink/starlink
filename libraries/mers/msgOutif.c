@@ -23,7 +23,7 @@
 
 *  Arguments:
 *     prior = int (Given)
-*        Message output filter. This may be one of three values:
+*        Message output filter. This may be one of these values:
 *        
 *           -  MSG__QUIET = always output the message, regardless of the
 *           output filter setting;
