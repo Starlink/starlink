@@ -214,12 +214,12 @@
      :                   LBND, UBND, CMPLET, STATUS )
 
 *  Report the number of positions read and the file name.
-      CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
       CALL MSG_SETI( 'NXY', COUNT )
       CALL MSG_SETC( 'FN', PNAME )
       BUFFER = ' ^NXY pixel positions read in from $'//PNAME//'.'
       CALL MSG_OUTIF( MSG__NORM, 'NREAD', BUFFER, STATUS )
-      CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Close the file.
       CALL FIO_CLOSE( FD, STATUS )
