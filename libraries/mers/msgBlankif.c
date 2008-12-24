@@ -1,29 +1,35 @@
 /*
 *+
 *  Name:
-*     msgBlank
+*     msgBlankif
 
 *  Purpose:
-*     Output a blank line.
+*     Conditionally output a blank line.
 
 *  Language:
 *    Starlink ANSI C
 
 *  Invocation:
-*     msgBlank( int * status );
+*     msgBlankif( int prior, int * status );
 
 *  Description:
-*     A blank line is output to the user. If the status argument is not
+*     Depending upon the given value of the given message priority and
+*     the message filtering level set using msgIfset, a blank line is
+*     either output to the user or discarded. If the status argument is not
 *     set to SAI__OK on entry, no action is taken. If an output error
 *     occurs, an error report is made and the status argument returned
 *     set to MSG__OPTER.
 
 *  Arguments:
+*     prior = int (Given)
+*        Message output filter. See msgOutif documentation for details of
+*        the messaging levels.
 *     status = int * (Given and Returned)
 *        The global status.
 
 *  Algorithm:
-*     -  Call msgBlankif with normal priority.
+*     -  Use msgOut in private error context to prevent tokens from
+*        being cleared.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -62,7 +68,7 @@
 *     10-SEP-2008 (TIMJ):
 *        Rewrite in C. Use msgOut.
 *     23-DEC-2008 (TIMJ):
-*        Call msgBlankif with normal priority.
+*        Clone from msgBlank and now calls msgOutif
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -72,8 +78,21 @@
 */
 
 #include "merswrap.h"
-#include "msg_par.h"
+#include "sae_par.h"
+#include "ems.h"
 
-void msgBlank( int * status ) {
-  msgBlankif( MSG__NORM, status );
+void msgBlankif( int prior, int * status ) {
+
+  /*  Check the inherited global status. */
+  if (*status != SAI__OK) return;
+
+  /*  Mark a new error reporting context to ensure that no existing message 
+   *  tokens are annulled. */
+  emsMark();
+
+  /* Deliver the message with specified priority */
+  msgOutif( prior, "MSG_BLANK", " ", status );
+
+  /*  Release the current error reporting context. */
+  emsRlse();
 }

@@ -73,6 +73,8 @@ F77_SUBROUTINE(msg_bell)( INTEGER(status) );
 
 F77_SUBROUTINE(msg_blank)( INTEGER(status) );
 
+F77_SUBROUTINE(msg_blankif)( INTEGER(PRIOR), INTEGER(status) );
+
 F77_SUBROUTINE(msg_fmtc)( CHARACTER(token),
                           CHARACTER(format),
                           CHARACTER(cvalue)

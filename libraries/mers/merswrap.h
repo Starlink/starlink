@@ -103,6 +103,8 @@ void msgBell( int *status );
 
 void msgBlank( int *status );
 
+void msgBlankif( int prior, int *status );
+
 /* Gnu compiler can check for format consistency at compile time */
 void msgFmt( const char *token,
              const char *format,

@@ -1,29 +1,32 @@
 /*
 *+
 *  Name:
-*     msgBlank
+*     MSG_BLANKIF
 
 *  Purpose:
-*     Output a blank line.
+*     Conditionally output a blank line.
 
 *  Language:
-*    Starlink ANSI C
+*    Starlink ANSI C (Callable from Fortran)
 
 *  Invocation:
-*     msgBlank( int * status );
+*     CALL MSG_BLANK( PRIOR, STATUS )
 
 *  Description:
-*     A blank line is output to the user. If the status argument is not
+*     Depending upon the given value of the given message priority and
+*     the message filtering level set using msgIfset, a blank line is
+*     either output to the user or discarded. If the status argument is not
 *     set to SAI__OK on entry, no action is taken. If an output error
 *     occurs, an error report is made and the status argument returned
 *     set to MSG__OPTER.
 
 *  Arguments:
-*     status = int * (Given and Returned)
+*     PRIOR = INTEGER (Given)
+*     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Algorithm:
-*     -  Call msgBlankif with normal priority.
+*     -  Calls msgBlankif
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -60,9 +63,9 @@
 *        Output the blank line conditionally, assuming MSG__NORM to be
 *        the priority.
 *     10-SEP-2008 (TIMJ):
-*        Rewrite in C. Use msgOut.
+*        Call msgBlank. Now in C.
 *     23-DEC-2008 (TIMJ):
-*        Call msgBlankif with normal priority.
+*        Calls msgBlankif.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -71,9 +74,16 @@
 *-
 */
 
+#include "f77.h"
+#include "mers_f77.h"
 #include "merswrap.h"
-#include "msg_par.h"
 
-void msgBlank( int * status ) {
-  msgBlankif( MSG__NORM, status );
+
+F77_SUBROUTINE(msg_blankif)( INTEGER(PRIOR), INTEGER(STATUS) ) {
+  int status;
+  int prior;
+  F77_IMPORT_INTEGER( *STATUS, status );
+  F77_IMPORT_INTEGER( *PRIOR, prior );
+  msgBlankif( prior, &status );
+  F77_EXPORT_INTEGER( status, *STATUS );
 }

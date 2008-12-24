@@ -5,6 +5,8 @@ Version 2.0
  o errFioer removed from interface (there is no corresponding C interface in EMS)
  o C interface no longer includes the fortran msgFmt<x> routines. Instead a single
    C routine is provided for sprintf style formatting (msgFmt).
+ o New function msgBlankif. This is a version of msgBlank that can be output conditionally
+   similar to msgOut vs msgOutif.
 
 Version 1.8-2
 -------------
