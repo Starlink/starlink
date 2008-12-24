@@ -95,7 +95,7 @@
  *     15-MAY-2008 (PWD):
  *        Remove ems_msgtb.h include, not needed.
  *     23-DEC-2008 (TIMJ):
- *        use isgraph() to filter out non-printable characters. Rather
+ *        use isprint() to filter out non-printable characters. Rather
  *        than checking for char < 32. Add argument to enable escaping
  *        of % characters in token values. Required for safe sprintf processing.
  *     {enter_further_changes_here}
@@ -287,7 +287,7 @@ void ems1Form( const char *text, const int maxlen, Logical esctokval,
     if ( clean ) {
         int i;
         for ( i = 0; i < *oplen; i++ ) {
-          if ( !isgraph(opstr[ i ]) ) opstr[ i ] = ' ';
+          if ( !isprint(opstr[ i ]) ) opstr[ i ] = ' ';
         }
     }
 
