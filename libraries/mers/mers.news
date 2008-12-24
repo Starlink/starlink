@@ -8,6 +8,8 @@ Version 2.0
  o New function msgBlankif. This is a version of msgBlank that can be output conditionally
    similar to msgOut vs msgOutif.
  o C interface for messaging level now uses a special type (msglev_t) rather than simple int.
+ o errRepf, msgOutiff and msgOutf: new routines supporting sprintf-style formatting in addition
+   to token replacement. %KEYWORD expansion disabled. $PARAM expansion unaffected. (C interface only)
 
 Version 1.8-2
 -------------
