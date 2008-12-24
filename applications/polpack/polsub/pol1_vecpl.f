@@ -220,7 +220,7 @@
          CALL MSG_SETI( 'NP', NPLOT )
          CALL MSG_OUTIF( MSG__NORM, 'POL1_VECPL_NPLT',
      :                   '  ^NP vectors plotted.', STATUS )
-         CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
       END IF      
 
