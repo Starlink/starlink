@@ -129,10 +129,10 @@
       NP1H = ( N + 1 ) / 2
  
 *  Give an informational message.
-      CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
       CALL MSG_OUTIF( MSG__NORM, 'INFOREV1',
      :                'Doing inverse transformation', STATUS )
-      CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
  
 *  Swap the quadrants round so that zero frequencies are at the
 *  corners.

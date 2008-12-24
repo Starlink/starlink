@@ -468,7 +468,7 @@
       CALL MSG_SETI( 'YSIZE', NLIN )
       CALL MSG_OUTIF( MSG__NORM, 'WIENER_MSG3',
      :  '  Internal file size is ^XSIZE by ^YSIZE.', STATUS )
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Add margins to the input data array.
 *  ====================================

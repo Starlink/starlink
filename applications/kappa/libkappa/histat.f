@@ -544,7 +544,7 @@
 
 *  Display the NDF name, also sending it to the logfile if necessary.
 *  Cannot use MSG_BLANK because the message is optional.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
       IF ( LOGFIL ) CALL FIO_WRITE( IFIL, ' ', STATUS )
       CALL NDF_MSG( 'NDF', NDF )
       CALL MSG_LOAD( 'NDFNAME',
@@ -558,7 +558,7 @@
 
 *  Display (and log) the NDF's title.  Cannot use MSG_BLANK because
 *  the message is optional.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
       IF ( LOGFIL ) CALL FIO_WRITE( IFIL, ' ', STATUS )
       CALL NDF_CMSG( 'TITLE', NDF, 'Title', STATUS )
       CALL MSG_LOAD( 'NDFTITLE',

@@ -206,7 +206,7 @@
  
 *  If the progress of the iterations is to be printed (verbose message
 *  reporting), print some headings.
-      CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
       CALL MSG_OUTIF( MSG__NORM, 'HEADING', '      iteration    '/
      :  /'smoothing length    max. change    rms change', STATUS )
       CALL MSG_OUTIF( MSG__NORM, 'HEADING2', '      ---------    '/

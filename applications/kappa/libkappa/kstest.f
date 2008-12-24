@@ -520,7 +520,7 @@
 *  Display the result of the test unless the MSG level is set
 *  MSG__QUIET.
          IF ( I .EQ. 2 ) THEN
-            CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
+            CALL MSG_BLANKIF( MSG__NORM, STATUS )
             CALL MSG_OUTIF( MSG__NORM, 'HEADING', 
      :        '                  Probability        Max. Sep.', STATUS )
             CALL MSG_OUTIF( MSG__NORM, 'LINE',
@@ -562,7 +562,7 @@
       CALL PAR_PUT1R( 'DIST', NFILES - 1, D, STATUS )
 
 * Let's be friendly and tell the user something.
-      CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
       IF ( NFAIL .EQ. NFILES - 1 ) THEN
          CALL MSG_OUTIF( MSG__NORM, 'FINAL',
      :     'All subsamples were rejected', STATUS )
@@ -597,7 +597,7 @@
 
          CALL MSG_OUTIF( MSG__NORM, 'COADD',
      :     'Coadded result is ^MEAN +/- ^VAR', STATUS )
-         CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Write to the results parameters.
          CALL PAR_PUT0I( 'NKEPT', NKEPT, STATUS )

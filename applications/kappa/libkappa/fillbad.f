@@ -477,7 +477,7 @@
 
 *  If blocking, tell the user which block is being done.
          IF( BLOCK ) THEN
-            CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+            CALL MSG_BLANKIF( MSG__NORM, STATUS )
  
             DO II = 1, IDIM
                CALL MSG_SETI( 'SEC', LBND( II ) )

@@ -185,7 +185,7 @@
      :                MODE, STATUS )
 
 *  Report it unless silent reporting is requested.
-      CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
       IF ( MODE .EQ. 'SIGMA' ) THEN
          CALL MSG_OUTIF( MSG__NORM, 'ERRCLIP_MSG1', '  Applying an '/
      :     /'upper limit on standard deviation.', STATUS )

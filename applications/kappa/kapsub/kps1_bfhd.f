@@ -105,7 +105,7 @@
          CALL CHR_APPND( TITLE, LINE, IAT )
 
          CALL MSG_OUTIF( MSG__NORM, ' ', LINE( : IAT ), STATUS )
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
          IF ( LOGF ) THEN
             CALL FIO_WRITE( FDL, LINE( : IAT ), STATUS )
@@ -172,7 +172,7 @@
 
 *  Display the header.
       CALL MSG_OUTIF( MSG__NORM, ' ', LINE( : IAT ), STATUS )
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
       IF ( LOGF ) THEN
          CALL FIO_WRITE( FDL, LINE( : IAT ), STATUS )

@@ -203,7 +203,7 @@
      :           STATUS .EQ. SAI__OK )
 
 *  Tell the user which iteration we are starting.
-         CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
          CALL MSG_SETI( 'I', ITER )
          CALL MSG_OUTIF( MSG__NORM, 'KPS1_LUCY_MSG2',
      :                   '  Iteration ^I', STATUS )
@@ -232,7 +232,7 @@
 
 *  Warn the user if the required normalised chi-squared has not been
 *  reached.
-      CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
       IF ( XSQ .GT. AIM ) THEN
          CALL MSG_SETR( 'X', AIM )      

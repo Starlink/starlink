@@ -511,7 +511,7 @@
       CALL MSG_SETI( 'YSIZE', NLIN )
       CALL MSG_OUTIF( MSG__NORM, 'LUCY_MSG3', '  Internal file size '/
      :                /'is ^XSIZE by ^YSIZE.', STATUS )
-      CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Map the DATA array of the input NDF.
       CALL KPG1_MAP( INDF1, 'DATA', '_REAL', 'READ', IPN1, NEL1,

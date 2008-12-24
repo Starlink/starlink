@@ -547,7 +547,7 @@
       END IF
 
 *  A final blank line.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
       IF ( LOGF ) CALL FIO_WRITE( FDL, ' ', STATUS )
 
 *  Tidy up.

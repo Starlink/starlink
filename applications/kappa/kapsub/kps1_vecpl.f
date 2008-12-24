@@ -251,7 +251,7 @@
          CALL MSG_SETI( 'NP', NPLOT )
          CALL MSG_OUTIF( MSG__NORM, 'KPS1_VECPL_MSG2', '  ^NP vectors'//
      :                   ' plotted.', STATUS )
-         CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
       END IF      
 

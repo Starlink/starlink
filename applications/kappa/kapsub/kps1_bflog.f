@@ -727,7 +727,7 @@
          END IF
 
          IF ( LOGF ) CALL FIO_WRITE( FD, ' ', STATUS )
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
       END DO
 
 *  Give a title for the parameter values which are to be displayed.
@@ -738,7 +738,7 @@
       CALL MSG_OUTIF( MSG__NORM, ' ', BUF( : LBUF ), STATUS )
 
       IF ( LOGF ) CALL FIO_WRITE( FD, ' ', STATUS )
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
       CALL AST_ANNUL( FRM2, STATUS )
 
