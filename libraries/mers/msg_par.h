@@ -48,6 +48,8 @@
 *        Original version
 *     02-May-2008 (TIMJ):
 *        Add MSG__DEBUG
+*     23-DEC-2008 (TIMJ):
+*        msglev_t is an enum rather than #define
 *     {enter_changes_here}
 
 *-
