@@ -42,6 +42,7 @@
 */
 
 #include <stdlib.h>
+#include <stdarg.h>
 #include "msg_par.h"
 
 /* This is the type of struct used for ERR globals */
@@ -71,17 +72,21 @@ void err1Ptwsz( int errwsz );
 void err1Ptstm( int errstm );
 void err1Ptrvl( int errrvl );
 
+void err1Rep( const char * param, const char * text, int useformat,
+              va_list args, int * status );
 void err1RestoreEms( MersTune * ems, int * status );
 void err1TuneEms( MersTune * ems, int * status );
 
 
 void msg1Form ( const char * param, const char * text, int clean,
-                size_t msglen, char * msgstr, int * status );
+                int useformat, size_t msglen, char * msgstr, int * status );
 int msg1Genv( const char * param, char *msgstr, size_t msglen );
 int msg1Gref( const char * param, char *refstr, size_t reflen );
 int msg1Gkey( const char * param, char *keystr, size_t keylen );
 
 void msg1Ktok ( void );
+void msg1Outif( msglev_t prior, const char * param, const char * text,
+                int useformat, va_list args, int *status );
 void msg1Prtln( const char * text, int * status );
 void msg1Print( const char * text, int * status );
 

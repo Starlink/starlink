@@ -1,9 +1,9 @@
 /*+
  *  Name:
- *     emsExpnd
+ *     ems_expnd
  *
  *  Purpose:
-*  Fortran callable routine
+ *     Fortran callable routine
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -50,7 +50,9 @@ F77_SUBROUTINE(ems_expnd) ( CHARACTER(text), CHARACTER(opstr),
    ctext = cnfCreim( text, text_length );
    str = cnfCreat( opstr_length );
 
-   emsExpnd( ctext, str, opstr_length, oplen, status );
+   /* Note that escaping of % in token values is disabled for fortran
+      interface */
+   emsExpnd( ctext, str, opstr_length, 0, oplen, status );
 
    cnfExprt( str, opstr, opstr_length );
    cnfFree( ctext );

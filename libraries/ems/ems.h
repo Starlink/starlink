@@ -98,6 +98,7 @@ void emsErrno( const char *token,
 void emsExpnd( const char *text,
                char *opstr,
                const int maxlen,
+               int esctokval,
                int *oplen,
                int *status );
 

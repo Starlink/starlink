@@ -1,17 +1,17 @@
 /*
 *+
 *  Name:
-*     msgOutif
+*     msgOutiff
 
 *  Purpose:
-*     Conditionally deliver the text of a message to the user.
+*     Conditionally deliver the formatted text of a message to the user.
 
 *  Language:
 *     Starlink ANSI C
 
 *  Invocation:
-*     msgOutif( msglev_t prior, const char * param, const char * text,
-*               int * status );
+*     msgOutiff( msglev_t prior, const char * param, const char * text,
+*               int * status, ... );
 
 *  Description:
 *     Depending upon the given value of the given message priority and 
@@ -20,6 +20,8 @@
 *     The values of any existing message tokens are always annulled by 
 *     a call to msgOutif. If an output error occurs, an error is 
 *     reported and the status argument returned set to MSG__OPTER.
+*
+*     sprintf-style formatting is applied.
 
 *  Arguments:
 *     prior = msglev_t (Given)
@@ -47,11 +49,20 @@
 *        The message text.
 *     status = int * (Given and Returned)
 *        The global status.
+*     ... = variadic arguments required by sprintf (Given)
+
+*  Notes:
+*     Formatting is applied after token replacement. Tokens containing
+*     "%" will not be treated as format specifiers. Keyword
+*     associations will be disabled since they also use "%".
+*
+*     Using printf formatting can be useful for simplifying code that
+*     does not require deferred token handling. See also msgFmt() for
+*     formatting tokens.
+
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 1991, 1992 Science & Engineering Research Council.
-*     Copyright (C) 1996, 1999, 2001 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
 *  Licence:
@@ -71,34 +82,12 @@
 *     02111-1307, USA
 
 *  Authors:
-*     PCTR: P.C.T. Rees (STARLINK)
-*     AJC: A. J. Chipperfield (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
-*     EC: Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
-*     10-JUN-1991 (PCTR):
-*        Original version.
-*     26-AUG-1992 (PCTR):
-*        Call MSG1_FORM and MSG1_PRINT directly, instead of MSG_OUT
-*        (MSG_OUT no calls MSG_OUTIF with PRIOR set to MSG__NORM).
-*     25-JAN-1996 (AJC):
-*        re-format CHARACTER declarations
-*     15-SEP-1999 (AJC):
-*        Add CLEAN argument to call MSG1_FORM
-*     22-FEB-2001 (AJC):
-*        Use MSG1_KTOK not EMS1_KTOK
-*     02-MAY-2008 (EC):
-*        Fixed logic for MSG__DEBUG
-*     24-JUL-2008 (TIMJ):
-*        Use common block accessor
-*     10-SEP-2008 (TIMJ):
-*        Rewrite in C
-*     23-DEC-2008 (TIMJ):
-*        Use msglev_t rather than simple integer.
 *     24-DEC-2008 (TIMJ):
-*        Now calls msg1Outif.
+*        Original version
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -113,8 +102,10 @@
 
 #include <stdarg.h>
 
-void msgOutif( msglev_t prior, const char * param, const char * text,
-               int * status) {
+void msgOutiff( msglev_t prior, const char * param, const char * text,
+               int * status, ...) {
   va_list args;
-  msg1Outif( prior, param, text, 0, args, status );
+  va_start( args, status );
+  msg1Outif( prior, param, text, 1, args, status );
+  va_end( args );
 }

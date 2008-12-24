@@ -11,7 +11,7 @@
 
 *  Invocation:
 *     msg1Form( const char *param, const char *text, int clean,
-*               size_t msglen, char *msgstr, int * status );
+*               int useformat, size_t msglen, char *msgstr, int * status );
 
 *  Description:
 *     Construct the final text, "msgstr", of a message
@@ -24,6 +24,9 @@
 *        The input message text, with any tokens.
 *     clean = int (Given)
 *        If the string is to be 'cleaned'
+*     useformat = int (Given)
+*        Boolean indicating whether the supplied text needs to take account
+*        of sprintf formatting.
 *     msglen = size_t (Given)
 *        Allocated size of buffer "msgstr".
 *     msgstr = char * (Returned)
@@ -33,6 +36,11 @@
 
 *  Implementation Notes:
 *     -  This subroutine is the STANDALONE version of msg1Form.
+
+*  Notes:
+*     The standalone version does not treat "%" as a special escape
+*     code but still respects the "format" argument to decide whether
+*     sprintf processing is to be performed.
 
 *  Algorithm:
 *     -  Call emsExpnd.
@@ -84,6 +92,8 @@
 *        Use EMS_EXPND not EMS1_FORM
 *     09-SEP-2008 (TIMJ):
 *        Rewrite in C
+*     23-DEC-2008 (TIMJ):
+*        Add useformat argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -98,11 +108,11 @@
 #include "mers1.h"
 
 void msg1Form ( const char * param, const char * text, int clean,
-                size_t msglen, char * msgstr, int * status ) {
+                int useformat, size_t msglen, char * msgstr, int * status ) {
 
   int lstat = SAI__OK;   /* Local status */
   int retlen = 0;
 
   /*  Call emsExpnd. */
-  emsExpnd( text, msgstr, msglen, &retlen, &lstat );
+  emsExpnd( text, msgstr, msglen, useformat, &retlen, &lstat );
 }

@@ -1,17 +1,17 @@
 /*
 *+
 *  Name:
-*     msgOutif
+*     msg1Outif
 
 *  Purpose:
-*     Conditionally deliver the text of a message to the user.
+*     Conditionally deliver the text of a message to the user (internal).
 
 *  Language:
 *     Starlink ANSI C
 
 *  Invocation:
-*     msgOutif( msglev_t prior, const char * param, const char * text,
-*               int * status );
+*     msg1Outif( msglev_t prior, const char * param, const char * text,
+*                int useformat, va_list args, int * status );
 
 *  Description:
 *     Depending upon the given value of the given message priority and 
@@ -45,8 +45,24 @@
 *        The message name.
 *     text = const char * (Given)
 *        The message text.
+*     useformat = Logical (Given)
+*        If true, "text" is processed using sprintf to expand format
+*        specifiers using the supplied "args".
+*     args = va_list (Given)
+*        Variadic arguments for sprintf processing.
 *     status = int * (Given and Returned)
 *        The global status.
+
+*  Notes:
+*     If "format" is true, printf-style formatting will be applied using
+*     the supplied va_list argument. Formatting is applied after token
+*     replacement. Tokens containing "%" will not be treated as format
+*     specifiers. Keyword associations will be disabled since they also
+*     use "%".
+*
+*     Using printf formatting can be useful for simplifying code that
+*     does not require deferred token handling. See also msgFmt() for
+*     formatting tokens.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -98,7 +114,7 @@
 *     23-DEC-2008 (TIMJ):
 *        Use msglev_t rather than simple integer.
 *     24-DEC-2008 (TIMJ):
-*        Now calls msg1Outif.
+*        Internal copy of msgOutif. Supports sprintf processing.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -107,14 +123,74 @@
 *-
 */
 
+#include "star/util.h"
+#include "sae_par.h"
 #include "msg_par.h"
+#include "msg_err.h"
 #include "mers1.h"
+#include "ems.h"
 #include "merswrap.h"
 
+#include <stdio.h>
 #include <stdarg.h>
 
-void msgOutif( msglev_t prior, const char * param, const char * text,
-               int * status) {
-  va_list args;
-  msg1Outif( prior, param, text, 0, args, status );
+void msg1Outif( msglev_t prior, const char * param, const char * text,
+               int useformat, va_list args, int * status) {
+
+  char msgstr[MSG__SZMSG+1];    /* Message string */
+  char fstr[MSG__SZMSG+2];      /* temp string for sprintf - bigger than
+                                   msgstr to allow us to trap truncation 
+                                   after formatting. */
+
+  /*  Check inherited global status. */
+  if (*status != SAI__OK) {
+
+    /*     Call MSG1_KTOK to annul any defined message tokens.*/
+    msg1Ktok();
+  } else {
+
+    /*     The given status is OK, so check that the given value of the
+     *     output filter is allowed. */
+    if (prior < MSG__QUIET || prior > MSG__DEBUG) {
+
+      /*        The given message filtering level is out of range: set the
+       *        returned status and report an error. (Mark and subsequently 
+       *        release an error context to prevent token name clashes.) */
+      emsMark();
+      *status = MSG__INVIF;
+      emsSeti( "PRIOR", prior );
+      emsRep( "MSG_OUTIF_INVIF",
+              "MSG_OUTIF: Invalid message filtering value:  ^PRIOR",
+              status );
+      emsRlse();
+
+      /*        Annul the message token table. */
+      msg1Ktok();
+
+    } else {
+
+      /*        Conditionally output the given message.*/
+      if (prior <= msg1Gtinf() ) {
+
+        /*           Form the output message string. */
+        msg1Form( param, text, !msg1Gtstm(), useformat, sizeof(msgstr), msgstr,
+                  status );
+
+        /*           Handle sprintf processing. */
+        if (useformat) {
+          /* format, and then copy back */
+          vsnprintf(fstr, sizeof(fstr), msgstr, args );
+          star_strellcpy( msgstr, fstr, sizeof(msgstr) );
+        }
+
+        /*           Deliver the message string. */
+        msg1Print( msgstr, status );
+      } else {
+
+        /*           Call MSG1_KTOK to annul any defined message tokens, even
+         *           though the message was not output. */
+        msg1Ktok();
+      }
+    }
+  }
 }

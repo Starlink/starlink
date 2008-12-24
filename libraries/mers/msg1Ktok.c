@@ -52,6 +52,8 @@
 *        Original version - to avoid use of EMS internal EMS1_KTOK
 *     24-JUL-2008 (TIMJ):
 *        Rewrite in C.
+*     23-DEC-2008 (TIMJ):
+*        New emsExpnd API.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -71,6 +73,6 @@ void msg1Ktok ( void ) {
 
   /* Set status to bad and call emsExpnd */
   istat = SAI__ERROR;
-  emsExpnd( " ", string, sizeof(string), &lenstr, &istat );
+  emsExpnd( " ", string, sizeof(string), 0, &lenstr, &istat );
 }
 

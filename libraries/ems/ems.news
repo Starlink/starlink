@@ -13,6 +13,9 @@
 
    * Note that emsRep is unaffected by the addition of emsRepf.
 
+   * emsExpnd has an additional argument to support sprintf processing in MERS.
+     This argument is not present in the EMS_EXPND fortran interface.
+
 2.2-0
 
    * Support for using EMS together with POSIX threads has been added.

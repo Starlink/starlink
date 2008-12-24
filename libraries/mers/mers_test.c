@@ -59,7 +59,8 @@ int main ( void ) {
   msgBell( &status );
   msgBlank( &status );
   msgSetc( "TOK", "(SETC)" );
-  msgOut( " ", "MSG is installed and %%working - ^TOK - ^PF", &status );
+  msgOut( " ", "MSG is installed and %%working - ^TOK - ^PF "
+          "< missing token", &status );
   
   msgOut(" ", "STATUS token check: ^STATUS", &status);
 
@@ -67,9 +68,24 @@ int main ( void ) {
   msgFmt( "C", "%s", "formatted" );
   msgOut(" ", "msgFmt: '^C' and '^D'", &status );
 
+  msgSetc( "PC", "(token with % per cent)");
+  msgOutf(" ", "Formatted int with leading zeroes: %05d ^PC", &status, 52);
+
   msgOutif( MSG__VERB, " ", "Should not see this message", &status );
   msgIfset( MSG__VERB, &status );
+  msgOutif( MSG__VERB, " ", "Should be blank line after this", &status );
+  msgBlankif( MSG__VERB, &status );
   msgOutif( MSG__VERB, " ", "Should see this verbose message", &status );
+  msgOutiff( MSG__VERB, " ", "Formatted %05d conditional message", &status,
+             42);
+
+  /* ERR */
+  errMark();
+  msgSetc("PC", "Single % token");
+  status = SAI__ERROR;
+  errRepf( " ", "Formatted error message %s - ^PC", &status,
+           "text via sprintf");
+  errRlse();
 
   return exstat;
 }

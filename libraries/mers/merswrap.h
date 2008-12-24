@@ -86,6 +86,11 @@ void errRep( const char *param,
              const char *text,
              int *status );
 
+void errRepf( const char *param,
+              const char *text,
+              int *status,
+              ... ) __attribute__((format (printf, 2, 4 )));
+
 void errRlse( void );
 
 void errStart( void );
@@ -131,10 +136,21 @@ void msgOut( const char *param,
              const char *text,
              int *status );
 
+void msgOutf( const char *param,
+              const char *text,
+              int *status,
+              ... ) __attribute__((format (printf, 2, 4 )));
+
 void msgOutif( msglev_t prior,
                const char *param,
                const char *text,
                int *status );
+
+void msgOutiff( msglev_t prior,
+                const char *param,
+                const char *text,
+                int *status,
+                ... ) __attribute__((format (printf, 3, 5 )));
 
 void msgRenew( void );
 

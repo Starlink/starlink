@@ -67,7 +67,7 @@ int main( void ){
    emsSetc("D", "C");
    emsSetc("D", "D");
    emsSetc("D", "E");
-   emsExpnd( "^D", buffer, sizeof(buffer), &oplen, &status );
+   emsExpnd( "^D", buffer, sizeof(buffer), 0, &oplen, &status );
    printf("Before emsBegin    - Should be ABCDE: %s\n",buffer);
    emsRenew();
    emsBegin( &status );
@@ -76,14 +76,14 @@ int main( void ){
    emsSetc("D", "C");
    emsSetc("D", "D");
    emsSetc("D", "E");
-   emsExpnd( "^D", buffer, sizeof(buffer), &oplen, &status );
+   emsExpnd( "^D", buffer, sizeof(buffer), 0, &oplen, &status );
    printf("After emsBegin     - Should be ABCDE: %s\n",buffer);
    emsSetc("D", "A");
    emsSetc("D", "B");
    emsSetc("D", "C");
    emsSetc("D", "D");
    emsSetc("D", "E");
-   emsExpnd( "^D", buffer, sizeof(buffer), &oplen, &status );
+   emsExpnd( "^D", buffer, sizeof(buffer), 0, &oplen, &status );
    printf("2nd after emsBegin - Should be ABCDE: %s\n",buffer);
    emsEnd( &status );
    emsSetc("D", "A");
@@ -91,7 +91,7 @@ int main( void ){
    emsSetc("D", "C");
    emsSetc("D", "D");
    emsSetc("D", "E");
-   emsExpnd( "^D", buffer, sizeof(buffer), &oplen, &status );
+   emsExpnd( "^D", buffer, sizeof(buffer), 0, &oplen, &status );
    printf("After emsEnd       - Should be ABCDEABCDE: %s\n",buffer);
 
 /* The basic C interface */

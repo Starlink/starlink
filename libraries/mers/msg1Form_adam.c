@@ -11,13 +11,15 @@
 
 *  Invocation:
 *     msg1Form( const char *param, const char *text, int clean,
-*               size_t msglen, char *msgstr, int * status );
+*               int useformat, size_t msglen, char *msgstr, int * status );
 
 *  Description:
 *     Construct the final text of a message using the text in "text",
 *     and available message tokens, keywords and parameter-object associations. 
 *     Clean any non-printing characters from the final string if "clean"
 *     is true.
+*
+*     Keyword associations are disabled if "useformat" is true.
 
 *  Arguments:
 *     param = const char * (Given)
@@ -26,6 +28,9 @@
 *        The input message text, with any tokens.
 *     clean = int (Given)
 *        If the string is to be 'cleaned'
+*     useformat = int (Given)
+*        Boolean indicating whether the supplied text needs to take account
+*        of sprintf formatting. See notes for additional information.
 *     msglen = size_t (Given)
 *        Allocated size of buffer "msgstr".
 *     msgstr = char * (Returned)
@@ -35,6 +40,12 @@
 
 *  Implementation Notes:
 *     -  This subroutine is the ADAM version of msg1Form
+
+*  Notes:
+*     If "useformat" is true Keyword association is disabled because the
+*     "%KEYWORD" syntax is hard to disambiguate from a sprintf %x specifier.
+*     Additionally, token replacement will be modified to replace any %
+*     in tokens with %% in preparation for a sprintf call.
 
 *  Algorithm:
 *     -  Attempt to get a message text from the parameter system,
@@ -109,6 +120,8 @@
 *        Rewrite in C.
 *     26-NOV-2008 (TIMJ):
 *        Fix ^STATUS expansion.
+*     23-DEC-2008 (TIMJ):
+*        Disable keyword associations if sprintf formats are required.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -140,7 +153,7 @@
 #define STATSTR "STATUS"
 
 void msg1Form ( const char * param, const char * text, int clean,
-                size_t msglen, char * msgstr, int * status ) {
+                int useformat, size_t msglen, char * msgstr, int * status ) {
 
   /*  Local Variables: */
   int define;          /* Whether a token is defined */
@@ -219,7 +232,8 @@ void msg1Form ( const char * param, const char * text, int clean,
          *       Find the associated message */
         emsMark();
         emsFacer( STATSTR, *status );
-        emsExpnd( "^" STATSTR, stmsg, sizeof(stmsg), &tkvlen, &lstat );
+        emsExpnd( "^" STATSTR, stmsg, sizeof(stmsg), useformat, &tkvlen,
+                  &lstat );
         emsRlse();
 
         /* Need to put this text back into original */
@@ -254,7 +268,7 @@ void msg1Form ( const char * param, const char * text, int clean,
 
     /*     Make a first pass to expand plain ^ tokens
      *     This will also kill tokens */
-    emsExpnd( texst0, texst2, sizeof(texst2), &texlen, &lstat);
+    emsExpnd( texst0, texst2, sizeof(texst2), useformat, &texlen, &lstat);
 
     /*     Initialise token escape state flag. */
     literl = 0;
@@ -266,8 +280,14 @@ void msg1Form ( const char * param, const char * text, int clean,
     lstat = SAI__OK;
     pstat = SAI__OK;
 
-    /*     Initialise the escape string and previous escape character. */
-    star_strlcpy( escstr, MSG__KEYEC MSG__REFEC, sizeof(escstr) );
+    /*     Initialise the escape string and previous escape character.
+           Note that KEY escapes are not included if useformat is true and
+           if it happens to be a "%".
+     */
+    star_strlcpy( escstr, MSG__REFEC, sizeof(escstr) );
+    if (useformat && strcmp(MSG__KEYEC, "%") == 0) {
+      star_strlcat( escstr, MSG__KEYEC, sizeof(escstr) );
+    }
     prevec[0] = '\0';
     escape[0] = '\0';
     prevec[1] = '\0';

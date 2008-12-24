@@ -9,7 +9,7 @@
  *     Starlink ANSI C
 
  *  Invocation:
- *     emsExpnd( text, opstr, maxlen, oplen, status )
+ *     emsExpnd( text, opstr, maxlen, esctokval, oplen, status )
 
  *  Description:
  *     Expands any tokens of the form ^NAME within the string 'text' and
@@ -27,10 +27,18 @@
  *        The expanded message text.
  *     maxlen = const int (Given)
  *        The maximum length for the expanded string
+ *     esctokval = Logical (Given)
+ *        if true, token values containing % will be escaped into %%
+ *        to enable sprintf processing to be performed on the expanded
+ *        string subsequently.
  *     oplen = int * (Returned)
  *        The length of the expanded message.
  *     status = int * (Given and Returned)
  *        The global status.
+
+ *  Notes:
+ *     The Fortran interface does not have esctokval since the Fortran
+ *     API does not include sprintf-style processing.
 
  *  Copyright:
  *     Copyright (C) 2001 Central Laboratory of the Research Councils.
@@ -70,6 +78,10 @@
  *        Use struct to access message table.
  *     28-JUL-2008 (TIMJ):
  *        Initialise return buffer on error.
+ *     23-DEC-2008 (TIMJ):
+ *        Modify interface to allow the tokens with values containing a "%"
+ *        to be escaped when they are returned. This allows for subsequent
+ *        sprintf-style processing to revert them to a single "%".
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -87,8 +99,8 @@
 #include "ems_defs.h"                  /* EMS_ message table */
 
 /* Function Definitons: */
-void emsExpnd( const char *text, char *opstr, const int maxlen, int *oplen,
-               int *status )
+void emsExpnd( const char *text, char *opstr, const int maxlen,
+               int esctokval, int *oplen, int *status )
 {
     ems_msgtab_t *msgtab = ems1Gmsgtab();  /* Current message table */
 
@@ -107,7 +119,8 @@ void emsExpnd( const char *text, char *opstr, const int maxlen, int *oplen,
     } else {
 
         /*  Form output message string. */
-        ems1Form( text, maxlen, 0, !msgtab->msgstm, opstr, oplen, status );
+        ems1Form( text, maxlen, esctokval, !msgtab->msgstm, opstr, oplen,
+                  status );
     }
 
     return;

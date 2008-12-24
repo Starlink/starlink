@@ -132,7 +132,7 @@ void msgLoad( const char *param,
 
     /*     Status is SAI__OK, so form the returned message string.
      *     This will also annul the token table. */
-    msg1Form( param, text, !msg1Gtstm(), opstr_length, opstr, status );
+    msg1Form( param, text, !msg1Gtstm(), 0, opstr_length, opstr, status );
     *oplen = strlen( opstr );
   }
 
