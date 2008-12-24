@@ -10,7 +10,7 @@
 *     Starlink ANSI C
 
 *  Invocation:
-*     msgOutif( int prior, const char * param, const char * text,
+*     msgOutif( msglev_t prior, const char * param, const char * text,
 *               int * status );
 
 *  Description:
@@ -22,7 +22,7 @@
 *     reported and the status argument returned set to MSG__OPTER.
 
 *  Arguments:
-*     prior = int (Given)
+*     prior = msglev_t (Given)
 *        Message output filter. This may be one of these values:
 *        
 *           -  MSG__QUIET = always output the message, regardless of the
@@ -148,7 +148,7 @@ void msgOutif( msglev_t prior, const char * param, const char * text,
       if (prior <= msg1Gtinf() ) {
 
         /*           Form the output message string. */
-        msg1Form( param, text, !msg1Gtstm(), sizeof(msgstr), msgstr,
+        msg1Form( param, text, !msg1Gtstm(), 0, sizeof(msgstr), msgstr,
                   status );
 
         /*           Deliver the message string. */
