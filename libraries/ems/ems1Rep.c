@@ -136,7 +136,6 @@ void ems1Rep( const char *err, const char *text, Logical useformat,
     char fstr[EMS__SZMSG+1];           /* formatted error message text */
     char mstr[EMS__SZMSG+1];           /* Final error message text */
     char pstr[EMS__SZPAR+1];           /* Local error name text */
-    const char *esc = NULL;            /* Should we be escaping tokens */
 
     ems_msgtab_t *msgtab = ems1Gmsgtab();  /* Current message table */
     
@@ -178,11 +177,6 @@ void ems1Rep( const char *err, const char *text, Logical useformat,
     } else {
         istat = *status;
     }
-
-    /* if we are using sprintf after token replacement we have to make sure
-       that any tokens with % in are replaced with %% so that sprintf will
-       convert them back to % */
-    if (useformat) esc = "%";
 
     /*  Now form the given error message.  Status is not altered by this
      *  routine. */
