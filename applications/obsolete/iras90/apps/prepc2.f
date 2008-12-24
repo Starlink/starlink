@@ -189,7 +189,7 @@
          CALL GRP_NEW( 'Noise maps', JGRP( 7 ), STATUS )
 
 *  Give an introductory message for the displayed file name pairs.
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
          CALL MSG_OUTIF( MSG__NORM, 'PREPC2_MSG1', 
      : '  The following pairs of data and noise maps will be stored '//
      : 'together:', STATUS )
@@ -243,7 +243,7 @@
                   CALL MSG_SETC( 'N', NAME2 )
                   CALL MSG_OUTIF( MSG__NORM, 'PREPC2_MSG3', 
      :                            '    ^N (noise map)', STATUS )
-                  CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+                  CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  If this NDF was not part of a pair, store a blank name for the noise
 *  map.
@@ -261,7 +261,7 @@
          IF( NAME2 .EQ. ' ' ) THEN
             CALL MSG_OUTIF( MSG__NORM, 'PREPC2_MSG4',
      :                      '    (no pairs found)', STATUS )
-            CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+            CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
             DO I = 1, 7
                CALL GRP_DELET( JGRP( I ), STATUS )

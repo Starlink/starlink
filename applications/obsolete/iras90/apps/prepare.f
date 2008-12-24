@@ -498,7 +498,7 @@
 
 *  Loop round each NDF to be prepared.
       DO I = 1, SIZE
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Get an NDF identifier for the input NDF.
          CALL NDG_NDFAS( IGRP(1), I, 'READ', INDF1, STATUS )
@@ -548,12 +548,12 @@
 *  Warn the user that no output NDFs can be created for this input NDF.
             CALL GRP_GET( IGRP(1), I, 1, NDFIN, STATUS )
 
-            CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+            CALL MSG_BLANKIF( MSG__QUIET, STATUS )
             CALL MSG_SETC( 'IN', NDFIN )
             CALL MSG_OUTIF( MSG__QUIET, 'PREPARE_MSG2',
      :                 'WARNING: No output NDFs can be created for ^IN',
      :                      STATUS )
-            CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+            CALL MSG_BLANKIF( MSG__QUIET, STATUS )
 
          END IF
 
@@ -561,7 +561,7 @@
       END DO
 
 *  Display a blank line.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Get the number of good output NDFs created.
       CALL GRP_GRPSZ( IGRP(8), NOUT, STATUS )

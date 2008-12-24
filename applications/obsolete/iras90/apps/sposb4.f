@@ -202,6 +202,6 @@
      :                   'dimensions cannot be calculated.', STATUS )
       END IF
 
-      CALL MSG_OUTIF( MSG__VERB, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__VERB, STATUS )
 
       END

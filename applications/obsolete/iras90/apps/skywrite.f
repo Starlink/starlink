@@ -405,7 +405,7 @@
       CALL AGS_NZONE( ZONE2, STATUS )
 
 *  Describe the picture to the user.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
       CALL AGI_ICOM( PICCOM, STATUS )
       CALL AGI_ILAB( -1, PICLAB, STATUS )
@@ -593,7 +593,7 @@
                CALL MSG_OUTIF( MSG__NORM, 'SKYWRITE_MSG3',
      :                   '  Nothing has been written, nothing to save.',
      :                         STATUS )
-               CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+               CALL MSG_BLANKIF( MSG__NORM, STATUS )
             END IF
       
 *  If erase is selected, ...

@@ -183,7 +183,7 @@
 
 *  Loop round each NDF to be processed.
       DO I = 1, NIN
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Get an NDF identifier for the NDF to be modified.
          CALL NDG_NDFAS( IGRP1, I, 'UPDATE', INDF1, STATUS )
@@ -254,12 +254,12 @@
      :                            TEXT( INDEX ), STATUS )
 
                ELSE
-                  CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+                  CALL MSG_BLANKIF( MSG__QUIET, STATUS )
                   CALL MSG_SETC( 'IT', ITEM )
                   CALL MSG_OUTIF( MSG__QUIET, 'SETIMAGE_MSG5',
      :                            'WARNING: Cannot modify item "^IT".',
      :                            STATUS )
-                  CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+                  CALL MSG_BLANKIF( MSG__QUIET, STATUS )
                END IF
 
             END DO
@@ -283,7 +283,7 @@
       END DO
 
 *  Display a blank line.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Store a list of the processed files for use by later applications.
       CALL IRM_LISTN( 'NDFLIST', IGRP1, 'SETIMAGE', STATUS )

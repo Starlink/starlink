@@ -185,11 +185,11 @@
       CALL NDF_XGT0R( INDF2, 'IRAS', 'TAU_', BETA, STATUS )
 
 *  Tell the user.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
       CALL MSG_SETR( 'B', BETA )
       CALL MSG_OUTIF( MSG__NORM, 'COLCORR_MSG1',
      :   '  Using emissivity spectral index, BETA = ^B', STATUS )
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Now create sections from the two input images which cover the region
 *  of overlap between the two images. This ensure that the two data

@@ -392,11 +392,11 @@
                   END DO
                END DO
 
-               CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+               CALL MSG_BLANKIF( MSG__QUIET, STATUS )
                CALL MSG_OUTIF( MSG__QUIET, 'TRACA8_MSG1',
      :                 'WARNING: Data of ANY quality will be displayed',
      :                         STATUS )
-               CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+               CALL MSG_BLANKIF( MSG__QUIET, STATUS )
 
             END IF
 
@@ -404,11 +404,11 @@
 *  'AVERAGE'.
             IF ( OFFMTD .NE. 2 ) THEN
                OFFMTD = 2
-               CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+               CALL MSG_BLANKIF( MSG__QUIET, STATUS )
                CALL MSG_OUTIF( MSG__QUIET, 'TRACA8_MSG2',
      :                 'WARNING: Offset method reverted to AVERAGE',
      :                         STATUS )
-               CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+               CALL MSG_BLANKIF( MSG__QUIET, STATUS )
             END IF
 
 *  Get the detector indices of the newly selected detectors.
@@ -571,11 +571,11 @@
  
 *  Otherwise give a warning message and does not change the mode.
                ELSE
-                  CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+                  CALL MSG_BLANKIF( MSG__QUIET, STATUS )
                   CALL MSG_OUTIF( MSG__QUIET, 'TRACA8_MSG3',
      :                          'WARNING: No graphics cursor available',
      :                            STATUS )
-                  CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+                  CALL MSG_BLANKIF( MSG__QUIET, STATUS )
                END IF
             END IF   
 

@@ -217,7 +217,7 @@
 
 *  Loop round each NDF to be processed.
       DO I = 1, SIZE
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Get an NDF identifier for the input NDF.
          CALL NDG_NDFAS( IGRP1, I, 'READ', INDF1, STATUS )
@@ -413,7 +413,7 @@
       END DO
 
 *  Display a blank line.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Assign a group expression to the output parameter NDFLIST which
 *  specifies all the output NDFs. NDFLIST should normally be associated 

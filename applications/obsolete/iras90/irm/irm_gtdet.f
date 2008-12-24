@@ -311,14 +311,14 @@
  10            FORMAT( 62( I2: ',' ) )
                CALL CHR_RMBLK( LIS )
 
-               CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+               CALL MSG_BLANKIF( MSG__NORM, STATUS )
                CALL MSG_OUTIF( MSG__NORM, 'IRM_GTDET_MSG1',
      :                      '  The following detectors are available: ',
      :                         STATUS )
                CALL MSG_SETC( 'LIS', LIS )
                CALL MSG_OUTIF( MSG__NORM, 'IRM_GTDET_MSG2',
      :                         '  ^LIS', STATUS )
-               CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+               CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Indicate that another prompt is required.
                PROMPT = .TRUE.

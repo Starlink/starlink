@@ -119,11 +119,11 @@
       IF( CURSOR ) THEN
 
 *  Display instructions describing the use of the cursor.
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
          CALL MSG_OUTIF( MSG__NORM, 'SBOXA1_MSG1',
      :     '  Position the cursor at a corner of the box and press '//
      :     'any key ', STATUS )
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Get the position of the first corner from the cursor.
          XC( 1 ) = VAL__BADR
@@ -133,7 +133,7 @@
          CALL MSG_OUTIF( MSG__NORM, 'SBOXA1_MSG2',
      :     '  Position the cursor at the opposite corner of the box '//
      :     'and press any key ', STATUS )
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Get the position of the second corner from the cursor.
          CALL SBOXB0( OUTLIN, XC( 2 ), YC( 2 ), STATUS )

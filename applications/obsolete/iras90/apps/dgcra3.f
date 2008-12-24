@@ -108,7 +108,7 @@
 
 *  If such quality information was found, tell the user conditionally.
       IF ( STATUS .EQ. SAI__OK ) THEN
-         CALL MSG_OUTIF( MSG__VERB, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__VERB, STATUS )
          CALL MSG_SETC( 'X', XNAME )
          CALL MSG_OUTIF( MSG__VERB, 'DGCRA3_MSG1',
      :      '   Quality information will be put in NDF extension "^X".',
@@ -154,7 +154,7 @@
          CALL IRQ_ADDQN( LOCS, QNAME, .FALSE., COMNT, STATUS )
 
 *  Conditionally report to the user about this new quality name.
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
          CALL MSG_SETC( 'N', QNAME )
          CALL NDF_MSG( 'NDF', NDFID )
          CALL MSG_OUTIF( MSG__NORM, 'DGCRA3_MSG2',
@@ -166,7 +166,7 @@
       
 *  If the name was there. report to the user.
       ELSE
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
          CALL MSG_SETC( 'N', QNAME )
          CALL MSG_SETC( 'COM', COMNT )
          CALL MSG_OUTIF( MSG__NORM, 'DGCRA3_MSG2',

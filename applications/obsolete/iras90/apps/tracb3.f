@@ -187,11 +187,11 @@
 *  If no nearest trace and sample are found, report a message before
 *  exit.
       IF ( .NOT.FOUND ) THEN
-         CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__QUIET, STATUS )
          CALL MSG_OUTIF( MSG__QUIET, 'TRACB3_MSG1',
      :                   'WARNING: Cannot find the nearest trace',
      :                   STATUS )
-         CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__QUIET, STATUS )
       END IF
 
       END

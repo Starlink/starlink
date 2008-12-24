@@ -272,7 +272,7 @@
 
 *  Display the total number of samples excluded from the estimation of
 *  the destripe constants.
-      CALL MSG_OUTIF( MSG__VERB, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__VERB, STATUS )
       CALL MSG_SETI( 'NEXCL', NSAMP*( DHIGH - DLOW + 1 ) - NSUM )
       CALL MSG_OUTIF( MSG__VERB, 'DESTA0_MSG3',
      :          '    ^NEXCL samples excluded from the calculation of '//

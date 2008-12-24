@@ -127,7 +127,7 @@
 *  flagged. Release the locators, and flag that no quality values are to
 *  be assigned to this output NDF.
       IF( THERE ) THEN
-         CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__QUIET, STATUS )
          CALL MSG_SETC( 'QN', QNAME )
          CALL MSG_OUTIF( MSG__QUIET, 'BACKA3_MSG1',
      :                 'WARNING: Quality name ^QN is already in use. '//

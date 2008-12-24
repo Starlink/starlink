@@ -418,7 +418,7 @@
       END IF
 
 *  Seperate subseuquent results with a blank line
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
       IF( LOGING ) CALL FIO_WRITE( FD, ' ', STATUS )
 
  999  CONTINUE

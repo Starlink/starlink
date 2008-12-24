@@ -132,7 +132,7 @@
      :       TYPE .NE. IRI__MAPCR .AND.
      :       TYPE .NE. IRI__NONAM ) THEN
 
-            CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+            CALL MSG_BLANKIF( MSG__QUIET, STATUS )
             CALL MSG_SETC( 'T1', TYPE )
             CALL MSG_SETC( 'T2', IRI__NONAM )
             CALL MSG_OUTIF( MSG__QUIET, 'PREPA4_MSG1',

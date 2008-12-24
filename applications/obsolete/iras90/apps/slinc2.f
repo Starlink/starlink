@@ -172,12 +172,12 @@
          ELSE
 
 *  Write help messages.
-            CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+            CALL MSG_BLANKIF( MSG__NORM, STATUS )
             CALL MSG_OUTIF( MSG__NORM, 'SLINC2_MSG1',
      :   '  Position the cursor at the start of the curve and press '//
      :   'any button (position the cursor outside the image to exit).',
      :                            STATUS )
-            CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+            CALL MSG_BLANKIF( MSG__NORM, STATUS )
       
 *  Get the begin position of the great circle section.
             CALL IRM_SKCUR( IRA, SCS, LBND, UBND, LON, LAT, OUT,
@@ -191,7 +191,7 @@
                CALL MSG_OUTIF( MSG__NORM, 'SLINC2_MSG2',
      :      '  Position the cursor at another point on the curve and '//
      :      'press any button.', STATUS )
-               CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+               CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
                CALL IRM_SKCUR( IRA, SCS, LBND, UBND, LONTEM, LATTEM,
      :                         OUT, STATUS )

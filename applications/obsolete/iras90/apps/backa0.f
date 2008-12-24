@@ -331,7 +331,7 @@
      :          'background value', STATUS )
 
 *  Display the background surface brightness.
-      CALL MSG_OUTIF( MSG__VERB, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__VERB, STATUS )
       CALL MSG_SETR( 'SB', MEDIAN )
       CALL MSG_SETC( 'U', IRC__MJPS )
       CALL MSG_OUTIF( MSG__NORM, 'BACKA0_MSG4',

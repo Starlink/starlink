@@ -410,7 +410,7 @@
 *  Loop round until all requested operations have been performed.
       EXIT = .FALSE.
       DO WHILE( .NOT. EXIT .AND. STATUS .EQ. SAI__OK )
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  If the coordinate system has changed, tell the user what sort of sky
 *  coordinates will be displayed, and remember the current sky
@@ -478,12 +478,12 @@
                   CALL SGS_CUVIS( .TRUE. )
 
 *  Display instructions.
-                  CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+                  CALL MSG_BLANKIF( MSG__NORM, STATUS )
                   CALL MSG_OUTIF( MSG__NORM, 'SKYPOS_MSG2',
      :             '  Position the cursor and press any button '//
      :             '(position the cursor outside the image to exit).',
      :                            STATUS )
-                  CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+                  CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Indicate that the cursor returns image coordinates.
                   GOTSKY = .FALSE.
@@ -677,7 +677,7 @@
  
 *  If the inverse mapping is required, get a pair of sky coordinates
 *  from the environment and then cancel the parameter values.
-               CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+               CALL MSG_BLANKIF( MSG__NORM, STATUS )
                IF( INVER ) THEN
                   CALL IRA_GETCO( 'LON', 'LAT',
      :                            ' of the required position', SCS,
@@ -696,7 +696,7 @@
                   CALL PAR_CANCL( 'Y', STATUS )
 
                END IF
-               CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+               CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  If a null value has been supplied, annul the error and flag that the
 *  current operation is complete.
@@ -713,7 +713,7 @@
             END IF
 
 *  Display a blank line before the first position in each operation.
-            IF( NEWOP ) CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+            IF( NEWOP ) CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Now tranform and display the supplied coordinates. if necessary.
             IF( MORE ) THEN
@@ -746,7 +746,7 @@
          END DO
 
 *  Separate operations with a blank line.
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  If the user has asked for mutiple operations to be performed, prepare
 *  for the next one.
@@ -878,7 +878,7 @@
       CALL PAR_PUT0L( 'INSIDE', INSIDE, STATUS )
 
 *  Tidy up.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Tidy up (including saving the astrometry information associated with 
 *  the DATA picture).

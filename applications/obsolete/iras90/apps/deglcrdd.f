@@ -295,7 +295,7 @@
             
 *  Conditionaly report the width of glitches.
       IF ( NPROF .EQ. 4 ) THEN
-         CALL MSG_OUTIF( MSG__VERB, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__VERB, STATUS )
          CALL MSG_SETR( 'WID', PRFWID( 1 ) * GLWID )
          CALL MSG_OUTIF( MSG__VERB, 'DEGLCRDD_MSG1',
      :                  'Spikes of ^WID arcmin width or less in 12um '/
@@ -317,7 +317,7 @@
      :                 /'waveband will be regarded as glitches',
      :                   STATUS )
       ELSE
-         CALL MSG_OUTIF( MSG__VERB, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__VERB, STATUS )
          CALL MSG_SETR( 'WID', PRFWID( 1 ) * GLWID )
          CALL MSG_OUTIF( MSG__VERB, 'DEGLCRDD_MSG1',
      :                  'Spikes of ^WID arcmin width or less in all '/
@@ -348,7 +348,7 @@
          CALL IRC_IMPRT( NDFIN, IRCID, STATUS )
       
 *  Conditionaly tell the user which CRDD file is being processed.
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
          CALL NDF_MSG( 'NDF', NDFIN )
          CALL MSG_OUTIF( MSG__NORM, 'DEGLCRDD_MSG2',
      :                  '   Deglitch ^NDF ...' , STATUS )
@@ -427,12 +427,12 @@
             IF ( STATUS .NE. SAI__OK ) GOTO 970
 
 *  Conditionaly tell the user an output CRDD file is created.
-            CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+            CALL MSG_BLANKIF( MSG__NORM, STATUS )
             CALL MSG_SETI( 'NBAD', NBAD )
             CALL MSG_OUTIF( MSG__NORM, 'DEGLCRDD_MSG3',
      :               '      ^NBAD samples are set as bad',
      :                      STATUS )
-            CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+            CALL MSG_BLANKIF( MSG__NORM, STATUS )
             CALL NDF_MSG( 'NDF', NDFOUT )
             CALL MSG_OUTIF( MSG__NORM, 'DEGLCRDD_MSG3',
      :                  '   Deglitched CRDD data are stored in ^NDF',

@@ -407,7 +407,7 @@
       CALL AGS_NZONE( ZONE2, STATUS )
 
 *  Describe the picture to the user.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
       CALL AGI_ICOM( PICCOM, STATUS )
       CALL AGI_ILAB( -1, PICLAB, STATUS )
@@ -619,7 +619,7 @@
                CALL MSG_OUTIF( MSG__NORM, 'SKYLINE_MSG3',
      :                     '  Nothing has been drawn, nothing to save.',
      :                         STATUS )
-               CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+               CALL MSG_BLANKIF( MSG__NORM, STATUS )
             END IF
 
 *  If erase is specified, ...
@@ -638,7 +638,7 @@
                CALL MSG_OUTIF( MSG__NORM, 'SKYLINE_MSG4',
      :               '  Nothing has been drawn, nothing can be erased.',
      :                         STATUS )
-               CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+               CALL MSG_BLANKIF( MSG__NORM, STATUS )
             END IF
 
 *  If pen number is to be changed, get new pen number set set the pen.

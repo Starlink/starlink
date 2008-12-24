@@ -150,7 +150,7 @@
                CALL MSG_OUTIF( MSG__NORM, 'IRM_QNDF_MSG1',
      : 'WARNING: No quality names are defined within ^NDF. All data '//
      : 'will be used', STATUS )
-               CALL MSG_OUTIF( MSG__NORM, ' ',' ', STATUS )
+               CALL MSG_BLANKIF( MSG__NORM, STATUS )
                CALL NDF_CLONE( INDF, ONDF, STATUS )
 
             END IF
@@ -194,7 +194,7 @@
                   CALL MSG_OUTIF( MSG__NORM, 'IRM_QNDF_MSG1',
      :                       'WARNING: All data from ^NDF will be used',
      :                            STATUS )
-                  CALL MSG_OUTIF( MSG__NORM, ' ',' ', STATUS )
+                  CALL MSG_BLANKIF( MSG__NORM, STATUS )
                   CALL NDF_CLONE( INDF, ONDF, STATUS )
 
                END IF

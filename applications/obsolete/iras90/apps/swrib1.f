@@ -107,7 +107,7 @@
       CALL GKS_GSTAT( STATUS )
 
 *  Write help messages.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
       CALL MSG_OUTIF( MSG__NORM, 'SWRIB1_MSG1',
      :       '  Position the cursor at a text position and press any '//
      :   'button (position the cursor well outside the image to exit).',

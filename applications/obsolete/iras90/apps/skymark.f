@@ -311,7 +311,7 @@
       CALL AGS_NZONE( ZONE2, STATUS )
 
 *  Describe the picture to the user.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
       CALL AGI_ICOM( PICCOM, STATUS )
       CALL AGI_ILAB( -1, PICLAB, STATUS )
@@ -535,12 +535,12 @@
             IF ( MODE( : 6 ) .EQ. 'CURSOR' ) THEN
                CALL SGS_CUVIS( .TRUE. )
 
-               CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+               CALL MSG_BLANKIF( MSG__NORM, STATUS )
                CALL MSG_OUTIF( MSG__NORM, 'SKYMARK_MSG6',
      :             '  Position the cursor and press any button '//
      :             '(position the cursor outside the image to exit).',
      :                         STATUS )
-               CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+               CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Put the cursor at the centre of the image and then get the position
 *  of the cursor.

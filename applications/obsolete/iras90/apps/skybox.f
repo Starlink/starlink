@@ -309,7 +309,7 @@
          CALL AGS_NZONE( ZONE2, STATUS )
 
 *  Describe the picture to the user.
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
          CALL AGI_ICOM( PICCOM, STATUS )
          CALL AGI_ILAB( -1, PICLAB, STATUS )

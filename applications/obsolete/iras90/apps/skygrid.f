@@ -304,7 +304,7 @@
       CALL PAR_GET0L( 'CLEAR', CLEAR, STATUS )
 
 *  Describe the picture to the user.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
       CALL AGI_ICOM( PICCOM, STATUS )
       CALL AGI_ILAB( -1, PICLAB, STATUS )
@@ -395,7 +395,7 @@
 
 *  Get the astrometry information associated with the DATA picture.
       CALL IRM_GTAST( 'IN', PICID2, LBND, UBND, IDA, STATUS )
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Get the bounds of the section of the DATA picture which is to be
 *  covered by the sky coordinate grid (in pixel coordinates).

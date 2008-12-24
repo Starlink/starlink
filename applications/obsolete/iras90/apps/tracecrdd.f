@@ -730,10 +730,10 @@
 
 *  Tell the user that output is being logged to the text file.
       IF( LOGING ) THEN
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
          CALL MSG_OUTIF( MSG__NORM, 'TRACECRDD_MSG1',
      :           '  Logging displayed information to $LOGFILE', STATUS )
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Write a header to the log file.
          CALL FIO_WRITE( FID, ' ', STATUS )

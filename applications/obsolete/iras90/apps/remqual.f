@@ -196,7 +196,7 @@
 
 *  Loop round each NDF to be processed.
       DO I = 1, NIN
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Get an NDF identifier for the input NDF.
          CALL NDG_NDFAS( IGRP1, I, 'UPDATE', NDFIN, STATUS )
@@ -286,7 +286,7 @@
       END DO
 
 *  Display a blank line.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Store a list of the processed files for use by later applications.
       CALL IRM_LISTN( 'NDFLIST', IGRP1, 'REMQUAL', STATUS )

@@ -230,11 +230,11 @@
 *  If cursor is not available on the graphic device, give user a message
 *  and exit the routine.
       IF ( .NOT.CURSOR ) THEN
-         CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__QUIET, STATUS )
          CALL MSG_OUTIF( MSG__QUIET, 'TRACA9_MSG1',
      :                  'WARNING: No graphics cursor available',
      :                  STATUS )
-         CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__QUIET, STATUS )
 
          GOTO 999
       END IF

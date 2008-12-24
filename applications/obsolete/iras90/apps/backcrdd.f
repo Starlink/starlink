@@ -353,7 +353,7 @@
 *  Loop round each pair of input and output CRDD files...
       NOUT = 0
       DO INDEX = 1, NCRDDF 
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Get an NDF identifier for the input NDF.
          CALL NDG_NDFAS( IGRP1, INDEX, 'READ', INDF1, STATUS )

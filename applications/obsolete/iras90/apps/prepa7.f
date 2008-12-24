@@ -241,12 +241,12 @@
 *  If some units are specified, warn the use that non-standard units 
 *  are being used.
          IF( U .NE. ' ' ) THEN
-            CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+            CALL MSG_BLANKIF( MSG__QUIET, STATUS )
             CALL MSG_SETC( 'U', U )
             CALL MSG_OUTIF( MSG__QUIET, 'PREPA7_MSG1',
      : 'WARNING: Non-standard system of units "^U" being used',
      :                      STATUS )
-            CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+            CALL MSG_BLANKIF( MSG__QUIET, STATUS )
 
 *  Otherwise, reset the NDF UNITS component.
          ELSE

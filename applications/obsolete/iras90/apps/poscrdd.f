@@ -184,7 +184,7 @@
 
 *  Tell the user that output is being logged to the text file.
       IF( LOGPOS ) THEN
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
          CALL MSG_OUTIF( MSG__NORM, 'POSCRDD_MSG1',
      :                   '  Logging displayed information to $LOGFILE',
      :                   STATUS )

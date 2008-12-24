@@ -436,7 +436,7 @@
 
 *  Loop round each NDF to be processed.
       DO I = 1, NIN
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Get an NDF identifier for the input NDF.
          CALL NDG_NDFAS( IGRP2, I, 'UPDATE', NDFIN, STATUS )
@@ -719,7 +719,7 @@
       END DO
 
 *  Display a blank line.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Annul any workspace used to hold pixel indices
  999  CONTINUE

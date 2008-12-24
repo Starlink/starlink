@@ -245,7 +245,7 @@
 
 *  Tell the user that output is being logged to the text file.
       IF( LOGPOS ) THEN
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
          CALL MSG_OUTIF( MSG__NORM, 'HISTORY_MSG1',
      :               '  Logging displayed history to $LOGFILE', STATUS )
       END IF

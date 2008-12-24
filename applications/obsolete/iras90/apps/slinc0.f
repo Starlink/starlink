@@ -153,7 +153,7 @@
          ELSE
 
 *  Write help messages.
-            CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+            CALL MSG_BLANKIF( MSG__NORM, STATUS )
             CALL MSG_OUTIF( MSG__NORM, 'SLINC0_MSG1',
      :   '  Position the cursor at the start of the curve and press '//
      :   'any button (position the cursor outside the image to exit).',

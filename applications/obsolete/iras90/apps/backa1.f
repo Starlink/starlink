@@ -400,7 +400,7 @@
 
 *  Display the background at the start of the scan, and the amount by 
 *  which it changes along the length of the scan.
-      CALL MSG_OUTIF( MSG__VERB, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__VERB, STATUS )
 
       CALL MSG_SETR( 'B', BLOW )
       CALL MSG_SETC( 'U', IRC__MJPS )

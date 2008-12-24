@@ -304,7 +304,7 @@
       END IF
 
 *  Seperate subsequent results by a blank line.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
       IF( LOGING ) CALL FIO_WRITE( FD, ' ', STATUS )
 
       END

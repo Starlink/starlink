@@ -155,12 +155,12 @@
 
 *  Give a warning if any large optical depths were encountered.
       IF( LARGE ) THEN
-         CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__QUIET, STATUS )
          CALL MSG_SETR( 'L', LARVAL )
          CALL MSG_OUTIF( MSG__QUIET, 'CCORA0_MSG1',
      :   'WARNING: Large optical depths (> ^LARVAL) encountered',
      :   STATUS )
-         CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__QUIET, STATUS )
       END IF
       
       END

@@ -451,7 +451,7 @@
 *  Loop round until all requested operations have been performed.
       EXIT = .FALSE.
       DO WHILE( .NOT. EXIT .AND. STATUS .EQ. SAI__OK )
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Indicate that this is the start of a new operation.
          NEWOP = .TRUE.
@@ -494,7 +494,7 @@
                   CALL SGS_CUVIS( .TRUE. )
 
 *  Display instructions.
-                  CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+                  CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
                   IF( SHAPE .EQ. 'POLYGON' ) THEN
                      CALL MSG_OUTIF( MSG__NORM, 'SKYPHOT_MSG2',
@@ -509,7 +509,7 @@
      :                               STATUS )
                   END IF
       
-                  CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+                  CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Record the source of input coordinates  in the log file.
                   IF( LOGING ) THEN
@@ -690,7 +690,7 @@
  
 *  Get the sky coordinates of the aperture centre from the environment
 *  and then cancel the parameter values.
-               CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+               CALL MSG_BLANKIF( MSG__NORM, STATUS )
                CALL IRA_GETCO( 'LON', 'LAT',
      :                         ' of the aperture centre', SCS,
      :                         .FALSE., A, B, STATUS )
@@ -698,7 +698,7 @@
                CALL PAR_CANCL( 'LON', STATUS )
                CALL PAR_CANCL( 'LAT', STATUS )
 
-               CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+               CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  If a null value has been supplied, annul the error and flag that the
 *  current operation is complete.
@@ -727,7 +727,7 @@
             END IF
 
 *  Display a blank line before the first position in each operation.
-            IF( NEWOP ) CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+            IF( NEWOP ) CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Now process the new position, if required.
             IF( MORE ) THEN
@@ -796,7 +796,7 @@
          END IF
 
 *  Separate operations with a blank line.
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  If the user has asked for mutiple operations to be performed, prepare
 *  for the next one.
@@ -966,7 +966,7 @@
 *  Do the next operation.
       END DO
 
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Write out the final displayed values to the appropriate parameters.
       CALL PAR_PUT0R( 'MEAN', MEAN, STATUS )

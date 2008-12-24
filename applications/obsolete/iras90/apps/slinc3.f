@@ -150,12 +150,12 @@
             END IF      
          ELSE
 
-            CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+            CALL MSG_BLANKIF( MSG__NORM, STATUS )
             CALL MSG_OUTIF( MSG__NORM, 'SLINC3_MSG1',
      : '  Position the cursor at a vertex of the poly-line and press '//
      : 'any button (position the cursor outside the image to exit).',
      :                            STATUS )
-            CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+            CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
             CALL IRM_SKCUR( IRA, SCS, LBND, UBND, LON, LAT, OUT,
      :                      STATUS )

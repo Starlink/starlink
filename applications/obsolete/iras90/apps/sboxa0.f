@@ -127,11 +127,11 @@
       IF( CURSOR ) THEN
 
 *  Display instructions describing the use of the cursor.
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
          CALL MSG_OUTIF( MSG__NORM, 'SBOXA0_MSG1',
      :     '  Position the cursor at the centre of the box and press '//
      :     'any key ', STATUS )
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Get a position from the cursor.
          XCEN = VAL__BADR

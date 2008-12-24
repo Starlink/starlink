@@ -475,7 +475,7 @@
 
 *  Get a value for parameter COORDS.
       CALL IRA_GTSCS( 'COORDS', .FALSE., SCS, STATUS )
-      CALL MSG_OUTIF( MSG__VERB, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__VERB, STATUS )
       CALL MSG_SETC( 'C', SCS )
       CALL MSG_OUTIF( MSG__VERB, 'MAPCRDD_MSG1',
      :               '  Using ^C sky coordinates.', STATUS )
@@ -520,7 +520,7 @@
       CALL IRA_INIT( STATUS )
 
 *  Get an NDF Group containing all the input CRDD files.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
       CALL IRM_RDNDF( 'IN', 0, 1, 'Give more CRDD file names',
      :                IGRP, NCRDDF, STATUS )
 
@@ -541,7 +541,7 @@
       MINSOP = SOP
 
 *  Conditionally display the waveband.
-      CALL MSG_OUTIF( MSG__VERB, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__VERB, STATUS )
       CALL MSG_SETI( 'WL', I90__WAVEL( BAND0 ) )
       CALL MSG_OUTIF( MSG__VERB, 'MAPCRDD_MSG7',
      :               '  Input CRDD files contain ^WL um data.', STATUS )
@@ -605,7 +605,7 @@
 *  Get the required pixel dimensions (in radians), using different
 *  default values for each waveband and ensuring that each dimension is
 *  greater than 0.02 arc-minutes (=5.8E-6 radians).
-      CALL MSG_OUTIF( MSG__VERB, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__VERB, STATUS )
       PIXSIZ( 1 ) = IRA__DTOR*DEFPXS( BAND0 )/60.0
       PIXSIZ( 2 ) = IRA__DTOR*DEFPXS( BAND0 )/60.0
       CALL IRM_DIMEN( 'PIXSIZE', .TRUE., 5.8E-6, PIXSIZ, STATUS )
@@ -639,7 +639,7 @@
      :             ANYVAR, STATUS )
 
 *  Conditionally display the number of CRDD files being mapped.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
       IF( NCRDDF .EQ. 1 ) THEN
          CALL MSG_OUTIF( MSG__NORM, 'MAPCRDD_MSG9',
      :                   '  Only 1 CRDD file being mapped.', STATUS )
@@ -648,7 +648,7 @@
          CALL MSG_OUTIF( MSG__NORM, 'MAPCRDD_MSG10',
      :                   '  ^NCRDDF CRDD files being mapped.', STATUS )
       END IF
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Annul the NDF and IRC identifiers for the first good CRDD file.
       CALL IRC_ANNUL( IDC0, STATUS )
@@ -727,7 +727,7 @@
       CALL NDF_CREAT( 'OUT', '_REAL', 2, LBND, UBND, NDFOUT, STATUS )
 
 *  Conditionally display the the bounds of the output image.
-      CALL MSG_OUTIF( MSG__VERB, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__VERB, STATUS )
       CALL MSG_SETI( 'XLO', LBND( 1 ) )
       CALL MSG_SETI( 'YLO', LBND( 2 ) )
       CALL MSG_SETI( 'XHI', UBND( 1 ) )
@@ -814,13 +814,13 @@
 *  If some but not all input CRDD files had VARIANCE components,
 *  conditionally warn the user that no variance values will be used.
       IF( ANYVAR .AND. .NOT. ALLVAR ) THEN
-         CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__QUIET, STATUS )
          CALL MSG_OUTIF( MSG__QUIET, 'MAPCRDD_MSG17',
      :   'WARNING: Some input CRDD files did not contain VARIANCE '//
      :   'values.', STATUS )
          CALL MSG_OUTIF( MSG__QUIET, 'MAPCRDD_MSG18',
      :   '          No input VARIANCE values will be used.', STATUS )
-         CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__QUIET, STATUS )
       END IF
 
 *  If all input CRDD files contained VARIANCE components, get a value

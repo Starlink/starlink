@@ -103,26 +103,26 @@
 
 *  CPC images can not be scaled to different units.
          IF( TYPE .EQ. IRI__CPC ) THEN
-            CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )         
+            CALL MSG_BLANKIF( MSG__QUIET, STATUS )         
             CALL MSG_SETC( 'U1', UNITS )
             CALL MSG_SETC( 'U2', U )
             CALL MSG_OUTIF( MSG__QUIET, 'PREPC0_MSG1',
      :   'WARNING:  CPC image cannot be produced in ^U1. Output will '//
      :   'be in ^U.', STATUS )
-            CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )         
+            CALL MSG_BLANKIF( MSG__QUIET, STATUS )         
             FACTOR = 1.0
             GO TO 999
          END IF
 
 *  Images with no input units can not be scaled to different units.
          IF( U .EQ. ' ' ) THEN
-            CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )         
+            CALL MSG_BLANKIF( MSG__QUIET, STATUS )         
             CALL MSG_SETC( 'U1', UNITS )
             CALL MSG_OUTIF( MSG__QUIET, 'PREPC0_MSG2',
      :'WARNING:  No system of units is specified in the FITS header. '//
      :'Therefore the output data cannot be scaled to units of ^U1. ', 
      :                      STATUS )
-            CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )         
+            CALL MSG_BLANKIF( MSG__QUIET, STATUS )         
             FACTOR = 1.0
             GO TO 999
          END IF
@@ -138,7 +138,7 @@
 *  the input to output units from the environment.
          ELSE 
             CALL ERR_ANNUL( STATUS )
-            CALL MSG_OUTIF( MSG__QUIET, ' ', ' ', STATUS )
+            CALL MSG_BLANKIF( MSG__QUIET, STATUS )
             CALL MSG_SETC( 'U1', U )
             CALL MSG_SETC( 'U2', UNITS )
             CALL MSG_OUTIF( MSG__QUIET, 'PREPC0_MSG3',

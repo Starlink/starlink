@@ -128,10 +128,10 @@
       CALL IRA_TRANS( 9, XX, YY, .TRUE., SCS, IDA, AA, BB, STATUS )
 
 *  Describe the box in pixel coordinates.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
       CALL MSG_OUTIF( MSG__NORM, 'SBOXA2_MSG1', '  Pixel coordinates:',
      :                STATUS )
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
       CALL MSG_SETR( 'X', REAL( XX( 1 ) ) )
       CALL MSG_SETR( 'Y', REAL( YY( 1 ) ) )
@@ -151,13 +151,13 @@
       CALL MSG_OUTIF( MSG__NORM, 'SBOXA2_MSG4',
      :                '    ^N   ^X,  ^Y', STATUS )
 
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
       CALL MSG_SETR( 'X', REAL( XX( 8 ) - XX( 6 ) ) )
       CALL MSG_SETR( 'Y', REAL( YY( 7 ) - YY( 9 ) ) )
       CALL MSG_SETC( 'N', CNAME( 6 ) )
       CALL MSG_OUTIF( MSG__NORM, 'SBOXA2_MSG5', 
      :                '    ^N   ^X x ^Y pixels', STATUS )
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 
       CALL MSG_SETI( 'X1', NINT( XX( 1 ) + 0.5D0 ) )
@@ -167,17 +167,17 @@
       CALL MSG_OUTIF( MSG__NORM, 'SBOXA2_MSG6',
      :               '    Image section      :   ( ^X1:^X3, ^Y1:^Y3 )', 
      :                STATUS )
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 
 
 *  Display the sky coordinates of each corner, and the centre.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
       CALL MSG_SETC( 'SCS', SCS )
       CALL MSG_OUTIF( MSG__NORM, 'SBOXA2_MSG7', 
      :                '  Sky coordinates (^SCS):', STATUS )
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
       DO I = 1, 5
          CALL IRA_DTOC( AA( I ), BB( I ), SCS, 0, ATEXT, BTEXT, STATUS )
@@ -205,7 +205,7 @@
       CALL IRA_DIST( AA( 7 ), BB( 7 ), AA( 9 ), BB( 9 ), DISTY, STATUS )
 
 *  Display the size of each dimension in arc-minutes.
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
       IF( DISTX .NE. VAL__BADD .AND. DISTY .NE. VAL__BADD ) THEN
          CALL MSG_SETR( 'X', REAL( ABS( DISTX ) *IRA__R2AM ) )
@@ -219,7 +219,7 @@
      :                   '    ^N   (undefined)', STATUS )
       ENDIF
 
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
  999  CONTINUE
 

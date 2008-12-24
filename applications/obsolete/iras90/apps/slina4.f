@@ -146,7 +146,7 @@
             CALL MSG_OUTIF( MSG__NORM, 'SLINA4_MSG1',
      :                      '  No meridian arcs have been drawn.',
      :                      STATUS )
-            CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+            CALL MSG_BLANKIF( MSG__NORM, STATUS )
          END IF
       
 *  If last parallel section is to be erased, ...
@@ -163,7 +163,7 @@
             CALL MSG_OUTIF( MSG__NORM, 'SLINA4_MSG2',
      :                      '  No parallel arcs have been drawn.',
      :                      STATUS )
-            CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+            CALL MSG_BLANKIF( MSG__NORM, STATUS )
          END IF
 
 *  If last great circle section is to be erased, ...
@@ -180,7 +180,7 @@
             CALL MSG_OUTIF( MSG__NORM, 'SLINA4_MSG3',
      :                      '  No great circle arcs have been drawn.',
      :                      STATUS )
-            CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+            CALL MSG_BLANKIF( MSG__NORM, STATUS )
          END IF
 
 *  If last polyline is to be erased, ...
@@ -198,7 +198,7 @@
             CALL MSG_OUTIF( MSG__NORM, 'SLINA4_MSG4',
      :                      '  No poly-lines have been drawn.',
      :                      STATUS )
-            CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+            CALL MSG_BLANKIF( MSG__NORM, STATUS )
          END IF
 
 *  If all curves are to be erased, reset all curve counters to 0.

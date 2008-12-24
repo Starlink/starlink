@@ -147,7 +147,7 @@
 
 *  If the user wants current attribute setting, ...
             ELSE IF ( ATRB( : 4 ) .EQ. 'SHOW' ) THEN
-               CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+               CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
                CALL MSG_SETR( 'DX', DIR( 1 ) )
                CALL MSG_SETR( 'DY', DIR( 2 ) )
@@ -180,7 +180,7 @@
                CALL MSG_OUTIF( MSG__NORM, 'SWRIA0_MSG7',
      :'  PEN - pen number - ^P', STATUS )
 
-               CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+               CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  If the up direction of the text to be set, ask for new value.
             ELSE IF ( ATRB( : 9 ) .EQ. 'DIRECTION' ) THEN

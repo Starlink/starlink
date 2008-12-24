@@ -160,7 +160,7 @@
 *  delete the trailing names from the group, and cancel the re-prompt
 *  flag.
          IF( SIZE .GT. MAXSIZ .AND. MAXSIZ .GT. 0 ) THEN
-            CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+            CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
             IF( MAXSIZ .GT. 1 ) THEN
                CALL MSG_SETI( 'MAX', MAXSIZ )
@@ -174,7 +174,7 @@
      :                          STATUS )
             END IF
 
-            CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+            CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
             CALL GRP_SETSZ( IGRP, MAXSIZ, STATUS )
             SIZE = MAXSIZ
@@ -195,10 +195,10 @@
 *  that no more NDFs can be specified, and cancel the re-prompt flag.
             ELSE
 
-               CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+               CALL MSG_BLANKIF( MSG__NORM, STATUS )
                CALL MSG_OUTIF( MSG__NORM, 'IRM_RDNDF_MSG4',
      :             'WARNING: No more NDF names allowed', STATUS )
-               CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+               CALL MSG_BLANKIF( MSG__NORM, STATUS )
                FLAG = .FALSE.
 
             END IF

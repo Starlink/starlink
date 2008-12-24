@@ -144,7 +144,7 @@
 
 *  Tell the user that output is being logged to the text file.
       IF( TRA_LOG ) THEN
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
          CALL MSG_OUTIF( MSG__NORM, 'IRASTRACE_MSG1',
      :           '  Logging displayed information to $LOGFILE', STATUS )
       END IF

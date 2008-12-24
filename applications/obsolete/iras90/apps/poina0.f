@@ -108,10 +108,10 @@
 
 *  If the logfile is required display name of the logfile to the user
       IF( LOGREQ ) THEN
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
          CALL MSG_OUTIF( MSG__NORM, 'POINTCRDD_MSG1',
      :           '  Logging detection results to $LOGFILE', STATUS )
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Write a header to the log file.
          CALL FIO_WRITE( LOGFID, ' ', STATUS )

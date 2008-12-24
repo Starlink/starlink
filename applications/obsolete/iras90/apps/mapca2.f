@@ -211,7 +211,7 @@
 *  as the first CRDD file. If not, conditionally give a warning
 *  message, and pass on to the next CRDD file.
             IF( BAND .NE. BAND0 ) THEN
-               CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+               CALL MSG_BLANKIF( MSG__NORM, STATUS )
                CALL NDF_MSG( 'NDF', INDF )
                CALL MSG_SETI( 'W', I90__WAVEL( BAND ) )
                CALL MSG_OUTIF( MSG__NORM, 'MAPCA2_MSG1',

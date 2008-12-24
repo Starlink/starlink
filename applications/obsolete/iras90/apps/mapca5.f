@@ -222,7 +222,7 @@
       CALL MSG_SETI( 'NY', NSECT( 2 ) )
       CALL MSG_OUTIF( MSG__VERB, 'MAPCA5_MSG1',
      :       '  Using ^NZ sectors cross-scan and ^NY in-scan.', STATUS )
-      CALL MSG_OUTIF( MSG__VERB, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__VERB, STATUS )
 
 *  Allocate memory to hold the weight for each sector.
       CALL PSX_CALLOC( NSECT( 1 )*NSECT( 2 ), '_REAL', IPSECT, STATUS )
@@ -298,7 +298,7 @@
       DO CRDDF = 1, NCRDDF
 
 *  Conditionally display the name of the NDF being processed.
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
          CALL GRP_GET( IGRP, CRDDF, 1, NAME, STATUS )
          CALL MSG_SETC( 'NAME', NAME )
          CALL MSG_OUTIF( MSG__NORM, 'MAPCA5_MSG2',
@@ -360,7 +360,7 @@
 
       END DO
 
-      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Abort if an error has occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999

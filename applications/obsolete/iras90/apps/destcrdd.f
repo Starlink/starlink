@@ -364,7 +364,7 @@
 *  Loop round each pair of input and output CRDD files...
       NOUT = 0
       DO INDEX = 1, NCRDDF 
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Get an NDF identifier for the input NDF.
          CALL NDG_NDFAS( IGRP1, INDEX, 'READ', INDF1, STATUS )
@@ -545,7 +545,7 @@
          CALL PAR_PUT0R( 'BACKMEAN', SB, STATUS )
          CALL PAR_PUT0R( 'BACKSIGMA', SBSIG, STATUS )
 
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
          IF( NOUT .GT. 1 ) THEN
 
@@ -577,12 +577,12 @@
 
          END IF
 
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
       ELSE
          CALL PAR_PUT0R( 'BACKMEAN', 0.0, STATUS )
          CALL PAR_PUT0R( 'BACKSIGMA', 0.0, STATUS )
-         CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__NORM, STATUS )
          CALL MSG_OUTIF( MSG__NORM, 'DESTCRDD_MSG8',
      :   '  No mean background surface brightness could be calculated.',
      :                   STATUS )
