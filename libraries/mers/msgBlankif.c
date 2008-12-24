@@ -10,7 +10,7 @@
 *    Starlink ANSI C
 
 *  Invocation:
-*     msgBlankif( int prior, int * status );
+*     msgBlankif( msglev_t prior, int * status );
 
 *  Description:
 *     Depending upon the given value of the given message priority and
@@ -21,7 +21,7 @@
 *     set to MSG__OPTER.
 
 *  Arguments:
-*     prior = int (Given)
+*     prior = msglev_t (Given)
 *        Message output filter. See msgOutif documentation for details of
 *        the messaging levels.
 *     status = int * (Given and Returned)
@@ -68,7 +68,8 @@
 *     10-SEP-2008 (TIMJ):
 *        Rewrite in C. Use msgOut.
 *     23-DEC-2008 (TIMJ):
-*        Clone from msgBlank and now calls msgOutif
+*        Clone from msgBlank and now calls msgOutif. Use msglev_t rather
+*        than simple integer.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -78,10 +79,11 @@
 */
 
 #include "merswrap.h"
+#include "msg_par.h"
 #include "sae_par.h"
 #include "ems.h"
 
-void msgBlankif( int prior, int * status ) {
+void msgBlankif( msglev_t prior, int * status ) {
 
   /*  Check the inherited global status. */
   if (*status != SAI__OK) return;

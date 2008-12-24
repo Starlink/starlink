@@ -95,6 +95,8 @@
 *        Use common block accessor
 *     10-SEP-2008 (TIMJ):
 *        Rewrite in C
+*     23-DEC-2008 (TIMJ):
+*        Use msglev_t rather than simple integer.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -110,7 +112,8 @@
 #include "ems.h"
 #include "merswrap.h"
 
-void msgOutif( int prior, const char * param, const char * text, int * status) {
+void msgOutif( msglev_t prior, const char * param, const char * text,
+               int * status) {
 
   char msgstr[MSG__SZMSG];    /* Message string */
 

@@ -57,20 +57,16 @@
 #define MSG_PAR_DEFINED
 
 /*  Global Constants: */
-/*   Normal conditional message output level */
-#define MSG__NORM 2 
 
-/*   Quiet conditional message output level */
-#define MSG__QUIET 1 
+typedef enum msglev_t {
+  MSG__QUIET = 1, /*   Quiet conditional message output level */
+  MSG__NORM  = 2, /*   Normal conditional message output level */
+  MSG__VERB  = 3, /*   Verbose conditional message output level */
+  MSG__DEBUG = 4  /*   Debug conditional message output level */
+} msglev_t;
 
 /*   Maximum length of message text */
 #define MSG__SZMSG 300 
-
-/*   Verbose conditional message output level */
-#define MSG__VERB 3 
-
-/*   Debug conditional message output level */
-#define MSG__DEBUG 4
 
 /*. */
 #endif  /* MSG_PAR_DEFINED */

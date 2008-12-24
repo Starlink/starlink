@@ -10,7 +10,7 @@
 *     Starlink ANSI C
 
 *  Invocation:
-*     msgIfset( int filter, int * status );
+*     msgIfset( msglev_t filter, int * status );
 
 *  Description:
 *     The value of the message filtering level is set using the given
@@ -19,7 +19,7 @@
 *     filtering level remains unchanged.
 
 *  Arguments:
-*     filter = int (Given)
+*     filter = msglev_t (Given)
 *        The filtering level.
 *     status = int * (Given and Returned)
 *        The global status.
@@ -59,6 +59,8 @@
 *        Use common block accessor
 *     12-SEP-2008 (TIMJ):
 *        Rewrite in C
+*     23-DEC-2008 (TIMJ):
+*        Use msglev_t rather than simple integer.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -75,7 +77,7 @@
 #include "msg_err.h"
 #include "msg_par.h"
 
-void msgIfset( int filter, int * status ) {
+void msgIfset( msglev_t filter, int * status ) {
 
   /*  Check inherited global status. */
   if (*status != SAI__OK) return;

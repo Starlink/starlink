@@ -44,6 +44,8 @@
 #ifndef MERSWRAP_DEFINED
 #define MERSWRAP_DEFINED
 
+#include "msg_par.h"
+
 /* If we're not using GNU C, elide __attribute__ */
 #ifndef __GNUC__
 #  define  __attribute__(x)  /*NOTHING*/
@@ -103,7 +105,7 @@ void msgBell( int *status );
 
 void msgBlank( int *status );
 
-void msgBlankif( int prior, int *status );
+void msgBlankif( msglev_t prior, int *status );
 
 /* Gnu compiler can check for format consistency at compile time */
 void msgFmt( const char *token,
@@ -113,9 +115,9 @@ void msgFmt( const char *token,
 void msgIfget( const char *pname,
                int *status );
 
-void msgIflev( int *filter );
+void msgIflev( msglev_t *filter );
 
-void msgIfset( int filter,
+void msgIfset( msglev_t filter,
                int *status );
 
 void msgLoad( const char *param,
@@ -129,7 +131,7 @@ void msgOut( const char *param,
              const char *text,
              int *status );
 
-void msgOutif( int prior,
+void msgOutif( msglev_t prior,
                const char *param,
                const char *text,
                int *status );

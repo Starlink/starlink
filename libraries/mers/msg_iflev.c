@@ -66,7 +66,7 @@
 #include "mers_f77.h"
 
 F77_SUBROUTINE(msg_iflev)( INTEGER(FILTER) ) {
-  int filter;
+  msglev_t filter;
   msgIflev( &filter );
   F77_EXPORT_INTEGER( filter, *FILTER );
 }

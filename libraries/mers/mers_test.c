@@ -67,6 +67,10 @@ int main ( void ) {
   msgFmt( "C", "%s", "formatted" );
   msgOut(" ", "msgFmt: '^C' and '^D'", &status );
 
+  msgOutif( MSG__VERB, " ", "Should not see this message", &status );
+  msgIfset( MSG__VERB, &status );
+  msgOutif( MSG__VERB, " ", "Should see this verbose message", &status );
+
   return exstat;
 }
 

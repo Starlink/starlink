@@ -7,6 +7,7 @@ Version 2.0
    C routine is provided for sprintf style formatting (msgFmt).
  o New function msgBlankif. This is a version of msgBlank that can be output conditionally
    similar to msgOut vs msgOutif.
+ o C interface for messaging level now uses a special type (msglev_t) rather than simple int.
 
 Version 1.8-2
 -------------

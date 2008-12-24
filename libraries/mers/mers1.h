@@ -35,11 +35,14 @@
 *  History:
 *     24-JUL-2008 (TIMJ):
 *        Initial version.
+*     23-DEC-2008 (TIMJ):
+*        Use msglev_t rather than simple integer.
 
 *-
 */
 
 #include <stdlib.h>
+#include "msg_par.h"
 
 /* This is the type of struct used for ERR globals */
 typedef struct {
@@ -48,7 +51,7 @@ typedef struct {
   int errrvl;
   int msgwsz;
   int msgstm;
-  int msginf;
+  msglev_t msginf;
 } MersTune;
 
 
@@ -82,13 +85,13 @@ void msg1Ktok ( void );
 void msg1Prtln( const char * text, int * status );
 void msg1Print( const char * text, int * status );
 
-int msg1Gtinf ( void );
+msglev_t msg1Gtinf ( void );
 int msg1Gtstm ( void );
 int msg1Gtwsz ( void );
 
 void msg1Ptwsz( int msgwsz );
 void msg1Ptstm( int msgstm );
-void msg1Ptinf( int msginf );
+void msg1Ptinf( msglev_t msginf );
 
 
 

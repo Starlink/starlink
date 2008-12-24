@@ -10,14 +10,14 @@
 *     Starlink ANSI C
 
 *  Invocation:
-*     msgIflev( int * filter );
+*     msgIflev( msglev_t * filter );
 
 *  Description:
 *     The value of the current filtering level set for conditional
 *     message output is returned.
 
 *  Arguments:
-*     filter = int * (Returned)
+*     filter = msglev_t * (Returned)
 *        The current message filtering level.
 
 *  Copyright:
@@ -53,6 +53,8 @@
 *        Use Common block accessor
 *     12-SEP-2008 (TIMJ):
 *        Rewrite in C
+*     23-DEC-2008 (TIMJ):
+*        Use msglev_t rather than simple integer.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -64,7 +66,7 @@
 #include "mers1.h"
 #include "merswrap.h"
 
-void msgIflev( int * filter ) {
+void msgIflev( msglev_t * filter ) {
   /*  Return the current value of the message output filter level. */
   *filter = msg1Gtinf();
 }

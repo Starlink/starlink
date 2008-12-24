@@ -73,7 +73,7 @@
 
 F77_SUBROUTINE(msg_ifset)( INTEGER(FILTER),
                            INTEGER(STATUS) ) {
-  int filter;
+  msglev_t filter;
   int status;
 
   F77_IMPORT_INTEGER( *STATUS, status );

@@ -104,7 +104,7 @@ void err1Ptrvl ( int errrvl ) {
   this_err_glbl.errrvl = errrvl;
 }
 
-int msg1Gtinf ( void ) {
+msglev_t msg1Gtinf ( void ) {
   return this_err_glbl.msginf;
 }
 
@@ -122,7 +122,7 @@ void msg1Ptwsz ( int msgwsz ) {
 void msg1Ptstm ( int msgstm ) {
   this_err_glbl.msgstm = msgstm;
 }
-void msg1Ptinf ( int msginf ) {
+void msg1Ptinf ( msglev_t msginf ) {
   this_err_glbl.msginf = msginf;
 }
 
