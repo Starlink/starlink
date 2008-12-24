@@ -732,7 +732,7 @@
      :     'testing.  Check that the regions used for fitting '//
      :     'reported below are sensible, i.e. avoid features like '//
      :     'spectral lines.', STATUS )
-         CALL MSG_BLANKIF( MSG__VERB, ' ', STATUS )
+         CALL MSG_BLANKIF( MSG__VERB, STATUS )
          CALL MSG_OUTIF( MSG__VERB, 'AUTOWARN2',
      :     'Feedback is welcome on the tuning of the CLIP '//
      :     'parameter''s default, the size of the default averaging '//
