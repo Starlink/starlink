@@ -147,10 +147,10 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Give an informational message.
-      CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
       CALL MSG_OUTIF( MSG__NORM, 'INFOFOR1',
      :                'Doing forward transformation', STATUS )
-      CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
+      CALL MSG_BLANKIF( MSG__NORM, STATUS )
 
 *  Transform the supplied image, storing the FT in the WIM3 array.
       CALL KPG1_FFTF<T>( M, N, DATA, WIM2, WIM3, STATUS )
