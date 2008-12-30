@@ -96,7 +96,7 @@ emsExpnd( msg, status )
   int actual_length;
  CODE:
   RETVAL = result;
-  emsExpnd(msg, RETVAL, EMS__SZTOK, &actual_length, &status);
+  emsExpnd(msg, RETVAL, EMS__SZTOK, 0, &actual_length, &status);
  OUTPUT:
   RETVAL
 
