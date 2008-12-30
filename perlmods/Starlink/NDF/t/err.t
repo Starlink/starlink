@@ -43,7 +43,9 @@ ok( $status != $good, "Status now bad");
 
 print "# This error message is good:\n";
 err_flush($status);
-is($status, $good, "Check status");
+print "# End of flush\n";
+$status = &NDF::SAI__OK if $status == &NDF::ERR__OPTER;
+is($status, $good, "Check status from NDF open flush");
 
 # Tuning - generate output even from annul
 err_tune('REVEAL', 1, $status);
@@ -51,7 +53,7 @@ err_tune('REVEAL', 1, $status);
 $status = &NDF::SAI__WARN;
 err_rep("","Hidden output from TUNE should be visible", $status);
 err_annul($status);
-is($status, $good, "check status");
+is($status, $good, "check status from TUNE");
 
 $ENV{ERR_REVEAL} = 0;
 err_tune('REVEAL', 0, $status);
@@ -62,7 +64,7 @@ err_load($param, $plen, $opstr, $oplen, $status);
 is($status, &NDF::EMS__NOMSG, "Check NOMSG status");
 err_load($param, $plen, $opstr, $oplen, $status); # Run it again to clear it
 err_annul($status);
-is($status, $good,"Check status");
+is($status, $good,"Check status from NOMSG errLoad");
 
 
 

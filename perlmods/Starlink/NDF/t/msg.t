@@ -1,6 +1,6 @@
 #!perl -w
 
-use Test::More tests => 13;
+use Test::More tests => 7;
 use strict;
 use_ok( "NDF" );
 
@@ -27,13 +27,6 @@ msg_ifset(&NDF::MSG__VERB, $status);
 msg_setc('TEST', 'This is a test of MSG');
 
 # Test formatting
-
-my $pi = 3.141592654;
-msg_fmtr('FMT', 'f4.2', $pi);
-msg_out(' ','# Hello: ^TEST with pi = ^FMT',$status);
-
-is($status, $good, "Check status");
-
 
 # Set up some tokens and then return the message
 
@@ -84,13 +77,6 @@ my %tokfmt = (
 # actually returns ' -1' rather than '  1'
 $tokans{l} = ' -1' if $^O eq 'dec_osf';
 
-
-foreach my $tok (keys %tokens) {
-  eval "msg_fmt$tok('$tok', '$tokfmt{$tok}','$tokens{$tok}');";
-  die "Error processing msg_fmt$tok : $@" if $@;
-  msg_load($tok, "^$tok", my $opstr, my $oplen, $status);
-  is($opstr, $tokans{$tok},"compare tokens [$tok: format $tokens{$tok} as $tokfmt{$tok}]");
-}
 
 # Tuning
 msg_tune('SZOUT', 23, $status);

@@ -168,7 +168,7 @@ char *s;
 
 /* Do the compiler numeric constants */
 
-static double
+static int
 constant(name)
 char *name;
 {
@@ -465,7 +465,7 @@ VAL__BADUB()
 
 # Numeric constants (autoloaded)
 
-double
+int
 constant(name)
         char *          name
  PROTOTYPE: $
@@ -4354,68 +4354,16 @@ OUTPUT:
   status
 
 void
-msgFmtc(token, format, value)
-  char * token
-  char * format
-  char * value
- ALIAS:
-  NDF::msg_fmtc = 2
- PROTOTYPE: $$$
- CODE:
-  msgFmtc(token, format, value);
-
-void
-msgFmtd(token, format, value)
-  char * token
-  char * format
-  ndfdouble  value
- ALIAS:
-  NDF::msg_fmtd = 2
- PROTOTYPE: $$$
- CODE:
-  msgFmtd(token, format, value);
-
-void
-msgFmti(token, format, value)
-  char * token
-  char * format
-  ndfint  value
- ALIAS:
-  NDF::msg_fmti = 2
- PROTOTYPE: $$$
- CODE:
-  msgFmti(token, format, value);
-
-void
-msgFmtl(token, format, value)
-  char * token
-  char * format
-  Logical  value
- ALIAS:
-  NDF::msg_fmtl = 2
- PROTOTYPE: $$$
- CODE:
-  msgFmtl(token, format, value);
-
-void
-msgFmtr(token, format, value)
-  char * token
-  char * format
-  ndffloat  value
- ALIAS:
-  NDF::msg_fmtr = 2
- PROTOTYPE: $$$
- CODE:
-  msgFmtr(token, format, value);
-
-void
 msgIflev(filter)
   ndfint &filter = NO_INIT
  ALIAS:
   NDF::msg_iflev = 2
  PROTOTYPE: $
+ PREINIT:
+   msglev_t filt;
  CODE:
-  msgIflev(&filter);
+  msgIflev(&filt);
+  filter = filt;
  OUTPUT:
   filter
 
@@ -4426,8 +4374,11 @@ msgIfset(filter, status)
  ALIAS:
   NDF::msg_ifset = 2
  PROTOTYPE: $$
+ PREINIT:
+   msglev_t filt;
  CODE:
-  msgIfset(filter, &status);
+  filt = filter;
+  msgIfset(filt, &status);
 
 void
 msgLoad(param, text, opstr, oplen, status)
@@ -4650,12 +4601,12 @@ errLoad(param, parlen, opstr, oplen, status)
   NDF::err_load = 2 
  PROTOTYPE: $$$$$
  PREINIT:
-   char str1[FCHAR];
-   char str2[FCHAR];
+   char str1[ERR__SZPAR+1];
+   char str2[ERR__SZMSG+1];
  CODE:
   param = str1;
   opstr = str2;
-errLoad(param, FCHAR, &parlen, opstr, FCHAR, &oplen,
+  errLoad(param, sizeof(str1), &parlen, opstr, sizeof(str2), &oplen,
           &status);
  OUTPUT:
   param
