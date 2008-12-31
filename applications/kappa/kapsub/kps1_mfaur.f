@@ -40,7 +40,7 @@
 *        The number of bins in the compressed line.  This may be set
 *        to the number of elements in the line to prevent compression.
 *     MAXRNG = INTEGER (Given)
-*        The maximum number of ranges.
+*        The maximum number of range boundaries.  This must be even.
 *     NRANGE = INTEGER (Returned)
 *        The number of ranges returned.  This is always a multiple of
 *        two, i.e pairs of lower and upper ranges.
@@ -52,6 +52,7 @@
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
