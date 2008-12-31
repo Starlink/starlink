@@ -1,0 +1,37 @@
+ 
+Set up CAT examples...
+
+  CAT example programs now available -- (for CAT Version 4.2)
+
+ 
+EXAMPLE_WRITE - create a catalogue...
+Catalogue created successfully.
+ 
+EXAMPLE_READ - read back the catalogue...
+ LOOP     COLI        COLR           COLC                   STATUS
+
+    1        1 F      2.400E+01 F    Loop   1%      F            0
+    2        2 F      2.500E+01 F    Loop   2%      F            0
+    3        3 F      2.600E+01 F    Loop   3%      F            0
+    4        4 F      2.700E+01 F    Loop   4%      F            0
+    5        5 F      2.800E+01 F    Loop   5%      F            0
+    6        6 F      2.900E+01 F    Loop   6%      F            0
+    7        7 F      3.000E+01 F    Loop   7%      F            0
+    8        8 F      3.100E+01 F    Loop   8%      F            0
+    9        9 F      3.200E+01 F    Loop   9%      F            0
+   10        0 T      0.000E+00 T                   T            0
+   11       11 F      3.400E+01 F    Loop  11%      F            0
+   12       12 F      3.500E+01 F    Loop  12%      F            0
+   13       13 F      3.600E+01 F    Loop  13%      F            0
+   14       14 F      3.700E+01 F    Loop  14%      F            0
+   15       15 F      3.800E+01 F    Loop  15%      F            0
+   16       16 F      3.900E+01 F    Loop  16%      F            0
+   17       17 F      4.000E+01 F    Loop  17%      F            0
+   18       18 F      4.100E+01 F    Loop  18%      F            0
+   19       19 F      4.200E+01 F    Loop  19%      F            0
+   20       20 F      4.300E+01 F    Loop  20%      F            0
+   21       21 F      4.400E+01 F    Loop  21%      F            0
+   22       22 F      4.500E+01 F    Loop  22%      F            0
+   23       23 F      4.600E+01 F    Loop  23%      F            0
+   24       24 F      4.700E+01 F    Loop  24%      F            0
+   25       25 F      4.800E+01 F    Loop  25%      F            0

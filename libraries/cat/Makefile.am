@@ -92,6 +92,15 @@ BLOCK_DATA_FILES = ant_block.f attrbb.f catsb.f ctrlb.f idsb.f
 BUILT_SOURCES = $(include_MESSAGES) $(PRIVATE_INCLUDES)
 
 EXAMPLE_FILES = examples/0README.LIS \
+examples/car_choi1.f \
+examples/car_choic.f \
+examples/car_gtfld.f \
+examples/car_gtlst.f \
+examples/car_lxfmt.f \
+examples/car_ptlst.f \
+examples/cat-examples_link_adam \
+examples/cat-examples_output.lis \
+examples/cat-examples_test.csh \
 examples/complex.TXT \
 examples/complex.dat \
 examples/details.f \
@@ -109,6 +118,7 @@ examples/poly.TXT \
 examples/scale.TXT \
 examples/simple.TXT \
 examples/simple_radians.TXT
+
 
 ## Create CAT1_NUL from the processed source. Need to add include of PRM_PAR
 ## by hand to avoid expanding that.
