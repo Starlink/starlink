@@ -30,13 +30,13 @@
 *     ARRAY( EL ) = ? (Given)
 *        The binned and averaged array.
 *     MAXRNG = INTEGER (Given)
-*        The maximum number of ranges.
+*        The maximum number of range boundaries.  This must be even.
 *     NRANGE = INTEGER (Returned)
 *        The number of ranges returned.  This is always a multiple of
-*        two, i.e pairs of lower and uper ranges.
+*        two, i.e pairs of lower and upper ranges.
 *     RANGES( MAXRNG ) = INTEGER (Returned)
 *        The ranges to include in the detrending fits found from the 
-*        averaged and binned representative line.  Each
+*        averaged and binned representative line.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -48,6 +48,7 @@
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -73,6 +74,9 @@
 *  History:
 *     2006 June 2 (MJC):
 *        Original version.
+*     2008 December 31 (MJC):
+*        Fixed logic to end the search loop.  In normal use this bug
+*        would not have mattered.
 *     {enter_further_changes_here}
 
 *-
@@ -140,11 +144,11 @@
 *  into the start of a range in the original grid co-ordinates, subject
 *  to the supplied maximum number of ranges.
       I = I + 1
-      DO WHILE ( I .LE. EL .AND. R .LE. MAXRNG )
+      DO WHILE ( I .LE. EL .AND. R .LT. MAXRNG / 2 )
          IF ( ARRAY( I ) .EQ. VAL__BAD<T> ) THEN
             RANGES( 2 * R ) = COMPRS * ( I - 1 )
             R = R + 1
-            IF ( R .LE. MAXRNG ) THEN
+            IF ( R .LE. MAXRNG / 2 ) THEN
                K = I
                START = .FALSE.
                DO WHILE ( .NOT. START .AND. K .LE. EL ) 
