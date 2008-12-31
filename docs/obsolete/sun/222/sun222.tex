@@ -1,0 +1,866 @@
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+% \usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+% Fixed part
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun\stardocnumber}
+
+% Variable part - replace [xxx] as appropriate.
+\newcommand{\stardocnumber}    {222.1}
+\newcommand{\stardocauthors}   {T. Jenness, M. J. Bly}
+\newcommand{\stardocdate}      {23 February 1998}
+\newcommand{\stardoctitle}     {NDFPERL \\ [2ex] PERL interface to NDF}
+\newcommand{\stardocversion}   {Version 1.3}
+\newcommand{\stardocmanual}    {}
+\newcommand{\stardocabstract}  {NDFperl is a Perl interface to the extensible
+N-dimensional data format (NDF) used by Starlink packages for storing data.
+It may be used within Perl scripts for manipulating NDF data and provides a
+convenient way of accessing NDF data for users not wanting to use Fortran.}
+% ? End of document identification
+
+% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sun.tex
+%
+%  Purpose:
+%     Template for Starlink User Note (SUN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     {Add further history here}
+%
+% -
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+
+% LaTeX document produced by pod2latex from "NDF.pm.pod".
+% The followings need be defined in the preamble of this document:
+%\def\C++{{\rm C\kern-.05em\raise.3ex\hbox{\footnotesize ++}}}
+\def\underscore{\leavevmode\kern.04em\vbox{\hrule width 0.4em height 0.3pt}}
+%\setlength{\parindent}{0pt}
+
+% Some commands for referencing
+\newcommand{\task}[1]{{\sf #1}}
+\newcommand{\ndf}{\xref{NDF}{sun33}{}}
+\newcommand{\hds}{\xref{HDS}{sun92}{}}
+\newcommand{\ary}{\xref{ARY}{sun11}{}}
+\newcommand{\mers}{\xref{MERS}{sun104}{}}
+\newcommand{\Kappa}{\xref{{\sc{Kappa}}}{sun95}{}}
+\newcommand{\parget}{\xref{\task{parget}}{sun95}{PARGET}}
+
+\newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
+\newcommand{\text}[1]{{\small \tt #1}}
+
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+  \renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf  \stardoctitle \\ [2.5ex]}
+   {\LARGE\bf \stardocversion \\ [4ex]}
+%  {\Huge\bf  \stardocmanual}
+   \end{center}
+   \vspace{5mm}
+
+% ? Add picture here if required for the LaTeX version.
+%   e.g. \includegraphics[scale=0.3]{filename.ps}
+% ? End of picture
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+%     \stardocmanual
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required for the hypertext version.
+%   e.g. \includegraphics[scale=0.7]{filename.ps}
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+  \stardocabstract
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+  \newpage
+  \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \latexonlytoc
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
+  \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+  \cleardoublepage
+  \renewcommand{\thepage}{\arabic{page}}
+  \setcounter{page}{1}
+
+% ? Main text
+\section{\xlabel{introduction}\label{introduction}Introduction}
+
+The extensible N-dimensional data format (NDF) is a format for storing bulk
+data in the form of N-dimensional arrays of numbers.  It is typically used
+for storing spectra, images and similar datasets with higher dimensionality.
+The NDF format is based on the Hierarchical Data System (HDS) and is
+extensible; not only does it provide a comprehensive set of standard
+ancillary items to describe the data, it can also be extended indefinitely
+to handle additional user-defined information of any type.
+
+The NDFPERL module provides a perl interface to the Fortran \ndf, \hds\ and
+\mers\ (MSG and ERR) libraries that are supplied with the standard Starlink
+software distribution.
+
+This document assumes a basic knowledge of both perl and the Starlink
+programming environment.
+
+
+\section{\xlabel{using_ndfperl}\label{using_ndfperl}Using NDFPERL}
+
+The NDFPERL system consists of a binary \texttt{ndfperl}, typically
+installed in \texttt{/star/bin} on Starlink systems, and a module
+\texttt{NDF.pm}, typically installed in
+\texttt{/star/lib/perl5}.\footnote{Alternatively, it is possible to
+build a shared library, \texttt{NDF.so}, instead of a binary in which
+case the standard perl binary can be used.  All Starlink distributions
+include NDFPERL as a binary because the Digital Unix version of this
+module must be built using 32 bit memory addressing whereas most perl
+installations on these systems are built with 64 bit addressing.}
+
+The entire \ndf, \hds\ and \mers\ system can be imported into a perl program
+by using the \texttt{use} command:
+
+\begin{myquote}
+\begin{verbatim}
+use NDF;
+\end{verbatim}
+\end{myquote}
+
+If only a subset of these commands are required then it is possible to supply
+the names of the subsystem to the \texttt{use} command:
+
+\begin{myquote}
+\begin{verbatim}
+use NDF qw(:ndf :misc);
+\end{verbatim}
+\end{myquote}
+
+would import just the \texttt{ndf\_} and miscellaneous commands into
+the namespace. The remaining commands would still be available but must
+be accessed through their package name (\emph{e.g.}\ \texttt{hds\_open}
+would be available as \texttt{\&NDF::hds\_open}). The individual
+subsystems along with the available commands are listed in appendix
+\ref{subsys}.
+
+Once the module has been loaded the library subroutines can be accessed
+by using perl commands of the same name. For example, the following
+could be used in order to open and close an NDF file:
+
+\begin{myquote}
+\begin{verbatim}
+#!/star/bin/ndfperl
+
+use NDF;
+
+$status = &NDF::SAI__OK;   # Initialise good status
+
+ndf_begin;                 # initialise the NDF system
+
+ndf_find(&NDF::DAT__ROOT, 'ndf_test', $indf, $status);
+ndf_annul($indf, $status); # Close the file
+
+ndf_end($status);          # Close down NDF
+\end{verbatim}
+\end{myquote}
+
+Note that the routine names are all in lower case, but apart from this
+use the same syntax that would be used for accessing the Fortran
+routine.  Section \ref{access_to_compiler_constants} describes how to
+access constants such as \texttt{SAI\_\_OK} and \texttt{DAT\_\_ROOT}.
+
+Example programs are available in the \texttt{t} sub-directory of the
+installation tree, or on Starlink systems in \texttt{/star/examples/ndfperl}.
+
+\subsection{\xlabel{access_to_compiler_constants}Access to compiler constants}%
+\label{access_to_compiler_constants}\index{Access to compiler constants}
+
+Occassionally it is necessary to access Starlink system constants
+dealing with error status and system limitations.  Compiler constants
+can be accessed via \texttt{\&NDF::(constant)} and are autoloaded as
+required.  \emph{e.g.}, the value for \texttt{SAI\_\_OK} can be
+accessed as \texttt{\&NDF::SAI\_\_OK}, as in:
+
+\begin{myquote}
+\begin{verbatim}
+ndf_find(&NDF::DAT__ROOT,$filename,$indf,$status);
+print "An error occurred\n" if ($status != &NDF::SAI__OK);
+\end{verbatim}
+\end{myquote}
+
+At present all the \texttt{DAT\_\_}, \texttt{ERR\_\_}, \texttt{EMS\_\_}, 
+\texttt{MSG\_\_} and \texttt{SAI\_\_} constants are available.  More
+can be included as more C include files are created.  In the absence of
+the necessary include files a request for a specific compiler constant
+will be refused.
+
+\subsection{\xlabel{dealing_with_mapped_arrays}Dealing with MAPPED arrays}%
+\label{dealing_with_mapped_arrays}\index{Dealing with MAPPED arrays}
+
+Routines such as \texttt{ndf\_map} and \texttt{dat\_mapv} return
+pointers to the data arrays. These pointers are handled differently in
+perl than in Fortran.
+
+To read a mapped array you must first \emph{copy\/} the data from the mapped
+array into a perl array. Modifiying this perl array \emph{will not\/} change
+the mapped array. The perl array must be copied back into the mapped 
+array for any changes to become permanent. To reduce resource requirements
+you may want to unmap the array as soon as it has been copied to the 
+perl array. Currently there is no way to access the mapped data directly.
+
+In perl the array must first be packed into a single string and this
+string must then be copied to the mapped memory location.
+For example:
+
+\begin{myquote}
+\begin{verbatim}
+$mapped_string = pack("i*", @data);
+ndf_map($indf, 'DATA', '_INTEGER', 'WRITE', $pntr, $el, $status);
+string2mem($mapped_string, 4 * $el, $pntr);
+\end{verbatim}
+\end{myquote}
+
+This copies a perl data array to the NDF \texttt{DATA\_ARRAY}. If
+\texttt{\$el} does not equal \texttt{\$\#data + 1} (\emph{i.e.}, the
+number of entries in the perl array) then odd things will happen.
+
+The reverse process can be achieved using \texttt{mem2string} as follows:
+
+\begin{myquote}
+\begin{verbatim}
+ndf_map($indf, 'DATA', '_INTEGER', 'READ', $pntr, $el, $status);
+mem2string($pntr, 4 * $el, $mapped_string);
+@data = unpack("i*", $mapped_string);
+\end{verbatim}
+\end{myquote}
+
+Note that both \texttt{mem2string} and \texttt{string2mem} require the
+\emph{number of bytes\/} to be mapped.  The data then has to be
+unpacked into an array by the perl \texttt{unpack} command. Obviously
+for \texttt{\_REAL} data a different option should be used for
+\texttt{pack}.  For large data arrays this method is extremely
+inefficient and use of the \htmladdnormallinkfoot{Perl Data Language
+(PDL)}{http://www.aao.gov.au/local/www/kgb/perldl/} should be
+considered\footnote{A module is available for reading NDF files into
+PDL. If PDL::IO::NDF is not available on your system please contact the
+Starlink librarian (\texttt{ussc@star.rl.ac.uk}) if you are on a
+Starlink site or the JACH WWW pages
+(\texttt{http://www.jach.hawaii.edu/jcmt\_sw/perl}).}.
+
+
+Character arrays can be dealt with as follows:
+
+\begin{myquote}
+\begin{verbatim}
+$mapped_string = pack("A20" x ($#data +1), @data);
+ndf_map($indf, 'DATA', '_CHARACTER*20', 'WRITE', $pntr, $el, $status);
+string2mem($mapped_string, 20*($#data +1), $pntr);
+\end{verbatim}
+\end{myquote}
+
+This packs an array of perl strings into a fixed length (space padded) string
+of length 20 $\times$ (size of array) characters. The string is then copied to
+the mapped array with \texttt{string2mem}.
+
+Dealing with arrays is made easier by the \texttt{array2mem} and
+\texttt{mem2array}  routines, which handle the packing for the
+programmer. At present these routines do not work with character arrays
+and the lower level \texttt{string2mem} and \texttt{mem2string}
+routines must still be used.
+
+To copy from a mapped array to a perl array you use \texttt{mem2array}.
+The routine requires the pointer to the mapped array, the pack type (as
+used in the the perl \texttt{pack} command, \emph{i.e.}
+\texttt{"i$\ast$"} for ints, \texttt{"f$\ast$"} for floats) and the
+number of elements, and returns the array.
+
+For example:
+\begin{myquote}
+\begin{verbatim}
+ndf_map($indf, 'DATA', '_INTEGER', 'READ', $pntr, $el, $status);
+@data = mem2array($pntr, "i*", $el);
+\end{verbatim}
+\end{myquote}
+
+To write to a mapped array, you use \texttt{array2mem}:
+
+\begin{myquote}
+\begin{verbatim}
+ndf_map($indf, 'DATA', '_INTEGER', 'WRITE', $pntr, $el, $status);
+array2mem(@data, "i*", $pntr);
+\end{verbatim}
+\end{myquote}
+
+Remember that, at present, these routines \emph{do not\/} work with
+\texttt{\_CHARACTER} arrays. In that case you must use the
+\texttt{mem2string} and \texttt{string2mem} routines directly.
+
+\subsection{\xlabel{accessing_fits_entries}Accessing FITS entries}%
+\label{accessing_fits_entries}\index{Accessing FITS entries}
+
+FITS entries are stored in the FITS extension of an NDF. The FITS array
+can be accessed by using raw HDS commands as follows:
+
+\begin{myquote}
+\begin{verbatim}
+ndf_xloc($indf, 'FITS', 'READ', $floc, $status);
+dat_get1c($floc, 200, @fits, $nfits, $status);
+\end{verbatim}
+\end{myquote}
+
+(The 200 indicates the maximum size of the array --- this can be any
+value greater than or equal to the actual size of the array and can be
+determined beforehand by using the \texttt{dat\_size} command).  The FITS
+header information is now in the perl \texttt{@fits} array and can be accessed
+via \texttt{fits\_get\_item} and \texttt{fits\_get\_nth\_item}.
+
+For example, to list all the values and keywords:
+
+\begin{myquote}
+\begin{verbatim}
+for ($i=0; $i <= $#fits; $i++) {
+  ($keyword, $value, $comment) = fits_get_nth_item(@fits, $i);
+  print "$i: $keyword\t $value\n";
+}
+\end{verbatim}
+\end{myquote}
+% $
+
+You can also use \texttt{fits\_extract\_key\_val} to
+access the \texttt{nth} entry via
+
+\begin{myquote}
+\begin{verbatim}
+($keyword, $value, $comment) = fits_extract_key_val($fits[$n]);
+\end{verbatim}
+\end{myquote}
+% $ 
+
+To find out the value that goes with a keyword:
+
+\begin{myquote}
+\begin{verbatim}
+$inst = fits_get_item(@fits, 'INSTRUME');
+print "Instrument is $inst\n";
+\end{verbatim}
+\end{myquote}
+
+Remember that perl has associative arrays:
+
+\begin{myquote}
+\begin{verbatim}
+%fitsitem = ();
+for ($i=0; $i <= $#fits; $i++) {
+  ($keyword, $value, $comment) = fits_get_nth_item(@fits, $i);
+  $fitsitem{$keyword} = $value;
+}
+\end{verbatim}
+\end{myquote}
+
+so that:
+
+\begin{myquote}
+\begin{verbatim}
+print "$fitsitem{'INSTRUME'}\n";
+\end{verbatim}
+\end{myquote}
+
+will print, say, SCUBA.
+
+A general routine exists for reading the FITS header.
+\texttt{fits\_read\_header} reads the FITS extension and returns the
+reference to a hash array:
+
+\begin{myquote}
+\begin{verbatim}
+($hashref, $status) = fits_read_header($file);
+\end{verbatim}
+\end{myquote}
+
+The FITS entries can then be accessed as \verb+$$hashref{'ITEM'}+.
+This takes the filename as an argument and returns the Starlink status.
+
+\subsection{\xlabel{accessing_adam_parameters_from_atasks}Accessing ADAM parameters from A-tasks}%
+\label{accessing_adam_parameters_from_atasks}\index{Accessing ADAM parameters from A-tasks}
+
+ADAM A-tasks store their parameters in HDS files in the \texttt{ADAM\_USER}
+directory (which defaults to \texttt{\$HOME/adam}). This routine retrieves the
+value of a parameter for any ADAM task that uses the \texttt{ADAM\_USER}
+directory and is based on the \Kappa\ task \parget.
+
+For example
+\begin{myquote}
+\begin{verbatim}
+($in) = par_get("data_array","GLOBAL", \$status);
+\end{verbatim}
+\end{myquote}
+
+returns the current data set (stored in \texttt{GLOBAL.sdf}). Note that
+the data is returned in an array context. The routine returns without
+action if \texttt{\$status} is not set to \texttt{SAI\_\_OK} on entry.
+Note that a reference to \texttt{\$status} is passed into this routine
+so that the status can be modified on exit.
+
+Either the \texttt{\$ADAM\_USER} or \texttt{\$HOME} environment
+variable must be set so that the location of the parameter files can be
+determined.
+
+This command can not access parameter values of tasks that are
+currently running.  In order to retrieve parameter values via the ADAM
+messaging system the \texttt{Starlink::ADAMTASK} module must be
+used\footnote{Please contact the author for more information on the
+\texttt{Starlink::ADAMTASK} module.}.
+
+\subsection{\xlabel{notes}\label{notes}NOTES}
+
+\subsubsection{Function calls}%
+\index{Function calls}
+
+The commands in this module use  perl prototypes to check argument 
+passing. This means that arrays do not have to be referenced when being
+used as arguments \emph{unless\/} the routine is called with an \texttt{\&}.
+
+For example, both
+
+\begin{myquote}
+\begin{verbatim}
+$value = fits_get_item(@fits, $keyword);
+\end{verbatim}
+\end{myquote}
+and
+\begin{myquote}
+\begin{verbatim}
+$value = &fits_get_item(\@fits, $keyword);
+\end{verbatim}
+\end{myquote}
+
+are correct but
+\begin{myquote} 
+\begin{verbatim}
+$value = &fits_get_item(@fits, $keyword);
+\end{verbatim}
+\end{myquote}
+
+will fail because perl will pass all the members of the array and not the
+reference to the array. 
+
+\subsubsection{Arrays}%
+\index{Arrays}
+
+Note that the \texttt{GetNx}/\texttt{PutNx} routines have not been
+implemented in this module because plain Perl does not really support
+N-dimensional arrays.  All data in plain perl is vectorised.  If you
+wish to use N-dimensional data structures in perl you must use the
+\htmladdnormallinkfoot{PDL}{http://www.aao.gov.au/local/www/kgb/perldl/}
+module in conjunction with a vectorised read (see \emph{e.g.}, the
+\texttt{rndf} command in \texttt{perldl} which stores all arrays as
+true N-dimensional data sets). The PDL module is available from
+\htmladdnormallinkfoot{CPAN}{http://www.perl.com/CPAN/}. Also
+note that the Get1x/Put1x routines are implemented but are not
+necessary since the vectorised routines can always be used instead.
+
+\subsubsection{Accessing TYPEd data}%
+\index{Accessing TYPEd data}
+
+Although routines are available for accessing data of any type
+(\emph{e.g.} \texttt{\_INTEGER}, \texttt{\_REAL}, \texttt{\_DOUBLE})
+the untyped nature of perl and the type conversion inherent in the NDF
+routines mean that, in practice, only character handling routines are
+needed to access data (\emph{e.g.} via \texttt{ndf\_xgt0c} or
+\texttt{dat\_get1c}).  This does not apply to mapped data arrays where
+the size of the data type must be known before unpacking.  The double
+precision routines may be necessary since the type conversion routines
+truncate to \texttt{\_REAL} precision when converting to \texttt{\_CHAR}.
+
+\subsubsection{Printing History information}%
+\index{Printing History information}
+
+Whilst all the NDF history calls are implemented, \texttt{NDF\_HOUT} has
+only a minimal functionality since \texttt{NDF\_HOUT} requires the name of a
+Fortran subroutine.  Calling a perl subroutine from Fortran has not been
+implemented and \texttt{NDF\_HECHO} is called by default.
+
+\appendix
+\newpage
+\section{\xlabel{ndfperl_sub-systems}NDFPERL sub-systems\label{subsys}}
+
+This section lists name of each sub-system that can be imported via the 
+perl \texttt{use} command. By default all sub-systems are loaded into the
+current namespace.
+
+\begin{description}
+
+\item[:ndf]%
+\index{:ndf@:ndf}%
+\hfil\\
+This imports all the \texttt{NDF\_} functions for use.
+
+\item[:msg]%
+\index{:msg@:msg}%
+\hfil\\
+This imports all the \texttt{MSG\_} functions.
+
+\item[:err]%
+\index{:err@:err}%
+\hfil\\
+This imports all the Starlink error handling functions (\texttt{ERR\_}).
+
+\item[:ary]%
+\index{:ary@:ary}%
+\hfil\\
+This imports some \texttt{ARY\_} functions.
+
+\item[:hds]%
+\index{:hds@:hds}%
+\hfil\\
+This imports the \texttt{HDS\_} functions.
+
+\item[:dat]%
+\index{:dat@:dat}%
+\hfil\\
+This imports most of the \texttt{DAT\_} functions.
+
+\item[:cmp]%
+\index{:cmp@:cmp}%
+\hfil\\
+This imports most of the \texttt{CMP\_} functions.
+
+\item[:misc]%
+\index{:misc@:misc}%
+\hfil\\
+This imports routines for converting DATA pointers to arrays and routines for 
+easy access to FITS arrays commonly found in NDFs. A routine for accessing
+parameters stored by ADAM tasks is also available.
+
+\end{description}
+
+\section{\xlabel{implemented_routines}Implemented routines}%
+\label{implemented_routines}\index{Implemented routines}
+
+This section lists all the routines that are available from within this module.
+
+The command syntax for these commands can be found in the documentation
+for each library (\ndf, \hds, \mers\ and \ary).
+
+\begin{description}
+
+\item[:ndf]%
+\index{:ndf@:ndf}\mbox{}
+All \texttt{ndf\_} routines are implemented except those dealing with
+ADAM parameters (\emph{e.g.} \texttt{ndf\_assoc}).
+
+\item[:ary]%
+\index{:ary@:ary}\mbox{}
+\begin{flushleft}
+\texttt{ary\_annul} \texttt{ary\_dim} \texttt{ary\_find}
+\texttt{ary\_map} \texttt{ary\_ndim} \texttt{ary\_size}
+\texttt{ary\_unmap}
+\end{flushleft}
+
+\item[:msg]%
+\index{:msg@:msg}\mbox{}
+All \texttt{msg\_} routines are implemented:
+\begin{flushleft}
+\texttt{msg\_bell} \texttt{msg\_blank} \texttt{msg\_fmtc}
+\texttt{msg\_fmtd} \texttt{msg\_fmti} \texttt{msg\_fmtl}
+\texttt{msg\_fmtr} \texttt{msg\_iflev} \texttt{msg\_ifset}
+\texttt{msg\_load} \texttt{msg\_out} \texttt{msg\_outif}
+\texttt{msg\_renew} \texttt{msg\_setc} \texttt{msg\_setd}
+\texttt{msg\_seti} \texttt{msg\_setl} \texttt{msg\_setr}
+\end{flushleft}
+
+\item[:err]%
+\index{:err@:err}\mbox{}
+All \texttt{err\_} routines are implemented:
+\begin{flushleft}
+\texttt{err\_annul} \texttt{err\_begin} \texttt{err\_end}
+\texttt{err\_facer} \texttt{err\_fioer} \texttt{err\_flbel}
+\texttt{err\_flush} \texttt{err\_level} \texttt{err\_load}
+\texttt{err\_mark} \texttt{err\_rep} \texttt{err\_rlse}
+\texttt{err\_stat} \texttt{err\_syser}
+\end{flushleft}
+
+\item[:hds]%
+\index{:hds@:hds}\mbox{}
+All \texttt{hds\_} routines are implemented:
+\begin{flushleft}
+\texttt{hds\_copy} \texttt{hds\_erase} \texttt{hds\_ewild}
+\texttt{hds\_flush} \texttt{hds\_free} \texttt{hds\_group}
+\texttt{hds\_gtune} \texttt{hds\_link} \texttt{hds\_lock}
+\texttt{hds\_new} \texttt{hds\_open} \texttt{hds\_show}
+\texttt{hds\_state} \texttt{hds\_stop} \texttt{hds\_trace}
+\texttt{hds\_tune} \texttt{hds\_wild}
+\end{flushleft}
+
+\item[:dat]%
+\index{:dat@:dat}\mbox{}
+\begin{flushleft}
+\texttt{dat\_alter} \texttt{dat\_annul} \texttt{dat\_basic}
+\texttt{dat\_ccopy} \texttt{dat\_cctyp} \texttt{dat\_cell}
+\texttt{dat\_clen} \texttt{dat\_clone} \texttt{dat\_coerc}
+\texttt{dat\_copy} \texttt{dat\_drep} \texttt{dat\_erase}
+\texttt{dat\_ermsg} \texttt{dat\_find} \texttt{dat\_get0c}
+\texttt{dat\_get0d} \texttt{dat\_get0i} \texttt{dat\_get0l}
+\texttt{dat\_get0r} \texttt{dat\_get1c} \texttt{dat\_get1d}
+\texttt{dat\_get1i} \texttt{dat\_get1r} \texttt{dat\_getvc}
+\texttt{dat\_getvd} \texttt{dat\_getvi} \texttt{dat\_getvr}
+\texttt{dat\_index} \texttt{dat\_len} \texttt{dat\_map}
+\texttt{dat\_mapc} \texttt{dat\_mapd} \texttt{dat\_mapi}
+\texttt{dat\_mapl} \texttt{dat\_mapr} \texttt{dat\_mapv}
+\texttt{dat\_mould} \texttt{dat\_move} \texttt{dat\_msg}
+\texttt{dat\_name} \texttt{dat\_ncomp} \texttt{dat\_new}
+\texttt{dat\_new0c} \texttt{dat\_new0d} \texttt{dat\_new0i}
+\texttt{dat\_new0l} \texttt{dat\_new0r} \texttt{dat\_new1c}
+\texttt{dat\_new1d} \texttt{dat\_new1i} \texttt{dat\_new1l}
+\texttt{dat\_new1r} \texttt{dat\_newc} \texttt{dat\_paren}
+\texttt{dat\_prec} \texttt{dat\_prim} \texttt{dat\_prmry}
+\texttt{dat\_put0c} \texttt{dat\_put0d} \texttt{dat\_put0d}
+\texttt{dat\_put0l} \texttt{dat\_put0r} \texttt{dat\_put1c}
+\texttt{dat\_put1d} \texttt{dat\_put1i} \texttt{dat\_put1r}
+\texttt{dat\_putd} \texttt{dat\_puti} \texttt{dat\_putr}
+\texttt{dat\_putvc} \texttt{dat\_putvd} \texttt{dat\_putvi}
+\texttt{dat\_putvr} \texttt{dat\_ref} \texttt{dat\_refct}
+\texttt{dat\_renam} \texttt{dat\_reset} \texttt{dat\_retyp}
+\texttt{dat\_shape} \texttt{dat\_size} \texttt{dat\_slice}
+\texttt{dat\_state} \texttt{dat\_struc} \texttt{dat\_temp}
+\texttt{dat\_there} \texttt{dat\_type} \texttt{dat\_unmap}
+\texttt{dat\_valid} \texttt{dat\_vec} \texttt{dat\_where}
+\end{flushleft}
+
+\item[:cmp]%
+\index{:cmp@:cmp}\mbox{}
+\begin{flushleft}
+\texttt{cmp\_get0c} \texttt{cmp\_get0d} \texttt{cmp\_get0i}
+\texttt{cmp\_get0l} \texttt{cmp\_get0r} \texttt{cmp\_get1c}
+\texttt{cmp\_get1d}  \texttt{cmp\_get1i} \texttt{cmp\_get1r}
+\texttt{cmp\_getvc} \texttt{cmp\_getvd} \texttt{cmp\_getvi}
+\texttt{cmp\_getvr} \texttt{cmp\_len} \texttt{cmp\_mapv}
+\texttt{cmp\_mod}  \texttt{cmp\_modc} \texttt{cmp\_prim}
+\texttt{cmp\_put0c} \texttt{cmp\_put0d} \texttt{cmp\_put0i}
+\texttt{cmp\_put0l} \texttt{cmp\_put0r} \texttt{cmp\_put1c}
+\texttt{cmp\_put1d} \texttt{cmp\_put1i} \texttt{cmp\_put1r}
+\texttt{cmp\_putni} \texttt{cmp\_putvc} \texttt{cmp\_putvd}
+\texttt{cmp\_putvi} \texttt{cmp\_putvr} \texttt{cmp\_shape}
+\texttt{cmp\_size} \texttt{cmp\_struc} \texttt{cmp\_type}
+\texttt{cmp\_unmap}
+\end{flushleft}
+
+\item[:misc]%
+\index{:misc@:misc}\mbox{}
+\begin{flushleft}
+\texttt{mem2string} \texttt{string2mem} \texttt{array2mem} 
+\texttt{mem2array} \texttt{fits\_get\_nth\_item} \texttt{fits\_read\_header} 
+\texttt{fits\_get\_item} \texttt{fits\_extract\_key\_val}
+\texttt{fits\_construct\_string} \texttt{par\_get}
+\end{flushleft}
+
+\end{description}
+
+% ? End of main text 
+\end{document}

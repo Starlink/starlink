@@ -1,0 +1,436 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocsource}    {ssn\stardocnumber}
+\newcommand{\stardocnumber}    {25.2}
+\newcommand{\stardocauthors}   {V S Dhillon\\G J Privett}
+\newcommand{\stardocdate}      {10th March 1997}
+\newcommand{\stardoctitle}     {PERIOD --- Installation Notes}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on  the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% Environment for indenting and using a small font.
+\newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
+% in-line verbatims
+\newcommand{\myverb}[1]{{\small \verb+#1+}}
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Large\bf \stardoctitle}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+%  \vspace{10mm}
+%  \begin{center}
+%     {\Large\bf Abstract}
+%  \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+% \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+% \newpage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+% \setcounter{page}{1}
+
+\section{\xlabel{introduction}Introduction}
+ 
+This document describes how to install {\tt PERIOD} version 4.2, a
+software package designed to search for periodicities in data.  A
+detailed description of how to use {\tt PERIOD} can be found in
+\xref{SUN/167}{sun167}{} and the program itself contains extensive
+on-line help. 
+
+This release of {\tt PERIOD} makes use of {\tt FITSIO} routines
+to read {\tt OGIP FITS} files so that must be installed if {\tt
+PERIOD} is to be built.  {\tt FITSIO} is normally installed as part of
+the Starlink Software Connection, which is also required to build the
+package.
+
+Version 4.2 represents the first Starlink port of this package to
+to encompass LINUX. It is also  the first version of {\tt PERIOD} to use 
+PGPLOT routines rather than the XANADU {\tt PLT} routine.  
+
+\section{\xlabel{installation}Installation}
+
+\subsection{Miscellaneous}
+
+The {\tt PERIOD} package consists of a number of FORTRAN subroutines
+which are compiled and linked to form the executable {\tt period\_main}
+on UNIX based systems.  The software provides largely the same functionality as
+the VMS based version 4.0.
+
+For the source only distribution, the compressed tar file supplied
+contains the source archive, the makefile, its driver {\tt mk} script,
+a news file and the three documents about {\tt PERIOD}.  These are:
+\xref{SUN/167}{sun167}{} --- the User's Guide, SSN/25 --- the
+Installation Notes (this document), and the program history file.  In
+addition, there are two
+archives containing hypertext versions of the User's Guide and
+Installation Notes.
+
+For the ready-to-run distributions, the compressed tar file supplied
+contains in addition to the source files listed above, the complete
+{\tt PERIOD} system built for an appropriate system.
+
+\subsection{Building PERIOD from source}
+
+To build {\tt PERIOD} from source, you need the source distribution, the
+PGPLOT system, and the Starlink infrastructure software.
+
+{\tt PERIOD} is supplied as a compressed tar file: {\tt period.tar.Z}.
+
+To build {\tt PERIOD} the contents of the compressed tar file must be
+extracted to a suitable directory.  On Starlink systems, this
+would be {\tt /star/period}.
+
+\begin{myquote}
+\begin{verbatim}
+% mkdir /star/period ; cd /star/period
+% zcat /tmp/period.tar.Z | tar xvf -
+\end{verbatim}
+\end{myquote}
+ 
+You must then set an environment variable to identify the type of
+operating system you are using.  The example given below shows the
+value of SYSTEM needed to create the Solaris 2 version of the software.
+The values required for other Starlink supported systems may be found
+in the files {\tt mk} and {\tt makefile}.
+
+\begin{myquote} 
+\begin{verbatim} 
+% setenv SYSTEM sun4_Solaris
+\end{verbatim} 
+\end{myquote}
+
+The UNIX `make' facility may then be employed to generate {\tt PERIOD}
+in the current directory, and clean up after itself.  The `make' facility
+should be driven the the {\tt mk} script provided which sets certain 
+system dependent make macros before invoking the makefile:
+
+\begin{myquote} 
+\begin{verbatim} 
+% ./mk build 
+% ./mk clean 
+\end{verbatim} 
+\end{myquote}
+
+\subsection{Ready-to-run distribution}
+
+The ready-to-run distribution is supplied in a compressed tar archive
+with a name which represents the system for which is is built.
+
+If you have a ready-to-run distribution, you should unpack the
+compressed tar file to the source directory, as detailed above for
+building.  However, you will not need to build {\tt PERIOD} or clean up
+the distribution.
+
+You will also need the Starlink HTX utility (see
+\xref{SUN/188}{sun188}{}) to allow the installation to procedure to
+manipulate the hypertext versions of the documentation.
+
+The ready-to-run distribution only requires installation, as follows.
+
+\subsection{Installing PERIOD}
+
+The makefile will install the binary and help files in the standard
+locations on Starlink systems:  the binary in {\tt INSTALL\_BIN}, the 
+documentation in {\tt INSTALL\_DOCS} and the help files in 
+{\tt INSTALL\_HELP}.  
+
+For {\tt PERIOD}, {\tt INSTALL\_BIN} is {\tt \$INSTALL/bin/period},
+{\tt INSTALL\_DOCS} is {\tt \$INSTALL/docs}, and
+{\tt INSTALL\_HELP} is {\tt \$INSTALL/help/period}.  These
+directories may be overridden by specifying root directory using the
+{\tt INSTALL} environment variable.
+
+You do not need to create the installation directories, the makefile will
+do that for you, provided you have write access to the directory defined
+as {\tt INSTALL}.
+
+On a Starlink system, {\tt INSTALL} is set to {\tt /star}, thus:
+
+\begin{myquote}
+\begin{verbatim}
+% setenv INSTALL /star
+\end{verbatim}
+\end{myquote}
+
+To install {\tt PERIOD}, invoke `make' thus:
+
+\begin{myquote}
+\begin{verbatim}
+% ./mk install
+\end{verbatim}
+\end{myquote}
+
+Once the software is installed, you should then define an alias for 
+{\tt PERIOD} in your {\tt .cshrc} file:
+
+\begin{myquote}
+\begin{verbatim}
+alias period /star/bin/period/period_main
+\end{verbatim}
+\end{myquote}
+
+In addition, define the environment variable {\tt PERIOD\_HELP} in your
+{\tt .login} file to point to the help files directory:
+
+\begin{myquote}
+\begin{verbatim}
+setenv PERIOD_HELP /your-INSTALL-directory/help/period
+\end{verbatim}
+\end{myquote}
+
+Once this has been done, any new user will be able to start up {\tt PERIOD}
+by simply typing {\tt period} at the command line.
+
+If you are installing {\tt PERIOD} on a Starlink system, in the default
+location, the standard Starlink {\tt login} and {\tt cshrc} files will
+detect its presence and define both the alias and environment variable
+automatically on login.
+
+\section{\xlabel{version4.2}Version 4.2}
+ 
+Version 4.2 is the second release of {\tt PERIOD} under the UNIX operating
+system but the first to encompass the LINUX operating system.
+ 
+The XANADU {\tt PLT} plotting system (not available for LINUX) employed by 
+previous versions of {\tt PERIOD} has been replaced by the more widely 
+available PGPLOT system. This has involved the loss of some of {\tt PLT}
+interactive plotting functions. However, these were rarely employed by users
+and it is felt that the small loss of functionality is greatly outweighed by
+the ability to run the software on a much larger number of machines.
+ 
+\section{\xlabel{version4.1}Version 4.1}
+
+Version 4.1 is the first release of {\tt PERIOD} under the UNIX operating
+system.  The functionality of the system is essentially the same as
+that of version 4.0 but with the ability to read some types of 
+{\tt OGIP FITS} files.  One minor difference is that the directory
+structure restrictions present within the VMS version have been
+removed.
+
+\section{\xlabel{version4.0}Version 4.0}
+
+Version 4.0 of {\tt PERIOD} is the fourth general release of the
+package, and the second release on Starlink. 
+
+The major change over version 3.0 is a number of bug fixes (most
+importantly to {\tt PERIOD\_CLEAN}), the removal of the {\tt CHAOS} and
+{\tt MEM} options, and the inclusion of a new option ({\tt SIG}) which
+calculates reliable false alarm probabilities for all periodograms.
+
+\section{\xlabel{Bugs}Contacts and Bug Reports}
+
+Please report any bugs, problems or suggestions for improvements to the
+author (who may be contacted by E-mail; SPAN: 29146::VSD, Internet: {\tt
+vsd@lpve.ing.iac.es}), who will be be very happy to receive them.
+
+Bug reports from Starlink systems should be sent to the Starlink
+Software Librarian, email {\tt ussc@star.rl.ac.uk}
+
+Note that any changes made to {\tt PERIOD} are documented in the
+history file {\tt period\_history.tex} (located in the source
+directory), which should be consulted for further information on
+version changes, bug fixes, {\em etc}.
+
+\end{document}
