@@ -1,0 +1,943 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                %
+%               FORMLOAD_DIR:AAT_SCHED_TEMPLATE.TEX              %
+%                Template for AAT Scheduling Form                %
+%                                                                %
+%               bill martin (rgo)  and sean ryan (aat)           %
+%                           january 1996                         %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%                   AAT INSTRUMENT SCHEDULING FORM
+% Either process the blank form with latex and then mark the appropriate boxes 
+% by hand, or search for the string "%%%", edit in the responses where 
+% appropriate, and process the completed form with latex. Check the output!
+% -or run with PATT2 application form system FORMLOAD
+
+% AAT V1.0 SGR 17/8/93
+% Based on ING telescope instrument scheduling form by Bill Martin
+% Please send any comments to sgr@aaoepp2.aao.gov.au (Sean Ryan, AAO).
+
+% To insert your own text, replace the lines that contain %?#$&input
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%?#$&pages
+% a xx xx xx xx xx a
+% a 1              a
+% x xx xx xx xx xx x
+
+%?#$&questions
+% a xxxxxxx xxxxxxx xxxxxxx xxxxxxx xxxxxxx a
+% a 01_1_01 01_1_02 01_1_03 01_1_04 01_1_05 a
+% a 01_1_06 01_1_07 01_1_08 01_1_09 01_1_10 a
+% a 01_1_11 01_1_12 01_2_01 01_2_02 01_2_03 a
+% a 01_2_04 01_2_05 01_2_06 01_2_07 01_2_08 a
+% a 01_2_09 01_2_10 01_2_11 01_2_12 01_2_13 a
+% a 01_2_14 01_2_15 01_2_16 01_2_17 01_2_18 a
+% a 01_2_19 01_2_20 01_2_21 01_2_22 01_2_23 a
+% a 01_2_24 01_2_25 01_2_27 01_2_28 01_2_29 a
+% a 01_2_30 01_3_01 01_3_02 01_3_03 01_3_04 a
+% a 01_3_05 01_3_06 01_3_07 01_3_08 01_4_01 a
+% a 01_4_02 01_4_03 01_4_04 01_4_05 01_4_06 a
+% a 01_4_07 01_4_08 01_4_09 01_4_10 01_4_11 a
+% a 01_4_12 01_4_13 01_4_14 01_4_15 01_4_16 a
+% a 01_4_17 01_4_18 01_4_19 01_4_20 01_4_21 a
+% a 01_4_22 01_4_23 01_4_24 01_4_25 01_4_26 a
+% a 01_4_27 01_4_28 01_4_29 01_4_30 01_4_31 a
+% a 01_4_32 01_4_33 01_4_34 01_4_35 01_4_36 a
+% a 01_4_37 01_4_38 01_4_39 01_4_40 01_4_41 a
+% a 01_4_42 01_4_43 01_4_44 01_4_45 01_5_01 a
+% a 01_5_02 01_5_03 01_5_04 01_5_05 01_1_13 a
+% a 01_6_01 01_6_02 01_6_03 01_6_04 01_6_05 a
+% a 01_5_06 XE_0_00                         a
+% x xxxxxxx xxxxxxx xxxxxxx xxxxxxx xxxxxxx x
+
+
+%?#$&message
+% a xxxxxxxxx1xxxxxxxxx2xxxxxxxxx3xxxxxxxxx4xxxxxxxxx5xxxxxxxxx6xxxxx a
+% a This AAT Instrument Request Form is correct as of January 1996    a
+% x xxxxxxxxx1xxxxxxxxx2xxxxxxxxx3xxxxxxxxx4xxxxxxxxx5xxxxxxxxx6xxxxx x
+
+%?#$&scale(001.000)(001.000)(000.000)(000.000)
+
+%?#$&startbeg
+
+ \documentstyle[11pt]{article}
+%?#$&offset
+\topmargin 0.00in
+\oddsidemargin -0.60in
+\evensidemargin -0.40in
+%?#$&endoffset
+
+ \textwidth 7.95in
+ \textheight 11.50in
+ \parskip 8pt plus 3pt minus 2pt
+ \parindent 0in
+ \pagestyle{empty}
+
+ %%%====================================
+ % These fonts may need local changes
+ \font\ajfrn=cmr10
+ \font\ajfrL=cmr12
+ \font\ajbf=cmssbx10
+ \font\ajssl=cmss12
+ \font\ajsss=cmss8
+ %=======================================
+ \font\frmin=cmr7
+ \font\ajinpfont=cmss9
+
+ \newcommand{\ajnull}{\makebox[0.05in]{\phantom{a}}}
+
+%?#$&startmid
+
+%?#$&input XE_0_00
+
+ \begin{document}
+
+ \small\setlength{\baselineskip}{2.3mm}
+
+%?#$&startend
+
+
+%?#$&page1
+
+ {\setlength{\unitlength}{0.25mm}
+
+ \huge\bf
+ \begin{picture}(800,1180)(50,-580)
+
+%%%	Is this form for the coming semester? If not, obtain an updated version.
+ \put(80,695){AAT Instrument Request Form - Semester 96B}
+ \normalsize\bf
+ \put(230,670){(Indicate choices by marking boxes appropriately)}
+
+ \linethickness{0.25mm}
+
+ \footnotesize\bf
+ \put(080,600){\framebox(100,25){Prime}}
+ \put(180,600){\framebox(20,25){ }}		%%%<--- mark in { }} for Prime F
+
+% Prime focus instrument
+ \put(200,613){\vector(1,0){30}}
+ \put(229,525){\framebox(001,100){}}
+ \put(230,600){\framebox(100,25){LBL f/1}}
+ \put(330,600){\framebox(20,25){ }}		%%%<--- mark for LBL f/1 imager
+ \put(230,575){\framebox(100,25){CCD f/3.3}}
+ \put(330,575){\framebox(20,25){ }}		%%%<--- mark for CCD at f/3.3
+ \put(230,550){\framebox(100,25){\scriptsize\bf Photographic}}
+ \put(330,550){\framebox(20,25){ }}		%%%<--- mark for PF photographic
+ \put(230,525){\framebox(100,25){2dF}}
+ \put(330,525){\framebox(20,25){ }}		%%%<--- mark for 2dF
+
+ \put(350,563){\vector(1,0){30}}
+ \put(380,545){\framebox(100,25){\tiny\bf Sub-beam prism?}}
+ \put(480,545){\framebox(20,25){ }}		%%%<--- Y or N for subbeam prism
+
+ \put(500,563){\vector(1,0){29}}
+ \put(529,525){\framebox(001,50){}}
+ \put(530,550){\framebox(100,25){Triplet}}
+ \put(630,550){\framebox(20,25){ }}		%%%<--- photographic triplet
+ \put(530,525){\framebox(100,25){Doublet}}
+ \put(630,525){\framebox(20,25){ }}		%%%<--- photographic doublet
+
+% Filters for LBL f/1
+ \put(350,613){\vector(1,0){30}}
+ \put(380,605){\framebox(100,25){$^{\rm\bf Filters:~ 3~ of}_{\rm\bf B,V,V+R,R,I}$}}
+ \put(480,605){\framebox(20,25){ }}		%%%<--- filter 1 for LBL f/1
+ \put(500,605){\framebox(20,25){ }}		%%%<--- filter 2 for LBL f/1
+ \put(520,605){\framebox(20,25){ }}		%%%<--- filter 3 for LBL f/1
+
+% Detector for LBL f/1
+ \put(540,613){\vector(1,0){140}}
+ \put(680,605){\framebox(100,25)
+ {\scriptsize $^{\rm\bf Detector\ options}_{\rm\bf \hskip 10mm 2,3}$}}
+ \put(780,605){\framebox(20,25){ }}		%%%<--- LBL f/1 detector
+
+% Detector for f/3.3 CCD imaging
+ \put(350,588){\vector(1,0){30}}
+ \put(380,575){\framebox(120,25){Doublet}}
+ \put(500,588){\vector(1,0){180}}
+ \put(680,575){\framebox(100,25)
+ {\scriptsize $^{\rm\bf Detector\ options}_{\rm\bf \hskip 10mm 1,2,3}$}}
+ \put(780,575){\framebox(20,25){ }}		%%%<--- f/3.3 detector
+
+% Cass focus
+ \put(080,450){\framebox(100,25){Cass}}
+ \put(180,450){\framebox(20,25){ }}		%%%<--- mark for Cass focus
+
+% Cass instruments
+ \put(200,463){\vector(1,0){29}}
+ \put(229,325){\framebox(001,150){}}
+ \put(230,450){\framebox(60,25){RGO $\dagger$}}
+ \put(290,463){\framebox(40,12){25cm}}
+ \put(290,450){\framebox(40,12){82cm}}
+ \put(330,463){\framebox(20,12){ }}		%%%<--- mark for RGO 25cm camera
+ \put(330,450){\framebox(20,12){ }}		%%%<--- mark for RGO 82cm camera
+ \put(230,425){\framebox(60,25){IRIS}}
+ \put(290,438){\framebox(40,12){\scriptsize\bf f/15}}
+ \put(290,425){\framebox(40,12){\scriptsize\bf f/36}}
+ \put(330,438){\framebox(20,12){ }}		%%%<--- mark for f/15 IRIS
+ \put(330,425){\framebox(20,12){ }}		%%%<--- mark for f/36 IRIS
+ \put(230,400){\framebox(100,25){HatPol * }}
+ \put(330,400){\framebox(20,25){ }}		%%%<--- mark for Hatfield Polar.
+ \put(230,375){\framebox(100,25){LDSS * }}
+ \put(330,375){\framebox(20,25){ }}		%%%<--- mark for LDSS
+ \put(230,350){\framebox(100,25){\scriptsize\bf Taurus *}}
+ \put(330,350){\framebox(20,25){ }}		%%%<--- mark for Taurus
+ \put(230,325){\framebox(100,25){MES * }}
+ \put(330,325){\framebox(20,25){ }}		%%%<--- mark for Man. Ech. Spec.
+% \put(230,300){\framebox(100,25){ANU echelle * }}
+% \put(330,300){\framebox(20,25){ }}		%%%<--- mark for ANU Ech. Spec.
+
+ \put(135,450){\line(0,-1){175}}
+ \put(080,250){\framebox(100,25){Auxiliary}}
+ \put(180,250){\framebox(20,25){ }}		%%%<--- mark for auxiliary focus
+
+% auxiliary focus instruments
+ \put(200,263){\vector(1,0){29}}
+ \put(229,225){\framebox(001,50){}}
+ \put(230,250){\framebox(100,25){CCD imaging}}
+ \put(330,250){\framebox(20,25){ }}		%%%<--- CCD imaging @ auxiliary
+ \put(230,225){\framebox(100,25){\scriptsize\bf Photometer * }}
+ \put(330,225){\framebox(20,25){ }}		%%%<--- auxiliary photometer
+% \put(350,237){\vector(1,0){30}}
+% \put(380,203){\framebox(001,44){}}
+% \put(381,225){\framebox(099,22){S20}}
+% \put(381,203){\framebox(099,22){GaAs}}
+% \put(480,225){\framebox(20,22){ }}		%%%<--- S20 photomultiplier
+% \put(480,203){\framebox(20,22){ }}		%%%<--- GaAs photomultiplier
+
+% detectors for auxiliary focus imaging
+ \put(350,263){\vector(1,0){30}}
+ \put(380,253){\framebox(100,22)
+ {\scriptsize $^{\rm\bf Detector\ options}_{\rm\bf \hskip 8mm 1,2,3,5}$}}
+ \put(480,253){\framebox(20,22){ }}		%%%<--- CCD detector (Auxiliary)
+
+% RGO options
+ \put(350,469){\vector(1,0){30}}
+ \put(350,456){\vector(1,0){30}}
+ \put(380,453){\framebox(100,22){FORS?}}
+ \put(480,453){\framebox(20,22){ }}		%%%<--- mark Y or N for FORS
+
+ \put(500,463){\vector(1,0){29}}
+ \put(529,379){\framebox(001,96){}}
+ \put(530,451){\framebox(100,24){no modules}}
+ \put(630,451){\framebox(20,24){ }}		%%%<--- without fibres or polar.
+ \put(530,427){\framebox(60,24){\tiny\bf POLARIM.}}
+ \put(590,439){\framebox(40,12){\tiny\bf 1/4 $\lambda$}}
+ \put(590,427){\framebox(40,12){\tiny\bf 1/2 $\lambda$}}
+ \put(630,439){\framebox(20,12){ }}		%%%<--- 1/4 waveplate polarimet.
+ \put(630,427){\framebox(20,12){ }}		%%%<--- 1/2 waveplate polarimet.
+ \put(530,403){\framebox(100,24){AUTOFIB}}
+ \put(630,403){\framebox(20,24){ }}		%%%<--- mark for AUTOFIB
+ \put(530,379){\framebox(60,24){\scriptsize\bf FOCAP *}}
+ \put(590,391){\framebox(40,12){\tiny\bf @ Cass}}
+ \put(590,379){\framebox(40,12){\tiny\bf @ Aux}}
+ \put(630,391){\framebox(20,12){ }}		%%%<--- FOCAP at main Cass focus
+ \put(630,379){\framebox(20,12){ }}		%%%<--- FOCAP at Auxiliary focus
+
+% detectors for RGO spectrograph
+ \put(650,463){\vector(1,0){30}}
+ \put(650,444){\vector(1,0){30}}
+ \put(650,431){\vector(1,0){30}}
+ \put(650,413){\vector(1,0){30}}
+ \put(650,394){\vector(1,0){30}}
+ \put(650,381){\vector(1,0){30}}
+ \put(680,379){\framebox(1,96){}}
+ \put(681,414){\framebox(100,25)
+ {\scriptsize $^{\rm\bf Detector\ options}_{\rm\bf \hskip 10mm 1,2,3}$}}
+ \put(781,414){\framebox(20,25){ }}		%%%<--- detector on RGO spec.
+
+% IRISPOL option
+ \put(350,444){\vector(1,0){30}}
+ \put(350,431){\vector(1,0){30}}
+ \put(380,425){\framebox(60,22){\tiny\bf IRISPOL?}}
+ \put(440,436){\framebox(40,11){\tiny\bf 1/4 $\lambda$}}
+ \put(440,425){\framebox(40,11){\tiny\bf 1/2 $\lambda$}}
+ \put(480,436){\framebox(20,11){ }}		%%%<--- IRIS 1/4 waveplate polar
+ \put(480,425){\framebox(20,11){ }}		%%%<--- IRIS 1/2 waveplate polar
+
+
+% Detector for LDSS 
+ \put(350,388){\vector(1,0){30}}
+ \put(380,378){\framebox(100,22)
+ {\scriptsize $^{\rm\bf Detector\ options}_{\rm\bf \hskip 10mm 1,2,3}$}}
+ \put(480,378){\framebox(20,22){ }}		%%%<--- LDSS detector 
+
+% Options for Taurus
+ \put(350,363){\vector(1,0){30}}
+ \put(380,328){\framebox(001,44){}}
+ \put(381,350){\framebox(059,22){FP}}
+ \put(381,328){\framebox(059,22){FOP}}
+ \put(440,361){\framebox(040,11){\scriptsize\bf f/8}}
+ \put(440,350){\framebox(040,11){\scriptsize\bf f/15}}
+ \put(480,361){\framebox(020,11){ }}		%%%<--- Taurus f/8 imager
+ \put(480,350){\framebox(020,11){ }}		%%%<--- Taurus f/15 imager
+ \put(440,339){\framebox(040,11){\tiny\bf 1/4 $\lambda$}}
+ \put(440,328){\framebox(040,11){\tiny\bf 1/2 $\lambda$}}
+ \put(480,339){\framebox(020,11){ }}		%%%<--- Taurus 1/4 waveplate
+ \put(480,328){\framebox(020,11){ }}		%%%<--- Taurus 1/2 waveplate
+
+% Taurus imager detectors
+% \put(500,367){\vector(1,0){180}}
+% \put(500,356){\vector(1,0){180}}
+% \put(680,328){\framebox(001,44){}}
+% \put(681,350){\framebox(100,22){Etalon+IPCS}}
+% \put(781,350){\framebox(020,22){ }}		%%%<--- Taurus etalon and IPCS
+% \put(681,328){\framebox(100,22)
+% {\scriptsize $^{\rm\bf Detector\ options}_{\rm\bf \hskip 6mm 1a/b,2,3,4}$}}
+% \put(781,328){\framebox(020,22){ }}		%%%<--- Taurus CCDs or IPCS
+
+% Faint Object Polarimeter detectors (CCDs only)
+% \put(500,345){\vector(1,0){30}}
+% \put(500,334){\vector(1,0){30}}
+% \put(530,328){\framebox(100,22)
+% {\scriptsize $^{\rm\bf Detector\ options}_{\rm\bf \hskip 6mm 1a/b,2,3}$}}
+% \put(630,328){\framebox(020,22){ }}		%%%<--- Faint Object Polarim CCD
+
+ \put(500,367){\vector(1,0){180}}
+ \put(500,356){\vector(1,0){180}}
+ \put(500,345){\vector(1,0){180}}
+ \put(500,334){\vector(1,0){180}}
+ \put(680,328){\framebox(001,44){}}
+ \put(681,339){\framebox(100,22)
+ {\scriptsize $^{\rm\bf Detector\ options}_{\rm\bf \hskip 10mm 1,2,3}$}}
+ \put(781,339){\framebox(020,22){ }}		%%%<--- Faint Object Polarim CCD
+
+ \put(080,200){* Instrument has special status; discuss with instrument
+                   scientist before applying.}
+
+% coude
+ \put(080,150){\framebox(100,25){Coude}}
+ \put(180,150){\framebox(20,25){ }}		%%%<--- mark for coude
+
+% coude instruments
+ \put(200,163){\vector(1,0){29}}
+ \put(229,125){\framebox(001,50){}}
+ \put(230,150){\framebox(100,25){UCLES $\dagger$}}
+ \put(330,150){\framebox(20,25){ }}		%%%<--- mark for UCLES
+ \put(230,125){\framebox(100,25){UHRF}}
+ \put(330,125){\framebox(20,25){ }}		%%%<--- mark for UHRF
+
+ \put(350,138){\vector(1,0){30}}
+ \put(380,075){\framebox(001,75){}}
+ \put(381,125){\framebox(099,25){1.0M}}
+ \put(481,125){\framebox(20,25){ }}		%%%<--- UHRF at 1 million resol.
+ \put(381,100){\framebox(099,25){0.6M}}
+ \put(481,100){\framebox(20,25){ }}		%%%<--- UHRF at 600000 resol.
+ \put(381,075){\framebox(099,25){0.3M}}
+ \put(481,075){\framebox(20,25){ }}		%%%<--- UHRF at 300000 resol.
+
+% UCLES detector
+ \put(350,163){\vector(1,0){330}}
+ \put(680,150){\framebox(100,25)
+ {\scriptsize $^{\rm\bf Detector\ options}_{\rm\bf \hskip 8mm 1,2,3,4}$}}
+ \put(780,150){\framebox(20,25){ }}		%%%<--- UCLES detector
+
+% UHRF detector
+ \put(500,138){\vector(1,0){30}}
+ \put(500,113){\vector(1,0){30}}
+ \put(500,088){\vector(1,0){30}}
+ \put(530,075){\framebox(1,75){}}
+ \put(531,100){\framebox(100,25)
+ {\scriptsize $^{\rm\bf Detector\ options}_{\rm\bf \hskip 8mm 1,2,3,4}$}}
+ \put(631,100){\framebox(20,25){ }}		%%%<--- UHRF detector
+
+% Detector legend
+ \put(080,050){Detector}
+ \put(080,040){legend}
+% \put(140,035){\framebox(100,25)
+% {\scriptsize $^{\rm\bf 1a\ =\ Tek @ 200K}_{\rm\bf 1b\ =\ Tek @ 170K}$}}
+ \put(140,035){\framebox(100,25){\scriptsize\bf 1 = Tek}}
+ \put(240,035){\framebox(100,25){\scriptsize\bf 2 = blue Thom}}
+ \put(340,035){\framebox(100,25){\scriptsize\bf 3 = red Thom}}
+ \put(440,035){\framebox(100,25){\scriptsize\bf 4 = coude IPCS}}
+ \put(540,035){\framebox(100,25)
+ {\scriptsize $^{\rm\bf 5\ =\ other}_{\rm\bf (specify\ below)}$}}
+% \put(340,035){\framebox(100,25){\scriptsize\bf 3 = red Thom}}
+% \put(440,035){\framebox(100,25){\scriptsize\bf 4 = cass IPCS}}
+% \put(540,035){\framebox(100,25){\scriptsize\bf 5 = coude IPCS}}
+% \put(640,035){\framebox(100,25)
+% {\scriptsize $^{\rm\bf 6\ =\ other}_{\rm\bf (specify\ below)}$}}
+
+% RGO gratings
+ \put(080,020){RGO }
+ \put(080,010){gratings}
+ \put(140,005){\framebox(40,20){\scriptsize\bf 250B}}
+ \put(180,005){\framebox(15,20){ }}		%%%<--- RGO 250B grating
+ \put(195,005){\framebox(40,20){\scriptsize\bf 270R}}
+ \put(235,005){\framebox(15,20){ }}		%%%<--- RGO 270R grating
+ \put(250,005){\framebox(40,20){\scriptsize\bf 300B}}
+ \put(290,005){\framebox(15,20){ }}		%%%<--- RGO 300B grating
+ \put(305,005){\framebox(40,20){\scriptsize\bf 600U}}
+ \put(345,005){\framebox(15,20){ }}		%%%<--- RGO 600U grating
+ \put(360,005){\framebox(40,20){\scriptsize\bf 600V}}
+ \put(400,005){\framebox(15,20){ }}		%%%<--- RGO 600V grating
+ \put(415,005){\framebox(40,20){\scriptsize\bf 600R}}
+ \put(455,005){\framebox(15,20){ }}		%%%<--- RGO 600R grating
+ \put(470,005){\framebox(40,20){\scriptsize\bf 600H}}
+ \put(510,005){\framebox(15,20){ }}		%%%<--- RGO 600H grating
+ \put(525,005){\framebox(40,20){\scriptsize\bf 1200B}}
+ \put(565,005){\framebox(15,20){ }}		%%%<--- RGO 1200B grating
+ \put(580,005){\framebox(40,20){\scriptsize\bf 1200V}}
+ \put(620,005){\framebox(15,20){ }}		%%%<--- RGO 1200V grating
+ \put(635,005){\framebox(40,20){\scriptsize\bf 1200R}}
+ \put(675,005){\framebox(15,20){ }}		%%%<--- RGO 1200R grating
+ \put(690,005){\framebox(40,20){\scriptsize\bf 1200I}}
+ \put(730,005){\framebox(15,20){ }}		%%%<--- RGO 1200I grating
+ \put(745,005){\framebox(40,20){\scriptsize\bf 1200J}}
+ \put(785,005){\framebox(15,20){ }}             %%%<--- RGO 1200J grating
+
+% Taurus etalons
+ \put(080,-010){Taurus}
+ \put(080,-020){etalons}
+ \put(140,-025){\framebox(40,20){\scriptsize\bf $^1$500$\mu$}}
+ \put(180,-025){\framebox(20,20){ }}		%%%<--- etalon #1
+ \put(200,-025){\framebox(40,20){\scriptsize\bf $^2$250$\mu$}}
+ \put(240,-025){\framebox(20,20){ }}		%%%<--- etalon #2
+ \put(260,-025){\framebox(40,20){\scriptsize\bf $^3$125$\mu$}}
+ \put(300,-025){\framebox(20,20){ }}		%%%<--- etalon #3
+ \put(320,-025){\framebox(40,20){\scriptsize\bf $^4$70$\mu$}}
+ \put(360,-025){\framebox(20,20){ }}		%%%<--- etalon #4
+ \put(380,-025){\framebox(40,20){\scriptsize\bf $^5$15$\mu$}}
+ \put(420,-025){\framebox(20,20){ }}		%%%<--- etalon #5
+ \put(440,-025){\framebox(40,20){\scriptsize\bf $^6$200$\mu$}}
+ \put(480,-025){\framebox(20,20){ }}		%%%<--- etalon #6
+
+% Imaging filters
+ \put(080,-040){Imaging}
+ \put(080,-050){filters}
+ \put(140,-055){\framebox(40,20){$^1$U}}
+ \put(180,-055){\framebox(20,20){ }}		%%%<--- mark for filter 1
+ \put(200,-055){\framebox(40,20){$^2$B}}
+ \put(240,-055){\framebox(20,20){ }}		%%%<--- mark for filter 2
+ \put(260,-055){\framebox(40,20){$^3$V}}
+ \put(300,-055){\framebox(20,20){ }}		%%%<--- mark for filter 3
+ \put(320,-055){\framebox(40,20){$^4$R}}
+ \put(360,-055){\framebox(20,20){ }}		%%%<--- mark for filter 4
+ \put(380,-055){\framebox(40,20){$^5$I}}
+ \put(420,-055){\framebox(20,20){ }}		%%%<--- mark for filter 5
+ \put(560,-055){\framebox(100,20){
+ \scriptsize $^{\rm\bf Other}_{\rm\bf (specify~below)}$}}
+ \put(660,-055){\framebox(20,20){ }}		%%%<--- mark for filter 5
+
+ \put(200,-75){\framebox(40,20){$^6$B}}
+ \put(240,-75){\framebox(20,20){ }}		%%%<--- mark for filter 6
+ \put(260,-75){\framebox(40,20){$^7$V}}
+ \put(300,-75){\framebox(20,20){ }}		%%%<--- mark for filter 7
+ \put(320,-75){\framebox(40,20){$^8$R}}
+ \put(360,-75){\framebox(20,20){ }}		%%%<--- mark for filter 8
+ \put(380,-75){\framebox(40,20){$^9$I}}
+ \put(420,-75){\framebox(20,20){ }}		%%%<--- mark for filter 9
+
+ \put(200,-095){\framebox(40,20){\tiny\bf $^{10}$B(J)}}
+ \put(240,-095){\framebox(20,20){ }}		%%%<--- mark for filter 10
+ \put(320,-095){\framebox(40,20){\tiny\bf $^{11}$R(F)}}
+ \put(360,-095){\framebox(20,20){ }}		%%%<--- mark for filter 11
+ \put(380,-095){\framebox(40,20){\tiny\bf $^{12}$I(N)}}
+ \put(420,-095){\framebox(20,20){ }}		%%%<--- mark for filter 12
+
+ \put(200,-115){\framebox(40,20){\tiny\bf $^{13}$B(*)}}
+ \put(240,-115){\framebox(20,20){ }}		%%%<--- mark for filter 13
+ \put(320,-115){\framebox(40,20){\tiny\bf $^{14}$R(*)}}
+ \put(360,-115){\framebox(20,20){ }}		%%%<--- mark for filter 14
+ \put(380,-115){\framebox(40,20){\scriptsize\bf $^{15}$695}}
+ \put(420,-115){\framebox(20,20){ }}		%%%<--- mark for filter 15
+ \put(440,-115){\framebox(40,20){\scriptsize\bf $^{16}$780}}
+ \put(480,-115){\framebox(20,20){ }}		%%%<--- mark for filter 16
+ \put(500,-115){\framebox(40,20){\scriptsize\bf $^{17}$830}}
+ \put(540,-115){\framebox(20,20){ }}		%%%<--- mark for filter 17
+ \put(560,-115){\framebox(40,20){\scriptsize\bf $^{18}$KG3}}
+ \put(600,-115){\framebox(20,20){ }}		%%%<--- mark for filter 18
+ \put(620,-115){\framebox(40,20){\tiny\bf $^{19}$O(*)}}
+ \put(660,-115){\framebox(20,20){ }}		%%%<--- mark for filter 19
+
+ \put(80,-130){H$\alpha$}
+ \put(80,-140){filters}
+ \put(140,-145){\framebox(40,20){\tiny\bf 660/11}}
+ \put(180,-145){\framebox(20,20){ }}		%%%<--- mark for this Ha filter 
+ \put(200,-145){\framebox(40,20){\tiny\bf 669/12}}
+ \put(240,-145){\framebox(20,20){ }}		%%%<--- mark for this Ha filter 
+ \put(260,-145){\framebox(40,20){\tiny\bf 681/12}}
+ \put(300,-145){\framebox(20,20){ }}		%%%<--- mark for this Ha filter 
+ \put(320,-145){\framebox(40,20){\tiny\bf 690/8}}
+ \put(360,-145){\framebox(20,20){ }}		%%%<--- mark for this Ha filter 
+ \put(380,-145){\framebox(40,20){\tiny\bf 709/8}}
+ \put(420,-145){\framebox(20,20){ }}		%%%<--- mark for this Ha filter 
+ \put(440,-145){\framebox(40,20){\tiny\bf 712/13}}
+ \put(480,-145){\framebox(20,20){ }}		%%%<--- mark for this Ha filter 
+ \put(560,-145){\framebox(100,20){
+ \scriptsize $^{\rm\bf Other}_{\rm\bf (specify~below)}$}}
+ \put(660,-145){\framebox(20,20){ }}		%%%<--- mark for other filter 
+
+% Reduction software 
+
+ \put(080,-175){\scriptsize\bf Reduction}
+ \put(080,-185){\footnotesize\bf software}
+ \put(140,-190){\framebox(100,20){\scriptsize\bf IRAF$\ddagger$}}
+ \put(240,-190){\framebox(020,20){ }}             %%%<--- IRAF
+ \put(260,-190){\framebox(100,20){\scriptsize\bf Figaro 3$\ddagger$
+ {\tiny Starlink}}}
+ \put(360,-190){\framebox(020,20){ }}             %%%<--- Figaro 3
+ \put(380,-190){\framebox(100,20){\scriptsize\bf Figaro 4$\ddagger$
+ {\tiny AAO}}}
+ \put(480,-190){\framebox(020,20){ }}             %%%<--- Figaro 4
+ \put(500,-190){\framebox(100,20){\scriptsize\bf Other Starlink$\ddagger$}}
+ \put(600,-190){\framebox(020,20){ }}            %%%<--- Other Starlink
+ \put(620,-190){\framebox(100,20){\scriptsize\bf Other$\ddagger$}}
+ \put(720,-190){\framebox(020,20){ }}            %%%<--- Other
+
+% Summary information
+
+ \rm
+ \put(080,-305){\framebox(700,105){}}
+ \put(090,-215){\bf $\dagger$ Setup wavelength for detector rotation: }
+ \put(090,-230){\bf $\ddagger$ Specify package, display, etc:}
+ \put(090,-245){\bf Other instrumentation requests:}
+%%% ADD OTHER INSTRUMENTATION REQUESTS IN THE { } SPACES BELOW. YOU MUST DO 
+%   YOUR OWN LINE BREAKS.
+ \put(090,-245){ }
+ \put(090,-260){ }
+ \put(090,-275){ }
+ \put(090,-290){ }
+
+ \put(080,-385){\framebox(700,70){}}
+ \put(090,-335){\bf Name:}
+ \put(200,-335){  }		%%%<--- Principal applicant
+ \put(090,-355){\bf Institution:}
+ \put(200,-355){  }		%%%<--- Applicant's institution
+ \put(090,-375){\bf Proposal Title:}
+ \put(200,-375){  }		%%%<--- Title of project
+                                                                                
+ \end{picture}}
+
+\vspace*{-26.75cm}{\ajinpfont
+
+{%?#$&\bjpos(03.30)(-4.30)(02.00)(02.00)
+\ajnull%?#$&input 01_1_01
+}
+
+{%?#$&\bjpos(07.05)(-4.30)(02.00)(02.00)
+\ajnull%?#$&input 01_1_02
+}
+
+{%?#$&\bjpos(10.75)(-4.40)(02.00)(02.00)
+\ajnull%?#$&input 01_1_03
+}
+
+{%?#$&\bjpos(11.30)(-4.40)(02.00)(02.00)
+\ajnull%?#$&input 01_1_04
+}
+
+{%?#$&\bjpos(11.80)(-4.40)(02.00)(02.00)
+\ajnull%?#$&input 01_1_05
+}
+
+{%?#$&\bjpos(18.30)(-4.40)(02.00)(02.00)
+\ajnull%?#$&input 01_1_06
+}
+
+{%?#$&\bjpos(07.05)(-2.50)(02.00)(02.00)
+\ajnull%?#$&input 01_1_13
+}
+
+{%?#$&\bjpos(07.05)(-3.70)(02.00)(02.00)
+\ajnull%?#$&input 01_1_07
+}
+
+{%?#$&\bjpos(18.30)(-3.70)(02.00)(02.00)
+\ajnull%?#$&input 01_1_08
+}
+
+{%?#$&\bjpos(07.05)(-3.10)(02.00)(02.00)
+\ajnull%?#$&input 01_1_09
+}
+
+{%?#$&\bjpos(10.85)(-2.95)(02.00)(02.00)
+\ajnull%?#$&input 01_1_10
+}
+
+{%?#$&\bjpos(14.55)(-3.05)(02.00)(02.00)
+\ajnull%?#$&input 01_1_11
+}
+
+{%?#$&\bjpos(14.55)(-2.45)(02.00)(02.00)
+\ajnull%?#$&input 01_1_12
+}
+
+{%?#$&\bjpos(03.35)(-0.55)(02.00)(02.00)
+\ajnull%?#$&input 01_2_01
+}
+
+{%?#$&\bjpos(07.05)(-0.75)(02.00)(02.00)
+\ajnull%?#$&input 01_2_02
+}
+
+{%?#$&\bjpos(07.05)(-0.40)(02.00)(02.00)
+\ajnull%?#$&input 01_2_03
+}
+
+{%?#$&\bjpos(10.80)(-0.60)(02.00)(02.00)
+\ajnull%?#$&input 01_2_04
+}
+
+{%?#$&\bjpos(14.55)(-0.60)(02.00)(02.00)
+\ajnull%?#$&input 01_2_05
+}
+
+{%?#$&\bjpos(14.55)(-0.15)(02.00)(02.00)
+\ajnull%?#$&input 01_2_06
+}
+
+{%?#$&\bjpos(14.55)(00.15)(02.00)(02.00)
+\ajnull%?#$&input 01_2_07
+}
+
+{%?#$&\bjpos(14.55)(00.60)(02.00)(02.00)
+\ajnull%?#$&input 01_2_08
+}
+
+{%?#$&\bjpos(14.55)(01.05)(02.00)(02.00)
+\ajnull%?#$&input 01_2_09
+}
+
+{%?#$&\bjpos(14.55)(01.40)(02.00)(02.00)
+\ajnull%?#$&input 01_2_10
+}
+
+{%?#$&\bjpos(18.35)(00.30)(02.00)(02.00)
+\ajnull%?#$&input 01_2_11
+}
+
+{%?#$&\bjpos(07.05)(-0.15)(02.00)(02.00)
+\ajnull%?#$&input 01_2_12
+}
+
+{%?#$&\bjpos(07.05)(00.15)(02.00)(02.00)
+\ajnull%?#$&input 01_2_13
+}
+
+{%?#$&\bjpos(10.85)(-0.10)(02.00)(02.00)
+\ajnull%?#$&input 01_2_14
+}
+
+{%?#$&\bjpos(10.85)(00.20)(02.00)(02.00)
+\ajnull%?#$&input 01_2_15
+}
+
+{%?#$&\bjpos(07.05)(00.65)(02.00)(02.00)
+\ajnull%?#$&input 01_2_16
+}
+
+{%?#$&\bjpos(07.05)(01.25)(02.00)(02.00)
+\ajnull%?#$&input 01_2_17
+}
+
+{%?#$&\bjpos(10.85)(01.30)(02.00)(02.00)
+\ajnull%?#$&input 01_2_18
+}
+
+{%?#$&\bjpos(07.05)(01.85)(02.00)(02.00)
+\ajnull%?#$&input 01_2_19
+}
+
+{%?#$&\bjpos(10.85)(01.80)(02.00)(02.00)
+\ajnull%?#$&input 01_2_20
+}
+
+{%?#$&\bjpos(10.85)(02.05)(02.00)(02.00)
+\ajnull%?#$&input 01_2_21
+}
+
+{%?#$&\bjpos(10.85)(02.35)(02.00)(02.00)
+\ajnull%?#$&input 01_2_22
+}
+
+{%?#$&\bjpos(10.85)(02.65)(02.00)(02.00)
+\ajnull%?#$&input 01_2_23
+}
+
+{%?#$&\bjpos(18.30)(02.20)(02.00)(02.00)
+\ajnull%?#$&input 01_2_24
+}
+
+{%?#$&\bjpos(07.05)(02.60)(02.00)(02.00)
+\ajnull%?#$&input 01_2_25
+}
+
+{%?#$&\bjpos(03.30)(04.40)(02.00)(02.00)
+\ajnull%?#$&input 01_2_27
+}
+
+{%?#$&\bjpos(07.05)(04.40)(02.00)(02.00)
+\ajnull%?#$&input 01_2_28
+}
+
+{%?#$&\bjpos(10.85)(04.40)(02.00)(02.00)
+\ajnull%?#$&input 01_2_29
+}
+
+{%?#$&\bjpos(07.05)(05.05)(02.00)(02.00)
+\ajnull%?#$&input 01_2_30
+}
+
+{%?#$&\bjpos(03.30)(06.90)(02.00)(02.00)
+\ajnull%?#$&input 01_3_01
+}
+
+{%?#$&\bjpos(07.10)(06.95)(02.00)(02.00)
+\ajnull%?#$&input 01_3_02
+}
+
+{%?#$&\bjpos(18.40)(06.90)(02.00)(02.00)
+\ajnull%?#$&input 01_3_03
+}
+
+{%?#$&\bjpos(07.10)(07.50)(02.00)(02.00)
+\ajnull%?#$&input 01_3_04
+}
+
+{%?#$&\bjpos(10.85)(07.50)(02.00)(02.00)
+\ajnull%?#$&input 01_3_05
+}
+
+{%?#$&\bjpos(10.85)(08.10)(02.00)(02.00)
+\ajnull%?#$&input 01_3_06
+}
+
+{%?#$&\bjpos(10.85)(08.75)(02.00)(02.00)
+\ajnull%?#$&input 01_3_07
+}
+
+{%?#$&\bjpos(14.60)(08.15)(02.00)(02.00)
+\ajnull%?#$&input 01_3_08
+}
+
+{%?#$&\bjpos(03.25)(10.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_01
+}
+
+{%?#$&\bjpos(04.60)(10.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_02
+}
+
+{%?#$&\bjpos(06.00)(10.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_03
+}
+
+{%?#$&\bjpos(07.40)(10.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_04
+}
+
+{%?#$&\bjpos(08.75)(10.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_05
+}
+
+{%?#$&\bjpos(10.10)(10.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_06
+}
+
+{%?#$&\bjpos(11.50)(10.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_07
+}
+
+{%?#$&\bjpos(12.85)(10.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_08
+}
+
+{%?#$&\bjpos(14.25)(10.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_09
+}
+
+{%?#$&\bjpos(15.65)(10.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_10
+}
+
+{%?#$&\bjpos(17.00)(10.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_11
+}
+
+{%?#$&\bjpos(18.35)(10.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_12
+}
+
+{%?#$&\bjpos(03.35)(11.30)(02.00)(02.00)
+\ajnull%?#$&input 01_4_13
+}
+
+{%?#$&\bjpos(04.85)(11.30)(02.00)(02.00)
+\ajnull%?#$&input 01_4_14
+}
+
+{%?#$&\bjpos(06.35)(11.30)(02.00)(02.00)
+\ajnull%?#$&input 01_4_15
+}
+
+{%?#$&\bjpos(07.85)(11.30)(02.00)(02.00)
+\ajnull%?#$&input 01_4_16
+}
+
+{%?#$&\bjpos(09.35)(11.30)(02.00)(02.00)
+\ajnull%?#$&input 01_4_17
+}
+
+{%?#$&\bjpos(10.85)(11.30)(02.00)(02.00)
+\ajnull%?#$&input 01_4_18
+}
+
+{%?#$&\bjpos(03.30)(12.05)(02.00)(02.00)
+\ajnull%?#$&input 01_4_19
+}
+
+{%?#$&\bjpos(04.85)(12.05)(02.00)(02.00)
+\ajnull%?#$&input 01_4_20
+}
+
+{%?#$&\bjpos(06.35)(12.05)(02.00)(02.00)
+\ajnull%?#$&input 01_4_21
+}
+
+{%?#$&\bjpos(07.85)(12.05)(02.00)(02.00)
+\ajnull%?#$&input 01_4_22
+}
+
+{%?#$&\bjpos(09.35)(12.05)(02.00)(02.00)
+\ajnull%?#$&input 01_4_23
+}
+
+{%?#$&\bjpos(15.35)(12.05)(02.00)(02.00)
+\ajnull%?#$&input 01_4_24
+}
+
+{%?#$&\bjpos(04.85)(12.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_25
+}
+
+{%?#$&\bjpos(06.35)(12.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_26
+}
+
+{%?#$&\bjpos(07.85)(12.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_27
+}
+
+{%?#$&\bjpos(09.35)(12.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_28
+}
+
+{%?#$&\bjpos(04.85)(13.05)(02.00)(02.00)
+\ajnull%?#$&input 01_4_29
+}
+
+{%?#$&\bjpos(07.85)(13.05)(02.00)(02.00)
+\ajnull%?#$&input 01_4_30
+}
+
+{%?#$&\bjpos(09.35)(13.05)(02.00)(02.00)
+\ajnull%?#$&input 01_4_31
+}
+
+{%?#$&\bjpos(04.85)(13.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_32
+}
+
+{%?#$&\bjpos(07.85)(13.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_33
+}
+
+{%?#$&\bjpos(09.35)(13.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_34
+}
+
+{%?#$&\bjpos(10.85)(13.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_35
+}
+
+{%?#$&\bjpos(12.35)(13.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_36
+}
+
+{%?#$&\bjpos(13.85)(13.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_37
+}
+
+{%?#$&\bjpos(15.35)(13.55)(02.00)(02.00)
+\ajnull%?#$&input 01_4_38
+}
+
+{%?#$&\bjpos(03.30)(14.30)(02.00)(02.00)
+\ajnull%?#$&input 01_4_39
+}
+
+{%?#$&\bjpos(04.85)(14.30)(02.00)(02.00)
+\ajnull%?#$&input 01_4_40
+}
+
+{%?#$&\bjpos(06.35)(14.30)(02.00)(02.00)
+\ajnull%?#$&input 01_4_41
+}
+
+{%?#$&\bjpos(07.85)(14.30)(02.00)(02.00)
+\ajnull%?#$&input 01_4_42
+}
+
+{%?#$&\bjpos(09.35)(14.30)(02.00)(02.00)
+\ajnull%?#$&input 01_4_43
+}
+
+{%?#$&\bjpos(10.85)(14.30)(02.00)(02.00)
+\ajnull%?#$&input 01_4_44
+}
+
+{%?#$&\bjpos(15.35)(14.30)(02.00)(02.00)
+\ajnull%?#$&input 01_4_45
+}
+
+{%?#$&\bjpos(04.85)(15.30)(02.00)(02.00)
+\ajnull%?#$&input 01_6_01
+}
+
+{%?#$&\bjpos(07.85)(15.30)(02.00)(02.00)
+\ajnull%?#$&input 01_6_02
+}
+
+{%?#$&\bjpos(10.85)(15.30)(02.00)(02.00)
+\ajnull%?#$&input 01_6_03
+}
+
+{%?#$&\bjpos(13.85)(15.30)(02.00)(02.00)
+\ajnull%?#$&input 01_6_04
+}
+
+{%?#$&\bjpos(16.85)(15.30)(02.00)(02.00)
+\ajnull%?#$&input 01_6_05
+}
+
+{%?#$&\bjpos(08.00)(16.30)(10.80)(02.00)
+\ajnull%?#$&input 01_5_01
+}
+
+{%?#$&\bjpos(01.00)(17.50)(16.00)(02.50)
+\ajnull%?#$&input 01_5_02
+}
+
+{%?#$&\bjpos(02.35)(19.20)(15.00)(02.00)
+\ajnull%?#$&input 01_5_03
+}
+
+{%?#$&\bjpos(03.10)(19.70)(14.50)(02.00)
+\ajnull%?#$&input 01_5_04
+}
+
+{%?#$&\bjpos(03.90)(20.25)(14.00)(02.00)
+\ajnull%?#$&input 01_5_05
+}
+
+{%?#$&\bjpos(07.00)(16.60)(11.00)(02.00)
+\ajnull%?#$&input 01_5_06
+}
+
+}
+
+ \eject
+%?#$&end
+ \end{document}                

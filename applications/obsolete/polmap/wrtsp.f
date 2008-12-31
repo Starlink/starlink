@@ -1,0 +1,122 @@
+      SUBROUTINE WRTSP(CPARAM,NPTS,STOKES_I,STOKES_Q,STOKES_QV,STOKES_U,
+     &                 STOKES_UV,LAMBDA,TITLE,OUT_LU)
+C+
+C
+C Subroutine: 
+C
+C    W R T S P
+C
+C
+C Author: Tim Harries (tjh@st-and.ac.uk)
+C
+C Parameters: 
+C
+C CPARAM (<), NPTS (<), STOKES_I (<), STOKES_Q (<), STOKES_QV (<),
+C STOKES_U (<), STOKES_UV (<), LAMBDA (<), TITLE (<), OUT_LU (<)
+C
+C History: 
+C  
+C   May 1994 Created
+C 
+C
+C  
+C
+C
+C
+C This routine writes out a polarization spectrum into a TSP format file
+C
+C
+C
+C-
+      IMPLICIT NONE
+      INTEGER OUT_LU
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+C
+C The current arrays
+C
+      INTEGER NPTS
+      REAL STOKES_I(*)
+      REAL STOKES_Q(*)
+      REAL STOKES_QV(*)
+      REAL STOKES_U(*)
+      REAL STOKES_UV(*)
+      REAL LAMBDA(*)
+C
+C Misc.
+C
+      INTEGER SP
+C
+      CHARACTER*(*) CPARAM
+      CHARACTER*80 PATH,TITLE
+C
+C
+      INTEGER UBND(1),LBND(1),NDFO,OAXISP,NDFQ,NDFU,QPTR
+C
+C
+      INTEGER UPTR,QVPTR,UVPTR,PLACE
+      INTEGER IPTR
+C
+      CHARACTER*(DAT__SZLOC) PLOC,LOC      
+      INTEGER STATUS
+C
+      STATUS = SAI__OK
+C
+C Add the .sdf extension if necessary
+C
+      CALL SSTRIP(CPARAM)
+      SP = INDEX(CPARAM,' ')
+      SP = SP-1
+      PATH = CPARAM(:SP)
+      IF ( PATH((SP-3):SP).NE.'.sdf') THEN
+       TITLE = PATH
+       PATH = PATH(1:SP)//'.sdf'
+      ELSE
+       TITLE = PATH(1:(SP-4))
+      ENDIF
+      LBND(1) = 1
+      UBND(1) = NPTS
+C
+C Begin the ndf and hds systems
+C
+      CALL NDF_BEGIN
+      CALL HDS_START(STATUS)
+C
+C Create a new tsp ndf and map it
+C
+      CALL HDS_NEW(PATH,'OUTPUT','NDF',0,0,LOC,STATUS)
+      CALL DAT_NEW(LOC,'DATA_ARRAY','_REAL',1,UBND,STATUS)
+      CALL NDF_IMPRT(LOC,NDFO,STATUS)
+      CALL NDF_ACRE(NDFO,STATUS)
+      CALL NDF_ACPUT('Wavelength',NDFO,'Lab',1,STATUS)
+      CALL NDF_ACPUT('Angstroms',NDFO,'Unit',1,STATUS)
+      CALL NDF_AMAP(NDFO,'Centre',1,'_REAL','UPDATE',OAXISP,UBND,STATUS)
+
+      CALL NDF_XNEW(NDFO,'POLARIMETRY','EXT',0,0,PLOC,STATUS)
+      CALL NDF_PLACE(PLOC,'STOKES_Q',PLACE,STATUS)
+      CALL NDF_NEW('_REAL',1,LBND,UBND,PLACE,NDFQ,STATUS)
+      CALL NDF_PLACE(PLOC,'STOKES_U',PLACE,STATUS)
+      CALL NDF_NEW('_REAL',1,LBND,UBND,PLACE,NDFU,STATUS)
+
+      CALL NDF_MAP(NDFO,'DATA','_REAL','WRITE',IPTR,UBND,STATUS)
+      CALL NDF_MAP(NDFQ,'DATA','_REAL','WRITE',QPTR,UBND,STATUS)
+      CALL NDF_MAP(NDFU,'DATA','_REAL','WRITE',UPTR,UBND,STATUS)
+      CALL NDF_MAP(NDFQ,'VARIANCE','_REAL','WRITE',QVPTR,UBND,STATUS)
+      CALL NDF_MAP(NDFU,'VARIANCE','_REAL','WRITE',UVPTR,UBND,STATUS)
+C
+C If everything is oK then write out the arrays
+C
+      IF (STATUS.EQ.SAI__OK) THEN
+      CALL WRITE_IT(NPTS,LAMBDA,STOKES_I,STOKES_Q,STOKES_QV,STOKES_U,
+     &              STOKES_UV,
+     &UBND(1),%VAL(IPTR),%VAL(QPTR),%VAL(QVPTR),%VAL(UPTR),
+     &%VAL(UVPTR),%VAL(OAXISP))
+      ENDIF
+C
+C Close down the ndf and hds
+C
+      CALL DAT_ANNUL(PLOC,STATUS)
+      CALL NDF_END(STATUS)
+      CALL HDS_CLOSE(LOC,STATUS)
+      CALL HDS_STOP(STATUS)
+      END

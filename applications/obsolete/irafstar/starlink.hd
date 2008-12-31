@@ -1,0 +1,13 @@
+#  Help directory for the starlink package
+
+$doc = "./doc/"
+use_imh hlp = doc$use_imh.hlp
+use_ndf hlp = doc$use_ndf.hlp
+use_fits hlp = doc$use_fits.hlp
+
+#$figdir = "../figaro/"
+#_figaro pkg = figdir$_figaro.hd
+
+#$kapdir = "../kappa/"
+#_kappa  pkg = kapdir$_kappa.hd
+

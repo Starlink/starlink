@@ -1,0 +1,1117 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun204.1}
+\newcommand{\stardocnumber}    {204.1}
+\newcommand{\stardocauthors}   {T.\,J.\,Harries}
+\newcommand{\stardocdate}      {15th January 1996}
+\newcommand{\stardoctitle}     {POLMAP \\ [1.5ex]
+                                An interactive data analysis package \\[1.0ex]
+                                for linear spectropolarimetry}
+%  \newcommand{\stardocversion}   {<software_version>}
+%  \newcommand{\stardocmanual}    {<manual_type>}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf  \stardoctitle}
+%  {\Huge\bf  \stardoctitle \\ [2.5ex]}
+%  {\LARGE\bf \stardocversion \\ [4ex]}
+%  {\Huge\bf  \stardocmanual}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+%  \vspace{10mm}
+%  \begin{center}
+%     {\Large\bf Abstract}
+%  \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+%     \stardoctitle\\
+%     \stardocversion\\
+%     \stardocmanual
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+% \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%   ==================
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+% \newpage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+% \setcounter{page}{1}
+
+\section{Introduction}
+
+A linear polarization spectrum is a set of Stokes vectors
+$(I_{\lambda},Q_{\lambda},U_{\lambda})$. Hence linear
+spectropolarimetric data is four-dimensional (six-dimensional if the
+variance arrays of the Stokes parameters are included) and cannot be
+manipulated using the standard spectral analysis packages ({\em e.g.},
+{\sc dipso}; Howarth \& Murray 1991). 
+
+{\sc polmap} owes much to {\sc dipso} as far as the style of user
+interface is concerned, but no attempt was made to provide the wealth
+of spectral analysis routines available in {\sc dipso}. The routines
+provided by {\sc polmap} are specifically designed for the
+spectropolarimetrist. The manual includes a simple step-by-step guide
+to the program and some example data analysis recipes.
+
+\subsection{{\sc polmap} and TSP }
+
+The TSP package (Bailey 1990) runs under the ADAM environment and
+provides many routines for handling time-series and polarimetric data.
+The TSP routines are biased towards data reduction, and facilities are
+provided to reduce data from several different instruments. {\sc
+polmap} does not contain any data reduction routines, but was designed
+with data analysis in mind. 
+
+{\sc polmap} also provides routines for displaying data that are not
+available in TSP. Command are provided to read and write TSP
+polarization spectrum format files from within {\sc polmap}.  Hence the
+packages should be seen as complimentary, in a similar manner to {\sc figaro}
+and {\sc dipso}.
+
+\subsection{The command interface}
+
+Commands may be entered at the prompt in either upper- or lower-case.
+Numerical parameters must follow the command in the order specified and
+must be separated by spaces. If any command parameters are omitted on
+the command line they are usually prompted for. Several commands may be
+entered on the same command line provided they are separated by commas;
+the only exception is the {\bf COMFILE} command, which must appear on
+its own command line.
+
+If a character string parameter (such as a filename) contains
+upper-case characters it must be placed in double quotes in order to
+protect it from the command parser. If a range of integers is required
+as a parameter to a command a greater-than sign may be employed. For
+example instead of {\tt DELETE 4 5 6 7} the form {\tt DELETE 4 > 7} may
+be used. {\bf HELP COMMANDS} will give a list of the available commands
+and you can also obtain help on a specific command using {\bf HELP}
+{\it command}.
+
+\subsection{Data storage}
+
+The data storage system is very similar to {\sc dipso}. The polarization
+spectra are stored in a stack and spectra may be put onto the top
+(numerically largest) stack entry or pulled from the middle of the stack.
+Routines that alter or measure data generally work on the spectrum in the
+current arrays and results to any operation are generally stored in these
+arrays as well. The entire stack may be saved in NDF format using the {\bf
+WRSTK} command.
+
+\subsection{Getting started}
+
+In order to run {\sc polmap} you must source the {\tt polmap.csh} script.
+On Starlink systems, the command alias {\tt polmapsetup} will do this
+for you if you have initialised the Starlink Software for use.
+
+The {\tt polmap.csh} script sets the environment variable {\tt POLMAP\_DIR}
+to point to the location of the {\sc polmap} files, and defines the
+command alias {\tt polmap} to run the {\sc polmap} exectuable.
+
+Then copy the file {\tt sn1987a.sdf} from the {\sc polmap} directory
+into an empty working directory: 
+
+\begin{quote}
+{\tt cp~\$POLMAP\_DIR/sn1987a.sdf~.} 
+\end{quote}
+
+Typing {\tt polmap} at your normal shell prompt will start the
+program.  A message-of-the-day will appear with any updates or changes
+to the program and the arrow prompt notifies you that the program is
+now ready for input.
+
+Data may be read into the program from ascii files ({\bf RDALAS}), {\it
+TSP} files ({\bf RDTSP}) or from stack files that were created using
+{\sc polmap} ({\bf RDSTK}).   Type {\tt rdtsp sn1987a} to read in the
+file demonstration spectrum from your working directory. The case of
+the input string in unimportant and if parameters are omitted they are
+normally prompted for. Place character string parameters in quotes to
+protect them from the command parsing routine.  The polarization
+spectrum is now in the current arrays. The current arrays are the
+arrays on which most of the {\sc polmap} commands act and are the
+arrays to which results of commands are written. The polarization
+spectrum can be put onto a {\it stack} of spectra using the {\bf PUT}
+command. Try it now. The program should respond with a short message
+naming the stack entry in which the spectrum has been copied. It is
+important to note that although the spectrum has been put onto the
+stack it is also still in the current arrays.  Using {\bf PUT} again
+will put another copy of the current spectrum onto the stack. The {\bf
+LIST} command will list the stack contents along with some useful
+information such as the spectral range and the number of data points.
+Typing {\tt LIST 0} will display the contents of the current arrays.
+
+In order to plot the data we must first initialize a graphics
+device. This is done using the {\bf DEV} command. The command requires
+as a parameter a standard GKS device name (eg. xwindows) along with
+the number of subdivisions in $x$ and $y$ into which the plotting
+surface must be divided. If $x$ and $y$ are not specified then the
+defaults ($x=1$,$y=1$) are employed. Once you have initialised your
+graphics device try typing {\tt TRIPLOT 0.03 1}. This command will
+produce a triplot of the data in stack entry 1 (which should be the
+demonstration spectrum). The top section of the triplot shows the
+position angle of the polarization (in degrees), the middle sections
+shows the percentage polarization and the final section is the Stokes
+$I$ component. Note that the top two sections appear to have a varying
+bin size. This is because the polarization spectrum is binned to a
+constant percentage polarization error (of 0.03 percent). This means
+that regions of the spectrum with smaller errors on Stokes $Q$ and $U$
+have a higher spectral resolution. The range over which the spectrum
+is plotted can be adjusted using {\bf TRANGE},{\bf PRANGE},{\bf
+IRANGE} and {\bf WRANGE} to limit the position angle, percentage
+polarization,intensity and wavelength ranges respectively. {\bf
+TAUTO},{\bf PAUTO},{\bf IAUTO} and {\bf WAUTO} switch off the ranges
+and let the program autolimit them. The wavelength range can also be
+set interactively using the {\bf CWRANGE} command, which uses the
+cursor.
+
+\subsection{A step-by-step analysis example}
+
+You should now have two copies of the demonstration data on the
+stack. Type {\tt title demo2} to change the title of the current
+spectrum and then put it on the stack. Listing the stack you should
+now find three entries of the same spectrum, so let's delete
+some. Typing {\tt DEL 1 2} will delete the first and second stack
+entries. Listing the stack again will show that there is now only one
+entry, entitled {\tt demo2}. Triplot this entry and type {\tt
+CONTDEF}.  This command allows the user to define multiple regions of
+continuum. Start at the shortward end of the spectrum and define four
+line-free continuum bins.  Define a bin with the end shortward of the
+start in order to quit the continuum definition. Typing {\tt CONTFIT 1
+2} will fit a second order polynomial to the three Stokes components
+of the first stack entry. The fit has been mapped onto the wavelength
+grid of the current array, so title the fit and put it onto the
+stack. You can plot the two spectra on the same axes using {\tt
+TRIPLOT 0.03 1 2}. Note that the line styles are the same for both the
+spectra. The {\bf LROT} command will make the line style change for
+each plot. In order to rectify the spectrum type {\tt IDIV 1}. The
+Stokes $I$ spectrum of the current arrays has been divided into the
+$I$ array of stack entry number one. The results are now in the
+current arrays. {\tt TRIPLOT 0.03} will plot the current polarization
+(hopefully rectified) spectrum. Put this onto the stack and then use
+{\tt wrstk junk} to write out the entire stack onto disk. The file
+{\tt junk.sdf} will be in our current directory. Typing {\tt QUIT}
+will leave the program.
+
+\subsection{Command files}
+
+The {\bf COMFILE} command may be used to read input from a text file
+rather than from the keyboard. The {\bf COMFILE} must be given on its
+own command line. The text file is simply a list of commands as you
+would have typed them in. The default extension of a command file is
+{\tt .cmd}. A command file may contain a {\bf COMFILE} command but the
+nest must be no deeper than twenty files (more than enough hopefully).
+If you have a set of commands that you regularly issue after starting
+the program then these may be placed in the file {\tt .polmap} in your
+home directory. If found, this command file is executed on start-up.
+It might contain a {\bf DEV} command to initialize your specific
+device type, or a command to set your plotting styles.
+
+\subsection{The command history}
+
+The {\bf COMMS} command lists the twenty previous commands. Any of
+these commands may be accessed using the pling (!) symbol. For example
+{\tt !203} will execute the command number 203 from the command
+history, in a similar fashion to the UNIX operating system. It should
+be noted that if commas are used to separate commands then each will
+be given a separate command history number.
+
+\section{The TRIPLOT command}
+\subsection{Introduction}
+
+The {\bf TRIPLOT} command provides a flexible but
+straightfoward method for displaying polarization spectra. As
+mentioned in the previous section a triplot consists of three separate
+graphs. The top panel displays the position angle of the polarization
+in degrees, the middle section shows the percentage polarization and
+the bottom section shows the intensity spectrum. The first command
+parameter is the percentage error in polarization with which to bin
+the spectrum. If no further parameters are given the polarization
+spectrum in the current arrays will be plotted. Additional parameters
+refer to stack entries. If only one stack entry is specified then that
+polarization spectrum is plotted. If more than one stack entry are
+specified then they are all plotted, but on the axis limits of the
+first polarization spectrum specified. If don't want the plotting
+surface erased before each triplot command is executed then use the
+{\bf NOBOX} command. The {\bf BOX} command negates this.
+
+A polarized flux section may be included in the triplot using the {\bf
+PFLUX} command. The {\bf NOPFLUX} command negates this. The polarized
+flux section appears between the percentage flux and the position
+angle section. 
+
+In some cases, the polarization structure is more clearly seen in
+normalized Stokes $Q$ and $U$. The {\bf QUPANEL} will tell the triplot
+command to produce a plot showing Stokes $I$ in the bottom panel and
+Stokes $Q$ and Stokes $U$ in place of the usual position angle and
+percentage polarization.
+
+\subsection{The plotting ranges}
+
+The plotting limits may be altered by the user. For example, the
+wavelength range to be plotted is by default the first and last
+wavelength points of the polarization spectrum. The {\bf WRANGE}
+command allows the user to specify a range and the {\bf CWRANGE}
+allows the user to select a range from a previous triplot using the
+cursor. {\bf WAUTO} switches back to the default wavelength range.
+{\bf IRANGE} and {\bf IAUTO} can be used to set the plotting range for
+the intensity section and {\bf TRANGE} and {\bf TAUTO} refer to the
+position angle plot. {\bf PRANGE} and {\bf PAUTO} change the
+percentage polarization plotting ranges. {\bf PFRANGE} and {\bf
+PFAUTO} perform similar functions on the polarized flux panel.
+
+It is an truism of spectropolarimetry that the most interesting objects
+have a polarization with a position angle close to 0$^\circ$ or
+180$^\circ$, resulting in a position angle plot that oscillates madly
+between the extremes of the plot because of wrap-around. In order to
+prevent this the triplot can be forced to plot position angles either
+higher than 180$^\circ$ ({\bf THI}) or lower than 0$^\circ$ ({\bf
+TLOW}). Simply set the range to (0$^\circ$,200$^\circ$) for
+example using {\bf TRANGE} and invoke {\bf THI}. The effects of {\bf
+THI} or {\bf TLOW} can be lifted using {\bf TFREE}.
+
+\subsection{Plotting styles}
+
+The type of line used to plot the spectrum can be changed for each
+plot using {\bf LROT} and the colour of the line (for those of you
+lucky enough to have a colour terminal) can be rotated using {\bf
+CROT}. You can select a specific line style or colour using the {\bf
+SETLINE} or {\bf SETCOLOUR} commands. If you wish to plot a
+join-the-dots spectrum then use the {\bf POLY} command. The {\bf
+HIST} command returns to histogram style plots. The data may be
+plotted as points with error bars using the {\bf MARK} command.
+
+The axis labels on the plot can be changed. {\bf XLABEL} alters the
+(guess) label on the $x$-axis and {\bf ILABEL} changes the label on
+the intensity spectrum. The font used to annotate the axes may be
+changed using the {\bf FONT} command.
+
+\section{The QUPLOT command}
+
+A polarization spectrum may also be plotted in the $QU$ plane. The
+{\bf QUPLOT} commmand requires the bin error a parameter. This plots
+the current polarization spectrum in the $QU$ plane. The axis limits
+may be alted using {\bf QRANGE} and {\bf URANGE} or autoscaled using
+{\bf QAUTO} and {\bf UAUTO}. The {\bf BOX} and {\bf NOBOX} commands
+work as described above. The entire current polarization spectrum is
+plotted unless a wavelength range is specified using {\bf WRANGE}. The
+plotting symbol style my be change with the {\bf SETSYMB} command. For
+a list of the various plotting symbols available see the {\sc pgplot}
+manual.
+
+If you want the $QU$ points to be joined up in wavelength order (to
+emphasize a $QU$ loop for example) then use the commannd {\bf QUJOIN}
+before the {\bf QUPLOT} call. {\bf NOQUJOIN} switches off the point
+drawing. Arrowheads may be employed using the {\bf QUARROW} command.
+The arrowhead style can be altered using the {\bf ARROWSTYLE} command.
+
+\section{Interstellar polarization}
+
+A raw polarization spectrum is a vector sum of the interstellar polarization
+spectrum (introduced by interstellar dust grains aligned in the galactic
+magnetic field) and the intrinsic polarization spectrum. In order to analyse
+the intrinsic polarization spectrum it is therefore necessary to subtract the
+interstellar polarization vector. Obtaining a reliable estimate of the
+interstellar polarization is difficult, but it is crucial to the
+subsequent analysis since the magnitude of this vector is often significantly
+larger than that of the intrinsic vector. The wavelength dependence of the
+interstellar polarization can be described empirically using the Serkowski law
+(Serkowski 1973):
+
+\begin{equation}
+\label{serk}
+p(\lambda)=p_{max} \exp [-k\ln^2 (\lambda_{max} / \lambda)]
+\end{equation}
+
+where $p(\lambda)$ is the percentage polarization at wavelength $\lambda$,
+$p_{max}$ is the maximum polarization which occurs at wavelength
+$\lambda_{max}$ and $k$ is a curve width parameter. Originally $k=1.15$ but it
+has been suggested that allowing $k$ to vary may improve the fit
+(Condina-Landaberry \& Magalh\~{a}es 1976 and Whittet {\it et al} 1992).
+
+The command {\bf ISFIT} uses a non-linear least-squares method to fit
+a Serkowski law (equation \ref{serk}) to the data in the current
+arrays. The four parameters to this command are $q$, the maximum
+Stokes $Q$ polarization, $u$, the maximum Stokes $U$ polarization,
+$w$, the wavelength of the maximum polarization and $k$ the curve
+width parameter. A free parameter is initialised with the $:$ symbol
+and a parameter to be held fixed is defined using the $=$ symbol. A
+typical command line may look like:
+
+\begin{quote}
+{\tt  > isfit q:1.5 u:0.1 w:5500 k=1.15} 
+\end{quote}
+
+This command holds $k$ at $1.15$ but $q$, $u$  and $w$ are free
+parameters. These parameters are used to create a polarization spectrum
+at the wavelength bins defined by the spectrum in the current arrays.
+This means that the spectrum in the current arrays is lost.  Errors are
+reported if the number of free parameters exceeds the number of
+available polarization datum.
+
+The interstellar polarization vector can be removed from the target
+spectrum using the {\bf SUBTRACT} command. The polarization spectrum
+in the current arrays is subtracted from the specified entry. The
+subtraction is performed over the overlapping wavelength region. The
+Stokes $I$ spectrum is obtained from the stack polarization spectrum
+and linear interpolation is used to regrid the stack polarization
+spectrum onto the current wavelength array. The resulting polarization
+spectrum is placed in the current arrays.
+
+Other useful commands for adding and subtracting polarization vectors
+include {\bf STATADD} and {\bf STATSUB}, which add/subtract a
+constant vector found using the {\bf PTHETA} command. The {\bf ICADD}
+command adds a constant value to the $I$ Stokes spectrum only, thereby
+diluting the polarization. 
+
+\section{Merging spectra}
+
+The simplest way to merge two spectra is the {\bf CONTADD} command,
+which is described above. The {\bf MERGE} command merges two stack
+polarization spectra (that may or may not overlap) and uses a weighted
+mean on data with $x$-values common to both spectra. The {\bf WMERGE}
+command works on spectra that have the same $x$-array (spectra can be
+remapped using  the {\bf GRID} and {\bf CONTADD} commands) and
+produces a weighted mean of the two spectra.
+
+\section{PA calibration}
+
+Raw polarization spectra often have a PA that is a slow function of
+wavelength due to the slight chromicity of the waveplate. Two commands
+are provided in order to calibrate this effect ({\bf FITPA} and {\bf
+PACALIB}). The {\bf FITPA} command fits a polynomial to the difference
+spectrum of the observed PA spectrum (usually a spectrum taken through
+a 100\% polarizing filter) and the actual PA.  Care must be taken
+that the observed PA spectrum does not wrap-around (i.e. flip from
+$\approx0^\circ$ to $\approx180^\circ$) as this will spoil the PA
+fit. This is {\em not} checked for by {\sc polmap}, but may be fixed with a
+call to {\bf ROTPA} prior to the fit. The {\bf PACALIB}
+command applies this fit to the current arrays.
+
+\section{References} 
+
+Bailey J. A., 1990, SERC Starlink User Note, No. 66.2
+
+Codina-Landaberry S., Magalh\~{a}es A. M., 1976, AA, 49 407
+
+Howarth I. D., Murray J., 1991, SERC Starlink User Note, No. 50.13
+
+Serkowski K., 1973, in Greenburg J. M., Hayes D. S., eds, IAU Symp. 52,
+Interstellar Dust and Related Topics. Reidel, p. 145
+
+Whittet D. C. B., Martin P. G., Hough J. H., Rouse M. F., Bailey J. A.,
+Axon D. J., 1992, ApJ, 386, 562
+
+\appendix
+\newpage
+\section{At-a-glance guide}
+
+The following table summarizes the most frequently used {\sc polmap}
+commands. More detailed information is given by the online help
+command {\bf HELP}.
+
+\begin{center}
+\begin{tabular}{lll}
+\hline \hline
+Command & Arguments & Description \\ \hline \hline \\
+\multicolumn{3}{c}{\bf Plotting} \\ \hline 
+DEV     & {\it device [nx] [ny]} & Initializes GKS graphics device \\
+TRIPLOT     & {\it error [entry] ... }& Plots pol. spectrum in triplot form \\
+QUPLOT      & {\it error}        & Plots pol. spectrum in $QU$ space \\
+LROT        &                    & Changes the line style for each plot \\
+FONT        & {\it type}         & Changes the font style \\
+\\
+\multicolumn{3}{c}{\bf Reading and writing} \\ \hline
+RDALAS,WRALAS & {\it filename}   & Reads/writes current pol. spectrum (ascii format) \\
+RDTSP,WRTSP & {\it filename}     & Reads/writes current pol. spectrum (TSP format) \\
+RDSTK,WRSTK & {\it filename}     & Reads/writes stack in NDF format \\
+\\ 
+\multicolumn{3}{c}{\bf Stack} \\ \hline
+PUT         &                    & Puts current pol. spectrum onto stack\\
+GET         &     {\it entry}    & Gets stack number {\it entry} \\
+LIST        &                    & List stack entries            \\
+DEL         & {\it entry [entry] ...}  & Deletes stack entry           \\
+\\ 
+\multicolumn{3}{c}{\bf Rectification} \\ \hline
+CONTDEF     & {\it [wstart] [wend]} & Defines continuum bins  \\
+CONTFIT     & {\it order entry}   & Fits a polynomial to a pol. spectrum \\
+IDIV        & {\it entry}         & Divides current Stokes $I$ array into {\it entry} \\
+\\ 
+\multicolumn{3}{c}{\bf PA calibration} \\ \hline
+ROTPA       & {\it angle}         & Rotates PA of polarization spectrum \\
+FITPA       & {\it pa ncoeff}     & Fits polynomial to PA \\
+PACALIB     &                     & Applies polynomial fit \\
+\\ 
+\multicolumn{3}{c}{\bf Miscellaneous} \\ \hline
+MERGE       & {\it entry}         & Merges current pol. spectrum with stack entry. \\
+HELP    & {\it command}          & Gives online help for {\it command} \\
+PTHETA      &                     & Measures polarization in continuum bins \\
+TOV     &  {\it wavelength}      & Converts to velocity space \\
+TOW     &  {\it wavelength}      & Converts to wavelength space \\
+
+\end{tabular}
+\end{center}
+
+\newpage
+\section{List of Commands}
+
+{\bf ! \it n} \\
+Runs command number n from the command history. See help on COMMS command.
+
+{\bf ADD \it entry } \\
+Adds the current polarization spectrum to the specified stack entry. See notes
+on the  SUBTRACT command for more details.
+
+{\bf ARROWSTYLE \it fs angle vent} \\
+Sets the style of the arrowheads to be drawn by QUPLOT when QUARROW is
+set.  fs=1 (filled arrowhead). fs=2 (outline). The angle denoted the
+acute angle of the arrow point in degrees. Vent is the fraction of the
+triangular arrowhead that is cut away from the back.
+
+{\bf BIN \it entry error} \\
+Bins the specified stack entry so that each wavelength bin has a
+constant error in percentage polarization.
+
+{\bf BOX} \\
+Flags the graphics screen to clear before each triplot.
+
+{\bf CADD \it q u} \\
+Adds the constant polarization vector (q,u) to the currect arrays. q and u
+should be in \% polarization.
+
+{\bf CHOPW \it min max} \\
+Reduces the wavelength range of the current polarization spectrum to run from
+min to  max.
+
+{\bf CIRANGE} \\
+Sets the intensity plotting range interactively.
+
+{\bf COMFILE \it filename} \\
+This command tells  polmap to use a command file as input instead of the
+terminal. 
+
+{\bf CPFRANGE} \\
+Sets the polarized flux plotting range interactively.
+
+{\bf CPRANGE} \\
+Sets the percentage polarization plotting range interactively.
+
+{\bf COMMS} \\
+List the twenty previous commands issued.
+
+{\bf CONTADD \it entry} \\
+Adds the current (I,Q,U) spectrum to the specified stack entry.
+
+{\bf CONTDEF \it  [min max] [min max] } \\
+Defines continuum regions of the polarization spectrum. Multiple continuum bins
+may be defined on one command line. If no parameters are given then the
+continuum bins are defined using the cursor. A triplot must have previously
+been plotted in order to interactively define windows. In order to quit contdef
+define a bin with  max less than  min.
+
+{\bf CONTFIT \it entry order } \\
+Make a polynomial fit to the continuum of a polarization spectrum. The
+continuum is defined using bins set up by  CONTDEF. A polynomial fit is
+made to the Stokes vector (I,Q,U). The resulting fit is stored in the
+current arrays.
+
+{\bf CONTSUB \it entry  } \\
+Subtracts the current (I,Q,U) spectrum from the specified stack entry. This
+command can be used to remove polarized continuum counts from a polarization
+spectrum.
+
+{\bf COUNTS} \\
+Finds the mean value of the I stokes parameter using all the bins in the
+current polarization spectrum.
+
+{\bf CREMOVE} \\
+Uses the cursor to set two (wavelength,intensity) points. The parts of
+the current spectrum with wavelengths outside the range defined are
+lost. An intensity i (found by linear interpolation between the two
+points) is subtracted from each of the remaining intensities. This
+command is useful for removing the effects of a depolaring continuum
+from an emission line, for example.
+
+
+{\bf CROT} \\
+Sets the plotting colour for the line to change after each plot
+
+{\bf CSUB \it q u} \\
+Subtracts the constant polarization vector (q,u) from the currect
+arrays. q and u should be \% polarization.
+
+{\bf CTRANGE} \\
+Sets the PA plotting range interactively.
+
+{\bf CURSOR} \\
+Use the graphics cursor to measure points on the current plot.
+
+{\bf CWRANGE } \\
+Define the plotting wavelength range using the cursor. A triplot must
+have previously been made.
+
+{\bf DEL \it  entry [entry] } \\
+Deletes the specified entries from the stack.
+
+{\bf DEV \it  device [nx] [ny]} \\
+Initialize the plotting device. The device name must be a GKS standard. Use a
+question mark as the parameter in order to list the possible devices. The
+plotting surface is divided into nx subdivisions in x and ny subdivisions in
+y. If nx and ny are not specified then the default values are used (nx=1 and
+ny=1).
+
+{\bf DRAWLINE \it x1 y1 x2 y2} \\
+This command draws a line in the current line style from point (x1,y1)
+to (x2,y2), where the distances are given in world coordinates.
+
+{\bf EDIT \it [wmin] [wmax]} \\
+Removes the data points from the current spectrum that lie between
+wmin and wmax.If wmin and wmax are not specified the cursor is used to
+specify the wavelength range.
+
+{\bf FITPA \it pa ncoeffs} \\
+Given the actual pa of the current spectrum a polynomial fit of ncoeff
+coefficients is made to the difference between the actual and observed
+position angles as a function of wavelength. This fit can then be
+applied to another observation using PACALIB.
+
+{\bf FONT \it type} \\
+Sets the character font for plotting. There are four fonts:
+1. Simple single-stroke (default)
+2. Roman font
+3. Italic font
+4. Script font
+
+{\bf GET \it entry } \\
+Takes the polarization spectrum from the stack and places it in the current
+arrays.
+
+{\bf HELP \it command} \\
+Gives online help to polmap commands. HELP COMMANDS will give a list of
+all the possible commands. HELP <command> will provide detailed online 
+help for the selected command. Parameters shown in brackets are optional.
+
+{\bf HIST} \\
+Flags triplot to produce histogram style output.
+
+
+{\bf IAUTO} \\
+Automatically set the Stokes I range.
+
+{\bf ICADD \it constant} \\
+Adds a constant to the Stokes I array of the current polarization spectrum.
+
+{\bf ILABEL} \\
+Sets the label for the intensity on a triplot.
+
+{\bf INTEG} \\
+ Integrates the Stokes I parameter of the current array
+using trapezoidal integration.
+
+{\bf IPLOT } \\
+Plots the Stokes I parameter of the current spectrum.
+
+{\bf IQUADD \it i q u} \\
+Adds the constant polarization vector (i,q,u) to the current arrays.
+
+{\bf IRANGE \it  min max } \\
+Limits the Stokes I  plotting range.
+
+{\bf ISFIT} \\
+Fits a Serkowski law to the data held in the current arrays.
+Non-linear least-squares minimization is used.
+The resulting IS law is mapped onto the X array of the current
+polarization spectrum.
+
+{\bf LIST \it  [mode] } \\
+List the stack contents. If  mode is 0 then the contents of the current
+arrays are listed.
+
+{\bf LROT} \\
+Flags the line style to change after every plot with nobox set.
+
+{\bf LS} \\
+List the polarization spectra titles that are on the current stack in
+'page' format, useful for large stacks.
+
+{\bf MARK} \\
+Flags triplot to mark bins with points and error bars rather than in
+histogram style (HIST) or join-the-dots style (POLY).
+
+{\bf MAXPOL} \\
+This command finds the maximum polarization datum within each of the
+continuum bins.
+
+{\bf MERGE \it entry} \\
+Merges the current polarization spectrum with the spectrum in the specified
+stack entry. The resulting spectrum is sorted into wavelength order. Weighted
+means for the polarization vector are calculated for bins of identical X value.
+
+{\bf MOTD} \\
+Displays the message of the day
+
+{\bf NOBOX} \\
+Stops automatic clearing of the plotting surface before a triplot.
+
+{\bf NOCROT} \\
+Sets the line ploot colour to the forground colour.
+
+{\bf NOLROT} \\
+Stops the line style changing.
+
+{\bf NOPFLUX} \\
+Don't include polarized flux box in triplot.
+
+{\bf NOQUARROW} \\
+Stops the QUPLOT command joining the dots with arrows.
+
+{\bf NOQUJOIN} \\
+Data are plotted as points in the QU plane.
+
+{\bf NOQUPANEL} \\
+Switches TRIPLOT back to its default mode of plotting.
+
+{\bf PACALIB} \\
+Applies a position angle fit (previously made using FITPA) to the current
+spectrum. This command is usually used to remove the rotation of pa with
+wavelength associated with achromatic half-wave plates.
+
+{\bf PAGE} \\
+Clears the graphics screen and moves on to a new page.
+
+{\bf PAPER \it width height} \\
+Sets the physical size of the plotting windows. Width and height must be
+in cms and a call to DEV must have been made immediately before.
+
+{\bf PFLUX} \\
+Incude polarized flux box in triplot.
+
+{\bf PFRANGE \it  min max } \\
+Limits the polarized flux plotting range.
+
+{\bf POLY} \\
+Forces join-the-dots plotting rather than histogram plotting.
+
+{\bf POP \it  entry} \\
+Same as GET (qv).
+
+{\bf PPLOT} \\
+Plots the polarization spectrum of the current arrays.
+
+{\bf PRANGE \it min max } \\
+Limits the percentage polarization plotting range.
+
+{\bf PTHETA} \\
+Sums the Stokes parameters over each of the pre-defined continuum bins and
+display the results.
+
+{\bf PUSH} \\
+Same as PUT (qv).
+
+{\bf PUT} \\
+Places the current polarization spectrum on to the top of the stack. If the
+stack is too large a warning message is given.
+
+{\bf PVAL \it number value} \\
+Sets the value of a specified IS parameter to the value
+
+{\bf QAUTO} \\
+Automatically set the Stokes Q range.
+
+{\bf QRANGE \it min max } \\
+Limits the Stokes Q  plotting range.
+
+{\bf QSM \it width} \\
+Convolves the current spectrum with a Gaussian profile of the given
+width. Intensities beyond the ends of the arrays are assumed to be zero.
+
+{\bf QUARROW} \\
+Forces QUPLOT to join-the-dots using arrows. The style of the
+arrowhead may be altered using ARROWSTYLE.
+
+{\bf QUIT} \\
+Quits the  polmap program.
+
+{\bf QUJOIN} \\
+Forces points to be joined by a dotted line in the QU plane.
+
+{\bf QUPANEL} \\
+Flag the TRIPLOT command to plot Stokes I, Q and U rather than the
+usual I, P and PA.
+
+{\bf QUPLOT \it error } \\
+Plots the data in the current arrays in the QU plane. The data is
+binned to the constant error given. The wavelength range of the data
+to be plotted can set using WRANGE. The axes of the plot can be
+adjusted using QRANGE and URANGE. The data are plotted with error bars
+and consecutive points can be joined by setting the QUJOIN flag.
+
+{\bf RDALAS \it filename } \\
+Reads in a polarization spectrum from the file filename. The file must
+be in ascii format. The first column must be the wavelength followed
+by the Stokes Q parameter and its variance and the Stokes U parameter
+and its variance.  The polarization spectrum is placed in the current
+arrays.
+
+{\bf RDSTK \it filename } \\
+Reads a stack into  polmap.
+
+{\bf RDTSP \it filename } \\
+Reads in a polarization spectrum from a  TSP (Bailey 1992) format file.
+Details of the N-dimensional data format files can be found in the  TSP
+user guide. The polarization spectrum is placed in the current arrays.
+
+{\bf REGRID \it binsize} \\
+Rebins the current polarization spectrum. Each bin in the results spectrum
+corresponds to binsize bins in the old spectrum.
+
+{\bf RETITLE \it entry} \\
+Retitle the specified stack entry. The retitle command will prompt for the
+new title.
+
+{\bf ROTPA \it angle } \\
+Rotates the position angle of the current polarization spectrum through 
+angle where the angle is given in degrees.
+
+{\bf RVEL \it vel} \\
+Applies the given radial velocity correction to the wavelength arrays
+of the current polarization spectrum. The standard sign convention is
+used in which a positive velocity indicates the source is moving away
+from the observer.
+
+{\bf SERKTHRU \it q u lambda k lammax} \\
+This command maps a Serkowski law onto the current arrays. The vector
+(q,u) at wavelength lambda is given along with the values ok k and
+lammax. The Serkowski law that passes through this point is mapped on
+the current arrays.
+
+{\bf SETCOLOUR \it colour} \\
+Sets the line colour for a triplot.
+
+{\bf SETHEIGHT \it height} \\
+Sets the height of the characters that are plotted. Standard size is height=1.
+
+{\bf SETLINE \it linestyle} \\
+Sets the line style of a triplot. The parameter sould be in the range 1-5.
+
+{\bf SETSYMB \it  style} \\
+Sets the symbol style for a QU plot. The style parameter should be in the 
+range 0 to 31.
+
+{\bf SMOOTH  \it n} \\
+Applies a box smooth to the current polarization spectrum (Bevington
+routine). The smooth is repeated n times.
+
+{\bf STATADD} \\
+Adds the mean polarization vector obtained from the results of the most recent
+PTHETA to the currect arrays.
+
+{\bf STATSUB} \\
+Subtracts the mean polarization vector obtained from the results of
+the most recent PTHETA to the currect arrays.
+
+{\bf SUBTRACT \it  entry } \\
+Subtract the current polarization from a specified stack entry. The Stokes Q
+and U parameters of both spectra are normalised and the current polarization
+vector is subtracted from the specified stack entry. The Stokes I parameter
+is obtained from the stack polarization spectrum. Linear interpolation is used
+to regrid the stack polarization spectrum onto the current wavelength grid.
+
+{\bf SWAP \it  entry} \\
+Swaps the current polarization spectrum with that of a stack entry.
+
+{\bf TAPPEND \it string} \\
+Appends the character string string to the end to the current polarization 
+spectrum title.
+
+{\bf TAUTO} \\
+Switchs the position angle plotting range to (0,180).
+
+{\bf TEXT \it  [x] [y]} \\
+This command can be used to annotate diagrams. The x and y axis positions for
+the lefthand end of the text may be given. The angle at which the text is
+to be written is then prompted for. Finally the text string is prompted for.
+The text is written in the current font style. If x and y are not given on
+the command line the cursor is used to locate the position of the text.
+
+{\bf TFREE} \\
+Releases PA plotting restrictions set using THI and TLOW.
+
+{\bf THI} \\
+PA data in the range 0 to (Tmax-180) is plotted above 180. This avoids messy
+plots that can be obtained if the PA of the polarization spectrum is close
+to 0 or 180. eg. >TRANGE 0 190,THI will plot all PAs between 0 and 10 between
+180 and 190.
+
+{\bf TITLE \it title } \\
+Titles the current polarization spectrum with the character string  title.
+Quotes are usually required to protect the case and numerics.
+
+{\bf TLOW} \\
+PA data in the range (180+Tmin) to 180is plotted below 0. This avoids messy
+plots that can be obtained if the PA of the polarization spectrum is close to 0
+or 180. eg TRANGE -10 180,TLOW will plot all PAs between 170 and 180 between
+-10 and 0.
+
+{\bf TOV \it wavelength } \\
+Transforms the x-axis of the current polarization spectrum to velocity
+space. The wavelength given is the rest wavelength for the transformation and
+the velocity is in kilometers per second.
+
+{\bf TOW \it wavelength } \\
+Transforms the x-axis of the current polarization spectrum to wavelength
+space. The parameter is the wavelength of the rest velocity for the
+transformation and should be given in Angstroms.
+
+{\bf TRANGE \it min max } \\
+Limits the position angle plotting range.
+
+{\bf TRIPLOT \it error [entry] [entry] ...} \\
+Plot the specified polarization spectra in triplot format. This format has the
+position angle in the top section, the percentage polarization in the middle
+section and the bottom section displays the I Stokes parameter. The
+polarization is binned to a constant error. The  DEV command must have been
+called to initialize the plotting device. If no  entry is specified the
+contents of the current arrays are plotted.
+
+{\bf UAUTO} \\
+Automatically set the Stokes U range.
+
+{\bf URANGE  \it min max } \\
+Limits the Stokes U  plotting range.
+
+{\bf WAUTO} \\
+Automatically set the wavelength range.
+
+{\bf WMERGE \it spec1 spec2 weight1 weight2} \\
+Merges two polarization spectra with identical x-grids. The spectra
+are merged according to the given weights and the result is placed in
+the current arrays.
+
+{\bf WRALAS \it filename} \\
+Writes out the polarization spectrum from the current arrays into the
+file filename. The file is written in ascii format with wavelength as
+the first column followed by the Q Stokes parameter and its variance
+and the U Stokes parameter and its variance.
+
+{\bf WRANGE \it min max } \\
+Limits the wavelength plotting range.
+
+{\bf WRTSP \it filename } \\
+Writes out the polarization spectrum from the current arrays into a  TSP
+format file. Details of the N-dimensional data format files can
+be found in the  TSP user guide.
+
+{\bf WRSTK \it filename } \\
+Writes out the stack into a save file.
+
+{\bf XADD \it constant} \\
+Adds a constant value to the x array.
+
+{\bf XGRID \it xstart xend npts} \\
+Creates an evenly spaced wavelength grid on the current arrays. The Stokes
+parameters are zeroed and the current spectrum is lost. The grid has npts and
+runs from xstart to xend.
+
+{\bf XLABEL \it label} \\
+Sets the x-axis label for the triplot.
+
+\end{document} 
+

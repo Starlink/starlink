@@ -1,0 +1,36 @@
+ P TITLE                                         A17    POR Cover File
+ P FILENAME                                      A      RPS_FORM
+ P MEDIUM                                        A4     DISK
+ P ACCESSMODE                                    A6     DIRECT
+ S KEYFIELD                                      A      PI.NUMBER         ASCENDING        :
+ S PI.NUMBER             6 I*2      0            I6        0              PINB EQUIVALENT  :
+ F $LAST.NAME           27 C*27     0            A27                      PI_LNAME         :A/120,229.5:
+ F FIRST.NAME           17 C*17     0            A17                      PI_FNAME         :A/50,229.5: 
+ F MIDDLE.NAME          12 C*12     0            A12                      PI_MNAME         :A/85,229.5:
+ F PI.TITLE             12 C*12     0            A12    DR.               PI_TITLE         :A/30,229.5: 
+ F $DEPARTMENT          60 C*60     0            A60                      PI_DEPT          :1/50,216: 
+ F INSTITUTE            60 C*60     0            A60                      PI_INSTI         :1/50,203:2/50,114:
+ F ADDRESS              60 C*60     0            A60                      PI_ADDR          :1/50,190: 
+ F CITY.TOWN            32 C*32     0            A32                      PI_CITY          :1/135,190:
+ F COUNTY               32 C*32     0            A32                      PI_STATE         :1/30,176: 
+ F POSTAL.CODE          10 C*12     0            A12                      PI_ZIP           :1/92,176:
+ F COUNTRY              32 C*24     0            A24    UNITED KINDGOM    PI_CNTRY         :1/140,176:
+ F TELEPHONE.NUMBER     24 C*24     0            A24                      PI_TEL           :1/30,164: 
+ F TELEX.NUMBER         20 C*20     0            A20                      PI_TLX           :1/92,164: 
+ F FAX.NUMBER           24 C*24     0            A24                      PI_FAX           :1/140,164:
+ F NETWORK.NAME         10 C*10     0            A10    INTERNET          NW_NAME          :1/30,138: 
+ F NETWORK.ADDRESS      40 C*40     0            A40                      NW_ADDRESS       :1/92,138:
+ S PROPOSAL.NUMBER       6 I*4      0            I6          0            PRNB             :          
+ G PROPOSAL.TITLE(2)    60 C*60     0            A60                      TIT<N>           :1/30,119-7:A/30,217-5:
+ F SUBJECT.CATEGORY      2 I*2      0            I2     0                 SUBCT            :1/28,102:2/57,6:
+ F NUMBER.OF.TARGETS     4 I*4      0            I4     1                 TNS              :1/63,73:
+ G COI.NAME(6)          32 C*32     0            A32                      COI_NAME         :A:2/25,189-6.5:
+ G COI.INSTITUTE(6)     32 C*32     0            A32                      COI_INST         :A:2/75,189-6.5:
+ G COI.CNTRY(6)         24 C*24     0            A24                      COI_CNTRY        :A:2/135,189-6.5:
+ F ADMIN.NAME           32 C*32     0            A32                      ADMIN_NAME       :2/70,134:
+ F ADMIN.POST           60 C*60     0            A60                      ADMIN_POST       :2/70,124:
+ F AGENCY                6 C*6      0            A6     PPARC             AGENCY           :2/125,73:
+ S FORM.CHECK            6 I*2      0            I6         0             FCHK             :
+ P NRECORDS                                      I10            14                         :
+ P RECORDSIZE                         BYTE       I5         0                              :
+ E

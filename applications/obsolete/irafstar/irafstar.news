@@ -1,0 +1,19 @@
+IRAFSTAR 1.2-1
+--------------
+
+Fixes a bug whereby the conversion process was deemed to have failed if 
+NDF2IRAF or NDF2FITS produced any messages.
+
+
+IRAFSTAR 1.2
+------------
+
+The main change in this version is that FITS file handling has been added
+to the default settings of the automatic data-conversion system. Given a
+filename, the system will look for the file with extension .sdf, .imh, .fit
+and .fits in that order.  A new task 'use_fits' will force FITS file output
+to filename.fit by default.  This facility is more relevant if IRAF V2.11
+is used.
+
+Other minor modifications and bug fixes have been made to the adaptor
+process and SUN/217 and SSN/35 updated.

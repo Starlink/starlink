@@ -1,0 +1,31 @@
+1 FORMLOAD_Update                 
+
+  For the 96B Semester of PATT, there are some updates to the
+  telescope time application files for FORMLOAD:-
+
+  1) CTIO, KPNO and NOT files have been removed as they have their own
+     electronic submission systems (as of 95B).
+
+  2) The WHT, INT and JKT PATT forms (For UK-PATT applicants) are to be 
+     processed electronically. Look out for notices in "SPECTRUM", PATT 
+     Newsletter and on www and Starlink News. Watch these spaces! 
+     
+     For these telescopes, you should send your (formload) .dat file
+     (Proposal) and .ps file (Figures) to:  patt@ast.cam.ac.uk 
+     Do not send the .tex file (Proposal) or "encapsulated" .ps file.
+
+  3) There are small mods to the patt2 and AAT scheduling form.
+     The ING Scheduling Form option has been discontinued
+
+  4) the JCMT (patt3) form is revised and is the latest (March 95) version.
+     There are just the 3 pages in the formload package. The "scientific
+     justification", "technical information" and "figures+diagrams" pages
+     must be added by individual applicants.
+
+  These updates are in effect on Unix machines only.
+
+  NOTE: As of January 1995, Bill Martin took over the responsibility
+        of processing FORMLOAD from Alan Penny.
+
+  W Martin (RGO)                                               January 1996
+

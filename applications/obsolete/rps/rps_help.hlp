@@ -1,0 +1,408 @@
+0 HELP
+RPS  provides a  facility  for  filling  the  Rosat Observation 
+Request forms. See the User-guide for full details of the files required,
+the method of use, and outputs.
+ 
+
+1 CONSTRAINTS
+This section contains the details for any time critical observation. 
+The four types of constraint (only one can be selected) are:
+
+	Coordinated:		In a fixed time-window
+	Monitoring: 		Samples at a given interval
+	Phase dependent:	Samples at a given phase
+	Contiguous:		Not split into many slots
+
+2 CONTIGUOUS.OBS
+Used to indicate that the observation should be made in not more that the
+given number of slots. Note - only one of the four constraints may be
+selected for each target.
+
+2 COORD.OBSERVATION
+Indicates if the observation is linked with other simultaneous
+observations so making the exact time important. The start and end
+times must be given in UT (year, month, day, hour, minute). See
+the AO document for the anticipated dates for the AO period.
+Note - only one of the four constraints may be selected for each 
+target.
+
+2 END.DAY
+The day to end on for time critical observations, 1 to 31
+See COORD.OBSERVATION
+
+2 END.HOUR
+The hour to end at for time critical observations, 0 to 23
+See COORD.OBSERVATION
+
+2 END.MINUTE
+The minute to end for time critical observations, 0 to 59
+See COORD.OBSERVATION
+
+2 END.MONTH
+The month to end in for time critical observations, 1 to 12.
+See COORD.OBSERVATION
+
+2 END.YEAR
+The year to end in for time critical observations, eg 1994.
+See COORD.OBSERVATION
+
+2 EPOCH
+For PHASE.DEPENDENT observations, the reference date (MJD). The observations
+will be made at an integral number of PERIODs from this date. 
+
+2 MONITOR
+Indicates whether the observation is to be made in several parts at fixed
+intervals but with no fixed starting time. TIME.INTERVAL is used to
+specify the required interval, in kiloseconds. Also see PHASE.DEPENDENT
+Note - only one of the four constraints may be selected for each target.
+
+2 NUMBER.INTERVALS
+The preferred maximum number of slots into which the observation will be
+divided. Used for CONTIGUOUS.OBS observations.
+
+2 PERIOD
+The period in days between phase dependant observations. 
+Due to a format restriction, the current version uses R*4 storage - this may
+be sufficient, but if you need to give greater precision, use the REMARKS 
+field.  See PHASE.DEPENDENT, EPOCH
+
+2 PHASE.DEPENDENT
+Indicates that the observation is to be spread over a number of intervals
+with a fixed interval between them and a given starting date. EPOCH
+is the reference date (MJD) and PERIOD is the interval in days.
+Due to a format restriction, the current version uses R*4 storage - this may
+be sufficient, but if you need to give greater precision, use the REMARKS 
+entry. Also see MONITOR.  Note - only one of the four constraints may be
+selected for each target.
+
+2 START.DAY
+The day to start on for time critical observations, 1 to 31.
+See COORD.OBSERVATION
+
+2 START.HOUR
+The hour to start at for time critical observations, 0 to 23.
+See COORD.OBSERVATION
+
+2 START.MINUTE
+The minute to start at for time critical observations, 0 to 59.
+See COORD.OBSERVATION
+
+2 START.MONTH
+The month to start during for time critical observations, 1 to 12.
+See COORD.OBSERVATION
+
+2 START.YEAR
+The year to start in for time critical observations, eg 1995.
+See COORD.OBSERVATION
+
+1 COVER
+Your personal details (name, address, telephone number, etc.) and the proposal 
+name and number of targets. You do not specifically set the latter as it is 
+maintained by the program.
+
+2 ADDRESS
+The first line of your institute address, ie Street, any number within it,etc.
+ - up to 60 characters.
+
+2 CITY.TOWN
+Your Town / City. Up to 32 characters.
+
+2 COUNTRY
+The default is 'United Kingdom'. Up to 24 characters.
+
+2 COUNTY
+Your county, state or other national division. 32 characters.
+
+2 DEPARTMENT
+Your department at your institute, or anyway up to 60 characters of it.
+
+2 FAX.NUMBER
+Your Fax no. if available. 24 chars.
+
+2 FIRST.NAME
+Your first name. 17 characters long at a maximum. Required.
+
+2 INSTITUTE
+Your institute up to 60 characters. The signature on the 'general' page 
+should be that of an administrator in the institute. Required.
+
+2 LAST.NAME
+Your last name. Up to 27 characters are allowed so sorry if your name
+is longer. Required.
+
+2 MIDDLE.NAME
+You may add another name or initials - up to 12 characters allowed.
+
+2 NETWORK.ADDRESS
+Your Email address, if available. Up to 24 chars.
+
+2 NETWORK.NAME
+Your Electronic Mail Network, if available, eg JANET. 10 chars.
+
+2 NUMBER.OF.TARGETS
+The number of targets that you have entered for the proposal. Only 20
+can be submitted in one form. If your proposal requires more than 20
+please consult the UKDC as to how you should submit it.
+
+2 POSTAL.CODE
+The users post code, ZIP code or equivalent. Up to 12 characters. Required.
+
+2 PROPOSAL.TITLE
+Two 60 character strings for the title of the proposal; at least the
+first must have an entry.
+
+2 SUBJECT.CATEGORY
+The type of objects(s) to be viewed in the Proposal. Required. A number 
+should be entered which corresponds to one of the following categories: 
+
+  1. Normal stars                    2. White dwarfs
+  3. Cataclysmic variables           4. Neutron stars and black holes
+  5. Supernova remnants              6. Nearby galaxies
+  7. AGN                             8. Clusters of galaxies
+  9. Diffuse X-ray emiss.           10. Other
+
+2 TELEPHONE.NUMBER
+Your telephone number, plus any extension. 24 characters allowed. Required.
+
+2 TELEX.NUMBER
+The institute's TELEX number of up to 20 characters.
+
+2 TITLE
+Your title (Dr, Ms, Mr, etc.) - up to 12 characters.
+
+1 GENERAL
+For Details of any collaborators, etc. All fields are optional apart
+from the printed form requiring certain details, such as the name
+of an administrator at your Institute. The printed form must be signed
+by both the Proposer and an administrator of her / his institute.
+
+2 ADMIN.NAME
+Name of administrator who will sign the form on behalf of the Institute
+of the PI. Max 32 chars. Required.
+
+2 ADMIN.POST
+Post of the administrator. 60 chars.
+
+2 COI.COUNTRY
+Country for each Co-investigator. 24 chars.
+
+2 COI.INSTITUTE
+Institute for each Co-investigator. 32 chars.
+
+2 COI.NAME
+Name for each Co-investigator. Up to 6 allowed for. 32 chars.
+
+1 GENERAL_HELP
+RPS provides a facility for filling the Rosat Observation Request forms.
+The top level entries for each page are
+CONSTRAINTS   	COVER		GENERAL		TARGET
+
+2 CHECK_TARGET
+This enables you to enter the coordinates of a target and find the
+possible observing dates, the estimated survey exposure and sensitivity
+and approximate ecliptic coordinates.
+
+
+2 CREATE_FILE
+When creating a proposal file, you can take the cover details from an
+existing file. You cannot alter the target numbers until you exit
+from adding targets, and go back and edit them.
+
+
+2 EDIT_OLD_FILE
+When you choose to edit existing files, RPS makes copies and then
+edits that. Before ending, you will be asked whether you want to keep
+the new versions (default) or the old ones.
+
+
+2 FIELDS
+Each of the fields in use is described under the appropriate section of 
+the form, ie COVER, GENERAL, TARGET and CONSTRAINTS. 'Required' after the 
+description indicates that it is required that you enter the field.
+
+
+2 FILE_NAME
+The filename entered initially (or the default RPS_FORM) is used for the
+various output files that may be created:
+	filename.DAT		proposal cover, general data
+	filename_TARGET.DAT	Target records
+				The above 2 may be referred to elsewhere
+				in docs just as the proposal form or file
+	filename.ABSTRACT	Abstract, entered or edited from RPS (unix vsn)
+	filename.TEX		Latex file of proposal
+	filename.LIS		Summary file
+	filename.POST		Mail file containing proposal details
+
+Note - the unix file names are all uppercase, regardless of case entered.
+
+2 FORM_FILLING
+The unix version of the program has only one mode of operation, namely line 
+mode, as explained below. The data is split into four sections, which are
+completed separately.
+
+   o  COVER	    Personal details and Proposal name, etc.
+   o  GENERAL	    Collaborators, institute authority
+   o  TARGET	    Details of each target in the Proposal
+   o  CONSTRAINTS   Any constraints on the observation time
+
+
+2 LINE_MODE 
+Each piece  of  data in a section is prompted  for  until  the  section is
+completed.   The user  can  then choose to go through the section again to
+check  the  data;  in  this  case  the  original  input  values become the
+defaults.  To choose  the  default value at any point a carriage return is
+used on its own. 
+
+
+2 PRINT_FILE
+The main option is to create the .TEX LaTeX file. You can choose to print 
+particular pages in TeX, or the blank forms, as in the AO document.
+
+
+2 SUBMIT
+This will try to create the .POST file from the proposal form. It might
+fail because:
+- Errors are detected in the cover or a target (checksum errors). Use 
+REVIEW TARGETS or SUMMARISE for more information or enter edit target
+or cover and type ctrl/z to initiate the verification. 
+- The Target numbers do not form a sequence from 1 to the number of 
+target records.
+- There is no abstract file yet, or it is longer than 800 bytes.
+When created, you can choose to let the program mail it to the UKDC
+(rosatmail@sdc1.bnsc.rl.ac.uk) by the method RPS was installed with, or
+you can exit from RPS and Mail it yourself.
+
+
+2 SUMMARISE
+This gives a terminal or file-output summary of the proposal. For each
+target from left to right the fields are:
+
+Heading    	Description
+Rec No		Record number
+Target Name	Target name (16 chars)
+Targ No		Target number
+Qual		Quality indicator - `OK', or `F' if record failed check
+R.A.		RA - HH MM SS.S
+Dec		dec - DD MM SS.S
+Start		start of visible period, due to Sun constraint
+End		end visible period
+		(there may be two periods listed)
+No. obs		Number of observations
+TC		type of time constraint, or 'none'
+Pri Inst	Detectors requested, in priority order
+		W - WFC, P - PSPC, H -HRI
+Time Ksec	Time requested, ksec (to nearest integer)
+2*srv exp XRT	Twice estimated XRT survey exposure, Ksec (cf AO fig. 6.1)
+2*srv exp WFC	Twice estimated WFC survey exposure, Ksec (cf AO fig. 6.3)
+		Data for each filter:
+Instr		Instrument. Z after WFC indicates Zoom on
+Flt		Filter
+%		Time percentage requested
+WFC sec		Time with this filter
+Det cps		estimated cps for detection (cf AO fig. 6.4)
+
+2 VERIFICATION
+When you have filled the cover or a target, a check is made for the
+required entries, and values of certain fields. You are warned of the
+first error detected and have the option to return to that field, but
+you may exit with an unverified form. However you cannot 'submit' 
+such a form so any errors must be corrected or fields filled before
+you attempt to do so.
+
+1 TARGET
+The details that need to be filled in for each different target.
+
+2 ALTERNATIVE.NAME
+Any other name by which the object is known. Maximum 20 characters.
+
+2 CODES_GENERAL_INFORMATION
+The code values are 1 - Main instrument.
+                    2 - Secondary instrument.
+There are only 2 options available these are:
+	  WFC = 1 , HRI = 2 
+	  WFC = 2 , HRI = 1 
+(the PSPC cannot be requested).
+
+2 HRI.CODE
+Indicates whether the High Resolution Imager is to be used.
+
+The code values are 1 - Main instrument.
+                    2 - Secondary instrument.
+There are only 2 options available these are:
+	  WFC = 1 , HRI = 2 
+	  WFC = 2 , HRI = 1 
+
+2 NUMBER.OBS
+Number of observations of the target. This will be one unless
+constraints are set ( TIME.CRITICAL flag set). For MONITOR  and PHASE.DEPENDENT
+observations this will give the number of parts into which the total 
+exposure will be divided.
+
+2 REMARKS
+Any relevant comments you wish to make regarding the Target. 4 x 50 chars.
+
+2 TARGET.DEC
+The declination of the source for epoch J2000. The standard format is
+#DD MM SS - degrees, arcminutes, arcseconds, separated by spaces 
+( # indicates an optional sign). Optionally, it may be entered as degrees 
+(DDD.DDDDDD), in which case it will be converted to sexagesimal during 
+verification. If no sign is given it will be assumed to be +ve. Required.
+
+2 TARGET.NAME
+The normal name for the object. Up to 20 characters. Required.
+
+2 TARGET.NUMBER
+The number of the target. This is automatically filled in when creating a
+form or adding targets. Since the number is used to indicate the observing
+priority of one target relative to another, you may wish to change these
+around, but the final proposal must contain the sequence 1 to the number
+of targets in these fields. A maximum of 20 targets can be submitted on
+one form. Please consult the UKDC if your proposal requires more than 20
+targets.
+
+2 TARGET.RA             
+The Right Ascension of the source for epoch J2000. The standard format is
+HH MM SS - hours, minutes, seconds, separated by spaces. Optionally, it
+may be entered as degrees (DDD.DDDDDD), in which case it will be converted
+to sexagesimal during verification. The seconds may be entered as a real
+value with tenths (ie SS.S). Required.
+
+2 TIME.CRITICAL
+Logical value indicating whether the observation is time dependent. Setting
+this flag will mean that the proposal will need priority 1 if it is to be
+accepted. Since the time for priority 1 observation is strictly limited, you
+should not normally mix targets which require this setting with those that
+do not.
+
+2 TOTAL.OBS.TIME
+The preferred duration in Kiloseconds for the observation. You should 
+compare this with the expected survey exposure, in assessing the value of
+the proposed observation. The allowed range is 1.5 to 1000. Required.
+
+2 WFC.CODE
+Indicates whether the Wide Field Camera is to be used. Required.
+
+The code values are 1 - Main instrument.
+                    2 - Secondary instrument.
+There are only 2 options available these are:
+	  WFC = 1 , HRI = 2 
+	  WFC = 2 , HRI = 1 
+(the PSPC cannot be requested).
+
+2 WFC.FILT.CODE
+Indicates the required filters to be used if the WFC is in use. The valid 
+generic codes are S1, S2, P1, P2, and OPQ. For S1 and S2 the specific
+filters are designated by the suffixes A and B. At least one setting must 
+be selected.
+
+2 WFC.FILT.MINT
+The minimum feasible for each filter in use. Zero is valid.
+
+2 WFC.FILT.PCNT
+The percentage time for each filter in use. '100%' if only one filter 
+selected.
+
+2 WFC.ZOOM.ON
+Indicates if ZOOM mode required. This may be automatically selected for
+some filters.
+

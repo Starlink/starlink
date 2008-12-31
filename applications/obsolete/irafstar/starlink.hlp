@@ -1,0 +1,16 @@
+.help starlink Starlink starlink
+.nf
+starlink - an umbrella package for the Starlink applications
+
+Usage:
+
+   starlink
+
+Description:
+
+   The package sets up some environment variables required for the
+   automatic data-conversion system and provide some utility tasks.
+
+Parameters
+   None
+.endhelp

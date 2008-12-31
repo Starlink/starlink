@@ -1,0 +1,73 @@
+# zzsetenv.def
+# Set environment variables and tasks for Starlink working
+# History:
+#   20-JUN-1997 (AJC):
+#      Original version
+#    1-JUL-1997 (AJC):
+#      Remove setting of HDS_SCRATCH to envget("imdir")
+#   24-SEP-1997 (AJC):
+#      Set ADAM_USER to uparm$  not home$uparm
+#      Add FITS
+#      Revise methods 
+#   30-SEP-1997 (AJC):
+#      Define NDF_DEL_IRAF for removing existing output files
+#   11-DEC-1997 (AJC):
+#      Correct 1>$2 to 1>&2 for iraf2ndf
+#   23-DEC-1997 (AJC):
+#      Use NDF_DEL_IRAF as in CONVERT. The method using imdel in IRAF
+#      copes with pix files elsewhere but causes problems with clio.
+#   29-JUN-1998 (AJC):
+#      Don't force failure if output
+#-
+
+if ( (!deftask( "use_imh" )) ) {
+
+s1 = (osfn(envget("uparm")))
+set ADAM_USER = (substr(s1,1,strlen(s1)-1))
+
+set NDF_FORMATS_IN = "IRAF(.imh),FITS(.fit),FITS(.fits)"
+set NDF_FORMATS_OUT = "IRAF(.imh),FITS(.fit),FITS(.fits)"
+
+set NDF_FROM_IRAF = "$iraf2ndf;cvt ^dir ^name ^ndf"
+set NDF_TO_IRAF = "$ndf2iraf;cvt ^ndf ^dir ^name"
+#set NDF_DEL_IRAF = "sh -c \"echo 'imdelete ^dir^name';logout | cl\""
+set NDF_DEL_IRAF = "f='\'^dir^name\'';touch \"$f.imh\" \"$f.pix\";rm \"$f.imh\" \"$f.pix\""
+
+set NDF_FROM_FITS = "$fits2ndf;cvt ^dir ^name ^type ^ndf"
+set NDF_TO_FITS = "$ndf2fits;cvt ^ndf ^dir ^name ^type"
+
+
+# FITS need a special temporary file (see CONVERT)
+# Must use old method until defvar (IRAF V2.11) is available on all platforms
+s1 = "NONE"
+show | match ("HDS_SCRATCH", stop-) | scan (s1)
+if (s1 == "NONE")
+   set NDF_TEMP_FITS="temp_fits_^name"
+else
+   set NDF_TEMP_FITS=(envget("HDS_SCRATCH") // "/temp_fits_^name")
+
+# The conversion switching tasks
+task $use_imh = starlink$irafstar/use_imh.cl
+task $use_fits = starlink$irafstar/use_fits.cl
+task $use_ndf = starlink$irafstar/use_ndf.cl
+}
+;
+# Can't put the following inside a compound statement for the if. Probably
+# because it contains {}
+set ndf2iraf='eval cvt() { \
+              unset ICL_TASK_NAME;unset NDF_FORMATS_IN;\
+              $CONVERT_DIR/ndf2iraf out=$2$3 in=$1 $NDF_TO_IRAF_PARS 1>&2;\
+          }'
+set ndf2fits='eval cvt() { \
+              unset ICL_TASK_NAME;unset NDF_FORMATS_IN;\
+              $CONVERT_DIR/ndf2fits out=$2$3$4 in=$1 $NDF_TO_FITS_PARS 1>&2;\
+          }'
+set iraf2ndf='eval cvt() { \
+              unset ICL_TASK_NAME;unset NDF_FORMATS_OUT;\
+              $CONVERT_DIR/iraf2ndf in=$1$2 out=$3 $NDF_FROM_IRAF_PARS 1>&2;\
+          }'
+set fits2ndf='eval cvt() { \
+              unset ICL_TASK_NAME;unset NDF_FORMATS_OUT;\
+              $CONVERT_DIR/fits2ndf in=$1$2$3 out=$4 $NDF_FROM_FITS_PARS 1>&2;\
+          }'
+keep

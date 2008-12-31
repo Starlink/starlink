@@ -1,0 +1,17 @@
+.help use_fits Starlink starlink
+.nf
+use_fits - default to produce FITS files out.
+
+Usage:
+
+   use_fits
+
+Description:
+
+   The script sets the environment variable NDF_FORMATS_OUT so that no
+   automatic conversion is applied to NDF files produced by Starlink 
+   programs.
+
+Parameters
+   None
+.endhelp

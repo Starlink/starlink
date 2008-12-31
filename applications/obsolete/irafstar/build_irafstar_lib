@@ -1,0 +1,12 @@
+# Create the source archive for the irafstar package
+#
+echo IRAFSTAR
+tar cfh irafstar_source.tar \
+tclAppInit.c tclIrafio.c zfiopr.c \
+tclIrafio.h \
+adamadap.tcl \
+starlink.cl starlink.par zzsetenv.def \
+use_imh.cl use_fits.cl use_ndf.cl \
+_starlink.hd  root.hd starlink.hd \
+starlink.men starlink.hlp helpdb.mip doc \
+build_irafstar_lib

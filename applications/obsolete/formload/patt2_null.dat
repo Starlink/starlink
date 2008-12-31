@@ -1,0 +1,101 @@
+
+                  $FORMLOAD_DIR\patt2_null.dat     
+
+             A file containing null entries to load into the 
+               PATT2 Application form to get a form
+
+     Alan Penny       Rutherford Appleton Laboratory   1992 Feb
+     Bill Martin      Royal Greenwich Observatory      1995 July
+--------------------------------------------------------------------
+
+01_1_01#?$& AAT,WHT,INT,JKT,UKIRT      !
+01_2_01#?$& Semester                   !
+01_3_01#?$& Surname of PA              !
+01_3_02#?$& Title                      !
+01_3_03#?$& Initials                   !
+01_3_04#?$& Post held                  !
+01_3_05#?$& Address (line 1)           !
+01_3_06#?$& Address (line 2)           !
+01_3_07#?$& Address (line 3)           !
+01_3_08#?$& Telephone                  !
+01_3_09#?$& Fax                        !
+01_3_10#?$& E-Mail                     !
+01_3_11#?$& Will the PA be observing?  !
+01_4_01#?$& Collaborators (1)-name     !
+01_4_02#?$& Collaborators (1)-Inst     !
+01_4_03#?$& Collaborators (1)-observe? !
+01_4_04#?$& Collaborators (2)-name     !
+01_4_05#?$& Collaborators (2)-Inst     !
+01_4_06#?$& Collaborators (2)-observe? !
+01_4_07#?$& Collaborators (3)-name     !
+01_4_08#?$& Collaborators (3)-Inst     !
+01_4_09#?$& Collaborators (3)-observe? !
+01_4_10#?$& Collaborators (4)-name     !
+01_4_11#?$& Collaborators (4)-Inst     !
+01_4_12#?$& Collaborators (4)-observe? !
+01_5_01#?$& Investigation title(12wds) !
+01_6_01#?$& Summary of proposal        !
+01_7_01#?$& Focal station              !
+01_7_02#?$& Instrument                 !
+01_7_03#?$& Detector(s)                !
+01_7_04#?$& Gratings/Filters           !
+01_8_01#?$& Time this semester (dark)  !
+01_8_02#?$& Time this semester (grey)  !
+01_8_03#?$& Time this semester (bright)!
+01_8_04#?$& Specify nights or weeks    !
+01_8_05#?$& Minimum useful (dark)      !
+01_8_06#?$& Minimum useful (grey)      !
+01_8_07#?$& Minimum useful (bright)    !
+01_9_01#?$& Long Term (total time-dark)!
+01_9_02#?$& Long Term (total time-grey)!
+01_9_03#?$& Long Term (total time-brit)!
+01_9_04#?$& Specify nights or weeks    !
+
+02_1_01#?$& Preferred dates            !
+02_1_02#?$& Impossible dates           !
+02_1_03#?$& Justify imp. dates  - 1    !
+02_1_04#?$& Justify imp. dates  - 2    !
+02_1_05#?$& Other telescopes? Simult?  !
+02_1_06#?$& Scheduling constraints     !
+02_2_01#?$& Service observing-YES-put-x!
+02_2_02#?$& Service observing -NO-put-x!
+02_2_03#?$& Service observing -maybe  x!
+02_3_01#?$& SA at Tel - every night?  x!
+02_3_02#?$& SA at Tel - NO            x!
+02_3_03#?$& SA at Tel-first night onlyx!
+02_5_01#?$& List of principal targets  !
+02_6_01#?$& Other applications?(Tel)-1 !
+02_6_02#?$& Other applications?(Title) ! 
+02_6_03#?$& Other applications?(Tel)-2 !
+02_6_04#?$& Other applications?(Title) ! 
+02_6_05#?$& Other applications?(Tel)-3 !
+02_6_06#?$& Other applications?(Title) !
+02_6_07#?$& Other applications?(Tel)-4 !
+02_6_08#?$& Other applications?(Title) !
+
+03_1_01#?$& Scientific Justification   !
+04_1_01#?$& Technical information (I)  !
+04_1_02#?$& Technical information (II  !
+05_1_01#?$& Backup programme (summary) !
+05_2_01#?$& Last 4 Sems (see,eg,Table) !
+05_3_01#?$& Pubs for last 4 Sems (6)   !
+05_4_01#?$& Experience of Observers    !
+05_5_01#?$& Student research? (Name)   !
+05_5_02#?$& Student research (Grant)   !
+05_6_01#?$& Research grant obs? (PI)   !
+05_6_02#?$& Research obs?(Grant title) !
+05_6_03#?$& Research obs? (Grant No.)  !
+05_7_01#?$& Non-standard T and S       !
+05_8_01#?$& Other expenditure(freight) !
+06_2_01#?$& Summary Slip (short title) !
+06_2_02#?$& Pricipal App and Institute !
+06_2_03#?$& Time this Semester (Dark)  !
+06_2_04#?$& Time this Semester (Grey)  !
+06_2_05#?$& Time this Semester(Bright) !
+06_2_06#?$& Time requested(nights/wks) !
+06_3_01#?$& Acknowledge (short title)  !
+
+06_3_02#?$& Address for Acknowledge    !
+
+XE_0_00#?$& LaTeX setup commands      p!
+

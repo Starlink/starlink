@@ -1,0 +1,10 @@
+      LOGICAL FUNCTION MDH_CTOL( CVAL )
+      CHARACTER*(*) CVAL
+      INTEGER IANS , MDH_LOGIC
+      IANS = MDH_LOGIC( CVAL )
+      IF ( IANS .GT. 0 ) THEN
+        MDH_CTOL = .TRUE.
+      ELSE IF ( IANS .LT. 0 ) THEN
+        MDH_CTOL = .FALSE.
+      END IF
+      END

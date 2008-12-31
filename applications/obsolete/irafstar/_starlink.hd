@@ -1,0 +1,9 @@
+# Help definitions for the starlink package
+
+$doc = "./doc"
+
+starlink     men = starlink.men,
+         hlp = ..,
+         sys = starlink.hlp,
+         pkg = starlink.hd,
+         src = starlink.cl

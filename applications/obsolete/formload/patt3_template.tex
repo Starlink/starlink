@@ -1,0 +1,890 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                          %
+%         template for the PATT3 Form                      %
+%        FORLMOAD_DIR:PATT3_TEMPLATE.TEX                   %
+%                                                          %
+%     Alan   Penny          RAL           1992 October     %
+%     Bill Martin           RGO           1995 January     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% To insert your own text, replace the lines that contain %?#$&input.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%?#$&pages
+% a xx xx xx xx xx a
+% a 1  2  3        a
+% x xx xx xx xx xx x
+
+%?#$&questions
+% a xxxxxxx xxxxxxx xxxxxxx xxxxxxx xxxxxxx a
+% a 01_1_01 01_2_01 01_2_02 01_2_03 01_2_04 a
+% a 01_2_05 01_2_06 01_2_07 01_2_08 01_2_09 a
+% a 01_2_10 01_2_11 01_2_12 01_2_13 01_2_14 a
+% a 01_2_15 01_2_16 01_2_17 01_2_18 01_2_19 a
+% a 01_2_20 01_3_01 01_3_02 01_3_03 01_4_01 a
+% a 01_5_01 01_5_02 01_6_01 01_6_02 01_6_03 a
+% a 01_6_04 01_6_05 01_6_06 01_6_07 01_6_08 a
+% a 01_6_09 01_6_10 01_6_11 01_6_12 01_6_13 a
+% a 01_6_14 01_7_01 01_7_02 01_7_03 01_7_04 a
+% a 01_7_05 01_7_06 01_7_07 01_7_08 01_7_09 a
+% a 01_7_10 01_8_01 02_9_01 02_9_02 02_9_03 a
+% a 03_1_01 03_1_02 03_1_03 03_1_04 03_1_05 a
+% a 03_1_06 03_1_07 03_2_01 03_2_02 03_2_03 a
+% a 03_2_04 03_2_05 03_2_06 03_2_07 XE_0_00 a
+% x xxxxxxx xxxxxxx xxxxxxx xxxxxxx xxxxxxx a
+
+%?#$&special
+% a xxxxxxx xxxxxxxxx1xxxxxxxxx2xxxxxxxxx3xxxxxxxxx4xxxxxxxxx5xxxxxxxxx6
+% a 01_2_04  "y"  "\ajby"  "Y"  "\ajby"  "n"  "\ajbn"  "N"  "\ajbn"
+% a 01_2_12  "y"  "\ajby"  "Y"  "\ajby"  "n"  "\ajbn"  "N"  "\ajbn"
+% a 01_2_14  "y"  "\ajby"  "Y"  "\ajby"  "n"  "\ajbn"  "N"  "\ajbn" 
+% a 01_2_16  "y"  "\ajby"  "Y"  "\ajby"  "n"  "\ajbn"  "N"  "\ajbn"
+% a 01_2_18  "y"  "\ajby"  "Y"  "\ajby"  "n"  "\ajbn"  "N"  "\ajbn"
+% a 01_2_20  "y"  "\ajby"  "Y"  "\ajby"  "n"  "\ajbn"  "N"  "\ajbn"
+% a 01_3_03  "y"  "\ajby"  "Y"  "\ajby"  "n"  "\ajbn"  "N"  "\ajbn"
+% a 01_5_01  "y"  "\ajby"  "Y"  "\ajby"  "n"  "\ajbn"  "N"  "\ajbn"
+% a 03_1_01  "y"  "\ajby"  "Y"  "\ajby"  "n"  "\ajbn"  "N"  "\ajbn"
+% a 03_1_05  "y"  "\ajby"  "Y"  "\ajby"  "n"  "\ajbn"  "N"  "\ajbn"
+% x xxxxxxx xxxxxxxxx1xxxxxxxxx2xxxxxxxxx3xxxxxxxxx4xxxxxxxxx5xxxxxxxxx6
+
+%?#$&message
+% a xxxxxxxxx1xxxxxxxxx2xxxxxxxxx3xxxxxxxxx4xxxxxxxxx5xxxxxxxxx6xxxxx a
+% a  This PATT3 template version correct as July 1995.                a
+% x xxxxxxxxx1xxxxxxxxx2xxxxxxxxx3xxxxxxxxx4xxxxxxxxx5xxxxxxxxx6xxxxx x
+
+%?#$&scale(001.000)(001.000)(000.000)(000.000)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%?#$&startbeg
+
+\documentstyle[11pt]{article}
+
+%?#$&offset
+\topmargin -1.25in
+\oddsidemargin -0.55in     
+\evensidemargin -0.55in     
+%?#$&endoffset
+
+
+\textheight 11.05in
+\textwidth 8.0in
+\parskip 8pt plus 3pt minus 2pt
+\parindent 0in
+\pagestyle{empty}			
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% These fonts may need local changes
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\font\ajfrn=cmr10
+\font\ajfrL=cmr12
+\font\ajbf=cmssbx10
+\font\ajssl=cmss12
+\font\ajsss=cmss8
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Formload LaTeX commands
+
+\font\ajinpfont=cmss9
+
+\newcommand{\ajnull}{\makebox[0.05in]{\phantom{a}}}
+
+%?#$&startmid
+
+%?#$&input XE_0_00
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PATT3 LaTeX commands
+
+\newcommand{\ajyn}{\ajssl \setlength{\baselineskip}{2.3mm} Y/N}
+
+\newcommand{\ajy}{\ajssl \setlength{\baselineskip}{2.3mm} Y/N
+                  \hspace*{-0.16in}\rule[0.02in]{0.09in}{0.08in}}
+
+\newcommand{\ajn}{\ajssl \setlength{\baselineskip}{2.3mm} Y/N
+                  \hspace*{-0.35in}\rule[0.02in]{0.09in}{0.08in}}
+
+\newcommand{\ajyesno}{\ajssl YES/NO}
+
+\newcommand{\ajno}{\ajssl YES/NO\hspace*{-0.49in}\rule[0.02in]{0.18in}{0.06in}}
+
+\newcommand{\ajyes}{\ajssl YES/NO\hspace*{-0.18in}\rule[0.02in]{0.13in}{0.06in}}
+
+\newcommand{\ajby}{\ajssl \setlength{\baselineskip}{2.3mm} \phantom{Y/N}
+                  \hspace*{-0.16in}\rule[0.02in]{0.09in}{0.08in}}
+
+\newcommand{\ajbn}{\ajssl \setlength{\baselineskip}{2.3mm} \phantom{Y/N}
+                  \hspace*{-0.35in}\rule[0.02in]{0.09in}{0.08in}}
+
+\newcommand{\ajbno}{\ajssl 
+                    \phantom{YES/NO}\hspace*{-0.61in}\rule[0.02in]{0.30in}{0.06in}}
+
+\newcommand{\ajbyes}{\ajssl 
+                     \phantom{YES/NO}\hspace*{-0.18in}\rule[0.02in]{0.20in}{0.06in}}
+
+\newcommand{\yydash}{\rule[0.0in]{0.17in}{0.5pt}\hspace*{0.074in}}
+
+\newcommand{\ydash}{\yydash\yydash\yydash\yydash\yydash\yydash\yydash\yydash
+                    \yydash\yydash\yydash\yydash\yydash\yydash\yydash\yydash
+                    \yydash\yydash\yydash\yydash\yydash\yydash\yydash\yydash
+                    \yydash\yydash\yydash\yydash\yydash\yydash\yydash}
+
+
+
+%SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
+
+
+\begin{document}
+
+\small\setlength{\baselineskip}{2.3mm}
+
+%?#$&startend
+
+%EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+
+%?#$&page1
+
+\vspace*{1.3cm}\hspace*{-0.4cm}{\setlength{\unitlength}{1.0cm}
+\begin{picture}(19.00,25.80)(00.00,01.30)
+
+ \put(17.60,28.50){{\ajbf PATT 3 }}
+ \put(17.20,28.00){{\bf \footnotesize \sf Millimetre \& }}
+ \put(17.20,27.70){{\bf \footnotesize \sf Submillimetre }}
+ \put(17.30,27.40){{\bf \footnotesize \sf (Feb 1995) }}
+ \put(06.20,28.00){{\ajbf JAMES CLERK MAXWELL TELESCOPE }}
+ \put(06.30,27.50){{\ajbf APPLICATION FOR TELESCOPE TIME }}
+ \put(00.30,27.10){\rule{18.4cm}{0.03cm}}
+ \put(12.90,26.60){{\small \sf For office use only }}
+ \put(00.35,26.60){{\small \bf \sf Read `The JCMT Newsletter', contact 
+             JCMT\_INFO, or access the World-Wide-Web}} 
+ \put(00.35,26.20){{\small \bf \sf 
+             (http://www.jach.hawaii.edu) 
+             for up-to-date
+             information }}
+ \put(12.90,26.20){{\small \bf \sf REF:- }}
+ \put(00.30,25.90){\rule{18.4cm}{0.03cm}}
+ \put(12.70,25.90){\line(0,1){1.23}}
+
+ \put(00.35,25.30){{\sf 1 }}
+ \put(01.65,25.30){{\ajbf Semester: }}
+ \put(06.00,25.30){{\sf (last 2 digits of year, followed by `A' for Feb -- Jul;
+            or `B' for Aug -- Jan semesters)}}
+ \put(00.30,25.10){\rule{18.4cm}{0.03cm}}
+
+ \put(00.35,24.60){{\sf 2 }}
+ \put(01.20,24.60){{\sf i) }}
+ \put(01.65,24.60){{\sf Principal Investigator: }}
+ \put(16.90,24.60){{\sf Possible }}
+ \put(01.65,24.20){{\sf Surname }}
+ \put(16.90,24.20){{\sf Observer }}
+ \put(10.00,24.20){{\sf Title }}
+ \put(12.50,24.20){{\sf Initials }}
+ \put(01.70,23.70){\line(1,0){7.6}}
+ \put(01.70,23.70){\line(0,1){0.2}}
+ \put(09.30,23.70){\line(0,1){0.2}}
+ \put(10.00,23.70){\line(1,0){1.7}}
+ \put(10.00,23.70){\line(0,1){0.2}}
+ \put(11.70,23.70){\line(0,1){0.2}}
+ \put(12.50,23.70){\line(1,0){1.7}}
+ \put(12.50,23.70){\line(0,1){0.2}}
+ \put(14.20,23.70){\line(0,1){0.2}}
+ \put(16.800,23.70){{\ajyn }}
+ \put(01.65,23.10){{\sf Address }}
+ \put(11.60,23.10){{\sf Full Internet E. Mail address: }}
+ \put(03.40,22.60){\line(1,0){7.7}}
+ \put(03.40,22.60){\line(0,1){0.2}}
+ \put(11.10,22.60){\line(0,1){0.2}}
+ \put(12.80,22.60){\line(1,0){5.8}}
+ \put(12.80,22.60){\line(0,1){0.2}}
+ \put(18.60,22.60){\line(0,1){0.2}}
+ \put(13.10,22.10){{\sf Fax: }}
+ \put(14.30,22.10){\line(1,0){4.3}}
+ \put(14.30,22.10){\line(0,1){0.2}}
+ \put(18.60,22.10){\line(0,1){0.2}}
+ \put(03.40,22.10){\line(1,0){7.7}}
+ \put(03.40,22.10){\line(0,1){0.2}}
+ \put(11.10,22.10){\line(0,1){0.2}}
+ \put(11.60,21.60){{\sf Telephone \& Ext: }}
+ \put(14.30,21.60){\line(1,0){4.3}}
+ \put(14.30,21.60){\line(0,1){0.2}}
+ \put(18.60,21.60){\line(0,1){0.2}}
+ \put(03.40,21.60){\line(1,0){7.7}}
+ \put(03.40,21.60){\line(0,1){0.2}}
+ \put(11.10,21.60){\line(0,1){0.2}}
+
+ \put(01.00,21.10){{\sf ii) }}
+ \put(01.65,21.10){{\sf Collaborators (state institution) }}
+ \put(01.65,20.60){\line(1,0){10.4}}
+ \put(01.65,20.60){\line(0,1){0.2}}
+ \put(12.05,20.60){\line(0,1){0.2}}
+ \put(16.80,20.60){{\ajyn }}
+ \put(01.65,20.10){\line(1,0){10.4}}
+ \put(01.65,20.10){\line(0,1){0.2}}
+ \put(12.05,20.10){\line(0,1){0.2}}
+ \put(16.80,20.10){{\ajyn }}
+ \put(01.65,19.60){\line(1,0){10.4}}
+ \put(01.65,19.60){\line(0,1){0.2}}
+ \put(12.05,19.60){\line(0,1){0.2}}
+ \put(16.80,19.60){{\ajyn }}
+ \put(01.65,19.10){\line(1,0){10.4}}
+ \put(01.65,19.10){\line(0,1){0.2}}
+ \put(12.05,19.10){\line(0,1){0.2}}
+ \put(16.80,19.10){{\ajyn }}
+ \put(01.65,18.60){\line(1,0){10.4}}
+ \put(01.65,18.60){\line(0,1){0.2}}
+ \put(12.05,18.60){\line(0,1){0.2}}
+ \put(16.80,18.60){{\ajyn }}
+
+ \put(00.30,18.15){\rule{18.4cm}{0.03cm}}
+
+ \put(00.35,17.70){{\sf 3 }}
+ \put(01.65,17.70){{\sf TITLE OF INVESTIGATION(12 words maximum) }}
+ \put(10.30,17.70){\line(1,0){8.3}}
+ \put(10.30,17.70){\line(0,1){0.2}}
+ \put(18.60,17.70){\line(0,1){0.2}}
+ \put(01.60,17.20){\line(1,0){12.75}}
+ \put(01.60,17.20){\line(0,1){0.2}}
+ \put(14.35,17.20){\line(0,1){0.2}}
+
+ \put(14.45,17.20){{\scriptsize Student Thesis Project?} \ajyn}
+
+ \put(00.30,16.95){\rule{18.4cm}{0.03cm}}
+
+ \put(00.35,16.55){{\sf 4 }}
+ \put(01.65,16.55){{\sf ABSTRACT OF PROPOSED OBSERVATIONS}} 
+
+ \put(00.30,13.25){\rule{18.4cm}{0.03cm}}
+ 
+ \put(00.35,12.75){{\sf 5 }}
+ \put(01.65,12.75){{\sf LONG TERM STATUS: }}
+ \put(05.15,12.75){\ajyn}
+ \put(06.50,12.75){{\sf If yes, give total number of useful shifts needed to
+             complete programme: }}
+
+ \put(00.30,12.55){\rule{18.4cm}{0.03cm}}
+ 
+ \put(00.35,12.20){{\sf 6 }}
+ \put(01.65,12.20){{\sf RECEIVERS REQUESTED:}}
+ \put(06.00,12.20){  $\bigcirc$  Rx A 
+     \hspace{0.25cm} $\bigcirc$  Rx B3i 
+     \hspace{0.25cm} $\bigcirc$  Rx C2 
+     \hspace{0.25cm} $\bigcirc$  Rx G  
+     \hspace{0.25cm} $\bigcirc$  UKT14  
+     \hspace{0.25cm} $\bigcirc$  +pol 
+     \hspace{0.25cm} $\bigcirc$  Other}
+ \put(06.00,11.90){\tiny 208-280 GHz \hspace{0.3cm}
+     298-380 GHz \hspace{0.3cm}
+     450-504 GHz \hspace{0.3cm}
+     660-692 GHz \hspace{0.3cm}
+     continuum bolometer }
+ \put(04.05,11.40){{\sf \# HOURS:}}
+ \put(06.25,11.40){\line(1,0){1.1}}
+ \put(06.25,11.40){\line(0,1){0.2}}
+ \put(07.35,11.40){\line(0,1){0.2}}
+ \put(08.05,11.40){\line(1,0){1.1}}
+ \put(08.05,11.40){\line(0,1){0.2}}
+ \put(09.15,11.40){\line(0,1){0.2}}
+ \put(10.05,11.40){\line(1,0){1.1}}
+ \put(10.05,11.40){\line(0,1){0.2}}
+ \put(11.15,11.40){\line(0,1){0.2}}
+ \put(11.95,11.40){\line(1,0){1.1}}
+ \put(11.95,11.40){\line(0,1){0.2}}
+ \put(13.05,11.40){\line(0,1){0.2}}
+ \put(13.75,11.40){\line(1,0){1.1}}
+ \put(13.75,11.40){\line(0,1){0.2}}
+ \put(14.85,11.40){\line(0,1){0.2}}
+ \put(15.85,11.40){\line(1,0){1.1}}
+ \put(15.85,11.40){\line(0,1){0.2}}
+ \put(16.95,11.40){\line(0,1){0.2}}
+ \put(17.55,11.40){\line(1,0){1.1}}
+ \put(17.55,11.40){\line(0,1){0.2}}
+ \put(18.65,11.40){\line(0,1){0.2}}
+
+ \put(00.30,11.15){\rule{18.4cm}{0.03cm}}
+ 
+ \put(00.35,10.65){{\sf 7 }}
+ \put(01.65,10.65){{\sf DETAILS OF OBSERVING TIME (give complete breakdown by
+             instrument on the Technical page)}}
+ \put(00.90,10.15){{\sf i) }}
+ \put(01.50,10.15){{\sf Total number of shifts requested: \dotfill }}
+ \put(09.00,10.15){{\sf ii) }}
+ \put(09.60,10.15){{\sf Preferred scheduling: \dotfill }}
+ \put(00.90,09.65){{\sf iii) }}
+ \put(01.50,09.65){{\sf Impossible dates (give reasons) \dotfill }}
+ \put(00.90,09.25){{\sf iv) }}
+ \put(01.50,09.25){{\sf Remote eavesdropping  
+		\hspace{0.5cm} $\bigcirc$ Yes 
+		\hspace{0.3cm} $\bigcirc$ No  }}
+
+ \put(10.20,09.25){{\sf v) }}
+ \put(10.70,09.25){{\sf Serviced observing
+		\hspace{0.5cm} $\bigcirc$ Yes 
+                \hspace{0.3cm} $\bigcirc$ No  }}
+
+ \put(00.90,08.75){{\sf vi) }}
+ \put(01.50,08.75){{\sf Flexible Scheduling
+		\hspace{0.5cm} $\bigcirc$ Preferred
+		\hspace{0.3cm} $\bigcirc$ Possible
+		\hspace{0.3cm} $\bigcirc$ No        }} 
+ \put(00.30,08.50){\rule{18.4cm}{0.03cm}}
+
+ \put(00.35,08.00){{\sf 8  }}
+ \put(01.65,08.00){{\sf LIST OF PRINCIPAL SOURCES (exact coordinates
+             required, continue on Figs \& Tables page if necessary) }}
+ \put(00.40,07.40){{\sf Name  }}
+ \put(02.80,07.40){{\sf RA  }}
+ \put(04.70,07.40){{\sf Dec  }}
+ \put(05.70,07.40){{\sf Point or }}
+ \put(07.30,07.40){{\sf Brightness/Flux  }}
+ \put(10.60,07.40){{\sf V(lsr)  }}
+ \put(11.90,07.40){{\sf Point or }}
+ \put(13.65,07.40){{\sf Linewidth  }}
+ \put(16.40,07.40){{\sf Priority  }}
+ \put(00.40,07.28){\line(1,0){0.80}}
+ \put(02.30,07.28){\line(1,0){1.40}}
+ \put(04.40,07.28){\line(1,0){1.00}}
+ \put(05.70,07.28){\line(1,0){1.10}}
+ \put(07.30,07.28){\line(1,0){2.40}}
+ \put(10.60,07.28){\line(1,0){0.90}}
+ \put(11.90,07.28){\line(1,0){1.10}}
+ \put(13.65,07.28){\line(1,0){1.40}}
+ \put(16.40,07.28){\line(1,0){1.20}}
+ \put(02.20,06.95){{\sf (hh mm ss)  }}
+ \put(04.40,06.95){{\sf (dd ' ")  }}
+ \put(05.70,06.95){{\sf Extended }}
+ \put(07.27,06.95){{\sf ($T_{a}$*(K)/F(mJy))  }}
+ \put(10.60,06.95){{\sf (km/s)  }}
+ \put(12.10,06.95){{\sf Maps }}
+ \put(13.90,06.95){{\sf (km/s)  }}
+ \put(00.30,02.00){\rule{18.4cm}{0.03cm}}
+
+ \put(09.30,01.30){{\small \sf 1 }}
+
+\end{picture}}
+
+
+\vspace*{-26.75cm}{\ajinpfont
+
+
+{%?#$&\bjpos(03.20)(01.40)(02.00)(02.00)
+\ajnull%?#$&input 01_1_01
+}
+
+{%?#$&\bjpos(01.40)(02.90)(07.00)(02.00)
+\ajnull%?#$&input 01_2_01
+}
+
+{%?#$&\bjpos(09.80)(02.90)(01.50)(02.00)
+\ajnull%?#$&input 01_2_02
+}
+
+{%?#$&\bjpos(12.30)(02.90)(01.50)(02.00)
+\ajnull%?#$&input 01_2_03
+}
+
+{%?#$&\bjpos(17.50)(02.70)(02.00)(02.00)
+\ajnull%?#$&input 01_2_04
+}
+
+{%?#$&\bjpos(03.10)(04.00)(08.00)(02.00)
+\ajnull%?#$&input 01_2_05
+}
+
+{%?#$&\bjpos(03.10)(04.50)(08.00)(02.00)
+\ajnull%?#$&input 01_2_06
+}
+
+{%?#$&\bjpos(03.10)(05.00)(08.00)(02.00)
+\ajnull%?#$&input 01_2_07
+}
+
+{%?#$&\bjpos(12.60)(04.00)(06.00)(02.00)
+\ajnull%?#$&input 01_2_08
+}
+
+{%?#$&\bjpos(14.10)(04.50)(04.00)(02.00)
+\ajnull%?#$&input 01_2_09
+}
+
+{%?#$&\bjpos(14.10)(05.00)(04.00)(02.00)
+\ajnull%?#$&input 01_2_10
+}
+
+{%?#$&\bjpos(01.40)(06.00)(11.00)(02.00)
+\ajnull%?#$&input 01_2_11
+}
+
+{%?#$&\bjpos(17.50)(05.80)(01.00)(02.00)
+\ajnull%?#$&input 01_2_12
+}
+
+{%?#$&\bjpos(01.40)(06.50)(11.00)(02.00)
+\ajnull%?#$&input 01_2_13
+}
+
+{%?#$&\bjpos(17.50)(06.30)(01.00)(02.00)
+\ajnull%?#$&input 01_2_14
+}
+
+{%?#$&\bjpos(01.40)(07.00)(11.00)(02.00)
+\ajnull%?#$&input 01_2_15
+}
+
+{%?#$&\bjpos(17.50)(06.80)(01.00)(02.00)
+\ajnull%?#$&input 01_2_16
+}
+
+{%?#$&\bjpos(01.40)(07.50)(11.00)(02.00)
+\ajnull%?#$&input 01_2_17
+}
+
+{%?#$&\bjpos(17.50)(07.30)(01.00)(02.00)
+\ajnull%?#$&input 01_2_18
+}
+
+{%?#$&\bjpos(01.40)(08.00)(11.00)(02.00)
+\ajnull%?#$&input 01_2_19
+}
+
+{%?#$&\bjpos(17.50)(07.80)(01.00)(02.00)
+\ajnull%?#$&input 01_2_20
+}
+
+{%?#$&\bjpos(10.10)(08.90)(08.00)(02.00)
+\ajnull%?#$&input 01_3_01
+}
+
+{%?#$&\bjpos(01.40)(09.40)(13.00)(02.00)
+\ajnull%?#$&input 01_3_02
+}
+
+{%?#$&\bjpos(18.50)(09.20)(01.00)(02.00)
+\ajnull%?#$&input 01_3_03
+}
+
+{%?#$&\bjpos(01.40)(10.80)(17.00)(03.00)
+\ajnull%?#$&input 01_4_01
+}
+
+{%?#$&\bjpos(05.80)(13.60)(01.00)(02.00)
+\ajnull%?#$&input 01_5_01
+}
+
+{%?#$&\bjpos(17.20)(14.00)(03.00)(02.00)
+\ajnull%?#$&input 01_5_02
+}
+
+{%?#$&\bjpos(05.80)(14.50)(01.00)(02.00)
+\ajnull%?#$&input 01_6_01
+}
+
+{%?#$&\bjpos(06.00)(15.30)(01.00)(02.00)
+\ajnull%?#$&input 01_6_02           
+}
+
+{%?#$&\bjpos(07.60)(14.50)(01.00)(02.00)
+\ajnull%?#$&input 01_6_03
+}
+
+{%?#$&\bjpos(07.80)(15.30)(01.00)(02.00)
+\ajnull%?#$&input 01_6_04
+}
+
+{%?#$&\bjpos(09.65)(14.50)(01.00)(02.00)
+\ajnull%?#$&input 01_6_05
+}
+
+{%?#$&\bjpos(09.80)(15.30)(01.00)(02.00)
+\ajnull%?#$&input 01_6_06
+}
+
+{%?#$&\bjpos(11.60)(14.50)(01.00)(02.00)
+\ajnull%?#$&input 01_6_07
+}
+
+{%?#$&\bjpos(11.70)(15.30)(01.00)(02.00)
+\ajnull%?#$&input 01_6_08
+}
+
+{%?#$&\bjpos(13.40)(14.50)(01.00)(02.00)
+\ajnull%?#$&input 01_6_09
+}
+
+{%?#$&\bjpos(13.50)(15.30)(01.00)(02.00)
+\ajnull%?#$&input 01_6_10
+}
+
+{%?#$&\bjpos(15.50)(14.50)(01.00)(02.00)
+\ajnull%?#$&input 01_6_11
+}
+
+{%?#$&\bjpos(15.60)(15.30)(01.00)(02.00)
+\ajnull%?#$&input 01_6_12
+}
+
+{%?#$&\bjpos(17.20)(14.50)(01.00)(02.00)
+\ajnull%?#$&input 01_6_13
+}
+
+{%?#$&\bjpos(17.30)(15.30)(01.00)(02.00)
+\ajnull%?#$&input 01_6_14
+}
+
+{%?#$&\bjpos(06.20)(16.60)(03.00)(02.00)
+\ajnull%?#$&input 01_7_01
+}
+
+{%?#$&\bjpos(12.50)(16.60)(06.00)(02.00)
+\ajnull%?#$&input 01_7_02
+}
+
+{%?#$&\bjpos(06.00)(17.10)(12.00)(02.00)
+\ajnull%?#$&input 01_7_03
+}
+
+{%?#$&\bjpos(05.25)(17.50)(01.00)(02.00)
+\ajnull%?#$&input 01_7_04
+}
+
+{%?#$&\bjpos(06.75)(17.50)(01.00)(02.00)
+\ajnull%?#$&input 01_7_05
+}
+
+{%?#$&\bjpos(13.85)(17.50)(01.00)(02.00)
+\ajnull%?#$&input 01_7_06
+}
+
+{%?#$&\bjpos(15.35)(17.50)(01.00)(02.00)
+\ajnull%?#$&input 01_7_07
+}
+
+{%?#$&\bjpos(04.75)(18.00)(01.00)(02.00)
+\ajnull%?#$&input 01_7_08
+}
+
+{%?#$&\bjpos(07.10)(18.00)(01.00)(02.00)
+\ajnull%?#$&input 01_7_09
+}
+
+{%?#$&\bjpos(09.30)(18.00)(01.00)(02.00)
+\ajnull%?#$&input 01_7_10
+}
+
+{%?#$&\bjpos(00.00)(20.30)(18.00)(05.00)
+\ajnull%?#$&input 01_8_01
+}
+
+}
+
+\eject
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%?#$&page2
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace*{1.0cm}\hspace*{-0.0cm}{\setlength{\unitlength}{1.00cm}
+\begin{picture}(19.00,25.80)(00.00,01.30)
+ \put(00.30,28.00){\rule{18.4cm}{0.03cm}}
+
+ \put(00.35,27.50){{\sf 9  }}
+ \put(01.65,27.50){{\sf RELATED APPLICATIONS (over last 4 semesters (include unsuccessful 
+applications))  }}
+ \put(01.40,27.00){{\sf Complete Ref (ie: M/94A/U22) }}
+ \put(07.30,27.00){{\sf Allocated }}
+ \put(10.00,27.00){{\sf Useful Shifts }}
+ \put(13.40,27.00){{\sf Comments  }}
+ \put(00.30,24.00){\rule{18.4cm}{0.03cm}}
+
+ \put(00.35,23.50){{\sf 10  }}
+ \put(01.40,23.50){{\sf PUBLICATIONS (title and reference of all
+            publications (incl. preprints) over last 4 semesters which have }}
+ \put(01.40,23.00){{\sf resulted from PATT time; continue on separate sheet if
+                        necessary  }}
+
+ \put(00.30,17.00){\rule{18.4cm}{0.03cm}}
+ \put(00.35,16.50){{\sf 11  }}
+ \put(01.40,16.50){{\sf ABSTRACT FOR BACKUP PROJECT for proposals primarily
+		above $\sim$300 GHz ($\lambda$$<$1mm)}}
+
+ \put(00.30,13.50){\rule{18.4cm}{0.03cm}}
+
+ \put(00.35,13.00){{\sf 12}}
+ \put(01.40,13.00){{\sf JUSTIFICATION (add no more than 1 page for each of 
+	Scientific
+	case + Technical details + Figures \& Tables)}}
+
+ \put(00.30,12.70){\rule{18.4cm}{0.03cm}}
+
+ \put(06.80,12.20){{\bf SUBMISSION OF APPLICATIONS }}
+ \put(01.30,11.70){{\sf \parbox[t]{17.20cm}{
+To ensure prompt processing, please ensure that this application is sent to the 
+correct establishment. Applications should be submitted to the national TAG of 
+the Principal Investigator or, if the PI is not from one of the 3 partners, to 
+the national TAG of the first named co-investigator on the application who is 
+from one of the partners. International applications (those with no applicants 
+from one of the partners) should be submitted to the UK national TAG. Members
+of the JAC staff in Hawaii (apart from those funded directly by the partners) 
+count as International unless they are the PI on an application when it should
+be forwarded to the appropriate national TAG. } }}
+ 
+ \put(00.75,09.40){\line(1,0){17.6}}
+ \put(00.85,08.90){{\small \sf \bf CANADA }}
+ \put(00.85,08.40){{\small \sf JCMT Canadian Time Allocation Group}}
+ \put(00.85,07.90){{\small \sf Herzberg Institute\ of Astrophysics}}
+ \put(00.85,07.40){{\small \sf National Research Council }}
+ \put(00.85,06.90){{\small \sf 100 Sussex Drive, }}
+ \put(00.85,06.40){{\small \sf Ottawa, Ontario K1A 0R6 }}
+ \put(00.85,05.90){{\small \sf CANADA }}
+ \put(07.00,08.90){{\small \sf \bf NETHERLANDS }}
+ \put(07.00,08.40){{\small \sf JCMT Program Committee,}}
+ \put(07.00,07.90){{\small \sf Leiden Observatory, }}
+ \put(07.00,07.40){{\small \sf P O Box 9513, }}
+ \put(07.00,06.90){{\small \sf 2300 R A Leiden, }}
+ \put(07.00,06.40){{\small \sf NETHERLANDS }}
+ \put(12.30,08.90){{\small \sf \bf UK \& International }}
+ \put(12.30,08.40){{\small \sf PATT Secretariat, }}
+ \put(12.30,07.90){{\small \sf Particle Physics \& Astronomy }}
+ \put(12.30,07.40){{\small \sf Research Council, }}
+ \put(12.30,06.90){{\small \sf Polaris House, }}
+ \put(12.30,06.40){{\small \sf Swindon SN2 1ET }}
+ \put(12.30,05.90){{\small \sf UNITED KINGDOM }}
+ \put(00.75,08.70){\line(1,0){17.6}}
+ \put(00.75,05.70){\line(1,0){17.6}}
+ \put(00.75,05.70){\line(0,1){3.7}}
+ \put(06.80,05.70){\line(0,1){3.7}}
+ \put(12.10,05.70){\line(0,1){3.7}}
+ \put(18.60,05.70){\line(0,1){3.7}}
+
+ \put(00.00,05.50){\rule{18.4cm}{0.03cm}}
+
+ \put(07.95,05.10){{\bf CLOSING DATES }}
+
+ \put(01.30,04.60){{\bf `A' SEMESTER: FEBRUARY -- JULY}}
+ \put(02.50,04.10){{\sf Applications must be received by:}}
+ \put(02.50,03.60){{\bf      Canada = 30 SEPTEMBER }}
+ \put(02.50,03.10){{\bf          UK = 30 SEPTEMBER }}
+ \put(02.50,02.60){{\bf Netherlands = 15 SEPTEMBER }}
+
+ \put(11.30,04.60){{\bf `B' SEMESTER: AUGUST -- JANUARY }}
+ \put(12.50,04.10){{\sf Applications must be received by:}}
+ \put(12.50,03.60){{\bf      Canada = 31 MARCH }}
+ \put(12.50,03.10){{\bf          UK = 31 MARCH }}
+ \put(12.50,02.60){{\bf Netherlands = 15 MARCH }}
+
+ \put(00.00,02.00){\rule{18.4cm}{0.03cm}}
+ \put(09.20,01.30){{\footnotesize \sf 2 }}
+
+
+\end{picture}}
+
+
+\vspace*{-26.35cm}{\ajinpfont
+
+{%?#$&\bjpos(03.00)(-0.30)(17.00)(03.00)
+\ajnull%?#$&input 02_9_01
+}
+
+{%?#$&\bjpos(01.50)(04.10)(17.00)(06.00)
+\ajnull%?#$&input 02_9_02
+}
+
+{%?#$&\bjpos(01.50)(10.50)(17.00)(03.00)
+\ajnull%?#$&input 02_9_03
+}
+
+}
+
+\eject
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%?#$&page3
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\vspace*{-0.3cm}\hspace*{-0.0cm}{\setlength{\unitlength}{1.00cm}
+\begin{picture}(19.00,25.80)(00.00,01.30)
+ \put(00.30,26.70){\rule{18.4cm}{0.03cm}}
+ \put(04.00,26.20){{\bf UK SPECIFIC PAGE (need not be completed by other applicants)}}
+ \put(01.30,25.70){{\sf AUTHORISATION }}
+                                                                                
+ \put(01.30,25.10){{\sf \parbox[t]{17.20cm}{\setlength{\baselineskip}{2.3mm}
+  We have read the `Notes for Guidance' relating to applications to the Panel
+ for the Allocation of Telescope Time and if an award is made, understand
+ that all participants may be required to sign a form of indemnity before
+ being permitted to use the equipment. We are not bound by any contrary
+ conditions governing the proposed investigation including obligations
+ to third parties incurred in respect of ownership and use of research
+ results and patents.} }}
+                                                                                
+ \put(09.10,23.40){{\sf Signature }}
+ \put(15.90,23.40){{\sf Date }}
+ \put(01.30,22.30){{\sf Signature(s) of Principal }}
+ \put(01.30,21.95){{\sf Applicant/Observer }}
+ \put(06.45,22.30){\line(1,0){6.60}}
+ \put(14.00,22.30){\line(1,0){4.30}}
+ \put(01.30,21.50){{\sf Head of Applicant's }}
+ \put(01.30,21.15){{\sf Department/Establishment }}
+ \put(06.45,21.50){\line(1,0){6.60}}
+ \put(14.00,21.50){\line(1,0){4.30}}
+ \put(01.30,20.75){{\sf Administrative Authority }}
+ \put(01.30,20.40){{\sf (State position held) }}
+ \put(06.45,20.75){\line(1,0){6.60}}
+ \put(14.00,20.75){\line(1,0){4.30}}
+
+ \put(00.00,20.00){\rule{18.4cm}{0.03cm}}
+
+ \put(00.35,19.50){{\sf 13  }}
+ \put(01.40,19.50){{\sf (i)  }}
+ \put(01.90,19.50){{\sf Are the observations primarily for a student
+                        research training programme?  }}
+ \put(14.90,19.50){{\sf \ajyn }}
+ \put(02.30,19.00){{\sf If YES, state:  }}
+ \put(05.30,19.00){{\sf a)  }}
+ \put(06.20,19.00){{\sf Name of student(s)  }}
+ \put(09.40,19.00){{\sf \makebox[8.90cm]{\dotfill}  }}
+ \put(05.30,18.50){{\sf b)  }}
+ \put(06.20,18.50){{\sf Project title(s)  }}
+ \put(08.60,18.50){{\sf \makebox[9.70cm]{\dotfill}    }}
+ \put(05.30,18.00){{\sf c)  }}
+ \put(06.20,18.00){{\sf SERC studentship no(s) (UK only)  }}
+ \put(11.60,18.00){{\sf \makebox[6.70cm]{\dotfill}    }}
+ \put(01.40,17.00){{\sf (ii) }}
+ \put(01.90,17.00){{\sf Are the observations associated with a current
+                        research grant?  }}
+ \put(14.90,17.00){{\sf \ajyn }}
+ \put(02.30,16.50){{\sf If YES, state:  }}
+ \put(05.30,16.50){{\sf a)  }}
+ \put(06.20,16.50){{\sf Name of principal investigator  }}
+ \put(11.00,16.50){{\sf \makebox[7.30cm]{\dotfill}  }}
+ \put(05.30,16.00){{\sf b)  }}
+ \put(06.20,16.00){{\sf Grant number  }}
+ \put(08.60,16.00){{\sf \makebox[9.70cm]{\dotfill}    }}
+
+ \put(00.30,15.50){\rule{18.4cm}{0.03cm}}
+ 
+ \put(00.35,15.00){{\sf 14  }}
+ \put(01.65,15.00){{\sf FUNDING  }}
+ \put(01.65,14.60){{\sf (i)  }}
+ \put(02.25,14.60){{\sf Name  }}
+ \put(04.80,14.60){{\sf No. of nights  }}
+ \put(08.45,14.60){{\sf Reason (data reduction,etc)  }}
+ \put(16.15,14.60){{\sf Funding Source  }}
+ \put(02.25,14.50){\line(1,0){0.80}}
+ \put(04.80,14.50){\line(1,0){1.90}}
+ \put(08.45,14.50){\line(1,0){3.3}}
+ \put(16.15,14.38){\line(1,0){2.25}}
+
+ \put(00.30,12.00){\rule{18.4cm}{0.03cm}}
+
+ \put(00.00,11.15){{\sf TO BE COMPLETED BY THE APPLICANT }}
+ \put(00.00,10.50){{\sf INVESTIGATOR(S)/DEPT(S) }}
+ \put(05.60,10.50){{\sf SHORT TITLE OF  }}
+ \put(10.05,10.50){{\sf COMMENTS AND  }}
+ \put(13.95,10.50){{\sf NO. OF SHIFTS (8 HOURS) }}
+ \put(13.80,10.40){\line(1,0){4.6}}
+ \put(00.00,10.10){{\sf /INSTITUTION(S)/  }}
+ \put(05.60,10.10){{\sf INVESTIGATIONS  }}
+ \put(10.05,10.10){{\sf SCHEDULING PREF.  }}
+ \put(00.00,09.80){{\sf T\&S REQUIREMENT }}
+ \put(14.00,10.00){{\sf REQUESTED }}
+ \put(16.60,10.00){{\sf MINIMUM }}
+ \put(00.00,09.55){\line(1,0){18.4}}
+ \put(00.00,05.20){ \ydash }
+ \put(04.60,05.20){\line(0,1){5.5}}
+ \put(09.20,05.20){\line(0,1){6.85}}
+ \put(13.80,05.20){\line(0,1){6.85}}
+ \put(16.10,05.20){\line(0,1){5.20}}
+ \put(00.00,03.90){\line(1,0){9.6}}
+ \put(00.00,-0.60){\line(1,0){9.6}}
+ \put(00.00,-0.60){\line(0,1){4.5}}
+ \put(09.60,-0.60){\line(0,1){4.5}}
+ \put(01.80,03.50){{\sf ADDRESS FOR ACKNOWLEDGEMENT }}
+ \put(10.45,03.60){{\sf \parbox[t]{8.00cm}{
+                    PARTICLE PHYSICS \& \\
+                    ASTRONOMY RESEARCH COUNCIL, \\
+                    POLARIS HOUSE, \\
+                    NORTH STAR AVENUE, \\
+                    SWINDON SN2 1ET } }}
+ \put(10.45,01.40){{\sf We acknowledge receipt of your application form }}
+ \put(10.45,00.90){{\sf dated }}
+ \put(14.85,00.90){{\sf please quote }}
+ \put(10.45,00.40){{\sf ref. M/ }}
+ \put(13.00,00.40){{\sf / }}
+ \put(14.00,00.40){{\sf in future correspondence.}}
+
+
+\end{picture}}
+
+
+\vspace*{-26.85cm}{\ajinpfont
+
+
+{%?#$&\bjpos(16.00)(07.00)(01.00)(02.00)
+\ajnull%?#$&input 03_1_01
+}
+
+{%?#$&\bjpos(09.70)(07.75)(08.00)(02.00)
+\ajnull%?#$&input 03_1_02
+}
+
+{%?#$&\bjpos(08.80)(08.25)(09.00)(02.00)
+\ajnull%?#$&input 03_1_03
+}
+
+{%?#$&\bjpos(11.90)(08.75)(06.00)(02.00)
+\ajnull%?#$&input 03_1_04
+}
+
+{%?#$&\bjpos(16.00)(09.50)(01.00)(02.00)
+\ajnull%?#$&input 03_1_05
+}
+
+{%?#$&\bjpos(11.30)(10.25)(07.00)(02.00)
+\ajnull%?#$&input 03_1_06
+}
+
+{%?#$&\bjpos(08.70)(10.75)(09.00)(02.00)
+\ajnull%?#$&input 03_1_07
+}
+
+{%?#$&\bjpos(02.40)(12.30)(17.00)(03.00)
+\ajnull%?#$&input 03_2_01
+}
+
+{%?#$&\bjpos(00.20)(17.70)(04.50)(04.00)
+\ajnull%?#$&input 03_2_02
+}
+
+{%?#$&\bjpos(05.00)(17.70)(04.50)(04.00)
+\ajnull%?#$&input 03_2_03
+}
+
+{%?#$&\bjpos(09.60)(17.70)(04.50)(04.00)
+\ajnull%?#$&input 03_2_04
+}
+
+{%?#$&\bjpos(14.20)(17.70)(02.00)(04.00)
+\ajnull%?#$&input 03_2_05
+}
+
+{%?#$&\bjpos(16.60)(17.70)(02.00)(04.00)
+\ajnull%?#$&input 03_2_06
+}
+
+{%?#$&\bjpos(01.80)(24.00)(09.50)(04.00)
+\ajnull%?#$&input 03_2_07
+}
+
+}
+
+\eject
+%?#$&end
+\end{document}
+

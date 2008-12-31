@@ -1,0 +1,2 @@
+       use_imh - Default to produce IRAF format files from Starlink programs
+       use_ndf - Default to produce NDF files from Starlink programs

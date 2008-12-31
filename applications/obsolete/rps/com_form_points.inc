@@ -1,0 +1,11 @@
+*+COM_FORM_POINTS  Include file, holds Field page limits, special field nos.
+ 
+      INTEGER FLD_NTARGETS
+      INTEGER FLD_TARG_NUMBER
+      INTEGER FLD_CONSTRAINTS
+      INTEGER FLD_LIMS_COVER(2), FLD_LIMS_GEN(2)	! Cover, Gen page limits
+      INTEGER FLD_LIMS_TARG(2),FLD_LIMS_CONS(2)		! Target, Constr page limits
+ 
+      COMMON /FORM_LIMITS/ FLD_NTARGETS, FLD_TARG_NUMBER, 
+     &   FLD_CONSTRAINTS, FLD_LIMS_COVER, FLD_LIMS_TARG, 
+     &   FLD_LIMS_CONS, FLD_LIMS_GEN

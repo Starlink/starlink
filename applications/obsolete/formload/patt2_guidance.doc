@@ -1,0 +1,269 @@
+
+PARTICLE PHYSICS AND ASTRONOMY RESEARCH COUNCIL
+
+Panel for the Allocation of Telescope Time (PATT)
+
+Notes for Guidance on the completion of the application form PATT2 for
+observing time on the PPARC's optical and infrared telescopes.
+
+1 USE OF FORM PATT2
+
+Use form PATT2 only if you are applying to PATT for observing time on one of
+the following telescopes:
+
+     the 3.9m Anglo-Australian Telescope (AAT) at Siding Spring, New South
+     Wales;
+
+     the 4.2m William Herschel Telescope (WHT) at the Roque de los Muchachos,
+     La Palma;    *******ELECTRONIC SUBMISSION FOR (UK) PATT*******
+
+     the 2.5m Isaac Newton Telescope (INT) at the Roque de los Muchachos,
+     La Palma;   *******ELECTRONIC SUBMISSION FOR (UK) PATT********
+
+     the 1.0m Jacobus Kapteyn Telescope (JKT) at the Roque de los Muchachos,
+     La Palma;   *******ELECTRONIC SUBMISSION FOR (UK) PATT********
+
+     the 3.8m United Kingdom Infrared Telescope (UKIRT) on Hawaii.
+
+**The WHT, INT and JKT forms are to be submitted electronically for Sem 96B**
+
+Note, however, that there are special arrangements for service schemes on these
+telescopes (see notes to section 11 below).
+
+Do not use PATT2 for applications for the James Clerk Maxwell Telescope (JCMT),
+the UK Schmidt Telescope (UKST) or the Multi-Element Radio-Link Interferometer
+MERLIN. Separate application forms for these facilities are available as
+follows: for the JCMT (form PATT3) from the PATT secretariat; for the UKST,
+from the Schmidt Unit, Royal Observatory Edinburgh; for MERLIN, from the
+Director, NRAL, Jodrell Bank.
+
+PATT also considers requests from UK university based personnel, including
+students, for travel and subsistence to take up time awarded on non-PPARC
+telescopes (or time awarded on PPARC facilities by committees other than PATT).
+Applications to PATT for such support should be made on form RG2 (in the case
+of PPARC research students, form S102) and must be sent to the Executive
+Secretary, PATT (or PPARC Studentship Section) at the same time that
+application is made to the telescope. A copy of the scientific case should
+accompany the application and details of the travel and subsistence funds
+required should also be included.
+
+2 HOW TO OBTAIN FORM PATT2
+
+WHT, INT and JKT
+---------------- 
+At Starlink sites:
+Applications for PATT (UK) time must be made by submitting the .DAT
+file which you would normally construct for FORMLOAD. This should be sent
+electronically by email to:   patt@ast.cam.ac.uk  where it will be processed
+and (if there are no processing problems) you will then receive an 
+acknowledgement and a Reference Number. Diagrams should be sent as .ps 
+files (not encapsulated) please.
+
+It would help RGO if you run your .dat file through FORMLOAD anyway
+and print (or view) the result to check that there are no errors.
+
+AAT and UKIRT
+-------------
+Submit (hard copies) to PATT in the normal way using FORMLOAD.
+
+At non-Starlink sites, copies of the FORMLOAAD program may be obtained by 
+contacting Starlink (ussc@star.rl.ac.uk). 
+
+3 NOTES ON THE COMPLETION OF THE APPLICATION FORM
+
+A separate application form must be completed for each observing programme. Use
+standard sized typescript (no smaller than 12 letters per inch and 6 lines per
+inch); do not photoreduce the application form.
+
+Section 1: Telescope. A separate application form must be completed for each
+telescope requested, even if the same programme is proposed.
+
+Section 2: Semester. Semesters are designated as follows. February 1994 - July
+1994 is Semester 94A; August 1994 - January 1995 is Semester 94B; February 1995
+- July 1995 is Semester 95A, etc.
+
+Section 3: Principal Applicant (PA). The PA must be a member of the permanent
+staff of an educational or research institution, or a postdoctoral fellow. The
+PA may not be a student, but an application may be made on behalf of a student
+with his or her supervisor as PA. During the consideration of the application
+the PA may be contacted by the office or by assessors.
+
+Section 4: Collaborators. Those applicants thought likely to participate in the
+observing run should be identified; UK applicants seeking financial support
+should see the notes to section 24. Space for four collaborators allowed for.
+
+Section 5: Short title. This title (12 words maximum) should serve to identify
+the proposed investigation.
+
+Section 6: Summary. This should be a summary of the essential features of the
+scientific case for support.
+
+Section 7: Focal station, instrument, detector, gratings. Provide this 
+information here and also complete the (AAT only) instrument scheduling form.
+The ING Instrument Form has been discontinued for the present, so please
+provide as much information here as you can.
+Details of any user-supplied instruments not previously used on the telescope 
+should be given on a separate page.
+
+Section 8: Observing time requested. Observing time is offered in units of
+whole nights on the AAT, the WHT and UKIRT, and whole weeks on the INT and JKT.
+Enter the number of nights/weeks needed to complete the programme. PATT defines
+nights as dark, grey or bright according to the proportion of dark hours
+available in the night concerned: dark time is defined to be that time between
+the limits of astronomical twilight when the moon is beneath the horizon.
+Breakdowns of nights or weeks into dark, grey and bright are given in the PATT
+Newsletter or SPECTRUM. Dark time on all optical telescopes is normally heavily
+oversubscribed and should therefore only be requested if absolutely necessary;
+grey time may be allocated to those programmes where dark time is not
+considered essential. If you require dark time on UKIRT you should justify your
+request in your main case for support in section 16.
+
+Section 9: Long term proposals. Long term status will be granted only to
+applications of very high scientific merit needing a large number of nights
+over more than one semester. Enter the total number of nights/weeks needed to
+complete the programme. If a proposal is awarded long term status, it is not
+necessary to make reapplication in subsequent semesters; it is however
+necessary to reconfirm the amount of time required at each PATT round.
+
+Section 10: Scheduling information. Applicants must complete the panels on
+preferred dates and impossible nights for the observing run. It is imperative
+that all impossible nights in the semester are listed and reasons given. For
+this purpose an impossible night is one on which it is not possible to observe
+at least one of your target objects at a reasonable altitude at any time in the
+night concerned. Teaching and other similar commitments do not count as
+impossible nights. Indicate any other scheduling constraints in this section,
+such as a need for simultaneity with other telescopes or satellites, dates of
+occultations and necessity to avoid the Moon; if requesting grey time you
+should indicate if you require the first or third quarter of the lunar month.
+
+If the Moon is likely to be a problem positionally with respect to a (single)
+target, you should work out and LIST the relevant impossible dates.
+
+Section 11: Service observing. Investigators should indicate whether they wish
+their programme to be observed in service time should it be possible. Service
+observing is only offered for certain instruments and schemes vary from
+telescope to telescope. Smaller requests can generally be made directly to the
+telescope concerned rather than via PATT. Applicants should check the details
+of these schemes; these are given in the PATT Newsletter or SPECTRUM.
+
+Section 12: Support astronomer. Indicate what astronomical staff support is
+required when observing in addition to a telescope operator. (No operator is
+provided for the JKT). Support for WHT,INT and JKT is on first night only.
+
+Section 13: List of principal targets. Details of the principal targets
+referred to in the scientific case must be included here. Magnitudes and
+colours should be given in systems that will enable an assessment of the
+feasibility of the observations, eg of exposure times.
+
+Section 14: Other applications. Applicants must list all other applications for
+observing time on this or other telescopes or satellites for the same or
+similar programmes in the coming semester. And any other telescope committees.
+
+Section 15: Scientific justification. This section should contain the
+scientific justification of the proposed investigation within the maximum of
+the one side of A4 provided. One separate side of A4 paper containing 
+diagrams and/or references may be attached (page 4a) if desired. If the
+scientific justification exceeds one page, only the first page will be copied
+to the Panel. Further supplementary material such as preprints may be provided
+but will only be made available to referees and assessors: three copies should
+be supplied. The information provided must be sufficiently self-contained to
+enable PATT to assess the scientific merit of the proposal without reference to
+other material. It should include a description of the overall aims of the
+research, the order of importance of the objectives, an explanation of any
+unusual methods or techniques, details of scientific results achieved from
+previous time allocations and the relationship of these results and related
+work elsewhere to the current work of the applicants.
+
+Section 16: Technical information (I). Provide any additional information about
+the targets, the desired signal-to-noise and the wavelength or velocity 
+resolution, so that a technical assessment can be made of the feasibility of 
+the proposal given the telescope and instrument configuration and the 
+requested number of nights and phase of Moon.
+Also describe here any NON-STANDARD technical requirements including any
+software requirements.
+
+Section 16: Technical information (II). This is an additional page for 
+References and Figures (see also Section 15 -Notes).
+
+Section 17: Backup programme. Investigators are asked to give a short abstract
+of an alternative programme which they could carry out should poor observing
+conditions or other unexpected problems make it impossible to run the main
+programme. The backup programme is expected to use the same instrumental
+configuration and setup as the main programme; give full details if this is not
+the case.
+
+Section 18: Related PATT applications. Applicants should list applications
+which were submitted to PATT for any of the previous four semesters and which
+relate to the present proposal. Include successful and unsuccessful
+applications involving the present principal applicant, whether as PA or as a
+named collaborator.
+
+Section 19: Publications. Give a list of all publications (first author and
+reference) based on usage of PATT telescopes during the same interval which
+include the present principal applicant as an author, whether or not they are
+related to the present application.
+
+Section 20: Experience of observers who have not previously used the telescope.
+Complete this section for anyone identified in section 4 as a possible observer
+who has not used the telescope in question.
+
+Section 21: Student research training. If the observations are primarily for a
+student research training programme, give the details requested.
+
+Section 22: PPARC research grants. If the observations are associated with a
+current PPARC research grant, give the details requested.
+
+Section 23: Travel and subsistence. This section applies to UK observers only.
+PATT will only award travel, subsistence and freight costs associated with the
+take up of observing time. As a general rule no more than one applicant
+(excluding students) will be supported for any observing programme, or two if
+the applicant's own equipment is being used: complete this section if a request
+is being made for more than one observer or if freight, remote observing or
+other costs are being sought. PPARC research grant funds are not awarded in
+support of PPARC students, and for such students, support should be sought from
+PPARC Studentship Section using form S102. Support will normally only be
+provided for PPARC research students who have been identified on the PATT
+application form in section 21.
+
+Section 24: Signatures. All UK application forms must be authorised by the
+appropriate university or institute authorities.
+
+Section 25: Acknowledgement slip. Applicants are required to complete the
+summary on the acknowledgement slip, which will normally be returned by the
+office within 7 days.
+
+4 COMPLETED APPLICATION FORMS
+
+EIGHT copies of the completed application form and instrument scheduling form
+together with THREE copies of any supplementary material, eg preprints, should
+be sent to:
+
+**
+The Executive Secretary, Panel for the Allocation of Telescope Time, Particle
+Physics and Astronomy Research Council
+
+Polaris House, North Star Avenue, SWINDON SN2 1SZ UK
+
+(**-except UK-PATT applications for WHT, INT and JKT - see above**)
+
+IT IS IMPORTANT THAT WHT,INT AND JKT FORMS (FILES) ARE *NOT* SENT TO SWINDON.
+
+Applications will be accepted at any time during the 6 months prior to the
+closing date for each semester. These closing dates are
+
+Semester              Closing Date
+
+A February - July     30 September
+
+B August - January    31 March
+
+Changes to Proposed Programmes. Any requests or enquiries about changes to
+programmes approved by PATT but arising before the observing trip should be
+addressed to the Executive Secretary, PATT, and not to the PATT Chairman or
+individual members of the Panel. If the investigators wish to make changes to
+the instrumentation or configuration requested then it is the responsibility of
+the Astronomer-in-Charge to decide whether or not the changes are permissible.
+
+
+version 1/96
+

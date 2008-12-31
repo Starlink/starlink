@@ -1,0 +1,43 @@
+ P TITLE                                               A17    POR Target List
+ P FILENAME                                            A      RPS_FORM_TARGET
+ P MEDIUM                                              A4     DISK
+ P ACCESSMODE                                          A6     DIRECT
+ F TARGET.NUMBER         4 I*4      0            I4        0              ATGN             :
+ F TARGET.NAME          20 C*20     0            A20                      SRNA             :
+ F ALTERNATIVE.NAME     20 C*20     0            A20                      SRAN             :
+ F TARGET.RA            11 C*11     0            A11                      RA               :
+ S RA.RADS              12 R*8      0            F12.9   0.0              RA_RADS          :
+ F TARGET.DEC           11 C*11     0            A11                      DEC              :
+ S DEC.RADS             12 R*8      0            F12.9    0.0             DEC_RADS         :
+ F TOTAL.OBS.TIME        8 R*4      0 Ksec       F7.2      0.0            TIMMA            :
+ F NUMBER.OBS            2 I*2      0            I2      1                NBOBS            :
+ F TIME.CRITICAL         1 L*1      0            L1     F                 TIMCR            :
+ F HRI.CODE              1 I*1      0            I1     1                 HRI              :
+ F WFC.CODE              1 I*1      0            I1     2                 WFC              :
+ F WFC.ZOOM.ON           1 L*1      0            L1     F                 WFCFOV           :
+ G WFC.FILT.CODE(8)      3 C*3      0            A3                       NF<N>            :A:
+ G WFC.FILT.PCNT(8)      4 I*4      0 %          I3       0               F<N>TPS          :A:
+ G WFC.FILT.MINT(8)      8 R*4      0 Ksec       F7.2      0.00           F<N>TMN          :A:
+ G $REMARKS(4)          50 C*50     0            A50                      REM              :A:
+ F COORD.OBSERVATION     1 L*1      0            L1     F                 COOB             :
+ F $START.YEAR           4 I*4      0            I4        0              CYB              :L:
+ F START.MONTH           2 I*2      0            I2      0                CMB              :L:
+ F START.DAY             2 I*2      0            I2      0                CDB              :L:
+ F START.HOUR            2 I*2      0            I2      0                CHB              :L:
+ F START.MINUTE          8 R*4      0            F7.4    0.0              CMNB             :L:
+ F $END.YEAR             4 I*4      0            I4        0              CYE              :L:
+ F END.MONTH             2 I*2      0            I2      0                CME              :L:
+ F END.DAY               2 I*2      0            I2      0                CDE              :L:
+ F END.HOUR              2 I*2      0            I2      0                CHE              :L:
+ F END.MINUTE            8 R*4      0            F7.4    0.0              CMNE             :L:
+ F $MONITOR              1 L*1      0            L1     F                 MNAC             :
+ F TIME.INTERVAL         8 R*4      0 Ksec       F7.3     0.0             TIIN             :L:
+ F PHASE.DEPENDENT       1 L*1      0            L1     F                 PHDP             :
+ F EPOCH                10 R*4      0 MJD        F10.4      0.0           EPCH             :L:
+ F PERIOD               12 R*4      0 Days       F12.8    0.0             PER              :L:
+ F CONTIGUOUS.OBS        1 L*1      0            L1     F                 CTOB             :
+ F NUMBER.INTERVALS      4 I*4      0            I3       0               NBOI             :L:
+ S FORM.CHECK            6 I*2      0            I6         0             FCHK             :
+ P NRECORDS                                      I10             7                         :
+ P RECORDSIZE                         BYTE       I5         0                              :
+ E                                                                                                                                  

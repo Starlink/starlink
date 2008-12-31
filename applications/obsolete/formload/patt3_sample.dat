@@ -1,0 +1,124 @@
+                  FORMLOAD_DIR:PATT3_SAMPLE.DAT     
+     Sample of a .DAT file containing entries to load into the 
+                   PATT3 Application form
+
+     Graeme Watt       Royal Observatory Edinburgh   1995 July
+     Bill Martin       Royal Greenwich Observatory   1995 July
+
+01_1_01#?$& Semester                   !96A
+01_2_01#?$& Surname                    !Newton
+01_2_02#?$& Title                      !Prof.
+01_2_03#?$& Initials                   !I.
+01_2_04#?$& Possible Observer       y/n!no
+01_2_05#?$& Contact address 1          !My Institute
+01_2_06#?$& Contact address 2          !Madingley Road
+01_2_07#?$& Contact address 3          !Cambridge  
+01_2_08#?$& Full E-Mail address        !in@ast.cam.ac.uk
+01_2_09#?$& Fax number                 !01223 374871
+01_2_10#?$& Telephone + ext no.        !01223 374870
+01_2_11#?$& Collaborators 1            !John Smith (Armagh)
+01_2_12#?$& Collaborators 1 Obs     y/n!yes
+01_2_13#?$& Collaborators 2            !Sean O'Brien (Sussex)
+01_2_14#?$& Collaborators 2 Obs     y/n!no
+01_2_15#?$& Collaborators 3            !Bruce McCleod (IoA)
+01_2_16#?$& Collaborators 3 Obs     y/n!yes
+01_2_17#?$& Collaborators 4            !Di Centraleating (ROE)
+01_2_18#?$& Collaborators 4 Obs     y/n!n
+01_2_19#?$& Collaborators 5            !Peter Brown (Cardiff)
+01_2_20#?$& Collaborators 5 Obs     y/n!yes
+01_3_01#?$& Investigation Title 1      !A super wonderful investigation
+01_3_02#?$& Investigation Title 2      !of every aspect of Astronomy
+01_3_03#?$& Student thesis project? y/n!yes
+
+01_4_01#?$& Abstract                  p!
+\hspace*{0.3in}This investigation will solve every problem in astronomy.
+And thus it will be of great interest to the members of PATT, since they
+will no longer have to attend the arduous and time-consuming PATT
+meetings.
+
+\vspace*{0.15in}\hspace*{2.0in}{\bf YOU WILL GIVE US ALL THE TIME.}
+
+01_5_01#?$& Long term status        y/n!n
+01_5_02#?$& Total shifts needed        !20
+01_6_01#?$& Rx A Receiver?            x!x
+01_6_02#?$& Rx A Receiver (No.hours)   !5
+01_6_03#?$& Rx B3i Receiver?          x!x
+01_6_04#?$& Rx B3i Receiver (No.hours) !3
+01_6_05#?$& Rx C2 Receiver?           x!x
+01_6_06#?$& Rx C2 Receiver (No.hours)  !4
+01_6_07#?$& Rx G Receiver ?           x!x
+01_6_08#?$& Rx G Receiver (No.hours)   !6
+01_6_09#?$& UKT14 (continuum bol)     p!x
+01_6_10#?$& UKT14 (No. hours)          !2
+01_6_11#?$& +pol                       !x
+01_6_12#?$& +pol (No. hours)           !3
+01_6_13#?$& Other                      !x
+01_6_14#?$& Other (No. hours)          !4
+
+01_7_01#?$& Total number of shifts     !10
+01_7_02#?$& Preferred scheduling       !September
+01_7_03#?$& Impossible dates (reasons) !December (Christmas)
+01_7_04#?$& Remote eavesdropping (yes) !x
+01_7_05#?$& Remote eavesdropping (no)  !x
+01_7_06#?$& Serviced observing (yes)   !x
+01_7_07#?$& Serviced observing (no)    !x
+01_7_08#?$& Flexible scheduling (Pref) !x
+01_7_09#?$& Flexible scheduling (Poss) !x
+01_7_10#?$& Flexible scheduling (no)   !x
+
+01_8_01#?$& List of Principal Sources p!
+ \vspace*{0.02in}
+ \begin{tabular}[t]{p{1.5cm}p{1.5cm}p{1.5cm}p{1.5cm}p{2.0cm}p{1.2cm}p{1.5cm}
+  p{1.5cm}p{2.0cm}}
+ All the        &  0-24 & -90to +90 & point & bright & 2000 & maps & 0.01 & 1st priority \\
+ stars and gals &       &           &       &        &      &      &      & \\
+ in the sky     &       &           &       &        &      &      &      & \\
+ \end{tabular}
+
+02_9_01#?$& Related applications (4)  p!
+ \vspace*{0.3cm}\begin{tabular}{p{4.0cm}p{3.0cm}p{2.0cm}p{4.0cm}}
+        M/94A/U10 & 4 shifts & 4 & perfect  \\
+        M/94B/U11 & 8 shifts & 0 & missed the plane  \\
+        M/95A/U12 & 10 shifts & 10 & perfect \\
+        M/95B/U13 & 12 shifts & 0 & Christmas  \\
+ \end{tabular}
+
+02_9_02#?$& Publications              p!
+ \hspace*{0.3in} See Ap.J., A.J., M.N. for the last 30 years
+
+02_9_03#?$& Abstract for backup       p!
+ \hspace*{0.3in}The backup programme is even better than the main proposal, 
+ so you can see how excellent the main proposals is! Even if it wasn't, it
+would be, as it is the culmination of all things good and extravagant and
+anyway it will be crystal clear, as we have a direct line on the Internet.
+
+03_1_01#?$& Student observations?   y/n!yes
+03_1_02#?$& Name of student(s)        p!Brown
+03_1_03#?$& Project Title(s)          p!Looking for the Unknown
+03_1_04#?$& Studentship number(s)     p!12345
+03_1_05#?$& Current research grant  y/n!no
+03_1_06#?$& If Yes: Name of PI        p!Barns
+03_1_07#?$& If Yes: Grant number      p!34567
+
+03_2_01#?$& FUNDING                   p!
+ \vspace*{0.5cm}
+ \hspace*{-0.5cm}\begin{tabular}[t]{p{3.2cm}p{3.0cm}p{7.0cm}p{2.0cm}}
+  John Smith & 21 & Data reduction & MI5
+ \end{tabular}
+
+03_2_02#?$& Investigators/Inst/T&S    p!
+  I Newton - Trinity Cambs \newline
+  The Royal Astrologer - Phys \newline
+  10 million pounds
+
+03_2_03#?$& Short Title               p!Super Wonderful Astronomy
+03_2_04#?$& Comments and scheduling   p!Must be just right
+03_2_05#?$& No. of Shifts requested   p!34
+03_2_06#?$& No. of shifts minimum     p!23
+03_2_07#?$& Address for ackn.         p!
+  Isaac Newton \newline
+  The Royal Society \newline
+  London
+
+XE_0_00#?$& LaTeX setup commands      p!
+\font\frmin=cmr7

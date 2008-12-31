@@ -1,0 +1,172 @@
+
+                  $FORMLOAD_DIR\patt2_sample.dat     
+
+          Sample of a file containing entries to load into the 
+               PATT2 Application form to get a sample form
+
+     Alan Penny       Rutherford Appleton Laboratory   1992 Feb
+     Bill Martin      Royal Greenwich Observatory      1996 January
+--------------------------------------------------------------------
+
+01_1_01#?$& AAT,WHT,INT,JKT,UKIRT      !WHT
+01_2_01#?$& Semester                   !95A
+01_3_01#?$& Surname of PA              !Green
+01_3_02#?$& Title                      !Prof
+01_3_03#?$& Initials                   !J J
+01_3_04#?$& Post held                  !Cosmological Consultant
+01_3_05#?$& Address (line 1)           !Royal Greenwich Observatory
+01_3_06#?$& Address (line 2)           !Madingley Rd
+01_3_07#?$& Address (line 3)           !Cambridge,CB3 0EZ
+01_3_08#?$& Telephone                  !0223-374870
+01_3_09#?$& Fax                        !0223-374871
+01_3_10#?$& E-Mail                     !jjg@mail.ast.cam.ac.uk
+01_3_11#?$& Will the PA be observing?  !Yes
+01_4_01#?$& Collaborators (1)-name     !John Smith
+01_4_02#?$& Collaborators (1)-Inst     !IoA
+01_4_03#?$& Collaborators (1)-observe? !Yes
+01_4_04#?$& Collaborators (2)-name     !James Brown
+01_4_05#?$& Collaborators (2)-Inst     !NRAL
+01_4_06#?$& Collaborators (2)-observe? !No
+01_4_07#?$& Collaborators (3)-name     !
+01_4_08#?$& Collaborators (3)-Inst     !
+01_4_09#?$& Collaborators (3)-observe? !
+01_4_10#?$& Collaborators (4)-name     !
+01_4_11#?$& Collaborators (4)-Inst     !
+01_4_12#?$& Collaborators (4)-observe? !
+01_5_01#?$& Investigation title(12wds) !We are going to confirm that the Hubble
+Constant really is 42
+
+01_6_01#?$& Summary of proposal        !
+\hspace*{0.6in}This investigation will, by observing most of the
+Universe as we knew it, determine and evaluate the Hubble
+Constant. We fully expect the value to be 42. We aim to use the Green
+Engine attached to the WHT to take a multitude of pictures.
+
+01_7_01#?$& Focal station              !Nasmyth
+01_7_02#?$& Instrument                 !The Green Engine
+01_7_03#?$& Detector(s)                !TEK2+Loral
+01_7_04#?$& Gratings/Filters           !UBVWXYZ+[OVIII]
+01_8_01#?$& Time this semester (dark)  !15
+01_8_02#?$& Time this semester (grey)  !12
+01_8_03#?$& Time this semester (bright)!-
+01_8_04#?$& Specify nights or weeks    !nights
+01_8_05#?$& Minimum useful (dark)      !14
+01_8_06#?$& Minimum useful (grey)      !11
+01_8_07#?$& Minimum useful (bright)    !-
+01_9_01#?$& Long Term (total time-dark)!25
+01_9_02#?$& Long Term (total time-grey)!12
+01_9_03#?$& Long Term (total time-brit)!-
+01_9_04#?$& Specify nights or weeks    !weeks
+
+02_1_01#?$& Preferred dates            !1st February to 31st July
+02_1_02#?$& Impossible dates           !all the rest
+02_1_03#?$& Justify imp. dates  - 1    !self evident
+02_1_04#?$& Justify imp. dates  - 2    !plus RAs
+02_1_05#?$& Other telescopes? Simult?  !AAT and UKIRT and we might get time on
+ the HST which we would need to be simultaneous with the WHT
+
+02_1_06#?$& Scheduling constraints     !There should be no Moon up at any time
+ and the time must not clash with any of the other telescopes. Also my wife
+ is expecting quadruplets in March and I have a skiing holiday in February.
+
+02_2_01#?$& Service observing-YES-put-x!-
+02_2_02#?$& Service observing -NO-put-x!x
+02_2_03#?$& Service observing -maybe  x!-
+02_3_01#?$& SA at Tel - every night?  x!x
+02_3_02#?$& SA at Tel - NO            x!-
+02_3_03#?$& SA at Tel-first night onlyx!-
+02_5_01#?$& List of principal targets  !
+ \begin{tabular}[t]{p{1.2in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}p{1.0in}}
+  H100009089 & 20 10 10.98 & +38 23 45.87 & 20.0 (Mv) & B-V=0.43456 & 2000secs\\
+  H2001 & 01 20 10 & +21 56.9 & 21.0(Mv) & B-V=0.2 & 1000secs\\
+  H3002 & 06 30 10 & +56 32.1 & 22.0(Mv) & B-V=0.3 & 3000secs\\
+ \end{tabular}
+
+02_6_01#?$& Other applications?(Tel)-1 !AAT
+02_6_02#?$& Other applications?(Title) !Determination of Hubble Constant in 
+the South
+02_6_03#?$& Other applications?(Tel)-2 !Polar
+02_6_04#?$& Other applications?(Title) !Determination of the colour of Hubble 
+at the Pole
+02_6_05#?$& Other applications?(Tel)-3 !
+02_6_06#?$& Other applications?(Title) !
+02_6_07#?$& Other applications?(Tel)-4 !
+02_6_08#?$& Other applications?(Title) !
+
+03_1_01#?$& Scientific Justification   !
+\parbox[t]{7.15in}{
+There is very little need to justify this application as it has been proven
+ from the {\it Hitchiker's Guide to the Galaxy }that the answer to Life, the 
+Universe and Everything is 42. It might be worth while however, adding a little
+ observational confirmation to this if only to while away the long autumnal
+ days and, in particular, nights. Talking of which, we really would like to
+have some quiet, pleasant and if possible, balmy nights during our stay, if
+ this is not too much to ask? As we will have plenty of nights awarded, a
+ few barbeques (preferably pig or Mufflon) in the earlier part of twilight
+ would add something to the spirit of the observations to come. Talking of
+ which, I think a bottle or two of Carlos I would not go amiss to wash down
+ the food and lay the dust.
+} 
+
+04_1_01#?$& Technical information (I)  !
+\parbox[t]{7.25in}{
+The Signal will be immense and there will be very little Noise.
+This proposal uses the new Green Engine, which can be strapped to any
+ focus at any time night or day. It has many colourful modes which can be
+ set up within a few minutes. It will pulsate gently in the gloaming when
+ it warms up for its multicolour autophoto data taking session. There may
+ be a requirement for some liquid Helium if Carlos I is not available. 
+}
+
+04_1_02#?$& Technical information (II)  !
+\parbox[t]{7.25in}{
+References: "The Hitch Hikers Guide to the Galaxy".
+Figures: None.
+}
+
+05_1_01#?$& Backup programme (summary) !
+We expect to observe/study all the Planets with the expectation
+ of seeing Life, the Universe and Everything on a smaller scale, but with the
+ aim of verifying that the Universal Constant is indeed 42.
+
+05_2_01#?$& Last 4 Sems (see,eg,Table) !
+\begin{tabular}[t]{p{1.5in}p{0.7in}p{0.8in}p{3.2in}}
+W/Y/00 & 4Gn Service & none & cloud throughout \\
+W/X/00 & 5Dn         & 5n   & superb weather and seeing \\
+W/W/00 & 10Dn        & none & Engine ran out of coal and could not continue \\
+W/V/00 & 2Gn         & none & Went to AAT by mistake \\
+\end{tabular}
+
+05_3_01#?$& Pubs for last 4 Sems (6)  !None as such, but we fully expect to
+ submit one next month, which will prove beyong any shadow of doubt that Ho=42.
+ After that period, MNRAS will find themselves awash with papers.
+05_4_01#?$& Experience of Observers   !Infinite
+05_5_01#?$& Student research? (Name)  !A N Other
+05_5_02#?$& Student research (Grant)  !1001
+05_6_01#?$& Research grant obs? (PI)  !Mick Jagger
+05_6_02#?$& Research obs?(Grant title)!Very little satisfaction
+05_6_03#?$& Research obs? (Grant No.) !2002
+05_7_01#?$& Non-standard T and S      !J Smith is essential to the project
+05_8_01#?$& Other expenditure(freight)!About 40000ptas for a few bottles of 
+Carlos I
+
+06_2_01#?$& Summary Slip (short title)!
+Confirmation that the Hubble Constant is 42.
+
+06_2_02#?$& Pricipal App and Institute!J J Green, Royal Greenwich Observatory
+06_2_03#?$& Time this Semester (Dark) !15
+06_2_04#?$& Time this Semester (Grey) !12
+06_2_05#?$& Time this Semester(Bright)!-
+06_2_06#?$& Time requested(nights/wks)!nights
+06_3_01#?$& Acknowledge (short title) !Confirmation that the Hubble Constant
+ is 42
+
+06_3_02#?$& Address for Acknowledge   !
+  J J Green\newline
+  Royal Greenwich Observatory\newline
+  Madingley Road\newline
+  Cambridge, CB3 0EZ
+
+XE_0_00#?$& LaTeX setup commands      p!
+\font\frmin=cmr7
+

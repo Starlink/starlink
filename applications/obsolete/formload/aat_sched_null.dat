@@ -1,0 +1,124 @@
+
+                     $FORMLOAD_DIR/aat_sched_null.dat
+               A file containing null entries to load into the
+                     AAT Instrument Request Form
+
+                      bill martin (rgo)  - 1995 january
+----------------------------------------------------------------------
+
+01_1_01#?$& PRIME FOCUS  (enter x)    x!
+01_1_02#?$&  LBL f/1 ?                x!
+01_1_03#?$&   Filters(1 of BVV+RRI)   p!
+01_1_04#?$&   Filters(1 of BVV+RRI)   p!
+01_1_05#?$&   Filters(1 of BVV+RRI)   p!
+01_1_06#?$&     Detector option 2,3   p!
+01_1_07#?$&  CCD f/3.3 (Doublet) ?    x!
+01_1_08#?$&   Detector option 1,2,3   p!
+01_1_09#?$&  Photographic             x!
+01_1_10#?$&   Sub-beam prism ? (y/n)  p!
+01_1_11#?$&     Triplet               x!
+01_1_12#?$&     Doublet               x!
+01_1_13#?$&     2dF                   x!
+
+01_2_01#?$& CASSEGRAIN (enter x)      x!
+01_2_02#?$&   RGO Spec (25cm camera)  x!
+01_2_03#?$&   RGO Spec (82cm camera)  x!
+01_2_04#?$&     FORS?  (y/n)          p!
+01_2_05#?$&       No modules          x!
+01_2_06#?$&       Polarim (1/4)       x!
+01_2_07#?$&       Polarim (1/2)       x!
+01_2_08#?$&       AUTOFIB             x!
+01_2_09#?$&       FOCAP at Cass       x!
+01_2_10#?$&       FOCAP at Aux        x!
+01_2_11#?$&        Detector (1,2,3)   p!
+01_2_12#?$&   IRIS (f/15)             x!
+01_2_13#?$&   IRIS (f/36)             x!
+01_2_14#?$&     IRISPOL (1/4)         x!
+01_2_15#?$&     IRISPOL (1/2)         x!
+01_2_16#?$&   HATPOL                  x!
+01_2_17#?$&   LDSS                    x!
+01_2_18#?$&        Detector (1,2,3)   p!
+01_2_19#?$&   Taurus                  x!
+01_2_20#?$&     FP  (f/8)             x!
+01_2_21#?$&     FP  (f/15)            x!
+01_2_22#?$&     FOP (1/4)             x!
+01_2_23#?$&     FOP (1/2)             x!
+01_2_24#?$&        Detector (1,2,3)   p!
+01_2_25#?$&   MES                     x!
+01_2_27#?$& AUXILIARY                 x!
+01_2_28#?$&   CCD Imaging             x!
+01_2_29#?$&        Detector (1,2,3,5) p!
+01_2_30#?$&   Photometer              x!
+
+01_3_01#?$& COUDE (enter x)           x!
+01_3_02#?$&   UCLES                   x!
+01_3_03#?$&      Detector (1,2,3,4)   p!
+01_3_04#?$&   UHRF                    x!
+01_3_05#?$&    1.0M                   x!
+01_3_06#?$&    0.6M                   x!
+01_3_07#?$&    0.3M                   x!
+01_3_08#?$&      Detector (1,2,3,4)   p!
+
+01_4_01#?$& RGO Gratings - 250B       x!
+01_4_02#?$&                270R       x!
+01_4_03#?$&                300B       x!
+01_4_04#?$&                600U       x!
+01_4_05#?$&                600V       x!
+01_4_06#?$&                600R       x!
+01_4_07#?$&                600H       x!
+01_4_08#?$&               1200B       x!
+01_4_09#?$&               1200V       x!
+01_4_10#?$&               1200R       x!
+01_4_11#?$&               1200I       x!
+01_4_12#?$&               1200J       x!
+01_4_13#?$& Taurus Etalons - 500mu    x!
+01_4_14#?$&                  250      x!
+01_4_15#?$&                  125      x!
+01_4_16#?$&                   70      x!
+01_4_17#?$&                   15      x!
+01_4_18#?$&                  200      x!
+01_4_19#?$& Imaging Filters ---- U    x!
+01_4_20#?$&                      B    x!
+01_4_21#?$&                      V    x!
+01_4_22#?$&                      R    x!
+01_4_23#?$&                      I    x!
+01_4_24#?$&     Other (specify below) x!
+01_4_25#?$&                      B    x!
+01_4_26#?$&                      V    x!
+01_4_27#?$&                      R    x!
+01_4_28#?$&                      I    x!
+01_4_29#?$&                    B(J)   x!
+01_4_30#?$&                    R(F)   x!
+01_4_31#?$&                    I(N)   x!
+01_4_32#?$&                    B(*)   x!
+01_4_33#?$&                    R(*)   x!
+01_4_34#?$&                    695    x!
+01_4_35#?$&                    780    x!
+01_4_36#?$&                    830    x!
+01_4_37#?$&                    KG3    x!
+01_4_38#?$&                    O(*)   x!
+01_4_39#?$& H-alpha filters - 660/11  x!
+01_4_40#?$&                   669/12  x!
+01_4_41#?$&                   681/12  x!
+01_4_42#?$&                   690/8   x!
+01_4_43#?$&                   709/8   x!
+01_4_44#?$&                   712/13  x!
+01_4_45#?$&     Other (specify below) x!
+
+01_6_01#?$& Reduction software (IRAF) x!
+01_6_02#?$&    " (Figaro 3-S'link)    x!
+01_6_03#?$&    " (Figaro 4-AAO)       x!
+01_6_04#?$&    " (Other-S'link)       x!
+01_6_05#?$&    " (Other)              x!
+
+01_5_01#?$& Setup wavelength for detector rotation:    p!
+01_5_06#?$& Specify package, display, etc    p!
+01_5_02#?$& Other instrumentation requests:  p!
+
+01_5_03#?$& Name:                     p!
+01_5_04#?$& Institution:              p!
+01_5_05#?$& Proposal Title:           p!
+
+XE_0_00#?$& LaTeX setup commands       !
+\font\frmin=cmr7
+

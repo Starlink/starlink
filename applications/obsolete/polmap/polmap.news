@@ -1,0 +1,18 @@
+1 POLMAP interactive linear Spectropolarimetry package released
+                                                            Expires: 96.**.**
+
+ The first Starlink release of the POLMAP package by Tim Harries has been
+ made.  POLMAP is a package designed for interactive analysis of linera
+ sprectropolarimetry data, complimenting facilities available in TSP.
+  
+ To start POLMAP, type:
+
+    % polmapsetup
+    % polmap
+
+ (% is the shell prompt).
+
+ SUN/204 details use of POLMAP, and there is a hypertext version available
+ (`showme sun204' or `findme polmap').
+
+ Please report any problems with POLMAP to ussc@star.rl.ac.uk

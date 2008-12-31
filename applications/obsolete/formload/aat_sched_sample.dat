@@ -1,0 +1,125 @@
+     
+                     $FORMLOAD_DIR/aat_sched_sample.dat
+         Sample of a file containing entries to load into the
+                     AAT Instrument Request Form
+
+                      bill martin (rgo)  - 1995 january
+----------------------------------------------------------------------
+
+01_1_01#?$& PRIME FOCUS  (enter x)    x!x
+01_1_02#?$&  LBL f/1 ?                x!x
+01_1_03#?$&   Filters(1 of BVV+RRI)   p!B
+01_1_04#?$&   Filters(1 of BVV+RRI)   p!V
+01_1_05#?$&   Filters(1 of BVV+RRI)   p!I
+01_1_06#?$&     Detector option 2,3   p!2
+01_1_07#?$&  CCD f/3.3 (Doublet) ?    x!x
+01_1_08#?$&   Detector option 1,2,3   p!1
+01_1_09#?$&  Photographic             x!x
+01_1_10#?$&   Sub-beam prism ? (y/n)  p!y
+01_1_11#?$&     Triplet               x!x
+01_1_12#?$&     Doublet               x!x
+01_1_13#?$&     2dF                   x!x
+
+01_2_01#?$& CASSEGRAIN (enter x)      x!x
+01_2_02#?$&   RGO Spec (25cm camera)  x!x
+01_2_03#?$&   RGO Spec (82cm camera)  x!x
+01_2_04#?$&     FORS?  (y/n)          p!N
+01_2_05#?$&       No modules          x!x
+01_2_06#?$&       Polarim (1/4)       x!x
+01_2_07#?$&       Polarim (1/2)       x!x
+01_2_08#?$&       AUTOFIB             x!x
+01_2_09#?$&       FOCAP at Cass       x!x
+01_2_10#?$&       FOCAP at Aux        x!x
+01_2_11#?$&        Detector (1,2,3)   p!3
+01_2_12#?$&   IRIS (f/15)             x!x
+01_2_13#?$&   IRIS (f/36)             x!x
+01_2_14#?$&     IRISPOL (1/4)         x!x
+01_2_15#?$&     IRISPOL (1/2)         x!x
+01_2_16#?$&   HATPOL                  x!x
+01_2_17#?$&   LDSS                    x!x
+01_2_18#?$&        Detector (1,2,3)   p!2
+01_2_19#?$&   Taurus                  x!x
+01_2_20#?$&     FP  (f/8)             x!x
+01_2_21#?$&     FP  (f/15)            x!x
+01_2_22#?$&     FOP (1/4)             x!x
+01_2_23#?$&     FOP (1/2)             x!x
+01_2_24#?$&        Detector (1,2,3)   p!1
+01_2_25#?$&   MES                     x!x
+01_2_27#?$& AUXILIARY                 x!x
+01_2_28#?$&   CCD Imaging             x!x
+01_2_29#?$&        Detector (1,2,3,5) p!2
+01_2_30#?$&   Photometer              x!x
+
+01_3_01#?$& COUDE (enter x)           x!x
+01_3_02#?$&   UCLES                   x!x
+01_3_03#?$&      Detector (1,2,3,4)   p!3
+01_3_04#?$&   UHRF                    x!x
+01_3_05#?$&    1.0M                   x!x
+01_3_06#?$&    0.6M                   x!x
+01_3_07#?$&    0.3M                   x!x
+01_3_08#?$&      Detector (1,2,3,4)   p!2
+
+01_4_01#?$& RGO Gratings - 250B       x!x
+01_4_02#?$&                270R       x!x
+01_4_03#?$&                300B       x!x
+01_4_04#?$&                600U       x!x
+01_4_05#?$&                600V       x!x
+01_4_06#?$&                600R       x!x
+01_4_07#?$&                600H       x!x
+01_4_08#?$&               1200B       x!x
+01_4_09#?$&               1200V       x!x
+01_4_10#?$&               1200R       x!x
+01_4_11#?$&               1200I       x!x
+01_4_12#?$&               1200J       x!x
+01_4_13#?$& Taurus Etalons - 500mu    x!x
+01_4_14#?$&                  250      x!x
+01_4_15#?$&                  125      x!x
+01_4_16#?$&                   70      x!x
+01_4_17#?$&                   15      x!x
+01_4_18#?$&                  200      x!x
+01_4_19#?$& Imaging Filters ---- U    x!x
+01_4_20#?$&                      B    x!x
+01_4_21#?$&                      V    x!x
+01_4_22#?$&                      R    x!x
+01_4_23#?$&                      I    x!x
+01_4_24#?$&     Other (specify below) x!x
+01_4_25#?$&                      B    x!x
+01_4_26#?$&                      V    x!x
+01_4_27#?$&                      R    x!x
+01_4_28#?$&                      I    x!x
+01_4_29#?$&                    B(J)   x!x
+01_4_30#?$&                    R(F)   x!x
+01_4_31#?$&                    I(N)   x!x
+01_4_32#?$&                    B(*)   x!x
+01_4_33#?$&                    R(*)   x!x
+01_4_34#?$&                    695    x!x
+01_4_35#?$&                    780    x!x
+01_4_36#?$&                    830    x!x
+01_4_37#?$&                    KG3    x!x
+01_4_38#?$&                    O(*)   x!x
+01_4_39#?$& H-alpha filters - 660/11  x!x
+01_4_40#?$&                   669/12  x!x
+01_4_41#?$&                   681/12  x!x
+01_4_42#?$&                   690/8   x!x
+01_4_43#?$&                   709/8   x!x
+01_4_44#?$&                   712/13  x!x
+01_4_45#?$&     Other (specify below) x!x
+
+01_6_01#?$& Reduction software (IRAF) x!x
+01_6_02#?$&    " (Figaro 3-S'link)    x!x
+01_6_03#?$&    " (Figaro 4-AAO)       x!x
+01_6_04#?$&    " (Other-S'link)       x!x
+01_6_05#?$&    " (Other)              x!x
+01_5_01#?$& Setup wavelength for detector rotation:    p! 5000 angstroms
+01_5_06#?$& Specify package, display, etc    p!Matador
+01_5_02#?$& Other instrumentation requests:  p!
+Own filter and holder to be provided.
+
+01_5_03#?$& Name:                     p!W L Martin
+01_5_04#?$& Institution:              p!Royal Greenwich Observatory
+01_5_05#?$& Proposal Title:           p!An investigation to show that the answer
+to Life, the Universe and everything is 42.
+
+XE_0_00#?$& LaTeX setup commands       !
+\font\frmin=cmr7
+

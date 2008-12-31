@@ -1,0 +1,72 @@
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C FORMLOAD_A.FOR --    s/rs that contain non-standard Fortran stuff
+C
+C Contains:-
+C QWRITE    Write a line to terminal - no carriage control
+C FILOPN    Opens files
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C QWRITE -- Write a line to terminal - no carriage control
+C
+C  alan penny                 ral                      1992 Nov
+
+      subroutine qwrite ( text )
+
+      implicit none
+
+      character*(*)  text
+C	!i: text to write
+C-
+Cbegin
+
+
+      write ( 6, '(1x,a,'' ''$)' ) text
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C FILOPN -- Opens files
+C
+C  alan penny                 ral                      1992 Nov
+
+      subroutine filopn ( kopt, num, isvms, file, istat )
+
+      implicit none
+
+      integer        kopt
+C	!i: 1 = open read; 2 = open write
+      integer        num
+C	!i: Is the system VMS?
+      logical       isvms
+C	!i: File to open
+      character*(*)  file
+C	!i: File to open
+      integer        istat
+C	!o: Error flag (0=ok; 1=bad)
+C-
+Cbegin
+
+
+      istat = 1
+
+      if ( kopt.eq.1 ) then
+         open ( UNIT=num, FILE=file, READONLY, STATUS='OLD', err=999 )
+      else
+         if ( isvms ) then
+            open ( UNIT=num, FILE=file, STATUS='NEW', 
+     +             CARRIAGECONTROL='LIST', err=999 )
+         else
+            open ( UNIT=num, FILE=file, STATUS='UNKNOWN',
+     +             CARRIAGECONTROL='LIST', err=999 )
+         endif
+      endif
+
+      istat = 0
+  999 continue
+
+
+      end
+

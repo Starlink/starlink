@@ -1,0 +1,107 @@
+      SUBROUTINE RDTSP(CPARAM,NPTS,STOKES_I,STOKES_Q,STOKES_QV,
+     &                 STOKES_U,
+     &                 STOKES_UV,LAMBDA,TITLE,OUT_LU)
+C+
+C
+C Subroutine: 
+C
+C     R D T S P
+C
+C
+C Author: Tim Harries (tjh@st-and.ac.uk)
+C
+C Parameters: 
+C
+C CPARAM (<), NPTS (>), STOKES_I (>), STOKES_Q (>), STOKES_QV (>),
+C STOKES_U (>), STOKES_UV (>), LAMBDA (>), TITLE (>) ,OUT_LU (<)
+C
+C History: 
+C  
+C   May 1994 Created
+C 
+C
+C  
+C
+C
+C This routine reads in a polarization spectrum from a TSP format file
+C and puts it into the 'current' arrays
+C
+C
+C
+C-
+C
+      IMPLICIT NONE
+      INTEGER OUT_LU
+C
+C HDS and NDF includes
+C
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'array_size.inc'
+C
+C The current arrays
+C
+      INTEGER NPTS
+      REAL STOKES_I(*)
+      REAL STOKES_Q(*)
+      REAL STOKES_QV(*)
+      REAL STOKES_U(*)
+      REAL STOKES_UV(*)
+      REAL LAMBDA(*)
+C
+C Misc.
+C
+      INTEGER SP
+C
+C
+      CHARACTER*(*) CPARAM
+      CHARACTER*80 PATH,TITLE
+C
+      INTEGER STATUS,NELM,NDF1,NDF2,NDF3,IPTR
+      INTEGER PTRQ,PTRQV,PTRU,PTRUV,APTR
+C
+C
+      CHARACTER*(DAT__SZLOC) PLOC,LOC
+C
+      STATUS = 0
+C
+      CALL SSTRIP(CPARAM)
+      SP = INDEX(CPARAM,' ')
+      SP = SP-1
+      PATH = CPARAM(:SP)
+      IF ( PATH((SP-3):SP).NE.'.sdf') THEN
+       TITLE = PATH
+       PATH = PATH(1:SP)//'.sdf'
+      ELSE
+       TITLE = PATH(1:(SP-4))
+      ENDIF
+
+      CALL NDF_BEGIN
+      CALL HDS_START(STATUS)
+      CALL HDS_OPEN(PATH,'READ',LOC,STATUS)
+      CALL NDF_IMPRT(LOC,NDF1,STATUS)
+      CALL NDF_MAP(NDF1,'DATA','_REAL','READ',IPTR,NELM,STATUS)
+      CALL NDF_AMAP(NDF1,'Centre',1,'_REAL','READ',APTR,NELM,STATUS)
+      CALL NDF_XLOC(NDF1,'POLARIMETRY','READ',PLOC,STATUS)
+      CALL NDF_FIND(PLOC,'STOKES_Q',NDF2,STATUS)
+      CALL NDF_MAP(NDF2,'DATA','_REAL','READ',PTRQ,NELM,STATUS)
+      CALL NDF_MAP(NDF2,'VARIANCE','_REAL','READ',PTRQV,NELM,STATUS)
+      CALL NDF_FIND(PLOC,'STOKES_U',NDF3,STATUS)
+      CALL NDF_MAP(NDF3,'DATA','_REAL','READ',PTRU,NELM,STATUS)
+      CALL NDF_MAP(NDF3,'VARIANCE','_REAL','READ',PTRUV,NELM,STATUS)
+      IF (NELM.GT.MAXPTS) THEN
+       CALL WR_ERROR('TSP file too big to read in',OUT_LU)
+      ELSE 
+       IF (STATUS.EQ.SAI__OK) THEN
+       NPTS = NELM
+       CALL READ_IT(NPTS,LAMBDA,STOKES_I,STOKES_Q,STOKES_QV,STOKES_U,
+     & STOKES_UV,
+     & NELM,%VAL(IPTR),%VAL(PTRQ),%VAL(PTRQV),%VAL(PTRU),
+     & %VAL(PTRUV),%VAL(APTR))
+       ENDIF
+      ENDIF
+      CALL DAT_ANNUL(PLOC,STATUS)
+      CALL NDF_END(STATUS)
+      CALL HDS_CLOSE(LOC,STATUS)
+      CALL HDS_STOP(STATUS)
+      END

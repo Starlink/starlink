@@ -1,0 +1,76 @@
+                  FORMLOAD_DIR:PATT3_NULL.DAT     
+     Sample of a .DAT file containing 'null' entries to load into the 
+         PATT3 Application form, to get a blank form with no entries.
+
+     Bill Martin       Royal Greenwich Observatory   1995 July
+
+01_1_01#?$& Semester                   !
+01_2_01#?$& Surname                    !
+01_2_02#?$& Title                      !
+01_2_03#?$& Initials                   !
+01_2_04#?$& Possible Observer       y/n!
+01_2_05#?$& Contact address 1          !
+01_2_06#?$& Contact address 2          !
+01_2_07#?$& Contact address 3          !  
+01_2_08#?$& Full E-Mail address        !
+01_2_09#?$& Fax number                 !
+01_2_10#?$& Telephone + ext no.        !
+01_2_11#?$& Collaborators 1            !
+01_2_12#?$& Collaborators 1 Obs     y/n!
+01_2_13#?$& Collaborators 2            !
+01_2_14#?$& Collaborators 2 Obs     y/n!
+01_2_15#?$& Collaborators 3            !
+01_2_16#?$& Collaborators 3 Obs     y/n!
+01_2_17#?$& Collaborators 4            !
+01_2_18#?$& Collaborators 4 Obs     y/n!
+01_2_19#?$& Collaborators 5            !
+01_2_20#?$& Collaborators 5 Obs     y/n!
+01_3_01#?$& Investigation Title 1      !
+01_3_02#?$& Investigation Title 2      !
+01_3_03#?$& Student thesis project? y/n!
+01_4_01#?$& Abstract                  p!
+01_5_01#?$& Long term status        y/n!
+01_5_02#?$& Total shifts needed        !
+01_6_01#?$& Rx A Receiver?            x!
+01_6_02#?$& Rx A Receiver (No.hours)   !
+01_6_03#?$& Rx B3i Receiver?          x!
+01_6_04#?$& Rx B3i Receiver (No.hours) !
+01_6_05#?$& Rx C2 Receiver?           x!
+01_6_06#?$& Rx C2 Receiver (No.hours)  !
+01_6_07#?$& Rx G Receiver ?           x!
+01_6_08#?$& Rx G Receiver (No.hours)   !
+01_6_09#?$& UKT14 (continuum bol)     p!
+01_6_10#?$& UKT14 (No. hours)          !
+01_6_11#?$& +pol                       !
+01_6_12#?$& +pol (No. hours)           !
+01_6_13#?$& Other                      !
+01_6_14#?$& Other (No. hours)          !
+01_7_01#?$& Total number of shifts     !
+01_7_02#?$& Preferred scheduling       !
+01_7_03#?$& Impossible dates (reasons) !
+01_7_04#?$& Remote eavesdropping (yes) !
+01_7_05#?$& Remote eavesdropping (no)  !
+01_7_06#?$& Serviced observing (yes)   !
+01_7_07#?$& Serviced observing (no)    !
+01_7_08#?$& Flexible scheduling (Pref) !
+01_7_09#?$& Flexible scheduling (Poss) !
+01_7_10#?$& Flexible scheduling (no)   !
+01_8_01#?$& List of Principal Sources p!
+02_9_01#?$& Related applications (4)  p!
+02_9_02#?$& Publications              p!
+02_9_03#?$& Abstract for backup       p!
+03_1_01#?$& Student observations?   y/n!
+03_1_02#?$& Name of student(s)        p!
+03_1_03#?$& Project Title(s)          p!
+03_1_04#?$& Studentship number(s)     p!
+03_1_05#?$& Current research grant  y/n!
+03_1_06#?$& If Yes: Name of PI        p!
+03_1_07#?$& If Yes: Grant number      p!
+03_2_01#?$& FUNDING                   p!
+03_2_02#?$& Investigators/Inst/T&S    p!
+03_2_03#?$& Short Title               p!
+03_2_04#?$& Comments and scheduling   p!
+03_2_05#?$& No. of Shifts requested   p!
+03_2_06#?$& No. of shifts minimum     p!
+03_2_07#?$& Address for ackn.         p!
+XE_0_00#?$& LaTeX setup commands      p!

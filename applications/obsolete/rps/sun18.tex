@@ -1,0 +1,650 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun18.6}
+\newcommand{\stardocnumber}    {18.6}
+\newcommand{\stardocauthors}   {Martin Ricketts}
+\newcommand{\stardocdate}      {12 March 1996}
+\newcommand{\stardoctitle}     {RPS \\[1ex] ROSAT Proposal Submission}
+\newcommand{\stardocversion}   {Version 5.4}
+\newcommand{\stardocmanual}    {User's Guide}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf  \stardoctitle \\ [2.5ex]}
+   {\LARGE\bf \stardocversion \\ [4ex]}
+   {\Huge\bf  \stardocmanual}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%   ==================
+
+This Note describes RPS released to support proposal submission for
+AO-7 of the Rosat Pointed Observation Programme, which has a deadline
+for submission of May 15th 1996.  AO-7 covers observations with the HRI
+and WFC. RPS provides data-checking, proposal printing, and electronic
+proposal submission.  Details of the AO-7 Proposer's Guide are
+available from the Leicester Database and Archive Service WWW page:
+\htmladdnormallink{{\tt http://ledas-www.star.le.ac.uk/}}{http://ledas-www.star.le.ac.uk/}
+
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+ \newpage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+ 
+\section{\label{se:introduction}\xlabel{introduction}Introduction}
+
+\subsection{Overview}
+
+The RPS package provides all the tools necessary for the generation and
+electronic submission of observing proposals for the UK ROSAT Pointed 
+Observation Programme. Briefly RPS allows the user to do the following:
+
+\begin{enumerate}
+
+\item create a new ROSAT Proposal Form (RPF) by `filling it in'
+interactively
+
+\item edit an existing RPF, for example to make minor changes to
+observation details
+
+\item summarise the details of an RPF
+
+\item produce a laser printer version of the RPF for submission to the
+UK Programme
+
+\item produce a version of the RPF that can be transmitted over the
+network and submit this electronically to the ROSAT UK Data Centre
+(UKDC) at RAL
+
+\item check when a target will be observable by Rosat and get an
+estimate of the survey exposure
+
+\end{enumerate}
+
+Before starting to use RPS, the user ought to be familar with the
+requirements of the UK ROSAT Pointed Observation Programme as laid out
+in the Announcement of Opportunity (AO) cover letter and the Technical
+Description. Copies of these documents are available from the UKDC at
+RAL. 
+
+The RPS package is designed to enable guest observers to fulfil the
+most important requirements of the UK Programme, namely to submit a
+computer-readable version of their RPF to the UKDC and also to submit 2
+paper copies of the complete proposal --- consisting of the RPF plus
+the scientific case for the proposal.
+
+The use of the RPS package offers a number of advantages to users, for
+example it will check the data you enter into each form, ensuring that
+the form you submit will not be rejected because of incorrectly entered
+or incomplete data.  There is now only the {\bf Unix} version of the
+package which works in line-entry mode.  If you have any queries
+regarding RPS then contact the UKDC, Internet mail address  {\tt
+rosatmail@sdc1.bnsc.rl.ac.uk}, or Janet addresses {\tt
+savax::rosatmail} or {\tt rosatmail@uk.ac.rl.savax}.
+
+\subsection{Proposal Forms}
+\label{sse:forms}
+
+The ROSAT Proposal Form (RPF) for one Proposal consists of four
+sections, namely Cover, General, Target and Constraints `forms',
+as follows:
+
+\begin{enumerate}
+
+\item The {\bf Cover Page} which contains details of the Principal
+Investigator (PI), the proposal title, subject category and the number
+of targets proposed. The printed cover page also includes the abstract.
+
+\item The {\bf General Form} which contains the
+details of any Co-Investigators (Co-Is), the official endorsement of
+the PI's institution and the PI declaration.
+
+\item One or more {\bf Target Summary} sheets which contain the
+technical details of the proposed observation(s) of each target.
+
+\item If any targets have time constraints, these are summarised on a
+{\bf Constraints Summary} sheet. The types of time-constraint that can
+be applied to an observation are explained in Chapter 9 of the
+Technical Description.
+
+\item If there are any remarks, these are printed on one or more separate 
+{\bf Remarks Summary} sheets.
+
+\end{enumerate}
+
+In addition, the abstract of the scientific case has to be entered; an
+editor is provided for this.
+
+\subsection{File names}
+
+RPS uses various files to store and output the RPF, as follows, where
+{\tt propname} is the name you enter when starting up the program:
+
+\begin{list}%
+{}{\setlength{\leftmargin}{53mm} \setlength{\labelwidth}{40mm} \setlength{\labelsep}{6mm}
+\setlength{\listparindent}{0mm} }
+
+\item[{\tt propname} \hfill]  holds the cover and general form
+data, where {\tt propname} is the name entered by the user when
+first creating the RPF. 
+
+{\bf NB.} \emph{These are binary files in {\tt FACTS}
+format, as used within the SCAR package, and are {\bf not} transferable
+between different platforms.}
+
+\item[{\tt propname\_target} \hfill] holds the target data. 
+
+\item[{\tt propname.abstract} \hfill] may be created within RPS.
+This must be a simple ASCII text file ({\em i.e.}, without \LaTeX\ 
+commands).  Without an abstract file the RPF can be printed, but not
+submitted by electronic mail.
+
+\item[{\tt propname.tex} \hfill] \LaTeX\ input file. This file can be
+processed outside RPS in the usual way if desired.
+
+\item[{\tt propname.post} \hfill] computer-readable version of the
+RPF for submission to the UKDC.  If possible users should submit their
+RPFs to the UKDC using the option within RPS.
+
+\item[{\tt propname.lis} \hfill] will be created if you want the
+{\em Summarise} output in a file rather than to the terminal.  Can be
+printed.
+
+\end{list}
+
+\section{\label{se:getting_started}\xlabel{getting_started}Getting Started}
+ 
+There is just one environment variable, {\tt RPS\_AUX}, which prefixes
+the file names.  At Starlink sites, if RPS is installed, this is set by
+{\tt /star/etc/login}.
+
+The program is initiated by typing:
+
+\begin{verbatim}
+      % rps
+\end{verbatim}
+
+where {\tt \%} is the Unix shell prompt.
+
+You are asked initially to enter a filename (without suffix) to be used
+by RPS for all files created. This is {\tt propname} referred to
+above.  Although there is a default (\verb+rps_form+), for all
+purposes other than {\em Check Target} you should enter a suitable
+name.
+
+Following this you will be presented with the main menu options, which
+include accessing the Help library.
+
+When form-filling, {\bf Help} is accessed by entering {\tt `?'} in any
+field.  This gives a description of the field and the options allowed
+where appropriate.  The main menu {\bf Help} item gives access to the whole
+of the {\tt Help} file.
+
+\section{\label{se:main_options}\xlabel{main_options}Main Options}
+
+\subsection{Create New File}
+
+This lets you create a new Proposal Form, using the Cover Page data
+from a previous file if you supply a filename.  The fields from the
+Cover page are presented, with defaults where appropriate.  See section
+\ref{se:form_filling} on \htmlref{Form Filling}{se:form_filling}
+for a further description of the facilities available.
+
+After completing the cover page the validation is carried out.  If you
+have entered the necessary fields such as your name, Institute, the
+Proposal name and category, {\em etc.},  the page will be validated.
+If the validation fails, you will be given the first field where an
+error was detected and you can go back to it by taking the default.  If
+you wish to exit from the form-filling, enter {\tt `E'} instead.
+
+When you have finished with the Cover page, the General form will be
+displayed.  Some of these details are only required on the paper
+copies, but you can get them printed by entering them here.
+
+Following this the first Target form is entered. Fill in the details of
+your first target.  On completion the validation will be done.  If this
+indicates the form is unsatisfactory, then correct the appropriate
+field and try again. As before, you can exit from an incomplete or
+incorrect form by entering {\tt `E'} in reply to the prompt.
+
+If the Constraints flag is set on the Target record then after you have
+completed it the Constraints page is entered for you to fill the
+relevant fields.  If the validation fails twice on the constraints
+form, the program returns to the Target form, in case you wish to
+change anything there. There is also a warning if the moon constraint
+affects a coordinated observation; you have the options of ignoring it,
+or returning to the form, {\em e.g.}, to change the time range.  On
+completion of a target / constraints form you are asked if you want
+another target. When you reply in the negative you will get the main
+menu again.
+
+\subsection{Edit Old File}
+
+Once a form has been created, the form-filling procedures, outlined
+above, can be used to change the contents. Also, on each Target form
+there is a Target number; this is just incremented when a Form is
+created; since this number may decide the precedence when it comes to
+scheduling, you may wish to alter it.  The `Review' option allows
+deletion of records and changing of Target numbers.
+
+The options are:
+
+\begin{description}
+\item[\mbox{}]\mbox{}
+\begin{description}
+
+\item [Edit Cover Page] --- Although the Cover page contains the number
+of Targets, this is not displayed with the other fields as it is
+automatically adjusted whenever records are added or deleted.
+
+\item [Edit General Page] 
+
+\item [Edit Target Data] --- The Constraints form is accessed after the
+main Target form if selected.
+
+\item [Add Target] --- to enter data for another target.
+
+\item [Review Targets] --- This displays the Target numbers and names
+for up to 20 Targets and then allows two main options. To change the
+Target number of record {\tt n} so it becomes Target {\tt m} enter
+after the prompt:
+
+\begin{verbatim}
+     > Cn,m
+\end{verbatim}
+
+and to delete {\em record} {\tt n} ({\bf not} {\em target number} {\tt n}):
+
+\begin{verbatim}
+     > Dn
+\end{verbatim}
+
+Deleting a Target record does not automatically change any of the other
+target numbers, but the records are concatenated.
+
+\end{description}
+\end{description}
+
+When exiting from RPS after editing, you will be given the option of
+deleting the old (default) version or the new one.
+
+\subsection{Summarise}
+
+This writes a few lines for each target in the form (as many as you
+have filters selected).  The output can be to the screen (default) or a
+listing file.  The details of the format are as follows:
+
+\begin{center}
+\begin{tabular}{rl}
+\setlength{\leftmargin}{40mm}
+\hspace{20mm}Heading	& Contents\\ \hline
+Rec No		& Record number\\
+Target Name	& Target name (16 chars)\\
+Targ No		& Target number\\
+Qual		& Quality indicator - `OK', or `F' if record failed check\\
+R.A.		& RA - HH MM SS.S\\
+Dec		& dec - DD MM SS.S\\
+Start		& start of visible period, due to Sun constraint\\
+End		& end visible period\\
+		& (there may be two periods listed)\\
+No. obs		& Number of observations\\
+TC		& type of time constraint, or `none'\\
+Time Ksec	& Time requested, ksec (to nearest integer)\\
+2 $\times$ srv exp XRT	& Twice estimated XRT survey exposure, Ksec (cf AO fig. 6.1)\\
+2 $\times$ srv exp WFC	& Twice estimated WFC survey exposure, Ksec \\
+		& Data for each filter:\\
+Instr		& Instrument. Z after WFC indicates Zoom on\\
+Flt		& Filter\\
+\%		& Time percentage requested\\
+sec		& Time, total or for particular WFC filter \\
+Det cps		& estimated cps for detection:\\
+		& WFC:  see AO section 12.2, uses Bcell = 0.01\\
+		& HRI:  see AO section 11.2, uses Rb = 0.000013\\
+\end{tabular}
+\end{center}
+
+\subsection{Check Target}
+
+This can be used to check the dates when a target satisfies the sun
+constraint, and also to find what the expected survey exposure,
+{\em etc.}, is likely to be; these outputs are as for the {\em Summarise}
+option.  Enter the RA and dec separately on request.  These can be in
+any format that is valid for the form-filling procedure --- {\tt `?'} will
+give you the help information on the field. After one display typing
+{\tt `Y'} enables a further target to be tested. the default is to exit to
+the main menu.
+
+\subsection{Print File}
+
+All the \LaTeX\ options create a file which you process after leaving RPS.
+
+The options are:
+
+\begin{description}
+
+\item [All forms] --- \LaTeX\ file of whole proposal produced.
+
+\item [Selected Pages] --- \LaTeX\ particular pages,
+
+\item [Blank Forms] --- \LaTeX\ gives you a blank copy of each page
+as given in the AO document.
+
+\end{description}
+
+\subsection{Proposal Submission}
+
+This will try to create the {\tt .post} file from the proposal form. It might
+fail because:
+
+\begin{enumerate}
+
+\item Errors are detected in the one or more of the pages. Use {\bf
+Review Targets} or {\bf Summarise} for more information or enter the
+Target or Cover Edit and type {\tt \%} to exit and initiate the
+verification.
+
+\item The Target numbers do not form a sequence from 1 to the number of
+target records.
+
+\item There is no abstract file yet, or it is longer than 800 characters.
+
+\end{enumerate}
+
+You can choose to let the program mail it to the UKDC, the address being
+given on the file {\tt address.dis} in the {\tt RPS\_AUX} directory.
+Alternatively, you can exit from RPS and
+send it yourself.  A checksum is used to ensure that the paper copies
+match the file sent over the network.
+
+{\bf Two paper copies must also be sent to RAL, which have attached the
+scientific case (see the AO document). } If you do not have the means
+to produce the \LaTeX\ hard-copy version of the RPF forms at your
+Institute, please produce your RPF by filling in your entries on a
+photocopy of the RPF form as they appear in the AO Technical
+Description. You should nevertheless submit the RPF electronically to
+the UKDC.
+
+The {\bf Data Protection Act 1984} applies to the database of
+proposals; by submitting a proposal it is assumed that you accept its
+provisions.
+
+\section{\label{se:form_filling}\xlabel{form_filling}Form Filling Procedure}
+
+For each section, you will be presented with each field name in turn.
+The line mode options, apart from moving to the next field
+with \verb+<return>+ are as follows:
+
+\begin{center}
+\begin{tabular}{|ll|ll|} \hline
+Input	&Action&Input	&Action\\ \hline
+\verb+%+&to exit out of the form at any time.		&\verb+&+&to go to the previous field.\\
+\verb+^+&to erase information in character fields	&\verb+?+&for field help.\\
+        &entering spaces will NOT erase!		&\verb+??+&for key help.\\
+\verb+#+&to skip groups of similar fields.		&\verb+???+&for screen help.\\ \hline
+\end{tabular}
+\end{center}
+
+For array entries a null entry causes a skip to the next array. Also
+for each of the four types of Constraint, the data fields are skipped
+if that constraint is not applicable.
+
+\sloppy
+
+\section{\label{se:form_contents}\xlabel{form_contents}Form contents}
+
+The table below shows the fields for each section:
+
+\footnotesize
+\begin{tabular}{llrlr}
+{\bf Form}	&{\bf Field name} &{\bf Format}&{\bf Field name}	&{\bf Format}\\[2mm]
+{\bf Cover}	&LAST.NAME            &C*27	&FIRST.NAME           &C*17	\\
+	&MIDDLE.NAME          &C*12	&PI.TITLE             &C*12  \\
+	&DEPARTMENT          &C*60   	&INSTITUTE           &C*60   \\
+	&ADDRESS             &C*60   	&CITY.TOWN           &C*32   \\
+	&COUNTY              &C*32   	&POSTAL.CODE         &C*12   \\
+	&COUNTRY             &C*24   	&TELEPHONE.NUMBER    &C*24   \\
+	&TELEX.NUMBER        &C*20   	&FAX.NUMBER          &C*24   \\
+	&NETWORK.NAME        &C*10   	&NETWORK.ADDRESS     &C*25   \\
+	&PROPOSAL.TITLE(2)   &C*60   	&SUBJECT.CATEGORY    &I*1    \\
+	&NUMBER.OF.TARGETS   &I*1    	&			& \\ [1mm]
+{\bf General}	&COI.NAME(6)         &C*32  	&COI.INSTITUTE(6)    &C*32   \\
+	&COI.CNTRY(6)        &C*24   	&ADMIN.NAME         &C*32    \\
+	&ADMIN.POST         &C*60    	&AGENCY             &C*6     \\ [1mm]
+{\bf Target}	&TARGET.NUMBER      &I*2 &TARGET.NAME        &C*20     \\
+	&ALTERNATIVE.NAME   &C*20     	&TARGET.RA          &C*11     \\
+	&TARGET.DEC         &C*11     	&TOTAL.OBS.TIME     &R*4      \\
+	&NUMBER.OBS         &I*1      	&TIME.CRITICAL      &L*1      \\
+	&HRI.CODE           &I*1      	&WFC.CODE           &I*1      \\
+	&WFC.ZOOM.ON        &L*1      	&WFC.FILT.CODE(8)   &C*3      \\	
+	&WFC.FILT.PCNT(8)   &I*1      	&WFC.FILT.MINT(8)   &R*4      \\
+	&REMARKS(4)        &C*50     	&			&	\\[1mm]
+{\bf Constraints}&COORD.OBSERVATION  &L*1 	&START.YEAR        &I*2      \\
+	&START.MONTH        &I*1      	&START.DAY          &I*2      \\
+	&START.HOUR         &I*1      	&START.MINUTE       &R*4      \\
+	&END.YEAR          &I*2      	&END.MONTH          &I*1      \\
+	&END.DAY            &I*2      	&END.HOUR           &I*1      \\
+	&END.MINUTE         &R*4      	&MONITOR           &L*1      \\
+	&TIME.INTERVAL      &R*4      	&PHASE.DEPENDENT    &L*1      \\
+	&EPOCH              &R*4      	&PERIOD             &R*4      \\
+	&CONTIGUOUS.OBS     &L*1      	&NUMBER.INTERVALS   &I*2      \\
+\end{tabular}
+\normalsize
+
+\section{\label{se:acknowledgements}\xlabel{acknowledgements}Acknowledgements}
+
+Assistance has been provided by M Watson, of Leicester University
+and at RAL: Brian Stewart, Mark Jefferies, Martin Bush, and Dave Ewart.
+For the Unix version, a lot of the work was done by Margo Duesterhaus and
+Phillip Brisco at NASA Goddard.
+
+\end{document}

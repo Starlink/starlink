@@ -1,0 +1,23 @@
+% Rosat - Proposal form for Rosat Observations - File RPS_FORM_0.TEX
+\documentstyle{report}
+\setlength{\textwidth}{180mm}
+\setlength{\textheight}{260mm}
+\setlength{\oddsidemargin}{-25mm}
+\setlength{\evensidemargin}{-25mm}
+\setlength{\topmargin}{-25mm}
+\setlength{\unitlength}{1mm}
+\def\gap{\rule[-5mm]{0mm}{1mm}}
+\newsavebox{\yesno}
+\newcounter{rxpage}
+\newcounter{subpage}
+\renewcommand{\thepage}{\Roman{page} \alph{subpage}}
+ 
+\savebox{\yesno}(0,0)[tl]{
+\multiput(120,0)(30,0){2}{\framebox(6,4){}}
+\put(130,1){\makebox(0,0)[bl]{\large{Yes}}}
+\put(160,1){\makebox(0,0)[bl]{\large{No}}}  }
+ 
+\begin{document}
+\pagestyle{empty}
+\sloppy
+

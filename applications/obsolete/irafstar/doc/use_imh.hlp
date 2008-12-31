@@ -1,0 +1,17 @@
+.help use_imh Starlink starlink
+.nf
+use_imh - default to produce IRAF format files out instead of NDFs.
+
+Usage:
+
+   use_imh
+
+Description:
+
+   The script sets the environment variable NDF_FORMATS_OUT so that a
+   conversion to IRAF format is automatically applied to NDF files
+   produced by Starlink programs.
+
+Parameters
+   None
+.endhelp
