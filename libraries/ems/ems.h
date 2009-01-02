@@ -130,7 +130,7 @@ void emsRepf( const char *err,
 
 void emsRepv( const char *err,
               const char *text, va_list args,
-              int *status ) __attribute__((format (printf, 2, 0 )));;
+              int *status ) __attribute__((format (printf, 2, 0 )));
 
 void emsRlse( void );             
 
@@ -169,7 +169,7 @@ void emsSetu( const char *token,
 
 void emsSetv( const char *token,
               const char *format,
-              va_list args)  __attribute__((format (printf, 2, 0 )));;
+              va_list args)  __attribute__((format (printf, 2, 0 )));
 
 void emsStat( int *status );      
 
