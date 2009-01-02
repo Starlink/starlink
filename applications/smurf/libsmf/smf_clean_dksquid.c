@@ -121,7 +121,7 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
   size_t arrayoff;        /* Array offset */
   double corr;            /* Linear correlation coefficient */
   double *corrbuf=NULL;   /* Array of correlation coeffs all bolos this col */
-  int curlevel;           /* Current messaging level */
+  msglev_t curlevel;      /* Current messaging level */
   int needDA=0;           /* Do we need dksquids from the DA? */ 
   int dkgood;             /* Flag for non-constant dark squid */ 
   double *dksquid=NULL;   /* Buffer for smoothed dark squid */

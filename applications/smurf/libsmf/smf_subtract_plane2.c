@@ -122,7 +122,7 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
   gsl_matrix *azelmatx = NULL; /* Matrix of input positions */
   size_t base;             /* Starting point for index into arrays */
   double chisq;            /* Chi-squared from the linear regression fit */
-  int curlevel;            /* Current messaging level */
+  msglev_t curlevel;       /* Current messaging level */
   smfData *data = NULL;    /* Pointer to current smfData */
   double dskyaz;           /* Sky power fit - azimuth gradient */
   double dskyel;           /* Sky power fit - elev gradient */

@@ -164,7 +164,7 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
   double c[2];              /* Coordinates for point C (zenith) */
   double chisq = 0;         /* Chi-squared from the linear regression fit */
   double cosalpha;          /* Cosine alpha */
-  int curlevel;             /* Current messaging level */
+  msglev_t curlevel;        /* Current messaging level */
   double dalpha;            /* Change in focal plane angle (radians) */
   double delta;             /* Change in angle */
   double dskyaz;            /* Sky power fit - azimuth gradient */

@@ -109,7 +109,7 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
   double *alljump=NULL;         /* Buffer containing DC jumps */
   dim_t base;                   /* Index to starting point of bolo */
   double baseline;              /* Current baseline estimate  */
-  int curlevel;                 /* Current messaging level */
+  msglev_t curlevel;            /* Current messaging level */
   double *dat=NULL;             /* Pointer to bolo data */
   double dcstep;                /* Size of DC steps to detect */
   dim_t i;                      /* Loop Counter */
