@@ -1219,8 +1219,9 @@ void smurf_makemap( int *status ) {
     }
 
     /* Call the low-level iterative map-maker */
-    smf_iteratemap( igrp, keymap, darks, outfset, moving, lbnd_out, ubnd_out,
-                    maxmem-mapmem, map, hitsmap, variance, weights, status );
+    smf_iteratemap( igrp, keymap, darks, bpms, outfset, moving, lbnd_out, 
+                    ubnd_out, maxmem-mapmem, map, hitsmap, variance, weights, 
+                    status );
 
     /* Calculate exposure time per output pixel from hitsmap */
     for (i=0; (i<nxy) && (*status == SAI__OK); i++) {

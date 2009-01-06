@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
-*                    AstFrameSet *outfset, int moving, 
+*                    const smfArray *bpms, AstFrameSet *outfset, int moving, 
 *	             int *lbnd_out, int *ubnd_out, size_t maxmem, 
 *                    double *map, unsigned int *hitsmap, double *mapvar, 
 *                    double *weights, int *status );
@@ -165,7 +165,8 @@
 *     2008-12-12 (EC):
 *        Extra re-normalization required for GAIn model
 *     2009-01-06 (EC):
-*        Added flagging of data during stationary telescope pointing
+*        -Added flagging of data during stationary telescope pointing
+*        -apply bad pixel mask (BPM)
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -220,8 +221,8 @@
 
 #define FUNC_NAME "smf_iteratemap"
 
-void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
-                     AstFrameSet *outfset, int moving, 
+void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
+                     const smfArray *bpms, AstFrameSet *outfset, int moving, 
                      int *lbnd_out, int *ubnd_out, size_t maxmem, 
                      double *map, unsigned int *hitsmap, double *mapvar, 
                      double *weights, int *status ) {
@@ -981,6 +982,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
               msgOutif(MSG__VERB," ", "  update quality", status);
               smf_update_quality( data, qua_data, 1, NULL, badfrac, status );
 
+              if( bpms ) {
+                msgOutif(MSG__VERB," ", "  applying BPM", status);
+                smf_apply_mask( data, qua_data, bpms, SMF__BPM_QUAL, status );
+              }
+                                  
               if( baseorder >= 0 ) {
                 msgOutif(MSG__VERB," ", "  fit polynomial baselines", status);
                 smf_scanfit( data, qua_data, baseorder, status );
