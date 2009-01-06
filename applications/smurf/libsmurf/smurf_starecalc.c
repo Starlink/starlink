@@ -182,7 +182,7 @@ void smurf_starecalc ( int *status ) {
     smf_open_and_flatfield( igrp, ogrp, i, darks, &data, status );
 
     /* Mask out bad pixels - mask data array not quality array */
-    smf_apply_mask( data, bpms, SMF__BPM_DATA, status );
+    smf_apply_mask( data, NULL, bpms, SMF__BPM_DATA, status );
 
     smf_calc_stareimage( data, naver, status );
 

@@ -13,12 +13,16 @@
 *     C function
 
 *  Invocation:
-*     void smf_apply_mask( smfData *indata, const smfArray *bpms,
-*                          smf_dark_sub_meth method, int *status) {
+*     void smf_apply_mask( smfData *indata, unsigned char *quality, 
+*                          const smfArray *bpms, smf_dark_sub_meth method, 
+*                          int *status)
 
 *  Arguments:
 *     indata = const smfData * (Given)
 *        Observation to be masked.
+*     quality = unsigned char * (Given and Returned)
+*        If set, use this buffer instead of QUALITY associated with data.
+*        If NULL, use the QUALITY associated with data. 
 *     bpms = smfArray * (Given) 
 *        Masks for each subarray (e.g. returned by smf_reqest_mask call)
 *     method = smf_bpm_meth (Given)
@@ -42,6 +46,7 @@
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     EC: Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -51,6 +56,8 @@
 *        Add QUALITY option
 *     2008-12-11 (TIMJ):
 *        Mask data before masking quality.
+*     2009-01-06 (EC):
+*        Added optional external quality array
 
 *  Notes:
 *      - for efficiency use SMF__BPM_QQUAL alone. All other methods
@@ -60,6 +67,7 @@
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -95,8 +103,9 @@
 
 #define FUNC_NAME "smf_apply_mask"
 
-void smf_apply_mask( smfData *indata, const smfArray *bpms,
-                     smf_dark_sub_meth method, int *status) {
+void smf_apply_mask( smfData *indata, unsigned char *quality, 
+                     const smfArray *bpms, smf_dark_sub_meth method, 
+                     int *status) {
 
   size_t previdx;
   size_t nextidx;
@@ -105,12 +114,19 @@ void smf_apply_mask( smfData *indata, const smfArray *bpms,
   smfData * bpm = NULL;
   smfFile * file = NULL;
   int masked = 0;
+  unsigned char *qua=NULL;
 
   if (*status != SAI__OK) return;
   if (!bpms) return;
 
   /* work out which masks are suitable */
   smf_choose_closest( bpms, indata, &previdx, &nextidx, status );
+
+  if( quality ) {
+    qua = quality;
+  } else {
+    qua = indata->pntr[2];
+  }
 
   /* get the file struct and create a token */
   file = indata->file;
@@ -217,20 +233,19 @@ void smf_apply_mask( smfData *indata, const smfArray *bpms,
     */
     if ( method & (SMF__BPM_QUAL | SMF__BPM_QQUAL) ) {
       masked = 1;
-      if (indata->pntr[2]) {
+      if (qua) {
         if (method & SMF__BPM_QUAL) {
-          smf_update_quality( indata, NULL, 1, 
+          smf_update_quality( indata, qua, 1, 
                               bpm->pntr[0], 0, status);
         } else {
           /* just mask the first nelem items */
           int *mask = bpm->pntr[0];
           size_t nelem = bpm->dims[0] * bpm->dims[1];
-          unsigned char *qual = indata->pntr[2];
           size_t i;
 
           for (i=0; i<nelem; i++) {
             if (mask[i] == VAL__BADI) {
-              qual[i] |= SMF__Q_BADB;
+              qua[i] |= SMF__Q_BADB;
             }
           }
 

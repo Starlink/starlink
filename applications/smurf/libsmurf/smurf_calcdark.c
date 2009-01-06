@@ -146,7 +146,7 @@ void smurf_calcdark( int *status ) {
     /* need the output filename */
     pname = filename;
     grpGet( ogrp, i, 1, &pname, sizeof(filename), status );
-    smf_apply_mask( dark, bpms, SMF__BPM_DATA, status );
+    smf_apply_mask( dark, NULL, bpms, SMF__BPM_DATA, status );
     smf_write_smfData( dark, NULL, NULL, filename, indf, status );
     ndfAnnul( &indf, status);
   }

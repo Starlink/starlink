@@ -201,7 +201,7 @@ void smurf_remsky( int * status ) {
       /* This seems inefficient but it works */
       smf_open_and_flatfield( igrp, ogrp, i, darks, &odata, status );
       /* Mask out bad pixels - mask data array not quality array */
-      smf_apply_mask( odata, bpms, SMF__BPM_DATA, status );
+      smf_apply_mask( odata, NULL, bpms, SMF__BPM_DATA, status );
       smf_close_file( &odata, status);
     }
     /* Group output files together now that they exist */
@@ -221,7 +221,7 @@ void smurf_remsky( int * status ) {
       smf_open_and_flatfield( igrp, ogrp, i, darks, &odata, status );
 
       /* Mask out bad pixels - mask data array not quality array */
-      smf_apply_mask( odata, bpms, SMF__BPM_DATA, status );
+      smf_apply_mask( odata, NULL, bpms, SMF__BPM_DATA, status );
 
       if (*status != SAI__OK) {
         /* Tell the user which file it was... */

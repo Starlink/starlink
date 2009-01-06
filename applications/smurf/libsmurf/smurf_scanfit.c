@@ -166,7 +166,7 @@ void smurf_scanfit( int * status ) {
     }
 
     /* Mask out bad pixels - mask data array not quality array */
-    smf_apply_mask( ffdata, bpms, SMF__BPM_DATA, status );
+    smf_apply_mask( ffdata, NULL, bpms, SMF__BPM_DATA, status );
 
     smf_scanfit( ffdata, NULL, order, status );
 

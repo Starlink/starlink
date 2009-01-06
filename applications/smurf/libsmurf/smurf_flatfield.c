@@ -193,7 +193,7 @@ void smurf_flatfield( int *status ) {
     }
 
     /* Mask out bad pixels - mask data array not quality array */
-    smf_apply_mask( ffdata, bpms, SMF__BPM_DATA, status );
+    smf_apply_mask( ffdata, NULL, bpms, SMF__BPM_DATA, status );
 
     /* Free resources for output data */
     smf_close_file( &ffdata, status );

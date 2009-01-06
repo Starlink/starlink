@@ -1005,7 +1005,7 @@ void smurf_makemap( int *status ) {
           }
 
           /* Mask out bad pixels - mask data array not quality array */
-          smf_apply_mask( data, bpms, SMF__BPM_DATA, status );
+          smf_apply_mask( data, NULL, bpms, SMF__BPM_DATA, status );
 
           /* Rebin the data onto the output grid. This also closes the
              data file.  */
