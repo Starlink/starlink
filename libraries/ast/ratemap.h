@@ -193,7 +193,11 @@ astPROTO_ISA(RateMap)             /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstRateMap *astRateMap_( void *, int, int, const char *, int *, ...);
 #else
-AstRateMap *astRateMapId_( void *, int, int, const char *, ... );
+AstRateMap *astRateMapId_( void *, int, int, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,4,5)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -260,6 +264,7 @@ astINVOKE(O,astLoadRateMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
    to the wrong sort of Object is supplied. */
 /* None. */
 #endif
+
 
 
 

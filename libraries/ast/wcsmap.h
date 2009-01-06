@@ -414,7 +414,11 @@ astPROTO_ISA(WcsMap)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstWcsMap *astWcsMap_( int, int, int, int, const char *, int *, ...);
 #else
-AstWcsMap *astWcsMapId_( int, int, int, int, const char *, ... );
+AstWcsMap *astWcsMapId_( int, int, int, int, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,5,6)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -535,6 +539,7 @@ astINVOKE(V,astIsZenithal_(astCheckWcsMap(this),STATUS_PTR))
 
 #endif
 #endif
+
 
 
 

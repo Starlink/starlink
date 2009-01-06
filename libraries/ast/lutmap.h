@@ -203,7 +203,11 @@ astPROTO_ISA(LutMap)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstLutMap *astLutMap_( int, const double [], double, double, const char *, int *, ...);
 #else
-AstLutMap *astLutMapId_( int, const double [], double, double, const char *, ... );
+AstLutMap *astLutMapId_( int, const double [], double, double, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,5,6)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -290,6 +294,7 @@ astINVOKE(O,astLoadLutMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PT
 #endif
 
 #endif
+
 
 
 

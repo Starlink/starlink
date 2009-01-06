@@ -205,7 +205,11 @@ astPROTO_ISA(UnitMap)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstUnitMap *astUnitMap_( int, const char *, int *, ...);
 #else
-AstUnitMap *astUnitMapId_( int, const char *, ... );
+AstUnitMap *astUnitMapId_( int, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,2,3)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -272,6 +276,7 @@ astINVOKE(O,astLoadUnitMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
    to the wrong sort of Object is supplied. */
 /* None. */
 #endif
+
 
 
 

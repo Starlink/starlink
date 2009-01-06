@@ -142,7 +142,11 @@ astPROTO_ISA(Circle)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstCircle *astCircle_( void *, int, const double[], const double[], AstRegion *, const char *, int *, ...);
 #else
-AstCircle *astCircleId_( void *, int, const double[], const double[], AstRegion *, const char *, ... );
+AstCircle *astCircleId_( void *, int, const double[], const double[], AstRegion *, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,6,7)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -216,6 +220,7 @@ astINVOKE(O,astLoadCircle_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PT
 #define astBestCircle(pset,cen,unc) astBestCircle_(pset,cen,unc,STATUS_PTR)
 #endif
 #endif
+
 
 
 

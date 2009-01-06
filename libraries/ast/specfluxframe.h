@@ -133,7 +133,11 @@ astPROTO_ISA(SpecFluxFrame)           /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstSpecFluxFrame *astSpecFluxFrame_( void *, void *, const char *, int *, ...);
 #else
-AstSpecFluxFrame *astSpecFluxFrameId_( void *, void *, const char *, ... );
+AstSpecFluxFrame *astSpecFluxFrameId_( void *, void *, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,3,4)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -205,6 +209,7 @@ astINVOKE(O,astLoadSpecFluxFrame_(mem,size,vtab,name,astCheckChannel(channel),ST
    to the wrong sort of Object is supplied. */
 
 #endif
+
 
 
 

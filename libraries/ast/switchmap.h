@@ -196,7 +196,11 @@ astPROTO_ISA(SwitchMap)             /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstSwitchMap *astSwitchMap_( void *, void *, int, void **, const char *, int *, ...);
 #else
-AstSwitchMap *astSwitchMapId_( void *, void *, int, void **, const char *, ... );
+AstSwitchMap *astSwitchMapId_( void *, void *, int, void **, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,5,6)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -273,6 +277,7 @@ astINVOKE(O,astLoadSwitchMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS
    to the wrong sort of Object is supplied. */
 /* None. */
 #endif
+
 
 
 

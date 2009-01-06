@@ -432,7 +432,11 @@ astPROTO_ISA(PointSet)           /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstPointSet *astPointSet_( int, int, const char *, int *, ...);
 #else
-AstPointSet *astPointSetId_( int, int, const char *, ... );
+AstPointSet *astPointSetId_( int, int, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,3,4)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -550,6 +554,7 @@ astINVOKE(V,astTestPointAccuracy_(astCheckPointSet(this),axis,STATUS_PTR))
 
 #endif
 #endif
+
 
 
 

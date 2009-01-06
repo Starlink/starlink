@@ -145,7 +145,11 @@ astPROTO_ISA(DSBSpecFrame)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstDSBSpecFrame *astDSBSpecFrame_( const char *, int *, ...);
 #else
-AstDSBSpecFrame *astDSBSpecFrameId_( const char *, ... );
+AstDSBSpecFrame *astDSBSpecFrameId_( const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,1,2)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -282,6 +286,7 @@ astINVOKE(V,astSetAlignSideBand_(astCheckDSBSpecFrame(this),val,STATUS_PTR))
 astINVOKE(V,astGetImagFreq_(astCheckDSBSpecFrame(this),STATUS_PTR))
 #endif
 #endif
+
 
 
 

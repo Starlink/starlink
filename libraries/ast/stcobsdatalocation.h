@@ -145,7 +145,11 @@ astPROTO_ISA(StcObsDataLocation)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstStcObsDataLocation *astStcObsDataLocation_( void *, int, AstKeyMap **, const char *, int *, ...);
 #else
-AstStcObsDataLocation *astStcObsDataLocationId_( void *, int, AstKeyMap **, const char *, ... );
+AstStcObsDataLocation *astStcObsDataLocationId_( void *, int, AstKeyMap **, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,4,5)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -220,6 +224,7 @@ astINVOKE(O,astLoadStcObsDataLocation_(mem,size,vtab,name,astCheckChannel(channe
 astINVOKE(V,astStcSetObs_(astCheckStcObsDataLocation(this),obs?astCheckPointList(obs):NULL,STATUS_PTR))
 #endif
 #endif
+
 
 
 

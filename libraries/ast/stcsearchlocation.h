@@ -139,7 +139,11 @@ astPROTO_ISA(StcSearchLocation)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstStcSearchLocation *astStcSearchLocation_(  void *, int, AstKeyMap **, const char *, int *, ...);
 #else
-AstStcSearchLocation *astStcSearchLocationId_(  void *, int, AstKeyMap **, const char *, ... );
+AstStcSearchLocation *astStcSearchLocationId_(  void *, int, AstKeyMap **, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,4,5)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -206,6 +210,7 @@ astINVOKE(O,astLoadStcSearchLocation_(mem,size,vtab,name,astCheckChannel(channel
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif
+
 
 
 

@@ -144,7 +144,11 @@ astPROTO_ISA(Polygon)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstPolygon *astPolygon_( void *, int, int, const double *, AstRegion *, const char *, int *, ...);
 #else
-AstPolygon *astPolygonId_( void *, int, int, const double *, AstRegion *, const char *, ... );
+AstPolygon *astPolygonId_( void *, int, int, const double *, AstRegion *, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,6,7)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -215,6 +219,7 @@ astINVOKE(O,astLoadPolygon_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif
+
 
 
 

@@ -139,7 +139,11 @@ astPROTO_ISA(StcCatalogEntryLocation)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstStcCatalogEntryLocation *astStcCatalogEntryLocation_( void *, int, AstKeyMap **, const char *, int *, ...);
 #else
-AstStcCatalogEntryLocation *astStcCatalogEntryLocationId_( void *, int, AstKeyMap **, const char *, ... );
+AstStcCatalogEntryLocation *astStcCatalogEntryLocationId_( void *, int, AstKeyMap **, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,4,5)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -207,6 +211,7 @@ astINVOKE(O,astLoadStcCatalogEntryLocation_(mem,size,vtab,name,astCheckChannel(c
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif
+
 
 
 

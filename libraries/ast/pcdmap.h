@@ -242,7 +242,11 @@ astPROTO_ISA(PcdMap)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstPcdMap *astPcdMap_( double, const double [2], const char *, int *, ...);
 #else
-AstPcdMap *astPcdMapId_( double, const double [2], const char *, ... );
+AstPcdMap *astPcdMapId_( double, const double [2], const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,3,4)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -341,6 +345,7 @@ astINVOKE(V,astTestPcdCen_(astCheckPcdMap(this),axis,STATUS_PTR))
 
 #endif
 #endif
+
 
 
 

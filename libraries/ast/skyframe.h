@@ -268,7 +268,11 @@ astPROTO_ISA(SkyFrame)           /* Test class membership */
 #if defined(astCLASS)            /* Protected */
 AstSkyFrame *astSkyFrame_( const char *, int *, ...);
 #else
-AstSkyFrame *astSkyFrameId_( const char *, ... );
+AstSkyFrame *astSkyFrameId_( const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,1,2)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -446,6 +450,7 @@ astINVOKE(V,astTestProjection_(astCheckSkyFrame(this),STATUS_PTR))
 
 #endif
 #endif
+
 
 
 

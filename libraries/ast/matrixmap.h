@@ -225,7 +225,11 @@ astPROTO_ISA(MatrixMap)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstMatrixMap *astMatrixMap_( int, int, int, const double[], const char *, int *, ...);
 #else
-AstMatrixMap *astMatrixMapId_( int, int, int, const double[], const char *, ... );
+AstMatrixMap *astMatrixMapId_( int, int, int, const double[], const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,5,6)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -302,6 +306,7 @@ astINVOKE(O,astMtrRot_(astCheckMatrixMap(this),theta,axis,STATUS_PTR))
 astINVOKE(O,astMtrMult_(astCheckMatrixMap(this),astCheckMatrixMap(a),STATUS_PTR))
 #endif
 #endif
+
 
 
 

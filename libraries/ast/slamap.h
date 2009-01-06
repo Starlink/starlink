@@ -230,7 +230,11 @@ astPROTO_ISA(SlaMap)             /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstSlaMap *astSlaMap_( int, const char *, int *, ...);
 #else
-AstSlaMap *astSlaMapId_( int, const char *, ... );
+AstSlaMap *astSlaMapId_( int, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,2,3)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -314,6 +318,7 @@ astINVOKE(V,astSlaAdd_(astCheckSlaMap(this),cvt,args,STATUS_PTR))
 #endif
 
 #endif
+
 
 
 

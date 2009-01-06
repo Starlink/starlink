@@ -139,7 +139,11 @@ astPROTO_ISA(StcResourceProfile)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstStcResourceProfile *astStcResourceProfile_( void *, int, AstKeyMap **, const char *, int *, ...);
 #else
-AstStcResourceProfile *astStcResourceProfileId_( void *, int, AstKeyMap **, const char *, ... );
+AstStcResourceProfile *astStcResourceProfileId_( void *, int, AstKeyMap **, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,4,5)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -207,6 +211,7 @@ astINVOKE(O,astLoadStcResourceProfile_(mem,size,vtab,name,astCheckChannel(channe
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif
+
 
 
 

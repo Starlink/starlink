@@ -221,7 +221,11 @@ astPROTO_ISA(ZoomMap)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstZoomMap *astZoomMap_( int, double, const char *, int *, ...);
 #else
-AstZoomMap *astZoomMapId_( int, double, const char *, ... );
+AstZoomMap *astZoomMapId_( int, double, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,3,4)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -306,6 +310,7 @@ astINVOKE(V,astSetZoom_(astCheckZoomMap(this),value,STATUS_PTR))
 #define astTestZoom(this) astINVOKE(V,astTestZoom_(astCheckZoomMap(this),STATUS_PTR))
 #endif
 #endif
+
 
 
 

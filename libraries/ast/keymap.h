@@ -204,7 +204,11 @@ astPROTO_ISA(KeyMap)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstKeyMap *astKeyMap_( const char *, int *, ...);
 #else
-AstKeyMap *astKeyMapId_( const char *, ... );
+AstKeyMap *astKeyMapId_( const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,1,2)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -367,6 +371,7 @@ astINVOKE(V,astTestSizeGuess_(astCheckKeyMap(this),STATUS_PTR))
 #endif
 
 #endif
+
 
 
 

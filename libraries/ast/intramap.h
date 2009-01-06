@@ -232,7 +232,11 @@ astPROTO_ISA(IntraMap)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstIntraMap *astIntraMap_( const char *, int, int, const char *, int *, ...);
 #else
-AstIntraMap *astIntraMapId_( const char *, int, int, const char *, ... );
+AstIntraMap *astIntraMapId_( const char *, int, int, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,4,5)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -333,6 +337,7 @@ astINVOKE(V,astTestIntraFlag_(astCheckIntraMap(this),STATUS_PTR))
 astIntraRegFor_(name,nin,nout,tran,tran_wrap,flags,purpose,author,contact,STATUS_PTR)
 #endif
 #endif
+
 
 
 

@@ -154,7 +154,11 @@ astPROTO_ISA(CmpRegion)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstCmpRegion *astCmpRegion_( void *, void *, int, const char *, int *, ...);
 #else
-AstCmpRegion *astCmpRegionId_( void *, void *, int, const char *, ... );
+AstCmpRegion *astCmpRegionId_( void *, void *, int, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,4,5)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -225,6 +229,7 @@ astINVOKE(O,astLoadCmpRegion_(mem,size,vtab,name,astCheckChannel(channel),STATUS
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif
+
 
 
 

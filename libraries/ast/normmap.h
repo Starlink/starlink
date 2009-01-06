@@ -131,7 +131,11 @@ astPROTO_ISA(NormMap)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstNormMap *astNormMap_( void *, const char *, int *, ...);
 #else
-AstNormMap *astNormMapId_( void *, const char *, ... );
+AstNormMap *astNormMapId_( void *, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,2,3)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -201,6 +205,7 @@ astINVOKE(O,astLoadNormMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif
+
 
 
 

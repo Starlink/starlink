@@ -194,7 +194,11 @@ astPROTO_ISA(SelectorMap)             /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstSelectorMap *astSelectorMap_( int, void **, double, const char *, int *, ...);
 #else
-AstSelectorMap *astSelectorMapId_( int, void **, double, const char *, ... );
+AstSelectorMap *astSelectorMapId_( int, void **, double, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,4,5)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -261,6 +265,7 @@ astINVOKE(O,astLoadSelectorMap_(mem,size,vtab,name,astCheckChannel(channel),STAT
    to the wrong sort of Object is supplied. */
 /* None. */
 #endif
+
 
 
 

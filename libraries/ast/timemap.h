@@ -193,7 +193,11 @@ astPROTO_ISA(TimeMap)             /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstTimeMap *astTimeMap_( int, const char *, int *, ...);
 #else
-AstTimeMap *astTimeMapId_( int, const char *, ... );
+AstTimeMap *astTimeMapId_( int, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,2,3)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -269,6 +273,7 @@ astINVOKE(V,astTimeAdd_(astCheckTimeMap(this),cvt,args,STATUS_PTR))
 #define astDat(in,forward) astDat_(in,forward,STATUS_PTR)
 #endif
 #endif
+
 
 
 

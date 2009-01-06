@@ -202,7 +202,11 @@ astPROTO_ISA(ShiftMap)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstShiftMap *astShiftMap_( int, const double [], const char *, int *, ...);
 #else
-AstShiftMap *astShiftMapId_( int, const double [], const char *, ... );
+AstShiftMap *astShiftMapId_( int, const double [], const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,3,4)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -274,6 +278,7 @@ astINVOKE(O,astLoadShiftMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_
 #endif
 
 #endif
+
 
 
 

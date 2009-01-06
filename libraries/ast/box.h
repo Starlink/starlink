@@ -145,7 +145,11 @@ astPROTO_ISA(Box)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstBox *astBox_( void *, int, const double[], const double[], AstRegion *, const char *, int *, ...);
 #else
-AstBox *astBoxId_( void *, int, const double[], const double[], AstRegion *, const char *, ... );
+AstBox *astBoxId_( void *, int, const double[], const double[], AstRegion *, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,6,7)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -217,6 +221,7 @@ astINVOKE(O,astLoadBox_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif
+
 
 
 

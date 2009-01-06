@@ -149,7 +149,11 @@ astPROTO_ISA(Ellipse)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstEllipse *astEllipse_( void *, int, const double[2], const double[2], const double[2], AstRegion *, const char *, int *, ...);
 #else
-AstEllipse *astEllipseId_( void *, int, const double[2], const double[2], const double[2], AstRegion *, const char *, ... );
+AstEllipse *astEllipseId_( void *, int, const double[2], const double[2], const double[2], AstRegion *, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,7,8)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -223,6 +227,7 @@ astINVOKE(O,astLoadEllipse_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
 #define astBestEllipse(pset,cen,unc) astBestEllipse_(pset,cen,unc,STATUS_PTR)
 #endif
 #endif
+
 
 
 

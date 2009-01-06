@@ -152,7 +152,11 @@ astPROTO_ISA(Prism)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstPrism *astPrism_( void *, void *, const char *, int *, ...);
 #else
-AstPrism *astPrismId_( void *, void *, const char *, ... );
+AstPrism *astPrismId_( void *, void *, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,3,4)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -223,6 +227,7 @@ astINVOKE(O,astLoadPrism_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif
+
 
 
 

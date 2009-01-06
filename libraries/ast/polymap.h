@@ -201,7 +201,11 @@ astPROTO_ISA(PolyMap)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstPolyMap *astPolyMap_( int, int, int, const double[], int, const double[], const char *, int *, ...);
 #else
-AstPolyMap *astPolyMapId_( int, int, int, const double[], int, const double[], const char *, ... );
+AstPolyMap *astPolyMapId_( int, int, int, const double[], int, const double[], const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,7,8)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -270,6 +274,7 @@ astINVOKE(O,astLoadPolyMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif
+
 
 
 

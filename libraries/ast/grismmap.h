@@ -178,7 +178,11 @@ astPROTO_ISA(GrismMap)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstGrismMap *astGrismMap_( const char *, int *, ...);
 #else
-AstGrismMap *astGrismMapId_( const char *, ... );
+AstGrismMap *astGrismMapId_( const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,1,2)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -337,6 +341,7 @@ astINVOKE(O,astLoadGrismMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_
 
 #endif
 #endif
+
 
 
 

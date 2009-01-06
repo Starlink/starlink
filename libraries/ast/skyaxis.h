@@ -292,7 +292,11 @@ astPROTO_ISA(SkyAxis)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstSkyAxis *astSkyAxis_( const char *, int *, ...);
 #else
-AstSkyAxis *astSkyAxisId_( const char *, ... );
+AstSkyAxis *astSkyAxisId_( const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,1,2)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -406,6 +410,7 @@ astINVOKE(V,astTestAxisCentreZero_(astCheckSkyAxis(this),STATUS_PTR))
 
 #endif
 #endif
+
 
 
 

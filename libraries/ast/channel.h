@@ -365,7 +365,11 @@ AstChannel *astChannel_( const char *(*)( void ), void (*)( const char * ),
                          const char *, int *, ...);
 #else
 AstChannel *astChannelId_( const char *(*)( void ), void (*)( const char * ),
-                           const char *, ... );
+                           const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,3,4)))
+#endif
+;
 AstChannel *astChannelForId_( const char *(*)( void ),
                               char *(*)( const char *(*)( void ), int * ),
                               void (*)( const char * ),
@@ -568,6 +572,7 @@ astINVOKE(V,astWriteString_(astCheckChannel(this),name,set,helpful,value,comment
 
 #endif
 #endif
+
 
 
 

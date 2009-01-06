@@ -540,7 +540,11 @@ astPROTO_ISA(FrameSet)           /* Test class membership */
 #if defined(astCLASS)            /* Protected */
 AstFrameSet *astFrameSet_( void *, const char *, int *, ...);
 #else
-AstFrameSet *astFrameSetId_( void *, const char *, ... );
+AstFrameSet *astFrameSetId_( void *, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,2,3)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -663,6 +667,7 @@ astINVOKE(V,astTestCurrent_(astCheckFrameSet(this),STATUS_PTR))
 astINVOKE(V,astValidateFrameIndex_(astCheckFrameSet(this),iframe,method,STATUS_PTR))
 #endif
 #endif
+
 
 
 

@@ -200,7 +200,11 @@ astPROTO_ISA(SpecMap)             /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstSpecMap *astSpecMap_( int, int, const char *, int *, ...);
 #else
-AstSpecMap *astSpecMapId_( int, int, const char *, ... );
+AstSpecMap *astSpecMapId_( int, int, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,3,4)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -269,6 +273,7 @@ astINVOKE(O,astLoadSpecMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
 astINVOKE(V,astSpecAdd_(astCheckSpecMap(this),cvt,args,STATUS_PTR))
 
 #endif
+
 
 
 

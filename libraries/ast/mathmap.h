@@ -285,7 +285,11 @@ AstMathMap *astMathMap_( int, int, int, const char *[], int, const char *[],
                          const char *, int *, ...);
 #else
 AstMathMap *astMathMapId_( int, int, int, const char *[], int, const char *[],
-                           const char *, ... );
+                           const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,7,8)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -397,6 +401,7 @@ astINVOKE(V,astTestSimpFI_(astCheckMathMap(this),STATUS_PTR))
 astINVOKE(V,astTestSimpIF_(astCheckMathMap(this),STATUS_PTR))
 #endif
 #endif
+
 
 
 

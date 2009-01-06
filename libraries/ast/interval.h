@@ -146,7 +146,11 @@ astPROTO_ISA(Interval)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstInterval *astInterval_( void *, const double[], const double[], AstRegion *, const char *, int *, ...);
 #else
-AstInterval *astIntervalId_( void *, const double[], const double[], AstRegion *, const char *, ... );
+AstInterval *astIntervalId_( void *, const double[], const double[], AstRegion *, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,5,6)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -222,6 +226,7 @@ astINVOKE(O,astLoadInterval_(mem,size,vtab,name,astCheckChannel(channel),STATUS_
 #define astBoxInterval(box) astINVOKE(O,astBoxInterval_(astCheckBox(box),STATUS_PTR))
 #endif
 #endif
+
 
 
 

@@ -208,7 +208,11 @@ astPROTO_ISA(WinMap)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstWinMap *astWinMap_( int, const double [], const double [], const double [], const double [], const char *, int *, ...);
 #else
-AstWinMap *astWinMapId_( int, const double [], const double [], const double [], const double [], const char *, ... );
+AstWinMap *astWinMapId_( int, const double [], const double [], const double [], const double [], const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,6,7)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -284,6 +288,7 @@ astINVOKE(V,astWinTerms_(astCheckWinMap(this),scale,shift,STATUS_PTR))
 #endif
 
 #endif
+
 
 
 

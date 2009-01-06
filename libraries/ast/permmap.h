@@ -215,7 +215,11 @@ AstPermMap *astPermMap_( int, const int [], int, const int [],
                          const double [], const char *, int *, ...);
 #else
 AstPermMap *astPermMapId_( int, const int [], int, const int [],
-                           const double [], const char *, ... );
+                           const double [], const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,6,7)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -293,6 +297,7 @@ astINVOKE(O,astLoadPermMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
 #endif
 
 #endif
+
 
 
 

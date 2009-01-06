@@ -379,7 +379,11 @@ astPROTO_ISA(Axis)               /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstAxis *astAxis_( const char *, int *, ...);
 #else
-AstAxis *astAxisId_( const char *, ... );
+AstAxis *astAxisId_( const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,1,2)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -593,6 +597,7 @@ astINVOKE(V,astTestAxisBottom_(astCheckAxis(this),STATUS_PTR))
 
 #endif
 #endif
+
 
 
 

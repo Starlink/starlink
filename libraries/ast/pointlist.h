@@ -141,7 +141,11 @@ astPROTO_ISA(PointList)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstPointList *astPointList_( void *, int, int, int, const double *, AstRegion *, const char *, int *, ...);
 #else
-AstPointList *astPointListId_( void *, int, int, int, const double *, AstRegion *, const char *, ... );
+AstPointList *astPointListId_( void *, int, int, int, const double *, AstRegion *, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,7,8)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -212,6 +216,7 @@ astINVOKE(O,astLoadPointList_(mem,size,vtab,name,astCheckChannel(channel),STATUS
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif
+
 
 
 

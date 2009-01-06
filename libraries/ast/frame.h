@@ -837,7 +837,11 @@ astPROTO_ISA(Frame)              /* Test class membership */
 #if defined(astCLASS)            /* Protected */
 AstFrame *astFrame_( int, const char *, int *, ...);
 #else
-AstFrame *astFrameId_( int, const char *, ... );
+AstFrame *astFrameId_( int, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,2,3)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -1354,6 +1358,7 @@ astINVOKE(V,astGetFrameFlags_(astCheckFrame(this),STATUS_PTR))
 
 #endif
 #endif
+
 
 
 

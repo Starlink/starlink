@@ -344,7 +344,11 @@ astPROTO_ISA(CmpFrame)           /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstCmpFrame *astCmpFrame_( void *, void *, const char *, int *, ...);
 #else
-AstCmpFrame *astCmpFrameId_( void *, void *, const char *, ... );
+AstCmpFrame *astCmpFrameId_( void *, void *, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,3,4)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -415,6 +419,7 @@ astINVOKE(O,astLoadCmpFrame_(mem,size,vtab,name,astCheckChannel(channel),STATUS_
    to the wrong sort of Object is supplied. */
 
 #endif
+
 
 
 

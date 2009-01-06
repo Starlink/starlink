@@ -136,7 +136,11 @@ astPROTO_ISA(NullRegion)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstNullRegion *astNullRegion_( void *, AstRegion *, const char *, int *, ...);
 #else
-AstNullRegion *astNullRegionId_( void *, AstRegion *, const char *, ... );
+AstNullRegion *astNullRegionId_( void *, AstRegion *, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,3,4)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -205,6 +209,7 @@ astINVOKE(O,astLoadNullRegion_(mem,size,vtab,name,astCheckChannel(channel),STATU
 #if defined(astCLASS)            /* Protected */
 #endif
 #endif
+
 
 
 

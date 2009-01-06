@@ -182,7 +182,11 @@ AstXmlChan *astXmlChan_( const char *(*)( void ), void (*)( const char * ),
                           const char *, int *, ...);
 #else
 AstXmlChan *astXmlChanId_( const char *(*)( void ), void (*)( const char * ),
-                            const char *, ... );
+                            const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,3,4)))
+#endif
+;
 AstXmlChan *astXmlChanForId_( const char *(*)( void ),
                               char *(*)( const char *(*)( void ), int * ),
                               void (*)( const char * ),
@@ -328,6 +332,7 @@ astINVOKE(O,astLoadXmlChan_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
 #endif
 
 #endif
+
 
 
 

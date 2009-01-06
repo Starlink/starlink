@@ -211,7 +211,11 @@ astPROTO_ISA(CmpMap)             /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstCmpMap *astCmpMap_( void *, void *, int, const char *, int *, ...);
 #else
-AstCmpMap *astCmpMapId_( void *, void *, int, const char *, ... );
+AstCmpMap *astCmpMapId_( void *, void *, int, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,4,5)))
+#endif
+;
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -284,6 +288,7 @@ astINVOKE(O,astLoadCmpMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PT
    to the wrong sort of Object is supplied. */
 /* None. */
 #endif
+
 
 
 

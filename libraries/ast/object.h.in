@@ -1376,7 +1376,11 @@ void astLockId_( AstObject *, int, int * );
 void astUnlockId_( AstObject *, int * );
 void astExportId_( AstObject *, int * );
 void astImportId_( AstObject *, int * );
-void astSetId_( void *, const char *, ... );
+void astSetId_( void *, const char *, ... )
+#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
+__attribute__((format(printf,2,3)))
+#endif
+;
 #endif
 
 void astExemptId_( AstObject *, int * );
