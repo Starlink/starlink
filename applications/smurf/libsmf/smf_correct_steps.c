@@ -183,7 +183,7 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
   /* Set the quality mask to complement of SMF__Q_JUMP so that past DC step
      flags get ignored */
 
-  mask = ~SMF__Q_JUMP;
+  mask = ~(SMF__Q_JUMP|SMF__Q_STAT);
 
   /* Repair DC steps */
   if( dcbox && dcthresh && (*status == SAI__OK) ) {

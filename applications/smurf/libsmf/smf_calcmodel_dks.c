@@ -152,7 +152,7 @@ void smf_calcmodel_dks( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     qua_data = (qua->sdata[idx]->pntr)[0];
 
     /* Which QUALITY bits should be checked */
-    mask = ~SMF__Q_JUMP; 
+    mask = ~(SMF__Q_JUMP|SMF__Q_STAT); 
 
     if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;

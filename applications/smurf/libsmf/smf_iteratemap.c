@@ -986,7 +986,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
 
               if( spikethresh ) {
                 msgOutif(MSG__VERB," ", "  flag spikes...", status);
-                smf_flag_spikes( data, NULL, qua_data, ~SMF__Q_JUMP,
+                smf_flag_spikes( data, NULL, qua_data, 
+                                 ~(SMF__Q_JUMP|SMF__Q_STAT),
                                  spikethresh, spikeiter, 100, 
                                  &aiter, NULL, status );
                 msgSeti("AITER",aiter);
@@ -1082,7 +1083,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
                 (ast[i]->sdata[idx]->dims)[1] * (ast[i]->sdata[idx]->dims)[2];
 
               /* Ignore data with these QUALITY flags */
-              mask = ~(SMF__Q_JUMP | SMF__Q_SPIKE);
+              mask = ~(SMF__Q_JUMP|SMF__Q_SPIKE);
 
               for( k=0; k<dsize; k++ ) {	  
                 if( !(qua_data[k]&mask) && (ast_data[k]!=VAL__BADD) ) {

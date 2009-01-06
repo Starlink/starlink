@@ -249,10 +249,10 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 
   /* Which QUALITY bits should be checked for correcting sample. Ensure that
      this matches the mask used in smf_calcmodel_gai! */
-  mask_cor = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_APOD);
+  mask_cor = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_APOD|SMF__Q_STAT);
 
   /* Which QUALITY bits should be checked for measuring the mean */
-  mask_meas = ~(SMF__Q_JUMP); 
+  mask_meas = ~(SMF__Q_JUMP|SMF__Q_STAT); 
 
   /* Loop over index in subgrp (subarray) and put the previous iteration
      of the common mode back into the signal */

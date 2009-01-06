@@ -148,7 +148,7 @@ void smf_calcmodel_gai( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 
       /* Which QUALITY bits should be considered for correcting data (must
        match mask_cor in smf_calcmodel_com!) */
-      mask = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_APOD);
+      mask = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_APOD|SMF__Q_STAT);
 
       /* Undo the gain correction stored in GAI */
       for( i=0; i<nbolo; i++ ) {

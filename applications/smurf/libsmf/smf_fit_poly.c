@@ -209,7 +209,7 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
   mcov = gsl_matrix_alloc( ncoeff, ncoeff );
 
   /* QUALITY bitmask for samples to ignore */
-  mask = ~SMF__Q_JUMP;
+  mask = ~(SMF__Q_JUMP|SMF__Q_STAT);
 
   /* Loop over bolometers. Only fit this bolometer if it is not
      flagged SMF__Q_BADB */

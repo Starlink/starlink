@@ -198,10 +198,10 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   }
 
   /* Which QUALITY bits should be considered for ignoring data */
-  mask = ~SMF__Q_JUMP;
+  mask = ~(SMF__Q_JUMP|SMF__Q_STAT);
 
   /* Which QUALITY bits should be considered for re-flagging spikes */
-  mask_spike = ~(SMF__Q_JUMP | SMF__Q_SPIKE);
+  mask_spike = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_STAT);
 
   /* Initialize chisquared */
   dat->chisquared[chunk] = 0;
