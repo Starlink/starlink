@@ -164,6 +164,8 @@
 *        Use smf_write_smfData instead of smf_NDFexport
 *     2008-12-12 (EC):
 *        Extra re-normalization required for GAIn model
+*     2009-01-06 (EC):
+*        Added flagging of data during stationary telescope pointing
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -171,7 +173,7 @@
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2006-2008 University of British Columbia
+*     Copyright (C) 2006-2009 University of British Columbia
 *     All Rights Reserved.
 
 *  Licence:
@@ -247,6 +249,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
   double dtemp;                 /* temporary double */
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
   smfFilter *filt=NULL;         /* Pointer to filter struct */
+  double flagstat;              /* Threshold for flagging stationary regions */
   double f_edgelow=0;           /* Freq. cutoff for low-pass edge filter */
   double f_edgehigh=0;          /* Freq. cutoff for high-pass edge filter */
   double f_notchlow[SMF__MXNOTCH]; /* Array low-freq. edges of notch filters */
@@ -283,6 +286,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
   char name[GRP__SZNAM+1];      /* Buffer for storing exported model names */
   dim_t nchunks=0;              /* Number of chunks within iteration loop */
   size_t ncontchunks=0;         /* Number continuous chunks outside iter loop*/
+  size_t nflag;                 /* Number of flagged samples */
   dim_t nmodels=0;              /* Number of model components / iteration */
   int numiter;                  /* Total number iterations */
   dim_t padEnd=0;               /* How many samples of padding at the end */
@@ -453,6 +457,13 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
       }
     } else {
       spikeiter = 0;
+    }
+
+    if( astMapGet0D( keymap, "FLAGSTAT", &flagstat ) ) {
+      if( flagstat < 0 ) {
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "flagstat cannot be < 0.", status );
+      }
     }
 
     if( astMapGet0D( keymap, "FILT_EDGELOW", &f_edgelow ) ) {
@@ -993,6 +1004,19 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
                 msgSeti("AITER",aiter);
                 msgOutif(MSG__VERB," ", "  ...finished in ^AITER iterations",
                          status); 
+              }
+              
+              if( flagstat ) {
+                msgSetd("THRESH",flagstat);
+                msgOutif(MSG__VERB, "", 
+                         "  flagging regions slewing < ^THRESH arcsec/sec...", 
+                         status );
+                smf_flag_stationary( data, qua_data, flagstat, &nflag, status );
+                if( *status == SAI__OK ) {
+                  msgSeti("N",nflag);
+                  msgOutif(MSG__VERB," ", "  ...^N new time slices flagged",
+                           status); 
+                }
               }
 
               if( apod ) {

@@ -72,6 +72,10 @@ badfrac = 0.05
 # Number of iterations for sigma-clipper (0=until convergence)
 # spikeiter = 0
 
+# Flag data taken while telescope was stationary (value is a threshold
+# slew velocity (arcsec/sec) measured in tracking coordinates
+flagstat = 2
+
 # Hard-edge high-pass frequency-domain filter 
 #   e.g. keep only frequencies >= 0.1 Hz
 # filt_edgehigh = 0.1
