@@ -84,7 +84,7 @@
 #include "libsmf/smf.h"
 
 int ***smf_freepolbins( int nndf, int npbin, double **pangle, int ***ptime, 
-                        int *status ){
+                        int *status __attribute__((unused)) ){
 
 /* Local Variables */
    int i;

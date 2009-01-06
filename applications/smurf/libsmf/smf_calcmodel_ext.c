@@ -91,8 +91,9 @@
 
 #define FUNC_NAME "smf_calcmodel_ext"
 
-void smf_calcmodel_ext( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
-			smfArray **allmodel, int flags, int *status) {
+void smf_calcmodel_ext( smfDIMMData *dat, int chunk,
+                        AstKeyMap *keymap __attribute__((unused)), 
+                        smfArray **allmodel, int flags, int *status) {
 
   /* Local Variables */
   dim_t i;                      /* Loop counter */

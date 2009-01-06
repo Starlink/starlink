@@ -384,6 +384,11 @@
 #include "smf_typ.h"
 #include "star/kaplibs.h"
 
+/* Handle GCC __attribute__ */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Returns nearest integer to "x" */
 #define NINT(x) ( ( (x) > 0 ) ? (int)( (x) + 0.5 ) : (int)( (x) - 0.5 ) )
 
