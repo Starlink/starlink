@@ -81,7 +81,7 @@
 *     Council. 
 *     Copyright (C) 1999-2000 Central Laboratory of the Research 
 *     Councils. 
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -104,6 +104,7 @@
 *     RFWS: R.F. Warren-Smith (Durham Univ.)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -126,6 +127,8 @@
 *        an error was reported if any stars could not be used.
 *     17-APR-2008 (DSB):
 *        Fix index for SIG array when only 1 valid object is found.
+*     9-JAN-2008 (TIMJ):
+*        Use special status when no stars found.
 *     {enter_further_changes_here}
 
 *-
@@ -136,6 +139,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! Magic-value definitions
+      INCLUDE 'KAP_ERR'          ! KAPPA errors
  
 *  Arguments Given:
       INTEGER
@@ -257,6 +261,7 @@
 *    Consider each star position in turn, counting the successes.
  
       NGOOD = 0
+      LSTAR = 0
  
       DO STAR = 1, NXY
  
@@ -502,7 +507,7 @@
 *    If no star positions could be used, report an error.
 
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
-         STATUS = SAI__ERROR
+         STATUS = KAP__PSFNO
          IF( NXY .EQ. 1 ) THEN
             CALL ERR_REP( 'KPS1_STPA<T>_ERR1', 'No star could be '//
      :                    'found at the supplied position.', STATUS )
