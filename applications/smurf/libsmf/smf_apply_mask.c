@@ -1,10 +1,10 @@
 /*
 *+
 *  Name:
-*     smf_apply_dark
+*     smf_apply_mask
 
 *  Purpose:
-*     Given a data set and a collection of darks, subtract the relevant dark.
+*     Apply pixel masks to data.
 
 *  Language:
 *     Starlink ANSI C
@@ -13,14 +13,14 @@
 *     C function
 
 *  Invocation:
-*     void smf_apply_dark( smfData *indata, const smfArray *bpms,
-*                          smf_bpm_meth method, int *status);
+*     void smf_apply_mask( smfData *indata, const smfArray *bpms,
+*                          smf_dark_sub_meth method, int *status) {
 
 *  Arguments:
 *     indata = const smfData * (Given)
 *        Observation to be masked.
-*     darks = const smfArray* (Given)
-*        Set of masks to search. Can be NULL to ignore masks.
+*     bpms = smfArray * (Given) 
+*        Masks for each subarray (e.g. returned by smf_reqest_mask call)
 *     method = smf_bpm_meth (Given)
 *        Bit mask indicating how the mask should be applied.
 *        Can be used to control whether the data are modified, quality
