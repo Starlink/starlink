@@ -145,12 +145,13 @@
 *        Add obsidss to smfHead
 *     2008-08-25 (EC)
 *        Add smfDIMMHead
+*     2009-01-05 (EC)
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2005-2008 University of British Columbia.
+*     Copyright (C) 2005-2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -312,6 +313,7 @@ static const size_t SMF__BADIDX = (size_t)-1;
 #define SMF__Q_JUMP 8     /* Location of a DC jump */
 #define SMF__Q_PAD 16     /* Padded data */
 #define SMF__Q_APOD 32    /* Apodized/boundary data */
+#define SMF__Q_STAT 64    /* Telescope stationary */
 
 /* Flags for smf_open_newfile
    Must be individual bits in a single integer

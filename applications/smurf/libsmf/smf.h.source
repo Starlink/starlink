@@ -346,7 +346,7 @@
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
-*     Copyright (C) 2005-2008 University of British Columbia.
+*     Copyright (C) 2005-2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -1182,4 +1182,8 @@ double smf_cso2filt_tau( const smfHead *hdr, double csotau, int *status);
 int smf_validate_smfHead( const smfHead * hdr, int hasfits, int hasstate,
                           int *status );
 int smf_validate_smfData( const smfData * data, int hashdr, int hasfile,
+                          int *status );
+
+void smf_flag_stationary( smfData *data, unsigned char *quality, 
+                          double sthresh, size_t *nflagged, 
                           int *status );
