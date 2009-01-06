@@ -66,6 +66,9 @@
 *  History:
 *     12-NOV-2004 (DSB):
 *        Original version
+*     6-JAN-2008 (DSB):
+*        Correct conversion from pixel index limits to pixel coordinate 
+*        limits before checking for a linear mapping.
 *     {enter_further_changes_here}
 
 *-
@@ -171,7 +174,7 @@
 *  Also get the total axis dimensions.
          CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND, UBND, NDIM1, STATUS ) 
          DO I = 1, NIN
-            DLBND( I ) = DBLE( LBND( I ) )
+            DLBND( I ) = DBLE( LBND( I ) ) - 1.0D0
             DUBND( I ) = DBLE( UBND( I ) )
             DIM( I ) = DUBND( I ) - DLBND( I )
          END DO
