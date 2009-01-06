@@ -169,6 +169,8 @@ void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs,
 	    status );
   irqAddqn( *qlocs, "APOD", 0, "Set iff data are apodized/boundary", 
 	    status );
+  irqAddqn( *qlocs, "STAT", 0, "Set iff telescope was stationary", 
+	    status );
 
   /* Now fix the bits to the desired values */
   fixbit = smf_get_fixbit(SMF__Q_BADS, status);
@@ -183,6 +185,8 @@ void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs,
   irqFxbit( *qlocs, "PAD", fixbit, &fixed, status );
   fixbit = smf_get_fixbit(SMF__Q_APOD, status);
   irqFxbit( *qlocs, "APOD", fixbit, &fixed, status );
+  fixbit = smf_get_fixbit(SMF__Q_STAT, status);
+  irqFxbit( *qlocs, "STAT", fixbit, &fixed, status );
 
   /* Set names to read only */
   irqRwqn( *qlocs, "BADSAM", 1, 1, &value, status );
@@ -191,6 +195,7 @@ void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs,
   irqRwqn( *qlocs, "DCJUMP", 1, 1, &value, status );
   irqRwqn( *qlocs, "PAD", 1, 1, &value, status );
   irqRwqn( *qlocs, "APOD", 1, 1, &value, status );
+  irqRwqn( *qlocs, "STAT", 1, 1, &value, status );
 
   if ( smurfloc ) datAnnul( &smurfloc, status);
 
