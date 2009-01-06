@@ -362,6 +362,11 @@
 *     2005 Sep 1 (TIMJ):
 *        Fix slight problem with CNF_PVAL and pointer arithmetic.
 *        Initialise FIT arrays
+*     2009 Jan 5 (TIMJ):
+*        Use MSG_FLUSHERR instead of ERR_FLUSH to flush fit failures.
+*        This is done to help ORAC-DR to prevent many ignorable error
+*        from filling the stderr feed. Currently not configurable by parameter
+*        but it could be if there are problems with doing it this way.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -722,8 +727,8 @@
      :               CENTRE, PEAK, SIGMA, CHISQR, COVAR, FITTED,
      :               STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_FLUSH( STATUS )
-         CALL ERR_ANNUL( STATUS )
+*  Report the error using MSG
+         CALL MSG_FLUSHERR( STATUS )
       END IF
       CALL ERR_RLSE
 
