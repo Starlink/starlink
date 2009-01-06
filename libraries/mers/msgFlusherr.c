@@ -1,25 +1,27 @@
 /*
 *+
 *  Name:
-*     errFlbel
+*     msgFlusherr
 
 *  Purpose:
-*     Deliver an ASCII BEL and flush the current error context.
+*     Flush the current error context as if it was an MSG message
 
 *  Language:
 *     Starlink ANSI C
 
 *  Invocation:
-*     errFlbel( int * status );
+*     msgFlusherr(int * status);
 
 *  Description:
-*     An ASCII BEL character is delivered to the user and then all
-*     pending error messages in the current error context are delivered
-*     to the user using a call to errFlush. On successful completion, 
-*     the error context is annulled and the status argument reset to 
-*     SAI__OK; if an error occurs during output of the error messages, the 
-*     error context is not annulled and the status argument is returned 
-*     set to ERR__OPTER.
+*     Ensure that all pending error messages in the current error 
+*     context have been output to the user. On successful completion, the 
+*     error context is annulled and the status argument reset to SAI__OK;
+*     if an error occurs during output of the error messages, the 
+*     error context is not anulled and the status argument is returned 
+*     set to ERR__OPTER. The messages are output in the same way as using
+*     MSG_OUTIF in QUIET mode except that error messages are prepended with
+*     "#" similarly to normal error messages (instead of "!"). Note though
+*     that word-wrapped error messages will not include any prefix.
 
 *  Arguments:
 *     status = int * (Returned)
@@ -28,12 +30,10 @@
 *        ERR__OPTER.
 
 *  Algorithm:
-*     -  Call err1Flush with BEL set to true.
+*     -  Call err1Flush with bell disabled and msg mode enabled.
 
 *  Copyright:
-*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
-*     Copyright (C) 1993 Science & Engineering Research Council.
-*     All Rights Reserved.
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -52,19 +52,12 @@
 *     02111-1307, USA
 
 *  Authors:
-*     PCTR: P.C.T. Rees (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
-*     4-OCT-1993 (PCTR):
-*        Original version.
-*     26-JUL-2008 (TIMJ):
-*        Call ERR1_FLUSH not ERR_FLUSH. No longer need common block.
-*     3-AUG-2008 (TIMJ):
-*        Rewrite in C
 *     5-JAN-2009 (TIMJ):
-*        New API for err1Flush
+*        Copy from errFlush and set usemsg to true.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -76,10 +69,9 @@
 #include "mers1.h"
 #include "merswrap.h"
 
-void errFlbel ( int * status ) {
-  int errbel = 1;
+void msgFlusherr ( int * status ) {
+  int errbel = 0;
 
-
-  /*  Flush the current error context. */
-  err1Flush( 0, &errbel, status );
+  /*  Call internal flush routine with BEL disabled and msg enabled. */
+  err1Flush( 1, &errbel, status );
 }

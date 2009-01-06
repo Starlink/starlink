@@ -112,6 +112,8 @@ void msgBlank( int *status );
 
 void msgBlankif( msglev_t prior, int *status );
 
+void msgFlusherr( int * status );
+
 /* Gnu compiler can check for format consistency at compile time */
 void msgFmt( const char *token,
              const char *format,

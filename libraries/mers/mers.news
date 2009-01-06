@@ -10,6 +10,7 @@ Version 2.0
  o C interface for messaging level now uses a special type (msglev_t) rather than simple int.
  o errRepf, msgOutiff and msgOutf: new routines supporting sprintf-style formatting in addition
    to token replacement. %KEYWORD expansion disabled. $PARAM expansion unaffected. (C interface only)
+ o New function msgFlusherr can be used to flush error messages using MSG instead of ERR.
 
 Version 1.8-2
 -------------

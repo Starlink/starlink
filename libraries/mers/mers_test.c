@@ -14,7 +14,7 @@
 *     Copyright (C) 2008 Science and Technology Facilities Council.
 
 *  Language:
-*     Starlink ANSI C*  Licence:
+*     Starlink ANSI C
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -85,6 +85,24 @@ int main ( void ) {
   status = SAI__ERROR;
   errRepf( " ", "Formatted error message %s - ^PC", &status,
            "text via sprintf");
+  errRlse();
+
+  status = SAI__OK;
+  errMark();
+  msgBlank( &status );
+
+  status = SAI__ERROR;
+  errRep(" ", "Test flush", &status );
+  errRep(" ", "Line 2 of flush but this one has to be a bit longer so that we can force a word wrap", &status );
+  errFlush( &status );
+
+  msgBlank( &status );
+  status = SAI__ERROR;
+  errRep(" ", "Test flush via MSG", &status );
+  errRep(" ", "Line 2 of flush but this one has to be a bit longer so that we can force a word wrap and it should be output by MSG", &status );
+  msgFlusherr( &status );
+
+
   errRlse();
 
   return exstat;

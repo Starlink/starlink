@@ -59,7 +59,7 @@ typedef struct {
 int mers1Getenv( int usemsg, const char * param, int * status );
 
 void err1Bell( int * status );
-void err1Flush ( int * errbel, int * status );
+void err1Flush ( int usemsg, int * errbel, int * status );
 void err1Prerr( const char * text, int * status );
 void err1Print( const char * text, int * errbel, int * status );
 
