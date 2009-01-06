@@ -44,7 +44,7 @@
 
 #  Copyright:
 #     Copyright (C) 2007-2008 Science and Technology Facilities Council.
-#     Copyright (C) 2005-2007 University of British Columbia.
+#     Copyright (C) 2005-2009 University of British Columbia.
 #     Copyright (C) 2005-2006 Particle Physics & Astronomy Research Council.
 #     All Rights Reserved.
 
@@ -195,6 +195,8 @@
 #         Add NAVER parameter to STARECALC
 #     12-DEC-2008 (TIMJ):
 #         Add BPM masking param
+#     01-JAN-2008 (EC):
+#         Add FLAGSTAT to SC2CLEAN
 #     {enter_changes_here}
 
 #  Bugs:
@@ -2228,6 +2230,13 @@ package @PACKAGE@ {
                 type _DOUBLE
                 vpath {DEFAULT}
                 prompt {Array of lower-frequency edges [Hz] for notch filters}
+                default 0
+                helpkey *
+            }
+            parameter flagstat {
+                type _DOUBLE
+                vpath {DEFAULT}
+                prompt {Threshold slew velocity [arcsec/sec] to flag stationary}
                 default 0
                 helpkey *
             }

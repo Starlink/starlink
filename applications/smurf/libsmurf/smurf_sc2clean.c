@@ -61,6 +61,8 @@
 *          Array of upper-frequency edges for hard notch filters (Hz)
 *     FILT_NOTCHLOW = _DOUBLE (Read)
 *          Array of lower-frequency edges for hard notch filters (Hz)
+*     FLAGSTAT = _DOUBLE (Read)
+*          Flag data during slew speeds less than FLAGSTAT (arcsec/sec)
 *     ORDER = INTEGER (Read)
 *          Fit and remove polynomial baselines of this order
 *     SPIKETHRESH = _DOUBLE (Read)
@@ -80,11 +82,13 @@
 *        Added spike flagging
 *     2008-07-22 (TIMJ):
 *        Use kaplibs for IN OUT params. Filter darks.
+*     2009-01-06 (EC):
+*        Added FLAGSTAT, use parGdr0X in more places.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2008 University of British Columbia.
+*     Copyright (C) 2008-2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -143,6 +147,7 @@ void smurf_sc2clean( int *status ) {
   dim_t dcbox=0;            /* width of box for measuring DC steps */
   double dcthresh=0;        /* n-sigma threshold for DC steps */
   int dkclean;              /* Flag for dark squid cleaning */
+  double flagstat;          /* Threshold for flagging stationary regions */
   smfData *ffdata = NULL;   /* Pointer to output data struct */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
   size_t i = 0;             /* Counter, index */
@@ -198,10 +203,10 @@ void smurf_sc2clean( int *status ) {
   }
 
   /* Check for badfrac threshold for flagging bad bolos */
-  parGet0d( "BADFRAC", &badfrac, status );
+  parGdr0d( "BADFRAC", 0, 0, NUM__MAXD, 1, &badfrac, status );
 
   /* Check for DC step correction paramaters */
-  parGet0d( "DCTHRESH", &dcthresh, status );
+  parGdr0d( "DCTHRESH", 0, 0, NUM__MAXD, 1, &dcthresh, status );
   parGdr0i( "DCBOX", 1000, 0, NUM__MAXI, 1, &sval, status );
   if( *status == SAI__OK ) {
     dcbox = (dim_t) sval;
@@ -209,22 +214,25 @@ void smurf_sc2clean( int *status ) {
   parGet0l( "DKCLEAN", &dkclean, status );
 
   /* Order of polynomial for baseline fits */
-  parGet0i( "ORDER", &order, status );
+  parGdr0i( "ORDER", -1, -1, NUM__MAXI, 1, &order, status );
 
   /* Spike flagging */
-  parGet0d( "SPIKETHRESH", &spikethresh, status );
+  parGdr0d( "SPIKETHRESH", 0, 0, NUM__MAXD, 1, &spikethresh, status );
   parGdr0i( "SPIKEITER", 0, 0, NUM__MAXI, 1, &sval, status );
   if( *status == SAI__OK ) {
     spikeiter = (size_t) sval;
   }
   parGet0l( "DKCLEAN", &dcbad, status );
 
+  /* Stationary flagging */
+  parGdr0d( "FLAGSTAT", 0, 0, NUM__MAXD, 1, &flagstat, status );
+
   /* Clean dark squids */
   parGet0l( "DKCLEAN", &dkclean, status );
 
   /* Frequency-domain filtering */
-  parGet0d( "FILT_EDGELOW", &f_edgelow, status );
-  parGet0d( "FILT_EDGEHIGH", &f_edgehigh, status );
+  parGdr0d( "FILT_EDGELOW", 0, 0, NUM__MAXD, 1, &f_edgelow, status );
+  parGdr0d( "FILT_EDGEHIGH", 0, 0, NUM__MAXD, 1, &f_edgehigh, status );
   if( f_edgelow || f_edgehigh ) {
     dofft = 1;
   }
@@ -322,6 +330,19 @@ void smurf_sc2clean( int *status ) {
       if( *status == SAI__OK ) {
 	msgSeti("AITER",aiter);
 	msgOutif(MSG__VERB," ", "Finished in ^AITER iterations",
+		 status); 
+      }
+    }
+
+    /* Flag periods of stationary pointing */
+    if( flagstat ) {
+      msgSetd("THRESH",flagstat);
+      msgOutif(MSG__VERB, "", 
+               "Flagging regions with speeds < ^THRESH arcsec/sec", status );
+      smf_flag_stationary( ffdata, NULL, flagstat, &nflag, status );
+      if( *status == SAI__OK ) {
+	msgSeti("N",nflag);
+	msgOutif(MSG__VERB," ", "^N new time slices flagged",
 		 status); 
       }
     }
