@@ -498,7 +498,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 /* Create a Mapping (a PermMap) from the Frame representing the "ncpar" clump
    parameters, to the "ndim" Frame representing clump centre pixel positions. 
    The inverse transformation supplies bad values for the other parameters. */
-      map = (AstMapping *) astPermMap( ncpar, NULL, ndim, NULL, NULL, "" );
+      map = (AstMapping *) astPermMap( ncpar, NULL, ndim, NULL, NULL, " " );
    
 /* If no WCS FrameSet was supplied.... */
       if( !iwcs ) {

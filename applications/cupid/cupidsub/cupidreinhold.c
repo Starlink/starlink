@@ -171,8 +171,8 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Get the AST KeyMap holding the configuration parameters for this
    algorithm. */
    if( !astMapGet0A( config, "REINHOLD", (AstObject *) &rconfig ) ) {     
-      rconfig = astKeyMap( "" );
-      astMapPut0A( config, "REINHOLD", rconfig, "" );
+      rconfig = astKeyMap( " " );
+      astMapPut0A( config, "REINHOLD", rconfig, " " );
    }
 
 /* The configuration file can optionally omit the algorithm name. In this

@@ -272,7 +272,7 @@ void cupidClumpCat( const char *param, double *tab, int size,
       outperm[ 1 ] = 6;
       outperm[ 2 ] = 9;
 
-      map = (AstMapping *) astPermMap( ncol, inperm, ndim, outperm, NULL, "" );
+      map = (AstMapping *) astPermMap( ncol, inperm, ndim, outperm, NULL, " " );
 
 /* Create a FrameSet to store in the output catalogue. It has two Frames,
    the base Frame has "ncol" axes - each axis describes one of the table

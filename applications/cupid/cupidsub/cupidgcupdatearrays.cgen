@@ -451,7 +451,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 
 /* Create extra diagnostic info if required (meant for debugging). */
       if( excols ) {
-         extra = astKeyMap( "" );
+         extra = astKeyMap( " " );
 
 /* Total FWHM on axis 0, 1 & 2, in pixels. */
          astMapPut0D( extra, "GCFWHM1", 

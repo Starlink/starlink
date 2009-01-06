@@ -213,8 +213,8 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Get the AST KeyMap holding the configuration parameters for this
    algorithm. */
    if( !astMapGet0A( config, "FELLWALKER", (AstObject *) &fwconfig ) ) {     
-      fwconfig = astKeyMap( "" );
-      astMapPut0A( config, "FELLWALKER", fwconfig, "" );
+      fwconfig = astKeyMap( " " );
+      astMapPut0A( config, "FELLWALKER", fwconfig, " " );
    }
 
 /* The configuration file can optionally omit the algorithm name. In this

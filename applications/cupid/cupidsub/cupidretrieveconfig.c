@@ -124,7 +124,7 @@ AstKeyMap *cupidRetrieveConfig( HDSLoc *xloc, int *status ){
 /* Return an empty KeyMap if the CUPID extension does not contain a CONFIG 
    component. */
    } else {
-      ret = astKeyMap( "" );
+      ret = astKeyMap( " " );
    }
 
 /* Return the pointer */
