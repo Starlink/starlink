@@ -74,9 +74,11 @@
 *        -fixed logic bugs
 *        -added mask for quality
 *        -flag bolo as bad if fit failed
+*     2009-01-06 (EC):
+*        Stride-ify
 
 *  Copyright:
-*     Copyright (C) 2008 University of British Columbia.
+*     Copyright (C) 2008-2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -118,7 +120,8 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
                         unsigned char mask, size_t window, smfData *model, 
                         int calcdk, int nofit, int *status ) {
 
-  size_t arrayoff;        /* Array offset */
+  dim_t b;                /* Bolometer index */ 
+  size_t bstride;         /* Bolometer index stride */
   double corr;            /* Linear correlation coefficient */
   double *corrbuf=NULL;   /* Array of correlation coeffs all bolos this col */
   msglev_t curlevel;      /* Current messaging level */
@@ -129,7 +132,6 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
   double gain;            /* Gain parameter from template fit */
   double *gainbuf=NULL;   /* Array of gains for all bolos in this col */
   size_t i;               /* Loop counter */
-  dim_t index;            /* index into buffer */
   int isTordered;         /* Data order */
   size_t j;               /* Loop counter */
   size_t k;               /* Loop counter */
@@ -141,7 +143,7 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
   double offset;          /* Offset parameter from template fit */
   double *offsetbuf=NULL; /* Array of offsets for all bolos in this col */
   unsigned char *qua=NULL;/* Pointer to quality array */
-  dim_t stride;           /* Distance between bolo samples in array */
+  size_t tstride;         /* Time slice index stride */
 
   if (*status != SAI__OK) return;
 
@@ -174,8 +176,8 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
   }
 
   /* Check for 3-d data and get dimensions */
-  smf_get_dims( indata, &nrow, &ncol, &nbolo, &ntslice, &ndata, NULL, NULL,
-                status );
+  smf_get_dims( indata, &nrow, &ncol, &nbolo, &ntslice, &ndata, &bstride, 
+                &tstride, status );
 
   /* Obtain the number of rows and columns */
   isTordered = indata->isTordered;
@@ -228,10 +230,8 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
 
     if( needDA ) {
       /* Copy dark squids from the DA extension into dksquid */
-      index = i;
       for( j=0; j<ntslice; j++ ) {
-        dksquid[j] = indata->da->dksquid[index];
-        index += ncol;
+        dksquid[j] = indata->da->dksquid[i+ncol*j];
       }
     }
 
@@ -250,45 +250,35 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
     /* Loop over rows, removing the fitted dksquid template. */
     for( j=0; (!nofit) && (*status==SAI__OK) && (j<nrow); j++ ) {
 
-      /* Calculate index of first sample for this bolometer, and the stride */
+      /* Calculate bolometer index from row/col counters */
       if( SMF__COL_INDEX ) {
-        index = i*nrow + j;
+        b = i*nrow + j;
       } else {
-        index = i + j*ncol;
-      }
-
-      if( isTordered ) {
-        stride = nbolo;
-      } else {
-        stride = 1;
-        index *= ntslice;
+        b = i + j*ncol;
       }
 
       /* If dark squid is bad, flag entire bolo as bad if it isn't already */
-      if( !dkgood && qua && !(qua[index]&SMF__Q_BADB) ) {
-        arrayoff = index;
+      if( !dkgood && qua && !(qua[b*bstride]&SMF__Q_BADB) ) {
         for( k=0; k<ntslice; k++ ) {
-          qua[arrayoff] |= SMF__Q_BADB;
-          arrayoff += stride;
+          qua[b*bstride+k*tstride] |= SMF__Q_BADB;
         }
       }
 
       /* Try to fit if we think we have a good dark squid and bolo */
-
-      if( (!qua && dkgood) || (qua && dkgood && !(qua[index]&SMF__Q_BADB)) ) {
+      if((!qua && dkgood) || (qua && dkgood && !(qua[b*bstride]&SMF__Q_BADB))) {
 
         switch( indata->dtype ) {
         case SMF__DOUBLE:
-          smf_templateFit1D( &( ((double *)indata->pntr[0])[index] ), 
-                             &qua[index], mask, mask,
-                             ntslice, stride, dksquid, 1, &gain, &offset, 
+          smf_templateFit1D( &( ((double *)indata->pntr[0])[b*bstride] ), 
+                             &qua[b*bstride], mask, mask,
+                             ntslice, tstride, dksquid, 1, &gain, &offset, 
                              &corr, status );
           break;
           
         case SMF__INTEGER:
-          smf_templateFit1I( &( ((int *)indata->pntr[0])[index] ), 
-                             &qua[index], mask, mask,
-                             ntslice, stride, dksquid, 1, &gain, &offset, 
+          smf_templateFit1I( &( ((int *)indata->pntr[0])[b*bstride] ), 
+                             &qua[b*bstride], mask, mask,
+                             ntslice, tstride, dksquid, 1, &gain, &offset, 
                              &corr, status );
           break;
           
@@ -313,11 +303,9 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
           }
           
           /* Flag entire bolo as bad if it isn't already */
-          if( qua && !(qua[index]&SMF__Q_BADB) ) {
-            arrayoff = index;
+          if( qua && !(qua[b*bstride]&SMF__Q_BADB) ) {
             for( k=0; k<ntslice; k++ ) {
-              qua[arrayoff] |= SMF__Q_BADB;
-              arrayoff += stride;
+              qua[b*bstride+k*tstride] |= SMF__Q_BADB;
             }
           }
         } else {
