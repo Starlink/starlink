@@ -88,7 +88,7 @@ itcl::class gaia::GaiaQueryResult {
       eval itk_initialize $args
    }
 
-   #  Remove the currently selected rows from a local catalog file
+   #  Remove the currently selected rows from a local catalog file.
    public method remove_selected {} {
       set file [$astrocat url]
       set info [get_selected]
@@ -108,7 +108,7 @@ itcl::class gaia::GaiaQueryResult {
       }
    }
 
-   #  Save the currently selected rows the local catalog file
+   #  Save the currently selected rows to the local catalog file.
    public method save_selected {} {
       set file [$astrocat url]
       set info [get_selected]
