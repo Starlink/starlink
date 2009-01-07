@@ -288,7 +288,7 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
 	  if( *status == SAI__OK ) {
 	    ndfMap( bndndf, "DATA", "_INTEGER", "READ", data_pntr, &nmap, 
 		    status );
-      data_index = data_pntr[0];
+            data_index = data_pntr[0];
 
 	    if( *status == SAI__OK ) {
 	      ubnd_old[0] = data_index[0];
@@ -420,7 +420,7 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
       
 	ndfMap( bndndf, "DATA", "_INTEGER", "WRITE", data_pntr, &nmap, 
 		status );    
-  data_index = data_pntr[0];
+        data_index = data_pntr[0];
 	if( *status == SAI__OK ) {
 	  data_index[0] = lbnd_out[0];
 	  data_index[1] = lbnd_out[1];
@@ -435,7 +435,7 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
 				"_INTEGER", 1, lbnd_temp, ubnd_temp, status );
 	ndfMap( bndndf, "DATA", "_INTEGER", "WRITE", data_pntr, &nmap, 
 		status );    
-  data_index = data_pntr[0];
+        data_index = data_pntr[0];
 	if( *status == SAI__OK ) {
 	  data_index[0] = ubnd_out[0];
 	  data_index[1] = ubnd_out[1];
