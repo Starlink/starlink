@@ -194,7 +194,7 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
    is moving, these refer to the offset coordinate system centred on the 
    first time slice base pointing position, with north defined by the
    requested output coordinate system. */
-      if( autogrid && usesys ) {
+      if( autogrid ) {
          kpg1Opgrd( nallpos, allpos, strcmp( usesys, "AZEL" ), par, &rdiam, 
                           status );
 
@@ -232,7 +232,7 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
      
 /* Ensure the pixel sizes have the correct signs. */
       if( par[ 4 ] != AST__BAD ) {
-         if( usesys && !strcmp( usesys, "AZEL" ) ) {
+         if( !strcmp( usesys, "AZEL" ) ) {
             par[ 4 ] = fabs( par[ 4 ] );
          } else {
             par[ 4 ] = -fabs( par[ 4 ] );
@@ -374,7 +374,7 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
 /* If any parameter were given explicit values which differ from the
    autogrid default values, then we need to re-calculate the optimal CRPIX1/2 
    values. We also do this if all the points are effectively co-incident. */
-         if( ( coin || !udefs ) && autogrid && usesys ) {
+         if( ( coin || !udefs ) && autogrid ) {
             par[ 0 ] = AST__BAD;
             par[ 1 ] = AST__BAD;
             kpg1Opgrd( nallpos, allpos, strcmp( usesys, "AZEL" ), par,
