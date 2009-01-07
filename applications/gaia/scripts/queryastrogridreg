@@ -9,11 +9,11 @@ exec $GAIA_DIR/gaiavo_tcl $0 ${1+"$@"}
 #      Query an astrogrid VO registry
 
 #   Usage:
-#      queryastrogridreg registry capability column substring outfile
+#      queryastrogridreg registry standardID column substring outfile
 
 #   Description:
 #      Queries a astrogrid VO registry for all known services with 
-#      capability with additional constraint, defined as a column
+#      a given standardID with additional constraint, defined as a column
 #      name and substring (which define a predicate). The results 
 #      of the query are written to a VOTable "outfile" (rather
 #      than an XML file with the standard registry response). 
@@ -21,7 +21,7 @@ exec $GAIA_DIR/gaiavo_tcl $0 ${1+"$@"}
 #
 #        queryastrogridreg \
 #             "http://registry.astrogrid.org/astrogrid-registry/services/RegistryQueryv1_0" \
-#             "sia:SimpleImageAccess" "title" "infrared" \
+#             "ivo://ivoa.net/std/SIA" "title" "infrared" \
 #             query.vot
 #
 #      which will query for all known SIAP servers known to the registry
@@ -68,12 +68,12 @@ exec $GAIA_DIR/gaiavo_tcl $0 ${1+"$@"}
 #  Check the command-line arguments.
 if { $argc == 5 } {
    set registry [lindex $argv 0]
-   set capability [lindex $argv 1]
+   set standardID [lindex $argv 1]
    set column [lindex $argv 2]
    set substring [lindex $argv 3]
    set outfile [lindex $argv 4]
 } else {
-   puts stderr {Usage: queryastrogridreg registry capability column substring outfile}
+   puts stderr {Usage: queryastrogridreg registry standardID column substring outfile}
    exit
 }
 
@@ -103,28 +103,28 @@ set wsdlcontent [::read $wsdlfid]
 ::WS::Client::ParseWsdl $wsdlcontent -serviceAlias VORegistry
 
 #  Construct the ADQL fragment needed as the query. This is in two forms
-#  with and without an addition constraint based on a column substring.
+#  with and without an additional constraint based on a column substring.
 if { $column == {} } {
 
-#  WHERE capability/@xsi:type = 'sia:SimpleImageAccess' like query.
+#  WHERE capability/@standardID = 'ivo://ivoa.net/std/SIA' like query.
 set where "\
 <Condition xmlns=\"http://www.ivoa.net/xml/ADQL/v1.0\" xsi:type=\"comparisonPredType\" Comparison=\"=\">
-  <Arg xsi:type=\"columnReferenceType\" Name=\"capability/@xsi:type\"/>
+  <Arg xsi:type=\"columnReferenceType\" Name=\"capability/@standardID\"/>
   <Arg xsi:type=\"atomType\">
-     <Literal xsi:type=\"stringType\" Value=\"${capability}\"/>
+     <Literal xsi:type=\"stringType\" Value=\"${standardID}\"/>
   </Arg>
 </Condition>
 "
 
 } else {
 
-#  WHERE capability/@xsi:type = 'sia:SimpleImageAccess' AND title like '%infra%'
+#  WHERE capability/@standardID = 'ivo://ivoa.net/std/SIA' AND title like '%infra%'
 set where " \
   <Condition xmlns=\"http://www.ivoa.net/xml/ADQL/v1.0\" xsi:type=\"intersectionSearchType\">
     <Condition xsi:type=\"comparisonPredType\" Comparison=\"=\">
-      <Arg xsi:type=\"columnReferenceType\" Name=\"capability/@xsi:type\"/>
+      <Arg xsi:type=\"columnReferenceType\" Name=\"capability/@standardID\"/>
       <Arg xsi:type=\"characterValueExpressionType\">
-        <Literal xsi:type=\"stringType\" Value=\"${capability}\"/>
+        <Literal xsi:type=\"stringType\" Value=\"${standardID}\"/>
       </Arg>
     </Condition>
     <Condition xsi:type=\"likePredType\">
@@ -182,5 +182,5 @@ if { $body != {} } {
    exit 0
 }
 
-puts stderr "No services like: $service && $capability"
+puts stderr "No services like: $service && $standardID"
 exit 1
