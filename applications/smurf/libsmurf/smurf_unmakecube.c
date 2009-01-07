@@ -484,7 +484,7 @@ void smurf_unmakecube( int *status ) {
                    status );
 
 /* See if the current time series overlaps the current sky cube. */
-         smf_resampcube( data, ifile, size, skycube->abskyfrm, 
+         smf_resampcube( data, skycube->abskyfrm, 
                          skycube->iskymap, skycube->ispecfrm, 
                          skycube->ispecmap, detgrp, skycube->moving, 
                          skycube->slbnd, skycube->subnd, interp, 
@@ -502,7 +502,7 @@ void smurf_unmakecube( int *status ) {
                     status );
 
 /* Resample the cube data into the output time series. */
-            smf_resampcube( data, ifile, size, skycube->abskyfrm, 
+            smf_resampcube( data, skycube->abskyfrm, 
                             skycube->iskymap, skycube->ispecfrm, 
                             skycube->ispecmap, detgrp, skycube->moving, 
                             skycube->slbnd, skycube->subnd, interp, 

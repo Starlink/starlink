@@ -13,22 +13,17 @@
 *     C function
 
 *  Invocation:
-*     smf_resampcube( smfData *data, int index, int size, 
-*                     AstSkyFrame *abskyfrm, AstMapping *iskymap, 
-*                     AstFrame *ispecfrm, AstMapping *ispecmap, 
-*                     Grp *detgrp, int moving, int slbnd[ 3 ], 
-*                     int subnd[ 3 ], int interp, const double params[], 
-*                     float *in_data, float *out_data, int *overlap,
-*                     int *status );
+*     smf_resampcube( smfData *data, AstSkyFrame *abskyfrm, 
+*                     AstMapping *iskymap, AstFrame *ispecfrm, 
+*                     AstMapping *ispecmap, Grp *detgrp, int moving, 
+*                     int slbnd[ 3 ], int subnd[ 3 ], int interp, 
+*                     const double params[], float *in_data, 
+*                     float *out_data, int *overlap, int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
 *        Pointer to the smfData structure describing the template time
 *        series file.
-*     index = int (Given)
-*        Index of the current template within the group of templates.
-*     size = int (Given)
-*        Index of the last template within the group of templates.
 *     abskyfrm = AstSkyFrame * (Given)
 *        A SkyFrame that specifies the coordinate system used to describe 
 *        the spatial axes of the input sky cube. This should represent
@@ -90,6 +85,8 @@
 *  History:
 *     25-JAN-2008 (DSB):
 *        Initial version.
+*     7-JAN-2009 (DSB):
+*        Remove unsused parameters index and size.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -133,8 +130,7 @@
 
 #define FUNC_NAME "smf_resampcube"
 
-void smf_resampcube( smfData *data, int index, int size, 
-                     AstSkyFrame *abskyfrm, AstMapping *iskymap, 
+void smf_resampcube( smfData *data, AstSkyFrame *abskyfrm, AstMapping *iskymap,
                      AstFrame *ispecfrm, AstMapping *ispecmap, 
                      Grp *detgrp, int moving, int slbnd[ 3 ], 
                      int subnd[ 3 ], int interp, const double params[], 

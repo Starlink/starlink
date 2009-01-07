@@ -17,7 +17,7 @@
 *  Invocation:
 *     smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last, 
 *                       int *ptime, dim_t nchan, dim_t ndet, dim_t nslice, 
-*                       dim_t nel, dim_t nxy, dim_t nout, dim_t dim[3], 
+*                       dim_t nxy, dim_t nout, dim_t dim[3], 
 *                       int badmask, int is2d, AstMapping *ssmap, 
 *                       AstSkyFrame *abskyfrm, AstMapping *oskymap, 
 *                       Grp *detgrp, int moving, int usewgt, int genvar, 
@@ -50,8 +50,6 @@
 *        Number of detectors in input cube.
 *     nslice = dim_t (Given)
 *        Number of time slices in input cube.
-*     nel = dim_t (Given)
-*        Total number of elements in input cube.
 *     nxy = dim_t (Given)
 *        Number of elements in one spatial plane of the output cube.
 *     nout = dim_t (Given)
@@ -186,6 +184,8 @@
 *        data that falls outside the otuput cube is included in the check.
 *     12-FEB-2008 (DSB):
 *        Update naccept when using a 3D weights array.
+*     7-JAN-2009 (DSB):
+*        Remove unused "nel" parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -232,7 +232,7 @@
 
 void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last, 
                        int *ptime, dim_t nchan, dim_t ndet, dim_t nslice, 
-                       dim_t nel, dim_t nxy, dim_t nout, dim_t dim[3], 
+                       dim_t nxy, dim_t nout, dim_t dim[3], 
                        int badmask, int is2d, AstMapping *ssmap, 
                        AstSkyFrame *abskyfrm, AstMapping *oskymap, 
                        Grp *detgrp, int moving, int usewgt, int genvar, 
@@ -648,7 +648,7 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
          smf_rebincube_norm2d( nout, nxy, genvar, data_array, 
                                var_array, wgt_array, pop_array, status );
       } else {
-         smf_rebincube_norm3d( nout, nxy, genvar, *nused, data_array, 
+         smf_rebincube_norm3d( nout, genvar, *nused, data_array, 
                                var_array, wgt_array, status );
       }
 

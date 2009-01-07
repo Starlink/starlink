@@ -378,7 +378,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    system of the output cube. So use astConvert to get a Mapping from one
    to the other. */
       } else {
-         fs = astConvert( specframe, ospecframe, "" );
+         fs = astConvert( specframe, ospecframe, " " );
 
 /* Report an error and abort if no conversion could be found between the two 
    spectral axes. */
@@ -400,8 +400,8 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
             ssmap = astCmpMap( astCmpMap( specmap, 
                                           astGetMapping( fs, AST__BASE,
                                                          AST__CURRENT ),
-                                          1, "" ), 
-                               ospecmap, 1, "" );
+                                          1, " " ), 
+                               ospecmap, 1, " " );
 
          }
 
@@ -613,7 +613,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    latlut = astFree( latlut );
 
 /* Combine the two LutMaps in parallel. */
-   cmpmap1 = astCmpMap( lutmap1, lutmap2, 0, "" );
+   cmpmap1 = astCmpMap( lutmap1, lutmap2, 0, " " );
 
 /* Create a PermMap with a forward transformation that duplicates axis 1 
    and discards axis 2. */
@@ -621,10 +621,10 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    inperm[ 1 ] = 0;
    outperm[ 0 ] = 1;
    outperm[ 1 ] = 1;
-   pmap = astPermMap( 2, inperm, 2, outperm, NULL, "" );
+   pmap = astPermMap( 2, inperm, 2, outperm, NULL, " " );
 
 /* Combine this PermMap in series with the two LutMaps. */
-   cmpmap2 = astCmpMap( pmap, cmpmap1, 1, "" );
+   cmpmap2 = astCmpMap( pmap, cmpmap1, 1, " " );
 
 /* Store the pixel index bounds on the first two axes. */
    lbnd[ 0 ] = 1;
@@ -651,15 +651,15 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
 /* Now include the shift in the spectral Mapping. */
    astInvert( ospecmap );
-   cmpmap3 = astCmpMap( astShiftMap( 1, &shift, "" ), ospecmap, 1, "" );
+   cmpmap3 = astCmpMap( astShiftMap( 1, &shift, " " ), ospecmap, 1, " " );
 
 /* Combine the spectral and spatial Mappings in parallel. */
-   cmpmap4 = astCmpMap( cmpmap2, cmpmap3, 0, "" );
+   cmpmap4 = astCmpMap( cmpmap2, cmpmap3, 0, " " );
   
 /* Create the required FrameSet. */
-   *wcsout = astFrameSet( astFrame( 3, "Domain=GRID" ), "" );
+   *wcsout = astFrameSet( astFrame( 3, "Domain=GRID" ), " " );
    astAddFrame( *wcsout, AST__BASE, cmpmap4, 
-                astCmpFrame( oskyframe, ospecframe, "" ) );
+                astCmpFrame( oskyframe, ospecframe, " " ) );
 
 /* Report the coordinate systems in use in the output cube, and the pixel
    bounds of the cube. */

@@ -350,7 +350,7 @@ void  smf_rebincube( smfWorkForce *wf, smfData *data, int first, int last,
    code that is faster than AST. */
    if( spread == AST__NEAREST ) {
       smf_rebincube_nn( wf, data, first, last, ptime, nchan, ndet, nslice, 
-                        nel, nxy, nout, dim, badmask, is2d, (AstMapping *) ssmap, 
+                        nxy, nout, dim, badmask, is2d, (AstMapping *) ssmap, 
                         abskyfrm, oskymap, detgrp, moving, usewgt, genvar, 
                         tfac, fcon2, data_array, var_array, wgt_array, 
                         texp_array, teff_array, nused, nreject, naccept,

@@ -14,7 +14,7 @@
 *     C function
 
 *  Invocation:
-*     void smf_rebincube_norm3d( dim_t nout, dim_t nxy, int genvar, 
+*     void smf_rebincube_norm3d( dim_t nout, int genvar, 
 *                                int nused, float *data_array, 
 *                                float *var_array, double *wgt_array, 
 *                                int *status );
@@ -22,8 +22,6 @@
 *  Arguments:
 *     nout = dim_t (Given)
 *        Number of elements in output cube.
-*     nxy = dim_t (Given)
-*        Number of elements in one spatial plane of the output cube.
 *     genvar = int (Given)
 *        Indicates how the output variances should be calculated: 
 *           0 = do not calculate any output variances
@@ -55,6 +53,8 @@
 *  History:
 *     23-APR-2006 (DSB):
 *        Initial version.
+*     7-JAN-2009 (DSB):
+*        Remove unused parameter nxy.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -94,10 +94,8 @@
 
 #define FUNC_NAME "smf_rebincube_norm3d"
 
-void smf_rebincube_norm3d( dim_t nout, dim_t nxy, int genvar, 
-                           int nused, float *data_array, 
-                           float *var_array, double *wgt_array, 
-                           int *status ){
+void smf_rebincube_norm3d( dim_t nout, int genvar, int nused, float *data_array,
+                           float *var_array, double *wgt_array, int *status ){
 
 /* Local Variables */
    dim_t iv;                   /* Vector index into output 3D array */

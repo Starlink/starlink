@@ -742,7 +742,7 @@ void smf_rebincube_ast( smfWorkForce *wf, smfData *data, int first, int last,
 
 void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last, 
                        int *ptime, dim_t nchan, dim_t ndet, dim_t nslice, 
-                       dim_t nel, dim_t nxy, dim_t nout, dim_t dim[3], 
+                       dim_t nxy, dim_t nout, dim_t dim[3], 
                        int badmask, int is2d, AstMapping *ssmap, 
                        AstSkyFrame *abskyfrm, AstMapping *oskymap, 
                        Grp *detgrp, int moving, int usewgt, int genvar, 
@@ -770,10 +770,8 @@ void smf_rebincube_norm2d( dim_t nout, dim_t nxy, int genvar,
                            float *data_array, float *var_array, 
                            double *wgt_array, int *pop_array, int *status );
 
-void smf_rebincube_norm3d( dim_t nout, dim_t nxy, int genvar, 
-                            int nused, float *data_array, 
-                            float *var_array, double *wgt_array, 
-                            int *status );
+void smf_rebincube_norm3d( dim_t nout, int genvar, int nused, float *data_array,
+                           float *var_array, double *wgt_array, int *status );
 
 void smf_rebincube_spectab( dim_t nchan, dim_t nchanout, AstMapping *ssmap, 
                             int **pspectab, int *status );
@@ -907,8 +905,7 @@ void smf_resampcube_ast( smfData *data, dim_t nchan,
                          const double params[], float *in_data, 
                          float *out_data, int *status );
 
-void smf_resampcube( smfData *data, int index, int size, 
-                     AstSkyFrame *abskyfrm, AstMapping *iskymap, 
+void smf_resampcube( smfData *data, AstSkyFrame *abskyfrm, AstMapping *iskymap,
                      AstFrame *ispecfrm, AstMapping *ispecmap, 
                      Grp *detgrp, int moving, int slbnd[ 3 ], 
                      int subnd[ 3 ], int interp, const double params[], 
