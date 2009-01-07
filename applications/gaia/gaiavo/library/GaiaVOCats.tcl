@@ -118,7 +118,7 @@ itcl::class gaiavo::GaiaVOCats {
    destructor {
       #  Delete all instances of astrocat.
       $w_.cat delete
-      for { set i 0 } { $i < npages_ } { incr i } {
+      for { set i 0 } { $i < $npages_ } { incr i } {
          $w_.cat$i delete
       }
    }
@@ -275,6 +275,7 @@ itcl::class gaiavo::GaiaVOCats {
 
    #  Interrupt the current query.
    public method interrupt {} {
+      set interrupted_ 1
       $query_component_ interrupt
       set_feedback off
       catch {$itk_component(results$current_) config -title "Query Results"}
@@ -302,48 +303,75 @@ itcl::class gaiavo::GaiaVOCats {
 
       #  If status is bad result is a message, otherwise it should be
       #  the name of a VOTable file.
-      if { ! $status } {
-         warning_dialog "$names_($current_): $result" $w_
-         after 0 [list $itk_component(progressbar) config -text $result]
-      } elseif { ! [file exists $result] } {
-         error_dialog "$names_($current_): $result" $w_
-         after 0 [list $itk_component(progressbar) config -text $result]
-      } else {
+      if { $status && [file exists $result] } {
 
          #  Got a VOTable.
          busy {
             $w_.cat$current_ open $result
 
-            #  Need to update GaiaQueryResult with content.
-            #  Update table headings.
-            set prev_headings $headings_
-            set headings_ [$w_.cat$current_ headings]
-            $itk_component(results$current_) config -headings $headings_
+            #  If empty or have problems reading it, do away with it.
+            set info_ {}
+            if { [catch {set info_ [$w_.cat$current_ content]} msg] != 0 } {
+               warning_dialog "$names_($current_): $msg" $w_
+               remove_current_ "$msg"
+            } else {
+               if { $info_ == {} } { 
+                  remove_current_ "No images in $names_($current_)"
+               } else {
 
-            #  Initial show columns.
-            if { $itk_option(-show_cols) != {} } {
-               $itk_component(results$current_) \
-                  set_options $headings_ Show 0
-               $itk_component(results$current_) \
-                  set_options $itk_option(-show_cols) Show 1
+                  #  Need to update GaiaQueryResult with content.
+                  #  Update table headings.
+                  set prev_headings $headings_
+                  set headings_ [$w_.cat$current_ headings]
+                  $itk_component(results$current_) config -headings $headings_
+                  
+                  #  Initial show columns.
+                  if { $itk_option(-show_cols) != {} } {
+                     $itk_component(results$current_) \
+                        set_options $headings_ Show 0
+                     $itk_component(results$current_) \
+                        set_options $itk_option(-show_cols) Show 1
+                  }
+                  
+                  if { "$prev_headings" != "$headings_" } {
+                     $itk_component(results$current_) update_options
+                  }
+                  
+                  #  Update content.
+                  $itk_component(results$current_) config -info $info_
+                  
+                  $itk_component(results$current_) config -title \
+                     "Returned [$itk_component(results$current_) total_rows] rows"
+                  
+                  #  Make sure results are visible.
+                  $itk_component(bookmenu) configure -value $current_
+                  view_page_ $current_
+               }
             }
-
-            if { "$prev_headings" != "$headings_" } {
-               $itk_component(results$current_) update_options
-            }
-
-            #  Update content.
-            set info_ [$w_.cat$current_ content]
-            $itk_component(results$current_) config -info $info_
-
-            $itk_component(results$current_) config \
-               -title "Returned [$itk_component(results$current_) total_rows] rows"
-
-            #  Make sure results are visible.
-            $itk_component(bookmenu) configure -value $current_
-            view_page_ $current_
          }
+      } else {
+         #  Something went wrong, remove this service from consideration and 
+         #  make a report. Note a bad status is less bad than no file.
+         if { ! $status } {
+            warning_dialog "$names_($current_): $result" $w_
+         } else {
+            error_dialog "$names_($current_): $result" $w_
+         }
+         remove_current_ $result
       }
+   }
+
+   #  Remove the current query result page and associated. Text is something
+   #  set as the progressbar value (usually the error that caused this
+   #  removal). 
+   protected method remove_current_ {text} {
+      after 0 [list $itk_component(progressbar) config -text $text]
+      $itk_component(notebook) delete $current_
+      $itk_component(bookmenu) delete $current_
+      $itk_component(bookmenu) update_menubutton
+      incr current_ -1
+      incr npages_ -1
+      incr ncolumn_ -1
    }
 
    #  Start the queries.
@@ -353,6 +381,7 @@ itcl::class gaiavo::GaiaVOCats {
       clear_query_results_
 
       #  Now invoke method to start the queries in sub-classes.
+      set interrupted_ 0
       start_queries_
    }
 
@@ -368,6 +397,10 @@ itcl::class gaiavo::GaiaVOCats {
          delete object $itk_component(results$i)
       }
       $itk_component(bookmenu) clear
+      $itk_component(bookmenu) update_menubutton
+      if { $current_ > 0 } { 
+         $itk_component(notebook) delete 0 end
+      }
       set npages_ 0
       set current_ 0
    }
@@ -397,10 +430,11 @@ itcl::class gaiavo::GaiaVOCats {
    protected method add_query_result_ {title} {
 
       #  Create a new page and make it current.
-      $itk_component(notebook) add -label $title
-      set site [$itk_component(notebook) childsite $title]
+      set site [$itk_component(notebook) add -label $title]
       set current_ $npages_
+      set names_($current_) $title
       incr npages_
+      incr ncolumn_
 
       if { ![ info exists $w_.cat$current_] } {
          astrocat $w_.cat$current_
@@ -426,11 +460,18 @@ itcl::class gaiavo::GaiaVOCats {
       bind $itk_component(results$current_).listbox <Double-1> \
          [code $this open]
 
+      set cbreak 0
+      if { $ncolumn_  > 25 } {
+         set cbreak 1
+         set ncolumn_ 0
+      }
+         
       #  Add to "Query Results:" menu.
       $itk_component(bookmenu) add \
          -command [code $this view_page_ $current_] \
          -label $title \
-         -value $current_
+         -value $current_ \
+         -columnbreak $cbreak
    }
 
    #  Respond to feedback about query progress (stop and start).
@@ -497,8 +538,14 @@ itcl::class gaiavo::GaiaVOCats {
    #  Current page of notebook.
    protected variable current_ 0
 
+   #  Number of entries in the bookmenu column.
+   protected variable ncolumn_ 0
+
    #  Names of pages for error dialogs etc.
    protected variable names_
+
+   #  True then interrupted.
+   protected variable interrupted_ 0
    
    #  Common variables: (shared by all instances)
    #  -----------------

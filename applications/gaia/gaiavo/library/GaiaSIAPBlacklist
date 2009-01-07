@@ -1,5 +1,44 @@
 #  Backlisted SIAP servers. These will never be queried.
 #
-#  Bonn 1420 MHz Survey
+#  Just a list of servers that returned errors during testing.
+#
 ivo://nasa.heasarc/skyview/1420mhz
+ivo://wfau.roe.ac.uk/ukidssdr2-siap
+ivo://wfau.roe.ac.uk/sss-siap
+ivo://wfau.roe.ac.uk/ukidss-siap
+ivo://uk.ac.cam.ast/IPHAS/images/SIAP
+ivo://uk.ac.cam.ast/INT-WFS/images/SIAP-atlas
 
+ivo://sdss.jhu/services/SIAPDR1-Color
+ivo://sdss.jhu/services/SIAPDR1-G
+ivo://sdss.jhu/services/SIAPDR1-I
+ivo://sdss.jhu/services/SIAPDR1-R
+ivo://sdss.jhu/services/SIAPDR1-U
+ivo://sdss.jhu/services/SIAPDR1-Z
+
+ivo://sdss.jhu/services/SIAPDR2-Color
+ivo://sdss.jhu/services/SIAPDR2-G
+ivo://sdss.jhu/services/SIAPDR2-I
+ivo://sdss.jhu/services/SIAPDR2-R
+ivo://sdss.jhu/services/SIAPDR2-U
+ivo://sdss.jhu/services/SIAPDR2-Z
+
+ivo://sdss.jhu/services/SIAPDR3-Color
+ivo://sdss.jhu/services/SIAPDR3-G
+ivo://sdss.jhu/services/SIAPDR3-I
+ivo://sdss.jhu/services/SIAPDR3-R
+ivo://sdss.jhu/services/SIAPDR3-U
+ivo://sdss.jhu/services/SIAPDR3-Z
+
+ivo://sdss.jhu/services/SIAPDR4-Color
+ivo://sdss.jhu/services/SIAPDR4-images
+ivo://sdss.jhu/services/SIAPDR5-images
+
+ivo://archive.stsci.edu/dss/dss2red
+ivo://archive.stsci.edu/dss/dss2infrared
+ivo://archive.stsci.edu/dss/dss2blue
+ivo://archive.stsci.edu/dss/dss2
+ivo://archive.stsci.edu/dss/dss1yellow
+ivo://archive.stsci.edu/dss/dss1red
+ivo://archive.stsci.edu/dss/dss1blue
+ivo://archive.stsci.edu/dss/dss1

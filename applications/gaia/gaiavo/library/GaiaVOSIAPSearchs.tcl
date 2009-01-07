@@ -141,7 +141,7 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
       pack $itk_component(size2) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(size2) {Height of images, arcminutes}
 
-      #  Additional options. 
+      #  Additional options.
       itk_component add options {
          frame $w_.options
       }
@@ -149,17 +149,17 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
       #  Open registry query dialog to change the list of services.
       itk_component add registry {
          button $itk_component(options).registry \
-            -text "Manage services..." \
+            -text "View image servers..." \
             -command [code $this registry_query_]
       }
       pack $itk_component(registry) -side right -padx 1m -pady 2m
       add_short_help $itk_component(registry) \
-         {Query a VO registry for SIAP services or remove services from query}
+         {View or change the VO image services that will be queried}
 
       #  Set search region from the displayed image, mark region by dragging.
       itk_component add setfromimg {
          button $itk_component(options).setfromimg \
-            -text "Set from image" \
+            -text "Set area from image" \
             -command [code $this set_from_image]
       }
       pack $itk_component(setfromimg) -side right -padx 1m -pady 2m
@@ -239,7 +239,7 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
 
    #  Called when a query completes.
    protected method query_done_ {} {
-      
+
       #  Immediate notification we're finished for now.
       if { $itk_option(-feedbackcommand) != {} } {
          eval $itk_option(-feedbackcommand) off
@@ -283,10 +283,10 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
             set tempname [$tempcats_ get_name]
             set tst [gaiavotable::save $vot 0 $tempname]
             gaiavotable::close $vot
-            
+
             #  This is the current VOTable now.
             set votable_ $filename
-            
+
          } else {
             set status 0
             set tempname "Query returned an error ($query_status: $errmsg)"
@@ -380,11 +380,11 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
          return
       }
       lassign $list x0 y0 x1 y1
-      
+
       #  Get center and radius in canvas coords.
       set x [expr ($x0+$x1)/2.]
       set y [expr ($y0+$y1)/2.]
-      
+
       if { [catch {$image convert coords $x $y canvas ra dec "wcs J2000"} msg] } {
          error_dialog \
             "error converting canvas ($x, $y) to world coordinates: $msg" $w_
@@ -397,17 +397,17 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
 
    #  Activate the registry dialog.
    protected method registry_query_ {} {
+      blt::busy hold [winfo toplevel $w_]
       utilReUseWidget GaiaVOCatRegistry $w_.voregistry \
          -catalog [$itk_option(-astrocat) longname] \
          -service SIAP \
          -show_cols {shortName title} \
          -activate_cmd [code $this changed_registry_]
    }
-   
-   #  Registry has been changed, so update from the services catalog.
-   protected method changed_registry_ {} {
-      #  Update self.
-      $itk_option(-astrocat) open [$itk_option(-astrocat) longname]
+
+   #  Registry has been changed and maybe accepted.
+   protected method changed_registry_ {accepted} {
+      blt::busy release [winfo toplevel $w_]
    }
 
    #  Configuration options: (public variables)
@@ -426,7 +426,7 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
 
    #  Nameserver for looking up object coordinates.
    itk_option define -namesvr namesvr NameSvr ned@eso
-   
+
    #  GaiaImageCtrl instance.
    itk_option define -gaiactrl gaiactrl GaiaCtrl {}
 

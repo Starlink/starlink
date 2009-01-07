@@ -11,7 +11,7 @@
 #  Description:
 #     Extends the GaiaVOCats class to query a set of SIAP servers for any
 #     images they have on a region of sky. The images may then be downloaded
-#     and displayed. The list of SIAP servers can be modified using the 
+#     and displayed. The list of SIAP servers can be modified using the
 #     associated query dialog.
 
 #  Invocations:
@@ -128,7 +128,10 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
    #  Start the queries, calls query_ for each SIAP server.
    protected method start_queries_ {} {
       foreach {url name} [get_access_details] {
-         query_ $url $name
+         if { ! $interrupted_ } {
+            puts "query_: $url $name"
+            query_ $url $name
+         }
       }
    }
 
@@ -235,7 +238,7 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
    }
 
    #  Initialise the blacklist. Just a simple text file with comment lines
-   #  starting with # in the first column and other lines being the 
+   #  starting with # in the first column and other lines being the
    #  identifiers of the blacklisted services.
    protected method init_blacklist_ {} {
       set blacklist [utilGetConfigFilename .skycat GaiaSIAPBlacklist]

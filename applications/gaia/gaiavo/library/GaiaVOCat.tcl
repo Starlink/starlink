@@ -88,7 +88,7 @@ itcl::class gaiavo::GaiaVOCat {
 
       #  File menu.
       set m [add_menubutton File]
-      
+
       #  Read old query from disk.
       add_menuitem $m command "Open..." \
          {Read previous query results from a VOTable} \
@@ -107,8 +107,12 @@ itcl::class gaiavo::GaiaVOCat {
       set m [add_menubutton Edit]
 
       add_menuitem $m command "Remove selected" \
-         {Remove selected rows from the results} \
+         {Remove selected rows} \
          -command [code $this remove_selected]
+
+      add_menuitem $m command "Keep selected" \
+         {Keep the selected rows} \
+         -command [code $this save_selected]
 
       add_menuitem $m command "Add new row..." \
          {Enter the data for a new row of results} \
@@ -140,6 +144,9 @@ itcl::class gaiavo::GaiaVOCat {
    #  Destructor:
    #  -----------
    destructor {
+      if { [::file exists $newfile_] } {
+         catch { ::file delete -force $newfile_ }
+      }
    }
 
    #  Methods:
@@ -266,9 +273,9 @@ itcl::class gaiavo::GaiaVOCat {
 
    #  Open services for the selected rows. Depends on the type of service query
    #  as to what will happen. For SIAP we should open a window to download an
-   #  image. 
+   #  image.
    public method open {} {
-      foreach row [$itk_component(results) get_selected] { 
+      foreach row [$itk_component(results) get_selected] {
          open_service_ $row
       }
    }
@@ -318,20 +325,50 @@ itcl::class gaiavo::GaiaVOCat {
    #  Remove the currently selected rows.
    public method remove_selected {} {
       $itk_component(results) remove_selected
+      refresh_
+   }
+
+   #  Remove all but the selected rows.
+   public method save_selected {} {
+      $itk_component(results) save_selected
+      refresh_
+   }
+
+   #  Re-read catalogue to refresh. Note there is a wart here. For VOTables
+   #  only the backing store TST has been updated. So we need to take a copy 
+   #  of the backing file before opening it as it will be deleted when the
+   #  astrocat sees that the file name has changed (from the VOTable name).
+   protected method refresh_ {} { 
+
+      #  Prepare to delete last catalogue file (could be open, so defer).
+      set oldfile $newfile_
+
+      #  Copy backing file to new file.
+      set tempname [$w_.cat url]
+      set newfile_ [gaia::GaiaTempName::make_name "GaiaTempCat" $count_ ".TAB"]
+      incr count_
+      ::file copy -force $tempname $newfile_
+
+      #  Now delete old catalogue.
+      if { [::file exists $oldfile] } {
+         catch { ::file delete -force $oldfile }
+      }
+      
+      #   Finally open catalogue, read and update display.
+      $w_.cat open $newfile_
+      $w_.cat query
       set info_ [$w_.cat content]
       $itk_component(results) config -info $info_
-
-      puts "It must be possible to do this!"
    }
 
    #  Pop up a dialog to enter the data for a new row.
    public method enter_new_object {} {
-      $itk_component(results) enter_new_object [code $this query]
+      $itk_component(results) enter_new_object [code $this refresh_]
    }
 
    #  Pop up a window so that the user can edit the selected object(s).
    public method edit_selected_object {} {
-      $itk_component(results) edit_selected_object [code $this query]
+      $itk_component(results) edit_selected_object [code $this refresh_]
    }
 
    #  Open the catalogue for this window.
@@ -393,8 +430,10 @@ itcl::class gaiavo::GaiaVOCat {
 
          #  Got a VOTable.
          busy {
+            #  Open and read.
             $w_.cat open $result
-            
+            $w_.cat query
+
             #  Need to update GaiaQueryResult with content.
             #  Update table headings.
             set prev_headings $headings_
@@ -452,7 +491,8 @@ itcl::class gaiavo::GaiaVOCat {
       puts stderr "Must implement an add_query_component_ method"
    }
 
-   #  Open a service, "args" is a list of values from a row of the current table.
+   #  Open a service, "args" is a list of values from a row of the 
+   #  current table.
    protected method open_service_ {args} {
       puts stderr "Must implemenent an open_service_ method"
    }
@@ -502,9 +542,15 @@ itcl::class gaiavo::GaiaVOCat {
 
    #  Component that will perform the query. Must be defined in add_query_component_.
    protected variable query_component_ {}
+   
+   #  Temporary file for modified table contents.
+   protected variable newfile_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
+
+   #  Counter for temp names.
+   protected common count_ 0
 
    #  Flag: set to 1 after we checked for a proxy server.
    protected common checked_proxies_ 0

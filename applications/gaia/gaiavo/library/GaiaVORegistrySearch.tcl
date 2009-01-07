@@ -255,12 +255,12 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       configure -service $service
    }
 
-   #  Translate a service type to its full description.
+   #  Translate a service type to its full description or standard ID.
    protected method get_service_ {} {
       if { $itk_option(-registry) == "NVO" } { 
          return $services_($itk_option(-service))
       }
-      return $v1services_($itk_option(-service))
+      return $v1standardIDs_($itk_option(-service))
    }
 
    #  Save the result of a query to an external VOTable.
@@ -313,9 +313,6 @@ itcl::class gaiavo::GaiaVORegistrySearch {
    #  Command to execute when batch jobs starts and stops.
    itk_option define -feedbackcommand feedbackcommand FeedBackCommand {}
 
-   #  An astrocat instance for handling the result as a TST.
-   itk_option define -astrocat astrocat AstroCat {}
-
    #  Command to execute to inititate a query externally (that's use this to
    #  do the same job as the "Query" button). Issued when return is pressed in
    #  the substring entry.
@@ -359,10 +356,11 @@ itcl::class gaiavo::GaiaVORegistrySearch {
    set services_(SSAP) "SimpleSpectralAccess"
    set services_(CONE) "ConeSearch"
 
-   protected common v1services_
-   set v1services_(SIAP) "sia:SimpleImageAccess"
-   set v1services_(SSAP) "ssa:SimpleSpectralAccess"
-   set v1services_(CONE) "cs:ConeSearch"
+   #  Mapping of short service names to their standard ids.
+   protected common v1standardIDs_
+   set v1standardIDs_(SIAP) "ivo://ivoa.net/std/SIA"
+   set v1standardIDs_(SSAP) "ivo://ivoa.net/std/SSA"
+   set v1standardIDs_(CONE) "ivo://ivoa.net/std/ConeSearch"
 
    #  The endmethod of the NVO registry.
    protected common nvoendmethod_ "VOTCapabilityPredicate"
