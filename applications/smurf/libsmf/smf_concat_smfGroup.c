@@ -245,7 +245,6 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
             status );
   } else {
     /* Find the range of indices */
-
     foundfirst = 0;
     foundlast = 0;
     
@@ -293,13 +292,10 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
     /* Two passes over data for the subarray: first time to identify
        dimensions of each file, second time to actually open each file
        and copy into single array. */
-
     for( pass=0; pass<2; pass++ ) {
-      
       /* Loop over subgroups (number of time chunks), continuing only
          if the chunk is equal to whichchunk */
       for( j=firstpiece; j<=lastpiece; j++ ) {
-
         /* First pass - get dimensions */
         if( pass == 0 ) {
 
@@ -569,7 +565,6 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
 
             /* Copy DATA/QUALITY/VARIANCE and JCMTstate information into
                concatenated smfData */
-
             if( *status == SAI__OK ) {
 
               /* Which dimension contains reference time slices depends on
@@ -649,7 +644,6 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
               tchunk += reftlen;
             }
           }
-
           /* Close the file we had open */
           smf_close_file( &refdata, status );
         }
@@ -661,7 +655,6 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
        regions of the data with something intelligent.  */
 
     if( *status == SAI__OK ) for( j=0; j<2; j++ ) { /* Loop padded region */
-        
         tstart = 0;
         tend = 0;
       
@@ -701,8 +694,7 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
                 /* Use memset for bolo-ordered data */
                 memset( (char *)data->pntr[2]+k*tlen+tstart, qual, 
                         tend-tstart+1);
-              }
-            
+              }            
             }
           }
 
@@ -767,6 +759,5 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
     /* Put this concatenated subarray into the smfArray */
     smf_addto_smfArray( *concat, data, status );
   }
-
 }
 
