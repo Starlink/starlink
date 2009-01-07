@@ -115,6 +115,8 @@
 *        Concat dark squid signals.
 *     2008-12-04 (EC):
 *        Padded JCMTState filled with first/last real values.
+*     2009-01-07 (EC):
+*        Stride-ify
 
 *  Notes:
 *     If projection information supplied, pointing LUT will not be
@@ -131,8 +133,9 @@
 *     VAL__BADI, and the JCMTState values are all set to 0.
 
 *  Copyright:
+*     Copyright (C) 2007-2009 University of British Columbia.
 *     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     
 *     All Rights Reserved.
 
 *  Licence:
@@ -183,7 +186,7 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
                           int *status ) {
 
   /* Local Variables */
-  dim_t base;                   /* Base for array index */
+  size_t bstr;                  /* Concatenated bolo stride */
   int creflag;                  /* flags for smfData creation */
   smfDA *da=NULL;               /* Pointer to smfDA struct */
   smfData *data=NULL;           /* Concatenated smfData */
@@ -200,23 +203,28 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
   dim_t j;                      /* Loop counter */
   dim_t k;                      /* Loop counter */
   dim_t l;                      /* Loop counter */
+  dim_t m;                      /* Loop counter */
   dim_t lastpiece = 0;          /* index to end of whichchunk */
   dim_t nbolo=0;                /* Number of detectors */
   dim_t ncol=0;                 /* Number of columns */
   dim_t ndata;                  /* Total data points: nbolo*tlen */
   dim_t nrelated;               /* Number of subarrays */
+  dim_t nrow;                   /* Number of rows */
   Grp *outgrp=NULL;             /* Pointer to 1-element output group */
   size_t outgrpsize;            /* Size of outgrp */
   int pass;                     /* Two passes over list of input files */
   char *pname;                  /* Pointer to input filename */
   unsigned char qual;           /* Set quality */
   smfData *refdata=NULL;        /* Reference smfData */
-  dim_t refdims[2];             /* reference dimensions for array (not time) */
   smf_dtype refdtype;           /* reference DATA/VARIANCE type */
   const char *refdtypestr;      /* const string for reference data type */
   smfHead *refhdr=NULL;         /* pointer to smfHead in ref data */
+  dim_t refncol=0;              /* reference number of rows */
   dim_t refndata;               /* Number data points in reference file */
+  dim_t refnrow=0;              /* reference number of rows */
   dim_t reftlen;                /* Number of time slices in reference file */
+  size_t rbstr;                 /* Reference bolo stride */
+  size_t rtstr;                 /* Reference time slice stride */
   JCMTState *sourceState=NULL;  /* temporary JCMTState pointer */
   double steptime;              /* Length of a sample in seconds */
   dim_t tchunk = 0;             /* Time offset in concat. array this chunk */
@@ -225,14 +233,12 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
   dim_t tlen;                   /* Time length entire concatenated array */
   double torigin;               /* Origin of TimeFrame */
   dim_t tstart;                 /* Time at end of padded region */
+  smf_dtype type;               /* type of array */
+  size_t tstr;                  /* Concatenated time slice stride */
   dim_t sz;                     /* Data type size */
 
   /* Main routine */
   if (*status != SAI__OK) return;
-
-  /* Compiler warnings */
-  refdims[0] = 1;
-  refdims[1] = 1;
 
   /* Verify that we have a valid whichchunk, and determine the range of
      indices into igrp->chunk */
@@ -304,7 +310,6 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
 
           /* Verify that the array is 3-dimensional and compatible with the
              reference array dimensions. */
-
           if( *status == SAI__OK ) {
             msgSetc( "FILE", refdata->file->name );
 
@@ -318,7 +323,6 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
 
           /* If data order is 0 (bolo-ordered) then fail since that case
              is not currently handled. */
-
           if( (*status == SAI__OK) && (refdata->isTordered == 0) ) {
             *status = SAI__ERROR;
             errRep( "", FUNC_NAME 
@@ -326,16 +330,16 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
                    status);
           }
 
+          /* Get data dimensions */
+          smf_get_dims( refdata, &nrow, &ncol, 
+                        NULL, &reftlen, NULL, NULL, NULL, status );
+
           if( *status == SAI__OK ) {
             if( j == firstpiece ) {
               /* If this is the first chunk we will use it for refdims
-                 - check the number of bolometers! (Assumption is that
-                 input data is standard ICD-compliant time-ordered
-                 data) */
-
-              refdims[0] = refdata->dims[0];
-              refdims[1] = refdata->dims[1];
-              nbolo = refdims[0]*refdims[1];
+                 - check the number of bolometers! */
+              refnrow = nrow;
+              refncol = ncol;
 
               /* Check for DATA/VARIANCE/QUALITY and data type */
               for( k=0; k<3; k++ ) {
@@ -348,21 +352,17 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
 
             } else {
               /* Check these dims against refdims */
-              if( (refdata->dims[0] != refdims[0]) || 
-                  (refdata->dims[1] != refdims[1]) ) {
-
+              if( (nrow != refnrow) || (ncol != refncol) ) {
                 *status = SAI__ERROR;
-                msgSeti( "XREF", refdims[0] );
-                msgSeti( "YREF", refdims[1] );
-                msgSeti( "X", refdata->dims[0] );
-                msgSeti( "Y", refdata->dims[1] );
-		
+                msgSeti( "XREF", refnrow );
+                msgSeti( "YREF", refncol );
+                msgSeti( "X", nrow );
+                msgSeti( "Y", ncol );
                 errRep( "", FUNC_NAME ": Detector dimensions (^X,^Y) in "
                         "^FILE do not match reference (^XREF,^YREF)", status );
               }
 	      
               /* Check existence of DATA/QUALITY/VARIANCE */
-
               if( (refdata->pntr[0] != NULL) != havearray[0] ) {
                 *status = SAI__ERROR;
                 if( havearray[0] ) msgSetc( "FLAG", "is missing" );
@@ -390,7 +390,7 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
 
           if( *status == SAI__OK ) {
             /* At this stage increment tlen for this chunk */	  
-            tlen += refdata->dims[2];
+            tlen += reftlen;
           }
 
           /* Close the reference file */
@@ -399,10 +399,8 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
       
       	/* Second pass copy data over to new array */
         if( (pass == 1) && (*status == SAI__OK) ) {
-
           /* Open the file corresponding to this chunk. Data may
              require flat-fielding. */
-
           smf_open_and_flatfield( igrp->grp, NULL, igrp->subgroups[j][i], 
                                   darks, &refdata, status );
 
@@ -413,18 +411,17 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
             havelut = 1;
 
             /* Calculate the LUT for this chunk */
-
             smf_calc_mapcoord( refdata, outfset, moving, lbnd_out, ubnd_out, 
                                SMF__NOCREATE_FILE, status );
           } else {
             havelut = 0;
           }
 
-          /* Change data order if required */
-          smf_dataOrder( refdata, isTordered, status );
+          /* Get reference dimensions/strides */
+          smf_get_dims( refdata, NULL, NULL, &nbolo, &reftlen, &refndata, 
+                        &rbstr, &rtstr, status );
 
           if( *status == SAI__OK ) {
-
             /* If first chunk initialize the concatenated array */
             if( j == firstpiece ) {
               /* Copy first data right after the initial padding */
@@ -432,7 +429,6 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
  
               /* Allocate memory for empty smfData with a smfHead. Create
                  a DA struct only if the input file has one. */
-
               if( refdata->da ) creflag = 0;
               else creflag = SMF__NOCREATE_DA;
               data = smf_create_smfData( creflag, status );
@@ -483,14 +479,14 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
 		
                 /* Allocate space in the smfData for DATA/VARAIANCE/QUALITY */
                 if( isTordered ) {
-                  data->dims[0] = refdims[0];
-                  data->dims[1] = refdims[1];
+                  data->dims[0] = refncol;
+                  data->dims[1] = refnrow;
                   data->dims[2] = tlen;
                   ncol = data->dims[SMF__COL_INDEX];
                 } else {
                   data->dims[0] = tlen;
-                  data->dims[1] = refdims[0];
-                  data->dims[2] = refdims[1];
+                  data->dims[1] = refnrow;
+                  data->dims[2] = refncol;
                   ncol = data->dims[1+SMF__COL_INDEX];
                 }
                 data->ndims = 3;
@@ -499,6 +495,10 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
                 data->dtype = refdtype;
                 data->isTordered = isTordered;
                 ndata = nbolo*tlen;
+
+                /* get the strides */
+                smf_get_dims( data, NULL, NULL, NULL, NULL, NULL,
+                              &bstr, &tstr, status );
 
                 /* Allocate space for dksquid array. Ignore other DA for now*/
                 if( da ) {
@@ -522,7 +522,6 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
                    but SMF__NOCREATE_QUALITY is also not set. In this
                    case, allocate a fresh QUALITY component that will
                    not require propagation from the template */
-		
                 if( !havearray[2] && !(flags & SMF__NOCREATE_QUALITY) ) {
                   data->pntr[2] = smf_malloc(ndata, 
                                              smf_dtype_sz(SMF__UBYTE,status),
@@ -559,24 +558,12 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
                     }
                   }
                 }		
-
               }
             }
 
             /* Copy DATA/QUALITY/VARIANCE and JCMTstate information into
                concatenated smfData */
             if( *status == SAI__OK ) {
-
-              /* Which dimension contains reference time slices depends on
-                 ordering */
-              if( isTordered ) {
-                reftlen = refdata->dims[2]; 
-              } else {
-                reftlen = refdata->dims[0];
-              }
-
-              refndata = reftlen*nbolo;
-
               /* Copy over JCMTstate */
               hdr = data->hdr;
               refhdr = refdata->hdr;	    
@@ -586,21 +573,10 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
 
               /* Copy LUT */
               if( havelut ) {
-                sz = sizeof( *(refdata->lut) );
-                if( isTordered ) {
-                  /* If concatenating time-ordered data just copy entire
-                     chunk over at once */
-
-                  memcpy( (char *)data->lut + tchunk*nbolo*sz,
-                          refdata->lut, refndata*sz );
-                } else {
-                  /* If concatenating bolo-ordered data need to copy
-                     one chunk of bolometer data over at a time */
-		  
-                  for( l=0; l<nbolo; l++ ) {
-                    memcpy( (char *)data->lut + l*tlen*sz + tchunk*sz,
-                            (char *)refdata->lut + l*reftlen*sz,
-                            reftlen*sz );
+                for( l=0; l<nbolo; l++ ) {
+                  for( m=0; m<reftlen; m++ ) {
+                    data->lut[(tchunk+m)*tstr + l*bstr] =
+                      refdata->lut[m*rtstr + l*rbstr];
                   }
                 }
               }
@@ -613,31 +589,34 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
 
               /* Now do DATA/QUALITY/VARIANCE */
               for( k=0; k<3; k++ ) if( havearray[k] ) {
-                  if( k == 2 ) sz = smf_dtype_sz( SMF__UBYTE, status );
-                  else sz = smf_dtype_sz(data->dtype, status );
-	      
-                  if( *status == SAI__OK ) {
+                  if( k == 2 ) type = SMF__UBYTE;
+                  else type = data->dtype;
 
-                    if( isTordered ) {
-                      /* If concatenating time-ordered data just copy entire
-                         chunk over at once */
-
-                      memcpy( (char *)data->pntr[k] + tchunk*nbolo*sz,
-                              refdata->pntr[k], refndata*sz );
-
-                    } else {
-                      /* If concatenating bolo-ordered data need to copy
-                         one chunk of bolometer data over at a time */
-
-                      for( l=0; l<nbolo; l++ ) {
-                        memcpy( (char *)data->pntr[k] + l*tlen*sz + tchunk*sz,
-                                (char *)refdata->pntr[k] + l*reftlen*sz,
-                                reftlen*sz );
+                  switch( type ) {
+                  case SMF__DOUBLE:
+                    for( l=0; l<nbolo; l++ ) {
+                      for( m=0; m<reftlen; m++ ) {
+                        ((double *)data->pntr[k])[(tchunk+m)*tstr + l*bstr] =
+                          ((double *)refdata->pntr[k])[m*rtstr + l*rbstr];
                       }
-
                     }
+                    break;
+                  case SMF__UBYTE:
+                    for( l=0; l<nbolo; l++ ) {
+                      for( m=0; m<reftlen; m++ ) {
+                        ((unsigned char *)data->pntr[k])[(tchunk+m)*tstr + 
+                                                         l*bstr] =
+                          ((unsigned char *)refdata->pntr[k])[m*rtstr + 
+                                                              l*rbstr];
+                      }
+                    }
+                    break;
+                  default:
+                    msgSetc("DTYPE",smf_dtype_str(type, status));
+                    *status = SAI__ERROR;
+                    errRep( "", FUNC_NAME 
+                            ": Don't know how to handle ^DTYPE type.", status);
                   }
-
                 }
 	    
               /* increment tchunk */
@@ -654,7 +633,7 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
     /* Full subarray is now concatenated. Finish up by filling the padded
        regions of the data with something intelligent.  */
 
-    if( *status == SAI__OK ) for( j=0; j<2; j++ ) { /* Loop padded region */
+    for( j=0; (*status==SAI__OK)&&(j<2); j++ ) { /* Loop padded region */
         tstart = 0;
         tend = 0;
       
@@ -678,44 +657,25 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
               /* SMF__Q_PAD always set */
               qual = SMF__Q_PAD;
 
-              if( isTordered ) {
-                /* Check for SMF__Q_BADB in first sample of this bolo */
-                qual |= ((char *)data->pntr[2])[nbolo*padStart+k] & SMF__Q_BADB;
+              /* Check for SMF__Q_BADB in first sample of this bolo */
+              qual |= ((char *)data->pntr[2])[padStart*tstr+k*bstr]&SMF__Q_BADB;
 
-                /* Need to loop over time slice for time-ordered data */
-                for( l=tstart; l<=tend; l++ ) {
-                  ((char *)data->pntr[2])[nbolo*l+k] = qual;
-                }
-
-              } else {
-                /* Check for SMF__Q_BADB in first sample of this bolo */
-                qual |= ((char *)data->pntr[2])[k*tlen+padStart] & SMF__Q_BADB;
-
-                /* Use memset for bolo-ordered data */
-                memset( (char *)data->pntr[2]+k*tlen+tstart, qual, 
-                        tend-tstart+1);
-              }            
+              /* Loop over relevant time slices at set quality */
+              for( l=tstart; l<=tend; l++ ) {
+                ((char *)data->pntr[2])[l*tstr+k*bstr] |=  qual;
+              }
             }
           }
 
           /* If LUT present, set data to VAL__BADI */
           if( data->lut ) {
-            if( isTordered ) {
-              /* Loop over continuous chunk of data if time-ordered */
-              for( l=tstart*nbolo; l<=(tend+1)*nbolo-1; l++ ) {
-                data->lut[l] = VAL__BADI;
-              }
-            } else {
-              /* Loop over bolo if bolo-ordered */
+            for( l=tstart; l<=tend; l++ ) {
               for( k=0; k<nbolo; k++ ) {
-                base = k*tlen;
-                for( l=base+tstart; l<=base+tend; l++ ) {
-                  data->lut[l] = VAL__BADI;
-                }
+                data->lut[l*tstr + k*bstr] = VAL__BADI;
               }
             }
           }
-
+          
           /* If smfHead->allState present, pad with start/finish values */
           if( (data->hdr) && (data->hdr->allState) ) {
             /* Pointer to first/last real JCMTState */
