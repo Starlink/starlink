@@ -133,10 +133,10 @@ proc get {query outfile} {
 #  Endpoint can terminate in & or ?
 switch -glob $endpoint {
    *& {
-      set query ${endpoint}POS=${ra},${dec}&SIZE=${size}
+      set query ${endpoint}POS=${ra},${dec}&SIZE=${size}&FORMAT=image/fits
    }
    default {
-      set query ${endpoint}&POS=${ra},${dec}&SIZE=${size}
+      set query ${endpoint}&POS=${ra},${dec}&SIZE=${size}&FORMAT=image/fits
    }
 }
 
