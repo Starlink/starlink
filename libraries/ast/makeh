@@ -176,6 +176,11 @@ print( ' (makeh):
 *-
 */
 
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 ' );
 
 #  Open the scratch file created above and read it.
