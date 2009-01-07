@@ -68,6 +68,8 @@
 *        -always set data dimensions (moved out of loop)
 *     2008-02-08 (EC):
 *        -Fixed dtype for QUALITY -- SMF__UBYTE instead of SMF__USHORT
+*     2009-01-06 (EC):
+*        Stride-ify
 
 *  Notes:
 *     Nothing is done about the FITS channels or WCS information stored in
@@ -75,7 +77,7 @@
 *     bolo-ordered data produced with this routine.
 
 *  Copyright:
-*     Copyright (C) 2005-2008 University of British Columbia.
+*     Copyright (C) 2005-2009 University of British Columbia.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -120,7 +122,8 @@
 void smf_dataOrder( smfData *data, int isTordered, int *status ) {
 
   /* Local Variables */
-  dim_t bolobase;               /* base index for time-ordered array offsets */
+  size_t bstr1;                 /* bolometer index stride input */
+  size_t bstr2;                 /* bolometer index stride output */
   smf_dtype dtype;              /* Data array type */
   dim_t i;                      /* loop counter */
   int inPlace=0;                /* If set change array in-place */
@@ -134,7 +137,8 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
   dim_t newdims[3];             /* Size of each dimension new buffer */ 
   int *newlut=NULL;             /* Pointer to pointing LUT */
   dim_t ntslice;                /* Number of time slices */
-  dim_t timebase;               /* base index for time-ordered array offsets */
+  size_t tstr1;                 /* time index stride input */
+  size_t tstr2;                 /* time index stride output */
   size_t sz=0;                  /* Size of element of data array */
 
   /* Main routine */
@@ -169,31 +173,31 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
   }
 
   /* inPlace=1 if smfData was mapped! */
-  if( data->file ) {
-    if( data->file->fd || data->file->ndfid ) {
-      inPlace = 1;
-    }
+  if( data->file && (data->file->fd || data->file->ndfid) ) {
+    inPlace = 1;
   } 
 
-  /* Calculate data dimensions */
-  if( data->isTordered ) {
-    nbolo = (data->dims)[0]*(data->dims)[1];
-    ntslice = (data->dims)[2];
-    newdims[0] = (data->dims)[2];
-    newdims[1] = (data->dims)[0];
-    newdims[2] = (data->dims)[1];
-  } else {
-    ntslice = (data->dims)[0];
-    nbolo = (data->dims)[1]*(data->dims)[2];
+  /* Calculate input data dimensions (before changing order) */
+  smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, &ndata, &bstr1, &tstr1,
+                status);
+
+  /* What will the dimensions/strides be in the newly-ordered array? */
+  if( isTordered ) {
     newdims[0] = (data->dims)[1];
     newdims[1] = (data->dims)[2];
     newdims[2] = (data->dims)[0];
+    bstr2 = 1;
+    tstr2 = nbolo;
+  } else {
+    newdims[0] = (data->dims)[2];
+    newdims[1] = (data->dims)[0];
+    newdims[2] = (data->dims)[1];
+    bstr2 = ntslice;
+    tstr2 = 1;
   }
-  ndata = nbolo*ntslice;
 
   /* Loop over elements of data->ptr and re-form arrays */
   for( i=0; i<3; i++ ) if( data->pntr[i] ) {
-
       /* Pointer to component we're looking at */
       oldbuf = data->pntr[i];
 
@@ -211,134 +215,59 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
 
       if( *status == SAI__OK ) {
 
-        timebase = 0;
-        if( isTordered ) { /* Converting bolo ordered -> time ordered */
-	
-          /* Switch on the data type outside the main loops */	
-          switch( dtype ) {
-          case SMF__INTEGER:
-            for( j=0; j<ntslice; j++ ) { /* Loop over tslice */
-              bolobase = 0;
-              for( k=0; k<nbolo; k++ ) { /* Loop over bolo */
-                ((int *)newbuf)[timebase+k] = ((int *)oldbuf)[bolobase+j];
-                bolobase += ntslice;
-              }
-              timebase += nbolo;
+        /* Loop over all of the elements and re-order the data */
+        switch( dtype ) {
+        case SMF__INTEGER:
+          for( j=0; j<ntslice; j++ ) {
+            for( k=0; k<nbolo; k++ ) {
+              ((int *)newbuf)[j*tstr2+k*bstr2] = 
+                ((int *)oldbuf)[j*tstr1+k*bstr1];
             }
-            break;
-	  
-          case SMF__FLOAT:
-            for( j=0; j<ntslice; j++ ) { /* Loop over tslice */
-              bolobase = 0;
-              for( k=0; k<nbolo; k++ ) { /* Loop over bolo */
-                ((float *)newbuf)[timebase+k] = ((float *)oldbuf)[bolobase+j];
-                bolobase += ntslice;
-              }
-              timebase += nbolo;
-            }
-            break;
-	  
-          case SMF__DOUBLE:
-            for( j=0; j<ntslice; j++ ) { /* Loop over tslice */
-              bolobase = 0;
-              for( k=0; k<nbolo; k++ ) { /* Loop over bolo */
-                ((double *)newbuf)[timebase+k] = ((double *)oldbuf)[bolobase+j];
-                bolobase += ntslice;
-              }
-              timebase += nbolo;
-            }
-            break;
-	  
-          case SMF__UBYTE:
-            for( j=0; j<ntslice; j++ ) { /* Loop over tslice */
-              bolobase = 0;
-              for( k=0; k<nbolo; k++ ) { /* Loop over bolo */
-                ((unsigned char *)newbuf)[timebase+k] = 
-                  ((unsigned char *)oldbuf)[bolobase+j];
-                bolobase += ntslice;
-              }
-              timebase += nbolo;
-            }
-            break;
-
-          default:
-            msgSetc("DTYPE",smf_dtype_string(data, status));
-            *status = SAI__ERROR;
-            errRep( "", FUNC_NAME 
-                    ": Don't know how to handle ^DTYPE type.", status);
           }
-
-        } else {          /* Converting time ordered -> bolo ordered */
-
-          /* Switch on the data type outside the main loops */
-	
-          switch( dtype ) {
-          case SMF__INTEGER:
-            for( j=0; j<ntslice; j++ ) { /* Loop over tslice */
-              bolobase = 0;
-              for( k=0; k<nbolo; k++ ) { /* Loop over bolo */
-                ((int *)newbuf)[bolobase+j] = ((int *)oldbuf)[timebase+k];
-                bolobase += ntslice;
-              }
-              timebase += nbolo;
+          break;
+          
+        case SMF__FLOAT:
+          for( j=0; j<ntslice; j++ ) {
+            for( k=0; k<nbolo; k++ ) {
+              ((float *)newbuf)[j*tstr2+k*bstr2] = 
+                ((float *)oldbuf)[j*tstr1+k*bstr1];
             }
-            break;
-
-          case SMF__FLOAT:
-            for( j=0; j<ntslice; j++ ) { /* Loop over tslice */
-              bolobase = 0;
-              for( k=0; k<nbolo; k++ ) { /* Loop over bolo */
-                ((float *)newbuf)[bolobase+j] = ((float *)oldbuf)[timebase+k];
-                bolobase += ntslice;
-              }
-              timebase += nbolo;
-            }
-            break;
-
-          case SMF__DOUBLE:
-            for( j=0; j<ntslice; j++ ) { /* Loop over tslice */
-              bolobase = 0;
-              for( k=0; k<nbolo; k++ ) { /* Loop over bolo */
-                ((double *)newbuf)[bolobase+j] = ((double *)oldbuf)[timebase+k];
-                bolobase += ntslice;
-              }
-              timebase += nbolo;
-            }
-            break;
-
-          case SMF__UBYTE:
-            for( j=0; j<ntslice; j++ ) { /* Loop over tslice */
-              bolobase = 0;
-              for( k=0; k<nbolo; k++ ) { /* Loop over bolo */
-                ((unsigned char *)newbuf)[bolobase+j] = 
-                  ((unsigned char *)oldbuf)[timebase+k];
-                bolobase += ntslice;
-              }
-              timebase += nbolo;
-            }
-            break;
-
-          default:
-            msgSetc("DTYPE",smf_dtype_string(data, status));
-            *status = SAI__ERROR;
-            errRep( "", FUNC_NAME 
-                    ": Don't know how to handle ^DTYPE type.", status);
           }
+          break;
+
+        case SMF__DOUBLE:
+          for( j=0; j<ntslice; j++ ) {
+            for( k=0; k<nbolo; k++ ) {
+              ((double *)newbuf)[j*tstr2+k*bstr2] = 
+                ((double *)oldbuf)[j*tstr1+k*bstr1];
+            }
+          }
+          break;
+
+        case SMF__UBYTE:
+          for( j=0; j<ntslice; j++ ) {
+            for( k=0; k<nbolo; k++ ) {
+              ((unsigned char *)newbuf)[j*tstr2+k*bstr2] = 
+                ((unsigned char *)oldbuf)[j*tstr1+k*bstr1];
+            }
+          }
+          break;
+
+        default:
+          msgSetc("DTYPE",smf_dtype_string(data, status));
+          *status = SAI__ERROR;
+          errRep( "", FUNC_NAME 
+                  ": Don't know how to handle ^DTYPE type.", status);
         }
 
         if( inPlace ) {
           /* Copy newbuf to oldbuf */
-
           memcpy( oldbuf, newbuf, ndata*sz );
-
           /* Free newbuf */
           newbuf = smf_free( newbuf, status );
-
         } else {
-
           /* Free oldbuf */
           oldbuf = smf_free( oldbuf, status );
-
           /* Set pntr to newbuf */
           data->pntr[i] = (void *) newbuf;
         }
@@ -346,54 +275,31 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
     }
 
   /* If NDF associated with data, modify dimensions of the data */
-  if( data->file ) {
-    if( data->file->ndfid != NDF__NOID ) {
-      fprintf(stderr,
-              "Do not yet handle changing dimensions of NDF on reorder\n");
-    }
+  if( data->file && (data->file->ndfid != NDF__NOID) ) {
+    fprintf(stderr,
+            "Do not yet handle changing dimensions of NDF on reorder\n");
   }
 
   /* If there is a LUT re-order it here */
   oldlut = data->lut;
   if( oldlut ) {
-
     newlut = smf_malloc( ndata, sizeof(*newlut), 0, status );
 
     if( *status == SAI__OK ) {
-      if( isTordered ) { /* Converting bolo ordered -> time ordered */
-        timebase = 0;
-        for( j=0; j<ntslice; j++ ) { /* Loop over tslice */
-          bolobase = 0;
-          for( k=0; k<nbolo; k++ ) { /* Loop over bolo */
-            ((int *)newlut)[timebase+k] = ((int *)oldlut)[bolobase+j];
-            bolobase += ntslice;
-          }
-          timebase += nbolo; 
-        }
-      } else {           /* Converting time ordered -> bolo ordered */
-        timebase = 0;
-        for( j=0; j<ntslice; j++ ) { /* Loop over tslice */
-          bolobase = 0;
-          for( k=0; k<nbolo; k++ ) { /* Loop over bolo */
-            ((int *)newlut)[bolobase+j] = ((int *)oldlut)[timebase+k];
-            bolobase += ntslice;
-          }
-          timebase += nbolo; 
+      for( j=0; j<ntslice; j++ ) {
+        for( k=0; k<nbolo; k++ ) {
+          ((int *)newlut)[j*tstr2+k*bstr2] = ((int *)oldlut)[j*tstr1+k*bstr1];
         }
       }
 
       if( inPlace ) {
         /* Copy newlut to oldlut */
-        memcpy( oldlut, newlut, ndata*sizeof(*newlut) );
-	
+        memcpy( oldlut, newlut, ndata*sizeof(*newlut) );	
         /* Free newlut */
         newlut = smf_free( newlut, status );
-	
-      } else {
-	
+      } else {	
         /* Free oldlut */
         oldlut = smf_free( oldlut, status );
-
         /* Set pntr to newbuf */
         data->lut = newlut;
       }
@@ -405,5 +311,4 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
     memcpy( data->dims, newdims, 3*sizeof(*newdims) );
     data->isTordered = isTordered;
   }
-
 }
