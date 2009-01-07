@@ -79,7 +79,9 @@
 /* URI defining the starlink AST XML namespace */
 #define AST__XMLNS  "http://www.starlink.ac.uk/ast/xml/"
 
-#if defined(astCLASS)            /* Protected */
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
 #endif
 
 /* Type Definitions. */
@@ -182,11 +184,7 @@ AstXmlChan *astXmlChan_( const char *(*)( void ), void (*)( const char * ),
                           const char *, int *, ...);
 #else
 AstXmlChan *astXmlChanId_( const char *(*)( void ), void (*)( const char * ),
-                            const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,3,4)))
-#endif
-;
+                            const char *, ... )__attribute__((format(printf,3,4)));
 AstXmlChan *astXmlChanForId_( const char *(*)( void ),
                               char *(*)( const char *(*)( void ), int * ),
                               void (*)( const char * ),

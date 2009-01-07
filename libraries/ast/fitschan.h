@@ -123,6 +123,10 @@
 /* Macros. */
 /* ------- */
 
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
 
 #if defined(astCLASS) || defined(astFORTRAN77)
 #define STATUS_PTR status
@@ -314,11 +318,7 @@ AstFitsChan *astFitsChan_( const char *(*)( void ), void (*)( const char * ),
                           const char *, int *, ...);
 #else
 AstFitsChan *astFitsChanId_( const char *(*)( void ), void (*)( const char * ),
-                            const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,3,4)))
-#endif
-;
+                            const char *, ... )__attribute__((format(printf,3,4)));
 AstFitsChan *astFitsChanForId_( const char *(*)( void ),
                               char *(*)( const char *(*)( void ), int * ),
                               void (*)( const char * ),

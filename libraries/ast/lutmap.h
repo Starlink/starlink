@@ -134,6 +134,14 @@
 #include <stddef.h>
 #endif
 
+/* Macros */
+/* ====== */
+
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Type Definitions. */
 /* ================= */
 /* LutMap structure. */
@@ -203,11 +211,7 @@ astPROTO_ISA(LutMap)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstLutMap *astLutMap_( int, const double [], double, double, const char *, int *, ...);
 #else
-AstLutMap *astLutMapId_( int, const double [], double, double, const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,5,6)))
-#endif
-;
+AstLutMap *astLutMapId_( int, const double [], double, double, const char *, ... )__attribute__((format(printf,5,6)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

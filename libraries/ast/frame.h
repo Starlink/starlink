@@ -557,6 +557,11 @@
 #define STATUS_PTR astGetStatusPtr
 #endif
 
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 #if defined(astCLASS)            /* Protected */
 
 /* A bad value for the System attribute. */
@@ -837,11 +842,7 @@ astPROTO_ISA(Frame)              /* Test class membership */
 #if defined(astCLASS)            /* Protected */
 AstFrame *astFrame_( int, const char *, int *, ...);
 #else
-AstFrame *astFrameId_( int, const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,2,3)))
-#endif
-;
+AstFrame *astFrameId_( int, const char *, ... )__attribute__((format(printf,2,3)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

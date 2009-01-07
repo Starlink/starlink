@@ -90,6 +90,11 @@
 #define AST__AND 1
 #define AST__OR 2
 
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Type Definitions. */
 /* ================= */
 /* CmpRegion structure. */
@@ -154,11 +159,7 @@ astPROTO_ISA(CmpRegion)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstCmpRegion *astCmpRegion_( void *, void *, int, const char *, int *, ...);
 #else
-AstCmpRegion *astCmpRegionId_( void *, void *, int, const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,4,5)))
-#endif
-;
+AstCmpRegion *astCmpRegionId_( void *, void *, int, const char *, ... )__attribute__((format(printf,4,5)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

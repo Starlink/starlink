@@ -78,6 +78,14 @@
 #include <stddef.h>
 #endif
 
+/* Macros */
+/* ====== */
+
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Type Definitions. */
 /* ================= */
 /* PointList structure. */
@@ -141,11 +149,7 @@ astPROTO_ISA(PointList)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstPointList *astPointList_( void *, int, int, int, const double *, AstRegion *, const char *, int *, ...);
 #else
-AstPointList *astPointListId_( void *, int, int, int, const double *, AstRegion *, const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,7,8)))
-#endif
-;
+AstPointList *astPointListId_( void *, int, int, int, const double *, AstRegion *, const char *, ... )__attribute__((format(printf,7,8)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

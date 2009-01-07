@@ -186,6 +186,11 @@
 #endif
 #define AST_MATHMAP_RAND_CONTEXT_NTAB_ (32)
 
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Type Definitions. */
 /* ================= */
 /* Random number generator context. */
@@ -285,11 +290,7 @@ AstMathMap *astMathMap_( int, int, int, const char *[], int, const char *[],
                          const char *, int *, ...);
 #else
 AstMathMap *astMathMapId_( int, int, int, const char *[], int, const char *[],
-                           const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,7,8)))
-#endif
-;
+                           const char *, ... )__attribute__((format(printf,7,8)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

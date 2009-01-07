@@ -72,6 +72,14 @@
 #include <stddef.h>
 #endif
 
+/* Macros */
+/* ====== */
+
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Type Definitions. */
 /* ================= */
 /* GrismMap structure. */
@@ -178,11 +186,7 @@ astPROTO_ISA(GrismMap)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstGrismMap *astGrismMap_( const char *, int *, ...);
 #else
-AstGrismMap *astGrismMapId_( const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,1,2)))
-#endif
-;
+AstGrismMap *astGrismMapId_( const char *, ... )__attribute__((format(printf,1,2)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

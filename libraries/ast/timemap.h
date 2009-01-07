@@ -131,6 +131,14 @@
 #include <stddef.h>
 #endif
 
+/* Macros */
+/* ====== */
+
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* TimeMap structure. */
 /* ----------------- */
 /* This structure contains all information that is unique to each
@@ -193,11 +201,7 @@ astPROTO_ISA(TimeMap)             /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstTimeMap *astTimeMap_( int, const char *, int *, ...);
 #else
-AstTimeMap *astTimeMapId_( int, const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,2,3)))
-#endif
-;
+AstTimeMap *astTimeMapId_( int, const char *, ... )__attribute__((format(printf,2,3)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

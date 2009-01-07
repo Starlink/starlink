@@ -342,6 +342,11 @@
 #define AST__HPX 30
 #define AST__WCSBAD 31   /* A bad projection type */
 
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Type Definitions. */
 /* ================= */
 /* WcsMap structure. */
@@ -414,11 +419,7 @@ astPROTO_ISA(WcsMap)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstWcsMap *astWcsMap_( int, int, int, int, const char *, int *, ...);
 #else
-AstWcsMap *astWcsMapId_( int, int, int, int, const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,5,6)))
-#endif
-;
+AstWcsMap *astWcsMapId_( int, int, int, int, const char *, ... )__attribute__((format(printf,5,6)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

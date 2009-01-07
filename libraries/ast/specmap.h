@@ -138,6 +138,11 @@
 #define AST__C 2.99792458E8      /* Speed of light (metres per second) */
 #define AST__H 6.6260755E-34     /* Plank constant (Joule.seconds) */
 
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* SpecMap structure. */
 /* ----------------- */
 /* This structure contains all information that is unique to each
@@ -200,11 +205,7 @@ astPROTO_ISA(SpecMap)             /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstSpecMap *astSpecMap_( int, int, const char *, int *, ...);
 #else
-AstSpecMap *astSpecMapId_( int, int, const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,3,4)))
-#endif
-;
+AstSpecMap *astSpecMapId_( int, int, const char *, ... )__attribute__((format(printf,3,4)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

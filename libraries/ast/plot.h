@@ -156,6 +156,11 @@
 
 #endif
 
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Type Definitions */
 /* ================ */
 
@@ -659,11 +664,7 @@ astPROTO_ISA(Plot)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstPlot *astPlot_( void *, const float *, const double *, const char *, int *, ...);
 #else
-AstPlot *astPlotId_( void *, const float [], const double [], const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,4,5)))
-#endif
-;
+AstPlot *astPlotId_( void *, const float [], const double [], const char *, ... )__attribute__((format(printf,4,5)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

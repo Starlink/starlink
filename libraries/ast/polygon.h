@@ -79,6 +79,14 @@
 #include <stddef.h>
 #endif
 
+/* Macros */
+/* ====== */
+
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Type Definitions. */
 /* ================= */
 /* Polygon structure. */
@@ -144,11 +152,7 @@ astPROTO_ISA(Polygon)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstPolygon *astPolygon_( void *, int, int, const double *, AstRegion *, const char *, int *, ...);
 #else
-AstPolygon *astPolygonId_( void *, int, int, const double *, AstRegion *, const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,6,7)))
-#endif
-;
+AstPolygon *astPolygonId_( void *, int, int, const double *, AstRegion *, const char *, ... )__attribute__((format(printf,6,7)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

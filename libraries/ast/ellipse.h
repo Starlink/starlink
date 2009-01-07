@@ -78,6 +78,14 @@
 #include <stddef.h>
 #endif
 
+/* Macros */
+/* ====== */
+
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Type Definitions. */
 /* ================= */
 /* Ellipse structure. */
@@ -149,11 +157,7 @@ astPROTO_ISA(Ellipse)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstEllipse *astEllipse_( void *, int, const double[2], const double[2], const double[2], AstRegion *, const char *, int *, ...);
 #else
-AstEllipse *astEllipseId_( void *, int, const double[2], const double[2], const double[2], AstRegion *, const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,7,8)))
-#endif
-;
+AstEllipse *astEllipseId_( void *, int, const double[2], const double[2], const double[2], AstRegion *, const char *, ... )__attribute__((format(printf,7,8)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

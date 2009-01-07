@@ -129,6 +129,14 @@
 #include <stddef.h>
 #endif
 
+/* Macros */
+/* ====== */
+
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Type Definitions. */
 /* ================= */
 /* SelectorMap structure. */
@@ -194,11 +202,7 @@ astPROTO_ISA(SelectorMap)             /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstSelectorMap *astSelectorMap_( int, void **, double, const char *, int *, ...);
 #else
-AstSelectorMap *astSelectorMapId_( int, void **, double, const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,4,5)))
-#endif
-;
+AstSelectorMap *astSelectorMapId_( int, void **, double, const char *, ... )__attribute__((format(printf,4,5)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

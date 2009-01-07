@@ -128,6 +128,14 @@
 #include <stddef.h>
 #endif
 
+/* Macros */
+/* ====== */
+
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Type Definitions. */
 /* ================= */
 /* SwitchMap structure. */
@@ -196,11 +204,7 @@ astPROTO_ISA(SwitchMap)             /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstSwitchMap *astSwitchMap_( void *, void *, int, void **, const char *, int *, ...);
 #else
-AstSwitchMap *astSwitchMapId_( void *, void *, int, void **, const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,5,6)))
-#endif
-;
+AstSwitchMap *astSwitchMapId_( void *, void *, int, void **, const char *, ... )__attribute__((format(printf,5,6)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

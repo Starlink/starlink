@@ -354,6 +354,11 @@
 #define STATUS_PTR astGetStatusPtr
 #endif
 
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Set to "yes" or "no" to indicate if AST was build with threads support. */
 #define AST__THREADSAFE @THREADS@
 
@@ -1376,11 +1381,7 @@ void astLockId_( AstObject *, int, int * );
 void astUnlockId_( AstObject *, int * );
 void astExportId_( AstObject *, int * );
 void astImportId_( AstObject *, int * );
-void astSetId_( void *, const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,2,3)))
-#endif
-;
+void astSetId_( void *, const char *, ... )__attribute__((format(printf,2,3)));
 #endif
 
 void astExemptId_( AstObject *, int * );

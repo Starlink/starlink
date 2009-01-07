@@ -216,6 +216,11 @@
 #define AST__SKYAXIS_DHMSUNIT_BUFF_LEN 17
 #define AST__SKYAXIS_GETATTRIB_BUFF_LEN 50
 
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 
 /* Type Definitions. */
 /* ================= */
@@ -292,11 +297,7 @@ astPROTO_ISA(SkyAxis)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstSkyAxis *astSkyAxis_( const char *, int *, ...);
 #else
-AstSkyAxis *astSkyAxisId_( const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,1,2)))
-#endif
-;
+AstSkyAxis *astSkyAxisId_( const char *, ... )__attribute__((format(printf,1,2)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

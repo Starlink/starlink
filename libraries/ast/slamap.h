@@ -170,6 +170,11 @@
    Supplement to the Astronomical Almanac"). */
 #define AST__SOLRAD 6.96E8 
 
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* SlaMap structure. */
 /* ----------------- */
 /* This structure contains all information that is unique to each
@@ -230,11 +235,7 @@ astPROTO_ISA(SlaMap)             /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstSlaMap *astSlaMap_( int, const char *, int *, ...);
 #else
-AstSlaMap *astSlaMapId_( int, const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,2,3)))
-#endif
-;
+AstSlaMap *astSlaMapId_( int, const char *, ... )__attribute__((format(printf,2,3)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

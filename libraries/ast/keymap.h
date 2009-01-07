@@ -85,6 +85,10 @@
 #define AST__KEYMAP_CONVERTVALUE_BUFF_LEN 50    /* Max. characters in result buffer for ConvertValue */
 #define AST__KEYMAP_MAPKEY_MAX_STRINGS 50       /* Number of string values to buffer in MapKey */
 
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
 
 /* Type Definitions. */
 /* ================= */
@@ -204,11 +208,7 @@ astPROTO_ISA(KeyMap)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstKeyMap *astKeyMap_( const char *, int *, ...);
 #else
-AstKeyMap *astKeyMapId_( const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,1,2)))
-#endif
-;
+AstKeyMap *astKeyMapId_( const char *, ... )__attribute__((format(printf,1,2)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

@@ -274,6 +274,11 @@
 #define STATUS_PTR astGetStatusPtr
 #endif
 
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 #if defined(astCLASS)            /* Protected */
 
 /* The legal System values recognized by this class of Frame. */
@@ -344,11 +349,7 @@ astPROTO_ISA(CmpFrame)           /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstCmpFrame *astCmpFrame_( void *, void *, const char *, int *, ...);
 #else
-AstCmpFrame *astCmpFrameId_( void *, void *, const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,3,4)))
-#endif
-;
+AstCmpFrame *astCmpFrameId_( void *, void *, const char *, ... )__attribute__((format(printf,3,4)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

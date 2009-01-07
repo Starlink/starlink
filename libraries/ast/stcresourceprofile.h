@@ -80,6 +80,14 @@
 #include <stddef.h>
 #endif
 
+/* Macros */
+/* ====== */
+
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Type Definitions. */
 /* ================= */
 /* StcResourceProfile structure. */
@@ -139,11 +147,7 @@ astPROTO_ISA(StcResourceProfile)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstStcResourceProfile *astStcResourceProfile_( void *, int, AstKeyMap **, const char *, int *, ...);
 #else
-AstStcResourceProfile *astStcResourceProfileId_( void *, int, AstKeyMap **, const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,4,5)))
-#endif
-;
+AstStcResourceProfile *astStcResourceProfileId_( void *, int, AstKeyMap **, const char *, ... )__attribute__((format(printf,4,5)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

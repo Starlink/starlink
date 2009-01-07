@@ -174,6 +174,14 @@
 #include <stddef.h>
 #endif
 
+/* Macros */
+/* ====== */
+
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Type Definitions. */
 /* ================= */
 /* PcdMap structure. */
@@ -242,11 +250,7 @@ astPROTO_ISA(PcdMap)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstPcdMap *astPcdMap_( double, const double [2], const char *, int *, ...);
 #else
-AstPcdMap *astPcdMapId_( double, const double [2], const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,3,4)))
-#endif
-;
+AstPcdMap *astPcdMapId_( double, const double [2], const char *, ... )__attribute__((format(printf,3,4)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

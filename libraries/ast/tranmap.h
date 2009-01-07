@@ -128,6 +128,14 @@
 #include <stddef.h>
 #endif
 
+/* Macros */
+/* ====== */
+
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Type Definitions. */
 /* ================= */
 /* TranMap structure. */
@@ -193,11 +201,7 @@ astPROTO_ISA(TranMap)             /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstTranMap *astTranMap_( void *, void *, const char *, int *, ...);
 #else
-AstTranMap *astTranMapId_( void *, void *, const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,3,4)))
-#endif
-;
+AstTranMap *astTranMapId_( void *, void *, const char *, ... )__attribute__((format(printf,3,4)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

@@ -154,6 +154,11 @@
 
 #define AST__ANY (-66)           /* Allow any number of input/output coords */
 
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Type Definitions. */
 /* ================= */
 /* IntraMap structure. */
@@ -232,11 +237,7 @@ astPROTO_ISA(IntraMap)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstIntraMap *astIntraMap_( const char *, int, int, const char *, int *, ...);
 #else
-AstIntraMap *astIntraMapId_( const char *, int, int, const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,4,5)))
-#endif
-;
+AstIntraMap *astIntraMapId_( const char *, int, int, const char *, ... )__attribute__((format(printf,4,5)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

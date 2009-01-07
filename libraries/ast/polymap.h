@@ -132,6 +132,14 @@
 #include <stddef.h>
 #endif
 
+/* Macros */
+/* ====== */
+
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Type Definitions. */
 /* ================= */
 /* PolyMap structure. */
@@ -201,11 +209,7 @@ astPROTO_ISA(PolyMap)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstPolyMap *astPolyMap_( int, int, int, const double[], int, const double[], const char *, int *, ...);
 #else
-AstPolyMap *astPolyMapId_( int, int, int, const double[], int, const double[], const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,7,8)))
-#endif
-;
+AstPolyMap *astPolyMapId_( int, int, int, const double[], int, const double[], const char *, ... )__attribute__((format(printf,7,8)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

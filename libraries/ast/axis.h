@@ -262,6 +262,10 @@
 #define AST__AXIS_GETATTRIB_BUFF_LEN 50
 #endif
 
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
 
 /* Type Definitions. */
 /* ================= */
@@ -379,11 +383,7 @@ astPROTO_ISA(Axis)               /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstAxis *astAxis_( const char *, int *, ...);
 #else
-AstAxis *astAxisId_( const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,1,2)))
-#endif
-;
+AstAxis *astAxisId_( const char *, ... )__attribute__((format(printf,1,2)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

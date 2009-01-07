@@ -71,6 +71,14 @@
 #include <stddef.h>
 #endif
 
+/* Macros */
+/* ====== */
+
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Type Definitions. */
 /* ================= */
 /* NormMap structure. */
@@ -131,11 +139,7 @@ astPROTO_ISA(NormMap)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstNormMap *astNormMap_( void *, const char *, int *, ...);
 #else
-AstNormMap *astNormMapId_( void *, const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,2,3)))
-#endif
-;
+AstNormMap *astNormMapId_( void *, const char *, ... )__attribute__((format(printf,2,3)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

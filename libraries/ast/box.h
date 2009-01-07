@@ -78,6 +78,13 @@
 #include <stddef.h>
 #endif
 
+/* Macros */
+/* ====== */
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Type Definitions. */
 /* ================= */
 /* Box structure. */
@@ -145,11 +152,7 @@ astPROTO_ISA(Box)            /* Test class membership */
 #if defined(astCLASS)            /* Protected. */
 AstBox *astBox_( void *, int, const double[], const double[], AstRegion *, const char *, int *, ...);
 #else
-AstBox *astBoxId_( void *, int, const double[], const double[], AstRegion *, const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,6,7)))
-#endif
-;
+AstBox *astBoxId_( void *, int, const double[], const double[], AstRegion *, const char *, ... )__attribute__((format(printf,6,7)));
 #endif
 
 #if defined(astCLASS)            /* Protected */

@@ -146,6 +146,14 @@
 #include <stddef.h>
 #endif
 
+/* Macros */
+/* ====== */
+
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Type Definitions. */
 /* ================= */
 /* PermMap structure. */
@@ -215,11 +223,7 @@ AstPermMap *astPermMap_( int, const int [], int, const int [],
                          const double [], const char *, int *, ...);
 #else
 AstPermMap *astPermMapId_( int, const int [], int, const int [],
-                           const double [], const char *, ... )
-#ifdef __GNUC__ /* Check the variable argument list if using GNU compiler */
-__attribute__((format(printf,6,7)))
-#endif
-;
+                           const double [], const char *, ... )__attribute__((format(printf,6,7)));
 #endif
 
 #if defined(astCLASS)            /* Protected */
