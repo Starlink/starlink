@@ -242,7 +242,7 @@
 
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008,2009 Science and Technology Facilities Council.
 *     Copyright (C) 1995-2006 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
@@ -252,6 +252,10 @@
 *        - Write WCS to TIMES and WEIGHTS extensions.
 *     28-NOV-2008 (TIMJ):
 *        Initialise OUTWCS such that CALCSKY works properly.
+*     8-JAN-2009 (TIMJ):
+*        Make sure that HDSNAME does not include a '.' since this
+*        breaks HDS (now that .sdf is allowed as an argument).
+*
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
@@ -1984,7 +1988,16 @@ c
             STEMP = 'SURF_INTMAPS'
          END IF
 
-         HDSNAME = OUT(1:DAT__SZNAM)
+*  calculate the HDS component name but truncate at the first "."
+         IPOSN = INDEX( OUT, '.' )
+         IF (IPOSN .EQ. 0 ) THEN
+            IPOSN = CHR_LEN( OUT )
+         ELSE
+            IPOSN = IPOSN - 1 ! do not want the '.'
+         END IF
+         IPOSN = MIN( IPOSN, DAT__SZNAM )
+         HDSNAME = OUT(1:IPOSN)
+
          CALL HDS_NEW (OUT, HDSNAME, STEMP, 0, 0, OUT_LOC, 
      :        STATUS)
 
