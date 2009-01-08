@@ -105,7 +105,6 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
   dim_t nbolo;                  /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
   dim_t ntslice;                /* Number of time slices */
-  size_t off;                   /* Index offset */
   unsigned char *qua=NULL;      /* Pointer to the QUALITY array */
   size_t tstride;               /* Time slice stride in data array */
   unsigned char mask;           /* Quality bit mask */
@@ -123,7 +122,8 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
   }
 
   /* Calculate data dimensions */
-  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, &ndata, &bstride, &tstride, status );
+  smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, &ndata, &bstride, 
+                &tstride, status );
 
   /* Obtain pointer to data and quality components */
   dat = data->pntr[0];
@@ -135,30 +135,30 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
   }
 
   /* Set the quality bitmask to decide which samples to apodize */
-  mask = ~(SMF__Q_JUMP | SMF__Q_SPIKE);
+  mask = ~(SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_STAT);
 
-  /* Loop over bolometer start index */
-  for( i=0; (*status==SAI__OK)&&(i<nbolo*bstride); i+=bstride ) {
+  /* Loop over bolometer */
+  for( i=0; (*status==SAI__OK)&&(i<nbolo); i++ ) {
 
     /* Determine the first and last samples to apodize (after padding) */
-    first = i;
-    last = i+(ntslice-1)*tstride;
+    first = 0;
+    last = ntslice-1;
 
-    if( qua && !(qua[i]&SMF__Q_BADB)) {
+    if( qua && !(qua[i*bstride]&SMF__Q_BADB)) {
       /* First sample */
-      for( j=i; j<(i+ntslice*tstride); j+=tstride ) {
-        if( !(qua[j]&SMF__Q_PAD) ) break;
+      for( j=0; j<ntslice; j++ ) {
+        if( !(qua[i*bstride+j*tstride]&SMF__Q_PAD) ) break;
       }
 
-      if( j==(i+ntslice*tstride) ) {
+      if( j==ntslice ) {
         *status=SAI__ERROR;
         errRep( "", FUNC_NAME ": Can't apodize, entire array is padding.", 
                 status );
       } else {
         first = j;
         /* Last sample if first was found */
-        for( j=i+(ntslice-1)*tstride; j>0; j-=tstride ) {
-          if( !(qua[j]&SMF__Q_PAD) ) break;
+        for( j=ntslice-1; j>0; j-- ) {
+          if( !(qua[i*bstride+j*tstride]&SMF__Q_PAD) ) break;
         }
         last = j;
       }
@@ -174,41 +174,33 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
     if( *status == SAI__OK ) {
 
       /* Quality checking version */
-      if( qua && !(qua[i]&SMF__Q_BADB)) {
-        off = 0; /* Time slice offset from first/last  */
+      if( qua && !(qua[i*bstride]&SMF__Q_BADB)) {
         for( j=0; (*status==SAI__OK)&&(j<len); j++ ) {
           ap = sin( AST__DPI/2. * (double) j / len );
 
-          if( !(qua[first+off]&mask) ) {
-            dat[first+off]*=ap;
-            qua[first+off]|=SMF__Q_APOD;
-          }
-          
-          if( !(qua[last-off]&mask) ) {
-            dat[last-off]*=ap;
-            qua[last-off]|=SMF__Q_APOD;
+          if( !(qua[i*bstride+(first+j)*tstride]&mask) ) {
+            dat[i*bstride+(first+j)*tstride]*=ap;
+            qua[i*bstride+(first+j)*tstride]|=SMF__Q_APOD;
           }
 
-          /* Increment time slice offset */
-          off+= tstride; 
+          if( !(qua[i*bstride+(last-j)*tstride]&mask) ) {
+            dat[i*bstride+(last-j)*tstride]*=ap;
+            qua[i*bstride+(last-j)*tstride]|=SMF__Q_APOD;
+          }
         }
 
       } else if (!qua) {
         /* Non-Quality checking version */
-        off = 0; /* Time slice offset from first/last  */
         for( j=0; (*status==SAI__OK)&&(j<len); j++ ) {
           ap = sin( AST__DPI/2. * (double) j / len );
 
-          if( dat[first+off]!=VAL__BADD ) {
-            dat[first+off]*=ap;
+          if( dat[i*bstride+(first+j)*tstride]!=VAL__BADD ) {
+            dat[i*bstride+(first+j)*tstride]*=ap;
           }
 
-          if( dat[last-off]!=VAL__BADD ) {
-            dat[last-off]*=ap;
+          if( dat[i*bstride+(last-j)*tstride]!=VAL__BADD ) {
+            dat[i*bstride+(last-j)*tstride]*=ap;
           }
-          
-          /* Increment time slice offset */
-          off+= tstride; 
         }
       }
     } 
