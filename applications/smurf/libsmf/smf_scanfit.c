@@ -139,7 +139,8 @@ void smf_scanfit( smfData *data, unsigned char *quality, int order,
 
   /* Check history for scanfit */
   if ( smf_history_check( data, FUNC_NAME, status ) ) {
-    msgOutif(MSG__VERB," ", "Data have been fitted already: assuming that a recalculation is desired", status );
+    msgOutif(MSG__VERB," ", "Data have been fitted already: "
+             "assuming that a recalculation is desired", status );
   }
 
   /* Also check for sky removal and extinction correction since it
@@ -162,7 +163,9 @@ void smf_scanfit( smfData *data, unsigned char *quality, int order,
       msgSeti("O",order);
       msgSeti("NF",nframes);
       *status = SAI__ERROR;
-      errRep( FUNC_NAME, "Requested polynomial order, ^O, greater than or equal to number of points, ^NF. Unable to fit polynomial.", status );
+      errRep( FUNC_NAME, "Requested polynomial order, ^O, greater than or "
+              "equal to number of points, ^NF. Unable to fit polynomial.", 
+              status );
       return;
     }
   }
