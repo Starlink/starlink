@@ -202,7 +202,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int maxbad;          /* Max number of bad pixels allowed in a clump */
    int maxclump;        /* Max no. of clumps */
    int maxskip;         /* Max no. of failed fits between good fits */
-   int nclump;          /* Number of usable clumps */
+   size_t nclump;       /* Number of usable clumps */
    int niter;           /* Iterations performed so far */
    int npad;            /* No. of peaks below threshold for temination */
    int npeak;           /* The number of elements in the "peaks" array. */
@@ -326,16 +326,15 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       ipeak = 0;
       sum_peak = 0.0;
       sum_peak2 = 0.0;
+      iter = 1;
+      niter = 0;
+      nskip = 0;
+      sumclumps = 0.0;
+      sumdata = VAL__BADD;
       peaks = astMalloc( sizeof( double )*npeak );
       if( peaks ) {
          for( i = 0; i < npeak; i++ ) peaks[ i ] = 0.0;
 
-/* More initialisation. */
-         iter = 1;
-         niter = 0;
-         nskip = 0;
-         sumclumps = 0.0;
-         sumdata = VAL__BADD;
 
 /* Use the setjmp function to define here to be the place to which the
    signal handling function will jump when a signal is detected. Zero is
@@ -570,7 +569,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       if( ilevel > 0 ) {
 
          if( ret ) {
-            datSize( ret, (size_t *) &nclump, status );
+            datSize( ret, &nclump, status );
          } else {
             nclump = 0;
          }

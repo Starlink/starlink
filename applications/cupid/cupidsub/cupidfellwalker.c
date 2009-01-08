@@ -402,8 +402,8 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
          } else if ( !allow_edge && ( 
            clbnd[ j     ] < 3 || cubnd[ j     ] > dims[ 0 ] - 1 ||
-         ( clbnd[ j + 1 ] < 3 || cubnd[ j + 1 ] > dims[ 1 ] - 1 ) && ndim > 1  ||
-         ( clbnd[ j + 2 ] < 3 || cubnd[ j + 2 ] > dims[ 2 ] - 1 ) && ndim > 2 ) ){
+           ( ( clbnd[ j + 1 ] < 3 || cubnd[ j + 1 ] > dims[ 1 ] - 1 ) && ndim > 1 ) ||
+           ( ( clbnd[ j + 2 ] < 3 || cubnd[ j + 2 ] > dims[ 2 ] - 1 ) && ndim > 2 ) ) ){
             nedge++;
 
          } else {

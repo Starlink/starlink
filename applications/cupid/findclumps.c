@@ -1082,7 +1082,7 @@ void findclumps( int *status ) {
 
 /* If the input is a spectral cube, see if spectra are to be processed 
    independetly of their neighbouring spectra. */
-   if( velax != -1 && method ){
+   if( velax != -1 ){
       parGet0l( "PERSPECTRUM", &perspectrum, status );
       if( perspectrum && strcmp( method, "FELLWALKER" ) &&
                          strcmp( method, "CLUMPFIND" ) && 
@@ -1107,7 +1107,7 @@ void findclumps( int *status ) {
 /* If no group was supplied, annul the error and create an empty KeyMap. */
    if( *status == PAR__NULL || size == 0 ) {
       if( *status != SAI__OK ) errAnnul( status );
-      keymap = astKeyMap( "" );
+      keymap = astKeyMap( " " );
 
 /* If a group was supplied, see if it consists of the single value "def".
    If so, create an empty KeyMap. */
@@ -1117,7 +1117,7 @@ void findclumps( int *status ) {
          value = buffer;
          grpGet( grp, 1, 1, &value, GRP__SZNAM, status );
          if( astChrMatch( value, "DEF" ) ) {
-            keymap = astKeyMap( "" );
+            keymap = astKeyMap( " " );
          }
       }
 
@@ -1280,7 +1280,7 @@ void findclumps( int *status ) {
    CUPID extension. We put them into a new KeyMap so that the CUPID NDF
    extension gets names of the form "method.name" rather than just "name". */
       if( astMapGet0A( keymap, method, (AstObject *) &config ) ) {     
-         config2 = astKeyMap( "" );
+         config2 = astKeyMap( " " );
          astMapPut0A( config2, method, config, NULL );
          cupidStoreConfig( xloc, config2, status );
          config2 = astAnnul( config2 );
