@@ -155,7 +155,8 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
   if ( poly == NULL ) {
     if ( *status == SAI__OK) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Input pointer for storing coefficients is NULL. Possible programming error.", status);
+      errRep(FUNC_NAME, "Input pointer for storing coefficients is NULL. "
+             "Possible programming error.", status);
       return;
     }
   }
@@ -184,7 +185,9 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
       msgSeti("O",order);
       msgSeti("NF",nframes);
       *status = SAI__ERROR;
-      errRep( FUNC_NAME, "Requested polynomial order, ^O, greater than or equal to the number of points, ^NF. Unable to fit polynomial.", status );
+      errRep( FUNC_NAME, "Requested polynomial order, ^O, greater than or "
+              "equal to the number of points, ^NF. Unable to fit polynomial.", 
+              status );
       return;
     }
   }
@@ -193,7 +196,8 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
     if ( *status == SAI__OK) {
       msgSeti("O",order);
       *status = SAI__ERROR;
-      errRep( FUNC_NAME, "Polynomial order, ^O, is negative. Unable to fit polynomial", status );
+      errRep( FUNC_NAME, "Polynomial order, ^O, is negative. Unable to fit "
+              "polynomial", status );
       return;
     }
   }
