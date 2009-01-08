@@ -34,21 +34,12 @@ extern "C" {
 /* These are the GSD library functions */
 #include "gsd.h"
 
-
-
-
 /* GSD constants */
 #define MAXDIMS 5
 #define INQNMLEN 16
 #define INQUNLEN 11
 
-
-
-/* File descriptors */
-/* These are defined as void since the GSD module allocates all the
-   memory and stores a pointer to the struct in this pointer */
-typedef void file_descriptor;
-typedef void item_descriptor;
+/* File descriptors - use this so we can hide them from perl */
 typedef FILE GSDFILE;
 
 /* Somewhere to store the data */
@@ -84,8 +75,8 @@ gsdOpenRead(filename, version, label, no_items, fptr, file_dsc, item_dsc, data_p
   char *	label = NO_INIT
   int		no_items = NO_INIT
   GSDFILE *	fptr = NO_INIT
-  file_descriptor *	file_dsc = NO_INIT
-  item_descriptor *	item_dsc = NO_INIT
+  GSDFileDesc *	file_dsc = NO_INIT
+  GSDItemDesc *	item_dsc = NO_INIT
   gsd_data *	data_ptr = NO_INIT
   PREINIT:
    char labelbuff[41];
@@ -93,7 +84,7 @@ gsdOpenRead(filename, version, label, no_items, fptr, file_dsc, item_dsc, data_p
   CODE:
     label = labelbuff; /* Point to some memory */
     RETVAL = gsdOpenRead(filename, &version, label, &no_items, &fptr, 
-             (void **) &file_dsc, (void **) &item_dsc, (char**) &data_ptr);
+             &file_dsc, &item_dsc, &data_ptr);
   OUTPUT:
    version
    label
@@ -110,8 +101,8 @@ gsdOpenRead(filename, version, label, no_items, fptr, file_dsc, item_dsc, data_p
 int
 gsdClose(fptr, file_dsc, item_dsc, data_ptr)
   GSDFILE *	fptr
-  file_descriptor *	file_dsc
-  item_descriptor *	item_dsc
+  GSDFileDesc *	file_dsc
+  GSDItemDesc *	item_dsc
   gsd_data *	data_ptr 
   PROTOTYPE: $$$$
   CODE:
@@ -129,8 +120,8 @@ gsdClose(fptr, file_dsc, item_dsc, data_ptr)
 
 int
 gsdFind(file_dsc, item_dsc, name, itemno, unit, type, array)
-  file_descriptor *	file_dsc
-  item_descriptor *	item_dsc 
+  GSDFileDesc *	file_dsc
+  GSDItemDesc *	item_dsc 
   char *		name
   int          		itemno = NO_INIT
   char *		unit = NO_INIT
@@ -156,8 +147,8 @@ gsdFind(file_dsc, item_dsc, name, itemno, unit, type, array)
 
 int
 gsdItem(file_dsc, item_dsc, itemno, name, unit, type, array)
-  file_descriptor *     file_dsc
-  item_descriptor *     item_dsc
+  GSDFileDesc *     file_dsc
+  GSDItemDesc *     item_dsc
   int                   itemno
   char *                name = NO_INIT
   char *                unit = NO_INIT
@@ -185,8 +176,8 @@ gsdItem(file_dsc, item_dsc, itemno, name, unit, type, array)
 
 int
 gsdGet0d(file_dsc, item_dsc, data_ptr, itemno, dat_val)
-  file_descriptor *	file_dsc
-  item_descriptor *	item_dsc
+  GSDFileDesc *	file_dsc
+  GSDItemDesc *	item_dsc
   gsd_data *	data_ptr
   int           itemno
   double 	dat_val = NO_INIT
@@ -198,8 +189,8 @@ gsdGet0d(file_dsc, item_dsc, data_ptr, itemno, dat_val)
 
 int
 gsdGet0i(file_dsc, item_dsc, data_ptr, itemno, dat_val)
-  file_descriptor *     file_dsc
-  item_descriptor *     item_dsc 
+  GSDFileDesc *     file_dsc
+  GSDItemDesc *     item_dsc 
   gsd_data *        data_ptr
   int           itemno
   int 		dat_val = NO_INIT
@@ -211,8 +202,8 @@ gsdGet0i(file_dsc, item_dsc, data_ptr, itemno, dat_val)
 
 int
 gsdGet0l(file_dsc, item_dsc, data_ptr, itemno, dat_val)
-  file_descriptor *	file_dsc
-  item_descriptor *	item_dsc
+  GSDFileDesc *	file_dsc
+  GSDItemDesc *	item_dsc
   gsd_data *	data_ptr
   int           itemno
   char  	dat_val = NO_INIT
@@ -229,8 +220,8 @@ gsdGet0l(file_dsc, item_dsc, data_ptr, itemno, dat_val)
 
 int
 gsdGet0r(file_dsc, item_dsc, data_ptr, itemno, dat_val)
-  file_descriptor *	file_dsc
-  item_descriptor *	item_dsc
+  GSDFileDesc *	file_dsc
+  GSDItemDesc *	item_dsc
   gsd_data *	data_ptr
   int           itemno
   float 	dat_val = NO_INIT
@@ -242,8 +233,8 @@ gsdGet0r(file_dsc, item_dsc, data_ptr, itemno, dat_val)
 
 int
 gsdGet0b(file_dsc, item_dsc, data_ptr, itemno, dat_val)
-  file_descriptor *	file_dsc
-  item_descriptor *	item_dsc
+  GSDFileDesc *	file_dsc
+  GSDItemDesc *	item_dsc
   gsd_data *	data_ptr
   int           itemno
   char  	dat_val = NO_INIT
@@ -255,8 +246,8 @@ gsdGet0b(file_dsc, item_dsc, data_ptr, itemno, dat_val)
 
 int
 gsdGet0w(file_dsc, item_dsc, data_ptr, itemno, dat_val)
-  file_descriptor *	file_dsc
-  item_descriptor *	item_dsc
+  GSDFileDesc *	file_dsc
+  GSDItemDesc *	item_dsc
   gsd_data *	data_ptr
   int           itemno
   short 	dat_val = NO_INIT
@@ -269,8 +260,8 @@ gsdGet0w(file_dsc, item_dsc, data_ptr, itemno, dat_val)
 
 int
 gsdGet0c(file_dsc, item_dsc, data_ptr, itemno, cdat_val)
-  file_descriptor *     file_dsc
-  item_descriptor *     item_dsc 
+  GSDFileDesc *     file_dsc
+  GSDItemDesc *     item_dsc 
   gsd_data *       data_ptr
   int           itemno
   char *	cdat_val = NO_INIT
@@ -285,8 +276,8 @@ gsdGet0c(file_dsc, item_dsc, data_ptr, itemno, cdat_val)
   
 int
 gsdInqSize(file_dsc, item_dsc, data_ptr, itemno,  dimnames, dimunits, dimvals, actdims, size)
-  file_descriptor *     file_dsc
-  item_descriptor *     item_dsc 
+  GSDFileDesc *     file_dsc
+  GSDItemDesc *     item_dsc 
   gsd_data *        data_ptr
   int itemno
   SV *	dimnames = NO_INIT
@@ -331,8 +322,8 @@ gsdInqSize(file_dsc, item_dsc, data_ptr, itemno,  dimnames, dimunits, dimvals, a
 
 int
 gsdGet1d(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, values, actvals)
-  file_descriptor *     file_dsc
-  item_descriptor *     item_dsc 
+  GSDFileDesc *     file_dsc
+  GSDItemDesc *     item_dsc 
   gsd_data *        data_ptr
   int itemno
   int ndims
@@ -357,8 +348,8 @@ gsdGet1d(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, value
 
 int
 gsdGet1i(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, values, actvals)
-  file_descriptor *     file_dsc
-  item_descriptor *     item_dsc 
+  GSDFileDesc *     file_dsc
+  GSDItemDesc *     item_dsc 
   gsd_data *        data_ptr
   int itemno
   int ndims
@@ -383,8 +374,8 @@ gsdGet1i(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, value
 
 int
 gsdGet1r(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, values, actvals)
-  file_descriptor *     file_dsc
-  item_descriptor *     item_dsc 
+  GSDFileDesc *     file_dsc
+  GSDItemDesc *     item_dsc 
   gsd_data *        data_ptr
   int itemno
   int ndims
@@ -409,8 +400,8 @@ gsdGet1r(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, value
 
 int
 gsdGet1c(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, values, actvals)
-  file_descriptor *     file_dsc
-  item_descriptor *     item_dsc 
+  GSDFileDesc *     file_dsc
+  GSDItemDesc *     item_dsc 
   gsd_data *        data_ptr
   int itemno
   int ndims
@@ -446,8 +437,8 @@ gsdGet1c(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, value
 
 int
 gsdGet1dp(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, packed, actvals)
-  file_descriptor *     file_dsc
-  item_descriptor *     item_dsc 
+  GSDFileDesc *     file_dsc
+  GSDItemDesc *     item_dsc 
   gsd_data *        data_ptr
   int itemno
   int ndims
@@ -473,8 +464,8 @@ gsdGet1dp(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, pack
 
 int
 gsdGet1ip(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, packed, actvals)
-  file_descriptor *     file_dsc
-  item_descriptor *     item_dsc 
+  GSDFileDesc *     file_dsc
+  GSDItemDesc *     item_dsc 
   gsd_data *        data_ptr
   int itemno
   int ndims
@@ -500,8 +491,8 @@ gsdGet1ip(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, pack
 
 int
 gsdGet1rp(file_dsc, item_dsc, data_ptr, itemno, ndims, dimvals, start, end, packed, actvals)
-  file_descriptor *     file_dsc
-  item_descriptor *     item_dsc 
+  GSDFileDesc *     file_dsc
+  GSDItemDesc *     item_dsc 
   gsd_data *        data_ptr
   int itemno
   int ndims
