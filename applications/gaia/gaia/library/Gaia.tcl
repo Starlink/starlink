@@ -426,9 +426,14 @@ itcl::class gaia::Gaia {
          }
       }
 
-      #  Start the internal debug logging, if required.
+      #  Start the internal debug logging, if required. When set to greater
+      #  than 1, Don't buffer so that we see all messages immediately.
       if { $itk_option(-debuglog) } {
-         cmdtrace on notruncate [::open "GaiaDebug.log" w]
+         set fid [::open "GaiaDebug.log" w]
+         if { $itk_option(-debuglog) > 1 } {
+            fconfigure $fid -buffering none
+         }
+         cmdtrace on notruncate $fid
       }
 
       #  Set the blank and background colours for the first time.
