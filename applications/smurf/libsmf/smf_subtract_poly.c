@@ -236,7 +236,7 @@ void smf_subtract_poly(smfData *data, unsigned char *quality, int rel,
 	   quicker than calling pow() unnecessarily. */
 
 	if ( (outdata[i*nframes + j] != VAL__BADD) &&
-	     !(qual[i*nframes + j] & SMF__Q_BADS) ) {
+	     !(qual[i*nframes + j] & mask) ) {
 
 	  baseline = -firstframe[i];
 
