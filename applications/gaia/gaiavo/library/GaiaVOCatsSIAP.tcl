@@ -120,16 +120,14 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
       init_servers_
 
       #  And the blacklist.
-      if { ![info exists blacklist_] } {
-         init_blacklist_
-      }
+      init_blacklist_
    }
 
    #  Start the queries, calls query_ for each SIAP server.
    protected method start_queries_ {} {
-      foreach {url name} [get_access_details] {
+      foreach {url name identifier} [get_access_details] {
          if { ! $interrupted_ } {
-            query_ $url $name
+            query_ $url $name $identifier
          }
       }
    }
@@ -215,6 +213,24 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
       set urlget_ {}
    }
 
+   #  Use specialised warning dialog that offers to blacklist the current
+   #  server.
+   protected method warning_dialog_ {message} {
+      set choice [choice_dialog "$message" "OK Blacklist" "OK" $w_]
+      if { $choice != "OK" } {
+         blacklist $ids_($current_)
+      }
+   }
+
+   #  Use specialised error dialog that offers to blacklist the current
+   #  server.
+   protected method error_dialog_ {message} {
+      set choice [choice_dialog "$message" "OK Blacklist" "OK" $w_]
+      if { $choice != "OK" } {
+         blacklist $ids_($current_)
+      }
+   }
+
    #  Return a list of access URLs and titles for all the SIAP servers in
    #  the local catalogue. Skips servers without an accessURL and those in the
    #  blacklist (servers known to be test services).
@@ -223,8 +239,8 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
       set result {}
       foreach row [$w_.cat content] {
          eval lassign \$row $headings
-         if { ! [blacklisted_ $identifier] && $accessURL != {} } {
-            lappend result $accessURL $title
+         if { ! [blacklisted $identifier] && $accessURL != {} } {
+            lappend result $accessURL $title $identifier
          }
       }
       return $result
@@ -232,27 +248,55 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
 
    #  Check if an identifier is blacklisted. These are URNs of the form
    #  ivo://... that should be unique for each service.
-   protected method blacklisted_ {identifier} {
+   public proc blacklisted {identifier} {
       return [info exists blacklist_($identifier)]
    }
 
    #  Initialise the blacklist. Just a simple text file with comment lines
    #  starting with # in the first column and other lines being the
    #  identifiers of the blacklisted services.
-   protected method init_blacklist_ {} {
+   protected proc init_blacklist_ {} {
+
+      #  If initialised already do nothing.
+      if { [info exists blacklist_] } {
+         return
+      }
+      
+      #  Look for the blacklist in the standard place.
       set blacklist [utilGetConfigFilename .skycat GaiaSIAPBlacklist]
       if { ! [::file exists $blacklist] } {
 
-         #  Use builtin defaults.
+         #  Not found use builtin defaults.
          ::file copy -force $::gaiavo_library/GaiaSIAPBlacklist $blacklist
       }
-      set fid [::open $blacklist]
+      set fid [::open $blacklist "r"]
       while { [gets $fid line] >= 0 } {
          if { [string range $line 0 0] != "\#" } {
             set blacklist_($line) 1
          }
       }
       ::close $fid
+   }
+
+   #  Add an identifier to the blacklist and update the standard file.
+   public proc blacklist {identifier} {
+      set blacklist_($identifier) 1
+
+      set blacklist [utilGetConfigFilename .skycat GaiaSIAPBlacklist]
+      set fid [::open $blacklist "w"]
+      puts $fid "\#  Backlisted SIAP servers. These will never be queried."
+      puts $fid "\#"
+      foreach id [array names blacklist_] {
+         puts $fid $id
+      }
+      ::close $fid
+   }
+
+   #  Remove an identifier from the blacklist.
+   public proc unblacklist {identifier} {
+      if { [info exists blacklist_($identifier)] } {
+         unset blacklist_($identifier)
+      }
    }
 
    #  Configuration options: (public variables)

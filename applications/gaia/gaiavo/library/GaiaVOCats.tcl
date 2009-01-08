@@ -312,7 +312,7 @@ itcl::class gaiavo::GaiaVOCats {
             #  If empty or have problems reading it, do away with it.
             set info_ {}
             if { [catch {set info_ [$w_.cat$current_ content]} msg] != 0 } {
-               warning_dialog "$names_($current_): $msg" $w_
+               warning_dialog_ "$names_($current_): $msg"
                remove_current_ "$msg"
             } else {
                if { $info_ == {} } { 
@@ -353,12 +353,22 @@ itcl::class gaiavo::GaiaVOCats {
          #  Something went wrong, remove this service from consideration and 
          #  make a report. Note a bad status is less bad than no file.
          if { ! $status } {
-            warning_dialog "$names_($current_): $result" $w_
+            warning_dialog_ "$names_($current_): $result"
          } else {
-            error_dialog "$names_($current_): $result" $w_
+            error_dialog_ "$names_($current_): $result"
          }
          remove_current_ $result
       }
+   }
+
+   #  Popup the warning dialog. Override for specialised behaviour.
+   protected method warning_dialog_ {message} {
+      warning_dialog "$message" $w_
+   }
+
+   #  Popup the error dialog. Override for specialised behaviour.
+   protected method error_dialog_ {message} {
+      error_dialog "$message" $w_
    }
 
    #  Remove the current query result page and associated. Text is something
@@ -410,10 +420,11 @@ itcl::class gaiavo::GaiaVOCats {
    #  Start the catalogue query based on the current query options and
    #  display the results in a page of the results book. The url will
    #  be passed to the query component and the name used in a menu.
-   protected method query_ {url name} {
+   #  The identifier is needed so that this may be blacklisted.
+   protected method query_ {url name identifier} {
 
       #  Create a page for the query results.
-      add_query_result_ $name
+      add_query_result_ $name $identifier
 
       #  Start the query in the background.
       catch {
@@ -429,12 +440,13 @@ itcl::class gaiavo::GaiaVOCats {
    }
 
    #  Add a GaiaQueryResult to the notebook.
-   protected method add_query_result_ {title} {
+   protected method add_query_result_ {title identifier} {
 
       #  Create a new page and make it current.
       set site [$itk_component(notebook) add -label $title]
       set current_ $npages_
       set names_($current_) $title
+      set ids_($current_) $identifier
       incr npages_
       incr ncolumn_
 
@@ -545,6 +557,9 @@ itcl::class gaiavo::GaiaVOCats {
 
    #  Names of pages for error dialogs etc.
    protected variable names_
+
+   #  Identifiers of services.
+   protected variable ids_
 
    #  True then interrupted.
    protected variable interrupted_ 0
