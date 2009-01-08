@@ -58,11 +58,13 @@
 *        - Added quality to interface
 *     2008-12-03 (TIMJ):
 *        Use smf_get_dims
+*     2009-01-07 (EC)
+*        Fix for bolo-ordered data
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 2006-2008 University of British Columbia. All Rights
+*     Copyright (C) 2006-2009 University of British Columbia. All Rights
 *     Reserved.
 
 *  Licence:
@@ -124,7 +126,9 @@ void smf_scanfit( smfData *data, unsigned char *quality, int order,
   int lbnd[3];              /* Lower bound for coeff array (poly) */
   dim_t nbol = 0;           /* Number of bolometers */
   int ncoeff;               /* Number of coefficients in baseline fit */
+  dim_t ncols;              /* Number of cols */
   dim_t nframes = 1;        /* Number of frames in a scan */
+  dim_t nrows;              /* Number of rows */
   int npts;                 /* Number of data points in coefficient array */
   HDSLoc *ploc = NULL;      /* Locator for SCANFIT coeffs */
   void *pntr[3];            /* Pointers to mapped data */
@@ -154,7 +158,8 @@ void smf_scanfit( smfData *data, unsigned char *quality, int order,
   }
 
   /* Get the dimensions */
-  smf_get_dims( data,  NULL, NULL, &nbol, &nframes, NULL, NULL, NULL, status);
+  smf_get_dims( data,  &nrows, &ncols, &nbol, &nframes, NULL, NULL, NULL, 
+                status);
 
   /* Return with error if order is greater than the number of data
      points */
@@ -210,8 +215,8 @@ void smf_scanfit( smfData *data, unsigned char *quality, int order,
     for (i=0; i<3; i++) {
       lbnd[i] = 1;
     }
-    ubnd[0] = (data->dims)[0];
-    ubnd[1] = (data->dims)[1];
+    ubnd[0] = nrows;
+    ubnd[1] = ncols;
     ubnd[2] = ncoeff;
     
     /* Open SCANFIT extension - note if SCANFIT exists, opening it with
