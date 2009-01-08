@@ -249,14 +249,6 @@ void smf_subtract_poly(smfData *data, unsigned char *quality, int rel,
 	      baseline += poly[i + nbol*k] * pow(jay, (double)k);
 	    }
 	  }
-	  
-	  /*
-	  if( (i==3) && (j<100) ) {
-	    printf("%i: %f %f -- %f\n", j, poly[i], poly[i+nbol], 
-		   baseline );
-	  }
-	  */
-
 	  outdata[i*nframes + j] -= baseline;
 	}
       }
