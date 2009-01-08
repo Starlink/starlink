@@ -758,7 +758,7 @@ sub _split_path {
   # back together after splitting.
   my ($last, $root) = split(/\./, reverse($file), 2);
   $last = reverse($last);
-  $root = reverse($root);
+  $root = (defined $root ? reverse($root) : '');
 
   # If the path ends in '.sdf' assume this is just a file name
   if ($last eq 'sdf') {
