@@ -394,15 +394,17 @@ itcl::class gaiavo::GaiaVOCats {
    #  Clear all the existing queries so that a new set can be done.
    protected method clear_query_results_ {} {
       for { set i 0 } { $i < $npages_ } { incr i } {
-         delete object $itk_component(results$i)
+         if { [info exists itk_component(results$i)] } {
+            delete object $itk_component(results$i)
+         }
       }
       $itk_component(bookmenu) clear
       $itk_component(bookmenu) update_menubutton
-      if { $current_ > 0 } { 
+      if { $current_ > -1 } { 
          $itk_component(notebook) delete 0 end
       }
       set npages_ 0
-      set current_ 0
+      set current_ -1
    }
 
    #  Start the catalogue query based on the current query options and
@@ -415,12 +417,12 @@ itcl::class gaiavo::GaiaVOCats {
 
       #  Start the query in the background.
       catch {
-         $itk_component(results$current_) config -title "Querying... $name"
+         $itk_component(results$current_) config -title "Querying: $name"
          $itk_component(results$current_) clear
       }
 
       set_state disabled
-      $itk_component(progressbar) config -text "Querying... $url"
+      $itk_component(progressbar) config -text "Querying: $url"
       $itk_component(progressbar) look_busy
 
       $query_component_ query $url
@@ -536,7 +538,7 @@ itcl::class gaiavo::GaiaVOCats {
    protected variable npages_ 0
 
    #  Current page of notebook.
-   protected variable current_ 0
+   protected variable current_ -1
 
    #  Number of entries in the bookmenu column.
    protected variable ncolumn_ 0

@@ -408,6 +408,7 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
    #  Registry has been changed and maybe accepted.
    protected method changed_registry_ {accepted} {
       blt::busy release [winfo toplevel $w_]
+      $itk_option(-astrocat) open [$w_.voregistry cget -catalog]
    }
 
    #  Configuration options: (public variables)

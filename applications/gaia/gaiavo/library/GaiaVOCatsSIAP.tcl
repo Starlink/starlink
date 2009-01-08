@@ -129,7 +129,6 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
    protected method start_queries_ {} {
       foreach {url name} [get_access_details] {
          if { ! $interrupted_ } {
-            puts "query_: $url $name"
             query_ $url $name
          }
       }
