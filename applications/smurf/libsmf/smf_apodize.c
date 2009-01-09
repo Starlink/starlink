@@ -37,7 +37,10 @@
 *     the data were previously padded (indicated by SMF__Q_PAD quality
 *     bits) then the apodizations starts after the padding (or before
 *     for the roll-off at the end). Apodized sections are quality
-*     flagged SMF__Q_APOD.
+*     flagged SMF__Q_APOD. In addition to the LEN samples at the start
+*     and end that are apodized, an additional section of data beyond that
+*     are also quality flagged SMF__Q_APOD to ensure that ringing caused
+*     by filtering does not get used in the final map.
 
 *  Notes:
 
@@ -165,7 +168,7 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
     } 
 
     /* Can we apodize? */
-    if( (*status==SAI__OK) && (last-first+1 < 2*len) ) {
+    if( (*status==SAI__OK) && (last-first+1 < 4*len) ) {
       *status = SAI__ERROR;
       errRep("", FUNC_NAME ": Can't apodize, not enough samples.", status );
     }
@@ -175,7 +178,9 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
 
       /* Quality checking version */
       if( qua && !(qua[i*bstride]&SMF__Q_BADB)) {
-        for( j=0; (*status==SAI__OK)&&(j<len); j++ ) {
+
+        /* First roll-off the signal */
+        for( j=0; j<len; j++ ) {
           ap = sin( AST__DPI/2. * (double) j / len );
 
           if( !(qua[i*bstride+(first+j)*tstride]&mask) ) {
@@ -188,10 +193,15 @@ void smf_apodize( smfData *data, unsigned char *quality, size_t len,
             qua[i*bstride+(last-j)*tstride]|=SMF__Q_APOD;
           }
         }
+        /* then put in some extra flags, len samples again*/
+        for( j=len; j<2*len; j++ ) {
+          qua[i*bstride+(first+j)*tstride]|=SMF__Q_APOD;
+          qua[i*bstride+(last-j)*tstride]|=SMF__Q_APOD;
+        }
 
       } else if (!qua) {
         /* Non-Quality checking version */
-        for( j=0; (*status==SAI__OK)&&(j<len); j++ ) {
+        for( j=0; j<len; j++ ) {
           ap = sin( AST__DPI/2. * (double) j / len );
 
           if( dat[i*bstride+(first+j)*tstride]!=VAL__BADD ) {
