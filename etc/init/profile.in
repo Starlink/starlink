@@ -204,8 +204,8 @@ fi
 
 #  AUTOASTROM
 
-if test -f ${bindir}/autoastrom/autoastrom; then
-   export AUTOASTROM_DIR=${bindir}/autoastrom
+if test -f ${exec_prefix}/Perl/bin/autoastrom; then
+   export AUTOASTROM_DIR=${exec_prefix}/Perl/bin
 fi
 
 #  CCDPACK
@@ -446,7 +446,7 @@ fi
 
 # AUTOASTROM
 
-if test -f ${bindir}/autoastrom/autoastrom; then
+if test -f ${exec_prefix}/Perl/bin/autoastrom; then
   autoastrom () { ${exec_prefix}/Perl/bin/perl $AUTOASTROM_DIR/autoastrom; }
 else
   autoastrom () { ${staretcdir}/notinst autoastrom; }

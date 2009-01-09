@@ -224,8 +224,8 @@ endif
 
 #
 #  AUTOASTROM
-if ( -e ${bindir}/autoastrom/autoastrom ) then
-   setenv AUTOASTROM_DIR ${bindir}/autoastrom
+if ( -e ${exec_dir}/Perl/bin/autoastrom ) then
+   setenv AUTOASTROM_DIR ${exec_dir}/Perl/bin
 endif
 
 #

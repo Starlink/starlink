@@ -94,7 +94,7 @@ endif
 #  Autoastrom
 #
 
-if ( -e ${bindir}/autoastrom/autoastrom ) then
+if ( -e ${exec_prefix}/Perl/bin/autoastrom ) then
    alias autoastrom '${AUTOASTROM_DIR}/autoastrom'
    alias autoastromsetup '${AUTOASTROM_DIR}/autoastrom'
 else
