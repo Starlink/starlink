@@ -75,6 +75,18 @@ hdsNew(const char *file_str,
    _call( dau_check_name(  &name, data->name ))
    _call( dat1_check_type( &type, data->type ))
 
+/* A '.' in the hds type name really really upsets things. Currently
+   dau_check_name does not check for a '.' so we do it here */
+   if ( _ok(hds_gl_status) && strchr( data->name, '.' ) ) {
+     hds_gl_status = DAT__NAMIN;
+     emsSetc( "NAME", data->name );
+     emsRep( "HDS_NEW_CHECK_NAM",
+             "Invalid name string \'^NAME\' specified. Contains "
+             "illegal \'.\' character (possible programming error).",
+             &hds_gl_status);
+     _call(hds_gl_status);
+   }
+
 /* Determine the object attributes and validate the shape.      */
 
    _call( dat1_unpack_type( data->type, &data->obj ))
