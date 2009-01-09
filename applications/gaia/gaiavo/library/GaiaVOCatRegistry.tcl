@@ -73,7 +73,6 @@ itcl::class gaiavo::GaiaVOCatRegistry {
    #  ------------
    constructor {args} {
       eval itk_initialize $args
-      wm title $w_ "Query VO Registry for services"
    }
 
    #  Destructor:
@@ -88,6 +87,8 @@ itcl::class gaiavo::GaiaVOCatRegistry {
    #  be "Accept" and "Close" should be "Cancel".
    public method init {} {
       GaiaVOCat::init
+
+      wm title $w_ "Query VO Registry for services"
 
       $itk_component(open) configure -text "Accept"
       add_short_help $itk_component(open) {Accept list of services}
@@ -118,6 +119,14 @@ itcl::class gaiavo::GaiaVOCatRegistry {
          set initial_catalogue_ $itk_option(-catalog)
          $w_.cat open $itk_option(-catalog)
       }
+
+      #  Add a menu option to apply the blacklist.
+      set m [get_menu Options]
+      add_menuitem $m checkbutton "Apply blacklist" \
+         {Filter list to remove those in the blacklist} \
+         -variable [scope itk_option(-apply_blacklist)] \
+         -onvalue 1 -offvalue 0 \
+         -command [code $this update_content_]
    }
 
    #  User pressed the accept button. Override to not require selected row
@@ -167,11 +176,34 @@ itcl::class gaiavo::GaiaVOCatRegistry {
       catch {::focus $itk_component(results).listbox}
    }
 
+   #  Override update_content_ so we can apply the blacklist.
+   protected method update_content_ {} {
+      set info_ [$w_.cat content]
+      if { $itk_option(-blacklist) != {} && $itk_option(-apply_blacklist) } {
+         set headings [$w_.cat headings]
+         set result {}
+         foreach row [$w_.cat content] {
+            eval lassign \$row $headings
+            if { ! [$itk_option(-blacklist) blacklisted $identifier] } {
+               lappend result $row
+            }
+         }
+         set info_ $result
+      }
+      $itk_component(results) config -info $info_
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
    #  The type of services to query for - SSAP, SIAP, ConeSearch.
    itk_option define -service service Service SIAP
+
+   #  GaiaVOBlacklist instance that manages the blacklist for the services.
+   itk_option define -blacklist blacklist Blacklist {}
+
+   #  Whether to apply the blacklist to filter the list.
+   itk_option define -apply_blacklist apply_blacklist Apply_Blacklist 1
 
    #  Protected variables: (available to instance)
    #  --------------------

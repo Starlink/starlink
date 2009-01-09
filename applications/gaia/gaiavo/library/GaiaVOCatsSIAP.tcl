@@ -74,8 +74,11 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
    #  Constructor:
    #  ------------
    constructor {args} {
-      wm title $w_ "Query VO Simple Image Access servers"
       eval itk_initialize $args
+
+      #  Create the blacklist before we need it.
+      set blacklist_ \
+         [uplevel \#0 gaiavo::GaiaVOBlacklist \#auto -backingstore GaiaSIAPBlacklist]
    }
 
    #  Destructor:
@@ -90,6 +93,8 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
    #  Add additional menu items. Nameserver.
    public method init {} {
       GaiaVOCats::init
+
+      wm title $w_ "Query VO Simple Image Access servers"
 
       set m [get_menu "Options"]
       set ns_menu [menu $m.ns]
@@ -119,9 +124,6 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
 
       #  Initialise the catalog of SIAP servers.
       init_servers_
-
-      #  And the blacklist.
-      set blacklist_ [gaiavo::GaiaVOBlacklist \#auto -backingstore GaiaSIAPBlacklist]
    }
 
    #  Start the queries, calls query_ for each SIAP server.
@@ -151,7 +153,8 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
             -feedbackcommand  [code $this set_feedback] \
             -command [code $this query_done] \
             -namesvr $itk_option(-namesvr) \
-            -gaiactrl [$itk_option(-gaia) get_image]
+            -gaiactrl [$itk_option(-gaia) get_image] \
+            -blacklist $blacklist_
       }
       pack $itk_component(siap) -side top -fill x
       add_short_help $itk_component(siap) {Controls for querying SIAP services}
@@ -170,9 +173,6 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
             error_dialog $msg $w_
             return -code error
          }
-
-         #  Display catalogue name in header.
-         wm title $w_ "[$w_.cat longname $itk_option(-siap_catalog)] ($itk_option(-number))"
       }
    }
 

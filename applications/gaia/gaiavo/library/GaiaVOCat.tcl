@@ -357,6 +357,11 @@ itcl::class gaiavo::GaiaVOCat {
       #   Finally open catalogue, read and update display.
       $w_.cat open $newfile_
       $w_.cat query
+      update_content_
+   }
+
+   #  Update the display from the catalogue content.
+   protected method update_content_ {} {
       set info_ [$w_.cat content]
       $itk_component(results) config -info $info_
    }
@@ -453,9 +458,7 @@ itcl::class gaiavo::GaiaVOCat {
             }
 
             #  Update content.
-            set info_ [$w_.cat content]
-            $itk_component(results) config -info $info_
-
+            update_content_
             $itk_component(results) config \
                -title "Returned [$itk_component(results) total_rows] rows"
 

@@ -402,7 +402,8 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
          -catalog [$itk_option(-astrocat) longname] \
          -service SIAP \
          -show_cols {shortName title} \
-         -activate_cmd [code $this changed_registry_]
+         -activate_cmd [code $this changed_registry_] \
+         -blacklist $itk_option(-blacklist)
    }
 
    #  Registry has been changed and maybe accepted.
@@ -430,6 +431,9 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
 
    #  GaiaImageCtrl instance.
    itk_option define -gaiactrl gaiactrl GaiaCtrl {}
+
+   #  GaiaVOBlacklist instance that manages the blacklist for SIAP services.
+   itk_option define -blacklist blacklist Blacklist {}
 
    #  Protected variables: (available to instance)
    #  --------------------
