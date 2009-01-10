@@ -25,10 +25,7 @@
 *     the Error Reporting System.
 
 *  Algorithm:
-*     -  If there are pending messages, then flush them.
-*     -  If there are no pending messages, but STATUS is set, then
-*     report a warning message and then flush it.
-*     -  Clear the message token table.
+*     -  call errClear
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -90,7 +87,7 @@
 #include "ems.h"
 #include "sae_par.h"
 
-void errStop( int * status ) {
+void errStop( int * status __attribute__((unused)) ) {
   int istat = SAI__OK;    /* Local status */
 
   /*     Call ERR_CLEAR to clear the error message table. */
