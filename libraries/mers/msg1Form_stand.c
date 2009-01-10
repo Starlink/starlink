@@ -102,13 +102,20 @@
 *-
 */
 
+/* If we're not using GNU C, elide __attribute__ */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 #include "sae_par.h"
 #include "ems.h"
 
 #include "mers1.h"
 
-void msg1Form ( const char * param, const char * text, int clean,
-                int useformat, size_t msglen, char * msgstr, int * status ) {
+void msg1Form ( const char * param __attribute__((unused)),
+                const char * text, int clean __attribute__((unused)),
+                int useformat, size_t msglen, char * msgstr,
+                int * status __attribute__((unused)) ) {
 
   int lstat = SAI__OK;   /* Local status */
   int retlen = 0;
