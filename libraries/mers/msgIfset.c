@@ -90,7 +90,8 @@ void msgIfset( msglev_t filter, int * status ) {
       can be an unsigned type so will always be > 0. To hide the warning
       and allow msglev_t to be signed we expand the test.
    */
-  if ( filter == MSG__NONE || filter > MSG__NONE || filter <= MSG__ALL ) {
+  if ( filter == MSG__NONE ||
+       ( filter > MSG__NONE && filter <= MSG__ALL ) ) {
 
     /*     Assign the message filtering level. */
     msg1Ptinf( filter );
@@ -101,10 +102,12 @@ void msgIfset( msglev_t filter, int * status ) {
     emsMark();
     *status = MSG__INVIF;
     emsSeti( "FILTER", filter );
+    emsSeti( "LOW", MSG__NONE );
+    emsSeti( "HIGH", MSG__ALL );
     emsRep( "MSG_IFSET_INVIF",
-            "MSG_IFSET: Invalid message filtering value: ^FILTER",
+            "MSG_IFSET: Invalid message filtering value: "
+            "^LOW <= ^FILTER <= ^HIGH",
             status );
     emsRlse();
-
   }
 }
