@@ -2,15 +2,36 @@ Version 2.0
 -----------
 
  o Complete rewrite in C.
- o errFioer removed from interface (there is no corresponding C interface in EMS)
- o C interface no longer includes the fortran msgFmt<x> routines. Instead a single
-   C routine is provided for sprintf style formatting (msgFmt).
- o New function msgBlankif. This is a version of msgBlank that can be output conditionally
-   similar to msgOut vs msgOutif.
- o C interface for messaging level now uses a special type (msglev_t) rather than simple int.
- o errRepf, msgOutiff and msgOutf: new routines supporting sprintf-style formatting in addition
-   to token replacement. %KEYWORD expansion disabled. $PARAM expansion unaffected. (C interface only)
- o New function msgFlusherr can be used to flush error messages using MSG instead of ERR.
+
+ o errFioer removed from interface (there is no corresponding C interface
+   in EMS)
+
+ o C interface no longer includes the fortran msgFmt<x> routines. Instead a
+   single C routine is provided for sprintf style formatting (msgFmt).
+
+ o New function msgBlankif. This is a version of msgBlank that can be output
+   conditionally similar to msgOut vs msgOutif.
+
+ o C interface for messaging level now uses a special type (msglev_t) rather
+   than simple int.
+
+ o errRepf, msgOutiff and msgOutf: new routines supporting sprintf-style
+   formatting in addition to token replacement. %KEYWORD expansion disabled.
+   $PARAM expansion unaffected. (C interface only)
+
+ o Can now be used in a threaded application so long as msgTune and errTune
+   are only called before multiple threads are created.
+
+ o New function msgFlusherr can be used to flush error messages using MSG
+   instead of ERR.
+
+ o MSG filter levels extended to include MSG__DEBUG1 to MSG__DEBUG20. This
+   should allow more fine grained control of debugging messages.
+
+ o The filter level can now also be set to MSG__NONE (no messages at all) and
+   MSG__ALL (every message) but these can not be used in msgOutif calls. This
+   allows all messages to be silenced or all messages to be displayed.
+
 
 Version 1.8-2
 -------------

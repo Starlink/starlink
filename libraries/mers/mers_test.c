@@ -79,6 +79,12 @@ int main ( void ) {
   msgOutiff( MSG__VERB, " ", "Formatted %05d conditional message", &status,
              42);
 
+  msgIfset( MSG__NONE, &status );
+  msgOutif( MSG__QUIET, " ", "Should not see this message", &status );
+  msgIfset( MSG__ALL, &status );
+  msgOutif( MSG__DEBUG20," ", "Should see this message", &status );
+
+
   /* ERR */
   errMark();
   msgSetc("PC", "Single % token");

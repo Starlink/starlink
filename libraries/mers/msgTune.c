@@ -33,8 +33,8 @@
 *     1. The following values of PARAM may be used:
 *
 *        'FILTER' Specifies the required MSG conditional message reporting
-*            level. VALUE may be 1, 2, 3 or 4, corresponding with quiet, normal
-*            (the default), verbose and debug levels respectively.
+*            level. VALUE may be any of the defined msglev_t values MSG__NONE
+*            to MSG__ALL,
 *
 *        'SZOUT' Specifies a maximum line length to be used in the line wrapping
 *            process. By default the message output by MSG is split into chunks 
@@ -67,7 +67,7 @@
 *        the ADAM message system.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
 *     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
@@ -108,6 +108,9 @@
 *        Use common block setter
 *     15-SEP-2008 (TIMJ):
 *        Rewrite in C.
+*     09-JAN-2009 (TIMJ):
+*        FILTER values can now be MSG__NONE to MSG__ALL and assume that the
+*        integer argument is one of type msglev_t.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -132,9 +135,6 @@ void msgTune( const char * param, int value, int * status ) {
   const char * parnames[] = { "SZOUT", "STREAM", "FILTER", NULL };
   const char * thispar = NULL;   /* Selected parameter */
 
-  const int levels[] = { MSG__QUIET, MSG__NORM, MSG__VERB,
-                            MSG__DEBUG };
-
   int i;
   int set;                 /* Value has been set */
   int env = 0;             /* Are we using the environment? */
@@ -143,12 +143,8 @@ void msgTune( const char * param, int value, int * status ) {
   int envval;              /* Tuning value from environment */
   int fromenv = 0;         /* Value came from environment */
   int ltune;               /* Actual tuning value used */
-  int nfilt;               /* Number of messaging filters */
 
   if (*status != SAI__OK) return;
-
-  /* How many filters */
-  nfilt = sizeof(levels) / sizeof(*levels);
 
   /* Check for 'ENVIRONMENT' */
   if  (strcasecmp( param, "ENVIRONMENT" ) == 0) {
@@ -223,9 +219,11 @@ void msgTune( const char * param, int value, int * status ) {
         if (ltune != -1) msg1Ptstm( ltune );
 
       } else if (strcasecmp( "FILTER", thispar ) == 0 ) {
-        /* This should really allow a string QUIET, VERBOSE etc */
-        if ( useval > 0 && useval <= nfilt ) {
-          msgIfset( levels[useval-1], status );
+        /* This should really allow a string QUIET, VERBOSE etc
+           but that would have to be a different API */
+        if ( useval >= MSG__NONE && useval <= MSG__ALL ) {
+          /* Assume that the supplied int is a valid msglev_t */
+          msgIfset( useval, status );
         } else {
           *status = MSG__BTUNE;
         }

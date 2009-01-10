@@ -26,21 +26,27 @@
 *        Message output filter. This may be one of these values:
 *        
 *           -  MSG__QUIET = always output the message, regardless of the
-*           output filter setting;
+*           output filter setting; this can be overridden by setting the
+*           filter level to MSG___NONE.
 *           -  MSG__NORM = output the message if the current output
-*           filter is set to either MSG__NORM or MSG__VERB or MSG__DEBUG;
+*           filter is set to either MSG__NORM or MSG__VERB or MSG__DEBUGnn;
 *           -  MSG__VERB = output the message only if the current
-*           output filter is set to MSG__VERB or MSG__DEBUG;
+*           output filter is set to MSG__VERB or MSG__DEBUGnn;
 *           -  MSG__DEBUG = out the message only if the current
-*           output filter is set to MSG__DEBUG.
+*           output filter is set to MSG__DEBUGnn.
+*           -  MSG__DEBUGnn = output the message only if the current output
+*           filter is less than or equal to MSG__DEBUGnn. 1 <= NN <= 20.
 *
 *        Here, the collating sequence:
 *
-*           MSG__QUIET < MSG__NORM < MSG__VERB < MSG__DEBUG
+*           MSG__QUIET < MSG__NORM < MSG__VERB < MSG__DEBUG < MSG__DEBUGnn
 *           
 *        may be assumed. Any other value will result in an error report
 *        and the status being returned set to MSG__INVIF: no further 
-*        action will be taken.
+*        action will be taken. MSG__NONE can not be specified as a priority
+*        since that is used as a level indicating that all messages should
+*        be surpressed. MSG__ALL can also not be a priority since that level
+*        indicates that all messages should be displayed.
 *     param = const char * (Given)
 *        The message name.
 *     text = const char * (Given)
@@ -115,6 +121,8 @@
 *        Use msglev_t rather than simple integer.
 *     24-DEC-2008 (TIMJ):
 *        Internal copy of msgOutif. Supports sprintf processing.
+*     09-JAN-2009 (TIMJ):
+*        Extend range of filters.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -150,8 +158,9 @@ void msg1Outif( msglev_t prior, const char * param, const char * text,
   } else {
 
     /*     The given status is OK, so check that the given value of the
-     *     output filter is allowed. */
-    if (prior < MSG__QUIET || prior > MSG__DEBUG) {
+     *     output filter is allowed. NONE and ALL are not allowed as input
+     *     messaging levels. */
+    if (prior < MSG__QUIET || prior >= MSG__ALL) {
 
       /*        The given message filtering level is out of range: set the
        *        returned status and report an error. (Mark and subsequently 
@@ -169,7 +178,8 @@ void msg1Outif( msglev_t prior, const char * param, const char * text,
 
     } else {
 
-      /*        Conditionally output the given message.*/
+      /*        Conditionally output the given message. NONE will always
+                fail and ALL will always pass. */
       if (prior <= msg1Gtinf() ) {
 
         /*           Form the output message string. */

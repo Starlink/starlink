@@ -742,6 +742,7 @@ represented by symbolic constants defined in the include file
 \item [MSG\_\_NORM] -- normal mode, normal priority (default);
 \item [MSG\_\_VERB] -- verbose mode, low priority.
 \item [MSG\_\_DEBUG] -- debug mode, lowest priority
+\item [MSG\_\_DEBUGnn] -- multiple debug modes. 1 to 20.
 \end {description}
 \end {quote}
 Whether or not the message will be output depends upon the ``conditional
@@ -753,10 +754,10 @@ message output filter'' which may be set using the subroutine MSG\_IFSET.
 \end{verbatim}
 \end {small}
 The first argument of MSG\_IFSET is the required conditional output filter
-level -- it may take the same values as the message priority; by default it
-is set to MSG\_\_NORM.
+level -- it may take the same values as the message priority with the addition of MSG\_\_NONE and MSG\_\_ALL; by default it is set to MSG\_\_NORM.
 The current conditional output filtering level may be inquired using
-subroutine MSG\_IFLEV.
+subroutine MSG\_IFLEV. NONE and ALL allow every message to be hidden or all messages to be displayed respectively. These levels can not be used with
+MSG\_OUTIF.
 
 See also
 \htmlref{MSG\_TUNE}{MSG_TUNE}

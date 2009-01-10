@@ -19,13 +19,17 @@
 *     abbreviations. This value is then used to set the informational
 *     filtering level. It is recommended that one parameter name is
 *     used universally for this purpose, namely MSG_FILTER, in order to
-*     clarify the interface file entries.  The three acceptable strings
+*     clarify the interface file entries.  The acceptable strings
 *     for MSG_FILTER are
 *
+*        -  NONE  -- representing MSG__NONE;
 *        -  QUIET -- representing MSG__QUIET;
 *        -  NORMAL -- representing MSG__NORM;
-*        -  VERBOSE -- representing MSG__VERB.
-*        -  DEBUG -- representing MSG__DEBUG
+*        -  VERBOSE -- representing MSG__VERB;
+*        -  DEBUG -- representing MSG__DEBUG;
+*        -  DEBUG1 to DEBUG20 -- representing MSG__DEBUGnn;
+*        -  ALL -- representing MSG__ALL
+*        
 *
 *     msgIfget accepts abbreviations of these strings; any other value
 *     will result in an error report and the status value being
@@ -40,7 +44,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
 *     Copyright (C) 1991, 1992 Science & Engineering Research Council.
 *     Copyright (C) 1996, 1999, 2004 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
@@ -89,6 +93,8 @@
 *        Add MSG__DEBUG
 *     12-SEP-2008 (TIMJ):
 *        Rewrite in C.
+*     09-JAN-2009 (TIMJ):
+*        Add new message levels.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -111,18 +117,23 @@
 
 void msgIfget( const char * pname, int * status ) {
 
+  /* we will assume that the index into this array corresponds to
+     the actual constant msglev_t value */
   const char * slevels[] = {
-    "QUIET", "NORMAL", "VERBOSE", "DEBUG", NULL
-  };
-  const int ilevels[] = {
-    MSG__QUIET, MSG__NORM, MSG__VERB, MSG__DEBUG
+    "NONE", "QUIET", "NORMAL", "VERBOSE", "DEBUG",
+    "DEBUG1", "DEBUG2", "DEBUG3", "DEBUG4", "DEBUG5",
+    "DEBUG6", "DEBUG7", "DEBUG8", "DEBUG9", "DEBUG10",
+    "DEBUG11", "DEBUG12", "DEBUG13", "DEBUG14", "DEBUG15",
+    "DEBUG16", "DEBUG17", "DEBUG18", "DEBUG19", "DEBUG20",
+    "ALL", NULL
   };
 
-  int i;                /* Loop counter */
-  int filter;           /* Message filtering level */
+  size_t i;             /* Loop counter */
+  msglev_t filter;      /* Message filtering level */
   size_t namcod;        /* SUBPAR pointer to parameter */
   char fname[8];        /* Name of message filtering level */
   size_t flen;          /* length of supplied string */
+  const msglev_t badlev = -1; /* indicate that we did not match a level */
 
   /*  Check inherited global status. */
   if (*status != SAI__OK) return;
@@ -146,7 +157,7 @@ void msgIfget( const char * pname, int * status ) {
   } else {
 
     i = 0;
-    filter = -1;  /* initialise so that we can see if we set it */
+    filter = badlev;  /* initialise so that we can see if we set it */
     flen = strlen( fname );
 
     while ( slevels[i] != NULL ) {
@@ -155,14 +166,14 @@ void msgIfget( const char * pname, int * status ) {
       if (strncasecmp( slevels[i], fname, flen ) == 0 ) {
 
         /* we have a match */
-        filter = ilevels[i];
+        filter = i;
         break;
       }
       i++;
     }
 
     /*     Set the message filtering level. */
-    if (filter != -1) {
+    if (filter != badlev) {
       msg1Ptinf( filter );
     } else {
 

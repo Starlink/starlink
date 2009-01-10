@@ -28,21 +28,27 @@
 *        Message output filter. This may be one of these values:
 *        
 *           -  MSG__QUIET = always output the message, regardless of the
-*           output filter setting;
+*           output filter setting; this can be overridden by setting the
+*           filter level to MSG___NONE.
 *           -  MSG__NORM = output the message if the current output
-*           filter is set to either MSG__NORM or MSG__VERB or MSG__DEBUG;
+*           filter is set to either MSG__NORM or MSG__VERB or MSG__DEBUGnn;
 *           -  MSG__VERB = output the message only if the current
-*           output filter is set to MSG__VERB or MSG__DEBUG;
+*           output filter is set to MSG__VERB or MSG__DEBUGnn;
 *           -  MSG__DEBUG = out the message only if the current
-*           output filter is set to MSG__DEBUG.
+*           output filter is set to MSG__DEBUGnn.
+*           -  MSG__DEBUGnn = output the message only if the current output
+*           filter is less than or equal to MSG__DEBUGnn. 1 <= NN <= 20.
 *
 *        Here, the collating sequence:
 *
-*           MSG__QUIET < MSG__NORM < MSG__VERB < MSG__DEBUG
+*           MSG__QUIET < MSG__NORM < MSG__VERB < MSG__DEBUG < MSG__DEBUGnn
 *           
 *        may be assumed. Any other value will result in an error report
 *        and the status being returned set to MSG__INVIF: no further 
-*        action will be taken.
+*        action will be taken. MSG__NONE can not be specified as a priority
+*        since that is used as a level indicating that all messages should
+*        be surpressed. MSG__ALL can also not be a priority since that level
+*        indicates that all messages should be displayed.
 *     param = const char * (Given)
 *        The message name.
 *     text = const char * (Given)
@@ -62,7 +68,7 @@
 
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -88,6 +94,8 @@
 *  History:
 *     24-DEC-2008 (TIMJ):
 *        Original version
+*     09-JAN-2009 (TIMJ):
+*        Update prologue for message levels.
 *     {enter_further_changes_here}
 
 *  Bugs:
