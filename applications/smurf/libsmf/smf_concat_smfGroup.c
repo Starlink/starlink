@@ -479,14 +479,14 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
 		
                 /* Allocate space in the smfData for DATA/VARAIANCE/QUALITY */
                 if( isTordered ) {
-                  data->dims[0] = refncol;
-                  data->dims[1] = refnrow;
-                  data->dims[2] = tlen;
-                  ncol = data->dims[SMF__COL_INDEX];
+                 data->dims[SMF__COL_INDEX] = refncol; 
+                 data->dims[SMF__ROW_INDEX] = refnrow;
+                 data->dims[2] = tlen;
+                 ncol = data->dims[SMF__COL_INDEX];
                 } else {
                   data->dims[0] = tlen;
-                  data->dims[1] = refnrow;
-                  data->dims[2] = refncol;
+                  data->dims[SMF__ROW_INDEX+1] = refnrow;
+                  data->dims[SMF__COL_INDEX+1] = refncol;
                   ncol = data->dims[1+SMF__COL_INDEX];
                 }
                 data->ndims = 3;
@@ -581,7 +581,7 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
                 }
               }
 
-              /* dark squids */
+              /* dark squids */ 
               if( da ) {
                 memcpy( &(da->dksquid[tchunk*ncol]), refdata->da->dksquid,
                         reftlen*ncol*sizeof(*(da->dksquid)) );
