@@ -137,6 +137,7 @@ void msgIfget( const char * pname, int * status ) {
   char fname[8];        /* Name of message filtering level */
   size_t flen;          /* length of supplied string */
   const msglev_t badlev = -1; /* indicate that we did not match a level */
+  char *endptr = NULL;  /* position in strong after finding number */
 
   /*  Check inherited global status. */
   if (*status != SAI__OK) return;
@@ -163,11 +164,11 @@ void msgIfget( const char * pname, int * status ) {
 
     /* See if we have an integer rather than a string */
     errno = 0;
-    strint = strtoul( fname, NULL, 10 );
+    strint = strtoul( fname, &endptr, 10 );
 
-    /* non-zero errno seems to be the only portable way of trapping
-       failure. */
-    if (errno != 0) {
+    /* Trapping failure seems to be non-portable to we ask for endptr so
+       that we can compare it with fname as well as looking at errno. */
+    if ( ( strint == 0 && errno != 0) || ( endptr == fname ) ) {
       /* was not an integer so treat as string */
 
       i = 0;
@@ -186,6 +187,7 @@ void msgIfget( const char * pname, int * status ) {
       }
     } else {
       /* was a valid match */
+      printf(" Strint = %lu errnor = %d fname='%s'\n",strint,errno,fname);
       filter = strint;
     }
 
