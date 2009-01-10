@@ -187,7 +187,6 @@ void msgIfget( const char * pname, int * status ) {
       }
     } else {
       /* was a valid match */
-      printf(" Strint = %lu errnor = %d fname='%s'\n",strint,errno,fname);
       filter = strint;
     }
 
