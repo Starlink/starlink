@@ -94,7 +94,7 @@
 *     12-SEP-2008 (TIMJ):
 *        Rewrite in C.
 *     09-JAN-2009 (TIMJ):
-*        Add new message levels.
+*        Add new message levels. Recognize an integer as a valid level.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -113,6 +113,8 @@
 #include "star/subpar.h"
 #include "ems.h"
 
+#include <errno.h>
+#include <stdlib.h>
 #include <string.h>
 
 void msgIfget( const char * pname, int * status ) {
@@ -128,6 +130,7 @@ void msgIfget( const char * pname, int * status ) {
     "ALL", NULL
   };
 
+  unsigned long strint; /* string as integer */
   size_t i;             /* Loop counter */
   msglev_t filter;      /* Message filtering level */
   size_t namcod;        /* SUBPAR pointer to parameter */
@@ -156,25 +159,39 @@ void msgIfget( const char * pname, int * status ) {
 
   } else {
 
-    i = 0;
     filter = badlev;  /* initialise so that we can see if we set it */
-    flen = strlen( fname );
 
-    while ( slevels[i] != NULL ) {
-      /* compare case insensitive. Assume that subParGet0c
-         returns terminated string */
-      if (strncasecmp( slevels[i], fname, flen ) == 0 ) {
+    /* See if we have an integer rather than a string */
+    errno = 0;
+    strint = strtoul( fname, NULL, 10 );
 
-        /* we have a match */
-        filter = i;
-        break;
+    /* non-zero errno seems to be the only portable way of trapping
+       failure. */
+    if (errno != 0) {
+      /* was not an integer so treat as string */
+
+      i = 0;
+      flen = strlen( fname );
+
+      while ( slevels[i] != NULL ) {
+        /* compare case insensitive. Assume that subParGet0c
+           returns terminated string */
+        if (strncasecmp( slevels[i], fname, flen ) == 0 ) {
+
+          /* we have a match */
+          filter = i;
+          break;
+        }
+        i++;
       }
-      i++;
+    } else {
+      /* was a valid match */
+      filter = strint;
     }
 
     /*     Set the message filtering level. */
     if (filter != badlev) {
-      msg1Ptinf( filter );
+      msgIfset( filter, status );
     } else {
 
       /*        An invalid filter name has been used, so report an error. */

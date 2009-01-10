@@ -32,6 +32,9 @@ Version 2.0
    MSG__ALL (every message) but these can not be used in msgOutif calls. This
    allows all messages to be silenced or all messages to be displayed.
 
+ o msgIfget can now understand parameters that have an integer value as well as
+   parameters containing the level string. This is to allow the KAPPA ILEVEL
+   scheme to coexist.
 
 Version 1.8-2
 -------------
