@@ -122,6 +122,8 @@
 *        Fix ^STATUS expansion.
 *     23-DEC-2008 (TIMJ):
 *        Disable keyword associations if sprintf formats are required.
+*     12-JAN-2008 (TIMJ):
+*        Fix logic with STREAM mode and with % escaping.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -165,6 +167,7 @@ void msg1Form ( const char * param, const char * text, int clean,
   int lstat = SAI__OK; /* Local status */
   int lstpos;          /* Previous value of curpos */
   int namlen;          /* Name string length */
+  int oldstm;          /* Initial EMS STREAM setting */
   int pstat = SAI__OK; /* Local status */
   int texlen;          /* message text length */
   int tkvlen;          /* Token value length */
@@ -267,8 +270,12 @@ void msg1Form ( const char * param, const char * text, int clean,
     }
 
     /*     Make a first pass to expand plain ^ tokens
-     *     This will also kill tokens */
+     *     This will also kill tokens  - note that we have to force
+     *     STREAM mode in EMS so that we can control it ourselves
+     *     later on */
+    oldstm = emsStune( "STREAM", !clean, &lstat );
     emsExpnd( texst0, texst2, sizeof(texst2), useformat, &texlen, &lstat);
+    (void) emsStune( "STREAM", oldstm, &lstat );
 
     /*     Initialise token escape state flag. */
     literl = 0;
@@ -282,10 +289,10 @@ void msg1Form ( const char * param, const char * text, int clean,
 
     /*     Initialise the escape string and previous escape character.
            Note that KEY escapes are not included if useformat is true and
-           if it happens to be a "%".
+           if it happens to be a "%" that we use for params.
      */
     star_strlcpy( escstr, MSG__REFEC, sizeof(escstr) );
-    if (useformat && strcmp(MSG__KEYEC, "%") == 0) {
+    if (!(useformat && strcmp(MSG__KEYEC, "%") == 0)) {
       star_strlcat( escstr, MSG__KEYEC, sizeof(escstr) );
     }
     prevec[0] = '\0';
@@ -439,7 +446,6 @@ void msg1Form ( const char * param, const char * text, int clean,
           msgstr[i] = ' ';
         }
       }
-
     }
 
   }
