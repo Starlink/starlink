@@ -48,8 +48,8 @@
 *  Copyright:
 *     Copyright (C) 1982, 1984, 1985, 1989 Science & Engineering Research
 *     Council. Copyright (C) 1999, 2001 Central Laboratory of the Research
-*     Councils. Copyrigh (C) 2008 Science and Technology Facilities Council.
-*     All Rights Reserved.
+*     Councils. Copyrigh (C) 2008, 2009 Science and Technology Facilities
+*     Council. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -94,6 +94,8 @@
 *        Rewrite in C
 *     23-DEC-2008 (TIMJ):
 *        Add useformat argument.
+*     12-JAN-2009 (TIMJ):
+*        Remember to adjust EMS STREAM tuning parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -113,13 +115,22 @@
 #include "mers1.h"
 
 void msg1Form ( const char * param __attribute__((unused)),
-                const char * text, int clean __attribute__((unused)),
+                const char * text, int clean,
                 int useformat, size_t msglen, char * msgstr,
                 int * status __attribute__((unused)) ) {
 
   int lstat = SAI__OK;   /* Local status */
   int retlen = 0;
+  int oldstm;
+
+  /* Since we use EMS for expansion we have to override the STREAM
+     tuning control */
+  oldstm = emsStune( "STREAM", !clean, &lstat );
 
   /*  Call emsExpnd. */
   emsExpnd( text, msgstr, msglen, useformat, &retlen, &lstat );
+
+  /* reset tuning */
+  (void) emsStune( "STREAM", oldstm, &lstat );
+
 }
