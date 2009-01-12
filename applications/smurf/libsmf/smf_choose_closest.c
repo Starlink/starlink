@@ -135,7 +135,7 @@ void smf_choose_closest( const smfArray *alldata, const smfData *indata,
     if ( (*status==SAI__OK) && (thissubnum == refsubnum) ) {
       double thistime = (thisdark->hdr->allState)[0].rts_end;
       double diff = reftime - thistime;
-      if (diff > 0) {
+      if (diff >= 0) {
         if (prev.diff > diff) {
           prev.diff = diff;
           prev.index = i;
@@ -146,15 +146,15 @@ void smf_choose_closest( const smfArray *alldata, const smfData *indata,
           next.diff = diff;
           next.index = i;
         }
-      } else {
+      } //else {
         /* should not be possible */
-        if (*status == SAI__OK) {
-          *status = SAI__ERROR;
-          errRep(" ","Should not be possible for dark and science "
-                 "observation to have identical MJD times", status );
-          return;
-        }
-      }
+        //if (*status == SAI__OK) {
+        //  *status = SAI__ERROR;
+        //  errRep(" ","Should not be possible for dark and science "
+        //         "observation to have identical MJD times", status );
+        //  return;
+        //}
+      //}
     }
   }
 

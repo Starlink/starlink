@@ -181,9 +181,12 @@ void smf_apply_mask( smfData *indata, unsigned char *quality,
         if (*status == SAI__OK) {
           *status = SAI__ERROR;
           msgSeti( "B1", bpm->dims[0]);
-          msgSeti( "B1", bpm->dims[0]);
+          msgSeti( "B2", bpm->dims[1]);
+          msgSeti( "D1", indata->dims[0]);
+          msgSeti( "D2", indata->dims[1]);
           errRep( " ", FUNC_NAME ": the selected bad pixel mask has a "
-                  "different number of elements than the data it is masking",
+                  "different number of elements (^B1,^B2) than the data "
+                  "it is masking (^D1,^D2)",
                   status);
         }
       }
