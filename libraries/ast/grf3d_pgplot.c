@@ -853,7 +853,7 @@ int astG3DText( const char *text, float ref[3], const char *just, float up[3],
    coordinate system. */
    if( !getTextAxes( ref, up, norm, just, tx, ty, tz, newjust ) ) return 0;
 
-/* Draw thex text. */
+/* Draw the text. */
    return Text( list, nlist, ref, newjust, tx, ty, tz );
 
 /* Clear local constants. */
@@ -1946,7 +1946,7 @@ static int Text( int *list, int nlist, float ref[3], const char *just,
 *        X axis. This is parallel to the text base line.
 *     ty
 *        A unit vector (expressed in 3D world coords) along the text plane 
-*        Y axis. This is parallel to the projectionof ht eup vector on to
+*        Y axis. This is parallel to the projection of the up vector on to
 *        the text plane.
 *     tz
 *        A unit vector (expressed in 3D world coords) along the text plane 
@@ -3129,11 +3129,15 @@ F77_INTEGER_FUNCTION(ast_g3dtext)( CHARACTER(TEXT),
    GENPTR_REAL_ARRAY(UP)
    GENPTR_REAL_ARRAY(NORM)
    F77_INTEGER_TYPE(RESULT);
-   char *text, *just;
+   char *text, *just, *p;
 
    text = astString( TEXT, TEXT_length );
    just = astString( JUST, JUST_length );
       
+/* Ignore trailing spaces in the text */
+   p = text + TEXT_length;
+   while( !*p || *p == ' ' ) *(p--) = 0;
+
    if( astOK ) {
       RESULT = (F77_INTEGER_TYPE) astG3DText( text, REF, just, UP, NORM );
    } else {
@@ -3167,11 +3171,15 @@ F77_INTEGER_FUNCTION(ast_g3dtxext)( CHARACTER(TEXT),
    GENPTR_REAL_ARRAY(ZB)
    GENPTR_REAL_ARRAY(BL)
    F77_INTEGER_TYPE(RESULT);
-   char *text, *just;
+   char *text, *just, *p;
 
    text = astString( TEXT, TEXT_length );
    just = astString( JUST, JUST_length );
-      
+
+/* Ignore trailing spaces in the text */
+   p = text + TEXT_length;
+   while( !*p || *p == ' ' ) *(p--) = 0;
+
    if( astOK ) {
       RESULT = (F77_INTEGER_TYPE) astG3DTxExt( text, REF, just, UP, NORM,
                                                XB, YB, ZB, BL );
