@@ -14,9 +14,9 @@
 
 *  Invocation:
 *     smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
-*                          size_t whichchunk, int isTordered,
-*                          AstFrameSet *outfset, int moving, int
-*                          *lbnd_out, int *ubnd_out, dim_t padStart,
+*                          const smfArray *bpms, size_t whichchunk, 
+*                          int isTordered, AstFrameSet *outfset, int moving, 
+*                          int *lbnd_out, int *ubnd_out, dim_t padStart,
 *                          dim_t padEnd, int flags, smfArray **concat,
 *                          int *status )
 
@@ -26,6 +26,8 @@
 *     darks = const smfArray * (Given)
 *        Collection of darks that can be applied to non-flatfielded data.
 *        Can be NULL.
+*     bpms = smfArray * (Given) 
+*        Masks for each subarray (e.g. returned by smf_reqest_mask call)
 *     whichchunk = size_t (Given)
 *        Which continuous subset of igrp will get concatenated?
 *     isTordered = int (Given)
@@ -117,6 +119,8 @@
 *        Padded JCMTState filled with first/last real values.
 *     2009-01-07 (EC):
 *        Stride-ify
+*     2009-01-12 (EC):
+*        Add bad pixel masks (bpms) to interface
 
 *  Notes:
 *     If projection information supplied, pointing LUT will not be
@@ -178,9 +182,9 @@
 
 #define FUNC_NAME "smf_concat_smfGroup"
 
-void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
-                          size_t whichchunk, int isTordered, 
-                          AstFrameSet *outfset, int moving, 
+void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks, 
+                          const smfArray *bpms, size_t whichchunk, 
+                          int isTordered, AstFrameSet *outfset, int moving, 
                           int *lbnd_out, int *ubnd_out, dim_t padStart,
                           dim_t padEnd, int flags, smfArray **concat, 
                           int *status ) {
@@ -403,6 +407,9 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
              require flat-fielding. */
           smf_open_and_flatfield( igrp->grp, NULL, igrp->subgroups[j][i], 
                                   darks, &refdata, status );
+
+          /* Apply bad pixel mask */
+          smf_apply_mask( refdata, NULL, bpms, SMF__BPM_DATA, status );
 
           /* Calculate the pointing LUT if requested */
           if( !(flags & SMF__NOCREATE_LUT) && outfset ) {

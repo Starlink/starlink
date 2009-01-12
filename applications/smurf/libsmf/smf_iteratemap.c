@@ -26,6 +26,8 @@
 *        keymap containing parameters to control map-maker
 *     darks = const smfArray * (Given)
 *        Collection of dark frames. Can be NULL.
+*     bpms = smfArray * (Given) 
+*        Masks for each subarray (e.g. returned by smf_reqest_mask call)
 *     outfset = AstFrameSet* (Given)
 *        Frameset containing the sky->output map mapping if calculating
 *        pointing LUT on-the-fly
@@ -167,6 +169,8 @@
 *     2009-01-06 (EC):
 *        -Added flagging of data during stationary telescope pointing
 *        -apply bad pixel mask (BPM)
+*     2009-01-12 (EC):
+*        Move application of BPM into smf_concat_smfGroup
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -791,7 +795,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
         res = smf_malloc( nchunks, sizeof(*res), 1, status );
 
         /* Concatenate (no variance since we calculate it ourselves -- NOI) */
-        smf_concat_smfGroup( igroup, darks, contchunk, 0, outfset, moving,
+        smf_concat_smfGroup( igroup, darks, bpms, contchunk, 0, outfset, moving,
                              lbnd_out, ubnd_out, padStart, padEnd, 
                              SMF__NOCREATE_VARIANCE, &res[0], status );
       } 
@@ -982,11 +986,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
               msgOutif(MSG__VERB," ", "  update quality", status);
               smf_update_quality( data, qua_data, 1, NULL, badfrac, status );
 
-              if( bpms ) {
-                msgOutif(MSG__VERB," ", "  applying BPM", status);
-                smf_apply_mask( data, qua_data, bpms, SMF__BPM_QUAL, status );
-              }
-                                  
               if( baseorder >= 0 ) {
                 msgOutif(MSG__VERB," ", "  fit polynomial baselines", status);
                 smf_scanfit( data, qua_data, baseorder, status );

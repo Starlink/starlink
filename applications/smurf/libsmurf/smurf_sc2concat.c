@@ -222,7 +222,7 @@ void smurf_sc2concat( int *status ) {
   for( contchunk=0;(*status==SAI__OK)&&contchunk<ncontchunks; contchunk++ ) {
 
     /* Concatenate this continuous chunk */
-    smf_concat_smfGroup( igroup, darks, contchunk, 1, NULL, 0, NULL, 
+    smf_concat_smfGroup( igroup, darks, NULL, contchunk, 1, NULL, 0, NULL, 
                          NULL, padStart, padEnd, 0, &concat, status );
     
     /* Export concatenated data for each subarray to NDF file */
