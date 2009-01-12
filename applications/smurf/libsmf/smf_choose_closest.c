@@ -48,7 +48,8 @@
 *     2008-11-25 (TIMJ):
 *        Rename from smf_choose_darks:27736
 *     2009-01-12 (EC):
-*        Set status if invalid JCMTState in dark header
+*        -Set status if invalid JCMTState in dark header
+*        -Don't set bad status if dark time stamp same as data
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -146,15 +147,7 @@ void smf_choose_closest( const smfArray *alldata, const smfData *indata,
           next.diff = diff;
           next.index = i;
         }
-      } //else {
-        /* should not be possible */
-        //if (*status == SAI__OK) {
-        //  *status = SAI__ERROR;
-        //  errRep(" ","Should not be possible for dark and science "
-        //         "observation to have identical MJD times", status );
-        //  return;
-        //}
-      //}
+      } 
     }
   }
 
