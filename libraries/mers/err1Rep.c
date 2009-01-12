@@ -61,7 +61,7 @@
 *     -  Use emsRep to store the message in the error table.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
 *     Copyright (C) 1983, 1989-1991, 1994 Science & Engineering
 *     Research Council.
 *     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
@@ -122,6 +122,8 @@
 *        Rewrite in C
 *     23-DEC-2008 (TIMJ):
 *        Copy from errRep to allow printf formatting to be enabled/disabled.
+*     12-JAN-2009 (TIMJ):
+*        Fix err1Gtstm logic for msg1Form (was inverted)
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -196,7 +198,7 @@ void err1Rep( const char * param, const char * text, int useformat,
 
   /*  Now form the given error message.
    *  Status is not altered by this routine. */
-  msg1Form( param, text, err1Gtstm(), useformat, sizeof(tstr), tstr, &istat );
+  msg1Form( param, text, !err1Gtstm(), useformat, sizeof(tstr), tstr, &istat );
 
   /*  Any double ^ will now be single - we must protect it from EMS_REP */
   lpos = 0;
