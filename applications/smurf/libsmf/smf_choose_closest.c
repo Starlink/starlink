@@ -37,6 +37,7 @@
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     EC: Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -46,9 +47,12 @@
 *        Be more lenient with time gaps for scan mode. Use SMF__BADIDX
 *     2008-11-25 (TIMJ):
 *        Rename from smf_choose_darks:27736
+*     2009-01-12 (EC):
+*        Set status if invalid JCMTState in dark header
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2009 University of British Columbia
 *     All Rights Reserved.
 
 *  Licence:
@@ -87,6 +91,8 @@ typedef struct {
   double diff;
 } smf_timediff;
 
+#define FUNC_NAME "smf_choose_closest"
+
 void smf_choose_closest( const smfArray *alldata, const smfData *indata,
                        size_t *previdx, size_t *nextidx, int * status ) {
   size_t i;          /* loop counter */
@@ -113,13 +119,20 @@ void smf_choose_closest( const smfArray *alldata, const smfData *indata,
 
   /* loop through all the darks finding the ones closest in time
      with the correct subarray number */
-  for (i=0; i< alldata->ndat; i++) {
+  for (i=0; (*status==SAI__OK)&&(i<alldata->ndat); i++) {
     smfData *thisdark = (alldata->sdata)[i];
     int thissubnum;
     smf_find_subarray( thisdark->hdr, NULL, 0, &thissubnum, status );
 
+    /* Is there a valid state? */
+    if( !thisdark->hdr->allState ) {
+      *status = SAI__ERROR;
+      errRep( "", FUNC_NAME ": dark does not contain a valid JCMT State", 
+              status );
+    }
+
     /* see if we even need to look at the time */
-    if (thissubnum == refsubnum) {
+    if ( (*status==SAI__OK) && (thissubnum == refsubnum) ) {
       double thistime = (thisdark->hdr->allState)[0].rts_end;
       double diff = reftime - thistime;
       if (diff > 0) {
