@@ -78,9 +78,8 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
       eval itk_initialize $args
 
       #  Handler for temporary files.
-      set tempcats_ [gaia::GaiaTempName \#auto -prefix GaiaVOSIAP \
+      set tempcats_ [gaia::GaiaTempName \#auto -prefix GaiaTempSIAP \
                         -exists 0 -type ".TAB"]
-
       set lwidth 10
       set vwidth 50
 

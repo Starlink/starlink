@@ -78,7 +78,7 @@ itcl::class gaiavo::GaiaVOSIAPSearch {
       eval itk_initialize $args
 
       #  Handler for temporary files.
-      set tempcats_ [gaia::GaiaTempName \#auto -prefix GaiaVOSIAP \
+      set tempcats_ [gaia::GaiaTempName \#auto -prefix GaiaTempSIAP \
                         -exists 0 -type ".TAB"]
 
       #  Display the SIAP shortname and/or access URL.

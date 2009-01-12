@@ -119,6 +119,21 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
          return
       }
 
+      #  Add additional commands to display the selected images in new
+      #  windows. Re-uses "Open" as Display.
+      $itk_component(open) configure -text "Display"
+      add_short_help $itk_component(open) "Download and display selected image"
+      
+      itk_component add displaynew {
+         button $itk_component(buttons).displaynew \
+            -text "Display in new" \
+            -command [code $this display_in_new]
+      }
+      pack $itk_component(displaynew) -before $itk_component(close) \
+         -side left -expand 1 -pady 2m
+      add_short_help $itk_component(displaynew) \
+         {Download and display selected image in new windows}
+
       #  Set default name server.
       set_namesvr $namesvr
 
@@ -176,6 +191,16 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
       }
    }
 
+   #  Display the selected image in a new window.
+   public method display_in_new {} {
+      set new_window_ 1
+      foreach row [$itk_component(results$current_) get_selected] {
+         $this open_service_ $row
+         break
+      }
+      set new_window_ 0
+   }
+
    #  Open a service, "args" is a list of values from a row of the
    #  current table.
    protected method open_service_ {args} {
@@ -195,7 +220,8 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
       if { $itk_option(-gaia) != {} } {
          if { $urlget_ == {} } {
             set urlget_ [gaia::GaiaUrlGet .\#auto \
-                            -notify_cmd [code $this display_image_]]
+                            -notify_cmd \
+                            [code $this display_image_ $new_window_]]
             blt::busy hold $w_
             $urlget_ get $accessref
          }
@@ -203,10 +229,14 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
    }
 
    #  Display an image, if it exists.
-   protected method display_image_ {filename type} {
+   protected method display_image_ {new_window filename type} {
       blt::busy release $w_
       if { [::file exists $filename] } {
-         $itk_option(-gaia) open $filename
+         if { $new_window } {
+            $itk_option(-gaia) newimage_clone $filename
+         } else {
+            $itk_option(-gaia) open $filename
+         }
       }
       if { $urlget_ != {} } {
          catch {delete object $urlget_}
@@ -272,6 +302,9 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
 
    #  The blacklist manager.
    protected variable blacklist_
+
+   #  Whether downloaded images should be displayed in new windows.
+   protected variable new_window_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------

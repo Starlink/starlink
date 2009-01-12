@@ -82,7 +82,7 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       eval itk_initialize $args
 
       #  Handler for temporary files.
-      set tempcats_ [gaia::GaiaTempName \#auto -prefix GaiaVORegistry \
+      set tempcats_ [gaia::GaiaTempName \#auto -prefix GaiaTempReg \
                         -exists 0 -type ".TAB"]
 
       #  Display the registry. Offer two symbolic types. NVO and AstroGrid.

@@ -190,7 +190,7 @@ itcl::class gaiavo::GaiaVOCats {
             -command [code $this open]
       }
       pack $itk_component(open) -side left -expand 1 -pady 2m
-      add_short_help $itk_component(open) {Open window to query selected service}
+      add_short_help $itk_component(open) {Open selected service}
 
       itk_component add close {
          button $itk_component(buttons).close \
@@ -214,12 +214,13 @@ itcl::class gaiavo::GaiaVOCats {
       wm withdraw $w_
    }
 
-   #  Open services for the selected rows. Depends on the type of service query
-   #  as to what will happen. For SIAP we should open a window to download an
-   #  image.
+   #  Open service for the the selected row. Depends on the type of service
+   #  query as to what will happen. For SIAP we should open a window to
+   #  download and display an image.
    public method open {} {
       foreach row [$itk_component(results$current_) get_selected] {
          open_service_ $row
+         break
       }
    }
 
@@ -305,7 +306,7 @@ itcl::class gaiavo::GaiaVOCats {
       #  the name of a VOTable file.
       if { $status && [file exists $result] } {
 
-         #  Got a VOTable.
+         #  Got a table response.
          busy {
             $w_.cat$current_ open $result
 
