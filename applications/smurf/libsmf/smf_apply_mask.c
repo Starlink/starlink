@@ -122,6 +122,15 @@ void smf_apply_mask( smfData *indata, unsigned char *quality,
   /* work out which masks are suitable */
   smf_choose_closest( bpms, indata, &previdx, &nextidx, status );
 
+  /* Only handles time-ordered at the moment */
+  if( indata->isTordered != 1 ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": bolo-ordered data not currently supported",
+            status );
+    return;
+  }
+
+  /* Internal or external quality? */
   if( quality ) {
     qua = quality;
   } else {
