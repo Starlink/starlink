@@ -54,7 +54,8 @@
 int main ( void ) {
   int exstat = EXIT_SUCCESS;
   int status = SAI__OK;
-  
+  int perc = 0;
+
   /* msgOut */
   msgBell( &status );
   msgBlank( &status );
@@ -76,8 +77,17 @@ int main ( void ) {
   msgOutif( MSG__VERB, " ", "Should be blank line after this", &status );
   msgBlankif( MSG__VERB, &status );
   msgOutif( MSG__VERB, " ", "Should see this verbose message", &status );
-  msgOutiff( MSG__VERB, " ", "Formatted %05d conditional message", &status,
+  msgOutiff( MSG__VERB, " ", "Formatted %05d conditional message and embedded per cent: %% ", &status,
              42);
+
+  msgTune( "STREAM", 1, &status );
+  
+  for (perc = 0; perc < 100; perc += 10 ) {
+    msgOutiff( MSG__VERB, "", "%3d %% done[9D[A",
+               &status, perc );
+  }
+  msgTune( "STREAM", 0, &status );
+  msgOutiff( MSG__VERB, "", "%3d %% done", &status, perc);
 
   msgIfset( MSG__NONE, &status );
   msgOutif( MSG__QUIET, " ", "Should not see this message", &status );
