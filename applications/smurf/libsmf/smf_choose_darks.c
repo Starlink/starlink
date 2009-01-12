@@ -118,14 +118,12 @@ void smf_choose_darks( const smfArray *darks, const smfData *indata,
         *dark2 = i;
       } else if (seqdiff == 0) {
         /* should not be possible */
-        //if (*status == SAI__OK) {
-        //  *status = SAI__ERROR;
-        //  errRep(" ","Should not be possible for dark and science "
-        //         "observation to have identical sequence counter.", status );
-        //  return;
-        *dark1=i;
-        *dark2=i;
-        //}
+        if (*status == SAI__OK) {
+          *status = SAI__ERROR;
+          errRep(" ","Should not be possible for dark and science "
+                 "observation to have identical sequence counter.", status );
+          return;
+        }
       }
     }
 
