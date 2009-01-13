@@ -53,6 +53,10 @@
  *     text are ignored, multiple blanks between words are maintained, a
  *     single blank is dropped in multiple blanks which occur at a new
  *     returned line.
+ *     - This routine does not know the format of EMS/ERR error strings so
+ *     if an input string is '!  very_long_word' the first return line will
+ *     be '!  ' and the second line returned will be 'very_long_word' truncated
+ *     to maxlen characters. This is probably not what was actually intended.
  
  *  Copyright:
  *     Copyright (C) 1991 Science & Engineering Research Council.
