@@ -20,8 +20,7 @@
 *     error context is not anulled and the status argument is returned 
 *     set to ERR__OPTER. The messages are output in the same way as using
 *     MSG_OUTIF in QUIET mode except that error messages are prepended with
-*     "#" similarly to normal error messages (instead of "!"). Note though
-*     that word-wrapped error messages will not include any prefix.
+*     "#" similarly to normal error messages (instead of "!").
 
 *  Arguments:
 *     STATUS = INTEGER (Returned)
