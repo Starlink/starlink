@@ -42,6 +42,11 @@
     this means you can now query for catalogue positions in J2000 and plot
     over an image set to B1950 and vice versa.
 
+    The contour toolbox now detects cubes displayed in other windows and
+    will step through the slices of the cube contouring each in turn over
+    the displayed image. See the help in the contour toolbox for how 
+    to use this.
+
   Lehuakona Release
   =================
 

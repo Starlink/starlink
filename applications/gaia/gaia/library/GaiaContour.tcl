@@ -12,7 +12,7 @@
 #     This class privides a toolbox for drawing contours over an
 #     image. The contours can be of the image itself, or of another
 #     image (which can be stored on disk, or displayed in another
-#     clone).
+#     clone, if in a clone that may display a cube).
 #
 #     The toolbox provides interactive control of the levels, the
 #     colour that each level is drawn in and its line width. Drawing
@@ -215,6 +215,27 @@ itcl::class gaia::GaiaContour {
          {Add custom colour...} \
          {Choose a new colour for menus}
 
+      #  If contouring a cube, displayed in another RTD, do we want to
+      #  move through the slices.
+      $Options add checkbutton \
+         -label {Cube: step through} \
+         -variable [scope cube_step_] \
+         -onvalue 1 \
+         -offvalue 0
+      $short_help_win_ add_menu_short_help $Options \
+         {Cube: step through} \
+         {If contouring a cube step through the slices, otherwise just displayed slice}
+
+      #  If contouring a cube, do we want to clear contours for each plane?
+      $Options add checkbutton \
+         -label {Cube: clear each slice} \
+         -variable [scope cube_clear_] \
+         -onvalue 1 \
+         -offvalue 0
+      $short_help_win_ add_menu_short_help $Options \
+         {Cube: clear each slice} \
+         {If contouring a cube clear contours for new slices}
+
       #  Allow selection of the contoured image.
       add_image_controls_
 
@@ -289,6 +310,7 @@ itcl::class gaia::GaiaContour {
       #  Set the canvas level tags and record no contours are drawn.
       for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
          set leveltags_($i) cont[incr unique_]
+         set linetags_($i) line[incr unique_]
          set drawn_($i) 0
       }
 
@@ -552,7 +574,7 @@ itcl::class gaia::GaiaContour {
    }
 
    #  Add controls for selecting the image to be contoured. This can
-   #  an image displayed in another window, or retained in a file.
+   #  be an image displayed in another window, or retained in a file.
    protected method add_image_controls_ {} {
 
       #  Separator.
@@ -722,7 +744,7 @@ itcl::class gaia::GaiaContour {
    #  Restore menu custom colours.
    protected method restore_custom_ {spec} {
       foreach {index colour} "$spec" {
-         add_custom_colour $colour $index 
+         add_custom_colour $colour $index
       }
    }
 
@@ -761,6 +783,30 @@ itcl::class gaia::GaiaContour {
       set_target_ $itk_option(-image)
    }
 
+   #  Get the GaiaCube instance associated with a given rtdimage. Return {} if
+   #  not a cube, rtdimage is the local one or we're not stepping through
+   #  slices. 
+   protected method get_gaiacube_ {rtdimage} {
+      if { $rtdimage != {} && $cube_step_ && $rtdimage != $itk_option(-rtdimage) } {
+
+         #  Only volatile rtdimage's are displaying cubes.
+         if { [$rtdimage volatile] } {
+
+            #  Locate all GaiaCtrlImages....
+            set images [skycat::SkyCat::get_skycat_images]
+
+            #  Check rtdimage of each of these against the one given.
+            foreach w $images {
+               if { [$w get_image] == $rtdimage } {
+                  #  Return the widget, if active.
+                  return [[winfo parent $w] get_gaia_cube]
+               }
+            }
+         }
+      }
+      return {}
+   }
+
    #  Set the "target" image.
    protected method set_target_ {name} {
       set target_ $name
@@ -769,14 +815,31 @@ itcl::class gaia::GaiaContour {
    #  Draw either all the contours or just one which is identified by
    #  its index.
    public method draw { {all 1} {index 0} args} {
+
+      #  Open the image.
+      set rtdimage [get_rtdimage_]
+      if { $rtdimage == 0 } {
+         return
+      }
+
       busy {
 
-         #  Check the image to be contoured.
-         set rtdimage [get_rtdimage_]
-         if { $rtdimage == 0 } {
-            return
-         }
+         #  Bind spacebar to pause the contouring.
+         bind $w_ <Key-space> [code $this toggle_pause_]
 
+         #  Bind escape to pause the contouring.
+         set halt_ 0
+         bind $w_ <Escape> [code $this halt_]
+
+         #  If this is the rtdimage of a displayed cube, in another window,
+         #  then we loop over the animation limits along the current axis, if
+         #  requested.
+         set gaiacube [get_gaiacube_ $rtdimage]
+         if { $gaiacube != {} } {
+            set gaiaanimation [$gaiacube component animation]
+            set delay_ [$gaiaanimation cget -delay]
+         }
+         
          #  Clear existing contours.
          if { $all } {
             remove_contours
@@ -785,58 +848,199 @@ itcl::class gaia::GaiaContour {
             remove_contour_ $index
             update
          }
-
+         
          #  If requested just display over the visible canvas +/- a little.
          if { ! $whole_ } {
             set bounds [calc_bounds_]
          } else {
             set bounds ""
          }
-
+         
          #  Draw the contours. Do this one at a time so that we can
          #  update the interface.
          if { $all } {
-            for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
-               set att [get_ast_att_ $i]
-               set level [$itk_component(value$i) get]
-
-               #  Set the tag used to control clear etc.
-               $itk_option(-rtdimage) configure -ast_tag \
-                  "$itk_option(-ast_tag) $leveltags_($i)"
-
-               #  Draw the contour (return value is number of points).
-               set drawn_($i) \
-                  [$itk_option(-rtdimage) contour \
-                      $level $rtdimage $careful_ $smooth_ \
-                      $att $bounds [expr {$i == 0}]]
-
-               #  Add/update the key.
-               draw_key_
-               update idletasks
+            
+            #  If this is a cube loop over the planes, drawing all the
+            #  contours for each plane before moving to the next.
+            if { $gaiacube != {} } {
+               set ll [$gaiaanimation cget -lower_limit]
+               set ul [$gaiaanimation cget -upper_limit]
+               set step [$gaiaanimation cget -step]
+            } else {
+               set ll 0
+               set ul 1
+               set step 1
             }
-         } else {
+            for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
+               set drawn_($i) 0
+            }
+            
+            #  Cube loop.
+            for {set j $ll} {$j <= $ul} {incr j $step} {
+               
+               if { $halt_ } {
+                  break
+               }
 
+               if { $gaiacube != {} } {
+                  #  Move cube to new plane.
+                  $gaiacube set_display_plane $j 0
+               }
+               
+               #  Level loop.
+               for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
+                  set att [get_ast_att_ $i]
+                  set level [$itk_component(value$i) get]
+                  if { $level == {} } {
+                     set drawn_($i) 0
+                     continue
+                  }
+
+                  #  Stop or wait for a while if asked.
+                  if { $pause_ } {
+                     puts "Contouring paused..."
+                     
+                     #  Complete some graphics when pausing cubes.
+                     if { $gaiacube != {} } {
+                        draw_key_
+                        update_slice_coord_ $rtdimage
+                        update idletasks
+                     }
+                     if { $pause_ } {
+                        ::tkwait variable [scope pause_]
+                        puts "Continues"
+                     }
+                  }
+                  if { $halt_ } {
+                     puts "Contouring halted."
+                     break
+                  }
+                  
+                  #  Set the tag used to control clear etc.
+                  $itk_option(-rtdimage) configure -ast_tag \
+                     "$itk_option(-ast_tag) $leveltags_($i) $linetags_($i)"
+                  
+                  #  Draw the contour (return value is number of points).
+                  incr drawn_($i) \
+                     [$itk_option(-rtdimage) contour \
+                         $level $rtdimage $careful_ $smooth_ \
+                         $att $bounds [expr {$i == 0}]]
+                  update
+               }
+               
+               #  Update coordinate and clear contours, if requested.
+               if { $gaiacube != {} } {
+                  draw_key_
+                  update_slice_coord_ $rtdimage
+                  update idletasks
+                  after $delay_
+                  if { $cube_clear_ } {
+                     remove_contours
+                  }
+               }
+            }
+            
+         } else {
+            
             set atts [get_ast_att_ $index]
             set level [$itk_component(value$index) get]
-
+            
             #  Set the tag used to control clear etc.
             $itk_option(-rtdimage) configure -ast_tag \
-               "$itk_option(-ast_tag) $leveltags_($index)"
-
+               "$itk_option(-ast_tag) $leveltags_($index) $linetags_($index)"
+            
             #  Draw the contour.
-            set drawn_($index) \
-               [$itk_option(-rtdimage) contour \
-                   $level $rtdimage $careful_ $smooth_ \
-                   $atts $bounds 1]
+            #  If this is a cube loop over the planes, drawing this level.
+            if { $gaiacube != {} } {
+               set ll [$gaiaanimation cget -lower_limit]
+               set ul [$gaiaanimation cget -upper_limit]
+               set step [$gaiaanimation cget -step]
+               set drawn_($index) 0
+               for {set j $ll} {$j <= $ul} {incr j $step} {
 
-            #  Add/update the key.
-            draw_key_
-            update idletasks
+                  #  Stop or wait for a while if asked.
+                  if { $pause_ } {
+                     puts "Contouring paused..."
+                     ::tkwait variable [scope pause_]
+                     puts "Continues"
+                  }
+                  if { $halt_ } {
+                     puts "Contouring halted."
+                     break
+                  }
+
+                  #  Move cube to new plane.
+                  $gaiacube set_display_plane $j 0
+                  incr drawn_($index) \
+                     [$itk_option(-rtdimage) contour \
+                         $level $rtdimage $careful_ $smooth_ \
+                         $atts $bounds 1]
+                  
+                  #  Update coordinate and clear contours, if requested.
+                  if { $gaiacube != {} } {
+                     draw_key_
+                     update_slice_coord_ $rtdimage
+                     update idletasks
+                     after $delay_
+                     if { $cube_clear_ } {
+                        remove_contour_ $index
+                     }
+                  }
+               }
+            } else {
+               set drawn_($index) \
+                  [$itk_option(-rtdimage) contour \
+                      $level $rtdimage $careful_ $smooth_ \
+                      $atts $bounds 1]
+            }
          }
-      }
+         
+         #  Add/update the key.
+         draw_key_
+         update idletasks
+
+         #  Remove Space-bar and escape bindings.
+         bind $w_ <Key-space> {}
+         bind $w_ <Escape> {}
+      } 1
 
       #  Some contours are now drawn.
       set contoured_ 1
+   }
+
+   #  Coordinate label when drawing cube slices. Comes and goes with the
+   #  key (bound to same canvas tags).
+   protected method update_slice_coord_ {rtdimage} {
+      if { $rtdimage != {} && $cube_step_ } {
+         set gaiacube [get_gaiacube_ $rtdimage]
+         if { $gaiacube != {} } {
+            set coordinate [$gaiacube get_plane_coord 1 1 1]
+            if { $coordinate != {} } {
+               
+               #  Get a position.
+               set w [winfo width $itk_option(-canvas)]
+               set h [winfo height $itk_option(-canvas)]
+               set x0 [$itk_option(-canvas) canvasx 0]
+               set y0 [$itk_option(-canvas) canvasy 0]
+               set dw [expr $w*0.5]
+               set dh [expr $h*0.05]
+               set x [expr $x0+$dw]
+               set y [expr $y0+$dh]
+
+               set keycol [$itk_component(keycolour) get]
+               set font [$itk_component(keyfont) get]
+
+               $itk_option(-canvas) create text $x $y \
+                  -text "$coordinate" \
+                  -anchor center \
+                  -justify left \
+                  -fill $keycol \
+                  -tags "$itk_option(-ast_tag) $keytag_ $texttag_" \
+                  -width 0 \
+                  -font $font
+            }
+         }
+      }
    }
 
    #  Get the contour levels from the appropriate entry fields.
@@ -850,12 +1054,11 @@ itcl::class gaia::GaiaContour {
       }
       if { $levels != {} } {
          return $levels
-      } else {
-         if { ! $ignore } {
-            info_dialog "You must give some valid contour levels"
-         }
-         return {}
       }
+      if { ! $ignore } {
+         info_dialog "You must give some valid contour levels"
+      }
+      return {}
    }
 
    #  Get the attributes from the colour, width and style widgets.
@@ -955,37 +1158,32 @@ itcl::class gaia::GaiaContour {
       remove_contours
    }
 
-   #  Get the rtdimage that is needed for contouring. This can be the
-   #  current image, a one displayed elsewhere or an image in a disk
-   #  file. A filename takes preference over a one displayed
-   #  already. If an error occurs then rtdimage is set to 0.
+   #  Get the rtdimage that is needed for contouring. This can be the current
+   #  image, a one displayed elsewhere or an image in a disk file. A filename
+   #  takes preference over a one displayed already. If an error occurs then
+   #  0 is returned.
    protected method get_rtdimage_ {} {
+
+      set rtdimage {}
       if { $imagefile_ != {} } {
 
-	 set rtdimage {}
-	 #  Remove the existing external image, if not using same file.
+         #  If have an image_rtd_ reuse if, otherwise create a new rtdimage.
 	 if { $image_rtd_ != {} } {
-	    if { "[$image_rtd_ cget -file]" == "$imagefile_" } {
-	       set rtdimage $image_rtd_
-	    } else {
-	       catch {image delete $image_rtd_}
-	    }
-	 }
-
-	 if { $rtdimage == {} } {
-	    #  Displayed on disk, create an rtdimage and return this.
+            set rtdimage $image_rtd_
+            $image_rtd_ configure -file $imagefile_
+         } else {
 	    if {[catch {image create rtdimage -file $imagefile_} rtdimage] != 0} {
 	       error "Failed to access image: $imagefile_"
 	       set rtdimage 0
                set image_rtd_ {}
 	    } else {
-               #  Record so we can tidy up.
+               #  Record so we can reuse.
                set image_rtd_ $rtdimage
             }
 	 }
       } else {
 
-         #  Name of an rtdimage, just check that this isn't the
+         #  Using the name of an rtdimage, just check that this isn't the
          #  current one and that it exists.
          if { [catch {$target_ get_image} rtdimage] != 0 }  {
             error_dialog "Failed to locate the displayed image for contouring"
@@ -1266,11 +1464,11 @@ itcl::class gaia::GaiaContour {
             if { $i != $index } {
                $itk_component(style$i) configure -value $style
             }
-            $itk_option(-canvas) itemconfigure $leveltags_($i) \
+            $itk_option(-canvas) itemconfigure $linetags_($i) \
                -dash [get_dash_ $style]
          }
       } else {
-         $itk_option(-canvas) itemconfigure $leveltags_($index) \
+         $itk_option(-canvas) itemconfigure $linetags_($index) \
             -dash [get_dash_ $style]
       }
    }
@@ -1499,7 +1697,7 @@ itcl::class gaia::GaiaContour {
                -fill $colour \
                -width $width \
                -dash [get_dash_ $style] \
-               -tags "$itk_option(-ast_tag) $keytag_ $leveltags_($i)"
+               -tags "$itk_option(-ast_tag) $keytag_ $leveltags_($i) $linetags_($i)"
 
             $itk_option(-canvas) create text [expr $x+$dx+5] $y \
                -text "$level" \
@@ -1664,8 +1862,26 @@ itcl::class gaia::GaiaContour {
       return "18 6 6 6"
    }
 
+   #  Toggle value pause_ to pause and restart contouring.
+   protected method toggle_pause_ {} {
+      if { $pause_ } {
+         set pause_ 0
+      } else {
+         set pause_ 1
+      }
+   }
+
+   #  Halt contouring if requested.
+   protected method halt_ {} {
+      if { $pause_ } {
+         set pause_ 0
+      }
+      set halt_ 1
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
+
    #  Name of canvas.
    itk_option define -canvas canvas Canvas {} {}
 
@@ -1747,6 +1963,7 @@ itcl::class gaia::GaiaContour {
 
    #  Tags used for configuring each contour levels.
    protected variable leveltags_
+   protected variable linetags_
 
    #  Tags for elements of key (needs to be unique for each object).
    #  Text is different as need to disable width attributes.
@@ -1800,6 +2017,21 @@ itcl::class gaia::GaiaContour {
 
    #  Array of the ColourLabelMenu objects in use.
    protected variable colour_menu_
+
+   #  Whether to step through a cube.
+   protected variable cube_step_ 1
+
+   #  Whether to clear contours between cube slices.
+   protected variable cube_clear_ 1
+
+   #  Delay used when stepping through slices.
+   protected variable delay_ 500
+
+   #  Variable to pause progress through levels.
+   protected variable pause_ 0
+
+   #  Variable to halt the contouring.
+   protected variable halt_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------

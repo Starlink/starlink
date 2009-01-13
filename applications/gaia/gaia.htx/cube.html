@@ -359,6 +359,26 @@
       to drop the slave).
     </p>
 
+    <h3>Contouring and cubes</h3>
+    <p>
+      Each plane from a cube can be contoured using the contour toolbox found
+      in <tt>Image-Analysis->Contouring...</tt>. Using this toolbox you can
+      also contour another image over the cube slice and the contours will
+      remain displayed as you move slice, thus allowing you to compare a
+      continuum image with each slice in the cube.
+    </p>
+    <p>
+      To get the reverse effect, contouring each slice over a continuum image,
+      you must display your cube and image in separate windows (using the 
+      <tt>File->New window</tt> item in the main window), and then open the
+      contour toolbox associated with the continuum window. Now select the 
+      other window displaying the cube for contouring and enter some levels.
+      Contouring will now contour each slice, the speed, range and step
+      between slices is determined by the values in the <tt>Animation</tt>
+      section, there is also an option to just contour the current slice.
+    </p>
+
+
     <h3>Data formats and efficiency</h3>
     <p>
       The toolbox should handle both NDF and FITS data cubes with more-or-less

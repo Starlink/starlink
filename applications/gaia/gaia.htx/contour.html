@@ -50,6 +50,39 @@
       and choose <tt>Whole of image</tt> for the contour region.
     </p>
 
+    <h3>Contouring a cube over the displayed image.</h3>
+    <p>
+      To contour a cube over the displayed image (which could be a slice from
+      a cube itself) you must display the cube in another window and select
+      that window in the <tt>Displayed image:</tt> menu. Now when you press
+      <tt>Draw contours</tt> all the slices of the cube will be contoured,
+      one-by-one, over the image. The coordinate of the slice will be shown at
+      the top of the main window (this is part of the key).
+    </p>
+    <p>
+      To change the speed of the slice selection, change the range of slices
+      used, or increase the step between slices you must use the controls of
+      the <tt>Animation</tt> section in the cube toolbox associated with the
+      other window.
+    </p>
+    <p>
+      To not clear the contours between slices unselect the <tt>Cube: clear
+      each slice</tt> item in the <tt>Options</tt> menu. Just contouring the
+      current slice can also be performed by unselecting <tt>Cube: step
+      through</tt>.
+    </p>
+
+    <h3>Pausing and halting</h3>
+    <p>
+      To pause contouring during long operations (especially comparing cube
+      slices) you can press the <tt>Space</tt> key while the keyboard focus is
+      in the contouring toolbox. Pressing <tt>Space</tt> again continues.
+      To permanently halt contouring press the <tt>Esc</tt> key. Note these
+      will only take effect after a contour has completed, so may take some
+      time to respond.
+    </p>
+
+
     <h3>Printing the image plus contours</h3>
     <p>
       Choose the <tt>File</tt> menu in the main window and select

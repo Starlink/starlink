@@ -700,7 +700,7 @@ itcl::class gaia::GaiaImagePanel {
                [$itk_component(high) component label] \
                   configure -foreground black
             }
-         }
+         } 0; # Don't take focus when busy.
       }
       update_cut_window
 
