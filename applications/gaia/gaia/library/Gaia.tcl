@@ -752,6 +752,11 @@ itcl::class gaia::Gaia {
       insert_menuitem $m $index command "Query VO image servers..." \
          {Find VO image servers and query for images} \
          -command [code $this vo_siap_query_ $m $index]
+
+      #  Cone Search.
+      insert_menuitem $m $index command "Query VO catalog servers..." \
+         {Find VO Cone Search servers and query for catalogs} \
+         -command [code $this vo_find_cone_ $m $index]
    }
 
    #  Add a menubutton with the GAIA options.
@@ -2362,11 +2367,7 @@ window gives you access to this."
       if { [gaia::GaiaVOTableAccess::check_for_gaiavo] } {
 
          #  Find and open the current list of servers.
-         set siap_file [utilGetConfigFilename .skycat GaiaSIAPServers.vot]
-         if { ! [::file exists $siap_file] } {
-            #  Use builtin defaults.
-            ::file copy -force $::gaiavo_library/GaiaSIAPServers.vot $siap_file
-         }
+         set siap_file [vo_config_file_ GaiaSIAPServers.vot]
 
          #  Open dialog.
          utilReUseWidget gaiavo::GaiaVOCatsSIAP $w_.siapquery \
@@ -2376,6 +2377,54 @@ window gives you access to this."
          #  Grey out menu, no GaiaVO.
          $m entryconfigure $index -state disabled
       }
+   }
+
+   #  Open a dialog for querying Cone Search services for any catalogues.
+   protected method vo_find_cone_ {m index} {
+      if { [gaia::GaiaVOTableAccess::check_for_gaiavo] } {
+
+         #  Find and open the current list of servers.
+         set cone_file [vo_config_file_ GaiaConeServers.vot]
+
+         utilReUseWidget gaiavo::GaiaVOCatRegistry $w_.voregistry \
+            -catalog $cone_file \
+            -service CONE \
+            -show_cols {shortName title} \
+            -activate_cmd [code $this vo_query_cone_] \
+            -whole_operation 0
+      } else {
+         #  Grey out menu, no GaiaVO.
+         $m entryconfigure $index -state disabled
+      }
+   }
+ 
+   #  Open a dialog for querying a Cone Search server.
+   protected method vo_query_cone_ {headers row} {
+      puts "vo_query_cone_: $headers, $row"
+      if { [gaia::GaiaVOTableAccess::check_for_gaiavo] } {
+ 
+         #  See if the given headers and row data specify a Cone
+         #  server. Need a accessURL field for that.
+         set accessURL [gaiavo::GaiaVOCatCone::getAccessURL $headers $row]
+         if { $accessURL != {} } {
+            set name [gaiavo::GaiaVOCatCone::getName $headers $row]
+            gaiavo::GaiaVOCatCone $w_.conequery\#auto \
+               -accessURL $accessURL -shortname $name -gaia $this \
+               -title "$name Cone Search service"
+         } else {
+            warning_dialog "Cone service does not specify an accessURL" $w_
+         }
+      }
+   }
+   
+   #  Get a cached configuration file. If not present use builtin list.
+   protected method vo_config_file_ {name} {
+      set config_file [utilGetConfigFilename .skycat $name]
+      if { ! [::file exists $config_file] } {
+         #  Use builtin defaults.
+         ::file copy -force $::gaiavo_library/$name $config_file
+      }
+      return $config_file
    }
 
    #  Configuration options: (public variables)

@@ -1,0 +1,149 @@
+#!/bin/sh
+# The next line is executed by /bin/sh, but not Tcl \
+exec $GAIA_DIR/gaiavo_tcl $0 ${1+"$@"}
+#+
+#   Name:
+#      querycone
+
+#   Purpose:
+#      Query a Cone Search server for a catalogue.
+
+#   Usage:
+#      querycone endpoint ra dec size verbosity outfile
+
+#   Description:
+#      Queries a VO Cone Search server for all all known objects in a given
+#      area of the sky. The result is a VOTable catalogue containing all
+#      the sources in the portion of sky in the cone.
+#
+#      The RA and Dec values are in FK5/J2000 and must be in decimal
+#      degrees. The size should also be degrees and may be a comma
+#      delimetered list, width and height. Verbosity should be an integer
+#      from the list 1, 2, 3.
+
+#   Authors:
+#      Peter W. Draper (PWD):
+
+#  Copyright:
+#     Copyright (C) 2009 Science and Technology Facilties Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of the
+#     License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+#     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#   History:
+#      12-JAN-2009 (PWD):
+#         Original version.
+#-
+#.
+
+package require uri
+
+#  Check the command-line arguments.
+if { $argc == 6 } {
+   set endpoint [lindex $argv 0]
+   set ra [lindex $argv 1]
+   set dec [lindex $argv 2]
+   set size [lindex $argv 3]
+   set verb [lindex $argv 4]
+   set outfile [lindex $argv 5]
+} else {
+   puts stderr {Usage: querycone endpoint ra dec size verb outfile}
+   exit 1
+}
+
+#  Open the output file, just a test.
+if { [catch "::open $outfile w" fid] } {
+   puts stderr "Failed to open output file: $outfile"
+   exit 1
+}
+::close $fid
+
+#  Establish the standard proxy define using http_proxy.
+#cat::ProxyDialog::check_proxies $::env(HOME)/.skycat/proxies
+set proxy {}
+set port {}
+if { [info exists ::env(http_proxy)] } {
+   if { [scan $::env(http_proxy) {http://%[^:/]:%d} proxy port] != 2 } {
+      scan $::env(http_proxy) {http://%[^:/]} proxy
+   }
+}
+::http::config -proxyhost $proxy
+::http::config -proxyport $port
+
+#  Proc to do the query. Needed as can be recursive if redirected.
+proc get {query outfile} {
+
+   #  Open the result file.
+   set fid [::open $outfile w]
+
+   #  Download the response.
+   if { [catch {set response [::http::geturl $query -channel $fid] } msg] } {
+
+      #  Failed, so delete file and exit with an error.
+      catch {
+         ::close $fid
+         ::file delete $outfile
+      }
+      puts stderr "$msg"
+      return 1
+   }
+
+   #  Check for a moved response and handle the re-direct.
+   if { [::http::ncode $response] == 302 } {
+      array set meta [eval set $response\(meta\)]
+      set location $meta(Location)
+
+      if { [string first "http://" $location] == -1 } {
+
+         #  Need to rebuild the query (usual case).
+         array set parts [::uri::split $query]
+         if { $parts(port) != {} } {
+            set newquery "$parts(scheme)://$parts(host):$parts(port)${location}"
+         } else {
+            set newquery "$parts(scheme)://$parts(host)${location}"
+         }
+      } else {
+
+         #  Funny location is already a URL, probably broken, but try it
+         #  anyway.
+         set newquery $location.
+      }
+
+      puts "Redirected to: $newquery"
+      catch {::close $fid}
+      get $newquery $outfile
+   }
+   catch {::close $fid}
+   return 0
+}
+
+#  Construct the initial query from the endpoint and parameters.
+#  Endpoint can terminate in & or ?
+switch -glob $endpoint {
+   *& {
+      set query ${endpoint}RA=${ra}&DEC=${dec}&SR=${size}&VERB=${verb}
+   }
+   default {
+      set query ${endpoint}&RA=${ra}&DEC=${dec}&SR=${size}&VERB=${verb}
+   }
+}
+
+#  Do it.
+if { [get $query $outfile] == 1 } {
+   exit 1
+}
+exit

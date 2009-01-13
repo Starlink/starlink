@@ -84,17 +84,21 @@ itcl::class gaiavo::GaiaVOCatRegistry {
    #  --------
 
    #  Make the interface conform to our usage. The "Open" button should
-   #  be "Accept" and "Close" should be "Cancel".
+   #  be "Accept" and "Close" should be "Cancel" when we're offering a
+   #  whole catalog service, otherwise we keep "Open" and "Close" and 
+   #  deal with row-based actions.
    public method init {} {
       GaiaVOCat::init
 
       wm title $w_ "Query VO Registry for services"
+      
+      if { $itk_option(-whole_operation) } {
+         $itk_component(open) configure -text "Accept"
+         add_short_help $itk_component(open) {Accept list of services}
 
-      $itk_component(open) configure -text "Accept"
-      add_short_help $itk_component(open) {Accept list of services}
-
-      $itk_component(close) configure -text "Cancel"
-      add_short_help $itk_component(close) {Cancel changes and close window}
+         $itk_component(close) configure -text "Cancel"
+         add_short_help $itk_component(close) {Cancel changes and close window}
+      }
 
       #  Bindings on the listbox showing catalogue content.
       set lbox $itk_component(results).listbox
@@ -129,17 +133,23 @@ itcl::class gaiavo::GaiaVOCatRegistry {
          -command [code $this update_content_]
    }
 
-   #  User pressed the accept button. Override to not require selected row
-   #  and close window.
+   #  User pressed the accept button. Override to not necessarily require
+   #  the selected row and close window.
    public method open {} {
-      open_service_ 1
-      close
+      if { $itk_option(-whole_operation) } {
+         open_service_ 1
+         close
+      } else {
+         GaiaVOCat::open
+      }
    }
 
    #  Close the window, activated in response to a cancel. Only difference to 
    #  accept is what argument is used to qualify activate_cmd.
    public method close {} {
-      open_service_ 0
+      if { $itk_option(-whole_operation) } {
+         open_service_ 0
+      }
       GaiaVOCat::close
    }
 
@@ -163,11 +173,17 @@ itcl::class gaiavo::GaiaVOCatRegistry {
    #  Open a service. In this case it means accept the whole catalogue which
    #  could be modified and in a new catalogue, so we need to attempt to 
    #  update the initial catalogue with this new content. Note we change the
-   #  meaning of activate_cmd.
-   protected method open_service_ {accepted} {
+   #  meaning of activate_cmd when operating on a whole catalogue.
+   protected method open_service_ {args} {
       if { $itk_option(-activate_cmd) != {} } {
          $w_.cat save $initial_catalogue_
-         eval $itk_option(-activate_cmd) $accepted
+         if { $itk_option(-whole_operation) } {
+            eval $itk_option(-activate_cmd) $args
+         } else {
+            #  Need headers and selected row.
+            set headings [$itk_component(results) get_headings]
+            eval $itk_option(-activate_cmd) "\$headings" "\$args"
+         }
       }
    }
 
@@ -195,6 +211,9 @@ itcl::class gaiavo::GaiaVOCatRegistry {
 
    #  Configuration options: (public variables)
    #  ----------------------
+
+   #  The type of operation, whole or row.
+   itk_option define -whole_operation whole_operation Whole_Operation 1
 
    #  The type of services to query for - SSAP, SIAP, ConeSearch.
    itk_option define -service service Service SIAP
