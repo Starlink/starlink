@@ -37,6 +37,11 @@
     the -default_cut percentile to any images received by the realtime
     interface.
 
+    Catalogue windows now transform their positions from the given equinox
+    to the equinox of the image before plotting marker symbols. For instance
+    this means you can now query for catalogue positions in J2000 and plot
+    over an image set to B1950 and vice versa.
+
   Lehuakona Release
   =================
 
