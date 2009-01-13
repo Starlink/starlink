@@ -36,15 +36,18 @@
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     20-MAR-2008 (DSB):
 *        Initial version.
+*     09-JAN-2009 (TIMJ):
+*        use msgBlankif and msgOutiff
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -80,7 +83,6 @@
 void smf_reportprogress( int max, int *status ){
 
 /* Local Variables */
-   char buf[20];
    static int count = 0.0;
    static int maxcount = 1;
    static int perc_last = 0;
@@ -112,15 +114,14 @@ void smf_reportprogress( int max, int *status ){
    tuning parameter non-zero so that the escape characters are left in place. */ 
       if( perc != perc_last ) {
          if( perc < 100 ) {
-            sprintf( buf, "%3d %% done[9D[A", perc );
             msgTune( "STREAM", 1, status );
-            msgOutif( MSG__VERB, "", buf, status );
+            msgOutiff( MSG__VERB, "", "%3d %% done[9D[A",
+                       status, perc );
             msgTune( "STREAM", 0, status );
 
          } else {
-            sprintf( buf, "%3d %% done", perc );
-            msgOutif( MSG__VERB, "", buf, status );
-            msgOutif( MSG__VERB, "", " ", status );
+            msgOutiff( MSG__VERB, "", "%3d %% done", status, perc );
+            msgBlankif( MSG__VERB, status );
          }
       } 
 
