@@ -148,6 +148,24 @@ itcl::class gaiavo::GaiaVOConeSearch {
       pack $itk_component(size) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(size) {Size of search area, arcminutes}
 
+      #  Verbosity. Controls number of columns returned for some services.
+      itk_component add verb {
+         LabelMenu $w_.verb \
+            -text "Columns:" \
+            -labelwidth $lwidth
+      }
+      pack $itk_component(verb) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(verb) \
+         {Hint for number of returned columns in the catalogue}
+
+      foreach {name value} "Default {} Least 1 Normal 2 Most 3" {
+         $itk_component(verb) add \
+            -command [code $this set_verb_ $value] \
+            -label $name \
+            -value $name
+      }
+      $itk_component(verb) configure -value Default
+
       #  Additional options. Set search region from the displayed
       #  image, mark region by dragging.
       itk_component add options {
@@ -214,7 +232,9 @@ itcl::class gaiavo::GaiaVOConeSearch {
       }
       set votable_ [$tempcats_ get_typed_name ".vot"]
       set interrupted_ 0
-      $querytask_ runwith $itk_option(-accessURL) $ra $dec "$size" 2 $votable_
+
+      $querytask_ runwith $itk_option(-accessURL) $ra $dec $size \
+         $verb_ $votable_
    }
 
    #  Interrupt the query.
@@ -384,6 +404,11 @@ itcl::class gaiavo::GaiaVOConeSearch {
       return [list $ra $dec $radius]
    }
 
+   #  Set the verbosity.
+   protected method set_verb_ {value} {
+      set verb_ $value
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -429,6 +454,9 @@ itcl::class gaiavo::GaiaVOConeSearch {
    protected variable ra_ 00:00:00
    protected variable dec_ 00:00:00
    protected variable size_ 10
+
+   #  Verbosity.
+   protected variable verb_ 2
 
    #  Batch job handler.
    protected variable batch_ {}
