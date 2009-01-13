@@ -50,9 +50,11 @@
 *     2009-01-12 (EC):
 *        -Set status if invalid JCMTState in dark header
 *        -Don't set bad status if dark time stamp same as data
+*     2009-01-13 (TIMJ):
+*        use smf_find_dateobs
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
 *     Copyright (C) 2009 University of British Columbia
 *     All Rights Reserved.
 
@@ -109,7 +111,6 @@ void smf_choose_closest( const smfArray *alldata, const smfData *indata,
   if (*status  != SAI__OK) return;
 
   /* get reference MJD and subarray number */
-  reftime = (indata->hdr->allState)[0].rts_end;
   smf_find_dateobs( indata->hdr, &reftime, NULL, status );
   smf_find_subarray( indata->hdr, NULL, 0, &refsubnum, status );
 
@@ -135,8 +136,10 @@ void smf_choose_closest( const smfArray *alldata, const smfData *indata,
 
     /* see if we even need to look at the time */
     if ( (*status==SAI__OK) && (thissubnum == refsubnum) ) {
-      double thistime = (thisfile->hdr->allState)[0].rts_end;
-      double diff = reftime - thistime;
+      double thistime;
+      double diff;
+      smf_find_subarray( thisfile->hdr, &thistime, NULL, status );
+      diff = reftime - thistime;
       if (diff >= 0) {
         if (prev.diff > diff) {
           prev.diff = diff;
