@@ -128,8 +128,10 @@
 *        Rewrite in C
 *     5-SEP-2008 (TIMJ):
 *        Use starutil for strlcat and strlcpy.
-*     5-JAN-2008 (TIMJ):
+*     5-JAN-2009 (TIMJ):
 *        Add usemsg option for controlling destination of flush.
+*     12-JAN-2009 (TIMJ):
+*        Use new API for err1Print and msg1Print to handle prefixes.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -147,11 +149,8 @@
 #include "sae_par.h"
 #include "star/util.h"
 
-#define SZTABS 3
-
 void err1Flush ( int usemsg, int * errbel, int * status ) {
 
-  char line[ERR__SZMSG+1+SZTABS]; /* Output line buffer */
   char opstr[ERR__SZMSG+1];       /* Error message string */
   char param[ERR__SZPAR+1];       /* Message name */
   const char *tabs = NULL;        /* Line tab */
@@ -221,21 +220,11 @@ void err1Flush ( int usemsg, int * errbel, int * status ) {
 
     } else if (istat != SAI__OK) {
 
-      /* Construct the output line */
-      star_strlcpy( line, tabs, sizeof(line) );
-
-      if (oplen > 0) {
-        /* Do not need msg1Putc here because we are just appending
-           the message to the tab and there is no possibility of overrun
-           if ERR__SZMSG matches EMS__SZMSG */
-        star_strlcat( line, opstr, sizeof(line) );
-      }
-
       /* Continue to print messages regardless of output errors. */
       if (usemsg) {
-        msg1Print( line, &pstat );
+        msg1Print( opstr, tabs, &pstat );
       } else{
-        err1Print( line, errbel, &pstat );
+        err1Print( opstr, tabs, errbel, &pstat );
       }
       opcnt++;
 
@@ -265,8 +254,8 @@ void err1Flush ( int usemsg, int * errbel, int * status ) {
     /* Report an error message if an output error has occurred.
      * Don't annul the context in this case.
      * Output it as the last of the current flush */
-    err1Print("!  errFlush: Error encountered during message output",
-	      errbel, &pstat );
+    err1Print("errFlush: Error encountered during message output",
+              tabs, errbel, &pstat );
     *status = ERR__OPTER;
   }
 

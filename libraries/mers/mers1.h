@@ -61,7 +61,8 @@ int mers1Getenv( int usemsg, const char * param, int * status );
 void err1Bell( int * status );
 void err1Flush ( int usemsg, int * errbel, int * status );
 void err1Prerr( const char * text, int * status );
-void err1Print( const char * text, int * errbel, int * status );
+void err1Print( const char * text, const char * prefix, 
+                int * errbel, int * status );
 
 void err1Gtglbl( int *errwsz, int *errstm, int *errrvl );
 int err1Gtrvl ( void );
@@ -88,7 +89,7 @@ void msg1Ktok ( void );
 void msg1Outif( msglev_t prior, const char * param, const char * text,
                 int useformat, va_list args, int *status );
 void msg1Prtln( const char * text, int * status );
-void msg1Print( const char * text, int * status );
+void msg1Print( const char * text, const char * prefix, int * status );
 
 msglev_t msg1Gtinf ( void );
 int msg1Gtstm ( void );

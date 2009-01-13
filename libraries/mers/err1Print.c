@@ -10,7 +10,8 @@
 *     Starlink ANSI C
 
 *  Invocation:
-*     err1Print( const char * text, int * errbel, int * status);
+*     err1Print( const char * text, const char * text,int * errbel,
+*                int * status);
 
 *  Description:
 *     The text of the given error message is split into lines of length
@@ -20,6 +21,10 @@
 *  Arguments:
 *     text = const char * (Given)
 *        Text to be output.
+*     prefix = const char * (Given)
+*        This is the text to be attached to the first line of output.
+*        Any continuation lines will use the first character from this
+*        string. Do not prepend this to "text".
 *     errbel = int * (Given & Returned)
 *        If true, an attempt will be made to ring a terminal bell
 *        in addition to flushing the error messages. Will be set to
@@ -29,7 +34,7 @@
 *        else it is not touched.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
 *     Copyright (C) 1983, 1985, 1987, 1989-1994 Science & Engineering
 *     Research Council. Copyright (C) 1997, 1999, 2001 Central 
 *     Laboratory of the Research Councils. All Rights Reserved.
@@ -95,6 +100,11 @@
 *        Add extra argument so that we do not need ERRBEL common block.
 *     30-JUL-2008 (TIMJ):
 *        Rewrite in C
+*     12-JAN-2009 (TIMJ):
+*        Fix counting when no bell character.
+*        Add prefix to API so that we can trap for cases where we would
+*        normally get an output line with just the prefix (since ems1Rform
+*        will return '!  ' for an input string of '!  very_long_word').
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -108,14 +118,17 @@
 #include "merswrap.h"
 #include "ems.h"
 #include "mers1.h"
+#include "star/util.h"
 
 #include <string.h>
 
-void err1Print( const char * text, int *errbel, int *status) {
+void err1Print( const char * text, const char * prefix,
+                int *errbel, int *status) {
 
 
   /*  Local Variables: */
-  const char constr[] = "!     ";/* Continuation string */
+  const char fixstr[] = "     "; /* Fixed part of continuation string */
+  char constr[32];               /* Continuation tab string */
   int contab;                    /* Length of continuation string */
   int iposn;                     /* Character position for text */
   int leng;                      /* String length */
@@ -135,19 +148,22 @@ void err1Print( const char * text, int *errbel, int *status) {
   /*  Get length of text to send. */
   leng = strlen( text );
 
-  /* and length of continuation character */
-  contab = strlen( constr );
-
   /*  Check whether a bell character is to be delivered and initialise the 
-   *  output line. */
+   *  output line. Include the prefix. */
   if (*errbel) {
-    strcpy(line, "\a");
-    lstart = 1;
+    star_strlcpy(line, "\a", sizeof(line) );
     *errbel = 0;
   } else {
-    strcpy(line, " ");
-    lstart = 0;
+    line[0] = '\0';
   }
+  star_strlcat( line, prefix, sizeof(line) );
+  lstart = strlen( line );
+
+  /* precalculate continuation string */
+  constr[0] = prefix[0];
+  constr[1] = '\0';
+  star_strlcat( constr, fixstr, sizeof(constr) );
+  contab = strlen( constr );
 
   /*  If the text is not blank, then continue. */
   if (leng > 0) {
@@ -172,7 +188,7 @@ void err1Print( const char * text, int *errbel, int *status) {
       while (iposn != 0) {
 
         /*        Re-initialise the output line for a continuation. */
-        strcpy( line, constr );
+        star_strlcpy( line, constr, sizeof(line) );
 
         /*        Call MSG1_RFORM to load the continuation line and write the
          *        result. */
@@ -183,7 +199,7 @@ void err1Print( const char * text, int *errbel, int *status) {
   } else {
 
     /*     If there is no text, then send a blank message. */
-    err1Prerr( "!!", &lstat );
+    err1Prerr( prefix, &lstat );
   }
 
   /*  Check I/O status and set STATUS if necessary. */

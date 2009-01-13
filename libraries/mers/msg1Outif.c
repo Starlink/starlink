@@ -123,6 +123,8 @@
 *        Internal copy of msgOutif. Supports sprintf processing.
 *     09-JAN-2009 (TIMJ):
 *        Extend range of filters.
+*     12-JAN-2009 (TIMJ):
+*        New API for msg1Print
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -194,7 +196,7 @@ void msg1Outif( msglev_t prior, const char * param, const char * text,
         }
 
         /*           Deliver the message string. */
-        msg1Print( msgstr, status );
+        msg1Print( msgstr, "", status );
       } else {
 
         /*           Call MSG1_KTOK to annul any defined message tokens, even

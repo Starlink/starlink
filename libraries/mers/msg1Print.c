@@ -22,6 +22,11 @@
 *  Arguments:
 *     text = const char * (Given)
 *        The message text.
+*     prefix = const char * (Given)
+*        Text to be prepended to the first line of output. Subsequent lines
+*        will be prepended with the first character of the prefix and some
+*        spaces for padding if the prefix is non-zero length. If text is
+*        zero length no prefix will be used.
 *     status = int * (Given and Returned)
 *        The global status.
 
@@ -30,7 +35,7 @@
 *        System specific message delivery is done via msg1Prtln.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
 *     Copyright (C) 1982-1984, 1987, 1989-1992, 1994 Science &
 *     Engineering Research Council. Copyright (C) 1999, 2001, 2004 Central
 *     Laboratory of the Research Councils.
@@ -107,6 +112,8 @@
 *        code to a new routine to aid code reuse.
 *     10-SEP-2008 (TIMJ):
 *        Rewrite in C
+*     12-JAN-2009 (TIMJ):
+*        Add prefix option. See err1Print and err1Flush.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -121,17 +128,22 @@
 #include "msg_par.h"
 #include "mers1.h"
 #include "ems.h"
+#include "star/util.h"
 
 #include <string.h>
 
-void msg1Print( const char * text, int * status ) {
+void msg1Print( const char * text, const char * prefix, int * status ) {
 
 
   int iposn;                     /* Character position for text */
+  int lstart;                    /* position to start formatting string */
   int leng;                      /* String length */
   int istat = SAI__OK;           /* Local status */
   int oplen;                     /* Output string length */
   char line[MSG__SZMSG+1];       /* Output line of text */
+  const char fixstr[] = "     "; /* Fixed part of constr */
+  char constr[32];               /* continuation tab string if prefix set */
+  int contab = 0;                /* length of constr */
 
   /*  Check the inherited global status.  */
   if (*status != SAI__OK) return;
@@ -149,18 +161,33 @@ void msg1Print( const char * text, int * status ) {
     if (msg1Gtstm()) {
 
       /*     Output with no messing */
-      msg1Prtln( text, &istat );
+      star_strlcpy( line, prefix, sizeof(line) );
+      star_strlcat( line, text, sizeof(line) );
+      msg1Prtln( line, &istat );
     } else {
+
+      /* Precalculate continuation string */
+      constr[0] = prefix[0];
+      if (strlen(prefix) > 0) {
+        constr[1] = '\0';
+        star_strlcat( constr, fixstr, sizeof(constr) );
+        contab = strlen(constr);
+      }
 
       /*     Call MSG1_RFORM to load the output line and deliver it. */
       iposn = 0;
 
+      /*     Handle prefix */
+      star_strlcpy( line, prefix, sizeof(line) );
+      lstart = strlen( line );
+
       /*     Loop to deliver the message in line-sized chunks. */
-      ems1Rform( text, msg1Gtwsz(), &iposn, line, &oplen );
+      ems1Rform( text, msg1Gtwsz() - lstart, &iposn, &(line[lstart]), &oplen );
       msg1Prtln( line, &istat );
 
       while ( iposn != 0 && istat == SAI__OK) {
-        ems1Rform( text, msg1Gtwsz(), &iposn, line, &oplen );
+        star_strlcpy( line, constr, sizeof(line) );
+        ems1Rform( text, msg1Gtwsz() - contab, &iposn, &(line[contab]), &oplen );
         msg1Prtln( line, &istat );
       }
     }
