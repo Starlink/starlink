@@ -14,7 +14,7 @@
 *     C function
 
 *  Invocation:
-*     smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, 
+*     smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, double dut1,
 *                                 const double telpos[3], AstFrameSet **fset, 
 *                                 smfDetposWcsCache *cache, int *status );
 
@@ -25,6 +25,8 @@
 *        Index into the time series data (the 3rd dimension). Call with a
 *        negative index value to free cached resources (a NULL pointer
 *        will then be returned as the function value).
+*     dut1 = double (Given)
+*        DUT1 correction in seconds.
 *     telpos = double[ 3 ] (Given)
 *        Geodetic lon / lat / altitude of the telscope (deg/deg/metres)
 *     fset = AstFrameSet ** (Given)
@@ -74,10 +76,12 @@
 *        Avoid use of static cache.
 *     16-DEC-2008 (DSB):
 *        For extra speed, clone the cached SkyFrame rather than copying it.
+*     13-JAN-2009 (TIMJ):
+*        Add dut1 argument.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -119,9 +123,10 @@
 /* Seconds per day */
 #define SPD 86400.0                    
 
-smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3],
-                                 AstFrameSet **fset, smfDetposWcsCache *cache, 
-                                 int *status ) {
+smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, double dut1,
+                                   const double telpos[3],
+                                   AstFrameSet **fset, smfDetposWcsCache *cache,
+                                   int *status ) {
 
 /* Local Variables: */
    AstCmpMap *cmap1 = NULL;    /* Parallel CmpMap holding both LutMaps */
@@ -262,8 +267,9 @@ smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, const double telpos[
    if TCS_TAI is missing. Remember to convert from TAI to TDB (as required by 
    the Epoch attribute). */
    csky = astClone( cache->sky );
-   astSet( csky, "Epoch=MJD %.*g", DBL_DIG, hdr->state->tcs_tai + 
-                                            32.184/SPD ); 
+   astSet( csky, "Epoch=MJD %.*g, dut1=%.*g",
+           DBL_DIG, hdr->state->tcs_tai + 32.184/SPD,
+           DBL_DIG, dut1 ); 
 
 /* Create the FrameSet */
    *fset = astFrameSet( cache->grid, "" );

@@ -155,7 +155,7 @@ void smf_close_file( smfData ** data, int * status ) {
   int       freedata = 0; /* should the data arrays be freed? */
   smfHead * hdr;          /* pointer to smfHead in smfData */
   size_t headlen=0;       /* Size of header (mmap'd files) in bytes */ 
-  int       i;            /* loop counter */
+  size_t       i;         /* loop counter */
   int       isSc2store = 0; /* is this sc2Store data */
   size_t ndata=0;         /* Number of elements in data array */
   long pagesize=0;        /* Size of memory page used by mmap */
@@ -271,11 +271,11 @@ void smf_close_file( smfData ** data, int * status ) {
     if (hdr->tswcs != NULL) hdr->tswcs = astAnnul( hdr->tswcs );
     if (hdr->fitshdr != NULL) hdr->fitshdr = astAnnul( hdr->fitshdr );
 
-    if( hdr->cache1 ) hdr->cache1 = sc2ast_createwcs2( -1, NULL, NULL, NULL, NULL, 
+    if( hdr->cache1 ) hdr->cache1 = sc2ast_createwcs2( -1, NULL, 0.0, NULL, NULL, NULL, 
                                                        hdr->cache1, status );
-    if( hdr->cache2 ) hdr->cache2 = smf_create_lutwcs( 1, NULL, NULL, 0, NULL, NULL, 
+    if( hdr->cache2 ) hdr->cache2 = smf_create_lutwcs( 1, NULL, NULL, 0, NULL, 0.0, NULL, 
                                                        NULL, NULL, hdr->cache2, status );
-    if( hdr->cache3 ) hdr->cache3 = smf_detpos_wcs( NULL, -1, NULL, NULL, hdr->cache3, 
+    if( hdr->cache3 ) hdr->cache3 = smf_detpos_wcs( NULL, -1, 0.0, NULL, NULL, hdr->cache3, 
                                                     status );
 
     if (!hdr->isCloned) {

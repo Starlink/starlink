@@ -23,10 +23,10 @@
 *  Arguments:
 *     clearcache = int (Given)
 *        If set to 1 and fixed mappings have previously been cached, clear them
-*     fplane_x = double* (Given)
+*     fplane_x = const double* (Given)
 *        Lookup table (LUT) specifying x-focal plane offset for each of
 *        n_pix pixels in radians. Ignored if cache from previous call exists.
-*     fplane_y = double* (Given)
+*     fplane_y = const double* (Given)
 *        Lookup table (LUT) specifying y-focal plane offset for each of
 *        n_pix pixels in radians. Ignored if cache from previous call exists.
 *     n_pix = int (Given)
@@ -34,9 +34,11 @@
 *        call exists.
 *     state = JCMTState* (Given)
 *        Current JCMT state (time, pointing etc.)
-*     instap = double[2] (Given)
+*     dut1 = double (Given)
+*        DUT1 correction in seconds.
+*     instap = const double[2] (Given)
 *        Additional focal plane offsets that may be applied (arc-seconds).
-*     telpos = double[3] (Given)
+*     telpos = const double[3] (Given)
 *        LON / Lat / altitude of the telscope (deg/deg/metres)
 *     fset = AstFrameSet** (Returned)
 *        Constructed frameset.
@@ -113,12 +115,14 @@
 *        Avoid use of static cache.
 *     2008-12-16 (DSB):
 *        For extra speed, clone the cached SkyFrame rather than copying it.
+*     2009-01-13 (TIMJ):
+*        Add dut1 argument.
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2006 University of British Columbia.
 *     All Rights Reserved.
@@ -168,10 +172,11 @@
 #define FUNC_NAME "smf_create_lutwcs"
 
 smfCreateLutwcsCache *smf_create_lutwcs( int clearcache, const double *fplane_x,
-      			       const double *fplane_y, const int n_pix, 
-		               const JCMTState *state, const double instap[2], 
-                               const double telpos[3], AstFrameSet **fset, 
-                               smfCreateLutwcsCache *cache, int *status ) {
+                                         const double *fplane_y, const int n_pix, 
+                                         const JCMTState *state, double dut1,
+                                         const double instap[2], 
+                                         const double telpos[3], AstFrameSet **fset, 
+                                         smfCreateLutwcsCache *cache, int *status ) {
 
   /* Local Variables */
   AstMapping *azelmap;            /* tangent plane to spherical azel mapping */
@@ -457,8 +462,9 @@ smfCreateLutwcsCache *smf_create_lutwcs( int clearcache, const double *fplane_x,
        values corresponding to the centre of the integration and corresponding
        to the astrometry calculation. Remember to convert from TAI to TDB (as
        required by the Epoch attribute). */
-    astSet( cache->skyframe, "Epoch=MJD %.*g", DBL_DIG, state->tcs_tai + 
-                                            32.184/SPD ); 
+    astSet( cache->skyframe, "Epoch=MJD %.*g, dut1=%.*g",
+            DBL_DIG, state->tcs_tai + 32.184/SPD,
+            DBL_DIG, dut1 ); 
 
     /* Now modify the cached FrameSet to use the new Mapping and SkyFrame.
        First remove the existing current Frame and then add in the new one.

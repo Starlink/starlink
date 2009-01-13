@@ -109,7 +109,7 @@ int *status             /* global status (given and returned) */
 */
 {
    static sc2astCache *cache = NULL;
-   cache = sc2ast_createwcs2( subnum, state, instap, telpos, fset,     
+   cache = sc2ast_createwcs2( subnum, state, 0.0, instap, telpos, fset,     
                               cache, status );
 }
 
@@ -122,6 +122,7 @@ sc2astCache *sc2ast_createwcs2
 int subnum,             /* subarray number, 0-7 (given). If -1 is
                            supplied the cached AST objects will be freed. */
 const JCMTState *state, /* Current telescope state (time, pointing etc.) */
+double dut1,            /* UT1-UTC (seconds) */
 const double instap[2], /* Offset of subarray in the focal plane */ 
 const double telpos[3], /* Geodetic W Lon/Lat/Alt of telescope (deg/deg/ign.)*/
 AstFrameSet **fset,     /* constructed frameset (returned) */
@@ -208,6 +209,7 @@ int *status             /* global status (given and returned) */
                  definitions. (PF)
      15Dec2008 : Clone the cached SkyFrame instead of deep copying it
                  (it's much faster). (DSB)
+     18Dec2008 : dut1 is now an argument (TIMJ)
 */
 
 {
@@ -573,12 +575,15 @@ int *status             /* global status (given and returned) */
       astExempt( cache->skyframe );
    }
 
-   astSet( cache->skyframe, "Epoch=MJD %.*g", DBL_DIG, state->tcs_tai + 32.184/SC2AST_SPD );
-
-/* Call this every time since we can not ensure that we will always
-   have cleared the cache when a new observation starts */
-   astSetD( cache->skyframe, "SkyRef(1)", state->tcs_az_bc1 );
-   astSetD( cache->skyframe, "SkyRef(2)", state->tcs_az_bc2 );
+/* Update the epoch, dut1 and sky reference.
+   Call this every time for skyref and dut1 since we can not ensure that
+   we will always have cleared the cache when a new observation starts */
+   astSet( cache->skyframe,
+           "Epoch=MJD %.*g,SkyRef(1)=%.*g, SkyRef(2)=%.*g,dut1=%.*g",
+           DBL_DIG, state->tcs_tai + 32.184/SC2AST_SPD,
+           DBL_DIG, state->tcs_az_bc1,
+           DBL_DIG, state->tcs_az_bc2,
+           DBL_DIG, dut1 );
 
 /* Now modify the cached FrameSet to use the new Mapping and SkyFrame.
    First remove the existing current Frame and then add in the new one.

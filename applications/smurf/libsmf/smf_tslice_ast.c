@@ -155,7 +155,7 @@ void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status ) {
   smfHead *hdr;              /* Local copy of the header structure */
   dim_t ntslice;             /* Number of time-slices in data */
   const JCMTState *tmpState; /* Local pointer to STATE */
-  double dut1;               /* UT1-UTC correction, in days */ 
+  double dut1=0.0;           /* UT1-UTC correction, in days */ 
   int subsysnum;             /* Subsystem numeric id. 0 - 8 */
 
   if (*status != SAI__OK) return;
@@ -193,6 +193,13 @@ void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status ) {
   /* Create and store FrameSet only if the WCS info is wanted */
   if (needwcs) {
 
+    /* Read DUT1 from the header */
+    if( astGetFitsF( hdr->fitshdr, "DUT1", &dut1 ) ) {
+      dut1 *= SPD;
+    } else {
+      dut1 = 0.0;
+    }
+
     /* Ideally we want to modify in place to reduce malloc/free */
     /* For now take the inefficient and simpler approach and annul
        the previous calculation of the wcs before creating a new one */
@@ -207,7 +214,7 @@ void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status ) {
     case INST__SCUBA2:
       /* Need to get the subarray number */
       smf_find_subarray( hdr, NULL, 0, &subsysnum, status );
-      hdr->cache1 = sc2ast_createwcs2( subsysnum, tmpState, hdr->instap, 
+      hdr->cache1 = sc2ast_createwcs2( subsysnum, tmpState, dut1, hdr->instap, 
                                        hdr->telpos, &(hdr->wcs),
                                        hdr->cache1, status );
       break;
@@ -215,22 +222,22 @@ void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status ) {
     case INST__AZTEC:
 
       hdr->cache2 = smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney, hdr->ndet,
-              			       tmpState, hdr->instap, hdr->telpos,
- 			               &(hdr->wcs), hdr->cache2, status );
+                                       tmpState, dut1, hdr->instap, hdr->telpos,
+                                       &(hdr->wcs), hdr->cache2, status );
       break;
       
 /* For ACSIS data, use the .MORE.ACSIS.RECEPPOS values if they are
    still available in the smfHead. Otherwise, use the FPLANEX/Y values. */
     case INST__ACSIS:
       if( hdr->detpos ) {
-         hdr->cache3 = smf_detpos_wcs( hdr, index, hdr->telpos, &(hdr->wcs), 
-                                       hdr->cache3, status );
+        hdr->cache3 = smf_detpos_wcs( hdr, index, dut1, hdr->telpos, &(hdr->wcs), 
+                                      hdr->cache3, status );
 
       } else {
-         hdr->cache2 = smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney, 
-                                          hdr->ndet, tmpState, hdr->instap, 
-                                          hdr->telpos, &(hdr->wcs), hdr->cache2, 
-                                          status );
+        hdr->cache2 = smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney, 
+                                         hdr->ndet, tmpState, dut1, hdr->instap, 
+                                         hdr->telpos, &(hdr->wcs), hdr->cache2, 
+                                         status );
       }
 
       break;
@@ -241,17 +248,6 @@ void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status ) {
 
     }
     
-/* Set the current Frame's DUT1 value, converting from days to seconds. Use 
-   the current Frame pointer rather than the FrameSet pointer in order to 
-   prevent the current Frame from being re-mapped to take account of the 
-   change in DUT1 value. */
-    if( hdr->wcs && astGetFitsF( hdr->fitshdr, "DUT1", &dut1 ) ) {
-       cfrm = astGetFrame( hdr->wcs, AST__CURRENT );
-       astSetD( cfrm, "DUT1", SPD*dut1 );
-       cfrm = astAnnul( cfrm );
-    }
-
-    /* astShow( hdr->wcs ); */
   }
   return;
 }
