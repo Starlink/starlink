@@ -97,6 +97,8 @@
 *        Manage caches for smf_create_wcs and smf_detpos_wcs.
 *     2008-12-18 (TIMJ):
 *        Do not use an int for index API use dim_t. Use smf_get_dims.
+*     2009-01-13 (TIMJ):
+*        DUT1 setting moved to WCS routines.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -105,7 +107,7 @@
 *     smfHead).
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
