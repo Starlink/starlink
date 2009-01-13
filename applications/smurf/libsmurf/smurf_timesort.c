@@ -183,6 +183,8 @@
 *        convention. Instead, just append the output subscan number to
 *        the end of the supplied basename.
 *        - Correct implementation of LIMITTYPE=SLICES.
+*     13-JAN-2009 (DSB):
+*        Correct bugs in setting the NDF origin for the spectral axis.
 
 *  Copyright:
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
@@ -338,6 +340,7 @@ void smurf_timesort( int *status ) {
    int k;
    int l;
    int lbnd[ 3 ];
+   int lchan;
    int maxsyspop;
    int merge;                 
    int nbaddet;
@@ -345,7 +348,6 @@ void smurf_timesort( int *status ) {
    int ncomp;                 
    int ndet;
    int ndet_out;
-   size_t ndetgrp;
    int ndim;                  
    int nnout[ NDF__MXDIM ];     
    int nobs;
@@ -357,12 +359,10 @@ void smurf_timesort( int *status ) {
    int nts_out;
    int nullsizelimit;
    int ok;
-   size_t outsize;               
    int place;
    int rts_num0;
    int rts_num;
    int rts_num_last;
-   size_t size;                  
    int sizelimit;
    int slbnd[ 3 ];
    int sorted;                 
@@ -371,8 +371,12 @@ void smurf_timesort( int *status ) {
    int totout;
    int tslimit;
    int ubnd[ 3 ];
+   int uchan;
    size_t len;                
+   size_t ndetgrp;
    size_t ntai;               
+   size_t outsize;               
+   size_t size;                  
    smfData *data = NULL; 
    void *ipin;                
    void *ipout;               
@@ -510,7 +514,7 @@ void smurf_timesort( int *status ) {
                  &igrp4, &outsize, status );
 
 /* Loop round each input NDF. */
-      for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++ ) {
+      for( ifile = 1; ifile <= (int) size && *status == SAI__OK; ifile++ ) {
    
 /* Tell the user which NDF is being processed. */
          msgSeti( "I", ifile );
@@ -564,12 +568,9 @@ void smurf_timesort( int *status ) {
 
 /* If bad detectors are being removed, modify the size of the output NDF. */   
             if( nbaddet > 0 ) {
-               lbnd[ 0 ] = 1;
+               ndfBound( indf2, 3, lbnd, ubnd, &ndim, status );
                lbnd[ 1 ] = 1;
-               lbnd[ 2 ] = 1;
-               ubnd[ 0 ] = dims[ 0 ];
                ubnd[ 1 ] = dims[ 1 ] - nbaddet;
-               ubnd[ 2 ] = dims[ 2 ];
                ndfSbnd( 3, lbnd, ubnd, indf2, status ); 
             }
 
@@ -579,8 +580,8 @@ void smurf_timesort( int *status ) {
                if( there ) {
                   ndfMap( indf1, comp[ i ], "_REAL", "READ", &ipin, &el, status );
                   ndfMap( indf2, comp[ i ], "_REAL", "WRITE", &ipout, &el, status );
-                  smf_reorderF( (float *) ipin,1,ndim, dims, 2, index, 1, mask, 
-                                (float *) ipout, status );
+                  smf_reorderF( (float *) ipin, 1, ndim, dims, 2, index, 1, 
+                                mask, (float *) ipout, status );
                }
             }
    
@@ -705,7 +706,7 @@ void smurf_timesort( int *status ) {
             astTran1( tmap, ntai, grid, 1, tai );
    
 /* Create a LutMap holding these sorted time values. */
-            lut = astLutMap( ntai, tai, 1.0, 1.0, "" );
+            lut = astLutMap( ntai, tai, 1.0, 1.0, " " );
    
 /* Split off a Mapping for the other two axes. */
             axes[ 0 ] = 1;
@@ -714,7 +715,7 @@ void smurf_timesort( int *status ) {
             if( omap && astGetI( omap, "Nout" ) == 2 ) {
    
 /* Put this Mapping in parallel with the time axis Mapping created above. */
-               map = (AstMapping *) astCmpMap( omap, lut, 0, "" );
+               map = (AstMapping *) astCmpMap( omap, lut, 0, " " );
                
 /* Remove the current Frame from the FrameSet, then add it back in again
    using the above Mapping to connect it to the GRID (base) Frame. */
@@ -846,10 +847,10 @@ void smurf_timesort( int *status ) {
             ndfid = astMalloc( sizeof( int )*nsubscan );    
 
 /* Create a KeyMap to hold JCMTSTATE data values. */
-            km1 = astKeyMap( "" );
+            km1 = astKeyMap( " " );
 
 /* Create a KeyMap to hold ACSIS data values. */
-            km2 = astKeyMap( "" );
+            km2 = astKeyMap( " " );
 
 /* Initialise a pointer to an array used to hold the index of the
    input NDF from which each time slice in the concatenated list of time
@@ -861,6 +862,8 @@ void smurf_timesort( int *status ) {
             nts_in = 0;
 
 /* Further initialisations to avoid compiler warnings. */
+            uchan = 0;
+            lchan = 0;
             nchan = 0;
             ndet = 0;
 
@@ -891,25 +894,33 @@ void smurf_timesort( int *status ) {
                          "^F (^I/^N)...", status );
    
 /* Get the shape of the data array. */
-               ndfDim( indf1, 3, dims, &ndim, status ); 
+               ndfBound( indf1, 3, lbnd, ubnd, &ndim, status ); 
                if( ndim != 3 && *status == SAI__OK ) {
                   *status = SAI__ERROR;
                   ndfMsg( "NDF", indf1 );
                   errRep( "", "Input NDF ^NDF is not 3 dimensional.", status );
                }        
+
+/* Get the corresponding dimensions. */
+               dims[ 0 ] = ubnd[ 0 ] - lbnd[ 0 ] + 1;
+               dims[ 1 ] = ubnd[ 1 ] - lbnd[ 1 ] + 1;
+               dims[ 2 ] = ubnd[ 2 ] - lbnd[ 2 ] + 1;
       
-/* If this is the first input file, store the number of channels and the 
+/* If this is the first input file, store the channel number bounds and the 
    number of detectors in the data. */
                if( isubscan == 0 ) {
-                  nchan = dims[ 0 ];
+                  lchan = lbnd[ 0 ];
+                  uchan = ubnd[ 0 ];
+                  nchan = uchan - lchan + 1;
                   ndet = dims[ 1 ];
       
-/* If this is not the first input file, check the number of channels and 
+/* If this is not the first input file, check the channel number bounds and 
    detectors are the same as in the first input NDF. */
-               } else if( dims[ 0 ] != nchan && *status == SAI__OK ) {
+               } else if( ( lchan != lbnd[ 0 ] || uchan != ubnd[ 0 ] ) && 
+                          *status == SAI__OK ) {
                   *status = SAI__ERROR;
                   ndfMsg( "NDF", indf1 );
-                  errRep( "", "The number of spectral channels in '^NDF' differs "
+                  errRep( "", "The spectral channel bounds in '^NDF' differs "
                           "from the first NDF.", status );
       
                } else if( dims[ 1 ] != ndet && *status == SAI__OK ) {
@@ -1151,18 +1162,18 @@ void smurf_timesort( int *status ) {
             basename[ astChrLen( basename ) ] = 0;
 
 /* Initialise the bounds of each output NDF. */
-            lbnd[ 0 ] = 1;
+            lbnd[ 0 ] = lchan;
             lbnd[ 1 ] = 1;
             lbnd[ 2 ] = 1;
-            ubnd[ 0 ] = nchan;
+            ubnd[ 0 ] = uchan;
             ubnd[ 1 ] = ndet_out;
             ubnd[ 2 ] = tslimit;
       
 /* Initialise the bounds of each section used to represent one time slice
    in the output NDF. */
-            slbnd[ 0 ] = 1;
+            slbnd[ 0 ] = lchan;
             slbnd[ 1 ] = 1;
-            subnd[ 0 ] = nchan;
+            subnd[ 0 ] = uchan;
             subnd[ 1 ] = ndet_out;
       
 /* The number of time slices remaining to be written out. */
@@ -1402,10 +1413,10 @@ void smurf_timesort( int *status ) {
       
 /* Create a LutMap to hold the TAI value for each time slice in the
    current output NDF. */
-               lut = astLutMap( ubnd[ 2 ], taiout, 1.0, 1.0, "" );
+               lut = astLutMap( ubnd[ 2 ], taiout, 1.0, 1.0, " " );
       
 /* Put this Mapping in parallel with the Mapping for the other axes. */
-               map = (AstMapping *) astCmpMap( omap, lut, 0, "" );
+               map = (AstMapping *) astCmpMap( omap, lut, 0, " " );
                      
 /* Remove the current Frame from the WCS FrameSet, then add it back in again
    using the above Mapping to connect it to the GRID (base) Frame. */
