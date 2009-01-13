@@ -103,6 +103,7 @@ itcl::class util::LabelEntry {
     #  called for keypress events when validation is on (based on code from iwidgets)
 
     private method validate_ {char sym} {
+       
 	set cmd $validate_cmd_
 
 	if {"$cmd" == "" || "$itk_option(-validate)" == ""} {
@@ -114,6 +115,8 @@ itcl::class util::LabelEntry {
 	    $sym == "Tab" ||
 	    $sym == "BackSpace" ||
 	    $sym == "Delete" ||
+	    $sym == "Escape" ||
+	    $sym == "space" ||
 	    $char == ""} {
 	    return
 	}
