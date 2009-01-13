@@ -110,6 +110,7 @@ void smf_choose_closest( const smfArray *alldata, const smfData *indata,
 
   /* get reference MJD and subarray number */
   reftime = (indata->hdr->allState)[0].rts_end;
+  smf_find_dateobs( indata->hdr, &reftime, NULL, status );
   smf_find_subarray( indata->hdr, NULL, 0, &refsubnum, status );
 
   /* initialise the diff structs */
@@ -118,23 +119,23 @@ void smf_choose_closest( const smfArray *alldata, const smfData *indata,
   next.diff = VAL__MAXD;
   next.index = SMF__BADIDX;
 
-  /* loop through all the darks finding the ones closest in time
+  /* loop through all the files finding the ones closest in time
      with the correct subarray number */
   for (i=0; (*status==SAI__OK)&&(i<alldata->ndat); i++) {
-    smfData *thisdark = (alldata->sdata)[i];
+    smfData *thisfile = (alldata->sdata)[i];
     int thissubnum;
-    smf_find_subarray( thisdark->hdr, NULL, 0, &thissubnum, status );
+    smf_find_subarray( thisfile->hdr, NULL, 0, &thissubnum, status );
 
     /* Is there a valid state? */
-    if( !thisdark->hdr->allState ) {
+    if( !thisfile->hdr->allState ) {
       *status = SAI__ERROR;
-      errRep( "", FUNC_NAME ": dark does not contain a valid JCMT State", 
+      errRep( "", FUNC_NAME ": file does not contain a valid JCMT State", 
               status );
     }
 
     /* see if we even need to look at the time */
     if ( (*status==SAI__OK) && (thissubnum == refsubnum) ) {
-      double thistime = (thisdark->hdr->allState)[0].rts_end;
+      double thistime = (thisfile->hdr->allState)[0].rts_end;
       double diff = reftime - thistime;
       if (diff >= 0) {
         if (prev.diff > diff) {
