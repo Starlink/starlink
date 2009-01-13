@@ -16,7 +16,7 @@
 *  Invocation:
 *     result = smf_create_lutwcs( int clearcache, const double *fplane_x, 
 *                                 const double *fplane_y, const int n_pix, 
-*        		          const JCMTState *state, const double instap[2],
+*        		          const JCMTState *state, double dut1, const double instap[2],
 *                   	          const double telpos[3], AstFrameSet **fset, 
 *                                 CreateLutwcsCache *cache, int *status )
 
