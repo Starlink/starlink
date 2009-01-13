@@ -8,12 +8,16 @@
  * extending the TclAstroCat C++ class. Here we add support for
  * plotting objects in an image, done in C++ to improve performace
  * on large data sets.
- * 
+ *
  * See the man page for a complete description.
- * 
+ *
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  10 Feb 98  Created
+ * Peter W. Draper 13 Jan 09  Change imgplotCmd to transform the catalogue
+ *                            from the given equinox (presumably that of the
+ *                            catalogue celestial coordinates) to the image
+ *                            equinox before plotting.
  */
 static const char* const rcsId="@(#) $Id: SkySearch.C,v 1.2 2006/03/26 13:22:33 abrighto Exp $";
 
@@ -67,13 +71,13 @@ int SkySearch::call(const char* name, int len, int argc, char* argv[])
 
 /*
  * Parse the given symbol info and set the values of the last 7 args from
- * it. The symbol info is a variable length list of 
+ * it. The symbol info is a variable length list of
  *  {shape color ratio angle label cond}
  * Any missing values are not set, so they should be initialized to a valid
- * default. 
+ * default.
  */
-int SkySearch::parse_symbol(const QueryResult& r, int argc, char** argv, 
-			    char*& shape, char*& fg, char*& bg, char*& ratio, 
+int SkySearch::parse_symbol(const QueryResult& r, int argc, char** argv,
+			    char*& shape, char*& fg, char*& bg, char*& ratio,
 			    char*& angle, char*& label, char*& cond)
 {
     static char* symbols[] = {
@@ -90,7 +94,7 @@ int SkySearch::parse_symbol(const QueryResult& r, int argc, char** argv,
     };
     static int nsymbols = sizeof(symbols)/sizeof(char*);
     int found = 0;
-    
+
     if (argc < 1)
 	return error("empty plot symbol");
 
@@ -111,7 +115,7 @@ int SkySearch::parse_symbol(const QueryResult& r, int argc, char** argv,
 	    fg = bg = argv[1];
 	}
     }
-    
+
     // ratio
     if (argc >= 3) {
 	if (strlen(argv[2])) {
@@ -139,13 +143,13 @@ int SkySearch::parse_symbol(const QueryResult& r, int argc, char** argv,
 	    cond = argv[5];
 	}
     }
-    
+
     return TCL_OK;
 }
 
 
 /*
- * Set Tcl variables with the names of the given column headings and the values 
+ * Set Tcl variables with the names of the given column headings and the values
  * from the given query result row, so that the column heading names may be used
  * as variables in Tcl expressions.
  *
@@ -155,7 +159,7 @@ int SkySearch::parse_symbol(const QueryResult& r, int argc, char** argv,
  * colIndexes are the integer column indexes for the column names in the query
  * result.
  */
-int SkySearch::set_column_variables(const QueryResult& r, int rownum, 
+int SkySearch::set_column_variables(const QueryResult& r, int rownum,
 				    int numCols, char** colNames,
 				    const int* colIndexes)
 {
@@ -170,15 +174,15 @@ int SkySearch::set_column_variables(const QueryResult& r, int rownum,
 
 
 /*
- * Plot a symbol in the given skycat image with the given shape, id, 
+ * Plot a symbol in the given skycat image with the given shape, id,
  * catalog name, pos (x, y, xy_units), radius (in radius_units),
  * bg and fg colors, x/y size ratio, rotation angle and label.
  */
-int SkySearch::plot_symbol(Skycat* image, const char* shape, 
-			   const char* id, int rownum, 
-			   double x, double y, const char* xy_units, 
-			   double radius, const char* radius_units, 
-			   const char* bg, const char* fg, 
+int SkySearch::plot_symbol(Skycat* image, const char* shape,
+			   const char* id, int rownum,
+			   double x, double y, const char* xy_units,
+			   double radius, const char* radius_units,
+			   const char* bg, const char* fg,
 			   double ratio, double angle, const char* label)
 {
     // get the list of tags to use for the symbol.
@@ -186,8 +190,8 @@ int SkySearch::plot_symbol(Skycat* image, const char* shape,
     // all symbols for this instance by the instance name. The row number
     // is coded as row#$rownum. The general tag "objects" is also included.
     std::ostringstream symbol_os;
-    symbol_os << "{cat" << id << "} " 
-	      << this->instname() 
+    symbol_os << "{cat" << id << "} "
+	      << this->instname()
 	      << ' ' << this->instname() << ".objects"
 	      << " row#" << rownum
 	      << " objects";
@@ -198,22 +202,22 @@ int SkySearch::plot_symbol(Skycat* image, const char* shape,
     // is coded as row#$rownum. The general tag "objects" is also included.
     std::ostringstream label_os;
     if (label && strlen(label)) {
-	label_os 
-	    << "{label" << id << "} " 
-	    << this->instname() 
+	label_os
+	    << "{label" << id << "} "
+	    << this->instname()
 	    << ' ' << this->instname() << ".labels"
 	    << " row#" << rownum
 	    << " objects";
     }
 
     // draw the symbol and label
-    return image->draw_symbol(shape, x, y, xy_units, radius, radius_units, bg, fg, 
+    return image->draw_symbol(shape, x, y, xy_units, radius, radius_units, bg, fg,
 			      symbol_os.str().c_str(), ratio, angle, label, label_os.str().c_str());
 }
 
 
 /*
- * Plot the object for the given row in the given image.  
+ * Plot the object for the given row in the given image.
  * The row data is taken from the QueryResult object r and plotted in the
  * given image.
  *
@@ -225,34 +229,34 @@ int SkySearch::plot_symbol(Skycat* image, const char* shape,
  * units (pos_units).
  *
  * numCols is the number of column variables specified in the array colNames[], which
- * is a list of column names for columns whose values are used in the expressions. 
+ * is a list of column names for columns whose values are used in the expressions.
  *
  * shape is the plot symbol (circle, ellipse, etc...)
  *
- * bg and fg are the background and foreground colors for drawing. If they are 
- * different, 2 lines are drawn, otherwise 1. 
+ * bg and fg are the background and foreground colors for drawing. If they are
+ * different, 2 lines are drawn, otherwise 1.
  *
- * ratio and angle are optional arguments to the plot proc (for ellipse, plus). 
+ * ratio and angle are optional arguments to the plot proc (for ellipse, plus).
  *
  * label is an expr to use to label the object.
  *
  * cond should evaluate to a boolean expr. If true, plot the object, otherwise not.
  *
- * size should be an expr and evaluate to the radius on the object in the 
+ * size should be an expr and evaluate to the radius on the object in the
  * given units (size_units), using the column names as tcl variables.
  *
  * name is the short name of the catalog, used to identify all catalog objects
  * for this catalog.
  *
  */
-int SkySearch::plot_row(Skycat* image, const QueryResult& r, 
-			int rownum, const char* id, 
-			double x, double y, const char* xy_units, 
-			int numCols, char** colNames, const int* colIndexes, 
-			const char* shape, 
-			const char* bg, const char* fg, 
-			const char* ratio, const char* angle, 
-			const char* label, const char* cond, 
+int SkySearch::plot_row(Skycat* image, const QueryResult& r,
+			int rownum, const char* id,
+			double x, double y, const char* xy_units,
+			int numCols, char** colNames, const int* colIndexes,
+			const char* shape,
+			const char* bg, const char* fg,
+			const char* ratio, const char* angle,
+			const char* label, const char* cond,
 			const char* radius, const char* radius_units)
 {
     // set local tcl variables for column values used
@@ -263,7 +267,7 @@ int SkySearch::plot_row(Skycat* image, const QueryResult& r,
     int condVal = 1;
     if (strcmp(cond, "1") != 0) {
 	if (Tcl_ExprBoolean(interp_, (char*)cond, &condVal) != TCL_OK)
-	    return fmt_error("error in plot symbol condition: '%s': %s", 
+	    return fmt_error("error in plot symbol condition: '%s': %s",
 			     cond, interp_->result);
     }
 
@@ -274,7 +278,7 @@ int SkySearch::plot_row(Skycat* image, const QueryResult& r,
     // eval expr to get radius
     double radiusVal = 0;
     if (Tcl_ExprDouble(interp_, (char*)radius,  &radiusVal) != TCL_OK)
-	return fmt_error("error in plot symbol expression: '%s': %s", 
+	return fmt_error("error in plot symbol expression: '%s': %s",
 			 radius, interp_->result);
     if (radiusVal < 0.) {
 	// don't want a neg radius
@@ -285,15 +289,15 @@ int SkySearch::plot_row(Skycat* image, const QueryResult& r,
     double ratioVal = 1;
     if (strcmp(ratio, "1") != 0) {
 	if (Tcl_ExprDouble(interp_, (char*)ratio, &ratioVal) != TCL_OK)
-	    return fmt_error("error in plot symbol ratio expression: '%s': %s", 
+	    return fmt_error("error in plot symbol ratio expression: '%s': %s",
 			     ratio, interp_->result);
     }
-    
+
     // angle may be an expression with column name variables
     double angleVal = 0;
     if (strcmp(angle, "0") != 0) {
 	if (Tcl_ExprDouble(interp_, (char*)angle, &angleVal) != TCL_OK)
-	    return fmt_error("error in plot symbol angle expression: '%s': %s", 
+	    return fmt_error("error in plot symbol angle expression: '%s': %s",
 			     angle, interp_->result);
     }
 
@@ -304,14 +308,14 @@ int SkySearch::plot_row(Skycat* image, const QueryResult& r,
 	char buf[1024];
         sprintf(buf, "subst %s", label);
 	if (Tcl_Eval(interp_, buf) != TCL_OK)
-	    return fmt_error("error in plot symbol label: '%s': %s", 
+	    return fmt_error("error in plot symbol label: '%s': %s",
 			     label, interp_->result);
 	if (strlen(interp_->result))
 	    strncpy(labelVal, interp_->result, sizeof(labelVal)-1);
     }
 
-    if (plot_symbol(image, shape, id, rownum, x, y, xy_units, 
-		    radiusVal, radius_units, bg, fg, ratioVal, 
+    if (plot_symbol(image, shape, id, rownum, x, y, xy_units,
+		    radiusVal, radius_units, bg, fg, ratioVal,
 		    angleVal, labelVal) != TCL_OK)
 	return TCL_ERROR;
 
@@ -320,17 +324,17 @@ int SkySearch::plot_row(Skycat* image, const QueryResult& r,
     return TCL_OK;
 }
 
- 
+
 /*
  * Plot the current objects (in the query result r) using the given plot
  * info (cols, symbol, expr) from the catalog config file "symbol" entry.
- *     
+ *
  * cols should be a list of column names that may be used as Tcl
  * variables in "symbol" or "expr".
- *     
+ *
  * "symbol" may be a simple symbol name, such as "circle" or a list such
  * as {ellipse color ratio angle label condition}.
- *     
+ *
  * The last 4 elements in the symbol description may be expressions using
  * the column names given.  ratio gives the ratio of x/y, angle is the
  * rotation angle, label is an optional text expr and condition may
@@ -342,8 +346,8 @@ int SkySearch::plot_row(Skycat* image, const QueryResult& r,
  * {image deg ...}  as supported by rtd.
  *
  */
-int SkySearch::plot_objects(Skycat* image, const QueryResult& r, 
-			    const char* cols, const char* symbol, 
+int SkySearch::plot_objects(Skycat* image, const QueryResult& r,
+			    const char* cols, const char* symbol,
 			    const char* expr)
 {
     int status = 0;
@@ -358,7 +362,7 @@ int SkySearch::plot_objects(Skycat* image, const QueryResult& r,
     // this loop executes only once and is used for error handling/cleanup via "break"
     int once = 1;
     while (once-- > 0) {
-	// check that plot columns are valid and also save the column indexes 
+	// check that plot columns are valid and also save the column indexes
 	// for accessing row values as variables later
 	if ((status = Tcl_SplitList(interp_, (char*)cols, &numCols, &colNames)) != TCL_OK)
 	    break;
@@ -369,12 +373,12 @@ int SkySearch::plot_objects(Skycat* image, const QueryResult& r,
 		break;
 	    }
 	}
-    
-	// parse symbol info, a variable length list of 
+
+	// parse symbol info, a variable length list of
 	// {shape color ratio angle label cond}
 	if ((status = Tcl_SplitList(interp_, (char*)symbol, &nsymb, &symb)) != TCL_OK)
 	    break;
-    
+
 	// default values
 	char* shape = "";
 	char* fg = "white"; // if no color is specified, use 2: b&w
@@ -383,10 +387,10 @@ int SkySearch::plot_objects(Skycat* image, const QueryResult& r,
 	char* angle = "0";
 	char* label = "";
 	char* cond = "1";
-	if ((status = parse_symbol(r, nsymb, (char**)symb, shape, fg, bg, ratio, 
-				   angle, label, cond)) != TCL_OK) 
+	if ((status = parse_symbol(r, nsymb, (char**)symb, shape, fg, bg, ratio,
+				   angle, label, cond)) != TCL_OK)
 	    break;
-    
+
 	// parse the size expr list: {size units}
 	if ((status = Tcl_SplitList(interp_, (char*)expr, &nexpr, &exprList)) != TCL_OK)
 	    break;
@@ -404,10 +408,10 @@ int SkySearch::plot_objects(Skycat* image, const QueryResult& r,
 	int id_col = r.id_col();
 	for (int rownum = 0; rownum < nrows; rownum++) {
 	    char* id;
-	    if ((status = r.get(rownum, id_col, id)) != 0) 
+	    if ((status = r.get(rownum, id_col, id)) != 0)
 		break;
 	    WorldOrImageCoords pos;
-	    if (r.getPos(rownum, pos) != 0) 
+	    if (r.getPos(rownum, pos) != 0)
 		continue;	// coordinates might be missing - just ignore
 	    double x, y;
 	    char xy_units[32];
@@ -420,14 +424,14 @@ int SkySearch::plot_objects(Skycat* image, const QueryResult& r,
 		x = pos.ra_deg();
 		y = pos.dec_deg();
 		strcpy(xy_units, "deg");
-	    } 
+	    }
 	    else {
 		status = error("no wcs or image coordinates to plot");
 		break;
 	    }
-	    if ((status = plot_row(image, r, rownum, id, x, y, xy_units, 
-				   numCols, (char**)colNames, colIndexes, shape, bg, fg, ratio, 
-				   angle, label, cond, size, units)) != TCL_OK) 
+	    if ((status = plot_row(image, r, rownum, id, x, y, xy_units,
+				   numCols, (char**)colNames, colIndexes, shape, bg, fg, ratio,
+				   angle, label, cond, size, units)) != TCL_OK)
 		break;
 	}
     }
@@ -470,7 +474,7 @@ int SkySearch::plot(Skycat* image, const QueryResult& r)
     do {
 	p = strchr(sym, ':');
 	if (p)
-	    *p = '\0';    
+	    *p = '\0';
 	// split each symbol entry into {cols symbol expr}
 	// where "cols" is a list of column names to use as variables,
 	// "symbol" is a list describing the symbol shape, color, ratio, angle,
@@ -478,23 +482,23 @@ int SkySearch::plot(Skycat* image, const QueryResult& r)
 	status = Tcl_SplitList(interp_, sym, &argc, &argv);
 	if (status != TCL_OK)
 	    break;
-	
+
 	if (argc < 3) {
 	    if (argc == 0)
 		continue;
 	    status = error("invalid symbol entry in config file: ", sym);
 	    break;
 	}
-	
+
 	// plot the objects for this symbol
-	if ((status = plot_objects(image, r, argv[0], argv[1], argv[2])) != TCL_OK) 
+	if ((status = plot_objects(image, r, argv[0], argv[1], argv[2])) != TCL_OK)
 	    break;
 
 	if (argv) {
 	    Tcl_Free((char *)argv);
 	    argv = NULL;
 	}
-	
+
 	// move to next ':' separated symbol
 	sym = p + 1;
     } while(p);
@@ -505,7 +509,7 @@ int SkySearch::plot(Skycat* image, const QueryResult& r)
 	free(symbols);
 
     return status;
-   
+
 }
 
 
@@ -527,7 +531,7 @@ int SkySearch::plot(Skycat* image, const QueryResult& r)
  * the format returned by the query command.
  *
  * If $equinox is specified, it is the equinox of the image being displayed.
- * (The ra,dec columns in the table data are assumed to be J2000 unless 
+ * (The ra,dec columns in the table data are assumed to be J2000 unless
  * specified otherwise, with the equinox keyword in the table config entry).
  *
  * If $headings is given, it is used as a Tcl list of column headings.
@@ -544,10 +548,10 @@ int SkySearch::plot(Skycat* image, const QueryResult& r)
 int SkySearch::imgplotCmd(int argc, char* argv[])
 {
     // can't plot without a catalog, since no plot symbols would be defined
-    if (!cat_) 
+    if (!cat_)
 	return error("no catalog is currently open");
 
-    if (argc <= 0 || argc > 4) 
+    if (argc <= 0 || argc > 4)
 	return error("wrong number of args for astrocat imgplot subcommand");
 
     // Get a pointer to the C++ class implementing the extended rtdimage object.
@@ -557,9 +561,9 @@ int SkySearch::imgplotCmd(int argc, char* argv[])
 	return TCL_ERROR;
 
     if (argc == 1) {
-	if (!result_) 
+	if (!result_)
 	    return error("no previous data to plot");
-    
+
 	return plot(image, *result_);
     }
 
@@ -567,7 +571,7 @@ int SkySearch::imgplotCmd(int argc, char* argv[])
     int numCols = 0;;
     char** colNames = NULL;
     int freeColNames = 0;
-    
+
     // get the equinox, if specified
     if (argc >= 3) {
 	equinoxStr = argv[2];
@@ -577,19 +581,30 @@ int SkySearch::imgplotCmd(int argc, char* argv[])
     if (argc < 4) {		// use current catalog
 	numCols = cat_->numCols();
 	colNames = cat_->colNames();
-    } 
+    }
     else {			// use headings list
-	if (Tcl_SplitList(interp_, argv[3], &numCols, &colNames) != TCL_OK) 
+	if (Tcl_SplitList(interp_, argv[3], &numCols, &colNames) != TCL_OK)
 	    return TCL_ERROR;
 	freeColNames++;		// delete memory later
-    } 
+    }
 
     // get query results from arguments
+    // PWD: set equinox of result to that of image, so catalog will be transformed.
     QueryResult r;
     r.entry(cat_->entry());
+    double equinox = 2000.0;
+    if ( image->isWcs() ) {
+        equinox = r.equinox();        //  Record catalog equinox.
+        r.getInfo()->equinox( image->image()->wcs().equinox() );
+    }
     int status = getQueryResult(numCols, (char**)colNames, argv[1], equinoxStr, r);
     if (status == TCL_OK)
 	status = plot(image, r);
+
+    // catalog equinox back to original
+    if ( image->isWcs() ) {
+        r.getInfo()->equinox( equinox );
+    }
 
     // clean up
     if (freeColNames && colNames)

@@ -11,9 +11,10 @@
  *
  * See the man page for a complete description.
  *
- * who             when       what
- * --------------  --------   ----------------------------------------
- * Allan Brighton  7 Nov 95  Created
+ * who              when       what
+ * --------------   --------   ----------------------------------------
+ * Allan Brighton   7 Nov 95  Created
+ * Peter W. Draper 13 Jan 09  Added getEntry method.
  */
 
 
@@ -106,6 +107,9 @@ public:
 
     // return true if the catalog uses image pixel coords
     virtual int isPix() const             {return entry_->isPix();}
+
+    // get the CatalogInfoEntry instance.
+    CatalogInfoEntry * getInfo()          {return entry_;}
 };
 
 
