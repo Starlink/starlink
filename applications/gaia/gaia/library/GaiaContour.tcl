@@ -111,11 +111,11 @@ itcl::class gaia::GaiaContour {
 
       #  Add the File menu.
       add_menubar
-      set File [add_menubutton "File"]
+      set File [add_menubutton "File" left]
       configure_menubutton File -underline 0
 
       #  Add the options menu
-      set Options [add_menubutton "Options"]
+      set Options [add_menubutton "Options" left]
       configure_menubutton Options -underline 0
 
       #  Add window help.
