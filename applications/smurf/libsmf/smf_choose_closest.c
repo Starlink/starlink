@@ -138,7 +138,7 @@ void smf_choose_closest( const smfArray *alldata, const smfData *indata,
     if ( (*status==SAI__OK) && (thissubnum == refsubnum) ) {
       double thistime;
       double diff;
-      smf_find_subarray( thisfile->hdr, &thistime, NULL, status );
+      smf_find_dateobs( thisfile->hdr, &thistime, NULL, status );
       diff = reftime - thistime;
       if (diff >= 0) {
         if (prev.diff > diff) {
