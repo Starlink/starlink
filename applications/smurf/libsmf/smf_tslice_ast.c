@@ -153,7 +153,6 @@
 
 void smf_tslice_ast (smfData * data, dim_t index, int needwcs, int * status ) {
 
-  AstFrame *cfrm = NULL;     /* Pointer to current Frame */
   smfHead *hdr;              /* Local copy of the header structure */
   dim_t ntslice;             /* Number of time-slices in data */
   const JCMTState *tmpState; /* Local pointer to STATE */
