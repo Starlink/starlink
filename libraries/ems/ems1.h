@@ -63,8 +63,6 @@ void ems1Flush( int *status );
 void ems1Form( const char *text, const int, Logical esctokval, Logical clean,
                char *opstr, int *oplen, int *status );
 void ems1Fthreaddata( void *ptr );
-void ems1Gesc( const char *escchr, const char *string, int *iposn );
-void ems1Gnam( const char *string, int *iposn, char *name, int *namlen, int *status);
 void ems1Imsgtab( ems_msgtab_t *msgtab );
 void ems1Itoktab( ems_toktab_t *toktab );
 void ems1Kerr( void );

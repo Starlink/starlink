@@ -41,6 +41,7 @@ F77_SUBROUTINE(ems_mload) ( CHARACTER(msg), CHARACTER(text), CHARACTER(opstr),
 {
    char *str;                 /* Buffer for expanded string */
    char *ctext;               /* Imported text string */
+   char *cmsg;
 
    GENPTR_CHARACTER(msg)
    GENPTR_CHARACTER(text)
@@ -51,12 +52,14 @@ F77_SUBROUTINE(ems_mload) ( CHARACTER(msg), CHARACTER(text), CHARACTER(opstr),
 /* Import the given strings
 *  We don't need to import msg because it's not used at lower levels
 */    
+   cmsg = cnfCreim( msg, msg_length );
    ctext = cnfCreim( text, text_length );
    str = cnfCreat( opstr_length );
 
-   emsMload( msg, ctext, str, oplen, status );
+   emsMload( cmsg, ctext, str, oplen, status );
 
    cnfExprt( str, opstr, opstr_length );
+   cnfFree( cmsg );
    cnfFree( ctext );
    cnfFree( str );
 }

@@ -86,7 +86,8 @@
 #include "ems_par.h"
 #include "ems_sys.h"
 #include "ems1.h"
-              
+#include "ems.h"              
+
 void ems1Gnam( const char *string, int *iposn,
                 char *name, int *namlen, int *status ) {
 

@@ -113,10 +113,12 @@
 #include "ems_par.h"                 /* EMS_ public constants */
 #include "ems_sys.h"                 /* EMS_ private constants */
 #include "ems1.h"                    /* EMS1 function prototypes */
+#include "ems.h"
 #include "star/mem.h"
 
 void ems1Form( const char *text, const int maxlen, Logical esctokval,
-               Logical clean, char *opstr, int *oplen, int *status ) 
+               Logical clean, char *opstr, int *oplen,
+               int *status __attribute__((unused)) ) 
 {
     Logical literl;              /* Whether a literal token escape */
 

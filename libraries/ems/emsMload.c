@@ -98,8 +98,8 @@
 #include "ems_defs.h"                  /* EMS_ message table */
 
 /* Function Definitons: */
-void emsMload( const char *msg, const char *text, char *opstr, int *oplen,
-               int *status )
+void emsMload( const char *msg __attribute__((unused)), const char *text, char *opstr,
+               int *oplen, int *status )
 {
     ems_msgtab_t *msgtab = ems1Gmsgtab();  /* Current message table */
 

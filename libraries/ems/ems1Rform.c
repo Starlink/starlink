@@ -118,6 +118,7 @@
 #include "ems_sys.h"
 #include "ems_par.h"                 /* EMS_ public constants */
 #include "ems1.h"                    /* EMS_ internal functions */
+#include "ems.h"
 
 void ems1Rform( const char *text, const int maxlen, int *iposn, char *string,
                 int *strlength  ) 
