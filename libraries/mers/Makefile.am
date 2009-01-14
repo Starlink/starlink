@@ -88,7 +88,7 @@ errStat.c errLevel.c errFacer.c msgRenew.c err1Bell.c msgBell.c \
 err1Print.c mers1Blk.c err1Flush.c errFlush.c errFlbel.c errRep.c err1Rep.c \
 msgLoad.c msgOutif.c msg1Print.c msgOut.c msgBlank.c errOut.c errLoad.c \
 msgIflev.c msgIfset.c mers1Getenv.c errTune.c msgTune.c msgFmt.c msgBlankif.c \
-errRepf.c msg1Outif.c msgOutiff.c msgOutf.c msgFlusherr.c
+errRepf.c msg1Outif.c msgOutiff.c msgOutf.c msgFlusherr.c msgFlevok.c
 
 C_INTERFACE_ADAM = 
 
