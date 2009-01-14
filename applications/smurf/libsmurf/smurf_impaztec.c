@@ -177,13 +177,16 @@
 
 #if HAVE_LIBNETCDF
 /* Prototypes for local functions that wrap netcdf messages */
-void nc_getSignal(int ncid, const char* signalname, double* signal, int* status);
-void nc_error(int nc_status, int *status);
+static void nc_getSignal(int ncid, const char* signalname, double* signal,
+                         int* status);
+static void nc_error(int nc_status, int *status);
 
 #endif
 
 void smurf_impaztec( int *status ) {
- 
+
+#if HAVE_LIBNETCDF
+
   /* Local Variables */
   double *airmass = NULL;      /* airmass of each frame */
   double *tel_lst = NULL;      /* LST read from telescope */
@@ -299,8 +302,6 @@ void smurf_impaztec( int *status ) {
   double dut1 = -0.6;
 
   /* Main routine */
-
-#if HAVE_LIBNETCDF
 
   /* We should use the telescope location that the TCS actually used.
      We therefore use the OBSGEO coordinates known to be in use at that
@@ -920,7 +921,7 @@ void smurf_impaztec( int *status ) {
 #ifdef HAVE_LIBNETCDF
 
 /* get a signal specified by name from the netCDF file identified by ncid */
-void nc_getSignal(int ncid, const char* signalname, double* signal,int* status){
+static void nc_getSignal(int ncid, const char* signalname, double* signal,int* status){
 
   int sigid, nc_status;
   if (*status != SAI__OK) return;
@@ -933,7 +934,7 @@ void nc_getSignal(int ncid, const char* signalname, double* signal,int* status){
 }
 
 /* handle netCDF status errors. terminate if we have any errors */
-void nc_error(int nc_status,int* status){
+static void nc_error(int nc_status,int* status){
 
   if(nc_status != NC_NOERR){
     msgSetc("ERROR",nc_strerror(nc_status));
