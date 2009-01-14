@@ -237,6 +237,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *        Improve calculation of approximate Local Apparent Sidereal time
 *        by finding and using the ratio of solar to sidereal time
 *        independently for each approximation period.
+*     14-JAN-2009 (DSB):
+*        Override the astIntersect method.
 *class--
 */
 
@@ -883,6 +885,7 @@ static void ClearSystem( AstFrame *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
+static void Intersect( AstFrame *, const double[2], const double[2], const double[2], const double[2], double[2], int * );
 static void LineOffset( AstFrame *, AstLineDef *, double, double, double[2], int * );
 static void Norm( AstFrame *, double[], int * );
 static void NormBox( AstFrame *, double[], double[], AstMapping *, int * );
@@ -4185,6 +4188,7 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name, int *status
    member functions implemented here. */
    frame->Angle = Angle;
    frame->Distance = Distance;
+   frame->Intersect = Intersect;
    frame->Norm = Norm;
    frame->NormBox = NormBox;
    frame->Resolve = Resolve;
@@ -4227,6 +4231,174 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name, int *status
    that the vtab is now initialised. */
    if( vtab == &class_vtab ) class_init = 1;
 
+}
+
+static void Intersect( AstFrame *this_frame, const double a1[2],
+                       const double a2[2], const double b1[2],
+                       const double b2[2], double cross[2], 
+                       int *status ) {
+/*
+*  Name:
+*     Intersect
+
+*  Purpose:
+*     Find the point of intersection between two geodesic curves.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     void Intersect( AstFrame *this_frame, const double a1[2],
+*                      const double a2[2], const double b1[2],
+*                      const double b2[2], double cross[2], 
+*                      int *status ) 
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astIntersect method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function finds the coordinate values at the point of
+*     intersection between two geodesic curves. Each curve is specified
+*     by two points on the curve. 
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+*     a1
+*        An array of double, with one element for each Frame axis.
+*        This should contain the coordinates of a point on the first
+*        geodesic curve.
+*     a2
+*        An array of double, with one element for each Frame axis.
+*        This should contain the coordinates of a second point on the 
+*        first geodesic curve.
+*     b1
+*        An array of double, with one element for each Frame axis.
+*        This should contain the coordinates of a point on the second
+*        geodesic curve.
+*     b2
+*        An array of double, with one element for each Frame axis.
+*        This should contain the coordinates of a second point on 
+*        the second geodesic curve.
+*     cross
+*        An array of double, with one element for each Frame axis
+*        in which the coordinates of the required intersection
+*        point will be returned. These will be AST__BAD if the curves do
+*        not intersect.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Notes:
+*     - The geodesic curve used by this function is the path of
+*     shortest distance between two points, as defined by the
+*     astDistance function.
+*     - This function will return "bad" coordinate values (AST__BAD)
+*     if any of the input coordinates has this value.
+*     - For SkyFrames each curve will be a great circle, and in general
+*     each pair of curves will intersect at two diametrically opposite 
+*     points on the sky. The returned position is the one which is
+*     closest to point "a1".
+*/
+
+/* Local Variables: */
+   AstSkyFrame *this;          /* Pointer to the SkyFrame structure */
+   const int *perm;            /* Pointer to axis permutation array */
+   double aa1[ 2 ];            /* Permuted coordinates for a1 */
+   double aa2[ 2 ];            /* Permuted coordinates for a2 */
+   double bb1[ 2 ];            /* Permuted coordinates for b1 */
+   double bb2[ 2 ];            /* Permuted coordinates for b2 */
+   double cc[ 2 ];             /* Permuted coords at intersection */
+   double d1;                  /* Cos(distance from a1 to vp) */
+   double d2;                  /* Cos(distance from a1 to -vp) */
+   double na[ 3 ];             /* Normal to the a1/a2 great circle */
+   double nb[ 3 ];             /* Normal to the b1/b2 great circle */
+   double va1[ 3 ];            /* Vector pointing at a1 */
+   double va2[ 3 ];            /* Vector pointing at a2 */
+   double vb1[ 3 ];            /* Vector pointing at b1 */
+   double vb2[ 3 ];            /* Vector pointing at b2 */
+   double vmod;                /* Length of "vp" */
+   double vp[ 3 ];             /* Vector pointing at the intersection */
+   double vpn[ 3 ];            /* Normalised vp */
+   int iaxis;                  /* Axis index */
+
+/* Initialise. */
+   cross[ 0 ] = AST__BAD;
+   cross[ 1 ] = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the SkyFrame structure. */
+   this = (AstSkyFrame *) this_frame;
+
+/* Check that all supplied values are OK. */
+   if ( ( a1[ 0 ] != AST__BAD ) && ( a1[ 1 ] != AST__BAD ) &&
+        ( a2[ 0 ] != AST__BAD ) && ( a2[ 1 ] != AST__BAD ) &&
+        ( b1[ 0 ] != AST__BAD ) && ( b1[ 1 ] != AST__BAD ) &&
+        ( b2[ 0 ] != AST__BAD ) && ( b2[ 1 ] != AST__BAD ) ) {
+
+/* Obtain a pointer to the SkyFrame's axis permutation array. */
+      perm = astGetPerm( this );
+      if ( astOK ) {
+
+/* Apply the axis permutation array to obtain the coordinates of 
+   the points in the required (longitude,latitude) order. */
+         for( iaxis = 0; iaxis < 2; iaxis++ ) {
+            aa1[ perm[ iaxis ] ] = a1[ iaxis ];
+            aa2[ perm[ iaxis ] ] = a2[ iaxis ];
+            bb1[ perm[ iaxis ] ] = b1[ iaxis ];
+            bb2[ perm[ iaxis ] ] = b2[ iaxis ];
+         }
+
+/* Convert each (lon,lat) pair into a unit length 3-vector. */
+         palSlaDcs2c( aa1[ 0 ], aa1[ 1 ], va1 );
+         palSlaDcs2c( aa2[ 0 ], aa2[ 1 ], va2 );
+         palSlaDcs2c( bb1[ 0 ], bb1[ 1 ], vb1 );
+         palSlaDcs2c( bb2[ 0 ], bb2[ 1 ], vb2 );
+
+/* Find the normal vectors to the two great cicles. */
+         palSlaDvxv( va1, va2, na );
+         palSlaDvxv( vb1, vb2, nb );
+
+/* The cross product of the two normal vectors points to one of the
+   two diametrically opposite intersections. */
+         palSlaDvxv( na, nb, vp );
+
+/* Normalise the "vp" vector, also obtaining its original modulus. */
+         palSlaDvn( vp, vpn, &vmod );
+         if( vmod != 0.0 ) {
+
+/* We want the intersection which is closest to "a1". The dot product
+   gives the cos(distance) between two positions. So find the dot
+   product between "a1" and "vpn", and then between "a1" and the point
+   diametrically opposite "vpn". */
+            d1 = palSlaDvdv( vpn, va1 );
+            vpn[ 0 ] = -vpn[ 0 ];
+            vpn[ 1 ] = -vpn[ 1 ];
+            vpn[ 2 ] = -vpn[ 2 ];
+            d2 = palSlaDvdv( vpn, va1 );
+
+/* Revert to "vpn" if it is closer to "a1". */
+            if( d1 > d2 ) {
+               vpn[ 0 ] = -vpn[ 0 ];
+               vpn[ 1 ] = -vpn[ 1 ];
+               vpn[ 2 ] = -vpn[ 2 ];
+            }
+
+/* Convert the vector back into a (lon,lat) pair, and put the longitude
+   into the range 0 to 2.pi. */
+            palSlaDcc2s( vpn, cc, cc + 1 );
+            *cc = palSlaDranrm( *cc );
+
+/* Permute the result coordinates to undo the effect of the SkyFrame
+   axis permutation array. */
+            cross[ 0 ] = cc[ perm[ 0 ] ];
+            cross[ 1 ] = cc[ perm[ 1 ] ];
+         }
+      }
+   }
 }
 
 static int IsEquatorial( AstSystemType system, int *status ) {
@@ -6568,7 +6740,7 @@ static double Offset2( AstFrame *this_frame, const double point1[2],
          p1[ perm[ 0 ] ] = point1[ 0 ];
          p1[ perm[ 1 ] ] = point1[ 1 ];
 
-/* If the axes are permuted, convert the supplie dangle into a position
+/* If the axes are permuted, convert the supplied angle into a position
    angle. */
          pa = ( perm[ 0 ] == 0 )? angle: piby2 - angle;
 

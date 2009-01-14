@@ -530,6 +530,8 @@
 *        Added Dut1 accessor methods.
 *     17-MAY-2007 (DSB):
 *        Added NormUnit attribute.
+*     14-JAN-2009 (DSB):
+*        Added astIntersect method.
 *-
 */
 
@@ -724,6 +726,7 @@ typedef struct AstFrameVtab {
    void (* ClearSymbol)( AstFrame *, int, int * );
    void (* ClearTitle)( AstFrame *, int * );
    void (* ClearUnit)( AstFrame *, int, int * );
+   void (* Intersect)( AstFrame *, const double[2], const double[2], const double[2], const double[2], double[2], int * );
    void (* Norm)( AstFrame *, double[], int * );
    void (* NormBox)( AstFrame *, double *, double *, AstMapping *, int * );
    void (* Offset)( AstFrame *, const double[], const double[], double, double[], int * );
@@ -870,6 +873,7 @@ AstFrameSet *astConvert_( AstFrame *, AstFrame *, const char *, int * );
 AstFrameSet *astFindFrame_( AstFrame *, AstFrame *, const char *, int * );
 double astAngle_( AstFrame *, const double[], const double[], const double[], int * );
 double astDistance_( AstFrame *, const double[], const double[], int * );
+void astIntersect_( AstFrame *, const double[2], const double[2], const double[2], const double[2], double[2], int * );
 void astNorm_( AstFrame *, double[], int * );
 double astAxDistance_( AstFrame *, int, double, double, int * );
 double astAxOffset_( AstFrame *, int, double, double, int * );
@@ -1083,6 +1087,8 @@ astINVOKE(V,astAxOffset_(astCheckFrame(this),axis,v1,dist,STATUS_PTR))
 astINVOKE(V,astOffset_(astCheckFrame(this),point1,point2,offset,point3,STATUS_PTR))
 #define astAxAngle(this,a,b,axis) \
 astINVOKE(V,astAxAngle_(astCheckFrame(this),a,b,axis,STATUS_PTR))
+#define astIntersect(this,a1,a2,b1,b2,cross) \
+astINVOKE(V,astIntersect_(astCheckFrame(this),a1,a2,b1,b2,cross,STATUS_PTR))
 #define astOffset2(this,point1,angle,offset,point2) \
 astINVOKE(V,astOffset2_(astCheckFrame(this),point1,angle,offset,point2,STATUS_PTR))
 #define astResolve(this,point1,point2,point3,point4,d1,d2) \

@@ -158,6 +158,8 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 *        Added astGetRefFS.
 *     28-MAY-2007 (DSB):
 *        - Added protected function astBndMesh.
+*     14-JAN-2009 (DSB):
+*        Override the astIntersect method.
 *class--
 
 *  Implementation Notes:
@@ -876,6 +878,7 @@ static void CheckPerm( AstFrame *, const int *, const char *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
+static void Intersect( AstFrame *, const double[2], const double[2], const double[2], const double[2], double[2], int * );
 static void Negate( AstRegion *, int * );
 static void Norm( AstFrame *, double[], int * );
 static void NormBox( AstFrame *, double[], double[], AstMapping *, int * );
@@ -4251,6 +4254,7 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name, int *status ) {
    frame->GetSymbol = GetSymbol;
    frame->GetTitle = GetTitle;
    frame->GetUnit = GetUnit;
+   frame->Intersect = Intersect;
    frame->IsUnitFrame = IsUnitFrame;
    frame->Match = Match;
    frame->Norm = Norm;
@@ -4351,6 +4355,93 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name, int *status ) {
    that the vtab is now initialised. */
    if( vtab == &class_vtab ) class_init = 1;
 
+}
+
+static void Intersect( AstFrame *this_frame, const double a1[2],
+                       const double a2[2], const double b1[2],
+                       const double b2[2], double cross[2], 
+                       int *status ) {
+/*
+*  Name:
+*     Intersect
+
+*  Purpose:
+*     Find the point of intersection between two geodesic curves.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "region.h"
+*     void Intersect( AstFrame *this_frame, const double a1[2],
+*                      const double a2[2], const double b1[2],
+*                      const double b2[2], double cross[2], 
+*                      int *status ) 
+
+*  Class Membership:
+*     Region member function (over-rides the astIntersect method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function finds the coordinate values at the point of
+*     intersection between two geodesic curves. Each curve is specified
+*     by two points on the curve. 
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+*     a1
+*        An array of double, with one element for each Frame axis.
+*        This should contain the coordinates of a point on the first
+*        geodesic curve.
+*     a2
+*        An array of double, with one element for each Frame axis.
+*        This should contain the coordinates of a second point on the 
+*        first geodesic curve.
+*     b1
+*        An array of double, with one element for each Frame axis.
+*        This should contain the coordinates of a point on the second
+*        geodesic curve.
+*     b2
+*        An array of double, with one element for each Frame axis.
+*        This should contain the coordinates of a second point on 
+*        the second geodesic curve.
+*     cross
+*        An array of double, with one element for each Frame axis
+*        in which the coordinates of the required intersection
+*        point will be returned. These will be AST__BAD if the curves do
+*        not intersect.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Notes:
+*     - The geodesic curve used by this function is the path of
+*     shortest distance between two points, as defined by the
+*     astDistance function.
+*     - This function will return "bad" coordinate values (AST__BAD)
+*     if any of the input coordinates has this value.
+*     - For SkyFrames each curve will be a great circle, and in general
+*     each pair of curves will intersect at two diametrically opposite 
+*     points on the sky. The returned position is the one which is
+*     closest to point "a1".
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+   AstRegion *this;              /* Pointer to the Region structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the FrameSet structure. */
+   this = (AstRegion *) this_frame;
+
+/* Obtain a pointer to the Region's encapsulated Frame and invoke the
+   astIntersect method for this Frame. Annul the Frame pointer 
+   afterwards. */
+   fr = astGetFrame( this->frameset, AST__CURRENT );
+   astIntersect( fr, a1, a2, b1, b2, cross );
+   fr = astAnnul( fr );
 }
 
 static int IsUnitFrame( AstFrame *this, int *status ){

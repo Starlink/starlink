@@ -75,6 +75,7 @@ c     - astDistance: Calculate the distance between two points in a Frame
 c     - astFindFrame: Find a coordinate system with specified characteristics
 c     - astFormat: Format a coordinate value for a Frame axis
 c     - astGetActiveUnit: Determines how the Unit attribute will be used
+c     - astIntersect: Find the intersection between two geodesic curves
 c     - astNorm: Normalise a set of Frame coordinates
 c     - astOffset: Calculate an offset along a geodesic curve
 c     - astOffset2: Calculate an offset along a geodesic curve in a 2D Frame
@@ -92,6 +93,7 @@ f     - AST_DISTANCE: Calculate the distance between two points in a Frame
 f     - AST_FINDFRAME: Find a coordinate system with specified characteristics
 f     - AST_FORMAT: Format a coordinate value for a Frame axis
 f     - AST_GETACTIVEUNIT: Determines how the Unit attribute will be used
+f     - AST_INTERSECT: Find the intersection between two geodesic curves
 f     - AST_NORM: Normalise a set of Frame coordinates
 f     - AST_OFFSET: Calculate an offset along a geodesic curve
 f     - AST_OFFSET2: Calculate an offset along a geodesic curve in a 2D Frame
@@ -248,6 +250,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        the primary frame
 *     17-NOV-2008 (DSB):
 *        Correct parent class in invocation of astMAKE_ISA.
+*     14-JAN-2009 (DSB):
+*        Added astIntersect.
 *class--
 */
 
@@ -907,6 +911,7 @@ static void ClearUnit( AstFrame *, int, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
+static void Intersect( AstFrame *, const double[2], const double[2], const double[2], const double[2], double[2], int * );
 static void Norm( AstFrame *, double[], int * );
 static void NormBox( AstFrame *, double[], double[], AstMapping *, int * );
 static void Offset( AstFrame *, const double[], const double[], double, double[], int * );
@@ -5298,6 +5303,7 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name, int *status ) {
    vtab->GetTitle = GetTitle;
    vtab->GetUnit = GetUnit;
    vtab->GetNormUnit = GetNormUnit;
+   vtab->Intersect = Intersect;
    vtab->IsUnitFrame = IsUnitFrame;
    vtab->Match = Match;
    vtab->Norm = Norm;
@@ -5441,6 +5447,180 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name, int *status ) {
    that the vtab is now initialised. */
    if( vtab == &class_vtab ) class_init = 1;
 
+}
+
+static void Intersect( AstFrame *this, const double a1[2],
+                       const double a2[2], const double b1[2],
+                       const double b2[2], double cross[2], 
+                       int *status ) {
+/*
+*++
+*  Name:
+c     astIntersect
+f     AST_INTERSECT
+
+*  Purpose:
+*     Find the point of intersection between two geodesic curves.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "frame.h"
+c     void astIntersect( AstFrame *this, const double a1[2],
+c                        const double a2[2], const double b1[2],
+c                        const double b2[2], double cross[2] )
+f     CALL AST_INTERSECT( THIS, A1, A2, B1, B2, CROSS, STATUS )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+c     This function 
+f     This routine
+*     finds the coordinate values at the point of intersection between
+*     two geodesic curves. Each curve is specified by two points on 
+*     the curve.  It can only be used with 2-dimensional Frames.
+*
+*     For example, in a basic Frame, it will find the point of
+*     intersection between two straight lines. But for a SkyFrame it 
+*     will find an intersection of two great circles.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Frame.
+c     a1
+f     A1( 2 ) = DOUBLE PRECISION (Given)
+c        An array of double, with one element for each Frame axis
+f        An array with one element for each Frame axis
+*        (Naxes attribute). This should contain the coordinates of the
+*        first point on the first geodesic curve.
+c     a2
+f     A2( 2 ) = DOUBLE PRECISION (Given)
+c        An array of double, with one element for each Frame axis
+f        An array with one element for each Frame axis
+*        (Naxes attribute). This should contain the coordinates of a
+*        second point on the first geodesic curve. It should not be 
+*        co-incident with the first point.
+c     b1
+f     B1( 2 ) = DOUBLE PRECISION (Given)
+c        An array of double, with one element for each Frame axis
+f        An array with one element for each Frame axis
+*        (Naxes attribute). This should contain the coordinates of the
+*        first point on the second geodesic curve.
+c     b2
+f     B2( 2 ) = DOUBLE PRECISION (Given)
+c        An array of double, with one element for each Frame axis
+f        An array with one element for each Frame axis
+*        (Naxes attribute). This should contain the coordinates of a
+*        second point on the second geodesic curve. It should not be 
+*        co-incident with the first point.
+c     cross
+f     CROSS( 2 ) = DOUBLE PRECISION (Returned)
+c        An array of double, with one element for each Frame axis
+f        An array with one element for each Frame axis
+*        in which the coordinates of the required intersection will 
+*        be returned.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - For SkyFrames each curve will be a great circle, and in general
+*     each pair of curves will intersect at two diametrically opposite 
+*     points on the sky. The returned position is the one which is
+*     closest to point 
+c     "a1".
+f     A1.
+*     - This function will return "bad" coordinate values (AST__BAD)
+*     if any of the input coordinates has this value, or if the two
+*     points defining either geodesic are co-incident, or if the two
+*     curves do not intersect.
+c     - The geodesic curve used by this function is the path of
+f     - The geodesic curve used by this routine is the path of
+*     shortest distance between two points, as defined by the
+c     astDistance function.
+f     AST_DISTANCE function.
+*     - An error will be reported if the Frame is not 2-dimensional.
+*--
+*/
+
+/* Local Variables: */
+   double ca;                    /* Y axis intercept of line a */
+   double cb;                    /* Y axis intercept of line b */
+   double dxa;                   /* X range spanned by line a */
+   double dxb;                   /* X range spanned by line b */
+   double ma;                    /* Gradient of line a */
+   double mb;                    /* Gradient of line b */
+   int naxes;                    /* Number of Frame axes */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Initialize bad values. */
+   cross[ 0 ] = AST__BAD;
+   cross[ 1 ] = AST__BAD;
+
+/* Determine the number of Frame axes. */
+   naxes = astGetNaxes( this );
+
+/* Report an error if the Frame is not 2 dimensional. */
+   if( naxes != 2 && astOK ) {
+      astError( AST__NAXIN, "astIntersect(%s): Invalid number of Frame axes (%d)."
+                " astIntersect can only be used with 2 dimensonal Frames.", status,
+                astGetClass( this ), naxes );
+   }
+
+/* Check that all supplied values are OK. */
+   if ( ( a1[ 0 ] != AST__BAD ) && ( a1[ 1 ] != AST__BAD ) &&
+        ( a2[ 0 ] != AST__BAD ) && ( a2[ 1 ] != AST__BAD ) &&
+        ( b1[ 0 ] != AST__BAD ) && ( b1[ 1 ] != AST__BAD ) &&
+        ( b2[ 0 ] != AST__BAD ) && ( b2[ 1 ] != AST__BAD ) ) {
+
+/* Find teh x increments spanned by the two lines. */
+
+/* Check the first line is not vertical. */
+      dxa = a2[ 0 ] - a1[ 0 ];
+      dxb = b2[ 0 ] - b1[ 0 ];
+      if( dxa != 0.0 ) {
+
+/* Find the gradient and Y axis intercept of the first line. */
+         ma = ( a2[ 1 ] - a1[ 1 ] )/dxa;
+         ca = a1[ 1 ] - a1[ 0 ]*ma;
+
+/* Check the second line is not vertical. */
+         if( dxb != 0.0 ) {
+
+/* Find the gradient and Y axis intercept of the second line. */
+            mb = ( b2[ 1 ] - b1[ 1 ] )/dxb;
+            cb = b1[ 1 ] - b1[ 0 ]*mb;
+
+/* Check the lines are not parallel. */
+            if( ma != mb ) {
+
+/* Find the intersection of the two lines. */
+               cross[ 0 ] = ( cb -ca )/( ma - mb );
+               cross[ 1 ] = ( ( ma + mb )*cross[ 0 ] + ca + cb )/2;
+            }
+
+/* If the second line is vertical but the first is not. */
+         } else {
+            cross[ 0 ] = b1[ 0 ];
+            cross[ 1 ] = ma*b1[ 0 ] + ca;
+         }
+
+/* First line is vertical but second is not. */
+      } else if( dxb != 0.0 ) {
+
+/* Find the gradient and Y axis intercept of the second line. */
+         mb = ( b2[ 1 ] - b1[ 1 ] )/dxb;
+         cb = b1[ 1 ] - b1[ 0 ]*mb;
+
+/* Find the intercection. */
+         cross[ 0 ] = a1[ 0 ];
+         cross[ 1 ] = mb*a1[ 0 ] + cb;
+      } 
+   }
 }
 
 static int IsUnitFrame( AstFrame *this, int *status ){
@@ -13569,6 +13749,13 @@ double astOffset2_( AstFrame *this, const double point1[2], double angle,
                  double offset, double point2[2], int *status ) {
    if ( !astOK ) return AST__BAD;
    return (**astMEMBER(this,Frame,Offset2))( this, point1, angle, offset, point2, status );
+}
+void astIntersect_( AstFrame *this, const double a1[2],
+                    const double a2[2], const double b1[2],
+                    const double b2[2], double cross[2], 
+                    int *status ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,Frame,Intersect))( this, a1, a2, b1, b2, cross, status );
 }
 void astOverlay_( AstFrame *template, const int *template_axes,
                   AstFrame *result, int *status ) {

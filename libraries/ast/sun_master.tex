@@ -18,13 +18,13 @@
 
 % Variable part - replace [xxx] as appropriate.
 c+
-\newcommand{\stardocnumber}    {211.24}
+\newcommand{\stardocnumber}    {211.25}
 c-
 f+
-\newcommand{\stardocnumber}    {210.24}
+\newcommand{\stardocnumber}    {210.25}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {2nd December 2008}
+\newcommand{\stardocdate}      {14th January December 2009}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -21559,6 +21559,17 @@ occurred in the AST library between versions V5.0 and V5.1 (the
 current version):
 
 \begin{enumerate}
+
+
+\item A new function called 
+c+
+astIntercept
+c-
+f+
+AST\_INTERCEPT
+f-
+has been added to the Frame class. This function finds the point of
+intersection beteeen two geodesic curves.
 
 
 \item A new function called

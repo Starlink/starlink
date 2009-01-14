@@ -23,6 +23,7 @@
 *     AST_FORMAT
 *     AST_FRAME
 *     AST_GETACTIVEUNIT
+*     AST_INTERSECT
 *     AST_ISAFRAME
 *     AST_NORM
 *     AST_OFFSET
@@ -34,7 +35,7 @@
 *     AST_UNFORMAT         
 
 *  Copyright:
-*     Copyright (C) 1997-2006 Council for the Central Laboratory of the
+*     Copyright (C) 1997-2009 Council for the Central Laboratory of the
 *     Research Councils
 
 *  Licence:
@@ -74,6 +75,8 @@
 *        Replaced AST_BEAR by AST_AXANGLE.
 *     17-DEC-2002 (DSB):
 *        Added AST_GETACTIVEUNIT and AST_SETACTIVEUNIT.
+*     14-JAN-2009 (DSB):
+*        Added AST_INTERSECT.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -389,6 +392,26 @@ F77_SUBROUTINE(ast_resolve)( INTEGER(THIS),
    astAt( "AST_RESOLVE", NULL, 0 );
    astWatchSTATUS(
       astResolve( astI2P( *THIS ), POINT1, POINT2, POINT3, POINT4, D1, D2 );
+   )
+}
+
+F77_SUBROUTINE(ast_intersect)( INTEGER(THIS),
+                               DOUBLE_ARRAY(A1),
+                               DOUBLE_ARRAY(A2),
+                               DOUBLE_ARRAY(B1),
+                               DOUBLE_ARRAY(B2),
+                               DOUBLE_ARRAY(CROSS),
+                               INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_DOUBLE_ARRAY(A1)
+   GENPTR_DOUBLE_ARRAY(A2)
+   GENPTR_DOUBLE_ARRAY(B1)
+   GENPTR_DOUBLE_ARRAY(B2)
+   GENPTR_DOUBLE_ARRAY(CROSS)
+
+   astAt( "AST_INTERSECT", NULL, 0 );
+   astWatchSTATUS(
+      astIntersect( astI2P( *THIS ), A1, A2, B1, B2, CROSS );
    )
 }
 

@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V5.0) of the Starlink AST (astrometry) library is
+   A new release (V5.1) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,6 +15,13 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+
+- A new method (astIntersect) has been added to the Frame class. It
+determines the position at which two geodesic curves intersect.
+
+
+Main Changes in Version 6.0
+---------------------------
 
 -  AST is now thread-safe. Many of the macro definitions in the "ast.h"
 header file have changed, and so all source code that include "ast.h"
