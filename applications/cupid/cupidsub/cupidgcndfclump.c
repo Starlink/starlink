@@ -107,7 +107,8 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 *        Pointer to the inherited status value.
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2005,2007 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -128,6 +129,7 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -135,6 +137,8 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 *        Original version.
 *     5-MAR-2007 (DSB):
 *        Initiaslise "exloc" locator to NULL before calling datFind.
+*     13-JAN-2009 (TIMJ):
+*        DO NOT CAST int* to size_t* since that is not going to work for long.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -145,9 +149,9 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 
 /* Local Variables: */
 
-   char *cen[] = { "CENTRE1", "CENTRE2", "CENTRE3" };
-   char *fwhm[] = { "FWHM1", "FWHM2", "FWHM3" };
-   char *vgrad[] = { "VGRAD1", "VGRAD2", "VGRAD3" };
+   const char *cen[] = { "CENTRE1", "CENTRE2", "CENTRE3" };
+   const char *fwhm[] = { "FWHM1", "FWHM2", "FWHM3" };
+   const char *vgrad[] = { "VGRAD1", "VGRAD2", "VGRAD3" };
 
    HDSLoc *cloc;                /* Cell locator */
    HDSLoc *dloc;                /* Component locator */
@@ -173,7 +177,8 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
    int ok;                      /* Pixel within clump NDF? */
    int place;                   /* NDF place holder */
    int pv;                      /* Pixel offset */
-   int size;                    /* No of elements in NDF array */
+   size_t oldsize;              /* Size of original NDF */
+   hdsdim size[1];              /* No of elements in NDF array */
    int step[ 3 ];               /* The step size on each internal axis */
    int ub[ 3 ];                 /* Upper pixel index bounds of NDF */
 
@@ -182,20 +187,20 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 
 /* If no array was supplied create one of length 1. */
    if( !(*obj) ) {
-      size = 1;
-      datTemp( "NDF", 1, &size, obj, status );
+      size[0] = 1;
+      datTemp( "NDF", 1, size, obj, status );
 
 /* Otherwise, get the number of NDFs already in the supplied array of
    NDFs, and increase it by 1. */
    } else {
-      datSize( *obj, (size_t *) &size, status );
-      size++;
-      datAlter( *obj, 1, &size, status );
+      datSize( *obj, &oldsize, status );
+      size[0] = oldsize + 1;
+      datAlter( *obj, 1, size, status );
    }
 
 /* Get a locator for the new cell. */
    cloc = NULL;
-   datCell( *obj, 1, &size, &cloc, status );
+   datCell( *obj, 1, size, &cloc, status );
 
 /* Begin an NDF context */
    ndfBegin();
@@ -353,8 +358,8 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
          for( i = 0; i < nex; i++ ) {
             key = astMapKey( extra, i );
             if( astMapGet0D( extra, key, &dval ) ) {
-               datNew( exloc, (char *) key, "_DOUBLE", 0, NULL, status );
-               datFind( exloc, (char *) key, &dloc, status );
+               datNew( exloc, key, "_DOUBLE", 0, NULL, status );
+               datFind( exloc, key, &dloc, status );
                datPutD( dloc, 0, NULL, &dval, status );
                datAnnul( &dloc, status );
             }
