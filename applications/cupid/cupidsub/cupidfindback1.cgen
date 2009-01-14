@@ -1,3 +1,5 @@
+/* -*- C -*- */
+
 #include "sae_par.h"
 #include "cupid.h"
 #include "mers.h"
@@ -6,7 +8,7 @@
 
 void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms, 
                                     CGEN_TYPE *din, CGEN_TYPE *dout, 
-                                    CGEN_TYPE *wa, CGEN_TYPE *wb, int ilevel, 
+                                    CGEN_TYPE *wa, CGEN_TYPE *wb,
                                     int alg, int *status ){
 /*
 *+
@@ -23,7 +25,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 *  Synopsis:
 *     void cupidFindback1<X>( int dim[3], int box[3], double rms, 
 *                             CGEN_TYPE *din, CGEN_TYPE *dout, CGEN_TYPE *wa, 
-*                             CGEN_TYPE *wb, int ilevel, int alg, int *status )
+*                             CGEN_TYPE *wb, int alg, int *status )
 
 *  Description:
 *     This function uses spatial filtering to remove features with a
@@ -74,8 +76,6 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 *        Pointer to workspace with the same size as "din".
 *     wb
 *        Pointer to workspace with the same size as "din".
-*     ilevel
-*        Intformation level.
 *     alg
 *        Indicates which variant of the algorithm to use.
 *     status
@@ -144,7 +144,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 /* Filter the input data by replacing each input value by the minimum
    value in a box centred on the input pixel. The filtered data goes in
    "wa". */
-   if( ilevel > 0 ) msgOut( "", "      Applying minimum filter", status );
+   msgOutif( MSG__VERB, "", "      Applying minimum filter", status );
    CGEN_FUNCTION(cupidFindback3)( dim, box, din, wa, status );
 
 /*
@@ -157,7 +157,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 /* Apply a second filter which replaces each pixel value in "wa" by the 
    maximum value in a box centred on the pixel. The filtered data goes
    (temporarily) in the output array. */
-   if( ilevel > 0 ) msgOut( "", "      Applying maximum filter", status );
+   msgOutif( MSG__VERB, "", "      Applying maximum filter", status );
    CGEN_FUNCTION(cupidFindback10)( dim, box, wa, dout, status );
 
 /*
@@ -180,12 +180,10 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 
 /* Smooth the current background estimate in dout using a mean box filter, 
    putting the results in "wa". */
-      if( ilevel > 0 ) {
-         msgSeti( "A", newbox[ 0 ] );
-         msgSeti( "B", newbox[ 1 ] );
-         msgSeti( "C", newbox[ 2 ] );
-         msgOut( "", "      Applying mean filter (box size [^A,^B,^C]).", status );
-      }
+      msgOutiff( MSG__VERB, "",
+                 "      Applying mean filter (box size [^%d,^%d,%d]).", status,
+                 newbox[ 0 ], newbox[ 1 ], newbox[ 2 ]);
+
       CGEN_FUNCTION(cupidFindback4)( dim, newbox, dout, wa, status );
 
 /*
@@ -206,7 +204,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 
 /* Find the minimum of the original background estimate and the smoothed
    background estimate at every point and store in "dout". */
-      if( ilevel > 0 ) msgOut( "", "      Taking minimum ", status );
+      msgOutif( MSG__VERB, "", "      Taking minimum ", status );
       p1 = dout;
       p2 = wa;
       for( i = 0; i < nel; i++,p1++,p2++ ) {
@@ -229,7 +227,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
    at the mean residuals between the background estimate and the input
    data in background areas. First form the residuals between the input
    data and the background estimate, storing them in the output array. */
-   if( ilevel > 0 ) msgOut( "", "      Forming residuals", status );
+   msgOutif( MSG__VERB, "", "      Forming residuals", status );
    p1 = din;
    p2 = wa;
    p3 = dout;
@@ -251,7 +249,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 
 
 /* Identify background pixels and set all other pixel bad. */
-   if( ilevel > 0 ) msgOut( "", "      Removing source residuals", status );
+   msgOutif( MSG__VERB, "", "      Removing source residuals", status );
    CGEN_FUNCTION(cupidFindback2)( rms, dim, dout, status );
 
 /*
@@ -263,7 +261,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 
 /* Smooth the remaining residuals with a mean filter, putting the results 
    in "wb". */
-   if( ilevel > 0 ) msgOut( "", "      Smoothing background residuals", status );
+   msgOutif( MSG__VERB, "", "      Smoothing background residuals", status );
    CGEN_FUNCTION(cupidFindback4)( dim, box, dout, wb, status );
 
 /*
@@ -276,7 +274,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 /* Fill in rejected pixel values by interpolation between the good pixels on
    either side. For simplicity and speed, this is done independently for 
    each row. */
-   if( ilevel > 0 ) msgOut( "", "      Filling in missing residuals", status );
+   msgOutif( MSG__VERB, "", "      Filling in missing residuals", status );
    nrow = dim[ 1 ]*dim[ 2 ];
    vl = CGEN_BAD;
    iv = 0;
@@ -316,7 +314,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 
 
 /* Smooth the residuals again, putting the results in the output array. */
-   if( ilevel > 0 ) msgOut( "", "      Smoothing filled residuals", status );
+   msgOutif( MSG__VERB, "", "      Smoothing filled residuals", status );
    CGEN_FUNCTION(cupidFindback4)( dim, box, wb, dout, status );
 
 /*
@@ -331,7 +329,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
    the source regions by virture of the double smoothing and filling just 
    performed. Add this correction onto the background estimate and store in 
    the output. */
-   if( ilevel > 0 ) msgOut( "", "      Correcting background estimate", status );
+   msgOutif( MSG__VERB, "", "      Correcting background estimate", status );
    p1 = wa;
    p2 = din;
    p3 = dout;

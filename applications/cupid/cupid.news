@@ -6,6 +6,17 @@
  and  analyse clumps of emission within 2- or 3- dimensional 
  data arrays.
 
+Changes introduced at V0.0-39:
+
+   - The message filtering system has been modified to use the standard
+     Starlink approach. ILEVEL has been retained but can now use the
+     standard NONE, QUIET, NORM, VERB, DEBUG strings as defined in the
+     MERS system. These are equivalent to ILEVEL 0, 1, 2, 3, and 4
+     respectively.
+
+     FINDBACK now reports verbose messages at an ILEVEL of VERB (3) rather
+     than ILEVEL 1 as previously implemented. Some script modifications may
+     be required. The default (NORM) still results in no message output.
 
 Changes introduced at V0.0-38:
 

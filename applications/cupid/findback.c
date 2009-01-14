@@ -79,11 +79,11 @@ void findback( int *status ){
 *        supplied, then the same value will be used for the both the first 
 *        and second pixel axes (a value of 1 will be assumed for the third 
 *        axis if the input array is 3-dimensional).
-*     ILEVEL = _INTEGER (Read)
-*        Controls the amount of diagnostic information reported. It
-*        should be in the range 0 to 1. A value of zero will suppress all 
-*        screen output. A value of 1 will indicate progress through the
-*        various stages of the algorithm. [0]
+*     ILEVEL = _CHAR (Read)
+*        Controls the amount of diagnostic information reported. This is the
+*        standard messaging level. The default messaging level is NORM (1).
+*        A value of NONE or 0 will suppress all screen output. VERB (2) will
+*        indicate progress through the various stages of the algorithm. [NORM]
 *     IN = NDF (Read)
 *        The input NDF.
 *     RMS = _DOUBLE (Read)
@@ -107,7 +107,8 @@ void findback( int *status ){
 *     - Smoothing cubes in 3 dimensions can be very slow.
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2006, 2007 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -128,6 +129,7 @@ void findback( int *status ){
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -138,6 +140,8 @@ void findback( int *status ){
 *        - Fix bug that left the output NDF uninitialised if ILEVEL is set
 *        non-zero.
 *        - Use generic data type handling as in FINDCLUMPS.
+*     14-JAN-2009 (TIMJ):
+*        Use MERS for message filtering.
 *     {enter_further_changes_here}
 
 *-
@@ -159,7 +163,6 @@ void findback( int *status ){
    int dim[ NDF__MXDIM ];    /* Dimensions of each NDF pixel axis */
    int el;                   /* Number of elements mapped */
    int i;                    /* Loop count */
-   int ilevel;               /* Interaction level */
    int indf1;                /* Identifier for input NDF */
    int indf2;                /* Identifier for output NDF */
    int islice;               /* Slice index */
@@ -198,6 +201,9 @@ void findback( int *status ){
 /* Initialise pointer values. */
    wa = NULL;
    wb = NULL;
+
+/* Get the interaction level. */
+   msgIfget( "ILEVEL", status );
 
 /* Get an identifier for the input NDF. We use NDG (via kpg1_Rgndf)
    instead of calling ndfAssoc directly since NDF/HDS has problems with
@@ -242,9 +248,7 @@ void findback( int *status ){
       ndfProp( indf1, "UNITS,AXIS,WCS,QUALITY", "OUT", &indf2, status );
    }
 
-/* Get the interaction level. */
-   parGdr0i( "ILEVEL", 0, 0, 1, 1, &ilevel, status );
-   if( ilevel > 0 ) msgBlank( status );
+   msgBlankif( MSG__VERB, status );
 
 /* Get the dimensions of each of the filters, in pixels. If only one
    value is supplied, duplicate it as the second value if the second axis
@@ -261,12 +265,8 @@ void findback( int *status ){
    box[ 1 ] = 2*( box[ 1 ] / 2 ) + 1; 
    box[ 2 ] = 2*( box[ 2 ] / 2 ) + 1; 
 
-   if( ilevel > 0 ) {
-      msgSeti( "B0", box[0] );
-      msgSeti( "B1", box[1] );
-      msgSeti( "B2", box[2] );
-      msgOut( "", "Using box sizes [^B0,^B1,^B2].", status );
-   }
+   msgOutiff( MSG__VERB, "", "Using box sizes [%d,%d,%d].", status,
+              box[0], box[1], box[2]);
 
 /* If any trailing axes have a cell size of 1, then we apply the algorithm 
    independently to every pixel index on the trailing axes. First of all 
@@ -362,24 +362,21 @@ void findback( int *status ){
    for( islice = 0; islice < nslice; islice++ ) {
 
 /* Report the bounds of the slice if required. */
-      if( ilevel > 0 ) {
-          msgBlank( status );
-          msgSeti( "I", islice + 1 );
-          msgSeti( "N", nslice );
-          msgOut( "", "   Processing slice ^I of ^N...", status );
-          msgBlank( status );
-      }
+     msgBlankif( MSG__VERB, status );
+     msgOutiff( MSG__VERB, "", "   Processing slice %d of %d...", status,
+                islice+1, nslice );
+     msgBlankif( MSG__VERB, status );
 
 /* Process this slice, then increment the pointer to the next slice. */
       if( type == CUPID__FLOAT ) {
-         cupidFindback1F( slice_dim, box, rms, (float *) ipd1, (float *) ipd2, 
-                        (float *) wa, (float *) wb, ilevel, newalg, status );
+         cupidFindback1F( slice_dim, box, rms, ipd1, ipd2, 
+                          wa, wb, newalg, status );
          ipd1 = ( (float *) ipd1 ) + slice_size;
          ipd2 = ( (float *) ipd2 ) + slice_size;
    
       } else {
-         cupidFindback1D( slice_dim, box, rms, (double *) ipd1, (double *) ipd2, 
-                        (double *) wa, (double *) wb, ilevel, newalg, status  );
+         cupidFindback1D( slice_dim, box, rms, ipd1, ipd2, 
+                          wa, wb, newalg, status  );
          ipd1 = ( (double *) ipd1 ) + slice_size;
          ipd2 = ( (double *) ipd2 ) + slice_size;
       }
@@ -416,7 +413,7 @@ void findback( int *status ){
 
 /* Tidy up */
 L999:;
-   if( ilevel > 0 ) msgBlank( status );
+   msgBlankif( MSG__VERB, status );
 
 /* Free workspace. */
    wa = astFree( wa );

@@ -202,11 +202,11 @@ package cupid {
 
          parameter ilevel {
             position 4
-            type _INTEGER
+            type _CHAR
+            prompt {Information level}
+            default NORM
             vpath DEFAULT
             ppath CURRENT DEFAULT
-            default 0
-            prompt {Information level}
             helpkey *
           }
 
