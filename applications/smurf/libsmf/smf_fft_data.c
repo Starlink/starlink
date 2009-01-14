@@ -354,7 +354,7 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
             astBegin;
             
             /* Create a new astFrameSet containing a 4d base GRID frame */
-            tswcs = astFrameSet( astFrame( 4, "Domain=GRID" ), "" );
+            tswcs = astFrameSet( astFrame( 4, "Domain=GRID" ), " " );
             
             /* The current frame will have frequency along the first axis,
                x, y bolo coordinates along the second and third axes,
@@ -365,27 +365,27 @@ smfData *smf_fft_data( const smfData *indata, int inverse, int *status ) {
                                       "StdOfRest=Topocentric" );
 
             curframe2d = astFrame( 2, "Domain=BOLO" ); /* x, y, component */
-            curframe3d = astCmpFrame( specframe, curframe2d, "" );            
+            curframe3d = astCmpFrame( specframe, curframe2d, " " );            
             curframe1d = astFrame( 1, "Domain=COEFF"); /* real/imag component*/
-            curframe4d = astCmpFrame( curframe3d, curframe1d, "" );
+            curframe4d = astCmpFrame( curframe3d, curframe1d, " " );
 
             /* The mapping from 4d grid coordinates to (frequency, x,
                y, coeff) is accomplished with a shift and a zoommap
                for the 1st dimension, and a shift for the others */
 
             zshift = -1;
-            zshiftmapping = astShiftMap( 1, &zshift, "" ); 
-            scalemapping = astZoomMap( 1, df, "" );
-            specmapping = astCmpMap( zshiftmapping, scalemapping, 1, "" );
+            zshiftmapping = astShiftMap( 1, &zshift, " " ); 
+            scalemapping = astZoomMap( 1, df, " " );
+            specmapping = astCmpMap( zshiftmapping, scalemapping, 1, " " );
             
             zshift2[0] = -1; /* Set BOLO origin to 0, 0 */
             zshift2[1] = -1;
-            zshiftmapping2 = astShiftMap( 2, zshift2, "" );
+            zshiftmapping2 = astShiftMap( 2, zshift2, " " );
 
-            mapping3d = astCmpMap( specmapping, zshiftmapping2, 0, "" );
+            mapping3d = astCmpMap( specmapping, zshiftmapping2, 0, " " );
 
-            cmapping = astUnitMap( 1, "" );
-            fftmapping = astCmpMap( mapping3d, cmapping, 0, "" );
+            cmapping = astUnitMap( 1, " " );
+            fftmapping = astCmpMap( mapping3d, cmapping, 0, " " );
 
             /* Add the curframe4d with the fftmapping to the frameset */
             astAddFrame( tswcs, AST__BASE, fftmapping, curframe4d );

@@ -1246,7 +1246,7 @@ void smurf_makecube( int *status ) {
 
 /* Create a FrameSet describing 2D GRID to spatial sky coords. This will
    be used in the extra 2D images stored in the output SMURF extension. */
-   wcsout2d = astFrameSet( astFrame( 2, "Domain=GRID" ), "" );
+   wcsout2d = astFrameSet( astFrame( 2, "Domain=GRID" ), " " );
    astAddFrame( wcsout2d, AST__BASE, oskymap, oskyfrm );
 
 /* Invert the spectral Mapping (for the convenience of smf_rebincube), so that

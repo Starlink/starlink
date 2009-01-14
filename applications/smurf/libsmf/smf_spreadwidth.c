@@ -104,7 +104,7 @@ int smf_spreadwidth( int spread, const double params[], int *status ){
 /* Re-bin a single non-zero pixel value using the supplied spreading
    scheme, and then determining the width of the resulting non-zero pixel
    values. */
-   umap = astUnitMap( 1, "" );
+   umap = astUnitMap( 1, " " );
    lbin = 0;
    ubin = 0;
    val = 1.0;

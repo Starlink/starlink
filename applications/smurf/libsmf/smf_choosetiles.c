@@ -365,7 +365,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
    rebinning a single non-zero pixel value using the supplied spreading
    scheme, and then determining the width of the resulting non-zero pixel
    values. */
-      umap = astUnitMap( 1, "" );
+      umap = astUnitMap( 1, " " );
       lbin = 0;
       ubin = 0;
       val = 1.0;
@@ -460,8 +460,8 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
             shift[ 0 ] = tlbnd[ 0 ] - tile->elbnd[ 0 ];
             shift[ 1 ] = tlbnd[ 1 ] - tile->elbnd[ 1 ];
             shift[ 2 ] = 0.0;
-            tile->map2d = (AstMapping *) astShiftMap( 2, shift, "" );
-            tile->map3d = (AstMapping *) astShiftMap( 3, shift, "" );
+            tile->map2d = (AstMapping *) astShiftMap( 2, shift, " " );
+            tile->map3d = (AstMapping *) astShiftMap( 3, shift, " " );
 
 /* Create a GRP group to hold the names of the input files that have data
    that falls within the bounds of the extended tile area. */

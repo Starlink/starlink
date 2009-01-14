@@ -158,12 +158,12 @@ void smurf_dreamweights ( int *status ) {
       /* NULL value so provide defaults */
       errAnnul( status );
       msgOutif(MSG__VERB, " ", "No config file specified - assuming default configuration parameters", status);
-      keymap = astKeyMap("");
-      astMapPut0I( keymap, "GRIDXMIN", -4, "" );
-      astMapPut0I( keymap, "GRIDXMAX", 4, "" );
-      astMapPut0I( keymap, "GRIDYMIN", -4, "" );
-      astMapPut0I( keymap, "GRIDYMAX", 4, "" );
-      astMapPut0D( keymap, "GRIDSTEP", 6.28, "" );
+      keymap = astKeyMap(" " );
+      astMapPut0I( keymap, "GRIDXMIN", -4, " " );
+      astMapPut0I( keymap, "GRIDXMAX", 4, " " );
+      astMapPut0I( keymap, "GRIDYMIN", -4, " " );
+      astMapPut0I( keymap, "GRIDYMAX", 4, " " );
+      astMapPut0D( keymap, "GRIDSTEP", 6.28, " " );
     } else {
       kpg1Kymap( confgrp, &keymap, status );
     }

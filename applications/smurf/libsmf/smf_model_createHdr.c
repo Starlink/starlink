@@ -174,7 +174,7 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
       } else {
         
         /* Create a new FrameSet containing a 1D GRID Frame. */
-        fset = astFrameSet( astFrame( 1, "Domain=GRID" ), "" );
+        fset = astFrameSet( astFrame( 1, "Domain=GRID" ), " " );
         
         /* Extract the 1D Frame (presumably a TimeFrame)
            describing time from the current (WCS) 3D Frame. */

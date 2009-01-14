@@ -610,7 +610,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
 /* Create the catalogue. */
       kpg1Wrtab( "OUTCAT", nallpos, nallpos, 2, allpos2, AST__CURRENT, 
-                       astFrameSet( *skyframe, "" ), "Detector positions", 1, 
+                       astFrameSet( *skyframe, " " ), "Detector positions", 1, 
                        NULL, labgrp, NULL, 1, status );
 
 /* Free resources. */

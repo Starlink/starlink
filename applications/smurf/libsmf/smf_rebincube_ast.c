@@ -367,7 +367,7 @@ void smf_rebincube_ast( smfWorkForce *wf, smfData *data, int first, int last,
 /* If we only have 1 detector, use a UnitMap instead of a LutMap (lutMaps
    must have 2 or more table entries). */
    } else {
-      lutmap = (AstMapping *) astUnitMap( 1, "" );    
+      lutmap = (AstMapping *) astUnitMap( 1, " " );    
    }
 
 /* Combine the above LutMap with a 1-input, 2-output PermMap that copies its 
@@ -378,8 +378,8 @@ void smf_rebincube_ast( smfWorkForce *wf, smfData *data, int first, int last,
    outperm[ 0 ] = 1;
    outperm[ 1 ] = -1;
    con = 1.0;
-   detmap = astCmpMap( lutmap, astPermMap( 1, inperm, 2, outperm, &con, "" ),
-                       1, "" );
+   detmap = astCmpMap( lutmap, astPermMap( 1, inperm, 2, outperm, &con, " " ),
+                       1, " " );
 
 /* Store the bounds of a single time slice grid. */
    lbnd_in[ 0 ] = 1;
@@ -395,7 +395,7 @@ void smf_rebincube_ast( smfWorkForce *wf, smfData *data, int first, int last,
    inperm[ 0 ] = 3;
    inperm[ 1 ] = 1;
    inperm[ 2 ] = 2;
-   pmap = astPermMap( 3, inperm, 3, outperm, NULL, "" );
+   pmap = astPermMap( 3, inperm, 3, outperm, NULL, " " );
 
 /* If we are using multiple threads to rebin spectral blocks in parallel, 
    calculate the number of channels that are processed by each thread,
@@ -528,7 +528,7 @@ void smf_rebincube_ast( smfWorkForce *wf, smfData *data, int first, int last,
    detector index) and 3-output (output grid coords) Mapping. We finally
    add a PermMap to re-arrange the output axes so that channel number is
    axis 3 in the output. */
-      dtotmap = (AstMapping *) astCmpMap( detmap, totmap, 1, "" );
+      dtotmap = (AstMapping *) astCmpMap( detmap, totmap, 1, " " );
       if( ndet > 1 ) {
          atlTolut( dtotmap, 1.0, (double) ndet, 1.0, "LutInterp=1", &splut, 
                    status );
@@ -536,8 +536,8 @@ void smf_rebincube_ast( smfWorkForce *wf, smfData *data, int first, int last,
          splut = astClone( dtotmap );
       }
 
-      fullmap = astSimplify( astCmpMap( astCmpMap( sslut, splut, 0, "" ), 
-                                        pmap, 1, "" ) );
+      fullmap = astSimplify( astCmpMap( astCmpMap( sslut, splut, 0, " " ), 
+                                        pmap, 1, " " ) );
 
 /* If required calculate the variance associated with each value in the
    current time slice. based on the input Tsys values. If they are
@@ -607,7 +607,7 @@ void smf_rebincube_ast( smfWorkForce *wf, smfData *data, int first, int last,
 /* Create a dummy mapping that can be used with astRebinSeq (it is not
    actually used for anything since we are not adding any more data into the
    output arrays). */
-      fullmap = (AstMapping *) astPermMap( 2, NULL, 3, NULL, NULL, "" );
+      fullmap = (AstMapping *) astPermMap( 2, NULL, 3, NULL, NULL, " " );
 
 /* Exclude flags that require access to the input variances. */
       ast_flags = AST__USEBAD;

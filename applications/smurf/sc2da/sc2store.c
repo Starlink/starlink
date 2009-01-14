@@ -3791,7 +3791,7 @@ AstFrameSet *timeWcs( int subnum, int ntime, const SC2STORETelpar* telpar,
    Work out the duration of the observation to decide on formatting.
    To give AST some help with formatting axes we use a TimeOrigin.
 */
-   timefrm = astTimeFrame( "" );
+   timefrm = astTimeFrame( " " );
 
    /* If telpar is defined, add additional info */
    if (telpar) {
@@ -3834,7 +3834,7 @@ AstFrameSet *timeWcs( int subnum, int ntime, const SC2STORETelpar* telpar,
      }
 
    }
-   timemap = astLutMap( ntime, ltimes, 1.0, 1.0, "" );
+   timemap = astLutMap( ntime, ltimes, 1.0, 1.0, " " );
 
    if (malloced) free( ltimes );
 
@@ -3842,8 +3842,8 @@ AstFrameSet *timeWcs( int subnum, int ntime, const SC2STORETelpar* telpar,
    axes. Join all the Frames together into a CmpFrame (in the order spectral,
    spatial, time), and join all the Mappings together into a parallel
    CmpMap. */
-   totfrm = astCmpFrame( spacefset, timefrm, "" );
-   totmap = astCmpMap( spacefset, timemap, 0, "" );
+   totfrm = astCmpFrame( spacefset, timefrm, " " );
+   totmap = astCmpMap( spacefset, timemap, 0, " " );
 
 /* Create a 3D GRID Frame. */
    gridfrm = astFrame( 3, "Domain=GRID,Title=FITS pixel coordinates" );
@@ -3853,7 +3853,7 @@ AstFrameSet *timeWcs( int subnum, int ntime, const SC2STORETelpar* telpar,
 
 /* Create the FrameSet to return, initially containing just the above
    GRID Frame. */
-   result = astFrameSet( gridfrm, "" );
+   result = astFrameSet( gridfrm, " " );
 
 /* Add the total Frame into the FrameSet using the total Mapping to
    connect it to the base (i.e. GRID) Frame. */

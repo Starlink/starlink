@@ -134,11 +134,11 @@ void smf_history_add(  smfData* data, const char * appl,
 
   /* Now add entry to the history AstKeyMap if not already present */
   if ( data->history == NULL ) {
-    history = astKeyMap("");
+    history = astKeyMap(" " );
     data->history = history;
-    astMapPut0I( data->history, appl, 1, "" );
+    astMapPut0I( data->history, appl, 1, " " );
   } else if ( !astMapGet0I( data->history, appl, &done ) ) {
-    astMapPut0I( data->history, appl, 1, "" );
+    astMapPut0I( data->history, appl, 1, " " );
   }
 
 }

@@ -148,7 +148,7 @@ void smf_getrefwcs( const char *param, AstFrameSet **specwcs,
 
 /* Use astFindFrame to search the reference WCS for a SkyFrame. This search
    includes the component Frames contained within CmpFrames. */
-      fs = astFindFrame( refwcs, template, "" );
+      fs = astFindFrame( refwcs, template, " " );
 
 /* If a SkyFrame was found... */
       if( fs ) {
@@ -177,7 +177,7 @@ void smf_getrefwcs( const char *param, AstFrameSet **specwcs,
             gfrm = astPickAxes( bfrm, 2, outax, NULL );
 
 /* Create the returned spatial FrameSet. */
-            *spacewcs = astFrameSet( gfrm, "" );
+            *spacewcs = astFrameSet( gfrm, " " );
             astInvert( splitmap );
             astAddFrame( *spacewcs, AST__BASE, splitmap, cfrm );
          }                        
@@ -191,7 +191,7 @@ void smf_getrefwcs( const char *param, AstFrameSet **specwcs,
 
 /* Use astFindFrame to search the reference WCS for a DSBSpecFrame. This search
    includes the component Frames contained within CmpFrames. */
-      fs = astFindFrame( refwcs, template, "" );
+      fs = astFindFrame( refwcs, template, " " );
 
 /* If a DSBSpecFrame was found... */
       if( fs ) {
@@ -219,7 +219,7 @@ void smf_getrefwcs( const char *param, AstFrameSet **specwcs,
             gfrm = astPickAxes( bfrm, 1, outax, NULL );
 
 /* Create the returned spectral FrameSet. */
-            *specwcs = astFrameSet( gfrm, "" );
+            *specwcs = astFrameSet( gfrm, " " );
             astInvert( splitmap );
             astAddFrame( *specwcs, AST__BASE, splitmap, cfrm );
          }                        

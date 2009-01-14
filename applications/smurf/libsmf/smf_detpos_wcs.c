@@ -214,7 +214,7 @@ smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, double dut1,
    LutMaps so that they use nearest neighbour interpolation. */
          lonmap = astLutMap( nrec, cache->lonlut, 1.0, 1.0, "LutInterp=1" );
          latmap = astLutMap( nrec, cache->latlut, 1.0, 1.0, "LutInterp=1" );
-         cmap1 = astCmpMap( lonmap, latmap, 0, "" );
+         cmap1 = astCmpMap( lonmap, latmap, 0, " " );
 
          latmap = astAnnul( latmap );
          lonmap = astAnnul( lonmap );
@@ -222,10 +222,10 @@ smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, double dut1,
          if( !cache->pmap ) {
             outperm[ 0 ] = 1;
             outperm[ 1 ] = 1;
-            cache->pmap = astPermMap( 2, NULL, 2, outperm, NULL, "" );
+            cache->pmap = astPermMap( 2, NULL, 2, outperm, NULL, " " );
             astExempt( cache->pmap );
          }
-         map = (AstMapping *) astCmpMap( cache->pmap, cmap1, 1, "" );
+         map = (AstMapping *) astCmpMap( cache->pmap, cmap1, 1, " " );
 
          cache->pmap = astAnnul( cache->pmap );
          cmap1 = astAnnul( cmap1 );
@@ -237,7 +237,7 @@ smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, double dut1,
    } else {
       outperm[ 0 ] = -1;
       outperm[ 1 ] = -2;
-      map = (AstMapping *) astPermMap( 2, NULL, 2, outperm, p1, "" );
+      map = (AstMapping *) astPermMap( 2, NULL, 2, outperm, p1, " " );
    }
 
 /* Create two Frames to put in the FrameSet. */
@@ -272,7 +272,7 @@ smfDetposWcsCache *smf_detpos_wcs( smfHead *hdr, int index, double dut1,
            DBL_DIG, dut1 ); 
 
 /* Create the FrameSet */
-   *fset = astFrameSet( cache->grid, "" );
+   *fset = astFrameSet( cache->grid, " " );
    astAddFrame( *fset, AST__BASE, map, csky );
 
 /* Free resources */

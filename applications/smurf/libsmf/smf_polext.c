@@ -117,7 +117,7 @@ void smf_polext( int ondf, double angle, int *status ){
    perm[ 0 ] = 2;
    perm[ 1 ] = 1;
    astPermAxes( template, perm );
-   fs = astFindFrame( curfrm, template, "" );
+   fs = astFindFrame( curfrm, template, " " );
 
 /* Check a match was found. */
    if( fs ) {

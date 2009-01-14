@@ -426,7 +426,7 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
    into the output arrays). */
       ldim[ 0 ] = 1;
       ldim[ 1 ] = 1;
-      dummy = (AstMapping *) astUnitMap( 2, "" );
+      dummy = (AstMapping *) astUnitMap( 2, " " );
       astRebinSeqD( dummy, 0.0, 2, NULL, NULL, NULL, NULL, spread, 
                     params, AST__REBINEND | rebinflags, 0.1, 1000000, 
                     VAL__BADD, 2, ldim, udim, NULL, NULL, map, 

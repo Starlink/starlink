@@ -182,7 +182,7 @@ double smf_calc_fcon( smfData *data, dim_t nchan, int report,
                                                             specframe2, 
                                                             "" ),
                                                 AST__BASE, AST__CURRENT ),
-                        1, "" );
+                        1, " " );
 
 /* Find the topocentric channel width in Hz at the mid channel. */
       at = 0.5*( 1.0 + nchan );

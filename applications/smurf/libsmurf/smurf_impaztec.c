@@ -796,7 +796,7 @@ void smurf_impaztec( int *status ) {
 
   /* Format the FITS headers */
   /* Add the FITS data to the output file */
-  fitschan = astFitsChan ( NULL, NULL, "" );
+  fitschan = astFitsChan ( NULL, NULL, " " );
   astSetFitsS ( fitschan, "DATE-OBS", dateobs, "observation date", 0 );
   rad = ra * AST__DR2D;
   astSetFitsF ( fitschan, "RA", rad, "Right Ascension of observation", 0 );

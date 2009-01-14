@@ -217,7 +217,7 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
 /* Get the mapping from the input grid coordinate system to the output sky 
    system. */
    tmap1 = astGetMapping( swcsin, AST__BASE, AST__CURRENT );
-   grid2sky = (AstMapping *) astCmpMap( tmap1, fsmap, 1, "" );
+   grid2sky = (AstMapping *) astCmpMap( tmap1, fsmap, 1, " " );
    tmap1 = astAnnul( tmap1 );
    fsmap = astAnnul( fsmap );
 
@@ -225,7 +225,7 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
    whether the target is moving or not. Combine the input GRID to output 
    SKY Mapping with the output SKY to output pixel Mapping supplied in 
    "oskymap". */
-   result = (AstMapping *) astCmpMap( grid2sky, oskymap, 1, "" );
+   result = (AstMapping *) astCmpMap( grid2sky, oskymap, 1, " " );
 
 /* Free remaining resources since this function will be called in a tight
    loop, and so relying on astBegin/End would be inefficient. */

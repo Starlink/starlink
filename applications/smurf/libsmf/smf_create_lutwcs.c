@@ -305,12 +305,12 @@ smfCreateLutwcsCache *smf_create_lutwcs( int clearcache, const double *fplane_x,
          and put it into the cached FrameSet for this subarray. The centre of
          the first pixel has coords (1.0,1.0) in the GRID Frame. */
       cache->frameset = astFrameSet( astFrame ( 2, "Domain=GRID" ), 
-                                    "" );   
+                                    " " );   
     
       /* We add a dummy 2D Frame to the FrameSet so that there is a Frame to
          remove on the first call to astRemoveFrame below. */
       astAddFrame( cache->frameset, AST__BASE, 
-                   astUnitMap( 2, "" ), astFrame( 2, "" ) );
+                   astUnitMap( 2, " " ), astFrame( 2, " " ) );
 
       /* Start LUT-specific code */    
 
@@ -321,7 +321,7 @@ smfCreateLutwcsCache *smf_create_lutwcs( int clearcache, const double *fplane_x,
       inperm[1] = 0;
       outperm[0] = 1;
       outperm[1] = 1;
-      permmap = astPermMap( 2, inperm, 2, outperm, NULL, "" );
+      permmap = astPermMap( 2, inperm, 2, outperm, NULL, " " );
       cache->map = (AstMapping *) permmap;
     
       /* LUTs give the focal plane Tanplane offsets based on pixel number.
@@ -330,26 +330,26 @@ smfCreateLutwcsCache *smf_create_lutwcs( int clearcache, const double *fplane_x,
          that assigns constant values to its outputs, instead of two LutMaps, 
          since a LutMap must have at least 2 table entries. */
       if( n_pix > 1 ) {
-         azlutmap = astLutMap( n_pix, fplane_x, 1, 1, "" );
-         ellutmap = astLutMap( n_pix, fplane_y, 1, 1, "" );
-         azellutmap = (AstMapping *) astCmpMap( azlutmap, ellutmap, 0, "" );
+         azlutmap = astLutMap( n_pix, fplane_x, 1, 1, " " );
+         ellutmap = astLutMap( n_pix, fplane_y, 1, 1, " " );
+         azellutmap = (AstMapping *) astCmpMap( azlutmap, ellutmap, 0, " " );
       } else {
          outperm[ 0 ] = -1;
          outperm[ 1 ] = -2;
          constants[ 0 ] = fplane_x[ 0 ];
          constants[ 1 ] = fplane_y[ 0 ];
          azellutmap = (AstMapping *) astPermMap( 2, NULL, 2, outperm, 
-                                                 constants, "" );
+                                                 constants, " " );
       }
-      cache->map = (AstMapping *) astCmpMap( cache->map, azellutmap, 1, "" );
+      cache->map = (AstMapping *) astCmpMap( cache->map, azellutmap, 1, " " );
 
       /* End LUT-specific code */
 
       /* Apply focal plane ("instrument aperture") offsets */
       if( instap ) {
-	instapmap = astShiftMap( 2, instap, "" );
+	instapmap = astShiftMap( 2, instap, " " );
         astInvert( instapmap );
-	cache->map = (AstMapping *) astCmpMap( cache->map, instapmap, 1, "" );
+	cache->map = (AstMapping *) astCmpMap( cache->map, instapmap, 1, " " );
 
         cache->instap[ 0 ] = instap[ 0 ];
         cache->instap[ 1 ] = instap[ 1 ];
@@ -386,7 +386,7 @@ smfCreateLutwcsCache *smf_create_lutwcs( int clearcache, const double *fplane_x,
     rmat[ 1 ] =  sin( state->tcs_az_ang );
     rmat[ 2 ] = -rmat[ 1 ];
     rmat[ 3 ] = rmat[ 0 ];
-    rmap = astMatrixMap( 2, 2, 0, rmat, "" );
+    rmap = astMatrixMap( 2, 2, 0, rmat, " " );
 
 
     /* Create a Mapping from tanplane AzEl coords (in rads) to spherical
@@ -421,8 +421,8 @@ smfCreateLutwcsCache *smf_create_lutwcs( int clearcache, const double *fplane_x,
          coords to spherical AzEl in rads. */
 
       mapping = (AstMapping *) astCmpMap( cache->map, 
-                                          astCmpMap( rmap, azelmap, 1, "" ),
-                                          1, "" );    
+                                          astCmpMap( rmap, azelmap, 1, " " ),
+                                          1, " " );    
 
     } else {
       /* Create a ShiftMap which moves the origin of projection plane (X,Y)
@@ -431,14 +431,14 @@ smfCreateLutwcsCache *smf_create_lutwcs( int clearcache, const double *fplane_x,
 
       shifts[ 0 ] = temp_jig_x + temp_chop_x;
       shifts[ 1 ] = temp_jig_y + temp_chop_y;
-      jigglemap = astShiftMap( 2, shifts, "" );
+      jigglemap = astShiftMap( 2, shifts, " " );
     
       mapping = (AstMapping *) astCmpMap( cache->map, 
                                           astCmpMap( rmap,
                                                      astCmpMap( jigglemap, azelmap, 
-                                                                1, "" ), 
-                                                     1, "" ),
-                                          1, "" );
+                                                                1, " " ), 
+                                                     1, " " ),
+                                          1, " " );
     }
   
     /* If not already created, create a SkyFrame describing (Az,El). Hard-wire 

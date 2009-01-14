@@ -551,8 +551,8 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
             ssmap = astCmpMap( astCmpMap( specmap, 
                                           astGetMapping( fs, AST__BASE,
                                                          AST__CURRENT ),
-                                          1, "" ), 
-                               ospecmap, 1, "" );
+                                          1, " " ), 
+                               ospecmap, 1, " " );
 
          }
 
@@ -659,7 +659,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    the required tan plane projection. The longitude and
    latitude axis types are set to either (RA,Dec) or (AZ,EL)
    to get the correct handedness. */
-               fct = astFitsChan ( NULL, NULL, "" );
+               fct = astFitsChan ( NULL, NULL, " " );
                smf_makefitschan( astGetC( oskyframe, "System"), &(par[0]),
                                  &(par[2]), &(par[4]), par[6], fct, status );
    
@@ -679,11 +679,11 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
 /* Construct the CmpFrame that will be used as the current Frame in the 
    output cube WCS FrameSet. */
-            cmpfrm = astCmpFrame( oskyframe, ospecframe, "" );
+            cmpfrm = astCmpFrame( oskyframe, ospecframe, " " );
 
 /* Construct the corresponding Mapping (from interim GRID coords to the 
    above CmpFrame). */
-            cmpmap = astCmpMap( oskymap, ospecmap, 0, "" );
+            cmpmap = astCmpMap( oskymap, ospecmap, 0, " " );
 
 /* Create the returned output cube WCS FrameSet, initialising it to hold a 3D 
    GRID Frame, which represents interim GRID coords. This interim GRID
@@ -691,7 +691,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    known) to represent actual GRID coords in the output cube, and a PIXEL
    Frame will also be added which puts the PIXEL origin at the tangent
    point. */
-            *wcsout = astFrameSet( astFrame( 3, "Domain=GRID" ), "" );
+            *wcsout = astFrameSet( astFrame( 3, "Domain=GRID" ), " " );
 
 /* Add the CmpFrame created above into the new FrameSet, using the above
    Mapping to join it to the 3D GRID Frame already in the FrameSet. */
@@ -774,7 +774,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    whether the target is moving or not. Combine the input GRID to output 
    SKY Mapping with the output SKY to output interim grid Mapping found 
    earlier. */
-         totmap = astCmpMap( fsmap, oskymap, 1, "" );
+         totmap = astCmpMap( fsmap, oskymap, 1, " " );
 
 /* Initialise a string to point to the name of the first detector for which 
    data is available */
@@ -1014,7 +1014,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
 /* Now remap the interim GRID Frame in the returned FrameSet so that it
    represent actual GRID coords in the output cube. */
-   astRemapFrame( *wcsout, AST__BASE, astShiftMap( 3, gshift, "" ) );
+   astRemapFrame( *wcsout, AST__BASE, astShiftMap( 3, gshift, " " ) );
 
 /* Allow the user to override the output pixel bounds calculated above. */
    lbnd0[ 0 ] = lbnd[ 0 ];
@@ -1049,7 +1049,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    gshift[ 1 ] = lbnd0[ 1 ] - lbnd[ 1 ];
    gshift[ 2 ] = 0.0;
    if( gshift[ 0 ] != 0.0 || gshift[ 1 ] != 0.0 ) {
-      astRemapFrame( *wcsout, AST__BASE, astShiftMap( 3, gshift, "" ) );
+      astRemapFrame( *wcsout, AST__BASE, astShiftMap( 3, gshift, " " ) );
    }
 
 /* Report the pixel bounds of the cube. */

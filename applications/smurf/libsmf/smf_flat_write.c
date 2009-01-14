@@ -232,11 +232,11 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
 
   /* Create a simple frame for heater settings */
   heatfrm = astFrame( 1, "Domain=HEATER,Label(1)=Heater Setting" );
-  heatmap = astLutMap( bbhtframes->ndat, heater, 1.0, 1.0, "" );
+  heatmap = astLutMap( bbhtframes->ndat, heater, 1.0, 1.0, " " );
 
   /* Join the frames and mappings */
-  totfrm = astCmpFrame( spacefset, heatfrm, "" );
-  totmap = astCmpMap( spacefset, heatmap, 0, "" );
+  totfrm = astCmpFrame( spacefset, heatfrm, " " );
+  totmap = astCmpMap( spacefset, heatmap, 0, " " );
 
   /* Create a 3D GRID frame */
   gridfrm = astFrame( 3, "Domain=GRID,Title=FITS pixel coordinates" );
@@ -246,7 +246,7 @@ void smf_flat_write( const char * flatname, const smfArray * bbhtframes,
 
   /* Create the FrameSet to return, initially containing just the above
      GRID Frame. */
-  result = astFrameSet( gridfrm, "" );
+  result = astFrameSet( gridfrm, " " );
 
   /* Add the total Frame into the FrameSet using the total Mapping to
      connect it to the base (i.e. GRID) Frame. */

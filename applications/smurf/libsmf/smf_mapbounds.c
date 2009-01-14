@@ -402,7 +402,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
              the required tan plane projection. The longitude and
              latitude axis types are set to either (RA,Dec) or (AZ,EL)
              to get the correct handedness. */
-          fitschan = astFitsChan ( NULL, NULL, "" );
+          fitschan = astFitsChan ( NULL, NULL, " " );
           smf_makefitschan( astGetC( oskyframe, "System"), &(par[0]),
                             &(par[2]), &(par[4]), par[6], fitschan, status ); 
           astClear( fitschan, "Card" );
@@ -420,7 +420,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
         astClear( abskyframe, "AlignOffset" );
 
         /* Create the output FrameSet */
-        *outframeset = astFrameSet( astFrame(2, "Domain=GRID"), "");
+        *outframeset = astFrameSet( astFrame(2, "Domain=GRID"), " " );
 
         /* Now add the SkyFrame to it */
         astAddFrame( *outframeset, AST__BASE, oskymap, oskyframe );
@@ -591,7 +591,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
      coordinates */
   shift[0] = 2.0 - par[0] - lbnd_out[0];
   shift[1] = 2.0 - par[1] - lbnd_out[1];
-  astRemapFrame( *outframeset, AST__BASE, astShiftMap( 2, shift, "") );
+  astRemapFrame( *outframeset, AST__BASE, astShiftMap( 2, shift, " " ) );
 
   /* Set the dynamic defaults for lbnd/ubnd */
   lbnd0[ 0 ] = lbnd_out[ 0 ];
@@ -625,7 +625,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   shift[ 0 ] = lbnd0[ 0 ] - lbnd_out[ 0 ];
   shift[ 1 ] = lbnd0[ 1 ] - lbnd_out[ 1 ];
   if( shift[ 0 ] != 0.0 || shift[ 1 ] != 0.0 ) {
-    astRemapFrame( *outframeset, AST__BASE, astShiftMap( 2, shift, "" ) );
+    astRemapFrame( *outframeset, AST__BASE, astShiftMap( 2, shift, " " ) );
   }
 
 /* Report the pixel bounds of the cube. */

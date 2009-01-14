@@ -254,7 +254,7 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
 	   reduces to a UnitMap. */
 	
 	map2sky_old = astGetMapping( oldfset, AST__BASE, AST__CURRENT );
-	testcmpmap = astCmpMap( map2sky_old, sky2map, 1, "" );
+	testcmpmap = astCmpMap( map2sky_old, sky2map, 1, " " );
 	testsimpmap = astSimplify( testcmpmap );
 	
 	if( astIsAUnitMap( testsimpmap ) ) {

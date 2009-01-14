@@ -132,7 +132,7 @@ void smf_fits_crchan( size_t nfits, const char * headrec, AstFitsChan ** fits,
   }
 
   /* Create the empty fitschan. */
-  *fits = astFitsChan( NULL, NULL, "" );
+  *fits = astFitsChan( NULL, NULL, " " );
 
   /* Fill it */
   card = headrec;

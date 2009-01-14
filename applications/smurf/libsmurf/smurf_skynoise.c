@@ -248,7 +248,7 @@ void smurf_skynoise ( int *status ) {
    sc2sim_invf2d ( corner, exp, pixsize, size, atmsim, spectrum, status );
 
    /* Add the FITS data to the output file */
-   fitschan = astFitsChan ( NULL, NULL, "" ); 
+   fitschan = astFitsChan ( NULL, NULL, " " ); 
 
    astSetFitsF ( fitschan, "CORNER", corner, "corner frequency in 1/arcsec", 0 );
    astSetFitsF ( fitschan, "EXPONENT", exp, 

@@ -128,7 +128,7 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
     } else {
       /* If WCS is present then check for a sky frame */
       /* astFindFrame returns AST__NULL if a skyframe is not present */
-      skyframe = astFindFrame( owcs, astSkyFrame(""), "");
+      skyframe = astFindFrame( owcs, astSkyFrame(" "), " " );
       /* If no sky frame, copy the input WCS info using astCopy */
       if (skyframe == AST__NULL) {
         msgOutif(MSG__DEBUG," ", 

@@ -157,27 +157,27 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
 
             /* Create a new FrameSet containing a 2d base GRID frame */
 
-            filt->wcs = astFrameSet( astFrame( 2, "Domain=GRID" ), "" );
+            filt->wcs = astFrameSet( astFrame( 2, "Domain=GRID" ), " " );
 
             /* The current frame will have freq. along first axis, and
                real/imag coefficients along the other */
 
             specframe = astSpecFrame( "System=freq,Unit=Hz,StdOfRest=Topocentric" );
             cframe = astFrame( 1, "Domain=GRID" );
-            curframe2d = astCmpFrame( specframe, cframe, "" ); 
+            curframe2d = astCmpFrame( specframe, cframe, " " ); 
 
             /* The mapping from 2d grid coordinates to (frequency, coeff) is
                accomplished with a shift and a zoommap for the 1st dimension,
                and a unit mapping for the other */
 
             zshift = -1;
-            zshiftmapping = astShiftMap( 1, &zshift, "" ); 
-            scalemapping = astZoomMap( 1, filt->df, "" );
-            specmapping = astCmpMap( zshiftmapping, scalemapping, 1, "" );
+            zshiftmapping = astShiftMap( 1, &zshift, " " ); 
+            scalemapping = astZoomMap( 1, filt->df, " " );
+            specmapping = astCmpMap( zshiftmapping, scalemapping, 1, " " );
             
-            cmapping = astUnitMap( 1, "" );
+            cmapping = astUnitMap( 1, " " );
 
-            fftmapping = astCmpMap( specmapping, cmapping, 0, "" );
+            fftmapping = astCmpMap( specmapping, cmapping, 0, " " );
 
             /* Add the curframe2d with the fftmapping to the frameset */
             astAddFrame( filt->wcs, AST__BASE, fftmapping, curframe2d );

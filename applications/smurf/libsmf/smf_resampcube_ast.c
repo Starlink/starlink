@@ -246,7 +246,7 @@ void smf_resampcube_ast( smfData *data, dim_t nchan,
 /* If we only have 1 detector, use a UnitMap instead of a LutMap (lutMaps
    must have 2 or more table entries). */
    } else {
-      lutmap = (AstMapping *) astUnitMap( 1, "" );    
+      lutmap = (AstMapping *) astUnitMap( 1, " " );    
    }
 
 /* Combine the above LutMap with a 1-input, 2-output PermMap that copies its 
@@ -257,8 +257,8 @@ void smf_resampcube_ast( smfData *data, dim_t nchan,
    skyperm[ 0 ] = 1;
    skyperm[ 1 ] = -1;
    con = 1.0;
-   detmap = astCmpMap( lutmap, astPermMap( 1, tsperm, 2, skyperm, &con, "" ),
-                       1, "" );
+   detmap = astCmpMap( lutmap, astPermMap( 1, tsperm, 2, skyperm, &con, " " ),
+                       1, " " );
 
 /* Store the bounds of a single time slice grid. */
    lbnd_out[ 0 ] = 1;
@@ -274,7 +274,7 @@ void smf_resampcube_ast( smfData *data, dim_t nchan,
    tsperm[ 0 ] = 3;
    tsperm[ 1 ] = 1;
    tsperm[ 2 ] = 2;
-   pmap = astPermMap( 3, tsperm, 3, skyperm, NULL, "" );
+   pmap = astPermMap( 3, tsperm, 3, skyperm, NULL, " " );
 
 /* Loop round all time slices in the input NDF. */
    for( itime = 0; itime < nslice && *status == SAI__OK; itime++ ) {
@@ -305,7 +305,7 @@ void smf_resampcube_ast( smfData *data, dim_t nchan,
    detector index) and 3-output (output grid coords) Mapping. We finally
    add a PermMap to re-arrange the output axes so that channel number is
    axis 3 in the output. */
-      dtotmap = (AstMapping *) astCmpMap( detmap, totmap, 1, "" );
+      dtotmap = (AstMapping *) astCmpMap( detmap, totmap, 1, " " );
       if( ndet > 1 ) {
          atlTolut( dtotmap, 1.0, (double) ndet, 1.0, "LutInterp=1", &splut, 
                    status );
@@ -313,8 +313,8 @@ void smf_resampcube_ast( smfData *data, dim_t nchan,
          splut = astClone( dtotmap );
       }
 
-      fullmap = astSimplify( astCmpMap( astCmpMap( sslut, splut, 0, "" ), 
-                                        pmap, 1, "" ) );
+      fullmap = astSimplify( astCmpMap( astCmpMap( sslut, splut, 0, " " ), 
+                                        pmap, 1, " " ) );
 
 /* Invert this Mapping to get the mapping from sky cube grid coords to time 
    series grid coords. */

@@ -407,14 +407,14 @@ int *status             /* global status (given and returned) */
 /* We add a dummy 2D Frame to the FrameSet so that there is a Frame to
    remove on the first call to astRemoveFrame below. */
       astAddFrame( cache->frameset[ subnum ], AST__BASE, 
-                   astUnitMap( 2, "" ), astFrame( 2, "" ) );
+                   astUnitMap( 2, "" ), astFrame( 2, " " ) );
 
 /* The GRID domain locates the [0][0] pixel at coordinates (1,1). Shift
    these so that the [0][0] pixel is at the origin of a coordinate system */
 
       zshift[0] = -1.0;
       zshift[1] = -1.0;
-      zshiftmap = astShiftMap ( 2, zshift, "" );
+      zshiftmap = astShiftMap ( 2, zshift, " " );
       cache->map[ subnum ] = (AstMapping *) zshiftmap;
 
 /* The mm coords now have to be rotated through an angle approximating
@@ -433,7 +433,7 @@ int *status             /* global status (given and returned) */
         rot[ 2 ] =  cos( r );
         rot[ 3 ] =  sin( r );
       }
-      rotmap = astMatrixMap ( 2, 2, 0, rot, "" );
+      rotmap = astMatrixMap ( 2, 2, 0, rot, " " );
       cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
                                                       rotmap, 1, "" );
 
@@ -443,7 +443,7 @@ int *status             /* global status (given and returned) */
 
       shift[ 0 ] = xoff[ subnum ];
       shift[ 1 ] = yoff[ subnum ];
-      shiftmap = astShiftMap( 2, shift, "" );
+      shiftmap = astShiftMap( 2, shift, " " );
       cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
                                                       shiftmap, 1, "" );
 
@@ -453,21 +453,21 @@ int *status             /* global status (given and returned) */
 /* The mapping from pixel numbers to millimetres is a simple scaling,
    because the pixel separation is the same in both coordinates and is
    accurately constant. A ZoomMap can be used for this. */
-      zoommap = astZoomMap ( 2, PIX2MM, "" );
+      zoommap = astZoomMap ( 2, PIX2MM, " " );
 
       cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
 						      zoommap, 1, "" );
 
 /* Correct for polynomial distortion */      
 
-      polymap = astPolyMap( 2, 2, 14, coeff_f, 14, coeff_i, "" );
+      polymap = astPolyMap( 2, 2, 14, coeff_f, 14, coeff_i, " " );
       cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
 						      polymap, 1, "" );
       
 /* Convert from mm to radians (but these coords are still cartesian (x,y)
    (i.e. measured in the tangent plane) rather than spherical (lon,lat)
    measured on the sky. */
-      radmap = astZoomMap ( 2, MM2RAD, "" );
+      radmap = astZoomMap ( 2, MM2RAD, " " );
       cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
                                                       radmap, 1, "" );
 
@@ -482,7 +482,7 @@ int *status             /* global status (given and returned) */
            from centre of rotation. */
         totinstap[ 0 ] = instap[0] - 0.0;
         totinstap[ 1 ] = instap[1] - 0.0;   
-        instapmap = astShiftMap( 2, totinstap, "" );
+        instapmap = astShiftMap( 2, totinstap, " " );
         cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
                                                          instapmap, 1, "" );
       } else {
@@ -545,7 +545,7 @@ int *status             /* global status (given and returned) */
    coords to take account of the small offsets of SMU jiggle pattern. */
       shifts[ 0 ] = state->smu_az_jig_x + state->smu_az_chop_x;
       shifts[ 1 ] = state->smu_az_jig_y + state->smu_az_chop_y;
-      jigglemap = astShiftMap( 2, shifts, "" );
+      jigglemap = astShiftMap( 2, shifts, " " );
 
 
       mapping = (AstMapping *) astCmpMap( cache->map[ subnum ], 
@@ -737,7 +737,7 @@ int *status               /* global status (given and returned) */
 
    shift[0] = x;
    shift[1] = y;
-   shiftmap = astShiftMap ( 2, shift, "" );
+   shiftmap = astShiftMap ( 2, shift, " " );
 
 /* Remap the base frame */
 
@@ -858,7 +858,7 @@ int *status             /* global status (given and returned) */
 /* An AST FrameSet is initialised and will be built up as the various frames
    and the mappings between them are created */
 
-   *fset = astFrameSet ( gridframe, "" );
+   *fset = astFrameSet ( gridframe, " " );
 
    unitmap = astUnitMap ( 1, " " );
    cmpmap = astCmpMap ( frameset, unitmap, 0, " " );
@@ -925,10 +925,10 @@ int *status              /* global status (given and returned) */
 /* If required, create a CmpMap holding a WcsMap followed by an inverted
    SphMap. */
    if( !cache[ 1 ] ) {
-      wcsmap = astWcsMap( 2, AST__TAN, 1, 2, "" );
+      wcsmap = astWcsMap( 2, AST__TAN, 1, 2, " " );
       astInvert( wcsmap );
       astInvert( cache[ 0 ] );
-      cache[ 1 ] = (AstMapping *) astCmpMap( wcsmap, cache[ 0 ], 1, "" );
+      cache[ 1 ] = (AstMapping *) astCmpMap( wcsmap, cache[ 0 ], 1, " " );
       astInvert( cache[ 0 ] );
       wcsmap = astAnnul( wcsmap );
       astExempt( cache[ 1 ] );
@@ -951,11 +951,11 @@ int *status              /* global status (given and returned) */
 
    strcpy(eul, "ZYZ" );
    slaDeuler( eul, -rot, -(PIBY2-lat), -lon, mat ); 
-   matmap = astMatrixMap( 3, 3, 0, (double *) mat, "" );
+   matmap = astMatrixMap( 3, 3, 0, (double *) mat, " " );
 
 /* Create the required compound Mapping. */
-   m1 = astCmpMap( cache[ 1 ], matmap, 1, "" );
-   result = (AstMapping *) astCmpMap( m1, cache[ 0 ], 1, "" );
+   m1 = astCmpMap( cache[ 1 ], matmap, 1, " " );
+   result = (AstMapping *) astCmpMap( m1, cache[ 0 ], 1, " " );
    matmap = astAnnul( matmap );
    m1 = astAnnul( m1 );
 

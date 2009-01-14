@@ -338,7 +338,7 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
      required tan plane projection. The longitude and latitude axis
      types are set to either (RA,Dec) or (AZ,EL) to get the correct
      handedness. */
-  fitschan = astFitsChan ( NULL, NULL, "" );
+  fitschan = astFitsChan ( NULL, NULL, " " );
   smf_makefitschan( astGetC( skyframe, "System"), &(par[0]),
                     &(par[2]), &(par[4]), par[6], fitschan, status );
   astClear( fitschan, "Card" );
@@ -349,7 +349,7 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
   sky2map = astGetMapping( fs, AST__BASE, AST__CURRENT );
 
   /* Create the output FrameSet */
-  *outframeset = astFrameSet( astFrame(2, "Domain=GRID"), "");
+  *outframeset = astFrameSet( astFrame(2, "Domain=GRID"), " " );
 
   /* Now add the SkyFrame to it */
   astAddFrame( *outframeset, AST__BASE, sky2map, skyframe );
@@ -358,7 +358,7 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system, double pixsiz
      coordinates */
   shift[0] = -lbnd_out[0];
   shift[1] = -lbnd_out[1];
-  astRemapFrame( *outframeset, AST__BASE, astShiftMap( 2, shift, "") );
+  astRemapFrame( *outframeset, AST__BASE, astShiftMap( 2, shift, " " ) );
  
   astExport( *outframeset );
 

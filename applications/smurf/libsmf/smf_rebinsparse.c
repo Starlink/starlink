@@ -286,8 +286,8 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
    output spectral grid axis (pixel axis 3). Simplify the Mapping. */
    ssmap = astCmpMap( astCmpMap( specmap, astGetMapping( fs, AST__BASE,
                                                          AST__CURRENT ),
-                                 1, "" ), 
-                      ospecmap, 1, "" );
+                                 1, " " ), 
+                      ospecmap, 1, " " );
    ssmap = astSimplify( ssmap );
 
 /* Create a table with one element for each channel in the input array,
@@ -358,7 +358,7 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
                                                             specframe2, 
                                                             "" ),
                                                 AST__BASE, AST__CURRENT ),
-                        1, "" );
+                        1, " " );
 
 /* Differentiate this Mapping at the mid channel position to get the width
    of an input channel in Hz. */

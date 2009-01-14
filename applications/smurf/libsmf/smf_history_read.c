@@ -142,7 +142,7 @@ void smf_history_read( smfData* data,int *status) {
 
     if ( *status == SAI__OK ) {
       /* Create AstKeyMap */
-      history = astKeyMap("");
+      history = astKeyMap(" " );
       /* Stop with an error if the history could not be created */
       if ( history == AST__NULL) {
 	if ( *status == SAI__OK ){
@@ -159,7 +159,7 @@ void smf_history_read( smfData* data,int *status) {
 	if ( strncmp( refappl, "smf_", 4 ) == 0 ) {
 	  /* Insert record into history. Note that previous values are
 	     overwritten, thus avoiding duplicate entries. */
-	  astMapPut0I( history, refappl, 1, "" );
+	  astMapPut0I( history, refappl, 1, " " );
 	}
       }
     }

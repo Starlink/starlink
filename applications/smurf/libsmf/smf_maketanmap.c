@@ -114,10 +114,10 @@ AstMapping *smf_maketanmap( double lon, double lat, AstMapping *cache[ 2 ],
   /* If required, create a CmpMap holding a WcsMap followed by an inverted
      SphMap. */
   if( !cache[ 1 ] ) {
-    wcsmap = astWcsMap( 2, AST__TAN, 1, 2, "" );
+    wcsmap = astWcsMap( 2, AST__TAN, 1, 2, " " );
     astInvert( wcsmap );
     astInvert( cache[ 0 ] );
-    cache[ 1 ] = (AstMapping *) astCmpMap( wcsmap, cache[ 0 ], 1, "" );
+    cache[ 1 ] = (AstMapping *) astCmpMap( wcsmap, cache[ 0 ], 1, " " );
     astInvert( cache[ 0 ] );
     wcsmap = astAnnul( wcsmap );
     astExempt( cache[ 1 ] );
@@ -153,11 +153,11 @@ AstMapping *smf_maketanmap( double lon, double lat, AstMapping *cache[ 2 ],
   mat[ 7 ] = 0;
   mat[ 8 ] = st;
 
-  matmap = astMatrixMap( 3, 3, 0, mat, "" );
+  matmap = astMatrixMap( 3, 3, 0, mat, " " );
 
   /* Create the required compound Mapping. */
-  m1 = astCmpMap( cache[ 1 ], matmap, 1, "" );
-  result = (AstMapping *) astCmpMap( m1, cache[ 0 ], 1, "" );
+  m1 = astCmpMap( cache[ 1 ], matmap, 1, " " );
+  result = (AstMapping *) astCmpMap( m1, cache[ 0 ], 1, " " );
   matmap = astAnnul( matmap );
   m1 = astAnnul( m1 );
 

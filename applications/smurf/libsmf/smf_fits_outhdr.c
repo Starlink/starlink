@@ -109,7 +109,7 @@ void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
    header for the output NDF. Also create the output key map at this point. */
    if( *outhdr == NULL ) {
       *outhdr = astCopy( inhdr );
-      if( obsidmap ) *obsidmap = astKeyMap( "" );
+      if( obsidmap ) *obsidmap = astKeyMap( " " );
 
 /* If this is not the first file, merge the input NDF's FITS extension
    into the output NDF's FITS extension by removing any headers from the

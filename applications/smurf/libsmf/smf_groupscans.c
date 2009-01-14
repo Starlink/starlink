@@ -136,7 +136,7 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
    if( *status != SAI__OK ) return result;
 
 /* Create the returned KeyMap. */
-   result = astKeyMap( "" );
+   result = astKeyMap( " " );
 
 /* Loop round all the input NDFs. */
    for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++ ) {
@@ -176,7 +176,7 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
    value. Create a new KeyMap and store a pointer for it in the returned
    KeyMap if this is the first time this OBSID value has been encountered. */
       if( !astMapGet0A( result, obsid, &obsmap ) ) {
-         obsmap = astKeyMap( "" );
+         obsmap = astKeyMap( " " );
          astMapPut0A( result, obsid, obsmap, NULL );
       }
 
@@ -184,7 +184,7 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
    value. Create a new KeyMap and store a pointer for it in the returned
    KeyMap if this is the first time this SUBSYSNR value has been encountered. */
       if( !astMapGet0A( obsmap, subsysnr, &sysmap ) ) {
-         sysmap = astKeyMap( "" );
+         sysmap = astKeyMap( " " );
          astMapPut0A( obsmap, subsysnr, sysmap, NULL );
       }
 

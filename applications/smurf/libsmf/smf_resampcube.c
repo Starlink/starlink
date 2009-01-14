@@ -237,8 +237,8 @@ void smf_resampcube( smfData *data, AstSkyFrame *abskyfrm, AstMapping *iskymap,
    sky cube spectral grid axis (pixel axis 3). */
    ssmap = astCmpMap( astCmpMap( specmap, astGetMapping( fs, AST__BASE,
                                                          AST__CURRENT ),
-                                 1, "" ), 
-                      ispecmap, 1, "" );
+                                 1, " " ), 
+                      ispecmap, 1, " " );
 
 /* Issue a warning if any of the detector names specified in "detgrp"
    were not found in the data. If the supplied group holds the detectors

@@ -328,8 +328,8 @@ void  smf_rebincube( smfWorkForce *wf, smfData *data, int first, int last,
    output spectral grid axis (pixel axis 3). */
    ssmap = astCmpMap( astCmpMap( specmap, astGetMapping( fs, AST__BASE,
                                                          AST__CURRENT ),
-                                 1, "" ), 
-                      ospecmap, 1, "" );
+                                 1, " " ), 
+                      ospecmap, 1, " " );
 
 /* In principle, the spectral coverage of the current input file and the 
    output file may not be equal. The effect of this input file on the 
