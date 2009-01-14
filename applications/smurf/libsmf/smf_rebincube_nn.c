@@ -186,6 +186,8 @@
 *        Update naccept when using a 3D weights array.
 *     7-JAN-2009 (DSB):
 *        Remove unused "nel" parameter.
+*     14-JAN-2009 (DSB):
+*        Fix bug in initialisation of detector data structures.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -471,22 +473,27 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
    data, plus a pointer to the common data. */
             init_detector_data = ( detector_data == NULL );
             if( init_detector_data ) ndet_max = 0;
-
             detector_data = astGrow( detector_data, sizeof( smfRebincubeNNArgs2 ), 
                                      ndet ) ;
-            if( ndet > ndet_max ) ndet_max = ndet;
+
+/* Initialise pointers stored within any new elements added to the 
+   "detector_data" array. */
+            if( ndet > ndet_max && astOK ) {
+               for( idet = ndet_max; idet < ndet; idet++ ) {
+                  detector_data[ idet ].common = NULL;
+                  detector_data[ idet ].work = NULL;
+                  detector_data[ idet ].ddata = NULL;
+               }
+               ndet_max = ndet;
+            }
 
 /* Allocate work space for each detector and store the common data
    pointer. */
             if( astOK ) {
                for( idet = 0; idet < ndet; idet++ ) {
                   detector_data[ idet ].common = common_data;
-                  if( init_detector_data ) {
-                     detector_data[ idet ].work = astMalloc( nchanout*sizeof( float ) );
-                  } else {
-                     detector_data[ idet ].work = astGrow( detector_data[ idet ].work, 
+                  detector_data[ idet ].work = astGrow( detector_data[ idet ].work, 
                                                         sizeof( float ), nchanout );
-                  }
                }
             }
 
