@@ -402,12 +402,12 @@ int *status             /* global status (given and returned) */
    and put it into the cached FrameSet for this subarray. The centre of
    the first pixel has coords (1.0,1.0) in the GRID Frame. */
       cache->frameset[ subnum ] = astFrameSet( astFrame ( 2, "Domain=GRID" ), 
-                                              "" );   
+                                              " " );   
 
 /* We add a dummy 2D Frame to the FrameSet so that there is a Frame to
    remove on the first call to astRemoveFrame below. */
       astAddFrame( cache->frameset[ subnum ], AST__BASE, 
-                   astUnitMap( 2, "" ), astFrame( 2, " " ) );
+                   astUnitMap( 2, " " ), astFrame( 2, " " ) );
 
 /* The GRID domain locates the [0][0] pixel at coordinates (1,1). Shift
    these so that the [0][0] pixel is at the origin of a coordinate system */
@@ -435,7 +435,7 @@ int *status             /* global status (given and returned) */
       }
       rotmap = astMatrixMap ( 2, 2, 0, rot, " " );
       cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
-                                                      rotmap, 1, "" );
+                                                      rotmap, 1, " " );
 
 /* For each 450/850 subarray, the next Mapping creates FRAME450/FRAME850
    coordinates, which are coordinates in millimetres with origin at the
@@ -445,7 +445,7 @@ int *status             /* global status (given and returned) */
       shift[ 1 ] = yoff[ subnum ];
       shiftmap = astShiftMap( 2, shift, " " );
       cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
-                                                      shiftmap, 1, "" );
+                                                      shiftmap, 1, " " );
 
       printf("Setting up subarray %d coordinates: (%f,%f) rot %f\n",
              subnum, shift[0], shift[1], r);
@@ -456,20 +456,20 @@ int *status             /* global status (given and returned) */
       zoommap = astZoomMap ( 2, PIX2MM, " " );
 
       cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
-						      zoommap, 1, "" );
+						      zoommap, 1, " " );
 
 /* Correct for polynomial distortion */      
 
       polymap = astPolyMap( 2, 2, 14, coeff_f, 14, coeff_i, " " );
       cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
-						      polymap, 1, "" );
+						      polymap, 1, " " );
       
 /* Convert from mm to radians (but these coords are still cartesian (x,y)
    (i.e. measured in the tangent plane) rather than spherical (lon,lat)
    measured on the sky. */
       radmap = astZoomMap ( 2, MM2RAD, " " );
       cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
-                                                      radmap, 1, "" );
+                                                      radmap, 1, " " );
 
 /* Apply focal plane offsets - if supplied. Note the effective values in
    the cache so that we can spot if they are changed. */
@@ -484,7 +484,7 @@ int *status             /* global status (given and returned) */
         totinstap[ 1 ] = instap[1] - 0.0;   
         instapmap = astShiftMap( 2, totinstap, " " );
         cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], 
-                                                         instapmap, 1, "" );
+                                                         instapmap, 1, " " );
       } else {
         cache->instap_x[ subnum ] = 0.0;
         cache->instap_y[ subnum ] = 0.0;
@@ -538,7 +538,7 @@ int *status             /* global status (given and returned) */
    coords to spherical AzEl in rads. */
 
       mapping = (AstMapping *) astCmpMap( cache->map[ subnum ], azelmap, 1, 
-					  "" );
+					  " " );
 
    } else {
 /* Create a ShiftMap which moves the origin of projection plane (X,Y)
@@ -550,7 +550,7 @@ int *status             /* global status (given and returned) */
 
       mapping = (AstMapping *) astCmpMap( cache->map[ subnum ], 
 					  astCmpMap( jigglemap, azelmap, 1, 
-						     "" ), 1, "" );
+						     " " ), 1, " " );
    }
 
 /* If not already created, create a SkyFrame describing (Az,El). Hard-wire 
