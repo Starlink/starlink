@@ -127,13 +127,6 @@ void smf_choose_closest( const smfArray *alldata, const smfData *indata,
     int thissubnum;
     smf_find_subarray( thisfile->hdr, NULL, 0, &thissubnum, status );
 
-    /* Is there a valid state? */
-    if( !thisfile->hdr->allState ) {
-      *status = SAI__ERROR;
-      errRep( "", FUNC_NAME ": file does not contain a valid JCMT State", 
-              status );
-    }
-
     /* see if we even need to look at the time */
     if ( (*status==SAI__OK) && (thissubnum == refsubnum) ) {
       double thistime;
