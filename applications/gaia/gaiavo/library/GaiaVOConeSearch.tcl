@@ -164,6 +164,7 @@ itcl::class gaiavo::GaiaVOConeSearch {
             -label $name \
             -value $name
       }
+      set_verb_ "Default"
       $itk_component(verb) configure -value Default
 
       #  Additional options. Set search region from the displayed
@@ -456,7 +457,7 @@ itcl::class gaiavo::GaiaVOConeSearch {
    protected variable size_ 10
 
    #  Verbosity.
-   protected variable verb_ 2
+   protected variable verb_ "Default"
 
    #  Batch job handler.
    protected variable batch_ {}

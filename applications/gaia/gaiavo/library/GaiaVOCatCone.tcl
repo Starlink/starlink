@@ -117,6 +117,16 @@ itcl::class gaiavo::GaiaVOCatCone {
 
       #  Set default name server.
       set_namesvr $namesvr
+
+      #  Plot button.
+      itk_component add plot {
+         button $itk_component(buttons).plot \
+            -text "Plot" \
+            -command [code $this plot]
+      }
+
+      pack $itk_component(plot) -side left -expand 1 -pady 2m
+      add_short_help $itk_component(plot) {Plot positions over image}
    }
 
    #  Set the name server used, pass to other components.
@@ -178,6 +188,25 @@ itcl::class gaiavo::GaiaVOCatCone {
       }
       return {}
    }
+
+   #  Plot the RA and Dec positions on the image.
+   public method plot {} {
+      set rtdctrl [$itk_option(-gaia) get_image]
+      set rtdimage [$rtdctrl get_image]
+      set equinox "J2000"; # Must be true for all catalogues.
+
+      #  Do the plot... 
+      #  XXX uses the plotting symbols set in the astrocat for this catalogue,
+      #  need to set a value. 
+      set symbol [list {} [list circle red {} {} {} {}] [list {4.0} {}]]
+      $w_.cat symbol $symbol
+
+      if {[catch {$w_.cat imgplot $rtdimage $info_ $equinox $headings_} msg]} {
+         error_dialog $msg
+      }
+   }
+
+
 
    #  Configuration options: (public variables)
    #  ----------------------
