@@ -122,9 +122,11 @@ static double smf__find_utc( const smfHead *hdr, int first, int *status) {
   double utc = VAL__BADD;
   AstTimeFrame *tf = NULL;
 
-  if (*status == SAI__OK) return VAL__BADD;
+  if (*status != SAI__OK) return VAL__BADD;
 
-    if (hdr->allState) {
+  tf = astTimeFrame( " " );
+
+  if (hdr->allState) {
       dim_t index;
       if (first) {
         index = 0;
@@ -134,6 +136,7 @@ static double smf__find_utc( const smfHead *hdr, int first, int *status) {
       astSet( tf, "TimeScale=TAI" );
       astSet( tf, "TimeOrigin=MJD %.*g", DBL_DIG, (hdr->allState)[0].rts_end);
       astSet( tf, "TimeScale=UTC" ); /* we need UTC */
+
     } else if (hdr->fitshdr) {
       /* look for DATE-OBS */
       char iso[81];
@@ -146,6 +149,7 @@ static double smf__find_utc( const smfHead *hdr, int first, int *status) {
       }
       smf_fits_getS( hdr, fitscard, iso, sizeof(iso), status );
       astSet( tf, "TimeOrigin=%s", iso );
+
     } else {
       *status = SAI__ERROR;
       errRep( " ","Can not find date of observation without FITS header "
