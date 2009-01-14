@@ -82,7 +82,8 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 *        Pointer to the inherited status value.
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2006, 2007 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -103,6 +104,7 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -110,6 +112,8 @@ void CGEN_FUNCTION(cupidFindback1)( int dim[3], int box[3], double rms,
 *        Original version.
 *     19-MAR-2007 (DSB):
 *        Added parameter "rms".
+*     14-JAN-2009 (TIMJ):
+*        Use msgOutif rather than ilevel.
 *     {enter_further_changes_here}
 
 *  Bugs:
