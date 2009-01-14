@@ -5604,13 +5604,13 @@ f     AST_DISTANCE function.
             }
 
 /* If the second line is vertical but the first is not. */
-         } else {
+         } else if( b1[ 1 ] != b2[ 1 ] ){
             cross[ 0 ] = b1[ 0 ];
             cross[ 1 ] = ma*b1[ 0 ] + ca;
          }
 
 /* First line is vertical but second is not. */
-      } else if( dxb != 0.0 ) {
+      } else if( dxb != 0.0 && a1[ 1 ] != a2[ 1 ] ){
 
 /* Find the gradient and Y axis intercept of the second line. */
          mb = ( b2[ 1 ] - b1[ 1 ] )/dxb;
