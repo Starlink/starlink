@@ -13,22 +13,22 @@
 *     C function
 
 *  Invocation:
-*     int *smf_find_median( float *farray, double *darray, int nel, 
+*     int *smf_find_median( const float *farray, const double *darray, int nel, 
 *                           int *hist, float *median, int *status )
 
 *  Arguments:
-*     farray = float * (Given)
+*     farray = const float * (Given)
 *        Pointer to an array of single precision data for which the
 *        median is to be returned. Only one of "farray" and "darray" 
 *        should be non-NULL.
-*     darray = float * (Given)
+*     darray = const float * (Given)
 *        Pointer to an array of double precision data for which the
 *        median is to be returned. Only one of "farray" and "darray" 
 *        should be non-NULL.
 *     nel = int (Given)
 *        The number of elements in farray or darray (which ever is
 *        supplied).
-*     hist = int * (Given)
+*     hist = int * (Given & Returned)
 *        Pointer to an array to use for the histogram. If NULL is
 *        supplied, a new array is allocated.
 *     median = float * (Returned)
@@ -66,10 +66,12 @@
 *        but is too slow for large data arrays.
 *     15-JAN-2009 (DSB):
 *        Avoid changing the supplied array when sorting is used.
+*     15-JAN-2009 (TIMJ):
+*        Declare const arguments
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -101,7 +103,7 @@
 #include "smf.h"
 #include "smf_err.h"
 
-int *smf_find_median( float *farray, double *darray, size_t nel, 
+int *smf_find_median( const float *farray, const double *darray, size_t nel, 
                       int *hist, float *median, int *status ){
 
   const size_t threshold = 10000;  /* point at which we abandon sorting */
@@ -169,7 +171,7 @@ int *smf_find_median( float *farray, double *darray, size_t nel,
    numbin = nel/2;
 
 /* Ensure we have an array at least this big. */
-   result = astGrow( hist, numbin, sizeof( int ) );
+   result = astGrow( hist, numbin, sizeof( *result ) );
    if( result ) {
 
 /* First deal with single precision data... */
