@@ -1,3 +1,5 @@
+# -*- Tcl -*-
+
 package cupid {
    version @PACKAGE_VERSION@
    prefix scp
@@ -202,6 +204,7 @@ package cupid {
 
          parameter ilevel {
             position 4
+            access READ
             type _CHAR
             prompt {Information level}
             default NORM
@@ -295,14 +298,14 @@ package cupid {
           }
 
          parameter ilevel {
-            type _INTEGER
-            access READ
-            vpath DEFAULT
-            ppath CURRENT,DEFAULT
+            type _CHAR
             prompt {Information level}
-            default 1
+            default NORM
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            access READ
             helpkey *
-          }
+         }
 
          parameter in {
             position 1

@@ -1,3 +1,5 @@
+/* -*- C -*- */
+
 #include "sae_par.h"
 #include "prm_par.h"
 #include "ndf.h"
@@ -14,8 +16,8 @@
 extern CupidGC cupidGC;
 
 
-void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims,
-                                 char *aname, int *status ){
+void CGEN_FUNCTION(cupidGCDump)( msglev_t msglev, CGEN_TYPE *array, int ndim,
+                                 const int *dims, const char *aname, int *status ){
 /*
 *+
 *  Name:
@@ -28,14 +30,16 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidGCDump<X>( CGEN_TYPE *array, int ndim, int *dims, char *aname,
-*        int *status )
+*     void cupidGCDump<X>( msglev_t msglev, CGEN_TYPE *array, int ndim,
+*         const int *dims, const char *aname, int *status )
 
 *  Description:
 *     This function is a diagnostic function which dumps the supplied
 *     array, or the contents of the cupidGC structure.
 
 *  Parameters:
+*     msglev
+*        Messaging level at which this routine should execute.
 *     array
 *        Pointer to the array to be dumped. If NULL, then the contents of
 *        the cupidGC structure is dumped.
@@ -50,6 +54,7 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims,
 *        Pointer to the inherited status value.
 
 *  Copyright:
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -71,11 +76,14 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims,
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     21-OCT-2005 (DSB):
 *        Original version.
+*     14-JAN-2009 (TIMJ):
+*        Add message level.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -93,6 +101,9 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims,
    char name[ 100 ];
    FILE *fd;
 
+   if (*status != SAI__OK) return;
+   if (!msgFlevok( msglev, status ) ) return;
+
    if( array ) {
 
       for( i = 0; i < cupidGC.ndim; i++ ) {
@@ -101,7 +112,7 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims,
       }
 
       msgSetc( "N", aname );
-      msgOut( "", "      Dumping ^N", status );
+      msgOutif( msglev, "", "      Dumping ^N", status );
 
       ndfOpen( NULL, aname, "WRITE", "NEW", &indf, &place, status );
       ndfNew( CGEN_HDS_TYPE, ndim, lbnd, ubnd, &place, &indf, status );
@@ -139,7 +150,7 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims,
       }
 
       msgSeti( "JJ", jj );
-      msgOut( "", "      Dumping data^JJ, etc", status );
+      msgOutif( msglev, "", "      Dumping data^JJ, etc", status );
 
       sprintf( name, "data%d", jj );
       ndfOpen( NULL, name, "WRITE", "NEW", &indf, &place, status );

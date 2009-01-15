@@ -9,7 +9,7 @@
 
 HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                      double *ipv, double rms, AstKeyMap *config, int velax,
-                     int ilevel, double beamcorr[ 3 ], int *status ){
+                     double beamcorr[ 3 ], int *status ){
 /*
 *+
 *  Name:
@@ -25,7 +25,7 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *  Synopsis:
 *     HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, 
 *                          void *ipd, double *ipv, double rms, 
-*                          AstKeyMap *config, int velax, int ilevel,
+*                          AstKeyMap *config, int velax,
 *                          double beamcorr[ 3 ], int *status )
 
 *  Description:
@@ -62,8 +62,6 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     velax
 *        The index of the velocity axis in the data array (if any). Only
 *        used if "ndim" is 3. 
-*     ilevel
-*        Amount of screen information to display (in range zero to 6).
 *     beamcorr
 *        An array in which is returned the FWHM (in pixels) describing the
 *        instrumental smoothing along each pixel axis. The clump widths
@@ -80,6 +78,7 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     pixel origin is set to the same value as the supplied NDF.
 
 *  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -101,11 +100,14 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     16-JAN-2006 (DSB):
 *        Original version.
+*     14-JAN-2009 (TIMJ):
+*        Use MERS for message filtering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -163,10 +165,8 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    if( *status != SAI__OK ) return ret;
 
 /* Say which method is being used. */
-   if( ilevel > 0 ) {
-      msgBlank( status );
-      msgOut( "", "Reinhold:", status );
-   }
+   msgBlankif( MSG__NORM, status );
+   msgOutif( MSG__NORM, "", "Reinhold:", status );
 
 /* Get the AST KeyMap holding the configuration parameters for this
    algorithm. */
@@ -238,14 +238,14 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    "*peakval" value. All other pixels are set to some other value (which 
    will usually be CUPID__KBACK but will be something else at positions of 
    peaks which were not peaks in all scan directions). */
-   if( ilevel > 2 ) msgOut( "", "Finding clump edges...", status );
+   msgOutif( MSG__DEBUG, "", "Finding clump edges...", status );
    mask = cupidRInitEdges( type, ipd, el, ndim, dims, skip, minlen, thresh, 
                            noise, rms, flatslope, &peakval, status );
 
 /* Dilate the edge regions using a cellular automata. This creates a new
    mask array in which a pixel is marked as an edge pixel if any of its
    neighbours are marked as edge pixels in the mask array created above. */
-   if( ilevel > 2 ) msgOut( "", "Dilating clump edges...", status );
+   msgOutif( MSG__DEBUG, "", "Dilating clump edges...", status );
    mask2 = cupidRCA( mask, NULL, el, dims, skip, 0.0, peakval, CUPID__KEDGE, 
                      CUPID__KBACK, 0, status );
 
@@ -253,7 +253,7 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    the original mask array so that a pixel is marked as an edge pixel if a
    fraction greater than "cathresh" of neighbouring pixels are marked as edge 
    pixels in "mask2". We loop doing this "CAiteration" times. */
-   if( ilevel > 2 && caiter > 0 ) msgOut( "", "Eroding clump edges...", status );
+   if( caiter > 0 ) msgOutif( MSG__DEBUG,"", "Eroding clump edges...", status );
    m1 = mask;
    m2 = mask2;
    for( i = 0; i < caiter; i++ ) {
@@ -267,15 +267,13 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Fill the volume around each peak with integer values which indicate
    which peak they are close to. All the pixels around one peak form one
    clump. */
-   if( ilevel > 2 ) msgOut( "", "Filling clumps...", status );
+   msgOutif( MSG__DEBUG, "", "Filling clumps...", status );
    maxid = cupidRFillClumps( m2, m1, el, ndim, skip, dims, peakval, status );
 
 /* Abort if no clumps found. */
    if( maxid < 0 ) {
-      if( ilevel > 0 ) {
-         msgOut( "", "No usable clumps found.", status );
-         msgBlank( status );
-      }
+      msgOutif( MSG__NORM, "", "No usable clumps found.", status );
+      msgBlankif( MSG__NORM, status );
       goto L10;
    }
 
@@ -283,7 +281,7 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    each output pixel by the most commonly occuring value within a 3x3x3 
    cube of input pixels centred on the output pixel. Put the smoothed
    results back into the supplied "m1" array. */
-   if( ilevel > 2 && fixiter >0 ) msgOut( "", "Smoothing clump boundaries...", status );
+   if( fixiter >0 ) msgOutif( MSG__DEBUG, "", "Smoothing clump boundaries...", status );
    for( i = 0; i < fixiter; i++ ) {
       m2 = cupidRCA2( m1, m2, el, dims, skip, status );
       m3 = m2;
@@ -394,27 +392,23 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          }
       }
 
-      if( ilevel > 0 ) {
-         if( ngood == 0 ) msgOut( "", "No usable clumps found.", status );
+      if( ngood == 0 ) msgOutif( MSG__NORM,"", "No usable clumps found.", status );
 
-         if( ilevel > 0 ) {
-            if( nsmall == 1 ){
-               msgOut( "", "One clump rejected because it contains too few pixels.", status );
-            } else if( nsmall > 1 ) {
-               msgSeti( "N", nsmall );
-               msgOut( "", "^N clumps rejected because they contain too few pixels.", status );
-            }
-            if( nthin == 1 ) {
-               msgOut( "", "1 clump rejected because it spans only a single "
-                       "pixel along one or more axes.", status );
-
-            } else if( nthin > 1 ) {
-               msgSeti( "N", nthin );
-               msgOut( "", "^N clumps rejected because they spans only a single "
-                       "pixel along one or more axes.", status );
-            }
-         }
-      }         
+      if( nsmall == 1 ){
+        msgOutif( MSG__NORM, "", "One clump rejected because it contains too few pixels.", status );
+      } else if( nsmall > 1 ) {
+        msgSeti( "N", nsmall );
+        msgOutif( MSG__NORM, "", "^N clumps rejected because they contain too few pixels.", status );
+      }
+      if( nthin == 1 ) {
+        msgOutif( MSG__NORM, "", "1 clump rejected because it spans only a single "
+                  "pixel along one or more axes.", status );
+          
+      } else if( nthin > 1 ) {
+        msgSeti( "N", nthin );
+        msgOutif( MSG__NORM, "", "^N clumps rejected because they spans only a single "
+                  "pixel along one or more axes.", status );
+      }
 
 /* Sort the clump indices into descending order of peak value. */
       j = ngood;

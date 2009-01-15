@@ -18,7 +18,7 @@
 void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj, 
                        int ndim, int deconv, int backoff, double beamcorr[ 3 ],
                        const char *ttl, int usewcs, AstFrameSet *iwcs, 
-                       int ilevel, const char *dataunits, Grp *hist,
+                       const char *dataunits, Grp *hist,
                        FILE *logfile, int *nclumps, int *status ){
 /*
 *+
@@ -35,7 +35,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *     void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj, 
 *                            int ndim, int deconv, int backoff, 
 *                            double beamcorr[ 3 ], const char *ttl, 
-*                            int usewcs, AstFrameSet *iwcs, int ilevel, 
+*                            int usewcs, AstFrameSet *iwcs, 
 *                            const char *dataunits, Grp *hist,
 *                            FILE *logfile, int *nclumps, int *status )
 
@@ -83,8 +83,6 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *        pixel coords).
 *     iwcs
 *        The WCS FrameSet from the input data, or NULL.
-*     ilevel
-*        The level of information to display.
 *     dataunits
 *        The Units component from the output NDF.
 *     hist
@@ -100,7 +98,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -141,6 +139,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *        Prevent log file columns overlapping.
 *     18-MAR-2008 (DSB):
 *        Added argument "backoff" for Jenny Hatchell.
+*     14-JAN-2009 (TIMJ):
+*        Use MERS for message filtering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -185,7 +185,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    int ncpar;                   /* Number of clump parameters */
    int nok;                     /* No. of usable clumps */
    int nfrm;                    /* Total number of Frames */
-   int nndf;                    /* Total number of NDFs */
+   size_t nndf;                 /* Total number of NDFs */
    int nsmall;                  /* No. of clumps smaller than the beam size */
    int ok;                      /* Is the clump usable? */
    int pixfrm;                  /* Index of PIXEL Frame */
@@ -202,15 +202,17 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    astBegin;
 
 /* Get the total number of NDFs supplied. */
-   datSize( obj, (size_t *) &nndf, status );
+   datSize( obj, &nndf, status );
 
 /* If we are writing the information to an NDF extension, create an array 
    of "nndf" Clump structures in the extension, and get a locator to it. */
    if( xloc ) {
+      hdsdim ndfdims[1];
       aloc = NULL;
       datThere( xloc, "CLUMPS", &there, status );
       if( there ) datErase( xloc, "CLUMPS", status );
-      datNew( xloc, "CLUMPS", "CLUMP", 1, &nndf, status );
+      ndfdims[0] = nndf;
+      datNew( xloc, "CLUMPS", "CLUMP", 1, ndfdims, status );
       datFind( xloc, "CLUMPS", &aloc, status );
    } else {
       aloc = NULL;
@@ -411,36 +413,33 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 
 /* Tell the user how many usable clumps there are and how many were rejected 
    due to being smaller than the beam size. */
-   if( ilevel > 0 ) {
-
-      if( nsmall == 1 ) {
-         msgOut( "", "1 further clump rejected because it "
-                 "is smaller than the beam width.", status );
-      } else if( nsmall > 1 ) {
-         msgSeti( "N", nsmall );
-         msgOut( "", "^N further clumps rejected because "
-                 "they are smaller than the beam width.", status );
-      }
-
-      if( nbad == 1 ) {
-         msgOut( "", "1 further clump rejected because it includes "
-                 "too many bad pixels.", status );
-      } else if( nbad > 1 ) {
-         msgSeti( "N", nbad );
-         msgOut( "", "^N further clumps rejected because they include "
-                 "too many bad pixels.", status );
-      }
-
-      if( iclump == 0 ) {
-         msgOut( "", "No usable clumps found.", status );
-      } else if( iclump == 1 ){
-         msgOut( "", "One usable clump found.", status );
-      } else {
-         msgSeti( "N", iclump );
-         msgOut( "", "^N usable clumps found.", status );
-      }
-      msgBlank( status );
+   if( nsmall == 1 ) {
+     msgOutif( MSG__NORM, "", "1 further clump rejected because it "
+             "is smaller than the beam width.", status );
+   } else if( nsmall > 1 ) {
+     msgSeti( "N", nsmall );
+     msgOutif( MSG__NORM, "", "^N further clumps rejected because "
+             "they are smaller than the beam width.", status );
    }
+
+   if( nbad == 1 ) {
+     msgOutif( MSG__NORM, "", "1 further clump rejected because it includes "
+             "too many bad pixels.", status );
+   } else if( nbad > 1 ) {
+     msgSeti( "N", nbad );
+     msgOutif( MSG__NORM, "", "^N further clumps rejected because they include "
+             "too many bad pixels.", status );
+   }
+
+   if( iclump == 0 ) {
+     msgOutif( MSG__NORM, "", "No usable clumps found.", status );
+   } else if( iclump == 1 ){
+     msgOutif( MSG__NORM, "", "One usable clump found.", status );
+   } else {
+     msgSeti( "N", iclump );
+     msgOutif( MSG__NORM, "", "^N usable clumps found.", status );
+   }
+   msgBlankif( MSG__NORM, status );
 
 /* Resize the array of clump structures, and return the size of the array. */
    if( aloc && iclump < nndf && iclump ) datAlter( aloc, 1, &iclump, status );

@@ -24,7 +24,7 @@ CupidGC cupidGC;
 
 HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                           double *ipv, double rms, AstKeyMap *config, int velax,
-                          int ilevel, double beamcorr[ 3 ], int *status ){
+                          double beamcorr[ 3 ], int *status ){
 /*
 *+
 *  Name:
@@ -40,7 +40,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *  Synopsis:
 *     HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, 
 *                               void *ipd, double *ipv, double rms, 
-*                               AstKeyMap *config, int velax, int ilevel,
+*                               AstKeyMap *config, int velax,
 *                               double beamcorr[ 3 ], int *status )
 
 *  Description:
@@ -95,8 +95,6 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     velax
 *        The index of the velocity axis in the data array (if any). Only
 *        used if "ndim" is 3. 
-*     ilevel
-*        Amount of screen information to display.
 *     beamcorr
 *        An array in which is returned the FWHM (in pixels) describing the
 *        instrumental smoothing along each pixel axis. The clump widths
@@ -131,6 +129,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     pixel origin is set to the same value as the supplied NDF.
 
 *  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -152,6 +151,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -162,6 +162,8 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     7-MAR-2007 (DSB):
 *        Guard against segvio caused by use of null pointers that are
 *        returned by astMalloc if an error has occurred.
+*     14-JAN-2009 (TIMJ):
+*        Use MERS for message filtering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -194,18 +196,18 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int area_thresh;     /* The lower threshold for clump areas */
    int excols;          /* Are extra output columns required? */
    int el;              /* Number of elements in array */
-   int i;               /* Loop count */
-   int iclump;          /* Number of clumps found so far */
+   size_t i;            /* Loop count */
+   size_t iclump;       /* Number of clumps found so far */
    int imax;            /* Index of element with largest residual */
-   int ipeak;           /* Index within "peaks" at which to store the new peak */
+   size_t ipeak;        /* Index within "peaks" at which to store the new peak */
    int iter;            /* Continue finding more clumps? */
    int maxbad;          /* Max number of bad pixels allowed in a clump */
-   int maxclump;        /* Max no. of clumps */
+   size_t maxclump;     /* Max no. of clumps */
    int maxskip;         /* Max no. of failed fits between good fits */
    size_t nclump;       /* Number of usable clumps */
    int niter;           /* Iterations performed so far */
    int npad;            /* No. of peaks below threshold for temination */
-   int npeak;           /* The number of elements in the "peaks" array. */
+   size_t npeak;        /* The number of elements in the "peaks" array. */
    int nskip;           /* No. of failed fits since last good fit */
    int area_below;      /* Count of consecutive clump areas below the threshold */
    int peaks_below;     /* Count of consecutive peaks below the threshold */
@@ -223,11 +225,9 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    new_peak = 0.0;
 
 /* Say which method is being used. */
-   if( ilevel > 0 ) {
-      msgBlank( status );
-      msgOut( "", "GaussClumps:", status );
-      if( ilevel > 1 ) msgBlank( status );
-   }
+   msgBlankif( MSG__NORM, status );
+   msgOutif( MSG__NORM,  "", "GaussClumps:", status );
+   msgBlankif( MSG__VERB, status );
 
 /* Get the AST KeyMap holding the configuration parameters for this
    algorithm. */
@@ -276,10 +276,10 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    of elements in the array. We use the memory management functions of the 
    AST library since they provide greater security and functionality than 
    direct use of malloc, etc. */
-   dims = astMalloc( sizeof( int )*(size_t) ndim );
+   dims = astMalloc( sizeof( *dims )*(size_t) ndim );
    el = 1;
    if( dims ) {
-      for( i = 0; i < ndim; i++ ) {
+     for( i = 0; i < (size_t)ndim; i++ ) {
          dims[ i ] = subnd[ i ] - slbnd[ i ] + 1;
          el *= dims[ i ];
       }
@@ -290,11 +290,6 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    cupidStore macro is a wrapper around the astStore function. */
    res = cupidStore( NULL, ipd, el, type, "cupidGaussClumps" );
    if( res ) {
-
-/* Store the information level in the cupidGC structure, from where it
-   can be accessed from the service routines which evaluate the objective
-   function for the fitting routine. */
-      cupidGC.ilevel = ilevel;
 
 /* Set the lower threshold for clump peaks to a user-specified multiple
    of the RMS noise. */
@@ -331,7 +326,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       nskip = 0;
       sumclumps = 0.0;
       sumdata = VAL__BADD;
-      peaks = astMalloc( sizeof( double )*npeak );
+      peaks = astMalloc( sizeof( *peaks )*npeak );
       if( peaks ) {
          for( i = 0; i < npeak; i++ ) peaks[ i ] = 0.0;
 
@@ -343,10 +338,11 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    identifier. */
          if( setjmp( CupidGCHere ) ) {
             iter = 0;
-            msgBlank( status );
-            msgOut( "", "Interupt detected. Clumps found so far will be saved",
-                    status );
-            msgBlank( status );
+            msgBlankif( MSG__QUIET, status );
+            msgOutif( MSG__QUIET, "",
+                      "Interupt detected. Clumps found so far will be saved",
+                      status );
+            msgBlankif( MSG__QUIET, status );
          }
       }
 
@@ -360,11 +356,8 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Report the iteration number to the user if required. */
          ++niter;         
-         if( ilevel > 3 ) {
-            msgBlank( status );
-            msgSetd( "N", niter );
-            msgOut( "", "Iteration ^N:", status );
-         }
+         msgBlankif( MSG__DEBUG1, status );
+         msgOutiff( MSG__DEBUG1, "", "Iteration %d:", status, niter );
 
 /* Find the 1D vector index of the elements with the largest value in the 
    residuals array. */
@@ -375,21 +368,18 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          if( allbad ) {    
             iter = 0;
             niter--;
-            if( ilevel > 2 ) msgBlank( status );
-            if( ilevel > 3 ) {
-               msgOut( "", "There are no good pixels left to be fitted.", 
-                       status );
-               msgBlank( status );
-            }
+            msgBlankif( MSG__DEBUG, status );
+            msgOutif( MSG__DEBUG1, "",
+                      "There are no good pixels left to be fitted.", 
+                      status );
+            msgBlankif( MSG__DEBUG1, status );
          } else if( nskip > maxskip ){
             iter = 0;
             niter--;
-            if( ilevel > 2 ) msgBlank( status );
-            if( ilevel > 3 ) {
-               msgSeti( "N", maxskip );
-               msgOut( "", "The previous ^N fits were unusable.", status );
-               msgBlank( status );
-            }
+            msgBlankif( MSG__DEBUG, status );
+            msgOutiff( MSG__DEBUG1, "",
+                       "The previous %d fits were unusable.", status, maxskip );
+            msgBlankif( MSG__DEBUG1, status );
          }
 
 /* If not, make an initial guess at the Gaussian clump parameters centred
@@ -438,18 +428,17 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    returned HDS object. The standard deviation of the new residuals is 
    returned. */
                   cupidGCUpdateArrays( type, res, ipd, el, ndim, dims,
-                                       x, rms, mlim, imax, ilevel, slbnd,    
+                                       x, rms, mlim, imax, slbnd,    
                                        &ret, iclump, excols, mean_peak,
                                        maxbad, &area, &sumclumps, status );
 
 /* Dump the modified residuals if required. */
-                  if( ilevel > 5 ) {
-                     sprintf( buf, "residuals%d", iclump );
-                     cupidGCDump( type, res, ndim, dims, buf, status );
-                  }
+                  sprintf( buf, "residuals%lu", iclump );
+                  cupidGCDump( type, MSG__DEBUG3, res, ndim, dims, buf,
+                               status );
 
 /* Display the clump parameters on the screen if required. */
-                  cupidGCListClump( iclump, ndim, x, chisq, slbnd, ilevel,
+                  cupidGCListClump( iclump, ndim, x, chisq, slbnd,
                                     rms, status );
 
 /* If this clump has a peak value which is below the threshold, increment
@@ -474,55 +463,48 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                   if( iclump == maxclump ) {
                      iter = 0;
 
-                     if( ilevel > 2 ) msgBlank( status );
-                     if( ilevel > 3 ) {
-                        msgSeti( "M", maxclump );
-                        msgOut( "", "The specified maximum number of "
-                                "clumps (^M) have been found.", status );
-                        msgBlank( status );
-                     }
+                     msgBlankif( MSG__DEBUG, status );
+                     msgOutiff( MSG__DEBUG1, "",
+                                "The specified maximum number of "
+                                "clumps (%lu) have been found.", status,
+                                maxclump );
+                     msgBlankif( MSG__DEBUG1, status );
 
 /* If the integrated data sum in the fitted gaussians exceeds or equals
    the integrated data sum in th einput, exit. */
                   } else if( sumclumps >= sumdata ) {
                      iter = 0;
 
-                     if( ilevel > 2 ) msgBlank( status );
-                     if( ilevel > 3 ) {
-                        msgSetr( "SC", (float) sumclumps );
-                        msgSetr( "SD", (float) sumdata );
-                        msgOut( "", "The total data sum of the fitted "
-                                "Gaussians (^SC) has reached the total "
-                                "data sum in the supplied data (^SD).", 
-                                status );
-                        msgBlank( status );
-                     }
+                     msgBlankif( MSG__DEBUG, status );
+                     msgOutiff( MSG__DEBUG1,"",
+                                "The total data sum of the fitted "
+                                "Gaussians (%g) has reached the total "
+                                "data sum in the supplied data (%g).", 
+                                status, (float)sumclumps, (float)sumdata );
+                     msgBlankif( MSG__DEBUG1, status );
                   
 /* If the count of consecutive peaks below the threshold has reached
    "Npad", terminate. */
                   } else if( peaks_below == npad ) {
                      iter = 0;
  
-                     if( ilevel > 2 ) msgBlank( status );
-                     if( ilevel > 3 ) {
-                        msgSeti( "N", npad );
-                        msgOut( "", "The previous ^N clumps all had peak "
-                                "values below the threshold.", status );
-                        msgBlank( status );
-                     }
+                     msgBlankif( MSG__DEBUG, status );
+                     msgOutiff( MSG__DEBUG1, "",
+                                "The previous %d clumps all had peak "
+                                "values below the threshold.", status,
+                                npad );
+                     msgBlankif( MSG__DEBUG1, status );
 
 /* If the count of consecutive clumps with area below the threshold has reached
    "Npad", terminate. */
                   } else if( area_below == npad ) {
                      iter = 0;
  
-                     if( ilevel > 2 ) msgBlank( status );
-                     if( ilevel > 3 ) {
-                        msgSeti( "N", npad );
-                        msgOut( "", "The previous ^N clumps all had areas "
-                                "below the threshold.", status );
-                        msgBlank( status );
-                     }
+                     msgBlankif( MSG__DEBUG, status );
+                     msgOutiff( MSG__DEBUG1, "",
+                                "The previous %d clumps all had areas "
+                                "below the threshold.", status, npad );
+                     msgBlankif( MSG__DEBUG1, status );
                   }
 
 /* If the peak value fitted is very different from the previous fitted peak
@@ -538,15 +520,15 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                   new_peak = 0.5*( new_peak + x[ 0 ] );
 
                   nskip++;
-                  if( ilevel > 3 ) msgOut( "", "   Clump rejected due to "
-                                           "aberrant peak value.", status );
+                  msgOutif( MSG__DEBUG1, "", "   Clump rejected due to "
+                            "aberrant peak value.", status );
                }
 
 /* Tell the user if no clump could be fitted around the current peak
    pixel value */
             } else {
                nskip++;
-               if( ilevel > 3 ) msgOut( "", "   No clump fitted.", status );
+               msgOutif( MSG__DEBUG1, "", "   No clump fitted.", status );
 
 /* Set the specified element of the residuals array bad if no fit was 
    performed. This prevents the any subsequent attempt to fit a Gaussian 
@@ -559,45 +541,41 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
             }
 
 /* Tell the user if one of the trmination criteria has ben met. */
-         } else if( ilevel > 3 ) {
-            msgOut( "", "   At least one termination criterion has been reached.", status );
-            msgBlank( status );
+         } else {
+           msgOutif( MSG__DEBUG1, "",
+                     "   At least one termination criterion has been reached.",
+                     status );
+           msgBlankif( MSG__DEBUG1, status );
          }
       }
 
 /* Tell the user how clumps are being returned. */
-      if( ilevel > 0 ) {
+      if( ret ) {
+        datSize( ret, &nclump, status );
+      } else {
+        nclump = 0;
+      }
 
-         if( ret ) {
-            datSize( ret, &nclump, status );
-         } else {
-            nclump = 0;
-         }
-
-         if( nclump == 0 ) msgOut( "", "No usable clumps found.", status );
+      if( nclump == 0 ) msgOutif( MSG__NORM, "", "No usable clumps found.", status );
    
-         if( ilevel > 0 ) {
-            if( iclump - nclump == 1 ) {
-               msgOut( "", "1 clump rejected because it touches an edge of "
-                       "the data array.", status );
-            } else if( iclump - nclump > 1 ) {
-               msgSeti( "N", iclump - nclump );
-               msgOut( "", "^N clumps rejected because they touch an edge of "
-                       "the data array.", status );
-            }
-         }
+      if( iclump - nclump == 1 ) {
+        msgOutif( MSG__NORM, "",
+                  "1 clump rejected because it touches an edge of "
+                  "the data array.", status );
+      } else if( iclump - nclump > 1 ) {
+        msgOutiff( MSG__NORM, "",
+                   "%d clumps rejected because they touch an edge of "
+                   "the data array.", status, iclump - nclump );
       }
 
 /* Tell the user how many iterations have been performed (i.e. how many
    attempts there have been to fit a Gaussian peak). */
-      if( ilevel > 3 ) {
-         if( niter == 1 ){
-            msgOut( "", "No fit attempted.", status );
-         } else {
-            msgSeti( "M", niter - iclump );
-            msgSeti( "N", niter );
-            msgOut( "", "Fits attempted for ^N candidate clumps (^M failed).", status );
-         }
+      if( niter == 1 ){
+        msgOutif( MSG__DEBUG1, "", "No fit attempted.", status );
+      } else {
+        msgOutiff( MSG__DEBUG1, "",
+                   "Fits attempted for %d candidate clumps (%d failed).",
+                   status, niter - iclump, niter );
       }
 
 /* Free resources */

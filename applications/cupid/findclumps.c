@@ -172,22 +172,26 @@ void findclumps( int *status ) {
 *        values are stored in the output catalogue and NDF. Note, the filter 
 *        to remove clumps smaller than the beam width is still applied, even
 *        if DECONV is FALSE. [TRUE]
-*     ILEVEL = _INTEGER (Read)
+*     ILEVEL = _CHAR (Read)
 *        Controls the amount of diagnostic information reported. It
-*        should be in the range 0 to 6. A value of zero will suppress all 
-*        screen output. Larger values give more information (the precise 
+*        uses the standard message filtering system. It should be in
+*        the range 0 to 6 (NONE, QUIET, NORM, VERB, DEBUG,
+*        DEBUG1-3). A value of NONE (zero) will suppress all screen
+*        output. Larger values give more information (the precise
 *        information displayed depends on the algorithm being used).
-*        Note, this screen output describes the progress of the specific clump
-*        finding algorithm selected using the METHOD parameter, and therefore 
-*        clump parameters such as clump size, etc, will be displayed
-*        using the definition most natural to the chosen algorithm. These
-*        definitions may not be the same as those used to create the output
-*        catalogue, since the output catalogue contains standardised columns 
-*        chosen to allow comparison between different algorithms. For
-*        instance, the clump sizes displayed on the screen by the GaussClumps
-*        algorithm will be FWHM in pixels, but the clump sizes stored in the 
-*        output catalogue are the RMS deviation of each pixel centre from the 
-*        clump centroid, weighted by the corresponding pixel data value. [1]
+*        Note, this screen output describes the progress of the
+*        specific clump finding algorithm selected using the METHOD
+*        parameter, and therefore clump parameters such as clump size,
+*        etc, will be displayed using the definition most natural to
+*        the chosen algorithm. These definitions may not be the same
+*        as those used to create the output catalogue, since the
+*        output catalogue contains standardised columns chosen to
+*        allow comparison between different algorithms. For instance,
+*        the clump sizes displayed on the screen by the GaussClumps
+*        algorithm will be FWHM in pixels, but the clump sizes stored
+*        in the output catalogue are the RMS deviation of each pixel
+*        centre from the clump centroid, weighted by the corresponding
+*        pixel data value. [NORM]
 *     IN = NDF (Read)
 *        The 1, 2 or 3 dimensional NDF to be analysed. 
 *     LOGFILE = LITERAL (Read)
@@ -715,8 +719,8 @@ void findclumps( int *status ) {
 *     catalogue is reduced (in quadrature) by this amount. [2.0]
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2005-2007 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2007-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -763,6 +767,8 @@ void findclumps( int *status ) {
 *        Added adam parameter BACKOFF.
 *     15-JUL-2008 (TIMJ):
 *        Tweak to GRP C API.
+*     14-JAN-2009 (TIMJ):
+*        Use MERS for message filtering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -825,7 +831,6 @@ void findclumps( int *status ) {
    int gotwcs;                  /* Does input NDF contain a WCS FrameSet? */
    int i;                       /* Loop count */
    int ifr;                     /* Index of Frame within WCS FrameSet */
-   int ilevel;                  /* Interaction level */
    int indf2;                   /* Identifier for main output NDF */
    int indf3;                   /* Identifier for Quality output NDF */
    int indf;                    /* Identifier for input NDF */
@@ -872,6 +877,9 @@ void findclumps( int *status ) {
 
 /* Start an NDF context */
    ndfBegin();
+
+/* Get the interaction level. */
+   msgIfget( "ILEVEL", status );
 
 /* Get an identifier for the input NDF. We use NDG (via kpg1_Rgndf)
    instead of calling ndfAssoc directly since NDF/HDS has problems with
@@ -1016,9 +1024,10 @@ void findclumps( int *status ) {
 /* Issue a warnining if no velocity axis was found, and use pixel axis 3. */
       if( velax == -1 ) {
          velax = 2;
-         msgOut( "", "WARNING: Cannot identify a velocity axis within the "
-                 "supplied NDF. Assuming pixel axis 3 is the velocity axis.", 
-                 status );
+         msgOutif( MSG__QUIET, "",
+                   "WARNING: Cannot identify a velocity axis within the "
+                   "supplied NDF. Assuming pixel axis 3 is the velocity axis.", 
+                   status );
       }
    }         
 
@@ -1034,9 +1043,7 @@ void findclumps( int *status ) {
 /* Map the Data array. */
    ndfMap( indf, "DATA", itype, "READ", &ipd, &el, status );
 
-/* Get the interaction level. */
-   parGdr0i( "ILEVEL", 1, 0, 6, 1, &ilevel, status );
-   if( ilevel > 0 ) msgBlank( status );
+   msgBlankif( MSG__NORM, status );
 
 /* See if clump parameters should be deconvolved. */
    parGet0l( "DECONV", &deconv, status );
@@ -1139,20 +1146,20 @@ void findclumps( int *status ) {
 /* Switch for each method */
    if( !strcmp( method, "GAUSSCLUMPS" ) ) {
       ndfs = cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, rms, 
-                               keymap, velax, ilevel, beamcorr, status ); 
+                               keymap, velax, beamcorr, status ); 
 
    } else if( !strcmp( method, "CLUMPFIND" ) ) {
       ndfs = cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                             keymap, velax, ilevel, perspectrum, beamcorr, 
+                             keymap, velax, perspectrum, beamcorr, 
                              &backoff, status ); 
       
    } else if( !strcmp( method, "REINHOLD" ) ) {
       ndfs = cupidReinhold( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                            keymap, velax, ilevel, beamcorr, status ); 
+                            keymap, velax, beamcorr, status ); 
       
    } else if( !strcmp( method, "FELLWALKER" ) ) {
       ndfs = cupidFellWalker( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                              keymap, velax, ilevel, perspectrum, beamcorr, 
+                              keymap, velax, perspectrum, beamcorr, 
                               status ); 
       
    } else if( *status == SAI__OK ) {
@@ -1240,18 +1247,18 @@ void findclumps( int *status ) {
       ndfState( indf, "WCS", &gotwcs, status );
       cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, deconv, backoff, 
                         beamcorr, "Output from CUPID:FINDCLUMPS", usewcs, 
-                        gotwcs ? iwcs : NULL, ilevel, dataunits, 
+                        gotwcs ? iwcs : NULL, dataunits, 
                         confgrp, logfile, &nclumps, status );
 
       if( logfile ) fprintf( logfile, "\n\n" );
 
 /* Allocate room for a mask holding bad values for points which are not 
    inside any clump. */
-      rmask = astMalloc( sizeof( float )*(size_t) el );
+      rmask = astMalloc( sizeof( *rmask )*(size_t) el );
 
 /* Create any output NDF by summing the contents of the NDFs describing the 
    found and usable clumps. This also fills the above mask array. */
-      cupidSumClumps( type, ipd, ilevel, nsig, slbnd, subnd, el, ndfs, 
+      cupidSumClumps( type, ipd, nsig, slbnd, subnd, el, ndfs, 
                       rmask, ipo, method, status );
 
 /* Delete any existing quality name information from the output NDF, and 
@@ -1349,7 +1356,7 @@ void findclumps( int *status ) {
 /* Report the configuration (if any). */
       parGet0l( "REPCONF", &repconf, status );
       if( repconf ) {
-         msgBlank( status );
+         msgBlankif( MSG__QUIET, status );
          if( logfile ) fprintf( logfile, "\n" );
 
 /* Display the values, including the algorithm name. */
@@ -1364,20 +1371,20 @@ void findclumps( int *status ) {
                   confpar = 0;
 
                } else if( !strcmp( value, CONF_STRING ) ) {
-                  msgOut( "", "Configuration parameters:", status );
+                  msgOutif( MSG__QUIET,"", "Configuration parameters:", status );
 
                } else if( astChrLen( value ) == 0 ) {
-                  msgBlank( status );
+                  msgBlankif( MSG__QUIET, status );
 
                } else if( confpar && strcmp( value, LINE_STRING ) ){
                   msgSetc( "A", method );
                   msgSetc( "V", value );
-                  msgOut( "", "   ^A.^V", status );
+                  msgOutif( MSG__QUIET, "", "   ^A.^V", status );
 
                }
             }
          }
-         msgBlank( status );
+         msgBlankif( MSG__QUIET, status );
          if( logfile ) fprintf( logfile, "\n" );
       }
 

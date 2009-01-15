@@ -1,3 +1,5 @@
+/* -*- C -*- */
+
 #include "sae_par.h"
 #include "cupid.h"
 #include "ast.h"
@@ -8,7 +10,7 @@
 void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
                                  int dims[ 3 ], int skip[ 3 ], double rms, 
                                  AstKeyMap *config, int *ipa, double *peakvals,
-                                 int *npeak, int ilevel, int perspectrum,
+                                 int *npeak, int perspectrum,
                                  int *status ){
 /*
 *+
@@ -25,7 +27,7 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 *     void cupidFWJoin<X>( CGEN_TYPE *array, int nel, int ndim,
 *                          int dims[ 3 ], int skip[ 3 ], double rms, 
 *                          AstKeyMap *config, int *ipa, double *peakvals,
-*                          int *npeak, int ilevel, int perspectrum, 
+*                          int *npeak, int perspectrum, 
 *                          int *status )
 
 *  Description:
@@ -87,8 +89,6 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 *        The address of an integer holding the highest clump index value
 *        in "ipa". On exit, the supplied value will be reduced if any of 
 *        the clumps were merged.
-*     ilevel
-*        Amount of information to display.
 *     perspectrum
 *        If non-zero, then each spectrum is processed independently of its
 *        neighbours. A clump that extends across several spectra will be 
@@ -109,7 +109,7 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -130,6 +130,7 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -141,6 +142,8 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 *        Fix bug that caused incorrect clumps to be merged.
 *     17-SEP-2007 (DSB):
 *        Added "perspectrum" parameter.
+*     14-JAN-2009 (TIMJ):
+*        Use MERS for message filtering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -349,14 +352,13 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 /* If necesaary, translate all the values in "ipa" using the above table. */
          if( trans ) {
 
-            if( ilevel > 2 ) {
-               for( ipeak = 0; ipeak <= *npeak; ipeak++ ) {
-                  if( ipeak != table2[ ipeak ] ) {
-                     msgSeti( "P0", ipeak );
-                     msgSeti( "P1", table2[ ipeak ] );
-                     msgOut( "", "Moving clump ^P0 into clump ^P1", status );
-                  }
-               }
+            for( ipeak = 0; ipeak <= *npeak; ipeak++ ) {
+              if( ipeak != table2[ ipeak ] ) {
+                msgSeti( "P0", ipeak );
+                msgSeti( "P1", table2[ ipeak ] );
+                msgOutif( MSG__DEBUG, "",
+                          "Moving clump ^P0 into clump ^P1", status );
+              }
             }
 
             pa = ipa;

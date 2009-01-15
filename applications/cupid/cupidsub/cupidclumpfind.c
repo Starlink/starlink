@@ -8,7 +8,7 @@
 
 HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                         double *ipv, double rms, AstKeyMap *config, int velax,
-                        int ilevel, int perspectrum, double beamcorr[ 3 ], 
+                        int perspectrum, double beamcorr[ 3 ], 
                         int *backoff, int *status ){
 /*
 *+
@@ -25,7 +25,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *  Synopsis:
 *     HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, 
 *                             void *ipd, double *ipv, double rms, 
-*                             AstKeyMap *config, int velax, int ilevel,
+*                             AstKeyMap *config, int velax,
 *                             int perspectrum, double beamcorr[ 3 ], 
 *                             int *backoff, int *status )
 
@@ -65,8 +65,6 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     velax
 *        The index of the velocity axis in the data array (if any). Only
 *        used if "ndim" is 3. 
-*     ilevel
-*        Amount of screen information to display.
 *     perspectrum
 *        If non-zero, then each spectrum is processed independently of its
 *        neighbours. A clump that extends across several spectra will be 
@@ -92,8 +90,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2007 Science & Technology Facilities Council.
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -114,6 +111,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -123,6 +121,8 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        Added "perspectrum" parameter.
 *     19-MAR-2008 (DSB):
 *        Added "backoff" parameter.
+*     14-JAN-2009 (TIMJ):
+*        Use MERS for message filtering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -171,11 +171,9 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    if( *status != SAI__OK ) return ret;
 
 /* Say which method is being used. */
-   if( ilevel > 0 ) {
-      msgBlank( status );
-      msgOut( "", "ClumpFind:", status );
-      if( ilevel > 1 ) msgBlank( status );
-   }
+   msgBlankif( MSG__NORM, status );
+   msgOutif( MSG__NORM, "", "ClumpFind:", status );
+   msgBlankif( MSG__VERB, status );
 
 /* Get the AST KeyMap holding the configuration parameters for this
    algorithm. */
@@ -299,10 +297,8 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          clevel = levels[ ilev ];
 
 /* Tell the user the current contour level. */
-         if( ilevel > 1 ) {
-            msgSetd( "C", clevel );
-            msgOut( "", "Contour level ^C:", status );
-         }
+         msgSetd( "C", clevel );
+         msgOutif( MSG__VERB, "", "Contour level ^C:", status );
 
 /* Scan the data array at a new contour level. This extends clumps found
    at a higher contour level, and adds any new clumps found at this contour
@@ -313,16 +309,17 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          if( clevel <= maxrem ) {
             clumps = cupidCFScan( type, ipd, ipa, el, ndim, dims, skip, 
                                   ( ndim == 3 && perspectrum ) ? ( velax + 1 ) : 0,
-                                  clumps, idl, clevel, &index, naxis, ilevel,
+                                  clumps, idl, clevel, &index, naxis,
                                   idl || ilev < nlevels - 1, slbnd, &maxrem, status );
 
-         } else if( ilevel > 2 ) {
-            msgOut( "", "   No pixels found at this contour level.", status );
+         } else {
+           msgOutif(MSG__DEBUG, "",
+                    "   No pixels found at this contour level.", status );
          }
       }
 
 /* Mark end of contour levels. */
-      if( ilevel > 1 ) msgBlank( status );
+      msgBlankif( MSG__VERB, status );
 
 /* Get the minimum number of pixels allowed in a clump.*/
       if( perspectrum ) {
@@ -369,40 +366,43 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       }
 
 /* Tell the user how clumps are being returned. */
-      if( ilevel > 0 ) {
-         if( nclump == 0 ) msgOut( "", "No usable clumps found.", status );
+         if( nclump == 0 ) msgOutif( MSG__NORM, "",
+                                     "No usable clumps found.", status );
 
-         if( ilevel > 0 ) {
-            msgSeti( "M", minpix );
-            if( nminpix == 1 ) {
-               msgOut( "", "1 clump rejected because it contains fewer "
-                       "than MinPix (^M) pixels.", status );
-            } else if( nminpix > 1 ) {
-               msgSeti( "N", nminpix );
-               msgOut( "", "^N clumps rejected because they contain fewer "
-                       "than MinPix (^M) pixels.", status );
-            }
-   
-            if( nedge == 1 ) {
-               msgOut( "", "1 clump rejected because it touches an edge of "
-                       "the data array.", status );
-            } else if( nedge > 1 ) {
-               msgSeti( "N", nedge );
-               msgOut( "", "^N clumps rejected because they touch an edge of "
-                       "the data array.", status );
-            }
-
-            if( nthin == 1 ) {
-               msgOut( "", "1 clump rejected because it spans only a single "
-                       "pixel along one or more axes.", status );
-
-            } else if( nthin > 1 ) {
-               msgSeti( "N", nthin );
-               msgOut( "", "^N clumps rejected because they spans only a single "
-                       "pixel along one or more axes.", status );
-            }
+         msgSeti( "M", minpix );
+         if( nminpix == 1 ) {
+           msgOutif( MSG__NORM,"", "1 clump rejected because it contains fewer "
+                   "than MinPix (^M) pixels.", status );
+         } else if( nminpix > 1 ) {
+           msgSeti( "N", nminpix );
+           msgOutif( MSG__NORM, "",
+                     "^N clumps rejected because they contain fewer "
+                   "than MinPix (^M) pixels.", status );
          }
-      }
+   
+         if( nedge == 1 ) {
+           msgOutif( MSG__NORM, "",
+                     "1 clump rejected because it touches an edge of "
+                     "the data array.", status );
+         } else if( nedge > 1 ) {
+           msgSeti( "N", nedge );
+           msgOutif( MSG__NORM, "",
+                     "^N clumps rejected because they touch an edge of "
+                     "the data array.", status );
+         }
+
+         if( nthin == 1 ) {
+           msgOutif( MSG__NORM, "",
+                   "1 clump rejected because it spans only a single "
+                   "pixel along one or more axes.", status );
+
+         } else if( nthin > 1 ) {
+           msgSeti( "N", nthin );
+           msgOutif( MSG__NORM, "",
+                     "^N clumps rejected because they spans only a single "
+                     "pixel along one or more axes.", status );
+         }
+
 
 /* Shuffle non-null clump pointers to the start of the "clumps" array,
    and count them. */
@@ -445,7 +445,8 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Free resources */
       for( i = 0; i < index; i++ ) {
-         if( clumps[ i ] ) clumps[ i ] = cupidCFFreePS( clumps[ i ], NULL, 0, status );
+         if( clumps[ i ] ) clumps[ i ] = cupidCFFreePS( clumps[ i ], NULL,
+                                                        0, status );
       }
       clumps = astFree( clumps );
       levels = astFree( levels );

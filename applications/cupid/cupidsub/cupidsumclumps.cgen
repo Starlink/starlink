@@ -1,3 +1,5 @@
+/* -*- C -*- */
+
 #include "sae_par.h"
 #include "ndf.h"
 #include "cupid.h"
@@ -11,7 +13,7 @@
 #define REINHOLD    3
 #define FELLWALKER  4
 
-void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim, 
+void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ndim, 
                                     int *lbnd, int *ubnd, int nel, HDSLoc *obj,
                                     float *rmask, void *out, const char *method,
                                     int *status ){
@@ -28,7 +30,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidSumClumps<X>( CGEN_TYPE *in, int ilevel, int ndim, int *lbnd, 
+*     void cupidSumClumps<X>( CGEN_TYPE *in, int ndim, int *lbnd, 
 *                             int *ubnd, int nel, HDSLoc *obj, float *rmask, 
 *                             void *out, const char *method, int *status )
 
@@ -40,8 +42,6 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 *  Parameters:
 *     in
 *        Pointer to the start of the input data array. May be null.
-*     ilevel
-*        The level of screen information required.
 *     ndim
 *        The number of pixel axes in the "out" array.
 *     lbnd
@@ -80,6 +80,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 *     CUPID__FLOAT, etc.
 
 *  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -101,6 +102,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -108,6 +110,8 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 *        Original version.
 *     22-MAR-2007 (DSB):
 *        Plug NDF identifier leak.
+*     14-JAN-2009 (TIMJ):
+*        Use MERS for message filtering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -137,7 +141,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
    int indf;            /* NDF identifier for clump image */
    int j;               /* Clump loop count */
    int k;               /* Axis loop count */
-   int nclump;          /* Number of clump NDFs supplied */
+   size_t nclump;       /* Number of clump NDFs supplied */
    int step[ 3 ];       /* 1D step between adjacent pixels on each axis */
    int yy[ 3 ];         /* nD pixel coords of current "out" pixel */
 
@@ -202,7 +206,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 
 /* Loop round all non-NULL clumps. */
    clump_index = 0;
-   datSize( obj, (size_t *) &nclump, status );
+   datSize( obj, &nclump, status );
    for( j = 1; j <= nclump; j++ ) {
       cloc = NULL;
       datCell( obj, 1, &j, &cloc, status );

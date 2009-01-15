@@ -1,3 +1,5 @@
+/* -*- C -*- */
+
 #include "sae_par.h"
 #include "cupid.h"
 #include "ast.h"
@@ -7,7 +9,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
                                             int ndim, int dims[3], int skip[3],
                                             int perspectrum, CupidPixelSet **clumps, 
                                             int idl, double clevel, int *index,
-                                            int naxis, int ilevel, int newok,
+                                            int naxis, int newok,
                                             int *slbnd, double *maxpd,
                                             int *status ){
 /*
@@ -26,7 +28,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 *                                     int ndim, int dims[3], int skip[3], 
 *                                     int perspectrum, CupidPixelSet **clumps, 
 *                                     int idl, double clevel, int *index, 
-*                                     int naxis, int ilevel, int newok, 
+*                                     int naxis, int newok, 
 *                                     int *slbnd, double *maxpd, int *status )
 
 *  Description:
@@ -102,8 +104,6 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 *        the two pixels must be no more than 1 pixel away along no more than 
 *        "naxis" axes. The supplied value is ignored and a value of 1 is
 *        used if "perspectrum" is non-zero.
-*     ilevel
-*        Diagnostic information level.
 *     newok
 *        Can new clumps be started at this contour level?
 *     slbnd
@@ -141,7 +141,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -162,6 +162,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -169,6 +170,8 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 *        Original version.
 *     17-SEP-2007 (DSB):
 *        Added "perspectrum" parameter.
+*     14-JAN-2009 (TIMJ):
+*        Use MERS for message filtering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -333,11 +336,10 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
          total_pop += ps->pop;
 
 /* Tell the user about the new PixelSet. */
-         if( ilevel > 3 ) {
-            msgSeti( "I", ps->index );
-            msgSeti( "P", ps->pop );
-            msgOut( "", "   New PixelSet: index ^I population ^P", status );
-         }
+         msgSeti( "I", ps->index );
+         msgSeti( "P", ps->pop );
+         msgOutif( MSG__DEBUG1, "",
+                   "   New PixelSet: index ^I population ^P", status );
 
 /* If we are using the "friends-of-friends" algorithm (as described in
    the 1994 ApJ Williams et al paper) to carve up merged contours, then we
@@ -364,31 +366,31 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
          if( ps->pop == 0 ) {
             ret[ i ] = cupidCFFreePS( ps, NULL, nel, status );
             if( i == *index - 1 ) (*index)--;
-            if( ilevel > 3 ) msgOut( "", "      Transferred to adjoining "
-                                     "PixelSets", status );
+            msgOutif( MSG__DEBUG1, "", "      Transferred to adjoining "
+                    "PixelSets", status );
 
 /* If Pixels remain in the PixelSet then it is a new clump, so tell the user 
    and leave it in the returned list of clumps. */
          } else if( newok ) {
-            if( ilevel > 3 ) {
-               msgSetd( "V", ps->vpeak );
-               msgSeti( "C", ps->peak[ 0 ] + slbnd[ 0 ] - 1 );
-               for( j = 1; j < ndim; j++ ) {
-                  msgSetc( "C", "," );
-                  msgSeti( "C", ps->peak[ j ] + slbnd[ j ] - 1 );
-               }
-               msgOut( "", "      Retained as a new peak: pos (^C): value ^V", 
-                       status );
+            msgSetd( "V", ps->vpeak );
+            msgSeti( "C", ps->peak[ 0 ] + slbnd[ 0 ] - 1 );
+            for( j = 1; j < ndim; j++ ) {
+              msgSetc( "C", "," );
+              msgSeti( "C", ps->peak[ j ] + slbnd[ j ] - 1 );
             }
+            msgOutif( MSG__DEBUG1, "",
+                      "      Retained as a new peak: pos (^C): value ^V", 
+                      status );
+
             new_clumps++;
 
 /* If no new clumps are allowed, tell the user, and free the clump. */   
          } else {
             ret[ i ] = cupidCFFreePS( ps, NULL, nel, status );
             if( i == *index - 1 ) (*index)--;
-            if( ilevel > 3 ) msgOut( "", "      Ignored (no new clumps "
-                                     "can be started at this contour level).",
-                                     status );
+            msgOutif( MSG__DEBUG1, "", "      Ignored (no new clumps "
+                      "can be started at this contour level).",
+                      status );
          } 
 
 /* If a null PixelSet pointer was encountered at the end of the list,
@@ -399,14 +401,12 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    }
 
 /* Issue summary information for this contour level. */
-   if( ilevel > 2 ) {
-      msgSeti( "P", total_pop );
-      msgSetc( "P", (total_pop == 1) ? " pixel" : " pixels" );
-      msgSeti( "N", new_clumps );
-      msgSetc( "N", (new_clumps == 1) ? " new clump" : " new clumps" );
-      msgOut( "", "   ^P checked, ^N found", status );
-      msgBlank( status );
-   }
+   msgSeti( "P", total_pop );
+   msgSetc( "P", (total_pop == 1) ? " pixel" : " pixels" );
+   msgSeti( "N", new_clumps );
+   msgSetc( "N", (new_clumps == 1) ? " new clump" : " new clumps" );
+   msgOutif( MSG__DEBUG,  "", "   ^P checked, ^N found", status );
+   msgBlankif( MSG__DEBUG, status );
 
 /* Rationalise the use of index values in order to make unused slots in
    the returned array free. First allocate an array to hold the
@@ -428,11 +428,10 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 /* If the index value associated with the clump is about to change, tell
    the user if requested. */
             if( i != new_index ) {
-               if( ilevel > 3 ) {
-                  msgSeti( "I", i );
-                  msgSeti( "J", new_index );
-                  msgOut( "", "   Changing index ^I to index ^J", status );
-               }
+              msgSeti( "I", i );
+              msgSeti( "J", new_index );
+              msgOutif( MSG__DEBUG1,"",
+                        "   Changing index ^I to index ^J", status );
    
 /* Change the index value stored in the PixelSet structure.*/
                ret[ i ]->index = new_index;

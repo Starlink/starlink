@@ -88,6 +88,7 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
 *     The chi-squared value or gradient.
 
 *  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -109,6 +110,7 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -117,6 +119,8 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
 *     9-MAR-2007 (DSB):
 *        Fix bugs in the algorithm used to reduce the weights in regions
 *        that do not contribute to the fit.
+*     14-JAN-2009 (TIMJ):
+*        Use MERS for message filtering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -403,44 +407,42 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
    if( what < 0 ) {
       ret = chisq;
 
-      if( cupidGC.ilevel > 5 ) {
-         cupidGCDumpF( NULL, 0, NULL, NULL, status ); 
+        cupidGCDumpF( MSG__DEBUG3, NULL, 0, NULL, NULL, status ); 
 
          msgSeti( "NF", cupidGC.nf );
-         msgOut( "", "   Fit attempt ^NF:", status );
+         msgOutif( MSG__DEBUG3, "", "   Fit attempt ^NF:", status );
 
          msgSetd( "C", ret );
-         msgOut( "", "      Chi-squared: ^C", status );
+         msgOutif( MSG__DEBUG3, "", "      Chi-squared: ^C", status );
 
          msgSetd( "V", par[ 0 ] );
-         msgOut( "", "      Peak intensity: ^V", status );
+         msgOutif( MSG__DEBUG3, "", "      Peak intensity: ^V", status );
          msgSetd( "V", par[ 1 ] );
-         msgOut( "", "      Constant background: ^V", status );
+         msgOutif( MSG__DEBUG3, "", "      Constant background: ^V", status );
          msgSetd( "V", par[ 2 ] );
-         msgOut( "", "      Centre on 1st axis: ^V", status );
+         msgOutif( MSG__DEBUG3, "", "      Centre on 1st axis: ^V", status );
          msgSetd( "V", par[ 3 ] );
-         msgOut( "", "      FWHM on 1st axis: ^V", status );
+         msgOutif( MSG__DEBUG3, "", "      FWHM on 1st axis: ^V", status );
    
          if( ndim > 1 ) {
             msgSetd( "V", par[ 4 ] );
-            msgOut( "", "      Centre on 2nd axis: ^V", status );
+            msgOutif( MSG__DEBUG3, "", "      Centre on 2nd axis: ^V", status );
             msgSetd( "V", par[ 5 ] );
-            msgOut( "", "      FWHM on 2nd axis: ^V", status );
+            msgOutif( MSG__DEBUG3, "", "      FWHM on 2nd axis: ^V", status );
             msgSetd( "V", par[ 6 ] );
-            msgOut( "", "      Position angle: ^V", status );
+            msgOutif( MSG__DEBUG3, "", "      Position angle: ^V", status );
    
             if( ndim > 2 ) {
                msgSetd( "V", par[ 7 ] );
-               msgOut( "", "      Centre on vel axis: ^V", status );
+               msgOutif( MSG__DEBUG3, "", "      Centre on vel axis: ^V", status );
                msgSetd( "V", par[ 8 ] );
-               msgOut( "", "      FWHM on vel axis: ^V", status );
+               msgOutif( MSG__DEBUG3, "", "      FWHM on vel axis: ^V", status );
                msgSetd( "V", par[ 9 ] );
-               msgOut( "", "      Vel gradient on 1st axis: ^V", status );
+               msgOutif( MSG__DEBUG3, "", "      Vel gradient on 1st axis: ^V", status );
                msgSetd( "V", par[ 10 ] );
-               msgOut( "", "      Vel gradient on 2nd axis: ^V", status );
+               msgOutif( MSG__DEBUG3, "", "      Vel gradient on 2nd axis: ^V", status );
             }
          }
-      }
 
 /* If the rate of change of the chi squared with respect to one of the
    model parameters is required, we have more work. */

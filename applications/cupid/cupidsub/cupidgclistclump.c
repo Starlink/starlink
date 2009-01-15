@@ -3,7 +3,7 @@
 #include "mers.h"
 
 void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
-                       int *lbnd, int ilevel, double rms, int *status ){
+                       int *lbnd, double rms, int *status ){
 /*
 *+
 *  Name:
@@ -17,7 +17,7 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
 
 *  Synopsis:
 *     void cupidGCListClump( int iclump, int ndim, double *par, double chisq, 
-*                            int *lbnd, int ilevel, double rms,
+*                            int *lbnd, double rms,
 *                            int *status )
 
 *  Description:
@@ -35,14 +35,13 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
 *        Lower pixel bounds of supplied data array.
 *     chisq
 *        The chi-squared associated with the fit.
-*     ilevel
-*        The amount of information to display to standard output.
 *     rms
 *        The RMS noise level.
 *     status
 *        Pointer to the inherited status value.
 
 *  Copyright:
+*     Copyright (C) 2007 Science and Technology Facilities Council.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -64,11 +63,14 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     5-OCT-2005 (DSB):
 *        Original version.
+*     14-JAN-2008 (TIMJ):
+*        Use msgOutif instead of ilevel
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -80,6 +82,7 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
 /* Local Variables: */
 
    int np;              /* Number of parameters */
+   msglev_t curlev;     /* Current message filter level */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
@@ -94,46 +97,45 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
    }
 
 /* Report information to standard output if requested. */
-   if( ilevel == 2 || ilevel == 3 ) {
-      if(  ilevel == 3 ) msgBlank( status );
+   msgIflev( &curlev );
+   if( curlev == MSG__VERB || curlev == MSG__DEBUG ) {
+     msgBlankif( MSG__DEBUG, status );
+     msgSeti( "N", iclump );
+     msgOutif( MSG__VERB, "", "Clump ^N:", status );
+   } else {
       msgSeti( "N", iclump );
-      msgOut( "", "Clump ^N:", status );
-   } else if( ilevel > 3 ) {
-      msgSeti( "N", iclump );
-      msgOut( "", "   Storing clump ^N:", status );
+      msgOutif( MSG__DEBUG1, "", "   Storing clump ^N:", status );
    }
 
-   if( ilevel > 2 ) {
-      msgSetd( "V", chisq );
-      msgOut( "", "   Chi-squared: ^V", status );
+   msgSetd( "V", chisq );
+   msgOutif( MSG__DEBUG, "", "   Chi-squared: ^V", status );
 
-      msgSetd( "V", par[ 0 ]*rms );
-      msgOut( "", "   Peak intensity: ^V", status );
-      msgSetd( "V", par[ 1 ]*rms );
-      msgOut( "", "   Constant background: ^V", status );
-      msgSetd( "V", par[ 2 ] + lbnd[ 0 ] - 1.5 );
-      msgOut( "", "   Centre on 1st axis: ^V", status );
-      msgSetd( "V", par[ 3 ] );
-      msgOut( "", "   FWHM on 1st axis: ^V", status );
+   msgSetd( "V", par[ 0 ]*rms );
+   msgOutif( MSG__DEBUG, "", "   Peak intensity: ^V", status );
+   msgSetd( "V", par[ 1 ]*rms );
+   msgOutif( MSG__DEBUG, "", "   Constant background: ^V", status );
+   msgSetd( "V", par[ 2 ] + lbnd[ 0 ] - 1.5 );
+   msgOutif( MSG__DEBUG, "", "   Centre on 1st axis: ^V", status );
+   msgSetd( "V", par[ 3 ] );
+   msgOutif( MSG__DEBUG, "", "   FWHM on 1st axis: ^V", status );
 
-      if( ndim > 1 ) {
-         msgSetd( "V", par[ 4 ] + lbnd[ 1 ] - 1.5 );
-         msgOut( "", "   Centre on 2nd axis: ^V", status );
-         msgSetd( "V", par[ 5 ] );
-         msgOut( "", "   FWHM on 2nd axis: ^V", status );
-         msgSetd( "V", par[ 6 ] );
-         msgOut( "", "   Position angle: ^V", status );
+   if( ndim > 1 ) {
+     msgSetd( "V", par[ 4 ] + lbnd[ 1 ] - 1.5 );
+     msgOutif( MSG__DEBUG, "", "   Centre on 2nd axis: ^V", status );
+     msgSetd( "V", par[ 5 ] );
+     msgOutif( MSG__DEBUG, "", "   FWHM on 2nd axis: ^V", status );
+     msgSetd( "V", par[ 6 ] );
+     msgOutif( MSG__DEBUG, "", "   Position angle: ^V", status );
 
-         if( ndim > 2 ) {
-            msgSetd( "V", par[ 7 ] + lbnd[ 2 ] - 1.5 );
-            msgOut( "", "   Centre on vel axis: ^V", status );
-            msgSetd( "V", par[ 8 ] );
-            msgOut( "", "   FWHM on vel axis: ^V", status );
-            msgSetd( "V", par[ 9 ] );
-            msgOut( "", "   Vel gradient on 1st axis: ^V", status );
-            msgSetd( "V", par[ 10 ] );
-            msgOut( "", "   Vel gradient on 2nd axis: ^V", status );
-         }
-      }
+     if( ndim > 2 ) {
+       msgSetd( "V", par[ 7 ] + lbnd[ 2 ] - 1.5 );
+       msgOutif( MSG__DEBUG, "", "   Centre on vel axis: ^V", status );
+       msgSetd( "V", par[ 8 ] );
+       msgOutif( MSG__DEBUG, "", "   FWHM on vel axis: ^V", status );
+       msgSetd( "V", par[ 9 ] );
+       msgOutif( MSG__DEBUG, "", "   Vel gradient on 1st axis: ^V", status );
+       msgSetd( "V", par[ 10 ] );
+       msgOutif( MSG__DEBUG, "", "   Vel gradient on 2nd axis: ^V", status );
+     }
    }
 }

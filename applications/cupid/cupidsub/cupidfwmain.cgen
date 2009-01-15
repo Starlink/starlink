@@ -1,3 +1,5 @@
+/* -*- C -*- */
+
 #include "sae_par.h"
 #include "cupid.h"
 #include "ast.h"
@@ -8,7 +10,7 @@
 int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                                 int dims[ 3 ], int skip[ 3 ], int slbnd[ 3 ],
                                 double rms, AstKeyMap *config, int *ipa, 
-                                int ilevel, int perspectrum, int *status ){
+                                int perspectrum, int *status ){
 /*
 *+
 *  Name:
@@ -23,7 +25,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *  Synopsis:
 *     int cupidFWMain<X>( CGEN_TYPE *array, int nel, int ndim, int dims[ 3 ], 
 *                         int skip[ 3 ], int slbnd[ 3 ], double rms, 
-*                         AstKeyMap *config, int *ipa, int ilevel, 
+*                         AstKeyMap *config, int *ipa, 
 *                         int perspectrum, int *status )
 
 *  Description:
@@ -77,8 +79,6 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *        Pointer to the array to receive the index of the clump to which
 *        each data pixel is assigned. The lowest clump index is 0. Pixels
 *        not in a clump are assigned -1.
-*     ilevel
-*        Amount of information to display.
 *     perspectrum
 *        If non-zero, then each spectrum is processed independently of its
 *        neighbours. A clump that extends across several spectra will be 
@@ -102,7 +102,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -123,6 +123,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -135,6 +136,8 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *        Added "perspectrum" parameter.
 *     21-SEP-2007 (DSB):
 *        Move clump merging so that it happens before the clump cleaning.
+*     14-JAN-2009 (TIMJ):
+*        Use MERS for message filtering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -273,15 +276,15 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    }
 
 /* If required, dump the mask indicating which pixel are below the threshold. */
-   if( ilevel > 4 ) {
-      printf("   About to dump initial mask\n" );
-      cupidDumpI( ipa, ndim, dims, slbnd, status );
+   if (msgFlevok(MSG__DEBUG2, status)) {
+     msgOutif( MSG__DEBUG2, "", "   About to dump initial mask", status );
+     cupidDumpI( ipa, ndim, dims, slbnd, status );
    }
 
 /* Use a cellular automata to remove small isolated groups of usable
    pixels from the above "ipa" array. This allocates new memory for the 
    cleaned up array. */ 	 
-   if( ilevel > 1 ) msgOut( "", "Removing isolated pixels\n", status );
+   msgOutif( MSG__VERB, "", "Removing isolated pixels\n", status );
 
    if( ndim == 1 ) {
       frac = 0.5;
@@ -294,9 +297,10 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    work = cupidRCA( ipa, NULL, nel, dims, skip, frac, VAL__MAXI, 0, -1, 1, status );
 
 /* If required, dump the mask resulting from the above cleaning. */
-   if( ilevel > 4 ) {
-      printf("   About to dump cleaned initial mask\n" );
-      cupidDumpI( work, ndim, dims, slbnd, status );
+   if (msgFlevok(MSG__DEBUG2, status)) {
+     msgOutif( MSG__DEBUG2, "", "   About to dump cleaned initial mask",
+               status);
+     cupidDumpI( work, ndim, dims, slbnd, status );
    }
 
 /* Initialise the pointer to an array holding the peak value in every clump. */
@@ -305,11 +309,11 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 /* Pre-allocate some memory for the route array which holds the 1D vector
    indices of the pixels traversed in the route from the initial pixel to
    the clump peak. */
-   route = astMalloc( sizeof( int )*100 );
+   route = astMalloc( sizeof( *route )*100 );
    if( route ) {
 
 /* Prepare progress report. */
-      if( ilevel > 1 ) msgOut( "", "Walking...\n", status );
+      msgOutif( MSG__VERB, "", "Walking...\n", status );
       count = 0;
 
 /* Store some useful constants. */
@@ -517,18 +521,17 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    than 3x3x3. */
                      if( maxg <= 0 ) {
 
-                        if( ilevel > 3 ) {
-                           msgSeti( "P", iix + slbnd[ 0 ] - 1 );
-                           if( ndim > 1 ) {
-                              msgSetc( "P", "," );
-                              msgSeti( "P", iiy + slbnd[ 1 ] - 1  );
-                              if( ndim > 1 ) {
-                                 msgSetc( "P", "," );
-                                 msgSeti( "P", iiz + slbnd[ 2 ] - 1 );
-                              }
-                           }
-                           msgOut( "", "    Local max found at (^P)", status );
+                        msgSeti( "P", iix + slbnd[ 0 ] - 1 );
+                        if( ndim > 1 ) {
+                          msgSetc( "P", "," );
+                          msgSeti( "P", iiy + slbnd[ 1 ] - 1  );
+                          if( ndim > 1 ) {
+                            msgSetc( "P", "," );
+                            msgSeti( "P", iiz + slbnd[ 2 ] - 1 );
+                          }
                         }
+                        msgOutif( MSG__DEBUG1, "",
+                                  "    Local max found at (^P)", status );
 
                         jzlo = iiz - nsz;
                         jzhi = iiz + nsz;
@@ -577,17 +580,18 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 
 /* Tell the user if we are jumping to a near-by pixel and continuing to
    walk up hill. */
-                        if( ilevel > 3 && iv != nv ) {
-                           msgSeti( "P", iix + slbnd[ 0 ] - 1 );
-                           if( ndim > 1 ) {
+                        if( iv != nv ) {
+                          msgSeti( "P", iix + slbnd[ 0 ] - 1 );
+                          if( ndim > 1 ) {
+                            msgSetc( "P", "," );
+                            msgSeti( "P", iiy + slbnd[ 1 ] - 1 );
+                            if( ndim > 1 ) {
                               msgSetc( "P", "," );
-                              msgSeti( "P", iiy + slbnd[ 1 ] - 1 );
-                              if( ndim > 1 ) {
-                                 msgSetc( "P", "," );
-                                 msgSeti( "P", iiz + slbnd[ 2 ] - 1 );
-                              }
-                           }
-                           msgOut( "", "      (jumping to (^P))", status );
+                              msgSeti( "P", iiz + slbnd[ 2 ] - 1 );
+                            }
+                          }
+                          msgOutif( MSG__DEBUG1, "",
+                                    "      (jumping to (^P))", status );
                         }
 
                      } else{
@@ -605,7 +609,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                         if( clump_index < 1 ) {
                            clump_index = ++ret;
                            peak_values = astGrow( peak_values, ret + 1,
-                                                  sizeof( double ) );
+                                                  sizeof( *peak_values ) );
                         }
 
 /* Update the peak value in the clump */
@@ -614,11 +618,11 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                         }
 
 /* Report new peak. */
-                        if( ilevel > 2 ) {
-                           msgSeti( "I", clump_index );
-                           msgSetr( "V", (float) array[ iv ] );
-                           msgOut( "", "      (a new peak, index = ^I, value=^V)", status );
-                        }
+                        msgSeti( "I", clump_index );
+                        msgSetr( "V", (float) array[ iv ] );
+                        msgOutif( MSG__DEBUG,"",
+                                  "      (a new peak, index = ^I, value=^V)",
+                                  status );
 
 /* Otherwise, if the next pixel on the route is already assigned to a
    clump, we now know what peak we are heading towards so use that clump 
@@ -654,16 +658,14 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                }
 
 /* Issue a progress report if required.*/
-               if( ilevel > 1 ){
-                  if( ++count % 100000 == 0 && nel - count > 100000 ) {
-                     if( ilevel > 2 ) msgBlank( status );
-                     percent = (int)(100*(float)count/(float)nel);
-                     if( percent > lpercent ) {
-                        msgSeti( "F", percent );
-                        msgOut( "", "  ^F % done", status );
-                        lpercent = percent;
-                     }
-                  }
+               if( ++count % 100000 == 0 && nel - count > 100000 ) {
+                 msgBlankif( MSG__DEBUG, status );
+                 percent = (int)(100*(float)count/(float)nel);
+                 if( percent > lpercent ) {
+                   msgSeti( "F", percent );
+                   msgOutif( MSG__VERB, "", "  ^F % done", status );
+                   lpercent = percent;
+                 }
                }
             }
          }
@@ -671,30 +673,29 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    }
 
 /* Report completion of walk. */
-   if( ilevel > 1 ) {
-      msgBlank( status );
-      msgOut( "", "  100 % done", status );
-      msgBlank( status );
-   }
+   msgBlankif( MSG__VERB, status );
+   msgOutif( MSG__VERB, "", "  100 % done", status );
+   msgBlankif( MSG__VERB, status );
 
 /* If required, dump the unmerged clump mask. */
-   if( ilevel > 4 ) {
-      printf("   About to dump raw clump mask\n" );
-      cupidDumpI( work, ndim, dims, slbnd, status );
+   if (msgFlevok(MSG__DEBUG2, status)) {
+     msgOutif( MSG__DEBUG2, "", "   About to dump raw clump mask", status );
+     cupidDumpI( work, ndim, dims, slbnd, status );
    }
 
 /* Amalgamate adjoining clumps if there is no significant dip between the
    clumps. */
-   if( ilevel > 1 ) msgOut( "", "Merging adjoining clumps", status );
+   msgOutif( MSG__VERB, "", "Merging adjoining clumps", status );
    CGEN_FUNCTION(cupidFWJoin)( array, nel, ndim, dims, skip, rms, config, 
-                               work, peak_values, &ret, ilevel, perspectrum,
+                               work, peak_values, &ret, perspectrum,
                                status );
-   if( ilevel > 1 ) msgOut( "", "Merging completed", status );
+   msgOutif( MSG__VERB, "", "Merging completed", status );
 
 /* If required, dump the merged clump mask. */
-   if( ilevel > 4 ) {
-      printf("   About to dump merged but uncleaned clump mask\n" );
-      cupidDumpI( work, ndim, dims, slbnd, status );
+   if (msgFlevok(MSG__DEBUG2, status)) {
+     msgOutif( MSG__DEBUG2, "",
+               "   About to dump merged but uncleaned clump mask", status );
+     cupidDumpI( work, ndim, dims, slbnd, status );
    }
 
 /* Smooth the boundaries between the clumps. This cellular automata replaces 
@@ -707,7 +708,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
       cleaniter = 0;
    }
 
-   if( ilevel > 1 ) msgOut( "", "Cleaning clumps", status );
+   msgOutif( MSG__VERB, "", "Cleaning clumps", status );
    m1 = work;
    m2 = ipa;
    for( iter = 0; iter < cleaniter; iter++ ) {
@@ -715,11 +716,10 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
       m3 = m1;
       m1 = m2;
       m2 = m3;
-      if( ilevel > 1 ) {
-         msgSeti( "I", iter + 1 );
-         msgSeti( "J", cleaniter );
-         msgOut( "", "Completed cleaning iteration ^I of ^J", status );
-      }
+      msgSeti( "I", iter + 1 );
+      msgSeti( "J", cleaniter );
+      msgOutif( MSG__VERB, "",
+                "Completed cleaning iteration ^I of ^J", status );
    }
 
 /* If the final results are not now in the "ipa" array, copy them to the
@@ -727,9 +727,10 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    if( m1 != ipa ) memcpy( ipa, work, sizeof( int )*nel );
 
 /* If required, dump the cleaned clump mask. */
-   if( ilevel > 4 ) {
-      printf("   About to dump cleaned clump mask\n" );
-      cupidDumpI( ipa, ndim, dims, slbnd, status );
+   if (msgFlevok(MSG__DEBUG2, status)) {
+     msgOutif( MSG__DEBUG2, "", "   About to dump cleaned clump mask",
+               status );
+     cupidDumpI( ipa, ndim, dims, slbnd, status );
    }
 
 /* Free resources. */

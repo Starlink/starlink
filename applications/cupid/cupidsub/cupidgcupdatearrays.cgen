@@ -1,3 +1,5 @@
+/* -*- C -*- */
+
 #include "sae_par.h"
 #include "cupid.h"
 #include "mers.h"
@@ -16,7 +18,7 @@ extern CupidGC cupidGC;
 
 void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel, int ndim,
                                          int *dims, double *par, double rms,
-                                         double mlim, int imax, int ilevel, 
+                                         double mlim, int imax,
                                          int *lbnd, HDSLoc **ndfs, int iclump, 
                                          int excols, double mean_peak, 
                                          int maxbad, int *area, double *sumclumps,
@@ -36,7 +38,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *     void cupidGCUpdateArrays<X>( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel, 
 *                                  int ndim, int *dims, double *par, 
 *                                  double rms, double mlim, int imax, 
-*                                  int ilevel, int *lbnd, HDSLoc **ndfs, 
+*                                  int *lbnd, HDSLoc **ndfs, 
 *                                  int iclump, int excols, double mean_peak,
 *                                  int maxbad, int *area, double *sumclumps,
 *                                  int *status )
@@ -69,8 +71,6 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *     imax
 *        Index within "res" of highest value (only used if "res" is not
 *        NULL).
-*     ilevel
-*        Level of information to display on standard output.
 *     lbnd
 *        Pointer to array holding the pixel indices of the first pixel in
 *        the user-supplied NDF.
@@ -112,6 +112,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
 *  Copyright:
+*     Copyright (C) 2007, 2009 Science and Technology Facilities Council.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -133,6 +134,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -140,6 +142,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *        Original version.
 *     17-AUG-2007 (DSB):
 *        Add velocity gradient to "extracols" information.
+*     14-JAN-2008 (TIMJ):
+*        Use msgOutif instead of ilevel
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -409,33 +413,31 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
    }
 
 /* Display info */
-   if( ilevel > 3 ) {
-      msgSetd( "V", sum );
-      msgSeti( "N", *area );
-      msgOut( "", "   Integrated clump intensity: ^V (in ^N pixels)", status );
+   msgSetd( "V", sum );
+   msgSeti( "N", *area );
+   msgOutif( MSG__DEBUG1, "",
+             "   Integrated clump intensity: ^V (in ^N pixels)", status );
 
-      if( area_off ) {
-         msgOut( "", "   (the clump overlaps the edge of the data array)", status );
-      } else if( bad > maxbad ) {
-         msgOut( "", "   (the clump contains too many bad pixels)", status );
-      }
-
-      msgSetd( "M", meanr );
-      msgOut( "", "   Mean residual: ^M", status );
-      msgSetd( "M", maxr );
-      msgOut( "", "   Max residual: ^M", status );
-      msgSetd( "M", minr );
-      msgOut( "", "   Min residual: ^M", status );
-      msgSetd( "M", sigr );
-      msgOut( "", "   Residual sigma: ^M", status );
-      
+   if( area_off ) {
+     msgOutif( MSG__DEBUG1, "",
+               "   (the clump overlaps the edge of the data array)", status );
+   } else if( bad > maxbad ) {
+     msgOutif( MSG__DEBUG1, "",
+               "   (the clump contains too many bad pixels)", status );
    }
+
+   msgSetd( "M", meanr );
+   msgOutif( MSG__DEBUG1, "", "   Mean residual: ^M", status );
+   msgSetd( "M", maxr );
+   msgOutif( MSG__DEBUG1, "", "   Max residual: ^M", status );
+   msgSetd( "M", minr );
+   msgOutif( MSG__DEBUG1, "", "   Min residual: ^M", status );
+   msgSetd( "M", sigr );
+   msgOutif( MSG__DEBUG1, "", "   Residual sigma: ^M", status );
 
 /* Dump the residuals to disk if required. */
-   if( ilevel > 4 ) {
-      sprintf( name, "clump_residuals%d", iclump ); 
-      CGEN_FUNCTION(cupidGCDump)( res, ndim, dims, name, status );   
-   }
+   sprintf( name, "clump_residuals%d", iclump ); 
+   CGEN_FUNCTION(cupidGCDump)( MSG__DEBUG2, res, ndim, dims, name, status );   
 
 /* If required, create an NDF holding the clump data values so long as
    the clump does not touch the edge of the data array. */

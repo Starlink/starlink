@@ -9,7 +9,7 @@
 
 HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                          double *ipv, double rms, AstKeyMap *config, int velax,
-                         int ilevel, int perspectrum, double beamcorr[ 3 ], 
+                         int perspectrum, double beamcorr[ 3 ], 
                          int *status ){
 /*
 *+
@@ -26,7 +26,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *  Synopsis:
 *     HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, 
 *                              void *ipd, double *ipv, double rms, 
-*                              AstKeyMap *config, int velax, int ilevel,
+*                              AstKeyMap *config, int velax,
 *                              int perspectrum, double beamcorr[ 3 ], 
 *                              int *status )
 
@@ -95,8 +95,6 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     velax
 *        The index of the velocity axis in the data array (if any). Only
 *        used if "ndim" is 3. 
-*     ilevel
-*        Amount of screen information to display (in range zero to 6).
 *     perspectrum
 *        If non-zero, then each spectrum is processed independently of its
 *        neighbours. A clump that extends across several spectra will be 
@@ -119,7 +117,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -140,6 +138,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -149,6 +148,8 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        Add rejection of clumps that touch the edge of an array.
 *     17-SEP-2007 (DSB):
 *        Added "perspectrum" parameter.
+*     14-JAN-2009 (TIMJ):
+*        Use MERS for message filtering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -204,11 +205,9 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    nrem = NULL;
 
 /* Say which method is being used. */
-   if( ilevel > 0 ) {
-      msgBlank( status );
-      msgOut( "", "FellWalker:", status );
-      if( ilevel > 1 ) msgBlank( status );
-   }
+   msgBlankif( MSG__NORM, status );
+   msgOutif( MSG__NORM, "", "FellWalker:", status );
+   msgBlankif( MSG__VERB, status );
 
 /* Get the AST KeyMap holding the configuration parameters for this
    algorithm. */
@@ -264,15 +263,13 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Assign every data pixel to a clump and stores the clumps index in the
    corresponding pixel in "ipa". */
    maxid = cupidFWMain( type, ipd, el, ndim, dims, skip, slbnd, rms, fwconfig,
-                        ipa, ilevel, 
+                        ipa, 
                         ( ndim > 2 && perspectrum ) ? velax + 1 : 0, status );
 
 /* Abort if no clumps found. */
    if( maxid < 0 ) {
-      if( ilevel > 0 ) {
-         msgOut( "", "No usable clumps found.", status );
-         msgBlank( status );
-      }
+      msgOutif( MSG__NORM, "", "No usable clumps found.", status );
+      msgBlankif( MSG__NORM, status );
       goto L10;
    }
 
@@ -411,41 +408,38 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          }
       }
 
-      if( ilevel > 0 ) {
-         if( ngood == 0 ) msgOut( "", "No usable clumps found.", status );
-         if( ilevel > 0 ) {
-            if( nsmall == 1 ){
-               msgOut( "", "One clump rejected because it contains too few pixels.", status );
-            } else if( nsmall > 0 ){
-               msgSeti( "N", nsmall );
-               msgOut( "", "^N clumps rejected because they contain too few pixels.", status );
-            }
-            if( nlow == 1 ){
-               msgOut( "", "One clump rejected because its peak is too low.", status );
-            } else if( nlow > 0 ){
-               msgSeti( "N", nlow );
-               msgOut( "", "^N clumps rejected because the peaks are too low.", status );
-            }
-            if( nthin == 1 ) {
-               msgOut( "", "1 clump rejected because it spans only a single "
-                       "pixel along one or more axes.", status );
-
-            } else if( nthin > 1 ) {
-               msgSeti( "N", nthin );
-               msgOut( "", "^N clumps rejected because they spans only a single "
-                       "pixel along one or more axes.", status );
-            }
-            if( nedge == 1 ) {
-               msgOut( "", "1 clump rejected because it touches an edge "
-                       "of the array.", status );
-
-            } else if( nedge > 1 ) {
-               msgSeti( "N", nedge );
-               msgOut( "", "^N clumps rejected because they touch an edge "
-                       "of the array.", status );
-            }
-         }        
-      }         
+      if( ngood == 0 ) msgOutif( MSG__NORM, "", "No usable clumps found.", status );
+      if( nsmall == 1 ){
+        msgOutif( MSG__NORM, "", "One clump rejected because it contains too few pixels.", status );
+      } else if( nsmall > 0 ){
+        msgSeti( "N", nsmall );
+        msgOutif( MSG__NORM, "", "^N clumps rejected because they contain too few pixels.", status );
+      }
+      if( nlow == 1 ){
+        msgOutif( MSG__NORM, "", "One clump rejected because its peak is too low.", status );
+      } else if( nlow > 0 ){
+        msgSeti( "N", nlow );
+        msgOutif( MSG__NORM, "", "^N clumps rejected because the peaks are too low.", status );
+      }
+      if( nthin == 1 ) {
+        msgOutif( MSG__NORM, "", "1 clump rejected because it spans only a single "
+                "pixel along one or more axes.", status );
+        
+      } else if( nthin > 1 ) {
+        msgSeti( "N", nthin );
+        msgOutif( MSG__NORM, "", "^N clumps rejected because they spans only a single "
+                "pixel along one or more axes.", status );
+      }
+      if( nedge == 1 ) {
+        msgOutif( MSG__NORM, "", "1 clump rejected because it touches an edge "
+                "of the array.", status );
+        
+      } else if( nedge > 1 ) {
+        msgSeti( "N", nedge );
+        msgOutif( MSG__NORM, "", "^N clumps rejected because they touch an edge "
+                "of the array.", status );
+      }
+                 
 
 /* Sort the clump indices into descending order of peak value. */
       j = ngood;

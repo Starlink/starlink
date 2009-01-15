@@ -1,3 +1,5 @@
+/* -*- C -*- */
+
 #include "sae_par.h"
 #include "cupid.h"
 #include "mers.h"
@@ -88,6 +90,7 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
 *  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -109,11 +112,14 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     18-OCT-2005 (DSB):
 *        Original version.
+*     14-JAN-2009 (TIMJ):
+*        Use MERS for message filtering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -217,12 +223,10 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
    if( iv[ 0 ] == 8 ) {
       int nwf;
 
-      if( cupidGC.ilevel > 4 ) {
-         msgBlank( status );
-         msgOut( "", "   pdaSumsl reports false convergence. Trying again...", status );
-         msgBlank( status );
-      }
-
+      msgBlankif( MSG__DEBUG2, status );
+      msgOutif( MSG__DEBUG2, "",
+                "   pdaSumsl reports false convergence. Trying again...", status );
+      msgBlankif( MSG__DEBUG2, status );
 
       nwf = cupidGC.nwf;
       cupidGC.nwf = 0;
@@ -236,26 +240,26 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 
       cupidGC.nwf = nwf;
 
-      if( cupidGC.ilevel > 4 ) {
-         msgBlank( status );
-         msgOut( "", "   Second attempt at minimisation completed.", status );
-         msgBlank( status );
-      }
+      msgBlankif( MSG__DEBUG2, status );
+      msgOutif( MSG__DEBUG2, "",
+                "   Second attempt at minimisation completed.", status );
+      msgBlankif( MSG__DEBUG2, status );
 
    }
 
 /* See if convergence was achieved. */
    ret = ( iv[ 0 ] < 7 );
-   if( iv[ 0 ] >= 7 && cupidGC.ilevel > 4 ) {
+   if( iv[ 0 ] >= 7 ) {
       msgSeti( "I", iv[ 0 ] );
-      msgOut( "", "   pdaSumsl returned error code ^I", status );
+      msgOutif( MSG__DEBUG2, "", "   pdaSumsl returned error code ^I", status );
    }
 
 /* Check none of the parameters are Nan */
    for( i = 0; i < n; i++ ) {
       if( !finite( x[ i ] ) ) {
          ret = 0;
-         msgOut( "", "   pdaSumsl returned NaN parameters", status );
+         msgOutif( MSG__QUIET, "",
+                   "   pdaSumsl returned NaN parameters", status );
          break;
       }
    }

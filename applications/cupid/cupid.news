@@ -18,6 +18,15 @@ Changes introduced at V0.0-39:
      than ILEVEL 1 as previously implemented. Some script modifications may
      be required. The default (NORM) still results in no message output.
 
+     The FINDCLUMPS command now uses ILEVEL that is one bigger than
+     previously to obtain the same result. This is because the default
+     messaging level (NORM; equivalent of 2 in MERS) is equivalent
+     to the previous ILEVEL of 1. So where an ILEVEL of 5 was used previously
+     this should now be a 6 (DEBUG2). If ILEVEL has not previously been
+     used the output should be as before. Messages that could previously
+     not be turned off at all are now at the QUIET (1) level and can be
+     disabled with ILEVEL=NONE (ILEVEL=0).
+
 Changes introduced at V0.0-38:
 
    - Use a dynamic default of FALSE for parameter "BACKOFF" if METHOD is

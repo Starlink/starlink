@@ -1,3 +1,5 @@
+/* -*- C -*- */
+
 #include "sae_par.h"
 #include "mers.h"
 #include "ast.h"
@@ -55,6 +57,7 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax,
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
 *  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -76,6 +79,7 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax,
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -83,6 +87,8 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax,
 *        Original version.
 *     19-MAR-2007 (DSB):
 *        Issue a warning if the total input data sum is negative.
+*     14-JAN-2009 (TIMJ):
+*        Use MERS for message filtering.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -128,13 +134,14 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax,
 /* Return the data sum, if required. */
    if( *sumdata == VAL__BADD ) {
       if( sum < 0.0 ) {
-         msgBlank( status );
+         msgBlankif( MSG__QUIET, status );
          msgSetr( "S", (float) sum );
-         msgOut( "", "WARNING: The total data sum in the input data (^S) is "
+         msgOutif( MSG__QUIET,"",
+                 "WARNING: The total data sum in the input data (^S) is "
                  "negative. You should normally remove any negative "
                  "background level in the data (using CUPID:FINDBACK) before "
                  "running CUPID:FINDCLUMPS.", status );
-         msgBlank( status );
+         msgBlankif( MSG__QUIET, status );
       }
       *sumdata = sum;
    }
