@@ -160,6 +160,8 @@ void extractclumps( int *status ) {
 *        - Store data units in output catalogue.
 *     18-MAR-2008 (DSB):
 *        Added adam parameter BACKOFF.
+*     15-JAN-2009 (DSB):
+*        Remove ILEVEL arguments.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -506,7 +508,7 @@ void extractclumps( int *status ) {
       msgBlank( status );
       cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, deconv, backoff, 
                         beamcorr, "Output from CUPID:EXTRACTCLUMPS", 
-                        usewcs, gotwcs ? iwcs : NULL, 1, dataunits, 
+                        usewcs, gotwcs ? iwcs : NULL, dataunits, 
                         NULL, logfile, &nclumps, status );
 
 /* Map the output pixel assignment array. */
@@ -519,7 +521,7 @@ void extractclumps( int *status ) {
 
 /* Create the output data array by summing the contents of the NDFs describing 
    the  found and usable clumps. This also fills the above mask array. */
-      cupidSumClumps( type, ipd, 1, nsig, slbnd, subnd, el, ndfs, 
+      cupidSumClumps( type, ipd, nsig, slbnd, subnd, el, ndfs, 
                       rmask, ipa, method, status );
 
 /* Delete any existing quality name information from the output NDF, and 

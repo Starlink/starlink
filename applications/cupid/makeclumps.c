@@ -204,6 +204,8 @@ void makeclumps( int *status ) {
 *     6-NOV-2007 (DSB):
 *        "int" and "size_t" have different sizes on 64 bit machines, so
 *         do not cast the address of an int to the address of a size_t.
+*     15-JAN-2009 (DSB):
+*        Remove ILEVEL arguments.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -411,7 +413,7 @@ void makeclumps( int *status ) {
    containing the clump data values, appended to the end of the array of
    NDF structures in the HDS object located by "obj". */
       cupidGCUpdateArraysF( NULL, NULL, nel, ndim, dims, par, rms, trunc, 0,
-                            0, lbnd, &obj, i, 0, 0.0, 0, &area, &sum, status );
+                            lbnd, &obj, i, 0, 0.0, 0, &area, &sum, status );
 
 /* Update the largest peak value. */
       if( par[ 0 ] > maxpeak ) maxpeak = par[ 0 ];
@@ -427,7 +429,7 @@ void makeclumps( int *status ) {
 
 /* Create the output data array by summing the contents of the NDFs
    describing the found clumps. */
-   cupidSumClumps( CUPID__FLOAT, NULL, 0, ndim, lbnd, ubnd, nel, obj, 
+   cupidSumClumps( CUPID__FLOAT, NULL, ndim, lbnd, ubnd, nel, obj, 
                    NULL, ipd2, "GAUSSCLUMPS", status );
 
 /* Add Gaussian noise to the data. */
@@ -452,7 +454,7 @@ void makeclumps( int *status ) {
    beamcorr[ 1 ] = beamfwhm;
    beamcorr[ 3 ] = velfwhm;
    cupidStoreClumps( "OUTCAT", xloc, obj, ndim, deconv, 1, beamcorr,
-                     "Output from CUPID:MAKECLUMPS", 0, NULL, 2, "",
+                     "Output from CUPID:MAKECLUMPS", 0, NULL, "",
                      NULL, NULL, &nclumps, status );
 
 /* Relase the extension locator.*/
