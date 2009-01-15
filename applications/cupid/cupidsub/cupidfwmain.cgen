@@ -138,6 +138,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *        Move clump merging so that it happens before the clump cleaning.
 *     14-JAN-2009 (TIMJ):
 *        Use MERS for message filtering.
+*        Fix debugging messages when 2d image is processed.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -525,7 +526,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                         if( ndim > 1 ) {
                           msgSetc( "P", "," );
                           msgSeti( "P", iiy + slbnd[ 1 ] - 1  );
-                          if( ndim > 1 ) {
+                          if( ndim > 2 ) {
                             msgSetc( "P", "," );
                             msgSeti( "P", iiz + slbnd[ 2 ] - 1 );
                           }
@@ -585,7 +586,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                           if( ndim > 1 ) {
                             msgSetc( "P", "," );
                             msgSeti( "P", iiy + slbnd[ 1 ] - 1 );
-                            if( ndim > 1 ) {
+                            if( ndim > 2 ) {
                               msgSetc( "P", "," );
                               msgSeti( "P", iiz + slbnd[ 2 ] - 1 );
                             }
