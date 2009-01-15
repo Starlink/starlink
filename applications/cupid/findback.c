@@ -81,8 +81,8 @@ void findback( int *status ){
 *        axis if the input array is 3-dimensional).
 *     ILEVEL = _CHAR (Read)
 *        Controls the amount of diagnostic information reported. This is the
-*        standard messaging level. The default messaging level is NORM (1).
-*        A value of NONE or 0 will suppress all screen output. VERB (2) will
+*        standard messaging level. The default messaging level is NORM (2).
+*        A value of NONE or 0 will suppress all screen output. VERB (3) will
 *        indicate progress through the various stages of the algorithm. [NORM]
 *     IN = NDF (Read)
 *        The input NDF.
