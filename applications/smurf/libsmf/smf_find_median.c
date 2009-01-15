@@ -64,6 +64,8 @@
 *        Sort data if the number of data points are below a threshold.
 *        Do this since it is more accurate than histogram techniques
 *        but is too slow for large data arrays.
+*     15-JAN-2009 (DSB):
+*        Avoid changing the supplied array when sorting is used.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -105,12 +107,14 @@ int *smf_find_median( float *farray, double *darray, size_t nel,
   const size_t threshold = 10000;  /* point at which we abandon sorting */
 
 /* Local Variables */
-   double dmedian;
-   double dsum;
+   double *tdarray;
    double dmean;
+   double dmedian;
    double dmode;
+   double dsum;
    double valmax;
    double valmin;
+   float *tfarray;
    float fvalmax;
    float fvalmin;
    int *result;
@@ -140,14 +144,20 @@ int *smf_find_median( float *farray, double *darray, size_t nel,
      return hist;
    }
 
-/* see if we should use sort to find the median */
+/* See if we should use sort to find the median. If so, take a copy of
+   the supplied data first to avoid re-ordering the supplied array */
    if (nel <= threshold) {
      int neluse;
      if ( farray ) {
-       kpg1Medur( 1, nel, farray, median, &neluse, status );
+       tfarray = astStore( NULL, farray, nel*sizeof( float ) );
+       kpg1Medur( 1, nel, tfarray, median, &neluse, status );
+       tfarray = astFree( tfarray );
+
      } else {
        double dmedian;
-       kpg1Medud( 1, nel, darray, &dmedian, &neluse, status );
+       tdarray = astStore( NULL, darray, nel*sizeof( double ) );
+       kpg1Medud( 1, nel, tdarray, &dmedian, &neluse, status );
+       tdarray = astFree( tdarray );
        *median = ( dmedian != VAL__BADD ) ? dmedian : VAL__BADR;
 
      }
