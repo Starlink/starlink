@@ -5,7 +5,7 @@
 #include "mers.h"
 #include "sae_par.h"
 
-void kpg1Hdsky( HDSLoc *loc, AstKeyMap *keymap, int old, int new, 
+void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new, 
                 int *status ){
 /*
 *  Name:
@@ -18,7 +18,7 @@ void kpg1Hdsky( HDSLoc *loc, AstKeyMap *keymap, int old, int new,
 *     C.
 
 *  Invocation:
-*     void kpg1Hdsky( HDSLoc *loc, AstKeyMap *keymap, int old, int new, 
+*     void kpg1Hdsky( const HDSLoc *loc, AstKeyMap *keymap, int old, int new, 
 *                     int *status )
 
 *  Description:
@@ -105,7 +105,7 @@ void kpg1Hdsky( HDSLoc *loc, AstKeyMap *keymap, int old, int new,
 /* Local Varianles: */
    char name[ DAT__SZNAM + 1 ];
    char type[ DAT__SZTYP + 1 ];
-   const char *hdstype;
+   const char *hdstype = NULL;
    int append;
    int haskey;
    int kmtype;

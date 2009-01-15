@@ -169,12 +169,12 @@ void kpg1Opgrd( int, const double[], int, double *, double *, int * );
 void kpg1Gtaxv( const char *, int, int, AstFrame *, int, double *, int *, int * );
 void kpg1Gilst( int, int, int, const char *, int *, int *, int *, int * );
 void kpg1Asffr( AstFrameSet *, const char *, int *, int * );
-void kpg1Datcp( HDSLoc *, HDSLoc *, const char *, int * );
-void kpg1Hdsky( HDSLoc *, AstKeyMap *, int, int, int * );
-void kpg1Kyhds( AstKeyMap *, int *, int, int, HDSLoc *, int * );
-void kpg1Ghstd( int, int, double *, int, int, double *, double *, int *, int * );
-void kpg1Ghstr( int, int, float *, int, int, float *, float *, int *, int * );
-void kpg1Hsstp( int, int *, double, double, double *, double *, double *, double *, int * );
+void kpg1Datcp( const HDSLoc *, HDSLoc *, const char *, int * );
+void kpg1Hdsky( const HDSLoc *, AstKeyMap *, int, int, int * );
+void kpg1Kyhds( AstKeyMap *, const int *, int, int, HDSLoc *, int * );
+void kpg1Ghstd( int, int, const double *, int, int, double *, double *, int *, int * );
+void kpg1Ghstr( int, int, const float *, int, int, float *, float *, int *, int * );
+void kpg1Hsstp( int, const int *, double, double, double *, double *, double *, double *, int * );
 void fts1Astwn( AstFitsChan *, int, int * );
 void kpg1Ky2hd( AstKeyMap *, HDSLoc *, int * );
 

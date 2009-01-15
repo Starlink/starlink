@@ -6,8 +6,8 @@
 #include "mers.h"
 #include "sae_par.h"
 
-void kpg1Kyhds( AstKeyMap *keymap, int *map, int axis, int mode, HDSLoc *loc, 
-                int *status ){
+void kpg1Kyhds( AstKeyMap *keymap, const int *map, int axis, int mode,
+                HDSLoc *loc, int *status ){
 /*
 *  Name:
 *     kpg1Kyhds
@@ -19,7 +19,7 @@ void kpg1Kyhds( AstKeyMap *keymap, int *map, int axis, int mode, HDSLoc *loc,
 *     C.
 
 *  Invocation:
-*     void kpg1Kyhds( AstKeyMap *keymap, int *map, int axis, int mode, 
+*     void kpg1Kyhds( AstKeyMap *keymap, const int *map, int axis, int mode, 
 *                     HDSLoc *loc, int *status )
 
 *  Description:

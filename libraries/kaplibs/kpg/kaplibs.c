@@ -470,7 +470,7 @@ void kpgStati( int bad, int el, const int data[], int nclip, const float clip[],
 
   F77_CALL(kpg1_stati)( LOGICAL_ARG(&BAD),
 			INTEGER_ARG(&EL),
-			DOUBLE_ARRAY_ARG(DATA),
+			INTEGER_ARRAY_ARG(DATA),
 			INTEGER_ARG(&NCLIP),
 			REAL_ARRAY_ARG(CLIP),
 			INTEGER_ARG(&NGOOD),
@@ -1386,7 +1386,7 @@ F77_SUBROUTINE(kpg1_datcp)( CHARACTER(LOC1),
                             TRAIL(LOC2)
                             TRAIL(NAME) );
 
-void kpg1Datcp( HDSLoc *loc1, HDSLoc *loc2, const char *name, int *status ){
+void kpg1Datcp( const HDSLoc *loc1, HDSLoc *loc2, const char *name, int *status ){
    DECLARE_CHARACTER(LOC1,DAT__SZLOC);
    DECLARE_CHARACTER(LOC2,DAT__SZLOC);
    DECLARE_CHARACTER_DYN(NAME);
@@ -1431,7 +1431,7 @@ F77_SUBROUTINE(kpg1_ghstd)( LOGICAL(BAD),
                             INTEGER_ARRAY(HIST), 
                             INTEGER(STATUS) );
 
-void kpg1Ghstd( int bad, int dim, double *array, int numbin, int cumul,
+void kpg1Ghstd( int bad, int dim, const double *array, int numbin, int cumul,
                 double *valmax, double *valmin, int *hist, int *status ){
    DECLARE_LOGICAL(BAD);
    DECLARE_INTEGER(DIM);
@@ -1485,7 +1485,7 @@ F77_SUBROUTINE(kpg1_ghstr)( LOGICAL(BAD),
                             INTEGER_ARRAY(HIST), 
                             INTEGER(STATUS) );
 
-void kpg1Ghstr( int bad, int dim, float *array, int numbin, int cumul,
+void kpg1Ghstr( int bad, int dim, const float *array, int numbin, int cumul,
                 float *valmax, float *valmin, int *hist, int *status ){
    DECLARE_LOGICAL(BAD);
    DECLARE_INTEGER(DIM);
@@ -1539,7 +1539,7 @@ F77_SUBROUTINE(kpg1_hsstp)( INTEGER(NUMBIN),
                             DOUBLE(MODE),
                             INTEGER(STATUS) );
 
-void kpg1Hsstp( int numbin, int *hist, double valmax, double valmin,
+void kpg1Hsstp( int numbin, const int *hist, double valmax, double valmin,
                 double *sum, double *mean, double *median, double *mode,
                 int *status ){
    DECLARE_INTEGER(NUMBIN);
