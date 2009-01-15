@@ -149,13 +149,13 @@ int *smf_find_median( float *farray, double *darray, size_t nel,
    if (nel <= threshold) {
      int neluse;
      if ( farray ) {
-       tfarray = astStore( NULL, farray, nel*sizeof( float ) );
+       tfarray = astStore( NULL, farray, nel*sizeof( *tfarray ) );
        kpg1Medur( 1, nel, tfarray, median, &neluse, status );
        tfarray = astFree( tfarray );
 
      } else {
        double dmedian;
-       tdarray = astStore( NULL, darray, nel*sizeof( double ) );
+       tdarray = astStore( NULL, darray, nel*sizeof( *tdarray ) );
        kpg1Medud( 1, nel, tdarray, &dmedian, &neluse, status );
        tdarray = astFree( tdarray );
        *median = ( dmedian != VAL__BADD ) ? dmedian : VAL__BADR;
