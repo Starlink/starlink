@@ -157,50 +157,78 @@ for my $f (@files) {
     $isfirst_file = 0;
   }
 
-  # Store the first BASE AZEL position for later
-  if (!defined $base_az) {
-    $base_az = $local{TCS_AZ_BC1}->[0];
-    $base_el = $local{TCS_AZ_BC2}->[0];
-  }
-
   for my $i ( 0 .. $#{$local{RTS_NUM}} ) {
     my @slice;
 
     # Use the RTS sequence number as the ID
     push(@slice, $local{RTS_NUM}->[$i]);
 
+    # Check for bad values
+    my $isokay = 1;
+    for my $key (qw/ TCS_TR_AC1 TCS_TR_AC2 SMU_TR_JIG_X SMU_TR_JIG_Y
+                     SMU_TR_CHOP_X SMU_TR_CHOP_Y / ) {
+      if ($local{$key}->[$i] == &NDF::VAL__BADD()) {
+        $isokay = 0;
+        last;
+      }
+    }
+
     # Now calculate the RA,Dec of the field centre in tracking coordinates
     # taking the chop and jiggle into account
-    my $rabase = $local{TCS_TR_AC1}->[$i];
-    my $decbase = $local{TCS_TR_AC2}->[$i];
-    my $xoffset = $local{SMU_TR_JIG_X}->[$i] + $local{SMU_TR_CHOP_X}->[$i];
-    my $yoffset = $local{SMU_TR_JIG_Y}->[$i] + $local{SMU_TR_CHOP_Y}->[$i];
-    $xoffset *= Astro::SLA::DAS2R;
-    $yoffset *= Astro::SLA::DAS2R;
+    my ($ra, $dec) = (&NDF::VAL__BADD(), &NDF::VAL__BADD() );
+    if ($isokay) {
+      my $rabase = $local{TCS_TR_AC1}->[$i];
+      my $decbase = $local{TCS_TR_AC2}->[$i];
+      my $xoffset = $local{SMU_TR_JIG_X}->[$i] + $local{SMU_TR_CHOP_X}->[$i];
+      my $yoffset = $local{SMU_TR_JIG_Y}->[$i] + $local{SMU_TR_CHOP_Y}->[$i];
+      $xoffset *= Astro::SLA::DAS2R;
+      $yoffset *= Astro::SLA::DAS2R;
 
-    Astro::SLA::slaDtp2s( $xoffset, $yoffset, $rabase, $decbase, my $ra, my $dec );
+      Astro::SLA::slaDtp2s( $xoffset, $yoffset, $rabase, $decbase, $ra, $dec );
+      $ra = Astro::Coords::Angle::Hour->new( $ra )->degrees;
+      $dec = Astro::Coords::Angle->new($dec)->degrees;
+    }
+    push(@slice, $ra, $dec );
 
-    push(@slice, Astro::Coords::Angle::Hour->new( $ra )->degrees,
-         Astro::Coords::Angle->new($dec)->degrees);
+    # Check for bad values
+    $isokay = 1;
+    for my $key (qw/ TCS_AZ_AC1 TCS_AZ_AC2 SMU_AZ_JIG_X SMU_AZ_JIG_Y
+                     TCS_AZ_BC1 TCS_AZ_BC2 SMU_AZ_CHOP_X SMU_AZ_CHOP_Y / ) {
+      if ($local{$key}->[$i] == &NDF::VAL__BADD()) {
+        $isokay = 0;
+        last;
+      }
+    }
 
     # Now calculate "az" and "el". Complication here is that we calculate the
     # position after taking out the motion due to the telescope base position
     # changing. Note that there is no rotation because we do not first convert
     # each position to RA/Dec and then back to AZEL.
-    my $actual_az_diff = $local{TCS_AZ_AC1}->[$i] - $local{TCS_AZ_BC1}->[$i];
-    my $actual_el_diff = $local{TCS_AZ_AC2}->[$i] - $local{TCS_AZ_BC2}->[$i];
-    my $this_az_base = $base_az + $actual_az_diff;
-    my $this_el_base = $base_el + $actual_el_diff;
+    my ($az, $el) = (&NDF::VAL__BADD(), &NDF::VAL__BADD() );
+    if ($isokay) {
+
+      # Store the BASE AZEL position for later - first few could be bad but we
+      # know they are good in here
+      $base_az = $local{TCS_AZ_BC1}->[$i] unless defined $base_az;
+      $base_el = $local{TCS_AZ_BC2}->[$i] unless defined $base_el;
+
+      my $actual_az_diff = $local{TCS_AZ_AC1}->[$i] - $local{TCS_AZ_BC1}->[$i];
+      my $actual_el_diff = $local{TCS_AZ_AC2}->[$i] - $local{TCS_AZ_BC2}->[$i];
+      my $this_az_base = $base_az + $actual_az_diff;
+      my $this_el_base = $base_el + $actual_el_diff;
         
-    $xoffset = $local{SMU_AZ_JIG_X}->[$i] + $local{SMU_AZ_CHOP_X}->[$i];
-    $yoffset = $local{SMU_AZ_JIG_Y}->[$i] + $local{SMU_AZ_CHOP_Y}->[$i];
-    $xoffset *= Astro::SLA::DAS2R;
-    $yoffset *= Astro::SLA::DAS2R;
+      my $xoffset = $local{SMU_AZ_JIG_X}->[$i] + $local{SMU_AZ_CHOP_X}->[$i];
+      my $yoffset = $local{SMU_AZ_JIG_Y}->[$i] + $local{SMU_AZ_CHOP_Y}->[$i];
+      $xoffset *= Astro::SLA::DAS2R;
+      $yoffset *= Astro::SLA::DAS2R;
 
-    Astro::SLA::slaDtp2s( $xoffset, $yoffset, $this_az_base, $this_el_base, my $az, my $el );
+      Astro::SLA::slaDtp2s( $xoffset, $yoffset, $this_az_base, $this_el_base, $az, $el );
+      $az = Astro::Coords::Angle->new( $az )->degrees;
+      $el = Astro::Coords::Angle->new( $el )->degrees;
+    }
 
-    push(@slice, Astro::Coords::Angle::Hour->new( $az )->degrees,
-         Astro::Coords::Angle->new($el)->degrees);
+    push(@slice, $az, $el );
+
 
     # And append the remaining columns
     for my $col (@columns) {
@@ -218,7 +246,7 @@ err_end( $status );
 Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
 
 Copyright (C) 2007 Particle Physics and Astronomy Research Council.
-Copyright (C) 2007 Science and Technology Facilities Council.
+Copyright (C) 2007-2009 Science and Technology Facilities Council.
 All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under
