@@ -124,14 +124,17 @@ itcl::class gaiavo::GaiaVOCatCone {
       #  And set the default name server.
       set_namesvr $namesvr
 
-      #  Plot symbols button. XXX position this to the left.
+      #  Plot symbols button.
       itk_component add plot {
          button $itk_component(buttons).plot \
             -text "Plot" \
             -command [code $this plot]
       }
-      pack $itk_component(plot) -side left -expand 1 -pady 2m
+      pack $itk_component(plot) -side left -before $itk_component(open) -expand 1 -pady 2m
       add_short_help $itk_component(plot) {Plot positions over image}
+
+      #  Loose the "Open" button.
+      pack forget $itk_component(open)
 
       #  Set names for the canvas tags used for all symbols. This defined
       #  in the imgplot command.
@@ -192,7 +195,6 @@ itcl::class gaiavo::GaiaVOCatCone {
    #  Open a service, "args" is a list of values from a row of the current
    #  table. 
    protected method open_service_ {args} {
-      # XXX what to do with this? Offer extended view of the row?
       puts "nothing done with open_service_"
    }
 
