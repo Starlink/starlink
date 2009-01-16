@@ -93,12 +93,12 @@ itcl::class gaiavo::GaiaVOCatCone {
 
       set m [add_menubutton Options "Options menu"]
 
-      #  Change the plot symbols. XXX how to associate this with the
-      #  catalogue?
+      #  Change the plot symbols.
       add_menuitem $m command "Set plot symbols..." \
          {Set the symbol (color, size, etc.) to use to plot objects} \
          -command [code $this set_plot_symbols]
 
+      #  Add the standard name servers.
       set ns_menu [menu $m.ns]
       add_menuitem $m cascade "Set Name Server" \
          {Select the name server used to resolve astronomical object names} \
@@ -121,36 +121,37 @@ itcl::class gaiavo::GaiaVOCatCone {
          return
       }
 
-      #  Set default name server.
+      #  And set the default name server.
       set_namesvr $namesvr
 
-      #  Plot button.
+      #  Plot symbols button. XXX position this to the left.
       itk_component add plot {
          button $itk_component(buttons).plot \
             -text "Plot" \
             -command [code $this plot]
       }
-
       pack $itk_component(plot) -side left -expand 1 -pady 2m
       add_short_help $itk_component(plot) {Plot positions over image}
 
-      #  Canvas tag is used for all symbols.
+      #  Set names for the canvas tags used for all symbols. This defined
+      #  in the imgplot command.
       set tag_ $w_.cat
       set object_tag_ $tag_.objects
       set label_tag_ $tag_.labels
 
-      #  Add bindings for symbols. XXX need to implement.
+      #  Add bindings for symbols.
       $canvas_ bind $object_tag_  <1> [code $this select_symbol current 0]
       $canvas_ bind $object_tag_  <Shift-1> \
-         [code $this select_symbol current 1]
+                                  [code $this select_symbol current 1]
       $canvas_ bind $object_tag_  <Control-1> \
-         [code $this select_symbol current 1]
-      #$canvas_ bind $object_tag_  <Any-Enter> "$canvas_ config -cursor tcross"
-      #$canvas_ bind $object_tag_  <Any-Leave> "$draw_ reset_cursor"
+                                  [code $this select_symbol current 1]
+      $canvas_ bind $object_tag_  <Any-Enter> "$canvas_ config -cursor tcross"
+      $canvas_ bind $object_tag_  <Any-Leave> "$draw_ reset_cursor"
+
+      #  Button release selects symbols for selected rows.
+      bind $itk_component(results).listbox <ButtonRelease-1> \
+         [code $this select_result_row]
    }
-
-
-
 
    #  Set the name server used, pass to other components.
    public method set_namesvr {name} {
@@ -191,7 +192,7 @@ itcl::class gaiavo::GaiaVOCatCone {
    #  Open a service, "args" is a list of values from a row of the current
    #  table. 
    protected method open_service_ {args} {
-      # Hmm, what to do with this? Offer extended view of the row?
+      # XXX what to do with this? Offer extended view of the row?
       puts "nothing done with open_service_"
    }
 
@@ -256,6 +257,99 @@ itcl::class gaiavo::GaiaVOCatCone {
          -command [code $this plot]
    }
 
+   #  Select a symbol, given the canvas id and optional row number 
+   #  in the table listing. If $toggle is 0, deselect all other symbols 
+   #  first, otherwise toggle the selection of the items given by $id.
+   public method select_symbol {id toggle {rownum -1}} {
+      set tag [lindex [$canvas_ gettags $id] 0]
+
+      if {$rownum < 0} {
+         set rownum [get_table_row $id]
+         if {$rownum < 0} {
+            return
+         }
+      }
+        
+      if {$toggle} {
+         if {[$draw_ item_has_tag $tag $w_.selected]} {
+            deselect_symbol $tag
+            $itk_component(results) deselect_row $rownum
+            return
+         } 
+      } else {
+         deselect_symbol $w_.selected
+      }
+
+      if {"$rownum" >= 0} {
+         $itk_component(results) select_row $rownum [expr !$toggle]
+         $itk_component(results) select_result_row
+      }
+      
+      foreach i [$canvas_ find withtag $tag] {
+         set width [$canvas_ itemcget $i -width]
+         $canvas_ itemconfig $i -width [expr $width+2]
+      }
+      $canvas_ addtag $w_.selected withtag $tag
+      $canvas_ raise $tag $rtdimage_
+   }
+
+   #  Return the table row index corresponding the given symbol canvas id.
+   #  Note: The imgplot subcommand adds a canvas tag "row#$rownum" that we can
+   #  use here.  Also: cat$id is first tag in the tag list for each object.
+   public method get_table_row {id} {
+
+      set tags [$canvas_ gettags $id]
+      #  Look for row#tag (but only if not sorted!)
+      if {[llength [$w_.cat sortcols]] == 0} {
+         foreach tag $tags {
+            if {[scan $tag "row#%d" rownum] == 1} {
+               return $rownum
+            }
+         }
+      }
+
+      #  Search for $id in query results (slow way).
+      set tag [lindex $tags 0]
+      set rownum -1
+      foreach row [$itk_component(results) get_contents] {
+         incr rownum
+         set id [lindex $row [$w_.cat id_col]]
+         if { "cat$id" == "$tag" } {
+            return $rownum
+         }
+      }
+
+      #  Not found.
+      return -1
+   }
+
+   #  Deselect the given symbol, given its canvas tag or id.
+   public method deselect_symbol {tag} {
+      foreach i [$canvas_ find withtag $tag] {
+         set width [$canvas_ itemcget $i -width]
+         $canvas_ itemconfig $i -width [expr $width-2]
+      }
+      $canvas_ dtag $tag $w_.selected
+   }
+
+   #  Called when a row in the table is selected.
+   protected method select_result_row {} {
+      $itk_component(results) select_result_row
+
+      #  Clear symbol selection
+      deselect_symbol $w_.selected
+
+      #  Select symbols matching selected rows
+      foreach row [$itk_component(results) get_selected_with_rownum] {
+         lassign $row rownum row
+         set id [lindex $row [$w_.cat id_col]]
+         if {"$id" == ""} {
+            continue
+         }
+         select_symbol cat$id 1 $rownum
+      }
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -270,6 +364,7 @@ itcl::class gaiavo::GaiaVOCatCone {
       set rtdctrl_ [$itk_option(-gaia) get_image]
       set rtdimage_ [$rtdctrl_ get_image]
       set canvas_ [$rtdctrl_ get_canvas]
+      set draw_ [$rtdctrl_ component draw]
    }
 
    #  The name server.
@@ -282,6 +377,7 @@ itcl::class gaiavo::GaiaVOCatCone {
    protected variable rtdctrl_ {}
    protected variable rtdimage_ {}
    protected variable canvas_ {}
+   protected variable draw_ {}
 
    #  Equinox for VO catalogues. Really ICRS but J2000 (=FK5/J2000).
    protected variable equinox_ "J2000"

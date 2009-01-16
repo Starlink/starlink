@@ -10,7 +10,7 @@
 
 #  Description:
 #     Provides controls for constructing and doing a query of a Cone
-#     Search service. The service is defined by an accessURL, which 
+#     Search service. The service is defined by an accessURL, which
 #     will be qualified by a position, size on the sky and verbosity
 #     setting.
 
@@ -252,7 +252,7 @@ itcl::class gaiavo::GaiaVOConeSearch {
 
    #  Called when the query completes.
    protected method query_done_ {} {
-      
+
       #  Immediate notification we're finished.
       if { $itk_option(-feedbackcommand) != {} } {
          eval $itk_option(-feedbackcommand) off
@@ -289,17 +289,23 @@ itcl::class gaiavo::GaiaVOConeSearch {
          set tempname "$msg ($filename)"
       } else {
 
-         #  Check the STATUS return. XXX correct for Cone Search?
-         lassign [gaiavotable::info $vot "QUERY_STATUS"] query_status errmsg
+         #  Check the STATUS return.
+         set query_status 1
+         set errmsg {}
+         catch {
+            lassign [gaiavotable::info $vot "Error"] query_status errmsg
+         }
+         puts "query_status = $query_status, errmsg = $errmsg"
+
          if { $query_status != "ERROR" } {
             set status 1
             set tempname [$tempcats_ get_name]
             set tst [gaiavotable::save $vot 0 $tempname]
             gaiavotable::close $vot
-            
+
             #  This is the current VOTable now.
             set votable_ $filename
-            
+
          } else {
             set status 0
             set tempname "Query returned an error ($query_status: $errmsg)"
@@ -390,11 +396,11 @@ itcl::class gaiavo::GaiaVOConeSearch {
          return
       }
       lassign $list x0 y0 x1 y1
-      
+
       #  Get center and radius in canvas coords.
       set x [expr ($x0+$x1)/2.]
       set y [expr ($y0+$y1)/2.]
-      
+
       if { [catch {$image convert coords $x $y canvas ra dec "wcs J2000"} msg] } {
          error_dialog \
             "error converting canvas ($x, $y) to world coordinates: $msg" $w_
@@ -432,7 +438,7 @@ itcl::class gaiavo::GaiaVOConeSearch {
 
    #  Nameserver for looking up object coordinates.
    itk_option define -namesvr namesvr NameSvr ned@eso
-   
+
    #  GaiaImageCtrl instance.
    itk_option define -gaiactrl gaiactrl GaiaCtrl {}
 
