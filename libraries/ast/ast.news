@@ -19,6 +19,10 @@ Main Changes in this Version
 - A new method (astIntersect) has been added to the Frame class. It
 determines the position at which two geodesic curves intersect.
 
+- The XmlStrict attribute and astXmlWarnings function have been removed. 
+The same functionality is now available via the Strict attribute, and a
+new function called astWarnings.
+
 
 Main Changes in Version 6.0
 ---------------------------

@@ -40,20 +40,17 @@ f     encodings and the internal ASCII encoding. If no such routines
 *     - XmlIndent: Controls output of indentation and line feeds
 *     - XmlLength: Controls output buffer length
 *     - XmlPrefix: The namespace prefix to use when writing
-*     - XmlStrict: How to handle non-fatal warnings
 
 *  Functions:
-c     In addition to those functions applicable to all Channels, the
-c     following functions may also be applied to all XmlChans:
-f     In addition to those routines applicable to all Channels, the
-f     following routines may also be applied to all XmlChans:
-*
-c     - astXmlWarnings: Return warnings from previous read operation
-c     - AST_XMLWARNINGS: Return warnings from previous read operation
+c     The XmlChan class does not define any new functions beyond those
+f     The XmlChan class does not define any new routines beyond those
+*     which are applicable to all Mappings.
 
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -278,10 +275,6 @@ static void (* parent_setattrib)( AstObject *, const char *, int * );
 static int (* parent_getfull)( AstChannel *, int * );
 static int (* parent_getcomment)( AstChannel *, int * );
 
-#if defined(THREAD_SAFE)
-static int (* parent_managelock)( AstObject *, int, int, int * );
-#endif
-
 /* Text values used to represent XmlFormat values externally. These
    should be in the order defined by the associated constants above. */
 static const char *xformat[3] = { NATIVE_STRING, QUOTED_STRING, IVOA_STRING };
@@ -295,8 +288,7 @@ static const char *xformat[3] = { NATIVE_STRING, QUOTED_STRING, IVOA_STRING };
    globals->IsUsable_This = NULL; \
    globals->GetAttrib_Buff[ 0 ] = 0; \
    globals->GetNextChar_C = NULL; \
-   globals->GetNextChar_Buf = NULL; \
-   globals->Report_NWarn = 0;
+   globals->GetNextChar_Buf = NULL;
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(XmlChan)
@@ -308,7 +300,6 @@ astMAKE_INITGLOBALS(XmlChan)
 #define getattrib_buff astGLOBAL(XmlChan,GetAttrib_Buff)
 #define getnextchar_c astGLOBAL(XmlChan,GetNextChar_C)
 #define getnextchar_buf astGLOBAL(XmlChan,GetNextChar_Buf)
-#define report_nwarn astGLOBAL(XmlChan,Report_NWarn)
 
 
 
@@ -325,9 +316,6 @@ static char getattrib_buff[ 51 ];
 /* Variables used in GetNextChar */
 static char *getnextchar_c = NULL;    /* Pointer to next character to read */
 static char *getnextchar_buf = NULL;  /* Pointer to previously read text */
-
-/* Variables used in Reportr */
-static int report_nwarn = 0;      /* Number of warnings issued since last reset */
 
 
 /* Define the class virtual function table and its initialisation flag
@@ -447,7 +435,6 @@ static void WriteInt( AstChannel *, const char *, int, int, int, const char *, i
 static void WriteIsA( AstChannel *, const char *, const char *, int * );
 static void WriteObject( AstChannel *, const char *, int, int, AstObject *, const char *, int * );
 static void WriteString( AstChannel *, const char *, int, int, const char *, const char *, int * );
-static AstKeyMap *XmlWarnings( AstXmlChan *, int * );
 static AstTimeScaleType TimeScaleReader( AstXmlChan *, AstXmlElement *, int * );
 
 static int TestXmlLength( AstXmlChan *, int * );
@@ -465,19 +452,10 @@ static void ClearXmlIndent( AstXmlChan *, int * );
 static void SetXmlIndent( AstXmlChan *, int, int * );
 static int GetXmlIndent( AstXmlChan *, int * );
 
-static int TestXmlStrict( AstXmlChan *, int * );
-static void ClearXmlStrict( AstXmlChan *, int * );
-static void SetXmlStrict( AstXmlChan *, int, int * );
-static int GetXmlStrict( AstXmlChan *, int * );
-
 static int TestXmlPrefix( AstXmlChan *, int * );
 static void ClearXmlPrefix( AstXmlChan *, int * );
 static void SetXmlPrefix( AstXmlChan *, const char *, int * );
 static const char * GetXmlPrefix( AstXmlChan *, int * );
-
-#if defined(THREAD_SAFE)
-static int ManageLock( AstObject *, int, int, int * );
-#endif
 
 /* Member functions. */
 /* ================= */
@@ -2136,17 +2114,11 @@ void astInitXmlChanVtab_(  AstXmlChanVtab *vtab, const char *name, int *status )
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that provide
    virtual methods for this class. */
-   vtab->XmlWarnings = XmlWarnings;
 
    vtab->SetXmlIndent = SetXmlIndent;
    vtab->ClearXmlIndent = ClearXmlIndent;
    vtab->TestXmlIndent = TestXmlIndent;
    vtab->GetXmlIndent = GetXmlIndent;
-
-   vtab->SetXmlStrict = SetXmlStrict;
-   vtab->ClearXmlStrict = ClearXmlStrict;
-   vtab->TestXmlStrict = TestXmlStrict;
-   vtab->GetXmlStrict = GetXmlStrict;
 
    vtab->SetXmlLength = SetXmlLength;
    vtab->ClearXmlLength = ClearXmlLength;
@@ -2187,11 +2159,6 @@ void astInitXmlChanVtab_(  AstXmlChanVtab *vtab, const char *name, int *status )
    channel->GetFull = GetFull;
    parent_getcomment = channel->GetComment;
    channel->GetComment = GetComment;
-
-#if defined(THREAD_SAFE)
-   parent_managelock = object->ManageLock;
-   object->ManageLock = ManageLock;
-#endif
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -2841,11 +2808,6 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
 /* --------- */
    if ( !strcmp( attrib, "xmlindent" ) ) {
       astClearXmlIndent( this );
-
-/* XmlStrict */
-/* ------------- */
-   } else if ( !strcmp( attrib, "xmlstrict" ) ) {
-      astClearXmlStrict( this );
 
 /* XmlLength */
 /* --------- */
@@ -4873,15 +4835,6 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
          result = getattrib_buff;
       }
 
-/* XmlStrict */
-/* --------- */
-   } else if ( !strcmp( attrib, "xmlstrict" ) ) {
-      ival = astGetXmlStrict( this );
-      if ( astOK ) {
-         (void) sprintf( getattrib_buff, "%d", ival );
-         result = getattrib_buff;
-      }
-
 /* XmlLength */
 /* --------- */
    } else if ( !strcmp( attrib, "xmllength" ) ) {
@@ -5725,90 +5678,6 @@ static AstXmlElement *MakePos2D( AstXmlChan *this, AstXmlElement *elem, int *sta
    return new;
 
 }
-
-#if defined(THREAD_SAFE)
-static int ManageLock( AstObject *this_object, int mode, int extra, int *status ) {
-/*
-*  Name:
-*     ManageLock
-
-*  Purpose:
-*     Manage the thread lock on an Object.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "object.h"
-*     AstObject *ManageLock( AstObject *this, int mode, int extra, int *status ) 
-
-*  Class Membership:
-*     XmlChan member function (over-rides the astManageLock protected
-*     method inherited from the parent class).
-
-*  Description:
-*     This function manages the thread lock on the supplied Object. The
-*     lock can be locked, unlocked or checked by this function as 
-*     deteremined by parameter "mode". See astLock for details of the way
-*     these locks are used.
-
-*  Parameters:
-*     this
-*        Pointer to the Object.
-*     mode
-*        An integer flag indicating what the function should do:
-*
-*        AST__LOCK: Lock the Object for exclusive use by the calling
-*        thread. The "extra" value indicates what should be done if the
-*        Object is already locked (wait or report an error - see astLock).
-*
-*        AST__UNLOCK: Unlock the Object for use by other threads.
-*
-*        AST__CHECKLOCK: Check that the object is locked for use by the
-*        calling thread (report an error if not).
-*     extra
-*        Extra mode-specific information. 
-*     status
-*        Pointer to the inherited status variable.
-
-*  Returned Value:
-*    A local status value: 
-*        0 - Success
-*        1 - Could not lock or unlock the object because it was already 
-*            locked by another thread.
-*        2 - Failed to lock a POSIX mutex
-*        3 - Failed to unlock a POSIX mutex
-*        4 - Bad "mode" value supplied.
-
-*  Notes:
-*     - This function attempts to execute even if an error has already
-*     occurred.
-*/
-
-/* Local Variables: */
-   AstXmlChan *this;         /* Pointer to XmlChan structure */
-   int result;               /* Returned status value */
-
-/* Initialise */
-   result = 0;
-
-/* Check the supplied point is not NULL. */
-   if( ! this_object ) return result;
-
-/* Obtain a pointers to the XmlChan structure. */
-   this = (AstXmlChan *) this_object;
-
-/* Invoke the astManageLock method on any Objects contained within
-   the supplied Object. */
-   if( !result ) result = astManageLock( this->warnings, mode, extra );
-
-/* Invoke the ManageLock method inherited from the parent class, and
-   return the resulting status value. */
-   if( !result ) result = (*parent_managelock)( this_object, mode, extra, status );
-   return result;
-
-}
-#endif
 
 static AstRegion *NegationReader( AstXmlChan *this, AstXmlElement *elem, 
                                   AstFrame *frm, int *status ){
@@ -7180,9 +7049,6 @@ static AstObject *Read( AstChannel *this_channel, int *status ) {
 /* Save the current default format, and then reset it to NATIVE */
    def_fmt = this->formatdef;
    this->formatdef = NATIVE_FORMAT;
-
-/* Reset the keymap containing warnings. */
-   Report( this, NULL, RESET, NULL, status );
 
 /* First we construct an in-memory XML representation of the data source,
    by reading text up to the end of the first element encountered from
@@ -9029,30 +8895,21 @@ static void Report( AstXmlChan *this, AstXmlElement *elem, int severity,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;        /* Declare the thread specific global data */
-   char key[20];              /* Key buffer */
    char buff[300];            /* Message buffer */
    char *text;                /* Pointer to tformatted element text */
    const char *name;          /* Element name */
 
-/* Get a pointer to the structure holding thread-specific global data. */   
-   astGET_GLOBALS(this);
+   if( severity == RESET ) astAddWarning( this, NULL, NULL, status );
 
-   if( severity == RESET ) {
-      if( this->warnings ) (void) astAnnul( this->warnings );
-      report_nwarn = 0;
+   if( !astOK ) return;
 
-   } else if( severity == WARNING && astOK ) {
+   if( severity == WARNING && !astGetStrict( this ) ) {
       name = astXmlGetName( elem );
-      if( !this->warnings ) this->warnings = astKeyMap( "", status );
-      sprintf( key, "Warning_%d", ++report_nwarn );
       sprintf( buff, "astRead(%s): Warning whilst reading %s %s element: %s",
                astGetClass( this ), ANA(name), name, msg );
-      astMapPut0C( this->warnings, key, buff, "" );
-      if( astGetXmlStrict( this ) ) severity = FAILURE;
-   }
+      astAddWarning( this, buff, "astRead", status );
 
-   if( severity == FAILURE && astOK ) {
+   } else {
       text = (char *) astXmlGetTag( elem, 1 );
       astError( AST__BADIN, "astRead(%s): Failed to read %s element: %s", status,
                 astGetClass( this ), text, msg );
@@ -9330,13 +9187,6 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
         ( 1 == astSscanf( setting, "xmlindent= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetXmlIndent( this, ival );
-
-/* XmlStrict */
-/* ----------*/
-   } else if ( nc = 0,
-        ( 1 == astSscanf( setting, "xmlstrict= %d %n", &ival, &nc ) )
-        && ( nc >= len ) ) {
-      astSetXmlStrict( this, ival );
 
 /* XmlLength */
 /* ----------*/
@@ -11076,11 +10926,6 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 /* --------- */
    if ( !strcmp( attrib, "xmlindent" ) ) {
       result = astTestXmlIndent( this );
-
-/* XmlStrict */
-/* --------- */
-   } else if ( !strcmp( attrib, "xmlstrict" ) ) {
-      result = astTestXmlStrict( this );
 
 /* XmlLength */
 /* --------- */
@@ -13079,64 +12924,6 @@ static void WriteString( AstChannel *this_channel, const char *name, int set,
 
 }
 
-static AstKeyMap *XmlWarnings( AstXmlChan *this, int *status ){
-/*
-*++
-*  Name:
-c     astXmlWarnings
-f     AST_XMLWARNINGS
-
-*  Purpose:
-*     Returns any warnings issued by the previous XmlChan read operation.
-
-*  Type:
-*     Public virtual function.
-
-*  Synopsis:
-c     #include "xmlchan.h"
-c     AstKeyMap *XmlWarnings( AstXmlChan *this )
-f     RESULT = AST_XMLWARNINGS( THIS, STATUS )
-
-*  Class Membership:
-*     XmlChan member function.
-
-*  Description:
-*     This function returns an AST KeyMap object holding the text of any
-*     warnings issued as a result of the previous invocation of the 
-c     astRead 
-f     AST_READ
-*     function on the XmlChan. If no warnings were issued, a null Object
-*     pointer will be returned. See also the XmlStrict attribute.
-
-*  Parameters:
-c     this
-f     THIS = INTEGER (Given)
-*        Pointer to the XmlChan.
-f     STATUS = INTEGER (Given and Returned)
-f        The global status.
-
-*  Returned Value:
-c     astXmlWarnings()
-f     AST_XMLWARNINGS = INT
-*        A pointer to the KeyMap holding the warning messages, or a null
-*        Object pointer (AST__NULL) if no warnings were issued during the
-*        previous read operation. 
-
-*  Notes:
-*     - A null Object pointer (AST__NULL) will be returned if this
-c     function is invoked with the AST error status set, or if it
-f     function is invoked with STATUS set to an error value, or if it
-*     should fail for any reason.
-*--
-*/
-
-/* Check the global status, and supplied keyword name. */
-   if( !astOK ) return NULL;
-
-/* Return a copy of the stored KeyMap (if any). */
-   return this->warnings ? astCopy( this->warnings ) : NULL;
-}
-
 
 /* Functions which access class attributes. */
 /* ---------------------------------------- */
@@ -13295,52 +13082,6 @@ astMAKE_SET(XmlChan,XmlFormat,int,xmlformat,(
 astMAKE_TEST(XmlChan,XmlFormat,( this->xmlformat != UNKNOWN_FORMAT ))
 astMAKE_GET(XmlChan,XmlFormat,int,0,(this->xmlformat == UNKNOWN_FORMAT ? 
                                 this->formatdef : this->xmlformat))
-
-/*
-*att++
-*  Name:
-*     XmlStrict
-
-*  Purpose:
-*     How to handle non-fatal warnings
-
-*  Type:
-*     Public attribute.
-
-*  Synopsis:
-*     Integer (boolean)
-
-*  Description:
-*     This attribute controls what happens when a non-fatal warning is
-*     issued whilst reading an Object from an XmlChan using the 
-c     astRead function.
-f     AST_READ function.
-*     Such warnings can be issued for instance when lack of suitable
-*     information in the XML document causes AST to fall back on the use 
-*     of default values, or when the XML document contains information
-*     which AST does not support and consequently ignores.
-*
-*     The default value for this attribute is zero (i.e. false), which
-*     causes warnings to be ignored. No error is reported, and the read
-*     operation continues to completion (unless interupted by fatal errors).
-*     Any warnings issued during the read operation are saved and can be
-*     examined after the read operation has completed by calling the
-c     astXmlWarnings function.
-f     AST_XMLWARNINGS function.
-*
-*     A non-zero value (i.e. true) causes the first warning to be converted 
-*     into a fatal error. An error is reported and the AST error status is
-*     set. This will cause the read operation to fail.
-
-*  Applicability:
-*     XmlChan
-*        All XmlChans have this attribute.
-*att--
-*/
-astMAKE_CLEAR(XmlChan,XmlStrict,xmlstrict,-1)
-astMAKE_GET(XmlChan,XmlStrict,int,0,(this->xmlstrict == -1 ? 0 : this->xmlstrict))
-astMAKE_SET(XmlChan,XmlStrict,int,xmlstrict,( value ? 1 : 0 ))
-astMAKE_TEST(XmlChan,XmlStrict,( this->xmlstrict != -1 ))
 
 /*
 *att++
@@ -13559,8 +13300,6 @@ static void Delete( AstObject *obj, int *status ) {
 /* Free any memory used to store text read from the source */
    GetNextChar( NULL, status );
 
-/* Free memory used to store any warnings. */
-   Report( this, NULL, RESET, NULL, status );
 }
 
 /* Dump function. */
@@ -13621,14 +13360,6 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
       set = TestXmlIndent( this, status );
       ival = set ? GetXmlIndent( this, status ) : astGetXmlIndent( this );
       astWriteInt( channel, "XmlInd", set, 0, ival, "XML indentation" );
-
-/* XmlStrict */
-/* --------- */
-      set = TestXmlStrict( this, status );
-      ival = set ? GetXmlStrict( this, status ) : astGetXmlStrict( this );
-      astWriteInt( channel, "XmlStr", set, 0, ival, 
-                   ival ? "Warnings cause read to abort" : 
-                   "Warnings do not cause read to abort" );
 
 /* XmlLength */
 /* --------- */
@@ -14266,14 +13997,12 @@ AstXmlChan *astInitXmlChan_( void *mem, size_t size, int init,
       new->readcontext = NULL;  /* XmlElement giving context for current read */ 
       new->write_isa = 0;       /* Write out the next "IsA" item? */
       new->xmlindent = -1;      /* Indentat output? */
-      new->xmlstrict = -1;      /* Abort read on warnings? */
       new->xmllength = -INT_MAX;/* Buffer length */
       new->xmlprefix = NULL;    /* Xml prefix */
       new->xmlformat = UNKNOWN_FORMAT; /* Xml format */
       new->formatdef = NATIVE_FORMAT;  /* Default Xml format */
       new->reset_source = 1;    /* A new line should be read from the source */
       new->isa_class = NULL;    /* Class being loaded */
-      new->warnings = NULL;     /* KeyMap containing warnings */
 
 /* If an error occurred, clean up by deleting the new object. */
       if ( !astOK ) new = astDelete( new );
@@ -14414,7 +14143,6 @@ AstXmlChan *astLoadXmlChan_( void *mem, size_t size,
       new->readcontext = NULL;  /* XmlElement giving context for current read */ 
       new->write_isa = 0;       /* Write out the next "IsA" item? */
       new->xmlindent = -1;      /* Indent output? */
-      new->xmlstrict = -1;      /* Abort read on warnings? */
       new->xmllength = -INT_MAX;/* Buffer length */
       new->xmlprefix = NULL;    /* Xml prefix */
       new->reset_source = 1;    /* A new line should be read from the source */
@@ -14426,10 +14154,6 @@ AstXmlChan *astLoadXmlChan_( void *mem, size_t size,
 /* XmlIndent */
 /* --------- */
       new->xmlindent = astReadInt( channel, "xmlind", -1 );
-
-/* XmlStrict */
-/* --------- */
-      new->xmlstrict = astReadInt( channel, "xmlstr", -1 );
 
 /* XmlLength */
 /* --------- */
@@ -14472,10 +14196,6 @@ AstXmlChan *astLoadXmlChan_( void *mem, size_t size,
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
 
-AstKeyMap *astXmlWarnings_( AstXmlChan *this, int *status ){
-   if( !astOK ) return 0;
-   return (**astMEMBER(this,XmlChan,XmlWarnings))( this, status );
-}
 
 
 

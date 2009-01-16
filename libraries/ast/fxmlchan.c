@@ -16,7 +16,6 @@
 *  Routines Defined:
 *     AST_XMLCHAN
 *     AST_ISAXMLCHAN
-*     AST_XMLWARNINGS
 
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
@@ -119,18 +118,6 @@ F77_LOGICAL_FUNCTION(ast_isaxmlchan)( INTEGER(THIS),
    astAt( "AST_ISAXMLCHAN", NULL, 0 );
    astWatchSTATUS(
       RESULT = astIsAXmlChan( astI2P( *THIS ) ) ? F77_TRUE : F77_FALSE;
-   )
-   return RESULT;
-}
-
-F77_INTEGER_FUNCTION(ast_xmlwarnings)( INTEGER(THIS),
-                                       INTEGER(STATUS) ) {
-   GENPTR_INTEGER(THIS)
-   F77_INTEGER_TYPE(RESULT);
-
-   astAt( "AST_XMLWARNINGS", NULL, 0 );
-   astWatchSTATUS(
-      RESULT = astP2I( astXmlWarnings( astI2P( *THIS ) ) );
    )
    return RESULT;
 }

@@ -852,6 +852,9 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *        - Add new functions astTestFits and astSetFitsU.
 *        - Remove use of AST__UNDEF<X> constants.
 *        - Remove "undefread" warning.
+*     16-JAN-2009 (DSB):
+*        Use astAddWarning to store each warning in the parent Channel
+*        structure.
 *class--
 */
 
@@ -27389,8 +27392,13 @@ static void Warn( AstFitsChan *this, const char *condition, const char *text,
 /* Check the inherited status, warning text, FitsChan and Clean attribute. */
    if( !astOK || !text || !text[0] || !this || astGetClean( this ) ) return;
 
-/* Look for the supplied condition within the list of conditions to be
-   reported (given by the Warnings attribue). */
+/* Store all warnings in the parent Channel structure. */
+   astAddWarning( this, text, method, status );
+
+/* For historical reasons, warnings are also stored in the FitsChan as a 
+   set of FITS cards, but only if the supplied condition is contained 
+   within the list of conditions to be reported in this way (given by 
+   the Warnings attribute). */
    if( FullForm( astGetWarnings( this ), condition, 0, status ) >= 0 ){
 
 /* If found, save the current card index, and rewind the FitsChan. */
@@ -33915,6 +33923,16 @@ f     (using AST_FINDFITS) after the call to AST_READ or AST_WRITE has been
 *     cards will be propagated to any output header unless they are
 c     deleted from the FitsChan using astDelFits.
 f     deleted from the FitsChan using astDelFits.
+
+*  Notes:
+*     This attribute only controls the warnings that are to be stored as 
+*     a set of header cards in the FitsChan as described above. It has no
+*     effect on the storage of warnings in the parent Channel structure. 
+*     All warnings are stored in the parent Channel structure, from where 
+*     they can be retrieved using the 
+c     astWarnings
+f     AST_WARNINGS
+*     function.
 
 *  Applicability:
 *     FitsChan

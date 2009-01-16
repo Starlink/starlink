@@ -28,6 +28,8 @@
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -104,14 +106,12 @@ typedef struct AstXmlChan {
    AstXmlDocument *readcontext;/* XmlDocument giving context for current read */
    int write_isa;              /* Is the next "isA" really needed? */
    int xmlindent;              /* Indentat output? */
-   int xmlstrict;              /* Abort read on warning? */
    int xmllength;              /* Buffer length */
    int xmlformat;              /* Output format to use when writing */
    int formatdef;              /* Default format */
    char *xmlprefix;            /* Namespace prefix */
    int reset_source;           /* Read a new line from the source ? */
    const char *isa_class;      /* Class being loaded */
-   AstKeyMap *warnings;        /* A list of warning messages */
 } AstXmlChan;
 
 /* Virtual function table. */
@@ -128,17 +128,10 @@ typedef struct AstXmlChanVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   AstKeyMap *(* XmlWarnings)( AstXmlChan *, int * );
-
    int (* GetXmlIndent)( AstXmlChan *, int * );
    int (* TestXmlIndent)( AstXmlChan *, int * );
    void (* ClearXmlIndent)( AstXmlChan *, int * );
    void (* SetXmlIndent)( AstXmlChan *, int, int * );
-
-   int (* GetXmlStrict)( AstXmlChan *, int * );
-   int (* TestXmlStrict)( AstXmlChan *, int * );
-   void (* ClearXmlStrict)( AstXmlChan *, int * );
-   void (* SetXmlStrict)( AstXmlChan *, int, int * );
 
    int (* GetXmlLength)( AstXmlChan *, int * );
    int (* TestXmlLength)( AstXmlChan *, int * );
@@ -165,7 +158,6 @@ typedef struct AstXmlChanGlobals {
    char GetAttrib_Buff[ 51 ];
    char *GetNextChar_C;    
    char *GetNextChar_Buf;  
-   int Report_NWarn;
 } AstXmlChanGlobals;
 
 #endif
@@ -221,18 +213,11 @@ void astInitXmlChanGlobals_( AstXmlChanGlobals * );
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-AstKeyMap *astXmlWarnings_( AstXmlChan *, int * );
-
 # if defined(astCLASS)           /* Protected */
 int astGetXmlIndent_( AstXmlChan *, int * );
 int astTestXmlIndent_( AstXmlChan *, int * );
 void astClearXmlIndent_( AstXmlChan *, int * );
 void astSetXmlIndent_( AstXmlChan *, int, int * );
-
-int astGetXmlStrict_( AstXmlChan *, int * );
-int astTestXmlStrict_( AstXmlChan *, int * );
-void astClearXmlStrict_( AstXmlChan *, int * );
-void astSetXmlStrict_( AstXmlChan *, int, int * );
 
 int astGetXmlLength_( AstXmlChan *, int * );
 int astTestXmlLength_( AstXmlChan *, int * );
@@ -298,19 +283,12 @@ astINVOKE(O,astLoadXmlChan_(mem,size,vtab,name,astCheckChannel(channel),STATUS_P
    before use.  This provides a contextual error report if a pointer
    to the wrong sort of Object is supplied. */
 
-#define astXmlWarnings(this) astINVOKE(O,astXmlWarnings_(astCheckXmlChan(this),STATUS_PTR))
-
 #if defined(astCLASS)            /* Protected */
 
 #define astClearXmlIndent(this) astINVOKE(V,astClearXmlIndent_(astCheckXmlChan(this),STATUS_PTR))
 #define astGetXmlIndent(this) astINVOKE(V,astGetXmlIndent_(astCheckXmlChan(this),STATUS_PTR))
 #define astSetXmlIndent(this,xmlindent) astINVOKE(V,astSetXmlIndent_(astCheckXmlChan(this),xmlindent,STATUS_PTR))
 #define astTestXmlIndent(this) astINVOKE(V,astTestXmlIndent_(astCheckXmlChan(this),STATUS_PTR))
-
-#define astClearXmlStrict(this) astINVOKE(V,astClearXmlStrict_(astCheckXmlChan(this),STATUS_PTR))
-#define astGetXmlStrict(this) astINVOKE(V,astGetXmlStrict_(astCheckXmlChan(this),STATUS_PTR))
-#define astSetXmlStrict(this,xmlstrict) astINVOKE(V,astSetXmlStrict_(astCheckXmlChan(this),xmlstrict,STATUS_PTR))
-#define astTestXmlStrict(this) astINVOKE(V,astTestXmlStrict_(astCheckXmlChan(this),STATUS_PTR))
 
 #define astClearXmlLength(this) astINVOKE(V,astClearXmlLength_(astCheckXmlChan(this),STATUS_PTR))
 #define astGetXmlLength(this) astINVOKE(V,astGetXmlLength_(astCheckXmlChan(this),STATUS_PTR))

@@ -21561,6 +21561,34 @@ current version):
 \begin{enumerate}
 
 
+\item The handling of warnings within different classes of Channel has
+been rationalised. The XmlStrict attribute and 
+c+
+astXmlWarnings 
+c-
+f+
+AST\_XMLWARNINGS
+f-
+function have been removed. The same functionality is now available via
+the Strict attribute (which has had its remit widened), and the new
+c+
+astWarnings 
+c-
+f+
+AST\_WARNINGS
+f-
+function. This new function can be used on any class of Channel. Teh
+FitsChan class retains its long standing ability to store warnings as
+header cards within the FitsChan, but it also now stores warnings in the
+parent Channel structure, from where they can be retrieved using the 
+c+
+astWarnings 
+c-
+f+
+AST\_WARNINGS
+f-
+function.
+
 \item A new function called 
 c+
 astIntercept

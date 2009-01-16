@@ -41,14 +41,18 @@ c     following functions may also be applied to all Channels:
 f     In addition to those routines applicable to all Objects, the
 f     following routines may also be applied to all Channels:
 *
+c     - astWarnings: Return warnings from the previous read or write
 c     - astPutChannelData: Store data to pass to source or sink functions
 c     - astRead: Read an Object from a Channel
 c     - astWrite: Write an Object to a Channel
+f     - AST_WARNINGS: Return warnings from the previous read or write
 f     - AST_READ: Read an Object from a Channel
 f     - AST_WRITE: Write an Object to a Channel
 
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 *     Research Councils
 
 *  Licence:
@@ -96,6 +100,8 @@ f     - AST_WRITE: Write an Object to a Channel
 *        Added "Strict" attribute.
 *     11-DEC-2008 (DSB):
 *        Added astPutChannelData and astChannelData functions.
+*     16-JAN-2009 (DSB):
+*        Added astAddWarning and astWarnings.
 *class--
 */
 
@@ -129,6 +135,7 @@ f     - AST_WRITE: Write an Object to a Channel
 #include "object.h"              /* Base Object class */
 #include "channel.h"             /* Interface definition for this class */
 #include "loader.h"              /* Interface to the global loader */
+#include "keymap.h"              /* Storing arbitrary data in an AST Object */
 #include "globals.h"             /* Thread-safe global data access */
 
 /* Error code definitions. */
@@ -295,6 +302,7 @@ static AstObject *Read( AstChannel *, int * );
 static AstObject *ReadObject( AstChannel *, const char *, AstObject *, int * );
 static AstChannelValue *FreeValue( AstChannelValue *, int * );
 static AstChannelValue *LookupValue( const char *, int * );
+static AstKeyMap *Warnings( AstChannel *, int * );
 static char *GetNextText( AstChannel *, int * );
 static char *InputTextItem( AstChannel *, int * );
 static char *ReadString( AstChannel *, const char *, const char *, int * );
@@ -313,6 +321,7 @@ static int TestSkip( AstChannel *, int * );
 static int TestStrict( AstChannel *, int * );
 static int Use( AstChannel *, int, int, int * );
 static int Write( AstChannel *, AstObject *, int * );
+static void AddWarning( AstChannel *, const char *, const char *, int * );
 static void AppendValue( AstChannelValue *, AstChannelValue **, int * );
 static void ClearAttrib( AstObject *, const char *, int * );
 static void ClearComment( AstChannel *, int * );
@@ -320,6 +329,8 @@ static void ClearFull( AstChannel *, int * );
 static void ClearSkip( AstChannel *, int * );
 static void ClearStrict( AstChannel *, int * );
 static void ClearValues( AstChannel *, int * );
+static void Copy( const AstObject *, AstObject *, int * );
+static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void GetNextData( AstChannel *, int, char **, char **, int * );
 static void OutputTextItem( AstChannel *, const char *, int * );
@@ -344,6 +355,101 @@ static void WriteString( AstChannel *, const char *, int, int, const char *, con
 
 /* Member functions. */
 /* ================= */
+static void AddWarning( AstChannel *this, const char *msg, const char *method,
+                        int *status ) {
+/*
+*+
+*  Name:
+*     astAddWarning
+
+*  Purpose:
+*     Add a warning to a Channel.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "channel.h"
+*     void astAddWarning( AstChannel *this, const char *msg, 
+*                         const char *method, int status, ... )
+
+*  Class Membership:
+*     Channel method.
+
+*  Description:
+*     This function stores a warning message inside a Channel. These
+*     messages can be retirieved using astWarnings.
+
+*  Parameters:
+*     this
+*        Pointer to the Channel.
+*     msg
+*        The wanting message to store. It may contain printf format
+*        specifiers. If a NULL pointer is supplied, all warnings
+*        currently stored in the Channel are removed.
+*     method
+*        The method name.
+*     status 
+*        Inherited status value.
+*     ...
+*        Extra values to substitute into the message string as
+*        replacements for the printf format specifiers.
+*-
+
+*  Note: The expansion of the printf format specifiers is done in the
+*     astAddWarning_ wrapper function. The AddWarning functions defined by
+*     each class receives the fully expanded message and does not have a
+*     variable argument list. The variable argument list is included in the
+*     above prologue in order to document the wrapper function.
+
+*/
+
+/* Local Variables: */
+   int i;          /* Message index */
+   char *a;        /* Pointer to copy of message */
+
+/* If a NULL pointer was supplied, free all warnings currently in the
+   Channel. Do this before checking the inherited status so that it works
+   even if an error has occurred. */
+   if( !msg ) {
+      for( i = 0; i < this->nwarn; i++ ) {
+         (this->warnings)[ i ] = astFree( (this->warnings)[ i ] );
+      }
+      this->warnings = astFree( this->warnings );
+      this->nwarn = 0;
+      return;
+   }
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* If we are being strict, issue an error rather than a warning. */
+   if( astGetStrict( this ) ) {
+      astError( AST__BADIN, "%s(%s): %s", status, method, astGetClass( this ),
+                msg );
+
+/* Otherwise, we store a copy of the message in the Channel. */
+   } else {
+
+/* Allocate memory and store a copy of th supplied string in it. */
+      a = astStore( NULL, msg, strlen( msg ) + 1 );
+
+/* Expand the array of warning pointers in ther Channel structure. */
+      this->warnings = astGrow( this->warnings, this->nwarn + 1, 
+                                sizeof( char * ) );
+
+/* If all is OK so far, store the new warning pointer, and increment the
+   number of warnings in the Channel. */
+      if( astOK ) {
+         (this->warnings)[ (this->nwarn)++ ] = a;
+
+/* Otherwise, attempt to free the memory holding the copy of the warning. */
+      } else {
+         a = astFree( a );
+      }
+   }
+}
+
 static void AppendValue( AstChannelValue *value, AstChannelValue **head, int *status ) {
 /*
 *  Name:
@@ -1258,6 +1364,136 @@ static char *GetNextText( AstChannel *this, int *status ) {
 #undef ERRBUF_LEN
 }
 
+static AstKeyMap *Warnings( AstChannel *this, int *status ){
+/*
+*++
+*  Name:
+c     astWarnings
+f     AST_WARNINGS
+
+*  Purpose:
+*     Returns any warnings issued by the previous read or write operation.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "channel.h"
+c     AstKeyMap *Warnings( AstChannel *this )
+f     RESULT = AST_WARNINGS( THIS, STATUS )
+
+*  Class Membership:
+*     Channel member function.
+
+*  Description:
+*     This function returns an AST KeyMap object holding the text of any
+*     warnings issued as a result of the previous invocation of the 
+c     astRead or astWrite
+f     AST_READ or AST_WRITE
+*     function on the Channel. If no warnings were issued, a 
+c     a NULL value
+f     AST__NULL 
+*     will be returned. 
+*
+*     Such warnings are non-fatal and will not prevent the
+*     read or write operation succeeding. However, the converted object
+*     may not be identical to the original object in all respects.
+*     Differences which would usually be deemed as insignificant in most 
+*     usual cases will generate a warning, whereas more significant 
+*     differences will generate an error.
+*
+*     The "Strict" attribute allows this warning facility to be switched
+*     off, so that a fatal error is always reported for any conversion
+*     error.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Channel.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astWarnings()
+f     AST_WARNINGS = INTEGER
+*        A pointer to the KeyMap holding the warning messages, or 
+c        NULL
+f        AST__NULL
+*        if no warnings were issued during the previous read operation. 
+
+*  Applicability:
+*     Channel
+*        The basic Channel class generates a warning when ever an
+*        un-recognised item is encountered whilst reading an Object from
+*        an external data source. If Strict is zero (the default), then
+*        unexpected items in the Object description are simply ignored,
+*        and any remaining items are used to construct the returned
+*        Object. If Strict is non-zero, an error will be reported and a
+*        NULL Object pointer returned if any unexpected items are
+*        encountered.
+*
+*        As AST continues to be developed, new attributes are added
+*        occasionally to selected classes. If an older version of AST is
+*        used to read external Object descriptions created by a more
+*        recent version of AST, then the Channel class will, by default,
+*        ignore the new attributes, using the remaining attributes to
+*        construct the Object. This is usually a good thing. However,
+*        since external Object descriptions are often stored in plain
+*        text, it is possible to edit them using a text editor. This
+*        gives rise to the possibility of genuine errors in the
+*        description due to finger-slips, typos, or simple
+*        mis-understanding. Such inappropriate attributes will be ignored
+*        if Strict is left at its default zero value. This will cause the
+*        mis-spelled attribute to revert to its default value,
+*        potentially causing subtle changes in the behaviour of
+*        application software. If such an effect is suspected, the Strict
+*        attribute can be set non-zero, resulting in the erroneous
+*        attribute being identified in an error message.
+*     FitsChan
+*        The returned KeyMap will contain warnings for all conditions
+*        listed in the documentation for the AllWarnings attribute.
+*     XmlChan
+*        Reports conversion errors that result in what are usally 
+*        insignificant  changes.
+
+*  Notes:
+*     - The returned KeyMap uses keys of the form "Warning_1",
+*     "Warning_2", etc.
+*     - A value of 
+c     NULL will be returned if this function is invoked with the AST
+c     error status set,
+f     AST__NULL will be returned if this function is invoked with STATUS 
+f     set to an error value, 
+*     or if it should fail for any reason.
+*--
+*/
+
+/* Local Variables: */
+   AstKeyMap *result;
+   char key[ 20 ];
+   int i;
+
+/* Check the global status, and supplied keyword name. */
+   result = NULL;
+   if( !astOK ) return result;
+
+/* Check there are some warnings to return. */
+   if( this->nwarn && this->warnings ) {
+
+/* Create the KeyMap. */
+      result = astKeyMap( "", status );
+
+/* Loop round all warnings, adding them into the KeyMap. */      
+      for( i = 0; i < this->nwarn; i++ ){
+         sprintf( key, "Warning_%d", i + 1 );
+         astMapPut0C( result, key, (this->warnings)[ i ], " " );
+      }
+   }
+
+/* Return the KeyMap. */
+   return result;
+}
+
 AstChannel *astInitChannel_( void *mem, size_t size, int init,
                              AstChannelVtab *vtab, const char *name,
                              const char *(* source)( void ),
@@ -1425,6 +1661,8 @@ AstChannel *astInitChannel_( void *mem, size_t size, int init,
       new->skip = -INT_MAX;
       new->strict = -INT_MAX;
       new->data = NULL;
+      new->warnings = NULL;
+      new->nwarn = 0;
 
 /* If an error occurred, clean up by deleting the new object. */
       if ( !astOK ) new = astDelete( new );
@@ -1494,6 +1732,7 @@ void astInitChannelVtab_(  AstChannelVtab *vtab, const char *name, int *status )
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that
    provide virtual methods for this class. */
+   vtab->AddWarning = AddWarning;
    vtab->ClearComment = ClearComment;
    vtab->ClearFull = ClearFull;
    vtab->ClearSkip = ClearSkip;
@@ -1504,6 +1743,7 @@ void astInitChannelVtab_(  AstChannelVtab *vtab, const char *name, int *status )
    vtab->GetNextText = GetNextText;
    vtab->GetSkip = GetSkip;
    vtab->GetStrict = GetStrict;
+   vtab->Warnings = Warnings;
    vtab->PutNextText = PutNextText;
    vtab->Read = Read;
    vtab->ReadClassData = ReadClassData;
@@ -1541,6 +1781,10 @@ void astInitChannelVtab_(  AstChannelVtab *vtab, const char *name, int *status )
    object->SetAttrib = SetAttrib;
    parent_testattrib = object->TestAttrib;
    object->TestAttrib = TestAttrib;
+
+/* Declare the destructor and copy constructor. */
+   astSetDelete( (AstObjectVtab *) vtab, Delete );
+   astSetCopy( (AstObjectVtab *) vtab, Copy );
 
 /* Declare the Dump function for this class. There is no destructor or
    copy constructor. */
@@ -4452,46 +4696,30 @@ astMAKE_TEST(Channel,Skip,( this->skip != -INT_MAX ))
 *     Integer (boolean).
 
 *  Description:
-*     This is a boolean attribute which indicates whether an error should
-*     be reported when reading an Object from a Channel if the external
-*     Object description is found to contain items that are not understood.
-*
-*     If Strict is zero (the default), then unexpected items in the
-*     Object description are simply ignored, and any remaining items are
-*     used to construct the returned Object. If Strict is non-zero, an
-*     error will be reported and a NULL Object pointer returned if any
-*     unexpected items are encountered.
-*
-*     As AST continues to be developed, new attributes are added
-*     occasionally to selected classes. If an older version of AST is
-*     used to read external Object descriptions created by a more recent
-*     version of AST, then the Channel class will, by default, ignored
-*     the new attributes using the remaining attributes to construct the 
-*     Object. This is usually a good thing. However, since external
-*     Object descriptions are often stored in plain text, it is possible
-*     to edit them using a text editor. This gives rise to the possibility 
-*     of genuine errors in the description due to finger-slips, typos, or
-*     simple mis-understanding. Such inappropriate attributes will be
-*     ignored if Strict is left at its default zero value. This will
-*     cause the mis-spelled attribute to revert to its default value,
-*     potentially causing subtle changes in the behaviour of application
-*     software. If such an effect is suspected, the Strict attribute can
-*     be set non-zero, resulting in the erroneous attribute being
-*     identified in an error message.
+*     This is a boolean attribute which indicates whether a warning
+*     rather than an error should be issed for insignificant conversion
+*     problems. If it is set non-zero, then fatal errors are issued
+*     instead of warnings, resulting in the 
+c     AST error status being set.
+f     inherited STATUS variable being set to an error value.
+*     If Strict is zero (the default), then execution continues after minor
+*     conversion problems, and a warning message is added to the Channel
+*     structure. Such messages can be retrieved using the 
+c     astWarnings
+f     AST_WARNINGS
+*     function.
 
 *  Notes:
 *     - This attribute was introduced in AST version 5.0. Prior to this
-*     version of AST unexpected data items always caused an error to be
-*     reported. So applications linked against versions of AST prior to
-*     version 5.0 may not be able to read Object descriptions created 
-*     by later versions of AST, if the Object's class description has
-*     changed.
+*     version of AST unexpected data items read by a basic Channel always 
+*     caused an error to be reported. So applications linked against 
+*     versions of AST prior to version 5.0 may not be able to read Object 
+*     descriptions created by later versions of AST, if the Object's class 
+*     description has changed.
 
 *  Applicability:
 *     Channel
 *        All Channels have this attribute.
-*     FitsChan
-*        The FitsChan class currently ignores this attribute.
 *att--
 */
 
@@ -4504,11 +4732,93 @@ astMAKE_TEST(Channel,Strict,( this->strict != -INT_MAX ))
 
 /* Destructor. */
 /* ----------- */
-/* None. */
+static void Delete( AstObject *obj, int *status ) {
+/*
+*  Name:
+*     Delete
+
+*  Purpose:
+*     Destructor for Channel objects.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     void Delete( AstObject *obj, int *status )
+
+*  Description:
+*     This function implements the destructor for Channel objects.
+
+*  Parameters:
+*     obj
+*        Pointer to the object to be deleted.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Notes:
+*     This function attempts to execute even if the global error status is
+*     set.
+*/
+
+/* Local Variables: */
+   AstChannel *this;               /* Pointer to Channel */
+
+/* Obtain a pointer to the Channel structure. */
+   this = (AstChannel *) obj;
+
+/* Free memory used to store warnings. */
+   astAddWarning( this, NULL, NULL, status );
+
+}
 
 /* Copy constructor. */
 /* ----------------- */
-/* None. */
+static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
+/*
+*  Name:
+*     Copy
+
+*  Purpose:
+*     Copy constructor for Channel objects.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     void Copy( const AstObject *objin, AstObject *objout, int *status )
+
+*  Description:
+*     This function implements the copy constructor for Channel objects.
+
+*  Parameters:
+*     objin
+*        Pointer to the object to be copied.
+*     objout
+*        Pointer to the object being constructed.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Notes:
+*     -  This constructor makes a deep copy.
+*/
+
+/* Local Variables: */
+   AstChannel *in;                 /* Pointer to input Channel */
+   AstChannel *out;                /* Pointer to output Channel */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain pointers to the input and output Channels. */
+   in = (AstChannel *) objin;
+   out = (AstChannel *) objout;
+
+/* For safety, first clear any references to the input memory from
+   the output Channel. */
+   out->warnings = NULL;
+   out->nwarn = 0;
+
+}
 
 /* Dump function. */
 /* -------------- */
@@ -5244,6 +5554,10 @@ AstChannel *astLoadChannel_( void *mem, size_t size,
 /* We do not have any data to pass to the source and sink functions. */
       new->data = NULL;
 
+/* No warnings yet. */
+      new->warnings = NULL;
+      new->nwarn = 0;
+
 /* Now read each individual data item from this list and use it to
    initialise the appropriate instance variable(s) for this class. */
 
@@ -5308,6 +5622,7 @@ void astPutNextText_( AstChannel *this, const char *line, int *status ) {
 }
 AstObject *astRead_( AstChannel *this, int *status ) {
    if ( !astOK ) return NULL;
+   astAddWarning( this, NULL, NULL, status );
    return (**astMEMBER(this,Channel,Read))( this, status );
 }
 void astReadClassData_( AstChannel *this, const char *class, int *status ) {
@@ -5367,6 +5682,43 @@ void astPutChannelData_( AstChannel *this, void *data, int *status ) {
    (**astMEMBER(this,Channel,PutChannelData))( this, data, status );
 }
 
+AstKeyMap *astWarnings_( AstChannel *this, int *status ){
+   if( !astOK ) return NULL;
+   return (**astMEMBER(this,Channel,Warnings))( this, status );
+}
+
+/* Because of the variable argument list, we need to work a bit harder on
+   astAddWarning. Functions that provide implementations of the
+   astAddWarning method recieve the fully expanded message and so do not
+   need a variable argument list. */
+
+void astAddWarning_( void *this_void, const char *fmt, const char *method, 
+                     int *status, ... ) {
+   AstChannel *this;
+   char buff[ 201 ];
+   va_list args;                 
+   int nc;
+
+   this = astCheckChannel( this_void );
+
+   if( fmt ) {
+      if( astOK ) {
+         va_start( args, status );
+         nc = vsprintf( buff, fmt, args );
+         va_end( args );
+         if( nc > 200 ) {
+            astError( AST__INTER, "astAddWarning(%s): Message buffer size "
+                      "exceeded (internal AST programming error).",
+                      status, astGetClass( this ) );
+         } else {
+            (**astMEMBER(this,Channel,AddWarning))( this, buff, method, status );
+         }
+      }
+   } else {
+      (**astMEMBER(this,Channel,AddWarning))( this, NULL, method, status );
+   }
+}
+
 /* Count the number of times astWrite is invoked (excluding invocations
    made from within the astWriteObject method - see below). The count is 
    done here so that invocations of astWrite within a sub-class will be 
@@ -5378,6 +5730,7 @@ int astWrite_( AstChannel *this, AstObject *object, int *status ) {
    astGET_GLOBALS(this);
    nwrite_invoc++;
    channel_data = this->data;
+   astAddWarning( this, NULL, NULL, status );
    return (**astMEMBER(this,Channel,Write))( this, object, status );
 }
 

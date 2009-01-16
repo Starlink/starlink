@@ -640,11 +640,11 @@ c      end if
 
       call ast_begin( status )
 
-*  Test the XmlStrict attribute.
+*  Test the Strict attribute.
       call puteg( 'teststc_eg1', 1, status )
 
       call err_mark
-      call xmlread( 1, obj, 'XmlStrict=1', status )
+      call xmlread( 1, obj, 'Strict=1', status )
 
       if( status .ne. ast__badin ) then
          if( status .ne. sai__ok ) call err_flush( status )
@@ -654,8 +654,8 @@ c      end if
       end if
       call err_rlse
 
-*  Test the astXmlWarnings function.
-      call xmlread( 1, obj, 'XmlStrict=0', status )
+*  Test the ast_warnings function.
+      call xmlread( 1, obj, 'Strict=0', status )
       if( warns .EQ. AST__NULL ) then
          call stopit( status, 'Error 2' )
 
@@ -1637,7 +1637,7 @@ c      end if
      :                'object from XmlChan.' )
       end if
 
-      warns = ast_XmlWarnings( ch, status )
+      warns = ast_warnings( ch, status )
       call ast_annul( ch, status )
 
       end

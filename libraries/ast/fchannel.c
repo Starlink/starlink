@@ -453,3 +453,18 @@ F77_INTEGER_FUNCTION(ast_write)( INTEGER(THIS),
    )
    return RESULT;
 }
+
+F77_INTEGER_FUNCTION(ast_warnings)( INTEGER(THIS),
+                                    INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   F77_INTEGER_TYPE(RESULT);
+
+   astAt( "AST_WARNINGS", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astP2I( astWarnings( astI2P( *THIS ) ) );
+   )
+   return RESULT;
+}
+
+
+

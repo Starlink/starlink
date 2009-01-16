@@ -244,6 +244,13 @@
 
 /* Type Definitions. */
 /* ================= */
+
+/* The astWarnings function returns a KeyMap pointer, but we cannot
+   include keymap.h here to define the AstKeyMap type since keymap.h
+   itself include sthis file. So we make a temporary declaration which
+   will be replaced by the full one when the keymap.h file is included. */
+struct AstKeyMap;
+
 /* Channel structure. */
 /* ------------------ */
 /* This structure contains all information that is unique to each
@@ -265,6 +272,8 @@ typedef struct AstChannel {
    int skip;                     /* Skip data between Objects? */
    int strict;                   /* Report unexpected data items? */
    void *data;                   /* Data to pass to source/sink functions */
+   char **warnings;              /* Array of warning strings */
+   int nwarn;                    /* Size of warnings array */
 } AstChannel;
 
 /* Virtual function table. */
@@ -281,6 +290,7 @@ typedef struct AstChannelVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
+   struct AstKeyMap *(* Warnings)( AstChannel *, int * );
    AstObject *(* Read)( AstChannel *, int * );
    AstObject *(* ReadObject)( AstChannel *, const char *, AstObject *, int * );
    char *(* GetNextText)( AstChannel *, int * );
@@ -296,6 +306,7 @@ typedef struct AstChannelVtab {
    int (* TestSkip)( AstChannel *, int * );
    int (* TestStrict)( AstChannel *, int * );
    int (* Write)( AstChannel *, AstObject *, int * );
+   void (* AddWarning)( AstChannel *, const char *, const char *, int * );
    void (* ClearComment)( AstChannel *, int * );
    void (* ClearFull)( AstChannel *, int * );
    void (* ClearSkip)( AstChannel *, int * );
@@ -410,6 +421,7 @@ AstObject *astRead_( AstChannel *, int * );
 int astWrite_( AstChannel *, AstObject *, int * );
 void astPutChannelData_( AstChannel *, void *, int * );
 void *astChannelData_( void );
+struct AstKeyMap *astWarnings_( AstChannel *, int * );
 
 char *astSourceWrap_( const char *(*)( void ), int * );
 void astSinkWrap_( void (*)( const char * ), const char *, int * );
@@ -428,6 +440,7 @@ int astTestComment_( AstChannel *, int * );
 int astTestFull_( AstChannel *, int * );
 int astTestSkip_( AstChannel *, int * );
 int astTestStrict_( AstChannel *, int * );
+void astAddWarning_( void *, const char *, const char *, int *, ... );
 void astClearComment_( AstChannel *, int * );
 void astClearFull_( AstChannel *, int * );
 void astClearSkip_( AstChannel *, int * );
@@ -500,12 +513,16 @@ astINVOKE(O,astRead_(astCheckChannel(this),STATUS_PTR))
 astINVOKE(V,astWrite_(astCheckChannel(this),astCheckObject(object),STATUS_PTR))
 #define astPutChannelData(this,data) \
 astINVOKE(V,astPutChannelData_(astCheckChannel(this),data,STATUS_PTR))
+#define astWarnings(this) \
+astINVOKE(O,astWarnings_(astCheckChannel(this),STATUS_PTR))
 
 #define astSourceWrap astSourceWrap_
 #define astSinkWrap astSinkWrap_
 #define astChannelData astChannelData_()
 
 #if defined(astCLASS)            /* Protected */
+#define astAddWarning astAddWarning_
+
 #define astClearComment(this) \
 astINVOKE(V,astClearComment_(astCheckChannel(this),STATUS_PTR))
 #define astClearFull(this) \
