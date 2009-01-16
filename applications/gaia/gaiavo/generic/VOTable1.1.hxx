@@ -1271,16 +1271,20 @@ namespace votable_11
     // name
     // 
     typedef ::xml_schema::token name_type;
+    typedef ::xsd::cxx::tree::optional< name_type > name_optional;
     typedef ::xsd::cxx::tree::traits< name_type, char > name_traits;
 
-    const name_type&
+    const name_optional&
     name () const;
 
-    name_type&
+    name_optional&
     name ();
 
     void
     name (const name_type& x);
+
+    void
+    name (const name_optional& x);
 
     void
     name (::std::auto_ptr< name_type > p);
@@ -1308,16 +1312,13 @@ namespace votable_11
 
     // Constructors.
     //
-    INFO (const name_type&);
+    INFO ();
 
-    INFO (const char*,
-          const name_type&);
+    INFO (const char*);
 
-    INFO (const ::std::string&,
-          const name_type&);
+    INFO (const ::std::string&);
 
-    INFO (const ::xml_schema::string&,
-          const name_type&);
+    INFO (const ::xml_schema::string&);
 
     INFO (const ::xercesc::DOMElement& e,
           ::xml_schema::flags f = 0,
@@ -1343,7 +1344,7 @@ namespace votable_11
 
     protected:
     ID_optional ID_;
-    ::xsd::cxx::tree::one< name_type > name_;
+    name_optional name_;
     value_optional value_;
   };
 

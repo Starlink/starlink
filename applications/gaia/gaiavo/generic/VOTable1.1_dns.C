@@ -806,22 +806,28 @@ namespace votable_11_dns
     this->ID_.set (x);
   }
 
-  const INFO::name_type& INFO::
+  const INFO::name_optional& INFO::
   name () const
   {
-    return this->name_.get ();
+    return this->name_;
   }
 
-  INFO::name_type& INFO::
+  INFO::name_optional& INFO::
   name ()
   {
-    return this->name_.get ();
+    return this->name_;
   }
 
   void INFO::
   name (const name_type& x)
   {
     this->name_.set (x);
+  }
+
+  void INFO::
+  name (const name_optional& x)
+  {
+    this->name_ = x;
   }
 
   void INFO::
@@ -4939,40 +4945,37 @@ namespace votable_11_dns
   //
 
   INFO::
-  INFO (const name_type& name)
+  INFO ()
   : ::xml_schema::string (),
     ID_ (::xml_schema::flags (), this),
-    name_ (name, ::xml_schema::flags (), this),
+    name_ (::xml_schema::flags (), this),
     value_ (::xml_schema::flags (), this)
   {
   }
 
   INFO::
-  INFO (const char* string,
-        const name_type& name)
+  INFO (const char* string)
   : ::xml_schema::string (string),
     ID_ (::xml_schema::flags (), this),
-    name_ (name, ::xml_schema::flags (), this),
+    name_ (::xml_schema::flags (), this),
     value_ (::xml_schema::flags (), this)
   {
   }
 
   INFO::
-  INFO (const ::std::string& string,
-        const name_type& name)
+  INFO (const ::std::string& string)
   : ::xml_schema::string (string),
     ID_ (::xml_schema::flags (), this),
-    name_ (name, ::xml_schema::flags (), this),
+    name_ (::xml_schema::flags (), this),
     value_ (::xml_schema::flags (), this)
   {
   }
 
   INFO::
-  INFO (const ::xml_schema::string& string,
-        const name_type& name)
+  INFO (const ::xml_schema::string& string)
   : ::xml_schema::string (string),
     ID_ (::xml_schema::flags (), this),
-    name_ (name, ::xml_schema::flags (), this),
+    name_ (::xml_schema::flags (), this),
     value_ (::xml_schema::flags (), this)
   {
   }
@@ -5040,13 +5043,6 @@ namespace votable_11_dns
         this->value (r);
         continue;
       }
-    }
-
-    if (!name_.present ())
-    {
-      throw ::xsd::cxx::tree::expected_attribute< char > (
-        "name",
-        "");
     }
   }
 
