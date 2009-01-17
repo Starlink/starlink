@@ -1,0 +1,349 @@
+#!/bin/sh
+#+
+#  Name:
+#     htxfinder
+
+#  Type of Module:
+#     CGI compliant shell script.
+
+#  Invocation:
+#     By CGI compliant HTTP server.
+
+#  Description:
+#     This is a CGI script for performing keyword searches on the Starlink
+#     documentation set. It makes use of the HTX "findme" command (SUN/188)
+#     to perform the search.
+#
+#     If accessed directly by a client, this script outputs an HTML search form
+#     into which the keyword and search options may be entered. When the form
+#     is submitted, the resulting request is returned to this script, which
+#     then detects that the form contents are to be handled. It decodes these
+#     contents, performs the document search, and outputs an HTML document
+#     containing the search results. These results will normally include a link
+#     to each of the documents found.
+
+#  Installation and Configuration:
+#     This script should be installed with appropriate protections in the
+#     directory that holds your HTTP server's CGI scripts. Note that it will
+#     also execute the "findme" script that forms part of the standard HTX
+#     installation, so this must be available with appropriate protections,
+#     and should also be secure (see below).
+#
+#     This script may require editing to configure it for your system, as
+#     follows:
+#
+#    STARLINK='/web/star'
+#        Edit and un-comment the line above to define the directory under which
+#        your HTX installation resides (normally this will be the directory
+#        where you have installed the rest of your Starlink software). This
+#        script will execute HTX scripts which it finds in the directory:
+#
+#           $STARLINK/bin
+#
+#        and its subdirectories. In the interests of security, this directory,
+#        those above it, and the HTX installation itself should only be
+#        writable by trusted individuals. The default value used is:
+#
+#           "/star"
+#
+#        if you do not specify STARLINK explicitly above.
+#
+HTX_PATH='/star/docs:/star/help'
+#HTX_PATH='/star/docs:/star/help'
+#        Edit and un-comment the line above to define a colon-separated list
+#        of the directories (i.e. document libraries) in which to search for
+#        documents. The default value used is:
+#
+#           "/star/docs:/star/help"
+#
+#        if you do not specify HTX_PATH explicitly above.
+#
+#     HTX_SUPPORT=''
+#        Edit and un-comment the line above to contain text (which may include
+#        HTML constructs) which identifies the person to contact for help with
+#        problems originating with this script or the documents it searches.
+#        This will appear at the end of any output sent to the client. The
+#        default behaviour is to omit this information if you do not specify
+#        HTX_SUPPORT explicitly above (unless this script is running on the
+#        Starlink WWW server at RAL, in which case a suitable default is
+#        supplied).
+#
+#     echo 'Content-type: text/plain'
+#     echohtxfinder
+#        Un-comment the previous two lines to receive debugging information
+#        at the client side.
+#
+#     No edits apart from those above should normally be needed.
+
+#  Input:
+#     The script uses the standard CGI environment variables for input and also
+#     reads the returned form contents (a "POST" request) from standard input.
+
+#  Implementation Deficiencies:
+#     The correct operation of this script depends on there being links in
+#     your HTTP server directory such that the names of documents found locally
+#     by the "findme" command (which will start with one of the directory names
+#     given in the HTX_PATH list) can also be interpreted by the HTTP server.
+#     If this is not done, the search may succeed, but the client will not be
+#     able to follow links from the output back to the matched documents. This
+#     is because these links must go via your HTTP server, which only sees a
+#     "virtual" file system based on the contents of your server directory.
+
+#  Copyright:
+#     Copyright (C) 1995, The Central Laboratory of the Research Councils.
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     29-NOV-1995 (RFWS):
+#        Original version.
+#     4-MAR-1997 (RFWS):
+#        Buffer script output to prevent the user thinking it has stalled.
+#        Fix problem with trailing space on keyword if no buttons checked.
+#        Change default information searched to omit lines of text.
+#     6-NOV-1997 (RFWS):
+#        Fix problem with final character of keyword getting lost.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Initialisation.
+#  --------------
+#  Supply a default value for STARLINK if necessary.
+      STARLINK="${STARLINK:-/web/star}"
+
+#  Supply a default value for the HTX_PATH environment variable if necessary.
+      HTX_PATH="${HTX_PATH:-/web/star/docs:/web/star/help}"
+      export HTX_PATH
+
+#  If no support person has been specified and this script is running on the
+#  Starlink WWW server at RAL, then provide a suitable default.
+      if test ! -n "${HTX_SUPPORT}"; then
+         if test "${SERVER_NAME}${SCRIPT_NAME}" = \
+                 "www.starlink.rl.ac.uk/cgi-bin/htxfinder"; then
+            HTX_SUPPORT='Starlink Software Support
+(<A HREF="mailto:ussc@star.rl.ac.uk">ussc@star.rl.ac.uk</A>)'
+         fi
+      fi
+
+#  Output the document search form.
+#  -------------------------------
+#  Detect if this is a request for the search form to be displayed.
+      if test ! "${REQUEST_METHOD}" = "POST"; then
+
+#  Output the HTML contents of the form.
+         cat <<END
+Content-type: text/html
+
+<HTML>
+<HEAD>
+<TITLE>Starlink Document Search by Topic</TITLE>
+</HEAD>
+<BODY>
+<H1>Starlink Document Search by Topic</H1>
+This page uses the
+<A HREF="http://www.starlink.ac.uk/cgi-bin/htxserver/sun188.htx/sun188.html?xref_findme">findme</A>
+command to search the central <A HREF="http://www.starlink.ac.uk/">Starlink</A>
+document collection at <A HREF="http://www.cclrc.ac.uk/ral">RAL</A> by topic.
+<HR>
+<H2>Quick Search:</H2>
+<FORM METHOD="POST">
+Enter the string you want to find in the box and press the SEARCH
+button to start the search:
+<BLOCKQUOTE>
+<INPUT TYPE="text" NAME="keyword">
+<INPUT TYPE="submit" VALUE="SEARCH">
+<INPUT TYPE="reset" VALUE="RESET">
+</BLOCKQUOTE>
+To see all documents, leave the search box empty.
+<HR>
+<H2>Fine Tuning:</H2>
+You can fine tune your search using the options below (equivalent
+<A HREF="http://www.starlink.ac.uk/cgi-bin/htxserver/sun188.htx/sun188.html?xref_findme">findme</A>
+command options are shown in parentheses).
+<P>
+<OL>
+<LI>Select how the topic string should match:
+<BLOCKQUOTE>
+<DL>
+<DT><INPUT TYPE="checkbox" NAME="wordonly"> Match whole words only (-w)</DT>
+<DT><INPUT TYPE="checkbox" NAME="casesensitive"> Case sensitive matching (-c)</DT>
+</DL>
+</BLOCKQUOTE>
+</LI>
+<P>
+<LI>Select how the output list should appear:
+<BLOCKQUOTE>
+<DL>
+<DT><INPUT TYPE="checkbox" NAME="briefoutput"> Brief listing (-b)</DT>
+<DT><INPUT TYPE="checkbox" NAME="sortoutput"> Sort output list by significance (-s)</DT>
+<DT><INPUT TYPE="checkbox" NAME="showmatches"> Include match statistics (-m)</DT>
+</DL>
+</BLOCKQUOTE>
+</LI>
+<P>
+<LI>Select the document information to search (default -t -h):
+<BLOCKQUOTE>
+<DL>
+<DT><INPUT TYPE="checkbox" NAME="searchnames"> Search document names (-n)</DT>
+<DT><INPUT TYPE="checkbox" NAME="searchtitles"> Search document titles (-t)</DT>
+<DT><INPUT TYPE="checkbox" NAME="searchheadings"> Search page headings (-h)</DT>
+<DT><INPUT TYPE="checkbox" NAME="searchlines"> Search lines of text (-l) <I>n.b. this may take some time</I></DT>
+</DL>
+</BLOCKQUOTE>
+</LI>
+</OL>
+<INPUT TYPE="submit" VALUE="SEARCH">
+<INPUT TYPE="reset" VALUE="RESET">
+</FORM>
+<HR>
+<I>
+This form was generated by the Starlink document finder at ${SERVER_NAME}${SCRIPT_NAME}.
+END
+#  Inclusion of the name of a support person is optional.
+         if test -n "${HTX_SUPPORT}"; then
+            cat <<END
+Please report any problems with this finder to ${HTX_SUPPORT}.
+END
+         fi
+         cat <<END
+</I>
+<HR>
+</BODY>
+</HTML>
+END
+
+#  Perform the document search.
+#  ---------------------------
+#  Detect if a document search (requested by the form generated above) is
+#  required.
+      elif test "${CONTENT_TYPE}" = "application/x-www-form-urlencoded"; then
+
+#  Read the HTML form contents line by line, until the required number of
+#  characters have been obtained.
+         nchar='0'
+         data=''
+         while test "${nchar}" -le "${CONTENT_LENGTH}"; do
+            read line
+            n=`echo "${line}" | wc -c`
+            nchar=`expr "${nchar}" '+' ${n}`
+
+#  Discard any newline characters and concatenate the remaining characters
+#  read.
+            line="`echo "${line}" | awk '{printf $0}'`"
+            data="${data}${line}"
+         done
+
+#  Echo the data read above through "sed" to eliminate any potentially
+#  insecure quote characters. Then use "awk" to convert each valid form
+#  parameter into a variable assignment and use "eval" to perform these
+#  assignments. This makes the form parameters available as local variables in
+#  this script.
+         eval `echo "${data}&" | sed -e 's/'\''/%27/g' | \
+               awk '
+                  BEGIN{
+                     RS = "&"
+                     FS = "="
+                  }
+                  $1~/^[a-zA-Z][a-zA-Z0-9_]*$/ {
+                     printf( "FORM_%s='\''%s'\''\n", $1, $2 )
+                  }'`
+
+#  Replace any "+" characters in the keyword string with spaces (the URL
+#  encoding imposes this substitution which we must reverse).
+         keyword="`echo "${FORM_keyword}" | sed 's%+% %g'`"
+
+#  According to the values of the form parameters, set the flags to be used
+#  by the "findme" script which indicate which information to search.
+         flags=''
+         if test -n "${FORM_searchnames}"; then flags="${flags} -n"; fi
+         if test -n "${FORM_searchtitles}"; then flags="${flags} -t"; fi
+         if test -n "${FORM_searchheadings}"; then flags="${flags} -h"; fi
+         if test -n "${FORM_searchlines}"; then flags="${flags} -l"; fi
+
+#  Supply a default if necessary. If the keyword is blank, then all documents
+#  will be matched, so set the default search flags to make this case quick.
+         if test ! -n "${flags}"; then
+            if test -n "${keyword}"; then flags='-t -h'; else flags='-n'; fi
+         fi
+
+#  Similarly set the other "findme" flags.
+         if test -n "${FORM_wordonly}"; then flags="${flags} -w"; fi
+         if test -n "${FORM_casesensitive}"; then flags="${flags} -c"; fi
+         if test -n "${FORM_briefoutput}"; then flags="${flags} -b"; fi
+         if test -n "${FORM_sortoutput}"; then flags="${flags} -s"; fi
+         if test -n "${FORM_showmatches}"; then flags="${flags} -m"; fi
+
+#  Output the HTML preamble for the table of results.
+         (
+            cat <<END
+Content-type: text/html
+
+<HTML>
+<HEAD>
+<TITLE>Result of Starlink Document Search for Topic "${keyword}"</TITLE>
+</HEAD>
+<BODY>
+<H1>Result of <A HREF="http://www.starlink.ac.uk/">Starlink</A> Document Search</H1>
+<H2>For topic "${keyword}"</H2>
+<HR>
+<P>
+<H2>Documents found:</H2>
+<BLOCKQUOTE>
+END
+
+#  Invoke "findme" to perform the search and write the resulting list of
+#  documents to standard output in HTML format. Suppress any error or
+#  progress reports.
+            ${STARLINK}/bin/findme 2>/dev/null -q -html ${flags} "${keyword}"
+
+#  Save the return status, which records the number of documents matched.
+            ndoc="${?}"
+
+#  Say how many documents were matched.
+            case "${ndoc}" in
+            0) echo 'None';;
+            1) echo '1 document matched';;
+            *) echo "${ndoc} documents matched";;
+            esac
+
+#  Generate the remainder of the output HTML document.
+            cat <<END
+</BLOCKQUOTE>
+<HR>
+<I>
+This search was performed by the Starlink document finder at
+${SERVER_NAME}${SCRIPT_NAME}.
+This uses the 
+<A HREF="http://www.starlink.ac.uk/cgi-bin/htxserver/sun188.htx/sun188.html?xref_findme">findme</A>
+command, which should be consulted for a description of the search
+options available.
+END
+
+#  Inclusion of the name of a support person at the foot of the page is
+#  optional.
+            if test -n "${HTX_SUPPORT}"; then
+               cat <<END
+Please report any problems with this finder to ${HTX_SUPPORT}.
+END
+            fi
+            cat <<END
+</I>
+<HR>
+</BODY>
+</HTML>
+END
+
+#  Pipe the resulting document through "awk" to buffer it so that no output
+#  appears until the search is complete. This is to avoid the search appearing
+#  to have stalled after the heading is displayed (which happens immediately
+#  with some browsers)..
+         ) | awk '{l[n++]=$0} END{for(i=0;i<n;i++)print(l[i])}'
+      fi
+
+#  End of script.

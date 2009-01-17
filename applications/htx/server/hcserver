@@ -1,0 +1,519 @@
+#!/bin/sh
+#+
+#  Name:
+#     hcserver
+
+#  Type of Module:
+#     CGI compliant shell script.
+
+#  Invocation:
+#     By CGI compliant HTTP server.
+
+#  Description:
+#     This is a CGI script for serving files that may be used to generate
+#     hard-copy of documents.
+#
+#     If accessed directly by a client (who must supply a search string
+#     specifying which document is required), this script outputs an HTML
+#     form into which the preferred file format and compression method may be
+#     entered.
+#
+#     When the form is submitted, the resulting request is returned to this
+#     script, which then detects that the form contents are to be handled. It
+#     decodes these contents, locates the required document file and returns
+#     its contents to the client, suitably compressed if necessary, for storage
+#     on the client's file system.
+
+#  Installation and Configuration:
+#     This script should be installed with appropriate protections in the
+#     directory that holds your HTTP server's CGI scripts.
+#
+#     This script may require editing to configure it for your system, as
+#     follows:
+#
+#HTX_PATH='/star/docs:/star/help'
+#HTX_PATH='/home/starlink/www/star/docs:/home/starlink/www/star/help'
+HTX_PATH='/star/docs:/star/help'
+#        Edit and un-comment the line above to define a colon-separated list
+#        of directories in which to search for hard-copy files. The default
+#        value used is:
+#
+#           "/star/docs:/star/help"
+#
+#        if you do not specify HTX_PATH explicitly above.
+#
+      HTX_TYPES='Postscript=ps:DVI=dvi:Text=lis:Text=txt:Latex=tex:Runoff=rno'
+#     HTX_TYPES='Postscript=ps:Text=txt'
+#        Edit and un-comment the line above to contain a colon-separated list
+#        of file type specifications to use when searching for hard-copy files.
+#        Each element of the list should be of the form:
+#
+#           description=type
+#
+#        where "description" is an English description of the file format and
+#        "type" is the file extension used to identify files in that format.
+#        All file types for which a corresponding file can be found will be
+#        offered to the client as potential hard-copy files, and the first one
+#        found will be selected as the default. The default value used for
+#        HTX_TYPES is:
+#
+#           "Postscript=ps:Text=txt"
+#
+#        if you do not specify it explicitly above.
+#
+      HTX_GZIP='/usr/local/bin/gzip'
+#     HTX_GZIP=''
+#        Edit and un-comment the line above to define the location of the
+#        "gzip" file compression utility on your system. If this is not defined
+#        here, then the option of "gzip" file compression will not be offered
+#        to clients. Note that you should specify an absolute path and refer
+#        to a secure location for this utility.
+#        
+#     HTX_SUPPORT=''
+#        Edit and un-comment the line above to contain text (which may include
+#        HTML constructs) which identifies the person to contact for help with
+#        problems originating with this script or the files it serves. This
+#        will appear at the end of any messages sent to the client. The default
+#        behaviour is to omit this information if you do not specify
+#        HTX_SUPPORT explicitly above (unless this script is running on the
+#        Starlink WWW server at RAL, in which case a suitable default is
+#        supplied).
+#
+#     echo 'Content-type: text/plain'
+#     echo
+#        Un-comment the previous two lines to receive debugging information
+#        at the client side.
+#
+#     No edits apart from those above should normally be needed.
+
+#  Input:
+#     The script uses the standard CGI environment variables for input and also
+#     reads the returned form contents (a "POST" request) from standard input.
+#
+#     When the client initially requests that the script supply a form to be
+#     filled in, it should do so by appending a query string of the form:
+#
+#        "?docname.n"
+#
+#     to the URL of this CGI script. Here, "docname" is the name of the
+#     required document and ".n" is an optional version number. Any directory
+#     path information prefixed to "docname" is also optional and will simply
+#     be ignored.
+
+#  Implementation Deficiencies:
+#     Currently, the document version number, which may be appended to the
+#     document query string (as ".n") is ignored (i.e. there is no attempt
+#     to check that the document version requested is valid, or that it matches
+#     the version of the hard-copy files available).
+
+#  Copyright:
+#     Copyright (C) 1995, The Central Laboratory of the Research Councils.
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     5-DEC-1995 (RFWS):
+#        Original version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Initialisation.
+#  ==============
+#  Supply a default value for HTX_PATH if necessary.
+      HTX_PATH="${HTX_PATH:-/web/star/docs:/web/star/help}"
+
+#  Supply a default value for HTX_TYPES if necessary.
+      HTX_TYPES="${HTX_TYPES:-Postscript=ps:Text=txt:Dvi=dvi}"
+
+#  If no support person has been specified and this script is running on the
+#  Starlink WWW server at RAL, then provide a suitable default.
+      if test ! -n "${HTX_SUPPORT}"; then
+         if test "${SERVER_NAME}${SCRIPT_NAME}" = \
+                 "www.starlink.rl.ac.uk/cgi-bin/hcserver"; then
+            HTX_SUPPORT='Starlink Software Support
+(<A HREF="mailto:ussc@star.rl.ac.uk">ussc@star.rl.ac.uk</A>)'
+         fi
+      fi
+
+#  Generate the form.
+#  =================
+#  Obtain the document name.
+#  ------------------------
+#  Test if a request to supply the fill-out form has been received.
+      if test ! "${REQUEST_METHOD}" = "POST"; then
+
+#  Check that a query string has been supplied giving the name of the
+#  required document. If not, then output an HTML document containing an
+#  error message.
+         if test ! -n "${QUERY_STRING}"; then
+            cat <<END
+Content-type: text/html
+
+<HTML>
+<HEAD>
+<TITLE>Error in Hard-Copy Request</TITLE>
+</HEAD>
+<BODY>
+<H1>Error in Hard-Copy Request</H1>
+<HR>
+The hard-copy request you submitted had the URL:
+<BLOCKQUOTE>
+http://${SERVER_NAME}${SCRIPT_NAME}${PATH_INFO}
+</BLOCKQUOTE>
+This URL is invalid because it does not contain a query string specifying the
+name of the document you require.
+<P>
+Please alert the author of your document, or the maintainer of your software
+or documentation system to this problem.
+END
+
+#  If the query string exists, then strip off any path information and document
+#  version number to obtain the document name.
+         else
+            doc="`echo "${QUERY_STRING}" | sed 's%^.*/%%
+                                                s%\.[0-9]*$%%'`"
+
+#  Check that a document name has been obtained. If not, then output an HTML
+#  document containing an error message.
+            if test ! -n "${doc}"; then
+               cat <<END
+Content-type: text/html
+
+<HTML>
+<HEAD>
+<TITLE>Error in Hard-Copy Request</TITLE>
+</HEAD>
+<BODY>
+<H1>Error in Hard-Copy Request</H1>
+<HR>
+The hard-copy request you submitted had the URL:
+<BLOCKQUOTE>
+http://${SERVER_NAME}${SCRIPT_NAME}${PATH_INFO}?${QUERY_STRING}
+</BLOCKQUOTE>
+This URL is invalid because the query string does not specify the name of the
+document you require.
+<P>
+Please alert the author of your document, or the maintainer of your software
+or documentation system to this problem.
+END
+
+#  Search for the hard-copy files.
+#  ------------------------------
+#  We will store the list of possible hard-copy files (in HTML format) in the
+#  "results" variable.
+            else
+               results=`
+
+#  Initialise the "checked" variable which is used to identify the default
+#  radio button in the HTML form.
+                  checked=' CHECKED'
+
+#  Locally re-define the "IFS" variable and loop to look for hard-copy files
+#  satisfying any of the type specifications in the HTX_TYPES search list.
+                  oldifs="${IFS}"
+                  IFS=':'
+                  for typespec in ${HTX_TYPES}; do
+                     IFS="${oldifs}"
+
+#  Extract the file type extension from the type specification.
+                     type="\`expr "X${typespec}" ':' 'X[^=]*=\(.*\)$'\`"
+
+#  Again locally redefine the "IFS" variable and loop to search for files in
+#  each of the directories in the HTX_PATH search path.
+                     IFS=':'
+                     for dir in ${HTX_PATH}; do
+                        IFS="${oldifs}"
+
+#  Generate the name of the hard-copy file we are looking for and see if it
+#  exists and is readable.
+                        hcfile="${dir}/${doc}.${type}"
+                        if test -r "${hcfile}"; then
+
+#  If it is readable, extract an English description of its format from the
+#  type specification.
+                           format="\`expr "X${typespec}" ':' 'X\([^=]*\)=.*$'\`"
+
+#  Also use "ls" to determine the file size in bytes.
+                           size="\`ls -l -d "${hcfile}" 2>/dev/null \
+                                   | awk '{print $5}'\`"
+
+#  Generate an HTML list element describing the file, with an HTML forms radio
+#  button that can be used to select it. Set the "VALUE" field for the button
+#  to be the name of the hard-copy file, but without directory information.
+#  Also prefix each line with the English description of the file format, so
+#  that the list can be sorted alphabetically (note we must also put all this
+#  on a single line to allow sorting).
+                           echo \
+"${format}:<DT><INPUT TYPE=\"radio\" NAME=\"file\" VALUE=\"${doc}.${type}\"${checked}> ${format} (.${type}) format - ${size} bytes</DT>"
+
+#  After generating the first list element, clear the "checked" variable so
+#  that only the first radio button (the default) is checked.
+                           checked=''
+
+#  Quit following the HTX_PATH search path once a file of the required type
+#  has been located.
+                           break
+                        fi
+                     done
+
+#  Pass the list generated above through "sort" to sort it into alphabetical
+#  order and then through "sed" to remove the initial field used for sorting.
+#  The resulting list is now stored in the "results" variable.
+                  done | sort | sed 's%^[^:]*:%%'`
+
+#  Output the form contents.
+#  ------------------------
+#  Check to see if a list of suitable hard-copy files was produced above. If
+#  not, then output an HTML document containing an error message.
+               if test ! -n "${results}"; then
+                  cat <<END
+Content-type: text/html
+
+<HTML>
+<HEAD>
+<TITLE>No Hard-Copy Available</TITLE>
+</HEAD>
+<BODY>
+<H1>No Hard-Copy Available</H1>
+<HR>
+Sorry, there are no files at this site suitable for producing a hard-copy of
+document "${doc}".
+END
+
+#  If suitable files were found, then output the HTML fill-in form, embedding
+#  the results list produced above.
+               else
+                  cat <<END
+Content-type: text/html
+
+<HEAD>
+<TITLE>Select Hard-Copy File Format for ${doc}</TITLE>
+</HEAD>
+<BODY>
+<H1>Select Hard-Copy File Format for ${doc}</H1>
+<HR>
+<FORM METHOD="POST">
+1. Document "${doc}" is available in the following file formats for producing
+your own hard-copy output. Please select the format you require:
+<BLOCKQUOTE>
+<DL>
+${results}
+</DL>
+</BLOCKQUOTE>
+<I>
+Note that some documents may contain graphics and images which cannot be
+included in certain formats. If you require these parts of the document, then
+<B>Postscript</B> is the recommended format to use.
+</I>
+<HR>
+2. If you would like a compressed copy of the file, please select the
+compression method to use:
+<BLOCKQUOTE>
+<DL>
+<DT><INPUT TYPE="radio" NAME="compress" VALUE="none" CHECKED> No compression</DT>
+<DT><INPUT TYPE="radio" NAME="compress" VALUE="compress"> UNIX compress (.Z) compression</DT>
+END
+
+#  Only offer "gzip" compression if it is available.
+                  if test -n "${HTX_GZIP}"; then
+                     cat <<END
+<DT><INPUT TYPE="radio" NAME="compress" VALUE="gzip"> gzip (.gz) compression</DT>
+END
+                  fi
+                  cat <<END
+</DL>
+</BLOCKQUOTE>
+<HR>
+3. When you are ready, press
+<INPUT TYPE="submit" VALUE="This Button"> to request the file.
+</FORM>
+END
+               fi
+            fi
+         fi
+
+#  Output a footnote.
+#  -----------------
+#  Add a footnote to any HTML output to identify this server.
+         cat <<END
+<HR>
+<I>
+This message was generated by the hard-copy file server at
+${SERVER_NAME}${SCRIPT_NAME}.
+END
+
+#  Inclusion of the name of a support person is optional.
+         if test -n "${HTX_SUPPORT}"; then
+            cat <<END
+Please report any problems with this server or the files it serves to
+${HTX_SUPPORT}.
+END
+         fi
+         cat <<END
+</I>
+<HR>
+<BODY>
+</HTML>
+END
+
+#  Send a hard-copy file.
+#  =====================
+#  Test if we need to respond to the contents of the form generated above.
+      elif test "${CONTENT_TYPE}" = "application/x-www-form-urlencoded"; then
+
+#  Interpret the form contents.
+#  ---------------------------
+#  Read the HTML form contents line by line, until the required number of
+#  characters have been obtained.
+         nchar='0'
+         data=''
+         while test "${nchar}" -lt "${CONTENT_LENGTH}"; do
+            read line
+            n=`echo "${line}" | wc -c`
+            nchar=`expr "${nchar}" '+' ${n}`
+
+#  Discard each newline character and concatenate the remaining characters
+#  read.
+            line="`echo "${line}" | sed -e 's%.$%%'`"
+            data="${data}${line}"
+         done
+
+#  Echo the data read above through "sed" to eliminate any potentially
+#  insecure quote characters. Then use "awk" to convert each valid form
+#  parameter into a variable assignment and use "eval" to perform these
+#  assignments. This makes the form parameters available as local variables in
+#  this script.
+         eval `echo "${data}" | sed -e 's/'\''/%27/g' | \
+               awk '
+                  BEGIN{
+                     RS = "&"
+                     FS = "="
+                  }
+                  $1~/^[a-zA-Z][a-zA-Z0-9_]*$/ {
+                     printf( "FORM_%s='\''%s'\''\n", $1, $2 )
+                  }'`
+
+#  Validate the hard-copy file name.
+#  --------------------------------
+#  Restore any escaped "/" characters in the name of the hard-copy file and
+#  then remove any directory path. We must do this and then search for the file
+#  afresh for security reasons (otherwise the client could request a copy of
+#  any file accessible to this script).
+         file="`echo "${FORM_file}" | sed 's|%2F|/|g
+                                           s%^.*/%%'`"
+
+#  Extract the file type extension.
+         ftype="`expr "X${file}" ':' 'X.*\.\([^.]*\)$'`"
+
+#  Locally redefine the "IFS" variable and loop to validate the file type.
+         ok=''
+         oldifs="${IFS}"
+         IFS=':'
+         for typespec in ${HTX_TYPES}; do
+            IFS="${oldifs}"
+
+#  Extract each valid file extension from the HTX_TYPES list and compare it
+#  with the one supplied. Note if a match is found.
+            type="`expr "X${typespec}" ':' 'X[^=]*=\(.*\)$'`"
+            if test "${type}" = "${ftype}"; then
+               ok='1'
+               break
+            fi
+         done
+            
+#  If the file type appears valid, locally redefine the "IFS" variable and
+#  loop to search for the file in each directory on the HTX_PATH search path.
+         hcfile=''
+         if test "${ok}" = '1'; then
+            IFS=':'
+            for dir in ${HTX_PATH}; do
+               IFS="${oldifs}"
+
+#  When the file is found, note its full name and quit searching.
+               if test -r "${dir}/${file}"; then
+                  hcfile="${dir}/${file}"
+                  break
+               fi
+            done
+         fi
+
+#  If the file could not be found (or its type is invalid), then output an HTML
+#  document containing an error message and denying the file's existence.
+         if test ! -f "${hcfile}"; then
+            cat <<END
+Content-type: text/html
+
+<HTML>
+<HEAD>
+<TITLE>Bad Hard-Copy File Name</TITLE>
+</HEAD>
+<BODY>
+<H1>Bad Hard-Copy File Name</H1>
+<HR>
+Sorry, the hard-copy file you requested (${file}) is not currently available.
+<P>
+Either it has been temporarily removed at this site, or you have sent an
+invalid request to this server.
+<HR>
+<I>
+This message was generated by the hard-copy file server at
+${SERVER_NAME}${SCRIPT_NAME}.
+END
+
+#  Inclusion of the name of a support person is optional.
+         if test -n "${HTX_SUPPORT}"; then
+            cat <<END
+Please report any problems with this server or the files it serves to
+${HTX_SUPPORT}.
+END
+         fi
+         cat <<END
+</I>
+<HR>
+<BODY>
+</HTML>
+END
+
+#  Output the hard-copy file contents.
+#  ----------------------------------
+#  If the hard-copy file was found, then output it as the body of a MIME
+#  message of type "application/octet-stream" (which effectively requests that
+#  the client saves it in a file).
+         else
+            echo "Content-type: application/octet-stream"
+            echo
+
+#  Apply the appropriate compression method according to the value of
+#  $FORM_compress (if its value is unrecognised, don't apply any compression).
+            case "${FORM_compress}" in
+            compress)
+               compress -c "${hcfile}";;
+
+#  Only apply "gzip" compression if it is available - otherwise don't compress
+#  the file.
+            gzip)
+               if test -n "${HTX_GZIP}"; then
+                  ${HTX_GZIP} -c "${hcfile}"
+               else
+                  cat "${hcfile}"
+               fi;;
+            *)
+               cat "${hcfile}";;
+            esac
+
+#  For some reason, it seems a good idea to wait here for a bit, otherwise
+#  certain files (usually binary ones) may be received by the client with bits
+#  missing. This may be something to do with this script terminating before
+#  the HTTP server has read all its output. Sleeping for a second seems to
+#  avoid the problem.
+            sleep 1
+         fi
+      fi
+
+#  End of script.
