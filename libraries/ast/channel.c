@@ -324,7 +324,7 @@ static int TestSkip( AstChannel *, int * );
 static int TestStrict( AstChannel *, int * );
 static int Use( AstChannel *, int, int, int * );
 static int Write( AstChannel *, AstObject *, int * );
-static void AddWarning( AstChannel *, const char *, const char *, int * );
+static void AddWarning( AstChannel *, int, const char *, const char *, int * );
 static void AppendValue( AstChannelValue *, AstChannelValue **, int * );
 static void ClearAttrib( AstObject *, const char *, int * );
 static void ClearComment( AstChannel *, int * );
@@ -360,8 +360,8 @@ static void WriteString( AstChannel *, const char *, int, int, const char *, con
 
 /* Member functions. */
 /* ================= */
-static void AddWarning( AstChannel *this, const char *msg, const char *method,
-                        int *status ) {
+static void AddWarning( AstChannel *this, int level, const char *msg, 
+                        const char *method, int *status ) {
 /*
 *+
 *  Name:
@@ -375,7 +375,7 @@ static void AddWarning( AstChannel *this, const char *msg, const char *method,
 
 *  Synopsis:
 *     #include "channel.h"
-*     void astAddWarning( AstChannel *this, const char *msg, 
+*     void astAddWarning( AstChannel *this, int level, const char *msg, 
 *                         const char *method, int status, ... )
 
 *  Class Membership:
@@ -388,6 +388,9 @@ static void AddWarning( AstChannel *this, const char *msg, const char *method,
 *  Parameters:
 *     this
 *        Pointer to the Channel.
+*     level
+*        Ignore the warning if the ReportLevel attribute value is less
+*        than "level".
 *     msg
 *        The wanting message to store. It may contain printf format
 *        specifiers. If a NULL pointer is supplied, all warnings
@@ -428,29 +431,35 @@ static void AddWarning( AstChannel *this, const char *msg, const char *method,
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Only proceed if the message level is sufficiently important. */
+   if( astGetReportLevel( this ) >= level ) {
+
 /* If we are being strict, issue an error rather than a warning. */
-   if( astGetStrict( this ) ) {
-      astError( AST__BADIN, "%s(%s): %s", status, method, astGetClass( this ),
-                msg );
+      if( astGetStrict( this ) ) {
+         if( astOK ) {
+            astError( AST__BADIN, "%s(%s): %s", status, method, 
+                      astGetClass( this ), msg );
+         }
 
 /* Otherwise, we store a copy of the message in the Channel. */
-   } else {
+      } else {
 
 /* Allocate memory and store a copy of th supplied string in it. */
-      a = astStore( NULL, msg, strlen( msg ) + 1 );
+         a = astStore( NULL, msg, strlen( msg ) + 1 );
 
 /* Expand the array of warning pointers in ther Channel structure. */
-      this->warnings = astGrow( this->warnings, this->nwarn + 1, 
-                                sizeof( char * ) );
+         this->warnings = astGrow( this->warnings, this->nwarn + 1, 
+                                   sizeof( char * ) );
 
 /* If all is OK so far, store the new warning pointer, and increment the
    number of warnings in the Channel. */
-      if( astOK ) {
-         (this->warnings)[ (this->nwarn)++ ] = a;
+         if( astOK ) {
+            (this->warnings)[ (this->nwarn)++ ] = a;
 
 /* Otherwise, attempt to free the memory holding the copy of the warning. */
-      } else {
-         a = astFree( a );
+         } else {
+            a = astFree( a );
+         }
       }
    }
 }
@@ -729,23 +738,15 @@ static void ClearValues( AstChannel *this, int *status ) {
 /* Obtain a pointer to the first element. */
       value = *head;
 
-/* If no error has yet occurred, then report an appropriate error
-   message, depending on whether the Value is associated with an
-   Object or a string. Only do this if we are using strict error
-   reporting. */
-      if ( astGetStrict( this ) && astOK ) {
-         if ( value->is_object ) {
-            astError( AST__BADIN,
-                      "astRead(%s): The Object \"%s = <%s>\" was "
-                      "not recognised as valid input.", status,
-                      astGetClass( this ), value->name,
-                      astGetClass( value->ptr.object ) );
-         } else {
-            astError( AST__BADIN,
-                      "astRead(%s): The value \"%s = %s\" was not "
-                      "recognised as valid input.", status,
-                      astGetClass( this ), value->name, value->ptr.string );
-         }
+/* Issue a warning. */
+      if ( value->is_object ) {
+         astAddWarning( this, 1, "The Object \"%s = <%s>\" was "
+                        "not recognised as valid input.", "astRead", status,
+                        value->name, astGetClass( value->ptr.object ) );
+      } else {
+         astAddWarning( this, 1, "The value \"%s = %s\" was not "
+                        "recognised as valid input.", "astRead", status,
+                        value->name, value->ptr.string );
       }
 
 /* Remove the Value structure from the list (which updates the head of
@@ -1471,7 +1472,7 @@ f        AST__NULL
 *        attribute being identified in an error message.
 *     FitsChan
 *        The returned KeyMap will contain warnings for all conditions
-*        listed in the documentation for the AllWarnings attribute.
+*        listed in the Warnings attribute.
 *     XmlChan
 *        Reports conversion errors that result in what are usally 
 *        insignificant  changes.
@@ -4702,7 +4703,9 @@ astMAKE_TEST(Channel,Full,( this->full != -INT_MAX ))
 *
 *     1 - Report only conditions where significant information content has been
 *     changed. For instance, an unsupported time-scale has been replaced by a
-*     supported near-equivalent time-scale.
+*     supported near-equivalent time-scale. Another example is if a basic
+*     Channel unexpected encounters data items that may have been introduced 
+*     by later versions of AST.
 *
 *     2 - Report the above, and in addition report significant default
 *     values. For instance, if no time-scale was specified when reading an
@@ -4725,6 +4728,9 @@ astMAKE_TEST(Channel,Full,( this->full != -INT_MAX ))
 *  Applicability:
 *     Channel
 *        All Channels have this attribute.
+*     FitsChan
+*        All the conditions selected by the FitsChan Warnings attribute are
+*        reported at level 1.
 *att--
 */
 
@@ -4864,7 +4870,7 @@ static void Delete( AstObject *obj, int *status ) {
    this = (AstChannel *) obj;
 
 /* Free memory used to store warnings. */
-   astAddWarning( this, NULL, NULL, status );
+   astAddWarning( this, 0, NULL, NULL, status );
 
 }
 
@@ -5732,7 +5738,7 @@ void astPutNextText_( AstChannel *this, const char *line, int *status ) {
 }
 AstObject *astRead_( AstChannel *this, int *status ) {
    if ( !astOK ) return NULL;
-   astAddWarning( this, NULL, NULL, status );
+   astAddWarning( this, 0, NULL, NULL, status );
    return (**astMEMBER(this,Channel,Read))( this, status );
 }
 void astReadClassData_( AstChannel *this, const char *class, int *status ) {
@@ -5802,8 +5808,8 @@ AstKeyMap *astWarnings_( AstChannel *this, int *status ){
    astAddWarning method recieve the fully expanded message and so do not
    need a variable argument list. */
 
-void astAddWarning_( void *this_void, const char *fmt, const char *method, 
-                     int *status, ... ) {
+void astAddWarning_( void *this_void, int level, const char *fmt, 
+                     const char *method, int *status, ... ) {
    AstChannel *this;
    char buff[ 201 ];
    va_list args;                 
@@ -5821,11 +5827,11 @@ void astAddWarning_( void *this_void, const char *fmt, const char *method,
                       "exceeded (internal AST programming error).",
                       status, astGetClass( this ) );
          } else {
-            (**astMEMBER(this,Channel,AddWarning))( this, buff, method, status );
+            (**astMEMBER(this,Channel,AddWarning))( this, level, buff, method, status );
          }
       }
    } else {
-      (**astMEMBER(this,Channel,AddWarning))( this, NULL, method, status );
+      (**astMEMBER(this,Channel,AddWarning))( this, level, NULL, method, status );
    }
 }
 
@@ -5840,7 +5846,7 @@ int astWrite_( AstChannel *this, AstObject *object, int *status ) {
    astGET_GLOBALS(this);
    nwrite_invoc++;
    channel_data = this->data;
-   astAddWarning( this, NULL, NULL, status );
+   astAddWarning( this, 0, NULL, NULL, status );
    return (**astMEMBER(this,Channel,Write))( this, object, status );
 }
 

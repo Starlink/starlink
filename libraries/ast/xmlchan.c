@@ -8899,7 +8899,7 @@ static void Report( AstXmlChan *this, AstXmlElement *elem, int severity,
    char *text;                /* Pointer to tformatted element text */
    const char *name;          /* Element name */
 
-   if( severity == RESET ) astAddWarning( this, NULL, NULL, status );
+   if( severity == RESET ) astAddWarning( this, 0, NULL, NULL, status );
 
    if( !astOK ) return;
 
@@ -8907,7 +8907,7 @@ static void Report( AstXmlChan *this, AstXmlElement *elem, int severity,
       name = astXmlGetName( elem );
       sprintf( buff, "astRead(%s): Warning whilst reading %s %s element: %s",
                astGetClass( this ), ANA(name), name, msg );
-      astAddWarning( this, buff, "astRead", status );
+      astAddWarning( this, 1, buff, "astRead", status );
 
    } else {
       text = (char *) astXmlGetTag( elem, 1 );

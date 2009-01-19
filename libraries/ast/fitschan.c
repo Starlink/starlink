@@ -27392,16 +27392,17 @@ static void Warn( AstFitsChan *this, const char *condition, const char *text,
 /* Check the inherited status, warning text, FitsChan and Clean attribute. */
    if( !astOK || !text || !text[0] || !this || astGetClean( this ) ) return;
 
-/* Store all warnings in the parent Channel structure. */
-   astAddWarning( this, text, method, status );
-
-/* For historical reasons, warnings are also stored in the FitsChan as a 
-   set of FITS cards, but only if the supplied condition is contained 
-   within the list of conditions to be reported in this way (given by 
-   the Warnings attribute). */
+/* Ignore the warning if the supplied condition is not contained within 
+   the list of conditions to be reported in this way (given by the 
+   Warnings attribute). */
    if( FullForm( astGetWarnings( this ), condition, 0, status ) >= 0 ){
 
-/* If found, save the current card index, and rewind the FitsChan. */
+/* If found, store the warning in the parent Channel structure. */
+      astAddWarning( this, 1, text, method, status );
+
+/* For historical reasons, warnings are also stored in the FitsChan as a 
+   set of FITS cards... First save the current card index, and rewind the 
+   FitsChan. */
       icard = astGetCard( this );
       astClearCard( this );
 

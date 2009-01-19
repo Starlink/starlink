@@ -305,7 +305,7 @@ typedef struct AstChannelVtab {
    int (* TestFull)( AstChannel *, int * );
    int (* TestStrict)( AstChannel *, int * );
    int (* Write)( AstChannel *, AstObject *, int * );
-   void (* AddWarning)( AstChannel *, const char *, const char *, int * );
+   void (* AddWarning)( AstChannel *, int, const char *, const char *, int * );
    void (* ClearComment)( AstChannel *, int * );
    void (* ClearFull)( AstChannel *, int * );
    void (* ClearStrict)( AstChannel *, int * );
@@ -446,7 +446,7 @@ int astReadInt_( AstChannel *, const char *, int, int * );
 int astTestComment_( AstChannel *, int * );
 int astTestFull_( AstChannel *, int * );
 int astTestStrict_( AstChannel *, int * );
-void astAddWarning_( void *, const char *, const char *, int *, ... );
+void astAddWarning_( void *, int, const char *, const char *, int *, ... );
 void astClearComment_( AstChannel *, int * );
 void astClearFull_( AstChannel *, int * );
 void astClearStrict_( AstChannel *, int * );
