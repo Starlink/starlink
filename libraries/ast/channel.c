@@ -32,8 +32,9 @@ f     and "sink" routines which connect it to an external data store
 *
 *     - Comment: Include textual comments in output?
 *     - Full: Set level of output detail
+*     - ReportLevel: Selects the level of error reporting
 *     - Skip: Skip irrelevant data?
-*     - Strict: Report an error if unexpected data items are found?
+*     - Strict: Generate errors instead of warnings?
 
 *  Functions:
 c     In addition to those functions applicable to all Objects, the
@@ -311,12 +312,14 @@ static const char *GetAttrib( AstObject *, const char *, int * );
 static double ReadDouble( AstChannel *, const char *, double, int * );
 static int GetComment( AstChannel *, int * );
 static int GetFull( AstChannel *, int * );
+static int GetReportLevel( AstChannel *, int * );
 static int GetSkip( AstChannel *, int * );
 static int GetStrict( AstChannel *, int * );
 static int ReadInt( AstChannel *, const char *, int, int * );
 static int TestAttrib( AstObject *, const char *, int * );
 static int TestComment( AstChannel *, int * );
 static int TestFull( AstChannel *, int * );
+static int TestReportLevel( AstChannel *, int * );
 static int TestSkip( AstChannel *, int * );
 static int TestStrict( AstChannel *, int * );
 static int Use( AstChannel *, int, int, int * );
@@ -326,6 +329,7 @@ static void AppendValue( AstChannelValue *, AstChannelValue **, int * );
 static void ClearAttrib( AstObject *, const char *, int * );
 static void ClearComment( AstChannel *, int * );
 static void ClearFull( AstChannel *, int * );
+static void ClearReportLevel( AstChannel *, int * );
 static void ClearSkip( AstChannel *, int * );
 static void ClearStrict( AstChannel *, int * );
 static void ClearValues( AstChannel *, int * );
@@ -341,6 +345,7 @@ static void RemoveValue( AstChannelValue *, AstChannelValue **, int * );
 static void SetAttrib( AstObject *, const char *, int * );
 static void SetComment( AstChannel *, int, int * );
 static void SetFull( AstChannel *, int, int * );
+static void SetReportLevel( AstChannel *, int, int * );
 static void SetSkip( AstChannel *, int, int * );
 static void SetStrict( AstChannel *, int, int * );
 static void SinkWrap( void (*)( const char * ), const char *, int * );
@@ -614,6 +619,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
    } else if ( !strcmp( attrib, "full" ) ) {
       astClearFull( this );
 
+/* ReportLevel. */
+/* ------------ */
+   } else if ( !strcmp( attrib, "reportlevel" ) ) {
+      astClearReportLevel( this );
+
 /* Skip. */
 /* ----- */
    } else if ( !strcmp( attrib, "skip" ) ) {
@@ -866,8 +876,9 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
    const char *result;           /* Pointer value to return */
    int comment;                  /* Comment attribute value */
    int full;                     /* Full attribute value */
+   int report_level;             /* ReportLevel attribute value */
    int skip;                     /* Skip attribute value */
-   int strict;                   /* Report errors for unexpected data items? */
+   int strict;                   /* Report errors insead of warnings? */
 
 /* Initialise. */
    result = NULL;
@@ -901,6 +912,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
       full = astGetFull( this );
       if ( astOK ) {
          (void) sprintf( getattrib_buff, "%d", full );
+         result = getattrib_buff;
+      }
+
+/* ReportLevel. */
+/* ------------ */
+   } else if ( !strcmp( attrib, "reportlevel" ) ) {
+      report_level = astGetReportLevel( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%d", report_level );
          result = getattrib_buff;
       }
 
@@ -1658,6 +1678,7 @@ AstChannel *astInitChannel_( void *mem, size_t size, int init,
 /* Set all attributes to their undefined values. */
       new->comment = -INT_MAX;
       new->full = -INT_MAX;
+      new->report_level = -INT_MAX;
       new->skip = -INT_MAX;
       new->strict = -INT_MAX;
       new->data = NULL;
@@ -1768,6 +1789,11 @@ void astInitChannelVtab_(  AstChannelVtab *vtab, const char *name, int *status )
    vtab->WriteObject = WriteObject;
    vtab->WriteString = WriteString;
    vtab->PutChannelData = PutChannelData;
+
+   vtab->ClearReportLevel = ClearReportLevel;
+   vtab->GetReportLevel = GetReportLevel;
+   vtab->SetReportLevel = SetReportLevel;
+   vtab->TestReportLevel = TestReportLevel;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -3181,8 +3207,9 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
    int full;                     /* Full attribute value */
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by "astSscanf" */
+   int report_level;             /* Skip attribute value */
    int skip;                     /* Skip attribute value */
-   int strict;                   /* Report errors for unexpected data items? */
+   int strict;                   /* Report errors instead of warnings? */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -3212,6 +3239,13 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
                ( 1 == astSscanf( setting, "full= %d %n", &full, &nc ) )
                && ( nc >= len ) ) {
       astSetFull( this, full );
+
+/* ReportLavel. */
+/* ------------ */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( setting, "reportlevel= %d %n", &report_level, &nc ) )
+               && ( nc >= len ) ) {
+      astSetReportLevel( this, report_level );
 
 /* Skip. */
 /* ----- */
@@ -3410,6 +3444,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 /* ----- */
    } else if ( !strcmp( attrib, "full" ) ) {
       result = astTestFull( this );
+
+/* ReportLevel. */
+/* ------------ */
+   } else if ( !strcmp( attrib, "reportlevel" ) ) {
+      result = astTestReportLevel( this );
 
 /* Skip. */
 /* ----- */
@@ -4641,6 +4680,64 @@ astMAKE_TEST(Channel,Full,( this->full != -INT_MAX ))
 /*
 *att++
 *  Name:
+*     ReportLevel
+
+*  Purpose:
+*     Determines which read/write conditions are reported.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This attribute determines which, if any, of the conditions that occur
+*     whilst reading or writing an Object should be reported. These
+*     conditions will generate either a fatal error or a warning, as
+*     determined by attribute Strict. ReportLevel can take any of the
+*     following values:
+*
+*     0 - Do not report any conditions.
+*
+*     1 - Report only conditions where significant information content has been
+*     changed. For instance, an unsupported time-scale has been replaced by a
+*     supported near-equivalent time-scale.
+*
+*     2 - Report the above, and in addition report significant default
+*     values. For instance, if no time-scale was specified when reading an
+*     Object from an external data source, report the default time-scale
+*     that is being used.
+*
+*     2 - Report the above, and in addition report any other potentially
+*     interesting conditions that have no significant effect on the
+*     conversion. For instance, report if a time-scale of "TT"
+*     (terrestrial time) is used in place of "ET" (ephemeris time). This
+*     change has no signficiant effect because ET is the predecessor of, 
+*     and is continuous with, TT. Synonyms such as "IAT" and "TAI" are
+*     another example.
+*
+*     The default value is 1. Note, there are many other conditions that
+*     can occur whilst reading or writing an Object that completely
+*     prevent the conversion taking place. Such conditions will always 
+*     generate errors, irrespective of the ReportLevel and Strict attributes.
+
+*  Applicability:
+*     Channel
+*        All Channels have this attribute.
+*att--
+*/
+
+/* This is an integer value with a value of -INT_MAX when undefined,
+   yielding a default of one. */
+astMAKE_CLEAR(Channel,ReportLevel,report_level,-INT_MAX)
+astMAKE_GET(Channel,ReportLevel,int,1,( this->report_level != -INT_MAX ? this->report_level : 1 ))
+astMAKE_SET(Channel,ReportLevel,int,report_level,value)
+astMAKE_TEST(Channel,ReportLevel,( this->report_level != -INT_MAX ))
+
+/*
+*att++
+*  Name:
 *     Skip
 
 *  Purpose:
@@ -4877,6 +4974,12 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    actual default attribute value.  Since "set" will be zero, these
    values are for information only and will not be read back. */
 
+/* ReportLevel. */
+/* ------------ */
+   set = TestReportLevel( this, status );
+   ival = set ? GetReportLevel( this, status ) : astGetReportLevel( this );
+   astWriteInt( channel, "RpLev", set, 0, ival, "Error reporting level" );
+
 /* Skip. */
 /* ----- */
    set = TestSkip( this, status );
@@ -4890,8 +4993,8 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    set = TestStrict( this, status );
    ival = set ? GetStrict( this, status ) : astGetStrict( this );
    astWriteInt( channel, "Strict", set, 0, ival,
-                ival ? "Report unexpected data items" :
-                       "Ignore unexpected data items" );
+                ival ? "Report errors insead of warnings" :
+                       "Report warnings instead of errors" );
 
 /* Full. */
 /* ----- */
@@ -5565,6 +5668,13 @@ AstChannel *astLoadChannel_( void *mem, size_t size,
    supplying the "unset" value as the default. If a "set" value is
    obtained, we then use the appropriate (private) Set... member
    function to validate and set the value properly. */
+
+/* ReportLevel. */
+/* ------------ */
+      new->report_level = astReadInt( channel, "rplev", -INT_MAX );
+      if ( TestReportLevel( new, status ) ) SetReportLevel( new,
+                                                            new->report_level, 
+                                                            status );
 
 /* Skip. */
 /* ----- */

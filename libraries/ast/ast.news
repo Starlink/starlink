@@ -20,8 +20,8 @@ Main Changes in this Version
 determines the position at which two geodesic curves intersect.
 
 - The XmlStrict attribute and astXmlWarnings function have been removed. 
-The same functionality is now available via the Strict attribute, and a
-new function called astWarnings.
+The same functionality is now available via the existing Strict attribute, 
+a new attribute called ReportLevel, and a new function called astWarnings.
 
 
 Main Changes in Version 6.0

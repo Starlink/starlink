@@ -270,6 +270,7 @@ typedef struct AstChannel {
    int comment;                  /* Output comments? */
    int full;                     /* Set max/normal/min information level */
    int skip;                     /* Skip data between Objects? */
+   int report_level;             /* Skip data between Objects? */
    int strict;                   /* Report unexpected data items? */
    void *data;                   /* Data to pass to source/sink functions */
    char **warnings;              /* Array of warning strings */
@@ -298,18 +299,15 @@ typedef struct AstChannelVtab {
    double (* ReadDouble)( AstChannel *, const char *, double, int * );
    int (* GetComment)( AstChannel *, int * );
    int (* GetFull)( AstChannel *, int * );
-   int (* GetSkip)( AstChannel *, int * );
    int (* GetStrict)( AstChannel *, int * );
    int (* ReadInt)( AstChannel *, const char *, int, int * );
    int (* TestComment)( AstChannel *, int * );
    int (* TestFull)( AstChannel *, int * );
-   int (* TestSkip)( AstChannel *, int * );
    int (* TestStrict)( AstChannel *, int * );
    int (* Write)( AstChannel *, AstObject *, int * );
    void (* AddWarning)( AstChannel *, const char *, const char *, int * );
    void (* ClearComment)( AstChannel *, int * );
    void (* ClearFull)( AstChannel *, int * );
-   void (* ClearSkip)( AstChannel *, int * );
    void (* ClearStrict)( AstChannel *, int * );
    void (* GetNextData)( AstChannel *, int, char **, char **, int * );
    void (* PutChannelData)( AstChannel *, void *, int * );
@@ -317,7 +315,6 @@ typedef struct AstChannelVtab {
    void (* ReadClassData)( AstChannel *, const char *, int * );
    void (* SetComment)( AstChannel *, int, int * );
    void (* SetFull)( AstChannel *, int, int * );
-   void (* SetSkip)( AstChannel *, int, int * );
    void (* SetStrict)( AstChannel *, int, int * );
    void (* WriteBegin)( AstChannel *, const char *, const char *, int * );
    void (* WriteDouble)( AstChannel *, const char *, int, int, double, const char *, int * );
@@ -326,6 +323,17 @@ typedef struct AstChannelVtab {
    void (* WriteIsA)( AstChannel *, const char *, const char *, int * );
    void (* WriteObject)( AstChannel *, const char *, int, int, AstObject *, const char *, int * );
    void (* WriteString)( AstChannel *, const char *, int, int, const char *, const char *, int * );
+
+   int (* GetSkip)( AstChannel *, int * );
+   int (* TestSkip)( AstChannel *, int * );
+   void (* ClearSkip)( AstChannel *, int * );
+   void (* SetSkip)( AstChannel *, int, int * );
+
+   int (* GetReportLevel)( AstChannel *, int * );
+   int (* TestReportLevel)( AstChannel *, int * );
+   void (* ClearReportLevel)( AstChannel *, int * );
+   void (* SetReportLevel)( AstChannel *, int, int * );
+
 } AstChannelVtab;
 
 /* Define a private structure type used to store linked lists of
@@ -433,24 +441,20 @@ char *astReadString_( AstChannel *, const char *, const char *, int * );
 double astReadDouble_( AstChannel *, const char *, double, int * );
 int astGetComment_( AstChannel *, int * );
 int astGetFull_( AstChannel *, int * );
-int astGetSkip_( AstChannel *, int * );
 int astGetStrict_( AstChannel *, int * );
 int astReadInt_( AstChannel *, const char *, int, int * );
 int astTestComment_( AstChannel *, int * );
 int astTestFull_( AstChannel *, int * );
-int astTestSkip_( AstChannel *, int * );
 int astTestStrict_( AstChannel *, int * );
 void astAddWarning_( void *, const char *, const char *, int *, ... );
 void astClearComment_( AstChannel *, int * );
 void astClearFull_( AstChannel *, int * );
-void astClearSkip_( AstChannel *, int * );
 void astClearStrict_( AstChannel *, int * );
 void astGetNextData_( AstChannel *, int, char **, char **, int * );
 void astPutNextText_( AstChannel *, const char *, int * );
 void astReadClassData_( AstChannel *, const char *, int * );
 void astSetComment_( AstChannel *, int, int * );
 void astSetFull_( AstChannel *, int, int * );
-void astSetSkip_( AstChannel *, int, int * );
 void astSetStrict_( AstChannel *, int, int * );
 void astWriteBegin_( AstChannel *, const char *, const char *, int * );
 void astWriteDouble_( AstChannel *, const char *, int, int, double, const char *, int * );
@@ -460,6 +464,18 @@ int astWriteInvocations_( int * );
 void astWriteIsA_( AstChannel *, const char *, const char *, int * );
 void astWriteObject_( AstChannel *, const char *, int, int, AstObject *, const char *, int * );
 void astWriteString_( AstChannel *, const char *, int, int, const char *, const char *, int * );
+
+int astGetSkip_( AstChannel *, int * );
+int astTestSkip_( AstChannel *, int * );
+void astClearSkip_( AstChannel *, int * );
+void astSetSkip_( AstChannel *, int, int * );
+
+int astGetReportLevel_( AstChannel *, int * );
+int astTestReportLevel_( AstChannel *, int * );
+void astClearReportLevel_( AstChannel *, int * );
+void astSetReportLevel_( AstChannel *, int, int * );
+
+
 #endif
 
 /* Function interfaces. */
@@ -527,8 +543,6 @@ astINVOKE(O,astWarnings_(astCheckChannel(this),STATUS_PTR))
 astINVOKE(V,astClearComment_(astCheckChannel(this),STATUS_PTR))
 #define astClearFull(this) \
 astINVOKE(V,astClearFull_(astCheckChannel(this),STATUS_PTR))
-#define astClearSkip(this) \
-astINVOKE(V,astClearSkip_(astCheckChannel(this),STATUS_PTR))
 #define astClearStrict(this) \
 astINVOKE(V,astClearStrict_(astCheckChannel(this),STATUS_PTR))
 #define astGetComment(this) \
@@ -539,8 +553,6 @@ astINVOKE(V,astGetFull_(astCheckChannel(this),STATUS_PTR))
 astINVOKE(V,astGetNextData_(astCheckChannel(this),begin,name,val,STATUS_PTR))
 #define astGetNextText(this) \
 astINVOKE(V,astGetNextText_(astCheckChannel(this),STATUS_PTR))
-#define astGetSkip(this) \
-astINVOKE(V,astGetSkip_(astCheckChannel(this),STATUS_PTR))
 #define astGetStrict(this) \
 astINVOKE(V,astGetStrict_(astCheckChannel(this),STATUS_PTR))
 #define astPutNextText(this,line) \
@@ -559,16 +571,12 @@ astINVOKE(V,astReadString_(astCheckChannel(this),name,def,STATUS_PTR))
 astINVOKE(V,astSetComment_(astCheckChannel(this),value,STATUS_PTR))
 #define astSetFull(this,value) \
 astINVOKE(V,astSetFull_(astCheckChannel(this),value,STATUS_PTR))
-#define astSetSkip(this,value) \
-astINVOKE(V,astSetSkip_(astCheckChannel(this),value,STATUS_PTR))
 #define astSetStrict(this,value) \
 astINVOKE(V,astSetStrict_(astCheckChannel(this),value,STATUS_PTR))
 #define astTestComment(this) \
 astINVOKE(V,astTestComment_(astCheckChannel(this),STATUS_PTR))
 #define astTestFull(this) \
 astINVOKE(V,astTestFull_(astCheckChannel(this),STATUS_PTR))
-#define astTestSkip(this) \
-astINVOKE(V,astTestSkip_(astCheckChannel(this),STATUS_PTR))
 #define astTestStrict(this) \
 astINVOKE(V,astTestStrict_(astCheckChannel(this),STATUS_PTR))
 #define astWriteBegin(this,class,comment) \
@@ -587,6 +595,24 @@ astINVOKE(V,astWriteObject_(astCheckChannel(this),name,set,helpful,astCheckObjec
 astINVOKE(V,astWriteString_(astCheckChannel(this),name,set,helpful,value,comment,STATUS_PTR))
 
 #define astWriteInvocations astWriteInvocations_(STATUS_PTR)
+
+#define astClearSkip(this) \
+astINVOKE(V,astClearSkip_(astCheckChannel(this),STATUS_PTR))
+#define astGetSkip(this) \
+astINVOKE(V,astGetSkip_(astCheckChannel(this),STATUS_PTR))
+#define astSetSkip(this,value) \
+astINVOKE(V,astSetSkip_(astCheckChannel(this),value,STATUS_PTR))
+#define astTestSkip(this) \
+astINVOKE(V,astTestSkip_(astCheckChannel(this),STATUS_PTR))
+
+#define astClearReportLevel(this) \
+astINVOKE(V,astClearReportLevel_(astCheckChannel(this),STATUS_PTR))
+#define astGetReportLevel(this) \
+astINVOKE(V,astGetReportLevel_(astCheckChannel(this),STATUS_PTR))
+#define astSetReportLevel(this,value) \
+astINVOKE(V,astSetReportLevel_(astCheckChannel(this),value,STATUS_PTR))
+#define astTestReportLevel(this) \
+astINVOKE(V,astTestReportLevel_(astCheckChannel(this),STATUS_PTR))
 
 #endif
 #endif
