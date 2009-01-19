@@ -139,6 +139,8 @@ f     - AST_CURRENTTIME: Return the current system time
 *        Added "LT" (Local Time) time scale.
 *     9-DEC-2008 (DSB):
 *        Ensure Format string pointer is used correctly.
+*     19-JAN-2009 (DSB):
+*        Ensure "<bad>" is returned by astFormat if the axis value is bad.
 *class--
 */
 
@@ -1118,55 +1120,62 @@ static const char *Format( AstFrame *this_frame, int axis, double value, int *st
 /* Validate the axis index. */
    (void) astValidateAxis( this, axis, "astFormat" );
 
-/* If the format string does not indicate a date/time format, invoke the
-   parent Format method. */
-   fmt = astGetFormat( this, 0 );
-   df = DateFormat( fmt, &ndp, status );
-   if( !df ) {
-      result = (*parent_format)( this_frame, axis, value, status );
-
-/* Otherwise, format the value as a date/time */
+/* Check if a bad coordinate value was supplied and return a pointer to an
+   appropriate string if necessary. */
+   if ( value == AST__BAD ) {
+      result = "<bad>";
    } else {
 
+/* If the format string does not indicate a date/time format, invoke the
+   parent Format method. */
+      fmt = astGetFormat( this, 0 );
+      df = DateFormat( fmt, &ndp, status );
+      if( !df ) {
+         result = (*parent_format)( this_frame, axis, value, status );
+
+/* Otherwise, format the value as a date/time */
+      } else {
+
 /* Convert the value to an absolute MJD in units of days. */
-      ts = astGetTimeScale( this );
-      sys = astGetSystem( this );
-      off = astGetTimeOrigin( this );
-      u = astGetUnit( this, 0 );
-      map = MakeMap( this, sys, AST__MJD, ts, ts, off, 0.0, u, "d", 
-                     "astFormat", status );
-      if( map ) {
-         astTran1( map, 1, &value, 1, &mjd );
-         map = astAnnul( map );
+         ts = astGetTimeScale( this );
+         sys = astGetSystem( this );
+         off = astGetTimeOrigin( this );
+         u = astGetUnit( this, 0 );
+         map = MakeMap( this, sys, AST__MJD, ts, ts, off, 0.0, u, "d", 
+                        "astFormat", status );
+         if( map ) {
+            astTran1( map, 1, &value, 1, &mjd );
+            map = astAnnul( map );
 
 /* If no time fields will be produced, round to the nearest day. */
-         if( ndp < 0 ) mjd = (int) ( mjd + 0.5 );
+            if( ndp < 0 ) mjd = (int) ( mjd + 0.5 );
 
 /* Convert the MJD into a set of numeric date fields, plus day fraction,
    and format them. */
-         palSlaDjcl( mjd, &iy, &im, &id, &fd, &j );
-         d = format_buff;
-         d += sprintf( d, "%4d-%2.2d-%2.2d", iy, im, id );
+            palSlaDjcl( mjd, &iy, &im, &id, &fd, &j );
+            d = format_buff;
+            d += sprintf( d, "%4d-%2.2d-%2.2d", iy, im, id );
 
 /* If required, convert the day fraction into a set of numerical time
    fields. */
-         if( ndp >= 0 ) {
-            palSlaDd2tf( ndp, fd, sign, ihmsf );
+            if( ndp >= 0 ) {
+               palSlaDd2tf( ndp, fd, sign, ihmsf );
 
 /* Format the time fields. */
-            if( ndp > 0 ) {
-               tlen = sprintf( tbuf, " %2.2d:%2.2d:%2.2d.%*.*d", ihmsf[0],
-                             ihmsf[1], ihmsf[2], ndp, ndp, ihmsf[3] );
-            } else {
-               tlen = sprintf( tbuf, " %2.2d:%2.2d:%2.2d", ihmsf[0],
-                             ihmsf[1], ihmsf[2] );
-            }
+               if( ndp > 0 ) {
+                  tlen = sprintf( tbuf, " %2.2d:%2.2d:%2.2d.%*.*d", ihmsf[0],
+                                ihmsf[1], ihmsf[2], ndp, ndp, ihmsf[3] );
+               } else {
+                  tlen = sprintf( tbuf, " %2.2d:%2.2d:%2.2d", ihmsf[0],
+                                ihmsf[1], ihmsf[2] );
+               }
 
 /* Add in the formatted time. */
-            d += sprintf( d, "%s", tbuf );
+               d += sprintf( d, "%s", tbuf );
 
+            }
+            result = format_buff;         
          }
-         result = format_buff;         
       }
    }
 
