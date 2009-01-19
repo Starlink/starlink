@@ -13,6 +13,16 @@
      `staircase', dots or markers at each point, and lines 
      connecting data points (the only available mode previously).
 
+   o  FITSMOD
+
+      - Parameter EDIT has a new option "Null".  This will 
+      nullify the value of the chosen keyword, by substituting
+      spaces for its value and equals sign, effectively turning
+      the header into a comment.
+
+      - Likewise there is an Null option for Field 1 of the file
+      format.
+
 1 KAPPA_Version_1.9
 
    A new release of KAPPA (V1.9-11) is available.  The main changes

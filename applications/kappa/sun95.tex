@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.35}
 \newcommand{\stardocnumber}    {95.35}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2008 November 14}
+\newcommand{\stardocdate}      {2009 January 18}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.10}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -24308,6 +24308,10 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
             card, and if the END card is absent, the new location is at the end
             of the headers.
 
+            \item {\tt "Null"} nullifies the value of the named keyword  
+            effectively turning it into a comment header.  Spaces substitute 
+            the keyword's value and equals sign.
+
             \item {\tt "Print"} --- causes the value of a named keyword to be
             displayed to standard output.  This will be a blank for a comment
             card.
@@ -24596,9 +24600,9 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          \sstitem
          Field 1:
             This specifies the editing operation.  Allowed values are
-            {\tt Amend}, {\tt Delete}, {\tt Exist}, {\tt Move}, {\tt Print}, 
-            {\t Rename}, {\tt Write}, and {\tt Update}, and can be
-            abbreviated to the initial letter.
+            {\tt Amend}, {\tt Delete}, {\tt Exist}, {\tt Move}, 
+            {\tt Null}, {\tt Print}, {\tt Rename}, {\tt Write}, and 
+            {\tt Update}, and can be abbreviated to the initial letter.
 
             \sstitemlist{
 
@@ -24632,6 +24636,11 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
                \sstitem
                {\tt Amend} acts like {\tt Update} if the keyword supplied in 
                {\tt "Field 2"} exists, and like {\tt Write} otherwise. 
+
+               \sstitem
+               {\tt Null} replaces the value of a named keyword with blanks,
+               effectively turning the header into a comment.
+
            }
 
          \sstitem
@@ -24785,6 +24794,11 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          This writes a real value to keyword AIRMASS if it exists,
          otherwise it writes a real value to new keyword AIRMASS
          located at the end of the FITS extension.
+      }
+      \sstexamplesubsection{
+         N AIRMASS
+      }{
+         This blanks the value of the AIRMASS keyword, if it exists.
       }
       \sstexamplesubsection{
          W FILTER(AIRMASS) Y
@@ -55721,6 +55735,17 @@ The following applications have been modified:
          show the loci of data values including the histogram
          `staircase', dots or markers at each point, and lines connecting 
          data points (the only available mode previously).
+      \end{itemize}
+
+   \item [\htmlref{FITSMOD}{FITSMOD}] \mbox{}
+      \begin{itemize}
+         \item Parameter EDIT has a new option {\tt "Null"}.  This 
+         will nullify the value of the chosen keyword, by substituting 
+         spaces for its value and equals sign, effectively turning 
+         the header into a comment.
+
+         \item Likewise there is an {\tt Null} option for Field 1 of 
+         the file format. 
       \end{itemize}
 \end{description}
 

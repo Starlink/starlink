@@ -69,6 +69,10 @@
 *        the END card is absent, the new location is at the end of the
 *        headers.
 *
+*        'Null' nullifies the value of the named keyword effectively
+*        turning it into a comment header.  Spaces substitute the
+*        keyword's value and equals sign.
+*
 *        "Print" causes the value of a named keyword to be displayed to
 *        standard output.  This will be a blank for a comment card.
 *
@@ -144,7 +148,7 @@
 *        exist in FITS array, or the null value (!) is supplied the
 *        consequences will be as follows.  For a "Write", "Amend" (new
 *        keyword), or "Move" edit, the KEYWORD keyword will be inserted
-*        just before the END card or appended to FITS array when the END 
+*        just before the END card or appended to FITS array when the END
 *        card does not exist; for an "Update" or "Amend" (with an 
 *        existing keyword) edit, the edit keyword is not relocated.
 *
@@ -283,6 +287,9 @@
 *     otherwise it writes a real value to new keyword AIRMASS located 
 *     at the end of the FITS extension.
 *
+*         N AIRMASS
+*     This blanks the value of the AIRMASS keyword, if it exists.
+*
 *         W FILTER(AIRMASS) Y
 *     This writes a logical true value to new keyword FILTER, which
 *     will be located just before the AIRMASS keyword, if it exists.
@@ -338,8 +345,8 @@
 *
 *     -  Field 1:
 *        This specifies the editing operation.  Allowed values are
-*        Amend, Delete, Exist, Move, Print, Rename, Write, and Update, 
-*        and can be abbreviated to the initial letter.  
+*        Amend, Delete, Exist, Move, Null, Print, Rename, Write, and 
+*        Update, and can be abbreviated to the initial letter.  
 *        -  Delete removes a named keyword.  
 *        -  Print causes the value of a named keyword to be
 *        displayed to standard output.  
@@ -357,6 +364,8 @@
 *        same time.  Update requires that the keyword exists.  
 *        -  Amend acts like Update if the keyword supplied in 
 *        "Field 2" exists, and like Write otherwise.  
+*        -  Null replaces the value of a named keyword with blanks,
+*        effectively turning the header into a comment.
 *
 *     -  Field 2:
 *        This specifies the keyword to edit, and optionally the
@@ -452,7 +461,7 @@
 *  Copyright:
 *     Copyright (C) 1996, 1999-2000, 2004 Central Laboratory of the
 *     Research Councils.
-*     Copyright (C) 2008 Science and Technology Facilties Council.
+*     Copyright (C) 2008, 2009 Science and Technology Facilties Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -490,6 +499,8 @@
 *     2008 June 14 (MJC):
 *        Add Amend editing option, and make Field 1 options easier to
 *        read.
+*     2009 January 11 (MJC):
+*        Add Null editing option.
 *     {enter_further_changes_here}
 
 *-
@@ -703,7 +714,7 @@
 
 *  Obtain the edit command
          CALL PAR_CHOIC( 'EDIT', 'Read', 'Amend,Delete,Exist,Move,'/
-     :                    /'Print,Rename,Update,Write',
+     :                    /'Null,Print,Rename,Update,Write',
      :                   .FALSE., EDIT, STATUS )
 
 *  Obtain the edit keyword and occurrence.
@@ -947,6 +958,11 @@
                GOTO 999
             END IF
             CALL ERR_RLSE
+
+*   Preserved the comment when making a keyword's value null.
+         ELSE IF ( EDIT .EQ. 'NULL' ) THEN
+            COMENT = '$C'
+            
          END IF
 
 *  Obtain the new keyword.
