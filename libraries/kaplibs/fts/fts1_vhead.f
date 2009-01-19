@@ -1,4 +1,3 @@
-
       SUBROUTINE FTS1_VHEAD( BUFFER, FIXED, CARD, STATUS )
 *+
 *  Name:
@@ -61,7 +60,9 @@
 *  [optional_subroutine_items]...
 *  Copyright:
 *     Copyright (C) 1994 Science & Engineering Research Council.
-*     Copyright (C) 1996, 2000 Central Laboratory of the Research Councils.
+*     Copyright (C) 1996, 2000 Central Laboratory of the Research 
+*     Councils.
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -90,17 +91,21 @@
 *        Original version.
 *     1996 July 26 (MJC):
 *        Distinguish between mandatory and other keywords for
-*        non-character values.   Add the FIXED argument.
+*        non-character values.  Add the FIXED argument.
 *     21-MAR-2000 (DSB):
 *        Modified to retain trailing spaces within string values.
 *        Fixed bug which caused random character strings to be used as
-*        comments for string keywords if no comment was supplied in the header.
+*        comments for string keywords if no comment was supplied in the
+*        header.
 *     2-NOV-2000 (DSB):
 *        Modified to accept:
 *         - blank keyword values
 *         - missing equals sign (but only iof the value is blank)
-*        Also fixed bug which caused comments to be lost if they abut the
-*        keyword value.
+*        Also fixed bug which caused comments to be lost if they abut 
+*        the keyword value.
+*     2009 January 11 (MJC):
+*        Use new FTS1_GVALC routine to find the location of a string
+*        value, and extract the string.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -155,7 +160,7 @@
       PARAMETER ( VALLN = 70 )
 
 *  Local Variables:
-      CHARACTER * ( VALLN ) CDUMMY ! Work string for value
+      CHARACTER*( VALLN ) CDUMMY ! Work string for value
       INTEGER CLEN               ! String length
       INTEGER COLEQS             ! Character pointer to the equals sign
       INTEGER CPOS               ! Integer pointer for appending
@@ -163,9 +168,9 @@
       INTEGER CSTAT              ! Status value in CHR calls
       INTEGER ENDW               ! Column position of the end of the
                                  ! header value (w.r.t. = sign)
-      CHARACTER * ( COMILN ) FITCOM ! FITS comment
-      CHARACTER * ( VALLN ) FITDAT ! FITS value
-      CHARACTER * ( KEYLN ) FITNAM ! FITS keyword
+      CHARACTER*( COMILN ) FITCOM ! FITS comment
+      CHARACTER*( VALLN ) FITDAT ! FITS value
+      CHARACTER*( KEYLN ) FITNAM ! FITS keyword
       INTEGER IVAL               ! Holds integer value
       INTEGER LSTAT              ! Local status
       LOGICAL LVAL               ! Value of a logical FITS item
@@ -175,10 +180,6 @@
       INTEGER NCCOM              ! Number of characters in FITS
                                  ! COMMENT or HISTORY card
       INTEGER NCCQ               ! Column of FITS trailing quote for
-                                 ! character value
-      INTEGER NCCQ2              ! Column of FITS trailing quote for
-                                 ! character value (work variable)
-      INTEGER NCDQ               ! Column of FITS double quote for
                                  ! character value
       INTEGER NCFD               ! Column position in output FITS
                                  ! character value (final double quote)
@@ -191,16 +192,16 @@
       INTEGER NCSTQ              ! Column from where to start search
                                  ! for a trailing quote for a FITS
                                  ! character value
-      LOGICAL NOEQS              ! True if the equals sign should be omitted
+      LOGICAL NOEQS              ! Omit the equals sign?
       INTEGER NWORD              ! Number of words in value (fixed at 1)
       REAL RVAL                  ! Holds real value
       INTEGER SLASH              ! Index of comment character
       INTEGER STARTW             ! Column position of the start of the
                                  ! header value (w.r.t. = sign)
-      LOGICAL TRAILQ             ! True when value has a trailing quote
-      LOGICAL VALDEF             ! True if the value is defined
-      LOGICAL VALID              ! True when a FITS header is valid
-      LOGICAL VALKEY             ! True if the keyword is valid
+      LOGICAL TRAILQ             ! Does the value have a trailing quote?
+      LOGICAL VALDEF             ! Is the value defined?
+      LOGICAL VALID              ! Is FITS header valid?
+      LOGICAL VALKEY             ! Is keyword valid?
 
 *.
 
@@ -331,24 +332,24 @@
             IF ( COLEQS .EQ. 0 ) THEN
                COLEQS = 9
 
-*  Find the first comment character (slash) following column 9. Use one more 
-*  than the length of the string if no slash is found.
+*  Find the first comment character (solidus or slash) following column
+*  Use one more than the length of the string if no solidus is found.
                SLASH = INDEX( BUFFER( COLEQS: ), '/' )
-               IF( SLASH .EQ. 0 ) THEN
+               IF ( SLASH .EQ. 0 ) THEN
                   SLASH = NCBUFF + 1
                ELSE
                   SLASH = COLEQS + SLASH - 1
                END IF
 
-*  If there are non-blank characters between column 9 and the slash, we
-*  need to insert an equals sign.
-               IF( BUFFER( COLEQS : SLASH - 1 ) .NE. ' ' ) THEN
+*  If there are non-blank characters between column 9 and the solidus,
+*  we need to insert an equals sign.
+               IF ( BUFFER( COLEQS : SLASH - 1 ) .NE. ' ' ) THEN
                   VALID = .FALSE.
                   CALL MSG_OUTIF( MSG__NORM, 'FITS_VHEAD_NOEQS',
      :              'The header card has no equals sign.', STATUS )
 
-*  If the value strign is blank, we do not need an equals in the returned
-*  card.
+*  If the value strign is blank, we do not need an equals in the 
+*  returned card.
                ELSE
                   NOEQS = .TRUE.
                END IF
@@ -387,122 +388,16 @@
 *  Search for the leading quote.
             IF ( CDUMMY( 1:1 ) .EQ. '''' ) THEN
 
-*  Initialise the character value.
-               FITDAT = ' '
-
-*  Determine where the initial quote is located.
-*  =============================================
-               NCSTQ = INDEX( BUFFER( COLEQS+1: ), '''' ) + COLEQS
-
-*  Determine where the trailing quote is located.
-*  ==============================================
-
-*  First look for any double quotes.  These mean a single quote, so
-*  O'Hara appears as O''Hara in a FITS card image.  Start the search
-*  immediately after the leading quote, and subsequently immediately
-*  following a double quote.  Prevent the search extending beyond the
-*  end of the value.  Keep a count of the absolute column.  Enclosed
-*  quotes that should be double but are single will be tested for
-*  later.
-               NCDQ = 1
-               NCFD = 1
-               NCSTQ = NCSTQ + 1
-               DO WHILE ( NCDQ .NE. 0 )
-                  NCDQ = INDEX( BUFFER( NCSTQ: ), '''''' )
-
-*  If there is no double quote no action is necessary.  When there is,
-*  we form part of the value, removing the second quote.
-                  IF ( NCDQ .GT. 0 ) THEN
-                     FITDAT( NCFD: NCFD + NCDQ ) =
-     :                       BUFFER( NCSTQ: NCSTQ + NCDQ )
-
-*  Increment the counter to where to append to the value.
-                     NCFD = NCFD + NCDQ
-
-*  Increment the counter in the FITS card, skipping over the double
-*  quote.
-                     NCSTQ = NCSTQ + NCDQ + 1
-                  END IF
-               END DO
-
-*  We need some method for detecting single quotes within the string.
-*  Any that lie before the last correctly doubled quote will be in the
-*  string.  The single quotes get doubled later.  The following
-*  algorithm is far from foolproof, but it will catch some errors in
-*  the input card.
-*
-*  The method assumes that the next slash will be a comment rather than
-*  literal text in the string.  Find the location of the comment
-*  delimiter.  Start just before the normal position just in case some
-*  characters have been removed before it, but not too far in case we
-*  confuse a slash in the value with the comment delimiter when there
-*  is no closing quote.  When there is no comment delimiter, the search
-*  for the closing quote continues to the end of the card.  Specify the
-*  position of the notional closing quote.
-               NCCOM = INDEX( BUFFER( MAX( COMPOS - 3, NCSTQ ): ), '/' )
-               IF ( NCCOM .EQ. 0 ) THEN
-                  NCCOM = FITSLN
-                  NCCQ2 = FITSLN
-               ELSE
-                  NCCOM = MAX( COMPOS - 3, NCSTQ ) + NCCOM - 1
-                  NCCQ2 = NCCOM - 2
-               END IF
-
-*  Find any quotes after the last double-quote, or the initial quote.
-*  The last of these is taken to be the actual final quote, and earlier
-*  single quotes in the single as part of the string.
-               NCCQ = 1
-               NCFS = 1
-               TRAILQ = .FALSE.
-               DO WHILE ( NCCQ .NE. 0 )
-                  NCCQ = INDEX( BUFFER( NCSTQ:NCCOM ), '''' )
-
-*  If there is no single quote no action is necessary.  When there is,
-                  IF ( NCCQ .GT. 0 ) THEN
-
-*  Record the trailing quote and its position.
-                     TRAILQ = .TRUE.
-
-*  Append the remainder or all of the value (the latter when there is
-*  no double quote in the FITS card image) to the value, and including
-*  the quote.  If it is the last quote, later it will be removed from
-*  the value.
-                     FITDAT( NCFD:NCFD + NCCQ - 1 ) =
-     :                       BUFFER( NCSTQ:NCSTQ + NCCQ - 1 )
-
-*  Increment the counter to where to append to the value.
-                     NCFD = NCFD + NCCQ
-
-*  Increment the counter in the FITS card, skipping over the single
-*  quote.
-                     NCSTQ = NCSTQ + NCCQ
-
-                  END IF
-               END DO
-
-*  Extract the character value.
-*  ============================
-
-*  There is no trailing quote so assume that the character value
-*  extends to the end of the card image.  Copy the value.
-               IF ( .NOT. TRAILQ ) THEN
-                  FITDAT = BUFFER( NCSTQ:NCCQ2 )
-
-*  Assign the position of the closing quote.
-                  NCCQ = NCCQ2 + 2
-               ELSE
-                  NCCQ = NCSTQ - 1
-
-*  Remove the trailing quote from the value.
-                  FITDAT( NCFD-1:NCFD-1 ) = ' '
-               END IF
+*  Extract the string and its location.
+               CALL FTS1_GVALC( BUFFER, NCSTQ, NCCQ, FITDAT, STATUS )
 
 *  The value is defined.
                VALDEF = .TRUE.
 
 *  Make NCFD hold the original length of the FITSDAT string (including
-*  any trailing spaces which were included inside the delimiting quotes).
-               NCFD = NCFD - 2
+*  any trailing spaces which were included inside the delimiting 
+*  quotes).
+               NCFD = NCCQ - NCSTQ - 1
 
 *  Define the column from which to look for a comment, i.e. one column
 *  after the trailing quote.
@@ -521,7 +416,7 @@
      :                         STARTW, ENDW, FITDAT, LSTAT )
 
 *  Store safe values if no words were found.
-               IF( NWORD .EQ. 0 ) THEN
+               IF ( NWORD .EQ. 0 ) THEN
                   STARTW = 0
                   ENDW = 0
                   FITDAT = ' '
@@ -547,7 +442,7 @@
 *  Extract the comment.
 *  ====================
 
-*  Look for the comment delimiter character---slash.
+*  Look for the comment delimiter character---solidus.
             NCC = INDEX( BUFFER( NCOMS: ), '/' ) + NCOMS - 1
             IF ( NCC .EQ. NCOMS - 1 ) THEN
                FITCOM = ' '
@@ -624,7 +519,7 @@
 *  start the comment before a space after the closing quote or before
 *  the standard position
                CARD = FITNAM//'= '''//FITDAT( :NCCOM )//''''
-               IF( CHR_LEN( FITCOM ) .GT. 0 ) THEN
+               IF ( CHR_LEN( FITCOM ) .GT. 0 ) THEN
                   CPOS = MAX( COMPOS - 1, NCCOM + 13 )
                   CALL CHR_APPND( '/ '//FITCOM, CARD, CPOS )
                END IF
@@ -642,7 +537,7 @@
                CLEN = CHR_LEN( CDUMMY )
 
 *  Create the start of the FITS header.
-               IF( NOEQS ) THEN
+               IF ( NOEQS ) THEN
                   CARD = FITNAM//'  '
                ELSE
                   CARD = FITNAM//'= '
@@ -673,7 +568,7 @@
                   ELSE
                      CALL CHR_APPND( FITDAT, CARD, CPOS )
                   END IF
-                  IF( CHR_LEN( FITCOM ) .GT. 0 ) THEN
+                  IF ( CHR_LEN( FITCOM ) .GT. 0 ) THEN
                      CALL CHR_APPND( ' / '//FITCOM, CARD, CPOS )
                   END IF
                ELSE
@@ -696,7 +591,7 @@
                      ELSE
                         CALL CHR_APPND( FITDAT, CARD, CPOS )
                      END IF
-                     IF( CHR_LEN( FITCOM ) .GT. 0 ) THEN
+                     IF ( CHR_LEN( FITCOM ) .GT. 0 ) THEN
                         CALL CHR_APPND( ' / '//FITCOM, CARD, CPOS )
                      END IF
                   ELSE
@@ -715,17 +610,17 @@
 *  Create the output card by appending the value and as much of the
 *  comment as will fit into the header card.
                         CALL CHR_APPND( CDUMMY, CARD, CPOS )
-                        IF( CHR_LEN( FITCOM ) .GT. 0 ) THEN
+                        IF ( CHR_LEN( FITCOM ) .GT. 0 ) THEN
                            CALL CHR_APPND( ' / '//FITCOM, CARD, CPOS )
                         END IF
 
 *  Check for a blank value
 *  -----------------------
-                     ELSE IF( CDUMMY .EQ. ' '  ) THEN
+                     ELSE IF ( CDUMMY .EQ. ' '  ) THEN
 
-*  Create the output card by appending as much of the comment as will fit 
-*  into the header card.
-                        IF( CHR_LEN( FITCOM ) .GT. 0 ) THEN
+*  Create the output card by appending as much of the comment as will 
+*  fit into the header card.
+                        IF ( CHR_LEN( FITCOM ) .GT. 0 ) THEN
                            CALL CHR_APPND( ' / '//FITCOM, CARD, CPOS )
                         END IF
 
@@ -782,7 +677,7 @@
 *  start the comment before a space after the closing quote or before
 *  the standard position
                         CARD = FITNAM//'= '''//FITDAT( :NCCOM )//''''
-                        IF( CHR_LEN( FITCOM ) .GT. 0 ) THEN
+                        IF ( CHR_LEN( FITCOM ) .GT. 0 ) THEN
                            CPOS = MAX( COMPOS - 1, NCCOM + 13 )
                            CALL CHR_APPND( '/ '//FITCOM, CARD, CPOS )
                         END IF

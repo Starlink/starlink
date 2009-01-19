@@ -39,8 +39,8 @@
 *     EDITS( NKEY ) = CHARACTER * ( * ) (Given)
 *        The editing commands.  These need only be one character per
 *        element.  Allowed values are 'Amend', 'Delete', 'Exist', 
-*        'Move', 'Rename', 'Print', 'Update', and 'Write', which can be
-*        abbreviated to the initial letter.
+*        'Move', 'Null'', 'Rename', 'Print', 'Update', and 'Write', 
+*        which can be abbreviated to the initial letter.
 *
 *        'Amend' acts as 'Update' if the keyword exists, but as 'Write'
 *        if the keyword is absent.
@@ -54,6 +54,10 @@
 *        second keyword.  When this positional keyword is not supplied,
 *        it defaults to the END card, and if the END card is absent,
 *        the new location is at the end of the headers.
+*
+*        'Null' nullifies the value of the named keyword effectively
+*        turning it into a comment header.  Spaces substitute the
+*        keyword's value and equals sign.
 *
 *        'Print' causes the value of a named keyword to be displayed to
 *        standard output.  This will be a blank for a comment card.
@@ -159,7 +163,7 @@
 *  Copyright:
 *     Copyright (C) 1996, 1999, 2004 Central Laboratory of the Research
 *                   Councils.
-*     Copyright (C) 2008 Science and Technology Facilties Council.
+*     Copyright (C) 2008, 2009 Science and Technology Facilties Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -193,6 +197,8 @@
 *        Use CNF_PVAL.
 *     2008 June 14 (MJC):
 *        Document Amend option.
+*     2009 January 11 (MJC):
+*        Document Null option.
 *     {enter_further_changes_here}
 
 *  Bugs:

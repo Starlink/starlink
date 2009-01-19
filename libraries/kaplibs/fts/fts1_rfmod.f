@@ -82,8 +82,8 @@
 *     value and comment.
 *
 *     Field 1:  This specifies the editing operation.  Allowed values
-*     are Amend, Delete, Exist, Move, Read, Write, and Update, and can
-*     be abbreviated to the initial letter.  Delete removes a named
+*     are Amend, Delete, Exist, Move, Null, Read, Write, and Update, and
+*     can be abbreviated to the initial letter.  Delete removes a named
 *     keyword.  Read causes the value of a named keyword to be
 *     displayed to standard output.  Exist reports TRUE to standard
 *     output if the named keyword exists in the header, and FALSE if
@@ -97,7 +97,9 @@
 *     secondary keyword is defined explicitly, the card may be
 *     relocated at the same time.  Update requires that the keyword
 *     exists.  Amend behaves as Write if the keyword in Field 2 is
-*     not already present, or as Update if the keyword exists.
+*     not already present, or as Update if the keyword exists.  Null
+*     replaces the value of a named keyword with blanks, effectively 
+*     turning the header into a comment.
 
 *     Field 2:  This specifies the keyword to edit, and optionally the
 *     position of that keyword in the header after the edit (for Move,
@@ -132,11 +134,11 @@
 
 *     Field 3:
 *     This specifies the value to assign to the edited keyword in the
-*     the Write and Update operations, or the name of the new keyword
-*     in the Rename modification.  If the keyword exists, the existing
-*     value or keyword is replaced, as appropriate.  The data type used
-*     to store the value is inferred from the value itself.  See topic
-*     "Value Data Types".
+*     the Amend, Write, and Update operations, or the name of the new 
+*     keyword in the Rename modification.  If the keyword exists, the 
+*     existing value or keyword is replaced, as appropriate.  The data 
+*     type used to store the value is inferred from the value itself.  
+*     See topic "Value Data Types".
 *
 *     For the Update and Write modifications there is a special value,
 *     $V, which means use the current value of the edited keyword,
@@ -150,7 +152,7 @@
 *
 *     Field 4:
 *     This specifies the comment to assign to the edited keyword for the
-*     Write and Update operations.  A leading '/' should not be
+*     Amend, Write, and Update operations.  A leading '/' should not be
 *     supplied.
 
 *     There is a special value, $C, which means use the current comment
@@ -248,7 +250,7 @@
 *
 *  Copyright:
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
-*     Copyright (C) 2008 Science and Technology Facilties Council.
+*     Copyright (C) 2008, 2009 Science and Technology Facilties Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -276,6 +278,8 @@
 *        Original version.
 *     2008 June 14 (MJC):
 *        Add Amend command.
+*     2009 January 11 (MJC):
+*        Add Null command.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -446,12 +450,13 @@
 *  Validate the edit command.  Just use the first character, as
 *  subsequent characters are superfluous (but might help the human
 *  reader).
-         IF ( .NOT. CHR_INSET( 'A,D,E,M,P,R,U,W', EDIT ) ) THEN
+         IF ( .NOT. CHR_INSET( 'A,D,E,M,N,P,R,U,W', EDIT ) ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'EDIT', LINE( I1( 1 ):I2( 1 ) ) )
             CALL ERR_REP( 'FTS1_RFMOD_BADEDIT',
      :        'The edit command ^EDIT is not one of Amend, Delete, '/
-     :        /'Exist, Move, Print, Rename, Update, or Write.', STATUS )
+     :        /'Exist, Move, NUll, Print, Rename, Update, or Write.',
+     :        STATUS )
             GOTO 50
          END IF
 

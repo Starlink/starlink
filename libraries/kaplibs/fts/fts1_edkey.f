@@ -36,10 +36,9 @@
 *        Maximum number of cards in the resultant FITS array.  This must
 *        be not less than NOCARD + NKEY + 1.
 *     EDITS( MAXMOD ) = CHARACTER * ( * ) (Returned)
-*        The editing commands.  These need only be one character per
-*        element.  Allowed values are 'Amend', 'Delete', 'Exist', 
-*        'Move', 'Rename', 'Print', 'Update', and 'Write', which can be
-*        abbreviated to the initial letter.
+*        The editing commands.  Allowed values are 'Amend', 'Delete', 
+*        'Exist', 'Move', 'Rename', 'Print', 'Update', and 'Write'.
+*        Each element can be abbreviated to the initial letter.
 *
 *        'Amend' acts as 'Update' if the keyword exists, but as 'Write'
 *        if the keyword is absent.
@@ -53,6 +52,10 @@
 *        second keyword.  When this positional keyword is not supplied,
 *        it defaults to the END card, and if the END card is absent,
 *        the new location is at the end of the headers.
+*
+*        'Null' nullifies the value of the named keyword effectively
+*        turning it into a comment header.  Spaces substitute the
+*        keyword's value and equals sign.
 *
 *        'Print' causes the value of a named keyword to be displayed to
 *        standard output.  This will be a blank for a comment card.
@@ -129,8 +132,8 @@
 *        For a Rename edit, VALUES has a different meaning; in this
 *        case it stores the replacement keyword name.
 *     COMNTS( NKEY ) = CHARACTER * ( * ) (Given)
-*        The comments to be written to the NAMES keywords for the
-*        Update and Write editing commands.  The special value '$C'
+*        The comments to be written to the NAMES keywords for the Amend,
+*        Update, and Write editing commands.  The special value '$C'
 *        means use the current comment.  In addition $C(keyword)
 *        requests that the comment of the keyword given between the
 *        parentheses be assigned to the keyword being edited.  If this
@@ -181,7 +184,7 @@
 *  Copyright:
 *     Copyright (C) 1996, 2000 Central Laboratory of the Research
 *                   Councils.
-*     Copyright (C) 2008 Science and Technology Facilties Council.
+*     Copyright (C) 2008, 2009 Science and Technology Facilties Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -213,6 +216,8 @@
 *        variables.
 *     2008 June 14 (MJC):
 *        Add Amend hybrid option.
+*     2009 January 11 (MJC):
+*        Add Null option.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -738,8 +743,13 @@
                END IF
             END IF
 
-*  Perform the Rename, Update, Amend or Write command.
-*  ===================================================
+*  Perform the Null command.
+*  =========================
+         ELSE IF ( EDIT .EQ. 'N' ) THEN
+            CALL FTS1_BLVAL( FTSCAR( CARD ), STATUS )
+
+*  Perform the Rename, Update, Amend, or Write command.
+*  ====================================================
          ELSE IF ( EDIT .EQ. 'W' .OR. EDIT .EQ. 'U' .OR.
      :             EDIT .EQ. 'A' .OR. EDIT .EQ. 'R' ) THEN
 
@@ -751,15 +761,15 @@
 *  ===========================================
             IF ( EDIT .EQ. 'R' ) THEN
 
-*  Validate the value as a keyword.  Although the card index to the original
-*  keyword is known, use a new variable for the name because we still
-*  to search for the current value by name with the $V special value.
-*  Later it will be renamed to create the updated card at that location,
-*  The occurrence is not used here.
+*  Validate the value as a keyword.  Although the card index to the
+*  original keyword is known, use a new variable for the name because we
+*  still need to search for the current value by name with the $V 
+*  special value.  Later it will be renamed to create the updated card 
+*  at that location.  The occurrence is not used here.
                CALL ERR_MARK
                CALL FTS1_EVKEY( VALUE, NEWKEY, LREFVK, REVOC, STATUS )
 
-*  Check for a bad keyword name.  *  Issue a warning, but continue with
+*  Check for a bad keyword name.  Issue a warning, but continue with
 *  the editing.
                IF ( STATUS .NE. SAI__OK ) THEN
                   CALL ERR_ANNUL( STATUS )
@@ -993,7 +1003,8 @@
 *  At present the only special values are $C meaning use the current
 *  comment of the current keyword, and $C(keyword{[occurrence]}) meaning
 *  use the comment of the occurrence of a named keyword.
-            REFCOM = COMENT( 1:2 ) .EQ. '$C'
+            REFCOM = COMENT( 1:2 ) .EQ. '$C' 
+            
             IF ( REFCOM ) THEN
 
 *  Initialise as the current editing keyword.
@@ -1095,8 +1106,8 @@
 
                END IF
 
-* Just use the supplied comment.  It has already been obtained for a
-* rename edit.
+*  Just use the supplied comment.  It has already been obtained for a
+*  rename edit.
             ELSE IF ( EDIT .NE. 'R' ) THEN
                COMENT = COMNTS( I )
             END IF
