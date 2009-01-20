@@ -42,8 +42,9 @@ AC_CHECK_FUNCS([mkstemp mkstemps])
 
 dnl    Check for GCC, so we can add SMURF compiler warning flags. 
 dnl    Would like to include -fstack-protector, but not all GCC versions 
-dnl    support that, so need to check that. 
-SMURF_CFLAGS="-Wall -Wextra -Wcast-qual -Wcast-align -Wwrite-strings \
+dnl    support that, so need to check that. SMURF is using C99 features
+dnl    so we always ask that they are supported by GCC.
+SMURF_CFLAGS="-std=c99 -Wall -Wextra -Wcast-qual -Wcast-align -Wwrite-strings \
 -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations \
 -Wredundant-decls"
 
@@ -51,8 +52,7 @@ if test "$GCC" = "yes"; then
     have_fsp=yes
     AC_MSG_CHECKING([whether ${CC} accepts -fstack-protector])
     fsp_old_cflags="$CFLAGS"
-dnl  Assume that any gcc that can take stack-protector also knows about c99
-    CFLAGS="$CFLAGS -fstack-protector -std=c99 -pedantic-errors"
+    CFLAGS="$CFLAGS -fstack-protector -pedantic-errors"
     AC_TRY_COMPILE(,,,[have_fsp=no])
     echo $have_fsp
     if test "$have_fsp" = "no"; then
@@ -61,8 +61,6 @@ dnl  Assume that any gcc that can take stack-protector also knows about c99
         CFLAGS="$CFLAGS $SMURF_CFLAGS"
     fi
 fi
-
-dnl AM_CONDITIONAL([HAVE_GCC], [test "$GCC" = "yes"])
 
 STAR_MESSGEN( [ libsmf/smf_err.msg ] )
 
