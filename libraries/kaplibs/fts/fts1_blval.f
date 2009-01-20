@@ -14,9 +14,9 @@
 
 *  Description:
 *     This routine modifies a FITS-header card by replacing the value
-*     with blank characters, leaving thwe keyword and any comment in
-*     situ.  If the header has no value, the header is returned
-*     unchanged.
+*     with blank characters, leaving the keyword, value indicator and 
+*     any comment in situ.  If the header has no value, the header is 
+*     returned unchanged.
 *
 *  Arguments:
 *     HEADER = CHARACTER * ( 80 ) (Given & Returned)
@@ -51,7 +51,9 @@
 *  History:
 *     2009 January 11 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     2009 January 20 (MJC):
+*        Retain the Value Indicator.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -163,7 +165,7 @@
      :                            NWORD, STARTW, ENDW, WORDS, ISTAT )
                   END = ENDW( 1 ) + EQUALS + 1
                END IF
-               START = EQUALS
+               START = EQUALS + 2
 
 *  Blank the value.
                HEADER( START:END ) = ' '

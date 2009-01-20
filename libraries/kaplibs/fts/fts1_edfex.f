@@ -55,9 +55,8 @@
 *        it defaults to the END card, and if the END card is absent,
 *        the new location is at the end of the headers.
 *
-*        'Null' nullifies the value of the named keyword effectively
-*        turning it into a comment header.  Spaces substitute the
-*        keyword's value and equals sign.
+*        'Null' nullifies the value of the named keyword.  Spaces 
+*        substitute the keyword's value and equals sign.
 *
 *        'Print' causes the value of a named keyword to be displayed to
 *        standard output.  This will be a blank for a comment card.
@@ -199,6 +198,9 @@
 *        Document Amend option.
 *     2009 January 11 (MJC):
 *        Document Null option.
+*     2009 January 19 (MJC):
+*        Description modified for Null option retaining the Value
+*        Indicator.
 *     {enter_further_changes_here}
 
 *  Bugs:

@@ -98,8 +98,7 @@
 *     relocated at the same time.  Update requires that the keyword
 *     exists.  Amend behaves as Write if the keyword in Field 2 is
 *     not already present, or as Update if the keyword exists.  Null
-*     replaces the value of a named keyword with blanks, effectively 
-*     turning the header into a comment.
+*     replaces the value of a named keyword with blanks. 
 
 *     Field 2:  This specifies the keyword to edit, and optionally the
 *     position of that keyword in the header after the edit (for Move,
@@ -211,6 +210,9 @@
 *     otherwise it writes a real value to new keyword AIRMASS located 
 *     at the end of the FITS extension.
 *
+*         N AIRMASS
+*     This blanks the value of the AIRMASS keyword, if it exists.
+*
 *         W FILTER(AIRMASS) Y
 *     This writes a logical true value to new keyword FILTER, which
 *     will be located just before the AIRMASS keyword, if it exists.
@@ -280,6 +282,9 @@
 *        Add Amend command.
 *     2009 January 11 (MJC):
 *        Add Null command.
+*     2009 January 19 (MJC):
+*        Description modified for Null option retaining the Value
+*        Indicator.
 *     {enter_further_changes_here}
 
 *  Bugs:
