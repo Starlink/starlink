@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.35}
 \newcommand{\stardocnumber}    {95.35}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2009 January 18}
+\newcommand{\stardocdate}      {2009 January 20}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.10}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -24308,9 +24308,8 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
             card, and if the END card is absent, the new location is at the end
             of the headers.
 
-            \item {\tt "Null"} nullifies the value of the named keyword  
-            effectively turning it into a comment header.  Spaces substitute 
-            the keyword's value and equals sign.
+            \item {\tt "Null"} nullifies the value of the named keyword.
+            Spaces substitute the keyword's value.
 
             \item {\tt "Print"} --- causes the value of a named keyword to be
             displayed to standard output.  This will be a blank for a comment
@@ -24638,8 +24637,7 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
                {\tt "Field 2"} exists, and like {\tt Write} otherwise. 
 
                \sstitem
-               {\tt Null} replaces the value of a named keyword with blanks,
-               effectively turning the header into a comment.
+               {\tt Null} replaces the value of a named keyword with blanks.
 
            }
 
@@ -55741,8 +55739,7 @@ The following applications have been modified:
       \begin{itemize}
          \item Parameter EDIT has a new option {\tt "Null"}.  This 
          will nullify the value of the chosen keyword, by substituting 
-         spaces for its value and equals sign, effectively turning 
-         the header into a comment.
+         spaces for its value.
 
          \item Likewise there is an {\tt Null} option for Field 1 of 
          the file format. 

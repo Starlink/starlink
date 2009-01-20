@@ -69,9 +69,8 @@
 *        the END card is absent, the new location is at the end of the
 *        headers.
 *
-*        'Null' nullifies the value of the named keyword effectively
-*        turning it into a comment header.  Spaces substitute the
-*        keyword's value and equals sign.
+*        'Null' nullifies the value of the named keyword.  Spaces 
+*        substitute the keyword's value.
 *
 *        "Print" causes the value of a named keyword to be displayed to
 *        standard output.  This will be a blank for a comment card.
@@ -364,8 +363,7 @@
 *        same time.  Update requires that the keyword exists.  
 *        -  Amend acts like Update if the keyword supplied in 
 *        "Field 2" exists, and like Write otherwise.  
-*        -  Null replaces the value of a named keyword with blanks,
-*        effectively turning the header into a comment.
+*        -  Null replaces the value of a named keyword with blanks.
 *
 *     -  Field 2:
 *        This specifies the keyword to edit, and optionally the

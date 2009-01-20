@@ -17,8 +17,7 @@
 
       - Parameter EDIT has a new option "Null".  This will 
       nullify the value of the chosen keyword, by substituting
-      spaces for its value and equals sign, effectively turning
-      the header into a comment.
+      spaces for its value.
 
       - Likewise there is an Null option for Field 1 of the file
       format.
