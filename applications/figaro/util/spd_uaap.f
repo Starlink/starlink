@@ -231,6 +231,9 @@
          ELSE IF ( CHR_SIMLR(LOCUNT(INDEX1:),'micron') ) THEN
             UNFACT = UNFACT - 6.
             FAILED = .FALSE.
+         ELSE IF ( CHR_SIMLR(LOCUNT(INDEX1:),'um') ) THEN
+            UNFACT = UNFACT - 6.
+            FAILED = .FALSE.
          ELSE IF ( CHR_SIMLR(LOCUNT(INDEX1:),'Angstrom') ) THEN
             UNFACT = UNFACT - 10.
             FAILED = .FALSE.
