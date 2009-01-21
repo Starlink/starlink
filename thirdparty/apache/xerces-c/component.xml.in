@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@" support="U">
+  <version>@PACKAGE_VERSION@</version>
+  <path>thirdparty/apache/xerces-c</path>
+  <description>Apache Xerces-c library for parsing XML</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <!--developers>
+    <person>
+    </person>
+  </developers-->
+  <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
