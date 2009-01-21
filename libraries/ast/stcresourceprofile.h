@@ -181,7 +181,8 @@ AstStcResourceProfile *astLoadStcResourceProfile_( void *, size_t, AstStcResourc
    classes). */
 
 /* Check class membership. */
-#define astCheckStcResourceProfile(this) astINVOKE_CHECK(StcResourceProfile,this)
+#define astCheckStcResourceProfile(this) astINVOKE_CHECK(StcResourceProfile,this,0)
+#define astVerifyStcResourceProfile(this) astINVOKE_CHECK(StcResourceProfile,this,1)
 
 /* Test class membership. */
 #define astIsAStcResourceProfile(this) astINVOKE_ISA(StcResourceProfile,this)

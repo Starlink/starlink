@@ -9195,8 +9195,8 @@ AstCmpFrame *astCmpFrameId_( void *frame1_void, void *frame2_void,
 
 /* Obtain the Frame pointers from the ID's supplied and validate the
    pointers to ensure they identify valid Frames. */
-   frame1 = astCheckFrame( astMakePointer( frame1_void ) );
-   frame2 = astCheckFrame( astMakePointer( frame2_void ) );
+   frame1 = astVerifyFrame( astMakePointer( frame1_void ) );
+   frame2 = astVerifyFrame( astMakePointer( frame2_void ) );
    if ( astOK ) {
 
 /* Initialise the CmpFrame, allocating memory and initialising the

@@ -292,7 +292,8 @@ void astClearSizeGuess_( AstKeyMap *, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckKeyMap(this) astINVOKE_CHECK(KeyMap,this)
+#define astCheckKeyMap(this) astINVOKE_CHECK(KeyMap,this,0)
+#define astVerifyKeyMap(this) astINVOKE_CHECK(KeyMap,this,1)
 
 /* Test class membership. */
 #define astIsAKeyMap(this) astINVOKE_ISA(KeyMap,this)

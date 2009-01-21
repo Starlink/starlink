@@ -1972,7 +1972,7 @@ AstCircle *astCircleId_( void *frame_void, int form, const double centre[],
 
 /* Obtain a Frame pointer from the supplied ID and validate the
    pointer to ensure it identifies a valid Frame. */
-   frame = astCheckFrame( astMakePointer( frame_void ) );
+   frame = astVerifyFrame( astMakePointer( frame_void ) );
 
 /* Obtain a Region pointer from the supplied "unc" ID and validate the
    pointer to ensure it identifies a valid Region . */

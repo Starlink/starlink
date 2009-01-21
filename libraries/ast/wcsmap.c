@@ -649,7 +649,7 @@ static const char *(* parent_getattrib)( AstObject *, const char *, int * );
 static int (* parent_testattrib)( AstObject *, const char *, int * );
 static void (* parent_clearattrib)( AstObject *, const char *, int * );
 static void (* parent_setattrib)( AstObject *, const char *, int * );
-static int *(* parent_mapsplit)( AstMapping *, int, int *, AstMapping **, int * );
+static int *(* parent_mapsplit)( AstMapping *, int, const int *, AstMapping **, int * );
 
 /* The following array of PrjData structured describes each of the WCSLIB
    projections. The last entry in the list should be for the AST__WCSBAD 
@@ -762,7 +762,7 @@ static void LongRange( const PrjData *, struct AstPrjPrm *, double *, double *, 
 static void PermGet( AstPermMap *, int **, int **, double **, int * );
 static void SetAttrib( AstObject *, const char *, int * );
 static void WcsPerm( AstMapping **, int *, int, int * );
-static int *MapSplit( AstMapping *, int, int *, AstMapping **, int * );
+static int *MapSplit( AstMapping *, int, const int *, AstMapping **, int * );
 
 /* Member functions. */
 /* ================= */
@@ -3177,7 +3177,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, int *status ){
+static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping **map, int *status ){
 /*
 *  Name:
 *     MapSplit
@@ -3191,7 +3191,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, 
 
 *  Synopsis:
 *     #include "wcsmap.h"
-*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map, int *status )
+*     int *MapSplit( AstMapping *this, int nin, const int *in, AstMapping **map, int *status )
 
 *  Class Membership:
 *     WcsMap method (over-rides the protected astMapSplit method

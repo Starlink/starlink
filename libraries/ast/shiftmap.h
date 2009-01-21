@@ -246,7 +246,8 @@ AstShiftMap *astLoadShiftMap_( void *, size_t, AstShiftMapVtab *,
    classes). */
 
 /* Check class membership. */
-#define astCheckShiftMap(this) astINVOKE_CHECK(ShiftMap,this)
+#define astCheckShiftMap(this) astINVOKE_CHECK(ShiftMap,this,0)
+#define astVerifyShiftMap(this) astINVOKE_CHECK(ShiftMap,this,1)
 
 /* Test class membership. */
 #define astIsAShiftMap(this) astINVOKE_ISA(ShiftMap,this)

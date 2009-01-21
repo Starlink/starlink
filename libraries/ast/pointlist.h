@@ -185,7 +185,8 @@ AstPointList *astLoadPointList_( void *, size_t, AstPointListVtab *,
    classes). */
 
 /* Check class membership. */
-#define astCheckPointList(this) astINVOKE_CHECK(PointList,this)
+#define astCheckPointList(this) astINVOKE_CHECK(PointList,this,0)
+#define astVerifyPointList(this) astINVOKE_CHECK(PointList,this,1)
 
 /* Test class membership. */
 #define astIsAPointList(this) astINVOKE_ISA(PointList,this)

@@ -240,7 +240,8 @@ void astSpecAdd_( AstSpecMap *, const char *, const double[], int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckSpecMap(this) astINVOKE_CHECK(SpecMap,this)
+#define astCheckSpecMap(this) astINVOKE_CHECK(SpecMap,this,0)
+#define astVerifySpecMap(this) astINVOKE_CHECK(SpecMap,this,1)
 
 /* Test class membership. */
 #define astIsASpecMap(this) astINVOKE_ISA(SpecMap,this)

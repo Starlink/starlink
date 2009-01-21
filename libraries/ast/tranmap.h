@@ -236,7 +236,8 @@ AstTranMap *astLoadTranMap_( void *, size_t, AstTranMapVtab *,
    classes). */
 
 /* Check class membership. */
-#define astCheckTranMap(this) astINVOKE_CHECK(TranMap,this)
+#define astCheckTranMap(this) astINVOKE_CHECK(TranMap,this,0)
+#define astVerifyTranMap(this) astINVOKE_CHECK(TranMap,this,1)
 
 /* Test class membership. */
 #define astIsATranMap(this) astINVOKE_ISA(TranMap,this)

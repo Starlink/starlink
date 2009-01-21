@@ -345,7 +345,8 @@ void astSetSimpIF_( AstMathMap *, int, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckMathMap(this) astINVOKE_CHECK(MathMap,this)
+#define astCheckMathMap(this) astINVOKE_CHECK(MathMap,this,0)
+#define astVerifyMathMap(this) astINVOKE_CHECK(MathMap,this,1)
 
 /* Test class membership. */
 #define astIsAMathMap(this) astINVOKE_ISA(MathMap,this)

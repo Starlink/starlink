@@ -248,7 +248,8 @@ AstUnitMap *astLoadUnitMap_( void *, size_t, AstUnitMapVtab *,
    classes). */
 
 /* Check class membership. */
-#define astCheckUnitMap(this) astINVOKE_CHECK(UnitMap,this)
+#define astCheckUnitMap(this) astINVOKE_CHECK(UnitMap,this,0)
+#define astVerifyUnitMap(this) astINVOKE_CHECK(UnitMap,this,1)
 
 /* Test class membership. */
 #define astIsAUnitMap(this) astINVOKE_ISA(UnitMap,this)

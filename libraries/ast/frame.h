@@ -1039,7 +1039,8 @@ int astGetFrameFlags_( AstFrame *, int * );
    pointers (so that they can accept objects from derived classes). */
 
 /* Check class membership. */
-#define astCheckFrame(this) astINVOKE_CHECK(Frame,this)
+#define astCheckFrame(this) astINVOKE_CHECK(Frame,this,0)
+#define astVerifyFrame(this) astINVOKE_CHECK(Frame,this,1)
 
 /* Test class membership. */
 #define astIsAFrame(this) astINVOKE_ISA(Frame,this)

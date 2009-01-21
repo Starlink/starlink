@@ -55,6 +55,8 @@ f     The NullRegion class does not define any new routines beyond those
 *  History:
 *     11-OCT-2004 (DSB):
 *        Original version.
+*     20-JAN-2009 (DSB):
+*        Over-ride astRegBasePick.
 *class--
 */
 
@@ -146,6 +148,7 @@ static AstMapping *Simplify( AstMapping *, int * );
 static AstPointSet *RegBaseMesh( AstRegion *, int * );
 static AstPointSet *RegMesh( AstRegion *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static AstRegion *RegBasePick( AstRegion *this, int, const int *, int * );
 static AstRegion *GetDefUnc( AstRegion *, int * );
 static int Overlap( AstRegion *, AstRegion *, int * );
 static int OverlapX( AstRegion *, AstRegion *, int * );
@@ -303,6 +306,7 @@ void astInitNullRegionVtab_(  AstNullRegionVtab *vtab, const char *name, int *st
    region->RegBaseMesh = RegBaseMesh;
    region->GetRegionBounds = GetRegionBounds;
    region->RegMesh = RegMesh;
+   region->RegBasePick = RegBasePick;
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
@@ -624,6 +628,103 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
       if( astOK && result ) this->basemesh = astClone( result );
 
    }
+
+/* Return the result. */
+   return result;
+}
+
+static AstRegion *RegBasePick( AstRegion *this_region, int naxes, 
+                               const int *axes, int *status ){
+/*
+*  Name:
+*     RegBasePick
+
+*  Purpose:
+*     Return a Region formed by picking selected base Frame axes from the
+*     supplied Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "nullregion.h"
+*     AstRegion *RegBasePick( AstRegion *this, int naxes, const int *axes, 
+*                             int *status )
+
+*  Class Membership:
+*     NullRegion member function (over-rides the astRegBasePick protected
+*     method inherited from the Region class).
+
+*  Description:
+*     This function attempts to return a Region that is spanned by selected 
+*     axes from the base Frame of the encapsulated FrameSet of the supplied 
+*     Region. This may or may not be possible, depending on the class of
+*     Region. If it is not possible a NULL pointer is returned.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     naxes
+*        The number of base Frame axes to select.
+*     axes
+*        An array holding the zero-based indices of the base Frame axes
+*        that are to be selected.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Pointer to the Region, or NULL if no region can be formed.
+
+*  Notes:
+*    - A NULL pointer is returned if an error has already occurred, or if
+*    this function should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstFrame *bfrm;         /* The base Frame in the supplied Region */
+   AstFrame *frm;          /* The base Frame in the returned Region */
+   AstRegion *bunc;        /* The uncertainty in the supplied Region */
+   AstRegion *result;      /* Returned Region */
+   AstRegion *unc;         /* The uncertainty in the returned Region */
+
+/* Initialise */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the base Frame of the encapsulated FrameSet. */
+   bfrm = astGetFrame( this_region->frameset, AST__BASE );
+
+/* Create a Frame by picking the selected axes from the base Frame of the
+   encapsulated FrameSet. */
+   frm = astPickAxes( bfrm, naxes, axes, NULL );
+
+/* Get the uncertainty Region (if any) within the base Frame of the supplied
+   Region, and select the required axes from it. If the resulting Object
+   is not a Region, annul it so that the returned Region will have no 
+   uncertainty. */
+   if( astTestUnc( this_region ) ) {
+      bunc = astGetUncFrm( this_region, AST__BASE );
+      unc = astPickAxes( bunc, naxes, axes, NULL );
+      bunc = astAnnul( bunc );
+
+      if( ! astIsARegion( unc ) ) unc = astAnnul( unc );
+
+   } else {
+      unc = NULL;
+   }
+
+/* Create the new NullRegion. */
+   result = (AstRegion *) astNullRegion( frm, unc, "", status );
+
+/* Free resources */
+   frm = astAnnul( frm );      
+   bfrm = astAnnul( bfrm );      
+   if( unc ) unc = astAnnul( unc );
+
+/* Return a NULL pointer if an error has occurred. */
+   if( !astOK ) result = astAnnul( result );
 
 /* Return the result. */
    return result;
@@ -1216,7 +1317,7 @@ AstNullRegion *astNullRegionId_( void *frame_void, void *unc_void,
 
 /* Obtain a Frame pointer from the supplied ID and validate the
    pointer to ensure it identifies a valid Frame. */
-   frame = astCheckFrame( astMakePointer( frame_void ) );
+   frame = astVerifyFrame( astMakePointer( frame_void ) );
 
 /* Obtain a Region pointer from the supplied "unc" ID and validate the
    pointer to ensure it identifies a valid Region . */

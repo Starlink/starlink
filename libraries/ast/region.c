@@ -160,6 +160,9 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 *        - Added protected function astBndMesh.
 *     14-JAN-2009 (DSB):
 *        Override the astIntersect method.
+*     20-JAN-2009 (DSB):
+*        Change astPickAxes so that it returns a Region rather than a
+*        Frame if possible. This included adding method astRegBasePick.
 *class--
 
 *  Implementation Notes:
@@ -846,6 +849,7 @@ static AstPointSet *RegTransform( AstRegion *, AstPointSet *, int, AstPointSet *
 static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet *, int * );
 static AstPointSet *GetSubMesh( int *, AstPointSet *, int * );
 static AstRegion *MapRegion( AstRegion *, AstMapping *, AstFrame *, int * );
+static AstRegion *RegBasePick( AstRegion *this, int, const int *, int * );
 static AstSystemType SystemCode( AstFrame *, const char *, int * );
 static AstSystemType ValidateSystem( AstFrame *, AstSystemType, const char *, int * );
 static const char *Abbrev( AstFrame *, int, const char *, const char *, const char *, int * );
@@ -4151,6 +4155,7 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name, int *status ) {
    vtab->RegBaseMesh = RegBaseMesh;
    vtab->RegBaseBox = RegBaseBox;
    vtab->RegBaseBox2 = RegBaseBox2;
+   vtab->RegBasePick = RegBasePick;
    vtab->RegCentre = RegCentre;
    vtab->RegGrid = RegGrid;
    vtab->RegMesh = RegMesh;
@@ -6526,12 +6531,7 @@ static void PermAxes( AstFrame *this_frame, const int perm[], int *status ) {
 */
 
 /* Local Variables: */
-   AstFrame *fr;                 /* Pointer to current Frame */
    AstRegion *this;              /* Pointer to the Region structure */
-   AstPermMap *map;              /* Pointer to axis permutation Mapping */
-   int *invperm;                 /* Pointer to inverse permutation array */
-   int axis;                     /* Loop counter for axes */
-   int naxes;                    /* Number of Region axes */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -6539,39 +6539,9 @@ static void PermAxes( AstFrame *this_frame, const int perm[], int *status ) {
 /* Obtain a pointer to the Region structure. */
    this = (AstRegion *) this_frame;
 
-/* Validate the permutation array, to check that it describes a
-   genuine permutation. */
-   astCheckPerm( this, perm, "astPermAxes" );
+/* Invoke the astPermAxes method on the encapsulated FrameSet. */
+   astPermAxes( this->frameset, perm );
 
-/* Obtain a pointer to the Region's current Frame and invoke this
-   Frame's astPermAxes method to permute its axes. Annul the Frame
-   pointer afterwards. */
-   fr = astGetFrame( this->frameset, AST__CURRENT );
-   astPermAxes( fr, perm );
-   fr = astAnnul( fr );
-
-/* Obtain the number of axes in the Region's current Frame and allocate
-   memory to hold an inverse permutation array. */
-   naxes =  astGetNaxes( this );
-   invperm = astMalloc( sizeof( int ) * (size_t) naxes );
-
-/* Fill the inverse permutation array with values that will invert the
-   axis permutation supplied. */
-   if ( astOK ) {
-      for ( axis = 0; axis < naxes; axis++ ) invperm[ perm[ axis ] ] = axis;
-
-/* Create a PermMap that will permute coordinate values in the same way as
-   the current Frame's axes have been permuted. */
-      map = astPermMap( naxes, invperm, naxes, perm, NULL, "", status );
-
-/* Modify the Frame's relationship to the base Frame in the Region so that 
-   the correct coordinate values remain associated with the permuted axes. */
-      astRemapFrame( this->frameset, AST__CURRENT, map );
-
-/* Annul the PermMap and free the inverse permutation array. */
-      map = astAnnul( map );
-   }
-   invperm = astFree( invperm );
 }
 
 static AstFrame *PickAxes( AstFrame *this_frame, int naxes, const int axes[],
@@ -6652,9 +6622,18 @@ static AstFrame *PickAxes( AstFrame *this_frame, int naxes, const int axes[],
 */
 
 /* Local Variables: */
-   AstFrame *frame;              /* Pointer to Frame to be returned */
-   AstRegion *this;              /* Pointer to Region structure */
-
+   AstFrame *cfrm;            /* Current Frame from input Region */
+   AstFrame *frame;           /* Pointer to Frame to be returned */
+   AstMapping *cbmap;         /* Base->current Mapping from input Region */
+   AstMapping *fsmap;         /* Mapping from selected current to base axes */
+   AstRegion *breg;           /* Region spanning selected base Frame axes */
+   AstRegion *creg;           /* Region spanning selected current Frame axes */
+   AstRegion *this;           /* Pointer to Region structure */
+   int *base_axes;            /* Holds selected base frame axis indices */
+   int def;                   /* Were any default axes requested? */
+   int i;                     /* Axis index */
+   int nbase;                 /* No. of selected base Frame axes */
+ 
 /* Initialise the returned pointers. */
    if ( map ) *map = NULL;
    frame = NULL;
@@ -6668,10 +6647,63 @@ static AstFrame *PickAxes( AstFrame *this_frame, int naxes, const int axes[],
 /* Check that a valid set of axes is being selected . */
    astValidateAxisSelection( this, naxes, axes, "astPickAxes" );
 
-/* Obtain a pointer to the Region's encapsulated FrameSet and use its
-   astPickAxes method to obtain the required new Frame and Mapping. */
-   frame = astPickAxes( this->frameset, naxes, axes, map );
+/* Pick the required axes from the current Frame of the encapsulated
+   FrameSet. */
+   cfrm = astGetFrame( this->frameset, AST__CURRENT );
+   frame = astPickAxes( cfrm, naxes, axes, map );
 
+/* See if any default axes are to be included in the returned Frame. */
+   def = 0;
+   for( i = 0; i < naxes; i++ ) {
+      if( axes[ i ] < 0 ) def = 1;
+   }    
+
+/* Regions cannot yet include extra default axes in the returned Frame
+   so return a basic Frame if any default axes were requested. */
+   if( ! def ) {
+
+/* We now see if the requested set of current Frame axes correspond to a 
+   unique set of base Frame axes. If they do, we may be able to return a 
+   Region spanning the selected axes rather than just a Frame. The check 
+   is performed by attempting to split the current->base Mapping. */
+      cbmap = astGetMapping( this->frameset, AST__CURRENT, AST__BASE );
+      base_axes = astMapSplit( cbmap, naxes, axes, &fsmap );
+
+/* Check the Mapping could be split. */
+      if( base_axes ) {
+
+/* Store the number of base Frame axes that correspond to the requested
+   set of current Frame axes. */
+         nbase = astGetNout( fsmap );
+
+/* Attempt to create a new Region that spans the corresponding set of
+   base Frame axes. */
+         breg = astRegBasePick( this, nbase, base_axes );
+         if( breg ) {
+
+/* Use the split Mapping to map the base Frame region into the requested
+   Frame. We invert the "fsmap" first so that it maps the selected base
+   Frame axes into the selected current Frame axes. */
+            astInvert( fsmap );
+            creg = astMapRegion( breg, fsmap, frame );
+
+/* Copy properties from the old Region to the new Region. */
+            astRegOverlay( creg, this );
+ 
+/* Return this new Region in place of the simple Frame found above. */
+            (void) astAnnul( frame );
+            frame = (AstFrame *) creg;
+
+/* Free resources */
+            breg = astAnnul( breg );
+         }
+         fsmap = astAnnul( fsmap );
+         base_axes = astFree( base_axes );
+      }
+      cbmap = astAnnul( cbmap );
+   }
+   cfrm = astAnnul( cfrm );
+   
 /* If an error occurred, annul the Mapping pointer (if requested) and
    the new Frame pointer. */
    if ( !astOK ) {
@@ -6997,6 +7029,56 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
              "the astRegBaseMesh method inherited from the Region class "
              "(internal AST programming error).", status, astGetClass( this ), 
              astGetClass( this ) );
+   return NULL;
+}
+
+static AstRegion *RegBasePick( AstRegion *this, int naxes, const int *axes, 
+                               int *status ){
+/*
+*+
+*  Name:
+*     astRegBasePick
+
+*  Purpose:
+*     Return a Region formed by picking selected base Frame axes from the
+*     supplied Region.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "region.h"
+*     AstRegion *astRegBasePick( AstRegion *this, int naxes, const int *axes )
+
+*  Class Membership:
+*     Region virtual function.
+
+*  Description:
+*     This function attempts to return a Region that is spanned by selected 
+*     axes from the base Frame of the encapsulated FrameSet of the supplied 
+*     Region. This may or may not be possible, depending on the class of
+*     Region. If it is not possible a NULL pointer is returned.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     naxes
+*        The number of base Frame axes to select.
+*     axes
+*        An array holding the zero-based indices of the base Frame axes
+*        that are to be selected.
+
+*  Returned Value:
+*     Pointer to the Region, or NULL if no region can be formed.
+
+*  Notes:
+*    - This base implementation simply returns NULL. Derived classes that
+*    may be able to split the base Frame Region should over-ride it with 
+*    an appropriate class-specific implementation.
+*    - A NULL pointer is returned if an error has already occurred, or if
+*    this function should fail for any reason.
+*-
+*/
    return NULL;
 }
 
@@ -7946,8 +8028,14 @@ static void RegOverlay( AstRegion *this, AstRegion *that, int *status ){
    this->regionfs = that->regionfs;
    this->adaptive = that->adaptive;
 
-   if( astTestMeshSize( that ) ) astSetMeshSize( this, astGetMeshSize( that ) );
-   if( astTestFillFactor( that ) ) astSetFillFactor( this, astGetFillFactor( that ) );
+/* Clear things that depend on the number of axes. */
+   if( astGetNaxes( this ) == astGetNaxes( that ) ) {
+      if( astTestMeshSize( that ) ) astSetMeshSize( this, astGetMeshSize( that ) );
+      if( astTestFillFactor( that ) ) astSetFillFactor( this, astGetFillFactor( that ) );
+   } else {
+      astClearMeshSize( this );
+      astClearFillFactor( this );
+   }
 
 /* If the original Region has no uncertainty, ensure the new Region has
    no uncertainty. */
@@ -11542,6 +11630,10 @@ int astOverlapX_( AstRegion *that, AstRegion *this, int *status ){
 AstFrame *astRegFrame_( AstRegion *this, int *status ){
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Region,RegFrame))( this, status );
+}
+AstRegion *astRegBasePick_( AstRegion *this, int naxes, const int *axes, int *status ){
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Region,RegBasePick))( this, naxes, axes, status );
 }
 AstPointSet *astBTransform_( AstRegion *this, AstPointSet *in,
                              int forward, AstPointSet *out, int *status ) {

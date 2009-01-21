@@ -196,7 +196,8 @@ AstCmpRegion *astLoadCmpRegion_( void *, size_t, AstCmpRegionVtab *,
    classes). */
 
 /* Check class membership. */
-#define astCheckCmpRegion(this) astINVOKE_CHECK(CmpRegion,this)
+#define astCheckCmpRegion(this) astINVOKE_CHECK(CmpRegion,this,0)
+#define astVerifyCmpRegion(this) astINVOKE_CHECK(CmpRegion,this,1)
 
 /* Test class membership. */
 #define astIsACmpRegion(this) astINVOKE_ISA(CmpRegion,this)

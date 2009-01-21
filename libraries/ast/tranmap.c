@@ -118,7 +118,7 @@ static int class_check;
 /* Pointers to parent class methods which are extended by this class. */
 static int (* parent_getobjsize)( AstObject *, int * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
-static int *(* parent_mapsplit)( AstMapping *, int, int *, AstMapping **, int * );
+static int *(* parent_mapsplit)( AstMapping *, int, const int *, AstMapping **, int * );
 
 #if defined(THREAD_SAFE)
 static int (* parent_managelock)( AstObject *, int, int, int * );
@@ -163,7 +163,7 @@ AstTranMap *astTranMapId_( void *, void *, const char *, ... );
 /* ======================================== */
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static double Rate( AstMapping *, double *, int, int, int * );
-static int *MapSplit( AstMapping *, int, int *, AstMapping **, int * );
+static int *MapSplit( AstMapping *, int, const int *, AstMapping **, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static void Copy( const AstObject *, AstObject *, int * );
@@ -996,7 +996,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, int *status ){
+static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping **map, int *status ){
 /*
 *  Name:
 *     MapSplit
@@ -1010,7 +1010,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, 
 
 *  Synopsis:
 *     #include "tranmap.h"
-*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map, int *status )
+*     int *MapSplit( AstMapping *this, int nin, const int *in, AstMapping **map, int *status )
 
 *  Class Membership:
 *     TranMap method (over-rides the protected astMapSplit method
@@ -1825,8 +1825,8 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Obtain the Mapping pointers from the ID's supplied and validate the
    pointers to ensure they identify valid Mappings. */
-   map1 = astCheckMapping( astMakePointer( map1_void ) );
-   map2 = astCheckMapping( astMakePointer( map2_void ) );
+   map1 = astVerifyMapping( astMakePointer( map1_void ) );
+   map2 = astVerifyMapping( astMakePointer( map2_void ) );
    if ( astOK ) {
 
 /* Initialise the TranMap, allocating memory and initialising the

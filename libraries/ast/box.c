@@ -77,6 +77,8 @@ f     The Box class does not define any new routines beyond those
 *     26-MAY-2008 (DSB):
 *        Fix bug in RegBaseMesh that caused an error to be reported if
 *        the Box occupies a single point.
+*     20-JAN-2009 (DSB):
+*        Over-ride astRegBasePick.
 *class--
 */
 
@@ -180,6 +182,7 @@ static AstMapping *Simplify( AstMapping *, int * );
 static AstPointSet *RegBaseGrid( AstRegion *, int * );
 static AstPointSet *RegBaseMesh( AstRegion *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static AstRegion *RegBasePick( AstRegion *this, int, const int *, int * );
 static double *RegCentre( AstRegion *this, double *, double **, int, int, int * );
 static double SetShrink( AstBox *, double, int * );
 static int MakeGrid( int, double **, int, double *, double *, int, int, double, int * );
@@ -462,6 +465,7 @@ void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name, int *status ) {
    new member functions implemented here. */
    region->RegBaseGrid = RegBaseGrid;
    region->RegBaseMesh = RegBaseMesh;
+   region->RegBasePick = RegBasePick;
    region->RegBaseBox = RegBaseBox;
    region->RegPins = RegPins;
    region->RegCentre = RegCentre;
@@ -1657,6 +1661,129 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
 /* Undefine macros local to this function. */
 #undef NP_EDGE
 
+}
+
+static AstRegion *RegBasePick( AstRegion *this_region, int naxes, const int *axes, 
+                               int *status ){
+/*
+*  Name:
+*     RegBasePick
+
+*  Purpose:
+*     Return a Region formed by picking selected base Frame axes from the
+*     supplied Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "box.h"
+*     AstRegion *RegBasePick( AstRegion *this, int naxes, const int *axes, 
+*                             int *status )
+
+*  Class Membership:
+*     Box member function (over-rides the astRegBasePick protected
+*     method inherited from the Region class).
+
+*  Description:
+*     This function attempts to return a Region that is spanned by selected 
+*     axes from the base Frame of the encapsulated FrameSet of the supplied 
+*     Region. This may or may not be possible, depending on the class of
+*     Region. If it is not possible a NULL pointer is returned.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     naxes
+*        The number of base Frame axes to select.
+*     axes
+*        An array holding the zero-based indices of the base Frame axes
+*        that are to be selected.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Pointer to the Region, or NULL if no region can be formed.
+
+*  Notes:
+*    - A NULL pointer is returned if an error has already occurred, or if
+*    this function should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstFrame *bfrm;         /* The base Frame in the supplied Region */
+   AstFrame *frm;          /* The base Frame in the returned Region */
+   AstPointSet *pset;      /* Holds axis values defining the supplied Region */
+   AstRegion *bunc;        /* The uncertainty in the supplied Region */
+   AstRegion *result;      /* Returned Region */
+   AstRegion *unc;         /* The uncertainty in the returned Region */
+   double **ptr;           /* Holds axis values defining the supplied Region */
+   double *cen;            /* Base Frm axis values at centre of returned Box */
+   double *cor;            /* Base Frm axis values at a corner of returned Box */
+   int i;                  /* Index of axis within returned Region */
+
+/* Initialise */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the base Frame of the encapsulated FrameSet. */
+   bfrm = astGetFrame( this_region->frameset, AST__BASE );
+
+/* Create a Frame by picking the selected axes from the base Frame of the
+   encapsulated FrameSet. */
+   frm = astPickAxes( bfrm, naxes, axes, NULL );
+
+/* Get the uncertainty Region (if any) within the base Frame of the supplied
+   Region, and select the required axes from it. If the resulting Object
+   is not a Region, annul it so that the returned Region will have no 
+   uncertainty. */
+   if( astTestUnc( this_region ) ) {
+      bunc = astGetUncFrm( this_region, AST__BASE );
+      unc = astPickAxes( bunc, naxes, axes, NULL );
+      bunc = astAnnul( bunc );
+
+      if( ! astIsARegion( unc ) ) unc = astAnnul( unc );
+
+   } else {
+      unc = NULL;
+   }
+
+/* Get pointers to the coordinate data in the parent Region structure. */
+   pset = this_region->points;
+   ptr = astGetPoints( pset );
+
+/* Get space to hold the centre and corner of the Box in the new Frame. */
+   cen = astMalloc( sizeof( *cen )*naxes );
+   cor = astMalloc( sizeof( *cor )*naxes );
+
+/* Check pointers can be used safely. */
+   if( astOK ) {
+
+/* Copy the centre and corner axis values for the selected axes into the
+   arrays allocated above. */
+      for( i = 0; i < naxes; i++ ) {
+         cen[ i ] = ptr[ axes[ i ] ][ 0 ];
+         cor[ i ] = ptr[ axes[ i ] ][ 1 ];
+      }
+
+/* Create the new Box. */
+      result = (AstRegion *) astBox( frm, 0, cen, cor, unc, "", status );
+   }
+
+/* Free resources */
+   frm = astAnnul( frm );      
+   bfrm = astAnnul( bfrm );      
+   if( unc ) unc = astAnnul( unc );
+   cen = astFree( cen );
+   cor = astFree( cor );
+
+/* Return a NULL pointer if an error has occurred. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the result. */
+   return result;
 }
 
 static double *RegCentre( AstRegion *this_region, double *cen, double **ptr, 
@@ -3424,7 +3551,7 @@ AstBox *astBoxId_( void *frame_void, int form, const double point1[],
 
 /* Obtain a Frame pointer from the supplied ID and validate the
    pointer to ensure it identifies a valid Frame. */
-   frame = astCheckFrame( astMakePointer( frame_void ) );
+   frame = astVerifyFrame( astMakePointer( frame_void ) );
 
 /* Obtain a Region pointer from the supplied "unc" ID and validate the
    pointer to ensure it identifies a valid Region . */

@@ -321,7 +321,8 @@ void astSetAlignSpecOffset_( AstSpecFrame *, int, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckSpecFrame(this) astINVOKE_CHECK(SpecFrame,this)
+#define astCheckSpecFrame(this) astINVOKE_CHECK(SpecFrame,this,0)
+#define astVerifySpecFrame(this) astINVOKE_CHECK(SpecFrame,this,1)
 
 /* Test class membership. */
 #define astIsASpecFrame(this) astINVOKE_ISA(SpecFrame,this)

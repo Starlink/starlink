@@ -1441,7 +1441,7 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Obtain and validate pointers to the Region structures provided. */
    if( astOK ) {
       for( i = 0; i < nreg; i++ ) {
-         regs[ i ] = astCheckRegion( astMakePointer(regs_void[ i ]) );
+         regs[ i ] = astVerifyRegion( astMakePointer(regs_void[ i ]) );
       }
    }
 

@@ -321,7 +321,8 @@ void astSetPolarLong_( AstSphMap *, double, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckSphMap(this) astINVOKE_CHECK(SphMap,this)
+#define astCheckSphMap(this) astINVOKE_CHECK(SphMap,this,0)
+#define astVerifySphMap(this) astINVOKE_CHECK(SphMap,this,1)
 
 /* Test class membership. */
 #define astIsASphMap(this) astINVOKE_ISA(SphMap,this)

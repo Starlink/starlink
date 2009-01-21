@@ -8206,7 +8206,7 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Obtain a Frame pointer from any ID supplied and validate the
    pointer to ensure it identifies a valid Frame. */
    if( frame_void ){
-      frame = astCheckFrame( astMakePointer( frame_void ) );
+      frame = astVerifyFrame( astMakePointer( frame_void ) );
    } else {
       frame = NULL;
    }

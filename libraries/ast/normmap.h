@@ -175,7 +175,8 @@ AstNormMap *astLoadNormMap_( void *, size_t, AstNormMapVtab *,
    classes). */
 
 /* Check class membership. */
-#define astCheckNormMap(this) astINVOKE_CHECK(NormMap,this)
+#define astCheckNormMap(this) astINVOKE_CHECK(NormMap,this,0)
+#define astVerifyNormMap(this) astINVOKE_CHECK(NormMap,this,1)
 
 /* Test class membership. */
 #define astIsANormMap(this) astINVOKE_ISA(NormMap,this)

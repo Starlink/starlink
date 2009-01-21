@@ -923,7 +923,8 @@ void astInitPlotGlobals_( AstPlotGlobals * );
    pointers (so that they can accept objects from derived classes). */
 
 /* Check class membership. */
-#define astCheckPlot(this) astINVOKE_CHECK(Plot,this)
+#define astCheckPlot(this) astINVOKE_CHECK(Plot,this,0)
+#define astVerifyPlot(this) astINVOKE_CHECK(Plot,this,1)
 
 /* Test class membership. */
 #define astIsAPlot(this) astINVOKE_ISA(Plot,this)

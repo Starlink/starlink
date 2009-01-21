@@ -263,7 +263,8 @@ int *astGetOutPerm_( AstPermMap *, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckPermMap(this) astINVOKE_CHECK(PermMap,this)
+#define astCheckPermMap(this) astINVOKE_CHECK(PermMap,this,0)
+#define astVerifyPermMap(this) astINVOKE_CHECK(PermMap,this,1)
 
 /* Test class membership. */
 #define astIsAPermMap(this) astINVOKE_ISA(PermMap,this)

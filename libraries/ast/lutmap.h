@@ -255,7 +255,8 @@ void astInitLutMapGlobals_( AstLutMapGlobals * );
    classes). */
 
 /* Check class membership. */
-#define astCheckLutMap(this) astINVOKE_CHECK(LutMap,this)
+#define astCheckLutMap(this) astINVOKE_CHECK(LutMap,this,0)
+#define astVerifyLutMap(this) astINVOKE_CHECK(LutMap,this,1)
 
 /* Test class membership. */
 #define astIsALutMap(this) astINVOKE_ISA(LutMap,this)

@@ -244,7 +244,8 @@ AstPolyMap *astLoadPolyMap_( void *, size_t, AstPolyMapVtab *,
    classes). */
 
 /* Check class membership. */
-#define astCheckPolyMap(this) astINVOKE_CHECK(PolyMap,this)
+#define astCheckPolyMap(this) astINVOKE_CHECK(PolyMap,this,0)
+#define astVerifyPolyMap(this) astINVOKE_CHECK(PolyMap,this,1)
 
 /* Test class membership. */
 #define astIsAPolyMap(this) astINVOKE_ISA(PolyMap,this)

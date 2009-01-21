@@ -360,7 +360,8 @@ AstFitsChan *astDssFits_( AstDssMap *, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckDssMap(this) astINVOKE_CHECK(DssMap,this)
+#define astCheckDssMap(this) astINVOKE_CHECK(DssMap,this,0)
+#define astVerifyDssMap(this) astINVOKE_CHECK(DssMap,this,1)
 
 /* Test class membership. */
 #define astIsADssMap(this) astINVOKE_ISA(DssMap,this)

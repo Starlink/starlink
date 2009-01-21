@@ -861,7 +861,7 @@ static int TestActiveUnit( AstFrame *, int * );
 static void SetActiveUnit( AstFrame *, int, int * );
 
 static int GetFrameFlags( AstFrame *, int * );
-static int *MapSplit( AstMapping *, int, int *, AstMapping **, int * );
+static int *MapSplit( AstMapping *, int, const int *, AstMapping **, int * );
 static int GetMatchEnd( AstFrame *, int * );
 static int GetMaxAxes( AstFrame *, int * );
 static int GetMinAxes( AstFrame *, int * );
@@ -6163,7 +6163,7 @@ static int ManageLock( AstObject *this_object, int mode, int extra, int *status 
 }
 #endif
 
-static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, int *status ){
+static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping **map, int *status ){
 /*
 *  Name:
 *     MapSplit
@@ -6177,7 +6177,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, 
 
 *  Synopsis:
 *     #include "frame.h"
-*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map, int *status )
+*     int *MapSplit( AstMapping *this, int nin, const int *in, AstMapping **map, int *status )
 
 *  Class Membership:
 *     Frame method (over-rides the protected astMapSplit method
@@ -14302,12 +14302,34 @@ c     astPickAxes()
 f     AST_PICKAXES = INTEGER
 *        A pointer to the new Frame.
 
+*  Applicability:
+*     Frame
+*        This function applies to all Frames. The class of Frame returned 
+*        may differ from that of the original Frame, depending on which 
+*        axes are selected. For example, if a single axis is picked from a 
+*        SkyFrame (which must always have two axes) then the resulting 
+*        Frame cannot be a valid SkyFrame, so will revert to the parent 
+*        class (Frame) instead.
+*     FrameSet
+*        Using this function on a FrameSet is identical to using it on
+*        the current Frame in the FrameSet. The returned Frame will not
+*        be a FrameSet.
+*     Region
+*        If this function is used on a Region, an attempt is made to
+*        retain the bounds information on the selected axes. If
+*        succesful, the returned Frame will be a Region of some class. 
+*        Otherwise, the returned Frame is obtained by calling this 
+*        function on the Frame represented by the supplied Region (the
+*        returned Frame will then not be a Region). In order to be
+*        succesful, the selected axes in the Region must be independent
+*        of the others. For instance, a Box can be split in this way but
+*        a Circle cannot. Another requirement for success is that no
+*        default axes are added (that is, the 
+c        "axes"
+f        AXES
+*        array must not contain any zero values.
+
 *  Notes:
-*     - The class of Frame returned may differ from that of the
-*     original Frame, depending on which axes are selected. For
-*     example, if a single axis is picked from a SkyFrame (which must
-*     always have two axes) then the resulting Frame cannot be a valid
-*     SkyFrame, so will revert to the parent class (Frame) instead.
 c     - The new Frame will contain a "deep" copy (c.f. astCopy) of all
 f     - The new Frame will contain a "deep" copy (c.f. AST_COPY) of all
 *     the data selected from the original Frame. Modifying any aspect

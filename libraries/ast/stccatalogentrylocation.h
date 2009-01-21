@@ -181,7 +181,8 @@ AstStcCatalogEntryLocation *astLoadStcCatalogEntryLocation_( void *, size_t, Ast
    classes). */
 
 /* Check class membership. */
-#define astCheckStcCatalogEntryLocation(this) astINVOKE_CHECK(StcCatalogEntryLocation,this)
+#define astCheckStcCatalogEntryLocation(this) astINVOKE_CHECK(StcCatalogEntryLocation,this,0)
+#define astVerifyStcCatalogEntryLocation(this) astINVOKE_CHECK(StcCatalogEntryLocation,this,1)
 
 /* Test class membership. */
 #define astIsAStcCatalogEntryLocation(this) astINVOKE_ISA(StcCatalogEntryLocation,this)

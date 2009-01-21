@@ -474,7 +474,8 @@ void astInitWcsMapGlobals_( AstWcsMapGlobals * );
    classes). */
 
 /* Check class membership. */
-#define astCheckWcsMap(this) astINVOKE_CHECK(WcsMap,this)
+#define astCheckWcsMap(this) astINVOKE_CHECK(WcsMap,this,0)
+#define astVerifyWcsMap(this) astINVOKE_CHECK(WcsMap,this,1)
 
 /* Test class membership. */
 #define astIsAWcsMap(this) astINVOKE_ISA(WcsMap,this)

@@ -164,7 +164,7 @@ static double Rate( AstMapping *, double *, int, int, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int *GetInPerm( AstPermMap *, int * );
 static int *GetOutPerm( AstPermMap *, int * );
-static int *MapSplit( AstMapping *, int, int *, AstMapping **, int * );
+static int *MapSplit( AstMapping *, int, const int *, AstMapping **, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static int NullPerm( AstPermMap *, int, int * );
 static void Copy( const AstObject *, AstObject *, int * );
@@ -1352,7 +1352,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, int *status ){
+static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping **map, int *status ){
 /*
 *  Name:
 *     MapSplit
@@ -1366,7 +1366,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, 
 
 *  Synopsis:
 *     #include "permmap.h"
-*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map, int *status )
+*     int *MapSplit( AstMapping *this, int nin, const int *in, AstMapping **map, int *status )
 
 *  Class Membership:
 *     PermMap method (over-rides the protected astMapSplit method

@@ -150,6 +150,7 @@ typedef struct AstRegionVtab {
    AstRegion *(* GetUncFrm)( AstRegion *, int, int * );
    AstRegion *(* GetUnc)( AstRegion *, int, int * );
    AstRegion *(* GetDefUnc)( AstRegion *, int * );
+   AstRegion *(* RegBasePick)( AstRegion *this, int, const int *, int * );
    void (* ResetCache)( AstRegion *, int * );
    void (* SetUnc)( AstRegion *, AstRegion *, int * );
    void (* SetRegFS)( AstRegion *, AstFrame *, int * );
@@ -291,6 +292,7 @@ AstPointSet *astBndBaseMesh_( AstRegion *, double *, double *, int * );
 AstPointSet *astBndMesh_( AstRegion *, double *, double *, int * );
 AstRegion *astGetUncFrm_( AstRegion *, int, int * );
 AstRegion *astGetDefUnc_( AstRegion *, int * );
+AstRegion *astRegBasePick_( AstRegion *this, int, const int *, int * );
 int astOverlapX_( AstRegion *, AstRegion *, int * );
 AstFrameSet *astGetRegFS_( AstRegion *, int * );
 void astSetRegFS_( AstRegion *, AstFrame *, int * );
@@ -346,7 +348,8 @@ AstRegion *astMapRegionId_( AstRegion *, AstMapping *, AstFrame *, int * );
    pointers (so that they can accept objects from derived classes). */
 
 /* Check class membership. */
-#define astCheckRegion(this) astINVOKE_CHECK(Region,this)
+#define astCheckRegion(this) astINVOKE_CHECK(Region,this,0)
+#define astVerifyRegion(this) astINVOKE_CHECK(Region,this,1)
 
 /* Test class membership. */
 #define astIsARegion(this) astINVOKE_ISA(Region,this)
@@ -424,6 +427,7 @@ astINVOKE(V,astMaskUS_(astCheckRegion(this),(map?astCheckMapping(map):NULL),insi
 #define astRegSetAttrib(this,setting,bset) astINVOKE(V,astRegSetAttrib_(astCheckRegion(this),setting,bset,STATUS_PTR))
 #define astRegClearAttrib(this,setting,batt) astINVOKE(V,astRegClearAttrib_(astCheckRegion(this),setting,batt,STATUS_PTR))
 #define astRegBaseMesh(this) astINVOKE(O,astRegBaseMesh_(astCheckRegion(this),STATUS_PTR))
+#define astRegBasePick(this,naxes,axes) astINVOKE(O,astRegBasePick_(astCheckRegion(this),naxes,axes,STATUS_PTR))
 #define astRegBaseGrid(this) astINVOKE(O,astRegBaseGrid_(astCheckRegion(this),STATUS_PTR))
 #define astBndBaseMesh(this,lbnd,ubnd) astINVOKE(O,astBndBaseMesh_(astCheckRegion(this),lbnd,ubnd,STATUS_PTR))
 #define astBndMesh(this,lbnd,ubnd) astINVOKE(O,astBndMesh_(astCheckRegion(this),lbnd,ubnd,STATUS_PTR))

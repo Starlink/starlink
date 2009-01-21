@@ -275,7 +275,8 @@ void astSetZoom_( AstZoomMap *, double, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckZoomMap(this) astINVOKE_CHECK(ZoomMap,this)
+#define astCheckZoomMap(this) astINVOKE_CHECK(ZoomMap,this,0)
+#define astVerifyZoomMap(this) astINVOKE_CHECK(ZoomMap,this,1)
 
 /* Test class membership. */
 #define astIsAZoomMap(this) astINVOKE_ISA(ZoomMap,this)

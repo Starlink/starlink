@@ -236,7 +236,8 @@ AstRateMap *astLoadRateMap_( void *, size_t, AstRateMapVtab *,
    classes). */
 
 /* Check class membership. */
-#define astCheckRateMap(this) astINVOKE_CHECK(RateMap,this)
+#define astCheckRateMap(this) astINVOKE_CHECK(RateMap,this,0)
+#define astVerifyRateMap(this) astINVOKE_CHECK(RateMap,this,1)
 
 /* Test class membership. */
 #define astIsARateMap(this) astINVOKE_ISA(RateMap,this)

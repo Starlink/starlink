@@ -194,7 +194,8 @@ AstInterval *astBoxInterval_( AstBox *, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckInterval(this) astINVOKE_CHECK(Interval,this)
+#define astCheckInterval(this) astINVOKE_CHECK(Interval,this,0)
+#define astVerifyInterval(this) astINVOKE_CHECK(Interval,this,1)
 
 /* Test class membership. */
 #define astIsAInterval(this) astINVOKE_ISA(Interval,this)

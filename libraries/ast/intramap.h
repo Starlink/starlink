@@ -289,7 +289,8 @@ void astIntraRegFor_( const char *, int, int, void (*)( AstMapping *, int, int, 
    classes). */
 
 /* Check class membership. */
-#define astCheckIntraMap(this) astINVOKE_CHECK(IntraMap,this)
+#define astCheckIntraMap(this) astINVOKE_CHECK(IntraMap,this,0)
+#define astVerifyIntraMap(this) astINVOKE_CHECK(IntraMap,this,1)
 
 /* Test class membership. */
 #define astIsAIntraMap(this) astINVOKE_ISA(IntraMap,this)

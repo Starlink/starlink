@@ -59,6 +59,8 @@ f     The CmpRegion class does not define any new routines beyond those
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -86,6 +88,8 @@ f     The CmpRegion class does not define any new routines beyond those
 *        - Corrected RegBaseMesh.
 *        - In RegBaseBox, if the CmpRegion is bounded find the box by
 *        finding the extreme position sin a mesh covering the boundary.
+*     20-JAN-2009 (DSB):
+*        Over-ride astRegBasePick.
 *class--
 */
 
@@ -193,6 +197,7 @@ AstCmpRegion *astCmpRegionId_( void *, void *, int, const char *, ... );
 static AstMapping *Simplify( AstMapping *, int * );
 static AstPointSet *RegBaseMesh( AstRegion *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static AstRegion *RegBasePick( AstRegion *this, int, const int *, int * );
 static AstRegion *GetUncFrm( AstRegion *, int, int * );
 static AstRegion *MatchRegion( AstRegion *, int, AstRegion *, const char *, int * );
 static double GetFillFactor( AstRegion *, int * );
@@ -1033,6 +1038,7 @@ void astInitCmpRegionVtab_(  AstCmpRegionVtab *vtab, const char *name, int *stat
    region->RegBaseMesh = RegBaseMesh;
    region->RegPins = RegPins;
    region->GetBounded = GetBounded;
+   region->RegBasePick = RegBasePick;
 
 /* Declare the copy constructor, destructor and class dump function. */
    astSetCopy( vtab, Copy );
@@ -1822,6 +1828,95 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
    if( !astOK ) result = astAnnul( result );
 
 /* Return a pointer to the output PointSet. */
+   return result;
+}
+
+static AstRegion *RegBasePick( AstRegion *this_region, int naxes, 
+                               const int *axes, int *status ){
+/*
+*  Name:
+*     RegBasePick
+
+*  Purpose:
+*     Return a Region formed by picking selected base Frame axes from the
+*     supplied Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpregion.h"
+*     AstRegion *RegBasePick( AstRegion *this, int naxes, const int *axes, 
+*                             int *status )
+
+*  Class Membership:
+*     CmpRegion member function (over-rides the astRegBasePick protected
+*     method inherited from the Region class).
+
+*  Description:
+*     This function attempts to return a Region that is spanned by selected 
+*     axes from the base Frame of the encapsulated FrameSet of the supplied 
+*     Region. This may or may not be possible, depending on the class of
+*     Region. If it is not possible a NULL pointer is returned.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     naxes
+*        The number of base Frame axes to select.
+*     axes
+*        An array holding the zero-based indices of the base Frame axes
+*        that are to be selected.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Pointer to the Region, or NULL if no region can be formed.
+
+*  Notes:
+*    - A NULL pointer is returned if an error has already occurred, or if
+*    this function should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstCmpRegion *this;     /* Pointer to Cmpregion structure */
+   AstFrame *frm1;         /* Axes picked from the 1st encapsulated Region */
+   AstFrame *frm2;         /* Axes picked from the 2nd encapsulated Region */
+   AstRegion *result;      /* Returned Region */
+
+/* Initialise */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the CmpRegion information. */
+   this = (AstCmpRegion *) this_region;
+
+/* Both encapsulated regions refer to the same Frame (the base Frame of
+   the parent Region), so attempt to pick the requested axs from them. 
+   If the resulting Frames are not Regions, we cannot pick the requested
+   axes so return the NULL Frame pointer initialised above. */
+   frm1 = astPickAxes( this->region1, naxes, axes, NULL );
+   if( astIsARegion( frm1 ) ) {
+      frm2 = astPickAxes( this->region2, naxes, axes, NULL );
+      if( astIsARegion( frm2 ) ) {
+
+/* Create the new CmpRegion. */
+         result = (AstRegion *) astCmpRegion( (AstRegion *) frm1, 
+                                              (AstRegion *) frm2, 
+                                              this->oper, "", status );
+      }
+   }
+
+/* Free resources */
+   frm1 = astAnnul( frm1 );      
+   frm2 = astAnnul( frm2 );      
+
+/* Return a NULL pointer if an error has occurred. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the result. */
    return result;
 }
 
@@ -3263,8 +3358,8 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Obtain the Region pointers from the ID's supplied and validate the
    pointers to ensure they identify valid Regions. */
-   region1 = astCheckRegion( astMakePointer( region1_void ) );
-   region2 = astCheckRegion( astMakePointer( region2_void ) );
+   region1 = astVerifyRegion( astMakePointer( region1_void ) );
+   region2 = astVerifyRegion( astMakePointer( region2_void ) );
    if ( astOK ) {
 
 /* Initialise the CmpRegion, allocating memory and initialising the

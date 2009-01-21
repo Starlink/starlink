@@ -451,7 +451,7 @@ typedef struct AstMappingVtab {
    void (* Invert)( struct AstMapping *, int * );
    void (* MapBox)( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [], int * );
    int (* MapList)( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
-   int *(* MapSplit)( AstMapping *, int, int *, AstMapping **, int * );
+   int *(* MapSplit)( AstMapping *, int, const int *, AstMapping **, int * );
    void (* ReportPoints)( AstMapping *, int, AstPointSet *, AstPointSet *, int * );
    void (* SetInvert)( AstMapping *, int, int * );
    void (* SetReport)( AstMapping *, int, int * );
@@ -547,12 +547,12 @@ void astTranP_( AstMapping *, int, int, const double *[], int, int, double *[], 
 void astDecompose_( AstMapping *, AstMapping **, AstMapping **, int *, int *, int *, int * );
 void astMapBox_( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [], int * );
 double astRate_( AstMapping *, double *, int, int, int * );
-int *astMapSplit_( AstMapping *, int, int *, AstMapping **, int * );
+int *astMapSplit_( AstMapping *, int, const int *, AstMapping **, int * );
 #else
 void astDecomposeId_( AstMapping *, AstMapping **, AstMapping **, int *, int *, int *, int * );
 void astMapBoxId_( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [], int * );
 double astRateId_( AstMapping *, double *, int, int, int * );
-void astMapSplitId_( AstMapping *, int, int *, int *, AstMapping **, int * );
+void astMapSplitId_( AstMapping *, int, const int *, int *, AstMapping **, int * );
 #endif
 
 #if defined(astCLASS)            /* Protected */
@@ -590,7 +590,8 @@ void astSetReport_( AstMapping *, int, int * );
    pointers (so that they can accept objects from derived classes). */
 
 /* Check class membership. */
-#define astCheckMapping(this) astINVOKE_CHECK(Mapping,this)
+#define astCheckMapping(this) astINVOKE_CHECK(Mapping,this,0)
+#define astVerifyMapping(this) astINVOKE_CHECK(Mapping,this,1)
 
 /* Test class membership. */
 #define astIsAMapping(this) astINVOKE_ISA(Mapping,this)

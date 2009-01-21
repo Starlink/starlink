@@ -249,7 +249,8 @@ void astSetAlignTimeScale_( AstTimeFrame *, AstTimeScaleType, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckTimeFrame(this) astINVOKE_CHECK(TimeFrame,this)
+#define astCheckTimeFrame(this) astINVOKE_CHECK(TimeFrame,this,0)
+#define astVerifyTimeFrame(this) astINVOKE_CHECK(TimeFrame,this,1)
 
 /* Test class membership. */
 #define astIsATimeFrame(this) astINVOKE_ISA(TimeFrame,this)

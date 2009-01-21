@@ -179,7 +179,8 @@ AstNullRegion *astLoadNullRegion_( void *, size_t, AstNullRegionVtab *,
    classes). */
 
 /* Check class membership. */
-#define astCheckNullRegion(this) astINVOKE_CHECK(NullRegion,this)
+#define astCheckNullRegion(this) astINVOKE_CHECK(NullRegion,this,0)
+#define astVerifyNullRegion(this) astINVOKE_CHECK(NullRegion,this,1)
 
 /* Test class membership. */
 #define astIsANullRegion(this) astINVOKE_ISA(NullRegion,this)

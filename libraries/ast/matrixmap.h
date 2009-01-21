@@ -271,7 +271,8 @@ AstMatrixMap *astMtrMult_( AstMatrixMap *, AstMatrixMap *, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckMatrixMap(this) astINVOKE_CHECK(MatrixMap,this)
+#define astCheckMatrixMap(this) astINVOKE_CHECK(MatrixMap,this,0)
+#define astVerifyMatrixMap(this) astINVOKE_CHECK(MatrixMap,this,1)
 
 /* Test class membership. */
 #define astIsAMatrixMap(this) astINVOKE_ISA(MatrixMap,this)

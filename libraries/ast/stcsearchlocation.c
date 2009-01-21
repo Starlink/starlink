@@ -502,14 +502,14 @@ AstStcSearchLocation *astStcSearchLocationId_( void *region_void, int ncoords,
 
 /* Obtain a Region pointer from the supplied ID and validate the
    pointer to ensure it identifies a valid Region. */
-   region = astCheckRegion( astMakePointer( region_void ) );
+   region = astVerifyRegion( astMakePointer( region_void ) );
 
 /* Obtain pointer from the supplied KeyMap ID's and validate the
    pointers to ensure it identifies a valid KeyMap. */
    keymaps = astMalloc( sizeof( AstKeyMap * )*(size_t) ncoords );
    if( keymaps ) {
       for( icoord = 0; icoord < ncoords; icoord++ ) {
-         keymaps[ icoord ] = astCheckKeyMap( astMakePointer( coords[ icoord ] ) );
+         keymaps[ icoord ] = astVerifyKeyMap( astMakePointer( coords[ icoord ] ) );
       }
    }
 

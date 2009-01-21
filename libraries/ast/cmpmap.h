@@ -260,7 +260,8 @@ void astInitCmpMapGlobals_( AstCmpMapGlobals * );
    classes). */
 
 /* Check class membership. */
-#define astCheckCmpMap(this) astINVOKE_CHECK(CmpMap,this)
+#define astCheckCmpMap(this) astINVOKE_CHECK(CmpMap,this,0)
+#define astVerifyCmpMap(this) astINVOKE_CHECK(CmpMap,this,1)
 
 /* Test class membership. */
 #define astIsACmpMap(this) astINVOKE_ISA(CmpMap,this)

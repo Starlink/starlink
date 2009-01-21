@@ -180,7 +180,8 @@ AstStcSearchLocation *astLoadStcSearchLocation_( void *, size_t, AstStcSearchLoc
    classes). */
 
 /* Check class membership. */
-#define astCheckStcSearchLocation(this) astINVOKE_CHECK(StcSearchLocation,this)
+#define astCheckStcSearchLocation(this) astINVOKE_CHECK(StcSearchLocation,this,0)
+#define astVerifyStcSearchLocation(this) astINVOKE_CHECK(StcSearchLocation,this,1)
 
 /* Test class membership. */
 #define astIsAStcSearchLocation(this) astINVOKE_ISA(StcSearchLocation,this)

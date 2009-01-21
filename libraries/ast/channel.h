@@ -491,7 +491,8 @@ void astSetReportLevel_( AstChannel *, int, int * );
    pointers (so that they can accept objects from derived classes). */
 
 /* Check class membership. */
-#define astCheckChannel(this) astINVOKE_CHECK(Channel,this)
+#define astCheckChannel(this) astINVOKE_CHECK(Channel,this,0)
+#define astVerifyChannel(this) astINVOKE_CHECK(Channel,this,1)
 
 /* Test class membership. */
 #define astIsAChannel(this) astINVOKE_ISA(Channel,this)

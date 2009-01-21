@@ -188,7 +188,8 @@ AstPolygon *astLoadPolygon_( void *, size_t, AstPolygonVtab *,
    classes). */
 
 /* Check class membership. */
-#define astCheckPolygon(this) astINVOKE_CHECK(Polygon,this)
+#define astCheckPolygon(this) astINVOKE_CHECK(Polygon,this,0)
+#define astVerifyPolygon(this) astINVOKE_CHECK(Polygon,this,1)
 
 /* Test class membership. */
 #define astIsAPolygon(this) astINVOKE_ISA(Polygon,this)

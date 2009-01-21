@@ -464,7 +464,7 @@ static double NewVertex( const MapData *, int, double, double [], double [], int
 static double Random( long int *, int * );
 static double Rate( AstMapping *, double *, int, int, int * );
 static double UphillSimplex( const MapData *, double, int, const double [], double [], double *, int *, int * );
-static int *MapSplit( AstMapping *, int, int *, AstMapping **, int * );
+static int *MapSplit( AstMapping *, int, const int *, AstMapping **, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int GetInvert( AstMapping *, int * );
 static int GetIsSimple( AstMapping *, int * );
@@ -7898,7 +7898,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return -1;
 }
 
-static int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map, int *status ){
+static int *MapSplit( AstMapping *this, int nin, const int *in, 
+                      AstMapping **map, int *status ){
 /*
 *+
 *  Name:
@@ -7913,7 +7914,8 @@ static int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map, int 
 
 *  Synopsis:
 *     #include "mapping.h"
-*     int *astMapSplit( AstMapping *this, int nin, int *in, AstMapping **map )
+*     int *astMapSplit( AstMapping *this, int nin, const int *in, 
+*                       AstMapping **map )
 
 *  Class Membership:
 *     Mapping method.
@@ -22633,7 +22635,8 @@ int astMapList_( AstMapping *this, int series, int invert, int *nmap,
    return (**astMEMBER(this,Mapping,MapList))( this, series, invert,
                                         nmap, map_list, invert_list, status );
 }
-int *astMapSplit_( AstMapping *this, int nin, int *in, AstMapping **map, int *status ){
+int *astMapSplit_( AstMapping *this, int nin, const int *in, AstMapping **map, 
+                   int *status ){
    if( map ) *map = NULL;
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Mapping,MapSplit))( this, nin, in, map, status );
@@ -22831,7 +22834,8 @@ int astLinearApprox_( AstMapping *this, const double *lbnd,
 void DecomposeId_( AstMapping *, AstMapping **, AstMapping **, int *, int *, int *, int * );
 void MapBoxId_( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [], int * );
 double astRateId_( AstMapping *, double *, int, int, int * );
-void astMapSplitId_( AstMapping *, int, int *, int *, AstMapping **, int * );
+void astMapSplitId_( AstMapping *, int, const int *, int *, AstMapping **, 
+                     int * );
 
 /* Special interface function implementations. */
 /* ------------------------------------------- */
@@ -23292,8 +23296,8 @@ f        calculated.
    return astRate( this, at, ax1 - 1, ax2 - 1 );
 }
 
-void astMapSplitId_( AstMapping *this, int nin, int *in, int *out, 
-                            AstMapping **map, int *status ){
+void astMapSplitId_( AstMapping *this, int nin, const int *in, int *out, 
+                     AstMapping **map, int *status ){
 /*
 *++
 *  Name:
@@ -23308,7 +23312,7 @@ f     AST_MAPSPLIT
 
 *  Synopsis:
 c     #include "mapping.h"
-c     void astMapSplit( AstMapping *this, int nin, int *in, int *nout,
+c     void astMapSplit( AstMapping *this, int nin, const int *in, int *nout,
 c                       AstMapping **map )
 f     CALL AST_MAPSPLIT( THIS, NIN, IN, OUT, MAP, STATUS )
 

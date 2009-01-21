@@ -1893,8 +1893,8 @@ AstSpecFluxFrame *astSpecFluxFrameId_( void *frame1_void, void *frame2_void,
 
 /* Obtain the Frame pointers from the ID's supplied and validate the
    pointers to ensure they identify valid Frames. */
-   frame1 = astCheckSpecFrame( astMakePointer( frame1_void ) );
-   frame2 = astCheckFluxFrame( astMakePointer( frame2_void ) );
+   frame1 = astVerifySpecFrame( astMakePointer( frame1_void ) );
+   frame2 = astVerifyFluxFrame( astMakePointer( frame2_void ) );
    if ( astOK ) {
 
 /* Initialise the SpecFluxFrame, allocating memory and initialising the

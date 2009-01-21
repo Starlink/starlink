@@ -269,7 +269,8 @@ void astInitGrismMapGlobals_( AstGrismMapGlobals * );
    classes). */
 
 /* Check class membership. */
-#define astCheckGrismMap(this) astINVOKE_CHECK(GrismMap,this)
+#define astCheckGrismMap(this) astINVOKE_CHECK(GrismMap,this,0)
+#define astVerifyGrismMap(this) astINVOKE_CHECK(GrismMap,this,1)
 
 /* Test class membership. */
 #define astIsAGrismMap(this) astINVOKE_ISA(GrismMap,this)

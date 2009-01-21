@@ -190,7 +190,8 @@ AstBox *astLoadBox_( void *, size_t, AstBoxVtab *,
    classes). */
 
 /* Check class membership. */
-#define astCheckBox(this) astINVOKE_CHECK(Box,this)
+#define astCheckBox(this) astINVOKE_CHECK(Box,this,0)
+#define astVerifyBox(this) astINVOKE_CHECK(Box,this,1)
 
 /* Test class membership. */
 #define astIsABox(this) astINVOKE_ISA(Box,this)

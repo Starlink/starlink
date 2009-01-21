@@ -155,7 +155,7 @@ static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int GetIsLinear( AstMapping *, int * );
-static int *MapSplit( AstMapping *, int, int *, AstMapping **, int * );
+static int *MapSplit( AstMapping *, int, const int *, AstMapping **, int * );
 
 /* Function Macros */
 /* =============== */
@@ -642,7 +642,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, int *status ){
+static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping **map, int *status ){
 /*
 *  Name:
 *     MapSplit
@@ -656,7 +656,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, 
 
 *  Synopsis:
 *     #include "shiftmap.h"
-*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map, int *status )
+*     int *MapSplit( AstMapping *this, int nin, const int *in, AstMapping **map, int *status )
 
 *  Class Membership:
 *     ShiftMap method (over-rides the protected astMapSplit method

@@ -602,7 +602,8 @@ void astSetCurrent_( AstFrameSet *, int, int * );
    pointers (so that they can accept objects from derived classes). */
 
 /* Check class membership. */
-#define astCheckFrameSet(this) astINVOKE_CHECK(FrameSet,this)
+#define astCheckFrameSet(this) astINVOKE_CHECK(FrameSet,this,0)
+#define astVerifyFrameSet(this) astINVOKE_CHECK(FrameSet,this,1)
 
 /* Test class membership. */
 #define astIsAFrameSet(this) astINVOKE_ISA(FrameSet,this)

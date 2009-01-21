@@ -224,7 +224,7 @@ static void SetAttrib( AstObject *, const char *, int * );
 static void WinMat( AstMapping **, int *, int, int * );
 static void WinPerm( AstMapping **, int *, int, int * );
 static void WinWcs( AstMapping **, int *, int, int * );
-static int *MapSplit( AstMapping *, int, int *, AstMapping **, int * );
+static int *MapSplit( AstMapping *, int, const int *, AstMapping **, int * );
 
 /* Function Macros */
 /* =============== */
@@ -1728,7 +1728,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, int *status ){
+static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping **map, int *status ){
 /*
 *  Name:
 *     MapSplit
@@ -1742,7 +1742,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, 
 
 *  Synopsis:
 *     #include "winmap.h"
-*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map, int *status )
+*     int *MapSplit( AstMapping *this, int nin, const int *in, AstMapping **map, int *status )
 
 *  Class Membership:
 *     WinMap method (over-rides the protected astMapSplit method

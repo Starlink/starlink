@@ -300,7 +300,8 @@ void astSetPcdCen_( AstPcdMap *, int, double, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckPcdMap(this) astINVOKE_CHECK(PcdMap,this)
+#define astCheckPcdMap(this) astINVOKE_CHECK(PcdMap,this,0)
+#define astVerifyPcdMap(this) astINVOKE_CHECK(PcdMap,this,1)
 
 /* Test class membership. */
 #define astIsAPcdMap(this) astINVOKE_ISA(PcdMap,this)

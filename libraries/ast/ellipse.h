@@ -196,7 +196,8 @@ AstRegion *astBestEllipse_( AstPointSet *, double *, AstRegion *, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckEllipse(this) astINVOKE_CHECK(Ellipse,this)
+#define astCheckEllipse(this) astINVOKE_CHECK(Ellipse,this,0)
+#define astVerifyEllipse(this) astINVOKE_CHECK(Ellipse,this,1)
 
 /* Test class membership. */
 #define astIsAEllipse(this) astINVOKE_ISA(Ellipse,this)

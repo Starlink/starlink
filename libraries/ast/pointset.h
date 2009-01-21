@@ -493,7 +493,8 @@ void astSetPointAccuracy_( AstPointSet *, int, double, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckPointSet(this) astINVOKE_CHECK(PointSet,this)
+#define astCheckPointSet(this) astINVOKE_CHECK(PointSet,this,0)
+#define astVerifyPointSet(this) astINVOKE_CHECK(PointSet,this,1)
 
 /* Test class membership. */
 #define astIsAPointSet(this) astINVOKE_ISA(PointSet,this)

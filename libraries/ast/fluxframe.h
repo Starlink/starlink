@@ -206,7 +206,8 @@ void astSetSpecVal_( AstFluxFrame *, double, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckFluxFrame(this) astINVOKE_CHECK(FluxFrame,this)
+#define astCheckFluxFrame(this) astINVOKE_CHECK(FluxFrame,this,0)
+#define astVerifyFluxFrame(this) astINVOKE_CHECK(FluxFrame,this,1)
 
 /* Test class membership. */
 #define astIsAFluxFrame(this) astINVOKE_ISA(FluxFrame,this)

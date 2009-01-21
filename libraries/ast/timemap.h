@@ -240,7 +240,8 @@ double astDat_( double, int, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckTimeMap(this) astINVOKE_CHECK(TimeMap,this)
+#define astCheckTimeMap(this) astINVOKE_CHECK(TimeMap,this,0)
+#define astVerifyTimeMap(this) astINVOKE_CHECK(TimeMap,this,1)
 
 /* Test class membership. */
 #define astIsATimeMap(this) astINVOKE_ISA(TimeMap,this)

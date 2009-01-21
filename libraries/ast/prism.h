@@ -194,7 +194,8 @@ AstPrism *astLoadPrism_( void *, size_t, AstPrismVtab *,
    classes). */
 
 /* Check class membership. */
-#define astCheckPrism(this) astINVOKE_CHECK(Prism,this)
+#define astCheckPrism(this) astINVOKE_CHECK(Prism,this,0)
+#define astVerifyPrism(this) astINVOKE_CHECK(Prism,this,1)
 
 /* Test class membership. */
 #define astIsAPrism(this) astINVOKE_ISA(Prism,this)

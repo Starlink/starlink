@@ -472,7 +472,8 @@ void astSetAxisBottom_( AstAxis *, double, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckAxis(this) astINVOKE_CHECK(Axis,this)
+#define astCheckAxis(this) astINVOKE_CHECK(Axis,this,0)
+#define astVerifyAxis(this) astINVOKE_CHECK(Axis,this,1)
 
 /* Test class membership. */
 #define astIsAAxis(this) astINVOKE_ISA(Axis,this)

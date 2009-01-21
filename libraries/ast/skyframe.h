@@ -353,7 +353,8 @@ void astSetSkyRefP_( AstSkyFrame *, int, double, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckSkyFrame(this) astINVOKE_CHECK(SkyFrame,this)
+#define astCheckSkyFrame(this) astINVOKE_CHECK(SkyFrame,this,0)
+#define astVerifySkyFrame(this) astINVOKE_CHECK(SkyFrame,this,1)
 
 /* Test class membership. */
 #define astIsASkyFrame(this) astINVOKE_ISA(SkyFrame,this)

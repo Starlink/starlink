@@ -198,7 +198,7 @@ static const char *Form[3] = { "Full", "Diagonal", "Unit" }; /* Text values
 
 /* Pointers to parent class methods which are extended by this class. */
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
-static int *(* parent_mapsplit)( AstMapping *, int, int *, AstMapping **, int * );
+static int *(* parent_mapsplit)( AstMapping *, int, const int *, AstMapping **, int * );
 
 
 #ifdef THREAD_SAFE
@@ -263,7 +263,7 @@ static void MatWin( AstMapping **, int *, int, int * );
 static void MatPermSwap( AstMapping **, int *, int, int * );
 static void PermGet( AstPermMap *, int **, int **, double **, int * );
 static void SMtrMult( int, int, int, const double *, double *, double*, int * );
-static int *MapSplit( AstMapping *, int, int *, AstMapping **, int * );
+static int *MapSplit( AstMapping *, int, const int *, AstMapping **, int * );
 
 /* Member functions. */
 /* ================= */
@@ -2034,7 +2034,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, int *status ){
+static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping **map, int *status ){
 /*
 *  Name:
 *     MapSplit
@@ -2048,7 +2048,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, 
 
 *  Synopsis:
 *     #include "matrixmap.h"
-*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map, int *status )
+*     int *MapSplit( AstMapping *this, int nin, const int *in, AstMapping **map, int *status )
 
 *  Class Membership:
 *     MatrixMap method (over-rides the protected astMapSplit method

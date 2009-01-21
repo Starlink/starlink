@@ -254,7 +254,8 @@ int astWinTerms_( AstWinMap *, double **, double **, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckWinMap(this) astINVOKE_CHECK(WinMap,this)
+#define astCheckWinMap(this) astINVOKE_CHECK(WinMap,this,0)
+#define astVerifyWinMap(this) astINVOKE_CHECK(WinMap,this,1)
 
 /* Test class membership. */
 #define astIsAWinMap(this) astINVOKE_ISA(WinMap,this)

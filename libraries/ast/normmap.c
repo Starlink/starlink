@@ -114,7 +114,7 @@ static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
-static int *(* parent_mapsplit)( AstMapping *, int, int *, AstMapping **, int * );
+static int *(* parent_mapsplit)( AstMapping *, int, const int *, AstMapping **, int * );
 
 #if defined(THREAD_SAFE)
 static int (* parent_managelock)( AstObject *, int, int, int * );
@@ -163,7 +163,7 @@ static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static int Equal( AstObject *, AstObject *, int * );
-static int *MapSplit( AstMapping *, int, int *, AstMapping **, int * );
+static int *MapSplit( AstMapping *, int, const int *, AstMapping **, int * );
 
 #if defined(THREAD_SAFE)
 static int ManageLock( AstObject *, int, int, int * );
@@ -663,7 +663,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, int *status ){
+static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping **map, int *status ){
 /*
 *  Name:
 *     MapSplit
@@ -677,7 +677,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, 
 
 *  Synopsis:
 *     #include "normmap.h"
-*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map, int *status )
+*     int *MapSplit( AstMapping *this, int nin, const int *in, AstMapping **map, int *status )
 
 *  Class Membership:
 *     NormMap method (over-rides the protected astMapSplit method
@@ -1268,7 +1268,7 @@ AstNormMap *astNormMapId_( void *frame_void, const char *options, ... ) {
    if ( !astOK ) return NULL;
 
 /* Obtain and validate pointers to the Frame structures provided. */
-   frame = astCheckFrame( astMakePointer( frame_void ) );
+   frame = astVerifyFrame( astMakePointer( frame_void ) );
 
 /* Initialise the NormMap, allocating memory and initialising the
    virtual function table as well if necessary. */

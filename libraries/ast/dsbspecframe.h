@@ -216,7 +216,8 @@ void astInitDSBSpecFrameGlobals_( AstDSBSpecFrameGlobals * );
    classes). */
 
 /* Check class membership. */
-#define astCheckDSBSpecFrame(this) astINVOKE_CHECK(DSBSpecFrame,this)
+#define astCheckDSBSpecFrame(this) astINVOKE_CHECK(DSBSpecFrame,this,0)
+#define astVerifyDSBSpecFrame(this) astINVOKE_CHECK(DSBSpecFrame,this,1)
 
 /* Test class membership. */
 #define astIsADSBSpecFrame(this) astINVOKE_ISA(DSBSpecFrame,this)

@@ -245,7 +245,8 @@ int astSwitchList_( AstSwitchMap *, int, int *, AstMapping ***, int **, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckSwitchMap(this) astINVOKE_CHECK(SwitchMap,this)
+#define astCheckSwitchMap(this) astINVOKE_CHECK(SwitchMap,this,0)
+#define astVerifySwitchMap(this) astINVOKE_CHECK(SwitchMap,this,1)
 
 /* Test class membership. */
 #define astIsASwitchMap(this) astINVOKE_ISA(SwitchMap,this)

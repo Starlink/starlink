@@ -190,7 +190,8 @@ AstRegion *astBestCircle_( AstPointSet *, double *, AstRegion *, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckCircle(this) astINVOKE_CHECK(Circle,this)
+#define astCheckCircle(this) astINVOKE_CHECK(Circle,this,0)
+#define astVerifyCircle(this) astINVOKE_CHECK(Circle,this,1)
 
 /* Test class membership. */
 #define astIsACircle(this) astINVOKE_ISA(Circle,this)

@@ -201,7 +201,8 @@ void astInitPlot3DGlobals_( AstPlot3DGlobals * );
    classes). */
 
 /* Check class membership. */
-#define astCheckPlot3D(this) astINVOKE_CHECK(Plot3D,this)
+#define astCheckPlot3D(this) astINVOKE_CHECK(Plot3D,this,0)
+#define astVerifyPlot3D(this) astINVOKE_CHECK(Plot3D,this,1)
 
 /* Test class membership. */
 #define astIsAPlot3D(this) astINVOKE_ISA(Plot3D,this)

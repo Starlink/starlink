@@ -201,7 +201,8 @@ const char *astGetRegionClass_( AstStc *, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckStc(this) astINVOKE_CHECK(Stc,this)
+#define astCheckStc(this) astINVOKE_CHECK(Stc,this,0)
+#define astVerifyStc(this) astINVOKE_CHECK(Stc,this,1)
 
 /* Test class membership. */
 #define astIsAStc(this) astINVOKE_ISA(Stc,this)

@@ -280,7 +280,8 @@ void astSlaAdd_( AstSlaMap *, const char *, const double[], int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckSlaMap(this) astINVOKE_CHECK(SlaMap,this)
+#define astCheckSlaMap(this) astINVOKE_CHECK(SlaMap,this,0)
+#define astVerifySlaMap(this) astINVOKE_CHECK(SlaMap,this,1)
 
 /* Test class membership. */
 #define astIsASlaMap(this) astINVOKE_ISA(SlaMap,this)

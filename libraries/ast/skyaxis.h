@@ -351,7 +351,8 @@ void astSetAxisCentreZero_( AstSkyAxis *, int, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckSkyAxis(this) astINVOKE_CHECK(SkyAxis,this)
+#define astCheckSkyAxis(this) astINVOKE_CHECK(SkyAxis,this,0)
+#define astVerifySkyAxis(this) astINVOKE_CHECK(SkyAxis,this,1)
 
 /* Test class membership. */
 #define astIsASkyAxis(this) astINVOKE_ISA(SkyAxis,this)

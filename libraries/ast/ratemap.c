@@ -114,7 +114,7 @@ static int class_check;
 /* Pointers to parent class methods which are extended by this class. */
 static int (* parent_getobjsize)( AstObject *, int * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
-static int *(* parent_mapsplit)( AstMapping *, int, int *, AstMapping **, int * );
+static int *(* parent_mapsplit)( AstMapping *, int, const int *, AstMapping **, int * );
 
 #if defined(THREAD_SAFE)
 static int (* parent_managelock)( AstObject *, int, int, int * );
@@ -161,7 +161,7 @@ static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int 
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
-static int *MapSplit( AstMapping *, int, int *, AstMapping **, int * );
+static int *MapSplit( AstMapping *, int, const int *, AstMapping **, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int GetObjSize( AstObject *, int * );
 
@@ -798,7 +798,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
-static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, int *status ){
+static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping **map, int *status ){
 /*
 *  Name:
 *     MapSplit
@@ -812,7 +812,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, 
 
 *  Synopsis:
 *     #include "ratemap.h"
-*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map, int *status )
+*     int *MapSplit( AstMapping *this, int nin, const int *in, AstMapping **map, int *status )
 
 *  Class Membership:
 *     RateMap method (over-rides the protected astMapSplit method
@@ -1554,7 +1554,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Obtain the Mapping pointer from the ID supplied and validate the
    pointer to ensure it identifies a valid Mapping. */
-   map = astCheckMapping( astMakePointer( map_void ) );
+   map = astVerifyMapping( astMakePointer( map_void ) );
    if ( astOK ) {
 
 /* Initialise the RateMap, allocating memory and initialising the

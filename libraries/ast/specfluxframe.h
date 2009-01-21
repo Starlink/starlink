@@ -175,7 +175,8 @@ void astInitSpecFluxFrameGlobals_( AstSpecFluxFrameGlobals * );
    classes). */
 
 /* Check class membership. */
-#define astCheckSpecFluxFrame(this) astINVOKE_CHECK(SpecFluxFrame,this)
+#define astCheckSpecFluxFrame(this) astINVOKE_CHECK(SpecFluxFrame,this,0)
+#define astVerifySpecFluxFrame(this) astINVOKE_CHECK(SpecFluxFrame,this,1)
 
 /* Test class membership. */
 #define astIsASpecFluxFrame(this) astINVOKE_ISA(SpecFluxFrame,this)

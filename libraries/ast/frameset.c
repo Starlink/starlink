@@ -852,7 +852,7 @@ static void LineOffset( AstFrame *, AstLineDef *, double, double, double[2], int
 
 static double Distance( AstFrame *, const double[], const double[], int * );
 static double Gap( AstFrame *, int, double, int *, int * );
-static int *MapSplit( AstMapping *, int, int *, AstMapping **, int * );
+static int *MapSplit( AstMapping *, int, const int *, AstMapping **, int * );
 static int Fields( AstFrame *, int, const char *, const char *, int, char **, int *, double *, int * );
 static int ForceCopy( AstFrameSet *, int, int * );
 static int GetBase( AstFrameSet *, int * );
@@ -5622,7 +5622,7 @@ static int ManageLock( AstObject *this_object, int mode, int extra, int *status 
 }
 #endif
 
-static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, int *status ){
+static int *MapSplit( AstMapping *this_map, int nin, const int *in, AstMapping **map, int *status ){
 /*
 *  Name:
 *     MapSplit
@@ -5636,7 +5636,7 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map, 
 
 *  Synopsis:
 *     #include "frameset.h"
-*     int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map, int *status )
+*     int *MapSplit( AstMapping *this, int nin, const int *in, AstMapping **map, int *status )
 
 *  Class Membership:
 *     FrameSet method (over-rides the protected astMapSplit method
@@ -10834,7 +10834,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Obtain the Frame pointer from the ID supplied and validate the
    pointer to ensure it identifies a valid Frame. */
-   frame = astCheckFrame( astMakePointer( frame_void ) );
+   frame = astVerifyFrame( astMakePointer( frame_void ) );
    if ( astOK ) {
 
 /* Initialise the FrameSet, allocating memory and initialising the

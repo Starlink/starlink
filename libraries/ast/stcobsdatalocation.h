@@ -192,7 +192,8 @@ void astStcSetObs_( AstStcObsDataLocation *, AstPointList *, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckStcObsDataLocation(this) astINVOKE_CHECK(StcObsDataLocation,this)
+#define astCheckStcObsDataLocation(this) astINVOKE_CHECK(StcObsDataLocation,this,0)
+#define astVerifyStcObsDataLocation(this) astINVOKE_CHECK(StcObsDataLocation,this,1)
 
 /* Test class membership. */
 #define astIsAStcObsDataLocation(this) astINVOKE_ISA(StcObsDataLocation,this)

@@ -251,7 +251,8 @@ void astSetXmlPrefix_( AstXmlChan *, const char *, int * );
    classes). */
 
 /* Check class membership. */
-#define astCheckXmlChan(this) astINVOKE_CHECK(XmlChan,this)
+#define astCheckXmlChan(this) astINVOKE_CHECK(XmlChan,this,0)
+#define astVerifyXmlChan(this) astINVOKE_CHECK(XmlChan,this,1)
 
 /* Test class membership. */
 #define astIsAXmlChan(this) astINVOKE_ISA(XmlChan,this)

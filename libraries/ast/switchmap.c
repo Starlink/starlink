@@ -2253,7 +2253,7 @@ f     function is invoked with STATUS set to an error value, or if it
       fsmap = fsmap_void ? astCheckMapping( astMakePointer(fsmap_void) ) : NULL;
       ismap = ismap_void ? astCheckMapping( astMakePointer(ismap_void) ) : NULL;
       for( i = 0; i < nroute; i++ ) {
-         routemaps[ i ] = astCheckMapping( astMakePointer(routemaps_void[ i ]) );
+         routemaps[ i ] = astVerifyMapping( astMakePointer(routemaps_void[ i ]) );
       }
    }
 

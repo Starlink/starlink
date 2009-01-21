@@ -237,7 +237,8 @@ AstSelectorMap *astLoadSelectorMap_( void *, size_t, AstSelectorMapVtab *,
    classes). */
 
 /* Check class membership. */
-#define astCheckSelectorMap(this) astINVOKE_CHECK(SelectorMap,this)
+#define astCheckSelectorMap(this) astINVOKE_CHECK(SelectorMap,this,0)
+#define astVerifySelectorMap(this) astINVOKE_CHECK(SelectorMap,this,1)
 
 /* Test class membership. */
 #define astIsASelectorMap(this) astINVOKE_ISA(SelectorMap,this)

@@ -388,7 +388,8 @@ void astInitCmpFrameGlobals_( AstCmpFrameGlobals * );
    classes). */
 
 /* Check class membership. */
-#define astCheckCmpFrame(this) astINVOKE_CHECK(CmpFrame,this)
+#define astCheckCmpFrame(this) astINVOKE_CHECK(CmpFrame,this,0)
+#define astVerifyCmpFrame(this) astINVOKE_CHECK(CmpFrame,this,1)
 
 /* Test class membership. */
 #define astIsACmpFrame(this) astINVOKE_ISA(CmpFrame,this)

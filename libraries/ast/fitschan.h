@@ -452,7 +452,8 @@ void astInitFitsChanGlobals_( AstFitsChanGlobals * );
    classes). */
 
 /* Check class membership. */
-#define astCheckFitsChan(this) astINVOKE_CHECK(FitsChan,this)
+#define astCheckFitsChan(this) astINVOKE_CHECK(FitsChan,this,0)
+#define astVerifyFitsChan(this) astINVOKE_CHECK(FitsChan,this,1)
 
 /* Test class membership. */
 #define astIsAFitsChan(this) astINVOKE_ISA(FitsChan,this)

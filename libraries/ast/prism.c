@@ -40,6 +40,8 @@ f     The Prism class does not define any new routines beyond those
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -70,6 +72,8 @@ f     The Prism class does not define any new routines beyond those
 *        Override astGetObjSize.
 *     9-OCT-2007 (DSB):
 *        Guard against all axes being extrusion axes in EquivPrism.
+*     20-JAN-2009 (DSB):
+*        Over-ride astRegBasePick.
 *class--
 */
 
@@ -190,6 +194,7 @@ AstPrism *astPrismId_( void *, void *, const char *, ... );
 static AstMapping *Simplify( AstMapping *, int * );
 static AstPointSet *RegBaseMesh( AstRegion *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static AstRegion *RegBasePick( AstRegion *this, int, const int *, int * );
 static AstRegion *EquivPrism( AstPrism *, AstRegion *, int * );
 static int GetObjSize( AstObject *, int * );
 static AstRegion *GetUncFrm( AstRegion *, int, int * );
@@ -1299,6 +1304,7 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name, int *status ) {
    region->GetBounded = GetBounded;
    region->RegCentre = RegCentre;
    region->OverlapX = OverlapX;
+   region->RegBasePick = RegBasePick;
 
 /* Declare the copy constructor, destructor and class dump function. */
    astSetCopy( vtab, Copy );
@@ -2028,6 +2034,170 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
    if( !astOK ) result = astAnnul( result );
 
 /* Return a pointer to the output PointSet. */
+   return result;
+}
+
+static AstRegion *RegBasePick( AstRegion *this_region, int naxes, 
+                               const int *axes, int *status ){
+/*
+*  Name:
+*     RegBasePick
+
+*  Purpose:
+*     Return a Region formed by picking selected base Frame axes from the
+*     supplied Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "prism.h"
+*     AstRegion *RegBasePick( AstRegion *this, int naxes, const int *axes, 
+*                             int *status )
+
+*  Class Membership:
+*     Prism member function (over-rides the astRegBasePick protected
+*     method inherited from the Region class).
+
+*  Description:
+*     This function attempts to return a Region that is spanned by selected 
+*     axes from the base Frame of the encapsulated FrameSet of the supplied 
+*     Region. This may or may not be possible, depending on the class of
+*     Region. If it is not possible a NULL pointer is returned.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     naxes
+*        The number of base Frame axes to select.
+*     axes
+*        An array holding the zero-based indices of the base Frame axes
+*        that are to be selected.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Pointer to the Region, or NULL if no region can be formed.
+
+*  Notes:
+*    - A NULL pointer is returned if an error has already occurred, or if
+*    this function should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstFrame *frm1;      /* Axes picked from the 1st encapsulated Region */
+   AstFrame *frm2;      /* Axes picked from the 2nd encapsulated Region */
+   AstPrism *this;      /* Pointer to Prism structure */
+   AstRegion *result;   /* Returned Region */
+   int *axes1;          /* Axes to pick from 1st input encapsulated Region */
+   int *axes2;          /* Axes to pick from 2nd input encapsulated Region */
+   int i;               /* Output axis index */
+   int j;               /* Input axis index */
+   int nax1;            /* No. of axes in 1st input encapsulated Region */
+   int nax2;            /* No. of axes in 2nd input encapsulated Region */
+   int naxes1;          /* No. of axes in 1st output encapsulated Region */
+   int naxes2;          /* No. of axes in 2nd output encapsulated Region */
+
+/* Initialise */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the Prism information. */
+   this = (AstPrism *) this_region;
+
+/* Get the number of axes in each of the two encapsulated Regions. */
+   nax1 = astGetNaxes( this->region1 );
+   nax2 = astGetNaxes( this->region2 );
+
+/* Allocate memory to hold the indices of the axes selected from each of 
+   the two encapsulated Regions. */
+   axes1 = astMalloc( sizeof( *axes1 )*nax1 );
+   axes2 = astMalloc( sizeof( *axes2 )*nax2 );
+
+/* Check pointers can be used safely. */
+   if( astOK ) {
+
+/* Initialise the counters that count the number of axes selected from 
+   each of the two encapsulated Regions. */
+      naxes1 = 0;
+      naxes2 = 0;
+
+/* For each of the axes to be selected from the prism... */
+      for( i = 0; i < naxes; i++ ) {
+         j = axes[ i ];
+
+/* ... if the current selected axis is part of the first encapsulated
+   Region, add its index into the array that holds the axes to be selected
+   from the first encapsulated region. Increment the number of axes
+   selected from the first encapsulated region. */
+         if( j < nax1 ) {
+            axes1[ naxes1++ ] = j;
+
+/* If the current selected axis is part of the second encapsulated Region, 
+   add its index into the array that holds the axes to be selected from 
+   the second encapsulated region. Note, the index is converted from a
+   Prism axis index to a sub-region axis index by subtracting "nax1". 
+   Also increment the number of axes selected from the second encapsulated 
+   region. */
+         } else {
+            axes2[ naxes2++ ] = j - nax1;
+         }
+      }         
+
+/* Pick any required axes from the first sub-region. If the result of the
+   selection is not a Region, we cannot pick the required axes, so annul
+   the object holding the selected axes. */
+      if( naxes1 ) {
+         frm1 = astPickAxes( this->region1, naxes1, axes1, NULL );
+         if( frm1 && !astIsARegion( frm1 ) ) frm1 = astAnnul( frm1 );
+      } else {
+         frm1 = NULL;
+      }
+
+/* Pick any required axes from the second sub-region. If the result of the
+   selection is not a Region, we cannot pick the required axes, so annul
+   the object holding the selected axes. */
+      if( naxes2 ) {
+         frm2 = astPickAxes( this->region2, naxes2, axes2, NULL );
+         if( frm2 && !astIsARegion( frm2 ) ) frm2 = astAnnul( frm2 );
+      } else {
+         frm2 = NULL;
+      }
+
+/* If we are selecting axes only from the first sub-region, and the above
+   selection was succesful, just return a clone of the Region holding the
+   axes selected from the first sub-region. */
+      if( naxes1 > 0 && naxes2 == 0 && frm1 ) {
+         result = astClone( frm1 );
+
+/* If we are selecting axes only from the second sub-region, and the above
+   selection was succesful, just return a clone of the Region holding the
+   axes selected from the second sub-region. */
+      } else if( naxes1 == 0 && naxes2 > 0 && frm2 ) {
+         result = astClone( frm2 );
+
+/* If we are selecting axes from both sub-regions, and both the above
+   selections were succesful, joing them together into a Prism. */
+      } else if( naxes1 > 0 && naxes2 > 0 && frm1 && frm2 ) {
+         result = (AstRegion *) astPrism( (AstRegion *) frm1, 
+                                          (AstRegion *) frm2, 
+                                          "", status );
+      }
+
+/* Free resources */
+      if( frm1 ) frm1 = astAnnul( frm1 );      
+      if( frm2 ) frm2 = astAnnul( frm2 );      
+   }
+
+   axes1 = astFree( axes1 );
+   axes1 = astFree( axes1 );
+
+/* Return a NULL pointer if an error has occurred. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the result. */
    return result;
 }
 
@@ -3800,8 +3970,8 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Obtain the Region pointers from the ID's supplied and validate the
    pointers to ensure they identify valid Regions. */
-   region1 = astCheckRegion( astMakePointer( region1_void ) );
-   region2 = astCheckRegion( astMakePointer( region2_void ) );
+   region1 = astVerifyRegion( astMakePointer( region1_void ) );
+   region2 = astVerifyRegion( astMakePointer( region2_void ) );
    if ( astOK ) {
 
 /* Initialise the Prism, allocating memory and initialising the
