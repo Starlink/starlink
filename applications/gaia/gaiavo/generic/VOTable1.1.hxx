@@ -39,9 +39,9 @@
 //
 // End prologue.
 
-#include <xsd/cxx/version.hxx>
+#include <xsd/cxx/config.hxx>
 
-#if (XSD_INT_VERSION != 3010000L)
+#if (XSD_INT_VERSION != 3020000L)
 #error XSD runtime version mismatch
 #endif
 
@@ -75,6 +75,7 @@
 #include <xsd/cxx/tree/parsing/boolean.hxx>
 #include <xsd/cxx/tree/parsing/float.hxx>
 #include <xsd/cxx/tree/parsing/double.hxx>
+#include <xsd/cxx/tree/parsing/decimal.hxx>
 
 #include <xsd/cxx/xml/dom/serialization-header.hxx>
 #include <xsd/cxx/tree/serialization.hxx>
@@ -89,6 +90,7 @@
 #include <xsd/cxx/tree/serialization/boolean.hxx>
 #include <xsd/cxx/tree/serialization/float.hxx>
 #include <xsd/cxx/tree/serialization/double.hxx>
+#include <xsd/cxx/tree/serialization/decimal.hxx>
 
 namespace xml_schema
 {
@@ -191,6 +193,9 @@ namespace xml_schema
   typedef ::xsd::cxx::xml::dom::namespace_info < char > namespace_info;
   typedef ::xsd::cxx::xml::dom::namespace_infomap < char > namespace_infomap;
   typedef ::xsd::cxx::tree::list_stream < char > list_stream;
+  typedef ::xsd::cxx::tree::as_double < double_ > as_double;
+  typedef ::xsd::cxx::tree::as_decimal < decimal > as_decimal;
+  typedef ::xsd::cxx::tree::facet facet;
 
   // Flags and properties.
   //
@@ -200,20 +205,16 @@ namespace xml_schema
   // Exceptions.
   //
   typedef ::xsd::cxx::tree::exception< char > exception;
+  typedef ::xsd::cxx::tree::bounds< char > bounds;
+  typedef ::xsd::cxx::tree::duplicate_id< char > duplicate_id;
   typedef ::xsd::cxx::tree::parsing< char > parsing;
   typedef ::xsd::cxx::tree::expected_element< char > expected_element;
   typedef ::xsd::cxx::tree::unexpected_element< char > unexpected_element;
   typedef ::xsd::cxx::tree::expected_attribute< char > expected_attribute;
   typedef ::xsd::cxx::tree::unexpected_enumerator< char > unexpected_enumerator;
   typedef ::xsd::cxx::tree::expected_text_content< char > expected_text_content;
-  typedef ::xsd::cxx::tree::no_type_info< char > no_type_info;
-  typedef ::xsd::cxx::tree::not_derived< char > not_derived;
-  typedef ::xsd::cxx::tree::duplicate_id< char > duplicate_id;
-  typedef ::xsd::cxx::tree::serialization< char > serialization;
-  typedef ::xsd::cxx::tree::no_namespace_mapping< char > no_namespace_mapping;
   typedef ::xsd::cxx::tree::no_prefix_mapping< char > no_prefix_mapping;
-  typedef ::xsd::cxx::tree::xsi_already_in_use< char > xsi_already_in_use;
-  typedef ::xsd::cxx::tree::bounds< char > bounds;
+  typedef ::xsd::cxx::tree::serialization< char > serialization;
 
   // Parsing/serialization diagnostics.
   //
@@ -3555,6 +3556,8 @@ namespace votable_11
     //
     FITS (const STREAM_type&);
 
+    FITS (::std::auto_ptr< STREAM_type >&);
+
     FITS (const ::xercesc::DOMElement& e,
           ::xml_schema::flags f = 0,
           ::xml_schema::container* c = 0);
@@ -3605,6 +3608,8 @@ namespace votable_11
     // Constructors.
     //
     BINARY (const STREAM_type&);
+
+    BINARY (::std::auto_ptr< STREAM_type >&);
 
     BINARY (const ::xercesc::DOMElement& e,
             ::xml_schema::flags f = 0,
@@ -4561,23 +4566,23 @@ namespace votable_11
   void
   VOTABLE_write (::std::ostream& os,
                  const ::votable_11::VOTABLE& x, 
-                 const ::xml_schema::namespace_infomap& m,
+                 const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
                  const ::std::string& e = "UTF-8",
                  ::xml_schema::flags f = 0);
 
   void
   VOTABLE_write (::std::ostream& os,
                  const ::votable_11::VOTABLE& x, 
-                 const ::xml_schema::namespace_infomap& m,
                  ::xml_schema::error_handler& eh,
+                 const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
                  const ::std::string& e = "UTF-8",
                  ::xml_schema::flags f = 0);
 
   void
   VOTABLE_write (::std::ostream& os,
                  const ::votable_11::VOTABLE& x, 
-                 const ::xml_schema::namespace_infomap& m,
                  ::xercesc::DOMErrorHandler& eh,
+                 const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
                  const ::std::string& e = "UTF-8",
                  ::xml_schema::flags f = 0);
 
@@ -4587,23 +4592,23 @@ namespace votable_11
   void
   VOTABLE_write (::xercesc::XMLFormatTarget& ft,
                  const ::votable_11::VOTABLE& x, 
-                 const ::xml_schema::namespace_infomap& m,
+                 const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
                  const ::std::string& e = "UTF-8",
                  ::xml_schema::flags f = 0);
 
   void
   VOTABLE_write (::xercesc::XMLFormatTarget& ft,
                  const ::votable_11::VOTABLE& x, 
-                 const ::xml_schema::namespace_infomap& m,
                  ::xml_schema::error_handler& eh,
+                 const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
                  const ::std::string& e = "UTF-8",
                  ::xml_schema::flags f = 0);
 
   void
   VOTABLE_write (::xercesc::XMLFormatTarget& ft,
                  const ::votable_11::VOTABLE& x, 
-                 const ::xml_schema::namespace_infomap& m,
                  ::xercesc::DOMErrorHandler& eh,
+                 const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
                  const ::std::string& e = "UTF-8",
                  ::xml_schema::flags f = 0);
 
@@ -4620,7 +4625,7 @@ namespace votable_11
 
   ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >
   VOTABLE_write (const ::votable_11::VOTABLE& x, 
-                 const ::xml_schema::namespace_infomap& m,
+                 const ::xml_schema::namespace_infomap& m = ::xml_schema::namespace_infomap (),
                  ::xml_schema::flags f = 0);
 
   void

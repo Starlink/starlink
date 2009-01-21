@@ -3855,7 +3855,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, true, false);
       this->parse (p, f);
     }
   }
@@ -3878,7 +3878,7 @@ namespace votable_11_dns
           static_cast< ::xercesc::DOMElement* > (
             this->dom_document ().importNode (
               const_cast< ::xercesc::DOMElement* > (&i), true)));
-        this->any ().push_back (r);
+        this->any_ .push_back (r);
         continue;
       }
 
@@ -3890,7 +3890,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new anyTEXT (*this, f, c);
+    return new class anyTEXT (*this, f, c);
   }
 
   anyTEXT::
@@ -3908,20 +3908,20 @@ namespace votable_11_dns
   }
 
   astroYear::
-  astroYear (const char* token)
-  : ::xml_schema::token (token)
+  astroYear (const char* _xsd_token_base)
+  : ::xml_schema::token (_xsd_token_base)
   {
   }
 
   astroYear::
-  astroYear (const ::std::string& token)
-  : ::xml_schema::token (token)
+  astroYear (const ::std::string& _xsd_token_base)
+  : ::xml_schema::token (_xsd_token_base)
   {
   }
 
   astroYear::
-  astroYear (const ::xml_schema::token& token)
-  : ::xml_schema::token (token)
+  astroYear (const ::xml_schema::token& _xsd_token_base)
+  : ::xml_schema::token (_xsd_token_base)
   {
   }
 
@@ -3962,7 +3962,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new astroYear (*this, f, c);
+    return new class astroYear (*this, f, c);
   }
 
   astroYear::
@@ -3980,20 +3980,20 @@ namespace votable_11_dns
   }
 
   ucdType::
-  ucdType (const char* token)
-  : ::xml_schema::token (token)
+  ucdType (const char* _xsd_token_base)
+  : ::xml_schema::token (_xsd_token_base)
   {
   }
 
   ucdType::
-  ucdType (const ::std::string& token)
-  : ::xml_schema::token (token)
+  ucdType (const ::std::string& _xsd_token_base)
+  : ::xml_schema::token (_xsd_token_base)
   {
   }
 
   ucdType::
-  ucdType (const ::xml_schema::token& token)
-  : ::xml_schema::token (token)
+  ucdType (const ::xml_schema::token& _xsd_token_base)
+  : ::xml_schema::token (_xsd_token_base)
   {
   }
 
@@ -4034,7 +4034,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new ucdType (*this, f, c);
+    return new class ucdType (*this, f, c);
   }
 
   ucdType::
@@ -4052,20 +4052,20 @@ namespace votable_11_dns
   }
 
   arrayDEF::
-  arrayDEF (const char* token)
-  : ::xml_schema::token (token)
+  arrayDEF (const char* _xsd_token_base)
+  : ::xml_schema::token (_xsd_token_base)
   {
   }
 
   arrayDEF::
-  arrayDEF (const ::std::string& token)
-  : ::xml_schema::token (token)
+  arrayDEF (const ::std::string& _xsd_token_base)
+  : ::xml_schema::token (_xsd_token_base)
   {
   }
 
   arrayDEF::
-  arrayDEF (const ::xml_schema::token& token)
-  : ::xml_schema::token (token)
+  arrayDEF (const ::xml_schema::token& _xsd_token_base)
+  : ::xml_schema::token (_xsd_token_base)
   {
   }
 
@@ -4106,7 +4106,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new arrayDEF (*this, f, c);
+    return new class arrayDEF (*this, f, c);
   }
 
   arrayDEF::
@@ -4149,7 +4149,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new encodingType (*this, f, c);
+    return new class encodingType (*this, f, c);
   }
 
   encodingType::value encodingType::
@@ -4223,7 +4223,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new dataType (*this, f, c);
+    return new class dataType (*this, f, c);
   }
 
   dataType::value dataType::
@@ -4288,20 +4288,20 @@ namespace votable_11_dns
   }
 
   precType::
-  precType (const char* token)
-  : ::xml_schema::token (token)
+  precType (const char* _xsd_token_base)
+  : ::xml_schema::token (_xsd_token_base)
   {
   }
 
   precType::
-  precType (const ::std::string& token)
-  : ::xml_schema::token (token)
+  precType (const ::std::string& _xsd_token_base)
+  : ::xml_schema::token (_xsd_token_base)
   {
   }
 
   precType::
-  precType (const ::xml_schema::token& token)
-  : ::xml_schema::token (token)
+  precType (const ::xml_schema::token& _xsd_token_base)
+  : ::xml_schema::token (_xsd_token_base)
   {
   }
 
@@ -4342,7 +4342,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new precType (*this, f, c);
+    return new class precType (*this, f, c);
   }
 
   precType::
@@ -4385,7 +4385,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new yesno (*this, f, c);
+    return new class yesno (*this, f, c);
   }
 
   yesno::value yesno::
@@ -4469,7 +4469,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
       this->parse (p, f);
     }
   }
@@ -4486,73 +4486,73 @@ namespace votable_11_dns
 
       // DESCRIPTION
       //
-      if (n.name () == "DESCRIPTION" && n.namespace_ () == "")
+      if (n.name () == "DESCRIPTION" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< DESCRIPTION_type > r (
           DESCRIPTION_traits::create (i, f, this));
 
-        if (!this->DESCRIPTION ())
+        if (!this->DESCRIPTION_)
         {
-          this->DESCRIPTION (r);
+          this->DESCRIPTION_.set (r);
           continue;
         }
       }
 
       // DEFINITIONS
       //
-      if (n.name () == "DEFINITIONS" && n.namespace_ () == "")
+      if (n.name () == "DEFINITIONS" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< DEFINITIONS_type > r (
           DEFINITIONS_traits::create (i, f, this));
 
-        if (!this->DEFINITIONS ())
+        if (!this->DEFINITIONS_)
         {
-          this->DEFINITIONS (r);
+          this->DEFINITIONS_.set (r);
           continue;
         }
       }
 
       // COOSYS
       //
-      if (n.name () == "COOSYS" && n.namespace_ () == "")
+      if (n.name () == "COOSYS" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< COOSYS_type > r (
           COOSYS_traits::create (i, f, this));
 
-        this->COOSYS ().push_back (r);
+        this->COOSYS_.push_back (r);
         continue;
       }
 
       // PARAM
       //
-      if (n.name () == "PARAM" && n.namespace_ () == "")
+      if (n.name () == "PARAM" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< PARAM_type > r (
           PARAM_traits::create (i, f, this));
 
-        this->PARAM ().push_back (r);
+        this->PARAM_.push_back (r);
         continue;
       }
 
       // INFO
       //
-      if (n.name () == "INFO" && n.namespace_ () == "")
+      if (n.name () == "INFO" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< INFO_type > r (
           INFO_traits::create (i, f, this));
 
-        this->INFO ().push_back (r);
+        this->INFO_.push_back (r);
         continue;
       }
 
       // RESOURCE
       //
-      if (n.name () == "RESOURCE" && n.namespace_ () == "")
+      if (n.name () == "RESOURCE" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< RESOURCE_type > r (
           RESOURCE_traits::create (i, f, this));
 
-        this->RESOURCE ().push_back (r);
+        this->RESOURCE_.push_back (r);
         continue;
       }
 
@@ -4570,7 +4570,7 @@ namespace votable_11_dns
         ::std::auto_ptr< ID_type > r (
           ID_traits::create (i, f, this));
 
-        this->ID (r);
+        this->ID_.set (r);
         continue;
       }
 
@@ -4579,7 +4579,7 @@ namespace votable_11_dns
         ::std::auto_ptr< version_type > r (
           version_traits::create (i, f, this));
 
-        this->version (r);
+        this->version_.set (r);
         continue;
       }
     }
@@ -4589,7 +4589,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new VOTABLE (*this, f, c);
+    return new class VOTABLE (*this, f, c);
   }
 
   VOTABLE::
@@ -4667,7 +4667,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
       this->parse (p, f);
     }
   }
@@ -4684,81 +4684,81 @@ namespace votable_11_dns
 
       // DESCRIPTION
       //
-      if (n.name () == "DESCRIPTION" && n.namespace_ () == "")
+      if (n.name () == "DESCRIPTION" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< DESCRIPTION_type > r (
           DESCRIPTION_traits::create (i, f, this));
 
-        if (!this->DESCRIPTION ())
+        if (!this->DESCRIPTION_)
         {
-          this->DESCRIPTION (r);
+          this->DESCRIPTION_.set (r);
           continue;
         }
       }
 
       // INFO
       //
-      if (n.name () == "INFO" && n.namespace_ () == "")
+      if (n.name () == "INFO" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< INFO_type > r (
           INFO_traits::create (i, f, this));
 
-        this->INFO ().push_back (r);
+        this->INFO_.push_back (r);
         continue;
       }
 
       // COOSYS
       //
-      if (n.name () == "COOSYS" && n.namespace_ () == "")
+      if (n.name () == "COOSYS" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< COOSYS_type > r (
           COOSYS_traits::create (i, f, this));
 
-        this->COOSYS ().push_back (r);
+        this->COOSYS_.push_back (r);
         continue;
       }
 
       // PARAM
       //
-      if (n.name () == "PARAM" && n.namespace_ () == "")
+      if (n.name () == "PARAM" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< PARAM_type > r (
           PARAM_traits::create (i, f, this));
 
-        this->PARAM ().push_back (r);
+        this->PARAM_.push_back (r);
         continue;
       }
 
       // LINK
       //
-      if (n.name () == "LINK" && n.namespace_ () == "")
+      if (n.name () == "LINK" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< LINK_type > r (
           LINK_traits::create (i, f, this));
 
-        this->LINK ().push_back (r);
+        this->LINK_.push_back (r);
         continue;
       }
 
       // TABLE
       //
-      if (n.name () == "TABLE" && n.namespace_ () == "")
+      if (n.name () == "TABLE" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< TABLE_type > r (
           TABLE_traits::create (i, f, this));
 
-        this->TABLE ().push_back (r);
+        this->TABLE_.push_back (r);
         continue;
       }
 
       // RESOURCE
       //
-      if (n.name () == "RESOURCE" && n.namespace_ () == "")
+      if (n.name () == "RESOURCE" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< RESOURCE1_type > r (
           RESOURCE1_traits::create (i, f, this));
 
-        this->RESOURCE1 ().push_back (r);
+        this->RESOURCE1_.push_back (r);
         continue;
       }
 
@@ -4770,7 +4770,7 @@ namespace votable_11_dns
           static_cast< ::xercesc::DOMElement* > (
             this->dom_document ().importNode (
               const_cast< ::xercesc::DOMElement* > (&i), true)));
-        this->any ().push_back (r);
+        this->any_ .push_back (r);
         continue;
       }
 
@@ -4788,7 +4788,7 @@ namespace votable_11_dns
         ::std::auto_ptr< name_type > r (
           name_traits::create (i, f, this));
 
-        this->name (r);
+        this->name_.set (r);
         continue;
       }
 
@@ -4797,7 +4797,7 @@ namespace votable_11_dns
         ::std::auto_ptr< ID_type > r (
           ID_traits::create (i, f, this));
 
-        this->ID (r);
+        this->ID_.set (r);
         continue;
       }
 
@@ -4806,7 +4806,7 @@ namespace votable_11_dns
         ::std::auto_ptr< utype_type > r (
           utype_traits::create (i, f, this));
 
-        this->utype (r);
+        this->utype_.set (r);
         continue;
       }
 
@@ -4815,7 +4815,7 @@ namespace votable_11_dns
         ::std::auto_ptr< type_type > r (
           type_traits::create (i, f, this));
 
-        this->type (r);
+        this->type_.set (r);
         continue;
       }
 
@@ -4829,19 +4829,14 @@ namespace votable_11_dns
           static_cast< ::xercesc::DOMAttr* > (
             this->dom_document ().importNode (
               const_cast< ::xercesc::DOMAttr* > (&i), true)));
-        this->any_attribute ().insert (r);
+        this->any_attribute_ .insert (r);
         continue;
       }
     }
 
     if (!type_.present ())
     {
-      ::std::auto_ptr< type_type > r (
-        type_traits::create (
-          ::std::string ("results"),
-          &p.element (), f, this));
-
-      this->type (r);
+      this->type_.set (type_default_value ());
     }
   }
 
@@ -4849,7 +4844,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new RESOURCE (*this, f, c);
+    return new class RESOURCE (*this, f, c);
   }
 
   RESOURCE::
@@ -4888,7 +4883,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, true, false);
       this->parse (p, f);
     }
   }
@@ -4905,23 +4900,23 @@ namespace votable_11_dns
 
       // COOSYS
       //
-      if (n.name () == "COOSYS" && n.namespace_ () == "")
+      if (n.name () == "COOSYS" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< COOSYS_type > r (
           COOSYS_traits::create (i, f, this));
 
-        this->COOSYS ().push_back (r);
+        this->COOSYS_.push_back (r);
         continue;
       }
 
       // PARAM
       //
-      if (n.name () == "PARAM" && n.namespace_ () == "")
+      if (n.name () == "PARAM" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< PARAM_type > r (
           PARAM_traits::create (i, f, this));
 
-        this->PARAM ().push_back (r);
+        this->PARAM_.push_back (r);
         continue;
       }
 
@@ -4933,7 +4928,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new DEFINITIONS (*this, f, c);
+    return new class DEFINITIONS (*this, f, c);
   }
 
   DEFINITIONS::
@@ -4954,8 +4949,8 @@ namespace votable_11_dns
   }
 
   INFO::
-  INFO (const char* string)
-  : ::xml_schema::string (string),
+  INFO (const char* _xsd_string_base)
+  : ::xml_schema::string (_xsd_string_base),
     ID_ (::xml_schema::flags (), this),
     name_ (::xml_schema::flags (), this),
     value_ (::xml_schema::flags (), this)
@@ -4963,8 +4958,8 @@ namespace votable_11_dns
   }
 
   INFO::
-  INFO (const ::std::string& string)
-  : ::xml_schema::string (string),
+  INFO (const ::std::string& _xsd_string_base)
+  : ::xml_schema::string (_xsd_string_base),
     ID_ (::xml_schema::flags (), this),
     name_ (::xml_schema::flags (), this),
     value_ (::xml_schema::flags (), this)
@@ -4972,8 +4967,8 @@ namespace votable_11_dns
   }
 
   INFO::
-  INFO (const ::xml_schema::string& string)
-  : ::xml_schema::string (string),
+  INFO (const ::xml_schema::string& _xsd_string_base)
+  : ::xml_schema::string (_xsd_string_base),
     ID_ (::xml_schema::flags (), this),
     name_ (::xml_schema::flags (), this),
     value_ (::xml_schema::flags (), this)
@@ -5002,7 +4997,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
       this->parse (p, f);
     }
   }
@@ -5022,7 +5017,7 @@ namespace votable_11_dns
         ::std::auto_ptr< ID_type > r (
           ID_traits::create (i, f, this));
 
-        this->ID (r);
+        this->ID_.set (r);
         continue;
       }
 
@@ -5031,7 +5026,7 @@ namespace votable_11_dns
         ::std::auto_ptr< name_type > r (
           name_traits::create (i, f, this));
 
-        this->name (r);
+        this->name_.set (r);
         continue;
       }
 
@@ -5040,7 +5035,7 @@ namespace votable_11_dns
         ::std::auto_ptr< value_type > r (
           value_traits::create (i, f, this));
 
-        this->value (r);
+        this->value_.set (r);
         continue;
       }
     }
@@ -5050,7 +5045,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new INFO (*this, f, c);
+    return new class INFO (*this, f, c);
   }
 
   INFO::
@@ -5125,7 +5120,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
       this->parse (p, f);
     }
   }
@@ -5142,40 +5137,40 @@ namespace votable_11_dns
 
       // DESCRIPTION
       //
-      if (n.name () == "DESCRIPTION" && n.namespace_ () == "")
+      if (n.name () == "DESCRIPTION" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< DESCRIPTION_type > r (
           DESCRIPTION_traits::create (i, f, this));
 
-        if (!this->DESCRIPTION ())
+        if (!this->DESCRIPTION_)
         {
-          this->DESCRIPTION (r);
+          this->DESCRIPTION_.set (r);
           continue;
         }
       }
 
       // VALUES
       //
-      if (n.name () == "VALUES" && n.namespace_ () == "")
+      if (n.name () == "VALUES" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< VALUES_type > r (
           VALUES_traits::create (i, f, this));
 
-        if (!this->VALUES ())
+        if (!this->VALUES_)
         {
-          this->VALUES (r);
+          this->VALUES_.set (r);
           continue;
         }
       }
 
       // LINK
       //
-      if (n.name () == "LINK" && n.namespace_ () == "")
+      if (n.name () == "LINK" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< LINK_type > r (
           LINK_traits::create (i, f, this));
 
-        this->LINK ().push_back (r);
+        this->LINK_.push_back (r);
         continue;
       }
 
@@ -5193,7 +5188,7 @@ namespace votable_11_dns
         ::std::auto_ptr< ID_type > r (
           ID_traits::create (i, f, this));
 
-        this->ID (r);
+        this->ID_.set (r);
         continue;
       }
 
@@ -5202,7 +5197,7 @@ namespace votable_11_dns
         ::std::auto_ptr< unit_type > r (
           unit_traits::create (i, f, this));
 
-        this->unit (r);
+        this->unit_.set (r);
         continue;
       }
 
@@ -5211,7 +5206,7 @@ namespace votable_11_dns
         ::std::auto_ptr< datatype_type > r (
           datatype_traits::create (i, f, this));
 
-        this->datatype (r);
+        this->datatype_.set (r);
         continue;
       }
 
@@ -5220,13 +5215,13 @@ namespace votable_11_dns
         ::std::auto_ptr< precision_type > r (
           precision_traits::create (i, f, this));
 
-        this->precision (r);
+        this->precision_.set (r);
         continue;
       }
 
       if (n.name () == "width" && n.namespace_ ().empty ())
       {
-        this->width (width_traits::create (i, f, this));
+        this->width_.set (width_traits::create (i, f, this));
         continue;
       }
 
@@ -5235,7 +5230,7 @@ namespace votable_11_dns
         ::std::auto_ptr< ref_type > r (
           ref_traits::create (i, f, this));
 
-        this->ref (r);
+        this->ref_.set (r);
         continue;
       }
 
@@ -5244,7 +5239,7 @@ namespace votable_11_dns
         ::std::auto_ptr< name_type > r (
           name_traits::create (i, f, this));
 
-        this->name (r);
+        this->name_.set (r);
         continue;
       }
 
@@ -5253,7 +5248,7 @@ namespace votable_11_dns
         ::std::auto_ptr< ucd_type > r (
           ucd_traits::create (i, f, this));
 
-        this->ucd (r);
+        this->ucd_.set (r);
         continue;
       }
 
@@ -5262,7 +5257,7 @@ namespace votable_11_dns
         ::std::auto_ptr< utype_type > r (
           utype_traits::create (i, f, this));
 
-        this->utype (r);
+        this->utype_.set (r);
         continue;
       }
 
@@ -5271,7 +5266,7 @@ namespace votable_11_dns
         ::std::auto_ptr< value_type > r (
           value_traits::create (i, f, this));
 
-        this->value (r);
+        this->value_.set (r);
         continue;
       }
 
@@ -5280,7 +5275,7 @@ namespace votable_11_dns
         ::std::auto_ptr< arraysize_type > r (
           arraysize_traits::create (i, f, this));
 
-        this->arraysize (r);
+        this->arraysize_.set (r);
         continue;
       }
     }
@@ -5290,7 +5285,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new PARAM (*this, f, c);
+    return new class PARAM (*this, f, c);
   }
 
   PARAM::
@@ -5359,7 +5354,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
       this->parse (p, f);
     }
   }
@@ -5376,72 +5371,72 @@ namespace votable_11_dns
 
       // DESCRIPTION
       //
-      if (n.name () == "DESCRIPTION" && n.namespace_ () == "")
+      if (n.name () == "DESCRIPTION" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< DESCRIPTION_type > r (
           DESCRIPTION_traits::create (i, f, this));
 
-        if (!this->DESCRIPTION ())
+        if (!this->DESCRIPTION_)
         {
-          this->DESCRIPTION (r);
+          this->DESCRIPTION_.set (r);
           continue;
         }
       }
 
       // FIELD
       //
-      if (n.name () == "FIELD" && n.namespace_ () == "")
+      if (n.name () == "FIELD" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< FIELD_type > r (
           FIELD_traits::create (i, f, this));
 
-        this->FIELD ().push_back (r);
+        this->FIELD_.push_back (r);
         continue;
       }
 
       // PARAM
       //
-      if (n.name () == "PARAM" && n.namespace_ () == "")
+      if (n.name () == "PARAM" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< PARAM_type > r (
           PARAM_traits::create (i, f, this));
 
-        this->PARAM ().push_back (r);
+        this->PARAM_.push_back (r);
         continue;
       }
 
       // GROUP
       //
-      if (n.name () == "GROUP" && n.namespace_ () == "")
+      if (n.name () == "GROUP" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< GROUP_type > r (
           GROUP_traits::create (i, f, this));
 
-        this->GROUP ().push_back (r);
+        this->GROUP_.push_back (r);
         continue;
       }
 
       // LINK
       //
-      if (n.name () == "LINK" && n.namespace_ () == "")
+      if (n.name () == "LINK" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< LINK_type > r (
           LINK_traits::create (i, f, this));
 
-        this->LINK ().push_back (r);
+        this->LINK_.push_back (r);
         continue;
       }
 
       // DATA
       //
-      if (n.name () == "DATA" && n.namespace_ () == "")
+      if (n.name () == "DATA" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< DATA_type > r (
           DATA_traits::create (i, f, this));
 
-        if (!this->DATA ())
+        if (!this->DATA_)
         {
-          this->DATA (r);
+          this->DATA_.set (r);
           continue;
         }
       }
@@ -5460,7 +5455,7 @@ namespace votable_11_dns
         ::std::auto_ptr< ID_type > r (
           ID_traits::create (i, f, this));
 
-        this->ID (r);
+        this->ID_.set (r);
         continue;
       }
 
@@ -5469,7 +5464,7 @@ namespace votable_11_dns
         ::std::auto_ptr< name_type > r (
           name_traits::create (i, f, this));
 
-        this->name (r);
+        this->name_.set (r);
         continue;
       }
 
@@ -5478,7 +5473,7 @@ namespace votable_11_dns
         ::std::auto_ptr< ref_type > r (
           ref_traits::create (i, f, this));
 
-        this->ref (r);
+        this->ref_.set (r);
         continue;
       }
 
@@ -5487,7 +5482,7 @@ namespace votable_11_dns
         ::std::auto_ptr< ucd_type > r (
           ucd_traits::create (i, f, this));
 
-        this->ucd (r);
+        this->ucd_.set (r);
         continue;
       }
 
@@ -5496,13 +5491,13 @@ namespace votable_11_dns
         ::std::auto_ptr< utype_type > r (
           utype_traits::create (i, f, this));
 
-        this->utype (r);
+        this->utype_.set (r);
         continue;
       }
 
       if (n.name () == "nrows" && n.namespace_ ().empty ())
       {
-        this->nrows (nrows_traits::create (i, f, this));
+        this->nrows_.set (nrows_traits::create (i, f, this));
         continue;
       }
     }
@@ -5512,7 +5507,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new TABLE (*this, f, c);
+    return new class TABLE (*this, f, c);
   }
 
   TABLE::
@@ -5587,7 +5582,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
       this->parse (p, f);
     }
   }
@@ -5604,40 +5599,40 @@ namespace votable_11_dns
 
       // DESCRIPTION
       //
-      if (n.name () == "DESCRIPTION" && n.namespace_ () == "")
+      if (n.name () == "DESCRIPTION" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< DESCRIPTION_type > r (
           DESCRIPTION_traits::create (i, f, this));
 
-        if (!this->DESCRIPTION ())
+        if (!this->DESCRIPTION_)
         {
-          this->DESCRIPTION (r);
+          this->DESCRIPTION_.set (r);
           continue;
         }
       }
 
       // VALUES
       //
-      if (n.name () == "VALUES" && n.namespace_ () == "")
+      if (n.name () == "VALUES" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< VALUES_type > r (
           VALUES_traits::create (i, f, this));
 
-        if (!this->VALUES ())
+        if (!this->VALUES_)
         {
-          this->VALUES (r);
+          this->VALUES_.set (r);
           continue;
         }
       }
 
       // LINK
       //
-      if (n.name () == "LINK" && n.namespace_ () == "")
+      if (n.name () == "LINK" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< LINK_type > r (
           LINK_traits::create (i, f, this));
 
-        this->LINK ().push_back (r);
+        this->LINK_.push_back (r);
         continue;
       }
 
@@ -5655,7 +5650,7 @@ namespace votable_11_dns
         ::std::auto_ptr< ID_type > r (
           ID_traits::create (i, f, this));
 
-        this->ID (r);
+        this->ID_.set (r);
         continue;
       }
 
@@ -5664,7 +5659,7 @@ namespace votable_11_dns
         ::std::auto_ptr< unit_type > r (
           unit_traits::create (i, f, this));
 
-        this->unit (r);
+        this->unit_.set (r);
         continue;
       }
 
@@ -5673,7 +5668,7 @@ namespace votable_11_dns
         ::std::auto_ptr< datatype_type > r (
           datatype_traits::create (i, f, this));
 
-        this->datatype (r);
+        this->datatype_.set (r);
         continue;
       }
 
@@ -5682,13 +5677,13 @@ namespace votable_11_dns
         ::std::auto_ptr< precision_type > r (
           precision_traits::create (i, f, this));
 
-        this->precision (r);
+        this->precision_.set (r);
         continue;
       }
 
       if (n.name () == "width" && n.namespace_ ().empty ())
       {
-        this->width (width_traits::create (i, f, this));
+        this->width_.set (width_traits::create (i, f, this));
         continue;
       }
 
@@ -5697,7 +5692,7 @@ namespace votable_11_dns
         ::std::auto_ptr< ref_type > r (
           ref_traits::create (i, f, this));
 
-        this->ref (r);
+        this->ref_.set (r);
         continue;
       }
 
@@ -5706,7 +5701,7 @@ namespace votable_11_dns
         ::std::auto_ptr< name_type > r (
           name_traits::create (i, f, this));
 
-        this->name (r);
+        this->name_.set (r);
         continue;
       }
 
@@ -5715,7 +5710,7 @@ namespace votable_11_dns
         ::std::auto_ptr< ucd_type > r (
           ucd_traits::create (i, f, this));
 
-        this->ucd (r);
+        this->ucd_.set (r);
         continue;
       }
 
@@ -5724,7 +5719,7 @@ namespace votable_11_dns
         ::std::auto_ptr< utype_type > r (
           utype_traits::create (i, f, this));
 
-        this->utype (r);
+        this->utype_.set (r);
         continue;
       }
 
@@ -5733,7 +5728,7 @@ namespace votable_11_dns
         ::std::auto_ptr< arraysize_type > r (
           arraysize_traits::create (i, f, this));
 
-        this->arraysize (r);
+        this->arraysize_.set (r);
         continue;
       }
 
@@ -5742,7 +5737,7 @@ namespace votable_11_dns
         ::std::auto_ptr< type_type > r (
           type_traits::create (i, f, this));
 
-        this->type (r);
+        this->type_.set (r);
         continue;
       }
     }
@@ -5752,7 +5747,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new FIELD (*this, f, c);
+    return new class FIELD (*this, f, c);
   }
 
   FIELD::
@@ -5815,7 +5810,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
       this->parse (p, f);
     }
   }
@@ -5832,59 +5827,59 @@ namespace votable_11_dns
 
       // DESCRIPTION
       //
-      if (n.name () == "DESCRIPTION" && n.namespace_ () == "")
+      if (n.name () == "DESCRIPTION" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< DESCRIPTION_type > r (
           DESCRIPTION_traits::create (i, f, this));
 
-        if (!this->DESCRIPTION ())
+        if (!this->DESCRIPTION_)
         {
-          this->DESCRIPTION (r);
+          this->DESCRIPTION_.set (r);
           continue;
         }
       }
 
       // FIELDref
       //
-      if (n.name () == "FIELDref" && n.namespace_ () == "")
+      if (n.name () == "FIELDref" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< FIELDref_type > r (
           FIELDref_traits::create (i, f, this));
 
-        this->FIELDref ().push_back (r);
+        this->FIELDref_.push_back (r);
         continue;
       }
 
       // PARAMref
       //
-      if (n.name () == "PARAMref" && n.namespace_ () == "")
+      if (n.name () == "PARAMref" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< PARAMref_type > r (
           PARAMref_traits::create (i, f, this));
 
-        this->PARAMref ().push_back (r);
+        this->PARAMref_.push_back (r);
         continue;
       }
 
       // PARAM
       //
-      if (n.name () == "PARAM" && n.namespace_ () == "")
+      if (n.name () == "PARAM" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< PARAM_type > r (
           PARAM_traits::create (i, f, this));
 
-        this->PARAM ().push_back (r);
+        this->PARAM_.push_back (r);
         continue;
       }
 
       // GROUP
       //
-      if (n.name () == "GROUP" && n.namespace_ () == "")
+      if (n.name () == "GROUP" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< GROUP1_type > r (
           GROUP1_traits::create (i, f, this));
 
-        this->GROUP1 ().push_back (r);
+        this->GROUP1_.push_back (r);
         continue;
       }
 
@@ -5902,7 +5897,7 @@ namespace votable_11_dns
         ::std::auto_ptr< ID_type > r (
           ID_traits::create (i, f, this));
 
-        this->ID (r);
+        this->ID_.set (r);
         continue;
       }
 
@@ -5911,7 +5906,7 @@ namespace votable_11_dns
         ::std::auto_ptr< name_type > r (
           name_traits::create (i, f, this));
 
-        this->name (r);
+        this->name_.set (r);
         continue;
       }
 
@@ -5920,7 +5915,7 @@ namespace votable_11_dns
         ::std::auto_ptr< ref_type > r (
           ref_traits::create (i, f, this));
 
-        this->ref (r);
+        this->ref_.set (r);
         continue;
       }
 
@@ -5929,7 +5924,7 @@ namespace votable_11_dns
         ::std::auto_ptr< ucd_type > r (
           ucd_traits::create (i, f, this));
 
-        this->ucd (r);
+        this->ucd_.set (r);
         continue;
       }
 
@@ -5938,7 +5933,7 @@ namespace votable_11_dns
         ::std::auto_ptr< utype_type > r (
           utype_traits::create (i, f, this));
 
-        this->utype (r);
+        this->utype_.set (r);
         continue;
       }
     }
@@ -5948,7 +5943,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new GROUP (*this, f, c);
+    return new class GROUP (*this, f, c);
   }
 
   GROUP::
@@ -5984,7 +5979,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
       this->parse (p, f);
     }
   }
@@ -6004,7 +5999,7 @@ namespace votable_11_dns
         ::std::auto_ptr< ref_type > r (
           ref_traits::create (i, f, this));
 
-        this->ref (r);
+        this->ref_.set (r);
         continue;
       }
     }
@@ -6021,7 +6016,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new FIELDref (*this, f, c);
+    return new class FIELDref (*this, f, c);
   }
 
   FIELDref::
@@ -6057,7 +6052,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
       this->parse (p, f);
     }
   }
@@ -6077,7 +6072,7 @@ namespace votable_11_dns
         ::std::auto_ptr< ref_type > r (
           ref_traits::create (i, f, this));
 
-        this->ref (r);
+        this->ref_.set (r);
         continue;
       }
     }
@@ -6094,7 +6089,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new PARAMref (*this, f, c);
+    return new class PARAMref (*this, f, c);
   }
 
   PARAMref::
@@ -6151,7 +6146,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
       this->parse (p, f);
     }
   }
@@ -6168,40 +6163,40 @@ namespace votable_11_dns
 
       // MIN
       //
-      if (n.name () == "MIN" && n.namespace_ () == "")
+      if (n.name () == "MIN" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< MIN_type > r (
           MIN_traits::create (i, f, this));
 
-        if (!this->MIN ())
+        if (!this->MIN_)
         {
-          this->MIN (r);
+          this->MIN_.set (r);
           continue;
         }
       }
 
       // MAX
       //
-      if (n.name () == "MAX" && n.namespace_ () == "")
+      if (n.name () == "MAX" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< MAX_type > r (
           MAX_traits::create (i, f, this));
 
-        if (!this->MAX ())
+        if (!this->MAX_)
         {
-          this->MAX (r);
+          this->MAX_.set (r);
           continue;
         }
       }
 
       // OPTION
       //
-      if (n.name () == "OPTION" && n.namespace_ () == "")
+      if (n.name () == "OPTION" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< OPTION_type > r (
           OPTION_traits::create (i, f, this));
 
-        this->OPTION ().push_back (r);
+        this->OPTION_.push_back (r);
         continue;
       }
 
@@ -6219,7 +6214,7 @@ namespace votable_11_dns
         ::std::auto_ptr< ID_type > r (
           ID_traits::create (i, f, this));
 
-        this->ID (r);
+        this->ID_.set (r);
         continue;
       }
 
@@ -6228,7 +6223,7 @@ namespace votable_11_dns
         ::std::auto_ptr< type_type > r (
           type_traits::create (i, f, this));
 
-        this->type (r);
+        this->type_.set (r);
         continue;
       }
 
@@ -6237,7 +6232,7 @@ namespace votable_11_dns
         ::std::auto_ptr< null_type > r (
           null_traits::create (i, f, this));
 
-        this->null (r);
+        this->null_.set (r);
         continue;
       }
 
@@ -6246,19 +6241,14 @@ namespace votable_11_dns
         ::std::auto_ptr< ref_type > r (
           ref_traits::create (i, f, this));
 
-        this->ref (r);
+        this->ref_.set (r);
         continue;
       }
     }
 
     if (!type_.present ())
     {
-      ::std::auto_ptr< type_type > r (
-        type_traits::create (
-          ::std::string ("legal"),
-          &p.element (), f, this));
-
-      this->type (r);
+      this->type_.set (type_default_value ());
     }
   }
 
@@ -6266,7 +6256,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new VALUES (*this, f, c);
+    return new class VALUES (*this, f, c);
   }
 
   VALUES::
@@ -6308,7 +6298,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
       this->parse (p, f);
     }
   }
@@ -6328,7 +6318,7 @@ namespace votable_11_dns
         ::std::auto_ptr< value_type > r (
           value_traits::create (i, f, this));
 
-        this->value (r);
+        this->value_.set (r);
         continue;
       }
 
@@ -6337,7 +6327,7 @@ namespace votable_11_dns
         ::std::auto_ptr< inclusive_type > r (
           inclusive_traits::create (i, f, this));
 
-        this->inclusive (r);
+        this->inclusive_.set (r);
         continue;
       }
     }
@@ -6351,12 +6341,7 @@ namespace votable_11_dns
 
     if (!inclusive_.present ())
     {
-      ::std::auto_ptr< inclusive_type > r (
-        inclusive_traits::create (
-          ::std::string ("yes"),
-          &p.element (), f, this));
-
-      this->inclusive (r);
+      this->inclusive_.set (inclusive_default_value ());
     }
   }
 
@@ -6364,7 +6349,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new MIN (*this, f, c);
+    return new class MIN (*this, f, c);
   }
 
   MIN::
@@ -6406,7 +6391,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
       this->parse (p, f);
     }
   }
@@ -6426,7 +6411,7 @@ namespace votable_11_dns
         ::std::auto_ptr< value_type > r (
           value_traits::create (i, f, this));
 
-        this->value (r);
+        this->value_.set (r);
         continue;
       }
 
@@ -6435,7 +6420,7 @@ namespace votable_11_dns
         ::std::auto_ptr< inclusive_type > r (
           inclusive_traits::create (i, f, this));
 
-        this->inclusive (r);
+        this->inclusive_.set (r);
         continue;
       }
     }
@@ -6449,12 +6434,7 @@ namespace votable_11_dns
 
     if (!inclusive_.present ())
     {
-      ::std::auto_ptr< inclusive_type > r (
-        inclusive_traits::create (
-          ::std::string ("yes"),
-          &p.element (), f, this));
-
-      this->inclusive (r);
+      this->inclusive_.set (inclusive_default_value ());
     }
   }
 
@@ -6462,7 +6442,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new MAX (*this, f, c);
+    return new class MAX (*this, f, c);
   }
 
   MAX::
@@ -6504,7 +6484,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
       this->parse (p, f);
     }
   }
@@ -6521,12 +6501,12 @@ namespace votable_11_dns
 
       // OPTION
       //
-      if (n.name () == "OPTION" && n.namespace_ () == "")
+      if (n.name () == "OPTION" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< OPTION1_type > r (
           OPTION1_traits::create (i, f, this));
 
-        this->OPTION1 ().push_back (r);
+        this->OPTION1_.push_back (r);
         continue;
       }
 
@@ -6544,7 +6524,7 @@ namespace votable_11_dns
         ::std::auto_ptr< name_type > r (
           name_traits::create (i, f, this));
 
-        this->name (r);
+        this->name_.set (r);
         continue;
       }
 
@@ -6553,7 +6533,7 @@ namespace votable_11_dns
         ::std::auto_ptr< value_type > r (
           value_traits::create (i, f, this));
 
-        this->value (r);
+        this->value_.set (r);
         continue;
       }
     }
@@ -6563,7 +6543,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new OPTION (*this, f, c);
+    return new class OPTION (*this, f, c);
   }
 
   OPTION::
@@ -6620,7 +6600,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
       this->parse (p, f);
     }
   }
@@ -6640,7 +6620,7 @@ namespace votable_11_dns
         ::std::auto_ptr< ID_type > r (
           ID_traits::create (i, f, this));
 
-        this->ID (r);
+        this->ID_.set (r);
         continue;
       }
 
@@ -6649,7 +6629,7 @@ namespace votable_11_dns
         ::std::auto_ptr< content_role_type > r (
           content_role_traits::create (i, f, this));
 
-        this->content_role (r);
+        this->content_role_.set (r);
         continue;
       }
 
@@ -6658,7 +6638,7 @@ namespace votable_11_dns
         ::std::auto_ptr< content_type_type > r (
           content_type_traits::create (i, f, this));
 
-        this->content_type (r);
+        this->content_type_.set (r);
         continue;
       }
 
@@ -6667,7 +6647,7 @@ namespace votable_11_dns
         ::std::auto_ptr< title_type > r (
           title_traits::create (i, f, this));
 
-        this->title (r);
+        this->title_.set (r);
         continue;
       }
 
@@ -6676,7 +6656,7 @@ namespace votable_11_dns
         ::std::auto_ptr< value_type > r (
           value_traits::create (i, f, this));
 
-        this->value (r);
+        this->value_.set (r);
         continue;
       }
 
@@ -6685,7 +6665,7 @@ namespace votable_11_dns
         ::std::auto_ptr< href_type > r (
           href_traits::create (i, f, this));
 
-        this->href (r);
+        this->href_.set (r);
         continue;
       }
 
@@ -6694,7 +6674,7 @@ namespace votable_11_dns
         ::std::auto_ptr< gref_type > r (
           gref_traits::create (i, f, this));
 
-        this->gref (r);
+        this->gref_.set (r);
         continue;
       }
 
@@ -6703,7 +6683,7 @@ namespace votable_11_dns
         ::std::auto_ptr< action_type > r (
           action_traits::create (i, f, this));
 
-        this->action (r);
+        this->action_.set (r);
         continue;
       }
     }
@@ -6713,7 +6693,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new LINK (*this, f, c);
+    return new class LINK (*this, f, c);
   }
 
   LINK::
@@ -6755,7 +6735,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, true, false);
       this->parse (p, f);
     }
   }
@@ -6772,42 +6752,42 @@ namespace votable_11_dns
 
       // TABLEDATA
       //
-      if (n.name () == "TABLEDATA" && n.namespace_ () == "")
+      if (n.name () == "TABLEDATA" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< TABLEDATA_type > r (
           TABLEDATA_traits::create (i, f, this));
 
-        if (!this->TABLEDATA ())
+        if (!this->TABLEDATA_)
         {
-          this->TABLEDATA (r);
+          this->TABLEDATA_.set (r);
           continue;
         }
       }
 
       // BINARY
       //
-      if (n.name () == "BINARY" && n.namespace_ () == "")
+      if (n.name () == "BINARY" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< BINARY_type > r (
           BINARY_traits::create (i, f, this));
 
-        if (!this->BINARY ())
+        if (!this->BINARY_)
         {
-          this->BINARY (r);
+          this->BINARY_.set (r);
           continue;
         }
       }
 
       // FITS
       //
-      if (n.name () == "FITS" && n.namespace_ () == "")
+      if (n.name () == "FITS" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< FITS_type > r (
           FITS_traits::create (i, f, this));
 
-        if (!this->FITS ())
+        if (!this->FITS_)
         {
-          this->FITS (r);
+          this->FITS_.set (r);
           continue;
         }
       }
@@ -6820,7 +6800,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new DATA (*this, f, c);
+    return new class DATA (*this, f, c);
   }
 
   DATA::
@@ -6856,7 +6836,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, true, false);
       this->parse (p, f);
     }
   }
@@ -6873,12 +6853,12 @@ namespace votable_11_dns
 
       // TR
       //
-      if (n.name () == "TR" && n.namespace_ () == "")
+      if (n.name () == "TR" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< TR_type > r (
           TR_traits::create (i, f, this));
 
-        this->TR ().push_back (r);
+        this->TR_.push_back (r);
         continue;
       }
 
@@ -6890,7 +6870,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new TABLEDATA (*this, f, c);
+    return new class TABLEDATA (*this, f, c);
   }
 
   TABLEDATA::
@@ -6909,22 +6889,22 @@ namespace votable_11_dns
   }
 
   TD::
-  TD (const char* string)
-  : ::xml_schema::string (string),
+  TD (const char* _xsd_string_base)
+  : ::xml_schema::string (_xsd_string_base),
     encoding_ (::xml_schema::flags (), this)
   {
   }
 
   TD::
-  TD (const ::std::string& string)
-  : ::xml_schema::string (string),
+  TD (const ::std::string& _xsd_string_base)
+  : ::xml_schema::string (_xsd_string_base),
     encoding_ (::xml_schema::flags (), this)
   {
   }
 
   TD::
-  TD (const ::xml_schema::string& string)
-  : ::xml_schema::string (string),
+  TD (const ::xml_schema::string& _xsd_string_base)
+  : ::xml_schema::string (_xsd_string_base),
     encoding_ (::xml_schema::flags (), this)
   {
   }
@@ -6947,7 +6927,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
       this->parse (p, f);
     }
   }
@@ -6967,7 +6947,7 @@ namespace votable_11_dns
         ::std::auto_ptr< encoding_type > r (
           encoding_traits::create (i, f, this));
 
-        this->encoding (r);
+        this->encoding_.set (r);
         continue;
       }
     }
@@ -6977,7 +6957,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new TD (*this, f, c);
+    return new class TD (*this, f, c);
   }
 
   TD::
@@ -7013,7 +6993,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, true, false);
       this->parse (p, f);
     }
   }
@@ -7030,12 +7010,12 @@ namespace votable_11_dns
 
       // TD
       //
-      if (n.name () == "TD" && n.namespace_ () == "")
+      if (n.name () == "TD" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< TD_type > r (
           TD_traits::create (i, f, this));
 
-        this->TD ().push_back (r);
+        this->TD_.push_back (r);
         continue;
       }
 
@@ -7047,7 +7027,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new TR (*this, f, c);
+    return new class TR (*this, f, c);
   }
 
   TR::
@@ -7060,6 +7040,14 @@ namespace votable_11_dns
 
   FITS::
   FITS (const STREAM_type& STREAM)
+  : ::xml_schema::type (),
+    STREAM_ (STREAM, ::xml_schema::flags (), this),
+    extnum_ (::xml_schema::flags (), this)
+  {
+  }
+
+  FITS::
+  FITS (::std::auto_ptr< STREAM_type >& STREAM)
   : ::xml_schema::type (),
     STREAM_ (STREAM, ::xml_schema::flags (), this),
     extnum_ (::xml_schema::flags (), this)
@@ -7086,7 +7074,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
       this->parse (p, f);
     }
   }
@@ -7103,14 +7091,14 @@ namespace votable_11_dns
 
       // STREAM
       //
-      if (n.name () == "STREAM" && n.namespace_ () == "")
+      if (n.name () == "STREAM" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< STREAM_type > r (
           STREAM_traits::create (i, f, this));
 
         if (!STREAM_.present ())
         {
-          this->STREAM (r);
+          this->STREAM_.set (r);
           continue;
         }
       }
@@ -7133,7 +7121,7 @@ namespace votable_11_dns
 
       if (n.name () == "extnum" && n.namespace_ ().empty ())
       {
-        this->extnum (extnum_traits::create (i, f, this));
+        this->extnum_.set (extnum_traits::create (i, f, this));
         continue;
       }
     }
@@ -7143,7 +7131,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new FITS (*this, f, c);
+    return new class FITS (*this, f, c);
   }
 
   FITS::
@@ -7156,6 +7144,13 @@ namespace votable_11_dns
 
   BINARY::
   BINARY (const STREAM_type& STREAM)
+  : ::xml_schema::type (),
+    STREAM_ (STREAM, ::xml_schema::flags (), this)
+  {
+  }
+
+  BINARY::
+  BINARY (::std::auto_ptr< STREAM_type >& STREAM)
   : ::xml_schema::type (),
     STREAM_ (STREAM, ::xml_schema::flags (), this)
   {
@@ -7179,7 +7174,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, true, false);
       this->parse (p, f);
     }
   }
@@ -7196,14 +7191,14 @@ namespace votable_11_dns
 
       // STREAM
       //
-      if (n.name () == "STREAM" && n.namespace_ () == "")
+      if (n.name () == "STREAM" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< STREAM_type > r (
           STREAM_traits::create (i, f, this));
 
         if (!STREAM_.present ())
         {
-          this->STREAM (r);
+          this->STREAM_.set (r);
           continue;
         }
       }
@@ -7223,7 +7218,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new BINARY (*this, f, c);
+    return new class BINARY (*this, f, c);
   }
 
   BINARY::
@@ -7256,8 +7251,8 @@ namespace votable_11_dns
   }
 
   STREAM::
-  STREAM (const char* string)
-  : ::xml_schema::string (string),
+  STREAM (const char* _xsd_string_base)
+  : ::xml_schema::string (_xsd_string_base),
     type_ (type_default_value (), ::xml_schema::flags (), this),
     href_ (::xml_schema::flags (), this),
     actuate_ (actuate_default_value (), ::xml_schema::flags (), this),
@@ -7268,8 +7263,8 @@ namespace votable_11_dns
   }
 
   STREAM::
-  STREAM (const ::std::string& string)
-  : ::xml_schema::string (string),
+  STREAM (const ::std::string& _xsd_string_base)
+  : ::xml_schema::string (_xsd_string_base),
     type_ (type_default_value (), ::xml_schema::flags (), this),
     href_ (::xml_schema::flags (), this),
     actuate_ (actuate_default_value (), ::xml_schema::flags (), this),
@@ -7280,8 +7275,8 @@ namespace votable_11_dns
   }
 
   STREAM::
-  STREAM (const ::xml_schema::string& string)
-  : ::xml_schema::string (string),
+  STREAM (const ::xml_schema::string& _xsd_string_base)
+  : ::xml_schema::string (_xsd_string_base),
     type_ (type_default_value (), ::xml_schema::flags (), this),
     href_ (::xml_schema::flags (), this),
     actuate_ (actuate_default_value (), ::xml_schema::flags (), this),
@@ -7319,7 +7314,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
       this->parse (p, f);
     }
   }
@@ -7339,7 +7334,7 @@ namespace votable_11_dns
         ::std::auto_ptr< type_type > r (
           type_traits::create (i, f, this));
 
-        this->type (r);
+        this->type_.set (r);
         continue;
       }
 
@@ -7348,7 +7343,7 @@ namespace votable_11_dns
         ::std::auto_ptr< href_type > r (
           href_traits::create (i, f, this));
 
-        this->href (r);
+        this->href_.set (r);
         continue;
       }
 
@@ -7357,7 +7352,7 @@ namespace votable_11_dns
         ::std::auto_ptr< actuate_type > r (
           actuate_traits::create (i, f, this));
 
-        this->actuate (r);
+        this->actuate_.set (r);
         continue;
       }
 
@@ -7366,7 +7361,7 @@ namespace votable_11_dns
         ::std::auto_ptr< encoding_type > r (
           encoding_traits::create (i, f, this));
 
-        this->encoding (r);
+        this->encoding_.set (r);
         continue;
       }
 
@@ -7375,7 +7370,7 @@ namespace votable_11_dns
         ::std::auto_ptr< expires_type > r (
           expires_traits::create (i, f, this));
 
-        this->expires (r);
+        this->expires_.set (r);
         continue;
       }
 
@@ -7384,39 +7379,24 @@ namespace votable_11_dns
         ::std::auto_ptr< rights_type > r (
           rights_traits::create (i, f, this));
 
-        this->rights (r);
+        this->rights_.set (r);
         continue;
       }
     }
 
     if (!type_.present ())
     {
-      ::std::auto_ptr< type_type > r (
-        type_traits::create (
-          ::std::string ("locator"),
-          &p.element (), f, this));
-
-      this->type (r);
+      this->type_.set (type_default_value ());
     }
 
     if (!actuate_.present ())
     {
-      ::std::auto_ptr< actuate_type > r (
-        actuate_traits::create (
-          ::std::string ("onRequest"),
-          &p.element (), f, this));
-
-      this->actuate (r);
+      this->actuate_.set (actuate_default_value ());
     }
 
     if (!encoding_.present ())
     {
-      ::std::auto_ptr< encoding_type > r (
-        encoding_traits::create (
-          ::std::string ("none"),
-          &p.element (), f, this));
-
-      this->encoding (r);
+      this->encoding_.set (encoding_default_value ());
     }
   }
 
@@ -7424,7 +7404,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new STREAM (*this, f, c);
+    return new class STREAM (*this, f, c);
   }
 
   STREAM::
@@ -7449,9 +7429,9 @@ namespace votable_11_dns
   }
 
   COOSYS::
-  COOSYS (const char* string,
+  COOSYS (const char* _xsd_string_base,
           const ID_type& ID)
-  : ::xml_schema::string (string),
+  : ::xml_schema::string (_xsd_string_base),
     ID_ (ID, ::xml_schema::flags (), this),
     equinox_ (::xml_schema::flags (), this),
     epoch_ (::xml_schema::flags (), this),
@@ -7460,9 +7440,9 @@ namespace votable_11_dns
   }
 
   COOSYS::
-  COOSYS (const ::std::string& string,
+  COOSYS (const ::std::string& _xsd_string_base,
           const ID_type& ID)
-  : ::xml_schema::string (string),
+  : ::xml_schema::string (_xsd_string_base),
     ID_ (ID, ::xml_schema::flags (), this),
     equinox_ (::xml_schema::flags (), this),
     epoch_ (::xml_schema::flags (), this),
@@ -7471,9 +7451,9 @@ namespace votable_11_dns
   }
 
   COOSYS::
-  COOSYS (const ::xml_schema::string& string,
+  COOSYS (const ::xml_schema::string& _xsd_string_base,
           const ID_type& ID)
-  : ::xml_schema::string (string),
+  : ::xml_schema::string (_xsd_string_base),
     ID_ (ID, ::xml_schema::flags (), this),
     equinox_ (::xml_schema::flags (), this),
     epoch_ (::xml_schema::flags (), this),
@@ -7505,7 +7485,7 @@ namespace votable_11_dns
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
-      ::xsd::cxx::xml::dom::parser< char > p (e);
+      ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
       this->parse (p, f);
     }
   }
@@ -7525,7 +7505,7 @@ namespace votable_11_dns
         ::std::auto_ptr< ID_type > r (
           ID_traits::create (i, f, this));
 
-        this->ID (r);
+        this->ID_.set (r);
         continue;
       }
 
@@ -7534,7 +7514,7 @@ namespace votable_11_dns
         ::std::auto_ptr< equinox_type > r (
           equinox_traits::create (i, f, this));
 
-        this->equinox (r);
+        this->equinox_.set (r);
         continue;
       }
 
@@ -7543,7 +7523,7 @@ namespace votable_11_dns
         ::std::auto_ptr< epoch_type > r (
           epoch_traits::create (i, f, this));
 
-        this->epoch (r);
+        this->epoch_.set (r);
         continue;
       }
 
@@ -7552,7 +7532,7 @@ namespace votable_11_dns
         ::std::auto_ptr< system_type > r (
           system_traits::create (i, f, this));
 
-        this->system (r);
+        this->system_.set (r);
         continue;
       }
     }
@@ -7566,12 +7546,7 @@ namespace votable_11_dns
 
     if (!system_.present ())
     {
-      ::std::auto_ptr< system_type > r (
-        system_traits::create (
-          ::std::string ("eq_FK5"),
-          &p.element (), f, this));
-
-      this->system (r);
+      this->system_.set (system_default_value ());
     }
   }
 
@@ -7579,7 +7554,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new COOSYS (*this, f, c);
+    return new class COOSYS (*this, f, c);
   }
 
   COOSYS::
@@ -7591,20 +7566,20 @@ namespace votable_11_dns
   //
 
   version::
-  version (const char* nmtoken)
-  : ::xml_schema::nmtoken (nmtoken)
+  version (const char* _xsd_nmtoken_base)
+  : ::xml_schema::nmtoken (_xsd_nmtoken_base)
   {
   }
 
   version::
-  version (const ::std::string& nmtoken)
-  : ::xml_schema::nmtoken (nmtoken)
+  version (const ::std::string& _xsd_nmtoken_base)
+  : ::xml_schema::nmtoken (_xsd_nmtoken_base)
   {
   }
 
   version::
-  version (const ::xml_schema::nmtoken& nmtoken)
-  : ::xml_schema::nmtoken (nmtoken)
+  version (const ::xml_schema::nmtoken& _xsd_nmtoken_base)
+  : ::xml_schema::nmtoken (_xsd_nmtoken_base)
   {
   }
 
@@ -7645,7 +7620,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new version (*this, f, c);
+    return new class version (*this, f, c);
   }
 
   version::
@@ -7688,7 +7663,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new type (*this, f, c);
+    return new class type (*this, f, c);
   }
 
   type::value type::
@@ -7758,7 +7733,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new type1 (*this, f, c);
+    return new class type1 (*this, f, c);
   }
 
   type1::value type1::
@@ -7832,7 +7807,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new type2 (*this, f, c);
+    return new class type2 (*this, f, c);
   }
 
   type2::value type2::
@@ -7902,7 +7877,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new content_role (*this, f, c);
+    return new class content_role (*this, f, c);
   }
 
   content_role::value content_role::
@@ -7976,7 +7951,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new type3 (*this, f, c);
+    return new class type3 (*this, f, c);
   }
 
   type3::value type3::
@@ -8046,7 +8021,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new actuate (*this, f, c);
+    return new class actuate (*this, f, c);
   }
 
   actuate::value actuate::
@@ -8120,7 +8095,7 @@ namespace votable_11_dns
   _clone (::xml_schema::flags f,
           ::xml_schema::container* c) const
   {
-    return new system (*this, f, c);
+    return new class system (*this, f, c);
   }
 
   system::value system::

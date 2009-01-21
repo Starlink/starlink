@@ -39,9 +39,9 @@
 //
 // End prologue.
 
-#include <xsd/cxx/version.hxx>
+#include <xsd/cxx/config.hxx>
 
-#if (XSD_INT_VERSION != 3010000L)
+#if (XSD_INT_VERSION != 3020000L)
 #error XSD runtime version mismatch
 #endif
 
@@ -75,6 +75,7 @@
 #include <xsd/cxx/tree/parsing/boolean.hxx>
 #include <xsd/cxx/tree/parsing/float.hxx>
 #include <xsd/cxx/tree/parsing/double.hxx>
+#include <xsd/cxx/tree/parsing/decimal.hxx>
 
 namespace xml_schema
 {
@@ -179,20 +180,15 @@ namespace xml_schema
   // Exceptions.
   //
   typedef ::xsd::cxx::tree::exception< char > exception;
+  typedef ::xsd::cxx::tree::bounds< char > bounds;
+  typedef ::xsd::cxx::tree::duplicate_id< char > duplicate_id;
   typedef ::xsd::cxx::tree::parsing< char > parsing;
   typedef ::xsd::cxx::tree::expected_element< char > expected_element;
   typedef ::xsd::cxx::tree::unexpected_element< char > unexpected_element;
   typedef ::xsd::cxx::tree::expected_attribute< char > expected_attribute;
   typedef ::xsd::cxx::tree::unexpected_enumerator< char > unexpected_enumerator;
   typedef ::xsd::cxx::tree::expected_text_content< char > expected_text_content;
-  typedef ::xsd::cxx::tree::no_type_info< char > no_type_info;
-  typedef ::xsd::cxx::tree::not_derived< char > not_derived;
-  typedef ::xsd::cxx::tree::duplicate_id< char > duplicate_id;
-  typedef ::xsd::cxx::tree::serialization< char > serialization;
-  typedef ::xsd::cxx::tree::no_namespace_mapping< char > no_namespace_mapping;
   typedef ::xsd::cxx::tree::no_prefix_mapping< char > no_prefix_mapping;
-  typedef ::xsd::cxx::tree::xsi_already_in_use< char > xsi_already_in_use;
-  typedef ::xsd::cxx::tree::bounds< char > bounds;
 
   // Parsing/serialization diagnostics.
   //
@@ -3535,6 +3531,8 @@ namespace votable_11_dns
     //
     FITS (const STREAM_type&);
 
+    FITS (::std::auto_ptr< STREAM_type >&);
+
     FITS (const ::xercesc::DOMElement& e,
           ::xml_schema::flags f = 0,
           ::xml_schema::container* c = 0);
@@ -3585,6 +3583,8 @@ namespace votable_11_dns
     // Constructors.
     //
     BINARY (const STREAM_type&);
+
+    BINARY (::std::auto_ptr< STREAM_type >&);
 
     BINARY (const ::xercesc::DOMElement& e,
             ::xml_schema::flags f = 0,
