@@ -54,7 +54,7 @@
 *        the new location is at the end of the headers.
 *
 *        'Null' nullifies the value of the named keyword.  Spaces 
-*        substitute the keyword's value and equals sign.
+*        substitute the keyword's value.
 *
 *        'Print' causes the value of a named keyword to be displayed to
 *        standard output.  This will be a blank for a comment card.
