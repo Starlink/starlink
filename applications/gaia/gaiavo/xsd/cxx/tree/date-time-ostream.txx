@@ -202,7 +202,10 @@ namespace xsd
         os << x.minutes () << C (':');
 
         os.width (9);
-        os << std::fixed << x.seconds ();
+        std::ios_base::fmtflags ff (
+          os.setf (std::ios::fixed, std::ios::floatfield));
+        os << x.seconds ();
+        os.setf (ff, std::ios::floatfield);
 
         os.fill (f);
 
@@ -239,7 +242,10 @@ namespace xsd
         os << x.minutes () << C (':');
 
         os.width (9);
-        os << std::fixed << x.seconds ();
+        std::ios_base::fmtflags ff (
+          os.setf (std::ios::fixed, std::ios::floatfield));
+        os << x.seconds ();
+        os.setf (ff, std::ios::floatfield);
 
         os.fill (f);
 
@@ -305,7 +311,10 @@ namespace xsd
 
         if (x.seconds () > 0.0)
         {
-          os << std::fixed << x.seconds () << C ('S');
+          std::ios_base::fmtflags ff (
+            os.setf (std::ios::fixed, std::ios::floatfield));
+          os << x.seconds () << C ('S');
+          os.setf (ff, std::ios::floatfield);
         }
 
         return os;

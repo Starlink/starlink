@@ -33,6 +33,7 @@
 #include <xsd/cxx/xml/elements.hxx> // xml::properties
 #include <xsd/cxx/xml/dom/auto-ptr.hxx> // dom::auto_ptr
 
+#include <xsd/cxx/tree/facet.hxx>
 #include <xsd/cxx/tree/exceptions.hxx>
 #include <xsd/cxx/tree/istream-fwd.hxx>
 
@@ -97,6 +98,11 @@ namespace xsd
          */
         static const unsigned long no_xml_declaration = 0x00010000UL;
 
+        /**
+         * @brief Do not add extra spaces or new lines that make the
+         * resulting XML easier to read.
+         */
+        static const unsigned long dont_pretty_print = 0x00020000UL;
 
         //@cond
 
@@ -293,17 +299,7 @@ namespace xsd
          *
          * For polymorphic object models use the @c _clone function instead.
          */
-        _type (const type& x, flags f = 0, container* c = 0)
-            : container_ (c)
-        {
-          while (&f == 0) /* unused */;
-
-          if (x.dom_info_.get ())
-          {
-            std::auto_ptr<dom_info> r (x.dom_info_->clone (*this, c));
-            dom_info_ = r;
-          }
-        }
+        _type (const type& x, flags f = 0, container* c = 0);
 
         /**
          * @brief Copy the instance polymorphically.
@@ -843,7 +839,7 @@ namespace xsd
             //
             assert (size != 0);
 
-            for ( ;i < size && !a_.isSameNode (nl.item (i)); ++i);
+            for ( ;i < size && !a_.isSameNode (nl.item (i)); ++i)/*noop*/;
 
             // a_ should be in the list.
             //
@@ -920,6 +916,17 @@ namespace xsd
       private:
         container* container_;
       };
+
+      inline _type::
+      _type (const type& x, flags, container* c)
+          : container_ (c)
+      {
+        if (x.dom_info_.get ())
+        {
+          std::auto_ptr<dom_info> r (x.dom_info_->clone (*this, c));
+          dom_info_ = r;
+        }
+      }
 
 
       /**
@@ -1027,7 +1034,27 @@ namespace xsd
 
       //@cond
 
-      template <typename T, typename C>
+      // Extra schema type id to disambiguate certain cases where
+      // different XML Schema types (e.g., double and decimal) are
+      // mapped to the same fundamental C++ type (e.g., double).
+      //
+      struct schema_type
+      {
+        enum value
+        {
+          other,
+          double_,
+          decimal
+        };
+      };
+
+      //@endcond
+
+
+      //@cond
+      template <typename T,
+                typename C,
+                schema_type::value ST = schema_type::other>
       struct traits
       {
         typedef T type;
@@ -1063,7 +1090,10 @@ namespace xsd
        *
        * @nosubgrouping
        */
-      template <typename X, typename C, typename B>
+      template <typename T,
+                typename C,
+                typename B,
+                schema_type::value ST = schema_type::other>
       class fundamental_base: public B
       {
       public:
@@ -1076,7 +1106,7 @@ namespace xsd
          * @brief Default constructor.
          */
         fundamental_base ()
-            : x_ ()
+            : facet_table_ (0), x_ ()
         {
         }
 
@@ -1085,8 +1115,8 @@ namespace xsd
          *
          * @param x An underlying type value.
          */
-        fundamental_base (X x)
-            : x_ (x)
+        fundamental_base (T x)
+            : facet_table_ (0), x_ (x)
         {
         }
 
@@ -1103,7 +1133,7 @@ namespace xsd
         fundamental_base (const fundamental_base& x,
                           flags f = 0,
                           container* c = 0)
-            : B (x, f, c), x_ (x.x_)
+            : B (x, f, c), facet_table_ (0), x_ (x.x_)
         {
         }
 
@@ -1181,7 +1211,7 @@ namespace xsd
          * @return A reference to the instance.
          */
         fundamental_base&
-        operator= (const X& x)
+        operator= (const T& x)
         {
           if (&x_ != &x)
             x_ = x;
@@ -1196,7 +1226,7 @@ namespace xsd
          *
          * @return A constant reference to the underlying type.
          */
-        operator const X& () const
+        operator const T& () const
         {
           return x_;
         }
@@ -1207,26 +1237,24 @@ namespace xsd
          *
          * @return A reference to the underlying type.
          */
-        operator X& ()
+        operator T& ()
         {
           return x_;
         }
 
-        // A call to one of the following operators causes ICE on VC++ 7.1.
-        // Refer to the following discussion for details:
+        // The following extra conversion operators causes problems on
+        // some compilers (notably VC 7.1 and 9.0) and are disabled by
+        // default.
         //
-        // http://codesynthesis.com/pipermail/xsd-users/2006-June/000399.html
-        //
-#if defined(_MSC_VER) && _MSC_VER >= 1400
-
+#ifdef XSD_TREE_EXTRA_FUND_CONV
         /**
          * @brief Implicitly convert the instance to another type (const
          * version).
          *
          * @return A value converted to the target type.
          */
-        template <typename Y>
-        operator Y () const
+        template <typename T2>
+        operator T2 () const
         {
           return x_;
         }
@@ -1236,18 +1264,43 @@ namespace xsd
          *
          * @return A value converted to the target type.
          */
-        template <typename Y>
-        operator Y ()
+        template <typename T2>
+        operator T2 ()
         {
           return x_;
         }
-#endif
+#endif // XSD_TREE_EXTRA_FUND_CONV
+
+      public:
+        /**
+         * @brief Get the facet table associated with this type.
+         *
+         * @return A pointer to read-only facet table or 0.
+         */
+        const facet*
+        _facet_table () const
+        {
+          return facet_table_;
+        }
+
+      protected:
+        /**
+         * @brief Set the facet table associated with this type.
+         *
+         * @param ft A pointer to read-only facet table.
+         */
+        void
+        _facet_table (const facet* ft)
+        {
+          facet_table_ = ft;
+        }
 
       private:
-        X x_;
+        const facet* facet_table_;
+        T x_;
       };
 
-      // While this operators are not normally necessary, they
+      // While thse operators are not normally necessary, they
       // help resolve ambiguities between implicit conversion and
       // construction.
       //
@@ -1257,13 +1310,13 @@ namespace xsd
        *
        * @return True if the underlying values are equal, false otherwise.
        */
-      template <typename X, typename C, typename B>
+      template <typename T, typename C, typename B, schema_type::value ST>
       inline bool
-      operator== (const fundamental_base<X, C, B>& x,
-                  const fundamental_base<X, C, B>& y)
+      operator== (const fundamental_base<T, C, B, ST>& x,
+                  const fundamental_base<T, C, B, ST>& y)
       {
-        X x_ (x);
-        X y_ (y);
+        T x_ (x);
+        T y_ (y);
         return x_ == y_;
       }
 
@@ -1272,15 +1325,16 @@ namespace xsd
        *
        * @return True if the underlying values are not equal, false otherwise.
        */
-      template <typename X, typename C, typename B>
+      template <typename T, typename C, typename B, schema_type::value ST>
       inline bool
-      operator!= (const fundamental_base<X, C, B>& x,
-                  const fundamental_base<X, C, B>& y)
+      operator!= (const fundamental_base<T, C, B, ST>& x,
+                  const fundamental_base<T, C, B, ST>& y)
       {
-        X x_ (x);
-        X y_ (y);
+        T x_ (x);
+        T y_ (y);
         return x_ != y_;
       }
+
 
       //@cond
 

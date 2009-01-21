@@ -272,24 +272,23 @@ namespace xsd
 
       //
       //
-      template<typename S, typename X>
+      template<typename S, typename T>
       std::auto_ptr<type>
       extractor_impl (istream<S>& s, flags f, container* c)
       {
-        return std::auto_ptr<type> (new X (s, f, c));
+        return std::auto_ptr<type> (new T (s, f, c));
       }
 
 
       // stream_extraction_initializer
       //
-      template<unsigned long id, typename S, typename C, typename X>
-      stream_extraction_initializer<id, S, C, X>::
+      template<unsigned long id, typename S, typename C, typename T>
+      stream_extraction_initializer<id, S, C, T>::
       stream_extraction_initializer (const C* name, const C* ns)
       {
         stream_extraction_map_instance<id, S, C> ().register_type (
-          xml::qualified_name<C> (name, ns), &extractor_impl<S, X>);
+          xml::qualified_name<C> (name, ns), &extractor_impl<S, T>);
       }
     }
   }
 }
-

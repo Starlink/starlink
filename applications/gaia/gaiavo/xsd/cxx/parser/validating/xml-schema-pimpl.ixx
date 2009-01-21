@@ -167,6 +167,20 @@ namespace xsd
 
           template<>
           inline const char*
+          id<char> ()
+          {
+            return "ID";
+          }
+
+          template<>
+          inline const char*
+          idref<char> ()
+          {
+            return "IDREF";
+          }
+
+          template<>
+          inline const char*
           idrefs<char> ()
           {
             return "IDREFS";
@@ -477,7 +491,7 @@ namespace xsd
           inline const wchar_t*
           nmtokens<wchar_t> ()
           {
-            return L"SNMTOKEN";
+            return L"NMTOKENS";
           }
 
           template<>
@@ -485,6 +499,20 @@ namespace xsd
           ncname<wchar_t> ()
           {
             return L"NCName";
+          }
+
+          template<>
+          inline const wchar_t*
+          id<wchar_t> ()
+          {
+            return L"ID";
+          }
+
+          template<>
+          inline const wchar_t*
+          idref<wchar_t> ()
+          {
+            return L"IDREF";
           }
 
           template<>

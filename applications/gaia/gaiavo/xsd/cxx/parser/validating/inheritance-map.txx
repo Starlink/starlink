@@ -15,6 +15,9 @@ namespace xsd
         bool inheritance_map<C>::
         check (const C* derived, const ro_string<C>& base) const
         {
+          if (base == derived)
+            return true;
+
           typename map::const_iterator i (map_.find (derived));
 
           if (i != map_.end ())

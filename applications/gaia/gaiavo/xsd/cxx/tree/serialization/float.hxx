@@ -12,95 +12,82 @@
 
 #include <xsd/cxx/tree/bits/literals.hxx>
 
-// The formula for the number of decimla digits required is given in:
-//
-// http://www2.open-std.org/JTC1/SC22/WG21/docs/papers/2005/n1822.pdf
-//
-namespace XERCES_CPP_NAMESPACE
-{
-  inline void
-  operator<< (xercesc::DOMElement& e, float f)
-  {
-    if (f == std::numeric_limits<float>::infinity ())
-      e << "INF";
-    else if (f == -std::numeric_limits<float>::infinity ())
-      e << "-INF";
-    else if (!(f == f))
-      e << "NaN";
-    else
-    {
-      std::basic_ostringstream<char> os;
-      os.imbue (std::locale::classic ());
-
-#ifdef XSD_FP_ALL_DIGITS
-      os.precision (2 + std::numeric_limits<float>::digits * 301/1000);
-#else
-      os.precision (std::numeric_limits<float>::digits10);
-#endif
-
-      os << f;
-      e << os.str ();
-    }
-  }
-
-  inline void
-  operator<< (xercesc::DOMAttr& a, float f)
-  {
-    if (f == std::numeric_limits<float>::infinity ())
-      a << "INF";
-    else if (f == -std::numeric_limits<float>::infinity ())
-      a << "-INF";
-    else if (!(f == f))
-      a << "NaN";
-    else
-    {
-      std::basic_ostringstream<char> os;
-      os.imbue (std::locale::classic ());
-
-#ifdef XSD_FP_ALL_DIGITS
-      os.precision (2 + std::numeric_limits<float>::digits * 301/1000);
-#else
-      os.precision (std::numeric_limits<float>::digits10);
-#endif
-
-      os << f;
-      a << os.str ();
-    }
-  }
-}
-
 namespace xsd
 {
   namespace cxx
   {
     namespace tree
     {
+      namespace bits
+      {
+        // The formula for the number of decimla digits required is given in:
+        //
+        // http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2005/n1822.pdf
+        //
+        template <typename C>
+        std::basic_string<C>
+        insert (float f)
+        {
+          std::basic_string<C> r;
+
+          if (f == std::numeric_limits<float>::infinity ())
+            r = bits::positive_inf<C> ();
+          else if (f == -std::numeric_limits<float>::infinity ())
+            r = bits::negative_inf<C> ();
+          else if (!(f == f))
+            r = bits::nan<C> ();
+          else
+          {
+            std::basic_ostringstream<C> os;
+            os.imbue (std::locale::classic ());
+
+            // Precision.
+            //
+#if defined (XSD_CXX_TREE_FLOAT_PRECISION_MAX)
+            os.precision (2 + std::numeric_limits<float>::digits * 301/1000);
+#elif defined (XSD_CXX_TREE_FLOAT_PRECISION)
+            os.precision (XSD_CXX_TREE_FLOAT_PRECISION);
+#else
+            os.precision (std::numeric_limits<float>::digits10);
+#endif
+            // Format.
+            //
+#if defined (XSD_CXX_TREE_FLOAT_FIXED)
+            os << std::fixed << f;
+#elif defined (XSD_CXX_TREE_FLOAT_SCIENTIFIC)
+            os << std::scientific << f;
+#else
+            os << f;
+#endif
+            r = os.str ();
+          }
+
+          return r;
+        }
+      }
+
       template <typename C>
       inline void
       operator<< (list_stream<C>& ls, float f)
       {
-        if (f == std::numeric_limits<float>::infinity ())
-          ls.os_ << bits::positive_inf<C> ();
-        else if (f == -std::numeric_limits<float>::infinity ())
-          ls.os_ << bits::negative_inf<C> ();
-        else if (!(f == f))
-          ls.os_ << bits::nan<C> ();
-        else
-        {
-          // We don't need to restore the original locale or precision
-          // because items in the list are all of the same type.
-          //
-          ls.os_.imbue (std::locale::classic ());
-
-#ifdef XSD_FP_ALL_DIGITS
-          ls.os_.precision (2 + std::numeric_limits<float>::digits * 301/1000);
-#else
-          ls.os_.precision (std::numeric_limits<float>::digits10);
-#endif
-          ls.os_ << f;
-        }
+        ls.os_ << bits::insert<C> (f);
       }
     }
+  }
+}
+
+namespace XERCES_CPP_NAMESPACE
+{
+  inline void
+  operator<< (xercesc::DOMElement& e, float f)
+  {
+    e << xsd::cxx::tree::bits::insert<char> (f);
+  }
+
+  inline void
+  operator<< (xercesc::DOMAttr& a, float f)
+  {
+    a << xsd::cxx::tree::bits::insert<char> (f);
   }
 }
 

@@ -302,11 +302,11 @@ namespace xsd
       }
 
       template <typename C>
-      template <typename X>
+      template <typename T>
       std::auto_ptr<type> type_factory_map<C>::
       traits_adapter (const xercesc::DOMElement& e, flags f, container* c)
       {
-        std::auto_ptr<X> r (traits<X, C>::create (e, f, c));
+        std::auto_ptr<T> r (traits<T, C>::create (e, f, c));
         return std::auto_ptr<type> (r.release ());
       }
 
@@ -404,32 +404,32 @@ namespace xsd
 
       //
       //
-      template<typename X>
+      template<typename T>
       std::auto_ptr<type>
       factory_impl (const xercesc::DOMElement& e, flags f, container* c)
       {
-        return std::auto_ptr<type> (new X (e, f, c));
+        return std::auto_ptr<type> (new T (e, f, c));
       }
 
       //
       //
-      template<unsigned long id, typename C, typename X>
-      type_factory_initializer<id, C, X>::
+      template<unsigned long id, typename C, typename T>
+      type_factory_initializer<id, C, T>::
       type_factory_initializer (const C* name, const C* ns)
       {
         type_factory_map_instance<id, C> ().register_type (
-          xml::qualified_name<C> (name, ns), &factory_impl<X>);
+          xml::qualified_name<C> (name, ns), &factory_impl<T>);
       }
 
-      template<unsigned long id, typename C, typename X>
-      type_factory_initializer<id, C, X>::
+      template<unsigned long id, typename C, typename T>
+      type_factory_initializer<id, C, T>::
       type_factory_initializer (const C* root_name, const C* root_ns,
                                 const C* subst_name, const C* subst_ns)
       {
         type_factory_map_instance<id, C> ().register_element (
           xml::qualified_name<C> (root_name, root_ns),
           xml::qualified_name<C> (subst_name, subst_ns),
-          &factory_impl<X>);
+          &factory_impl<T>);
       }
     }
   }

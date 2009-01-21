@@ -24,7 +24,7 @@ namespace xsd
     namespace tree
     {
       template <typename C>
-      struct traits<double, C>
+      struct traits<double, C, schema_type::double_>
       {
         typedef double type;
 
@@ -42,21 +42,21 @@ namespace xsd
       };
 
       template <typename C>
-      double traits<double, C>::
+      double traits<double, C, schema_type::double_>::
       create (const xercesc::DOMElement& e, flags f, container* c)
       {
         return create (text_content<C> (e), 0, f, c);
       }
 
       template <typename C>
-      double traits<double, C>::
+      double traits<double, C, schema_type::double_>::
       create (const xercesc::DOMAttr& a, flags f, container* c)
       {
         return create (xml::transcode<C> (a.getValue ()), 0, f, c);
       }
 
       template <typename C>
-      double traits<double, C>::
+      double traits<double, C, schema_type::double_>::
       create (const std::basic_string<C>& s,
               const xercesc::DOMElement*,
               flags,
@@ -70,9 +70,6 @@ namespace xsd
         ro_string<C> tmp (s);
         trim (tmp);
 
-        // @@ We map both xsd:double and xsd:decimal to double and decimal
-        // cannot be in scientific notation or be INF/NaN.
-        //
         if (tmp == bits::positive_inf<C> ())
           return std::numeric_limits<double>::infinity ();
 

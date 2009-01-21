@@ -90,6 +90,13 @@ namespace xsd
               return 0;
           }
 
+#if _XERCES_VERSION >= 30000
+          virtual const XMLCh*
+          getContentType () const
+          {
+            return 0;
+          }
+#endif
         private :
           std::istream& is_;
         };

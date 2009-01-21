@@ -867,61 +867,6 @@ namespace xsd
 
 
       /**
-       * @brief Exception indicating that a namespace-prefix mapping was
-       * not provided.
-       *
-       * @nosubgrouping
-       */
-      template <typename C>
-      class no_namespace_mapping: public exception<C>
-      {
-      public:
-        virtual
-        ~no_namespace_mapping () throw ();
-
-        /**
-         * @brief Initialize an instance with the namespace for which
-         * the namespace-prefix mapping was not provided.
-         *
-         * @param ns A namespace.
-         */
-        no_namespace_mapping (const std::basic_string<C>& ns);
-
-      public:
-        /**
-         * @brief Get the namespace for which the namespace-prefix
-         * mapping was not provided.
-         *
-         * @return The namespace.
-         */
-        const std::basic_string<C>&
-        namespace_ () const
-        {
-          return namespace__;
-        }
-
-        /**
-         * @brief Get %exception description.
-         *
-         * @return A C %string describing the %exception.
-         */
-        virtual const char*
-        what () const throw ();
-
-      protected:
-        //@cond
-
-        virtual void
-        print (std::basic_ostream<C>&) const;
-
-        //@endcond
-
-      private:
-        std::basic_string<C> namespace__;
-      };
-
-
-      /**
        * @brief Exception indicating that a prefix-namespace mapping was
        * not provided.
        *
@@ -973,34 +918,6 @@ namespace xsd
 
       private:
         std::basic_string<C> prefix_;
-      };
-
-
-      /**
-       * @brief Exception indicating that the xsi prefix is used for
-       * another namespace.
-       *
-       * @nosubgrouping
-       */
-      template <typename C>
-      class xsi_already_in_use: public exception<C>
-      {
-      public:
-        /**
-         * @brief Get %exception description.
-         *
-         * @return A C %string describing the %exception.
-         */
-        virtual const char*
-        what () const throw ();
-
-      protected:
-        //@cond
-
-        virtual void
-        print (std::basic_ostream<C>&) const;
-
-        //@endcond
       };
 
 

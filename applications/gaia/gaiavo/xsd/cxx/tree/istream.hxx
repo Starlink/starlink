@@ -19,106 +19,106 @@ namespace xsd
       class istream_common
       {
       public:
-        template <typename X>
+        template <typename T>
         struct as_size
         {
-          explicit as_size (X& x) : x_ (x) {}
-          X& x_;
+          explicit as_size (T& x) : x_ (x) {}
+          T& x_;
         };
 
 
         // 8-bit
         //
-        template <typename X>
+        template <typename T>
         struct as_int8
         {
-          explicit as_int8 (X& x) : x_ (x) {}
-          X& x_;
+          explicit as_int8 (T& x) : x_ (x) {}
+          T& x_;
         };
 
-        template <typename X>
+        template <typename T>
         struct as_uint8
         {
-          explicit as_uint8 (X& x) : x_ (x) {}
-          X& x_;
+          explicit as_uint8 (T& x) : x_ (x) {}
+          T& x_;
         };
 
 
         // 16-bit
         //
-        template <typename X>
+        template <typename T>
         struct as_int16
         {
-          explicit as_int16 (X& x) : x_ (x) {}
-          X& x_;
+          explicit as_int16 (T& x) : x_ (x) {}
+          T& x_;
         };
 
-        template <typename X>
+        template <typename T>
         struct as_uint16
         {
-          explicit as_uint16 (X& x) : x_ (x) {}
-          X& x_;
+          explicit as_uint16 (T& x) : x_ (x) {}
+          T& x_;
         };
 
 
         // 32-bit
         //
-        template <typename X>
+        template <typename T>
         struct as_int32
         {
-          explicit as_int32 (X& x) : x_ (x) {}
-          X& x_;
+          explicit as_int32 (T& x) : x_ (x) {}
+          T& x_;
         };
 
-        template <typename X>
+        template <typename T>
         struct as_uint32
         {
-          explicit as_uint32 (X& x) : x_ (x) {}
-          X& x_;
+          explicit as_uint32 (T& x) : x_ (x) {}
+          T& x_;
         };
 
 
         // 64-bit
         //
-        template <typename X>
+        template <typename T>
         struct as_int64
         {
-          explicit as_int64 (X& x) : x_ (x) {}
-          X& x_;
+          explicit as_int64 (T& x) : x_ (x) {}
+          T& x_;
         };
 
-        template <typename X>
+        template <typename T>
         struct as_uint64
         {
-          explicit as_uint64 (X& x) : x_ (x) {}
-          X& x_;
+          explicit as_uint64 (T& x) : x_ (x) {}
+          T& x_;
         };
 
 
         // Boolean
         //
-        template <typename X>
+        template <typename T>
         struct as_bool
         {
-          explicit as_bool (X& x) : x_ (x) {}
-          X& x_;
+          explicit as_bool (T& x) : x_ (x) {}
+          T& x_;
         };
 
 
         // Floating-point
         //
-        template <typename X>
+        template <typename T>
         struct as_float32
         {
-          explicit as_float32 (X& x) : x_ (x) {}
-          X& x_;
+          explicit as_float32 (T& x) : x_ (x) {}
+          T& x_;
         };
 
-        template <typename X>
+        template <typename T>
         struct as_float64
         {
-          explicit as_float64 (X& x) : x_ (x) {}
-          X& x_;
+          explicit as_float64 (T& x) : x_ (x) {}
+          T& x_;
         };
       };
 

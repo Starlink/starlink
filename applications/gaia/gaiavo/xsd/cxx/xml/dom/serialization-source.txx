@@ -5,6 +5,7 @@
 
 #include <xercesc/util/XMLUni.hpp>     // xercesc::fg*
 #include <xercesc/util/XMLUniDefs.hpp> // chLatin_L, etc
+#include <xercesc/validators/schema/SchemaSymbols.hpp>
 
 #if _XERCES_VERSION >= 30000
 #  include <xercesc/dom/DOMLSOutput.hpp>
@@ -148,8 +149,11 @@ namespace xsd
               }
             }
 
+            // Since this is the first namespace in document we don't
+            // need to worry about conflicts.
+            //
             if (i == e)
-              throw mapping<C> (ns);
+              prefix = xml::bits::first_prefix<C> ();
           }
 
           const XMLCh ls[] = {xercesc::chLatin_L,
@@ -172,7 +176,7 @@ namespace xsd
           // Check if we need to provide xsi mapping.
           //
           bool xsi (false);
-          string xsi_prefix (xml::bits::xsi_prefix<C> ());
+          string xsi_prefix;
           string xmlns_prefix (xml::bits::xmlns_prefix<C> ());
 
           for (infomap_iterator i (map.begin ()), e (map.end ()); i != e; ++i)
@@ -199,29 +203,7 @@ namespace xsd
                 break;
               }
             }
-
-            if (xsi)
-            {
-              // If we were not told to provide xsi mapping, make sure our
-              // prefix does not conflict with user-defined prefixes.
-              //
-              infomap_iterator i (map.find (xsi_prefix));
-
-              if (i != map.end ())
-                throw xsi_already_in_use ();
-            }
           }
-
-          // Create xmlns:xsi attribute.
-          //
-          if (xsi)
-          {
-            root->setAttributeNS (
-              xml::string (xml::bits::xmlns_namespace<C> ()).c_str (),
-              xml::string (xmlns_prefix + colon + xsi_prefix).c_str (),
-              xml::string (xml::bits::xsi_namespace<C> ()).c_str ());
-          }
-
 
           // Create user-defined mappings.
           //
@@ -233,18 +215,26 @@ namespace xsd
               //
               if (!i->second.name.empty ())
                 root->setAttributeNS (
-                  xml::string (xml::bits::xmlns_namespace<C> ()).c_str (),
+                  xercesc::XMLUni::fgXMLNSURIName,
                   xml::string (xmlns_prefix).c_str (),
                   xml::string (i->second.name).c_str ());
             }
             else
             {
               root->setAttributeNS (
-                xml::string (xml::bits::xmlns_namespace<C> ()).c_str (),
+                xercesc::XMLUni::fgXMLNSURIName,
                 xml::string (xmlns_prefix + colon + i->first).c_str (),
                 xml::string (i->second.name).c_str ());
             }
           }
+
+          // If we were not told to provide xsi mapping but we need it
+          // then we will have to add it ourselves.
+          //
+          if (xsi)
+            xsi_prefix = dom::prefix (xml::bits::xsi_namespace<C> (),
+                                      *root,
+                                      xml::bits::xsi_prefix<C> ());
 
           // Create xsi:schemaLocation and xsi:noNamespaceSchemaLocation
           // attributes.
@@ -276,7 +266,7 @@ namespace xsd
           if (!schema_location.empty ())
           {
             root->setAttributeNS (
-              xml::string (xml::bits::xsi_namespace<C> ()).c_str (),
+              xercesc::SchemaSymbols::fgURI_XSI,
               xml::string (xsi_prefix + colon +
                            xml::bits::schema_location<C> ()).c_str (),
               xml::string (schema_location).c_str ());
@@ -285,7 +275,7 @@ namespace xsd
           if (!no_namespace_schema_location.empty ())
           {
             root->setAttributeNS (
-              xml::string (xml::bits::xsi_namespace<C> ()).c_str (),
+              xercesc::SchemaSymbols::fgURI_XSI,
               xml::string (
                 xsi_prefix + colon +
                 xml::bits::no_namespace_schema_location<C> ()).c_str (),
@@ -340,7 +330,8 @@ namespace xsd
                 XMLUni::fgDOMWRTDiscardDefaultContent, true))
             conf->setParameter (XMLUni::fgDOMWRTDiscardDefaultContent, true);
 
-          if (conf->canSetParameter (XMLUni::fgDOMWRTFormatPrettyPrint, true))
+          if (!(flags & dont_pretty_print) &&
+              conf->canSetParameter (XMLUni::fgDOMWRTFormatPrettyPrint, true))
             conf->setParameter (XMLUni::fgDOMWRTFormatPrettyPrint, true);
 
           // See if we need to write XML declaration.
@@ -367,7 +358,8 @@ namespace xsd
                 XMLUni::fgDOMWRTDiscardDefaultContent, true))
             writer->setFeature (XMLUni::fgDOMWRTDiscardDefaultContent, true);
 
-          if (writer->canSetFeature (XMLUni::fgDOMWRTFormatPrettyPrint, true))
+          if (!(flags & dont_pretty_print) &&
+              writer->canSetFeature (XMLUni::fgDOMWRTFormatPrettyPrint, true))
             writer->setFeature (XMLUni::fgDOMWRTFormatPrettyPrint, true);
 
           // See if we need to write XML declaration.

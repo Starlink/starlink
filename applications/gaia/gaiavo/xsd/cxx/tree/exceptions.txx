@@ -272,29 +272,6 @@ namespace xsd
       }
 
 
-      // no_namespace_mapping
-      //
-      template <typename C>
-      no_namespace_mapping<C>::
-      ~no_namespace_mapping () throw ()
-      {
-      }
-
-      template <typename C>
-      no_namespace_mapping<C>::
-      no_namespace_mapping (const std::basic_string<C>& namespace_)
-          : namespace__ (namespace_)
-      {
-      }
-
-      template <typename C>
-      const char* no_namespace_mapping<C>::
-      what () const throw ()
-      {
-        return "no mapping provided for a namespace";
-      }
-
-
       // no_prefix_mapping
       //
       template <typename C>
@@ -315,18 +292,6 @@ namespace xsd
       what () const throw ()
       {
         return "no mapping provided for a namespace prefix";
-      }
-
-
-      // xsi_already_in_use
-      //
-      template <typename C>
-      const char* xsi_already_in_use<C>::
-      what () const throw ()
-      {
-        return "namespace prefix 'xsi' is already in use and no "
-          "user-defined mapping has been provided for namespace "
-          "'http://www.w3.org/2001/XMLSchema-instance'";
       }
 
 

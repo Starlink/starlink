@@ -531,17 +531,41 @@ namespace xsd
         };
 
         template <typename C>
-        struct id_pimpl: virtual id_pskel<C>, ncname_pimpl<C>
+        struct id_pimpl: virtual id_pskel<C>
         {
+          virtual void
+          _pre ();
+
+          virtual void
+          _characters (const ro_string<C>&);
+
+          virtual void
+          _post ();
+
           virtual std::basic_string<C>
           post_id ();
+
+        protected:
+          std::basic_string<C> str_;
         };
 
         template <typename C>
-        struct idref_pimpl: virtual idref_pskel<C>, ncname_pimpl<C>
+        struct idref_pimpl: virtual idref_pskel<C>
         {
+          virtual void
+          _pre ();
+
+          virtual void
+          _characters (const ro_string<C>&);
+
+          virtual void
+          _post ();
+
           virtual std::basic_string<C>
           post_idref ();
+
+        protected:
+          std::basic_string<C> str_;
         };
 
         template <typename C>
@@ -988,6 +1012,14 @@ namespace xsd
           template<typename C>
           const C*
           ncname ();
+
+          template<typename C>
+          const C*
+          id ();
+
+          template<typename C>
+          const C*
+          idref ();
 
           template<typename C>
           const C*

@@ -1,4 +1,4 @@
-// file      : xsd/cxx/parser/map.txx
+// file      : xsd/cxx/parser/map.ixx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
 // copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
@@ -9,22 +9,18 @@ namespace xsd
   {
     namespace parser
     {
-      // parser_map
-      //
-      template <typename C>
-      parser_map<C>::
-      ~parser_map ()
-      {
-      }
-
       // parser_map_impl
       //
       template <typename C>
-      parser_base<C>* parser_map_impl<C>::
-      find (const ro_string<C>& type) const
+      inline parser_map_impl<C>::parser_map_impl ()
       {
-        typename map::const_iterator i (map_.find (type.data ()));
-        return i != map_.end () ? i->second : 0;
+      }
+
+      template <typename C>
+      inline void parser_map_impl<C>::
+      insert (parser_base<C>& parser)
+      {
+        map_[parser._dynamic_type ()] = &parser;
       }
     }
   }

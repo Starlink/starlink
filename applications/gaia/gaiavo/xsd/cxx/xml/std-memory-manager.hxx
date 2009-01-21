@@ -19,7 +19,11 @@ namespace xsd
       {
       public:
         virtual void*
+#if _XERCES_VERSION >= 30000
+        allocate(XMLSize_t size)
+#else
         allocate(size_t size)
+#endif
         {
           return operator new (size);
         }
@@ -29,10 +33,17 @@ namespace xsd
         {
           operator delete (p);
         }
+
+#if _XERCES_VERSION >= 30000
+        virtual xercesc::MemoryManager*
+        getExceptionMemoryManager()
+        {
+          return xercesc::XMLPlatformUtils::fgMemoryManager;
+        }
+#endif
       };
     }
   }
 }
 
 #endif  // XSD_CXX_XML_STD_MEMORY_MANAGER_HXX
-

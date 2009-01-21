@@ -65,6 +65,8 @@ namespace xsd
             {
               throw expected_text_content<C> ();
             }
+          default:
+            break; // ignore
           }
         }
 
@@ -73,4 +75,3 @@ namespace xsd
     }
   }
 }
-

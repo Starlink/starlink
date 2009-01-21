@@ -33,30 +33,30 @@ namespace xsd
       // as_size
       //
 #ifdef XSD_CXX_TREE_USE_64_BIT_SIZE
-      template <typename X>
+      template <typename T>
       inline istream<XDR>&
-      operator>> (istream<XDR>& s, istream<XDR>::as_size<X>& x)
+      operator>> (istream<XDR>& s, istream<XDR>::as_size<T>& x)
       {
         uint64_t v;
 
-        if (!xdr_uint64_t (&s.impl (), &v) || v > ~(X (0)))
+        if (!xdr_uint64_t (&s.impl (), &v) || v > ~(T (0)))
           throw xdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (v);
+        x.x_ = static_cast<T> (v);
 
         return s;
       }
 #else
-      template <typename X>
+      template <typename T>
       inline istream<XDR>&
-      operator>> (istream<XDR>& s, istream<XDR>::as_size<X>& x)
+      operator>> (istream<XDR>& s, istream<XDR>::as_size<T>& x)
       {
         uint32_t v;
 
         if (!xdr_uint32_t (&s.impl (), &v))
           throw xdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (v);
+        x.x_ = static_cast<T> (v);
 
         return s;
       }
@@ -65,30 +65,30 @@ namespace xsd
 
       // 8-bit
       //
-      template <typename X>
+      template <typename T>
       inline istream<XDR>&
-      operator>> (istream<XDR>& s, istream<XDR>::as_int8<X>& x)
+      operator>> (istream<XDR>& s, istream<XDR>::as_int8<T>& x)
       {
         int8_t v;
 
         if (!xdr_int8_t (&s.impl (), &v))
           throw xdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (v);
+        x.x_ = static_cast<T> (v);
 
         return s;
       }
 
-      template <typename X>
+      template <typename T>
       inline istream<XDR>&
-      operator>> (istream<XDR>& s, istream<XDR>::as_uint8<X>& x)
+      operator>> (istream<XDR>& s, istream<XDR>::as_uint8<T>& x)
       {
         uint8_t v;
 
         if (!xdr_uint8_t (&s.impl (), &v))
           throw xdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (v);
+        x.x_ = static_cast<T> (v);
 
         return s;
       }
@@ -96,30 +96,30 @@ namespace xsd
 
       // 16-bit
       //
-      template <typename X>
+      template <typename T>
       inline istream<XDR>&
-      operator>> (istream<XDR>& s, istream<XDR>::as_int16<X>& x)
+      operator>> (istream<XDR>& s, istream<XDR>::as_int16<T>& x)
       {
         int16_t v;
 
         if (!xdr_int16_t (&s.impl (), &v))
           throw xdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (v);
+        x.x_ = static_cast<T> (v);
 
         return s;
       }
 
-      template <typename X>
+      template <typename T>
       inline istream<XDR>&
-      operator>> (istream<XDR>& s, istream<XDR>::as_uint16<X>& x)
+      operator>> (istream<XDR>& s, istream<XDR>::as_uint16<T>& x)
       {
         uint16_t v;
 
         if (!xdr_uint16_t (&s.impl (), &v))
           throw xdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (v);
+        x.x_ = static_cast<T> (v);
 
         return s;
       }
@@ -127,30 +127,30 @@ namespace xsd
 
       // 32-bit
       //
-      template <typename X>
+      template <typename T>
       inline istream<XDR>&
-      operator>> (istream<XDR>& s, istream<XDR>::as_int32<X>& x)
+      operator>> (istream<XDR>& s, istream<XDR>::as_int32<T>& x)
       {
         int32_t v;
 
         if (!xdr_int32_t (&s.impl (), &v))
           throw xdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (v);
+        x.x_ = static_cast<T> (v);
 
         return s;
       }
 
-      template <typename X>
+      template <typename T>
       inline istream<XDR>&
-      operator>> (istream<XDR>& s, istream<XDR>::as_uint32<X>& x)
+      operator>> (istream<XDR>& s, istream<XDR>::as_uint32<T>& x)
       {
         uint32_t v;
 
         if (!xdr_uint32_t (&s.impl (), &v))
           throw xdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (v);
+        x.x_ = static_cast<T> (v);
 
         return s;
       }
@@ -158,30 +158,30 @@ namespace xsd
 
       // 64-bit
       //
-      template <typename X>
+      template <typename T>
       inline istream<XDR>&
-      operator>> (istream<XDR>& s, istream<XDR>::as_int64<X>& x)
+      operator>> (istream<XDR>& s, istream<XDR>::as_int64<T>& x)
       {
         int64_t v;
 
         if (!xdr_int64_t (&s.impl (), &v))
           throw xdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (v);
+        x.x_ = static_cast<T> (v);
 
         return s;
       }
 
-      template <typename X>
+      template <typename T>
       inline istream<XDR>&
-      operator>> (istream<XDR>& s, istream<XDR>::as_uint64<X>& x)
+      operator>> (istream<XDR>& s, istream<XDR>::as_uint64<T>& x)
       {
         uint64_t v;
 
         if (!xdr_uint64_t (&s.impl (), &v))
           throw xdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (v);
+        x.x_ = static_cast<T> (v);
 
         return s;
       }
@@ -189,16 +189,16 @@ namespace xsd
 
       // Boolean
       //
-      template <typename X>
+      template <typename T>
       inline istream<XDR>&
-      operator>> (istream<XDR>& s, istream<XDR>::as_bool<X>& x)
+      operator>> (istream<XDR>& s, istream<XDR>::as_bool<T>& x)
       {
         bool_t v;
 
         if (!xdr_bool (&s.impl (), &v))
           throw xdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (v);
+        x.x_ = static_cast<T> (v);
 
         return s;
       }
@@ -206,30 +206,30 @@ namespace xsd
 
       // Floating-point
       //
-      template <typename X>
+      template <typename T>
       inline istream<XDR>&
-      operator>> (istream<XDR>& s, istream<XDR>::as_float32<X>& x)
+      operator>> (istream<XDR>& s, istream<XDR>::as_float32<T>& x)
       {
         float v;
 
         if (!xdr_float (&s.impl (), &v))
           throw xdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (v);
+        x.x_ = static_cast<T> (v);
 
         return s;
       }
 
-      template <typename X>
+      template <typename T>
       inline istream<XDR>&
-      operator>> (istream<XDR>& s, istream<XDR>::as_float64<X>& x)
+      operator>> (istream<XDR>& s, istream<XDR>::as_float64<T>& x)
       {
         double v;
 
         if (!xdr_double (&s.impl (), &v))
           throw xdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (v);
+        x.x_ = static_cast<T> (v);
 
         return s;
       }

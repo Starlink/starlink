@@ -610,6 +610,11 @@ namespace xsd
         size_type n (trim (tmp));
         const C* s (tmp.data ());
 
+        // Set all the fields since some of them may not be specified.
+        //
+        years_ = months_ = days_ = hours_ = minutes_ = 0;
+        seconds_ = 0.0;
+
         // duration := [-]P[nY][nM][nD][TnHnMn[.n+]S]
         //
         if (n >= 3)

@@ -38,33 +38,33 @@ namespace xsd
       //
 
 #ifdef XSD_CXX_TREE_USE_64_BIT_SIZE
-      template <typename X>
+      template <typename T>
       inline istream<ACE_InputCDR>&
       operator>> (istream<ACE_InputCDR>& s,
-                  istream<ACE_InputCDR>::as_size<X>& x)
+                  istream<ACE_InputCDR>::as_size<T>& x)
       {
         ACE_CDR::ULongLong r;
 
         if (!s.impl ().read_ulonglong (r) ||
-            r > ~(X (0)))
+            r > ~(T (0)))
           throw ace_cdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (r);
+        x.x_ = static_cast<T> (r);
 
         return s;
       }
 #else
-      template <typename X>
+      template <typename T>
       inline istream<ACE_InputCDR>&
       operator>> (istream<ACE_InputCDR>& s,
-                  istream<ACE_InputCDR>::as_size<X>& x)
+                  istream<ACE_InputCDR>::as_size<T>& x)
       {
         ACE_CDR::ULong r;
 
         if (!s.impl ().read_ulong (r))
           throw ace_cdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (r);
+        x.x_ = static_cast<T> (r);
 
         return s;
       }
@@ -73,32 +73,32 @@ namespace xsd
 
       // 8-bit
       //
-      template <typename X>
+      template <typename T>
       inline istream<ACE_InputCDR>&
       operator>> (istream<ACE_InputCDR>& s,
-                  istream<ACE_InputCDR>::as_int8<X>& x)
+                  istream<ACE_InputCDR>::as_int8<T>& x)
       {
         ACE_CDR::Octet r;
 
         if (!s.impl ().read_octet (r))
           throw ace_cdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (r);
+        x.x_ = static_cast<T> (r);
 
         return s;
       }
 
-      template <typename X>
+      template <typename T>
       inline istream<ACE_InputCDR>&
       operator>> (istream<ACE_InputCDR>& s,
-                  istream<ACE_InputCDR>::as_uint8<X>& x)
+                  istream<ACE_InputCDR>::as_uint8<T>& x)
       {
         ACE_CDR::Octet r;
 
         if (!s.impl ().read_octet (r))
           throw ace_cdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (r);
+        x.x_ = static_cast<T> (r);
 
         return s;
       }
@@ -106,32 +106,32 @@ namespace xsd
 
       // 16-bit
       //
-      template <typename X>
+      template <typename T>
       inline istream<ACE_InputCDR>&
       operator>> (istream<ACE_InputCDR>& s,
-                  istream<ACE_InputCDR>::as_int16<X>& x)
+                  istream<ACE_InputCDR>::as_int16<T>& x)
       {
         ACE_CDR::Short r;
 
         if (!s.impl ().read_short (r))
           throw ace_cdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (r);
+        x.x_ = static_cast<T> (r);
 
         return s;
       }
 
-      template <typename X>
+      template <typename T>
       inline istream<ACE_InputCDR>&
       operator>> (istream<ACE_InputCDR>& s,
-                  istream<ACE_InputCDR>::as_uint16<X>& x)
+                  istream<ACE_InputCDR>::as_uint16<T>& x)
       {
         ACE_CDR::UShort r;
 
         if (!s.impl ().read_ushort (r))
           throw ace_cdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (r);
+        x.x_ = static_cast<T> (r);
 
         return s;
       }
@@ -139,32 +139,32 @@ namespace xsd
 
       // 32-bit
       //
-      template <typename X>
+      template <typename T>
       inline istream<ACE_InputCDR>&
       operator>> (istream<ACE_InputCDR>& s,
-                  istream<ACE_InputCDR>::as_int32<X>& x)
+                  istream<ACE_InputCDR>::as_int32<T>& x)
       {
         ACE_CDR::Long r;
 
         if (!s.impl ().read_long (r))
           throw ace_cdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (r);
+        x.x_ = static_cast<T> (r);
 
         return s;
       }
 
-      template <typename X>
+      template <typename T>
       inline istream<ACE_InputCDR>&
       operator>> (istream<ACE_InputCDR>& s,
-                  istream<ACE_InputCDR>::as_uint32<X>& x)
+                  istream<ACE_InputCDR>::as_uint32<T>& x)
       {
         ACE_CDR::ULong r;
 
         if (!s.impl ().read_ulong (r))
           throw ace_cdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (r);
+        x.x_ = static_cast<T> (r);
 
         return s;
       }
@@ -172,32 +172,32 @@ namespace xsd
 
       // 64-bit
       //
-      template <typename X>
+      template <typename T>
       inline istream<ACE_InputCDR>&
       operator>> (istream<ACE_InputCDR>& s,
-                  istream<ACE_InputCDR>::as_int64<X>& x)
+                  istream<ACE_InputCDR>::as_int64<T>& x)
       {
         ACE_CDR::LongLong r;
 
         if (!s.impl ().read_longlong (r))
           throw ace_cdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (r);
+        x.x_ = static_cast<T> (r);
 
         return s;
       }
 
-      template <typename X>
+      template <typename T>
       inline istream<ACE_InputCDR>&
       operator>> (istream<ACE_InputCDR>& s,
-                  istream<ACE_InputCDR>::as_uint64<X>& x)
+                  istream<ACE_InputCDR>::as_uint64<T>& x)
       {
         ACE_CDR::ULongLong r;
 
         if (!s.impl ().read_ulonglong (r))
           throw ace_cdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (r);
+        x.x_ = static_cast<T> (r);
 
         return s;
       }
@@ -205,17 +205,17 @@ namespace xsd
 
       // Boolean
       //
-      template <typename X>
+      template <typename T>
       inline istream<ACE_InputCDR>&
       operator>> (istream<ACE_InputCDR>& s,
-                  istream<ACE_InputCDR>::as_bool<X>& x)
+                  istream<ACE_InputCDR>::as_bool<T>& x)
       {
         ACE_CDR::Boolean r;
 
         if (!s.impl ().read_boolean (r))
           throw ace_cdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (r);
+        x.x_ = static_cast<T> (r);
 
         return s;
       }
@@ -223,32 +223,32 @@ namespace xsd
 
       // Floating-point
       //
-      template <typename X>
+      template <typename T>
       inline istream<ACE_InputCDR>&
       operator>> (istream<ACE_InputCDR>& s,
-                  istream<ACE_InputCDR>::as_float32<X>& x)
+                  istream<ACE_InputCDR>::as_float32<T>& x)
       {
         ACE_CDR::Float r;
 
         if (!s.impl ().read_float (r))
           throw ace_cdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (r);
+        x.x_ = static_cast<T> (r);
 
         return s;
       }
 
-      template <typename X>
+      template <typename T>
       inline istream<ACE_InputCDR>&
       operator>> (istream<ACE_InputCDR>& s,
-                  istream<ACE_InputCDR>::as_float64<X>& x)
+                  istream<ACE_InputCDR>::as_float64<T>& x)
       {
         ACE_CDR::Double r;
 
         if (!s.impl ().read_double (r))
           throw ace_cdr_stream_extraction ();
 
-        x.x_ = static_cast<X> (r);
+        x.x_ = static_cast<T> (r);
 
         return s;
       }

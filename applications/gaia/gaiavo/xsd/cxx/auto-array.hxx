@@ -12,11 +12,11 @@ namespace xsd
 {
   namespace cxx
   {
-    template <typename X>
+    template <typename T>
     struct std_deallocator
     {
       void
-      deallocate (X* p)
+      deallocate (T* p)
       {
         delete[] p;
       }
@@ -26,15 +26,15 @@ namespace xsd
     // an optional deallocator type. If not specified, delete[]
     // is used.
     //
-    template <typename X, typename D = std_deallocator<X> >
+    template <typename T, typename D = std_deallocator<T> >
     struct auto_array
     {
-      auto_array (X a[])
+      auto_array (T a[])
           : a_ (a), d_ (0)
       {
       }
 
-      auto_array (X a[], D& d)
+      auto_array (T a[], D& d)
           : a_ (a), d_ (&d)
       {
       }
@@ -47,28 +47,28 @@ namespace xsd
           delete[] a_;
       }
 
-      X&
+      T&
       operator[] (std::size_t index) const
       {
         return a_[index];
       }
 
-      X*
+      T*
       get () const
       {
         return a_;
       }
 
-      X*
+      T*
       release ()
       {
-        X* tmp (a_);
+        T* tmp (a_);
         a_ = 0;
         return tmp;
       }
 
       void
-      reset (X a[] = 0)
+      reset (T a[] = 0)
       {
         if (a_ != a)
         {
@@ -85,7 +85,7 @@ namespace xsd
 
       operator bool_convertible () const
       {
-        return a_ ? &auto_array<X, D>::true_ : 0;
+        return a_ ? &auto_array<T, D>::true_ : 0;
       }
 
     private:
@@ -99,12 +99,12 @@ namespace xsd
       true_ ();
 
     private:
-      X* a_;
+      T* a_;
       D* d_;
     };
 
-    template <typename X, typename D>
-    void auto_array<X, D>::
+    template <typename T, typename D>
+    void auto_array<T, D>::
     true_ ()
     {
     }

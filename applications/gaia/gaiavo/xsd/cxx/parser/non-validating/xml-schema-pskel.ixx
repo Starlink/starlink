@@ -16,7 +16,7 @@ namespace xsd
     {
       namespace non_validating
       {
-                template<>
+        template<>
         inline const char* any_type_pskel<char>::
         _static_type ()
         {
@@ -639,7 +639,7 @@ namespace xsd
     {
       namespace non_validating
       {
-
+        template<>
         inline const wchar_t* any_type_pskel<wchar_t>::
         _static_type ()
         {

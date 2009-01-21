@@ -302,25 +302,24 @@ namespace xsd
 
       //
       //
-      template<typename S, typename X>
+      template<typename S, typename T>
       void
       inserter_impl (ostream<S>& s, const type& x)
       {
-        s << static_cast<const X&> (x);
+        s << static_cast<const T&> (x);
       }
 
       // stream_insertion_initializer
       //
-      template<unsigned long id, typename S, typename C, typename X>
-      stream_insertion_initializer<id, S, C, X>::
+      template<unsigned long id, typename S, typename C, typename T>
+      stream_insertion_initializer<id, S, C, T>::
       stream_insertion_initializer (const C* name, const C* ns)
       {
         stream_insertion_map_instance<id, S, C> ().register_type (
-          typeid (X),
+          typeid (T),
           xml::qualified_name<C> (name, ns),
-          &inserter_impl<S, X>);
+          &inserter_impl<S, T>);
       }
     }
   }
 }
-

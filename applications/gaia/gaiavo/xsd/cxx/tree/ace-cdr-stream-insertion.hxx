@@ -35,10 +35,10 @@ namespace xsd
       //
 
 #ifdef XSD_CXX_TREE_USE_64_BIT_SIZE
-      template <typename X>
+      template <typename T>
       inline ostream<ACE_OutputCDR>&
       operator<< (ostream<ACE_OutputCDR>& s,
-                  ostream<ACE_OutputCDR>::as_size<X> x)
+                  ostream<ACE_OutputCDR>::as_size<T> x)
       {
         if (!s.impl ().write_ulonglong (
               static_cast<ACE_CDR::ULongLong> (x.x_)))
@@ -46,10 +46,10 @@ namespace xsd
         return s;
       }
 #else
-      template <typename X>
+      template <typename T>
       inline ostream<ACE_OutputCDR>&
       operator<< (ostream<ACE_OutputCDR>& s,
-                  ostream<ACE_OutputCDR>::as_size<X> x)
+                  ostream<ACE_OutputCDR>::as_size<T> x)
       {
         if (x.x_ > ~(ACE_CDR::ULong (0)) ||
             !s.impl ().write_ulong (static_cast<ACE_CDR::ULong> (x.x_)))
@@ -62,10 +62,10 @@ namespace xsd
 
       // 8-bit
       //
-      template <typename X>
+      template <typename T>
       inline ostream<ACE_OutputCDR>&
       operator<< (ostream<ACE_OutputCDR>& s,
-                  ostream<ACE_OutputCDR>::as_int8<X> x)
+                  ostream<ACE_OutputCDR>::as_int8<T> x)
       {
         ACE_CDR::Octet r (static_cast<ACE_CDR::Octet> (x.x_));
 
@@ -75,10 +75,10 @@ namespace xsd
         return s;
       }
 
-      template <typename X>
+      template <typename T>
       inline ostream<ACE_OutputCDR>&
       operator<< (ostream<ACE_OutputCDR>& s,
-                  ostream<ACE_OutputCDR>::as_uint8<X> x)
+                  ostream<ACE_OutputCDR>::as_uint8<T> x)
       {
         ACE_CDR::Octet r (static_cast<ACE_CDR::Octet> (x.x_));
 
@@ -91,20 +91,20 @@ namespace xsd
 
       // 16-bit
       //
-      template <typename X>
+      template <typename T>
       inline ostream<ACE_OutputCDR>&
       operator<< (ostream<ACE_OutputCDR>& s,
-                  ostream<ACE_OutputCDR>::as_int16<X> x)
+                  ostream<ACE_OutputCDR>::as_int16<T> x)
       {
         if (!s.impl ().write_short (static_cast<ACE_CDR::Short> (x.x_)))
           throw ace_cdr_stream_insertion ();
         return s;
       }
 
-      template <typename X>
+      template <typename T>
       inline ostream<ACE_OutputCDR>&
       operator<< (ostream<ACE_OutputCDR>& s,
-                  ostream<ACE_OutputCDR>::as_uint16<X> x)
+                  ostream<ACE_OutputCDR>::as_uint16<T> x)
       {
         if (!s.impl ().write_ushort (static_cast<ACE_CDR::UShort> (x.x_)))
           throw ace_cdr_stream_insertion ();
@@ -114,20 +114,20 @@ namespace xsd
 
       // 32-bit
       //
-      template <typename X>
+      template <typename T>
       inline ostream<ACE_OutputCDR>&
       operator<< (ostream<ACE_OutputCDR>& s,
-                  ostream<ACE_OutputCDR>::as_int32<X> x)
+                  ostream<ACE_OutputCDR>::as_int32<T> x)
       {
         if (!s.impl ().write_long (static_cast<ACE_CDR::Long> (x.x_)))
           throw ace_cdr_stream_insertion ();
         return s;
       }
 
-      template <typename X>
+      template <typename T>
       inline ostream<ACE_OutputCDR>&
       operator<< (ostream<ACE_OutputCDR>& s,
-                  ostream<ACE_OutputCDR>::as_uint32<X> x)
+                  ostream<ACE_OutputCDR>::as_uint32<T> x)
       {
         if (!s.impl ().write_ulong (static_cast<ACE_CDR::ULong> (x.x_)))
           throw ace_cdr_stream_insertion ();
@@ -137,20 +137,20 @@ namespace xsd
 
       // 64-bit
       //
-      template <typename X>
+      template <typename T>
       inline ostream<ACE_OutputCDR>&
       operator<< (ostream<ACE_OutputCDR>& s,
-                  ostream<ACE_OutputCDR>::as_int64<X> x)
+                  ostream<ACE_OutputCDR>::as_int64<T> x)
       {
         if (!s.impl ().write_longlong (static_cast<ACE_CDR::LongLong> (x.x_)))
           throw ace_cdr_stream_insertion ();
         return s;
       }
 
-      template <typename X>
+      template <typename T>
       inline ostream<ACE_OutputCDR>&
       operator<< (ostream<ACE_OutputCDR>& s,
-                  ostream<ACE_OutputCDR>::as_uint64<X> x)
+                  ostream<ACE_OutputCDR>::as_uint64<T> x)
       {
         if (!s.impl ().write_ulonglong (
               static_cast<ACE_CDR::ULongLong> (x.x_)))
@@ -161,10 +161,10 @@ namespace xsd
 
       // Boolean
       //
-      template <typename X>
+      template <typename T>
       inline ostream<ACE_OutputCDR>&
       operator<< (ostream<ACE_OutputCDR>& s,
-                  ostream<ACE_OutputCDR>::as_bool<X> x)
+                  ostream<ACE_OutputCDR>::as_bool<T> x)
       {
         if (!s.impl ().write_boolean (static_cast<ACE_CDR::Boolean> (x.x_)))
           throw ace_cdr_stream_insertion ();
@@ -174,20 +174,20 @@ namespace xsd
 
       // Floating-point
       //
-      template <typename X>
+      template <typename T>
       inline ostream<ACE_OutputCDR>&
       operator<< (ostream<ACE_OutputCDR>& s,
-                  ostream<ACE_OutputCDR>::as_float32<X> x)
+                  ostream<ACE_OutputCDR>::as_float32<T> x)
       {
         if (!s.impl ().write_float (static_cast<ACE_CDR::Float> (x.x_)))
           throw ace_cdr_stream_insertion ();
         return s;
       }
 
-      template <typename X>
+      template <typename T>
       inline ostream<ACE_OutputCDR>&
       operator<< (ostream<ACE_OutputCDR>& s,
-                  ostream<ACE_OutputCDR>::as_float64<X> x)
+                  ostream<ACE_OutputCDR>::as_float64<T> x)
       {
         if (!s.impl ().write_double (static_cast<ACE_CDR::Double> (x.x_)))
           throw ace_cdr_stream_insertion ();

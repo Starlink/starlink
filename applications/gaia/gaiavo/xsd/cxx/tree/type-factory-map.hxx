@@ -8,7 +8,8 @@
 
 #include <map>
 #include <string>
-#include <memory> // std::auto_ptr
+#include <memory>  // std::auto_ptr
+#include <cstddef> // std::size_t
 
 #include <xercesc/dom/DOMElement.hpp>
 
@@ -57,7 +58,7 @@ namespace xsd
         find (const qualified_name& name) const;
 
       private:
-        template <typename X>
+        template <typename T>
         static std::auto_ptr<type>
         traits_adapter (const xercesc::DOMElement&, flags, container*);
 
@@ -98,7 +99,7 @@ namespace xsd
       struct type_factory_plate
       {
         static type_factory_map<C>* map;
-        static unsigned long count;
+        static std::size_t count;
 
         type_factory_plate ();
         ~type_factory_plate ();
@@ -108,7 +109,7 @@ namespace xsd
       type_factory_map<C>* type_factory_plate<id, C>::map = 0;
 
       template<unsigned long id, typename C>
-      unsigned long type_factory_plate<id, C>::count = 0;
+      std::size_t type_factory_plate<id, C>::count = 0;
 
 
       //
@@ -123,13 +124,13 @@ namespace xsd
 
       //
       //
-      template<typename X>
+      template<typename T>
       std::auto_ptr<type>
       factory_impl (const xercesc::DOMElement&, flags, container*);
 
       //
       //
-      template<unsigned long id, typename C, typename X>
+      template<unsigned long id, typename C, typename T>
       struct type_factory_initializer
       {
         // Register type.

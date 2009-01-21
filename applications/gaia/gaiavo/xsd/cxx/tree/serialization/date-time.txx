@@ -372,7 +372,7 @@ namespace xsd
 
             size_type size (s.size ()), n (size);
 
-            for (; n > 0 && s[n - 1] == C ('0'); --n);
+            for (; n > 0 && s[n - 1] == C ('0'); --n)/*noop*/;
 
             if (n > 0 && s[n - 1] == C ('.'))
               --n;
@@ -458,7 +458,7 @@ namespace xsd
 
             size_type size (s.size ()), n (size);
 
-            for (; n > 0 && s[n - 1] == C ('0'); --n);
+            for (; n > 0 && s[n - 1] == C ('0'); --n)/*noop*/;
 
             if (n > 0 && s[n - 1] == C ('.'))
               --n;
@@ -578,7 +578,7 @@ namespace xsd
 
             size_type size (s.size ()), n (size);
 
-            for (; n > 0 && s[n - 1] == C ('0'); --n);
+            for (; n > 0 && s[n - 1] == C ('0'); --n)/*noop*/;
 
             if (n > 0 && s[n - 1] == C ('.'))
               --n;

@@ -34,12 +34,12 @@ namespace xsd
                 severity,
                 const std::basic_string<C>& message);
 
-        template <typename X>
+        template <typename E>
         void
         throw_if_failed () const
         {
           if (failed_)
-            throw X (diagnostics_);
+            throw E (diagnostics_);
         }
 
       private:

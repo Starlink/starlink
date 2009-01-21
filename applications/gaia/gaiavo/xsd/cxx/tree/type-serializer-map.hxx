@@ -8,6 +8,7 @@
 
 #include <map>
 #include <string>
+#include <cstddef>  // std::size_t
 #include <typeinfo>
 
 #include <xercesc/dom/DOMElement.hpp>
@@ -61,13 +62,13 @@ namespace xsd
                    const type&) const;
 
         // Create DOMDocument with root element suitable for serializing
-        // X into it.
+        // x into it.
         //
         xml::dom::auto_ptr<xercesc::DOMDocument>
         serialize (const C* name, // element name
                    const C* ns,   // element namespace
                    const xml::dom::namespace_infomap<C>&,
-                   const type&,
+                   const type& x,
                    unsigned long flags) const;
 
       public:
@@ -146,7 +147,9 @@ namespace xsd
         // Sets an xsi:type attribute corresponding to the type_info.
         //
         void
-        set_xsi_type (xercesc::DOMElement&, const type_info&) const;
+        set_xsi_type (xercesc::DOMElement& parent,
+                      xercesc::DOMElement&,
+                      const type_info&) const;
       };
 
 
@@ -156,7 +159,7 @@ namespace xsd
       struct type_serializer_plate
       {
         static type_serializer_map<C>* map;
-        static unsigned long count;
+        static std::size_t count;
 
         type_serializer_plate ();
         ~type_serializer_plate ();
@@ -166,7 +169,7 @@ namespace xsd
       type_serializer_map<C>* type_serializer_plate<id, C>::map = 0;
 
       template<unsigned long id, typename C>
-      unsigned long type_serializer_plate<id, C>::count = 0;
+      std::size_t type_serializer_plate<id, C>::count = 0;
 
 
       //
@@ -180,12 +183,12 @@ namespace xsd
 
       //
       //
-      template<typename X>
+      template<typename T>
       void
       serializer_impl (xercesc::DOMElement&, const type&);
 
 
-      template<unsigned long id, typename C, typename X>
+      template<unsigned long id, typename C, typename T>
       struct type_serializer_initializer
       {
         // Register type.
@@ -204,4 +207,3 @@ namespace xsd
 #include <xsd/cxx/tree/type-serializer-map.txx>
 
 #endif // XSD_CXX_TREE_TYPE_SERIALIZER_MAP_HXX
-

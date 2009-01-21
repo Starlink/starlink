@@ -216,8 +216,8 @@ namespace xsd
 
       // idref
       //
-      template <typename X, typename C, typename B>
-      idref<X, C, B>* idref<X, C, B>::
+      template <typename T, typename C, typename B>
+      idref<T, C, B>* idref<T, C, B>::
       _clone (flags f, container* c) const
       {
         return new idref (*this, f, c);
@@ -228,8 +228,8 @@ namespace xsd
       // non-trivial to track down cases. So we are going to use the
       // old-n-ugly this-> techniques.
       //
-      template <typename X, typename C, typename B>
-      const _type* idref<X, C, B>::
+      template <typename T, typename C, typename B>
+      const _type* idref<T, C, B>::
       get_ () const
       {
         if (!this->empty () && this->_container () != 0)
@@ -240,8 +240,8 @@ namespace xsd
           return 0;
       }
 
-      template <typename X, typename C, typename B>
-      _type* idref<X, C, B>::
+      template <typename T, typename C, typename B>
+      _type* idref<T, C, B>::
       get_ ()
       {
         if (!this->empty () && this->_container () != 0)
@@ -252,8 +252,8 @@ namespace xsd
           return 0;
       }
 
-      template <typename X, typename C, typename B>
-      void idref<X, C, B>::
+      template <typename T, typename C, typename B>
+      void idref<T, C, B>::
       true_ ()
       {
       }
@@ -608,4 +608,3 @@ namespace xsd
     }
   }
 }
-

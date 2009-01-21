@@ -12,7 +12,6 @@
 #include <xsd/cxx/xml/string.hxx>        // xml::{string, transcode}
 #include <xsd/cxx/xml/dom/serialization-header.hxx>  // dom::{prefix, clear}
 
-#include <xsd/cxx/tree/exceptions.hxx>   // no_namespace_mapping
 #include <xsd/cxx/tree/elements.hxx>
 #include <xsd/cxx/tree/types.hxx>
 #include <xsd/cxx/tree/list.hxx>
@@ -128,9 +127,9 @@ namespace xsd
 
       // Insertion operators for list.
       //
-      template <typename C, typename X, bool fund>
+      template <typename C, typename T, schema_type::value ST, bool fund>
       void
-      operator<< (xercesc::DOMElement& e, const list<X, C, fund>& v)
+      operator<< (xercesc::DOMElement& e, const list<T, C, ST, fund>& v)
       {
         xml::dom::clear<char> (e);
 
@@ -142,9 +141,9 @@ namespace xsd
         e << os.str ();
       }
 
-      template <typename C, typename X, bool fund>
+      template <typename C, typename T, schema_type::value ST, bool fund>
       void
-      operator<< (xercesc::DOMAttr& a, const list<X, C, fund>& v)
+      operator<< (xercesc::DOMAttr& a, const list<T, C, ST, fund>& v)
       {
         std::basic_ostringstream<C> os;
         list_stream<C> ls (os, *a.getOwnerElement ());
@@ -154,11 +153,11 @@ namespace xsd
         a << os.str ();
       }
 
-      template <typename C, typename X, bool fund>
+      template <typename C, typename T, schema_type::value ST, bool fund>
       void
-      operator<< (list_stream<C>& ls, const list<X, C, fund>& v)
+      operator<< (list_stream<C>& ls, const list<T, C, ST, fund>& v)
       {
-        for (typename list<X, C, fund>::const_iterator
+        for (typename list<T, C, ST, fund>::const_iterator
                b (v.begin ()), e (v.end ()), i (b); i != e; ++i)
         {
           if (i != b)
@@ -168,52 +167,141 @@ namespace xsd
         }
       }
 
+      // Specializations for double and decimal.
+      //
+      template <typename C, typename T, bool fund>
+      void
+      operator<< (list_stream<C>& ls,
+                  const list<T, C, schema_type::double_, fund>& v)
+      {
+        for (typename list<T, C, schema_type::double_, fund>::const_iterator
+               b (v.begin ()), e (v.end ()), i (b); i != e; ++i)
+        {
+          if (i != b)
+            ls.os_ << C (' ');
+
+          ls << as_double<T> (*i);
+        }
+      }
+
+      template <typename C, typename T, bool fund>
+      void
+      operator<< (list_stream<C>& ls,
+                  const list<T, C, schema_type::decimal, fund>& v)
+      {
+        for (typename list<T, C, schema_type::decimal, fund>::const_iterator
+               b (v.begin ()), e (v.end ()), i (b); i != e; ++i)
+        {
+          if (i != b)
+            ls.os_ << C (' ');
+
+          ls << as_decimal<T> (*i);
+        }
+      }
+
 
       // Insertion operators for fundamental_base.
       //
-      template <typename X, typename C, typename B>
+      template <typename T, typename C, typename B, schema_type::value ST>
       void
-      operator<< (xercesc::DOMElement& e, const fundamental_base<X, C, B>& x)
+      operator<< (xercesc::DOMElement& e,
+                  const fundamental_base<T, C, B, ST>& x)
       {
-        const X& r (x);
+        const T& r (x);
         e << r;
       }
 
-      template <typename X, typename C, typename B>
+      template <typename T, typename C, typename B, schema_type::value ST>
       void
-      operator<< (xercesc::DOMAttr& a, const fundamental_base<X, C, B>& x)
+      operator<< (xercesc::DOMAttr& a, const fundamental_base<T, C, B, ST>& x)
       {
-        const X& r (x);
+        const T& r (x);
         a << r;
       }
 
-      template <typename X, typename C, typename B>
+      template <typename T, typename C, typename B, schema_type::value ST>
       void
-      operator<< (list_stream<C>& ls, const fundamental_base<X, C, B>& x)
+      operator<< (list_stream<C>& ls, const fundamental_base<T, C, B, ST>& x)
       {
-        const X& r (x);
+        const T& r (x);
         ls << r;
       }
 
+      // Specializations for double.
+      //
+      template <typename T, typename C, typename B>
+      void
+      operator<< (
+        xercesc::DOMElement& e,
+        const fundamental_base<T, C, B, schema_type::double_>& x)
+      {
+        e << as_double<T> (x);
+      }
+
+      template <typename T, typename C, typename B>
+      void
+      operator<< (
+        xercesc::DOMAttr& a,
+        const fundamental_base<T, C, B, schema_type::double_>& x)
+      {
+        a << as_double<T> (x);
+      }
+
+      template <typename T, typename C, typename B>
+      void
+      operator<< (
+        list_stream<C>& ls,
+        const fundamental_base<T, C, B, schema_type::double_>& x)
+      {
+        ls << as_double<T> (x);
+      }
+
+      // Specializations for decimal.
+      //
+      template <typename T, typename C, typename B>
+      void
+      operator<< (
+        xercesc::DOMElement& e,
+        const fundamental_base<T, C, B, schema_type::decimal>& x)
+      {
+        e << as_decimal<T> (x, x._facet_table ());
+      }
+
+      template <typename T, typename C, typename B>
+      void
+      operator<< (
+        xercesc::DOMAttr& a,
+        const fundamental_base<T, C, B, schema_type::decimal>& x)
+      {
+        a << as_decimal<T> (x, x._facet_table ());
+      }
+
+      template <typename T, typename C, typename B>
+      void
+      operator<< (
+        list_stream<C>& ls,
+        const fundamental_base<T, C, B, schema_type::decimal>& x)
+      {
+        ls << as_decimal<T> (x, x._facet_table ());
+      }
 
       // Insertion operators for built-in types.
       //
 
-
       namespace bits
       {
-        template <typename C, typename X>
+        template <typename C, typename T>
         void
-        insert (xercesc::DOMElement& e, const X& x)
+        insert (xercesc::DOMElement& e, const T& x)
         {
           std::basic_ostringstream<C> os;
           os << x;
           e << os.str ();
         }
 
-        template <typename C, typename X>
+        template <typename C, typename T>
         void
-        insert (xercesc::DOMAttr& a, const X& x)
+        insert (xercesc::DOMAttr& a, const T& x)
         {
           std::basic_ostringstream<C> os;
           os << x;
@@ -443,23 +531,23 @@ namespace xsd
 
       // idref
       //
-      template <typename X, typename C, typename B>
+      template <typename T, typename C, typename B>
       inline void
-      operator<< (xercesc::DOMElement& e, const idref<X, C, B>& x)
+      operator<< (xercesc::DOMElement& e, const idref<T, C, B>& x)
       {
         bits::insert<C> (e, x);
       }
 
-      template <typename X, typename C, typename B>
+      template <typename T, typename C, typename B>
       inline void
-      operator<< (xercesc::DOMAttr& a, const idref<X, C, B>& x)
+      operator<< (xercesc::DOMAttr& a, const idref<T, C, B>& x)
       {
         bits::insert<C> (a, x);
       }
 
-      template <typename X, typename C, typename B>
+      template <typename T, typename C, typename B>
       inline void
-      operator<< (list_stream<C>& ls, const idref<X, C, B>& x)
+      operator<< (list_stream<C>& ls, const idref<T, C, B>& x)
       {
         ls.os_ << x;
       }
@@ -526,19 +614,10 @@ namespace xsd
 
         if (x.qualified ())
         {
-          const std::basic_string<C>& ns (x.namespace_ ());
+          std::basic_string<C> p (xml::dom::prefix (x.namespace_ (), e));
 
-          try
-          {
-            std::basic_string<C> p (xml::dom::prefix (ns, e));
-
-            if (!p.empty ())
-              os << p << C (':');
-          }
-          catch (const xml::dom::no_prefix&)
-          {
-            throw no_namespace_mapping<C> (ns);
-          }
+          if (!p.empty ())
+            os << p << C (':');
         }
 
         os << x.name ();
@@ -553,20 +632,11 @@ namespace xsd
 
         if (x.qualified ())
         {
-          const std::basic_string<C>& ns (x.namespace_ ());
+          std::basic_string<C> p (
+            xml::dom::prefix (x.namespace_ (), *a.getOwnerElement ()));
 
-          try
-          {
-            std::basic_string<C> p (
-              xml::dom::prefix (ns, *a.getOwnerElement ()));
-
-            if (!p.empty ())
-              os << p << C (':');
-          }
-          catch (const xml::dom::no_prefix&)
-          {
-            throw no_namespace_mapping<C> (ns);
-          }
+          if (!p.empty ())
+            os << p << C (':');
         }
 
         os << x.name ();
@@ -577,22 +647,13 @@ namespace xsd
       void
       operator<< (list_stream<C>& ls, const qname<C, B, uri, ncname>& x)
       {
-
         if (x.qualified ())
         {
-          const std::basic_string<C>& ns (x.namespace_ ());
+          std::basic_string<C> p (
+            xml::dom::prefix (x.namespace_ (), ls.parent_));
 
-          try
-          {
-            std::basic_string<C> p (xml::dom::prefix (ns, ls.parent_));
-
-            if (!p.empty ())
-              ls.os_ << p << C (':');
-          }
-          catch (const xml::dom::no_prefix&)
-          {
-            throw no_namespace_mapping<C> (ns);
-          }
+          if (!p.empty ())
+            ls.os_ << p << C (':');
         }
 
         ls.os_ << x.name ();

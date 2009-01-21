@@ -7,7 +7,8 @@
 #define XSD_CXX_TREE_STREAM_EXTRACTION_MAP_HXX
 
 #include <map>
-#include <memory> // std::auto_ptr
+#include <memory>  // std::auto_ptr
+#include <cstddef> // std::size_t
 
 #include <xsd/cxx/tree/elements.hxx>
 #include <xsd/cxx/tree/istream.hxx>
@@ -53,7 +54,7 @@ namespace xsd
       struct stream_extraction_plate
       {
         static stream_extraction_map<S, C>* map;
-        static unsigned long count;
+        static std::size_t count;
 
         stream_extraction_plate ();
         ~stream_extraction_plate ();
@@ -63,7 +64,7 @@ namespace xsd
       stream_extraction_map<S, C>* stream_extraction_plate<id, S, C>::map = 0;
 
       template<unsigned long id, typename S, typename C>
-      unsigned long stream_extraction_plate<id, S, C>::count = 0;
+      std::size_t stream_extraction_plate<id, S, C>::count = 0;
 
 
       //
@@ -77,12 +78,12 @@ namespace xsd
 
       //
       //
-      template<typename S, typename X>
+      template<typename S, typename T>
       std::auto_ptr<type>
       extractor_impl (istream<S>&, flags, container*);
 
 
-      template<unsigned long id, typename S, typename C, typename X>
+      template<unsigned long id, typename S, typename C, typename T>
       struct stream_extraction_initializer
       {
         stream_extraction_initializer (const C* name, const C* ns);

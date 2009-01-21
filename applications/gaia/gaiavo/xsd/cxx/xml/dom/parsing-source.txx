@@ -31,21 +31,31 @@ namespace xsd
     {
       namespace dom
       {
-
         // parser
         //
         template <typename C>
         parser<C>::
-        parser (const xercesc::DOMElement& e)
+        parser (const xercesc::DOMElement& e, bool ep, bool ap)
             : element_ (e),
-              next_element_ (e.getFirstChild ()),
-              a_ (e.getAttributes ()), ai_ (0)
+              next_element_ (0),
+              a_ (0),
+              ai_ (0)
         {
           using xercesc::DOMNode;
 
-          for (; next_element_ != 0 &&
+          if (ep)
+          {
+            for (next_element_ = e.getFirstChild ();
+                 next_element_ != 0 &&
                  next_element_->getNodeType () != DOMNode::ELEMENT_NODE;
-               next_element_ = next_element_->getNextSibling ());
+                 next_element_ = next_element_->getNextSibling ()) /*noop*/;
+          }
+
+          if (ap)
+          {
+            a_ = e.getAttributes ();
+            as_ = a_->getLength ();
+          }
         }
 
         template <typename C>
@@ -57,7 +67,7 @@ namespace xsd
           for (next_element_ = next_element_->getNextSibling ();
                next_element_ != 0 &&
                  next_element_->getNodeType () != DOMNode::ELEMENT_NODE;
-               next_element_ = next_element_->getNextSibling ());
+               next_element_ = next_element_->getNextSibling ())/*noop*/;
         }
 
         // parse()

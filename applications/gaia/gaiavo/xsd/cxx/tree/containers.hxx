@@ -23,10 +23,10 @@ namespace xsd
   {
     namespace tree
     {
-      // Test whether X is a fundamental C++ type.
+      // Test whether T is a fundamental C++ type.
       //
 
-      template <typename X>
+      template <typename T>
       struct fundamental_p
       {
         static const bool r = false;
@@ -124,20 +124,20 @@ namespace xsd
 
       // one (for internal use only)
       //
-      template <typename X, bool fund = fundamental_p<X>::r>
+      template <typename T, bool fund = fundamental_p<T>::r>
       class one;
 
-      template <typename X>
-      class one<X, false>
+      template <typename T>
+      class one<T, false>
       {
       public:
         ~one ();
 
         one (flags, container*);
 
-        one (const X&, flags, container*);
+        one (const T&, flags, container*);
 
-        one (std::auto_ptr<X>, flags, container*);
+        one (std::auto_ptr<T>, flags, container*);
 
         one (const one&, flags, container*);
 
@@ -145,23 +145,23 @@ namespace xsd
         operator= (const one&);
 
       public:
-        const X&
+        const T&
         get () const
         {
           return *x_;
         }
 
-        X&
+        T&
         get ()
         {
           return *x_;
         }
 
         void
-        set (const X&);
+        set (const T&);
 
         void
-        set (std::auto_ptr<X>);
+        set (std::auto_ptr<T>);
 
         bool
         present () const
@@ -170,14 +170,14 @@ namespace xsd
         }
 
       protected:
-        X* x_;
+        T* x_;
         flags flags_;
         container* container_;
       };
 
 
-      template <typename X>
-      class one<X, true>
+      template <typename T>
+      class one<T, true>
       {
       public:
         one (flags, container*)
@@ -185,7 +185,7 @@ namespace xsd
         {
         }
 
-        one (const X& x, flags, container*)
+        one (const T& x, flags, container*)
             : x_ (x), present_ (true)
         {
         }
@@ -208,20 +208,20 @@ namespace xsd
         }
 
       public:
-        const X&
+        const T&
         get () const
         {
           return x_;
         }
 
-        X&
+        T&
         get ()
         {
           return x_;
         }
 
         void
-        set (const X& x)
+        set (const T& x)
         {
           x_ = x;
           present_ = true;
@@ -234,18 +234,18 @@ namespace xsd
         }
 
       protected:
-        X x_;
+        T x_;
         bool present_;
       };
 
 
       // Note that I cannot get rid of fund because of HP aCC3.
       //
-      template <typename X, bool fund = fundamental_p<X>::r>
+      template <typename T, bool fund = fundamental_p<T>::r>
       class optional;
 
-      template <typename X>
-      class optional<X, false>
+      template <typename T>
+      class optional<T, false>
       {
       public:
         ~optional ();
@@ -254,15 +254,15 @@ namespace xsd
         optional (flags = 0, container* = 0);
 
         explicit
-        optional (const X&, flags = 0, container* = 0);
+        optional (const T&, flags = 0, container* = 0);
 
         explicit
-        optional (std::auto_ptr<X>, flags = 0, container* = 0);
+        optional (std::auto_ptr<T>, flags = 0, container* = 0);
 
         optional (const optional&, flags = 0, container* = 0);
 
         optional&
-        operator= (const X&);
+        operator= (const T&);
 
         optional&
         operator= (const optional&);
@@ -270,25 +270,25 @@ namespace xsd
         // Pointer-like interface.
         //
       public:
-        const X*
+        const T*
         operator-> () const
         {
           return x_;
         }
 
-        X*
+        T*
         operator-> ()
         {
           return x_;
         }
 
-        const X&
+        const T&
         operator* () const
         {
           return *x_;
         }
 
-        X&
+        T&
         operator* ()
         {
           return *x_;
@@ -311,23 +311,23 @@ namespace xsd
           return x_ != 0;
         }
 
-        const X&
+        const T&
         get () const
         {
           return *x_;
         }
 
-        X&
+        T&
         get ()
         {
           return *x_;
         }
 
         void
-        set (const X&);
+        set (const T&);
 
         void
-        set (std::auto_ptr<X>);
+        set (std::auto_ptr<T>);
 
         void
         reset ();
@@ -337,7 +337,7 @@ namespace xsd
         true_ ();
 
       private:
-        X* x_;
+        T* x_;
         flags flags_;
         container* container_;
       };
@@ -345,8 +345,8 @@ namespace xsd
 
       //
       //
-      template <typename X>
-      class optional<X, true>
+      template <typename T>
+      class optional<T, true>
       {
       public:
         explicit
@@ -356,12 +356,12 @@ namespace xsd
         }
 
         explicit
-        optional (const X&, flags = 0, container* = 0);
+        optional (const T&, flags = 0, container* = 0);
 
         optional (const optional&, flags = 0, container* = 0);
 
         optional&
-        operator= (const X&);
+        operator= (const T&);
 
         optional&
         operator= (const optional&);
@@ -369,25 +369,25 @@ namespace xsd
         // Pointer-like interface.
         //
       public:
-        const X*
+        const T*
         operator-> () const
         {
           return &x_;
         }
 
-        X*
+        T*
         operator-> ()
         {
           return &x_;
         }
 
-        const X&
+        const T&
         operator* () const
         {
           return get ();
         }
 
-        X&
+        T&
         operator* ()
         {
           return get ();
@@ -410,20 +410,20 @@ namespace xsd
           return present_;
         }
 
-        const X&
+        const T&
         get () const
         {
           return x_;
         }
 
-        X&
+        T&
         get ()
         {
           return x_;
         }
 
         void
-        set (const X& y)
+        set (const T& y)
         {
           x_ = y;
           present_ = true;
@@ -441,50 +441,50 @@ namespace xsd
 
       private:
         bool present_;
-        X x_;
+        T x_;
       };
 
       // Comparison operators.
       //
 
-      template <typename X, bool fund>
+      template <typename T, bool fund>
       inline bool
-      operator== (const optional<X, fund>& a, const optional<X, fund>& b)
+      operator== (const optional<T, fund>& a, const optional<T, fund>& b)
       {
         return !a || !b ? a.present () == b.present () : *a == *b;
       }
 
-      template <typename X, bool fund>
+      template <typename T, bool fund>
       inline bool
-      operator!= (const optional<X, fund>& a, const optional<X, fund>& b)
+      operator!= (const optional<T, fund>& a, const optional<T, fund>& b)
       {
         return !(a == b);
       }
 
-      template <typename X, bool fund>
+      template <typename T, bool fund>
       inline bool
-      operator< (const optional<X, fund>& a, const optional<X, fund>& b)
+      operator< (const optional<T, fund>& a, const optional<T, fund>& b)
       {
         return a && (!b || *a < *b);
       }
 
-      template <typename X, bool fund>
+      template <typename T, bool fund>
       inline bool
-      operator> (const optional<X, fund>& a, const optional<X, fund>& b)
+      operator> (const optional<T, fund>& a, const optional<T, fund>& b)
       {
         return b < a;
       }
 
-      template <typename X, bool fund>
+      template <typename T, bool fund>
       inline bool
-      operator<= (const optional<X, fund>& a, const optional<X, fund>& b)
+      operator<= (const optional<T, fund>& a, const optional<T, fund>& b)
       {
         return !(a > b);
       }
 
-      template <typename X, bool fund>
+      template <typename T, bool fund>
       inline bool
-      operator>= (const optional<X, fund>& a, const optional<X, fund>& b)
+      operator>= (const optional<T, fund>& a, const optional<T, fund>& b)
       {
         return !(a < b);
       }
@@ -492,9 +492,9 @@ namespace xsd
       // Provide an ostream insertion opretaor to prevent confusion from
       // the implicit bool conversion.
       //
-      template <typename C, typename X, bool fund>
+      template <typename C, typename T, bool fund>
       std::basic_ostream<C>&
-      operator<< (std::basic_ostream<C>&, const optional<X, fund>&);
+      operator<< (std::basic_ostream<C>&, const optional<T, fund>&);
 
 
       // Sequence.
@@ -503,7 +503,7 @@ namespace xsd
       // Note that I cannot get rid of 'fund' because HP aCC3 likes it
       // this way.
       //
-      template <typename X, bool fund = fundamental_p<X>::r>
+      template <typename T, bool fund = fundamental_p<T>::r>
       class sequence;
 
 
@@ -542,25 +542,25 @@ namespace xsd
         typedef typename I::difference_type difference_type;
       };
 
-      template <typename X>
-      struct iterator_traits<X*>
+      template <typename T>
+      struct iterator_traits<T*>
       {
         typedef std::random_access_iterator_tag iterator_category;
-        typedef X value_type;
+        typedef T value_type;
         typedef std::ptrdiff_t difference_type;
       };
 #endif
 
       // Iterator adapter for complex types. It expects I to point to
       // a smart pointer-like object that has operator*() that returns
-      // a refernce to a type static_cast'able to X and get() that
-      // returns a pointer to a type static_cast'able to X.
+      // a refernce to a type static_cast'able to T and get() that
+      // returns a pointer to a type static_cast'able to T.
       //
 
-      template <typename I, typename X>
+      template <typename I, typename T>
       struct iterator_adapter
       {
-        typedef X value_type;
+        typedef T value_type;
         typedef value_type& reference;
         typedef value_type* pointer;
 
@@ -581,8 +581,8 @@ namespace xsd
 
         // Allow iterator to const_iterator conversion.
         //
-        template <typename J, typename Y>
-        iterator_adapter (const iterator_adapter<J, Y>& j)
+        template <typename J, typename T2>
+        iterator_adapter (const iterator_adapter<J, T2>& j)
             : i_ (j.base ())
         {
         }
@@ -691,70 +691,70 @@ namespace xsd
 
       // Forward iterator requirements.
       //
-      template <typename I, typename J, typename X, typename Y>
+      template <typename I, typename J, typename T1, typename T2>
       inline bool
-      operator== (const iterator_adapter<I, X>& i,
-                  const iterator_adapter<J, Y>& j)
+      operator== (const iterator_adapter<I, T1>& i,
+                  const iterator_adapter<J, T2>& j)
       {
         return i.base () == j.base ();
       }
 
-      template <typename I, typename J, typename X, typename Y>
+      template <typename I, typename J, typename T1, typename T2>
       inline bool
-      operator!= (const iterator_adapter<I, X>& i,
-                  const iterator_adapter<J, Y>& j)
+      operator!= (const iterator_adapter<I, T1>& i,
+                  const iterator_adapter<J, T2>& j)
       {
         return i.base () != j.base ();
       }
 
       // Random access iterator requirements
       //
-      template <typename I, typename J, typename X, typename Y>
+      template <typename I, typename J, typename T1, typename T2>
       inline bool
-      operator< (const iterator_adapter<I, X>& i,
-                 const iterator_adapter<J, Y>& j)
+      operator< (const iterator_adapter<I, T1>& i,
+                 const iterator_adapter<J, T2>& j)
       {
         return i.base() < j.base();
       }
 
-      template <typename I, typename J, typename X, typename Y>
+      template <typename I, typename J, typename T1, typename T2>
       inline bool
-      operator> (const iterator_adapter<I, X>& i,
-                 const iterator_adapter<J, Y>& j)
+      operator> (const iterator_adapter<I, T1>& i,
+                 const iterator_adapter<J, T2>& j)
       {
         return i.base() > j.base();
       }
 
-      template <typename I, typename J, typename X, typename Y>
+      template <typename I, typename J, typename T1, typename T2>
       inline bool
-      operator<= (const iterator_adapter<I, X>& i,
-                  const iterator_adapter<J, Y>& j)
+      operator<= (const iterator_adapter<I, T1>& i,
+                  const iterator_adapter<J, T2>& j)
       {
         return i.base() <= j.base();
       }
 
-      template <typename I, typename J, typename X, typename Y>
+      template <typename I, typename J, typename T1, typename T2>
       inline bool
-      operator>= (const iterator_adapter<I, X>& i,
-                  const iterator_adapter<J, Y>& j)
+      operator>= (const iterator_adapter<I, T1>& i,
+                  const iterator_adapter<J, T2>& j)
       {
         return i.base() >= j.base();
       }
 
-      template <typename I, typename J, typename X, typename Y>
-      inline typename iterator_adapter<I, X>::difference_type
-      operator- (const iterator_adapter<I, X>& i,
-                 const iterator_adapter<J, Y>& j)
+      template <typename I, typename J, typename T1, typename T2>
+      inline typename iterator_adapter<I, T1>::difference_type
+      operator- (const iterator_adapter<I, T1>& i,
+                 const iterator_adapter<J, T2>& j)
       {
         return i.base () - j.base ();
       }
 
-      template <typename I, typename X>
-      inline iterator_adapter<I, X>
-      operator+ (typename iterator_adapter<I, X>::difference_type n,
-                 const iterator_adapter<I, X>& i)
+      template <typename I, typename T>
+      inline iterator_adapter<I, T>
+      operator+ (typename iterator_adapter<I, T>::difference_type n,
+                 const iterator_adapter<I, T>& i)
       {
-        return iterator_adapter<I, X> (i.base() + n);
+        return iterator_adapter<I, T> (i.base() + n);
       }
 
       //
@@ -1007,8 +1007,8 @@ namespace xsd
 
       //
       //
-      template <typename X>
-      class sequence<X, false>: public sequence_common
+      template <typename T>
+      class sequence<T, false>: public sequence_common
       {
       protected:
         // For IBM XL C++ 8.0.
@@ -1016,26 +1016,26 @@ namespace xsd
         typedef sequence_common::ptr ptr;
 
       public:
-        typedef X        value_type;
-        typedef X*       pointer;
-        typedef const X* const_pointer;
-        typedef X&       reference;
-        typedef const X& const_reference;
+        typedef T        value_type;
+        typedef T*       pointer;
+        typedef const T* const_pointer;
+        typedef T&       reference;
+        typedef const T& const_reference;
 
         typedef
-        iterator_adapter<base_sequence::iterator, X>
+        iterator_adapter<base_sequence::iterator, T>
         iterator;
 
         typedef
-        iterator_adapter<base_sequence::const_iterator, const X>
+        iterator_adapter<base_sequence::const_iterator, const T>
         const_iterator;
 
         typedef
-        iterator_adapter<base_sequence::reverse_iterator, X>
+        iterator_adapter<base_sequence::reverse_iterator, T>
         reverse_iterator;
 
         typedef
-        iterator_adapter<base_sequence::const_reverse_iterator, const X>
+        iterator_adapter<base_sequence::const_reverse_iterator, const T>
         const_reverse_iterator;
 
         typedef sequence_common::size_type       size_type;
@@ -1056,18 +1056,18 @@ namespace xsd
         //
 #ifdef _MSC_VER
         explicit
-        sequence (size_type n, const X& x = X ())
+        sequence (size_type n, const T& x = T ())
             : sequence_common (n, x)
         {
         }
 #else
         explicit
         sequence (size_type n)
-            : sequence_common (n, X ())
+            : sequence_common (n, T ())
         {
         }
 
-        sequence (size_type n, const X& x)
+        sequence (size_type n, const T& x)
             : sequence_common (n, x)
         {
         }
@@ -1086,7 +1086,7 @@ namespace xsd
 
       public:
         void
-        assign (size_type n, const X& x)
+        assign (size_type n, const T& x)
         {
           sequence_common::assign (n, x);
         }
@@ -1106,7 +1106,7 @@ namespace xsd
         //
 #ifdef _MSC_VER
         void
-        resize (size_type n, const X& x = X ())
+        resize (size_type n, const T& x = T ())
         {
           sequence_common::resize (n, x);
         }
@@ -1114,11 +1114,11 @@ namespace xsd
         void
         resize (size_type n)
         {
-          sequence_common::resize (n, X ());
+          sequence_common::resize (n, T ());
         }
 
         void
-        resize (size_type n, const X& x)
+        resize (size_type n, const T& x)
         {
           sequence_common::resize (n, x);
         }
@@ -1177,63 +1177,63 @@ namespace xsd
         }
 
       public:
-        X&
+        T&
         operator[] (size_type n)
         {
-          return static_cast<X&> (*(v_[n]));
+          return static_cast<T&> (*(v_[n]));
         }
 
-        const X&
+        const T&
         operator[] (size_type n) const
         {
-          return static_cast<const X&> (*(v_[n]));
+          return static_cast<const T&> (*(v_[n]));
         }
 
-        X&
+        T&
         at (size_type n)
         {
-          return static_cast<X&> (*(v_.at (n)));
+          return static_cast<T&> (*(v_.at (n)));
         }
 
-        const X&
+        const T&
         at (size_type n) const
         {
-          return static_cast<const X&> (*(v_.at (n)));
+          return static_cast<const T&> (*(v_.at (n)));
         }
 
-        X&
+        T&
         front ()
         {
-          return static_cast<X&> (*(v_.front ()));
+          return static_cast<T&> (*(v_.front ()));
         }
 
-        const X&
+        const T&
         front () const
         {
-          return static_cast<const X&> (*(v_.front ()));
+          return static_cast<const T&> (*(v_.front ()));
         }
 
-        X&
+        T&
         back ()
         {
-          return static_cast<X&> (*(v_.back ()));
+          return static_cast<T&> (*(v_.back ()));
         }
 
-        const X&
+        const T&
         back () const
         {
-          return static_cast<const X&> (*(v_.back ()));
+          return static_cast<const T&> (*(v_.back ()));
         }
 
       public:
         void
-        push_back (const X& x)
+        push_back (const T& x)
         {
           v_.push_back (ptr (x._clone (flags_, container_)));
         }
 
         void
-        push_back (std::auto_ptr<X> x)
+        push_back (std::auto_ptr<T> x)
         {
           if (x->_container () != container_)
             x->_container (container_);
@@ -1248,7 +1248,7 @@ namespace xsd
         }
 
         iterator
-        insert (iterator position, const X& x)
+        insert (iterator position, const T& x)
         {
           return iterator (
             v_.insert (
@@ -1256,7 +1256,7 @@ namespace xsd
         }
 
         iterator
-        insert (iterator position, std::auto_ptr<X> x)
+        insert (iterator position, std::auto_ptr<T> x)
         {
           if (x->_container () != container_)
             x->_container (container_);
@@ -1265,7 +1265,7 @@ namespace xsd
         }
 
         void
-        insert (iterator position, size_type n, const X& x)
+        insert (iterator position, size_type n, const T& x)
         {
           sequence_common::insert (position.base (), n, x);
         }
@@ -1303,10 +1303,10 @@ namespace xsd
 
       // Specialization for fundamental types.
       //
-      template <typename X>
-      class sequence<X, true>: public std::vector<X>
+      template <typename T>
+      class sequence<T, true>: public std::vector<T>
       {
-        typedef std::vector<X> base_sequence;
+        typedef std::vector<T> base_sequence;
 
       public:
         explicit
@@ -1315,7 +1315,7 @@ namespace xsd
         }
 
         explicit
-        sequence (typename base_sequence::size_type n, const X& x = X ())
+        sequence (typename base_sequence::size_type n, const T& x = T ())
             : base_sequence (n, x)
         {
         }
@@ -1336,46 +1336,46 @@ namespace xsd
       // Comparison operators.
       //
 
-      template <typename X, bool fund>
+      template <typename T, bool fund>
       inline bool
-      operator== (const sequence<X, fund>& a, const sequence<X, fund>& b)
+      operator== (const sequence<T, fund>& a, const sequence<T, fund>& b)
       {
         return (a.size () == b.size ()
                 && std::equal (a.begin (), a.end (), b.begin ()));
       }
 
-      template <typename X, bool fund>
+      template <typename T, bool fund>
       inline bool
-      operator!= (const sequence<X, fund>& a, const sequence<X, fund>& b)
+      operator!= (const sequence<T, fund>& a, const sequence<T, fund>& b)
       {
         return !(a == b);
       }
 
-      template <typename X, bool fund>
+      template <typename T, bool fund>
       inline bool
-      operator< (const sequence<X, fund>& a, const sequence<X, fund>& b)
+      operator< (const sequence<T, fund>& a, const sequence<T, fund>& b)
       {
         return std::lexicographical_compare (a.begin (), a.end (),
                                              b.begin (), b.end ());
       }
 
-      template <typename X, bool fund>
+      template <typename T, bool fund>
       inline bool
-      operator> (const sequence<X, fund>& a, const sequence<X, fund>& b)
+      operator> (const sequence<T, fund>& a, const sequence<T, fund>& b)
       {
         return b < a;
       }
 
-      template <typename X, bool fund>
+      template <typename T, bool fund>
       inline bool
-      operator<= (const sequence<X, fund>& a, const sequence<X, fund>& b)
+      operator<= (const sequence<T, fund>& a, const sequence<T, fund>& b)
       {
         return !(a > b);
       }
 
-      template <typename X, bool fund>
+      template <typename T, bool fund>
       inline bool
-      operator>= (const sequence<X, fund>& a, const sequence<X, fund>& b)
+      operator>= (const sequence<T, fund>& a, const sequence<T, fund>& b)
       {
         return !(a < b);
       }
@@ -1383,9 +1383,9 @@ namespace xsd
       // Note that the container object of the two sequences being
       // swapped should be the same.
       //
-      template <typename X, bool fund>
+      template <typename T, bool fund>
       inline void
-      swap (sequence<X, fund>& x, sequence<X, fund>& y)
+      swap (sequence<T, fund>& x, sequence<T, fund>& y)
       {
         x.swap (y);
       }
@@ -1396,4 +1396,3 @@ namespace xsd
 #include <xsd/cxx/tree/containers.txx>
 
 #endif  // XSD_CXX_TREE_CONTAINERS_HXX
-

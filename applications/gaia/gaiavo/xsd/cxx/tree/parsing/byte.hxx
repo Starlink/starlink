@@ -20,7 +20,7 @@ namespace xsd
     namespace tree
     {
       template <typename C>
-      struct traits<signed char, C>
+      struct traits<signed char, C, schema_type::other>
       {
         typedef signed char type;
 
@@ -38,21 +38,21 @@ namespace xsd
       };
 
       template <typename C>
-      signed char traits<signed char, C>::
+      signed char traits<signed char, C, schema_type::other>::
       create (const xercesc::DOMElement& e, flags f, container* c)
       {
         return create (text_content<C> (e), 0, f, c);
       }
 
       template <typename C>
-      signed char traits<signed char, C>::
+      signed char traits<signed char, C, schema_type::other>::
       create (const xercesc::DOMAttr& a, flags f, container* c)
       {
         return create (xml::transcode<C> (a.getValue ()), 0, f, c);
       }
 
       template <typename C>
-      signed char traits<signed char, C>::
+      signed char traits<signed char, C, schema_type::other>::
       create (const std::basic_string<C>& s,
               const xercesc::DOMElement*,
               flags,

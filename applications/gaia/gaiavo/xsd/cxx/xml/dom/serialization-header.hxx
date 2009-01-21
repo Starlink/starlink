@@ -19,19 +19,20 @@ namespace xsd
     {
       namespace dom
       {
+        // Find an existing prefix or establish a new one. Try to use
+        // hint if provided and available.
         //
-        //
-        class no_prefix {};
-
         template <typename C>
         std::basic_string<C>
-        prefix (const C* ns, const xercesc::DOMElement&);
+        prefix (const C* ns, xercesc::DOMElement&, const C* hint = 0);
 
         template <typename C>
         inline std::basic_string<C>
-        prefix (const std::basic_string<C>& ns, const xercesc::DOMElement& e)
+        prefix (const std::basic_string<C>& ns,
+                xercesc::DOMElement& e,
+                const C* hint = 0)
         {
-          return prefix (ns.c_str (), e);
+          return prefix (ns.c_str (), e, hint);
         }
 
         //

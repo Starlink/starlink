@@ -194,18 +194,6 @@ namespace xsd
       }
 
 
-      // no_namespace_mapping
-      //
-      template<>
-      inline
-      void no_namespace_mapping<char>::
-      print (std::basic_ostream<char>& os) const
-      {
-        os << "no mapping provided for namespace '"
-           << namespace_ () << "'";
-      }
-
-
       // no_prefix_mapping
       //
       template<>
@@ -215,19 +203,6 @@ namespace xsd
       {
         os << "no mapping provided for namespace prefix '"
            << prefix () << "'";
-      }
-
-
-      // xsi_already_in_use
-      //
-      template<>
-      inline
-      void xsi_already_in_use<char>::
-      print (std::basic_ostream<char>& os) const
-      {
-        os << "namespace prefix 'xsi' is already in use and no "
-           << "user-defined mapping has been provided for namespace "
-           << "'http://www.w3.org/2001/XMLSchema-instance'";
       }
 
 
@@ -439,18 +414,6 @@ namespace xsd
       }
 
 
-      // no_namespace_mapping
-      //
-      template<>
-      inline
-      void no_namespace_mapping<wchar_t>::
-      print (std::basic_ostream<wchar_t>& os) const
-      {
-        os << L"no mapping provided for namespace '"
-           << namespace_ () << L"'";
-      }
-
-
       // no_prefix_mapping
       //
       template<>
@@ -460,19 +423,6 @@ namespace xsd
       {
         os << L"no mapping provided for namespace prefix '"
            << prefix () << L"'";
-      }
-
-
-      // xsi_already_in_use
-      //
-      template<>
-      inline
-      void xsi_already_in_use<wchar_t>::
-      print (std::basic_ostream<wchar_t>& os) const
-      {
-        os << L"namespace prefix 'xsi' is already in use and no "
-           << L"user-defined mapping has been provided for namespace "
-           << L"'http://www.w3.org/2001/XMLSchema-instance'";
       }
 
 

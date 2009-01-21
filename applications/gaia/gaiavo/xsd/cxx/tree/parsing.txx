@@ -96,30 +96,33 @@ namespace xsd
 
       // fundamental_base
       //
-      template <typename X, typename C, typename B>
-      fundamental_base<X, C, B>::
+      template <typename T, typename C, typename B, schema_type::value ST>
+      fundamental_base<T, C, B, ST>::
       fundamental_base (const xercesc::DOMElement& e, flags f, container* c)
           : B (e, f, c),
-            x_ (traits<X, C>::create (e, f, c))
+            facet_table_ (0),
+            x_ (traits<T, C, ST>::create (e, f, c))
       {
       }
 
-      template <typename X, typename C, typename B>
-      fundamental_base<X, C, B>::
+      template <typename T, typename C, typename B, schema_type::value ST>
+      fundamental_base<T, C, B, ST>::
       fundamental_base (const xercesc::DOMAttr& a, flags f, container* c)
           : B (a, f, c),
-            x_ (traits<X, C>::create (a, f, c))
+            facet_table_ (0),
+            x_ (traits<T, C, ST>::create (a, f, c))
       {
       }
 
-      template <typename X, typename C, typename B>
-      fundamental_base<X, C, B>::
+      template <typename T, typename C, typename B, schema_type::value ST>
+      fundamental_base<T, C, B, ST>::
       fundamental_base (const std::basic_string<C>& s,
                         const xercesc::DOMElement* e,
                         flags f,
                         container* c)
           : B (s, e, f, c),
-            x_ (traits<X, C>::create (s, e, f, c))
+            facet_table_ (0),
+            x_ (traits<T, C, ST>::create (s, e, f, c))
       {
       }
 
@@ -170,42 +173,42 @@ namespace xsd
       // I clear keep_dom from flags.
       //
 
-      template <typename X, typename C>
-      list<X, C, false>::
+      template <typename T, typename C, schema_type::value ST>
+      list<T, C, ST, false>::
       list (const xercesc::DOMElement& e, flags f, container* c)
-          : sequence<X> (flags (f & ~flags::keep_dom), c) // ambiguous
+          : sequence<T> (flags (f & ~flags::keep_dom), c) // ambiguous
       {
         init (text_content<C> (e), &e);
       }
 
-      template <typename X, typename C>
-      list<X, C, false>::
+      template <typename T, typename C, schema_type::value ST>
+      list<T, C, ST, false>::
       list (const xercesc::DOMAttr& a, flags f, container* c)
-          : sequence<X> (flags (f & ~flags::keep_dom), c) // ambiguous
+          : sequence<T> (flags (f & ~flags::keep_dom), c) // ambiguous
       {
         init (xml::transcode<C> (a.getValue ()), a.getOwnerElement ());
       }
 
-      template <typename X, typename C>
-      list<X, C, false>::
+      template <typename T, typename C, schema_type::value ST>
+      list<T, C, ST, false>::
       list (const std::basic_string<C>& s,
             const xercesc::DOMElement* e,
             flags f,
             container* c)
-          : sequence<X> (flags (f & ~flags::keep_dom), c) // ambiguous
+          : sequence<T> (flags (f & ~flags::keep_dom), c) // ambiguous
       {
         init (s, e);
       }
 
-      template <typename X, typename C>
-      void list<X, C, false>::
+      template <typename T, typename C, schema_type::value ST>
+      void list<T, C, ST, false>::
       init (const std::basic_string<C>& s, const xercesc::DOMElement* parent)
       {
         if (s.size () == 0)
           return;
 
         using std::basic_string;
-        typedef typename sequence<X>::ptr ptr;
+        typedef typename sequence<T>::ptr ptr;
         typedef typename basic_string<C>::size_type size_type;
 
         const C* data (s.c_str ());
@@ -221,7 +224,7 @@ namespace xsd
           if (j != basic_string<C>::npos)
           {
             ptr r (
-              new X (basic_string<C> (data + i, j - i),
+              new T (basic_string<C> (data + i, j - i),
                      parent,
                      this->flags_,
                      this->container_));
@@ -235,7 +238,7 @@ namespace xsd
             // Last element.
             //
             ptr r (
-              new X (basic_string<C> (data + i, size - i),
+              new T (basic_string<C> (data + i, size - i),
                      parent,
                      this->flags_,
                      this->container_));
@@ -247,35 +250,35 @@ namespace xsd
         }
       }
 
-      template <typename X, typename C>
-      list<X, C, true>::
+      template <typename T, typename C, schema_type::value ST>
+      list<T, C, ST, true>::
       list (const xercesc::DOMElement& e, flags f, container* c)
-          : sequence<X> (flags (f & ~flags::keep_dom), c) // ambiguous
+          : sequence<T> (flags (f & ~flags::keep_dom), c) // ambiguous
       {
         init (text_content<C> (e), &e);
       }
 
-      template <typename X, typename C>
-      inline list<X, C, true>::
+      template <typename T, typename C, schema_type::value ST>
+      inline list<T, C, ST, true>::
       list (const xercesc::DOMAttr& a, flags f, container* c)
-          : sequence<X> (flags (f & ~flags::keep_dom), c) // ambiguous
+          : sequence<T> (flags (f & ~flags::keep_dom), c) // ambiguous
       {
         init (xml::transcode<C> (a.getValue ()), a.getOwnerElement ());
       }
 
-      template <typename X, typename C>
-      inline list<X, C, true>::
+      template <typename T, typename C, schema_type::value ST>
+      inline list<T, C, ST, true>::
       list (const std::basic_string<C>& s,
             const xercesc::DOMElement* parent,
             flags f,
             container* c)
-          : sequence<X> (flags (f & ~flags::keep_dom), c) // ambiguous
+          : sequence<T> (flags (f & ~flags::keep_dom), c) // ambiguous
       {
         init (s, parent);
       }
 
-      template <typename X, typename C>
-      inline void list<X, C, true>::
+      template <typename T, typename C, schema_type::value ST>
+      inline void list<T, C, ST, true>::
       init (const std::basic_string<C>& s, const xercesc::DOMElement* parent)
       {
         if (s.size () == 0)
@@ -297,7 +300,7 @@ namespace xsd
           if (j != basic_string<C>::npos)
           {
             push_back (
-              traits<X, C>::create (
+              traits<T, C, ST>::create (
                 basic_string<C> (data + i, j - i), parent, 0, 0));
 
             i = bits::find_ns (data, size, j);
@@ -307,7 +310,7 @@ namespace xsd
             // Last element.
             //
             push_back (
-              traits<X, C>::create (
+              traits<T, C, ST>::create (
                 basic_string<C> (data + i, size - i), parent, 0, 0));
 
             break;
@@ -635,22 +638,22 @@ namespace xsd
 
       // idref
       //
-      template <typename X, typename C, typename B>
-      idref<X, C, B>::
+      template <typename T, typename C, typename B>
+      idref<T, C, B>::
       idref (const xercesc::DOMElement& e, flags f, container* c)
           : base_type (e, f, c), identity_ (*this)
       {
       }
 
-      template <typename X, typename C, typename B>
-      idref<X, C, B>::
+      template <typename T, typename C, typename B>
+      idref<T, C, B>::
       idref (const xercesc::DOMAttr& a, flags f, container* c)
           : base_type (a, f , c), identity_ (*this)
       {
       }
 
-      template <typename X, typename C, typename B>
-      idref<X, C, B>::
+      template <typename T, typename C, typename B>
+      idref<T, C, B>::
       idref (const std::basic_string<C>& s,
              const xercesc::DOMElement* e,
              flags f,
@@ -775,6 +778,8 @@ namespace xsd
 
           if (xns != 0)
             return xml::transcode<C> (xns);
+          else if (p.empty ())
+            return std::basic_string<C> ();
         }
 
         throw no_prefix_mapping<C> (p);
@@ -908,4 +913,3 @@ namespace xsd
     }
   }
 }
-

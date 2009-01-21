@@ -381,8 +381,9 @@ namespace xsd
 
         template <typename C>
         void list_base<C>::
-        _pre ()
+        _pre_impl ()
         {
+          simple_content<C>::_pre_impl ();
           buf_.clear ();
         }
 
@@ -445,7 +446,7 @@ namespace xsd
 
         template <typename C>
         void list_base<C>::
-        _post ()
+        _post_impl ()
         {
           // Handle the last item.
           //
@@ -454,6 +455,8 @@ namespace xsd
             ro_string<C> tmp (buf_); // Private copy ctor.
             _xsd_parse_item (tmp);
           }
+
+          simple_content<C>::_post_impl ();
         }
       }
     }

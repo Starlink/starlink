@@ -11,6 +11,7 @@
 #include <xercesc/sax2/Attributes.hpp>
 #include <xercesc/sax2/XMLReaderFactory.hpp>
 #include <xercesc/validators/schema/SchemaSymbols.hpp>
+#include <xercesc/util/XMLUni.hpp>
 
 #include <xsd/cxx/xml/string.hxx>
 #include <xsd/cxx/xml/sax/std-input-source.hxx>
@@ -526,8 +527,14 @@ namespace xsd
               xml::string (e.message ()).c_str (),
               id.c_str (),
               id.c_str (),
+#if _XERCES_VERSION >= 30000
+              static_cast<XMLFileLoc> (e.line ()),
+              static_cast<XMLFileLoc> (e.column ())
+#else
               static_cast<XMLSSize_t> (e.line ()),
-              static_cast<XMLSSize_t> (e.column ()));
+              static_cast<XMLSSize_t> (e.column ())
+#endif
+            );
 
             eh.fatalError (se);
           }
@@ -558,8 +565,14 @@ namespace xsd
               xml::string (e.message ()).c_str (),
               id.c_str (),
               id.c_str (),
+#if _XERCES_VERSION >= 30000
+              static_cast<XMLFileLoc> (e.line ()),
+              static_cast<XMLFileLoc> (e.column ())
+#else
               static_cast<XMLSSize_t> (e.line ()),
-              static_cast<XMLSSize_t> (e.column ()));
+              static_cast<XMLSSize_t> (e.column ())
+#endif
+            );
 
             eh.fatalError (se);
           }
@@ -653,32 +666,54 @@ namespace xsd
           typedef std::basic_string<C> string;
 
           {
-            string ns (xml::transcode<C> (uri));
-            string name (xml::transcode<C> (lname));
+            last_valid_ = true;
+            last_ns_ = xml::transcode<C> (uri);
+            last_name_ = xml::transcode<C> (lname);
 
             // Without this explicit construction IBM XL C++ complains
             // about ro_string's copy ctor being private even though the
             // temporary has been eliminated. Note that we cannot
-            // eliminate ns and name since ro_string does not make a copy.
+            // eliminate ns, name and value since ro_string does not make
+            // a copy.
             //
-            ro_string<C> ro_ns (ns);
-            ro_string<C> ro_name (name);
+            ro_string<C> ro_ns (last_ns_);
+            ro_string<C> ro_name (last_name_);
 
-            try
+            if (!polymorphic_)
             {
-              if (!polymorphic_)
+              try
+              {
                 consumer_.start_element (ro_ns, ro_name, 0);
+              }
+              catch (schema_exception<C>& e)
+              {
+                set_location (e);
+                throw;
+              }
+            }
+            else
+            {
+              // Search for the xsi:type attribute.
+              //
+              int i (attributes.getIndex (
+                       xercesc::SchemaSymbols::fgURI_XSI,
+                       xercesc::SchemaSymbols::fgXSI_TYPE));
+
+              if (i == -1)
+              {
+                try
+                {
+                  consumer_.start_element (ro_ns, ro_name, 0);
+                }
+                catch (schema_exception<C>& e)
+                {
+                  set_location (e);
+                  throw;
+                }
+              }
               else
               {
-                // Search for the xsi:type attribute.
-                //
-                int i (attributes.getIndex (
-                         xercesc::SchemaSymbols::fgURI_XSI,
-                         xercesc::SchemaSymbols::fgXSI_TYPE));
-
-                if (i == -1)
-                  consumer_.start_element (ro_ns, ro_name, 0);
-                else
+                try
                 {
                   // @@ Probably need proper QName validation.
                   //
@@ -686,30 +721,34 @@ namespace xsd
                   //
                   string qn (xml::transcode<C> (attributes.getValue (i)));
 
-                  string tp, tn, tns;
+                  ro_string<C> tp, tn;
                   typename string::size_type pos (qn.find (C (':')));
 
                   if (pos != string::npos)
                   {
-                    tp.assign (qn, 0, pos);
-                    tn.assign (qn, pos + 1, string::npos);
+                    tp.assign (qn.c_str (), pos);
+                    tn.assign (qn.c_str () + pos + 1);
 
                     if (tp.empty ())
                       throw dynamic_type<C> (qn);
                   }
                   else
-                    tn = qn;
+                    tn.assign (qn);
+
+                  if (tn.empty ())
+                    throw dynamic_type<C> (qn);
 
                   // Search our namespace declaration stack. Sun CC 5.7
                   // blows if we use const_reverse_iterator.
                   //
+                  ro_string<C> tns;
                   for (typename ns_decls::reverse_iterator
                          it (ns_decls_.rbegin ()), e (ns_decls_.rend ());
                        it != e; ++it)
                   {
                     if (it->prefix == tp)
                     {
-                      tns = it->ns;
+                      tns.assign (it->ns);
                       break;
                     }
                   }
@@ -719,35 +758,38 @@ namespace xsd
                     // The 'xml' prefix requires special handling.
                     //
                     if (tp == xml::bits::xml_prefix<C> ())
-                      tns = xml::bits::xml_namespace<C> ();
+                      tns.assign (xml::bits::xml_namespace<C> ());
                     else
                       throw dynamic_type<C> (qn);
                   }
 
-                  // Construct the compound name.
+                  // Construct the compound type id.
                   //
+                  string id (tn.data (), tn.size ());
+
                   if (!tns.empty ())
                   {
-                    tn += C (' ');
-                    tn += tns;
+                    id += C (' ');
+                    id.append (tns.data (), tns.size ());
                   }
 
-                  ro_string<C> ro_tn (tn);
-
-                  consumer_.start_element (ro_ns, ro_name, &ro_tn);
+                  ro_string<C> ro_id (id);
+                  consumer_.start_element (ro_ns, ro_name, &ro_id);
+                }
+                catch (schema_exception<C>& e)
+                {
+                  set_location (e);
+                  throw;
                 }
               }
             }
-            catch (schema_exception<C>& e)
-            {
-              set_location (e);
-              throw;
-            }
           }
 
-          // Xerces SAX uses unsigned int for indexing.
-          //
-          for (unsigned int i (0); i < attributes.getLength(); ++i)
+#if _XERCES_VERSION >= 30000
+          for (XMLSize_t i (0), end (attributes.getLength()); i < end; ++i)
+#else
+          for (unsigned int i (0), end (attributes.getLength()); i < end; ++i)
+#endif
           {
             string ns (xml::transcode<C> (attributes.getURI (i)));
             string name (xml::transcode<C> (attributes.getLocalName (i)));
@@ -783,20 +825,32 @@ namespace xsd
         {
           typedef std::basic_string<C> string;
 
-          string ns (xml::transcode<C> (uri));
-          string name (xml::transcode<C> (lname));
-
-          // Without this explicit construction IBM XL C++ complains
-          // about ro_string's copy ctor being private even though the
-          // temporary has been eliminated. Note that we cannot
-          // eliminate ns and name since ro_string does not make a copy.
-          //
-          ro_string<C> ro_ns (ns);
-          ro_string<C> ro_name (name);
-
           try
           {
-            consumer_.end_element (ro_ns, ro_name);
+            // Without this explicit construction IBM XL C++ complains
+            // about ro_string's copy ctor being private even though the
+            // temporary has been eliminated. Note that we cannot
+            // eliminate ns, name and value since ro_string does not make
+            // a copy.
+            //
+            if (last_valid_)
+            {
+              last_valid_ = false;
+              ro_string<C> ro_ns (last_ns_);
+              ro_string<C> ro_name (last_name_);
+
+              consumer_.end_element (ro_ns, ro_name);
+            }
+            else
+            {
+              string ns (xml::transcode<C> (uri));
+              string name (xml::transcode<C> (lname));
+
+              ro_string<C> ro_ns (ns);
+              ro_string<C> ro_name (name);
+
+              consumer_.end_element (ro_ns, ro_name);
+            }
           }
           catch (schema_exception<C>& e)
           {
@@ -888,11 +942,16 @@ namespace xsd
             if (id != 0)
               e.id (xml::transcode<C> (id));
 
+#if _XERCES_VERSION >= 30000
+            e.line (static_cast<unsigned long> (loc_->getLineNumber ()));
+            e.column (static_cast<unsigned long> (loc_->getColumnNumber ()));
+#else
             XMLSSize_t l (loc_->getLineNumber ());
             XMLSSize_t c (loc_->getColumnNumber ());
 
             e.line (l == -1 ? 0 : static_cast<unsigned long> (l));
             e.column (c == -1 ? 0: static_cast<unsigned long> (c));
+#endif
           }
         }
       }

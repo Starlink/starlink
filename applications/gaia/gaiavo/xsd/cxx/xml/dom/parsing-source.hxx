@@ -32,14 +32,17 @@ namespace xsd
     {
       namespace dom
       {
+        // Parser state object. Can be used for parsing element, attributes,
+        // or both.
+        //
         template <typename C>
         class parser
         {
         public:
-          parser (const xercesc::DOMElement& e);
+          parser (const xercesc::DOMElement& e, bool ep, bool ap);
 
           bool
-          more_elements () const
+          more_elements ()
           {
             return next_element_ != 0;
           }
@@ -54,9 +57,9 @@ namespace xsd
           next_element ();
 
           bool
-          more_attributes () const
+          more_attributes ()
           {
-            return a_->getLength () > ai_;
+            return as_ > ai_;
           }
 
           const xercesc::DOMAttr&
@@ -88,7 +91,8 @@ namespace xsd
           const xercesc::DOMNode* next_element_;
 
           const xercesc::DOMNamedNodeMap* a_;
-          unsigned long ai_; // Index of the next DOMAttr.
+          XMLSize_t ai_; // Index of the next DOMAttr.
+          XMLSize_t as_; // Cached size of a_.
         };
 
 

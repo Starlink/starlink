@@ -39,23 +39,23 @@ namespace xsd
 
       // fundamental_base
       //
-      template <typename X, typename C, typename B>
+      template <typename T, typename C, typename B, schema_type::value ST>
       template <typename S>
-      inline fundamental_base<X, C, B>::
+      inline fundamental_base<T, C, B, ST>::
       fundamental_base (istream<S>& s, flags f, container* c)
-          : B (s, f, c)
+          : B (s, f, c), facet_table_ (0)
       {
-        X& r (*this);
+        T& r (*this);
         s >> r;
       }
 
       // list
       //
-      template <typename X, typename C>
+      template <typename T, typename C, schema_type::value ST>
       template <typename S>
-      list<X, C, false>::
+      list<T, C, ST, false>::
       list (istream<S>& s, flags f, container* c)
-          : sequence<X> (f, c)
+          : sequence<T> (f, c)
       {
         std::size_t size;
         istream_common::as_size<std::size_t> as_size (size);
@@ -67,17 +67,17 @@ namespace xsd
 
           while (size--)
           {
-            std::auto_ptr<X> p (new X (s, f, c));
+            std::auto_ptr<T> p (new T (s, f, c));
             push_back (p);
           }
         }
       }
 
-      template <typename X, typename C>
+      template <typename T, typename C, schema_type::value ST>
       template <typename S>
-      list<X, C, true>::
+      list<T, C, ST, true>::
       list (istream<S>& s, flags f, container* c)
-          : sequence<X> (f, c)
+          : sequence<T> (f, c)
       {
         std::size_t size;
         istream_common::as_size<std::size_t> as_size (size);
@@ -89,7 +89,7 @@ namespace xsd
 
           while (size--)
           {
-            X x;
+            T x;
             s >> x;
             push_back (x);
           }
@@ -204,9 +204,9 @@ namespace xsd
 
       // idref
       //
-      template <typename X, typename C, typename B>
+      template <typename T, typename C, typename B>
       template <typename S>
-      inline idref<X, C, B>::
+      inline idref<T, C, B>::
       idref (istream<S>& s, flags f, container* c)
           : B (s, f, c), identity_ (*this)
       {

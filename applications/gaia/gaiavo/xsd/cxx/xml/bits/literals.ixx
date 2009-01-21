@@ -91,6 +91,41 @@ namespace xsd
         {
           return "noNamespaceSchemaLocation";
         }
+
+        template <>
+        inline const char*
+        first_prefix<char> ()
+        {
+          return "p1";
+        }
+
+        template <>
+        inline const char*
+        second_prefix<char> ()
+        {
+          return "p2";
+        }
+
+        template <>
+        inline const char*
+        third_prefix<char> ()
+        {
+          return "p3";
+        }
+
+        template <>
+        inline const char*
+        fourth_prefix<char> ()
+        {
+          return "p4";
+        }
+
+        template <>
+        inline const char*
+        fifth_prefix<char> ()
+        {
+          return "p5";
+        }
       }
     }
   }
@@ -181,6 +216,41 @@ namespace xsd
         no_namespace_schema_location<wchar_t> ()
         {
           return L"noNamespaceSchemaLocation";
+        }
+
+        template <>
+        inline const wchar_t*
+        first_prefix<wchar_t> ()
+        {
+          return L"p1";
+        }
+
+        template <>
+        inline const wchar_t*
+        second_prefix<wchar_t> ()
+        {
+          return L"p2";
+        }
+
+        template <>
+        inline const wchar_t*
+        third_prefix<wchar_t> ()
+        {
+          return L"p3";
+        }
+
+        template <>
+        inline const wchar_t*
+        fourth_prefix<wchar_t> ()
+        {
+          return L"p4";
+        }
+
+        template <>
+        inline const wchar_t*
+        fifth_prefix<wchar_t> ()
+        {
+          return L"p5";
         }
       }
     }

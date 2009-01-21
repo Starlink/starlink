@@ -46,37 +46,10 @@ namespace xsd
         xercesc::DOMElement&
         create_element (const C* name, const C* ns, xercesc::DOMElement&);
 
-
-        // No mapping provided for a namespace.
-        //
-        template <typename C>
-        struct mapping
-        {
-          mapping (const std::basic_string<C>& name)
-              : name_ (name)
-          {
-          }
-
-          const std::basic_string<C>&
-          name () const
-          {
-            return name_;
-          }
-
-        private:
-          std::basic_string<C> name_;
-        };
-
         // Serialization flags.
         //
         const unsigned long no_xml_declaration = 0x00010000UL;
-
-
-        // 'xsi' prefix is already in use and no user-defined mapping has
-        //  been provided.
-        //
-        struct xsi_already_in_use {};
-
+        const unsigned long dont_pretty_print  = 0x00020000UL;
 
         template <typename C>
         xml::dom::auto_ptr<xercesc::DOMDocument>

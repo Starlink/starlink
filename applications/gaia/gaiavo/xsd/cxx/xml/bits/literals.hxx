@@ -53,6 +53,26 @@ namespace xsd
         template <typename C>
         const C*
         no_namespace_schema_location ();
+
+        template <typename C>
+        const C*
+        first_prefix ();
+
+        template <typename C>
+        const C*
+        second_prefix ();
+
+        template <typename C>
+        const C*
+        third_prefix ();
+
+        template <typename C>
+        const C*
+        fourth_prefix ();
+
+        template <typename C>
+        const C*
+        fifth_prefix ();
       }
     }
   }

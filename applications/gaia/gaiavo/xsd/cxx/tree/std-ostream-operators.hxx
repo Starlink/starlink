@@ -41,12 +41,12 @@ namespace xsd
 
       // fundamental_base
       //
-      template <typename X, typename C, typename B>
+      template <typename T, typename C, typename B, schema_type::value ST>
       inline
       std::basic_ostream<C>&
-      operator<< (std::basic_ostream<C>& os, fundamental_base<X, C, B> x)
+      operator<< (std::basic_ostream<C>& os, fundamental_base<T, C, B, ST> x)
       {
-        X& r (x);
+        T& r (x);
         return os << r;
       }
 
@@ -58,11 +58,11 @@ namespace xsd
 
       // This is an xsd:list-style format (space-separated).
       //
-      template <typename C, typename X, bool fund>
+      template <typename C, typename T, schema_type::value ST, bool fund>
       std::basic_ostream<C>&
-      operator<< (std::basic_ostream<C>& os, const list<X, C, fund>& v)
+      operator<< (std::basic_ostream<C>& os, const list<T, C, ST, fund>& v)
       {
-        for (typename list<X, C, fund>::const_iterator
+        for (typename list<T, C, ST, fund>::const_iterator
                b (v.begin ()), e (v.end ()), i (b); i != e; ++i)
         {
           if (i != b)
@@ -180,9 +180,9 @@ namespace xsd
 
       // idref
       //
-      template <typename X, typename C, typename B>
+      template <typename T, typename C, typename B>
       inline std::basic_ostream<C>&
-      operator<< (std::basic_ostream<C>& os, const idref<X, C, B>& v)
+      operator<< (std::basic_ostream<C>& os, const idref<T, C, B>& v)
       {
         const B& r (v);
         return os << r;

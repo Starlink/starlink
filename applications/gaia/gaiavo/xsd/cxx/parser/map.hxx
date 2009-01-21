@@ -32,7 +32,7 @@ namespace xsd
         // absent if the type does not have a namespace.
         //
         virtual parser_base<C>*
-        find (const ro_string<C>& type) = 0;
+        find (const ro_string<C>& type) const = 0;
       };
 
 
@@ -41,19 +41,13 @@ namespace xsd
       template <typename C>
       struct parser_map_impl: parser_map<C>
       {
-        virtual
-        ~parser_map_impl ();
-
-        parser_map_impl ()
-            : map_ (0)
-        {
-        }
+        parser_map_impl ();
 
         void
-        insert (const C* type, parser_base<C>&);
+        insert (parser_base<C>&);
 
         virtual parser_base<C>*
-        find (const ro_string<C>& type);
+        find (const ro_string<C>& type) const;
 
       private:
         parser_map_impl (const parser_map_impl&);
@@ -62,14 +56,24 @@ namespace xsd
         operator= (const parser_map_impl&);
 
       private:
-        typedef std::map<std::basic_string<C>, parser_base<C>*> map;
+        struct string_comparison
+        {
+          bool
+          operator() (const C* x, const C* y) const
+          {
+            ro_string<C> s (x);
+            return s.compare (y) < 0;
+          }
+        };
 
-        map* map_;
+        typedef std::map<const C*, parser_base<C>*, string_comparison> map;
+        map map_;
       };
     }
   }
 }
 
+#include <xsd/cxx/parser/map.ixx>
 #include <xsd/cxx/parser/map.txx>
 
 #endif  // XSD_CXX_PARSER_MAP_HXX

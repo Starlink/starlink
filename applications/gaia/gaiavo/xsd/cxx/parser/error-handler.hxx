@@ -37,6 +37,13 @@ namespace xsd
         void
         throw_if_failed () const;
 
+        void
+        reset ()
+        {
+          failed_ = false;
+          diagnostics_.clear ();
+        }
+
       private:
         bool failed_;
         diagnostics<C> diagnostics_;

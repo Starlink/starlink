@@ -20,7 +20,7 @@ namespace xsd
     namespace tree
     {
       template <typename C>
-      struct traits<long long, C>
+      struct traits<long long, C, schema_type::other>
       {
         typedef long long type;
 
@@ -38,21 +38,21 @@ namespace xsd
       };
 
       template <typename C>
-      long long traits<long long, C>::
+      long long traits<long long, C, schema_type::other>::
       create (const xercesc::DOMElement& e, flags f, container* c)
       {
         return create (text_content<C> (e), 0, f, c);
       }
 
       template <typename C>
-      long long traits<long long, C>::
+      long long traits<long long, C, schema_type::other>::
       create (const xercesc::DOMAttr& a, flags f, container* c)
       {
         return create (xml::transcode<C> (a.getValue ()), 0, f, c);
       }
 
       template <typename C>
-      long long traits<long long, C>::
+      long long traits<long long, C, schema_type::other>::
       create (const std::basic_string<C>& s,
               const xercesc::DOMElement*,
               flags,

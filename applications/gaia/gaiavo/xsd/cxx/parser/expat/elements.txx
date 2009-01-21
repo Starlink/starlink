@@ -11,9 +11,6 @@
 
 #include <xsd/cxx/xml/bits/literals.hxx> // xml::bits::{xml_prefix, etc}
 
-#include <xsd/cxx/parser/error-handler.hxx>
-#include <xsd/cxx/parser/schema-exceptions.hxx>
-
 namespace xsd
 {
   namespace cxx
@@ -32,9 +29,9 @@ namespace xsd
                   const std::basic_string<C>& name,
                   bool polymorphic)
             : cxx::parser::document<C> (p, std::basic_string<C> (), name),
-              polymorphic_ (polymorphic),
-              router_ (*this, polymorphic),
-              xml_parser_ (0)
+              xml_parser_ (0),
+              eh_ (0),
+              polymorphic_ (polymorphic)
         {
         }
 
@@ -44,9 +41,9 @@ namespace xsd
                   const C* name,
                   bool polymorphic)
             : cxx::parser::document<C> (p, std::basic_string<C> (), name),
-              polymorphic_ (polymorphic),
-              router_ (*this, polymorphic),
-              xml_parser_ (0)
+              xml_parser_ (0),
+              eh_ (0),
+              polymorphic_ (polymorphic)
         {
         }
 
@@ -57,9 +54,9 @@ namespace xsd
                   const C* name,
                   bool polymorphic)
             : cxx::parser::document<C> (p, ns, name),
-              polymorphic_ (polymorphic),
-              router_ (*this, polymorphic),
-              xml_parser_ (0)
+              xml_parser_ (0),
+              eh_ (0),
+              polymorphic_ (polymorphic)
         {
         }
 
@@ -70,18 +67,18 @@ namespace xsd
                   const std::basic_string<C>& name,
                   bool polymorphic)
             : cxx::parser::document<C> (p, ns, name),
-              polymorphic_ (polymorphic),
-              router_ (*this, polymorphic),
-              xml_parser_ (0)
+              xml_parser_ (0),
+              eh_ (0),
+              polymorphic_ (polymorphic)
         {
         }
 
         template <typename C>
         document<C>::
         document (bool polymorphic)
-            : polymorphic_ (polymorphic),
-              router_ (*this, polymorphic),
-              xml_parser_ (0)
+            : xml_parser_ (0),
+              eh_ (0),
+              polymorphic_ (polymorphic)
         {
         }
 
@@ -118,9 +115,7 @@ namespace xsd
         void document<C>::
         parse (std::istream& is)
         {
-          error_handler<C> eh;
-          parse (is, 0, 0, eh);
-          eh.throw_if_failed ();
+          parse (is, 0, 0, default_eh_);
         }
 
         template <typename C>
@@ -135,9 +130,8 @@ namespace xsd
         void document<C>::
         parse (std::istream& is, const std::basic_string<C>& system_id)
         {
-          error_handler<C> eh;
-          parse (is, &system_id, 0, eh);
-          eh.throw_if_failed ();
+          default_eh_.reset ();
+          parse (is, &system_id, 0, default_eh_);
         }
 
         template <typename C>
@@ -156,9 +150,8 @@ namespace xsd
                const std::basic_string<C>& system_id,
                const std::basic_string<C>& public_id)
         {
-          error_handler<C> eh;
-          parse (is, &system_id, &public_id, eh);
-          eh.throw_if_failed ();
+          default_eh_.reset ();
+          parse (is, &system_id, &public_id, default_eh_);
         }
 
         template <typename C>
@@ -179,9 +172,8 @@ namespace xsd
         void document<C>::
         parse (const void* data, std::size_t size, bool last)
         {
-          error_handler<C> eh;
-          parse (data, size, last, 0, 0, eh);
-          eh.throw_if_failed ();
+          default_eh_.reset ();
+          parse (data, size, last, 0, 0, default_eh_);
         }
 
         template <typename C>
@@ -198,9 +190,8 @@ namespace xsd
         parse (const void* data, std::size_t size, bool last,
                const std::basic_string<C>& system_id)
         {
-          error_handler<C> eh;
-          parse (data, size, last, &system_id, 0, eh);
-          eh.throw_if_failed ();
+          default_eh_.reset ();
+          parse (data, size, last, &system_id, 0, default_eh_);
         }
 
         template <typename C>
@@ -219,9 +210,8 @@ namespace xsd
                const std::basic_string<C>& system_id,
                const std::basic_string<C>& public_id)
         {
-          error_handler<C> eh;
-          parse (data, size, last, &system_id, &public_id, eh);
-          eh.throw_if_failed ();
+          default_eh_.reset ();
+          parse (data, size, last, &system_id, &public_id, default_eh_);
         }
 
         template <typename C>
@@ -280,7 +270,10 @@ namespace xsd
           if (parser == 0)
             throw std::bad_alloc ();
 
-          parse_begin (parser);
+          if (system_id || public_id)
+            parse_begin (parser, system_id ? *system_id : *public_id, eh);
+          else
+            parse_begin (parser, eh);
 
           // Temporarily unset the exception failbit. Also clear the
           // fail bit when we reset the old state if it was caused
@@ -289,6 +282,8 @@ namespace xsd
           bits::stream_exception_controller sec (is);
 
           char buf[16384]; // 4 x page size.
+
+          bool r (true);
 
           do
           {
@@ -300,51 +295,19 @@ namespace xsd
               // will have to test for stream failures before calling
               // post.
               //
-              return true;
+              break;
             }
 
-            try
+            if (XML_Parse (
+                  parser, buf, is.gcount (), is.eof ()) == XML_STATUS_ERROR)
             {
-              if (XML_Parse (
-                    parser, buf, is.gcount (), is.eof ()) == XML_STATUS_ERROR)
-              {
-                unsigned long l (XML_GetCurrentLineNumber (xml_parser_));
-                unsigned long c (XML_GetCurrentColumnNumber (xml_parser_));
-                std::basic_string<C> message (
-                  XML_ErrorString (XML_GetErrorCode (xml_parser_)));
-
-                parse_end ();
-
-                eh.handle (
-                  public_id
-                  ? *public_id
-                  : (system_id ? *system_id : std::basic_string<C> ()),
-                  l, c, xml::error_handler<C>::severity::fatal, message);
-
-                return false;
-              }
+              r = false;
+              break;
             }
-            catch (const schema_exception<C>& e)
-            {
-              unsigned long l (XML_GetCurrentLineNumber (xml_parser_));
-              unsigned long c (XML_GetCurrentColumnNumber (xml_parser_));
-
-              parse_end ();
-
-              eh.handle (
-                public_id
-                ? *public_id
-                : (system_id ? *system_id : std::basic_string<C> ()),
-                l, c, xml::error_handler<C>::severity::fatal, e.message ());
-
-              return false;
-            }
-
           } while (!is.eof ());
 
           parse_end ();
-
-          return true;
+          return r;
         }
 
         template <typename C>
@@ -365,52 +328,19 @@ namespace xsd
             if (auto_xml_parser_ == 0)
               throw std::bad_alloc ();
 
-            parse_begin (auto_xml_parser_);
+            if (system_id || public_id)
+              parse_begin (auto_xml_parser_,
+                           system_id ? *system_id : *public_id, eh);
+            else
+              parse_begin (auto_xml_parser_, eh);
           }
 
-          try
-          {
-            if (XML_Parse (xml_parser_,
-                           static_cast<const char*> (data),
-                           static_cast<int> (size),
-                           last) == XML_STATUS_ERROR)
-            {
-              unsigned long l (XML_GetCurrentLineNumber (xml_parser_));
-              unsigned long c (XML_GetCurrentColumnNumber (xml_parser_));
-              std::basic_string<C> message (
-                XML_ErrorString (XML_GetErrorCode (xml_parser_)));
-
-              parse_end ();
-
-              eh.handle (
-                public_id
-                ? *public_id
-                : (system_id ? *system_id : std::basic_string<C> ()),
-                l, c, xml::error_handler<C>::severity::fatal, message);
-
-              return false;
-            }
-          }
-          catch (const schema_exception<C>& e)
-          {
-            unsigned long l (XML_GetCurrentLineNumber (xml_parser_));
-            unsigned long c (XML_GetCurrentColumnNumber (xml_parser_));
-
-            parse_end ();
-
-            eh.handle (
-              public_id
-              ? *public_id
-              : (system_id ? *system_id : std::basic_string<C> ()),
-              l, c, xml::error_handler<C>::severity::fatal, e.message ());
-
-            return false;
-          }
-
-          if (last)
-            parse_end ();
-
-          return true;
+          bool r (XML_Parse (xml_parser_,
+                             static_cast<const char*> (data),
+                             static_cast<int> (size),
+                             last) != XML_STATUS_ERROR);
+          parse_end ();
+          return r;
         }
 
         // XML_Parser
@@ -421,6 +351,41 @@ namespace xsd
         parse_begin (XML_Parser parser)
         {
           xml_parser_ = parser;
+          eh_ = &default_eh_;
+          public_id_.clear ();
+          set ();
+        }
+
+        template <typename C>
+        void document<C>::
+        parse_begin (XML_Parser parser,
+                     const std::basic_string<C>& public_id)
+        {
+          xml_parser_ = parser;
+          eh_ = &default_eh_;
+          public_id_ = public_id;
+          set ();
+        }
+
+        template <typename C>
+        void document<C>::
+        parse_begin (XML_Parser parser, xml::error_handler<C>& eh)
+        {
+          xml_parser_ = parser;
+          eh_ = &eh;
+          public_id_.clear ();
+          set ();
+        }
+
+        template <typename C>
+        void document<C>::
+        parse_begin (XML_Parser parser,
+                     const std::basic_string<C>& public_id,
+                     xml::error_handler<C>& eh)
+        {
+          xml_parser_ = parser;
+          eh_ = &eh;
+          public_id_ = public_id;
           set ();
         }
 
@@ -428,9 +393,35 @@ namespace xsd
         void document<C>::
         parse_end ()
         {
-          clear ();
-          xml_parser_ = 0;
-          auto_xml_parser_ = 0;
+          XML_Error e (XML_GetErrorCode (xml_parser_));
+
+          if (e == XML_ERROR_NONE || e == XML_ERROR_ABORTED)
+          {
+            clear ();
+            xml_parser_ = 0;
+            auto_xml_parser_ = 0;
+          }
+          else
+          {
+            unsigned long l = XML_GetCurrentLineNumber (xml_parser_);
+            unsigned long c = XML_GetCurrentColumnNumber (xml_parser_);
+            std::basic_string<C> message (XML_ErrorString (e));
+
+            eh_->handle (public_id_,
+                         l, c,
+                         xml::error_handler<C>::severity::fatal,
+                         message);
+
+            clear ();
+            xml_parser_ = 0;
+            auto_xml_parser_ = 0;
+
+            // We don't want to throw an empty parsing exception here
+            // since the user probably already knows about the error.
+          }
+
+          if (eh_ == &default_eh_)
+            default_eh_.throw_if_failed ();
         }
 
         //
@@ -441,21 +432,17 @@ namespace xsd
         {
           assert (xml_parser_ != 0);
 
-          XML_SetUserData(xml_parser_, &router_);
+          XML_SetUserData(xml_parser_, this);
 
-          XML_SetStartElementHandler (
-            xml_parser_, event_router<C>::start_element);
-          XML_SetEndElementHandler (
-            xml_parser_, event_router<C>::end_element);
-          XML_SetCharacterDataHandler (
-            xml_parser_, event_router<C>::characters);
+          XML_SetStartElementHandler (xml_parser_, start_element_thunk_);
+          XML_SetEndElementHandler (xml_parser_, end_element_thunk_);
+          XML_SetCharacterDataHandler (xml_parser_, characters_thunk_);
 
           if (polymorphic_)
           {
-            XML_SetNamespaceDeclHandler (
-              xml_parser_,
-              event_router<C>::start_namespace_decl,
-              event_router<C>::end_namespace_decl);
+            XML_SetNamespaceDeclHandler (xml_parser_,
+                                         start_namespace_decl_thunk_,
+                                         end_namespace_decl_thunk_);
           }
         }
 
@@ -474,59 +461,68 @@ namespace xsd
             XML_SetNamespaceDeclHandler (xml_parser_, 0, 0);
         }
 
-        // event_router
-        //
-
         template <typename C>
-        event_router<C>::
-        event_router (cxx::parser::document<C>& consumer, bool polymorphic)
-            : consumer_ (consumer), polymorphic_ (polymorphic)
+        void document<C>::
+        translate_schema_exception (const schema_exception<C>& e)
         {
+          unsigned long l = XML_GetCurrentLineNumber (xml_parser_);
+          unsigned long c = XML_GetCurrentColumnNumber (xml_parser_);
+
+          eh_->handle (public_id_,
+                       l, c,
+                       xml::error_handler<C>::severity::fatal,
+                       e.message ());
+
+          XML_StopParser (xml_parser_, false);
         }
+
+        // Event routing.
+        //
 
         // Expat thunks.
         //
         template <typename C>
-        void XMLCALL event_router<C>::
-        start_element (
-          void* data, const XML_Char* ns_name, const XML_Char** atts)
+        void XMLCALL document<C>::
+        start_element_thunk_ (void* data,
+                              const XML_Char* ns_name,
+                              const XML_Char** atts)
         {
-          event_router& r (*reinterpret_cast<event_router*> (data));
-          r.start_element_ (ns_name, atts);
+          document& d (*reinterpret_cast<document*> (data));
+          d.start_element_ (ns_name, atts);
         }
 
         template <typename C>
-        void XMLCALL event_router<C>::
-        end_element (void* data, const XML_Char* ns_name)
+        void XMLCALL document<C>::
+        end_element_thunk_ (void* data, const XML_Char* ns_name)
         {
-          event_router& r (*reinterpret_cast<event_router*> (data));
-          r.end_element_ (ns_name);
+          document& d (*reinterpret_cast<document*> (data));
+          d.end_element_ (ns_name);
         }
 
         template <typename C>
-        void XMLCALL event_router<C>::
-        characters (void* data, const XML_Char* s, int n)
+        void XMLCALL document<C>::
+        characters_thunk_ (void* data, const XML_Char* s, int n)
         {
-          event_router& r (*reinterpret_cast<event_router*> (data));
-          r.characters_ (s, static_cast<std::size_t> (n));
+          document& d (*reinterpret_cast<document*> (data));
+          d.characters_ (s, static_cast<std::size_t> (n));
         }
 
         template <typename C>
-        void XMLCALL event_router<C>::
-        start_namespace_decl (void* data,
-                              const XML_Char* prefix,
-                              const XML_Char* ns)
+        void XMLCALL document<C>::
+        start_namespace_decl_thunk_ (void* data,
+                                     const XML_Char* prefix,
+                                     const XML_Char* ns)
         {
-          event_router& r (*reinterpret_cast<event_router*> (data));
-          r.start_namespace_decl_ (prefix, ns);
+          document& d (*reinterpret_cast<document*> (data));
+          d.start_namespace_decl_ (prefix, ns);
         }
 
         template <typename C>
-        void XMLCALL event_router<C>::
-        end_namespace_decl (void* data, const XML_Char* prefix)
+        void XMLCALL document<C>::
+        end_namespace_decl_thunk_ (void* data, const XML_Char* prefix)
         {
-          event_router& r (*reinterpret_cast<event_router*> (data));
-          r.end_namespace_decl_ (prefix);
+          document& d (*reinterpret_cast<document*> (data));
+          d.end_namespace_decl_ (prefix);
         }
 
         namespace bits
@@ -556,9 +552,20 @@ namespace xsd
         }
 
         template <typename C>
-        void event_router<C>::
+        void document<C>::
         start_element_ (const XML_Char* ns_name, const XML_Char** atts)
         {
+          // Current Expat (2.0.0) has a (mis)-feature of a possibility of
+	  // calling callbacks even after the non-resumable XML_StopParser
+          // call. The following code accounts for this.
+          //
+          {
+            XML_ParsingStatus s;
+            XML_GetParsingStatus (xml_parser_, &s);
+            if (s.parsing == XML_FINISHED)
+              return;
+          }
+
           typedef std::basic_string<C> string;
 
           const char* ns_p;
@@ -571,12 +578,22 @@ namespace xsd
             const ro_string<C> ns (ns_p, ns_s), name (name_p, name_s);
 
             if (!polymorphic_)
-              consumer_.start_element (ns, name, 0);
+            {
+              try
+              {
+                start_element (ns, name, 0);
+              }
+              catch (const schema_exception<C>& e)
+              {
+                translate_schema_exception (e);
+                return;
+              }
+            }
             else
             {
               // Search for the xsi:type attribute.
               //
-              const XML_Char** p (atts);
+              const XML_Char** p = atts; // VC8 can't handle p (atts)
               for (; *p != 0; p += 2)
               {
                 bits::split_name (*p, ns_p, ns_s, name_p, name_s);
@@ -588,7 +605,17 @@ namespace xsd
               }
 
               if (*p == 0)
-                consumer_.start_element (ns, name, 0);
+              {
+                try
+                {
+                  start_element (ns, name, 0);
+                }
+                catch (const schema_exception<C>& e)
+                {
+                  translate_schema_exception (e);
+                  return;
+                }
+              }
               else
               {
                 // @@ Need proper QName validation.
@@ -597,58 +624,69 @@ namespace xsd
                 //
                 ro_string<C> qn (*(p + 1));
 
-                string tp, tn, tns;
+                ro_string<C> tp, tn;
                 typename ro_string<C>::size_type pos (qn.find (C (':')));
 
-                if (pos != ro_string<C>::npos)
+                try
                 {
-                  tp.assign (qn.data (), pos);
-                  tn.assign (qn.data () + pos + 1);
-
-                  if (tp.empty ())
-                    throw dynamic_type<C> (qn);
-                }
-                else
-                  tn = qn;
-
-                if (tn.empty ())
-                  throw dynamic_type<C> (qn);
-
-                // Search our namespace declaration stack. Sun CC 5.7
-                  // blows if we use const_reverse_iterator.
-                //
-                for (typename ns_decls::reverse_iterator
-                       it (ns_decls_.rbegin ()), e (ns_decls_.rend ());
-                     it != e; ++it)
-                {
-                  if (it->prefix == tp)
+                  if (pos != ro_string<C>::npos)
                   {
-                    tns = it->ns;
-                    break;
+                    tp.assign (qn.data (), pos);
+                    tn.assign (qn.data () + pos + 1);
+
+                    if (tp.empty ())
+                      throw dynamic_type<C> (qn);
                   }
-                }
-
-                if (!tp.empty () && tns.empty ())
-                {
-                  // The 'xml' prefix requires special handling.
-                  //
-                  if (tp == xml::bits::xml_prefix<C> ())
-                    tns = xml::bits::xml_namespace<C> ();
                   else
+                    tn.assign (qn.data (), qn.size ());
+
+                  if (tn.empty ())
                     throw dynamic_type<C> (qn);
-                }
 
-                // Construct the compound name.
-                //
-                if (!tns.empty ())
+                  // Search our namespace declaration stack. Note that
+                  // we need to do this even if prefix is empty. Sun CC
+                  // 5.7 blows if we use const_reverse_iterator.
+                  //
+                  ro_string<C> tns;
+                  for (typename ns_decls::reverse_iterator
+                         it (ns_decls_.rbegin ()), e (ns_decls_.rend ());
+                       it != e; ++it)
+                  {
+                    if (it->prefix == tp)
+                    {
+                      tns.assign (it->ns);
+                      break;
+                    }
+                  }
+
+                  if (!tp.empty () && tns.empty ())
+                  {
+                    // The 'xml' prefix requires special handling.
+                    //
+                    if (tp == xml::bits::xml_prefix<C> ())
+                      tns.assign (xml::bits::xml_namespace<C> ());
+                    else
+                      throw dynamic_type<C> (qn);
+                  }
+
+                  // Construct the compound type id.
+                  //
+                  string id (tn.data (), tn.size ());
+
+                  if (!tns.empty ())
+                  {
+                    id += C (' ');
+                    id.append (tns.data (), tns.size ());
+                  }
+
+                  ro_string<C> ro_id (id);
+                  start_element (ns, name, &ro_id);
+                }
+                catch (const schema_exception<C>& e)
                 {
-                  tn += C (' ');
-                  tn += tns;
+                  translate_schema_exception (e);
+                  return;
                 }
-
-                ro_string<C> ro_tn (tn);
-
-                consumer_.start_element (ns, name, &ro_tn);
               }
             }
           }
@@ -660,14 +698,33 @@ namespace xsd
             const ro_string<C> ns (ns_p, ns_s), name (name_p, name_s);
             const ro_string<C> value (*(atts + 1));
 
-            consumer_.attribute (ns, name, value);
+            try
+            {
+              attribute (ns, name, value);
+            }
+            catch (const schema_exception<C>& e)
+            {
+              translate_schema_exception (e);
+              break;
+            }
           }
         }
 
         template <typename C>
-        void event_router<C>::
+        void document<C>::
         end_element_ (const XML_Char* ns_name)
         {
+          // Current Expat (2.0.0) has a (mis)-feature of a possibility of
+	  // calling callbacks even after the non-resumable XML_StopParser
+          // call. The following code accounts for this.
+          //
+          {
+            XML_ParsingStatus s;
+            XML_GetParsingStatus (xml_parser_, &s);
+            if (s.parsing == XML_FINISHED)
+              return;
+          }
+
           const char* ns_p;
           const char* name_p;
           size_t ns_s, name_s;
@@ -676,35 +733,59 @@ namespace xsd
 
           const ro_string<C> ns (ns_p, ns_s), name (name_p, name_s);
 
-          consumer_.end_element (ns, name);
-        }
-
-        template <typename C>
-        void event_router<C>::
-        characters_ (const XML_Char* s, std::size_t n)
-        {
-          if (n != 0)
+          try
           {
-            const ro_string<C> str (s, n);
-            consumer_.characters (str);
+            end_element (ns, name);
+          }
+          catch (const schema_exception<C>& e)
+          {
+            translate_schema_exception (e);
           }
         }
 
         template <typename C>
-        void event_router<C>::
+        void document<C>::
+        characters_ (const XML_Char* s, std::size_t n)
+        {
+          // Current Expat (2.0.0) has a (mis)-feature of a possibility of
+	  // calling callbacks even after the non-resumable XML_StopParser
+          // call. The following code accounts for this.
+          //
+          {
+            XML_ParsingStatus s;
+            XML_GetParsingStatus (xml_parser_, &s);
+            if (s.parsing == XML_FINISHED)
+              return;
+          }
+
+          if (n != 0)
+          {
+            const ro_string<C> str (s, n);
+
+            try
+            {
+              characters (str);
+            }
+            catch (const schema_exception<C>& e)
+            {
+              translate_schema_exception (e);
+            }
+          }
+        }
+
+        template <typename C>
+        void document<C>::
         start_namespace_decl_ (const XML_Char* p, const XML_Char* ns)
         {
           // prefix is 0 for default namespace
           // namespace is 0 when unsetting default namespace
           //
           if (polymorphic_)
-          {
             ns_decls_.push_back (ns_decl ((p ? p : ""), (ns ? ns : "")));
-          }
         }
 
         template <typename C>
-        void event_router<C>::
+        void document<C>::
         end_namespace_decl_ (const XML_Char* p)
         {
           // prefix is 0 for default namespace

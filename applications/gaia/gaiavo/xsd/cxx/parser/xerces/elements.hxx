@@ -422,6 +422,12 @@ namespace xsd
           cxx::parser::document<C>& consumer_;
           bool polymorphic_;
 
+          // Last element name cache.
+          //
+          bool last_valid_;
+          std::basic_string<C> last_ns_;
+          std::basic_string<C> last_name_;
+
           // Namespace-prefix mapping. Only maintained in the polymorphic
           // case.
           //

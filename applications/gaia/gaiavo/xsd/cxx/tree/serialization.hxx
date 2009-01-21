@@ -30,6 +30,29 @@ namespace xsd
         std::basic_ostringstream<C>& os_;
         xercesc::DOMElement& parent_;
       };
+
+      template <typename T>
+      struct as_double
+      {
+        as_double (const T& v)
+            : x (v)
+        {
+        }
+
+        const T& x;
+      };
+
+      template <typename T>
+      struct as_decimal
+      {
+        as_decimal (const T& v, const facet* f = 0)
+            : x (v), facets (f)
+        {
+        }
+
+        const T& x;
+        const facet* facets;
+      };
     }
   }
 }

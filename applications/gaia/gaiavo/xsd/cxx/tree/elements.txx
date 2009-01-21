@@ -44,16 +44,14 @@ namespace xsd
         return new simple_type (*this, f, c);
       }
 
-
       // fundamental_base
       //
-      template <typename X, typename C, typename B>
-      fundamental_base<X, C, B>* fundamental_base<X, C, B>::
+      template <typename T, typename C, typename B, schema_type::value ST>
+      fundamental_base<T, C, B, ST>* fundamental_base<T, C, B, ST>::
       _clone (flags f, container* c) const
       {
         return new fundamental_base (*this, f, c);
       }
-
     }
   }
 }

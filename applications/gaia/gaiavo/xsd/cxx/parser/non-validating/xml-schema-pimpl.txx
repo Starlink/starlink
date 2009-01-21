@@ -891,19 +891,73 @@ namespace xsd
         // id
         //
         template <typename C>
+        void id_pimpl<C>::
+        _pre ()
+        {
+          str_.clear ();
+        }
+
+        template <typename C>
+        void id_pimpl<C>::
+        _characters (const ro_string<C>& s)
+        {
+          if (str_.size () == 0)
+          {
+            ro_string<C> tmp (s.data (), s.size ());
+
+            if (trim_left (tmp) != 0)
+              str_ += tmp;
+          }
+          else
+            str_ += s;
+        }
+
+        template <typename C>
         std::basic_string<C> id_pimpl<C>::
         post_id ()
         {
-          return this->post_ncname ();
+          ro_string<C> tmp (str_);
+          str_.resize (trim_right (tmp));
+
+          std::basic_string<C> r;
+          r.swap (str_);
+          return r;
         }
 
         // idref
         //
         template <typename C>
+        void idref_pimpl<C>::
+        _pre ()
+        {
+          str_.clear ();
+        }
+
+        template <typename C>
+        void idref_pimpl<C>::
+        _characters (const ro_string<C>& s)
+        {
+          if (str_.size () == 0)
+          {
+            ro_string<C> tmp (s.data (), s.size ());
+
+            if (trim_left (tmp) != 0)
+              str_ += tmp;
+          }
+          else
+            str_ += s;
+        }
+
+        template <typename C>
         std::basic_string<C> idref_pimpl<C>::
         post_idref ()
         {
-          return this->post_ncname ();
+          ro_string<C> tmp (str_);
+          str_.resize (trim_right (tmp));
+
+          std::basic_string<C> r;
+          r.swap (str_);
+          return r;
         }
 
         // idrefs
@@ -1357,7 +1411,7 @@ namespace xsd
 
           unsigned short day (0);
           bool z (false);
-          short zh, zm;
+          short zh (0), zm (0);
 
           // gday := ---DD[Z|(+|-)HH:MM]
           //
@@ -1411,7 +1465,7 @@ namespace xsd
 
           unsigned short month (0);
           bool z (false);
-          short zh, zm;
+          short zh (0), zm (0);
 
           // gmonth := --MM[Z|(+|-)HH:MM]
           //
@@ -1465,7 +1519,7 @@ namespace xsd
 
           int year (0);
           bool z (false);
-          short zh, zm;
+          short zh (0), zm (0);
 
           // gyear := [-]CCYY[N]*[Z|(+|-)HH:MM]
           //
@@ -1533,7 +1587,7 @@ namespace xsd
 
           unsigned short month (0), day (0);
           bool z (false);
-          short zh, zm;
+          short zh (0), zm (0);
 
           // gmonth_day := --MM-DD[Z|(+|-)HH:MM]
           //
@@ -1591,7 +1645,7 @@ namespace xsd
           int year (0);
           unsigned short month (0);
           bool z (false);
-          short zh, zm;
+          short zh (0), zm (0);
 
           // gyear_month := [-]CCYY[N]*-MM[Z|(+|-)HH:MM]
           //
@@ -1662,7 +1716,7 @@ namespace xsd
           int year (0);
           unsigned short month (0), day (0);
           bool z (false);
-          short zh, zm;
+          short zh (0), zm (0);
 
           // date := [-]CCYY[N]*-MM-DD[Z|(+|-)HH:MM]
           //
@@ -1734,7 +1788,7 @@ namespace xsd
           unsigned short hours (0), minutes (0);
           double seconds (0.0);
           bool z (false);
-          short zh, zm;
+          short zh (0), zm (0);
 
           // time := HH:MM:SS[.S+][Z|(+|-)HH:MM]
           //
@@ -1810,7 +1864,7 @@ namespace xsd
           unsigned short month (0), day (0), hours (0), minutes (0);
           double seconds (0.0);
           bool z (false);
-          short zh, zm;
+          short zh (0), zm (0);
 
           // date_time := [-]CCYY[N]*-MM-DDTHH:MM:SS[.S+][Z|(+|-)HH:MM]
           //
@@ -2012,4 +2066,3 @@ namespace xsd
     }
   }
 }
-

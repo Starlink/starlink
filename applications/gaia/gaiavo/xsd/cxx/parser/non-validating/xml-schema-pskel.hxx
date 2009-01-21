@@ -24,7 +24,7 @@ namespace xsd
         // _any_* callbacks.
         //
         template <typename C>
-        struct any_type_pskel: virtual complex_content<C>
+        struct any_type_pskel: complex_content<C>
         {
           virtual bool
           _start_element_impl (const ro_string<C>&,
@@ -54,7 +54,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct any_simple_type_pskel: virtual simple_content<C>
+        struct any_simple_type_pskel: simple_content<C>
         {
           virtual bool
           _characters_impl (const ro_string<C>&);
@@ -73,7 +73,7 @@ namespace xsd
         // Boolean.
         //
         template <typename C>
-        struct boolean_pskel: virtual simple_content<C>
+        struct boolean_pskel: simple_content<C>
         {
           virtual bool
           post_boolean () = 0;
@@ -89,7 +89,7 @@ namespace xsd
         // 8-bit
         //
         template <typename C>
-        struct byte_pskel: virtual simple_content<C>
+        struct byte_pskel: simple_content<C>
         {
           virtual signed char
           post_byte () = 0;
@@ -102,7 +102,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct unsigned_byte_pskel: virtual simple_content<C>
+        struct unsigned_byte_pskel: simple_content<C>
         {
           virtual unsigned char
           post_unsigned_byte () = 0;
@@ -118,7 +118,7 @@ namespace xsd
         // 16-bit
         //
         template <typename C>
-        struct short_pskel: virtual simple_content<C>
+        struct short_pskel: simple_content<C>
         {
           virtual short
           post_short () = 0;
@@ -131,7 +131,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct unsigned_short_pskel: virtual simple_content<C>
+        struct unsigned_short_pskel: simple_content<C>
         {
           virtual unsigned short
           post_unsigned_short () = 0;
@@ -147,7 +147,7 @@ namespace xsd
         // 32-bit
         //
         template <typename C>
-        struct int_pskel: virtual simple_content<C>
+        struct int_pskel: simple_content<C>
         {
           virtual int
           post_int () = 0;
@@ -160,7 +160,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct unsigned_int_pskel: virtual simple_content<C>
+        struct unsigned_int_pskel: simple_content<C>
         {
           virtual unsigned int
           post_unsigned_int () = 0;
@@ -176,7 +176,7 @@ namespace xsd
         // 64-bit
         //
         template <typename C>
-        struct long_pskel: virtual simple_content<C>
+        struct long_pskel: simple_content<C>
         {
           virtual long long
           post_long () = 0;
@@ -189,7 +189,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct unsigned_long_pskel: virtual simple_content<C>
+        struct unsigned_long_pskel: simple_content<C>
         {
           virtual unsigned long long
           post_unsigned_long () = 0;
@@ -205,7 +205,7 @@ namespace xsd
         // Arbitrary-length integers.
         //
         template <typename C>
-        struct integer_pskel: virtual simple_content<C>
+        struct integer_pskel: simple_content<C>
         {
           virtual long long
           post_integer () = 0;
@@ -218,7 +218,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct negative_integer_pskel: virtual simple_content<C>
+        struct negative_integer_pskel: simple_content<C>
         {
           virtual long long
           post_negative_integer () = 0;
@@ -231,7 +231,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct non_positive_integer_pskel: virtual simple_content<C>
+        struct non_positive_integer_pskel: simple_content<C>
         {
           virtual long long
           post_non_positive_integer () = 0;
@@ -244,7 +244,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct positive_integer_pskel: virtual simple_content<C>
+        struct positive_integer_pskel: simple_content<C>
         {
           virtual unsigned long long
           post_positive_integer () = 0;
@@ -257,7 +257,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct non_negative_integer_pskel: virtual simple_content<C>
+        struct non_negative_integer_pskel: simple_content<C>
         {
           virtual unsigned long long
           post_non_negative_integer () = 0;
@@ -273,7 +273,7 @@ namespace xsd
         // Floats.
         //
         template <typename C>
-        struct float_pskel: virtual simple_content<C>
+        struct float_pskel: simple_content<C>
         {
           virtual float
           post_float () = 0;
@@ -286,7 +286,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct double_pskel: virtual simple_content<C>
+        struct double_pskel: simple_content<C>
         {
           virtual double
           post_double () = 0;
@@ -299,7 +299,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct decimal_pskel: virtual simple_content<C>
+        struct decimal_pskel: simple_content<C>
         {
           virtual double
           post_decimal () = 0;
@@ -315,7 +315,7 @@ namespace xsd
         // Strings.
         //
         template <typename C>
-        struct string_pskel: virtual simple_content<C>
+        struct string_pskel: simple_content<C>
         {
           virtual std::basic_string<C>
           post_string () = 0;
@@ -328,7 +328,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct normalized_string_pskel: virtual simple_content<C>
+        struct normalized_string_pskel: simple_content<C>
         {
           virtual std::basic_string<C>
           post_normalized_string () = 0;
@@ -341,7 +341,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct token_pskel: virtual simple_content<C>
+        struct token_pskel: simple_content<C>
         {
           virtual std::basic_string<C>
           post_token () = 0;
@@ -354,7 +354,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct name_pskel: virtual simple_content<C>
+        struct name_pskel: simple_content<C>
         {
           virtual std::basic_string<C>
           post_name () = 0;
@@ -367,7 +367,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct nmtoken_pskel: virtual simple_content<C>
+        struct nmtoken_pskel: simple_content<C>
         {
           virtual std::basic_string<C>
           post_nmtoken () = 0;
@@ -393,7 +393,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct ncname_pskel: virtual simple_content<C>
+        struct ncname_pskel: simple_content<C>
         {
           virtual std::basic_string<C>
           post_ncname () = 0;
@@ -406,7 +406,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct id_pskel: virtual ncname_pskel<C>
+        struct id_pskel: simple_content<C>
         {
           virtual std::basic_string<C>
           post_id () = 0;
@@ -419,7 +419,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct idref_pskel: virtual ncname_pskel<C>
+        struct idref_pskel: simple_content<C>
         {
           virtual std::basic_string<C>
           post_idref () = 0;
@@ -447,7 +447,7 @@ namespace xsd
         // Language.
         //
         template <typename C>
-        struct language_pskel: virtual simple_content<C>
+        struct language_pskel: simple_content<C>
         {
           virtual std::basic_string<C>
           post_language () = 0;
@@ -462,7 +462,7 @@ namespace xsd
         // URI.
         //
         template <typename C>
-        struct uri_pskel: virtual simple_content<C>
+        struct uri_pskel: simple_content<C>
         {
           virtual std::basic_string<C>
           post_uri () = 0;
@@ -477,7 +477,7 @@ namespace xsd
         // QName.
         //
         template <typename C>
-        struct qname_pskel: virtual simple_content<C>
+        struct qname_pskel: simple_content<C>
         {
           virtual qname<C>
           post_qname () = 0;
@@ -492,7 +492,7 @@ namespace xsd
         // Base64 and hex binaries.
         //
         template <typename C>
-        struct base64_binary_pskel: virtual simple_content<C>
+        struct base64_binary_pskel: simple_content<C>
         {
           virtual std::auto_ptr<buffer>
           post_base64_binary () = 0;
@@ -505,7 +505,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct hex_binary_pskel: virtual simple_content<C>
+        struct hex_binary_pskel: simple_content<C>
         {
           virtual std::auto_ptr<buffer>
           post_hex_binary () = 0;
@@ -520,7 +520,7 @@ namespace xsd
         // Time and date types.
         //
         template <typename C>
-        struct gday_pskel: virtual simple_content<C>
+        struct gday_pskel: simple_content<C>
         {
           virtual gday
           post_gday () = 0;
@@ -533,7 +533,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct gmonth_pskel: virtual simple_content<C>
+        struct gmonth_pskel: simple_content<C>
         {
           virtual gmonth
           post_gmonth () = 0;
@@ -546,7 +546,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct gyear_pskel: virtual simple_content<C>
+        struct gyear_pskel: simple_content<C>
         {
           virtual gyear
           post_gyear () = 0;
@@ -559,7 +559,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct gmonth_day_pskel: virtual simple_content<C>
+        struct gmonth_day_pskel: simple_content<C>
         {
           virtual gmonth_day
           post_gmonth_day () = 0;
@@ -572,7 +572,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct gyear_month_pskel: virtual simple_content<C>
+        struct gyear_month_pskel: simple_content<C>
         {
           virtual gyear_month
           post_gyear_month () = 0;
@@ -585,7 +585,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct date_pskel: virtual simple_content<C>
+        struct date_pskel: simple_content<C>
         {
           virtual date
           post_date () = 0;
@@ -598,7 +598,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct time_pskel: virtual simple_content<C>
+        struct time_pskel: simple_content<C>
         {
           virtual time
           post_time () = 0;
@@ -611,7 +611,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct date_time_pskel: virtual simple_content<C>
+        struct date_time_pskel: simple_content<C>
         {
           virtual date_time
           post_date_time () = 0;
@@ -624,7 +624,7 @@ namespace xsd
         };
 
         template <typename C>
-        struct duration_pskel: virtual simple_content<C>
+        struct duration_pskel: simple_content<C>
         {
           virtual duration
           post_duration () = 0;

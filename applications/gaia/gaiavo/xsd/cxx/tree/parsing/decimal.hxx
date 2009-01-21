@@ -1,10 +1,13 @@
-// file      : xsd/cxx/tree/parsing/unsigned-long.hxx
+// file      : xsd/cxx/tree/parsing/decimal.hxx
 // author    : Boris Kolpackov <boris@codesynthesis.com>
 // copyright : Copyright (c) 2005-2008 Code Synthesis Tools CC
 // license   : GNU GPL v2 + exceptions; see accompanying LICENSE file
 
-#ifndef XSD_CXX_TREE_PARSING_UNSIGNED_LONG_HXX
-#define XSD_CXX_TREE_PARSING_UNSIGNED_LONG_HXX
+#ifndef XSD_CXX_TREE_PARSING_DECIMAL_HXX
+#define XSD_CXX_TREE_PARSING_DECIMAL_HXX
+
+#include <limits>
+#include <locale>
 
 #include <xsd/cxx/ro-string.hxx>
 #include <xsd/cxx/zc-istream.hxx>
@@ -12,6 +15,7 @@
 #include <xsd/cxx/xml/string.hxx> // xml::transcode
 
 #include <xsd/cxx/tree/text.hxx>  // text_content
+#include <xsd/cxx/tree/bits/literals.hxx>
 
 namespace xsd
 {
@@ -20,9 +24,9 @@ namespace xsd
     namespace tree
     {
       template <typename C>
-      struct traits<unsigned long long, C, schema_type::other>
+      struct traits<double, C, schema_type::decimal>
       {
-        typedef unsigned long long type;
+        typedef double type;
 
         static type
         create (const xercesc::DOMElement& e, flags f, container* c);
@@ -38,21 +42,21 @@ namespace xsd
       };
 
       template <typename C>
-      unsigned long long traits<unsigned long long, C, schema_type::other>::
+      double traits<double, C, schema_type::decimal>::
       create (const xercesc::DOMElement& e, flags f, container* c)
       {
         return create (text_content<C> (e), 0, f, c);
       }
 
       template <typename C>
-      unsigned long long traits<unsigned long long, C, schema_type::other>::
+      double traits<double, C, schema_type::decimal>::
       create (const xercesc::DOMAttr& a, flags f, container* c)
       {
         return create (xml::transcode<C> (a.getValue ()), 0, f, c);
       }
 
       template <typename C>
-      unsigned long long traits<unsigned long long, C, schema_type::other>::
+      double traits<double, C, schema_type::decimal>::
       create (const std::basic_string<C>& s,
               const xercesc::DOMElement*,
               flags,
@@ -67,6 +71,7 @@ namespace xsd
         trim (tmp);
 
         zc_istream<C> is (tmp);
+        is.imbue (std::locale::classic ());
 
         type t;
         is >> t;
@@ -77,4 +82,4 @@ namespace xsd
   }
 }
 
-#endif // XSD_CXX_TREE_PARSING_UNSIGNED_LONG_HXX
+#endif // XSD_CXX_TREE_PARSING_DECIMAL_HXX

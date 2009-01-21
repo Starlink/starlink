@@ -17,31 +17,31 @@ namespace xsd
         // Simple auto_ptr version that calls release() instead of delete.
         //
 
-        template <typename X>
+        template <typename T>
         struct remove_c
         {
-          typedef X r;
+          typedef T r;
         };
 
-        template <typename X>
-        struct remove_c<const X>
+        template <typename T>
+        struct remove_c<const T>
         {
-          typedef X r;
+          typedef T r;
         };
 
-        template <typename X>
+        template <typename T>
         struct auto_ptr_ref
         {
-          X* x_;
+          T* x_;
 
           explicit
-          auto_ptr_ref (X* x)
+          auto_ptr_ref (T* x)
               : x_ (x)
           {
           }
         };
 
-        template <typename X>
+        template <typename T>
         struct auto_ptr
         {
           ~auto_ptr ()
@@ -50,7 +50,7 @@ namespace xsd
           }
 
           explicit
-          auto_ptr (X* x = 0)
+          auto_ptr (T* x = 0)
               : x_ (x)
           {
           }
@@ -60,13 +60,13 @@ namespace xsd
           {
           }
 
-          template <typename Y>
-          auto_ptr (auto_ptr<Y>& y)
+          template <typename T2>
+          auto_ptr (auto_ptr<T2>& y)
               : x_ (y.release ())
           {
           }
 
-          auto_ptr (auto_ptr_ref<X> r)
+          auto_ptr (auto_ptr_ref<T> r)
               : x_ (r.x_)
           {
           }
@@ -80,9 +80,9 @@ namespace xsd
             return *this;
           }
 
-          template <typename Y>
+          template <typename T2>
           auto_ptr&
-          operator= (auto_ptr<Y>& y)
+          operator= (auto_ptr<T2>& y)
           {
             if (x_ != y.x_)
               reset (y.release ());
@@ -91,7 +91,7 @@ namespace xsd
           }
 
           auto_ptr&
-          operator= (auto_ptr_ref<X> r)
+          operator= (auto_ptr_ref<T> r)
           {
             if (r.x_ != x_)
               reset (r.x_);
@@ -99,56 +99,56 @@ namespace xsd
             return *this;
           }
 
-          template <typename Y>
-          operator auto_ptr_ref<Y> ()
+          template <typename T2>
+          operator auto_ptr_ref<T2> ()
           {
-            return auto_ptr_ref<Y> (release ());
+            return auto_ptr_ref<T2> (release ());
           }
 
-          template <typename Y>
-          operator auto_ptr<Y> ()
+          template <typename T2>
+          operator auto_ptr<T2> ()
           {
-            return auto_ptr<Y> (release ());
+            return auto_ptr<T2> (release ());
           }
 
         public:
-          X&
+          T&
           operator* () const
           {
             return *x_;
           }
 
-          X*
+          T*
           operator-> () const
           {
             return x_;
           }
 
-          X*
+          T*
           get () const
           {
             return x_;
           }
 
-          X*
+          T*
           release ()
           {
-            X* x (x_);
+            T* x (x_);
             x_ = 0;
             return x;
           }
 
           void
-          reset (X* x = 0)
+          reset (T* x = 0)
           {
             if (x_)
-              const_cast<typename remove_c<X>::r*> (x_)->release ();
+              const_cast<typename remove_c<T>::r*> (x_)->release ();
 
             x_ = x;
           }
 
         private:
-          X* x_;
+          T* x_;
         };
       }
     }

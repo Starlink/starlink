@@ -24,6 +24,8 @@
 #include <xsd/cxx/parser/exceptions.hxx>
 #include <xsd/cxx/parser/elements.hxx>
 #include <xsd/cxx/parser/document.hxx>
+#include <xsd/cxx/parser/error-handler.hxx>
+#include <xsd/cxx/parser/schema-exceptions.hxx>
 
 namespace xsd
 {
@@ -73,72 +75,6 @@ namespace xsd
 
         private:
           XML_Parser parser_;
-        };
-
-
-        //
-        //
-        template <typename C>
-        struct event_router
-        {
-        public:
-          event_router (cxx::parser::document<C>& consumer,
-                        bool polymorphic);
-
-        public:
-          static void XMLCALL
-          start_element (void*, const XML_Char*, const XML_Char**);
-
-          static void XMLCALL
-          end_element (void*, const XML_Char*);
-
-          static void XMLCALL
-          characters (void*, const XML_Char*, int);
-
-          static void XMLCALL
-          start_namespace_decl (void*, const XML_Char*, const XML_Char*);
-
-          static void XMLCALL
-          end_namespace_decl (void*, const XML_Char*);
-
-        private:
-          void
-          start_element_ (const XML_Char* ns_name, const XML_Char** atts);
-
-          void
-          end_element_ (const XML_Char* ns_name);
-
-          void
-          characters_ (const XML_Char* s, std::size_t n);
-
-          void
-          start_namespace_decl_ (const XML_Char* prefix, const XML_Char* ns);
-
-          void
-          end_namespace_decl_ (const XML_Char* prefix);
-
-        private:
-          cxx::parser::document<C>& consumer_;
-          bool polymorphic_;
-
-          // Namespace-prefix mapping. Only maintained in the polymorphic
-          // case.
-          //
-          struct ns_decl
-          {
-            ns_decl (const std::basic_string<C>& p,
-                     const std::basic_string<C>& n)
-                : prefix (p), ns (n)
-            {
-            }
-
-            std::basic_string<C> prefix;
-            std::basic_string<C> ns;
-          };
-
-          typedef std::vector<ns_decl> ns_decls;
-
-          ns_decls ns_decls_;
         };
 
 
@@ -271,14 +207,20 @@ namespace xsd
           // document doc (root, "root");
           //
           // root.pre ();
-          // doc.parse_begin (xml_parser);
+          // doc.parse_begin (xml_parser, "file.xml");
           //
-          // while (more_stuff_to_parse)
+          // while (more_stuff_to_parse &&)
           // {
           //    // Call XML_Parse or XML_ParseBuffer.
-          //    // Handle XML wellformedness errors if any.
+          //
+          //    if (status == XML_STATUS_ERROR)
+          //      break;
           // }
           //
+          // // Call parse_end even in case of an error to translate
+          // // XML and Schema errors to exceptions or error_handler
+          // // calls.
+          // //
           // doc.parse_end ();
           // result_type result (root.post_xxx ());
           //
@@ -293,7 +235,52 @@ namespace xsd
           parse_begin (XML_Parser);
 
           void
+          parse_begin (XML_Parser, const std::basic_string<C>& public_id);
+
+          void
+          parse_begin (XML_Parser, xml::error_handler<C>&);
+
+          void
+          parse_begin (XML_Parser,
+                       const std::basic_string<C>& public_id,
+                       xml::error_handler<C>&);
+          void
           parse_end ();
+
+          // Event routing.
+          //
+        public:
+          static void XMLCALL
+          start_element_thunk_ (void*, const XML_Char*, const XML_Char**);
+
+          static void XMLCALL
+          end_element_thunk_ (void*, const XML_Char*);
+
+          static void XMLCALL
+          characters_thunk_ (void*, const XML_Char*, int);
+
+          static void XMLCALL
+          start_namespace_decl_thunk_ (
+            void*, const XML_Char*, const XML_Char*);
+
+          static void XMLCALL
+          end_namespace_decl_thunk_ (void*, const XML_Char*);
+
+        protected:
+          void
+          start_element_ (const XML_Char* ns_name, const XML_Char** atts);
+
+          void
+          end_element_ (const XML_Char* ns_name);
+
+          void
+          characters_ (const XML_Char* s, std::size_t n);
+
+          void
+          start_namespace_decl_ (const XML_Char* prefix, const XML_Char* ns);
+
+          void
+          end_namespace_decl_ (const XML_Char* prefix);
 
         protected:
           void
@@ -314,12 +301,38 @@ namespace xsd
                  const std::basic_string<C>* public_id,
                  xml::error_handler<C>&);
 
-        protected:
-          bool polymorphic_;
-          event_router<C> router_;
 
+          void
+          translate_schema_exception (const schema_exception<C>& e);
+
+        protected:
           XML_Parser xml_parser_;
           parser_auto_ptr auto_xml_parser_;
+
+          xml::error_handler<C>* eh_;
+          error_handler<C> default_eh_;
+          std::basic_string<C> public_id_;
+
+          bool polymorphic_;
+
+          // Namespace-prefix mapping. Only maintained in the polymorphic
+          // case.
+          //
+          struct ns_decl
+          {
+            ns_decl (const std::basic_string<C>& p,
+                     const std::basic_string<C>& n)
+                : prefix (p), ns (n)
+            {
+            }
+
+            std::basic_string<C> prefix;
+            std::basic_string<C> ns;
+          };
+
+          typedef std::vector<ns_decl> ns_decls;
+
+          ns_decls ns_decls_;
         };
       }
     }

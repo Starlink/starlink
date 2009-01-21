@@ -2132,7 +2132,7 @@ namespace xsd
        *
        * @nosubgrouping
        */
-      template <typename X, typename C, typename B>
+      template <typename T, typename C, typename B>
       class idref: public B
       {
         typedef B base_type;
@@ -2147,7 +2147,7 @@ namespace xsd
         /**
          * @brief Referenced type.
          */
-        typedef X ref_type;
+        typedef T ref_type;
 
       public:
         /**
