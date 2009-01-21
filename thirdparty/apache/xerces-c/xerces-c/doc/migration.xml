@@ -1,0 +1,126 @@
+<?xml version="1.0" standalone="no"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+-->
+
+<!DOCTYPE s1 SYSTEM "sbk:/style/dtd/document.dtd">
+
+<s1 title="Migration">
+    <s2 title="Migration Archive">
+
+       <p>For migration information to &XercesCName; 2 series or earlier,
+          please refer to <link idref="migrate-archive-&XercesC3Series;">Migration Archive</link>.</p>
+
+    </s2>
+
+    <s2 title="Migrating from &XercesCName; 2 series to &XercesCName; &XercesC3Version;">
+      <p>The following section is a discussion of the technical differences between
+      &XercesCName; 2 series and &XercesCName; &XercesC3Version;.</p>
+
+      <p>Topics discussed are:</p>
+      <ul>
+        <li><link anchor="NewFeatures300">New features in &XercesCName; &XercesC3Version;</link></li>
+        <li><link anchor="API300">Public API Changes</link></li>
+        <ul>
+            <li><link anchor="NewAPI300">New Public API</link></li>
+            <li><link anchor="ModifiedAPI300">Modified Public API</link></li>
+            <li><link anchor="DeprecatedAPI300">Deprecated/Removed Public API</link></li>
+        </ul>
+      </ul>
+
+    <anchor name="NewFeatures300"/>
+    <s3 title="New features in &XercesCName; &XercesC3Version;">
+      <ul>
+        <li>Autotools-based build system for the UNIX/Linux/Mac OS X platforms</li>
+        <li>Project files for VC++ 9</li>
+        <li>Support for the ICU transcoder in VC++ 7.1, 8, and 9 project files</li>
+        <li>libcurl-based net accessor</li>
+        <li>Support for XInclude in DOM</li>
+        <li>Support for both XPath 1 and XPath 2 models in the DOM XPath interface</li>
+        <li>Support for the XML Schema subset of XPath 1 in DOM</li>
+        <li>Conformance to the final DOM Level 3 interface specification</li>
+        <li>Ability to provide custom DOM memory manager as well as tune the global DOM heap parameters</li>
+        <li>All public and widely used interfaces as well as a large
+            portion of the implementation were converted to be 64-bit safe.</li>
+        <li>Various XML Schema fixes including the fix for the large
+            maxOccurs and minOccurs bug as well as for the changed ##other
+            interpretation</li>
+        <li>Reviewed and cleaned up diagnostics messages</li>
+        <li>Optimizations for SAX/SAX2 and DOM parsing as well as XML Schema
+            validation</li>
+      </ul>
+    </s3>
+
+    <anchor name="API300"/>
+    <s3 title="Public API Changes">
+
+        <p>&XercesCName; &XercesC3Version; is a major release and includes
+           a number of application-breaking interface changes compared to
+           &XercesCName; 2 series.
+           The following sub-sections provide an overview of the public API
+           changes between &XercesCName; 2 series and this release.</p>
+
+        <anchor name="NewAPI300"/>
+        <s4 title="New Public APIs">
+            <ul>
+              <li>XMLGrammarPoolImpl implementation has been moved to
+                  framework/ and is now publicly accessible</li>
+
+              <li>DOM XPath interfaces now support XPath 2 model</li>
+
+              <li>A number of DOM interfaces (DOMLSInput, DOMLSOuput,
+                  DOMLSParser, DOMLSSerializer, DOMConfiguration, etc.)
+                  were added as part of the the final DOM Level 3
+                  specification conformance work</li>
+            </ul>
+        </s4>
+
+        <anchor name="ModifiedAPI300"/>
+        <s4 title="Modified Public APIs">
+
+          <p>A large number of public APIs have been modified. Consult
+             individual interface documentation for details. The following
+             list gives an overview of major changes:</p>
+
+          <ul>
+            <li>Several DOM interfaces have been adjusted to conform to the final
+                DOM Level 3 specification</li>
+
+            <li>DOM XPath interfaces have been adjusted to support both XPath 1
+                and XPath 2</li>
+
+            <li>Many public interfaces that used int/long types to represent
+                memory-related sizes, counts, indexes, etc., have been modified
+                to use the 64-bit safe XMLSize_t type instead</li>
+          </ul>
+
+        </s4>
+
+        <anchor name="DeprecatedAPI300"/>
+        <s4 title="Deprecated/Removed Public APIs">
+          <p>All APIs marked as deprecated in &XercesCName; 2 series have
+             been removed in this release. In particular deprecated DOM
+             (depdom) as well as COM support have been removed.</p>
+
+          <p>Furthermore, a number of DOM interfaces (DOMBuilder, DOMWriter,
+             DOMInputSource, etc.) were replaced as part of the the final
+             DOM Level 3 specification conformance work.</p>
+        </s4>
+
+    </s3>
+    </s2>
+
+</s1>
