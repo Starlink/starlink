@@ -2088,7 +2088,7 @@ C
 
       character fwd(1)*30,inv(1)*30
       integer status, frm, reg, reg2, reg3, reg4, mm, map
-      integer mdata(-1:15),lbnd,ubnd,nbad,unc
+      integer mdata(-1:15),lbnd,ubnd,nbad,unc, enc, enc2
       double precision pnts( 3 ), xin(3),xout(3), acc, ina, inb, outa,
      :                 outb
       data mdata /17*0/
@@ -2210,6 +2210,26 @@ C
          write(*,*) 'mdata(8) = ',mdata(8)
          call stopit( status, 'Above value should be 0' )
       end if
+
+      if( ast_getenclosure( reg, status ) .ne. AST__NULL ) then
+         call stopit( status, 'Non-NULL enclosure' )
+      end if
+
+      enc = ast_nullregion( frm, AST__NULL, 'Ident=freddd', status )
+      call ast_setenclosure( reg, enc, status )
+      enc2 = ast_getenclosure( reg, status ) 
+      if( enc .eq. AST__NULL ) then
+         call stopit( status, 'No enclosure' )
+      end if
+      if( ast_getc( enc2, 'Ident', status ) .ne. 'freddd' ) then
+         call stopit( status, 'Enclosure has been changed' )
+      end if
+
+      call ast_setenclosure( reg, AST__NULL, status )
+      if( ast_getenclosure( reg, status ) .ne. AST__NULL ) then
+         call stopit( status, 'Enclosure remains' )
+      end if
+
       
       
 

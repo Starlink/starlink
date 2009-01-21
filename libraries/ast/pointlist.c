@@ -18,17 +18,30 @@ f     AST_POINTLIST
 *     The PointList class inherits from the Region class.
 
 *  Attributes:
-*     The PointList class does not define any new attributes beyond
-*     those which are applicable to all Regions. 
+*     In addition to those attributes common to all Regions, every
+*     PointList also has the following attributes:
+*
+*     - ListSize: The number of positions stored in the PointList
 
 *  Functions:
-c     The PointList class does not define any new functions beyond those
-f     The PointList class does not define any new routines beyond those
-*     which are applicable to all Regions.
+*  Functions:
+c     In addition to those functions applicable to all Regions, the
+c     following functions may also be applied to all PointLists:
+f     In addition to those routines applicable to all Regions, the
+f     following routines may also be applied to all PointList:
+*
+c     - astGetEnclosure: Get a Region that encloses a PointList
+c     - astPoints: Return the axis values of the points in a PointList
+c     - astSetEnclosure: Specify a Region that encloses a PointList
+f     - AST_GETENCLOSURE: Get a Region that encloses a PointList
+f     - AST_POINTS: Return the axis values of the points in a PointList
+f     - AST_SETENCLOSURE: Specify a Region that encloses a PointList
 
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -54,6 +67,10 @@ f     The PointList class does not define any new routines beyond those
 *        Original version.
 *     20-JAN-2009 (DSB):
 *        Over-ride astRegBasePick.
+*     21-JAN-2009 (DSB):
+*        - Add methods astGetEnclosure, astSetEnclosure and astPoints, and 
+*        attribute ListSize.
+*        - Override astGetObjSize and astEqual.
 *class--
 
 *  Implementation Deficiencies:
@@ -111,14 +128,21 @@ f     The PointList class does not define any new routines beyond those
 static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static AstMapping *(* parent_simplify)( AstMapping *, int * );
+static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static const char *(* parent_getattrib)( AstObject *, const char *, int * );
+static int (* parent_equal)( AstObject *, AstObject *, int * );
+static int (* parent_getobjsize)( AstObject *, int * );
+static int (* parent_testattrib)( AstObject *, const char *, int * );
+static void (* parent_clearattrib)( AstObject *, const char *, int * );
+static void (* parent_setattrib)( AstObject *, const char *, int * );
 
 
 #ifdef THREAD_SAFE
 /* Define how to initialise thread-specific globals. */ 
 #define GLOBAL_inits \
-   globals->Class_Init = 0; 
+   globals->Class_Init = 0; \
+   globals->GetAttrib_Buff[ 0 ] = 0;
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(PointList)
@@ -126,6 +150,7 @@ astMAKE_INITGLOBALS(PointList)
 /* Define macros for accessing each item of thread specific global data. */
 #define class_init astGLOBAL(PointList,Class_Init)
 #define class_vtab astGLOBAL(PointList,Class_Vtab)
+#define getattrib_buff astGLOBAL(PointList,GetAttrib_Buff)
 
 
 #include <pthread.h>
@@ -133,6 +158,7 @@ astMAKE_INITGLOBALS(PointList)
 
 #else
 
+static char getattrib_buff[ 101 ];
 
 /* Define the class virtual function table and its initialisation flag
    as static variables. */
@@ -167,16 +193,255 @@ static int MaskUS( AstRegion *, AstMapping *, int, int, const int[], const int[]
 static AstMapping *Simplify( AstMapping *, int * );
 static AstPointSet *RegBaseMesh( AstRegion *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
-static AstRegion *RegBasePick( AstRegion *this, int, const int *, int * );
+static AstRegion *GetEnclosure( AstPointList *, int * );
+static AstRegion *RegBasePick( AstRegion *, int, const int *, int * );
+static int Equal( AstObject *, AstObject *, int * );
 static int GetClosed( AstRegion *, int * );
+static int GetListSize( AstPointList *, int * );
+static int GetObjSize( AstObject *, int * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
-static void RegBaseBox( AstRegion *this, double *, double *, int * );
+static void Points( AstPointList *, int, int, double *, int * );
+static void RegBaseBox( AstRegion *, double *, double *, int * );
+static void SetEnclosure( AstPointList *, AstRegion *, int * );
+
+static const char *GetAttrib( AstObject *, const char *, int * );
+static int TestAttrib( AstObject *, const char *, int * );
+static void ClearAttrib( AstObject *, const char *, int * );
+static void SetAttrib( AstObject *, const char *, int * );
+
 
 /* Member functions. */
 /* ================= */
+
+static void ClearAttrib( AstObject *this_object, const char *attrib, 
+                         int *status ) {
+/*
+*  Name:
+*     ClearAttrib
+
+*  Purpose:
+*     Clear an attribute value for a PointList.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "pointlist.h"
+*     void ClearAttrib( AstObject *this, const char *attrib, int *status )
+
+*  Class Membership:
+*     PointList member function (over-rides the astClearAttrib
+*     protected method inherited from the Object class).
+
+*  Description:
+*     This function clears the value of a specified attribute for a
+*     PointList, so that the default value will subsequently be used.
+
+*  Parameters:
+*     this
+*        Pointer to the PointList.
+*     attrib
+*        Pointer to a null-terminated string specifying the attribute
+*        name.  This should be in lower case with no surrounding white
+*        space.
+*     status
+*        Pointer to the inherited status variable.
+*/
+
+/* Local Variables: */
+   AstPointList *this;            /* Pointer to the PointList structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the PointList structure. */
+   this = (AstPointList *) this_object;
+
+/* Check the attribute name and clear the appropriate attribute. */
+
+/* Test if the name matches any of the read-only attributes of this
+   class. If it does, then report an error. */
+   if ( !strcmp( attrib, "listsize" ) ) {
+      astError( AST__NOWRT, "astClear: Invalid attempt to clear the \"%s\" "
+                "value for a %s.", status, attrib, astGetClass( this ) );
+      astError( AST__NOWRT, "This is a read-only attribute." , status);
+
+/* If the attribute is still not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      (*parent_clearattrib)( this_object, attrib, status );
+   }
+}
+
+static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two PointLists are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "pointlist.h"
+*     int Equal( AstObject *this, AstObject *that, int *status ) 
+
+*  Class Membership:
+*     PointList member function (over-rides the astEqual protected
+*     method inherited from the astRegion class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two PointLists are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a PointList).
+*     that
+*        Pointer to the second Object.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     One if the PointLists are equivalent, zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstPointList *that;        
+   AstPointList *this;        
+   int result;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Invoke the Equal method inherited from the parent Region class. This 
+   checks that the Objects are both of the same class, and have the same 
+   points lists, Negated and Closed flags (amongst other things). */
+   if( (*parent_equal)( this_object, that_object, status ) ) {
+
+/* Obtain pointers to the two PointList structures. */
+      this = (AstPointList *) this_object;
+      that = (AstPointList *) that_object;
+
+/* Test their enclosure Regions for equality. */
+      if( this->enclosure && that->enclosure ) {
+         result = astEqual( this->enclosure, that->enclosure );
+
+      } else if( !this->enclosure && !that->enclosure ) {
+         result = 1;         
+      }
+   }
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
+static const char *GetAttrib( AstObject *this_object, const char *attrib, 
+                              int *status ) {
+/*
+*  Name:
+*     GetAttrib
+
+*  Purpose:
+*     Get the value of a specified attribute for a PointList.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "pointlist.h"
+*     const char *GetAttrib( AstObject *this, const char *attrib, int *status )
+
+*  Class Membership:
+*     PointList member function (over-rides the protected astGetAttrib
+*     method inherited from the Region class).
+
+*  Description:
+*     This function returns a pointer to the value of a specified
+*     attribute for a PointList, formatted as a character string.
+
+*  Parameters:
+*     this
+*        Pointer to the PointList.
+*     attrib
+*        Pointer to a null-terminated string containing the name of
+*        the attribute whose value is required. This name should be in
+*        lower case, with all white space removed.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     - Pointer to a null-terminated string containing the attribute
+*     value.
+
+*  Notes:
+*     - The returned string pointer may point at memory allocated
+*     within the PointList, or at static memory. The contents of the
+*     string may be over-written or the pointer may become invalid
+*     following a further invocation of the same function or any
+*     modification of the PointList. A copy of the string should
+*     therefore be made if necessary.
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   AstPointList *this;           /* Pointer to the PointList structure */
+   const char *result;           /* Pointer value to return */
+   int ival;                     /* Integer attribute value */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */   
+   if ( !astOK ) return result;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this_object);
+
+/* Obtain a pointer to the PointList structure. */
+   this = (AstPointList *) this_object;
+
+/* Compare "attrib" with each recognised attribute name in turn,
+   obtaining the value of the required attribute. If necessary, write
+   the value into "getattrib_buff" as a null-terminated string in an 
+   appropriate format.  Set "result" to point at the result string. */
+
+/* ListSize. */
+/* -------- */
+   if ( !strcmp( attrib, "listsize" ) ) {
+      ival = astGetListSize( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
+      }
+
+/* If the attribute name was not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      result = (*parent_getattrib)( this_object, attrib, status );
+   }
+
+/* Return the result. */
+   return result;
+}
 
 static int GetClosed( AstRegion *this, int *status ) {
 /*
@@ -227,6 +492,180 @@ static int GetClosed( AstRegion *this, int *status ) {
    return ( astGetNegated( this ) == 0 );
 }
 
+static AstRegion *GetEnclosure( AstPointList *this, int *status ){
+/*
+*++
+*  Name:
+c     astGetEnclosure
+f     AST_GETENCLOSURE
+
+*  Purpose:
+*     Returns the enclosure Region previously stored in a PointList.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "pointlist.h"
+c     AstRegion *GetEnclosure( AstPointList *this )
+f     RESULT = AST_GETENCLOSURE( THIS, STATUS )
+
+*  Class Membership:
+*     PointList method.
+
+*  Description:
+*     This function returns the Region previously stored in the PointList 
+*     using
+c     astSetEnclosure.
+f     AST_SETENCLOSURE.
+*     If this has not been done, then a 
+c     NULL pointer
+f     value of AST__NULL
+*     is returned by this function.
+*
+*     The enclosure Region should usually be a Region that encloses the
+*     points in the PointList, although no check is performed to see if
+*     this is actually the case.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the PointList.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astGetEnclosure()
+f     AST_GETENCLOSURE = INTEGER
+*        Pointer to a deep copy of the Region previously stored using
+c        astSetEnclosure, or NULL
+f        AST_SETENCLOSURE, or AST__NULL
+*        if no such Region has been stored in the PointList. Any changes
+*        made to the returned Region will have no effect on the PointList 
+*        unless the modified Region is stored in the PointList using 
+c        astSetEnclosure.
+c        AST_SETENCLOSURE.
+
+*--
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Return the pointer stored in the PointList. */
+   return this->enclosure ? astCopy( this->enclosure ) : NULL; 
+}
+
+static int GetListSize( AstPointList *this, int *status ) {
+/*
+*+
+*  Name:
+*     astGetListSize
+
+*  Purpose:
+*     Determine how many points there are in a PointList.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "pointlist.h"
+*     int astGetListSize( AstPointList *this )
+
+*  Class Membership:
+*     PointList method.
+
+*  Description:
+*     This function returns the number of points stored in a Point|List.
+
+*  Parameters:
+*     this
+*        Pointer to the PointList.
+
+*  Returned Value:
+*     The number of points in the PointList.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* Return the number of points by querying the PointSet that holds the
+   points. */
+   return astGetNpoint( ((AstRegion *) this)->points );
+}
+
+static int GetObjSize( AstObject *this_object, int *status ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "pointlist.h"
+*     int GetObjSize( AstObject *this, int *status ) 
+
+*  Class Membership:
+*     PointList member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied PointList,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the PointList.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstPointList *this;         /* Pointer to PointList structure */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the PointList structure. */
+   this = (AstPointList *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by this class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object, status );
+
+   if( this->enclosure ) result += astGetObjSize( this->enclosure );
+   result += astGetObjSize( this->lbnd );
+   result += astGetObjSize( this->ubnd );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name, int *status ) {
 /*
 *+
@@ -265,6 +704,7 @@ void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name, int *stat
 
 /* Local Variables: */
    astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstRegionVtab *region;        /* Pointer to Region component of Vtab */
 
@@ -288,11 +728,34 @@ void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name, int *stat
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that provide
    virtual methods for this class. */
+   vtab->Points = Points;
+   vtab->GetListSize = GetListSize;
+   vtab->GetEnclosure = GetEnclosure;
+   vtab->SetEnclosure = SetEnclosure;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
+   object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
    region = (AstRegionVtab *) vtab;
+
+   parent_equal = object->Equal;
+   object->Equal = Equal;
+
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
+
+   parent_clearattrib = object->ClearAttrib;
+   object->ClearAttrib = ClearAttrib;
+
+   parent_getattrib = object->GetAttrib;
+   object->GetAttrib = GetAttrib;
+
+   parent_setattrib = object->SetAttrib;
+   object->SetAttrib = SetAttrib;
+
+   parent_testattrib = object->TestAttrib;
+   object->TestAttrib = TestAttrib;
 
    parent_transform = mapping->Transform;
    mapping->Transform = Transform;
@@ -640,6 +1103,130 @@ MAKE_MASK(UB,unsigned char)
 /* Undefine the macro. */
 #undef MAKE_MASK
 
+static void Points( AstPointList *this, int max_coord, int max_point, 
+                    double *out, int *status ) {
+/*
+*++
+*  Name:
+c     astPoints
+f     AST_POINTS
+
+*  Purpose:
+*     Return the axis values in a PointList.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "pointlist.h"
+c     void astPoints( AstPointList *this, int max_coord, int max_point, 
+c                     double *out ) 
+f     CALL AST_POINTS( THIS, MAX_COORD, MAX_POINT, OUT, STATUS )
+
+*  Class Membership:
+*     Mapping method.
+
+*  Description:
+c     This function 
+f     This routine
+*     returns the PointList axis values in a supplied array.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the PointList to be applied.
+c     max_coord
+f     MAX_COORD = INTEGER (Given)
+*        The maximum number of axes for which coordinates are to be 
+*        stored in the returned array. If this is less than the number
+*        of axes spanned by the PointList, then coordinates will not be 
+*        stored for axes larger than the given maximum. If this is more 
+*        than the number of axes spanned by the PixelList, then the unused 
+*        elements of the array will be filled with bad (AST__BAD) values.
+c     max_point
+f     MAX_POINT = INTEGER (Given)
+*        The maximum number of positions for which coordinates are to be 
+*        stored in the returned array. If this is less than the number
+*        of positions in the PointList, then coordinates will not be stored 
+*        for positions beyond the given maximum. If this is more than the 
+*        number of positions in the PointList, then the unused elements of 
+*        the array will be filled with bad (AST__BAD) values.
+c     out
+f     OUT( MAX_POINT, MAX_COORD ) = DOUBLE PRECISION (Returned)
+c        The address of the first element in a 2-dimensional array of 
+c        shape "[max_coord][max_point]", into
+c        which the coordinates of the points will
+c        be written. These will be stored such that the value of
+c        coordinate number "coord" for point number "point"
+c        will be found in element "out[coord][point]".
+f        An array into which the coordinates of the 
+f        points will be written. These will be stored
+f        such that the value of coordinate number COORD for output
+f        point number POINT will be found in element OUT(POINT,COORD).
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - The number of axes spanned by the PointList is given by the Naxes
+*     attribute.
+*     - The number of points in the PointList is given by the ListSize
+*     attribute.
+*--
+*/
+
+/* Local Variables: */
+   AstPointSet *pset;       /* PointSet holding PointList axis values */
+   double **ptr;            /* Pointer to axes values in the PointList */
+   double *p;               /* Pointer to next input axis value */
+   double *q;               /* Pointer to next output axis value */
+   int i;                   /* Point index */
+   int j;                   /* Axis index */
+   int ncoord;              /* No. of axes to copy */
+   int npoint;              /* No. of points to copy */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get a pointer to the PointSet holding the axis values. */
+   pset = ( (AstRegion *) this )->points;
+
+/* Get the dimensions of this PointList, and get a pointer to teh axis
+   values. */
+   ncoord = astGetNcoord( pset );
+   npoint = astGetNpoint( pset );
+   ptr = astGetPoints( pset );
+
+/* Check pointers can be used safely. */
+   if ( astOK ) {
+
+/* Determine how many axes are to be copied. */
+      if( ncoord > max_coord ) ncoord = max_coord;
+
+/* Determine how many points are to be copied. */
+      if( npoint > max_point ) npoint = max_point;
+
+/* Loop round the axes to be copied. */
+      for( j = 0; j < ncoord; j++ ) {
+
+/* Get points to the first element of the input and output arrays. */
+         p = ptr[ j ];
+         q = out + j*max_point;
+
+/* Loop round copying the points. */
+         for( i = 0; i < npoint; i++ ) *(q++) = *(p++);
+
+/* Fill in any unused elements in the output array for this axis. */
+         for( ; i < max_point; i++ ) *(q++) = AST__BAD;
+      }
+
+/* Fill in any unused axes in the output array. */
+      for( ; j < max_coord; j++ ) {
+         q = out + j*max_point;
+         for( i = 0; i < max_point; i++ ) *(q++) = AST__BAD;
+      }
+   }
+}
+
 static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int *status ){
 /*
 *  Name:
@@ -761,8 +1348,8 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
          this->lbnd = lb;
          this->ubnd = ub;
       } else {
-         this->lbnd = astAnnul( this->lbnd );
-         this->ubnd = astAnnul( this->ubnd );
+         this->lbnd = astFree( this->lbnd );
+         this->ubnd = astFree( this->ubnd );
       }
    }
 
@@ -1200,6 +1787,152 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    return result;
 }
 
+static void SetAttrib( AstObject *this_object, const char *setting, 
+                       int *status ) {
+/*
+*  Name:
+*     astSetAttrib
+
+*  Purpose:
+*     Set an attribute value for a PointList.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "pointlist.h"
+*     void SetAttrib( AstObject *this, const char *setting )
+
+*  Class Membership:
+*     PointList member function (over-rides the astSetAttrib protected
+*     method inherited from the Object class).
+
+*  Description:
+*     This function assigns an attribute value for a PointList, the
+*     attribute and its value being specified by means of a string of
+*     the form:
+*
+*        "attribute= value "
+*
+*     Here, "attribute" specifies the attribute name and should be in
+*     lower case with no white space present. The value to the right
+*     of the "=" should be a suitable textual representation of the
+*     value to be assigned and this will be interpreted according to
+*     the attribute's data type.  White space surrounding the value is
+*     only significant for string attributes.
+
+*  Parameters:
+*     this
+*        Pointer to the PointList.
+*     setting
+*        Pointer to a null-terminated string specifying the new
+*        attribute value.
+*/
+
+/* Local Variables: */
+   AstPointList *this;            /* Pointer to the PointList structure */
+   int len;                      /* Length of setting string */
+   int nc;                       /* Number of characters read by astSscanf */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the PointList structure. */
+   this = (AstPointList *) this_object;
+
+/* Obtain the length of the setting string. */
+   len = (int) strlen( setting );
+
+/* Test for each recognised attribute in turn, using "astSscanf" to parse
+   the setting string and extract the attribute value (or an offset to
+   it in the case of string values). In each case, use the value set
+   in "nc" to check that the entire string was matched. Once a value
+   has been obtained, use the appropriate method to set it. */
+
+/* Define a macro to see if the setting string matches any of the
+   read-only attributes of this class. */
+#define MATCH(attrib) \
+        ( nc = 0, ( 0 == astSscanf( setting, attrib "=%*[^\n]%n", &nc ) ) && \
+                  ( nc >= len ) )
+
+/* Use this macro to report an error if a read-only attribute has been
+   specified. */
+   if ( MATCH( "listsize" ) ) {
+      astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.", 
+                status, setting, astGetClass( this ) );
+      astError( AST__NOWRT, "This is a read-only attribute." , status );
+
+/* If the attribute is still not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      (*parent_setattrib)( this_object, setting, status );
+   }
+
+/* Undefine macros local to this function. */
+#undef MATCH
+}
+
+static void SetEnclosure( AstPointList *this, AstRegion *region,
+                          int *status ){
+/*
+*++
+*  Name:
+c     astSetEnclosure
+f     AST_SETENCLOSURE
+
+*  Purpose:
+*     Stores a new enclosure Region in a PointList.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "pointlist.h"
+c     astSetEnclosure( AstPointList *this, AstRegion *region )
+f     CALL AST_SETENCLOSURE( THIS, REGION, STATUS )
+
+*  Class Membership:
+*     PointList method.
+
+*  Description:
+*     This function stores a copy of a supplied Region as the "enclosure 
+*     Region" in a PointList. The enclosure Region can be retrieved later 
+*     using
+c     astGetEnclosure.
+f     AST_GETENCLOSURE.
+*
+*     The enclosure Region should usually be a Region that encloses the
+*     points in the PointList, although no check is performed to see if
+*     this is actually the case.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the PointList.
+c     region
+f     REGION = INTEGER (Given)
+*        Pointer to the new enclosure Region, or 
+c        NULL
+f        AST__NULL
+*        (in which case any existing enclosure Region will be removed).
+*        A deep copy of the Region will be taken, so any subsequent changes 
+*        made to the Region will have no effect on the PointList.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*--
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Clear any existing enclosure Region. */
+   if( this->enclosure ) this->enclosure = astAnnul( this->enclosure );
+
+/* Store the new enclosure Region (if supplied). */
+   if( region ) this->enclosure = astCopy( region );
+}
+
 static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /*
 *  Name:
@@ -1351,6 +2084,78 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    if ( !astOK ) result = astAnnul( result );
 
 /* Return the result. */
+   return result;
+}
+
+static int TestAttrib( AstObject *this_object, const char *attrib, 
+                       int *status ) {
+/*
+*  Name:
+*     TestAttrib
+
+*  Purpose:
+*     Test if a specified attribute value is set for a PointList.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "pointlist.h"
+*     int TestAttrib( AstObject *this, const char *attrib, int *status )
+
+*  Class Membership:
+*     PointList member function (over-rides the astTestAttrib protected
+*     method inherited from the Object class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate
+*     whether a value has been set for one of a PointList's attributes.
+
+*  Parameters:
+*     this
+*        Pointer to the PointList.
+*     attrib
+*        Pointer to a null-terminated string specifying the attribute
+*        name.  This should be in lower case with no surrounding white
+*        space.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     One if a value has been set, otherwise zero.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstPointList *this;            /* Pointer to the PointList structure */
+   int result;                   /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the PointList structure. */
+   this = (AstPointList *) this_object;
+
+/* Check the attribute name and test the appropriate attribute. */
+
+/* Test if the name matches any of the read-only attributes of this
+   class. If it does, then return zero. */
+   if ( !strcmp( attrib, "listsize" ) ){
+      result = 0;
+
+/* If the attribute is still not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      result = (*parent_testattrib)( this_object, attrib, status );
+   }
+
+/* Return the result, */
    return result;
 }
 
@@ -1593,6 +2398,31 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    "object.h" file. For a description of each attribute, see the class
    interface (in the associated .h file). */
 
+/*
+*att++
+*  Name:
+*     ListSize
+
+*  Purpose:
+*     Number of points in a PointList.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer, read-only.
+
+*  Description:
+*     This is a read-only attribute giving the number of points in a
+*     PointList. This value is determined when the PointList is created.
+
+*  Applicability:
+*     PointList
+*        All PointLists have this attribute.
+*att--
+*/
+
+
 /* Copy constructor. */
 /* ----------------- */
 static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
@@ -1640,6 +2470,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    the output PointList. */
    out->lbnd = NULL;
    out->ubnd = NULL;
+   out->enclosure = NULL;
 
 /* Copy dynamic memory contents */
    if( in->lbnd && in->ubnd ) {
@@ -1647,6 +2478,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
       out->lbnd = astStore( NULL, in->lbnd, nb );
       out->ubnd = astStore( NULL, in->ubnd, nb );
    }
+   if( in->enclosure ) out->enclosure = astCopy( in->enclosure );
 }
 
 
@@ -1687,6 +2519,7 @@ static void Delete( AstObject *obj, int *status ) {
    this = (AstPointList *) obj;
 
 /* Annul all resources. */
+   if( this->enclosure ) this->enclosure = astAnnul( this->enclosure );
    this->lbnd = astFree( this->lbnd );
    this->ubnd = astFree( this->ubnd );
 }
@@ -1745,7 +2578,12 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    actual default attribute value.  Since "set" will be zero, these
    values are for information only and will not be read back. */
 
-/* There are no values to write, so return without further action. */
+/* Enclosure */ 
+/* --------- */
+   if( this->enclosure ) {
+      astWriteObject( channel, "Enclos", 1, 1, this->enclosure, 
+                      "Region enclosing the points" );
+   }
 }
 
 /* Standard class functions. */
@@ -2181,6 +3019,7 @@ AstPointList *astInitPointList_( void *mem, size_t size, int init, AstPointListV
 /* ------------------------------ */
          new->lbnd = NULL;
          new->ubnd = NULL;
+         new->enclosure = NULL;
 
 /* If an error occurred, clean up by deleting the new PointList. */
          if ( !astOK ) new = astDelete( new );
@@ -2319,9 +3158,9 @@ AstPointList *astLoadPointList_( void *mem, size_t size, AstPointListVtab *vtab,
    obtained, we then use the appropriate (private) Set... member
    function to validate and set the value properly. */
 
-
-/* There are no values to read. */
-/* ---------------------------- */
+/* Enclosure */
+/* --------- */
+      new->enclosure = astReadObject( channel, "enclos", NULL );
 
 /* If an error occurred, clean up by deleting the new PointList. */
       if ( !astOK ) new = astDelete( new );
@@ -2343,6 +3182,21 @@ AstPointList *astLoadPointList_( void *mem, size_t size, AstPointListVtab *vtab,
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
 
-
-
-
+int astGetListSize_( AstPointList *this, int *status ) {
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,PointList,GetListSize))( this, status );
+}
+void astPoints_( AstPointList *this, int max_coord, int max_point, double *out,
+                 int *status ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,PointList,Points))( this, max_coord, max_point, out, 
+                                         status );
+}
+void astSetEnclosure_( AstPointList *this, AstRegion *region, int *status ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,PointList,SetEnclosure))( this, region, status );
+}
+AstRegion *astGetEnclosure_( AstPointList *this, int *status ) {
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,PointList,GetEnclosure))( this, status );
+}

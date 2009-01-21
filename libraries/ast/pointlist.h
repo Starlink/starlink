@@ -100,7 +100,7 @@ typedef struct AstPointList {
 /* Attributes specific to objects in this class. */
    double *lbnd;              /* Lower axis limits of bounding box */
    double *ubnd;              /* Upper axis limits of bounding box */
-
+   AstRegion *enclosure;      /* A Region enclosing the points */
 } AstPointList;
 
 /* Virtual function table. */
@@ -117,6 +117,10 @@ typedef struct AstPointListVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
+   void (* Points)( AstPointList *, int, int, double *, int * );
+   int (* GetListSize)( AstPointList *, int * );
+   AstRegion *(* GetEnclosure)( AstPointList *, int * );
+   void (* SetEnclosure)( AstPointList *, AstRegion *, int * );
 } AstPointListVtab;
 
 #if defined(THREAD_SAFE) 
@@ -127,6 +131,7 @@ typedef struct AstPointListVtab {
 typedef struct AstPointListGlobals {
    AstPointListVtab Class_Vtab;
    int Class_Init;
+   char GetAttrib_Buff[ 101 ];
 } AstPointListGlobals;
 
 
@@ -168,7 +173,11 @@ AstPointList *astLoadPointList_( void *, size_t, AstPointListVtab *,
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
+void astPoints_( AstPointList *, int, int, double *, int * );
+AstRegion *astGetEnclosure_( AstPointList *, int * );
+void astSetEnclosure_( AstPointList *, AstRegion *, int * );
 # if defined(astCLASS)           /* Protected */
+int astGetListSize_( AstPointList *, int * );
 #endif
 
 /* Function interfaces. */
@@ -218,7 +227,16 @@ astINVOKE(O,astLoadPointList_(mem,size,vtab,name,astCheckChannel(channel),STATUS
    before use.  This provides a contextual error report if a pointer
    to the wrong sort of Object is supplied. */
 
+#define astPoints(this,max_coord,max_point,out) \
+astINVOKE(V,astPoints_(astCheckPointList(this),max_coord,max_point,out,STATUS_PTR))
+#define astGetEnclosure(this) \
+astINVOKE(O,astGetEnclosure_(astCheckPointList(this),STATUS_PTR))
+#define astSetEnclosure(this,region) \
+astINVOKE(V,astSetEnclosure_(astCheckPointList(this),(region?astCheckRegion(region):NULL),STATUS_PTR))
+
 #if defined(astCLASS)            /* Protected */
+#define astGetListSize(this) \
+astINVOKE(V,astGetListSize_(astCheckPointList(this),STATUS_PTR))
 #endif
 #endif
 

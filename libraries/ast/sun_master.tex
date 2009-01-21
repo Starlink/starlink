@@ -21560,6 +21560,27 @@ current version):
 
 \begin{enumerate}
 
+\item The PointList class has a new method, 
+c+
+astPoints, 
+c-
+f+
+AST\_POINTS,
+f-
+that copies the axis values from the PointList into a supplied array. 
+
+\item The PointList class has two new methods, 
+c+
+astSetEnclosure and astGetEnclosure,
+c-
+f+
+AST\_SETENCLOSURE and AST\_GETENCLOSURE,
+f-
+that allow a Region that encloses the points to be associated with the 
+PointList.
+
+\item The PointList class has a new (read-only) attribute, ListSize, that 
+gives the number of points stored in the PointList.
 
 \item The handling of warnings within different classes of Channel has
 been rationalised. The XmlStrict attribute and 
