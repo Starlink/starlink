@@ -32,7 +32,7 @@ for ac_arg in $ac_configure_args; do
 done
 export star_extra_items
 (
-   cd gsl-1.9; \
+   cd xerces-c; \
    cmd="./configure --prefix=$prefix \
                     --srcdir=. \
                     $star_extra_items \

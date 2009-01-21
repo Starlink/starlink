@@ -1,4 +1,4 @@
-SUBDIRS = src tests samples
+SUBDIRS = src tests
 
 EXTRA_DIST = version.incl \
              config/pretty-make \
