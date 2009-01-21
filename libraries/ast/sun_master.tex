@@ -21600,6 +21600,20 @@ f-
 has been added to the Frame class. This function finds the point of
 intersection beteeen two geodesic curves.
 
+\item A bug in the type-checking of Objects passed as arguments to constructor
+functions has been fixed. This bug could lead to applications crashing or
+showing strange behaviour if an inappropriate class of Object was
+supplied as an argument to a constructor.
+
+\item The 
+c+
+astPickAxes 
+c-
+f+
+AST\_PICKAXES
+f-
+function will now return a Region, if possible, when applied to a Region. If 
+this is not possible, a Frame will be returned as before.
 
 \item A new function called
 c+

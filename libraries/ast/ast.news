@@ -23,6 +23,14 @@ determines the position at which two geodesic curves intersect.
 The same functionality is now available via the existing Strict attribute, 
 a new attribute called ReportLevel, and a new function called astWarnings.
 
+- A bug in the type-checking of Objects passed as arguments to constructor
+functions has been fixed. This bug could lead to applications crashing or
+showing strange behaviour if an inappropriate class of Object was
+supplied as an argument to a constructor.
+
+- The astPickAxes function will now return a Region, if possible, when
+applied to a Region. If this is not possible, a Frame will be returned as
+before.
 
 Main Changes in Version 6.0
 ---------------------------
