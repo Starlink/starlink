@@ -239,6 +239,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *        independently for each approximation period.
 *     14-JAN-2009 (DSB):
 *        Override the astIntersect method.
+*     21-JAN-2009 (DSB):
+*        Fix mis-use of results buffers for GetFormat and GetAttrib.
 *class--
 */
 
