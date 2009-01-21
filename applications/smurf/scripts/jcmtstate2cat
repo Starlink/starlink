@@ -14,7 +14,7 @@ jcmtstate2cat - convert JCMT state structure into TST format
 Reads a set of SCUBA-2 or ACSIS files and writes a catalogue of the state information
 to standard out. The output file is in TST format and can be read into the
 TOPCAT application (but may require that TOPCAT is told explicitly that
-the catalogue is in TST format).
+the catalogue is in TST format, e.g. with the "-f tst" command line option).
 
 This information includes the telescope pointing position (Actual, Demand and Base)
 in both the tracking system and AZEL coordinate frames, jiggle patterns, telescope
@@ -46,15 +46,21 @@ Four columns are generated in addition to writing the simple contents
 of the JCMT state structure. "ra" and "dec" contain the tracking
 coordinates taking into account jiggle and chop (noting that if the
 tracking system is GALACTIC the columns will still be called "ra" and
-"dec"). "az" and "el" contain the azimuth and elevation of the
-observation taking account of jiggling and chopping but referenced
-back to the base position for the beginning of the observation. Note
-that jiggle and chop offsets are added onto the actual AZEL
-coordinates (TCS_AZ_AC1 and TCS_AZ_AC2) without attempting to convert
-them to RA/Dec first. This means that the values may not correspond to
-a simple rotation relative to the "ra" and "dec" values if the jiggle
-coordinate system is AZEL. If the jiggle coordinate system if TRACKING
-then the coordinates will be related by a simple rotation.
+"dec"). "az" and "el" contain the (moving) azimuth and elevation
+taking into account telescope and secondary movement. "daz" and "del"
+contain the azimuth and elevation of the observation taking account of
+jiggling and chopping but referenced back to the base position for the
+beginning of the observation. Note that jiggle and chop offsets are
+added onto the actual AZEL coordinates (TCS_AZ_AC1 and TCS_AZ_AC2)
+without attempting to convert them to RA/Dec first. This means that
+the values may not correspond to a simple rotation relative to the
+"ra" and "dec" values if the jiggle coordinate system is AZEL. If the
+jiggle coordinate system is TRACKING then the coordinates will be
+related by a simple rotation.
+
+Note that information from the ACSIS extension is not included at this
+time. This is partly because this extension can change in shape
+between observations.
 
 =cut
 
@@ -77,7 +83,6 @@ pod2usage(-exitstatus => 0, -verbose =>2) if $man;
 if ($version) {
   my $id = '$Id$';
   print "jcmtstate2cat - convert JCMT State information to catalog\n";
-  print " CVS revision: $id\n";
   exit;
 }
 
@@ -152,7 +157,7 @@ for my $f (@files) {
   # now dump the contents
   if ($isfirst_file) {
     print "# This is a TST formatted file\n";
-    print join("\t", "Id", "RA", "DEC", "AZ","EL",@columns) ,"\n";
+    print join("\t", "Id", "RA", "DEC", "DAZ","DEL", "AZ", "EL", @columns) ,"\n";
     print join("\t", map { "--" } (0..($#columns+3))),"\n";
     $isfirst_file = 0;
   }
@@ -200,11 +205,13 @@ for my $f (@files) {
       }
     }
 
-    # Now calculate "az" and "el". Complication here is that we calculate the
-    # position after taking out the motion due to the telescope base position
-    # changing. Note that there is no rotation because we do not first convert
-    # each position to RA/Dec and then back to AZEL.
+    # Now calculate "az" and "el" and "daz" and "del". Complication
+    # here for daz/del is that we calculate the position after taking
+    # out the motion due to the telescope base position changing. Note
+    # that there is no rotation because we do not first convert each
+    # position to RA/Dec and then back to AZEL.
     my ($az, $el) = (&NDF::VAL__BADD(), &NDF::VAL__BADD() );
+    my ($daz,$del) = ($az, $el);
     if ($isokay) {
 
       # Store the BASE AZEL position for later - first few could be bad but we
@@ -222,12 +229,20 @@ for my $f (@files) {
       $xoffset *= Astro::SLA::DAS2R;
       $yoffset *= Astro::SLA::DAS2R;
 
-      Astro::SLA::slaDtp2s( $xoffset, $yoffset, $this_az_base, $this_el_base, $az, $el );
+      # az and el are not corrected for base position
+      Astro::SLA::slaDtp2s( $xoffset, $yoffset,
+                            $local{TCS_AZ_AC1}->[$i], $local{TCS_AZ_AC2}->[$i], $az, $el );
       $az = Astro::Coords::Angle->new( $az )->degrees;
       $el = Astro::Coords::Angle->new( $el )->degrees;
+
+      # daz and del are corrected for base position
+      Astro::SLA::slaDtp2s( $xoffset, $yoffset, $this_az_base, $this_el_base, $daz, $del );
+      $daz = Astro::Coords::Angle->new( $daz )->degrees;
+      $del = Astro::Coords::Angle->new( $del )->degrees;
+
     }
 
-    push(@slice, $az, $el );
+    push(@slice, $daz, $del, $az, $el );
 
 
     # And append the remaining columns
