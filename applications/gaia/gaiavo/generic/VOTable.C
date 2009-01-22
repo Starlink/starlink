@@ -181,7 +181,7 @@ namespace gaia {
         char line[2048];
         fb->sgetn( line, 2048 );
         in->clear();                 // Rewind before proceeding.
-        in->seekg( 0, ios::beg ); 
+        in->seekg( 0, ios::beg );
 
         //   Now look for namespace signifier.
         if ( strstr( line, VOTABLE_NS ) == NULL ) {
@@ -262,7 +262,7 @@ namespace gaia {
         namespace xml = xsd::cxx::xml;
         namespace tree = xsd::cxx::tree;
 
-        // Instantiate the DOM parser.
+        //  Instantiate the DOM parser.
         const XMLCh ls_id[] = { xercesc::chLatin_L,
                                 xercesc::chLatin_S,
                                 xercesc::chNull };
@@ -270,48 +270,50 @@ namespace gaia {
         //  Get an implementation of the Load-Store (LS) interface.
         DOMImplementation* impl(DOMImplementationRegistry::getDOMImplementation(ls_id));
 
-        //  Create a DOMBuilder.
-        auto_ptr<DOMBuilder> parser(impl->createDOMBuilder(DOMImplementationLS::MODE_SYNCHRONOUS,0));
+        auto_ptr<DOMLSParser> parser
+            (impl->createLSParser( DOMImplementationLS::MODE_SYNCHRONOUS, 0 ));
 
-        //  Discard comment nodes.
-        parser->setFeature(XMLUni::fgDOMComments, false);
+        DOMConfiguration* conf( parser->getDomConfig() );
 
-        //  Enable datatype normalisation.
-        parser->setFeature(XMLUni::fgDOMDatatypeNormalization, true);
+        //  Discard comment nodes in the document.
+        conf->setParameter( XMLUni::fgDOMComments, false );
+
+        //  Enable datatype normalization.
+        conf->setParameter( XMLUni::fgDOMDatatypeNormalization, true );
 
         //  Do not create EntityReference nodes in the DOM tree. No
         //  EntityReference nodes will be created, only the nodes
         //  corresponding to their fully expanded substitution text will be
         //  created.
-        parser->setFeature(XMLUni::fgDOMEntities, false);
+        conf->setParameter( XMLUni::fgDOMEntities, false );
 
-        //  Starlink: do not check namespaces.
-        parser->setFeature(XMLUni::fgDOMNamespaces, false );
+        //  Starlink: do not perform namespace processing.
+        conf->setParameter( XMLUni::fgDOMNamespaces, false );
 
-        //  Do not include ignorable whitespace.
-        parser->setFeature(XMLUni::fgDOMWhitespaceInElementContent, false);
+        //  Do not include ignorable whitespace in the DOM tree.
+        conf->setParameter( XMLUni::fgDOMElementContentWhitespace, false );
 
         //  No validation.
-        parser->setFeature(XMLUni::fgDOMValidation, false);
-        parser->setFeature(XMLUni::fgXercesSchema, false);
-        parser->setFeature(XMLUni::fgXercesSchemaFullChecking, false);
-        parser->setFeature(XMLUni::fgXercesLoadExternalDTD, false);
-        parser->setFeature(XMLUni::fgXercesContinueAfterFatalError, true);
+        conf->setParameter( XMLUni::fgDOMValidate, false );
+        conf->setParameter( XMLUni::fgXercesSchema, false );
+        conf->setParameter( XMLUni::fgXercesSchemaFullChecking, false );
+        conf->setParameter( XMLUni::fgXercesLoadExternalDTD, false );
+        conf->setParameter( XMLUni::fgXercesContinueAfterFatalError, true );
 
         //  We will release the DOM document ourselves.
-        parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument, true);
+        conf->setParameter( XMLUni::fgXercesUserAdoptsDOMDocument, true );
 
         //  Set error handler.
         tree::error_handler<char> eh;
-        xml::dom::bits::error_handler_proxy<char> ehp(eh);
-        parser->setErrorHandler(&ehp);
+        xml::dom::bits::error_handler_proxy<char> ehp( eh );
+        conf->setParameter( XMLUni::fgDOMErrorHandler, &ehp );
 
         //  Wrap input stream.
-        xml::sax::std_input_source isrc(*in);
-        xercesc::Wrapper4InputSource wrap(&isrc, false);
+        xml::sax::std_input_source isrc( *in );
+        xercesc::Wrapper4InputSource wrap( &isrc, false );
 
         //  Do the parse.
-        xml::dom::auto_ptr<DOMDocument> doc(parser->parse(wrap));
+        xml::dom::auto_ptr<DOMDocument> doc( parser->parse( &wrap ) );
         if ( ehp.failed() ) {
             doc.reset();
         }
@@ -428,7 +430,7 @@ namespace gaia {
         return 1;
     }
 
-    /** 
+    /**
      *  Get the value of a named INFO element.
      */
     int VOTable::infoValue( const char *name, string& value, string &content )
