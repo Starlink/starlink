@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="xerces-c" support="U">
+  <version>3.0.0</version>
+  <path>thirdparty/apache/xerces-c</path>
+  <description>Apache Xerces-c library for parsing XML</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies >
+    
+  </dependencies>
+  <!--developers>
+    <person>
+    </person>
+  </developers-->
+  <!-- <documentation></documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
