@@ -1,0 +1,313 @@
+%ADASS_PROCEEDINGS_FORM%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% SAMPLE2.TEX -- ADASS XVII (2007)-- ADASS Conference Proceedings sample
+% paper with complicated markup. Based on ADASS XI (01) version.
+%
+% This is a comprehensive example, meaning that we have made use of each
+% of the capabilities of the LaTeX + the ASPCONF macro package that we think
+% you may need to use. 
+%
+% Much of the input will be enclosed by braces (i.e., { }).  The
+% percent sign, "%", denotes the start of a comment; text after it
+% will be ignored by LaTeX.  You might also notice in some of the
+% examples below the use of "\ " after a period; this prevents LaTeX
+% from interpreting the period as the end of a sentence and putting
+% extra space after it.   
+% 
+% You should check your paper by processing it with LaTeX.  For
+% details about how to run LaTeX as well as how to print out the User
+% Guide, consult the README file.  
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+\documentclass[11pt,twoside]{article}  % Leave intact
+\usepackage{asp2006}
+\usepackage{adassconf}
+
+\begin{document}   % Leave intact
+
+%-----------------------------------------------------------------------
+%			    Paper ID Code
+%-----------------------------------------------------------------------
+% Enter the proper paper identification code.  The ID code for your paper 
+% is the session number associated with your presentation as published 
+% in the official conference proceedings.  You can find this number by 
+% locating your abstract in the printed proceedings that you received 
+% at the meeting, or on-line at the conference web site.
+%
+% This identifier will not appear in your paper; however, it allows different
+% papers in the proceedings to cross-reference each other.  Note that
+% you should only have one \paperID, and it should not include a
+% trailing period.
+
+\paperID{E.09}
+
+%-----------------------------------------------------------------------
+%		            Paper Title 
+%-----------------------------------------------------------------------
+% Enter the title of the paper.
+%
+% EXAMPLE: \title{A Breakthrough in Astronomical Software Development}
+
+\title{Developments in the Starlink Software Collection}
+       
+%-----------------------------------------------------------------------
+%          Short Title & Author list for page headers
+%-----------------------------------------------------------------------
+% Please supply the author list and the title (abbreviated if necessary) as 
+% arguments to \markboth.
+%
+% The author last names for the page header must appear in one of 
+% these formats:
+%
+% EXAMPLES:
+%     LASTNAME
+%     LASTNAME1 and LASTNAME2
+%     LASTNAME1, LASTNAME2, and LASTNAME3
+%     LASTNAME et al.
+%
+% Use the "et al." form in the case of four or more authors.
+%
+% If the title is too long to fit in the header, shorten it: 
+%
+% EXAMPLE: change
+%    Rapid Development for Distributed Computing, with Implications for the Virtual Observatory
+% to:
+%    Rapid Development for Distributed Computing
+
+\markboth{Jenness et al.}{Starlink}
+
+%-----------------------------------------------------------------------
+%		          Authors of Paper
+%-----------------------------------------------------------------------
+% Enter the authors followed by their affiliations.  The \author and
+% \affil commands may appear multiple times as necessary.  List each
+% author by giving the first name or initials first followed by the
+% last name. Do not include street addresses and postal codes, but 
+% do include the country name or abbreviation. 
+%
+% If the list of authors is lengthy and there are several institutional 
+% affiliations, you can save space by using the \altaffilmark and \altaffiltext 
+% commands in place of the \affil command.
+
+\author{Tim Jenness}
+\affil{Joint Astronomy Centre, 660 N. A`oh\={o}k\={u} Place, HI, 96720, USA}
+\author{David S. Berry}
+\affil{Centre for Astrophysics, University of Central Lancashire, Preston, PR1\,2HE UK}
+\author{Brad Cavanagh}
+\affil{Joint Astronomy Centre, 660 N. A`oh\={o}k\={u} Place, HI, 96720, USA}
+\author{Malcolm J.\ Currie}
+\affil{Rutherford Appleton Laboratory, Didcot, Oxford, OX11\,0QX, UK}
+\author{Peter W.\ Draper}
+\affil{Dept. of Physics, University of Durham, Durham, DH1\,3LE, UK}
+\author{Frossie Economou}
+\affil{Joint Astronomy Centre, 660 N. A`oh\={o}k\={u} Place, HI, 96720, USA}
+
+
+
+% Notice that some of these authors have alternate affiliations, which
+% are identified by the \altaffilmark after each name.  The actual alternate
+% affiliation information is typeset in footnotes at the bottom of the
+% first page, and the text itself is specified in \altaffiltext commands.
+% There is a separate \altaffiltext for each alternate affiliation
+% indicated above.
+
+
+%-----------------------------------------------------------------------
+%			 Contact Information
+%-----------------------------------------------------------------------
+% This information will not appear in the paper but will be used by
+% the editors in case you need to be contacted concerning your
+% submission.  Enter your name as the contact along with your email
+% address.
+
+\contact{Tim Jenness}
+\email{t.jenness@jach.hawaii.edu}
+
+%-----------------------------------------------------------------------
+%		      Author Index Specification
+%-----------------------------------------------------------------------
+% Specify how each author name should appear in the author index.  The 
+% \paindex{ } should be used to indicate the primary author, and the
+% \aindex for all other co-authors.  You MUST use the following syntax: 
+%
+%    \aindex{LASTNAME, F.~M.}
+% 
+% where F is the first initial and M is the second initial (if used). Please 
+% ensure that there are no extraneous spaces anywhere within the command 
+% argument. This guarantees that authors that appear in multiple papers
+% will appear only once in the author index. Authors must be listed in the order
+% of the \paindex and \aindex commmands.
+
+\paindex{Jenness, T.}
+\aindex{Berry, D.~S.}
+\aindex{Currie, M.~J.}
+\aindex{Draper, P.~W.}
+\aindex{Economou, F.}
+
+%-----------------------------------------------------------------------
+%			Subject Index keywords
+%-----------------------------------------------------------------------
+% Enter up to 6 keywords that are relevant to the topic of your paper.  These 
+% will NOT be printed as part of your paper; however, they will guide the creation 
+% of the subject index for the proceedings.  Please use entries from the
+% standard list where possible, which can be found in the index for the 
+% ADASS XVI proceedings. Separate topics from sub-topics with an exclamation 
+% point (!). 
+
+\keywords{data analysis environments,data processing!pipelines,virtual observatory,surveys!data products,software!threading}
+
+% We reset the footnote counter for the hyperlink since it does not
+% appear to recognize the previous 3 footnotes generated from the
+% altaffilmarks.  
+
+\setcounter{footnote}{3}
+
+%-----------------------------------------------------------------------
+%			       Abstract
+%-----------------------------------------------------------------------
+% Type abstract in the space below.  Consult the User Guide and Latex
+% Information file for a list of supported macros (e.g. for typesetting 
+% special symbols). Do not leave a blank line between \begin{abstract} 
+% and the start of your text.
+
+\begin{abstract}          % Leave intact
+This paper summarises new and improved facilities to the Starlink software in 2008. The main thrust of development this year has been support for archive processing and a migration to multi-threaded applications. In particular, the provenance of pixel data is tracked automatically by Starlink applications.
+\end{abstract}
+
+%-----------------------------------------------------------------------
+%			      Main Body
+%-----------------------------------------------------------------------
+% Place the text for the main body of the paper here.  You should use
+% the \section command to label the various sections; use of
+% \subsection is optional.  Significant words in section titles should
+% be capitalized.  Sections and subsections will be numbered
+% automatically. 
+
+\section{Introduction}
+
+The Starlink Software Collection is now an open-source-software project using primarily the GNU General Public License (see e.g.\ Gray et al.\ 2005). Since the demise of the Starlink Project in 2005, the Joint Astronomy Centre has been leading development of the software in order to enhance the processing and visualization of 3D data (RA, declination and frequency) from JCMT’s heterodyne instrumentation (Currie et al.\ 2008; Draper et al.\ 2009), to support the UKIRT and JCMT data reduction pipelines, and also to facilitate the ingestion of pipelined data products into the JCMT Science Archive (JSA) hosted at CADC (Jenness et al.\ 2008; Economou et al.\ 2008; Gaudet et al.\ 2008).
+
+
+\section{Thread Support}
+
+Now that multi-core architectures are common-place and data rates are still increasing, it is important to add support for multiple threads in the data reduction algorithms. Historically the Starlink software was written in Fortran 77 (inherently not thread-safe) or when in C has included a dependence on many global variables (mainly because it was a port of a Fortran program or library that used COMMON blocks).  Due to the processing demands of HARP and SCUBA-2 we have begun the task of adding threads to our applications and making some of the key libraries thread-safe.
+
+\begin{itemize}
+\item The AST library (see e.g.\ Berry 2008)  is now thread-safe. 
+\item The Error Message system (EMS) library can now handle error contexts in multiple threads using thread-local storage and the MERS library (a library sitting above EMS handling message output) has been rewritten in C and is now thread-safe.
+\item The SCUBA-2 and HARP data processing application (SMURF) can now use multiple threads when regridding cubes (regridding separate frequency channels independently) or making SCUBA-2 images (making maps from each time-series file in a separate thread and then combine).
+\end{itemize}
+
+\section{Starlink and the VO}
+
+The JCMT Science Archive is committed to being fully VO-compliant, but this requires that users have tools to access the diverse data products. We are modifying GAIA to enable it to use SIAP queries (Draper et al.\ 2009) and wish to extend it, in conjunction with CADC, to support data cube queries since they are a primary product of our heterodyne instrumentation. Also, submillimetre images and cubes are usually full of amorphous emission ill-suited to a point-source description, so GAIA needs to be able to visualise clump outlines, such as those found using the CUPID application (Berry et al.\ 2007),  and retrieve those outlines from the JSA. GAIA and SPLAT already use the PLASTIC protocol for inter-process communication but we intend to  switch to SAMP (Taylor et al.\ 2007; Taylor et al.\ 2008).
+
+\section{Provenance}
+
+A key functionality of modern science archives is the ability to track which raw observations contributed to a particular reduced data product. Whilst it is possible for the data pipeline to keep track of input files and then fix up headers in the products, the approach we have taken is for each individual data reduction application to track provenance automatically. This plays a key role in simplifying pipeline infrastructure whilst ensuring that products reduced outside the pipeline environment also track provenance. The core Starlink applications (including KAPPA, CCDPACK, and SMURF) have all been modified to make use of this feature but the key thing to note is that the change in each application is tiny with the real work being done by the file I/O library. The I/O library (NDF for Starlink) has been modified to provide triggers each time a data array is read (memory mapped or copied) and output data files are automatically opened at the end of processing to receive any provenance from input files. All ancestors are stored in each output file such that intermediate files are not required in order to check provenance. Root ancestors created by applications handling raw data files insert a unique observation identifier into the provenance information in order to be able to relate products to the original raw data files.
+
+
+\section{Application Enhancements}
+
+In addition to the changes described elsewhere in this poster there have been enhancements to the applications. Also, the binary release of the Starlink software is now relocatable into any directory for the first time. Of the more than 100 improvements in the last year, the most significant are listed below.
+
+\begin{description}
+\item GAIA
+\begin{itemize}
+\item can now browse components in NDF and FITS files in addition to the primary data array.
+\item It is now possible to screen grab the active window.
+\end{itemize}
+\item KAPPA
+\begin{itemize}
+\item WCSSLIDE can be used to apply pointing shifts to the world coordinates of an image.
+\item PLUCK allows a spectrum to be extracted from a cube at an arbitrary position (using regridding techniques).
+\item MFITTREND can now use spline fitting to remove baseline features from data cubes.
+\item Applications have been added for manipulating provenance.
+\item The MSTATS application now offers a wider selection of statistics.
+\end{itemize}
+
+\item SMURF
+\begin{itemize}
+\item A time-series file can now be created from a data cube and a reference time series. This allows a baseline mask to be calculated for the raw data or for an iterative reduction technique to be used.
+\end{itemize}
+\item PICARD
+\begin{itemize}
+\item A recipe is now available for automatic baseline removal of data cubes. This uses feature detection using the CUPID application  to locate emission regions in a smoothed cube before fitting baselines.
+\end{itemize}
+\end{description}
+
+\section{Releases}
+
+The Joint Astronomy Centre releases binary distributions for a number of platforms (32- and 64-bit Linux, based on Centos5.2, and Mac OS X Intel and powerPC (using Tiger, since Leopard X11 is not compatible with Tiger)). Two releases have been made in the past year, \textit{humu} in February 2008 and \textit{lehuakona} in November 2008. Releases are available from \htmladdnormallink{http://starlink.jach.hawaii.edu}.
+
+The source code is also freely available for download. It is known to build on Linux, Solaris 10 (32- and 64-bit), Mac OS X (Intel, PowerPC, 32- and 64-bit) and with a number of compilers  including GNU gcc with g95 or gfortran,  Sun and Intel compilers.
+
+
+% Finally, we have a little acknowledgments section. Do NOT place 
+% acknowledgments in a separate \section. 
+
+\acknowledgments
+
+This work has been supported by the Science and Technology Facilities Council.
+
+%-----------------------------------------------------------------------
+%			      References
+%-----------------------------------------------------------------------
+% List your references below within the reference environment
+% (i.e. between the \begin{references} and \end{references} tags).
+% Each new reference should begin with a \reference command which sets
+% up the proper indentation.  
+%    NOTE: all citations in the text _must_ have a corresponding entry in 
+%    the reference list, and all references must be cited in the text.
+%
+% Observe the following order when listing bibliographical 
+% information for each reference:  author name(s), publication 
+% year, journal name, volume, and page number for articles. 
+% URLs to the reference may be given either in-line, or as a footnote. 
+% Note that many journal names are available as macros; see
+% the User Guide for a listing "macro-ized" journals. 
+%
+% You may find the following tricks to be helpful:
+%
+%   o  "\ " after a period prevents LaTeX from interpreting the period 
+%      as an end of a sentence.
+%   o  \adassxvi is a macro that expands to the full title, editor,
+%      and publishing information for the ADASS XVI conference
+%      proceedings.  Such macros are defined for ADASS conferences I
+%      through the most recently published proceedings.
+%   o  When referencing a paper in the current volume, use the
+%      \adassxvii and \paperref macros.  The argument to \paperref is
+%      the paper ID code for the paper you are referencing.  See the 
+%      note in the "Paper ID Code" section above for details on how to 
+%      determine the paper ID code for the paper you reference.  
+
+\begin{references}
+
+\reference Berry, D.~S.\ 2008, \adassxvii, 635
+
+\reference Berry, D.~S., Reinhold, K., Jenness, T., \& Economou, F.\ 2007,
+ \adassxvi, 425
+
+\reference Currie, M.~J., Draper, P.~W., Berry, D.~S., Jenness, T., Cavanagh, B., \& Economou, F.\ 2008, \adassxvii, 650
+
+\reference Draper, P.~W., Berry, D.~S., Jenness, T., \& Economou, F.\ 2009,
+  \adassxviii, \paperref{F3}
+
+\reference Economou, F., Jenness, T., Chrysostomou, A., Cavanagh, B., Redman, R., \& Berry, D.~S.\ 2008, \adassxvii, 450
+
+\reference Gaudet, S., Dowler, P., Goliath, S., \& Redman, R.\ 2008, \adassxvii, 135
+
+\reference Gray, N.\ et al.\ 2005, \adassxiv, 119
+
+\reference Jenness, T., Cavanagh, B., Economou, F. \& Berry, D.~S.\ 2008, \adassxvii, 565
+
+\reference Taylor, J.~D., Boch, T., Comparato, M., Taylor, M., Winstanley, N., \& Mann, R.~G.\ 2007, \adassxvi, 511
+
+\reference Taylor, M.\ et al. 2008, ``SAMP -- Simple Application Messaging Protocol'', IVOA, \htmladdnormallink{http://www.ivoa.net/Documents/latest/SAMP.html}
+    
+\end{references}
+
+% Do not place any material after the references section
+
+\end{document}  % Leave intact
