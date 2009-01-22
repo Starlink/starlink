@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="tdom" support="U">
+  <version>0.8.2</version>
+  <path>thirdparty/tclsys/tdom</path>
+  <description>tDOM</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies >
+    <build>tcl</build><build>tk</build>
+  </dependencies>
+  <developers>
+    <!-- tDOMis maintained on www.tdom.org, but we take the call first-->
+    <person>
+      <name>Peter W. Draper</name>
+      <uname>pwd</uname>
+      <email>p.w.draper@durham.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <!-- <documentation></documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
