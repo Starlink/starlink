@@ -18,7 +18,9 @@
 
 *  Arguments:
 *     nel = size_t (Given)
-*        Number of elements in "array"
+*        Number of elements in "array". If this is 1, then "sorted" is
+*        returned as +1, and the returned function value is a single 
+*        element array holding the value zero.
 *     array = const CGEN_TYPE * (Given)
 *        Pointer to an array holding the values that are to be indexed.
 *     sorted = int * (Returned)
@@ -51,10 +53,12 @@
 *        Initial version.
 *     12-DEC-2008 (TIMJ):
 *        Generic version.
+*     22-JAN-2009 (DSB):
+*        Handle single element arrays cleanly.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007-2008 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -100,59 +104,69 @@ int* CGEN_FUNCTION(smf_sort)( size_t nel, const CGEN_TYPE *array, int *sorted, i
 /* Check the inherited status. */
    if( *status != SAI__OK ) return NULL;
 
+/* First handle the special case of a single element array. */
+   if( nel == 1 ) {
+     *sorted = 1;
+     result = astMalloc( sizeof( *result ) );
+     if( result ) *result = 0;
+   
+/* Now handle multi-element arrays. */
+   } else {
+
 /* Determine if the initial array is sorted. */
-   *sorted = ( array[ 1 ] > array[ 0 ] ) ? 1 : -1;
-   dp = array + 1;
-   dq = array + 2;
-
-   for( i = 2; i < nel; i++,dp++,dq++ ) {
-      if( *dp > *dq ) {
-         if( *sorted == 1 ) {
-            *sorted = 0;
-            break;
-         }      
-      } else {
-         if( *sorted == -1 ) {
-            *sorted = 0;
-            break;
-         }      
+      *sorted = ( array[ 1 ] > array[ 0 ] ) ? 1 : -1;
+      dp = array + 1;
+      dq = array + 2;
+   
+      for( i = 2; i < nel; i++,dp++,dq++ ) {
+         if( *dp > *dq ) {
+            if( *sorted == 1 ) {
+               *sorted = 0;
+               break;
+            }      
+         } else {
+            if( *sorted == -1 ) {
+               *sorted = 0;
+               break;
+            }      
+         }
       }
-   }
-
+   
 /* Allocate the returned array. */
-   result = astMalloc( sizeof( *result )*nel );
-   if( result ) {
-
+      result = astMalloc( sizeof( *result )*nel );
+      if( result ) {
+   
 /* If the array is already sorted decreasing, set up a suitable index to
    swap the order to monotonic increasing. */
-      if( *sorted == -1 ) {
-         r = result + nel - 1;
-         for( i = 0; i < nel; i++ ) *(r--) = i;
-
+         if( *sorted == -1 ) {
+            r = result + nel - 1;
+            for( i = 0; i < nel; i++ ) *(r--) = i;
+   
 /* Otherwise, set up a unit index */
-      } else {
-         r = result;
-         for( i = 0; i < nel; i++ ) *(r++) = i;
-
+         } else {
+            r = result;
+            for( i = 0; i < nel; i++ ) *(r++) = i;
+   
 /* Leave this unit mapping unchanged if the array is already sorted
    increasing. */
-         if( *sorted == 0 ) {
-
+            if( *sorted == 0 ) {
+   
 /* Arrive here if the index needs sorting. Use a bubble sort algorithm. */
-            r = result + nel - 1;
-            done = 0;
-            while( ! done ) {
-               done = 1;                   
-               q = result + 1;
-               for( p = result; p < r; p++, q++ ) {
-                  if( array[ *p ] > array[ *q ] ) {
-                     temp = *p;
-                     *p = *q;
-                     *q = temp;
-                     done = 0;    
-                  }   
+               r = result + nel - 1;
+               done = 0;
+               while( ! done ) {
+                  done = 1;                   
+                  q = result + 1;
+                  for( p = result; p < r; p++, q++ ) {
+                     if( array[ *p ] > array[ *q ] ) {
+                        temp = *p;
+                        *p = *q;
+                        *q = temp;
+                        done = 0;    
+                     }   
+                  }
+                  r--;
                }
-               r--;
             }
          }
       }
