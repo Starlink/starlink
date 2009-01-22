@@ -487,7 +487,7 @@ astERROR_INVOKE(astRet##rettype##_(function))
 
 *  Synopsis:
 *     #include "object.h"
-*     astINVOKE_CHECK(class,this)
+*     astINVOKE_CHECK(class,this,force)
 *     astINVOKE_ISA(class,this)
 
 *  Class Membership:
@@ -504,6 +504,13 @@ astERROR_INVOKE(astRet##rettype##_(function))
 *     this
 *        The "this" argument (the Object pointer) to be passed to the
 *        function.
+*     force
+*        Type checking takes time, and so can be disabled within the
+*        protected context in order to save time. Setting "force" to 
+*        zero causes the astINVOKE_CHECK macro to skip the class check 
+*        in a protected context (it assumes that AST "knows what it is 
+*        doing"). Setting "force" to a non-zero value forces the class
+*        check even in a protected context.
 
 *  Notes:
 *     - To avoid problems with some compilers, you should not leave
@@ -515,13 +522,17 @@ astERROR_INVOKE(astRet##rettype##_(function))
    defined), define astINVOKE_CHECK to invoke the astCheck<Class>
    function. */
 #if !defined(astCLASS) || defined(AST_CHECK_CLASS)
-#define astINVOKE_CHECK(class,this) \
+#define astINVOKE_CHECK(class,this,force) \
 astCheck##class##_((Ast##class *)astEnsurePointer_(this),astGetStatusPtr)
 
 /* For the internal interface, astINVOKE_CHECK omits the
    astCheck<class> function (unless AST_CHECK_CLASS is defined). */
 #else
-#define astINVOKE_CHECK(class,this) ((Ast##class *)astEnsurePointer_(this))
+
+#define astINVOKE_CHECK(class,this,force) ( (force) ? \
+   ( astCheck##class##_((Ast##class *)astEnsurePointer_(this),astGetStatusPtr) ) : \
+   ( (Ast##class *) astEnsurePointer_(this) ) )
+
 #endif
 
 /* Define astINVOKE_ISA to invoke the astIsA<Class> function. */
@@ -1454,7 +1465,8 @@ void astVSet_( AstObject *, const char *, char **, va_list, int * );
 /* Interfaces to standard class functions. */
 /* --------------------------------------- */
 /* Check class membership. */
-#define astCheckObject(this) astINVOKE_CHECK(Object,this)
+#define astCheckObject(this) astINVOKE_CHECK(Object,this,0)
+#define astVerifyObject(this) astINVOKE_CHECK(Object,this,1)
 
 /* Test class membership. */
 #define astIsAObject(this) astINVOKE_ISA(Object,this)
