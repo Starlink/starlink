@@ -185,9 +185,11 @@
 *        - Correct implementation of LIMITTYPE=SLICES.
 *     13-JAN-2009 (DSB):
 *        Correct bugs in setting the NDF origin for the spectral axis.
+*     22-JAN-2009 (DSB):
+*        Handle single time slice NDFs correctly.
 
 *  Copyright:
-*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -252,7 +254,7 @@ void smurf_timesort( int *status ) {
    AstKeyMap *obs_map = NULL;
    AstKeyMap *subscan_map = NULL;
    AstKeyMap *subsys_map = NULL;
-   AstLutMap *lut = NULL;     
+   AstMapping *lut = NULL;     
    AstMapping *map = NULL;    
    AstMapping *omap = NULL;   
    AstMapping *specmap;
@@ -293,7 +295,11 @@ void smurf_timesort( int *status ) {
    double *taiout = NULL;
    double *vp;
    double fcon;
+   double ina;
+   double inb;
    double invar;                      
+   double outa;
+   double outb;
    double tcon;
    float *dts_in;
    float *dts_out;
@@ -685,52 +691,52 @@ void smurf_timesort( int *status ) {
 /* If required, remove information for dead detectors from the ACSIS extension. */
          if( mask ) smf_maskacsis( indf2, mask, status );
 
-/* Now modify the WCS in the output NDF. First get the existing WCS
-   FrameSet from the output NDF. */
-         ndfGtwcs( indf2, &wcs, status );
+/* Now, if the NDF contains more than one time-slice,  modify the WCS in the 
+   output NDF. First get the existing WCS FrameSet from the output NDF. */
+         if( ntai > 1 ) {
+            ndfGtwcs( indf2, &wcs, status );
    
 /* Get pointers to the current Frame, and the GRID->WCS Mapping. */
-         cfrm = astGetFrame( wcs, AST__CURRENT );
-         map = astGetMapping( wcs, AST__BASE, AST__CURRENT );
+            cfrm = astGetFrame( wcs, AST__CURRENT );
+            map = astGetMapping( wcs, AST__BASE, AST__CURRENT );
    
 /* Split off the Mapping for the third (time) axis. */
-         axes[ 0 ] = 3;
-         astMapSplit( map, 1, axes, nnout, &tmap );
-         if( tmap && astGetI( tmap, "Nout" ) == 1 ) {
-   
+            axes[ 0 ] = 3;
+            astMapSplit( map, 1, axes, nnout, &tmap );
+            if( tmap && astGetI( tmap, "Nout" ) == 1 ) {
+      
 /* Get a table of time values for every grid index, in order of increasing 
    time value. */
-            grid = astMalloc( sizeof( double )*ntai );
-            tai = astMalloc( sizeof( double )*ntai );
-            for( i = 0; i < (int) ntai; i++ ) grid[ i ] = index[ i ] + 1.0;
-            astTran1( tmap, ntai, grid, 1, tai );
-   
+               grid = astMalloc( sizeof( double )*ntai );
+               tai = astMalloc( sizeof( double )*ntai );
+               for( i = 0; i < (int) ntai; i++ ) grid[ i ] = index[ i ] + 1.0;
+               astTran1( tmap, ntai, grid, 1, tai );
+      
 /* Create a LutMap holding these sorted time values. */
-            lut = astLutMap( ntai, tai, 1.0, 1.0, " " );
-   
+               lut = (AstMapping *) astLutMap( ntai, tai, 1.0, 1.0, " " );
+      
 /* Split off a Mapping for the other two axes. */
-            axes[ 0 ] = 1;
-            axes[ 1 ] = 2;
-            astMapSplit( map, 2, axes, nnout, &omap );
-            if( omap && astGetI( omap, "Nout" ) == 2 ) {
-   
+               axes[ 0 ] = 1;
+               axes[ 1 ] = 2;
+               astMapSplit( map, 2, axes, nnout, &omap );
+               if( omap && astGetI( omap, "Nout" ) == 2 ) {
+      
 /* Put this Mapping in parallel with the time axis Mapping created above. */
-               map = (AstMapping *) astCmpMap( omap, lut, 0, " " );
-               
+                  map = (AstMapping *) astCmpMap( omap, lut, 0, " " );
+                  
 /* Remove the current Frame from the FrameSet, then add it back in again
    using the above Mapping to connect it to the GRID (base) Frame. */
-               astRemoveFrame( wcs, AST__CURRENT );
-               astAddFrame( wcs, AST__BASE, map, cfrm );
-   
+                  astRemoveFrame( wcs, AST__CURRENT );
+                  astAddFrame( wcs, AST__BASE, map, cfrm );
+      
 /* Store the modifed WCS FrameSet in the output NDF. */
-               ndfPtwcs( wcs, indf2, status );
-   
-            }
-   
+                  ndfPtwcs( wcs, indf2, status );
+               }
+      
 /* Free resources. */
-            grid = astFree( grid );
-            tai = astFree( tai );
-   
+               grid = astFree( grid );
+               tai = astFree( tai );
+            }
          }
    
 /* Free remaining resources. */
@@ -1412,9 +1418,21 @@ void smurf_timesort( int *status ) {
                if( mask ) smf_maskacsis( indf2, mask, status );
       
 /* Create a LutMap to hold the TAI value for each time slice in the
-   current output NDF. */
-               lut = astLutMap( ubnd[ 2 ], taiout, 1.0, 1.0, " " );
-      
+   current output NDF. If there is only one time slice, any Mapping that 
+   maps 1.0 onto the time-slice's tai value will do. For consistency with
+   the input WCS, we choose a WinMap. */
+               if( ubnd[ 2 ] > 1 ) {
+                  lut = (AstMapping *) astLutMap( ubnd[ 2 ], taiout, 1.0, 1.0, 
+                                                  " " );
+               } else {
+                  ina = 1.0;
+                  inb = 2.0;
+                  outa = tai[ 0 ];
+                  outb = 0.0;
+                  lut = (AstMapping *) astWinMap( 1, &ina, &inb, &outa, &outb, 
+                                                  " " );
+               }
+
 /* Put this Mapping in parallel with the Mapping for the other axes. */
                map = (AstMapping *) astCmpMap( omap, lut, 0, " " );
                      
