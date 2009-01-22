@@ -1,0 +1,1828 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ADASSCONF.STY -- ADASS Conference Proceedings Style
+% Version 17.0  (2006)
+% Updated ADASS XVI (2006) by Dave Bell
+% Updated ADASS XV (2005) by Carlos Gabriel
+% Updated ADASS XIV (2004) by Patrick Shopbell
+% Updated ADASS XIII (2003) by Francois Ochsenbein
+% Updated ADASS XII  (2002) by Harry Payne
+% Based on Version 12.0 (1999) for ADASS XI
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% IS THIS FILE BEING DISPLAYED IN YOUR WEB BROWSER WINDOW?
+%
+% With the most common browsers, you can save the file to disk by
+% choosing "Save As..." from the "File" menu.  This will bring up a
+% file chooser window.  
+% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% ATTENTION DEVELOPERS:  Be sure to update the version number
+%   (\revtex@ver value) after making changes to this file.  Use
+%   the convention of matching the major revision number to the 
+%   ADASS conference number.  
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% ADASS paper authors use LaTeX 2.09 to format papers; however, this 
+% style file has some LaTeX 2e extensions (in included html.sty).
+%
+%\newif\iflatextwo@nine \latextwo@ninefalse
+%\ifx\if@compatibility\undefined \latextwo@ninetrue \fi
+%\if@compatibility \latextwo@ninetrue \fi
+%
+%\newlinechar=`\^^J
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% This section was adapted from the version of aspconf.sty modified
+% for ADASS IX.  Changes were made to \revtex@ver, \revtex@date, \cpr@year,
+% \vol@title, \vol@author and the definition of \adassix.
+%
+% dmehring making further edits on 09mar99.  Changing full name of
+% eds. to initials for all \adass* macros
+% 
+% rev. 10.0 by fap on 31 Mar 2000, modified from ADASS IX version 
+% rev. 10.1 by fap on 4/3/00 to add Harry Payne as editor of ADASS X
+%
+% revised by dab on 11/10/01 for ADASS XI
+% rev. 12.0 by hep on 09/27/02
+%
+%\def\revtex@ver{17.0}		% Version number of this file.
+%\def\revtex@date{11 Oct 2006}	
+%\def\revtex@org{PASP}		
+%\def\revtex@jnl{}		
+%\def\revtex@genre{conference proceedings}	
+%\typeout{\revtex@org\space
+%\ifx\revtex@jnl\@empty\else\revtex@jnl\space\fi
+%\revtex@genre\space substyle, v\revtex@ver\space <\revtex@date>.}
+%\def\revtex@pageid{\xdef\@thefnmark{\null}
+%\@footnotetext{This \revtex@genre\space was prepared with the
+%\revtex@org\space \revtex@jnl\space Rev\TeX\ macros v\revtex@ver.}}
+%\ifnum\@ptsize<1
+%\typeout{Warning: Undersize manuscript font (1\@ptsize\space pts).
+%	Use 11pt documentstyle option.}
+%\fi
+%\def\ps@paspcstitle{\let\@mkboth\@gobbletwo
+%\def\@oddhead{\null{\footnotesize\it\@slug}\hfil}
+%\def\@oddfoot{\rm\hfil\thepage\hfil}
+%\let\@evenhead\@oddhead\let\@evenfoot\@oddfoot
+%}
+%\def\ps@pasprptitle{\let\@mkboth\@gobbletwo
+%\def\@oddhead{\null{\footnotesize\it\@slug}\hfil}
+%\def\@oddfoot{\vbox to 1.5cm{\vfill%
+%   \hbox to \textwidth{\rm\hfil\thepage\hfil}
+%   \hbox{\pasp@copyright\hfil}}}
+%\let\@evenhead\@oddhead\let\@evenfoot\@oddfoot
+%}
+%\def\ps@myheadings{\let\@mkboth\@gobbletwo
+%\def\@oddhead{\hbox{}\hfil\sl\rightmark\hskip 1in\rm\thepage}%
+%\def\@oddfoot{}%
+%\def\@evenhead{\rm\thepage\hskip 1in\sl\leftmark\hfil\hbox{}}%
+%\def\@evenfoot{}\def\sectionmark##1{}\def\subsectionmark##1{}}
+%\def\@leftmark#1#2{\sec@upcase{#1}}
+%\def\@rightmark#1#2{\sec@upcase{#2}}
+%\textwidth=5.25in
+%\textheight=8.3in
+%\headheight=18pt
+%\headsep=18pt
+%\topmargin=0in
+%\footskip=.25in
+%\oddsidemargin=1.37in
+%\evensidemargin=1.37in
+%\parindent=2em
+%\parskip=.1ex
+%\def\@singleleading{0.9}
+%\def\@doubleleading{1.6}
+%\def\baselinestretch{\@singleleading}
+%\def\tightenlines{\def\baselinestretch{\@singleleading}}
+%\def\loosenlines{\def\baselinestretch{\@doubleleading}}
+%\clubpenalty\@M
+%\widowpenalty\@M
+%\def\@journalname{ASP Conference Series}
+%\def\cpr@holder{Astronomical Society of the Pacific}
+%to be changed when volume number known
+%\def\@jourvol{XXX}
+%\def\cpr@year{2006}
+%\def\vol@title{Astronomical Data Analysis Software and Systems XVI
+%%%% THIS MODIFICATION ADDS THE PAPER IDENTIFICATION
+%	\makebox[0.33\textwidth][r]{{\bf\thepaperID}}
+%}
+%\def\vol@author{R.~Shaw, F.~Hill and D.~Bell, eds.}
+%\let\journalid=\@gobbletwo
+%\let\articleid=\@gobbletwo
+%\let\received=\@gobble
+%\let\accepted=\@gobble
+%\def\@slug{{\tabcolsep\z@\begin{tabular}[t]{l}\vol@title\\
+%\@journalname, Vol.\ \@jourvol, \cpr@year\\
+%\vol@author
+%\end{tabular}}
+%}
+%\def\pasp@copyright{\copyright\ Copyright \cpr@year\ \cpr@holder.  
+%                    All rights reserved.}
+%\def\paspconf@frontindent{.45in}
+%\def\pasp@titletocentry#1{\relax}
+%\def\reset@rticle{\relax}
+%\def\title#1{\reset@rticle\pasp@titletocentry{#1}\vspace*{1.0\baselineskip}
+%\@tempdima\textwidth \advance\@tempdima by-\paspconf@frontindent
+%\hfill
+%\parbox{\@tempdima}
+%	{\pretolerance=10000\raggedright\large\bf\sec@upcase{#1}}\par
+%\vspace*{1\baselineskip}\thispagestyle{title}\def\rightmark{#1}}
+%\def\author#1{\vspace*{1\baselineskip}
+%\@tempdima\textwidth \advance\@tempdima by-\paspconf@frontindent
+%\hfill
+%\parbox{\@tempdima}
+%{\pretolerance=10000\raggedright{#1}}\par}
+%\def\affil#1{\vspace*{.5\baselineskip}
+%\@tempdima\textwidth \advance\@tempdima by-\paspconf@frontindent
+%\hfill
+%\parbox{\@tempdima}
+%{\pretolerance=10000\raggedright{\it #1}}\par}
+%\def\altaffilmark#1{$^{#1}$}
+%\def\altaffiltext#1#2{\footnotetext[#1]{#2}}
+%\def\abstract{\vspace*{1.3\baselineskip}\bgroup\leftskip\paspconf@frontindent
+%\noindent{\bf\sec@upcase{Abstract.}}\hskip 1em}
+%\def\endabstract{\par\egroup\vspace*{1.4\baselineskip}}
+%\skip\footins 4ex plus 1ex minus .5ex
+%\footnotesep 3ex
+%\long\def\@makefntext#1{\noindent\hbox to\z@{\hss$^{\@thefnmark}$}#1}
+%\def\tablenotemark#1{\rlap{$^{#1}$}}
+%\def\tablenotetext#1#2{
+%\@temptokena={\vspace{.5ex}{\noindent\llap{$^{#1}$}#2}\par}
+%\@temptokenb=\expandafter{\tblnote@list}
+%\xdef\tblnote@list{\the\@temptokenb\the\@temptokena}}
+%\def\spewtablenotes{
+%\ifx\tblnote@list\@empty
+%\else
+%\let\@temptokena=\tblnote@list
+%\gdef\tblnote@list{\@empty}
+%\vspace{4.5ex}
+%\footnoterule
+%\vspace{.5ex}
+%{\footnotesize\@temptokena}
+%\fi}
+%\newtoks\@temptokenb
+%\def\tblnote@list{}
+%\def\endtable{\spewtablenotes\end@float}
+%\@namedef{endtable*}{\spewtablenotes\end@dblfloat}
+%\let\tableline=\hline
+%\def\thefigure{\@arabic\c@figure}
+%\def\fnum@figure{Figure \thefigure.}
+%\def\thetable{\@arabic\c@table}
+%\def\fnum@table{Table \thetable.}
+%\long\def\@makecaption#1#2{
+%\vskip 10pt
+%\setbox\@tempboxa\hbox{#1\hskip 1.5em #2}
+%\let\@tempdima=\hsize \advance\@tempdima by -2em
+%\ifdim \wd\@tempboxa >\@tempdima
+%	{\leftskip 2em
+%	#1\hskip 1.5em #2\par}
+%\else
+%	\hbox to\hsize{\hskip 2em\box\@tempboxa\hfil}
+%\fi}
+%\def\fps@figure{tbp}
+%\def\fps@table{htbp}
+%\let\keywords=\@gobble
+%\let\subjectheadings=\@gobble
+%\setcounter{secnumdepth}{2}
+%\def\upper{\def\sec@upcase##1{\uppercase{##1}}}
+%\def\sec@upcase#1{\relax#1}
+%\def\section{\@startsection {section}{1}{\z@}{-4.2ex plus -1ex minus
+%-.2ex}{2.2ex plus .2ex}{\normalsize\bf}}
+%\def\subsection{\@startsection{subsection}{2}{\z@}{-2.2ex plus -1ex minus
+%-.2ex}{1.1ex plus .2ex}{\normalsize\bf}}
+%
+%\def\subsubsection{\@startsection{subsubsection}{3}{\z@}{-2.2ex plus
+%-1ex minus -.2ex}{-1.2em}{\normalsize\it}}
+%\def\thesection{\@arabic\c@section.}
+%\def\thesubsection{\thesection\@arabic\c@subsection.}
+%\def\thesubsubsection{\thesubsection\@arabic\c@subsubsection.}
+%\def\@sect#1#2#3#4#5#6[#7]#8{\ifnum #2>\c@secnumdepth
+%\def\@svsec{}\else
+%\refstepcounter{#1}\edef\@svsec{\csname the#1\endcsname\hskip 1em }\fi
+%\@tempskipa #5\relax
+%\ifdim \@tempskipa>\z@
+%\begingroup #6\relax
+%\@hangfrom{\hskip #3\relax\@svsec}{\interlinepenalty \@M \sec@upcase{#8}\par}%
+%\endgroup
+%\csname #1mark\endcsname{#7}\addcontentsline
+%{toc}{#1}{\ifnum #2>\c@secnumdepth \else
+%\protect\numberline{\csname the#1\endcsname}\fi
+%#7}\else
+%\def\@svsechd{#6\hskip #3\@svsec #8\csname #1mark\endcsname
+%{#7}\addcontentsline
+%{toc}{#1}{\ifnum #2>\c@secnumdepth \else
+%\protect\numberline{\csname the#1\endcsname}\fi
+%#7}}\fi
+%\@xsect{#5}}
+%\def\@ssect#1#2#3#4#5{\@tempskipa #3\relax
+%\ifdim \@tempskipa>\z@
+%\begingroup #4\@hangfrom{\hskip #1}{\interlinepenalty \@M \sec@upcase{#5}\par}\endgroup
+%\else \def\@svsechd{#4\hskip #1\relax #5}\fi
+%\@xsect{#3}}
+%\def\acknowledgments{\@startsection{paragraph}{4}{1em}
+%{1ex plus .5ex minus .5ex}{-1em}{\bf}{\sec@upcase{Acknowledgments.}}}
+%
+%\let\acknowledgements=\acknowledgments			
+%\def\qanda@heading{Discussion}
+%\newif\if@firstquestion \@firstquestiontrue
+%\newenvironment{question}[1]{\if@firstquestion
+%\section*{\qanda@heading}\global\@firstquestionfalse\fi
+%\par\vskip 1ex
+%\noindent{\it#1\/}:}{\par}
+%\newenvironment{answer}[1]{\par\vskip 1ex
+%\noindent{\it#1\/}:}{\par}
+%\renewcommand\theequation{\@arabic\c@equation}
+%\def\mathwithsecnums{
+%\@newctr{equation}[section]
+%\renewcommand\theequation{\hbox{\normalsize\arabic{section}-\arabic{equation}}}}
+%\def\references{\section*{References}
+%\bgroup\parindent=0pt\parskip=.5ex
+%\def\refpar{\par\hangindent=3em\hangafter=1}}
+%\def\endreferences{\refpar\egroup}
+%\def\thebibliography{\section*{References}
+%\list{\null}{\leftmargin 3em\labelwidth 0pt\labelsep 0pt\itemindent -3em
+%\usecounter{enumi}}
+%\def\refpar{\relax}
+%\def\newblock{\hskip .11em plus .33em minus .07em}
+%\sloppy\clubpenalty4000\widowpenalty4000
+%\sfcode`\.=1000\relax}
+%\def\endthebibliography{\endlist}
+%\def\@biblabel#1{\relax}
+%\def\@cite#1#2{#1\if@tempswa , #2\fi}
+%\def\reference{\relax\refpar}
+%\def\@citex[#1]#2{\if@filesw\immediate\write\@auxout{\string\citation{#2}}\fi
+%\def\@citea{}\@cite{\@for\@citeb:=#2\do
+%{\@citea\def\@citea{,\penalty\@m\ }\@ifundefined
+%{b@\@citeb}{\@warning
+%{Citation `\@citeb' on page \thepage \space undefined}}%
+%{\csname b@\@citeb\endcsname}}}{#1}}
+%\let\jnl@style=\rm
+%\def\ref@jnl#1{{\jnl@style#1\/}}
+%\def\aj{\ref@jnl{AJ}}			
+%\def\araa{\ref@jnl{ARA\&A}}		
+%\def\apj{\ref@jnl{ApJ}}			
+%\def\apjl{\ref@jnl{ApJ}}		
+%\def\apjs{\ref@jnl{ApJS}}		
+%\def\ao{\ref@jnl{Appl.Optics}}		
+%\def\apss{\ref@jnl{Ap\&SS}}		
+%\def\aap{\ref@jnl{A\&A}}		
+%\def\aapr{\ref@jnl{A\&A~Rev.}}		
+%\def\aaps{\ref@jnl{A\&AS}}		
+%\def\azh{\ref@jnl{AZh}}			
+%\def\baas{\ref@jnl{BAAS}}		
+%\def\jrasc{\ref@jnl{JRASC}}		
+%\def\memras{\ref@jnl{MmRAS}}		
+%\def\mnras{\ref@jnl{MNRAS}}		
+%\def\pra{\ref@jnl{Phys.\ Rev.\ A}}		
+%\def\prb{\ref@jnl{Phys.\ Rev.\ B}}		
+%\def\prc{\ref@jnl{Phys.\ Rev.\ C}}		
+%\def\prd{\ref@jnl{Phys.\ Rev.\ D}}		
+%\def\prl{\ref@jnl{Phys.\ Rev.\ Lett}}	
+%\def\pasp{\ref@jnl{PASP}}		
+%\def\pasj{\ref@jnl{PASJ}}		
+%\def\qjras{\ref@jnl{QJRAS}}		
+%\def\skytel{\ref@jnl{S\&T}}		
+%\def\solphys{\ref@jnl{Solar~Phys.}}	
+%\def\sovast{\ref@jnl{Soviet~Ast.}}	
+% Mehringer adding SPIE macro
+%\def\spie{\ref@jnl{in SPIE Proc., Vol.~}}
+%\def\ssr{\ref@jnl{Space~Sci.Rev.}}	
+%\def\zap{\ref@jnl{ZAp}}			
+%\let\astap=\aap
+%\let\apjlett=\apjl
+%\let\apjsupp=\apjs
+% Use editor initials in place of full first names.
+%%%%%%%%%%%%% ADASS Proceedings Macros
+%% Shorter text (FO Feb. 2004)
+%% Removed "~Vol.~" as volume no. is given as a plain number in the Journals now. (RAS Apr. 2006)
+%% Removed non-breaking space from "ed.~" and in between Ed. initials & surname. (RAS Apr. 2006)
+%\def\adassxvii{\ref@jnl{this volume}}      % ADASS XVII
+\def\adassxvii{\ref@jnl{in ASP Conf.~Ser.\ XXX, 
+   ADASS XVII, % Astronomical Data Analysis Software and Systems XVII, 
+   ed.\ J.\ Lewis, R.~Argyle, P.\ Bunclark, D.~Evans, \& E.\ Gonzalez-Solares (San Francisco: ASP)}}
+\def\adassxvi{\ref@jnl{in ASP Conf.~Ser.\ 376, 
+   ADASS XVI, % Astronomical Data Analysis Software and Systems XVI, 
+   ed.\ R.~A.\ Shaw, F.\ Hill, \& D.~J.\ Bell (San Francisco: ASP)}}
+\def\adassxv{\ref@jnl{in ASP Conf.~Ser.\ 351, 
+   ADASS XV, % Astronomical Data Analysis Software and Systems XV, 
+   ed.\ C.\ Gabriel, C.\ Arviset, D.\ Ponz, \& E.\ Solano (San Francisco: ASP)}}
+\def\adassxiv{\ref@jnl{in ASP Conf.~Ser.\ 347, 
+   ADASS XIV, % Astronomical Data Analysis Software and Systems XIV, 
+   ed.\ P.\ Shopbell, M.\ Britton, \& R.\ Ebert (San Francisco: ASP)}}
+\def\adassxiii{\ref@jnl{in ASP Conf.~Ser.\ 314, 
+   ADASS XIII, % Astronomical Data Analysis Software and Systems XIII, 
+   ed.\ F.\ Ochsenbein, M.~Allen, \& D.~Egret (San Francisco: ASP)}}
+\def\adassxii{\ref@jnl{in ASP Conf.~Ser.\ 295, 
+   ADASS XII, % Astronomical Data Analysis Software and Systems XII, 
+   ed.\ H.~E.\ Payne, R.~I.\ Jedrzejewski, \& R.~N.\ Hook (San Francisco: ASP)}}
+\def\adassxi{\ref@jnl{in ASP Conf.~Ser.\ 281, 
+   ADASS XI, % Astronomical Data Analysis Software and Systems XI, 
+   ed.\ D.~A.\ Bohlender, D.\ Durand, \& T.~H.\ Handley (San Francisco: ASP)}}
+\def\adassx{\ref@jnl{in ASP Conf.~Ser.\ 238, 
+   ADASS X, % Astronomical Data Analysis Software and Systems X, 
+   ed.\ F.~R.\ Harnden, Jr., F.~A.\ Primini, \& H.~E.\ Payne (San Francisco: ASP)}}
+\def\adassix{\ref@jnl{in ASP Conf.~Ser.\ 216, 
+   ADASS IX, % Astronomical Data Analysis Software and Systems IX, 
+   ed.\ N.\ Manset, C.\ Veillet, \& D.\ Crabtree (San Francisco: ASP)}} 
+\def\adassviii{\ref@jnl{in ASP Conf.~Ser.\ 172, 
+   ADASS VIII, % Astronomical Data Analysis Software and Systems VIII, 
+   ed.\ D.~M.\ Mehringer, R.~L.\ Plante, \& D.~A.\ Roberts (San Francisco: ASP)}}
+\def\adassvii{\ref@jnl{in ASP Conf.\ Ser.\ 145, 
+   ADASS VII, % Astronomical Data Analysis Software and Systems VII, 
+   ed.\ R.\ Albrecht, R.~N.\ Hook, \& H.~A.\ Bus\-house (San Francisco: ASP)}}   %% FO 22.04.04
+\def\adassvi{\ref@jnl{in ASP Conf.\ Ser.\ 125, 
+   ADASS VI, % Astronomical Data Analysis Software and Systems VI, 
+   ed.\ G.\ Hunt \& H.~E.\ Payne (San Francisco: ASP)}}   
+\def\adassv{\ref@jnl{in ASP Conf.\ Ser.\ 101, 
+   ADASS V, % Astronomical Data Analysis Software and Systems V, 
+   ed.\ G.~H.\ Jacoby \& J.\ Barnes (San Francisco: ASP)}}   
+\def\adassiv{\ref@jnl{in ASP Conf.\ Ser.\ 77, 
+   ADASS IV, % Astronomical Data Analysis Software and Systems IV, 
+   ed.\ R.~A.\ Shaw, H.~E.\ Payne, \& J.~J.~E.\ Hayes (San Francisco: ASP)}}
+\def\adassiii{\ref@jnl{in ASP Conf.\ Ser.\ 61, 
+   ADASS III, % Astronomical Data Analysis Software and Systems III, 
+   ed.\ D.~R.\ Crabtree, R.~J.\ Hanisch, \& J.\ Barnes (San Francisco: ASP)}}
+\def\adassii{\ref@jnl{in ASP Conf.\ Ser.\ 52, 
+   ADASS II, % Astronomical Data Analysis Software and Systems II, 
+   ed.\ R.~J.\ Hanisch, R.~J.~V.\ Brissenden, \& J.\ Barnes (San Francisco: ASP)}}
+\def\adassi{\ref@jnl{in ASP Conf.\ Ser.\ 25, 
+   ADASS I, % Astronomical Data Analysis Software and Systems I, 
+   ed.\ D.~M.\ Worrall, C.\ Biemesderfer, \& J.\ Barnes (San Francisco: ASP)}}
+%%%%
+%dmehring adding ibid macro 10mar99
+\def\ibid{\rule[0.1cm]{1cm}{0.001cm}}
+%\def\deg{\hbox{$^\circ$}}
+%\def\sun{\hbox{$\odot$}}
+%\def\earth{\hbox{$\oplus$}}
+%\def\la{\mathrel{\hbox{\rlap{\hbox{\lower4pt\hbox{$\sim$}}}\hbox{$<$}}}}
+%\def\ga{\mathrel{\hbox{\rlap{\hbox{\lower4pt\hbox{$\sim$}}}\hbox{$>$}}}}
+%\def\sq{\hbox{\rlap{$\sqcap$}$\sqcup$}}
+%\def\arcmin{\hbox{$^\prime$}}
+%\def\arcsec{\hbox{$^{\prime\prime}$}}
+%\def\fd{\hbox{$.\!\!^{\rm d}$}}
+%\def\fh{\hbox{$.\!\!^{\rm h}$}}
+%\def\fm{\hbox{$.\!\!^{\rm m}$}}
+%\def\fs{\hbox{$.\!\!^{\rm s}$}}
+%\def\fdg{\hbox{$.\!\!^\circ$}}
+%\def\farcm{\hbox{$.\mkern-4mu^\prime$}}
+%\def\farcs{\hbox{$.\!\!^{\prime\prime}$}}
+%\def\fp{\hbox{$.\!\!^{\scriptscriptstyle\rm p}$}}
+%\def\micron{\hbox{$\mu$m}}
+%\def\onehalf{\hbox{$\,^1\!/_2$}}	
+%\def\onethird{\hbox{$\,^1\!/_3$}}
+%\def\twothirds{\hbox{$\,^2\!/_3$}}
+%\def\onequarter{\hbox{$\,^1\!/_4$}}
+%\def\threequarters{\hbox{$\,^3\!/_4$}}
+%\def\ubvr{\hbox{$U\!BV\!R$}}		
+%\def\ub{\hbox{$U\!-\!B$}}		
+%\def\bv{\hbox{$B\!-\!V$}}		
+%\def\vr{\hbox{$V\!-\!R$}}		
+%\def\ur{\hbox{$U\!-\!R$}}		
+%\newcount\lecurrentfam
+%\def\LaTeX{\lecurrentfam=\the\fam \leavevmode L\raise.42ex
+%\hbox{$\fam\lecurrentfam\scriptstyle\kern-.3em A$}\kern-.15em\TeX}
+%
+\newbox\pt@box
+\newdimen\pt@width
+\newcount\pt@line
+\newcount\pt@column
+\newcount\pt@nlines
+\newcount\pt@ncol
+\newcount\pt@page
+\def\colhead#1{\multicolumn{1}{c}{#1}\pt@addcol}
+\newcommand\tabletypesize[1]{\def\pt@typesize{#1}}%
+\def\pt@typesize{}%
+\def\tablecolumns#1{\pt@column=#1\pt@ncol=#1\gdef\pt@addcol{\relax}}
+\def\tablecaption#1{\gdef\pt@caption{#1}} \def\pt@caption{\relax}
+\def\tablehead#1{\gdef\pt@head{\hline\hline\relax\\[-1.7ex]
+#1\hskip\tabcolsep\\[.7ex]\hline\relax\\[-1.5ex]}} \def\pt@head{\relax}
+\newif\if@pt@rot
+\newcommand\rotate{\@pt@rottrue}%
+\def\tabletail#1{\gdef\pt@tail{#1}} \def\pt@tail{\relax}
+\def\tablewidth#1{\pt@width=#1} \pt@width\textwidth
+\def\tableheadfrac#1{\gdef\pt@headfrac{#1}} \def\pt@headfrac{.1}
+
+\def\pt@calcnlines{%
+ \begingroup     
+  \if@pt@rot\textheight\textwidth\fi
+  \pt@typesize%AO-type sizes in deluxetable
+  \@tempdima\pt@headfrac\textheight
+  \@tempdimb\textheight\advance\@tempdimb by-\@tempdima
+  \@tempdima\arraystretch\baselineskip
+  \divide\@tempdimb by\@tempdima
+  \global\pt@nlines\@tempdimb
+ \endgroup
+}%
+
+\def\pt@tabular{\hbox \bgroup $\let\@acol\@ptabacol   % $
+\let\@classz\@tabclassz
+\let\@classiv\@tabclassiv \let\\\@tabularcr\@tabarray}
+
+\def\@ptabacol{\edef\@preamble{\@preamble \hskip \tabcolsep\tabskip\fill}}
+
+
+\def\fnum@ptable{Table \thetable}
+\def\fnum@ptablecont{Table \thetable---{\rm Continued}}
+
+\newdimen\pt@tmpcapwidth
+\def\set@mkcaption{\long\def\@makecaption##1##2{\ifdim\pt@width>\z@%
+\pt@tmpcapwidth\pt@width\else\pt@tmpcapwidth\textwidth\fi%
+\center\parbox{\pt@tmpcapwidth}{\center\rm##1.\quad##2\endcenter}%
+\endcenter}}
+\def\set@mkcaptioncont{\long\def\@makecaption##1##2{
+\center\rm##1\endcenter\vskip 2.5ex}}
+
+\newenvironment{deluxetable}[1]{\def\pt@format{\string#1}%
+\set@tblnotetext\global\pt@ncol=0\global\pt@column=0\global\pt@page=1% 
+%\let\footnotesize=\footnotesave%
+\def\pt@addcol{\global\advance\pt@ncol by\@ne}}%
+{%
+\pt@width\wd\pt@box\box\pt@box\spew@ptblnotes%
+\typeout{Table \thetable\space has been set to width \the\pt@width}%
+\endcenter\end@float%
+\let\footnotesize=\normalsize}%
+
+\let\planotable=\deluxetable
+\let\endplanotable=\enddeluxetable
+
+\def\startdata{\pt@line=0\pt@calcnlines%
+\ifdim\pt@width>\z@\def\@halignto{to \pt@width}\else\def\@halignto{}\fi%
+\let\fnum@table=\fnum@ptable\set@mkcaption%
+\@float{table}\center\caption{\pt@caption}\leavevmode%
+\setbox\pt@box=\pt@tabular{\pt@format}\pt@head}
+\def\enddata{\crcr\noalign{\vskip .7ex}\hline\endtabular}
+
+\def\pt@nl{\global\advance\pt@line by\@ne%
+\ifnum\pt@line=\pt@nlines%
+\endtabular\pt@width\wd\pt@box\box\pt@box
+\typeout{Page \the\pt@page\space of table \thetable\space has been set to
+width \the\pt@width\space with \the\pt@nlines\space lines per page}%
+\global\advance\pt@page by\@ne%
+\endcenter\end@float\clearpage%
+\addtocounter{table}{\m@ne}%
+\let\fnum@table=\fnum@ptablecont\set@mkcaptioncont%
+\@float{table}\center\caption{\pt@caption}\leavevmode%
+\global\pt@ncol=\pt@column
+\global\pt@line=0%
+\setbox\pt@box=\pt@tabular{\pt@format}\pt@head%
+\else\\
+\fi}
+
+
+\let\nl=\pt@nl
+\let\nextline=\pt@nl
+
+\def\tablevspace#1{\noalign{\vskip#1}}
+\def\tablebreak{\pt@line\pt@nlines\advance\pt@line by\m@ne\pt@nl}
+
+
+\def\cutinhead#1{\noalign{\vskip 1.5ex}
+\hline\pt@nl\noalign{\vskip -4ex}
+\multicolumn{\pt@ncol}{c}{#1}\pt@nl
+\noalign{\vskip .8ex}
+\hline\pt@nl\noalign{\vskip -2ex}}
+
+\def\sidehead#1{\noalign{\vskip 1.5ex}
+\multicolumn{\pt@ncol}{@{\hskip\z@}l}{#1}\pt@nl
+\noalign{\vskip .5ex}}
+
+\def\set@tblnotetext{\def\tablenotetext##1##2{{%
+\@temptokena={\vspace{0ex}{%
+\parbox{\pt@width}{\hskip1em$^{\rm ##1}$##2}\par}}%
+\@temptokenb=\expandafter{\tblnote@list}%
+\xdef\tblnote@list{\the\@temptokenb\the\@temptokena}}}}
+
+\def\spew@ptblnotes{
+\ifx\tblnote@list\@empty\relax
+\else
+\par
+\vspace{2ex}
+{\parskip=1.5ex%
+\tblnote@list}
+\gdef\tblnote@list{}
+\fi}
+
+
+\def\tablerefs#1{\@temptokena={\vspace*{3ex}{%
+\parbox{\pt@width}{\hskip1em\rm References. --- #1}\par}}%
+:
+\@temptokenb=\expandafter{\tblnote@list}
+\xdef\tblnote@list{\the\@temptokenb\the\@temptokena}}
+
+\def\tablecomments#1{\@temptokena={\vspace*{3ex}{%
+\parbox{\pt@width}{\hskip1em\rm Note. --- #1}\par}}%
+\@temptokenb=\expandafter{\tblnote@list}
+\xdef\tblnote@list{\the\@temptokenb\the\@temptokena}}
+\@ifundefined{epsfbox}{\@input{epsf.sty}}{\relax}
+\def\eps@scaling{.95}
+
+
+% \def\epsscale#1{\gdef\eps@scaling{#1}}  % made non-global plante 1-Apr-99
+\def\epsscale#1{\def\eps@scaling{#1}}
+%
+\def\plotone#1{\centering \leavevmode
+\epsfxsize=\eps@scaling\textwidth \epsfbox{#1}}
+\def\plottwo#1#2{\centering \leavevmode
+\epsfxsize=.45\textwidth \epsfbox{#1} \hfil
+\epsfxsize=.45\textwidth \epsfbox{#2}}
+\def\plotfiddle#1#2#3#4#5#6#7{\centering \leavevmode
+\vbox to#2{\rule{0pt}{#2}}
+\special{psfile=#1 voffset=#7 hoffset=#6 vscale=#5 hscale=#4 angle=#3}}
+\newif\if@finalstyle \@finalstylefalse
+\ps@myheadings		
+\let\ps@title=\ps@paspcstitle	
+\ds@twoside
+%
+%  Define \codesize to be \scriptsize\bf to enclose code snippets.
+%  This should allow 80 chars across.
+\newcommand{\codesize}{\scriptsize\bf\renewcommand{\baselinestretch}{0.8}}
+\newcommand{\edcomment}[1]{\small\tt\begin{itemize}\item[FROM EDITOR>]
+\it#1 \end{itemize}\normalsize}
+%
+%
+% \typeout{Loading html macros}
+%
+% end aspconf.sty
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% The following section is the modified contents of html.sty, v 1.31 from 
+% the latex2html package.  The modifications made to include the file
+% here are:
+%
+%   1. The check for re-loading of html style is altered to give
+%      error message.
+%
+%   2. The LaTeX 2e extensions have been moved to the end of this file
+%      (since it uses \endinput).
+%   
+%   3. \makeatother and \endinput at end of html.sty portion removed
+%
+% ----------------
+%
+% $Id: adassconf.sty,v 1.2 2003/06/06 18:56:05 payne Exp $
+% LaTeX2HTML Version 98.2 : html.sty
+% 
+% This file contains definitions of LaTeX commands which are
+% processed in a special way by the translator. 
+% For example, there are commands for embedding external hypertext links,
+% for cross-references between documents or for including raw HTML.
+% This file includes the comments.sty file v2.0 by Victor Eijkhout
+% In most cases these commands do nothing when processed by LaTeX.
+%
+% Place this file in a directory accessible to LaTeX (i.e., somewhere
+% in the TEXINPUTS path.)
+%
+% NOTE: This file works with LaTeX 2.09 or (the newer) LaTeX2e.
+%       If you only have LaTeX 2.09, some complex LaTeX2HTML features
+%       like support for segmented documents are not available.
+
+% Changes:
+% See the change log at end of file.
+
+
+% Exit if the style file is already loaded
+% (suggested by Lee Shombert <las@potomac.wash.inmet.com>
+%
+% modified by Ray Plante for adassconf.sty
+\ifx \htmlstyloaded\relax 
+     \errmessage{html style environment has already been loaded!
+                 ^^J Remove "html" from the documentstyle
+                 command and rerun LaTeX}
+     \endinput\else\let\htmlstyloaded\relax
+\fi
+\makeatletter
+
+\providecommand{\latextohtml}{\LaTeX2\texttt{HTML}}
+
+
+%%% LINKS TO EXTERNAL DOCUMENTS
+%
+% This can be used to provide links to arbitrary documents.
+% The first argumment should be the text that is going to be
+% highlighted and the second argument a URL.
+% The hyperlink will appear as a hyperlink in the HTML 
+% document and as a footnote in the dvi or ps files.
+%
+%\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}} 
+
+
+% This is an alternative definition of the command above which
+% will ignore the URL in the dvi or ps files.
+%\newcommand{\htmladdnormallink}[2]{#1}
+
+
+% This command takes as argument a URL pointing to an image.
+% The image will be embedded in the HTML document but will
+% be ignored in the dvi and ps files.
+%
+\newcommand{\htmladdimg}[1]{}
+
+
+%%% CROSS-REFERENCES BETWEEN (LOCAL OR REMOTE) DOCUMENTS
+%
+% This can be used to refer to symbolic labels in other Latex 
+% documents that have already been processed by the translator.
+% The arguments should be:
+% #1 : the URL to the directory containing the external document
+% #2 : the path to the labels.pl file of the external document.
+% If the external document lives on a remote machine then labels.pl 
+% must be copied on the local machine.
+%
+%e.g. \externallabels{http://cbl.leeds.ac.uk/nikos/WWW/doc/tex2html/latex2html}
+%                    {/usr/cblelca/nikos/tmp/labels.pl}
+% The arguments are ignored in the dvi and ps files.
+%
+\newcommand{\externallabels}[2]{}
+
+
+% This complements the \externallabels command above. The argument
+% should be a label defined in another latex document and will be
+% ignored in the dvi and ps files.
+%
+\newcommand{\externalref}[1]{}
+
+
+% Suggested by  Uffe Engberg (http://www.brics.dk/~engberg/)
+% This allows the same effect for citations in external bibliographies.
+% An  \externallabels  command must be given, locating a labels.pl file
+% which defines the location and keys used in the external .html file.
+%  
+\newcommand{\externalcite}{\nocite}
+
+
+%%% HTMLRULE
+% This command adds a horizontal rule and is valid even within
+% a figure caption.
+% Here we introduce a stub for compatibility.
+\newcommand{\htmlrule}{\protect\HTMLrule}
+\newcommand{\HTMLrule}{\@ifstar\htmlrulestar\htmlrulestar}
+\newcommand{\htmlrulestar}[1]{}
+
+% This command adds information within the <BODY> ... </BODY> tag
+%
+\newcommand{\bodytext}[1]{}
+\newcommand{\htmlbody}{}
+
+
+%%% HYPERREF 
+% Suggested by Eric M. Carol <eric@ca.utoronto.utcc.enfm>
+% Similar to \ref but accepts conditional text. 
+% The first argument is HTML text which will become ``hyperized''
+% (underlined).
+% The second and third arguments are text which will appear only in the paper
+% version (DVI file), enclosing the fourth argument which is a
+% reference to a label.  
+%
+%e.g. \hyperref{using the tracer}{using the tracer (see Section}{)}{trace}
+% where there is a corresponding \label{trace}
+%
+\newcommand{\hyperref}{\hyperrefx[ref]}
+\def\hyperrefx[#1]{{\def\next{#1}%
+ \def\tmp{ref}\ifx\next\tmp\aftergroup\hyperrefref
+ \else\def\tmp{pageref}\ifx\next\tmp\aftergroup\hyperpageref
+ \else\def\tmp{page}\ifx\next\tmp\aftergroup\hyperpageref
+ \else\def\tmp{noref}\ifx\next\tmp\aftergroup\hypernoref
+ \else\def\tmp{no}\ifx\next\tmp\aftergroup\hypernoref
+ \else\typeout{*** unknown option \next\space to  hyperref ***}%
+ \fi\fi\fi\fi\fi}}
+\newcommand{\hyperrefref}[4]{#2\ref{#4}#3}
+\newcommand{\hyperpageref}[4]{#2\pageref{#4}#3}
+\newcommand{\hypernoref}[3]{#2}
+
+
+%%% HYPERCITE --- added by RRM
+% Suggested by Stephen Simpson <simpson@math.psu.edu>
+% effects the same ideas as in  \hyperref, but for citations.
+% It does not allow an optional argument to the \cite, in LaTeX.
+%
+%   \hypercite{<html-text>}{<LaTeX-text>}{<opt-text>}{<key>}
+%
+% uses the pre/post-texts in LaTeX, with a  \cite{<key>}
+%
+%   \hypercite[ext]{<html-text>}{<LaTeX-text>}{<key>}
+%
+% uses the pre/post-texts in LaTeX, with a  \nocite{<key>}
+% the actual reference comes from an \externallabels  file.
+%
+\newcommand{\hypercite}{\hypercitex[int]}
+\def\hypercitex[#1]{{\def\next{#1}%
+ \def\tmp{int}\ifx\next\tmp\aftergroup\hyperciteint
+ \else\def\tmp{cite}\ifx\next\tmp\aftergroup\hyperciteint
+ \else\def\tmp{ext}\ifx\next\tmp\aftergroup\hyperciteext
+ \else\def\tmp{nocite}\ifx\next\tmp\aftergroup\hyperciteext
+ \else\def\tmp{no}\ifx\next\tmp\aftergroup\hyperciteext
+ \else\typeout{*** unknown option \next\space to  hypercite ***}%
+ \fi\fi\fi\fi\fi}}
+\newcommand{\hyperciteint}[4]{#2{\def\tmp{#3}\def\emptyopt{}%
+ \ifx\tmp\emptyopt\cite{#4}\else\cite[#3]{#4}\fi}}
+\newcommand{\hyperciteext}[3]{#2\nocite{#3}}
+
+
+
+%%% HTMLREF
+% Reference in HTML version only.
+% Mix between \htmladdnormallink and \hyperref.
+% First arg is text for in both versions, second is label for use in HTML
+% version.
+\newcommand{\htmlref}[2]{#1}
+
+%%% HTMLCITE
+% Reference in HTML version only.
+% Mix between \htmladdnormallink and \hypercite.
+% First arg is text for in both versions, second is citation for use in HTML
+% version.
+\newcommand{\htmlcite}[2]{#1}
+
+
+%%% HTMLIMAGE
+% This command can be used inside any environment that is converted
+% into an inlined image (eg a "figure" environment) in order to change
+% the way the image will be translated. The argument of \htmlimage
+% is really a string of options separated by commas ie 
+% [scale=<scale factor>],[external],[thumbnail=<reduction factor>
+% The scale option allows control over the size of the final image.
+% The ``external'' option will cause the image not to be inlined 
+% (images are inlined by default). External images will be accessible
+% via a hypertext link. 
+% The ``thumbnail'' option will cause a small inlined image to be 
+% placed in the caption. The size of the thumbnail depends on the
+% reduction factor. The use of the ``thumbnail'' option implies
+% the ``external'' option.
+%
+% Example:
+% \htmlimage{scale=1.5,external,thumbnail=0.2}
+% will cause a small thumbnail image 1/5th of the original size to be
+% placed in the final document, pointing to an external image 1.5
+% times bigger than the original.
+% 
+\newcommand{\htmlimage}[1]{}
+
+
+% \htmlborder causes a border to be placed around an image or table
+% when the image is placed within a <TABLE> cell.
+\newcommand{\htmlborder}[1]{}
+
+% Put \begin{makeimage}, \end{makeimage} around LaTeX to ensure its
+% translation into an image.
+% This shields sensitive text from being translated.
+\newenvironment{makeimage}{}{}
+
+
+% A dummy environment that can be useful to alter the order
+% in which commands are processed, in LaTeX2HTML
+\newenvironment{tex2html_deferred}{}{}
+
+
+%%% HTMLADDTONAVIGATION
+% This command appends its argument to the buttons in the navigation
+% panel. It is ignored by LaTeX.
+%
+% Example:
+% \htmladdtonavigation{\htmladdnormallink
+%              {\htmladdimg{http://server/path/to/gif}}
+%              {http://server/path}}
+\newcommand{\htmladdtonavigation}[1]{}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Comment.sty   version 2.0, 19 June 1992
+% selectively in/exclude pieces of text: the user can define new
+% comment versions, and each is controlled separately.
+% This style can be used with plain TeX or LaTeX, and probably
+% most other packages too.
+%
+% Examples of use in LaTeX and TeX follow \endinput
+%
+% Author
+%    Victor Eijkhout
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+%
+%    eijkhout@cs.utk.edu
+%
+% Usage: all text included in between
+%    \comment ... \endcomment
+% or \begin{comment} ... \end{comment}
+% is discarded. The closing command should appear on a line
+% of its own. No starting spaces, nothing after it.
+% This environment should work with arbitrary amounts
+% of comment.
+%
+% Other 'comment' environments are defined by
+% and are selected/deselected with
+% \includecomment{versiona}
+% \excludecoment{versionb}
+%
+% These environments are used as
+% \versiona ... \endversiona
+% or \begin{versiona} ... \end{versiona}
+% with the closing command again on a line of its own.
+%
+% Basic approach:
+% to comment something out, scoop up  every line in verbatim mode
+% as macro argument, then throw it away.
+% For inclusions, both the opening and closing comands
+% are defined as noop
+%
+% Changed \next to \html@next to prevent clashes with other sty files
+% (mike@emn.fr)
+% Changed \html@next to \htmlnext so the \makeatletter and
+% \makeatother commands could be removed (they were causing other
+% style files - changebar.sty - to crash) (nikos@cbl.leeds.ac.uk)
+% Changed \htmlnext back to \html@next...
+
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}\edef\test{\meaning\test}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \csarg\ifx{LaInnEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \fi \html@next}
+}
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \edef\tmp{\string\\end#1}%
+      \csarg\xdef{PlainEnd#1Test}{\meaning\tmp}%
+     \edef\tmp{\string\\end\string\{#1\string\}}%
+      \csarg\xdef{LaLaEnd#1Test}{\meaning\tmp}%
+     \edef\tmp{\string\\end \string\{#1\string\}}%
+      \csarg\xdef{LaInnEnd#1Test}{\meaning\tmp}%
+    }}
+
+\excludecomment{comment}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% end Comment.sty
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%
+% Alternative code by Robin Fairbairns, 22 September 1997
+% revised to cope with % and unnested { }, by Ross Moore, 4 July 1998
+%
+\def\raw@catcodes{\catcode`\%=12 \catcode`\{=12 \catcode`\}=12}
+\newcommand\@gobbleenv{\bgroup\raw@catcodes
+ \let\reserved@a\@currenvir\@gobble@nv}
+\bgroup
+ \def\expansionhead{\gdef\@gobble@nv@i##1}
+ \def\expansiontail{{\def\reserved@b{##1}\@gobble@nv@ii}}
+ \raw@catcodes\relax
+ \expandafter\expansionhead\expandafter}\expansiontail
+\egroup
+\long\gdef\@gobble@nv#1\end#2{\@gobble@nv@i}
+%\long\def\@gobble@nv#1\end#2{\def\reserved@b{#2}%
+\def\@gobble@nv@ii{%
+ \ifx\reserved@a\reserved@b
+  \edef\reserved@a{\egroup\noexpand\end{\reserved@a}}%
+  \expandafter\reserved@a
+ \else
+  \expandafter\@gobble@nv
+ \fi}
+
+\renewcommand{\excludecomment}[1]{%
+    \csname newenvironment\endcsname{#1}{\@gobbleenv}{}}
+
+%%% RAW HTML 
+% 
+% Enclose raw HTML between a \begin{rawhtml} and \end{rawhtml}.
+% The html environment ignores its body
+%
+\excludecomment{rawhtml}
+
+
+%%% HTML ONLY
+%
+% Enclose LaTeX constructs which will only appear in the 
+% HTML output and will be ignored by LaTeX with 
+% \begin{htmlonly} and \end{htmlonly}
+%
+\excludecomment{htmlonly}
+% Shorter version
+\newcommand{\html}[1]{}
+
+% for images.tex only
+\excludecomment{imagesonly}
+
+%%% LaTeX ONLY
+% Enclose LaTeX constructs which will only appear in the 
+% DVI output and will be ignored by latex2html with 
+%\begin{latexonly} and \end{latexonly}
+%
+\newenvironment{latexonly}{}{}
+% Shorter version
+\newcommand{\latex}[1]{#1}
+
+
+%%% LaTeX or HTML
+% Combination of \latex and \html.
+% Say \latexhtml{this should be latex text}{this html text}
+%
+%\newcommand{\latexhtml}[2]{#1}
+\long\def\latexhtml#1#2{#1}
+
+
+%%% tracing the HTML conversions
+% This alters the tracing-level within the processing
+% performed by  latex2html  by adjusting  $VERBOSITY      % $
+% (see  latex2html.config  for the appropriate values)
+%
+\newcommand{\htmltracing}[1]{}
+\newcommand{\htmltracenv}[1]{}
+
+
+%%%  \strikeout for HTML only
+% uses <STRIKE>...</STRIKE> tags on the argument
+% LaTeX just gobbles it up.
+\newcommand{\strikeout}[1]{}
+
+%%%  \htmlurl  and  \url
+%  implement \url as the simplest thing, if not already defined
+%  let \htmlurl#1  be equivalent to it 
+%
+\def\htmlurlx#1{\begin{small}\texttt{#1}\end{small}}%
+\expandafter\ifx\csname url\endcsname\relax
+ \let\htmlurl=\htmlurlx \else \let\htmlurl=\url \fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% JCL - stop input here if LaTeX2e is not present
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% this portion has been moved to the end of the file by Ray Plante
+% for use within adassconf.sty.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% commented out by Ray Plante for use within adassconf.sty
+%
+% \makeatother
+% \endinput
+
+% Modifications:
+%
+% (The listing of Initiales see Changes)
+
+% $Log: adassconf.sty,v $
+% Revision 1.2  2003/06/06 18:56:05  payne
+% updated the editor list
+%
+% Revision 1.1.1.1  2003/06/06 17:42:50  payne
+% initial upload
+%
+% Revision 1.5  2003/04/16 23:01:02  payne
+% Made titlemark default to title.  That means titlemark is only needed if
+% the title is too long to fit in the header, and that titlemark must come
+% AFTER the title.
+%
+% And I removed the slug and header dependence on finalstyle, so that the
+% are printed, so we can ask authors to put in titlemark and authormark 
+% commands.
+%
+% Revision 1.4  2003/04/16 00:10:08  payne
+% Changes for typesetting urls.
+%
+% Revision 1.2  2003/02/24 23:16:17  payne
+% Rearranged papers so that invited papers come first in each part.  Put
+% the final volume number in the style file, fixed some addresses in the
+% participant list, and corrected the number of invited papers in the
+% proceedings from 7 to 8.
+%
+% Revision 1.1.1.1  2003/02/21 16:45:30  payne
+% Initial upload
+%
+% Revision 1.28  1999/07/14 20:52:42  rplante
+% additional functions to support HTML version and external linking
+%
+% Revision 1.27  1999/07/09 17:20:08  rplante
+% tweaked to help support electronic version
+%
+% Revision 1.26  1999/04/09 21:35:05  dmehring
+% R.~Albrecht -> R.\ Albrecht
+%
+% Revision 1.25  1999/04/09 20:52:55  dmehring
+% H.~Jacoby -> H.\ Jacoby so line would break
+%
+% Revision 1.24  1999/04/09 14:41:46  rplante
+% added volume number
+%
+% Revision 1.23  1999/04/05 19:19:45  dmehring
+% diddled \adass* macros again
+%
+% Revision 1.22  1999/04/02 20:42:12  rplante
+% tweaked \tighten
+%
+% Revision 1.21  1999/04/02 18:08:06  rplante
+% tighten description lists; add tighten macro
+%
+% Revision 1.20  1999/04/01 22:52:58  dmehring
+% added "Vol." to \spie macro
+%
+% Revision 1.19  1999/04/01 22:25:49  dmehring
+% added "Vol." back to adass macros
+%
+% Revision 1.18  1999/04/01 22:05:34  dmehring
+% changed \def\vol@author{D.\ Mehringer, R.\ L.\ Plante, and D.\ A.\ Roberts, eds.}
+% to \def\vol@author{D.\ M.\ Mehringer, R.\ L.\ Plante, and D.\ A.\ Roberts, eds.}
+% changed \def\cpr@year{1994} to \def\cpr@year{1999}
+%
+% Revision 1.17  1999/04/01 18:30:11  rplante
+% fixed epsf scaling bug
+%
+% Revision 1.16  1999/03/30 21:41:58  rplante
+% fix broken ability to latex individual papers
+%
+% Revision 1.15  1999/03/25 19:44:54  rplante
+% reset figure and table numbers with each article
+%
+% Revision 1.14  1999/03/25 18:28:42  rplante
+% counter resets, page number control, appearance of part in toc
+%
+% Revision 1.13  1999/03/24 16:06:22  rplante
+% support paper titles and authors in table of contents
+%
+% Revision 1.12  1999/03/19 22:35:36  rplante
+% more tweaking for book
+%
+% Revision 1.11  1999/03/19 19:36:05  rplante
+% tweaked paspbook
+%
+% Revision 1.10  1999/03/19 18:21:26  rplante
+% updated for proceedings volume
+%
+% Revision 1.9  1999/03/18 20:28:14  dmehring
+% changed phys rev macros so they now have spaces
+%
+% Revision 1.8  1999/03/15 19:33:17  dmehring
+% made small changes to adass macros
+%
+% Revision 1.7  1999/03/10 22:45:54  dmehring
+% added \ibid macro (produces horizontal line for a reference which has an
+% identical author list the the previous reference)
+%
+% Revision 1.6  1999/03/10 20:36:15  dmehring
+% and yet another SPIE macro modification
+%
+% Revision 1.5  1999/03/10 20:32:15  dmehring
+% modified SPIE macro
+%
+% Revision 1.4  1999/03/10 20:30:32  dmehring
+% added SPIE macro
+%
+% Revision 1.3  1999/03/10 00:17:27  dmehring
+% changed Ser. Vol. to Proc. in \adass* macros
+%
+% Revision 1.2  1999/03/10 00:03:08  dmehring
+% edited \adass* macros to change editors first names to initials
+% also added a couple of commas
+%
+% Revision 1.1  1999/03/09 23:45:03  droberts
+% Initial revision
+%
+% Revision 1.31  1998/07/07 14:15:41  RRM
+%  --  new commands  \htmlsetstyle  and  \htmladdtostyle
+%
+% Revision 1.30  1998/07/04 02:42:22  RRM
+%  --  cope with catcodes of % { } in rawhtml/comment/htmlonly environments
+%
+% Revision 1.29  1998/06/23 13:33:23  RRM
+%  --  use \begin{small} with the default for URLs
+%
+% Revision 1.28  1998/06/21 09:38:39  RRM
+%  --  implement \htmlurl  to agree with \url if already defined
+%     or loaded subsequently (LaTeX-2e only)
+%  --  get LaTeX to print the revision number when loading
+%
+% Revision 1.27  1998/06/20 15:13:10  RRM
+%  --  \TeX is already protected in recent versions of LaTeX
+% 	so \DeclareRobust doesn't work --- causes looping
+%  --  \part and \subparagraph need not be defined in some styles
+%
+% Revision 1.26  1998/06/01 08:36:49  latex2html
+%  --  implement optional argument for \endsegment
+%  --  made the counter value output from \DumpPtr more robust
+%
+% Revision 1.25  1998/05/09 05:43:35  latex2html
+%  --   conditionals for avoiding undefined counters
+%
+% Revision 1.23  1998/02/26 10:32:24  latex2html
+%  --  use \providecommand for  \latextohtml
+%  --  implemented \HTMLcode to do what \HTML did previously
+% 	\HTML still works, unless already defined by another package
+%  --  fixed problems remaining with undefined \chapter
+%  --  defined \endsegment
+%
+% Revision 1.22  1997/12/05 11:38:18  RRM
+%  --  implemented an optional argument to \begin for style-sheet info.
+%  --  modified use of an optional argument with sectioning-commands
+%
+% Revision 1.21  1997/11/05 10:28:56  RRM
+%  --  replaced redefinition of \@htmlrule with \htmlrulestar
+%
+% Revision 1.20  1997/10/28 02:15:58  RRM
+%  --  altered the way some special html-macros are defined, so that
+% 	star-variants are explicitly defined for LaTeX
+% 	 -- it is possible for these to occur within  images.tex
+% 	e.g. \htmlinfostar \htmlrulestar \tableofchildlinksstar
+%
+% Revision 1.19  1997/10/11 05:47:48  RRM
+%  --  allow the dummy {tex2html_nowrap} environment in LaTeX
+% 	use it to make its contents be evaluated in environment order
+%
+% Revision 1.18  1997/10/04 06:56:50  RRM
+%  --  uses Robin Fairbairns' code for ignored environments,
+%      replacing the previous  comment.sty  stuff.
+%  --  extensions to the \tableofchildlinks command
+%  --  extensions to the \htmlinfo command
+%
+% Revision 1.17  1997/07/08 11:23:39  RRM
+%     include value of footnote counter in .ptr files for segments
+%
+% Revision 1.16  1997/07/03 08:56:34  RRM
+%     use \textup  within the \latextohtml macro
+%
+% Revision 1.15  1997/06/15 10:24:58  RRM
+%      new command  \htmltracenv  as environment-ordered \htmltracing
+%
+% Revision 1.14  1997/06/06 10:30:37  RRM
+%  -   new command:  \htmlborder  puts environment into a <TABLE> cell
+%      with a border of specified width, + other attributes.
+%  -   new commands: \HTML  for setting arbitrary HTML tags, with attributes
+%                    \HTMLset  for setting Perl variables, while processing
+%                    \HTMLsetenv  same as \HTMLset , but it gets processed
+%                                 as if it were an environment.
+%  -   new command:  \latextohtml  --- to set the LaTeX2HTML name/logo
+%  -   fixed some remaining problems with \segmentcolor & \segmentpagecolor
+%
+% Revision 1.13  1997/05/19 13:55:46  RRM
+%      alterations and extra options to  \hypercite
+%
+% Revision 1.12  1997/05/09 12:28:39  RRM
+%  -  Added the optional argument to \htmlhead, also in \DumpCounters
+%  -  Implemented \HTMLset as a no-op in LaTeX.
+%  -  Fixed a bug in accessing the page@color settings.
+%
+% Revision 1.11  1997/03/26 09:32:40  RRM
+%  -  Implements LaTeX versions of  \externalcite  and  \hypercite  commands.
+%     Thanks to  Uffe Engberg  and  Stephen Simpson  for the suggestions.
+%
+% Revision 1.10  1997/03/06 07:37:58  RRM
+% Added the  \htmltracing  command, for altering  $VERBOSITY .    %$
+%
+% Revision 1.9  1997/02/17 02:26:26  RRM
+% - changes to counter handling (RRM)
+% - shuffled around some definitions
+% - changed \htmlrule of 209 mode
+%
+% Revision 1.8  1997/01/26 09:04:12  RRM
+% RRM: added optional argument to sectioning commands
+%      \htmlbase  sets the <BASE HREF=...> tag
+%      \htmlinfo  and  \htmlinfo* allow the document info to be positioned
+%
+% Revision 1.7  1997/01/03 12:15:44  L2HADMIN
+% % - fixes to the  color  and  natbib  interfaces
+% % - extended usage of  \hyperref, via an optional argument.
+% % - extended use comment environments to allow shifting expansions
+% %     e.g. within \multicolumn  (`bug' reported by Luc De Coninck).
+% % - allow optional argument to: \htmlimage, \htmlhead,
+% %     \htmladdimg, \htmladdnormallink, \htmladdnormallinkfoot
+% % - added new commands: \htmlbody, \htmlnohead
+% % - added new command: \tableofchildlinks
+%
+% Revision 1.6  1996/12/25 03:04:54  JCL
+% added patches to segment feature from Martin Wilck
+%
+% Revision 1.5  1996/12/23 01:48:06  JCL
+%  o introduced the environment makeimage, which may be used to force
+%    LaTeX2HTML to generate an image from the contents.
+%    There's no magic, all what we have now is a defined empty environment
+%    which LaTeX2HTML will not recognize and thus pass it to images.tex.
+%  o provided \protect to the \htmlrule commands to allow for usage
+%    within captions.
+%
+% Revision 1.4  1996/12/21 19:59:22  JCL
+% - shuffled some entries
+% - added \latexhtml command
+%
+% Revision 1.3  1996/12/21 12:22:59  JCL
+% removed duplicate \htmlrule, changed \htmlrule back not to create a \hrule
+% to allow occurrence in caption
+%
+% Revision 1.2  1996/12/20 04:03:41  JCL
+% changed occurrence of \makeatletter, \makeatother
+% added new \htmlrule command both for the LaTeX2.09 and LaTeX2e
+% sections
+%
+%
+% jcl 30-SEP-96
+%  - Stuck the commands commonly used by both LaTeX versions to the top,
+%    added a check which stops input or reads further if the document
+%    makes use of LaTeX2e.
+%  - Introduced rrm's \dumpcurrentcolor and \bodytext
+% hws 31-JAN-96 - Added support for document segmentation
+% hws 10-OCT-95 - Added \htmlrule command
+% jz 22-APR-94 - Added support for htmlref
+% nd  - Created
+%
+%
+% end html.sty
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% the following section contains extra macros and enhancements for use
+% by the ADASS conference proceedings.
+%
+% \typeout{Loading ADASS VIII macros}
+\def\paspheader{
+    \ps@myheadings\let\ps@title=\ps@paspcstitle
+    \@twosidetrue\@mparswitchtrue
+}
+\def\paspreprint{\@finalstyletrue
+    \ps@myheadings\let\ps@title=\ps@pasprptitle
+    \@twosidetrue\@mparswitchtrue
+}
+\def\paspbook{\@finalstyletrue\paspheader}
+\let\adassconfstyloaded\relax
+%\paspbook
+
+\def\pasp@authortocentry#1{\relax}
+
+%-----------------------------------------------------------------------
+%			    Paper ID Code
+%-----------------------------------------------------------------------
+% This identifies the paper and provides a label for cross-referencing
+% between papers in the proceedings.
+
+\def\thepaperID{}
+\def\paperID#1{\gdef\thepaperID{#1}\label{#1}\adassartinit}
+
+%-----------------------------------------------------------------------
+%			 Contact Information
+%-----------------------------------------------------------------------
+% This information will not appear in the paper but will be used by
+% the editors in case they need to contact the author
+
+\def\contact#1{\relax}
+\def\email#1{\relax}
+
+%-----------------------------------------------------------------------
+%		      Author Index Specification
+%-----------------------------------------------------------------------
+% These macros specify how each author name should appear in the
+% author index.  
+
+\def\paindex#1{\relax}
+\def\aindex#1{\relax}
+
+%-----------------------------------------------------------------------
+%			Subject Index keywords
+%-----------------------------------------------------------------------
+% Keywords are used for creating the subject index; however, they do
+% not appear in the individual papers.  There is no required syntax;
+% however, the convention for post-processing is to delimit the terms
+% with commas.  Complex terms may optionally be broken into major and
+% minor terms with form MAJOR: MINOR.  
+
+% already defined above
+% \def\keywords#1{\relax}
+\def\sindex#1{\relax}
+
+%-----------------------------------------------------------------------
+%			     Page marks
+%-----------------------------------------------------------------------
+% These macros help define the slugs that go at the top of each page
+
+\def\authormark#1{\def\leftmark{#1}}
+\def\titlemark#1{\def\rightmark{#1}}
+
+%-----------------------------------------------------------------------
+%			      References
+%-----------------------------------------------------------------------
+
+\def\sectprop#1#2{\relax}
+\let\newextlabel=\newlabel
+
+\let\std@ref=\ref
+\let\std@pageref=\pageref
+\def\If@MacroDef#1#2#3{\ifx#1\relax #2\else #3\fi}
+\def\cond@setextref#1{\expandafter\If@MacroDef\csname r@#1\endcsname%
+                  {\@setextref{#1}}{\relax}}
+\def\@setextref#1{\protected@write\@auxout{}{\string\extlabel{#1}}}
+\def\ref#1{\std@ref{#1}\protect\cond@setextref{#1}}
+\def\pageref#1{\std@pageref{#1}\protect\cond@setextref{#1}}
+    
+\def\extlabel#1{\relax}
+\def\paperref#1{\if@finalstyle\std@pageref{#1}\@setextref{#1}\else[#1]\fi}
+
+% 
+% adjustments to html macros
+%
+\def\makeusletter{\catcode`\_=11}  \def\makeussubscript{\catcode`\_=8}
+\def\beginurlcodes{\makeusletter%
+\def~{\raisebox{-0.2\normalbaselineskip}{\char126}}} 
+\def\formatURL#1{\htmlurl{#1}\egroup}
+\def\footURL#1{\footnote{\htmlurl{#1}}\egroup}
+\def\gobbleURL#1{\egroup}
+
+\newcommand{\htmladdnormallinkfoot}[1]{#1\bgroup\beginurlcodes\footURL}
+\newcommand{\htmladdnormallink}[1]{#1\bgroup\beginurlcodes\gobbleURL}
+% \renewcommand{\htmladdimg}{\bgroup\beginurlcodes\gobbleURL}
+\newcommand{\makeURL}{\bgroup\beginurlcodes\formatURL}
+\newcommand{\htmladdURL}{\bgroup\beginurlcodes\formatURL}
+
+% Tighten up lists
+%
+\newcounter{tictr}
+\renewenvironment{itemize}{%
+   \begin{list}{%
+      \mbox{$\bullet$}}{%
+      \usecounter{tictr}\setlength{\itemsep}{0.0pt}\setlength{\parsep}{0.0pt}
+      \setlength{\topsep}{0.0pt} \def\makelabel##1{\hss\llap{##1}}
+   }}{\end{list}}
+\newcounter{tectr}
+\renewenvironment{enumerate}{%
+   \begin{list}{%
+      \arabic{tectr}.}{%
+      \usecounter{tectr}\setlength{\itemsep}{0.0pt}\setlength{\parsep}{0.0pt}
+      \setlength{\topsep}{0.0pt} \def\makelabel##1{\hss\llap{##1}}
+   }}{\end{list}}
+
+\newcommand\tighten{%
+\def\section{\@startsection {section}{1}{\z@}%
+                            {-3.2ex plus -1ex minus -.8ex}%
+                            {2.2ex plus .2ex}%
+                            {\normalsize\bf}}
+\def\subsection{\@startsection{subsection}{2}{\z@}%
+                            {-1.7ex plus -1ex minus -.5ex}%
+                            {1.1ex plus .2ex}%
+                            {\normalsize\bf}}
+\def\endabstract{\par\egroup\vspace*{0.8\baselineskip}}
+\renewenvironment{description}
+               {\list{}{\labelwidth\z@ \itemindent-\leftmargin
+                        \setlength{\itemsep}{1ex}\setlength{\parsep}{0ex}
+                        \let\makelabel\descriptionlabel}}
+               {\endlist}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% This must be last in this ADASS section!
+%
+\InputIfFileExists{\jobname.ax2}%
+{\typeout{^^JLoading reprint style ^^J}}{\relax}
+
+%
+%
+% end ADASS specific definitions
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% this section contains LaTeX2e-specific code from html.sty.  This is
+% not used by adassconf.sty v 8.x but is included for possible
+% migration to LaTeX2e in the future.
+%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% JCL - stop input here if LaTeX2e is not present
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\ifx\if@compatibility\undefined
+  %LaTeX209
+  \makeatother\relax\expandafter\endinput
+\fi
+\if@compatibility
+  %LaTeX2e in LaTeX209 compatibility mode
+  \makeatother\relax\expandafter\endinput
+\fi
+
+%\let\real@TeXlogo = \TeX
+%\DeclareRobustCommand{\TeX}{\relax\real@TeXlogo}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Start providing LaTeX2e extension:
+% This is currently:
+%  - additional optional argument for \htmladdimg
+%  - support for segmented documents
+%
+
+%\ProvidesPackage{html}
+%          [1996/12/22 v1.1 hypertext commands for latex2html (nd, hws, rrm)]
+\ProvidesPackage{adassconf2006}
+          [1998/06/21 v1.31 hypertext commands for latex2html (nd, hws, rrm)]
+
+
+%%%  bind \htmlurl to \url if that is later loaded
+%
+\expandafter\ifx\csname url\endcsname\relax
+ \AtBeginDocument{\@ifundefined{url}{}{\let\htmlurl=\url}}\fi
+
+%%%%MG
+
+% This command takes as argument a URL pointing to an image.
+% The image will be embedded in the HTML document but will
+% be ignored in the dvi and ps files.  The optional argument
+% denotes additional HTML tags.
+%
+% Example:  \htmladdimg[ALT="portrait" ALIGN=CENTER]{portrait.gif}
+%
+\renewcommand{\htmladdimg}[2][]{}
+
+%%% HTMLRULE for LaTeX2e
+% This command adds a horizontal rule and is valid even within
+% a figure caption.
+%
+% This command is best used with LaTeX2e and HTML 3.2 support.
+% It is like \hrule, but allows for options via key--value pairs
+% as follows:  \htmlrule[key1=value1, key2=value2, ...] .
+% Use \htmlrule* to suppress the <BR> tag.
+% Eg. \htmlrule[left, 15, 5pt, "none", NOSHADE] produces
+% <BR CLEAR="left"><HR NOSHADE SIZE="15">.
+% Renew the necessary part.
+\renewcommand{\htmlrulestar}[1][all]{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  renew some definitions to allow optional arguments
+%
+% The description of the options is missing, as yet.
+%
+\renewcommand{\latextohtml}{\textup{\LaTeX2\texttt{HTML}}}
+%\renewcommand{\htmladdnormallinkfoot}[3][]{#2\footnote{#3}} 
+\renewcommand{\htmladdnormallink}[3][]{#2}
+\renewcommand{\htmlbody}[1][]{}
+\renewcommand{\hyperref}[1][ref]{\hyperrefx[#1]}
+\renewcommand{\hypercite}[1][int]{\hypercitex[#1]}
+\renewcommand{\htmlref}[3][]{#2}
+\renewcommand{\htmlcite}[1]{#1\htmlcitex}
+\newcommand{\htmlcitex}[2][]{{\def\tmp{#1}\ifx\tmp\@empty\else~[#1]\fi}}
+\renewcommand{\htmlimage}[2][]{}
+\renewcommand{\htmlborder}[2][]{}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  HTML  HTMLset  HTMLsetenv
+%
+%  These commands do nothing in LaTeX, but can be used to place
+%  HTML tags or set Perl variables during the LaTeX2HTML processing;
+%  They are intended for expert use only.
+
+\newcommand{\HTMLcode}[2][]{}
+\ifx\undefined\HTML\newcommand{\HTML}[2][]{}\else
+\typeout{*** Warning: \string\HTML\space had an incompatible definition ***}%
+\typeout{*** instead use \string\HTMLcode\space for raw HTML code ***}%
+\fi 
+\newcommand{\HTMLset}[3][]{}
+\newcommand{\HTMLsetenv}[3][]{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% The following commands pertain to document segmentation, and
+% were added by Herbert Swan <dprhws@edp.Arco.com> (with help from
+% Michel Goossens <goossens@cern.ch>):
+%
+%
+% This command inputs internal latex2html tables so that large
+% documents can to partitioned into smaller (more manageable)
+% segments.
+%
+\newcommand{\internal}[2][internals]{}
+
+%
+%  Define a dummy stub \htmlhead{}.  This command causes latex2html
+%  to define the title of the start of a new segment.  It is not
+%  normally placed in the user's document.  Rather, it is passed to
+%  latex2html via a .ptr file written by \segment.
+%
+\newcommand{\htmlhead}[3][]{}
+
+%  In the LaTeX2HTML version this will eliminate the title line
+%  generated by a \segment command, but retains the title string
+%  for use in other places.
+%
+\newcommand{\htmlnohead}{}
+
+
+%  In the LaTeX2HTML version this put a URL into a <BASE> tag
+%  within the <HEAD>...</HEAD> portion of a document.
+%
+\newcommand{\htmlbase}[1]{}
+
+
+%  Include style information into the stylesheet; e.g. CSS
+%
+\newcommand{\htmlsetstyle}[3][]{}
+\newcommand{\htmladdtostyle}[3][]{}
+
+
+%
+%  The dummy command \endpreamble is needed by latex2html to
+%  mark the end of the preamble in document segments that do
+%  not contain a \begin{document}
+%
+\newcommand{\startdocument}{}
+
+
+% \tableofchildlinks, \htmlinfo
+%     by Ross Moore  ---  extensions dated 27 September 1997
+%
+%  These do nothing in LaTeX but for LaTeX2HTML they mark 
+%  where the table of child-links and info-page should be placed,
+%  when the user wants other than the default.
+%	\tableofchildlinks	 % put mini-TOC at this location
+%	\tableofchildlinks[off]	 % not on current page
+%	\tableofchildlinks[none] % not on current and subsequent pages
+%	\tableofchildlinks[on]   % selectively on current page
+%	\tableofchildlinks[all]  % on current and all subsequent pages
+%	\htmlinfo	 	 % put info-page at this location
+%	\htmlinfo[off]		 % no info-page in current document
+%	\htmlinfo[none]		 % no info-page in current document
+%  *-versions omit the preceding <BR> tag.
+%
+\newcommand{\tableofchildlinks}{%
+  \@ifstar\tableofchildlinksstar\tableofchildlinksstar}
+\newcommand{\tableofchildlinksstar}[1][]{}
+
+\newcommand{\htmlinfo}{\@ifstar\htmlinfostar\htmlinfostar}
+\newcommand{\htmlinfostar}[1][]{}
+
+
+%  This redefines  \begin  to allow for an optional argument
+%  which is used by LaTeX2HTML to specify `style-sheet' information
+
+\let\realLaTeX@begin=\begin
+\renewcommand{\begin}[1][]{\realLaTeX@begin}
+
+
+%
+%  Allocate a new set of section counters, which will get incremented
+%  for "*" forms of sectioning commands, and for a few miscellaneous
+%  commands.
+%
+
+\newcounter{lpart}
+\newcounter{lchapter}[part]
+\@ifundefined{c@chapter}%
+ {\let\Hchapter\relax \newcounter{lsection}[part]}%
+ {\let\Hchapter=\chapter \newcounter{lsection}[chapter]}
+\newcounter{lsubsection}[section]
+\newcounter{lsubsubsection}[subsection]
+\newcounter{lparagraph}[subsubsection]
+\newcounter{lsubparagraph}[paragraph]
+%\newcounter{lequation}
+
+%
+%  Redefine "*" forms of sectioning commands to increment their
+%  respective counters.
+%
+\let\Hpart=\part
+%\let\Hchapter=\chapter
+\let\Hsection=\section
+\let\Hsubsection=\subsection
+\let\Hsubsubsection=\subsubsection
+\let\Hparagraph=\paragraph
+\let\Hsubparagraph=\subparagraph
+\let\Hsubsubparagraph=\subsubparagraph
+
+\ifx\c@subparagraph\undefined
+ \newcounter{lsubsubparagraph}[lsubparagraph]
+\else
+ \newcounter{lsubsubparagraph}[subparagraph]
+\fi
+
+%
+%  The following definitions are specific to LaTeX2e:
+%  (They must be commented out for LaTeX 2.09)
+%
+\expandafter\ifx\csname part\endcsname\relax\else
+\renewcommand{\part}{\@ifstar{\stepcounter{lpart}%
+  \bgroup\def\tmp{*}\H@part}{\bgroup\def\tmp{}\H@part}}\fi
+\newcommand{\H@part}[1][]{\def\tmp@a{#1}\check@align
+ \expandafter\egroup\expandafter\Hpart\tmp}
+
+\ifx\Hchapter\relax\else
+ \def\chapter{\resetsections \@ifstar{\stepcounter{lchapter}%
+   \bgroup\def\tmp{*}\H@chapter}{\bgroup\def\tmp{}\H@chapter}}\fi
+\newcommand{\H@chapter}[1][]{\def\tmp@a{#1}\check@align
+ \expandafter\egroup\expandafter\Hchapter\tmp}
+
+\renewcommand{\section}{\resetsubsections
+ \@ifstar{\stepcounter{lsection}\bgroup\def\tmp{*}%
+   \H@section}{\bgroup\def\tmp{}\H@section}}
+\newcommand{\H@section}[1][]{\def\tmp@a{#1}\check@align
+ \expandafter\egroup\expandafter\Hsection\tmp}
+
+\renewcommand{\subsection}{\resetsubsubsections
+ \@ifstar{\stepcounter{lsubsection}\bgroup\def\tmp{*}%
+   \H@subsection}{\bgroup\def\tmp{}\H@subsection}}
+\newcommand{\H@subsection}[1][]{\def\tmp@a{#1}\check@align
+ \expandafter\egroup\expandafter\Hsubsection\tmp}
+
+\renewcommand{\subsubsection}{\resetparagraphs
+ \@ifstar{\stepcounter{lsubsubsection}\bgroup\def\tmp{*}%
+   \H@subsubsection}{\bgroup\def\tmp{}\H@subsubsection}}
+\newcommand{\H@subsubsection}[1][]{\def\tmp@a{#1}\check@align
+ \expandafter\egroup\expandafter\Hsubsubsection\tmp}
+
+\renewcommand{\paragraph}{\resetsubparagraphs
+ \@ifstar{\stepcounter{lparagraph}\bgroup\def\tmp{*}%
+   \H@paragraph}{\bgroup\def\tmp{}\H@paragraph}}
+\newcommand\H@paragraph[1][]{\def\tmp@a{#1}\check@align
+ \expandafter\egroup\expandafter\Hparagraph\tmp}
+
+\ifx\Hsubparagraph\relax\else\@ifundefined{subparagraph}{}{%
+\renewcommand{\subparagraph}{\resetsubsubparagraphs
+ \@ifstar{\stepcounter{lsubparagraph}\bgroup\def\tmp{*}%
+   \H@subparagraph}{\bgroup\def\tmp{}\H@subparagraph}}}\fi
+\newcommand\H@subparagraph[1][]{\def\tmp@a{#1}\check@align
+ \expandafter\egroup\expandafter\Hsubparagraph\tmp}
+
+\ifx\Hsubsubparagraph\relax\else\@ifundefined{subsubparagraph}{}{%
+\def\subsubparagraph{%
+ \@ifstar{\stepcounter{lsubsubparagraph}\bgroup\def\tmp{*}%
+   \H@subsubparagraph}{\bgroup\def\tmp{}\H@subsubparagraph}}}\fi
+\newcommand\H@subsubparagraph[1][]{\def\tmp@a{#1}\check@align
+ \expandafter\egroup\expandafter\Hsubsubparagraph\tmp}
+
+\def\check@align{\def\empty{}\ifx\tmp@a\empty
+ \else\def\tmp@b{center}\ifx\tmp@a\tmp@b\let\tmp@a\empty
+ \else\def\tmp@b{left}\ifx\tmp@a\tmp@b\let\tmp@a\empty
+ \else\def\tmp@b{right}\ifx\tmp@a\tmp@b\let\tmp@a\empty
+ \else\expandafter\def\expandafter\tmp@a\expandafter{\expandafter[\tmp@a]}%
+ \fi\fi\fi \def\empty{}\ifx\tmp\empty\let\tmp=\tmp@a \else 
+  \expandafter\def\expandafter\tmp\expandafter{\expandafter*\tmp@a}%
+ \fi\fi}
+%
+\def\resetsections{\setcounter{section}{0}\setcounter{lsection}{0}%
+ \reset@dependents{section}\resetsubsections }
+\def\resetsubsections{\setcounter{subsection}{0}\setcounter{lsubsection}{0}%
+ \reset@dependents{subsection}\resetsubsubsections }
+\def\resetsubsubsections{\setcounter{subsubsection}{0}\setcounter{lsubsubsection}{0}%
+ \reset@dependents{subsubsection}\resetparagraphs }
+%
+\def\resetparagraphs{\setcounter{lparagraph}{0}\setcounter{lparagraph}{0}%
+ \reset@dependents{paragraph}\resetsubparagraphs }
+\def\resetsubparagraphs{\ifx\c@subparagraph\undefined\else
+  \setcounter{subparagraph}{0}\fi \setcounter{lsubparagraph}{0}%
+ \reset@dependents{subparagraph}\resetsubsubparagraphs }
+\def\resetsubsubparagraphs{\ifx\c@subsubparagraph\undefined\else
+  \setcounter{subsubparagraph}{0}\fi \setcounter{lsubsubparagraph}{0}}
+%
+\def\reset@dependents#1{\begingroup\let \@elt \@stpelt
+ \csname cl@#1\endcsname\endgroup}
+%
+%
+%  Define a helper macro to dump a single \secounter command to a file.
+%
+\newcommand{\DumpPtr}[2]{%
+\count255=\arabic{#1}\def\dummy{dummy}\def\tmp{#2}%
+\ifx\tmp\dummy\def\ctr{#1}\else
+ \def\ctr{#2}\advance\count255 by \arabic{#2}\fi
+\immediate\write\ptrfile{%
+\noexpand\setcounter{\ctr}{\number\count255}}}
+%\expandafter\noexpand\expandafter\setcounter\expandafter{\ctr}{\number\count255}}}
+
+%
+%  Define a helper macro to dump all counters to the file.
+%  The value for each counter will be the sum of the l-counter
+%      actual LaTeX section counter.
+%  Also dump an \htmlhead{section-command}{section title} command
+%      to the file.
+%
+\newwrite\ptrfile
+\def\DumpCounters#1#2#3#4{%
+\begingroup\let\protect=\noexpand
+\immediate\openout\ptrfile = #1.ptr
+\DumpPtr{part}{lpart}%
+\ifx\Hchapter\relax\else\DumpPtr{chapter}{lchapter}\fi
+\DumpPtr{section}{lsection}%
+\DumpPtr{subsection}{lsubsection}%
+\DumpPtr{subsubsection}{lsubsubsection}%
+\DumpPtr{paragraph}{lparagraph}%
+\DumpPtr{subparagraph}{lsubparagraph}%
+\DumpPtr{equation}{dummy}%
+\DumpPtr{footnote}{dummy}%
+\def\tmp{#4}\ifx\tmp\@empty
+\immediate\write\ptrfile{\noexpand\htmlhead{#2}{#3}}\else
+\immediate\write\ptrfile{\noexpand\htmlhead[#4]{#2}{#3}}\fi
+\dumpcitestatus \dumpcurrentcolor
+\immediate\closeout\ptrfile
+\endgroup }
+
+
+%% interface to natbib.sty
+
+\def\dumpcitestatus{}
+\def\loadcitestatus{\def\dumpcitestatus{%
+  \ifciteindex\immediate\write\ptrfile{\noexpand\citeindextrue}%
+  \else\immediate\write\ptrfile{\noexpand\citeindexfalse}\fi }%
+}
+\@ifpackageloaded{natbib}{\loadcitestatus}{%
+ \AtBeginDocument{\@ifpackageloaded{natbib}{\loadcitestatus}{}}}
+
+
+%% interface to color.sty
+
+\def\dumpcurrentcolor{}
+\def\loadsegmentcolors{%
+ \let\real@pagecolor=\pagecolor
+ \let\pagecolor\segmentpagecolor
+ \let\segmentcolor\color
+ \ifx\current@page@color\undefined \def\current@page@color{{}}\fi
+ \def\dumpcurrentcolor{\bgroup\def\@empty@{{}}%
+   \expandafter\def\expandafter\tmp\space####1@{\def\thiscol{####1}}%
+  \ifx\current@color\@empty@\def\thiscol{}\else
+   \expandafter\tmp\current@color @\fi
+  \immediate\write\ptrfile{\noexpand\segmentcolor{\thiscol}}%
+  \ifx\current@page@color\@empty@\def\thiscol{}\else
+   \expandafter\tmp\current@page@color @\fi
+  \immediate\write\ptrfile{\noexpand\segmentpagecolor{\thiscol}}%
+ \egroup}%
+ \global\let\loadsegmentcolors=\relax
+}
+
+% These macros are needed within  images.tex  since this inputs
+% the <segment>.ptr files for a segment, so that counters are
+% colors are synchronised.
+%
+\newcommand{\segmentpagecolor}[1][]{%
+ \@ifpackageloaded{color}{\loadsegmentcolors\bgroup
+  \def\tmp{#1}\ifx\@empty\tmp\def\next{[]}\else\def\next{[#1]}\fi
+  \expandafter\segmentpagecolor@\next}%
+ {\@gobble}}
+\def\segmentpagecolor@[#1]#2{\def\tmp{#1}\def\tmpB{#2}%
+ \ifx\tmpB\@empty\let\next=\egroup
+ \else
+  \let\realendgroup=\endgroup
+  \def\endgroup{\edef\next{\noexpand\realendgroup
+   \def\noexpand\current@page@color{\current@color}}\next}%
+  \ifx\tmp\@empty\real@pagecolor{#2}\def\model{}%
+  \else\real@pagecolor[#1]{#2}\def\model{[#1]}%
+  \fi
+  \edef\next{\egroup\def\noexpand\current@page@color{\current@page@color}%
+  \noexpand\real@pagecolor\model{#2}}%
+ \fi\next}
+%
+\newcommand{\segmentcolor}[2][named]{\@ifpackageloaded{color}%
+ {\loadsegmentcolors\segmentcolor[#1]{#2}}{}}
+
+\@ifpackageloaded{color}{\loadsegmentcolors}{\let\real@pagecolor=\@gobble
+ \AtBeginDocument{\@ifpackageloaded{color}{\loadsegmentcolors}{}}}
+
+
+%  Define the \segment[align]{file}{section-command}{section-title} command,
+%  and its helper macros.  This command does four things:
+%       1)  Begins a new LaTeX section;
+%       2)  Writes a list of section counters to file.ptr, each
+%           of which represents the sum of the LaTeX section
+%           counters, and the l-counters, defined above;
+%       3)  Write an \htmlhead{section-title} command to file.ptr;
+%       4)  Inputs file.tex.
+
+\newcommand{\segment}{\@ifstar{\@@htmls}{\@@html}}
+%\tracingall
+\newcommand{\@endsegment}[1][]{}
+\let\endsegment\@endsegment
+\newcommand{\@@htmls}[1][]{\@@htmlsx{#1}}
+\newcommand{\@@html}[1][]{\@@htmlx{#1}}
+\def\@@htmlsx#1#2#3#4{\csname #3\endcsname* {#4}%
+                   \DumpCounters{#2}{#3*}{#4}{#1}\input{#2}}
+\def\@@htmlx#1#2#3#4{\csname #3\endcsname {#4}%
+                   \DumpCounters{#2}{#3}{#4}{#1}\input{#2}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Addition ADASS XIII (FO)
+%%% This macro contains both reference and page number
+\def\adassref#1#2{#2}
+%%% Just a marker
+\def\ok{}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% ADASS 2006
+%%% reset counters 
+\def\adassartinit{
+\setcounter{section}{0}
+\setcounter{subsection}{0}
+\setcounter{subsubsection}{0}
+\setcounter{equation}{0}
+\setcounter{figure}{0}
+\setcounter{table}{0}
+\setcounter{footnote}{0}}
+
+
