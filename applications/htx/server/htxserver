@@ -154,6 +154,9 @@ HTX_LOCATIONS='star/docs=/star/docs:star/help=/star/help'
 #  Copyright:
 #     Copyright (C) 2009 Science and Technology Facilities Council.
 #     Copyright (C) 1995, The Central Laboratory of the Research Councils.
+#     All Rights Reserved.
+
+
 
 #  Authors:
 #     PDRAPER: Peter Draper (Starink, Durham University)
@@ -182,6 +185,7 @@ HTX_LOCATIONS='star/docs=/star/docs:star/help=/star/help'
 #        reporting. Added link to SUN/188 in error messages.
 #     22-JAN-2009 (TIMJ):
 #        SUN/188 URL uses $server_url rather than hard coded RAL address
+#        URLGEN does not include localhost in its file:// URL
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -282,7 +286,7 @@ HTX_LOCATIONS='star/docs=/star/docs:star/help=/star/help'
 #  URL of the directory as known to the HTTP server.
             if test -n "${fileref}"; then
                url="`echo "${fileref}" | \
-                     sed -n 's%^file://localhost/%/%
+                     sed -n 's%^file:///%/%
                              s%^'"${dir}"/'%'"${dir_url}"'/%p'`"
                break
             fi
