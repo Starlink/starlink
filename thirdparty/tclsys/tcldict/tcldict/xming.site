@@ -1,0 +1,5 @@
+  CC=mingw32-gcc
+  AR=mingw32-ar
+  RANLIB=mingw32-ranlib
+  RC=mingw32-windres
+

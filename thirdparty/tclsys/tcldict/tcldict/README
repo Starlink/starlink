@@ -1,0 +1,54 @@
+
+Updated: 17 November 2005.
+
+The original dict extension from May 2004 has been updated with todays code
+from the Tcl CVS repository.
+
+This version doesn't have support for mp_int, because 8.4 has no such support.
+
+April 2004.
+
+This is a backport of the Tcl 8.5 [dict] command for Tcl 8.4. 
+
+Most code was taken straight from from the Tcl-core CVS HEAD and
+sampleextension on 14 April 2004. I glued it together with the help of
+Donal K. Fellows, Don G. Porter and others to make this extension.
+
+Perhaps the most significant change in the code is that it is slighly
+less efficient than the real thing, mostly because some optimization
+tricks are only available when linking against tclInt.h, not tcl.h.
+
+- Pascal Scheffers.
+
+
+
+UNIX BUILD
+==========
+
+Building under most UNIX systems is easy, just run the configure script
+and then run make. For more information about the build process, see
+the tcl/unix/README file in the Tcl src dist. The following minimal
+example will install the extension in the /opt/tcl directory.
+
+	$ cd tclDict
+	$ ./configure --prefix=/opt/tcl
+	$ make
+	$ make install
+
+WINDOWS BUILD
+=============
+
+The recommended method to build extensions under windows is to use the
+Msys + Mingw build process. This provides a Unix-style build while
+generating native Windows binaries. Using the Msys + Mingw build tools
+means that you can use the same configure script as per the Unix build
+to create a Makefile.
+
+If you have VC++ then you may wish to use the files in the win
+subdirectory and build the extension using just VC++. These files have
+been designed to be as generic as possible but will require some
+additional maintenance by the project developer to synchronise with
+the TEA configure.in and Makefile.in files. Instructions for using the
+VC++ makefile are written in the first part of the Makefile.vc
+file.
+
