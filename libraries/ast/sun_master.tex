@@ -4765,31 +4765,14 @@ copies are independent of each other.
 \subsubsection{AST Pointer Contexts}
 
 Each thread maintains its own set of nested AST contexts, so when astEnd
-is called, only pointers that were created within the current thread will
+is called, only Objects that are locked by the current thread will
 be annulled.
 
-Attempting to use astExport, astImport, astExempt astAnnul or astDelete on 
-a pointer that was created in a different thread will lead to unpredictable 
-behaviour. In general if an Object created in one thread needs to be
-accessed in a second thread, the second thread should create a clone of
-the pointer using astClone, and then use the cloned pointer rather than
-the original pointer.
-
-When a thread exits, it may potentially pass an Object pointer back to
-its parent. 
-
-There is no automatic procedure for ensuring that all Objects are deleted
-when a thread exits. This means that each thread should ensure it deletes 
-all Objects that it creates in order to avoid memory leaks. Using an
-astBegin/astEnd block in the thread start function is the easiest way to
-do this. 
-
-If a thread wants to return an AST Object to its parent thread
-(\emph{e.g.} by storing a pointer in the data structure that was passed to
-the thread upon creation), it should
-exempt the pointer using astExempt before the thread exits. The parent
-thread should then import the pointer into its current context using 
-astImport.
+If an Object is unlocked by a thread using astUnlock, it is exempted from
+context handling so that subsequent invocations of astEnd will not cause it 
+to be annulled (this is similar to using astExempt on the Object). When the
+Object is subsequently locked by another thread using astLock, it will be
+imported into the context that was active when astLock was called. 
 
 c-
 
