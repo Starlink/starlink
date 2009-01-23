@@ -60,7 +60,7 @@
 #        If set, the URL to be calculated is processed by sed using the 
 #        pattern stored in this variable. This is done as an environment
 #        variable rather than a command line switch to make it easier for
-#        something that calls findme to get the benefit without having
+#        something that calls urlgen through another script
 #        to also modify the findme arguments. This may possibly be a hack.
 
 #  Notes:
