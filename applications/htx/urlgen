@@ -65,10 +65,13 @@
 
 #  Copyright:
 #     Copyright (C) 1995 The Central Laboratory of the Research Councils
+#     Copyright (C) 2009 Science and Technology Facilities Council
+#     All Rights Reserved.
 
 #  Authors:
 #     RFWS: R.F. Warren-Smith (Starlink, RAL)
 #     SER: S.E. Rankin (Starlink, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -78,6 +81,8 @@
 #        Revised to improve efficiency.
 #     17-May-2004 (SER)
 #        Added file:// to document echo outputs.
+#     22-JAN-2008 (TIMJ):
+#        Set HTX_DIR if not set.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -107,6 +112,10 @@
 
 #  Note that no URL has yet been generated.
       done=''
+
+#  Default HTX_DIR
+      HTX_DIR="${HTX_DIR-`dirname $0`}"
+      export HTX_DIR
 
 #  Search for the document locally.
 #  -------------------------------
