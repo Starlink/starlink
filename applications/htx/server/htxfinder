@@ -58,6 +58,11 @@ HTX_PATH='/star/docs:/star/help'
 #
 #        if you do not specify HTX_PATH explicitly above.
 #
+#HTX_URLSED='%star/docs/%docs/%'
+#        The output from findme does not always reflect the positions of
+#        files as seen by the web server. Adjust this pattern to correct
+#        the output of findme.
+#
 #     HTX_SUPPORT=''
 #        Edit and un-comment the line above to contain text (which may include
 #        HTML constructs) which identifies the person to contact for help with
@@ -110,6 +115,9 @@ HTX_PATH='/star/docs:/star/help'
 #        Fix problem with final character of keyword getting lost.
 #     22-JAN-2008 (TIMJ):
 #        Remove some hard-wired RAL urls.
+#        Add hack to allow URL rewriting from findme output for those
+#        of us with web server layouts that do not exactly match the
+#        expected form.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -312,10 +320,16 @@ END
 #  Invoke "findme" to perform the search and write the resulting list of
 #  documents to standard output in HTML format. Suppress any error or
 #  progress reports.
-            ${STARLINK}/bin/findme 2>/dev/null -q -html ${flags} "${keyword}"
+            htmlres=`${STARLINK}/bin/findme 2>/dev/null -q -html ${flags} "${keyword}"`
 
 #  Save the return status, which records the number of documents matched.
             ndoc="${?}"
+
+#  Rewrite URLs
+            if test -n "${HTX_URLSED}"; then
+               htmlres=`echo "${htmlres}" | sed "s${HTX_URLSED}"`
+            fi
+            echo ${htmlres}
 
 #  Say how many documents were matched.
             case "${ndoc}" in
