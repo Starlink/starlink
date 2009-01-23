@@ -135,7 +135,7 @@ HTX_PATH='/star/docs:/star/help'
 #  Starlink WWW server at RAL, then provide a suitable default.
       if test ! -n "${HTX_SUPPORT}"; then
          if test "${SERVER_NAME}${SCRIPT_NAME}" = \
-                 "www.starlink.rl.ac.uk/cgi-bin/hcserver"; then
+                 "www.starlink.ac.uk/cgi-bin/hcserver"; then
             HTX_SUPPORT='Starlink Software Support
 (<A HREF="mailto:ussc@star.rl.ac.uk">ussc@star.rl.ac.uk</A>)'
          fi

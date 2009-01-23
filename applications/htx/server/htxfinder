@@ -113,11 +113,13 @@ HTX_PATH='/star/docs:/star/help'
 #        Change default information searched to omit lines of text.
 #     6-NOV-1997 (RFWS):
 #        Fix problem with final character of keyword getting lost.
-#     22-JAN-2008 (TIMJ):
+#     22-JAN-2009 (TIMJ):
 #        Remove some hard-wired RAL urls.
 #        Add hack to allow URL rewriting from findme output for those
 #        of us with web server layouts that do not exactly match the
 #        expected form.
+#     23-JAN-2009 (TIMJ):
+#        Further cleaning up of URLs.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -138,7 +140,7 @@ HTX_PATH='/star/docs:/star/help'
 #  Starlink WWW server at RAL, then provide a suitable default.
       if test ! -n "${HTX_SUPPORT}"; then
          if test "${SERVER_NAME}${SCRIPT_NAME}" = \
-                 "www.starlink.rl.ac.uk/cgi-bin/htxfinder"; then
+                 "www.starlink.ac.uk/cgi-bin/htxfinder"; then
             HTX_SUPPORT='Starlink Software Support
 (<A HREF="mailto:ussc@star.rl.ac.uk">ussc@star.rl.ac.uk</A>)'
          fi
@@ -168,8 +170,8 @@ Content-type: text/html
 <H1>Starlink Document Search by Topic</H1>
 This page uses the
 <A HREF="${server_url}/cgi-bin/htxserver/sun188.htx/sun188.html?xref_findme">findme</A>
-command to search the central <A HREF="http://www.starlink.ac.uk/">Starlink</A>
-document collection at <A HREF="http://www.cclrc.ac.uk/ral">RAL</A> by topic.
+command to search the central <A HREF="${server_url}">Starlink</A>
+document collection at <A HREF="http://www.scitech.ac.uk/About/Find/RAL/Introduction.aspx">RAL</A> by topic.
 <HR>
 <H2>Quick Search:</H2>
 <FORM METHOD="POST">
@@ -309,7 +311,7 @@ Content-type: text/html
 <TITLE>Result of Starlink Document Search for Topic "${keyword}"</TITLE>
 </HEAD>
 <BODY>
-<H1>Result of <A HREF="http://www.starlink.ac.uk/">Starlink</A> Document Search</H1>
+<H1>Result of <A HREF="${server_url}">Starlink</A> Document Search</H1>
 <H2>For topic "${keyword}"</H2>
 <HR>
 <P>

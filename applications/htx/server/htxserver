@@ -186,6 +186,8 @@ HTX_LOCATIONS='star/docs=/star/docs:star/help=/star/help'
 #     22-JAN-2009 (TIMJ):
 #        SUN/188 URL uses $server_url rather than hard coded RAL address
 #        URLGEN does not include localhost in its file:// URL
+#     23-JAN-2009 (TIMJ):
+#        Further cleaning up of URLs.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -217,7 +219,7 @@ HTX_LOCATIONS='star/docs=/star/docs:star/help=/star/help'
 #  Starlink WWW server at RAL, then provide a suitable default.
       if test ! -n "${HTX_SUPPORT}"; then
          if test "${SERVER_NAME}${SCRIPT_NAME}" = \
-                 "www.starlink.rl.ac.uk/cgi-bin/htxserver"; then
+                 "www.starlink.ac.uk/cgi-bin/htxserver"; then
             HTX_SUPPORT='Starlink Software Support
 (<A HREF="mailto:ussc@star.rl.ac.uk">ussc@star.rl.ac.uk</A>)'
          fi
