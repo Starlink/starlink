@@ -1,5 +1,5 @@
 
-#  N.B. the previous line should be blank.
+#  N.B. the previous line should be blank. -*- sh -*-
 #+
 #  Name:
 #     urlgen
@@ -56,6 +56,12 @@
 #        If HTX_WHERE has neither of the above values, a local file reference
 #        will be generated if the document is found locally, otherwise a
 #        remote URL will be generated.
+#     HTX_URLSED
+#        If set, the URL to be calculated is processed by sed using the 
+#        pattern stored in this variable. This is done as an environment
+#        variable rather than a command line switch to make it easier for
+#        something that calls findme to get the benefit without having
+#        to also modify the findme arguments. This may possibly be a hack.
 
 #  Notes:
 #     -  If a cross-reference label is specified but it cannot be found in
@@ -83,6 +89,7 @@
 #        Added file:// to document echo outputs.
 #     22-JAN-2008 (TIMJ):
 #        Set HTX_DIR if not set.
+#        Add HTX_URLSED environment variable
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -179,15 +186,17 @@
 #  directory name if necessary. 
             case "${doc}" in [!/]*) doc="`pwd`/${doc}";; esac
 
+            localurl=""
+
 #  If the file and fragment specifier were found, then output the full local
 #  URL.
             if test -n "${filefrg}"; then
-               echo "file://${doc}.htx/${filefrg}"
+               localurl="file://${doc}.htx/${filefrg}"
 
 #  If they were not found, but no label was given, then output a URL using a
 #  file name based on the document name instead.
             elif test ! -n "${label}"; then
-               echo "file://${doc}.htx/${docname}.html"
+               localurl="file://${doc}.htx/${docname}.html"
 
 #  Otherwise, the required label was not found, so output an error message and
 #  abort.
@@ -196,6 +205,14 @@
 "${HTX_SCRIPT}: cannot find label \"${label}\" in document ${docname}"
                exit 1
             fi
+
+#  Rewrite the path a little 
+               if test -n "${HTX_URLSED}"; then
+                  localurl=`echo "${localurl}" | sed "${HTX_URLSED}"`
+               fi
+
+#  Write out the local URL
+            echo ${localurl}
 
 #  Note that a local URL has been generated.
             done='1'
