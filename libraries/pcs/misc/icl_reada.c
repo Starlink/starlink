@@ -74,6 +74,8 @@
 *         prototype.
 *      Modified timj 29/12/05
 *         Use DAT__FLEXT rather than hard coded ".sdf"
+*      Modified pwd 23/01/09
+*         Fix problem in keyboard_input introduced by last changes.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -918,17 +920,17 @@ keyboard_input(void)
     time.tv_sec  = 0;
     time.tv_usec = 0;
     for(;;) {
-	FD_ZERO(&infds);
-	FD_SET(fileno(stdin), &infds);
-	if(!select(2, &infds, NULL, NULL, &time))	/* non-blocking */
-	    break;
-	if(FD_ISSET(fileno(stdin), &infds)) {
+        FD_ZERO(&infds);
+        FD_SET(fileno(stdin), &infds);
+        if(!select(2, &infds, NULL, NULL, &time))       /* non-blocking */
+            break;
+        if(FD_ISSET(fileno(stdin), &infds)) {
             
             if (inbuf_rpos >= inbuf_cpos) {
                 readret = 
                     read( fileno(stdin),
                           readbuff,
-                          INPUTBUFFERLENGTH - inbuf_rpos - inbuf_cpos );
+                          INPUTBUFFERLENGTH - (inbuf_rpos - inbuf_cpos) );
             }
             else {
                 readret = 
