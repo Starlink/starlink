@@ -61,7 +61,7 @@ HTX_PATH='/star/docs:/star/help'
 #
 #        if you do not specify it explicitly above.
 #
-      HTX_GZIP='/usr/local/bin/gzip'
+      HTX_GZIP='/usr/bin/gzip'
 #     HTX_GZIP=''
 #        Edit and un-comment the line above to define the location of the
 #        "gzip" file compression utility on your system. If this is not defined
@@ -108,14 +108,24 @@ HTX_PATH='/star/docs:/star/help'
 
 #  Copyright:
 #     Copyright (C) 1995, The Central Laboratory of the Research Councils.
+#     Copyright (C) 2009 Science and Technology Facilities Council.
+#     All Rights Reserved.
 
 #  Authors:
 #     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
 #     5-DEC-1995 (RFWS):
 #        Original version.
+#     23-JAN-2009 (TIMJ):
+#        Fix serving of compressed files:
+#        o  Fix sed problem where s%.$%% removes last character regardless
+#           of whether it is a newline.
+#        o  Fix odd awk problem resulting in newline at end of $FORM_compress
+#        Use Content-disposition header to give the client a clue about the
+#        filename.
 #     {enter_changes_here}
 
 #  Bugs:
@@ -380,7 +390,7 @@ END
 
 #  Discard each newline character and concatenate the remaining characters
 #  read.
-            line="`echo "${line}" | sed -e 's%.$%%'`"
+            line="`echo "${line}" | tr -d '\n'`"
             data="${data}${line}"
          done
 
@@ -389,6 +399,9 @@ END
 #  parameter into a variable assignment and use "eval" to perform these
 #  assignments. This makes the form parameters available as local variables in
 #  this script.
+#  NOTE BY TIMJ: For "file=sun92.ps&compress=gzip" this awk script would
+#  generate FORM_compress='gzip\n'. Not sure why but it affected the last
+#  entry in the string. In the mean time do a search and replace
          eval `echo "${data}" | sed -e 's/'\''/%27/g' | \
                awk '
                   BEGIN{
@@ -396,6 +409,7 @@ END
                      FS = "="
                   }
                   $1~/^[a-zA-Z][a-zA-Z0-9_]*$/ {
+                     sub(/\n/,"",$2)
                      printf( "FORM_%s='\''%s'\''\n", $1, $2 )
                   }'`
 
@@ -486,7 +500,24 @@ END
 #  message of type "application/octet-stream" (which effectively requests that
 #  the client saves it in a file).
          else
+
+#  Work out what the output file will be called at the other
+#  end based on how we compressed it
+            hcoutfile=`basename ${hcfile}`
+            case "${FORM_compress}" in
+            compress)
+               hcoutfile="${hcoutfile}.Z"
+               ;;
+            gzip)
+               if test -n "${HTX_GZIP}"; then
+                  hcoutfile="${hcoutfile}.gz"
+               fi;;
+            *)
+               ;;
+            esac
+
             echo "Content-type: application/octet-stream"
+            echo  "Content-disposition: attachment; filename=${hcoutfile}"
             echo
 
 #  Apply the appropriate compression method according to the value of
