@@ -39,6 +39,31 @@
 *        paragraphs.  Paragraph wrapping is enabled by parameter WRAP.
 *        There is no suggested default to allow more room for entering
 *        the value.
+*     DATE =  LITERAL (Read)
+*        The date and time to associated with the new history record. 
+*        Normally, a null (!) value should be supplied, in which case 
+*        the current UTC date and time will be used. If a value is
+*        supplied. it should be in one of the following forms:
+*
+*           "Gregorian Calendar Date" --- With the month expressed either 
+*           as an integer or a 3-character abbreviation, and with 
+*           optional decimal places to represent a fraction of a day 
+*           ("1996-10-2" or "1996-Oct-2.6" for example). If no fractional 
+*           part of a day is given, the time refers to the start of the 
+*           day (zero hours).
+*           
+*           "Gregorian Date and Time" --- Any calendar date (as above) 
+*           but with a fraction of a day expressed as hours, minutes and 
+*           seconds ("1996-Oct-2 12:13:56.985" for example). The date and 
+*           time can be separated by a space or by a "T" (as used by 
+*           ISO8601 format).
+*           
+*           "Modified Julian Date" --- With or without decimal places
+*           ("MJD 54321.4" for example).
+*           
+*           "Julian Date" --- With or without decimal places 
+*           ("JD 2454321.9" for example).
+*        [!]
 *     FILE =  FILENAME (Read)
 *        Name of the text file containing the commentary.  It is only
 *        accessed if MODE="File".
@@ -100,6 +125,7 @@
 
 *  Copyright:
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -120,11 +146,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
 *     1995 June 28 (MJC):
 *        Original version.
+*     23-JAN-2008 (DSB):
+*        Added DATE parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -157,6 +186,7 @@
                                  ! (handling mapped char arrays is
                                  ! messy, so use hardwired buffer)
       INTEGER CONSTA             ! State of COMMENT parameter
+      CHARACTER * ( 80 ) DATE    ! Date string
       INTEGER FD                 ! File descriptor 
       CHARACTER * ( NDF__SZHUM ) HUMODE ! History update mode
       INTEGER INDF               ! NDF identifier
@@ -192,6 +222,15 @@
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 
+*  Get the date to use, and tell the NDF library to attach this date 
+*  to the next history record written to the NDF.
+         CALL PAR_GET0C( 'DATE', DATE, STATUS )
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+         ELSE
+            CALL NDF_HSDAT( DATE, INDF, STATUS )
+         END IF
+         
 *  Check whether or not there is a HISTORY component present.
          CALL NDF_STATE( INDF, 'History', THERE, STATUS )
 
