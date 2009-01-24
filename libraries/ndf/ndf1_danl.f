@@ -121,6 +121,8 @@
 *       associated with the data object, even if it has no DATA_ARRAY.
 *     31-OCT-2007 (DSB):
 *        Add call to NDF1_EVENT.
+*     24-JAN-2009 (DSB):
+*        Sort history records if required.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -140,6 +142,7 @@
       INCLUDE 'ARY_PAR'          ! ARY_ public constants
       INCLUDE 'ARY_ERR'          ! ARY_ error codes
       INCLUDE 'AST_PAR'          ! AST_ public constants
+      INCLUDE 'CNF_PAR'          ! CNF functions and constants
 
 *  Global Variables:
       INCLUDE 'NDF_DCB'          ! NDF_ Data Control Block
@@ -218,6 +221,8 @@
 *  Local Variables:
       INTEGER IAX                ! Loop counter for axes
       INTEGER ICCOMP             ! Loop counter for character components
+      INTEGER IPW1               ! Work space
+      INTEGER IPW2               ! Work space
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of data object
       INTEGER NDIM               ! Number of data object dimensions
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of data object
@@ -427,6 +432,25 @@
 *  Dump any logged error message information to the history record.
                CALL NDF1_HDERR( IDCB, .TRUE., STATUS )
             END IF
+
+*  If there is any chance that the history records are not in chronological 
+*  order, sort them.
+            CALL ERR_BEGIN( STATUS )
+            IF( DCB_HSORT( IDCB ) ) THEN
+               CALL PSX_CALLOC( DCB_HNREC( IDCB ), '_DOUBLE', IPW1, 
+     :                          STATUS )
+               CALL PSX_CALLOC( DCB_HNREC( IDCB ), '_INTEGER', IPW2, 
+     :                          STATUS )
+	       
+               CALL NDF1_HSRT( IDCB, DCB_HNREC( IDCB ), 
+     :                         %VAL( CNF_PVAL( IPW1 ) ),
+     :                         %VAL( CNF_PVAL( IPW2 ) ), STATUS )
+	       
+               CALL PSX_FREE( IPW1, STATUS )
+               CALL PSX_FREE( IPW2, STATUS )
+               DCB_HSORT( IDCB ) = .FALSE.
+            END IF
+            CALL ERR_END( STATUS )
 
 *  If history component locators have been acquired, then annul them.
             IF ( DCB_KH( IDCB ) ) THEN

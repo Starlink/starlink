@@ -5,6 +5,8 @@ NDF Library
    (was lost in the switch to Unix)
 
 V1.8
+   - New routine NDF_HSDAT allows history records to be created with a
+   given date and time.
    - New routine NDF_HGMOD retrieves the current history update mode from
    an NDF.
    - Routine NDF_HSMOD now allows temporary disabling of history recording

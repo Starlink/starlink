@@ -21,6 +21,8 @@
 
 * Copyright:
 *    Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -40,6 +42,7 @@
 
 * Authors:
 *    RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC, UCLan)
 *    <{enter_new_authors_here}>
 
 * History:
@@ -51,6 +54,8 @@
 *       Added public C interface.
 *    18-NOV-2005 (TIMJ):
 *       Use HDSLoc* rather than char [DAT__SZLOC]
+*     23-JAN-2009 (DSB):
+*        Added ndfHsdat.
 *    <{enter_further_changes_here}>
 
 *-
@@ -429,6 +434,10 @@ void ndfHgmod( int indf,
                int *status );
 
 void ndfHsmod( const char *hmode,
+               int indf,
+               int *status );
+
+void ndfHsdat( const char *date,
                int indf,
                int *status );
 

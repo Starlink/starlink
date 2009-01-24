@@ -36,6 +36,8 @@
 
 *  Copyright:
 *     Copyright (C) 1997 Rutherford Appleton Laboratory
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -55,6 +57,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -90,6 +93,8 @@
 *        Initialise PCB_FORID.
 *     1-JUL-1997 (RFWS):
 *        Added support for the WCS component.
+*     23-JAN-2009 (DSB):
+*        Added DCB_HTIME and DCB_HSORT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -125,10 +130,16 @@
 *           Extension increment for the history records array.
 *        DCB_HLOC( NDF__MXDCB ) = CHARACTER * ( DAT__SZLOC ) (Write)
 *           Locator for NDF history component.
+*        DCB_HSORT( NDF__MXDCB ) = LOGICAL (Write)
+*           Do the history records need sorting?
 *        DCB_HNREC( NDF__MXDCB ) = INTEGER (Write)
 *           Number of valid history records present.
 *        DCB_HRLOC( NDF__MXDCB ) = CHARACTER * ( DAT__SZLOC ) (Write)
 *           Locator for array of history records.
+*        DCB_HTIME( NDF__MXDCB ) = DOUBLE PRECISION (Write)
+*           The date/time to attach to the next history record to be 
+*           created, as a UTC Modified Julian Date. If negative, then 
+*           the current time will be used.
 *        DCB_HTLEN( NDF__MXDCB ) = LOGICAL (Write)
 *           History current record text length.
 *        DCB_HUMOD( NDF__MXDCB ) = INTEGER (Read)
@@ -354,10 +365,12 @@
             DCB_KH( SLOT ) = .FALSE.     ! History info. available?
             DCB_HLOC( SLOT ) = DAT__NOLOC ! History structure locator
             DCB_HRLOC( SLOT ) = DAT__NOLOC ! History records locator
+            DCB_HSORT( SLOT ) = .FALSE.  ! History records are in order
             DCB_HNREC( SLOT ) = 0        ! No. history records present
             DCB_HEXT( SLOT ) = 5         ! History records extend size
             DCB_HDEF( SLOT ) = .TRUE.    ! Default history required
             DCB_HTLEN( SLOT ) = 0        ! History not modified
+            DCB_HTIME( SLOT ) = -1.0D0   ! History record takes current time
             DCB_HUMOD( SLOT ) = NDF__HNORM ! History update mode
 
             DCB_IFMT( SLOT ) = 0         ! Foreign file format code

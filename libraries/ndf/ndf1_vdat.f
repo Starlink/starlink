@@ -28,6 +28,8 @@
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -47,6 +49,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David S. Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -55,6 +58,8 @@
 *     8-SEP-1993 (RFWS):
 *        Changed name. Also allow up to 2 leap seconds in any minute
 *        (to accommodate times returned from the C run time library).
+*     23-JAN-2009 (DSB):
+*        Refer to NDF1_TIME rather than NDF1_GTIME in comments.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -142,7 +147,7 @@
      :                    STATUS )
 
 *  Validate the second field (allow for up to 2 leap seconds, since
-*  these can in principle be returned by the NDF1_GTIME function as a
+*  these can in principle be returned by the NDF1_TIME function as a
 *  result of calling the ANSI C run time library date/time functions -
 *  see the ANSI C standard for details).
          ELSE IF ( ( SEC .LT. 0.0 ) .OR.

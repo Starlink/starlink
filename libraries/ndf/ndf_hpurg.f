@@ -39,6 +39,8 @@
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -58,6 +60,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David S Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -77,6 +80,8 @@
 *        emptying any cell twice).
 *     27-SEP-1993 (RFWS):
 *        Improved error messages.
+*     23-JAN-2009 (DSB):
+*        Added DCB_HTIME.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -106,6 +111,10 @@
 *           Number of valid history records present.
 *        DCB_HRLOC( NDF__MXDCB ) = CHARACTER * ( DAT__SZLOC ) (Read)
 *           Locator for array of history records.
+*        DCB_HTIME( NDF__MXDCB ) = DOUBLE PRECISION (Write)
+*           The date/time to attach to the next history record to be 
+*           created, as a UTC Modified Julian Date. If negative, then 
+*           the current time will be used.
 *        DCB_HTLEN( NDF__MXDCB ) = LOGICAL (Write)
 *           Current history record text length.
       
@@ -265,11 +274,12 @@
 
 *  If the current history record has been deleted, then reset the
 *  default history writing flag and current record text length to their
-*  initial values.
+*  initial values. Also clear any user-supplied date-stamp.
                   IF ( STATUS .EQ. SAI__OK ) THEN
                      IF ( I2 .GE. DCB_HNREC( IDCB ) ) THEN
                         DCB_HDEF( IDCB ) = .TRUE.
                         DCB_HTLEN( IDCB ) = 0
+                        DCB_HTIME( IDCB ) = -1.0D0
                      END IF
                   END IF
 

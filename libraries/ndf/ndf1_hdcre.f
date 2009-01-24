@@ -27,6 +27,8 @@
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -46,6 +48,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David S Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -56,6 +59,8 @@
 *     2-JUN-1993 (RFWS):
 *        Obtain and format the date/time as separate operations. Also
 *        use NDF__SZHDT to declare the date/time string length.
+*     23-JAN-2009 (DSB):
+*        Store UTC rather than local time in the HISTORY component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -117,9 +122,9 @@
             CALL DAT_FIND( DCB_LOC( IDCB ), 'HISTORY',
      :                     DCB_HLOC( IDCB ), STATUS )
 
-*  Obtain the current date and time and convert it to standard history
+*  Obtain the current UTC date and time and convert it to standard history
 *  format.
-            CALL NDF1_GTIME( YMDHM, SEC, STATUS )
+            CALL NDF1_TIME( YMDHM, SEC, STATUS )
             CALL NDF1_FMHDT( YMDHM, SEC, TIME, STATUS )
 
 *  Create a scalar CREATED component in the history structure and write

@@ -112,7 +112,8 @@ ndf_state.f ndf_stype.f ndf_temp.f ndf_trace.f ndf_tune.f ndf_type.f   \
 ndf_unmap.f ndf_valid.f ndf_xdel.f ndf_xgt0x.f ndf_xiary.f ndf_xloc.f  \
 ndf_xname.f ndf_xnew.f ndf_xnumb.f ndf_xpt0x.f ndf_xstat.f ndf1_cvcmd.f \
 ndf1_farg.f ndf_ptszx.f ndf_gtszx.f ndf_sctyp.f ndf1_sctyp.f ndf1_vstyp.f \
-ndf1_wclim.f ndf1_wplim.f ndf1_mpanl.f ndf1_mpspt.f ndf_hgmod.f
+ndf1_wclim.f ndf1_wplim.f ndf1_mpanl.f ndf1_mpspt.f ndf_hgmod.f \
+ndf_hsdat.f ndf1_chtim.f ndf1_hcopy.f ndf1_hsrt.f
 
 #  Additional Fortran routines required for the standalone library.
 
@@ -127,7 +128,8 @@ ndf_exist.f ndf_prop.f ndf1_getap_a.f ndf1_hwenv_a.f
 
 BASIC_C_ROUTINES = \
 ndf1_docmd.c ndf1_expfn.c ndf1_filac.c ndf1_gtarg.c ndf1_gtfil.c \
-ndf1_gtime.c ndf1_tilde.c ndf1.c ndf.c ndfinit.c ndf_hndlr.c
+ndf1_gtime.c ndf1_tilde.c ndf1.c ndf.c ndfinit.c ndf_hndlr.c \
+ndf1_time.c ndf1_mjd2t.c
 
 #  Additional C routines required for the standalone library.
 

@@ -51,6 +51,8 @@
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -70,6 +72,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David S Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -95,6 +98,9 @@
 *        Added creation of the HOST and USER history components.
 *     26-APR-1994 (RFWS):
 *        Added creation of the DATASET component.
+*     23-JAN-2009 (DSB):
+*        Set the new history record date and time to the values 
+*        specified by DCB_HTIME (if set).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -120,6 +126,12 @@
 *           Locator for NDF history component.
 *        DCB_HNREC( NDF__MXDCB ) = INTEGER (Read)
 *           Number of valid history records present.
+*        DCB_HSORT( NDF__MXDCB ) = LOGICAL (Write)
+*           Do the history records need sorting?
+*        DCB_HTIME( NDF__MXDCB ) = DOUBLE PRECISION (Read)
+*           The date/time to attach to the next history record to be 
+*           created, as a UTC Modified Julian Date. If negative, then 
+*           the current time will be used.
 *        DCB_HRLOC( NDF__MXDCB ) = CHARACTER * ( DAT__SZLOC ) (Read)
 *           Locator for array of history records.
 *        DCB_HTLEN( NDF__MXDCB ) = LOGICAL (Read and Write)
@@ -211,9 +223,22 @@
 *  previously held information which was not properly deleted).
                   CALL NDF1_HRST( CELL, STATUS )
 
-*  Obtain the current date and time and convert it to standard history
-*  format.
-                  CALL NDF1_GTIME( YMDHM, SEC, STATUS )
+*  If a date/time for the history record has been specified using
+*  NDF_HDATE then convert it to separate fields, as needed by NDF1_FMHDT. 
+                  IF( DCB_HTIME( IDCB ) .GT. 0.0 ) THEN
+                     CALL NDF1_MJD2T( DCB_HTIME( IDCB ), YMDHM, SEC, 
+     :                                STATUS )
+
+*  The supplied date may not be in chronological order, so indicate that
+*  we need to sort the records before closing the NDF.
+                     DCB_HSORT( IDCB ) = .TRUE.
+
+*  Otherwise get the current UTC time fields.
+                  ELSE
+                     CALL NDF1_TIME( YMDHM, SEC, STATUS )
+                  END IF
+
+*  Convert these fields to standard history format.
                   CALL NDF1_FMHDT( YMDHM, SEC, TIME, STATUS )
 
 *  Create a DATE component in the history record and write the date/time

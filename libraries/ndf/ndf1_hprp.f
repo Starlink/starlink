@@ -49,11 +49,14 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David S Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
 *     18-MAY-1993 (RFWS):
 *        Original version.
+*     23-JAN-2009 (DSB):
+*        Added DCB_HTIME and DCB_HSORT.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -79,11 +82,17 @@
 *        DCB_HLOC( NDF__MXDCB ) = CHARACTER * ( DAT__SZLOC ) (Read and
 *        Write)
 *           Locator for NDF history component.
+*        DCB_HSORT( NDF__MXDCB ) = LOGICAL (Read and Write)
+*           Do the history records need sorting?
 *        DCB_HNREC( NDF__MXDCB ) = INTEGER (Read and Write)
 *           Number of valid history records present.
 *        DCB_HRLOC( NDF__MXDCB ) = CHARACTER * ( DAT__SZLOC ) (Read and
 *        Write)
 *           Locator for array of history records.
+*        DCB_HTIME( NDF__MXDCB ) = DOUBLE PRECISION (Read and Write)
+*           The date/time to attach to the next history record to be 
+*           created, as a UTC Modified Julian Date. If negative, then 
+*           the current time will be used.
 *        DCB_HTLEN( NDF__MXDCB ) = INTEGER (Read and Write)
 *           Text length of the current history record.
 *        DCB_HUMOD( NDF__MXDCB ) = INTEGER (Read and Write)
@@ -135,6 +144,9 @@
                CALL NDF1_CPYNC( DCB_HLOC( IDCB1 ), 'CREATED',
      :                          DCB_HLOC( IDCB2 ), STATUS )
 
+*  Propagate the sorted flag.
+               DCB_HSORT( IDCB2 ) = DCB_HSORT( IDCB1 )
+
 *  Propagate the CURRENT_RECORD value and component from the input
 *  structure.
                DCB_HNREC( IDCB2 ) = DCB_HNREC( IDCB1 )
@@ -163,6 +175,7 @@
 *  Propagate remaining history status informaton.
                DCB_HDEF( IDCB2 ) = DCB_HDEF( IDCB1 )
                DCB_HTLEN( IDCB2 ) = DCB_HTLEN( IDCB1 )
+               DCB_HTIME( IDCB2 ) = DCB_HTIME( IDCB1 )
 
 *  Note whether the output DCB history information is up to date.
                DCB_KH( IDCB2 ) = ( STATUS .EQ. SAI__OK )

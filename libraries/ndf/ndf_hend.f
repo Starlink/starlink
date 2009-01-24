@@ -41,6 +41,8 @@
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -60,6 +62,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David S Berry (JC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -73,6 +76,8 @@
 *        Improved the handling of error reporting environments.
 *     28-SEP-1993 (RFWS):
 *        Add logging of pending error messages.
+*     23-JAN-2009 (DSB):
+*        Added DCB_HTIME.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -97,6 +102,10 @@
 *           Whether default history information is to be written.
 *        DCB_HTLEN( NDF__MXDCB ) = INTEGER (Write)
 *           Current history record text width.
+*        DCB_HTIME( NDF__MXDCB ) = DOUBLE PRECISION (Write)
+*           The date/time to attach to the next history record to be 
+*           created, as a UTC Modified Julian Date. If negative, then 
+*           the current time will be used.
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -133,9 +142,11 @@
 *  Reset the current history record text width to indicate that no
 *  current history record exists (so that a new one will subsequently
 *  be created). Also indicate that new default history information will
-*  be required.
+*  be required, and that he current time should be attached to the next
+*  history record.
          DCB_HTLEN( IDCB ) = 0
          DCB_HDEF( IDCB ) = .TRUE.
+         DCB_HTIME( IDCB ) = -1.0D0
 
 *  End the current error reporting environment and return to process
 *  the next DCB entry.

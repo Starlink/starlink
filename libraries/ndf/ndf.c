@@ -17,6 +17,8 @@
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -38,6 +40,7 @@
 *     AJC: A.J. Chipperfield (STARLINK, RAL)
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     PWD: Peter W. Draper (JAC, Durham University)
+*     DSB: David S Berry (JAC, UCLan)
 *     <{enter_new_authors_here}>
 
 *  History:
@@ -57,6 +60,8 @@
 *        instead of crashing during a strlen(NULL). Other changes to CNF
 *        should protect against "given and returned" strings being NULL
 *        or having zero or negative length.
+*     23-JAN-2009 (DSB):
+*        Added ndfHsdat.
 *     <{enter_further_changes_here}>
 *-
 */
@@ -1818,6 +1823,34 @@ int len;
    F77_FREE_CHARACTER( fhmode );
    F77_FREE_CHARACTER( fappn );
    F77_FREE_CHARACTER( ftext );
+   F77_IMPORT_INTEGER( fstatus, *status );
+
+   return;
+}
+
+F77_SUBROUTINE(ndf_hsdat)( CHARACTER(date),
+                           INTEGER(indf),
+                           INTEGER(status)
+                           TRAIL(date) );
+
+void ndfHsdat( const char *date,
+               int indf,
+               int *status ) {
+
+DECLARE_CHARACTER_DYN(fdate);
+DECLARE_INTEGER(findf);
+DECLARE_INTEGER(fstatus);
+
+   F77_CREATE_EXPORT_CHARACTER( date, fdate );
+   F77_EXPORT_INTEGER( indf, findf );
+   F77_EXPORT_INTEGER( *status, fstatus );
+
+   F77_CALL(ndf_hsdat)( CHARACTER_ARG(fdate),
+                        INTEGER_ARG(&findf),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(fdate) );
+
+   F77_FREE_CHARACTER( fdate );
    F77_IMPORT_INTEGER( fstatus, *status );
 
    return;

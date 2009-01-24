@@ -12,9 +12,9 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {33.8}
+\newcommand{\stardocnumber}    {33.9}
 \newcommand{\stardocauthors}   {R.F.~Warren-Smith \& D.S.~Berry}
-\newcommand{\stardocdate}      {4th July 2008}
+\newcommand{\stardocdate}      {23rd January 2009}
 \newcommand{\stardoctitle}     {NDF \\ [\latex{1ex}]
                                 Routines for Accessing the\\
                                 Extensible N-Dimensional Data Format}
@@ -8033,7 +8033,9 @@ which may be read back at a later date and acted upon.\footnote{Except
 that the USER, HOST and REFERENCE items (marked by open circles) may
 not always be present in \st{history\/} records written by applications
 which do not use the NDF\_ library. In this case, enquiries about them
-will simply result in a blank value being returned.}
+will simply result in a blank value being returned. Also, DATE can
+optionally be set to an alternative, user-supplied value using the 
+\htmlref{NDF\_HSDAT}{NDF_HSDAT} routine.}
 
 The final TEXT item is ``free format'' and there is no restriction on
 what this may contain. It is available for applications to write their
@@ -8168,6 +8170,12 @@ will be completely suppressed by this action. A single such call to
 NDF\_HPUT is sufficient and \st{default history recording\/} cannot then be
 re-established until the NDF has been released (or a new application
 started -- see \S\ref{ss:endhistory}).
+
+Each history record has a date and time associated with it. By default,
+this will be the UTC date and time at which the history record was
+created. However, an alternative date and time can be specified by
+calling the \htmlref{NDF\_HSDAT}{NDF_HSDAT} routine before the history
+record is created.
 
 \subsection{\xlabel{the_history_update_mode}\label{ss:historyupdatemode}The History Update Mode}
 
@@ -8433,7 +8441,7 @@ APPN variable):
 
 Other information about individual records may also be obtained using
 NDF\_HINFO, such as the text width, the number of text lines written
-and, of course, the date and time when the record was written (see
+and, of course, the date and time associated with the record (see
 Appendix~\ref{ss:routinedescriptions} for full details of the
 information items available).
 
@@ -11172,6 +11180,8 @@ locator}{sun92}{using_locators}}
 \noteroutine{\htmlref{NDF\_HPUT}{NDF_HPUT}( HMODE, APPN, REPL, NLINES, TEXT, TRANS, WRAP, RJUST,
                        INDF, STATUS )}
             {Write history information to an NDF}
+\noteroutine{\htmlref{NDF\_HSDAT}{NDF_HSDAT}( DATE, INDF, STATUS )}
+            {Set the date and time for the next history record in an NDF}
 \noteroutine{\htmlref{NDF\_HSMOD}{NDF_HSMOD}( HMODE, INDF, STATUS )}
             {Set the history update mode for an NDF}
 
@@ -14384,6 +14394,89 @@ locator}{sun92}{using_locators}}
          \sstitem
          On exit from this routine, all message tokens in the current
          message context are left in an undefined state.
+      }
+   }
+}
+\sstroutine{
+   NDF\_HSDAT
+}{
+   Set the history date for an NDF
+}{
+   \sstdescription{
+      The routine sets the date and time that will be used for subsequent
+      history records added to an NDF (both default history records and
+      those added using NDF\_HPUT). If no date and time is set using
+      this routine, then the curent date and time will be used. Any
+      date and time established by a previous call to this function can be
+      removed by supplying a blank value for argument {\tt "}DATE{\tt "}, in which
+      case the current date and time will be used for subsequent history
+      records.
+   }
+   \sstinvocation{
+      CALL NDF\_HSDAT( DATE, INDF, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         DATE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The time and date to be used for subsequent history records, or
+         blank to re-establish the default behaviour (i.e. to use the
+         current time). The allowed formats are described later in the
+         {\tt "}Date and Time Formats:{\tt "} section.
+      }
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         NDF identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      Date and Time Formats
+   }{
+      The formats accepted for the {\tt "}DATE{\tt "} argument are listed
+      below. They are all case-insensitive and are generally tolerant
+      of extra white space and alternative field delimiters:
+
+      \sstitemlist{
+
+         \sstitem
+         Gregorian Calendar Date: With the month expressed either as an
+         integer or a 3-character abbreviation, and with optional decimal
+         places to represent a fraction of a day ({\tt "}1996-10-2{\tt "} or
+         {\tt "}1996-Oct-2.6{\tt "} for example). If no fractional part of a day is
+         given, the time refers to the start of the day (zero hours).
+
+         \sstitem
+         Gregorian Date and Time: Any calendar date (as above) but with
+         a fraction of a day expressed as hours, minutes and seconds
+         ({\tt "}1996-Oct-2 12:13:56.985{\tt "} for example). The date and time can be
+         separated by a space or by a {\tt "}T{\tt "} (as used by ISO8601 format).
+
+         \sstitem
+         Modified Julian Date: With or without decimal places
+         ({\tt "}MJD 54321.4{\tt "} for example).
+
+         \sstitem
+         Julian Date: With or without decimal places ({\tt "}JD 2454321.9{\tt "} for
+         example).
+
+         \sstitem
+         Besselian Epoch: Expressed in decimal years, with or without
+         decimal places ({\tt "}B1950{\tt "} or {\tt "}B1976.13{\tt "} for example).
+
+         \sstitem
+         Julian Epoch: Expressed in decimal years, with or without
+         decimal places ({\tt "}J2000{\tt "} or {\tt "}J2100.9{\tt "} for example).
+
+         \sstitem
+         Year: Decimal years, with or without decimal places ({\tt "}1996.8{\tt "}
+         for example).  Such values are interpreted as a Besselian epoch
+         (see above) if less than 1984.0 and as a Julian epoch otherwise.
       }
    }
 }
@@ -18503,6 +18596,8 @@ Appendix~\ref{ss:cinterface}.\\[1.0ex]
             {Write history information to an NDF}
 \noteroutineC{\xlabel{ndfHsmod}void \htmlref{ndfHsmod}{NDF_HSMOD}}{( const char $*$hmode, int indf, int $*$status );}
             {Set the history update mode for an NDF}
+\noteroutineC{\xlabel{ndfHsdat}void \htmlref{ndfHsdat}{NDF_HSDAT}}{(const char $*$datee, int indf, int $*$status );}
+            {Set the date and time for the next history record in an NDF}
 \noteroutineC{\xlabel{ndfInit}void ndfInit}{( int argc, char $*$const argv[~], int $*$status );}
             {Initialise the NDF\_ library for use from a C main routine (not available from Fortran)}
 \noteroutineC{\xlabel{ndfIsacc}void \htmlref{ndfIsacc}{NDF_ISACC}}{( int indf, const char $*$access, int $*$isacc, int $*$status );}
@@ -18911,10 +19006,10 @@ scaled array. See \S\ref{ss:scaledform}.
 
 \end{enumerate}
 
-\subsection{\xlabel{list_of_most_recent_changes}Changes Introduced in V1.7}
+\subsection{Changes Introduced in V1.7}
 
 The following describes the most significant changes which occurred in
-the NDF\_ system between versions V1.6 and V1.7 (the current version):
+the NDF\_ system between versions V1.6 and V1.7:
 
 \begin{enumerate}
 \item NDF sections expressions can now include WCS axis values.
@@ -18923,6 +19018,17 @@ See \S\ref{ss:axissections}.
 \item New tuning parameters (``PXT...'') can be used to supress the default
 propagation of named NDF extensions by NDF\_PROP and NDF\_SCOPY. See 
 \htmlref{NDF\_TUNE}{NDF_TUNE}.
+
+\end{enumerate}
+
+\subsection{\xlabel{list_of_most_recent_changes}Changes Introduced in V1.8}
+
+The following describes the most significant changes which occurred in
+the NDF\_ system between versions V1.7 and V1.8 (the current version):
+
+\begin{enumerate}
+\item The routine NDF\_HSDAT has been added. This allows history records
+to be created with a specified date.
 
 \end{enumerate}
 

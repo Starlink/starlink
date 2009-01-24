@@ -54,6 +54,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -90,6 +91,8 @@
 *        component.
 *     11-JUL-1997 (RFWS):
 *        Added support for the WCS component.
+*     23-JAN-2009 (DSB):
+*        Added DCB_HTIME and DCB_HSORT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -120,11 +123,17 @@
 *        DCB_HLOC( NDF__MXDCB ) = CHARACTER * ( DAT__SZLOC ) (Read and
 *        Write)
 *           Locator for NDF history component.
+*        DCB_HSORT( NDF__MXDCB ) = LOGICAL (Write)
+*           Do the history records need sorting?
 *        DCB_HNREC( NDF__MXDCB ) = INTEGER (Write)
 *           Number of valid history records present.
 *        DCB_HRLOC( NDF__MXDCB ) = CHARACTER * ( DAT__SZLOC ) (Read and
 *        Write)
 *           Locator for array of history records.
+*        DCB_HTIME( NDF__MXDCB ) = DOUBLE PRECISION (Write)
+*           The date/time to attach to the next history record to be 
+*           created, as a UTC Modified Julian Date. If negative, then 
+*           the current time will be used.
 *        DCB_HTLEN( NDF__MXDCB ) = LOGICAL (Write)
 *           History current record text length.
 *        DCB_HUMOD( NDF__MXDCB ) = INTEGER (Read)
@@ -309,9 +318,11 @@
 *  Clear the DCB history information.
                         DCB_HDEF( IDCB ) = .TRUE.
                         DCB_HEXT( IDCB ) = 5
+                        DCB_HSORT( IDCB ) = .FALSE.
                         DCB_HNREC( IDCB ) = 0
                         DCB_HTLEN( IDCB ) = 0
                         DCB_HUMOD( IDCB ) = NDF__HNORM
+                        DCB_HTIME( IDCB ) = -1.0D0   
 
 *  Note whether information is still available in the DCB.
                         DCB_KH( IDCB ) = STATUS .EQ. SAI__OK

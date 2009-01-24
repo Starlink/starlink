@@ -93,4 +93,5 @@ WCDTS	<world coordinate system data too short>
 WCSIN	<world coordinate system information invalid>
 ARCIN	<command line argument count invalid>
 ARGIN	<command line argument invalid>
+BDTIM   <date/time string invalid>
 .END
