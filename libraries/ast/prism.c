@@ -3009,7 +3009,8 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    AstMapping *nmap2;            /* Reg2->current Mapping */
    AstMapping *result;           /* Result pointer to return */
    AstPointList *newpl;          /* New PointList */
-   AstPointList *ps1;            /* PointList PointSet */
+   AstPointSet *ps1;             /* PointList PointSet */
+   AstPointSet *ps2;             /* New PointList PointSet */
    AstPrism *cpr;                /* Component Prism */
    AstPrism *new;                /* New Prism */
    AstRegion *new2;              /* New Interval or Box */
@@ -3026,7 +3027,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    double *lbnd;                 /* Lower bounds of Interval subregion */
    double *p1;                   /* Pointer to next old axis value */
    double *p;                    /* Pointer to next new axis value */
-   double *points;               /* Work space holding PointList axis values */
+   double **points;              /* PointList axis values */
    double *ubnd;                 /* Upper bounds of Interval subregion */
    int *axin;                    /* Indices of Mapping inputs to use */
    int *axout1;                  /* Indices of cfrm axes corresponding to reg1 */
@@ -3096,15 +3097,19 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    but with the extra axes inherited form the Interval. */
             if( ok ) {
                ps1 = astRegTransform( reg1, NULL, 1, NULL, NULL );
+
                ptr1 = astGetPoints( ps1 );
                np = astGetNpoint( ps1 );
-               points = astMalloc( sizeof( double )*(size_t)( np*( nax1 + nax2 ) ) );
+
+               ps2 = astPointSet( np, nax1 + nax2, "", status );
+               points = astGetPoints( ps2 );
+
                if( points ) {
 
 /* Copy the axis values form the old PointList to the first nax1 axes of
    the new PointList. */
-                  p = points;
                   for( i = 0; i < nax1; i++) {
+                     p = points[ i ];
                      p1 = ptr1[ i ];
                      for( j = 0; j < np; j++ ) *(p++) = *(p1++);
                   }
@@ -3112,6 +3117,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /* Fill up the remaining nax2 axes of the new PointList by copying the 
    axis values covered by the Interval. */
                   for( i = 0; i < nax2; i++) {
+                     p = points[ i + nax1 ];
                      for( j = 0; j < np; j++ ) *(p++) = lbnd[ i ];
                   }
 
@@ -3119,8 +3125,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    the base Frame uncertainty from "this" (if set). */
                   bfrm = astGetFrame( fs, AST__BASE );
                   unc = astTestUnc( reg ) ? astGetUncFrm( reg, AST__BASE ) : NULL;
-                  newpl = astPointList( bfrm, np, nax1 + nax2, np, points, 
-                                        unc, "", status );
+                  newpl = astPointList( bfrm, ps2, unc, "", status );
 
 /* Finally map it into the current Frame of "this" and simplify it. */
                   newpl2 = astMapRegion( newpl, bcmap, cfrm );
@@ -3131,9 +3136,9 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
                   newpl2 = astAnnul( newpl2 );
                   if( unc ) unc = astAnnul( unc );
                   bfrm = astAnnul( bfrm );
-                  points = astFree( points );                  
                }
                ps1 = astAnnul( ps1 );
+               ps2 = astAnnul( ps2 );
             }
          }
          ubnd = astFree( ubnd );

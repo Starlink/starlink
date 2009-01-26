@@ -6566,6 +6566,7 @@ static AstRegion *Position2DReader( AstXmlChan *this, AstXmlElement *elem,
 /* Local Variables: */
    AstMapping *map1;        /* Mapping from first axis units to radians */
    AstMapping *map2;        /* Mapping from second axis units to radians */
+   AstPointSet *pset;       /* Pointset holding Position2D axis values */
    AstRegion *r;            /* Region to store in ancillary KeyMap */
    AstRegion *result;       /* Returned uncertainty Region */
    IVOAScan *scan;          /* Structure holding scan results */
@@ -6575,6 +6576,7 @@ static AstRegion *Position2DReader( AstXmlChan *this, AstXmlElement *elem,
    const char *unit1;       /* Pointer to axis 1 unit attribute string */
    const char *unit2;       /* Pointer to axis 2 unit attribute string */
    const char *unit;        /* Pointer to Position2D's unit attribute string */
+   double **ptr;            /* Arrays holding Position2D axis values */
    double cen[ 2 ];         /* Centre values */
    double hw[ 2 ];          /* Half widths values */
    double pa;               /* Error position angle */
@@ -6673,9 +6675,16 @@ static AstRegion *Position2DReader( AstXmlChan *this, AstXmlElement *elem,
          }
 
 /* Create a PointList from it and store in the returned ancillary KeyMap. */
-         r = (AstRegion *) astPointList( frm, 1, 2, 1, pos, NULL, "", status );
-         astMapPut0A( *anc, AST__STCVALUE, r, NULL );
-         r = astAnnul( r );
+         pset = astPointSet( 1, 2, "", status );
+         ptr = astGetPoints( pset );
+         if( astOK ) {
+            ptr[ 0 ][ 0 ] = pos[ 0 ];
+            ptr[ 1 ][ 0 ] = pos[ 1 ];
+            r = (AstRegion *) astPointList( frm, pset, NULL, "", status );
+            astMapPut0A( *anc, AST__STCVALUE, r, NULL );
+            r = astAnnul( r );
+         }
+         pset = astAnnul( pset );
       }
 
 /* Does this Position2D contain any Error? */

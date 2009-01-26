@@ -71,6 +71,9 @@ f     - AST_SETENCLOSURE: Specify a Region that encloses a PointList
 *        - Add methods astGetEnclosure, astSetEnclosure and astPoints, and 
 *        attribute ListSize.
 *        - Override astGetObjSize and astEqual.
+*     26-JAN-2009 (DSB):
+*        Change protected constructor to accept a PointSet rather than an
+*        array of doubles.
 *class--
 
 *  Implementation Deficiencies:
@@ -666,7 +669,8 @@ static int GetObjSize( AstObject *this_object, int *status ) {
    return result;
 }
 
-void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name, int *status ) {
+void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name, 
+                             int *status ) {
 /*
 *+
 *  Name:
@@ -1484,12 +1488,13 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes,
    AstFrame *bfrm;         /* The base Frame in the supplied Region */
    AstFrame *frm;          /* The base Frame in the returned Region */
    AstPointSet *pset;      /* Holds axis values defining the supplied Region */
+   AstPointSet *pset_new;  /* Holds axis values defining the returned Region */
    AstRegion *bunc;        /* The uncertainty in the supplied Region */
    AstRegion *result;      /* Returned Region */
    AstRegion *unc;         /* The uncertainty in the returned Region */
    double **ptr;           /* Holds axis values defining the supplied Region */
+   double **ptr_new;       /* Holds axis values defining the returned Region */
    double *p;              /* Pointer to next input axis value */
-   double *points;         /* Base Frm lower bound axis values */
    double *q;              /* Pointer to next output axis value */
    int i;                  /* Index of axis within returned Region */
    int j;                  /* Point index */
@@ -1528,8 +1533,11 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes,
    ptr = astGetPoints( pset );
    npnt = astGetNpoint( pset );
 
-/* Get space to hold the PointList axis values in the new Frame. */
-   points = astMalloc( sizeof( *points )*naxes*npnt );
+/* Create a PointSet to hold the points for the returned PointList. */
+   pset_new = astPointSet( npnt, naxes, "", status );
+
+/* Get pointers to its data. */
+   ptr_new = astGetPoints( pset_new );
 
 /* Check pointers can be used safely. */
    if( astOK ) {
@@ -1538,20 +1546,19 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes,
    above. */
       for( i = 0; i < naxes; i++ ) {
          p = ptr[ axes[ i ] ];
-         q = points + i*npnt;
+         q = ptr_new[ i ];
          for( j = 0; j < npnt; j++ ) *(q++) = *(p++);
       }
 
 /* Create the new PointList. */
-      result = (AstRegion *) astPointList( frm, npnt, naxes, npnt, 
-                                           points, unc, "", status );
+      result = (AstRegion *) astPointList( frm, pset_new, unc, "", status );
    }
 
 /* Free resources */
    frm = astAnnul( frm );      
    bfrm = astAnnul( bfrm );      
    if( unc ) unc = astAnnul( unc );
-   points = astFree( points );
+   pset_new = astAnnul( pset_new );
 
 /* Return a NULL pointer if an error has occurred. */
    if( !astOK ) result = astAnnul( result );
@@ -1627,8 +1634,6 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    double **ptr3;               /* Pointer to axis values in "pset3" */
    double **ptr;                /* Pointer to axis values in "this" */
    double *p;                   /* Pointer to next axis value to read */
-   double *q;                   /* Pointer to next axis value to write */
-   double *work;                /* Work array to hold all axis values */
    int ic;                      /* Axis index */
    int icurr;                   /* Index of original current Frame in "this" */
    int ip;                      /* Point index */
@@ -1725,22 +1730,10 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    direction: we create a new PointList from the supplied list of points,
    and then we transform the points associated with the supplied PointList 
    using the new PointList. This checks that all the points in the
-   supplied PointList are close to the supplied points. We need some work
-   space. */
-      work = astMalloc( sizeof( double )*(size_t)( nc*np ) );
-      if( result && astOK ) { 
-
-/* Copy the points associated with this PointList into the work array. We
-   need to do this since the PointList constructor expects a single 1-D
-   array rather than a PointSet. */
-         q = work;
-         for( ic = 0; ic < nc && result; ic++ ){ 
-            p = ptr[ ic ];
-            for( ip = 0; ip < np; ip++ ) *(q++) = *(p++);
-         }
-
-/* Create the new PointList holding the supplied points. */
-         pl = astPointList( unc, np, nc, np, work, unc, "", status );
+   supplied PointList are close to the supplied points. Create the new 
+   PointList holding the supplied points. */
+      if( result ) {
+         pl = astPointList( unc, pset, unc, "", status );
 
 /* Transform the points in "this" PointList using the new PointList as a
    Mapping. */
@@ -1765,8 +1758,6 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
          pset3 = astAnnul( pset3 );
 
       }
-
-      work = astFree( work );
    }
 
    pset2 = astAnnul( pset2 );
@@ -1988,13 +1979,6 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    AstRegion *this;              /* Pointer to original Region structure */
    AstRegion *unc;               /* Pointer to new uncertainty Region */
    double **ptr2;                /* Pointer to current Frame points */
-   double *p1;                   /* Pointer to next axis value in old Region */
-   double *p2;                   /* Pointer to next axis value in new Region */
-   double *pts;                  /* Pointer to vectorised current Frame points */
-   int ic;                       /* Index of coord */
-   int ip;                       /* Index of point */
-   int nc;                       /* No. of coords */
-   int np;                       /* No. of points */
    int simpler;                  /* Has some simplication taken place? */
 
 /* Initialise. */
@@ -2037,32 +2021,16 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    supplied PointList, in its current Frame. */
       unc = astGetUncFrm( new, AST__CURRENT );
 
-/* Allocate memory to hold the lists to pass to the PointList
-   constructor. */
-      np = astGetNpoint( pset2 );
-      nc = astGetNcoord( pset2 );
-      pts = astMalloc( sizeof( double )*(size_t) np*nc );
-      if( astOK ) {
-
-/* Copy the transformed PointList into a single array. */
-         p2 = pts;
-         for( ic = 0; ic < nc; ic++ ){
-            p1 = ptr2[ ic ];
-            for( ip = 0; ip < np; ip++ ) *(p2++) = *(p1++);
-         }
-
 /* Create a new PointList, and use it in place of the original. */
-         new2 = astPointList( fr, np, nc, np, pts, unc, "", status );
-         (void) astAnnul( new );
-         new = (AstRegion *) new2;
-         simpler = 1;
-      }
+      new2 = astPointList( fr, pset2, unc, "", status );
+      (void) astAnnul( new );
+      new = (AstRegion *) new2;
+      simpler = 1;
 
 /* Free resources. */
       fr = astAnnul( fr );
       pset2 = astAnnul( pset2 );
       unc = astAnnul( unc );
-      pts = astFree( pts );
    }
 
 /* Free resources. */
@@ -2593,9 +2561,131 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 astMAKE_ISA(PointList,Region,check,&class_check)
 astMAKE_CHECK(PointList)
 
-AstPointList *astPointList_( void *frame_void, int npnt, int ncoord, int dim, 
-                             const double *points, AstRegion *unc,
-                             const char *options, int *status, ...) {
+AstPointList *astPointList_( void *frame_void, AstPointSet *points,
+                             AstRegion *unc, const char *options, 
+                             int *status, ...) {
+/*
+*+
+*  Name:
+*     astPointList
+
+*  Purpose:
+*     Create a PointList.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "pointlist.h"
+*     AstPointList *astPointList( AstFrame *frame, AstPointSet *points,
+*                                 AstRegion *unc, const char *options, 
+*                                 int *status, ...) {
+
+*  Class Membership:
+*     PointList constructor.
+
+*  Description:
+*     This function implements the protected interface to the astPointList 
+*     constructor function, returning a true C pointer. The parameter list 
+*     differs from the public constructor, in that the positions are
+*     defined by a PointSet rather than an array of doubles.
+
+*  Parameters:
+*     frame
+*        A pointer to the Frame in which the region is defined. A deep
+*        copy is taken of the supplied Frame. This means that any
+*        subsequent changes made to the Frame using the supplied pointer
+*        will have no effect the Region.
+*     points
+*        A PointSet holding the physical coordinates of the points. 
+*     unc
+*        An optional pointer to an existing Region which specifies the 
+*        uncertainties associated with each point in the PointList being 
+*        created. The uncertainty at any point in the PointList is found by 
+*        shifting the supplied "uncertainty" Region so that it is centred at 
+*        the point being considered. The area covered by the shifted 
+*        uncertainty Region then represents the uncertainty in the position. 
+*        The uncertainty is assumed to be the same for all points.
+*
+*        If supplied, the uncertainty Region must be of a class for which 
+*        all instances are centro-symetric (e.g. Box, Circle, Ellipse, etc.) 
+*        or be a Prism containing centro-symetric component Regions. A deep 
+*        copy of the supplied Region will be taken, so subsequent changes to 
+*        the uncertainty Region using the supplied pointer will have no 
+*        effect on the created Box. Alternatively, a NULL Object pointer 
+*        may be supplied, in which case a default uncertainty is used 
+*        equivalent to a box 1.0E-6 of the size of the bounding box of the 
+*        PointList being created.
+*        
+*        The uncertainty Region has two uses: 1) when the astOverlap
+*        function compares two Regions for equality the uncertainty Region 
+*        is used to determine the tolerance on the comparison, and 2)
+*        when a Region is mapped into a different coordinate system and
+*        subsequently simplified (using astSimplify), the uncertainties are 
+*        used to determine if the transformed boundary can be accurately 
+*        represented by a specific shape of Region.
+*     options
+*        Pointer to a null-terminated string containing an optional
+*        comma-separated list of attribute assignments to be used for
+*        initialising the new PointList. The syntax used is identical to
+*        that for the astSet function and may include "printf" format
+*        specifiers identified by "%" symbols in the normal way.
+*     status 
+*        Pointer to the inherited status value.
+*     ...
+*        If the "options" string contains "%" format specifiers, then
+*        an optional list of additional arguments may follow it in
+*        order to supply values to be substituted for these
+*        specifiers. The rules for supplying these are identical to
+*        those for the astSet function (and for the C "printf"
+*        function).
+
+*  Returned Value:
+*     A pointer to the new PointList.
+*/
+
+/* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   AstFrame *frame;              /* Pointer to Frame structure */
+   AstPointList *new;            /* Pointer to new PointList */
+   va_list args;                 /* Variable argument list */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
+/* Check the global status. */
+   if ( !astOK ) return NULL;
+
+/* Obtain and validate a pointer to the supplied Frame structure. */
+   frame = astCheckFrame( frame_void );
+
+/* Initialise the PointList, allocating memory and initialising the
+   virtual function table as well if necessary. */
+   new = astInitPointList( NULL, sizeof( AstPointList ), !class_init, 
+                           &class_vtab, "PointList", frame, points, unc );
+
+/* If successful, note that the virtual function table has been
+   initialised. */
+   if ( astOK ) {
+      class_init = 1;
+
+/* Obtain the variable argument list and pass it along with the options string
+   to the astVSet method to initialise the new PointList's attributes. */
+      va_start( args, status );
+      astVSet( new, options, NULL, args );
+      va_end( args );
+
+/* If an error occurred, clean up by deleting the new object. */
+      if ( !astOK ) new = astDelete( new );
+   }
+
+/* Return a pointer to the new PointList. */
+   return new;
+}
+
+AstPointList *astPointListId_( void *frame_void, int npnt, int ncoord, int dim,
+                               const double *points, void *unc_void, 
+                               const char *options, ... ) {
 /*
 *++
 *  Name:
@@ -2734,98 +2824,21 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
-   AstFrame *frame;              /* Pointer to Frame structure */
-   AstPointList *new;            /* Pointer to new PointList */
-   va_list args;                 /* Variable argument list */
+   AstFrame *frame;          /* Pointer to Frame structure */
+   AstPointList *new;        /* Pointer to new PointList */
+   AstPointSet *pset;        /* Pointer to PointSet holding points */
+   AstRegion *unc;           /* Pointer to Region structure */
+   astDECLARE_GLOBALS;       /* Pointer to thread-specific global data */
+   const double *q;          /* Pointer to next supplied axis value */
+   double **ptr;             /* Pointer to data in pset */
+   double *p;                /* Pointer to next PointSet axis value */
+   int *status;              /* Pointer to inherited status value */
+   int i;                    /* Axis index */
+   int j;                    /* Point index */
+   va_list args;             /* Variable argument list */
 
 /* Get a pointer to the thread specific global data structure. */
    astGET_GLOBALS(NULL);
-
-/* Check the global status. */
-   if ( !astOK ) return NULL;
-
-/* Obtain and validate a pointer to the supplied Frame structure. */
-   frame = astCheckFrame( frame_void );
-
-/* Initialise the PointList, allocating memory and initialising the
-   virtual function table as well if necessary. */
-   new = astInitPointList( NULL, sizeof( AstPointList ), !class_init, 
-                           &class_vtab, "PointList", frame, npnt, ncoord, 
-                           dim, points, unc );
-
-/* If successful, note that the virtual function table has been
-   initialised. */
-   if ( astOK ) {
-      class_init = 1;
-
-/* Obtain the variable argument list and pass it along with the options string
-   to the astVSet method to initialise the new PointList's attributes. */
-      va_start( args, status );
-      astVSet( new, options, NULL, args );
-      va_end( args );
-
-/* If an error occurred, clean up by deleting the new object. */
-      if ( !astOK ) new = astDelete( new );
-   }
-
-/* Return a pointer to the new PointList. */
-   return new;
-}
-
-AstPointList *astPointListId_( void *frame_void, int npnt, int ncoord, int dim,
-                               const double *points, void *unc_void, 
-                               const char *options, ... ) {
-/*
-*  Name:
-*     astPointListId_
-
-*  Purpose:
-*     Create a PointList.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "pointlist.h"
-*     AstPointList *astPointListId_( void *frame_void, int npnt, int ncoord, 
-*                              int dim, const double *points, void *unc_void,
-*                              const char *options, ... )
-
-*  Class Membership:
-*     PointList constructor.
-
-*  Description:
-*     This function implements the external (public) interface to the
-*     astPointList constructor function. It returns an ID value (instead
-*     of a true C pointer) to external users, and must be provided
-*     because astPointList_ has a variable argument list which cannot be
-*     encapsulated in a macro (where this conversion would otherwise
-*     occur).
-*
-*     The variable argument list also prevents this function from
-*     invoking astPointList_ directly, so it must be a re-implementation
-*     of it in all respects, except for the final conversion of the
-*     result to an ID value.
-
-*  Parameters:
-*     As for astPointList_.
-
-*  Returned Value:
-*     The ID value associated with the new PointList.
-*/
-
-/* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
-   AstFrame *frame;              /* Pointer to Frame structure */
-   AstPointList *new;            /* Pointer to new PointList */
-   AstRegion *unc;               /* Pointer to Region structure */
-   va_list args;                 /* Variable argument list */
-
-   int *status;                  /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(NULL);
-
-/* Pointer to inherited status value */
 
 /* Get a pointer to the inherited status value. */
    status = astGetStatusPtr;
@@ -2837,6 +2850,17 @@ AstPointList *astPointListId_( void *frame_void, int npnt, int ncoord, int dim,
    pointer to ensure it identifies a valid Frame. */
    frame = astVerifyFrame( astMakePointer( frame_void ) );
 
+/* Create a PointSet and store the supplied points in it. */
+   pset = astPointSet( npnt, ncoord , "", status );
+   ptr = astGetPoints( pset );
+   if( astOK ) {
+      for( i = 0; i < ncoord; i++ ) {
+         p = ptr[ i ];
+         q = points + i*dim;
+         for( j = 0; j < npnt; j++ ) *(p++) = *(q++);
+      }
+   }
+
 /* Obtain a Region pointer from the supplied "unc" ID and validate the
    pointer to ensure it identifies a valid Region . */
    unc = unc_void ? astCheckRegion( astMakePointer( unc_void ) ) : NULL;
@@ -2844,8 +2868,7 @@ AstPointList *astPointListId_( void *frame_void, int npnt, int ncoord, int dim,
 /* Initialise the PointList, allocating memory and initialising the
    virtual function table as well if necessary. */
    new = astInitPointList( NULL, sizeof( AstPointList ), !class_init, 
-                           &class_vtab, "PointList", frame, npnt, ncoord, dim, 
-                           points, unc );
+                           &class_vtab, "PointList", frame, pset, unc );
 
 /* If successful, note that the virtual function table has been
    initialised. */
@@ -2862,13 +2885,16 @@ AstPointList *astPointListId_( void *frame_void, int npnt, int ncoord, int dim,
       if ( !astOK ) new = astDelete( new );
    }
 
+/* Free resources. */
+   pset = astAnnul( pset );
+
 /* Return an ID value for the new PointList. */
    return astMakeId( new );
 }
 
-AstPointList *astInitPointList_( void *mem, size_t size, int init, AstPointListVtab *vtab, 
-                                 const char *name, AstFrame *frame, int npnt, 
-                                 int ncoord, int dim, const double *points,
+AstPointList *astInitPointList_( void *mem, size_t size, int init, 
+                                 AstPointListVtab *vtab, const char *name, 
+                                 AstFrame *frame, AstPointSet *points, 
                                  AstRegion *unc, int *status ) {
 /*
 *+
@@ -2883,10 +2909,10 @@ AstPointList *astInitPointList_( void *mem, size_t size, int init, AstPointListV
 
 *  Synopsis:
 *     #include "pointlist.h"
-*     AstPointList *astInitPointList( void *mem, size_t size, int init, AstPointListVtab *vtab, 
-*                                     const char *name, AstFrame *frame, int npnt, 
-*                                     int ncoord, int dim, const double *points,
-*                                     AstRegion *unc )
+*     AstPointList *astInitPointList( void *mem, size_t size, int init, 
+*                                     AstPointListVtab *vtab, const char *name,
+*                                     AstFrame *frame, AstPointSet *points, 
+*                                     AstRegion *unc, int *status )
 
 *  Class Membership:
 *     PointList initialiser.
@@ -2927,24 +2953,8 @@ AstPointList *astInitPointList_( void *mem, size_t size, int init, AstPointListV
 *        method).
 *     frame
 *        A pointer to the Frame in which the region is defined.
-*     npnt
-*        The number of points in the Region. 
-*     ncoord
-*        The number of coordinates being supplied for each point. This
-*        must equal the number of axes in the supplied Frame, given by 
-*        its Naxes attribute.
-*     dim
-*        The number of elements along the second dimension of the "points"
-*        array (which contains the point coordinates). This value is
-*        required so that the coordinate values can be correctly
-*        located if they do not entirely fill this array. The value
-*        given should not be less than "npnt".
 *     points
-*        The address of the first element of a 2-dimensional array of 
-*        shape "[ncoord][dim]" giving the physical coordinates of the 
-*        points. These should be stored such that the value of coordinate 
-*        number "coord" for point number "pnt" is found in element 
-*        "in[coord][pnt]".
+*        A PointSet containing the Points for the PointList.
 *     unc
 *        A pointer to a Region which specifies the uncertainty in the
 *        supplied positions (all points in the new PointList being 
@@ -2972,13 +2982,8 @@ AstPointList *astInitPointList_( void *mem, size_t size, int init, AstPointListV
 
 /* Local Variables: */
    AstPointList *new;        /* Pointer to new PointList */
-   AstPointSet *pset;        /* Pointer to PointSet holding points */
-   const double *q;          /* Pointer to next supplied axis value */
-   double **ptr;             /* Pointer to data in pset */
-   double *p;                /* Pointer to next PointSet axis value */
-   int i;                    /* Axis index */
-   int j;                    /* Point index */
-   int nin;                  /* No. of axes */
+   int ncoord;               /* No. of axes in PointSet */
+   int nin;                  /* No. of axes in Frame */
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -2991,28 +2996,19 @@ AstPointList *astInitPointList_( void *mem, size_t size, int init, AstPointListV
 
 /* Check the number of axis values per position is correct. */
    nin = astGetNaxes( frame );
+   ncoord = astGetNcoord( points );
    if( nin != ncoord ) {
-      astError( AST__NCPIN, "astInitPointList(%s): Bad number of coordinate "
-                "values (%d).", status, name, ncoord );
+      astError( AST__NCPIN, "astInitPointList(): Bad number of coordinate "
+                "values (%d).", status, ncoord );
       astError( AST__NCPIN, "The %s given requires %d coordinate value(s) for "
                 "each input point.", status, astGetClass( frame ), nin );
-
-/* If so create a PointSet and store the supplied points in it. */
-   } else {
-      pset = astPointSet( npnt, ncoord , "", status );
-      ptr = astGetPoints( pset );
-      if( astOK ) {
-         for( i = 0; i < ncoord; i++ ) {
-            p = ptr[ i ];
-            q = points + i*dim;
-            for( j = 0; j < npnt; j++ ) *(p++) = *(q++);
-         }
-      }
+   }
 
 /* Initialise a Region structure (the parent class) as the first component
    within the PointList structure, allocating memory if necessary. */
-      new = (AstPointList *) astInitRegion( mem, size, 0, (AstRegionVtab *) vtab, 
-                                            name, frame, pset, unc );
+   if( astOK ) {
+      new = (AstPointList *) astInitRegion( mem, size, 0, (AstRegionVtab *) vtab,
+                                            name, frame, points, unc );
       if ( astOK ) {
 
 /* Initialise the PointList data. */
@@ -3024,10 +3020,6 @@ AstPointList *astInitPointList_( void *mem, size_t size, int init, AstPointListV
 /* If an error occurred, clean up by deleting the new PointList. */
          if ( !astOK ) new = astDelete( new );
       }
-
-/* Free resources. */
-      pset = astAnnul( pset );
-
    }
 
 /* Return a pointer to the new PointList. */

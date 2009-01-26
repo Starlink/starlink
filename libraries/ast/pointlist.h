@@ -152,7 +152,7 @@ astPROTO_ISA(PointList)            /* Test class membership */
 
 /* Constructor. */
 #if defined(astCLASS)            /* Protected. */
-AstPointList *astPointList_( void *, int, int, int, const double *, AstRegion *, const char *, int *, ...);
+AstPointList *astPointList_( void *, AstPointSet *, AstRegion *, const char *, int *, ...);
 #else
 AstPointList *astPointListId_( void *, int, int, int, const double *, AstRegion *, const char *, ... )__attribute__((format(printf,7,8)));
 #endif
@@ -160,7 +160,9 @@ AstPointList *astPointListId_( void *, int, int, int, const double *, AstRegion 
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
-AstPointList *astInitPointList_( void *, size_t, int, AstPointListVtab *, const char *, AstFrame *, int, int, int, const double *, AstRegion *, int * );
+AstPointList *astInitPointList_( void *, size_t, int, AstPointListVtab *, 
+                                 const char *, AstFrame *, AstPointSet *, 
+                                 AstRegion *, int * );
 
 /* Vtab initialiser. */
 void astInitPointListVtab_( AstPointListVtab *, const char *, int * );
@@ -210,8 +212,8 @@ int astGetListSize_( AstPointList *, int * );
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
-#define astInitPointList(mem,size,init,vtab,name,frame,npnt,ncoord,indim,points,unc) \
-astINVOKE(O,astInitPointList_(mem,size,init,vtab,name,frame,npnt,ncoord,indim,points,unc,STATUS_PTR))
+#define astInitPointList(mem,size,init,vtab,name,frame,points,unc) \
+astINVOKE(O,astInitPointList_(mem,size,init,vtab,name,frame,points,unc,STATUS_PTR))
 
 /* Vtab Initialiser. */
 #define astInitPointListVtab(vtab,name) astINVOKE(V,astInitPointListVtab_(vtab,name,STATUS_PTR))
