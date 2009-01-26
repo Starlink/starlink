@@ -151,7 +151,7 @@
      :                          DLBND1, DUBND1, XL, XU, STATUS )
 
 *  Convert to pixel indices   
-               UBND1( I ) = LBND1( I ) + NINT( DUBND1 ) - 1
+               UBND1( I ) = LBND1( I ) + NINT( DUBND1 ) - 2
                LBND1( I ) = LBND1( I ) + NINT( DLBND1 ) - 1
             END DO
 
@@ -169,6 +169,7 @@
 
 *  If the pixel index bounds are being used, copy them.
       ELSE
+         NDIM1 = NDIM2
          DO I = 1, NDIM1
             LBND1( I ) = LBND2( I )
             UBND1( I ) = UBND2( I )
