@@ -1120,6 +1120,16 @@ package kappa {
             helpkey *
           }
 
+         parameter likewcs {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Use the template WCS shape?}
+            helpkey *
+          }
+
          parameter out {
             position 2
             type NDF

@@ -45,7 +45,13 @@
 *        matching section from the input NDF before copying takes
 *        place.  By default, no template will be used and the shape of
 *        the output NDF will therefore match that of the input NDF (or
-*        NDF section). [!]
+*        NDF section). The shape of the template in either pixel indices 
+*        or the current WCS Frame may be used, as selected by parameter
+*        LIKEWCS. [!]
+*     LIKEWCS = _LOGICAL (Read)
+*        If TRUE, then the WCS bounds of the template supplied via parameter 
+*        LIKE are used to decide on the bounds of the output NDF. Otherwise,
+*        the pixel bounds of the template are used.  [FALSE]
 *     OUT = NDF (Write)
 *        The output NDF data structure.
 *     TITLE = LITERAL (Read)
@@ -150,7 +156,9 @@
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 1995, 1998, 2000, 2003-2004 Central Laboratory of
 *     the Research Councils. Copyright (C) 2005-2006 Particle Physics &
-*     Astronomy Research Council. All Rights Reserved.
+*     Astronomy Research Council. 
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -209,6 +217,8 @@
 *     9-SEP-2008 (DSB):
 *        Report an error if TRIM is true but there are no significant
 *        output pixel axes.
+*     26-JAN-2009 (DSB):
+*        Added parameter LIKEWCS.
 *     {enter_further_changes_here}
 
 *-
@@ -278,6 +288,7 @@
       INTEGER UBND( NDF__MXDIM ) ! Template NDF upper bounds
       LOGICAL BAD                ! Bad values in the array component?
       LOGICAL ISBAS              ! Is the NDF identifier for a base NDF?
+      LOGICAL LIKWCS             ! Match WCS bounds with template?
       LOGICAL THERE              ! Does object exists?
       LOGICAL TRIM               ! Remove insignificant pixel axes?
       LOGICAL TRMWCS             ! Remove corresponding WCS axes?
@@ -309,12 +320,13 @@
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
 
-*  If a template was supplied, then obtain its bounds and select a
-*  matching section from the input NDF.  Annul the original input NDF
-*  identifier and replace it with the section identifier.
+*  If a template was supplied, then obtain the pixel or WCS bounds of it,
+*  as determined by the LIKEWCS parameter, and select a matching section 
+*  from the input NDF.  Annul the original input NDF identifier and 
+*  replace it with the section identifier.
          ELSE
-            CALL NDF_BOUND( NDF2, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
-            CALL NDF_SECT( NDF1, NDIM, LBND, UBND, NDFT, STATUS )
+            CALL PAR_GET0L( 'LIKEWCS', LIKWCS, STATUS )
+            CALL KPG1_LIKE( NDF1, NDF2, LIKWCS, NDFT, STATUS )
             CALL NDF_ANNUL( NDF1, STATUS )
             NDF1 = NDFT
          END IF

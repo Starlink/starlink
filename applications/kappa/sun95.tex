@@ -35289,7 +35289,16 @@ KAPPA: \htmlref{ADD}{ADD},
          matching section from the input NDF before copying takes
          place.  By default, no template will be used and the shape of
          the output NDF will therefore match that of the input NDF (or
-         NDF section). {\tt [!]}
+         NDF section). The shape of the template in either pixel indices 
+         or the current WCS Frame may be used, as selected by parameter
+         LIKEWCS. {\tt [!]}
+      }
+      \sstsubsection{
+         LIKEWCS = \_LOGICAL (Read)
+      }{
+         If TRUE, then the WCS bounds of the template supplied via parameter 
+         LIKE are used to decide on the bounds of the output NDF. Otherwise,
+         the pixel bounds of the template are used.  {\tt [FALSE]}
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -55744,6 +55753,15 @@ The following applications have been modified:
          \item Likewise there is an {\tt Null} option for Field 1 of 
          the file format. 
       \end{itemize}
+
+   \item [\htmlref{NDFCOPY}{NDFCOPY}] \mbox{}
+      \begin{itemize}
+         \item A new parameter caller LIKEWCS has been added. This allows the
+         shape of the template NDF in the WCS frame to be used to determine 
+         the bounds of the output NDF.
+      \end{itemize}
+
+
 \end{description}
 
 
