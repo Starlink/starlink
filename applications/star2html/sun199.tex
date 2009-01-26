@@ -16,14 +16,14 @@
 \newcommand{\stardoccopyright} 
 {Copyright \copyright\ 2000-2004 Council for the Central Laboratory of the
 Research Councils \newline\
-Copyright \copyright\ 2008 Science and Technology Facilities Council}
+Copyright \copyright\ 2008-2009 Science and Technology Facilities Council}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {199.11}
+\newcommand{\stardocnumber}    {199.12}
 \newcommand{\stardocauthors}   {P W Draper\\
                                 A J Chipperfield\\
                                 M D Lawden}
-\newcommand{\stardocdate}      {4 April 2008}
+\newcommand{\stardocdate}      {26 January 2009}
 \newcommand{\stardoctitle}     {Star2HTML\\[1ex]
                                 Converting Starlink Documents to Hypertext}
 \newcommand{\stardocversion}   {Version 1.6}
@@ -1266,8 +1266,232 @@ Lamport, Leslie : A Document Preparation System.
  \LaTeX\ User's Guide \& Reference Manual, 2nd ed, Addison-Wesley, 1994.
 \end{htmlonly}
 
-\newpage
 \appendix
+
+\newpage
+\section{\xlabel{the_star2html_command}The \texttt{star2html} command\label{star2html}}
+
+The \texttt{star2html} command sets up a Starlink-specific environment before
+calling \latextohtml\ to produce a hypertext version of a Starlink document.
+A typical invocation, is simply:
+
+\begin{quote}
+\texttt{\# star2html sun199}
+\end{quote}
+
+However, there are some optional switches which you might find useful.
+The full format of the command is:
+
+\begin{quote}
+\begin{verbatim}
+# star2html [-a author(s)] [-aux] [-c copyright_statement] 
+            [-d document_date] [-m email_address] [-s 0|1] 
+            [-obsolete] [-t title] [arguments for LaTeX2HTML] document
+\end{verbatim}
+\end{quote}
+
+The switches (all of which are optional) have the following meanings:
+
+\begin{description}
+
+\item[\texttt{-a authors}] \dash\
+   The names of the document authors.
+   If not supplied, the value of the command \verb#\stardocauthors# will be
+   used.
+   If this doesn't exist, the name of the person running the application will
+   be used.
+   The value appears in the footer of every page of the hypertext version.
+
+\item[\texttt{-aux}] \dash\
+   This controls whether or not the document \texttt{.aux} file is used.
+   (This file is produced by running LaTeX on the source file, and contains a
+   description of the section numbering).
+   If this switch is omitted, the \texttt{.aux} file is not used.
+   This default is sensible because the structure of the paper version
+   may differ from the structure of the hypertext version.
+   For example, optional diagrams and/or sections may be specified by
+   \verb+\htmlonly+ and \verb+\latexonly+ environments.
+
+\item[\texttt{-c copyright\_statement}] \dash\
+   A copyright statement to override the default which will appear
+   in the footer of each page. The default statement is found from
+   the \verb#\stardoccopyright# command if there is one in the document, or 
+   failing that from the environment variable \verb#HTX_COPYRIGHT# if defined,
+   or failing that the default is: ``Copyright \copyright\ YYYY Council for
+   the Central Laboratory of the Research Councils'' (where YYYY is the
+   current year).
+   To prevent any copyright statement from appearing, specify \verb#"-c none"#
+   or, in the absence of a \verb#\stardoccopyright# command or explicit
+   \verb#-c "copyright_statement"#, set  \verb#HTX_COPYRIGHT# to \verb#"none"#.
+
+\item[\texttt{-d document\_date}] \dash\
+   The date when the document was created.
+   If not supplied, the value of the \verb#\stardocdate# command will be used.
+   If this doesn't exist, today's date will be used.
+   The value appears in the footer of every page of the hypertext version.
+
+\item[\texttt{-hcserver URL}] \dash\
+   A URL pointing to the hardcopy server to be used for the document.
+   Should be an copy of the \texttt{hcserver} script from the HTX package.
+   If this is not set a check of the variable \texttt{HTX\_HCSERVER} is made,
+   if that is not set then no changes to the hardcopy server URL are made.
+
+\item[\texttt{-m e-mail\_address}] \dash\
+   A contact e-mail address for the document.
+   If not supplied, the value of the environment variable
+   \verb#HTX_EMAIL# will be used.
+   If this isn't set, then the e-mail address
+   ``\texttt{ussc@star.rl.ac.uk}'' will be used.
+   The value appears in the footer of every page of the hypertext version.
+   If you are only responsible for producing your own documents, you may find
+   it convenient to set this environment variable in your \texttt{.login}
+   script.
+
+\item[\texttt{-obsolete}] \dash\
+   This flag indicates you want to mark the document as obsolete. This is
+   done by displaying an image with the word OBSOLETE written into it as
+   the background.
+
+\item[\texttt{-s 1|0}] \dash\
+   This switch controls whether the input file will be split
+   into parts, or not, before being processed by \latextohtml.
+   The split occurs at \verb#\section#, \verb#\subsection#,
+   \verb#\sstroutine# and \verb#\routine# statements.
+   Splitting up the document may considerable speed up processing and
+   consequently this is the default.
+
+\item[\texttt{-t title}] \dash\
+   The title of the document.
+   If not supplied, the value of the \verb#\stardoctitle# command will be used.
+   If this fails, a name generated from the document type will be used.
+   The value is used as a title for the first page, and appears in the footer of
+   every page of the hypertext version.
+
+\item[\texttt{LATEX2HTML arguments}] \dash\
+   Any unknown arguments before the file name will be passed to \latextohtml\
+   (do not use the \verb#-dir# and \verb#-no_subdir# arguments).
+
+\item[\texttt{document}] \dash\
+   The name of the document to be converted into HTML (the file type
+   \texttt{.tex} is optional).
+
+\end{description}
+
+Some error messages always appear, but they can usually be ignored.
+
+\newpage
+\section{\xlabel{the_xlabel_command}\label{xlabel}The \texttt{xlabel} command}
+The \texttt{xlabel} command is used to ensure that all sections and subsections
+in the document include an \verb+\xlabel+ command labelling them with the
+section heading in lower case with all non-alphanumeric characters removed and
+words separated by underscore.
+
+The format of the command is:
+\begin{quote}
+\verb+# xlabel+ \textit{document}
+\end{quote}
+
+This will process the file \textit{document} and create a new version,
+\texttt{new}\textit{document}, containing any additional \verb+\xlabel+
+commands required. The file type \texttt{.tex} is optional and will be added
+if it is omitted.
+
+A label is created from the heading of each \verb+\section+ and
+\verb+\subsection+ in the specified document by removing common font-changing
+commands (such as \verb+\texttt+, \verb+\texttt+, \verb+\em+ and \verb+\emph+),
+replacing all spaces by underscore, removing all non-alphanumeric characters
+(underscore counts as alphanumeric here) and folding to lower case.
+If the sectioning command does not already contain an \verb+\xlabel+ command
+specifying the generated label, one is inserted.
+
+The labels generated will be displayed and should be inspected for
+peculiarities, probably caused by unusual \LaTeX\ commands in the heading.
+
+Warnings will be displayed if:
+\begin{itemize}
+\item The document contains an \verb+\xlabel+ command specifying the same
+label for a different section. Note that duplicates for \verb+\xlabel+'s not
+in section or subsection headings will not be detected.
+\item The section already contains an \verb+\xlabel+ command specifying
+a different label.
+\item The section heading resulted in an empty label.
+\end{itemize}
+
+When you are happy with the result, copy \texttt{new}\textit{document} back to
+\textit{document}.
+
+\newpage
+
+\section{\xlabel{the_structure_of_a_converted_hypertext_document}The structure of a converted hypertext document}
+
+Star2HTML bases the structure of the hypertext version of a \LaTeX\ document
+on the original structure defined by commands like \verb+\section+.
+However, it changes the format of the title page, adds buttons and links
+to aid navigation within the document, and adds identification information
+to each page.
+It does this automatically.
+
+It splits a document up into pages.
+Each section, subsection, and so on, is stored in its own page.
+Each page is divided into bands, separated by a horizontal line.
+The top-level page is the \emph{Title Page}.
+This is the first page you see when you start reading the document.
+
+The Title Page is divided into the following bands:
+
+\begin{enumerate}
+\item A \emph{Navigation Band}.
+ This contains a row of navigation buttons (some of which are blanked out),
+ followed by a line containing a link to the document Abstract (by default).
+\item A \emph{Title Band}.
+ This contains information from the title page of the paper document (title,
+ document number, author, date, \textit{etc.}), but presented in a different
+ order and style.
+ References to CCLRC/RAL, PPARC, and Starlink are converted into links
+ to their associate web pages.
+ A button is added to help people copy the document.
+\item A \emph{Contents Band}.
+ This looks like two bands because a horizontal line appears between the heading
+ ``Contents'' and the list of section titles (which are links to the
+ section pages).
+\item A \emph{Navigation Band}.
+ This is a duplicate of the band at the top of the page.
+ It only appears in long pages.
+\item An \emph{Identification Band}.
+ Shows the document title, code, author, date, and e-mail address.
+\end{enumerate}
+
+The other pages are made up of similar bands, some of which don't always
+appear.
+
+\begin{enumerate}
+\item A \emph{Navigation Band}.
+The lines below the navigation buttons show the titles of the Next, Up, and
+Previous pages.
+``Up'' means the next level up in the structural hierarchy, thus if the page is
+a subsection, it will point to the containing section.
+\item A \emph{Text Band}.
+This contains the author's text for the section.
+\item A \emph{Structure Band}.
+This shows the titles of the subsections in this section, with links to the
+pages containing the text.
+If the section has no subsections, this band won't appear.
+\item A \emph{Navigation Band}.
+This is a duplicate of the band at the top of the page.
+It only appears in long pages.
+\item An \emph{Identification Band}.
+ Same as for the Title Page.
+\end{enumerate}
+
+If your document has an index it will be converted to an index page with
+links from each entry to the indexed entry.
+The last page in the hypertext document will be called ``About this
+document \ldots''.
+This gives details about how and when the hypertext document was produced.
+It has no equivalent in the paper version.
+
+\newpage
+
 \section{\xlabel{changes_in_this_release}\label{changes}Changes in release 1.6}
 In this release Star2HTML has been upgraded to use \latextohtml\ version
 2000.2 exclusively (this is also part of the Starlink release).  The old
@@ -1433,212 +1657,5 @@ document conversion by splitting it up into smaller parts.
 The ``\verb#-c#'' flag (which has no effect by default) adds a
 copyright statement to the document footer (this can be set
 permanently by the \verb#HTX_COPYRIGHT# environment variable).
-
-
-\newpage
-\section{\xlabel{the_star2html_command}The \texttt{star2html} command\label{star2html}}
-
-The \texttt{star2html} command sets up a Starlink-specific environment before
-calling \latextohtml\ to produce a hypertext version of a Starlink document.
-A typical invocation, is simply:
-
-\begin{quote}
-\texttt{\# star2html sun199}
-\end{quote}
-
-However, there are some optional switches which you might find useful.
-The full format of the command is:
-
-\begin{quote}
-\begin{verbatim}
-# star2html [-a author(s)] [-aux] [-c copyright_statement] 
-            [-d document_date] [-m email_address] [-s 0|1] 
-            [-obsolete] [-t title] [arguments for LaTeX2HTML] document
-\end{verbatim}
-\end{quote}
-
-The switches (all of which are optional) have the following meanings:
-
-\begin{description}
-\item[\texttt{-a authors}] \dash\
-   The names of the document authors.
-   If not supplied, the value of the command \verb#\stardocauthors# will be
-   used.
-   If this doesn't exist, the name of the person running the application will
-   be used.
-   The value appears in the footer of every page of the hypertext version.
-\item[\texttt{-aux}] \dash\
-   This controls whether or not the document \texttt{.aux} file is used.
-   (This file is produced by running LaTeX on the source file, and contains a
-   description of the section numbering).
-   If this switch is omitted, the \texttt{.aux} file is not used.
-   This default is sensible because the structure of the paper version
-   may differ from the structure of the hypertext version.
-   For example, optional diagrams and/or sections may be specified by
-   \verb+\htmlonly+ and \verb+\latexonly+ environments.
-\item[\texttt{-c copyright\_statement}] \dash\
-   A copyright statement to override the default which will appear
-   in the footer of each page. The default statement is found from
-   the \verb#\stardoccopyright# command if there is one in the document, or 
-   failing that from the environment variable \verb#HTX_COPYRIGHT# if defined,
-   or failing that the default is: ``Copyright \copyright\ YYYY Council for
-   the Central Laboratory of the Research Councils'' (where YYYY is the
-   current year).
-   To prevent any copyright statement from appearing, specify \verb#"-c none"#
-   or, in the absence of a \verb#\stardoccopyright# command or explicit
-   \verb#-c "copyright_statement"#, set  \verb#HTX_COPYRIGHT# to \verb#"none"#.
-\item[\texttt{-d document\_date}] \dash\
-   The date when the document was created.
-   If not supplied, the value of the \verb#\stardocdate# command will be used.
-   If this doesn't exist, today's date will be used.
-   The value appears in the footer of every page of the hypertext version.
-\item[\texttt{-m e-mail\_address}] \dash\
-   A contact e-mail address for the document.
-   If not supplied, the value of the environment variable
-   \verb#HTX_EMAIL# will be used.
-   If this isn't set, then the e-mail address
-   ``\texttt{ussc@star.rl.ac.uk}'' will be used.
-   The value appears in the footer of every page of the hypertext version.
-   If you are only responsible for producing your own documents, you may find
-   it convenient to set this environment variable in your \texttt{.login}
-   script.
-\item[\texttt{-obsolete}] \dash\
-   This flag indicates you want to mark the document as obsolete. This is
-   done by displaying an image with the word OBSOLETE written into it as
-   the background.
-\item[\texttt{-s 1|0}] \dash\
-   This switch controls whether the input file will be split
-   into parts, or not, before being processed by \latextohtml.
-   The split occurs at \verb#\section#, \verb#\subsection#,
-   \verb#\sstroutine# and \verb#\routine# statements.
-   Splitting up the document may considerable speed up processing and
-   consequently this is the default.
-\item[\texttt{-t title}] \dash\
-   The title of the document.
-   If not supplied, the value of the \verb#\stardoctitle# command will be used.
-   If this fails, a name generated from the document type will be used.
-   The value is used as a title for the first page, and appears in the footer of
-   every page of the hypertext version.
-\item[\texttt{LATEX2HTML arguments}] \dash\
-   Any unknown arguments before the file name will be passed to \latextohtml\
-   (do not use the \verb#-dir# and \verb#-no_subdir# arguments).
-\item[\texttt{document}] \dash\
-   The name of the document to be converted into HTML (the file type
-   \texttt{.tex} is optional).
-
-\end{description}
-
-Some error messages always appear, but they can usually be ignored.
-
-\newpage
-\section{\xlabel{the_xlabel_command}\label{xlabel}The \texttt{xlabel} command}
-The \texttt{xlabel} command is used to ensure that all sections and subsections
-in the document include an \verb+\xlabel+ command labelling them with the
-section heading in lower case with all non-alphanumeric characters removed and
-words separated by underscore.
-
-The format of the command is:
-\begin{quote}
-\verb+# xlabel+ \textit{document}
-\end{quote}
-
-This will process the file \textit{document} and create a new version,
-\texttt{new}\textit{document}, containing any additional \verb+\xlabel+
-commands required. The file type \texttt{.tex} is optional and will be added
-if it is omitted.
-
-A label is created from the heading of each \verb+\section+ and
-\verb+\subsection+ in the specified document by removing common font-changing
-commands (such as \verb+\texttt+, \verb+\texttt+, \verb+\em+ and \verb+\emph+),
-replacing all spaces by underscore, removing all non-alphanumeric characters
-(underscore counts as alphanumeric here) and folding to lower case.
-If the sectioning command does not already contain an \verb+\xlabel+ command
-specifying the generated label, one is inserted.
-
-The labels generated will be displayed and should be inspected for
-peculiarities, probably caused by unusual \LaTeX\ commands in the heading.
-
-Warnings will be displayed if:
-\begin{itemize}
-\item The document contains an \verb+\xlabel+ command specifying the same
-label for a different section. Note that duplicates for \verb+\xlabel+'s not
-in section or subsection headings will not be detected.
-\item The section already contains an \verb+\xlabel+ command specifying
-a different label.
-\item The section heading resulted in an empty label.
-\end{itemize}
-
-When you are happy with the result, copy \texttt{new}\textit{document} back to
-\textit{document}.
-
-\newpage
-
-\section{\xlabel{the_structure_of_a_converted_hypertext_document}The structure of a converted hypertext document}
-
-Star2HTML bases the structure of the hypertext version of a \LaTeX\ document
-on the original structure defined by commands like \verb+\section+.
-However, it changes the format of the title page, adds buttons and links
-to aid navigation within the document, and adds identification information
-to each page.
-It does this automatically.
-
-It splits a document up into pages.
-Each section, subsection, and so on, is stored in its own page.
-Each page is divided into bands, separated by a horizontal line.
-The top-level page is the \emph{Title Page}.
-This is the first page you see when you start reading the document.
-
-The Title Page is divided into the following bands:
-
-\begin{enumerate}
-\item A \emph{Navigation Band}.
- This contains a row of navigation buttons (some of which are blanked out),
- followed by a line containing a link to the document Abstract (by default).
-\item A \emph{Title Band}.
- This contains information from the title page of the paper document (title,
- document number, author, date, \textit{etc.}), but presented in a different
- order and style.
- References to CCLRC/RAL, PPARC, and Starlink are converted into links
- to their associate web pages.
- A button is added to help people copy the document.
-\item A \emph{Contents Band}.
- This looks like two bands because a horizontal line appears between the heading
- ``Contents'' and the list of section titles (which are links to the
- section pages).
-\item A \emph{Navigation Band}.
- This is a duplicate of the band at the top of the page.
- It only appears in long pages.
-\item An \emph{Identification Band}.
- Shows the document title, code, author, date, and e-mail address.
-\end{enumerate}
-
-The other pages are made up of similar bands, some of which don't always
-appear.
-
-\begin{enumerate}
-\item A \emph{Navigation Band}.
-The lines below the navigation buttons show the titles of the Next, Up, and
-Previous pages.
-``Up'' means the next level up in the structural hierarchy, thus if the page is
-a subsection, it will point to the containing section.
-\item A \emph{Text Band}.
-This contains the author's text for the section.
-\item A \emph{Structure Band}.
-This shows the titles of the subsections in this section, with links to the
-pages containing the text.
-If the section has no subsections, this band won't appear.
-\item A \emph{Navigation Band}.
-This is a duplicate of the band at the top of the page.
-It only appears in long pages.
-\item An \emph{Identification Band}.
- Same as for the Title Page.
-\end{enumerate}
-
-If your document has an index it will be converted to an index page with
-links from each entry to the indexed entry.
-The last page in the hypertext document will be called ``About this
-document \ldots''.
-This gives details about how and when the hypertext document was produced.
-It has no equivalent in the paper version.
 
 \end{document}

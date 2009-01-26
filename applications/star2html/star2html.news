@@ -1,13 +1,16 @@
 1 Star2HTML_update
 
+ A new command-line option has been added "-hcserver". This defines
+ the URL of an HTX hardcopy server.
+
+ Previous news:
+
  Star2HTML has been updated to work with a new version of LaTeX2HTML.
  Previous facilities for backwards compatibility have been withdrawn
  and all documentation will now need to do updated.
 
  The /stardoccopyright declaration may include \newline\ which will
  also be handled in the HTML version of a document.
-
- Previous news:
 
  Star2HTML, the Starlink internal document hypertext support package,
  has been updated so that the default copyright is now assigned to 

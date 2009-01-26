@@ -60,6 +60,10 @@
 #        The date the document was created. If not supplied the value of
 #        the \stardocdate command will be used, if this doesn't exist
 #        todays date will be used. This appears in the footer of every page.
+#     -hcserver URL (optional)
+#        A URL pointing to the hardcopy server to be used for the document.
+#        Should be an copy of the "hcserver" script from the HTX package.
+#        Also see the HTX_HCSERVER variable.
 #     -m "contact email address" (optional)
 #        A contact email address for the document. If not supplied the
 #        value of the environment variable HTX_EMAIL will be
@@ -98,6 +102,12 @@
 #     HTX_COPYRIGHT
 #       If set then this will be used as the copyright statement. This
 #       can be overridden by the command line parameter -c.
+#
+#     HTX_HCSERVER
+#       If set then the hardcopy server part of a document will be modified
+#       to use this value. Requires that the document uses the standard
+#       template so that the required part can be identified. This can be
+#       overridden by the command parameter -hcserver.
 
 #  Examples:
 #      star2html sun109.tex
@@ -229,6 +239,8 @@
 #        made associated changes.
 #     20-MAY-2008 (PDRAPER):
 #        Parse stardocopyright to convert \newline into <BR>.
+#     26-JAN-2009 (PDRAPER):
+#        add HTX_HCSERVER support to move server to JAC.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -285,6 +297,14 @@ if ( ! -x $LATEX2HTML ) {
   die "Star2HTML fatal: failed to locate LaTeX2HTML wrapper script ($LATEX2HTML)\n";
 }
 
+#  Pick up HCSERVER for hardcopy downloads from environment, overridden by
+#  command-line. 
+$HCSERVER = $ENV{'HTX_HCSERVER'} || "0";
+
+#  Substring to match HCSERVER line and pattern for actual replacement.
+$HCSERVER_SUBSTRING = 'cgi-bin/hcserver';
+$HCSERVER_PATTERN = 'http:\/\/[^\\ ]*\/cgi-bin\/hcserver';
+
 #  Parse the command line extracting the document name and recording
 #  the status of the optional parameters.
 
@@ -302,6 +322,9 @@ while (@ARGV) {
    }
    elsif ( $next_element =~ /^-a$/ ) {
      $AUTHORS = shift;
+   }
+   elsif ( $next_element =~ /^-hcserver$/ ) {
+     $HCSERVER = shift;
    }
    elsif ( $next_element =~ /^-m$/ ) {
      $MAIL = shift;
@@ -402,19 +425,19 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
    $file = $TEXDIR . '/'. $TEXNAME . '.aux';
    if ( -e $file && $AUXCOPY ) {
       system("cp $file $DESTDIR") and
-	 &clear_up( "Star2HTML fatal: cannot copy $file into $DESTDIR\n" );
+         &clear_up( "Star2HTML fatal: cannot copy $file into $DESTDIR\n" );
       $have_auxfile = 1;
    }
    $file = $TEXDIR . '/'. $TEXNAME . '.lot';
    if ( -e $file && $AUXCOPY ) {
       system("cp $file $DESTDIR") and
-	 &clear_up( "Star2HTML fatal: cannot copy $file into $DESTDIR\n" );
+         &clear_up( "Star2HTML fatal: cannot copy $file into $DESTDIR\n" );
       $have_auxfile = 1;
    }
    $file = $TEXDIR . '/'. $TEXNAME . '.lof';
    if ( -e $file && $AUXCOPY ) {
       system("cp $file $DESTDIR") and
-	 &clear_up( "Star2HTML fatal: cannot copy $file into $DESTDIR\n" );
+         &clear_up( "Star2HTML fatal: cannot copy $file into $DESTDIR\n" );
       $have_auxfile = 1;
    }
 
@@ -654,7 +677,7 @@ sub edit_main {
 #  \documentstyle or \documentclass or end of document (assumed to be
 #  on one line).
       if ( ( index( $_, '\documentstyle' ) != -1 ) ||
-	   ( index( $_, '\documentclass' ) != -1 ) ) {
+           ( index( $_, '\documentclass' ) != -1 ) ) {
         if ( $need_styles ) {
           print( EDIT  $_ );
           print( EDIT "\\input{$htmlsty}\n" );
@@ -679,6 +702,11 @@ sub edit_main {
                   '%\end{latexonly}.' );
          }
          $comment_out = 0;
+      }
+
+#  Check for hcserver line, if changing and if found change.
+      if ( $HCSERVER ne 0 and index( $_, $HCSERVER_SUBSTRING ) != -1 ) {
+         s/$HCSERVER_PATTERN/$HCSERVER/;
       }
 
       if ( $SPLIT ) {
@@ -1242,7 +1270,7 @@ require Exporter;
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
 @EXPORT_OK = qw(
-	     uudecode uuencode
+             uudecode uuencode
 );
 $VERSION = '0.52';
 
@@ -1261,13 +1289,13 @@ sub uuencode {
 
     my($chunk,@result,$r);
     if (
-	ref($in) eq 'IO::Handle' or
-	ref(\$in) eq "GLOB" or
-	ref($in) eq "GLOB" or
-	ref($in) eq 'FileHandle'
+        ref($in) eq 'IO::Handle' or
+        ref(\$in) eq "GLOB" or
+        ref($in) eq "GLOB" or
+        ref($in) eq 'FileHandle'
        ) {
         # local $^W = 0; # Why did I get use of undefined value here ?
-	binmode($in);
+        binmode($in);
         local $/;
         $in = <$in>;
     }
@@ -1301,43 +1329,43 @@ sub uudecode {
     my(@result,$file,$mode);
     $mode = $file = "";
     if (
-	ref($in) eq 'IO::Handle' or
-	ref(\$in) eq "GLOB" or
-	ref($in) eq "GLOB" or
-	ref($in) eq 'FileHandle'
+        ref($in) eq 'IO::Handle' or
+        ref(\$in) eq "GLOB" or
+        ref($in) eq "GLOB" or
+        ref($in) eq 'FileHandle'
        ) {
-	local($\) = "\n";
-	binmode($in);
-	while (<$in>) {
-	    if ($file eq "" and !$mode){
-		($mode,$file) = ($1, $2) if /^begin\s+(\d+)\s+(.+)$/ ;
-		next;
-	    }
-	    last if /^end/;
-	    push @result, uudecode_chunk($_);
-	}
+        local($\) = "\n";
+        binmode($in);
+        while (<$in>) {
+            if ($file eq "" and !$mode){
+                ($mode,$file) = ($1, $2) if /^begin\s+(\d+)\s+(.+)$/ ;
+                next;
+            }
+            last if /^end/;
+            push @result, uudecode_chunk($_);
+        }
     } elsif (ref(\$in) eq "SCALAR") {
-	while ($in =~ m/\G(.*?(\n|\r|\r\n|\n\r))/gc) {
-	    my $line = $1;
-	    if ($file eq "" and !$mode){
-		($mode,$file) = $line =~ /^begin\s+(\d+)\s+(.+)$/ ;
-		next;
-	    }
-	    next if $file eq "" and !$mode;
-	    last if $line =~ /^end/;
-	    push @result, uudecode_chunk($line);
-	}
+        while ($in =~ m/\G(.*?(\n|\r|\r\n|\n\r))/gc) {
+            my $line = $1;
+            if ($file eq "" and !$mode){
+                ($mode,$file) = $line =~ /^begin\s+(\d+)\s+(.+)$/ ;
+                next;
+            }
+            next if $file eq "" and !$mode;
+            last if $line =~ /^end/;
+            push @result, uudecode_chunk($line);
+        }
     } elsif (ref($in) eq "ARRAY") {
-	my $line;
-	foreach $line (@$in) {
-	    if ($file eq "" and !$mode){
-		($mode,$file) = $line =~ /^begin\s+(\d+)\s+(.+)$/ ;
-		next;
-	    }
-	    next if $file eq "" and !$mode;
-	    last if $line =~ /^end/;
-	    push @result, uudecode_chunk($line);
-	}
+        my $line;
+        foreach $line (@$in) {
+            if ($file eq "" and !$mode){
+                ($mode,$file) = $line =~ /^begin\s+(\d+)\s+(.+)$/ ;
+                next;
+            }
+            next if $file eq "" and !$mode;
+            last if $line =~ /^end/;
+            push @result, uudecode_chunk($line);
+        }
     }
     wantarray ? (join("",@result),$file,$mode) : join("",@result);
 }
