@@ -12,7 +12,7 @@ C     RST - A Nx1 scratch vector (the row status vector)
 C     DET - The determinant of the matrix. DET is set to 0 for a
 C         singular matrix, and in that case, A contains garbage.
 C
-      REAL*8 A(N,N), SAVE, PIVOT, ONROW, CPREV, CNOW
+      REAL*8 A(N,N), SAVE, PIVOT, ONROW, CPREV, CNOW, DET
       INTEGER*2 RST(2,N)
 C
       MRANK = 0
@@ -43,6 +43,8 @@ C
 30    CONTINUE
       PIVOT = A(NROW,NCOL)
       IF(PIVOT.EQ.0) GO TO 300
+      IF(NCOL.EQ.0) GO TO 300
+      IF(NROW.EQ.0) GO TO 300
       RST(1,NCOL) = NROW
       RST(2,NCOL) = I
 C
