@@ -7,6 +7,8 @@ and which may be of use to anyone developing their own KAPPA-like
 applications (see SUN/238).
 
 Version 2.8
+   - KPG1_LIKE added. It obtains a section of an NDF that matches either
+     the pixel or WCS shape of a given template NDF.
    - KPG1_KYMAP can read vectors as well as scalars from a GRP
      group into an AST keyMap.
    - Added KPG1_MXMNX, which provides a single interface to the

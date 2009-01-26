@@ -204,6 +204,7 @@ kpg1_hstlo.f \
 kpg1_imprg.f \
 kpg1_isscs.f \
 kpg1_kgodr.f \
+kpg1_like.f \
 kpg1_lintd.f \
 kpg1_listc.f \
 kpg1_lutin.f \
