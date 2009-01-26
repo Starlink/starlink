@@ -11,6 +11,9 @@
 *
 * Array bound of SCALE changed from 1 to 2.
 *                                TDCA/RAL, Starlink. 26 May 1999.
+*
+* Return bad coeff values for singular matrices.
+*                                DSB, JAC/UCLan, 26 Jan 2009.
 
       PARAMETER (MAXFIT=8)
       REAL*8 COV(MAXFIT*MAXFIT), VEC(MAXFIT)
@@ -44,6 +47,10 @@
 
       CALL JTY_INVERT(NCOEFF,COV,COEFF,DET)
       IF(DET.EQ.0) THEN
+
+          DO 35 J = 1,NCOEFF
+35        COEFF( J ) = 0.0
+
           CALL PAR_WRUSER('JTY_FITLPOLY: singular covariance matrix',
      :       STATUS)
           RETURN

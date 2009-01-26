@@ -12,7 +12,7 @@
       REAL*8 COV(MAXFIT*MAXFIT*MAXFIT*MAXFIT), VEC(MAXFIT*MAXFIT)
       REAL*8 COEFF(1)
       REAL*8 AX, BX, AY, BY, XSC, YSC, JTY_LPI, DET
-      REAL*4 X(1), Y(1), Z(1), SCALE(1)
+      REAL*4 X(1), Y(1), Z(1), SCALE(4)
       INTEGER STATUS
 
       AX = 2.0D0 / (SCALE(2) - SCALE(1))
@@ -47,6 +47,10 @@
 
       CALL JTY_INVERT(NFIT,COV,COEFF,DET)
       IF(DET.EQ.0) THEN
+
+          DO 35 J = 1,NFIT
+35        COEFF(J) = 0
+
           CALL PAR_WRUSER('JTY_FIT2DLPOLY: singular covariance matrix',
      :       STATUS)
           RETURN
