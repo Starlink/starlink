@@ -31,20 +31,26 @@ C
       PIVOT = 0
       NROW = 0
       NCOL = 0
+
       DO 30 J = 1,N
-      IF(RST(1,J).NE.0) GO TO 30
-      DO 20 K = 1,N
-      IF(RST(1,K).NE.0) GO TO 20
-      IF(PIVOT.GE.DABS(A(J,K))) GO TO 20
-      PIVOT = DABS(A(J,K))
-      NROW = J
-      NCOL = K
-20    CONTINUE
+         IF(RST(1,J).NE.0) GO TO 30
+
+         DO 20 K = 1,N
+            IF(RST(1,K).NE.0) GO TO 20
+            IF(PIVOT.GE.DABS(A(J,K))) GO TO 20
+            PIVOT = DABS(A(J,K))
+            NROW = J
+            NCOL = K
+20       CONTINUE
+
 30    CONTINUE
-      PIVOT = A(NROW,NCOL)
-      IF(PIVOT.EQ.0) GO TO 300
+
       IF(NCOL.EQ.0) GO TO 300
       IF(NROW.EQ.0) GO TO 300
+
+      PIVOT = A(NROW,NCOL)
+      IF(PIVOT.EQ.0) GO TO 300
+
       RST(1,NCOL) = NROW
       RST(2,NCOL) = I
 C
