@@ -1297,7 +1297,7 @@ typedef struct AstObjectVtab {
    AstObject **free_list;        /* List of pointers for freed Objects */
 
 #if defined(THREAD_SAFE)
-   int (* ManageLock)( AstObject *, int, int, int * );
+   int (* ManageLock)( AstObject *, int, int, AstObject **, int * );
 #endif
 
 } AstObjectVtab;
@@ -1420,7 +1420,7 @@ void astShow_( AstObject *, int * );
 AstObject *astCast_( AstObject *, AstObject *, int * );
 
 #if defined(THREAD_SAFE)
-int astManageLock_( AstObject *, int, int, int * );
+int astManageLock_( AstObject *, int, int, AstObject **, int * );
 #endif
 
 int astGetObjSize_( AstObject *, int * );
@@ -1563,10 +1563,10 @@ astINVOKE(V,astSame_(astCheckObject(this),astCheckObject(that),STATUS_PTR))
 #if defined(astCLASS)            /* Protected */
 
 #if defined(THREAD_SAFE)
-#define astManageLock(this,mode,extra) \
-astINVOKE(V,astManageLock_(astCheckObject(this),mode, extra,STATUS_PTR))
+#define astManageLock(this,mode,extra,fail) \
+astINVOKE(V,astManageLock_(astCheckObject(this),mode, extra,fail,STATUS_PTR))
 #else
-#define astManageLock(this,mode,extra) 
+#define astManageLock(this,mode,extra,fail) 
 #endif
 
 #define astGetObjSize(this) astINVOKE(V,astGetObjSize_(astCheckObject(this),STATUS_PTR))
