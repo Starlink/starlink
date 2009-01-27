@@ -15,18 +15,25 @@
 
    o  FITSMOD
 
-      - Parameter EDIT has a new option "Null".  This will 
+      -  Parameter EDIT has a new option "Null".  This will 
       nullify the value of the chosen keyword, by substituting
       spaces for its value.
 
-      - Likewise there is an Null option for Field 1 of the file
+      -  Likewise there is an Null option for Field 1 of the file
       format.
+
+   o  HISCOM
+
+      -  A new parameter called DATE has been added.  This allows 
+      the date and time of the new history record to be set explicitly 
+      rather than to the default current time.  There is a choice of 
+      formats including Gregorian Date and Time, and Julian Date.
 
    o  NDFCOPY
 
-      - A new parameter caller LIKEWCS has been added. This allows the
-      shape of the template NDF in the WCS frame to be used to determine 
-      the bounds of the output NDF.
+      -  A new parameter called LIKEWCS has been added.  This 
+      allows the shape of the template NDF in the WCS Frame to be 
+      used to determine the bounds of the output NDF.
 
 1 KAPPA_Version_1.9
 
@@ -37,8 +44,8 @@
 2 New_applications
 
    o  PROVMOD allows provenance to be modified within an NDF.  The 
-   CREATOR, DATE, and PATH components of the PROVENANCE extension may 
-   be altered using a substitution syntax incorporating string 
+   CREATOR, DATE, and PATH components of the PROVENANCE extension 
+   may be altered using a substitution syntax incorporating string 
    matching atoms and quantifiers.
 
    o  PROVREM allows selected provenance to be removed from an NDF.
@@ -63,14 +70,14 @@
 
    o  FFCLEAN 
    
-      - This has been extended to operate on cubes, either by
+      -  This has been extended to operate on cubes, either by
       processing the cubes as a set of independent one-dimensional
       spectra, or as a set of independent two-dimensional images
       (see the new parameter AXES).  Likewise you can process a
       two-dimensional NDF as a set of independent one-dimensional
       spectra.
 
-      - It can store the calculated noise level in the output
+      -  It can store the calculated noise level in the output
       variance array (see new parameter GENVAR).  If the NDF is
       processed as a set of spectra or images, then each
       individual spectrum or image is assigned its own noise
@@ -78,12 +85,12 @@
 
    o  FITSMOD
 
-      - Parameter EDIT has a new option "Amend".  This will write a 
+      -  Parameter EDIT has a new option "Amend".  This will write a 
       new header if the chosen keyword does not exist, but will only 
       modify an existing header.  Using this option, it is now not 
       necessary to know whether or not a header exists.  
        
-      - Likewise there is an Amend option for Field 1 of the file
+      -  Likewise there is an Amend option for Field 1 of the file
       format. 
 
    o  MAKESNR 
@@ -93,7 +100,7 @@
 
    o  MFITTREND
 
-      - Cubic-spline fitting is now available, the type of fit is
+      -  Cubic-spline fitting is now available, the type of fit is
       controlled by the new parameter FITTYPE.  There are two subtypes
       of fit selected by new parameter INTERPOL: interpolation through
       specified or equally spaced knots, or smoothing at automatically
@@ -104,18 +111,18 @@
 
    o  MSTATS 
    
-      - This now offers a wider selection of statistics to combine
+      -  This now offers a wider selection of statistics to combine
       the supplied NDFs.  Note that for consistency with other
       applications, the SMODE parameter has been replaced by
       ESTIMATOR. Scripts should be modified accordingly.
 
-      - There are two further new parameters: VARIANCE to control
+      -  There are two further new parameters: VARIANCE to control
       whether or not to use variance to weight the statistics
       (previously this effectively set true); and WLIM to decide
       the minimum fraction of good contributing value to form a
       non-bad output value.
 
-      - It uses NDF blocking to avoid excessive memory
+      -  It uses NDF blocking to avoid excessive memory
       requirements.
 
    o  PROVSHOW has a new parameter SHOW that can be used to select the
@@ -173,11 +180,11 @@
 
    o  ARDMASK 
    
-      - This now has an option to use WCS co-ordinates in the input
+      -  This now has an option to use WCS co-ordinates in the input
       NDF as the default co-ordinate system for the supplied ARD
       description.  See the new parameter DEFPIX.
 
-      - It can now use a two-dimensional ARD description to mask each
+      -  It can now use a two-dimensional ARD description to mask each
       plane in a three-dimensional NDF.
 
    o  COLLAPSE issues a warning whenever any output values are set

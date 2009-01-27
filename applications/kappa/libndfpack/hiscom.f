@@ -42,26 +42,26 @@
 *     DATE =  LITERAL (Read)
 *        The date and time to associated with the new history record. 
 *        Normally, a null (!) value should be supplied, in which case 
-*        the current UTC date and time will be used. If a value is
-*        supplied. it should be in one of the following forms:
+*        the current UTC date and time will be used.  If a value is
+*        supplied, it should be in one of the following forms.
 *
-*           "Gregorian Calendar Date" --- With the month expressed either 
-*           as an integer or a 3-character abbreviation, and with 
-*           optional decimal places to represent a fraction of a day 
-*           ("1996-10-2" or "1996-Oct-2.6" for example). If no fractional 
-*           part of a day is given, the time refers to the start of the 
-*           day (zero hours).
+*           Gregorian Calendar Date --- With the month expressed 
+*           either as an integer or a 3-character abbreviation, and with 
+*           optional decimal places to represent a fraction of a day
+*           ("1996-10-2" or "1996-Oct-2.6" for example).  If no 
+*           fractional part of a day is given, the time refers to the 
+*           start of the day (zero hours).
 *           
-*           "Gregorian Date and Time" --- Any calendar date (as above) 
+*           Gregorian Date and Time --- Any calendar date (as above) 
 *           but with a fraction of a day expressed as hours, minutes and 
-*           seconds ("1996-Oct-2 12:13:56.985" for example). The date and 
-*           time can be separated by a space or by a "T" (as used by 
-*           ISO8601 format).
+*           seconds ("1996-Oct-2 12:13:56.985" for example).  The date
+*           and time can be separated by a space or by a "T" (as used by
+*           ISO 8601 format).
 *           
-*           "Modified Julian Date" --- With or without decimal places
+*           Modified Julian Date --- With or without decimal places
 *           ("MJD 54321.4" for example).
 *           
-*           "Julian Date" --- With or without decimal places 
+*           Julian Date --- With or without decimal places 
 *           ("JD 2454321.9" for example).
 *        [!]
 *     FILE =  FILENAME (Read)
