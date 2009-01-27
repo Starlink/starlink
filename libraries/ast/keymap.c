@@ -257,7 +257,7 @@ static void (* parent_clearattrib)( AstObject *, const char *, int * );
 static void (* parent_setattrib)( AstObject *, const char *, int * );
 
 #if defined(THREAD_SAFE)
-static int (* parent_managelock)( AstObject *, int, int, int * );
+static int (* parent_managelock)( AstObject *, int, int, AstObject **, int * );
 #endif
 
 /* Define macros for accessing each item of thread specific global data. */
@@ -398,7 +398,7 @@ static void ClearSizeGuess( AstKeyMap *, int * );
 static void SetSizeGuess( AstKeyMap *, int, int * );
 
 #if defined(THREAD_SAFE)
-static int ManageLock( AstObject *, int, int, int * );
+static int ManageLock( AstObject *, int, int, AstObject **, int * );
 #endif
 
 /* Member functions. */
@@ -2402,7 +2402,8 @@ static int KeyCmp( const char *key1, const char *key2, int *status ) {
 }
 
 #if defined(THREAD_SAFE)
-static int ManageLock( AstObject *this_object, int mode, int extra, int *status ) {
+static int ManageLock( AstObject *this_object, int mode, int extra, 
+                       AstObject **fail, int *status ) {
 /*
 *  Name:
 *     ManageLock
@@ -2415,7 +2416,8 @@ static int ManageLock( AstObject *this_object, int mode, int extra, int *status 
 
 *  Synopsis:
 *     #include "object.h"
-*     AstObject *ManageLock( AstObject *this, int mode, int extra, int *status ) 
+*     AstObject *ManageLock( AstObject *this, int mode, int extra, 
+*                            AstObject **fail, int *status ) 
 
 *  Class Membership:
 *     KeyMap member function (over-rides the astManageLock protected
@@ -2443,6 +2445,13 @@ static int ManageLock( AstObject *this_object, int mode, int extra, int *status 
 *        calling thread (report an error if not).
 *     extra
 *        Extra mode-specific information. 
+*     fail
+*        If a non-zero function value is returned, a pointer to the
+*        Object that caused the failure is returned at "*fail". This may
+*        be "this" or it may be an Object contained within "this". Note,
+*        the Object's reference count is not incremented, and so the
+*        returned pointer should not be annulled. A NULL pointer is 
+*        returned if this function returns a value of zero.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -2479,6 +2488,10 @@ static int ManageLock( AstObject *this_object, int mode, int extra, int *status 
 /* Obtain a pointers to the KeyMap structure. */
    this = (AstKeyMap *) this_object;
 
+/* Invoke the ManageLock method inherited from the parent class. */
+   if( !result ) result = (*parent_managelock)( this_object, mode, extra,
+                                                fail, status );
+
 /* Invoke the astManageLock method on any Objects contained within
    the supplied Object. */
    for( itab = 0; itab < this->mapsize; itab++ ) {
@@ -2488,12 +2501,13 @@ static int ManageLock( AstObject *this_object, int mode, int extra, int *status 
             nel = next->nel;
             if( nel == 0 ) {
                obj = ( (Entry0A *) next )->value;
-               if( !result ) result = astManageLock( obj, mode, extra );
+               if( !result ) result = astManageLock( obj, mode, extra, fail );
             } else {
                alist = ( (Entry1A *) next )->value;
                if( alist ) {
                   for( i = 0; i < nel; i++ ) {
-                     if( !result ) result = astManageLock( alist[ i ], mode, extra );
+                     if( !result ) result = astManageLock( alist[ i ], mode, 
+                                                           extra, fail );
                   }
                }
             }
@@ -2502,9 +2516,6 @@ static int ManageLock( AstObject *this_object, int mode, int extra, int *status 
       }
    }
 
-/* Invoke the ManageLock method inherited from the parent class, and
-   return the resulting status value. */
-   if( !result ) result = (*parent_managelock)( this_object, mode, extra, status );
    return result;
 
 }

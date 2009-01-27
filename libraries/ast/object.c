@@ -378,7 +378,7 @@ static int CheckThread( int ihandle, int head );
 
 #if defined(THREAD_SAFE)
 static void ChangeThreadVtab( AstObject *, int * );
-static int ManageLock( AstObject *, int, int, int * );
+static int ManageLock( AstObject *, int, int, AstObject **, int * );
 #endif
 
 /* Member functions. */
@@ -920,7 +920,7 @@ f     function is invoked with STATUS set to an error value, or if it
       }
       new->locker = -1;
       new->globals = NULL;
-      (void) ManageLock( new, AST__LOCK, 0, status );
+      (void) ManageLock( new, AST__LOCK, 0, NULL, status );
 #endif
 
 /* Loop to execute any copy constructors declared by derived classes. */
@@ -1048,7 +1048,7 @@ f     value
 
 /* Attempt to unlock and destroy the mutex. */
 #if defined(THREAD_SAFE)
-   ManageLock( this, AST__UNLOCK, 0, status );
+   (void) ManageLock( this, AST__UNLOCK, 0, NULL, status );
    pthread_mutex_destroy( &(this->mutex) );
    pthread_mutex_destroy( &(this->mutexl) );
 #endif
@@ -2033,7 +2033,8 @@ static unsigned long Magic( const AstObject *this, size_t size, int *status ) {
 }
 
 #if defined(THREAD_SAFE)
-static int ManageLock( AstObject *this, int mode, int extra, int *status ) {
+static int ManageLock( AstObject *this, int mode, int extra, 
+                       AstObject **fail, int *status ) {
 /*
 *+
 *  Name:
@@ -2047,7 +2048,8 @@ static int ManageLock( AstObject *this, int mode, int extra, int *status ) {
 
 *  Synopsis:
 *     #include "object.h"
-*     int astManageLock( AstObject *this, int mode, int extra ) 
+*     int astManageLock( AstObject *this, int mode, int extra, 
+*                        AstObject **fail ) 
 
 *  Class Membership:
 *     Object method.
@@ -2071,9 +2073,16 @@ static int ManageLock( AstObject *this, int mode, int extra, int *status ) {
 *        AST__UNLOCK: Unlock the Object for use by other threads.
 *
 *        AST__CHECKLOCK: Check that the object is locked for use by the
-*        calling thread (report an error if not).
+*        calling thread.
 *     extra
 *        Extra mode-specific information. 
+*     fail
+*        If a non-zero function value is returned, a pointer to the
+*        Object that caused the failure is returned at "*fail". This may
+*        be "this" or it may be an Object contained within "this". Note,
+*        the Object's reference count is not incremented, and so the
+*        returned pointer should not be annulled. A NULL pointer is 
+*        returned if this function returns a value of zero.
 
 *  Returned Value:
 *     A status value:
@@ -2098,6 +2107,7 @@ static int ManageLock( AstObject *this, int mode, int extra, int *status ) {
 
 /* Initialise */
    result = 0;
+   if( fail ) *fail = NULL;
 
 /* Check the supplied point is not NULL. */
    if( ! this ) return result;
@@ -2183,6 +2193,9 @@ static int ManageLock( AstObject *this, int mode, int extra, int *status ) {
    it is locked. */
    if( pthread_mutex_unlock( &(this->mutexl) ) ) result = 3;
 
+/* If the operation failed, return a pointer to the failed object. */
+   if( result && fail ) *fail = this;
+
 /* Return the status value */
    return result;
 }
@@ -2229,22 +2242,37 @@ AstObject *astCheckLock_( AstObject *this, int *status ) {
 /* This function does nothing in the non-threads version of libast. */
 #if defined(THREAD_SAFE)
 
+/* Local Variables; */
+   AstObject *fail;
+
 /* Check the supplied pointer. */
    if( this ) {
 
-/* We use the private ManageLock function rather than the virtual 
-   astManageLock method to avoid the unnecessary overhead of checking 
-   any Objects contained within the top level Object. If the top level 
-   object is locked correctly, then any contained objects must also 
-   be locked correctly. Report an appropriate error if anything went 
-   wrong. */
-      if( astOK && ManageLock( this, AST__CHECKLOCK, 0, status ) ) {
-         astError( AST__LCKERR, "astCheckLock(%s): The supplied %s cannot "
-                   "be used since it is already locked for exclusive use "
-                   "by another thread (programming error).", status, 
-                   astGetClass( this ), astGetClass( this ) );
+/* First use the private ManageLock function rather than the virtual 
+   astManageLock method to check the top level Object is locked for use
+   by the current thread. This saves time and allows a more appropriate
+   error message to be issued. */
+      if( ManageLock( this, AST__CHECKLOCK, 0, NULL, status ) ) {
+         if( astOK ) {
+            astError( AST__LCKERR, "astCheckLock(%s): The supplied %s cannot "
+                      "be used since it is not locked for use by the current "
+                      "thread (programming error).", status, astGetClass( this ),
+                      astGetClass( this ) );
+         }
+
+/* If the top level Object is locked, now use the virtual astManageLock 
+   method to check any objects contained within the top level Object. */
+      } else if( astManageLock( this, AST__CHECKLOCK, 0, &fail ) ) {
+         if( astOK ) {
+            astError( AST__LCKERR, "astCheckLock(%s): The supplied %s cannot "
+                      "be used since a %s contained within the %s is not "
+                      "locked for use by the current thread (programming "
+                      "error).", status, astGetClass( this ), 
+                       astGetClass( this ), astGetClass( fail ), 
+                       astGetClass( this ) );
+         }
       }
-   }   
+   }
 #endif
 
 /* Return the supploed pointer. */
@@ -4444,7 +4472,7 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
          }
          new->locker = -1;
          new->globals = NULL;
-         (void) ManageLock( new, AST__LOCK, 0, status );
+         (void) ManageLock( new, AST__LOCK, 0, NULL, status );
          if( !astOK ) new = astDelete( new );
 #endif
       }
@@ -4612,9 +4640,10 @@ void astDump_( AstObject *this, AstChannel *channel, int *status ) {
 }
 
 #if defined(THREAD_SAFE)
-int astManageLock_( AstObject *this, int mode, int extra, int *status ) {
+int astManageLock_( AstObject *this, int mode, int extra, AstObject **fail,
+                    int *status ) {
    if( !this ) return 0;
-   return (**astMEMBER(this,Object,ManageLock))( this, mode, extra, status );
+   return (**astMEMBER(this,Object,ManageLock))( this, mode, extra, fail, status );
 }
 #endif
 
@@ -5788,6 +5817,7 @@ c--
 
 /* Local Variables: */
    astDECLARE_GLOBALS;           /* Thread-specific global data */
+   AstObject *fail;              /* Pointer to Object that failed to lock */
    AstObject *this;              /* Pointer to Object */
    int ihandle;                  /* Index of supplied objetc handle */
    int lstat;                    /* Local status value */
@@ -5801,12 +5831,22 @@ c--
 
 /* The protected astManageLock function implements the public functions, 
    astLock and astUnlock. */
-   lstat = astManageLock( this, AST__LOCK, wait );
+   lstat = astManageLock( this, AST__LOCK, wait, &fail );
    if( astOK ) {
       if( lstat == 1 ) {
-         astError( AST__LCKERR, "astLock(%s): Failed to lock the %s because "
-                   "it is already locked by another thread (programming "
-                   "error).", status, astGetClass( this ), astGetClass( this ) );
+         if( fail == this ) {
+            astError( AST__LCKERR, "astLock(%s): Failed to lock the %s because"
+                      " it is already locked by another thread (programming "
+                      "error).", status, astGetClass( this ), 
+                      astGetClass( this ) );
+
+         } else {
+            astError( AST__LCKERR, "astLock(%s): Failed to lock the %s because"
+                      " a %s contained within it is already locked by another "
+                      "thread (programming error).", status, 
+                      astGetClass( this ), astGetClass( this ),
+                      astGetClass( fail ) );
+         }
 
       } else if( lstat == 2 ) {
          astError( AST__LCKERR, "astLock(%s): Failed to lock a POSIX mutex.", status,
@@ -5889,6 +5929,7 @@ c--
 
 /* Local Variables: */
    astDECLARE_GLOBALS;           /* Thread-specific global data */
+   AstObject *fail;              /* Pointer to Object that failed */
    AstObject *this;              /* Pointer to Object */
    int ihandle;                  /* Index of supplied objetc handle */
    int lstat;                    /* Local status value */
@@ -5902,12 +5943,23 @@ c--
 
 /* The protected astManageLock function implements the public functions, 
    astLock and astUnlock. */
-   lstat = astManageLock( this, AST__UNLOCK, 0 );
+   lstat = astManageLock( this, AST__UNLOCK, 0, &fail );
    if( astOK ) {
       if( lstat == 1 ) {
-         astError( AST__LCKERR, "astUnlock(%s): Failed to unlock the %s because "
-                   "it is locked by another thread (programming "
-                   "error).", status, astGetClass( this ), astGetClass( this ) );
+         if( fail == this ) {
+            astError( AST__LCKERR, "astUnlock(%s): Failed to unlock the %s "
+                      "because it is locked by another thread (programming "
+                      "error).", status, astGetClass( this ), 
+                      astGetClass( this ) );
+
+         } else {
+            astError( AST__LCKERR, "astUnlock(%s): Failed to unlock the %s "
+                      "because a %s contained within it is locked by another "
+                      "thread (programming error).", status, 
+                      astGetClass( this ), astGetClass( this ),
+                      astGetClass( fail ) );
+         }
+
 
       } else if( lstat == 3 ) {
          astError( AST__LCKERR, "astUnlock(%s): Failed to unlock a POSIX mutex.", status,

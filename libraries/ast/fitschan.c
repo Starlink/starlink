@@ -1145,7 +1145,7 @@ static int (* parent_write)( AstChannel *, AstObject *, int * );
 static AstObject *(* parent_read)( AstChannel *, int * );
 
 #if defined(THREAD_SAFE)
-static int (* parent_managelock)( AstObject *, int, int, int * );
+static int (* parent_managelock)( AstObject *, int, int, AstObject **, int * );
 #endif
 
 /* Strings to describe each data type. These should be in the order implied
@@ -1586,7 +1586,7 @@ static void WriteString( AstChannel *, const char *, int, int, const char *, con
 static void WriteToSink( AstFitsChan *, int * );
 
 #if defined(THREAD_SAFE)
-static int ManageLock( AstObject *, int, int, int * );
+static int ManageLock( AstObject *, int, int, AstObject **, int * );
 #endif
 
 
@@ -17938,7 +17938,8 @@ static int MakeIntWorld( AstMapping *cmap, AstFrame *fr, int *wperm, char s,
 }
 
 #if defined(THREAD_SAFE)
-static int ManageLock( AstObject *this_object, int mode, int extra, int *status ) {
+static int ManageLock( AstObject *this_object, int mode, int extra, 
+                       AstObject **fail, int *status ) {
 /*
 *  Name:
 *     ManageLock
@@ -17951,7 +17952,8 @@ static int ManageLock( AstObject *this_object, int mode, int extra, int *status 
 
 *  Synopsis:
 *     #include "object.h"
-*     AstObject *ManageLock( AstObject *this, int mode, int extra, int *status ) 
+*     AstObject *ManageLock( AstObject *this, int mode, int extra, 
+*                            AstObject **fail, int *status ) 
 
 *  Class Membership:
 *     FitsChan member function (over-rides the astManageLock protected
@@ -17979,6 +17981,13 @@ static int ManageLock( AstObject *this_object, int mode, int extra, int *status 
 *        calling thread (report an error if not).
 *     extra
 *        Extra mode-specific information. 
+*     fail
+*        If a non-zero function value is returned, a pointer to the
+*        Object that caused the failure is returned at "*fail". This may
+*        be "this" or it may be an Object contained within "this". Note,
+*        the Object's reference count is not incremented, and so the
+*        returned pointer should not be annulled. A NULL pointer is 
+*        returned if this function returns a value of zero.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -18009,14 +18018,15 @@ static int ManageLock( AstObject *this_object, int mode, int extra, int *status 
 /* Obtain a pointers to the FitsChan structure. */
    this = (AstFitsChan *) this_object;
 
+/* Invoke the ManageLock method inherited from the parent class. */
+   if( !result ) result = (*parent_managelock)( this_object, mode, extra,
+                                                fail, status );
+
 /* Invoke the astManageLock method on any Objects contained within
    the supplied Object. */
-   if( !result ) result = astManageLock( this->keyseq, mode, extra );
-   if( !result ) result = astManageLock( this->keywords, mode, extra );
+   if( !result ) result = astManageLock( this->keyseq, mode, extra, fail );
+   if( !result ) result = astManageLock( this->keywords, mode, extra, fail );
 
-/* Invoke the ManageLock method inherited from the parent class, and
-   return the resulting status value. */
-   if( !result ) result = (*parent_managelock)( this_object, mode, extra, status );
    return result;
 
 }
@@ -26572,8 +26582,8 @@ static double TDBConv( double mjd, int timescale, int fromTDB,
 
 /* Lock the timeframes for use by the current thread, waiting if they are
    currently locked by another thread. */
-      astManageLock( timeframe, AST__LOCK, 1 );
-      astManageLock( tdbframe, AST__LOCK, 1 );
+      astManageLock( timeframe, AST__LOCK, 1, NULL );
+      astManageLock( tdbframe, AST__LOCK, 1, NULL );
 
 /* Set the required timescale. */
       astSetTimeScale( timeframe, timescale );
@@ -26585,8 +26595,8 @@ static double TDBConv( double mjd, int timescale, int fromTDB,
       fs = astAnnul( fs );
 
 /* Unlock the timeframes. */
-      astManageLock( timeframe, AST__UNLOCK, 1 );
-      astManageLock( tdbframe, AST__UNLOCK, 1 );
+      astManageLock( timeframe, AST__UNLOCK, 1, NULL );
+      astManageLock( tdbframe, AST__UNLOCK, 1, NULL );
    }
 
 /* Return the result */

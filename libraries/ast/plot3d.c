@@ -1202,7 +1202,7 @@ static void (* parent_clearattrib)( AstObject *, const char *, int * );
 static void (* parent_setattrib)( AstObject *, const char *, int * );
 
 #if defined(THREAD_SAFE)
-static int (* parent_managelock)( AstObject *, int, int, int * );
+static int (* parent_managelock)( AstObject *, int, int, AstObject **, int * );
 #endif
 
 /* Define macros for accessing each item of thread specific global data. */
@@ -1302,7 +1302,7 @@ static void ClearAttrib( AstObject *, const char *, int * );
 static void SetAttrib( AstObject *, const char *, int * );
 
 #if defined(THREAD_SAFE)
-static int ManageLock( AstObject *, int, int, int * );
+static int ManageLock( AstObject *, int, int, AstObject **, int * );
 #endif
 
 /* Declare private member functions that access Plot3D attributes. 
@@ -3679,7 +3679,8 @@ SET_PLOT_ACCESSORS(Size)
 }
 
 #if defined(THREAD_SAFE)
-static int ManageLock( AstObject *this_object, int mode, int extra, int *status ) {
+static int ManageLock( AstObject *this_object, int mode, int extra, 
+                       AstObject **fail, int *status ) {
 /*
 *  Name:
 *     ManageLock
@@ -3692,10 +3693,11 @@ static int ManageLock( AstObject *this_object, int mode, int extra, int *status 
 
 *  Synopsis:
 *     #include "object.h"
-*     AstObject *ManageLock( AstObject *this, int mode, int extra, int *status ) 
+*     AstObject *ManageLock( AstObject *this, int mode, int extra, 
+*                            AstObject **fail, int *status ) 
 
 *  Class Membership:
-*     Plot3D member function (over-rides the astManageLock protected
+*     CmpMap member function (over-rides the astManageLock protected
 *     method inherited from the parent class).
 
 *  Description:
@@ -3720,6 +3722,13 @@ static int ManageLock( AstObject *this_object, int mode, int extra, int *status 
 *        calling thread (report an error if not).
 *     extra
 *        Extra mode-specific information. 
+*     fail
+*        If a non-zero function value is returned, a pointer to the
+*        Object that caused the failure is returned at "*fail". This may
+*        be "this" or it may be an Object contained within "this". Note,
+*        the Object's reference count is not incremented, and so the
+*        returned pointer should not be annulled. A NULL pointer is 
+*        returned if this function returns a value of zero.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -3750,15 +3759,16 @@ static int ManageLock( AstObject *this_object, int mode, int extra, int *status 
 /* Obtain a pointers to the Plot3D structure. */
    this = (AstPlot3D *) this_object;
 
+/* Invoke the ManageLock method inherited from the parent class. */
+   if( !result ) result = (*parent_managelock)( this_object, mode, extra,
+                                                fail, status );
+
 /* Invoke the astManageLock method on any Objects contained within
    the supplied Object. */
-   if( !result ) result = astManageLock( this->plotxy, mode, extra );
-   if( !result ) result = astManageLock( this->plotxz, mode, extra );
-   if( !result ) result = astManageLock( this->plotyz, mode, extra );
+   if( !result ) result = astManageLock( this->plotxy, mode, extra, fail );
+   if( !result ) result = astManageLock( this->plotxz, mode, extra, fail );
+   if( !result ) result = astManageLock( this->plotyz, mode, extra, fail );
 
-/* Invoke the ManageLock method inherited from the parent class, and
-   return the resulting status value. */
-   if( !result ) result = (*parent_managelock)( this_object, mode, extra, status );
    return result;
 
 }
