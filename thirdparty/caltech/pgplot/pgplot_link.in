@@ -64,6 +64,7 @@
 #        Include err_link
 #     07-OCT-2004 (PWD):
 #        Moved into drivers so we can make -lpng -lz optional.
+#        (no longer true, -lpng are now required).
 #     {enter_further_changes_here}
 
 #  Bugs:

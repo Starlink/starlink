@@ -51,6 +51,7 @@
 #        Forgot to include png and z libraries
 #     07-OCT-2004 (PWD):
 #        Moved into drivers so we can make -lpng and -lz optional.
+#        (no longer true -lpng and -lz are required again).
 #     {enter_further_changes_here}
 
 #  Bugs:
