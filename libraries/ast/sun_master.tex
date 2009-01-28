@@ -4741,7 +4741,14 @@ multi-threaded application.
 \subsubsection{Locking AST Objects for Exclusive Use}
 The basic restriction is that a thread can only access Objects that it
 has previously locked for its own exclusive use. If a thread attempts to
-access any Object that it has not locked, an error is reported. 
+access any Object that it has not locked, an error is reported.
+
+The astAnnul function is the one exception to this restriction. Pointers
+for Objects not currently locked by the calling thread can be annulled
+succesfully using astAnnul. This means that a thread that has finished
+with an Object pointer can unlock the Object by passing the pointer to
+astUnlock (so that other threads can use the Object via their own cloned
+pointers), and can then annul the pointer using astAnnul.
 
 When an Object is created, it is initially locked by the calling thread.
 Therefore a thread does not need to lock an Object explicitly if it was

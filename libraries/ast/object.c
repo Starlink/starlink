@@ -295,6 +295,22 @@ static pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
 #define LOCK_MUTEX2 pthread_mutex_lock( &mutex2 );
 #define UNLOCK_MUTEX2 pthread_mutex_unlock( &mutex2 ); 
 
+/* Each Object contains two mutexes. The primary mutex (mutex1) is used
+   to guard access to all aspects of the Object except for the "locker"
+   and "ref_count" items. The secondary mutex (mutex2) is used to guard
+   access to these two remaining items. We need this secondary mutex
+   since the "locker" and "ref_count" items need to be accessable within
+   a thread even if that thread has not locked the Object using astLock.
+   Define macros for accessing these two mutexes. */
+#define LOCK_PMUTEX(this) (pthread_mutex_lock(&((this)->mutex1)))
+#define UNLOCK_PMUTEX(this) (pthread_mutex_unlock(&((this)->mutex1)))
+#define LOCK_SMUTEX(this) (pthread_mutex_lock(&((this)->mutex2)))
+#define UNLOCK_SMUTEX(this) (pthread_mutex_unlock(&((this)->mutex2)))
+
+
+
+
+
 /* If thread safety is not needed, declare and initialise globals at static 
    variables. */ 
 #else
@@ -332,9 +348,13 @@ static int astgetc_istr = 0;
 /* "AstGetC_Strings" array initialised? */ 
 static int astgetc_init = 0;
 
-/* Null macros for mutex locking an dunlocking */
+/* Null macros for mutex locking and unlocking */
 #define LOCK_MUTEX2
 #define UNLOCK_MUTEX2
+#define LOCK_PMUTEX(this)
+#define LOCK_SMUTEX(this)
+#define UNLOCK_PMUTEX(this)
+#define UNLOCK_SMUTEX(this)
 
 #endif
 
@@ -435,6 +455,8 @@ c        This function applies to all Objects.
 f        This routine applies to all Objects.
 
 *  Notes:
+c     - This function will attempt to annul the pointer even if the
+c     Object is not currently locked by the calling thread (see astLock).
 c     - This function attempts to execute even if the AST error
 c     status is set
 f     - This routine attempts to execute even if STATUS is set to an
@@ -451,6 +473,10 @@ f     error value
    generates an error if it doesn't). */
    if ( !astIsAObject( this ) ) return NULL;
 
+/* Get a lock on the object's secondary mutex. This mutex guards access
+   to the "ref_count" and "locker" components of the AstObject structure. */
+   LOCK_SMUTEX(this);
+
 #ifdef MEM_DEBUG
    {   int rc;
        char buf[100];
@@ -460,12 +486,78 @@ f     error value
    }
 #endif
 
+/* Decrement the Object's reference count. */
+   --(this->ref_count);
+
+/* Unlock the object's secondary mutex. */
+   UNLOCK_SMUTEX(this);
+
 /* Decrement the Object's reference count and delete the Object if
    necessary. */
-   if ( !--this->ref_count ) (void) astDelete( this );
+   if ( !this->ref_count ) (void) astDelete( this );
 
 /* Always return NULL. */
    return NULL;
+}
+
+AstObject *astCast_( AstObject *this, AstObject *obj, int *status ) {
+/*
+*+
+*  Name:
+*     astCast
+
+*  Purpose:
+*     Cast an Object into an instance of a sub-class.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "object.h"
+*     AstObject *astCast( AstObject *this, AstObject *obj ) 
+
+*  Class Membership:
+*     Object method.
+
+*  Description:
+*     This function returns a deep copy of the supplied Object, but cast into
+*     an instance of the ancestor class specified by "obj".
+
+*  Parameters:
+*     this
+*        Pointer to the Object to be cast.
+*     obj
+*        Pointer to an Object that defines the class of the returned Object. 
+*        The returned Object will be of the same class as "obj". "this" 
+*        should be a sub-class of "obj".
+*-
+*/
+
+/* Local Variables: */
+   AstObjectVtab *old_vtab;
+   AstObject *new;
+
+/* Initialise */
+   new = NULL;
+
+/* Check pointer have been supplied. */
+   if( this && obj ) {
+
+/* Temporarily change the vtab of the supplied object to the supplied
+   vtab. */
+      old_vtab = this->vtab;
+      this->vtab = obj->vtab;
+
+/* Now take a copy of the object (now considered to be an instance of the
+   class specified by "vtab"). */
+      new = astCopy( this );
+
+/* Re-instate the original Object vtab. */
+      this->vtab = old_vtab;
+   }
+
+/* Return the copy pointer. */
+   return new;
 }
 
 #if defined(THREAD_SAFE)
@@ -543,6 +635,85 @@ static void ChangeThreadVtab( AstObject *this, int *status ){
    }
 }
 #endif
+
+AstObject *astCheckLock_( AstObject *this, int *status ) {
+/*
+*+
+*  Name:
+*     astCheckLock
+
+*  Purpose:
+*     Check that supplied Object is locked by the calling thread.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "object.h"
+*     AstObject *astCheckLock( AstObject *this ) 
+
+*  Class Membership:
+*     Object method.
+
+*  Description:
+*     This function reports an error if the supplied object has not
+*     previously been locked (using astLock) by the calling thread.
+
+*  Parameters:
+*     this
+*        Pointer to the Object.
+
+*  Returned Value:
+*     A copy of the supplied pointer ("this") is returned. The Object
+*     reference count is not changed.
+
+*  Notes:
+*     - This function attempts to execute even if an error has already
+*     occurred.
+
+*-
+*/
+
+/* This function does nothing in the non-threads version of libast. */
+#if defined(THREAD_SAFE)
+
+/* Local Variables; */
+   AstObject *fail;
+
+/* Check the supplied pointer. */
+   if( this ) {
+
+/* First use the private ManageLock function rather than the virtual 
+   astManageLock method to check the top level Object is locked for use
+   by the current thread. This saves time and allows a more appropriate
+   error message to be issued. */
+      if( ManageLock( this, AST__CHECKLOCK, 0, NULL, status ) ) {
+         if( astOK ) {
+            astError( AST__LCKERR, "astCheckLock(%s): The supplied %s cannot "
+                      "be used since it is not locked for use by the current "
+                      "thread (programming error).", status, astGetClass( this ),
+                      astGetClass( this ) );
+         }
+
+/* If the top level Object is locked, now use the virtual astManageLock 
+   method to check any objects contained within the top level Object. */
+      } else if( astManageLock( this, AST__CHECKLOCK, 0, &fail ) ) {
+         if( astOK ) {
+            astError( AST__LCKERR, "astCheckLock(%s): The supplied %s cannot "
+                      "be used since a %s contained within the %s is not "
+                      "locked for use by the current thread (programming "
+                      "error).", status, astGetClass( this ), 
+                       astGetClass( this ), astGetClass( fail ), 
+                       astGetClass( this ) );
+         }
+      }
+   }
+#endif
+
+/* Return the supploed pointer. */
+   return this;
+
+}
 
 static void Clear( AstObject *this, const char *attrib, int *status ) {
 /*
@@ -789,6 +960,10 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Check the global error status. */
    if ( !astOK ) return NULL;
 
+/* Get a lock on the object's secondary mutex. This mutex guards access
+   to the "ref_count" and "locker" components of the AstObject structure. */
+   LOCK_SMUTEX(this);
+
 #ifdef MEM_DEBUG
    {   int rc;
        char buf[100];
@@ -800,6 +975,9 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Increment the Object's reference count. */
    this->ref_count++;
+
+/* Unlock the object's secondary mutex. */
+   UNLOCK_SMUTEX(this);
 
 /* Return a new pointer to the Object. */
    return this;
@@ -908,14 +1086,14 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Create a new mutex for the new Object, and lock it for use by the
    current thread. */
 #ifdef THREAD_SAFE
-      if( pthread_mutex_init( &(new->mutex), NULL ) != 0 ) {
+      if( pthread_mutex_init( &(new->mutex1), NULL ) != 0 ) {
          astError( AST__INTER, "astInitObject(%s): Failed to "
-                   "initialise a POSIX mutex for the new Object.", status, 
+                   "initialise POSIX mutex1 for the new Object.", status, 
                    vtab->class );
       }
-      if( pthread_mutex_init( &(new->mutexl), NULL ) != 0 ) {
+      if( pthread_mutex_init( &(new->mutex2), NULL ) != 0 ) {
          astError( AST__INTER, "astInitObject(%s): Failed to "
-                   "initialise a POSIX mutexl for the new Object.", status, 
+                   "initialise POSIX mutex2 for the new Object.", status, 
                    vtab->class );
       }
       new->locker = -1;
@@ -1046,11 +1224,11 @@ f     value
    this->id = astFree( this->id );
    this->ident = astFree( this->ident );
 
-/* Attempt to unlock and destroy the mutex. */
+/* Attempt to unlock the Object and destroy its mutexes. */
 #if defined(THREAD_SAFE)
    (void) ManageLock( this, AST__UNLOCK, 0, NULL, status );
-   pthread_mutex_destroy( &(this->mutex) );
-   pthread_mutex_destroy( &(this->mutexl) );
+   pthread_mutex_destroy( &(this->mutex1) );
+   pthread_mutex_destroy( &(this->mutex2) );
 #endif
 
 /* Save the virtual function table address and note if the Object's
@@ -1188,8 +1366,13 @@ static void Dump( AstObject *this, AstChannel *channel, int *status ) {
 
 /* RefCnt. */
 /* ------- */
-   astWriteInt( channel, "RefCnt", 0, 0, this->ref_count,
+   LOCK_SMUTEX(this);
+   ival = this->ref_count;
+   UNLOCK_SMUTEX(this);
+
+   astWriteInt( channel, "RefCnt", 0, 0, ival,
                 "Count of active Object pointers" );
+
 
 /* Nobj. */
 /* ----- */
@@ -1731,7 +1914,7 @@ static int GetObjSize( AstObject *this, int *status ) {
    return this->size;
 }
 
-int astGetRefCount_( const AstObject *this, int *status ) {
+int astGetRefCount_( AstObject *this, int *status ) {
 /*
 *+
 *  Name:
@@ -1772,11 +1955,24 @@ int astGetRefCount_( const AstObject *this, int *status ) {
 *-
 */
 
+/* Local Variables; */
+   int result;          /* Returned value */
+
 /* Check the global error status. */
    if ( !astOK ) return 0;
 
-/* Return the reference count. */
-   return this->ref_count;
+/* Get a lock on the object's secondary mutex. This mutex guards access
+   to the "ref_count" and "locker" components of the AstObject structure. */
+   LOCK_SMUTEX(this);
+
+/* Get the reference count. */
+   result = this->ref_count;
+
+/* Unlock the object's secondary mutex. */
+   UNLOCK_SMUTEX(this);
+
+/* Return the result. */
+   return result;
 }
 
 /*
@@ -2115,20 +2311,22 @@ static int ManageLock( AstObject *this, int mode, int extra,
 /* Get a pointer to Thread-specific global data. */
    astGET_GLOBALS(NULL);
 
-/* Get a lock on the object's locker mutex. This gives us exclusive
-   access to the "locker" attribute in the Object structure. */
-   if( pthread_mutex_lock( &(this->mutexl) ) ) {
+/* Get a lock on the object's secondary mutex. This gives us exclusive
+   access to the "locker" (and "ref_count") component in the AstObject 
+   structure. All other components in the structure are guarded by the
+   primary mutex (this->mutex1). */
+   if( LOCK_SMUTEX(this) ) {
       result = 2;
 
-/* If the locker mutex was locked succesfully, first deal with cases
+/* If the secondary mutex was locked succesfully, first deal with cases
    where the caller wants to lock the Object for exclusive use by the 
    calling thread. */
    } else if( mode == AST__LOCK ) {
 
-/* If the Object is not currently locked, lock the Object mutex and
-   record the identity of the calling thread in the Object. */
+/* If the Object is not currently locked, lock the Object primary mutex 
+   and record the identity of the calling thread in the Object. */
       if( this->locker == -1 ) {
-         if( pthread_mutex_lock( &(this->mutex) ) ) result = 2;
+         if( LOCK_PMUTEX(this) ) result = 2;
          this->locker = AST__THREAD_ID;
          this->globals = AST__GLOBALS;
          ChangeThreadVtab( this, status );
@@ -2137,17 +2335,20 @@ static int ManageLock( AstObject *this, int mode, int extra,
       } else if( this->locker == AST__THREAD_ID ) {
 
 /* If the object is locked by a different thread, and the caller is
-   willing to wait, attempt to lock the Object mutex. This will cause 
-   the calling thread to block until the Object is release. Then store 
-   the identity of the calling thread (the current lock owner). We need
-   to release the lock on the "locker" attribute so that the other thread
-   can modify it when it releases teh object. */
+   willing to wait, attempt to lock the Object primary mutex. This will 
+   cause the calling thread to block until the Object is release by the
+   thread that currently has it locked. Then store the identity of the 
+   calling thread (the new lock owner). We first need to release the 
+   secondary mutex so that the other thread can modify the "locker" 
+   component in the AstObject structure when it releases the Object 
+   (using this function). We then re-lock the secondary mutex so this
+   thread can change the "locker" component safely. */
       } else if( extra ) {
-         if( pthread_mutex_unlock( &(this->mutexl) ) ) {
+         if( UNLOCK_SMUTEX(this) ) {
             result = 3;
-         } else if( pthread_mutex_lock( &(this->mutex) ) ) {
+         } else if( LOCK_PMUTEX(this) ) {
             result = 2;
-         } else if( pthread_mutex_lock( &(this->mutexl) ) ) {
+         } else if( LOCK_SMUTEX(this) ) {
             result = 2;
          } 
          this->locker = AST__THREAD_ID;
@@ -2167,11 +2368,12 @@ static int ManageLock( AstObject *this, int mode, int extra,
       if( this->locker == -1 ) {
 
 /* If the object is currently locked by the calling thread, clear the
-   identity of the thread that owns the lock and unlock the mutex. */
+   identity of the thread that owns the lock and unlock the primary 
+   mutex. */
       } else if( this->locker == AST__THREAD_ID ) {
          this->locker = -1;
          this->globals = NULL;
-         if( pthread_mutex_unlock( &(this->mutex) ) ) result = 3;
+         if( UNLOCK_PMUTEX(this) ) result = 3;
 
 /* Return an error status value if the Object is locked by another
    thread. */
@@ -2189,9 +2391,9 @@ static int ManageLock( AstObject *this, int mode, int extra,
       result = 4;
    } 
 
-/* Unlock the locker mutex so other threads can test the Object to see if
-   it is locked. */
-   if( pthread_mutex_unlock( &(this->mutexl) ) ) result = 3;
+/* Unlock the secondary mutex so that other threads can access the "locker"
+   component in the Object to see if it is locked. */
+   if( UNLOCK_SMUTEX(this) ) result = 3;
 
 /* If the operation failed, return a pointer to the failed object. */
    if( result && fail ) *fail = this;
@@ -2200,85 +2402,6 @@ static int ManageLock( AstObject *this, int mode, int extra,
    return result;
 }
 #endif
-
-AstObject *astCheckLock_( AstObject *this, int *status ) {
-/*
-*+
-*  Name:
-*     astCheckLock
-
-*  Purpose:
-*     Check that supplied Object is locked by the calling thread.
-
-*  Type:
-*     Protected function.
-
-*  Synopsis:
-*     #include "object.h"
-*     AstObject *astCheckLock( AstObject *this ) 
-
-*  Class Membership:
-*     Object method.
-
-*  Description:
-*     This function reports an error if the supplied object has not
-*     previously been locked (using astLock) by the calling thread.
-
-*  Parameters:
-*     this
-*        Pointer to the Object.
-
-*  Returned Value:
-*     A copy of the supplied pointer ("this") is returned. The Object
-*     reference count is not changed.
-
-*  Notes:
-*     - This function attempts to execute even if an error has already
-*     occurred.
-
-*-
-*/
-
-/* This function does nothing in the non-threads version of libast. */
-#if defined(THREAD_SAFE)
-
-/* Local Variables; */
-   AstObject *fail;
-
-/* Check the supplied pointer. */
-   if( this ) {
-
-/* First use the private ManageLock function rather than the virtual 
-   astManageLock method to check the top level Object is locked for use
-   by the current thread. This saves time and allows a more appropriate
-   error message to be issued. */
-      if( ManageLock( this, AST__CHECKLOCK, 0, NULL, status ) ) {
-         if( astOK ) {
-            astError( AST__LCKERR, "astCheckLock(%s): The supplied %s cannot "
-                      "be used since it is not locked for use by the current "
-                      "thread (programming error).", status, astGetClass( this ),
-                      astGetClass( this ) );
-         }
-
-/* If the top level Object is locked, now use the virtual astManageLock 
-   method to check any objects contained within the top level Object. */
-      } else if( astManageLock( this, AST__CHECKLOCK, 0, &fail ) ) {
-         if( astOK ) {
-            astError( AST__LCKERR, "astCheckLock(%s): The supplied %s cannot "
-                      "be used since a %s contained within the %s is not "
-                      "locked for use by the current thread (programming "
-                      "error).", status, astGetClass( this ), 
-                       astGetClass( this ), astGetClass( fail ), 
-                       astGetClass( this ) );
-         }
-      }
-   }
-#endif
-
-/* Return the supploed pointer. */
-   return this;
-
-}
 
 void astSet_( void *this_void, const char *settings, int *status, ... ) {
 /*
@@ -2802,66 +2925,6 @@ void astSetVtab_( AstObject *this, AstObjectVtab *vtab, int *status ) {
 *-
 */
    if( this ) this->vtab = vtab;
-}
-
-AstObject *astCast_( AstObject *this, AstObject *obj, int *status ) {
-/*
-*+
-*  Name:
-*     astCast
-
-*  Purpose:
-*     Cast an Object into an instance of a sub-class.
-
-*  Type:
-*     Protected function.
-
-*  Synopsis:
-*     #include "object.h"
-*     AstObject *astCast( AstObject *this, AstObject *obj ) 
-
-*  Class Membership:
-*     Object method.
-
-*  Description:
-*     This function returns a deep copy of the supplied Object, but cast into
-*     an instance of the ancestor class specified by "obj".
-
-*  Parameters:
-*     this
-*        Pointer to the Object to be cast.
-*     obj
-*        Pointer to an Object that defines the class of the returned Object. 
-*        The returned Object will be of the same class as "obj". "this" 
-*        should be a sub-class of "obj".
-*-
-*/
-
-/* Local Variables: */
-   AstObjectVtab *old_vtab;
-   AstObject *new;
-
-/* Initialise */
-   new = NULL;
-
-/* Check pointer have been supplied. */
-   if( this && obj ) {
-
-/* Temporarily change the vtab of the supplied object to the supplied
-   vtab. */
-      old_vtab = this->vtab;
-      this->vtab = obj->vtab;
-
-/* Now take a copy of the object (now considered to be an instance of the
-   class specified by "vtab"). */
-      new = astCopy( this );
-
-/* Re-instate the original Object vtab. */
-      this->vtab = old_vtab;
-   }
-
-/* Return the copy pointer. */
-   return new;
 }
 
 static int Same( AstObject *this, AstObject *that, int *status ) {
@@ -4460,14 +4523,14 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
 
 #ifdef THREAD_SAFE
       } else {
-         if( pthread_mutex_init( &(new->mutex), NULL ) != 0 ) {
+         if( pthread_mutex_init( &(new->mutex1), NULL ) != 0 ) {
             astError( AST__INTER, "astInitObject(%s): Failed to "
-                      "initialise a POSIX mutex for the new Object.", status, 
+                      "initialise POSIX mutex1 for the new Object.", status, 
                       vtab->class );
          }
-         if( pthread_mutex_init( &(new->mutexl), NULL ) != 0 ) {
+         if( pthread_mutex_init( &(new->mutex2), NULL ) != 0 ) {
             astError( AST__INTER, "astInitObject(%s): Failed to "
-                      "initialise a POSIX mutexl for the new Object.", status, 
+                      "initialise POSIX mutex2 for the new Object.", status, 
                       vtab->class );
          }
          new->locker = -1;
@@ -4923,8 +4986,14 @@ AstObject *astAnnulId_( AstObject *this_id, int *status ) {
 
 /* Obtain the Object pointer from the ID supplied and validate the
    pointer to ensure it identifies a valid Object (this generates an
-   error if it doesn't). */
-   if ( !astIsAObject( astMakePointer( this_id ) ) ) return NULL;
+   error if it doesn't). Note, we use "astMakePointer_NoLockCheck",
+   rather than the usual "astMakePointer" since a thread should be able
+   to renounce interest in an object without needing to own the object.
+   If we used "astMakePointer" then a thread could not annul a pointer
+   unless it owned the object. But having annulled the pointer it could
+   then not unlock the object for use by another thread (since the
+   pointer it would need to do this has just been annulled). */
+   if ( !astIsAObject( astMakePointer_NoLockCheck( this_id ) ) ) return NULL;
 
 /* Obtain the Handle offset for this Object and annul the Handle and
    its associated Object pointer. */
@@ -5793,6 +5862,9 @@ c++
 *        This function applies to all Objects.
 
 *  Notes:
+*     - The astAnnul function is exceptional in that it can be used on 
+*     pointers for Objects that are not currently locked by the calling
+*     thread. All other AST functions will report an error.
 *     - The Locked object will belong to the current AST context.
 *     - This function returns without action if the Object is already 
 *     locked by the calling thread.
@@ -6825,7 +6897,6 @@ static int CheckThread( int ihandle, int head ) {
    return result;
 }
 #endif
-
 
 
 

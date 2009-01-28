@@ -1236,8 +1236,11 @@ typedef struct AstObject {
 
 #if defined(THREAD_SAFE)
    int locker;                   /* Thread that has locked this Object */
-   pthread_mutex_t mutex;        /* Mutex for this Object */
-   pthread_mutex_t mutexl; 
+   pthread_mutex_t mutex1;       /* Guards access to all elements of the
+                                    Object except for the "locker" and
+                                    "ref_count" components */
+   pthread_mutex_t mutex2;       /* Guards access to the "locker" and
+                                    "ref_count" components */
    struct AstGlobals *globals;   /* Pointer to thread-specific global data */
 #endif
 
@@ -1436,7 +1439,7 @@ const char *astGetID_( AstObject *, int * );
 const char *astGetIdent_( AstObject *, int * );
 int astEqual_( AstObject *, AstObject *, int * );
 int astGetNobject_( const AstObject *, int * );
-int astGetRefCount_( const AstObject *, int * );
+int astGetRefCount_( AstObject *, int * );
 int astTestAttrib_( AstObject *, const char *, int * );
 int astTestID_( AstObject *, int * );
 int astTestIdent_( AstObject *, int * );
