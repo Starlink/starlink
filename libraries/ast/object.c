@@ -188,6 +188,8 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *     24-OCT-2008 (DSB):
 *        Prevent a mutex deadlock that could occur when annulling an
 *        Object ID.
+*     28-JAN-2008 (DSB):
+*        Allow unlocked objects to be annulled using astAnnul.
 *class--
 */
 
@@ -4897,8 +4899,9 @@ static void AnnulHandle( int ihandle, int *status ) {
 
 /* If this indicates that the Handle isn't active, then report an
    error (but only if the global error status has not already been
-   set). */
-      if ( context < 0 ) {
+   set). We allow handles that are currently not owned by any thread to
+   be annulled. */
+      if ( context < 0 && context != UNOWNED_CONTEXT ) {
          if ( astOK ) {
             astError( AST__INHAN, "astAnnulHandle: Invalid attempt to annul "
                       "an Object Handle (no. %u).", status, ihandle );
@@ -4925,7 +4928,11 @@ static void AnnulHandle( int ihandle, int *status ) {
 
 /* Remove the Handle from the active list for its context level and
    place it on the free Handles list ready for re-use. */
-         RemoveHandle( ihandle, &active_handles[ context ], status );
+         if( context == UNOWNED_CONTEXT ) {
+            RemoveHandle( ihandle, &unowned_handles, status );
+         } else {
+            RemoveHandle( ihandle, &active_handles[ context ], status );
+         }
 
 #if defined(DEBUG_HANDLES)
          handles[ ihandle ].thread = -1;
@@ -5602,7 +5609,11 @@ f        This routine applies to all Objects.
 /* Remove the object's Handle from its original active Handles list
    and insert it into the list appropriate to its new context
    level. */
-         RemoveHandle( ihandle, &active_handles[ context ], status );
+         if( context == UNOWNED_CONTEXT ) {
+            RemoveHandle( ihandle, &unowned_handles, status );
+         } else {
+            RemoveHandle( ihandle, &active_handles[ context ], status );
+         }
          InsertHandle( ihandle, &active_handles[ 0 ], status );
       }
 
