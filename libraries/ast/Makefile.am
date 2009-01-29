@@ -205,6 +205,7 @@ GRP_C_INCLUDE_FILES = \
     c2f77.h \
     ems.h \
     err.h \
+    Ers.h \
     f77.h \
     grf.h \
     grf3d.h \
