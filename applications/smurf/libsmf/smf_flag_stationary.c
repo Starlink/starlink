@@ -140,7 +140,7 @@ void smf_flag_stationary( smfData *data, unsigned char *quality,
     errRep( "", FUNC_NAME ": Supplied smfData has no header", status );
   } else if( !data->hdr->allState ) {
     *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": Supplied smfData has JCMTState in its header", 
+    errRep( "", FUNC_NAME ": Supplied smfData has no JCMTState in its header", 
             status );
   } else if( data->hdr->steptime <= 0 ) {
     *status = SAI__ERROR;
