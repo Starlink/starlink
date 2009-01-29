@@ -91,11 +91,13 @@
 *     12-FEB-2008 (DSB):
 *        - Added argument binzero.
 *        - POL_ANG is stored in degrees, not radians.
+*     29-JAN-2009 (DSB):
+*        Correct size of memory allocation for *pangle.
 
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007-2008 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -520,7 +522,7 @@ L999:;
    with angle value AST__BAD, and return a NULL pointer. */
    if( !result ){
       *npbin = 1;
-      *pangle = astMalloc( sizeof( *pangle ) );
+      *pangle = astMalloc( sizeof( **pangle ) );
       if( *pangle ) **pangle = AST__BAD;
    }
 
