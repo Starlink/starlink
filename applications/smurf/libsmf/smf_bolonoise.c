@@ -177,8 +177,11 @@ void smf_bolonoise( smfData *data, unsigned char *quality, size_t window,
     }
   } 
 
-  if( quality ) qua = quality;
-  else qua = data->pntr[2];
+  if( quality ) {
+    qua = quality;
+  } else {
+    qua = data->pntr[2];
+  }
 
   isTordered = data->isTordered;
 
