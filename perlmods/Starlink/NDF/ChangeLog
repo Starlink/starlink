@@ -1,3 +1,7 @@
+2009-01-29  Tim Jenness  <tjenness@cpan.org>
+
+	* NDF.xs: Add ndfHsdat support.
+
 2005-10-15  Tim Jenness  <tjenness@cpan.org>
 
 	* NDF.xs: Fix up for 64 bit architecture.

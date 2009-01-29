@@ -2022,6 +2022,17 @@ ndf_hput_r(hmode, appn, repl, nlines, chrsz, text, trans, wrap, rjust, indf, sta
   status
 
 void
+ndf_hsdat(date, indf, status)
+  char * date
+  ndfint &indf
+  ndfint &status
+ PROTOTYPE: $$$
+ CODE:
+   ndfHsdat( date, indf, &status );
+ OUTPUT:
+  status
+
+void
 ndf_hsmod(hmode, indf, status)
   char * hmode
   ndfint &indf

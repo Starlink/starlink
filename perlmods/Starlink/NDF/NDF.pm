@@ -16,7 +16,7 @@ require AutoLoader;
 
 # Version derived from CVS repository:  '$Revision$ '
 
-$VERSION = '1.47';
+$VERSION = '1.48';
 
 # Add the following to the 'ndf'=> associative array if you want to
 # use ADAM PARAMETERS. Remove the comment field from the entries in the XS
@@ -48,7 +48,7 @@ $VERSION = '1.47';
                             ndf_xgt0d ndf_xgt0i ndf_xgt0l ndf_xgt0r ndf_xiary
                             ndf_xloc ndf_xname ndf_xnew ndf_xnumb ndf_xpt0c
                             ndf_xpt0d ndf_xpt0i ndf_xpt0l ndf_xpt0r ndf_xstat
-                            ndfGtwcs ndfPtwcs
+                            ndfGtwcs ndfPtwcs ndf_hsdat
                           /],
 
                 'ary'=>[qw/ary_annul ary_dim ary_find ary_map ary_ndim
