@@ -13,13 +13,16 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_bolonoise( smfData *data, size_t window, double f_low, 
-*                    double f_white1, double f_white2, double flagratio,
-*                    double *whitenoise, double *fratio, int nep, int *status )
+*     smf_bolonoise( smfData *data, unsigned char *quality, size_t window, 
+*                    double f_low, double f_white1, double f_white2, 
+*                    double flagratio, double *whitenoise, double *fratio, 
+*                    int nep, int *status )
 
 *  Arguments:
 *     data = smfData * (Given)
 *        Pointer to the input smfData.
+*     quality = unsigned char * (Given and Returned)
+*        If set, use this buffer instead of QUALITY associated with data.
 *     window = size_t (Given)
 *        Width of boxcar smooth to apply to power spectrum before measurement
 *     f_low = double (Given)
@@ -120,9 +123,10 @@
 
 #define FUNC_NAME "smf_bolonoise"
 
-void smf_bolonoise( smfData *data, size_t window, double f_low, 
-                    double f_white1, double f_white2, double flagratio,
-                    double *whitenoise, double *fratio, int nep, int *status ) {
+void smf_bolonoise( smfData *data, unsigned char *quality, size_t window, 
+                    double f_low, double f_white1, double f_white2, 
+                    double flagratio, double *whitenoise, double *fratio, 
+                    int nep, int *status ) {
 
   double *base=NULL;       /* Pointer to base coordinates of array */
   size_t bstride;          /* bolometer index stride */
@@ -173,7 +177,9 @@ void smf_bolonoise( smfData *data, size_t window, double f_low,
     }
   } 
 
-  qua = data->pntr[2];
+  if( quality ) qua = quality;
+  else qua = data->pntr[2];
+
   isTordered = data->isTordered;
 
   /* Initialize arrays */

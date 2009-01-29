@@ -469,6 +469,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
         *status = SAI__ERROR;
         errRep(FUNC_NAME, "flagstat cannot be < 0.", status );
       }
+    } else {
+      flagstat = 0;
     }
 
     if( astMapGet0D( keymap, "FILT_EDGELOW", &f_edgelow ) ) {
@@ -1012,15 +1014,26 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
               }
               
               if( flagstat ) {
-                msgSetd("THRESH",flagstat);
-                msgOutif(MSG__VERB, "", 
-                         "  flagging regions slewing < ^THRESH arcsec/sec...", 
-                         status );
-                smf_flag_stationary( data, qua_data, flagstat, &nflag, status );
-                if( *status == SAI__OK ) {
-                  msgSeti("N",nflag);
-                  msgOutif(MSG__VERB," ", "  ...^N new time slices flagged",
-                           status); 
+                if( !memiter ) {
+                  /* In order for this to work we need to check when we
+                     are reading in the raw data since model containers
+                     don't have the full JCMTState */
+                  *status = SAI__ERROR;
+                  errRep( "", FUNC_NAME ": Flagging stationary regions not "
+                          "supported if memiter=1. Do not set flagstat",
+                          status );
+                } else {
+                  msgSetd("THRESH",flagstat);
+                  msgOutif(MSG__VERB, "", 
+                           "  flagging regions slewing < ^THRESH arcsec/sec...",
+                           status );
+                  smf_flag_stationary( data, qua_data, flagstat, &nflag, 
+                                       status );
+                  if( *status == SAI__OK ) {
+                    msgSeti("N",nflag);
+                    msgOutif(MSG__VERB," ", "  ...^N new time slices flagged",
+                             status); 
+                  }
                 }
               }
 
