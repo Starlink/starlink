@@ -4771,6 +4771,15 @@ typedef struct Handle {
    int thread;                   /* Identifier for owning thread */
 #endif
 
+#ifdef MEM_DEBUG
+   int id;                       /* The id associated with the memory block 
+                                    holding the Object last associated with 
+                                    this handle. */
+   AstObjectVtab *vtab;          /* Pointer to the firtual function table of
+                                    the Object last associated with this 
+                                    handle. */
+#endif
+
 /* Links between Handles are implemented using integer offsets rather
    than through pointers. */
    int flink;                    /* Backward link to previous Handle */
@@ -5301,6 +5310,15 @@ static int CheckId( AstObject *this_id, int *status ) {
                       "%d).", status, id  );
             astError( AST__OBJIN, "This pointer has been annulled, or the "
                       "associated Object deleted." , status);
+
+#ifdef MEM_DEBUG
+            astError( AST__OBJIN, "This pointer was last associated with "
+                      "a %s stored in a memory block with id %d.", 
+                      status, handles[ work.i ].vtab->class,
+                      handles[ work.i ].id );
+#endif
+
+
          }
 
 /* If OK, set the Handle offset to be returned. */
@@ -6365,8 +6383,14 @@ AstObject *astMakeId_( AstObject *this, int *status ) {
                handles[ ihandle ].ptr = this;
                handles[ ihandle ].context = context_level;
 
+/* Store extra debugging information in the handle if enabled */
 #if defined(DEBUG_HANDLES)
                handles[ ihandle ].thread = AST__THREAD_ID;
+#endif
+
+#if defined(MEM_DEBUG)
+               handles[ ihandle ].id = astMemoryId( this );
+               handles[ ihandle ].vtab = this->vtab;
 #endif
 
 /* Insert the Handle into the active Handles list for the current
@@ -6823,8 +6847,8 @@ f     AST_STRIPESCAPES
 
 #if defined(DEBUG_HANDLES)
 
-/* Check each handle in a list is unqieuely connected to one other handle
-   in both the forward and backward diorections. */
+/* Check each handle in a list is uniquely connected to one other handle
+   in both the forward and backward directions. */
 
    static void CheckList( int head ) {
    int ihandle;

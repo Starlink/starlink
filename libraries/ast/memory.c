@@ -3624,6 +3624,41 @@ void astWatchMemory_( int id ) {
    Watched_ID = id;
 }
 
+int astMemoryId_( void *ptr, int *status ){
+/*
+*+
+*  Name:
+*     astMemoryId
+
+*  Purpose:
+*     Return the integer identifier for a memory block.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     int astMemoryId( void *ptr )
+
+*  Description:
+*     This function returns the integer identifier associated with a
+*     memory block allocated by function sin this module.
+
+*  Parameters:
+*     ptr
+*        The pointer (a genuine C pointer, not an encoded object
+*        identifier).
+
+*  Returned Value:
+*     The integer identifier. A value of -1 is returned if "ptr" is NULL.
+
+*-
+*/
+   astDECLARE_GLOBALS;
+   astGET_GLOBALS(NULL);
+   return ptr ? ((Memory *)(ptr-SIZEOF_MEMORY))->id : -1;
+}
+
 void *astMemoryPtr_( int id ){
 /*
 *+
@@ -3732,7 +3767,7 @@ void astMemoryUse_( void *ptr, const char *verb, int *status ){
    astDECLARE_GLOBALS;
    astGET_GLOBALS(NULL);
 
-   if( ptr && ((Memory *)(ptr-SIZEOF_MEMORY))->id == Watched_ID ) {
+   if( ptr && astMemoryId( ptr ) == Watched_ID ) {
       if( !Quiet_Use || !strcmp( verb, ISSUED ) || 
                         !strcmp( verb, FREED ) ) {
          astMemoryAlarm( verb );
