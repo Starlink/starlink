@@ -6009,15 +6009,15 @@ c--
 
 /* We will arrive here if an attempt is made to lock an Object that was
    already locked. In this case, the handle will not be on the unowned
-   list, but it should be on the list for the current context level, or a
-   lower context level. Check this is the case. */
+   list, but it should be on the active list for the current context
+   level, or a lower context level. Check this is the case. */
          } else if( handles[ ihandle ].context > context_level && astOK ) {
             astError( AST__INTER, "astLock(%s): Supplied Object handle "
                       "(index %d value %d) has a context level of %d "
-                      "which should be %d (internal AST programming error).",
-                      status, astGetClass( this ), ihandle,  
+                      "which should be %d or less (internal AST programming "
+                      "error).", status, astGetClass( this ), ihandle,  
                       handles[ ihandle ].check, handles[ ihandle ].context, 
-                      UNOWNED_CONTEXT );
+                      context_level );
          }
          UNLOCK_MUTEX2;
       }
