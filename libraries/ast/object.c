@@ -392,7 +392,7 @@ static void ClearUseDefs( AstObject *, int * );
 static void SetUseDefs( AstObject *, int, int * );
 
 
-#if defined(DEBUG_HANDLES)
+#if defined(MEM_DEBUG)
 static void CheckList( int head );
 static void CheckInList( int ihandle, int head, int in );
 static int CheckThread( int ihandle, int head );
@@ -4753,6 +4753,7 @@ int astSame_( AstObject *this, AstObject *that, int *status ) {
    (although it contains external functions which replace the internal
    versions defined earlier). */
 
+
 /* Type Definitions. */
 /* ----------------- */
 /* Define the Handle structure. This is attached to Objects when they
@@ -4767,11 +4768,8 @@ typedef struct Handle {
    int context;                  /* Context level for this Object */
    int check;                    /* Check value to ensure validity */
 
-#if defined(DEBUG_HANDLES)
+#if defined(MEM_DEBUG)
    int thread;                   /* Identifier for owning thread */
-#endif
-
-#ifdef MEM_DEBUG
    int id;                       /* The id associated with the memory block 
                                     holding the Object last associated with 
                                     this handle. */
@@ -4819,6 +4817,13 @@ static int unowned_handles = -1; /* Offset to head of unowned Handle
                                     all handles must be owned by a thread. */ 
 #endif
 
+#ifdef MEM_DEBUG
+static int Watched_Handle = -1; /* A handle index to be watched. Activity
+                                   on this handle is reported using 
+                                   astHandleUse and astHandleAlarm. */
+#endif
+
+
 /* External Interface Function Prototypes. */
 /* --------------------------------------- */
 /* Private functions associated with the external interface. */
@@ -4828,6 +4833,7 @@ static void AnnulHandle( int, int * );
 static void InitContext( int * );
 static void InsertHandle( int, int *, int * );
 static void RemoveHandle( int, int *, int * );
+
 
 /* The following functions have public prototypes only (i.e. no
    protected prototypes), so we must provide local prototypes for use
@@ -4840,6 +4846,7 @@ void astImportId_( AstObject *, int * );
 void astSetId_( void *, const char *, ... );
 void astLockId_( AstObject *, int, int * );
 void astUnlockId_( AstObject *, int * );
+
 
 /* External Interface Functions. */
 /* ----------------------------- */
@@ -4943,11 +4950,13 @@ static void AnnulHandle( int ihandle, int *status ) {
             RemoveHandle( ihandle, &active_handles[ context ], status );
          }
 
-#if defined(DEBUG_HANDLES)
+#if defined(MEM_DEBUG)
          handles[ ihandle ].thread = -1;
 #endif
          InsertHandle( ihandle, &free_handles, status );
 
+/* If required, tell the user that the handle has been anulled. */
+         astHandleUse_( ihandle, "annulled" );
       }
    }
 }
@@ -5316,8 +5325,13 @@ static int CheckId( AstObject *this_id, int *status ) {
                       "a %s stored in a memory block with id %d.", 
                       status, handles[ work.i ].vtab->class,
                       handles[ work.i ].id );
+            void *ptr = handles[ work.i ].ptr;
+            astError( AST__OBJIN, "Handle properties: index %d  "
+                      "ptr: %p (id=%d)  context: %d  check: %d "
+                      "thread %d\n", status, work.i, ptr, astMemoryId( ptr ), 
+                       handles[ work.i ].context, handles[ work.i ].check, 
+                       handles[ work.i ].thread );
 #endif
-
 
          }
 
@@ -5418,6 +5432,9 @@ AstObject *astDeleteId_( AstObject *this_id, int *status ) {
             AnnulHandle( i, status );
          }
       }
+
+/* If required, tell the user that the handle's object has been deleted. */
+      astHandleUse_( ihandle, "object-deleted" );
    }
 
    UNLOCK_MUTEX2;
@@ -5633,6 +5650,9 @@ f        This routine applies to all Objects.
             RemoveHandle( ihandle, &active_handles[ context ], status );
          }
          InsertHandle( ihandle, &active_handles[ 0 ], status );
+
+/* If required, tell the user that the handle has been exempted. */
+         astHandleUse_( ihandle, "exempted" );
       }
 
       UNLOCK_MUTEX2;
@@ -5742,7 +5762,12 @@ f     and have not been rendered exempt using AST_EXEMPT.
    and insert it into the list appropriate to its new context
    level. */
                RemoveHandle( ihandle, &active_handles[ context ], status );
-               InsertHandle( ihandle, &active_handles[ context_level - 1 ], status );
+               InsertHandle( ihandle, &active_handles[ context_level - 1 ], 
+                             status );
+
+/* If required, tell the user that the handle has been exempted. */
+               astHandleUse_( ihandle, "exported from context level %d",
+                              context_level );
             }
          }
       }
@@ -5837,6 +5862,10 @@ f        This routine applies to all Objects.
    level. */
             RemoveHandle( ihandle, &active_handles[ context ], status );
             InsertHandle( ihandle, &active_handles[ context_level ], status );
+
+/* If required, tell the user that the handle has been imported. */
+            astHandleUse_( ihandle, "imported into context level %d",
+                           context_level );
          }
       }
       UNLOCK_MUTEX2;
@@ -5964,12 +5993,15 @@ c--
          if( handles[ ihandle ].context == UNOWNED_CONTEXT ) {
             RemoveHandle( ihandle, &unowned_handles, status );
 
-#if defined(DEBUG_HANDLES)
+#if defined(MEM_DEBUG)
             handles[ ihandle ].thread = AST__THREAD_ID;
+            astHandleUse_( ihandle, "locked by thread %d at context level %d", 
+                           handles[ ihandle ].thread, context_level );
 #endif
 
             InsertHandle( ihandle, &active_handles[ context_level ], status );
             handles[ ihandle ].context = context_level;
+
          }
          UNLOCK_MUTEX2;
       }
@@ -6076,12 +6108,16 @@ c--
          if( handles[ ihandle ].context != UNOWNED_CONTEXT ) {
             RemoveHandle( ihandle, &active_handles[ handles[ ihandle ].context ], status );
 
-#if defined(DEBUG_HANDLES)
+#if defined(MEM_DEBUG)
+            astHandleUse_( ihandle, "unlocked from thread %d at context "
+                           "level %d", handles[ ihandle ].thread, 
+                           handles[ ihandle ].context );
             handles[ ihandle ].thread = -1;
 #endif
 
             InsertHandle( ihandle, &unowned_handles, status );
             handles[ ihandle ].context = UNOWNED_CONTEXT;
+
          }
          UNLOCK_MUTEX2;
       }
@@ -6257,7 +6293,7 @@ static void InsertHandle( int ihandle, int *head, int *status ) {
 *     full-length C pointers.
 */
 
-#if defined(DEBUG_HANDLES)
+#if defined(MEM_DEBUG)
    CheckList( *head );
    CheckInList( ihandle, *head, 0 );
 #endif
@@ -6283,7 +6319,7 @@ static void InsertHandle( int ihandle, int *head, int *status ) {
 /* Update the list head to identify the new element. */
    *head = ihandle;
 
-#if defined(DEBUG_HANDLES)
+#if defined(MEM_DEBUG)
    CheckList( *head );
 #endif
 }
@@ -6384,11 +6420,10 @@ AstObject *astMakeId_( AstObject *this, int *status ) {
                handles[ ihandle ].context = context_level;
 
 /* Store extra debugging information in the handle if enabled */
-#if defined(DEBUG_HANDLES)
-               handles[ ihandle ].thread = AST__THREAD_ID;
-#endif
-
 #if defined(MEM_DEBUG)
+               handles[ ihandle ].thread = AST__THREAD_ID;
+               astHandleUse_( ihandle, "associated with a %s (id %d)",
+                              astGetClass( this ), astMemoryId( this ) );
                handles[ ihandle ].id = astMemoryId( this );
                handles[ ihandle ].vtab = this->vtab;
 #endif
@@ -6604,7 +6639,7 @@ static void RemoveHandle( int ihandle, int *head, int *status ) {
 *     of Handles are constructed.
 */
 
-#if defined(DEBUG_HANDLES)
+#if defined(MEM_DEBUG)
    CheckList( *head );
    CheckInList( ihandle, *head, 1 );
 #endif
@@ -6632,7 +6667,7 @@ static void RemoveHandle( int ihandle, int *head, int *status ) {
    handles[ ihandle ].flink = ihandle;
    handles[ ihandle ].blink = ihandle;
 
-#if defined(DEBUG_HANDLES)
+#if defined(MEM_DEBUG)
    CheckList( *head );
 #endif
 }
@@ -6845,7 +6880,7 @@ f     AST_STRIPESCAPES
 }
 
 
-#if defined(DEBUG_HANDLES)
+#if defined(MEM_DEBUG)
 
 /* Check each handle in a list is uniquely connected to one other handle
    in both the forward and backward directions. */
@@ -6854,7 +6889,7 @@ f     AST_STRIPESCAPES
    int ihandle;
    astDECLARE_GLOBALS;          
 
-   astGET_GLOBALS(this);
+   astGET_GLOBALS(NULL);
 
    if ( head != -1 ) {
       ihandle = head;      
@@ -6915,7 +6950,7 @@ static void CheckInList( int ihandle, int head, int in ){
 static int CheckThread( int ihandle, int head ) {
    int result = 1;
    astDECLARE_GLOBALS;          
-   astGET_GLOBALS(this);
+   astGET_GLOBALS(NULL);
 
    int sb = -222;
    if( head == unowned_handles || head == free_handles ) {
@@ -6931,7 +6966,34 @@ static int CheckThread( int ihandle, int head ) {
    }
    return result;
 }
+
+void astWatchHandle_( int handle ){
+   Watched_Handle = handle;
+}
+
+void astHandleUse_( int handle, const char *verb, ... ){
+   va_list args;                 
+   if( handle == Watched_Handle ) {
+      va_start( args, verb );
+      astHandleAlarm( verb, args );
+      va_end( args );
+   }
+}
+
+void astHandleAlarm_( const char *verb, va_list args ){
+   char buff[200];
+   astDECLARE_GLOBALS;          
+   astGET_GLOBALS(NULL);
+
+   vsprintf( buff, verb, args );
+   printf( "astHandleAlarm: Handle %d has been %s (current thread is %d).\n", 
+           Watched_Handle, buff, AST__THREAD_ID );
+}
+
+
 #endif
+
+
 
 
 

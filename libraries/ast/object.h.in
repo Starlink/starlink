@@ -1621,5 +1621,24 @@ astINVOKE(V,astTestAttrib_(astCheckObject(this),attrib,STATUS_PTR))
 #endif
 #endif
 
+/* Extra stuff for debuging probnlems with object handles and memory usage */
+#ifdef MEM_DEBUG
+
+void astWatchHandle_( int );
+void astHandleUse_( int, const char *, ... );
+void astHandleAlarm_( const char *, va_list );
+
+#define astWatchHandle astWatchHandle_
+#define astHandleUse astHandleUse_
+#define astHandleAlarm astHandleAlarm_
+
+#else
+
+#define astWatchHandle
+#define astHandleUse
+#define astHandleAlarm 
+
+#endif
+
 
 
