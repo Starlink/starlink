@@ -6014,7 +6014,7 @@ c--
          } else if( handles[ ihandle ].context > context_level && astOK ) {
             astError( AST__INTER, "astLock(%s): Supplied Object handle "
                       "(index %d value %d) has a context level of %d "
-                      "which should be %d or less (internal AST programming "
+                      "which should be %d or lower (internal AST programming "
                       "error).", status, astGetClass( this ), ihandle,  
                       handles[ ihandle ].check, handles[ ihandle ].context, 
                       context_level );
@@ -6450,8 +6450,7 @@ AstObject *astMakeId_( AstObject *this, int *status ) {
 #if defined(MEM_DEBUG)
                handles[ ihandle ].thread = AST__THREAD_ID;
                astHandleUse( ihandle, "associated with a %s (id %d)",
-                              astGetClass( this ), astMemoryId( this ),
-                              handles[ ihandle ].check );
+                              astGetClass( this ), astMemoryId( this ));
                handles[ ihandle ].id = astMemoryId( this );
                handles[ ihandle ].vtab = this->vtab;
 #endif
