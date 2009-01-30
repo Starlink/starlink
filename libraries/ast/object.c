@@ -6007,7 +6007,11 @@ c--
             InsertHandle( ihandle, &active_handles[ context_level ], status );
             handles[ ihandle ].context = context_level;
 
-         } else if( astOK ) {
+/* We will arrive here if an attempt is made to lock an Object that was
+   already locked. In this case, the handle will not be on the unowned
+   list, but it should be on the list for the current context level, or a
+   lower context level. Check this is the case. */
+         } else if( handles[ ihandle ].context > context_level && astOK ) {
             astError( AST__INTER, "astLock(%s): Supplied Object handle "
                       "(index %d value %d) has a context level of %d "
                       "which should be %d (internal AST programming error).",
