@@ -396,6 +396,8 @@ static void SetUseDefs( AstObject *, int, int * );
 static void CheckList( int head );
 static void CheckInList( int ihandle, int head, int in );
 static int CheckThread( int ihandle, int head );
+static const char *HandleString( int, char * );
+static const char *HeadString( int, char * );
 #endif
 
 #if defined(THREAD_SAFE)
@@ -4934,6 +4936,11 @@ static void AnnulHandle( int ihandle, int *status ) {
    the mutex that protects access to the handles arrays so that it can 
    potentially be re-aquired within astAnnul without causing deadlock. */
       } else {
+
+         astHandleUse( ihandle, "annulled using check value %d ",
+                       handles[ ihandle ].check  );
+
+
          ptr = handles[ ihandle ].ptr;
          UNLOCK_MUTEX2;
          ptr = astAnnul( ptr );
@@ -4955,8 +4962,6 @@ static void AnnulHandle( int ihandle, int *status ) {
 #endif
          InsertHandle( ihandle, &free_handles, status );
 
-/* If required, tell the user that the handle has been anulled. */
-         astHandleUse_( ihandle, "annulled" );
       }
    }
 }
@@ -5309,7 +5314,7 @@ static int CheckId( AstObject *this_id, int *status ) {
          }
 
 /* See if the "check" field matches the ID value and the Handle is
-   valie (i.e. is associated with an active Object). If not, the
+   valid (i.e. is associated with an active Object). If not, the
    Handle has been annulled and possibly re-used, so report an
    error. */
       } else if ( ( handles[ work.i ].check != id ) ||
@@ -5434,7 +5439,7 @@ AstObject *astDeleteId_( AstObject *this_id, int *status ) {
       }
 
 /* If required, tell the user that the handle's object has been deleted. */
-      astHandleUse_( ihandle, "object-deleted" );
+      astHandleUse( ihandle, "object-deleted" );
    }
 
    UNLOCK_MUTEX2;
@@ -5652,7 +5657,7 @@ f        This routine applies to all Objects.
          InsertHandle( ihandle, &active_handles[ 0 ], status );
 
 /* If required, tell the user that the handle has been exempted. */
-         astHandleUse_( ihandle, "exempted" );
+         astHandleUse( ihandle, "exempted" );
       }
 
       UNLOCK_MUTEX2;
@@ -5766,7 +5771,7 @@ f     and have not been rendered exempt using AST_EXEMPT.
                              status );
 
 /* If required, tell the user that the handle has been exempted. */
-               astHandleUse_( ihandle, "exported from context level %d",
+               astHandleUse( ihandle, "exported from context level %d",
                               context_level );
             }
          }
@@ -5864,7 +5869,7 @@ f        This routine applies to all Objects.
             InsertHandle( ihandle, &active_handles[ context_level ], status );
 
 /* If required, tell the user that the handle has been imported. */
-            astHandleUse_( ihandle, "imported into context level %d",
+            astHandleUse( ihandle, "imported into context level %d",
                            context_level );
          }
       }
@@ -5995,13 +6000,20 @@ c--
 
 #if defined(MEM_DEBUG)
             handles[ ihandle ].thread = AST__THREAD_ID;
-            astHandleUse_( ihandle, "locked by thread %d at context level %d", 
+            astHandleUse( ihandle, "locked by thread %d at context level %d", 
                            handles[ ihandle ].thread, context_level );
 #endif
 
             InsertHandle( ihandle, &active_handles[ context_level ], status );
             handles[ ihandle ].context = context_level;
 
+         } else if( astOK ) {
+            astError( AST__INTER, "astLock(%s): Supplied Object handle "
+                      "(index %d value %d) has a context level of %d "
+                      "which should be %d (internal AST programming error).",
+                      status, astGetClass( this ), ihandle,  
+                      handles[ ihandle ].check, handles[ ihandle ].context, 
+                      UNOWNED_CONTEXT );
          }
          UNLOCK_MUTEX2;
       }
@@ -6109,7 +6121,7 @@ c--
             RemoveHandle( ihandle, &active_handles[ handles[ ihandle ].context ], status );
 
 #if defined(MEM_DEBUG)
-            astHandleUse_( ihandle, "unlocked from thread %d at context "
+            astHandleUse( ihandle, "unlocked from thread %d at context "
                            "level %d", handles[ ihandle ].thread, 
                            handles[ ihandle ].context );
             handles[ ihandle ].thread = -1;
@@ -6293,7 +6305,10 @@ static void InsertHandle( int ihandle, int *head, int *status ) {
 *     full-length C pointers.
 */
 
+
 #if defined(MEM_DEBUG)
+   char buf[80];
+   astHandleUse( ihandle, "about to be inserted into %s", HeadString( *head, buf ) );
    CheckList( *head );
    CheckInList( ihandle, *head, 0 );
 #endif
@@ -6321,6 +6336,7 @@ static void InsertHandle( int ihandle, int *head, int *status ) {
 
 #if defined(MEM_DEBUG)
    CheckList( *head );
+   astHandleUse( ihandle, "has been inserted into %s", buf );
 #endif
 }
 
@@ -6419,21 +6435,22 @@ AstObject *astMakeId_( AstObject *this, int *status ) {
                handles[ ihandle ].ptr = this;
                handles[ ihandle ].context = context_level;
 
-/* Store extra debugging information in the handle if enabled */
-#if defined(MEM_DEBUG)
-               handles[ ihandle ].thread = AST__THREAD_ID;
-               astHandleUse_( ihandle, "associated with a %s (id %d)",
-                              astGetClass( this ), astMemoryId( this ) );
-               handles[ ihandle ].id = astMemoryId( this );
-               handles[ ihandle ].vtab = this->vtab;
-#endif
-
 /* Insert the Handle into the active Handles list for the current
    context level. */
                InsertHandle( ihandle, &active_handles[ context_level ], status );
 
 /* Associate an identifier value with the Handle. */
                id = AssocId( ihandle, status );
+
+/* Store extra debugging information in the handle if enabled */
+#if defined(MEM_DEBUG)
+               handles[ ihandle ].thread = AST__THREAD_ID;
+               astHandleUse( ihandle, "associated with a %s (id %d)",
+                              astGetClass( this ), astMemoryId( this ),
+                              handles[ ihandle ].check );
+               handles[ ihandle ].id = astMemoryId( this );
+               handles[ ihandle ].vtab = this->vtab;
+#endif
 
 /* If an error occurred, clean up by annulling the Handle. This
    ensures that the Object pointer is annulled and returns the unused
@@ -6639,7 +6656,10 @@ static void RemoveHandle( int ihandle, int *head, int *status ) {
 *     of Handles are constructed.
 */
 
+
 #if defined(MEM_DEBUG)
+   char buf[80];
+   astHandleUse( ihandle, "about to be removed from %s", HeadString( *head, buf ) );
    CheckList( *head );
    CheckInList( ihandle, *head, 1 );
 #endif
@@ -6647,6 +6667,7 @@ static void RemoveHandle( int ihandle, int *head, int *status ) {
 /* Check a head pointer was supplied (may not be if an error has
    occurred). */
    if( ! head ) return;
+
 
 /* Remove the Handle from the list by re-establishing links between
    the elements on either side of it. */
@@ -6668,6 +6689,7 @@ static void RemoveHandle( int ihandle, int *head, int *status ) {
    handles[ ihandle ].blink = ihandle;
 
 #if defined(MEM_DEBUG)
+   astHandleUse( ihandle, "has been removed from %s", buf );
    CheckList( *head );
 #endif
 }
@@ -6885,18 +6907,20 @@ f     AST_STRIPESCAPES
 /* Check each handle in a list is uniquely connected to one other handle
    in both the forward and backward directions. */
 
-   static void CheckList( int head ) {
+static void CheckList( int head ) {
+   int ok;
    int ihandle;
+   char buf[200];
    astDECLARE_GLOBALS;          
 
    astGET_GLOBALS(NULL);
 
+   ok = 1;
    if ( head != -1 ) {
       ihandle = head;      
       if( handles[ handles[ ihandle ].blink ].flink != ihandle ||
           handles[ handles[ ihandle ].flink ].blink != ihandle ) {
-         printf("CheckList error\n");
-
+         ok = 0;
       } else {
          if( CheckThread( ihandle, head ) ) {
             ihandle= handles[ head ].blink;
@@ -6904,7 +6928,7 @@ f     AST_STRIPESCAPES
                if( handles[ handles[ ihandle ].blink ].flink != ihandle ||
                    handles[ handles[ ihandle ].flink ].blink != ihandle ||
                    CheckThread( ihandle, head ) == 0 ) {
-                  printf("CheckList error\n");
+                  ok = 0;
                   break;
                } 
                ihandle= handles[ ihandle ].blink;
@@ -6912,12 +6936,33 @@ f     AST_STRIPESCAPES
          }
       }
    }
+
+   if( !ok ) {
+      printf("CheckList error in %s\n", HeadString( head, buf ) );
+      printf("   Central handle: %s\n", HandleString( ihandle, buf ) );      
+
+      if( handles[ handles[ ihandle ].blink ].flink != ihandle ) {
+         printf("   Central handle->blink: %s\n", 
+                 HandleString( handles[ ihandle ].blink, buf ) );      
+         printf("   Central handle->blink->flink: %s\n", 
+                 HandleString( handles[ handles[ ihandle ].blink ].flink, buf ) );
+      }
+
+      if( handles[ handles[ ihandle ].flink ].blink != ihandle ) {
+         printf("   Central handle->flink: %s\n", 
+                 HandleString( handles[ ihandle ].flink, buf ) );      
+         printf("   Central handle->flink->blink: %s\n", 
+                 HandleString( handles[ handles[ ihandle ].flink ].blink, buf ) );
+      }
+   }
+
 }
 
 
 /* Check if a specified handle is, or is not, in a given list of handles. */
 
 static void CheckInList( int ihandle, int head, int in ){
+   char list[80], buf[200];
    int found = 0;
 
    if ( head != -1 ) {
@@ -6938,9 +6983,11 @@ static void CheckInList( int ihandle, int head, int in ){
    }
 
    if( in && !found ) {
-      printf("Error: Handle not in list\n" );
+      printf("Error: Handle %s not in %s\n", HandleString( ihandle, buf ),
+              HeadString( head, list ) );
    } else if( !in && found ) {
-      printf("Error: Handle is in list\n" );
+      printf("Error: Handle %s is in %s\n", HandleString( ihandle, buf ),
+              HeadString( head, list ) );
    }
 
 }
@@ -6949,6 +6996,7 @@ static void CheckInList( int ihandle, int head, int in ){
 
 static int CheckThread( int ihandle, int head ) {
    int result = 1;
+   char buf[200];
    astDECLARE_GLOBALS;          
    astGET_GLOBALS(NULL);
 
@@ -6961,7 +7009,8 @@ static int CheckThread( int ihandle, int head ) {
    } 
    if( sb != -222 ) {
       result = 0;
-      printf("Handle has wrong thread: is %d, should be %d\n",  
+      printf("Handle %s has wrong thread: is %d, should "
+             "be %d\n", HandleString( ihandle, buf ), 
               handles[ ihandle ].thread, sb );
    }
    return result;
@@ -6981,19 +7030,50 @@ void astHandleUse_( int handle, const char *verb, ... ){
 }
 
 void astHandleAlarm_( const char *verb, va_list args ){
-   char buff[200];
+   char buff[200], hbuf[200];
    astDECLARE_GLOBALS;          
    astGET_GLOBALS(NULL);
 
    vsprintf( buff, verb, args );
-   printf( "astHandleAlarm: Handle %d has been %s (current thread is %d).\n", 
-           Watched_Handle, buff, AST__THREAD_ID );
+   printf( "astHandleAlarm: Handle %s %s (current thread is %d).\n\n", 
+           HandleString( Watched_Handle, hbuf ), buff, AST__THREAD_ID );
 }
 
+static const char *HandleString( int ihandle, char *buf ){
+   sprintf( buf, "(index:%d v:%d c:%d t:%d i:%d cl:%s)", ihandle, 
+            handles[ ihandle ].check, 
+            handles[ ihandle ].context, handles[ ihandle ].thread,
+            handles[ ihandle ].id, 
+            handles[ ihandle ].vtab ? handles[ ihandle ].vtab->class : "<none>" );
+   return buf;
+}
+
+static const char *HeadString( int head, char *list ){
+   int i;
+   astDECLARE_GLOBALS;          
+   astGET_GLOBALS(NULL);
+
+   if( head == free_handles ) {
+      strcpy( list, "free_handles" );
+
+   } else if( head == unowned_handles ) {
+      strcpy( list, "unowned_handles" );
+
+   } else {
+      *list = 0;
+      for( i = 0; i <= context_level; i++ ) {
+         if( head == active_handles[ i ] ) {
+            sprintf( list, "active_handles[%d]", i );
+            break;
+         }
+      }
+      if( *list == 0 ) sprintf( list, "unknown handles list with head %d",
+                                head );
+   }      
+   return list;
+}
 
 #endif
-
-
 
 
 
