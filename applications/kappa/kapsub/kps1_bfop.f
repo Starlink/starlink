@@ -95,8 +95,9 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2007 Particle Physics and Astronomy Research 
-*     Council.  All Rights Reserved.
+*     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009 Science and Technology Facilities Council. 
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -130,6 +131,13 @@
 *        Made RMS single precision.
 *     2007 June 15 (MJC):
 *        Add REFOFF argument and parameter.
+*     2009 January 31 (MJC):
+*        Fix bug storing second and higher dimensions of CENTRE.
+*        Increase precision of sky co-ordinates for CENTRE and REFOFF
+*        to a hundreth of an arcsecond.
+*     2009 February 2 (MJC):
+*        Made the last change more general using Digits attribute and
+*        checking for AsTime axes.
 *     {enter_further_changes_here}
 
 *-
@@ -172,13 +180,18 @@
       PARAMETER ( R2D = 180.0D0 / PI )
 
 *  Local Variables:
+      CHARACTER*9 ATTR           ! Buffer for attribute name
       CHARACTER*50 AXVAL         ! A formatted axis value
+      CHARACTER*12 FMAT( 2 )     ! SkyFrame format
       INTEGER IAT                ! No. of characters currently in buffer
       INTEGER IB                 ! Beam loop counter
       INTEGER J                  ! Loop count
       INTEGER K                  ! Loop count
+      INTEGER LAT                ! Index to latitude axis in SkyFrame
       CHARACTER*128 LINE( BUFSIZ ) ! Buffer for output text
       DOUBLE PRECISION S2FWHM    ! Sigma-to-FWHM conversion
+      INTEGER PREC( 2 )          ! Number of digits of precision
+      LOGICAL TIME( 2 )          ! Coordinates formatted as times?
       DOUBLE PRECISION WORK( 2 ) ! Work array for storing values
                                  ! and errors
       REAL WORKER( BUFSIZ )      ! Work array for storing values
@@ -189,40 +202,59 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Inquire current number of SkyFrame format precision digits
+*  and whether the axis should be formatted as a time axis.
+      PREC( 1 ) = AST_GETI( RFRM, 'Digits(1)', STATUS )
+      PREC( 2 ) = AST_GETI( RFRM, 'Digits(2)', STATUS )
+      TIME( 1 ) = AST_GETL( RFRM, 'AsTime(1)', STATUS )
+      TIME( 2 ) = AST_GETL( RFRM, 'AsTime(2)', STATUS )
+
+*  Provide sufficient precision for sky co-ordinates.  Use three
+*  figures are the decimals seconds of time and two digits of
+*  arcseconds.  Allow for negative sign that appears to count as a
+*  digit.
+      DO J = 1, 2
+         ATTR = 'Digits('
+         IAT = 7
+         CALL CHR_PUTI( J, ATTR, IAT )
+         CALL CHR_APPND( ')', ATTR, IAT )
+         IF ( TIME( J ) .OR. P( J ) .LT. 0.0D0 ) THEN
+            CALL AST_SETI( RFRM, ATTR( :IAT ), 9, STATUS )
+         ELSE
+            CALL AST_SETI( RFRM, ATTR( :IAT ), 8, STATUS )
+         END IF
+      END DO
+
 *  CENTRE
 *  ======
 
 *  Now write the primary-beam position out to the output parameters. 
 *  The complete set of axis values (separated by spaces) is written to
-*  CENTRE.
+*  a buffer.
       IAT = 0
       LINE( 1 ) = ' '
 
       DO J = 1, NAXR
-         AXVAL = AST_FORMAT( RFRM, 1, P( J ), STATUS )
+         AXVAL = AST_FORMAT( RFRM, J, P( J ), STATUS )
          CALL CHR_APPND( AXVAL, LINE( 1 ), IAT )
          IAT = IAT + 1
       END DO
 
+*  Record the errors in the second element of the buffer.
       IAT = 0
       LINE( 2 ) = ' '
-      IF ( SIGMA( 1 ) .NE. VAL__BADD ) THEN
-         AXVAL = AST_FORMAT( RFRM, 1, SIGMA( 1 ), STATUS )
-      ELSE
-         AXVAL = 'bad'
-      END IF
-      CALL CHR_APPND( AXVAL, LINE( 2 ), IAT )
-      IAT = IAT + 1
+      DO J = 1, NAXR
+         IF ( SIGMA( J ) .NE. VAL__BADD ) THEN
+            AXVAL = AST_FORMAT( RFRM, J, SIGMA( J ), STATUS )
+         ELSE
+            AXVAL = 'bad'
+         END IF
+         CALL CHR_APPND( AXVAL, LINE( 2 ), IAT )
+         IAT = IAT + 1
+      END DO
 
-*  Now we swap the path to the second axis.
-      IF ( SIGMA( 2 ) .NE. VAL__BADD ) THEN
-         AXVAL = AST_FORMAT( RFRM, 1, SIGMA( 2 ), STATUS )
-      ELSE
-         AXVAL = 'bad'
-      END IF
-      CALL CHR_APPND( AXVAL, LINE( 2 ), IAT )
-      IAT = IAT + 1
-
+*  Record the formattd co-ordinates and correspending errors in the
+*  output parameter.
       CALL PAR_PUT1C( 'CENTRE', 2, LINE, STATUS )
 
 *  FWHMs
@@ -264,12 +296,16 @@
 *  OFFSET of primary beam
 *  ======================
 
+*  Obtain the latitude axis so that the required precision
+*  is used.
+      LAT = AST_GETI( RFRM, 'LatAxis', STATUS )
+
 *  Write the primary-beam offset and error out to the output
 *  parameter.  Both values are written to REFOFF.
-      LINE( 1 ) = AST_FORMAT( RFRM, 1, REFOFF( 1 ), STATUS )
+      LINE( 1 ) = AST_FORMAT( RFRM, LAT, REFOFF( 1 ), STATUS )
 
       IF ( REFOFF( 2 ) .NE. VAL__BADD ) THEN
-         LINE( 2 ) = AST_FORMAT( RFRM, 1, REFOFF( 2 ), STATUS )
+         LINE( 2 ) = AST_FORMAT( RFRM, LAT, REFOFF( 2 ), STATUS )
       ELSE
          LINE( 2 ) = 'bad'
       END IF
@@ -310,5 +346,9 @@
          CALL PAR_PUT1C( 'OFFSET', K, LINE, STATUS )
          CALL PAR_PUT1R( 'PA', K, WORKER, STATUS )
       END IF
+
+*  Reset the SkyFrame precisions to their original values.
+      CALL AST_SETI( RFRM, 'Digits(1)', PREC( 1 ), STATUS )
+      CALL AST_SETI( RFRM, 'Digits(2)', PREC( 2 ), STATUS )
 
       END

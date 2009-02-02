@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.35}
 \newcommand{\stardocnumber}    {95.35}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2009 January 26}
+\newcommand{\stardocdate}      {2009 January 31}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.10}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -14721,7 +14721,8 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          current co-ordinate Frame of the NDF (supplying a colon {\tt
          ":"} will display details of the current co-ordinate Frame).
          A position should be supplied as a list of formatted
-         WCS axis values separated by spaces or commas.
+         WCS axis values separated by spaces or commas, and should 
+         lie within the bounds of the NDF.
 
          If the initial co-ordinates are supplied on the command line 
          without BEAMS the number of contiguous POS, POS2,\ldots
@@ -14733,12 +14734,12 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          POS2-POS5 = LITERAL (Read)
       }{
          When MODE = {\tt "Interface"} these parameters specify the
-         co-ordinates of the secondary beam positions.  For each
-         parameter the supplied location may be merely an initial
-         guess for the fit, or if Parameter FIXPOS is {\tt TRUE}, it
-         defines a fixed location, unless Parameter FIXSEP is {\tt
-         TRUE}, whereupon it defines a fixed separation from the
-         primary beam.
+	 co-ordinates of the secondary beam positions.  These should 
+	 lie within the bounds of the NDF.  For each parameter the
+	 supplied location may be merely an initial guess for the fit,
+	 or if Parameter FIXPOS is {\tt TRUE}, it defines a fixed
+	 location, unless Parameter FIXSEP is {\tt TRUE}, whereupon it
+	 defines a fixed separation from the primary beam.
 
          For POLAR = {\tt FALSE} each distance should be given as a single
          literal string containing a space- or comma-separated list of 
@@ -14771,10 +14772,11 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
       \sstsubsection{
          REFPOS = LITERAL (Read)
       }{
-         The reference position.  The offset of the primary beam with
-         respect to this point is reported and stored in parameter
-         REFOFF.  It is only accessed if the current WCS Frame in the
-         NDF is not a SKY Domain.
+         The reference position.  This is often the desired position for
+         the beam.  The offset of the primary beam with respect to this 
+         point is reported and stored in Parameter REFOFF.  It is only
+         accessed if the current WCS Frame in the NDF is not a SKY
+         Domain containing a reference position.
 
          The co-ordinates are specified in the current WCS Frame of the
          NDF (supplying a colon {\tt ":"} will display details of the current
@@ -14872,11 +14874,13 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
       \sstsubsection{
          REFOFF( 2 ) = LITERAL (Write)
       }{
-         The formatted offset followed by its error of the primary beam 
-         with respect to the reference position (see Parameter REFPOS).
-         These are measured in the current Frame of the NDF along a 
-         latitude axis if that Frame is in the SKY Domain, or the first
-         axis otherwise.  The error is derived entirely from the
+         The formatted offset followed by its error of the primary
+         beam's location with respect to the reference position (see
+         Parameter REFPOS).  The offset might be used to assess the
+         optical alignment of an instrument.  The ofset and its error
+         are measured in the current Frame of the NDF along a latitude
+         axis if that Frame is in the SKY Domain, or the first axis
+         otherwise.  The error is derived entirely from the
          uncertainities in the fitted position of the primary beam,
          \emph{i.e.} the reference position has no error attached to 
          it.  By definition the error is zero when FIXPOS is {\tt TRUE}.

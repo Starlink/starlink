@@ -36,22 +36,22 @@
 *     or polar co-ordinates.
 *
 *     Four methods are available for obtaining the initial positions, 
-*     selected using parameter MODE:
+*     selected using Parameter MODE:
 *
-*     - from the parameter system (see parameters POS, POS2--POS5);
+*     - from the parameter system (see Parameters POS, POS2--POS5);
 *
 *     - using a graphics cursor to indicate the feature in a previously
-*     displayed data array (see parameter DEVICE);
+*     displayed data array (see Parameter DEVICE);
 *
-*     - from a specified positions list (see parameter INCAT); or
+*     - from a specified positions list (see Parameter INCAT); or
 *
 *     - from a simple text file containing a list of co-ordinates (see
-*     parameter COIN).
+*     Parameter COIN).
 *
 *     In the first two modes the application loops, asking for new
 *     feature co-ordinates until it is told to quit or encounters an
 *     error or the maximum number of features is reached.  The last is
-*     five, unless parameters POS2---POS5 define the location of the 
+*     five, unless Parameters POS2---POS5 define the location of the 
 *     secondary beams and then only the primary beam's position is 
 *     demanded.
 *
@@ -61,7 +61,7 @@
 *     the primary beam, and the offset of the primary beam from a
 *     reference position.  Also a listing of the fit results may be 
 *     written to a log file geared more towards human readers, 
-*     including details of the input parameters (see parameter
+*     including details of the input parameters (see Parameter
 *     LOGFILE).  
 *
 *  Usage:
@@ -100,7 +100,7 @@
 *     COIN = FILENAME (Read)
 *        Name of a text file containing the initial guesses at the 
 *        co-ordinates of beams to be fitted.  It is only accessed if 
-*        parameter MODE is given the value "File".  Each line should
+*        Parameter MODE is given the value "File".  Each line should
 *        contain the formatted axis values for a single position, in the
 *        current Frame of the NDF.  Axis values can be separated by 
 *        spaces, tabs or commas.  The file may contain comment lines 
@@ -111,7 +111,7 @@
 *        the positions themselves.  [current value]
 *     DEVICE = DEVICE (Read)
 *        The graphics device which is to be used to give the initial
-*        guesses at the beam positions.  Only accessed if parameter 
+*        guesses at the beam positions.  Only accessed if Parameter 
 *        MODE is given the value "Cursor".  [Current graphics device]
 *     FIXAMP = _DOUBLE (Read)
 *        This specifies the fixed amplitude of the first beam. 
@@ -151,13 +151,13 @@
 *        If TRUE, the supplied position of each beam is used and
 *        the centre co-ordinates of the beam features are not fit. 
 *        FALSE causes the initial estimate of the location of each 
-*        beam to come from the source selected by parameter MODE, and 
+*        beam to come from the source selected by Parameter MODE, and 
 *        all these locations are part of the fitting process (however
 *        note the exception when FIXSEP = TRUE.  It is advisable not to
 *        use this option in the inaccurate "Cursor" mode.  [FALSE]
 *     FIXSEP = _LOGICAL (Read)
 *        If TRUE, the separations of secondary beams from the primary
-*        beam are fixed, and this takes precedence over parameter
+*        beam are fixed, and this takes precedence over Parameter
 *        FIXPOS.  If FALSE, the beam separations are free to be fitted
 *        (although it is actually the centres being fit).  It is 
 *        advisable not to use this option in the inaccurate "Cursor" 
@@ -165,7 +165,7 @@
 *     INCAT = FILENAME (Read)
 *        A catalogue containing a positions list giving the initial
 *        guesses at the beam positions, such as produced by applications
-*        CURSOR, LISTMAKE, etc.  It is only accessed if parameter MODE 
+*        CURSOR, LISTMAKE, etc.  It is only accessed if Parameter MODE 
 *        is given the value "Catalogue". 
 *     LOGFILE = FILENAME (Read)
 *        Name of the text file to log the results.  If null, there
@@ -175,9 +175,9 @@
 *         The primary beam position's major-axis FWHM and its error, 
 *         measured in the current co-ordinate Frame of the NDF.
 *     MARK = LITERAL (Read)
-*        Only accessed if parameter MODE is given the value "Cursor". 
+*        Only accessed if Parameter MODE is given the value "Cursor". 
 *        It indicates which positions are to be marked on the screen 
-*        using the marker type given by parameter MARKER.  It can take 
+*        using the marker type given by Parameter MARKER.  It can take 
 *        any of the following values.
 *
 *        - "Initial" -- The position of the cursor when the mouse 
@@ -192,7 +192,7 @@
 *
 *        [current value]
 *     MARKER = INTEGER (Read)
-*        This parameter is only accessed if parameter MARK is set TRUE.
+*        This parameter is only accessed if Parameter MARK is set TRUE.
 *        It specifies the type of marker with which each cursor 
 *        position should be marked, and should be given as an integer
 *        PGPLOT marker type.  For instance, 0 gives a box, 1 gives a
@@ -205,21 +205,21 @@
 *        The mode in which the initial co-ordinates are to be obtained. 
 *        The supplied string can be one of the following values.
 *
-*        - "Interface" -- positions are obtained using parameters POS,
+*        - "Interface" -- positions are obtained using Parameters POS,
 *        POS2--POS5.
 *
 *        - "Cursor" -- positions are obtained using the graphics cursor
-*        of the device specified by parameter DEVICE.
+*        of the device specified by Parameter DEVICE.
 *
 *        - "Catalogue" -- positions are obtained from a positions list
-*        using parameter INCAT.
+*        using Parameter INCAT.
 *
 *        -  "File" -- positions are obtained from a text file using 
-*        parameter COIN. 
+*        Parameter COIN. 
 *        [current value]
 *     NDF = NDF (Read)
 *        The NDF structure containing the data array to be analysed.  In
-*        cursor mode (see parameter MODE), the run-time default is the 
+*        cursor mode (see Parameter MODE), the run-time default is the 
 *        displayed data, as recorded in the graphics database.  In other
 *        modes, there is no run-time default and the user must supply a
 *        value.  []
@@ -247,7 +247,7 @@
 *        secondary beam.
 *     PLOTSTYLE = LITERAL (Read)
 *        A group of attribute settings describing the style to use when
-*        drawing the graphics markers specified by parameter MARK.
+*        drawing the graphics markers specified by Parameter MARK.
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text 
@@ -289,22 +289,23 @@
 *     POS = LITERAL (Read)
 *        When MODE = "Interface" POS specifies the co-ordinates of the 
 *        primary beam position.  This is either merely an initial guess
-*        for the fit, or if parameter FIXPOS is TRUE, it defines a
+*        for the fit, or if Parameter FIXPOS is TRUE, it defines a
 *        fixed location.  It is specified in the current co-ordinate 
 *        Frame of the NDF (supplying a colon ":" will display details of
 *        the current co-ordinate Frame).  A position should be supplied 
 *        as a list of formatted WCS axis values separated by spaces or
-*        commas.
+*        commas, and should lie within the bounds of the NDF.
 
 *        If the initial co-ordinates are supplied on the command line 
 *        without BEAMS the number of contiguous POS, POS2,... parameters
 *        specifies the number of beams to be fit.
 *     POS2-POS5 = LITERAL (Read)
 *        When MODE = "Interface" these parameters specify the 
-*        co-ordinates of the secondary beam positions.  For each 
-*        parameter the supplied location may be merely an initial guess 
-*        for the fit, or if parameter FIXPOS is TRUE, it defines a fixed
-*        location, unless parameter FIXSEP is TRUE, whereupon it defines 
+*        co-ordinates of the secondary beam positions.  These should lie 
+*        within the bounds of the NDF.  For each parameter the supplied 
+*        location may be merely an initial guess for the fit, or if 
+*        Parameter FIXPOS is TRUE, it defines a fixed location, unless 
+*        Parameter FIXSEP is TRUE, whereupon it defines 
 *        a fixed separation from the primary beam.
 *
 *        For POLAR = FALSE each distance should be given as a single
@@ -316,8 +317,8 @@
 *        the format required for each axis value, and a new parameter 
 *        value is then obtained.
 
-*        If parameter POLAR is TRUE, POS2--POS5 may be given as an 
-*        offset followed by a position angle.  See parameter POLAR for 
+*        If Parameter POLAR is TRUE, POS2--POS5 may be given as an 
+*        offset followed by a position angle.  See Parameter POLAR for 
 *        more details of the sense of the angle and the offset 
 *        co-ordinates.
 *
@@ -325,26 +326,29 @@
 *        feature.  Thus POS2 applies to the first secondary beam
 *        (second position in all), POS3 is for the second secondary 
 *        beam, and so on.  As the total number of parameters required is 
-*        one fewer than the value of parameter BEAMS, POS2--POS5 are 
+*        one fewer than the value of Parameter BEAMS, POS2--POS5 are 
 *        only accessed when BEAMS exceeds 1.
 *     QUIET = _LOGICAL (Read)
 *        If TRUE then the fit parameters are not displayed on the 
 *        screen.  Output parameters and files are still created.  
 *        [FALSE]
 *     REFOFF( 2 ) = LITERAL (Write)
-*        The formatted offset followed by its error of the primary beam 
-*        with respect to the reference position (see parameter REFPOS).
-*        These are measured in the current Frame of the NDF along a 
-*        latitude axis if that Frame is in the SKY Domain, or the first
-*        axis otherwise.  The error is derived entirely from the
+*        The formatted offset followed by its error of the primary
+*        beam's location with respect to the reference position (see
+*        Parameter REFPOS).  The offset  might be used to assess the
+*        optical alignment of an instrument.  The ofset and its error
+*        are measured in the current Frame of the NDF along a latitude
+*        axis if that Frame is in the SKY Domain, or the first axis
+*        otherwise.  The error is derived entirely from the
 *        uncertainities in the fitted position of the primary beam,
 *        i.e. the reference position has no error attached to it.  By
 *        definition the error is zero when FIXPOS is TRUE.
 *     REFPOS = LITERAL (Read)
-*        The reference position.  The offset of the primary beam with
-*        respect to this point is reported and stored in parameter
-*        REFOFF.  It is only accessed if the current WCS Frame in the
-*        NDF is not a SKY Domain.
+*        The reference position.  This is often the desired position for
+*        the beam.  The offset of the primary beam with respect to this 
+*        point is reported and stored in Parameter REFOFF.  It is only
+*        accessed if the current WCS Frame in the NDF is not a SKY
+*        Domain containing a reference position.
 
 *        The co-ordinates are specified in the current WCS Frame of the
 *        NDF (supplying a colon ":" will display details of the current
@@ -440,7 +444,7 @@
 *  Notes:
 *     -  All positions are supplied and reported in the current 
 *     co-ordinate Frame of the NDF.  A description of the co-ordinate 
-*     Frame being used is given if parameter DESCRIBE is set to a TRUE
+*     Frame being used is given if Parameter DESCRIBE is set to a TRUE
 *     value.  Application WCSFRAME can be used to change the current
 *     co-ordinate Frame of the NDF before running this application if 
 *     required.
@@ -459,8 +463,9 @@
 *      is performed using double-precision floating point.
 
 *  Copyright:
-*     Copyright (C) 2007 Particle Physics and Astronomy Research 
-*     Council.  All Rights Reserved.
+*     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009 Science and Technology Facilities Council. 
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -495,10 +500,10 @@
 *        Add SEPARATION parameter.
 *     2007 May 22 (MJC):
 *        Improve and correct documentation.  Made SEPARATION a series of
-*        parameters SEP--SEP4 to allow command-line access.  Revise
+*        Parameters SEP--SEP4 to allow command-line access.  Revise
 *        calls to routines whose APIs have changed.
 *     2007 June 1 (MJC):
-*        Add parameters OFFSET, PA, and POLAR.
+*        Add Parameters OFFSET, PA, and POLAR.
 *     2007 June 4 (MJC):
 *        Polar co-ordinates demanded a further restructuring of the code
 *        and revised parameters.  Parameter FIXSEP was introduced, 
@@ -510,12 +515,15 @@
 *        Rework derivation of the number of positions from the command
 *        line.  Remove unused variables.
 *     2007 June 15 (MJC):
-*        Added parameters REFPOS and REFOUT, and Ellipse option to
+*        Added Parameters REFPOS and REFOUT, and Ellipse option to
 *        MARK.
 *     2007 July 9 (MJC):
 *        Do not ignore SkyRef attribute for the reference position when 
 *        the SkyRefIs attribute is set to Ignored.  Record which
 *        reference point is being used.
+*     2009 January 31 (MJC):
+*        Clarify some of the parameter descriptions.  Flag that we
+*        have a reference position for SkyRefIs=Origin.
 *     {enter_further_changes_here}
 
 *-
@@ -1013,6 +1021,7 @@
          IF ( SKYREF .EQ. 'Origin' ) THEN
             REFPOS( 1 ) = 0.0D0
             REFPOS( 2 ) = 0.0D0
+            GOTREF = .TRUE.
 
 *  Extract the co-ordinates of the reference position in the current
 *  Frame.  These are in radians.

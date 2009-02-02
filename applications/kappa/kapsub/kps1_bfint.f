@@ -157,8 +157,9 @@
 *      the include file BF_PAR.
 
 *  Copyright:
-*     Copyright (C) 2007 Particle Physics and Astronomy Research
-*     Council.  All Rights Reserved.
+*     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009 Science and Technology Facilities Council. 
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -220,6 +221,8 @@
 *        Passed FrameSet identifier to KPS1_BFCRF.
 *     2007 July 9 (MJC):
 *        Added REFLAB argument passed to KPS1_BFLOG.
+*     2009 January 31 (MJC):
+*        Check that the input co-ordinates lie with the array bounds.
 *     {enter_further_changes_here}
 
 *-
@@ -576,7 +579,9 @@
 *  Copy the initial PIXEL position into a single-precision array,
 *  checking for bad axis values.
          DO J = 1, BF__NDIM
-            IF ( PIXPOS( NBPS, J ) .EQ. AST__BAD ) THEN
+            IF ( PIXPOS( NBPS, J ) .EQ. AST__BAD .OR.
+     :           PIXPOS( NBPS, J ) .LT. SLBND( J ) .OR.
+     :           PIXPOS( NBPS, J ) .GT. SUBND( J ) ) THEN
                OK = .FALSE.
             END IF
          END DO
@@ -591,7 +596,8 @@
                STATUS = SAI__ERROR
                CALL ERR_REP( 'KPS1_BFINT_ERR3', 'The supplied '/
      :                       /'co-ordinates (^CX,^CY) convert to bad '/
-     :                       /'PIXEL co-ordinates.', STATUS )
+     :                       /'PIXEL co-ordinates, or lie outside the '/
+     :                       /'array bounds.', STATUS )
                IF ( .NOT. CURSOR ) THEN
                   CALL ERR_REP( 'KPS1_BFINT_ERR3A', 'Check that you '/
      :                           /'are using the correct chosen '/
@@ -603,14 +609,17 @@
 
 *  Give the user another chance at a prompt to supply valid
 *  co-ordinates.
-               CALL MSG_OUT( 'KPS1_BFINT_MSG5', 'The supplied '/
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'KPS1_BFINT_MSG5', 'The supplied '/
      :                       /'co-ordinates (^CX,^CY) convert to bad '/
-     :                       /'PIXEL co-ordinates.', STATUS )
+     :                       /'PIXEL co-ordinates, or lie outside the '/
+     :                       /'array bounds.', STATUS )
                IF ( .NOT. CURSOR ) THEN
                   CALL ERR_REP( 'KPS1_BFINT_MSG5A', 'Check that you '/
      :                           /'are using the correct chosen '/
      :                           /'system by entering : before you '/
      :                           /'try again.', STATUS )
+                  CALL ERR_FLUSH( STATUS )
                END IF            
 
 *  Reset allowing the using to have another attempt.
@@ -818,7 +827,7 @@
  10   CONTINUE
 
 *  A final blank line.
-      CALL MSG_BLANKIF( MSG__NORM, STATUS )
+      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
       IF ( LOGF ) CALL FIO_WRITE( FDL, ' ', STATUS )
 
 *  Tidy up.
