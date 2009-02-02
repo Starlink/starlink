@@ -120,7 +120,7 @@
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 1999 Central Laboratory of the Research Councils.
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -156,6 +156,8 @@
 *        background under the feature.
 *     17-APR-2008 (DSB):
 *        Use KPG__NOCEN error code.
+*     2009 January 31 (MJC):
+*        Fix bug validating denominator.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -664,7 +666,7 @@
                   FINAL( I ) = LAST( I )
 
 *  There were no data above/below the background.
-               ELSE IF ( DENOM( I ) .LT. VAL__EPSR ) THEN
+               ELSE IF ( DENOM( I ) .LT. VAL__SMLR ) THEN
                   STATUS = KPG__NOCEN
                   CALL MSG_SETI( 'I', I )
                   IF ( POSTIV ) THEN
