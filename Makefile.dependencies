@@ -1882,6 +1882,7 @@ $(MANIFESTS)/polpack: \
 		$(MANIFESTS)/kaplibs \
 		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
+		$(MANIFESTS)/nbs \
 		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
 		$(MANIFESTS)/ndg \
@@ -2796,6 +2797,12 @@ $(MANIFESTS)/tcl:
 	  && $(CONFIG_CPT) \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/tcldict: \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk
+	cd thirdparty/tclsys/tcldict \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/tcllibs: \
 		$(MANIFESTS)/tcl
 	cd thirdparty/tclsys/tcllibs \
@@ -2805,6 +2812,12 @@ $(MANIFESTS)/tclx: \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk
 	cd thirdparty/tclsys/tclx \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/tdom: \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk
+	cd thirdparty/tclsys/tdom \
 	  && $(MAKE_CPT)
 
 # Component tk is a configure dependency, so is configurable in place.
@@ -2878,6 +2891,10 @@ $(MANIFESTS)/vtk: \
 $(MANIFESTS)/xdisplay: \
 		$(MANIFESTS)/star2html
 	cd applications/xdisplay \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/xerces-c:
+	cd thirdparty/apache/xerces-c \
 	  && $(MAKE_CPT)
 
 # List of all supported components
