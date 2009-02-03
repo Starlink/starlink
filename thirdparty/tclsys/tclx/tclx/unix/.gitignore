@@ -1,0 +1,12 @@
+Common.mk
+Makefile
+config.log
+config.status
+runtcl
+runtcl.standalone
+runtcl.static
+runwishx
+runwishx.standalone
+runwishx.static
+tclxConfig.sh
+

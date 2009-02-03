@@ -1,0 +1,11 @@
+Makefile
+astrotclConfig.sh
+config.log
+config.status
+install
+tmp
+makefile.mk
+pkgIndex.tcl
+libastrotcl2.0.so
+configure.lineno
+

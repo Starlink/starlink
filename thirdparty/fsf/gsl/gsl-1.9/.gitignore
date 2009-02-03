@@ -1,0 +1,14 @@
+config.h
+Makefile
+gsl.pc
+gsl-randist
+config.status
+libtool
+gsl.spec
+config.log
+gsl-config
+.libs
+gsl-histogram
+stamp-h1
+configure.lineno
+

@@ -1,0 +1,12 @@
+Makefile
+config.cache
+config.log
+config.status
+libcfitsio.a
+libcfitsio.so
+fitscopy
+imcopy
+cfitsio.pc
+listhead
+configure.lineno
+

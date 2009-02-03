@@ -1,0 +1,9 @@
+Makefile
+config.log
+config.status
+jpegtclConfig.sh
+libjpeg
+pkgIndex.tcl
+libjpegtclstub1.0.a
+libjpegtcl1.0.so
+

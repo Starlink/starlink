@@ -1,0 +1,11 @@
+Makefile
+config.log
+config.status
+tclConfig.sh
+tclsh
+config.cache
+libtcl8.4.so
+libtclstub8.4.a
+libtcl8.4.dylib
+configure.lineno
+

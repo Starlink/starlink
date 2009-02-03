@@ -1,0 +1,11 @@
+Makefile
+config.log
+config.status
+jconfig.h
+djpeg
+libjpeg.a
+wrjpgcom
+rdjpgcom
+jpegtran
+cjpeg
+

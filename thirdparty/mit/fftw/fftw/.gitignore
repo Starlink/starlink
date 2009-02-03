@@ -1,0 +1,11 @@
+config.log
+fftw3.pc
+config.h
+fftw.pc
+.libs
+Makefile
+config.status
+stamp-h1
+configure.lineno
+libtool
+

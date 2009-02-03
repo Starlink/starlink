@@ -71,6 +71,11 @@ ltmain.sh
 compile
 Makefile
 ylwrap
+libtoolize
+*-stamp
+configure-output.log
+configure-output.log.err
+make.config
 
 # Mac specific
 
