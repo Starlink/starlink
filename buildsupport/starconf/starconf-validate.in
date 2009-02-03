@@ -161,7 +161,7 @@ if ( ! ( $? >> 8 ) ) {
     push(@allgitfiles, @required_files);
     push(@allgitfiles, @extra_checkins);
     foreach $f (@allgitfiles) {
-        my $result = `git-ls-files $f 2>&1`;
+        my $result = `git ls-files $f 2>&1`;
         #  Return will be "" if not checked in.
         if ( $result eq "" ) {
             print "$progname: file $f is not checked in, but should be\n";
@@ -170,7 +170,7 @@ if ( ! ( $? >> 8 ) ) {
         }
     }
     foreach $f (@non_checkins) {
-        my $result = `git-ls-files $f 2>&1`;
+        my $result = `git ls-files $f 2>&1`;
 
         #  Return will be "" if not checked in.
         if ( $result ne "" ) {
