@@ -4748,7 +4748,9 @@ for Objects not currently locked by the calling thread can be annulled
 succesfully using astAnnul. This means that a thread that has finished
 with an Object pointer can unlock the Object by passing the pointer to
 astUnlock (so that other threads can use the Object via their own cloned
-pointers), and can then annul the pointer using astAnnul.
+pointers), and can then annul the pointer using astAnnul. Note, however,
+that an error will be reported by astAnnul if the supplied pointer has
+been locked by another thread using astLock.
 
 When an Object is created, it is initially locked by the calling thread.
 Therefore a thread does not need to lock an Object explicitly if it was

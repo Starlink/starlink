@@ -162,6 +162,7 @@ void astAt_( const char *, const char *, int, int, int * );
 #if defined(astCLASS) || defined(astFORTRAN77)      /* Protected only */
 int astReporting_( int, int * );
 void astError_( int, const char *, int *, ... );
+void astBacktrace_( void );
 #if defined(THREAD_SAFE) 
 void astInitErrorGlobals_( AstErrorGlobals * );
 #endif
@@ -188,6 +189,7 @@ void astErrorPublic_( int, const char *, ... );
 #define astStatus (*status)
 #define astError astError_
 #define astReporting(report) astReporting_(report,status)
+#define astBacktrace astBacktrace_()
 
 #elif defined(astFORTRAN77)
 
