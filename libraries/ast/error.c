@@ -63,7 +63,7 @@
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -119,6 +119,8 @@
 *        to the AST status variable are now global rather than static. 
 *     19-SEP-2008 (DSB):
 *        Big changes for the thread-safe version of AST.
+*     3-FEB-2009 (DSB):
+*        Added astBacktrace.
 */
 
 /* Define the astCLASS macro (even although this is not a class
@@ -158,6 +160,13 @@
 #  define FREE free
 #  define REALLOC realloc
 #endif
+
+/* Include execinfo.h if the backtrace function is available */
+#if HAVE_EXECINFO_H
+#include <execinfo.h>
+#endif
+
+
 
 /* Module Variables. */
 /* ================= */
@@ -303,6 +312,69 @@ void astAt_( const char *routine, const char *file, int line, int forn,
 /* If the values relate to a foreign interface, set a flag which prevents
    local values set later replacing them. */
    foreign_set = forn;
+}
+
+void astBacktrace_( void ) {
+/*
+c+
+*  Name:
+*     astBacktrace
+
+*  Purpose:
+*     Display a backtrace on standard output.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "error.h"
+*     void astBacktrace( void )
+
+*  Description:
+*     This function displays a set of messages on standard output that
+*     give a backtrace of the caller. It can be useful for debugging AST
+*     code in situations when it is not easy or possible to use a
+*     debugger (for instance, when debugging JNIAST).
+
+*  Notes:
+*     - This function requires the GNU C library. When called, it will 
+*     just issue a warning if the GNU 'backtrace' function was not 
+*     available when AST was configured.
+c-
+*/
+#if HAVE_BACKTRACE
+
+#define MAX_ADDR 100
+
+/* Local Variables: */
+   char **strings;           /* Pointer to array of formated strings */
+   int j;                    /* String index */
+   int np;                   /* Number of used return addresses */
+   void *buffer[ MAX_ADDR ]; /* Array of return addresses */
+
+/* Get the array of return addresses. */
+   np = backtrace( buffer, MAX_ADDR );
+
+/* Convert them into strings. */
+   strings = backtrace_symbols( buffer, np );
+
+/* If succesful, display them and then free the array. Note we skip the
+   first one since that will refer to this function. */
+   if( strings ) {
+      printf("\n");
+      for( j = 1; j < np; j++ ) printf( "%d: %s\n", j, strings[j] );
+      free( strings );
+      printf("\n");
+
+/* If not succesful, issue a warning. */
+   } else {
+      printf( "Cannot convert backtrace addresses into formatted strings\n" );
+   }
+
+#else
+   printf("Backtrace functionality is not available on the current "
+          "operating system.\n");
+#endif
 }
 
 void astClearStatus_( int *status ) {
