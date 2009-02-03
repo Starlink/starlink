@@ -47,10 +47,10 @@
  *                 27/08/08  Use DBL_DIG and FLT_DIG to encode double and
  *                           float values so that we do not lose any precision.
  *                 23/01/09  Add dummyReallocFile for use when opening a file.
- *                           This will always fail (since fits_ cannot be set
- *                           and under these conditions reallocFile now
- *                           returns the given pointer, rather than an error,
- *                           no idea why this change was made, so not undone).
+ *                           This will always fail unless the file is already
+ *                           sufficiently large. Previously it always returned
+ *                           a pointer to the memory, which caused problems
+ *                           when the file was truncated.
  */
 static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.1.1.1 2006/01/12 16:43:57 abrighto Exp $";
 
@@ -101,6 +101,10 @@ static char buf_[1024];
 
 // "current" FitsIO object pointer, needed for cfitsio realloc callback
 FitsIO* FitsIO::fits_ = NULL;
+
+// length of memory mapped for current FitsIO object, needed for realloc
+// callback checks.
+size_t FitsIO::length_ = 0;
 
 /*
  * constructor: initialize from the given header and data objects
@@ -368,7 +372,7 @@ int FitsIO::cfitsio_error()
 void* FitsIO::reallocFile(void* p, size_t newsize)
 {
     if (!fits_) {
-        return NULL;            // PWD: no associated fits file.
+        return p;
     }
     if (fits_->checkWritable() != 0)
 	return NULL;		// not a writable FITS file
@@ -413,8 +417,10 @@ fitsfile* FitsIO::openFitsMem(Mem& header)
     // MemRep class in the header object.
     // XXX (make sure the values are not actually modified...)
     MemRep* mrep = (MemRep*)header.rep();
-    if (fits_open_memfile(&fitsio, filename, rw_flag, &mrep->ptr, (size_t*)&mrep->size,
+    FitsIO::length_ = mrep->size;
+    if (fits_open_memfile(&fitsio, filename, rw_flag, &mrep->ptr, &mrep->size,
 			  FITSBLOCK, FitsIO::dummyReallocFile, &status) != 0) {
+        FitsIO::length_ = 0;
 	cfitsio_error();
 	return NULL;
     }
@@ -424,11 +430,15 @@ fitsfile* FitsIO::openFitsMem(Mem& header)
 /*
  * This static method is called by the cfitsio routines when the size of the
  * file has to be increased, which will be an error when opening the file for
- * first time.
+ * first time, unless no actual increase has been requested (need to set
+ * static member length_ to length of file before call).
  */
 void* FitsIO::dummyReallocFile(void* p, size_t newsize)
 {
-    return NULL;
+    if ( newsize > length_ ) {
+        return NULL;
+    }
+    return p;
 }
 
 /*
