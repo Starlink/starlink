@@ -11463,9 +11463,10 @@ f     Frame axis (e.g. using AST_FORMAT). Its value may be set either
 *
 *     Note that the Digits value acts only as a means of determining a
 *     default Format string. Its effects are over-ridden if a Format
-*     string is set explicitly for an axis. However, if the Format string
-*     includes a precision given by ".*" then the Digits attribute is
-*     used to determine the number of decimal placs to produce.
+*     string is set explicitly for an axis. However, if the Format
+*     attribute specifies the precision using the string ".*", then 
+*     the Digits attribute is used to determine the number of decimal 
+*     places to produce.
 
 *  Applicability:
 *     Frame
