@@ -154,7 +154,7 @@ int NDFIO::wcsinit()
 //  compatible object (FITS-like). The filename is the fully specified name of
 //  the file containing the NDF.
 //-
-NDFIO *NDFIO::read( const char *filename, const char *component, 
+NDFIO *NDFIO::read( const char *filename, const char *component,
                     int deepsearch )
 {
     Mem data;
@@ -200,7 +200,7 @@ NDFIO *NDFIO::read( const char *filename, const char *component,
             }
 
             //  Create a Mem object to hold the displayable data.
-            size_t tsize = (size_t) width * (size_t) height * 
+            size_t tsize = (size_t) width * (size_t) height *
 	                   (size_t) ( abs( bitpix ) / 8 );
 
             // Now map the data and initialise with this pointer.
@@ -481,7 +481,7 @@ int NDFIO::makeDisplayable( int index, const char *component )
       }
 
       //  Create a Mem object to hold the displayable data.
-      size_t tsize = (size_t)width * (size_t)height * 
+      size_t tsize = (size_t)width * (size_t)height *
                      (size_t)( abs( bitpix ) / 8 );
 
       //  Release existing displayable.
@@ -493,7 +493,7 @@ int NDFIO::makeDisplayable( int index, const char *component )
       //  memory to store the image.
       int readonly = gaiaGetReadMNDF( NDFinfo_, index );
       if ( ! readonly ) {
-          
+
           //  Use CNF managed memory so that it is registered. Note this
           //  memory currently leaks.
           indata = cnfMalloc( tsize );
@@ -526,7 +526,7 @@ int NDFIO::makeDisplayable( int index, const char *component )
 
          //  This is now the current NDF and component.
          curd_ = index;
-         strncpy( component_, (char *) component, 20 );
+         memmove( component_, component, 20 );
          ndfid_ = ndfid;
       }
       else {
@@ -610,7 +610,7 @@ NDFIO* NDFIO::copy()
     void *newInfo = gaiaCloneMNDF( NDFinfo_ );
     int newId = gaiaGetIdMNDF( newInfo, curd_ );
 
-    return new NDFIO( newInfo, curd_, component_, newId, 
-                      width_, height_, bitpix_, bzero_, bscale_, 
+    return new NDFIO( newInfo, curd_, component_, newId,
+                      width_, height_, bitpix_, bzero_, bscale_,
                       header_, data_ );
 }
