@@ -47,6 +47,9 @@
     the displayed image. See the help in the contour toolbox for how 
     to use this.
 
+    A bug in the operation of the patch toolbox has been fixed. Previously
+    GAIA could crash when using very small detached sky regions.
+
   Lehuakona Release
   =================
 
