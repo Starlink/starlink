@@ -1426,22 +1426,15 @@ static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst,
 /* Check the local error status. */
    if ( !astOK ) return result;
 
-/* Get the Negated and Closed attributes of the two Regions. They must be
-   the same in each Region if we are to merge the Regions. The exception
-   here is that a Nullregion must  always be inverted in order to merge. */
-   neg_this = astGetNegated( this );
-   if( astIsANullRegion( reg ) ) {
-      neg_reg = astGetNegated( reg );
-      if( 
-   } else {
-xxx
-
-this whole buisness of handling negated flags needs thinking about
-
-
+/* Get the Closed attributes of the two Regions. They must be the same in 
+   each Region if we are to merge the Regions. */
    closed_this = astGetClosed( this );
    closed_reg = astGetClosed( reg );
-   if( neg_this == neg_reg && closed_this == closed_reg ) {
+   if( closed_this == closed_reg ) {
+
+/* Get the Nagated attributes of the two Regions. */
+      neg_this = astGetNegated( this );
+      neg_reg = astGetNegated( reg );
 
 /* Get the number of axes in the two supplied Regions. */
       nax_reg = astGetNaxes( reg );
@@ -1468,8 +1461,9 @@ this whole buisness of handling negated flags needs thinking about
 /* Indicate we do not yet have a merged Region. */
       new = NULL;
    
-/* First attempt to merge with another Box. The result will be a Box. */
-      if( astIsABox( reg ) ) {
+/* First attempt to merge with another Box. The result will be a Box. Both
+   Boxes must be un-negated. */
+      if( astIsABox( reg ) && !neg_this && !neg_reg ) {
    
 /* Allocate memory to store the centre and corner of the returned Box. */
          centre = astMalloc( sizeof( double )*(size_t) nax );
@@ -1493,8 +1487,9 @@ this whole buisness of handling negated flags needs thinking about
          centre = astFree( centre );
          corner = astFree( corner );
    
-/* Now attempt to merge with an Interval. The result will be an Interval. */
-      } else if( astIsAInterval( reg ) ) {
+/* Now attempt to merge with an Interval. The result will be an Interval. 
+   Both Intervals must be un-negated. */
+      } else if( astIsAInterval( reg )  && !neg_this && !neg_reg ) {
    
 /* Allocate memory to store the bounds of the returned Interval. */
          lbnd = astMalloc( sizeof( double )*(size_t) nax );
@@ -1538,8 +1533,9 @@ this whole buisness of handling negated flags needs thinking about
          lbnd = astFree( lbnd );
          ubnd = astFree( ubnd );
    
-/* Now attempt to merge with a NullRegion. The result will be an Interval. */
-      } else if( astIsANullRegion( reg ) ) {
+/* Now attempt to merge with a NullRegion. The result will be an
+   Interval. The NullRegion must be negated and the Box must not. */
+      } else if( astIsANullRegion( reg ) && !neg_this && neg_reg ) {
 
 /* Allocate memory to store the bounds of the returned Interval. */
          lbnd = astMalloc( sizeof( double )*(size_t) nax );
@@ -1567,7 +1563,7 @@ this whole buisness of handling negated flags needs thinking about
                }
             }
 
-/* Fill the other axes with bad values to indicaste they are unbounded. */
+/* Fill the other axes with bad values to indicate they are unbounded. */
             if( boxfirst ) {
                for( i = nax_this; i < nax; i++ ) {
                   lbnd[ i ] = AST__BAD;
@@ -1589,8 +1585,9 @@ this whole buisness of handling negated flags needs thinking about
          lbnd = astFree( lbnd );
          ubnd = astFree( ubnd );
 
-/* Now attempt to merge with a PointList. The result will be a PointList. */
-      } else if( astIsAPointList( reg ) ) {
+/* Now attempt to merge with a PointList. The result will be a PointList. 
+   Both Regions must be un-negated. */
+      } else if( astIsAPointList( reg )  && !neg_this && !neg_reg ) {
    
 /* We can only do this if the Box has zero width on each axis (i.e.
    represents a point). Get the Box centre and corner. */
@@ -1670,6 +1667,11 @@ this whole buisness of handling negated flags needs thinking about
    the supplied Region to it. */
       if( new ) {
          astRegOverlay( new, this );
+
+/* The above Prism constructors create the Prism with the correct value
+   for the Nagated attribute (i.e. zero). Ensure the above call to
+   astRegOverlay has not changed this. */
+         astClearNegated( new );
 
 /* If both the supplied Regions have uncertainty, assign the new Region an 
    uncertainty. */
