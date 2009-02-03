@@ -14,7 +14,7 @@ AC_CONFIG_SRCDIR([MSG_PAR])
 
 dnl   Include defaults for Starlink configurations
 STAR_DEFAULTS
-STAR_MONOLITHS
+# STAR_MONOLITHS
 
 AC_PROG_CC
 AC_PROG_FC
