@@ -5334,22 +5334,10 @@ static int CheckId( AstObject *this_id, int *status ) {
                       "%d).", status, id  );
             astError( AST__OBJIN, "This pointer has been annulled, or the "
                       "associated Object deleted." , status);
-
-#ifdef MEM_DEBUG
-            astError( AST__OBJIN, "This pointer was last associated with "
-                      "a %s stored in a memory block with id %d.", 
-                      status, handles[ work.i ].vtab->class,
-                      handles[ work.i ].id );
-            void *ptr = handles[ work.i ].ptr;
-            astError( AST__OBJIN, "Handle properties: index %d  "
-                      "ptr: %p (id=%d)  context: %d  check: %d "
-                      "thread %d\n", status, work.i, ptr, astMemoryId( ptr ), 
-                       handles[ work.i ].context, handles[ work.i ].check, 
-                       handles[ work.i ].thread );
-#endif
          }
 
-      } else if(  handles[ work.i ].thread != AST__THREAD_ID ) {
+      } else if(  handles[ work.i ].context != UNOWNED_CONTEXT && 
+                  handles[ work.i ].thread != AST__THREAD_ID ) {
          if ( astOK ) {
             astError( AST__OBJIN, "Invalid Object pointer given (value is "
                       "%d).", status, id  );
@@ -5361,6 +5349,15 @@ static int CheckId( AstObject *this_id, int *status ) {
       } else {
          ihandle = work.i;
       }
+
+#ifdef MEM_DEBUG
+      if ( !astOK && ( work.i >= 0 ) && ( work.i < nhandles ) ) {
+         char buf[200];
+         astError( AST__OBJIN, "Handle properties: %s ", status,
+                   HandleString( work.i, buf ) );
+      }
+#endif
+
    }
 
 /* Return the result. */
