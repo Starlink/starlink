@@ -99,6 +99,7 @@ tclIndex
 
 # Built during configure
 
+world-stamp
 applications/astrom/params.f
 applications/atools/make_history_help
 applications/ccdpack/CCD1_PAR
