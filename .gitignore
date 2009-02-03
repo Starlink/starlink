@@ -93,6 +93,7 @@ starconf-status
 starlink.version
 STAR_SUPPRESS_BUILD
 version.dat
+tclIndex
 
 # These are non-standard ignores. They could go in subdirs but for now put them in global
 
@@ -493,9 +494,7 @@ applications/fluxes/fluxnow.csh
 applications/gaia/demodata.tar
 applications/gaia/gaia/gaia_tcl
 applications/gaia/gaia/gaia_wish
-applications/gaia/gaia/library/tclIndex
 applications/gaia/gaia/pkgIndex.tcl
-applications/gaia/gaia3d/library/tclIndex
 applications/gaia/gaia3d/pkgIndex.tcl
 applications/gaia/scripts/gaia.sh
 applications/gaia/scripts/tabbedgaia.sh
@@ -700,7 +699,6 @@ applications/startcl/atclsh
 applications/startcl/awish
 applications/startcl/gwm
 applications/startcl/gwmXrefresh
-applications/startcl/tclIndex
 applications/surf/surf.csh
 applications/surf/surf.icl
 applications/surf/surf.sh
