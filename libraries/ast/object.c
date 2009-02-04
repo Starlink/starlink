@@ -1090,12 +1090,12 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Create a new mutex for the new Object, and lock it for use by the
    current thread. */
 #ifdef THREAD_SAFE
-      if( pthread_mutex_init( &(new->mutex1), NULL ) != 0 ) {
+      if( pthread_mutex_init( &(new->mutex1), NULL ) != 0 && astOK ) {
          astError( AST__INTER, "astInitObject(%s): Failed to "
                    "initialise POSIX mutex1 for the new Object.", status, 
                    vtab->class );
       }
-      if( pthread_mutex_init( &(new->mutex2), NULL ) != 0 ) {
+      if( pthread_mutex_init( &(new->mutex2), NULL ) != 0 && astOK ) {
          astError( AST__INTER, "astInitObject(%s): Failed to "
                    "initialise POSIX mutex2 for the new Object.", status, 
                    vtab->class );
@@ -1612,8 +1612,8 @@ static const char *Get( AstObject *this, const char *attrib, int *status ) {
 /* If no characters were copied, the attribute name was blank, so
    report an error. */
       if ( !j ) {
-         astError( AST__BADAT, "astGet(%s): A blank attribute name was given.", status,
-                   astGetClass( this ) );
+         if( astOK ) astError( AST__BADAT, "astGet(%s): A blank attribute "
+                               "name was given.", status, astGetClass( this ) );
 
 /* Of OK, invoke astGetAttrib to obtain a pointer to the attribute
    value formatted as a character string. */
@@ -1757,7 +1757,7 @@ static const char *GetAttrib( AstObject *this, const char *attrib, int *status )
       }
 
 /* If the attribute name was not recognised, then report an error. */
-   } else {
+   } else if( astOK ){
       astError( AST__BADAT, "astGet: The %s given does not have an attribute "
                 "called \"%s\".", status, astGetClass( this ), attrib );
    }
@@ -2111,7 +2111,7 @@ type astGet##code##_( AstObject *this, const char *attrib, int *status ) { \
          result = value; \
 \
 /* If the read was unsuccessful, report an error. */ \
-      } else { \
+      } else if( astOK ) { \
          astError( AST__ATGER, "astGet" #code "(%s): The attribute " \
                    "value \"%s=%s\" cannot be read using the requested data " \
                    "type.", status,astGetClass( this ), attrib, str ); \
@@ -3438,7 +3438,7 @@ static int TestAttrib( AstObject *this, const char *attrib, int *status ) {
       result = 0;
 
 /* Any attempt to test any other attribute is an error. */
-   } else {
+   } else if( astOK ){
       astError( AST__BADAT, "astTest: The attribute name \"%s\" is invalid "
                "for a %s.", status, attrib, astGetClass( this ) );
    }
@@ -3703,31 +3703,35 @@ static void VSet( AstObject *this, const char *settings, char **text,
    if an error value was returned and report an error. Include
    information from errno if it was set. */
             if ( nc < 0 ) {
-               stat = errno;
-
-               if( stat ) {
-                  strerror_r( stat, errbuf, ERRBUF_LEN );
-               } else {
-                  *errbuf = 0;
+               if( astOK ) {
+                  stat = errno;
+   
+                  if( stat ) {
+                     strerror_r( stat, errbuf, ERRBUF_LEN );
+                  } else {
+                     *errbuf = 0;
+                  }
+   
+                  astError( AST__ATSER, "astVSet(%s): Error formatting an "
+                            "attribute setting%s%s.", status, astGetClass( this ),
+                            stat? " - " : "", errbuf );
+                  astError( AST__ATSER, "The setting string was \"%s\".", status,
+                            settings );
                }
-
-               astError( AST__ATSER, "astVSet(%s): Error formatting an "
-                         "attribute setting%s%s.", status, astGetClass( this ),
-                         stat? " - " : "", errbuf );
-               astError( AST__ATSER, "The setting string was \"%s\".", status,
-                         settings );
 
 /* Also check that the result buffer did not overflow. If it did,
    memory will probably have been corrupted but this cannot be
    prevented with "vsprintf" (although we try and make the buffer
    large enough). Report the error and abort. */
             } else if ( nc > buff_len ) {
-               astError( AST__ATSER, "astVSet(%s): Internal buffer overflow "
-                         "while formatting an attribute setting - the result "
-                         "exceeds %d characters.", status, astGetClass( this ),
-                         buff_len );
-               astError( AST__ATSER, "The setting string was \"%s\".", status,
-                         settings );
+               if( astOK ) {
+                  astError( AST__ATSER, "astVSet(%s): Internal buffer overflow "
+                            "while formatting an attribute setting - the result "
+                            "exceeds %d characters.", status, astGetClass( this ),
+                            buff_len );
+                  astError( AST__ATSER, "The setting string was \"%s\".", status,
+                            settings );
+               }
 
 /* If all is OK, loop to process each formatted attribute assignment
    (these are now separated by '\n' characters). */
@@ -4460,7 +4464,7 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
          if( vtab->nfree > 0 ) {
             mem = vtab->free_list[ --(vtab->nfree) ];
             vtab->free_list[ vtab->nfree ] = NULL;
-            if( astSizeOf( mem ) != size ) {
+            if( astSizeOf( mem ) != size && astOK ) {
                astError( AST__INTER, "astInitObject(%s): Free block has size "
                          "%d but the %s requires %d bytes (internal AST "
                          "programming error).", status, vtab->class, astSizeOf( mem ),
@@ -4533,12 +4537,12 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
 
 #ifdef THREAD_SAFE
       } else {
-         if( pthread_mutex_init( &(new->mutex1), NULL ) != 0 ) {
+         if( pthread_mutex_init( &(new->mutex1), NULL ) != 0 && astOK ) {
             astError( AST__INTER, "astInitObject(%s): Failed to "
                       "initialise POSIX mutex1 for the new Object.", status, 
                       vtab->class );
          }
-         if( pthread_mutex_init( &(new->mutex2), NULL ) != 0 ) {
+         if( pthread_mutex_init( &(new->mutex2), NULL ) != 0 && astOK ) {
             astError( AST__INTER, "astInitObject(%s): Failed to "
                       "initialise POSIX mutex2 for the new Object.", status, 
                       vtab->class );
@@ -4960,15 +4964,15 @@ static void AnnulHandle( int ihandle, int *status ) {
 #if defined(THREAD_SAFE)
             RemoveHandle( ihandle, &unowned_handles, status );
 #else
-            astError( AST__INTER, "AnnulHandle: reference to "
-                      "'unowned_handles' in a non-thread-safe context "
-                      "(internal AST programming error).", status );
+            if( astOK ) astError( AST__INTER, "AnnulHandle: reference to "
+                         "'unowned_handles' in a non-thread-safe context "
+                         "(internal AST programming error).", status );
 #endif
 
          } else if( active_handles ) {
             RemoveHandle( ihandle, &active_handles[ context ], status );
 
-         } else {
+         } else if( astOK ){
             astError( AST__INTER, "AnnulHandle: active_handles array has "
                       "not been initialised (internal AST programming error).",
                       status );
@@ -5372,7 +5376,7 @@ static int CheckId( AstObject *this_id, int *status ) {
 #ifdef MEM_DEBUG
       if ( !astOK && ( work.i >= 0 ) && ( work.i < nhandles ) ) {
          char buf[200];
-         astError( AST__OBJIN, "Handle properties: %s ", status,
+         astError( astStatus, "Handle properties: %s ", status,
                    HandleString( work.i, buf ) );
       }
 #endif
@@ -5790,9 +5794,9 @@ f     and have not been rendered exempt using AST_EXEMPT.
 /* Check that the current context level is at least 1 and report an
    error if it is not. */
          if ( context_level < 1 ) {
-            astError( AST__EXPIN, "astExport(%s): Attempt to export an Object "
-                      "from context level zero.", status,
-                      astGetClass( handles[ ihandle ].ptr ) );
+            if( astOK ) astError( AST__EXPIN, "astExport(%s): Attempt to export an Object "
+                                  "from context level zero.", status,
+                                  astGetClass( handles[ ihandle ].ptr ) );
 
 /* Extract the context level at which the Object was created. */
          } else {
