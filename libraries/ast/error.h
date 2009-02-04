@@ -155,7 +155,7 @@ typedef struct AstStatusBlock {
 /* Function Macros. */
 /* ================ */
 
-#if defined(astClass)
+#if defined(astCLASS)
 
 /*
 *+
