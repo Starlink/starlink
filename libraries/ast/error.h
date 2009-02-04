@@ -77,14 +77,11 @@
 *-
 */
 
-
-
 /* Include files. */
 /* ============== */
 #if defined(THREAD_SAFE)
 #include <pthread.h>
 #endif
-
 
 
 /* Macros. */
@@ -114,10 +111,15 @@
 #define astERROR_INVOKE(function) (astAt_(NULL,__FILE__,__LINE__,0,astGetStatusPtr),(function))
 #endif
 
-
-
 /* Type definitions */
 /* ================ */
+
+/* Define a structure to hold information about an error context. */
+typedef struct AstErrorContext {
+   int reporting;   /* Value of error reporting flag at start of context */
+   int ok;          /* Was the status value OK at start of context? */
+   int status;      /* The status value at the start of the context */
+} AstErrorContext;
 
 #if defined(THREAD_SAFE) && ( defined(astCLASS) || defined(astFORTRAN77) )
 
@@ -150,6 +152,106 @@ typedef struct AstStatusBlock {
 #endif
 
 
+/* Function Macros. */
+/* ================ */
+
+#if defined(astCLASS)
+
+/*
+*+
+*  Name:
+*     astErrorBegin
+
+*  Purpose:
+*     Begin a new error reporting context.
+
+*  Type:
+*     Protected macro.
+
+*  Synopsis:
+*     #include "error.h"
+*     astErrorBegin( AstErrorContext *context );
+
+*  Description:
+*     This macro starts a new error reporting context. It saves any 
+*     existing error status in the supplied ontext structure, and then 
+*     clears the status value. It also defers further error reporting. 
+*
+*     Each invocation of this macro should be followed (eventually) by a
+*     matching invocation of astErrorEnd.
+
+*  Parameters:
+*     context
+*        Pointer to a structure in which to to storeinformation about the
+*        current error reporting context. This structure should be passed
+*        unchanged to the corresponding invocation of astErrorEnd.
+
+*-
+*/
+#define astErrorBegin(context) {\
+\
+/* Save the original error status value. */ \
+   (context)->status = astStatus; \
+\
+/* Save a flag indicating if the original error status was good. */ \
+   (context)->ok = astOK; \
+\
+/* Switch off the immediate delivery of error messages, recording the  \
+   original value of the reporting flag. */ \
+   (context)->reporting = astReporting( 0 ); \
+\
+/* Clear any existing error condition. */ \
+   astClearStatus; \
+}
+
+
+/*
+*+
+*  Name:
+*     astErrorEnd
+
+*  Purpose:
+*     End an error reporting context.
+
+*  Type:
+*     Protected macro.
+
+*  Synopsis:
+*     #include "error.h"
+*     astErrorEnd( AstErrorContext *context );
+
+*  Description:
+*     This macro ends an error reporting context started using
+*     astErrorBegin. 
+*
+*     Each invocation of this macro should correspond to an earlier 
+*     invocation of astErrorBegin.
+
+*  Parameters:
+*     context
+*        Pointer to a structure holding information returned by the
+*        matching invocation of astErrorBegin.
+
+*-
+*/
+#define astErrorEnd(context) { \
+\
+/* If an error condition existed when astErrorBegin was called, and \
+   another error has since occurred, clear the deferred messages \
+   reported during the error context without displaying them. */ \
+   if( !(context)->ok && !astOK ) astClearStatus; \
+\
+/* Put the error reporting flag back to its original value. This will \
+   have the effect of displaying any remaining errors reported within \
+   the error context (they will already have been cleared if an error \
+   condition existed at the start of the context). */ \
+   astReporting( (context)->reporting ); \
+\
+/* If an error condition existed at the start of the context, re-instate \
+   the original status value. */ \
+   if( !(context)->ok ) astSetStatus( (context)->status ); \
+}
+#endif
 
 /* Function prototypes. */
 /* ==================== */

@@ -366,9 +366,15 @@
 #define AST__GETATTRIB_BUFF_LEN 50 /* Length of string returned by GetAttrib. */
 #define AST__ASTGETC_MAX_STRINGS 50 /* Number of string values to buffer within astGetC */
 
-#define AST__LOCK 1      /* Tells astManageLock to lock the object */
-#define AST__UNLOCK 2    /* Tells astManageLock to unlock the object */
-#define AST__CHECKLOCK 3 /* Tells astManageLock to check the object is locked */
+/* Values supplied to astManageLock */
+#define AST__LOCK 1      /* Lock the object */
+#define AST__UNLOCK 2    /* Unlock the object */
+#define AST__CHECKLOCK 3 /* Check if the object is locked */
+
+/* Values returned by astThread */
+#define AST__UNLOCKED 1  /* Object is unlocked */
+#define AST__RUNNING 2   /* Object is locked by the running thread */
+#define AST__OTHER 3     /* Object is locked by another thread */
 
 #endif
 
@@ -1391,6 +1397,7 @@ void astSet_( void *, const char *, int *, ... );
 
 #else                            /* Public */
 AstObject *astDeleteId_( AstObject *, int * );
+int astThreadId_( AstObject *, int, int * );
 void astLockId_( AstObject *, int, int * );
 void astUnlockId_( AstObject *, int * );
 void astExportId_( AstObject *, int * );
@@ -1532,6 +1539,7 @@ astINVOKE(O,astLoadObject_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PT
 #define astImport(this) astINVOKE(V,astImportId_((AstObject *)(this),STATUS_PTR))
 #define astSet astINVOKE(F,astSetId_)
 #define astLock(this,wait) astINVOKE(V,astLockId_((AstObject *)(this),wait,STATUS_PTR))
+#define astThread(this,ptr) astINVOKE(V,astThreadId_((AstObject *)(this),ptr,STATUS_PTR))
 #define astUnlock(this) astINVOKE(V,astUnlockId_((AstObject *)(this),STATUS_PTR))
 #endif
 
