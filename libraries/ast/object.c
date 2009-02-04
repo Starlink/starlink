@@ -2292,6 +2292,8 @@ static int ManageLock( AstObject *this, int mode, int extra,
 *        2 - Failed to lock a POSIX mutex
 *        3 - Failed to unlock a POSIX mutex
 *        4 - Bad "mode" value supplied.
+*        5 - Check failed - object is locked by a different thread
+*        6 - Check failed - object is unlocked 
 *     
 
 *  Notes:
@@ -2388,7 +2390,11 @@ static int ManageLock( AstObject *this, int mode, int extra,
 /* Check the Object is locked by the calling thread. Return a status of 1 if
    not. */
    } else if( mode == AST__CHECKLOCK ) {
-      if( this->locker != AST__THREAD_ID ) result = 1;
+      if( this->locker == -1 ) {
+         result = 6;
+      } else if( this->locker != AST__THREAD_ID ) {
+         result = 5;
+      }
    
 /* Return a status of 4 for any other modes. */
    } else {
@@ -5666,7 +5672,7 @@ f        This routine applies to all Objects.
 
 /* Obtain the Handle offset for this Object. */
       ihandle = CheckId( this_id, status );
-      if ( astOK ) {
+      if ( ihandle != -1 ) {
 
 /* Extract the context level at which the Object was created. */
          context = handles[ ihandle ].context;
@@ -5779,7 +5785,7 @@ f     and have not been rendered exempt using AST_EXEMPT.
 
 /* Obtain the Handle offset for this Object. */
       ihandle = CheckId( this_id, status );
-      if ( astOK ) {
+      if ( ihandle != -1 ) {
 
 /* Check that the current context level is at least 1 and report an
    error if it is not. */
@@ -5890,7 +5896,7 @@ f        This routine applies to all Objects.
 
 /* Obtain the Handle offset for this Object. */
       ihandle = CheckId( this_id, status );
-      if ( astOK ) {
+      if ( ihandle != -1 ) {
 
 /* Extract the context level at which the Object was created. */
          context = handles[ ihandle ].context;
@@ -6036,7 +6042,7 @@ c--
          LOCK_MUTEX2;
          if ( !active_handles ) InitContext( status );
          ihandle = CheckId( this_id, status );
-         if( handles[ ihandle ].context == UNOWNED_CONTEXT ) {
+         if( ihandle != -1 && handles[ ihandle ].context == UNOWNED_CONTEXT ) {
             RemoveHandle( ihandle, &unowned_handles, status );
 
             handles[ ihandle ].thread = AST__THREAD_ID;
@@ -6172,7 +6178,7 @@ c--
          astGET_GLOBALS(this);
          LOCK_MUTEX2;
          ihandle = CheckId( this_id, status );
-         if( handles[ ihandle ].context != UNOWNED_CONTEXT ) {
+         if( ihandle != -1 && handles[ ihandle ].context != UNOWNED_CONTEXT ) {
             RemoveHandle( ihandle, &active_handles[ handles[ ihandle ].context ], status );
 
 #if defined(MEM_DEBUG)
@@ -6838,6 +6844,162 @@ void astSetId_( void *this_id_void, const char *settings, ... ) {
       astVSet( this, settings, NULL, args );
       va_end( args );
    }
+}
+
+int astThreadId_( AstObject *this_id, int ptr, int *status ) {
+/*
+c++
+*  Name:
+*     astThread
+
+*  Purpose:
+*     Determine the thread that owns an Object.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+*     #include "object.h"
+*     int astThread( AstObject *this, int ptr )
+
+*  Class Membership:
+*     Object method.
+
+*  Description:
+*     Returns an integer that indicates whether the supplied Object (or
+*     Object pointer) is currently unlocked, or is currently locked by
+*     the running thread, or another thread.
+
+*  Parameters:
+*     this
+*        Pointer to the Object to be checked.
+*     ptr
+*        If non-zero, returns information about the supplied Object
+*        pointer, rather than the Object structure itself. See "Object
+*        Pointers and Structures" below.
+
+*  Returned Value:
+*     astThread()
+*        A value of AST__UNLOCKED is returned if the Object (or pointer) 
+*        is currently unlocked (i.e. has been unlocked using astUnlock
+*        but has not yet been locked using astLock). A value of 
+*        AST__RUNNING is returned if the Object (or pointer) is currently 
+*        locked by the running thread. A value of AST__OTHER is returned 
+*        if the Object (or pointer) is currently locked by the another 
+*        thread.
+
+*  Object Pointers and Structures: 
+*     At any one time, an AST Object can have several distinct pointers,
+*     any one of which can be used to access the Object structure. For 
+*     instance, the astClone function will produce a new distinct pointer 
+*     for a given Object. In fact, an AST "pointer" is not a real pointer 
+*     at all - it is an identifier for a "handle" structure, encoded to 
+*     make it look like a pointer. Each handle contains (amongst othere 
+*     things) a "real" pointer to the Object structure. This allows more 
+*     than one handle to refer to the same Object structure. So when you 
+*     call astClone (for instance) you get back an identifier for a new 
+*     handle that refers to the same Object as the supplied handle.
+*
+*     In order to use an Object for anything useful, it must be locked
+*     for use by the running thread (either implicitly at creation or
+*     explicitly using astLock). The identity of the thread is stored in
+*     both the Object structure, and in the handle that was passed to
+*     astLock (or returned by the constructor function). Thus it is
+*     possible for a thread to have active pointers for Objects that are 
+*     currently locked by another thread. In general, if such a pointer is 
+*     passed to an AST function an error will be reported indicating that 
+*     the Object is currently locked by another thread. The two exceptions
+*     to this is that astAnnul can be used to annull such a pointer, and
+*     this function can be used to return information about the pointer.
+*
+*     The other practical consequence of this is that when astEnd is
+*     called, all active pointers currently owned by the running thread 
+*     (at the current context level) are annulled. This includes pointers 
+*     for Objects that are currently locked by other threads.
+*     
+*     If the "ptr" parameter is zero, then the returned value describes 
+*     the Object structure itself. If "ptr" is non-zero, then the returned 
+*     value describes the supplied Object pointer (i.e. handle), rather
+*     than the Object structure.
+
+*  Notes:
+*     - This function attempts to execute even if the global error
+*     status is set, but no further error report will be made if it
+*     subsequently fails under these circumstances.
+*     - This function is only available in the C interface.
+*     - This function always returns AST__RUNNING if the AST library has 
+*     been built without POSIX thread support (i.e. the "-with-pthreads" 
+*     option was not specified when running the "configure" script), or
+*     if the application was linked with non-thread-safe version of the 
+*     AST library (i.e. the "-threadsafe" option was not specified when 
+*     running the "ast_link" or "ast_link_adam" script).
+c--
+*/
+
+/* Local Variables: */
+   astDECLARE_GLOBALS;      /* Thread-specific global data */
+   int result;              /* The returned value */
+
+/* Initialise the returned value */
+   result = AST__RUNNING;
+
+/* Nothing more to do if AST was not build with thread support. */
+#if defined(THREAD_SAFE)  
+
+/* More local Variables: */
+   AstObject *this;
+   int ihandle;
+   int check;
+
+/* Ensure global variables are accessable. */
+   astGET_GLOBALS(NULL);
+
+/* If the ownership of the handle is being queried... */
+   if( ptr ) {
+
+/* Lock the mutex that guards access to the handles array */
+      LOCK_MUTEX2;
+
+/* Check the supplied object identifier is valid and get the
+   corresponding index into the handles array. */
+      ihandle = CheckId( this_id, status );
+      if( ihandle != -1 ) {
+
+/* Set the returned value on the basis of the threa didentifier stored in
+   the handle structure. */
+         if( handles[ ihandle ].thread == -1 ) {
+            result = AST__UNLOCKED;
+         } else if( handles[ ihandle ].thread != AST__THREAD_ID ) {
+            result = AST__OTHER;
+         }
+      }
+
+/* Unlock the mutex that guards access to the handles array */
+      UNLOCK_MUTEX2;
+
+/* Otherwise, the ownership of the Object is being queried. Obtain the 
+   Object pointer from the ID supplied and validate the pointer to ensure 
+   it identifies a valid Object (this generates an error if it doesn't). 
+   Note, we use the "astMakePointer_NoLockCheck", since the usual 
+   "astMakePointer" macro invokes astCheckLock to report an error if the 
+   Object is not currently locked by the calling thread. */
+   } else if( astIsAObject( this = astMakePointer_NoLockCheck( this_id ) ) ) {
+
+/* Determine which thread (if any) has the object locked, and set an
+   appropriate return value. */
+      check = astManageLock( this, AST__CHECKLOCK, 0, NULL );
+
+      if( check == 5 ) {
+         result = AST__OTHER;
+      } else if( check == 6 ) {
+         result = AST__UNLOCKED;
+      }        
+   }
+
+#endif
+
+/* Return the result. */
+   return result;
 }
 
 int astVersion_( int *status ) {

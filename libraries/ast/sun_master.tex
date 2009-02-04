@@ -4764,6 +4764,9 @@ If a thread attempts to lock an Object that is already locked by another
 thread, it can choose to report an error immediately or to wait until the 
 Object is available.
 
+The astThread function can be used to determine whether an Object is
+locked by the running thread, locked by another thread, or unlocked.
+
 If two or more threads need simultaneous access to an Object, a deep copy
 of the Object should be taken for each thread, using astCopy, and then
 the copies should be unlocked and passed to the othe threads, which
