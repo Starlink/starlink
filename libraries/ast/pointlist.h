@@ -121,6 +121,7 @@ typedef struct AstPointListVtab {
    int (* GetListSize)( AstPointList *, int * );
    AstRegion *(* GetEnclosure)( AstPointList *, int * );
    void (* SetEnclosure)( AstPointList *, AstRegion *, int * );
+   void (* PointListPoints)( AstPointList *, AstPointSet **, int * );
 } AstPointListVtab;
 
 #if defined(THREAD_SAFE) 
@@ -180,6 +181,7 @@ AstRegion *astGetEnclosure_( AstPointList *, int * );
 void astSetEnclosure_( AstPointList *, AstRegion *, int * );
 # if defined(astCLASS)           /* Protected */
 int astGetListSize_( AstPointList *, int * );
+void astPointListPoints_( AstPointList *, AstPointSet **, int * );
 #endif
 
 /* Function interfaces. */
@@ -239,6 +241,9 @@ astINVOKE(V,astSetEnclosure_(astCheckPointList(this),(region?astCheckRegion(regi
 #if defined(astCLASS)            /* Protected */
 #define astGetListSize(this) \
 astINVOKE(V,astGetListSize_(astCheckPointList(this),STATUS_PTR))
+#define astPointListPoints(this,pset) \
+astINVOKE(V,astPointListPoints_(astCheckPointList(this),pset,STATUS_PTR))
+
 #endif
 #endif
 
