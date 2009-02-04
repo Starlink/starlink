@@ -1587,7 +1587,7 @@ static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst,
 
 /* Now attempt to merge with a PointList. The result will be a PointList. 
    Both Regions must be un-negated. */
-      } else if( astIsAPointList( reg )  && !neg_this && !neg_reg ) {
+      } else if( astIsAPointList( reg ) && !neg_this && !neg_reg ) {
    
 /* We can only do this if the Box has zero width on each axis (i.e.
    represents a point). Get the Box centre and corner. */

@@ -610,30 +610,15 @@ static AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg,
    AstMapping *map_reg;      /* Base->current Mapping from "reg" */
    AstMapping *map_this;     /* Base->current Mapping from "this" */
    AstMapping *sbunc;        /* Simplified uncertainty */
-   AstPointSet *pset_new;    /* PointSet holding PointList axis values for new */
-   AstPointSet *pset_reg;    /* PointSet holding PointList axis values for reg */
    AstRegion *bunc;          /* Base Frame uncertainty Region */
    AstRegion *new;           /* Pointer to new NullRegion in base Frame */
    AstRegion *result;        /* Pointer to returned NullRegion in current Frame */
    AstRegion *unc_reg;       /* Current Frame uncertainty Region from "reg" */
    AstRegion *unc_this;      /* Current Frame uncertainty Region from "this" */
-   double **ptr_new;         /* Pointers to arrays holding new axis values */
-   double **ptr_reg;         /* Pointers to arrays holding reg axis values */
-   double *centre;           /* Array to hold NullRegion centre axis values */
-   double *corner;           /* Array to hold NullRegion corner axis values */
-   double *lbnd;             /* Array to hold lower axis bounds */
-   double *lbnd_unc;         /* Array to hold uncertainty lower bounds */
-   double *p;                /* Pointer to next input value */
-   double *q;                /* Pointer to next output value */
-   double *ubnd;             /* Array to hold upper axis bounds */
-   double *ubnd_unc;         /* Array to hold uncertainty upper bounds */
    double fac_reg;           /* Ratio of used to default MeshSize for "reg" */
    double fac_this;          /* Ratio of used to default MeshSize for "this" */
-   double temp;              /* Temporary storage */
    int closed_reg;           /* Closed attribute value for other supplied Region */
    int closed_this;          /* Closed attribute value for supplied NullRegion  */
-   int i;                    /* Loop count */
-   int j;                    /* Loop count */
    int msz_reg;              /* Original MeshSize for "reg" */
    int msz_reg_set;          /* Was MeshSize originally set for "reg"? */
    int msz_this;             /* Original MeshSize for "this" */
@@ -643,8 +628,6 @@ static AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg,
    int nax_this;             /* Number of axes in "this" */
    int neg_reg;              /* Negated attribute value for other supplied Region */
    int neg_this;             /* Negated attribute value for supplied NullRegion  */
-   int npnt;                 /* Number of points in PointList */
-   int ok;                   /* Can supplied Regions be merged? */
 
 /* Initialise */
    result = NULL;
@@ -652,13 +635,15 @@ static AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg,
 /* Check the local error status. */
    if ( !astOK ) return result;
 
-/* Get the Negated and Closed attributes of the two Regions. They must be
-   the same in each Region if we are to merge the Regions. */
-   neg_this = astGetNegated( this );
-   neg_reg = astGetNegated( reg );
+/* Get the Closed attributes of the two Regions. They must be the same in 
+   each Region if we are to merge the Regions. */
    closed_this = astGetClosed( this );
    closed_reg = astGetClosed( reg );
-   if( neg_this == neg_reg && closed_this == closed_reg ) {
+   if( closed_this == closed_reg ) {
+
+/* Get the Nagated attributes of the two Regions. */
+      neg_this = astGetNegated( this );
+      neg_reg = astGetNegated( reg );
 
 /* Get the number of axes in the two supplied Regions. */
       nax_reg = astGetNaxes( reg );
@@ -685,192 +670,22 @@ static AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg,
 /* Indicate we do not yet have a merged Region. */
       new = NULL;
    
-/* First attempt to merge with another NullRegion. The result will be an
-   NullRegion. */
-      if( astIsANullRegion( reg ) ) {
-
-/* Allocate memory to store the bounds of the returned NullRegion. */
-         lbnd = astMalloc( sizeof( double )*(size_t) nax );
-         ubnd = astMalloc( sizeof( double )*(size_t) nax );
+/* We only check for merging with another NullRegion (other classes such
+   as Box and Interval check for merging of NullRegions with other classes). 
+   The result will be an NullRegion. Both Regions must have the same value 
+   for the Negated flag. */
+      if( astIsANullRegion( reg ) && neg_this == neg_reg ) {
+         new = (AstRegion *) astNullRegion( bfrm, NULL, "", status );
    
-/* Copy the limits from the supplied NullRegions into the above arrays, 
-   in the requested order. */
-         if( intfirst ) {
-            astNullRegionPoints( this, lbnd, ubnd );
-            astNullRegionPoints( reg, lbnd + nax_this, ubnd + nax_this );
-         } else {
-            astNullRegionPoints( reg, lbnd, ubnd );
-            astNullRegionPoints( this, lbnd + nax_reg, ubnd + nax_reg );
-         }
-   
-/*  Create the new NullRegion, initially with no uncertainty. */
-         new = (AstRegion *) astNullRegion( bfrm, lbnd, ubnd, NULL, "", 
-                                          status );
-   
-/* Free resources .*/
-         lbnd = astFree( lbnd );
-         ubnd = astFree( ubnd );
-
-/* Now attempt to merge with a Box. The result will be an NullRegion. */
-      } else if( astIsABox( reg ) ) {
-
-/* Allocate memory to store the bounds of the returned NullRegion. */
-         lbnd = astMalloc( sizeof( double )*(size_t) nax );
-         ubnd = astMalloc( sizeof( double )*(size_t) nax );
-   
-/* Get the bounds from the NullRegion and add them into the above arrays. */
-         if( intfirst ) {
-            astNullRegionPoints( this, lbnd, ubnd );
-         } else {
-            astNullRegionPoints( this, lbnd + nax_reg, ubnd + nax_reg );
-         }
-
-/* Copy the centre and corner from the supplied Box into the required part
-   of the above arrays. */
-         if( intfirst ) {
-            centre = lbnd + nax_this;
-            corner = ubnd + nax_this;
-         } else {
-            centre = lbnd;
-            corner = ubnd;
-         }
-         astBoxPoints( reg, centre, corner );
-
-/* Convert these centre and corner positions into upper and lower bounds. */
-         if( astOK ) {
-            for( i = 0; i < nax_reg; i++ ) {
-               centre[ i ] = 2*centre[ i ] - corner[ i ];
-               if( centre[ i ] > corner[ i ] ) {
-                  temp = centre[ i ];
-                  centre[ i ] = corner[ i ];
-                  corner[ i ] = temp;
-               }
-            }
-         }
-
-/*  Create the new NullRegion, initially with no uncertainty. */
-         new = (AstRegion *) astNullRegion( bfrm, lbnd, ubnd, NULL, "", 
-                                          status );
-   
-/* Free resources .*/
-         lbnd = astFree( lbnd );
-         ubnd = astFree( ubnd );
-   
-/* Now attempt to merge with a NullRegion. The result will be an Interval. */
-      } else if( astIsANullRegion( reg ) ) {
-
-/* Allocate memory to store the bounds of the returned Interval. */
-         lbnd = astMalloc( sizeof( double )*(size_t) nax );
-         ubnd = astMalloc( sizeof( double )*(size_t) nax );
-   
-/* Copy the limits from the supplied Interval into the above arrays.
-   Store bad values for the other axes indicating they are unbounded. */
-         if( intfirst ) {
-            astIntervalPoints( this, lbnd, ubnd );
-            for( i = nax_this; i < nax; i++ ) {
-               lbnd[ i ] = AST__BAD;
-               ubnd[ i ] = AST__BAD;
-            }
-         } else {
-            for( i = 0; i < nax_reg; i++ ) {
-               lbnd[ i ] = AST__BAD;
-               ubnd[ i ] = AST__BAD;
-            }
-            astIntervalPoints( this, lbnd + nax_reg, ubnd + nax_reg );
-         }
-
-/*  Create the new Interval, initially with no uncertainty. */
-         new = (AstRegion *) astInterval( bfrm, lbnd, ubnd, NULL, "", 
-                                          status );
-   
-/* Free resources .*/
-         lbnd = astFree( lbnd );
-         ubnd = astFree( ubnd );
-
-/* Now attempt to merge with a PointList. The result will be a PointList. */
-      } else if( astIsAPointList( reg ) ) {
-   
-/* We can only do this if the Interval has zero width on each axis (i.e.
-   represents a point). Get the Interval bounds.  */
-         lbnd = astMalloc( sizeof( double )*(size_t) nax_this );
-         ubnd = astMalloc( sizeof( double )*(size_t) nax_this );
-         astRegBaseBox( this, lbnd, ubnd );
-
-/* Get the size of the Interval's uncertainty region. */
-         lbnd_unc = astMalloc( sizeof( double )*(size_t) nax_this );
-         ubnd_unc = astMalloc( sizeof( double )*(size_t) nax_this );
-         bunc = astGetUncFrm( this, AST__BASE );
-         astGetRegionBounds( bunc, lbnd, ubnd );
-
-/* Set "ok" to zero if the Interval does not have zero width on any axis. Here
-   "zero width" means a width less than half the uncertainty on the axis.
-   We also replace the lower bound values in the "lbnd" array by the central 
-   values in the Interval. */
-         if( astOK ) {
-            ok = 1;
-            for( i = 0; i < nax_this; i++ ) {
-               if( fabs( lbnd[ i ] - lbnd[ i ] ) > 
-                   0.25*fabs( ubnd_unc[ i ] - lbnd_unc[ i ] ) ) {
-                  ok = 0;
-                  break;
-               } else {
-                  lbnd[ i ] = 0.5*( lbnd[ i ] + ubnd[ i ] );
-               }
-            }
-   
-/* If the Interval is a point, we go on to create a new PointList. */
-            if( ok ) {
-   
-/* Get a PointSet holding the axis values in the supplied PointList data.
-   Also get the number of points in the PointSet and pointers to the arrays
-   holding the axis values. */
-               astPointListPoints( reg, &pset_reg );
-               npnt = astGetNpoint( pset_reg );
-               ptr_reg = astGetPoints( pset_reg );
-
-/*  Create a new PointSet with room for the same number of points, but
-    with the extra required axes. Get pointers to its axis arrays. */
-               pset_new = astPointSet( npnt, nax, "", status );
-               ptr_new = astGetPoints( pset_new );
-                
-/* Copy the PointList axis values into the new PointSet, and then include
-   the extra axis values defined by the Interval to each point. */
-               if( astOK ) {
-
-                  for( j = 0; j < nax_reg; j++ ) {
-                     p = ptr_reg[ j ];
-                     q = ptr_new[ intfirst ? nax_this + j : j ];
-                     for( i = 0; i < npnt; i++ ) *(q++) = *(p++);
-                  }   
-
-                  for( j = 0; j < nax_this; j++ ) {
-                     p = lbnd + j;
-                     q = ptr_new[ intfirst ? j : nax_reg + j ];
-                     for( i = 0; i < npnt; i++ ) *(q++) = *p;
-                  }   
-
-/*  Create the new PointList, initially with no uncertainty. */
-                  new = (AstRegion *) astPointList( bfrm, pset_new, NULL, 
-                                                    "", status );
-               }   
-
-/* Free resources .*/
-               pset_new = astAnnul( pset_new );
-               pset_reg = astAnnul( pset_reg );
-            }
-         }
-         lbnd = astFree( lbnd );
-         ubnd = astFree( ubnd );
-         lbnd_unc = astFree( lbnd_unc );
-         ubnd_unc = astFree( ubnd_unc );
-         bunc = astAnnul( bunc );
-
-      }
-
-/* If a new Region was created above, propagate remaining attributes of
-   the supplied Region to it. */
-      if( new ) {
+/* Propagate remaining attributes of the supplied Region to it. */
          astRegOverlay( new, this );
+
+/* Ensure the Negated flag is set correctly in the returned NullRegion. */
+         if( neg_this ) {
+            astSetNegated( new, neg_this );
+         } else {
+            astClearNegated( new );
+         }
 
 /* If both the supplied Regions have uncertainty, assign the new Region an 
    uncertainty. */
