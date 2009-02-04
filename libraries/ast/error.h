@@ -198,7 +198,7 @@ typedef struct AstStatusBlock {
 \
 /* Switch off the immediate delivery of error messages, recording the  \
    original value of the reporting flag. */ \
-   (context)->rep = astReporting( 0 ); \
+   (context)->reporting = astReporting( 0 ); \
 \
 /* Clear any existing error condition. */ \
    astClearStatus; \
@@ -247,9 +247,9 @@ typedef struct AstStatusBlock {
    condition existed at the start of the context). */ \
    astReporting( (context)->reporting ); \
 \
-/* If an error condition existed at the start of the context, and another \
-   error has since occurred, re-instate the original status value. */ \
-   if( !(context)->ok && !astOK ) astSetStatus( (context)->status ); \
+/* If an error condition existed at the start of the context, re-instate \
+   the original status value. */ \
+   if( !(context)->ok ) astSetStatus( (context)->status ); \
 }
 #endif
 
