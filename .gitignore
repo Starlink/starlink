@@ -82,6 +82,7 @@ ylwrap
 ._*
 lib*.dylib
 a.out.dSYM
+*.dSYM
 
 # Starconf and Starlink build and configure
 
@@ -280,6 +281,9 @@ applications/ccdpack/gen/kpg1_trpi.f
 applications/ccdpack/gen/kpg1_vasv.f
 applications/ccdpack/gen/dgeneric
 
+applications/coco/coco
+applications/coco/cocomain
+
 applications/convert/convert.csh
 applications/convert/convert.icl
 applications/convert/convert.sh
@@ -359,9 +363,12 @@ applications/daophot/daogrey
 applications/daophot/daophot
 applications/daophot/daoplot
 applications/daophot/daophot.csh
+
 applications/datacube/datacube.csh
 applications/datacube/datacube.icl
 applications/datacube/datacube.sh
+applications/datacube/demo/datacube_demo.csh
+applications/datacube/help/datacube_help
 
 applications/dipso/dipso
 applications/dipso/dipsosetup
@@ -380,6 +387,9 @@ applications/echomop/echomop.sh
 applications/echomop/echomop_hyper.tar
 applications/echomop/sun152.latex_tar
 
+applications/echwind/echwind
+applications/echwind/echwind.csh
+
 applications/extractor/extractor
 applications/extractor/extractor.csh
 applications/extractor/extractor.sh
@@ -390,14 +400,34 @@ applications/extractor/sextractor/man/sex.1
 applications/extractor/sextractor/sextractor-tpx.spec
 applications/extractor/sextractor/sextractor.spec
 
+applications/extreme/cmp-crepint
+applications/extreme/cmp-frepint
+applications/extreme/cmp-inscnf
+applications/extreme/cmp-xxx
+applications/extreme/cmp-xxx.tex
+applications/extreme/crepint
+applications/extreme/crepint.tex
+applications/extreme/ctok.c
+applications/extreme/do-crepint
+applications/extreme/do-frepint
+applications/extreme/do-inscnf
+applications/extreme/do-xxx.tex
 applications/extreme/EXT_DEC
 applications/extreme/EXT_PAR
-applications/extreme/cmp-xxx
-applications/extreme/extmakefile
 applications/extreme/extmk
 applications/extreme/extreme.csh
 applications/extreme/extreme.h
+applications/extreme/extmakefile
+applications/extreme/extmakefile.tex
+applications/extreme/extmk.tex
+applications/extreme/frepint
+applications/extreme/frepint.tex
+applications/extreme/ftok.c
+applications/extreme/inscnf
+applications/extreme/inscnf.tex
 applications/extreme/mkdoc
+applications/extreme/ssn73.tex
+applications/extreme/tmp
 
 applications/figaro/figaro.csh
 applications/figaro/figaro.icl
@@ -410,6 +440,10 @@ applications/figaro/figaro5/figaro5
 applications/figaro/fighelp/fighelp
 
 applications/findcoords/findcoords
+
+applications/fluxes/fluxes
+applications/fluxes/fluxes.csh
+applications/fluxes/fluxnow.csh
 
 applications/gaia/demodata.tar
 applications/gaia/gaia/gaia_tcl
@@ -424,6 +458,30 @@ applications/gaia/tasks/gai1_ardsp.f
 applications/gaia/tasks/gaiaMon
 applications/gaia/tasks/rtd1_gbndx.f
 applications/gaia/tasks/rtd1_statx.f
+
+applications/generic/DCV_FUN
+applications/generic/dcv_ttoub.f
+applications/generic/dcv_ttouw.f
+
+applications/hdstools/hdstools.csh
+applications/hdstools/hdstools.icl
+applications/hdstools/hdstools.sh
+
+applications/hdstrace/hdstrace
+applications/hdstrace/tra/tra_putx.f
+
+applications/htx/creindex.sed
+applications/htx/edhead.sed
+applications/htx/edtail.sed
+applications/htx/gethead.sed
+applications/htx/gettitle.sed
+applications/htx/htxpath
+
+applications/icl/icl
+applications/icl/icl_io
+applications/icl/lex.c
+applications/icl/parse.c
+applications/icl/parse.h
 
 applications/ifd/ifd2iraf
 applications/ifd/ifd2irafifl
@@ -460,11 +518,6 @@ applications/kappa/kappa.icl
 applications/kappa/kappa.sh
 applications/kappa/kappa_link_adam
 applications/kappa/kappa_mon.f
-applications/kappa/kapview_mon.f
-applications/kappa/lutedit.tcl
-applications/kappa/ndfpack_mon.f
-applications/kappa/sort-help.pl
-applications/kappa/stardemo.tcl
 applications/kappa/kapsub/kps1_apad.f
 applications/kappa/kapsub/kps1_ardm.f
 applications/kappa/kapsub/kps1_bafi.f
@@ -540,7 +593,12 @@ applications/kappa/kapsub/kps1_xyzw.f
 applications/kappa/kapsub/kps1_zprg.f
 applications/kappa/libkappa/kapmon.hlp.1
 applications/kappa/libkappa/kapmon.hlp.2
+applications/kappa/kapview_mon.f
+applications/kappa/lutedit.tcl
 applications/kappa/multiplot.csh
+applications/kappa/ndfpack_mon.f
+applications/kappa/sort-help.pl
+applications/kappa/stardemo.tcl
 
 applications/kaprh/kaprh.csh
 applications/kaprh/kaprh.icl
@@ -549,9 +607,16 @@ applications/kaprh/kaprh_mon.f
 applications/kaprh/kapsub/kps1_dscl.f
 applications/kaprh/kapsub/kps1_hstc.f
 
+applications/messgen/cremsg
+applications/messgen/messgen
+
 applications/news/news
 applications/news/news2html
 applications/news/newsmaint
+
+applications/observe/observe
+
+applications/period/period
 
 applications/photom/photom.csh
 applications/photom/photom.icl
@@ -573,8 +638,45 @@ applications/polpack/polpack_mon.f
 applications/polpack/polsub/pol1_ptvrc.f
 applications/polpack/polsub/pol1_ptvrs.f
 
+applications/pongo/icl/agi.icl
+applications/pongo/icl/cover.icl
+applications/pongo/icl/ellipses.icl
+applications/pongo/icl/errors.icl
+applications/pongo/icl/figures.icl
+applications/pongo/icl/histogram.icl
+applications/pongo/icl/interactive.icl
+applications/pongo/icl/pongo_demo.icl
+applications/pongo/icl/pongo_proc.icl
+applications/pongo/icl/ppdotdiag.icl
+applications/pongo/icl/projections.icl
+applications/pongo/icl/radec.icl
+applications/pongo/icl/spectrum.icl
+applications/pongo/icl/vector.icl
+applications/pongo/pongo.icl
+
+applications/psmerge/psmerge
+
+applications/rv/rv.x
+applications/rv/xrv
+
+applications/scb/ctag
+applications/scb/ctag-l.c
+applications/scb/ctag-y.c
+applications/scb/ctag-y.h
+applications/scb/dbmcat.pl
+applications/scb/dummy-l.c
+applications/scb/ftag
+applications/scb/ftag-l.c
+applications/scb/ftag-y.c
+applications/scb/ftag-y.h
+applications/scb/Scb.pm
+applications/scb/scb.csh
+applications/scb/scb.pl
+applications/scb/scbcp.pl
+applications/scb/scbindex.pl
 applications/scb/scb_test.sh
 applications/scb/size_test.sh
+applications/scb/YyTag.pm
 
 applications/sgmlkit/bin/sgml2docs.x
 applications/sgmlkit/bin/sgml2hlp.x
@@ -597,9 +699,22 @@ applications/specx/src/specx
 applications/specx/src/specx_help
 applications/specx/src/TITLE
 
+applications/spt/forconv
+
+applications/sst/sst.csh
+applications/sst/sst.icl
+applications/sst/sst.sh
+
 applications/star2html/latex2html
 applications/star2html/star2html
 applications/star2html/xlabel
+
+applications/startcl/adamMessageRelay
+applications/startcl/adamtest
+applications/startcl/atclsh
+applications/startcl/awish
+applications/startcl/gwm
+applications/startcl/gwmXrefresh
 
 applications/starx/starX_link
 
@@ -636,6 +751,19 @@ docs/sc/013/examples/p3.f.xml
 docs/sc/013/sc13.pdf
 docs/sc/013/sc13.texml_tar
 
+etc/init/cshrc
+etc/init/login
+etc/init/profile
+
+libraries/agi/agp/AGP_COM
+libraries/agi/agp/AGP_CONST
+libraries/agi/agp/agp1_init.f
+
+libraries/ary/ary1_gt1x.f
+libraries/ary/ary1_gtnx.f
+libraries/ary/ary_gtszx.f
+libraries/ary/ary_ptszx.f
+
 libraries/ast/AST_PAR
 libraries/ast/addversion
 libraries/ast/ast.h
@@ -651,6 +779,9 @@ libraries/ast/version.h
 
 libraries/cat/CAT1_NUL
 
+libraries/cnf/CNF_PAR
+libraries/cnf/CNF_PAR.processed
+libraries/cnf/cnf.h
 libraries/cnf/f77.h
 
 libraries/ems/ems_fioer.c
@@ -658,9 +789,50 @@ libraries/ems/ems_link
 libraries/ems/ems_link_adam
 
 libraries/fio/fio1_serr.f
+libraries/fio/FIO1_SERR_PC_LINUX
+libraries/fio/make-errno-err
 
 libraries/gks/base/gkioop.f
+libraries/gks/data/emf/gks.emf-1.37
+libraries/gks/data/emf/gksemf
+libraries/gks/data/fonts/create_dbs
+libraries/gks/data/fonts/gks.dbs-1.37
+libraries/gks/data/fonts/gksdbs
+libraries/gks/data/wdts/cdrive.inc
+libraries/gks/data/wdts/gks.wdt-1.37
+libraries/gks/data/wdts/gkswdt
+libraries/gks/data/wdts/gkswdt.dat
+libraries/gks/data/wdts/gkswdt.lst
+libraries/gks/include/gkmc.par
 libraries/gks/include/gkmc.par.F
+
+libraries/gns/gksbuild
+libraries/gns/gns_gksdevices
+libraries/gns/gns_ididevices
+libraries/gns/idibuild
+
+libraries/gsd/gsd_print
+
+libraries/gwm/gwmXrefresh
+libraries/gwm/xdestroy
+libraries/gwm/xmake
+
+libraries/hds/DAT_PAR
+libraries/hds/dat_par.h
+libraries/hds/dat_par_f
+libraries/hds/dat_par_h
+libraries/hds/hds1_types.h
+libraries/hds/hds_machine
+libraries/hds/hds_machine.txt
+libraries/hds/hds_types.h
+libraries/hds/hdsdump
+libraries/hds/make-hds-types
+
+libraries/hlp/crehlp
+libraries/hlp/lsthlp
+
+libraries/idi/dctprep
+libraries/idi/xworks.dat
 
 libraries/img/hdr_inx.f
 libraries/img/hdr_outx.f
@@ -688,7 +860,13 @@ libraries/img/img_tmp2x.f
 libraries/img/img_tmp3x.f
 libraries/img/img_tmpx.f
 
+libraries/jpl/ephdsk
+libraries/jpl/jplconst
+libraries/jpl/jpleph.dat
+libraries/jpl/jplpleph
+libraries/jpl/jplstate
 libraries/jpl/runtesteph
+libraries/jpl/shorteph
 
 libraries/kaplibs/fts/fts1_chva.f
 libraries/kaplibs/fts/fts1_gkeyx.f
@@ -820,11 +998,37 @@ libraries/kaplibs/kpg/kpg1_unz2.f
 libraries/kaplibs/kpg/kpg1_vasv.f
 libraries/kaplibs/kpg/kpg1_wmod.f
 libraries/kaplibs/kpg/kpg1_xyzw.f
+
+libraries/mag/tapecreate
+
+libraries/nbs/nbsc.c
+libraries/nbs/nbsclow.c
+libraries/nbs/nbtrace
+
+libraries/pcs/compifl
+libraries/pcs/dtask/alink
+libraries/pcs/dtask/alink.in
+libraries/pcs/dtask/ilink
+libraries/pcs/dtask/ilink.in
+libraries/pcs/parsecon/SUBPAR_CMN
 libraries/pcs/sock/sock_link
 libraries/pcs/sock/sock_link_adam
 libraries/pcs/subpar/subpar_link_adam
 
+libraries/pgp/grfont.dat
+libraries/pgp/pack
+
+libraries/prm/make-prm-par
+libraries/prm/NUM_CMN
+libraries/prm/NUM_DEF_CVT
+libraries/prm/NUM_DEF_D
+libraries/prm/NUM_DEF_R
 libraries/prm/num_han.c
+libraries/prm/PRM_PAR
+libraries/prm/prm_par.h
+
+libraries/shl/browsehlp
+libraries/starmem/starmem_link
 
 libraries/sla/f77.h
 libraries/sla/gresid.F
