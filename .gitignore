@@ -597,6 +597,8 @@ applications/specx/src/specx
 applications/specx/src/specx_help
 applications/specx/src/TITLE
 
+applications/star2html/latex2html
+applications/star2html/star2html
 applications/star2html/xlabel
 
 applications/starx/starX_link
