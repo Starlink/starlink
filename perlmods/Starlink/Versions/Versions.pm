@@ -898,10 +898,24 @@ sub _get_global_version {
   print "Opening manifest file $file\n" if $DEBUG;
   my $sym = gensym;
   open( $sym, "< $file" ) || return;
-  my $version = <$sym>;
-  chomp($version);
+  my $branch = <$sym>;
+  chomp($branch);
+  my $id = <$sym>;
+  my $date = <$sym>;
+  my %info;
+  $info{STRING} = $branch;
+  if (defined $id) {
+    chomp($id);
+    $info{STRING} .= " @ $id";
+    $info{COMMIT} = $id;
+  }
+  if (defined $date) {
+    chomp($date);
+    $info{COMMITDATE} = $date;
+    $info{STRING} .= " ($date)";
+  }
   close($sym);
-  return $version;
+  return \%info;
 }
 
 =item B<_get_version>
@@ -919,10 +933,18 @@ The returned hash contains the following keys:
  MINOR =>  minor version number
  PATCHLEVEL => patchlevel
  STRING => stringified version in form "Vm.n-p"
+ OBJECT => version object
  VERSION => perl 5.6.0 version number vm.n.p
 
 The "VERSION" key is only set for perl versions 5.6.0 and newer.
 An empty list is returned if version can not be determined.
+
+If the request is for a Starlink version the string will not be
+of form "Vm.n-p", but will report the branch name, commit id and
+commit date.
+
+ COMMIT => commit identifier (SVN revision number of SHA1 git id)
+ COMMITDATE => date of commit (ISO 8601)
 
 =cut
 
@@ -934,7 +956,7 @@ sub _get_version ($) {
   return %{ $CACHE{ $app } } if exists $CACHE{ $app };
 
   # Special case 'starlink'
-  if ($app eq 'starlink') {
+  if ($app eq 'starlink' || $app eq 'starlink.version') {
     my $global = _get_global_version();
     if (defined $global) {
       $CACHE{$app} = {
@@ -942,8 +964,10 @@ sub _get_version ($) {
 		      MINOR => undef,
 		      PATCHLEVEL => undef,
 		      VERSION => undef,
-          OBJECT => undef,
-		      STRING => $global,
+		      OBJECT => undef,
+		      STRING => $global->{STRING},
+		      COMMIT => $global->{COMMIT},
+		      COMMITDATE => $global->{COMMITDATE},
 		     };
     }
     return (defined $global ? %{ $CACHE{$app} } : () );
