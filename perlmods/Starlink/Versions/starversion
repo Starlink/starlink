@@ -63,6 +63,9 @@ if (@list) {
     my ($major, $minor, $patchlevel) = starversion($app);
     my $string = starversion_string($app);
 
+    # remove file suffices
+    $app =~ s/\..*//;
+
     # Print the application name if we have more than one argument
     printf "%-15s", uc($app).':' if @list > 1;
 
