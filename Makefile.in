@@ -175,7 +175,8 @@ world: $(ALL_TARGETS)
 	- if test -n "$(GIT)"; then \
 	   $(GIT) branch | grep '^\*' | sed 's,\* ,,' > starlink.version; \
 	   $(GIT) rev-parse --verify HEAD >> starlink.version; \
-     $(GIT) log -n 1 HEAD --pretty=format:%cd --date=iso >> starlink.version; \
+	   $(GIT) log -n 1 HEAD --pretty=format:%cd --date=iso >> starlink.version; \
+	   echo >> starlink.version; \
 	   $(INSTALL_DATA) starlink.version $(MANIFESTS)/starlink.version; \
 	fi
 
