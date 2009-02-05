@@ -364,9 +364,9 @@
      :                    %VAL( CNF_PVAL( IPWRK1 ) ), LWRK1,
      :                    %VAL( CNF_PVAL( IPWRK2 ) ), LWRK2, 
      :                    %VAL( CNF_PVAL( IPWRK3 ) ),
-     :                    LWRK3, IERROR, STATUS )
-
-         IF ( STATUS .NE. SAI__OK ) THEN
+     :                    LWRK3, IERROR )
+         IF ( IERROR .LT. -2 .OR. IERROR .GT. 0 ) THEN 
+            STATUS = SAI__ERROR
             CALL MSG_SETI( 'IERROR', IERROR )
             CALL ERR_REP( 'RTD1_NOFIT', 'Unable to fit surface to '//
      :'data (^IERROR).', STATUS )

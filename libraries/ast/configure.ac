@@ -66,6 +66,10 @@ AC_SUBST(THREADS, $use_pthreads)
 # See which variadic function API to use
 AC_CHECK_HEADERS(stdarg.h varargs.h, break)
 
+# Can we use backtrace?
+AC_CHECK_HEADERS([execinfo.h])
+AC_CHECK_FUNCS([backtrace])
+
 #  See if we have long doubles (used by the Mapping and Region classes)
 AC_CHECK_TYPES([long double])
 

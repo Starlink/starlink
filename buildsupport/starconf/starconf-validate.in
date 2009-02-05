@@ -154,31 +154,33 @@ foreach $r (@required_files) {
 }
 
 # Subversion checkins.
-if ( -d ".svn" && -f ".svn/entries" ) {
-    @allsvnfiles = ();
-    push(@allsvnfiles, @definitely_required);
-    push(@allsvnfiles, @required_files);
-    push(@allsvnfiles, @extra_checkins);
-    foreach $f (@allsvnfiles) {
-        $result = `svn status -v $f`;
-        #  Return will be empty string, or "?   filename"
-        if ( ! $result || ( $result =~ /^\?/ ) ) {
-            #print "$progname: file $f is not checked in, but should be\n";
+my $gitshow = `git rev-parse --ls-inside-work-tree 2>&1`;
+if ( ! ( $? >> 8 ) ) {
+    @allgitfiles = ();
+    push(@allgitfiles, @definitely_required);
+    push(@allgitfiles, @required_files);
+    push(@allgitfiles, @extra_checkins);
+    foreach $f (@allgitfiles) {
+        my $result = `git ls-files $f 2>&1`;
+        #  Return will be "" if not checked in.
+        if ( $result eq "" ) {
+            print "$progname: file $f is not checked in, but should be\n";
             push(@list_err_not_checked_in, $f);
             $nwarnings++;
         }
     }
     foreach $f (@non_checkins) {
-        $result = `svn status -v $f`;
-        #  Return will be empty string, "I   filename" or "?   filename"
-        if ( $result && ! ( $result =~ /^I/ ) && ! ( $result =~ /^\?/ ) ) {
-            #print "$progname: file $f is checked in, but shouldn't be\n";
+        my $result = `git ls-files $f 2>&1`;
+
+        #  Return will be "" if not checked in.
+        if ( $result ne "" ) {
+            #print "$progname: file $f is checked in, but shouldn't be\n\n";
             push(@list_err_checked_in, $f);
             $nwarnings++;
         }
     }
 } else {
-    print "$progname: no .svn directory not a subversion checkout\n";
+    print "$progname: not in a git repository\n";
     $nwarnings++;
 }
 

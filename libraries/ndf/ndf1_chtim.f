@@ -79,11 +79,14 @@
 
 *  Authors:
 *     DSB: David S Berry (JAC, UCLan)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     23-JAN-2009 (DSB):
 *        Original version.
+*     03-FEB-2009 (TIMJ):
+*        Fix token name for DATE
 *     {enter_changes_here}
 
 *  Bugs:
@@ -136,7 +139,7 @@
          MJD = AST__BAD
          IF( STATUS .EQ. SAI__OK ) THEN
             STATUS = NDF__BDTIM
-            CALL MSG_SETC( 'D', DATE )
+            CALL MSG_SETC( 'DATE', DATE )
             CALL ERR_REP( 'NDF_HSDAT_INV', 'Invalid date/time string '//
      :                    '''^DATE'' specified (possible programming '//
      :                    'error).', STATUS )

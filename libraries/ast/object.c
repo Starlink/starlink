@@ -393,11 +393,11 @@ static void SetUseDefs( AstObject *, int, int * );
 
 
 #if defined(MEM_DEBUG)
-static void CheckList( int head );
-static void CheckInList( int ihandle, int head, int in );
-static int CheckThread( int ihandle, int head );
+static void CheckList( int * );
+static void CheckInList( int, int *, int );
+static int CheckThread( int, int * );
 static const char *HandleString( int, char * );
-static const char *HeadString( int, char * );
+static const char *HeadString( int *, char * );
 #endif
 
 #if defined(THREAD_SAFE)
@@ -1090,12 +1090,12 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Create a new mutex for the new Object, and lock it for use by the
    current thread. */
 #ifdef THREAD_SAFE
-      if( pthread_mutex_init( &(new->mutex1), NULL ) != 0 ) {
+      if( pthread_mutex_init( &(new->mutex1), NULL ) != 0 && astOK ) {
          astError( AST__INTER, "astInitObject(%s): Failed to "
                    "initialise POSIX mutex1 for the new Object.", status, 
                    vtab->class );
       }
-      if( pthread_mutex_init( &(new->mutex2), NULL ) != 0 ) {
+      if( pthread_mutex_init( &(new->mutex2), NULL ) != 0 && astOK ) {
          astError( AST__INTER, "astInitObject(%s): Failed to "
                    "initialise POSIX mutex2 for the new Object.", status, 
                    vtab->class );
@@ -1612,8 +1612,8 @@ static const char *Get( AstObject *this, const char *attrib, int *status ) {
 /* If no characters were copied, the attribute name was blank, so
    report an error. */
       if ( !j ) {
-         astError( AST__BADAT, "astGet(%s): A blank attribute name was given.", status,
-                   astGetClass( this ) );
+         if( astOK ) astError( AST__BADAT, "astGet(%s): A blank attribute "
+                               "name was given.", status, astGetClass( this ) );
 
 /* Of OK, invoke astGetAttrib to obtain a pointer to the attribute
    value formatted as a character string. */
@@ -1757,7 +1757,7 @@ static const char *GetAttrib( AstObject *this, const char *attrib, int *status )
       }
 
 /* If the attribute name was not recognised, then report an error. */
-   } else {
+   } else if( astOK ){
       astError( AST__BADAT, "astGet: The %s given does not have an attribute "
                 "called \"%s\".", status, astGetClass( this ), attrib );
    }
@@ -2111,7 +2111,7 @@ type astGet##code##_( AstObject *this, const char *attrib, int *status ) { \
          result = value; \
 \
 /* If the read was unsuccessful, report an error. */ \
-      } else { \
+      } else if( astOK ) { \
          astError( AST__ATGER, "astGet" #code "(%s): The attribute " \
                    "value \"%s=%s\" cannot be read using the requested data " \
                    "type.", status,astGetClass( this ), attrib, str ); \
@@ -2292,6 +2292,8 @@ static int ManageLock( AstObject *this, int mode, int extra,
 *        2 - Failed to lock a POSIX mutex
 *        3 - Failed to unlock a POSIX mutex
 *        4 - Bad "mode" value supplied.
+*        5 - Check failed - object is locked by a different thread
+*        6 - Check failed - object is unlocked 
 *     
 
 *  Notes:
@@ -2388,7 +2390,11 @@ static int ManageLock( AstObject *this, int mode, int extra,
 /* Check the Object is locked by the calling thread. Return a status of 1 if
    not. */
    } else if( mode == AST__CHECKLOCK ) {
-      if( this->locker != AST__THREAD_ID ) result = 1;
+      if( this->locker == -1 ) {
+         result = 6;
+      } else if( this->locker != AST__THREAD_ID ) {
+         result = 5;
+      }
    
 /* Return a status of 4 for any other modes. */
    } else {
@@ -3432,7 +3438,7 @@ static int TestAttrib( AstObject *this, const char *attrib, int *status ) {
       result = 0;
 
 /* Any attempt to test any other attribute is an error. */
-   } else {
+   } else if( astOK ){
       astError( AST__BADAT, "astTest: The attribute name \"%s\" is invalid "
                "for a %s.", status, attrib, astGetClass( this ) );
    }
@@ -3697,31 +3703,35 @@ static void VSet( AstObject *this, const char *settings, char **text,
    if an error value was returned and report an error. Include
    information from errno if it was set. */
             if ( nc < 0 ) {
-               stat = errno;
-
-               if( stat ) {
-                  strerror_r( stat, errbuf, ERRBUF_LEN );
-               } else {
-                  *errbuf = 0;
+               if( astOK ) {
+                  stat = errno;
+   
+                  if( stat ) {
+                     strerror_r( stat, errbuf, ERRBUF_LEN );
+                  } else {
+                     *errbuf = 0;
+                  }
+   
+                  astError( AST__ATSER, "astVSet(%s): Error formatting an "
+                            "attribute setting%s%s.", status, astGetClass( this ),
+                            stat? " - " : "", errbuf );
+                  astError( AST__ATSER, "The setting string was \"%s\".", status,
+                            settings );
                }
-
-               astError( AST__ATSER, "astVSet(%s): Error formatting an "
-                         "attribute setting%s%s.", status, astGetClass( this ),
-                         stat? " - " : "", errbuf );
-               astError( AST__ATSER, "The setting string was \"%s\".", status,
-                         settings );
 
 /* Also check that the result buffer did not overflow. If it did,
    memory will probably have been corrupted but this cannot be
    prevented with "vsprintf" (although we try and make the buffer
    large enough). Report the error and abort. */
             } else if ( nc > buff_len ) {
-               astError( AST__ATSER, "astVSet(%s): Internal buffer overflow "
-                         "while formatting an attribute setting - the result "
-                         "exceeds %d characters.", status, astGetClass( this ),
-                         buff_len );
-               astError( AST__ATSER, "The setting string was \"%s\".", status,
-                         settings );
+               if( astOK ) {
+                  astError( AST__ATSER, "astVSet(%s): Internal buffer overflow "
+                            "while formatting an attribute setting - the result "
+                            "exceeds %d characters.", status, astGetClass( this ),
+                            buff_len );
+                  astError( AST__ATSER, "The setting string was \"%s\".", status,
+                            settings );
+               }
 
 /* If all is OK, loop to process each formatted attribute assignment
    (these are now separated by '\n' characters). */
@@ -4454,7 +4464,7 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
          if( vtab->nfree > 0 ) {
             mem = vtab->free_list[ --(vtab->nfree) ];
             vtab->free_list[ vtab->nfree ] = NULL;
-            if( astSizeOf( mem ) != size ) {
+            if( astSizeOf( mem ) != size && astOK ) {
                astError( AST__INTER, "astInitObject(%s): Free block has size "
                          "%d but the %s requires %d bytes (internal AST "
                          "programming error).", status, vtab->class, astSizeOf( mem ),
@@ -4527,12 +4537,12 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
 
 #ifdef THREAD_SAFE
       } else {
-         if( pthread_mutex_init( &(new->mutex1), NULL ) != 0 ) {
+         if( pthread_mutex_init( &(new->mutex1), NULL ) != 0 && astOK ) {
             astError( AST__INTER, "astInitObject(%s): Failed to "
                       "initialise POSIX mutex1 for the new Object.", status, 
                       vtab->class );
          }
-         if( pthread_mutex_init( &(new->mutex2), NULL ) != 0 ) {
+         if( pthread_mutex_init( &(new->mutex2), NULL ) != 0 && astOK ) {
             astError( AST__INTER, "astInitObject(%s): Failed to "
                       "initialise POSIX mutex2 for the new Object.", status, 
                       vtab->class );
@@ -4770,8 +4780,11 @@ typedef struct Handle {
    int context;                  /* Context level for this Object */
    int check;                    /* Check value to ensure validity */
 
-#if defined(MEM_DEBUG)
+#if defined(THREAD_SAFE)
    int thread;                   /* Identifier for owning thread */
+#endif
+
+#if defined(MEM_DEBUG)
    int id;                       /* The id associated with the memory block 
                                     holding the Object last associated with 
                                     this handle. */
@@ -4927,9 +4940,7 @@ static void AnnulHandle( int ihandle, int *status ) {
                       "internal programming error)." , status);
          }
 
-/* If the Handle is active, annul its Object pointer and reset its
-   "context" value (making it inactive) and its "check" value (so it
-   is no longer associated with an identifier value). The astAnnul
+/* If the Handle is active, annul its Object pointer. The astAnnul
    function may call Delete functions supplied by any class, and these
    Delete functions may involve annulling external Object IDs, which in 
    turn requires access to the handles array. For this reason, we release 
@@ -4937,29 +4948,46 @@ static void AnnulHandle( int ihandle, int *status ) {
    potentially be re-aquired within astAnnul without causing deadlock. */
       } else {
 
+#ifdef MEM_DEBUG
          astHandleUse( ihandle, "annulled using check value %d ",
                        handles[ ihandle ].check  );
-
+#endif
 
          ptr = handles[ ihandle ].ptr;
          UNLOCK_MUTEX2;
          ptr = astAnnul( ptr );
          LOCK_MUTEX2;
-         handles[ ihandle ].ptr = ptr;
-         handles[ ihandle ].context = INVALID_CONTEXT;
-         handles[ ihandle ].check = 0;
 
-/* Remove the Handle from the active list for its context level and
-   place it on the free Handles list ready for re-use. */
+/* Remove the Handle from the active list for its context level. */
          if( context == UNOWNED_CONTEXT ) {
+
+#if defined(THREAD_SAFE)
             RemoveHandle( ihandle, &unowned_handles, status );
-         } else {
+#else
+            if( astOK ) astError( AST__INTER, "AnnulHandle: reference to "
+                         "'unowned_handles' in a non-thread-safe context "
+                         "(internal AST programming error).", status );
+#endif
+
+         } else if( active_handles ) {
             RemoveHandle( ihandle, &active_handles[ context ], status );
+
+         } else if( astOK ){
+            astError( AST__INTER, "AnnulHandle: active_handles array has "
+                      "not been initialised (internal AST programming error).",
+                      status );
          }
 
-#if defined(MEM_DEBUG)
+/* Reset the Handle's "context" value (making it inactive) and its "check" 
+   value (so it is no longer associated with an identifier value). */
+         handles[ ihandle ].ptr = NULL;
+         handles[ ihandle ].context = INVALID_CONTEXT;
+         handles[ ihandle ].check = 0;
+#if defined(THREAD_SAFE)
          handles[ ihandle ].thread = -1;
 #endif
+
+/* Place the modified Handle on the free Handles list ready for re-use. */
          InsertHandle( ihandle, &free_handles, status );
 
       }
@@ -5280,12 +5308,16 @@ static int CheckId( AstObject *this_id, int *status ) {
 */
 
 /* Local Variables: */
+   astDECLARE_GLOBALS;           /* Thread-specific global data */
    MixedInts work;               /* Union for decoding ID value */
    int id;                       /* ID value as an int */
    int ihandle;                  /* Result to return */
 
 /* Initialise. */
    ihandle = -1;
+
+/* Get a pointer to thread-specific global data. */
+   astGET_GLOBALS(NULL);
 
 /* Retrieve the integer Object identifier value from the pointer
    supplied. */
@@ -5324,26 +5356,31 @@ static int CheckId( AstObject *this_id, int *status ) {
                       "%d).", status, id  );
             astError( AST__OBJIN, "This pointer has been annulled, or the "
                       "associated Object deleted." , status);
-
-#ifdef MEM_DEBUG
-            astError( AST__OBJIN, "This pointer was last associated with "
-                      "a %s stored in a memory block with id %d.", 
-                      status, handles[ work.i ].vtab->class,
-                      handles[ work.i ].id );
-            void *ptr = handles[ work.i ].ptr;
-            astError( AST__OBJIN, "Handle properties: index %d  "
-                      "ptr: %p (id=%d)  context: %d  check: %d "
-                      "thread %d\n", status, work.i, ptr, astMemoryId( ptr ), 
-                       handles[ work.i ].context, handles[ work.i ].check, 
-                       handles[ work.i ].thread );
-#endif
-
          }
+#if defined(THREAD_SAFE)
+      } else if(  handles[ work.i ].context != UNOWNED_CONTEXT && 
+                  handles[ work.i ].thread != AST__THREAD_ID ) {
+         if ( astOK ) {
+            astError( AST__OBJIN, "Invalid Object pointer given (value is "
+                      "%d).", status, id  );
+            astError( AST__OBJIN, "This pointer is currently locked by "
+                      "another thread." , status);
+         }
+#endif
 
 /* If OK, set the Handle offset to be returned. */
       } else {
          ihandle = work.i;
       }
+
+#ifdef MEM_DEBUG
+      if ( !astOK && ( work.i >= 0 ) && ( work.i < nhandles ) ) {
+         char buf[200];
+         astError( astStatus, "Handle properties: %s ", status,
+                   HandleString( work.i, buf ) );
+      }
+#endif
+
    }
 
 /* Return the result. */
@@ -5439,7 +5476,9 @@ AstObject *astDeleteId_( AstObject *this_id, int *status ) {
       }
 
 /* If required, tell the user that the handle's object has been deleted. */
+#ifdef MEM_DEBUG
       astHandleUse( ihandle, "object-deleted" );
+#endif
    }
 
    UNLOCK_MUTEX2;
@@ -5637,7 +5676,7 @@ f        This routine applies to all Objects.
 
 /* Obtain the Handle offset for this Object. */
       ihandle = CheckId( this_id, status );
-      if ( astOK ) {
+      if ( ihandle != -1 ) {
 
 /* Extract the context level at which the Object was created. */
          context = handles[ ihandle ].context;
@@ -5649,15 +5688,23 @@ f        This routine applies to all Objects.
 /* Remove the object's Handle from its original active Handles list
    and insert it into the list appropriate to its new context
    level. */
+
+#if defined(THREAD_SAFE)
          if( context == UNOWNED_CONTEXT ) {
             RemoveHandle( ihandle, &unowned_handles, status );
          } else {
             RemoveHandle( ihandle, &active_handles[ context ], status );
          }
+#else
+         RemoveHandle( ihandle, &active_handles[ context ], status );
+#endif
+
          InsertHandle( ihandle, &active_handles[ 0 ], status );
 
 /* If required, tell the user that the handle has been exempted. */
+#ifdef MEM_DEBUG
          astHandleUse( ihandle, "exempted" );
+#endif
       }
 
       UNLOCK_MUTEX2;
@@ -5742,14 +5789,14 @@ f     and have not been rendered exempt using AST_EXEMPT.
 
 /* Obtain the Handle offset for this Object. */
       ihandle = CheckId( this_id, status );
-      if ( astOK ) {
+      if ( ihandle != -1 ) {
 
 /* Check that the current context level is at least 1 and report an
    error if it is not. */
          if ( context_level < 1 ) {
-            astError( AST__EXPIN, "astExport(%s): Attempt to export an Object "
-                      "from context level zero.", status,
-                      astGetClass( handles[ ihandle ].ptr ) );
+            if( astOK ) astError( AST__EXPIN, "astExport(%s): Attempt to export an Object "
+                                  "from context level zero.", status,
+                                  astGetClass( handles[ ihandle ].ptr ) );
 
 /* Extract the context level at which the Object was created. */
          } else {
@@ -5771,8 +5818,10 @@ f     and have not been rendered exempt using AST_EXEMPT.
                              status );
 
 /* If required, tell the user that the handle has been exempted. */
+#ifdef MEM_DEBUG
                astHandleUse( ihandle, "exported from context level %d",
                               context_level );
+#endif
             }
          }
       }
@@ -5851,7 +5900,7 @@ f        This routine applies to all Objects.
 
 /* Obtain the Handle offset for this Object. */
       ihandle = CheckId( this_id, status );
-      if ( astOK ) {
+      if ( ihandle != -1 ) {
 
 /* Extract the context level at which the Object was created. */
          context = handles[ ihandle ].context;
@@ -5869,8 +5918,10 @@ f        This routine applies to all Objects.
             InsertHandle( ihandle, &active_handles[ context_level ], status );
 
 /* If required, tell the user that the handle has been imported. */
+#ifdef MEM_DEBUG
             astHandleUse( ihandle, "imported into context level %d",
                            context_level );
+#endif
          }
       }
       UNLOCK_MUTEX2;
@@ -5995,17 +6046,18 @@ c--
          LOCK_MUTEX2;
          if ( !active_handles ) InitContext( status );
          ihandle = CheckId( this_id, status );
-         if( handles[ ihandle ].context == UNOWNED_CONTEXT ) {
+         if( ihandle != -1 && handles[ ihandle ].context == UNOWNED_CONTEXT ) {
             RemoveHandle( ihandle, &unowned_handles, status );
 
-#if defined(MEM_DEBUG)
             handles[ ihandle ].thread = AST__THREAD_ID;
+            handles[ ihandle ].context = context_level;
+
+#if defined(MEM_DEBUG)
             astHandleUse( ihandle, "locked by thread %d at context level %d", 
                            handles[ ihandle ].thread, context_level );
 #endif
 
             InsertHandle( ihandle, &active_handles[ context_level ], status );
-            handles[ ihandle ].context = context_level;
 
 /* We will arrive here if an attempt is made to lock an Object that was
    already locked. In this case, the handle will not be on the unowned
@@ -6059,6 +6111,9 @@ c++
 *        This function applies to all Objects.
 
 *  Notes:
+*     - This function attempts to execute even if the global error
+*     status is set, but no further error report will be made if it
+*     subsequently fails under these circumstances.
 *     - All unlocked Objects are excluded from AST context handling until
 *     they are re-locked using astLock.
 *     - This function is only available in the C interface.
@@ -6078,6 +6133,7 @@ c--
 
 /* Local Variables: */
    astDECLARE_GLOBALS;           /* Thread-specific global data */
+   AstErrorContext error_context;/* Info about the current error context */
    AstObject *fail;              /* Pointer to Object that failed */
    AstObject *this;              /* Pointer to Object */
    int ihandle;                  /* Index of supplied objetc handle */
@@ -6089,6 +6145,11 @@ c--
    since the usual "astMakePointer" macro invokes astCheckLock to report 
    an error if the Object is not currently locked by the calling thread. */
    if ( !astIsAObject( this = astMakePointer_NoLockCheck( this_id ) ) ) return;
+
+
+/* Start a new error reporting context. This saves any existing error status 
+   and then clear the status value. It also defer further error reporting. */
+   astErrorBegin( &error_context );
 
 /* The protected astManageLock function implements the public functions, 
    astLock and astUnlock. */
@@ -6121,23 +6182,30 @@ c--
          astGET_GLOBALS(this);
          LOCK_MUTEX2;
          ihandle = CheckId( this_id, status );
-         if( handles[ ihandle ].context != UNOWNED_CONTEXT ) {
+         if( ihandle != -1 && handles[ ihandle ].context != UNOWNED_CONTEXT ) {
             RemoveHandle( ihandle, &active_handles[ handles[ ihandle ].context ], status );
 
 #if defined(MEM_DEBUG)
             astHandleUse( ihandle, "unlocked from thread %d at context "
                            "level %d", handles[ ihandle ].thread, 
                            handles[ ihandle ].context );
-            handles[ ihandle ].thread = -1;
 #endif
-
-            InsertHandle( ihandle, &unowned_handles, status );
+            handles[ ihandle ].thread = -1;
             handles[ ihandle ].context = UNOWNED_CONTEXT;
+            InsertHandle( ihandle, &unowned_handles, status );
 
          }
          UNLOCK_MUTEX2;
       }
    }
+
+/* End the error reporting context. If an error has occurred within this
+   function, then this will display the deferred error messages so long
+   as there was no error condition on entry to this function. If there
+   was an error condition on entry, then the original status value will be
+   re-instated. */
+   astErrorEnd( &error_context );
+
 #endif 
 }
 
@@ -6312,9 +6380,10 @@ static void InsertHandle( int ihandle, int *head, int *status ) {
 
 #if defined(MEM_DEBUG)
    char buf[80];
-   astHandleUse( ihandle, "about to be inserted into %s", HeadString( *head, buf ) );
-   CheckList( *head );
-   CheckInList( ihandle, *head, 0 );
+   astHandleUse( ihandle, "about to be inserted into %s (%d)", 
+                 HeadString( head, buf ), head );
+   CheckList( head );
+   CheckInList( ihandle, head, 0 );
 #endif
 
 /* Check a head pointer was supplied (may not be if an error has
@@ -6339,7 +6408,7 @@ static void InsertHandle( int ihandle, int *head, int *status ) {
    *head = ihandle;
 
 #if defined(MEM_DEBUG)
-   CheckList( *head );
+   CheckList( head );
    astHandleUse( ihandle, "has been inserted into %s", buf );
 #endif
 }
@@ -6425,7 +6494,23 @@ AstObject *astMakeId_( AstObject *this, int *status ) {
             handles = astGrow( handles, nhandles + 1, sizeof( Handle ) );
             astEndPM;
 
-            if ( astOK ) ihandle = nhandles++;
+            if ( astOK ) {
+               ihandle = nhandles++;
+
+               handles[ ihandle ].ptr = NULL;
+               handles[ ihandle ].context = INVALID_CONTEXT;
+               handles[ ihandle ].check = 0;
+               handles[ ihandle ].flink = -1;
+               handles[ ihandle ].blink = -1;
+#if defined(THREAD_SAFE)
+               handles[ ihandle ].thread = 0;
+#endif
+
+#if defined(MEM_DEBUG)
+               handles[ ihandle ].id = 0;
+               handles[ ihandle ].vtab = NULL;
+#endif
+            }
          }
 
 /* If the first AST context level has not yet been initialised, invoke
@@ -6438,6 +6523,17 @@ AstObject *astMakeId_( AstObject *this, int *status ) {
             if ( astOK ) {
                handles[ ihandle ].ptr = this;
                handles[ ihandle ].context = context_level;
+#if defined(THREAD_SAFE)
+               handles[ ihandle ].thread = AST__THREAD_ID;
+#endif
+
+/* Store extra debugging information in the handle if enabled */
+#if defined(MEM_DEBUG)
+               handles[ ihandle ].id = astMemoryId( this );
+               handles[ ihandle ].vtab = this->vtab;
+               astHandleUse( ihandle, "associated with a %s (id %d)",
+                              astGetClass( this ), astMemoryId( this ));
+#endif
 
 /* Insert the Handle into the active Handles list for the current
    context level. */
@@ -6445,15 +6541,6 @@ AstObject *astMakeId_( AstObject *this, int *status ) {
 
 /* Associate an identifier value with the Handle. */
                id = AssocId( ihandle, status );
-
-/* Store extra debugging information in the handle if enabled */
-#if defined(MEM_DEBUG)
-               handles[ ihandle ].thread = AST__THREAD_ID;
-               astHandleUse( ihandle, "associated with a %s (id %d)",
-                              astGetClass( this ), astMemoryId( this ));
-               handles[ ihandle ].id = astMemoryId( this );
-               handles[ ihandle ].vtab = this->vtab;
-#endif
 
 /* If an error occurred, clean up by annulling the Handle. This
    ensures that the Object pointer is annulled and returns the unused
@@ -6662,15 +6749,14 @@ static void RemoveHandle( int ihandle, int *head, int *status ) {
 
 #if defined(MEM_DEBUG)
    char buf[80];
-   astHandleUse( ihandle, "about to be removed from %s", HeadString( *head, buf ) );
-   CheckList( *head );
-   CheckInList( ihandle, *head, 1 );
+   astHandleUse( ihandle, "about to be removed from %s", HeadString( head, buf ) );
+   CheckList( head );
+   CheckInList( ihandle, head, 1 );
 #endif
 
 /* Check a head pointer was supplied (may not be if an error has
    occurred). */
    if( ! head ) return;
-
 
 /* Remove the Handle from the list by re-establishing links between
    the elements on either side of it. */
@@ -6693,7 +6779,7 @@ static void RemoveHandle( int ihandle, int *head, int *status ) {
 
 #if defined(MEM_DEBUG)
    astHandleUse( ihandle, "has been removed from %s", buf );
-   CheckList( *head );
+   CheckList( head );
 #endif
 }
 
@@ -6762,6 +6848,162 @@ void astSetId_( void *this_id_void, const char *settings, ... ) {
       astVSet( this, settings, NULL, args );
       va_end( args );
    }
+}
+
+int astThreadId_( AstObject *this_id, int ptr, int *status ) {
+/*
+c++
+*  Name:
+*     astThread
+
+*  Purpose:
+*     Determine the thread that owns an Object.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+*     #include "object.h"
+*     int astThread( AstObject *this, int ptr )
+
+*  Class Membership:
+*     Object method.
+
+*  Description:
+*     Returns an integer that indicates whether the supplied Object (or
+*     Object pointer) is currently unlocked, or is currently locked by
+*     the running thread, or another thread.
+
+*  Parameters:
+*     this
+*        Pointer to the Object to be checked.
+*     ptr
+*        If non-zero, returns information about the supplied Object
+*        pointer, rather than the Object structure itself. See "Object
+*        Pointers and Structures" below.
+
+*  Returned Value:
+*     astThread()
+*        A value of AST__UNLOCKED is returned if the Object (or pointer) 
+*        is currently unlocked (i.e. has been unlocked using astUnlock
+*        but has not yet been locked using astLock). A value of 
+*        AST__RUNNING is returned if the Object (or pointer) is currently 
+*        locked by the running thread. A value of AST__OTHER is returned 
+*        if the Object (or pointer) is currently locked by the another 
+*        thread.
+
+*  Object Pointers and Structures: 
+*     At any one time, an AST Object can have several distinct pointers,
+*     any one of which can be used to access the Object structure. For 
+*     instance, the astClone function will produce a new distinct pointer 
+*     for a given Object. In fact, an AST "pointer" is not a real pointer 
+*     at all - it is an identifier for a "handle" structure, encoded to 
+*     make it look like a pointer. Each handle contains (amongst othere 
+*     things) a "real" pointer to the Object structure. This allows more 
+*     than one handle to refer to the same Object structure. So when you 
+*     call astClone (for instance) you get back an identifier for a new 
+*     handle that refers to the same Object as the supplied handle.
+*
+*     In order to use an Object for anything useful, it must be locked
+*     for use by the running thread (either implicitly at creation or
+*     explicitly using astLock). The identity of the thread is stored in
+*     both the Object structure, and in the handle that was passed to
+*     astLock (or returned by the constructor function). Thus it is
+*     possible for a thread to have active pointers for Objects that are 
+*     currently locked by another thread. In general, if such a pointer is 
+*     passed to an AST function an error will be reported indicating that 
+*     the Object is currently locked by another thread. The two exceptions
+*     to this is that astAnnul can be used to annull such a pointer, and
+*     this function can be used to return information about the pointer.
+*
+*     The other practical consequence of this is that when astEnd is
+*     called, all active pointers currently owned by the running thread 
+*     (at the current context level) are annulled. This includes pointers 
+*     for Objects that are currently locked by other threads.
+*     
+*     If the "ptr" parameter is zero, then the returned value describes 
+*     the Object structure itself. If "ptr" is non-zero, then the returned 
+*     value describes the supplied Object pointer (i.e. handle), rather
+*     than the Object structure.
+
+*  Notes:
+*     - This function attempts to execute even if the global error
+*     status is set, but no further error report will be made if it
+*     subsequently fails under these circumstances.
+*     - This function is only available in the C interface.
+*     - This function always returns AST__RUNNING if the AST library has 
+*     been built without POSIX thread support (i.e. the "-with-pthreads" 
+*     option was not specified when running the "configure" script), or
+*     if the application was linked with non-thread-safe version of the 
+*     AST library (i.e. the "-threadsafe" option was not specified when 
+*     running the "ast_link" or "ast_link_adam" script).
+c--
+*/
+
+/* Local Variables: */
+   astDECLARE_GLOBALS;      /* Thread-specific global data */
+   int result;              /* The returned value */
+
+/* Initialise the returned value */
+   result = AST__RUNNING;
+
+/* Nothing more to do if AST was not build with thread support. */
+#if defined(THREAD_SAFE)  
+
+/* More local Variables: */
+   AstObject *this;
+   int ihandle;
+   int check;
+
+/* Ensure global variables are accessable. */
+   astGET_GLOBALS(NULL);
+
+/* If the ownership of the handle is being queried... */
+   if( ptr ) {
+
+/* Lock the mutex that guards access to the handles array */
+      LOCK_MUTEX2;
+
+/* Check the supplied object identifier is valid and get the
+   corresponding index into the handles array. */
+      ihandle = CheckId( this_id, status );
+      if( ihandle != -1 ) {
+
+/* Set the returned value on the basis of the threa didentifier stored in
+   the handle structure. */
+         if( handles[ ihandle ].thread == -1 ) {
+            result = AST__UNLOCKED;
+         } else if( handles[ ihandle ].thread != AST__THREAD_ID ) {
+            result = AST__OTHER;
+         }
+      }
+
+/* Unlock the mutex that guards access to the handles array */
+      UNLOCK_MUTEX2;
+
+/* Otherwise, the ownership of the Object is being queried. Obtain the 
+   Object pointer from the ID supplied and validate the pointer to ensure 
+   it identifies a valid Object (this generates an error if it doesn't). 
+   Note, we use the "astMakePointer_NoLockCheck", since the usual 
+   "astMakePointer" macro invokes astCheckLock to report an error if the 
+   Object is not currently locked by the calling thread. */
+   } else if( astIsAObject( this = astMakePointer_NoLockCheck( this_id ) ) ) {
+
+/* Determine which thread (if any) has the object locked, and set an
+   appropriate return value. */
+      check = astManageLock( this, AST__CHECKLOCK, 0, NULL );
+
+      if( check == 5 ) {
+         result = AST__OTHER;
+      } else if( check == 6 ) {
+         result = AST__UNLOCKED;
+      }        
+   }
+
+#endif
+
+/* Return the result. */
+   return result;
 }
 
 int astVersion_( int *status ) {
@@ -6910,7 +7152,7 @@ f     AST_STRIPESCAPES
 /* Check each handle in a list is uniquely connected to one other handle
    in both the forward and backward directions. */
 
-static void CheckList( int head ) {
+void CheckList( int *head ) {
    int ok;
    int ihandle;
    char buf[200];
@@ -6919,15 +7161,16 @@ static void CheckList( int head ) {
    astGET_GLOBALS(NULL);
 
    ok = 1;
-   if ( head != -1 ) {
-      ihandle = head;      
+   if ( *head != -1 ) {
+      ihandle = *head;      
       if( handles[ handles[ ihandle ].blink ].flink != ihandle ||
           handles[ handles[ ihandle ].flink ].blink != ihandle ) {
          ok = 0;
+
       } else {
          if( CheckThread( ihandle, head ) ) {
-            ihandle= handles[ head ].blink;
-            while( ihandle != head ) {
+            ihandle= handles[ *head ].blink;
+            while( ihandle != *head ) {
                if( handles[ handles[ ihandle ].blink ].flink != ihandle ||
                    handles[ handles[ ihandle ].flink ].blink != ihandle ||
                    CheckThread( ihandle, head ) == 0 ) {
@@ -6964,17 +7207,17 @@ static void CheckList( int head ) {
 
 /* Check if a specified handle is, or is not, in a given list of handles. */
 
-static void CheckInList( int ihandle, int head, int in ){
+void CheckInList( int ihandle, int *head, int in ){
    char list[80], buf[200];
    int found = 0;
 
-   if ( head != -1 ) {
-      if( ihandle == head ) {
+   if ( *head != -1 ) {
+      if( ihandle == *head ) {
          found = 1;
       } else {
          if( CheckThread( ihandle, head ) ) {
-            int jhandle= handles[ head ].blink;
-            while( jhandle != head ) {
+            int jhandle= handles[ *head ].blink;
+            while( jhandle != *head ) {
                if( ihandle == jhandle ) {
                   found = 1;
                   break;
@@ -6997,25 +7240,38 @@ static void CheckInList( int ihandle, int head, int in ){
 
 /* Check that a handle is owned by the currently executing thread. */
 
-static int CheckThread( int ihandle, int head ) {
+int CheckThread( int ihandle, int *head ) {
    int result = 1;
+
+#if defined(THREAD_SAFE)
+
    char buf[200];
    astDECLARE_GLOBALS;          
    astGET_GLOBALS(NULL);
 
-   int sb = -222;
-   if( head == unowned_handles || head == free_handles ) {
-      if(  handles[ ihandle ].thread != -1 ) sb = -1;
+   if( *head == unowned_handles  ) {
+      if(  handles[ ihandle ].thread != -1 ) {
+         printf("Handle %s has wrong thread: is %d, should "
+             "be -1 (i.e. unowned)\n", HandleString( ihandle, buf ), 
+              handles[ ihandle ].thread );
+
+      }
+
+   } else if( *head == free_handles ) {
+      if(  handles[ ihandle ].thread != -1 ) {
+         printf("Handle %s has wrong thread: is %d, should "
+             "be -1 (i.e. free)\n", HandleString( ihandle, buf ), 
+              handles[ ihandle ].thread );
+      }
 
    } else if( handles[ ihandle ].thread != AST__THREAD_ID ) {
-      sb = AST__THREAD_ID;
-   } 
-   if( sb != -222 ) {
-      result = 0;
       printf("Handle %s has wrong thread: is %d, should "
              "be %d\n", HandleString( ihandle, buf ), 
-              handles[ ihandle ].thread, sb );
-   }
+              handles[ ihandle ].thread, AST__THREAD_ID );
+   } 
+
+#endif
+
    return result;
 }
 
@@ -7038,40 +7294,55 @@ void astHandleAlarm_( const char *verb, va_list args ){
    astGET_GLOBALS(NULL);
 
    vsprintf( buff, verb, args );
+
+#if defined(THREAD_SAFE)
    printf( "astHandleAlarm: Handle %s %s (current thread is %d).\n\n", 
            HandleString( Watched_Handle, hbuf ), buff, AST__THREAD_ID );
+#else
+   printf( "astHandleAlarm: Handle %s %s.\n\n", 
+           HandleString( Watched_Handle, hbuf ), buff );
+#endif
 }
 
 static const char *HandleString( int ihandle, char *buf ){
+#if defined(THREAD_SAFE)
    sprintf( buf, "(index:%d v:%d c:%d t:%d i:%d cl:%s)", ihandle, 
             handles[ ihandle ].check, 
             handles[ ihandle ].context, handles[ ihandle ].thread,
             handles[ ihandle ].id, 
             handles[ ihandle ].vtab ? handles[ ihandle ].vtab->class : "<none>" );
+#else
+   sprintf( buf, "(index:%d v:%d c:%d i:%d cl:%s)", ihandle, 
+            handles[ ihandle ].check, 
+            handles[ ihandle ].context, handles[ ihandle ].id, 
+            handles[ ihandle ].vtab ? handles[ ihandle ].vtab->class : "<none>" );
+#endif
    return buf;
 }
 
-static const char *HeadString( int head, char *list ){
+static const char *HeadString( int *head, char *list ){
    int i;
    astDECLARE_GLOBALS;          
    astGET_GLOBALS(NULL);
 
-   if( head == free_handles ) {
+   if( head == &free_handles ) {
       strcpy( list, "free_handles" );
 
-   } else if( head == unowned_handles ) {
+#if defined(THREAD_SAFE)
+   } else if( head == &unowned_handles ) {
       strcpy( list, "unowned_handles" );
+#endif
 
    } else {
       *list = 0;
       for( i = 0; i <= context_level; i++ ) {
-         if( head == active_handles[ i ] ) {
+         if( *head == active_handles[ i ] ) {
             sprintf( list, "active_handles[%d]", i );
             break;
          }
       }
       if( *list == 0 ) sprintf( list, "unknown handles list with head %d",
-                                head );
+                                *head );
    }      
    return list;
 }

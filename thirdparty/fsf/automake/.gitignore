@@ -1,0 +1,13 @@
+Makefile
+aclocal
+autom4te.cache
+automake
+checkout-fixup
+config.log
+config.status
+configure-output.log
+make.log
+make.log.err
+Makefile
+bootstrap.log
+

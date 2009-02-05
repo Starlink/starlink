@@ -47,6 +47,13 @@
     the displayed image. See the help in the contour toolbox for how 
     to use this.
 
+    A bug in the operation of the patch toolbox has been fixed. Previously
+    GAIA could crash when using very small detached sky regions.
+
+    A bug in the handling of temporary images created by the regions toolbox
+    has been fixed. Previously if more than one instance of this toolbox
+    was in use the names of the temporary files could clash.
+
   Lehuakona Release
   =================
 

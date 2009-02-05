@@ -260,18 +260,17 @@ current_MANIFESTS=$STARLINK/manifests
 AC_SUBST(STAR_MANIFEST_DIR)
 
 # Each package updates the "starlink.version" file installed into the
-# manifests directory. This tracks the subversion version number for
-# the current code state by running the svnversion program on the
-# _whole_ tree (this isn't very nice, but is required by the JAC).
-# Define SVNVERSION as the program to run, but allow it to be 
-# overridden (most likely by ":" to avoid the overhead).
+# manifests directory. This tracks the last git sha1 checkin for
+# the current code state by running the git show on the HEAD.
+# Define GIT as the program to run, but allow it to be overridden 
+# (most likely by ":" to avoid the overhead).
 # Also requires that STAR_SOURCE_ROOT_DIR is defined to locate the
 # head of the source tree.
-: ${SVNVERSION='svnversion'}
-if test "${SVNVERSION}" = "svnversion"; then
-   AC_PATH_PROG(SVNVERSION, svnversion)
+: ${GIT='git'}
+if test "${GIT}" = "git"; then
+   AC_PATH_PROG(GIT, git)
 fi
-AC_SUBST(SVNVERSION)
+AC_SUBST(GIT)
 
 : ${STAR_SOURCE_ROOT_DIR=''}
 AC_SUBST(STAR_SOURCE_ROOT_DIR)

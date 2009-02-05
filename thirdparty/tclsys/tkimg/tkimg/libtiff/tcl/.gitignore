@@ -1,0 +1,13 @@
+Makefile
+config.log
+config.status
+libtiff
+man
+mkg3states
+pkgIndex.tcl
+port
+tif_fax3sm.c
+tifftclConfig.sh
+libtifftclstub3.6.1.a
+libtifftcl3.6.1.so
+

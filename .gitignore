@@ -32,6 +32,7 @@
 *.now
 *.pro
 *.ps
+*.s
 *.sdf
 *.shl
 *.tar.gz
@@ -46,6 +47,7 @@ lib*.so
 
 .deps
 .libs
+compile
 config.guess
 config.cache
 config.h
@@ -54,22 +56,26 @@ config.log
 config.status
 config.sub
 configure
+configure-output.log
+configure-output.log.err
 conftest.*
 configure.in
+depcomp
 install-sh
 install.log
+libtool
+libtoolize
+ltmain.sh
+make.config
 make.log
 make.log.err
+Makefile
 Makefile.in
 missing
-libtool
 stamp-h1
 stamp-h2
-depcomp
-ltmain.sh
-compile
-Makefile
 ylwrap
+*-stamp
 
 # Mac specific
 
@@ -77,7 +83,7 @@ ylwrap
 lib*.dylib
 a.out.dSYM
 
-# Starconf and Starlink build
+# Starconf and Starlink build and configure
 
 component.xml
 componentinfo.dtd
@@ -91,18 +97,21 @@ starconf.*
 starconf-status
 starlink.version
 STAR_SUPPRESS_BUILD
+tclIndex
 version.dat
 world-stamp
 
-# These are non-standard ignores. They could go in subdirs but for now put them in global
+# These are non-standard ignores. They could go in subdirs but for now
+put them in global.
 
 applications/astrom/params.f
 
-applications/atools/make_history_help
 applications/atools/atools.csh
 applications/atools/atools.icl
 applications/atools/atools.sh
+applications/atools/make_history_help
 
+applications/ccdpack/CCD1_PAR
 applications/ccdpack/ccdhelp
 applications/ccdpack/ccdpack.csh
 applications/ccdpack/ccdpack.icl
@@ -112,8 +121,6 @@ applications/ccdpack/ccdpack_reg
 applications/ccdpack/ccdpack_res
 applications/ccdpack/ccdpack_scr
 applications/ccdpack/ccdwish
-applications/ccdpack/CCD1_PAR
-applications/ccdpack/gen/dgeneric
 applications/ccdpack/gen/ccg1_add.f
 applications/ccdpack/gen/ccg1_asli.f
 applications/ccdpack/gen/ccg1_aspi.f
@@ -271,6 +278,7 @@ applications/ccdpack/gen/kpg1_tdli.f
 applications/ccdpack/gen/kpg1_trbo.f
 applications/ccdpack/gen/kpg1_trpi.f
 applications/ccdpack/gen/kpg1_vasv.f
+applications/ccdpack/gen/dgeneric
 
 applications/convert/convert.csh
 applications/convert/convert.icl
@@ -327,11 +335,11 @@ applications/cupid/cupidsub/cupidrcopyline.c
 applications/cupid/cupidsub/cupidrinitedges.c
 applications/cupid/cupidsub/cupidrms.c
 applications/cupid/cupidsub/cupidsumclumps.c
+applications/cupid/history.help
 applications/cupid/make_doc
 applications/cupid/make_h
 applications/cupid/make_history_help
 applications/cupid/make_quickdes
-applications/cupid/history.help
 applications/cupid/outlineclump.help
 applications/cupid/sun255.tex
 
@@ -349,9 +357,8 @@ applications/daophot/allstar
 applications/daophot/daocurs
 applications/daophot/daogrey
 applications/daophot/daophot
-applications/daophot/daophot.csh
 applications/daophot/daoplot
-
+applications/daophot/daophot.csh
 applications/datacube/datacube.csh
 applications/datacube/datacube.icl
 applications/datacube/datacube.sh
@@ -375,13 +382,13 @@ applications/echomop/sun152.latex_tar
 
 applications/extractor/extractor
 applications/extractor/extractor.csh
-applications/extractor/extractor.icl
 applications/extractor/extractor.sh
+applications/extractor/extractor.icl
 applications/extractor/sex
+applications/extractor/sextractor/src/sex
 applications/extractor/sextractor/man/sex.1
 applications/extractor/sextractor/sextractor-tpx.spec
 applications/extractor/sextractor/sextractor.spec
-applications/extractor/sextractor/src/sex
 
 applications/extreme/EXT_DEC
 applications/extreme/EXT_PAR
@@ -424,7 +431,6 @@ applications/ifd/ifd2star
 applications/ifd/ifd_irafhlpgen
 applications/ifd/ifl2ifd
 
-
 applications/kappa/ccdpack/ccg1_ad1.f
 applications/kappa/ccdpack/ccg1_ad3.f
 applications/kappa/ccdpack/ccg1_flx1.f
@@ -455,6 +461,10 @@ applications/kappa/kappa.sh
 applications/kappa/kappa_link_adam
 applications/kappa/kappa_mon.f
 applications/kappa/kapview_mon.f
+applications/kappa/lutedit.tcl
+applications/kappa/ndfpack_mon.f
+applications/kappa/sort-help.pl
+applications/kappa/stardemo.tcl
 applications/kappa/kapsub/kps1_apad.f
 applications/kappa/kapsub/kps1_ardm.f
 applications/kappa/kapsub/kps1_bafi.f
@@ -530,16 +540,12 @@ applications/kappa/kapsub/kps1_xyzw.f
 applications/kappa/kapsub/kps1_zprg.f
 applications/kappa/libkappa/kapmon.hlp.1
 applications/kappa/libkappa/kapmon.hlp.2
-applications/kappa/lutedit.tcl
 applications/kappa/multiplot.csh
-applications/kappa/ndfpack_mon.f
-applications/kappa/sort-help.pl
-applications/kappa/stardemo.tcl
 
-applications/kaprh/kaprh_mon.f
 applications/kaprh/kaprh.csh
 applications/kaprh/kaprh.icl
 applications/kaprh/kaprh.sh
+applications/kaprh/kaprh_mon.f
 applications/kaprh/kapsub/kps1_dscl.f
 applications/kaprh/kapsub/kps1_hstc.f
 
@@ -547,23 +553,23 @@ applications/news/news
 applications/news/news2html
 applications/news/newsmaint
 
-applications/photom/help/photomhelp
 applications/photom/photom.csh
 applications/photom/photom.icl
 applications/photom/photom.sh
+applications/photom/help/photomhelp
 applications/photom/testphotom
 
 applications/pisa/pisa.icl
+applications/pisa/start
 applications/pisa/pisa_mon4
 applications/pisa/pisahelp
-applications/pisa/start
 
 applications/polpack/Polka.tcl
-applications/polpack/polpack_link_adam
-applications/polpack/polpack_mon.f
 applications/polpack/polpack.csh
 applications/polpack/polpack.icl
 applications/polpack/polpack.sh
+applications/polpack/polpack_link_adam
+applications/polpack/polpack_mon.f
 applications/polpack/polsub/pol1_ptvrc.f
 applications/polpack/polsub/pol1_ptvrs.f
 
@@ -606,13 +612,35 @@ buildsupport/starconf/starconf-deinstall
 buildsupport/starconf/starconf-finder
 buildsupport/starconf/starconf-validate
 
+docs/sc/003/sc3-scripts.tex
+docs/sc/005/sc5.htx_tar.extras
+docs/sc/013/VERSION
+docs/sc/013/examples/README
+docs/sc/013/examples/bytesex.h
+docs/sc/013/examples/crash.c.xml
+docs/sc/013/examples/fpdemo.c.xml
+docs/sc/013/examples/fpp.c.xml
+docs/sc/013/examples/idl-functions.pro.xml
+docs/sc/013/examples/io-c.c.xml
+docs/sc/013/examples/io-f.f.xml
+docs/sc/013/examples/islittleendian
+docs/sc/013/examples/islittleendian.c.xml
+docs/sc/013/examples/maple.ms.xml
+docs/sc/013/examples/mixed-c.c.xml
+docs/sc/013/examples/mixed-f.f.xml
+docs/sc/013/examples/p1.f.xml
+docs/sc/013/examples/p2.f.xml
+docs/sc/013/examples/p3.f.xml
+docs/sc/013/sc13.pdf
+docs/sc/013/sc13.texml_tar
+
 libraries/ast/AST_PAR
 libraries/ast/addversion
-libraries/ast/ast_cpp
 libraries/ast/ast.h
 libraries/ast/astbad
-libraries/ast/builddocs
+libraries/ast/ast_cpp
 libraries/ast/ast_link
+libraries/ast/builddocs
 libraries/ast/f77.h
 libraries/ast/object.h
 libraries/ast/sun210.tex
@@ -657,6 +685,8 @@ libraries/img/img_tmp1x.f
 libraries/img/img_tmp2x.f
 libraries/img/img_tmp3x.f
 libraries/img/img_tmpx.f
+
+libraries/jpl/runtesteph
 
 libraries/kaplibs/fts/fts1_chva.f
 libraries/kaplibs/fts/fts1_gkeyx.f
@@ -788,9 +818,6 @@ libraries/kaplibs/kpg/kpg1_unz2.f
 libraries/kaplibs/kpg/kpg1_vasv.f
 libraries/kaplibs/kpg/kpg1_wmod.f
 libraries/kaplibs/kpg/kpg1_xyzw.f
-
-libraries/jpl/runtesteph
-
 libraries/pcs/sock/sock_link
 libraries/pcs/sock/sock_link_adam
 libraries/pcs/subpar/subpar_link_adam
@@ -806,196 +833,3 @@ libraries/sla/wait.f
 
 libraries/starmem/mem.h
 
-thirdparty/apache/xerces-c/xerces-c/src/xercesc/util/Xerces_autoconf_config.hpp
-thirdparty/apache/xerces-c/xerces-c/xerces-c.pc
-
-thirdparty/caltech/pgplot/pgplot_link
-thirdparty/caltech/pgplot/pgplot_link_adam
-
-thirdparty/eso/skycat/skycat/astrotcl/astrotclConfig.sh
-thirdparty/eso/skycat/skycat/astrotcl/pkgIndex.tcl
-thirdparty/eso/skycat/skycat/cat/catConfig.sh
-thirdparty/eso/skycat/skycat/cat/cat_version.tcl
-thirdparty/eso/skycat/skycat/cat/pkgIndex.tcl
-thirdparty/eso/skycat/skycat/rtd/pkgIndex.tcl
-thirdparty/eso/skycat/skycat/rtd/rtd
-thirdparty/eso/skycat/skycat/rtd/rtdConfig.sh
-thirdparty/eso/skycat/skycat/rtd/rtd_version.tcl
-thirdparty/eso/skycat/skycat/skycat/linux/skycat.spec
-thirdparty/eso/skycat/skycat/skycat/pkgIndex.tcl
-thirdparty/eso/skycat/skycat/skycat/skycat-star
-thirdparty/eso/skycat/skycat/skycat/skycatConfig.sh
-thirdparty/eso/skycat/skycat/skycat/skycat_version.tcl
-thirdparty/eso/skycat/skycat/tclutil/pkgIndex.tcl
-thirdparty/eso/skycat/skycat/tclutil/tclutil.sh
-thirdparty/eso/skycat/skycat/tclutil/tclutilConfig.sh
-thirdparty/eso/skycat/skycat/tclutil/tclutil_version.tcl
-
-thirdparty/fsf/autoconf/bin/autoconf
-thirdparty/fsf/autoconf/bin/autoheader
-thirdparty/fsf/autoconf/bin/autom4te
-thirdparty/fsf/autoconf/bin/autoreconf
-thirdparty/fsf/autoconf/bin/autoscan
-thirdparty/fsf/autoconf/bin/autoupdate
-thirdparty/fsf/autoconf/bin/ifnames
-thirdparty/fsf/autoconf/doc/autoconf.info
-thirdparty/fsf/autoconf/doc/stamp-vti
-thirdparty/fsf/autoconf/doc/version.texi
-thirdparty/fsf/autoconf/lib/autoconf/autoconf.m4f
-thirdparty/fsf/autoconf/lib/autom4te.cfg
-thirdparty/fsf/autoconf/lib/autoscan/autoscan.list
-thirdparty/fsf/autoconf/lib/autotest/autotest.m4f
-thirdparty/fsf/autoconf/lib/emacs/elc-stamp
-thirdparty/fsf/autoconf/lib/m4sugar/m4sh.m4f
-thirdparty/fsf/autoconf/lib/m4sugar/m4sugar.m4f
-thirdparty/fsf/autoconf/tests/atconfig
-thirdparty/fsf/autoconf/tests/atlocal
-thirdparty/fsf/autoconf/tests/autoconf
-thirdparty/fsf/autoconf/tests/autoheader
-thirdparty/fsf/autoconf/tests/autom4te
-thirdparty/fsf/autoconf/tests/autoreconf
-thirdparty/fsf/autoconf/tests/autoscan
-thirdparty/fsf/autoconf/tests/autoupdate
-thirdparty/fsf/autoconf/tests/ifnames
-thirdparty/fsf/automake/aclocal
-thirdparty/fsf/automake/automake
-thirdparty/fsf/automake/checkout-fixup
-thirdparty/fsf/automake/lib/Automake/Config.pm
-thirdparty/fsf/automake/tests/aclocal-1.9
-thirdparty/fsf/automake/tests/automake-1.9
-thirdparty/fsf/automake/tests/defs
-thirdparty/fsf/gsl/gsl-1.9/gsl-config
-thirdparty/fsf/gsl/gsl-1.9/gsl.pc
-thirdparty/fsf/gsl/gsl-1.9/gsl.spec
-
-thirdparty/heasarc/cfitsio/cfitsio/cfitsio.pc
-thirdparty/heasarc/cfitsio/cfitsio_link
-
-thirdparty/ijg/jpeg/src/jconfig.h
-
-thirdparty/kitware/vtk/cmake/Bootstrap.cmk/
-thirdparty/kitware/vtk/cmake/CMakeCache.txt
-thirdparty/kitware/vtk/cmake/CMakeFiles/
-thirdparty/kitware/vtk/cmake/CPackConfig.cmake
-thirdparty/kitware/vtk/cmake/CPackSourceConfig.cmake
-thirdparty/kitware/vtk/cmake/CTestCustom.ctest
-thirdparty/kitware/vtk/cmake/CTestScript.cmake
-thirdparty/kitware/vtk/cmake/DartConfiguration.tcl
-thirdparty/kitware/vtk/cmake/DartTestfile.txt
-thirdparty/kitware/vtk/cmake/Modules/.NoDartCoverage
-thirdparty/kitware/vtk/cmake/Modules/CMakeFiles/
-thirdparty/kitware/vtk/cmake/Modules/DartTestfile.txt
-thirdparty/kitware/vtk/cmake/Modules/Platform/CMakeFiles/
-thirdparty/kitware/vtk/cmake/Modules/Platform/DartTestfile.txt
-thirdparty/kitware/vtk/cmake/Modules/Platform/cmake_install.cmake
-thirdparty/kitware/vtk/cmake/Modules/cmake_install.cmake
-thirdparty/kitware/vtk/cmake/Source/CMakeFiles/
-thirdparty/kitware/vtk/cmake/Source/CPack/cmCPackConfigure.h
-thirdparty/kitware/vtk/cmake/Source/CursesDialog/form/CMakeFiles/
-thirdparty/kitware/vtk/cmake/Source/CursesDialog/form/DartTestfile.txt
-thirdparty/kitware/vtk/cmake/Source/CursesDialog/form/cmake_install.cmake
-thirdparty/kitware/vtk/cmake/Source/DartTestfile.txt
-thirdparty/kitware/vtk/cmake/Source/cmConfigure.h
-thirdparty/kitware/vtk/cmake/Source/cmake_install.cmake
-thirdparty/kitware/vtk/cmake/Source/cmsys/
-thirdparty/kitware/vtk/cmake/Source/kwsys/CMakeFiles/
-thirdparty/kitware/vtk/cmake/Source/kwsys/DartTestfile.txt
-thirdparty/kitware/vtk/cmake/Source/kwsys/cmake_install.cmake
-thirdparty/kitware/vtk/cmake/Source/kwsys/testSystemTools.h
-thirdparty/kitware/vtk/cmake/Templates/CMakeFiles/
-thirdparty/kitware/vtk/cmake/Templates/DartTestfile.txt
-thirdparty/kitware/vtk/cmake/Templates/cmake_install.cmake
-thirdparty/kitware/vtk/cmake/Tests/CMakeTests/CMakeFiles/
-thirdparty/kitware/vtk/cmake/Tests/CMakeTests/DartTestfile.txt
-thirdparty/kitware/vtk/cmake/Tests/CMakeTests/ListTest.cmake
-thirdparty/kitware/vtk/cmake/Tests/CMakeTests/cmake_install.cmake
-thirdparty/kitware/vtk/cmake/Utilities/CMakeFiles/
-thirdparty/kitware/vtk/cmake/Utilities/DartTestfile.txt
-thirdparty/kitware/vtk/cmake/Utilities/Doxygen/CMakeFiles/
-thirdparty/kitware/vtk/cmake/Utilities/Doxygen/DartTestfile.txt
-thirdparty/kitware/vtk/cmake/Utilities/Doxygen/cmake_install.cmake
-thirdparty/kitware/vtk/cmake/Utilities/Release/MakeRelease.cmake
-thirdparty/kitware/vtk/cmake/Utilities/cmThirdParty.h
-thirdparty/kitware/vtk/cmake/Utilities/cmake_install.cmake
-thirdparty/kitware/vtk/cmake/Utilities/cmcompress/CMakeFiles/
-thirdparty/kitware/vtk/cmake/Utilities/cmcompress/DartTestfile.txt
-thirdparty/kitware/vtk/cmake/Utilities/cmcompress/cmake_install.cmake
-thirdparty/kitware/vtk/cmake/Utilities/cmcurl/CMakeFiles/
-thirdparty/kitware/vtk/cmake/Utilities/cmcurl/DartTestfile.txt
-thirdparty/kitware/vtk/cmake/Utilities/cmcurl/cmake_install.cmake
-thirdparty/kitware/vtk/cmake/Utilities/cmexpat/CMakeFiles/
-thirdparty/kitware/vtk/cmake/Utilities/cmexpat/DartTestfile.txt
-thirdparty/kitware/vtk/cmake/Utilities/cmexpat/cmake_install.cmake
-thirdparty/kitware/vtk/cmake/Utilities/cmexpat/expatConfig.h
-thirdparty/kitware/vtk/cmake/Utilities/cmexpat/expatDllConfig.h
-thirdparty/kitware/vtk/cmake/Utilities/cmtar/CMakeFiles/
-thirdparty/kitware/vtk/cmake/Utilities/cmtar/DartTestfile.txt
-thirdparty/kitware/vtk/cmake/Utilities/cmtar/cmake_install.cmake
-thirdparty/kitware/vtk/cmake/Utilities/cmtar/libtar/
-thirdparty/kitware/vtk/cmake/Utilities/cmtar/libtarint/
-thirdparty/kitware/vtk/cmake/Utilities/cmtar/listhash/libtar_hash.c
-thirdparty/kitware/vtk/cmake/Utilities/cmtar/listhash/libtar_list.c
-thirdparty/kitware/vtk/cmake/Utilities/cmxmlrpc/CMakeFiles/
-thirdparty/kitware/vtk/cmake/Utilities/cmxmlrpc/DartTestfile.txt
-thirdparty/kitware/vtk/cmake/Utilities/cmxmlrpc/cmake_install.cmake
-thirdparty/kitware/vtk/cmake/Utilities/cmxmlrpc/xmlrpc_amconfig.h
-thirdparty/kitware/vtk/cmake/Utilities/cmxmlrpc/xmlrpc_config.h
-thirdparty/kitware/vtk/cmake/Utilities/cmzlib/CMakeFiles/
-thirdparty/kitware/vtk/cmake/Utilities/cmzlib/DartTestfile.txt
-thirdparty/kitware/vtk/cmake/Utilities/cmzlib/cmake_install.cmake
-thirdparty/kitware/vtk/cmake/Utilities/cmzlib/zlibDllConfig.h
-thirdparty/kitware/vtk/cmake/cmake_install.cmake
-thirdparty/kitware/vtk/cmake/cmake_uninstall.cmake
-
-thirdparty/latex2html/latex2html/latex2html/cfgcache.pm
-
-thirdparty/mit/fftw/fftw/fftw.pc
-thirdparty/mit/fftw/fftw/tools/fftw-wisdom-to-conf
-thirdparty/mit/fftw/fftw/tools/fftw_wisdom.1
-
-thirdparty/tclsys/blt/blt/src/bltConfig.h
-thirdparty/tclsys/blt/blt/src/bltHash.h
-thirdparty/tclsys/itcl/itcl/itclConfig.sh
-thirdparty/tclsys/itcl/itcl/pkgIndex.tcl
-thirdparty/tclsys/itcl/itcl/tclconfig
-thirdparty/tclsys/itcl/itk/itkConfig.sh
-thirdparty/tclsys/itcl/itk/pkgIndex.tcl
-thirdparty/tclsys/itcl/itk/tclconfig
-thirdparty/tclsys/itcl/iwidgets/iwidgets.tcl
-thirdparty/tclsys/itcl/iwidgets/pkgIndex.tcl
-thirdparty/tclsys/itcl/make.config
-thirdparty/tclsys/tcl/make.config
-thirdparty/tclsys/tcl/unix/tclConfig.sh
-thirdparty/tclsys/tclx/tclx/unix/tclxConfig.sh
-thirdparty/tclsys/tdom/tdom/tdomConfig.sh
-thirdparty/tclsys/tk/make.config
-thirdparty/tclsys/tk/unix/tkConfig.sh
-thirdparty/tclsys/tkimg/tkimg/base/pkgIndex.tcl
-thirdparty/tclsys/tkimg/tkimg/base/tkimgConfig.sh
-thirdparty/tclsys/tkimg/tkimg/bmp/pkgIndex.tcl
-thirdparty/tclsys/tkimg/tkimg/gif/pkgIndex.tcl
-thirdparty/tclsys/tkimg/tkimg/ico/pkgIndex.tcl
-thirdparty/tclsys/tkimg/tkimg/jpeg/pkgIndex.tcl
-thirdparty/tclsys/tkimg/tkimg/libjpeg/tcl/jpegtclConfig.sh
-thirdparty/tclsys/tkimg/tkimg/libjpeg/tcl/libjpeg/
-thirdparty/tclsys/tkimg/tkimg/libjpeg/tcl/pkgIndex.tcl
-thirdparty/tclsys/tkimg/tkimg/libpng/tcl/pkgIndex.tcl
-thirdparty/tclsys/tkimg/tkimg/libpng/tcl/pngtclConfig.sh
-thirdparty/tclsys/tkimg/tkimg/libtiff/tcl/libtiff/
-thirdparty/tclsys/tkimg/tkimg/libtiff/tcl/pkgIndex.tcl
-thirdparty/tclsys/tkimg/tkimg/libtiff/tcl/port/
-thirdparty/tclsys/tkimg/tkimg/libtiff/tcl/tifftclConfig.sh
-thirdparty/tclsys/tkimg/tkimg/libz/tcl/pkgIndex.tcl
-thirdparty/tclsys/tkimg/tkimg/libz/tcl/zlibtclConfig.sh
-thirdparty/tclsys/tkimg/tkimg/pcx/pkgIndex.tcl
-thirdparty/tclsys/tkimg/tkimg/pixmap/pkgIndex.tcl
-thirdparty/tclsys/tkimg/tkimg/png/pkgIndex.tcl
-thirdparty/tclsys/tkimg/tkimg/ppm/pkgIndex.tcl
-thirdparty/tclsys/tkimg/tkimg/ps/pkgIndex.tcl
-thirdparty/tclsys/tkimg/tkimg/sgi/pkgIndex.tcl
-thirdparty/tclsys/tkimg/tkimg/sun/pkgIndex.tcl
-thirdparty/tclsys/tkimg/tkimg/tga/pkgIndex.tcl
-thirdparty/tclsys/tkimg/tkimg/tiff/pkgIndex.tcl
-thirdparty/tclsys/tkimg/tkimg/window/pkgIndex.tcl
-thirdparty/tclsys/tkimg/tkimg/xbm/pkgIndex.tcl
-thirdparty/tclsys/tkimg/tkimg/xpm/pkgIndex.tcl

@@ -36,7 +36,7 @@ f     The Box class does not define any new routines beyond those
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -79,6 +79,8 @@ f     The Box class does not define any new routines beyond those
 *        the Box occupies a single point.
 *     20-JAN-2009 (DSB):
 *        Over-ride astRegBasePick.
+*     26-JAN-2009 (DSB):
+*        Over-ride astMapMerge.
 *class--
 */
 
@@ -95,6 +97,8 @@ f     The Box class does not define any new routines beyond those
 /* ---------------------- */
 
 #include "globals.h"             /* Thread-safe global data access */
+#include "cmpmap.h"              /* Compound Mappings */
+#include "cmpframe.h"            /* Compound Frames */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory allocation facilities */
 #include "object.h"              /* Base Object class */
@@ -108,6 +112,8 @@ f     The Box class does not define any new routines beyond those
 #include "permmap.h"             /* Axis permutation Mappings */
 #include "interval.h"            /* Axis interval regions */
 #include "nullregion.h"          /* Empty regions */
+#include "pointlist.h"           /* List of points in a Frame */
+#include "prism.h"               /* Extruded regions */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -182,11 +188,14 @@ static AstMapping *Simplify( AstMapping *, int * );
 static AstPointSet *RegBaseGrid( AstRegion *, int * );
 static AstPointSet *RegBaseMesh( AstRegion *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static AstRegion *MergeBox( AstBox *, AstRegion *, int, int * );
 static AstRegion *RegBasePick( AstRegion *this, int, const int *, int * );
 static double *RegCentre( AstRegion *this, double *, double **, int, int, int * );
 static double SetShrink( AstBox *, double, int * );
 static int MakeGrid( int, double **, int, double *, double *, int, int, double, int * );
+static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
+static void BoxPoints( AstBox *, double *, double *, int *);
 static void Cache( AstBox *, int, int * );
 static void ClearClosed( AstRegion *, int * );
 static void ClearNegated( AstRegion *, int * );
@@ -203,74 +212,73 @@ static void SetUnc( AstRegion *, AstRegion *, int * );
 static int GetObjSize( AstObject *, int * );
 /* Member functions. */
 /* ================= */
-static int GetObjSize( AstObject *this_object, int *status ) {
+
+void BoxPoints( AstBox *this, double *centre, double *corner, int *status) {
 /*
+*+
 *  Name:
-*     GetObjSize
+*     astBoxPoints
 
 *  Purpose:
-*     Return the in-memory size of an Object.
+*     Return the defining points of a Box.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "box.h"
-*     int GetObjSize( AstObject *this, int *status ) 
+*     astBoxPoints( AstBox *this, double *centre, double *corner )
 
 *  Class Membership:
-*     Box member function (over-rides the astGetObjSize protected
-*     method inherited from the parent class).
+*     Region virtual function.
 
 *  Description:
-*     This function returns the in-memory size of the supplied Box,
-*     in bytes.
+*     This function returns the axis values at the points defining the
+*     supplied Box.
 
 *  Parameters:
 *     this
 *        Pointer to the Box.
-*     status
-*        Pointer to the inherited status variable.
-
-*  Returned Value:
-*     The Object size, in bytes.
+*     centre
+*        A pointer to an array in which to return the centre position of 
+*        the Box, in the base Frame of the encapsulated FrameSet.
+*     corner
+*        A pointer to an array in which to return the position of a corner
+*        of the Box, in the base Frame of the encapsulated FrameSet.
 
 *  Notes:
-*     - A value of zero will be returned if this function is invoked
-*     with the global status set, or if it should fail for any reason.
+*     - It is assumed that the length of the supplied arrays is at least
+*     equal to the number of axes in the base frame of the encapsulated
+*     FrameSet.
+*-
 */
 
 /* Local Variables: */
-   AstBox *this;         /* Pointer to Box structure */
-   int result;                /* Result value to return */
+   AstPointSet *pset;        
+   double **ptr;
+   int nc;
+   int i;
 
-/* Initialise. */
-   result = 0;
+/* Check the inherited status. */
+   if( !astOK ) return;
 
-/* Check the global error status. */
-   if ( !astOK ) return result;
+/* Get a pointer to the PointSet holding the points defining the Box. */
+   pset = ((AstRegion *) this)->points;
 
-/* Obtain a pointers to the Box structure. */
-   this = (AstBox *) this_object;
+/* Get a pointer to the PointSet's data arrays. */
+   ptr = astGetPoints( pset );
 
-/* Invoke the GetObjSize method inherited from the parent class, and then
-   add on any components of the class structure defined by thsi class
-   which are stored in dynamically allocated memory. */
-   result = (*parent_getobjsize)( this_object, status );
+/* See how many axes each point in the PointSet has. */
+   nc = astGetNcoord( pset );
 
-   result += astTSizeOf( this->extent );  
-   result += astTSizeOf( this->shextent );
-   result += astTSizeOf( this->centre );  
-   result += astTSizeOf( this->lo );      
-   result += astTSizeOf( this->hi );      
+/* Copy the centre and corner positions form the PointSet into the
+   supplied arrays. */
+   for( i = 0; i < nc; i++ ) {
+      centre[ i ] = ptr[ i ] [ 0 ];
+      corner[ i ] = ptr[ i ] [ 1 ];
+   }
 
-/* If an error occurred, clear the result value. */
-   if ( !astOK ) result = 0;
-
-/* Return the result, */
-   return result;
 }
-
 
 static void ClearClosed( AstRegion *this, int *status ){
 /*
@@ -362,124 +370,6 @@ static void ClearNegated( AstRegion *this, int *status ){
 /* If the new value is not the same as the old value, inidcatethat we
    need to re-calculate the cached information in the Box. */
    if( astGetNegated( this ) != old ) astResetCache( this );
-}
-void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name, int *status ) {
-/*
-*+
-*  Name:
-*     astInitBoxVtab
-
-*  Purpose:
-*     Initialise a virtual function table for a Box.
-
-*  Type:
-*     Protected function.
-
-*  Synopsis:
-*     #include "box.h"
-*     void astInitBoxVtab( AstBoxVtab *vtab, const char *name )
-
-*  Class Membership:
-*     Box vtab initialiser.
-
-*  Description:
-*     This function initialises the component of a virtual function
-*     table which is used by the Box class.
-
-*  Parameters:
-*     vtab
-*        Pointer to the virtual function table. The components used by
-*        all ancestral classes will be initialised if they have not already
-*        been initialised.
-*     name
-*        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
-*        is this pointer value that will subsequently be returned by the Object
-*        astClass function).
-*-
-*/
-
-/* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
-   AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
-   AstRegionVtab *region;        /* Pointer to Region component of Vtab */
-   AstObjectVtab *object;        /* Pointer to Object component of Vtab */
-
-/* Check the local error status. */
-   if ( !astOK ) return;
-
-/* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(NULL);
-
-/* Initialize the component of the virtual function table used by the
-   parent class. */
-   astInitRegionVtab( (AstRegionVtab *) vtab, name );
-
-/* Store a unique "magic" value in the virtual function table. This
-   will be used (by astIsABox) to determine if an object belongs
-   to this class.  We can conveniently use the address of the (static)
-   class_check variable to generate this unique value. */
-   vtab->check = &class_check;
-
-/* Initialise member function pointers. */
-/* ------------------------------------ */
-/* Store pointers to the member functions (implemented here) that provide
-   virtual methods for this class. */
-
-/* Save the inherited pointers to methods that will be extended, and
-   replace them with pointers to the new member functions. */
-   object = (AstObjectVtab *) vtab;
-   mapping = (AstMappingVtab *) vtab;
-   parent_getobjsize = object->GetObjSize;
-   object->GetObjSize = GetObjSize;
-   region = (AstRegionVtab *) vtab;
-
-   parent_transform = mapping->Transform;
-   mapping->Transform = Transform;
-
-   parent_simplify = mapping->Simplify;
-   mapping->Simplify = Simplify;
-
-   parent_setnegated = region->SetNegated;
-   region->SetNegated = SetNegated;
-
-   parent_setunc = region->SetUnc;
-   region->SetUnc = SetUnc;
-
-   parent_setclosed = region->SetClosed;
-   region->SetClosed = SetClosed;
-
-   parent_clearnegated = region->ClearNegated;
-   region->ClearNegated = ClearNegated;
-
-   parent_clearclosed = region->ClearClosed;
-   region->ClearClosed = ClearClosed;
-
-   parent_setregfs = region->SetRegFS;
-   region->SetRegFS = SetRegFS;
-
-   parent_resetcache = region->ResetCache;
-   region->ResetCache = ResetCache;
-
-/* Store replacement pointers for methods which will be over-ridden by
-   new member functions implemented here. */
-   region->RegBaseGrid = RegBaseGrid;
-   region->RegBaseMesh = RegBaseMesh;
-   region->RegBasePick = RegBasePick;
-   region->RegBaseBox = RegBaseBox;
-   region->RegPins = RegPins;
-   region->RegCentre = RegCentre;
-
-/* Declare the copy constructor, destructor and class dump
-   functions. */
-   astSetDelete( vtab, Delete );
-   astSetCopy( vtab, Copy );
-   astSetDump( vtab, Dump, "Box", "Axis intervals" );
-
-/* If we have just initialised the vtab for the current class, indicate
-   that the vtab is now initialised. */
-   if( vtab == &class_vtab ) class_init = 1;
-
 }
 
 static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc, int *status ){
@@ -889,6 +779,197 @@ static void Cache( AstBox *this, int lohi, int *status ){
 
 }
 
+static int GetObjSize( AstObject *this_object, int *status ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "box.h"
+*     int GetObjSize( AstObject *this, int *status ) 
+
+*  Class Membership:
+*     Box member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied Box,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the Box.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstBox *this;         /* Pointer to Box structure */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the Box structure. */
+   this = (AstBox *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object, status );
+
+   result += astTSizeOf( this->extent );  
+   result += astTSizeOf( this->shextent );
+   result += astTSizeOf( this->centre );  
+   result += astTSizeOf( this->lo );      
+   result += astTSizeOf( this->hi );      
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
+void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name, int *status ) {
+/*
+*+
+*  Name:
+*     astInitBoxVtab
+
+*  Purpose:
+*     Initialise a virtual function table for a Box.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "box.h"
+*     void astInitBoxVtab( AstBoxVtab *vtab, const char *name )
+
+*  Class Membership:
+*     Box vtab initialiser.
+
+*  Description:
+*     This function initialises the component of a virtual function
+*     table which is used by the Box class.
+
+*  Parameters:
+*     vtab
+*        Pointer to the virtual function table. The components used by
+*        all ancestral classes will be initialised if they have not already
+*        been initialised.
+*     name
+*        Pointer to a constant null-terminated character string which contains
+*        the name of the class to which the virtual function table belongs (it 
+*        is this pointer value that will subsequently be returned by the Object
+*        astClass function).
+*-
+*/
+
+/* Local Variables: */
+   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
+   AstRegionVtab *region;        /* Pointer to Region component of Vtab */
+   AstObjectVtab *object;        /* Pointer to Object component of Vtab */
+
+/* Check the local error status. */
+   if ( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
+
+/* Initialize the component of the virtual function table used by the
+   parent class. */
+   astInitRegionVtab( (AstRegionVtab *) vtab, name );
+
+/* Store a unique "magic" value in the virtual function table. This
+   will be used (by astIsABox) to determine if an object belongs
+   to this class.  We can conveniently use the address of the (static)
+   class_check variable to generate this unique value. */
+   vtab->check = &class_check;
+
+/* Initialise member function pointers. */
+/* ------------------------------------ */
+/* Store pointers to the member functions (implemented here) that provide
+   virtual methods for this class. */
+   vtab->BoxPoints = BoxPoints;
+
+/* Save the inherited pointers to methods that will be extended, and
+   replace them with pointers to the new member functions. */
+   object = (AstObjectVtab *) vtab;
+   mapping = (AstMappingVtab *) vtab;
+   region = (AstRegionVtab *) vtab;
+
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
+
+   parent_transform = mapping->Transform;
+   mapping->Transform = Transform;
+
+   parent_simplify = mapping->Simplify;
+   mapping->Simplify = Simplify;
+
+   parent_setnegated = region->SetNegated;
+   region->SetNegated = SetNegated;
+
+   parent_setunc = region->SetUnc;
+   region->SetUnc = SetUnc;
+
+   parent_setclosed = region->SetClosed;
+   region->SetClosed = SetClosed;
+
+   parent_clearnegated = region->ClearNegated;
+   region->ClearNegated = ClearNegated;
+
+   parent_clearclosed = region->ClearClosed;
+   region->ClearClosed = ClearClosed;
+
+   parent_setregfs = region->SetRegFS;
+   region->SetRegFS = SetRegFS;
+
+   parent_resetcache = region->ResetCache;
+   region->ResetCache = ResetCache;
+
+   mapping->MapMerge = MapMerge;
+
+/* Store replacement pointers for methods which will be over-ridden by
+   new member functions implemented here. */
+   region->RegBaseGrid = RegBaseGrid;
+   region->RegBaseMesh = RegBaseMesh;
+   region->RegBasePick = RegBasePick;
+   region->RegBaseBox = RegBaseBox;
+   region->RegPins = RegPins;
+   region->RegCentre = RegCentre;
+
+/* Declare the copy constructor, destructor and class dump
+   functions. */
+   astSetDelete( vtab, Delete );
+   astSetCopy( vtab, Copy );
+   astSetDump( vtab, Dump, "Box", "Axis intervals" );
+
+/* If we have just initialised the vtab for the current class, indicate
+   that the vtab is now initialised. */
+   if( vtab == &class_vtab ) class_init = 1;
+
+}
+
 static int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
                      double *ubnd, int np_axis, int iaxis, double axval, int *status ){
 /*
@@ -1022,6 +1103,685 @@ static int MakeGrid( int naxes, double **ptr, int ip, double *lbnd,
 
 /* Return the result. */
    return astOK ? ( ipp - ip ): 0 ;
+}
+
+static int MapMerge( AstMapping *this, int where, int series, int *nmap,
+                     AstMapping ***map_list, int **invert_list, int *status ) {
+/*
+*  Name:
+*     MapMerge
+
+*  Purpose:
+*     Simplify a sequence of Mappings containing a Box.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     int MapMerge( AstMapping *this, int where, int series, int *nmap,
+*                   AstMapping ***map_list, int **invert_list, int *status )
+
+*  Class Membership:
+*     Box method (over-rides the protected astMapMerge method
+*     inherited from the Region class).
+
+*  Description:
+*     This function attempts to simplify a sequence of Mappings by
+*     merging a nominated Box in the sequence with its neighbours,
+*     so as to shorten the sequence if possible.
+*
+*     In many cases, simplification will not be possible and the
+*     function will return -1 to indicate this, without further
+*     action.
+*
+*     In most cases of interest, however, this function will either
+*     attempt to replace the nominated Box with a Mapping which it
+*     considers simpler, or to merge it with the Mappings which
+*     immediately precede it or follow it in the sequence (both will
+*     normally be considered). This is sufficient to ensure the
+*     eventual simplification of most Mapping sequences by repeated
+*     application of this function.
+*
+*     In some cases, the function may attempt more elaborate
+*     simplification, involving any number of other Mappings in the
+*     sequence. It is not restricted in the type or scope of
+*     simplification it may perform, but will normally only attempt
+*     elaborate simplification in cases where a more straightforward
+*     approach is not adequate.
+
+*  Parameters:
+*     this
+*        Pointer to the nominated Box which is to be merged with
+*        its neighbours. This should be a cloned copy of the Box
+*        pointer contained in the array element "(*map_list)[where]"
+*        (see below). This pointer will not be annulled, and the
+*        Box it identifies will not be modified by this function.
+*     where
+*        Index in the "*map_list" array (below) at which the pointer
+*        to the nominated Box resides.
+*     series
+*        A non-zero value indicates that the sequence of Mappings to
+*        be simplified will be applied in series (i.e. one after the
+*        other), whereas a zero value indicates that they will be
+*        applied in parallel (i.e. on successive sub-sets of the
+*        input/output coordinates).
+*     nmap
+*        Address of an int which counts the number of Mappings in the
+*        sequence. On entry this should be set to the initial number
+*        of Mappings. On exit it will be updated to record the number
+*        of Mappings remaining after simplification.
+*     map_list
+*        Address of a pointer to a dynamically allocated array of
+*        Mapping pointers (produced, for example, by the astMapList
+*        method) which identifies the sequence of Mappings. On entry,
+*        the initial sequence of Mappings to be simplified should be
+*        supplied.
+*
+*        On exit, the contents of this array will be modified to
+*        reflect any simplification carried out. Any form of
+*        simplification may be performed. This may involve any of: (a)
+*        removing Mappings by annulling any of the pointers supplied,
+*        (b) replacing them with pointers to new Mappings, (c)
+*        inserting additional Mappings and (d) changing their order.
+*
+*        The intention is to reduce the number of Mappings in the
+*        sequence, if possible, and any reduction will be reflected in
+*        the value of "*nmap" returned. However, simplifications which
+*        do not reduce the length of the sequence (but improve its
+*        execution time, for example) may also be performed, and the
+*        sequence might conceivably increase in length (but normally
+*        only in order to split up a Mapping into pieces that can be
+*        more easily merged with their neighbours on subsequent
+*        invocations of this function).
+*
+*        If Mappings are removed from the sequence, any gaps that
+*        remain will be closed up, by moving subsequent Mapping
+*        pointers along in the array, so that vacated elements occur
+*        at the end. If the sequence increases in length, the array
+*        will be extended (and its pointer updated) if necessary to
+*        accommodate any new elements.
+*
+*        Note that any (or all) of the Mapping pointers supplied in
+*        this array may be annulled by this function, but the Mappings
+*        to which they refer are not modified in any way (although
+*        they may, of course, be deleted if the annulled pointer is
+*        the final one).
+*     invert_list
+*        Address of a pointer to a dynamically allocated array which,
+*        on entry, should contain values to be assigned to the Invert
+*        attributes of the Mappings identified in the "*map_list"
+*        array before they are applied (this array might have been
+*        produced, for example, by the astMapList method). These
+*        values will be used by this function instead of the actual
+*        Invert attributes of the Mappings supplied, which are
+*        ignored.
+*
+*        On exit, the contents of this array will be updated to
+*        correspond with the possibly modified contents of the
+*        "*map_list" array.  If the Mapping sequence increases in
+*        length, the "*invert_list" array will be extended (and its
+*        pointer updated) if necessary to accommodate any new
+*        elements.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     If simplification was possible, the function returns the index
+*     in the "map_list" array of the first element which was
+*     modified. Otherwise, it returns -1 (and makes no changes to the
+*     arrays supplied).
+
+*  Notes:
+*     - A value of -1 will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstBox *oldbox;       /* Pointer to supplied Box */
+   AstMapping *map;      /* Pointer to adjacent Mapping */
+   AstMapping *new;      /* Simplified or merged Region */
+   int i1;               /* Index of first Mapping merged */
+   int i;                /* Loop counter */
+   int result;           /* Result value to return */
+
+/* Initialise. */
+   result = -1;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the Box. */
+   oldbox = (AstBox *) this;
+
+/* First of all, see if the Box can be replaced by a simpler Region,
+   without reference to the neighbouring Regions in the list.           */
+/* =====================================================================*/
+
+/* Try to simplify the box. If the pointer value has changed, we assume
+   some simplification took place. */
+   new = astSimplify( oldbox );
+   if( new != (AstMapping *) oldbox ) {
+
+/* Annul the Box pointer in the list and replace it with the new Region
+   pointer, and indicate that the forward transformation of the returned
+   Region should be used (not really needed but keeps things clean). */
+      (void) astAnnul( ( *map_list )[ where ] );
+      ( *map_list )[ where ] = new;
+      ( *invert_list )[ where ] = 0;
+
+/* Return the index of the first modified element. */
+      result = where;
+
+/* If the Box itself could not be simplified, see if it can be merged
+   with the Regions on either side of it in the list. We can only merge
+   in parallel. */
+/* =====================================================================*/
+   } else if( ! series ){
+      new = astAnnul( new );
+
+/* Attempt to merge the Box with its lower neighbour (if any). */
+      if( where > 0 ) {
+         i1 = where - 1;
+         map = ( *map_list )[ where - 1 ];
+         if( astIsARegion( map ) ) {
+            new = (AstMapping *) MergeBox( oldbox, (AstRegion *) map, 0, 
+                                           status );
+         }
+      }
+
+/* If this did not produced a merged Region, attempt to merge the Box with its 
+   upper neighbour (if any). */
+      if( !new && where < *nmap - 1 ) {
+         i1 = where;
+         map = ( *map_list )[ where + 1 ];
+         if( astIsARegion( map ) ) {
+            new = (AstMapping *) MergeBox( oldbox, (AstRegion *) map, 1, 
+                                           status );
+         }
+      }
+
+/* If succesfull... */
+      if( new ){
+
+/* Annul the first of the two Mappings, and replace it with the merged 
+   Region. Also clear the invert flag. */ 
+         (void) astAnnul( ( *map_list )[ i1 ] );
+         ( *map_list )[ i1 ] = new;
+         ( *invert_list )[ i1 ] = 0;
+
+/* Annul the second of the two Mappings, and shuffle down the rest of the 
+   list to fill the gap. */
+         (void) astAnnul( ( *map_list )[ i1 + 1 ] );
+         for ( i = i1 + 2; i < *nmap; i++ ) {
+            ( *map_list )[ i - 1 ] = ( *map_list )[ i ];
+            ( *invert_list )[ i - 1 ] = ( *invert_list )[ i ];
+         }
+
+/* Clear the vacated element at the end. */
+         ( *map_list )[ *nmap - 1 ] = NULL;
+         ( *invert_list )[ *nmap - 1 ] = 0;
+
+/* Decrement the Mapping count and return the index of the first
+   modified element. */
+         ( *nmap )--;
+         result = i1;
+      }
+
+   } else {
+      new = astAnnul( new );
+   }
+
+/* Return the result. */
+   return result;
+}
+
+static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst, 
+                            int *status ) {
+/*
+*  Name:
+*     MergeBox
+
+*  Purpose:
+*     Attempt to merge a Box with another Region to form a Region of higher 
+*     dimensionality.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "box.h"
+*     AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst, int *status ) 
+
+*  Class Membership:
+*     Box member function.
+
+*  Description:
+*     This function attempts to combine the supplied Regions together
+*     into a Region of higher dimensionality. 
+
+*  Parameters:
+*     this
+*        Pointer to a Box.
+*     reg
+*        Pointer to another Region.
+*     boxfirst
+*        If non-zero, then the Box axes are put first in the new Region.
+*        Otherwise, the other Region's axes are put first.
+*     status
+*        Pointer to the inherited status value.
+
+*  Returned Value:
+*     A pointer to a new region, or NULL if the supplied Regions could
+*     not be merged.
+*/
+
+/* Local Variables: */
+   AstFrame *bfrm;           /* Pointer to base Frame for "result" */
+   AstFrame *cfrm;           /* Pointer to current Frame for "result" */
+   AstFrame *frm_reg;        /* Pointer to Frame from "reg" */
+   AstFrame *frm_this;       /* Pointer to Frame from "this" */
+   AstMapping *bcmap;        /* Base->current Mapping for "result" */
+   AstMapping *map_reg;      /* Base->current Mapping from "reg" */
+   AstMapping *map_this;     /* Base->current Mapping from "this" */
+   AstMapping *sbunc;        /* Simplified uncertainty */
+   AstPointSet *pset_new;    /* PointSet holding PointList axis values for new */
+   AstPointSet *pset_reg;    /* PointSet holding PointList axis values for reg */
+   AstRegion *bunc;          /* Base Frame uncertainty Region */
+   AstRegion *new;           /* Pointer to new Interval in base Frame */
+   AstRegion *result;        /* Pointer to returned Interval in current Frame */
+   AstRegion *unc_reg;       /* Current Frame uncertainty Region from "reg" */
+   AstRegion *unc_this;      /* Current Frame uncertainty Region from "this" */
+   double **ptr_new;         /* Pointers to arrays holding new axis values */
+   double **ptr_reg;         /* Pointers to arrays holding reg axis values */
+   double *centre;           /* Array to hold box centre axis values */
+   double *corner;           /* Array to hold box corner axis values */
+   double *lbnd;             /* Array to hold lower axis bounds */
+   double *p;                /* Pointer to next input value */
+   double *q;                /* Pointer to next output value */
+   double *ubnd;             /* Array to hold upper axis bounds */
+   double fac_reg;           /* Ratio of used to default MeshSize for "reg" */
+   double fac_this;          /* Ratio of used to default MeshSize for "this" */
+   double temp;              /* Temporary storage */
+   int closed_reg;           /* Closed attribute value for other supplied Region */
+   int closed_this;          /* Closed attribute value for supplied Box  */
+   int i;                    /* Loop count */
+   int j;                    /* Loop count */
+   int msz_reg;              /* Original MeshSize for "reg" */
+   int msz_reg_set;          /* Was MeshSize originally set for "reg"? */
+   int msz_this;             /* Original MeshSize for "this" */
+   int msz_this_set;         /* Was MeshSize originally set for "this"? */
+   int nax;                  /* Number of axes in "result" */
+   int nax_reg;              /* Number of axes in "reg" */
+   int nax_this;             /* Number of axes in "this" */
+   int neg_reg;              /* Negated attribute value for other supplied Region */
+   int neg_this;             /* Negated attribute value for supplied Box  */
+   int npnt;                 /* Number of points in PointList */
+   int ok;                   /* Can supplied Regions be merged? */
+
+/* Initialise */
+   result = NULL;
+
+/* Check the local error status. */
+   if ( !astOK ) return result;
+
+/* Get the Closed attributes of the two Regions. They must be the same in 
+   each Region if we are to merge the Regions. */
+   closed_this = astGetClosed( this );
+   closed_reg = astGetClosed( reg );
+   if( closed_this == closed_reg ) {
+
+/* Get the Nagated attributes of the two Regions. */
+      neg_this = astGetNegated( this );
+      neg_reg = astGetNegated( reg );
+
+/* Get the number of axes in the two supplied Regions. */
+      nax_reg = astGetNaxes( reg );
+      nax_this = astGetNaxes( this );
+   
+/* If the Regions can be combined, get the number of axes the
+   combination will have. */
+      nax = nax_reg + nax_this;
+   
+/* Get the base Frames from the two Region FrameSets, and combine them
+   into a single CmpFrame that will be used to create any new Region. */
+      frm_this = astGetFrame( ((AstRegion *) this)->frameset, AST__BASE );
+      frm_reg = astGetFrame( reg->frameset, AST__BASE );
+   
+      if( boxfirst ) {
+         bfrm = (AstFrame *) astCmpFrame( frm_this, frm_reg, "", status );
+      } else {
+         bfrm = (AstFrame *) astCmpFrame( frm_reg, frm_this, "", status );
+      }
+   
+      frm_this = astAnnul( frm_this );
+      frm_reg = astAnnul( frm_reg );
+   
+/* Indicate we do not yet have a merged Region. */
+      new = NULL;
+   
+/* First attempt to merge with another Box. The result will be a Box. Both
+   Boxes must be un-negated. */
+      if( astIsABox( reg ) && !neg_this && !neg_reg ) {
+   
+/* Allocate memory to store the centre and corner of the returned Box. */
+         centre = astMalloc( sizeof( double )*(size_t) nax );
+         corner = astMalloc( sizeof( double )*(size_t) nax );
+   
+/* Copy the centres and corners from the supplied Boxes into the above 
+   arrays, in the requested order. */
+         if( boxfirst ) {
+            astBoxPoints( this, centre, corner );
+            astBoxPoints( reg, centre + nax_this, corner + nax_this );
+         } else {
+            astBoxPoints( reg, centre, corner );
+            astBoxPoints( this, centre + nax_reg, corner + nax_reg );
+         }
+   
+/*  Create the new Box, initially with no uncertainty. */
+         new = (AstRegion *) astBox( bfrm, 0, centre, corner, NULL, "", 
+                                     status );
+   
+/* Free resources .*/
+         centre = astFree( centre );
+         corner = astFree( corner );
+   
+/* Now attempt to merge with an Interval. The result will be an Interval. 
+   Both Intervals must be un-negated. */
+      } else if( astIsAInterval( reg )  && !neg_this && !neg_reg ) {
+   
+/* Allocate memory to store the bounds of the returned Interval. */
+         lbnd = astMalloc( sizeof( double )*(size_t) nax );
+         ubnd = astMalloc( sizeof( double )*(size_t) nax );
+   
+/* Copy the centre and corner from the supplied Box into the required part
+   of the above arrays. */
+         if( boxfirst ) {
+            centre = lbnd;
+            corner = ubnd;
+         } else {
+            centre = lbnd + nax_reg;
+            corner = ubnd + nax_reg;
+         }
+         astBoxPoints( this, centre, corner );
+
+/* Convert these centre and corner positions into upper and lower bounds. */
+         if( astOK ) {
+            for( i = 0; i < nax_this; i++ ) {
+               centre[ i ] = 2*centre[ i ] - corner[ i ];
+               if( centre[ i ] > corner[ i ] ) {
+                  temp = centre[ i ];
+                  centre[ i ] = corner[ i ];
+                  corner[ i ] = temp;
+               }
+            }
+         }
+
+/* Get the bounds from the interval and add them into the above arrays. */
+         if( boxfirst ) {
+            astIntervalPoints( reg, lbnd + nax_this, ubnd + nax_this );
+         } else {
+            astIntervalPoints( reg, lbnd, ubnd );
+         }
+
+/*  Create the new Interval, initially with no uncertainty. */
+         new = (AstRegion *) astInterval( bfrm, lbnd, ubnd, NULL, "", 
+                                          status );
+   
+/* Free resources .*/
+         lbnd = astFree( lbnd );
+         ubnd = astFree( ubnd );
+   
+/* Now attempt to merge with a NullRegion. The result will be an
+   Interval. The NullRegion must be negated and the Box must not. */
+      } else if( astIsANullRegion( reg ) && !neg_this && neg_reg ) {
+
+/* Allocate memory to store the bounds of the returned Interval. */
+         lbnd = astMalloc( sizeof( double )*(size_t) nax );
+         ubnd = astMalloc( sizeof( double )*(size_t) nax );
+   
+/* Copy the centre and corner from the supplied Box into the required part
+   of the above arrays. */
+         if( boxfirst ) {
+            centre = lbnd;
+            corner = ubnd;
+         } else {
+            centre = lbnd + nax_reg;
+            corner = ubnd + nax_reg;
+         }
+         astBoxPoints( this, centre, corner );
+
+/* Convert these centre and corner positions into upper and lower bounds. */
+         if( astOK ) {
+            for( i = 0; i < nax_this; i++ ) {
+               centre[ i ] = 2*centre[ i ] - corner[ i ];
+               if( centre[ i ] > corner[ i ] ) {
+                  temp = centre[ i ];
+                  centre[ i ] = corner[ i ];
+                  corner[ i ] = temp;
+               }
+            }
+
+/* Fill the other axes with bad values to indicate they are unbounded. */
+            if( boxfirst ) {
+               for( i = nax_this; i < nax; i++ ) {
+                  lbnd[ i ] = AST__BAD;
+                  ubnd[ i ] = AST__BAD;
+               }
+            } else {
+               for( i = 0; i < nax_reg; i++ ) {
+                  lbnd[ i ] = AST__BAD;
+                  ubnd[ i ] = AST__BAD;
+               }
+            }
+
+/*  Create the new Interval, initially with no uncertainty. */
+            new = (AstRegion *) astInterval( bfrm, lbnd, ubnd, NULL, "", 
+                                             status );
+         }
+
+/* Free resources .*/
+         lbnd = astFree( lbnd );
+         ubnd = astFree( ubnd );
+
+/* Now attempt to merge with a PointList. The result will be a PointList. 
+   Both Regions must be un-negated. */
+      } else if( astIsAPointList( reg ) && !neg_this && !neg_reg ) {
+   
+/* We can only do this if the Box has zero width on each axis (i.e.
+   represents a point). Get the Box centre and corner. */
+         centre = astMalloc( sizeof( double )*(size_t) nax_this );
+         corner = astMalloc( sizeof( double )*(size_t) nax_this );
+         astBoxPoints( this, centre, corner );
+
+/* Get the size of the Box's uncertainty region. */
+         lbnd = astMalloc( sizeof( double )*(size_t) nax_this );
+         ubnd = astMalloc( sizeof( double )*(size_t) nax_this );
+         bunc = astGetUncFrm( this, AST__BASE );
+         astGetRegionBounds( bunc, lbnd, ubnd );
+
+/* Set "ok" to zero if the Box does not have zero width on any axis. Here
+   "zero width" means a width less than half the uncertainty on the axis. */
+         if( astOK ) {
+   
+            ok = 1;
+            for( i = 0; i < nax_this; i++ ) {
+               if( fabs( centre[ i ] - corner[ i ] ) > 
+                   0.25*fabs( ubnd[ i ] - lbnd[ i ] ) ) {
+                  ok = 0;
+                  break;
+               }
+            }
+   
+/* If the Box is a point, we go on to create a new PointList. */
+            if( ok ) {
+   
+/* Get a PointSet holding the axis values in the supplied PointList data.
+   Also get the number of points in the PointSet and pointers to the arrays
+   holding the axis values. */
+               astPointListPoints( reg, &pset_reg );
+               npnt = astGetNpoint( pset_reg );
+               ptr_reg = astGetPoints( pset_reg );
+
+/*  Create a new PointSet with room for the same number of points, but
+    with the extra required axes. Get pointers to its axis arrays. */
+               pset_new = astPointSet( npnt, nax, "", status );
+               ptr_new = astGetPoints( pset_new );
+                
+/* Copy the PointList axis values into the new PointSet, and then include
+   the extra axis values defined by the Box to each point. */
+               if( astOK ) {
+
+                  for( j = 0; j < nax_reg; j++ ) {
+                     p = ptr_reg[ j ];
+                     q = ptr_new[ boxfirst ? nax_this + j : j ];
+                     for( i = 0; i < npnt; i++ ) *(q++) = *(p++);
+                  }   
+
+                  for( j = 0; j < nax_this; j++ ) {
+                     p = centre + j;
+                     q = ptr_new[ boxfirst ? j : nax_reg + j ];
+                     for( i = 0; i < npnt; i++ ) *(q++) = *p;
+                  }   
+
+/*  Create the new PointList, initially with no uncertainty. */
+                  new = (AstRegion *) astPointList( bfrm, pset_new, NULL, 
+                                                    "", status );
+               }   
+
+/* Free resources .*/
+               pset_new = astAnnul( pset_new );
+               pset_reg = astAnnul( pset_reg );
+            }
+         }
+         centre = astFree( centre );
+         corner = astFree( corner );
+         lbnd = astFree( lbnd );
+         ubnd = astFree( ubnd );
+         bunc = astAnnul( bunc );
+
+      }
+
+/* If a new Region was created above, propagate remaining attributes of
+   the supplied Region to it. */
+      if( new ) {
+         astRegOverlay( new, this );
+
+/* The above Prism constructors create the Prism with the correct value
+   for the Nagated attribute (i.e. zero). Ensure the above call to
+   astRegOverlay has not changed this. */
+         astClearNegated( new );
+
+/* If both the supplied Regions have uncertainty, assign the new Region an 
+   uncertainty. */
+         if( astTestUnc( this ) && astTestUnc( reg ) ) {
+
+/* Get the uncertainties from the two supplied Regions. */
+            unc_this = astGetUncFrm( this, AST__BASE );
+            unc_reg = astGetUncFrm( reg, AST__BASE );
+
+/* Combine them into a single Region (a Prism), in the correct order. */
+            if( boxfirst ) {
+               bunc = (AstRegion *) astPrism( unc_this, unc_reg, "", status );
+            } else {
+               bunc = (AstRegion *) astPrism( unc_reg, unc_this, "", status );
+            }
+
+/* Attempt to simplify the Prism. */
+            sbunc = astSimplify( bunc );
+
+/* Use the simplified Prism as the uncertainty for the returned Region. */
+            astSetUnc( new, sbunc );
+
+/* Free resources. */
+            sbunc = astAnnul( sbunc );
+            bunc = astAnnul( bunc );
+            unc_reg = astAnnul( unc_reg );
+            unc_this = astAnnul( unc_this );
+         }
+
+/* Get the current Frames from the two Region FrameSets, and combine them
+   into a single CmpFrame. */
+         frm_this = astGetFrame( ((AstRegion *) this)->frameset, AST__CURRENT );
+         frm_reg = astGetFrame( reg->frameset, AST__CURRENT );
+      
+         if( boxfirst ) {
+            cfrm = (AstFrame *) astCmpFrame( frm_this, frm_reg, "", status );
+         } else {
+            cfrm = (AstFrame *) astCmpFrame( frm_reg, frm_this, "", status );
+         }
+      
+/* Get the base -> current Mappings from the two Region FrameSets, and 
+   combine them into a single parallel CmpMap that connects bfrm and cfrm. */
+         map_this = astGetMapping( ((AstRegion *) this)->frameset, AST__BASE, 
+                                   AST__CURRENT );
+         map_reg = astGetMapping( reg->frameset, AST__BASE, AST__CURRENT );
+      
+         if( boxfirst ) {
+            bcmap = (AstMapping *) astCmpMap( map_this, map_reg, 0, "", 
+                                              status );
+         } else {
+            bcmap = (AstMapping *) astCmpMap( map_reg, map_this, 0, "", 
+                                              status );
+         }
+      
+/* Map the new Region into the new current Frame. */
+         result = astMapRegion( new, bcmap, cfrm );
+
+/* The filling factor in the returned is the product of the filling
+   factors for the two supplied Regions. */
+         if( astTestFillFactor( reg ) || astTestFillFactor( this ) ) {
+            astSetFillFactor( result, astGetFillFactor( reg )*
+                                      astGetFillFactor( this ) );
+         }
+
+/* If the MeshSize value is set in either supplied Region, set a value
+   for the returned Region which scales the default value by the
+   product of the scaling factors for the two supplied Regions. First see
+   if either MeshSize value is set. */
+         msz_this_set = astTestMeshSize( this );
+         msz_reg_set = astTestMeshSize( reg );
+         if( msz_this_set || msz_reg_set ) {
+
+/* If so, get the two MeshSize values (one of which may be a default
+   value), and then clear them so that the default value will be returned
+   in future. */
+            msz_this = astGetMeshSize( this );
+            msz_reg = astGetMeshSize( reg );
+            astClearMeshSize( this );
+            astClearMeshSize( reg );
+
+/* Get the ratio of the used MeshSize to the default MeshSize for both
+   Regions. */
+            fac_this = (double)msz_this/(double)astGetMeshSize( this );
+            fac_reg = (double)msz_reg/(double)astGetMeshSize( reg );
+
+/* The MeshSize of the returned Returned is the default value scaled by
+   the product of the two ratios found above. */
+            astSetMeshSize( new, fac_this*fac_reg*astGetMeshSize( new ) );
+
+/* Re-instate the original MeshSize values for the supplied Regions (if
+   set) */
+            if( msz_this_set ) astSetMeshSize( this, msz_this );
+            if( msz_reg_set ) astSetMeshSize( reg, msz_reg );
+         }
+
+/* Free remaining resources */
+         frm_this = astAnnul( frm_this );
+         frm_reg = astAnnul( frm_reg );
+         map_this = astAnnul( map_this );
+         map_reg = astAnnul( map_reg );
+         bcmap = astAnnul( bcmap );
+         cfrm = astAnnul( cfrm );
+      }
+   }
+
+/* If an error has occurred, annul the returned pointer. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the result. */
+   return result;
 }
 
 static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int *status ){
@@ -3859,7 +4619,7 @@ AstBox *astLoadBox_( void *mem, size_t size, AstBoxVtab *vtab,
 
 /* If required, initialise the virtual function table for this class. */
       if ( !class_init ) {
-         astInitBoxVtab( vtab, name );
+          astInitBoxVtab( vtab, name );
          class_init = 1;
       }
    }
@@ -3917,6 +4677,25 @@ AstBox *astLoadBox_( void *mem, size_t size, AstBoxVtab *vtab,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
+
+
+void astBoxPoints_( AstBox *this, double *centre, double *corner, 
+                    int *status) {
+   if ( !astOK ) return;
+   return (**astMEMBER(this,Box,BoxPoints))( this, centre, corner, status );
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

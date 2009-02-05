@@ -12,18 +12,17 @@ f     AST_PRISM
 
 *  Description:
 *     A Prism is a Region which represents an extrusion of an existing Region 
-*     into one or more orthogonal dimensions (specified by an Interval or
-*     Box). If the Region to be extruded has N axes, and the Interval or Box 
-*     defining the extrusion has M axes, then the resulting Prism will have 
-*     (M+N) axes. A point is inside the Prism if the first N axis values 
-*     correspond to a point which is inside the Region being extruded, and the 
-*     remaining M axis values correspond to a point which inside the supplied 
-*     Interval or Box.
+*     into one or more orthogonal dimensions (specified by another Region).
+*     If the Region to be extruded has N axes, and the Region defining the 
+*     extrusion has M axes, then the resulting Prism will have (M+N) axes. 
+*     A point is inside the Prism if the first N axis values correspond to 
+*     a point inside the Region being extruded, and the remaining M axis 
+*     values correspond to a point inside the Region defining the extrusion.
 *
 *     As an example, a cylinder can be represented by extruding an existing 
-*     Circle. In this case the supplied Interval would have a single axis and 
-*     would specify the upper and lower limits of the cylinder along its 
-*     length.
+*     Circle, using an Interval to define the extrusion. Ih this case, the
+*     Interval would have a single axis and would specify the upper and 
+*     lower limits of the cylinder along its length.
 
 *  Inheritance:
 *     The Prism class inherits from the Region class.
@@ -74,6 +73,9 @@ f     The Prism class does not define any new routines beyond those
 *        Guard against all axes being extrusion axes in EquivPrism.
 *     20-JAN-2009 (DSB):
 *        Over-ride astRegBasePick.
+*     22-JAN-2009 (DSB):
+*        - Allow any class of Region to be used to define the extrusion axes.
+*        - Over-ride the astMapList method.
 *class--
 */
 
@@ -134,6 +136,7 @@ f     The Prism class does not define any new routines beyond those
 static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
+static int (* parent_maplist)( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static int (* parent_getobjsize)( AstObject *, int * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static AstRegion *(* parent_getuncfrm)( AstRegion *, int, int * );
@@ -194,14 +197,14 @@ AstPrism *astPrismId_( void *, void *, const char *, ... );
 static AstMapping *Simplify( AstMapping *, int * );
 static AstPointSet *RegBaseMesh( AstRegion *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
-static AstRegion *RegBasePick( AstRegion *this, int, const int *, int * );
-static AstRegion *EquivPrism( AstPrism *, AstRegion *, int * );
-static int GetObjSize( AstObject *, int * );
 static AstRegion *GetUncFrm( AstRegion *, int, int * );
+static AstRegion *RegBasePick( AstRegion *this, int, const int *, int * );
 static double *RegCentre( AstRegion *this, double *, double **, int, int, int * );
 static double GetFillFactor( AstRegion *, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int GetBounded( AstRegion *, int * );
+static int GetObjSize( AstObject *, int * );
+static int MapList( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static int Overlap( AstRegion *, AstRegion *, int * );
 static int OverlapX( AstRegion *, AstRegion *, int * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
@@ -351,274 +354,6 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
    if ( !astOK ) result = 0;
 
 /* Return the result, */
-   return result;
-}
-
-static AstRegion *EquivPrism( AstPrism *this, AstRegion *region, int *status ) {
-/*
-*  Name:
-*     EquivPrism
-
-*  Purpose:
-*     Obtain a pointer to a Prism equivalent to the supplied Region.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "prism.h"
-*     AstRegion *EquivPrism( AstPrism *this, AstRegion *region, int *status )
-
-*  Class Membership:
-*     Prism method 
-
-*  Description:
-*     This function returns a pointer to a Region which is equivalent to
-*     the supplied Region, and which is if possible a Prism with the same
-*     structure as "this". If there is no equivalent Prism, then a clone of 
-*     the supplied pointer is returned.
-*
-*     Only Boxes and Intervals have equivalent Prisms.
-
-*  Parameters:
-*     this
-*        Pointer to a Prism.
-*     region
-*        Pointer to the Region.
-*     status
-*        Pointer to the inherited status variable.
-
-*  Returned Value:
-*     A pointer to the equivalent Prism or a clone of the supplied
-*     pointer. This should be annulled (using astAnnul) when no longer 
-*     needed.
-
-*  Notes:
-*     - A NULL pointer will be returned if this function is invoked
-*     with the global error status set, or if it should fail for any
-*     reason.
-*/
-
-/* Local Variables: */
-   AstFrame *bfrm;
-   AstFrame *cfrm;
-   AstFrame *sfrm1;
-   AstFrame *sfrm2;
-   AstFrameSet *fs;
-   AstInterval *sreg1;
-   AstInterval *sreg2;
-   AstMapping *emap2;
-   AstMapping *map1;
-   AstMapping *map2;
-   AstMapping *map3;
-   AstMapping *map4;
-   AstMapping *map5;
-   AstMapping *map6;
-   AstMapping *map7;
-   AstMapping *map;
-   AstPermMap *pmap;
-   AstPrism *prism;
-   AstRegion *result;         
-   AstRegion *unc;      
-   double *lbnd;
-   double *lbndt;
-   double *ubnd;
-   double *ubndt;
-   int *inax2;
-   int *inperm;
-   int *outax1;
-   int *outax2;
-   int i;               
-   int j;
-   int nax1;
-   int nax2;
-   int naxb;
-   int nbase;
-   int next;                 
-
-/* Initialise */
-   result = NULL;
-
-/* Check the global error status. */
-   if ( !astOK ) return result;
-
-/* If the supplied Region is a Box or Interval, we can create an
-   equivalent Prism. */
-   if( astIsABox( region ) || astIsAInterval( region ) ) {
-
-/* Get the Mapping from the Frame represented by "this" to the Frame
-   represented by "region". */
-      fs = astConvert( this, region, "" );
-      if( fs ) {
-         map2 = astGetMapping( fs, AST__BASE, AST__CURRENT );
-
-/* Use this to construct the Mapping from the base Frame in "this" to the 
-   base Frame in "region". */
-         map1 = astGetMapping( ((AstRegion *) this)->frameset, AST__BASE,
-                               AST__CURRENT );
-         map3 = astGetMapping( region->frameset, AST__CURRENT, AST__BASE );
-
-         map4 = (AstMapping *) astCmpMap( map1, map2, 1, "", status );
-         map5 = (AstMapping *) astCmpMap( map4, map3, 1, "", status );
-         map = astSimplify( map5 );
-
-/* Get pointers to the base and current Frames in the Box or Interval. */
-         bfrm = astGetFrame( region->frameset, AST__BASE );
-         cfrm = astGetFrame( region->frameset, AST__CURRENT );
-
-/* Get the base Frame bounds of the Box or Interval, plus some extra
-   workspace. */
-         naxb = astGetNaxes( bfrm );
-         lbndt = astMalloc( sizeof( double )*(size_t) naxb );
-         ubndt = astMalloc( sizeof( double )*(size_t) naxb );
-         lbnd = astMalloc( sizeof( double )*(size_t) naxb );
-         ubnd = astMalloc( sizeof( double )*(size_t) naxb );
-         astRegBaseBox( region, lbnd, ubnd );
-
-/* Determine which outputs from the Mapping found above correspond to the 
-   extrusion axes of the supplied Prism. */
-         nbase = astGetNaxes( this->region1 );
-         next = astGetNaxes( this->region2 );
-         inax2 = astMalloc( sizeof(int)*(size_t)next );
-         if( inax2  ) {
-            for( i = 0; i < next; i++ ) inax2[ i ] = nbase + i;
-         }
-         outax2 = astMapSplit( map, next, inax2, &emap2 );
-
-/* The inputs of the Mapping returned by astMapSplit correspond to the
-   extrusion axes of the supplied Prism. The outputs of this Mapping 
-   define the axes of "region" which are to be used as the extrusion axes
-   in the equivalent Prism. Find out how many of them there are, and copy
-   the bounds for these axes into the temporary "lbndt" and "ubndt" arrays. */
-         if( outax2 ) {
-            nax2 = astGetNout( emap2 );
-            for( i = 0; i < nax2; i++ ) {
-               lbndt[ i ] = lbnd[ outax2[ i ] ];
-               if( lbndt[ i ] == -DBL_MAX ) lbndt[ i ] = AST__BAD;
-               ubndt[ i ] = ubnd[ outax2[ i ] ];
-               if( ubndt[ i ] == DBL_MAX ) ubndt[ i ] = AST__BAD;
-            }
-
-/* Pick these axes from the base Frame of the Box or Interval. */
-            sfrm2 = astPickAxes( bfrm, nax2, outax2, NULL );
-
-/* Create an Interval describing the extrusion axes. */
-            sreg2 = astInterval( sfrm2, lbndt, ubndt, NULL, "", status );
-
-/* Determine which outputs from this Mapping correspond to the base
-   axes of the supplied Prism. These are just the axes which are *not*
-   included in "inax2". */
-            outax1 = astMalloc( sizeof(int)*(size_t)naxb );
-            if( outax1 ) {
-               for( i = 0; i < naxb; i++ ) outax1[ i ] = i;
-               for( i = 0; i < nax2; i++ ) outax1[ inax2[ i ] ] = -1;
-               j = 0;
-               for( i = 0; i < naxb; i++ ) {
-                  if( outax1[ i ] != -1 ) outax1[ j++ ] = outax1[ i ];
-               }
-   
-/* Copy the base Frame bounds for these axes. Abort if there are none. */
-               nax1 = naxb - nax2;
-               if( nax1 > 0 ) {
-                  for( i = 0; i < nax1; i++ ) {
-                     lbndt[ i ] = lbnd[ outax1[ i ] ];
-                     if( lbndt[ i ] == -DBL_MAX ) lbndt[ i ] = AST__BAD;
-                     ubndt[ i ] = ubnd[ outax1[ i ] ];
-                     if( ubndt[ i ] == DBL_MAX ) ubndt[ i ] = AST__BAD;
-                  }
-   
-/* Pick these axes from the base Frame of the Box or Interval. */
-                  sfrm1 = astPickAxes( bfrm, nax1, outax1, NULL );
-   
-/* Create an Interval describing the base axes. */
-                  sreg1 = astInterval( sfrm1, lbndt, ubndt, NULL, "", status );
-   
-/* Create a Prism from these two regions. */
-                  prism = astPrism( sreg1, sreg2, "", status );
-   
-/* The axes in this Prism are in the order defined by the structure of
-      the suppied Prism (all the base axes followed by all the extrusion axes).
-      This may be different from the order of the base Frame axes in the
-      supplied Box or Interval. Get a PermMap which will remap the prism so its 
-      axes are in the same order as the original Region's base Frame. */
-                  inperm = astMalloc( sizeof( int )*(size_t)naxb );
-                  if( inperm ) {
-                     for( i = 0; i < nax1; i++ ) inperm[ i ] = outax1[ i ];
-                     for( i = 0; i < nax2; i++ ) inperm[ i + nax1 ] = outax2[ i ];
-                     pmap = astPermMap( naxb, inperm, naxb, NULL, NULL, "", status );
-   
-/* Combine this with the Mapping from the original base Frame to the
-   original current Frame, and simplify it. */
-                     astInvert( map3 );
-                     map6 = (AstMapping *) astCmpMap( pmap, map3, 1, "", status );
-                     map7 = astSimplify( map6 );            
-   
-/* If this is not a UnitMap, use it to remap the prism into the Region's 
-      original current Frame. We do not simplify the result since this could
-      turn the final prism back into a Box or Interval! */
-                     if( !astIsAUnitMap( map7 ) ) {
-                        result = astMapRegion( prism, map7, cfrm );
-                     } else {               
-                        result= astClone( prism );
-                     }
-   
-/* If the original Region has any non-default uncertainty, get it, and
-      set it in the re-ordered, re-mapped Prism. */
-                     if( astTestUnc( region ) ){
-                        unc = astGetUncFrm( region, AST__CURRENT );
-                        astSetUnc( result, unc );
-                        unc = astAnnul( unc );
-                     }
-   
-/* Copy Region attributes from the original Region to the new Prism. */
-                     astRegOverlay( result, region );
-   
-/* Free resources */
-                     inperm = astFree( inperm );
-                     pmap = astAnnul( pmap );
-                     map6 = astAnnul( map6 );
-                     map7 = astAnnul( map7 );
-                  }
-
-                  sfrm1 = astAnnul( sfrm1 );
-                  sreg1 = astAnnul( sreg1 );
-                  prism = astAnnul( prism );
-               }
-
-               outax1 = astFree( outax1 );
-            }
-
-            outax2 = astFree( outax2 );
-            sfrm2 = astAnnul( sfrm2 );
-            emap2 = astAnnul( emap2 );
-            sreg2 = astAnnul( sreg2 );
-         }
-
-         inax2 = astFree( inax2 );
-         ubnd = astFree( ubnd );
-         lbnd = astFree( lbnd );
-         ubndt = astFree( ubndt );
-         lbndt = astFree( lbndt );
-         bfrm = astAnnul( bfrm );
-         cfrm = astAnnul( cfrm );
-         map1 = astAnnul( map1 );
-         map2 = astAnnul( map2 );
-         map3 = astAnnul( map3 );
-         map4 = astAnnul( map4 );
-         map5 = astAnnul( map5 );
-         map = astAnnul( map );
-         fs = astAnnul( fs );
-      }
-   }
-
-/* If no equivalent Prism was created, return a clone of the supplied
-   pointer. */
-   if( !result ) result = astClone( region );
-
-/* Return NULL if an error occurred. */
-   if( !astOK ) result = astAnnul( result );
-
-/* Return the required pointer. */
    return result;
 }
 
@@ -1257,6 +992,9 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name, int *status ) {
    parent_simplify = mapping->Simplify;
    mapping->Simplify = Simplify;
 
+   parent_maplist = mapping->MapList;
+   mapping->MapList = MapList;
+
    parent_getuncfrm = region->GetUncFrm;
    region->GetUncFrm = GetUncFrm;
 
@@ -1412,6 +1150,142 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
 }
 #endif
 
+static int MapList( AstMapping *this_mapping, int series, int invert,
+                    int *nmap, AstMapping ***map_list, int **invert_list, 
+                    int *status ) {
+/*
+*  Name:
+*     MapList
+
+*  Purpose:
+*     Decompose a Prism into a sequence of simpler Regions.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     int MapList( AstMapping *this, int series, int invert, int *nmap,
+*                  AstMapping ***map_list, int **invert_list )
+
+*  Class Membership:
+*     Prism member function (over-rides the protected astMapList
+*     method inherited from the Region class).
+
+*  Description:
+*     This function decomposes a Prism into a sequence of simpler
+*     Regions which may be applied in parallel to achieve the same 
+*     effect. The Prism is decomposed as far as possible, but it is
+*     not guaranteed that this will necessarily yield any more than
+*     one Region, which may actually be the original Prism supplied.
+
+*  Parameters:
+*     this
+*        Pointer to the Prism to be decomposed (the Prism is not
+*        actually modified by this function).
+*     series
+*        Prisms always apply their component Regions in parallel, so this
+*        value should always be zero. This function will return without
+*        action if it is non-zero.
+*     invert
+*        Inverting a Region has no effect on the properties of the Region
+*        and so this parameter is ignored.
+*     nmap
+*        The address of an int which holds a count of the number of
+*        individual Regions in the decomposition. On entry, this
+*        should count the number of Regions already in the
+*        "*map_list" array (below). On exit, it is updated to include
+*        any new Regions appended by this function.
+*     map_list
+*        Address of a pointer to an array of Region pointers. On
+*        entry, this array pointer should either be NULL (if no
+*        Regions have yet been obtained) or should point at a
+*        dynamically allocated array containing Region pointers
+*        ("*nmap" in number) which have been obtained from a previous
+*        invocation of this function.
+*
+*        On exit, the dynamic array will be enlarged to contain any
+*        new Region pointers that result from the decomposition
+*        requested. These pointers will be appended to any previously
+*        present, and the array pointer will be updated as necessary
+*        to refer to the enlarged array (any space released by the
+*        original array will be freed automatically).
+*
+*        The new Region pointers returned will identify a sequence of
+*        Regions which, when applied (in parallel) in order, will be 
+*        equivalent to the original Prism. 
+*
+*        All the Region pointers returned by this function should be
+*        annulled by the caller, using astAnnul, when no longer
+*        required. The dynamic array holding these pointers should
+*        also be freed, using astFree.
+*     invert_list
+*        Address of a pointer to an array of int. On entry, this array
+*        pointer should either be NULL (if no Regions have yet been
+*        obtained) or should point at a dynamically allocated array
+*        containing Invert attribute values ("*nmap" in number) which
+*        have been obtained from a previous invocation of this
+*        function.
+*
+*        On exit, the dynamic array will be enlarged to contain any
+*        new Invert attribute values that result from the
+*        decomposition requested. These values will be appended to any
+*        previously present, and the array pointer will be updated as
+*        necessary to refer to the enlarged array (any space released
+*        by the original array will be freed automatically).
+*
+*        The new Invert values returned will always be zero since a
+*        Region is unaffected by its Invert setting.
+*
+*        The dynamic array holding these values should be freed by the
+*        caller, using astFree, when no longer required.
+
+*  Returned Value:
+*     Zero is always returned.
+
+*  Notes:
+*     - It is unspecified to what extent the original Prism and the
+*     individual (decomposed) Regions are
+*     inter-dependent. Consequently, the individual Regions cannot be
+*     modified without risking modification of the original Prism.
+*     - If this function is invoked with the global error status set,
+*     or if it should fail for any reason, then the *nmap value, the
+*     list of Region pointers and the list of Invert values will all
+*     be returned unchanged.
+*/
+
+/* Local Variables: */
+   AstPrism *this;              /* Pointer to Prism structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* Obtain a pointer to the Prism structure. */
+   this = (AstPrism *) this_mapping;
+
+/* When considered as a CmpMap, a Prism always combines its component
+   Mappings (Regions) in parallel. So check that a parallel decomposition
+   was requested. */
+   if ( ! series ) {
+
+/* Concatenate the Mapping lists obtained from each component Region. */
+      (void) astMapList( (AstMapping *) this->region1, 0, 0, nmap, map_list, 
+                         invert_list );
+      (void) astMapList( (AstMapping *) this->region2, 0, 0, nmap, map_list, 
+                         invert_list );
+
+/* If the Prism does not combine its components in the way required
+   by the decomposition (series or parallel), then we cannot decompose
+   it. In this case it must be appended to the Mapping list as a
+   single entity. We can use the parent class method to do this. */
+   } else {
+      (void) ( *parent_maplist )( this_mapping, series, invert, nmap,
+                                  map_list, invert_list, status );
+   }
+
+   return 0;
+}
+
 static int Overlap( AstRegion *this, AstRegion *that, int *status ){
 /*
 *  Name:
@@ -1477,25 +1351,26 @@ static int Overlap( AstRegion *this, AstRegion *that, int *status ){
 */
 
 /* Local Variables: */
+   AstFrame *bfrm;
+   AstFrame *efrm;
    AstFrameSet *fs;
+   AstMapping *bmap;
    AstMapping *emap;
    AstMapping *map1;
    AstMapping *map2;
-   AstMapping *map3;
    AstMapping *map;
    AstMapping *smap;
-   AstMapping *tmap;
-   AstRegion *that_reg1;
-   AstRegion *that_reg2;
+   AstRegion *that_base2;
+   AstRegion *that_base;
+   AstRegion *that_ext2;
+   AstRegion *that_ext;
    AstRegion *this_reg1;
    AstRegion *this_reg2;
-   AstRegion *that_prism;
    int *inax;
    int *outax;
    int i;
    int nbase;
    int next;
-   int ok;
    int rbase;
    int result;     
    int rext;            
@@ -1525,90 +1400,75 @@ static int Overlap( AstRegion *this, AstRegion *that, int *status ){
 /* Check the inherited status. */
    if ( !astOK ) return result;
 
-/* We know that "this" is a Prism. See if we can find a prism equivalent
-   to "that". If not, a clone of "that" is returned. */
-   that_prism = EquivPrism( (AstPrism *) this, that, status );
+/* Get pointers to the base and extrusion Regions within "this", and also
+   the nagated flag. */
+   GetRegions( (AstPrism *) this, &this_reg1, &this_reg2, &this_neg, status );
 
-/* If both Regions are Prisms, we provide a specialised implementation.
-   The implementation in the parent Region class assumes that at least one of 
-   the two Regions can be represented using a finite mesh of points on the 
-   boundary which is not the case with some Prisms. The implementation in this 
-   class sees if the Mapping between the base Frames of the Prisms allows 
-   the axis limits to be transferred from one Frame ot the other. */
-   if( astIsAPrism( this ) && astIsAPrism( that_prism ) ) {
+/* Get the number of axes in the base and extrusion Regions of "this". */
+   nbase = astGetNaxes( this_reg1 );
+   next = astGetNaxes( this_reg2 );
 
-/* Get the component Regions, and the Negated value for the two Prisms. The 
-   returned Regions represent a region within the base Frame of the FrameSet 
-   encapsulated by the parent Region structure. */
-      GetRegions( (AstPrism *) this, &this_reg1, &this_reg2, &this_neg, status );
-      GetRegions( (AstPrism *) that_prism, &that_reg1, &that_reg2, &that_neg, status );
+/* Get a FrameSet which goes from the Frame represented by "this" to the
+   Frame represented by "that". Check that the conection is defined. */
+   fs = astConvert( this, that, "" );
+   if( fs ) {
 
-/* Check that the component Regions have the same number of axes in both 
-   Prisms. */
-      nbase = astGetNaxes( this_reg1 );
-      next = astGetNaxes( this_reg2 );
-      if( astGetNaxes( that_reg1 ) == nbase &&
-          astGetNaxes( that_reg2 ) == next ) {
+/* Get the forward Mapping from the above FrameSet. */
+      map2 = astGetMapping( fs, AST__BASE, AST__CURRENT );
 
-/* Get a FrameSet which connects the Frame represented by the second Prism
-   to the Frame represented by the first Prism. Check that the conection is 
-   defined. */
-         fs = astConvert( that_prism, this, "" );
-         if( fs ) {
+/* Get a pointer to the Mapping from base to current Frame in "this". */
+      map1 = astGetMapping( this->frameset, AST__BASE, AST__CURRENT );
 
-/* Get a pointer to the Mapping from base to current Frame in the second 
-   Prism */
-            map1 = astGetMapping( that_prism->frameset, AST__BASE, AST__CURRENT );
-
-/* Get the Mapping from the current Frame of the second Prism to the
-   current Frame of the first Prism. */
-            map2 = astGetMapping( fs, AST__BASE, AST__CURRENT );
-
-/* Get a pointer to the Mapping from current to base Frame in the first
-   Prism. */
-            map3 = astGetMapping( this->frameset, AST__CURRENT, AST__BASE );
-
-/* Combine these Mappings to get the Mapping from the base Frame of the
-   second Prism to the base Frame of the first Prism. */
-            tmap = (AstMapping *) astCmpMap( map1, map2, 1, "", status );
-            map = (AstMapping *) astCmpMap( tmap, map3, 1, "", status );
+/* Combine these Mappings to get the Mapping from the base Frame of "this"
+   to the current Frame of "that". */
+      map = (AstMapping *) astCmpMap( map1, map2, 1, "", status );
 
 /* Simplify this Mapping. */
-            smap = astSimplify( map );
+      smap = astSimplify( map );
 
-/* See if the mapping between the extrusion axes of the Prisms is
-   independent of the other axes. We can only test the overlap using this
-   algorithm is this is the case. The extrusion axes are the trailing
-   "next" axes. */
-            inax = astMalloc( sizeof(int)*(size_t)next );
-            for( i = 0; i < next; i++ ) inax[ i ] = nbase + i;
-            outax = astMapSplit( smap, next, inax, &emap );
-            if( outax ) {
+/* See if the extrusion axes in "this" correspond to a unique set of axes
+   in the current Frame of "that". */
+      inax = astMalloc( sizeof(int)*(size_t)next );
+      for( i = 0; i < next; i++ ) inax[ i ] = nbase + i;
+      outax = astMapSplit( smap, next, inax, &emap );
 
-/* The inputs of the Mapping returned by astMapSplit correspond to the
-   extrusion axes of the second Prism. Check that the outputs of this
-   Mapping correspond to the extrusion axes of the first Prism. */
-               ok = 1;
-               for( i = 0; i < next; i++ ) {
-                  if( outax[ i ] < nbase ) {
-                     ok = 0;
-                     break;
-                  }
-               }
+/* If they do, attempt to create a Region by picking the axes from "that" 
+   that correspond to the extrusion axes in "this". */
+      if( emap && astGetNout( emap ) == next ) {
+         that_ext = (AstRegion *) astPickAxes( that, next, outax, NULL );
 
-               if( ok ) {
+/* If the picked axes formed a Region, see if the base axes can also be
+   picked in the same way. */
+         if( astIsARegion( that_ext ) ) {
+            outax = astFree( outax );
+            inax = astGrow( inax, (size_t)nbase, sizeof( int ) );
+            for( i = 0; i < nbase; i++ ) inax[ i ] = i;
+            outax = astMapSplit( smap, nbase, inax, &bmap );
+            if( bmap && astGetNout( bmap ) == nbase ) {
+               that_base = (AstRegion *) astPickAxes( that, nbase, outax, NULL );
+               if( astIsARegion( that_base ) ) {
 
-/* We now know that the extrusion axes correspond in the base Frames of the 
-   two Prisms. So we can test separately for overlap of the two extrusion 
-   Regions, and for overlap of the two extruded Regions,and then combine
-   the returned flags to represent overlap of the whole Prism. */
-                  rbase = astOverlap( this_reg1, that_reg1 );
-                  rext = astOverlap( this_reg2, that_reg2 );
+/* Map the two Regions picked from "that" into the Frames of the two
+   sub-regions within "this". */
+                  astInvert( emap );
+                  efrm = astGetFrame( this_reg2->frameset, AST__CURRENT );
+                  that_ext2 = astMapRegion( that_ext, emap, efrm );
+
+                  astInvert( bmap );
+                  bfrm = astGetFrame( this_reg1->frameset, AST__CURRENT );
+                  that_base2 = astMapRegion( that_base, bmap, bfrm );
+
+/* We can test separately for overlap of the two extrusion Regions, and for 
+   overlap of the two base Regions, and then combine the returned flags to 
+   represent overlap of the whole Prism. */
+                  rbase = astOverlap( this_reg1, that_base2 );
+                  rext = astOverlap( this_reg2, that_ext2 );
                   result = rtable[ rbase ][ rext ];
 
 /* The values in the rtable array assume that neither of the supplied
    Prisms have been negated. Modify the value obtained from rtable to
    take account of negation of either or both of the supplied Prisms. */
+                  that_neg = astGetNegated( that );
                   if( this_neg ) {
                      if( that_neg ) {
                         if( result == 1 ) {
@@ -1644,33 +1504,36 @@ static int Overlap( AstRegion *this, AstRegion *that, int *status ){
                         result = 5;
                      }
                   }
+
+/* Free resources */
+                  efrm = astAnnul( efrm );
+                  that_ext2 = astAnnul( that_ext2 );
+                  bfrm = astAnnul( bfrm );
+                  that_base2 = astAnnul( that_base2 );
                }
-
-/* Free resources. */
-               outax = astFree( outax );
-               emap = astAnnul( emap );
+               that_base = astAnnul( that_base );
+               bmap = astAnnul( bmap );
             }
-            inax = astFree( inax );
-            smap = astAnnul( smap );
-            map = astAnnul( map );
-            tmap = astAnnul( tmap );
-            map3 = astAnnul( map3 );
-            map2 = astAnnul( map2 );
-            map1 = astAnnul( map1 );
-            fs = astAnnul( fs );
          }
+         emap = astAnnul( emap );
+         that_ext = astAnnul( that_ext );
       }
-      this_reg1 = astAnnul( this_reg1 );
-      that_reg1 = astAnnul( that_reg1 );
-      this_reg2 = astAnnul( this_reg2 );
-      that_reg2 = astAnnul( that_reg2 );
+      outax = astFree( outax );
+      inax = astFree( inax );
+      smap = astAnnul( smap );      
+      map = astAnnul( map );      
+      map1 = astAnnul( map1 );      
+      map2 = astAnnul( map2 );      
+      fs = astAnnul( fs );      
    }
-
-   that_prism = astAnnul( that_prism );
+   this_reg1 = astAnnul( this_reg1 );
+   this_reg2 = astAnnul( this_reg2 );
 
 /* If overlap could not be determined using the above implementation, try 
    using the implementation inherited from the parent Region class. */
-   if( !result ) result = (*parent_overlap)( this, that, status );
+   if( !result ) {
+      result = (*parent_overlap)( this, that, status );
+   }
 
 /* If not OK, return zero. */
    if( !astOK ) result = 0;
@@ -1729,7 +1592,8 @@ static int OverlapX( AstRegion *that, AstRegion *this, int *status ){
 }
 
 
-static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int *status ){
+static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, 
+                        int *status ){
 /*
 *  Name:
 *     RegBaseBox
@@ -1743,7 +1607,8 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
 
 *  Synopsis:
 *     #include "prism.h"
-*     void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd, int *status )
+*     void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd, 
+*                      int *status )
 
 *  Class Membership:
 *     Prism member function (over-rides the astRegBaseBox protected
@@ -1818,7 +1683,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
 
 *  Synopsis:
 *     #include "prism.h"
-*     AstPointSet *astRegBaseMesh( AstRegion *this, int *status )
+*     AstPointSet *RegBaseMesh( AstRegion *this, int *status )
 
 *  Class Membership:
 *     Prism member function (over-rides the astRegBaseMesh protected
@@ -1937,16 +1802,16 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
          msz2 = ( astGetNaxes( reg2 ) == 1 ) ? 2 : sqrt( 0.5*mszp );
          gsz1 = 0.5*mszp/msz2;
 
-/* First, get a boundary mesh for the Prism (second region ) defining the 
-   prism extrusion. For instance, if the Prism is 1-dimensional, this mesh 
-   will consist of the two values on the Prism axis: the lower and upper 
-   bounds of the Prism. */
+/* First, get a boundary mesh for the second component Region defining the 
+   prism extrusion. For instance, if the Region is 1-dimensional, this mesh 
+   will consist of the two values on the Region axis: the lower and upper 
+   bounds of the Region. */
          msz = astTestMeshSize( reg2 ) ? astGetMeshSize( reg2 ) : -1;
          astSetMeshSize( reg2, msz2 );
          mesh2 = astRegMesh( reg2 );
 
 /* Also get a grid of points spread throughout the extent (i.e. not
-   merely on the boundary) of the Prism. */
+   merely on the boundary) of the second Region. */
          astSetMeshSize( reg2, gsz2 );
          grid2 = astRegGrid( reg2 );
 
@@ -1971,7 +1836,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
             astSetMeshSize( reg1, msz );
          }
 
-/* Note ht enumber of axes in the two component Regions. */
+/* Note the number of axes in the two component Regions. */
          nax1 = astGetNcoord( mesh1 );
          nax2 = astGetNcoord( mesh2 );
 
@@ -2514,7 +2379,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    unc1 = astGetUncFrm( reg1, AST__BASE );
    astRegPins( reg1, ps1b, unc1, &mask1 );
 
-/* Also determine which of the points are on or in theboundary by using
+/* Also determine which of the points are on or in the boundary by using
    "reg1" as a Mapping to transform the supplied points. */
    ps1b2 = astTransform( reg1, ps1b, 1, NULL );
 
@@ -3009,22 +2874,23 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 */
 
 /* Local Variables: */
-   AstFrame *bfrm;               /* Base Frame */
    AstFrame *cfrm;               /* Current Frame */
    AstFrame *newfrm1;            /* Current Frame axes for reg1 */
    AstFrame *newfrm2;            /* Current Frame axes for reg2 */
    AstFrameSet *fs;              /* Parent FrameSet */
    AstMapping *bcmap;            /* Base->current Mapping */
    AstMapping *nmap1;            /* Reg1->current Mapping */
+   AstMapping *map1;             /* First component Region from a CmpMap */
+   AstMapping *map2;             /* Second component Region from a CmpMap */
+   int series;                   /* Apply component Mappings in series? */
+   int invert1;                  /* Use inverted first component Mapping? */
+   int invert2;                  /* Use inverted second component Mapping? */
    AstMapping *nmap2;            /* Reg2->current Mapping */
    AstMapping *result;           /* Result pointer to return */
-   AstPointList *newpl;          /* New PointList */
-   AstPointSet *ps1;             /* PointList PointSet */
-   AstPointSet *ps2;             /* New PointList PointSet */
-   AstPrism *cpr;                /* Component Prism */
-   AstPrism *new;                /* New Prism */
-   AstRegion *new2;              /* New Interval or Box */
-   AstRegion *newpl2;            /* Remapped new PointList */
+   AstCmpMap *cmpmap;            /* Result pointer to return */
+   AstMapping *smap;             /* Simplified CmpMap */
+   AstRegion *new2;              /* New simplified Region */
+   AstRegion *new;               /* New Region */
    AstRegion *newreg1;           /* Reg1 mapped into current Frame */
    AstRegion *newreg2;           /* Reg2 mapped into current Frame */
    AstRegion *reg1;              /* First component Region */
@@ -3032,27 +2898,17 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    AstRegion *reg;               /* This Region */
    AstRegion *snewreg1;          /* Simplified newreg1 */
    AstRegion *snewreg2;          /* Simplified newreg2 */
-   AstRegion *unc;               /* Uncertainty Region */
-   double **ptr1;                /* PointList axis values */
-   double *lbnd;                 /* Lower bounds of Interval subregion */
-   double *p1;                   /* Pointer to next old axis value */
-   double *p;                    /* Pointer to next new axis value */
-   double **points;              /* PointList axis values */
-   double *ubnd;                 /* Upper bounds of Interval subregion */
    int *axin;                    /* Indices of Mapping inputs to use */
    int *axout1;                  /* Indices of cfrm axes corresponding to reg1 */
    int *axout2;                  /* Indices of cfrm axes corresponding to reg2 */
    int *perm;                    /* Axis permutation array */
    int i;                        /* Loop count */
-   int j;                        /* Loop count */
    int nax1;                     /* Number of axes in first component Region */
    int nax2;                     /* Number of axes in second component Region */
    int naxt;                     /* Total number of axes in current Frame */
    int naxout1;                  /* Number of current axes for reg1 */
    int naxout2;                  /* Number of current axes for reg2 */
    int neg;                      /* Negated flag for supplied Prism */
-   int np;                       /* Number of points in PointList */
-   int ok;                       /* Can PointList and Interval be combined? */
 
 /* Initialise. */
    result = NULL;
@@ -3066,10 +2922,6 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /* Get the component Regions, and the Negated flag for the Prism. */
    GetRegions( (AstPrism *) this_mapping, &reg1, &reg2, &neg, status );
 
-/* Get the number of axes in each component Region. */
-   nax1 = astGetNaxes( reg1 );
-   nax2 = astGetNaxes( reg2 );
-
 /* The above Regions describe areas within the base Frame of the FrameSet 
    encapsulated by the parent Region structure. Get the current Frame in
    this FrameSet and the base->current Mapping. */
@@ -3077,87 +2929,55 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    cfrm = astGetFrame( fs, AST__CURRENT );
    bcmap = astGetMapping( fs, AST__BASE, AST__CURRENT );
 
-/* Special Case: If the extruded region is a PointList and the extrusion
-   Region is a non-negated, closed, Interval with zero length on every axis 
-   (i.e. a point), then the two Regions can be combined into a single
-   PointList. Check the Region classes are right. */
-   if( astIsAPointList( reg1 ) && astIsAInterval( reg2 ) ) {
+/* Combine the two Regions into a parallel CmpMap (this uses the fact
+   that a Region is a type of Mapping). Then simplify the CmpMap. This
+   will result in the astMapMerge methods defined by sub-classes of 
+   Regions being used to merge adjacent regions. */
+   cmpmap = astCmpMap( reg1, reg2, 0, "", status );
+   smap = astSimplify( cmpmap );
+   cmpmap = astAnnul( cmpmap );
 
-/* Check the Negated and Closed values are right. */
-      if( astGetClosed( reg2 ) && !astGetNegated( reg2 ) && 
-          astGetClosed( reg1 ) && !astGetNegated( reg1 ) ) {
+/* Initially, assume we cannot form a new Region from the simplified
+   CmpMap. */
+   new = NULL;
 
-/* Get the bounds of the Interval in its current Frame */
-         lbnd = astMalloc( sizeof( double )*(size_t) nax2 );
-         ubnd = astMalloc( sizeof( double )*(size_t) nax2 );
-         if( ubnd ) {
-            astGetRegionBounds( reg2, lbnd, ubnd );
+/* If the result is a region, use it. */
+   if( astIsARegion( smap ) ) {
+      new = astClone( smap );
 
-/* See if the bounds cover a single value. */
-            ok = 1;
-            for( i = 0; i < nax2; i++ ) {
-               if( !EQUAL( lbnd[i], ubnd[i] ) ) {
-                  ok = 0;
-                  break;
-               }
-            }
-
-/* If so, get the axis values from the PointList in its current Frame,
-   and allocate workspace for a PointList with the same number of points
-   but with the extra axes inherited form the Interval. */
-            if( ok ) {
-               ps1 = astRegTransform( reg1, NULL, 1, NULL, NULL );
-
-               ptr1 = astGetPoints( ps1 );
-               np = astGetNpoint( ps1 );
-
-               ps2 = astPointSet( np, nax1 + nax2, "", status );
-               points = astGetPoints( ps2 );
-
-               if( points ) {
-
-/* Copy the axis values form the old PointList to the first nax1 axes of
-   the new PointList. */
-                  for( i = 0; i < nax1; i++) {
-                     p = points[ i ];
-                     p1 = ptr1[ i ];
-                     for( j = 0; j < np; j++ ) *(p++) = *(p1++);
-                  }
-
-/* Fill up the remaining nax2 axes of the new PointList by copying the 
-   axis values covered by the Interval. */
-                  for( i = 0; i < nax2; i++) {
-                     p = points[ i + nax1 ];
-                     for( j = 0; j < np; j++ ) *(p++) = lbnd[ i ];
-                  }
-
-/* We create a new PointList within the base Frame of "this" prism, using
-   the base Frame uncertainty from "this" (if set). */
-                  bfrm = astGetFrame( fs, AST__BASE );
-                  unc = astTestUnc( reg ) ? astGetUncFrm( reg, AST__BASE ) : NULL;
-                  newpl = astPointList( bfrm, ps2, unc, "", status );
-
-/* Finally map it into the current Frame of "this" and simplify it. */
-                  newpl2 = astMapRegion( newpl, bcmap, cfrm );
-                  result = astSimplify( newpl2 );
+/* If the result is a parallel CmpMap, get its two components and check
+   they are Regions. If so, and if they are not the same as the original
+   two component Regions, form a new Prism from them. */
+   } else if( astIsACmpMap( smap ) ) {
+      astDecompose( smap, &map1, &map2, &series, &invert1, &invert2  );
+      if( ! series && astIsARegion( map1 ) && astIsARegion( map2 ) ) {
+         if( (AstRegion *) map1 != reg1 || (AstRegion *) map2 != reg2 ) {
+            new = (AstRegion *) astPrism( (AstRegion *) map1, 
+                                          (AstRegion *) map2, "", status );
+         }
+      }
 
 /* Free resources */
-                  newpl = astAnnul( newpl );
-                  newpl2 = astAnnul( newpl2 );
-                  if( unc ) unc = astAnnul( unc );
-                  bfrm = astAnnul( bfrm );
-               }
-               ps1 = astAnnul( ps1 );
-               ps2 = astAnnul( ps2 );
-            }
-         }
-         ubnd = astFree( ubnd );
-         lbnd = astFree( lbnd );
-      }
+      map1 = astAnnul( map1 );
+      map2 = astAnnul( map2 );
    }
 
-/* If the special case above produced a result, skip the rest */
-   if( !result ) {
+   smap = astAnnul( smap );
+
+/* If the above produced a simplified Region, map it into the current Frame 
+   of "this" and simplify it. */
+   if( new ) {
+      new2 = astMapRegion( new, bcmap, cfrm );
+      result = astSimplify( new2 );
+      new = astAnnul( new );
+      new2 = astAnnul( new2 );
+
+/* If the above did not produced a result, try a different approach. */
+   } else {
+
+/* Get the number of axes in each component Region. */
+      nax1 = astGetNaxes( reg1 );
+      nax2 = astGetNaxes( reg2 );
 
 /* Use astMapSplit to see if the axes of the first component Region correspond
    to a distinct set of axes within the current Frame. If this is the case, 
@@ -3259,18 +3079,11 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
          newreg2 = astMapRegion( reg2, nmap2, newfrm2 );
          snewreg2 = astSimplify( newreg2 );      
    
-/* If the simplified second component is no longer an Interval or Box, revert 
-   to the original Interval. */
-         if( !astIsAInterval( snewreg2 ) && !astIsABox( snewreg2 ) ) {
-            (void) astAnnul( snewreg2 );
-            snewreg2 = astClone( newreg2 );
-         }
-   
 /* If either component Region was simplified, create a new Prism from the 
    simplified Regions. */
          if( snewreg1 != newreg1 || snewreg2 != newreg2 ) {
             (void) astAnnul( new );
-            new = astPrism( snewreg1, snewreg2, "", status );
+            new = (AstRegion *) astPrism( snewreg1, snewreg2, "", status );
    
 /* Ensure the new Prism has the same Negated attribute as the original. */
             if( neg ) astNegate( new );
@@ -3295,46 +3108,21 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
          snewreg2 = astAnnul( snewreg2 );
       }
    
-/* The second component Region in the Prism is known to be an Interval. 
-   If the first component Region is also an Interval, a Box, or a NullRegion 
-   we can replace the Prism by a single Interval defined within a CmpFrame.
-   Attempt to do this. If succesful, attempt to simplify the new Region
-   and use it in place of the original. */
-      if( new && astIsAPrism( new ) ) {
-         new2 = astMergeInterval( new->region2, new->region1 );
-         if( new2 ) {
-            (void) astAnnul( new );
-            new = astSimplify( new2 );
-            new2 = astAnnul( new2 );
-   
-/* If not succesful, see if the first component Region is a Prism. If so
-   we can merge the two extrusion Regions into a single Interval. */
-         } else if( astIsAPrism( new->region1 ) ) {
-            cpr = ( AstPrism *) ( new->region1 );
-            newreg1 = cpr->region1;
-            newreg2 = astMergeInterval( new->region2, cpr->region2 );
-            if( newreg2 ) {
-               new2 = (AstRegion *) astPrism( newreg1, newreg2, "", status );
-               (void) astAnnul( new );
-               new = astSimplify( new2 );
-               new2 = astAnnul( new2 );
-            }
-            newreg2 = astAnnul( newreg2 );
-         }      
-      }
-   
-/* Now invoke the parent Simplify method inherited from the Region class. 
-   This will simplify the encapsulated FrameSet and uncertainty Region. */
-      result = (*parent_simplify)( (AstMapping *) new, status );
-   
 /* Free resources. */
-      new = astAnnul( new );
       if( axout1 ) axout1 = astFree( axout1 );
       if( axout2 ) axout2 = astFree( axout2 );
       if( nmap1 ) nmap1 = astAnnul( nmap1 );
       if( nmap2 ) nmap2 = astAnnul( nmap2 );
    }
 
+/* Now invoke the parent Simplify method inherited from the Region class. 
+   This will simplify the encapsulated FrameSet and uncertainty Region. */
+   if( new ) {
+      result = (*parent_simplify)( (AstMapping *) new, status );
+      new = astAnnul( new );
+   }
+   
+/* Free resources. */
    reg1 = astAnnul( reg1 );
    reg2 = astAnnul( reg2 );
    cfrm = astAnnul( cfrm );
@@ -3365,7 +3153,7 @@ static int TestUnc( AstRegion *this_region, int *status ) {
 
 *  Synopsis:
 *     include "prism.h"
-*     int astTestUnc( AstRegion *this, int *status )
+*     int TestUnc( AstRegion *this, int *status )
 
 *  Class Membership:
 *     Prism member function (over-rides the astTestUnc protected
@@ -3763,7 +3551,7 @@ AstPrism *astPrism_( void *region1_void, void *region2_void,
 
 *  Synopsis:
 *     #include "prism.h"
-*     AstPrism *astPrism( AstRegion *region1, AstInterval *region2, 
+*     AstPrism *astPrism( AstRegion *region1, AstRegion *region2, 
 *                         const char *options, ..., int *status )
 
 *  Class Membership:
@@ -3777,7 +3565,7 @@ AstPrism *astPrism_( void *region1_void, void *region2_void,
 *     region1
 *        Pointer to the Region to be extruded.
 *     region2
-*        Pointer to the Interval defining the extent of the extrusion.
+*        Pointer to the Region defining the extent of the extrusion.
 *     options
 *        Pointer to a null terminated string containing an optional
 *        comma-separated list of attribute assignments to be used for
@@ -3889,18 +3677,17 @@ f     RESULT = AST_PRISM( REGION1, REGION2, OPTIONS, STATUS )
 *     its attributes.
 *
 *     A Prism is a Region which represents an extrusion of an existing Region 
-*     into one or more orthogonal dimensions (specified by an Interval or
-*     Box). If the Region to be extruded has N axes, and the Interval or Box 
-*     defining the extrusion has M axes, then the resulting Prism will have 
-*     (M+N) axes. A point is inside the Prism if the first N axis values 
-*     correspond to a point which is inside the Region being extruded, and the 
-*     remaining M axis values correspond to a point which inside the supplied 
-*     Interval or Box.
+*     into one or more orthogonal dimensions (specified by another Region).
+*     If the Region to be extruded has N axes, and the Region defining the 
+*     extrusion has M axes, then the resulting Prism will have (M+N) axes. 
+*     A point is inside the Prism if the first N axis values correspond to 
+*     a point inside the Region being extruded, and the remaining M axis 
+*     values correspond to a point inside the Region defining the extrusion.
 *
 *     As an example, a cylinder can be represented by extruding an existing 
-*     Circle. In this case the supplied Interval would have a single axis and 
-*     would specify the upper and lower limits of the cylinder along its 
-*     length.
+*     Circle, using an Interval to define the extrusion. Ih this case, the
+*     Interval would have a single axis and would specify the upper and 
+*     lower limits of the cylinder along its length.
 
 *  Parameters:
 c     region1
@@ -3908,7 +3695,7 @@ f     REGION1 = INTEGER (Given)
 *        Pointer to the Region to be extruded.
 c     region2
 f     REGION2 = INTEGER (Given)
-*        Pointer to the Interval or Box defining the extent of the extrusion.
+*        Pointer to the Region defining the extent of the extrusion.
 c     options
 f     OPTIONS = CHARACTER * ( * ) (Given)
 c        Pointer to a null-terminated string containing an optional
@@ -3963,10 +3750,11 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS;             /* Pointer to thread-specific global data */
    AstPrism *new;                  /* Pointer to new Prism */
    AstRegion *region1;             /* Pointer to first Region structure */
    AstRegion *region2;             /* Pointer to second Region structure */
+   int *status;                    /* Pointer to inherited status value */
    va_list args;                   /* Variable argument list */
 
 /* Get a pointer to the thread specific global data structure. */
@@ -3974,8 +3762,6 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Initialise. */
    new = NULL;
-
-   int *status;                  /* Pointer to inherited status value */
 
 /* Get a pointer to the inherited status value. */
    status = astGetStatusPtr;
@@ -4014,9 +3800,9 @@ f     function is invoked with STATUS set to an error value, or if it
    return astMakeId( new );
 }
 
-AstPrism *astInitPrism_( void *mem, size_t size, int init,
-                         AstPrismVtab *vtab, const char *name,
-                         AstRegion *region1, AstRegion *region2, int *status ) {
+AstPrism *astInitPrism_( void *mem, size_t size, int init, AstPrismVtab *vtab,
+                         const char *name, AstRegion *region1, 
+                         AstRegion *region2, int *status ) {
 /*
 *+
 *  Name:
@@ -4074,7 +3860,7 @@ AstPrism *astInitPrism_( void *mem, size_t size, int init,
 *     region1
 *        Pointer to the first Region.
 *     region2
-*        Pointer to the second Region (must be an Box or Interval).
+*        Pointer to the second Region.
 
 *  Returned Value:
 *     A pointer to the new Prism.
@@ -4104,24 +3890,9 @@ AstPrism *astInitPrism_( void *mem, size_t size, int init,
    new = NULL;
    reg2 = NULL;
 
-/* Take a copy of the first supplied Region. */
+/* Take a copy of the two supplied Regions. */
    reg1 = astCopy( region1 );
-   
-/* If the second Region is Box, create a corresponding Interval from it. */
-   if( astIsABox( region2 ) ) {
-      reg2 = astBoxInterval( region2 );
-
-/* If the second Region is an Interval, use a copy of it. */
-   } else if( astIsAInterval( region2 ) ) {
-      reg2 = astCopy( region2 );
-
-/* Otherwise, report an error. */
-   } else if( astOK ) {
-      astError( AST__BADIN, "astInitPrism(%s): Bad extrusion Region "
-                "class (%s) supplied.", status, name, astGetClass( region2 ) );
-      astError( AST__NCPIN, "The extrusion Region must be a Box or "
-                "Interval." , status);
-   }
+   reg2 = astCopy( region2 );
 
 /* Form a CmpFrame representing the combined Frame of these two Regions. */
    frm1 = astRegFrame( reg1 );
@@ -4249,15 +4020,12 @@ AstPrism *astLoadPrism_( void *mem, size_t size, AstPrismVtab *vtab,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
    AstFrame *cfrm;         /* Frame containing required axes */
    AstFrame *f1;           /* Base Frame in parent Region */
    AstPrism *new;          /* Pointer to the new Prism */
    AstRegion *creg;        /* Pointer to component Region */
-   int *axes;              /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(channel);
-
-/* Pointer to array of axis indices */
+   int *axes;              /* Pointer to array of axis indices */
    int i;                  /* Loop count */
    int nax1;               /* No.of axes in 1st component Frame */
    int nax2;               /* No.of axes in 2nd component Frame */
@@ -4267,6 +4035,9 @@ AstPrism *astLoadPrism_( void *mem, size_t size, AstPrismVtab *vtab,
 
 /* Check the global error status. */
    if ( !astOK ) return new;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* If a NULL virtual function table has been supplied, then this is
    the first loader to be invoked for this Prism. In this case the
@@ -4372,8 +4143,6 @@ AstPrism *astLoadPrism_( void *mem, size_t size, AstPrismVtab *vtab,
    same interface. */
 
 /* None. */
-
-
 
 
 

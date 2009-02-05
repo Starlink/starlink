@@ -32,6 +32,8 @@ f     The NullRegion class does not define any new routines beyond those
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -57,6 +59,8 @@ f     The NullRegion class does not define any new routines beyond those
 *        Original version.
 *     20-JAN-2009 (DSB):
 *        Over-ride astRegBasePick.
+*     26-JAN-2009 (DSB):
+*        Over-ride astMapMerge.
 *class--
 */
 
@@ -150,6 +154,8 @@ static AstPointSet *RegMesh( AstRegion *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static AstRegion *RegBasePick( AstRegion *this, int, const int *, int * );
 static AstRegion *GetDefUnc( AstRegion *, int * );
+static AstRegion *MergeNullRegion( AstNullRegion *, AstRegion *, int, int * );
+static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static int Overlap( AstRegion *, AstRegion *, int * );
 static int OverlapX( AstRegion *, AstRegion *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
@@ -299,6 +305,10 @@ void astInitNullRegionVtab_(  AstNullRegionVtab *vtab, const char *name, int *st
    parent_simplify = mapping->Simplify;
    mapping->Simplify = Simplify;
 
+/* Store replacement pointers for methods which will be over-ridden by
+   new member functions implemented here. */
+   mapping->MapMerge = MapMerge;
+
    region->GetDefUnc = GetDefUnc;
    region->Overlap = Overlap;
    region->OverlapX = OverlapX;
@@ -308,9 +318,6 @@ void astInitNullRegionVtab_(  AstNullRegionVtab *vtab, const char *name, int *st
    region->RegMesh = RegMesh;
    region->RegBasePick = RegBasePick;
 
-/* Store replacement pointers for methods which will be over-ridden by
-   new member functions implemented here. */
-
 /* Declare the copy constructor, destructor and class dump
    functions. */
    astSetDump( vtab, Dump, "NullRegion", "Boundless region" );
@@ -319,6 +326,476 @@ void astInitNullRegionVtab_(  AstNullRegionVtab *vtab, const char *name, int *st
    that the vtab is now initialised. */
    if( vtab == &class_vtab ) class_init = 1;
 
+}
+
+static int MapMerge( AstMapping *this, int where, int series, int *nmap,
+                     AstMapping ***map_list, int **invert_list, int *status ) {
+/*
+*  Name:
+*     MapMerge
+
+*  Purpose:
+*     Simplify a sequence of Mappings containing a NullRegion.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     int MapMerge( AstMapping *this, int where, int series, int *nmap,
+*                   AstMapping ***map_list, int **invert_list, int *status )
+
+*  Class Membership:
+*     NullRegion method (over-rides the protected astMapMerge method
+*     inherited from the Region class).
+
+*  Description:
+*     This function attempts to simplify a sequence of Mappings by
+*     merging a nominated NullRegion in the sequence with its neighbours,
+*     so as to shorten the sequence if possible.
+*
+*     In many cases, simplification will not be possible and the
+*     function will return -1 to indicate this, without further
+*     action.
+*
+*     In most cases of interest, however, this function will either
+*     attempt to replace the nominated NullRegion with a Mapping which it
+*     considers simpler, or to merge it with the Mappings which
+*     immediately precede it or follow it in the sequence (both will
+*     normally be considered). This is sufficient to ensure the
+*     eventual simplification of most Mapping sequences by repeated
+*     application of this function.
+*
+*     In some cases, the function may attempt more elaborate
+*     simplification, involving any number of other Mappings in the
+*     sequence. It is not restricted in the type or scope of
+*     simplification it may perform, but will normally only attempt
+*     elaborate simplification in cases where a more straightforward
+*     approach is not adequate.
+
+*  Parameters:
+*     this
+*        Pointer to the nominated NullRegion which is to be merged with
+*        its neighbours. This should be a cloned copy of the NullRegion
+*        pointer contained in the array element "(*map_list)[where]"
+*        (see below). This pointer will not be annulled, and the
+*        NullRegion it identifies will not be modified by this function.
+*     where
+*        Index in the "*map_list" array (below) at which the pointer
+*        to the nominated NullRegion resides.
+*     series
+*        A non-zero value indicates that the sequence of Mappings to
+*        be simplified will be applied in series (i.e. one after the
+*        other), whereas a zero value indicates that they will be
+*        applied in parallel (i.e. on successive sub-sets of the
+*        input/output coordinates).
+*     nmap
+*        Address of an int which counts the number of Mappings in the
+*        sequence. On entry this should be set to the initial number
+*        of Mappings. On exit it will be updated to record the number
+*        of Mappings remaining after simplification.
+*     map_list
+*        Address of a pointer to a dynamically allocated array of
+*        Mapping pointers (produced, for example, by the astMapList
+*        method) which identifies the sequence of Mappings. On entry,
+*        the initial sequence of Mappings to be simplified should be
+*        supplied.
+*
+*        On exit, the contents of this array will be modified to
+*        reflect any simplification carried out. Any form of
+*        simplification may be performed. This may involve any of: (a)
+*        removing Mappings by annulling any of the pointers supplied,
+*        (b) replacing them with pointers to new Mappings, (c)
+*        inserting additional Mappings and (d) changing their order.
+*
+*        The intention is to reduce the number of Mappings in the
+*        sequence, if possible, and any reduction will be reflected in
+*        the value of "*nmap" returned. However, simplifications which
+*        do not reduce the length of the sequence (but improve its
+*        execution time, for example) may also be performed, and the
+*        sequence might conceivably increase in length (but normally
+*        only in order to split up a Mapping into pieces that can be
+*        more easily merged with their neighbours on subsequent
+*        invocations of this function).
+*
+*        If Mappings are removed from the sequence, any gaps that
+*        remain will be closed up, by moving subsequent Mapping
+*        pointers along in the array, so that vacated elements occur
+*        at the end. If the sequence increases in length, the array
+*        will be extended (and its pointer updated) if necessary to
+*        accommodate any new elements.
+*
+*        Note that any (or all) of the Mapping pointers supplied in
+*        this array may be annulled by this function, but the Mappings
+*        to which they refer are not modified in any way (although
+*        they may, of course, be deleted if the annulled pointer is
+*        the final one).
+*     invert_list
+*        Address of a pointer to a dynamically allocated array which,
+*        on entry, should contain values to be assigned to the Invert
+*        attributes of the Mappings identified in the "*map_list"
+*        array before they are applied (this array might have been
+*        produced, for example, by the astMapList method). These
+*        values will be used by this function instead of the actual
+*        Invert attributes of the Mappings supplied, which are
+*        ignored.
+*
+*        On exit, the contents of this array will be updated to
+*        correspond with the possibly modified contents of the
+*        "*map_list" array.  If the Mapping sequence increases in
+*        length, the "*invert_list" array will be extended (and its
+*        pointer updated) if necessary to accommodate any new
+*        elements.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     If simplification was possible, the function returns the index
+*     in the "map_list" array of the first element which was
+*     modified. Otherwise, it returns -1 (and makes no changes to the
+*     arrays supplied).
+
+*  Notes:
+*     - A value of -1 will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstNullRegion *oldint;  /* Pointer to supplied NullRegion */
+   AstMapping *map;      /* Pointer to adjacent Mapping */
+   AstMapping *new;      /* Simplified or merged Region */
+   int i1;               /* Index of first Mapping merged */
+   int i;                /* Loop counter */
+   int result;           /* Result value to return */
+
+/* Initialise. */
+   result = -1;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the NullRegion. */
+   oldint = (AstNullRegion *) this;
+
+/* First of all, see if the NullRegion can be replaced by a simpler Region,
+   without reference to the neighbouring Regions in the list.           */
+/* =====================================================================*/
+
+/* Try to simplify the NullRegion. If the pointer value has changed, we assume
+   some simplification took place. */
+   new = astSimplify( oldint );
+   if( new != (AstMapping *) oldint ) {
+
+/* Annul the NullRegion pointer in the list and replace it with the new Region
+   pointer, and indicate that the forward transformation of the returned
+   Region should be used (not really needed but keeps things clean). */
+      (void) astAnnul( ( *map_list )[ where ] );
+      ( *map_list )[ where ] = new;
+      ( *invert_list )[ where ] = 0;
+
+/* Return the index of the first modified element. */
+      result = where;
+
+/* If the NullRegion itself could not be simplified, see if it can be merged
+   with the Regions on either side of it in the list. We can only merge
+   in parallel. */
+/* =====================================================================*/
+   } else if( ! series ){
+      new = astAnnul( new );
+
+/* Attempt to merge the NullRegion with its lower neighbour (if any). */
+      if( where > 0 ) {
+         i1 = where - 1;
+         map = ( *map_list )[ where - 1 ];
+         if( astIsARegion( map ) ) {
+            new = (AstMapping *) MergeNullRegion( oldint, (AstRegion *) map,
+                                                  0, status );
+         }
+      }
+
+/* If this did not produced a merged Region, attempt to merge the NullRegion 
+   with its upper neighbour (if any). */
+      if( !new && where < *nmap - 1 ) {
+         i1 = where;
+         map = ( *map_list )[ where + 1 ];
+         if( astIsARegion( map ) ) {
+            new = (AstMapping *) MergeNullRegion( oldint, (AstRegion *) map,
+                                                  1, status );
+         }
+      }
+
+/* If succesfull... */
+      if( new ){
+
+/* Annul the first of the two Mappings, and replace it with the merged 
+   Region. Also clear the invert flag. */ 
+         (void) astAnnul( ( *map_list )[ i1 ] );
+         ( *map_list )[ i1 ] = new;
+         ( *invert_list )[ i1 ] = 0;
+
+/* Annul the second of the two Mappings, and shuffle down the rest of the 
+   list to fill the gap. */
+         (void) astAnnul( ( *map_list )[ i1 + 1 ] );
+         for ( i = i1 + 2; i < *nmap; i++ ) {
+            ( *map_list )[ i - 1 ] = ( *map_list )[ i ];
+            ( *invert_list )[ i - 1 ] = ( *invert_list )[ i ];
+         }
+
+/* Clear the vacated element at the end. */
+         ( *map_list )[ *nmap - 1 ] = NULL;
+         ( *invert_list )[ *nmap - 1 ] = 0;
+
+/* Decrement the Mapping count and return the index of the first
+   modified element. */
+         ( *nmap )--;
+         result = i1;
+      }
+
+   } else {
+      new = astAnnul( new );
+   }
+
+/* Return the result. */
+   return result;
+}
+
+static AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg, 
+                                   int intfirst, int *status ) {
+/*
+*  Name:
+*     MergeNullRegion
+
+*  Purpose:
+*     Attempt to merge a NullRegion with another Region to form a Region of 
+*     higher dimensionality.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "box.h"
+*     AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg, 
+*                                 int intfirst, int *status ) 
+
+*  Class Membership:
+*     NullRegion member function.
+
+*  Description:
+*     This function attempts to combine the supplied Regions together
+*     into a Region of higher dimensionality. 
+
+*  Parameters:
+*     this
+*        Pointer to a NullRegion.
+*     reg
+*        Pointer to another Region.
+*     intfirst
+*        If non-zero, then the NullRegion axes are put first in the new Region.
+*        Otherwise, the other Region's axes are put first.
+*     status
+*        Pointer to the inherited status value.
+
+*  Returned Value:
+*     A pointer to a new region, or NULL if the supplied Regions could
+*     not be merged.
+*/
+
+/* Local Variables: */
+   AstFrame *bfrm;           /* Pointer to base Frame for "result" */
+   AstFrame *cfrm;           /* Pointer to current Frame for "result" */
+   AstFrame *frm_reg;        /* Pointer to Frame from "reg" */
+   AstFrame *frm_this;       /* Pointer to Frame from "this" */
+   AstMapping *bcmap;        /* Base->current Mapping for "result" */
+   AstMapping *map_reg;      /* Base->current Mapping from "reg" */
+   AstMapping *map_this;     /* Base->current Mapping from "this" */
+   AstMapping *sbunc;        /* Simplified uncertainty */
+   AstRegion *bunc;          /* Base Frame uncertainty Region */
+   AstRegion *new;           /* Pointer to new NullRegion in base Frame */
+   AstRegion *result;        /* Pointer to returned NullRegion in current Frame */
+   AstRegion *unc_reg;       /* Current Frame uncertainty Region from "reg" */
+   AstRegion *unc_this;      /* Current Frame uncertainty Region from "this" */
+   double fac_reg;           /* Ratio of used to default MeshSize for "reg" */
+   double fac_this;          /* Ratio of used to default MeshSize for "this" */
+   int closed_reg;           /* Closed attribute value for other supplied Region */
+   int closed_this;          /* Closed attribute value for supplied NullRegion  */
+   int msz_reg;              /* Original MeshSize for "reg" */
+   int msz_reg_set;          /* Was MeshSize originally set for "reg"? */
+   int msz_this;             /* Original MeshSize for "this" */
+   int msz_this_set;         /* Was MeshSize originally set for "this"? */
+   int nax;                  /* Number of axes in "result" */
+   int nax_reg;              /* Number of axes in "reg" */
+   int nax_this;             /* Number of axes in "this" */
+   int neg_reg;              /* Negated attribute value for other supplied Region */
+   int neg_this;             /* Negated attribute value for supplied NullRegion  */
+
+/* Initialise */
+   result = NULL;
+
+/* Check the local error status. */
+   if ( !astOK ) return result;
+
+/* Get the Closed attributes of the two Regions. They must be the same in 
+   each Region if we are to merge the Regions. */
+   closed_this = astGetClosed( this );
+   closed_reg = astGetClosed( reg );
+   if( closed_this == closed_reg ) {
+
+/* Get the Nagated attributes of the two Regions. */
+      neg_this = astGetNegated( this );
+      neg_reg = astGetNegated( reg );
+
+/* Get the number of axes in the two supplied Regions. */
+      nax_reg = astGetNaxes( reg );
+      nax_this = astGetNaxes( this );
+   
+/* If the Regions can be combined, get the number of axes the
+   combination will have. */
+      nax = nax_reg + nax_this;
+   
+/* Get the base Frames from the two Region FrameSets, and combine them
+   into a single CmpFrame that will be used to create any new Region. */
+      frm_this = astGetFrame( ((AstRegion *) this)->frameset, AST__BASE );
+      frm_reg = astGetFrame( reg->frameset, AST__BASE );
+   
+      if( intfirst ) {
+         bfrm = (AstFrame *) astCmpFrame( frm_this, frm_reg, "", status );
+      } else {
+         bfrm = (AstFrame *) astCmpFrame( frm_reg, frm_this, "", status );
+      }
+   
+      frm_this = astAnnul( frm_this );
+      frm_reg = astAnnul( frm_reg );
+   
+/* Indicate we do not yet have a merged Region. */
+      new = NULL;
+   
+/* We only check for merging with another NullRegion (other classes such
+   as Box and Interval check for merging of NullRegions with other classes). 
+   The result will be an NullRegion. Both Regions must have the same value 
+   for the Negated flag. */
+      if( astIsANullRegion( reg ) && neg_this == neg_reg ) {
+         new = (AstRegion *) astNullRegion( bfrm, NULL, "", status );
+   
+/* Propagate remaining attributes of the supplied Region to it. */
+         astRegOverlay( new, this );
+
+/* Ensure the Negated flag is set correctly in the returned NullRegion. */
+         if( neg_this ) {
+            astSetNegated( new, neg_this );
+         } else {
+            astClearNegated( new );
+         }
+
+/* If both the supplied Regions have uncertainty, assign the new Region an 
+   uncertainty. */
+         if( astTestUnc( this ) && astTestUnc( reg ) ) {
+
+/* Get the uncertainties from the two supplied Regions. */
+            unc_this = astGetUncFrm( this, AST__BASE );
+            unc_reg = astGetUncFrm( reg, AST__BASE );
+
+/* Combine them into a single Region (a Prism), in the correct order. */
+            if( intfirst ) {
+               bunc = (AstRegion *) astPrism( unc_this, unc_reg, "", status );
+            } else {
+               bunc = (AstRegion *) astPrism( unc_reg, unc_this, "", status );
+            }
+
+/* Attempt to simplify the Prism. */
+            sbunc = astSimplify( bunc );
+
+/* Use the simplified Prism as the uncertainty for the returned Region. */
+            astSetUnc( new, sbunc );
+
+/* Free resources. */
+            sbunc = astAnnul( sbunc );
+            bunc = astAnnul( bunc );
+            unc_reg = astAnnul( unc_reg );
+            unc_this = astAnnul( unc_this );
+         }
+
+/* Get the current Frames from the two Region FrameSets, and combine them
+   into a single CmpFrame. */
+         frm_this = astGetFrame( ((AstRegion *) this)->frameset, AST__CURRENT );
+         frm_reg = astGetFrame( reg->frameset, AST__CURRENT );
+      
+         if( intfirst ) {
+            cfrm = (AstFrame *) astCmpFrame( frm_this, frm_reg, "", status );
+         } else {
+            cfrm = (AstFrame *) astCmpFrame( frm_reg, frm_this, "", status );
+         }
+      
+/* Get the base -> current Mappings from the two Region FrameSets, and 
+   combine them into a single parallel CmpMap that connects bfrm and cfrm. */
+         map_this = astGetMapping( ((AstRegion *) this)->frameset, AST__BASE, 
+                                   AST__CURRENT );
+         map_reg = astGetMapping( reg->frameset, AST__BASE, AST__CURRENT );
+      
+         if( intfirst ) {
+            bcmap = (AstMapping *) astCmpMap( map_this, map_reg, 0, "", 
+                                              status );
+         } else {
+            bcmap = (AstMapping *) astCmpMap( map_reg, map_this, 0, "", 
+                                              status );
+         }
+      
+/* Map the new Region into the new current Frame. */
+         result = astMapRegion( new, bcmap, cfrm );
+
+/* The filling factor in the returned is the product of the filling
+   factors for the two supplied Regions. */
+         if( astTestFillFactor( reg ) || astTestFillFactor( this ) ) {
+            astSetFillFactor( result, astGetFillFactor( reg )*
+                                      astGetFillFactor( this ) );
+         }
+
+/* If the MeshSize value is set in either supplied Region, set a value
+   for the returned Region which scales the default value by the
+   product of the scaling factors for the two supplied Regions. First see
+   if either MeshSize value is set. */
+         msz_this_set = astTestMeshSize( this );
+         msz_reg_set = astTestMeshSize( reg );
+         if( msz_this_set || msz_reg_set ) {
+
+/* If so, get the two MeshSize values (one of which may be a default
+   value), and then clear them so that the default value will be returned
+   in future. */
+            msz_this = astGetMeshSize( this );
+            msz_reg = astGetMeshSize( reg );
+            astClearMeshSize( this );
+            astClearMeshSize( reg );
+
+/* Get the ratio of the used MeshSize to the default MeshSize for both
+   Regions. */
+            fac_this = (double)msz_this/(double)astGetMeshSize( this );
+            fac_reg = (double)msz_reg/(double)astGetMeshSize( reg );
+
+/* The MeshSize of the returned Returned is the default value scaled by
+   the product of the two ratios found above. */
+            astSetMeshSize( new, fac_this*fac_reg*astGetMeshSize( new ) );
+
+/* Re-instate the original MeshSize values for the supplied Regions (if
+   set) */
+            if( msz_this_set ) astSetMeshSize( this, msz_this );
+            if( msz_reg_set ) astSetMeshSize( reg, msz_reg );
+         }
+
+/* Free remaining resources */
+         frm_this = astAnnul( frm_this );
+         frm_reg = astAnnul( frm_reg );
+         map_this = astAnnul( map_this );
+         map_reg = astAnnul( map_reg );
+         bcmap = astAnnul( bcmap );
+         cfrm = astAnnul( cfrm );
+      }
+   }
+
+/* If an error has occurred, annul the returned pointer. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the result. */
+   return result;
 }
 
 static int Overlap( AstRegion *this, AstRegion *that, int *status ){

@@ -1,0 +1,8 @@
+Makefile
+config.log
+config.status
+pkgIndex.tcl
+zlibtclConfig.sh
+libzlibtclstub1.2.1.a
+libzlibtcl1.2.1.so
+

@@ -132,7 +132,7 @@ SUBDIRS = @subdirs@
 LN_S=@LN_S@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
-SVNVERSION = @SVNVERSION@
+GIT = @GIT@
 
 # Java support: need a java runtime.  The Java programs below use the
 # jar in $(BUILDSUPPORTCP), which is installed
@@ -154,10 +154,11 @@ RECURSIVE_TARGETS = all-recursive check-recursive \
 all: all-recursive
 
 # Note to track the build we create a world-stamp file with the current date
-# and a starlink.version file with the basename of the directory that the
-# repository was checked out from (usually trunk, but other names for release
-# branches) plus the number derived from svnversion, which reflects the
-# current state of the checkout.
+# and a starlink.version file with the current branch name  (usually master, 
+# but other names for release branches are possible), the sha1 of the
+# last commit which reflects the current state of the checkout and the
+# date and time in GMT (assuming the system has the correct timezone set)
+# as a single value (YYYYMMDDHHMMSS).
 world: $(ALL_TARGETS)
 	- if test -d $(prefix)/starjava/docs; then \
 	  test -f $(prefix)/bin/hlink \
@@ -172,11 +173,12 @@ world: $(ALL_TARGETS)
 	date >world-stamp
 	$(INSTALL_DATA) world-stamp $(MANIFESTS)/world-stamp
 	rm -f starlink.version
-	expr "`svn info | grep URL`" :  '.*/\([^/]*\)' > starlink.version
-	- if test -n "$(SVNVERSION)"; then \
-	   $(SVNVERSION) . >> starlink.version; \
+	- if test -n "$(GIT)"; then \
+	   $(GIT) branch | grep '^\*' | sed 's,\* ,,' > starlink.version; \
+	   $(GIT) rev-parse --verify HEAD >> starlink.version; \
+	   date -u '+%Y%m%d%H%M%S' >> starlink.version; \
+	   $(INSTALL_DATA) starlink.version $(MANIFESTS)/starlink.version; \
 	fi
-	$(INSTALL_DATA) starlink.version $(MANIFESTS)/starlink.version
 
 # Avoid doing anything if the variable JAVA is NOJAVA -- this is true if
 # we're using this file unconfigured during bootstrap (see ./bootstrap

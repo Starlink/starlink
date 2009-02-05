@@ -218,6 +218,8 @@
      :               LBNDE, UBNDE, STATUS )
 
 *  Now fit this region.
+      NX = 0
+      NY = 0
       CALL RTD1_DOFIT( NFIT, %VAL( CNF_PVAL( IPMASK ) ), DIM1, DIM2, 
      :                 TYPE, HAVVAR, IPVAR, IPIMG, IPC, IPTX, NX, IPTY,
      :                 NY, SIGMA, STATUS )

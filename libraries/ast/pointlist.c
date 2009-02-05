@@ -204,6 +204,7 @@ static int GetListSize( AstPointList *, int * );
 static int GetObjSize( AstObject *, int * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
 static void Copy( const AstObject *, AstObject *, int * );
+static void PointListPoints( AstPointList *, AstPointSet **, int *);
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void Points( AstPointList *, int, int, double *, int * );
@@ -736,6 +737,7 @@ void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name,
    vtab->GetListSize = GetListSize;
    vtab->GetEnclosure = GetEnclosure;
    vtab->SetEnclosure = SetEnclosure;
+   vtab->PointListPoints = PointListPoints;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -1106,6 +1108,49 @@ MAKE_MASK(UB,unsigned char)
 
 /* Undefine the macro. */
 #undef MAKE_MASK
+
+void PointListPoints( AstPointList *this, AstPointSet **pset, int *status) {
+/*
+*+
+*  Name:
+*     astPointListPoints
+
+*  Purpose:
+*     Return the defining points of a PointList.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "pointlist.h"
+*     astPointListPoints( AstPointList *this, AstPointSet **pset )
+
+*  Class Membership:
+*     Region virtual function.
+
+*  Description:
+*     This function returns the axis values at the points defining the
+*     supplied PointList.
+
+*  Parameters:
+*     this
+*        Pointer to the PointList.
+*     pset
+*        Address of a location at which to return a pointer to a PointSet
+*        holding the points in the PointList, in the base Frame of the 
+*        encapsulated FrameSet. The returned Pointer should be annulled
+*        when no longer needed.
+
+*-
+*/
+
+/* Check the inherited status. */
+   if( !astOK ) return;
+
+/* Return a clone of the PointSet holding the points defining the PointList. */
+   *pset = astClone( ((AstRegion *) this)->points );
+
+}
 
 static void Points( AstPointList *this, int max_coord, int max_point, 
                     double *out, int *status ) {
@@ -3192,3 +3237,8 @@ AstRegion *astGetEnclosure_( AstPointList *this, int *status ) {
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,PointList,GetEnclosure))( this, status );
 }
+void astPointListPoints_( AstPointList *this, AstPointSet **pset, int *status) {
+   if ( !astOK ) return;
+   return (**astMEMBER(this,PointList,PointListPoints))( this, pset, status );
+}
+

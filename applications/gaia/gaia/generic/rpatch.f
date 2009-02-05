@@ -244,6 +244,7 @@
      :                    EL, STATUS )
          ELSE
             HAVVAR = .FALSE.
+            IPVAR = 0
          END IF
       END IF
 

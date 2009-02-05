@@ -1,0 +1,17 @@
+.libs
+Makefile
+Makefile.in
+acinclude.m4
+aclocal.m4
+autom4te.cache
+config.cache
+config.log
+config.status
+configure
+grfont.dat
+libtool
+pgpack
+starconf.m4
+starconf.status
+starconf.status.local
+

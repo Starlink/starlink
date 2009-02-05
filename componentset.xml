@@ -176,7 +176,7 @@ Starlink applications, and a number of other common data formats.
 </component>
 
 <component id="cupid" support="S">
-  <version>0.0-38</version>
+  <version>0.0-39</version>
   <path>applications/cupid</path>
   <description>CUPID - AST applications</description>
   <abstract><p>
@@ -658,7 +658,7 @@ JCMT telescope based on Mauna Kea, Hawaii.
 </component>
 
 <component id="gaia" support="S">
-  <version>4.2-2</version>
+  <version>4.3-0</version>
   <path>applications/gaia</path>
   <description>GAIA - Graphical Astronomy and Image Analysis</description>
   <abstract><p>
@@ -866,7 +866,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>1.9-9</version>
+  <version>1.10</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -1373,7 +1373,7 @@ registration, sky subtraction, calculation of Stokes parameters, and
 display of vector maps.  
 </p></abstract>
   <dependencies >
-    <build>pcs</build><build>ast</build><build>cat</build><build>chr</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>prm</build><build>sae</build><build>startcl</build><build>tcl</build><build>trn</build><build>ifd</build><build option='link'>sla</build><build option='link'>nbs</build><build option='link'>kaplibs</build><build option='link'>shl</build><build option='link'>tcl</build><use>kappa</use><use>ccdpack</use><use>tcl</use><use>tk</use><use>startcl</use><sourceset>star2html</sourceset>
+    <build>pcs</build><build>ast</build><build>cat</build><build>chr</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>prm</build><build>sae</build><build>startcl</build><build>tcl</build><build>trn</build><build>ifd</build><build option='link'>sla</build><build option='link'>kaplibs</build><build option='link'>shl</build><build option='link'>tcl</build><use>kappa</use><use>ccdpack</use><use>tcl</use><use>tk</use><use>startcl</use><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1574,7 +1574,7 @@ reduce your SCUBA-2 data.
       <uname>timj</uname>
     </person>
   </developers>
-  <documentation> sun259</documentation>
+  <documentation> sun258 sun259</documentation>
   <bugreports>t.jenness@jach.hawaii.edu</bugreports>
 </component>
 
@@ -1685,7 +1685,7 @@ UNIX).
 </component>
 
 <component id="star2html" support="S">
-  <version>1.6-0</version>
+  <version>1.6-1</version>
   <path>applications/star2html</path>
   <description>Convert Starlink documents to hypertext</description>
   <abstract><p>Star2HTML lets you write (or convert) a Starlink document
@@ -4806,7 +4806,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ast" support="S">
-  <version>4.6-2</version>
+  <version>5.1-0</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -4989,7 +4989,7 @@ No longer under active control.
 </component>
 
 <component id="ems" support="S">
-  <version>2.2-0</version>
+  <version>2.3-0</version>
   <path>libraries/ems</path>
   <description>EMS -- Error Message Service</description>
   <abstract><p>The purpose of EMS is to provide facilities for
@@ -5177,7 +5177,7 @@ No longer under active control.
 </component>
 
 <component id="gsd" support="U">
-  <version>1.0-1</version>
+  <version>1.0-2</version>
   <path>libraries/gsd</path>
   <description>Global Section Datafile (GSD) access library</description>
   <abstract><p>This library provides read-only access to GSD files created at the James Clerk Maxwell Telescope. It is mainly useful for accessing JCMT archive data.
@@ -5459,7 +5459,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="mers" support="U">
-  <version>1.8-2</version>
+  <version>2.0-6</version>
   <path>libraries/mers</path>
   <description>Message and Error Reporting Systems</description>
   <abstract><p>This package contains two Fortran subroutine libraries,
@@ -6228,6 +6228,20 @@ Ultrix and for SunOS and may still work for them.
   </copyright>
 </component>
 
+<component id="xerces-c" support="U">
+  <version>3.0.0</version>
+  <path>thirdparty/apache/xerces-c</path>
+  <description>Apache Xerces-c library for parsing XML</description>
+  <dependencies >
+    
+  </dependencies>
+  <!--developers>
+    <person>
+    </person>
+  </developers-->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
 <component id="pgplot" support="S">
   <version>5.2.2-2</version>
   <path>thirdparty/caltech/pgplot</path>
@@ -6656,6 +6670,24 @@ and some distortion.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
+<component id="tcldict" support="U">
+  <version>8.5.2</version>
+  <path>thirdparty/tclsys/tcldict</path>
+  <description>tcldict</description>
+  <dependencies >
+    <build>tcl</build><build>tk</build>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Peter W. Draper</name>
+      <uname>pwd</uname>
+      <email>p.w.draper@durham.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
 <component id="tcllibs" support="U">
   <version>1.0.0</version>
   <path>thirdparty/tclsys/tcllibs</path>
@@ -6678,6 +6710,24 @@ and some distortion.
   <version>8.4.0</version>
   <path>thirdparty/tclsys/tclx</path>
   <description>TclX</description>
+  <dependencies >
+    <build>tcl</build><build>tk</build>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Peter W. Draper</name>
+      <uname>pwd</uname>
+      <email>p.w.draper@durham.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
+<component id="tdom" support="U">
+  <version>0.8.2</version>
+  <path>thirdparty/tclsys/tdom</path>
+  <description>tDOM</description>
   <dependencies >
     <build>tcl</build><build>tk</build>
   </dependencies>

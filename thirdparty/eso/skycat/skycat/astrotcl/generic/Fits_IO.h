@@ -4,7 +4,7 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id$" 
+ * "@(#) $Id: Fits_IO.h 28950 2009-01-23 12:49:27Z pdraper $" 
  *
  * Fits_IO.h - declarations for class FitsIO, a class representing the
  *            contents of a FITS image file (or other image source)
@@ -33,7 +33,7 @@
  * abrighto        02/01/05  Renamed .h file to avoid conflict with cfitsio's 
  *                           "fitsio.h" on case-ignoring file systems, such as 
  *                           Mac OSX.
- * Peter W. Draper 23/01/09  Added dummyReallocFile.
+ * Peter W. Draper 23/01/09  Added dummyReallocFile and length_.
 
  */
 
@@ -68,6 +68,7 @@ protected:
     //  at HDU functions from ther  
     fitsfile* fitsio_;		// handle to use for cfitsio C library routines
     static FitsIO* fits_;	// current class ptr for reallocFile callback
+    static size_t length_;	// current mapped length for reallocFile callback
 
     Mem primaryHeader_;		// the primary header, if there is more than one HDU
 

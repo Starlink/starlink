@@ -120,6 +120,7 @@ typedef struct AstBoxVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
+   void (* BoxPoints)( AstBox *, double *, double *, int *);
 } AstBoxVtab;
 
 #if defined(THREAD_SAFE) 
@@ -174,6 +175,7 @@ AstBox *astLoadBox_( void *, size_t, AstBoxVtab *,
 /* Prototypes for member functions. */
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
+void astBoxPoints_( AstBox *, double *, double *, int *);
 #endif
 
 /* Function interfaces. */
@@ -223,6 +225,7 @@ astINVOKE(O,astLoadBox_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PTR))
    to the wrong sort of Object is supplied. */
 
 #if defined(astCLASS)            /* Protected */
+#define astBoxPoints(this,centre,corner) astINVOKE(V,astBoxPoints_(astCheckBox(this),centre,corner,STATUS_PTR))
 #endif
 #endif
 

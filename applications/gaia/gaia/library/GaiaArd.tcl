@@ -490,7 +490,8 @@ itcl::class gaia::GaiaArd {
    protected method make_tmpname_ {} {
       if { $tempfiles_ == {} } {
          set tempfiles_ \
-            [gaia::GaiaTempName \#auto -prefix "GaiaArdIn" -type ".Dat"]
+            [gaia::GaiaTempName \#auto -prefix "GaiaArdIn" -type ".Dat" \
+                -exists 0]
       }
       return [$tempfiles_ get_name]
    }
@@ -499,7 +500,8 @@ itcl::class gaia::GaiaArd {
    protected method make_tmpimage_ {} {
       if { $tempimages_ == {} } {
          set tempimages_ \
-            [gaia::GaiaTempName \#auto -prefix "GaiaArdImg" -type ".sdf"]
+            [gaia::GaiaTempName \#auto -prefix "GaiaArdImg" -type ".sdf" \
+               -exists 0]
       }
       return [$tempimages_ get_name]
    }

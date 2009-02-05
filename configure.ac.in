@@ -29,10 +29,10 @@ AC_ARG_VAR([JAVA], [Location of java runtime])
 AC_PROG_MAKE_SET
 AC_PROG_LN_S
 
-dnl    Locate svnversion command, if not already defined.
-: ${SVNVERSION='svnversion'}
-if test "${SVNVERSION}" = "svnversion"; then
-   AC_PATH_PROG(SVNVERSION, svnversion)
+dnl    Locate git command, if not already defined.
+: ${GIT='git'}
+if test "${GIT}" = "git"; then
+   AC_PATH_PROG(GIT, git)
 fi
 AC_SUBST(SVNVERSION)
 
