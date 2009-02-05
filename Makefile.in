@@ -157,8 +157,7 @@ all: all-recursive
 # and a starlink.version file with the current branch name  (usually master, 
 # but other names for release branches are possible), the sha1 of the
 # last commit which reflects the current state of the checkout and the
-# date and time in GMT (assuming the system has the correct timezone set)
-# as a single value (YYYYMMDDHHMMSS).
+# date and time in of that commit in ISO8601 format.
 world: $(ALL_TARGETS)
 	- if test -d $(prefix)/starjava/docs; then \
 	  test -f $(prefix)/bin/hlink \
@@ -176,7 +175,7 @@ world: $(ALL_TARGETS)
 	- if test -n "$(GIT)"; then \
 	   $(GIT) branch | grep '^\*' | sed 's,\* ,,' > starlink.version; \
 	   $(GIT) rev-parse --verify HEAD >> starlink.version; \
-	   date -u '+%Y%m%d%H%M%S' >> starlink.version; \
+     $(GIT) log -n 1 HEAD --pretty=format:%cd --date=iso >> starlink.version; \
 	   $(INSTALL_DATA) starlink.version $(MANIFESTS)/starlink.version; \
 	fi
 
