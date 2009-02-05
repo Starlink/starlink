@@ -1,0 +1,19 @@
+#!/bin/tcsh
+
+if( "$1" == "" ) then
+   echo "Usage: maketest <test>"
+   echo "   (e.g. maketest regions)"
+   exit
+endif
+
+set a = "test$1"
+
+echo "Building $a"
+g95 -fno-second-underscore -g -o $a $a.f \
+-L/star/lib -I/star/include `ast_link -ems` `chr_link` `err_link`
+
+echo "Running $a"
+
+$a
+
+
