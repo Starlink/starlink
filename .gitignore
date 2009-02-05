@@ -81,13 +81,13 @@ ylwrap
 
 ._*
 lib*.dylib
-a.out.dSYM
 *.dSYM
 
 # Starconf and Starlink build and configure
 
 component.xml
 componentinfo.dtd
+componentset-extrainfo.xml
 dtask_applic.f
 dtask_libtool
 fac_*_err
@@ -106,6 +106,7 @@ world-stamp
 put them in global.
 
 applications/astrom/params.f
+applications/astrom/astrom
 
 applications/atools/atools.csh
 applications/atools/atools.icl
@@ -375,6 +376,8 @@ applications/dipso/dipsosetup
 applications/dipso/dipsosetup.sh
 applications/dipso/dipso_link
 applications/dipso/my_dipso
+
+applications/docfind/docfind
 
 applications/echomop/doc/echomop_hyper.tar
 applications/echomop/doc/sun152.latex_tar
@@ -1028,7 +1031,6 @@ libraries/prm/PRM_PAR
 libraries/prm/prm_par.h
 
 libraries/shl/browsehlp
-libraries/starmem/starmem_link
 
 libraries/sla/f77.h
 libraries/sla/gresid.F
@@ -1038,4 +1040,4 @@ libraries/sla/vers.f
 libraries/sla/wait.f
 
 libraries/starmem/mem.h
-
+libraries/starmem/starmem_link
