@@ -65,7 +65,7 @@ use version;
                 'Funcs' => [ @EXPORT_OK ],
                );
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 $DEBUG = 0;
 
 # This is the cache used to store the version numbers 
@@ -986,15 +986,15 @@ sub _get_version ($) {
     @version = _get_version_from_datestamp( 1, $app )
       unless defined $version[0];
 
-  } else {
-    # now try manifest
-    @version = _get_version_from_manifest( 0, $app );
-
-    # Okay, no PROG_DIR defined so look in /star (or wherever)
-    @version = _get_version_from_datestamp( 0, $app )
-      unless defined $version[0];
-
   }
+
+  # now try normal manifest location
+  @version = _get_version_from_manifest( 0, $app )
+    unless defined $version[0];
+
+  # Okay, no PROG_DIR defined so look in /star (or wherever)
+  @version = _get_version_from_datestamp( 0, $app )
+    unless defined $version[0];
 
   # If we have something we need to cache, cache it
   if (defined $version[0]) {
