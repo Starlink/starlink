@@ -48,6 +48,7 @@ lib*.so
 .deps
 .libs
 compile
+confdefs.h
 config.guess
 config.cache
 config.h
