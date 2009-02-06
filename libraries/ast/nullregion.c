@@ -574,7 +574,7 @@ static AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg,
 *     Private function.
 
 *  Synopsis:
-*     #include "box.h"
+*     #include "nullregion.h"
 *     AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg, 
 *                                 int intfirst, int *status ) 
 
