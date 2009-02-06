@@ -77,6 +77,11 @@ stamp-h2
 ylwrap
 *-stamp
 
+# Perl
+
+pm_to_blib
+blib
+
 # Mac specific
 
 ._*
@@ -1041,3 +1046,11 @@ libraries/sla/wait.f
 
 libraries/starmem/mem.h
 libraries/starmem/starmem_link
+
+perlmods/GSD/GSD.c
+perlmods/Starlink/ADAM/ADAM.c
+perlmods/Starlink/AST/AST.c
+perlmods/Starlink/Config/Config.pm
+perlmods/Starlink/EMS/EMS.c
+perlmods/Starlink/NBS/NBS.c
+perlmods/Starlink/NDF/NDF.c
