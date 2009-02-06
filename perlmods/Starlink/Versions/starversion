@@ -58,7 +58,10 @@ if (@list) {
 
   # Loop over all the supplied arguments
   foreach my $app (@list) {
-  
+
+    # Skip world-stamp
+    next if $app eq 'world-stamp';
+
     # Get the version information
     my ($major, $minor, $patchlevel) = starversion($app);
     my $string = starversion_string($app);
