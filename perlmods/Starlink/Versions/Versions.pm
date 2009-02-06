@@ -988,11 +988,11 @@ sub _get_version ($) {
 
   } else {
     # now try manifest
-    @version = _get_version_from_manifest( 0, $app ) 
-      unless defined $version[0];
+    @version = _get_version_from_manifest( 0, $app );
 
     # Okay, no PROG_DIR defined so look in /star (or wherever)
-    @version = _get_version_from_datestamp( 0, $app );
+    @version = _get_version_from_datestamp( 0, $app )
+      unless defined $version[0];
 
   }
 
