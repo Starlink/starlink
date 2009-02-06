@@ -49,21 +49,21 @@ use strict;
 use base qw/ Exporter /;
 use vars qw/ $VERSION @EXPORT_OK $DEBUG %EXPORT_TAGS/;
 
-use Symbol;             # For lexical file handles
+use Symbol;                           # For lexical file handles
 use Starlink::Config qw/ :override /; # For location of root starlink dir
-use File::Spec;         # For catfile()
+use File::Spec;                       # For catfile()
 use version;
 
 @EXPORT_OK = qw/ 
-  starversion starversion_string starversion_minor
-  starversion_major starversion_patchlevel
-  starversion_cmp starversion_eq starversion_gt starversion_lt
-  starversion_ge starversion_le starversion_vstring
-  /;
+                 starversion starversion_string starversion_minor
+                 starversion_major starversion_patchlevel
+                 starversion_cmp starversion_eq starversion_gt starversion_lt
+                 starversion_ge starversion_le starversion_vstring
+               /;
 
 %EXPORT_TAGS = (
-		'Funcs' => [ @EXPORT_OK ],
-		);
+                'Funcs' => [ @EXPORT_OK ],
+               );
 
 $VERSION = '1.03';
 $DEBUG = 0;
@@ -555,10 +555,10 @@ sub _get_app_datestamp_dir ($) {
     # special case bin dirs
     if ($appdir =~ /bin$/) {
       return File::Spec->catdir($appdir,
-				File::Spec->updir, 'dates');
+                                File::Spec->updir, 'dates');
     } else {
       return File::Spec->catdir($appdir, File::Spec->updir, 
-				File::Spec->updir, 'dates');
+                                File::Spec->updir, 'dates');
     }
   }
   return undef;
@@ -587,10 +587,10 @@ sub _get_app_manifest_dir ($) {
     # special case bin dirs
     if ($appdir =~ /bin$/) {
       return File::Spec->catdir($appdir,
-				File::Spec->updir, 'manifests');
+                                File::Spec->updir, 'manifests');
     } else {
       return File::Spec->catdir($appdir, File::Spec->updir, 
-				File::Spec->updir, 'manifests');
+                                File::Spec->updir, 'manifests');
     }
   }
   return undef;
@@ -739,8 +739,8 @@ sub _read_datestamp_file ($) {
       # Return immediately, the file will be closed automatically
       # but close it anyway for clarity
       if (defined $version[0]) {
-	close($sym);
-	return (@version);
+        close($sym);
+        return (@version);
       }
     }
   }
@@ -774,8 +774,8 @@ sub _read_manifest_file ($) {
       # Return immediately, the file will be closed automatically
       # but close it anyway for clarity
       if (defined $version[0]) {
-	close($sym);
-	return (@version);
+        close($sym);
+        return (@version);
       }
     }
   }
@@ -960,15 +960,15 @@ sub _get_version ($) {
     my $global = _get_global_version();
     if (defined $global) {
       $CACHE{$app} = {
-		      MAJOR => undef,
-		      MINOR => undef,
-		      PATCHLEVEL => undef,
-		      VERSION => undef,
-		      OBJECT => undef,
-		      STRING => $global->{STRING},
-		      COMMIT => $global->{COMMIT},
-		      COMMITDATE => $global->{COMMITDATE},
-		     };
+                      MAJOR => undef,
+                      MINOR => undef,
+                      PATCHLEVEL => undef,
+                      VERSION => undef,
+                      OBJECT => undef,
+                      STRING => $global->{STRING},
+                      COMMIT => $global->{COMMIT},
+                      COMMITDATE => $global->{COMMITDATE},
+                     };
     }
     return (defined $global ? %{ $CACHE{$app} } : () );
   }
@@ -999,12 +999,12 @@ sub _get_version ($) {
   # If we have something we need to cache, cache it
   if (defined $version[0]) {
     $CACHE{$app} = {
-		    MAJOR => $version[0],
-		    MINOR => $version[1],
-		    PATCHLEVEL => $version[2],
-		    STRING => "V$version[0].$version[1]-$version[2]",
-        OBJECT => version->new(join(".",@version[0..2])),
-		   };
+                    MAJOR => $version[0],
+                    MINOR => $version[1],
+                    PATCHLEVEL => $version[2],
+                    STRING => "V$version[0].$version[1]-$version[2]",
+                    OBJECT => version->new(join(".",@version[0..2])),
+                   };
     
     if ($] >= 5.006) {
       # Create a perl-style version 'string' if perl 5.6.0 or newer

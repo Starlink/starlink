@@ -24,9 +24,9 @@ $VERSION = '0.06';
 # Parse options
 my %options = ();
 GetOptions(\%options,
-	   'help|?', 'man', 'version', 'compare=s',
-	   'major', 'minor', 'patchlevel', 'all',
-	   ) or pod2usage(2);
+           'help|?', 'man', 'version', 'compare=s',
+           'major', 'minor', 'patchlevel', 'all',
+          ) or pod2usage(2);
 
 pod2usage(1) if $options{'help'};
 pod2usage(-verbose => 2) if $options{'man'};
@@ -82,15 +82,15 @@ if (@list) {
       # First check for major and minor specified
       # then check for major, minor or patchlevel
       if ($options{'major'} && $options{'minor'}) {
-	print (defined $major ? "$major.$minor" : 'UNKNOWN');
+        print (defined $major ? "$major.$minor" : 'UNKNOWN');
       } elsif ($options{'major'}) {
-	print (defined $major ? $major : 'UNKNOWN');
+        print (defined $major ? $major : 'UNKNOWN');
       } elsif ($options{'minor'}) {
-	print (defined $minor ? $minor : 'UNKNOWN');
+        print (defined $minor ? $minor : 'UNKNOWN');
       } elsif ($options{'patchlevel'}) {
-	print (defined $patchlevel ? $patchlevel : 'UNKNOWN');
+        print (defined $patchlevel ? $patchlevel : 'UNKNOWN');
       } else {
-	print (defined $string ? $string : 'UNKNOWN');
+        print (defined $string ? $string : 'UNKNOWN');
       }
     }
 
