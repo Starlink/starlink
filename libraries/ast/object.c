@@ -5991,10 +5991,7 @@ c++
 *     - This function is only available in the C interface.
 *     - This function returns without action if the AST library has 
 *     been built without POSIX thread support (i.e. the "-with-pthreads" 
-*     option was not specified when running the "configure" script), or
-*     if the application was linked with non-thread-safe version of the 
-*     AST library (i.e. the "-threadsafe" option was not specified when 
-*     running the "ast_link" or "ast_link_adam" script).
+*     option was not specified when running the "configure" script).
 c--
 */
 
@@ -6121,10 +6118,7 @@ c++
 *     locked by the calling thread.
 *     - This function returns without action if the AST library has 
 *     been built without POSIX thread support (i.e. the "-with-pthreads" 
-*     option was not specified when running the "configure" script), or
-*     if the application was linked with non-thread-safe version of the 
-*     AST library (i.e. the "-threadsafe" option was not specified when 
-*     running the "ast_link" or "ast_link_adam" script).
+*     option was not specified when running the "configure" script).
 c--
 */
 
@@ -6933,10 +6927,7 @@ c++
 *     - This function is only available in the C interface.
 *     - This function always returns AST__RUNNING if the AST library has 
 *     been built without POSIX thread support (i.e. the "-with-pthreads" 
-*     option was not specified when running the "configure" script), or
-*     if the application was linked with non-thread-safe version of the 
-*     AST library (i.e. the "-threadsafe" option was not specified when 
-*     running the "ast_link" or "ast_link_adam" script).
+*     option was not specified when running the "configure" script).
 c--
 */
 
