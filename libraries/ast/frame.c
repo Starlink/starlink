@@ -5968,7 +5968,7 @@ static AstLineDef *LineDef( AstFrame *this, const double start[2],
    if( astGetNaxes( this ) != 2 ) {
       astError( AST__INTER, "astLineDef(%s): The supplied %s is not 2 "
                 "dimensional (internal AST proramming error).", status,
-                 astGetClass( this ) );
+                 astGetClass( this ), astGetClass( this ) );
    } 
 
 /* Check the axis values are good */

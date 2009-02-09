@@ -21634,7 +21634,8 @@ static void Mirror( AstPlot *this, int axis, int *status ){
 
    } else {
       astError( AST__INTER, "astMirror(%s): Illegal axis index (%d) "
-                "supplied (internal AST programming error).", status, axis );
+                "supplied (internal AST programming error).", status, 
+                astGetClass( this ), axis );
    }   
 }
 

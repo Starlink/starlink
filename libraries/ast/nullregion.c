@@ -86,7 +86,10 @@ f     The NullRegion class does not define any new routines beyond those
 #include "nullregion.h"          /* Interface definition for this class */
 #include "mapping.h"             /* Position mappings */
 #include "circle.h"              /* Circle regions */
+#include "prism.h"               /* Extruded Regions */
 #include "unitmap.h"             /* Unit Mapping */
+#include "cmpframe.h"            /* Compound Frames */
+#include "cmpmap.h"              /* Compound Mappings */
 
 /* Error code definitions. */
 /* ----------------------- */

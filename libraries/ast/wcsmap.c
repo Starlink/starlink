@@ -1988,7 +1988,7 @@ static double GetPV( AstWcsMap *this, int i, int m, int *status ) {
          astError( AST__AXIIN, "astGetPV(%s): Parameter index (%d) is invalid "
                    "in attribute PV%d_%d for a \"%s\" projection - it should be "
                    "in the range 0 to %d.", status, astGetClass( this ), m, i + 1, m, 
-                   FindPrjData( this->type, status )->ctype, mxpar, status ); 
+                   FindPrjData( this->type, status )->ctype, mxpar ); 
 
 /* For latitude parameters use the values in the "params" structure which will
    have been defaulted. */

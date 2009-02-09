@@ -652,9 +652,9 @@ static void AddSpecCvt( AstSpecMap *this, int cvttype, const double *args, int *
 /* If the coordinate conversion type was not valid, then report an
    error. */
    if ( astOK && !cvt_string ) {
-      astError( AST__SPCIN,
-                "Invalid spectral coordinate conversion type (%d).", status,
-                astGetClass( this ), (int) cvttype );
+      astError( AST__SPCIN, "AddSpecCvt(%s): Invalid spectral coordinate "
+                "conversion type (%d).", status, astGetClass( this ),     
+                (int) cvttype );
    }
 
 /* Note the number of coordinate conversions already stored in the SpecMap. */

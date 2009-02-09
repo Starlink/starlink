@@ -4230,7 +4230,7 @@ static int CheckFitsName( const char *name, const char *method,
       if( n > FITSNAMLEN ){
          astError( AST__BDFTS, "%s(%s): The supplied FITS keyword name ('%s') "
                    "has %d characters. FITS only allows up to %d.", status, method, 
-                   class, name, n, FITSNAMLEN );                
+                   class, name, (int) n, FITSNAMLEN );                
 
 /* If the name has no characters in it, then assume it is a legal blank
    keyword name. Otherwise, check that no illegal characters occur in the 
@@ -4278,8 +4278,8 @@ static int CheckFitsName( const char *name, const char *method,
 /* Report an error if no pointer was supplied. */
    } else if( astOK ){
       astError( AST__INTER, "CheckFitsName(fitschan): AST internal "
-                "error; a NULL pointer was supplied for the keyword name. ", status, 
-                method, class );                
+                "error; a NULL pointer was supplied for the keyword name. ", 
+                status );
    }
 
 /* If an error has occurred, return 0. */
@@ -12601,7 +12601,6 @@ static int GetFits##code( AstFitsChan *this, const char *name, ctype value, int 
    char *c;               /* Pointer to next character */ \
    int cl;                /* Length of string value */ \
    int ret;               /* The returned value */ \
-   size_t sz;             /* Data size */ \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return 0; \
@@ -12624,8 +12623,8 @@ static int GetFits##code( AstFitsChan *this, const char *name, ctype value, int 
    the supplied buffer. */ \
       if( !CnvValue( this, ftype, value, method, status ) && astOK ) { \
          astError( AST__FTCNV, "%s(%s): Cannot convert FITS keyword " \
-                   "'%s' (value '%s') to %s.", status, method, class, \
-                   lname, CardData( this, &sz, status ), type_names[ ftype ] ); \
+                   "'%s' to %s.", status, method, class, \
+                   lname, type_names[ ftype ] ); \
       } \
 \
 /* If the returned value is a string containing 8 or fewer characters, \
@@ -15011,7 +15010,6 @@ static int GetValue( AstFitsChan *this, const char *keyname, int type,
 
 /* Local Variables: */
    int ret;                           /* Returned value */
-   size_t sz;                         /* Data size in bytes */
 
 /* Check the status */
    if( !astOK ) return 0;
@@ -15039,9 +15037,8 @@ static int GetValue( AstFitsChan *this, const char *keyname, int type,
       } else {
          ret = 0;
          if( report && astOK ){
-            astError( AST__FTCNV, "%s(%s): Cannot convert FITS keyword " \
-                      "'%s' (value '%s') to %s.", status, method, class, \
-                      keyname, CardData( this, &sz, status ), type_names[ type ] ); \
+            astError( AST__FTCNV, "%s(%s): Cannot convert FITS keyword '%s' to %s.", 
+                      status, method, class, keyname, type_names[ type ] ); 
          }
       }
 

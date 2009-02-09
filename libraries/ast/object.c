@@ -4467,8 +4467,8 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
             if( astSizeOf( mem ) != size && astOK ) {
                astError( AST__INTER, "astInitObject(%s): Free block has size "
                          "%d but the %s requires %d bytes (internal AST "
-                         "programming error).", status, vtab->class, astSizeOf( mem ),
-                          vtab->class, size );
+                         "programming error).", status, vtab->class, 
+                         (int) astSizeOf( mem ), vtab->class, (int) size );
             }
          } else {
             mem = astMalloc( size );
@@ -4843,7 +4843,7 @@ static int Watched_Handle = -1; /* A handle index to be watched. Activity
 /* --------------------------------------- */
 /* Private functions associated with the external interface. */
 static AstObject *AssocId( int, int * );
-static int CheckId( AstObject *, int * );
+static int CheckId( AstObject *, int, int * );
 static void AnnulHandle( int, int * );
 static void InitContext( int * );
 static void InsertHandle( int, int *, int * );
@@ -5056,7 +5056,7 @@ AstObject *astAnnulId_( AstObject *this_id, int *status ) {
 /* Obtain the Handle offset for this Object and annul the Handle and
    its associated Object pointer. */
    LOCK_MUTEX2;
-   AnnulHandle( CheckId( this_id, status ), status );
+   AnnulHandle( CheckId( this_id, 1, status ), status );
    UNLOCK_MUTEX2;
 
 /* Always return a NULL pointer value. */
@@ -5266,7 +5266,7 @@ f     depth.
    astSetStatus( stat );
 }
 
-static int CheckId( AstObject *this_id, int *status ) {
+static int CheckId( AstObject *this_id, int lock_check, int *status ) {
 /*
 *  Name:
 *     CheckId
@@ -5279,7 +5279,7 @@ static int CheckId( AstObject *this_id, int *status ) {
 
 *  Synopsis:
 *     #include "object.h"
-*     int CheckId( AstObject *this, int *status )
+*     int CheckId( AstObject *this, int lock_check, int *status )
 
 *  Class Membership:
 *     Object member function.
@@ -5294,6 +5294,9 @@ static int CheckId( AstObject *this_id, int *status ) {
 *  Parameters:
 *     this
 *        The identifier value to be decoded.
+*     lock_check
+*        Should an error be reported if the handle is in an Object
+*        context for a different thread?
 *     status
 *        Pointer to the inherited status variable.
 
@@ -5358,8 +5361,8 @@ static int CheckId( AstObject *this_id, int *status ) {
                       "associated Object deleted." , status);
          }
 #if defined(THREAD_SAFE)
-      } else if(  handles[ work.i ].context != UNOWNED_CONTEXT && 
-                  handles[ work.i ].thread != AST__THREAD_ID ) {
+      } else if(  lock_check && handles[ work.i ].context != UNOWNED_CONTEXT &&
+                                handles[ work.i ].thread != AST__THREAD_ID ) {
          if ( astOK ) {
             astError( AST__OBJIN, "Invalid Object pointer given (value is "
                       "%d).", status, id  );
@@ -5450,7 +5453,7 @@ AstObject *astDeleteId_( AstObject *this_id, int *status ) {
    LOCK_MUTEX2;
 
 /* Obtain the Handle offset for this Object. */
-   ihandle = CheckId( this_id, status );
+   ihandle = CheckId( this_id, 1, status );
    if ( ihandle != -1 ) {
 
 /* Since the Object is to be deleted, we must annul all identifiers
@@ -5675,7 +5678,7 @@ f        This routine applies to all Objects.
       LOCK_MUTEX2;
 
 /* Obtain the Handle offset for this Object. */
-      ihandle = CheckId( this_id, status );
+      ihandle = CheckId( this_id, 1, status );
       if ( ihandle != -1 ) {
 
 /* Extract the context level at which the Object was created. */
@@ -5788,7 +5791,7 @@ f     and have not been rendered exempt using AST_EXEMPT.
       LOCK_MUTEX2;
 
 /* Obtain the Handle offset for this Object. */
-      ihandle = CheckId( this_id, status );
+      ihandle = CheckId( this_id, 1, status );
       if ( ihandle != -1 ) {
 
 /* Check that the current context level is at least 1 and report an
@@ -5899,7 +5902,7 @@ f        This routine applies to all Objects.
       LOCK_MUTEX2;
 
 /* Obtain the Handle offset for this Object. */
-      ihandle = CheckId( this_id, status );
+      ihandle = CheckId( this_id, 1, status );
       if ( ihandle != -1 ) {
 
 /* Extract the context level at which the Object was created. */
@@ -5966,7 +5969,7 @@ c++
 *        Pointer to the Object to be locked.
 *     wait
 *        If the Object is curently locked by another thread then this
-*        function will either report an erroor block. If a non-zero value 
+*        function will either report an error or block. If a non-zero value 
 *        is supplied for "wait", the calling thread waits until the object 
 *        is available for it to use. Otherwise, an error is reported and 
 *        the function returns immediately without locking the Object.
@@ -5991,10 +5994,7 @@ c++
 *     - This function is only available in the C interface.
 *     - This function returns without action if the AST library has 
 *     been built without POSIX thread support (i.e. the "-with-pthreads" 
-*     option was not specified when running the "configure" script), or
-*     if the application was linked with non-thread-safe version of the 
-*     AST library (i.e. the "-threadsafe" option was not specified when 
-*     running the "ast_link" or "ast_link_adam" script).
+*     option was not specified when running the "configure" script).
 c--
 */
 
@@ -6045,7 +6045,7 @@ c--
          astGET_GLOBALS(this);
          LOCK_MUTEX2;
          if ( !active_handles ) InitContext( status );
-         ihandle = CheckId( this_id, status );
+         ihandle = CheckId( this_id, 1, status );
          if( ihandle != -1 && handles[ ihandle ].context == UNOWNED_CONTEXT ) {
             RemoveHandle( ihandle, &unowned_handles, status );
 
@@ -6121,10 +6121,7 @@ c++
 *     locked by the calling thread.
 *     - This function returns without action if the AST library has 
 *     been built without POSIX thread support (i.e. the "-with-pthreads" 
-*     option was not specified when running the "configure" script), or
-*     if the application was linked with non-thread-safe version of the 
-*     AST library (i.e. the "-threadsafe" option was not specified when 
-*     running the "ast_link" or "ast_link_adam" script).
+*     option was not specified when running the "configure" script).
 c--
 */
 
@@ -6181,7 +6178,7 @@ c--
       } else {
          astGET_GLOBALS(this);
          LOCK_MUTEX2;
-         ihandle = CheckId( this_id, status );
+         ihandle = CheckId( this_id, 1, status );
          if( ihandle != -1 && handles[ ihandle ].context != UNOWNED_CONTEXT ) {
             RemoveHandle( ihandle, &active_handles[ handles[ ihandle ].context ], status );
 
@@ -6634,7 +6631,85 @@ AstObject *astMakePointer_( AstObject *this_id, int *status ) {
    LOCK_MUTEX2;
 
 /* Validate the identifier supplied and derive the Handle offset. */
-   ihandle = CheckId( this_id, status );
+   ihandle = CheckId( this_id, 1, status );
+
+/* If the identifier was valid, extract the Object pointer from the
+   Handle. */
+   if ( ihandle != -1 ) ptr = handles[ ihandle ].ptr;
+
+   UNLOCK_MUTEX2;
+
+/* Return the result. */
+   return ptr;
+}
+
+AstObject *astMakePointer_NoLockCheck_( AstObject *this_id, int *status ) {
+/*
+*+
+*  Name:
+*     astMakePointer_NoLockCheck
+
+*  Purpose:
+*     Obtain a true C pointer from an Object identifier.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "object.h"
+*     AstObject *astMakePointer_NoLockCheck( AstObject *this )
+
+*  Class Membership:
+*     Object class function.
+
+*  Description:
+*     This function accepts an external Object identifier and returns
+*     a true C Object pointer that may be de-referenced to access the
+*     Object's data and methods.
+*
+*     It is identicial to astMakePointer except that it does not check
+*     that the supplied Object is locked by the running thread.
+
+*  Parameters:
+*     this
+*        The identifier value.
+
+*  Returned Value:
+*     The true C pointer value.
+
+*  Notes:
+*     - The object reference count is not modified by this function,
+*     so the returned pointer should not be annulled by the caller.
+*     - Typically, this function should be used whenever a public
+*     function must accept identifier values directly (rather than
+*     having them translated automatically into pointers during
+*     argument validation by the astCheck<Class> range of functions).
+*     - Note that this function will NOT accept a true C pointer as an
+*     argument, even when invoked from internal code (with astCLASS
+*     defined). An identifier value MUST be supplied, and an error
+*     will result if it is not associated with an active Object.
+*     - This function attempts to execute even if the global error
+*     status is set, but no further error report will be made if it
+*     subsequently fails under these circumstances.
+*     - This is a protected function in the sense that it is not
+*     intended that external users should invoke it directly.  It is
+*     accessible from external code, however, in order that public
+*     macros invoked from that code can make use of it.
+*-
+*/
+
+/* Local Variables: */
+   AstObject *ptr;               /* Pointer value to return */
+   int ihandle;                  /* Handle offset in "handles" array */
+
+/* Initialise. */
+   ptr = NULL;
+
+/* Gain exclusive access to the handles array. */
+   LOCK_MUTEX2;
+
+/* Validate the identifier supplied and derive the Handle offset. */
+   ihandle = CheckId( this_id, 0, status );
 
 /* If the identifier was valid, extract the Object pointer from the
    Handle. */
@@ -6933,10 +7008,7 @@ c++
 *     - This function is only available in the C interface.
 *     - This function always returns AST__RUNNING if the AST library has 
 *     been built without POSIX thread support (i.e. the "-with-pthreads" 
-*     option was not specified when running the "configure" script), or
-*     if the application was linked with non-thread-safe version of the 
-*     AST library (i.e. the "-threadsafe" option was not specified when 
-*     running the "ast_link" or "ast_link_adam" script).
+*     option was not specified when running the "configure" script).
 c--
 */
 
@@ -6966,7 +7038,7 @@ c--
 
 /* Check the supplied object identifier is valid and get the
    corresponding index into the handles array. */
-      ihandle = CheckId( this_id, status );
+      ihandle = CheckId( this_id, 1, status );
       if( ihandle != -1 ) {
 
 /* Set the returned value on the basis of the threa didentifier stored in

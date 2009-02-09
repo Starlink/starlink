@@ -101,6 +101,7 @@ typedef struct AstRegion {
    AstPointSet *basegrid;     /* Base frame grid covering the boundary */
    int adaptive;              /* Does the Region adapt to coord sys changes? */
    int nomap;                 /* Ignore the Region's FrameSet? */
+   struct AstRegion *enclosure;/* A Region enclosing the Region */
 } AstRegion;
 
 /* Virtual function table. */
@@ -155,6 +156,8 @@ typedef struct AstRegionVtab {
    void (* SetUnc)( AstRegion *, AstRegion *, int * );
    void (* SetRegFS)( AstRegion *, AstFrame *, int * );
    double *(* RegCentre)( AstRegion *, double *, double **, int, int, int * );
+   AstRegion *(* GetEnclosure)( AstRegion *, int * );
+   void (* SetEnclosure)( AstRegion *, AstRegion *, int * );
 
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
    int (* MaskLD)( AstRegion *, AstMapping *, int, int, const int[], const int ubnd[], long double [], long double, int * );
@@ -247,6 +250,8 @@ void astInitRegionGlobals_( AstRegionGlobals * );
 AstFrame *astGetRegionFrame_( AstRegion *, int * );
 int astOverlap_( AstRegion *, AstRegion *, int * );
 void astNegate_( AstRegion *, int * );
+AstRegion *astGetEnclosure_( AstRegion *, int * );
+void astSetEnclosure_( AstRegion *, AstRegion *, int * );
 
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
 int astMaskLD_( AstRegion *, AstMapping *, int, int, const int[], const int[], long double [], long double, int * );
@@ -408,6 +413,8 @@ astINVOKE(V,astMaskUS_(astCheckRegion(this),(map?astCheckMapping(map):NULL),insi
 #define astGetUnc(this,def) astINVOKE(O,astGetUnc_(astCheckRegion(this),def,STATUS_PTR))
 #define astGetRegionBounds(this,lbnd,ubnd) astINVOKE(V,astGetRegionBounds_(astCheckRegion(this),lbnd,ubnd,STATUS_PTR))
 #define astShowMesh(this,format,ttl) astINVOKE(V,astShowMesh_(astCheckRegion(this),format,ttl,STATUS_PTR))
+#define astGetEnclosure(this) astINVOKE(O,astGetEnclosure_(astCheckRegion(this),STATUS_PTR))
+#define astSetEnclosure(this,enclosure) astINVOKE(V,astSetEnclosure_(astCheckRegion(this),(enclosure?astCheckRegion(enclosure):NULL),STATUS_PTR))
 
 /* Interfaces to protected member functions. */
 /* ----------------------------------------- */

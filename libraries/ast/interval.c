@@ -113,6 +113,7 @@ f     The Interval class does not define any new routines beyond those
 #include "cmpmap.h"              /* Compound Mappings */
 #include "cmpframe.h"            /* Compound Frames */
 #include "prism.h"               /* Prism regions */
+#include "pointlist.h"           /* Lists of points in a Frame */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -2308,7 +2309,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
       astError( AST__INTER, "astRegBaseMesh(%s): The %s given is "
                 "unbounded and therefore no boundary mesh can be "
                 "produced (internal AST programming error).", status, 
-                astGetClass( this_region ) );
+                astGetClass( this_region ), astGetClass( this_region ) );
    }
 
 /* Return a pointer to the output PointSet. */

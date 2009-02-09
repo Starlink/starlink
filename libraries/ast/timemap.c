@@ -701,9 +701,9 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args, int *
 /* If the coordinate conversion type was not valid, then report an
    error. */
    if ( astOK && !cvt_string ) {
-      astError( AST__TIMIN,
-                "Invalid time coordinate conversion type (%d).", status,
-                astGetClass( this ), (int) cvttype );
+      astError( AST__TIMIN, "AddTimeCvt(%s): Invalid time coordinate "
+                "conversion type (%d).", status, astGetClass( this ),    
+                (int) cvttype );
    }
 
 /* Note the number of coordinate conversions already stored in the TimeMap. */

@@ -30,12 +30,8 @@ c     following functions may also be applied to all PointLists:
 f     In addition to those routines applicable to all Regions, the
 f     following routines may also be applied to all PointList:
 *
-c     - astGetEnclosure: Get a Region that encloses a PointList
 c     - astPoints: Return the axis values of the points in a PointList
-c     - astSetEnclosure: Specify a Region that encloses a PointList
-f     - AST_GETENCLOSURE: Get a Region that encloses a PointList
 f     - AST_POINTS: Return the axis values of the points in a PointList
-f     - AST_SETENCLOSURE: Specify a Region that encloses a PointList
 
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
@@ -76,6 +72,8 @@ f     - AST_SETENCLOSURE: Specify a Region that encloses a PointList
 *        array of doubles.
 *     6-FEB-2009 (DSB):
 *        Over-ride astMapMerge.
+*     9-FEB-2009 (DSB):
+*        Move methods astGetEnclosure and astSetEnclosure to Region class.
 *class--
 
 *  Implementation Deficiencies:
@@ -111,6 +109,9 @@ f     - AST_SETENCLOSURE: Specify a Region that encloses a PointList
 #include "mapping.h"             /* Position mappings */
 #include "unitmap.h"             /* Unit Mapping */
 #include "frame.h"               /* Coordinate systems */
+#include "cmpframe.h"            /* Compound Frames */
+#include "cmpmap.h"              /* Compound Mappings */
+#include "prism.h"               /* Extruded Regions */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -136,7 +137,6 @@ static int class_check;
 static AstMapping *(* parent_simplify)( AstMapping *, int * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static const char *(* parent_getattrib)( AstObject *, const char *, int * );
-static int (* parent_equal)( AstObject *, AstObject *, int * );
 static int (* parent_getobjsize)( AstObject *, int * );
 static int (* parent_testattrib)( AstObject *, const char *, int * );
 static void (* parent_clearattrib)( AstObject *, const char *, int * );
@@ -198,9 +198,7 @@ static int MaskUS( AstRegion *, AstMapping *, int, int, const int[], const int[]
 static AstMapping *Simplify( AstMapping *, int * );
 static AstPointSet *RegBaseMesh( AstRegion *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
-static AstRegion *GetEnclosure( AstPointList *, int * );
 static AstRegion *RegBasePick( AstRegion *, int, const int *, int * );
-static int Equal( AstObject *, AstObject *, int * );
 static int GetClosed( AstRegion *, int * );
 static int GetListSize( AstPointList *, int * );
 static int GetObjSize( AstObject *, int * );
@@ -211,7 +209,6 @@ static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void Points( AstPointList *, int, int, double *, int * );
 static void RegBaseBox( AstRegion *, double *, double *, int * );
-static void SetEnclosure( AstPointList *, AstRegion *, int * );
 static AstRegion *MergePointList( AstPointList *, AstRegion *, int, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 
@@ -282,81 +279,6 @@ static void ClearAttrib( AstObject *this_object, const char *attrib,
    } else {
       (*parent_clearattrib)( this_object, attrib, status );
    }
-}
-
-static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
-/*
-*  Name:
-*     Equal
-
-*  Purpose:
-*     Test if two PointLists are equivalent.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "pointlist.h"
-*     int Equal( AstObject *this, AstObject *that, int *status ) 
-
-*  Class Membership:
-*     PointList member function (over-rides the astEqual protected
-*     method inherited from the astRegion class).
-
-*  Description:
-*     This function returns a boolean result (0 or 1) to indicate whether
-*     two PointLists are equivalent.
-
-*  Parameters:
-*     this
-*        Pointer to the first Object (a PointList).
-*     that
-*        Pointer to the second Object.
-*     status
-*        Pointer to the inherited status variable.
-
-*  Returned Value:
-*     One if the PointLists are equivalent, zero otherwise.
-
-*  Notes:
-*     - A value of zero will be returned if this function is invoked
-*     with the global status set, or if it should fail for any reason.
-*/
-
-/* Local Variables: */
-   AstPointList *that;        
-   AstPointList *this;        
-   int result;
-
-/* Initialise. */
-   result = 0;
-
-/* Check the global error status. */
-   if ( !astOK ) return result;
-
-/* Invoke the Equal method inherited from the parent Region class. This 
-   checks that the Objects are both of the same class, and have the same 
-   points lists, Negated and Closed flags (amongst other things). */
-   if( (*parent_equal)( this_object, that_object, status ) ) {
-
-/* Obtain pointers to the two PointList structures. */
-      this = (AstPointList *) this_object;
-      that = (AstPointList *) that_object;
-
-/* Test their enclosure Regions for equality. */
-      if( this->enclosure && that->enclosure ) {
-         result = astEqual( this->enclosure, that->enclosure );
-
-      } else if( !this->enclosure && !that->enclosure ) {
-         result = 1;         
-      }
-   }
-
-/* If an error occurred, clear the result value. */
-   if ( !astOK ) result = 0;
-
-/* Return the result, */
-   return result;
 }
 
 static const char *GetAttrib( AstObject *this_object, const char *attrib, 
@@ -500,70 +422,6 @@ static int GetClosed( AstRegion *this, int *status ) {
    return ( astGetNegated( this ) == 0 );
 }
 
-static AstRegion *GetEnclosure( AstPointList *this, int *status ){
-/*
-*++
-*  Name:
-c     astGetEnclosure
-f     AST_GETENCLOSURE
-
-*  Purpose:
-*     Returns the enclosure Region previously stored in a PointList.
-
-*  Type:
-*     Public virtual function.
-
-*  Synopsis:
-c     #include "pointlist.h"
-c     AstRegion *GetEnclosure( AstPointList *this )
-f     RESULT = AST_GETENCLOSURE( THIS, STATUS )
-
-*  Class Membership:
-*     PointList method.
-
-*  Description:
-*     This function returns the Region previously stored in the PointList 
-*     using
-c     astSetEnclosure.
-f     AST_SETENCLOSURE.
-*     If this has not been done, then a 
-c     NULL pointer
-f     value of AST__NULL
-*     is returned by this function.
-*
-*     The enclosure Region should usually be a Region that encloses the
-*     points in the PointList, although no check is performed to see if
-*     this is actually the case.
-
-*  Parameters:
-c     this
-f     THIS = INTEGER (Given)
-*        Pointer to the PointList.
-f     STATUS = INTEGER (Given and Returned)
-f        The global status.
-
-*  Returned Value:
-c     astGetEnclosure()
-f     AST_GETENCLOSURE = INTEGER
-*        Pointer to a deep copy of the Region previously stored using
-c        astSetEnclosure, or NULL
-f        AST_SETENCLOSURE, or AST__NULL
-*        if no such Region has been stored in the PointList. Any changes
-*        made to the returned Region will have no effect on the PointList 
-*        unless the modified Region is stored in the PointList using 
-c        astSetEnclosure.
-c        AST_SETENCLOSURE.
-
-*--
-*/
-
-/* Check the global error status. */
-   if ( !astOK ) return NULL;
-
-/* Return the pointer stored in the PointList. */
-   return this->enclosure ? astCopy( this->enclosure ) : NULL; 
-}
-
 static int GetListSize( AstPointList *this, int *status ) {
 /*
 *+
@@ -663,7 +521,6 @@ static int GetObjSize( AstObject *this_object, int *status ) {
    which are stored in dynamically allocated memory. */
    result = (*parent_getobjsize)( this_object, status );
 
-   if( this->enclosure ) result += astGetObjSize( this->enclosure );
    result += astGetObjSize( this->lbnd );
    result += astGetObjSize( this->ubnd );
 
@@ -739,8 +596,6 @@ void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name,
    virtual methods for this class. */
    vtab->Points = Points;
    vtab->GetListSize = GetListSize;
-   vtab->GetEnclosure = GetEnclosure;
-   vtab->SetEnclosure = SetEnclosure;
    vtab->PointListPoints = PointListPoints;
 
 /* Save the inherited pointers to methods that will be extended, and
@@ -748,9 +603,6 @@ void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name,
    object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
    region = (AstRegionVtab *) vtab;
-
-   parent_equal = object->Equal;
-   object->Equal = Equal;
 
    parent_getobjsize = object->GetObjSize;
    object->GetObjSize = GetObjSize;
@@ -2428,67 +2280,6 @@ static void SetAttrib( AstObject *this_object, const char *setting,
 #undef MATCH
 }
 
-static void SetEnclosure( AstPointList *this, AstRegion *region,
-                          int *status ){
-/*
-*++
-*  Name:
-c     astSetEnclosure
-f     AST_SETENCLOSURE
-
-*  Purpose:
-*     Stores a new enclosure Region in a PointList.
-
-*  Type:
-*     Public virtual function.
-
-*  Synopsis:
-c     #include "pointlist.h"
-c     astSetEnclosure( AstPointList *this, AstRegion *region )
-f     CALL AST_SETENCLOSURE( THIS, REGION, STATUS )
-
-*  Class Membership:
-*     PointList method.
-
-*  Description:
-*     This function stores a copy of a supplied Region as the "enclosure 
-*     Region" in a PointList. The enclosure Region can be retrieved later 
-*     using
-c     astGetEnclosure.
-f     AST_GETENCLOSURE.
-*
-*     The enclosure Region should usually be a Region that encloses the
-*     points in the PointList, although no check is performed to see if
-*     this is actually the case.
-
-*  Parameters:
-c     this
-f     THIS = INTEGER (Given)
-*        Pointer to the PointList.
-c     region
-f     REGION = INTEGER (Given)
-*        Pointer to the new enclosure Region, or 
-c        NULL
-f        AST__NULL
-*        (in which case any existing enclosure Region will be removed).
-*        A deep copy of the Region will be taken, so any subsequent changes 
-*        made to the Region will have no effect on the PointList.
-f     STATUS = INTEGER (Given and Returned)
-f        The global status.
-
-*--
-*/
-
-/* Check the global error status. */
-   if ( !astOK ) return;
-
-/* Clear any existing enclosure Region. */
-   if( this->enclosure ) this->enclosure = astAnnul( this->enclosure );
-
-/* Store the new enclosure Region (if supplied). */
-   if( region ) this->enclosure = astCopy( region );
-}
-
 static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 /*
 *  Name:
@@ -3003,7 +2794,6 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    the output PointList. */
    out->lbnd = NULL;
    out->ubnd = NULL;
-   out->enclosure = NULL;
 
 /* Copy dynamic memory contents */
    if( in->lbnd && in->ubnd ) {
@@ -3011,7 +2801,6 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
       out->lbnd = astStore( NULL, in->lbnd, nb );
       out->ubnd = astStore( NULL, in->ubnd, nb );
    }
-   if( in->enclosure ) out->enclosure = astCopy( in->enclosure );
 }
 
 
@@ -3052,7 +2841,6 @@ static void Delete( AstObject *obj, int *status ) {
    this = (AstPointList *) obj;
 
 /* Annul all resources. */
-   if( this->enclosure ) this->enclosure = astAnnul( this->enclosure );
    this->lbnd = astFree( this->lbnd );
    this->ubnd = astFree( this->ubnd );
 }
@@ -3111,12 +2899,6 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    actual default attribute value.  Since "set" will be zero, these
    values are for information only and will not be read back. */
 
-/* Enclosure */ 
-/* --------- */
-   if( this->enclosure ) {
-      astWriteObject( channel, "Enclos", 1, 1, this->enclosure, 
-                      "Region enclosing the points" );
-   }
 }
 
 /* Standard class functions. */
@@ -3580,7 +3362,6 @@ AstPointList *astInitPointList_( void *mem, size_t size, int init,
 /* ------------------------------ */
          new->lbnd = NULL;
          new->ubnd = NULL;
-         new->enclosure = NULL;
 
 /* If an error occurred, clean up by deleting the new PointList. */
          if ( !astOK ) new = astDelete( new );
@@ -3715,10 +3496,6 @@ AstPointList *astLoadPointList_( void *mem, size_t size, AstPointListVtab *vtab,
    obtained, we then use the appropriate (private) Set... member
    function to validate and set the value properly. */
 
-/* Enclosure */
-/* --------- */
-      new->enclosure = astReadObject( channel, "enclos", NULL );
-
 /* If an error occurred, clean up by deleting the new PointList. */
       if ( !astOK ) new = astDelete( new );
    }
@@ -3748,14 +3525,6 @@ void astPoints_( AstPointList *this, int max_coord, int max_point, double *out,
    if ( !astOK ) return;
    (**astMEMBER(this,PointList,Points))( this, max_coord, max_point, out, 
                                          status );
-}
-void astSetEnclosure_( AstPointList *this, AstRegion *region, int *status ) {
-   if ( !astOK ) return;
-   (**astMEMBER(this,PointList,SetEnclosure))( this, region, status );
-}
-AstRegion *astGetEnclosure_( AstPointList *this, int *status ) {
-   if ( !astOK ) return NULL;
-   return (**astMEMBER(this,PointList,GetEnclosure))( this, status );
 }
 void astPointListPoints_( AstPointList *this, AstPointSet **pset, int *status) {
    if ( !astOK ) return;
