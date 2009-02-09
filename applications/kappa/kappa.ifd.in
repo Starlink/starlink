@@ -882,6 +882,15 @@ package kappa {
             helpkey *
           }
 
+         parameter date {
+            type LITERAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default !
+            prompt {Date associated with comment}
+            helpkey *
+          }
+
          parameter file {
             type FILENAME
             vpath PROMPT
