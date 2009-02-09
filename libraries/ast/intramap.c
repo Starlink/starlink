@@ -2839,12 +2839,12 @@ AstIntraMap *astLoadIntraMap_( void *mem, size_t size,
             astError( AST__URITF, "You can then register it with AST in your "
                                   "software by calling astIntraReg (see "
                                   "SUN/211)." , status);
-            astError( AST__URITF, "" , status);
+            astError( AST__URITF, " " , status);
             astError( AST__URITF, "   Function name:   \"%s\".", status, fname );
             astError( AST__URITF, "   Purpose:         \"%s\".", status, purpose );
             astError( AST__URITF, "   Author:          \"%s\".", status, author );
             astError( AST__URITF, "   Contact address: \"%s\".", status, contact );
-            astError( AST__URITF, "" , status);
+            astError( AST__URITF, " " , status);
 
 /* Obtain the numbers of input and output coordinates for the
    IntraMap. Use parent methods for this, since if any derived class

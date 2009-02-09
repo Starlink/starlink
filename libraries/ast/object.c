@@ -4467,8 +4467,8 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
             if( astSizeOf( mem ) != size && astOK ) {
                astError( AST__INTER, "astInitObject(%s): Free block has size "
                          "%d but the %s requires %d bytes (internal AST "
-                         "programming error).", status, vtab->class, astSizeOf( mem ),
-                          vtab->class, size );
+                         "programming error).", status, vtab->class, 
+                         (int) astSizeOf( mem ), vtab->class, (int) size );
             }
          } else {
             mem = astMalloc( size );

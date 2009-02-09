@@ -2429,7 +2429,7 @@ AstSwitchMap *astInitSwitchMap_( void *mem, size_t size, int init,
       } else if( astGetNout( fsmap ) != 1 ){ 
          astError( AST__BADNO, "astInitSwitchMap(%s): The forward selector "
                    "Mapping has %d outputs but should only have 1.", status, name, 
-                   astGetNin( fsmap ), nin );
+                   astGetNout( fsmap ) );
       }
    }
 
@@ -2448,7 +2448,7 @@ AstSwitchMap *astInitSwitchMap_( void *mem, size_t size, int init,
       } else if( astGetNin( ismap ) != 1 ){ 
          astError( AST__BADNI, "astInitSwitchMap(%s): The inverse selector "
                    "Mapping has %d inputs but should only have 1.", status, name, 
-                   astGetNout( ismap ), nin );
+                   astGetNin( ismap ) );
 
       }
    }

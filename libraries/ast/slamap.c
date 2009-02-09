@@ -620,9 +620,9 @@ static void AddSlaCvt( AstSlaMap *this, int cvttype, const double *args, int *st
 /* If the sky coordinate conversion type was not valid, then report an
    error. */
    if ( astOK && !cvt_string ) {
-      astError( AST__SLAIN,
-                "Invalid SLALIB sky coordinate conversion type (%d).", status,
-                astGetClass( this ), (int) cvttype );
+      astError( AST__SLAIN, "AddSlaCvt(%s): Invalid SLALIB sky coordinate "
+                "conversion type (%d).", status, astGetClass( this ), 
+                (int) cvttype );
    }
 
 /* Note the number of coordinate conversions already stored in the SlaMap. */

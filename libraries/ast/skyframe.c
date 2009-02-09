@@ -7693,7 +7693,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
       if( !ok && astOK ) {
          astError( AST__BADOC, "astSetAttrib(%s): Invalid axis values string "
                    "\"%.*s\" given for SkyRef attribute.", status, astGetClass( this ),
-                   astChrLen( setting + offset ), setting + offset );
+                   (int) astChrLen( setting + offset ), setting + offset );
       }
 
 /* SkyRef(axis). */
@@ -7747,7 +7747,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
       if( !ok && astOK ) {
          astError( AST__BADOC, "astSetAttrib(%s): Invalid axis values string "
                    "\"%.*s\" given for SkyRefP attribute.", status, astGetClass( this ),
-                   astChrLen( setting + offset ), setting + offset );
+                   (int) astChrLen( setting + offset ), setting + offset );
       }
 
 
@@ -10674,7 +10674,7 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size,
             new->skyrefis = IGNORED_REF;
          } else if( !astChrMatch( sval, " " ) && astOK ){
 	    astError( AST__INTER, "astRead(SkyFrame): Corrupt SkyFrame contains "
-		      "invalid SkyRefIs attribute value (%d).", status, sval );
+		      "invalid SkyRefIs attribute value (%s).", status, sval );
          }
          if( TestSkyRefIs( new, status ) ) SetSkyRefIs( new, new->skyrefis, status );
          sval = astFree( sval );

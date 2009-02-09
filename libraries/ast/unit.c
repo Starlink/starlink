@@ -4156,7 +4156,7 @@ static void MakeUnitAlias( const char *sym, const char *alias, int *status ){
 /* Report an error if the supplied unit was not found. */
    if( !unit ) {
       astError( AST__INTER, "MakeUnitAlias(Unit): Cannot find existing "
-                "units \"%\" to associate with the alias \"%s\" (AST "
+                "units \"%s\" to associate with the alias \"%s\" (AST "
                 "internal programming error).", status, sym, alias );
    }
 }

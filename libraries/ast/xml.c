@@ -354,12 +354,12 @@ static void AddContent( AstXmlParent *this, int where, AstXmlContentItem *item, 
    } else {
       if( !astXmlCheckType( item, AST__XMLMISC ) ){
          astError( AST__INTER, "AddContent(xml): Inappropriate attempt to "
-                   "add an item of type %d to an XML document (internal "
+                   "add an item of type %ld to an XML document (internal "
                    "AST programming error).", status, ( (AstXmlObject *) item)->type );
 
       } else if( !astXmlCheckType( this, AST__XMLDOC ) ){
          astError( AST__INTER, "AddContent(xml): Inappropriate attempt to "
-                   "add an item of type %d to an XML object of type %d "
+                   "add an item of type %ld to an XML object of type %ld "
                    "(internal AST programming error).", status, 
                    ( (AstXmlObject *) item)->type,
                    ( (AstXmlObject *) this)->type );
@@ -2060,7 +2060,7 @@ AstXmlObject *astXmlGetRoot_( AstXmlObject *this, int *status ){
    if( astXmlCheckType( this, AST__XMLDOC ) ) {
       if( this->parent ) {
          astError( AST__INTER, "astXmlGetRoot(xml): An XmlDocument has a "
-                   "non-null parent of type %d (internal AST programming "
+                   "non-null parent of type %ld (internal AST programming "
                    "error).", status, this->type );      
       } else {
          result = (AstXmlObject *) this;
@@ -3198,9 +3198,9 @@ static int CheckType( long int given, long int want, int *status ){
        want != AST__XMLPAR   &&
        want != AST__XMLDOC ) {
       if( astOK ) {
-         astError( AST__INTER, "CheckType(Xml): Unsupported XML object type (%d) "
-                   "supplied for parameter \"want\" (internal AST programming "
-                   "error). ", status, want );
+         astError( AST__INTER, "CheckType(Xml): Unsupported XML object "
+                   "type (%ld) supplied for parameter \"want\" (internal "
+                   "AST programming error). ", status, want );
       }
 
 /* You should never be given a generic "interface" type since the
@@ -3211,7 +3211,7 @@ static int CheckType( long int given, long int want, int *status ){
               given == AST__XMLCONT ||
               given == AST__XMLCHAR ) {
       if( astOK ) {
-         astError( AST__INTER, "CheckType(Xml): Generic type (%d) supplied for "
+         astError( AST__INTER, "CheckType(Xml): Generic type (%ld) supplied for "
                    "parameter \"given\" (internal AST programming error).", status,
                    given );
       }
@@ -3526,7 +3526,7 @@ static void CleanXml( AstXmlObject *this, long int type, int *status ){
       CleanXml( this, AST__XMLOBJECT, status );
 
    } else if( astOK ) {
-      astError( AST__INTER, "CleanXml: Invalid object type (%d) supplied "
+      astError( AST__INTER, "CleanXml: Invalid object type (%ld) supplied "
                 "(internal AST programming error).", status, type );      
    }
 
@@ -3686,8 +3686,8 @@ void *astXmlDelete_( void *obj_ptr, int *status ){
             }
 
          } else if( astOK ) {
-            astError( AST__INTER, "astXmlDelete(xml): XmlObject of type %d has "
-                      "inappropriate parent of type %d (internal AST "
+            astError( AST__INTER, "astXmlDelete(xml): XmlObject of type %ld has "
+                      "inappropriate parent of type %ld (internal AST "
                       "programming error).", status, obj->type, parent->type );
          }           
 
@@ -3735,8 +3735,8 @@ void *astXmlDelete_( void *obj_ptr, int *status ){
             }
 
          } else if( astOK ) {
-            astError( AST__INTER, "astXmlDelete(xml): XmlObject of type %d has "
-                      "inappropriate parent of type %d (internal AST "
+            astError( AST__INTER, "astXmlDelete(xml): XmlObject of type %ld has "
+                      "inappropriate parent of type %ld (internal AST "
                       "programming error).", status, obj->type, parent->type );
          }           
 
@@ -3788,8 +3788,8 @@ void *astXmlDelete_( void *obj_ptr, int *status ){
          }
 
       } else if( astOK ) {
-         astError( AST__INTER, "astXmlDelete(xml): XmlObject of type %d has "
-                   "inappropriate parent of type %d (internal AST "
+         astError( AST__INTER, "astXmlDelete(xml): XmlObject of type %ld has "
+                   "inappropriate parent of type %ld (internal AST "
                    "programming error).", status, obj->type, parent->type );
       }
 
@@ -3803,7 +3803,7 @@ void *astXmlDelete_( void *obj_ptr, int *status ){
 
 /* Report an error if required. */
    if( !ok && astOK ) {
-      astError( AST__INTER, "astXmlDelete(xml): Supplied XmlObject (type %d) "
+      astError( AST__INTER, "astXmlDelete(xml): Supplied XmlObject (type %ld) "
                 "is not owned by its own parent (internal AST "
                 "programming error).", status, obj->type );
    }
@@ -3883,8 +3883,8 @@ static AstXmlAttribute *FindAttribute( AstXmlElement *this, const char *name0,
       len = colon - name0;
 
       if( len > 49 ) {
-         astError( AST__XMLNM, "%s: The XML prefix in \"%s\" is too long "
-                   "(> 49 characters).", status, name0 );
+         astError( AST__XMLNM, "FindAttribute: The XML prefix in \"%s\" "
+                   "is too long (> 49 characters).", status, name0 );
       } else {
          strncpy( prefix_buffer, name0, len );
          prefix_buffer[ len ] = 0;
@@ -3892,8 +3892,8 @@ static AstXmlAttribute *FindAttribute( AstXmlElement *this, const char *name0,
          len = strlen( colon + 1 );
 
          if( len > 49 ) {
-            astError( AST__XMLNM, "%s: The XML attribute name in \"%s\" is "
-                      "too long (> 49 characters).", status, name0 );
+            astError( AST__XMLNM, "FindAttribute: The XML attribute name "
+                      "in \"%s\" is too long (> 49 characters).", status, name0 );
          } else {
             strcpy( name_buffer, colon + 1 );
             name = name_buffer;
@@ -5024,7 +5024,7 @@ static void InitXmlObject( AstXmlObject *new, long int type, int *status ){
 
 /* Check the supplied object type is OK. Report an error if not. */
    if( !CheckType( type, AST__XMLOBJECT, status ) ){
-      astError( AST__INTER, "InitXmlObject: Supplied object type (%d) "
+      astError( AST__INTER, "InitXmlObject: Supplied object type (%ld) "
                 "is not appropriate for an XmlObject", status, type );
    }
 
@@ -6940,7 +6940,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
          if( text1 ){
             if( !elem ) {
                astError( AST__INTER, "ReadContent(xml): Container lost at state "
-                         "107 (AST internal programming error).", status, state );
+                         "107 (AST internal programming error).", status );
                break;   
             } 
 
@@ -6974,7 +6974,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
             state = 200;
          } else {
             astError( AST__INTER, "Parse(xml): No container in state 108 "
-                      "(AST internal programming error).", status, state );
+                      "(AST internal programming error).", status );
             break;
          }
 

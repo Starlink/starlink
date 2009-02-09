@@ -2308,7 +2308,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
       astError( AST__INTER, "astRegBaseMesh(%s): The %s given is "
                 "unbounded and therefore no boundary mesh can be "
                 "produced (internal AST programming error).", status, 
-                astGetClass( this_region ) );
+                astGetClass( this_region ), astGetClass( this_region ) );
    }
 
 /* Return a pointer to the output PointSet. */
