@@ -124,29 +124,5 @@ F77_SUBROUTINE(ast_points)( INTEGER(THIS),
    )
 }
 
-F77_INTEGER_FUNCTION(ast_getenclosure)( INTEGER(THIS),
-                                        INTEGER(STATUS) ) {
-   GENPTR_INTEGER(THIS)
-   F77_INTEGER_TYPE(RESULT);
-
-   astAt( "AST_GETENCLOSURE", NULL, 0 );
-   astWatchSTATUS(
-      RESULT = astP2I( astGetEnclosure( astI2P( *THIS ) ) );
-   )
-   return RESULT;
-}
-
-F77_SUBROUTINE(ast_setenclosure)( INTEGER(THIS),
-                                  INTEGER(REGION),
-                                  INTEGER(STATUS) ) {
-   GENPTR_INTEGER(THIS)
-   GENPTR_INTEGER(REGION)
-
-   astAt( "AST_SETENCLOSURE", NULL, 0 );
-   astWatchSTATUS(
-      astSetEnclosure( astI2P( *THIS ), astI2P( *REGION ) );
-   )
-}
-
 
 

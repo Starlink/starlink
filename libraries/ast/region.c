@@ -101,6 +101,8 @@ c     following functions may also be applied to all Regions:
 f     In addition to those routines applicable to all Frames, the
 f     following routines may also be applied to all Regions:
 *
+c     - astGetEnclosure: Get a Region that encloses a Region
+f     - AST_GETENCLOSURE: Get a Region that encloses a Region
 c     - astGetRegionBounds: Get the bounds of a Region 
 f     - AST_GETREGIONBOUNDS: Get the bounds of a Region 
 c     - astGetRegionFrame: Get a copy of the Frame represent by a Region
@@ -116,6 +118,8 @@ f     - AST_OVERLAP: Determines the nature of the overlap between two Regions
 c     - astMask<X>: Mask a region of a data grid
 f     - AST_MASK<X>: Mask a region of a data grid
 c     - astSetUnc: Associate a new uncertainty with a Region
+f     - AST_SETENCLOSURE: Specify a Region that encloses a Region
+c     - astSetEnclosure: Specify a Region that encloses a Region
 f     - AST_SETUNC: Associate a new uncertainty with a Region
 c     - astShowMesh: Display a mesh of points on the surface of a Region
 f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
@@ -123,6 +127,8 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -163,6 +169,9 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 *     20-JAN-2009 (DSB):
 *        Change astPickAxes so that it returns a Region rather than a
 *        Frame if possible. This included adding method astRegBasePick.
+*     9-FEB-2009 (DSB):
+*        Move PointList methods astGetEnclosure and astSetEnclosure to
+*        Region.
 *class--
 
 *  Implementation Notes:
@@ -827,27 +836,29 @@ static int MaskUI( AstRegion *, AstMapping *, int, int, const int[], const int[]
 static int MaskUL( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned long int[], unsigned long int, int * );
 static int MaskUS( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned short int[], unsigned short int, int * );
 
-static int GetObjSize( AstObject *, int * );
 static AstAxis *GetAxis( AstFrame *, int, int * );
 static AstFrame *GetRegionFrame( AstRegion *, int * );
 static AstFrame *PickAxes( AstFrame *, int, const int[], AstMapping **, int * );
+static AstFrame *RegFrame( AstRegion *this, int * );
 static AstFrameSet *Conv( AstFrameSet *, AstFrameSet *, int * );
 static AstFrameSet *Convert( AstFrame *, AstFrame *, const char *, int * );
 static AstFrameSet *ConvertX( AstFrame *, AstFrame *, const char *, int * );
 static AstFrameSet *FindFrame( AstFrame *, AstFrame *, const char *, int * );
-static AstFrame *RegFrame( AstRegion *this, int * );
+static AstFrameSet *GetRegFS( AstRegion *, int * );
+static AstLineDef *LineDef( AstFrame *, const double[2], const double[2], int * );
 static AstMapping *RegMapping( AstRegion *this, int * );
 static AstMapping *Simplify( AstMapping *, int * );
-static AstPointSet *RegBaseGrid( AstRegion *, int * );
-static AstPointSet *RegBaseMesh( AstRegion *, int * );
+static AstPointSet *BTransform( AstRegion *, AstPointSet *, int, AstPointSet *, int * );
 static AstPointSet *BndBaseMesh( AstRegion *, double *, double *, int * );
 static AstPointSet *BndMesh( AstRegion *, double *, double *, int * );
+static AstPointSet *GetSubMesh( int *, AstPointSet *, int * );
+static AstPointSet *RegBaseGrid( AstRegion *, int * );
+static AstPointSet *RegBaseMesh( AstRegion *, int * );
 static AstPointSet *RegGrid( AstRegion *, int * );
 static AstPointSet *RegMesh( AstRegion *, int * );
-static AstPointSet *BTransform( AstRegion *, AstPointSet *, int, AstPointSet *, int * );
 static AstPointSet *RegTransform( AstRegion *, AstPointSet *, int, AstPointSet *, AstFrame **, int * );
 static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet *, int * );
-static AstPointSet *GetSubMesh( int *, AstPointSet *, int * );
+static AstRegion *GetEnclosure( AstRegion *, int * );
 static AstRegion *MapRegion( AstRegion *, AstMapping *, AstFrame *, int * );
 static AstRegion *RegBasePick( AstRegion *this, int, const int *, int * );
 static AstSystemType SystemCode( AstFrame *, const char *, int * );
@@ -867,14 +878,16 @@ static double Offset2( AstFrame *, const double[2], double, double, double[2], i
 static int DumpUnc( AstRegion *, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int GetNaxes( AstFrame *, int * );
+static int GetObjSize( AstObject *, int * );
 static int GetUseDefs( AstObject *, int * );
 static int IsUnitFrame( AstFrame *, int * );
+static int LineContains( AstFrame *, AstLineDef *, int, double *, int * );
+static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double **, int * );
 static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame **, int * );
 static int Overlap( AstRegion *, AstRegion *, int * );
 static int OverlapX( AstRegion *, AstRegion *, int * );
 static int RegDummyFS( AstRegion *, int * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
-static void ResetCache( AstRegion *, int * );
 static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame **, int * );
 static int Unformat( AstFrame *, int, const char *, double *, int * );
 static int ValidateAxis( AstFrame *, int, const char *, int * );
@@ -882,7 +895,11 @@ static void CheckPerm( AstFrame *, const int *, const char *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
+static void GetRegionBounds( AstRegion *this, double *, double *, int * );
+static void GetRegionBounds2( AstRegion *this, double *, double *, int * );
+static void GetUncBounds( AstRegion *this, double *, double *, int * );
 static void Intersect( AstFrame *, const double[2], const double[2], const double[2], const double[2], double[2], int * );
+static void LineOffset( AstFrame *, AstLineDef *, double, double, double[2], int * );
 static void Negate( AstRegion *, int * );
 static void Norm( AstFrame *, double[], int * );
 static void NormBox( AstFrame *, double[], double[], AstMapping *, int * );
@@ -891,23 +908,17 @@ static void Overlay( AstFrame *, const int *, AstFrame *, int * );
 static void PermAxes( AstFrame *, const int[], int * );
 static void RegBaseBox( AstRegion *this, double *, double *, int * );
 static void RegBaseBox2( AstRegion *this, double *, double *, int * );
-static void RegSetAttrib( AstRegion *, const char *, char **, int * );
-static void ShowMesh( AstRegion *this, int, const char *, int * );
-static void GetRegionBounds( AstRegion *this, double *, double *, int * );
-static void GetUncBounds( AstRegion *this, double *, double *, int * );
-static void GetRegionBounds2( AstRegion *this, double *, double *, int * );
+static void RegClearAttrib( AstRegion *, const char *, char **, int * );
 static void RegOverlay( AstRegion *, AstRegion *, int * );
+static void RegSetAttrib( AstRegion *, const char *, char **, int * );
 static void ReportPoints( AstMapping *, int, AstPointSet *, AstPointSet *, int * );
+static void ResetCache( AstRegion *, int * );
 static void Resolve( AstFrame *, const double [], const double [], const double [], double [], double *, double *, int * );
 static void SetAxis( AstFrame *, int, AstAxis *, int * );
-static void ValidateAxisSelection( AstFrame *, int, const int *, const char *, int * );
+static void SetEnclosure( AstRegion *, AstRegion *, int * );
 static void SetRegFS( AstRegion *, AstFrame *, int * );
-static AstFrameSet *GetRegFS( AstRegion *, int * );
-static AstLineDef *LineDef( AstFrame *, const double[2], const double[2], int * );
-static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double **, int * );
-static int LineContains( AstFrame *, AstLineDef *, int, double *, int * );
-static void LineOffset( AstFrame *, AstLineDef *, double, double, double[2], int * );
-static void RegClearAttrib( AstRegion *, const char *, char **, int * );
+static void ShowMesh( AstRegion *this, int, const char *, int * );
+static void ValidateAxisSelection( AstFrame *, int, const int *, const char *, int * );
 
 static int GetBounded( AstRegion *, int * );
 static AstRegion *GetDefUnc( AstRegion *, int * );
@@ -2402,7 +2413,16 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
 
 /* Test the Negated and Closed flags are equal */
                   if( astGetNegated( this ) == astGetNegated( that ) &&
-                       astGetClosed( this ) == astGetClosed( that ) ) result = 1;
+                       astGetClosed( this ) == astGetClosed( that ) ) {
+
+/* Test their enclosure Regions for equality. */
+                     if( this->enclosure && that->enclosure ) {
+                        result = astEqual( this->enclosure, that->enclosure );
+
+                     } else if( !this->enclosure && !that->enclosure ) {
+                        result = 1;         
+                     }
+                  }
                }
 
 /* Free resources. */
@@ -2722,6 +2742,74 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick, int *
    return result;
 }
 
+static AstRegion *GetEnclosure( AstRegion *this, int *status ){
+/*
+*++
+*  Name:
+c     astGetEnclosure
+f     AST_GETENCLOSURE
+
+*  Purpose:
+*     Returns the enclosure Region previously stored in a Region.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "region.h"
+c     AstRegion *GetEnclosure( AstRegion *this )
+f     RESULT = AST_GETENCLOSURE( THIS, STATUS )
+
+*  Class Membership:
+*     Region method.
+
+*  Description:
+*     This function returns the enclosure Region previously associated
+*     with the supplied Region using
+c     astSetEnclosure.
+f     AST_SETENCLOSURE.
+*     If no enclosure has been associated with the supplied Region, a 
+c     NULL pointer
+f     value of AST__NULL
+*     is returned by this function.
+*
+*     The enclosure Region associated with 
+c     "this"
+f     THIS 
+*     will usually be a Region that encloses 
+c     "this",
+f     THIS ,
+*     although no check is performed to see if this is actually the case.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Region.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astGetEnclosure()
+f     AST_GETENCLOSURE = INTEGER
+*        Pointer to a deep copy of the Region previously stored using
+c        astSetEnclosure, or NULL
+f        AST_SETENCLOSURE, or AST__NULL
+*        if no such Region has been stored in the Region. Any changes
+*        made to the returned Region will have no effect on the Region 
+*        unless the modified Region is stored in the Region using 
+c        astSetEnclosure.
+c        AST_SETENCLOSURE.
+
+*--
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Return the pointer stored in the Region. */
+   return this->enclosure ? astCopy( this->enclosure ) : NULL; 
+}
+
 static int GetObjSize( AstObject *this_object, int *status ) {
 /*
 *  Name:
@@ -2777,6 +2865,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
    which are stored in dynamically allocated memory. */
    result = (*parent_getobjsize)( this_object, status );
 
+   if( this->enclosure ) result += astGetObjSize( this->enclosure );
    result += astGetObjSize( this->frameset );
    result += astGetObjSize( this->points );
    result += astGetObjSize( this->basemesh );
@@ -4139,6 +4228,8 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name, int *status ) {
    vtab->SetFillFactor = SetFillFactor;
    vtab->TestFillFactor = TestFillFactor;
 
+   vtab->GetEnclosure = GetEnclosure;
+   vtab->SetEnclosure = SetEnclosure;
    vtab->ResetCache = ResetCache;
    vtab->DumpUnc = DumpUnc;
    vtab->GetBounded = GetBounded;
@@ -8751,6 +8842,75 @@ static void SetAxis( AstFrame *this_frame, int axis, AstAxis *newaxis, int *stat
    fr = astAnnul( fr );
 }
 
+static void SetEnclosure( AstRegion *this, AstRegion *enclosure, int *status ){
+/*
+*++
+*  Name:
+c     astSetEnclosure
+f     AST_SETENCLOSURE
+
+*  Purpose:
+*     Associate a new enclosure Region with a supplied Region.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "region.h"
+c     astSetEnclosure( AstRegion *this, AstRegion *enclosure )
+f     CALL AST_SETENCLOSURE( THIS, ENCLOSURE, STATUS )
+
+*  Class Membership:
+*     Region method.
+
+*  Description:
+*     This function can be used to indicate that one Region encloses
+*     another. It stores a deep copy of 
+c     "enclosure" within "this".
+f     ENCLOSURE within THIS.
+*     The enclosing Region can be retrieved later 
+*     using
+c     astGetEnclosure.
+f     AST_GETENCLOSURE.
+*
+*     Although the supplied enclosure Region should normally encloses
+c     "this",
+f     THIS,
+*     no check is performed to see if this is actually the case. AST
+*     itself makes no use of the enclosure Region, other than to make it
+*     available through the 
+c     astGetEnclosure
+f     AST_GETENCLOSURE
+*     function.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Region.
+c     enclosure
+f     ENCLOSURE = INTEGER (Given)
+*        Pointer to the new enclosure Region, or 
+c        NULL
+f        AST__NULL
+*        (in which case any existing enclosure Region will be removed).
+*        A deep copy of the Region will be taken, so any subsequent changes 
+*        made to the Region will have no effect on the Region.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*--
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Clear any existing enclosure Region. */
+   if( this->enclosure ) this->enclosure = astAnnul( this->enclosure );
+
+/* Store the new enclosure Region (if supplied). */
+   if( enclosure ) this->enclosure = astCopy( enclosure );
+}
+
 static void SetRegFS( AstRegion *this, AstFrame *frm, int *status ) {
 /*
 *+
@@ -10902,6 +11062,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    out->frameset = NULL;
    out->points = NULL;
    out->unc = NULL;
+   out->enclosure = NULL;
 
 /* Now copy each of the above structures. */
    out->frameset = astCopy( in->frameset );
@@ -10909,6 +11070,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    if( in->basemesh ) out->basemesh = astCopy( in->basemesh );
    if( in->basegrid ) out->basegrid = astCopy( in->basegrid );
    if( in->unc ) out->unc = astCopy( in->unc );
+   if( in->enclosure ) out->enclosure = astCopy( in->enclosure );
 }
 
 
@@ -10950,6 +11112,7 @@ static void Delete( AstObject *obj, int *status ) {
 
 /* Annul all resources. */
    this->frameset = astAnnul( this->frameset );
+   if( this->enclosure ) this->enclosure = astAnnul( this->enclosure );
    if( this->points ) this->points = astAnnul( this->points );
    if( this->basemesh ) this->basemesh = astAnnul( this->basemesh );
    if( this->basegrid ) this->basegrid = astAnnul( this->basegrid );
@@ -11054,6 +11217,13 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    ival = set ? GetAdaptive( this, status ) : astGetAdaptive( this );
    astWriteInt( channel, "Adapt", (ival != 0), 0, ival,
                 ival ? "Region adapts to coord sys changes" : "Region does not adapt to coord sys changes" );
+
+/* Enclosure */ 
+/* --------- */
+   if( this->enclosure ) {
+      astWriteObject( channel, "Enclos", 1, 1, this->enclosure, 
+                      "An enclosing Region" );
+   }
 
 /* FrameSet */
 /* -------- */
@@ -11275,6 +11445,7 @@ AstRegion *astInitRegion_( void *mem, size_t size, int init,
       new->fillfactor = AST__BAD;
       new->defunc = 0;
       new->nomap = 0;
+      new->enclosure = NULL;
 
 /* If the supplied Frame is a Region, gets its encapsulated Frame. If a 
    FrameSet was supplied, use its current Frame, otherwise use the
@@ -11529,6 +11700,10 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
 /* ----------- */
       new->unc = astReadObject( channel, "unc", NULL );
 
+/* Enclosure */
+/* --------- */
+      new->enclosure = astReadObject( channel, "enclos", NULL );
+
 /* FrameSet */
 /* -------- */
 /* First see if the dump contains a single Frame. If so, create a
@@ -11609,6 +11784,14 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
 
+void astSetEnclosure_( AstRegion *this, AstRegion *region, int *status ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,Region,SetEnclosure))( this, region, status );
+}
+AstRegion *astGetEnclosure_( AstRegion *this, int *status ) {
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Region,GetEnclosure))( this, status );
+}
 void astRegClearAttrib_( AstRegion *this, const char *attrib, char **base_attrib, int *status ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Region,RegClearAttrib))( this, attrib, base_attrib, status );
