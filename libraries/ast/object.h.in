@@ -1383,6 +1383,7 @@ void astEnd_( int * );
 AstObject *astI2P_( int, int * );
 AstObject *astMakeId_( AstObject *, int * );
 AstObject *astMakePointer_( AstObject *, int * );
+AstObject *astMakePointer_NoLockCheck_( AstObject *, int * );
 int astP2I_( AstObject *, int * );
 int astVersion_( int * );
 int astEscapes_( int, int * );
@@ -1503,7 +1504,7 @@ astINVOKE(O,astLoadObject_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PT
 #define astBegin astBegin_()
 #define astEnd astINVOKE(V,astEnd_(STATUS_PTR))
 #else                            /* Protected */
-#define astMakePointer_NoLockCheck(id) ((void *)astMakePointer_((AstObject *)(id),STATUS_PTR))
+#define astMakePointer_NoLockCheck(id) ((void *)astMakePointer_NoLockCheck_((AstObject *)(id),STATUS_PTR))
 #endif
 
 #define astVersion astVersion_(STATUS_PTR)
