@@ -113,6 +113,7 @@ f     The Interval class does not define any new routines beyond those
 #include "cmpmap.h"              /* Compound Mappings */
 #include "cmpframe.h"            /* Compound Frames */
 #include "prism.h"               /* Prism regions */
+#include "pointlist.h"           /* Lists of points in a Frame */
 
 /* Error code definitions. */
 /* ----------------------- */

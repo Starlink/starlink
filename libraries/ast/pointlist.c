@@ -109,6 +109,9 @@ f     - AST_POINTS: Return the axis values of the points in a PointList
 #include "mapping.h"             /* Position mappings */
 #include "unitmap.h"             /* Unit Mapping */
 #include "frame.h"               /* Coordinate systems */
+#include "cmpframe.h"            /* Compound Frames */
+#include "cmpmap.h"              /* Compound Mappings */
+#include "prism.h"               /* Extruded Regions */
 
 /* Error code definitions. */
 /* ----------------------- */
