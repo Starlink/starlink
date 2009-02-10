@@ -33,6 +33,7 @@
 *     -  Use EMS_SETC to set the message token.
 
 *  Copyright:
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     Copyright (C) 1983, 1989, 1990 Science & Engineering Research Council.
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
@@ -57,6 +58,7 @@
 *     JRG: Jack Giddings (UCL)
 *     PCTR: P.C.T. Rees (STARLINK)
 *     AJC: A.J.Chipperfield (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -74,6 +76,11 @@
 *        Converted to Standard Fortran 77 CHARACTER concatenation.
 *     15-FEB-2001 (AJC):
 *        Renamed to EMS_FMTx to MSG_FMTx
+*     10-FEB-2009 (TIMJ):
+*        Formatted WRITE fails even if the supplied string has many trailing spaces
+*        but the full string exceeds the buffer space. Ignore those spaces.
+*        Since EMS_SETC does handle string truncation, allocate
+*        2 * EMS__SZTOK for local storage and let EMS handle truncation.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -97,12 +104,13 @@
 
 *  Local Variables:
       INTEGER ALLOW                     ! Allowed length of FMT string
+      INTEGER CLEN                      ! Length of CVALUE
       INTEGER FLEN                      ! Length of FORMAT string
       INTEGER IOSTAT                    ! Fortran I/O status
       INTEGER NCHAR                     ! Character count
 
       CHARACTER * ( EMS__SZTOK ) FMT    ! String to contain FORMAT
-      CHARACTER * ( EMS__SZTOK ) STR    ! String to contain value
+      CHARACTER * ( 2 * EMS__SZTOK ) STR! String to contain value
 
 *.
 
@@ -116,8 +124,13 @@
 *     Load FMT.
          FMT = FORMAT( 1 : ALLOW )
 
+*     Find the length of the input string
+         CLEN = CHR_LEN( CVALUE )
+         CLEN = MAX( 1, CLEN )
+
 *     Construct the message token string.
-         WRITE ( STR, '( '//FMT//' )', IOSTAT = IOSTAT ) CVALUE
+         WRITE ( STR, '( '//FMT//' )',
+     :        IOSTAT = IOSTAT ) CVALUE( 1 : CLEN )
 
 *     Check the Fortran I/O status.
          IF ( IOSTAT .EQ. 0 ) THEN
