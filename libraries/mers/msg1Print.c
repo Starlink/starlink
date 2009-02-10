@@ -114,6 +114,8 @@
 *        Rewrite in C
 *     12-JAN-2009 (TIMJ):
 *        Add prefix option. See err1Print and err1Flush.
+*     9-FEB-2009 (TIMJ):
+*        Error reporting used wrong message token
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -205,7 +207,7 @@ void msg1Print( const char * text, const char * prefix, int * status ) {
     emsMark();
     emsSetc ( "OPLINE", line );
     emsRep( "MSG_PRINT_MESS",
-            "msg1Print: ^LINE", status );
+            "msg1Print: ^OPLINE", status );
     *status = MSG__OPTER;
     emsRep( "MSG_PRINT_OPTER",
             "Error encountered during message output", status );
