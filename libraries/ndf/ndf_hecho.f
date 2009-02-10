@@ -35,7 +35,9 @@
 *     EXTERNAL statement.
 
 *  Copyright:
-*     Copyright (C) 1993 Science & Engineering Research Council
+*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 1993, 1994 Science & Engineering Research Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -55,6 +57,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -62,7 +65,9 @@
 *        Original version.
 *     16-NOV-1994 (RFWS):
 *        Fixed bug: leading blanks on history lines were being removed
-*        during assignment to a message token. 
+*        during assignment to a message token.
+*     10-FEB-2009 (TIMJ):
+*        Do not need to use MSG_FMTC simply to prepend 3 spaces to the output.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -101,8 +106,8 @@
 *  Assign each line to a message token and write out a message
 *  containing the translation of the token.  This prevents any
 *  "special" characters in the line from being interpreted.
-         CALL MSG_FMTC( 'LINE', '3X,A', TEXT( I ) )
-         CALL MSG_OUT( ' ', '^LINE', STATUS )
+         CALL MSG_SETC( 'LINE', TEXT( I ) )
+         CALL MSG_OUT( ' ', '   ^LINE', STATUS )
 
 *  Quit if an error occurs.
          IF ( STATUS .NE. SAI__OK ) GO TO 2
