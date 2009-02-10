@@ -21555,6 +21555,21 @@ current version):
 
 \begin{enumerate}
 
+\item The Prism class has been modified so that any class of Region can
+be used to define the extrusion axes. Previously, only a Box or Interval
+could be used for this purpose.
+
+\item Improvements have been made to the way that Prisms are simplified
+when
+c+
+astSimplify
+c-
+f+
+AST\_SIMPLIFY
+f-
+is called.  The changes mean that more types of Prism will now simplify
+into a simpler class of Region.
+
 \item The PointList class has a new method, 
 c+
 astPoints, 
