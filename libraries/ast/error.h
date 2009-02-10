@@ -111,6 +111,11 @@
 #define astERROR_INVOKE(function) (astAt_(NULL,__FILE__,__LINE__,0,astGetStatusPtr),(function))
 #endif
 
+/* Define a dummy __attribute__ macro for use on non-GNU compilers. */
+#ifndef __GNUC__
+#  define  __attribute__(x)  /*NOTHING*/
+#endif
+
 /* Type definitions */
 /* ================ */
 
@@ -263,14 +268,14 @@ void astAt_( const char *, const char *, int, int, int * );
 
 #if defined(astCLASS) || defined(astFORTRAN77)      /* Protected only */
 int astReporting_( int, int * );
-void astError_( int, const char *, int *, ... );
+void astError_( int, const char *, int *, ... )__attribute__((format(printf,2,4)));
 void astBacktrace_( void );
 #if defined(THREAD_SAFE) 
 void astInitErrorGlobals_( AstErrorGlobals * );
 #endif
 #endif
 
-void astErrorPublic_( int, const char *, ... );
+void astErrorPublic_( int, const char *, ... )__attribute__((format(printf,2,3)));
 
 
 
