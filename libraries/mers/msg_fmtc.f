@@ -32,6 +32,16 @@
 *     -  Convert the value into a string.
 *     -  Use EMS_SETC to set the message token.
 
+*  Implementation Details:
+*     We allocate enough buffer space for both the input string itself and any format
+*     statement so that the formatted WRITE will almost certainly work (using X in a
+*     format can add many spaces). The input buffer is truncated at EMS__SZTOK+1 so
+*     that it will be truncated by EMS_SETC using ellipsis. The output buffer is sized
+*     at 2*EMS__SZTOK+1 to account for the format. This is not full proof but should
+*     allow all but the most odd formatting (where the output string requires more than
+*     double the amount of space used by the input string) to pass through the formatted
+*     internal WRITE.
+
 *  Copyright:
 *     Copyright (C) 2009 Science and Technology Facilities Council.
 *     Copyright (C) 1983, 1989, 1990 Science & Engineering Research Council.
@@ -81,6 +91,8 @@
 *        but the full string exceeds the buffer space. Ignore those spaces.
 *        Since EMS_SETC does handle string truncation, allocate
 *        2 * EMS__SZTOK for local storage and let EMS handle truncation.
+*     11-FEB-2009 (TIMJ):
+*        Handle truncation properly even if the supplied message is very very large. 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -110,7 +122,7 @@
       INTEGER NCHAR                     ! Character count
 
       CHARACTER * ( EMS__SZTOK ) FMT    ! String to contain FORMAT
-      CHARACTER * ( 2 * EMS__SZTOK ) STR! String to contain value
+      CHARACTER * ( ( 2 * EMS__SZTOK ) + 1 ) STR ! String to contain value
 
 *.
 
@@ -124,9 +136,10 @@
 *     Load FMT.
          FMT = FORMAT( 1 : ALLOW )
 
-*     Find the length of the input string
+*     Find the length of the input string but cap it at the size of the output buffer
          CLEN = CHR_LEN( CVALUE )
          CLEN = MAX( 1, CLEN )
+         CLEN = MIN( EMS__SZTOK + 1, CLEN )
 
 *     Construct the message token string.
          WRITE ( STR, '( '//FMT//' )',
