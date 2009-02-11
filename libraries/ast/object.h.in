@@ -1628,7 +1628,6 @@ astINVOKE(V,astTestAttrib_(astCheckObject(this),attrib,STATUS_PTR))
 /* Deprecated synonym. */
 #define astClass(this) astGetClass(this)
 #endif
-#endif
 
 /* Extra stuff for debuging probnlems with object handles and memory usage */
 #ifdef MEM_DEBUG
@@ -1649,5 +1648,5 @@ void astHandleAlarm_( const char *, va_list );
 
 #endif
 
-
+#endif
 
