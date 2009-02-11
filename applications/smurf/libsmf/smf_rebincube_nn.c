@@ -188,10 +188,12 @@
 *        Remove unused "nel" parameter.
 *     14-JAN-2009 (DSB):
 *        Fix bug in initialisation of detector data structures.
+*     11-FEB-2009 (DSB):
+*        Ignore negative or zero input Tsys values.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007-2008 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -265,6 +267,7 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
    float *ddata = NULL;        /* Pointer to start of input detector data */
    float *tdata = NULL;        /* Pointer to start of input time slice data */
    float *work = NULL;         /* Pointer to start of work array */
+   float rtsys;                /* Tsys value */
    float teff;                 /* Effective integration time */
    float texp;                 /* Total time ( = ton + toff ) */
    int *nexttime;              /* Pointer to next time slice index to use */
@@ -517,7 +520,9 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
          if( use_threads ) detector_data[ idet ].wgt = VAL__BADD;
 
 /* See if any good tsys values are present. */
-         if( ((float) tsys[ idet ]) != VAL__BADR ) *good_tsys = 1;
+         rtsys = tsys ? (float) tsys[ idet ] : VAL__BADR;
+         if( rtsys <= 0.0 ) rtsys = VAL__BADR;
+         if( rtsys != VAL__BADR ) *good_tsys = 1;
 
 /* Check the detector has a valid position in output grid coords */
          if( detxout[ idet ] != AST__BAD && detyout[ idet ] != AST__BAD ){
@@ -537,8 +542,8 @@ void smf_rebincube_nn( smfWorkForce *wf, smfData *data, int first, int last,
    the input Tsys values. */
                invar = VAL__BADR;
                if( usewgt || genvar == 2 ) { 
-                  if( (float) tsys[ idet ] != VAL__BADR ) {
-                     if( tcon != VAL__BADD ) invar = tcon*tsys[ idet ]*tsys[ idet ];
+                  if(  rtsys != VAL__BADR ) {
+                     if( tcon != VAL__BADD ) invar = tcon*rtsys*rtsys;
                   }
                }
 

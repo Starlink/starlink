@@ -169,10 +169,12 @@
 *     8-MAY-2008 (DSB):
 *        Use AST__USEVAR flag with astRebinSeq if output variances are
 *        based on input noise temperatures.
+*     11-FEB-2009 (DSB):
+*        Ignore negative or zero input Tsys values.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -251,6 +253,7 @@ void smf_rebincube_ast( smfWorkForce *wf, smfData *data, int first, int last,
    float *varwork = NULL;      /* Work array holding variances for 1 slice/channel */
    float *vp = NULL;           /* Pointer to next "varwork" element */
    float invar;                /* Input variance */
+   float rtsys;                /* Tsys value */
    float teff;                 /* Effective integration time */
    float texp;                 /* Total time ( = ton + toff ) */
    int *nexttime;              /* Pointer to next time slice index to use */
@@ -548,10 +551,12 @@ void smf_rebincube_ast( smfWorkForce *wf, smfData *data, int first, int last,
          vp = varwork;
          for( idet = 0; idet < ndet; idet++ ) {
             invar = VAL__BADR;
-            if( (float) tsys[ idet ] != VAL__BADR ) {
+            rtsys = tsys ? (float) tsys[ idet ] : VAL__BADR;
+            if( rtsys <= 0.0 ) rtsys = VAL__BADR;
+            if( rtsys != VAL__BADR ) {
                *good_tsys = 1;
                if( tcon != VAL__BADD ) {
-                  invar = tcon*tsys[ idet ]*tsys[ idet ];
+                  invar = tcon*rtsys*rtsys;
                   ignore = 0;
                }
             }

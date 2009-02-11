@@ -180,11 +180,13 @@
 *        Factor out printing of projection parameters.
 *     04-JUN-2008 (TIMJ):
 *        Remove big chunks of code into smf_get_projpar and smf_calc_skyframe
+*     11-FEB-2009 (DSB):
+*        Ignore negative or zero input Tsys values.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006,2007 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -262,6 +264,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    double map_pa=0;      /* Map position angle in output coord system (rads) */ 
    double skyref[ 2 ];   /* Values for output SkyFrame SkyRef attribute */
    float *pdata;         /* Pointer to next data sample */
+   float rtsys;          /* Tsys value */
    float telres=0;       /* Telescope resolution in radians */
    int found;            /* Was current detector name found in detgrp? */
    int good;             /* Are there any good detector samples? */
@@ -269,12 +272,12 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    int ifile;            /* Index of current input file */
    int ipar;             /* Parameter index */
    int ipos;             /* Position index */
-   int irec;             /* Index of current input detector */
-   int ispec;            /* Index of current spectral sample */
-   int itime;            /* Index of current time slice */
    int nallpos;          /* Number of positions */
    int outcat;           /* Produce an output catalogue holding sample positions? */
    int useauto;          /* Are autogrid default projection parameters being used? */
+   size_t irec;          /* Index of current input detector */
+   size_t itime;         /* Index of current time slice */
+   size_t ispec;         /* Index of current spectral sample */
    smfData *data = NULL; /* Pointer to data struct for current input file */
    smfFile *file = NULL; /* Pointer to file struct for current input file */
    smfHead *hdr = NULL;  /* Pointer to data header for this time slice */
@@ -555,7 +558,9 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                   *(p++) = yout[ irec ];
                   if( labgrp ) grpPut1( labgrp, lab, 0, status );
                   nallpos++;
-                  if( tsys && (float) tsys[ irec ] != VAL__BADR ) *gottsys = 1;
+                  rtsys = tsys ? (float) tsys[ irec ] : VAL__BADR;
+                  if( rtsys >= 0.0 ) rtsys = VAL__BADR;
+                  if( rtsys != VAL__BADR ) *gottsys = 1;
                }
 
 /* If this detector does not have a valid position, increment the data

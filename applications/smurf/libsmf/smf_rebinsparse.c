@@ -120,11 +120,13 @@
 *        output tiles and/or polarisation bins will receive contributions 
 *        from different input files, not necessarily starting at the first 
 *        input file or ending at the last.
+*     11-FEB-2009 (DSB):
+*        Ignore negative or zero input Tsys values.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -197,6 +199,7 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
    double tcon;          /* Variance factor for whole time slice */
    float *pdata = NULL;  /* Pointer to next data sample */
    float *qdata = NULL;  /* Pointer to next data sample */
+   float rtsys;          /* Tsys value */
    float teff;           /* Effective integration time, times 4 */
    float texp;           /* Total time ( = ton + toff ) */
    float toff;           /* Off time */
@@ -207,13 +210,13 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
    int good;             /* Are there any good detector samples? */
    int ibasein;          /* Index of base Frame in input FrameSet */
    int ichan;            /* Index of current channel */
-   int irec;             /* Index of current input detector */
-   int itime;            /* Index of current time slice */
    int iv;               /* Offset to next element */
    int iz;               /* Output grid index on axis 3 */
    int nchan;            /* Number of input spectral channels */
    int pixax[ 3 ];       /* The output fed by each selected mapping input */
    int specax;           /* Index of spectral axis in input FrameSet */
+   size_t irec;          /* Index of current input detector */
+   size_t itime;         /* Index of current time slice */
    smfHead *hdr = NULL;  /* Pointer to data header for this time slice */
 
 /* Check inherited status */
@@ -499,10 +502,10 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
    spectrum to the output NDF. */
             if( good ) {
                if( *ispec < dim[ 0 ] ){
-
-                  if( tcon != AST__BAD && genvar == 2 && 
-                      (float) tsys[ irec ] != VAL__BADR ) {
-                     var_array[ *ispec ] = tcon*tsys[ irec ]*tsys[ irec ];
+                  rtsys = tsys ? (float) tsys[ irec ] : VAL__BADR;
+                  if( rtsys <= 0.0 ) rtsys = VAL__BADR;
+                  if( tcon != AST__BAD && genvar == 2 && rtsys != VAL__BADR ) {
+                     var_array[ *ispec ] = tcon*rtsys*rtsys;
                   } else if( var_array ) {
                      var_array[ *ispec ] = VAL__BADR;
                   }
