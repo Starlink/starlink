@@ -391,15 +391,6 @@ static int TestUseDefs( AstObject *, int * );
 static void ClearUseDefs( AstObject *, int * );
 static void SetUseDefs( AstObject *, int, int * );
 
-
-#if defined(MEM_DEBUG)
-static void CheckList( int * );
-static void CheckInList( int, int *, int );
-static int CheckThread( int, int * );
-static const char *HandleString( int, char * );
-static const char *HeadString( int *, char * );
-#endif
-
 #if defined(THREAD_SAFE)
 static void ChangeThreadVtab( AstObject *, int * );
 static int ManageLock( AstObject *, int, int, AstObject **, int * );
@@ -4841,13 +4832,27 @@ static int Watched_Handle = -1; /* A handle index to be watched. Activity
 
 /* External Interface Function Prototypes. */
 /* --------------------------------------- */
+/* MYSTATIC should normally be set to "static" to make the following
+   function have local symbols. But it may be set to blank for debugging 
+   purposes in order to enable these functions to appear in a backtrace 
+   such as produced by the astBacktrace function. */
+#define MYSTATIC
+
 /* Private functions associated with the external interface. */
-static AstObject *AssocId( int, int * );
-static int CheckId( AstObject *, int, int * );
-static void AnnulHandle( int, int * );
-static void InitContext( int * );
-static void InsertHandle( int, int *, int * );
-static void RemoveHandle( int, int *, int * );
+MYSTATIC AstObject *AssocId( int, int * );
+MYSTATIC int CheckId( AstObject *, int, int * );
+MYSTATIC void AnnulHandle( int, int * );
+MYSTATIC void InitContext( int * );
+MYSTATIC void InsertHandle( int, int *, int * );
+MYSTATIC void RemoveHandle( int, int *, int * );
+
+#if defined(MEM_DEBUG)
+MYSTATIC void CheckList( int *, int * );
+MYSTATIC void CheckInList( int, int *, int, int * );
+MYSTATIC int CheckThread( int, int *, int * );
+MYSTATIC const char *HandleString( int, char * );
+MYSTATIC const char *HeadString( int *, char * );
+#endif
 
 
 /* The following functions have public prototypes only (i.e. no
@@ -4865,7 +4870,7 @@ void astUnlockId_( AstObject *, int * );
 
 /* External Interface Functions. */
 /* ----------------------------- */
-static void AnnulHandle( int ihandle, int *status ) {
+MYSTATIC void AnnulHandle( int ihandle, int *status ) {
 /*
 *  Name:
 *     AnnulHandle
@@ -5056,14 +5061,14 @@ AstObject *astAnnulId_( AstObject *this_id, int *status ) {
 /* Obtain the Handle offset for this Object and annul the Handle and
    its associated Object pointer. */
    LOCK_MUTEX2;
-   AnnulHandle( CheckId( this_id, 1, status ), status );
+   AnnulHandle( CheckId( this_id, 0, status ), status );
    UNLOCK_MUTEX2;
 
 /* Always return a NULL pointer value. */
    return NULL;
 }
 
-static AstObject *AssocId( int ihandle, int *status ) {
+MYSTATIC AstObject *AssocId( int ihandle, int *status ) {
 /*
 *  Name:
 *     AssocId
@@ -5266,7 +5271,7 @@ f     depth.
    astSetStatus( stat );
 }
 
-static int CheckId( AstObject *this_id, int lock_check, int *status ) {
+MYSTATIC int CheckId( AstObject *this_id, int lock_check, int *status ) {
 /*
 *  Name:
 *     CheckId
@@ -6015,68 +6020,80 @@ c--
    an error if the Object is not currently locked by the calling thread. */
    if ( !astIsAObject( this = astMakePointer_NoLockCheck( this_id ) ) ) return;
 
+/* Ensure the global data for this class is accessable. Do not use the
+   globals pointer stored in "*this" because "*this" may be locked by
+   another thread and so we would pick up the wrong globals. */
+   astGET_GLOBALS(NULL);
+
+/* Ensure the running thread has sole access to the static handles arrays. */
+   LOCK_MUTEX2;
+
+/* Ensure the Handles arrays have been initialised. */
+   if ( !active_handles ) InitContext( status );
+
+/* Get the Handle index for the supplied object identifier. No error is
+   reported if the handle is not curently associated with a thread.
+   However, an error is reported if the Handle is associated with any
+   thread other than the running thread. */
+   ihandle = CheckId( this_id, 0, status );
+
+/* We've finished with the handles arrays, for the moment. */
+   UNLOCK_MUTEX2;
+
+/* Check the object pointer was valid. */
+   if( ihandle != -1 ){
+
 /* The protected astManageLock function implements the public functions, 
    astLock and astUnlock. */
-   lstat = astManageLock( this, AST__LOCK, wait, &fail );
-   if( astOK ) {
-      if( lstat == 1 ) {
-         if( fail == this ) {
-            astError( AST__LCKERR, "astLock(%s): Failed to lock the %s because"
-                      " it is already locked by another thread (programming "
-                      "error).", status, astGetClass( this ), 
+      lstat = astManageLock( this, AST__LOCK, wait, &fail );
+      if( astOK ) {
+         if( lstat == 1 ) {
+            if( fail == this ) {
+               astError( AST__LCKERR, "astLock(%s): Failed to lock the %s because"
+                         " it is already locked by another thread (programming "
+                         "error).", status, astGetClass( this ), 
+                         astGetClass( this ) );
+
+            } else {
+               astError( AST__LCKERR, "astLock(%s): Failed to lock the %s because"
+                         " a %s contained within it is already locked by another "
+                         "thread (programming error).", status, 
+                         astGetClass( this ), astGetClass( this ),
+                         astGetClass( fail ) );
+            }
+
+         } else if( lstat == 2 ) {
+            astError( AST__LCKERR, "astLock(%s): Failed to lock a POSIX mutex.", status,
                       astGetClass( this ) );
 
+/* If the Object is now locked for the running thread... */
          } else {
-            astError( AST__LCKERR, "astLock(%s): Failed to lock the %s because"
-                      " a %s contained within it is already locked by another "
-                      "thread (programming error).", status, 
-                      astGetClass( this ), astGetClass( this ),
-                      astGetClass( fail ) );
-         }
 
-      } else if( lstat == 2 ) {
-         astError( AST__LCKERR, "astLock(%s): Failed to lock a POSIX mutex.", status,
-                   astGetClass( this ) );
+/* We need access to the handles arrays again. */
+            LOCK_MUTEX2;
 
-/* If the Object has been locked succesfully, and it was previously
-   unlocked, remove its handle from the (global) unowned list add put 
-   it on the active_handles list for the current context level. */
-      } else {
-         astGET_GLOBALS(this);
-         LOCK_MUTEX2;
-         if ( !active_handles ) InitContext( status );
-         ihandle = CheckId( this_id, 1, status );
-         if( ihandle != -1 && handles[ ihandle ].context == UNOWNED_CONTEXT ) {
-            RemoveHandle( ihandle, &unowned_handles, status );
-
-            handles[ ihandle ].thread = AST__THREAD_ID;
-            handles[ ihandle ].context = context_level;
+/* If the supplied handle is not currently assigned to any thread, assign 
+   it to the running thread. */
+            if( handles[ ihandle ].context == UNOWNED_CONTEXT ) {
+               RemoveHandle( ihandle, &unowned_handles, status );
 
 #if defined(MEM_DEBUG)
-            astHandleUse( ihandle, "locked by thread %d at context level %d", 
-                           handles[ ihandle ].thread, context_level );
+               astHandleUse( ihandle, "locked by thread %d at context level %d",
+                             handles[ ihandle ].thread, context_level );
 #endif
 
-            InsertHandle( ihandle, &active_handles[ context_level ], status );
+               handles[ ihandle ].thread = AST__THREAD_ID;
+               handles[ ihandle ].context = context_level;
+               InsertHandle( ihandle, &active_handles[ context_level ], 
+                                status );
+            }
 
-/* We will arrive here if an attempt is made to lock an Object that was
-   already locked. In this case, the handle will not be on the unowned
-   list, but it should be on the active list for the current context
-   level, or a lower context level. Check this is the case. */
-         } else if( handles[ ihandle ].context > context_level && astOK ) {
-            astError( AST__INTER, "astLock(%s): Supplied Object handle "
-                      "(index %d value %d) has a context level of %d "
-                      "which should be %d or lower (internal AST programming "
-                      "error).", status, astGetClass( this ), ihandle,  
-                      handles[ ihandle ].check, handles[ ihandle ].context, 
-                      context_level );
+/* Finished with the handles arrays again. */
+            UNLOCK_MUTEX2;
          }
-         UNLOCK_MUTEX2;
       }
    }
-
 #endif
-
 }
 
 void astUnlockId_( AstObject *this_id, int *status ) {
@@ -6143,56 +6160,72 @@ c--
    an error if the Object is not currently locked by the calling thread. */
    if ( !astIsAObject( this = astMakePointer_NoLockCheck( this_id ) ) ) return;
 
+/* Ensure the global data for this class is accessable. */
+   astGET_GLOBALS(this);
 
 /* Start a new error reporting context. This saves any existing error status 
    and then clear the status value. It also defer further error reporting. */
    astErrorBegin( &error_context );
 
+/* Ensure the running thread has sole access to the static handles arrays. */
+   LOCK_MUTEX2;
+
+/* Ensure the Handles arrays have been initialised. */
+   if ( !active_handles ) InitContext( status );
+
+/* Get the Handle index for the supplied object identifier. Report an error 
+   if the handle is not curently associated with the running thread. */
+   ihandle = CheckId( this_id, 1, status );
+
+/* Break the associated of the handle with the current thread so that the 
+   handle is not assigned to any thread. We do this before unlocking the
+   Object structure (using astManageLock) since as soon as astManageLock
+   returns, another thread that is waiting for the object to be unlocked
+   may start up and modify the handle properties. */
+   if( handles[ ihandle ].context >= 0 ) {
+      RemoveHandle( ihandle, &active_handles[ handles[ ihandle ].context ], 
+                    status );
+#if defined(MEM_DEBUG)
+      astHandleUse( ihandle, "unlocked from thread %d at context "
+                    "level %d", handles[ ihandle ].thread, 
+                    handles[ ihandle ].context );
+#endif
+      handles[ ihandle ].thread = -1;
+      handles[ ihandle ].context = UNOWNED_CONTEXT;
+      InsertHandle( ihandle, &unowned_handles, status );
+   }
+
+/* We've finished with the handles arrays, for the moment. */
+   UNLOCK_MUTEX2;
+
+/* Check the supplied object pointer was valid. */
+   if( ihandle != -1 ){
+
 /* The protected astManageLock function implements the public functions, 
    astLock and astUnlock. */
-   lstat = astManageLock( this, AST__UNLOCK, 0, &fail );
-   if( astOK ) {
-      if( lstat == 1 ) {
-         if( fail == this ) {
-            astError( AST__LCKERR, "astUnlock(%s): Failed to unlock the %s "
-                      "because it is locked by another thread (programming "
-                      "error).", status, astGetClass( this ), 
+      lstat = astManageLock( this, AST__UNLOCK, 0, &fail );
+      if( astOK ) {
+         if( lstat == 1 ) {
+            if( fail == this ) {
+               astError( AST__LCKERR, "astUnlock(%s): Failed to unlock the %s "
+                         "because it is locked by another thread (programming "
+                         "error).", status, astGetClass( this ), 
+                         astGetClass( this ) );
+   
+            } else {
+               astError( AST__LCKERR, "astUnlock(%s): Failed to unlock the %s "
+                         "because a %s contained within it is locked by another "
+                         "thread (programming error).", status, 
+                         astGetClass( this ), astGetClass( this ),
+                         astGetClass( fail ) );
+            }
+   
+   
+         } else if( lstat == 3 ) {
+            astError( AST__LCKERR, "astUnlock(%s): Failed to unlock a POSIX mutex.", status,
                       astGetClass( this ) );
 
-         } else {
-            astError( AST__LCKERR, "astUnlock(%s): Failed to unlock the %s "
-                      "because a %s contained within it is locked by another "
-                      "thread (programming error).", status, 
-                      astGetClass( this ), astGetClass( this ),
-                      astGetClass( fail ) );
-         }
-
-
-      } else if( lstat == 3 ) {
-         astError( AST__LCKERR, "astUnlock(%s): Failed to unlock a POSIX mutex.", status,
-                   astGetClass( this ) );
-
-/* If the Object has been unlocked succesfully, and it was previously
-   locked, remove its handle from the active_handles list for the current 
-   thread, and put it on the (global) unowned list. */
-      } else {
-         astGET_GLOBALS(this);
-         LOCK_MUTEX2;
-         ihandle = CheckId( this_id, 1, status );
-         if( ihandle != -1 && handles[ ihandle ].context != UNOWNED_CONTEXT ) {
-            RemoveHandle( ihandle, &active_handles[ handles[ ihandle ].context ], status );
-
-#if defined(MEM_DEBUG)
-            astHandleUse( ihandle, "unlocked from thread %d at context "
-                           "level %d", handles[ ihandle ].thread, 
-                           handles[ ihandle ].context );
-#endif
-            handles[ ihandle ].thread = -1;
-            handles[ ihandle ].context = UNOWNED_CONTEXT;
-            InsertHandle( ihandle, &unowned_handles, status );
-
-         }
-         UNLOCK_MUTEX2;
+         } 
       }
    }
 
@@ -6265,7 +6298,7 @@ AstObject *astI2P_( int integer, int *status ) {
    return temp.pointer;
 }
 
-static void InitContext( int *status ) {
+MYSTATIC void InitContext( int *status ) {
 /*
 *  Name:
 *     InitContext
@@ -6321,7 +6354,7 @@ static void InitContext( int *status ) {
    }
 }
 
-static void InsertHandle( int ihandle, int *head, int *status ) {
+MYSTATIC void InsertHandle( int ihandle, int *head, int *status ) {
 /*
 *  Name:
 *     InsertHandle
@@ -6379,8 +6412,8 @@ static void InsertHandle( int ihandle, int *head, int *status ) {
    char buf[80];
    astHandleUse( ihandle, "about to be inserted into %s (%d)", 
                  HeadString( head, buf ), head );
-   CheckList( head );
-   CheckInList( ihandle, head, 0 );
+   CheckList( head, status );
+   CheckInList( ihandle, head, 0, status );
 #endif
 
 /* Check a head pointer was supplied (may not be if an error has
@@ -6405,7 +6438,7 @@ static void InsertHandle( int ihandle, int *head, int *status ) {
    *head = ihandle;
 
 #if defined(MEM_DEBUG)
-   CheckList( head );
+   CheckList( head, status );
    astHandleUse( ihandle, "has been inserted into %s", buf );
 #endif
 }
@@ -6778,7 +6811,7 @@ int astP2I_( AstObject *pointer, int *status ) {
    return temp.integer;
 }
 
-static void RemoveHandle( int ihandle, int *head, int *status ) {
+MYSTATIC void RemoveHandle( int ihandle, int *head, int *status ) {
 /*
 *  Name:
 *     RemoveHandle
@@ -6825,8 +6858,8 @@ static void RemoveHandle( int ihandle, int *head, int *status ) {
 #if defined(MEM_DEBUG)
    char buf[80];
    astHandleUse( ihandle, "about to be removed from %s", HeadString( head, buf ) );
-   CheckList( head );
-   CheckInList( ihandle, head, 1 );
+   CheckList( head, status );
+   CheckInList( ihandle, head, 1, status );
 #endif
 
 /* Check a head pointer was supplied (may not be if an error has
@@ -6854,7 +6887,7 @@ static void RemoveHandle( int ihandle, int *head, int *status ) {
 
 #if defined(MEM_DEBUG)
    astHandleUse( ihandle, "has been removed from %s", buf );
-   CheckList( head );
+   CheckList( head, status );
 #endif
 }
 
@@ -7224,11 +7257,12 @@ f     AST_STRIPESCAPES
 /* Check each handle in a list is uniquely connected to one other handle
    in both the forward and backward directions. */
 
-void CheckList( int *head ) {
+void CheckList( int *head, int *status ) {
    int ok;
    int ihandle;
    char buf[200];
    astDECLARE_GLOBALS;          
+   if( !astOK ) return;
 
    astGET_GLOBALS(NULL);
 
@@ -7240,12 +7274,12 @@ void CheckList( int *head ) {
          ok = 0;
 
       } else {
-         if( CheckThread( ihandle, head ) ) {
+         if( CheckThread( ihandle, head, status ) ) {
             ihandle= handles[ *head ].blink;
             while( ihandle != *head ) {
                if( handles[ handles[ ihandle ].blink ].flink != ihandle ||
                    handles[ handles[ ihandle ].flink ].blink != ihandle ||
-                   CheckThread( ihandle, head ) == 0 ) {
+                   CheckThread( ihandle, head, status ) == 0 ) {
                   ok = 0;
                   break;
                } 
@@ -7279,15 +7313,16 @@ void CheckList( int *head ) {
 
 /* Check if a specified handle is, or is not, in a given list of handles. */
 
-void CheckInList( int ihandle, int *head, int in ){
+void CheckInList( int ihandle, int *head, int in, int *status ){
    char list[80], buf[200];
    int found = 0;
+   if( !astOK ) return;
 
    if ( *head != -1 ) {
       if( ihandle == *head ) {
          found = 1;
       } else {
-         if( CheckThread( ihandle, head ) ) {
+         if( CheckThread( ihandle, head, status ) ) {
             int jhandle= handles[ *head ].blink;
             while( jhandle != *head ) {
                if( ihandle == jhandle ) {
@@ -7312,13 +7347,15 @@ void CheckInList( int ihandle, int *head, int in ){
 
 /* Check that a handle is owned by the currently executing thread. */
 
-int CheckThread( int ihandle, int *head ) {
+int CheckThread( int ihandle, int *head, int *status ) {
    int result = 1;
 
 #if defined(THREAD_SAFE)
 
    char buf[200];
    astDECLARE_GLOBALS;          
+   if( !astOK ) return result;
+
    astGET_GLOBALS(NULL);
 
    if( *head == unowned_handles  ) {
@@ -7327,6 +7364,7 @@ int CheckThread( int ihandle, int *head ) {
              "be -1 (i.e. unowned)\n", HandleString( ihandle, buf ), 
               handles[ ihandle ].thread );
 
+         result = 0;
       }
 
    } else if( *head == free_handles ) {
@@ -7334,12 +7372,14 @@ int CheckThread( int ihandle, int *head ) {
          printf("Handle %s has wrong thread: is %d, should "
              "be -1 (i.e. free)\n", HandleString( ihandle, buf ), 
               handles[ ihandle ].thread );
+         result = 0;
       }
 
    } else if( handles[ ihandle ].thread != AST__THREAD_ID ) {
       printf("Handle %s has wrong thread: is %d, should "
              "be %d\n", HandleString( ihandle, buf ), 
               handles[ ihandle ].thread, AST__THREAD_ID );
+      result = 0;
    } 
 
 #endif
@@ -7376,23 +7416,38 @@ void astHandleAlarm_( const char *verb, va_list args ){
 #endif
 }
 
-static const char *HandleString( int ihandle, char *buf ){
+MYSTATIC const char *HandleString( int ihandle, char *buf ){
 #if defined(THREAD_SAFE)
-   sprintf( buf, "(index:%d v:%d c:%d t:%d i:%d cl:%s)", ihandle, 
-            handles[ ihandle ].check, 
-            handles[ ihandle ].context, handles[ ihandle ].thread,
-            handles[ ihandle ].id, 
-            handles[ ihandle ].vtab ? handles[ ihandle ].vtab->class : "<none>" );
+   astDECLARE_GLOBALS;          
+   astGET_GLOBALS(NULL);
+
+   if( ihandle >= 0 ) {
+      sprintf( buf, "(index:%d v:%d c:%d t:%d i:%d cl:%s) [cur. thread: %d]", 
+               ihandle, 
+               handles[ ihandle ].check, 
+               handles[ ihandle ].context, handles[ ihandle ].thread,
+               handles[ ihandle ].id, 
+               handles[ ihandle ].vtab ? handles[ ihandle ].vtab->class : "<none>",
+               AST__THREAD_ID );
+   } else {
+      sprintf( buf, "(index:%d <invalid>) [cur. thread: %d]", ihandle, 
+               AST__THREAD_ID );
+   }
+
 #else
-   sprintf( buf, "(index:%d v:%d c:%d i:%d cl:%s)", ihandle, 
-            handles[ ihandle ].check, 
-            handles[ ihandle ].context, handles[ ihandle ].id, 
-            handles[ ihandle ].vtab ? handles[ ihandle ].vtab->class : "<none>" );
+   if( ihandle >= 0 ) {
+      sprintf( buf, "(index:%d v:%d c:%d i:%d cl:%s)", ihandle, 
+               handles[ ihandle ].check, 
+               handles[ ihandle ].context, handles[ ihandle ].id, 
+               handles[ ihandle ].vtab ? handles[ ihandle ].vtab->class : "<none>" );
+   } else {
+      sprintf( buf, "(index:%d <invalid>)", ihandle );
+   }
 #endif
    return buf;
 }
 
-static const char *HeadString( int *head, char *list ){
+MYSTATIC const char *HeadString( int *head, char *list ){
    int i;
    astDECLARE_GLOBALS;          
    astGET_GLOBALS(NULL);

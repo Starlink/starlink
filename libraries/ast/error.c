@@ -314,7 +314,7 @@ void astAt_( const char *routine, const char *file, int line, int forn,
    foreign_set = forn;
 }
 
-void astBacktrace_( void ) {
+void astBacktrace_( int *status ) {
 /*
 c+
 *  Name:
@@ -324,19 +324,20 @@ c+
 *     Display a backtrace on standard output.
 
 *  Type:
-*     Protected function.
+*     Protected macro.
 
 *  Synopsis:
 *     #include "error.h"
-*     void astBacktrace( void )
+*     astBacktrace;
 
 *  Description:
-*     This function displays a set of messages on standard output that
+*     This macro displays a set of messages on standard output that
 *     give a backtrace of the caller. It can be useful for debugging AST
 *     code in situations when it is not easy or possible to use a
 *     debugger (for instance, when debugging JNIAST).
 
 *  Notes:
+*     - Only non-static function names are included in the backtrace.
 *     - This function requires the GNU C library. When called, it will 
 *     just issue a warning if the GNU 'backtrace' function was not 
 *     available when AST was configured.
@@ -348,6 +349,7 @@ c-
 
 /* Local Variables: */
    char **strings;           /* Pointer to array of formated strings */
+   char buf[ 120 ];          /* Output line buffer */
    int j;                    /* String index */
    int np;                   /* Number of used return addresses */
    void *buffer[ MAX_ADDR ]; /* Array of return addresses */
@@ -361,19 +363,22 @@ c-
 /* If succesful, display them and then free the array. Note we skip the
    first one since that will refer to this function. */
    if( strings ) {
-      printf("\n");
-      for( j = 1; j < np; j++ ) printf( "%d: %s\n", j, strings[j] );
+      INVOKE_ASTPUTERR( astStatus, " " );
+      for( j = 1; j < np; j++ ) {
+         sprintf( buf, "%d: %s", j, strings[j] );
+         INVOKE_ASTPUTERR( astStatus, buf );
+      }      
       free( strings );
-      printf("\n");
+      INVOKE_ASTPUTERR( astStatus, " " );
 
 /* If not succesful, issue a warning. */
    } else {
-      printf( "Cannot convert backtrace addresses into formatted strings\n" );
+      INVOKE_ASTPUTERR( astStatus, "Cannot convert backtrace addresses into formatted strings" );
    }
 
 #else
-   printf("Backtrace functionality is not available on the current "
-          "operating system.\n");
+   INVOKE_ASTPUTERR( astStatus, "Backtrace functionality is not available "
+                     "on the current operating system." );
 #endif
 }
 
