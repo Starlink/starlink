@@ -5,6 +5,17 @@
  *  Purpose:
 *  Fortran callable routine
 
+ *  Authors:
+ *    AJC: Alan Chipperfield (Starlink)
+ *    TIMJ: Tim Jenness (JAC, Hawaii)
+
+ *  History:
+ *    2000 (AJC):??
+ *      Fortran wrapper around ems1Stok
+ *    11-FEB-2009 (TIMJ):
+ *      Allow a long string to be imported (longer than EMS__SZNAM)
+ *      so that ems1Putc is allowed to truncate it consistently.
+
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
@@ -42,13 +53,13 @@ F77_SUBROUTINE(ems_setc) ( CHARACTER(token), CHARACTER(cvalue)
          TRAIL(token) TRAIL(cvalue) )
 {
    char ctok[EMS__SZNAM+1];      /* Imported token name */
-   char ccval[EMS__SZTOK+1];     /* Imported char value */
+   char *ccval;                  /* Imported char value */
 
    GENPTR_CHARACTER(token)
    GENPTR_CHARACTER(cvalue)
 
    cnfImpn( token, token_length, EMS__SZNAM, ctok );
-   cnfImpn( cvalue, cvalue_length, EMS__SZTOK, ccval );
+   ccval = cnfCreim( cvalue, cvalue_length );
 
 /* Ensure minimum 1 space */
    if ( ! strlen( ccval ) ) {
@@ -56,7 +67,10 @@ F77_SUBROUTINE(ems_setc) ( CHARACTER(token), CHARACTER(cvalue)
    }
 
 /* Now set the token string */
-   ems1Stok( ctok, ccval );
+   emsSetc( ctok, ccval );
+
+/* Free memory */
+   cnfFree( ccval );
 
    return;
 }

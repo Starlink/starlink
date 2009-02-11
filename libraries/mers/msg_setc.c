@@ -35,7 +35,7 @@
 *        The value to be assiged to the message token.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
 *     Copyright (C) 1983, 1984, 1989 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -73,6 +73,8 @@
 *        Converted to call EMS_SETC.
 *     18-JUL-2008 (TIMJ):
 *        Wrapper around C function.
+*     11-FEB-2009 (TIMJ):
+*        Pass full string to C function rather than truncating.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -91,19 +93,18 @@
 F77_SUBROUTINE(msg_setc)( CHARACTER(TOKEN), CHARACTER(CVALUE)
                           TRAIL(TOKEN) TRAIL(CVALUE) ) {
 
-  char *token;
-  char cvalue[EMS__SZTOK+1];
+  char *token = NULL;
+  char *cvalue = NULL;
 
   GENPTR_CHARACTER(TOKEN);
   GENPTR_CHARACTER(CVALUE);
 
-  token = starMallocAtomic( TOKEN_length + 1 );
-  F77_IMPORT_CHARACTER( TOKEN, TOKEN_length, token );
-  cnfImpn( CVALUE, CVALUE_length, EMS__SZTOK, cvalue );
+  token = cnfCreim( TOKEN, TOKEN_length );
+  cvalue = cnfCreim( CVALUE, CVALUE_length );
 
 /*  Construct the message token string. */
   msgSetc( token, cvalue );
 
-  starFree( token );
-
+  cnfFree( token );
+  cnfFree( cvalue );
 }

@@ -31,7 +31,7 @@
  *  Copyright:
  *     Copyright (C) 1990, 1991 Science & Engineering Research Council.
  *     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
- *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -82,6 +82,8 @@
  *          a space.
  *     16-SEP-2008 (TIMJ):
  *        Remove deprecated 3 arg interface.
+ *     11-FEB-2009 (TIMJ):
+ *        Allow ems1Putc to truncate the string consistently.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -104,7 +106,7 @@
 void emsSetc( const char *token, const char *cvalue )
 {
     int i;
-    char valbuf[ EMS__SZTOK + 1 ];
+    char valbuf[ EMS__SZTOK + 2 ]; /* +2 to allow ems1Putc to no there is truncation */
     const char null[] = "<Null>";
 
     TRACE( "emsSetc" );
@@ -117,7 +119,7 @@ void emsSetc( const char *token, const char *cvalue )
     } else {
       strncpy( valbuf, null, sizeof(valbuf) );
     }
-    valbuf[ EMS__SZTOK ] = '\0';
+    valbuf[ sizeof(valbuf)-1 ] = '\0';
 
     /*  Find the used length of the string */
     for ( i = strlen( valbuf ); i > 0 ; i-- ) {
