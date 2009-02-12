@@ -95,12 +95,20 @@ else
 fi
 
 for m in "$submodule_list"; do
-   modified=`cd $m && git diff-index --stat HEAD`
-   if test "$modified" != ""; then
-      echo "WARNING: submodule contains modified files, will not proceed"
-      echo "$m"
-      echo "$modified"
-      exit 1
+  
+   #  May not be checked in yet, in that case we see the modified files in the
+   #  full repository. Avoid that case.
+   files=`cd $m && ls`
+   if test "$files" != ""; then
+      modified=`cd $m && git diff-index --stat HEAD`
+      if test "$modified" != ""; then
+         echo "WARNING: submodule contains modified files, will not proceed"
+         echo "$m"
+         echo "$modified"
+         exit 1
+      fi
+   else
+      echo "... found uninitialised submodule: $m"
    fi
 done
 
