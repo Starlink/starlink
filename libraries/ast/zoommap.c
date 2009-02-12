@@ -1181,7 +1181,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, int *status 
 static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
-*     astSetAttrib
+*     SetAttrib
 
 *  Purpose:
 *     Set an attribute value for a ZoomMap.

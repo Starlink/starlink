@@ -15142,7 +15142,7 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
 static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
-*     astSetAttrib
+*     SetAttrib
 
 *  Purpose:
 *     Set an attribute value for a Mapping.

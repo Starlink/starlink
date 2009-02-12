@@ -296,7 +296,7 @@ static const char *AxisAbbrev( AstAxis *this_axis, const char *fmt,
                                const char *str1, const char *str2, int *status ) {
 /*
 *  Name:
-*     astAxisAbbrev
+*     AxisAbbrev
 
 *  Purpose:
 *     Abbreviate a formatted SkyAxis value by skipping leading fields.
@@ -406,7 +406,7 @@ static const char *AxisAbbrev( AstAxis *this_axis, const char *fmt,
 static double AxisDistance( AstAxis *this_axis, double v1, double v2, int *status ) {
 /*
 *  Name:
-*     astAxisDistance
+*     AxisDistance
 
 *  Purpose:
 *     Find the distance between two axis values.
@@ -468,7 +468,7 @@ static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
                        int maxfld, char **fields, int *nc, double *val, int *status ) {
 /*
 *  Name:
-*     astAxisFields
+*     AxisFields
 
 *  Purpose:
 *     Identify numerical fields within a formatted SkyAxis value.
@@ -1103,7 +1103,7 @@ static double AxisOffset( AstAxis *this_axis, double v1, double dist, int *statu
 /*
 *
 *  Name:
-*     astAxisOffset
+*     AxisOffset
 
 *  Purpose:
 *     Add an increment onto a supplied axis value.

@@ -1686,7 +1686,7 @@ static AstPointSet *BndMesh( AstRegion *this, double *lbnd, double *ubnd, int *s
 static AstPointSet *BTransform( AstRegion *this, AstPointSet *in,
                                 int forward, AstPointSet *out, int *status ) {
 /*
-*
+*+
 *  Name:
 *     astBTransform
 
@@ -1731,6 +1731,7 @@ static AstPointSet *BTransform( AstRegion *this, AstPointSet *in,
 *     -  This is identical to the astTransform method for a Region except
 *     that the supplied and returned points refer to the base Frame of
 *     the Region, rather than the current Frame.
+*-
 */
 
 /* Local Variables: */
@@ -2145,14 +2146,13 @@ static AstFrameSet *ConvertX( AstFrame *to, AstFrame *from,
                               const char *domainlist, int *status ) {
 /*
 *  Name:
-*     astConvertX
+*     ConvertX
 
 *  Purpose:
 *     Determine how to convert between two coordinate systems.
 
 *  Type:
-*     Region member function (over-rides the protected astConvertX
-*     method inherited fromm the Frame class).
+*     Private function.
 
 *  Synopsis:
 *     #include "region.h"
@@ -2160,7 +2160,8 @@ static AstFrameSet *ConvertX( AstFrame *to, AstFrame *from,
 *                               const char *domainlist )
 
 *  Class Membership:
-*     Frame method.
+*     Region member function (over-rides the protected astConvertX
+*     method inherited from the Frame class).
 
 *  Description:
 *     This function performs the processing for the public astConvert
@@ -7271,6 +7272,7 @@ static double *RegCentre( AstRegion *this, double *cen, double **ptr,
 static void RegClearAttrib( AstRegion *this, const char *aattrib, 
                             char **base_attrib, int *status ) {
 /*
+*+
 *  Name:
 *     astRegClearAttrib
 
@@ -7310,7 +7312,7 @@ static void RegClearAttrib( AstRegion *this, const char *aattrib,
 *        axis permutation. The returned pointer should be freed using
 *        astFree when no longer needed. A NULL pointer may be supplied in 
 *        which case no pointer is returned.
-
+*-
 */
 
 /* Local Variables: */
@@ -8147,6 +8149,7 @@ static void RegOverlay( AstRegion *this, AstRegion *that, int *status ){
 static void RegSetAttrib( AstRegion *this, const char *asetting, 
                           char **base_setting, int *status ) {
 /*
+*+
 *  Name:
 *     astRegSetAttrib
 
@@ -8193,7 +8196,7 @@ static void RegSetAttrib( AstRegion *this, const char *asetting,
 *        axis permutation. The returned pointer should be freed using
 *        astFree when no longer needed. A NULL pointer may be supplied in 
 *        which case no pointer is returned.
-
+*-
 */
 
 /* Local Variables: */
@@ -8505,7 +8508,7 @@ static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[],
                                    AstPointSet *out, int *status ) {
 /*
 *  Name:
-*     astResolvePoints
+*     ResolvePoints
 
 *  Purpose:
 *     Resolve a set of vectors into orthogonal components
@@ -8515,9 +8518,9 @@ static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[],
 
 *  Synopsis:
 *     #include "region.h"
-*     AstPointSet *astResolvePoints( AstFrame *this, const double point1[], 
-*                                    const double point2[], AstPointSet *in,
-*                                    AstPointSet *out )
+*     AstPointSet *ResolvePoints( AstFrame *this, const double point1[], 
+*                                 const double point2[], AstPointSet *in,
+*                                 AstPointSet *out )
 
 *  Class Membership:
 *     Region member function (over-rides the astResolvePoints method

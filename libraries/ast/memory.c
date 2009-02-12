@@ -436,6 +436,7 @@ static void DeIssue( Memory *, int * );
 /* ========================= */
 char *astAppendString_( char *str1, int *nc, const char *str2, int *status ) {
 /*
+*+
 *  Name:
 *     astAppendString
 
@@ -487,6 +488,7 @@ char *astAppendString_( char *str1, int *nc, const char *str2, int *status ) {
 *     or if it should fail for any reason, then the returned pointer
 *     will be equal to "str1" and the dynamic string contents will be
 *     unchanged.
+*-
 */
 
 /* Local Variables: */
@@ -3707,6 +3709,7 @@ void *astMemoryPtr_( int id ){
 
 void astMemoryAlarm_( const char *verb ){
 /*
+*+
 *  Name:
 *     astMemoryAlarm
 
@@ -3714,7 +3717,7 @@ void astMemoryAlarm_( const char *verb ){
 *     Called when a watched memory ID is used.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "memory.h"
@@ -3727,6 +3730,7 @@ void astMemoryAlarm_( const char *verb ){
 *  Parameters:
 *     verb
 *        Text to include in message.
+*-
 */
 
    printf( "astMemoryAlarm: Memory id %d has been %s.\n", Watched_ID, verb );

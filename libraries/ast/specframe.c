@@ -679,7 +679,7 @@ static void ClearStdOfRest( AstSpecFrame *this, int *status ) {
 static void ClearUnit( AstFrame *this_frame, int axis, int *status ) {
 /*
 *  Name:
-*     astClearUnit
+*     ClearUnit
 
 *  Purpose:
 *     Clear the value of the Unit string for a SpecFrame's axis.
@@ -2207,7 +2207,7 @@ static double GetSpecOriginCur( AstSpecFrame *this, int *status ) {
 static const char *GetUnit( AstFrame *this_frame, int axis, int *status ) {
 /*
 *  Name:
-*     astGetUnit
+*     GetUnit
 
 *  Purpose:
 *     Obtain a pointer to the Unit string for a SpecFrame's axis.
@@ -4080,7 +4080,7 @@ static void SetSystem( AstFrame *this_frame, AstSystemType newsys, int *status )
 static void SetUnit( AstFrame *this_frame, int axis, const char *value, int *status ) {
 /*
 *  Name:
-*     astSetUnit
+*     SetUnit
 
 *  Purpose:
 *     Set a pointer to the Unit string for a SpecFrame's axis.

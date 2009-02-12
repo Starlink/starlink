@@ -9130,7 +9130,7 @@ static IVOAScan *ScanIVOAElement( AstXmlChan *this, AstXmlElement *elem, int n,
 static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
-*     astSetAttrib
+*     SetAttrib
 
 *  Purpose:
 *     Set an attribute value for a XmlChan.

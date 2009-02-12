@@ -16852,6 +16852,7 @@ f     - YB( 4 ) = REAL (Returned) - Returned holding the y coordinate of
 
 int astGrfFunID_( const char *name, const char *method, const char *class, int *status ) {
 /*
+*+
 *  Name:
 *     astGrfFunID
 
@@ -16888,6 +16889,7 @@ int astGrfFunID_( const char *name, const char *method, const char *class, int *
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
 
+*-
 */
 
 /* Note that the list of identifiers here must be in the same order as the

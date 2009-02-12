@@ -950,7 +950,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
-*     astSetAttrib
+*     SetAttrib
 
 *  Purpose:
 *     Set an attribute value for a LutMap.

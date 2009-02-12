@@ -2156,7 +2156,7 @@ AstEllipse *astEllipseId_( void *frame_void, int form, const double centre[2],
                          void *unc_void, const char *options, ... ) {
 /*
 *  Name:
-*     astEllipseId
+*     astEllipseId_
 
 *  Purpose:
 *     Create a Ellipse.

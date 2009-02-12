@@ -410,7 +410,7 @@ static void ClearSystem( AstFrame *this_frame, int *status ) {
 static void ClearUnit( AstFrame *this_frame, int axis, int *status ) {
 /*
 *  Name:
-*     astClearUnit
+*     ClearUnit
 
 *  Purpose:
 *     Clear the value of the Unit string for a FluxFrame's axis.
@@ -1656,7 +1656,7 @@ static const char *GetTitle( AstFrame *this_frame, int *status ) {
 static const char *GetUnit( AstFrame *this_frame, int axis, int *status ) {
 /*
 *  Name:
-*     astGetUnit
+*     GetUnit
 
 *  Purpose:
 *     Obtain a pointer to the Unit string for a FluxFrame's axis.
@@ -2798,7 +2798,7 @@ static void SetSystem( AstFrame *this_frame, AstSystemType newsys, int *status )
 static void SetUnit( AstFrame *this_frame, int axis, const char *value, int *status ) {
 /*
 *  Name:
-*     astSetUnit
+*     SetUnit
 
 *  Purpose:
 *     Set a pointer to the Unit string for a FluxFrame's axis.

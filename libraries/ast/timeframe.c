@@ -2627,7 +2627,7 @@ static const char *GetTitle( AstFrame *this_frame, int *status ) {
 static const char *GetUnit( AstFrame *this_frame, int axis, int *status ) {
 /*
 *  Name:
-*     astGetUnit
+*     GetUnit
 
 *  Purpose:
 *     Obtain a pointer to the Unit string for a TimeFrame's axis.
@@ -4315,7 +4315,7 @@ static void SetTimeScale( AstTimeFrame *this, AstTimeScaleType value, int *statu
 static void SetUnit( AstFrame *this_frame, int axis, const char *value, int *status ) {
 /*
 *  Name:
-*     astSetUnit
+*     SetUnit
 
 *  Purpose:
 *     Set a pointer to the Unit string for a TimeFrame's axis.

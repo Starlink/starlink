@@ -400,6 +400,7 @@ static double AxisDistance( AstAxis *this, double v1, double v2, int *status ) {
 static int AxisFields( AstAxis *this, const char *fmt0, const char *str, 
                        int maxfld, char **fields, int *nc, double *val, int *status ) {
 /*
+*+
 *  Name:
 *     astAxisFields
 
@@ -465,7 +466,7 @@ static int AxisFields( AstAxis *this, const char *fmt0, const char *str,
 *     if it should fail for any reason, then a value of zero will be returned 
 *     as the function value, and "fields", "nc" and "val"  will be returned 
 *     holding their supplied values
-
+*-
 */
 
 /* Local Variables: */
@@ -913,6 +914,7 @@ static double AxisGap( AstAxis *this, double gap, int *ntick, int *status ) {
 
 static int AxisIn( AstAxis *this, double lo, double hi, double val, int closed, int *status ){
 /*
+*+
 *  Name:
 *     astAxisIn
 
@@ -957,6 +959,7 @@ static int AxisIn( AstAxis *this, double lo, double hi, double val, int closed, 
 *        the interval. Angle outside this range are also within the interval 
 *        if they can be brought into the range by addition or subtraction
 *        of a multiple of 2.PI.
+*-
 */
 
 /* For speed, omit the astOK check since no pointers are being used. */
@@ -1075,6 +1078,7 @@ static double AxisOffset( AstAxis *this, double v1, double dist, int *status ) {
 
 static void AxisOverlay( AstAxis *template, AstAxis *result, int *status ) {
 /*
+*+
 *  Name:
 *     astAxisOverlay
 
@@ -1109,6 +1113,7 @@ static void AxisOverlay( AstAxis *template, AstAxis *result, int *status ) {
 
 *  Returned Value:
 *     void
+*-
 */
 
 /* Check the global error status. */

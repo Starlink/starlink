@@ -1568,7 +1568,7 @@ static void PermPoints( AstPointSet *this, int forward, const int perm[], int *s
 static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
 /*
 *  Name:
-*     astSetAttrib
+*     SetAttrib
 
 *  Purpose:
 *     Set an attribute value for a PointSet.

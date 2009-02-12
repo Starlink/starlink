@@ -4635,7 +4635,7 @@ static const int *GetPerm( AstFrame *this_frame, int *status ) {
 static int GetTranForward( AstMapping *this_mapping, int *status ) {
 /*
 *  Name:
-*     astGetTranForward
+*     GetTranForward
 
 *  Purpose:
 *     Determine if a FrameSet defines a forward coordinate transformation.
@@ -4702,7 +4702,7 @@ static int GetTranForward( AstMapping *this_mapping, int *status ) {
 static int GetTranInverse( AstMapping *this_mapping, int *status ) {
 /*
 *  Name:
-*     astGetTranInverse
+*     GetTranInverse
 
 *  Purpose:
 *     Determine if a FrameSet defines an inverse coordinate transformation.
@@ -7182,7 +7182,7 @@ static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[],
                                    AstPointSet *out, int *status ) {
 /*
 *  Name:
-*     astResolvePoints
+*     ResolvePoints
 
 *  Purpose:
 *     Resolve a set of vectors into orthogonal components

@@ -3923,7 +3923,7 @@ static const char *GetTitle( AstFrame *this_frame, int *status ) {
 static const char *GetUnit( AstFrame *this_frame, int axis, int *status ) {
 /*
 *  Name:
-*     astGetUnit
+*     GetUnit
 
 *  Purpose:
 *     Obtain a pointer to the Unit string for a SkyFrame's axis.
@@ -7186,7 +7186,7 @@ static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[],
                                    AstPointSet *out, int *status ) {
 /*
 *  Name:
-*     astResolvePoints
+*     ResolvePoints
 
 *  Purpose:
 *     Resolve a set of vectors into orthogonal components
