@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="match" support="U">
-  <version>0.8-0</version>
+  <version>0.10-0</version>
   <path>thirdparty/rit/match</path>
   <description>MATCH</description>
   <abstract><p>

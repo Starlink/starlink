@@ -2,7 +2,7 @@
 
 @SET_MAKE@
 
-MATCH = match-0.8
+MATCH = match
 
 RECURSIVE_TARGETS = all clean distclean
 
