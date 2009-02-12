@@ -1,0 +1,3 @@
+[submodule "thirdparty/rit/match/match"]
+	path = thirdparty/rit/match/match
+	url = ../match
