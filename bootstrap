@@ -172,6 +172,9 @@ if $dryrun; then
     exit 0
 fi
 
+# The git repository contains various submodules that must be available
+# before we can proceed. Make sure that these are up-to-date.
+./update-modules
 
 # We invoke autoconf below, so must make sure it's on the path,
 # and this directory must be on the path before bootstrapping the 
