@@ -17,12 +17,12 @@
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {2.7}
+\newcommand{\stardocnumber}    {2.8}
 \newcommand{\stardocauthors}   {D.S.\ Berry \\ M.B.\ Taylor}
-\newcommand{\stardocdate}      {26th February 2008}
+\newcommand{\stardocdate}      {11th February 2009}
 \newcommand{\stardoctitle}     {NDG \\ [\latex{1ex}]
                                 Routines for Accessing Groups of NDFs}
-\newcommand{\stardocversion}   {Version 5.4}
+\newcommand{\stardocversion}   {Version 5.5}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 \newcommand{\stardocabstract}  {
 This document describes the routines provided within the NDG subroutine 
@@ -2027,6 +2027,81 @@ to add further members.
 }
 
 \sstroutine{
+   NDF\_MOREG
+}{
+   Search for NDFs within the extensions of a supplied NDF
+}{
+   \sstdescription{
+      Each extension within the supplied NDF is searched to see if it
+      contains any NDFs. The paths to any such NDFs are appended to the
+      end of the supplied group (a new group is created if none is
+      supplied). NDF identifiers for particular members of the group can
+      be obtained using NDG\_NDFAS.
+   }
+   \sstinvocation{
+      CALL NDF\_MOREG( INDF, IGRP, SIZE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         The identifier for the NDF to be searched.
+      }
+      \sstsubsection{
+         IGRP = INTEGER (Given and Returned)
+      }{
+         The identifier of the group in which NDF names are to be
+         stored. A new group is created if the supplied value is GRP\_\_NOID.
+         It should be deleted when no longer needed using GRP\_DELET.
+      }
+      \sstsubsection{
+         SIZE = INTEGER (Returned)
+      }{
+         The total number of NDF names in the returned group IGRP.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Each element in the returned group contains a full specification
+         for an NDF. Several other groups are created by this routine, and
+         are associated with the returned group by means of a GRP {\tt "}owner-slave{\tt "}
+         relationship. These supplemental groups are automatically deleted
+         when the returned group is deleted using GRP\_DELET. The returned
+         group should not be altered using GRP directly because corresponding
+         changes may need to be made to the supplemental groups. Routines
+         NDG\_SETSZ, NDG\_GTSUP and NDG\_PTSUP are provided to manipulate the
+         entire chain of groups. The full chain (starting from the head) is
+         as follows:
+
+         \sstitem
+            NDF slice specifications
+
+         \sstitem
+            HDS paths
+
+         \sstitem
+            File types
+
+         \sstitem
+            Base file names
+
+         \sstitem
+            Directory paths
+
+         \sstitem
+            Full NDF specification (this is the returned group IGRP)
+      }
+   }
+}
+
+\sstroutine{
    NDG\_NDFAS
 }{
    Obtain an NDF identifier for an existing NDF
@@ -2634,6 +2709,13 @@ to add further members.
 }
 
 \newpage
+\section{Changes Introduced in NDG Version 5.5}
+\begin{itemize}
+   \item A new routine NDG\_MOREG has been added which searchs the
+         extensions of a supplied NDF for encapsulated NDFs, appending
+         the paths to such NDFs to a supplied GRP group.
+\end{itemize}
+
 \section{Changes Introduced in NDG Version 5.4}
 \begin{itemize}
    \item Added new routines: NDG\_MDPRV.

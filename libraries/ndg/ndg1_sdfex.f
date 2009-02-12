@@ -1,5 +1,6 @@
-      SUBROUTINE NDG1_SDFEX( IGRP1, IGRPD, IGRPB, IGRPT, IGRPH, IGRPS, 
-     :                       LOC, DIR, NAM, TYP, SLICE, FOUND, STATUS )
+      SUBROUTINE NDG1_SDFEX( IGRP1, RECURS, IGRPD, IGRPB, IGRPT, IGRPH, 
+     :                       IGRPS, LOC, DIR, NAM, TYP, SLICE, FOUND, 
+     :                       STATUS )
 *+
 *  Name:
 *     NDG1_SDFEX
@@ -11,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDG1_SDFEX( IGRP1, IGRPD, IGRPB, IGRPT, IGRPH, IGRPS, 
+*     CALL NDG1_SDFEX( IGRP1, RECURS, IGRPD, IGRPB, IGRPT, IGRPH, IGRPS, 
 *                      LOC, DIR, NAM, TYP, SLICE, FOUND, STATUS )
 
 *  Description:
@@ -19,9 +20,10 @@
 *     NDFs found within it are appended to the end of group IGRP.
 *     Here, an NDF is defined as an HDS structure containing a component 
 *     called DATA_ARRAY which can be accessed by the ARY library.
-*     Note, only NDFs stored explicitly within the supplied object are 
-*     included in the returned group (i.e. NDFs within sub-components are 
-*     ignored).
+
+*     Note, if RECURS is .FALSE., only NDFs stored explicitly within the 
+*     supplied object are included in the returned group (i.e. NDFs within 
+*     sub-components are ignored).
 *
 *     The supplied fields are stored in the other groups for each found
 *     NDF.
@@ -30,6 +32,13 @@
 *     IGRP = INTEGER (Given)
 *        An identifier for the group to which the NDF paths should
 *        be appended.
+*     RECURS = LOGICAL (Given)
+*        Indicates if the search should recurse through each structure to 
+*        find all NDFs within the supplied object, no matter where they 
+*        are located. If RECUR is .TRUE. the returned paths in IGRP are 
+*        ordered by depth within the supplied structure. The NDFs near 
+*        the top of the structure come before those lower down in the 
+*        structure.
 *     IGRPD = INTEGER (Given)
 *        An identifier for the group to which the directory field for each 
 *        NDF found should be appended.
@@ -65,6 +74,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -98,6 +108,8 @@
 *        Changed definition of an NDF to "an HDS structure containing
 *        a component called DATA_ARRAY which can be accessed by the ARY
 *        library".
+*     12-FEB-2009 (DSB):
+*        Added argument RECURS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -115,6 +127,7 @@
 
 *  Arguments Given:
       INTEGER IGRP1
+      LOGICAL RECURS
       INTEGER IGRPD
       INTEGER IGRPB
       INTEGER IGRPT
@@ -133,34 +146,35 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER BN2*(GRP__SZNAM) ! File base name 
       CHARACTER CLOC*(DAT__SZLOC)! Locator to component or array cell
+      CHARACTER DIR2*(GRP__SZFNM)! Full directory spec
       CHARACTER PATH*(GRP__SZNAM)! Path to NDF object 
       CHARACTER PATH2*(GRP__SZNAM)! Path to NDF object with full dir path
-      CHARACTER VLOC*(DAT__SZLOC)! Locator to vectorised array
-      CHARACTER XLOC*(DAT__SZLOC)! Locator to next object to be checked
-      CHARACTER DIR2*(GRP__SZFNM)! Full directory spec
-      CHARACTER BN2*(GRP__SZNAM) ! File base name 
       CHARACTER SEC2*1           ! NDF section (should always be blank)
       CHARACTER SUF2*(GRP__SZFNM)! Suffix (eg HDS comp. path)
+      CHARACTER VLOC*(DAT__SZLOC)! Locator to vectorised array
+      CHARACTER XLOC*(DAT__SZLOC)! Locator to next object to be checked
       INTEGER DIM( DAT__MXDIM )  ! Dimensions of array component
+      INTEGER DOT                ! Index of first "."
       INTEGER IARY               ! ARY identifier for array structure
+      INTEGER IAT                ! Index of end of directory field
       INTEGER ICELL              ! Cell index
       INTEGER ICOMP              ! Component index
       INTEGER IGRP2              ! Group holding locators to be checked
       INTEGER ILOC               ! No. of locators checked so far 
+      INTEGER IPATH              ! Index of start of HDS component path
       INTEGER LPATH              ! Used length of PATH
       INTEGER LPATH2             ! Used length of PATH2
       INTEGER NCELL              ! No. of cells in array
       INTEGER NCOMP              ! No. of components in object
       INTEGER NDIM               ! No. of dimensions in array component
       INTEGER NLOC               ! No. of locators in group IGRP2
+      INTEGER PAR                ! INdex of first ")"
+      LOGICAL CHECK              ! Check the current structure for NDFs?
       LOGICAL ISANDF             ! Is object an NDF?
       LOGICAL STRUCT             ! Is object a structure?
       LOGICAL SUPPLD             ! Is supplied object currently being checked?
-      INTEGER IPATH              ! Index of start of HDS component path
-      INTEGER IAT                ! Index of end of directory field
-      INTEGER DOT                ! Index of first "."
-      INTEGER PAR                ! INdex of first ")"
 *.
 
 *  Check inherited global status.
@@ -254,14 +268,23 @@
                CALL GRP_PUT( IGRP1, 1, PATH( : LPATH ), 0, STATUS )
                FOUND = .TRUE.      
 
-*  If this is the supplied object, and it is not an NDF, we search it for
-*  NDF components.
-            ELSE IF( SUPPLD ) THEN
+*  Decide if the NDF structure should be checked for contained NDFs.
+               CHECK = RECURS
+
+*  If the current structure is not an NDF, continue to check it if it is
+*  the supplied object or if we are searching recursively through the entire
+*  structure.
+            ELSE 
+               CHECK = ( SUPPLD .OR. RECURS ) 
+            END IF
+
+*  If we are checking the current structure for further NDFs...
+            IF( CHECK ) THEN
 
 *  See if it is a scalar or an array.
                CALL DAT_SHAPE( XLOC, DAT__MXDIM, DIM, NDIM, STATUS ) 
 
-*  Ignore arrays...
+*  First deal with scalars...
                IF( NDIM .EQ. 0 ) THEN
 
 *  Find the number of components in the object.
@@ -277,14 +300,34 @@
 *  Increment the number of locators in the group.
                   NLOC = NLOC + NCOMP
 
-*  Indicate we are no longer checking the supplied object.
-                  SUPPLD = .FALSE.
+*  We only check arrays if we are recursing.
+               ELSE IF( RECURS ) THEN
+
+*  Vectorise the array.
+                  CALL DAT_VEC( XLOC, VLOC, STATUS )
+
+*  Add a locator for each cell to the end of the group of locators
+*  to be checked.
+                  CALL DAT_SIZE( VLOC, NCOMP, STATUS )
+                  DO ICOMP = 1, NCOMP
+                     CALL DAT_CELL( VLOC, 1, ICOMP, CLOC, STATUS )
+                     CALL GRP_PUT( IGRP2, 1, CLOC, 0, STATUS )
+                  END DO
+        
+*  Free the vectorised array locator.
+                  CALL DAT_ANNUL( VLOC, STATUS )
+
+*  Increment the number of locators in the group.
+                  NLOC = NLOC + NCOMP
 
                END IF
  
             END IF
 
          END IF
+
+*  Indicate we are no longer checking the supplied object.
+         SUPPLD = .FALSE.
 
 *  Annul the locator just checked.
          CALL DAT_ANNUL( XLOC, STATUS )

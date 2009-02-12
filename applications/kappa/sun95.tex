@@ -35316,6 +35316,16 @@ KAPPA: \htmlref{ADD}{ADD},
    }
    \sstparameters{
       \sstsubsection{
+         EXTEN = \_LOGICAL (Read)
+      }{
+         If set to {\tt FALSE} (the default), any NDFs contained within
+         extensions of the input NDF are copied to equivalent places 
+         within the output NDF without change. If set {\tt TRUE}, then any
+         extension NDFs which have the same bounds as the base input 
+         NDF are padded or trimmed as necessary in order to ensure that 
+         they have the same bounds as the output NDF. {\tt [FALSE]}
+      }
+      \sstsubsection{
          IN = NDF (Read)
       }{
          The input NDF (or section) which is to be copied.
@@ -55808,6 +55818,10 @@ The following applications have been modified:
          \item A new parameter caller LIKEWCS has been added.  This allows 
          the shape of the template NDF in the WCS Frame to be used to 
          determine the bounds of the output NDF.
+         \item A new parameter caller EXTEN has been added.  This 
+         can be set {\tt TRUE} to cause any extension NDFs contained
+         within the supplied NDF to be modified to match the shape of the
+         output NDF.
       \end{itemize}
 
 

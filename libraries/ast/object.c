@@ -5321,6 +5321,10 @@ MYSTATIC int CheckId( AstObject *this_id, int lock_check, int *status ) {
    int id;                       /* ID value as an int */
    int ihandle;                  /* Result to return */
 
+#ifdef MEM_DEBUG
+   int oldok = astOK;
+#endif
+
 /* Initialise. */
    ihandle = -1;
 
@@ -5382,7 +5386,7 @@ MYSTATIC int CheckId( AstObject *this_id, int lock_check, int *status ) {
       }
 
 #ifdef MEM_DEBUG
-      if ( !astOK && ( work.i >= 0 ) && ( work.i < nhandles ) ) {
+      if ( oldok && !astOK && ( work.i >= 0 ) && ( work.i < nhandles ) ) {
          char buf[200];
          astError( astStatus, "Handle properties: %s ", status,
                    HandleString( work.i, buf ) );

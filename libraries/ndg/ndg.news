@@ -1,5 +1,11 @@
 1 NDG_library
 
+Version 5.5
+
+   o A new routine NDG_MOREG has been added which searchs the
+   extensions of a supplied NDF for encapsulated NDFs, appending
+   the paths to such NDFs to a supplied GRP group.
+
 Version 5.3
 
    o New routines for accessing provenance information within NDFs;

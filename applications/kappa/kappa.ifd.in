@@ -1108,6 +1108,16 @@ package kappa {
 
          helplib {$KAPPA_HELP}
 
+          parameter exten {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Modify shape of extension NDFs?}
+            helpkey *
+            default FALSE
+          }
+
          parameter in {
             position 1
             type NDF

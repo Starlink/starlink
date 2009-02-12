@@ -576,9 +576,9 @@
 
 *  See if it contains any NDFs. If so, the details to the NDFs are stored
 *  in the returned groups.
-               CALL NDG1_SDFEX( IGRP, IGRPD, IGRPB, IGRPT, IGRPH, IGRPS,
-     :                          LOC, DIR, NAM, TYP, SLICE, FOUND, 
-     :                          STATUS )
+               CALL NDG1_SDFEX( IGRP, .FALSE., IGRPD, IGRPB, IGRPT, 
+     :                          IGRPH, IGRPS, LOC, DIR, NAM, TYP, SLICE, 
+     :                          FOUND, STATUS )
 
             END IF
 

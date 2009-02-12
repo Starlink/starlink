@@ -37,7 +37,7 @@ kps1_mfsb.f  kps1_mfspf.f kps1_mfta.f  \
 kps1_mlpcp.f kps1_mlpcv.f kps1_mlpfs.f kps1_mlpky.f kps1_mlplb.f \
 kps1_mlpml.f kps1_mlpmp.f kps1_mlpnd.f kps1_mlpng.f kps1_mlppn.f \
 kps1_msa.f   kps1_msbs.f  kps1_mss.f   kps1_msvp.f  kps1_mthcd.f \
-kps1_mthcr.f kps1_nmplt.f \
+kps1_mthcr.f kps1_nmplt.f kps1_ndfcp.f \
 kps1_op1.f   kps1_op2.f   kps1_plclc.f kps1_plcpy.f kps1_plfil.f \
 kps1_plint.f kps1_plmsk.f \
 kps1_polyv.f kps1_prflt.f kps1_prfmk.f kps1_prfsm.f kps1_psdim.f \
