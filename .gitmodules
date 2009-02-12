@@ -1,3 +1,0 @@
-[submodule "thirdparty/rit/match/match"]
-	path = thirdparty/rit/match/match
-	url = ssh://starlink.jach.hawaii.edu/web/starlink/git/match.git
