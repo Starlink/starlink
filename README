@@ -38,8 +38,10 @@ document are at the end of this README.
 
 This procedure will not build the Starlink _Java_ applications.  They are
 built separately, using the procedure described in java/source/README
-(currently only from the old Starlink CVS repository).  You do not need to
-build any of the Starlink classic applications to build the Java ones.
+(currently these are available from the subversion repository at
+https://starjava.jach.hawaii.edu/svn/trunk). You do not need to build any of
+the Starlink classic applications to build the Java ones, unless you need to
+rebuild the native parts of JNIAST, JNIHDS or SPLAT.
 
  Preparation
  -----------
@@ -72,12 +74,12 @@ build any of the Starlink classic applications to build the Java ones.
       % unset STARLINK
 
    and also make sure that an old-style Starlink system is not in your
-   path (since tools like messgen will get very confused).
+   PATH (since tools like messgen will get very confused).
 
    You may also run into difficulties if you have previously sourced
    the ${STARLINK}/etc/login and ${STARLINK}/etc/cshrc scripts that
    existed from a previous classic mk-build Starlink install, as
-   even with $STARLINK removed from your path some applications may
+   even with $STARLINK removed from your PATH some applications may
    still get confused at build time.  If the login script in question
    is a `new' one, from a previous autoconf install, you will
    probably be fine (although you may need to remove installed
@@ -94,17 +96,16 @@ build any of the Starlink classic applications to build the Java ones.
    these variables before building the software.  See './configure
    --help' for a list of `some influential environment variables'.
 
-   This is good time to get the compilers that you're going to use 
-   resolved, especially if you're not working on a GNU/Linux platform. 
+   This is good time to get the compilers that you're going to use
+   resolved, especially if you're not working on a GNU/Linux platform.
    See the platform specific instructions later in this file.
 
-   At the time of writing (March 2007) it is known that the gfortran
-   compiler will work, but only from GCC4.3 onwards (the development main
-   line). If this is picked up by default on your system you need to re-define
-   FC and F77 to select another compiler. For other versions of GCC4 you will
-   need to use g95 (thanks to Andy Vaught for his help with this), which
-   is available from the g95 web site: www.g95.org. For GCC3 based systems
-   g77 should be used.
+   At the time of writing (February 2009) it is known that the gfortran
+   compiler will work, but only from GCC4.3 onwards. If this is picked up by
+   default on your system you need to re-define FC and F77 to select another
+   compiler. For other versions of GCC4 you will need to use g95 (thanks to
+   Andy Vaught for his help with this), which is available from the g95 web
+   site: www.g95.org. For GCC3 based systems g77 should be used.
 
 
  The build sequence
@@ -117,22 +118,22 @@ build any of the Starlink classic applications to build the Java ones.
    ./configure -C
    make world
 
- Each of these steps is described in detail below. 
+ Each of these steps is described in detail below.
 
- - First bootstrap the system.  
+ - First bootstrap the system.
 
-   This builds and installs the buildsupport system (the tools in the
-   buildsupport directory, plus third-party applications autoconf, automake
-   and libtool), and then goes on to generate the configure scripts which will
-   be used in the next step.  The autoconf, automake and libtool applications
-   have been patched specifically for building this tree so any versions
-   shipped with the OS, or installed by you, will _not_ work.  These
-   applications will be installed into
+   This downloads third-party software, builds and installs the buildsupport
+   system (the tools in the buildsupport directory, plus third-party
+   applications autoconf, automake and libtool), and then goes on to generate
+   the configure scripts which will be used in the next step.  The autoconf,
+   automake and libtool applications have been patched specifically for
+   building this tree so any versions shipped with the OS, or installed by
+   you, will _not_ work.  These applications will be installed into
    $STARCONF_DEFAULT_PREFIX/buildsupport, so you should add
-   $STARCONF_DEFAULT_PREFIX/buildsupport/bin to the front of your path
+   $STARCONF_DEFAULT_PREFIX/buildsupport/bin to the front of your PATH
    at this point, BEFORE you run the ./bootstrap script.  In order for the
    `make' below to work, you also need to add the default bin
-   directory to your path, so you should do that now.
+   directory to your PATH, so you should do that now.
 
       # csh-like
       % setenv PATH $STARCONF_DEFAULT_PREFIX/bin:$STARCONF_DEFAULT_PREFIX/buildsupport/bin:$PATH
@@ -144,10 +145,9 @@ build any of the Starlink classic applications to build the Java ones.
       % PATH=$STARCONF_DEFAULT_PREFIX/bin:$STARCONF_DEFAULT_PREFIX/buildsupport/bin:$PATH
       % ./bootstrap
 
-   This step takes a long while; it can be an hour on a moderately
-   fast system.  Note that, although an important part of the
-   ./bootstrap script is running autoreconf in the top-level
-   directory, you should not run autoreconf yourself in this directory.
+   This step takes a long while. Note that, although an important part of the
+   ./bootstrap script is running autoreconf in the top-level directory, 
+   you should not run autoreconf yourself in this directory.
 
  - Build the configure dependencies.
 
@@ -174,7 +174,7 @@ build any of the Starlink classic applications to build the Java ones.
    the environment or, better, as arguments to the ./configure script.
    Don't do this unless you discover you have to.
 
-   Each of these steps also takes around an hour.
+   Each of these steps can also take some non-trivial time.
 
  Additional hints
  ----------------
@@ -190,9 +190,9 @@ build any of the Starlink classic applications to build the Java ones.
  - Disabling the documentation
 
    By default, the system will be configured so that all documentation
-   is built at the same time as the software.  For this to work, you 
-   must have LaTeX installed on your machine.  Building the documentation 
-   is rather slow, and you can speed up the build somewhat by omitting it.  
+   is built at the same time as the software.  For this to work, you
+   must have LaTeX installed on your machine.  Building the documentation
+   is rather slow, and you can speed up the build somewhat by omitting it.
    You do that as follows:
 
       % ./configure -C --without-stardocs
@@ -225,11 +225,11 @@ specific component, the instructions are slightly different.
    want to build against one installation tree (_STARLINK), but
    install into another (_PREFIX).  As above, unset the INSTALL and
    STARLINK variables, and make sure there is no old-style Starlink
-   system in your path.
+   system in your PATH.
 
  - If you have already built the buildsupport tools (autoconf,
    automake, libtool and starconf), then make sure these are in your
-   path.  If they are not built, or if you are not sure they are
+   PATH.  If they are not built, or if you are not sure they are
    up-to-date, you can build just these by going to the top-level of
    your checkout and giving the command
 
@@ -261,27 +261,31 @@ The `make world' command will not _re_build the tree after you do an update
 from the source repository, possibly unexpectedly.  For a detailed explanation
 of why this is so, see the `General FAQs' in SSN/78, described below.
 
+You should also run the ./update-modules script after performing an update
+of the source set from the main repository. This will make sure that any
+thirdparty code is also updated.
+
 
 Platform specific build notes
 -----------------------------
 
  - GNU/Linux
 
- Currently (April 2007) the source set is known to build on many different
+ Currently (February 2009) the source set is known to build on many different
  flavours of GNU/Linux and is actively developed using these. The only expected
  issue is that of Fortran compiler support (C, C++ and Fortran compilers are
- required to build the complete collection). 
+ required to build the complete collection).
 
  After the release of GCC 4 the Fortran compiler "g77" has been replaced with a
  completely new "gfortran" (that now implements Fortran 90, 95 and some 2003
- features), which has not been compatible with Starlink Fortran until the 4.3
- development branch. Happily this turned out to be not a major problem 
+ features), which has not been compatible with Starlink Fortran until the 
+ release of version 4.3. Happily this turned out to be not a major problem
  (thanks to Andy Vaught) as the other free Fortran compiler "g95", is
- compatible. So to build the collection with a GCC 4+ compiler you'll need a
- copy of "g95" which is available from  "www.g95.org", or more experimentally
- you'll need to build the complete GCC 4.3 compiler set from source.
+ compatible. So to build the collection with a GCC 4+ compiler you'll either
+ need a copy of "g95" which is available from  "www.g95.org", or more a very
+ recent version of gfortran (this can be checked by running gfortran -v).
 
- To make sure you use the "g95" compiler and not "gfortran" you need to 
+ To make sure you use the "g95" compiler and not "gfortran" you need to
  define the environment variables "FC" and "F77":
 
       % setenv FC g95                     # csh
@@ -296,9 +300,11 @@ Platform specific build notes
   - OS X
 
   The build situation under OS X follows much like that of GNU/Linux,
-  but you'll need to install your own Fortran compiler. In 10.3 
-  the "g77" compiler from "Fink" or "DarwinPorts" has been used successfully,
-  in 10.4 you'll need a copy of "g95" ("gfortran" has not been tested).
+  but you'll need to install your own Fortran compiler. In 10.3
+  the "g77" compiler from "Fink" or "MacPorts" has been used successfully,
+  in 10.4 you'll need a copy of "g95". For 10.5 or later you can use 
+  g95, or gfortran. The latter is available from hpc.sourceforge.net
+  as well as MacPorts.
 
   Note you'll also need a development installation of the Apple X11
   environment, and a functioning TeX and Ghostscript if you want to build the
@@ -306,8 +312,8 @@ Platform specific build notes
 
   - Solaris
 
-  The collection is known to build under Solaris 8 (sparc) and 10 (intel), 
-  using the SUN compilers (Workshop 6 and studio 11 respectively). To make 
+  The collection is known to build under Solaris 8 (sparc) and 10 (intel),
+  using the SUN compilers (Workshop 6 and studio 11 respectively). To make
   sure the correct compilers are picked up, you should define:
 
       % setenv FC f77                     # csh
@@ -320,49 +326,20 @@ Platform specific build notes
       % export CC=cc
       % export CXX=CC
 
-   - Tru64 UNIX
-
-   The collection builds nightly on a Tru64 UNIX 5.1 installation 
-   using the platform compilers:
-
-     %  cc -V
-     Compaq C V6.4-014 on Compaq Tru64 UNIX V5.1A (Rev. 1885)
-
-   (earlier versions and revisions are known to fail). It's probably best to
-   define all the compilers as for Solaris, but only the Fortran compiler
-   is known to be required:
-
-      % setenv FC f77                     # csh
-      % setenv F77 f77
-      % setenv CC cc
-      % setenv CXX cxx
-   or
-      % export FC=f77                     # sh
-      % export F77=f77
-      % export CC=cc
-      % export CXX=cxx
-
-   - Cygwin
-
-   This is essentially a GNU environment so works as GNU/Linux (only tested
-   with GCC 3 & "g77"), but you will need patience as the build process is
-   very slow (but the final applications seem to run more effectively) and a
-   full development installation, including LaTeX for the documentation
-   (probably best to disable this with "--without-stardocs"). 
-
-
 Further information
 -------------------
 
 The Starlink document SUN/248 gives further advice about building Starlink
 classic applications, including some old, out-of-date, platform-specific
 notes.  A version is currently (May 2006) available at
-<http://www.astro.gla.ac.uk/users/norman/star/sun248/>.  
+<http://www.astro.gla.ac.uk/users/norman/star/sun248/>.
 The source is in the repository at docs/sun/248.
 
-You should consult the project web pages at <http://www.starlink.ac.uk>, and
-consider subscribing to the Starlink development mailing list: see
-<http://www.jiscmail.ac.uk/archives/starlink.html>.
+You should consult the project web pages at <http://www.starlink.ac.uk>,
+<http://starlink.jach.hawaii.edu> and consider subscribing to the Starlink
+development and user mailing lists: see 
+<http://www.jiscmail.ac.uk/archives/starlink.html> and
+<http://www.jiscmail.ac.uk/archives/stardev.html>.
 
 Starlink document SSN/78 gives much more detailed information on the
 process of building Starlink classic applications, but this document
@@ -379,16 +356,16 @@ address quite specific details of how to configure software to work
 within the Starlink source tree.
 
 
-Subversion repository
----------------------
+git repository
+--------------
 
-In June 2007 the Starlink source code was moved to a subversion repository
-now held at the JAC. Part of the reason for this was to introduce a
-system-wide versioning system so that changes in the source code used in
-incremental releases could be more easily tracked. To enable this you need to
-have the svnversion command on the build machine and to have defined the 
-environment variable STAR_SOURCE_ROOT_DIR to point at the head of the source
-code (the directory containing this file), before configuring the source tree.
-Now each install of a package will update the manifest/starlink.version
-file to contain a compact version number for the working copy of all current
-sources.
+In February 2009 the Starlink source code was moved to a git repository
+at the JAC Hawaii. This is described by a wiki at:
+
+   http://starlink.jach.hawaii.edu/
+
+The build procedures described above are still correct, but much of the 
+associated documentation, SSN/78 etc. are becoming rapidly out-of-date.
+Consult the wiki for download instructions and how to access things like
+specific releases.
+
