@@ -1,0 +1,118 @@
+#!/bin/sh
+#+
+#  Name:
+#     update-modules
+
+#  Purpose:
+#     Update git submodules
+
+#  Type of Module:
+#     Bourne shell script
+
+#  Usage:
+#     update-modules <submodule>
+
+#  Description:
+#     This script updates the content of all the submodules. It should
+#     be ran whenever a submodule is known to be out-of-date. It can
+#     update a single submodule, or if no command-line argument is given
+#     all the known submodules (when new submodules are added to the 
+#     repository these must be made known by a git-pull or git-fetch
+#     first).
+#
+#     If any submodules contain local changes then this script will refuse 
+#     to run as the update process is destructive.
+#
+#     It is necessary that this script be ran at least once after a 
+#     repository clone is created (this will be done by the bootstrap
+#     script).
+
+#  Authors:
+#     PWD: P.W. Draper (JAC, Durham University)
+#     {enter_new_authors_here}
+
+#  Copyright:
+#     Copyright (C) 2009 Science and Technology Facilities Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of the
+#     License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+#     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  History:
+#     10-FEB-2009: (PWD):
+#        Original version.
+#     {enter_further_changes_here}
+
+#-
+
+echo ""
+echo "Updating local repository submodules:"
+
+#  If given a command-line argument assume this is the path of a submodule and
+#  just update that.
+
+if test "$1" != ""; then
+   submodule="$1"
+else
+   submodule=""
+fi
+
+#  Get a summary of the submodules. If this returns any content then one or
+#  more have been modified and committed and should be pushed or reset before
+#  proceeding.
+
+summary=`git submodule summary $submodule`
+
+if test "$summary" != ""; then
+   echo "ERROR: submodule(s) are modified, will not overwrite"
+   echo "$summary"
+   exit 1
+fi
+
+#  The above will not report modified files that have not been committed.
+#  This isn't important, but probably indicates some activity in the submodule
+#  so refuse to proceed when they are present as well.
+
+if test "$submodule" = ""; then
+   #  Get a list of all the paths to the submodules. 
+   #  Note in git 1.6 could use foreach subcommand.
+   submodule_list="`sed -n 's/.*path\ =\ \(.*\)/\1/p' < .gitmodules`"
+else
+   submodule_list="$submodule" 
+fi
+
+for m in "$submodule_list"; do
+   modified=`cd $m && git diff-index --stat HEAD`
+   if test "$modified" != ""; then
+      echo "WARNING: submodule contains modified files, will not proceed"
+      echo "$m"
+      echo "$modified"
+      exit 1
+   fi
+done
+
+
+#  No modifications so safe to check for updates. Note we always init to
+#  capture any new submodules added since the last update.
+
+git submodule init $submodule
+git submodule update $submodule
+
+#  Output the status of the submodules.
+git submodule status $submodule | awk '{print "...",$2,$3}'
+echo ""
+
+exit
