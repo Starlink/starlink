@@ -1,9 +1,0 @@
-#! /bin/sh -
-# Bootstrap dvi2bitmap
-#
-# Invoke as just
-#
-#   % ./bootstrap
-#
-
-autoreconf --install --symlink || { echo "Bootstrap failed!"; exit 1; }

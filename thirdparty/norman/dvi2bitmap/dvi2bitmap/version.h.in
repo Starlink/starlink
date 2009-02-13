@@ -1,1 +1,0 @@
-const char version_string[] = "@PACKAGE_STRING@";
