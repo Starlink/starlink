@@ -1354,8 +1354,8 @@ static AstRegion *MergePointList( AstPointList *this, AstRegion *reg,
             }
 
 /* Create the new PointList. */
-            result = (AstRegion *) astPointList( bfrm, pset_new, NULL, "", 
-                                                 status );
+            new = (AstRegion *) astPointList( bfrm, pset_new, NULL, "", 
+                                              status );
 
 /* Propagate remaining attributes of the supplied Region to it. */
             astRegOverlay( new, this );
