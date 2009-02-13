@@ -218,8 +218,6 @@ typedef struct AstIntraMapTranData {
 typedef struct AstIntraMapGlobals {
    AstIntraMapVtab Class_Vtab;
    int Class_Init;
-   AstIntraMapTranData *Tran_Data;
-   int Tran_Nfun;
 } AstIntraMapGlobals;
 
 #endif

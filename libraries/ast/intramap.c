@@ -133,6 +133,12 @@ f     The IntraMap class does not define any new routines beyond those
 /* Module Variables. */
 /* ================= */
 
+/* Pointer to array of transformation function data. */
+static AstIntraMapTranData *tran_data = NULL;
+
+/* Number of transformation functions registered. */
+static int tran_nfun = 0;
+
 /* Address of this static variable is used as a unique identifier for
    member of this class. */
 static int class_check;
@@ -153,9 +159,7 @@ static void (* parent_setattrib)( AstObject *, const char *, int * );
 
 /* Define how to initialise thread-specific globals. */ 
 #define GLOBAL_inits \
-   globals->Class_Init = 0; \
-   globals->Tran_Data = NULL; \
-   globals->Tran_Nfun = 0;
+   globals->Class_Init = 0; 
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(IntraMap)
@@ -163,11 +167,17 @@ astMAKE_INITGLOBALS(IntraMap)
 /* Define macros for accessing each item of thread specific global data. */
 #define class_init astGLOBAL(IntraMap,Class_Init)
 #define class_vtab astGLOBAL(IntraMap,Class_Vtab)
-#define tran_data astGLOBAL(IntraMap,Tran_Data)
-#define tran_nfun astGLOBAL(IntraMap,Tran_Nfun)
 
 
+/* A mutex used to serialise invocations of the IntraReg function (the
+   only function allowed to modify the contents of the static tran_data
+   array). */
+static pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
+#define LOCK_MUTEX1 pthread_mutex_lock( &mutex1 ); 
+#define UNLOCK_MUTEX1 pthread_mutex_unlock( &mutex1 ); 
 
+/* A mutex used to serialise invocations of extrnal transformation
+   functions (which may not be thread-safe). */
 static pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
 #define LOCK_MUTEX2 pthread_mutex_lock( &mutex2 ); 
 #define UNLOCK_MUTEX2 pthread_mutex_unlock( &mutex2 ); 
@@ -175,17 +185,16 @@ static pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
 /* If thread safety is not needed, declare and initialise globals at static 
    variables. */ 
 #else
-/* Pointer to array of transformation function data. */
-static AstIntraMapTranData *tran_data = NULL;
-
-/* Number of transformation functions registered. */
-static int tran_nfun = 0;
 
 
 /* Define the class virtual function table and its initialisation flag
    as static variables. */
 static AstIntraMapVtab class_vtab;   /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
+
+#define LOCK_MUTEX1
+#define UNLOCK_MUTEX1
+
 #define LOCK_MUTEX2
 #define UNLOCK_MUTEX2
 
@@ -821,6 +830,11 @@ static void IntraReg( const char *name, int nin, int nout,
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* This function modifies the global static tran_data array, so we use a
+   mutex to ensure that only one thread can run this function at any one
+   time. */
+   LOCK_MUTEX1;
+
 /* Get a pointer to the thread specific global data structure. */
    astGET_GLOBALS(NULL);
 
@@ -920,6 +934,10 @@ static void IntraReg( const char *name, int nin, int nout,
 /* Mark the end of the section in which memory allocations may never be  
    freed (other than by any AST exit handler). */
    astEndPM;
+
+/* Unlock the mutex that ensures that only one thread can run this function 
+   at any one time. */
+   UNLOCK_MUTEX1;
 
 }
 
