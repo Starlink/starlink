@@ -13,3 +13,6 @@
 [submodule "thirdparty/norman/dvi2bitmap/dvi2bitmap"]
 	path = thirdparty/norman/dvi2bitmap/dvi2bitmap
 	url = ../dvi2bitmap.git
+[submodule "thirdparty/fsf/automake"]
+	path = thirdparty/fsf/automake
+	url = ../automake.git
