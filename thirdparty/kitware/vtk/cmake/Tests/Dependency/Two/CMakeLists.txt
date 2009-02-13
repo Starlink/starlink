@@ -1,3 +1,0 @@
-ADD_LIBRARY( Two TwoSrc.c )
-TARGET_LINK_LIBRARIES( Two Three )
-

@@ -4,3 +4,6 @@
 [submodule "thirdparty/kitware/vtk/VTK"]
 	path = thirdparty/kitware/vtk/VTK
 	url = ../vtk.git
+[submodule "thirdparty/kitware/vtk/cmake"]
+	path = thirdparty/kitware/vtk/cmake
+	url = ../cmake.git
