@@ -7,3 +7,6 @@
 [submodule "thirdparty/kitware/vtk/cmake"]
 	path = thirdparty/kitware/vtk/cmake
 	url = ../cmake.git
+[submodule "thirdparty/fsf/autoconf"]
+	path = thirdparty/fsf/autoconf
+	url = ../autoconf.git
