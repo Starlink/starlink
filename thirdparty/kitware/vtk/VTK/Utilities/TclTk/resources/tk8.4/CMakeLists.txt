@@ -1,3 +1,0 @@
-IF(WIN32)
-  SUBDIRS(win)
-ENDIF(WIN32)

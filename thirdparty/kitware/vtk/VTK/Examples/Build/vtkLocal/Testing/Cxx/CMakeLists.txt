@@ -1,2 +1,0 @@
-ADD_EXECUTABLE(vtkLocalTest vtkLocalTest.cxx)
-TARGET_LINK_LIBRARIES(vtkLocalTest vtkLocal)

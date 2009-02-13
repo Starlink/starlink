@@ -1,8 +1,0 @@
-#! /bin/sh
-#	$Header: /cvsroot/VTK/VTK/Utilities/vtktiff/dist/newalpha,v 1.1 2004/04/28 15:49:22 king Exp $
-if test -r tiff.alpha; then
-    ALPHA=`cat tiff.alpha`; rm -f tiff.alpha
-    echo "$ALPHA" | awk '{ printf "define ALPHA %1d\n", $3+1}' > tiff.alpha
-else
-    echo "define ALPHA 001" >tiff.alpha
-fi
