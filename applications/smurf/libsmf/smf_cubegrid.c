@@ -559,7 +559,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                   if( labgrp ) grpPut1( labgrp, lab, 0, status );
                   nallpos++;
                   rtsys = tsys ? (float) tsys[ irec ] : VAL__BADR;
-                  if( rtsys >= 0.0 ) rtsys = VAL__BADR;
+                  if( rtsys <= 0.0 ) rtsys = VAL__BADR;
                   if( rtsys != VAL__BADR ) *gottsys = 1;
                }
 
