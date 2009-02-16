@@ -22,3 +22,6 @@
 [submodule "thirdparty/tclsys/blt/blt"]
 	path = thirdparty/tclsys/blt/blt
 	url = ../blt.git
+[submodule "thirdparty/fsf/libtool"]
+	path = thirdparty/fsf/libtool
+	url = ../libtool.git
