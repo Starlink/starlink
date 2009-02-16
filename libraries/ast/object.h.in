@@ -359,7 +359,8 @@
 #  define  __attribute__(x)  /*NOTHING*/
 #endif
 
-/* Set to "yes" or "no" to indicate if AST was build with threads support. */
+/* Set to "1" (yes) or "0" (no) to indicate if AST was build with threads 
+   support. */
 #define AST__THREADSAFE @THREADS@
 
 #if defined(astCLASS )

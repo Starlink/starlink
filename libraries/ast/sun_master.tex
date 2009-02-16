@@ -4716,10 +4716,10 @@ When the AST library is built from source, the build process checks to
 see if the POSIX threads library (``{\tt pthreads}'') is available. If so,
 appropriate {\tt pthreads} calls are inserted into the AST source code to
 ensure that AST is thread-safe, and the AST\_\_THREADSAFE macro (defined
-in the ``ast.h'' header file) is set to ``{\tt yes}''. If the {\tt pthreads}
+in the ``ast.h'' header file) is set to ``{\tt 1}''. If the {\tt pthreads}
 library cannot be found when AST is built, a working version of the AST 
 library will still be created, but it will not be thread-safe. In this
-case the AST\_\_THREADSAFE macro will be set to ``{\tt no}'' in ast.h. The
+case the AST\_\_THREADSAFE macro will be set to ``{\tt 0}'' in ast.h. The
 rest of this section assumes that the thread-safe version of AST is being
 used.
 
@@ -21558,6 +21558,11 @@ current version):
 \item The Prism class has been modified so that any class of Region can
 be used to define the extrusion axes. Previously, only a Box or Interval
 could be used for this purpose.
+
+c+
+\item The values of the AST\_\_THREADSAFE macro (defined in ast.h) have
+been changed from ``yes'' and ``no'' to ``1'' and ``0''.
+c-
 
 \item Improvements have been made to the way that Prisms are simplified
 when

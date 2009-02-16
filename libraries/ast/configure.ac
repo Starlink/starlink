@@ -52,15 +52,15 @@ AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 AC_ARG_WITH([pthreads],
             [ --without-pthreads   Build package without POSIX threads support],
         if test "$withval" = "yes"; then
-           use_pthreads="yes"
+           use_pthreads="1"
         else
-           use_pthreads="no"
+           use_pthreads="0"
         fi,
-        use_pthreads="yes")
-if test "$use_pthreads" = "yes"; then
-AC_CHECK_LIB([pthread], [pthread_create], ,[use_pthreads="no"])
+        use_pthreads="1")
+if test "$use_pthreads" = "1"; then
+AC_CHECK_LIB([pthread], [pthread_create], ,[use_pthreads="0"])
 fi
-AM_CONDITIONAL(NOTHREADS, test x$use_pthreads = xno)
+AM_CONDITIONAL(NOTHREADS, test x$use_pthreads = x0)
 AC_SUBST(THREADS, $use_pthreads)
 
 # See which variadic function API to use
