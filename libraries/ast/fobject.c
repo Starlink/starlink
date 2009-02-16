@@ -464,8 +464,9 @@ F77_SUBROUTINE(ast_activememory)( CHARACTER(TEXT)
                                   TRAIL(TEXT) ) {
    GENPTR_CHARACTER(TEXT)
    char *text;
-   int *status = 0;
-
+   int status_value;
+   int *status = &status_value;
+   *status = 0;
    astBeginPM;
    text = astString( TEXT, TEXT_length );
    astEndPM;
