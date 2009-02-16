@@ -2977,6 +2977,8 @@ c        This function applies to all Objects.
 f        This routine applies to all Objects.
 
 *  Notes:
+*     - Two independent Objects that happen to be identical are not
+*     considered to be the same Object by this function.
 c     - A value of zero will be returned if this function is invoked
 c     with the AST error status set, or if it should fail for any reason.
 f     - A value of .FALSE. will be returned if this function is invoked

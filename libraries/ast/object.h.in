@@ -1406,7 +1406,6 @@ void astImportId_( AstObject *, int * );
 void astSetId_( void *, const char *, ... )__attribute__((format(printf,2,3)));
 #endif
 
-void astExemptId_( AstObject *, int * );
 AstObject *astAnnulId_( AstObject *, int * );
 AstObject *astCheckLock_( AstObject *, int * );
 AstObject *astClone_( AstObject *, int * );
@@ -1414,11 +1413,13 @@ AstObject *astCopy_( const AstObject *, int * );
 const char *astGetC_( AstObject *, const char *, int * );
 double astGetD_( AstObject *, const char *, int * );
 float astGetF_( AstObject *, const char *, int * );
+int astEqual_( AstObject *, AstObject *, int * );
 int astGetI_( AstObject *, const char *, int * );
-int astTest_( AstObject *, const char *, int * );
 int astSame_( AstObject *, AstObject *, int * );
+int astTest_( AstObject *, const char *, int * );
 long astGetL_( AstObject *, const char *, int * );
 void astClear_( AstObject *, const char *, int * );
+void astExemptId_( AstObject *, int * );
 void astSetC_( AstObject *, const char *, const char *, int * );
 void astSetD_( AstObject *, const char *, double, int * );
 void astSetF_( AstObject *, const char *, float, int * );
@@ -1445,7 +1446,6 @@ const char *astGetAttrib_( AstObject *, const char *, int * );
 const char *astGetClass_( const AstObject *, int * );
 const char *astGetID_( AstObject *, int * );
 const char *astGetIdent_( AstObject *, int * );
-int astEqual_( AstObject *, AstObject *, int * );
 int astGetNobject_( const AstObject *, int * );
 int astGetRefCount_( AstObject *, int * );
 int astTestAttrib_( AstObject *, const char *, int * );
@@ -1527,13 +1527,13 @@ astINVOKE(O,astLoadObject_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PT
    they handle Object identifiers and their resources explicitly, and
    must therefore be passed identifier values without conversion to C
    pointers. */
-#if defined(astCLASS)            /* Protected */
+#if defined(astCLASS)            /* Protected only */
 #define astAnnul(this) astINVOKE(O,astAnnul_(astCheckObject(this),STATUS_PTR))
 #define astAnnulId(this) astINVOKE(O,astAnnulId_((AstObject *)(this),STATUS_PTR))
 #define astDelete(this) astINVOKE(O,astDelete_(astCheckObject(this),STATUS_PTR))
 #define astSet astINVOKE(F,astSet_)
 
-#else                            /* Public */
+#else                            /* Public only */
 #define astAnnul(this) astINVOKE(O,astAnnulId_((AstObject *)(this),STATUS_PTR))
 #define astDelete(this) astINVOKE(O,astDeleteId_((AstObject *)(this),STATUS_PTR))
 #define astExport(this) astINVOKE(V,astExportId_((AstObject *)(this),STATUS_PTR))
@@ -1544,6 +1544,8 @@ astINVOKE(O,astLoadObject_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PT
 #define astUnlock(this) astINVOKE(V,astUnlockId_((AstObject *)(this),STATUS_PTR))
 #endif
 
+/* Both.... */
+#define astEqual(this,that) astINVOKE(V,((this==that)||astEqual_(astCheckObject(this),astCheckObject(that),STATUS_PTR)))
 #define astExempt(this) astINVOKE(V,astExemptId_((AstObject *)(this),STATUS_PTR))
 #define astClear(this,attrib) astINVOKE(V,astClear_(astCheckObject(this),attrib,STATUS_PTR))
 #define astClone(this) astINVOKE(O,astClone_(astCheckObject(this),STATUS_PTR))
@@ -1595,8 +1597,6 @@ astINVOKE(V,astClearAttrib_(astCheckObject(this),attrib,STATUS_PTR))
 #define astDump(this,channel) \
 astINVOKE(V,astDump_(astCheckObject(this),astCheckChannel(channel),STATUS_PTR))
 
-#define astEqual(this,that) \
-astINVOKE(V,((this==that)||astEqual_(astCheckObject(this),astCheckObject(that),STATUS_PTR)))
 #define astGetAttrib(this,attrib) \
 astINVOKE(V,astGetAttrib_(astCheckObject(this),attrib,STATUS_PTR))
 #define astGetClass(this) astINVOKE(V,astGetClass_((const AstObject *)(this),STATUS_PTR))

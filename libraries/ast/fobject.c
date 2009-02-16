@@ -575,5 +575,19 @@ F77_LOGICAL_FUNCTION(ast_chrsub)( CHARACTER(TEST),
 }
 
 
+F77_LOGICAL_FUNCTION(ast_equal)( INTEGER(THIS),
+                                 INTEGER(THAT),
+                                 INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_INTEGER(THAT)
+   F77_LOGICAL_TYPE(RESULT);
+
+   astAt( "AST_EQUAL", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astEqual( astI2P( *THIS ), astI2P( *THAT ) ) ? F77_TRUE : F77_FALSE;
+   )
+   return RESULT;
+}
+
 
 
