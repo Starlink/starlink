@@ -1469,7 +1469,7 @@ static int Equal( AstObject *this, AstObject *that, int *status ){
 *     Check equality of two AST Objects.
 
 *  Type:
-*     Protected function.
+*     Public (but undocumented) function.
 
 *  Synopsis:
 *     #include "object.h"
@@ -1492,6 +1492,12 @@ static int Equal( AstObject *this, AstObject *that, int *status ){
 *     Non-zero if the objects are equivalent.
 
 *  Notes:
+*    - This function is available in the public interface even though it is 
+*    documented as protected. This is because it is difficult to document
+*    precisely which aspects of two Objects must be equal in order for this
+*    function to return a non-zero value. Each class of Object supplies
+*    its own Equal method that tests which-ever attributes the class
+*    considers to be significiant.
 *    - The implementation of this function provided by the base Object
 *    class simply compares the class names and the structure size.
 *    Sub-classes should override this method to provide more appropriate tests.
