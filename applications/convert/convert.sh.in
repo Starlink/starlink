@@ -62,6 +62,8 @@
 #        name for GZIP temporary file.
 #     2007 November 6 (PWD):
 #        Changed NDF_FROM_xxx and NDF_TO_xxx definitions to work in bash.
+#     2009 February 16 (PWD):
+#        Change various -z tests to -n, logic was reversed.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -211,7 +213,7 @@ $NDF_FORMATS_OUT',FITSGZ(.fts.gz),FITSGZ(.fits.gz)'
 #  Because NDF2FITS uses HDS_WILD which will only accept container files 
 #  as input, NDF_TEMP_FITS must specify an alternative to the default
 #  HDS scratch file.
-if test -z $HDS_SCRATCH; then
+if test -n "$HDS_SCRATCH"; then
    export NDF_TEMP_FITS="$HDS_SCRATCH/temp_fits_^name^fxscl"
 else
    export NDF_TEMP_FITS='temp_fits_^name^fxscl'
@@ -347,7 +349,7 @@ export NDF_TO_COMPRESSED=\
 '$CONVERT_DIR/convertndf to '\
 \'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
-if test -z $HDS_SCRATCH; then
+if test -n "$HDS_SCRATCH"; then
    export NDF_TEMP_COMPRESSED="$HDS_SCRATCH/temp_Z_^name"
 else
    export NDF_TEMP_COMPRESSED='temp_Z_^name'
@@ -363,7 +365,7 @@ export NDF_TO_GZIP=\
 '$CONVERT_DIR/convertndf to '\
 \'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
-if test -z $HDS_SCRATCH; then
+if test -n "$HDS_SCRATCH"; then
    export NDF_TEMP_GZIP="$HDS_SCRATCH/temp_gz_^name"
 else
    export NDF_TEMP_GZIP='temp_gz_^name'
@@ -379,7 +381,7 @@ export NDF_TO_FITSGZ=\
 '$CONVERT_DIR/convertndf to '\
 \'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
-if test -z $HDS_SCRATCH; then
+if test -n "$HDS_SCRATCH"; then
    export NDF_TEMP_GZIP="$HDS_SCRATCH/temp_fgz_^name"
 else
    export NDF_TEMP_GZIP='temp_fgz_^name'
@@ -392,9 +394,9 @@ export NDF_SHCVT=0
 
 #  Set up IDL_PATH and IDL_DLM_PATH if IDL is activated.
 #  -----------------------------------------------------
-if test -z $IDL_PATH; then
+if test -n "$IDL_PATH"; then
    export IDL_PATH=${IDL_PATH}:$CONVERT_DIR
-   if test -z $IDL_DLM_PATH ; then
+   if test -n "$IDL_DLM_PATH" ; then
       export IDL_DLM_PATH=${IDL_DLM_PATH}:$CONVERT_DIR
    else
       export IDL_DLM_PATH=$CONVERT_DIR
