@@ -16,3 +16,6 @@
 [submodule "thirdparty/fsf/automake"]
 	path = thirdparty/fsf/automake
 	url = ../automake.git
+[submodule "thirdparty/eso/skycat/skycat"]
+	path = thirdparty/eso/skycat/skycat
+	url = ../skycat.git

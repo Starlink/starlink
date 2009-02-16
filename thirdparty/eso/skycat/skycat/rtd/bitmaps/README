@@ -1,3 +1,0 @@
-Be sure to run update_bitmaps.sh if you add or modify a bitmap in this directory. 
-This will create ../generic/rtd_bitmaps.C which defines the bitmaps in C code.
-

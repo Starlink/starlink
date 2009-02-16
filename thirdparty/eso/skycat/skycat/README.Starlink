@@ -1,9 +1,0 @@
-This is the ESO Skycat distribution imported into the ESO thirdparty
-vendor branch. Note none of the build mechanism is used at this level,
-see the directory above.
-
-Also note that this is not Skycat official and various small-level changes
-have been made that support GAIA, if you want the official Skycat go to the
-ESO download site.
-
-Peter W. Draper 25-APR-2007.
