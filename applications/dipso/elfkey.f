@@ -1,6 +1,8 @@
-      SUBROUTINE ELFKEY( IF, STATUS )
+      SUBROUTINE ELFKEY( IF, COMTXT, COMFIL, STATUS )
       INCLUDE 'SAE_PAR'
       INTEGER STATUS 
+      LOGICAL COMTXT
+      CHARACTER COMFIL*(*)
 
       COMMON/DAT2/A,B,P,S,FLX,INDX,IREL,LP,NL,IAB
       COMMON/DAT5/NDIM,NDI2,NPAR,NUMFIT,NCUR,MAXFC
@@ -24,8 +26,20 @@ C     CALL TALPHA
 !
 !   Fix to change QUIT command
    24 ELFSTR = ' '
-      CALL RDSTR( ' ', 'ELFINP>  ', ' ', ELFSTR, STATUS )
-      IF( STATUS .NE. SAI__OK ) ELFSTR='QELF'
+      IF( .NOT. COMTXT ) THEN
+         CALL RDSTR( ' ', 'ELFINP>  ', ' ', ELFSTR, STATUS )
+         IF( STATUS .NE. SAI__OK ) ELFSTR='QELF'
+      ELSE
+         READ( 67, '(A800)', IOSTAT=IHX ) ELFSTR
+         IF( IHX .NE. 0 ) THEN
+            ELFSTR = 'QELF'
+            IF( IHX .NE. -1 ) THEN
+               WRITE (*,'(A,A)') '   Error reading from command file: ',
+     :                           COMFIL
+            END IF
+         END IF
+      END IF
+
 
       CALL SSTRIP (ELFSTR)
       CALL DTOUPP (ELFSTR)

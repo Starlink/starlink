@@ -1,9 +1,10 @@
 1 DIPSO - friendly spectrum analysis program
 
- V3.6-3 (15-DEC-2003) 
-    DIPSO V3.6-3 has been released. This includes the following changes:
+ V3.6-5 (17-FEB-2008) 
+    DIPSO V3.6-5 has been released. This includes the following changes:
 
+    o The ELFINP command now has a parameter that can be set non-zero to
+    allow input to be read from the currently running script file rather
+    than from the keyboard.
 
-    o A bug in the READ and SP0RD commands has been fixed which could cause 
-    usable AXIS structures in the supplied NDF to be ignored.
 

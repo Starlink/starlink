@@ -422,15 +422,6 @@ operating system commands, then simply push the DIPSO task into the background
 by typing control-Z,
 issue your operating system commands, and then re-enter DIPSO by typing {\tt{fg}}. 
 
-\section{The World-Wide-Web and DIPSO}
-The URL:
-
-\htmladdnormallink{{\tt{http://axp2.ast.man.ac.uk:8000/~dsb/dipso/dipso.html}}}{http://axp2.ast.man.ac.uk:8000/\~{}dsb/dipso/dipso.html}
-
-provides information related to DIPSO, including access to test
-versions of the most recent DIPSO executables and source code, and
-information on converting old VMS data to a form readable on Unix machines.
-
 \section {Data Storage}
 
 \subsection{Internal Data Storage}
@@ -1676,9 +1667,16 @@ use of \htmlref{{\tt{ELFCSL}}}{COM:ELFCSL}  immediately following \htmlref{{\tt{
 (N.B.\ {\em Not} the DIPSO current arrays!). The same result can be
 obtained using \htmlref{{\tt{CLEAR}}}{COM:CLEAR}  inside the \htmlref{{\tt{ELFINP}}}{COM:ELFINP}  editor.
 
-\dipcom{ELFINP}{(no parameters)}{Sets starting values and constraints for fitting emission lines}
-``ELF INPut''. Invokes the ELF command language; you are alerted to
-this by a change of prompt. Return to DIPSO by typing QELF.
+\dipcom{ELFINP}{[batch]}{Sets starting values and constraints for fitting emission lines}
+
+``ELF INPut''. Allows you to Specify starting values and constraints
+prior to optimising the line fits with ELFOPT. The ``batch'' parameter
+controls what happens if the ELFINP command is invoked from within a
+command file. If ``batch'' is zero (the default), the user is prompted for
+the strings specifying the ELF constraints, starting values, etc (you are
+alerted to this by a change of prompt). If ``batch'' is non-zero, the
+strings are read from the script file. In either case, the last string
+read should be ``QELF''.
 
 The ELF command language allows starting values and constraints to be
 entered prior to optimising line fits. The language is similar to
@@ -3530,6 +3528,13 @@ documentation first!
 
 This section records the changes introduced with each new version of DIPSO.
 {\em NOTE,} earlier changes may be over-ridden by later changes.
+
+\subsection{Changes introduced by DIPSO V3.6-5}
+\begin{itemize}
+\item The ELFINP command now has a parameter that can be set non-zero to
+allow input to be read from the currently running script file rather than
+from the keyboard.
+\end{itemize}
 
 \subsection{Changes introduced by DIPSO V3.6-4}
 \begin{itemize}

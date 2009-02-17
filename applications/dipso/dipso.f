@@ -2693,13 +2693,13 @@ c       WRITE(*,*)
 *
 *
           ELSE IF( SUBCMD .EQ. 'ELFINP' ) THEN
-             IF( PARAMS .NE. ' ' ) THEN
-                WRITE (*,
-     :          '(''   ELFINP:  superfluous parameters ignored'',A)')
-     :          BLEEP
-             END IF
 
-             CALL ELFKEY(IFPS, STATUS )
+             VARRAY( 1 ) = 0.
+             CALL DECODE( 'ELFINP', PARAMS, 0, 1, VARRAY, ' ', OK )
+             IF( .NOT .OK ) GO TO 5000
+
+             CALL ELFKEY( IFPS, ( NINT(VARRAY(1)) .NE. 0 ) .AND. COMTXT, 
+     :                    COMSAV(1:NCCAR), STATUS )
              IF( STATUS .NE. SAI__OK ) THEN
                 OK = .FALSE.
                 GO TO 5000

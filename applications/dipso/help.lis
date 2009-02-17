@@ -459,10 +459,16 @@ ELFNEWC (no parameters)
      The same result can be obtained using CLEAR inside
      the ELFINP editor.
 
-ELFINP (no parameters)
-     "ELF INPut". Invokes the ELF command language;
-     you are alerted to this by a change of prompt. Return
-     to DIPSO by typing QELF.
+ELFINP [batch]
+
+     "ELF INPut". Allows you to Specify starting values and constraints
+     prior to optimising the line fits with ELFOPT. The "batch" parameter
+     controls what happens if the ELFINP command is invoked from within a
+     command file. If "batch" is zero (the default), the user is prompted
+     for the strings specifying the ELF constraints, starting values, etc
+     (you are alerted to this by a change of prompt). If "batch" is
+     non-zero, the strings are read from the script file. In either case,
+     the last string read should be "QELF".
 
      The ELF command language allows starting values
      and constraints to be entered prior to optimising line
