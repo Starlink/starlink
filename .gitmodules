@@ -25,3 +25,6 @@
 [submodule "thirdparty/fsf/libtool"]
 	path = thirdparty/fsf/libtool
 	url = ../libtool.git
+[submodule "thirdparty/perlsys/perl/perl"]
+	path = thirdparty/perlsys/perl/perl
+	url = git://perl5.git.perl.org/perl.git
