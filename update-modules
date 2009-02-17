@@ -88,23 +88,22 @@ fi
 
 if test "$submodule" = ""; then
    #  Get a list of all the paths to the submodules. 
-   #  Note in git 1.6 could use foreach subcommand.
-   submodule_list="`sed -n 's/.*path\ =\ \(.*\)/\1/p' < .gitmodules`"
+   submodule_list="`git config -f .gitmodules --get-regexp '.*\.path$' | awk '{print $2}'`"
 else
    submodule_list="$submodule" 
 fi
 
-for m in "$submodule_list"; do
-  
+for m in $submodule_list; do
+
    #  May not be checked in yet, in that case we see the modified files in the
    #  full repository. Avoid that case.
-   files=`cd $m && ls`
-   if test "$files" != ""; then
-      modified=`cd $m && git diff-index --stat HEAD`
+   nfiles=`cd $m && ls -a | wc -w`
+   if test $nfiles -gt 2 ; then
+      modified=`cd $m && git diff-index --name-status HEAD`
       if test "$modified" != ""; then
          echo "WARNING: submodule contains modified files, will not proceed"
-         echo "$m"
-         echo "$modified"
+         echo "... $m"
+         echo "$modified" | head
          exit 1
       fi
    else
