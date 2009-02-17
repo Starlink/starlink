@@ -91,7 +91,7 @@
 #include "ast.h"
 #include "jcmt/state.h"
 #include "gsdac_struct.h"
-#include "libacsis/specwrite.h"
+#include "libacsis/specwrite/specwrite.h"
 
 #ifndef GSDAC_DEFINED
 #define GSDAC_DEFINED

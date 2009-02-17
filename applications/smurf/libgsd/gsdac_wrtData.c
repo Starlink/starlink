@@ -117,7 +117,7 @@
 
 /* SMURF includes */
 #include "smurf_par.h"
-#include "libacsis/specwrite.h"
+#include "libacsis/specwrite/specwrite.h"
 #include "libsmf/smf.h"
 #include "gsdac.h"
 #include "jcmt/state.h"
