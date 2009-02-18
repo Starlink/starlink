@@ -1,3 +1,0 @@
-#  Macros for inclusion in Tcl's make files.
-EXEEXT=@EXEEXT@
-

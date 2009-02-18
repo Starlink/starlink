@@ -49,3 +49,6 @@
 [submodule "thirdparty/mesa3d/mesa/mesa"]
 	path = thirdparty/mesa3d/mesa/mesa
 	url = ../mesa.git
+[submodule "thirdparty/tclsys/tcl"]
+	path = thirdparty/tclsys/tcl
+	url = ../tcl.git
