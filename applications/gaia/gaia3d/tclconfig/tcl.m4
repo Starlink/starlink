@@ -9,7 +9,7 @@
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# RCS: @(#) $Id: tcl.m4,v 1.3 2007/05/14 11:50:53 pwd Exp $
+# RCS: @(#) $Id$
 
 AC_PREREQ(2.50)
 
@@ -894,7 +894,7 @@ AC_DEFUN(TEA_CONFIG_CFLAGS, [
     CFLAGS_DEBUG=-g
     if test "$GCC" = "yes" ; then
 	CFLAGS_OPTIMIZE=-O2
-	CFLAGS_WARNING="-Wall"
+	CFLAGS_WARNING="-Wall -Wno-implicit-int"
     else
 	CFLAGS_OPTIMIZE=-O
 	CFLAGS_WARNING=""
@@ -3175,7 +3175,7 @@ AC_DEFUN(TEA_MAKE_LIB, [
 	MAKE_STUB_LIB="\${STLIB_LD} -out:\[$]@ \$(PKG_STUB_OBJECTS)"
     else
 	MAKE_STATIC_LIB="\${STLIB_LD} \[$]@ \$(PKG_OBJECTS)"
-	MAKE_SHARED_LIB="\${SHLIB_LD} -o \[$]@ \$(PKG_OBJECTS) \${SHLIB_LD_LIBS}"
+	MAKE_SHARED_LIB="\${SHLIB_LD} -o \[$]@ \$(PKG_OBJECTS) \${LDFLAGS_DEFAULT} \${SHLIB_LD_LIBS}"
 	MAKE_STUB_LIB="\${STLIB_LD} \[$]@ \$(PKG_STUB_OBJECTS)"
     fi
 

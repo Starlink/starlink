@@ -8248,7 +8248,7 @@ fi
     CFLAGS_DEBUG=-g
     if test "$GCC" = "yes" ; then
 	CFLAGS_OPTIMIZE=-O2
-	CFLAGS_WARNING="-Wall"
+	CFLAGS_WARNING="-Wall -Wno-implicit-int"
     else
 	CFLAGS_OPTIMIZE=-O
 	CFLAGS_WARNING=""
@@ -11092,7 +11092,7 @@ echo "${ECHO_T}enabled $tcl_ok debugging" >&6
 	MAKE_STUB_LIB="\${STLIB_LD} -out:\$@ \$(PKG_STUB_OBJECTS)"
     else
 	MAKE_STATIC_LIB="\${STLIB_LD} \$@ \$(PKG_OBJECTS)"
-	MAKE_SHARED_LIB="\${SHLIB_LD} -o \$@ \$(PKG_OBJECTS) \${SHLIB_LD_LIBS}"
+	MAKE_SHARED_LIB="\${SHLIB_LD} -o \$@ \$(PKG_OBJECTS) \${LDFLAGS_DEFAULT} \${SHLIB_LD_LIBS}"
 	MAKE_STUB_LIB="\${STLIB_LD} \$@ \$(PKG_STUB_OBJECTS)"
     fi
 

@@ -308,8 +308,8 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_default_prefix=/home/pdraper/starlink_svn/build
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CYGPATH EXEEXT PKG_LIB_FILE PKG_STUB_LIB_FILE PKG_STUB_SOURCES PKG_STUB_OBJECTS PKG_TCL_SOURCES PKG_HEADERS PKG_INCLUDES PKG_LIBS PKG_CFLAGS TCL_VERSION TCL_BIN_DIR TCL_SRC_DIR TCL_LIB_FILE TCL_LIB_FLAG TCL_LIB_SPEC TCL_STUB_LIB_FILE TCL_STUB_LIB_FLAG TCL_STUB_LIB_SPEC TCL_LIBS TCL_DEFS TCL_EXTRA_CFLAGS TCL_LD_FLAGS TCL_SHLIB_LD_LIBS TK_VERSION TK_BIN_DIR TK_SRC_DIR TK_LIB_FILE TK_LIB_FLAG TK_LIB_SPEC TK_STUB_LIB_FILE TK_STUB_LIB_FLAG TK_STUB_LIB_SPEC TK_LIBS TK_XINCLUDES CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC OBJEXT CPP CXX CXXFLAGS ac_ct_CXX INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE RANLIB ac_ct_RANLIB EGREP MATH_LIBS tclutil_VERSION tclutil_LIB_FILE tclutil_BUILD_LIB_SPEC tclutil_BUILD_DIR tclutil_LIB_SPEC BLT_LIB_SPEC BLT_LIB_DIR tclutil_SRC_DIR tclutil_PKG_OBJECTS astrotcl_VERSION astrotcl_LIB_FILE astrotcl_BUILD_LIB_SPEC astrotcl_BUILD_DIR astrotcl_LIB_SPEC astrotcl_SRC_DIR astrotcl_PKG_OBJECTS rtd_VERSION rtd_LIB_FILE rtd_BUILD_LIB_SPEC rtd_BUILD_DIR rtd_LIB_SPEC rtd_SRC_DIR rtd_PKG_OBJECTS cat_VERSION cat_LIB_FILE cat_BUILD_LIB_SPEC cat_BUILD_DIR cat_LIB_SPEC cat_SRC_DIR skycat_VERSION skycat_LIB_FILE skycat_BUILD_LIB_SPEC skycat_BUILD_DIR skycat_LIB_SPEC skycat_SRC_DIR PKG_SOURCES PKG_OBJECTS CLEANFILES TCL_INCLUDES TK_INCLUDES TCL_THREADS SHARED_BUILD AR CELIB_DIR LIBOBJS SHLIB_SUFFIX DL_LIBS CFLAGS_DEBUG CFLAGS_OPTIMIZE CFLAGS_WARNING STLIB_LD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_LIBS LDFLAGS_DEBUG LDFLAGS_OPTIMIZE LD_LIBRARY_PATH_VAR TCL_DBGX CFLAGS_DEFAULT LDFLAGS_DEFAULT MAKE_LIB MAKE_SHARED_LIB MAKE_STATIC_LIB MAKE_STUB_LIB RANLIB_STUB TCLSH_PROG WISH_PROG OS SHLIB_LD_CXX_LIBS STARLINK STAR_CPPFLAGS STAR_FCFLAGS STAR_FFLAGS STAR_LDFLAGS build build_cpu build_vendor build_os FC FCFLAGS ac_ct_FC C_FC_FCLINK_MAGIC C_FC_PPFC_FCLINK_MAGIC stardocsdir staretcdir starexamplesdir starfacsdir starhelpdir starnewsdir STAR_DEPENDENCIES_ATTRIBUTES STAR_DEPENDENCIES_CHILDREN STAR_DOCUMENTATION PACKAGE_VERSION_MAJOR PACKAGE_VERSION_MINOR PACKAGE_VERSION_RELEASE PACKAGE_VERSION_INTEGER STAR_MANIFEST_DIR SVNVERSION STAR_SOURCE_ROOT_DIR PREDIST PAX TAR LIBTOOL FGENERIC FCLIBS SHLIB_PKG_LIBS LTLIBOBJS'
+ac_default_prefix=/loc/pwda/pdraper/starlink_git/build
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CYGPATH EXEEXT PKG_LIB_FILE PKG_STUB_LIB_FILE PKG_STUB_SOURCES PKG_STUB_OBJECTS PKG_TCL_SOURCES PKG_HEADERS PKG_INCLUDES PKG_LIBS PKG_CFLAGS TCL_VERSION TCL_BIN_DIR TCL_SRC_DIR TCL_LIB_FILE TCL_LIB_FLAG TCL_LIB_SPEC TCL_STUB_LIB_FILE TCL_STUB_LIB_FLAG TCL_STUB_LIB_SPEC TCL_LIBS TCL_DEFS TCL_EXTRA_CFLAGS TCL_LD_FLAGS TCL_SHLIB_LD_LIBS TK_VERSION TK_BIN_DIR TK_SRC_DIR TK_LIB_FILE TK_LIB_FLAG TK_LIB_SPEC TK_STUB_LIB_FILE TK_STUB_LIB_FLAG TK_STUB_LIB_SPEC TK_LIBS TK_XINCLUDES CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC OBJEXT CPP CXX CXXFLAGS ac_ct_CXX INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE RANLIB ac_ct_RANLIB EGREP MATH_LIBS tclutil_VERSION tclutil_LIB_FILE tclutil_BUILD_LIB_SPEC tclutil_BUILD_DIR tclutil_LIB_SPEC BLT_LIB_SPEC BLT_LIB_DIR tclutil_SRC_DIR tclutil_PKG_OBJECTS astrotcl_VERSION astrotcl_LIB_FILE astrotcl_BUILD_LIB_SPEC astrotcl_BUILD_DIR astrotcl_LIB_SPEC astrotcl_SRC_DIR astrotcl_PKG_OBJECTS rtd_VERSION rtd_LIB_FILE rtd_BUILD_LIB_SPEC rtd_BUILD_DIR rtd_LIB_SPEC rtd_SRC_DIR rtd_PKG_OBJECTS cat_VERSION cat_LIB_FILE cat_BUILD_LIB_SPEC cat_BUILD_DIR cat_LIB_SPEC cat_SRC_DIR skycat_VERSION skycat_LIB_FILE skycat_BUILD_LIB_SPEC skycat_BUILD_DIR skycat_LIB_SPEC skycat_SRC_DIR PKG_SOURCES PKG_OBJECTS CLEANFILES TCL_INCLUDES TK_INCLUDES TCL_THREADS SHARED_BUILD AR CELIB_DIR LIBOBJS SHLIB_SUFFIX DL_LIBS CFLAGS_DEBUG CFLAGS_OPTIMIZE CFLAGS_WARNING STLIB_LD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_LIBS LDFLAGS_DEBUG LDFLAGS_OPTIMIZE LD_LIBRARY_PATH_VAR TCL_DBGX CFLAGS_DEFAULT LDFLAGS_DEFAULT MAKE_LIB MAKE_SHARED_LIB MAKE_STATIC_LIB MAKE_STUB_LIB RANLIB_STUB TCLSH_PROG WISH_PROG OS SHLIB_LD_CXX_LIBS STARLINK STAR_CPPFLAGS STAR_FCFLAGS STAR_FFLAGS STAR_LDFLAGS build build_cpu build_vendor build_os FC FCFLAGS ac_ct_FC C_FC_FCLINK_MAGIC C_FC_PPFC_FCLINK_MAGIC stardocsdir staretcdir starexamplesdir starfacsdir starhelpdir starnewsdir STAR_DEPENDENCIES_ATTRIBUTES STAR_DEPENDENCIES_CHILDREN STAR_DOCUMENTATION PACKAGE_VERSION_MAJOR PACKAGE_VERSION_MINOR PACKAGE_VERSION_RELEASE PACKAGE_VERSION_INTEGER STAR_MANIFEST_DIR GIT STAR_SOURCE_ROOT_DIR PREDIST PAX TAR LIBTOOL FGENERIC FCLIBS SHLIB_PKG_LIBS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -892,7 +892,7 @@ Optional Packages:
   --with-x                use the X Window System
   --with-celib=DIR        use Windows/CE support library from DIR
   --with-starlink         Starlink tree to use (default
-                          ${STARLINK:=/home/pdraper/starlink_svn/build})
+                          ${STARLINK:=/loc/pwda/pdraper/starlink_git/build})
   --without-stardocs      Do not install built documentation (default --with)
 
 Some influential environment variables:
@@ -11536,7 +11536,7 @@ echo "${ECHO_T}enabled $tcl_ok debugging" >&6
 	MAKE_STUB_LIB="\${STLIB_LD} -out:\$@ \$(PKG_STUB_OBJECTS)"
     else
 	MAKE_STATIC_LIB="\${STLIB_LD} \$@ \$(PKG_OBJECTS)"
-	MAKE_SHARED_LIB="\${SHLIB_LD} -o \$@ \$(PKG_OBJECTS) \${SHLIB_LD_LIBS}"
+	MAKE_SHARED_LIB="\${SHLIB_LD} -o \$@ \$(PKG_OBJECTS) \${LDFLAGS_DEFAULT} \${SHLIB_LD_LIBS}"
 	MAKE_STUB_LIB="\${STLIB_LD} \$@ \$(PKG_STUB_OBJECTS)"
     fi
 
@@ -12452,7 +12452,7 @@ test -n "$_star_docs_only"        || _star_docs_only=false
 
 
 # Ensure that STARLINK has a value, defaulting to
-# /home/pdraper/starlink_svn/build.  Note that this directory may be
+# /loc/pwda/pdraper/starlink_git/build.  Note that this directory may be
 # different from /star, and reflects the value of
 # STARCONF_DEFAULT_STARLINK that the `starconf' package was configured
 # with before its installation.
@@ -12466,7 +12466,7 @@ test -n "$_star_docs_only"        || _star_docs_only=false
 # is possible to make a test version of a new package, using tools
 # from an old installation, but installing in a new place.
 #
-# However, we install software in /home/pdraper/starlink_svn/build by
+# However, we install software in /loc/pwda/pdraper/starlink_git/build by
 # default.  This is so even if $STARLINK and STARCONF_DEFAULT_STARLINK
 # are different, because in this case we are planning to use a
 # previous installation in $STARLINK or $STARCONF_DEFAULT_STARLINK,
@@ -12482,7 +12482,7 @@ test -n "$_star_docs_only"        || _star_docs_only=false
 # installed.
 
 
-test -n "$STARLINK" || STARLINK=/home/pdraper/starlink_svn/build
+test -n "$STARLINK" || STARLINK=/loc/pwda/pdraper/starlink_git/build
 
 # Handle the --with-starlink option.  If --with-starlink is present
 # with no argument (the default), we do nothing as this simply
@@ -12804,25 +12804,24 @@ current_MANIFESTS=$STARLINK/manifests
 
 
 # Each package updates the "starlink.version" file installed into the
-# manifests directory. This tracks the subversion version number for
-# the current code state by running the svnversion program on the
-# _whole_ tree (this isn't very nice, but is required by the JAC).
-# Define SVNVERSION as the program to run, but allow it to be
-# overridden (most likely by ":" to avoid the overhead).
+# manifests directory. This tracks the last git sha1 checkin for
+# the current code state by running the git show on the HEAD.
+# Define GIT as the program to run, but allow it to be overridden
+# (most likely by ":" to avoid the overhead).
 # Also requires that STAR_SOURCE_ROOT_DIR is defined to locate the
 # head of the source tree.
-: ${SVNVERSION='svnversion'}
-if test "${SVNVERSION}" = "svnversion"; then
-   # Extract the first word of "svnversion", so it can be a program name with args.
-set dummy svnversion; ac_word=$2
+: ${GIT='git'}
+if test "${GIT}" = "git"; then
+   # Extract the first word of "git", so it can be a program name with args.
+set dummy git; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_path_SVNVERSION+set}" = set; then
+if test "${ac_cv_path_GIT+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  case $SVNVERSION in
+  case $GIT in
   [\\/]* | ?:[\\/]*)
-  ac_cv_path_SVNVERSION="$SVNVERSION" # Let the user override the test with a path.
+  ac_cv_path_GIT="$GIT" # Let the user override the test with a path.
   ;;
   *)
   as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
@@ -12832,7 +12831,7 @@ do
   test -z "$as_dir" && as_dir=.
   for ac_exec_ext in '' $ac_executable_extensions; do
   if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_SVNVERSION="$as_dir/$ac_word$ac_exec_ext"
+    ac_cv_path_GIT="$as_dir/$ac_word$ac_exec_ext"
     echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -12842,11 +12841,11 @@ done
   ;;
 esac
 fi
-SVNVERSION=$ac_cv_path_SVNVERSION
+GIT=$ac_cv_path_GIT
 
-if test -n "$SVNVERSION"; then
-  echo "$as_me:$LINENO: result: $SVNVERSION" >&5
-echo "${ECHO_T}$SVNVERSION" >&6
+if test -n "$GIT"; then
+  echo "$as_me:$LINENO: result: $GIT" >&5
+echo "${ECHO_T}$GIT" >&6
 else
   echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
@@ -13356,7 +13355,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:13359:" \
+echo "$as_me:13358:" \
      "checking for Fortran compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -13949,7 +13948,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FCFLAGS
 FCFLAGS="$FCFLAGS $ac_verb"
-(eval echo $as_me:13952: \"$ac_link\") >&5
+(eval echo $as_me:13951: \"$ac_link\") >&5
 ac_fc_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_fc_v_output" >&5
 FCFLAGS=$ac_save_FFLAGS
@@ -14027,7 +14026,7 @@ _ACEOF
 # flags.
 ac_save_FFLAGS=$FCFLAGS
 FCFLAGS="$FCFLAGS $ac_cv_prog_fc_v"
-(eval echo $as_me:14030: \"$ac_link\") >&5
+(eval echo $as_me:14029: \"$ac_link\") >&5
 ac_fc_v_output=`eval $ac_link 5>&1 2>&1 | grep -v 'Driving:'`
 echo "$ac_fc_v_output" >&5
 FCFLAGS=$ac_save_FFLAGS
@@ -15557,7 +15556,7 @@ s,@PACKAGE_VERSION_MINOR@,$PACKAGE_VERSION_MINOR,;t t
 s,@PACKAGE_VERSION_RELEASE@,$PACKAGE_VERSION_RELEASE,;t t
 s,@PACKAGE_VERSION_INTEGER@,$PACKAGE_VERSION_INTEGER,;t t
 s,@STAR_MANIFEST_DIR@,$STAR_MANIFEST_DIR,;t t
-s,@SVNVERSION@,$SVNVERSION,;t t
+s,@GIT@,$GIT,;t t
 s,@STAR_SOURCE_ROOT_DIR@,$STAR_SOURCE_ROOT_DIR,;t t
 s,@PREDIST@,$PREDIST,;t t
 s,@PAX@,$PAX,;t t
