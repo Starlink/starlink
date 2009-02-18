@@ -58,3 +58,6 @@
 [submodule "thirdparty/tclsys/tclx/tclx"]
 	path = thirdparty/tclsys/tclx/tclx
 	url = ../tclx.git
+[submodule "thirdparty/tclsys/tdom/tdom"]
+	path = thirdparty/tclsys/tdom/tdom
+	url = ../tdom.git
