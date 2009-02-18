@@ -1,0 +1,144 @@
+#!/bin/sh
+#+
+#  Name:
+#     remove-modules
+
+#  Purpose:
+#     Remove git submodules from a working tree.
+
+#  Type of Module:
+#     Bourne shell script
+
+#  Usage:
+#     remove-modules <submodule>
+
+#  Description:
+#     This script removes the content of the given submodule, or all
+#     submodules if ran without any arguments. It is destructive so
+#     should be used with care.
+#
+#     If any submodule contains local changes then this script will refuse 
+#     to run. You will need to correct the problem that represents before
+#     running this script.
+#
+#     A typical use of this script is to clear out all submodules in a 
+#     working tree where update-modules has been ran, before switching 
+#     to an historical release branch. Historical branches contain the
+#     original source in place of the submodules (the last of these
+#     is lehuakona).
+
+#  Authors:
+#     PWD: P.W. Draper (JAC, Durham University)
+#     {enter_new_authors_here}
+
+#  Copyright:
+#     Copyright (C) 2009 Science and Technology Facilities Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of the
+#     License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+#     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  History:
+#     18-FEB-2009: (PWD):
+#        Original version.
+#     {enter_further_changes_here}
+
+#-
+
+echo ""
+echo "Removing all local repository submodules:"
+
+#  If given a command-line argument assume this is the path of a submodule and
+#  just remove that.
+
+if test "$1" != ""; then
+   submodule="$1"
+else
+   submodule=""
+fi
+
+#  Get a summary of the submodules. If this returns any content then one or
+#  more have been modified and committed and should be pushed or reset before
+#  proceeding.
+
+summary=`git submodule summary $submodule`
+
+if test "$summary" != ""; then
+   echo "ERROR: submodule(s) are modified, will not remove"
+   echo "$summary"
+   exit 1
+fi
+
+#  The above will not report modified files that have not been committed.
+#  This isn't important, but probably indicates some activity in the submodule
+#  so refuse to proceed when they are present as well.
+
+if test "$submodule" = ""; then
+   #  Get a list of all the paths to the submodules. Note only registered ones.
+   submodule_list="`git ls-files --stage | grep ^160000| awk '{print $4}'`"
+else
+   submodule_list="$submodule" 
+   #  Verify this a submodule.
+   found="`git ls-files --stage | grep ^160000| grep $submodule| awk '{print $4}'`"
+   if test "$found" != "$submodule"; then
+      echo "ERROR: no such submodule: ... $submodule"
+      exit 1
+   fi
+fi
+
+for m in $submodule_list; do
+
+   #  May not be checked in yet, in that case we see the modified files in the
+   #  full repository. Avoid that case.
+   nfiles=`cd $m && ls -a | wc -w`
+   if test $nfiles -gt 2 ; then
+      modified=`cd $m && git diff-index --name-status HEAD`
+      if test "$modified" != ""; then
+         echo "WARNING: submodule contains modified files, will not proceed"
+         echo "... $m"
+         echo "$modified" | head
+         exit 1
+      fi
+   else
+      echo "... found uninitialised submodule: $m"
+   fi
+done
+
+#  No modifications so safe to proceed with removal of contents.
+#  Since this is destructive, ask one more time.
+
+read -p "Are you sure you want to proceed (y/N)? " answer
+
+if test "$answer" = "y"; then
+
+   for m in $submodule_list; do
+      nfiles=`cd $m && ls -a | wc -w`
+      if test $nfiles -gt 2 ; then
+         rm -rf $m
+         mkdir -p $m
+         echo "... removed: $m"
+      else
+         echo "... ignored: $m"
+      fi
+   done
+
+   echo "Removal complete:"
+   git status
+   echo ""
+else
+   echo "Nothing done"
+fi
+exit
