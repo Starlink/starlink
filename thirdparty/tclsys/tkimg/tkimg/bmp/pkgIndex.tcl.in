@@ -1,5 +1,0 @@
-# Tcl package index file - handcrafted
-#
-# $Id: pkgIndex.tcl.in,v 1.1.1.1 2006/01/16 18:01:27 abrighto Exp $
-
-package ifneeded "@DPACKAGE@" @VERSION@ [list load [file join $dir @tkimgbmp_LIB_FILE@]]

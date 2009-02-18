@@ -64,3 +64,6 @@
 [submodule "thirdparty/tclsys/tk"]
 	path = thirdparty/tclsys/tk
 	url = ../tk.git
+[submodule "thirdparty/tclsys/tkimg/tkimg"]
+	path = thirdparty/tclsys/tkimg/tkimg
+	url = ../tkimg.git
