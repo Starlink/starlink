@@ -34,3 +34,6 @@
 [submodule "thirdparty/heasarc/cfitsio/cfitsio"]
 	path = thirdparty/heasarc/cfitsio/cfitsio
 	url = ../cfitsio.git
+[submodule "thirdparty/mit/fftw/fftw"]
+	path = thirdparty/mit/fftw/fftw
+	url = ../fftw.git
