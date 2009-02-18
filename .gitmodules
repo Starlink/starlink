@@ -52,3 +52,6 @@
 [submodule "thirdparty/tclsys/tcl"]
 	path = thirdparty/tclsys/tcl
 	url = ../tcl.git
+[submodule "thirdparty/tclsys/tcldict/tcldict"]
+	path = thirdparty/tclsys/tcldict/tcldict
+	url = ../tcldict.git
