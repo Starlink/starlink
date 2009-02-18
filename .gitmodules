@@ -37,3 +37,6 @@
 [submodule "thirdparty/mit/fftw/fftw"]
 	path = thirdparty/mit/fftw/fftw
 	url = ../fftw.git
+[submodule "thirdparty/ijg/jpeg/jpeg"]
+	path = thirdparty/ijg/jpeg/jpeg
+	url = ../jpeg.git
