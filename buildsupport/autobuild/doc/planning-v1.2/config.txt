@@ -1,8 +1,0 @@
-Single configuration source
----------------------------
-In order to scale AutoBuild to multiple machines, there needs to be
-centralized configuration management.
-
-Currently, each AutoBuild instance uses its own configuration file from disk.
-This file is read in by auto-build.pl and then the values are passed into the
-creation of AutoBuild.pm.

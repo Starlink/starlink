@@ -1,2 +1,0 @@
-# attempt to start Starlink autobuilder every night at 0.00
-0 0 * * * PREFIX/starlink/cronbuild.sh 2> /dev/null; 
