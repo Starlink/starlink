@@ -22,11 +22,6 @@ been changed from "yes" and "no" to "1" and "0".
 - The PointList class has a new method, astPoints, that copies the axis
 values from the PointList into a supplied array. 
 
-- The Region class has two new methods, astSetEnclosure and
-astGetEnclosure, that allow two Regions to be associated together. It is
-expected that this will be used to indicate that one Region encloses
-another, but this is not enforced.
-
 - The PointList class has a new (read-only) attribute, ListSize, that 
 gives the number of points stored in the PointList.
 

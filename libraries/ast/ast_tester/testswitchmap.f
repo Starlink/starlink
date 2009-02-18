@@ -755,8 +755,9 @@
       l = l - f + 1
 
       if( next + ll - 1 .ge. 45000 ) then
-         write(*,*)
-         call stopit( status, 'Buffer overflow in mysink!!' )
+         write(*,*) 'Buffer overflow in mysink!!'
+         status = SAI__ERROR
+
       else if( l .gt. ll ) then
          write(*,*)
          if( ibuf .eq. 1 ) then
@@ -765,7 +766,8 @@
             write(*,*) buf2( next : next + l)
          end if
          write(*,*) 'Line length ',l,' greater than ',ll
-         call stopit( status, 'Line overflow in mysink!!' )
+         write(*,*) 'Line overflow in mysink!!'
+         status = SAI__ERROR
       else 
          end = next + l
          if( ibuf .eq. 1 ) then
