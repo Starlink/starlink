@@ -1,9 +1,0 @@
-#!/bin/sh
-set -x
-rm -f config.cache
-libtoolize --copy --force
-aclocal -I m4
-autoheader
-automake -a -c -f
-autoconf
-exit

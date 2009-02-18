@@ -67,3 +67,6 @@
 [submodule "thirdparty/tclsys/tkimg/tkimg"]
 	path = thirdparty/tclsys/tkimg/tkimg
 	url = ../tkimg.git
+[submodule "thirdparty/apache/xerces-c/xerces-c"]
+	path = thirdparty/apache/xerces-c/xerces-c
+	url = ../xerces.git
