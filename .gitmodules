@@ -31,3 +31,6 @@
 [submodule "applications/smurf/libacsis/specwrite"]
 	path = applications/smurf/libacsis/specwrite
 	url = ../acsis-libspecwrite.git
+[submodule "thirdparty/heasarc/cfitsio/cfitsio"]
+	path = thirdparty/heasarc/cfitsio/cfitsio
+	url = ../cfitsio.git
