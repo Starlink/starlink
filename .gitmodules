@@ -46,3 +46,6 @@
 [submodule "thirdparty/fsf/m4"]
 	path = thirdparty/fsf/m4
 	url = ../m4.git
+[submodule "thirdparty/mesa3d/mesa/mesa"]
+	path = thirdparty/mesa3d/mesa/mesa
+	url = ../mesa.git
