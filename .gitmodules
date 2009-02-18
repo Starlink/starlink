@@ -43,3 +43,6 @@
 [submodule "thirdparty/latex2html/latex2html/latex2html"]
 	path = thirdparty/latex2html/latex2html/latex2html
 	url = ../latex2html.git
+[submodule "thirdparty/fsf/m4"]
+	path = thirdparty/fsf/m4
+	url = ../m4.git
