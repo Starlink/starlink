@@ -82,6 +82,7 @@ ylwrap
 
 pm_to_blib
 blib
+Makefile.old
 
 # Mac specific
 
