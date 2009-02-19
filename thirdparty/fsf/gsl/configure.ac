@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision: 19893 $)
 
 dnl    Initialisation: package name and version number
-AC_INIT(gsl, 1.9, ussc@star.rl.ac.uk)
+AC_INIT(gsl, 1.12, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -11,7 +11,7 @@ AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
-AC_CONFIG_SRCDIR([gsl-1.9/configure.ac])
+AC_CONFIG_SRCDIR([gsl/configure.ac])
 
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
@@ -32,7 +32,7 @@ for ac_arg in $ac_configure_args; do
 done
 export star_extra_items
 (
-   cd gsl-1.9; \
+   cd gsl; \
    cmd="./configure --prefix=$prefix \
                     --srcdir=. \
                     $star_extra_items \
@@ -42,7 +42,7 @@ export star_extra_items
 )
            
 STAR_SPECIAL_INSTALL_COMMAND([
-   ( cd gsl-1.9; $(MAKE) INSTALL_ROOT=$$DESTDIR DESTDIR=$$DESTDIR install );
+   ( cd gsl; $(MAKE) INSTALL_ROOT=$$DESTDIR DESTDIR=$$DESTDIR install );
 ])
 
 AC_CONFIG_FILES([Makefile component.xml])
