@@ -82,3 +82,6 @@
 [submodule "thirdparty/tclsys/itcl/itk"]
 	path = thirdparty/tclsys/itcl/itk
 	url = ../itk.git
+[submodule "thirdparty/tclsys/itcl/iwidgets"]
+	path = thirdparty/tclsys/itcl/iwidgets
+	url = ../iwidgets.git
