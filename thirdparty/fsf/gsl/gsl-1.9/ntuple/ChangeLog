@@ -1,5 +1,0 @@
-2004-05-30  Brian Gough  <bjg@network-theory.co.uk>
-
-	* ntuple/test.c (main): choose ratio 1/(i+1.5) to avoid values
-	exactly on test cutoff x=0.1
-

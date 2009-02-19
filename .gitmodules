@@ -73,3 +73,6 @@
 [submodule "buildsupport/autobuild"]
 	path = buildsupport/autobuild
 	url = ../autobuild.git
+[submodule "thirdparty/fsf/gsl/gsl"]
+	path = thirdparty/fsf/gsl/gsl
+	url = ../gsl.git

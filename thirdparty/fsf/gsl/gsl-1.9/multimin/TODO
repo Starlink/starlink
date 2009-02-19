@@ -1,3 +1,0 @@
-* Check behavior of conjugate_fr in multimin -- the demo results look odd.
-
-* Should have made f and df return int instead of void.

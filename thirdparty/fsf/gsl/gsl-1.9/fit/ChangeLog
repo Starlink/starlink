@@ -1,8 +1,0 @@
-2004-12-23  Brian Gough  <bjg@network-theory.co.uk>
-
-	* gsl_fit.h: remove unused declarations
-
-Tue Sep 19 19:09:46 2000  Brian Gough  <bjg@network-theory.co.uk>
-
-	* fit/test.c (main): removed unused variables
-
