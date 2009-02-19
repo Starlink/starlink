@@ -79,3 +79,6 @@
 [submodule "thirdparty/tclsys/itcl/itcl"]
 	path = thirdparty/tclsys/itcl/itcl
 	url = ../itcl.git
+[submodule "thirdparty/tclsys/itcl/itk"]
+	path = thirdparty/tclsys/itcl/itk
+	url = ../itk.git
