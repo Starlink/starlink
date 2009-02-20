@@ -10,18 +10,19 @@
 #     Bourne shell script
 
 #  Usage:
-#     update-modules <submodule>
+#     update-modules [-f] [submodule]
 
 #  Description:
-#     This script updates the content of all the submodules. It should
-#     be ran whenever a submodule is known to be out-of-date. It can
-#     update a single submodule, or if no command-line argument is given
-#     all the known submodules (when new submodules are added to the 
-#     repository these must be made known by a git-pull or git-fetch
-#     first).
+#     This script updates the content of all the submodules or the given
+#     submodule. It should be ran whenever a submodule is known to be
+#     out-of-date. It can update a single submodule, or if no command-line
+#     argument is given all the known submodules (when new submodules are
+#     added to the repository these must be made known by a git-pull or
+#     git-fetch first).
 #
 #     If any submodules contain local changes then this script will refuse 
-#     to run as the update process is destructive.
+#     to run as the update process is destructive, unless the -f option
+#     is set.
 #
 #     It is necessary that this script be ran at least once after a 
 #     repository clone is created (this will be done by the bootstrap
@@ -61,25 +62,50 @@
 echo ""
 echo "Updating local repository submodules:"
 
-#  If given a command-line argument assume this is the path of a submodule and
-#  just update that.
+#  Parse any command-line arguments. We just have two -f and/or a submodule.
 
+check=1
 if test "$1" != ""; then
+   if test "$1" = "-f"; then
+      check=0
+      shift
+   fi
    submodule="$1"
 else
    submodule=""
 fi
 
 #  Get a summary of the submodules. If this returns any content then one or
-#  more have been modified and committed and should be pushed or reset before
-#  proceeding.
+#  more have been modified and/or committed and may need to be pushed or reset 
+#  before proceeding. Could also mean that the module just needs updating.
 
 summary=`git submodule summary $submodule`
+if test "$check" = "1" -a "$summary" != ""; then
 
-if test "$summary" != ""; then
-   echo "ERROR: submodule(s) are modified, will not overwrite"
-   echo "$summary"
-   exit 1
+   #  Check for modules that have modifications committed.
+   git ls-files --stage -- $submodule | grep '^160000 ' |
+      while read mode sha1 stage path; do
+         if git diff-files --quiet -- "$path"; then
+            #  Submodule is unmodified.
+            :
+         else
+            #  Submodule is modified. Either internally or needs an update.
+            #  We want to check internally, ask submodule if it has the 
+            #  requested SHA as its head, if not it needs an update.
+            if GIT_DIR=$path/.git git rev-parse --verify $sha1^0 >/dev/null 2>&1; then
+               #  Modified, and contains the SHA already, must be a local
+               #  modification. Don't allow that.
+               echo "ERROR: submodule is modified, will not overwrite"
+               echo "... $path"
+               echo "    `git submodule summary $path`"
+               exit 1
+            fi
+         fi
+      done
+   if test $?; then 
+      #  Last (sub-shell) command exited in error. So stop.
+      exit 1
+   fi
 fi
 
 #  The above will not report modified files that have not been committed.
@@ -91,29 +117,37 @@ if test "$submodule" = ""; then
    submodule_list="`git config -f .gitmodules --get-regexp '.*\.path$' | awk '{print $2}'`"
 else
    submodule_list="$submodule" 
+   #  Verify this a submodule, which may not be initialised yet.
+   found="`git config -f .gitmodules --get-regexp ".*${submodule}\.path$" | awk '{print $2}'`"
+   if test "$found" = ""; then
+      echo "ERROR: no such submodule: ... $submodule"
+      exit 1
+   fi
 fi
 
-for m in $submodule_list; do
+if test "$check" = "1"; then
+   for m in $submodule_list; do
 
-   #  May not be checked in yet, in that case we see the modified files in the
-   #  full repository. Avoid that case.
-   nfiles=`cd $m && ls -a | wc -w`
-   if test $nfiles -gt 2 ; then
-      modified=`cd $m && git diff-index --name-status HEAD`
-      if test "$modified" != ""; then
-         echo "WARNING: submodule contains modified files, will not proceed"
-         echo "... $m"
-         echo "$modified" | head
-         exit 1
+      #  May not be checked in yet, in that case we see the modified files in
+      #  the full repository. Avoid that case.
+      nfiles=`cd $m && ls -a | wc -w`
+      if test $nfiles -gt 2 ; then
+         modified=`cd $m && git diff-index --name-status HEAD`
+         if test "$modified" != ""; then
+            echo "WARNING: submodule contains modified files, will not proceed"
+            echo "... $m"
+            echo "$modified" | head
+            exit 1
+         fi
+      else
+         echo "... found uninitialised submodule: $m"
       fi
-   else
-      echo "... found uninitialised submodule: $m"
-   fi
-done
+   done
+fi
 
 
-#  No modifications so safe to check for updates. Note we always init to
-#  capture any new submodules added since the last update.
+#  No modifications, or told to not check, so safe to check for updates. Note
+#  we always init to capture any new submodules added since the last update.
 
 git submodule init $submodule
 git submodule update $submodule
