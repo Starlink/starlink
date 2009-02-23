@@ -182,14 +182,15 @@ AstPolygon *astPolygonId_( void *, int, int, const double *, void *, const char 
 static AstMapping *Simplify( AstMapping *, int * );
 static AstPointSet *RegBaseMesh( AstRegion *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
+static double Polywidth( AstFrame *, AstLineDef **, int, int, double[ 2 ], int * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
-static void Dump( AstObject *, AstChannel *, int * );
-static void RegBaseBox( AstRegion *this, double *, double *, int * );
 static void Cache( AstPolygon *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
-static void SetRegFS( AstRegion *, AstFrame *, int * );
+static void Dump( AstObject *, AstChannel *, int * );
+static void RegBaseBox( AstRegion *this, double *, double *, int * );
 static void ResetCache( AstRegion *this, int * );
+static void SetRegFS( AstRegion *, AstFrame *, int * );
 
 /* Member functions. */
 /* ================= */
@@ -227,14 +228,13 @@ static void Cache( AstPolygon *this, int *status ){
 /* Local Variables: */
    AstFrame *frm;       /* Pointer to base Frame in Polygon */
    double **ptr;        /* Pointer to data in the encapsulated PointSet */
-   double d;            /* Length of first edge */
-   double end[2];       /* Start position for edge */
-   double start[2];     /* Start position for edge */
+   double end[ 2 ];     /* Start position for edge */
+   double maxwid;       /* Maximum polygon width found so far */
+   double polcen[ 2 ];  /* Polygon centre perpendicular to current edge */
+   double polwid;       /* Polygon width perpendicular to current edge */
+   double start[ 2 ];   /* Start position for edge */
    int i;               /* Axis index */
-   int j;               /* Axis index */
    int nv;              /* Number of vertices in Polygon */
-   int nzedge;          /* INdex of edge used to define interior point */
-   int good;            /* Is interior point not on any edge? */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -276,44 +276,37 @@ static void Cache( AstPolygon *this, int *status ){
             start[ 1 ] = end[ 1 ];
          }     
 
-/* Find an edge which has non-zero length and for which the start
-   position is not contained in any other edge (the end position of each
-   line will be checked as the start position of the next line). */
-         nzedge = -1;
-         start[ 0 ] = ptr[ 0 ][ nv - 1 ];
-         start[ 1 ] = ptr[ 1 ][ nv - 1 ];
+/* We now look for a point that is inside the polygon. We want a point
+   that is well within the polygon, since points that are only just inside
+   the polygon can give numerical problems. Loop round each edge with 
+   non-zero length. */
+         maxwid = -1.0;
          for( i = 0; i < nv; i++ ) {
             if( this->edges[ i ]->length > 0.0 ) {
-               good = 1;
-               for( j = 0; j < nv; j++ ) {
-                  if( j != i ) {
-                     if( astLineContains( frm, this->edges[ j ], 0, start ) ) {
-                        good = 0;
-                        break;
-                     } 
-                  }
+
+/* We define another line perpendicular to the current edge, passing
+   through the mid point of the edge, extending towards the inside of the
+   polygon. The following function returns the distance we can travel
+   along this line before we hit any of the other polygon edges. It also
+   puts the position corresponding to half that distance into "polcen". */
+               polwid = Polywidth( frm, this->edges, i, nv, polcen, status );
+
+/* If the width of the polygon perpendicular to the current edge is
+   greater than the width perpdeicular to any other edge, record the
+   width and also store the current polygon centre. */
+               if( polwid > maxwid ) {
+                  maxwid = polwid;
+                  (this->in)[ 0 ] = polcen[ 0 ];                  
+                  (this->in)[ 1 ] = polcen[ 1 ];                  
                }
-               if( good ){
-                  nzedge = i;
-                  break;
-               } 
             }
-            start[ 0 ] = ptr[ 0 ][ i ];
-            start[ 1 ] = ptr[ 1 ][ i ];
          }
 
-/* Report an error if no such edge was found. */
-         if( nzedge < 0 ) {
+/* Report an error if no point was found. */
+         if( maxwid < 0 && astOK ) {
             if( astOK ) astError( AST__BADIN, "astInitPolygon(%s): Degenerate "
                                   "(zero-area) polygon supplied.", status,
                                   astGetClass( this ) );
-
-/* Otherwise, find a point which is just inside the Polygon. This is 1.0E-6
-   of the length of the edge found above away from the mid point of the 
-   edge (on the inside). */
-         } else {
-            d = this->edges[nzedge]->length;
-            astLineOffset( frm,this->edges[nzedge], 0.5*d, 1.0E-6*d, this->in );
          }
       }
    
@@ -421,6 +414,128 @@ void astInitPolygonVtab_(  AstPolygonVtab *vtab, const char *name, int *status )
 /* If we have just initialised the vtab for the current class, indicate
    that the vtab is now initialised. */
    if( vtab == &class_vtab ) class_init = 1;
+
+}
+
+static double Polywidth( AstFrame *frm, AstLineDef **edges, int i, int nv, 
+                         double cen[ 2 ], int *status ){
+/*
+*  Name:
+*     Polywidth
+
+*  Purpose:
+*     Find the width of a polygon perpendicular to a given edge.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polygon.h"
+*     double Polywidth( AstFrame *frm, AstLineDef **edges, int i, int nv, 
+*                       double cen[ 2 ], int *status )
+
+*  Class Membership:
+*     Polygon member function 
+
+*  Description:
+*     This function defines a line perpendicular to a given polygon edge, 
+*     passing through the mid point of the edge, extending towards the 
+*     inside of the polygon. It returns the distance that can be travelled
+*     along this line before any of the other polygon edges are hit (the
+*     "width" of the polygon perpendicular to the given edge). It also 
+*     puts the position corresponding to half that distance into "cen".
+
+*  Parameters:
+*     frm
+*        The Frame in which the lines are defined.
+*     edges
+*        Array of "nv" pointers to AstLineDef structures, each defining an 
+*        edge of the polygon.
+*     i
+*        The index of the edge that is to define the polygon width.
+*     nv
+*        Total number of edges.
+*     cen
+*        An array into which are put the coords of the point half way
+*        along the polygon width line.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returnd Value:
+*     The width of the polygon perpendicular to the given edge.
+
+*/
+
+/* Local Variables: */
+   AstLineDef *line;
+   double *cross;
+   double d;        
+   double end[ 2 ];
+   double l1;
+   double l2;
+   double result;
+   double start[ 2 ];
+   int j;
+
+/* Check the global error status. */
+   result = AST__BAD;
+   if ( !astOK ) return result;
+
+/* Create a Line description for a line perpendicular to the specified
+   edge, passing through the mid point of the edge, and extending towards
+   the inside of the polygon. First move away from the start along the 
+   line to the mid point. This gives the start of the new line. */
+   l1 = 0.5*( edges[ i ]->length );
+   astLineOffset( frm, edges[ i ], l1, 0.0, start );
+
+/* We now move away from this position at right angles to the line. We
+   start off by moving 5 times the length of the specified edge. For
+   some Frames (e.g. SkyFrames) this may result in a position that is 
+   much too closer (i.e. if it goes all the wat round the great circle
+   and comes back to the beginning). Therefore, we check that the end
+   point is the requested distance from the start point, and if not, we
+   halve the length of the line and try again. */
+   l2 = 10.0*l1;
+   while( 1 ) {
+      astLineOffset( frm, edges[ i ], l1, l2, end );
+      d = astDistance( frm, start, end );
+      if( d != AST__BAD && fabs( d - l2 ) < 1.0E-6*l2 ) break;
+      l2 *= 0.5;
+   }
+
+/* Create a description of the required line. */
+   line = astLineDef( frm, start, end );
+
+/* Loop round every edge, except for the supplied edge. */
+   for( j = 0; j < nv; j++ ) {
+      if( j != i ) {
+
+/* Find the position at which the line created above crosses the current
+   edge. Skip to the next edge if the line does not intersect the edge. */
+         if( astLineCrossing( frm, line, edges[ j ], &cross ) ) {
+
+/* Find the distance between the crossing point and the line start. */
+            d = astDistance( frm, start, cross );
+
+/* If this is less than the smallest found so far, record it. */
+            if( d != AST__BAD && ( d < result || result == AST__BAD ) ) {
+               result = d;
+            }
+         }
+
+/* Free resources */
+         cross = astFree( cross );
+      }
+   }
+   line = astFree( line );
+
+/* If a width was found, return the point half way across the polygon. */
+   if( result != AST__BAD ) {
+      astOffset( frm, start, end, 0.5*result, cen );
+   }
+
+/* Return the width. */
+   return result;
 
 }
 
@@ -2301,6 +2416,16 @@ AstPolygon *astLoadPolygon_( void *mem, size_t size, AstPolygonVtab *vtab,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
+
+
+
+
+
+
+
+
+
+
 
 
 

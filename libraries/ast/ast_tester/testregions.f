@@ -864,6 +864,7 @@ c      call ast_listissued( 'testregions' )
 
       call checkdump( pol1, 'checkdump pol1', status ) 
 
+
       p(1,1) = 0.0            ! On boundary
       p(1,2) = 0.0
       p(2,1) = 1.0            ! Outside
@@ -876,6 +877,7 @@ c      call ast_listissued( 'testregions' )
       p(5,2) = 0.25*pi + 0.1
 
       call ast_trann( pol1, 5, 2, 5, p, .true., 2, 5, q, status )
+
       if( q(1,1) .ne. AST__BAD ) call stopit( status, 'Poly 1' )
       if( q(1,2) .ne. AST__BAD ) call stopit( status, 'Poly 1b' )
       if( q(2,1) .ne. AST__BAD ) call stopit( status, 'Poly 2' )
