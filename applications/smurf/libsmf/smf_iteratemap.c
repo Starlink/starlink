@@ -240,6 +240,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
   const char *asttemp=NULL;     /* Pointer to static strings created by ast */
   double badfrac;               /* Bad bolo fraction for flagging */
   int baseorder;                /* Order of poly for baseline fitting */
+  size_t bstride;               /* Bolometer stride */
   double *chisquared=NULL;      /* chisquared for each chunk each iter */
   double chitol=0;              /* chisquared change tolerance for stopping */
   size_t contchunk;             /* Which chunk in outer loop */
@@ -261,6 +262,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
   double f_notchhigh[SMF__MXNOTCH];/* Array high-freq. edges of notch filters */
   int f_nnotch=0;               /* Number of notch filters in array */
   int f_nnotch2=0;              /* Number of notch filters in array */
+  dim_t goodbolo;               /* Number of good bolometers */
   int haveext=0;                /* Set if EXT is one of the models */
   int havegai=0;                /* Set if GAI is one of the models */
   int havenoi=0;                /* Set if NOI is one of the models */
@@ -289,6 +291,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
   smf_calcmodelptr modelptr=NULL; /* Pointer to current model calc function */
   dim_t msize;                  /* Number of elements in map */
   char name[GRP__SZNAM+1];      /* Buffer for storing exported model names */
+  dim_t nbolo;                  /* Number of bolometers */
   dim_t nchunks=0;              /* Number of chunks within iteration loop */
   size_t ncontchunks=0;         /* Number continuous chunks outside iter loop*/
   size_t nflag;                 /* Number of flagged samples */
@@ -979,6 +982,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
           /* If first iteration pre-condition the data */
           if( iter == 0 ) {
             msgOut(" ", "SMF_ITERATEMAP: Pre-conditioning chunk", status);
+            goodbolo=0; /* Initialize good bolo count for this chunk */
             for( idx=0; idx<res[i]->ndat; idx++ ) {
               /* Synchronize quality flags */
 
@@ -1066,6 +1070,23 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
 
                 filt = smf_free_smfFilter( filt, status );
               }
+
+              /* Count number of good bolometers in the file after flagging */
+              smf_get_dims( data, NULL, NULL, &nbolo, NULL, NULL, &bstride,
+                            NULL, status );
+              for( j=0; j<nbolo; j++ ) {
+                if( !(qua_data[j*bstride]&SMF__Q_BADB) ) {
+                  goodbolo++;
+                }
+              }
+            }
+
+            /* If we don't have enough good detectors then set bad status */
+            if( goodbolo < SMF__MINSTATSAMP ) {
+              *status = SMF__INSMP;
+              errRepf( "", FUNC_NAME ": Insufficient number of good bolos "
+                       "(%li<%i) to continue", status, goodbolo, 
+                       SMF__MINSTATSAMP );
             }
           }
 
@@ -1177,7 +1198,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
           if( *status != SAI__OK ) i=isize+1;
 
           /* If NOI was present, we now have an estimate of chisquared */
-          if( chisquared ) {
+          if( (*status==SAI__OK) && chisquared ) {
             msgSeti("CHUNK",i+1);
             msgSetd("CHISQ",chisquared[i]);
             msgOut( " ", 
