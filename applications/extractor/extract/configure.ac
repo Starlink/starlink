@@ -1,13 +1,13 @@
-# Modified for EXTRACTOR by PWD 15/03/2004.
+# Modified for EXTRACTOR by PWD 23/02/2009.
 
 # configure.ac for EXTRACTOR
-# (C) E.Bertin 2002,2003
+# (C) E.Bertin 2002-2006
 # Process this file with autoconf to produce a configure script.
 # First, disable the annoying config.cache
 define([AC_CACHE_LOAD],)
 define([AC_CACHE_SAVE],)
 
-AC_INIT(extractor, 2.3, [extractor@star.rl.ac.uk])
+AC_INIT(extractor, 2.5.0, [extractor@star.rl.ac.uk])
 AC_CONFIG_SRCDIR(src/extractor.c)
 AC_CONFIG_AUX_DIR(autoconf)
 AM_CONFIG_HEADER(config.h)
@@ -45,40 +45,6 @@ AC_ARG_ENABLE(icc,
         cclist="icc $cclist"
 	AC_MSG_RESULT([yes]),
         use_icc="no"
-	AC_MSG_RESULT([no]))
-
-# Provide special option for the Assure debugger
-AC_MSG_CHECKING([for Assure debugger mode])
-AC_ARG_ENABLE(assure,
-	[AC_HELP_STRING([--enable-assure],
-	[Enable special mode for compilation with the Assure debugger \
-(off by default)])],
-        use_assure="yes"
-        cclist="assuretcc $cclist"
-	AC_MSG_RESULT([yes]),
-        use_assure="no"
-	AC_MSG_RESULT([no]))
-
-# Provide special option for the Insure++ debugger
-AC_MSG_CHECKING([for Insure++ debugger mode])
-AC_ARG_ENABLE(insure,
-	[AC_HELP_STRING([--enable-insure],
-	[Enable special mode for compilation with the Insure++ debugger \
-(off by default)])],
-        use_insure="yes"
-        cclist="insure $cclist"
-	AC_MSG_RESULT([yes]),
-        use_insure="no"
-	AC_MSG_RESULT([no]))
-
-# Provide special option for the e-fence malloc checker
-AC_MSG_CHECKING([for e-fence mode])
-AC_ARG_ENABLE(efence,
-	[AC_HELP_STRING([--enable-efence],
-	[Enable linking with the -e-fence library (off by default)])],
-        use_efence="yes"
-	AC_MSG_RESULT([yes]),
-        use_efence="no"
 	AC_MSG_RESULT([no]))
 
 # Provide special option for gprof profiling
@@ -141,27 +107,16 @@ AC_CHECK_FUNCS([atexit memcpy memmove memset mkdir munmap strstr])
 AC_SYS_LARGEFILE
 AC_FUNC_FSEEKO
 
-# Special options for the Insure++ debugger
-if test $use_insure = "yes" -a $CC = "insure"; then
-  CFLAGS="$CFLAGS -g"
-  use_static="no"
-fi
+########################### No multithreading yet! ###########################
+#AC_DEFINE(USE_THREADS, 1, [Triggers multhreading])
+AC_DEFINE_UNQUOTED(THREADS_NMAX, 1,[Maximum number of POSIX threads])
+
+# href to the XSL style-sheet in preflist.h
+CFLAGS="$CFLAGS -DXSL_URL=\\\"file://$datadir/${PACKAGE_NAME}/${PACKAGE_NAME}.xsl\\\""
 
 # Special optimization options for the INTEL C compiler
 if test $use_icc = "yes" -a $CC = "icc"; then
   CFLAGS="$CFLAGS -O3 -axiMKW -ipo -ipo_obj -unroll"
-fi
-
-# Special options for the Assure debugger
-rootsrcdir=`pwd`
-if test $use_assure = "yes" -a $CC = "assuretcc"; then
-  CFLAGS="-WApname=$rootsrcdir/$PACKAGE"
-  LDFLAGS="-WApname=$rootsrcdir/$PACKAGE"
-fi
-
-# Link with e-fence option
-if test "$use_efence" = "yes"; then
-  LIBS="-lefence $LIBS"
 fi
 
 # Link with gprof option

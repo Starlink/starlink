@@ -1,5 +1,11 @@
 1 Update to EXTRACTOR
 
+ Changes in release 2.5.0
+
+    EXTRACTOR has been updated to use SExtractor version 2.5.0. The
+    main change is the introduction of a VOTable output catalogue
+    format.
+
  Changes in release 2.4.5
 
     Image coordinates should now be reported correctly when compiled
