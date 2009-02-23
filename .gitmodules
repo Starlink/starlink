@@ -85,3 +85,6 @@
 [submodule "thirdparty/tclsys/itcl/iwidgets"]
 	path = thirdparty/tclsys/itcl/iwidgets
 	url = ../iwidgets.git
+[submodule "applications/extractor/sextractor"]
+	path = applications/extractor/sextractor
+	url = ../sextractor.git

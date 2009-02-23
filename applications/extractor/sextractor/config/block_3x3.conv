@@ -1,5 +1,0 @@
-CONV NORM
-# 3x3 convolution mask of a block-function PSF (ex: DeNIS PSF).
-1 1 1
-1 1 1
-1 1 1
