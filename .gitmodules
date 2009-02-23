@@ -88,3 +88,6 @@
 [submodule "applications/extractor/sextractor"]
 	path = applications/extractor/sextractor
 	url = ../sextractor.git
+[submodule "applications/extractor/extract/src"]
+	path = applications/extractor/extract/src
+	url = ../starextract.git
