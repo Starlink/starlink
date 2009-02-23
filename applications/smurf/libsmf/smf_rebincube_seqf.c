@@ -210,7 +210,7 @@ void smf_rebincube_seqf( smfWorkForce *workforce, int njobs,
    supplied Mapping for each thread. Each copy is then unlocked so that
    the new thread can lock it succesfully. */
             data->this = astCopy( this );        
-            astUnlock( data->this );
+            astUnlock( data->this, 1 );
 
 /* Set the bounds on the first (i.e. spectral) axis of the input block to be 
    processed by each thread so that it covers the first of the two adjacent 

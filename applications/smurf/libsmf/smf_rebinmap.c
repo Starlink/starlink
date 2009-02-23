@@ -272,9 +272,9 @@ void smf_rebinmap( smfWorkForce *wf, smfData *data, double *bolovar,
             pdata->data = NULL;
             pdata->rebinflags = rebinflags;
             pdata->abskyfrm = astCopy( abskyfrm );
-            astUnlock( pdata->abskyfrm );
+            astUnlock( pdata->abskyfrm, 1 );
             pdata->sky2map = astCopy( sky2map );
-            astUnlock( pdata->sky2map );
+            astUnlock( pdata->sky2map, 1 );
             pdata->moving = moving;
             pdata->spread = spread;
             pdata->params = params;

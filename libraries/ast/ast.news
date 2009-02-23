@@ -16,6 +16,10 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- The astUnlock function now has an extra parameter that controls whether 
+or not an error is reported if the Object is currently locked by another
+thread.
+
 - The values of the AST__THREADSAFE macro (defined in ast.h) have
 been changed from "yes" and "no" to "1" and "0".
 

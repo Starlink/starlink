@@ -110,7 +110,7 @@ void smf_rebinseq_thread( void *data_ptr, int *status ){
 
 /* Unlock the Mapping so that the parent thread can lock it and then
    annul it. */
-   astUnlock( data->this );
+   astUnlock( data->this, 1 );
 
 /* Tell AST to use the original status variable */
    (void) astWatch( old_status );

@@ -168,6 +168,6 @@ void smf_rebinslices( void *job_data_ptr, int *status ){
 /* Unlock the supplied AST object pointers so that other threads can use
    them. */
    smf_lock_data( data, 0, status );
-   astUnlock( abskyfrm );
-   astUnlock( sky2map );
+   astUnlock( abskyfrm, 1 );
+   astUnlock( sky2map, 1 );
 }

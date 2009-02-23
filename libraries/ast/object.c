@@ -4873,7 +4873,7 @@ void astExemptId_( AstObject *, int * );
 void astImportId_( AstObject *, int * );
 void astSetId_( void *, const char *, ... );
 void astLockId_( AstObject *, int, int * );
-void astUnlockId_( AstObject *, int * );
+void astUnlockId_( AstObject *, int, int * );
 
 
 /* External Interface Functions. */
@@ -6108,7 +6108,7 @@ c--
 #endif
 }
 
-void astUnlockId_( AstObject *this_id, int *status ) {
+void astUnlockId_( AstObject *this_id, int report, int *status ) {
 /*
 c++
 *  Name:
@@ -6122,7 +6122,7 @@ c++
 
 *  Synopsis:
 *     #include "object.h"
-*     void astUnlock( AstObject *this )
+*     void astUnlock( AstObject *this, int report )
 
 *  Class Membership:
 *     Object method.
@@ -6134,6 +6134,11 @@ c++
 *  Parameters:
 *     this
 *        Pointer to the Object to be unlocked.
+*     report
+*        If non-zero, an error will be reported if the supplied Object,
+*        or any Object contained within the supplied Object, is not
+*        currently locked by the running thread. If zero, such Objects
+*        will be left unchanged, and no error will be reported.
 
 *  Applicability:
 *     Object
@@ -6147,7 +6152,9 @@ c++
 *     they are re-locked using astLock.
 *     - This function is only available in the C interface.
 *     - This function returns without action if the Object is not currently 
-*     locked by the calling thread.
+*     locked by any thread. If it is locked by the running thread, it is
+*     unlocked. If it is locked by another thread, an error will be reported 
+*     if "error" is non-zero.
 *     - This function returns without action if the AST library has 
 *     been built without POSIX thread support (i.e. the "-with-pthreads" 
 *     option was not specified when running the "configure" script).
@@ -6218,20 +6225,21 @@ c--
       lstat = astManageLock( this, AST__UNLOCK, 0, &fail );
       if( astOK ) {
          if( lstat == 1 ) {
-            if( fail == this ) {
-               astError( AST__LCKERR, "astUnlock(%s): Failed to unlock the %s "
-                         "because it is locked by another thread (programming "
-                         "error).", status, astGetClass( this ), 
-                         astGetClass( this ) );
-   
-            } else {
-               astError( AST__LCKERR, "astUnlock(%s): Failed to unlock the %s "
-                         "because a %s contained within it is locked by another "
-                         "thread (programming error).", status, 
-                         astGetClass( this ), astGetClass( this ),
-                         astGetClass( fail ) );
-            }
-   
+            if( report ) {
+               if( fail == this ) {
+                  astError( AST__LCKERR, "astUnlock(%s): Failed to unlock the %s "
+                            "because it is locked by another thread (programming "
+                            "error).", status, astGetClass( this ), 
+                            astGetClass( this ) );
+      
+               } else {
+                  astError( AST__LCKERR, "astUnlock(%s): Failed to unlock the %s "
+                            "because a %s contained within it is locked by another "
+                            "thread (programming error).", status, 
+                            astGetClass( this ), astGetClass( this ),
+                            astGetClass( fail ) );
+               }
+            }   
    
          } else if( lstat == 3 ) {
             astError( AST__LCKERR, "astUnlock(%s): Failed to unlock a POSIX mutex.", status,

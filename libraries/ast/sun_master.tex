@@ -21555,6 +21555,12 @@ current version):
 
 \begin{enumerate}
 
+c+
+\item The astUnlock function now has an extra parameter that controls whether 
+or not an error is reported if the Object is currently locked by another
+thread.
+c-
+
 \item The Prism class has been modified so that any class of Region can
 be used to define the extrusion axes. Previously, only a Box or Interval
 could be used for this purpose.
