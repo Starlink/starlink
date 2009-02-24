@@ -89,15 +89,23 @@ if test "$check" = "1" -a "$summary" != ""; then
             #  Submodule is unmodified.
             :
          else
-            #  Submodule is modified. Either internally or needs an update.
-            #  We want to check internally, ask submodule if it has the 
-            #  requested SHA as its head, if not it needs an update.
-            if GIT_DIR=$path/.git git rev-parse --verify $sha1^0 >/dev/null 2>&1; then
-               #  Modified, and contains the SHA already, must be a local
-               #  modification. Don't allow that.
-               echo "ERROR: submodule is modified, will not overwrite"
+            #  Submodule is modified. Either internally, needs an update
+            #  or could be missing.
+            if test -d $path; then
+               #  We want to check internally, ask submodule if it has the 
+               #  requested SHA as its head, if not it needs an update.
+               if GIT_DIR=$path/.git git rev-parse --verify $sha1^0 >/dev/null 2>&1; then
+                  #  Modified, and contains the SHA already, must be a local
+                  #  modification. Don't allow that.
+                  echo "ERROR: submodule is modified, will not overwrite"
+                  echo "... $path"
+                  echo "    `git submodule summary $path`"
+                  exit 1
+               fi
+            else
+               #  No directory! That's an error.
+               echo "ERROR: submodule is missing"
                echo "... $path"
-               echo "    `git submodule summary $path`"
                exit 1
             fi
          fi
