@@ -53,91 +53,13 @@ if { $argc == 1 || $argc == 2 } {
    exit
 }
 
-#  Add GAIA_DIR to autopath for some GAIA classes.
-lappend auto_path $env(GAIA_DIR)
-
-#  Open a socket to a GAIA application and return the file descriptor
-#  for remote commands. If a GAIA isn't found then start one up.
-proc connect_to_gaia {} {
-   global env
-
-   #  Get the hostname and port info from the file .rtd-remote, which is
-   #  created by rtdimage when the remote subcommand is used. Normally the
-   #  .rtd-remote file lives in the $HOME directory, but this can be changed
-   #  using the environment variable RTD_REMOTE_DIR. GAIA doesn't create the
-   #  RTD_REMOTE_DIR directory so neither should we, which means if it doesn't
-   #  exist we should give up now as no contact file will be written.
-   if { [info exists env(RTD_REMOTE_DIR)] } {
-      if { ! [file isdirectory $env(RTD_REMOTE_DIR)] } {
-         puts stderr "Remote access to GAIA is currently disabled.\
-The RTD_REMOTE_DIR directory: $env(RTD_REMOTE_DIR), does not exist."
-         exit 1
-      }
-      set rtd-remote "$env(RTD_REMOTE_DIR)/.rtd-remote"
-   } else {
-      set rtd-remote "$env(HOME)/.rtd-remote"
-   }
-
-   set tries 0
-   while { 1 } {
-      set needed 0
-
-      #  Open the file containing the GAIA process information and read it.
-      if {[catch {set fd [open ${rtd-remote}]} msg]} {
-         set needed 1
-      } else {
-         lassign [read $fd] pid host port
-         close $fd
-      }
-
-      #  See if the process is listening to this socket.
-      if { ! $needed } {
-         if {[catch {socket $host $port} msg]} {
-            set needed 1
-         } else {
-            fconfigure $msg -buffering line
-            return $msg
-         }
-      }
-
-      #  If the process doesn't exist and we've not been around the
-      #  loop already, then start a new GAIA.
-      if { $needed && $tries == 0 } {
-         puts stderr "Failed to connect to GAIA, starting new instance..."
-         exec $env(GAIA_DIR)/gaia.sh &
-      }
-
-      #  Now either wait and try again or give up if waited too long.
-      if { $needed && $tries < 500 } {
-         #  Wait for a while and then try again.
-         incr tries
-         after 1000
-      } elseif { $needed } {
-         puts stderr "Sorry timed out: failed to display image in GAIA"
-         exit 1
-      }
-   }
-}
-
-#  Send the command to GAIA and return the results or generate an error.
-proc send_to_gaia {args} {
-   global gaia_fd
-   puts $gaia_fd "$args"
-   lassign [gets $gaia_fd] status length
-   set result {}
-   if {$length > 0} {
-      set result [read $gaia_fd $length]
-   }
-   if {$status != 0} {
-      error "$result"
-   }
-   return "$result"
-}
+#  Get the standard contact scripts.
+source $env(GAIA_DIR)/connect_to_gaia.tcl
 
 #  Open up connection to GAIA.
-set gaia_fd [connect_to_gaia]
+lassign [connect_to_gaia] gaia_fd created_instance
 
-#  Got list so select the right clone. These start with number 1...
+#  Select the right clone. These start with number 1...
 if { $clone == 0 } {
    puts stderr "Clone numbers start from 1. So assuming 1"
    set clone 1
@@ -148,17 +70,16 @@ set clonewidget ".gaia$clone"
 
 #  See if this exists.
 set cmd "winfo exists $clonewidget"
-set exists [send_to_gaia remotetcl $cmd]
+set exists [send_to_gaia $gaia_fd remotetcl $cmd]
 if { ! $exists } {
-   puts "exists = $exists"
    #  No, so create it.
    set cmd "$gaia noblock_clone $clone {}"
-   set clonewidget [send_to_gaia remotetcl $cmd]
+   set clonewidget [send_to_gaia $gaia_fd remotetcl $cmd]
 }
 
 #  Get GAIA to display this catalogue.
 set cmd "$clonewidget display_polarimetry_catalog $catalogue"
-set res [send_to_gaia remotetcl $cmd]
+set res [send_to_gaia $gaia_fd remotetcl $cmd]
 if { $res != 1 } { 
    puts stderr "Failed to display catalogue ($res)"
 }
