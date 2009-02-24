@@ -132,6 +132,7 @@ if test "$check" = "1"; then
       #  the full repository. Avoid that case.
       nfiles=`cd $m && ls -a | wc -w`
       if test $nfiles -gt 2 ; then
+         (cd $m && git diff) >/dev/null 2>&1 ; # XXX need to update submodule index?
          modified=`cd $m && git diff-index --name-status HEAD`
          if test "$modified" != ""; then
             echo "WARNING: submodule contains modified files, will not proceed"
