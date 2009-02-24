@@ -110,7 +110,8 @@ if test "$check" = "1" -a "$summary" != ""; then
             fi
          fi
       done
-   if test $?; then 
+   status="$?"
+   if test "$status" != "0"; then 
       #  Last (sub-shell) command exited in error. So stop.
       exit 1
    fi
