@@ -68,9 +68,6 @@ if { $argc == 1 } {
 #  Get the standard contact scripts.
 source $env(GAIA_DIR)/connect_to_gaia.tcl
 
-#  Useful to know when instance is created.
-set created_instance 0
-
 #  Open up connection to GAIA.
 lassign [connect_to_gaia] gaia_fd created_instance
 

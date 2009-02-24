@@ -53,6 +53,9 @@
     A bug in the handling of temporary images created by the regions toolbox
     has been fixed. Previously if more than one instance of this toolbox
     was in use the names of the temporary files could clash.
+ 
+    The gaiadisp command now uses the RTD_REMOTE_DIR environment variable
+    to locate the .rtd-remote file (GAIA already did this).
 
   Lehuakona Release
   =================
