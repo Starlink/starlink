@@ -133,6 +133,9 @@
 *        Added parameter INVERT.
 *     2008 July 14 (BEC)
 *        Propagate UNITS component to output NDF.
+*     24-FEB-2009 (BEC):
+*        - Correct mapping mode for output NDF's VARIANCE component
+*          from WRITE to UPDATE.
 *     {enter_further_changes_here}
 
 *-
@@ -195,7 +198,7 @@
       
 *  If required, map the VARIANCE array.
       CALL NDF_STATE( IN, 'Variance', VAR, STATUS )
-      IF( VAR ) CALL NDF_MAP( OUT, 'Variance', TY_IN, 'WRITE', P_OUTV, 
+      IF( VAR ) CALL NDF_MAP( OUT, 'Variance', TY_IN, 'UPDATE', P_OUTV, 
      :                        NEL, STATUS )
 
 *  See if the operation is to be inverted.
@@ -225,7 +228,7 @@
       ELSE IF ( TY_IN .EQ. '_UBYTE' ) THEN
          CALL KPS1_CPBUB( NEL, INVERT, VAR, %VAL( CNF_PVAL( P_REF ) ), 
      :                    %VAL( CNF_PVAL( P_OUT ) ),
-     :                   %VAL( CNF_PVAL( P_OUTV ) ), NBAD, STATUS )
+     :                    %VAL( CNF_PVAL( P_OUTV ) ), NBAD, STATUS )
 
       ELSE IF ( TY_IN .EQ. '_WORD' ) THEN
          CALL KPS1_CPBW( NEL, INVERT, VAR, %VAL( CNF_PVAL( P_REF ) ), 
@@ -235,7 +238,7 @@
       ELSE IF ( TY_IN .EQ. '_UWORD' ) THEN
          CALL KPS1_CPBUW( NEL, INVERT, VAR, %VAL( CNF_PVAL( P_REF ) ), 
      :                    %VAL( CNF_PVAL( P_OUT ) ),
-     :                   %VAL( CNF_PVAL( P_OUTV ) ), NBAD, STATUS )
+     :                    %VAL( CNF_PVAL( P_OUTV ) ), NBAD, STATUS )
 
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
