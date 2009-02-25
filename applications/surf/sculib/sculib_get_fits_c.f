@@ -36,6 +36,8 @@
 *     be reported and bad status returned. If the keyword is found but the
 *     line does not conform to the above format an error will be reported
 *     and bad status returned.
+*
+*     The returned string will not contain any unprintable characters.
 
 *  Arguments:
 *     MAX_FITS             = INTEGER (Given)
@@ -56,6 +58,7 @@
 *     T. Jenness (timj@jach.hawaii.edu)
 
 *  Copyright:
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     Copyright (C) 1995, 1997, 1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
@@ -73,6 +76,8 @@
 *        Tweak headers for use with PROLAT.
 *     1999-AUG-19 (TIMJ):
 *        Header tweaks to ease production of SSN72 documentation.
+*     2009-FEB-25 (TIMJ):
+*        Clean the returned string. Some data files have embedded \0.
 
 *-
 
@@ -254,5 +259,10 @@
      :        'FITS item ^NAME', STATUS)
          END IF
       END IF
-     
+
+*   clean the string. In some cases the datafiles have embedded \0 in the FITS
+*   buffer. This was fixed at some point but since a FITS header from SCUBA
+*   should not be including unprintable characters we remove them here
+      CALL CHR_CLEAN( VALUE )
+
       END
