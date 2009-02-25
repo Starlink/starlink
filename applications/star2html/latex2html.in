@@ -20,6 +20,7 @@
 
 #  Authors:
 #     PDRAPER: P.W.Draper (Starlink - Durham University)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -31,6 +32,12 @@
 #     17-MAR-2008 (PDRAPER):
 #        Stripped out -vers argument support. Going to a single version
 #        of latex2html.
+#     24-FEB-2009 (TIMJ):
+#        Use perl5
+#        - strict and warnings
+#        - lexical filehandles
+#        - fix problem when readlink returns full path to GS.
+#        - use File::Spec
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -38,10 +45,13 @@
 
 #-
 
-$DEBUG = 0;
+use strict;
+use warnings;
+use File::Spec;
+my $DEBUG = 0;
 
 #  Look for the real latex2html script.
-$LATEX2HTML_DIR = "$ENV{'STARLINK_DIR'}/share/latex2html/bin";
+my $LATEX2HTML_DIR = "$ENV{'STARLINK_DIR'}/share/latex2html/bin";
 if ( ! -d $LATEX2HTML_DIR ) {
    $LATEX2HTML_DIR = "@l2hdir@";
 }
@@ -52,33 +62,37 @@ if ( $LATEX2HTML_DIR =~ /@/) {
 }
 
 #  Library search PATH.
-$GS_LIB = '';
+my $GS_LIB = '';
 
 #  Location of landscape script.
-$GSLANDSCAPE='';
+my $GSLANDSCAPE='';
 
 #  Name of ghostscript command.
-$GS = $ENV{'GS'} || 'gs';
+my $GS = $ENV{'GS'} || 'gs';
 
 #  Get name of gs executable.
 if ( ! ( -x $GS && ! -d $GS ) ) {
 
 #  Search PATH for binary.
-   $found = 0;
-   foreach ( split(/:/, $ENV{'PATH'} ) ) {
-      $executable = join( '', $_, '/', $GS );
+   my $found = 0;
+   foreach my $path ( split(/:/, $ENV{'PATH'} ) ) {
+      my $executable = File::Spec->catfile($path, $GS);
       if ( -x $executable && ! -d $executable ) {
 
 #  Trackdown the real name of the executable if this is a symbolic link.
-	 if ( -l $executable ) {
-	    $tmpfile='NULL';
-	    while ( $tmpfile ne '' ) {
-	       $tmpfile = readlink($executable);
-	       if ( $tmpfile ne '' ) {
-                  $executable = join( '', $_, '/', $tmpfile )
-               }
-	    }
-	 }
+         if ( -l $executable ) {
+             my $tmpfile='NULL';
+             while ( $tmpfile ) {
+                 $tmpfile = readlink($executable);
+                 if ( $tmpfile ) {
+                     if ( File::Spec->file_name_is_absolute($tmpfile) ) {
+                         $executable = $tmpfile;
+                     } else {
+                         $executable = File::Spec->catfile($path, $tmpfile);
+                     }
+                 }
+             }
+         }
          $GS = $executable;
          $found = 1;
          last;
@@ -93,27 +107,31 @@ if ( ! ( -x $GS && ! -d $GS ) ) {
 #  Do this by parsing the output from "gs -h" command.
 #|| die "Fatal: execution of \"$gs -h\" failed\n";
 
-open( GS, "$GS -h |" );
-$flag = 0;
-while ( <GS> ) {
+open( my $GSFD, "$GS -h |" );
+my $flag = 0;
+my @gs_lib_path;
+while ( <$GSFD> ) {
     if( /^\s*Search path/i ) {
 
 # Now look for the gs lib path
-	$flag = 1;
-    } elsif ( $flag == 1 ) {
+       $flag = 1;
+     } elsif ( $flag == 1 ) {
 
 # If line starts with whitespace, then we're in the search path list
-	if ( /^\s+/ ) {
-	    chop;
-	    push( @gs_lib_path, split( ":", $_ ) );
-	} else {
+         if ( /^\s+/ ) {
+             my $line = $_;
+             chomp($line);
+             $line =~ s/^\s+//;
+             $line =~ s/\s+$//;
+             push( @gs_lib_path, split( /\s*:\s*/, $line ) );
+         } else {
 
 # No more path entries
-	    $flag = 0;
-	}
+             $flag = 0;
+         }
     }
 }
-close( GS );
+close( $GSFD );
 
 #  Look for the ghostscript library. If not available then add guesses.
 if(!@gs_lib_path) {
@@ -124,10 +142,9 @@ if(!@gs_lib_path) {
 $GS_LIB = join(":", @gs_lib_path);
 
 #  Look for landscape postscript file.
-foreach $path (@gs_lib_path) {
-    $path =~ s/^\s*(\S*)\s*$/$1/; # strip whitespace
-    if(-d "$path" && -f "$path/landscap.ps") {
-	$GSLANDSCAPE = "$path/landscap.ps";
+foreach my $path (@gs_lib_path) {
+    if(-d $path && -f File::Spec->catfile($path,'landscap.ps')) {
+        $GSLANDSCAPE = File::Spec->catfile($path,"landscap.ps");
     }
 }
 

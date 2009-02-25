@@ -51,7 +51,7 @@
 #        in the footer of each page. The default statement is found from
 #        the \stardoccopyright command if there is one in the document,
 #        or failing that from the environment variable HTX_COPYRIGHT if
-#        defined, or failing that the default is: "Copyright Â© YYYY
+#        defined, or failing that the default is: "Copyright © YYYY
 #        Science and Technology Facilities Council" (where YYYY is the
 #        current year). To prevent any copyright statement from appearing,
 #        specify "-c none" or, in the absence of a \stardoccopyright
@@ -241,6 +241,14 @@
 #        Parse stardocopyright to convert \newline into <BR>.
 #     26-JAN-2009 (PDRAPER):
 #        add HTX_HCSERVER support to move server to JAC.
+#     24-FEB-2009 (TIMJ):
+#        Use perl5
+#        - use strict and warnings
+#        - lexical filehandles
+#        - remove $* usage (not supported in perl5.10)
+#        - fix \n problem with `pwd` call
+#        - use multi-arg system() and 3-arg open()
+#        - use File::Spec and Getopt::Long
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -248,138 +256,111 @@
 
 #-
 
+use strict;
+use warnings;
+use Cwd;
+use File::Spec;
+use Pod::Usage;
+use Getopt::Long;
+
 #  Print introductory message.
-$announce = "Star2HTML V@PACKAGE_VERSION@";
-$underline = $announce;
+my $announce = "Star2HTML V@PACKAGE_VERSION@";
+my $underline = $announce;
 $underline =~ s/./=/g;
 print( "\n$announce\n$underline\n" );
 
 #  Initialisation of variables used during cleanup.
-$keep_style = 1;       # Keep existing style files
-$have_texfile = 0;     # Have a copy of tex file
-$have_auxfile = 0;     # Have a copy of aux file
+my $keep_style = 1;       # Keep existing style files
+my $have_texfile = 0;     # Have a copy of tex file
+my $have_auxfile = 0;     # Have a copy of aux file
 
 #  Mail address of Starlink Librarian.
-$STARLINK_LIBRARIAN = '<A HREF="mailto:@PACKAGE_BUGREPORT@">@PACKAGE_BUGREPORT@</A>';
+my $STARLINK_LIBRARIAN = '<A HREF="mailto:@PACKAGE_BUGREPORT@">@PACKAGE_BUGREPORT@</A>';
 
 #  Do not copy aux file by default.
-$AUXCOPY = 0;
+my $AUXCOPY = 0;
 
 #  Default copyright statement.
-$year = ((gmtime())[5]) + 1900;
-$DEFAULT_COPYRIGHT = 'Copyright &copy ' . $year .
-                     ' Science and Technology Facilities Council';
+my $year = ((gmtime())[5]) + 1900;
+my $DEFAULT_COPYRIGHT = 'Copyright &copy ' . $year .
+    ' Science and Technology Facilities Council';
 
 #  Do split file into parts by default.
-$SPLIT = 1;
-$NSECTIONS = 0;
+my $SPLIT = 1;
+my $NSECTIONS = 0;
 
 #  The clear_up routine may exit.
-$CANEXIT = 1;
+my $CANEXIT = 1;
 
 #  The document is not obsolete.
-$OBSOLETE = 0;
+my $OBSOLETE = 0;
 
 #.
 
 #  Sort out how we are going to get the current directory name.
-use Cwd;
-$DEFAULTDIR = getcwd();
+my $DEFAULTDIR = getcwd();
 
 #  Locate the Star2HTML latex2html script. This should be in the same
 #  directory as this file.
-( $SCRIPTDIR, $SCRIPTNAME ) = &get_filename_and_directory( $0 );
+my ( $SCRIPTDIR, $SCRIPTNAME ) = &get_filename_and_directory( $0 );
 
 #  Also check for the "latex2html" script, which should be in the same
 #  place.
-$LATEX2HTML = $SCRIPTDIR . '/latex2html';
+my $LATEX2HTML = File::Spec->catfile( $SCRIPTDIR, 'latex2html');
 if ( ! -x $LATEX2HTML ) {
   die "Star2HTML fatal: failed to locate LaTeX2HTML wrapper script ($LATEX2HTML)\n";
 }
 
 #  Pick up HCSERVER for hardcopy downloads from environment, overridden by
 #  command-line. 
-$HCSERVER = $ENV{'HTX_HCSERVER'} || "0";
+my $HCSERVER = $ENV{'HTX_HCSERVER'} || "0";
 
 #  Substring to match HCSERVER line and pattern for actual replacement.
-$HCSERVER_SUBSTRING = 'cgi-bin/hcserver';
-$HCSERVER_PATTERN = 'http:\/\/[^\\ ]*\/cgi-bin\/hcserver';
+my $HCSERVER_SUBSTRING = 'cgi-bin/hcserver';
+my $HCSERVER_PATTERN = 'http:\/\/[^\\ ]*\/cgi-bin\/hcserver';
 
 #  Parse the command line extracting the document name and recording
 #  the status of the optional parameters.
 
-#  Process arguments. Create a list of unknown ones to pass to LaTeX2HTML.
-while (@ARGV) {
-   $next_element = shift;
-   if ( $next_element =~ /^-aux$/ ) {
-     $AUXCOPY = 1;
-   }
-   elsif ( $next_element =~ /^-t$/ ) {
-     $TITLE = shift;
-   }
-   elsif ( $next_element =~ /^-d$/ ) {
-     $DATE = shift;
-   }
-   elsif ( $next_element =~ /^-a$/ ) {
-     $AUTHORS = shift;
-   }
-   elsif ( $next_element =~ /^-hcserver$/ ) {
-     $HCSERVER = shift;
-   }
-   elsif ( $next_element =~ /^-m$/ ) {
-     $MAIL = shift;
-   }
-   elsif ( $next_element =~ /^-s$/ ) {
-     $SPLIT = shift;
-   }
-   elsif ( $next_element =~ /^-obsolete$/ ) {
-     $OBSOLETE = 1;
-   }
-   elsif ( $next_element =~ /^-c$/ ) {
-     $COPYRIGHT = shift;
+my ($NOCOPYRIGHT, $COPYRIGHT, $TITLE, $DATE, $AUTHORS, $MAIL, $help);
+my $status = GetOptions(
+    "aux" => \$AUXCOPY,
+    "t=s" => \$TITLE,
+    "d=s" => \$DATE,
+    "a=s" => \$AUTHORS,
+    "hcserver=s" => \$HCSERVER,
+    "m=s" => \$MAIL,
+    "s=s" => \$SPLIT,
+    "obsolete" => \$OBSOLETE,
+    "c=s" => \$COPYRIGHT,
+    "help"=> \$help,
+    );
 
-     #  The copyright should have a value. If the next word
-     #  begins with a "-" then is should be put back. Similarily if it
-     #  is a filename. If the value is "none", no copyright statement
-     #  will appear; if it is omitted, we revert to the default behaviour.
-     if ( $COPYRIGHT =~ /^-.*/ ) {
-       unshift( @ARGV, $COPYRIGHT );
-       $COPYRIGHT = "";
-       $NOCOPYRIGHT = "";
-     } elsif ( $COPYRIGHT =~ /^none$/i ) {
-       $NOCOPYRIGHT = "TRUE";
-     } else {
-       $maybe_file = $COPYRIGHT;
-       if ( $maybe_file !~ /.tex$/ ) { $maybe_file .= '.tex'; }
-       if ( -e $maybe_file ) {
-         unshift( @ARGV, $COPYRIGHT );
-         $COPYRIGHT = "";
-         $NOCOPYRIGHT = "";
-       }
-     }
-   }
-   elsif ( $next_element =~ /^-h(elp)?$/ ) {
+if ($help) {
       print( 'Usage: star2html [-a author(s)] [-aux] [-d document date] '.
              '[-s 1|0] [-c copyright statement] [-old] [-obsolete] '.
              '[-m email address] '.
              '[-t title] [arguments for LaTeX2HTML] '.
              'starlink_document[.tex]'. "\n");
-      system( "$LATEX2HTML -h");
+      system( $LATEX2HTML, "-h");
       exit(0);
-   }
-   else {
-      push(@EXTRAS, $next_element);
-   }
 }
+
+# Handle copyright
+# "none" is a special case
+if ($COPYRIGHT && $COPYRIGHT =~ /^none$/i) {
+    $NOCOPYRIGHT = "TRUE";
+}
+
 
 #  Last element should be the name of the file. Add a file extension
 #  if required and split into the full directory and a filename. Note
 #  we need an absolute directory for the original file.
-$TEXFILE = pop(@EXTRAS);
+my $TEXFILE = pop(@ARGV);
 if ( $TEXFILE !~ /.tex$/ ) { $TEXFILE .= '.tex'; }
-($TEXDIR, $TEXNAME) = &get_filename_and_directory( $TEXFILE );
-$TEXDIR = &get_absolute_directory( $TEXDIR );
-$TEXFILE = $TEXDIR . "/" . $TEXNAME;
+my ($TEXDIR, $TEXNAME) = &get_filename_and_directory( $TEXFILE );
+$TEXDIR = File::Spec->rel2abs( $TEXDIR );
+$TEXFILE = File::Spec->catfile($TEXDIR, $TEXNAME);
 $TEXNAME =~ s/.tex$//;
 
 #  The output from conversion will be placed into a subdirectory of
@@ -388,9 +369,10 @@ $TEXNAME =~ s/.tex$//;
 #  creation this directory will then be moved to ".htx" (98.1 needs
 #  this slight of hand as it isn't #possible to create images in a
 #  subdirectory with a "." in the name).
-$DESTDIR = $TEXDIR . '/' . $TEXNAME. '_htx/';
-$REALDESTDIR = $TEXDIR . '/'. $TEXNAME. '.htx/';
-$DESTFILE = $DESTDIR . '/'. $TEXNAME . '.tex';
+my $DESTDIR = File::Spec->catdir($TEXDIR, $TEXNAME. '_htx');
+my $REALDESTDIR = File::Spec->catdir($TEXDIR, $TEXNAME. '.htx');
+my $DESTFILE = File::Spec->catfile($DESTDIR, $TEXNAME . '.tex');
+my $FILE;
 
 #  Check file exists and is a text file we can write to.
 if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
@@ -401,8 +383,8 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
    if ( -d $REALDESTDIR ) {
 
      #  Need to strip trailing / from destination of rename.
-     $FROMDIR = $TEXDIR . '/'. $TEXNAME. '.htx';
-     $TODIR = $TEXDIR . '/'. $TEXNAME. '_htx';
+     my $FROMDIR = File::Spec->catdir($TEXDIR, $TEXNAME. '.htx');
+     my $TODIR = File::Spec->catdir($TEXDIR, $TEXNAME. '_htx');
      rename( $FROMDIR, $TODIR )
        || &clear_up( "Star2HTML fatal: cannot rename directory $FROMDIR to $TODIR\n" );
    } else {
@@ -422,23 +404,13 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
    $have_texfile = 1;
 
 #  Copy aux, lot and lof files if they exist and we've been asked to.
-   $file = $TEXDIR . '/'. $TEXNAME . '.aux';
-   if ( -e $file && $AUXCOPY ) {
-      system("cp $file $DESTDIR") and
-         &clear_up( "Star2HTML fatal: cannot copy $file into $DESTDIR\n" );
-      $have_auxfile = 1;
-   }
-   $file = $TEXDIR . '/'. $TEXNAME . '.lot';
-   if ( -e $file && $AUXCOPY ) {
-      system("cp $file $DESTDIR") and
-         &clear_up( "Star2HTML fatal: cannot copy $file into $DESTDIR\n" );
-      $have_auxfile = 1;
-   }
-   $file = $TEXDIR . '/'. $TEXNAME . '.lof';
-   if ( -e $file && $AUXCOPY ) {
-      system("cp $file $DESTDIR") and
-         &clear_up( "Star2HTML fatal: cannot copy $file into $DESTDIR\n" );
-      $have_auxfile = 1;
+   for my $suffix (qw/ .aux .lot .lof/) {
+       my $file = File::Spec->catfile($TEXDIR, $TEXNAME . $suffix);
+       if ( -e $file && $AUXCOPY ) {
+           system("cp", $file, $DESTDIR) and
+               &clear_up( "Star2HTML fatal: cannot copy $file into $DESTDIR\n" );
+           $have_auxfile = 1;
+       }
    }
 
 #  Append tex file directory to TEXINPUTS to get /specials etc.
@@ -446,7 +418,7 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
 
 #  Open main file for use in the following sections (could be more efficient
 #  I guess).
-   open( FILE, $TEXFILE )
+   open( $FILE, $TEXFILE )
       || &clear_up( "Star2HTML fatal: Failed to open file\n" );
 
 } else {
@@ -473,6 +445,7 @@ if ( !$AUTHORS ) {
 }
 
 #  If still no author use the user.
+my $user;
 if ( !$AUTHORS ) {
    $user = $ENV{'USER'} || $ENV{'LOGNAME'} || (getpwuid($<))[0];
    $AUTHORS = (getpwnam($user))[6];
@@ -518,6 +491,7 @@ if ( !$TITLE ) {
 
 # Use the patterns sunxxx.tex sgpxxx.tex & ssnxxx.tex where xxx is the
 # document number to guess the document type.
+my $TYPE;
 switch:{
     if ( $TEXNAME =~ /^sun(\d*)/ ){
        $TYPE = "Starlink User Note $1";
@@ -545,6 +519,7 @@ switch:{
 
 #------------------------------------------------------------------------------
 #  Make an address string for the bottom of each HTML page.
+my $ADDRESS;
 if ( ! $COPYRIGHT ) {
   $ADDRESS = '<I>'  . $TITLE .   '<BR>'
                     . $TYPE  .   '<BR>'
@@ -564,22 +539,23 @@ if ( ! $COPYRIGHT ) {
 }
 
 #  Close the main file.
-close(FILE);
+close($FILE);
 
 #  Now create the star2html.perl file in current directory (unless one
 #  already exists).
-&create_stylefile;
+create_stylefile();
 
 #  Create the initialisation file.
-&create_initfile;
+create_initfile();
 
 #------------------------------------------------------------------------------
 #  Invoke latex2html on the temporary file. Note we inhibit index file
 #  production.
 print( "Preparations finished - now starting LaTeX2HTML\n\n");
-system( "$LATEX2HTML " .
-        "-init_file .star2html-init -no_subdir -tmp `pwd` " .
-        "-no_auto_link -local_icons @EXTRAS $DESTFILE" );
+my $cwd = Cwd::getcwd();
+system( $LATEX2HTML,
+        "-init_file", ".star2html-init", "-no_subdir", "-tmp", $cwd,
+        "-no_auto_link", "-local_icons", @ARGV, $DESTFILE );
 if ( $? ) {
   print( "Star2HTML fatal: Translation of document $TEXFILE failed.\n" );
 } elsif ( $COPYRIGHT ) {
@@ -588,14 +564,14 @@ if ( $? ) {
 }
 
 #  Try to copy some special icons from @l2hdir@ to this directory.
-$LATEX2HTML_DIR = "$ENV{'STARLINK_DIR'}/share/latex2html/bin";
+my $LATEX2HTML_DIR = "$ENV{'STARLINK_DIR'}/share/latex2html/bin";
 if ( ! -d $LATEX2HTML_DIR ) {
   $LATEX2HTML_DIR = "@l2hdir@";
 }
 
-$ICONDIR = $LATEX2HTML_DIR . '/../icons';
+my $ICONDIR = $LATEX2HTML_DIR . '/../icons';
 if ( -d $ICONDIR ) {
-  system( "cp $ICONDIR/contents_motif.gif .") &&
+  system( "cp", "$ICONDIR/contents_motif.gif", File::Spec->curdir) &&
     warn("Failed to copy contents_motif.gif from $ICONDIR to output directory\n");
 }
 
@@ -615,8 +591,8 @@ chdir( $DEFAULTDIR ) or warn "Failed to change back to directory $DEFAULTDIR\n";
 
 #  Move the working directory to ".htx" instead of "_htx". We need
 #  to defer this so that image creation works (98.1 fix).
-$TODIR = $TEXDIR . '/'. $TEXNAME. '.htx';
-$FROMDIR = $TEXDIR . '/'. $TEXNAME. '_htx';
+my $TODIR = File::Spec->catdir($TEXDIR, $TEXNAME. '.htx');
+my $FROMDIR = File::Spec->catdir($TEXDIR, $TEXNAME. '_htx');
 rename( $FROMDIR, $TODIR ) || print( "Star2HTML warning: failed to move $FROMDIR to $TODIR.\n" );
 
 #  Exit.
@@ -642,36 +618,37 @@ sub edit_main {
 
 #  Generate the names of the dummy style files we require (needed to make
 #  sure their perl equivalents are loaded), and create them.
-   $cwd = getcwd();
-   $starsty = "$cwd" . '/star2html.sty';
-   system ( "touch $starsty" );
+   my $cwd = getcwd();
+   my $starsty = File::Spec->catfile($cwd, 'star2html.sty');
+   system ( "touch", $starsty );
 
 #  html.sty has contents that define dummy environments for htmlonly,
 #  rawhtml and comment. These are removed by pre-processing and can be
 #  required in the image creation stage (which uses ordinary LaTeX).
 #  Normally these should not be required to function.
-   $htmlsty = "$cwd" . '/html.sty';
-   open( HTMLSTY, ">$htmlsty" )
+   my $htmlsty = "$cwd" . '/html.sty';
+   open( my $HTMLSTY, ">",$htmlsty )
       || &clear_up( "Star2HTML fatal: Failed to open dummy style file ($htmlsty).\n" );
-   print( HTMLSTY "\\newenvironment{htmlonly}{}{} \n" );
-   print( HTMLSTY "\\newenvironment{rawhtml}{}{} \n" );
-   print( HTMLSTY "\\newenvironment{comment}{}{} \n" );
-   close( HTMLSTY );
+   print( $HTMLSTY "\\newenvironment{htmlonly}{}{} \n" );
+   print( $HTMLSTY "\\newenvironment{rawhtml}{}{} \n" );
+   print( $HTMLSTY "\\newenvironment{comment}{}{} \n" );
+   close( $HTMLSTY );
 
 #  Open the the main file for readonly.
-   open( FILE, $TEXFILE )
+   open( my $FILE, $TEXFILE )
       || &clear_up( "Star2HTML fatal: Failed to open main tex file ($TEXFILE).\n" );
 
 #  Open the "copy".
-   open( EDIT, ">$DESTFILE" )
+   open( my $EDIT, ">", $DESTFILE )
       || &clear_up( "Star2HTML fatal: Cannot open new file for editing.\n" );
 
 #  Now start copying the main file to the edited version. Partitioning
 #  sections into new files.
-   $fileIO = 'EDIT';
-   $need_styles = 1;
-   $comment_out = 0;
-   while (<FILE>) {
+   my $fileIO = $EDIT;
+   my $SECTION;
+   my $need_styles = 1;
+   my $comment_out = 0;
+   while (<$FILE>) {
 
 #  Check current line for any of the expected patterns.
 #  \documentstyle or \documentclass or end of document (assumed to be
@@ -679,9 +656,9 @@ sub edit_main {
       if ( ( index( $_, '\documentstyle' ) != -1 ) ||
            ( index( $_, '\documentclass' ) != -1 ) ) {
         if ( $need_styles ) {
-          print( EDIT  $_ );
-          print( EDIT "\\input{$htmlsty}\n" );
-          print( EDIT "\\input{$starsty} \n" );
+          print( $EDIT  $_ );
+          print( $EDIT "\\input{$htmlsty}\n" );
+          print( $EDIT "\\input{$starsty} \n" );
           $need_styles = 0;
           next;
         }
@@ -716,12 +693,12 @@ sub edit_main {
 
 
 #  New section (note reusing SECTION closes previous file).
-            $section_file = "section$NSECTIONS.tex";
+            my $section_file = "section$NSECTIONS.tex";
             $NSECTIONS++;
-            open( SECTION, ">$section_file" )
+            open( $SECTION, ">", $section_file )
                || &clear_up( "Star2HTML fatal: Failed to open dummy section file ($section_file)\n" );
-            $fileIO = 'SECTION';
-            print( EDIT "\\input{$section_file} \n");
+            $fileIO = $SECTION;
+            print( $EDIT "\\input{$section_file} \n");
          }
       }
 
@@ -735,16 +712,16 @@ sub edit_main {
 
 #  Check that style include have been done. If not append them.
    if ( $need_styles ) {
-      print( EDIT "\\input{$htmlsty}\n" );
-      print( EDIT "\\input{$starsty} \n" );
+      print( $EDIT "\\input{$htmlsty}\n" );
+      print( $EDIT "\\input{$starsty} \n" );
    }
 
 #  Close the files.
    if ( $SPLIT ) {
-     close( SECTION );
+     close( $SECTION );
    }
-   close( FILE );
-   close( EDIT );
+   close( $FILE );
+   close( $EDIT );
 
 }
 
@@ -783,14 +760,14 @@ sub create_stylefile{
    if ( -T 'star2html.perl' ) {
       $keep_style = 1;
    } else {
-      open( STYLE, '>star2html.perl' )
+      open( my $STYLE, '>',star2html.perl' )
          || &clear_up( "Star2HTML fatal: Failed to create new perl style file.\n" );
       $keep_style = 0;
 
 #  Add the special xref and xlabel routines. Also a quote environment
 #  for aligning verbatims within it (the default version doesn't do this).
 #------------------------------------------------------------------------------
-print( STYLE <<'_EOF_' );
+print( $STYLE <<'_EOF_' );
 package main;
 
 #  The base name for all document cross reference roots.
@@ -800,20 +777,20 @@ package main;
 $DOCBASE = 'http://www.starlink.ac.uk/cgi-bin/htxserver/';
 
 sub do_cmd_xref{
-   local($_) = @_;
-   local($text, $docname, $label);
-   s/$next_pair_pr_rx/$text = $2; ''/eo;
-   s/$next_pair_pr_rx/$docname = $2; ''/eo;
-   s/$next_pair_pr_rx/$label = $2; ''/eo;
+   my $arg = shift;
+   my ($text, $docname, $label);
+   $arg =~ s/$next_pair_pr_rx/$text = $2; ''/eo;
+   $arg =~ s/$next_pair_pr_rx/$docname = $2; ''/eo;
+   $arg =~ s/$next_pair_pr_rx/$label = $2; ''/eo;
    # Default for local documents would be:
-   #join('','<A HREF="',$DOCBASE,$docname,'.htx/',$docname,'.html#xref_',$label,'">',$text,'</A>',$_);
+   #join('','<A HREF="',$DOCBASE,$docname,'.htx/',$docname,'.html#xref_',$label,'">',$text,'</A>',$arg);
    # And for remote ones (notice?).
-   join('','<A HREF="',$DOCBASE,$docname,'.htx/',$docname,'.html?xref_',$label,'">',$text,'</A>',$_);
+   join('','<A HREF="',$DOCBASE,$docname,'.htx/',$docname,'.html?xref_',$label,'">',$text,'</A>',$arg);
 }
 
 sub do_cmd_xlabel{
    local($_) = @_;
-   local($label);
+   my $label;
    s/$next_pair_pr_rx/$label = $2; ''/eo;
    $label =~ s/\n//g;
    $label =~ s/ //g;
@@ -836,7 +813,7 @@ sub do_env_verse {
 
 _EOF_
 #------------------------------------------------------------------------------
-      close(STYLE);
+      close($STYLE);
    }
 }
 
@@ -853,32 +830,32 @@ sub get_item {
 #  Bugs:
 #    This will fail if the item contains verbatim {}'s.
 #-
-   local($item) = $_[0];
+   my $item = shift;
 
 #  Quote all words to stop problems with special characters.
    $item =~ s/(\W)/\\$1/g;
 
 #  Rewind search to beginning of file.
-   seek(FILE,0,0);
+   seek($FILE,0,0);
 
 #  Look for the item.
-   while( <FILE> ){
+   while( <$FILE> ){
       if ( /^[^%]/ && /{$item}(.*)/ ) {
 
 #  Now look for possible pattern of { text } allowing for nested brackets.
-         $* = 1;
          $_ = $1;
-         $started = 0;
+         my $nopen;
+         my $started = 0;
          bracket :{ while( 1 ) {
             $nopen = tr/\{/\{/;
             if ( $nopen != 0 ) { $started = 1; }
-            $nclosed = tr/\}/\}/;
+            my $nclosed = tr/\}/\}/;
             if ( $started ) {
                if ( $nclosed >= $nopen ) {
                   last bracket;
                }
             }
-            $line = <FILE>;
+            my $line = <$FILE>;
             if ( $line ) {
                $_ .= "\n". $line;
             } else {
@@ -886,13 +863,12 @@ sub get_item {
                return '';
             }
          }}
-         $* = 0;
 
 #  Now extract value.
-         $end = 0;
-         $start = index( $_, '{', 0 );
-         for($i=0 ; $i < $nopen ; $i++ ) {
-            $nowat = index( $_, '}', $end );
+         my $end = 0;
+         my $start = index( $_, '{', 0 );
+         for(my $i=0 ; $i < $nopen ; $i++ ) {
+            my $nowat = index( $_, '}', $end );
             $end = $nowat + $end;
          }
          return substr( $_, $start + 1, $end - $start - 1);
@@ -911,21 +887,19 @@ sub tidy_latex {
 #  multiple spaces into single spaces.
 #-
    for (@_) {
-      $* = 1;                        # Grep over multilines
-      s/(\\LaTeX\\|\\LaTeX)/LaTeX/g; # Remove special \LaTeX\ & \LaTeX
-      s/(\\TeX\\|\\TeX)/TeX/g;       # Remove special \TeX\ & \TeX
-      s/\~/ /g;                      # ~   ==> " "
-      s/\\\\[\s]*\[[^\]]*\]/\n/g;    # \\ [len] ==> \n, none-greedy form
-      s/\\\\/\n/g;                   # \\  ==> \n
-      s/\\\&/&/g;                    # \&   ==> "&"
-      s/\\./ /g;                     # \?   ==> " "
-      s/\n+/\n/g;                    # multiple newlines ==> "\n"
-      s/^[\s]+//g;                   # remove multiple spaces, tabs etc. from start.
-      s/[\ \t]+/ /g;                 # multiple spaces or tabs == > " "
-      s/(\}|\{)//g;                  # Get rid of pesky {}'s
-      s/\'/\\'/g;                    # Protect embedded single quotes
-      s/\n/<BR>/g;                   # Finally \n ==> <BR> to get HTML line breaks.
-      $* = 0;
+      s/(\\LaTeX\\|\\LaTeX)/LaTeX/mg; # Remove special \LaTeX\ & \LaTeX
+      s/(\\TeX\\|\\TeX)/TeX/mg;       # Remove special \TeX\ & \TeX
+      s/\~/ /mg;                      # ~   ==> " "
+      s/\\\\[\s]*\[[^\]]*\]/\n/mg;    # \\ [len] ==> \n, none-greedy form
+      s/\\\\/\n/mg;                   # \\  ==> \n
+      s/\\\&/&/mg;                    # \&   ==> "&"
+      s/\\./ /mg;                     # \?   ==> " "
+      s/\n+/\n/mg;                    # multiple newlines ==> "\n"
+      s/^[\s]+//mg;                   # remove multiple spaces, tabs etc. from start.
+      s/[\ \t]+/ /mg;                 # multiple spaces or tabs == > " "
+      s/(\}|\{)//mg;                  # Get rid of pesky {}'s
+      s/\'/\\'/mg;                    # Protect embedded single quotes
+      s/\n/<BR>/mg;                   # Finally \n ==> <BR> to get HTML line breaks.
    }
    return "@_";
 }
@@ -945,21 +919,19 @@ sub remove_commands {
    local($_) = @_;
 
 #  Scan for occurrances of \command{}'s.
-   $* = 1;
-   while ( m/\\(\w*)\{/ ) {
+   while ( m/\\(\w*)\{/m ) {
 
 #  See if command content should be removed or kept.
-      if ( $1,m/(footnote|vspace)/ ) {
-         s/\\$1\{[^\}]*\}//;
+      if ( $1,m/(footnote|vspace)/m ) {
+         s/\\$1\{[^\}]*\}//m;
       } else {
-         s/\\$1\{([^\}]*)\}//;
-         $_ = $` . $1 . $'
+         s/\\$1\{([^\}]*)\}//m;
+         $_ = $` . $1 . $';
       }
    }
 
 #  Scan for other known \command's.
-   s/(\\Large|\\large|\\Huge|\\huge|\\normalsize|\\small|\\bf|\\em|\\rm|\\it)//g;
-   $* = 0;
+   s/(\\Large|\\large|\\Huge|\\huge|\\normalsize|\\small|\\bf|\\em|\\rm|\\it)//mg;
    return $_;
 }
 
@@ -974,11 +946,11 @@ sub print_value {
 #  first argument. If none exists then the second argument is returned as
 #  a default value.
 #-
-   local($name,$default) = @_;
+   my ($fh,$name,$default) = @_;
    if ( defined( $ENV{ $name } ) ) {
-      print( DEFAULTS "\$$name = $ENV{ $name }; \n" );
+      print( $fh "\$$name = $ENV{ $name }; \n" );
    } else {
-      print( DEFAULTS "\$$name = $default; \n" );
+      print( $fh "\$$name = $default; \n" );
    }
 }
 
@@ -994,7 +966,7 @@ sub clear_up {
 #
 #  The argument to this routine (if given) is a message to print to the user.
 #-
-   local($file);
+   my $file;
 
 #  Print informational message
    if ( defined( @_ ) ) { print( "@_ \n") };
@@ -1035,7 +1007,7 @@ sub clear_up {
 
 #  Remove document parts if split.
    if ( $SPLIT ) {
-      for ($i = 0; $i < $NSECTIONS; $i++) {
+      for (my $i = 0; $i < $NSECTIONS; $i++) {
          $file = $DESTDIR . 'section' . $i . '.tex';
          unlink( $file );
       }
@@ -1059,41 +1031,41 @@ sub create_initfile{
 #  it overrides the defaults here).
 #-
 
-   open( DEFAULTS, '>.star2html-init' )
+   open( my $DEFAULTS, '>','.star2html-init' )
       || &clear_up( "Star2HTML fatal: Failed to open defaults file, .star2html-init\n" );
-   print( DEFAULTS "# Star2html latex2html defaults file.\n");
-   print( DEFAULTS "\$ADDRESS = \'$ADDRESS\'; \n" );
-   print( DEFAULTS "\$TITLE = \'$TITLE\'; \n" );
-   &print_value( NO_NAVIGATION, 0 );
-   &print_value( TOP_NAVIGATION, 1 );
-   &print_value( BOTTOM_NAVIGATION, 1 );
-   &print_value( AUTO_NAVIGATION, 0 );
-   &print_value( INDEX_IN_NAVIGATION, 1 );
-   &print_value( CONTENTS_IN_NAVIGATION, 1 );
-   &print_value( NEXT_PAGE_IN_NAVIGATION, 1 );
-   &print_value( PREVIOUS_PAGE_IN_NAVIGATION, 1 );
-   &print_value( INFO, 1 );
-   &print_value( SHOW_SECTION_NUMBERS, 0 );
-   &print_value( LINE_WIDTH, 500);
-   &print_value( WORDS_IN_PAGE, 200);
-   &print_value( default_language, 'english' );
-   &print_value( WORDS_IN_NAVIGATION_PANEL_TITLES, 4 );
-   &print_value( MATH_SCALE_FACTOR, 1.5 );
-   &print_value( FIGURE_SCALE_FACTOR, 1.0 );
-   &print_value( TRANSPARENT_FIGURES, 1 );
-   &print_value( PAPERSIZE, 'a3' );
-   &print_value( ICONSERVER, "\'.\'" );
+   print( $DEFAULTS "# Star2html latex2html defaults file.\n");
+   print( $DEFAULTS "\$ADDRESS = \'$ADDRESS\'; \n" );
+   print( $DEFAULTS "\$TITLE = \'$TITLE\'; \n" );
+   &print_value( $DEFAULTS, "NO_NAVIGATION", 0 );
+   &print_value( $DEFAULTS, "TOP_NAVIGATION", 1 );
+   &print_value( $DEFAULTS, "BOTTOM_NAVIGATION", 1 );
+   &print_value( $DEFAULTS, "AUTO_NAVIGATION", 0 );
+   &print_value( $DEFAULTS, "INDEX_IN_NAVIGATION", 1 );
+   &print_value( $DEFAULTS, "CONTENTS_IN_NAVIGATION", 1 );
+   &print_value( $DEFAULTS, "NEXT_PAGE_IN_NAVIGATION", 1 );
+   &print_value( $DEFAULTS, "PREVIOUS_PAGE_IN_NAVIGATION", 1 );
+   &print_value( $DEFAULTS, "INFO", 1 );
+   &print_value( $DEFAULTS, "SHOW_SECTION_NUMBERS", 0 );
+   &print_value( $DEFAULTS, "LINE_WIDTH", 500);
+   &print_value( $DEFAULTS, "WORDS_IN_PAGE", 200);
+   &print_value( $DEFAULTS, "default_language", 'english' );
+   &print_value( $DEFAULTS, "WORDS_IN_NAVIGATION_PANEL_TITLES", 4 );
+   &print_value( $DEFAULTS, "MATH_SCALE_FACTOR", 1.5 );
+   &print_value( $DEFAULTS, "FIGURE_SCALE_FACTOR", 1.0 );
+   &print_value( $DEFAULTS, "TRANSPARENT_FIGURES", 1 );
+   &print_value( $DEFAULTS, "PAPERSIZE", 'a3' );
+   &print_value( $DEFAULTS, "ICONSERVER", "\'.\'" );
 #  PNGs sometimes have gray backgrounds, supposed to be removed and
 #  give better antialised edges, but that's not always true (netpbm
 #  version?), so make the background white.
-   &print_value( WHITE_BACKGROUND, 1 );
-   &print_value( LATEX_COLOR, "'\\pagecolor{white}'" );
+   &print_value( $DEFAULTS, "WHITE_BACKGROUND", 1 );
+   &print_value( $DEFAULTS, "LATEX_COLOR", "'\\pagecolor{white}'" );
 #  Alternatively remove above and uncomment this to get GIFs.
-#   &print_value( IMAGE_TYPE, 'gif' );
+#   &print_value( $DEFAULTS, "IMAGE_TYPE", 'gif' );
 
 #  Add navigation panel changes. These add extra words for each
 #  description and a line-break between each description.
-   print( DEFAULTS <<'_EOF_' );
+   print( $DEFAULTS <<'_EOF_' );
 sub top_navigation_panel {
 
     #  Start with a horizontal rule (3-d dividing line)
@@ -1147,19 +1119,19 @@ _EOF_
 #  Check for existence of a local .latex2html-init file.
    if ( -T '.latex2html-init' ) {
       print( "Appending existing .latex2html-init defaults file.\n" );
-      if ( open( REALDEFAULTS, '.latex2html-init' ) ) {
-         @lines = <REALDEFAULTS>;                        # read in whole file
-         print( DEFAULTS @lines );                       # write it out
-         close( REALDEFAULTS );
+      if ( open( my $REALDEFAULTS, '.latex2html-init' ) ) {
+         my @lines = <$REALDEFAULTS>;                        # read in whole file
+         print( $DEFAULTS @lines );                       # write it out
+         close( $REALDEFAULTS );
       } else {
          print( "Star2HTML warning: Failed to append existing defaults file.\n" );
       }
    } else {
 
 #  Final line. If appending assume exists already
-      print( DEFAULTS "1;\n");
+      print( $DEFAULTS "1;\n");
    }
-   close(DEFAULTS);
+   close($DEFAULTS);
 }
 #------------------------------------------------------------------------------
 
@@ -1170,47 +1142,16 @@ sub get_filename_and_directory {
 #   or directory name. If the input is a directory name then no
 #   filename is returned.
 #-
-   local($file) = @_;
-   local(@path, $directory);
+   my $file = File::Spec->rel2abs(shift);
+   my $directory;
    if ( -d $file ) {           # $file is a directory
-      $directory = &get_absolute_directory( $file );
+      $directory = $file;
       $file = '';
    }
-   elsif ($file =~ /^\//) {     # starts with \
-      @path = split( m;/;, $file );
-      $file = pop( @path );
-      $directory = join( '/', @path );
-      $directory = &get_absolute_directory( $directory );
+   else {
+       (my $vol, $directory, $file) = File::Spec->splitpath( $file );
    }
-   elsif (-f $file) {           # plain file or relative name.
-      @path = split( m;/;, $file );
-      $file = pop( @path );
-      if ( scalar(@path) == 0 ) {
-        $directory = "./";
-      } elsif ( scalar(@path) == 1 ) {
-        $directory = &get_absolute_directory( "@path/" );
-      } else {
-        $directory = join( '/', @path );
-      }
-   }
-   ($directory, $file);
-}
-
-#------------------------------------------------------------------------------
-
-sub get_absolute_directory {
-#+
-#   Subroutine to convert a directory specification into an absolute name.
-#-
-    local($directory) = @_;
-    local($orig_cwd);
-    if (! ( $directory =~ /^\// ) ) { # $directory doesn't start with '/'
-        $orig_cwd = getcwd();
-        chdir $directory;
-        $directory = getcwd();
-        chdir $orig_cwd;
-    }
-    $directory;
+   return ($directory, $file);
 }
 
 #------------------------------------------------------------------------------
@@ -1222,12 +1163,12 @@ sub make_obsolete {
 #   -obsolete argument.
 #-
   if ( $OBSOLETE ) {
-    $CSSFILE = $DESTDIR . "/" . $TEXNAME . ".css";
+    my $CSSFILE = File::Spec->catfile($DESTDIR, $TEXNAME . ".css");
     # Look for the CSS file and append the background image to that.
     if ( -f $CSSFILE ) {
-      open( CSS, ">>${TEXNAME}.css" );
-      print( CSS "\nBODY   {background-image: url('obsolete.jpg')}\n" );
-      close( CSS );
+      open( my $CSS, ">>","${TEXNAME}.css" );
+      print( $CSS "\nBODY   {background-image: url('obsolete.jpg')}\n" );
+      close( $CSS );
     }
   }
 }
@@ -1248,7 +1189,7 @@ sub source_icon {
   # Decode it
   my ($string, $filename, $mode) = Convert::UU::uudecode( $uue );
 
-  open my $fh, ">$filename"
+  open (my $fh, ">",$filename)
     or die "Error opening output GIF $filename: $!";
   binmode($fh);
   print $fh $string;
