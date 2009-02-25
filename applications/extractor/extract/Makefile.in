@@ -505,14 +505,6 @@ install-data: install-data-recursive
 uninstall: uninstall-recursive
 
 install: $(REAL_INSTALL)
-install-svnversion:
-	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
-	@if test -n "$(SVNVERSION)"; then \
-	   if test -d "$(STAR_SOURCE_ROOT_DIR)"; then \
-	      cd $(STAR_SOURCE_ROOT_DIR) && \
-	      $(SVNVERSION) . > $(DESTDIR)$(STAR_MANIFEST_DIR)/starlink.version; \
-	   fi; \
-	fi
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
@@ -595,12 +587,12 @@ uninstall-info: uninstall-info-recursive
 	distcleancheck distdir distuninstallcheck dvi dvi-am html \
 	html-am info info-am install install-am install-data \
 	install-data-am install-exec install-exec-am install-info \
-	install-info-am install-man install-strip install-svnversion \
-	installcheck installcheck-am installdirs installdirs-am \
-	maintainer-clean maintainer-clean-generic \
-	maintainer-clean-recursive mostlyclean mostlyclean-generic \
-	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
-	uninstall uninstall-am uninstall-info-am
+	install-info-am install-man install-strip installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic maintainer-clean-recursive \
+	mostlyclean mostlyclean-generic mostlyclean-recursive pdf \
+	pdf-am ps ps-am tags tags-recursive uninstall uninstall-am \
+	uninstall-info-am
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
