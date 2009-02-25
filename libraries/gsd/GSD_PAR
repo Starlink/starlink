@@ -41,8 +41,11 @@
 *  History:
 *     13-MAR-2004 (TIMJ):
 *        Add standard prologue.
+*     24-FEB-2009 (TIMJ):
+*        Remove local BAD definitions. Not used.
 
 *  Copyright: 
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     Copyright (C) 1994-1999,2004 Particle Physics and Astronomy
 *     Research Council.  All Rights Reserved.
 
@@ -98,21 +101,6 @@
       PARAMETER (GSD__CHAR      = 7)
       INTEGER GSD__SZCHAR
       PARAMETER (GSD__SZCHAR    = 16)
-*
-*    Bad data values.
-*    These are PRIMDAT bad values, not the traditional VAX/GSD bad
-*    values. There are no bad values for logical and character any more.
-*
-      BYTE BBAD
-      PARAMETER (BBAD = VAL__BADB)
-      INTEGER*2 WBAD
-      PARAMETER (WBAD = VAL__BADW)
-      INTEGER*4 IBAD
-      PARAMETER (IBAD = VAL__BADI)
-      REAL*4 RBAD
-      PARAMETER (RBAD = VAL__BADR)
-      REAL*8 DBAD
-      PARAMETER (DBAD = VAL__BADD)
 *
 *
 *  Index array
