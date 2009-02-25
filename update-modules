@@ -13,20 +13,30 @@
 #     update-modules [-f] [submodule]
 
 #  Description:
-#     This script updates the content of all the submodules or the given
-#     submodule. It should be ran whenever a submodule is known to be
-#     out-of-date. It can update a single submodule, or if no command-line
-#     argument is given all the known submodules (when new submodules are
-#     added to the repository these must be made known by a git-pull or
-#     git-fetch first).
+#     This script attempts to safely update the content of all the submodules
+#     or the given submodule. It should be ran whenever a submodule is known
+#     to be out-of-date, but can be run at other times to get a listing of the
+#     submodules and their status.
 #
-#     If any submodules contain local changes then this script will refuse 
-#     to run as the update process is destructive, unless the -f option
-#     is set.
+#     It can update a single submodule, or if no command-line argument is
+#     given all the known submodules (when new submodules are added to the
+#     repository these must be made known by a git-pull or git-fetch first).
+#     New submodules are uninitialised and will be initialised after being
+#     detected.
+#
+#     If any of the submodules contain local changes then this script will
+#     refuse to run as the update process is destructive (although most
+#     committed changes will be recoverable see git-reflog). Note this means
+#     that no changes to any submodules will be made, regardless of whether
+#     they could be updated and/or initialised or not until the problem has
+#     been resolved.
+#
+#     In extreme circumstances when you do not have any changes to preserve
+#     the "-f" flag can be used to skip all safety checks.
 #
 #     It is necessary that this script be ran at least once after a 
-#     repository clone is created (this will be done by the bootstrap
-#     script).
+#     repository clone is created. This will be done by the bootstrap
+#     script.
 
 #  Authors:
 #     PWD: P.W. Draper (JAC, Durham University)
