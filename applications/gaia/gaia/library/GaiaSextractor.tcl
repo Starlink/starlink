@@ -2102,6 +2102,12 @@ itcl::class gaia::GaiaSextractor {
       #  Program verbosity (not used at present).
       set from_(VERBOSE_TYPE) verbose_type
       set to_(verbose_type) VERBOSE_TYPE
+
+      #  XML meta-data file. Not used.
+      set from_(WRITE_XML) write_xml
+      set to_(write_xml) WRITE_XML
+      set from_(XML_NAME) xml_name
+      set to_(xml_name) XML_NAME
    }
 
    #  Set the initial defaults for the values_ array. These are
