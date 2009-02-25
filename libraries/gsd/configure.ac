@@ -23,6 +23,7 @@ AC_C_BIGENDIAN
 AC_PROG_LIBTOOL
 
 STAR_CNF_COMPATIBLE_SYMBOLS
+STAR_PRM_COMPATIBLE_SYMBOLS
 
 dnl    Make sure the variable types are okay for GSD
 AC_CHECK_TYPES([int8_t, int16_t, int32_t, int64_t])
