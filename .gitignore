@@ -42,6 +42,8 @@
 core.*
 lib*.so
 *.class
+\#*\#
+.\#*
 
 # Autoconf/automake build dirs
 
