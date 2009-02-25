@@ -760,7 +760,7 @@ sub create_stylefile{
    if ( -T 'star2html.perl' ) {
       $keep_style = 1;
    } else {
-      open( my $STYLE, '>',star2html.perl' )
+      open( my $STYLE, '>', 'star2html.perl' )
          || &clear_up( "Star2HTML fatal: Failed to create new perl style file.\n" );
       $keep_style = 0;
 
