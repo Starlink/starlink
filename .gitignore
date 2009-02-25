@@ -59,6 +59,7 @@ config.log
 config.status
 config.sub
 configure
+configure.lineno
 configure-output.log
 configure-output.log.err
 conftest.*
