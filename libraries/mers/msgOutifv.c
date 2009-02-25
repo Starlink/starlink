@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     msgOutiff
+*     msgOutifv
 
 *  Purpose:
 *     Conditionally deliver the formatted text of a message to the user.
@@ -10,8 +10,8 @@
 *     Starlink ANSI C
 
 *  Invocation:
-*     msgOutiff( msglev_t prior, const char * param, const char * text,
-*               int * status, ... );
+*     msgOutifv( msglev_t prior, const char * param, const char * text,
+*                va_list args, int * status);
 
 *  Description:
 *     Depending upon the given value of the given message priority and 
@@ -21,7 +21,7 @@
 *     a call to msgOutif. If an output error occurs, an error is 
 *     reported and the status argument returned set to MSG__OPTER.
 *
-*     sprintf-style formatting is applied.
+*     sprintf-style formatting is applied using variadic arguments.
 
 *  Arguments:
 *     prior = msglev_t (Given)
@@ -53,9 +53,10 @@
 *        The message name.
 *     text = const char * (Given)
 *        The message text.
+*     args = va_list (Given)
+*        Variadic arguments for sprintf processing.
 *     status = int * (Given and Returned)
 *        The global status.
-*     ... = variadic arguments required by sprintf (Given)
 
 *  Notes:
 *     Formatting is applied after token replacement. Tokens containing
@@ -68,7 +69,7 @@
 
 
 *  Copyright:
-*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -92,12 +93,8 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     24-DEC-2008 (TIMJ):
-*        Original version
-*     09-JAN-2009 (TIMJ):
-*        Update prologue for message levels.
 *     24-FEB-2009 (TIMJ):
-*        Call msgOutifv instead of msg1Outif
+*        Original version. Copied from msgOutiff.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -107,14 +104,12 @@
 */
 
 #include "msg_par.h"
+#include "mers1.h"
 #include "merswrap.h"
 
 #include <stdarg.h>
 
-void msgOutiff( msglev_t prior, const char * param, const char * text,
-               int * status, ...) {
-  va_list args;
-  va_start( args, status );
-  msgOutifv( prior, param, text, args, status );
-  va_end( args );
+void msgOutifv( msglev_t prior, const char * param, const char * text,
+		va_list args, int * status) {
+  msg1Outif( prior, param, text, 1, args, status );
 }

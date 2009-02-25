@@ -45,6 +45,7 @@
 #define MERSWRAP_DEFINED
 
 #include "msg_par.h"
+#include <stdarg.h>
 
 /* If we're not using GNU C, elide __attribute__ */
 #ifndef __GNUC__
@@ -155,6 +156,12 @@ void msgOutiff( msglev_t prior,
                 const char *text,
                 int *status,
                 ... ) __attribute__((format (printf, 3, 5 )));
+
+void msgOutifv( msglev_t prior,
+		const char * param,
+		const char * text,
+		va_list args,
+		int * status) __attribute__((format (printf, 3, 0 )));
 
 void msgRenew( void );
 
