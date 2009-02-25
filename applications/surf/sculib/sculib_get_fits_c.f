@@ -37,7 +37,6 @@
 *     line does not conform to the above format an error will be reported
 *     and bad status returned.
 
-
 *  Arguments:
 *     MAX_FITS             = INTEGER (Given)
 *           the maximum number of items in the FITS array
@@ -52,38 +51,29 @@
 *     STATUS               = INTEGER (Given and returned)
 *           global status 
 
-
 *  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
 *     T. Jenness (timj@jach.hawaii.edu)
 
-
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Copyright (C) 1995, 1997, 1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
-
 *  History:
-*     $Id$
-*     $Log$
-*     Revision 1.5  1999/08/19 03:37:13  timj
-*     Header tweaks to ease production of SSN72 documentation.
-*
-*     Revision 1.4  1999/08/06 02:24:44  timj
-*     Tweak headers for use with PROLAT.
-*
-*     Revision 1.3  1999/08/03 19:35:04  timj
-*     Add copyright message to header.
-*     Convert old header style to new.
-*
-*     Revision 1.2  1997/11/19 18:52:02  timj
-*     Decode string by searching for quotes instead of a '/'.
-*     This fixes a bug in the DRT that sometimes does not put on a comment if the
-*     string is too long.
-*
-*     26-JUL-1995 (jfl):
-*       original version.
-*
+*     1995-JUL-26 (JFL):
+*        Original version.
+*     1997-NOV-19 (TIMJ):
+*        Decode string by searching for quotes instead of a '/'.
+*        This fixes a bug in the DRT that sometimes does not put on a comment if the
+*        string is too long.
+*     1999-AUG-03 (TIMJ):
+*        Add copyright message to header.
+*        Convert old header style to new.
+*     1999-AUG-06 (TIMJ):
+*        Tweak headers for use with PROLAT.
+*     1999-AUG-19 (TIMJ):
+*        Header tweaks to ease production of SSN72 documentation.
+
 *-
 
 
