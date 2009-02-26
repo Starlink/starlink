@@ -13,7 +13,7 @@
 
 static char errmess[132];              /* For DRAMA error messages */
 
-#define MM2RAD 2.4945e-5               /* scale at array in radians */
+#define MM2RAD (0.92*2.4945e-5)        /* scale at array in radians */
 #define PIBY2 1.57079632679
 #define PI 2*PIBY2 
 #define PIX2MM 1.135                   /* pixel interval in mm */
