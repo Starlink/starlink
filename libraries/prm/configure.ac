@@ -26,7 +26,6 @@ AC_PROG_LIBTOOL
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 
 STAR_CNF_COMPATIBLE_SYMBOLS
-STAR_PRM_COMPATIBLE_SYMBOLS
 
 AC_CHECK_HEADERS([fenv.h limits.h float.h time.h assert.h inttypes.h stdint.h])
 AC_CHECK_FUNCS([nextafter nextafterf])
@@ -51,20 +50,17 @@ dnl    Determine whether the Fortran compiler supports the VOLATILE keyword
 AC_FC_HAVE_VOLATILE
 
 dnl    Determine whether the Fortran compiler supports the 'xxx'X notation
-dnl    for integers and reals.  The notation Z"xxx" is the one blessed
-dnl    by ISO-1539, but (a) 'xxx'X hasn't caused problems so far, and
-dnl    (b) some compilers (for example g77 without the -ftypeless-boz
-dnl    option) parse the notation as an integer -- INTEGER(KIND=1) --
-dnl    rather than typeless), and (c) in any case ISO-1539 states
-dnl    that these boz-constants can appear only in DATA statements.
-dnl    If we can't use the 'xxx'X notation, we're therefore better
-dnl    off sticking to ordinary decimal notation.
+dnl    or the X'xxx' notation. 
+dnl 
+dnl    This is used for assigning integers and reals using a typeless
+dnl    transformation of the given bit patterns. Note the other BOZ
+dnl    descriptors are just usually integers in disguise, so like plain
+dnl    numbers may also require compiler support to work with PRM, see 
+dnl    STAR_PRM_COMPATIBLE_SYMBOLS. For this reason we only use plain
+dnl    numbers or the 'X' descriptor.
 AC_FC_HAVE_OLD_TYPELESS_BOZ()
-
-dnl    Except some compilers (g95) only support the X'xxx' form, but
-dnl    also don't allow integer contants to overflow, so decimal notation
-dnl    fails (for the unsigned types). So test for this and apply changes.
 AC_FC_HAVE_TYPELESS_BOZ()
+STAR_PRM_COMPATIBLE_SYMBOLS
 
 dnl    Determine whether the Fortran compiler supports the type-kind
 dnl    parameter notation (eg, I=1_4), as described in ISO-1539

@@ -611,14 +611,17 @@ AC_DEFUN([STAR_CNF_BLANK_COMMON],
 # STAR_PRM_COMPATIBLE_SYMBOLS
 # ---------------------------
 #
-#  See if any special flags are required to support PRM's use of typeless BOZ
-#  constants, or if there's no typeless BOZ support any special flags that are
-#  required for that. 
+#  See if any special flags are required to support PRM and the use of the
+#  PRM_PAR constants. If a typeless BOZ descriptor is available (usually 'X)
+#  then this macro will have no effect, however, if there's no typeless BOZ
+#  support any special Fortran compiler flags that are required when using
+#  PRM_PAR will be defined as part of the STAR_FCFLAGS and STAR_FFLAGS
+#  variables.
 #
 #  In fact this macro is only currently of use with the gfortran compiler
 #  which has no typeless BOZ support, so requires that the -fno-range-check
 #  flag is set so that assigments to integers can silently overflow (BOZ
-#  constants are replaced with their integer and floating point
+#  constants are replaced with their plain integer and floating point
 #  equivalents). In general this macro should be used by all packages that
 #  include PRM_PAR, all monoliths are assumed to use this by default.
 #
