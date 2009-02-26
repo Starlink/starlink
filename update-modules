@@ -107,14 +107,14 @@ if test "$check" = "1" -a "$summary" != ""; then
                if GIT_DIR=$path/.git git rev-parse --verify $sha1^0 >/dev/null 2>&1; then
                   #  Modified, and contains the SHA already, must be a local
                   #  modification. Don't allow that.
-                  echo "ERROR: submodule is modified, will not overwrite"
+                  echo "ERROR: a submodule is modified, not updating anything"
                   echo "... $path"
                   echo "    `git submodule summary $path`"
                   exit 1
                fi
             else
                #  No directory! That's an error.
-               echo "ERROR: submodule is missing"
+               echo "ERROR: missing submodule directory, not updating anything"
                echo "... $path"
                exit 1
             fi
@@ -151,16 +151,16 @@ if test "$check" = "1"; then
       #  the full repository. Avoid that case.
       nfiles=`cd $m && ls -a | wc -w`
       if test $nfiles -gt 2 ; then
-         (cd $m && git diff) >/dev/null 2>&1 ; # XXX need to update submodule index?
+         (cd $m && git diff) >/dev/null 2>&1 ; # XXX hack need to update submodule index?
          modified=`cd $m && git diff-index --name-status HEAD`
          if test "$modified" != ""; then
-            echo "WARNING: submodule contains modified files, will not proceed"
+            echo "ERROR: submodule has modified files, not updating anything"
             echo "... $m"
             echo "$modified" | head
             exit 1
          fi
       else
-         echo "... found uninitialised submodule: $m"
+         echo "... will initialise submodule: $m"
       fi
    done
 fi
