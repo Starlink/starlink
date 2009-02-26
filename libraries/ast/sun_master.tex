@@ -21265,7 +21265,7 @@ is should now be possible to align a SkyFrame with a CmpFrame containing a
 SkyFrame and a SpecFrame (for instance). The returned Mapping produces bad
 values for the extra axes (i.e. for the SpecFrame axis in the above example).
 
-\item The \verb+ast\_link\_adam+ and \verb+ast\_link+ scripts now ignore the 
+\item The ``ast\_link\_adam'' and ``ast\_link'' scripts now ignore the 
 \verb+-fsla+ and \verb+-csla+ options, and always link against the
 minimal cut-down version of SLALIB distributed as part of AST.
 
@@ -21533,11 +21533,11 @@ re-compile all source code that includes ast.h.
 \item New methods astLock and astUnlock allow an AST Object to be locked
 for exclusive use by a thread.
 
--  The TimeFrame class now support Local Time as a time scale. The offset
+\item The TimeFrame class now support Local Time as a time scale. The offset
 from UTC to Local Time is specified by a new TimeFrame attribute called 
 LTOffset.
 
--  The Channel class has a new attribute called Strict which controls
+\item The Channel class has a new attribute called Strict which controls
 whether or not to report an error if unexpected data items are found
 within an AST Object description read from an external data source. Note,
 the default behaviour is now not to report such errors. This differs from

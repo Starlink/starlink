@@ -26858,7 +26858,7 @@ f        .TRUE.
 *     -  An error will be reported if the keyword name does not conform
 *     to FITS requirements.
 c     -  Zero 
-*     -  .FALSE.
+f     -  .FALSE.
 *     is returned as the function value if an error has already occurred, 
 *     or if this function should fail for any reason.
 *--

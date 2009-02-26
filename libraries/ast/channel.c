@@ -4712,7 +4712,7 @@ astMAKE_TEST(Channel,Full,( this->full != -INT_MAX ))
 *     Object from an external data source, report the default time-scale
 *     that is being used.
 *
-*     2 - Report the above, and in addition report any other potentially
+*     3 - Report the above, and in addition report any other potentially
 *     interesting conditions that have no significant effect on the
 *     conversion. For instance, report if a time-scale of "TT"
 *     (terrestrial time) is used in place of "ET" (ephemeris time). This

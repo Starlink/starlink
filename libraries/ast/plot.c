@@ -20534,12 +20534,20 @@ static int ManageLock( AstObject *this_object, int mode, int extra,
    if( !result ) result = (*parent_managelock)( this_object, mode, extra,
                                                 fail, status );
 
-/* Invoke the astManageLock method on any Objects contained within
-   the supplied Object. */
-   if( !result ) result = astManageLock( this->grfcontext, mode, extra,
-                                         fail );
-   if( !result ) result = astManageLock( this->grfcontextID, mode, extra,
-                                         fail );
+/* If defined, ensure the grfcontext KeyMap contained within the Plot is 
+   locked, unlocked or checked. */
+   if( this->grfcontext ) {
+      if( !result ) result = astManageLock( this->grfcontext, mode, extra, fail );
+
+/* Also lock or unlock the associated object handle. */
+      if( mode == AST__LOCK ) {
+         if( !result ) astLock( this->grfcontextID, extra );
+
+      } else if( mode == AST__UNLOCK ) {
+         if( !result ) astUnlock( this->grfcontextID, 0 );
+ 
+      } 
+   }
 
    return result;
 
