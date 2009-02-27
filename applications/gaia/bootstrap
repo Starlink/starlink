@@ -156,13 +156,4 @@ if test -f "bootstrap_timeorder"; then
    done
 fi
 
-#  Bootstrap the GAIA sub-directories that are not managed by automake.
-#  Note only performed on an already configured system (it is important
-#  to do this before committing updates specially a version update).
-for d in gaia gaia3d
-do
-  echo "Additional bootstrap: $d"
-  (cd $d && test -f configure.in && /bin/sh ./bootstrap)
-done
-
 exit 0
