@@ -115,14 +115,16 @@ a standard Starlink install and contain package and version information.
 The file is searched for a version string. This will only work for old
 Starlink installations.
 
-=item 3
+=item 4
 
 If no environment variable C<PROG_DIR> can be found (or the directory
 does not exist), query C<Starlink::Config> for the location of the
 standard Starlink directory and look in file
 
   $STARLINK/manifests/prog
+
 or
+
   $STARLINK/dates/prog_datestamp
 
 for a version string. The Starlink directory will not be searched
@@ -943,7 +945,7 @@ If the request is for a Starlink version the string will not be
 of form "Vm.n-p", but will report the branch name, commit id and
 commit date.
 
- COMMIT => commit identifier (SVN revision number of SHA1 git id)
+ COMMIT => commit identifier (SVN revision number or SHA1 git id)
  COMMITDATE => date of commit (ISO 8601)
 
 =cut
@@ -1035,7 +1037,7 @@ Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
 =head1 COPYRIGHT
 
 Copyright (C) 2000-2005 Particle Physics and Astronomy Research Council.
-Copyright (C) 2007 Science and Technology Facilities Council.
+Copyright (C) 2007, 2009 Science and Technology Facilities Council.
 All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under
