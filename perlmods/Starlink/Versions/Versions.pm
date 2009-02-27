@@ -20,6 +20,7 @@ Starlink::Versions - determine version numbers of Starlink applications
 
  # Print global version number
  print starversion( 'starlink' );
+ print scalar starversion_global();
 
 =head1 DESCRIPTION
 
@@ -56,7 +57,7 @@ use version;
 
 @EXPORT_OK = qw/ 
                  starversion starversion_string starversion_minor
-                 starversion_major starversion_patchlevel
+                 starversion_major starversion_patchlevel starversion_global
                  starversion_cmp starversion_eq starversion_gt starversion_lt
                  starversion_ge starversion_le starversion_vstring
                /;
@@ -65,7 +66,7 @@ use version;
                 'Funcs' => [ @EXPORT_OK ],
                );
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 $DEBUG = 0;
 
 # This is the cache used to store the version numbers 
@@ -207,6 +208,30 @@ sub starversion {
     return ( $version{MAJOR}, $version{MINOR}, $version{PATCHLEVEL} );
   } else {
     return $version{OBJECT};
+  }
+}
+
+=item B<starversion_global>
+
+Returns the global Starlink version for the system.
+
+In list context returns the string representation, the 
+commit ID and the date of that commit.
+
+ ($string, $commit, $commitdate) = starversion_global();
+
+In scalar context returns just the string representation:
+
+  $string = starversion_global();
+
+=cut
+
+sub starversion_global {
+  my %version = _get_version( "starlink" ) or return();
+  if (wantarray) {
+    return ($version{STRING}, $version{COMMIT}, $version{COMMITDATE});
+  } else {
+    return $version{STRING};
   }
 }
 
