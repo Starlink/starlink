@@ -50,6 +50,7 @@ use strict;
 use base qw/ Exporter /;
 use vars qw/ $VERSION @EXPORT_OK $DEBUG %EXPORT_TAGS/;
 
+use DateTime::Format::Strptime;       # To parse ISO dates
 use Symbol;                           # For lexical file handles
 use Starlink::Config qw/ :override /; # For location of root starlink dir
 use File::Spec;                       # For catfile()
@@ -938,8 +939,12 @@ sub _get_global_version {
   }
   if (defined $date) {
     chomp($date);
-    $info{COMMITDATE} = $date;
-    $info{STRING} .= " ($date)";
+    # Git ISO is YYYY-MM-DD HH:MM:SS -1000
+    my $p = DateTime::Format::Strptime->new(pattern => '%Y-%m-%d %H:%M:%S %z',
+                                            time_zone=>'UTC');
+    my $dt = $p->parse_datetime($date);
+    $info{COMMITDATE} = $dt;
+    $info{STRING} .= " (".$dt->datetime.")";
   }
   close($sym);
   return \%info;
@@ -971,7 +976,7 @@ of form "Vm.n-p", but will report the branch name, commit id and
 commit date.
 
  COMMIT => commit identifier (SVN revision number or SHA1 git id)
- COMMITDATE => date of commit (ISO 8601)
+ COMMITDATE => date of commit (DateTime object)
 
 =cut
 

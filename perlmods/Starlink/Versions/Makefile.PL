@@ -6,6 +6,7 @@ WriteMakefile(
     'NAME'      => 'Starlink::Versions',
     'PREREQ_PM' => { 'File::Spec' => 0,
 	'Starlink::Config' => 0,
+        'DateTime::Format::Strptime' => 0,
 	},
     'EXE_FILES' => [ qw/ starversion / ],
     'VERSION_FROM' => 'Versions.pm', # finds $VERSION
