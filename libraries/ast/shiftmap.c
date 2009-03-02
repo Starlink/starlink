@@ -406,7 +406,7 @@ void astInitShiftMapVtab_(  AstShiftMapVtab *vtab, const char *name, int *status
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
@@ -1225,7 +1225,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstShiftMap *new;              /* Pointer to new ShiftMap */
    va_list args;                  /* Variable argument list */
 
@@ -1300,7 +1300,7 @@ AstShiftMap *astShiftMapId_( int ncoord, const double shift[],
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstShiftMap *new;            /* Pointer to new ShiftMap */
    va_list args;                /* Variable argument list */
 
@@ -1532,17 +1532,17 @@ AstShiftMap *astLoadShiftMap_( void *mem, size_t size,
 */
 
 /* Local Constants. */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
    AstShiftMap *new;            /* Pointer to the new ShiftMap */
    char buff[ KEY_LEN + 1 ];    /* Buffer for keyword string */
-   int axis;                    /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(channel);
-
-/* Axis index */
+   int axis;                    /* Axis index */
    int ncoord;                  /* The number of coordinate axes */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* Initialise. */
    new = NULL;

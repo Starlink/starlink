@@ -379,7 +379,7 @@ void astInitRateMapVtab_(  AstRateMapVtab *vtab, const char *name, int *status )
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
@@ -1375,7 +1375,7 @@ AstRateMap *astRateMap_( void *map_void, int ax1, int ax2, const char *options, 
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstRateMap *new;              /* Pointer to new RateMap */
    AstMapping *map;              /* Pointer to Mapping structure */
    va_list args;                 /* Variable argument list */
@@ -1543,18 +1543,19 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstRateMap *new;              /* Pointer to new RateMap */
    AstMapping *map;              /* Pointer to Mapping structure */
    va_list args;                 /* Variable argument list */
 
-/* Initialise. */
-   new = NULL;
+/* Pointer to inherited status value */
+   int *status;                  
 
-   int *status;                  /* Get a pointer to the thread specific global data structure. */
+/* Get a pointer to the thread specific global data structure. */
    astGET_GLOBALS(NULL);
 
-/* Pointer to inherited status value */
+/* Initialise. */
+   new = NULL;
 
 /* Get a pointer to the inherited status value. */
    status = astGetStatusPtr;
@@ -1813,7 +1814,7 @@ AstRateMap *astLoadRateMap_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstRateMap *new;               /* Pointer to the new RateMap */
 
 /* Initialise. */

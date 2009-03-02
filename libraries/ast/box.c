@@ -884,7 +884,7 @@ void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstRegionVtab *region;        /* Pointer to Region component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
@@ -4211,7 +4211,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstBox *new;                  /* Pointer to new Box */
    va_list args;                 /* Variable argument list */
@@ -4292,7 +4292,7 @@ AstBox *astBoxId_( void *frame_void, int form, const double point1[],
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstBox *new;                  /* Pointer to new Box */
    AstRegion *unc;               /* Pointer to Region structure */
@@ -4596,7 +4596,7 @@ AstBox *astLoadBox_( void *mem, size_t size, AstBoxVtab *vtab,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstBox *new;              /* Pointer to the new Box */
 
 /* Initialise. */
@@ -4682,7 +4682,8 @@ AstBox *astLoadBox_( void *mem, size_t size, AstBoxVtab *vtab,
 void astBoxPoints_( AstBox *this, double *centre, double *corner, 
                     int *status) {
    if ( !astOK ) return;
-   return (**astMEMBER(this,Box,BoxPoints))( this, centre, corner, status );
+   (**astMEMBER(this,Box,BoxPoints))( this, centre, corner, status );
+   return;
 }
 
 

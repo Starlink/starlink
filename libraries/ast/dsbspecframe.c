@@ -422,7 +422,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstDSBSpecFrame *this;        /* Pointer to the DSBSpecFrame structure */
    AstMapping *tmap;             /* Ptr to Mapping from topofreq to this */
    const char *result;           /* Pointer value to return */
@@ -720,7 +720,7 @@ static const char *GetLabel( AstFrame *this, int axis, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    const char *result;           /* Pointer to label string */
 
 /* Check the global error status. */
@@ -789,7 +789,7 @@ void astInitDSBSpecFrameVtab_(  AstDSBSpecFrameVtab *vtab, const char *name, int
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstFrameVtab *frame;          /* Pointer to Frame component of Vtab */
 
@@ -2757,7 +2757,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstDSBSpecFrame *new;        /* Pointer to new DSBSpecFrame */
    va_list args;                /* Variable argument list */
 
@@ -2830,7 +2830,7 @@ AstDSBSpecFrame *astDSBSpecFrameId_( const char *options, ... ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstDSBSpecFrame *new;        /* Pointer to new DSBSpecFrame */
    va_list args;                /* Variable argument list */
 
@@ -3045,7 +3045,7 @@ AstDSBSpecFrame *astLoadDSBSpecFrame_( void *mem, size_t size,
 */
 
 /* Local Constants. */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */

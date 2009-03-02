@@ -332,7 +332,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstPointList *this;           /* Pointer to the PointList structure */
    const char *result;           /* Pointer value to return */
    int ival;                     /* Integer attribute value */
@@ -569,7 +569,7 @@ void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstRegionVtab *region;        /* Pointer to Region component of Vtab */
@@ -2992,7 +2992,7 @@ AstPointList *astPointList_( void *frame_void, AstPointSet *points,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstPointList *new;            /* Pointer to new PointList */
    va_list args;                 /* Variable argument list */
@@ -3175,7 +3175,7 @@ f     function is invoked with STATUS set to an error value, or if it
    AstPointList *new;        /* Pointer to new PointList */
    AstPointSet *pset;        /* Pointer to PointSet holding points */
    AstRegion *unc;           /* Pointer to Region structure */
-   astDECLARE_GLOBALS;       /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS        /* Pointer to thread-specific global data */
    const double *q;          /* Pointer to next supplied axis value */
    double **ptr;             /* Pointer to data in pset */
    double *p;                /* Pointer to next PointSet axis value */
@@ -3446,7 +3446,7 @@ AstPointList *astLoadPointList_( void *mem, size_t size, AstPointListVtab *vtab,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstPointList *new;              /* Pointer to the new PointList */
 
 /* Initialise. */
@@ -3528,6 +3528,7 @@ void astPoints_( AstPointList *this, int max_coord, int max_point, double *out,
 }
 void astPointListPoints_( AstPointList *this, AstPointSet **pset, int *status) {
    if ( !astOK ) return;
-   return (**astMEMBER(this,PointList,PointListPoints))( this, pset, status );
+   (**astMEMBER(this,PointList,PointListPoints))( this, pset, status );
+   return;
 }
 

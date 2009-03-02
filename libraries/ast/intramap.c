@@ -658,7 +658,7 @@ void astInitIntraMapVtab_(  AstIntraMapVtab *vtab, const char *name, int *status
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
@@ -822,7 +822,7 @@ static void IntraReg( const char *name, int nin, int nout,
 */
    
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    char *clname;                 /* Pointer to cleaned name string */
    int found;                    /* Transformation function found? */
    int ifun;                     /* Loop counter for function information */
@@ -1475,7 +1475,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstIntraMap *intramap1;       /* Pointer to first IntraMap */
    AstIntraMap *intramap2;       /* Pointer to second IntraMap */
    AstMapping *new;              /* Pointer to replacement Mapping */
@@ -1826,7 +1826,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstIntraMap *this;            /* Pointer to IntraMap structure */
    AstMapping *id;               /* Public ID for the IntraMap supplied */
    AstPointSet *result;          /* Pointer to output PointSet */
@@ -2224,7 +2224,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;            /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS             /* Pointer to thread-specific global data */
    AstIntraMap *this;             /* Pointer to the IntraMap structure */
    const char *sval;              /* Pointer to string value */
    int set;                       /* Attribute value set? */
@@ -2394,7 +2394,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstIntraMap *new;             /* Pointer to new IntraMap */
    va_list args;                 /* Variable argument list */
 
@@ -2470,7 +2470,7 @@ AstIntraMap *astIntraMapId_( const char *name, int nin, int nout,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstIntraMap *new;             /* Pointer to new IntraMap */
    va_list args;                 /* Variable argument list */
 
@@ -2590,7 +2590,7 @@ AstIntraMap *astInitIntraMap_( void *mem, size_t size, int init,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;            /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS             /* Pointer to thread-specific global data */
    AstIntraMap *new;              /* Pointer to new IntraMap */
    char *clname;                  /* Cleaned transformation function name */
    int found;                     /* Transformation function name found? */
@@ -2764,7 +2764,7 @@ AstIntraMap *astLoadIntraMap_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;            /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS             /* Pointer to thread-specific global data */
    AstIntraMap *new;              /* Pointer to the new IntraMap */
    char *author;                  /* Pointer to author's name string */
    char *contact;                 /* Pointer to contact details string */

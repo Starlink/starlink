@@ -1224,7 +1224,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstSpecFrame *this;           /* Pointer to the SpecFrame structure */
    AstStdOfRestType sor;         /* Standard of rest */
    AstSystemType sys;            /* Spectral system */
@@ -1546,7 +1546,7 @@ static const char *GetLabel( AstFrame *this, int axis, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstMapping *map;              /* Mapping between units */
    AstSystemType system;         /* Code identifying type of spectral coordinates */
    char *new_lab;                /* Modified label string */
@@ -1796,7 +1796,7 @@ static const char *GetSymbol( AstFrame *this, int axis, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstMapping *map;              /* Mapping between units */
    AstSystemType system;         /* Code identifying type of sky coordinates */
    char *new_sym;                /* Modified symbol string */
@@ -2046,7 +2046,7 @@ static const char *GetTitle( AstFrame *this_frame, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstSpecFrame *this;           /* Pointer to SpecFrame structure */
    AstStdOfRestType sor;         /* Code identifying standard of rest */
    AstSystemType system;         /* Code identifying type of coordinates */
@@ -2314,7 +2314,7 @@ void astInitSpecFrameVtab_(  AstSpecFrameVtab *vtab, const char *name, int *stat
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrameVtab *frame;          /* Pointer to Frame component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
@@ -6665,7 +6665,7 @@ AstSpecFrame *astSpecFrame_( const char *options, int *status, ...) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMapping *um;               /* Mapping from default to actual units */
    AstSpecFrame *new;            /* Pointer to new SpecFrame */
    AstSystemType s;              /* System */
@@ -6893,19 +6893,20 @@ AstSpecFrame *astLoadSpecFrame_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSpecFrame *new;            /* Pointer to the new SpecFrame */
    char buff[ 20 ];              /* Buffer for item name */
    char *sval;                   /* Pointer to string value */
    double obslat;                /* Value for ObsLat attribute */
    double obslon;                /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(channel);
 
 /* Value for ObsLon attribute */
    int i;                        /* Loop count */
    int j;                        /* Loop count */
    int nc;                       /* String length */
    int sys;                      /* System value */
+
+   astGET_GLOBALS(channel);
 
 /* Initialise. */
    new = NULL;
@@ -7296,17 +7297,15 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMapping *um;               /* Mapping from default to actual units */
    AstSpecFrame *new;            /* Pointer to new SpecFrame */
    AstSystemType s;              /* System */
    const char *u;                /* Units string */
-   va_list args;                 /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(NULL);
-
-/* Variable argument list */
+   va_list args;                 /* Variable argument list */
 
    int *status;                  /* Pointer to inherited status value */
+   astGET_GLOBALS(NULL);         /* Get a pointer to the thread specific global data structure. */
 
 /* Get a pointer to the inherited status value. */
    status = astGetStatusPtr;

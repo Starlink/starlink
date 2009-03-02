@@ -3069,7 +3069,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstPlot3D *this;              /* Pointer to the Plot3D structure */
    const char *result;           /* Pointer value to return */
    double dval;                  /* Floating point attribute value */
@@ -3501,7 +3501,7 @@ void astInitPlot3DVtab_(  AstPlot3DVtab *vtab, const char *name, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstPlotVtab *plot;          /* Pointer to Plot component of Vtab */
    AstFrameSetVtab *fset;      /* Pointer to FrameSet component of Vtab */
    AstMappingVtab *mapping;    /* Pointer to Mapping component of Vtab */
@@ -7342,7 +7342,7 @@ AstPlot3D *astPlot3D_( void *frame_void, const float *graphbox,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstPlot3D *new;               /* Pointer to new Plot3D */
    va_list args;                 /* Variable argument list */
@@ -7805,7 +7805,7 @@ AstPlot3D *astLoadPlot3D_( void *mem, size_t size, AstPlot3DVtab *vtab,
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;      
+   astDECLARE_GLOBALS       
    AstPlot3D *new;
    char key[ KEY_LEN + 1 ];
    char *text;
@@ -8194,7 +8194,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstPlot3D *new;               /* Pointer to new Plot3D */
    va_list args;                 /* Variable argument list */

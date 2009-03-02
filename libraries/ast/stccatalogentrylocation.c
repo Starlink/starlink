@@ -174,7 +174,7 @@ void astInitStcCatalogEntryLocationVtab_(  AstStcCatalogEntryLocationVtab *vtab,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstStcVtab *stc;        /* Pointer to Stc component of Vtab */
 
@@ -398,7 +398,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstRegion *region;            /* Pointer to Region structure */
    AstStcCatalogEntryLocation *new;   /* Pointer to new StcCatalogEntryLocation */
    va_list args;                 /* Variable argument list */
@@ -480,17 +480,16 @@ AstStcCatalogEntryLocation *astStcCatalogEntryLocationId_( void *region_void, in
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstKeyMap **keymaps;            /* Pointer to array of KeyMap pointers */
    AstRegion *region;              /* Pointer to Region structure */
    AstStcCatalogEntryLocation *new;/* Pointer to new StcCatalogEntryLocation */
    int icoord;                     /* Keymap index */
-   va_list args;                   /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(NULL);
-
-/* Variable argument list */
-
+   va_list args;                   /* Variable argument list */
    int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Get a pointer to the inherited status value. */
    status = astGetStatusPtr;
@@ -722,7 +721,7 @@ AstStcCatalogEntryLocation *astLoadStcCatalogEntryLocation_( void *mem, size_t s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstStcCatalogEntryLocation *new;              /* Pointer to the new StcCatalogEntryLocation */
 
 /* Initialise. */

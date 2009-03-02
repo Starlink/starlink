@@ -286,7 +286,7 @@ void astInitNormMapVtab_(  AstNormMapVtab *vtab, const char *name, int *status )
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
@@ -1181,7 +1181,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrame *frame;              /* The Frame pointer */
    AstNormMap *new;              /* Pointer to new NormMap */
    va_list args;                 /* Variable argument list */
@@ -1261,7 +1261,7 @@ AstNormMap *astNormMapId_( void *frame_void, const char *options, ... ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrame *frame;              /* The Frame pointer */
    AstNormMap *new;              /* Pointer to new NormMap */
    va_list args;                 /* Variable argument list */
@@ -1488,7 +1488,7 @@ AstNormMap *astLoadNormMap_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstNormMap *new;              /* Pointer to the new NormMap */
 
 /* Initialise. */

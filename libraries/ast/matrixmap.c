@@ -1233,7 +1233,7 @@ void astInitMatrixMapVtab_(  AstMatrixMapVtab *vtab, const char *name, int *stat
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
@@ -3128,7 +3128,7 @@ static AstMatrixMap *MtrMult( AstMatrixMap *this, AstMatrixMap *a, int *status )
 */
 
 /* Local variables. */
-   astDECLARE_GLOBALS;       /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS        /* Pointer to thread-specific global data */
    AstMatrixMap *new;        /* New MatrixMap holding the product matrix */
    double *a_matrix;         /* Pointer to the forward "a" matrix */
    double *a_row;            /* Pointer to start of current row in "a" */
@@ -4923,7 +4923,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMatrixMap *new;            /* Pointer to new MatrixMap */
    va_list args;                 /* Variable argument list */
 
@@ -4999,7 +4999,7 @@ AstMatrixMap *astMatrixMapId_( int nin, int nout, int form, const double matrix[
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMatrixMap *new;            /* Pointer to new MatrixMap */
    va_list args;                 /* Variable argument list */
    int *status;                  /* Pointer to inherited status value */
@@ -5294,19 +5294,19 @@ AstMatrixMap *astLoadMatrixMap_( void *mem, size_t size,
 
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
 /* Local Variables: */
    AstMatrixMap *new;            /* Pointer to the new MatrixMap */
    char buff[ KEY_LEN + 1 ];     /* Buffer for keyword string */
    const char *form;             /* String form */
-   int def;                      /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(channel);
-
-/* Is the matrix defined? */
+   int def;                      /* Is the matrix defined? */
    int el;                       /* Element index */
    int nel;                      /* No. of elements in the matrix */
    int nin;                      /* No. of input coords */
    int nout;                     /* No. of output coords */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* Initialise. */
    new = NULL;

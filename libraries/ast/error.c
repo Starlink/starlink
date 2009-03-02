@@ -293,7 +293,7 @@ void astAt_( const char *routine, const char *file, int line, int forn,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;            /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS             /* Pointer to thread-specific global data */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -448,7 +448,7 @@ static void EmptyStack( int display, int *status ) {
 */
 
 /* Local variables; */
-   astDECLARE_GLOBALS;        /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS         /* Pointer to thread-specific global data */
    int i;
 
 /* If needed, get a pointer to the thread specific global data structure. */
@@ -532,7 +532,7 @@ void astErrorPublic_( int status_value, const char *fmt, ... ) {
 #define BUFF_LEN 1023            /* Max. length of an error message */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    char buff[ BUFF_LEN + 1 ];    /* Message buffer */
    int *status;                  /* Pointer to inherited status value */
    int imess;                    /* Index into deferred message stack */
@@ -663,7 +663,7 @@ void astError_( int status_value, const char *fmt, int *status, ... ) {
 #define BUFF_LEN 1023            /* Max. length of an error message */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    char buff[ BUFF_LEN + 1 ];    /* Message buffer */
    int imess;                    /* Index into deferred message stack */
    int nc;                       /* Number of characters written */
@@ -765,7 +765,7 @@ int *astGetStatusPtr_(){
    specific data, using the key stored in the global variable
    "starlink_ast_status_key". */
 #if defined(THREAD_SAFE)
-   astDECLARE_GLOBALS;        
+   astDECLARE_GLOBALS         
    AstStatusBlock *sb;
 
    astGET_GLOBALS(NULL);
@@ -855,7 +855,7 @@ c-
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;        /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS         /* Pointer to thread-specific global data */
    int oldval;                /* Original "reporting" value */
 
 /* If needed, get a pointer to the thread specific global data structure. */
@@ -996,14 +996,18 @@ c--
 
 /* Local Variables: */
    int *result;               /* Value to be returned */
-   astDECLARE_GLOBALS;        /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS         /* Pointer to thread-specific global data */
+
+#if defined(THREAD_SAFE)
+       AstStatusBlock *sb = NULL;
+#endif
 
 /* Ensure that the thread-specific status block has been created and
    ininitialised. */
    astGET_GLOBALS(NULL);
 
 #if defined(THREAD_SAFE)
-   AstStatusBlock *sb = (AstStatusBlock *) pthread_getspecific( starlink_ast_status_key );
+   sb = (AstStatusBlock *) pthread_getspecific( starlink_ast_status_key );
    result = sb->status_ptr;
    sb->status_ptr = status_ptr ? status_ptr : &(sb->internal_status);
 #else

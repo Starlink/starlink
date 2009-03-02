@@ -174,7 +174,7 @@ void astInitStcResourceProfileVtab_(  AstStcResourceProfileVtab *vtab, const cha
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstStcVtab *stc;        /* Pointer to Stc component of Vtab */
 
@@ -404,7 +404,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstRegion *region;            /* Pointer to Region structure */
    AstStcResourceProfile *new;   /* Pointer to new StcResourceProfile */
    va_list args;                 /* Variable argument list */
@@ -484,17 +484,15 @@ AstStcResourceProfile *astStcResourceProfileId_( void *region_void, int ncoords,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstKeyMap **keymaps;            /* Pointer to array of KeyMap pointers */
    AstRegion *region;              /* Pointer to Region structure */
    AstStcResourceProfile *new;     /* Pointer to new StcResourceProfile */
    int icoord;                     /* Keymap index */
-   va_list args;                   /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(NULL);
-
-/* Variable argument list */
+   va_list args;                   /* Variable argument list */
 
    int *status;                  /* Pointer to inherited status value */
+   astGET_GLOBALS(NULL);         /* Get a pointer to the thread specific global data structure. */
 
 /* Get a pointer to the inherited status value. */
    status = astGetStatusPtr;
@@ -726,7 +724,7 @@ AstStcResourceProfile *astLoadStcResourceProfile_( void *mem, size_t size, AstSt
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstStcResourceProfile *new;              /* Pointer to the new StcResourceProfile */
 
 /* Initialise. */

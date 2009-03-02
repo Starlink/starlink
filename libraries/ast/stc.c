@@ -1548,7 +1548,7 @@ void astInitStcVtab_(  AstStcVtab *vtab, const char *name, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstRegionVtab *region;        /* Pointer to Region component of Vtab */
@@ -3642,20 +3642,20 @@ AstStc *astLoadStc_( void *mem, size_t size, AstStcVtab *vtab,
 
 
 /* Local Constants: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
    AstFrame *f1;                 /* Base Frame in parent Region */
    AstObject *obj;               /* Pointer to Object retrieved from KeyMap */
-   AstRegion *creg;              /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(channel);
-
-/* Pointer to encapsulated Region */
+   AstRegion *creg;              /* Pointer to encapsulated Region */
    AstStc *new;                  /* Pointer to the new Stc */
    char key[ KEY_LEN + 1 ];      /* Buffer for keyword string */
    int ico;                      /* Loop counter for AstroCoords */
    int ikey;                     /* Index of KeyMap */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* Initialise. */
    new = NULL;

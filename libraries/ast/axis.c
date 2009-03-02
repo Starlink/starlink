@@ -664,7 +664,7 @@ static const char *AxisFormat( AstAxis *this, double value, int *status ) {
 #define ERRBUF_LEN 80
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;          /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS           /* Pointer to thread-specific global data */
    char errbuf[ ERRBUF_LEN ];   /* Buffer for system error message */
    const char *fmt0;            /* Pointer to original Format string */
    const char *fmt;             /* Pointer to parsed Format string */
@@ -1379,7 +1379,7 @@ static const char *GetAxisNormUnit( AstAxis *this, int *status ){
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;       /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS        /* Pointer to thread-specific global data */
    const char *result;       /* Pointer to dynamic memory holding returned text */
    int nc;                   /* Length of normalised Unit string */
 
@@ -1534,7 +1534,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstAxis*this;                 /* Pointer to the Axis structure */
    const char *result;           /* Pointer value to return */
    double dval;                  /* Double attribute value */
@@ -1669,7 +1669,7 @@ static const char *GetDefaultFormat( AstAxis *this, int *status ){
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;        /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS         /* Pointer to thread-specific global data */
 
 /* Check the global error status. */   
    if ( !astOK ) return "";
@@ -1722,7 +1722,7 @@ void astInitAxisVtab_(  AstAxisVtab *vtab, const char *name, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
 /* Check the local error status. */
@@ -2781,7 +2781,7 @@ AstAxis *astAxis_( const char *options, int *status, ...) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstAxis *new;                 /* Pointer to new Axis */
    va_list args;                 /* Variable argument list */
 
@@ -2855,7 +2855,7 @@ AstAxis *astAxisId_( const char *options, ... ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstAxis *new;                 /* Pointer to new Axis */
    va_list args;                 /* Variable argument list */
 
@@ -3073,7 +3073,7 @@ AstAxis *astLoadAxis_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstAxis *new;                 /* Pointer to the new Axis */
 
 /* Initialise. */

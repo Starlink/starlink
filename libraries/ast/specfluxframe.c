@@ -366,7 +366,7 @@ static const char *GetTitle( AstFrame *this_frame, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;          
+   astDECLARE_GLOBALS           
    AstSpecFluxFrame *this;       
    AstSpecFrame *sf;             
    AstFluxFrame *ff;             
@@ -451,7 +451,7 @@ void astInitSpecFluxFrameVtab_(  AstSpecFluxFrameVtab *vtab, const char *name, i
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstFrameVtab *frame;          /* Pointer to Frame component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
@@ -1786,7 +1786,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSpecFluxFrame *new;        /* Pointer to new SpecFluxFrame */
    AstFluxFrame *frame2;         /* Pointer to FluxFrame structure */
    AstSpecFrame *frame1;         /* Pointer to SpecFrame structure */
@@ -1873,7 +1873,7 @@ AstSpecFluxFrame *astSpecFluxFrameId_( void *frame1_void, void *frame2_void,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSpecFluxFrame *new;        /* Pointer to new SpecFluxFrame */
    AstSpecFrame *frame1;         /* Pointer to first Frame structure */
    AstFluxFrame *frame2;         /* Pointer to second Frame structure */
@@ -2095,7 +2095,7 @@ AstSpecFluxFrame *astLoadSpecFluxFrame_( void *mem, size_t size,
 */
 
 /* Local Constants: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */

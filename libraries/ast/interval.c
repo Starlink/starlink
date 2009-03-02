@@ -741,7 +741,7 @@ void astInitIntervalVtab_(  AstIntervalVtab *vtab, const char *name, int *status
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstRegionVtab *region;        /* Pointer to Region component of Vtab */
@@ -4142,7 +4142,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstInterval *new;             /* Pointer to new Interval */
    va_list args;                 /* Variable argument list */
@@ -4223,7 +4223,7 @@ AstInterval *astIntervalId_( void *frame_void, const double lbnd[],
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstInterval *new;             /* Pointer to new Interval */
    AstRegion *unc;               /* Pointer to Region structure */
@@ -4370,7 +4370,7 @@ AstInterval *astInitInterval_( void *mem, size_t size, int init, AstIntervalVtab
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;       /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS        /* Pointer to thread-specific global data */
    AstInterval *new;         /* Pointer to new Interval */
    AstPointSet *pset;        /* PointSet to pass to Region initialiser */
    double **ptr;             /* Pointer to coords data in pset */
@@ -4504,7 +4504,7 @@ AstInterval *astLoadInterval_( void *mem, size_t size, AstIntervalVtab *vtab,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;            /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS             /* Pointer to thread-specific global data */
    AstInterval *new;              /* Pointer to the new Interval */
 
 /* Initialise. */
@@ -4584,7 +4584,8 @@ AstInterval *astLoadInterval_( void *mem, size_t size, AstIntervalVtab *vtab,
 void astIntervalPoints_( AstInterval *this, double *lbnd, double *ubnd, 
                          int *status) {
    if ( !astOK ) return;
-   return (**astMEMBER(this,Interval,IntervalPoints))( this, lbnd, ubnd, status );
+   (**astMEMBER(this,Interval,IntervalPoints))( this, lbnd, ubnd, status );
+   return;
 }
 
 

@@ -947,7 +947,7 @@ void astInitCmpRegionVtab_(  AstCmpRegionVtab *vtab, const char *name, int *stat
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrameVtab *frame;          /* Pointer to Frame component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
@@ -3167,7 +3167,7 @@ AstCmpRegion *astCmpRegion_( void *region1_void, void *region2_void, int oper,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstCmpRegion *new;              /* Pointer to new CmpRegion */
    AstRegion *region1;             /* Pointer to first Region structure */
    AstRegion *region2;             /* Pointer to second Region structure */
@@ -3346,19 +3346,19 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstCmpRegion *new;              /* Pointer to new CmpRegion */
    AstRegion *region1;             /* Pointer to first Region structure */
    AstRegion *region2;             /* Pointer to second Region structure */
    va_list args;                   /* Variable argument list */
+
+   int *status;                  /* Pointer to inherited status value */
 
 /* Get a pointer to the thread specific global data structure. */
    astGET_GLOBALS(NULL);
 
 /* Initialise. */
    new = NULL;
-
-   int *status;                  /* Pointer to inherited status value */
 
 /* Get a pointer to the inherited status value. */
    status = astGetStatusPtr;
@@ -3665,7 +3665,7 @@ AstCmpRegion *astLoadCmpRegion_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstCmpRegion *new;               /* Pointer to the new CmpRegion */
    AstFrame *f1;                    /* Base Frame in parent Region */
    AstRegion *creg;                 /* Pointer to component Region */

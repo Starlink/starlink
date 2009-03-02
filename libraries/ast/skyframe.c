@@ -1100,14 +1100,14 @@ static double CalcLAST( AstSkyFrame *this, double epoch, double obslon,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;/* Declare the thread specific global data */
+   astDECLARE_GLOBALS /* Declare the thread specific global data */
    AstFrameSet *fs;   /* Mapping from TDB offset to LAST offset */
-
-/* Check the global error status. */
-   if ( !astOK ) return AST__BAD;
 
 /* Get a pointer to the structure holding thread-specific global data. */   
    astGET_GLOBALS(this);
+
+/* Check the global error status. */
+   if ( !astOK ) return AST__BAD;
 
 /* If not yet done, create two TimeFrames. Note, this is done here 
    rather than in astInitSkyFrameVtab in order to avoid infinite vtab
@@ -2129,7 +2129,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
    const char *cval;             /* Pointer to character attribute value */
    const char *result;           /* Pointer value to return */
@@ -2775,7 +2775,7 @@ static const char *GetFormat( AstFrame *this_frame, int axis, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstAxis *ax;                  /* Pointer to Axis object */
    AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
    const char *result;           /* Pointer value to return */
@@ -2954,7 +2954,7 @@ static const char *GetLabel( AstFrame *this, int axis, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstSystemType system;         /* Code identifying type of sky coordinates */
    const char *result;           /* Pointer to label string */
    int axis_p;                   /* Permuted axis index */
@@ -3445,7 +3445,7 @@ static const char *GetSymbol( AstFrame *this, int axis, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstSystemType system;         /* Code identifying type of sky coordinates */
    const char *result;           /* Pointer to symbol string */
    int axis_p;                   /* Permuted axis index */
@@ -3687,7 +3687,7 @@ static const char *GetTitle( AstFrame *this_frame, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstSkyFrame *this;            /* Pointer to SkyFrame structure */
    AstSystemType system;         /* Code identifying type of sky coordinates */
    const char *extra;            /* Pointer to extra information */
@@ -4038,7 +4038,7 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name, int *status
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrameVtab *frame;          /* Pointer to Frame component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    int stat;                     /* SLALIB status */
@@ -10377,7 +10377,7 @@ AstSkyFrame *astSkyFrame_( const char *options, int *status, ...) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSkyFrame *new;             /* Pointer to new SkyFrame */
    va_list args;                 /* Variable argument list */
 
@@ -10601,7 +10601,7 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSkyFrame *new;             /* Pointer to the new SkyFrame */
    char *sval;                   /* Pointer to string value */
    double dval;                  /* Floating point attribute value */
@@ -10989,7 +10989,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSkyFrame *new;             /* Pointer to new SkyFrame */
    va_list args;                 /* Variable argument list */
 

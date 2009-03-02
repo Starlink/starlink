@@ -728,7 +728,7 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstObject *aval;              /* AstObject pointer value */
    const char *cval;             /* Pointer to string value */ 
    const char *cvalue;           /* Pointer to output string value */ 
@@ -1810,7 +1810,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstKeyMap *this;              /* Pointer to the KeyMap structure */
    const char *result;           /* Pointer value to return */
    int ival;                     /* Attribute value */
@@ -2227,7 +2227,7 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
 /* Check the local error status. */
@@ -2595,7 +2595,7 @@ f     reason.
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    const char *result;           /* Pointer value to return */
    const char *value;            /* Pointer to key value */
    int i;                        /* Loop counter for initialisation */
@@ -5487,7 +5487,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstKeyMap *new;                 /* Pointer to new KeyMap */
    va_list args;                /* Variable argument list */
 
@@ -5559,7 +5559,7 @@ AstKeyMap *astKeyMapId_( const char *options, ... ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstKeyMap *new;                 /* Pointer to new KeyMap */
    va_list args;                /* Variable argument list */
 
@@ -5771,15 +5771,12 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
-   AstKeyMap *new;              /* Pointer to the new KeyMap */
+   astDECLARE_GLOBALS        /* Pointer to thread-specific global data */
+   AstKeyMap *new;           /* Pointer to the new KeyMap */
    AstObject **alist;        /* Pointer to vector of entry values */
    AstObject *aval;          /* AST Object value for an entry */
    char buff[ 30 ];          /* Buffer for key names */
-   char *key;                /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(channel);
-
-/* Pointer to key string for an entry */
+   char *key;                /* Pointer to key string for an entry */
    char *com;                /* Pointer to comment string for an entry */
    const char **slist;       /* Pointer to vector of entry values */
    char *sval;               /* String value for an entry */
@@ -5793,6 +5790,9 @@ AstKeyMap *astLoadKeyMap_( void *mem, size_t size, AstKeyMapVtab *vtab,
    int nentry;               /* Number of KeyMap entries read so far */
    int mapsize;              /* Size for new hash table */
    int type;                 /* Data type for an entry */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* Initialise. */
    new = NULL;

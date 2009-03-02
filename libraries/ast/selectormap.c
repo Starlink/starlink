@@ -376,7 +376,7 @@ void astInitSelectorMapVtab_(  AstSelectorMapVtab *vtab, const char *name, int *
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
@@ -1239,7 +1239,7 @@ AstSelectorMap *astSelectorMap_( int nreg, void **regs_void, double badval,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSelectorMap *new;          /* Pointer to new SelectorMap */
    AstRegion **regs;             /* Array of Region pointers */
    int i;                        /* Region index */
@@ -1421,19 +1421,19 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSelectorMap *new;          /* Pointer to new SelectorMap */
    AstRegion **regs;             /* Array of Region pointers */
    int i;                        /* Region index */
    va_list args;                 /* Variable argument list */
+
+   int *status;                  /* Pointer to inherited status value */
 
 /* Get a pointer to the thread specific global data structure. */
    astGET_GLOBALS(NULL);
 
 /* Initialise. */
    new = NULL;
-
-   int *status;                  /* Pointer to inherited status value */
 
 /* Get a pointer to the inherited status value. */
    status = astGetStatusPtr;
@@ -1714,7 +1714,7 @@ AstSelectorMap *astLoadSelectorMap_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSelectorMap *new;               
    AstFrameSet *fs;
    AstRegion *reg;

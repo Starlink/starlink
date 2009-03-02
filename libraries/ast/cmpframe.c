@@ -305,7 +305,7 @@ static void Clear##attribute( AstFrame *this_frame, int axis, int *status ) { \
 /* Define the macro. */
 #define MAKE_GET(attribute,type,bad_value,default,assign_default) \
 static type Get##attribute( AstFrame *this_frame, int axis, int *status ) { \
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */ \
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */ \
    AstCmpFrame *this;            /* Pointer to CmpFrame structure */ \
    AstFrame *frame;              /* Pointer to Frame containing axis */\
    int axis_p;                   /* Permuted axis index */ \
@@ -2659,7 +2659,7 @@ static const char *GetDomain( AstFrame *this_frame, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstCmpFrame *this;            /* Pointer to CmpFrame structure */
    char *dom1;                   /* Pointer to first sub domain */
    char *dom2;                   /* Pointer to second sub domain */
@@ -3389,7 +3389,7 @@ static const char *GetTitle( AstFrame *this_frame, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstCmpFrame *this;            /* Pointer to CmpFrame structure */
    const char *result;           /* Pointer value to return */
 
@@ -3615,7 +3615,7 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name, int *status
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstFrameVtab *frame;          /* Pointer to Frame component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
@@ -6228,7 +6228,7 @@ static int QsortCmpAxes( const void *a, const void *b ) {
 */
 
 /* Local Variables. */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    int result;                   /* Result value to return */
    int val_a;                    /* First axis index */
    int val_b;                    /* Second axis index */
@@ -6294,7 +6294,7 @@ static void RenumberAxes( int naxes, int axes[], int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    int *work;                    /* Pointer to workspace array */
    int i;                        /* Loop counter */
 
@@ -9098,7 +9098,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstCmpFrame *new;             /* Pointer to new CmpFrame */
    AstFrame *frame1;             /* Pointer to first Frame structure */
    AstFrame *frame2;             /* Pointer to second Frame structure */
@@ -9185,7 +9185,7 @@ AstCmpFrame *astCmpFrameId_( void *frame1_void, void *frame2_void,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstCmpFrame *new;             /* Pointer to new CmpFrame */
    AstFrame *frame1;             /* Pointer to first Frame structure */
    AstFrame *frame2;             /* Pointer to second Frame structure */
@@ -9425,17 +9425,17 @@ AstCmpFrame *astLoadCmpFrame_( void *mem, size_t size,
 */
 
 /* Local Constants: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
    AstCmpFrame *new;             /* Pointer to the new CmpFrame */
    char key[ KEY_LEN + 1 ];      /* Buffer for keywords */
-   int axis;                     /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(channel);
-
-/* Loop counter for axes */
+   int axis;                     /* Loop counter for axes */
    int naxes;                    /* Number of CmpFrame axes */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* Initialise. */
    new = NULL;

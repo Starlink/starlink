@@ -174,7 +174,7 @@ void astInitStcSearchLocationVtab_( AstStcSearchLocationVtab *vtab, const char *
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMappingVtab *mapping;  /* Pointer to Mapping component of Vtab */
    AstStcVtab *stc;          /* Pointer to Stc component of Vtab */
 
@@ -402,7 +402,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstRegion *region;            /* Pointer to Region structure */
    AstStcSearchLocation *new;    /* Pointer to new StcSearchLocation */
    va_list args;                 /* Variable argument list */
@@ -482,17 +482,16 @@ AstStcSearchLocation *astStcSearchLocationId_( void *region_void, int ncoords,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstKeyMap **keymaps;            /* Pointer to array of KeyMap pointers */
    AstRegion *region;              /* Pointer to Region structure */
    AstStcSearchLocation *new;      /* Pointer to new StcSearchLocation */
    int icoord;                     /* Keymap index */
-   va_list args;                   /* Get a pointer to the thread specific global data structure. */
+   va_list args;                   /* Variable argument list */
+   int *status;                    /* Pointer to inherited status value */
+
+   /* Get a pointer to the thread specific global data structure. */
    astGET_GLOBALS(NULL);
-
-/* Variable argument list */
-
-   int *status;                  /* Pointer to inherited status value */
 
 /* Get a pointer to the inherited status value. */
    status = astGetStatusPtr;
@@ -724,7 +723,7 @@ AstStcSearchLocation *astLoadStcSearchLocation_( void *mem, size_t size, AstStcS
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstStcSearchLocation *new;              /* Pointer to the new StcSearchLocation */
 
 /* Initialise. */

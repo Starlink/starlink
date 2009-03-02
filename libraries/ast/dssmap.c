@@ -783,7 +783,7 @@ void astInitDssMapVtab_(  AstDssMapVtab *vtab, const char *name, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
@@ -1563,7 +1563,7 @@ AstDssMap *astDssMap_( void *fits_void, const char *options, int *status, ...) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFitsChan *fits;            /* Pointer to supplied FitsChan */
    AstDssMap *new;               /* Pointer to new DssMap */
    va_list args;                 /* Variable argument list */
@@ -1796,7 +1796,7 @@ AstDssMap *astLoadDssMap_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstDssMap *new;              /* Pointer to the new DssMap */
    char name_buff[ 11 ];        /* Buffer for item name */
    int i;                       /* Coefficient index */

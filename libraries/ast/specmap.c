@@ -1853,7 +1853,7 @@ void astInitSpecMapVtab_(  AstSpecMapVtab *vtab, const char *name, int *status )
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
@@ -4116,7 +4116,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSpecMap *new;              /* Pointer to the new SpecMap */
    va_list args;                 /* Variable argument list */
 
@@ -4188,7 +4188,7 @@ AstSpecMap *astSpecMapId_( int nin, int flags, const char *options, ... ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSpecMap *new;              /* Pointer to the new SpecMap */
    va_list args;                 /* Variable argument list */
 
@@ -4415,16 +4415,13 @@ AstSpecMap *astLoadSpecMap_( void *mem, size_t size,
 */
 
 /* Local Constants: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
    AstSpecMap *new;              /* Pointer to the new SpecMap */
    char *sval;                   /* Pointer to string value */
-   char key[ KEY_LEN + 1 ];      /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(channel);
-
-/* Buffer for keyword string */
+   char key[ KEY_LEN + 1 ];      /* Buffer for keyword string */
    const char *argdesc[ MAX_ARGS ]; /* Pointers to argument descriptions */
    const char *comment;          /* Pointer to comment string */
    int argdec;                   /* Index of DEC argument */
@@ -4433,6 +4430,9 @@ AstSpecMap *astLoadSpecMap_( void *mem, size_t size,
    int icvt;                     /* Loop counter for conversion steps */
    int nargs;                    /* Number of user-supplied arguments */
    int szargs;                   /* Number of stored arguments */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* Initialise. */
    new = NULL;

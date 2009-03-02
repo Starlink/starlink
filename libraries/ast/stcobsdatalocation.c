@@ -267,7 +267,7 @@ void astInitStcObsDataLocationVtab_(  AstStcObsDataLocationVtab *vtab, const cha
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstStcVtab *stc;        /* Pointer to Stc component of Vtab */
@@ -635,7 +635,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstRegion *region;            /* Pointer to Region structure */
    AstStcObsDataLocation *new;   /* Pointer to new StcObsDataLocation */
    va_list args;                 /* Variable argument list */
@@ -717,17 +717,17 @@ AstStcObsDataLocation *astStcObsDataLocationId_( void *region_void, int ncoords,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstKeyMap **keymaps;            /* Pointer to array of KeyMap pointers */
    AstRegion *region;              /* Pointer to Region structure */
    AstStcObsDataLocation *new;     /* Pointer to new StcObsDataLocation */
    int icoord;                     /* Keymap index */
-   va_list args;                   /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(NULL);
-
-/* Variable argument list */
+   va_list args;                   /* Variable argument list */
 
    int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Get a pointer to the inherited status value. */
    status = astGetStatusPtr;
@@ -964,7 +964,7 @@ AstStcObsDataLocation *astLoadStcObsDataLocation_( void *mem, size_t size, AstSt
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstStcObsDataLocation *new;              /* Pointer to the new StcObsDataLocation */
 
 /* Initialise. */

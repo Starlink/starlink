@@ -272,7 +272,7 @@ void astInitNullRegionVtab_(  AstNullRegionVtab *vtab, const char *name, int *st
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstRegionVtab *region;        /* Pointer to Region component of Vtab */
 
@@ -1700,7 +1700,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstNullRegion *new;           /* Pointer to new NullRegion */
    va_list args;                 /* Variable argument list */
@@ -1778,7 +1778,7 @@ AstNullRegion *astNullRegionId_( void *frame_void, void *unc_void,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstNullRegion *new;           /* Pointer to new NullRegion */
    AstRegion *unc;               /* Pointer to Region structure */
@@ -2002,7 +2002,7 @@ AstNullRegion *astLoadNullRegion_( void *mem, size_t size, AstNullRegionVtab *vt
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstNullRegion *new;              /* Pointer to the new NullRegion */
 
 /* Initialise. */

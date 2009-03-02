@@ -1674,7 +1674,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;          /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS           /* Pointer to thread-specific global data */
    AstWcsMap *this;             /* Pointer to the WcsMap structure */
    const char *result;          /* Pointer value to return */
    double dval;                 /* Floating point attribute value */
@@ -2292,7 +2292,7 @@ void astInitWcsMapVtab_(  AstWcsMapVtab *vtab, const char *name, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
@@ -5213,7 +5213,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstWcsMap *new;               /* Pointer to new WcsMap */
    va_list args;                 /* Variable argument list */
 
@@ -5288,7 +5288,7 @@ AstWcsMap *astWcsMapId_( int ncoord, int type, int lonax, int latax,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstWcsMap *new;               /* Pointer to new WcsMap */
    va_list args;                 /* Variable argument list */
    int *status;                  /* Pointer to inherited status value */
@@ -5577,20 +5577,20 @@ AstWcsMap *astLoadWcsMap_( void *mem, size_t size,
 
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
 /* Local Variables: */
    const PrjData *prjdata;      /* Information about the projection */
    AstWcsMap *new;              /* Pointer to the new WcsMap */
    char *text;                  /* Textual form of an integer value */
-   char buff[ KEY_LEN + 1 ];    /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(channel);
-
-/* Buffer for keyword string */
+   char buff[ KEY_LEN + 1 ];    /* Buffer for keyword string */
    double pv;                   /* Projection parameter */
    int axis;                    /* Axis index */
    int i;                       /* Axis index */
    int m;                       /* Parameter index */
    int mxpar;                   /* Maximum number of PVi_m values */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* Initialise. */
    new = NULL;

@@ -3846,7 +3846,7 @@ const char *astFmtDecimalYr_( double year, int digits, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    const char *result;           /* Pointer value to return */
    int nc;                       /* Number of characters in buffer */
 
@@ -4184,7 +4184,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstAxis *ax;                  /* Pointer to Axis */
    AstFrame *pfrm;               /* Pointer to primary Frame containing axis */
    AstFrame *this;               /* Pointer to the Frame structure */
@@ -4753,7 +4753,7 @@ static const char *GetDefaultLabel( int axis, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
 
 /* Get a pointer to the structure holding thread-specific global data. */   
    astGET_GLOBALS(NULL);
@@ -4802,7 +4802,7 @@ static const char *GetDefaultSymbol( AstFrame *this, int axis, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
 
 /* Get a pointer to the structure holding thread-specific global data. */   
    astGET_GLOBALS(this);
@@ -4859,7 +4859,7 @@ static const char *GetDefaultTitle( AstFrame *this, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
 
 /* Get a pointer to the structure holding thread-specific global data. */   
    astGET_GLOBALS(this);
@@ -5239,7 +5239,7 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
@@ -13037,7 +13037,7 @@ AstFrame *astFrame_( int naxes, const char *options, int *status, ...) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrame *new;                /* Pointer to new Frame */
    va_list args;                 /* Variable argument list */
 
@@ -13302,19 +13302,19 @@ AstFrame *astLoadFrame_( void *mem, size_t size,
 */
 
 /* Local Constants: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
    AstFrame *new;                /* Pointer to the new Frame */
    char *sval;                   /* Pointer to string value */
-   char key[ KEY_LEN + 1 ];      /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(channel);
-
-/* Buffer for keywords */
+   char key[ KEY_LEN + 1 ];      /* Buffer for keywords */
    double dval;                  /* DOuble attribute value */
    int axis;                     /* Loop counter for axes */
    int ival;                     /* Integer value */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* Initialise. */
    new = NULL;
@@ -13960,7 +13960,7 @@ f     reason.
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Thread-specific global data */
+   astDECLARE_GLOBALS            /* Thread-specific global data */
    const char *fvalue;           /* Pointer to formatted value */
    const char *result;           /* Pointer value to return */
    int i;                        /* Loop counter for initialisation */
@@ -14122,7 +14122,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrame *new;                /* Pointer to new Frame */
    va_list args;                 /* Variable argument list */
 

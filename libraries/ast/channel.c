@@ -696,7 +696,7 @@ static void ClearValues( AstChannel *this, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstChannelValue **head;       /* Address of pointer to values list */
    AstChannelValue *value;       /* Pointer to value list element */
 
@@ -872,7 +872,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstChannel *this;             /* Pointer to the Channel structure */
    const char *result;           /* Pointer value to return */
    int comment;                  /* Comment attribute value */
@@ -1731,7 +1731,7 @@ void astInitChannelVtab_(  AstChannelVtab *vtab, const char *name, int *status )
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
 /* Check the local error status. */
@@ -1978,7 +1978,7 @@ static AstChannelValue *LookupValue( const char *name, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstChannelValue **head;       /* Address of head of list pointer */
    AstChannelValue *result;      /* Pointer value to return */
    AstChannelValue *value;       /* Pointer to list element */
@@ -2062,7 +2062,7 @@ static void OutputTextItem( AstChannel *this, const char *line, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -2255,7 +2255,7 @@ f     is invoked with STATUS set to an error value, or if it should fail
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstLoaderType *loader;        /* Pointer to loader for Object */
    AstObject *new;               /* Pointer to new Object */
    char *class;                  /* Pointer to Object class name string */
@@ -2450,7 +2450,7 @@ static void ReadClassData( AstChannel *this, const char *class, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstObject *object;            /* Pointer to new Object */
    AstChannelValue *value;       /* Pointer to Value structure */
    char *name;                   /* Pointer to data item name string */
@@ -3752,7 +3752,7 @@ static void WriteBegin( AstChannel *this, const char *class,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    char *line;                   /* Pointer to dynamic output string */
    int i;                        /* Loop counter for indentation characters */
    int nc;                       /* Number of output characters */
@@ -3884,7 +3884,7 @@ static void WriteDouble( AstChannel *this, const char *name,
 #define BUFF_LEN 100             /* Size of local formatting buffer */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    char *line;                   /* Pointer to dynamic output string */
    char buff[ BUFF_LEN + 1 ];    /* Local formatting buffer */
    int i;                        /* Loop counter for indentation characters */
@@ -3974,7 +3974,7 @@ static void WriteEnd( AstChannel *this, const char *class, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    char *line;                   /* Pointer to dynamic output string */
    int i;                        /* Loop counter for indentation characters */
    int nc;                       /* Number of output characters */
@@ -4098,7 +4098,7 @@ static void WriteInt( AstChannel *this, const char *name, int set, int helpful,
 #define BUFF_LEN 50              /* Size of local formatting buffer */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    char *line;                   /* Pointer to dynamic output string */
    char buff[ BUFF_LEN + 1 ];    /* Local formatting buffer */
    int i;                        /* Loop counter for indentation characters */
@@ -4228,7 +4228,7 @@ static void WriteIsA( AstChannel *this, const char *class,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    char *line;                   /* Pointer to dynamic output string */
    int i;                        /* Loop counter for indentation characters */
    int nc;                       /* Number of output characters */
@@ -4364,7 +4364,7 @@ static void WriteObject( AstChannel *this, const char *name,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    char *line;                   /* Pointer to dynamic output string */
    int i;                        /* Loop counter for indentation characters */
    int nc;                       /* Number of output characters */
@@ -4507,7 +4507,7 @@ static void WriteString( AstChannel *this, const char *name,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    char *line;                   /* Pointer to dynamic output string */
    int i;                        /* Loop counter for characters */
    int nc;                       /* Number of output characters */
@@ -5125,7 +5125,7 @@ AstChannel *astChannel_( const char *(* source)( void ),
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstChannel *new;              /* Pointer to new Channel */
    va_list args;                 /* Variable argument list */
 
@@ -5310,7 +5310,7 @@ f     pointer.
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstChannel *new;              /* Pointer to new Channel */
    va_list args;                 /* Variable argument list */
 
@@ -5494,7 +5494,7 @@ AstChannel *astChannelForId_( const char *(* source)( void ),
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstChannel *new;              /* Pointer to new Channel */
    va_list args;                 /* Variable argument list */
    int *status;                  /* Pointer to inherited status value */
@@ -5610,7 +5610,7 @@ AstChannel *astLoadChannel_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstChannel *new;              /* Pointer to the new Channel */
 
 /* Initialise. */
@@ -5841,7 +5841,7 @@ void astAddWarning_( void *this_void, int level, const char *fmt,
    included. Also store pointer to channel data in a thread-specific global 
    variable. */
 int astWrite_( AstChannel *this, AstObject *object, int *status ) {
-   astDECLARE_GLOBALS;           
+   astDECLARE_GLOBALS            
    if ( !astOK ) return 0;
    astGET_GLOBALS(this);
    nwrite_invoc++;
@@ -5857,7 +5857,7 @@ int astWrite_( AstChannel *this, AstObject *object, int *status ) {
    global variable. */
 void astWriteObject_( AstChannel *this, const char *name, int set,
                       int helpful, AstObject *value, const char *comment, int *status ) {
-   astDECLARE_GLOBALS;           
+   astDECLARE_GLOBALS            
    if ( !astOK ) return;
    astGET_GLOBALS(this);
    nwrite_invoc--;

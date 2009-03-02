@@ -491,7 +491,7 @@ void astInitEllipseVtab_(  AstEllipseVtab *vtab, const char *name, int *status )
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstRegionVtab *region;        /* Pointer to Region component of Vtab */
 
@@ -2113,7 +2113,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstEllipse *new;              /* Pointer to new Ellipse */
    va_list args;                 /* Variable argument list */
@@ -2196,7 +2196,7 @@ AstEllipse *astEllipseId_( void *frame_void, int form, const double centre[2],
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstEllipse *new;              /* Pointer to new Ellipse */
    AstRegion *unc;               /* Pointer to Region structure */
@@ -2538,7 +2538,7 @@ AstEllipse *astLoadEllipse_( void *mem, size_t size, AstEllipseVtab *vtab,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstEllipse *new;              /* Pointer to the new Ellipse */
 
 /* Initialise. */

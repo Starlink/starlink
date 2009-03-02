@@ -808,7 +808,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstGrismMap *this;            /* Pointer to the GrismMap structure */
    const char *result;           /* Pointer value to return */
    double dval;                  /* Attribute value */
@@ -933,7 +933,7 @@ void astInitGrismMapVtab_(  AstGrismMapVtab *vtab, const char *name, int *status
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
@@ -2117,7 +2117,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstGrismMap *new;             /* Pointer to new GrismMap */
    va_list args;                 /* Variable argument list */
 
@@ -2193,7 +2193,7 @@ AstGrismMap *astGrismMapId_( const char *options, ... ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstGrismMap *new;             /* Pointer to new GrismMap */
    va_list args;                 /* Variable argument list */
 
@@ -2417,7 +2417,7 @@ AstGrismMap *astLoadGrismMap_( void *mem, size_t size,
 */
 
 /* Local Constants: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */

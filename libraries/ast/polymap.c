@@ -460,7 +460,7 @@ void astInitPolyMapVtab_(  AstPolyMapVtab *vtab, const char *name, int *status )
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
@@ -1499,7 +1499,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;         /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS          /* Pointer to thread-specific global data */
    AstPolyMap *new;            /* Pointer to new PolyMap */
    va_list args;               /* Variable argument list */
 
@@ -1576,7 +1576,7 @@ AstPolyMap *astPolyMapId_( int nin, int nout, int ncoeff_f, const double coeff_f
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstPolyMap *new;              /* Pointer to new PolyMap */
    va_list args;                 /* Variable argument list */
    int *status;                  /* Pointer to inherited status value */
@@ -2026,20 +2026,20 @@ AstPolyMap *astLoadPolyMap_( void *mem, size_t size,
 
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
 /* Local Variables: */
    AstPolyMap *new;              /* Pointer to the new PolyMap */
    char buff[ KEY_LEN + 1 ];     /* Buffer for keyword string */
    int i;                        /* Loop index */
-   int iv;                       /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(channel);
-
-/* Vectorised keyword index */
+   int iv;                       /* Vectorised keyword index */
    int j;                        /* Loop index */
    int k;                        /* Loop index */
    int nin;                      /* No. of input coords */
    int nout;                     /* No. of output coords */
    int undef;                    /* Is the transformation undefined? */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* Initialise. */
    new = NULL;

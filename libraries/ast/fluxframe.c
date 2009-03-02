@@ -905,7 +905,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstFluxFrame *this;           /* Pointer to the FluxFrame structure */
    const char *result;           /* Pointer value to return */
    double dval;                  /* Attribute value */
@@ -1152,7 +1152,7 @@ static const char *GetLabel( AstFrame *this, int axis, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstMapping *map;              /* Mapping between units */
    AstSystemType system;         /* Code identifying type of flux coordinates */
    char *new_lab;                /* Modified label string */
@@ -1323,7 +1323,7 @@ static const char *GetSymbol( AstFrame *this, int axis, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstMapping *map;              /* Mapping between units */
    AstSystemType system;         /* Code identifying type of sky coordinates */
    char *new_sym;                /* Modified symbol string */
@@ -1596,7 +1596,7 @@ static const char *GetTitle( AstFrame *this_frame, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstFluxFrame *this;           /* Pointer to FluxFrame structure */
    AstSpecFrame *sf;             /* Pointer to SpecFrame structure */
    const char *result;           /* Pointer to result string */
@@ -1763,7 +1763,7 @@ void astInitFluxFrameVtab_(  AstFluxFrameVtab *vtab, const char *name, int *stat
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrameVtab *frame;          /* Pointer to Frame component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
@@ -3917,7 +3917,7 @@ AstFluxFrame *astFluxFrame_( double specval, void *specfrm_void,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMapping *um;               /* Mapping from default to actual units */
    AstFluxFrame *new;            /* Pointer to new FluxFrame */
    AstSpecFrame *sfrm;           /* Pointer to SpecFrame */
@@ -4153,16 +4153,17 @@ AstFluxFrame *astLoadFluxFrame_( void *mem, size_t size, AstFluxFrameVtab *vtab,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFluxFrame *new;            /* Pointer to the new FluxFrame */
    char buff[ 20 ];              /* Buffer for item name */
    char *sval;                   /* Pointer to string value */
    int i;                        /* Loop count */
    int j;                        /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(channel);
 
 /* Loop count */
    int sys;                      /* System value */
+
+   astGET_GLOBALS(channel);
 
 /* Initialise. */
    new = NULL;
@@ -4417,18 +4418,18 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMapping *um;               /* Mapping from default to actual units */
    AstFluxFrame *new;            /* Pointer to new FluxFrame */
    AstSpecFrame *sfrm;           /* Pointer to SpecFrame */
    AstSystemType s;              /* System */
-   const char *u;                /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(NULL);
-
-/* Units string */
+   const char *u;                /* Units string */
    va_list args;                 /* Variable argument list */
 
    int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Get a pointer to the inherited status value. */
    status = astGetStatusPtr;

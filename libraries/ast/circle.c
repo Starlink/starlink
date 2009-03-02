@@ -320,7 +320,7 @@ void astInitCircleVtab_(  AstCircleVtab *vtab, const char *name, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstRegionVtab *region;        /* Pointer to Region component of Vtab */
 
@@ -1872,7 +1872,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstCircle *new;               /* Pointer to new Circle */
    va_list args;                 /* Variable argument list */
@@ -1953,7 +1953,7 @@ AstCircle *astCircleId_( void *frame_void, int form, const double centre[],
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstCircle *new;               /* Pointer to new Circle */
    AstRegion *unc;               /* Pointer to Region structure */
@@ -2270,7 +2270,7 @@ AstCircle *astLoadCircle_( void *mem, size_t size, AstCircleVtab *vtab,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstCircle *new;              /* Pointer to the new Circle */
 
 /* Initialise. */

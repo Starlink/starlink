@@ -3583,7 +3583,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMathMap *this;             /* Pointer to the MathMap structure */
    const char *result;           /* Pointer value to return */
    int ival;                     /* Integer attribute value */
@@ -3680,7 +3680,7 @@ void astInitMathMapVtab_(  AstMathMapVtab *vtab, const char *name, int *status )
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
@@ -6154,7 +6154,7 @@ AstMathMap *astMathMap_( int nin, int nout,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMathMap *new;              /* Pointer to new MathMap */
    va_list args;                 /* Variable argument list */
 
@@ -6923,7 +6923,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMathMap *new;              /* Pointer to new MathMap */
    va_list args;                 /* Variable argument list */
 
@@ -7258,19 +7258,19 @@ AstMathMap *astLoadMathMap_( void *mem, size_t size,
 */
 
 /* Local Constants: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
    AstMathMap *new;              /* Pointer to the new MathMap */
    char key[ KEY_LEN + 1 ];      /* Buffer for keyword strings */
-   int ifun;                     /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(channel);
-
-/* Loop counter for functions */
+   int ifun;                     /* Loop counter for functions */
    int invert;                   /* Invert attribute value */
    int nin;                      /* True number of input coordinates */
    int nout;                     /* True number of output coordinates */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* Initialise. */
    new = NULL;

@@ -1041,7 +1041,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstPcdMap *this;              /* Pointer to the PcdMap structure */
    const char *result;           /* Pointer value to return */
    double dval;                  /* Double attribute value */
@@ -1145,7 +1145,7 @@ void astInitPcdMapVtab_(  AstPcdMapVtab *vtab, const char *name, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
@@ -2800,7 +2800,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstPcdMap *new;              /* Pointer to new PcdMap */
    va_list args;                /* Variable argument list */
 
@@ -2875,7 +2875,7 @@ AstPcdMap *astPcdMapId_( double disco, const double pcdcen[2],
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstPcdMap *new;              /* Pointer to new PcdMap */
    va_list args;                /* Variable argument list */
 
@@ -3098,7 +3098,7 @@ AstPcdMap *astLoadPcdMap_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstPcdMap *new;              /* Pointer to the new PcdMap */
 
 /* Initialise. */

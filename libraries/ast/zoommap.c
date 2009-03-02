@@ -378,7 +378,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;          /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS           /* Pointer to thread-specific global data */
    AstZoomMap *this;             /* Pointer to the ZoomMap structure */
    const char *result;           /* Pointer value to return */
    double zoom;                  /* Zoom attribute value */
@@ -488,7 +488,7 @@ void astInitZoomMapVtab_(  AstZoomMapVtab *vtab, const char *name, int *status )
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
@@ -1667,7 +1667,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstZoomMap *new;              /* Pointer to new ZoomMap */
    va_list args;                 /* Variable argument list */
 
@@ -1742,7 +1742,7 @@ AstZoomMap *astZoomMapId_( int ncoord, double zoom,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstZoomMap *new;              /* Pointer to new ZoomMap */
    va_list args;                 /* Variable argument list */
 
@@ -1974,7 +1974,7 @@ AstZoomMap *astLoadZoomMap_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstZoomMap *new;              /* Pointer to the new ZoomMap */
 
 /* Initialise. */

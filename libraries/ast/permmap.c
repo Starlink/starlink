@@ -585,7 +585,7 @@ void astInitPermMapVtab_(  AstPermMapVtab *vtab, const char *name, int *status )
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
@@ -2362,7 +2362,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstPermMap *new;              /* Pointer to new PermMap */
    va_list args;                 /* Variable argument list */
 
@@ -2443,17 +2443,18 @@ AstPermMap *astPermMapId_( int nin, const int inperm[], int nout,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstPermMap *new;              /* Pointer to new PermMap */
    int *inperm1;                 /* Pointer to temporary copy of "inperm" */
    int *outperm1;                /* Pointer to temporary copy of "outperm" */
    int coord;                    /* Loop counter for coordinates */
-   va_list args;                 /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(NULL);
 
 /* Variable argument list */
+   va_list args;                 /* Get a pointer to the thread specific global data structure. */
 
    int *status;                  /* Pointer to inherited status value */
+
+   astGET_GLOBALS(NULL);
 
 /* Get a pointer to the inherited status value. */
    status = astGetStatusPtr;
@@ -2804,16 +2805,13 @@ AstPermMap *astLoadPermMap_( void *mem, size_t size,
 */
 
 /* Local Constants: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
    AstPermMap *new;              /* Pointer to the new PermMap */
    char key[ KEY_LEN + 1 ];      /* Buffer for keyword strings */
-   int coord;                    /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(channel);
-
-/* Loop counter for coordinates */
+   int coord;                    /* Loop counter for coordinates */
    int iconst;                   /* Loop counter for constants */
    int in_cpy;                   /* Input coordinates obtained by copying? */
    int invert;                   /* Invert attribute value */
@@ -2822,6 +2820,9 @@ AstPermMap *astLoadPermMap_( void *mem, size_t size,
    int nin;                      /* Number of input coordinates */
    int nout;                     /* Number of output coordinates */
    int out_cpy;                  /* Output coordinates obtained by copying? */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* Initialise. */
    new = NULL;

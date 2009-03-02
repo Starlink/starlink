@@ -1930,7 +1930,7 @@ static void Clear( AstObject *this_object, const char *attrib, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstFrame *save_frame;         /* Saved pointer to integrity Frame */
    AstFrameSet *this;            /* Pointer to FrameSet structure */
    const char *save_method;      /* Saved pointer to method name */
@@ -2013,7 +2013,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstFrame *fr;                 /* Pointer to current Frame */
    AstFrameSet *this;            /* Pointer to the FrameSet structure */
 
@@ -3305,7 +3305,7 @@ static int ForceCopy( AstFrameSet *this, int iframe, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstFrame *frame;             /* Pointer to Frame */
    AstFrame *tmp;               /* Temporary Frame pointer */
    int ifr;                     /* Loop counter for Frames */
@@ -3641,7 +3641,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstFrame *fr;                 /* Pointer to current Frame */
    AstFrameSet *this;            /* Pointer to the FrameSet structure */
    const char *result;           /* Pointer value to return */
@@ -4867,7 +4867,7 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name, int *status
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrameVtab *frame;          /* Pointer to Frame component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
@@ -6662,7 +6662,7 @@ static void RecordIntegrity( AstFrameSet *this, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstFrame *current;            /* Pointer to current Frame */
 
 /* Get a pointer to the structure holding thread-specific global data. */   
@@ -7311,7 +7311,7 @@ static void RestoreIntegrity( AstFrameSet *this, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstFrame *current;            /* Pointer to current Frame */
    AstFrameSet *cvt;             /* Pointer to conversion FrameSet */
    AstMapping *map;              /* Pointer to conversion Mapping */
@@ -7447,7 +7447,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstFrame *fr;                 /* Pointer to current Frame */
    AstFrameSet *this;            /* Pointer to the FrameSet structure */
    int base;                     /* Base attribute value */
@@ -9441,7 +9441,7 @@ static void VSet( AstObject *this_object, const char *settings,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstFrame *save_frame;         /* Saved pointer to integrity Frame */
    AstFrameSet *this;            /* Pointer to FrameSet structure */
    char *fulltext;               /* Pointer to expanded text string */
@@ -10117,7 +10117,7 @@ AstFrameSet *astFrameSet_( void *frame_void, const char *options, int *status, .
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstFrameSet *new;             /* Pointer to new FrameSet */
    va_list args;                 /* Variable argument list */
@@ -10440,17 +10440,18 @@ AstFrameSet *astLoadFrameSet_( void *mem, size_t size,
 */
 
 /* Local Constants: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
    AstFrameSet *new;             /* Pointer to the new FrameSet */
    char key[ KEY_LEN + 1 ];      /* Buffer for keyword string */
    int ifr;                      /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(channel);
 
 /* Loop counter for Frames */
    int inode;                    /* Loop counter for nodes */
+
+   astGET_GLOBALS(channel);
 
 /* Initialise. */
    new = NULL;
@@ -10824,16 +10825,17 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstFrameSet *new;             /* Pointer to new FrameSet */
    va_list args;                 /* Variable argument list */
 
+   int *status;                  
 
 /* Initialise. */
    new = NULL;
 
-   int *status;                  /* Get a pointer to the thread specific global data structure. */
+/* Get a pointer to the thread specific global data structure. */
    astGET_GLOBALS(NULL);
 
 /* Pointer to inherited status value */

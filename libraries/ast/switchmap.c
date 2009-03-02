@@ -633,7 +633,7 @@ void astInitSwitchMapVtab_(  AstSwitchMapVtab *vtab, const char *name, int *stat
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
@@ -1977,7 +1977,7 @@ AstSwitchMap *astSwitchMap_( void *fsmap_void, void *ismap_void, int nroute,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSwitchMap *new;            /* Pointer to new SwitchMap */
    AstMapping *fsmap;            /* Pointer to fwd selector Mapping */
    AstMapping *ismap;            /* Pointer to inv selector Mapping */
@@ -2229,21 +2229,21 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSwitchMap *new;            /* Pointer to new SwitchMap */
    AstMapping *fsmap;            /* Pointer to fwd selector Mapping */
    AstMapping *ismap;            /* Pointer to inv selector Mapping */
    AstMapping **routemaps;       /* Array of route Mapping pointers */
-   int i;                        /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(NULL);
-
-/* Route Mappings index */
+   int i;                        /* Route Mappings index */
    va_list args;                 /* Variable argument list */
+
+   int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Initialise. */
    new = NULL;
-
-   int *status;                  /* Pointer to inherited status value */
 
 /* Get a pointer to the inherited status value. */
    status = astGetStatusPtr;
@@ -2582,7 +2582,7 @@ AstSwitchMap *astLoadSwitchMap_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSwitchMap *new;               
    AstMapping *rmap;
    int i;

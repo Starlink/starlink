@@ -2090,7 +2090,7 @@ void astInitXmlChanVtab_(  AstXmlChanVtab *vtab, const char *name, int *status )
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstChannelVtab *channel;      /* Pointer to Channel component of Vtab */
 
@@ -4804,7 +4804,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstXmlChan *this;             /* Pointer to the XmlChan structure */
    const char *result;           /* Pointer value to return */
    int ival;                     /* Integer attribute value */
@@ -4994,7 +4994,7 @@ static char GetNextChar( void *data, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;       /* Declare the thread specific global data */
+   astDECLARE_GLOBALS        /* Declare the thread specific global data */
    AstXmlChan *this;         /* Pointer to the XmlChan */
    char result;              /* The returned character */
 
@@ -5271,7 +5271,7 @@ static int IsUsable( AstXmlElement *elem, int *status ){
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    const char *class;            /* Pointer to element name */
    const char *uri;              /* Pointer to namespace URI */
    IVOAReader reader;            /* Pointer to reader function */
@@ -7676,7 +7676,7 @@ static AstXmlElement *ReadXmlText( AstXmlChan *this, int *status ){
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;      /* Declare the thread specific global data */
+   astDECLARE_GLOBALS       /* Declare the thread specific global data */
    AstXmlElement *result;   /* Returned pointer */
    int skip;                /* Skip over initial irrelevant markup? */
 
@@ -13536,7 +13536,7 @@ f     pointer.
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstXmlChan *new;             /* Pointer to new XmlChan */
    va_list args;                 /* Variable argument list */
 
@@ -13618,7 +13618,7 @@ AstXmlChan *astXmlChanId_( const char *(* source)( void ),
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstXmlChan *new;             /* Pointer to new XmlChan */
    va_list args;                 /* Variable argument list */
 
@@ -13803,7 +13803,7 @@ AstXmlChan *astXmlChanForId_( const char *(* source)( void ),
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstXmlChan *new;              /* Pointer to new XmlChan */
    va_list args;                 /* Variable argument list */
    int *status;                  /* Pointer to inherited status value */
@@ -14098,7 +14098,7 @@ AstXmlChan *astLoadXmlChan_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstXmlChan *new;            /* Pointer to the new XmlChan */
    char *text;                 /* Textual version of integer value */
 

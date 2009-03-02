@@ -596,7 +596,7 @@ static void ChangeThreadVtab( AstObject *this, int *status ){
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;          
+   astDECLARE_GLOBALS           
    const char *class;
    int i;
 
@@ -1435,7 +1435,7 @@ static void EmptyObjectCache( int *status ){
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;   /* Thread-specific global data */
+   astDECLARE_GLOBALS    /* Thread-specific global data */
    int iblock;           /* Index of next entry in free list */
    int itab;             /* Index of next virtual function table */
    AstObjectVtab *vtab;  /* Pointer to next virtual function table */
@@ -1681,7 +1681,7 @@ static const char *GetAttrib( AstObject *this, const char *attrib, int *status )
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Thread-specific global data */
+   astDECLARE_GLOBALS            /* Thread-specific global data */
    const char *result;           /* Pointer value to return */
    int nobject;                  /* Nobject attribute value */
    int objsize;                  /* ObjSize attribute value */
@@ -2131,7 +2131,7 @@ MAKE_GETX(L,long,"%ld")
 const char *astGetC_( AstObject *this, const char *attrib, int *status ) {
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Thread-specific global data */
+   astDECLARE_GLOBALS            /* Thread-specific global data */
    const char *result;           /* Pointer value to return */
    const char *value;            /* Pointer to attribute value */
    int i;                        /* Loop count */
@@ -2301,7 +2301,7 @@ static int ManageLock( AstObject *this, int mode, int extra,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Thread-specific global data */
+   astDECLARE_GLOBALS            /* Thread-specific global data */
    int result;                   /* Returned value */
 
 /* Initialise */
@@ -4291,7 +4291,7 @@ void astInitObjectVtab_(  AstObjectVtab *vtab, const char *name, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Thread-specific global data */
+   astDECLARE_GLOBALS            /* Thread-specific global data */
    int ivtab;                    /* Index of next entry in known_vtabs */
 
 /* Check the local error status. */
@@ -4631,7 +4631,7 @@ AstObject *astLoadObject_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Thread-specific global data */
+   astDECLARE_GLOBALS            /* Thread-specific global data */
    AstObject *new;               /* Pointer to the new Object */
 
 /* Initialise. */
@@ -4919,7 +4919,7 @@ MYSTATIC void AnnulHandle( int ihandle, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Thread-specific global data */
+   astDECLARE_GLOBALS            /* Thread-specific global data */
    AstObject *ptr;               /* Object pointer */
    int context;                  /* Context level where Handle was issued */
 
@@ -5243,7 +5243,7 @@ f     depth.
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Thread-specific global data */
+   astDECLARE_GLOBALS            /* Thread-specific global data */
    int stat;                     /* Copy of global status */
    int *status;                  /* Pointer to inherited status value */
   
@@ -5324,7 +5324,7 @@ MYSTATIC int CheckId( AstObject *this_id, int lock_check, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Thread-specific global data */
+   astDECLARE_GLOBALS            /* Thread-specific global data */
    MixedInts work;               /* Union for decoding ID value */
    int id;                       /* ID value as an int */
    int ihandle;                  /* Result to return */
@@ -5570,7 +5570,7 @@ f     depth.
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Thread-specific global data */
+   astDECLARE_GLOBALS            /* Thread-specific global data */
    int ihandle;                  /* Offset of Handle to be annulled */
   
 /* Get a pointer to Thread-specific global data. */
@@ -5676,7 +5676,7 @@ f        This routine applies to all Objects.
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Thread-specific global data */
+   astDECLARE_GLOBALS            /* Thread-specific global data */
    int context;                  /* Handle context level */
    int ihandle;                  /* Offset of Handle in "handles" array */
 
@@ -5789,7 +5789,7 @@ f     and have not been rendered exempt using AST_EXEMPT.
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Thread-specific global data */
+   astDECLARE_GLOBALS            /* Thread-specific global data */
    int context;                  /* Handle context level */
    int ihandle;                  /* Offset of Handle in "handles" array */
   
@@ -5900,7 +5900,7 @@ f        This routine applies to all Objects.
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Thread-specific global data */
+   astDECLARE_GLOBALS            /* Thread-specific global data */
    int context;                  /* Handle context level */
    int ihandle;                  /* Offset of Handle in "handles" array */
   
@@ -6019,7 +6019,7 @@ c--
 #if defined(THREAD_SAFE)
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Thread-specific global data */
+   astDECLARE_GLOBALS            /* Thread-specific global data */
    AstObject *fail;              /* Pointer to Object that failed to lock */
    AstObject *this;              /* Pointer to Object */
    int ihandle;                  /* Index of supplied objetc handle */
@@ -6165,7 +6165,7 @@ c--
 #if defined(THREAD_SAFE)
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Thread-specific global data */
+   astDECLARE_GLOBALS            /* Thread-specific global data */
    AstErrorContext error_context;/* Info about the current error context */
    AstObject *fail;              /* Pointer to Object that failed */
    AstObject *this;              /* Pointer to Object */
@@ -6353,7 +6353,7 @@ MYSTATIC void InitContext( int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Thread-specific global data */
+   astDECLARE_GLOBALS            /* Thread-specific global data */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -6509,7 +6509,7 @@ AstObject *astMakeId_( AstObject *this, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Thread-specific global data */
+   astDECLARE_GLOBALS            /* Thread-specific global data */
    AstObject *id;                /* ID value to return */
    int ihandle;                  /* Handle offset */
 
@@ -7066,13 +7066,9 @@ c--
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;      /* Thread-specific global data */
+   astDECLARE_GLOBALS       /* Thread-specific global data */
    int result;              /* The returned value */
 
-/* Initialise the returned value */
-   result = AST__RUNNING;
-
-/* Nothing more to do if AST was not build with thread support. */
 #if defined(THREAD_SAFE)  
 
 /* More local Variables: */
@@ -7082,6 +7078,13 @@ c--
 
 /* Ensure global variables are accessable. */
    astGET_GLOBALS(NULL);
+#endif
+
+/* Initialise the returned value */
+   result = AST__RUNNING;
+
+/* Nothing more to do if AST was not build with thread support. */
+#if defined(THREAD_SAFE)  
 
 /* If the ownership of the handle is being queried... */
    if( ptr ) {
@@ -7250,7 +7253,7 @@ f     AST_STRIPESCAPES
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;
+   astDECLARE_GLOBALS
    int old_val;
   
 /* Get a pointer to Thread-specific global data. */
@@ -7281,7 +7284,7 @@ void CheckList( int *head, int *status ) {
    int ok;
    int ihandle;
    char buf[200];
-   astDECLARE_GLOBALS;          
+   astDECLARE_GLOBALS           
    if( !astOK ) return;
 
    astGET_GLOBALS(NULL);
@@ -7373,7 +7376,7 @@ int CheckThread( int ihandle, int *head, int *status ) {
 #if defined(THREAD_SAFE)
 
    char buf[200];
-   astDECLARE_GLOBALS;          
+   astDECLARE_GLOBALS           
    if( !astOK ) return result;
 
    astGET_GLOBALS(NULL);
@@ -7422,7 +7425,7 @@ void astHandleUse_( int handle, const char *verb, ... ){
 
 void astHandleAlarm_( const char *verb, va_list args ){
    char buff[200], hbuf[200];
-   astDECLARE_GLOBALS;          
+   astDECLARE_GLOBALS           
    astGET_GLOBALS(NULL);
 
    vsprintf( buff, verb, args );
@@ -7438,7 +7441,7 @@ void astHandleAlarm_( const char *verb, va_list args ){
 
 MYSTATIC const char *HandleString( int ihandle, char *buf ){
 #if defined(THREAD_SAFE)
-   astDECLARE_GLOBALS;          
+   astDECLARE_GLOBALS           
    astGET_GLOBALS(NULL);
 
    if( ihandle >= 0 ) {
@@ -7469,7 +7472,7 @@ MYSTATIC const char *HandleString( int ihandle, char *buf ){
 
 MYSTATIC const char *HeadString( int *head, char *list ){
    int i;
-   astDECLARE_GLOBALS;          
+   astDECLARE_GLOBALS           
    astGET_GLOBALS(NULL);
 
    if( head == &free_handles ) {

@@ -4342,7 +4342,7 @@ static void Apoly( AstPlot *this, float x, float y, const char *method, const ch
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
 
 /* Check the global status. */
    if( !astOK ) return;
@@ -4499,7 +4499,7 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
    double d[ CRV_NPNT ];   /* Offsets to evenly spaced points along curve */
    double x[ CRV_NPNT ];   /* X coords at evenly spaced points along curve */
    double y[ CRV_NPNT ];   /* Y coords at evenly spaced points along curve */
@@ -5155,7 +5155,7 @@ f     with STATUS set to an error value, or if it should fail for any
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
    AstPlot *this;          /* Plot with no more than 2 current axes */
    AstPlotCurveData cdata; /* Structure to receive break information */
    const char *class;      /* Object class */
@@ -5292,7 +5292,7 @@ f        The global status.
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
    AstFrameSet *fset;      /* Pointer to the Plot's FrameSet */
    int naxes;              /* No. of axes in the base Frame */
 
@@ -7660,7 +7660,7 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;    /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS     /* Pointer to thread-specific global data */
    CrvStatics *statics;   /* Pointer to structure holding static values */
    double *dd;            /* Pointer to array holding sub-segment distances */
    double *pd;            /* Pointer to next sub-segment distance */
@@ -8167,7 +8167,7 @@ static int CvBrk( AstPlot *this, int ibrk, double *brk, double *vbrk,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;  /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS   /* Pointer to thread-specific global data */
    int ret;             /* The number of breaks in the curve. */
 
 /* Check the global status. */
@@ -8323,7 +8323,7 @@ static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
 */
 
 /* local Variables: */
-   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
    double a1;    /* Distance from B to the lower x boundary */
    double a2;    /* Distance from B to the upper x boundary */
    double a3;    /* Distance from B to the lower y boundary */
@@ -8628,7 +8628,7 @@ f     contains any coordinates with the value AST__BAD.
 *--
 */
 /* Local Variables: */
-   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
    const char *class;      /* Object class */
    const char *method;     /* Current method */
    int naxes;              /* No. of axes in the base Frame */
@@ -8731,7 +8731,7 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
    double d[ CRV_NPNT ];   /* Offsets to evenly spaced points along curve */
    double x[ CRV_NPNT ];   /* X coords at evenly spaced points along curve */
    double y[ CRV_NPNT ];   /* Y coords at evenly spaced points along curve */
@@ -9559,7 +9559,7 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
 
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;
+   astDECLARE_GLOBALS
    char *a;
    char *lt;
    char cc;
@@ -12804,7 +12804,7 @@ static const char *SplitValue( AstPlot *this, const char *value, int axis,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;
+   astDECLARE_GLOBALS
    char *d;    
    const char *result;    
    float rsp;         
@@ -13625,7 +13625,7 @@ f        The global status.
 *--
 */
 /* Local Variables: */
-   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
    const char *class;      /* Object class */
    const char *method;     /* Current method */
    double d[ CRV_NPNT ];   /* Offsets to evenly spaced points along curve */
@@ -13972,7 +13972,7 @@ static void GLine( AstPlot *this, int n, const float *x,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;  /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS   /* Pointer to thread-specific global data */
    int i;               /* Loop count */
    int grf_status;      /* Status retruned from Grf function */
 
@@ -14078,7 +14078,7 @@ static void GMark( AstPlot *this, int n, const float *x,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;  /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS   /* Pointer to thread-specific global data */
    int i;               /* Loop count */
    int grf_status;      /* Status retruned from Grf function */
 
@@ -14516,7 +14516,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstPlot *this;                /* Pointer to the Plot structure */
    const char *result;           /* Pointer value to return */
    char label[21];               /* Graphics item label */
@@ -17211,7 +17211,7 @@ f        The global status.
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
    AstPlot *this;          /* Plot with 2d current Frame */
    AstPlotCurveData **cdata;/* Pointer to info. about breaks in curves */
    TickInfo **grid;        /* Pointer to info. about tick marks */
@@ -17590,7 +17590,7 @@ f     coordinates with the value AST__BAD, nor if LENGTH has this value.
 *--
 */
 /* Local Variables: */
-   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
    const char *class;      /* Object class */
    const char *method;     /* Current method */
    int naxes;              /* No. of axes in the base Frame */
@@ -17959,7 +17959,7 @@ void astGrfAttrs_( AstPlot *this, int id, int set, int prim, const char *method,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
    double *attr;           /* Pointer to the next attribute value */
    double dval;            /* Floating point attribute value */
    int ival;               /* Integer attribute value */
@@ -18571,7 +18571,7 @@ void astInitPlotVtab_(  AstPlotVtab *vtab, const char *name, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrameSetVtab *fset;        /* Pointer to FrameSet component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
@@ -20182,7 +20182,7 @@ static void LinePlot( AstPlot *this, double xa, double ya, double xb,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
    double d[ CRV_NPNT ];   /* Offsets to evenly spaced points along curve */
    double x[ CRV_NPNT ];   /* X coords at evenly spaced points along curve */
    double y[ CRV_NPNT ];   /* Y coords at evenly spaced points along curve */
@@ -21453,7 +21453,7 @@ f     - If any marker position is clipped (see AST_CLIP), then the
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
    AstMapping *mapping;    /* Pointer to graphics->physical mapping */
    AstPointSet *pset1;     /* PointSet holding physical positions */
    AstPointSet *pset2;     /* PointSet holding graphics positions */
@@ -21881,7 +21881,7 @@ static void Opoly( AstPlot *this, const char *method, const char *class, int *st
 
 */
 
-   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
 
 /* Check the global status. */
    if( !astOK ) return;
@@ -21997,7 +21997,7 @@ static int Overlap( AstPlot *this, int mode, int esc, const char *text, float x,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;    /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS     /* Pointer to thread-specific global data */
    int nbox = 0;          /* Number of boxes stored in "work" */
    int ret;               /* Does the new label overlap a previous label? */
    int i;                 /* Box index */
@@ -22698,7 +22698,7 @@ f        The global status.
 *--
 */
 /* Local Variables: */
-   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
    const char *class;      /* Object class */
    const char *method;     /* Current method */
    const double **in_ptr;  /* Pointer to array of data pointers */
@@ -24160,7 +24160,7 @@ f        The modified string. If the AST_ESCAPES routine
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;
+   astDECLARE_GLOBALS
    const char *a;
    char *b;
    int nc;
@@ -24851,7 +24851,7 @@ f     - If the plotting position is clipped (see AST_CLIP), then no
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
    AstMapping *mapping;    /* Pointer to graphics->physical mapping */
    AstPointSet *pset1;     /* PointSet holding physical positions */
    AstPointSet *pset2;     /* PointSet holding graphics positions */
@@ -25031,7 +25031,7 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
    char *new_text;         /* Pointer to complete text string (inc. units) */
    char *just;             /* Pointer to axis label justification string */
    const char *text;       /* Pointer to text string to be displayed */
@@ -28977,7 +28977,7 @@ AstPlot *astPlot_( void *frame_void, const float *graphbox,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstPlot *new;                 /* Pointer to new Plot */
    va_list args;                 /* Variable argument list */
@@ -29117,7 +29117,7 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrame *baseframe;         /* Pointer to base frame */
    AstFrame *graphicsframe;     /* Pointer to graphics frame */
    AstFrameSet *fset0;          /* The n-D FrameSet to be annotated */
@@ -29632,7 +29632,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstPlot *new;                 /* Pointer to the new Plot */
    char buff[ KEY_LEN + 1 ];     /* Buffer for keyword string */
    char *text;                   /* Textual version of integer value */
@@ -30486,7 +30486,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrame *frame;              /* Pointer to Frame structure */
    AstPlot *new;                 /* Pointer to new Plot */
    va_list args;                 /* Variable argument list */

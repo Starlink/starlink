@@ -404,7 +404,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;          /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS           /* Pointer to thread-specific global data */
    AstSphMap *this;              /* Pointer to the SphMap structure */
    const char *result;           /* Pointer value to return */
    double dval;                  /* Double precision attribute value */
@@ -487,7 +487,7 @@ void astInitSphMapVtab_(  AstSphMapVtab *vtab, const char *name, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
@@ -1492,7 +1492,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSphMap *new;              /* Pointer to new SphMap */
    va_list args;                /* Variable argument list */
 
@@ -1565,7 +1565,7 @@ AstSphMap *astSphMapId_( const char *options, ...) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSphMap *new;              /* Pointer to new SphMap */
    va_list args;                /* Variable argument list */
    int *status;                 /* Pointer to inherited status value */
@@ -1782,7 +1782,7 @@ AstSphMap *astLoadSphMap_( void *mem, size_t size,
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSphMap *new;               /* Pointer to the new SphMap */
 
 /* Initialise. */

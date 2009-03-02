@@ -2850,7 +2850,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;          /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS           /* Pointer to thread-specific global data */
    AstRegion *this;              /* Pointer to the Region structure */
    const char *result;           /* Pointer value to return */
    double dval;                  /* Floating point attribute value */
@@ -4093,7 +4093,7 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrameVtab *frame;          /* Pointer to Frame component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
@@ -11434,17 +11434,17 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
 */
 
 /* Local Constants: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
    AstFrame *f1;                  /* Base Frame for encapsulated FrameSet */
    AstRegion *new;                /* Pointer to the new Region */
-   int nax;                       /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(channel);
-
-/* No. of axes in Frame */
+   int nax;                       /* No. of axes in Frame */
    int naxpt;                     /* No. of axes in per point */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* Initialise. */
    new = NULL;

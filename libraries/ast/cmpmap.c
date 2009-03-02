@@ -792,7 +792,7 @@ void astInitCmpMapVtab_(  AstCmpMapVtab *vtab, const char *name, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
@@ -2852,7 +2852,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstCmpMap *this;              /* Pointer to CmpMap structure */
    AstMapping **map_list;        /* Mapping array pointer */
    AstMapping *map;              /* Pointer to cloned Mapping pointer */
@@ -3626,7 +3626,7 @@ AstCmpMap *astCmpMap_( void *map1_void, void *map2_void, int series,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstCmpMap *new;               /* Pointer to new CmpMap */
    AstMapping *map1;             /* Pointer to first Mapping structure */
    AstMapping *map2;             /* Pointer to second Mapping structure */
@@ -3812,19 +3812,19 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstCmpMap *new;               /* Pointer to new CmpMap */
    AstMapping *map1;             /* Pointer to first Mapping structure */
    AstMapping *map2;             /* Pointer to second Mapping structure */
    va_list args;                 /* Variable argument list */
+
+   int *status;                  /* Pointer to inherited status value */
 
 /* Get a pointer to the thread specific global data structure. */
    astGET_GLOBALS(NULL);
 
 /* Initialise. */
    new = NULL;
-
-   int *status;                  /* Pointer to inherited status value */
 
 /* Get a pointer to the inherited status value. */
    status = astGetStatusPtr;
@@ -4124,7 +4124,7 @@ AstCmpMap *astLoadCmpMap_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstCmpMap *new;               /* Pointer to the new CmpMap */
 
 /* Initialise. */

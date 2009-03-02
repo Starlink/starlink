@@ -1054,7 +1054,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;          /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS           /* Pointer to thread-specific global data */
    AstPointSet *this;            /* Pointer to the PointSet structure */
    const char *result;           /* Pointer value to return */
    int ncoord;                   /* Ncoord attribute value */
@@ -1412,7 +1412,7 @@ void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name, int *status
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
 /* Check the local error status. */
@@ -2373,7 +2373,7 @@ AstPointSet *astPointSet_( int npoint, int ncoord, const char *options, int *sta
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstPointSet *new;             /* Pointer to new PointSet */
    va_list args;                 /* Variable argument list */
 
@@ -2449,7 +2449,7 @@ AstPointSet *astPointSetId_( int npoint, int ncoord,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstPointSet *new;             /* Pointer to new PointSet */
    va_list args;                 /* Variable argument list */
 
@@ -2677,20 +2677,20 @@ AstPointSet *astLoadPointSet_( void *mem, size_t size,
 */
 
 /* Local Constants: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
    AstPointSet *new;             /* Pointer to the new PointSet */
    char key[ KEY_LEN + 1 ];      /* Buffer for keywords */
-   double acc;                   /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(channel);
-
-/* Accuracy value */
+   double acc;                   /* Accuracy value */
    int coord;                    /* Loop counter for coordinates */
    int empty;                    /* PointSet empty? */
    int i;                        /* Counter for coordinate values */
    int point;                    /* Loop counter for points */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* Initialise. */
    new = NULL;

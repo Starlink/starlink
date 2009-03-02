@@ -994,9 +994,11 @@ int astRateState_( int disabled, int *status ) {
 
 *-
 */
-   astDECLARE_GLOBALS;
+   astDECLARE_GLOBALS
+   int result;
    astGET_GLOBALS(NULL);
-   int result = rate_disabled;
+
+   result = rate_disabled;
    rate_disabled = disabled;
    return result;
 }   
@@ -1147,7 +1149,7 @@ static void FunPN( AstMapping *map, double *at, int ax1, int ax2,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;
+   astDECLARE_GLOBALS
    AstPointSet *pset1;
    AstPointSet *pset2;
    double **ptr1;
@@ -1607,7 +1609,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMapping *this;             /* Pointer to the Mapping structure */
    const char *result;           /* Pointer value to return */
    int invert;                   /* Invert attribute value */
@@ -2632,7 +2634,7 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name, int *status )
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
 /* Check the local error status. */
@@ -2923,7 +2925,7 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
                                   Xtype *out, Xtype *out_var, int *status ) { \
 \
 /* Local Variables: */ \
-   astDECLARE_GLOBALS;           /* Thread-specific data */ \
+   astDECLARE_GLOBALS            /* Thread-specific data */ \
    Xfloattype hi_lim;            /* Upper limit on output values */ \
    Xfloattype lo_lim;            /* Lower limit on output values */ \
    Xfloattype sum;               /* Weighted sum of pixel data values */ \
@@ -9321,7 +9323,7 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
                      const int ubnd[], Xtype out[], Xtype out_var[], int *status ) { \
 \
 /* Local Variables: */ \
-   astDECLARE_GLOBALS;           /* Thread-specific data */ \
+   astDECLARE_GLOBALS            /* Thread-specific data */ \
    AstMapping *simple;           /* Pointer to simplified Mapping */ \
    Xtype *d;                     /* Pointer to next output data value */ \
    Xtype *v;                     /* Pointer to next output variance value */ \
@@ -10168,7 +10170,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Thread-specific data */ 
+   astDECLARE_GLOBALS            /* Thread-specific data */ 
    AstPointSet *pset_in;         /* Input PointSet for transformation */
    AstPointSet *pset_out;        /* Output PointSet for transformation */
    const double *grad;           /* Pointer to gradient matrix of linear fit */
@@ -11400,7 +11402,7 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
                      double weights[], int *nused, int *status ) { \
 \
 /* Local Variables: */ \
-   astDECLARE_GLOBALS;           /* Thread-specific data */ \
+   astDECLARE_GLOBALS            /* Thread-specific data */ \
    AstMapping *simple;           /* Pointer to simplified Mapping */ \
    Xtype *d;                     /* Pointer to next output data value */ \
    Xtype *v;                     /* Pointer to next output variance value */ \
@@ -13074,7 +13076,7 @@ static int Resample##X( AstMapping *this, int ndim_in, \
                         const int ubnd[], Xtype out[], Xtype out_var[], int *status ) { \
 \
 /* Local Variables: */ \
-   astDECLARE_GLOBALS;           /* Thread-specific data */ \
+   astDECLARE_GLOBALS            /* Thread-specific data */ \
    AstMapping *simple;           /* Pointer to simplified Mapping */ \
    int idim;                     /* Loop counter for coordinate dimensions */ \
    int nin;                      /* Number of Mapping input coordinates */ \
@@ -13933,7 +13935,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Thread-specific data */ 
+   astDECLARE_GLOBALS            /* Thread-specific data */ 
    AstPointSet *pset_in;         /* Input PointSet for transformation */
    AstPointSet *pset_out;        /* Output PointSet for transformation */
    const double *grad;           /* Pointer to gradient matrix of linear fit */
@@ -16337,7 +16339,7 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
                               int *nused, int *status ) { \
 \
 /* Local Variables: */ \
-   astDECLARE_GLOBALS;           /* Thread-specific data */ \
+   astDECLARE_GLOBALS            /* Thread-specific data */ \
    Xtype in_val;                 /* Input pixel value */ \
    Xtype c; \
    double error; \
@@ -19203,7 +19205,7 @@ f     be reversed.
 */
 
 /* Local Variables: */ 
-   astDECLARE_GLOBALS;           /* Thread-specific data */ 
+   astDECLARE_GLOBALS            /* Thread-specific data */ 
    AstMapping *simple;           /* Pointer to simplified Mapping */ 
    double **out_ptr;             /* Pointer to array of output data pointers */
    int coord;                    /* Loop counter for coordinates */
@@ -22489,7 +22491,7 @@ AstMapping *astLoadMapping_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMapping *new;              /* Pointer to the new Mapping */
 
 /* Initialise. */

@@ -1082,7 +1082,7 @@ static const char *Format( AstFrame *this_frame, int axis, double value, int *st
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           
+   astDECLARE_GLOBALS            
    AstMapping *map;       
    AstSystemType sys;
    AstTimeFrame *this;    
@@ -1552,7 +1552,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 /* Local Variables: */
    AstTimeFrame *this;           /* Pointer to the TimeFrame structure */
    AstTimeScaleType ts;          /* Time scale */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    char *new_attrib;             /* Pointer value to new attribute name */
    const char *result;           /* Pointer value to return */
    double dval;                  /* Attribute value */
@@ -1992,7 +1992,7 @@ static const char *GetLabel( AstFrame *this, int axis, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstMapping *map;              /* Mapping between units */
    AstSystemType system;         /* Code identifying type of time coordinates */
    char *new_lab;                /* Modified label string */
@@ -2154,7 +2154,7 @@ static const char *GetSymbol( AstFrame *this, int axis, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstMapping *map;              /* Mapping between units */
    AstSystemType system;         /* Code identifying type of sky coordinates */
    char *new_sym;                /* Modified symbol string */
@@ -2518,7 +2518,7 @@ static const char *GetTitle( AstFrame *this_frame, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstSystemType system;         /* Code identifying type of coordinates */
    AstTimeScaleType ts;          /* Time scale value */
    AstTimeFrame *this;           /* Pointer to TimeFrame structure */
@@ -2734,7 +2734,7 @@ void astInitTimeFrameVtab_(  AstTimeFrameVtab *vtab, const char *name, int *stat
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrameVtab *frame;          /* Pointer to Frame component of Vtab */
    AstMapping *map;              /* Temporary Maping */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
@@ -6274,7 +6274,7 @@ AstTimeFrame *astTimeFrame_( const char *options, int *status, ...) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMapping *um;               /* Mapping from default to actual units */
    AstTimeFrame *new;            /* Pointer to new TimeFrame */
    AstSystemType s;              /* System */
@@ -6494,7 +6494,7 @@ AstTimeFrame *astLoadTimeFrame_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstTimeFrame *new;            /* Pointer to the new TimeFrame */
    char *sval;                   /* Pointer to string value */
    double obslat;                /* Value for ObsLat attribute */
@@ -6797,17 +6797,17 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMapping *um;               /* Mapping from default to actual units */
    AstTimeFrame *new;            /* Pointer to new TimeFrame */
    AstSystemType s;              /* System */
    const char *u;                /* Units string */
-   va_list args;                 /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(NULL);
-
-/* Variable argument list */
+   va_list args;                 /* Variable argument list */
 
    int *status;                  /* Pointer to inherited status value */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(NULL);
 
 /* Get a pointer to the inherited status value. */
    status = astGetStatusPtr;

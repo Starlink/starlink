@@ -2326,7 +2326,7 @@ void astInitSlaMapVtab_(  AstSlaMapVtab *vtab, const char *name, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
@@ -3368,7 +3368,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstPointSet *result;          /* Pointer to output PointSet */
    AstSlaMap *map;               /* Pointer to SlaMap to be applied */
    double **ptr_in;              /* Pointer to input coordinate data */
@@ -4368,7 +4368,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSlaMap *new;               /* Pointer to the new SlaMap */
    va_list args;                 /* Variable argument list */
 
@@ -4440,7 +4440,7 @@ AstSlaMap *astSlaMapId_( int flags, const char *options, ... ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSlaMap *new;               /* Pointer to the new SlaMap */
    va_list args;                 /* Variable argument list */
 
@@ -4659,21 +4659,21 @@ AstSlaMap *astLoadSlaMap_( void *mem, size_t size,
 */
 
 /* Local Constants: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
    AstSlaMap *new;               /* Pointer to the new SlaMap */
    char *sval;                   /* Pointer to string value */
-   char key[ KEY_LEN + 1 ];      /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(channel);
-
-/* Buffer for keyword string */
+   char key[ KEY_LEN + 1 ];      /* Buffer for keyword string */
    const char *argdesc[ MAX_SLA_ARGS ]; /* Pointers to argument descriptions */
    const char *comment;          /* Pointer to comment string */
    int iarg;                     /* Loop counter for arguments */
    int icvt;                     /* Loop counter for conversion steps */
    int nargs;                    /* Number of conversion arguments */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* Initialise. */
    new = NULL;

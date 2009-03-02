@@ -1559,7 +1559,7 @@ void *astFree_( void *ptr, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    Memory *mem;                  /* Pointer to memory header */
    int isdynamic;                /* Is the memory dynamically allocated? */
    size_t size;                  /* The usable size of the memory block */
@@ -1667,7 +1667,7 @@ void *astGrow_( void *ptr, int n, size_t size, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    int isdynamic;                /* Is the memory dynamically allocated? */
    Memory *mem;                  /* Pointer to memory header */
    size_t newsize;               /* New size to allocate */
@@ -1756,7 +1756,7 @@ int astIsDynamic_( const void *ptr, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    Memory *isdynmem;               /* Pointer to memory header */ \
 
 /* Check the global error status and the supplied pointer. */
@@ -1821,7 +1821,7 @@ void *astMalloc_( size_t size, int *status ) {
 #define ERRBUF_LEN 80
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    char errbuf[ ERRBUF_LEN ];    /* Buffer for system error message */
    Memory *mem;                  /* Pointer to space allocated by malloc */
    void *result;                 /* Returned pointer */
@@ -2388,7 +2388,7 @@ int astMemCaching_( int newval, int *status ){
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           
+   astDECLARE_GLOBALS            
    int i;
    int result;
    Memory *mem;
@@ -2568,7 +2568,7 @@ void *astRealloc_( void *ptr, size_t size, int *status ) {
 #define ERRBUF_LEN 80
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           
+   astDECLARE_GLOBALS            
    char errbuf[ ERRBUF_LEN ];    /* Buffer for system error message */
    int isdynamic;                /* Was memory allocated dynamically? */
    void *result;                 /* Returned pointer */
@@ -2767,7 +2767,7 @@ size_t astSizeOf_( const void *ptr, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    int isdynamic;                /* Was the memory allocated dynamically? */
    size_t size;                  /* Memory size */
 
@@ -2829,7 +2829,7 @@ static size_t SizeOfMemory( int *status ){
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
 
 /* If needed, get a pointer to the thread specific global data structure. */
    astGET_GLOBALS(NULL);
@@ -2888,7 +2888,7 @@ size_t astTSizeOf_( const void *ptr, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    int isdynamic;                /* Was the memory allocated dynamically? */
    size_t size;                  /* Memory size */
 
@@ -2972,7 +2972,7 @@ void *astStore_( void *ptr, const void *data, size_t size, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    int valid;                    /* Is the memory pointer usable? */
    void *new;                    /* Pointer to returned memory */
 

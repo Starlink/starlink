@@ -293,7 +293,7 @@ void astInitUnitMapVtab_(  AstUnitMapVtab *vtab, const char *name, int *status )
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
@@ -1040,7 +1040,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstUnitMap *new;              /* Pointer to new UnitMap */
    va_list args;                 /* Variable argument list */
 
@@ -1114,7 +1114,7 @@ AstUnitMap *astUnitMapId_( int ncoord, const char *options, ... ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstUnitMap *new;              /* Pointer to new UnitMap */
    va_list args;                 /* Variable argument list */
 
@@ -1334,7 +1334,7 @@ AstUnitMap *astLoadUnitMap_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstUnitMap *new;              /* Pointer to the new UnitMap */
 
 /* Initialise. */

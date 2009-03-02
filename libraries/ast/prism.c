@@ -942,7 +942,7 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFrameVtab *frame;          /* Pointer to Frame component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
@@ -3603,7 +3603,7 @@ AstPrism *astPrism_( void *region1_void, void *region2_void,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstPrism *new;                  /* Pointer to new Prism */
    AstRegion *region1;             /* Pointer to first Region structure */
    AstRegion *region2;             /* Pointer to second Region structure */
@@ -3750,7 +3750,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;             /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS              /* Pointer to thread-specific global data */
    AstPrism *new;                  /* Pointer to new Prism */
    AstRegion *region1;             /* Pointer to first Region structure */
    AstRegion *region2;             /* Pointer to second Region structure */
@@ -4020,7 +4020,7 @@ AstPrism *astLoadPrism_( void *mem, size_t size, AstPrismVtab *vtab,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;     /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS      /* Pointer to thread-specific global data */
    AstFrame *cfrm;         /* Frame containing required axes */
    AstFrame *f1;           /* Base Frame in parent Region */
    AstPrism *new;          /* Pointer to the new Prism */

@@ -1488,7 +1488,7 @@ static const char *DHmsFormat( const char *fmt, int digs, double value, int *sta
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    char sep;                     /* Field separator character */
    const char *result;           /* Pointer to result string */
    double absvalue;              /* Absolute value in radians */
@@ -2129,7 +2129,7 @@ static const char *DHmsUnit( const char *fmt, int digs, int output, int *status 
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    char dpchar;                  /* Character to indicate decimal places */
    char sep;                     /* Field separator character */
    const char *result;           /* Pointer to result string */
@@ -2357,7 +2357,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib, int *s
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSkyAxis *this;             /* Pointer to the SkyAxis structure */
    const char *result;           /* Pointer value to return */
    int as_time;                  /* AsTime attribute value */
@@ -2664,7 +2664,7 @@ static const char *GetAxisFormat( AstAxis *this_axis, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSkyAxis *this;             /* Pointer to the SkyAxis structure */
    const char *result;           /* Pointer to result string */
    int as_time;                  /* Format SkyAxis values as times? */
@@ -3036,7 +3036,7 @@ void astInitSkyAxisVtab_(  AstSkyAxisVtab *vtab, const char *name, int *status )
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstAxisVtab *axis;            /* Pointer to Axis component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    int stat;                     /* SLALIB status */
@@ -4468,7 +4468,7 @@ AstSkyAxis *astSkyAxis_( const char *options, int *status, ...) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSkyAxis *new;              /* Pointer to new SkyAxis */
    va_list args;                 /* Variable argument list */
 
@@ -4542,7 +4542,7 @@ AstSkyAxis *astSkyAxisId_( const char *options, ... ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSkyAxis *new;              /* Pointer to new SkyAxis */
    va_list args;                 /* Variable argument list */
 
@@ -4756,7 +4756,7 @@ AstSkyAxis *astLoadSkyAxis_( void *mem, size_t size,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstSkyAxis *new;              /* Pointer to the new SkyAxis */
 
 /* Initialise. */

@@ -2124,7 +2124,7 @@ const char *astXmlGetTag_( AstXmlObject *this, int opening, int *status ){
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;       /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS        /* Pointer to thread-specific global data */
    char *result;             /* The returned pointer */
 
 /* Initialise */
@@ -5014,7 +5014,7 @@ static void InitXmlObject( AstXmlObject *new, long int type, int *status ){
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;       /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS        /* Pointer to thread-specific global data */
 
 /* Check the global error status. */
    if( !astOK ) return;

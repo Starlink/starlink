@@ -807,7 +807,7 @@ void astInitWinMapVtab_(  AstWinMapVtab *vtab, const char *name, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
@@ -3937,7 +3937,7 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstWinMap *new;              /* Pointer to new WinMap */
    va_list args;                /* Variable argument list */
 
@@ -4015,7 +4015,7 @@ AstWinMap *astWinMapId_( int ncoord, const double c1_in[], const double c2_in[],
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstWinMap *new;              /* Pointer to new WinMap */
    va_list args;                /* Variable argument list */
    int *status;                 /* Pointer to inherited status value */
@@ -4281,17 +4281,17 @@ AstWinMap *astLoadWinMap_( void *mem, size_t size,
 */
 
 /* Local Constants. */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
    AstWinMap *new;              /* Pointer to the new WinMap */
    char buff[ KEY_LEN + 1 ];    /* Buffer for keyword string */
-   int axis;                    /* Get a pointer to the thread specific global data structure. */
-   astGET_GLOBALS(channel);
-
-/* Axis index */
+   int axis;                    /* Axis index */
    int ncoord;                  /* The number of coordinate axes */
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(channel);
 
 /* Initialise. */
    new = NULL;

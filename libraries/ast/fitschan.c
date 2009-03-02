@@ -5421,7 +5421,7 @@ static void ClearCard( AstFitsChan *this, int *status ){
 */
 
 /* Local Variables; */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
 
 /* Check the supplied FitsChan. If its is empty, return. */
    if ( !this || !(this->head) ) return;
@@ -5620,7 +5620,7 @@ static int CnvType( int otype, void *odata, size_t osize, int type,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    const char *c;           /* Pointer to next character */
    const char *ostring;     /* String data value */
    double odouble;          /* Double data value */
@@ -6252,7 +6252,7 @@ static void CreateKeyword( AstFitsChan *this, const char *name,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    char *seq_chars = SEQ_CHARS;  /* Pointer to characters used for encoding */
    char seq_char;                /* The first sequence character */
    const char *class;            /* Object clas */
@@ -7600,7 +7600,7 @@ static void Empty( AstFitsChan *this, int *status ){
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;        /* Declare the thread specific global data */
+   astDECLARE_GLOBALS         /* Declare the thread specific global data */
    const char *class;         /* Pointer to string holding object class */
    const char *method;        /* Pointer to string holding calling method */
    int old_ignore_used;       /* Original setting of ignore_used variable */
@@ -8685,7 +8685,7 @@ static void FindWcs( AstFitsChan *this, int last, int all, int rewind,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;      /* Declare the thread specific global data */
+   astDECLARE_GLOBALS       /* Declare the thread specific global data */
    const char *keyname;     /* Keyword name from current card */
    int nfld;                /* Number of fields in keyword template */
    int old_ignore_used;     /* Original value of variable ignore_used */
@@ -9486,7 +9486,7 @@ static char *FormatKey( char *key, int c1, int c2, char s, int *status ){
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           
+   astDECLARE_GLOBALS            
    char *ret;
    int len;
    int nc; 
@@ -12747,7 +12747,7 @@ static int FitsGetCom( AstFitsChan *this, const char *name,
 */
 
 /* Local Variables: */ 
-   astDECLARE_GLOBALS;    /* Declare the thread specific global data */
+   astDECLARE_GLOBALS     /* Declare the thread specific global data */
    const char *method;    /* Calling method */
    const char *class;     /* Object class */
    char *lcom;            /* Supplied keyword comment */ 
@@ -13612,7 +13612,7 @@ static void FixUsed( AstFitsChan *this, int reset, int used, int remove,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;     /* Declare the thread specific global data */
+   astDECLARE_GLOBALS      /* Declare the thread specific global data */
    FitsCard *card0;        /* Pointer to current FitsCard */
    int *flags;             /* Pointer to flags mask for the current card */
    int old_ignore_used;    /* Original value of variable ignore_used */
@@ -14040,7 +14040,7 @@ const char *GetAttrib( AstObject *this_object, const char *attrib, int *status )
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstFitsChan *this;            /* Pointer to the FitsChan structure */
    const char *result;           /* Pointer value to return */
    int ival;                     /* Integer attribute value */
@@ -15315,7 +15315,7 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name, int *status
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstChannelVtab *channel;      /* Pointer to Channel component of Vtab */
    char buf[ 100 ];              /* Buffer large enough to store formatted INT_MAX */
@@ -15533,7 +15533,7 @@ static void InsCard( AstFitsChan *this, int overwrite, const char *name,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;    /* Declare the thread specific global data */
+   astDECLARE_GLOBALS     /* Declare the thread specific global data */
    int flags;             /* Flags to assign to new card */
 
 /* Check the global status. */
@@ -16329,7 +16329,7 @@ static const char *IsSpectral( const char *ctype, char stype[5], char algcode[5]
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;
+   astDECLARE_GLOBALS
    int ctype_len;
    
 /* Initialise */
@@ -18100,7 +18100,7 @@ static int Match( const char *test, const char *temp, int maxfld, int *fields,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;    /* Declare the thread specific global data */
+   astDECLARE_GLOBALS     /* Declare the thread specific global data */
    char type;             /* Field type specifier */
    const char *a;         /* Pointer to next test character */
    const char *b;         /* Pointer to next template character */
@@ -18616,7 +18616,7 @@ static int MoveCard( AstFitsChan *this, int move, const char *method,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;     /* Declare the thread specific global data */
+   astDECLARE_GLOBALS      /* Declare the thread specific global data */
    FitsCard *card;         /* The current card */
    FitsCard *card0;        /* The previous non-deleted card */
    int moved;              /* The number of cards moved by so far */
@@ -22263,7 +22263,7 @@ static void SetValue( AstFitsChan *this, const char *keyname, void *value,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;    /* Declare the thread specific global data */
+   astDECLARE_GLOBALS     /* Declare the thread specific global data */
    FitsCard *card;        /* Pointer to original current card */
    const char *class;     /* Class name to include in error messages */
    const char *method;    /* Method name to include in error messages */
@@ -27702,7 +27702,7 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;       /* Declare the thread specific global data */
+   astDECLARE_GLOBALS        /* Declare the thread specific global data */
    AstFrame *ofrm;           /* Pointer to a Frame */
    AstMapping *map1;         /* Pointer to a Mapping */
    AstMapping *map2;         /* Pointer to a Mapping */
@@ -31871,7 +31871,7 @@ static int Write( AstChannel *this_channel, AstObject *object, int *status ) {
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstFitsChan *this;            /* Pointer to the FitsChan structure */
    FitsStore *store;             /* Intermediate storage for WCS information */
    char banner[ AST__FITSCHAN_FITSCARDLEN - FITSNAMLEN + 1 ]; /* Buffer for begin/end banner */
@@ -32104,7 +32104,7 @@ static void WriteBegin( AstChannel *this_channel, const char *class,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstFitsChan *this;            /* Pointer to the FitsChan structure. */
    char buff[ AST__FITSCHAN_FITSCARDLEN - FITSNAMLEN + 1 ];
                                  /* Character buffer */
@@ -32235,7 +32235,7 @@ static void WriteDouble( AstChannel *this_channel, const char *name,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstFitsChan *this;            /* Pointer to the FitsChan structure. */
    char keyword[ FITSNAMLEN + 1 ]; /* Buffer for FITS keyword */
 
@@ -32303,7 +32303,7 @@ static void WriteEnd( AstChannel *this_channel, const char *class, int *status )
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstFitsChan *this;            /* Pointer to the FitsChan structure. */
    char buff[ AST__FITSCHAN_FITSCARDLEN - FITSNAMLEN + 1 ];
                                  /* Character buffer */
@@ -32433,7 +32433,7 @@ static void WriteInt( AstChannel *this_channel, const char *name,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstFitsChan *this;            /* Pointer to the FitsChan structure. */
    char keyword[ FITSNAMLEN + 1 ]; /* Buffer for FITS keyword */
 
@@ -32513,7 +32513,7 @@ static void WriteIsA( AstChannel *this_channel, const char *class,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstFitsChan *this;            /* Pointer to the FitsChan structure. */
    char buff[ AST__FITSCHAN_FITSCARDLEN - FITSNAMLEN + 1 ];
                                  /* Character buffer */
@@ -32648,7 +32648,7 @@ static void WriteObject( AstChannel *this_channel, const char *name,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstFitsChan *this;            /* Pointer to the FitsChan structure. */
    char keyword[ FITSNAMLEN + 1 ]; /* Buffer for FITS keyword */
 
@@ -32727,7 +32727,7 @@ static void WriteToSink( AstFitsChan *this, int *status ){
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;          /* Declare the thread specific global data */
+   astDECLARE_GLOBALS           /* Declare the thread specific global data */
    char card[ AST__FITSCHAN_FITSCARDLEN + 1]; /* Buffer for header card */
    int icard;                   /* Current card index on entry */
    int old_ignore_used;         /* Original value of external variable ignore_used */
@@ -32867,7 +32867,7 @@ static void WriteString( AstChannel *this_channel, const char *name,
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstFitsChan *this;            /* Pointer to the FitsChan structure. */
    char *c;                      /* Pointer to next buffer character */
    char buff1[ AST__FITSCHAN_FITSCARDLEN - FITSNAMLEN - 3 ]; /* Buffer for a single substring */
@@ -34120,7 +34120,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;       /* Declare the thread specific global data */
+   astDECLARE_GLOBALS        /* Declare the thread specific global data */
    const char *class;        /* Pointer to object class */
    AstFitsChan *in;          /* Pointer to input FitsChan */
    AstFitsChan *out;         /* Pointer to output FitsChan */
@@ -34279,7 +34279,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Declare the thread specific global data */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstFitsChan *this;            /* Pointer to the FitsChan structure */
    char buff[ KEY_LEN + 1 ];     /* Buffer for keyword string */
    const char *class;            /* Object class */
@@ -34692,7 +34692,7 @@ f     pointer.
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFitsChan *new;             /* Pointer to new FitsChan */
    va_list args;                 /* Variable argument list */
 
@@ -34774,7 +34774,7 @@ AstFitsChan *astFitsChanId_( const char *(* source)( void ),
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFitsChan *new;             /* Pointer to new FitsChan */
    va_list args;                 /* Variable argument list */
 
@@ -34958,7 +34958,7 @@ AstFitsChan *astFitsChanForId_( const char *(* source)( void ),
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;           /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstFitsChan *new;             /* Pointer to new FitsChan */
    va_list args;                 /* Variable argument list */
    int *status;                  /* Pointer to inherited status value */
@@ -35273,7 +35273,7 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
 #define KEY_LEN 50              /* Maximum length of a keyword */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS;          /* Pointer to thread-specific global data */
+   astDECLARE_GLOBALS           /* Pointer to thread-specific global data */
    AstFitsChan *new;            /* Pointer to the new FitsChan */
    char *comment;               /* Pointer to keyword comment */
    char *keynm;                 /* Keyword name */
