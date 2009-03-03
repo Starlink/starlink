@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_GHST<T>( BAD, DIM, ARRAY, NUMBIN, CUMUL,
+      SUBROUTINE KPG1_GHST<T>( BAD, SIZE, ARRAY, NUMBIN, CUMUL,
      :                         VALMAX, VALMIN, HIST, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation
-*     CALL KPG1_GHSTx( BAD, DIM, ARRAY, NUMBIN, CUMUL, VALMAX, VALMIN,
+*     CALL KPG1_GHSTx( BAD, SIZE, ARRAY, NUMBIN, CUMUL, VALMAX, VALMIN,
 *    :                 HIST, STATUS )
 
 *  Description:
@@ -22,9 +22,9 @@
 *     BAD = LOGICAL (Given)
 *        If .TRUE., bad pixels will be processed.  This should not be
 *        set to false unless the input array contains no bad pixels.
-*     DIM = INTEGER (Given)
+*     SIZE = INTEGER (Given)
 *        The dimension of the array whose histogram is required.
-*     ARRAY( DIM ) = ? (Given)
+*     ARRAY( SIZE ) = ? (Given)
 *        The input data array.
 *     NUMBIN = INTEGER (Given)
 *        Number of bins used in the histogram.  For integer data types
@@ -81,6 +81,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (JAC)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -105,6 +106,10 @@
 *     15-MAY-2008 (DSB):
 *        Guard against cases where all values are equal and THRESH is 
 *        zero.
+*     03-MAR-2009 (PWD):
+*        Use NUM_MIN/MAX functions to handle generic MIN/MAX (byte data
+*        types). Rename DIM argument to SIZE to avoid clash with intrinsic of
+*        same name. 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -120,11 +125,11 @@
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
 
 *  Arguments Given:
-      INTEGER DIM
+      INTEGER SIZE
       INTEGER NUMBIN
       LOGICAL CUMUL
       LOGICAL BAD
-      <TYPE> ARRAY( DIM )
+      <TYPE> ARRAY( SIZE )
 
 *  Arguments Given and Returned:
       <TYPE> VALMAX
@@ -152,8 +157,9 @@
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
+      INCLUDE 'NUM_DEC_<T>'      ! NUM declarations for functions
       INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
-
+      INCLUDE 'NUM_DEF_<T>'      ! NUM definitions for functions
 *.
 
 *  Check the global inherited status.
@@ -172,17 +178,17 @@
          VLMIN = VAL__MAX<T>
 
          IF ( BAD ) THEN
-            DO  K = 1, DIM
+            DO  K = 1, SIZE
                IF ( ARRAY( K ) .NE. VAL__BAD<T> ) THEN
-                  VLMAX = MAX( VLMAX, ARRAY( K ) )
-                  VLMIN = MIN( VLMIN, ARRAY( K ) )
+                  VLMAX = NUM_MAX<T>( VLMAX, ARRAY( K ) )
+                  VLMIN = NUM_MIN<T>( VLMIN, ARRAY( K ) )
                END IF
             END DO
 
          ELSE
-            DO  K = 1, DIM
-               VLMAX = MAX( VLMAX, ARRAY( K ) )
-               VLMIN = MIN( VLMIN, ARRAY( K ) )
+            DO  K = 1, SIZE
+               VLMAX = NUM_MAX<T>( VLMAX, ARRAY( K ) )
+               VLMIN = NUM_MIN<T>( VLMIN, ARRAY( K ) )
             END DO
 
          END IF
@@ -247,7 +253,7 @@
          IF ( BAD ) THEN
 
 *  Loop round all the elements.
-            DO I = 1, DIM
+            DO I = 1, SIZE
 
 *  Test for bad pixel or pixel value outside the histogram range.
                IF ( ARRAY( I ) .NE. VAL__BAD<T> .AND.
@@ -272,7 +278,7 @@
          ELSE
 
 *  Loop round all the elements.
-            DO I = 1, DIM
+            DO I = 1, SIZE
 
 *  Test for pixel value outside the histogram range.
                IF ( ARRAY( I ) .GE. VALMIN .AND.
@@ -301,7 +307,7 @@
          IF ( BAD ) THEN
 
 *  Loop round all the elements.
-            DO I = 1, DIM
+            DO I = 1, SIZE
 
 *  Test for bad pixel or pixel value outside the histogram range.
                TEMP = NUM_<T>TOD( ARRAY( I ) )
@@ -325,7 +331,7 @@
          ELSE
 
 *  Loop round all the elements.
-            DO I = 1, DIM
+            DO I = 1, SIZE
 
 *  Test for pixel value outside the histogram range.
                TEMP = NUM_<T>TOD( ARRAY( I ) )
