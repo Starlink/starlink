@@ -217,7 +217,7 @@ F77_SUBROUTINE(ndg_gtsup)( INTEGER(IGRP), INTEGER(I), CHARACTER_ARRAY(FIELDS),
    string for which a pointer has been supplied in "fields". This length
    should include room for the trailing null. */
 
-void ndgGtsup( const Grp *grp, size_t i, const char const *fields[6], size_t len, int *status ){
+void ndgGtsup( const Grp *grp, size_t i, char *const fields[6], size_t len, int *status ){
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(I);
    DECLARE_CHARACTER_ARRAY_DYN(FIELDS);
