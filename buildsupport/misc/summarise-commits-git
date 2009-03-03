@@ -1,0 +1,468 @@
+#!perl -w
+
+=head1 NAME
+
+summarise-commits - Summarise commits in a git repository
+
+=head1 SYNOPSIS
+
+  summarise-commits -startrev sha1 -repos starlink
+
+=head1 DESCRIPTION
+
+Email the log of changes to the mailing list associated with a
+specific group of repositories. Starts from the revision that was
+used for the previous run of this program.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-help>
+
+Print help information.
+
+=item B<-version>
+
+Print version information.
+
+=item B<-man>
+
+Print the full documentation to STDOUT.
+
+=item B<-start>
+
+Start from the child of this revision. Standard GIT syntax can be used.
+Only of use if the repository group corresponds to a single git
+repository.
+
+=item B<-repgrp>
+
+The name identifying the group of repositories to process. This value
+corresponds to special settings that are indexed by repository
+name. Default is "starlink".
+
+=item B<-noemail>
+
+Disable the mailing of report summary. Mail message is not sent if no revisions
+have been committed since the last time this ran. Results will be sent to stdout
+and the revision tracking file will not be updated.
+
+=item B<-to>
+
+Override the email address to which messages should be sent.
+
+=back
+
+=cut
+
+# Something like
+#  git log  -M -C -C --stat=80  44f65bda26885f0939f4661..
+# should do it
+
+use warnings;
+use strict;
+use File::Spec;
+use Pod::Usage;
+use Getopt::Long;
+use Net::SMTP;
+$| = 1; # unbuffered
+
+# Restrict PATH
+$ENV{PATH} = "/usr/bin:/opt/local/bin";
+
+# Mail SMTP server
+my $MAILHOST = "mailhost";
+
+# Repository root path without the last directory included (which in JAC
+# case is the directory that contains all subversion repositories)
+my %REPO_ROOTS = (
+		  "/jac_sw/gitroot" => {
+					url => "http://cvsweb.jach.hawaii.edu/git/?p=",
+				       },
+		  "/web/starlink/git" => {
+					  url => "http://starlink.jach.hawaii.edu/git/?p=",
+					 },
+		 );
+
+# Find all the repositories inside these directories
+# They are all bare repositories so end in .git
+# Special case starlink repository and jac repository
+my %repos;
+my %repurl;
+
+my %starrepos;
+my %jacrepos;
+
+for my $root (keys %REPO_ROOTS) {
+  opendir( my $DH, $root ) or die "Could not open directory $root: $!";
+  my @_repos = grep /\.git$/, readdir($DH);
+  for my $_r (@_repos) {
+    my $name = $_r;
+    $name =~ s/\.git$//;
+    $repos{$name} = File::Spec->catdir( $root, $_r );
+
+    # Assume that all repositories with "starlink" in path are
+    # Starlink repositories
+    if ($repos{$name} =~ /starlink/) {
+      $starrepos{$name} = $repos{$name};
+    } elsif ($repos{$name} = /jac_sw/) {
+      $jacrepos{$name} = $repos{$name};
+    }
+
+    # URL
+    $repurl{$name} = $REPO_ROOTS{$root}{url};
+  }
+
+}
+
+# Do not include "oracdr" or "cpan-modules" in starlink
+delete $starrepos{oracdr};
+delete $starrepos{"cpan-modules"};
+delete $starrepos{"starlink-allcvs"};
+delete $starrepos{"starlink-oldsvn"};
+delete $starrepos{starlink}; # to make sure it is first
+
+# We could read these from a config file if this is to become a general
+# program for git use but for now use a hash
+
+# Combine repositories into more general lumps depending on interest
+# This does require that submodules are added manually rather th
+
+my %SETTINGS = (
+		starlink => {
+			     # List of all the modules to be included
+			     modules => ["starlink", sort keys %starrepos ],
+			     # URL root dir where report web page will appear
+			     reporturlroot => "http://starlink.jach.hawaii.edu/",
+			     # Where mail message will be sent
+			     reportmail => 'stardev@jiscmail.ac.uk',
+			     # Local directory on the web server for web page and .revision file
+			     reportdir => '/web/starlink',
+			     # Name of report web file
+			     reportfile => 'summarize-commits.html',
+			     # Filter used to restrict report to specific part of repository tree
+			     file_filter => '',
+			    },
+		scicom => {
+			   # List of all the modules to be included
+			   modules => [ "acsis-libspecwrite", keys %jacrepos ],
+			   # URL root dir where report web page will appear
+			   reporturlroot => "http://www.jach.hawaii.edu/software",
+			   # Where mail message will be sent
+			   reportmail => 'scicom@jach.hawaii.edu',
+			   # Local directory on the web server for web page and .revision file
+			   reportdir => '/web/html/software',
+			   # Name of report web file
+			   reportfile => 'summarize-commits.html',
+			   # Filter used to restrict report to specific part of repository tree
+			   file_filter => '',
+			  },
+		omp => {
+			   # List of all the modules to be included
+			   modules => [ "omp-perl" ],
+			   # URL root dir where report web page will appear
+			   reporturlroot => "http://www.jach.hawaii.edu/software",
+			   # Where mail message will be sent
+			   reportmail => 'omp_group@jach.hawaii.edu',
+			   # Local directory on the web server for web page and .revision file
+			   reportdir => '/web/html/software',
+			   # Name of report web file
+			   reportfile => 'summarize-commits.html',
+			   # Filter used to restrict report to specific part of repository tree
+			   file_filter => '',
+			  },
+		oracdr => {
+			   # List of all the modules to be included
+			   modules => [ "oracdr" ],
+			   # URL root dir where report web page will appear
+			   reporturlroot => "http://www.oracdr.org",
+			   # Where mail message will be sent
+			   reportmail => 'oracdr@jach.hawaii.edu',
+			   # Local directory on the web server for web page and .revision file
+			   reportdir => '/web/oracdr.org',
+			   # Name of report web file
+			   reportfile => 'summarize-commits.html',
+			   # Filter used to restrict report to specific part of repository tree
+			   file_filter => '',
+			  },
+		smurf => {
+			  # List of all the modules to be included
+			  modules => [ "starlink" ],
+			  # URL root dir where report web page will appear
+			  reporturlroot => "http://starlink.jach.hawaii.edu/",
+			  # Where mail message will be sent
+			  reportmail => 'scuba2dr_dev@phas.ubc.ca',
+			  # Local directory on the web server for web page and .revision file
+			  reportdir => '/web/starlink',
+			  # Name of report web file
+			  reportfile => 'summarize-commits-smurf.html',
+			  # Filter used to restrict report to specific part of repository tree
+			  file_filter => 'applications/smurf',
+			 },
+		staronly => { # only the starlink repository
+			     # List of all the modules to be included
+			     modules => ["starlink" ],
+			     # URL root dir where report web page will appear
+			     reporturlroot => "http://starlink.jach.hawaii.edu/",
+			     # Where mail message will be sent
+			     reportmail => 'stardev@jiscmail.ac.uk',
+			     # Local directory on the web server for web page and .revision file
+			     reportdir => '/web/starlink',
+			     # Name of report web file
+			     reportfile => 'summarize-commits-staronly.html',
+			     # Filter used to restrict report to specific part of repository tree
+			     file_filter => '',
+			    },
+		test => {
+			  # List of all the modules to be included
+			  modules => [ "starlink" ],
+			  # URL root dir where report web page will appear
+			  reporturlroot => "file://localhost/",
+			  # Where mail message will be sent
+			  reportmail => 'tim.jenness@gmail.com',
+			  # Local directory on the web server for web page and .revision file
+			  reportdir => '/home/timj',
+			  # Name of report web file
+			  reportfile => 'summarize-commits-test.html',
+			  # Filter used to restrict report to specific part of repository tree
+			  file_filter => 'libraries/ast',
+			 },
+);
+
+# Argument parsing
+my ($help, $man, $version, $startrev, $repgrp, $stdout, $toemail);
+my $email = 1; # default to sending email
+my $ostatus = GetOptions( "help" => \$help,
+                          "man" => \$man,
+                          "version" => \$version,
+			  "start=s" => \$startrev,
+			  "repgrp=s" => \$repgrp,
+			  "email!" => \$email,
+			  "to=s" => \$toemail,
+                         );
+
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose =>2) if $man;
+if ($version) {
+    my $id = '$Id$';
+    print "summarize-commits: Provide summary of recent commits to git repository\n";
+    print " Revision: $id\n";
+    exit;
+}
+
+# Validate revision
+if ($startrev) {
+  if ($startrev !~ /^([a-f0-9]+\^?)$/) {
+    die "Supplied revision ($startrev) does not look like a git commit id\n";
+  } else {
+    # untaint
+    $startrev = $1;
+  }
+}
+
+# Select the correct set of configuration parameters
+if ($repgrp) {
+  die "Specified repository ($repgrp) is not understood\n"
+    if !exists $SETTINGS{$repgrp};
+  # now untaint $repgrp
+  for my $k (keys %SETTINGS) {
+    if ($k eq $repgrp) {
+      $repgrp = $k;
+      last;
+    }
+  }
+} else {
+  # default to Starlink
+  $repgrp = 'starlink';
+}
+my %CFG = %{$SETTINGS{$repgrp}};
+
+# These are the derived values from those parameters
+
+# override email address
+if (!defined $toemail) {
+  $toemail = $CFG{reportmail};
+}
+
+# Name of file containing the commits that were processed last time
+# this ran
+my $revfile = ".revision-$repgrp";
+
+# Calculate the path to the revision file (we will need it later)
+my $revfilepath = File::Spec->catfile($CFG{reportdir}, $revfile);
+
+# report URL 
+my $reporturl = $CFG{reporturlroot} ."/$CFG{reportfile}";
+
+# now we can start
+my %BASEREV;
+if ($startrev) {
+  # only of use if there is a single module
+  die "Can not specify a single commit id for multi-module repository"
+    if (scalar @{$CFG{modules}} > 1);
+  $BASEREV{$CFG{modules}[0]} = $startrev;
+} elsif (-e $revfilepath) {
+  open(my $fh, "< $revfilepath") or
+    die "Error opening revision history file '$revfilepath' : $!";
+  # File will have 
+  #   repository_name SHA1
+  while (my $br = <$fh>) {
+    chomp($br);
+    my ($rep, $sha) = split(/\s+/,$br);
+    $BASEREV{$rep} = $sha;
+  }
+  close($fh) or die "Error closing file '$revfilepath': $!";
+} else {
+  die "Do not know which revision to use as reference! Consider using -start\n";
+}
+
+my @LONG;
+my @SHORT;
+my %ENDREV;       # most recent commit
+my $have_content; # any content at all?
+
+# loop over each repository
+for my $rep ( @{$CFG{modules}} ) {
+
+  push(@LONG, "Commits from repository $rep","");
+  push(@SHORT,  "Commits from repository $rep");
+
+  # Select the correct git repository (these are bare repos)
+  $ENV{GIT_DIR} = $repos{$rep};
+
+  die "No commit associated with repository $rep in configuration $repgrp\n"
+    unless exists $BASEREV{$rep};
+
+  my $baserev = $BASEREV{$rep};
+
+  # Explicit paths can be specified explicitly easily
+  my $path = '';
+  if ($CFG{file_filter}) {
+    $path = "-- ". $CFG{file_filter};
+  }
+
+  # run git log to get short output
+  my @shortl = `git log --dirstat=1 --pretty=format:\"(\%an) \%s\" ${baserev}.. $path`;
+  chomp(@shortl);
+
+  # run git log to get full output
+  my @lines = `git log -M -C -C --stat=78 ${baserev}.. $path`;
+  chomp(@lines);
+
+  if (@lines) {
+    $have_content = 1;
+
+    # look for the last commit
+    for my $l (reverse @lines) {
+      if ($l =~ /^commit ([a-f0-9]{40})/) {
+	$ENDREV{$rep} = $1;
+	print "FOUND ENDREV= $1\n";
+	last;
+      }
+    }
+  }
+
+  # indent
+  push(@LONG, map { "  $_" } @lines);
+  push(@SHORT, map { "  $_" } @shortl);
+}
+
+my @OUTPUT = (@SHORT, " ", @LONG );
+
+# Construct the email (which just has changed files in it)
+# Do nothing if nothing has been committed
+if ($have_content) {
+  if ($email && $CFG{reportmail}) {
+    sendmail({
+	      from => $ENV{USER} .'@jach.hawaii.edu',
+	      to => $toemail,
+	      subject => "Recent repository commits",
+	      mailhost => $MAILHOST,
+	      message => \@OUTPUT});
+  } else {
+    # write to standard out
+    print join("\n",@OUTPUT)."\n";
+  }
+
+  # Done, so write the new marker file if we send email
+  if ($email) {
+    if ( open my $revhdl, ">", $revfilepath) {
+      for my $r (keys %BASEREV) {
+	my $sha = $BASEREV{$r};
+	$sha = $ENDREV{$r} if exists $ENDREV{$r};
+	print $revhdl "$r $sha\n";
+      }
+      close($revhdl);
+    } else {
+      warn "Could not write marker file for revisions into $revfilepath\n";
+    }
+  }
+}
+
+exit;
+
+
+# send the email
+sub sendmail {
+    my $param = shift;
+
+    unless ($param->{to}
+            && $param->{from}
+            && $param->{subject}
+            && $param->{mailhost}
+            && $param->{message}) {
+        return 0;
+    }
+
+    my $smtp = Net::SMTP->new($param->{mailhost});
+    defined $smtp || do {
+        print STDERR "Can't open SMTP connection to ".$param->{mailhost}."\n";
+        return 0;
+    };
+
+    my $status = 1;
+
+    $status &= $smtp->mail($param->{from});
+    $status || print "Error mail\n";
+    $status &= $smtp->recipient($param->{to});
+    $status || print "Error recipient\n";
+    $status &= $smtp->data();
+    $status || print "Error data\n";
+    $status &= $smtp->datasend("To: ".$param->{to}."\n");
+    $status &= $smtp->datasend("From: ".$param->{from}."\n");
+    $status &= $smtp->datasend("Subject: ".$param->{subject}."\n");
+    $status &= $smtp->datasend("Date: ".localtime()."\n");
+    $status &= $smtp->datasend("\n");
+    foreach my $line (@{$param->{message}}) {
+        chomp($line);
+        $status &= $smtp->datasend($line . "\n");
+    }
+    $status &= $smtp->dataend;
+    $status &= $smtp->quit;
+    $status || print "Error quit\n";
+
+    return $status;
+}
+
+=head1 AUTHOR
+
+Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>,
+
+Copyright (C) 2009 Science and Technology Facilities Council.
+All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful,but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place,Suite 330, Boston, MA  02111-1307, USA
+
+=cut
