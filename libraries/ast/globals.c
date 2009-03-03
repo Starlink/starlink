@@ -210,6 +210,7 @@ AstGlobals *astGlobalsInit_( void ) {
       INIT( WinMap );
       INIT( StcResourceProfile );
       INIT( StcSearchLocation );
+      INIT( StcsChan );        
 #undef INIT
 
 /* Save the pointer as the value of the starlink_ast_globals_key

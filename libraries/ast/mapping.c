@@ -880,7 +880,7 @@ static void Decompose( AstMapping *this, AstMapping **map1, AstMapping **map2,
 *
 *     Since the Frame class inherits from the Mapping class, Frames can
 *     be considered as special types of Mappings and so this method can
-*     be used to decompose either CmpMaps or CmpFrames.
+*     be used to decompose CmpMaps, CmpFrames, CmpRegions or Prisms.
 
 *  Parameters:
 *     this
@@ -23314,7 +23314,7 @@ f     AST_MAPSPLIT
 
 *  Synopsis:
 c     #include "mapping.h"
-c     void astMapSplit( AstMapping *this, int nin, const int *in, int *out,
+c     void astMapSplit( AstMapping *this, int nin, const int *in, int *nout,
 c                       AstMapping **map )
 f     CALL AST_MAPSPLIT( THIS, NIN, IN, OUT, MAP, STATUS )
 

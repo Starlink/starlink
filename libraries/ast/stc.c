@@ -46,6 +46,8 @@ f     - AST_GETSTCNCOORD: Returns the number of AstroCoords elements in an Stc
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -71,6 +73,8 @@ f     - AST_GETSTCNCOORD: Returns the number of AstroCoords elements in an Stc
 *        Original version.
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
+*     13-MAR-2009 (DSB):
+*        Over-ride astRegBasePick.
 *class--
 */
 
@@ -123,21 +127,19 @@ f     - AST_GETSTCNCOORD: Returns the number of AstroCoords elements in an Stc
 static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_getobjsize)( AstObject *, int * );
 static AstMapping *(* parent_simplify)( AstMapping *, int * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
-static AstRegion *(* parent_getuncfrm)( AstRegion *, int, int * );
+static AstRegion *(* parent_getdefunc)( AstRegion *, int * );
 static const char *(* parent_getattrib)( AstObject *, const char *, int * );
 static int (* parent_equal)( AstObject *, AstObject *, int * );
+static int (* parent_getobjsize)( AstObject *, int * );
+static int (* parent_getusedefs)( AstObject *, int * );
 static int (* parent_testattrib)( AstObject *, const char *, int * );
-static int (* parent_testunc)( AstRegion *, int * );
 static void (* parent_clearattrib)( AstObject *, const char *, int * );
-static void (* parent_clearunc)( AstRegion *, int * );
 static void (* parent_setattrib)( AstObject *, const char *, int * );
 static void (* parent_setregfs)( AstRegion *, AstFrame *, int * );
-static int (* parent_getusedefs)( AstObject *, int * );
-static void (*parent_regsetattrib)( AstRegion *, const char *, char **, int * );
 static void (*parent_regclearattrib)( AstRegion *, const char *, char **, int * );
+static void (*parent_regsetattrib)( AstRegion *, const char *, char **, int * );
 
 static void (* parent_clearnegated)( AstRegion *, int * );
 static void (* parent_clearclosed)( AstRegion *, int * );
@@ -201,32 +203,31 @@ static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
+static AstKeyMap *GetStcCoord( AstStc *, int, int * );
+static AstKeyMap *MakeAstroCoordsKeyMap( AstRegion *, AstKeyMap *, const char *, int * );
 static AstMapping *Simplify( AstMapping *, int * );
 static AstPointSet *RegBaseMesh( AstRegion *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
-static int GetObjSize( AstObject *, int * );
-static AstRegion *GetUncFrm( AstRegion *, int, int * );
+static AstRegion *GetDefUnc( AstRegion *, int * );
+static AstRegion *GetStcRegion( AstStc *, int * );
+static AstRegion *RegBasePick( AstRegion *this, int, const int *, int * );
+static const char *GetRegionClass( AstStc *, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int GetBounded( AstRegion *, int * );
+static int GetObjSize( AstObject *, int * );
+static int GetStcNCoord( AstStc *, int * );
+static int GetUseDefs( AstObject *, int * );
+static int Overlap( AstRegion *, AstRegion *, int * );
+static int OverlapX( AstRegion *, AstRegion *, int * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
-static int TestUnc( AstRegion *, int * );
-static void ClearUnc( AstRegion *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void GetRegion( AstStc *, AstRegion **, int *, int * );
 static void RegBaseBox( AstRegion *, double *, double *, int * );
-static void SetRegFS( AstRegion *, AstFrame *, int * );
-static const char *GetRegionClass( AstStc *, int * );
-static AstRegion *GetStcRegion( AstStc *, int * );
-static AstKeyMap *GetStcCoord( AstStc *, int, int * );
-static int GetStcNCoord( AstStc *, int * );
-static int GetUseDefs( AstObject *, int * );
-static void RegSetAttrib( AstRegion *, const char *, char **, int * );
 static void RegClearAttrib( AstRegion *, const char *, char **, int * );
-static AstKeyMap *MakeAstroCoordsKeyMap( AstRegion *, AstKeyMap *, const char *, int * );
-static int Overlap( AstRegion *, AstRegion *, int * );
-static int OverlapX( AstRegion *, AstRegion *, int * );
+static void RegSetAttrib( AstRegion *, const char *, char **, int * );
+static void SetRegFS( AstRegion *, AstFrame *, int * );
 
 static void ClearAttrib( AstObject *, const char *, int * );
 static const char *GetAttrib( AstObject *, const char *, int * );
@@ -328,55 +329,6 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
    } else {
       (*parent_clearattrib)( this_object, attrib, status );
    }
-}
-
-static void ClearUnc( AstRegion *this_region, int *status ){
-/*
-*  Name:
-*     ClearUnc
-
-*  Purpose:
-*     Erase any uncertainty information in a Region.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "stc.h"
-*     void ClearUnc( AstRegion *this, int *status )
-
-*  Class Membership:
-*     Stc member function (over-rides the astClearUnc protected
-*     method inherited from the Region class).
-
-*  Description:
-*     This function erases all uncertainty information, whether default
-*     or not, from a Region.
-
-*  Parameters:
-*     this
-*        Pointer to the Region.
-*     status
-*        Pointer to the inherited status variable.
-
-*/
-
-/* Local Variables: */
-   AstStc *this;
-
-/* Check the inherited status. */
-   if( !astOK ) return;
-
-/* Invoke the implementation inherited form the parent Region class to 
-   clear any default uncertainty information. */
-   (* parent_clearunc)( this_region, status );
-
-/* Get a pointer to the Stc structure. */
-   this = (AstStc *) this_region;
-
-/* Clear any uncertainty information in the encapsulated Region. */
-   astClearUnc( this->region );
-
 }
 
 static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
@@ -938,6 +890,76 @@ static int GetBounded( AstRegion *this_region, int *status ) {
    return result;
 }
 
+static AstRegion *GetDefUnc( AstRegion *this_region, int *status ) {
+/*
+*  Name:
+*     GetDefUnc
+
+*  Purpose:
+*     Obtain a pointer to the default uncertainty Region for a given Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "stc.h"
+*     AstRegion *GetDefUnc( AstRegion *this ) 
+
+*  Class Membership:
+*     Stc method (over-rides the astGetDefUnc method inherited from
+*     the Region class).
+
+*     This function returns a pointer to a Region which represents the
+*     default uncertainty associated with a position on the boundary of the 
+*     given  Region. The returned Region refers to the base Frame within the 
+*     FrameSet encapsulated by the supplied Region.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+
+*  Returned Value:
+*     A pointer to the Region. This should be annulled (using astAnnul)
+*     when no longer needed.
+
+*  Notes:
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstStc *this;              /* Pointer to the Stc structure */
+   AstRegion *result;         /* Returned pointer */
+
+/* Initialise */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the Stc structure. */
+   this = (AstStc *) this_region;   
+
+/* If the encapsulated region has non-default uncertainty, use it as
+   the default uncertainty for the Cmpregion. Note, the current Frame of
+   an uncertainty Region is assumed to be the same as the base Frame in the 
+   Stc. */
+   if( astTestUnc( this->region ) ) {
+      result = astGetUncFrm( this->region, AST__CURRENT );
+
+/* Otherwise, use the parent method to determine the default uncertainty. */ 
+   } else {
+      result = (* parent_getdefunc)( this_region, status );
+   }
+
+/* Return NULL if an error occurred. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the required pointer. */
+   return result;
+}
+
 static void GetRegion( AstStc *this, AstRegion **reg, int *neg, int *status ) {
 /*
 *
@@ -1326,130 +1348,6 @@ f     function is invoked with STATUS set to an error value, or if it
    return astCopy( this->region );
 }
 
-static AstRegion *GetUncFrm( AstRegion *this_region, int ifrm, int *status ) {
-/*
-*  Name:
-*     GetUncFrm
-
-*  Purpose:
-*     Obtain a pointer to the uncertainty Region for a given Region.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "stc.h"
-*     AstRegion *GetUncFrm( AstRegion *this, int ifrm, int *status ) 
-
-*  Class Membership:
-*     Stc method (over-rides the astGetUncFrm method inherited from
-*     the Region class).
-
-*  Description:
-*     This function returns a pointer to a Region which represents the
-*     uncertainty associated with a position on the boundary of the given 
-*     Region. The returned Region can refer to the either the base or 
-*     the current Frame within the FrameSet encapsulated by the supplied 
-*     Region as specified by the "ifrm" parameter. If the returned Region is 
-*     re-centred at some point on the boundary of the supplied Region, then 
-*     the re-centred Region will represent the region in which the true 
-*     boundary position could be.
-
-*  Parameters:
-*     this
-*        Pointer to the Region.
-*     ifrm
-*        The index of a Frame within the FrameSet encapsulated by "this".
-*        The returned Region will refer to the requested Frame. It should
-*        be either AST__CURRENT or AST__BASE.
-*     status
-*        Pointer to the inherited status variable.
-
-*  Returned Value:
-*     A pointer to the Region. This should be annulled (using astAnnul)
-*     when no longer needed.
-
-*  Notes:
-*     - A default uncertainty Region will be created if the supplied Region 
-*     does not have an uncertainty Region.
-*     - A NULL pointer will be returned if this function is invoked
-*     with the global error status set, or if it should fail for any
-*     reason.
-*/
-
-/* Local Variables: */
-   AstStc *this;              /* Pointer to Stc structure */
-   AstFrame *frm;             /* Current Frame from supplied Region */
-   AstMapping *map;           /* Supplied to uncertainty Mapping */
-   AstRegion *bunc;           /* Uncertainty Region in base Frame of "this" */
-   AstRegion *result;         /* Returned pointer */
-
-/* Initialise */
-   result = NULL;
-
-/* Check the global error status. */
-   if ( !astOK ) return result;
-
-/* Get a pointer to the Stc structure. */
-   this = (AstStc *) this_region;   
-
-/* If the parent Region structure contains explicit uncertainty information, 
-   use it in preference to any uncertainty Region stored in the encapsulated
-   Region. */
-   if( (* parent_testunc)( this_region, status ) ) {
-      bunc = (* parent_getuncfrm)( this_region, AST__BASE, status );
-
-/* Otherwise, if the encapsulated Region has a defined uncertainty, use it. 
-   The current Frame in the encapsulated Region is equivalent to the base 
-   Frame in the parent Region structure. So we may need to map the component 
-   uncertainty into the current Region of the parent is required later on. */
-   } else if( astTestUnc( this->region ) ) {
-      bunc = astGetUncFrm( this->region, AST__CURRENT );
-
-/* Otherwise invoke the astGetUnc method inherited from the parent Region
-   class to create a default uncertainty region. */
-   } else {
-      bunc = (* parent_getuncfrm)( this_region, AST__BASE, status );
-   }
-
-/* The above code obtains an uncertainty Region in the base Frame of the
-   parent Region (equal to the current Frame of the encapsulated Region).
-   If this is what is required, return a clone of the above Region. */
-   if( ifrm == AST__BASE ) {
-      result = astClone( bunc );
-
-/* Otherwise, map it into the current Region of the parent.  */
-   } else {
-
-/* Get a Mapping from the Frame represented by the uncertainty Region
-   (the parent Region base Frame) to the parent Region current Frame. */
-      map = astGetMapping( this_region->frameset, AST__BASE, AST__CURRENT );
-
-/* If it is a UnitMap, the uncertainty Region is already in the correct 
-   Frame, so just return the stored pointer. */
-      if( astIsAUnitMap( map ) ) {
-         result= astClone( bunc );
-
-/* Otherwise, use this Mapping to map the uncertainty Region into the current
-   Frame. */
-      } else {
-         frm = astGetFrame( this_region->frameset, AST__CURRENT );
-         result = astMapRegion( bunc, map, frm );
-
-/* Free resources. */
-         frm = astAnnul( frm );
-      }
-      map = astAnnul( map );
-   }
-   bunc = astAnnul( bunc );
-
-/* Return NULL if an error occurred. */
-   if( !astOK ) result = astAnnul( result );
-
-/* Return the required pointer. */
-   return result;
-}
-
 static int GetUseDefs( AstObject *this_object, int *status ) {
 /*
 *  Name:
@@ -1611,21 +1509,11 @@ void astInitStcVtab_(  AstStcVtab *vtab, const char *name, int *status ) {
    parent_simplify = mapping->Simplify;
    mapping->Simplify = Simplify;
 
-   parent_getuncfrm = region->GetUncFrm;
-   region->GetUncFrm = GetUncFrm;
-
-   parent_clearunc = region->ClearUnc;
-   region->ClearUnc = ClearUnc;
-
-   parent_testunc = region->TestUnc;
-   region->TestUnc = TestUnc;
-
    parent_setregfs = region->SetRegFS;
    region->SetRegFS = SetRegFS;
 
    parent_equal = object->Equal;
    object->Equal = Equal;
-
 
    parent_clearclosed = region->ClearClosed;
    region->ClearClosed = ClearClosed;
@@ -1651,7 +1539,6 @@ void astInitStcVtab_(  AstStcVtab *vtab, const char *name, int *status ) {
    region->TestNegated = TestNegated;
    region->GetNegated = GetNegated;
 
-
    parent_setmeshsize = region->SetMeshSize;
    region->SetMeshSize = SetMeshSize;
 
@@ -1660,7 +1547,6 @@ void astInitStcVtab_(  AstStcVtab *vtab, const char *name, int *status ) {
 
    region->TestMeshSize = TestMeshSize;
    region->GetMeshSize = GetMeshSize;
-
 
    parent_setfillfactor = region->SetFillFactor;
    region->SetFillFactor = SetFillFactor;
@@ -1674,12 +1560,16 @@ void astInitStcVtab_(  AstStcVtab *vtab, const char *name, int *status ) {
    parent_getusedefs = object->GetUseDefs;
    object->GetUseDefs = GetUseDefs;
 
+   parent_getdefunc = region->GetDefUnc;
+   region->GetDefUnc = GetDefUnc;
+
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    region->Overlap = Overlap;
    region->OverlapX = OverlapX;
    region->RegBaseBox = RegBaseBox;
    region->RegBaseMesh = RegBaseMesh;
+   region->RegBasePick = RegBasePick;
    region->RegPins = RegPins;
    region->GetBounded = GetBounded;
 
@@ -2224,6 +2114,60 @@ static AstPointSet *RegBaseMesh( AstRegion *this, int *status ){
    a mesh in the current Frame of the encapsulated Region which is the same
    as the base Frame of the Stc Region. */
    return astRegMesh( ((AstStc *)this)->region );
+}
+
+static AstRegion *RegBasePick( AstRegion *this_region, int naxes, 
+                               const int *axes, int *status ){
+/*
+*  Name:
+*     RegBasePick
+
+*  Purpose:
+*     Return a Region formed by picking selected base Frame axes from the
+*     supplied Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "stc.h"
+*     AstRegion *RegBasePick( AstRegion *this, int naxes, const int *axes, 
+*                             int *status )
+
+*  Class Membership:
+*     Stc member function (over-rides the astRegBasePick protected
+*     method inherited from the Region class).
+
+*  Description:
+*     This function attempts to return a Region that is spanned by selected 
+*     axes from the base Frame of the encapsulated FrameSet of the supplied 
+*     Region. This may or may not be possible, depending on the class of
+*     Region. If it is not possible a NULL pointer is returned.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     naxes
+*        The number of base Frame axes to select.
+*     axes
+*        An array holding the zero-based indices of the base Frame axes
+*        that are to be selected.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Pointer to the Region, or NULL if no region can be formed.
+
+*  Notes:
+*    - A NULL pointer is returned if an error has already occurred, or if
+*    this function should fail for any reason.
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Invoke the astRegBaePick method on the encapsulated Region. */
+   return astRegBasePick( ((AstStc *)this_region)->region, naxes, axes );
 }
 
 static void RegClearAttrib( AstRegion *this_region, const char *attrib, 
@@ -2929,61 +2873,6 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
    return result;
 }
 
-static int TestUnc( AstRegion *this_region, int *status ) {
-/*
-*  Name:
-*     TestUnc
-
-*  Purpose:
-*     Does the Region contain non-default uncertainty information?
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     include "stc.h"
-*     int astTestUnc( AstRegion *this, int *status )
-
-*  Class Membership:
-*     Stc member function (over-rides the astTestUnc protected
-*     method inherited from the Region class).
-
-*  Description:
-*     This function returns a flag indicating if the uncertainty Region in 
-*     the supplied Region was supplied explicit (i.e. is not a default 
-*     uncertainty Region).
-
-*  Parameters:
-*     this
-*        Pointer to the Region.
-*     status
-*        Pointer to the inherited status variable.
-
-*  Returned Value:
-*     Non-zero if the uncertainty Region was supplied explicitly.
-*     Zero otherwise.
-
-*/
-
-/* Local Variables; */
-   int result;
-
-/* Check the global error status. */
-   if ( !astOK ) return 0;
-
-/* See if the parent Region structure contains explicit uncertainty
-   information. If so this will be used in preference to any uncertainty
-   info in the encapsulated Region. */
-   result = (* parent_testunc)( this_region, status );
-
-/* If not see if the encapsulated Region contains explicit uncertainty 
-   information. */
-   if( !result ) result = astTestUnc( ((AstStc *) this_region)->region );
-
-/* Return the result */
-   return result;
-}
-
 static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
                                int forward, AstPointSet *out, int *status ) {
 /*
@@ -3531,7 +3420,7 @@ AstStc *astInitStc_( void *mem, size_t size, int init, AstStcVtab *vtab,
       new->coord = NULL;
 
 /* Transfer attributes from the encapsulated region to the parent region. */
-     astRegOverlay( new, reg );
+     astRegOverlay( new, reg, 1 );
      if( astTestIdent( reg ) ) astSetIdent( new, astGetIdent( reg ) );
 
 /* If the base->current Mapping in the FrameSet within the encapsulated Region 

@@ -103,6 +103,7 @@ typedef struct AstBox {
    double shrink;                /* Temporary shrink factor */
    double *lo;                   /* Shrunk low limits */
    double *hi;                   /* Shrunk high limits */
+   double *geolen;               /* Geodesic half-dimensions of box */
    int stale;                    /* Is other info out of date? */
 } AstBox;
 

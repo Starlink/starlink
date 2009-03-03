@@ -16,6 +16,8 @@
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -112,6 +114,8 @@
 *     18-NOV-2008 (DSB):
 *        In astFlushMemory, do not release permanent memory blocks as
 *        they may still be needed.
+*     9-FEB-2009 (DSB):
+*        Added astChr2Double.
 */
 
 /* Configuration results. */
@@ -159,6 +163,7 @@
 #include "error.h"               /* Error reporting facilities */
 #include "globals.h"             /* Thread-specific global data */
 #include "memory.h"              /* Interface to this module */
+#include "pointset.h"            /* For AST__BAD */
 
 #ifdef MEM_DEBUG
 #include "object.h"              /* For astMakePointer */
@@ -780,6 +785,62 @@ static char *CheckTempStart( const char *template, const char *temp,
    }
 
 /* Return the string of allowed characters. */
+   return result;
+}
+
+double astChr2Double_( const char *str, int *status ) {
+/*
+*+
+*  Name:
+*     astChr2Double
+
+*  Purpose:
+*     read a double value from a string.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     double astChr2Double( const char *str )
+
+*  Description:
+*     This function reads a double from the supplied null-terminated string, 
+*     ignoring leading and trailing white space. AST__BAD is ereturned
+*     without error if the string is not a numerical value.
+
+*  Parameters:
+*     str
+*        Pointer to the string.
+
+*  Returned Value:
+*     The double value, or AST__BAD.
+
+*  Notes:
+*     -  A value of AST__BAD is returned if this function is invoked with 
+*     the global error status set or if it should fail for any reason.
+*-
+*/
+
+/* Local Variables: */
+   int nc;            /* Number of characters read from the string */
+   double result;     /* The returned value */
+
+/* Check the global error status and supplied pointer. */
+   if ( !astOK || !str ) return AST__BAD;
+
+/* Use scanf to read the floating point value. This fails if either 1) the
+   string does not begin with a numerical value (in which case astSscanf
+   returns zero), or 2) there are non-white characters following the
+   numerical value (i nwhich case "nc" - the number of characters read from
+   the string - is less than the length of the string). */
+   if ( nc = 0,
+        ( 1 != astSscanf( str, " %lg %n", &result, &nc ) )
+        || ( nc < strlen( str ) ) ) {
+      result = AST__BAD;
+   }
+
+/* Return the result. */
    return result;
 }
 

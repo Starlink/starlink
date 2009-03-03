@@ -63,6 +63,8 @@
 *        Use a double precision constant to initialise AST__UNDEFF.
 *     4-DEC-2008 (TIMJ):
 *        Add AST_TESTFITS. Remove AST__UNDEF<X>
+*     6-FEB-2009 (DSB):
+*        Added StcsChan class.
 *-
 
 *  Length of character string returned by a character function.
@@ -578,6 +580,10 @@ c      PARAMETER ( AST__UKERNN = 2 )
 *  Plot3D class.
       INTEGER AST_PLOT3D
       LOGICAL AST_ISAPLOT3D
+
+*  StcsChan class.
+      INTEGER AST_STCSCHAN
+      LOGICAL AST_ISASTCSCHAN
 
 
 

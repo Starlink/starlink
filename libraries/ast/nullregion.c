@@ -474,6 +474,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Initialise. */
    result = -1;
+   i1 = -1;
 
 /* Check the global error status. */
    if ( !astOK ) return result;
@@ -620,8 +621,6 @@ static AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg,
    AstRegion *unc_this;      /* Current Frame uncertainty Region from "this" */
    double fac_reg;           /* Ratio of used to default MeshSize for "reg" */
    double fac_this;          /* Ratio of used to default MeshSize for "this" */
-   int closed_reg;           /* Closed attribute value for other supplied Region */
-   int closed_this;          /* Closed attribute value for supplied NullRegion  */
    int msz_reg;              /* Original MeshSize for "reg" */
    int msz_reg_set;          /* Was MeshSize originally set for "reg"? */
    int msz_this;             /* Original MeshSize for "this" */
@@ -639,10 +638,11 @@ static AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg,
    if ( !astOK ) return result;
 
 /* Get the Closed attributes of the two Regions. They must be the same in 
-   each Region if we are to merge the Regions. */
-   closed_this = astGetClosed( this );
-   closed_reg = astGetClosed( reg );
-   if( closed_this == closed_reg ) {
+   each Region if we are to merge the Regions. In addition, in order to 
+   merge, either both Regions must have a defined uncertainty, or neither 
+   Region must have a defined Uncertainty. */
+   if( astGetClosed( this ) == astGetClosed( reg ) &&
+       astTestUnc( this ) == astTestUnc( reg ) ) {
 
 /* Get the Nagated attributes of the two Regions. */
       neg_this = astGetNegated( this );
@@ -681,7 +681,7 @@ static AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg,
          new = (AstRegion *) astNullRegion( bfrm, NULL, "", status );
    
 /* Propagate remaining attributes of the supplied Region to it. */
-         astRegOverlay( new, this );
+         astRegOverlay( new, this, 1 );
 
 /* Ensure the Negated flag is set correctly in the returned NullRegion. */
          if( neg_this ) {
@@ -776,7 +776,7 @@ static AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg,
 
 /* The MeshSize of the returned Returned is the default value scaled by
    the product of the two ratios found above. */
-            astSetMeshSize( new, fac_this*fac_reg*astGetMeshSize( new ) );
+            astSetMeshSize( result, fac_this*fac_reg*astGetMeshSize( result ) );
 
 /* Re-instate the original MeshSize values for the supplied Regions (if
    set) */
@@ -790,6 +790,7 @@ static AstRegion *MergeNullRegion( AstNullRegion *this, AstRegion *reg,
          map_this = astAnnul( map_this );
          map_reg = astAnnul( map_reg );
          bcmap = astAnnul( bcmap );
+         new = astAnnul( new );
          cfrm = astAnnul( cfrm );
       }
    }
@@ -1408,9 +1409,11 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    map = astAnnul( map );      
    new = astAnnul( new );      
 
-/* If any simplification took place, copy Region attributes from the 
-   supplied Region to the returned Region. */
-   if( result != this_mapping ) astRegOverlay( result, this );
+/* If any simplification could be performed, copy Region attributes from 
+   the supplied Region to the returned Region, and return a pointer to it.
+   If the supplied Region had no uncertainty, ensure the returned Region
+   has no uncertainty. Otherwise, return a clone of the supplied pointer. */
+   if( result != this_mapping ) astRegOverlay( result, this, 1 );
 
 /* If an error occurred, annul the returned pointer. */
    if ( !astOK ) result = astAnnul( result );

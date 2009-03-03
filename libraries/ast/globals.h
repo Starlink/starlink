@@ -60,6 +60,7 @@
 #include "stcobsdatalocation.h"
 #include "stcresourceprofile.h"
 #include "stcsearchlocation.h"
+#include "stcschan.h"
 #include "switchmap.h"
 #include "timeframe.h"
 #include "timemap.h"
@@ -200,6 +201,7 @@ typedef struct AstGlobals {
    AstWinMapGlobals WinMap;                     
    AstStcResourceProfileGlobals	StcResourceProfile;         
    AstStcSearchLocationGlobals StcSearchLocation;          
+   AstStcsChanGlobals StcsChan;        
 } AstGlobals;
 
 

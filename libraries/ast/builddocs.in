@@ -76,6 +76,7 @@ goodsource="${srcdir}/axis.c \
             ${srcdir}/stcsearchlocation.c \
             ${srcdir}/stccatalogentrylocation.c \
             ${srcdir}/stcobsdatalocation.c \
+            ${srcdir}/stcschan.c \
             ${srcdir}/timeframe.c \
             ${srcdir}/timemap.c \
             ${srcdir}/tranmap.c \

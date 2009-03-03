@@ -206,6 +206,7 @@ void *astMalloc_( size_t, int * );
 void *astRealloc_( void *, size_t, int * );
 void *astStore_( void *, const void *, size_t, int * );
 size_t astChrLen_( const char *, int * );
+double astChr2Double_( const char *, int * );
 void astRemoveLeadingBlanks_( char *, int * );
 char *astAppendString_( char *, int *, const char *, int * );
 char *astChrSub_( const char *, const char *, const char *[], int, int * );
@@ -244,6 +245,7 @@ void astEndPM_( int * );
 #define astString(chars,nchars) astERROR_INVOKE(astString_(chars,nchars,STATUS_PTR))
 #define astStringArray(chars,nel,len) astERROR_INVOKE(astStringArray_(chars,nel,len,STATUS_PTR))
 #define astChrLen(string) astERROR_INVOKE(astChrLen_(string,STATUS_PTR))
+#define astChr2Double(string) astERROR_INVOKE(astChr2Double_(string,STATUS_PTR))
 #define astRemoveLeadingBlanks(string) astERROR_INVOKE(astRemoveLeadingBlanks_(string,STATUS_PTR))
 #define astChrSub(test,template,subs,nsub) astERROR_INVOKE(astChrSub_(test,template,subs,nsub,STATUS_PTR))
 

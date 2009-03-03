@@ -22,13 +22,19 @@ f     AST_ELLIPSE
 *     those which are applicable to all Regions.
 
 *  Functions:
-c     The Ellipse class does not define any new functions beyond those
-f     The Ellipse class does not define any new routines beyond those
-*     which are applicable to all Regions.
+c     In addition to those functions applicable to all Regions, the
+c     following functions may also be applied to all Ellipses:
+f     In addition to those routines applicable to all Regions, the
+f     following routines may also be applied to all Ellipses:
+*
+c     - astEllipsePars: Get the geometric parameters of the Ellipse
+c     - AST_ELLIPSEPARS: Get the geometric parameters of the Ellipse
 
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -159,12 +165,14 @@ static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, 
 static double *RegCentre( AstRegion *this, double *, double **, int, int, int * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
 static void Cache( AstEllipse *, int * );
+static void CalcPars( AstFrame *, double[2], double[2], double[2], double *, double *, double *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
+static void EllipsePars( AstEllipse *, double[2], double *, double *, double *, int * );
 static void RegBaseBox( AstRegion *this, double *, double *, int * );
-static void SetRegFS( AstRegion *, AstFrame *, int * );
 static void ResetCache( AstRegion *this, int * );
+static void SetRegFS( AstRegion *, AstFrame *, int * );
 
 /* Member functions. */
 /* ================= */
@@ -515,6 +523,7 @@ void astInitEllipseVtab_(  AstEllipseVtab *vtab, const char *name, int *status )
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that provide
    virtual methods for this class. */
+   vtab->EllipsePars = EllipsePars;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -590,12 +599,9 @@ static void Cache( AstEllipse *this, int *status ){
    double *centre;      /* Array holding centre coords */
    double *point1;      /* Array holding coords at end of primary axis */
    double *point2;      /* Array holding coords at another point on ellipse */
-   double *point3;      /* Array holding a point on the primary axis */
    double a;            /* The half-length of the primary axis */
    double angle;        /* Orientation of primary axis */
    double b;            /* The half-length of the secondary axis */
-   double x;            /* The offset parallel to the primary axis */
-   double y;            /* The offset perpendicular to the primary axis */
    int i;               /* Axis index */
 
 /* Check the global error status. */
@@ -611,7 +617,6 @@ static void Cache( AstEllipse *this, int *status ){
       centre = (double *) astMalloc( sizeof( double )*2 );   
       point1 = (double *) astMalloc( sizeof( double )*2 );   
       point2 = (double *) astMalloc( sizeof( double )*2 );   
-      point3 = (double *) astMalloc( sizeof( double )*2 );   
    
 /* Get pointers to the coordinate data in the parent Region structure. */
       ptr = astGetPoints( ((AstRegion *) this)->points );
@@ -626,45 +631,16 @@ static void Cache( AstEllipse *this, int *status ){
             point2[ i ] = ptr[ i ][ 2 ];
          }
    
-/* Get the geodesic distance between the centre and point 1 (the end of
-   the primary axis of the ellipse). This is the half length of the
-   primary axis of the ellipse (the axis which joins the centre position to 
-   point 1). */
-         a = astDistance( frm, centre, point1 );      
-         if( astOK && ( a == 0.0 || a == AST__BAD ) ) {
-            astError( AST__BADIN, "astInitEllipse(%s): The supplied points "
-                      "imply a zero-width ellipse.", status, astGetClass( this ) );
+/* Calculate the geometric parameters of the ellipse. */
+         CalcPars( frm, centre, point1, point2, &a, &b, &angle, status );
+
+/* Check the returned values. */
+         if( a <= 0.0 || a == AST__BAD || b <= 0.0 || b == AST__BAD ) {
+            if( astOK ) astError( AST__BADIN, "astInitEllipse(%s): The "
+                                  "supplied points do not determine an "
+                                  "ellipse.", status, astGetClass( this ) );
          }
-   
-/* Find the point (point3) on the primary axis which is closest to point 2, 
-   and thus get the geodesic offsets (resolved parallel and perpendicular to
-   the primary axis) between the centre and point 2. */
-         astResolve( frm, centre, point1, point2, point3, &x, &y );
-   
-/* Find the half-length of the secondary ellipse axis. */
-         if( astOK ) {
-            b = a*a - x*x;
-            if( b > 0.0 ) {
-               b = a*y/sqrt( b );
-               if( b == 0.0 ) {
-                  astError( AST__BADIN, "astInitEllipse(%s): The supplied points "
-                            "imply a zero-width ellipse.", status, astGetClass( this ) );
-               }
-            } else {
-               astError( AST__BADIN, "astInitEllipse(%s): The supplied points "
-                         "do not determine an ellipse.", status, astGetClass( this ) );
-            }
-   
-         } else {
-            b = a;
-         }
-   
-/* Find the angle from the positive direction of the second axis to the
-   primary ellipse axis. */
-         point3[ 0 ] = centre[ 0 ];
-         point3[ 1 ] = centre[ 1 ] + fabs( 0.1*a );
-         angle = astAngle( frm, point3, centre, point1 );
-   
+
 /* Store useful things in the Ellipse structure. */
          if( astOK ) {
            astFree( this->centre );
@@ -695,12 +671,216 @@ static void Cache( AstEllipse *this, int *status ){
       if( centre ) centre = astFree( centre );
       if( point1 ) point1 = astFree( point1 );
       point2 = astFree( point2 );
-      point3 = astFree( point3 );
 
 /* Indicate cached information is up to date. */
       this->stale = 0;
 
    }
+}
+
+static void CalcPars( AstFrame *frm, double centre[2], double point1[2], 
+                      double point2[2], double *a, double *b, double *angle, 
+                      int *status ){
+/*
+*  Name:
+*     CalcPars
+
+*  Purpose:
+*     Calculate ellipse parameters.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "ellipse.h"
+*     void CalcPars( AstFrame *frm, double centre[2], double point1[2], 
+*                    double point2[2], double *a, double *b, double *angle, 
+*                    int *status )
+
+*  Class Membership:
+*     Ellipse member function 
+
+*  Description:
+*     This function uses the supplied positions to calculate the
+*     geometric parameters of an ellipse.
+
+*  Parameters:
+*     frm
+*        Pointer to the Frame in which the positions are defined.
+*     centre;      
+*        Array holding centre coords.
+*     point1
+*        Array holding coords at end of primary axis 
+*     point2
+*        Array holding coords at another point on ellipse 
+*     a
+*        Pointer to location at which to store the half-length of the
+*        primary axis.
+*     b
+*        Pointer to location at which to store the half-length of the
+*        secondary axis.
+*     angle
+*        Pointer to location at which to store the angle from the 
+*        positive direction of the second Frame axis to the primary 
+*        ellipse axis, in radians.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   double point3[ 2 ];  /* Array holding a point on the primary axis */
+   double x;            /* The offset parallel to the primary axis */
+   double y;            /* The offset perpendicular to the primary axis */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get the geodesic distance between the centre and point 1 (the end of
+   the primary axis of the ellipse). This is the half length of the
+   primary axis of the ellipse (the axis which joins the centre position to 
+   point 1). */
+   *a = astDistance( frm, centre, point1 );      
+   
+/* Find the point (point3) on the primary axis which is closest to point 2, 
+   and thus get the geodesic offsets (resolved parallel and perpendicular to
+   the primary axis) between the centre and point 2. */
+   if( *a > 0.0 ) {
+      astResolve( frm, centre, point1, point2, point3, &x, &y );
+   
+/* Find the half-length of the secondary ellipse axis. */
+      if( astOK ) {
+         *b = (*a)*(*a) - x*x;
+         if( *b > 0.0 ) *b = (*a)*y/sqrt( *b );
+      } else {
+         *b = *a;
+      }
+   
+/* Find the angle from the positive direction of the second axis to the
+   primary ellipse axis. */
+      point3[ 0 ] = centre[ 0 ];
+      point3[ 1 ] = centre[ 1 ] + fabs( 0.1*(*a) );
+      *angle = astAngle( frm, point3, centre, point1 );
+   }
+}
+
+static void EllipsePars( AstEllipse *this, double centre[2], double *a,
+                         double *b, double *angle, int *status ){
+/*
+*++
+*  Name:
+c     astEllipsePars
+f     AST_ELLIPSEPARS
+
+*  Purpose:
+*     Returns the geometric parameters of an Ellipse.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "ellipse.h"
+c     void astEllipsePars( AstEllipse *this, double centre[2], double *a,
+c                          double *b, double *angle )
+f     CALL AST_ELLIPSEPARS( THIS, CENTRE, A, B, ANGLE, STATUS )
+
+*  Class Membership:
+*     Region method.
+
+*  Description:
+c     This function 
+f     This routine
+*     returns the geometric parameters describing the supplied ellipse. 
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Region.
+c     centre
+f     CENTRE( 2 ) = DOUBLE PRECISION (Returned)
+*        The coordinates of the Ellipse centre are returned in this arrays.
+c     a
+f     A = DOUBLE PRECISION (Returned)
+*        Returned holding the half-length of the first axis of the
+*        ellipse. 
+c     b
+f     B = DOUBLE PRECISION (Returned)
+*        Returned holding the half-length of the second axis of the
+*        ellipse. 
+c     angle
+f     ANGLE = DOUBLE PRECISION (Returned)
+*        If the coordinate system in which the Ellipse is defined has 
+*        axes (X,Y), then 
+c        "*angle"
+f        ANGLE
+*        is returned holding the angle from the positive direction of 
+*        the Y axis to the first axis of the ellipse, in radians.
+*        Positive rotation is in the same sense as rotation from the 
+*        positive direction of Y to the positive direction of X.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes: 
+*     - If the coordinate system represented by the Ellipse has been
+*     changed since it was first created, the returned parameters refer 
+*     to the new (changed) coordinate system, rather than the original
+*     coordinate system. Note however that if the transformation from
+*     original to new coordinate system is non-linear, the shape
+*     represented by the supplied Ellipse object may not be an accurate
+*     ellipse.
+*     - Values of AST__BAD are returned for the parameters without error 
+*     if the ellipse is degenerate or undefined.
+*--
+*/
+
+/* Local Variables: */
+   AstRegion *this_region;  /* Parent Region pointer */
+   AstFrame *frm;           /* Current Frame represented by the Ellipse */
+   AstPointSet *pset;       /* PointSet holding PointList axis values */
+   double **ptr;            /* Pointer to axes values in the PointList */
+   double point1[ 2 ];      /* Array holding coords at end of primary axis */
+   double point2[ 2 ];      /* Array holding coords at another point on ellipse */
+   int i;                   /* Axis index */
+
+/* Check the inherited status. */
+   if( !astOK ) return;
+
+/* Store a pointer to the parent region structure. */
+   this_region = (AstRegion *) this;
+
+/* Transform the base Frame axis values into the current Frame. */
+   pset = astTransform( this_region->frameset, this_region->points, 1, NULL );
+
+/* Get pointers to the coordinate data. */
+   ptr = astGetPoints( pset );
+   
+/* Check pointers can be used safely. */
+   if( astOK ) {
+   
+/* Copy the points in to separate arrays. */
+      for( i = 0; i < 2; i++ ) {
+         centre[ i ] = ptr[ i ][ 0 ];
+         point1[ i ] = ptr[ i ][ 1 ];
+         point2[ i ] = ptr[ i ][ 2 ];
+      }
+   
+/* Get the Ellipse frame. */
+      frm = astGetFrame( this_region->frameset, AST__CURRENT );
+
+/* Calculate the geometric parameters of the ellipse. */
+      CalcPars( frm, centre, point1, point2, a, b, angle, status );
+
+/* Ensure no zero values are returned. */
+      if( *a <= 0.0  || *b <= 0.0 ) {
+         *a = AST__BAD;
+         *b = AST__BAD;
+         *angle = AST__BAD;
+      }
+   
+/* Free resources */
+      frm = astAnnul( frm );
+   }
+   pset = astAnnul( pset );
 }
 
 static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int *status ){
@@ -1038,12 +1218,19 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 
 /* Local Variables: */
    AstEllipse *this;   /* Pointer to Ellipse structure */
+   AstFrame *frm;      /* Base Frame */
    double **rptr;      /* Data pointers for Region PointSet */
    double *bc;         /* Base Frame centre position */
    double *result;     /* Returned pointer */
    double *tmp;        /* Temporary array pointer */
-   double delta;       /* Amount by which to shift axis values */
+   double a[ 2 ];      /* Original position */
+   double angle;       /* Orietentation of offset from old to new centre */
+   double axval;       /* Axis value */
+   double b[ 2 ];      /* New position */
+   double dist;        /* Distance from old to new centre */
+   double newcen[ 2 ]; /* New centre */
    int ic;             /* Coordinate index */
+   int ip;             /* Position index */
    int ncb;            /* Number of base frame coordinate values per point */
    int ncc;            /* Number of current frame coordinate values per point */
 
@@ -1056,9 +1243,11 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 /* Get a pointer to the Ellipse structure. */
    this = (AstEllipse *) this_region;
 
-/* Get the number of axis values per point in the base and current Frames. */
-   ncb = astGetNin( this_region->frameset );
+/* Get the number of axis values per point in the current Frame. */
    ncc = astGetNout( this_region->frameset );
+
+/* An ellipse always has 2 base frame axes. */
+   ncb = 2;
 
 /* If the centre coords are to be returned, return either a copy of the 
    base Frame centre coords, or transform the base Frame centre coords
@@ -1097,31 +1286,44 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
                tmp = astFree( tmp );
             }
 
-/* ... and change the coords in the parent Region structure and the cached 
-   coords in the Ellipse structure. */
+/* Replace any bad centre values with their current values. */
             for( ic = 0; ic < ncb; ic++ ) {
-               delta = bc[ ic ] - rptr[ ic ][ 0 ];
-               rptr[ ic ][ 0 ] += delta;
-               rptr[ ic ][ 1 ] += delta;
-               rptr[ ic ][ 2 ] += delta;
-               this->centre[ ic ] += delta;
-               this->point1[ ic ] += delta;
+               if( bc[ ic ] ==  AST__BAD ) bc[ ic ] = this->centre[ ic ];
             }
 
 /* If the centre position was supplied in the base Frame, use the
    supplied "cen" or "ptr" pointer directly to change the coords in the 
    parent Region structure and the cached coords in the Ellipse structure. */
          } else {
+            bc = newcen;
             for( ic = 0; ic < ncb; ic++ ) {
-               delta = cen ? cen[ ic ] : ptr[ ic ][ index ];
-               delta -= rptr[ ic ][ 0 ];
-               rptr[ ic ][ 0 ] += delta;
-               rptr[ ic ][ 1 ] += delta;
-               rptr[ ic ][ 2 ] += delta;
-               this->centre[ ic ] += delta;
-               this->point1[ ic ] += delta;
+               axval = cen ? cen[ ic ] : ptr[ ic ][ index ];
+               newcen[ ic ] = ( axval != AST__BAD ) ? axval : this->centre[ ic ];
             }
          }
+
+/* Find the direction and length of the offset between the old and new
+   centre. */
+         frm = astGetFrame( this_region->frameset, AST__BASE );
+         angle = astAxAngle( frm, this->centre, bc, 2 );
+         dist = astDistance( frm, this->centre, bc );
+
+/* Shift each point in the parent Region structure by the same length and
+   direction. */
+         for( ip = 0; ip < 3; ip++ ) {
+            a[ 0 ] = rptr[ ip ][ 0 ];
+            a[ 1 ] = rptr[ ip ][ 1 ];
+            astOffset2( frm, a, angle, dist, b );
+            rptr[ ip ][ 0 ] = b[ 0 ];
+            rptr[ ip ][ 1 ] = b[ 1 ];
+         }
+
+/* Indicate that the cache is stale. */
+         astResetCache( this );
+
+/* Free resources */
+         frm = astAnnul( frm );
+         if( bc != newcen ) bc = astFree( bc );
       }
    }
 
@@ -1596,9 +1798,10 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 
 /* If any simplification could be performed, copy Region attributes from 
    the supplied Region to the returned Region, and return a pointer to it.
-   Otherwise, return a clone of the supplied pointer. */
+   If the supplied Region had no uncertainty, ensure the returned Region
+   has no uncertainty. Otherwise, return a clone of the supplied pointer. */
    if( simpler ){
-      astRegOverlay( new, this );
+      astRegOverlay( new, this, 1 );
       result = (AstMapping *) new;
 
    } else {
@@ -2622,7 +2825,12 @@ AstEllipse *astLoadEllipse_( void *mem, size_t size, AstEllipseVtab *vtab,
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
 
-
+void astEllipsePars_( AstEllipse *this, double centre[2], double *a,
+                      double *b, double *angle, int *status ){
+   if ( !astOK ) return;
+   return (**astMEMBER(this,Ellipse,EllipsePars))( this, centre, a, b,
+                                                   angle, status );
+}
 
 
 

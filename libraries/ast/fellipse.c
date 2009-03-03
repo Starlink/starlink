@@ -108,3 +108,22 @@ F77_INTEGER_FUNCTION(ast_ellipse)( INTEGER(FRAME),
    )
    return RESULT;
 }
+
+F77_SUBROUTINE(ast_ellipsepars)( INTEGER(THIS),
+                                 DOUBLE_ARRAY(CENTRE),
+                                 DOUBLE(A),
+                                 DOUBLE(B),
+                                 DOUBLE(ANGLE),
+                                 INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_DOUBLE_ARRAY(CENTRE)
+   GENPTR_DOUBLE(A)
+   GENPTR_DOUBLE(B)
+   GENPTR_DOUBLE(ANGLE)
+
+   astAt( "AST_ELLIPSEPARS", NULL, 0 );
+   astWatchSTATUS(
+      astEllipsePars( astI2P( *THIS ), CENTRE, A, B, ANGLE );
+   )
+}
+

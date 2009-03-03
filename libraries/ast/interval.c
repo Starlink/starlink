@@ -524,7 +524,6 @@ static AstBox *Cache( AstInterval *this, int *status ){
    pointer to any equivalent Box. */
    this->stale = 0;
    return this->box;
-
 }
 
 static int GetBounded( AstRegion *this, int *status ) {
@@ -677,6 +676,7 @@ static AstRegion *GetDefUnc( AstRegion *this_region, int *status ) {
                 this->ubnd[ i ] != DBL_MAX ) {
                hw = fabs( 0.5E-6*(  this->ubnd[ i ] - this->lbnd[ i ] ) );
                c = 0.5*(  this->ubnd[ i ] + this->lbnd[ i ] );
+               if( hw == 0.0 ) hw = c*0.5E-6;
                ubnd[ i ] = c + hw;
                lbnd[ i ] = c - hw;
 
@@ -1127,6 +1127,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Initialise. */
    result = -1;
+   i1 = -1;
 
 /* Check the global error status. */
    if ( !astOK ) return result;
@@ -1286,8 +1287,6 @@ static AstRegion *MergeInterval( AstInterval *this, AstRegion *reg,
    double fac_reg;           /* Ratio of used to default MeshSize for "reg" */
    double fac_this;          /* Ratio of used to default MeshSize for "this" */
    double temp;              /* Temporary storage */
-   int closed_reg;           /* Closed attribute value for other supplied Region */
-   int closed_this;          /* Closed attribute value for supplied Interval  */
    int i;                    /* Loop count */
    int j;                    /* Loop count */
    int msz_reg;              /* Original MeshSize for "reg" */
@@ -1304,15 +1303,18 @@ static AstRegion *MergeInterval( AstInterval *this, AstRegion *reg,
 
 /* Initialise */
    result = NULL;
+   lbnd = NULL;
+   ubnd = NULL;
 
 /* Check the local error status. */
    if ( !astOK ) return result;
 
 /* Get the Closed attributes of the two Regions. They must be the same in 
-   each Region if we are to merge the Regions. */
-   closed_this = astGetClosed( this );
-   closed_reg = astGetClosed( reg );
-   if( closed_this == closed_reg ) {
+   each Region if we are to merge the Regions. In addition, in order to 
+   merge, either both Regions must have a defined uncertainty, or neither 
+   Region must have a defined Uncertainty. */
+   if( astGetClosed( this ) == astGetClosed( reg ) &&
+       astTestUnc( this ) == astTestUnc( reg ) ) {
 
 /* Get the Nagated attributes of the two Regions. */
       neg_this = astGetNegated( this );
@@ -1442,7 +1444,7 @@ static AstRegion *MergeInterval( AstInterval *this, AstRegion *reg,
 /*  Create the new Interval, initially with no uncertainty. */
          new = (AstRegion *) astInterval( bfrm, lbnd, ubnd, NULL, "", 
                                           status );
-   
+
 /* Free resources .*/
          lbnd = astFree( lbnd );
          ubnd = astFree( ubnd );
@@ -1531,7 +1533,7 @@ static AstRegion *MergeInterval( AstInterval *this, AstRegion *reg,
 /* If a new Region was created above, propagate remaining attributes of
    the supplied Region to it. */
       if( new ) {
-         astRegOverlay( new, this );
+         astRegOverlay( new, this, 1 );
 
 /* The above Prism constructors create the Prism with the correct value
    for the Nagated attribute (i.e. zero). Ensure the above call to
@@ -1624,7 +1626,7 @@ static AstRegion *MergeInterval( AstInterval *this, AstRegion *reg,
 
 /* The MeshSize of the returned Returned is the default value scaled by
    the product of the two ratios found above. */
-            astSetMeshSize( new, fac_this*fac_reg*astGetMeshSize( new ) );
+            astSetMeshSize( result, fac_this*fac_reg*astGetMeshSize( result ) );
 
 /* Re-instate the original MeshSize values for the supplied Regions (if
    set) */
@@ -1638,8 +1640,11 @@ static AstRegion *MergeInterval( AstInterval *this, AstRegion *reg,
          map_this = astAnnul( map_this );
          map_reg = astAnnul( map_reg );
          bcmap = astAnnul( bcmap );
+         new = astAnnul( new );
          cfrm = astAnnul( cfrm );
       }
+      bfrm = astAnnul( bfrm );
+
    }
 
 /* If an error has occurred, annul the returned pointer. */
@@ -2507,9 +2512,8 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
    AstInterval *this;  /* Pointer to Interval structure */
    AstBox *box;        /* Pointer to equivalent Box structure */
    double **bptr;      /* Data pointers for Region PointSet */
-   double *cen0;       /* Pointer to original centre values */
-   double *cen1;       /* Pointer to new centre values */
-   double *off;        /* Pointer to array of offset values */
+   double *lbnd;       /* Pointer to new lower bound values */
+   double *ubnd;       /* Pointer to new upper bound values */
    double *result;     /* Returned pointer */
    int i;              /* Coordinate index */
    int nax;            /* Number of axes */
@@ -2530,33 +2534,27 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 /* If the centre is being changed... */
       if( cen || ptr ) {
 
-/* Get the original baseFrame centre of the equivalent box. */
-         cen0 = astRegCentre( box, NULL, NULL, 0, AST__BASE );
-
 /* Set the new centre in the equivalent box. */
          astRegCentre( box, cen, ptr, index, ifrm );
 
-/* Get the new base Frame centre of the equivalent box. */
-         cen1 = astRegCentre( box, NULL, NULL, 0, AST__BASE );
-
-/* Find the offsets from old to new centre. */
+/* Get the new base Frame bounds from the Box. */
          nax = astGetNin( this_region->frameset );
-         off = astMalloc( sizeof(double)*(size_t)nax );
-         if( off ) {
-            for( i = 0; i < nax; i++ ) off[ i ] = cen1[ i ] - cen0[ i ];
+         lbnd = astMalloc( sizeof( double )*nax );
+         ubnd = astMalloc( sizeof( double )*nax );
+         astRegBaseBox( box, lbnd, ubnd );
 
-/* Move the limits in the Interval structure by these offsets. */
-            bptr = astGetPoints( this_region->points );
-            if( bptr ) {
-               for( i = 0; i < nax; i++ ) {
-                  bptr[ i ][ 0 ] += off[ i ];
-                  bptr[ i ][ 1 ] += off[ i ];
-               }
+/* Store these bounds in the Interval structure. */
+         bptr = astGetPoints( this_region->points );
+         if( astOK ) {
+            for( i = 0; i < nax; i++ ) {
+               bptr[ i ][ 0 ] = lbnd[ i ];
+               bptr[ i ][ 1 ] = ubnd[ i ];
             }
-            off = astFree( off );
          }
-         cen0 = astFree( cen0 );
-         cen1 = astFree( cen1 );
+
+/* Free resources. */
+         lbnd = astFree( lbnd );
+         ubnd = astFree( ubnd );
 
 /* If the centre is not being changed, just invoke the method on the
    equivalent box. */
@@ -3415,11 +3413,11 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
       
 /* If any simplification could be performed, copy Region attributes from 
    the supplied Region to the returned Region, and return a pointer to it.
-   Otherwise, return a clone of the supplied pointer. */
+   If the supplied Region had no uncertainty, ensure the returned Region
+   has no uncertainty. Otherwise, return a clone of the supplied pointer. */
          if( simpler ){
-            astRegOverlay( new, this );
+            astRegOverlay( new, this, 1 );
             result = (AstMapping *) new;
-      
          } else {
             new = astAnnul( new );
             result = astClone( this );

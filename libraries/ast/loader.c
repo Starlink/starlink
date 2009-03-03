@@ -59,6 +59,7 @@
 #include "stcsearchlocation.h"
 #include "stccatalogentrylocation.h"
 #include "stcobsdatalocation.h"
+#include "stcschan.h"
 
 #include "error.h"
 #include "ast_err.h"
@@ -104,6 +105,8 @@
 *        Added the SpecMap and SpecFrame classes.
 *     15-JUL-2003 (DSB):
 *        Added the GrsimMap class.
+*     6-FEB-2009 (DSB):
+*        Added the StcsChan class.
 *-
 */
 
@@ -168,6 +171,7 @@ if ( !strcmp( class, #name ) ) return (AstLoaderType *) astLoad##name##_
    LOAD(XmlChan);
    LOAD(ZoomMap);
 
+   LOAD(StcsChan);
    LOAD(Stc);
    LOAD(StcResourceProfile);
    LOAD(StcSearchLocation);

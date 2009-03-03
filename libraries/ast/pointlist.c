@@ -23,15 +23,11 @@ f     AST_POINTLIST
 *
 *     - ListSize: The number of positions stored in the PointList
 
+
 *  Functions:
-*  Functions:
-c     In addition to those functions applicable to all Regions, the
-c     following functions may also be applied to all PointLists:
-f     In addition to those routines applicable to all Regions, the
-f     following routines may also be applied to all PointList:
-*
-c     - astPoints: Return the axis values of the points in a PointList
-f     - AST_POINTS: Return the axis values of the points in a PointList
+c     The PointList class does not define any new functions beyond those
+f     The PointList class does not define any new routines beyond those
+*     which are applicable to all Regions.
 
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
@@ -207,7 +203,6 @@ static void Copy( const AstObject *, AstObject *, int * );
 static void PointListPoints( AstPointList *, AstPointSet **, int *);
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
-static void Points( AstPointList *, int, int, double *, int * );
 static void RegBaseBox( AstRegion *, double *, double *, int * );
 static AstRegion *MergePointList( AstPointList *, AstRegion *, int, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
@@ -594,7 +589,6 @@ void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name,
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that provide
    virtual methods for this class. */
-   vtab->Points = Points;
    vtab->GetListSize = GetListSize;
    vtab->PointListPoints = PointListPoints;
 
@@ -1109,6 +1103,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Initialise. */
    result = -1;
+   i1 = -1;
 
 /* Check the global error status. */
    if ( !astOK ) return result;
@@ -1261,8 +1256,6 @@ static AstRegion *MergePointList( AstPointList *this, AstRegion *reg,
    double **ptr_this;        /* PointSet data pointers for this */
    double fac_reg;           /* Ratio of used to default MeshSize for "reg" */
    double fac_this;          /* Ratio of used to default MeshSize for "this" */
-   int closed_reg;           /* Closed attribute value for other supplied Region */
-   int closed_this;          /* Closed attribute value for supplied PointList  */
    int i;                    /* Axis index */
    int msz_reg;              /* Original MeshSize for "reg" */
    int msz_reg_set;          /* Was MeshSize originally set for "reg"? */
@@ -1281,10 +1274,11 @@ static AstRegion *MergePointList( AstPointList *this, AstRegion *reg,
    if ( !astOK ) return result;
 
 /* Get the Closed attributes of the two Regions. They must be the same in 
-   each Region if we are to merge the Regions. */
-   closed_this = astGetClosed( this );
-   closed_reg = astGetClosed( reg );
-   if( closed_this == closed_reg ) {
+   each Region if we are to merge the Regions. In addition, in order to 
+   merge, either both Regions must have a defined uncertainty, or neither 
+   Region must have a defined Uncertainty. */
+   if( astGetClosed( this ) == astGetClosed( reg ) &&
+       astTestUnc( this ) == astTestUnc( reg ) ) {
 
 /* Get the Nagated attributes of the two Regions. */
       neg_this = astGetNegated( this );
@@ -1358,7 +1352,7 @@ static AstRegion *MergePointList( AstPointList *this, AstRegion *reg,
                                               status );
 
 /* Propagate remaining attributes of the supplied Region to it. */
-            astRegOverlay( new, this );
+            astRegOverlay( new, this, 1 );
 
 /* Ensure the Negated flag is set correctly in the returned PointList. */
             if( neg_this ) {
@@ -1453,7 +1447,7 @@ static AstRegion *MergePointList( AstPointList *this, AstRegion *reg,
    
 /* The MeshSize of the returned Returned is the default value scaled by
    the product of the two ratios found above. */
-               astSetMeshSize( new, fac_this*fac_reg*astGetMeshSize( new ) );
+               astSetMeshSize( result, fac_this*fac_reg*astGetMeshSize( result ) );
    
 /* Re-instate the original MeshSize values for the supplied Regions (if
    set) */
@@ -1468,7 +1462,9 @@ static AstRegion *MergePointList( AstPointList *this, AstRegion *reg,
             map_reg = astAnnul( map_reg );
             bcmap = astAnnul( bcmap );
             cfrm = astAnnul( cfrm );
+            new = astAnnul( new );
          }
+         bfrm = astAnnul( bfrm );
          pset_new = astAnnul( pset_new );
 
       }
@@ -1522,130 +1518,6 @@ void PointListPoints( AstPointList *this, AstPointSet **pset, int *status) {
 /* Return a clone of the PointSet holding the points defining the PointList. */
    *pset = astClone( ((AstRegion *) this)->points );
 
-}
-
-static void Points( AstPointList *this, int max_coord, int max_point, 
-                    double *out, int *status ) {
-/*
-*++
-*  Name:
-c     astPoints
-f     AST_POINTS
-
-*  Purpose:
-*     Return the axis values in a PointList.
-
-*  Type:
-*     Public virtual function.
-
-*  Synopsis:
-c     #include "pointlist.h"
-c     void astPoints( AstPointList *this, int max_coord, int max_point, 
-c                     double *out ) 
-f     CALL AST_POINTS( THIS, MAX_COORD, MAX_POINT, OUT, STATUS )
-
-*  Class Membership:
-*     Mapping method.
-
-*  Description:
-c     This function 
-f     This routine
-*     returns the PointList axis values in a supplied array.
-
-*  Parameters:
-c     this
-f     THIS = INTEGER (Given)
-*        Pointer to the PointList to be applied.
-c     max_coord
-f     MAX_COORD = INTEGER (Given)
-*        The maximum number of axes for which coordinates are to be 
-*        stored in the returned array. If this is less than the number
-*        of axes spanned by the PointList, then coordinates will not be 
-*        stored for axes larger than the given maximum. If this is more 
-*        than the number of axes spanned by the PixelList, then the unused 
-*        elements of the array will be filled with bad (AST__BAD) values.
-c     max_point
-f     MAX_POINT = INTEGER (Given)
-*        The maximum number of positions for which coordinates are to be 
-*        stored in the returned array. If this is less than the number
-*        of positions in the PointList, then coordinates will not be stored 
-*        for positions beyond the given maximum. If this is more than the 
-*        number of positions in the PointList, then the unused elements of 
-*        the array will be filled with bad (AST__BAD) values.
-c     out
-f     OUT( MAX_POINT, MAX_COORD ) = DOUBLE PRECISION (Returned)
-c        The address of the first element in a 2-dimensional array of 
-c        shape "[max_coord][max_point]", into
-c        which the coordinates of the points will
-c        be written. These will be stored such that the value of
-c        coordinate number "coord" for point number "point"
-c        will be found in element "out[coord][point]".
-f        An array into which the coordinates of the 
-f        points will be written. These will be stored
-f        such that the value of coordinate number COORD for output
-f        point number POINT will be found in element OUT(POINT,COORD).
-f     STATUS = INTEGER (Given and Returned)
-f        The global status.
-
-*  Notes:
-*     - The number of axes spanned by the PointList is given by the Naxes
-*     attribute.
-*     - The number of points in the PointList is given by the ListSize
-*     attribute.
-*--
-*/
-
-/* Local Variables: */
-   AstPointSet *pset;       /* PointSet holding PointList axis values */
-   double **ptr;            /* Pointer to axes values in the PointList */
-   double *p;               /* Pointer to next input axis value */
-   double *q;               /* Pointer to next output axis value */
-   int i;                   /* Point index */
-   int j;                   /* Axis index */
-   int ncoord;              /* No. of axes to copy */
-   int npoint;              /* No. of points to copy */
-
-/* Check the global error status. */
-   if ( !astOK ) return;
-
-/* Get a pointer to the PointSet holding the axis values. */
-   pset = ( (AstRegion *) this )->points;
-
-/* Get the dimensions of this PointList, and get a pointer to the axis
-   values. */
-   ncoord = astGetNcoord( pset );
-   npoint = astGetNpoint( pset );
-   ptr = astGetPoints( pset );
-
-/* Check pointers can be used safely. */
-   if ( astOK ) {
-
-/* Determine how many axes are to be copied. */
-      if( ncoord > max_coord ) ncoord = max_coord;
-
-/* Determine how many points are to be copied. */
-      if( npoint > max_point ) npoint = max_point;
-
-/* Loop round the axes to be copied. */
-      for( j = 0; j < ncoord; j++ ) {
-
-/* Get points to the first element of the input and output arrays. */
-         p = ptr[ j ];
-         q = out + j*max_point;
-
-/* Loop round copying the points. */
-         for( i = 0; i < npoint; i++ ) *(q++) = *(p++);
-
-/* Fill in any unused elements in the output array for this axis. */
-         for( ; i < max_point; i++ ) *(q++) = AST__BAD;
-      }
-
-/* Fill in any unused axes in the output array. */
-      for( ; j < max_coord; j++ ) {
-         q = out + j*max_point;
-         for( i = 0; i < max_point; i++ ) *(q++) = AST__BAD;
-      }
-   }
 }
 
 static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int *status ){
@@ -2394,9 +2266,10 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 
 /* If any simplification could be performed, copy Region attributes from 
    the supplied Region to the returned Region, and return a pointer to it.
-   Otherwise, return a clone of the supplied pointer. */
+   If the supplied Region had no uncertainty, ensure the returned Region
+   has no uncertainty. Otherwise, return a clone of the supplied pointer. */
    if( simpler ){
-      astRegOverlay( new, this );
+      astRegOverlay( new, this, 1 );
       result = (AstMapping *) new;
 
    } else {
@@ -3519,12 +3392,6 @@ AstPointList *astLoadPointList_( void *mem, size_t size, AstPointListVtab *vtab,
 int astGetListSize_( AstPointList *this, int *status ) {
    if ( !astOK ) return 0;
    return (**astMEMBER(this,PointList,GetListSize))( this, status );
-}
-void astPoints_( AstPointList *this, int max_coord, int max_point, double *out,
-                 int *status ) {
-   if ( !astOK ) return;
-   (**astMEMBER(this,PointList,Points))( this, max_coord, max_point, out, 
-                                         status );
 }
 void astPointListPoints_( AstPointList *this, AstPointSet **pset, int *status) {
    if ( !astOK ) return;

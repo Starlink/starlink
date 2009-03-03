@@ -90,6 +90,8 @@ f     The CmpRegion class does not define any new routines beyond those
 *        finding the extreme position sin a mesh covering the boundary.
 *     20-JAN-2009 (DSB):
 *        Over-ride astRegBasePick.
+*     19-MAR-2009 (DSB):
+*        Over-ride the astDecompose method.
 *class--
 */
 
@@ -140,9 +142,7 @@ static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
-static AstRegion *(* parent_getuncfrm)( AstRegion *, int, int * );
-static void (* parent_clearunc)( AstRegion *, int * );
-static int (* parent_testunc)( AstRegion *, int * );
+static AstRegion *(* parent_getdefunc)( AstRegion *, int * );
 static void (* parent_setregfs)( AstRegion *, AstFrame *, int * );
 static AstMapping *(* parent_simplify)( AstMapping *, int * );
 static int (* parent_equal)( AstObject *, AstObject *, int * );
@@ -198,15 +198,14 @@ static AstMapping *Simplify( AstMapping *, int * );
 static AstPointSet *RegBaseMesh( AstRegion *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static AstRegion *RegBasePick( AstRegion *this, int, const int *, int * );
-static AstRegion *GetUncFrm( AstRegion *, int, int * );
+static AstRegion *GetDefUnc( AstRegion *, int * );
 static AstRegion *MatchRegion( AstRegion *, int, AstRegion *, const char *, int * );
 static double GetFillFactor( AstRegion *, int * );
 static int Equal( AstObject *, AstObject *, int * );
 static int GetBounded( AstRegion *, int * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
-static int TestUnc( AstRegion *, int * );
-static void ClearUnc( AstRegion *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
+static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void GetRegions( AstCmpRegion *, AstRegion **, AstRegion **, int *, int *, int *, int * );
@@ -227,54 +226,98 @@ static int ManageLock( AstObject *, int, int, AstObject **, int * );
 
 /* Member functions. */
 /* ================= */
-static void ClearUnc( AstRegion *this_region, int *status ){
+static void Decompose( AstMapping *this_mapping, AstMapping **map1, 
+                       AstMapping **map2, int *series, int *invert1, 
+                       int *invert2, int *status ) {
 /*
+*
 *  Name:
-*     ClearUnc
+*     Decompose
 
 *  Purpose:
-*     Erase any uncertainty information in a Region.
+*     Decompose a CmpRegion into two component Regions.
 
 *  Type:
 *     Private function.
 
 *  Synopsis:
 *     #include "cmpregion.h"
-*     void ClearUnc( AstRegion *this, int *status )
+*     void Decompose( AstMapping *this, AstMapping **map1, 
+*                     AstMapping **map2, int *series,
+*                     int *invert1, int *invert2, int *status )
 
 *  Class Membership:
-*     CmpRegion member function (over-rides the astClearUnc protected
-*     method inherited from the Region class).
+*     CmpRegion member function (over-rides the protected astDecompose
+*     method inherited from the Mapping class).
 
 *  Description:
-*     This function erases all uncertainty information, whether default
-*     or not, from a Region.
+*     This function returns pointers to two Mappings which, when applied
+*     either in series or parallel, are equivalent to the supplied Mapping.
+*
+*     Since the Frame class inherits from the Mapping class, Frames can
+*     be considered as special types of Mappings and so this method can
+*     be used to decompose either CmpMaps, CmpFrames, CmpRegions or Prisms.
 
 *  Parameters:
 *     this
-*        Pointer to the Region.
+*        Pointer to the Mapping.
+*     map1
+*        Address of a location to receive a pointer to first component
+*        Mapping. 
+*     map2
+*        Address of a location to receive a pointer to second component
+*        Mapping. 
+*     series
+*        Address of a location to receive a value indicating if the
+*        component Mappings are applied in series or parallel. A non-zero
+*        value means that the supplied Mapping is equivalent to applying map1 
+*        followed by map2 in series. A zero value means that the supplied
+*        Mapping is equivalent to applying map1 to the lower numbered axes
+*        and map2 to the higher numbered axes, in parallel.
+*     invert1
+*        The value of the Invert attribute to be used with map1. 
+*     invert2
+*        The value of the Invert attribute to be used with map2. 
 *     status
 *        Pointer to the inherited status variable.
 
+*  Notes:
+*     - Any changes made to the component rames using the returned
+*     pointers will be reflected in the supplied CmpFrame.
+
+*-
 */
 
+
 /* Local Variables: */
-   AstCmpRegion *this;
+   AstCmpRegion *this;              /* Pointer to CmpRegion structure */
 
-/* Check the inherited status. */
-   if( !astOK ) return;
+/* Check the global error status. */
+   if ( !astOK ) return;
 
-/* Invoke the implementation inherited form the parent Region class to 
-   clear any default uncertainty information. */
-   (* parent_clearunc)( this_region, status );
+/* Obtain a pointer to the CmpMap structure. */
+   this = (AstCmpRegion *) this_mapping;
 
-/* Get a pointer to the CmpRegion structure. */
-   this = (AstCmpRegion *) this_region;
+/* The components Frames of a CmpRegion are considered to be series
+   Mappings. */
+   if( series ) *series = 1;
 
-/* Clear any uncertainty information in the component Regions. */
-   astClearUnc( this->region1 );
-   astClearUnc( this->region2 );
+/* The Frames are returned in their original order whether or not the
+   CmpRegion has been inverted. */
+   if( map1 ) *map1 = astClone( this->region1 );
+   if( map2 ) *map2 = astClone( this->region2 );
 
+/* The invert flags dont mean anything for a Region, but we return them
+   anyway. If the CmpRegion has been inverted, return inverted Invert flags. */
+   if( astGetInvert( this ) ) {
+      if( invert1 ) *invert1 = astGetInvert( this->region1 ) ? 0 : 1;
+      if( invert2 ) *invert2 = astGetInvert( this->region2 ) ? 0 : 1;
+
+/* If the CmpRegion has not been inverted, return the current Invert flags. */
+   } else {
+      if( invert1 ) *invert1 = astGetInvert( this->region1 );
+      if( invert2 ) *invert2 = astGetInvert( this->region2 );
+   }
 }
 
 static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
@@ -782,52 +825,39 @@ static void GetRegions( AstCmpRegion *this, AstRegion **reg1, AstRegion **reg2,
    }
 }
 
-static AstRegion *GetUncFrm( AstRegion *this_region, int ifrm, int *status ) {
+static AstRegion *GetDefUnc( AstRegion *this_region, int *status ) {
 /*
 *  Name:
-*     GetUncFrm
+*     GetDefUnc
 
 *  Purpose:
-*     Obtain a pointer to the uncertainty Region for a given Region.
+*     Obtain a pointer to the default uncertainty Region for a given Region.
 
 *  Type:
 *     Private function.
 
 *  Synopsis:
 *     #include "cmpregion.h"
-*     AstRegion *GetUncFrm( AstRegion *this, int ifrm, int *status ) 
+*     AstRegion *GetDefUnc( AstRegion *this ) 
 
 *  Class Membership:
-*     CmpRegion method (over-rides the astGetUncFrm method inherited from
+*     CmpRegion method (over-rides the astGetDefUnc method inherited from
 *     the Region class).
 
-*  Description:
 *     This function returns a pointer to a Region which represents the
-*     uncertainty associated with a position on the boundary of the given 
-*     Region. The returned Region can refer to the either the base or 
-*     the current Frame within the FrameSet encapsulated by the supplied 
-*     Region as specified by the "ifrm" parameter. If the returned Region is 
-*     re-centred at some point on the boundary of the supplied Region, then 
-*     the re-centred Region will represent the region in which the true 
-*     boundary position could be.
+*     default uncertainty associated with a position on the boundary of the 
+*     given  Region. The returned Region refers to the base Frame within the 
+*     FrameSet encapsulated by the supplied Region.
 
 *  Parameters:
 *     this
 *        Pointer to the Region.
-*     ifrm
-*        The index of a Frame within the FrameSet encapsulated by "this".
-*        The returned Region will refer to the requested Frame. It should
-*        be either AST__CURRENT or AST__BASE.
-*     status
-*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to the Region. This should be annulled (using astAnnul)
 *     when no longer needed.
 
 *  Notes:
-*     - A default uncertainty Region will be created if the supplied Region 
-*     does not have an uncertainty Region.
 *     - A NULL pointer will be returned if this function is invoked
 *     with the global error status set, or if it should fail for any
 *     reason.
@@ -835,9 +865,6 @@ static AstRegion *GetUncFrm( AstRegion *this_region, int ifrm, int *status ) {
 
 /* Local Variables: */
    AstCmpRegion *this;        /* Pointer to CmpRegion structure */
-   AstFrame *frm;             /* Current Frame from supplied Region */
-   AstMapping *map;           /* Supplied to uncertainty Mapping */
-   AstRegion *bunc;           /* Uncertainty Region in base Frame of "this" */
    AstRegion *result;         /* Returned pointer */
 
 /* Initialise */
@@ -849,59 +876,22 @@ static AstRegion *GetUncFrm( AstRegion *this_region, int ifrm, int *status ) {
 /* Get a pointer to the CmpRegion structure. */
    this = (AstCmpRegion *) this_region;   
 
-/* If the parent Region structure contains explicit uncertainty information, 
-   use it in preference to any uncertainty Region stored in the component 
-   Regions. */
-   if( (* parent_testunc)( this_region, status ) ) {
-      bunc = (* parent_getuncfrm)( this_region, AST__BASE, status );
+/* If the first component region has non-default uncertainty, use it as
+   the default uncertainty for the Cmpregion. Note, the current Frame of
+   an uncertainty Region is assumed to be the same as the base Frame in the 
+   CmpRegion. */
+   if( astTestUnc( this->region1 ) ) {
+      result = astGetUncFrm( this->region1, AST__CURRENT );
 
-/* Otherwise, if the first component has a defined uncertainty, use it. The 
-   current Frame in the component Region is equivalent to the base Frame in the
-   parent Region structure. So we may need to map the component uncertainty 
-   into the current Region of the parent is required later on. */
-   } else if( astTestUnc( this->region1 ) ) {
-      bunc = astGetUncFrm( this->region1, AST__CURRENT );
-
-/* Otherwise, if the second component has a defined uncertainty, use it. */
+/* Otherwise, if the second component region has non-default uncertainty, 
+   use it as the default uncertainty for the CmpRegion. */
    } else if( astTestUnc( this->region2 ) ) {
-      bunc = astGetUncFrm( this->region2, AST__CURRENT );
+      result = astGetUncFrm( this->region2, AST__CURRENT );
 
-/* Otherwise invoke the astGetUncFrm method inherited from the parent Region
-   class to create a default uncertainty region. */
+/* Otherwise, use the parent method to determine the default uncertainty. */ 
    } else {
-      bunc = (* parent_getuncfrm)( this_region, AST__BASE, status );
+      result = (* parent_getdefunc)( this_region, status );
    }
-
-/* The above code obtains an uncertainty Region in the base Frame of the
-   parent Region (equal to the current Frame of the component Regions).
-   If this is what is required, return a clone of the abobe Region. */
-   if( ifrm == AST__BASE ) {
-      result = astClone( bunc );
-
-/* Otherwise, map it into the current Region of the parent.  */
-   } else {
-
-/* Get a Mapping from the Frame represented by the uncertainty Region
-   (the parent Region base Frame) to the parent Region current Frame. */
-      map = astGetMapping( this_region->frameset, AST__BASE, AST__CURRENT );
-
-/* If it is a UnitMap, the uncertainty Region is already in the correct 
-   Frame, so just return the stored pointer. */
-      if( astIsAUnitMap( map ) ) {
-         result= astClone( bunc );
-
-/* Otherwise, use this Mapping to map the uncertainty Region into the current
-   Frame. */
-      } else {
-         frm = astGetFrame( this_region->frameset, AST__CURRENT );
-         result = astMapRegion( bunc, map, frm );
-
-/* Free resources. */
-         frm = astAnnul( frm );
-      }
-      map = astAnnul( map );
-   }
-   bunc = astAnnul( bunc );
 
 /* Return NULL if an error occurred. */
    if( !astOK ) result = astAnnul( result );
@@ -990,14 +980,8 @@ void astInitCmpRegionVtab_(  AstCmpRegionVtab *vtab, const char *name, int *stat
    parent_simplify = mapping->Simplify;
    mapping->Simplify = Simplify;
 
-   parent_getuncfrm = region->GetUncFrm;
-   region->GetUncFrm = GetUncFrm;
-
-   parent_clearunc = region->ClearUnc;
-   region->ClearUnc = ClearUnc;
-
-   parent_testunc = region->TestUnc;
-   region->TestUnc = TestUnc;
+   parent_getdefunc = region->GetDefUnc;
+   region->GetDefUnc = GetDefUnc;
 
    parent_setregfs = region->SetRegFS;
    region->SetRegFS = SetRegFS;
@@ -1033,6 +1017,7 @@ void astInitCmpRegionVtab_(  AstCmpRegionVtab *vtab, const char *name, int *stat
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   mapping->Decompose = Decompose;
    region->RegBaseBox = RegBaseBox;
    region->RegBaseBox2 = RegBaseBox2;
    region->RegBaseMesh = RegBaseMesh;
@@ -2629,68 +2614,6 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    if ( !astOK ) result = astAnnul( result );
 
 /* Return the result. */
-   return result;
-}
-
-static int TestUnc( AstRegion *this_region, int *status ) {
-/*
-*  Name:
-*     TestUnc
-
-*  Purpose:
-*     Does the Region contain non-default uncertainty information?
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     include "cmpregion.h"
-*     int astTestUnc( AstRegion *this, int *status )
-
-*  Class Membership:
-*     CmpRegion member function (over-rides the astTestUnc protected
-*     method inherited from the Region class).
-
-*  Description:
-*     This function returns a flag indicating if the uncertainty Region in 
-*     the supplied Region was supplied explicit (i.e. is not a default 
-*     uncertainty Region).
-
-*  Parameters:
-*     this
-*        Pointer to the Region.
-*     status
-*        Pointer to the inherited status variable.
-
-*  Returned Value:
-*     Non-zero if the uncertainty Region was supplied explicitly.
-*     Zero otherwise.
-
-*/
-
-/* Local Variables; */
-   AstCmpRegion *this;
-   int result;
-
-/* Check the global error status. */
-   if ( !astOK ) return 0;
-
-/* Get a pointer to the CmpRegion structure. */
-   this = (AstCmpRegion *) this_region;
-
-/* See if the parent Region structure contains explicit uncertainty
-   information. If so this will be used in preference to any uncertainty
-   info in the component Regions. */
-   result = (* parent_testunc)( this_region, status );
-
-/* If not see if either of the two component Regions contains explicit 
-   uncertainty information. */
-   if( !result ) {
-      this = (AstCmpRegion *) this_region;
-      result = astTestUnc( this->region1 ) || astTestUnc( this->region2 );
-   }
-
-/* Return the result */
    return result;
 }
 

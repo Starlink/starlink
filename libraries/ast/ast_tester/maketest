@@ -13,7 +13,5 @@ g95 -fno-second-underscore -w -g -o $a $a.f \
 -L/star/lib -I/star/include `ast_link -ems` `chr_link` `err_link` `prm_link` `psx_link`
 
 echo "Running $a"
-
 $a
-
 

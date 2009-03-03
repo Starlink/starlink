@@ -1395,9 +1395,10 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 
 /* If any simplification could be performed, copy Region attributes from 
    the supplied Region to the returned Region, and return a pointer to it.
-   Otherwise, return a clone of the supplied pointer. */
+   If the supplied Region had no uncertainty, ensure the returned Region
+   has no uncertainty. Otherwise, return a clone of the supplied pointer. */
    if( simpler ){
-      astRegOverlay( new, this );
+      astRegOverlay( new, this, 1 );
       result = (AstMapping *) new;
 
    } else {

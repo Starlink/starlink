@@ -446,7 +446,7 @@ int astReadInt_( AstChannel *, const char *, int, int * );
 int astTestComment_( AstChannel *, int * );
 int astTestFull_( AstChannel *, int * );
 int astTestStrict_( AstChannel *, int * );
-void astAddWarning_( void *, int, const char *, const char *, int *, ... );
+void astAddWarning_( void *, int, const char *, const char *, int *, ... )__attribute__((format(printf,3,6)));
 void astClearComment_( AstChannel *, int * );
 void astClearFull_( AstChannel *, int * );
 void astClearStrict_( AstChannel *, int * );

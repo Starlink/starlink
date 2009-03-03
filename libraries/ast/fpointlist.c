@@ -109,20 +109,6 @@ F77_INTEGER_FUNCTION(ast_pointlist)( INTEGER(FRAME),
    return RESULT;
 }
 
-F77_SUBROUTINE(ast_points)( INTEGER(THIS),
-                            INTEGER(MAX_COORD),
-                            INTEGER(MAX_POINT),
-                            DOUBLE_ARRAY(OUT),
-                            INTEGER(STATUS) ) {
-   GENPTR_INTEGER(MAX_COORD)
-   GENPTR_INTEGER(MAX_POINT)
-   GENPTR_DOUBLE_ARRAY(OUT)
-
-   astAt( "AST_POINTS", NULL, 0 );
-   astWatchSTATUS(
-      astPoints( astI2P( *THIS ), *MAX_COORD, *MAX_POINT, OUT );
-   )
-}
 
 
 

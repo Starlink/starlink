@@ -2243,6 +2243,14 @@ f        AST_READ
 *        (for instance, caused by the FitsChan not containing the necessary
 *        FITS headers cards needed to create an Object) results in the
 *        contents of the FitsChan being left unchanged.
+*     StcsChan
+*        The AST Object returned by a successful use of 
+c        astRead 
+f        AST_READ
+*        on an StcsChan, will be either a Region or a KeyMap, depending
+*        on the values of the StcsArea, StcsCoords and StcsProps
+*        attributes. See the documentation for these attributes for further
+*        information.
 
 *  Notes:
 *     - A null Object pointer (AST__NULL) will be returned, without
@@ -4664,6 +4672,9 @@ astMAKE_TEST(Channel,Comment,( this->comment != -INT_MAX ))
 *        The default value is zero for a FitsChan.
 *     XmlChan
 *        The default value is -1 for an XmlChan.
+*     StcsChan
+*        The default value is zero for an StcsChan. Set a positive value
+*        to cause default values to be included in STC-S descriptions.
 
 *  Notes:
 *     - All positive values supplied for this attribute are converted

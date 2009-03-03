@@ -116,7 +116,6 @@ typedef struct AstPointListVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-   void (* Points)( AstPointList *, int, int, double *, int * );
    int (* GetListSize)( AstPointList *, int * );
    void (* PointListPoints)( AstPointList *, AstPointSet **, int * );
 } AstPointListVtab;
@@ -173,7 +172,6 @@ AstPointList *astLoadPointList_( void *, size_t, AstPointListVtab *,
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-void astPoints_( AstPointList *, int, int, double *, int * );
 # if defined(astCLASS)           /* Protected */
 int astGetListSize_( AstPointList *, int * );
 void astPointListPoints_( AstPointList *, AstPointSet **, int * );
@@ -225,9 +223,6 @@ astINVOKE(O,astLoadPointList_(mem,size,vtab,name,astCheckChannel(channel),STATUS
 /* Here we make use of astCheckPointList to validate PointList pointers
    before use.  This provides a contextual error report if a pointer
    to the wrong sort of Object is supplied. */
-
-#define astPoints(this,max_coord,max_point,out) \
-astINVOKE(V,astPoints_(astCheckPointList(this),max_coord,max_point,out,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 #define astGetListSize(this) \

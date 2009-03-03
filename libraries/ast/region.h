@@ -96,7 +96,7 @@ typedef struct AstRegion {
    int negated;               /* Has the Region been negated? */
    int closed;                /* Is the boundary part of the Region? */
    int meshsize;              /* No. of points on boundary mesh */
-   int defunc;                /* Is "unc" set to a default value? */
+   struct AstRegion *defunc;  /* Default uncertainty Region */
    AstPointSet *basemesh;     /* Base frame mesh covering the boundary */
    AstPointSet *basegrid;     /* Base frame grid covering the boundary */
    int adaptive;              /* Does the Region adapt to coord sys changes? */
@@ -135,12 +135,13 @@ typedef struct AstRegionVtab {
    void (* GetUncBounds)( AstRegion *, double *, double *, int * );
    void (* GetRegionBounds2)( AstRegion *, double *, double *, int * );
    void (* ClearUnc)( AstRegion *, int * );
-   void (* RegOverlay)( AstRegion *, AstRegion *, int * );
-   int (* DumpUnc)( AstRegion *, int * );
+   void (* RegOverlay)( AstRegion *, AstRegion *, int, int * );
+   void (* GetRegionPoints)( AstRegion *, int, int, int *, double *, int * );
    int (* GetBounded)( AstRegion *, int * );
    int (* TestUnc)( AstRegion *, int * );
    int (* RegDummyFS)( AstRegion *, int * );
    int (* RegPins)( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
+   AstMapping *(* RegMapping)( AstRegion *, int * );
    AstPointSet *(* RegMesh)( AstRegion *, int * );
    AstPointSet *(* RegGrid)( AstRegion *, int * );
    AstPointSet *(* RegBaseMesh)( AstRegion *, int * );
@@ -265,6 +266,7 @@ void astSetUnc_( AstRegion *, AstRegion *, int * );
 AstRegion *astGetUnc_( AstRegion *, int, int * );
 void astGetRegionBounds_( AstRegion *, double *, double *, int * );
 void astShowMesh_( AstRegion *, int, const char *, int * );
+void astGetRegionPoints_( AstRegion *, int, int, int *, double *, int * );
 
 #if defined(astCLASS)            /* Protected */
 void astGetUncBounds_( AstRegion *, double *, double *, int * );
@@ -278,12 +280,12 @@ void astRegBaseBox2_( AstRegion *, double *, double *, int * );
 void astRegSetAttrib_( AstRegion *, const char *, char **, int * );
 void astRegClearAttrib_( AstRegion *, const char *, char **, int * );
 void astClearUnc_( AstRegion *, int * );
-void astRegOverlay_( AstRegion *, AstRegion *, int * );
-int astDumpUnc_( AstRegion *, int * );
+void astRegOverlay_( AstRegion *, AstRegion *, int, int * );
 int astGetBounded_( AstRegion *, int * );
 int astTestUnc_( AstRegion *, int * );
 int astRegDummyFS_( AstRegion *, int * );
 int astRegPins_( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
+AstMapping *astRegMapping_( AstRegion *, int * );
 AstPointSet *astRegMesh_( AstRegion *, int * );
 AstPointSet *astRegGrid_( AstRegion *, int * );
 AstPointSet *astRegBaseMesh_( AstRegion *, int * );
@@ -408,6 +410,8 @@ astINVOKE(V,astMaskUS_(astCheckRegion(this),(map?astCheckMapping(map):NULL),insi
 #define astGetUnc(this,def) astINVOKE(O,astGetUnc_(astCheckRegion(this),def,STATUS_PTR))
 #define astGetRegionBounds(this,lbnd,ubnd) astINVOKE(V,astGetRegionBounds_(astCheckRegion(this),lbnd,ubnd,STATUS_PTR))
 #define astShowMesh(this,format,ttl) astINVOKE(V,astShowMesh_(astCheckRegion(this),format,ttl,STATUS_PTR))
+#define astGetRegionPoints(this,maxpoint,maxcoord,npoint,points) \
+astINVOKE(V,astGetRegionPoints_(astCheckRegion(this),maxpoint,maxcoord,npoint,points,STATUS_PTR))
 
 /* Interfaces to protected member functions. */
 /* ----------------------------------------- */
@@ -416,7 +420,6 @@ astINVOKE(V,astMaskUS_(astCheckRegion(this),(map?astCheckMapping(map):NULL),insi
 #define astGetUncBounds(this,lbnd,ubnd) astINVOKE(V,astGetUncBounds_(astCheckRegion(this),lbnd,ubnd,STATUS_PTR))
 #define astGetRegionBounds2(this,lbnd,ubnd) astINVOKE(V,astGetRegionBounds2_(astCheckRegion(this),lbnd,ubnd,STATUS_PTR))
 #define astClearUnc(this) astINVOKE(V,astClearUnc_(astCheckRegion(this),STATUS_PTR))
-#define astDumpUnc(this) astINVOKE(V,astDumpUnc_(astCheckRegion(this),STATUS_PTR))
 #define astGetBounded(this) astINVOKE(V,astGetBounded_(astCheckRegion(this),STATUS_PTR))
 #define astGetUncFrm(this,ifrm) astINVOKE(O,astGetUncFrm_(astCheckRegion(this),ifrm,STATUS_PTR))
 #define astGetDefUnc(this) astINVOKE(O,astGetDefUnc_(astCheckRegion(this),STATUS_PTR))
@@ -435,8 +438,9 @@ astINVOKE(V,astMaskUS_(astCheckRegion(this),(map?astCheckMapping(map):NULL),insi
 #define astRegFrame(this) astINVOKE(O,astRegFrame_(astCheckRegion(this),STATUS_PTR))
 #define astRegGrid(this) astINVOKE(O,astRegGrid_(astCheckRegion(this),STATUS_PTR))
 #define astRegMesh(this) astINVOKE(O,astRegMesh_(astCheckRegion(this),STATUS_PTR))
-#define astRegOverlay(this,that) astINVOKE(V,astRegOverlay_(astCheckRegion(this),astCheckRegion(that),STATUS_PTR))
+#define astRegOverlay(this,that,unc) astINVOKE(V,astRegOverlay_(astCheckRegion(this),astCheckRegion(that),unc,STATUS_PTR))
 #define astRegDummyFS(this) astINVOKE(V,astRegDummyFS_(astCheckRegion(this),STATUS_PTR))
+#define astRegMapping(this) astINVOKE(O,astRegMapping_(astCheckRegion(this),STATUS_PTR))
 #define astRegPins(this,pset,unc,mask) astINVOKE(V,astRegPins_(astCheckRegion(this),astCheckPointSet(pset),unc?astCheckRegion(unc):unc,mask,STATUS_PTR))
 #define astRegTranPoint(this,in,np,forward) astRegTranPoint_(this,in,np,forward,STATUS_PTR)
 #define astGetRegFS(this) astINVOKE(O,astGetRegFS_(astCheckRegion(this),STATUS_PTR))

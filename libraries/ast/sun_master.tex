@@ -18,18 +18,18 @@
 
 % Variable part - replace [xxx] as appropriate.
 c+
-\newcommand{\stardocnumber}    {211.25}
+\newcommand{\stardocnumber}    {211.26}
 c-
 f+
-\newcommand{\stardocnumber}    {210.25}
+\newcommand{\stardocnumber}    {210.26}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {14th January December 2009}
+\newcommand{\stardocdate}      {22nd April 2009}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
                                 in Astronomy}
-\newcommand{\stardoccopyright} {Copyright (C) 1997-2008 Council for the Central Laboratory of the Research Councils}
+\newcommand{\stardoccopyright} {Copyright (C) 2009 Science \& Technology Facilities Council}
 \newcommand{\stardoctitlehtml} {AST - A Library for Handling World Coordinate
                                       Systems in Astronomy}
 \newcommand{\stardocversion}   {V<VERSION_NUMBER>}
@@ -14236,8 +14236,17 @@ located within a larger XML document.
 
 \subsection{Reading IVOA Space-Time-Coordinates (STC) Descriptions}
 Note, the XmlChan also provides experimental support for reading XML documents
-which use a restricted subset of the IVOA Space-Time-Coordinates (STC) schema
-described at \htmladdnormallink{
+which use a restricted subset of the IVOA Space-Time-Coordinates (STC)
+system.
+
+The StcsChan class supports the conversion of suitable AST Objects to and 
+from the STC Linear String Implementation (also known as STC-S) described at 
+\htmladdnormallink{http://www.ivoa.net/Documents/latest/STC-S.html }{
+http://www.ivoa.net/Documents/latest/STC-S.html}. See the description of the 
+StcsChan class for further details.
+
+The XmlChan class supports the conversion of AST Objects to and from an
+early draft (V1.2) the STC-X XML schema described at \htmladdnormallink{
 http://hea-www.harvard.edu/~arots/nvometa/v1.2/STC.html 
 }{
 http://hea-www.harvard.edu/~arots/nvometa/v1.2/STC.html 
@@ -14245,9 +14254,8 @@ http://hea-www.harvard.edu/~arots/nvometa/v1.2/STC.html
 STC document is read using an XmlChan, the read operation produces an AST
 Object of the Stc class, which is itself a subclass of Region. Specifically, 
 each such Object will be an instance of StcSearchLocation, StcResourceProfile,
-StcCatalogEntryLocation or StcObsDataLocation.
-
-See the description of the XmlFormat attribute for further details.
+StcCatalogEntryLocation or StcObsDataLocation. See the description of the 
+XmlChan class and the XmlFormat attribute for further details.
 
 \cleardoublepage
 \section{\label{ss:nativefits}Storing AST Objects in FITS Headers (FitsChans)}
@@ -18787,6 +18795,7 @@ Object             - Base class for all AST Objects
    Channel         - Basic (textual) I/O channel
       FitsChan     - I/O Channel using FITS header cards
       XmlChan      - I/O Channel using XML
+      StcsChan     - I/O Channel using STC-S descriptions
    KeyMap          - Store a set of key/value pairs
    Mapping         - Inter-relate two coordinate systems
       CmpMap       - Compound Mapping
@@ -21546,12 +21555,10 @@ input items were encountered.
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V5.1}
+\subsection{Changes Introduced in V5.1}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V5.0 and V5.1 (the
-current version):
+The following describes the most significant changes occurred in the 
+AST library between versions V5.0 and V5.1:
 
 \begin{enumerate}
 
@@ -21676,6 +21683,20 @@ c+
 \item The astIsUndef<X> functions used to test FITS keyword values
 have been removed. Use the new astTestFits function instead.
 c-
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V5.2}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V5.1 and V5.2 (the
+current version):
+
+\begin{enumerate}
+
+\item A new class of Channel, called StcsChan, has been added that allows
+conversion of suitable AST Objects to and from IVOA STC-S format.
 
 \end{enumerate}
 

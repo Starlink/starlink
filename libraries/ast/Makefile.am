@@ -109,11 +109,13 @@ GRP_C_ROUTINES = \
     stcsearchlocation.c \
     stccatalogentrylocation.c \
     stcobsdatalocation.c \
+    stcschan.c \
     fstc.c \
     fstcresourceprofile.c \
     fstcsearchlocation.c \
     fstccatalogentrylocation.c \
     fstcobsdatalocation.c \
+    fstcschan.c \
     timeframe.c \
     timemap.c \
     tranmap.c \
@@ -197,6 +199,7 @@ AST_H_FILES = \
              timeframe.h \
        channel.h \
           fitschan.h \
+          stcschan.h \
           xmlchan.h 
 
 # All the (C) include files required to build the library.

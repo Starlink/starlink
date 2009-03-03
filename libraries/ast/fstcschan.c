@@ -1,25 +1,25 @@
 /*
 *+
 *  Name:
-*     fcircle.c
+*     fstcschan.c
 
 *  Purpose:
-*     Define a FORTRAN 77 interface to the AST Circle class.
+*     Define a FORTRAN 77 interface to the AST StcsChan class.
 
 *  Type of Module:
 *     C source file.
 
 *  Description:
 *     This file defines FORTRAN 77-callable C functions which provide
-*     a public FORTRAN 77 interface to the Circle class.
+*     a public FORTRAN 77 interface to the StcsChan class.
 
 *  Routines Defined:
-*     AST_ISACIRCLE
-*     AST_CIRCLE
+*     AST_STCSCHAN
+*     AST_ISASTCSCHAN
 
 *  Copyright:
-*     Copyright (C) 1997-2006 Council for the Central Laboratory of the
-*     Research Councils
+*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -38,10 +38,10 @@
 *     02111-1307, USA
 
 *  Authors:
-*     DSB: David S. Berry (Starlink)
+*     DSB: David S. Berry (JAC,UCLan)
 
 *  History:
-*     31-AUG-2004 (DSB):
+*     18-DEC-2008 (DSB):
 *        Original version.
 */
 
@@ -57,40 +57,44 @@
 #include "c2f77.h"               /* F77 <-> C support functions/macros */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory handling facilities */
-#include "circle.h"              /* C interface to the Circle class */
+#include "channel.h"             /* Provides wrapper functions */
+#include "stcschan.h"             /* C interface to the StcsChan class */
 
+#include <stddef.h>
 
-F77_LOGICAL_FUNCTION(ast_isacircle)( INTEGER(THIS), INTEGER(STATUS) ) {
-   GENPTR_INTEGER(THIS)
-   F77_LOGICAL_TYPE(RESULT);
+/* Prototypes for external functions. */
+/* ================================== */
+/* This is the null function defined by the FORTRAN interface in fobject.c. */
+F77_SUBROUTINE(ast_null)( void );
 
-   astAt( "AST_ISACIRCLE", NULL, 0 );
-   astWatchSTATUS(
-      RESULT = astIsACircle( astI2P( *THIS ) ) ? F77_TRUE : F77_FALSE;
-   )
-   return RESULT;
-}
-
-F77_INTEGER_FUNCTION(ast_circle)( INTEGER(FRAME),
-                               INTEGER(FORM),
-                               DOUBLE_ARRAY(POINT1),
-                               DOUBLE_ARRAY(POINT2),
-                               INTEGER(UNC),
-                               CHARACTER(OPTIONS),
-                               INTEGER(STATUS)
-                               TRAIL(OPTIONS) ) {
-   GENPTR_INTEGER(FRAME)
-   GENPTR_INTEGER(FORM)
-   GENPTR_DOUBLE_ARRAY(POINT1)
-   GENPTR_DOUBLE_ARRAY(POINT2)
-   GENPTR_INTEGER(UNC)
+/* FORTRAN interface functions. */
+/* ============================ */
+/* These functions implement the remainder of the FORTRAN interface. */
+F77_INTEGER_FUNCTION(ast_stcschan)( void (* SOURCE)(),
+                                   void (* SINK)(),
+                                   CHARACTER(OPTIONS),
+                                   INTEGER(STATUS)
+                                   TRAIL(OPTIONS) ) {
    GENPTR_CHARACTER(OPTIONS)
    F77_INTEGER_TYPE(RESULT);
    char *options;
+   const char *(* source)( void );
    int i;
+   void (* sink)( const char * );
 
-   astAt( "AST_CIRCLE", NULL, 0 );
+   astAt( "AST_STCSCHAN", NULL, 0 );
    astWatchSTATUS(
+
+/* Set the source and sink function pointers to NULL if a pointer to
+   the null routine AST_NULL has been supplied. */
+      source = (const char *(*)( void )) SOURCE;
+      if ( source == (const char *(*)( void )) F77_EXTERNAL_NAME(ast_null) ) {
+         source = NULL;
+      }
+      sink = (void (*)( const char * )) SINK;
+      if ( sink == (void (*)( const char * )) F77_EXTERNAL_NAME(ast_null) ) {
+         sink = NULL;
+      }
       options = astString( OPTIONS, OPTIONS_length );
 
 /* Change ',' to '\n' (see AST_SET in fobject.c for why). */
@@ -99,25 +103,26 @@ F77_INTEGER_FUNCTION(ast_circle)( INTEGER(FRAME),
             if ( options[ i ] == ',' ) options[ i ] = '\n';
          }
       }
-
-      RESULT = astP2I( astCircle( astI2P( *FRAME ), *FORM, POINT1, POINT2, 
-                                  astI2P( *UNC ), "%s", options ) );
+      RESULT = astP2I( astStcsChanFor( source, astSourceWrap, sink, astSinkWrap,
+                                      "%s", options ) );
       astFree( options );
    )
    return RESULT;
 }
 
-F77_SUBROUTINE(ast_circlepars)( INTEGER(THIS),
-                                DOUBLE_ARRAY(CENTRE),
-                                DOUBLE(RADIUS),
-                                INTEGER(STATUS) ) {
+F77_LOGICAL_FUNCTION(ast_isastcschan)( INTEGER(THIS),
+                                      INTEGER(STATUS) ) {
    GENPTR_INTEGER(THIS)
-   GENPTR_DOUBLE_ARRAY(CENTRE)
-   GENPTR_DOUBLE(RADIUS)
+   F77_LOGICAL_TYPE(RESULT);
 
-   astAt( "AST_CIRCLEPARS", NULL, 0 );
+   astAt( "AST_ISASTCSCHAN", NULL, 0 );
    astWatchSTATUS(
-      astCirclePars( astI2P( *THIS ), CENTRE, RADIUS );
+      RESULT = astIsAStcsChan( astI2P( *THIS ) ) ? F77_TRUE : F77_FALSE;
    )
+   return RESULT;
 }
+
+
+
+
 

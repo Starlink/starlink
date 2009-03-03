@@ -190,8 +190,11 @@ static AstPointSet *RegBaseMesh( AstRegion *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static AstRegion *MergeBox( AstBox *, AstRegion *, int, int * );
 static AstRegion *RegBasePick( AstRegion *this, int, const int *, int * );
+static double *GeoCorner( AstFrame *, int, double *, double *, double *, int * );
+static double *GeoLengths( AstFrame *, int, double *, double *, double *, int * );
 static double *RegCentre( AstRegion *this, double *, double **, int, int, int * );
 static double SetShrink( AstBox *, double, int * );
+static int GetObjSize( AstObject *, int * );
 static int MakeGrid( int, double **, int, double *, double *, int, int, double, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
@@ -209,7 +212,6 @@ static void SetNegated( AstRegion *, int, int * );
 static void SetRegFS( AstRegion *, AstFrame *, int * );
 static void SetUnc( AstRegion *, AstRegion *, int * );
 
-static int GetObjSize( AstObject *, int * );
 /* Member functions. */
 /* ================= */
 
@@ -654,6 +656,7 @@ static void Cache( AstBox *this, int lohi, int *status ){
 */
 
 /* Local Variables: */
+   AstFrame *frm;
    AstPointSet *pset;
    AstRegion *unc;  
    double **ptr;
@@ -661,6 +664,7 @@ static void Cache( AstBox *this, int lohi, int *status ){
    double *extent;
    double *hi;
    double *lbnd_unc;
+   double *geolen;
    double *lo;
    double *shextent;
    double *ubnd_unc;
@@ -694,6 +698,9 @@ static void Cache( AstBox *this, int lohi, int *status ){
    lbnd_unc = astMalloc( sizeof( double)*(size_t) nc );
    ubnd_unc = astMalloc( sizeof( double)*(size_t) nc );
 
+/* Memory to store the geodesic half-dimensions of the box. */
+   geolen = astMalloc( sizeof( double)*(size_t) nc );
+
 /* Get pointers to the coordinate data in the parent Region structure. */
    pset = ((AstRegion *) this)->points;
    ptr = astGetPoints( pset );
@@ -701,10 +708,20 @@ static void Cache( AstBox *this, int lohi, int *status ){
 /* Check pointers can be used safely. */
    if( ptr ) {
 
-/* Calculate the half-width and store in the above array. Also store the
-   centre and the shrunk half-widths, and the shrunk lower and upper bounds. */
+/* Store the centre and corner axis values. */
       for( i = 0; i < nc; i++ ) {
          centre[ i ] = ptr[ i ][ 0 ];
+         hi[ i ] = ptr[ i ][ 1 ];
+      }
+
+/* Calculate the geodesic half-dimensions of the box. */
+      frm = astGetFrame( ((AstRegion *) this)->frameset, AST__BASE );
+      GeoLengths( frm, nc, centre, hi, geolen, status );
+      frm = astAnnul( frm );
+
+/* Calculate the half-width and store in the above array. Also store the
+   shrunk half-widths, and the shrunk lower and upper bounds. */
+      for( i = 0; i < nc; i++ ) {
          extent[ i ] = fabs( ptr[ i ][ 1 ] - centre[ i ] );
          shextent[ i ] = extent[ i ]*this->shrink;
          lo[ i ] = centre[ i ] - shextent[ i ];
@@ -719,17 +736,20 @@ static void Cache( AstBox *this, int lohi, int *status ){
          astFree( this->shextent );
          astFree( this->lo );
          astFree( this->hi );
+         astFree( this->geolen );
          this->extent = extent;
          this->centre = centre;
          this->shextent = shextent;
          this->lo = lo;
          this->hi = hi;
+         this->geolen = geolen;
          this->stale = 0;
          extent = NULL;
          centre = NULL;
          shextent = NULL;
          lo = NULL;
          hi = NULL;
+         geolen = NULL;
       }
 
 /* If lo and hi values are to be used, ensure they are expanded to at
@@ -777,6 +797,243 @@ static void Cache( AstBox *this, int lohi, int *status ){
    lbnd_unc = astFree( lbnd_unc );
    ubnd_unc = astFree( ubnd_unc );
 
+}
+
+static double *GeoCorner( AstFrame *frm, int nc, double *centre, 
+                          double *geolen, double *corner, int *status ){
+/*
+*  Name:
+*     GeoCorner
+
+*  Purpose:
+*     Find the corner position implied by the supplied centre position
+*     and geodesic box dimensions.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "box.h"
+*     double *GeoCorner( AstFrame *frm, int nc, double *centre, 
+*                        double *geolen, double *corner, int *status )
+
+*  Class Membership:
+*     Box member function 
+
+*  Description:
+*     This function returns the corner position that is implied by the
+*     supplied centre position and geodesic box dimensions. The returned
+*     corner position is found by offsetting away from the supplied
+*     centre position along each axis in turn, by the geodesic distance
+*     specified in "geolen".
+
+*  Parameters:
+*     frm
+*        Defines the geometry of the axes.
+*     nc
+*        The number of Frame axes.
+*     centre
+*        Pointer to an array holding the box centre axis values.
+*     geolen
+*        Pointer to an array holding the geodesic distance corresponding
+*        to each half axis of the box.
+*     corner
+*        Pointer to an array in which to store the axis values at the
+*        returned corner position. If this is NULL a new array is
+*        allocated and a pointer to it returned as the function value.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Pointer to the array holding the corner axis values. If a non-NULL
+*     value is supplied for parameter "corner", then the same value will
+*     be returned as the function value. Otherwise, the returned value
+*     will be a pointer to a newly allocated array that should be freed
+*     using astFree when no longer needed.
+
+*/
+
+/* Local Variables: */
+   double *p1;
+   double *p2;
+   double *p3;
+   double *pt;
+   double *result; 
+   double *work1;
+   double *work2;
+   double off;
+   double off0;
+   int i;            
+
+/* Initialise */
+   result = corner;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Ensure we have a results array. */
+   if( ! result ) result = astMalloc( sizeof( double )*nc );
+
+/* Also allocate two work arrays to hold a single position. */
+   work1 = astMalloc( sizeof( double )*nc );
+   work2 = astMalloc( sizeof( double )*nc );
+
+/* Check the pointers can be used safely. */
+   if( astOK ) {
+
+/* Select which array to use as the initial results array so that the
+   final results end up in the returned array. */
+      if( ( nc % 2 ) == 0 ) {
+         p1 = result;
+         p2 = work1;
+         p3 = work2;
+      } else {
+         p1 = work2;
+         p2 = work1;
+         p3 = result;
+      }
+
+/* Initialise the current corner position to be at the centre of the box. */
+      for( i = 0; i < nc; i++ ) p1[ i ] = centre[ i ];
+
+/* Loop round offsetting along each side of the box. */
+      for( i = 0; i < nc; i++ ) {
+
+/* In the p2 array put the axis values at a point which is offset 
+   slightly along the current axis away from the current "corner" 
+   position (p1). */
+         memcpy( p2, p1, sizeof( double )*nc );
+
+         if( geolen[ i ] != 0.0 ) {
+            off = 0.0001*fabs( geolen[ i ] );
+         } else {
+            off = 1.0E-6;
+         }
+
+         off0 = fabs( 1.0E-10*centre[ i ] );
+         if( off < off0 ) off = off0;
+         p2[ i ] += off;
+
+/* Offset away from the current corner position (p1) towards the position
+   found above (p2), moving by the geodesic distance supplied for this axis. 
+   Put the resulting axis values in p3. */
+         astOffset( frm, p1, p2, geolen[ i ], p3 );
+
+/* Swap the p3 and p1 arrays so that the offset position found above (p3)
+   becomes the starting position (p1) for the next offset. */
+         pt = p1;
+         p1 = p3;
+         p3 = pt;
+      }
+   }
+
+/* Free resources */
+   work1 = astFree( work1 );
+   work2 = astFree( work2 );
+
+/* Return the result */
+   return result;
+}
+
+static double *GeoLengths( AstFrame *frm, int nc, double *centre, 
+                           double *corner, double *geolen, int *status ){
+/*
+*  Name:
+*     GeoLengths
+
+*  Purpose:
+*     Find the geodesic dimensions of a box.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "box.h"
+*      double *GeoLengths( AstFrame *frm, int nc, double *centre, 
+*                          double *corner, double *geolen, int *status )
+
+*  Class Membership:
+*     Box member function 
+
+*  Description:
+*     This function returns half the geodesic distance along each edge of
+*     the supplied box.
+
+*  Parameters:
+*     frm
+*        Defines the geometry of the axes.
+*     nc
+*        The number of Frame axes.
+*     centre
+*        Pointer to an array holding rhe box centre axis values.
+*     corner
+*        Pointer to an array holding the axis values at the corner 
+*        position. 
+*     geolen
+*        Pointer to an array in which to return the geodesic distances 
+*        corresponding to each half axis of the box. If this is NULL a 
+*        new array is allocated and a pointer to it returned as the 
+*        function value.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Pointer to the array holding the geodesic half-dimensions of the box. 
+*     If a non-NULL value is supplied for parameter "corner", then the same 
+*     value will be returned as the function value. Otherwise, the 
+*     returned value will be a pointer to a newly allocated array that 
+*     should be freed using astFree when no longer needed.
+
+*/
+
+/* Local Variables: */
+   double *result; 
+   double *p1;
+   double *p2;
+   int i;            
+
+/* Initialise */
+   result = geolen;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Ensure we have a results array. */
+   if( ! result ) result = astMalloc( sizeof( double )*nc );
+
+/* Also allocate two work arrays to hold a single position. */
+   p1 = astMalloc( sizeof( double )*nc );
+   p2 = astMalloc( sizeof( double )*nc );
+
+/* Check the pointers can be used safely. */
+   if( astOK ) {
+
+/* Initialise the coords as the start and end of the line. */
+      memcpy( p1, centre, sizeof( double )*nc );
+      memcpy( p2, centre, sizeof( double )*nc );
+
+/* Loop round finding the geodesic half-length of each side of the box. */
+      for( i = 0; i < nc; i++ ) {
+
+/* The end of the line is the same as the start of the line, except that
+   it has the corner value for the current axis. */
+         p2[ i ] = corner[ i ];
+
+/* Find and return the geodesic distance along the line (i.e. from p1 to
+   p2). */
+         result[ i ] = astDistance( frm, p1, p2 );
+
+/* The start of the next line wil lbe at the end of the current line. */
+         p1[ i ] = corner[ i ];
+      }
+   }
+
+/* Free resources */
+   p1 = astFree( p1 );
+   p2 = astFree( p2 );
+
+/* Return the result */
+   return result;
 }
 
 static int GetObjSize( AstObject *this_object, int *status ) {
@@ -839,6 +1096,7 @@ static int GetObjSize( AstObject *this_object, int *status ) {
    result += astTSizeOf( this->centre );  
    result += astTSizeOf( this->lo );      
    result += astTSizeOf( this->hi );      
+   result += astTSizeOf( this->geolen );      
 
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;
@@ -1405,8 +1663,6 @@ static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst,
    double fac_reg;           /* Ratio of used to default MeshSize for "reg" */
    double fac_this;          /* Ratio of used to default MeshSize for "this" */
    double temp;              /* Temporary storage */
-   int closed_reg;           /* Closed attribute value for other supplied Region */
-   int closed_this;          /* Closed attribute value for supplied Box  */
    int i;                    /* Loop count */
    int j;                    /* Loop count */
    int msz_reg;              /* Original MeshSize for "reg" */
@@ -1428,10 +1684,11 @@ static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst,
    if ( !astOK ) return result;
 
 /* Get the Closed attributes of the two Regions. They must be the same in 
-   each Region if we are to merge the Regions. */
-   closed_this = astGetClosed( this );
-   closed_reg = astGetClosed( reg );
-   if( closed_this == closed_reg ) {
+   each Region if we are to merge the Regions. In addition, in order to 
+   merge, either both Regions must have a defined uncertainty, or neither 
+   Region must have a defined Uncertainty. */
+   if( astGetClosed( this ) == astGetClosed( reg ) &&
+       astTestUnc( this ) == astTestUnc( reg ) ) {
 
 /* Get the Nagated attributes of the two Regions. */
       neg_this = astGetNegated( this );
@@ -1667,7 +1924,7 @@ static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst,
 /* If a new Region was created above, propagate remaining attributes of
    the supplied Region to it. */
       if( new ) {
-         astRegOverlay( new, this );
+         astRegOverlay( new, this, 1 );
 
 /* The above Prism constructors create the Prism with the correct value
    for the Nagated attribute (i.e. zero). Ensure the above call to
@@ -1759,8 +2016,8 @@ static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst,
             fac_reg = (double)msz_reg/(double)astGetMeshSize( reg );
 
 /* The MeshSize of the returned Returned is the default value scaled by
-   the product of the two ratios found above. */
-            astSetMeshSize( new, fac_this*fac_reg*astGetMeshSize( new ) );
+   the product of the two ratios found above. */ 
+            astSetMeshSize( result, fac_this*fac_reg*astGetMeshSize( result ) );
 
 /* Re-instate the original MeshSize values for the supplied Regions (if
    set) */
@@ -1774,8 +2031,10 @@ static AstRegion *MergeBox( AstBox *this, AstRegion *reg, int boxfirst,
          map_this = astAnnul( map_this );
          map_reg = astAnnul( map_reg );
          bcmap = astAnnul( bcmap );
+         new = astAnnul( new );
          cfrm = astAnnul( cfrm );
       }
+      bfrm = astAnnul( bfrm );
    }
 
 /* If an error has occurred, annul the returned pointer. */
@@ -2613,11 +2872,13 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 
 /* Local Variables: */
    AstBox *this;       /* Pointer to Box structure */
+   AstFrame *frm;      /* Pointer to Box's base Frame */
    double **rptr;      /* Data pointers for Region PointSet */
    double *bc;         /* Base Frame centre position */
+   double *corner;     /* Array holding corner axis values */
    double *result;     /* Returned pointer */
    double *tmp;        /* Temporary array pointer */
-   double delta;       /* Amount by which to shift axis values */
+   double axval;       /* Axis value */
    int ic;             /* Coordinate index */
    int ncb;            /* Number of base frame coordinate values per point */
    int ncc;            /* Number of current frame coordinate values per point */
@@ -2631,6 +2892,10 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 /* Get a pointer to the Box structure. */
    this = (AstBox *) this_region;
 
+/* First ensure cached information (which includes the centre coords) 
+   is up to date. */
+   Cache( this, 0, status );
+
 /* Get the number of axis values per point in the base and current Frames. */
    ncb = astGetNin( this_region->frameset );
    ncc = astGetNout( this_region->frameset );
@@ -2640,7 +2905,6 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
    into the current Frame. First ensure cached information (which
    includes the centre coords) is up to date. */
    if( !ptr && !cen ) {
-      Cache( this, 0, status );
       if( ifrm == AST__CURRENT ) {
          result = astRegTranPoint( this_region, this->centre, 1, 1 );
       } else {
@@ -2671,29 +2935,35 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
                tmp = astFree( tmp );
             }
 
-/* ... and change the coords in the parent Region structure. */
+/* Replace any bad centre values with their current values. */
             for( ic = 0; ic < ncb; ic++ ) {
-               if( bc[ ic ] != AST__BAD && rptr[ ic ][ 0 ] != AST__BAD ) {
-                  delta = bc[ ic ] - rptr[ ic ][ 0 ];
-                  rptr[ ic ][ 0 ] += delta;
-                  rptr[ ic ][ 1 ] += delta;
-               }
+               if( bc[ ic ] ==  AST__BAD ) bc[ ic ] = this->centre[ ic ];
             }
+
+/* If the centre position was supplied in the base Frame, store the
+   centre coords in this->centre, skipping bad values. */
+         } else {
+            bc = this->centre;
+            for( ic = 0; ic < ncb; ic++ ) {
+               axval = cen ? cen[ ic ] : ptr[ ic ][ index ];
+               if( axval != AST__BAD ) bc[ ic ] = axval;
+            }
+         }            
+
+/* Find the coordinates at the new box corner. */
+         frm = astGetFrame( this_region->frameset, AST__BASE );
+         corner = GeoCorner( frm, ncb, bc, this->geolen, NULL, status );
+         frm = astAnnul( frm );
+
+/* ... and change the coords in the parent Region structure. */
+         for( ic = 0; ic < ncb; ic++ ) {
+            rptr[ ic ][ 0 ] = bc[ ic ];
+            rptr[ ic ][ 1 ] = corner[ ic ];
+         }
 
 /* Free resources */
-            bc = astFree( bc );
-
-/* If the centre position was supplied in the base Frame, use the
-   supplied "cen" or "ptr" pointer directly to change the coords in the 
-   parent Region structure. */
-         } else {
-            for( ic = 0; ic < ncb; ic++ ) {
-               delta = cen ? cen[ ic ] : ptr[ ic ][ index ];
-               delta -= rptr[ ic ][ 0 ];
-               rptr[ ic ][ 0 ] += delta;
-               rptr[ ic ][ 1 ] += delta;
-            }
-         }
+         if( ifrm == AST__CURRENT ) bc = astFree( bc );
+         corner = astFree( corner );
 
 /* Indicate the cached info in the Box structure is out of date. */
          astResetCache( this );
@@ -3548,7 +3818,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
          basemesh = astTransform( map, mesh, 0, NULL );
          if( astRegPins( new, basemesh, NULL, NULL ) ) {
 
-/* If so, use the new Box in place of the original. */
+/* If so, use the new Box in place of the original Box. */
             (void) astAnnul( new );
             new = astClone( newbox );
             simpler = 1;
@@ -3653,9 +3923,10 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 
 /* If any simplification could be performed, copy Region attributes from 
    the supplied Region to the returned Region, and return a pointer to it.
-   Otherwise, return a clone of the supplied pointer. */
+   If the supplied Region had no uncertainty, ensure the returned Region
+   has no uncertainty. Otherwise, return a clone of the supplied pointer. */
    if( simpler ){
-      astRegOverlay( new, this );
+      astRegOverlay( new, this, 1 );
       result = (AstMapping *) new;
 
    } else {
@@ -3941,6 +4212,7 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    out->centre = NULL;
    out->lo = NULL;
    out->hi = NULL;
+   out->geolen = NULL;
 
 /* Copy dynamic memory contents */
    nax = astGetNin( ((AstRegion *) in)->frameset );
@@ -3953,6 +4225,8 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
    out->lo = astStore( NULL, in->lo, 
                            sizeof( double )*(size_t)nax );
    out->hi = astStore( NULL, in->hi, 
+                           sizeof( double )*(size_t)nax );
+   out->geolen = astStore( NULL, in->geolen, 
                            sizeof( double )*(size_t)nax );
 }
 
@@ -3999,6 +4273,7 @@ static void Delete( AstObject *obj, int *status ) {
    this->shextent = astFree( this->shextent );
    this->lo = astFree( this->lo );
    this->hi = astFree( this->hi );
+   this->geolen = astFree( this->geolen );
 }
 
 /* Dump function. */
@@ -4509,6 +4784,7 @@ AstBox *astInitBox_( void *mem, size_t size, int init, AstBoxVtab *vtab,
          new->centre = NULL;  
          new->lo = NULL;      
          new->hi = NULL;      
+         new->geolen = NULL;      
          new->stale = 1;
 
 /* If an error occurred, clean up by deleting the new Box. */
@@ -4657,6 +4933,7 @@ AstBox *astLoadBox_( void *mem, size_t size, AstBoxVtab *vtab,
       new->centre = NULL;  
       new->lo = NULL;      
       new->hi = NULL;      
+      new->geolen = NULL;      
       new->stale = 1;
 
 /* If an error occurred, clean up by deleting the new Box. */
@@ -4686,13 +4963,6 @@ void astBoxPoints_( AstBox *this, double *centre, double *corner,
    (**astMEMBER(this,Box,BoxPoints))( this, centre, corner, status );
    return;
 }
-
-
-
-
-
-
-
 
 
 

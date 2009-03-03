@@ -76,6 +76,8 @@ f     The Prism class does not define any new routines beyond those
 *     22-JAN-2009 (DSB):
 *        - Allow any class of Region to be used to define the extrusion axes.
 *        - Over-ride the astMapList method.
+*     19-MAR-2009 (DSB):
+*        Over-ride the astDecompose method.
 *class--
 */
 
@@ -139,9 +141,7 @@ static int class_check;
 static int (* parent_maplist)( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static int (* parent_getobjsize)( AstObject *, int * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
-static AstRegion *(* parent_getuncfrm)( AstRegion *, int, int * );
-static void (* parent_clearunc)( AstRegion *, int * );
-static int (* parent_testunc)( AstRegion *, int * );
+static AstRegion *(* parent_getdefunc)( AstRegion *, int * );
 static void (* parent_setregfs)( AstRegion *, AstFrame *, int * );
 static AstMapping *(* parent_simplify)( AstMapping *, int * );
 static int (* parent_equal)( AstObject *, AstObject *, int * );
@@ -150,7 +150,7 @@ static void (* parent_setmeshsize)( AstRegion *, int, int * );
 static void (* parent_clearclosed)( AstRegion *, int * );
 static void (* parent_clearmeshsize)( AstRegion *, int * );
 static double (*parent_getfillfactor)( AstRegion *, int * );
-static int (* parent_overlap)( AstRegion *, AstRegion *, int * );
+static int (* parent_overlapx)( AstRegion *, AstRegion *, int * );
 static void (*parent_regsetattrib)( AstRegion *, const char *, char **, int * );
 static void (*parent_regclearattrib)( AstRegion *, const char *, char **, int * );
 
@@ -197,7 +197,7 @@ AstPrism *astPrismId_( void *, void *, const char *, ... );
 static AstMapping *Simplify( AstMapping *, int * );
 static AstPointSet *RegBaseMesh( AstRegion *, int * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
-static AstRegion *GetUncFrm( AstRegion *, int, int * );
+static AstRegion *GetDefUnc( AstRegion *, int * );
 static AstRegion *RegBasePick( AstRegion *this, int, const int *, int * );
 static double *RegCentre( AstRegion *this, double *, double **, int, int, int * );
 static double GetFillFactor( AstRegion *, int * );
@@ -208,11 +208,10 @@ static int MapList( AstMapping *, int, int, int *, AstMapping ***, int **, int *
 static int Overlap( AstRegion *, AstRegion *, int * );
 static int OverlapX( AstRegion *, AstRegion *, int * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int **, int * );
-static int TestUnc( AstRegion *, int * );
 static void ClearClosed( AstRegion *, int * );
 static void ClearMeshSize( AstRegion *, int * );
-static void ClearUnc( AstRegion *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
+static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void GetRegions( AstPrism *, AstRegion **, AstRegion **, int *, int * );
@@ -230,54 +229,97 @@ static int ManageLock( AstObject *, int, int, AstObject **, int * );
 
 /* Member functions. */
 /* ================= */
-static void ClearUnc( AstRegion *this_region, int *status ){
+static void Decompose( AstMapping *this_mapping, AstMapping **map1, 
+                       AstMapping **map2, int *series, int *invert1, 
+                       int *invert2, int *status ) {
 /*
+*
 *  Name:
-*     ClearUnc
+*     Decompose
 
 *  Purpose:
-*     Erase any uncertainty information in a Region.
+*     Decompose a Prism into two component Regions.
 
 *  Type:
 *     Private function.
 
 *  Synopsis:
-*     #include "prism.h"
-*     void ClearUnc( AstRegion *this, int *status )
+*     #include "cmpregion.h"
+*     void Decompose( AstMapping *this, AstMapping **map1, 
+*                     AstMapping **map2, int *series,
+*                     int *invert1, int *invert2, int *status )
 
 *  Class Membership:
-*     Prism member function (over-rides the astClearUnc protected
-*     method inherited from the Region class).
+*     Prism member function (over-rides the protected astDecompose
+*     method inherited from the Mapping class).
 
 *  Description:
-*     This function erases all uncertainty information, whether default
-*     or not, from a Region.
+*     This function returns pointers to two Mappings which, when applied
+*     either in series or parallel, are equivalent to the supplied Mapping.
+*
+*     Since the Frame class inherits from the Mapping class, Frames can
+*     be considered as special types of Mappings and so this method can
+*     be used to decompose either CmpMaps, CmpFrames, CmpRegions or Prisms.
 
 *  Parameters:
 *     this
-*        Pointer to the Region.
+*        Pointer to the Mapping.
+*     map1
+*        Address of a location to receive a pointer to first component
+*        Mapping. 
+*     map2
+*        Address of a location to receive a pointer to second component
+*        Mapping. 
+*     series
+*        Address of a location to receive a value indicating if the
+*        component Mappings are applied in series or parallel. A non-zero
+*        value means that the supplied Mapping is equivalent to applying map1 
+*        followed by map2 in series. A zero value means that the supplied
+*        Mapping is equivalent to applying map1 to the lower numbered axes
+*        and map2 to the higher numbered axes, in parallel.
+*     invert1
+*        The value of the Invert attribute to be used with map1. 
+*     invert2
+*        The value of the Invert attribute to be used with map2. 
 *     status
 *        Pointer to the inherited status variable.
 
+*  Notes:
+*     - Any changes made to the component rames using the returned
+*     pointers will be reflected in the supplied CmpFrame.
+
+*-
 */
 
 /* Local Variables: */
-   AstPrism *this;
+   AstPrism *this;              /* Pointer to Prism structure */
 
-/* Check the inherited status. */
-   if( !astOK ) return;
+/* Check the global error status. */
+   if ( !astOK ) return;
 
-/* Invoke the implementation inherited form the parent Region class to 
-   clear any default uncertainty information. */
-   (* parent_clearunc)( this_region, status );
+/* Obtain a pointer to the CmpMap structure. */
+   this = (AstPrism *) this_mapping;
 
-/* Get a pointer to the Prism structure. */
-   this = (AstPrism *) this_region;
+/* The components Frames of a Prism are considered to be parallel
+   Mappings. */
+   if( series ) *series = 0;
 
-/* Clear any uncertainty information in the component Regions. */
-   astClearUnc( this->region1 );
-   astClearUnc( this->region2 );
+/* The Frames are returned in their original order whether or not the
+   Prism has been inverted. */
+   if( map1 ) *map1 = astClone( this->region1 );
+   if( map2 ) *map2 = astClone( this->region2 );
 
+/* The invert flags dont mean anything for a Region, but we return them
+   anyway. If the Prism has been inverted, return inverted Invert flags. */
+   if( astGetInvert( this ) ) {
+      if( invert1 ) *invert1 = astGetInvert( this->region1 ) ? 0 : 1;
+      if( invert2 ) *invert2 = astGetInvert( this->region2 ) ? 0 : 1;
+
+/* If the Prism has not been inverted, return the current Invert flags. */
+   } else {
+      if( invert1 ) *invert1 = astGetInvert( this->region1 );
+      if( invert2 ) *invert2 = astGetInvert( this->region2 );
+   }
 }
 
 static int Equal( AstObject *this_object, AstObject *that_object, int *status ) {
@@ -775,52 +817,39 @@ static void GetRegions( AstPrism *this, AstRegion **reg1, AstRegion **reg2,
    *neg = astGetNegated( (AstRegion *) this );
 }
 
-static AstRegion *GetUncFrm( AstRegion *this_region, int ifrm, int *status ) {
+static AstRegion *GetDefUnc( AstRegion *this_region, int *status ) {
 /*
 *  Name:
-*     GetUncFrm
+*     GetDefUnc
 
 *  Purpose:
-*     Obtain a pointer to the uncertainty Region for a given Region.
+*     Obtain a pointer to the default uncertainty Region for a given Region.
 
 *  Type:
 *     Private function.
 
 *  Synopsis:
 *     #include "prism.h"
-*     AstRegion *GetUncFrm( AstRegion *this, int ifrm, int *status ) 
+*     AstRegion *GetDefUnc( AstRegion *this ) 
 
 *  Class Membership:
-*     Prism method (over-rides the astGetUncFrm method inherited from
+*     Prism method (over-rides the astGetDefUnc method inherited from
 *     the Region class).
 
-*  Description:
 *     This function returns a pointer to a Region which represents the
-*     uncertainty associated with a position on the boundary of the given 
-*     Region. The returned Region can refer to the either the base or 
-*     the current Frame within the FrameSet encapsulated by the supplied 
-*     Region as specified by the "ifrm" parameter. If the returned Region is 
-*     re-centred at some point on the boundary of the supplied Region, then 
-*     the re-centred Region will represent the region in which the true 
-*     boundary position could be.
+*     default uncertainty associated with a position on the boundary of the 
+*     given  Region. The returned Region refers to the base Frame within the 
+*     FrameSet encapsulated by the supplied Region.
 
 *  Parameters:
 *     this
 *        Pointer to the Region.
-*     ifrm
-*        The index of a Frame within the FrameSet encapsulated by "this".
-*        The returned Region will refer to the requested Frame. It should
-*        be either AST__CURRENT or AST__BASE.
-*     status
-*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     A pointer to the Region. This should be annulled (using astAnnul)
 *     when no longer needed.
 
 *  Notes:
-*     - A default uncertainty Region will be created if the supplied Region 
-*     does not have an uncertainty Region.
 *     - A NULL pointer will be returned if this function is invoked
 *     with the global error status set, or if it should fail for any
 *     reason.
@@ -828,9 +857,6 @@ static AstRegion *GetUncFrm( AstRegion *this_region, int ifrm, int *status ) {
 
 /* Local Variables: */
    AstPrism *this;            /* Pointer to Prism structure */
-   AstFrame *frm;             /* Current Frame from supplied Region */
-   AstMapping *map;           /* Supplied to uncertainty Mapping */
-   AstRegion *bunc;           /* Uncertainty Region in base Frame of "this" */
    AstRegion *bunc1;          /* Uncertainty Region for 1st component */
    AstRegion *bunc2;          /* Uncertainty Region for 2nd component */
    AstRegion *result;         /* Returned pointer */
@@ -844,59 +870,20 @@ static AstRegion *GetUncFrm( AstRegion *this_region, int ifrm, int *status ) {
 /* Get a pointer to the Prism structure. */
    this = (AstPrism *) this_region;   
 
-/* If the parent Region structure contains explicit uncertainty information, 
-   use it in preference to any uncertainty Region stored in the component 
-   Regions. */
-   if( (* parent_testunc)( this_region, status ) ) {
-      bunc = (* parent_getuncfrm)( this_region, AST__BASE, status );
-
-/* Otherwise construct an uncertainty Region from the uncertainty Regions
+/* Construct a default uncertainty Region from the uncertainty Regions
    in the two component Regions. The current Frames in the component
    Regions are equivalent to the base Frame in the parent Region structure. 
    So we may need to map the component uncertainty into the current Region of 
    the parent if required later on. */
-   } else {
-      bunc1 = astGetUncFrm( this->region1, AST__CURRENT );
-      bunc2 = astGetUncFrm( this->region2, AST__CURRENT );
+   bunc1 = astGetUncFrm( this->region1, AST__CURRENT );
+   bunc2 = astGetUncFrm( this->region2, AST__CURRENT );
 
 /* Combine them into a Prism. */
-      bunc = (AstRegion *) astPrism( bunc1, bunc2, "", status );
+   result = (AstRegion *) astPrism( bunc1, bunc2, "", status );
 
 /* Free resources. */
-      bunc1 = astAnnul( bunc1 );
-      bunc2 = astAnnul( bunc2 );
-   }
-
-/* The above code obtains an uncertainty Region in the base Frame of the
-   parent Region (equal to the current Frame of the component Regions).
-   If this is what is required, return a clone of the above Region. */
-   if( ifrm == AST__BASE ) {
-      result = astClone( bunc );
-
-/* Otherwise, map it into the current Region of the parent.  */
-   } else {
-
-/* Get a Mapping from the Frame represented by the uncertainty Region
-   (the parent Region base Frame) to the parent Region current Frame. */
-      map = astGetMapping( this_region->frameset, AST__BASE, AST__CURRENT );
-
-/* If it is a UnitMap, the uncertainty Region is already in the correct 
-   Frame, so just return the stored pointer. */
-      if( astIsAUnitMap( map ) ) {
-         result= astClone( bunc );
-
-/* Otherwise, use this Mapping to map the uncertainty Region into the current
-   Frame. */
-      } else {
-         frm = astGetFrame( this_region->frameset, AST__CURRENT );
-         result = astMapRegion( bunc, map, frm );
-
-/* Free resources. */
-         frm = astAnnul( frm );
-      }
-      map = astAnnul( map );
-   }
-   bunc = astAnnul( bunc );
+   bunc1 = astAnnul( bunc1 );
+   bunc2 = astAnnul( bunc2 );
 
 /* Return NULL if an error occurred. */
    if( !astOK ) result = astAnnul( result );
@@ -995,14 +982,8 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name, int *status ) {
    parent_maplist = mapping->MapList;
    mapping->MapList = MapList;
 
-   parent_getuncfrm = region->GetUncFrm;
-   region->GetUncFrm = GetUncFrm;
-
-   parent_clearunc = region->ClearUnc;
-   region->ClearUnc = ClearUnc;
-
-   parent_testunc = region->TestUnc;
-   region->TestUnc = TestUnc;
+   parent_getdefunc = region->GetDefUnc;
+   region->GetDefUnc = GetDefUnc;
 
    parent_setregfs = region->SetRegFS;
    region->SetRegFS = SetRegFS;
@@ -1025,8 +1006,8 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name, int *status ) {
    parent_getfillfactor = region->GetFillFactor;
    region->GetFillFactor = GetFillFactor;
 
-   parent_overlap = region->Overlap;
-   region->Overlap = Overlap;
+   parent_overlapx = region->OverlapX;
+   region->OverlapX = OverlapX;
 
    parent_regsetattrib = region->RegSetAttrib;
    region->RegSetAttrib = RegSetAttrib;
@@ -1036,12 +1017,13 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name, int *status ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   mapping->Decompose = Decompose;
    region->RegBaseBox = RegBaseBox;
    region->RegBaseMesh = RegBaseMesh;
    region->RegPins = RegPins;
    region->GetBounded = GetBounded;
    region->RegCentre = RegCentre;
-   region->OverlapX = OverlapX;
+   region->Overlap = Overlap;
    region->RegBasePick = RegBasePick;
 
 /* Declare the copy constructor, destructor and class dump function. */
@@ -1530,10 +1512,10 @@ static int Overlap( AstRegion *this, AstRegion *that, int *status ){
    this_reg2 = astAnnul( this_reg2 );
 
 /* If overlap could not be determined using the above implementation, try 
-   using the implementation inherited from the parent Region class. */
-   if( !result ) {
-      result = (*parent_overlap)( this, that, status );
-   }
+   using the implementation inherited from the parent Region class. Use
+   OverlapX rather than Overlap since a) it is OverlapX that does the work,
+   and b) calling Overlap could end us in an infinite loop. */
+   if( !result ) result = (*parent_overlapx)( this, that, status );
 
 /* If not OK, return zero. */
    if( !astOK ) result = 0;
@@ -2067,7 +2049,7 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes,
    }
 
    axes1 = astFree( axes1 );
-   axes1 = astFree( axes1 );
+   axes2 = astFree( axes2 );
 
 /* Return a NULL pointer if an error has occurred. */
    if( !astOK ) result = astAnnul( result );
@@ -2898,6 +2880,7 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    AstRegion *reg;               /* This Region */
    AstRegion *snewreg1;          /* Simplified newreg1 */
    AstRegion *snewreg2;          /* Simplified newreg2 */
+   AstRegion *unc;               /* Uncertainty Region from supplied Prism */
    int *axin;                    /* Indices of Mapping inputs to use */
    int *axout1;                  /* Indices of cfrm axes corresponding to reg1 */
    int *axout2;                  /* Indices of cfrm axes corresponding to reg2 */
@@ -2968,8 +2951,8 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    of "this" and simplify it. */
    if( new ) {
       new2 = astMapRegion( new, bcmap, cfrm );
-      result = astSimplify( new2 );
-      new = astAnnul( new );
+      (void) astAnnul( new );
+      new = astSimplify( new2 );
       new2 = astAnnul( new2 );
 
 /* If the above did not produced a result, try a different approach. */
@@ -3115,9 +3098,17 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
       if( nmap2 ) nmap2 = astAnnul( nmap2 );
    }
 
+/* If we have created a new Region, ensure any user-supplied uncertainty 
+   that has been stored explicitly with the supplied Prism is passed on
+   to the new Region. */
+   if( new ) {
+      if( astTestUnc( reg ) ) {
+         unc = astGetUnc( reg, 0 );
+         astSetUnc( new, unc );
+      }
+
 /* Now invoke the parent Simplify method inherited from the Region class. 
    This will simplify the encapsulated FrameSet and uncertainty Region. */
-   if( new ) {
       result = (*parent_simplify)( (AstMapping *) new, status );
       new = astAnnul( new );
    }
@@ -3129,76 +3120,13 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    bcmap = astAnnul( bcmap );
 
 /* If any simplification could be performed, copy Region attributes from 
-   the supplied Region to the returned Region, and return a pointer to it.
-   Otherwise, return a clone of the supplied pointer. */
-   if( result != this_mapping ) astRegOverlay( result, (AstRegion *) this_mapping );
+   the supplied Region to the returned Region, and return a pointer to it. */
+   if( result != this_mapping ) astRegOverlay( result, (AstRegion *) this_mapping, 0 );
 
 /* If an error occurred, annul the returned Mapping. */
    if ( !astOK ) result = astAnnul( result );
 
 /* Return the result. */
-   return result;
-}
-
-static int TestUnc( AstRegion *this_region, int *status ) {
-/*
-*  Name:
-*     TestUnc
-
-*  Purpose:
-*     Does the Region contain non-default uncertainty information?
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     include "prism.h"
-*     int TestUnc( AstRegion *this, int *status )
-
-*  Class Membership:
-*     Prism member function (over-rides the astTestUnc protected
-*     method inherited from the Region class).
-
-*  Description:
-*     This function returns a flag indicating if the uncertainty Region in 
-*     the supplied Region was supplied explicit (i.e. is not a default 
-*     uncertainty Region).
-
-*  Parameters:
-*     this
-*        Pointer to the Region.
-*     status
-*        Pointer to the inherited status variable.
-
-*  Returned Value:
-*     Non-zero if the uncertainty Region was supplied explicitly.
-*     Zero otherwise.
-
-*/
-
-/* Local Variables; */
-   AstPrism *this;
-   int result;
-
-/* Check the global error status. */
-   if ( !astOK ) return 0;
-
-/* Get a pointer to the Prism structure. */
-   this = (AstPrism *) this_region;
-
-/* See if the parent Region structure contains explicit uncertainty
-   information. If so this will be used in preference to any uncertainty
-   info in the component Regions. */
-   result = (* parent_testunc)( this_region, status );
-
-/* If not see if either of the two component Regions contains explicit 
-   uncertainty information. */
-   if( !result ) {
-      this = (AstPrism *) this_region;
-      result = astTestUnc( this->region1 ) || astTestUnc( this->region2 );
-   }
-
-/* Return the result */
    return result;
 }
 

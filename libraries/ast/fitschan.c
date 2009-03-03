@@ -1155,10 +1155,10 @@ static int (* parent_managelock)( AstObject *, int, int, AstObject **, int * );
 
 /* Strings to describe each data type. These should be in the order implied
    by the corresponding macros (eg AST__FLOAT, etc). */
-static const char *type_names[] = {"comment", "integer", "floating point",
-                                   "string", "complex floating point",
-                                   "complex integer", "logical",
-                                   "continuation string" };
+static const char *type_names[8] = {"comment", "integer", "floating point",
+                                    "string", "complex floating point",
+                                    "complex integer", "logical",
+                                    "continuation string" };
 
 /* Text values used to represent Encoding values externally. */
 static const char *xencod[8] = { NATIVE_STRING, FITSPC_STRING,
@@ -5536,6 +5536,7 @@ static int CnvValue( AstFitsChan *this, int type, int undef, void *buff,
    otype = CardType( this, status );
 
 /* Get a pointer to the stored data value, and its size. */
+   osize = 0;
    odata = CardData( this, &osize, status );
 
 /* Do the conversion. */
@@ -24243,6 +24244,9 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 /* Check the global error status. */
    if ( !astOK ) return NULL;
 
+/* Initialise to avoid compiler warnings. */
+   size = 0;
+
 /* Create the returned FitsChan. */
    ret = astFitsChan( NULL, NULL, "", status );
 
@@ -34306,18 +34310,18 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 #define KEY_LEN 50               /* Maximum length of a keyword */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    AstFitsChan *this;            /* Pointer to the FitsChan structure */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
    char buff[ KEY_LEN + 1 ];     /* Buffer for keyword string */
    const char *class;            /* Object class */
    const char *sval;             /* Pointer to string value */
+   int cardtype;                 /* Keyword data type */
    int flags;                    /* Keyword flags */
    int icard;                    /* Index of current card */
    int ival;                     /* Integer value */
    int ncard;                    /* No. of cards dumped so far */
-   int old_ignore_used;           /* Original value of external variable ignore_used */
+   int old_ignore_used;          /* Original value of external variable ignore_used */
    int set;                      /* Attribute value set? */
-   int type;                     /* Keyword data type */
    void *data;                   /* Pointer to keyword data value */
 
 /* Check the global error status. */
@@ -34417,9 +34421,9 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
       }
 
 /* Write out the keyword type. */
-      type = CardType( this, status );
+      cardtype = CardType( this, status );
       (void) sprintf( buff, "Ty%d", ncard );
-      astWriteString( channel, buff, 1, 1, type_names[type],
+      astWriteString( channel, buff, 1, 1, type_names[ cardtype ],
                       "FITS keyword data type" );
 
 /* Write out the flag values if any are non-zero. */
@@ -34431,29 +34435,29 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 
 /* Write out the data value, if defined, using the appropriate data type. */
       data = CardData( this, NULL, status );
-      if( data && type != AST__UNDEF ){
+      if( data && cardtype != AST__UNDEF ){
 
-         if( type == AST__FLOAT ){
+         if( cardtype == AST__FLOAT ){
             (void) sprintf( buff, "Dt%d", ncard );
             astWriteDouble( channel, buff, 1, 1, *( (double *) data ), 
                             "FITS keyword value" );
    
-         } else if( type == AST__STRING || type == AST__CONTINUE ){
+         } else if( cardtype == AST__STRING || cardtype == AST__CONTINUE ){
             (void) sprintf( buff, "Dt%d", ncard );
             astWriteString( channel, buff, 1, 1, (char *) data, 
                             "FITS keyword value" );
    
-         } else if( type == AST__INT ){
+         } else if( cardtype == AST__INT ){
             (void) sprintf( buff, "Dt%d", ncard );
             astWriteInt( channel, buff, 1, 1, *( (int *) data ), 
                          "FITS keyword value" );
    
-         } else if( type == AST__LOGICAL ){
+         } else if( cardtype == AST__LOGICAL ){
             (void) sprintf( buff, "Dt%d", ncard );
             astWriteInt( channel, buff, 1, 1, *( (int *) data ), 
                          "FITS keyword value" );
    
-         } else if( type == AST__COMPLEXF ){
+         } else if( cardtype == AST__COMPLEXF ){
             (void) sprintf( buff, "Dr%d", ncard );
             astWriteDouble( channel, buff, 1, 1, *( (double *) data ), 
                             "FITS keyword real value" );
@@ -34462,7 +34466,7 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
             astWriteDouble( channel, buff, 1, 1, *( ( (double *) data ) + 1 ), 
                             "FITS keyword imaginary value" );
    
-         } else if( type == AST__COMPLEXI ){
+         } else if( cardtype == AST__COMPLEXI ){
             (void) sprintf( buff, "Dr%d", ncard );
             astWriteInt( channel, buff, 1, 1, *( (int *) data ), 
                          "FITS keyword real value" );
