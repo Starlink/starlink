@@ -1,5 +1,10 @@
 1 NDG_library
 
+Version 5.6
+
+   o A new C function ndgGtprvk has been added, that returns provenance
+   information for a given ancestor in the form of an AST KeyMap.
+
 Version 5.5
 
    o A new routine NDG_MOREG has been added which searchs the

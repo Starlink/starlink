@@ -91,6 +91,7 @@ void ndgEndpv( const char *creator, int *status );
 void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot, const char *creator, int *status );
 void ndgCtprv( int indf, int *nanc, int *status );
 void ndgGtprv( int indf, int ianc, HDSLoc **prov, int *status );
+void ndgGtprvk( int indf, int ianc, AstKeyMap **prov, HDSLoc **more, int *status );
 void ndgMdprv( int indf, int ianc, HDSLoc *prov, int *status );
 void ndgRmprv( int indf, int ianc, int *status );
 void ndgRtprv( int indf, AstKeyMap **roots, int *status );

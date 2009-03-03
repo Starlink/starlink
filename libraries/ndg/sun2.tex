@@ -19,10 +19,10 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {2.8}
 \newcommand{\stardocauthors}   {D.S.\ Berry \\ M.B.\ Taylor}
-\newcommand{\stardocdate}      {11th February 2009}
+\newcommand{\stardocdate}      {3rd March 2009}
 \newcommand{\stardoctitle}     {NDG \\ [\latex{1ex}]
                                 Routines for Accessing Groups of NDFs}
-\newcommand{\stardocversion}   {Version 5.5}
+\newcommand{\stardocversion}   {Version 5.6}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 \newcommand{\stardocabstract}  {
 This document describes the routines provided within the NDG subroutine 
@@ -846,7 +846,7 @@ to add further members.
 \end{latexonly}
 
 
-\section{Full Routine Specifications}
+\section{Full Fortrn Routine Specifications}
 \label {SEC:FULLSPEC}
 
 % Routine descriptions:
@@ -2709,6 +2709,435 @@ to add further members.
 }
 
 \newpage
+
+\section{Full C Function Specifications}
+
+\sstroutine{
+   ndgCtprv
+}{
+   Count the number of ancestors used in the creation of an NDF
+}{
+   \sstdescription{
+      This routine returns the number of ancestors described in the
+      {\tt "}PROVENANCE{\tt "} extension of the supplied INDF.
+   }
+   \sstinvocation{
+      void ndgCtprv( int indf, int $*$nanc, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         indf
+      }{
+         An identifier for the NDF containing the provenance information.
+      }
+      \sstsubsection{
+         nanc
+      }{
+         Pointer to an int in which to returned the number of ancestor NDFs
+         stored in the provenance information of INDF.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ndgFmprv
+}{
+   Format the provenance information from an NDF
+}{
+   \sstdescription{
+      This routine returns an AST KeyMap holding a set of text strings
+      containing information taken from the {\tt "}PROVENANCE{\tt "} extension in INDF.
+
+      The returned KeyMap has an entry with key {\tt "}0{\tt "} that describes the
+      supplied NDF. It also has an entry describing each ancestor NDF.
+      These entries have keys {\tt "}1{\tt "}, {\tt "}2{\tt "}, {\tt "}3{\tt "}, etc, up to the number of
+      ancestors in the NDF.
+
+      Each of these entries contains a pointer to another AST KeyMap
+      which may contain any subset of the following entries (all of which
+      are strings):
+
+      {\tt "}ID{\tt "} - the integer index within the ancestors array (zero for the
+             main NDF).
+
+      {\tt "}PATH{\tt "} - The full path or base name for the NDF (see {\tt "}base{\tt "}).
+
+      {\tt "}DATE{\tt "} - The date of creation of the NDF.
+
+      {\tt "}CREATOR{\tt "} - The software item that created the NDF.
+
+      {\tt "}PARENTS{\tt "} - A comma separated list of indicies into the ancestors
+                  array that identifies the direct parents of the NDF.
+
+      {\tt "}MORE{\tt "} - A summary of the contents of the MORE structure associated
+               with the NDF.
+
+      Finally, the returned KeyMap has an entry with key {\tt "}MXLEN{\tt "} that is
+      again a pointer to another KeyMap with the same entries listed above.
+      However, this time the entries are integers, not strings, and holds
+      the maximum field width used to format the strings.
+   }
+   \sstinvocation{
+      void ndgFmprv( int indf, int base, AstKeyMap $*$$*$keymap, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         indf
+      }{
+         An identifier for the NDF containing the provenance information.
+      }
+      \sstsubsection{
+         base
+      }{
+         If non-zero, then the PATH field in the returned KeyMap holds the
+         base name of each NDF rather than the full path.
+      }
+      \sstsubsection{
+         keymap
+      }{
+         A location at which to returned a pointer to the returned AST KeyMap.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ndgGtprv
+}{
+   Get provenance information from an NDF
+}{
+   \sstdescription{
+      This routine returns information from the {\tt "}PROVENANCE{\tt "} extension
+      in INDF, describing the ancestor NDF with a given index.
+   }
+   \sstinvocation{
+      void ndgGtprv( int indf, int ianc, HDSLoc $*$$*$prov, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         indf
+      }{
+         An identifier for the NDF containing the provenance information.
+      }
+      \sstsubsection{
+         ianc
+      }{
+         The index of the ancestor NDF for which information should be
+         returned. A value of zero will result in information about the NDF
+         specified by {\tt "}indf{\tt "} being returned. Otherwise, the {\tt "}ianc{\tt "} value
+         is used as an index into the ANCESTORS array in the PROVENANCE
+         extension. No error is reported if {\tt "}ianc{\tt "} is too large, but a
+         NULL pointer will be returned for {\tt "}prov{\tt "}.
+      }
+      \sstsubsection{
+         prov
+      }{
+         The location at which to return a pointer to a locator for a
+         temporary HDS object containing the following components:
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}PATH{\tt "}: A string holding the path of the ancestor NDF.
+
+            \sstitem
+            {\tt "}DATE{\tt "}: A string holding the formatted UTC date and time at
+              which the provenance information for the ancestor NDF was
+              recorded.
+
+            \sstitem
+            {\tt "}CREATOR{\tt "}: A string identifying the software that created the
+              ancestor NDF.
+
+            \sstitem
+            {\tt "}MORE{\tt "}: Any extra information stored with the ancestor.
+
+            \sstitem
+            {\tt "}PARENTS{\tt "}: A 1D vector of integers that are the indices of the
+              immediate parents of the ancestor.
+
+         }
+         If the specified ancestor does not have any of these items of
+         information, then the corresponding component will not be
+         present in the returned HDS object. For instance, if the
+         ancestor has no immediate parent NDFs, then the {\tt "}PARENTS{\tt "}
+         component will not be present in the returned HDS object. The
+         returned locator should be annulled using datAnnul when no
+         longer needed.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ndgGtprvk
+}{
+   Create a KeyMap holding provenance information from an NDF
+}{
+   \sstdescription{
+      This routine returns information from the {\tt "}PROVENANCE{\tt "} extension
+      in INDF, describing the ancestor NDF with a given index. It is
+      similar to ndgGtprv except that the nformation is returned in the
+      form of an AST KeyMap rather than an HDS structure.
+   }
+   \sstinvocation{
+      void ndgGtprvk( int indf, int ianc, AstKeyMap $*$$*$prov, HDSLoc $*$$*$more,
+                      int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         indf
+      }{
+         An identifier for the NDF containing the provenance information.
+      }
+      \sstsubsection{
+         ianc
+      }{
+         The index of the ancestor NDF for which information should be
+         returned. A value of zero will result in information about the NDF
+         specified by {\tt "}indf{\tt "} being returned. Otherwise, the {\tt "}ianc{\tt "} value
+         is used as an index into the ANCESTORS array in the PROVENANCE
+         extension. No error is reported if {\tt "}ianc{\tt "} is too large (i.e.
+         larger than the value returned by ndgCtprv), but NULL will be
+         returned in {\tt "}$*$prov{\tt "}.
+      }
+      \sstsubsection{
+         prov
+      }{
+         The location at which to return a pointer to an AST KeyMap
+         containing entries with the following keys and values:
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}PATH{\tt "}: A string holding the path of the ancestor NDF.
+
+            \sstitem
+            {\tt "}DATE{\tt "}: A string holding the formatted UTC date and time at
+              which the provenance information for the ancestor NDF was
+              recorded.
+
+            \sstitem
+            {\tt "}CREATOR{\tt "}: A string identifying the software that created the
+              ancestor NDF.
+
+            \sstitem
+            {\tt "}PARENTS{\tt "}: A 1D vector of integers that are the indices of the
+              immediate parents of the ancestor.
+
+            \sstitem
+            {\tt "}MORE{\tt "}: A KeyMap containing extra scalar information stored
+            with the ancestor. Only scalar items stored directly within the
+            top level of the MORE structure are returned in the KeyMap. The
+            HDS name of the component is used as the key. The full contents
+            of the MORE structure are returned by the {\tt "}more{\tt "} parameter (see
+            below).
+
+         }
+         If the specified ancestor does not have any of these items of
+         information, then the corresponding entry will not be present
+         in the returned KeyMap. For instance, if the ancestor has no
+         immediate parent NDFs, then the {\tt "}PARENTS{\tt "} entry will not be
+         present in the KeyMap. A NULL pointer will be returned if the
+         NDF has no provenance extension, or if {\tt "}ianc{\tt "} is outside the
+         bounds of the ANCESTORS array (and is not zero).
+      }
+      \sstsubsection{
+         more
+      }{
+         The location at which to return a pointer to a locator for a
+         temporary HDS object containing a full deep copy of the MORE
+         structure associated with the requested ancestor. The
+         returned locator should be annulled using datAnnul when no
+         longer needed. A NULL pointer may be supplied for this parameter
+         if the MORE structure is not needed. A NULL pointer will be
+         returned if the requested ancestor has no MORE component.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ndgPtprv
+}{
+   Add provenance information to an NDF
+}{
+   \sstdescription{
+      This routine stores information in the {\tt "}PROVENANCE{\tt "} extension of
+      INDF1 indicating that INDF2 was used in the creation of INDF1.
+      The provenance information is stored in an NDF extension call
+      {\tt "}PROVENANCE{\tt "}.
+   }
+   \sstinvocation{
+      void ndgPtprv( int indf1, int indf2, HDSLoc $*$more, int isroot,
+                     const char $*$creator, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         indf1
+      }{
+         An identifier for a newly created NDF.
+      }
+      \sstsubsection{
+         indf2
+      }{
+         An identifier for an NDF that was used in the creation of INDF1.
+      }
+      \sstsubsection{
+         more
+      }{
+         A locator for an HDS structure containing arbitrary additional
+         information about INDF2, and how INDF2 was used in the creation
+         of INDF1. This information is stored in the provenance extension
+         of INDF1.
+      }
+      \sstsubsection{
+         isroot
+      }{
+         If non-zero, then INDF2 will be treated as a root NDF. That is,
+         any provenance information in INDF2 is ignored. If zero, then
+         any provenance information in INDF2 is copied into INDF1. INDF2
+         is then only a root NDF if it contains no provenance information.
+      }
+      \sstsubsection{
+         creator
+      }{
+         A text identifier for the software that created INDF1 (usually the
+         name of the calling application). The format of the identifier
+         is arbitrary, but the form {\tt "}PACKAGE:COMMAND{\tt "} is recommended.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ndgRtprv
+}{
+   Identify the root ancestors of an NDF
+}{
+   \sstdescription{
+      This routine uses the PROVENANCE extension of the supplied NDF to
+      obtain and return information identifying the root ancestors of
+      the supplied NDF. An ancestor is a root ancestor if it does not itself
+      have any ancestors.
+   }
+   \sstinvocation{
+      void ndgRtprv( int indf, AstKeyMap $*$$*$roots, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         indf
+      }{
+         An identifier for the NDF containing the provenance information.
+      }
+      \sstsubsection{
+         roots
+      }{
+         A location at which to return a pointer to an AST KeyMap. This
+         KeyMap will contain an entry for each root ancestor. The key
+         associated with each entry is the path to the NDF and the value
+         of the entry is an integer that gives the position of the root
+         ancestor within the list of all ancestors. This integer value
+         can be supplied to ndgGtprv in order to get further information
+         about the root ancestor.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ndgMdprv
+}{
+   Modify provenance information in an NDF
+}{
+   \sstdescription{
+      This routine modifies the information stored for a given ancestor
+      in the {\tt "}PROVENANCE{\tt "} extension of an NDF. The new values to store
+      are supplied in an HDS structure such as is returned by ndgGtprv.
+   }
+   \sstinvocation{
+      void ndgMdprv( int indf, int ianc, HDSLoc $*$prov, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         indf
+      }{
+         An identifier for the NDF containing the provenance information.
+      }
+      \sstsubsection{
+         ianc
+      }{
+         The index of the ancestor NDF for which information should be
+         modified. A value of zero will result in information about the NDF
+         specified by {\tt "}indf{\tt "} being modified. Otherwise, the {\tt "}ianc{\tt "} value
+         is used as an index into the ANCESTORS array in the PROVENANCE
+         extension. An error is reported if {\tt "}ianc{\tt "} is too large.
+      }
+      \sstsubsection{
+         prov
+      }{
+         A locator for an HDS object containing the values to store. It
+         should have at least the following components:
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}PATH{\tt "}: A string holding the path of the ancestor NDF.
+
+            \sstitem
+            {\tt "}DATE{\tt "}: A string holding the formatted UTC date and time at
+              which the provenance information for the ancestor NDF was
+              recorded.
+
+            \sstitem
+            {\tt "}CREATOR{\tt "}: A string identifying the software that created the
+              ancestor NDF.
+
+            \sstitem
+            {\tt "}MORE{\tt "}: Any extra information stored with the ancestor.
+
+         }
+         If the {\tt "}DATE{\tt "}, {\tt "}CREATOR{\tt "} or {\tt "}MORE{\tt "} components are missing then
+         the corresponding item of information will be deleted from the
+         provenance extension. An error is reported if {\tt "}PATH{\tt "} is missing.
+         Note, the PARENTS list stored with the specified ancestor cannot
+         be modified (any {\tt "}PARENTS{\tt "} component in the supplied HDS structure
+         will be ignored).
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+
+
+\section{Changes Introduced in NDG Version 5.6}
+\begin{itemize}
+   \item A new C function ndgGtprvk has been added, that returns provenance
+         information for a given ancestor in the form of an AST KeyMap.
+\end{itemize}
+
 \section{Changes Introduced in NDG Version 5.5}
 \begin{itemize}
    \item A new routine NDG\_MOREG has been added which searchs the

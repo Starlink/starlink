@@ -82,6 +82,8 @@ typedef struct Provenance {
 /* Prototypes for Private Functions. */
 /* --------------------------------- */
 static AstKeyMap *ndg1FormatProv( Provenance *, int, int, AstKeyMap *, int * );
+static HDSLoc *ndg1GtAnc( HDSLoc *, size_t *, int * );
+static HDSLoc *ndg1TCopy( HDSLoc *, const char *, int * );
 static Prov *ndg1FreeProv( Prov *, int * );
 static Prov *ndg1MakeProv( const char *, const char *, const char *, HDSLoc *, Provenance *, int * );
 static Provenance *ndg1FreeProvenance( Provenance *, int, int * );
@@ -91,9 +93,15 @@ static char *ndg1GetTextComp( HDSLoc *, const char *, char *, size_t, int * );
 static const char *ndg1Date( int * );
 static int ndg1FindAncestorIndex( Prov *, Provenance *, int * );
 static int ndg1TheSame( Prov *, Prov *, int * );
+static void ndg1A2h0c( const char *, AstKeyMap *, HDSLoc *, int * );
+static void ndg1A2h1i( const char *, AstKeyMap *, HDSLoc *, int * );
+static void ndg1CopyComps( HDSLoc *, HDSLoc *, int * );
 static void ndg1Disown( Prov *, Prov *, int * );
-static void ndg1ParentChild( Prov *, Prov *, int * );
+static void ndg1H2a0c( const char *, HDSLoc *, AstKeyMap *, int * );
+static void ndg1H2a0h( const char *, HDSLoc *, AstKeyMap *, int * );
+static void ndg1H2a1i( const char *, HDSLoc *, AstKeyMap *, int * );
 static void ndg1ParentChildIndex( Provenance *, int, int, int * );
+static void ndg1ParentChild( Prov *, Prov *, int * );
 static void ndg1PurgeProvenance( Provenance *, int * );
 static void ndg1WriteProvenanceExtension( Provenance *, int, int * );
 
@@ -410,7 +418,7 @@ F77_SUBROUTINE(ndg_mdprv)( INTEGER(indf), INTEGER(ianc), CHARACTER(fprov),
 *     NDG_MDPRV
 
 *  Purpose:
-*     Get provenance information from an NDF.
+*     Modify provenance information in an NDF.
 
 *  Language:
 *     Starlink ANSI C (callable from Fortran)
@@ -810,20 +818,21 @@ F77_SUBROUTINE(ndg_rtprv)( INTEGER(indf), INTEGER(roots), INTEGER(status) ){
 
 void ndgCtprv( int indf, int *nanc, int *status ){
 /*
+*+
 *  Name:
 *     ndgCtprv
 
 *  Purpose:
 *     Count the number of ancestors used in the creation of an NDF.
 
-*  Synopsis:
+*  Invocation:
 *     void ndgCtprv( int indf, int *nanc, int *status )
 
 *  Description:
 *     This routine returns the number of ancestors described in the 
 *     "PROVENANCE" extension of the supplied INDF.
 
-*  Parameters:
+*  Arguments:
 *     indf
 *        An identifier for the NDF containing the provenance information.
 *     nanc
@@ -831,11 +840,15 @@ void ndgCtprv( int indf, int *nanc, int *status ){
 *        stored in the provenance information of INDF.
 *     status 
 *        The global status.
+*-
 */
 
 /* Local variables: */
-   Provenance *prov = NULL;
+   HDSLoc *aloc = NULL;
+   HDSLoc *xloc = NULL;
    int *old_status;
+   int there;
+   size_t size;
 
 /* Initialise. */
    *nanc = 0;
@@ -846,14 +859,18 @@ void ndgCtprv( int indf, int *nanc, int *status ){
 /* Ensure AST uses the supplied status variable. */
    old_status = astWatch( status );
 
-/* Read the provenance extension from the NDF. */
-   prov = ndg1ReadProvenanceExtension( indf, NULL, NULL, 0, status );
+/* See if the supplied NDF has a provenance extension. If it has, get a 
+   HDS locator to it. */
+   ndfXstat( indf, EXT_NAME, &there, status ); 
+   if( there ) {
+      ndfXloc( indf, EXT_NAME, "Read", &xloc, status ); 
 
-/* Return the size of the ancestors array. */
-   *nanc = prov->nprov - 1;
-
-/* Free resources. */
-   ndg1FreeProvenance( prov, 1, status );
+/* Get the length of the ANCESTORS array, then annul the locator for the
+   ANCESTORS array. */
+      aloc = ndg1GtAnc( xloc, &size, status );
+      *nanc = (int) size;
+      if( aloc ) datAnnul( &aloc, status );
+   }
 
 /* Re-instate the original AST status variable. */
    astWatch( old_status );
@@ -868,7 +885,7 @@ void ndgFmprv( int indf, int base, AstKeyMap **keymap, int *status ){
 *  Purpose:
 *     Format the provenance information from an NDF.
 
-*  Synopsis:
+*  Invocation:
 *     void ndgFmprv( int indf, int base, AstKeyMap **keymap, int *status )
 
 *  Description:
@@ -904,7 +921,7 @@ void ndgFmprv( int indf, int base, AstKeyMap **keymap, int *status ){
 *     However, this time the entries are integers, not strings, and holds 
 *     the maximum field width used to format the strings.
 
-*  Parameters:
+*  Arguments:
 *     indf
 *        An identifier for the NDF containing the provenance information.
 *     base
@@ -968,10 +985,10 @@ void ndgFmprv( int indf, int base, AstKeyMap **keymap, int *status ){
    prov1 = ndg1ReadProvenanceExtension( indf, NULL, NULL, 0, status );
 
 /* Create the returned KeyMap. */
-   *keymap = astKeyMap( "" );
+   *keymap = astKeyMap( " " );
 
 /* Create a KeyMap to hold the field widths. */
-   mxkey = astKeyMap( "" );
+   mxkey = astKeyMap( " " );
 
 /* Loop round every ancestor. */
    for( i = 0; i < prov1->nprov;  i++ ) {
@@ -1002,20 +1019,21 @@ void ndgFmprv( int indf, int base, AstKeyMap **keymap, int *status ){
 
 void ndgGtprv( int indf, int ianc, HDSLoc **prov, int *status ){
 /*
+*+
 *  Name:
 *     ndgGtprv
 
 *  Purpose:
 *     Get provenance information from an NDF.
 
-*  Synopsis:
+*  Invocation:
 *     void ndgGtprv( int indf, int ianc, HDSLoc **prov, int *status )
 
 *  Description:
 *     This routine returns information from the "PROVENANCE" extension
 *     in INDF, describing the ancestor NDF with a given index.
 
-*  Parameters:
+*  Arguments:
 *     indf
 *        An identifier for the NDF containing the provenance information.
 *     ianc
@@ -1048,21 +1066,14 @@ void ndgGtprv( int indf, int ianc, HDSLoc **prov, int *status ){
 *        longer needed.
 *     status 
 *        The global status.
+*-
 */
 
 /* Local variables: */
-   HDSLoc *loc = NULL;
-   Prov *anc = NULL;
-   Prov *parent = NULL;
-   Provenance *prov1 = NULL;
-   hdsdim  dim[1];
+   AstKeyMap *km = NULL;
+   HDSLoc *more = NULL;
+   HDSLoc *new_more = NULL;
    int *old_status;
-   int *parents = NULL;
-   int icomp;
-   int iparent;
-   int k;
-   int len;
-   int ncomp;
 
 /* Initialise. */
    *prov = NULL;
@@ -1073,91 +1084,190 @@ void ndgGtprv( int indf, int ianc, HDSLoc **prov, int *status ){
 /* Ensure AST uses the supplied status variable. */
    old_status = astWatch( status );
 
-/* Read the provenance extension from the NDF. */
-   prov1 = ndg1ReadProvenanceExtension( indf, NULL, NULL, 0, status );
+/* Get a KeyMap holding the required values. */
+   ndgGtprvk( indf, ianc, &km, &more, status );
 
-/* Check the "ianc" value is within the bounds of the ANCESTORS array. */
-   if( prov1 && ianc >= 0 && ianc < prov1->nprov ) {
-
-/* Get a pointer to the ancestors Prov structure. */
-      anc = prov1->provs[ ianc ];
-
-/* Create the returned temporary HDS object. */
+/* If any provenance information was read, create the returned temporary 
+   HDS object. */
+   if( km ) {
       datTemp( TEMP_TYPE, 0, NULL, prov, status );
 
-/* If defined, add a PATH component. */
-      if( anc->path ) {
-         len = astChrLen( anc->path );
-         if( len ) {
-            datNew0C( *prov, PATH_NAME, len, status );
-            datFind( *prov, PATH_NAME, &loc, status );
-            datPut0C( loc, anc->path, status );
-            datAnnul( &loc, status );
-         }
-      }
-
-/* If defined, add a DATE component. */
-      if( anc->date ) {
-         len = astChrLen( anc->date );
-         if( len ) {
-            datNew0C( *prov, DATE_NAME, len, status );
-            datFind( *prov, DATE_NAME, &loc, status );
-            datPut0C( loc, anc->date, status );
-            datAnnul( &loc, status );
-         }
-      }
-
-/* If defined, add a CREATOR component. */
-      if( anc->creator ) {
-         len = astChrLen( anc->creator );
-         if( len ) {
-            datNew0C( *prov, CREATOR_NAME, len, status );
-            datFind( *prov, CREATOR_NAME, &loc, status );
-            datPut0C( loc, anc->creator, status );
-            datAnnul( &loc, status );
-         }
-      }
+/* Copy the required components form the KeyMap to the returned HDS
+   structure. */
+      ndg1A2h0c( PATH_NAME, km, *prov, status );
+      ndg1A2h0c( DATE_NAME, km, *prov, status );
+      ndg1A2h0c( CREATOR_NAME, km, *prov, status );
+      ndg1A2h1i( PARENTS_NAME, km, *prov, status );
 
 /* If defined, copy the MORE structure. */
-      if( anc->more ) {
-
-/* Copy each component of the provenance MORE structure into the re MORE
-   component of the returned temporary structure. */
-         datNcomp( anc->more, &ncomp, status );
-         for( icomp = 1; icomp <= ncomp; icomp++ ) {
-            datIndex( anc->more, icomp, &loc, status );
-            datCopy( loc, *prov, MORE_NAME, status );
-            datAnnul( &loc, status );
-         }
-      }
-
-/* Create a component holding the indices of the parents (if any). */
-      if( anc->nparent) {
-         datNew1I( *prov, PARENTS_NAME, anc->nparent, status );
-         datFind( *prov, PARENTS_NAME, &loc, status );
-         dim[ 0 ] = anc->nparent;
-         datMapI( loc, "WRITE", 1, dim, &parents, status );
-
-/* Loop round each cell of this array. */
-         for( k = 0; k < anc->nparent && *status == SAI__OK; k++ ) {
-            parent = anc->parents[ k ];
-
-/* Find the index of this parent in the provs array. */
-            for( iparent = 0; iparent < prov1->nprov; iparent++ ) {
-               if( prov1->provs[ iparent ] == parent ) break;
-            }
-
-            parents[ k ] = iparent;
-         }
-
-/* Free the parents array. */
-         datUnmap( loc, status );
-         datAnnul( &loc, status );
+      if( more ) {
+         datNew( *prov, MORE_NAME, MORE_TYPE, 0, NULL, status );
+         datFind( *prov, MORE_NAME, &new_more, status );
+         ndg1CopyComps( more, new_more, status );
+         datAnnul(  &new_more, status );
       }
    }
 
-/* Free resources. */
-   ndg1FreeProvenance( prov1, 1, status );
+/* Re-instate the original AST status variable. */
+   astWatch( old_status );
+}
+
+void ndgGtprvk( int indf, int ianc, AstKeyMap **prov, HDSLoc **more, 
+                int *status ){
+/*
+*+
+*  Name:
+*     ndgGtprvk
+
+*  Purpose:
+*     Create a KeyMap holding provenance information from an NDF.
+
+*  Invocation:
+*     void ndgGtprvk( int indf, int ianc, AstKeyMap **prov, HDSLoc **more, 
+*                     int *status )
+
+*  Description:
+*     This routine returns information from the "PROVENANCE" extension
+*     in INDF, describing the ancestor NDF with a given index. It is
+*     similar to ndgGtprv except that the nformation is returned in the 
+*     form of an AST KeyMap rather than an HDS structure.
+
+*  Arguments:
+*     indf
+*        An identifier for the NDF containing the provenance information.
+*     ianc
+*        The index of the ancestor NDF for which information should be
+*        returned. A value of zero will result in information about the NDF 
+*        specified by "indf" being returned. Otherwise, the "ianc" value
+*        is used as an index into the ANCESTORS array in the PROVENANCE 
+*        extension. No error is reported if "ianc" is too large (i.e.
+*        larger than the value returned by ndgCtprv), but NULL will be 
+*        returned in "*prov".
+*     prov
+*        The location at which to return a pointer to an AST KeyMap
+*        containing entries with the following keys and values:
+*
+*        - "PATH": A string holding the path of the ancestor NDF.
+*        - "DATE": A string holding the formatted UTC date and time at 
+*          which the provenance information for the ancestor NDF was 
+*          recorded.
+*        - "CREATOR": A string identifying the software that created the
+*          ancestor NDF.
+*        - "PARENTS": A 1D vector of integers that are the indices of the
+*          immediate parents of the ancestor.
+*        - "MORE": A KeyMap containing extra scalar information stored 
+*        with the ancestor. Only scalar items stored directly within the
+*        top level of the MORE structure are returned in the KeyMap. The
+*        HDS name of the component is used as the key. The full contents
+*        of the MORE structure are returned by the "more" parameter (see 
+*        below).
+*
+*        If the specified ancestor does not have any of these items of
+*        information, then the corresponding entry will not be present 
+*        in the returned KeyMap. For instance, if the ancestor has no 
+*        immediate parent NDFs, then the "PARENTS" entry will not be 
+*        present in the KeyMap. A NULL pointer will be returned if the
+*        NDF has no provenance extension, or if "ianc" is outside the
+*        bounds of the ANCESTORS array (and is not zero).
+*     more
+*        The location at which to return a pointer to a locator for a
+*        temporary HDS object containing a full deep copy of the MORE
+*        structure associated with the requested ancestor. The
+*        returned locator should be annulled using datAnnul when no
+*        longer needed. A NULL pointer may be supplied for this parameter
+*        if the MORE structure is not needed. A NULL pointer will be
+*        returned if the requested ancestor has no MORE component.
+*     status 
+*        The global status.
+*-
+*/
+
+/* Local variables: */
+   HDSLoc *aloc = NULL;
+   HDSLoc *cloc = NULL;
+   HDSLoc *xloc = NULL;
+   char path_buf[ PATH_LEN + 1 ];     
+   hdsdim  dim[ 1 ];
+   int *old_status;
+   int path_len;
+   int there;
+   size_t nanc;
+
+/* Initialise. */
+   if( more ) *more = NULL;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Ensure AST uses the supplied status variable. */
+   old_status = astWatch( status );
+
+/* See if the supplied NDF has a provenance extension. If it has, get a 
+   HDS locator to it. */
+   ndfXstat( indf, EXT_NAME, &there, status ); 
+   if( there ) {
+      ndfXloc( indf, EXT_NAME, "Read", &xloc, status ); 
+
+/* Create the returned (empty) KeyMap. */
+      *prov = astKeyMap( " " );
+
+/* If information about the supplied NDF itself is required, copy the 
+   DATE, CREATOR and PARENTS components to the KeyMap, if they exist. */
+      if( ianc == 0 ) {
+         ndg1H2a0c( DATE_NAME, xloc, *prov, status );
+         ndg1H2a0c( CREATOR_NAME, xloc, *prov, status );
+         ndg1H2a1i( PARENTS_NAME, xloc, *prov, status );
+
+/* Get the path to the supplied NDF, and store in the KeyMap. The path is
+   obtained from the NDF library since the PROVENANCE extension only
+   contains paths for ancestor NDFs, not the main NDF itself. */
+         ndfMsg( "NDF", indf ); 
+         msgLoad( " ", "^NDF", path_buf, PATH_LEN, &path_len, status );
+         astMapPut0C( *prov, PATH_NAME, path_buf, " " );
+
+/* Now deal with cases where we are returning information about an
+   ancestor. */
+      } else {
+
+/* Get a locator for the ANCESTORS array, and get its length. */
+         aloc = ndg1GtAnc( xloc, &nanc, status );
+         if( aloc ) {
+
+/* Check the supplied (one-based) index is within the bounds of the 
+   ANCESTORS array. */
+            if( ianc >= 1 && ianc <= (int) nanc ) {
+
+/* Get a locator to the requested element of the ANCESTORS array. */
+               dim[ 0 ] = ianc;
+               datCell( aloc, 1, dim, &cloc, status );
+
+/* Copy the PARENTS, DATE, PATH and CREATOR components from the ANCESTORS
+   array element to the KeyMap. */
+               ndg1H2a0c( DATE_NAME, cloc, *prov, status );
+               ndg1H2a0c( CREATOR_NAME, cloc, *prov, status );
+               ndg1H2a0c( PATH_NAME, cloc, *prov, status );
+               ndg1H2a1i( PARENTS_NAME, cloc, *prov, status );
+
+/* Copy top-level scalar items from any HDS MORE structure into a new
+   KeyMap (with key "MORE") stored within the returned KeyMap. */
+               ndg1H2a0h( MORE_NAME, cloc, *prov, status );
+
+/* If an HDS locator for the full MORE structure is required, create a
+   temporary HDS object containing a copy of it. */
+               if( more ) *more = ndg1TCopy( cloc, MORE_NAME, status );
+
+/* Annul the locator to the ANCESTORS array element. */
+               datAnnul( &cloc, status );
+            }
+
+/* Annul the locator to the ANCESTORS array. */
+            datAnnul( &aloc, status );
+         }
+      }
+
+/* Annul the locator to the PROVENANCE extension. */
+      datAnnul( &xloc, status );
+   }
 
 /* Re-instate the original AST status variable. */
    astWatch( old_status );
@@ -1166,13 +1276,14 @@ void ndgGtprv( int indf, int ianc, HDSLoc **prov, int *status ){
 void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot, 
                const char *creator, int *status ){
 /*
+*+
 *  Name:
 *     ndgPtprv
 
 *  Purpose:
 *     Add provenance information to an NDF.
 
-*  Synopsis:
+*  Invocation:
 *     void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot, 
 *                    const char *creator, int *status )
 
@@ -1182,7 +1293,7 @@ void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot,
 *     The provenance information is stored in an NDF extension call 
 *     "PROVENANCE".
 
-*  Parameters:
+*  Arguments:
 *     indf1 
 *        An identifier for a newly created NDF.
 *     indf2 
@@ -1203,6 +1314,7 @@ void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot,
 *        is arbitrary, but the form "PACKAGE:COMMAND" is recommended.
 *     status 
 *        The global status.
+*-
 */
 
 /* Local variables: */
@@ -1268,13 +1380,14 @@ void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot,
 
 void ndgRmprv( int indf, int ianc, int *status ){
 /*
+*-
 *  Name:
 *     ndgRmprv
 
 *  Purpose:
 *     Remove provenance information from an NDF.
 
-*  Synopsis:
+*  Invocation:
 *     void ndgRmprv( int indf, int ianc, int *status )
 
 *  Description:
@@ -1282,7 +1395,7 @@ void ndgRmprv( int indf, int ianc, int *status ){
 *     extension in INDF. The direct parents of the removed ancestor are
 *     assigned to the direct children of the removed ancestor.
 
-*  Parameters:
+*  Arguments:
 *     indf
 *        An identifier for the NDF containing the provenance information.
 *     ianc
@@ -1293,6 +1406,7 @@ void ndgRmprv( int indf, int ianc, int *status ){
 *     status
 *        The global status.
 
+*-
 */
 
 /* Local Variables: */
@@ -1395,13 +1509,14 @@ void ndgRmprv( int indf, int ianc, int *status ){
 
 void ndgRtprv( int indf, AstKeyMap **roots, int *status ){
 /*
+*+
 *  Name:
 *     ndgRtprv
 
 *  Purpose:
 *     Identify the root ancestors of an NDF.
 
-*  Synopsis:
+*  Invocation:
 *     void ndgRtprv( int indf, AstKeyMap **roots, int *status )
 
 *  Description:
@@ -1410,7 +1525,7 @@ void ndgRtprv( int indf, AstKeyMap **roots, int *status ){
 *     the supplied NDF. An ancestor is a root ancestor if it does not itself
 *     have any ancestors.
 
-*  Parameters:
+*  Arguments:
 *     indf
 *        An identifier for the NDF containing the provenance information.
 *     roots
@@ -1423,6 +1538,7 @@ void ndgRtprv( int indf, AstKeyMap **roots, int *status ){
 *        about the root ancestor.
 *     status 
 *        The global status.
+*-
 */
 
 /* Local variables: */
@@ -1444,7 +1560,7 @@ void ndgRtprv( int indf, AstKeyMap **roots, int *status ){
    prov1 = ndg1ReadProvenanceExtension( indf, NULL, NULL, 0, status );
 
 /* Create the returned KeyMap. */
-   *roots = astKeyMap( "" );
+   *roots = astKeyMap( " " );
 
 /* Loop round every ancestor. */
    for( i = 0; i < prov1->nprov;  i++ ) {
@@ -1452,7 +1568,7 @@ void ndgRtprv( int indf, AstKeyMap **roots, int *status ){
 
 /* If this ancestor has no parents, add its details to the returned
    KeyMap. */
-      if( prov->nparent == 0 ) astMapPut0I( *roots, prov->path, i, "" );
+      if( prov->nparent == 0 ) astMapPut0I( *roots, prov->path, i, " " );
    }
 
 /* Free resources. */
@@ -1464,13 +1580,14 @@ void ndgRtprv( int indf, AstKeyMap **roots, int *status ){
 
 void ndgMdprv( int indf, int ianc, HDSLoc *prov, int *status ){
 /*
+*+
 *  Name:
 *     ndgMdprv
 
 *  Purpose:
 *     Modify provenance information in an NDF.
 
-*  Synopsis:
+*  Invocation:
 *     void ndgMdprv( int indf, int ianc, HDSLoc *prov, int *status )
 
 *  Description:
@@ -1478,7 +1595,7 @@ void ndgMdprv( int indf, int ianc, HDSLoc *prov, int *status ){
 *     in the "PROVENANCE" extension of an NDF. The new values to store 
 *     are supplied in an HDS structure such as is returned by ndgGtprv.
 
-*  Parameters:
+*  Arguments:
 *     indf
 *        An identifier for the NDF containing the provenance information.
 *     ianc
@@ -1507,6 +1624,7 @@ void ndgMdprv( int indf, int ianc, HDSLoc *prov, int *status ){
 *        will be ignored).
 *     status 
 *        The global status.
+*-
 */
 
 /* Local variables: */
@@ -1605,6 +1723,181 @@ void ndgMdprv( int indf, int ianc, HDSLoc *prov, int *status ){
 
 /* Private functions. */
 /* ================= */
+static void ndg1A2h0c( const char *key, AstKeyMap *km, HDSLoc *loc, 
+                       int *status ){
+/*
+*  Name:
+*     ndg1A2h0c
+
+*  Purpose:
+*     Copy a scalar character value from an AST KeyMap to an HDS structure.
+
+*  Invocation:
+*     void ndg1A2h0c( const char *key, AstKeyMap *km, HDSLoc *loc, 
+*                     int *status )
+
+*  Description:
+*     This routine copies a scalar character value from an AST KeyMap
+*     to a supplied HDS structure. No error is reported if the specified
+*     key does not exist in the KeyMap, but no component is added to the 
+*     HDS structure. The KeyMap entry key is used as the name for the new 
+*     HDS component.
+
+*  Arguments:
+*     key
+*        The key for the KeyMap entry to copy.
+*     km
+*        Pointer to the KeyMap containing the value to copy.
+*     loc
+*        Locator for the HDS structure in which to store the copy.
+*     status 
+*        The global status.
+
+*/
+
+/* Local variables: */
+   HDSLoc *cloc = NULL;
+   const char *value;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Attempt to get a pointer to value. Skip to the end if the KeyMap does
+   not hold a value for the requested key. */
+   if( astMapGet0C( km, key, &value ) ) {
+
+/* Create a new component of the required type in the sypplied HDS
+   structure, and get a lcoator to it. */
+      datNew0C( loc, key, strlen( value ), status );
+      datFind( loc, key, &cloc, status );
+
+/* Store the value in the new component. */
+      datPut0C( cloc, value, status );
+
+/* Annul the locator for the new component. */
+      datAnnul( &cloc, status );
+   }
+}
+
+static void ndg1A2h1i( const char *key, AstKeyMap *km, HDSLoc *loc, 
+                       int *status ){
+/*
+*  Name:
+*     ndg1A2h1i
+
+*  Purpose:
+*     Copy a vector integer value from an AST KeyMap to an HDS structure.
+
+*  Invocation:
+*     void ndg1A2h1i( const char *key, AstKeyMap *km, HDSLoc *loc, 
+*                     int *status )
+
+*  Description:
+*     This routine copies a vector integer value from an AST KeyMap
+*     to a supplied HDS structure. No error is reported if the specified
+*     key does not exist in the KeyMap, but no component is added to the 
+*     HDS structure. The KeyMap entry key is used as the name for the new 
+*     HDS component.
+
+*  Arguments:
+*     key
+*        The key for the KeyMap entry to copy.
+*     km
+*        Pointer to the KeyMap containing the value to copy.
+*     loc
+*        Locator for the HDS structure in which to store the copy.
+*     status 
+*        The global status.
+
+*/
+
+/* Local variables: */
+   HDSLoc *cloc = NULL;
+   hdsdim dim[ 1 ];
+   int *value;
+   int nval;
+   int size;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Get the number of elements in the vector. */
+   size = astMapLength( km, key );
+
+/* Skip to the end if the KeyMap does not hold a value for the requested 
+   key. */
+   if( size > 0 ) {
+
+/* Create a new component of the required type in the sypplied HDS
+   structure, and get a locator to it. */
+      datNew1I( loc, key, size, status );
+      datFind( loc, key, &cloc, status );
+
+/* Map the vector. */
+      dim[ 0 ] = size;
+      datMapI( cloc, "WRITE", 1, dim, &value, status );
+
+/* Store the vector values in the mapped array. */
+      (void) astMapGet1I( km, key, size, &nval, value );
+
+/* Annul the locator for the new component. */
+      datAnnul( &cloc, status );
+   }
+}
+
+static void ndg1CopyComps( HDSLoc *loc1, HDSLoc *loc2, int *status ){
+/*
+*  Name:
+*     ndg1CopyComps
+
+*  Purpose:
+*     Copy the contents of "loc1" into "loc2".
+
+*  Invocation:
+*     void ndg1CopyComps( HDSLoc *loc1, HDSLoc *loc2, int *status )
+     
+*  Description:
+*     This routine copies every component from "loc1" into "loc2".
+
+*  Arguments:
+*     loc1
+*        Locator for the source object.
+*     loc2
+*        Locator for the destination object.
+*     status 
+*        The global status.
+
+*/
+
+/* Local variables: */
+   HDSLoc *loc = NULL;
+   char name[ DAT__SZNAM + 1 ];
+   int icomp;
+   int ncomp;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Get the number of components to copy. */
+   datNcomp( loc1, &ncomp, status );
+
+/* Loop round every component. */
+   for( icomp = 1; icomp <= ncomp; icomp++ ) {
+
+/* Get a locator for the current component in the source object. */
+      datIndex( loc1, icomp, &loc, status );
+
+/* Get its name. */
+      datName( loc, name, status );
+
+/* Copy it into the destination, using the same name. */
+      datCopy( loc, loc2, name, status );
+
+/* Annull the source component locator. */
+      datAnnul( &loc, status );
+   }
+}
+
 static void ndg1Disown( Prov *parent, Prov *child, int *status ){
 /*
 *  Name:
@@ -1613,7 +1906,7 @@ static void ndg1Disown( Prov *parent, Prov *child, int *status ){
 *  Purpose:
 *     Break a parent-child link between two supplied Prov structures.
 
-*  Synopsis:
+*  Invocation:
 *     void ndg1Disown( Prov *parent, Prov *child, int *status )
 
 *  Description:
@@ -1624,7 +1917,7 @@ static void ndg1Disown( Prov *parent, Prov *child, int *status ){
 *     Each Prov structure describes a single NDF. The parent NDF is used
 *     in the construction of ("gives birth to") the child NDF.
 
-*  Parameters:
+*  Arguments:
 *     parent
 *        The parent Prov structure.
 *     child
@@ -1694,7 +1987,7 @@ static int ndg1FindAncestorIndex( Prov *prov, Provenance *provenance,
 *  Purpose:
 *     Return the index of a Prov structure within the ANCESTORS array.
 
-*  Synopsis:
+*  Invocation:
 *     int ndg1FindAncestorIndex( Prov *prov, Provenance *provenance,
 *                                int *status )
 
@@ -1702,7 +1995,7 @@ static int ndg1FindAncestorIndex( Prov *prov, Provenance *provenance,
 *     This function returns the integer index of a Prov structure within
 *     the ANCESTORS array described by a Provenance structure.
 
-*  Parameters:
+*  Arguments:
 *     prov
 *        The Prov structure.
 *     provenance
@@ -1763,7 +2056,7 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
 *  Purpose:
 *     Format information in a Prov structure.
 
-*  Synopsis:
+*  Invocation:
 *     AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
 *                                AstKeyMap *mxlenkey, int *status )
 
@@ -1793,7 +2086,7 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
 *     A key will be missing in the returned KeyMap if the Provenance
 *     structure does not contain that item.
 
-*  Parameters:
+*  Arguments:
 *     provenance
 *        Pointer to the Provenance structure that contains the Prov 
 *        structure that is to be formatted.
@@ -1850,7 +2143,7 @@ static AstKeyMap *ndg1FormatProv( Provenance *provenance, int i, int base,
    prov = provenance->provs[ i ];
 
 /* Create the returned KeyMap. */
-   result = astKeyMap( "" );
+   result = astKeyMap( " " );
 
 /* Store the ID value. */
    nc = sprintf( buf, "%d", i );
@@ -2123,14 +2416,14 @@ static Prov *ndg1FreeProv( Prov *prov, int *status ){
 *  Purpose:
 *     Release the resources used by a Prov structure.
 
-*  Synopsis:
+*  Invocation:
 *     Prov *ndg1FreeProv( Prov *prov, int *status )
 
 *  Description:
 *     This function releases all the resoures used by a Prov structure
 *     and returns a NULL pointer.
 
-*  Parameters:
+*  Arguments:
 *     prov
 *        Pointer to the Prov to be released.
 *     status
@@ -2172,7 +2465,7 @@ static Provenance *ndg1FreeProvenance( Provenance *provenance,
 *  Purpose:
 *     Release the resources used by a Provenance structure.
 
-*  Synopsis:
+*  Invocation:
 *     Provenance *ndg1FreeProvenance( Provenance *provenance, 
 *                                     int free_provs, int *status )
 
@@ -2181,7 +2474,7 @@ static Provenance *ndg1FreeProvenance( Provenance *provenance,
 *     structure, including (if required) all the enclosed Prov structures, 
 *     and returns a NULL pointer.
 
-*  Parameters:
+*  Arguments:
 *     provenance
 *        Pointer to the Provenance to be released.
 *     free_provs
@@ -2237,7 +2530,7 @@ static char *ndg1GetTextComp( HDSLoc *loc, const char *comp, char *buf,
 *  Purpose:
 *     Return a pointer to a string holding the value of an HDS _CHAR component
 
-*  Synopsis:
+*  Invocation:
 *     char *ndg1GetTextComp( HDSLoc *loc, const char *comp, char *buf, 
 *                            size_t buflen, int *status )
 
@@ -2247,7 +2540,7 @@ static char *ndg1GetTextComp( HDSLoc *loc, const char *comp, char *buf,
 *     value is returned. Otherwise, a NULL pointer is returned (without 
 *     error).
 
-*  Parameters:
+*  Arguments:
 *     loc
 *        Locator for the HDS structure.
 *     comp 
@@ -2310,6 +2603,301 @@ static char *ndg1GetTextComp( HDSLoc *loc, const char *comp, char *buf,
    return result;
 }
 
+static HDSLoc *ndg1GtAnc( HDSLoc *xloc, size_t *nanc, int *status ){
+/*
+*  Name:
+*     ndg1GtAnc
+
+*  Purpose:
+*     Get a locator to the ANCESTORS array and return its length.
+
+*  Invocation:
+*     HDSLoc *ndg1GtAnc( HDSLoc *xloc, size_t *nanc, int *status )
+
+*  Description:
+*     This routine returns a locator for the ANCESTORS array in the 
+*     supplied PROVENANCE structure, and also returns its length.
+
+*  Arguments:
+*     xloc
+*        HDS locator for a PROVENANCE extension.
+*     nanc
+*        Pointer to an int in which to store the length of the ANCESTORS
+*        array. Zero is returned if the supplied structure does not
+*        contain an ANCESTORS array.
+*     status 
+*        The global status.
+
+*  Returned Value:
+*     A pointer to an HDS locator for the ANCESTORS array in the supplied 
+*     structure, or NULL if the supplied structure does not contain an 
+*     ANCESTORS array.
+
+*/
+
+/* Local variables: */
+   HDSLoc *result = NULL;
+   int there;
+
+/* Initialise */
+   *nanc = 0;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return result;
+
+/* Check that the supplied provenance structure contains an ANCESTORS
+   array. */
+   datThere( xloc, ANCESTORS_NAME, &there, status );
+   if( there ) {
+
+/* Get a locator to it and find its size. */
+      datFind( xloc, ANCESTORS_NAME, &result, status );
+      datSize( result, nanc, status );
+   }
+
+/* Return the locator. */
+   return result;
+}
+
+static void ndg1H2a0c( const char *name, HDSLoc *loc, AstKeyMap *km, 
+                       int *status ){
+/*
+*  Name:
+*     ndg1H2a0c
+
+*  Purpose:
+*     Copy a scalar character component from an HDS structure to an AST
+*     KeyMap.
+
+*  Invocation:
+*     void ndg1H2a0c( const char *name, HDSLoc *loc, AstKeyMap *km, 
+                      int *status )
+
+*  Description:
+*     This routine copies a named scalar component from an HDS structure
+*     to a supplied AST KeyMap. No error is reported if the component does 
+*     not exist in the HDS structure, but no entry is added to the KeyMap.
+*     The HDS component name is used a the key for the new KeyMap entry.
+
+*  Arguments:
+*     name
+*        The name of the scalar HDS component to copy.
+*     loc
+*        Locator for the HDS structure containing the component to copy.
+*     km
+*        Pointer to the KeyMap in which to store the copy.
+*     status 
+*        The global status.
+
+*/
+
+/* Local variables: */
+   char *value;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Attempt to get a dynamically allocated string holding the component
+   value. A NULL pointer is returned if the component does not exist. */
+   value = ndg1GetTextComp( loc, name, NULL, 0, status );
+
+/* If succesful, put the string cvalue into the KeyMap and free the string. */
+   if( value ) {
+      astMapPut0C( km, name, value, NULL );  
+      value = astFree( value );
+   }
+}
+
+static void ndg1H2a0h( const char *name, HDSLoc *loc, AstKeyMap *km, 
+                       int *status ){
+/*
+*  Name:
+*     ndg1H2a1i
+
+*  Purpose:
+*     Copy scalar values in an HDS component of an HDS structure to 
+*     an AST KeyMap.
+
+*  Invocation:
+*     void ndg1H2a0h( const char *name, HDSLoc *loc, AstKeyMap *km, 
+                      int *status )
+
+*  Description:
+*     This routine copies all scalar values in a named component of an HDS 
+*     structure to a supplied AST KeyMap. No error is reported if the 
+*     named component does not exist in the HDS structure, but no entry is 
+*     added to the KeyMap. The HDS component name is used a the key for 
+*     the new KeyMap entry. The new KeyMap entry will be a pointer to
+*     another KeyMap containing the copied scalar values. NB, any structures 
+*     or arrays within the named component are ignored. If the named
+*     component does not contain any scalar primitive values, then no new
+*     entry will be added to the supplied KeyMap.
+
+*  Arguments:
+*     name
+*        The name of the HDS component containing the scalar values to copy.
+*     loc
+*        Locator for the HDS structure containing the named component.
+*     km
+*        Pointer to the KeyMap in which to store the copied values.
+*     status 
+*        The global status.
+
+*/
+
+/* Local variables: */
+   AstKeyMap *km2 = NULL;
+   HDSLoc *cloc = NULL;
+   HDSLoc *dloc = NULL;
+   char *value = NULL;
+   char dname[ DAT__SZNAM + 1 ];
+   int empty;
+   int icomp;
+   int isprim;
+   int ncomp;
+   int there;
+   size_t clen;
+   size_t size;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Check that the required component exists within the supplied object. */
+   datThere( loc, name, &there, status );
+   if( there ) {
+
+/* Get a locator for the component to be copied. */
+      datFind( loc, name, &cloc, status );
+
+/* Create a new KeyMap to hold the copied values. */
+      km2 = astKeyMap( " " );
+
+/* Indicate this KeyMap is currently empty. */
+      empty = 1;
+
+/* Get the number of components within the named component. */
+      datNcomp( cloc, &ncomp, status );
+
+/* Loop round every component. */
+      for( icomp = 1; icomp <= ncomp; icomp++ ) {
+
+/* Get a locator for the current component in the source object. */
+         datIndex( cloc, icomp, &dloc, status );
+
+/* Check its size. This will be 1 for a scalar component. */
+         datSize( dloc, &size, status );
+         if( size == 1 ) {
+
+/* Check it is primtive. */
+            datPrim( dloc, &isprim, status );
+            if( isprim ) {
+         
+/* Get its name. */
+               datName( dloc, dname, status );
+
+/* Get its length as a string. */
+               datClen( dloc, &clen, status );
+
+/* Ensure the buffer is big enough to hold its value. */
+               value = astGrow( value, 1, clen + 1 );
+
+/* Get its value as a string. */
+               if( value ) {
+                  datGet0C( cloc, value, clen + 1, status );
+
+/* Put it into the KeyMap. */
+                  astMapPut0C( km2, dname, value, NULL );  
+
+/* Indicate the KeyMap is not empty. */
+                  empty = 0;
+               }
+            }
+         }
+
+/* Annull the source component locator. */
+         datAnnul( &dloc, status );
+      }
+
+/* Free the memory used to hold the string values. */
+      value = astFree( value );
+
+/* Annul the component locator (this also unmaps the vector). */
+      datAnnul( &cloc, status );
+
+/* If the KeyMap is not empty, add it to the supplied KeyMap. */
+      if( !empty ) astMapPut0A( km, name, km2, NULL );  
+
+/* Annul the new KeyMap pointer. */
+      km2 = astAnnul( km2 );      
+
+   }
+}
+
+static void ndg1H2a1i( const char *name, HDSLoc *loc, AstKeyMap *km, 
+                       int *status ){
+/*
+*  Name:
+*     ndg1H2a1i
+
+*  Purpose:
+*     Copy a integer vector component from an HDS structure to an AST
+*     KeyMap.
+
+*  Invocation:
+*     void ndg1H2a1i( const char *name, HDSLoc *loc, AstKeyMap *km, 
+                      int *status )
+
+*  Description:
+*     This routine copies a named integer vector component from an HDS 
+*     structure to a supplied AST KeyMap. No error is reported if the 
+*     component does not exist in the HDS structure, but no entry is added 
+*     to the KeyMap. The HDS component name is used a the key for the new 
+*     KeyMap entry.
+
+*  Arguments:
+*     name
+*        The name of the integer vector HDS component to copy.
+*     loc
+*        Locator for the HDS structure containing the component to copy.
+*     km
+*        Pointer to the KeyMap in which to store the copy.
+*     status 
+*        The global status.
+
+*/
+
+/* Local variables: */
+   HDSLoc *cloc = NULL;
+   int there;
+   int *value = NULL;
+   size_t size;
+   hdsdim dim[ 1 ];
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Check that the required component exists within the supplied object. */
+   datThere( loc, name, &there, status );
+   if( there ) {
+
+/* Get a locator for the component to be copied. */
+      datFind( loc, name, &cloc, status );
+
+/* Get the length of the vector. */
+      datSize( cloc, &size, status );
+
+/* Map the vector. */
+      dim[ 0 ] = size;
+      datMapI( cloc, "READ", 1, dim, &value, status );
+
+/* Copy the vector into the KeyMap. */
+      astMapPut1I( km, name, size, value, NULL );
+
+/* Annul the component locator (this also unmaps the vector). */
+      datAnnul( &cloc, status );
+   }
+}
+
 static Prov *ndg1MakeProv( const char *path, const char *date, 
                            const char *creator, HDSLoc *more, 
                            Provenance *provenance, int *status ){
@@ -2320,7 +2908,7 @@ static Prov *ndg1MakeProv( const char *path, const char *date,
 *  Purpose:
 *     Make a new Prov structure and add it into an existing Provenance.
 
-*  Synopsis:
+*  Invocation:
 *     Prov *ndg1MakeProv( const char *path, const char *date, 
 *                         const char *creator, HDSLoc *more, 
 *                         Provenance *provenance, int *status )
@@ -2332,7 +2920,7 @@ static Prov *ndg1MakeProv( const char *path, const char *date,
 *     Provenance structure. No parents or children are stored in the
 *     new Prov structure.
 
-*  Parameters:
+*  Arguments:
 *     path
 *        Pointer to a string holding the path to the NDF described by the
 *        new Prov structure.
@@ -2422,7 +3010,7 @@ static Provenance *ndg1MakeProvenance( Prov *main, int * status ){
 *  Purpose:
 *     Make a new Provenance structure for a main NDF.
 
-*  Synopsis:
+*  Invocation:
 *     Provenance *ndg1MakeProvenance( Prov *main, int * status )
 
 *  Description:
@@ -2433,7 +3021,7 @@ static Provenance *ndg1MakeProvenance( Prov *main, int * status ){
 *     of a particular NDF (the "main" NDF, as opposed to the ancestor
 *     NDFs that were used to create the main NDF).
 
-*  Parameters:
+*  Arguments:
 *     main
 *        Pointer to a Prov structure describing the main NDF. The
 *        returned Provenance structure represents the PROVENANCE extension 
@@ -2489,7 +3077,7 @@ static void ndg1ParentChild( Prov *parent, Prov *child, int *status ){
 *  Purpose:
 *     Create a parent-child link between two supplied Prov structures.
 
-*  Synopsis:
+*  Invocation:
 *     void ndg1ParentChild( Prov *parent, Prov *child, int *status )
 
 *  Description:
@@ -2499,7 +3087,7 @@ static void ndg1ParentChild( Prov *parent, Prov *child, int *status ){
 *     Each Prov structure describes a single NDF. The parent NDF is used
 *     in the construction of ("gives birth to") the child NDF.
 
-*  Parameters:
+*  Arguments:
 *     parent
 *        The parent Prov structure.
 *     child
@@ -2554,7 +3142,7 @@ static void ndg1ParentChildIndex( Provenance *provenance, int iparent,
 *     Create a parent-child link between two Prov structures with given
 *     indices.
 
-*  Synopsis:
+*  Invocation:
 *     void ndg1ParentChildIndex( Provenance *provenance, int iparent, 
 *                                int ichild, int *status )
 
@@ -2566,7 +3154,7 @@ static void ndg1ParentChildIndex( Provenance *provenance, int iparent,
 *     Each Prov structure describes a single NDF. The parent NDF is used
 *     in the construction of ("gives birth to") the child NDF.
 
-*  Parameters:
+*  Arguments:
 *     provenance
 *        The Provenance structure holding the Prov structures that are to
 *        be joined together.
@@ -2605,7 +3193,7 @@ static void ndg1PurgeProvenance( Provenance *provenance,
 *  Purpose:
 *     Purge duplicate ancestors from a Provenance structure.
 
-*  Synopsis:
+*  Invocation:
 *     void ndg1PurgeProvenance( Provenance *provenance, 
 *                               int *status )
 
@@ -2613,7 +3201,7 @@ static void ndg1PurgeProvenance( Provenance *provenance,
 *     This function removes any duplicated ancestors in the supplied
 *     Provenance structure.
 
-*  Parameters:
+*  Arguments:
 *     provenance
 *        Pointer to the Provenance to be checked.
 *     status
@@ -2731,7 +3319,7 @@ static Provenance *ndg1ReadProvenanceExtension( int indf, HDSLoc *more,
 *  Purpose:
 *     Create a new Provenance structure from an NDF PROVENANCE extension.
 
-*  Synopsis:
+*  Invocation:
 *     Provenance *ndg1ReadProvenanceExtension( int indf, HDSLoc *more, 
 *                                              const char *creator,
 *                                              int isroot, int *status )
@@ -2745,7 +3333,7 @@ static Provenance *ndg1ReadProvenanceExtension( int indf, HDSLoc *more,
 *     supplied NDF itself. The only item stored in this Prov structure is
 *     the NDF path.
 
-*  Parameters:
+*  Arguments:
 *     indf
 *        The NDF identifier.
 *     more
@@ -2783,7 +3371,7 @@ static Provenance *ndg1ReadProvenanceExtension( int indf, HDSLoc *more,
    char creator_buf[ CREATOR_LEN + 1 ];     
    char date_buf[ DATE_LEN + 1 ];     
    char path_buf[ PATH_LEN + 1 ];     
-   hdsdim  dim[1];
+   hdsdim  dim[ 1 ];
    int path_len;
    int there;
    size_t nanc;
@@ -2808,16 +3396,12 @@ static Provenance *ndg1ReadProvenanceExtension( int indf, HDSLoc *more,
                                  CREATOR_LEN, status );
 
 /* Get a locator for the ANCESTORS array, and get its length. */
-      datThere( xloc, ANCESTORS_NAME, &there, status );
-      if( there ) {
-         datFind( xloc, ANCESTORS_NAME, &aloc, status );
-         datSize( aloc, &nanc, status );
-      }
+      aloc = ndg1GtAnc( xloc, &nanc, status );
    }
 
 /* Get the path to the supplied NDF. */
    ndfMsg( "NDF", indf ); 
-   msgLoad( "", "^NDF", path_buf, PATH_LEN, &path_len, status );
+   msgLoad( " ", "^NDF", path_buf, PATH_LEN, &path_len, status );
    path = path_buf;
 
 /* Create a Prov structure to describe the main NDF. */
@@ -2923,6 +3507,72 @@ static Provenance *ndg1ReadProvenanceExtension( int indf, HDSLoc *more,
    return result;
 }
 
+static HDSLoc *ndg1TCopy( HDSLoc *loc, const char *name, int *status ){
+/*
+*  Name:
+*     ndg1TCopy
+
+*  Purpose:
+*     Create a temporary copy of an HDS object.
+
+*  Invocation:
+*     HDSLoc *ndg1TCopy( HDSLoc *loc, const char *name, int *status )
+
+*  Description:
+*     This routine creates a new temporary HDS object that is a copy of
+*     a specified component of the supplied structure.
+
+*  Arguments:
+*     loc
+*        locator for the HDS structure containing the object to copy. 
+*     name 
+*        The name of the component to copy. It must be scalar (i.e. not an
+*        array). If the supplied structure does not contain a component with
+*        the requested name, a NULL pointer is returned without error.
+*     status 
+*        The global status.
+
+*  Returned Value:
+*     A pointer to a locator for a new temporary HDS object which is a
+*     copy of the specified HDS object.
+
+*/
+
+/* Local variables: */
+   HDSLoc *result = NULL;
+   HDSLoc *cloc = NULL;
+   char type[ DAT__SZNAM + 1 ];
+   int there;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return result;
+
+/* Check that the required component exists within the supplied object. */
+   datThere( loc, name, &there, status );
+   if( there ) {
+
+/* Get a locator for the component to be copied. */
+      datFind( loc, name, &cloc, status );
+
+/* Create a temporary HDS object with arbitrary name and type. */
+      datTemp( "TEMP", 0, NULL, &result, status );
+
+/* Give it the name and type of the supplied object */
+      datRenam( result, name, status );
+      datType( cloc, type, status );
+      datRetyp( result, type, status );
+
+/* Copy all the components inside the component into "result". */
+      ndg1CopyComps( cloc, result, status );
+
+/* Annull the component locator. */
+      datAnnul( &cloc, status );
+   }
+
+/* Return the resulting locator. */
+   return result;
+}
+
 static int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) {
 /*
 *  Name:
@@ -2931,14 +3581,14 @@ static int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) {
 *  Purpose:
 *     Checks if two Prov structures are for the same NDF.
 
-*  Synopsis:
+*  Invocation:
 *     int ndg1TheSame( Prov *prov1, Prov *prov2, int *status ) 
 
 *  Description:
 *     This function returns non-zero if the two supplied Prov structures
 *     describe the same NDF.
 
-*  Parameters:
+*  Arguments:
 *     prov1
 *        The first Prov structure.
 *     prov2
@@ -3024,7 +3674,7 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
 *  Purpose:
 *     Create a new NDF PROVENANCE extension from a Provenance structure.
 
-*  Synopsis:
+*  Invocation:
 *     void ndg1WriteProvenanceExtension( Provenance *provenance, int indf, 
 *                                        int *status )
 
@@ -3033,7 +3683,7 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
 *     supplied NDF, and creates a new one holding the information in the
 *     supplied Provenance structure.
 
-*  Parameters:
+*  Arguments:
 *     provenance
 *        The Provenance structure.
 *     indf
@@ -3053,7 +3703,7 @@ static void ndg1WriteProvenanceExtension( Provenance *provenance, int indf,
    Prov *prov = NULL;
    const char *date = NULL;
    char *path = NULL;
-   hdsdim  dim[1];
+   hdsdim  dim[ 1 ];
    int *parents = NULL;
    int i;
    int k;
@@ -3204,14 +3854,14 @@ static const char *ndg1Date( int *status ){
 *     Return the current UTC date and time in ISO Gregorian calendar
 *     format.
 
-*  Synopsis:
+*  Invocation:
 *     const char *ndg1Date( int *status )
 
 *  Description:
 *     This function returns a pointer to a static string holding the
 *     current UTC date and time in ISO Gregorian calendar format.
 
-*  Parameters:
+*  Arguments:
 *     status
 *        Pointer to the inherited status variable.
 
@@ -3222,7 +3872,7 @@ static const char *ndg1Date( int *status ){
    const char *result;
 
 /* Initialise */
-   result = "";
+   result = " ";
 
 /* Check the inherited status value. */
    if( *status != SAI__OK ) return result;
@@ -3235,6 +3885,35 @@ static const char *ndg1Date( int *status ){
 
    return result;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
