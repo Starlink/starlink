@@ -1,3 +1,7 @@
+2009-03-03  Tim Jenness  <tjenness@cpan.org>
+
+	* NDF.pm (ndgGtprvk): Add ndgGtprvk interface
+
 2009-01-29  Tim Jenness  <tjenness@cpan.org>
 
 	* NDF.xs: Add ndfHsdat support.

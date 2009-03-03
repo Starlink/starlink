@@ -103,7 +103,7 @@ $VERSION = '1.48';
                             cmp_shape cmp_size cmp_struc cmp_type cmp_unmap
                           /],
 
-                'ndg'=>[qw/ ndg_ctprv ndg_gtprv ndg_mdprv ndg_rmprv
+                'ndg'=>[qw/ ndg_ctprv ndg_gtprv ndg_mdprv ndg_rmprv ndgGtrpvk
                           /],
 
                 'misc'=>[qw/mem2string string2mem array2mem mem2array
@@ -276,6 +276,19 @@ sub ndfPtwcs {
   ndfPtwcs_( \@buffer, $_[0], $_[1]);
 }
 
+# $keymap = ndfGtprvk( $indf, $ianc, $status );
+sub ndgGtprvk {
+  require Starlink::AST;
+  my $buffer = ndgGtprvk_( $_[0], $_[1], $_[2]);
+  return undef unless $_[2] == &NDF::SAI__OK;
+  my @strings = split(/\n/, $buffer);
+  my $chan = new Starlink::AST::Channel( 
+                                        source => sub { 
+                                          return shift(@strings); 
+                                        }
+                                       );
+  return $chan->Read();
+}
 
 # Now put in some general PERL sub routines
 

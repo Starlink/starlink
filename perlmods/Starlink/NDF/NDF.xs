@@ -4750,6 +4750,23 @@ ndg_gtprv( indf, ianc, prov, status )
   prov
   status
 
+# private version that returns string for object
+# Note that we do not handle MORE yet
+SV *
+ndgGtprvk_( indf, ianc, status )
+  ndfint &indf
+  ndfint &ianc
+  ndfint &status
+ PROTOTYPE: $$$
+ PREINIT:
+  AstKeyMap *km = NULL;
+ CODE:
+  ndgGtprvk( indf, ianc, &km, NULL, &status );
+  RETVAL = _ast_to_SV( (AstObject*)km, &status );
+ OUTPUT:
+  RETVAL
+  status
+
 void
 ndg_mdprv( indf, ianc, prov, status )
   ndfint &indf
