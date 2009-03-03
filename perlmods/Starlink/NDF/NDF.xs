@@ -366,7 +366,36 @@ static void astsink(  void (*sink)(const char *), const char *line, int *status 
   sv_catpvn( buffer, "\n", 1);
 
 }
- 
+
+/* Convert an AST object to an SV */
+SV* _ast_to_SV( AstObject * obj, int *status ) {
+  int *old_ast_status;
+  int ast_status = SAI__OK;
+  SV * buffer;
+  AstChannel *chan;
+
+  /* An SV to hold the output buffer */
+  /* It will be mortalized when it is returned */
+  buffer = newSVpv("",0);
+
+  if (*status == SAI__OK) {
+    /* Create a output channel. Use a thread safe version that
+      takes the SV as argument */
+    old_ast_status = astWatch( &ast_status );
+    chan = astChannelFor( NULL, NULL, (void (*)( const char * ))buffer,
+                          astsink,"" );
+    astWrite( chan, obj );
+    if (!astOK) {
+      *status = SAI__ERROR;
+      errRep( "AST_ERR", "Error converting the FrameSet into string form",
+        status );
+    }
+    astWatch( old_ast_status );
+  }
+  return buffer;
+}
+
+
  
 MODULE = NDF    PACKAGE = NDF
 
@@ -2083,35 +2112,10 @@ ndfGtwcs_(indf, status)
  PROTOTYPE: $$
  PREINIT:
   AstFrameSet * iwcs;
-  AstChannel * chan;
-  SV * buffer;
-  int ast_status_val = SAI__OK;
-  int *ast_status;
-  int *old_ast_status;
  CODE:
   /* Read the framset */
   ndfGtwcs(indf, &iwcs, &status);
-
-  /* An SV to hold the output buffer */
-  /* It will be mortalized when it is returned */
-  buffer = newSVpv("",0);
-
-  if (status == SAI__OK) {
-    /* Create a output channel. Use a thread safe version that 
-      takes the SV as argument */
-    ast_status = &ast_status_val;
-    old_ast_status = astWatch( ast_status );
-    chan = astChannelFor( NULL, NULL, (void (*)( const char * ))buffer, 
-	  		  astsink,"" );
-    astWrite( chan, iwcs );
-    if (!astOK) {
-      status = SAI__ERROR;
-      errRep( "AST_ERR", "Error converting the NDF FrameSet into string form",
-        &status );
-    }
-    astWatch( old_ast_status );
-  }
-  RETVAL = buffer;
+  RETVAL = _ast_to_SV( (AstObject*)iwcs, &status );
  OUTPUT:
   RETVAL
   status
