@@ -106,7 +106,7 @@
 void emsSetc( const char *token, const char *cvalue )
 {
     int i;
-    char valbuf[ EMS__SZTOK + 2 ]; /* +2 to allow ems1Putc to no there is truncation */
+    char valbuf[ EMS__SZTOK + 2 ]; /* +2 to allow ems1Putc to know when there is truncation */
     const char null[] = "<Null>";
 
     TRACE( "emsSetc" );
