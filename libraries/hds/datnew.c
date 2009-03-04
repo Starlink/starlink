@@ -232,14 +232,9 @@ void
 datCctyp( size_t size,
           char *type )
 {
-/* Local variables */
-   char str[DAT__SZTYP+1];
-
-/* Enter routine   */
-
-   strcpy( type, "_CHAR*" );
-   sprintf( str, "%lu", (unsigned long)size );
-   strncat( type, str, DAT__SZTYP - strlen(type) );
+  /* have to assume the buffer is big enough - should be DAT__SZTYP+1
+      - noting that snprintf is C99 so not used (yet) */
+  sprintf( type, "_CHAR*%lu", (unsigned long)size);
 }
 
 /*================================================*/
