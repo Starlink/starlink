@@ -94,6 +94,9 @@
 *        Use common block getter
 *     10-SEP-2008 (TIMJ):
 *        Call msgLoad
+*     4-MAR-2009 (TIMJ):
+*        Do not import Fortran strings if input status is bad. Stopping this
+*        prevents possible warnings from valgrind in cnfImpn.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -103,6 +106,7 @@
 */
 
 #include "f77.h"
+#include "sae_par.h"
 #include "merswrap.h"
 #include "mers_f77.h"
 #include "err_par.h"
@@ -121,15 +125,23 @@ F77_SUBROUTINE(msg_load)( CHARACTER(PARAM),
   char param[ERR__SZPAR];
   char text[MSG__SZMSG];
   char * opstr;
-  int oplen;
+  int oplen = 0;
   int status;
 
-  cnfImpn( PARAM, PARAM_length, ERR__SZPAR, param );
-  cnfImpn( TEXT, TEXT_length, MSG__SZMSG, text );
-
-  opstr = starMallocAtomic( OPSTR_length + 1 );
   F77_IMPORT_INTEGER( *STATUS, status );
+  opstr = starMallocAtomic( OPSTR_length + 1 );
+  opstr[0] = '\0';
 
+  if (status == SAI__OK) {
+    cnfImpn( PARAM, PARAM_length, ERR__SZPAR, param );
+    cnfImpn( TEXT, TEXT_length, MSG__SZMSG, text );
+  } else {
+    /* blank strings if status is bad */
+    param[0] = '\0';
+    text[0] = '\0';
+  }
+
+  /* Still call msgLoad so that tokens can be killed */
   msgLoad( param, text, opstr, OPSTR_length, &oplen, &status );
 
   F77_EXPORT_INTEGER( status, *STATUS );
