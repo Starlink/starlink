@@ -855,6 +855,8 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *     16-JAN-2009 (DSB):
 *        Use astAddWarning to store each warning in the parent Channel
 *        structure.
+*     4-MAR-2009 (DSB):
+*        DATE-OBS and MJD-OBS cannot have an axis description character.
 *class--
 */
 
@@ -8744,7 +8746,7 @@ static void FindWcs( AstFitsChan *this, int last, int all, int rewind,
              Match( keyname, "PS%d_%d%0c", 0, NULL, &nfld, method, class, status ) ||
              Match( keyname, "EPOCH", 0, NULL, &nfld, method, class, status ) ||
              Match( keyname, "EQUINOX%0c", 0, NULL, &nfld, method, class, status ) ||
-             Match( keyname, "MJD-OBS%0c", 0, NULL, &nfld, method, class, status ) ||
+             Match( keyname, "MJD-OBS",  0, NULL, &nfld, method, class, status ) ||
              Match( keyname, "DATE-OBS", 0, NULL, &nfld, method, class, status ) ||
              Match( keyname, "RADECSYS", 0, NULL, &nfld, method, class, status ) ||
              Match( keyname, "RADESYS%0c", 0, NULL, &nfld, method, class, status ) ||
@@ -24827,28 +24829,22 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    ---------------- */
 /* Read any DATE-OBS card. This prevents it being written out when the
    FitsChan is deleted.  */
-      if( s != ' ' ) {
-         sprintf( keyname, "DATE-OBS%c", s );
-      } else {
+      if( s == ' ' ) {
          strcpy( keyname, "DATE-OBS" );
-      }
-      if( GetValue2( ret, this, keyname, AST__STRING, (void *) &cval, 0, method, 
-                    class, status ) ){
-
+         if( GetValue2( ret, this, keyname, AST__STRING, (void *) &cval, 0, method, 
+                       class, status ) ){
+   
 /* Ignore DATE-OBS values if the header contains an MJD-OBS value */
-         if( s != ' ' ) {
-            sprintf( keyname, "MJD-OBS%c", s );
-         } else {
             strcpy( keyname, "MJD-OBS" );
-         }
-         if( !GetValue2( ret, this, keyname, AST__FLOAT, (void *) &dval, 0, 
-                        method, class, status ) ){
-
+            if( !GetValue2( ret, this, keyname, AST__FLOAT, (void *) &dval, 0, 
+                           method, class, status ) ){
+   
 /* Get the corresponding mjd-obs value, checking that DATE-OBS is valid. */
-            dval = DateObs( cval, status );
-            if( dval != AST__BAD ){
-               SetValue( ret, keyname, (void *) &dval, AST__FLOAT, 
-                         "Date of observation", status );
+               dval = DateObs( cval, status );
+               if( dval != AST__BAD ){
+                  SetValue( ret, keyname, (void *) &dval, AST__FLOAT, 
+                            "Date of observation", status );
+               }
             }
          }
       }
