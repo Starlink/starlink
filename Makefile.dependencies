@@ -27,6 +27,23 @@ CONFIG_CPT=test -f config.status \
 MAKE_CPT=(make && make install) >make.log 2>make.log.err \
   || { cat make.log.err; false; }
 
+$(MANIFESTS)/acsisio: \
+		$(MANIFESTS)/ary \
+		$(MANIFESTS)/ast \
+		$(MANIFESTS)/chr \
+		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ems \
+		$(MANIFESTS)/generic \
+		$(MANIFESTS)/hds \
+		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/prm \
+		$(MANIFESTS)/psx \
+		$(MANIFESTS)/sae \
+		$(MANIFESTS)/sla \
+		$(MANIFESTS)/starmem
+	cd libraries/acsisio \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/agi: \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
@@ -476,6 +493,8 @@ $(MANIFESTS)/cupid: \
 	cd applications/cupid \
 	  && $(MAKE_CPT)
 
+# Component cursa has configure dependencies on { perl },
+# which must be built before this component is configured.
 $(MANIFESTS)/cursa: \
 		$(MANIFESTS)/ary \
 		$(MANIFESTS)/ast \
@@ -1746,6 +1765,12 @@ $(MANIFESTS)/period: \
 		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx
 	cd applications/period \
+	  && $(MAKE_CPT)
+
+# Component perl is a configure dependency, so is configurable in place.
+$(MANIFESTS)/perl:
+	cd thirdparty/perlsys/perl \
+	  && $(CONFIG_CPT) \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/pgp: \
@@ -3090,5 +3115,6 @@ configure-deps: \
 		$(MANIFESTS)/blt \
 		$(MANIFESTS)/itcl \
 		$(MANIFESTS)/jpeg \
+		$(MANIFESTS)/perl \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk

@@ -221,7 +221,7 @@ text files.  CURSA also includes some facilities for accessing remote
 on-line catalogues via the Internet.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build option='link'>sae</build><build option='link'>cat</build><build option='link'>fio</build><build option='link'>par</build><build option='link'>pda</build><build option='link'>ndf</build><build option='link'>pgplot</build><build option='link'>startcl</build><build>graphpar</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
+    <build>pcs</build><build option='link'>sae</build><build option='link'>cat</build><build option='link'>fio</build><build option='link'>par</build><build option='link'>pda</build><build option='link'>ndf</build><build option='link'>pgplot</build><build option='link'>startcl</build><build>graphpar</build><sourceset>star2html</sourceset><configure>perl</configure><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -301,7 +301,7 @@ cube manipulation. </p></abstract>
 </component>
 
 <component id="dipso" support="S">
-  <version>3.6-4</version>
+  <version>3.6-5</version>
   <path>applications/dipso</path>
   <description>DIPSO -- A friendly spectrum analysis program</description>
   <abstract><p>
@@ -465,7 +465,7 @@ proposal, or before or during an observing run.
 </component>
 
 <component id="extractor" support="S">
-  <version>2.4-6</version>
+  <version>2.5-0</version>
   <path>applications/extractor</path>
   <description>EXTRACTOR - An Astronomical Source Detection Program</description>
   <abstract><p>
@@ -1576,6 +1576,27 @@ reduce your SCUBA-2 data.
   </developers>
   <documentation> sun258 sun259</documentation>
   <bugreports>t.jenness@jach.hawaii.edu</bugreports>
+</component>
+
+<component id="acsisio" support="U">
+  <version>0.7-2</version>
+  <path>libraries/acsisio</path>
+  <description>I/O routines for ACSIS data files</description>
+  <abstract><p> 
+	Collection of routines for reading and writing ACSIS format
+        data files containing collections of spectra.
+    </p></abstract>
+  <dependencies >
+    <build>sae</build><build>ems</build><build>ndf</build><build>hds</build><build>cnf</build><link>ems</link><link>cnf</link><link>hds</link><link>ndf</link>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Tim Jenness</name>
+      <uname>timj</uname>
+    </person>
+  </developers>
+  <documentation></documentation>
+  <bugreports>timj@jach.hawaii.edu</bugreports>
 </component>
 
 <component id="specx">
@@ -5554,7 +5575,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="ndg" support="S">
-  <version>5.4</version>
+  <version>5.6</version>
   <path>libraries/ndg</path>
   <description>NDG - Routines for Accessing Groups of NDFs</description>
   <abstract><p>NDG provides facilities for handling groups of NDFs.
@@ -6349,7 +6370,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="gsl" support="U">
-  <version>1.9</version>
+  <version>1.12</version>
   <path>thirdparty/fsf/gsl</path>
   <description>GNU Scientific Library</description>
   <dependencies >
@@ -6397,7 +6418,7 @@ Ultrix and for SunOS and may still work for them.
        build rule to be generated (by GenerateDependencies.java), but does
        not include it in the list of buildsupport dependencies, so that it
        is not build automatically. -->
-  <version>1.4.2</version>
+  <version>1.4.12.47-7896-dirty</version>
   <path>thirdparty/fsf/m4</path>
   <description>GNU m4</description>
   <dependencies/>
@@ -6411,11 +6432,10 @@ Ultrix and for SunOS and may still work for them.
   </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <copyright>
-    <year>1990-1994, 2000-2004</year>
+    <year>1990-1994, 2000-2005</year>
     <name>Free Software Foundation</name>
   </copyright>
-  <notes><p>Imported from distributed m4-1.4.tar.gz by nxg,
-    on 2004-03-07</p></notes>
+  <notes></notes>
 </component>
 
 <component id="cfitsio" support="U">
@@ -6587,8 +6607,22 @@ documents to hypertext.
   </copyright>
 </component>
 
+<component id="perl" support="U">
+  <version>5.10</version>
+  <path>thirdparty/perlsys/perl</path>
+  <description>Perl</description>
+  <dependencies >
+    
+  </dependencies>
+  <!--developers>
+    <person>
+    </person>
+  </developers-->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
 <component id="match" support="U">
-  <version>0.8-0</version>
+  <version>0.10-0</version>
   <path>thirdparty/rit/match</path>
   <description>MATCH</description>
   <abstract><p>
@@ -6651,7 +6685,7 @@ and some distortion.
 </component>
 
 <component id="tcl" support="U">
-  <version>8.4.11</version>
+  <version>8.4.19</version>
   <path>thirdparty/tclsys/tcl</path>
   <description>The Tcl system</description>
   <dependencies >
@@ -6743,7 +6777,7 @@ and some distortion.
 </component>
 
 <component id="tk" support="U">
-  <version>8.4.11</version>
+  <version>8.4.19</version>
   <path>thirdparty/tclsys/tk</path>
   <description>The Tk system</description>
   <dependencies >
