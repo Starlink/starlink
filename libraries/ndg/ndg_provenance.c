@@ -2712,7 +2712,7 @@ static void ndg1H2a0h( const char *name, HDSLoc *loc, AstKeyMap *km,
                        int *status ){
 /*
 *  Name:
-*     ndg1H2a1i
+*     ndg1H2a0h
 
 *  Purpose:
 *     Copy scalar values in an HDS component of an HDS structure to 
@@ -2742,6 +2742,18 @@ static void ndg1H2a0h( const char *name, HDSLoc *loc, AstKeyMap *km,
 *        Pointer to the KeyMap in which to store the copied values.
 *     status 
 *        The global status.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     3-MAR-2009 (DSB):
+*        Original version.
+*     4-MAR-2009 (TIMJ):
+*        Use correct locator when reading components.
+*     {enter_further_changes_here}
+
 
 */
 
@@ -2803,7 +2815,7 @@ static void ndg1H2a0h( const char *name, HDSLoc *loc, AstKeyMap *km,
 
 /* Get its value as a string. */
                if( value ) {
-                  datGet0C( cloc, value, clen + 1, status );
+                  datGet0C( dloc, value, clen + 1, status );
 
 /* Put it into the KeyMap. */
                   astMapPut0C( km2, dname, value, NULL );  
