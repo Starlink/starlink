@@ -32,6 +32,30 @@
  *                                TRAIL(values) )
  */
 
+/* Check status and return on error after setting error message that
+   includes the component name. Private version of _call() */
+#define _calln(event)\
+{\
+*status = (event);\
+if (!_ok(*status))\
+	{\
+        char private_context_message[132];\
+        char dname[DAT__SZNAM+1];\
+        int privstat = DAT__OK;\
+        emsMark();\
+        datName(locator, dname, &privstat );\
+        if (privstat != DAT__OK) dname[0] = '\0';\
+        emsAnnul(&privstat);\
+        emsRlse();\
+        sprintf( private_context_message,\
+             context_message ": '%s'", dname);\
+        hds_gl_status = *status;\
+        emsRep(context_name,private_context_message,status);\
+	      return hds_gl_status;\
+        }\
+}
+
+
 /*=====================*/
 /* DAT_GET - Read data */
 /*=====================*/
@@ -46,9 +70,8 @@ datGet(const HDSLoc     *locator,
 #undef context_name
 #undef context_message
 #define context_name "DAT_GET_ERR"
-#define context_message\
-        "DAT_GET: Error reading value(s) from an HDS primitive object."
-
+#define context_message \
+       "DAT_GET: Error reading value(s) from an HDS primitive object"
    struct DSC type;
 
    struct LCP       *lcp;
@@ -88,48 +111,48 @@ datGet(const HDSLoc     *locator,
    primitive.  */
 
    if (state->mapped)
-      _call(DAT__PRMAP)
+      _calln(DAT__PRMAP)
    if (data->struc)
-      _call(DAT__OBJIN)
+      _calln(DAT__OBJIN)
 
 /* Determine the shape of the object and match the dimensions.  */
 
-   _call( dau_get_shape( data, &naxes, axis ))
+   _calln( dau_get_shape( data, &naxes, axis ))
    if (ndim != naxes)
    {
-      _call(DAT__DIMIN)
+      _calln(DAT__DIMIN)
    }
    for (i=0; i<naxes; i++)
    {
       if (dims[i] != axis[i])
       {
-         _call(DAT__DIMIN)
+         _calln(DAT__DIMIN)
       }
    }
 
 /* Validate the application data type specification.  */
 
-   _call( dat1_check_type( &type, typbuf ))
+   _calln( dat1_check_type( &type, typbuf ))
 
 /* Determine the attributes of the application data and reject the operation
    if not primitive.  */
 
-   _call( dat1_unpack_type( typbuf, &data->app ))
+   _calln( dat1_unpack_type( typbuf, &data->app ))
    app = &data->app;
    if (app->class != DAT__PRIMITIVE)
-      _call(DAT__TYPIN)
+      _calln(DAT__TYPIN)
 
 /* Match the object and application data attributes and reject the operation
    if the types are incompatible.   */
 
    obj = &data->obj;
-   _call( dau_match_types( obj, app ))
+   _calln( dau_match_types( obj, app ))
 
 /* Ensure that the object data is 'active'.  */
 
-   _call( rec_get_rcl( &data->han, &rcl ))
+   _calln( rec_get_rcl( &data->han, &rcl ))
    if (!rcl.active)
-      _call(DAT__UNSET)
+      _calln(DAT__UNSET)
 
 /* Insert a pointer to the data into the PDD.                               */
    app->body = (unsigned char*)values;
@@ -170,7 +193,7 @@ datGet(const HDSLoc     *locator,
    {
       rec_locate_data( &data->han, objlen, objoff, 'R', &dom );
       obj->body = dom;
-      _call(dat1_cvt( 1, data->size, obj, app, &nbad ))
+      _calln(dat1_cvt( 1, data->size, obj, app, &nbad ))
       rec_release_data( &data->han, objlen, objoff, 'R', &dom );
    }
 
@@ -189,7 +212,7 @@ datGet(const HDSLoc     *locator,
     }
 
 /* Check the global status value before return.            */
-    _call(hds_gl_status)
+    _calln(hds_gl_status)
     return hds_gl_status;
 }
 
