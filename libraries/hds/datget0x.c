@@ -71,6 +71,8 @@
  *       Rewrite in C
  *     25-NOV-2005 (TIMJ):
  *       NUL terminate
+ *     4-MAR-2009 (TIMJ):
+ *       Do not call CNF if datGetC returns bad status.
 
  *  Notes:
  *    For datGet0C the buffer must be preallocated by the caller
@@ -78,6 +80,7 @@
  *    size must allow for the terminating nul.
 
  *  Copyright:
+ *    Copyright (C) 2009 Science and Technology Facilities Council.
  *    Copyright (C) 2005 Particle Physics and Astronomy Research Council.
  *    All Rights Reserved.
 
@@ -117,8 +120,13 @@ int datGet0C ( const HDSLoc * loc, char * value, size_t str_len, int * status ) 
 
   /* Terminate the string but first make sure we fool CNF by forcing
      a ' ' as the last character in the "fortran" string */
-  value[str_len-1] = ' ';
-  cnfImprt( value, str_len, value );
+  if (*status == DAT__OK) {
+    value[str_len-1] = ' ';
+    cnfImprt( value, str_len, value );
+  } else {
+    /* nothing to import */
+    value[0] = '\0';
+  }
   return *status;
 }
 
