@@ -3,7 +3,7 @@
 SUBDIRS = libcap
 
 bin_SCRIPTS = xcatview cursa_test.csh cursa.csh catcdsin \
- catremote UrlReader.class UrlReader.java geturl
+ catremote UrlReader.class UrlReader.java geturl cursa.cfg
 
 dist_noinst_SCRIPTS = cursa_link_adam
 
