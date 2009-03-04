@@ -18,7 +18,7 @@
       links to the hypertext version of your document (without
       affecting the paper version). </p></abstract>
   <dependencies >
-    <build>latex2html</build>
+    <build>latex2html</build><configure>perl</configure>
   </dependencies>
   <developers>
     <person>

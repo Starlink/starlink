@@ -1,5 +1,5 @@
-#! @PERL@
-#  Edit the line above if this isn't the location of perl on your system.
+#!@ENV@ starperl
+#
 #+
 #  Name:
 #     xlabel

@@ -1,5 +1,5 @@
-#! @PERL@
-# @edited_input@
+#!@ENV@ starperl
+#
 #+
 #  Name:
 #     latex2html

@@ -25,7 +25,7 @@ sun199.htx_tar: sun199.tex star2html latex2html
 l2hdir=$(DESTDIR)$(datadir)/latex2html/bin/
 
 edit=sed \
-    -e 's,@PERL\@,$(PERL),g' \
+    -e 's,@ENV\@,$(ENV),g' \
     -e 's,@PACKAGE_VERSION\@,$(PACKAGE_VERSION),g' \
     -e 's,@PACKAGE_BUGREPORT\@,$(PACKAGE_BUGREPORT),g' \
     -e 's,@l2hdir\@,$(l2hdir),g'
