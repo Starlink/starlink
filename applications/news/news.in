@@ -1,4 +1,4 @@
-#!@PERL@ -s
+#!@ENV@ starperl
 #
 # Program: news
 # Version: 2.1
@@ -50,6 +50,11 @@
 #------------------------------------------------------------------------
 #
 require "timelocal.pl";
+
+# handle command-line options
+use Getopt::Std;
+getopts('nth');
+
 #
 # set up variables
 #
@@ -86,7 +91,7 @@ $now = time;                                     # current time
 #
 # Determine how the topic list shall be sorted
 #
-if ($t){                                 # sort @files by title if -t option 
+if ($opt_t){                             # sort @files by title if -t option 
 @files = sort by_title keys(%filetitles);
 } else {                                 # default action - sort @files by date
 @files  = sort by_date keys(%fileages);
@@ -94,9 +99,9 @@ if ($t){                                 # sort @files by title if -t option
 # main control loop:
 # action determined by command line arguments
 #
-if ($n){
+if ($opt_n){
     &new_news;                                   # display new news items    
-} elsif ($h){
+} elsif ($opt_h){
     &help;
 } else {                                         # main NEWS option
     system "stty rows 24";                       # for now sets term to 24 rows

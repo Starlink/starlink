@@ -19,10 +19,13 @@ STAR_DEFAULTS
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_MAKE_SET
  
-STAR_CHECK_PROGS(perl)
 STAR_CHECK_PROGS(sh)
 STAR_CHECK_PROGS(echo)
- 
+
+dnl    Depends on the Starlink Perl.
+STAR_DECLARE_DEPENDENCIES([configure], [perl])
+STAR_CHECK_PROGS(env)
+
 dnl    Documentation is in the parent directory
 STAR_LATEX_DOCUMENTATION(sun195)
 

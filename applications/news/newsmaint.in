@@ -1,4 +1,4 @@
-#!@PERL@ -s
+#!@ENV@ starperl
 #
 # Program: newsmaint
 # Version: 1.0

@@ -9,7 +9,7 @@
   <abstract><p>Simple interactive tool for reading release notes.
     </p></abstract>
   <dependencies >
-    <sourceset>star2html</sourceset>
+    <configure>perl</configure><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
