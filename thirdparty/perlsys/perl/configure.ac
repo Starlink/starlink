@@ -28,7 +28,13 @@ dnl    file installed into the standard part of the tree and
 dnl    work in the standard tree to establish softlinks. This
 dnl    latter requirement is the stronger (could use STAR_MANIFEST_DIR 
 dnl    to get the manifest file relocated).
+dnl
+dnl    Export the various FLAGS values to support config.site definitions
+dnl    which are not exported.
 (
+   test -n "$CFLAGS" && export CFLAGS
+   test -n "$CC" && export CC
+   test -n "LDFLAGS" && export LDFLAGS
    cd perl; \
    rm -f config.sh ; \
    cmd="./configure.gnu --prefix=${prefix}/Perl -Duserelocatableinc"; \
