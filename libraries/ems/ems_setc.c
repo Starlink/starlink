@@ -15,6 +15,10 @@
  *    11-FEB-2009 (TIMJ):
  *      Allow a long string to be imported (longer than EMS__SZNAM)
  *      so that ems1Putc is allowed to truncate it consistently.
+ *    4-MAR-2009 (TIMJ):
+ *      Do not force token value to be a single space since a blank
+ *      Fortran string will result in a single byte being allocated
+ *      holding '\0'.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -33,6 +37,7 @@
 *     02111-1307, USA
 
 *  Copyright:
+*     Copyright (C) 2009 Science and Technology Faciltiies Council.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -60,11 +65,6 @@ F77_SUBROUTINE(ems_setc) ( CHARACTER(token), CHARACTER(cvalue)
 
    cnfImpn( token, token_length, EMS__SZNAM, ctok );
    ccval = cnfCreim( cvalue, cvalue_length );
-
-/* Ensure minimum 1 space */
-   if ( ! strlen( ccval ) ) {
-      strcpy( ccval, " " );
-   }
 
 /* Now set the token string */
    emsSetc( ctok, ccval );
