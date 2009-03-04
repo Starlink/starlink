@@ -67,7 +67,7 @@ xcatviewsupport_DATA = xcatviewLib/xcatview.tcl \
 NETWORKED = "yes"
 edit = sed \
         -e 's,@bindir\@,$(bindir),g' \
-        -e 's,@PERL\@,$(PERL),g' \
+        -e 's,@STARPERL\@,$(STARPERL),g' \
         -e 's,@AWISH\@,$(AWISH),g' \
         -e 's,@ATCLSH\@,$(ATCLSH),g' \
         -e 's,@PACKAGE_VERSION\@,$(PACKAGE_VERSION),g' \

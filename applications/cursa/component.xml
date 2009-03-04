@@ -21,7 +21,7 @@ text files.  CURSA also includes some facilities for accessing remote
 on-line catalogues via the Internet.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build option='link'>sae</build><build option='link'>cat</build><build option='link'>fio</build><build option='link'>par</build><build option='link'>pda</build><build option='link'>ndf</build><build option='link'>pgplot</build><build option='link'>startcl</build><build>graphpar</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
+    <build>pcs</build><build option='link'>sae</build><build option='link'>cat</build><build option='link'>fio</build><build option='link'>par</build><build option='link'>pda</build><build option='link'>ndf</build><build option='link'>pgplot</build><build option='link'>startcl</build><build>graphpar</build><sourceset>star2html</sourceset><configure>perl</configure><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>

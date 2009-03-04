@@ -131,12 +131,12 @@ alias cursa_catphotomlst  '$CURSA_DIR/catphotomlst'
 alias catgrid         '$CURSA_DIR/catphotomlst'
 alias cursa_catgrid   '$CURSA_DIR/catphotomlst'
 
-#  Perl scripts. Look for the Starlink Perl.
-if ( -e @PERL@ ) then
-   set starperl=@PERL@
+#  Perl scripts, use the Starlink Perl.
+if ( -e @STARPERL@ ) then
+   set starperl=@STARPERL@
 else 
-   if ( -e $STARLINK_DIR/Perl/bin/perl ) then
-      set starperl=$STARLINK_DIR/Perl/bin/perl
+   if ( -e $STARLINK_DIR/bin/starperl ) then
+      set starperl=$STARLINK_DIR/bin/starperl
    else
 #  No Starlink Perl, see what the default one can achieve.
       set starperl=perl

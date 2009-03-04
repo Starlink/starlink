@@ -20,7 +20,7 @@ AC_PROG_FC
 AC_PROG_LIBTOOL
 
 STAR_MONOLITHS
-STAR_CHECK_PROGS([perl])
+STAR_CHECK_PROGS([starperl])
 STAR_CHECK_PROGS([awish])
 STAR_CHECK_PROGS([atclsh])
 
@@ -43,8 +43,11 @@ dnl    Build dependencies for this package.
 STAR_DECLARE_DEPENDENCIES([build], [sae cat fio par pda ndf pgplot startcl], [link])
 dnl    cursa_link_adam depends on pgplot_link_adam which is, oddly
 dnl    enough, in graphpar rather than pgplot.
-STAR_DECLARE_DEPENDENCIES(build, graphpar)
-STAR_DECLARE_DEPENDENCIES(sourceset, star2html)
+STAR_DECLARE_DEPENDENCIES([build], [graphpar])
+STAR_DECLARE_DEPENDENCIES([sourceset], [star2html])
+
+dnl    The starperl command is part of perl.
+STAR_DECLARE_DEPENDENCIES([configure], [perl])
 
 STAR_LATEX_DOCUMENTATION([sun190 ssn76])
 
