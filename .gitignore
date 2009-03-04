@@ -32,6 +32,7 @@
 *.now
 *.pro
 *.ps
+*.pyc
 *.s
 *.sdf
 *.shl
@@ -691,10 +692,25 @@ applications/scb/scb_test.sh
 applications/scb/size_test.sh
 applications/scb/YyTag.pm
 
+applications/sgmlkit/bin/sgml2docs
 applications/sgmlkit/bin/sgml2docs.x
+applications/sgmlkit/bin/sgml2hlp
 applications/sgmlkit/bin/sgml2hlp.x
+applications/sgmlkit/doc/dtd2sgml/programcode-0.7.dtdsummary
+applications/sgmlkit/doc/dtd2sgml/programcode-0.7.sgmltext
+applications/sgmlkit/doc/dtd2sgml/sgmltext.stamp
+applications/sgmlkit/doc/dtd2sgml/starlink-0.7.dtdsummary
+applications/sgmlkit/doc/dtd2sgml/starlink-0.7.sgmltext
+applications/sgmlkit/doc/ssn70/sgmlkit-version-string
+applications/sgmlkit/doc/ssn70/ssn70.texml_tar
+applications/sgmlkit/doc/ssn70/tmp-sgml2docs
 applications/sgmlkit/dsssl/sl/common/slparams.dsl
+applications/sgmlkit/dsssl/sl/lib/sllib.dsl
+applications/sgmlkit/dtd/CATALOG-override
 applications/sgmlkit/lib/img-eqlist.pl
+applications/sgmlkit/misc/bindocs.sgml
+applications/sgmlkit/misc/libdocs.sgml
+applications/sgmlkit/misc/misc.stamp
 
 applications/smurf/libsmf/make_h
 applications/smurf/libsmf/smf.h
