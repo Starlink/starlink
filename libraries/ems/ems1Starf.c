@@ -116,7 +116,9 @@
  */
 
 /* for strtok_r in standards compliance mode */
+#if HAVE_STRTOK_R
 #define _POSIX_C_SOURCE 200112L
+#endif
 
 #if HAVE_CONFIG_H
 #include "config.h"
