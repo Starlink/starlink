@@ -270,8 +270,9 @@ static void tkpg_update_scroll_bars(TkPgplot *tkpg);
 static void tkpg_update_clip(TkPgplot *tkpg);
 static void tkpg_update_border(TkPgplot *tkpg);
 
-//static int PgplotCmd(ClientData context, Tcl_Interp *interp, int argc,
-//		     Tcl_Obj *CONST objv[]);
+/*static int PgplotCmd(ClientData context, Tcl_Interp *interp, int argc,
+		     Tcl_Obj *CONST objv[]);
+*/
 
 static int tkpg_InstanceCommand(ClientData context, Tcl_Interp *interp,
 				int objc, Tcl_Obj *CONST objv[]);
@@ -634,7 +635,7 @@ static TkPgplot *del_TkPgplot(TkPgplot *tkpg)
 /*
  * Remove the device from the appropriate list of PGPLOT widgets.
  */
-      // tkpg_RemoveWidget(pgx->name, pgx->state ? TKPG_ACTIVE_WIDGETS :
+      /* tkpg_RemoveWidget(pgx->name, pgx->state ? TKPG_ACTIVE_WIDGETS :*/
       tkpg_RemoveWidget(tkpg->name, pgx->state ? TKPG_ACTIVE_WIDGETS :
 		                                TKPG_FREE_WIDGETS);
 /*
@@ -1222,7 +1223,7 @@ void DRIV(ifunc, rbuf, nbuf, chr, lchr, len)
 					   TKPG_ACTIVE_WIDGETS, NULL);
       if(new_tkpg) {
 	new_tkpg->pgslct_id = (int) (rbuf[0]+0.5);
-	//tkpg_RemoveWidget(new_tkpg->pgx->name, TKPG_ACTIVE_WIDGETS);
+	/*tkpg_RemoveWidget(new_tkpg->pgx->name, TKPG_ACTIVE_WIDGETS);*/
 	tkpg_RemoveWidget(new_tkpg->name, TKPG_ACTIVE_WIDGETS);
 	tkpg_PrependWidget(new_tkpg, TKPG_ACTIVE_WIDGETS);
       } else {
@@ -1268,7 +1269,7 @@ void DRIV(ifunc, rbuf, nbuf, chr, lchr, len)
  * Remove the device from the list of open devices.
  */
     if(pgx)
-      //tkpg_close_widget(pgx->name);
+      /*tkpg_close_widget(pgx->name);*/
       tkpg_close_widget(tkpg->name);
     break;
 
@@ -1923,7 +1924,7 @@ static int tkpg_tcl_setcursor(TkPgplot *tkpg, Tcl_Interp *interp,
   if(objc != 4) {
     Tcl_AppendResult(interp, "Wrong number of arguments. Should be: \"",
 		     tkpg->name, " setcursor mode x y ci",
-		     //tkpg->pgx->name, " setcursor mode x y ci",
+		     /*tkpg->pgx->name, " setcursor mode x y ci",*/
 		     NULL);
     return TCL_ERROR;
   };
