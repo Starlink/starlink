@@ -703,6 +703,57 @@ sub _get_manifest_file ($$) {
   return File::Spec->catfile($_[0], $app);
 }
 
+=item B<_get_git_version>
+
+Given a Starlink version file created for git repositories, return
+version information.
+
+  my \%version = _get_git_version( $file );
+
+Returns a hash reference with keys STRING, COMMIT, and
+COMMITDATE. String is composed of the branch name, commit ID, and
+date. COMMIT is the commit ID. COMMITDATE is the date of the commit,
+returned as a DateTime object;
+
+The file must have the branch name as the first line. The second line,
+if it exists, must be the commit ID. The third line, if it exists,
+must be the date in 'YYYY-MM-DD HH:MM:SS TZ' format.
+
+=cut
+
+sub _get_git_version {
+  my $file = shift;
+
+  print "Opening git version file $file\n" if $DEBUG;
+
+  open my $fh, "<", $file or return;
+
+  my $branch = <$fh>;
+  chomp($branch);
+  my $id = <$fh>;
+  my $date = <$fh>;
+
+  my %info;
+  $info{STRING} = $branch;
+  if (defined $id) {
+    chomp($id);
+    $info{STRING} .= " @ $id";
+    $info{COMMIT} = $id;
+  }
+  if (defined $date) {
+    chomp($date);
+    # Git ISO is YYYY-MM-DD HH:MM:SS -1000
+    my $p = DateTime::Format::Strptime->new(pattern => '%Y-%m-%d %H:%M:%S %z',
+                                            time_zone=>'UTC');
+    my $dt = $p->parse_datetime($date);
+    $info{COMMITDATE} = $dt;
+    $info{STRING} .= " (".$dt->datetime.")";
+  }
+  close($fh);
+
+  return \%info;
+
+}
 
 =item B<_parse_version_string>
 
@@ -923,31 +974,8 @@ sub _get_global_version {
   # Get the filename
   print "Using manifest dir = $dir\n" if $DEBUG;
   my $file = _get_manifest_file($dir, 'starlink.version');
-  print "Opening manifest file $file\n" if $DEBUG;
-  my $sym = gensym;
-  open( $sym, "< $file" ) || return;
-  my $branch = <$sym>;
-  chomp($branch);
-  my $id = <$sym>;
-  my $date = <$sym>;
-  my %info;
-  $info{STRING} = $branch;
-  if (defined $id) {
-    chomp($id);
-    $info{STRING} .= " @ $id";
-    $info{COMMIT} = $id;
-  }
-  if (defined $date) {
-    chomp($date);
-    # Git ISO is YYYY-MM-DD HH:MM:SS -1000
-    my $p = DateTime::Format::Strptime->new(pattern => '%Y-%m-%d %H:%M:%S %z',
-                                            time_zone=>'UTC');
-    my $dt = $p->parse_datetime($date);
-    $info{COMMITDATE} = $dt;
-    $info{STRING} .= " (".$dt->datetime.")";
-  }
-  close($sym);
-  return \%info;
+
+  return _get_git_version( $file );
 }
 
 =item B<_get_version>
@@ -1060,9 +1088,10 @@ Can be used to determine any Starlink product that installs a
 datestamp file or a manifest file. For example, it can be used to
 determine library versions as well as applications.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
+Brad Cavanagh E<lt>b.cavanagh@jach.hawaii.eduE<gt>
 
 =head1 COPYRIGHT
 
