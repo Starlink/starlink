@@ -30,14 +30,20 @@ dnl    latter requirement is the stronger (could use STAR_MANIFEST_DIR
 dnl    to get the manifest file relocated).
 dnl
 dnl    Export the various FLAGS values to support config.site definitions
-dnl    which are not exported.
+dnl    which are not exported. Hack: note that a problem in Perl requires that
+dnl    we add CFLAGS to lddlflags, but that's not directly possible, so we
+dnl    push it through as part of optimize.
 (
    test -n "$CFLAGS" && export CFLAGS
    test -n "$CC" && export CC
    test -n "LDFLAGS" && export LDFLAGS
+   args=""
+   if test -n "$CFLAGS"; then
+      args="-Doptimize=$CFLAGS"
+   fi
    cd perl; \
    rm -f config.sh ; \
-   cmd="./configure.gnu --prefix=${prefix}/Perl -Duserelocatableinc"; \
+   cmd="./configure.gnu --prefix=${prefix}/Perl -Duserelocatableinc $args"; \
    echo $cmd; \
    $cmd; \
 )
