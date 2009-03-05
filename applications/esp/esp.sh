@@ -75,26 +75,6 @@ else
 fi
 adamdir=
 
-#  Define the locations of the ESP monolith and shell task soft links,
-#  plus the location of the help library, if they are not already defined.
-#  These are modified at install time by the makefile.
-
-if [ -n "$ESP_DIR" ]; then
-   echo ""
-   echo "   Environment Variable ESP_DIR is not set.  Setting" 
-   echo "   ESP_DIR to be INSTALL_BIN"
-   echo ""
-   ESP_DIR=INSTALL_BIN
-fi
-if [ -n "$ESP_HELP" ]; then
-   echo ""
-   echo "   Environment Variable ESP_HELP is not set.  Setting"
-   echo "   ESP_HELP to be INSTALL_HELP/esp"
-   echo ""
-   ESP_HELP=INSTALL_HELP/esp
-fi
-export ESP_DIR ESP_HELP
-
 #
 #  Define aliases for the applications.
 #  There should be a plain alias, and a package specific alias
