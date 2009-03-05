@@ -68,6 +68,8 @@ use Getopt::Long;
 use Net::SMTP;
 $| = 1; # unbuffered
 
+our $DEBUG = 0;
+
 # Restrict PATH
 $ENV{PATH} = "/usr/bin:/opt/local/bin";
 
@@ -106,7 +108,7 @@ for my $root (keys %REPO_ROOTS) {
     # Starlink repositories
     if ($repos{$name} =~ /starlink/) {
       $starrepos{$name} = $repos{$name};
-    } elsif ($repos{$name} = /jac_sw/) {
+    } elsif ($repos{$name} =~ /jac_sw/) {
       $jacrepos{$name} = $repos{$name};
     }
 
@@ -119,9 +121,10 @@ for my $root (keys %REPO_ROOTS) {
 # Do not include "oracdr" or "cpan-modules" in starlink
 delete $starrepos{oracdr};
 delete $starrepos{"cpan-modules"};
-delete $starrepos{"starlink-allcvs"};
-delete $starrepos{"starlink-oldsvn"};
+delete $starrepos{"starlink-fromoldcvs"};
+delete $starrepos{"starlink-allsvn"};
 delete $starrepos{starlink}; # to make sure it is first
+delete $starrepos{"oracdr-allsvn"};
 
 # We could read these from a config file if this is to become a general
 # program for git use but for now use a hash
@@ -287,7 +290,7 @@ if (!defined $toemail) {
 
 # Name of file containing the commits that were processed last time
 # this ran
-my $revfile = ".revision-$repgrp";
+my $revfile = ".gitrevision-$repgrp";
 
 # Calculate the path to the revision file (we will need it later)
 my $revfilepath = File::Spec->catfile($CFG{reportdir}, $revfile);
@@ -325,9 +328,6 @@ my $have_content; # any content at all?
 # loop over each repository
 for my $rep ( @{$CFG{modules}} ) {
 
-  push(@LONG, "Commits from repository $rep","");
-  push(@SHORT,  "Commits from repository $rep");
-
   # Select the correct git repository (these are bare repos)
   $ENV{GIT_DIR} = $repos{$rep};
 
@@ -345,27 +345,40 @@ for my $rep ( @{$CFG{modules}} ) {
   # run git log to get short output
   my @shortl = `git log --dirstat=1 --pretty=format:\"(\%an) \%s\" ${baserev}.. $path`;
   chomp(@shortl);
+  $have_content = 1 if @shortl;
 
   # run git log to get full output
+  print "Running $baserev .. $path\n" if $DEBUG;
   my @lines = `git log -M -C -C --stat=78 ${baserev}.. $path`;
   chomp(@lines);
 
+  # Log lists in order of newest first so we can get new HEAD
+  # from first line
   if (@lines) {
-    $have_content = 1;
-
-    # look for the last commit
-    for my $l (reverse @lines) {
-      if ($l =~ /^commit ([a-f0-9]{40})/) {
+    if ($lines[0] =~ /^commit ([a-f0-9]{40})/) {
 	$ENDREV{$rep} = $1;
-	print "FOUND ENDREV= $1\n";
-	last;
-      }
+        print "ENDREV=$ENDREV{$rep}\n" if $DEBUG;
     }
   }
 
   # indent
-  push(@LONG, map { "  $_" } @lines);
-  push(@SHORT, map { "  $_" } @shortl);
+
+  if (@shortl) {
+    push(@SHORT,
+         "",
+         "Commit summary from repository $rep",
+         "------------------------------------",
+         "");
+    push(@SHORT, map { "  $_" } @shortl);
+  }
+  if (@lines) {
+    push(@LONG,
+         "",
+         "Commits from repository $rep",
+         "-----------------------------",
+          "");
+    push(@LONG, map { "  $_" } @lines);
+  }
 }
 
 my @OUTPUT = (@SHORT, " ", @LONG );
@@ -388,10 +401,12 @@ if ($have_content) {
   # Done, so write the new marker file if we send email
   if ($email) {
     if ( open my $revhdl, ">", $revfilepath) {
-      for my $r (keys %BASEREV) {
+      for my $r (sort keys %BASEREV) {
 	my $sha = $BASEREV{$r};
 	$sha = $ENDREV{$r} if exists $ENDREV{$r};
 	print $revhdl "$r $sha\n";
+        my $differ = ($BASEREV{$r} ne $sha ? "(DIFFER)" : "" );
+        print "Before $r: $differ $BASEREV{$r} -> $sha\n" if $DEBUG;
       }
       close($revhdl);
     } else {
