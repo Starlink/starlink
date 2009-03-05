@@ -171,7 +171,21 @@ my %SETTINGS = (
 			   # Local directory on the web server for web page and .revision file
 			   reportdir => '/web/html/software',
 			   # Name of report web file
-			   reportfile => 'summarize-commits.html',
+			   reportfile => 'summarize-commits-omp.html',
+			   # Filter used to restrict report to specific part of repository tree
+			   file_filter => '',
+			  },
+		acsis => {
+			   # List of all the modules to be included
+			   modules => [ "acsis", "acsis-libspecwrite", "translator-wiredir" ],
+			   # URL root dir where report web page will appear
+			   reporturlroot => "http://www.jach.hawaii.edu/software",
+			   # Where mail message will be sent
+			   reportmail => 'acsis_sw@jach.hawaii.edu',
+			   # Local directory on the web server for web page and .revision file
+			   reportdir => '/web/html/software',
+			   # Name of report web file
+			   reportfile => 'summarize-commits-acsis.html',
 			   # Filter used to restrict report to specific part of repository tree
 			   file_filter => '',
 			  },
