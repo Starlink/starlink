@@ -51,7 +51,8 @@ STAR_LARGEFILE_SUPPORT
 
 dnl    Declare dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [ard atl ast blt cat cfitsio generic dnl
-fio img itcl pcs pda sae skycat startcl sla tcl tclx tk tcllibs vtk], link)
+fio img itcl pcs pda sae skycat startcl sla tcl tclx tk tcllibs vtk dnl
+xerces-c tcldict tdom], link)
 STAR_DECLARE_DEPENDENCIES(sourceset, star2html)
 STAR_DECLARE_DEPENDENCIES(configure, [tcl tk blt itcl])
 

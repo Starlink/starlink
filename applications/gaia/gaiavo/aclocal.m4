@@ -111,15 +111,11 @@ case $system in
 esac
 
 dnl    Define support for large files.
+STAR_DEFAULTS
 STAR_LARGEFILE_SUPPORT
 
 dnl    Need libtool for linking.
 AC_CHECK_PROGS([LIBTOOL],[libtool])
-
-dnl    We require a version of Xerces-c to be installed for VOTable support.
-dnl    Difficult to check for library linkage, so just use header check.
-AC_CHECK_HEADER([xercesc/util/XercesVersion.hpp], [], 
-    AC_MSG_ERROR([Couldn't find xerces-c headers. Need xerces-c.]))
 
 PKG_LIBS="${PKG_LIBS} -lxerces-c"
 

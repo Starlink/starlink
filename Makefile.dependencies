@@ -962,10 +962,13 @@ $(MANIFESTS)/gaia: \
 		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tcldict \
 		$(MANIFESTS)/tcllibs \
 		$(MANIFESTS)/tclx \
+		$(MANIFESTS)/tdom \
 		$(MANIFESTS)/tk \
-		$(MANIFESTS)/vtk
+		$(MANIFESTS)/vtk \
+		$(MANIFESTS)/xerces-c
 	cd applications/gaia \
 	  && $(MAKE_CPT)
 
@@ -1661,6 +1664,8 @@ $(MANIFESTS)/ndg: \
 	cd libraries/ndg \
 	  && $(MAKE_CPT)
 
+# Component news has configure dependencies on { perl },
+# which must be built before this component is configured.
 $(MANIFESTS)/news: \
 		$(MANIFESTS)/star2html
 	cd applications/news \
@@ -2505,6 +2510,8 @@ $(MANIFESTS)/sst: \
 	cd applications/sst \
 	  && $(MAKE_CPT)
 
+# Component star2html has configure dependencies on { perl },
+# which must be built before this component is configured.
 $(MANIFESTS)/star2html: \
 		$(MANIFESTS)/latex2html
 	cd applications/star2html \
