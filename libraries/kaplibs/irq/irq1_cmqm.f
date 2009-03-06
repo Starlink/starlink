@@ -124,6 +124,9 @@
 *  History:
 *     30-SEP-1991 (DSB):
 *        Original version.
+*     6-MAR-2009 (DSB):
+*        Fix bad logic that causes memory to be trashed if the quality
+*        expresson contains more than 2 quality names.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -198,6 +201,8 @@
      :       OPCODE( I ) .EQ. OPC__LDQN ) THEN
             NLDQ = NLDQ + 1
             QM( I ) = NLDQ
+         ELSE
+            QM( I ) = -1
          END IF
       END DO
 
@@ -230,6 +235,10 @@
                   MASKS( QM ( IOPN( 1 ) ) ) = IOR( MASK1, MASK2 )
                   MASKS( QM ( IOPN( 2 ) ) ) = -1
 
+                  QM( I ) =  QM ( IOPN( 1 ) )
+                  QM( IOPN( 1 ) ) = -1
+                  QM( IOPN( 2 ) ) = -1
+
                   CHANGE = .TRUE.
 
                END IF
@@ -251,6 +260,10 @@
                   MASK2 = MASKS( QM ( IOPN( 2 ) ) )
                   MASKS( QM ( IOPN( 1 ) ) ) = IOR( MASK1, MASK2 )
                   MASKS( QM ( IOPN( 2 ) ) ) = -1
+
+                  QM( I ) =  QM ( IOPN( 1 ) )
+                  QM( IOPN( 1 ) ) = -1
+                  QM( IOPN( 2 ) ) = -1
 
                   CHANGE = .TRUE.
 
@@ -277,6 +290,10 @@
                   MASKS( QM ( IOPN( 1 ) ) ) = IOR( MASK1, MASK2 )
                   MASKS( QM ( IOPN( 2 ) ) ) = -1
 
+                  QM( I ) =  QM ( IOPN( 1 ) )
+                  QM( IOPN( 1 ) ) = -1
+                  QM( IOPN( 2 ) ) = -1
+
                   CHANGE = .TRUE.
 
                END IF
@@ -302,6 +319,10 @@
                   MASKS( QM ( IOPN( 1 ) ) ) = IOR( MASK1, MASK2 )
                   MASKS( QM ( IOPN( 2 ) ) ) = -1
 
+                  QM( I ) =  QM ( IOPN( 1 ) )
+                  QM( IOPN( 1 ) ) = -1
+                  QM( IOPN( 2 ) ) = -1
+
                   CHANGE = .TRUE.
 
                END IF
@@ -316,6 +337,9 @@
                   OPCODE( IOPN( 1 ) ) = OPC__NULL
                   OPCODE( I ) = OPC__LDQN
 
+                  QM( I ) =  QM ( IOPN( 1 ) )
+                  QM( IOPN( 1 ) ) = -1
+
                   CHANGE = .TRUE.
 
                END IF
@@ -326,17 +350,28 @@
 
       END DO
 
-*  If any changes were introduced on this pass, do another pass.
-      IF( CHANGE ) GO TO 10
+*  If any changes were introduced on this pass...
+      IF( CHANGE ) THEN
 
-*  Remove all the -1 values from the list of masks.
-      NMASKS = 0
+*  Shuffle all the valid mask values to the start of the masks array
+         NMASKS = 0
+   
+         DO I = 1, NQNAME
+   
+            IF( MASKS( I ) .NE. -1 ) THEN
+               NMASKS = NMASKS + 1
+               MASKS( NMASKS ) = MASKS( I )
+            END IF
+   
+         END DO
 
-      DO I = 1, NQNAME
-         IF( MASKS( I ) .NE. -1 ) THEN
-            NMASKS = NMASKS + 1
-            MASKS( NMASKS ) = MASKS( I )
-         END IF
-      END DO
+*  Pad out the end of the masks array with invalid mask values.
+         DO I = NMASKS + 1, NQNAME
+            MASKS( I ) = -1
+         END DO
+
+*  Do another pass.
+         GO TO 10
+      END IF
 
       END
