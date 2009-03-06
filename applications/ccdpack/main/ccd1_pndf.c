@@ -231,6 +231,7 @@
 /* Construct a list of NDF names available to the Tcl interpreter as 
    the value of the NDFSETS variable. */
       for ( i = 1; i <= *nset; i++ ) {
+         setname[0] = '\0';
          F77_CALL(grp_get)( INTEGER_ARG(namgid), INTEGER_ARG(&i),
                             INTEGER_ARG(&one), CHARACTER_ARG(fsetname),
                             INTEGER_ARG(status)

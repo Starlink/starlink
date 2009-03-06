@@ -610,6 +610,7 @@
 
 *  If there are only two NDFs, see whether we want to bother the user
 *  with presenting a Chooser widget.
+      CHOOSR = .FALSE.
       IF ( NSET .EQ. 2 ) THEN
          CALL PAR_GET0L( 'CHOOSER', CHOOSR, STATUS )
       END IF
