@@ -603,13 +603,6 @@ itcl::class gaia::GaiaNDAccess {
       return [gaiautils::astclear $wcs $attrib]
    }
 
-   #  Clear the value of an AST attribute.
-   public method astclear {attrib} {
-      set wcs [${type_}::getwcs $handle_]
-      incr prop_changes_
-      return [gaiautils::astclear $wcs $attrib]
-   }
-
    #  Test if the value of an AST attribute has been set.
    public method asttest {attrib} {
       set wcs [${type_}::getwcs $handle_]
