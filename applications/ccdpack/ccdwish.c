@@ -101,22 +101,22 @@
 
 /* Global variables. */
 
-   extern int errno;
-   char buffer[ BUFLENG ];          /* General purpose buffer */
-   Tcl_AsyncHandler ccd_async;      /* Tcl asynchronous event handler */
-   int caught[] = {                 /* Signals caught to make an orderly exit */
-      SIGHUP, SIGINT, SIGQUIT, SIGTERM,  /* Likely signals */
-      0                                  /* List terminator */
-   };
-   int ccdifd = -1;                 /* Downward pipe file descriptor */
-   int ccdofd = -1;                 /* Upward pipe file descriptor */
+extern int errno;
+static char buffer[ BUFLENG + 1 ];          /* General purpose buffer */
+static Tcl_AsyncHandler ccd_async;      /* Tcl asynchronous event handler */
+static int caught[] = {                 /* Signals caught to make an orderly exit */
+    SIGHUP, SIGINT, SIGQUIT, SIGTERM,  /* Likely signals */
+    0                                  /* List terminator */
+};
+int ccdifd = -1;                 /* Downward pipe file descriptor */
+int ccdofd = -1;                 /* Upward pipe file descriptor */
 
 
 /* Prototypes for local functions. */
 
-   Tcl_AsyncProc ccdEndinterp;
-   void ccdSigtcl( int sig );
-   void ccdPipestcl( char *path, int ifd, int ofd );
+static Tcl_AsyncProc ccdEndinterp;
+static void ccdSigtcl( int sig );
+static void ccdPipestcl( char *path, int ifd, int ofd );
 
 /* Fortran functions for querying the command line */
 extern F77_INTEGER_FUNCTION(ccd1_iargc)();
