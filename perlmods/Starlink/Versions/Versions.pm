@@ -708,7 +708,7 @@ sub _get_manifest_file ($$) {
 Given a Starlink version file created for git repositories, return
 version information.
 
-  my \%version = _get_git_version( $file );
+  my \%version = _get_git_version( File => $file );
 
 Returns a hash reference with keys STRING, COMMIT, and
 COMMITDATE. String is composed of the branch name, commit ID, and
@@ -719,19 +719,34 @@ The file must have the branch name as the first line. The second line,
 if it exists, must be the commit ID. The third line, if it exists,
 must be the date in 'YYYY-MM-DD HH:MM:SS TZ' format.
 
+There are two acceptable named arguments. File is a filename, Data is
+an array of values. File overrides Data.
+
 =cut
 
 sub _get_git_version {
-  my $file = shift;
+  my %opts = @_;
 
-  print "Opening git version file $file\n" if $DEBUG;
+  my( $branch, $id, $date );
 
-  open my $fh, "<", $file or return;
+  if( defined( $opts{'File'} ) ) {
 
-  my $branch = <$fh>;
-  chomp($branch);
-  my $id = <$fh>;
-  my $date = <$fh>;
+    my $file = $opts{'File'};
+    print "Opening git version file $file\n" if $DEBUG;
+
+    open my $fh, "<", $file or return;
+
+    $branch = <$fh>;
+    chomp($branch);
+    $id = <$fh>;
+    $date = <$fh>;
+    close $fh;
+
+  } elsif( defined( $opts{'Data'} ) ) {
+    $branch = $opts{'Data'}[0];
+    $id = $opts{'Data'}[1];
+    $date = $opts{'Data'}[2];
+  }
 
   my %info;
   $info{STRING} = $branch;
@@ -749,7 +764,6 @@ sub _get_git_version {
     $info{COMMITDATE} = $dt;
     $info{STRING} .= " (".$dt->datetime.")";
   }
-  close($fh);
 
   return \%info;
 
@@ -975,7 +989,7 @@ sub _get_global_version {
   print "Using manifest dir = $dir\n" if $DEBUG;
   my $file = _get_manifest_file($dir, 'starlink.version');
 
-  return _get_git_version( $file );
+  return _get_git_version( File => $file );
 }
 
 =item B<_get_version>
