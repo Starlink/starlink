@@ -34,7 +34,7 @@
 #     Performs the given method on this object.
 
 #  Copyright:
-#     Copyright (C) 2008 Science and Technology Facilities Council
+#     Copyright (C) 2008-2009 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -169,39 +169,22 @@ itcl::class gaiavo::GaiaVORegistrySearch {
          eval $itk_option(-feedbackcommand) on
       }
 
-      #  Establish objects to run the query scripts.
-      if { $nvoquerytask_ == {} } {
-         set nvoquerytask_ [gaia::GaiaForeignExec \#auto \
-                               -application $::gaia_dir/querynvoreg \
+      #  Establish object to run the query scripts.
+      if { $querytask_ == {} } {
+         set querytask_ [gaia::GaiaForeignExec \#auto \
+                               -application $::gaia_dir/queryreg \
                                -notify [code $this query_done_]]
-      }
-      if { $astroquerytask_ == {} } {
-         set astroquerytask_ [gaia::GaiaForeignExec \#auto \
-                                 -application $::gaia_dir/queryastrogridreg \
-                                 -notify [code $this query_done_]]
       }
 
       set votable_ [$tempcats_ get_typed_name ".vot"]
       set interrupted_ 0
 
-      if { $itk_option(-registry) == "NVO" } { 
-         set predicate {}
-         if { $itk_option(-column) != {} && $itk_option(-substring) != {} } {
-            set predicate "$itk_option(-column) LIKE \'%$itk_option(-substring)%\'"
-         }
-         $nvoquerytask_ runwith [get_registry_] [get_service_] \
-            "$predicate" "$nvoendmethod_" "$votable_"
-
-         set querytask_ $nvoquerytask_
+      if { $itk_option(-column) != {} && $itk_option(-substring) != {} } {
+         $querytask_ runwith [get_registry_] [get_service_] \
+            "$itk_option(-column)" "$itk_option(-substring)" "$votable_"
       } else {
-         if { $itk_option(-column) != {} && $itk_option(-substring) != {} } {
-            $astroquerytask_ runwith [get_registry_] [get_service_] \
-               "$itk_option(-column)" "$itk_option(-substring)" "$votable_"
-         } else {
-            $astroquerytask_ runwith [get_registry_] [get_service_] \
-               "" "" "$votable_"
-         }
-         set querytask_ $astroquerytask_
+         $querytask_ runwith [get_registry_] [get_service_] \
+            "" "" "$votable_"
       }
    }
 
@@ -209,7 +192,7 @@ itcl::class gaiavo::GaiaVORegistrySearch {
    public method interrupt {} {
       if { $querytask_ != {} } {
          set interrupted_ 1
-         catch {$nvoquerytask_ delete_now}
+         catch {$querytask_ delete_now}
          set querytask_ {}
       }
       if { $itk_option(-feedbackcommand) != {} } {
@@ -257,10 +240,7 @@ itcl::class gaiavo::GaiaVORegistrySearch {
 
    #  Translate a service type to its full description or standard ID.
    protected method get_service_ {} {
-      if { $itk_option(-registry) == "NVO" } { 
-         return $services_($itk_option(-service))
-      }
-      return $v1standardIDs_($itk_option(-service))
+      return $standardIDs_($itk_option(-service))
    }
 
    #  Save the result of a query to an external VOTable.
@@ -333,9 +313,7 @@ itcl::class gaiavo::GaiaVORegistrySearch {
    #  Name of the VOTable from query.
    protected variable votable_ {}
 
-   #  Tasks controlling querys.
-   protected variable nvoquerytask_ {}
-   protected variable astroquerytask_ {}
+   #  Task controlling queries.
    protected variable querytask_ {}
 
    #  Set true when a query is being interrupted.
@@ -346,7 +324,7 @@ itcl::class gaiavo::GaiaVORegistrySearch {
 
    #  The known registries.
    protected common registries_
-   set registries_(NVO) "http://nvo.stsci.edu/vor10/NVORegInt.asmx?wsdl"
+   set registries_(NVO) "http://nvo.stsci.edu/vor10/ristandardservice.asmx"
    set registries_(AstroGrid) \
       "http://registry.astrogrid.org/astrogrid-registry/services/RegistryQueryv1_0"
 
@@ -357,13 +335,10 @@ itcl::class gaiavo::GaiaVORegistrySearch {
    set services_(CONE) "ConeSearch"
 
    #  Mapping of short service names to their standard ids.
-   protected common v1standardIDs_
-   set v1standardIDs_(SIAP) "ivo://ivoa.net/std/SIA"
-   set v1standardIDs_(SSAP) "ivo://ivoa.net/std/SSA"
-   set v1standardIDs_(CONE) "ivo://ivoa.net/std/ConeSearch"
-
-   #  The endmethod of the NVO registry.
-   protected common nvoendmethod_ "VOTCapabilityPredicate"
+   protected common standardIDs_
+   set standardIDs_(SIAP) "ivo://ivoa.net/std/SIA"
+   set standardIDs_(SSAP) "ivo://ivoa.net/std/SSA"
+   set standardIDs_(CONE) "ivo://ivoa.net/std/ConeSearch"
 
    #  Possible columns for adding a predicate.
    protected common columns_ "title shortName"
