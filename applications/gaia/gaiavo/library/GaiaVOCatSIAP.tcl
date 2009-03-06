@@ -29,7 +29,7 @@
 #     Performs the given method on this object.
 
 #  Copyright:
-#     Copyright (C) 2008 Science and Technology Facilities Council
+#     Copyright (C) 2008-2009 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
