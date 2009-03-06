@@ -272,8 +272,8 @@ itcl::class gaia::Gaia {
       }
 
       #  Kill the importer dialog, if used.
-      if { $importer_ != {} && [winfo exists $importer_] } {
-         catch {delete object $importer_}
+      if { [info exists $w_.importer] && [winfo exists $w_.importer] } {
+         catch {delete object $w_.importer}
       }
 
       #  The FITS browser needs to release any temporary files
@@ -2087,15 +2087,14 @@ window gives you access to this."
       #  Start import dialog. The output file is fixed and the user
       #  chooses the input file. The format of the output file is a
       #  TAB table.
-      utilReUseWidget gaia::GaiaTextImport $importer_ \
-         -title "Import text file to catalogue" \
-         -outfile "GaiaTextImport.TAB" \
+      utilReUseWidget gaia::GaiaTextImport $w_.importer \
+         -title "Import text file to catalogue ($itk_option(-number))" \
          -format tab \
          -show_infile 1 \
          -show_outfile 1
 
       #  Wait for import to complete and get the catalogue name.
-      lassign [$importer_ activate] outfile
+      lassign [$w_.importer activate] outfile
       if { $outfile != {} && [file exists $outfile] } {
          cat::AstroCat::open_catalog_window \
             $outfile \
@@ -2609,9 +2608,6 @@ window gives you access to this."
 
    #  Unique identifier for items to be ignored when drawn on canvas.
    protected variable ast_tag_ ast_element
-
-   #  The text catalogue importer dialog.
-   protected variable importer_ .importer
 
    #  Control re-creation of the help menu (gets called from Rtd and SkyCat).
    protected variable help_menu_done_ 0
