@@ -1066,6 +1066,16 @@ void ndgGtprv( int indf, int ianc, HDSLoc **prov, int *status ){
 *        longer needed.
 *     status 
 *        The global status.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     6-MAR-2009 (DSB):
+*        Ensure "more" locator is always annulled.
+*     {enter_further_changes_here}
+
 *-
 */
 
@@ -1107,6 +1117,9 @@ void ndgGtprv( int indf, int ianc, HDSLoc **prov, int *status ){
          datAnnul(  &new_more, status );
       }
    }
+
+/* Free remaining resources. */
+   if( more ) datAnnul(  &more, status );
 
 /* Re-instate the original AST status variable. */
    astWatch( old_status );
@@ -1176,7 +1189,9 @@ void ndgGtprvk( int indf, int ianc, AstKeyMap **prov, HDSLoc **more,
 *        returned locator should be annulled using datAnnul when no
 *        longer needed. A NULL pointer may be supplied for this parameter
 *        if the MORE structure is not needed. A NULL pointer will be
-*        returned if the requested ancestor has no MORE component.
+*        returned if the requested ancestor has no MORE component. Note,
+*        the returned object will be assigned an arbitrary HDS Name,
+*        which will not in general be "MORE".
 *     status 
 *        The global status.
 *-
@@ -3541,6 +3556,8 @@ static HDSLoc *ndg1TCopy( HDSLoc *loc, const char *name, int *status ){
 *        The name of the component to copy. It must be scalar (i.e. not an
 *        array). If the supplied structure does not contain a component with
 *        the requested name, a NULL pointer is returned without error.
+*        Note, the name of the returned copy is automatically generated
+*        by HDS and will not in general be the same as "name".
 *     status 
 *        The global status.
 
@@ -3548,6 +3565,17 @@ static HDSLoc *ndg1TCopy( HDSLoc *loc, const char *name, int *status ){
 *     A pointer to a locator for a new temporary HDS object which is a
 *     copy of the specified HDS object.
 
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     6-MAR-2009 (DSB):
+*        Do not attempt to change the name of the returned object to be
+*        the same as the supplied object, since the parent temporary 
+*        object may already contain an object with that name. Instead, 
+*        retain ther name automatically assigned by datTemp since it is
+*        guaranteed to be unique within the parent.
 */
 
 /* Local variables: */
@@ -3566,13 +3594,10 @@ static HDSLoc *ndg1TCopy( HDSLoc *loc, const char *name, int *status ){
 /* Get a locator for the component to be copied. */
       datFind( loc, name, &cloc, status );
 
-/* Create a temporary HDS object with arbitrary name and type. */
-      datTemp( "TEMP", 0, NULL, &result, status );
-
-/* Give it the name and type of the supplied object */
-      datRenam( result, name, status );
+/* Create a temporary HDS object with arbitrary name and the type
+   of the supplied object. */
       datType( cloc, type, status );
-      datRetyp( result, type, status );
+      datTemp( type, 0, NULL, &result, status );
 
 /* Copy all the components inside the component into "result". */
       ndg1CopyComps( cloc, result, status );
