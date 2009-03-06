@@ -18,10 +18,8 @@ dist_pkgdata_DATA = license.terms INCOMPATIBLE CHANGES
 subdirs = config doc itcl itk iwidgets tclconfig tools
 
 ##  Before distributing subdirectories we need to clean then up (we get all
-##  the files in these directories). Also remove the CVS trace and any
-##  softlinks.
+##  the files in these directories). Also remove the softlinks.
 dist-hook:
-	rm -rf `find $(distdir) -type d -name CVS`
 	rm -rf `find $(distdir) -type l`
 	(cd $(distdir)/itcl; make distclean)
 	(cd $(distdir)/itk; make distclean)

@@ -10,9 +10,7 @@ $(RECURSIVE_TARGETS):
 EXTRA_DIST = tcldict
 
 ##  Before distributing subdirectories we need to clean then up (we get all
-##  the files in these directories). Also remove the SVN trace and any
-##  softlinks.
+##  the files in these directories). Also remove any softlinks.
 dist-hook:
-	rm -rf `find $(distdir) -type d -name .svn`
 	rm -rf `find $(distdir) -type l`
 	(cd $(distdir)/tcldict; make distclean)
