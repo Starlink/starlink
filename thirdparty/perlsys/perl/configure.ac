@@ -37,15 +37,13 @@ dnl    push it through as part of optimize.
    test -n "$CFLAGS" && export CFLAGS
    test -n "$CC" && export CC
    test -n "LDFLAGS" && export LDFLAGS
-   args=""
+   args="-g -O2"
    if test -n "$CFLAGS"; then
-      args="-Doptimize=$CFLAGS"
+      args="$CFLAGS"
    fi
    cd perl; \
    rm -f config.sh ; \
-   cmd="./configure.gnu --prefix=${prefix}/Perl -Duserelocatableinc $args"; \
-   echo $cmd; \
-   $cmd; \
+   sh ./Configure -des -Dprefix=${prefix}/Perl -Doptimize="$args"; \
 )
  
 dnl    Install Perl using a staging area to get all files listed in 
