@@ -275,7 +275,7 @@
 
          IF( ALLBAD ) THEN
             CALL NDF_MSG( 'NDF', NDFOUT )
-            CALL MSG_OUT( 'QUALTOBAD_MSG2', 'WARNING: ^NDFOUT '//
+            CALL MSG_OUT( 'QUALTOBAD_MSG2', 'WARNING: ^NDF '//
      :                    'contains no valid Variances values', STATUS )
          END IF
 
