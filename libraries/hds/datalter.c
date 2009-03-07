@@ -6,6 +6,8 @@
 
 /* Include files */
 
+#include <stdio.h>
+
 #include "ems.h"                 /* EMS error reporting routines            */
 
 #include "hds1.h"                /* Global definitions for HDS              */
@@ -266,6 +268,28 @@ datMould( const HDSLoc    *locator,
    return hds_gl_status;
 }
 
+/* Check status and return on error after setting error message that
+   includes the component name. Private version of _call() */
+#define _callnc(event)\
+{\
+*status = (event);\
+if (!_ok(*status))\
+        {\
+        char private_context_message[132];\
+        char dname[DAT__SZNAM+1];\
+        int privstat = DAT__OK;\
+        emsMark();\
+        datName(locator, dname, &privstat );\
+        if (privstat != DAT__OK) dname[0] = '\0';\
+        emsAnnul(&privstat);\
+        emsRlse();\
+        sprintf( private_context_message,\
+                 context_message ": '%s' -> '%s'", dname, name_str); \
+        hds_gl_status = *status;\
+        emsRep(context_name,private_context_message,status);\
+              return hds_gl_status;\
+        }\
+}
 
 /*===========================*/
 /* DAT_RENAM - Rename object */
@@ -310,11 +334,11 @@ datRenam(const HDSLoc *locator,
 /* Return if the container file was opened for read only access.    */
 
    if (data->read)
-      _call(DAT__ACCON)
+      _callnc(DAT__ACCON)
 
 /* Validate the new object name.        */
 
-   _call(dau_check_name( &name, nambuf ))
+   _callnc(dau_check_name( &name, nambuf ))
 
 /* Identify the object record's ID so that the correct slot in the Component
    Record can be identified. Then stick a handle on its parent record. This is
@@ -327,23 +351,23 @@ datRenam(const HDSLoc *locator,
 /* Map to the Component Record Vector and check that no existing component
    has the same name.   */
 
-   _call(rec_get_rcl( &han, &rcl ))
+   _callnc(rec_get_rcl( &han, &rcl ))
    if ( rcl.class == DAT__CONTAINER )
    {
      ncomp = 1;
    }
    else
    {
-      _call(dat1_get_ncomp( &han, &ncomp ))
+      _callnc(dat1_get_ncomp( &han, &ncomp ))
    }
-   _call(rec_locate_data( &han, rcl.dlen, 0, 'U', &crv ))
+   _callnc(rec_locate_data( &han, rcl.dlen, 0, 'U', &crv ))
    for ( i = 0; i < ncomp; i++ )
    {
       dat1_locate_name( crv, i, &name1 );
       if ( _cheql( DAT__SZNAM, nambuf, name1 ) )
       {
          rec_release_data( &han, rcl.dlen, 0, 'U', &crv );
-         _call( DAT__COMEX )
+         _callnc( DAT__COMEX )
       }
    }
 
