@@ -66,18 +66,18 @@ datAlter(const HDSLoc    *locator,
 
    if (state->mapped || state->vmcopy || state->unlike || state->slice ||
        state->cell   || state->vector || state->broken || data->naxes == 0)
-      _call(DAT__OBJIN)
+      _callnam(DAT__OBJIN)
    if (data->read)
-      _call(DAT__ACCON)
+      _callnam(DAT__ACCON)
 
 /* Check that the # of dimensions match.        */
 
    if (data->naxes != ndim)
-      _call(DAT__DIMIN)
+      _callnam(DAT__DIMIN)
 
 /* Read the Object Descriptor Label and associate the axis vector.      */
 
-   _call( dat1_get_odl( &data->han, &odl ))
+   _callnam( dat1_get_odl( &data->han, &odl ))
    axis = odl.axis;
 
 /* Calculate the extent by which the object's size is to be altered.
@@ -87,7 +87,7 @@ datAlter(const HDSLoc    *locator,
    for (i=0; i<=(ndim-2); i++)
    {
       if (dims[i] != axis[i])
-         _call(DAT__DIMIN)
+         _callnam(DAT__DIMIN)
       extent *= dims[i];
    }
    extent *= dims[ndim-1] - axis[ndim-1];
@@ -96,14 +96,14 @@ datAlter(const HDSLoc    *locator,
 /* Validate the new shape of the object and adjust the extent to a byte
    count.       */
 
-   _call( dau_check_shape( ndim, dims, &odl ))
+   _callnam( dau_check_shape( ndim, dims, &odl ))
    obj = &data->obj;
    extent *= obj->length;
 
 /* Expand the record's dynamic domain if the extent is positive.        */
 
    if (extent > 0)
-      _call( rec_extend_record( &data->han, extent ))
+      _callnam( rec_extend_record( &data->han, extent ))
 
 /* Otherwise, shrink the domain if negative, after ensuring that no
    component records exist for an n-dimensional structure object.       */
@@ -113,9 +113,9 @@ datAlter(const HDSLoc    *locator,
       extent = -extent;
       if (data->struc)
       {
-         _call( rec_get_rcl( &data->han, &rcl ))
+         _callnam( rec_get_rcl( &data->han, &rcl ))
          off = rcl.dlen - extent;
-         _call(rec_locate_data( &data->han, extent, off, 'R', &srv ))
+         _callnam(rec_locate_data( &data->han, extent, off, 'R', &srv ))
          ptr = 0;
          for ( i = 0; ( i < extent ) && _ok( hds_gl_status );
                i += SZSRV )
@@ -129,14 +129,14 @@ datAlter(const HDSLoc    *locator,
             }
             rec_release_data( &data->han, extent, off, 'R', &srv );
             if (ptr != 0)
-               _call(DAT__DELIN)
+               _callnam(DAT__DELIN)
       }
-      _call(rec_shrink_record( &data->han, extent ))
+      _callnam(rec_shrink_record( &data->han, extent ))
    }
 
 /* Write the updated Object Descriptor Label and readjust the size.     */
 
-   _call(dat1_put_odl( &data->han, &odl ))
+   _callnam(dat1_put_odl( &data->han, &odl ))
    data->size = size;
 
 /* Adjust the last axis in the Dimension Bounds Table.  */
@@ -181,8 +181,8 @@ datReset( const HDSLoc *locator,
    the domain(D) active flag.   */
 
    if (data->read)
-      _call(DAT__ACCON)
-   _call(rec_reset_record( &data->han ))
+      _callnam(DAT__ACCON)
+   _callnam(rec_reset_record( &data->han ))
    return hds_gl_status;
 }
 
@@ -227,31 +227,31 @@ datMould( const HDSLoc    *locator,
 
    if (state->mapped || state->vmcopy || state->unlike || state->slice ||
        state->cell   || state->vector || state->broken || data->naxes == 0)
-      _call(DAT__OBJIN)
+      _callnam(DAT__OBJIN)
    if (data->read)
-      _call(DAT__ACCON)
+      _callnam(DAT__ACCON)
 
 /* Check that the new dimensionality is less than or equal to the old. Then
    calculate the new size of the object and check that it is the same as
    the existing size.   */
 
    if ((ndim) > data->naxes)
-      _call(DAT__DIMIN)
+      _callnam(DAT__DIMIN)
    size = 1;
    for (i=0; i<(ndim); i++)
       size    *= dims[i];
    if (size != data->size)
-      _call(DAT__DIMIN)
+      _callnam(DAT__DIMIN)
 
 /* Read the Object Descriptor Label (needed for the object type) and validate
    the new shape of the object. */
 
-   _call(dat1_get_odl( &data->han, &odl ))
-   _call(dau_check_shape( ndim, dims, &odl ))
+   _callnam(dat1_get_odl( &data->han, &odl ))
+   _callnam(dau_check_shape( ndim, dims, &odl ))
 
 /* Write the updated Object Descriptor Label.   */
 
-   _call(dat1_put_odl( &data->han, &odl ))
+   _callnam(dat1_put_odl( &data->han, &odl ))
 
 /* Adjust the number of dimensions and the Dimension Bounds Table.      */
 
@@ -431,11 +431,11 @@ datRetyp(const HDSLoc *locator,
 
 /* Return if the container file was opened for read only access.            */
    if (data->read)
-      _call(DAT__ACCON)
+      _callnam(DAT__ACCON)
 
 /* Validate the new object type specification and pack it.                  */
-   _call(dat1_check_type( &type, typbuf ))
-   _call( dat1_unpack_type( typbuf, &pdd ) )
+   _callnam(dat1_check_type( &type, typbuf ))
+   _callnam( dat1_unpack_type( typbuf, &pdd ) )
 
 /* Check that the change in type does not imply a change from a structure   */
 /* type to a primitive type (or vice versa). Report an error if it does.    */
@@ -467,12 +467,12 @@ change in object size (possible programming error).",
 /* Read the Object Descriptor Label. */
    else
    {
-      _call(dat1_get_odl( &data->han, &odl ))
+      _callnam(dat1_get_odl( &data->han, &odl ))
 
 /* Copy the new packed type specification to the Object Descriptor Label    */
 /* and then rewrite the Object Descriptor Label.                            */
       _chmove( DAT__SZTYP, typbuf, odl.type );
-      _call( dat1_put_odl( &data->han, &odl ) )
+      _callnam( dat1_put_odl( &data->han, &odl ) )
 
 /* Store the packed and unpacked forms of the new type in the LCP.          */
       _chmove( DAT__SZTYP, typbuf, data->type );
