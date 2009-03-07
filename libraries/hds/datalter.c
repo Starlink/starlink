@@ -207,7 +207,7 @@ datMould( const HDSLoc    *locator,
    struct LCP_STATE *state;
    struct ODL       odl;
    HDS_PTYPE        (*dbt)[2];
-   INT_BIG          size;
+   UINT_BIG          size;
    int              i;
 
 /* Enter routine.       */
