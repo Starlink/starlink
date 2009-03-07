@@ -183,6 +183,30 @@ if (!_ok(*status))\
         }\
 }
 
+/* Check status and return on error after setting error message that
+   includes the component name. Variable "locator" must be in scope
+   and refer to the relevant locator. */
+#define _callnam(event)\
+{\
+*status = (event);\
+if (!_ok(*status))\
+	{\
+        char private_context_message[132];\
+        char dname[DAT__SZNAM+1];\
+        int privstat = DAT__OK;\
+        emsMark();\
+        datName(locator, dname, &privstat );\
+        if (privstat != DAT__OK) dname[0] = '\0';\
+        emsAnnul(&privstat);\
+        emsRlse();\
+        sprintf( private_context_message,\
+             context_message ": '%s'", dname);\
+        hds_gl_status = *status;\
+        emsRep(context_name,private_context_message,status);\
+	      return hds_gl_status;\
+        }\
+}
+
 /* Data Structure Definitions:						    */
 /* ==========================						    */
 /* PRM - Union to hold all the primitive data types.			    */
