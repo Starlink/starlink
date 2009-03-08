@@ -48,6 +48,8 @@
  *    02 Sep 2005 (timj):
  *       Now use C main and inti runtime library. Do not try to
  *       stay running if SIGBUS or SIGSEGV occurs.
+ *    07 Mar 2009 (timj):
+ *       Integrate dipso changes for HAVE_FC_MAIN
  *    {enter_changes_here}
 
  * Bugs:
@@ -78,16 +80,20 @@ extern F77_SUBROUTINE(scl_main)( INTEGER(n) );
 extern F77_SUBROUTINE(ndf_end)( INTEGER(status) );
 extern F77_SUBROUTINE(hds_stop)( INTEGER(status) );
 
-#if HAVE_FC_MAIN
-void FC_MAIN () {}
-#endif
-
 /*  Global Variables: */
 jmp_buf here;      
 
-/* Play it safe and use a C main rather than a fortran entry point */
+/* FC_MAIN can be a macro expanding to the entry point used by the
+ * Fortran RTL. When that is true assume all Fortran initialisations are
+ * done, otherwise we need to take more care.
+ */
 
-int main () {
+#if HAVE_FC_MAIN
+int FC_MAIN ( void ) {
+#else
+int main ( void ) {
+#endif
+
 
 /*  Local Variables: */
       DECLARE_INTEGER(n);
@@ -102,8 +108,10 @@ int main () {
  
 #endif
 
-      /* Initialise fortran runtime */
+      /* Initialise fortran runtime if not a fortran main */
+#if ! HAVE_FC_MAIN
       cnfInitRTL( 0, NULL );
+#endif
 
 /*  Use the setjmp function to define here to be the place to which the
  *  signal handling function will jump when a signal is detected. Zero is
