@@ -4,15 +4,19 @@ bin_PROGRAMS = specx specx_help
 
 AM_FCFLAGS = -I../inc
 
-specx_SOURCES = run_specx.c scl_main.f TITLE
+specx_SOURCES = run_specx.c
 specx_help_SOURCES = helpm.c
 
 specx_help_LDADD = `shl_link` @FCLIBS@
+
+noinst_LTLIBRARIES = libspecx.la
+libspecx_la_SOURCES = scl_main.f TITLE
 
 FIG_LIBS = \
 -lfigfit -lfigtio -lfigich -lfiggen
 
 specx_LDADD = \
+libspecx.la \
 ../command/libcommand.la \
 ../exprt/libexprt.la \
 ../external/libexternal.la \
