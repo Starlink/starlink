@@ -9,7 +9,7 @@
 #     Query a (the) VO registry for services.
 
 #  Description:
-#     Extends the GaiaVOCat class to query the supported registries 
+#     Extends the GaiaVOCat class to query the supported registries
 #     for services of a given capability.
 
 #  Invocations:
@@ -85,13 +85,13 @@ itcl::class gaiavo::GaiaVOCatRegistry {
 
    #  Make the interface conform to our usage. The "Open" button should
    #  be "Accept" and "Close" should be "Cancel" when we're offering a
-   #  whole catalog service, otherwise we keep "Open" and "Close" and 
+   #  whole catalog service, otherwise we keep "Open" and "Close" and
    #  deal with row-based actions.
    public method init {} {
       GaiaVOCat::init
 
       wm title $w_ "Query VO Registry for services"
-      
+
       if { $itk_option(-whole_operation) } {
          $itk_component(open) configure -text "Accept"
          add_short_help $itk_component(open) {Accept list of services}
@@ -107,14 +107,19 @@ itcl::class gaiavo::GaiaVOCatRegistry {
       #  and delete of selected rows.
       bind $lbox <1> [code $this focus_listbox_]
 
-      #  Double click is same as "Edit", which allows an extended view.
-      bind $lbox <Double-1> [code $this edit_selected_object]
+      #  Double click is same as "Open", unless this is a whole_operation
+      #  in which case it is "Edit".
+      if { $itk_option(-whole_operation) } {
+         bind $lbox <Double-1> [code $this edit_selected_object]
+      } else {
+         bind $lbox <Double-1> [code $this open]
+      }
 
       #  Delete removes the selected rows.
       bind $lbox <Delete> [code $this remove_selected]
 
       #  Read the registry catalogue, if given.
-      if { $itk_option(-catalog) != {} && 
+      if { $itk_option(-catalog) != {} &&
            [::file exists $itk_option(-catalog)] } {
          $itk_component(registry) read_query $itk_option(-catalog)
 
@@ -144,7 +149,7 @@ itcl::class gaiavo::GaiaVOCatRegistry {
       }
    }
 
-   #  Close the window, activated in response to a cancel. Only difference to 
+   #  Close the window, activated in response to a cancel. Only difference to
    #  accept is what argument is used to qualify activate_cmd.
    public method close {} {
       if { $itk_option(-whole_operation) } {
@@ -171,7 +176,7 @@ itcl::class gaiavo::GaiaVOCatRegistry {
    }
 
    #  Open a service. In this case it means accept the whole catalogue which
-   #  could be modified and in a new catalogue, so we need to attempt to 
+   #  could be modified and in a new catalogue, so we need to attempt to
    #  update the initial catalogue with this new content. Note we change the
    #  meaning of activate_cmd when operating on a whole catalogue.
    protected method open_service_ {args} {

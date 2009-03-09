@@ -19,9 +19,9 @@
  *     listvot
 
  *  Parameters:
- *     in = string 
+ *     in = string
  *        Filename of the VOTable.
- 
+
  *  Authors:
  *     PWD: Peter Draper (JAC, Durham University)
  *     {enter_new_authors_here}
@@ -45,7 +45,7 @@
  *     along with this program; if not, write to the Free Software
  *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
  *     02111-1307, USA
- 
+
  *  History:
  *     09-JUL-2008 (PWD):
  *        Original version.
