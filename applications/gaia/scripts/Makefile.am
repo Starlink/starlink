@@ -6,7 +6,7 @@ SCRIPTS_GAIA = displaycat displaypolcat gaia.csh gaiacmap.sh gaiacut \
                gaiadisp gaiadisp.csh gaiadisp.sh gaiaremote.sh gaia.sh \
                gaia_standalone.csh gaiawcs2tab pix2wcs tabbedgaia.csh \
                tabbedgaia.sh wcs2pix zoomcutandflip connect_to_gaia.tcl \
-               querynvoreg querysiap ftpget queryastrogridreg querycone
+               querysiap ftpget querycone queryreg
 
 ##  Edit the main startup scripts so that they set the LD_LIBRARY_PATH
 ##  to include the installation libdir.
