@@ -7,6 +7,10 @@ and which may be of use to anyone developing their own KAPPA-like
 applications (see SUN/238).
 
 Version 2.8
+   - KPG1_BADBX added. It returns an NDF identifier for the smallest section 
+     of a supplied NDF that encloses all the good data values in the NDF.
+   - KPG1_BBOX<T> added. It obtains the pixel bounding box of a given value
+     within an N-dimensional data array.
    - KPG1_LIKE added. It obtains a section of an NDF that matches either
      the pixel or WCS shape of a given template NDF.
    - KPG1_KYMAP can read vectors as well as scalars from a GRP

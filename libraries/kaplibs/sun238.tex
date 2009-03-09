@@ -8,7 +8,7 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {238.5}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {30th June 2006}
+\newcommand{\stardocdate}      {9th March 2009}
 \newcommand{\stardoctitle}     {KAPLIBS \\ [1ex]
                                 Internal subroutines used within
                                 the KAPPA package.}
@@ -723,6 +723,28 @@ related items to be removed.
 
 \section{Changes in Version 2.8}
 \begin{itemize}
+
+\item KPG1\_BADBX added. It returns an NDF identifier for the smallest section 
+     of a supplied NDF that encloses all the good data values in the NDF.
+\item KPG1\_BBOX$<$T$>$ added. It obtains the pixel bounding box of a given value
+     within an N-dimensional data array.
+\item KPG1\_LIKE added. It obtains a section of an NDF that matches either
+     the pixel or WCS shape of a given template NDF.
+\item KPG1\_KYMAP can read vectors as well as scalars from a GRP
+     group into an AST keyMap.
+\item kaplibs\_link script now works without attempting to load ADAM
+     symbols
+\item Can now be built as a shared library
+\item Added kpg1\_astcmn to provide access to KPG\_AST private common block
+\item The HLP helper routines are no longer part of kaplibs. Use SHL
+     library instead.
+\item kpg1\_scrsz no longer present. Please use one\_scrsz instead.
+\item now released under the GPL
+\item kpgGtfts and kpgPtfts can now be used to read and write
+     AST FitsChan objects from/to an NDF
+\item kaplibs no longer links against Tk (the one Tk routine has been
+     removed from kaplibs)
+\item kaplibs now has a public C interface (but not for all routines)
 \item Added KPG1\_CGET, which returns the value of an NDF character
      component removing any AST or PGPLOT escape sequences.
 \item Added KPG1\_MXMNX, which provides a single interface to the
@@ -741,7 +763,7 @@ related items to be removed.
 
 \section{Changes in Version 2.6}
 \begin{itemize}
-\item The GRF mdoule (grf\_kaplibs.c) has been upgraded to include the
+\item The GRF module (grf\_kaplibs.c) has been upgraded to include the
 extra functions needed by AST V3.2.
 \end{itemize}
 
@@ -2533,6 +2555,33 @@ from one graphical element to another.
    }
 }
 \sstroutine{
+   FTS1\_BLVAL
+}{
+   Blanks out the value from a FITS-header card
+}{
+   \sstdescription{
+      This routine modifies a FITS-header card by replacing the value
+      with blank characters, leaving the keyword, value indicator and
+      any comment in situ.  If the header has no value, the header is
+      returned unchanged.
+   }
+   \sstinvocation{
+      CALL FTS1\_BLVAL( HEADER, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         HEADER = CHARACTER $*$ ( 80 ) (Given \& Returned)
+      }{
+         The FITS-header card.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    FTS1\_BSWAP
 }{
    Swaps adjacent bytes in an array of bytes
@@ -2969,9 +3018,12 @@ from one graphical element to another.
          EDITS( NKEY ) = CHARACTER $*$ ( $*$ ) (Given)
       }{
          The editing commands.  These need only be one character per
-         element.  Allowed values are {\tt '}Delete{\tt '}, {\tt '}Exist{\tt '}, {\tt '}Move{\tt '},
-         {\tt '}Rename{\tt '}, {\tt '}Print{\tt '}, {\tt '}Update{\tt '}, and {\tt '}Write{\tt '}, which can be
-         abbreviated to the initial letter.
+         element.  Allowed values are {\tt '}Amend{\tt '}, {\tt '}Delete{\tt '}, {\tt '}Exist{\tt '},
+         {\tt '}Move{\tt '}, {\tt '}Null{\tt '}{\tt '}, {\tt '}Rename{\tt '}, {\tt '}Print{\tt '}, {\tt '}Update{\tt '}, and {\tt '}Write{\tt '},
+         which can be abbreviated to the initial letter.
+
+         {\tt '}Amend{\tt '} acts as {\tt '}Update{\tt '} if the keyword exists, but as {\tt '}Write{\tt '}
+         if the keyword is absent.
 
          {\tt '}Delete{\tt '} removes a named keyword.
 
@@ -2982,6 +3034,9 @@ from one graphical element to another.
          second keyword.  When this positional keyword is not supplied,
          it defaults to the END card, and if the END card is absent,
          the new location is at the end of the headers.
+
+         {\tt '}Null{\tt '} nullifies the value of the named keyword.  Spaces
+         substitute the keyword{\tt '}s value.
 
          {\tt '}Print{\tt '} causes the value of a named keyword to be displayed to
          standard output.  This will be a blank for a comment card.
@@ -3022,22 +3077,24 @@ from one graphical element to another.
          The position keyword names.  A position name may be compound
          to handle hierarchical keywords, and it has the form
          keyword1.keyword2.keyword3 etc.  The maximum number of
-         keywords per FITS card is 20.  Each keyword must be no longer
-         than 8 characters.  When locating the position card,
+         keywords per FITS card is twenty.  Each keyword must be no
+         longer than eight characters.  When locating the position card,
          comparisons are made in uppercase and with the blanks removed.
 
          The new keywords are inserted immediately before each
          corresponding position keyword.  If any name in it does not
-         exist in FITS array, in the Write and Move edits its
+         exist in FITS array, the consequences will be as follows.  In
+         the Write, Amend (new keyword), and Move edits its
          corresponding keyword will be inserted just before the END
          card or appended to FITS array when the END card does not
-         exist (for the Write and Move edits); however, the card is not
-         relocated for the Update edit.  If two or more new cards have
-         the same position name, they will all be put just before the
-         position name in the same order as they are in NAMES.
+         exist; however, the card is not relocated for an Update or
+         Amend (with an existing keyword) edit.  If two or more new
+         cards have the same position name, they will all be put just
+         before the position name in the same order as they are in
+         NAMES.
 
-         A positional keyword is used by the Move, Write, and Update
-         editing commands.
+         A positional keyword is used by the Move, Write, Amend, and
+         Update editing commands.
       }
       \sstsubsection{
          KOCCUR( NKEY ) = INTEGER (Given)
@@ -3156,10 +3213,12 @@ from one graphical element to another.
       \sstsubsection{
          EDITS( MAXMOD ) = CHARACTER $*$ ( $*$ ) (Returned)
       }{
-         The editing commands.  These need only be one character per
-         element.  Allowed values are {\tt '}Delete{\tt '}, {\tt '}Exist{\tt '}, {\tt '}Move{\tt '},
-         {\tt '}Rename{\tt '}, {\tt '}Print{\tt '}, {\tt '}Update{\tt '}, and {\tt '}Write{\tt '}, which can be
-         abbreviated to the initial letter.
+         The editing commands.  Allowed values are {\tt '}Amend{\tt '}, {\tt '}Delete{\tt '},
+         {\tt '}Exist{\tt '}, {\tt '}Move{\tt '}, {\tt '}Rename{\tt '}, {\tt '}Print{\tt '}, {\tt '}Update{\tt '}, and {\tt '}Write{\tt '}.
+         Each element can be abbreviated to the initial letter.
+
+         {\tt '}Amend{\tt '} acts as {\tt '}Update{\tt '} if the keyword exists, but as {\tt '}Write{\tt '}
+         if the keyword is absent.
 
          {\tt '}Delete{\tt '} removes a named keyword.
 
@@ -3170,6 +3229,9 @@ from one graphical element to another.
          second keyword.  When this positional keyword is not supplied,
          it defaults to the END card, and if the END card is absent,
          the new location is at the end of the headers.
+
+         {\tt '}Null{\tt '} nullifies the value of the named keyword.  Spaces
+         substitute the keyword{\tt '}s value.
 
          {\tt '}Print{\tt '} causes the value of a named keyword to be displayed to
          standard output.  This will be a blank for a comment card.
@@ -3192,8 +3254,8 @@ from one graphical element to another.
          The names of the keywords to be edited in the FITS card
          array.  A name may be compound to handle hierarchical
          keywords, and it has the form keyword1.keyword2.keyword3 etc.
-         The maximum number of keywords per FITS card is 20.  Each
-         keyword must be no longer than 8 characters, and be a valid
+         The maximum number of keywords per FITS card is twenty.  Each
+         keyword must be no longer than eight characters, and be a valid
          FITS keyword comprising alphanumeric characters, hyphen, and
          unsderscore.  Any lowercase letters are converted to uppercase
          and blanks are removed before inserted or comparison with the
@@ -3202,7 +3264,8 @@ from one graphical element to another.
          The keywords {\tt '} {\tt '}, {\tt '}COMMENT{\tt '}, and {\tt '}HISTORY{\tt '} are comment cards
          and do not have a value.
 
-         The keyword must exist except for the Write and Exist commands.
+         The keyword must exist except for the Amend, Write, and Exist
+         commands.
       }
       \sstsubsection{
          PSTNS( NKEY ) = CHARACTER $*$ ( $*$ ) (Given)
@@ -3210,22 +3273,24 @@ from one graphical element to another.
          The position keyword names.  A position name may be compound
          to handle hierarchical keywords, and it has the form
          keyword1.keyword2.keyword3 etc.  The maximum number of
-         keywords per FITS card is 20.  Each keyword must be no longer
-         than 8 characters.  When locating the position card,
+         keywords per FITS card is twenty.  Each keyword must be no
+         longer than eight characters.  When locating the position card,
          comparisons are made in uppercase and with the blanks removed.
 
          The new keywords are inserted immediately before each
          corresponding position keyword.  If any name in it does not
-         exist in FITS array, in the Write and Move edits its
+         exist in FITS array, the consequences will be as follows.  In
+         the Write, Amend (new keyword), and Move edits its
          corresponding keyword will be inserted just before the END
          card or appended to FITS array when the END card does not
-         exist; however, the card is not relocated for the Update edit.
-         If two or more new cards have the same position name, they
-         will all be put just before the position name in the same
-         order as they are in NAMES.
+         exist; however, the card is not relocated for an Update or
+         Amend (with an existing keyword) edit.  If two or more new
+         cards have the same position name, they will all be put just
+         before the position name in the same order as they are in
+         NAMES.
 
-         A positional keyword is used by the Move, Write, and Update
-         editing commands.
+         A positional keyword is used by the Move, Write, Amend, and
+         Update editing commands.
       }
       \sstsubsection{
          KOCCUR( NKEY ) = INTEGER (Given)
@@ -3261,8 +3326,8 @@ from one graphical element to another.
       \sstsubsection{
          COMNTS( NKEY ) = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The comments to be written to the NAMES keywords for the
-         Update and Write editing commands.  The special value {\tt '}\$C{\tt '}
+         The comments to be written to the NAMES keywords for the Amend,
+         Update, and Write editing commands.  The special value {\tt '}\$C{\tt '}
          means use the current comment.  In addition \$C(keyword)
          requests that the comment of the keyword given between the
          parentheses be assigned to the keyword being edited.  If this
@@ -3279,7 +3344,7 @@ from one graphical element to another.
          special values: {\tt '}COMMENT{\tt '} to indicate that the card is a
          comment (so strictly it has no type), and {\tt '} {\tt '} to indicate that
          the data type is unknown, as occurs for a value defined by a
-         reference keyword.  The length should be at least 8
+         reference keyword.  The length should be at least eight
          characters.
       }
       \sstsubsection{
@@ -3774,6 +3839,62 @@ from one graphical element to another.
          STATUS = INTEGER (Given and Returned)
       }{
          The global status.
+      }
+   }
+}
+\sstroutine{
+   FTS1\_GVALC
+}{
+   Extracts a string value from a FITS header
+}{
+   \sstdescription{
+      This routines determines the location of a character value within
+      a FITS header and hence the value itself.  The location of the
+      delimiting quote marks and string value are returned.
+   }
+   \sstinvocation{
+      CALL FTS1\_GVALC( HEADER, CSTART, CEND, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         HEADER = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The FITS header {\tt '}card{\tt '} whose value is to be extractd.
+      }
+      \sstsubsection{
+         CSTART = INTEGER (Given)
+      }{
+         The column containing the leading quote of the string value.
+         This is set to zero if no string value could be found.
+      }
+      \sstsubsection{
+         CEND = INTEGER (Given)
+      }{
+         The column containing the trailing quote of the string value.
+         This is set to zero if no string value could be found.
+      }
+      \sstsubsection{
+         VALUE = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The character value.  CARD should contain at least 68
+         characters.  A blabnnk string is returned if the header failed
+         to contain a character value.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         It is assumed that the header conforms to the FITS Standard,
+         with one exception.  Single quotes within a string---these should
+         be doubled---are detected provided that the next solidus after a
+         single quote will be a comment delimiter rather than literal text
+         in the string.
       }
    }
 }
@@ -5118,8 +5239,8 @@ from one graphical element to another.
       value and comment.
 
       Field 1:  This specifies the editing operation.  Allowed values
-      are Delete, Exist, Move, Read, Write, and Update, and can be
-      abbreviated to the initial letter.  Delete removes a named
+      are Amend, Delete, Exist, Move, Null, Read, Write, and Update, and
+      can be abbreviated to the initial letter.  Delete removes a named
       keyword.  Read causes the value of a named keyword to be
       displayed to standard output.  Exist reports TRUE to standard
       output if the named keyword exists in the header, and FALSE if
@@ -5132,12 +5253,14 @@ from one graphical element to another.
       command.  Update revises the value and/or the comment.  If a
       secondary keyword is defined explicitly, the card may be
       relocated at the same time.  Update requires that the keyword
-      exists.
+      exists.  Amend behaves as Write if the keyword in Field 2 is
+      not already present, or as Update if the keyword exists.  Null
+      replaces the value of a named keyword with blanks.
 
       Field 2:  This specifies the keyword to edit, and optionally the
       position of that keyword in the header after the edit (for Move,
-      Write and Update edits).  The new position in the header is
-      immediately before a positional keyword, whose name is given in
+      Write, Update, and Amend edits).  The new position in the header
+      is immediately before a positional keyword, whose name is given in
       parentheses concatenated to the edit keyword.  See {\tt "}Field 1{\tt "} for
       defaulting when the position parameter is not defined or is null.
 
@@ -5167,11 +5290,11 @@ from one graphical element to another.
 
       Field 3:
       This specifies the value to assign to the edited keyword in the
-      the Write and Update operations, or the name of the new keyword
-      in the Rename modification.  If the keyword exists, the existing
-      value or keyword is replaced, as appropriate.  The data type used
-      to store the value is inferred from the value itself.  See topic
-      {\tt "}Value Data Types{\tt "}.
+      the Amend, Write, and Update operations, or the name of the new
+      keyword in the Rename modification.  If the keyword exists, the
+      existing value or keyword is replaced, as appropriate.  The data
+      type used to store the value is inferred from the value itself.
+      See topic {\tt "}Value Data Types{\tt "}.
 
       For the Update and Write modifications there is a special value,
       \$V, which means use the current value of the edited keyword,
@@ -5185,7 +5308,7 @@ from one graphical element to another.
 
       Field 4:
       This specifies the comment to assign to the edited keyword for the
-      Write and Update operations.  A leading {\tt '}/{\tt '} should not be
+      Amend, Write, and Update operations.  A leading {\tt '}/{\tt '} should not be
       supplied.
 
       There is a special value, \$C, which means use the current comment
@@ -5248,6 +5371,14 @@ from one graphical element to another.
           W AIRMASS 1.379
       This writes a real value to new keyword AIRMASS, which will be
       located at the end of the FITS extension.
+
+          A AIRMASS 1.379
+      This writes a real value to keyword AIRMASS if it exists,
+      otherwise it writes a real value to new keyword AIRMASS located
+      at the end of the FITS extension.
+
+          N AIRMASS
+      This blanks the value of the AIRMASS keyword, if it exists.
 
           W FILTER(AIRMASS) Y
       This writes a logical true value to new keyword FILTER, which
@@ -13468,6 +13599,43 @@ from one graphical element to another.
    }
 }
 \sstroutine{
+   KPG1\_BADBX
+}{
+   Obtain an NDF section containing all good data in the supplied NDF
+}{
+   \sstdescription{
+      This routine finds the pixel bounding box that encloses all good
+      data values in the DATA array of supplied NDF. It then creates and
+      returns an NDF section corresponding to this bounding box.
+   }
+   \sstinvocation{
+      CALL KPG1\_BADBX( NDF, MXDIM, NGOOD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF1 = INTEGER (Given)
+      }{
+         The input NDF identifier.
+      }
+      \sstsubsection{
+         INDF2 = INTEGER (Returned)
+      }{
+         An identifier for the smallest NDF section that contains all
+         good DATA values in the the input NDF.
+      }
+      \sstsubsection{
+         NGOOD = INTEGER (Returned)
+      }{
+         The number of good DATA values in the supplied NDF$>$
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    KPG1\_BILNR
 }{
    Perform bi-linear interpolation checking for bad values
@@ -13766,49 +13934,31 @@ from one graphical element to another.
       the largest integer.  $*$ indicates all integers, i.e. the bounds
       would be the smallest (non-bad) and largest integers. $*$-4
       would specify a range from the smallest integer to 4 inclusive.
-
-      Arguments:
-       NOS = CHARACTER $*$ ( $*$ ) (Given)
-           Number specification.
-       FIRST = INTEGER (Returned)
-           First integer in the sequence.
-       LAST  = INTEGER (Returned)
-           Last integer in the sequence.
-       STATUS = INTEGER (Given and Returned)
-           Global status value.
-
-      Algorithm:
-      \sstitemlist{
-
-         \sstitem
-            Find character position of the number separator and wildcard
-            if present. Report an error if the first character is a
-            separator.
-
-         \sstitem
-            If there is no separator and no wildcard convert from
-            character to integer the single value and use for the upper
-            and lower limits.
-
-         \sstitem
-            If there is a separator and the wildcard comes before it
-            set the lower limit to the minimum integer and convert the
-            upper limit.
-
-         \sstitem
-            If there is a separator and the wildcard comes after it
-            set the upper limit to the largest positive integer and
-            convert the lower limit.
-
-         \sstitem
-            If there is a separator and no wildcard determine the first
-            and last numbers either side of the separator by type
-            conversion.  If the first is greater than the last then swap
-            them.
-      }
    }
    \sstinvocation{
       CALL KPG1\_CNLIM( NOS, FIRST, LAST, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NOS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Number specification.
+      }
+      \sstsubsection{
+         FIRST = INTEGER (Returned)
+      }{
+         First integer in the sequence.
+      }
+      \sstsubsection{
+         LAST  = INTEGER (Returned)
+      }{
+         Last integer in the sequence.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         Global status value.
+      }
    }
 }
 \sstroutine{
@@ -18326,6 +18476,50 @@ from one graphical element to another.
    }
 }
 \sstroutine{
+   KPG1\_LIKE
+}{
+   Create a section from an NDF that matches the area of another NDF
+}{
+   \sstdescription{
+      This routine returns an identifier for a section of a supplied
+      NDF (INDF1) that covers the same area as a second template NDF
+      (INDF2). The area matched can be either the pixel area, or the WCS
+      area.
+   }
+   \sstinvocation{
+      CALL KPG1\_LIKE( INDF1, INDF2, LIKWCS, INDF3, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF1 = INTEGER (Given)
+      }{
+         The first NDF, from which a section is required.
+      }
+      \sstsubsection{
+         INDF2 = INTEGER (Given)
+      }{
+         The second NDF, which defines teh required area.
+      }
+      \sstsubsection{
+         LIKWCS = LOGICAL (Given)
+      }{
+         If .TRUE., then the section selected from INDF1 matches the WCS
+         bounding box of INDF2. If .FALSE., then the section selected
+         from INDF1 matches the pixel index bounding box of INDF2.
+      }
+      \sstsubsection{
+         INDF3 = INTEGER (Returned)
+      }{
+         The required section of INDF1.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    KPG1\_LINTD
 }{
    Obtains a linear transformation between 2 sets of x,y positions
@@ -19675,8 +19869,8 @@ from one graphical element to another.
 \sstroutine{
    KPG1\_OPGRD
 }{
-   Gets the parameters of an optimal projection for a given set of sky
-   positions
+   Gets the parameters of an optimal projection for a given set of
+   sky positions
 }{
    \sstdescription{
       This routine calculates the parameters of a tangent-plane
@@ -19706,10 +19900,10 @@ from one graphical element to another.
       }{
          If .TRUE., then it is assumed that the X grid axis increases
          westwards (assuming north is parallel to $+$ve Y). This is the
-         case for most celestial co-ordinate systems such as (RA,Dec) etc.
-         If .FALSE., then it is assumed that the X grid axis increases
-         eastwards (assuming north is parallel to $+$ve Y). This is the
-         case for a few systems such as (az,el) and geographic
+         case for most celestial co-ordinate systems such as (RA,Dec)
+         etc.  If .FALSE., then it is assumed that the X grid axis
+         increases eastwards (assuming north is parallel to $+$ve Y). This
+         is the case for a few systems such as (az,el) and geographic
          (longitude,latitude).
       }
       \sstsubsection{
@@ -19717,16 +19911,17 @@ from one graphical element to another.
       }{
          The projection parameters. Each parameter that is supplied with
          a value of AST\_\_BAD on entry will be replaced on exit with the
-         optimal value. Non-bad supplied values will be left unchanged on
-         exit. The supplied values will also be left unchanged if optimal
-         values cannot be determined. They are stored in the order CRPIX1,
-         CRPIX2, CRVAL1, CRVAL2, CDELT1, CDELT2, CROTA2. CRPIX1 and CRPIX2
-         are in units of pixels. All the other projection parameters will
-         be in units of radians, and refer to the celestial coodinate
-         system in which the POS values are supplied. CROTA2 is the angle
-         from the Y axis to celestial north, measured north through east
-         (no matter what the value of WEST). Returned pixel sizes are
-         rounded to the nearest tenth of an arc-second.
+         optimal value. Non-bad supplied values will be left unchanged
+         on exit. The supplied values will also be left unchanged if
+         optimal values cannot be determined. They are stored in the
+         order CRPIX1, CRPIX2, CRVAL1, CRVAL2, CDELT1, CDELT2, CROTA2.
+         CRPIX1 and CRPIX2 are in units of pixels. All the other
+         projection parameters will be in units of radians, and refer to
+         the celestial co-ordinate system in which the POS values are
+         supplied. CROTA2 is the angle from the Y axis to celestial
+         north, measured north through east (no matter the value of
+         WEST). Returned pixel sizes are rounded to the nearest tenth of
+         an arcsecond.
       }
       \sstsubsection{
          RDIAM = DOUBLE PRECISION (Returned)
@@ -25813,6 +26008,93 @@ from one graphical element to another.
    }
 }
 \sstroutine{
+   KPG1\_BBOXx
+}{
+   Determine the bounding box of selected pixels in an n-dimensional
+   array
+}{
+   \sstdescription{
+      This routine compresses an n-dimensional array by integer factors
+      along each dimension by summing the array values in a rectangular
+      box.  The output may be normalised to take account of any bad
+      values that may be present.
+   }
+   \sstinvocation{
+      CALL KPG1\_BBOXx( NDIM, LBND, UBND, ARRAY, VALUE, EQUAL, BLBND,
+                       BUBND, NPASS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NDIM = INTEGER (Given)
+      }{
+         The dimensionality of the n-dimensional array.
+      }
+      \sstsubsection{
+         LBND( NDIM ) = INTEGER (Given)
+      }{
+         The lower pixel index bounds of the input n-dimensional array.
+      }
+      \sstsubsection{
+         UBND( NDIM ) = INTEGER (Given)
+      }{
+         The upper pixel index bounds of the input n-dimensional array.
+      }
+      \sstsubsection{
+         ARRAY( $*$ ) = ? (Given)
+      }{
+         The input n-dimensional data array.
+      }
+      \sstsubsection{
+         VALUE = ? (Given)
+      }{
+         The data value used to define the box. VAL\_\_BADx is a legal
+         value for this argument.
+      }
+      \sstsubsection{
+         EQUAL = LOGICAL (Given)
+      }{
+         If .TRUE., then the returned box encloses all pixels with value
+         equal to VALUE. If .FALSE., then the returned box encloses all
+         pixels with value not equal to VALUE.
+      }
+      \sstsubsection{
+         BLBND( NDIM ) = INTEGER (Returned)
+      }{
+         The lower pixel index bounds of the required box.
+      }
+      \sstsubsection{
+         BUBND( NDIM ) = INTEGER (Returned)
+      }{
+         The upper pixel index bounds of the required box.
+      }
+      \sstsubsection{
+         NPASS = INTEGER (Returned)
+      }{
+         The number of array elements that pass the test specified by
+         VALUE and EQUAL. In general, the number of elements in the
+         returned bounding box will be greater than NPASS.
+      }
+      \sstsubsection{
+         STATUS  =  INTEGER (Given and Returned).
+      }{
+         Global status value
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for the following numeric data types:
+         replace {\tt "}x{\tt "} in the routine name by D or R as appropriate.  The
+         input and output data arrays plus a work space must have the
+         data type specified.
+      }
+   }
+   \sstbugs{
+      \{note\_bugs\_here\}
+   }
+}
+\sstroutine{
    KPG1\_BL1Dx
 }{
    Smooth a 1D vector using a block average filter
@@ -28796,7 +29078,7 @@ from one graphical element to another.
       data between defined limits and in a defined number of bins.
    }
    \sstinvocation{
-       CALL KPG1\_GHSTx( BAD, DIM, ARRAY, NUMBIN, CUMUL, VALMAX, VALMIN,
+       CALL KPG1\_GHSTx( BAD, SIZE, ARRAY, NUMBIN, CUMUL, VALMAX, VALMIN,
       :                 HIST, STATUS )
    }
    \sstarguments{
@@ -28807,12 +29089,12 @@ from one graphical element to another.
          set to false unless the input array contains no bad pixels.
       }
       \sstsubsection{
-         DIM = INTEGER (Given)
+         SIZE = INTEGER (Given)
       }{
          The dimension of the array whose histogram is required.
       }
       \sstsubsection{
-         ARRAY( DIM ) = ? (Given)
+         ARRAY( SIZE ) = ? (Given)
       }{
          The input data array.
       }
@@ -28831,16 +29113,16 @@ from one graphical element to another.
       \sstsubsection{
          VALMAX = ? (Given and Returned)
       }{
-         Maximum data value included in the array. If this is supplied as
-         VAL\_\_BAD$<$T$>$, then the actual maximum value in the ARRAY is found
-         and used, and returned on exit.
+         Maximum data value included in the array.  If this is supplied
+         as VAL\_\_BAD$<$T$>$, then the actual maximum value in the ARRAY is
+         found and used, and returned on exit.
       }
       \sstsubsection{
          VALMIN = ? (Given and Returned)
       }{
-         Minimum data value included in the array. If this is supplied as
-         VAL\_\_BAD$<$T$>$, then the actual minimum value in the ARRAY is found
-         and used, and returned on exit.
+         Minimum data value included in the array.  If this is supplied
+         as VAL\_\_BAD$<$T$>$, then the actual minimum value in the ARRAY is
+         found and used, and returned on exit.
       }
       \sstsubsection{
          HIST( NUMBIN ) = INTEGER (Returned)
@@ -30474,7 +30756,7 @@ from one graphical element to another.
    }
 }
 \sstroutine{
-   KPG1\_MEDU$<$T$>$
+   KPG1\_MEDUx
 }{
    Derives the unweighted median of a vector
 }{
@@ -30484,7 +30766,7 @@ from one graphical element to another.
       mean of the two elements that straddle the median.
    }
    \sstinvocation{
-      CALL KPG1\_MEDU$<$T$>$( BAD, EL, ARRAY, MEDIAN, NELUSE, STATUS )
+      CALL KPG1\_MEDUx( BAD, EL, ARRAY, MEDIAN, NELUSE, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -30500,13 +30782,13 @@ from one graphical element to another.
          The number of elements within the array to sort.
       }
       \sstsubsection{
-         ARRAY( EL ) = $<$TYPE$>$ (Given and Returned)
+         ARRAY( EL ) = ? (Given and Returned)
       }{
          The array whose median is to be found.  On exit the array is
          partially sorted.
       }
       \sstsubsection{
-         MEDIAN = $<$TYPE$>$ (Returned)
+         MEDIAN = ? (Returned)
       }{
          The median of the array.
       }
@@ -30526,7 +30808,10 @@ from one graphical element to another.
       \sstitemlist{
 
          \sstitem
-         There is a routine for each numeric data type.
+         There is a routine for each numeric data type: replace {\tt "}x{\tt "} in
+         the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+         array and MEDIAN arguments supplied to the routine must have the
+         data type specified.
       }
    }
 }
@@ -31834,7 +32119,10 @@ from one graphical element to another.
 
          \sstitem
          There is a routine for each numeric data type: replace {\tt "}x{\tt "}
-            in the routine name by D, R, I, W, UW, B or UB as appropriate.
+         in the routine name by D, I, or R as appropriate.  The array
+         returned from the routine must have the data type specified.  The
+         limitation on other integer types is because there are no
+         conversion routines between them and character in the CHR library.
       }
    }
 }
@@ -33715,7 +34003,7 @@ from one graphical element to another.
    }
 }
 \sstroutine{
-   KPG1\_THRS$<$T$>$
+   KPG1\_THRSx
 }{
    Sets pixels in array to defined new values outside limits
 }{
@@ -33726,14 +34014,14 @@ from one graphical element to another.
       all values outside the two thresholds may be set to zero or
       the bad value, for example.
 
-      If the lower threshold is greater than or equal to the uper
+      If the lower threshold is greater than or equal to the upper
       threshold, the values between the thresholds are set to the
       supplied lower replacement value, and the upper replacement value
       is ignored. In this case the number of replaced pixels is returned
       in NREPLO, and NREPHI is returned as -1.
    }
    \sstinvocation{
-      CALL KPG1\_THRS$<$T$>$( BAD, EL, INARR, THRLO, THRHI, NEWLO, NEWHI,
+      CALL KPG1\_THRSx( BAD, EL, INARR, THRLO, THRHI, NEWLO, NEWHI,
                        OUTARR, NREPLO, NREPHI, STATUS )
    }
    \sstarguments{
@@ -35019,6 +35307,96 @@ from one graphical element to another.
          STATUS = INTEGER (Given and Returned)
       }{
          The inherited global status.
+      }
+   }
+}
+\sstroutine{
+   KPG\_GTFTS
+}{
+   Obtain FITS header information from an NDF
+}{
+   \sstdescription{
+      The routine reads the FITS extension from an NDF and returns an
+      AST pointer to a FitsChan which contains this information. The
+      information may then be accessed using routines from the AST
+      library (SUN/211).
+   }
+   \sstinvocation{
+      CALL KPG\_GTFTS( INDF, FCHAN, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         NDF identifier.
+      }
+      \sstsubsection{
+         FCHAN = INTEGER (Returned)
+      }{
+         An AST pointer to a FitsChan which contains information about
+         the FITS headers associated with the NDF.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         It is the caller{\tt '}s responsibility to annul the AST pointer
+         issued by this routine (e.g. by calling AST\_ANNUL) when it is no
+         longer required.
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         AST\_\_NULL will be returned for the FCHAN argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason.
+
+         \sstitem
+         Status is set to KPG\_\_NOFTS if no FITS extension is found.
+      }
+   }
+}
+\sstroutine{
+   KPG\_PTFTS
+}{
+   Store FITS header information into an NDF
+}{
+   \sstdescription{
+      The routine stores the contents of an AST FitsChan into an
+      NDF by creating (or replacing) the FITS extension in the NDF.
+   }
+   \sstinvocation{
+      CALL KPG\_PTFTS( INDF, FCHAN, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         Identifier of NDF to receive the .FITS extension.
+      }
+      \sstsubsection{
+         FCHAN = INTEGER (Given)
+      }{
+         An AST pointer to a FitsChan which contains information about
+         the FITS header to be associated with the NDF.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If a .MORE.FITS extension already exists it will be completely
+         replaced by this routine.
       }
    }
 }

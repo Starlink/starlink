@@ -86,7 +86,7 @@ kpg1_pxdp.gn kpg1_retr.gn kpg1_rmap.gn kpg1_stat.gn \
 kpg1_stor.gn kpg1_tdli.gn kpg1_thrs.gn kpg1_trli.gn \
 kpg1_trsp.gn kpg1_vasv.gn kpg1_wmod.gn \
 kpg1_sclb.gn kpg1_scli.gn kpg1_scluw.gn \
-kpg1_sclub.gn kpg1_sclw.gn kpg1_ptnd.gn
+kpg1_sclub.gn kpg1_sclw.gn kpg1_ptnd.gn kpg1_bbox.gn
 
 
 # All except logical (include char)
@@ -169,6 +169,7 @@ kpg1_astcmn.f \
 kpg1_axano.f \
 kpg1_axrng.f \
 kpg1_axtyp.f \
+kpg1_badbx.f \
 kpg1_bilnr.f \
 kpg1_ceil.f \
 kpg1_cget.f \

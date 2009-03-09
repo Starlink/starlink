@@ -8,7 +8,7 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {238.5}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {30th June 2006}
+\newcommand{\stardocdate}      {9th March 2009}
 \newcommand{\stardoctitle}     {KAPLIBS \\ [1ex]
                                 Internal subroutines used within
                                 the KAPPA package.}
@@ -723,6 +723,28 @@ related items to be removed.
 
 \section{Changes in Version 2.8}
 \begin{itemize}
+
+\item KPG1\_BADBX added. It returns an NDF identifier for the smallest section 
+     of a supplied NDF that encloses all the good data values in the NDF.
+\item KPG1\_BBOX$<$T$>$ added. It obtains the pixel bounding box of a given value
+     within an N-dimensional data array.
+\item KPG1\_LIKE added. It obtains a section of an NDF that matches either
+     the pixel or WCS shape of a given template NDF.
+\item KPG1\_KYMAP can read vectors as well as scalars from a GRP
+     group into an AST keyMap.
+\item kaplibs\_link script now works without attempting to load ADAM
+     symbols
+\item Can now be built as a shared library
+\item Added kpg1\_astcmn to provide access to KPG\_AST private common block
+\item The HLP helper routines are no longer part of kaplibs. Use SHL
+     library instead.
+\item kpg1\_scrsz no longer present. Please use one\_scrsz instead.
+\item now released under the GPL
+\item kpgGtfts and kpgPtfts can now be used to read and write
+     AST FitsChan objects from/to an NDF
+\item kaplibs no longer links against Tk (the one Tk routine has been
+     removed from kaplibs)
+\item kaplibs now has a public C interface (but not for all routines)
 \item Added KPG1\_CGET, which returns the value of an NDF character
      component removing any AST or PGPLOT escape sequences.
 \item Added KPG1\_MXMNX, which provides a single interface to the
