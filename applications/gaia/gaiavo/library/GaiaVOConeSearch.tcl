@@ -162,9 +162,9 @@ itcl::class gaiavo::GaiaVOConeSearch {
          $itk_component(verb) add \
             -command [code $this set_verb_ $value] \
             -label $name \
-            -value $name
+            -value $value
       }
-      set_verb_ "Default"
+      set_verb_ {}
       $itk_component(verb) configure -value Default
 
       #  Additional options. Set search region from the displayed
@@ -295,7 +295,6 @@ itcl::class gaiavo::GaiaVOConeSearch {
          catch {
             lassign [gaiavotable::info $vot "Error"] query_status errmsg
          }
-         puts "query_status = $query_status, errmsg = $errmsg"
 
          if { $query_status != "ERROR" } {
             set status 1
@@ -463,7 +462,7 @@ itcl::class gaiavo::GaiaVOConeSearch {
    protected variable size_ 10
 
    #  Verbosity.
-   protected variable verb_ "Default"
+   protected variable verb_ {}
 
    #  Batch job handler.
    protected variable batch_ {}
