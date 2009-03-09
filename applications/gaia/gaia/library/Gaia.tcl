@@ -1505,9 +1505,9 @@ itcl::class gaia::Gaia {
          }
       }
 
-      #  When the rtd_autocut flag is true, we want to update the 
+      #  When the rtd_autocut flag is true, we want to update the
       #  the image cuts.
-      if { $itk_option(-rtd_autocut) } { 
+      if { $itk_option(-rtd_autocut) } {
          if { $itk_option(-default_cut) != 100 } {
             [$image_ get_image] autocut -percent $itk_option(-default_cut)
          } else {
@@ -1756,7 +1756,7 @@ itcl::class gaia::Gaia {
          set name ""
       }
 
-      #  If named window already exists, just configure args and file 
+      #  If named window already exists, just configure args and file
       #  and return.
       if { [winfo exists $name] } {
           if { $args != "" } {
@@ -2136,7 +2136,7 @@ window gives you access to this."
       $image_ configure -autofit $itk_option(-autofit)
    }
 
-   #  Apply the autofill value, also make sure autoscale is set or unset 
+   #  Apply the autofill value, also make sure autoscale is set or unset
    #  as needed.
    protected method autofill_ {autoscale} {
       if { $autoscale } {
@@ -2397,12 +2397,11 @@ window gives you access to this."
          $m entryconfigure $index -state disabled
       }
    }
- 
+
    #  Open a dialog for querying a Cone Search server.
    protected method vo_query_cone_ {headers row} {
-      puts "vo_query_cone_: $headers, $row"
       if { [gaia::GaiaVOTableAccess::check_for_gaiavo] } {
- 
+
          #  See if the given headers and row data specify a Cone
          #  server. Need a accessURL field for that.
          set accessURL [gaiavo::GaiaVOCatCone::getAccessURL $headers $row]
@@ -2416,7 +2415,7 @@ window gives you access to this."
          }
       }
    }
-   
+
    #  Get a cached configuration file. If not present use builtin list.
    protected method vo_config_file_ {name} {
       set config_file [utilGetConfigFilename .skycat $name]
