@@ -407,160 +407,6 @@ sub shutdown {
   return $status;
 }
 
-
-=item DESTROY
-
-This method shuts down the Adam messaging system, and kills the relay.
-Tasks will also die using their own destructors.
-
-This happens on destruction of the messaging object.  (and should only
-happen when perl exits or when the messaging system is no longer
-required).
-
-=cut
-
-
-# This is the crucial bit that shuts ams down at the end of the program
-#sub DESTROY {   
-#  my $self = shift;
-
-#  $NOBJECTS--;
-
-  # No point killing messaging if it was never initialised
-  # Also only kill if $NOBJECTS hits zero
-
-#  if ($NOBJECTS < 1) {
-#    my $status = $self->__adamtask_exit if $self->running;
-#    carp "Error shutting down AMS: Status = $status\n"
-#      unless $status == &Starlink::ADAM::SAI__OK;
-#  }
-
-#  print "Returning from adamtask_exit\n" if $debug;
-#}
-
-
-########### HIDDEN FUNCTIONS #############
-
-# Start up ADAM
-# Maybe we should not be using a private version of adamtask_init
-# for this. Probably makes sense to use the version in the
-# new Starlink::ADAM::Core module.
-
-sub __adamtask_init {
-
-  my ($taskname);
-
-  my $self = shift;
-
-  # See if we have a RELAY running already
-  if (defined $self->relay_name) { 
-    if (adam_path($self->relay_name) == 1) {
-      my $msghand = $self->stdout;
-      print $msghand "Relay task is already running\n" if $self->messages;
-      return &Starlink::ADAM::SAI__OK;
-    }
-  }
-
-  # Set the task name
-  $taskname = "perl_ams" . $$;
-
-  # Initialise ams using the program name as the task name
-  my $status = adam_start $taskname;
-  return $status if ($status != &Starlink::ADAM::SAI__OK);
-
-  # Start the relay process
-  # Hardwire the location
-
-#  my $relay_dir = "/local/lib/perl5/site_perl/Starlink";
-#  my $relay_dir = "/home/timj/perl/Starlink/AdamTask";
-  my $relay = "MessageRelay.pl";
-
-#  open (RELAY, "$relay_dir/$relay $taskname |");
-
-  # Create pipe
-  my $RELAY = new IO::Pipe;
-  $self->relay($RELAY);
-
-  # Relay should be in the current PATH
-  $RELAY->reader("$relay $taskname");
-  $RELAY->autoflush;
-
-  # Wait for a message from the RELAY
-  print "Waiting for relay...(from $RELAY)\n" if $debug;
-
-  my @reply = adam_receive;
-
-  # Status is the 7 member
-  $status = $reply[7];
-  return $status if ($status != &Starlink::ADAM::SAI__OK);
-
-  print join("::",@reply),"\n" if $debug;
-
-  # Store the path to the relay
-  $self->relay_name($reply[1]);
-  $self->relay_path($reply[3]);
-  $self->relay_messid($reply[4]);
-
-  # Reply to the obey
-  print "Replying to OBEY\n" if $debug;
-  $status = adam_reply($self->relay_path, $self->relay_messid, 
-		       "ACTSTART", $reply[1], "");
-
-
-  # Print some info
-#  print "Name path messid : $RELAY_NAME $RELAY_PATH $RELAY_MESSID\n";
-
-  print "ID: ",$self->relay, $self->relay_path, $self->relay_name, $self->relay_messid,"\n" if $debug;
-
-  return $status;
-
-}
-
-
-
-
-# adamtask_exit
-#
-#  Routine to shut down the relay and the messaging system in general
-#     - Hidden from outside world
-
-sub __adamtask_exit {
-
-  my $self = shift;
-
-  # Ask the relay to kill itself
-  print "Ask the relay to kill itself\n" if $debug;
-  print "ID: ",$self->relay, $self->relay_path, $self->relay_name, $self->relay_messid,"\n" if $debug;
-
-  my $status = adam_reply($self->relay_path, $self->relay_messid, "SYNC", 
-			  "", "adam_exit; exit") ;
-
-  carp "Error shutting down message relay" 
-    if ($status != &Starlink::ADAM::SAI__OK);
-
-  #    if adam_path($self->relay_path);
-
-  print "Killing the pipe\n" if $debug;
-  # Remove the pipe
-  $self->relay(undef);
-
-  undef $self->{RELAY};
-
-  print "Exit ams\n" if $debug;
-  # Exit AMS
-  adam_exit if $self->running;
-
-  # Reset adam_started
-  $self->running(0);
-
-  return $status;
-
-}
-
-
-
-1;
-
 =back
 
 =head1 AUTHOR
@@ -569,6 +415,7 @@ Tim Jenness (t.jenness@jach.hawaii.edu).
 
 =head1 COPYRIGHT
 
+Copyright (C) 2009 Science and Technology Facilities Council.
 Copyright (C) Particle Physics and Astronomy Research Council 1998, 1999.
 All Rights Reserved.
 
@@ -587,3 +434,5 @@ L<Starlink::ADAM>,
 and L<Starlink::EMS>
 
 =cut
+
+1;
