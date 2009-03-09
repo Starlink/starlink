@@ -86,7 +86,7 @@ GAIA_CONFIG
 TEA_ADD_SOURCES([${csources} ${fsources} ${gsources}])
 TEA_ADD_HEADERS([${cheaders}])
 TEA_ADD_INCLUDES([${gaia_includes}])
-TEA_ADD_LIBS([$skycat_BUILD_LIB_SPEC $cat_BUILD_LIB_SPEC $rtd_BUILD_LIB_SPEC $astrotcl_BUILD_LIB_SPEC $tclutil_BUILD_LIB_SPEC ${BLT_LIB_SPEC}])
+TEA_ADD_LIBS([$skycat_BUILD_LIB_SPEC $cat_BUILD_LIB_SPEC $rtd_BUILD_LIB_SPEC $astrotcl_BUILD_LIB_SPEC $tclutil_BUILD_LIB_SPEC ${BLT_LIB_SPEC} ${CFITSIO_LIB_SPEC}])
 TEA_ADD_CFLAGS([])
 TEA_ADD_STUB_SOURCES([])
 TEA_ADD_TCL_SOURCES([${tclsources}])

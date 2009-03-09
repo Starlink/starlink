@@ -12,7 +12,7 @@ dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
 dnl    Declare dependencies for this package
-STAR_DECLARE_DEPENDENCIES([build], [tcl tk tkimg blt itcl tclx], link)
+STAR_DECLARE_DEPENDENCIES([build], [cfitsio tcl tk tkimg blt itcl tclx], link)
 
 dnl    Look for --disable-shared etc. and pass on when configuring.
 star_extra_items="$ac_configure_args"

@@ -8,7 +8,7 @@
   <description>The main skycat component</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies >
-    <build option='link'>tcl</build><build option='link'>tk</build><build option='link'>tkimg</build><build option='link'>blt</build><build option='link'>itcl</build><build option='link'>tclx</build>
+    <build option='link'>cfitsio</build><build option='link'>tcl</build><build option='link'>tk</build><build option='link'>tkimg</build><build option='link'>blt</build><build option='link'>itcl</build><build option='link'>tclx</build>
   </dependencies>
   <developers>
     <person>
