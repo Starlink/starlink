@@ -3384,22 +3384,28 @@ namespace votable_11
   // COOSYS
   // 
 
-  const COOSYS::ID_type& COOSYS::
+  const COOSYS::ID_optional& COOSYS::
   ID () const
   {
-    return this->ID_.get ();
+    return this->ID_;
   }
 
-  COOSYS::ID_type& COOSYS::
+  COOSYS::ID_optional& COOSYS::
   ID ()
   {
-    return this->ID_.get ();
+    return this->ID_;
   }
 
   void COOSYS::
   ID (const ID_type& x)
   {
     this->ID_.set (x);
+  }
+
+  void COOSYS::
+  ID (const ID_optional& x)
+  {
+    this->ID_ = x;
   }
 
   void COOSYS::
@@ -7420,9 +7426,9 @@ namespace votable_11
     ::std::string ("eq_FK5"), 0, 0, 0);
 
   COOSYS::
-  COOSYS (const ID_type& ID)
+  COOSYS ()
   : ::xml_schema::string (),
-    ID_ (ID, ::xml_schema::flags (), this),
+    ID_ (::xml_schema::flags (), this),
     equinox_ (::xml_schema::flags (), this),
     epoch_ (::xml_schema::flags (), this),
     system_ (system_default_value (), ::xml_schema::flags (), this)
@@ -7430,10 +7436,9 @@ namespace votable_11
   }
 
   COOSYS::
-  COOSYS (const char* _xsd_string_base,
-          const ID_type& ID)
+  COOSYS (const char* _xsd_string_base)
   : ::xml_schema::string (_xsd_string_base),
-    ID_ (ID, ::xml_schema::flags (), this),
+    ID_ (::xml_schema::flags (), this),
     equinox_ (::xml_schema::flags (), this),
     epoch_ (::xml_schema::flags (), this),
     system_ (system_default_value (), ::xml_schema::flags (), this)
@@ -7441,10 +7446,9 @@ namespace votable_11
   }
 
   COOSYS::
-  COOSYS (const ::std::string& _xsd_string_base,
-          const ID_type& ID)
+  COOSYS (const ::std::string& _xsd_string_base)
   : ::xml_schema::string (_xsd_string_base),
-    ID_ (ID, ::xml_schema::flags (), this),
+    ID_ (::xml_schema::flags (), this),
     equinox_ (::xml_schema::flags (), this),
     epoch_ (::xml_schema::flags (), this),
     system_ (system_default_value (), ::xml_schema::flags (), this)
@@ -7452,10 +7456,9 @@ namespace votable_11
   }
 
   COOSYS::
-  COOSYS (const ::xml_schema::string& _xsd_string_base,
-          const ID_type& ID)
+  COOSYS (const ::xml_schema::string& _xsd_string_base)
   : ::xml_schema::string (_xsd_string_base),
-    ID_ (ID, ::xml_schema::flags (), this),
+    ID_ (::xml_schema::flags (), this),
     equinox_ (::xml_schema::flags (), this),
     epoch_ (::xml_schema::flags (), this),
     system_ (system_default_value (), ::xml_schema::flags (), this)
@@ -7536,13 +7539,6 @@ namespace votable_11
         this->system_.set (r);
         continue;
       }
-    }
-
-    if (!ID_.present ())
-    {
-      throw ::xsd::cxx::tree::expected_attribute< char > (
-        "ID",
-        "");
     }
 
     if (!system_.present ())
@@ -10338,13 +10334,14 @@ namespace votable_11
 
     // ID
     //
+    if (i.ID ())
     {
       ::xercesc::DOMAttr& a (
         ::xsd::cxx::xml::dom::create_attribute (
           "ID",
           e));
 
-      a << i.ID ();
+      a << *i.ID ();
     }
 
     // equinox

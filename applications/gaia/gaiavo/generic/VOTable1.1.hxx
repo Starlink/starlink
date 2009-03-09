@@ -3813,16 +3813,20 @@ namespace votable_11
     // ID
     // 
     typedef ::xml_schema::id ID_type;
+    typedef ::xsd::cxx::tree::optional< ID_type > ID_optional;
     typedef ::xsd::cxx::tree::traits< ID_type, char > ID_traits;
 
-    const ID_type&
+    const ID_optional&
     ID () const;
 
-    ID_type&
+    ID_optional&
     ID ();
 
     void
     ID (const ID_type& x);
+
+    void
+    ID (const ID_optional& x);
 
     void
     ID (::std::auto_ptr< ID_type > p);
@@ -3891,16 +3895,13 @@ namespace votable_11
 
     // Constructors.
     //
-    COOSYS (const ID_type&);
+    COOSYS ();
 
-    COOSYS (const char*,
-            const ID_type&);
+    COOSYS (const char*);
 
-    COOSYS (const ::std::string&,
-            const ID_type&);
+    COOSYS (const ::std::string&);
 
-    COOSYS (const ::xml_schema::string&,
-            const ID_type&);
+    COOSYS (const ::xml_schema::string&);
 
     COOSYS (const ::xercesc::DOMElement& e,
             ::xml_schema::flags f = 0,
@@ -3925,7 +3926,7 @@ namespace votable_11
            ::xml_schema::flags);
 
     protected:
-    ::xsd::cxx::tree::one< ID_type > ID_;
+    ID_optional ID_;
     equinox_optional equinox_;
     epoch_optional epoch_;
     ::xsd::cxx::tree::one< system_type > system_;
