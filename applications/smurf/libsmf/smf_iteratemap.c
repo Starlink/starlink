@@ -171,6 +171,9 @@
 *        -apply bad pixel mask (BPM)
 *     2009-01-12 (EC):
 *        Move application of BPM into smf_concat_smfGroup
+*     2009-03-09 (EC):
+*        Don't need to call smf_calcmodel_gai because flatfield no longer
+*        modified by smf_calcmodel_com
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -1264,11 +1267,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
 
             if( haveext ) {
               smf_calcmodel_ext( &dat, i, keymap, model[whichext], 
-                                 SMF__DIMM_INVERT, status );
-            }
-
-            if( havegai ) {
-              smf_calcmodel_gai( &dat, i, keymap, model[whichgai], 
                                  SMF__DIMM_INVERT, status );
             }
 
