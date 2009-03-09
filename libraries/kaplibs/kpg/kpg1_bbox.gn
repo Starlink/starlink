@@ -1,0 +1,200 @@
+      SUBROUTINE KPG1_BBOX<T>( NDIM, LBND, UBND, ARRAY, VALUE, EQUAL, 
+     :                         BLBND, BUBND, NPASS, STATUS )
+*+
+*  Name:
+*     KPG1_BBOXx
+
+*  Purpose:
+*     Determine the bounding box of selected pixels in an n-dimensional
+*     array.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPG1_BBOXx( NDIM, LBND, UBND, ARRAY, VALUE, EQUAL, BLBND, 
+*                      BUBND, NPASS, STATUS )
+
+*  Description:
+*     This routine compresses an n-dimensional array by integer factors
+*     along each dimension by summing the array values in a rectangular
+*     box.  The output may be normalised to take account of any bad
+*     values that may be present.
+
+*  Arguments:
+*     NDIM = INTEGER (Given)
+*        The dimensionality of the n-dimensional array.  
+*     LBND( NDIM ) = INTEGER (Given)
+*        The lower pixel index bounds of the input n-dimensional array.
+*     UBND( NDIM ) = INTEGER (Given)
+*        The upper pixel index bounds of the input n-dimensional array.
+*     ARRAY( * ) = ? (Given)
+*        The input n-dimensional data array.
+*     VALUE = ? (Given)
+*        The data value used to define the box. VAL__BADx is a legal
+*        value for this argument.
+*     EQUAL = LOGICAL (Given)
+*        If .TRUE., then the returned box encloses all pixels with value
+*        equal to VALUE. If .FALSE., then the returned box encloses all 
+*        pixels with value not equal to VALUE.
+*     BLBND( NDIM ) = INTEGER (Returned)
+*        The lower pixel index bounds of the required box.
+*     BUBND( NDIM ) = INTEGER (Returned)
+*        The upper pixel index bounds of the required box.
+*     NPASS = INTEGER (Returned)
+*        The number of array elements that pass the test specified by
+*        VALUE and EQUAL. In general, the number of elements in the 
+*        returned bounding box will be greater than NPASS.
+*     STATUS  =  INTEGER (Given and Returned).
+*        Global status value
+
+*  Notes:
+*     -  There is a routine for the following numeric data types:
+*     replace "x" in the routine name by D or R as appropriate.  The
+*     input and output data arrays plus a work space must have the
+*     data type specified.
+
+*  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     DSB: David S. Berry (JACH)
+*     {enter_new_authors_here}
+
+*  History:
+*     8-MAR-2009 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT  NONE             ! no implicit typing allowed
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! SAI__ constants
+      INCLUDE 'NDF_PAR'          ! NDF__ constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
+
+*  Arguments Given
+      INTEGER NDIM
+      INTEGER LBND( NDIM )
+      INTEGER UBND( NDIM )
+      <TYPE> ARRAY( * )
+      <TYPE> VALUE
+      LOGICAL EQUAL
+
+*  Arguments Returned:
+      INTEGER BLBND( NDIM )
+      INTEGER BUBND( NDIM )
+      INTEGER NPASS
+
+*  Status:
+      INTEGER STATUS
+
+*  Local Variables:
+      INTEGER DIM                ! Axis length
+      INTEGER IDIM               ! Axis index
+      INTEGER IEL                ! Vector index of current element
+      INTEGER NEL                ! Number of elements in array
+      INTEGER PIX( NDF__MXDIM )  ! Pixel indices of current element
+      LOGICAL FIRST              ! First element to pass the test?
+      LOGICAL INBOX              ! Does the pixel pass the test?
+*.
+
+*  Check the inherited status on entry.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Find the total number of elements in the array and initialise the 
+*  PIX array to hold the pixel indices of the first pixel.
+      NEL = 1
+      DO IDIM = 1, NDIM
+         NEL = NEL*(  UBND( 1 ) - LBND( 1 ) + 1 )
+         PIX( IDIM ) = LBND( IDIM )
+      END DO      
+
+*  Initialise other things.
+      NPASS = 0
+      FIRST = .TRUE.
+
+*  Loop over all array elements.
+      DO IEL = 1, NEL
+
+*  Test the current array element value.
+         IF( EQUAL ) THEN
+            INBOX = ( ARRAY( IEL ) .EQ. VALUE ) 
+         ELSE
+            INBOX = ( ARRAY( IEL ) .NE. VALUE ) 
+         END IF
+
+*  If it is in the box, extend the bounds of the box to accomodate it,
+*  and increment the number of elements that have passed the test.
+         IF( INBOX ) THEN
+
+*  If this is the first element to pass the test, just set both upper and
+*  lower bounds to the pixel indices of the current element.
+            IF( FIRST ) THEN
+
+               DO IDIM = 1, NDIM
+                  BLBND( IDIM ) = PIX( IDIM ) 
+                  BUBND( IDIM ) = PIX( IDIM ) 
+               END DO
+               FIRST = .FALSE.
+
+*  If this is not the first element to pass the test, set upper or lower 
+*  bounds as required. We know that only one of the two IF conidition will 
+*  hold, so we can use an ELSE, rather than two separate IF statements.
+*  This should be faster than dispensing with the FIRST flag, and initialising 
+*  the bounding box to extreme values (which would require two separate IF 
+*  statements here).
+            ELSE
+               DO IDIM = 1, NDIM
+                  IF( PIX( IDIM ) .LT. BLBND( IDIM ) ) THEN
+                     BLBND( IDIM ) = PIX( IDIM ) 
+                  ELSE IF( PIX( IDIM ) .GT. BUBND( IDIM ) ) THEN
+                     BUBND( IDIM ) = PIX( IDIM ) 
+                  END IF
+               END DO
+
+            END IF
+
+            NPASS = NPASS + 1
+
+         END IF         
+
+*  Update the pixel indices so that they refer to the next element on 
+*  pixel axis 1.
+         IDIM = 1
+         PIX( 1 ) = PIX( 1 ) + 1
+
+*  If the end of the axis has been reached, reset the pixel index to the
+*  start of the axis and increment the pixel index on the next axis.
+         DO WHILE( IDIM .LE. NDIM .AND. PIX( IDIM ) .GT. UBND( IDIM ) ) 
+            PIX( IDIM ) = LBND( IDIM )
+            IDIM = IDIM + 1
+            PIX( IDIM ) = PIX( IDIM ) + 1
+         END DO
+
+      END DO
+
+      END
