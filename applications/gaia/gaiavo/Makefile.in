@@ -314,7 +314,7 @@ tab2vot$(EXEEXT): tab2vot.o $(PKG_LIB_FILE)
 	      -o tab2vot$(EXEEXT)
 
 listvot$(EXEEXT): listvot.o $(PKG_LIB_FILE)
-	$(LTLINK) $(LDFLAGS) tab2vot.o $(PKG_LIB_FILE) \
+	$(LTLINK) $(LDFLAGS) listvot.o $(PKG_LIB_FILE) \
 	      $(LD_SEARCH_FLAGS) $(LD_LIBS) -lxerces-c \
 	      -o listvot$(EXEEXT)
 
