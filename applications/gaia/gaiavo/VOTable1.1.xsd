@@ -446,7 +446,7 @@
   <xs:element name="COOSYS">
     <xs:complexType><xs:simpleContent>
       <xs:extension base="xs:string">
-        <xs:attribute name="ID" type="xs:ID" use="required"/>
+        <xs:attribute name="ID" type="xs:ID"/>
         <xs:attribute name="equinox" type="astroYear"/>
         <xs:attribute name="epoch" type="astroYear"/>
         <xs:attribute name="system" default="eq_FK5">
