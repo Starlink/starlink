@@ -81,11 +81,13 @@
 *          flag additional bad bolometers
 *     2008-12-18 (EC)
 *        - Additionally look at spread in gain coefficients to flag bad bolos 
+*     2009-03-09 (EC)
+*        - Fit common mode gain to data, instead of using it to modify flatfield
 *     {enter_further_changes_here}
 
 
 *  Copyright:
-*     Copyright (C) 2006-2008 University of British Columbia.
+*     Copyright (C) 2006-2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -515,20 +517,16 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
       
       for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) 
         if( !(qua_data[i*bstride]&SMF__Q_BADB) ) {          
-          /* The calculated gain is the fit of the common mode to the data.
-             Calculate its inverse which gives the correction of the bolometer
-             to look like the common-mode signal */
+          /* The gain is the amplitude of the common mode template in data */
           g = gai_data[i*gbstride];
           if( (g!=VAL__BADD) && (g!=0) ){
-            g = 1./g;
             off = gai_data[i*gbstride+gcstride];
             gai_data[i*gbstride] = g;
             
             /* Remove the template */          
             for( j=0; j<ntslice; j++ ) {
               if( !(qua_data[i*bstride + j*tstride]&mask_cor) ) {
-                res_data[i*bstride+j*tstride] = (res_data[i*bstride+j*tstride]
-                                                 - off)*g - model_data[j];
+                res_data[i*bstride+j*tstride] -= (g*model_data[j] + off);
               }
             }
           } else {
