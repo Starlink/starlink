@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.35}
 \newcommand{\stardocnumber}    {95.35}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2009 January 31}
+\newcommand{\stardocdate}      {2009 March 9}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.10}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -35379,6 +35379,14 @@ KAPPA: \htmlref{ADD}{ADD},
          [FALSE]}
       }
       \sstsubsection{
+         TRIMBAD = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, then the pixel bounds of the output NDF are trimmed 
+         to exclude any border of bad pixels within the input NDF. That is,
+         the output NDF will be the smallest NDF that encloses all good 
+         data values in the input NDF. {\tt [FALSE]}
+      }
+      \sstsubsection{
          TRIMWCS = \_LOGICAL (Read)
       }{
          This parameter is only accessed if Parameter TRIM is {\tt TRUE}.  It
@@ -55815,6 +55823,9 @@ The following applications have been modified:
 
    \item [\htmlref{NDFCOPY}{NDFCOPY}] \mbox{}
       \begin{itemize}
+         \item A new logical parameter caller TRIMBAD has been added.  This 
+         allows the output NDF to be trimmed to exclude any border of bad
+         pixels.
          \item A new parameter caller LIKEWCS has been added.  This allows 
          the shape of the template NDF in the WCS Frame to be used to 
          determine the bounds of the output NDF.

@@ -31,6 +31,8 @@
 
    o  NDFCOPY
 
+      -  A new logical parameter called TRIMBAD has been added.  If TRUE,
+      the output NDF is trimmed to exclude any border of bad pixels. 
       -  A new parameter called LIKEWCS has been added.  This 
       allows the shape of the template NDF in the WCS Frame to be 
       used to determine the bounds of the output NDF.

@@ -78,6 +78,11 @@
 *        (1:100,-50:40).  In this example, the third pixel axis spans
 *        only a single pixel and is consequently removed if TRIM=TRUE. 
 *        [FALSE]
+*     TRIMBAD = _LOGICAL (Read)
+*        If TRUE, then the pixel bounds of the output NDF are trimmed to
+*        exclude any border of bad pixels within the input NDF. That is,
+*        the output NDF will be the smallest NDF that encloses all good 
+*        data values in the input NDF. [FALSE]
 *     TRIMWCS = _LOGICAL (Read)
 *        This parameter is only accessed if parameter TRIM is TRUE.  It
 *        controls the number of axes in the current WCS co-ordinate
@@ -228,6 +233,8 @@
 *        Added parameter LIKEWCS.
 *     11-FEB-2009 (DSB):
 *        Added parameter EXTEN. Most of the work moved to KPG1_NDFCP.
+*     9-MAR-2009 (DSB):
+*        Added parameter TRIMBAD.
 *     {enter_further_changes_here}
 
 *-
@@ -267,6 +274,7 @@
       INTEGER NDF6               ! Output extension NDF identifier
       INTEGER NDFT               ! Temporary NDF identifier
       INTEGER NDIM               ! Dimensionality of input extension NDF
+      INTEGER NGOOD              ! No. of good data values in NDF
       INTEGER OLBND( NDF__MXDIM )! Output NDF low bounds
       INTEGER ONDIM              ! Dimensionality of output NDF
       INTEGER OUBND( NDF__MXDIM )! Output NDF high bounds
@@ -277,6 +285,7 @@
       LOGICAL LIKWCS             ! Match WCS bounds with template?
       LOGICAL SAME               ! Extension NDF same as base NDF?
       LOGICAL TRIM               ! Remove insignificant piel axes?
+      LOGICAL TRMBAD             ! Remove any boundary of bad pixels?
       LOGICAL TRMWCS             ! Remove corresponding WCS axes?
 *.
 
@@ -291,10 +300,23 @@
 
 *  Obtain the input NDF.
       CALL LPG_ASSOC( 'IN', 'READ', NDF1, STATUS )
-      IF ( STATUS .EQ. SAI__OK ) THEN
+
+*  See if the output NDF is to be trimmed to exclude any border of bad
+*  pixels.
+      CALL PAR_GET0L( 'TRIMBAD', TRMBAD, STATUS )
+
+*  If so, obtain the required section of the input NDF. This is the
+*  smallest section that encloses all good data values.
+      IF( TRMBAD ) THEN
+         CALL KPG1_BADBX( NDF1, NDFT, NGOOD, STATUS )
+
+*  Use this section in place of the supplied NDF.
+         IF( STATUS .EQ. SAI__OK ) NDF1 = NDFT
+      END IF
 
 *  Defer error reporting and attempt to obtain a second NDF to act as a
 *  shape template.
+      IF ( STATUS .EQ. SAI__OK ) THEN
          CALL ERR_MARK
          CALL LPG_ASSOC( 'LIKE', 'READ', NDF2, STATUS )
 
