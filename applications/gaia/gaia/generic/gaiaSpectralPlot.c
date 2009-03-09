@@ -1234,7 +1234,7 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
                         RtdSegmentDisplay( canvas, segment, display,
                                            drawable, x, y, width, height );
 
-                        // Add the serifs.
+                        /* Add the serifs. */
                         xin[0] = xout[0] - SERIF_LENGTH;
                         xin[1] = xout[0] + SERIF_LENGTH;
                         yin[0] = yout[0];

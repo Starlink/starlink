@@ -119,7 +119,7 @@ static int gaiaNDFTclUnMap( ClientData clientData, Tcl_Interp *interp,
 static int importNdfHandle( Tcl_Interp *interp, Tcl_Obj *obj, NDFinfo **info );
 static long exportNdfHandle( int ndfid, AstFrameSet *wcs );
 static int queryNdfCoord( AstFrameSet *frameSet, int axis, double *coords,
-                          int trailed, int readable, int formatted, 
+                          int trailed, int readable, int formatted,
                           int ncoords, char **coord, char **error_mess );
 static void storeCard( AstFitsChan *channel, const char *keyword,
                        const char *value, const char *comment,
@@ -967,7 +967,7 @@ static int gaiaNDFTclBounds( ClientData clientData, Tcl_Interp *interp,
  * coordinate (so the list must have a number for each dimension of the NDF if
  * that isn'r true then any extra dimensions will be given the coordinate
  * AST__BAD).  The fifth argument defines whether to format the result (using
- * astFormat), otherwise it is returned as a double. The final two arguments 
+ * astFormat), otherwise it is returned as a double. The final two arguments
  * are booleans to switch on the addition of trailing label and units strings
  * and whether to make the whole result more readable (need trail plus this
  * for readable).
@@ -1073,7 +1073,7 @@ static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
  * from an NDF) and works with that as the BASE domain.
  */
 static int queryNdfCoord( AstFrameSet *frameSet, int axis, double *coords,
-                          int trailed, int readable, int formatted, 
+                          int trailed, int readable, int formatted,
                           int ncoords, char **coord, char **error_mess )
 {
     char *domain;
@@ -1109,8 +1109,8 @@ static int queryNdfCoord( AstFrameSet *frameSet, int axis, double *coords,
     astSetI( frameSet, "Base", pixel );
 
     /* Do the transformation */
-    result = gaiaUtilsQueryCoord( frameSet, axis, coords, trailed, 
-                                  readable, formatted, ncoords, coord, 
+    result = gaiaUtilsQueryCoord( frameSet, axis, coords, trailed,
+                                  readable, formatted, ncoords, coord,
                                   error_mess );
 
     /*  Restore the base frame. */
@@ -1593,13 +1593,14 @@ static int gaiaNDFTclHdu( ClientData clientData, Tcl_Interp *interp,
                           int objc, Tcl_Obj *CONST objv[] )
 {
     NDFinfo *info;
+    const char *action;
     int deepsearch = 1;
     int result;
 
-    /* Check arguments, need the NDF handle, the hdu command and whether to 
+    /* Check arguments, need the NDF handle, the hdu command and whether to
      * look for NDFs in the extension. */
     if ( objc < 3 || objc > 5 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, 
+        Tcl_WrongNumArgs( interp, 1, objv,
                           "ndf_handle [list|listheadings|get] [deepsearch]" );
         return TCL_ERROR;
     }
@@ -1610,7 +1611,7 @@ static int gaiaNDFTclHdu( ClientData clientData, Tcl_Interp *interp,
         return TCL_ERROR;
     }
 
-    const char *action = Tcl_GetString( objv[2] );
+    action = Tcl_GetString( objv[2] );
 
     /* hdu listheadings. */
     if ( strcmp( action, "listheadings" ) == 0 ) {
@@ -1625,7 +1626,7 @@ static int gaiaNDFTclHdu( ClientData clientData, Tcl_Interp *interp,
             Tcl_GetIntFromObj( interp, objv[3], &deepsearch );
         }
 
-        /* If this NDF hasn't been checked for "HDUs" then do that now. 
+        /* If this NDF hasn't been checked for "HDUs" then do that now.
          * Also need to do this again if deepsearch changes as that produces a
          * different listing*/
         if ( info->nhdu == -1 || ( deepsearch != info->deepsearch ) ) {
@@ -1633,7 +1634,7 @@ static int gaiaNDFTclHdu( ClientData clientData, Tcl_Interp *interp,
                 free( info->hdulist );
             }
             info->deepsearch = deepsearch;
-            gaiaNDFSiblingSearch( info->ndfid, deepsearch, &info->nhdu, 
+            gaiaNDFSiblingSearch( info->ndfid, deepsearch, &info->nhdu,
                                   &info->hdulist );
         }
         Tcl_SetResult( interp, info->hdulist, TCL_VOLATILE );
@@ -1645,7 +1646,7 @@ static int gaiaNDFTclHdu( ClientData clientData, Tcl_Interp *interp,
         return TCL_OK;
     }
 
-    //  Should never arrive here.
+    /*  Should never arrive here. */
     Tcl_SetResult( interp, "Unknown HDU command", TCL_VOLATILE );
     return TCL_ERROR;
 }
