@@ -104,6 +104,7 @@ $VERSION = '1.48';
                           /],
 
                 'ndg'=>[qw/ ndg_ctprv ndg_gtprv ndg_mdprv ndg_rmprv ndgGtprvk
+                            ndgRmprvs
                           /],
 
                 'misc'=>[qw/mem2string string2mem array2mem mem2array

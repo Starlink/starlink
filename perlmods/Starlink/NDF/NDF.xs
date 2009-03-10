@@ -30,7 +30,8 @@ extern "C" {
 /* For AST object creation */
 #include "ast.h"
 
-/* For NDG provenance - but we do not use C interface*/
+/* For NDG provenance - but we do not use C interface in all cases because
+   of the HDS locators. */
 #include "star/ndg.h"
 
 /* I use a string handling routine (strdup) so read in prototype */
@@ -4790,6 +4791,21 @@ ndg_rmprv( indf, ianc, status )
  OUTPUT:
   status
 
+# Note that we do not ask the caller to specify the size
+# of the incoming array
+
+void
+ndgRmprvs( indf, anc, status )
+  ndfint &indf
+  ndfint * anc
+  ndfint &status
+ PREINIT:
+  int nanc;
+ CODE:
+  nanc = av_len( (AV*)SvRV( ST(1) ) ) + 1; /* av_len is equivalent of $#a */
+  ndgRmprvs( indf, nanc, anc, &status );
+ OUTPUT:
+  status
 
 ########################################
 # Non Starlink stuff
