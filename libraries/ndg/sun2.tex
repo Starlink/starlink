@@ -2961,7 +2961,9 @@ to add further members.
          returned locator should be annulled using datAnnul when no
          longer needed. A NULL pointer may be supplied for this parameter
          if the MORE structure is not needed. A NULL pointer will be
-         returned if the requested ancestor has no MORE component.
+         returned if the requested ancestor has no MORE component. Note,
+         the returned object will be assigned an arbitrary HDS Name,
+         which will not in general be {\tt "}MORE{\tt "}.
       }
       \sstsubsection{
          status
@@ -3018,6 +3020,84 @@ to add further members.
          A text identifier for the software that created INDF1 (usually the
          name of the calling application). The format of the identifier
          is arbitrary, but the form {\tt "}PACKAGE:COMMAND{\tt "} is recommended.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ndgRmprv
+}{
+   Remove provenance information from an NDF
+}{
+   \sstdescription{
+      This routine removes a given ancestor from the {\tt "}PROVENANCE{\tt "}
+      extension in INDF. The direct parents of the removed ancestor are
+      assigned to the direct children of the removed ancestor.
+   }
+   \sstinvocation{
+      void ndgRmprv( int indf, int ianc, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         indf
+      }{
+         An identifier for the NDF containing the provenance information.
+      }
+      \sstsubsection{
+         ianc
+      }{
+         The index of the ancestor NDF to be removed. The supplied value
+         must be at least 1, and must be no more than the number of
+         ancestors in the provenance extension (as returned by NDG\_CTPRV).
+         An error is reported otherwise.
+      }
+      \sstsubsection{
+         status
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ndgRmprvs
+}{
+   Remove multiple ancestors from the provenance information in an NDF
+}{
+   \sstdescription{
+      This routine removes one or more ancestors from the {\tt "}PROVENANCE{\tt "}
+      extension in INDF. The direct parents of the removed ancestor are
+      assigned to the direct children of the removed ancestor.
+
+      Using this function once is more efficient than calling ndgRmprv
+      to remove each individual ancestor.
+   }
+   \sstinvocation{
+      void ndgRmprv( int indf, int nanc, int $*$anc, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         indf
+      }{
+         An identifier for the NDF containing the provenance information.
+      }
+      \sstsubsection{
+         nanc
+      }{
+         The length of the {\tt "}anc{\tt "} array.
+      }
+      \sstsubsection{
+         anc
+      }{
+         Pointer to an array holding the indices of the ancestor NDFs to be
+         removed. Each supplied value must be at least 1, and must be no
+         more than the number of ancestors in the provenance extension
+         (as returned by NDG\_CTPRV). An error is reported otherwise. The
+         supplied list is sorted into decreasing order before use so that
+         the highest index ancestor is removed first.
       }
       \sstsubsection{
          status
@@ -3134,6 +3214,8 @@ to add further members.
 
 \section{Changes Introduced in NDG Version 5.6}
 \begin{itemize}
+   \item A new C function ndgRmprvs has been added, that removes multiple
+         provenance ancestors from an NDF.
    \item A new C function ndgGtprvk has been added, that returns provenance
          information for a given ancestor in the form of an AST KeyMap.
 \end{itemize}

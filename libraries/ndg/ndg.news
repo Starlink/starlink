@@ -2,6 +2,9 @@
 
 Version 5.6
 
+   o A new C function ndgRmprvs has been added, that removes multiple
+   provenance ancestors from an NDF.
+
    o A new C function ndgGtprvk has been added, that returns provenance
    information for a given ancestor in the form of an AST KeyMap.
 

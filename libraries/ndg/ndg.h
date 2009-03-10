@@ -100,5 +100,6 @@ Grp *ndgCopy( const Grp *grp1, size_t indxlo, size_t indxhi, int reject,
 	      int *status );
 void ndgCrexp( const char grpexp[], const Grp *igrp0, Grp **igrp, 
                size_t *size, int *flag, int *status );
+void ndgRmprvs( int indf, int nanc, int *anc, int *status );
 
 #endif

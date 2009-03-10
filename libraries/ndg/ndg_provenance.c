@@ -100,9 +100,10 @@ static void ndg1Disown( Prov *, Prov *, int * );
 static void ndg1H2a0c( const char *, HDSLoc *, AstKeyMap *, int * );
 static void ndg1H2a0h( const char *, HDSLoc *, AstKeyMap *, int * );
 static void ndg1H2a1i( const char *, HDSLoc *, AstKeyMap *, int * );
-static void ndg1ParentChildIndex( Provenance *, int, int, int * );
 static void ndg1ParentChild( Prov *, Prov *, int * );
+static void ndg1ParentChildIndex( Provenance *, int, int, int * );
 static void ndg1PurgeProvenance( Provenance *, int * );
+static void ndg1Rmprv( Provenance *, int, int * );
 static void ndg1WriteProvenanceExtension( Provenance *, int, int * );
 
 /* Public functions. */
@@ -1395,7 +1396,7 @@ void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot,
 
 void ndgRmprv( int indf, int ianc, int *status ){
 /*
-*-
+*+
 *  Name:
 *     ndgRmprv
 
@@ -1425,15 +1426,8 @@ void ndgRmprv( int indf, int ianc, int *status ){
 */
 
 /* Local Variables: */
-   Prov *anc = NULL;
-   Prov *child = NULL;
-   Prov *parent = NULL;
    Provenance *prov = NULL;
    int *old_status;
-   int i;             
-   int ichild;
-   int iparent;
-   int n;
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
@@ -1444,79 +1438,155 @@ void ndgRmprv( int indf, int ianc, int *status ){
 /* Read the provenance extension from the NDF. */
    prov = ndg1ReadProvenanceExtension( indf, NULL, NULL, 0, status );
 
-/* Check the "ianc" value is within the bounds of the ANCESTORS array. */
-   if( prov && ianc > 0 && ianc < prov->nprov ) {
+/* Check that the NDF contained provenance information. */
+   if( prov ) {
 
-/* Get a pointer to the ancestor Prov structure. */
-      anc = prov->provs[ ianc ];
+/* Remove the ancestor. */
+      ndg1Rmprv( prov, ianc, status );
 
-/* Loop round all the direct children of the ancestor. */
-      n = anc->nchild;
-      for( ichild = 0; ichild < n; ichild++ ) {
+/* Store the modified provenance information in the NDF. */
+      ndg1WriteProvenanceExtension( prov, indf, status );
 
-/* The index into the children array is fixed at zero because the
-   following call to ndg1Disown will remove the first child from "anc" on
-   each pass. */
-         child = anc->children[ 0 ];
+/* Free resources. */
+      ndg1FreeProvenance( prov, 1, status );
 
-/* Break the parent-child link between the ancestor and the current
-   child. This reduces the number of children in anc (i.e. anc->nchild) 
-   by 1. */
-         ndg1Disown( anc, child, status );
+/* Report an error if no provenance information was found. */
+   } else if( *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRep( " ", "No provenance information found in supplied NDF.", 
+              status );
+   }
 
-/* Loop round all the direct parents of the ancestor. */
-         for( iparent = 0; iparent < anc->nparent; iparent++ ) {
-            parent = anc->parents[ iparent ];
+/* Report a context error if anything went wrong. */
+   if( *status != SAI__OK ) {
+      msgSeti( "IANC", ianc );
+      ndfMsg( "NDF", indf );
+      errRep( " ", "Failed to remove provenance ancestor ^IANC from '^NDF'.",
+              status );
+   } 
 
-/* Create a parent-child link between the parent and the child, thus
-   skipping the ancestor that is to be removed. */
-            ndg1ParentChild( parent, child, status );
+/* Re-instate the original AST status variable. */
+   astWatch( old_status );
+}
+
+void ndgRmprvs( int indf, int nanc, int *anc, int *status ){
+/*
+*+
+*  Name:
+*     ndgRmprvs
+
+*  Purpose:
+*     Remove multiple ancestors from the provenance information in an NDF.
+
+*  Invocation:
+*     void ndgRmprv( int indf, int nanc, int *anc, int *status )
+
+*  Description:
+*     This routine removes one or more ancestors from the "PROVENANCE" 
+*     extension in INDF. The direct parents of the removed ancestor are
+*     assigned to the direct children of the removed ancestor.
+*
+*     Using this function once is more efficient than calling ndgRmprv 
+*     to remove each individual ancestor.
+
+*  Arguments:
+*     indf
+*        An identifier for the NDF containing the provenance information.
+*     nanc
+*        The length of the "anc" array.
+*     anc
+*        Pointer to an array holding the indices of the ancestor NDFs to be 
+*        removed. Each supplied value must be at least 1, and must be no 
+*        more than the number of ancestors in the provenance extension 
+*        (as returned by NDG_CTPRV). An error is reported otherwise. The
+*        supplied list is sorted into decreasing order before use so that 
+*        the highest index ancestor is removed first.
+*     status
+*        The global status.
+
+*-
+*/
+
+/* Local Variables: */
+   Provenance *prov = NULL;
+   int *old_status;
+   int *sanc;        
+   int i;             
+   int ianc;
+   int n;
+   int sorted;
+   int tmp;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Ensure AST uses the supplied status variable. */
+   old_status = astWatch( status );
+
+/* Read the provenance extension from the NDF. */
+   prov = ndg1ReadProvenanceExtension( indf, NULL, NULL, 0, status );
+   if( prov ) {
+
+/* Produce a sorted copy of the supplied array of indices, so that the
+   ancestor indices decrease. This is necessary since removing an
+   ancestor will modify the indices of the remaining higher ancestor
+   indices. */
+      sanc = astStore( NULL, anc, sizeof( *anc )*nanc );
+      if( sanc ) {
+
+/* Use a bubblesort algorithm to sort the array so that the largest index
+   is first. */
+         n = nanc - 1;
+         sorted = 0;
+         while( ! sorted ) {
+            sorted = 1;
+            for( i = 0; i < n; i++ ) {
+               if( sanc[ i ] < sanc[ i + 1 ] ) {
+                  tmp = sanc[ i ];
+                  sanc[ i ] = sanc[ i + 1 ];
+                  sanc[ i + 1 ] = tmp;
+                  sorted = 0;
+               }
+            }
+            n--;
          }
       }
 
-/* Loop round all the direct parents of the ancestor. */
-      n = anc->nparent;
-      for( iparent = 0; iparent < anc->nparent; iparent++ ) {
-         parent = anc->parents[ 0 ];
+/* Loop round the array of ancestor indices. */
+      ianc = -1;
+      for( i = 0; i < nanc && *status == SAI__OK; i++ ) {
 
-/* Break the parent-child link between the ancestor and the current
-   parent. */
-         ndg1Disown( parent, anc, status );
+/* Skip duplicated indices. */
+         if( sanc[ i ] != ianc ) {
+            ianc = sanc[ i ];
+
+/* Remove the ancestor. */
+            ndg1Rmprv( prov, ianc, status );
+         }
       }
 
-/* Now free the resources used by the ancestor. */
-      prov->provs[ ianc ] = ndg1FreeProv( anc, status );
-
-/* Shuffle all the remaining Provs down one slot. */
-      for( i = ianc + 1; i < prov->nprov; i++ ) {
-         prov->provs[ i - 1 ] = prov->provs[ i ];
-      }
-      prov->provs[ i - 1 ] = NULL;
-      ( prov->nprov )--;
-
-/* Purge any duplicate entries in the provenance information. */
-      ndg1PurgeProvenance( prov, status );
+/* Free resources. */
+      sanc = astFree( sanc );
 
 /* Store the modified provenance informtion in the NDF. */
       ndg1WriteProvenanceExtension( prov, indf, status );
-
-/* Report an error if the ianc value is bad. */
+         
+/* Report an error if the NDF contains no provenance. */
    } else if( *status == SAI__OK ) {
       *status = SAI__ERROR;
-      ndfMsg( "NDF", indf );
-      if( prov ) {
-         msgSeti( "IANC", ianc );
-         msgSeti( "N", prov->nprov );
-         errRep( " ", "Cannot remove provenance ancestor ^IANC from '^NDF': "
-                 "only ^N ancestors found.", status );
-      } else {
-         errRep( " ", "Cannot remove provenance information from '^NDF': "
-                 "no provenance found.", status );
-      }
+      errRep( " ", "No provenance information found in supplied NDF.", 
+              status );
    }
 
 /* Free resources. */
    ndg1FreeProvenance( prov, 1, status );
+
+/* Report a context error if anything went wrong. */
+   if( *status != SAI__OK ) {
+      ndfMsg( "NDF", indf );
+      errRep( " ", "Failed to remove provenance ancestors from '^NDF'.",
+              status );
+   } 
 
 /* Re-instate the original AST status variable. */
    astWatch( old_status );
@@ -3532,6 +3602,114 @@ static Provenance *ndg1ReadProvenanceExtension( int indf, HDSLoc *more,
 
 /* Return the result */
    return result;
+}
+
+static void ndg1Rmprv( Provenance *prov, int ianc, int *status ){
+/*
+*-
+*  Name:
+*     ndg1Rmprv
+
+*  Purpose:
+*     Remove an ancestor from a Provenance structure.
+
+*  Invocation:
+*     void ndgRmprv( Provenance *prov, int ianc, int *status )
+
+*  Description:
+*     This routine removes a given ancestor from the supplied Provenance
+*     structure. The direct parents of the removed ancestor are assigned 
+*     to the direct children of the removed ancestor.
+
+*  Arguments:
+*     prov
+*        Pointer to the structure holding provenance information read
+*        from an NDF.
+*     ianc
+*        The index of the ancestor to be removed. The supplied value
+*        must be at least 1, and must be no more than the number of
+*        ancestors in the provenance extension (as returned by NDG_CTPRV).
+*        An error is reported otherwise.
+*     status
+*        The global status.
+
+*-
+*/
+
+/* Local Variables: */
+   Prov *anc = NULL;
+   Prov *child = NULL;
+   Prov *parent = NULL;
+   int i;             
+   int ichild;
+   int iparent;
+   int n;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Check the "ianc" value is within the bounds of the ANCESTORS array. */
+   if( ianc > 0 && ianc < prov->nprov ) {
+
+/* Get a pointer to the ancestor Prov structure. */
+      anc = prov->provs[ ianc ];
+
+/* Loop round all the direct children of the ancestor. */
+      n = anc->nchild;
+      for( ichild = 0; ichild < n; ichild++ ) {
+
+/* The index into the children array is fixed at zero because the
+   following call to ndg1Disown will remove the first child from "anc" on
+   each pass. */
+         child = anc->children[ 0 ];
+
+/* Break the parent-child link between the ancestor and the current
+   child. This reduces the number of children in anc (i.e. anc->nchild) 
+   by 1. */
+         ndg1Disown( anc, child, status );
+
+/* Loop round all the direct parents of the ancestor. */
+         for( iparent = 0; iparent < anc->nparent; iparent++ ) {
+            parent = anc->parents[ iparent ];
+
+/* Create a parent-child link between the parent and the child, thus
+   skipping the ancestor that is to be removed. */
+            ndg1ParentChild( parent, child, status );
+         }
+      }
+
+/* Loop round all the direct parents of the ancestor. */
+      n = anc->nparent;
+      for( iparent = 0; iparent < anc->nparent; iparent++ ) {
+         parent = anc->parents[ 0 ];
+
+/* Break the parent-child link between the ancestor and the current
+   parent. */
+         ndg1Disown( parent, anc, status );
+      }
+
+/* Now free the resources used by the ancestor. */
+      prov->provs[ ianc ] = ndg1FreeProv( anc, status );
+
+/* Shuffle all the remaining Provs down one slot. */
+      for( i = ianc + 1; i < prov->nprov; i++ ) {
+         prov->provs[ i - 1 ] = prov->provs[ i ];
+      }
+      prov->provs[ i - 1 ] = NULL;
+      ( prov->nprov )--;
+
+/* Purge any duplicate entries in the provenance information. */
+      ndg1PurgeProvenance( prov, status );
+
+/* Report an error if the ianc value is bad. */
+   } else if( *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      msgSeti( "IANC", ianc );
+      msgSeti( "N", prov->nprov );
+      errRep( " ", "Cannot remove provenance ancestor ^IANC: "
+              "only ^N ancestors found.", status );
+   }
+
 }
 
 static HDSLoc *ndg1TCopy( HDSLoc *loc, const char *name, int *status ){
