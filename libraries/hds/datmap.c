@@ -34,7 +34,7 @@ datMap(const HDSLoc    *locator,
 #undef context_message
 #define context_name "DAT_MAP_ERR"
 #define context_message\
-        "DAT_MAP: Error mapping an HDS primitive (^PRIMLOC)."
+        "DAT_MAP: Error mapping an HDS primitive"
 
    GENPTR_POINTER(pntr)
    struct DSC type;
@@ -70,8 +70,6 @@ datMap(const HDSLoc    *locator,
       return *status;
    hds_gl_status = DAT__OK;
 
-   datMsg( "PRIMLOC", locator );
-
 /* Import the type and mode strings.  */
 
    _strcsimp  ( &type,   type_str );
@@ -87,49 +85,49 @@ datMap(const HDSLoc    *locator,
    primitive.  */
 
    if (state->mapped)
-      _call(DAT__PRMAP)
+      _callnam(DAT__PRMAP)
    if (data->struc)
-      _call(DAT__OBJIN)
+      _callnam(DAT__OBJIN)
 
 /* Determine the shape of the object and match the dimensions.  */
 
-   _call( dau_get_shape(data, &naxes, axis))
+   _callnam( dau_get_shape(data, &naxes, axis))
    if (ndim != naxes)
-      _call(DAT__DIMIN)
+      _callnam(DAT__DIMIN)
    for (i=0; i<naxes; i++)
       if (dims[i] != axis[i])
-         _call(DAT__DIMIN)
+         _callnam(DAT__DIMIN)
 
 /* Validate the application data type, and the access mode. Return if the
    container file was opened for read-only access and the access mode is
    'WRITE' or 'UPDATE'.  */
 
-   _call(dat1_check_type(&type, typbuf))
+   _callnam(dat1_check_type(&type, typbuf))
    dat1_check_mode( (const char *) mode.body, mode.length, &data->mode,
                      &hds_gl_status );
-   _call( hds_gl_status )
+   _callnam( hds_gl_status )
    reading = (data->mode != 'W');
    if (data->read && data->mode != 'R')
-      _call(DAT__ACCON)
+      _callnam(DAT__ACCON)
 
 /* Determine the attributes of the application data and reject the operation
    if not primitive.  */
 
-   _call(dat1_unpack_type(typbuf, &data->app))
+   _callnam(dat1_unpack_type(typbuf, &data->app))
    app = &data->app;
    if (app->class != DAT__PRIMITIVE)
-      _call(DAT__TYPIN)
+      _callnam(DAT__TYPIN)
 
 /* Match the object and applications data attributes and reject the operation
    if the types are incompatible.   */
 
    obj = &data->obj;
-   _call(dau_match_types(obj, app))
+   _callnam(dau_match_types(obj, app))
 
 /* Ensure that the object data is 'active' if reading or updating.      */
-   _call(rec_get_rcl(&data->han, &rcl))
+   _callnam(rec_get_rcl(&data->han, &rcl))
    if (reading && !rcl.active)
-      _call(DAT__UNSET)
+      _callnam(DAT__UNSET)
                         
 /* If the mapping is character-type and an explicit character string length */
 /* was not supplied (i.e. there was no '*' character in the type            */
@@ -174,7 +172,7 @@ datMap(const HDSLoc    *locator,
 
    if (state->broken)
    {
-      _call( rec_alloc_xmem( applen, (void **) &app->body ) )
+      _callnam( rec_alloc_xmem( applen, (void **) &app->body ) )
       if (reading)
          dau_gather_data( 1, data, &nbad );
    }
@@ -184,10 +182,10 @@ datMap(const HDSLoc    *locator,
 
    else if (state->vmcopy)
    {
-      _call( rec_alloc_xmem( applen, (void **) &app->body ) )
+      _callnam( rec_alloc_xmem( applen, (void **) &app->body ) )
       if (reading)
       {
-         _call(rec_locate_data(&data->han, objlen, objoff, 'R', &dom))
+         _callnam(rec_locate_data(&data->han, objlen, objoff, 'R', &dom))
          obj->body = dom;
          dat1_cvt( 1, data->size, obj, app, &nbad );
 
@@ -246,7 +244,7 @@ datMap(const HDSLoc    *locator,
       &hds_gl_status );
    }
 
-   _call(hds_gl_status)
+   _callnam(hds_gl_status)
 
    return hds_gl_status;
 }
@@ -266,12 +264,9 @@ datMapI(const HDSLoc    *locator,
 #undef context_message
 #define context_name "DAT_MAPI_ERR"
 #define context_message\
-        "DAT_MAPI: Error mapping HDS ^PRIM primitive as integer values."
-  emsMark();
-  datMsg( "PRIM", locator );
+        "DAT_MAPI: Error mapping HDS primitive as integer values."
    datMap( locator, "_INTEGER", mode_str, ndim, dims,
            (void**)pntr, status );
-   emsRlse();
    return hds_gl_status;
 }
 
@@ -290,12 +285,9 @@ datMapR(const HDSLoc *locator,
 #undef context_message
 #define context_name "DAT_MAPR_ERR"
 #define context_message\
-        "DAT_MAPR: Error mapping an HDS primitive as real values ^PRIM."
-  emsMark();
-  datMsg( "PRIM", locator );
+        "DAT_MAPR: Error mapping an HDS primitive as real values."
    datMap( locator, "_REAL", mode_str, ndim, dims,
            (void**)pntr, status );
-   emsRlse();
    return hds_gl_status;
 }
 
@@ -314,12 +306,9 @@ datMapD(const HDSLoc *locator,
 #undef context_message
 #define context_name "DAT_MAPD_ERR"
 #define context_message\
-        "DAT_MAPD: Error mapping an HDS primitive as double precision values. ^PRIM"
-  emsMark();
-  datMsg( "PRIM", locator );
+        "DAT_MAPD: Error mapping an HDS primitive as double precision values."
    datMap( locator, "_DOUBLE", mode_str, ndim, dims,
            (void**)pntr, status );
-   emsRlse();
    return hds_gl_status;
 }
 
@@ -338,12 +327,9 @@ datMapL(const HDSLoc *locator,
 #undef context_message
 #define context_name "DAT_MAPL_ERR"
 #define context_message\
-        "DAT_MAPL: Error mapping an HDS primitive as logical values. ^PRIM"
-  emsMark();
-  datMsg( "PRIM", locator );
+        "DAT_MAPL: Error mapping an HDS primitive as logical values."
    datMap( locator, "_LOGICAL", mode_str, ndim, dims,
            (void**)pntr, status );
-   emsRlse();
    return hds_gl_status;
 }
 
@@ -362,12 +348,9 @@ datMapC(const HDSLoc *locator,
 #undef context_message
 #define context_name "DAT_MAPC_ERR"
 #define context_message\
-        "DAT_MAPC: Error mapping an HDS primitive as character values ^PRIM"
-  emsMark();
-  datMsg( "PRIM", locator );
+        "DAT_MAPC: Error mapping an HDS primitive as character values."
    datMap( locator, "_CHAR", mode_str, ndim, dims,
            (void**)pntr, status );
-   emsRlse();
    return hds_gl_status;
 }
 
@@ -387,13 +370,12 @@ datMapV(const HDSLoc *locator,
 #undef context_message
 #define context_name "DAT_MAPV_ERR"
 #define context_message\
-        "DAT_MAPV: Error mapping an HDS vectorized primitive. ^PRIM"
+        "DAT_MAPV: Error mapping an HDS vectorized primitive."
 
   /* Local variables */
   hdsdim dims[DAT__MXDIM];
   int    ndim;
-  emsMark();
-  datMsg( "PRIM", locator );
+
   /* Initialise return values */
   *pntr = NULL;
   *actval = 0;
@@ -402,7 +384,6 @@ datMapV(const HDSLoc *locator,
   datShape( locator, DAT__MXDIM, dims, &ndim, status );
   datMap( locator, type_str, mode_str, ndim, dims,
 	  pntr, status );
-  emsRlse();
   return hds_gl_status;
 }
 
@@ -461,19 +442,19 @@ datBasic(const HDSLoc *locator,
    primitive.  */
 
    if (state->mapped)
-      _call(DAT__PRMAP)
+      _callnam(DAT__PRMAP)
    if (data->struc)
-      _call(DAT__OBJIN)
+      _callnam(DAT__OBJIN)
 
 /* Validate the access mode. Return if the container file was opened for
    read-only access and the mode is 'WRITE' or 'UPDATE'.  */
 
    dat1_check_mode( (const char *) mode.body, mode.length, &data->mode,
                     &hds_gl_status );
-   _call( hds_gl_status )
+   _callnam( hds_gl_status )
    reading = (data->mode != 'W');
    if (data->read && data->mode != 'R')
-      _call(DAT__ACCON)
+      _callnam(DAT__ACCON)
 
 /* Copy the object data attributes to the application data attributes
    descriptor.  */
@@ -484,9 +465,9 @@ datBasic(const HDSLoc *locator,
 
 /* Ensure that the object data is 'active' if reading or updating.      */
 
-   _call( rec_get_rcl(&data->han, &rcl) )
+   _callnam( rec_get_rcl(&data->han, &rcl) )
    if (reading && !rcl.active)
-      _call(DAT__UNSET)
+      _callnam(DAT__UNSET)
    state->vmcopy = 0;
 
 /* Calculate the length (in bytes) of the virtual memory required for the
@@ -500,7 +481,7 @@ datBasic(const HDSLoc *locator,
 
    if (state->broken)
    {
-      _call( rec_alloc_xmem( objlen, (void **) &app->body ) )
+      _callnam( rec_alloc_xmem( objlen, (void **) &app->body ) )
       if (reading)
          dau_gather_data( 1, data, &nbad );
    }
@@ -526,7 +507,7 @@ datBasic(const HDSLoc *locator,
 /* Copy c pointer to user */
     *pntr = retpntr;
 
-   _call(hds_gl_status)
+   _callnam(hds_gl_status)
    
    return hds_gl_status;
 }
@@ -561,13 +542,13 @@ datUnmap(const HDSLoc *locator,
 /* Return if the locator is associated with a structure.        */
 
    if (data->struc)
-      _call(DAT__OBJIN)
+      _callnam(DAT__OBJIN)
 
 /* Otherwise, flush any mapped data.                                        */
    else
    {
       dau_flush_data( data );
-      _call( hds_gl_status );
+      _callnam( hds_gl_status );
    }
    return hds_gl_status;
 }
