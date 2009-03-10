@@ -300,11 +300,9 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
         lastmean = model_data_copy[i];
         for( j=0; j<nbolo; j++ ) {
           if( dat->gai ) {
-            /* if GAIn model was fit, there is an additional offset (the gain
-               has already been un-done in smf_iteratemap at the end of the
-               previous iteration). Offset is stored in the second plane of
-               the gain model. */
-            g = 1./gai_data[j*gbstride];
+            /* if GAIn model was fit, the common mode has a gain (1st
+               plane of the model) and an offset (2nd plane of the model). */
+            g = gai_data[j*gbstride];
             off = gai_data[j*gbstride + gcstride];
           } else {
             off = 0;
