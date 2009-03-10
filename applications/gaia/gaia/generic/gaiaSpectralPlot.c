@@ -148,7 +148,9 @@ static int CanvasTagsParseProc( ClientData clientData, Tcl_Interp *interp,
                                 Tk_Window tkwin, CONST char *value,
                                 char *widgRec, int offset );
 static Tk_CustomOption tagsOption = {
-    CanvasTagsParseProc, Tk_CanvasTagsPrintProc, (ClientData) NULL
+    (Tk_OptionParseProc *) CanvasTagsParseProc, 
+    (Tk_OptionPrintProc *) Tk_CanvasTagsPrintProc, 
+    (ClientData) NULL
 };
 
 /* FrameSet handling */
@@ -159,7 +161,9 @@ static char *FrameSetPrintProc( ClientData clientData, Tk_Window tkwin,
                                 char *widgRec, int offset,
                                 Tcl_FreeProc **freeProcPtr );
 static Tk_CustomOption framesetOption = {
-    FrameSetParseProc, FrameSetPrintProc, (ClientData) NULL
+    (Tk_OptionParseProc *) FrameSetParseProc, 
+    (Tk_OptionPrintProc *) FrameSetPrintProc, 
+    (ClientData) NULL
 };
 
 static int MappingParseProc( ClientData clientData, Tcl_Interp *interp,
@@ -169,7 +173,9 @@ static char *MappingPrintProc( ClientData clientData, Tk_Window tkwin,
                                char *widgRec, int offset,
                                Tcl_FreeProc **freeProcPtr );
 static Tk_CustomOption mappingOption = {
-    MappingParseProc, MappingPrintProc, (ClientData) NULL
+    (Tk_OptionParseProc *) MappingParseProc, 
+    (Tk_OptionPrintProc *) MappingPrintProc, 
+    (ClientData) NULL
 };
 
 /* Configuration options */
@@ -914,7 +920,7 @@ static int SPConfigure( Tcl_Interp *interp, Tk_Canvas canvas,
     tkwin = Tk_CanvasTkwin( canvas );
     /* Note using Tcl_Obj calls so need TK_CONFIG_OBJS flags. */
     if ( Tk_ConfigureWidget( interp, tkwin, configSpecs, objc,
-                             (CONST char **) objv, (char *) spPtr,
+                             (char **) objv, (char *) spPtr,
                              flags|TK_CONFIG_OBJS )
          != TCL_OK ) {
         return TCL_ERROR;
