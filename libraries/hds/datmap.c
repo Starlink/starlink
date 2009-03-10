@@ -4,6 +4,7 @@
 
 /*+DATMAP.C-*/
 
+#include <stdio.h>
 #include <string.h>
 #include "ems.h"      /* EMS error reporting routines            */
 #include "hds1.h"     /* Global definitions for HDS              */
