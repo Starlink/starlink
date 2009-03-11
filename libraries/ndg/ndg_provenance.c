@@ -92,6 +92,7 @@ static Provenance *ndg1ReadProvenanceExtension( int, HDSLoc *, const char *, int
 static char *ndg1GetTextComp( HDSLoc *, const char *, char *, size_t, int * );
 static const char *ndg1Date( int * );
 static int ndg1FindAncestorIndex( Prov *, Provenance *, int * );
+static int ndg1IntCmp( const void *, const void * );
 static int ndg1TheSame( Prov *, Prov *, int * );
 static void ndg1A2h0c( const char *, AstKeyMap *, HDSLoc *, int * );
 static void ndg1A2h1i( const char *, AstKeyMap *, HDSLoc *, int * );
@@ -1513,9 +1514,6 @@ void ndgRmprvs( int indf, int nanc, int *anc, int *status ){
    int *sanc;        
    int i;             
    int ianc;
-   int n;
-   int sorted;
-   int tmp;
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
@@ -1532,25 +1530,9 @@ void ndgRmprvs( int indf, int nanc, int *anc, int *status ){
    ancestor will modify the indices of the remaining higher ancestor
    indices. */
       sanc = astStore( NULL, anc, sizeof( *anc )*nanc );
-      if( sanc ) {
 
-/* Use a bubblesort algorithm to sort the array so that the largest index
-   is first. */
-         n = nanc - 1;
-         sorted = 0;
-         while( ! sorted ) {
-            sorted = 1;
-            for( i = 0; i < n; i++ ) {
-               if( sanc[ i ] < sanc[ i + 1 ] ) {
-                  tmp = sanc[ i ];
-                  sanc[ i ] = sanc[ i + 1 ];
-                  sanc[ i + 1 ] = tmp;
-                  sorted = 0;
-               }
-            }
-            n--;
-         }
-      }
+/* Sort the array so that the largest index is first. */
+      if( sanc ) qsort( sanc, (size_t) nanc, sizeof( *sanc ), ndg1IntCmp );
 
 /* Loop round the array of ancestor indices. */
       ianc = -1;
@@ -4101,7 +4083,35 @@ static const char *ndg1Date( int *status ){
    return result;
 }
 
+static int ndg1IntCmp( const void *a, const void *b ){
+/*
+*  Name:
+*     ndg1Date
 
+*  Purpose:
+*     qsort int comparison function
+
+*  Invocation:
+*     int ndg1IntCmp(const void *a, const void *b );
+
+*  Description:
+*     This function returns a positive, zero, or negative value if 
+*     the integer pointed to by "b" is larger than, equal to, or 
+*     less than, the integer pointed to by "a". Note, this results in
+*     qsort sorting into descending order, rather than ascending.
+
+*  Arguments:
+*     a
+*        Pointer to the first integer to be compared.
+*     b
+*        Pointer to the second integer to be compared.
+
+*/
+
+    const int *ia = (const int *) a; 
+    const int *ib = (const int *) b;
+    return *ib  - *ia; 
+}
 
 
 
