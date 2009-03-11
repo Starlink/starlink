@@ -745,18 +745,6 @@ itcl::class gaia::Gaia {
       if { $itk_option(-ukirt_ql) || $itk_option(-ukirt_xy) } {
          attach_camera
       }
-
-      #  Add SIAP query dialog to Data-Servers.
-      set m [get_menu Data-Servers]
-      set index [$m index "Reload config file..."]
-      insert_menuitem $m $index command "Query VO image servers..." \
-         {Find VO image servers and query for images} \
-         -command [code $this vo_siap_query_ $m $index]
-
-      #  Cone Search.
-      insert_menuitem $m $index command "Query VO catalog servers..." \
-         {Find VO Cone Search servers and query for catalogs} \
-         -command [code $this vo_find_cone_ $m $index]
    }
 
    #  Add a menubutton with the GAIA options.
@@ -2363,7 +2351,7 @@ window gives you access to this."
    #  ----------
 
    #  Open a dialog for querying SIAP services for any images.
-   protected method vo_siap_query_ {m index} {
+   public method vo_siap_query {} {
       if { [gaia::GaiaVOTableAccess::check_for_gaiavo] } {
 
          #  Find and open the current list of servers.
@@ -2374,13 +2362,12 @@ window gives you access to this."
             -siap_catalog $siap_file -gaia [scope $this] -title "SIAP services"
 
       } else {
-         #  Grey out menu, no GaiaVO.
-         $m entryconfigure $index -state disabled
+         error_dialog "No GAIA-VO extension is available" $w_
       }
    }
 
    #  Open a dialog for querying Cone Search services for any catalogues.
-   protected method vo_find_cone_ {m index} {
+   public method vo_find_cone {} {
       if { [gaia::GaiaVOTableAccess::check_for_gaiavo] } {
 
          #  Find and open the current list of servers.
@@ -2393,8 +2380,7 @@ window gives you access to this."
             -activate_cmd [code $this vo_query_cone_] \
             -whole_operation 0
       } else {
-         #  Grey out menu, no GaiaVO.
-         $m entryconfigure $index -state disabled
+         error_dialog "No GAIA-VO extension is available" $w_
       }
    }
 
@@ -2743,4 +2729,10 @@ set util::TopLevelWidget::help_window_class gaia::HelpWin
 #  to the autoload version).
 itcl::body ::cat::AstroCat::local_catalog {{id ""} {classname AstroCat} {debug 0} {w ""}} {
    gaia::GaiaSearch::get_local_catalog $id $w
+}
+
+#  Re-direct this proc so that we can add VO features. The Data-Servers menu
+#  is erased and no hooks exist to restore the VO menus.
+itcl::body ::cat::AstroCat::add_catalog_menu {w {id {} } {classname AstroCat} {debug 0}} {
+   ::gaia::GaiaSearch::add_catalog_menu $w $id $classname $debug
 }

@@ -551,12 +551,110 @@ itcl::class gaia::GaiaSearch {
             $astrocat_ entry add \
                [list "serv_type local" "long_name $fname" "short_name $name" \
                    "url $fname"]
-         }
+          }
 
          #  Display the catalogue.
          gaia::GaiaSearch::new_local_catalog "$name" $id ::gaia::GaiaSearch "catalog" $w
       } else {
          warning_dialog "Not a table ($type)" $w
+      }
+   }
+
+
+   #  Populate the Data-Servers menu with the standard items and VO.  Copy of
+   #  cat::AstroCat::add_catalog_menu proc so we can add VO items (this proc is
+   #  called to completely re-create this menu with new catalogs). See Gaia.tcl
+   #  which calls this instead of cat::AstroCat::add_catalog_menu.
+   #
+   #  w is the caller's toplevel window (an instance of TopLevelWidget).
+   #
+   #  id is an optional unique id to be associated with a new catalog widget.
+   #
+   #  classname is the name of the AstroCat subclass to use to create new
+   #  catalog widgets (defaults to "AstroCat").
+   #
+   #  debug is a flag is passed from the command line. If true, queries
+   #  are run in the foreground, to make debugging easier.
+   public proc add_catalog_menu {w {id ""} {classname AstroCat} {debug 0}} {
+
+      # save this info so we can update the menu automatically later
+      set catalog_menu_info_($w) \
+         [code cat::AstroCat::add_catalog_menu $w $id $classname $debug]
+
+      # add the menu to the caller's menubar
+      set m [$w add_menubutton "Data-Servers" "Display Data Servers menu"]
+
+      $w add_menuitem $m cascade "Catalogs" \
+         {Select a catalog from the menu} \
+         -menu [menu $m.catalogs]
+      fill_catalog_menu $w $id $classname $m.catalogs $debug catalog
+
+      $w add_menuitem $m cascade "Image Servers" \
+         {Select an image server from the menu} \
+         -menu [menu $m.imagesvr]
+      fill_catalog_menu $w $id $classname $m.imagesvr $debug imagesvr
+
+      $w add_menuitem $m cascade "Archives" \
+         {Select an archive from the menu} \
+         -menu [menu $m.archive]
+      fill_catalog_menu $w $id $classname $m.archive $debug archive
+
+      $w add_menuitem $m cascade "Local Catalogs" \
+         {Select a local catalog from the menu} \
+         -menu [menu $m.local]
+      fill_catalog_menu $w $id $classname $m.local $debug local shortname
+
+      $m.local add separator
+
+      $w add_menuitem $m.local command "Load from file..." \
+         {Open a local catalog file} \
+         -command [code cat::AstroCat::local_catalog $id $classname $debug $w] \
+         -accelerator "Control-O"
+
+      # clear the local catalogs (handy when many local catalogs have been
+      # opened).
+      $w add_menuitem $m.local command "Clear local catalogs" \
+         {Clear all local catalogs from the list} \
+         -command [code clear_local_catalogs]
+
+      $m add separator
+
+      $w add_menuitem $m command "Browse Catalog Directories..."  \
+         "Browse the catalog directory hierarchy to view \
+             catalogs or add them to the default list" \
+         -command [code cat::AstroCat::catalog_directory $id $classname $debug $w] \
+         -accelerator "Control-b"
+
+      #  GAIA-VO items, if no VO services grey out.
+      if { [gaia::GaiaVOTableAccess::check_for_gaiavo] } {
+         set state normal
+      } else {
+         set state disabled
+      }
+
+      #  Add SIAP query dialog.
+      $w add_menuitem $m command "Query VO image servers..." \
+         {Find VO image servers and query for images} \
+         -command [code $w vo_siap_query] -state $state
+
+      #  Cone Search.
+      $w add_menuitem $m command "Query VO catalog servers..." \
+         {Find VO Cone Search servers and query for catalogs} \
+         -command [code $w vo_find_cone] -state $state
+
+
+      $w add_menuitem $m command "Reload config file..."  \
+         "Reload the default catalog config file after it was edited by hand" \
+         -command [code cat::AstroCat::reload_config_file $w] \
+         -accelerator "Control-R"
+
+      # if there is a local catalog called "history", add it to the menu also
+      if {"[$astrocat_ servtype history]" == "local"} {
+         $m add separator
+         $w add_menuitem $m command "History..."  \
+            "Open an automatically generated catalog of previously viewed images" \
+            -command [code cat::AstroCat::select_catalog history local $id $classname 0 $debug $w] \
+            -accelerator "Control-h"
       }
    }
 
