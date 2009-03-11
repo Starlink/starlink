@@ -626,6 +626,7 @@ itcl::class gaia::GaiaSearch {
          -accelerator "Control-b"
 
       #  GAIA-VO items, if no VO services grey out.
+      #  =============
       if { [gaia::GaiaVOTableAccess::check_for_gaiavo] } {
          set state normal
       } else {
@@ -634,7 +635,7 @@ itcl::class gaia::GaiaSearch {
 
       #  Add SIAP query dialog.
       $w add_menuitem $m command "Query VO image servers..." \
-         {Find VO image servers and query for images} \
+         {Query VO image servers for a region of sky and download images} \
          -command [code $w vo_siap_query] -state $state
 
       #  Cone Search.

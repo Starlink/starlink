@@ -9,7 +9,7 @@
 #     Query a Cone Search server for a catalogue.
 
 #  Description:
-#     Extends the GaiaVOCat class to query a given Cone Search server for 
+#     Extends the GaiaVOCat class to query a given Cone Search server for
 #     any objects it contains in a given region of sky. The objects are
 #     described as a row in a catalogue.
 
@@ -97,6 +97,9 @@ itcl::class gaiavo::GaiaVOCatCone {
       add_menuitem $m command "Set plot symbols..." \
          {Set the symbol (color, size, etc.) to use to plot objects} \
          -command [code $this set_plot_symbols]
+
+      #  Add menus for selecting simple plot symbols.
+      add_plot_menus_
 
       #  Add the standard name servers.
       set ns_menu [menu $m.ns]
@@ -193,7 +196,7 @@ itcl::class gaiavo::GaiaVOCatCone {
    }
 
    #  Open a service, "args" is a list of values from a row of the current
-   #  table. 
+   #  table.
    protected method open_service_ {args} {
       puts "nothing done with open_service_"
    }
@@ -240,8 +243,23 @@ itcl::class gaiavo::GaiaVOCatCone {
 
    #  Set the catalogue plotting symbol to the default.
    protected method set_default_plot_symbol_ {} {
-      set symbol [list {} [list circle red {} {} {} {}] [list {4.0} {}]]
+      if { $type_ == {} } {
+         set type_ circle
+      }
+      if { $colour_ == {} } {
+         set colour_ red
+      }
+      if { $size_ == {} } {
+         set size_ 3
+      }
+      set_simple_symbol_
+   }
+
+   #  Set the catalogue plotting symbol to that of the markers menu.
+   protected method set_simple_symbol_ {} {
+      set symbol [list {} [list $type_ $colour_ {} {} {} {}] [list $size_ {}]]
       $w_.cat symbol $symbol
+      plot
    }
 
    #  Pop up a dialog to set the plot symbols to use for this catalogue.
@@ -259,8 +277,50 @@ itcl::class gaiavo::GaiaVOCatCone {
          -command [code $this plot]
    }
 
-   #  Select a symbol, given the canvas id and optional row number 
-   #  in the table listing. If $toggle is 0, deselect all other symbols 
+   #  Add the menu items for selecting simple plot symbols.
+   protected method add_plot_menus_ {} {
+      set m [add_menubutton Markers "Plot symbol markers"]
+
+      #  Add the menus
+      foreach {label name} {Type type Size size Colour colour} {
+         $m add cascade -label $label -menu [menu $m.$name]
+      }
+
+      #  Add short help texts for menu items
+      add_menu_short_help $m Type {Set the plot symbol shape}
+      add_menu_short_help $m Size {Set the plot symbol size (pixels)}
+      add_menu_short_help $m Colour {Set the plot symbol colour}
+
+      #  Add the known types.
+      foreach {name} $symbol_types_ {
+         $m.type add radiobutton \
+            -value $name \
+            -bitmap $name \
+            -variable [scope type_] \
+            -command [code $this set_simple_symbol_]
+      }
+
+      #  Size menu
+      foreach i {3 5 7 9 11 15 21 31} {
+         $m.size add radiobutton \
+            -value $i \
+            -label $i \
+            -variable [scope size_] \
+            -command [code $this set_simple_symbol_]
+      }
+
+      #  Colour menu
+      foreach i $colours_ {
+         $m.colour add radiobutton \
+            -value $i \
+            -command [code $this set_simple_symbol_] \
+            -variable [scope colour_] \
+            -background $i
+      }
+   }
+
+   #  Select a symbol, given the canvas id and optional row number
+   #  in the table listing. If $toggle is 0, deselect all other symbols
    #  first, otherwise toggle the selection of the items given by $id.
    public method select_symbol {id toggle {rownum -1}} {
       set tag [lindex [$canvas_ gettags $id] 0]
@@ -271,13 +331,13 @@ itcl::class gaiavo::GaiaVOCatCone {
             return
          }
       }
-        
+
       if {$toggle} {
          if {[$draw_ item_has_tag $tag $w_.selected]} {
             deselect_symbol $tag
             $itk_component(results) deselect_row $rownum
             return
-         } 
+         }
       } else {
          deselect_symbol $w_.selected
       }
@@ -286,7 +346,7 @@ itcl::class gaiavo::GaiaVOCatCone {
          $itk_component(results) select_row $rownum [expr !$toggle]
          $itk_component(results) select_result_row
       }
-      
+
       foreach i [$canvas_ find withtag $tag] {
          set width [$canvas_ itemcget $i -width]
          $canvas_ itemconfig $i -width [expr $width+2]
@@ -390,7 +450,18 @@ itcl::class gaiavo::GaiaVOCatCone {
    protected variable object_tag_ {}
    protected variable label_tag_ {}
 
+   #  Simple symbol values.
+   protected variable type_ {}
+   protected variable colour_ {}
+   protected variable size_ {}
+
    #  Common variables: (shared by all instances)
    #  -----------------
+
+   protected common symbol_types_ \
+      {circle square cross triangle diamond}
+
+   protected common colours_ {white grey90 grey80 grey70 grey60 grey50
+      grey40 grey30 grey20 grey10 black red green blue cyan magenta yellow}
 
 }
