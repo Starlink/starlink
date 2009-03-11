@@ -46,7 +46,7 @@ USA}
 \vfill
 \bigskip
 \begin{center}
-{\Large August 2007\\}
+{\Large December 2008\\}
 \end{center}
 \vfill
 \end{titlepage}
@@ -109,7 +109,7 @@ package should be sent to the primary author:
 
 \begin{verbatim}
         Dr. William Pence                 Telephone:  (301) 286-4599
-        HEASARC, Code 662                 E-mail: pence@tetra.gsfc.nasa.gov
+        HEASARC, Code 662                 E-mail: William.D.Pence@nasa.gov
         NASA/Goddard Space Flight Center
         Greenbelt, MD 20771, USA
 \end{verbatim}
@@ -426,19 +426,8 @@ using older DOS commands.
 \subsection{Macintosh PCs}
 
 When building on Mac OS-X, users should follow the Unix instructions,
-above.
-
-The classic MacOS version (OS 9 or earlier) of the CFITSIO library can
-be built by (1) un binhex and unstuff cfitsio\_mac.sit.hqx, (2) put
-CFitsioPPC.mcp in the cfitsio directory, and (3) load CFitsioPPC.mcp
-into CodeWarrior Pro 5 and make.  This builds the CFITSIO library for
-PPC.  There are also targets for both the test program and the speed
-test program.
-
-To use the MacOS port you can add Cfitsio PPC.lib to your CodeWarrior
-Pro 5 project.  Note that this only has been tested for the PPC and
-probably won't work on 68k Macs.
-
+above.  See the README.MacOS file for instructions on building a Universal
+Binary that supports both Intel and PowerPC CPUs.
 
 
 \section{Testing the Library}
@@ -2527,106 +2516,147 @@ in the FITS array.
 
 \section{Image Compression}
 
-CFITSIO now transparently supports 2 methods of image compression:
+CFITSIO transparently supports the 2 methods of image compression described
+below.
 
-1)  The entire FITS file may be externally compressed with the gzip or
-Unix compress algorithm, producing a *.gz or *.Z file, respectively.
-When reading compressed files of this type, CFITSIO first uncompresses
-the entire file into memory before performing the requested read
-operations.  Output files can be directly written in the gzip
-compressed format if the user-specified filename ends with `.gz'.  In
-this case, CFITSIO initially writes the uncompressed file in memory and
-then compresses it and writes it to disk when the FITS file is closed,
-thus saving user disk space. Read and write access to these compressed
-FITS files is generally quite fast; the main limitation is that there
-must be enough available memory (or swap space) to hold the entire
+1)  The entire FITS file may be externally compressed with the gzip or Unix
+compress utility programs, producing a *.gz or *.Z file, respectively. When reading
+compressed files of this type, CFITSIO first uncompresses the entire file
+into memory before performing the requested read operations.  Output files
+can be directly written in the gzip compressed format if the user-specified
+filename ends with `.gz'.  In this case, CFITSIO initially writes the
+uncompressed file in memory and then compresses it and writes it to disk
+when the FITS file is closed, thus saving user disk space. Read and write
+access to these compressed FITS files is generally quite fast since all the
+I/O is performed in memory; the main limitation with this technique is that
+there must be enough available memory (or swap space) to hold the entire
 uncompressed FITS file.
 
-2) CFITSIO also supports a newer image compression format in which the
-image is divided into a grid of rectangular tiles, and each tile of
-pixels is individually compressed.  The compressed tiles are stored in
-rows of a variable length array column in a FITS binary table, but
-CFITSIO recognizes that the binary table extension contains an image
-and treats it as if it were an IMAGE extension.  This tile-compressed
-format is especially well suited for compressing very large images
-because a) the FITS header keywords remain uncompressed for rapid read
-access, and because b) it is possible to extract and uncompress
-sections of the image without having to uncompress the entire image.
-This format is also much more effective in compressing floating point
-images (using a lossy compression algorithm) than simply compressing
-the image using gzip or compress.
+2) CFITSIO also supports the FITS tiled image compression convention in
+which the image is subdivided into a grid of rectangular tiles, and each
+tile of pixels is individually compressed.   The details of this FITS
+compression  convention are described at the FITS Support Office web site at
+http://fits.gsfc.nasa.gov/fits\_registry.html  Basically, the compressed
+image tiles are stored in rows of a variable length array column in a FITS
+binary table, however CFITSIO recognizes that this binary table extension
+contains an image and treats it as if it were an IMAGE extension.  This
+tile-compressed format is especially well suited for compressing very large
+images because a) the FITS header keywords remain uncompressed for rapid
+read access, and because b) it is possible to extract and uncompress
+sections of the image without having to uncompress the entire image. This
+format is also much more effective in compressing floating point images
+than simply compressing the image using gzip or compress because it
+approximages the floating point values with scaled integers which can then
+be compressed more efficiently.
 
-A detailed description of this format is available at:
+Currently CFITSIO supports 3 general purpose compression algorithms  plus
+one other special-purpose compression technique that is designed for data
+masks with positive integer pixel values. The 3 general purpose algorithms
+are GZIP, Rice, and HCOMPRESS, and the special purpose  algorithm is the
+IRAF pixel list compression technique (PLIO). In principle, any number of
+other compression algorithms could also be supported  by the FITS tiled
+image compression convention.
 
-\begin{verbatim}
-http://heasarc.gsfc.nasa.gov/docs/software/fitsio/
-       compression/compress_image.html
-\end{verbatim}
-
-The N-dimensional FITS image can be divided into any
-desired rectangular grid of compression tiles.  By default the tiles
-are chosen to correspond to the rows of the image, each containing
-NAXIS1 pixels, (except when using HCOMPRESS, where the default is
-to compress the entire image as a single big tile).
-For example, a 800 x 800 x 4 pixel data cube would be
-divided in to 3200 tiles containing 800 pixels each by default.
-Alternatively, this data cube could be divided into 256 tiles that are each
-100 X 100 X 1 pixels in size, or 4 tiles containing 800 x 800 X 1
-pixels, or a single tile containing the entire data cube.  Note that
-the image dimensions are not required to be an integer multiple of the
-tile dimensions, so, for example, this data cube could also be divided
-into 250 X 200 pixel tiles, in which case the last tile in each row
-would only contain 50 X 200 pixels.
-
-Currently, 4 image compression algorithms are supported:  Rice, GZIP,
-HCOMPRESS, and PLIO.  Rice and GZIP are general purpose algorithms that can be
-used to compress almost any image.  HCOMPRESS is very effective for
-astronomical images.  The PLIO  algorithm is
-more specialized and was developed for use in the IRAF data analysis
-system to store
-pixel data quality masks. It is designed to only work on images
-containing positive integers with values up to about 2**24.  Other
-image compression algorithms may be supported in the future.
+The FITS image can be subdivided into any desired rectangular grid of
+compression tiles.  With the GZIP, Rice,  and PLIO algorithms, the default
+is to take each row of the image as a tile.  The HCOMPRESS algorithm is
+inherently 2-dimensional in nature, so the default in this case is to take
+16 rows of the image per tile. In most cases it makes little difference what
+tiling pattern is used, so the default tiles are usually adequate.  In the
+case of very small images, it could be more efficient to compress the whole
+image as a single tile. Note that the image dimensions are not required to
+be an integer multiple of the tile dimensions; if not, then the tiles at the
+edges of the image will be smaller than the other tiles.
 
 The 4 supported image compression algorithms are all 'loss-less' when
-applied to integer FITS images;  the pixel values are preserved exactly
-with no loss of information during the compression and uncompression
-process.  The HCOMPRESS algorithm can also be used in a 'lossy' mode to achieve
-a greater degree of image compression (by specifying a 'scale' parameter
-value greater than 1).   To set the scale parameter effectively, one must
-know the RMS noise in the image pixel values;  The fits\_rms\_float
-and fits\_rms\_short routines in CFITSIO are provided to estimate
-the RMS value in an image.
+applied to integer FITS images;  the pixel values are preserved exactly with
+no loss of information during the compression and uncompression process.  In
+addition, the HCOMPRESS algorithm supports a 'lossy' compression mode that
+will produce
+larger amount of image compression.  This is achieved by specifying a non-zero
+value for the HCOMPRESS ``scale''
+parameter.  Since the amount of compression that is achieved depends directly
+on the RMS noise in the image, it is usually more convention
+to specify the HCOMPRESS scale factor relative to the RMS noise.
+Setting s = 2.5 means use a scale factor that is 2.5 times the calculated RMS noise
+in the image tile.   In some cases
+it may be desireable to specify the exact scaling to be used,
+instead of specifying it relative to the calculated noise value.  This may
+be done by specifying the negative of desired scale value (typically
+in the range -2 to -100).
 
-Floating point FITS images (which have BITPIX = -32 or -64)
-are first quantized into scaled integer pixel values before being
-compressed.  This technique produces much higher compression factors
-than, for example, simply using GZIP to compress the whole FITS file
-image, but it also means that
-the original floating value pixel values may not be precisely returned
-when the image is uncompressed.  When done properly, this only discards
-the 'noise' from the floating point values without losing any
-significant information.  The amount of noise that is discarded can be
-controlled by the 'noise\_bits' compression parameter.
+Very high compression factors (of 100 or more) can be
+achieved by using large HCOMPRESS scale values, however, this can produce undesireable
+``blocky'' artifacts in the compressed image.  A variation of the HCOMPRESS
+algorithm (called HSCOMPRESS) can be used in this case to apply a small
+amount of smoothing of the image when it is uncompressed to help cover up
+these artifacts.  This smoothing is purely cosmetic and does not cause any
+significant change to the image pixel values.
 
-No special action is required to read tile-compressed images because
-all the CFITSIO routines that read normal uncompressed FITS images can
-also read images in the tile-compressed format;  CFITSIO essentially
-treats the binary table that contains the compressed tiles as if
-it were an IMAGE extension.
+Floating point FITS images (which have BITPIX = -32 or -64) usually contain
+too much ``noise'' in the least significant bits of the mantissa of the
+pixel values  to be effectively compressed with any lossless algorithm.
+Consequently, floating point images are first quantized into scaled integer
+pixel values (and thus throwing away much of the noise) before being
+compressed with the specified algorithm (either GZIP, Rice, or HCOMPRESS).
+This technique produces much higher compression factors than
+simply using the GZIP utility to externally compress the whole FITS file,  but it also
+means that the original floating value pixel values are not exactly
+preserved. When done properly, this  integer scaling technique will only
+discard the insignificant noise while still preserving all the real
+information in the image.  The amount of precision that is retained in the
+pixel values is controlled by the "quantization level" parameter, q.  Larger
+values of q will result in compressed images whose pixels more closely match
+the floating point pixel values, but at the same time the amount of
+compression that is achieved will be reduced.  Users should experiment with
+different values for  this parameter to determine the optimal value that
+preserves all the useful information in the image, without needlessly
+preserving all the ``noise'' which will hurt the compression efficiency.
 
-When creating (writing) a new image with CFITSIO, a normal uncompressed
-FITS primary array or IMAGE extension will be written unless the
-tile-compressed format has been specified in 1 of 2 possible ways:
+The default value for the quantization scale factor is 16., which means that
+scaled integer pixel values will be quantized such that the difference
+between adjacent integer values will be 1/16th of the noise level in the
+image background. CFITSIO uses an optimized algorithm to accurately estimate
+the noise in the image.  As an example, if the RMS noise in the background
+pixels of an  image = 32.0,  then the spacing between adjacent scaled
+integer pixel values  will equal 2.0 by default.  Note that the RMS noise is
+independently calculated for each tile of the image, so the resulting
+integer scaling factor may fluctuate slightly for each tile.   In some cases
+it may be desireable to specify the exact quantization level to be used,
+instead of specifying it relative to the calculated noise value.  This may
+be done by specifying the negative of desired quantization level for the
+value of q.  In the previous example, one could specify q = -2.0 so that the
+quantized integer levels differ by 2.0.  Larger negative values for q means
+that the levels are more coursely spaced, and will produce higher
+compression factors.
+
+There are 2 methods for specifying all the parameters needed to write a FITS
+image in the tile compressed format.  The parameters may either be specified
+at run time as part of the file name of the output compressed FITS file, or
+the writing program may call a set of helper CFITSIO subroutines that are provided
+for specifying the parameter values, as described below:
 
 1)  At run time, when specifying the name of the output FITS file to be
-created at run time, the user can indicate that images should be
+created, the user can indicate that images should be
 written in tile-compressed format by enclosing the compression
-parameters in square brackets following the root disk file name.   The
-`imcopy' example program that included with the CFITSIO distribution
-can be used for this purpose to compress or uncompress images.  Here
-are some examples of the extended file name syntax for specifying
-tile-compressed output images:
+parameters in square brackets following the root disk file name
+in the following format:
+
+\begin{verbatim}
+    [compress NAME T1,T2; q QLEVEL, s HSCALE]
+\end{verbatim}
+where
+
+\begin{verbatim}
+    NAME   = algorithm name:  GZIP, Rice, HCOMPRESS, HSCOMPRSS or PLIO
+             may be abreviated to the first letter (or HS for HSCOMPRESS)
+    T1,T2  = tile dimension (e.g. 100,100 for square tiles 100 pixels wide)
+    QLEVEL = quantization level for floating point FITS images
+    HSCALE = HCOMPRESS scale factor; default = 0 which is lossless.
+\end{verbatim}
+
+Here are a few examples of this extended syntax:
+
 
 \begin{verbatim}
     myfile.fit[compress]    - use the default compression algorithm (Rice)
@@ -2637,14 +2667,11 @@ tile-compressed output images:
     myfile.fit[compress PLIO]     name is required.
     myfile.fit[compress HCOMP]
 
-    myfile.fit[compress R 100,100]   - use Rice, GZIP, or HCOMPRESS compression
-    myfile.fit[compress G 100,100]     and 100 x 100 pixel tile size
-    myfile.fit[compress H 100,100]
+    myfile.fit[compress R 100,100]   - use Rice and 100 x 100 pixel tiles
 
-    myfile.fit[compress R 100,100;2] - Rice or GZIP,  use noisebits = 2
-    myfile.fit[compress G 100,100;2]    when compressing floating point image
-
-    myfile.fit[compress H; 25 1]  -  HCOMPRESS, with scale = 25 and smooth = 1
+    myfile.fit[compress R; q 10.0] - quantization level = (RMS-noise) / 10.
+    myfile.fit[compress HS; s 2.0]  -  HSCOMPRESS (with smoothing)
+                                          and scale = 2.0 * RMS-noise
 \end{verbatim}
 
 2)  Before calling the CFITSIO routine to write the image header
@@ -2658,14 +2685,15 @@ return the current values of the parameters:
 \begin{verbatim}
   int fits_set_compression_type(fitsfile *fptr, int comptype, int *status)
   int fits_set_tile_dim(fitsfile *fptr, int ndim, long *tilesize, int *status)
-  int fits_set_noise_bits(fitsfile *fptr, int noisebits, int *status)
-  int fits_set_hcomp_scale(fitsfile *fptr, int scale, int *status)
+  int fits_set_quantize_level(fitsfile *fptr, float qlevel, int *status)
+  int fits_set_hcomp_scale(fitsfile *fptr, float scale, int *status)
   int fits_set_hcomp_smooth(fitsfile *fptr, int smooth, int *status)
+              Set smooth = 1 to apply smoothing when uncompressing the image
 
   int fits_get_compression_type(fitsfile *fptr, int *comptype, int *status)
   int fits_get_tile_dim(fitsfile *fptr, int ndim, long *tilesize, int *status)
-  int fits_get_noise_bits(fitsfile *fptr, int *noisebits, int *status)
-  int fits_get_hcomp_scale(fitsfile *fptr, int *scale, int *status)
+  int fits_get_quantize_level(fitsfile *fptr, float *level, int *status)
+  int fits_get_hcomp_scale(fitsfile *fptr, float *scale, int *status)
   int fits_get_hcomp_smooth(fitsfile *fptr, int *smooth, int *status)
 \end{verbatim}
 4 symbolic constants are defined for use as the value of the
@@ -2674,29 +2702,13 @@ Entering NULL for
 comptype will turn off the tile-compression and cause normal FITS
 images to be written.
 
-The HCOMPRESS algorithm has 2 parameters.  The first is the scale
-factor that controls the amount of compression.  The default value
-of scale = 0 (or 1) results in lossless compression.  Values of scale greater
-than 1 will produce larger amounts of 'lossy' compression.  As a rule
-of thumb setting scale to about 2 times the RMS noise in the
-sky background of typical astronomical image will compress the image
-by about a factor of 10, with minimal loss of significant information.
-Larger values of scale will produce greater compression, but with more
-loss of information. The fits\_rms\_float and fits\_rms\_short routines
-can be used to calculate the RMS value in an image.
 
-The second HCOMPRESS parameter controls whether to slightly smooth
-the image after decompressing it, if it was 'lossy' compressed
-(with smooth > 1).  Smoothing helps to remove some of the 'blockiness'
-in the image, especially if it was highly compressed.  The default
-is to not smooth the image (smooth = 0), but setting smooth to 1 (or
-any non-zero value) will cause the image to be smoothed.
+No special action is required by software when read tile-compressed images because
+all the CFITSIO routines that read normal uncompressed FITS images also
+transparently read images in the tile-compressed format;  CFITSIO essentially
+treats the binary table that contains the compressed tiles as if
+it were an IMAGE extension.
 
-The 'noisebits' parameter is only relevant when compressing floating point
-images (with BITPIX = 32 or 64).
-The default value is 4.  Decreasing the value of noisebits
-will improve the overall compression efficiency at the expense of
-losing more information.
 
 The following 2 routines are available for compressing or
 or decompressing an image:
@@ -2736,13 +2748,11 @@ on existing FITS images as shown in these examples:
        This will use the GZIP compression algorithm and 100 X 100 pixel
        tiles.
 
-4)  imcopy infile.fit 'outfile.fit[compress R 100,100; 4]'
+4)  imcopy infile.fit 'outfile.fit[compress R 100,100; q 10.0]'
 
        This will use the Rice compression algorithm, 100 X 100 pixel
-       tiles, and noise_bits = 4 (assuming the input image has a
-       floating point data type).  Decreasing the value of noisebits
-       will improve the overall compression efficiency at the expense
-       of losing more information.
+       tiles, and quantization level = RMSnoise / 10.0 (assuming the
+       input image has a floating point data type).
 
 5)  imcopy infile.fit outfile.fit
 
@@ -7005,7 +7015,9 @@ myfile.fits then moves to the extension with the keywords EXTNAME
 \item
 {\tt -}:  a dash (minus sign) signifies that the input file is to be read
 from the stdin file stream, or that the output file is to be written to
-the stdout stream.
+the stdout stream.  See also the stream:// driver which provides a
+more efficient, but more restricted method of reading or writing to
+the stdin or stdout streams.
 
 \item
 {\tt ftp://legacy.gsfc.nasa.gov/test/vela.fits}:  FITS files in any ftp
@@ -7115,20 +7127,24 @@ CFITSIO to read and/or write the file.  Currently supported types are
 
 \begin{verbatim}
         file://  - file on local magnetic disk (default)
-        ftp://   - a readonly file accessed with the anonymous FTP protocol.
+         ftp://  - a readonly file accessed with the anonymous FTP protocol.
                    It also supports  ftp://username:password@hostname/...
                    for accessing password-protected ftp sites.
         http://  - a readonly file accessed with the HTTP protocol.  It
                    does not  support username:password like the ftp driver.
                    Proxy HTTP survers are supported using the http_proxy
-                   environment variable.
-       gsiftp:// - to access files on a computational grid using the
-                   gridftp protocol in the Globus toolkit
+                   environment variable (see following note).
+      stream://  - special driver to read an input FITS file from the stdin
+                   stream, and/or write an output FITS file to the stdout
+		   stream.  This driver is fragile and has limited
+		   functionality (see the following note).
+      gsiftp://  - access files on a computational grid using the gridftp
+                   protocol in the Globus toolkit (see following note).
         root://  - uses the CERN root protocol for writing as well as
-                   reading files over the network.
-        shmem:// - opens or creates a file which persists in the computer's
-                   shared memory.
-        mem://   - opens a temporary file in core memory.  The file
+                   reading files over the network (see following note).
+       shmem://  - opens or creates a file which persists in the computer's
+                   shared memory (see following note).
+         mem://  - opens a temporary file in core memory.  The file
                    disappears when the program exits so this is mainly
                    useful for test purposes when a permanent output file
                    is not desired.
@@ -7148,6 +7164,62 @@ For example
 \end{verbatim}
 will cause CFITSIO to use port 3128 on the heasarc proxy server whenever
 reading a FITS file with HTTP.
+
+
+\subsection{Notes about the stream filetype driver}
+
+The stream driver can be used to efficiently read a FITS file from the
+stdin file stream or write a FITS to the stdout file stream.  However, because
+these input and output streams must be accessed sequentially, the FITS
+file reading or writing application must also read and write the file sequentially,
+at least within the tolerances described below.
+
+CFITSIO supports 2 different methods for accessing FITS files on the stdin and
+stdout streams.  The original method, which is invoked by specifying a dash
+character, "-", as the name of the file when opening or creating it, works by
+storing a complete copy of the entire FITS file in memory.  In this case, when
+reading from stdin, CFITSIO will copy the entire stream into memory before
+doing any processing of the file.  Similarly, when writing to stdout, CFITSIO
+will create a copy of the entire FITS file in memory, before finally flushing
+it out to  the stdout stream when the FITS file is closed.  Buffering the
+entire FITS file in this way allows the application to randomly access any
+part of the FITS file, in any order, but it also requires that the user have
+sufficient available memory (or virtual memory) to store the entire file,
+which may not be possible in the case of very large files.
+
+The newer stream filetype provides a more memory-efficient method of accessing
+FITS files on the stdin or stdout streams.  Instead of storing a copy of the
+entire FITS file in memory, CFITSIO only uses a set of internal
+buffer which by default
+can store  40 FITS blocks, or about  100K bytes of the FITS file.  The
+application program must process the FITS file sequentially from beginning
+to end, within this 100K buffer.  Generally speaking the application
+program must conform to the following restrictions:
+
+\begin{itemize}
+\item
+The program must finish reading or writing the header keywords
+before reading or writing any data in the HDU.
+\item
+The HDU can contain at most about 1400 header keywords.  This is the
+maximum that can fit in the nominal 40 FITS block buffer.  In principle,
+this limit could be increased by recompiling CFITSIO with a larger
+buffer limit, which is set by the NIOBUF parameter in fitsio2.h.
+\item
+The program must read or write the data in a sequential manner from the
+beginning to the end of the HDU.  Note that CFITSIO's internal
+100K buffer allows a little latitude in meeting this requirement.
+\item
+The program cannot move back to a previous HDU in the FITS file.
+\item
+Reading or writing of variable length array columns in binary
+tables is not supported, because this requires moving back and forth
+between the fixed-length portion of the binary table and the following
+heap area where the arrays are actually stored.
+\item
+Reading or writing of tile-compressed images is not supported on streams,
+because the images are internally stored using variable length arrays.
+\end{itemize}
 
 
 \subsection{Notes about the gsiftp filetype}
@@ -7595,6 +7667,20 @@ array, A or T = ASCII table extension, and B = binary table BINTABLE
 extension).   If the HDU location specifier is equal to `[PRIMARY]' or
 `[P]', then the primary array (the first HDU) will be opened.
 
+An optional pound sign character ("\#") may be appended to the extension
+name or number to signify that any other extensions in the file should
+be ignored during any subsequent file filtering operations.  For example,
+when doing row filtering operations on a table extension, CFITSIO normally
+creates a copy of the filtered table in memory, along with a verbatim
+copy of all the other extensions in the input FITS file.  If the pound
+sign is appended to the table extension name, then only that extension,
+and none of the other extensions in the file, will by copied to memory,
+as in the following example:
+
+\begin{verbatim}
+   myfile.fit[events#][TIME > 10000]
+\end{verbatim}
+
 FITS images are most commonly stored in the primary array or an image
 extension, but images can also be stored as a vector in a single cell
 of a binary table (i.e. each row of the vector column contains a
@@ -7673,7 +7759,10 @@ be specified before the image section specifier.
 
 When CFITSIO opens an image section it first creates a temporary file
 containing the image section plus a copy of any other HDUs in the
-file.  This temporary file is then opened by the application program,
+file. (If a `\#' character is appended to the name or number of the
+image HDU, as in  "myfile.fits[1\#][1:200,1:200]", then the other
+HDUs in the input file will not be copied into memory).
+This temporary file is then opened by the application program,
 so it is not possible to write to or modify the input file when
 specifying an image section.  Note that CFITSIO automatically updates
 the world coordinate system keywords in the header of the image
@@ -7795,7 +7884,11 @@ it begins with the string 'col ' and is not immediately followed by an
 equals sign.  The original file is not changed by this filtering
 operation, and instead the modifications are made on a copy of the
 input FITS file (usually in memory), which also contains a copy of all
-the other HDUs in the file.  This temporary file is passed to the
+the other HDUs in the file.  (If a `\#' character is appended to the name
+or number of the
+table HDU then only the primary array, and none of the other
+HDUs in the input file will be copied into memory).
+This temporary file is passed to the
 application program and will persist only until the file is closed or
 until the program exits, unless the outfile specifier (see above) is
 also supplied.
@@ -7926,9 +8019,14 @@ Examples:
     program, an optional row filter may be specified to select a subset
     of the rows in the table.  A temporary new FITS file is created on
     the fly which contains only those rows for which the row filter
-    expression evaluates to true.  (The primary array and any other
+    expression evaluates to true.  The primary array and any other
     extensions in the input file are also copied to the temporary
-    file).  The original FITS file is closed and the new virtual file
+    file.
+(If a `\#' character is appended to the name
+or number of the
+table HDU then only the primary array, and none of the other
+HDUs in the input file will be copied into the temporary file).
+    The original FITS file is closed and the new virtual file
     is opened by the application program.  The row filter expression is
     enclosed in square brackets following the file name and extension
     name (e.g., 'file.fits[events][GRADE==50]'  selects only those rows

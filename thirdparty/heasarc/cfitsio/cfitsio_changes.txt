@@ -1,6 +1,271 @@
                    Log of Changes Made to CFITSIO
-		   
-Version 3.06 - 27 August 2007
+
+Version 3.13 -  5 January 2009
+
+  Enhancements
+
+   - updated the typedef of LONGLONG in fitsio.h and cfortran.h to
+     support the Borland compiler which uses the  __int64 data type.
+     
+   - added new feature to the extended filename syntax so that when
+     performing a filtering operation on specified HDU, if you add
+     a '#' character after the name or number of the HDU, then ONLY
+     that HDU (and the primary array if the HDU is a table) will be
+     copied into the filtered version of the file in memory.  Otherwise,
+     by default CFITSIO copies all the HDUs from the input file into
+     memory.
+     
+   - when specifying a section, if the specified number of dimensions
+     is less than the number of dimensions in the image, then CFITSIO
+     will use the entire dimension, as if a '*' had been specified.
+     Thus [1:100] is equivalent to [1:100,*] when specifying a section
+     of 2 dimensional image.
+
+   - modified fits_copy_image_section to read/write the section 1 row
+     at a time, instead of the whole section, to reduce memory usage.
+
+   - added new stream:// drivers for reading/writing to stdin/stdout.
+     This driver is somewhat fragile, but for simple FITS read and
+     write operations this driver streams the FITS file on stdin
+     or stdout without first copying the entire file in memory, as is
+     done when specifying the file name as "-".
+   
+   - slight modification to ffcopy to make sure that the END keyword
+     is correctly written before copying the data.  This is required
+     by the new stream driver.
+     
+   - modified ffgcprll, so that when writing data to an HDU, it first
+     checks that the END keyword has been written to the correct place.
+     This is required by the new stream driver.
+
+  Fixes
+   
+   - fixed bug in ffgcls2 when reading an ASCII string column in binary
+     tables in cases where the width of the column is greater than 2880 
+     characters and when reading more than 1 row at a time.  Similar 
+     change was made to ffpcls to fix same problem with writing to 
+     columns wider than 2880 characters.
+     
+   - updated the source files listed in makepc.bat so that it can be
+     used to build CFITSIO with the Borland C++ compiler.
+     
+   - fixed overflow error in ffiblk that could cause writing to Large Files
+     (> 2.1 GB) to fail with an error status.
+      
+   - fixed a bug in the spatial region code (region.c) with the annulus 
+     region.   This bug only affected specialized applications which
+     directly use the internal region structure; it does not affect
+     any CFITSIO functions directly.
+
+   - fixed memory corruption bug in region.c that was triggered if the
+     region file contained a large number of excluded regions.
+
+   - got rid of a harmless error message that would appear if filtering
+     a FITS table with a GTI file that has zero rows. (eval_f.c)
+
+   - modified fits_read_rgnfile so that it removes the error messages
+     from the error stack if it is unable to open the region file as
+     a FITS file. (region.c)
+     
+Version 3.12 - 8 October 2008
+
+   - modified the histogramming code so that the first pixel in the binned
+     array is chosen as the reference pixel by default, if no other
+     value is previously defined.
+
+   - modified ffitab and ffibin to allow a null pointer to the 
+     EXTNAME string, when inserting a table with no name.
+
+Version 3.11 - 19 September 2008
+
+   - optimized the code when tile compressing real*4 images (which get
+     scaled to integers).  This produced a modest speed increase.  For 
+     best performance, one must specify the absolute q quantization 
+     parameter, rather than relative to the noise in the tile (which
+     is expensive to compute).
+
+   - modified the FITS region file reading code to check for NaN values,
+     which signify the end of the array of points in a polygon region.
+
+   - removed the test for LONGSIZE == 64 from fitsio.h, since it may 
+     not be defined.
+
+   - modified imcompress.c to support unconventional floating point FITS 
+     images that also have BSCALE and BZERO keywords.  The compressed
+     floating point images are linearly scaled twice in this case.
+
+Version 3.10 - 20 August 2008
+
+   - fixed a number of cases, mainly dealing with long input file names
+     (> 1024 char), where unsafe usage of strcat and strcpy could have caused
+     buffer overflows.  These buffer overflows could cause the application
+     to crash, and at least theoretically, could be exploited by a
+     malicious user to execute arbitrary code.  There are no known instances
+     of this type of malicious attack on CFITSIO applications, and the
+     likelihood of such an attack seems remote.  None the less, it would
+     be prudent for CFITSIO users to upgrade to this new version to guard
+     against this possibility.
+
+   - modified some of the routines to define input character string
+     parameters as "const char *" rather than just "char *" to eliminate
+     some compiler warnings when the calling routine passes a constant
+     string to the CFITSIO routine.  Most of the changes were to the
+     keyword name argument in the many routines that read or write keywords.
+
+   - fixed bug when tile-compressing a FITS image which caused all the 
+     completely blank keywords in the input header to be deleted from 
+     the output compressed image.  Also added a feature to preserve any
+     empty FITS blocks in the header (reserved space for future keywords)
+     when compressing or uncompressing an image.
+
+   - fixed small bug in the way the default tile size is set in imcompress.c.
+     (Fix sent in by Paul Price).
+
+   - added support for reading FITS format region files (in addition
+     to the ASCII format that was previously supported).  Thanks to
+     Keith Arnaud for modifying region.c to do this.
+
+Version 3.09 - 12 June 2008
+
+   - fixed bug in the calculator function, parse_data, that evaluates 
+     expressions then selecting rows or modifying values in table columns.
+     This bug only appeared in unusual circumstances
+     where the calculated value has a null value (= TNULLn).  The bug
+     could cause elements to not be flagged as having a null value, or
+     in rare cases could cause valid elements to be flagged as null. This
+     only appears to have affected 64-bit platforms (where size(long) = 8).
+   
+   - fixed typo in imcomp_decompress_tile: call to fffi2r8 should have 
+     been to fffi4r8.
+     
+   - in the imcopy_copy_comp2img routine, moved the call to 
+     fits_translate_keywords outside of the 'if' statement.  This could 
+     affect reading compressed images that did not have a EXTNAME keyword
+     in the header.
+     
+   - fixed imcomp_compress_tile in imcompress.c to properly support
+     writing unsigned integers, in place, to tile compressed images.
+
+   - modified fits_read_compressed_img so that if the calling routine
+     specifies nullval = 0, then it will not check for null-valued
+     pixels in the compressed FITS image.  This mimics the same
+     behavior when reading normal uncompressed FITS images.
+
+Version 3.08 - 15 April 2008 
+
+   - fixed backwards compatibility issue when uncompressing a Rice
+     compressed image that was created with previous versions of 
+     CFITSIO (this late fix was added on May 18).
+
+   - small change to cfortran.h to add "extern" to the common block 
+     definition.  This was done for compatibility with the version
+     of cfortran.h that is distributed by the debian project.
+   
+   - relaxed the requirement that a string valued keyword must have a
+     closing quote character.  If the quote is missing, CFITSIO will silently
+     append a quote at the end of the keyword record.  This change was made
+     because otherwise it is very difficult to correct the keyword
+     because CFITSIO would exit with an error before making the fix.
+   
+   - added a new BYTEPIX compression parameter when tile-compressing 
+     images with the Rice algorithm.
+
+   - cached the NAXIS and NAXISn keyword values in the fitsio structure
+     for efficiency, to eliminate duplicates reads of these keywords.
+   
+   - added variants of the Rice compression and uncompression routines to
+     support short int images (inaddition to the routines that support int).
+
+   - moved the definition of LONGLONG_MIN and LONGLONG_MAX from fitsio2.h
+     to fitsio.h, to make it accessable to application programs.
+
+   - make efficiency improvements to fitscore.c, to avoid needless searches
+     through the entire header when reading the required keywords that must
+     be near the beginning of the header.
+     
+   - made several improvements to getcol.c to optimize reading of compressed
+     and uncompressed images.
+
+   - changed the compression level in the gzip code from 6 to 1.  In most
+     cases this will provide nearly the same amount of compression, but is
+     significantly faster in some cases.
+	   
+   - added new "helper routines' to imcompress.c to allow applications to
+     specified the "quantize level" and Hcompress scaling and smoothing 
+     parameters
+
+   - modified the extended filename syntax to support the "quantize level"
+     and Hcompress scaling and smoothing parameters.  The parser in 
+     cfileio.c was extensively modified.
+
+   - extensive changes to quantize.c:
+       - replace the "nbits" parameter with "quantize level"
+       - the quantize level is now relative to the RMS noise in the image
+       - the HCOMPRESS scale factor is now relative to the RMS noise
+       - added routines to calculate RMS noise in image 
+      (these changes require a change to the main file structure in fitsio.h)
+
+   - initialize errno = 0 before the call to strtol in ffext, in case errno
+     has previously been set by an unrelated error condition.
+
+   - added the corresponding long name for the ffgkyjj routine to longnam.h.		   
+
+   - changed imcomp_copy_comp2img (in imcompress.c) to not require the
+     presence of the EXTNAME keyword in the input compressed image header.
+
+   - modified imcompress.c to only write the UNCOMPRESSED_DATA column
+     in tile-compressed images if it is actually needed.  This eliminates
+     the need to subsequently delete the column if it is not used 
+     (which is almost always the case).
+
+   - found that it is necessay to seek to the EOF of a file after 
+     turncating the size of the file, to reestablish a definite
+     current location in the file.  The required small changes to 3
+     routines: file_truncate (to seek to EOF) and fftrun (to set io_pos) 
+     and the truncation routine in drvrmem.c.
+
+   - improved the efficiency when compressing integer images with
+     gzip.  Previously, the image was always represented using integer*4
+     pixels, which were then compressed.  Now, if the range of pixel
+     values can be represented with integer*2 pixels or integer*1 pixels, 
+     then that is used.  This change is backward compatible with any 
+     compressed images that used the previous method.
+
+   - changed the default tiling pattern when using Hcompress from 
+     large squares (200 to 600 pixels wide) to 16 rows of the image.
+     This generally requires less memory, compresses faster, and is more
+     consistent with the default row by row tiling when using the other
+     compression methods.
+
+   - modified imcomp_init_table in imcompress.c to enforce a restriction
+     when using the Hcompress algorithm that the 1st 2 dimensions of sll
+     image tiles must be at least 4 pixels long.  Hcompress becomes very
+     inefficient for smaller dimensions, and does not work at all with
+     1D images.
+     
+   - fixed bug in the Hcompress compression algorithm that could affect
+     compression of I*4 images, using non-square compression tiles
+     (in the encode64 routine).
+
+Version 3.07 - 6 December 2007  (internal release)
+
+   - fixed bug with the PLIO image compression routine which silently
+     produced a corrupted compressed image if the uncompressed image pixels
+     were not all in the range 0 to 2**24.  (fixed in November)
+     
+   - fixed several 'for' loops in imcompress.c which were exceeding the
+     bounds of an array by 1.  (fixed in November)
+
+   - fixed a possible, but unlikely, memory overflow issue in iraffits.c.
+   
+   - added a clarification to the cfortran.doc file that cfortran.h
+     may be used and distributed under the terms of the GNU Library
+     General Public License.
+   
+   - fixed bug in the fits_modify_vector_len routine when modifying
+     the vector length of a 'X' bit column.
+	   
+Version 3.06 - 27 August 2007  
 
    - modified the imcopy.c utility program (to tile-compress images)
      so that it writes the default EXTNAME = 'COMPRESSED_IMAGE'
