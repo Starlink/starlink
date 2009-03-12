@@ -5646,8 +5646,8 @@ static int CnvType( int otype, void *odata, size_t osize, int type,
    if( otype == AST__UNDEF ) {
       if( type != AST__UNDEF ) {
          ret = 0;
-         astError( AST__FUNDEF, "The FITS keyword value has an undefined "
-                   "value.", status);
+         astError( AST__FUNDEF, "The FITS keyword '%s' has an undefined "
+                   "value.", status, name );
       }
 
 /* If the returned data type is undefined, the returned value is
