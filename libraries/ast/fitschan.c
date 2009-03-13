@@ -857,6 +857,9 @@ f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 *        structure.
 *     4-MAR-2009 (DSB):
 *        DATE-OBS and MJD-OBS cannot have an axis description character.
+*     13-MAR-2009 (DSB):
+*        The VELOSYS value read from the header is never used, so do not 
+*        report an error if VELOSYS has an undefined value.
 *class--
 */
 
@@ -1458,8 +1461,8 @@ static int CLASSFromStore( AstFitsChan *, FitsStore *, AstFrameSet *, double *, 
 static int CardType( AstFitsChan *, int * );
 static int CheckFitsName( const char *, const char *, const char *, int * );
 static int ChrLen( const char *, int * );
-static int CnvType( int, void *, size_t, int, void *, const char *, const char *, const char *, int * );
-static int CnvValue( AstFitsChan *, int , void *, const char *, int * );
+static int CnvType( int, void *, size_t, int, int, void *, const char *, const char *, const char *, int * );
+static int CnvValue( AstFitsChan *, int , int, void *, const char *, int * );
 static int FindFits( AstFitsChan *, const char *, char[ AST__FITSCHAN_FITSCARDLEN + 1 ], int, int * );
 static int ComBlock( AstFitsChan *, int, const char *, const char *, int * );
 static int CountFields( const char *, char, const char *, const char *, int * );
@@ -5444,8 +5447,8 @@ static void ClearCard( AstFitsChan *this, int *status ){
 
 }
 
-static int CnvValue( AstFitsChan *this, int type, void *buff, 
-                      const char *method, int *status ){
+static int CnvValue( AstFitsChan *this, int type, int undef, void *buff, 
+                     const char *method, int *status ){
 /*
 *
 *  Name:
@@ -5459,7 +5462,7 @@ static int CnvValue( AstFitsChan *this, int type, void *buff,
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     int CnvValue( AstFitsChan *this, int type, void *buff, 
+*     int CnvValue( AstFitsChan *this, int type, int undef, void *buff, 
 *                   const char *method, int *status )
 
 *  Class Membership:
@@ -5475,6 +5478,11 @@ static int CnvValue( AstFitsChan *this, int type, void *buff,
 *     type
 *        The FITS data type in which to return the data value of the
 *        current card.
+*     undef
+*        Determines what happens if the current card has an undefined
+*        value. If "undef" is zero, an error will be reported identifying 
+*        the undefined keyword value. If "undef" is non-zero, no error is
+*        reported and the contents of the output buffer are left unchanged.
 *     buf
 *        A pointer to a buffer to recieve the converted value. It is the
 *        responsibility of the caller to ensure that a suitable buffer is
@@ -5531,11 +5539,12 @@ static int CnvValue( AstFitsChan *this, int type, void *buff,
    odata = CardData( this, &osize, status );
 
 /* Do the conversion. */
-   return CnvType( otype, odata, osize, type, buff, CardName( this, status ), 
-                   method, astGetClass( this ), status );
+   return CnvType( otype, odata, osize, type, undef, buff, 
+                   CardName( this, status ), method, astGetClass( this ), 
+                   status );
 }
 
-static int CnvType( int otype, void *odata, size_t osize, int type, 
+static int CnvType( int otype, void *odata, size_t osize, int type, int undef,
                      void *buff, const char *name, const char *method, 
                      const char *class, int *status ){
 /*
@@ -5551,7 +5560,7 @@ static int CnvType( int otype, void *odata, size_t osize, int type,
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     int CnvType( int otype, void *odata, size_t osize, int type, 
+*     int CnvType( int otype, void *odata, size_t osize, int type, int undef,
 *                   void *buff, const char *name, const char *method, 
 *                   const char *class, int *status )
 
@@ -5573,6 +5582,11 @@ static int CnvType( int otype, void *odata, size_t osize, int type,
 *     type
 *        The FITS data type in which to return the data value of the
 *        current card.
+*     undef
+*        Determines what happens if the supplied data value type is 
+*        undefined If "undef" is zero, an error will be reported identifying 
+*        the undefined keyword value. If "undef" is non-zero, no error is
+*        reported and the contents of the output buffer are left unchanged.
 *     buff
 *        A pointer to a buffer to recieve the converted value. It is the
 *        responsibility of the caller to ensure that a suitable buffer is
@@ -5594,7 +5608,6 @@ static int CnvType( int otype, void *odata, size_t osize, int type,
 *     reported), one otherwise.
 
 *  Notes: 
-*     -  If the supplied value is undefined an error will be reported.
 *     -  When converting from floating point to integer, the  floating
 *     point value is truncated using a C cast.
 *     -  Non-zero numerical values are considered TRUE, and zero
@@ -5642,9 +5655,10 @@ static int CnvType( int otype, void *odata, size_t osize, int type,
    ret = 1;
 
 /* If the supplied data type is undefined, report an error unless the
-   returned data type is also undefined. */
+   returned data type is also undefined or an undefined value is
+   acceptable for the keyword. */
    if( otype == AST__UNDEF ) {
-      if( type != AST__UNDEF ) {
+      if( type != AST__UNDEF && !undef ) {
          ret = 0;
          astError( AST__FUNDEF, "The FITS keyword '%s' has an undefined "
                    "value.", status, name );
@@ -12623,7 +12637,7 @@ static int GetFits##code( AstFitsChan *this, const char *name, ctype value, int 
 \
 /* Convert the stored data value to the requested type, and store it in \
    the supplied buffer. */ \
-      if( !CnvValue( this, ftype, value, method, status ) && astOK ) { \
+      if( !CnvValue( this, ftype, 0, value, method, status ) && astOK ) { \
          astError( AST__FTCNV, "%s(%s): Cannot convert FITS keyword " \
                    "'%s' to %s.", status, method, class, \
                    lname, type_names[ ftype ] ); \
@@ -12903,7 +12917,8 @@ static int SetFits( AstFitsChan *this, const char *keyname, void *value,
 /* If the data value has not changed, and the card has a coment, 
    set the comment pointer NULL so that the existing comment will be
    retained. */
-         if( overwrite && CnvValue( this, type, &edval, "SetFits", status ) && 
+         if( overwrite && CnvValue( this, type, 0, &edval, "SetFits",
+                                    status ) && 
              CardComm( this, status ) ) {
             if( EQUAL( edval, dval ) ) comment = NULL;
          }
@@ -12918,7 +12933,8 @@ static int SetFits( AstFitsChan *this, const char *keyname, void *value,
       if( cval ){      
 
 /* If the data value has not changed, retain the original comment. */
-         if( overwrite && CnvValue( this, type, &ecval, "SetFits", status ) && 
+         if( overwrite && CnvValue( this, type, 0, &ecval, "SetFits", 
+                                    status ) && 
              CardComm( this, status ) ) {
             if( Similar( ecval, cval, status ) ) comment = NULL;
          }
@@ -12946,7 +12962,8 @@ static int SetFits( AstFitsChan *this, const char *keyname, void *value,
       ival = *( (int *) value );
 
 /* If the data value has not changed, retain the original comment. */
-      if( overwrite && CnvValue( this, type, &eival, "SetFits", status ) && 
+      if( overwrite && CnvValue( this, type, 0, &eival, "SetFits", 
+                                 status ) && 
          CardComm( this, status ) ) {
          if( eival == ival ) comment = NULL;
       }
@@ -12958,7 +12975,8 @@ static int SetFits( AstFitsChan *this, const char *keyname, void *value,
           ( (double *) value )[1] != AST__BAD ) {
 
 /* If the data value has not changed, retain the original comment. */
-         if( overwrite && CnvValue( this, type, ecdval, "SetFits", status ) && 
+         if( overwrite && CnvValue( this, type, 0, ecdval, "SetFits", 
+                                    status ) && 
              CardComm( this, status ) ) {
             if( EQUAL( ecdval[ 0 ], ( (double *) value )[ 0 ] ) &&
                 EQUAL( ecdval[ 1 ], ( (double *) value )[ 1 ] ) ) comment = NULL;
@@ -12972,7 +12990,8 @@ static int SetFits( AstFitsChan *this, const char *keyname, void *value,
    } else if( type == AST__COMPLEXI ){
 
 /* If the data value has not changed, retain the original comment. */
-      if( overwrite && CnvValue( this, type, ecival, "SetFits", status ) && 
+      if( overwrite && CnvValue( this, type, 0, ecival, "SetFits", 
+                                 status ) && 
           CardComm( this, status ) ) {
          if( ecival[ 0 ] == ( (int *) value )[ 0 ] &&
              ecival[ 1 ] == ( (int *) value )[ 1 ] ) comment = NULL;
@@ -12984,7 +13003,8 @@ static int SetFits( AstFitsChan *this, const char *keyname, void *value,
       ival = ( *( (int *) value ) != 0 );
 
 /* If the data value has not changed, retain the original comment. */
-      if( overwrite && CnvValue( this, type, &eival, "SetFits", status ) && 
+      if( overwrite && CnvValue( this, type, 0, &eival, "SetFits", 
+                                 status ) && 
           CardComm( this, status ) ) {
          if( eival == ival ) comment = NULL;
       }
@@ -15022,7 +15042,7 @@ static int GetValue( AstFitsChan *this, const char *keyname, int type,
 /* If the keyword was found, convert the current card's data value and copy 
    it to the supplied buffer. */
    if( ret ){
-      if( CnvValue( this, type, value, method, status ) ) {
+      if( CnvValue( this, type, 0, value, method, status ) ) {
 
 /* If required, mark it as having been read into an AST object. */
          if( mark ) MarkCard( this, status );
@@ -28290,6 +28310,7 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
    int nfld;          /* Number of integer fields in test string */
    int ok;            /* Was value converted succesfully? */
    int type;          /* Keyword data type */
+   int undef;         /* Is an undefined keyword value acceptable? */
    void *item;        /* Pointer to item to get/put */
 
 /* Check the global error status. */
@@ -28315,6 +28336,14 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
    are not removed as they may be needed for other, non-WCS related,
    purposes. */
       mark = 1;
+
+/* For most keywords, if the keyword is present in the header it must
+   have a definded value. However, some keywords are read from the header
+   but not actually used for anything. This is done to ensure that the 
+   keyword is stripped from the header. It is acceptable for such
+   keywords to have an undefined value. Initialise a flag indicating that
+   the next keyword read is not allowed to have an undefined value. */
+      undef = 0;
 
 /* Is this a primary CRVAL keyword? */
       if( Match( keynam, "CRVAL%d", 1, fld, &nfld, method, class, status ) ){
@@ -28612,6 +28641,7 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
       } else if( Match( keynam, "VELOSYS", 0, fld, &nfld, method, class, status ) ){
          item = &(store->velosys);
          type = AST__FLOAT;
+         undef = 1;
          i = 0;
          jm = 0;
          s = ' ';
@@ -28620,6 +28650,7 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
       } else if( Match( keynam, "VELOSYS%1c", 0, fld, &nfld, method, class, status ) ){
          item = &(store->velosys);
          type = AST__FLOAT;
+         undef = 1;
          i = 0;
          jm = 0;
          s = keynam[ strlen( keynam ) - 1 ];
@@ -28703,7 +28734,7 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
 /* Is this a TIMESYS keyword? */
       } else if( Match( keynam, "TIMESYS", 0, fld, &nfld, method, class, status ) ){
          item = NULL;
-         if( CnvValue( fc, AST__STRING, &cval, method, status ) ) {
+         if( CnvValue( fc, AST__STRING, 0, &cval, method, status ) ) {
             store->timesys = TimeSysToAst( fc, cval, method, class, status );
             MarkCard( fc, status );
 
@@ -28789,14 +28820,14 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
       if( item ){
          ok = 1;
          if( type == AST__FLOAT ){
-            if( CnvValue( fc, AST__FLOAT, &dval, method, status ) ) {
+            if( CnvValue( fc, AST__FLOAT, undef, &dval, method, status ) ) {
                SetItem( (double ****) item, i, jm, s, dval, status );
                if( mark ) MarkCard( fc, status );
             } else {
                ok = 0;
             }
          } else {
-            if( CnvValue( fc, AST__STRING, &cval, method, status ) ) {
+            if( CnvValue( fc, AST__STRING, undef, &cval, method, status ) ) {
                SetItemC( (char ****) item, i, s, cval, status );
                if( mark ) MarkCard( fc, status );
             } else {
