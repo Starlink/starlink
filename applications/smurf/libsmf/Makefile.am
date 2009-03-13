@@ -36,6 +36,7 @@ smf_calcmodel_ast.c \
 smf_calcmodel_com.c \
 smf_calcmodel_dks.c \
 smf_calcmodel_ext.c \
+smf_calcmodel_flt.c \
 smf_calcmodel_gai.c \
 smf_calcmodel_noi.c \
 smf_check_flat.c \

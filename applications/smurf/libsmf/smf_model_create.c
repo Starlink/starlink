@@ -142,11 +142,13 @@
 *        Use one_strlcpy/strlcat
 *     2008-08-20 (EC):
 *        Create smfHead and propagate steptime
+*     2009-03-12 (EC):
+*        Add SMF__FLT
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 2006-2008 University of British Columbia.
+*     Copyright (C) 2006-2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -527,6 +529,17 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
               head.data.dims[1+SMF__ROW_INDEX]=(idata->dims)[1+SMF__ROW_INDEX];
               head.data.dims[1+SMF__COL_INDEX]=(idata->dims)[1+SMF__COL_INDEX];
             }
+            break;
+
+          case SMF__FLT: /* Frequency domain filter */
+            /* We will use a frequency domain filter to remove noise, but
+               store what we removed with a time-domain representation for
+               easy visualization */
+            head.data.dtype = SMF__DOUBLE;
+            head.data.ndims = 3;
+            head.data.dims[0] = (idata->dims)[0];
+            head.data.dims[1] = (idata->dims)[1];
+            head.data.dims[2] = (idata->dims)[2];
             break;
 
           default:

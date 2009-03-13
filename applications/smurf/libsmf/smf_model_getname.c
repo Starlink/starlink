@@ -47,10 +47,12 @@
 *        Added QUA
 *     2008-06-24 (TIMJ):
 *        Return const
+*     2009-03-12 (EC):
+*        Added SMF__FLT
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006-2008 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2006-2009 Particle Physics and Astronomy Research Council.
 *     University of British Columbia.
 *     All Rights Reserved.
 
@@ -141,6 +143,10 @@ const char *smf_model_getname( smf_modeltype type, int *status ) {
 
   case SMF__GAI:
     retval = "gai";
+    break;
+
+  case SMF__FLT:
+    retval = "flt";
     break;
 
   default:

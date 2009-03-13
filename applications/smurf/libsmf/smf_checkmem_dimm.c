@@ -53,6 +53,8 @@
 *        Initial version.
 *     2008-04-30 (EC):
 *        Added SMF__EXT
+*     2009-03-12 (EC):
+*        Added SMF__FLT
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -60,7 +62,7 @@
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2005-2008 University of British Columbia.
+*     Copyright (C) 2005-2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -199,6 +201,9 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
           break;
         case SMF__GAI:
           total += 3*nrow*ncol*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
+          break;
+        case SMF__FLT:
+          total += nsamp*smf_dtype_sz(SMF__DOUBLE,status);
           break;
 	default:
 	  *status = SAI__ERROR;

@@ -37,11 +37,13 @@
 *        Added typedef SMF__NUL
 *     2008-03-03 (EC):
 *        Added QUA/LUT
+*     2009-03-12 (EC):
+*        Added SMF__FLT
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
+*     Copyright (C) 2007-2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -120,6 +122,8 @@ smf_modeltype smf_model_gettype( const char *modelname, int *status ) {
     return SMF__DKS;
   } else if( strncmp( tempstring, "GAI", 3 ) == 0 ) {
     return SMF__GAI;
+  } else if( strncmp( tempstring, "FLT", 3 ) == 0 ) {
+    return SMF__FLT;
   } else {
     *status = SAI__ERROR;
     msgSetc("MNAME",modelname);

@@ -47,10 +47,12 @@
 *     2008-12-11 (EC):
 *        Renames smf_model_createHdr from smf_model_createtswcs, and FITS header
 *        added.
+*     2009-03-12 (EC):
+*        Added SMF__FLT
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2008 University of British Columbia.
+*     Copyright (C) 2005-2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -218,6 +220,10 @@ void smf_model_createHdr( smfData *model, smf_modeltype type,
       fset = NULL;
       break;
       
+    case SMF__FLT:
+      fset = astCopy( refwcs );
+      break;
+
     default:
       *status = SAI__ERROR;
       errRep( "", FUNC_NAME ": Invalid smf_modeltype given.", status);        

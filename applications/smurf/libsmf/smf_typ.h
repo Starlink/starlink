@@ -145,7 +145,8 @@
 *        Add obsidss to smfHead
 *     2008-08-25 (EC)
 *        Add smfDIMMHead
-*     2009-01-05 (EC)
+*     2009-03-10 (EC)
+*        Add SMF__FLT to smf_modeltype
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -228,7 +229,8 @@ typedef enum smf_modeltype {
   SMF__LUT=7,             /* Pointing LUT */
   SMF__QUA=8,             /* Quality flags */
   SMF__DKS=9,             /* Dark squid signals */  
-  SMF__GAI=10             /* Relative Gain/Offset for each bolometer */ 
+  SMF__GAI=10,            /* Relative Gain/Offset for each bolometer */ 
+  SMF__FLT=11             /* Frequency domain filter */
 } smf_modeltype;
 
 /* Observing mode and type */

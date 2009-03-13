@@ -45,11 +45,12 @@
 *        Fixed problem with function pointer cast
 *     2007-08-21 (EC):
 *        Fixed up warnings caused by incorrect return type
+*     2009-03-12 (EC):
+*        Added SMF__FLT
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
+*     Copyright (C) 2007-2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -116,6 +117,10 @@ smf_calcmodelptr smf_model_getptr( smf_modeltype type, int *status) {
 
   case SMF__GAI:
     retval = (smf_calcmodelptr) &smf_calcmodel_gai;
+    break;
+
+  case SMF__FLT:
+    retval = (smf_calcmodelptr) &smf_calcmodel_flt;
     break;
 
   default:
