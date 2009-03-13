@@ -184,14 +184,22 @@ if test "$check" = "1"; then
    done
 fi
 
-
 #  No modifications, or told to not check, so safe to check for updates. Note
 #  we always init to capture any new submodules added since the last update.
 
 git submodule init $submodule
-git submodule update $submodule
+if test "$?" != "0"; then
+   echo "ERROR: failed to initialise a submodule"
+   exit 1
+fi
 
-#  Output the status of the submodules.
+git submodule update $submodule
+if test "$?" != "0"; then
+   echo "ERROR: failed to update a submodule"
+   exit 1
+fi
+
+#  Success output the status of the submodules.
 git submodule status $submodule | awk '{print "...",$2,$3}'
 echo ""
 
