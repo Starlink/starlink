@@ -175,6 +175,14 @@ fi
 # The git repository contains various submodules that must be available
 # before we can proceed. Make sure that these are up-to-date.
 ./update-modules
+if test $? -ne 0; then
+   echo ""
+   echo "The './update-modules' script has failed to complete."
+   echo "Check that git is available and can run on this system and that it"
+   echo "is able to download submodules. Note you can just run the "
+   echo "'./update-modules' command directly while checking the problem."
+   exit 1
+fi
 
 # We invoke autoconf below, so must make sure it's on the path,
 # and this directory must be on the path before bootstrapping the 
