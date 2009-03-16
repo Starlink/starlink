@@ -179,7 +179,7 @@ StarWCS::StarWCS( const char *header, const size_t lheader )
             // Have a character buffer which can be read in as a AST object.
             // This should be a FITS header which we need to read it in
             // through a FITS channel.
-            AstFitsChan *fitschan = astFitsChan( NULL, NULL, "" );
+            AstFitsChan *fitschan = astFitsChan( NULL, NULL, " " );
             int ncard = (int) lheader / FITSCARD;
             gaiaUtilsGtFitsChan( (char *) header, ncard, &fitschan );
 
@@ -1064,7 +1064,7 @@ int StarWCS::set( double ra, double dec,
     }
 
     //  Create a FITS channel to which we will send our header cards.
-    AstFitsChan *fitschan = astFitsChan( NULL, NULL, "" );
+    AstFitsChan *fitschan = astFitsChan( NULL, NULL, " " );
     char card[FITSCARD+1];
     icard( card, "NAXIS", 2 );
     astPutFits( fitschan, card, 0 );
@@ -1253,7 +1253,7 @@ int StarWCS::make2D()
         outperm[0] = 1;
         outperm[1] = -1;
         AstMapping *map =
-            (AstMapping *) astPermMap( 1, inperm, 2, outperm, zero, "" );
+            (AstMapping *) astPermMap( 1, inperm, 2, outperm, zero, " " );
 
         astAddFrame( wcs_, nsky, map, newFrame );
 
@@ -1315,7 +1315,7 @@ int StarWCS::make2D()
     // Create a mapping for this permutation that doesn't have <bad>
     // values as the result.
     AstMapping *map =
-        (AstMapping *) astPermMap( nbase, inperm, 2, outperm, zero, "" );
+        (AstMapping *) astPermMap( nbase, inperm, 2, outperm, zero, " " );
 
     // Now add this frame to the FrameSet and make it the base
     // one. Also reinstate the skyframe as the current frame.
