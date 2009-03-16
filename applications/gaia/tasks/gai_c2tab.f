@@ -60,7 +60,8 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
-*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council
+*     Copyright (C) 2009 Science and Technology Facilities Council
 *     All Rights Reserved.
 
 *  Licence:
@@ -133,10 +134,12 @@
       CHARACTER * ( 1 ) EXCEPT  ! Exception value (not used)
       CHARACTER * ( 1 ) EXPR    ! Virtual column expression (not used).
       CHARACTER * ( 1 ) TAB     ! Tab character
+      CHARACTER * ( 30 ) CLASS ! Class of textual information
       CHARACTER * ( 80 ) SYMBOL( 10 ) ! Incoming symbol parameter (may span more than one-line)
       CHARACTER * ( CAT__SZCMP ) LNAME ! Name of a component
       CHARACTER * ( CAT__SZCMP ) NAME ! Name of a component
       CHARACTER * ( CAT__SZEXP ) EXTFMT ! Column external format
+      CHARACTER * ( CAT__SZTXL ) TEXT ! Textual information
       CHARACTER * ( CAT__SZUNI ) UNITS ! Units of column
       CHARACTER * ( CAT__SZVAL ) VALUE ! Value of a component
       CHARACTER * ( MAXLEN ) LINE ! Line buffer for output
@@ -165,12 +168,12 @@
       INTEGER QI                ! Parameter identifier
       INTEGER SIZEA( 1 )        ! Size of dimension (must be 0)
       INTEGER ULEN              ! Used length of string
+      LOGICAL ADDIND            ! Whether to add a pseudo index
       LOGICAL AREDEG            ! TRUE if world coordinates are already in degrees.
+      LOGICAL DONE              ! End of textual information.
       LOGICAL NULFLG            ! Value is NULL
       LOGICAL PRFDSP            ! Preferential display flag
-      LOGICAL ADDIND            ! Whether to add a pseudo index
       LOGICAL SKIP              ! Whether to skip parameter
-
 *.
 
 *  Check the global status.
@@ -198,11 +201,37 @@
 *  ======
       WRITE( FI, '(A)' ) 'cat2tab'
 
+*  Textual information:
+*  ====================
+*
+*  Only want AST and COMMENT (AST for WCS information).
+      WRITE( FI, '(A)' ) ' '
+      WRITE( FI, '(A)' ) '# Textual information:'
+      DONE = .FALSE.
+ 8    CONTINUE
+      IF ( .NOT. DONE ) THEN
+         CALL CAT_GETXT( CI, DONE, CLASS, TEXT, STATUS )
+         IF ( .NOT. DONE .AND. 
+     :        ( CLASS .EQ. 'COMMENT' .OR. CLASS .EQ. 'AST' ) ) THEN
+
+*  Write the line, note we skip "COMMENT" which is returned from the
+*  FITS format and normalize on "#T".
+ 103        FORMAT( '#T', A )
+            IF ( TEXT( : 8 ) .EQ. 'COMMENT ' ) THEN
+               WRITE( FI, 103 ) TEXT( 9 : CHR_LEN( TEXT ) )
+            ELSE 
+               WRITE( FI, 103 ) TEXT( 3 : CHR_LEN( TEXT ) )
+            END IF
+         END IF
+         GO TO 8
+      END IF
+
 *  Parameters:
 *  ===========
 
 *  Loop for all the parameter getting their formatted values and writing
 *  them, together with their names, to the table.
+      WRITE( FI, '(A)' ) ' '
       WRITE( FI, '(A)' ) '# Parameters:'
       DO 2 I = 1, NUMPAR
 
@@ -281,6 +310,7 @@
 *  =============
 
 *  Check the columns for special significance.
+      WRITE( FI, '(A)' ) ' '
       WRITE( FI, '(A)' ) '# Column details:'
       DO 3 I = 1, NUMCOL
 
@@ -443,6 +473,7 @@
       END IF
 
 *  Now add the column names.
+      WRITE( FI, '(A)' ) ' '      
       IF ( ADDIND ) THEN
          NAME = 'ID_COL'
          LINE = NAME // TAB

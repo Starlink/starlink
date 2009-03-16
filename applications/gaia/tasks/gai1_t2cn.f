@@ -37,7 +37,8 @@
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
-*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council
+*     Copyright (C) 2009 Science and Technology Facilities Council
 *     All Rights Reserved.
 
 *  Licence:
@@ -102,6 +103,7 @@
       BYTE BVAL                 ! Dummy value
       CHARACTER * ( 1 ) COMM    ! Column comments (lost)
       CHARACTER * ( 1 ) CVAL    ! Dummy value
+      CHARACTER * ( 2 ) SKIP    ! Dummy value
       CHARACTER * ( CAT__SZCMP ) NAME ! Name of RA and DEC columns
       CHARACTER * ( CAT__SZEXP ) EXTFMT ! Column external format
       CHARACTER * ( CAT__SZUNI ) UNITS ! Units of column
@@ -161,14 +163,14 @@
          CALL FIO_READF( FI, LINE, STATUS )
          IF ( LINE( 1: 1 ) .NE. '-' .AND. STATUS .EQ. SAI__OK ) THEN
 
-*  Check for '#P' or '#C', which indicate hidden information.
+*  Check for '#P', '#C' ot '#T', which indicate hidden information.
             IF ( LINE( 1: 2 ) .EQ. '#P' ) THEN
 
 *  Hidden parameter statement, read back the details and create the
 *  parameter.
-               READ( LINE, 101 ) NAME, DTYPE, CSIZE, UNITS, EXTFMT,
-     :                           PRFDSP
- 101           FORMAT( '#P', A17, I3, I5, A22, A22, L2 )
+               READ( LINE, 101 ) SKIP, NAME, DTYPE, CSIZE, UNITS, 
+     :                           EXTFMT, PRFDSP
+ 101           FORMAT( A2, A17, I3, I5, A22, A22, L2 )
                IF ( DTYPE .EQ. CAT__TYPEUB .OR. DTYPE .EQ. CAT__TYPEB )
      :         THEN
                   CALL CAT_PPTAB( CI, NAME, CSIZE, DIMS, SIZEA,
@@ -202,15 +204,23 @@
 
 *  Re-create a column, if hidden one is recorded.
             ELSE IF ( LINE ( 1 : 2 ) .EQ. '#C' ) THEN
-               READ( LINE, 102 ) NAME, DTYPE, CSIZE, NULL,
+               READ( LINE, 102 ) SKIP, NAME, DTYPE, CSIZE, NULL,
      :                           SCALE, ZERO, ORDER, UNITS, EXTFMT,
      :                           PRFDSP
- 102           FORMAT( '#C', A17, I3, I5, I2, G15.7, G15.7, I2, A22,
+ 102           FORMAT( A2, A17, I3, I5, I2, G15.7, G15.7, I2, A22,
      :                 A22, L2 )
                CALL CAT_CNEWA( CI, NAME, ' ', DTYPE, CSIZE,
      :                         CAT__SCALR, 1, NULL, ' ', SCALE, ZERO,
      :                         ORDER, UNITS, EXTFMT, PRFDSP, ' ',
      :                         QI, STATUS )
+
+*  Skip to next loop.
+               GO TO 2
+
+*  Write a textual line if found.
+            ELSE IF ( LINE ( 1 : 2 ) .EQ. '#T' ) THEN
+               CALL CAT_PUTXT( CI, 'COMMENT', 
+     :                         LINE( 3 : CHR_LEN( LINE ) ), STATUS )
 
 *  Skip to next loop.
                GO TO 2
