@@ -19,6 +19,7 @@
  *  Copyright:
  *     Copyright (C) 1998-2005 Central Laboratory of the Research Councils.
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+ *     Copyright (C) 2009 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -58,6 +59,12 @@ class GaiaSkySearch : public SkySearch
     double xOrigin_;
     double yOrigin_;
 
+    //  Convert tcl list to QueryResult given column headings and transform
+    //  the coordinates using a given FrameSet (as a Mapping).
+    virtual int getQueryResult( int numCols, char** colNames, 
+                                const char* list, AstFrameSet *frmset, 
+                                QueryResult& r );
+
  public:
 
     //  Constructor.
@@ -86,15 +93,16 @@ class GaiaSkySearch : public SkySearch
                               char*& cond );
 
     // -- tcl subcommands --
-    virtual int openCmd( int argc, char *argv[] );
-    virtual int saveCmd( int argc, char *argv[] );
     virtual int checkCmd( int argc, char *argv[] );
-    virtual int entryCmd( int argc, char *argv[] );
-    virtual int csizeCmd( int argc, char *argv[] );
-    virtual int originCmd( int argc, char *argv[] );
-    virtual int infoCmd( int argc, char* argv[] );
     virtual int contentCmd( int argc, char *argv[] );
+    virtual int csizeCmd( int argc, char *argv[] );
+    virtual int entryCmd( int argc, char *argv[] );
+    virtual int imgplotCmd( int argc, char* argv[] );
+    virtual int infoCmd( int argc, char* argv[] );
     virtual int namesvrCmd( int argc, char *argv[] );
+    virtual int openCmd( int argc, char *argv[] );
+    virtual int originCmd( int argc, char *argv[] );
+    virtual int saveCmd( int argc, char *argv[] );
 };
 
 #endif // _GaiaSkySearch_h_

@@ -9,27 +9,27 @@
  *     Defines the members of the GaiaSkySearch class.
 
  *  Description:
- *     This class extends the SkySearch class (and thereby
- *     TclAstroCat) to use an external filter scheme to convert
- *     catalogues into "tab table" format. Keeping the names
- *     consistent and disposing of the intermediary files etc. These
- *     foreign catalogues are controlled by the GaiaLocalCatalog
- *     class.
+ *     This class extends the SkySearch class (and thereby TclAstroCat) to use
+ *     an external filter scheme to convert catalogues into "tab table"
+ *     format. Keeping the names consistent and disposing of the intermediary
+ *     files etc. These foreign catalogues are controlled by the
+ *     GaiaLocalCatalog class.
  *
- *     A special override of the plot_objects function is added to
- *     sort out problems with catalogues that have both WCS and X-Y
- *     coordinates.
- * 
- *     A "namesvr" command is provided so that coordinates can be 
+ *     Methods related to plotting overlay are also overridden to
+ *     resolve problems with catalogues that have both WCS and X-Y
+ *     coordinates and to align catalogues to images using the facilities
+ *     of AST.
+ *
+ *     A "namesvr" command is provided so that coordinates can be
  *     retrieved for objects, without doing a full catalogue or image query.
 
  *  Authors:
- *     P.W. Draper (PWD)
+ *     PWD: P.W. Draper (JAC, Durham University)
 
  *  Copyright:
  *     Copyright (C) 1998-2000 Central Laboratory of the Research Councils
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
- *     Copyright (C) 2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -69,13 +69,19 @@
 #include <iostream>
 #include <sstream>
 
+extern "C" {
+#include "ast.h"
+}
+
 #include "error.h"
 #include "util.h"
 #include "AstroCatalog.h"
 #include "LocalCatalog.h"
 #include "GaiaLocalCatalog.h"
+#include "Skycat.h"
 #include "SkySearch.h"
 #include "GaiaSkySearch.h"
+#include "StarWCS.h"
 
 //
 // Declare a table of tcl subcommands.
@@ -94,6 +100,7 @@ public:
     {"content",    &GaiaSkySearch::contentCmd,      0,  0},
     {"csize",      &GaiaSkySearch::csizeCmd,        1,  1},
     {"entry",      &GaiaSkySearch::entryCmd,        1,  4},
+    {"imgplot",    &GaiaSkySearch::imgplotCmd,      1,  4},
     {"info",       &GaiaSkySearch::infoCmd,         1,  2},
     {"namesvr",    &GaiaSkySearch::namesvrCmd,      2,  2},
     {"open",       &GaiaSkySearch::openCmd,         1,  2},
@@ -209,13 +216,13 @@ int GaiaSkySearch::openCmd(int argc, char* argv[])
     if ( argc == 2 && ( strlen(argv[1]) != 0 ) ) {
 
         // Open given catalog in given directory path.
-	e = lookupCatalogDirectoryEntry( argv[1] );
-	if ( !e ) {
-	    return TCL_ERROR;
+        e = lookupCatalogDirectoryEntry( argv[1] );
+        if ( !e ) {
+            return TCL_ERROR;
         }
-	e = CatalogInfo::lookup( e, argv[0] );
-	if ( !e ) {
-	    return fmt_error( "catalog entry for '%s' not found under '%s' ",
+        e = CatalogInfo::lookup( e, argv[0] );
+        if ( !e ) {
+            return fmt_error( "catalog entry for '%s' not found under '%s' ",
                               argv[0], argv[1]);
         }
     }
@@ -529,92 +536,92 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
                                     &numCols, &colNames)) != TCL_OK) {
             break;
         }
-	colIndexes = new int[numCols];
-	for (int i = 0; i < numCols; i++) {
-	    if ( (colIndexes[i] = r.colIndex(colNames[i])) < 0 ) {
-		status = error("unrecognised column in plot expression: ", colNames[i]);
-		break;
-	    }
-	}
+        colIndexes = new int[numCols];
+        for (int i = 0; i < numCols; i++) {
+            if ( (colIndexes[i] = r.colIndex(colNames[i])) < 0 ) {
+                status = error("unrecognised column in plot expression: ", colNames[i]);
+                break;
+            }
+        }
         if ( status != TCL_OK ) {
             break;
         }
 
-	//  Parse symbol info, a variable length list of
-	//  {shape color ratio angle label cond}
-	if ((status = Tcl_SplitList(interp_, (char*)symbol, &nsymb, &symb)) != TCL_OK)
-	    break;
+        //  Parse symbol info, a variable length list of
+        //  {shape color ratio angle label cond}
+        if ((status = Tcl_SplitList(interp_, (char*)symbol, &nsymb, &symb)) != TCL_OK)
+            break;
 
-	//  Default values
-	char* shape = "";
-	char* fg = "white"; // if no color is specified, use 2: b&w
-	char* bg = "black";
-	char* ratio = "1";  // these may be Tcl expressions
-	char* angle = "0";
-	char* label = "";
-	char* cond = "1";
-	if ((status = parse_symbol(r, nsymb, symb, shape, fg, bg, ratio,
-				   angle, label, cond)) != TCL_OK)
-	    break;
+        //  Default values
+        char* shape = "";
+        char* fg = "white"; // if no color is specified, use 2: b&w
+        char* bg = "black";
+        char* ratio = "1";  // these may be Tcl expressions
+        char* angle = "0";
+        char* label = "";
+        char* cond = "1";
+        if ((status = parse_symbol(r, nsymb, symb, shape, fg, bg, ratio,
+                                   angle, label, cond)) != TCL_OK)
+            break;
 
-	// parse the size expr list: {size units}
-	if ((status = Tcl_SplitList(interp_, (char*)expr, &nexpr, &exprList)) != TCL_OK)
-	    break;
-	if (nexpr == 0 || strlen(exprList[0]) == 0) {
-	    status = error("invalid symbol expression: ", expr);
-	    break;
-	}
-	char* size = exprList[0];
-	char* units = "image";
-	if (nexpr > 1 && strlen(exprList[1]))
-	    units = exprList[1];
+        // parse the size expr list: {size units}
+        if ((status = Tcl_SplitList(interp_, (char*)expr, &nexpr, &exprList)) != TCL_OK)
+            break;
+        if (nexpr == 0 || strlen(exprList[0]) == 0) {
+            status = error("invalid symbol expression: ", expr);
+            break;
+        }
+        char* size = exprList[0];
+        char* units = "image";
+        if (nexpr > 1 && strlen(exprList[1]))
+            units = exprList[1];
 
-	// for each row in the catalog, eval the expressions and plot the symbols
-	int nrows = r.numRows();
-	int id_col = r.id_col();
-	for (int rownum = 0; rownum < nrows; rownum++) {
-	    char* id;
-	    if ((status = r.get(rownum, id_col, id)) != 0)
-		break;
-	    WorldOrImageCoords pos;
-	    if ((status = r.getPos(rownum, pos)) != 0)
-		break;
-	    double x, y;
-	    char xy_units[32];
-	    if (r.isPix() && ! r.isWcs() ) { // PWD: modify here
-		x = pos.x();
-		y = pos.y();
-		strcpy(xy_units, "image");
+        // for each row in the catalog, eval the expressions and plot the symbols
+        int nrows = r.numRows();
+        int id_col = r.id_col();
+        for (int rownum = 0; rownum < nrows; rownum++) {
+            char* id;
+            if ((status = r.get(rownum, id_col, id)) != 0)
+                break;
+            WorldOrImageCoords pos;
+            if ((status = r.getPos(rownum, pos)) != 0)
+                break;
+            double x, y;
+            char xy_units[32];
+            if (r.isPix() && ! r.isWcs() ) { // PWD: modify here
+                x = pos.x();
+                y = pos.y();
+                strcpy(xy_units, "image");
 
                 //  Subtract the origins.
                 x -= xOrigin_;
                 y -= yOrigin_;
-	    }
-	    else if (r.isWcs()) {
-		x = pos.ra_deg();
-		y = pos.dec_deg();
-		strcpy(xy_units, "deg");
-	    }
-	    else {
-		status = error("no wcs or image coordinates to plot");
-		break;
-	    }
-	    if ((status = plot_row(image, r, rownum, id, x, y, xy_units,
-				   numCols, colNames, colIndexes, shape, bg, fg, ratio,
-				   angle, label, cond, size, units)) != TCL_OK)
-		break;
-	}
+            }
+            else if (r.isWcs()) {
+                x = pos.ra_deg();
+                y = pos.dec_deg();
+                strcpy(xy_units, "deg");
+            }
+            else {
+                status = error("no wcs or image coordinates to plot");
+                break;
+            }
+            if ((status = plot_row(image, r, rownum, id, x, y, xy_units,
+                                   numCols, colNames, colIndexes, shape, bg, fg, ratio,
+                                   angle, label, cond, size, units)) != TCL_OK)
+                break;
+        }
     }
 
     // free memory allocated for split Tcl lists and return the status
     if (colNames)
-	ckfree((char *)colNames);
+        ckfree((char *)colNames);
     if (colIndexes)
-	delete[] colIndexes;
+        delete[] colIndexes;
     if (symb)
-	ckfree((char *)symb);
+        ckfree((char *)symb);
     if (exprList)
-	ckfree((char *)exprList);
+        ckfree((char *)exprList);
 
     return status;
 }
@@ -630,18 +637,18 @@ int GaiaSkySearch::parse_symbol( const QueryResult& r, int argc, char** argv,
                                  char*& ratio, char*& angle, char*& label,
                                  char*& cond )
 {
-    static char* symbols[] = {
-	"arrow",
+    static const char* symbols[] = {
+        "arrow",
         "arc",
-	"circle",
-	"compass",
-	"cross",
-	"diamond",
-	"ellipse",
-	"line",
-	"plus",
-	"square",
-	"triangle",
+        "circle",
+        "compass",
+        "cross",
+        "diamond",
+        "ellipse",
+        "line",
+        "plus",
+        "square",
+        "triangle",
         "rotbox",
         "xrange",
         "yrange"
@@ -650,52 +657,52 @@ int GaiaSkySearch::parse_symbol( const QueryResult& r, int argc, char** argv,
     int found = 0;
 
     if (argc < 1)
-	return error("empty plot symbol");
+        return error("empty plot symbol");
 
     // symbol shape
     shape = argv[0];
     for (int i = 0; i < nsymbols; i++) {
-	if (strcmp(shape, symbols[i]) == 0) {
-	    found++;
-	    break;
-	}
+        if (strcmp(shape, symbols[i]) == 0) {
+            found++;
+            break;
+        }
     }
     if (!found)
-	return error("invalid plot symbol");
+        return error("invalid plot symbol");
 
     // color
     if (argc >= 2) {
-	if (strlen(argv[1])) {
-	    fg = bg = argv[1];
-	}
+        if (strlen(argv[1])) {
+            fg = bg = argv[1];
+        }
     }
 
     // ratio
     if (argc >= 3) {
-	if (strlen(argv[2])) {
-	    ratio = argv[2];
-	}
+        if (strlen(argv[2])) {
+            ratio = argv[2];
+        }
     }
 
     // angle
     if (argc >= 4) {
-	if (strlen(argv[3])) {
-	    angle = argv[3];
-	}
+        if (strlen(argv[3])) {
+            angle = argv[3];
+        }
     }
 
     // label
     if (argc >= 5) {
-	if (strlen(argv[4])) {
-	    label = argv[4];
-	}
+        if (strlen(argv[4])) {
+            label = argv[4];
+        }
     }
 
     // cond
     if (argc >= 6) {
-	if (strlen(argv[5])) {
-	    cond = argv[5];
-	}
+        if (strlen(argv[5])) {
+            cond = argv[5];
+        }
     }
 
     return TCL_OK;
@@ -818,7 +825,7 @@ int GaiaSkySearch::contentCmd( int argc, char *argv[] )
     if ( !cat_ ) {
         return error( "no catalog is currently open" );
     }
-    
+
     //  If a local catalogue use whole.
     LocalCatalog *lc = dynamic_cast<LocalCatalog *>( cat_ );
     QueryResult *qr;
@@ -925,3 +932,263 @@ int GaiaSkySearch::namesvrCmd( int argc, char *argv[] )
     delete cat;
     return TCL_OK;
 }
+
+/*
+ * Convert the given list from a Tcl list to a QueryResult (tab table),
+ * given the number of columns and the column headings.
+ *
+ * See TclAstroCat::getQueryResult for further description.
+ *
+ * Overridden so that we can apply a coordinate transformation from the
+ * catalog WCS to that of the image using an AstFrameSet (Skycat version uses
+ * an equinox) as the mapping. Note the mapping must transform from image
+ * world coordinates to catalogue world coordinates (usually both SkyFrames)
+ * and must define an inverse mapping.
+ */
+int GaiaSkySearch::getQueryResult( int numCols, char **colNames, 
+                                   const char *list, AstFrameSet *frmset,
+                                   QueryResult &r )
+{
+    cout << "Using GaiaSkySearch::getQueryResult" << endl;
+
+    ostringstream os;
+    int numRows = 0;
+    char **rows = NULL;
+    char raStr[32], decStr[32];
+
+    int status = Tcl_SplitList( interp_, (char*)list, &numRows, &rows );
+    if ( status == TCL_OK ) {
+
+        //  If catalog has world coordinates identified we need to transform
+        //  into the world coordinates of the image. That is defined by the
+        //  inverse transformation of the given FrameSet, so that must also be
+        //  defined.
+        if ( r.isWcs() && frmset != NULL ) {
+
+            //  Locate the RA and Dec axes in the given FrameSet (the current
+            //  coordinate system must be a SkyFrame and should represent the
+            //  catalogue coordinates).
+            if ( !astOK ) {
+                astClearStatus;
+            }
+            int base = astGetI( frmset, "Base" );
+            int current = astGetI( frmset, "Current" );
+
+            //  Base frame.
+            astSetI( frmset, "Current", base );
+            int astime2 = astGetI( frmset, "astime(2)" );
+            int ra1_index = 1;
+            if ( astime2 ) {
+                ra1_index  = 2;
+            }
+
+            //  Current frame.
+            astSetI( frmset, "Current", current );
+            astime2 = astGetI( frmset, "astime(2)" );
+            int ra2_index = 1;
+            int dec2_index = 2;
+            if ( astime2 ) {
+                ra2_index  = 2;
+                dec2_index = 1;
+            }
+
+            for ( int row = 0; row < numRows; row++ ) {
+
+                //  Always try again.
+                if ( ! astOK ) {
+                    astClearStatus;
+                }
+
+                int ncols = 0;
+                char** cols = NULL;
+                if ( Tcl_SplitList(interp_, rows[row], &ncols, &cols) != TCL_OK
+                     || ncols != numCols ) {
+                    status = error( "wrong number of columns: ", rows[row] );
+                    break;
+                }
+                int n = ncols - 1;
+                int ra_col = r.ra_col();
+                int dec_col = r.dec_col();
+                const char *raPtr = cols[ra_col];
+                const char *decPtr = cols[dec_col];
+
+                //  Convert values to double precision.
+                double xin[1];
+                double yin[1];
+                double xout[1];
+                double yout[1];
+                astUnformat( frmset, ra2_index, raPtr, &xin[0] );
+                astUnformat( frmset, dec2_index, decPtr, &yin[0] );
+
+                //  RA and Dec could be swapped.
+                if ( ra2_index == 1 ) {
+                    astTran2( frmset, 1, xin, yin, 0, xout, yout );
+                }
+                else {
+                    astTran2( frmset, 1, yin, xin, 0, xout, yout );
+                }
+                if ( ! astOK ) {
+                    astClearStatus;
+                    raStr[0] = decStr[0] = '\0';
+                }
+                else {
+                    //  Format the values, in the base frame.
+                    if ( ra1_index == 1 ) {
+                        strcpy( raStr, astFormat( frmset, 1, xout[0] ) );
+                        strcpy( decStr, astFormat( frmset, 2, yout[0] ) );
+                    }
+                    else {
+                        strcpy( decStr, astFormat( frmset, 1, xout[0] ) );
+                        strcpy( raStr, astFormat( frmset, 2, yout[0] ) );
+                    }
+                }
+
+                //  Output the columns
+                for ( int col = 0; col < ncols; col++ ) {
+                    //  RA and Dec are formatted already.
+                    if ( col == ra_col ) {
+                        os << raStr;
+                    }
+                    else if ( col == dec_col ) {
+                        os << decStr;
+                    }
+                    else {
+                        os << cols[col];
+                    }
+                    if ( col < n ) {
+                        os << '\t';
+                    }
+                }
+                os << '\n';
+                Tcl_Free( (char *)cols );
+            }
+        }
+        else {
+            //  No WCS so just output the columns
+            for ( int row = 0; row < numRows; row++ ) {
+                int ncols = 0;
+                char** cols = NULL;
+                if ( Tcl_SplitList(interp_, rows[row], &ncols, &cols) != TCL_OK
+                     || ncols != numCols ) {
+                    status = error( "wrong number of columns: ", rows[row] );
+                    break;
+                }
+                int n = ncols - 1;
+                for ( int col = 0; col < ncols; col++ ) {
+                    os << cols[col];
+                    if ( col < n ) {
+                        os << '\t';
+                    }
+                }
+                os << '\n';
+                Tcl_Free( (char *)cols );
+            }
+        }
+    }
+
+    //  Create a QueryResult object from the headings and data and
+    //  save (or append) it to the file
+    if ( status == 0 ) {
+        status = r.init( numCols, colNames, os.str().c_str() );
+    }
+
+    if ( rows ) {
+        Tcl_Free( (char *)rows );
+    }
+
+    return status;
+}
+
+
+/*
+ *  imgplot subcommand:
+ *
+ *  usage: $instName imgplot $image ?$data? ?$equinox||AST_reference? ?$headings?
+ *
+ *  See SkySearch::imgplot description.
+ *
+ *  Overridden to use AST to transform the catalogue positions onto the image.
+ *  The catalogue WCS must be passed as a reference to an AST FrameSet. See
+ *  gaiautils:: to create on of these.
+ * 
+ */
+int GaiaSkySearch::imgplotCmd( int argc, char* argv[] )
+{
+    cout << "GaiaSkySearch::imgplotCmd" << endl;
+
+    //  Can't plot without a catalog, since no plot symbols would be defined.
+    if ( !cat_ ) {
+	return error( "no catalog is currently open" );
+    }
+
+    //  Get a pointer to the C++ class implementing the extended rtdimage object.
+    //  We will need this to access the image to plot the catalog symbols.
+    Skycat *image = Skycat::getInstance( argv[0] );
+    if ( ! image ) {
+	return TCL_ERROR;
+    }
+
+    if ( argc == 1 ) {
+	if ( !result_ ) {
+	    return error( "no previous data to plot" );
+        }
+
+        //  Plot data from last QueryResult.
+	return plot( image, *result_ );
+    }
+
+    AstFrameSet *frmset = NULL;
+    int numCols = 0;;
+    char **colNames = NULL;
+    int freeColNames = 0;
+
+    //  Get an AST reference to a FrameSet describing the catalogue
+    //  coordinates, but only if catalogue and image both support sky
+    //  coordinates.
+    if ( argc >= 3 && cat_->isWcs() && image->isWcs() ) {
+        long adr;
+        if ( Tcl_ExprLong( interp_, argv[2], &adr ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        AstFrameSet *catwcs = (AstFrameSet *) adr;
+
+        //  Connect this to the coordinates of the image. Note this is now
+        //  assumes we have a StarRtdImage instance not Skycat.
+        StarWCS *wcs = (StarWCS *) image->image()->wcs().rep();
+        AstFrameSet *imagewcs = (AstFrameSet *) wcs->astWCSClone();
+        frmset = (AstFrameSet *) astConvert( catwcs, imagewcs, "SKY" );
+        if ( ! astOK ) {
+            astClearStatus;
+            return error( "Failed to connect image and catalogue coordinates" );
+        }
+    }
+
+    //  Get the column names
+    if ( argc < 4 ) {		
+        //  Use current catalogue.
+	numCols = cat_->numCols();
+	colNames = cat_->colNames();
+    }
+    else {			
+        //  Use headings list.
+	if ( Tcl_SplitList( interp_, argv[3], &numCols, &colNames ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+	freeColNames++;
+    }
+
+    //  Get query results from arguments
+    QueryResult r;
+    r.entry( cat_->entry() );
+    int status = getQueryResult( numCols, (char**)colNames, argv[1], frmset, r );
+    if ( status == TCL_OK ) {
+	status = plot( image, r );
+    }
+
+    //  Clean up
+    if ( freeColNames && colNames ) {
+	Tcl_Free( (char *)colNames );
+    }
+    return status;
+}
+
