@@ -38,8 +38,9 @@
 #     skycat::SkySearch
 
 #  Copyright:
-#     Copyright (C) 1998-2001 Central Laboratory of the Research Councils
+#     Copyright (C) 1998-2001 Central Laboratory of the Research Councils.
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2009 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -339,6 +340,31 @@ itcl::class gaia::GaiaSearch {
       SkySearch::plot
       if { ! $itk_option(-plot_wcs) } {
          $image_ configure -plot_wcs 1
+      }
+   }
+
+   #  Override the imgplot method to use AST for aligning the catalogue
+   #  positions to the image. In this version we need to pass an AST FrameSet
+   #  reference that describes the WCS of the catalogue.
+   protected method imgplot_ {equinox} {
+      puts "GaiaSearch: impgplot_ :$equinox"
+      
+      switch -glob $equinox {
+         B* {
+            set att "System=FK4,Equinox=$equinox"
+         }
+         J* {
+            set att "System=FK5,Equinox=$equinox"
+         }
+         default {
+            set att "Equinox=$equinox"
+         }
+         
+      }
+      set astref [gaiautils::astskyframeset $att]
+
+      if {[catch {$w_.cat imgplot $image_ $info_ $astref $headings_} msg]} {
+         error_dialog $msg
       }
    }
 

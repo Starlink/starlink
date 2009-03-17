@@ -10,7 +10,7 @@
 
  *  Copyright:
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
- *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -33,7 +33,7 @@
  *      C++ as it makes the Skycat class available, does not define a class.
 
  *   Authors:
- *      PWD: Peter W. Draper, Starlink - University of Durham
+ *      PWD: Peter W. Draper (Starlink - University of Durham)
 
  *   History:
  *      31-MAR-2006 (PWD):
@@ -88,6 +88,8 @@ static int GaiaUtilsAstShow( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstSkyFrame( ClientData clientData, Tcl_Interp *interp,
                                  int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsAstSkyFrameSet( ClientData clientData, Tcl_Interp *interp,
+                                    int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstTest( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstTran2( ClientData clientData, Tcl_Interp *interp,
@@ -169,6 +171,10 @@ int GaiaUtils_Init( Tcl_Interp *interp )
 
     Tcl_CreateObjCommand( interp, "gaiautils::astskyframe",
                           GaiaUtilsAstSkyFrame, (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::astskyframeset",
+                          GaiaUtilsAstSkyFrameSet, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::asttest", GaiaUtilsAstTest,
@@ -1250,6 +1256,41 @@ static int GaiaUtilsAstSkyFrame( ClientData clientData, Tcl_Interp *interp,
     }
     astClearStatus;
     Tcl_SetResult( interp, "Failed to create SkyFrame", TCL_VOLATILE );
+    return TCL_ERROR;
+}
+
+/**
+ * Create an AST FrameSet with a single SkyFrame.
+ *
+ * There is one argument the attributes to use when creating the SkyFrame.
+ * The result is the address of the new object.
+ */
+static int GaiaUtilsAstSkyFrameSet( ClientData clientData, Tcl_Interp *interp,
+                                    int objc, Tcl_Obj *CONST objv[] )
+{
+    AstSkyFrame *skyframe = NULL;
+    AstFrameSet *frameset = NULL;
+
+    /* Check arguments, only allow one. */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "attributes" );
+        return TCL_ERROR;
+    }
+
+    /* Create the SkyFrame */
+    skyframe = (AstSkyFrame*) astSkyFrame( Tcl_GetString( objv[1] ) );
+
+    /* Create the FrameSet */
+    frameset = (AstFrameSet *) astFrameSet( skyframe, " " );
+    astAnnul( skyframe );
+
+    /* Export the new object as a long containing the address */
+    if ( astOK ) {
+        Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) frameset ) );
+        return TCL_OK;
+    }
+    astClearStatus;
+    Tcl_SetResult( interp, "Failed to create SkyFrameSet", TCL_VOLATILE );
     return TCL_ERROR;
 }
 

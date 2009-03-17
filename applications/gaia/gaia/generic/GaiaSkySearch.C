@@ -511,7 +511,10 @@ int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
 
 /**
  *  Override plot_objects to sort out problems with plotting when
- *  have both pixel coordinates and sky coordinates.
+ *  have both pixel coordinates and sky coordinates. Also now we
+ *  are using AST transformations we need to make sure that further
+ *  transformations are not applied (the equinox is now the same as the
+ *  image).
  */
 int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
                                  const char* cols, const char* symbol,
@@ -600,7 +603,12 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
             else if (r.isWcs()) {
                 x = pos.ra_deg();
                 y = pos.dec_deg();
-                strcpy(xy_units, "deg");
+                
+                //  Degrees in the same units as image, so same equinox
+                //  in skycat speak.
+                const char *equinox = image->image()->wcs().equinoxStr();
+                strcpy(xy_units, "deg ");
+                strcat(xy_units, equinox);
             }
             else {
                 status = error("no wcs or image coordinates to plot");
@@ -1088,7 +1096,7 @@ int GaiaSkySearch::getQueryResult( int numCols, char **colNames,
 
     //  Create a QueryResult object from the headings and data and
     //  save (or append) it to the file
-    if ( status == 0 ) {
+    if ( status == TCL_OK ) {
         status = r.init( numCols, colNames, os.str().c_str() );
     }
 
@@ -1150,16 +1158,19 @@ int GaiaSkySearch::imgplotCmd( int argc, char* argv[] )
         if ( Tcl_ExprLong( interp_, argv[2], &adr ) != TCL_OK ) {
             return TCL_ERROR;
         }
-        AstFrameSet *catwcs = (AstFrameSet *) adr;
+        if ( adr != 0 ) {
+            AstFrameSet *catwcs = (AstFrameSet *) adr;
 
-        //  Connect this to the coordinates of the image. Note this is now
-        //  assumes we have a StarRtdImage instance not Skycat.
-        StarWCS *wcs = (StarWCS *) image->image()->wcs().rep();
-        AstFrameSet *imagewcs = (AstFrameSet *) wcs->astWCSClone();
-        frmset = (AstFrameSet *) astConvert( catwcs, imagewcs, "SKY" );
-        if ( ! astOK ) {
-            astClearStatus;
-            return error( "Failed to connect image and catalogue coordinates" );
+            //  Connect this to the coordinates of the image. Note this is now
+            //  assumes we have a StarRtdImage instance not Skycat.
+            StarWCS *wcs = (StarWCS *) image->image()->wcs().rep();
+            AstFrameSet *imagewcs = (AstFrameSet *) wcs->astWCSCopy();
+            frmset = (AstFrameSet *) astConvert( imagewcs, catwcs, "SKY" );
+            if ( ! astOK ) {
+                astClearStatus;
+                return error( "Failed to connect image and catalogue"
+                              " coordinates" );
+            }
         }
     }
 
@@ -1171,7 +1182,7 @@ int GaiaSkySearch::imgplotCmd( int argc, char* argv[] )
     }
     else {			
         //  Use headings list.
-	if ( Tcl_SplitList( interp_, argv[3], &numCols, &colNames ) != TCL_OK ) {
+	if ( Tcl_SplitList(interp_, argv[3], &numCols, &colNames) != TCL_OK ) {
             return TCL_ERROR;
         }
 	freeColNames++;
@@ -1180,7 +1191,8 @@ int GaiaSkySearch::imgplotCmd( int argc, char* argv[] )
     //  Get query results from arguments
     QueryResult r;
     r.entry( cat_->entry() );
-    int status = getQueryResult( numCols, (char**)colNames, argv[1], frmset, r );
+    int status = getQueryResult( numCols, (char**)colNames, argv[1], 
+                                 frmset, r );
     if ( status == TCL_OK ) {
 	status = plot( image, r );
     }
