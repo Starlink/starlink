@@ -119,7 +119,7 @@ if ( ${?@LD_LIB_PATH@} ) then
    if ( $found_openwin == "no" ) then
       switch (@build@) 
          case *sun4*: 
-            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:/usr/openwin/lib
+            setenv @LD_LIB_PATH@ "${@LD_LIB_PATH@}:/usr/openwin/lib"
          breaksw
       endsw
    endif
