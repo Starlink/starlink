@@ -318,10 +318,16 @@ fi
 
 #  ORAC-DR
 
-if test -f ${bindir}/oracdr/etc/oracdr_start.sh; then
-   export ORAC_DIR=${bindir}/oracdr
+if test -f ${bindir}/oracdr/src/etc/oracdr_start.sh; then
+   export ORAC_DIR=${bindir}/oracdr/src
    export ORAC_PERL5LIB=${ORAC_DIR}/lib/perl5
-   export ORAC_CAL_ROOT=${ORAC_DIR}/cal
+   export ORAC_CAL_ROOT=${bindir}/oracdr/cal
+else
+  if test -f ${bindir}/oracdr/etc/oracdr_start.sh; then
+     export ORAC_DIR=${bindir}/oracdr
+     export ORAC_PERL5LIB=${ORAC_DIR}/lib/perl5
+     export ORAC_CAL_ROOT=${ORAC_DIR}/cal
+  fi
 fi
 
 #  PERIOD
@@ -602,32 +608,36 @@ fi
 
 # ORAC-DR
 
-if test -f ${bindir}/oracdr/etc/profile; then
-  source ${bindir}/oracdr/etc/profile
+if test -f ${bindir}/oracdr/src/etc/profile; then
+  source ${bindir}/oracdr/src/etc/profile
 else
-  oracdr_cgs4 () { ${staretcdir}/notinst oracdr_cgs4; }
-  oracdr_classiccam () { ${staretcdir}/notinst oracdr_classiccam; }
-  oracdr_gmos () { ${staretcdir}/notinst oracdr_gmos; }
-  oracdr_ingrid () { ${staretcdir}/notinst oracdr_ingrid; }
-  oracdr_ircam () { ${staretcdir}/notinst oracdr_ircam; }
-  oracdr_ircam_old () { ${staretcdir}/notinst oracdr_ircam_old; }
-  oracdr_iris2 () { ${staretcdir}/notinst oracdr_iris2; }
-  oracdr_isaac () { ${staretcdir}/notinst oracdr_isaac; }
-  oracdr_michelle () { ${staretcdir}/notinst oracdr_michelle; }
-  oracdr_naco () { ${staretcdir}/notinst oracdr_naco; }
-  oracdr_niri () { ${staretcdir}/notinst oracdr_niri; }
-  oracdr_scuba () { ${staretcdir}/notinst oracdr_scuba; }
-  oracdr_sofi () { ${staretcdir}/notinst oracdr_sofi; }
-  oracdr_spex () { ${staretcdir}/notinst oracdr_spex; }
-  oracdr_swfcam () { ${staretcdir}/notinst oracdr_swfcam; }
-  oracdr_swfcam1 () { ${staretcdir}/notinst oracdr_swfcam1; }
-  oracdr_swfcam2 () { ${staretcdir}/notinst oracdr_swfcam2; }
-  oracdr_swfcam3 () { ${staretcdir}/notinst oracdr_swfcam3; }
-  oracdr_swfcam4 () { ${staretcdir}/notinst oracdr_swfcam4; }
-  oracdr_ufti () { ${staretcdir}/notinst oracdr_ufti; }
-  oracdr_ufti_old () { ${staretcdir}/notinst oracdr_ufti_old; }
-  oracdr_uist () { ${staretcdir}/notinst oracdr_uist; }
-  xoracdr () { ${staretcdir}/notinst xoracdr; }
+  if test -f ${bindir}/oracdr/etc/profile; then
+    source ${bindir}/oracdr/etc/profile
+  else
+    oracdr_cgs4 () { ${staretcdir}/notinst oracdr_cgs4; }
+    oracdr_classiccam () { ${staretcdir}/notinst oracdr_classiccam; }
+    oracdr_gmos () { ${staretcdir}/notinst oracdr_gmos; }
+    oracdr_ingrid () { ${staretcdir}/notinst oracdr_ingrid; }
+    oracdr_ircam () { ${staretcdir}/notinst oracdr_ircam; }
+    oracdr_ircam_old () { ${staretcdir}/notinst oracdr_ircam_old; }
+    oracdr_iris2 () { ${staretcdir}/notinst oracdr_iris2; }
+    oracdr_isaac () { ${staretcdir}/notinst oracdr_isaac; }
+    oracdr_michelle () { ${staretcdir}/notinst oracdr_michelle; }
+    oracdr_naco () { ${staretcdir}/notinst oracdr_naco; }
+    oracdr_niri () { ${staretcdir}/notinst oracdr_niri; }
+    oracdr_scuba () { ${staretcdir}/notinst oracdr_scuba; }
+    oracdr_sofi () { ${staretcdir}/notinst oracdr_sofi; }
+    oracdr_spex () { ${staretcdir}/notinst oracdr_spex; }
+    oracdr_swfcam () { ${staretcdir}/notinst oracdr_swfcam; }
+    oracdr_swfcam1 () { ${staretcdir}/notinst oracdr_swfcam1; }
+    oracdr_swfcam2 () { ${staretcdir}/notinst oracdr_swfcam2; }
+    oracdr_swfcam3 () { ${staretcdir}/notinst oracdr_swfcam3; }
+    oracdr_swfcam4 () { ${staretcdir}/notinst oracdr_swfcam4; }
+    oracdr_ufti () { ${staretcdir}/notinst oracdr_ufti; }
+    oracdr_ufti_old () { ${staretcdir}/notinst oracdr_ufti_old; }
+    oracdr_uist () { ${staretcdir}/notinst oracdr_uist; }
+    xoracdr () { ${staretcdir}/notinst xoracdr; }
+  fi
 fi
 
 # Polpack

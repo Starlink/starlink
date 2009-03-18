@@ -437,10 +437,22 @@ endif
 
 #
 #  ORAC-DR
-if ( -e ${bindir}/oracdr/etc/oracdr_start.csh ) then
-   setenv ORAC_DIR ${bindir}/oracdr
-   setenv ORAC_PERL5LIB ${ORAC_DIR}/lib/perl5
-   setenv ORAC_CAL_ROOT ${ORAC_DIR}/cal
+#    - New layout is $bindir/oracdr/src/etc
+#      Old layour is $bindir/oracdr/etc
+#    support both in interim
+if ( -e ${bindir}/oracdr ) then
+    set orac_root=${bindir}/oracdr
+    set orac_dir=${orac_root}
+    if (-e ${orac_dir}/src ) then
+        set orac_dir="${orac_dir}/src"
+    endif
+    if ( -e ${orac_dir}/etc/oracdr_start.csh ) then
+        setenv ORAC_DIR ${orac_dir}
+        setenv ORAC_PERL5LIB ${ORAC_DIR}/lib/perl5
+        setenv ORAC_CAL_ROOT ${orac_root}/cal
+    endif
+    unset orac_dir
+    unset orac_root
 endif
 
 #
