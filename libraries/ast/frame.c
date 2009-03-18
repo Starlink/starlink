@@ -252,6 +252,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        Correct parent class in invocation of astMAKE_ISA.
 *     14-JAN-2009 (DSB):
 *        Added astIntersect.
+*     18-MAR-2009 (DSB):
+*        Fixed bug in LineCrossing.
 *class--
 */
 
@@ -5866,8 +5868,8 @@ static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
       if( den != 0.0 ) {
          dx = l2->start[ 0 ] - l1->start[ 0 ];
          dy = l2->start[ 1 ] - l1->start[ 1 ];
-         t1 = ( l2->dir[ 1 ]*dx + l2->dir[ 0 ]*dy )/den;
-         t2 = ( l1->dir[ 1 ]*dx + l1->dir[ 0 ]*dy )/den;
+         t1 = ( l2->dir[ 1 ]*dx - l2->dir[ 0 ]*dy )/den;
+         t2 = ( l1->dir[ 1 ]*dx - l1->dir[ 0 ]*dy )/den;
 
 /* Store the crossing point, using the smaller t value to redue error. */
          if( fabs( t1 ) < fabs( t2 ) ) {
