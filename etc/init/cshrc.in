@@ -1,4 +1,4 @@
-#!/bin/csh
+#!csh -*- shell-script -*-
 #+
 #  Date: 2003-MAY-23
 #  File: @staretc@/cshrc
