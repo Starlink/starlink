@@ -126,7 +126,7 @@
 *  Need to construct a string to filter out parameter locators
 *  from the list of active locators. Need monolith and taskname
 *  excluded. Also seem to need HDS_SCRATCH excluded.
-      FILTER = '!KAPVIEW_MON,!HDS_SCRATCH,!GLOBAL,!'
+      FILTER = '!POLPACK_MON,!HDS_SCRATCH,!GLOBAL,!'
       IPOSN = CHR_LEN( FILTER )
       CALL CHR_APPND(NAME, FILTER, IPOSN)
 
