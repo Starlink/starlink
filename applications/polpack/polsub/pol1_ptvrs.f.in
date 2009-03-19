@@ -81,7 +81,7 @@
 
 *  If not, create one now.
       IF( .NOT. THERE ) THEN
-         CALL NDF_XNEW( INDF, 'POLPACK', 'POLPACK', 0, 0, XLOC, STATUS ) 
+         CALL NDF_XNEW( INDF, 'POLPACK', 'POLPACK', 0, 0, XLOC, STATUS )
 
 *  Is so, get a locator to it.
       ELSE
