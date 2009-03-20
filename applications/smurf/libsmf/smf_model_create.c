@@ -668,10 +668,10 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
               }
 	      
             } else if( mtype == SMF__NOI ) {
-              /* If this is a NOI, set to VAL__BADD, avoid divide-by-zero */
+              /* If this is a NOI, set to 1, avoid divide-by-zero */
               if( head.data.dtype == SMF__DOUBLE ) {
                 for( l=0; l<ndata; l++ ) {
-                  ((double *) dataptr)[l] = VAL__BADD;
+                  ((double *) dataptr)[l] = 1;
                 }
               } else {
                 /* Generate error message if NOI is not double... */
