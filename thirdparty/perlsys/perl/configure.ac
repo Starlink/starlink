@@ -41,9 +41,13 @@ dnl    push it through as part of optimize.
    if test -n "$CFLAGS"; then
       args="$CFLAGS"
    fi
+   cc=""
+   if test -n "$CC"; then
+      cc="-Dcc=$CC"
+   fi
    cd perl; \
    rm -f config.sh ; \
-   sh ./Configure -des -Dprefix=${prefix}/Perl -Doptimize="$args"; \
+   sh ./Configure -des -Dprefix=${prefix}/Perl $cc -Doptimize="$args"; \
 )
  
 dnl    Install Perl using a staging area to get all files listed in 
