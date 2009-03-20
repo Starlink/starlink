@@ -240,7 +240,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
   smfArray **ast=NULL;          /* Astronomical signal */
   double *ast_data=NULL;        /* Pointer to DATA component of ast */
   smfGroup *astgroup=NULL;      /* smfGroup of ast model files */
-  const char *asttemp=NULL;     /* Pointer to static strings created by ast */
   double badfrac;               /* Bad bolo fraction for flagging */
   int baseorder;                /* Order of poly for baseline fitting */
   size_t bstride;               /* Bolometer stride */
@@ -289,8 +288,9 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
   size_t memneeded;             /* Memory required for map-maker */
   smfArray ***model=NULL;       /* Array of pointers smfArrays for ea. model */
   smfGroup **modelgroups=NULL;  /* Array of group ptrs/ each model component */
+  char *modelname=NULL;         /* Name of current model component */
+  char modelnames[SMF_MODEL_MAX*4]; /* Array of all model components names */
   smf_modeltype *modeltyps=NULL;/* Array of model types */
-  char modelname[4];            /* Name of current model component */
   smf_calcmodelptr modelptr=NULL; /* Pointer to current model calc function */
   dim_t msize;                  /* Number of elements in map */
   char name[GRP__SZNAM+1];      /* Buffer for storing exported model names */
@@ -298,11 +298,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
   dim_t nchunks=0;              /* Number of chunks within iteration loop */
   size_t ncontchunks=0;         /* Number continuous chunks outside iter loop*/
   size_t nflag;                 /* Number of flagged samples */
+  int nm=0;                     /* Signed int version of nmodels */
   dim_t nmodels=0;              /* Number of model components / iteration */
   int numiter;                  /* Total number iterations */
   dim_t padEnd=0;               /* How many samples of padding at the end */
   dim_t padStart=0;             /* How many samples of padding at the start */
-  size_t pass;                  /* Two pass parsing of MODELORDER */
   smfArray **qua=NULL;          /* Quality flags for each file */
   unsigned char *qua_data=NULL; /* Pointer to DATA component of qua */
   smfGroup *quagroup=NULL;      /* smfGroup of quality model files */
@@ -571,66 +571,42 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
     /* Type and order of models to fit from MODELORDER keyword */
     havenoi = 0;
     haveext = 0;
-    if( astMapGet0C( keymap, "MODELORDER", &asttemp ) ) {
 
-      modelname[3] = 0;
+    if(astMapGet1C(keymap, "MODELORDER", 4, SMF_MODEL_MAX, &nm, modelnames)) {
+      nmodels = (dim_t) nm;
+      
+      /* Allocate modeltyps */
+      if( nmodels >= 1 ) {
+        modeltyps = smf_malloc( nmodels, sizeof(*modeltyps), 1, status );
+      } else {
+        msgOut(" ", "SMF_ITERATEMAP: No valid models in MODELORDER",
+               status );
+      }
+      
+      /* Loop over names and figure out enumerated type */
+      for( i=0; (*status==SAI__OK)&&(i<nmodels); i++ ) {
+        modelname = modelnames+i*4; /* Pointer to current name */
+        thismodel = smf_model_gettype( modelname, status );	    
 
-      /* First pass count components, second pass allocate modeltyps & store */
-      for( pass=1; pass<=2; pass++ ) {
-        j=0; /* Count number of characters in sub-string */
-        nmodels = 0;
-
-        /* Loop over all characters in asttemp, count # valid model names */
-        for( i=0; i<strlen(asttemp); i++ ) {
-	  
-          /* If current asttemp character non-delimeter, copy to modelname */
-          if( asttemp[i] != ' ' ) {
-            modelname[j] = asttemp[i];
-            j++;
+        if( *status == SAI__OK ) {
+          modeltyps[i] = thismodel;
+          
+          /* set havenoi/whichnoi */
+          if( thismodel == SMF__NOI ) {
+            havenoi = 1;
+            whichnoi = i; 
           }
-	  
-          /* If 3 characters in sub-string, extract type */
-          if( j == 3 ) {
-
-            thismodel = smf_model_gettype( modelname, status );	    
-
-            if( *status == SAI__OK ) {
-	      
-              /* If second pass modeltyps is allocated - store value */
-              if( pass == 2 ) {
-                modeltyps[nmodels] = thismodel;
-
-                /* set havenoi/whichnoi */
-                if( thismodel == SMF__NOI ) {
-                  havenoi = 1;
-                  whichnoi = nmodels; 
-                }
-
-                /* set haveext/whichext */
-                if( thismodel == SMF__EXT ) {
-                  haveext = 1;
-                  whichext = nmodels; 
-                }
-
-                /* set havegai/whichgai */
-                if( thismodel == SMF__GAI ) {
-                  havegai = 1;
-                  whichgai = nmodels; 
-                }
-              }
-              nmodels++;
-              j = 0;
-            }
+          
+          /* set haveext/whichext */
+          if( thismodel == SMF__EXT ) {
+            haveext = 1;
+            whichext = i; 
           }
-        }
-	
-        /* End of pass 1: allocate modeltyps */
-        if( pass == 1 ) {
-          if( nmodels >= 1 ) {
-            modeltyps = smf_malloc( nmodels, sizeof(*modeltyps), 0, status );
-          } else {
-            msgOut(" ", "SMF_ITERATEMAP: No valid models in MODELORDER",
-                   status );
+
+          /* set havegai/whichgai */
+          if( thismodel == SMF__GAI ) {
+            havegai = 1;
+            whichgai = i; 
           }
         }
       }
@@ -639,11 +615,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
              status);
       nmodels = 0;
     }
-  }
-
-  /* If !havenoi can't measure convergence, so turn off untilconverge */
-  if( !havenoi ) {
+    
+    /* If !havenoi can't measure convergence, so turn off untilconverge */
+    if( !havenoi ) {
     untilconverge = 0;
+    }
   }
 
   if( untilconverge ) {
@@ -1110,9 +1086,9 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
               msgOutif(MSG__VERB," ", "  ^MNAME", status);
               modelptr = smf_model_getptr( modeltyps[j], status );
 	    
-              if( *status == SAI__OK ) {
+              if( *status == SAI__OK ) { 
                 (*modelptr)( &dat, i, keymap, model[j], dimmflags, status );
-              }
+              } 
 
               /* If bad status set exit condition */
               if( *status != SAI__OK ) {
