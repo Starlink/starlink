@@ -629,15 +629,15 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   }
 
 /* Report the pixel bounds of the cube. */
-   if( *status == SAI__OK ) {
-      msgOutif( MSG__NORM, " ", " ", status );
-      msgSeti( "XL", lbnd_out[ 0 ] );
-      msgSeti( "YL", lbnd_out[ 1 ] );
-      msgSeti( "XU", ubnd_out[ 0 ] );
-      msgSeti( "YU", ubnd_out[ 1 ] );
-      msgOutif( MSG__NORM, " ", "   Output map pixel bounds: ( ^XL:^XU, ^YL:^YU )", 
-                status );
-   }
+  if( *status == SAI__OK ) {
+    msgOutif( MSG__NORM, " ", " ", status );
+    msgSeti( "XL", lbnd_out[ 0 ] );
+    msgSeti( "YL", lbnd_out[ 1 ] );
+    msgSeti( "XU", ubnd_out[ 0 ] );
+    msgSeti( "YU", ubnd_out[ 1 ] );
+    msgOutif( MSG__NORM, " ", "   Output map pixel bounds: ( ^XL:^XU, ^YL:^YU )",
+              status );
+  }
 
   /* If no error has occurred, export the returned FrameSet pointer from the 
      current AST context so that it will not be annulled when the AST

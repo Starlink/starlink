@@ -118,9 +118,9 @@
 
 #define FUNC_NAME "smf_calc_mapcoord"
 
-void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving, 
-			int *lbnd_out, int *ubnd_out, int flags, 
-			int *status ) {
+void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
+                        int *lbnd_out, int *ubnd_out, int flags,
+                        int *status ) {
 
   /* Local Variables */
 
@@ -199,8 +199,8 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
     if( file->isSc2store ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME,
-	     "File was opened by sc2store library (raw data?)",
-	     status);
+             "File was opened by sc2store library (raw data?)",
+             status);
     }
 
     if( !file->isTstream ) {
@@ -210,30 +210,30 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
 
     /* Get HDS locator to the MAPCOORD extension */
     mapcoordloc = smf_get_xloc( data, "MAPCOORD", "MAP_PROJECTION", "UPDATE", 
-				0, 0, status );
+                                0, 0, status );
 
     /* Obtain NDF identifier/placeholder for LUT in MAPCOORD extension*/
     lbnd[0] = 0;
     ubnd[0] = nbolo*ntslice-1;
     lutndf = smf_get_ndfid( mapcoordloc, "LUT", "UPDATE", "UNKNOWN",
-			      "_INTEGER", 1, lbnd, ubnd, status );
+                            "_INTEGER", 1, lbnd, ubnd, status );
 
     if( *status == SAI__OK ) {
       /* store the NDF identifier */
       file->mapcoordid = lutndf;
 
       /* Create sky to output grid mapping using the base coordinates to
-	 get the coordinates of the tangent point if it hasn't been done
-	 yet. */	  
+         get the coordinates of the tangent point if it hasn't been done
+         yet. */
       sky2map = astGetMapping( outfset, AST__CURRENT, AST__BASE );
       
       /* Get the system from the outfset to match each timeslice */
       system = astGetC( outfset, "system" );
 
       if( !astOK ) {
-	*status = SAI__ERROR;
-	errRep(FUNC_NAME, "Error extracting mapping info from frameset", 
-	       status);
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "Error extracting mapping info from frameset",
+               status);
       }
     }
 
@@ -249,76 +249,76 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
 
       if( *status == SAI__OK ) {
 
-	/* Check that the old and new mappings are the same by
-	   checking that combining one with the inverse of the other
-	   reduces to a UnitMap. */
+        /* Check that the old and new mappings are the same by
+           checking that combining one with the inverse of the other
+           reduces to a UnitMap. */
 	
-	map2sky_old = astGetMapping( oldfset, AST__BASE, AST__CURRENT );
-	testcmpmap = astCmpMap( map2sky_old, sky2map, 1, " " );
-	testsimpmap = astSimplify( testcmpmap );
+        map2sky_old = astGetMapping( oldfset, AST__BASE, AST__CURRENT );
+        testcmpmap = astCmpMap( map2sky_old, sky2map, 1, " " );
+        testsimpmap = astSimplify( testcmpmap );
 	
-	if( astIsAUnitMap( testsimpmap ) ) {
+        if( astIsAUnitMap( testsimpmap ) ) {
 
-	  /* The mappings are the same, now just check the pixel
-	     bounds in the output map */
+          /* The mappings are the same, now just check the pixel
+             bounds in the output map */
 	  
-	  lbnd_temp[0] = 1; 
-	  ubnd_temp[0] = 2; 
+          lbnd_temp[0] = 1;
+          ubnd_temp[0] = 2;
 	  
-	  bndndf = smf_get_ndfid( mapcoordloc, "LBND", "READ", "UNKNOWN",
-				  "_INTEGER", 1, lbnd_temp, ubnd_temp, 
-				  status );
+          bndndf = smf_get_ndfid( mapcoordloc, "LBND", "READ", "UNKNOWN",
+                                  "_INTEGER", 1, lbnd_temp, ubnd_temp,
+                                  status );
 	  
-	  if( *status == SAI__OK ) {
-	    ndfMap( bndndf, "DATA", "_INTEGER", "READ", data_pntr, &nmap, 
-		    status );    
-	    data_index = data_pntr[0];
-
-	    if( *status == SAI__OK ) {
-	      lbnd_old[0] = data_index[0];
-	      lbnd_old[1] = data_index[1];
-	    } 
-	    ndfAnnul( &bndndf, status );
-	  }
-	  
-	  bndndf = smf_get_ndfid( mapcoordloc, "UBND", "READ", "UNKNOWN",
-				  "_INTEGER", 1, lbnd_temp, ubnd_temp, 
-				  status );
-	  
-	  if( *status == SAI__OK ) {
-	    ndfMap( bndndf, "DATA", "_INTEGER", "READ", data_pntr, &nmap, 
-		    status );
+          if( *status == SAI__OK ) {
+            ndfMap( bndndf, "DATA", "_INTEGER", "READ", data_pntr, &nmap,
+                    status );
             data_index = data_pntr[0];
 
-	    if( *status == SAI__OK ) {
-	      ubnd_old[0] = data_index[0];
-	      ubnd_old[1] = data_index[1];
-	    } 
-	    ndfAnnul( &bndndf, status );
-	  }
+            if( *status == SAI__OK ) {
+              lbnd_old[0] = data_index[0];
+              lbnd_old[1] = data_index[1];
+            }
+            ndfAnnul( &bndndf, status );
+          }
 	  
-	  if( *status == SAI__OK ) {
-	    /* If we get this far finally do the bounds check! */
-	    if( (lbnd_old[0] == lbnd_out[0]) && 
-		(lbnd_old[1] == lbnd_out[1]) &&
-		(ubnd_old[0] == ubnd_out[0]) &&
-		(ubnd_old[1] == ubnd_out[1]) ) {
-	      
-	      docalc = 0; /* We don't have to re-calculate the LUT */
-	      msgOutif(MSG__VERB," ","SMF_CALC_MAPCOORD: Existing LUT OK", 
-		       status);
-	    }
-	  } 
-	}
+          bndndf = smf_get_ndfid( mapcoordloc, "UBND", "READ", "UNKNOWN",
+                                  "_INTEGER", 1, lbnd_temp, ubnd_temp,
+                                  status );
+	  
+          if( *status == SAI__OK ) {
+            ndfMap( bndndf, "DATA", "_INTEGER", "READ", data_pntr, &nmap,
+                    status );
+            data_index = data_pntr[0];
 
-	/* Bad status / AST errors at this point due to problems with 
+            if( *status == SAI__OK ) {
+              ubnd_old[0] = data_index[0];
+              ubnd_old[1] = data_index[1];
+            }
+            ndfAnnul( &bndndf, status );
+          }
+	  
+          if( *status == SAI__OK ) {
+            /* If we get this far finally do the bounds check! */
+            if( (lbnd_old[0] == lbnd_out[0]) &&
+                (lbnd_old[1] == lbnd_out[1]) &&
+                (ubnd_old[0] == ubnd_out[0]) &&
+                (ubnd_old[1] == ubnd_out[1]) ) {
+	      
+              docalc = 0; /* We don't have to re-calculate the LUT */
+              msgOutif(MSG__VERB," ","SMF_CALC_MAPCOORD: Existing LUT OK",
+                       status);
+            }
+          }
+        }
+
+        /* Bad status / AST errors at this point due to problems with
            MAPCOORD. Annul and continue calculating new MAPCOORD extension. */
-	astClearStatus;
-	errAnnul(status);
+        astClearStatus;
+        errAnnul(status);
 
       } else {
-	/* Bad status due to non-existence of MAPCOORD. Annul and continue */
-	errAnnul(status);
+        /* Bad status due to non-existence of MAPCOORD. Annul and continue */
+        errAnnul(status);
       }
     }
     
@@ -327,18 +327,18 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
   /* If we need to calculate the LUT do it here */
   if( docalc && (*status == SAI__OK) ) {
     msgOutif(MSG__VERB," ","SMF_CALC_MAPCOORD: Calculate new LUT", 
-	     status);
+             status);
 
     if( doextension ) {
       /* Map the LUT array */
-      ndfMap( lutndf, "DATA", "_INTEGER", "WRITE", data_pntr, &nmap, 
-	      status );
+      ndfMap( lutndf, "DATA", "_INTEGER", "WRITE", data_pntr, &nmap,
+              status );
       data_index = data_pntr[0];
       if( *status == SAI__OK ) {
         lut = data_index;
       } else {
-	errRep( FUNC_NAME, "Unable to map LUT in MAPCOORD extension",
-		status);
+        errRep( FUNC_NAME, "Unable to map LUT in MAPCOORD extension",
+                status);
       }
     } else {
       /* malloc the LUT array */
@@ -364,43 +364,43 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
 
     if( *status == SAI__OK ) {
       /* Calculate bounds in the input array. 
-	 Note: I had to swap the ranges for the two axes from what seemed to
-	 make the most sense to me!  EC */
+         Note: I had to swap the ranges for the two axes from what seemed to
+         make the most sense to me!  EC */
       lbnd_in[0] = 1;
-      ubnd_in[0] = (data->dims)[0]; 
+      ubnd_in[0] = (data->dims)[0];
       lbnd_in[1] = 1;
       ubnd_in[1] = (data->dims)[1];
       
       /* Loop over time slices */
       for( i=0; i<ntslice; i++ ) {
 
-	/* Calculate the bolometer to map-pixel transformation for tslice */
-	bolo2map = smf_rebin_totmap( data, i, abskyfrm, sky2map, moving, 
-				     status );	  
+        /* Calculate the bolometer to map-pixel transformation for tslice */
+        bolo2map = smf_rebin_totmap( data, i, abskyfrm, sky2map, moving,
+                                     status );
 	
-	if( *status == SAI__OK ) {
-	  astTranGrid( bolo2map, 2, lbnd_in, ubnd_in, 0.1, 1000000, 1,
-		       2, nbolo, outmapcoord );
+        if( *status == SAI__OK ) {
+          astTranGrid( bolo2map, 2, lbnd_in, ubnd_in, 0.1, 1000000, 1,
+                       2, nbolo, outmapcoord );
 	  
-	  for( j=0; j<nbolo; j++ ) {
-	    xnear = (int) (outmapcoord[j] - 0.5);
-	    ynear = (int) (outmapcoord[nbolo+j] - 0.5);
+          for( j=0; j<nbolo; j++ ) {
+            xnear = (int) (outmapcoord[j] - 0.5);
+            ynear = (int) (outmapcoord[nbolo+j] - 0.5);
 	    
-	    if( (xnear >= 0) && (xnear <= ubnd_out[0] - lbnd_out[0]) &&
-		(ynear >= 0) && (ynear <= ubnd_out[1] - lbnd_out[1]) ) {
-	      /* Point lands on map */
-	      lut[i*nbolo+j] = ynear*(ubnd_out[0]-lbnd_out[0]+1) + xnear;
-	    } else {
-	      /* Point lands outside map */
-	      lut[i*nbolo+j] = VAL__BADI;
-	    }
-	  }
-	}
-	/* clean up ast objects */
-	bolo2map = astAnnul( bolo2map );
+            if( (xnear >= 0) && (xnear <= ubnd_out[0] - lbnd_out[0]) &&
+                (ynear >= 0) && (ynear <= ubnd_out[1] - lbnd_out[1]) ) {
+              /* Point lands on map */
+              lut[i*nbolo+j] = ynear*(ubnd_out[0]-lbnd_out[0]+1) + xnear;
+            } else {
+              /* Point lands outside map */
+              lut[i*nbolo+j] = VAL__BADI;
+            }
+          }
+        }
+        /* clean up ast objects */
+        bolo2map = astAnnul( bolo2map );
 
-	/* Break out of loop over time slices if bad status */
-	if (*status != SAI__OK) goto CLEANUP;
+        /* Break out of loop over time slices if bad status */
+        if (*status != SAI__OK) goto CLEANUP;
       }
 
       /* Set the lut pointer in data to the buffer */
@@ -408,42 +408,42 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
 
       /* Write the WCS for the projection to the extension */
       if( doextension ) {
-        kpg1Wwrt( (AstObject*)outfset, "WCS", mapcoordloc, status ); 
+        kpg1Wwrt( (AstObject*)outfset, "WCS", mapcoordloc, status );
 	
-	/* Write the pixel bounds for the map to the extension */
+        /* Write the pixel bounds for the map to the extension */
 	
-	lbnd_temp[0] = 1; /* Don't get confused! Bounds for NDF that will */
-	ubnd_temp[0] = 2; /* contain the bounds for the output 2d map!    */
+        lbnd_temp[0] = 1; /* Don't get confused! Bounds for NDF that will */
+        ubnd_temp[0] = 2; /* contain the bounds for the output 2d map!    */
 	
-	bndndf = smf_get_ndfid( mapcoordloc, "LBND", "UPDATE", "UNKNOWN",
-				"_INTEGER", 1, lbnd_temp, ubnd_temp, status );
+        bndndf = smf_get_ndfid( mapcoordloc, "LBND", "UPDATE", "UNKNOWN",
+                                "_INTEGER", 1, lbnd_temp, ubnd_temp, status );
       
-	ndfMap( bndndf, "DATA", "_INTEGER", "WRITE", data_pntr, &nmap, 
-		status );    
+        ndfMap( bndndf, "DATA", "_INTEGER", "WRITE", data_pntr, &nmap,
+                status );
         data_index = data_pntr[0];
-	if( *status == SAI__OK ) {
-	  data_index[0] = lbnd_out[0];
-	  data_index[1] = lbnd_out[1];
-	} else {
-	  errRep( FUNC_NAME, "Unable to map LBND in MAPCOORD extension",
-		  status);
-	} 
+        if( *status == SAI__OK ) {
+          data_index[0] = lbnd_out[0];
+          data_index[1] = lbnd_out[1];
+        } else {
+          errRep( FUNC_NAME, "Unable to map LBND in MAPCOORD extension",
+                  status);
+        }
 	
-	ndfAnnul( &bndndf, status );
+        ndfAnnul( &bndndf, status );
 	
-	bndndf = smf_get_ndfid( mapcoordloc, "UBND", "UPDATE", "UNKNOWN",
-				"_INTEGER", 1, lbnd_temp, ubnd_temp, status );
-	ndfMap( bndndf, "DATA", "_INTEGER", "WRITE", data_pntr, &nmap, 
-		status );    
+        bndndf = smf_get_ndfid( mapcoordloc, "UBND", "UPDATE", "UNKNOWN",
+                                "_INTEGER", 1, lbnd_temp, ubnd_temp, status );
+        ndfMap( bndndf, "DATA", "_INTEGER", "WRITE", data_pntr, &nmap,
+                status );
         data_index = data_pntr[0];
-	if( *status == SAI__OK ) {
-	  data_index[0] = ubnd_out[0];
-	  data_index[1] = ubnd_out[1];
-	} else {
-	  errRep( FUNC_NAME, "Unable to map UBND in MAPCOORD extension",
-		  status);
-	} 
-	ndfAnnul( &bndndf, status );
+        if( *status == SAI__OK ) {
+          data_index[0] = ubnd_out[0];
+          data_index[1] = ubnd_out[1];
+        } else {
+          errRep( FUNC_NAME, "Unable to map UBND in MAPCOORD extension",
+                  status);
+        }
+        ndfAnnul( &bndndf, status );
       }
     }
   }
@@ -459,7 +459,7 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
   if (sky2map) sky2map  = astAnnul( sky2map );
   if (bolo2map) bolo2map = astAnnul( bolo2map );
   if( abskyfrm ) abskyfrm = astAnnul( abskyfrm );
-  if( oskyfrm ) oskyfrm = astAnnul( oskyfrm );  
+  if( oskyfrm ) oskyfrm = astAnnul( oskyfrm );
   if( mapcoordloc ) datAnnul( &mapcoordloc, status );
     
   /* If we get this far, docalc=0, and status is OK, there must be
@@ -467,6 +467,6 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
      the caller; "UPDATE" so that the caller can modify it if desired. */
   if( (*status == SAI__OK) && (docalc == 0) ) {
     smf_open_mapcoord( data, "UPDATE", status );
-  } 
-    
+  }
+
 }
