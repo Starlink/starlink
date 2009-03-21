@@ -174,6 +174,9 @@
 *     2009-03-09 (EC):
 *        Don't need to call smf_calcmodel_gai because flatfield no longer
 *        modified by smf_calcmodel_com
+*     2009-03-20 (EC):
+*        Added capability to calculate model components after AST. Use must
+*        now explicitly give AST in MODELORDER keywordd from config file.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -265,6 +268,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
   int f_nnotch=0;               /* Number of notch filters in array */
   int f_nnotch2=0;              /* Number of notch filters in array */
   dim_t goodbolo;               /* Number of good bolometers */
+  int haveast=0;                /* Set if AST is one of the models */
   int haveext=0;                /* Set if EXT is one of the models */
   int havegai=0;                /* Set if GAI is one of the models */
   int havenoi=0;                /* Set if NOI is one of the models */
@@ -276,6 +280,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
   int isize;                    /* Number of files in input group */
   dim_t j;                      /* Loop counter */
   dim_t k;                      /* Loop counter */
+  dim_t l;                      /* Loop counter */
   double *lastchisquared=NULL;  /* chisquared for last iter */
   smfArray **lut=NULL;          /* Pointing LUT for each file */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
@@ -324,6 +329,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
   int untilconverge=0;          /* Set if iterating to convergence */
   double *var_data=NULL;        /* Pointer to DATA component of NOI */
   int varmapmethod=0;           /* Method for calculating varmap */
+  dim_t whichast=0;             /* Model index of AST (must be specified) */
   dim_t whichext=0;             /* Model index of EXT if present */
   dim_t whichgai=0;             /* Model index of GAI if present */
   dim_t whichnoi=0;             /* Model index of NOI if present */
@@ -590,7 +596,13 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
 
         if( *status == SAI__OK ) {
           modeltyps[i] = thismodel;
-          
+
+          /* set haveast/whichast */
+          if( thismodel == SMF__AST ) {
+            haveast = 1;
+            whichast = i;
+          }
+
           /* set havenoi/whichnoi */
           if( thismodel == SMF__NOI ) {
             havenoi = 1;
@@ -611,14 +623,22 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
         }
       }
     } else {
-      msgOut(" ", "SMF_ITERATEMAP: MODELORDER unspecified - will only rebin!",
+      *status = SAI__ERROR;
+      errRep("", FUNC_NAME ": MODELORDER must be specified in config file!",
              status);
       nmodels = 0;
     }
-    
+
     /* If !havenoi can't measure convergence, so turn off untilconverge */
     if( !havenoi ) {
     untilconverge = 0;
+    }
+
+    /* Fail if no AST model component was specified */
+    if( !haveast ) {
+      *status = SAI__ERROR;
+      errRep("", FUNC_NAME ": AST must be member of MODELORDER in config file!",
+             status);
     }
   }
 
@@ -1073,27 +1093,42 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
                  "SMF_ITERATEMAP: Calculate time-stream model components", 
                  status);
 
-          /* Call the model calculations in the desired order. */
+          /* Call the model calculations in the desired order */
           if( *status == SAI__OK ) {
-            for( j=0; j<nmodels; j++ ) {
-	    
-              /* Set up control flags for the model calculation */
-              dimmflags = 0;
-              if( iter==0 ) dimmflags |= SMF__DIMM_FIRSTITER;
-              if( j==0 ) dimmflags |= SMF__DIMM_FIRSTCOMP;
-	    
+
+            /* If this is the first iteration just do all of the models up
+               to AST. Subsequent iterations start at the first model after
+               AST, and then loop back to the start */
+
+            if( iter == 0 ) {
+              l = 0;
+            } else {
+              l = whichast+1;
+            }
+
+            for( k=l; (*status==SAI__OK)&&((k%nmodels)!=whichast); k++ ) {
+              /* Which model component are we on */
+              j = k%nmodels;
+
               msgSetc("MNAME", smf_model_getname(modeltyps[j],status));
               msgOutif(MSG__VERB," ", "  ^MNAME", status);
               modelptr = smf_model_getptr( modeltyps[j], status );
-	    
+
+              /* Set up control flags for the model calculation */
+              dimmflags = 0;
+
+              if( iter==0 ) dimmflags |= SMF__DIMM_FIRSTITER;
+
+              if( (iter==1) && (j>whichast) ) {
+                /* In the case that AST is not the last model component,
+                   the last models will not be calculated for the first time
+                   until the start of the second iteration. */
+                dimmflags |= SMF__DIMM_FIRSTITER;
+              }
+
               if( *status == SAI__OK ) { 
                 (*modelptr)( &dat, i, keymap, model[j], dimmflags, status );
               } 
-
-              /* If bad status set exit condition */
-              if( *status != SAI__OK ) {
-                j = nmodels;
-              }
             }
           }
 
@@ -1178,31 +1213,45 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
 
           /* If NOI was present, we now have an estimate of chisquared */
           if( (*status==SAI__OK) && chisquared ) {
-            msgSeti("CHUNK",i+1);
-            msgSetd("CHISQ",chisquared[i]);
-            msgOut( " ", 
-                    "SMF_ITERATEMAP: *** CHISQUARED = ^CHISQ for chunk ^CHUNK",
-                    status);
+            
+            if( (iter==0) && (whichnoi>whichast) ) {
+              /* If NOI comes after AST in MODELORDER we can't check chi^2 or
+                 convergence until next iteration. */
+              msgOut( "", 
+                      "SMF_ITERATEMAP: Will calculate chi^2 next iteration",
+                      status );
+            } else {
+              msgSeti("CHUNK",i+1);
+              msgSetd("CHISQ",chisquared[i]);
+              msgOut( " ", 
+                      "SMF_ITERATEMAP: *** CHISQUARED = ^CHISQ for chunk "
+                      "^CHUNK", status);
 
-            if( iter > 0 ) {
-              msgSetd("DIFF", chisquared[i]-lastchisquared[i]);
-              msgOut( " ",
-                      "SMF_ITERATEMAP: *** change: ^DIFF", status );
-            }
+              if( ((iter > 0)&&(whichnoi<whichast)) ||
+                  ((iter > 1)&&(whichnoi>whichast)) ) {
+                /* Again, we have to check if NOI was calculated at least
+                   twice, which depends on NOI and AST in MODELORDER */
+                msgSetd("DIFF", chisquared[i]-lastchisquared[i]);
+                msgOut( " ",
+                        "SMF_ITERATEMAP: *** change: ^DIFF", status );
 
-            /* Check for the stopping criteria */
-            if( untilconverge ) {
-              if( iter > 0 ) {
-                if( (lastchisquared[i]-chisquared[i]) > chitol ) {
-                  /* Found a chunk that isn't converged yet */
-                  converged=0;
+                /* Check for the stopping criterion */
+                if( untilconverge ) {
+                  if( (lastchisquared[i]-chisquared[i]) > chitol ) {
+                    /* Found a chunk that isn't converged yet */
+                    converged=0;
+                  }
                 }
-              } 	    
+              } else {
+                /* Can't converge until at least 2 consecutive chi^2... */
+                converged=0;
+              }
+
+
+              /* Update lastchisquared */
+              lastchisquared[i] = chisquared[i];
+
             }
-
-            /* Update lastchisquared */
-            lastchisquared[i] = chisquared[i];
-
           }
         }
       

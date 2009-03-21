@@ -6,7 +6,7 @@ numiter = 5
 # chi^2 tolerance in negative-numiter case (requires noi model component)
 chitol = 1e-6
 
-# Export DIMM files as NDF?
+# Export model files as NDF?
 exportndf = 0
 
 # Model components/order (space delimited list)
@@ -14,15 +14,20 @@ exportndf = 0
 #  com = remove common-mode signal
 #  gai = if com specified, fit gain/offset of common mode
 #  ext = apply extinction correction
+#  ast = estimate the map and astronomical signal
+#  flt = apply filter to time streams
 #  noi = estimate time-domain variance
-modelorder = (com,gai,dks,ext,noi)
+modelorder = (com,gai,ext,ast,flt,noi)
 
 # low-pass boxcar filter on COM (samples) to assist with convergence
 # if boxfact set reduce width of boxcar by this factor each iteration
 # boxmin specifies a minimum width below which it can't be reduced
-com_boxcar  = 400
-com_boxfact = 0.5
-com_boxmin  = 100
+
+com_boxcar = 10
+
+#com_boxcar  = 400
+#com_boxfact = 0.5
+#com_boxmin  = 100
 
 # low-pass filter dark squid signals using boxcar of this width (if dks
 # model is specified)
@@ -48,11 +53,11 @@ maxlen = 0
 # The following are for data cleaning. 
 
 # Number of samples of padding to add to start and end before filtering
-#padstart = 1000
-#padend = 1000
+padstart = 1000
+padend = 1000
 
 # Apodize signals with a sin function roll-off across apod samples
-#apod = 1000
+apod = 1000
 
 # fraction of samples to be bad to flag entire bolo as dead
 badfrac = 0.05
@@ -64,7 +69,7 @@ badfrac = 0.05
 #dcbox = 400
 
 # subtract a baseline polynomial of this order
-# order = 1
+order = 0
 
 # S/N ratio to flag spikes with sigma-clipper
 # spikethresh = 5
