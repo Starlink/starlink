@@ -55,6 +55,8 @@
 *        Added SMF__EXT
 *     2009-03-12 (EC):
 *        Added SMF__FLT
+*     2009-03-20 (EC):
+*        Don't fail on SMF__AST (but don't add more memory)
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -203,7 +205,10 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
           total += 3*nrow*ncol*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
           break;
         case SMF__FLT:
-          total += nsamp*smf_dtype_sz(SMF__DOUBLE,status);
+          total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
+          break;
+        case SMF__AST:
+          /* Already accounted for as static memory usage above */
           break;
 	default:
 	  *status = SAI__ERROR;
