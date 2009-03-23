@@ -91,7 +91,8 @@
  *  Constructor - used internally only, public interface uses "open(name)",
  *  "e" is the catalog config entry object for this catalog. Note that
  *  getInfo() in LocalCatalog constructor will be resolved at that level,
- *  hence we must have our own version... This should be resolved correctly.
+ *  during construction, so for known catalogues there will be a
+ *  fake open. It would be nice to avoid that.
  */
 GaiaLocalCatalog::GaiaLocalCatalog( CatalogInfoEntry *e, Tcl_Interp *interp )
     : LocalCatalog( e ),
@@ -375,7 +376,7 @@ int GaiaLocalCatalog::startConvert()
             return 0;
         }
         else {
-            if ( Tcl_VarEval( interp_, "code ", interp_->result, 
+            if ( Tcl_VarEval( interp_, "code ", interp_->result,
                               (char *) NULL ) != TCL_OK ) {
                 return 0;
             }
@@ -415,18 +416,18 @@ void GaiaLocalCatalog::dispose()
 int GaiaLocalCatalog::readTemp()
 {
     if ( filename_ && access( filename_, F_OK ) == 0 ) {
-        
+
         //  Mmap the file and enter into a TabTable.
         Mem m( filename_ );
         if ( m.status() != 0 ) {
             return TCL_ERROR;
         }
-        
+
         //  Make a null terminated copy, which will be managed by info_.
         int size = m.size() + 1;
         char* data = (char *) malloc( size );
         if ( ! data ) {
-            return fmt_error( "cannot allocate %d bytes for %s", size, 
+            return fmt_error( "cannot allocate %d bytes for %s", size,
                               filename_ );
         }
         strncpy( data, (char*) m.ptr(), size-1 );
@@ -440,6 +441,40 @@ int GaiaLocalCatalog::readTemp()
         if ( info_.init( data, 0, 1 ) != 0 ) {
             return TCL_ERROR;
         }
+
+        //  Copy the comments from table to entry.
+        int n = info_.numComments();
+        if ( n > 0 ) {
+            char* c = NULL;
+            int have = 1024;
+            int l = 0;
+            int used = 0;
+
+            char* com = (char*)malloc( have );
+            com[0] = '\0';
+            char* p = com;
+
+            for ( int i = 0; i < n; i++ ) {
+                info_.getComment( i, c );
+                l = strlen( c );
+                if ( ( used + l ) >= have ) {
+                    have += 1024;
+                    com = (char*)realloc( com, have );
+                    p = com + used;
+                }
+                strcpy( p, c );
+                used += ( l + 1 );
+                p += l;
+                if ( i < ( n - 1 ) ) {
+                    *p++ = '\n'; //  new line not NULL.
+                }
+            }
+            entry_->comments( com );
+            free( com );
+        }
+
+        //  This will extract any catalog config info from the file's header.
+        info_.entry( entry_, data );
 
         //  Record modification date at this read.
         tempstamp_ = modDate( filename_ );
@@ -458,22 +493,22 @@ int GaiaLocalCatalog::readTemp()
 int GaiaLocalCatalog::checkInfo()
 {
     if ( info_.numCols() > 0 ) {
-        
+
         //  Check the real file.
         time_t newtime = modDate( realname_ );
         if ( difftime( newtime, timestamp_ ) == 0.0 ) {
-            
+
             //  Not changed, so check the temporary file, since it was last
             //  read.
             newtime = modDate( filename_ );
             if ( difftime( newtime, tempstamp_ ) == 0.0 ) {
-                
+
                 //  Neither are changed, so do nothing.
                 return 0;
             }
         }
     }
-    
+
     //  One of the files is changed, so reconvert or reload as necessary.
     return getInfo();
 }
