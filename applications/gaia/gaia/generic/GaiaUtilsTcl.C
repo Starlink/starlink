@@ -59,6 +59,15 @@ static const double pi_ = 3.14159265358979323846;
 static const double r2d_ = 180.0/pi_;
 static const double d2r_ = pi_/180.0;
 
+/* Struct for controlling line sent to AST via source function. */
+struct sourceInfo {
+    const char **lines;
+    int nlines;
+    int next;
+};
+typedef struct sourceInfo sourceInfo;
+static sourceInfo SOURCEInfo;
+
 /* Local prototypes */
 static int GaiaUtilsAstAnnul( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
@@ -72,6 +81,8 @@ static int GaiaUtilsAstConvert( ClientData clientData, Tcl_Interp *interp,
                                 int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstCopy( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsAstCreate( ClientData clientData, Tcl_Interp *interp,
+                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstDomains( ClientData clientData, Tcl_Interp *interp,
                                 int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstFormat( ClientData clientData, Tcl_Interp *interp,
@@ -141,6 +152,9 @@ int GaiaUtils_Init( Tcl_Interp *interp )
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::astconvert", GaiaUtilsAstConvert,
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::astcreate", GaiaUtilsAstCreate,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::astcopy", GaiaUtilsAstCopy,
@@ -330,7 +344,7 @@ static int GaiaUtilsAstSet( ClientData clientData, Tcl_Interp *interp,
     object = (AstObject *) adr;
 
     /* Set the attributes */
-    astSet( object, Tcl_GetString( objv[2] ) );
+    astSet( object, Tcl_GetString( objv[2] ), " " );
     if ( ! astOK ) {
         char *buf = ckalloc( 1024 );
         sprintf( buf, "Failed to set AST attribute (%s)",
@@ -457,10 +471,11 @@ static int GaiaUtilsAstShow( ClientData clientData, Tcl_Interp *interp,
     AstFitsChan *fitschan;
     AstObject *object;
     AstXmlChan *xmlchan;
+    const char* encoding;
     int nwrite;
     long adr;
 
-    /* Check arguments, allo up to three  */
+    /* Check arguments, allow up to three  */
     if ( objc < 2 || objc > 4 ) {
         Tcl_WrongNumArgs( interp, 1, objv,
                           "AST_object [native|FITS|XML] [FITSencoding]" );
@@ -475,7 +490,9 @@ static int GaiaUtilsAstShow( ClientData clientData, Tcl_Interp *interp,
 
     /* Determine type of channel */
     nwrite = 0;
-    if ( objc == 2 || strcmp( Tcl_GetString( objv[2] ), "native" ) == 0 ) {
+    objc == 2 ? encoding = "native" : encoding = Tcl_GetString( objv[2] );
+
+    if ( strcmp( encoding, "native" ) == 0 ) {
         astShow( object );
         nwrite = 1;
         if ( !astOK ) {
@@ -483,14 +500,14 @@ static int GaiaUtilsAstShow( ClientData clientData, Tcl_Interp *interp,
                            TCL_VOLATILE );
         }
     }
-    else if ( strcmp( Tcl_GetString( objv[2] ), "FITS" ) == 0 ) {
+    else if ( strcmp( encoding, "FITS" ) == 0 ) {
         if ( objc == 4 ) {
             fitschan = (AstFitsChan *) astFitsChan( NULL, &write_out,
                                                     "Encoding=%s",
                                                     Tcl_GetString( objv[3] ) );
         }
         else {
-            fitschan = (AstFitsChan *) astFitsChan( NULL, &write_out, "" );
+            fitschan = (AstFitsChan *) astFitsChan( NULL, &write_out, " " );
         }
         nwrite = astWrite( fitschan, object );
         if ( !astOK || nwrite == 0 ) {
@@ -499,8 +516,8 @@ static int GaiaUtilsAstShow( ClientData clientData, Tcl_Interp *interp,
         }
         fitschan = (AstFitsChan *) astAnnul( fitschan );
     }
-    else if ( strcmp( Tcl_GetString( objv[2] ), "XML" ) == 0 ) {
-        xmlchan = (AstXmlChan *) astXmlChan( NULL, &write_out, "" );
+    else if ( strcmp( encoding, "XML" ) == 0 ) {
+        xmlchan = (AstXmlChan *) astXmlChan( NULL, &write_out, " " );
         nwrite = astWrite( xmlchan, object );
         if ( !astOK || nwrite == 0 ) {
             Tcl_SetResult( interp, "Failed to write object via XML channel",
@@ -512,6 +529,97 @@ static int GaiaUtilsAstShow( ClientData clientData, Tcl_Interp *interp,
         if ( !astOK ) astClearStatus;
         return TCL_ERROR;
     }
+    return TCL_OK;
+}
+
+/**
+ * Create an AST object from an encoding.
+ *
+ * The first argument should be the encoding type, native, FITS or XML.
+ * The second argument a string containing the encoding.
+ */
+static const char *read_in()
+{
+    if ( SOURCEInfo.next < SOURCEInfo.nlines ) {
+        return SOURCEInfo.lines[SOURCEInfo.next++];
+    }
+    return NULL;
+}
+static int GaiaUtilsAstCreate( ClientData clientData, Tcl_Interp *interp,
+                               int objc, Tcl_Obj *CONST objv[] )
+{
+    AstObject *object = NULL;
+    AstChannel *chan = NULL;
+    const char *encoding = NULL;
+    const char *content = NULL;
+
+    /* Check arguments, allow two  */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "native|FITS|XML encoding" );
+        return TCL_ERROR;
+    }
+
+    /* Get the type of encoding and content. */
+    encoding = Tcl_GetString( objv[1] );
+    content = Tcl_GetString( objv[2] );
+
+    /* Determine type of channel, XXX FITS and XML not tested. */
+    if ( strcmp( encoding, "native" ) == 0 ) {
+        chan = (AstChannel *) astChannel( &read_in, NULL, " " );
+    }
+    else if ( strcmp( encoding, "FITS" ) == 0 ) {
+        chan = (AstChannel *) astFitsChan( &read_in, NULL, " " );
+    }
+    else if ( strcmp( encoding, "XML" ) == 0 ) {
+        chan = (AstChannel *) astXmlChan( &read_in, NULL, " " );
+    }
+    else {
+        char *buf = ckalloc( 1024 );
+        sprintf( buf, "Unknown AST channel type: %s", encoding );
+        Tcl_SetResult( interp, buf, TCL_DYNAMIC );
+        return TCL_ERROR;
+    }
+
+    /* Break content down into NULL terminated lines. */
+    SOURCEInfo.next = 0;
+    char *buf = strdup( content );
+    char *p = buf;
+    int nlines = 0;
+    while( *p ) {
+        if ( *p == '\n' ) {
+            nlines++;
+        }
+        p++;
+    }
+    SOURCEInfo.lines = (const char **) malloc( nlines * sizeof( char * ) );
+    SOURCEInfo.nlines = nlines;
+
+    char *c = buf;
+    p = buf;
+    nlines = 0;
+    while( *p ) {
+        if ( *p == '\n' ) {
+            SOURCEInfo.lines[nlines++] = c;
+            *p = '\0';
+            c = p + 1;
+        }
+        p++;
+    }
+
+    /* Read the object */
+    object = (AstObject *) astRead( chan );
+    astAnnul( chan );
+    
+    free( buf );
+    free( SOURCEInfo.lines );
+
+    if ( !astOK ) {
+        astClearStatus;
+        return TCL_ERROR;
+    }
+
+    /* Export object */
+    Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) object ) );
     return TCL_OK;
 }
 
@@ -713,7 +821,6 @@ static int GaiaUtilsAstDomains( ClientData clientData, Tcl_Interp *interp,
     Tcl_Obj *resultObj;
     char buffer[16];
     const char *domain;
-    int lataxis;
     int nframes;
     long adr;
     int current;
@@ -1247,7 +1354,7 @@ static int GaiaUtilsAstSkyFrame( ClientData clientData, Tcl_Interp *interp,
     }
 
     /* Create the SkyFrame */
-    skyframe = (AstSkyFrame*) astSkyFrame( Tcl_GetString( objv[1] ) );
+    skyframe = (AstSkyFrame*) astSkyFrame( Tcl_GetString( objv[1] ), " " );
 
     /* Export the new object as a long containing the address */
     if ( astOK ) {
@@ -1263,7 +1370,8 @@ static int GaiaUtilsAstSkyFrame( ClientData clientData, Tcl_Interp *interp,
  * Create an AST FrameSet with a single SkyFrame.
  *
  * There is one argument the attributes to use when creating the SkyFrame.
- * The result is the address of the new object.
+ * The result is the address of the new object. If these are invalid then
+ * a default SkyFrame is returned.
  */
 static int GaiaUtilsAstSkyFrameSet( ClientData clientData, Tcl_Interp *interp,
                                     int objc, Tcl_Obj *CONST objv[] )
@@ -1277,8 +1385,12 @@ static int GaiaUtilsAstSkyFrameSet( ClientData clientData, Tcl_Interp *interp,
         return TCL_ERROR;
     }
 
-    /* Create the SkyFrame */
-    skyframe = (AstSkyFrame*) astSkyFrame( Tcl_GetString( objv[1] ) );
+    /* Create the SkyFrame, if this fails just return a default SkyFrame */
+    skyframe = (AstSkyFrame*) astSkyFrame( Tcl_GetString( objv[1] ), " " );
+    if ( !astOK ) {
+        astClearStatus;
+        skyframe = (AstSkyFrame*) astSkyFrame( " " );
+    }
 
     /* Create the FrameSet */
     frameset = (AstFrameSet *) astFrameSet( skyframe, " " );
@@ -1750,7 +1862,7 @@ static int GaiaUtilsShiftWcs( ClientData clientData, Tcl_Interp *interp,
     }
 
     /* Construct a mapping using the shifts. */
-    AstShiftMap *shiftMap = astShiftMap( nvals, shifts, "" );
+    AstShiftMap *shiftMap = astShiftMap( nvals, shifts, " " );
 
     if ( copy ) {
 
