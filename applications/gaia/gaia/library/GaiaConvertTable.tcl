@@ -314,7 +314,7 @@ itcl::class gaia::GaiaConvertTable {
          lassign [::gaia::GaiaFITSHeader::get_kvc $line] keyword value
          set keyword [string tolower $keyword]
          set value [regsub -all {'} $value {}]
-         switch -glob $keyword {
+         switch -glob -- $keyword {
             symbol* {
                append symbol $value
             }
@@ -362,7 +362,7 @@ itcl::class gaia::GaiaConvertTable {
          }
          if { [string match "radian*" $unit] || 
               [string match "degree*" $unit] } {
-               
+
             #  Assuming this is a column with angle data. This is either an RA
             #  or DEC. If qualified by {HOURS}, {HMSxxx} or the name is some
             #  variation of RA/Ra/r.a./Rightxxx/alphaxxx, then assume RA,
@@ -374,11 +374,13 @@ itcl::class gaia::GaiaConvertTable {
                   set racol $i
                }
             } else {
-               switch -glob $name {
+               #  "daz" is AZEL for JAC, also DEl, bit that should be a dec.
+               switch -glob -- $name {
                   ra* -
                   right* -
                   r.a.* -
                   x_world* -
+                  daz -
                   alpha* {
                      if { $racol == -1 } {
                         set racol $i
@@ -388,7 +390,7 @@ itcl::class gaia::GaiaConvertTable {
                      #  Assume this is a declination, unless name starts with
                      #  "pos", which is most likely a position angle (for an
                      #  ellipse), and l or a b. Those are galactic coords.
-                     switch -glob $name {
+                     switch -glob -- $name {
                         pos* -
                         l* -
                         b* {
@@ -410,7 +412,7 @@ itcl::class gaia::GaiaConvertTable {
             #  Check for SExtractor specific names without units. SExtractor
             #  world coordinates are in degrees. Also allow X/Y and X_*/Y_*
             #  as generic X and Y columns.
-            switch -glob $name {
+            switch -glob -- $name {
                x_world {
                   if { $racol == -1 } {
                      set racol $i
