@@ -406,6 +406,7 @@ itcl::class gaia::GaiaSearch {
       #  Release previous version.
       if { $astref_ != 0 } {
          catch {gaiautils::astannul $astref_}
+         set astref_ 0
       }
 
       #  Check catalogue for additional meta-data describing the coordinate
@@ -415,10 +416,26 @@ itcl::class gaia::GaiaSearch {
       set comments [$w_.cat comments]
       if { $comments != {} } {
          set astref_ [get_kaplibs_frameset_ $comments]
-      } else {
-         #  XXX check for the system, equinox and epoch values of the
+      }
+      if { $astref_ == 0 } {
+         #  Check for the system, equinox and epoch values of the
          #  catalogue. These will be present for formerly VOTables.
-         set astref_ 0
+         set att {}
+         set system [$w_.cat system]
+         if { $system != {} } {
+            append att "System=$system,"
+         }
+         set equinox [$w_.cat equinox]
+         if { $equinox != {} } {
+            append att "Equinox=$equinox,"
+         }
+         set epoch [$w_.cat epoch]
+         if { $equinox != {} } {
+            append att "Epoch=$epoch"
+         }
+         if { $att != {} } {
+            set astref_ [gaiautils::astskyframeset $att]
+         }
       }
       if { $astref_ == 0 } {
 
