@@ -430,7 +430,7 @@ itcl::class gaia::GaiaSearch {
             append att "Equinox=$equinox,"
          }
          set epoch [$w_.cat epoch]
-         if { $equinox != {} } {
+         if { $epoch != {} } {
             append att "Epoch=$epoch"
          }
          if { $att != {} } {
