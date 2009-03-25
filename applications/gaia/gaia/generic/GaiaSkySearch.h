@@ -60,6 +60,9 @@ class GaiaSkySearch : public SkySearch
     double xOrigin_;
     double yOrigin_;
 
+    //  Whether to display in HMS, otherwise degrees.
+    int hms_;
+
     //  Convert tcl list to a GaiaQueryResult given column headings and
     //  transform the coordinates using a given FrameSet (as a Mapping).
     virtual int getQueryResult( int numCols, char** colNames, 
@@ -98,11 +101,13 @@ class GaiaSkySearch : public SkySearch
     virtual int contentCmd( int argc, char *argv[] );
     virtual int csizeCmd( int argc, char *argv[] );
     virtual int entryCmd( int argc, char *argv[] );
+    virtual int hmsCmd( int argc, char *argv[] );
     virtual int imgplotCmd( int argc, char* argv[] );
     virtual int infoCmd( int argc, char* argv[] );
     virtual int namesvrCmd( int argc, char *argv[] );
     virtual int openCmd( int argc, char *argv[] );
     virtual int originCmd( int argc, char *argv[] );
+    virtual int queryCmd( int argc, char* argv[] );
     virtual int saveCmd( int argc, char *argv[] );
 };
 

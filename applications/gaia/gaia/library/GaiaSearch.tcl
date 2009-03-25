@@ -84,9 +84,19 @@ itcl::class gaia::GaiaSearch {
    inherit skycat::SkySearch
 
    #  Constructor.
+   #  ============
    constructor {args} {
       set tag_ {};               #  Not sure why this is needed.
       eval itk_initialize $args
+   }
+
+   #  Destructor.
+   #  ===========
+   destructor {
+      #  Release AST frameset.
+      if { $astref_ != 0 } {
+         catch {gaiautils::astannul $astref_}
+      }
    }
 
    #  Init method, called after the options have been evaluated.
@@ -99,7 +109,7 @@ itcl::class gaia::GaiaSearch {
       #  to native format), catch any errors and dispose of this object.
       if { [catch {SkySearch::init} msg] } {
          catch {::delete object $this}
-         return
+         error $msg
       }
 
       #  Remove the "Save with image" menu option. This is not
@@ -256,6 +266,7 @@ itcl::class gaia::GaiaSearch {
    public method search {args} {
       set_origin
       if { $allow_searches_ } {
+         set_wcs_type
          AstroCat::search $args
       }
    }
@@ -347,37 +358,8 @@ itcl::class gaia::GaiaSearch {
    #  positions to the image. In this version we need to pass an AST FrameSet
    #  reference that describes the WCS of the catalogue.
    protected method imgplot_ {equinox} {
-
-      #  Check catalogue for additional meta-data describing the coordinate
-      #  system. This can be either an AST FrameSet from a KAPPA compatible
-      #  application, or the description from a VOTable (which will become STC
-      #  someday). If neither is available we use the Skycat equinox.
-      set comments [$w_.cat comments]
-      if { $comments != {} } {
-         set astref [get_kaplibs_frameset_ $comments]
-      } else {
-         #  XXX check for the system, equinox and epoch values of the
-         #  catalogue. These will be present for formerly VOTables.
-         set astref 0
-      }
-      if { $astref == 0 } {
-
-         #  Use the equinox, Skycat fashion.
-         switch -glob $equinox {
-            B* {
-               set att "System=FK4,Equinox=$equinox"
-            }
-            J* {
-               set att "System=FK5,Equinox=$equinox"
-            }
-            default {
-               set att "Equinox=$equinox"
-            }
-         }
-         set astref [gaiautils::astskyframeset $att]
-      }
-
-      if {[catch {$w_.cat imgplot $image_ $info_ $astref $headings_} msg]} {
+      set_wcs_type $equinox
+      if {[catch {$w_.cat imgplot $image_ $info_ $astref_ $headings_} msg]} {
          error_dialog $msg
       }
    }
@@ -414,6 +396,71 @@ itcl::class gaia::GaiaSearch {
       }
       return 0
 
+   }
+
+   #  Get a WCS description for the catalogue and set its display format.
+   #  Only two allowed, degrees and hms. A side-effect is the updating
+   #  of the astref_ frameset.
+   public method set_wcs_type { {equinox {}} } {
+
+      #  Release previous version.
+      if { $astref_ != 0 } {
+         catch {gaiautils::astannul $astref_}
+      }
+
+      #  Check catalogue for additional meta-data describing the coordinate
+      #  system. This can be either an AST FrameSet from a KAPPA compatible
+      #  application, or the description from a VOTable (which will become STC
+      #  someday). If neither is available we use the Skycat equinox.
+      set comments [$w_.cat comments]
+      if { $comments != {} } {
+         set astref_ [get_kaplibs_frameset_ $comments]
+      } else {
+         #  XXX check for the system, equinox and epoch values of the
+         #  catalogue. These will be present for formerly VOTables.
+         set astref_ 0
+      }
+      if { $astref_ == 0 } {
+
+         #  Use the equinox, Skycat fashion. Can be realized too quickly
+         #  for local catalogues, so fallback to image equinox, which will
+         #  be the default anyway.
+         if { $equinox == {} } {
+            if { [ catch {set equinox [get_equinox]} ] } {
+               lassign [$image_ wcscenter] ra dec equinox
+            }
+         }
+         switch -glob $equinox {
+            B* {
+               set att "System=FK4,Equinox=$equinox"
+            }
+            J* {
+               set att "System=FK5,Equinox=$equinox"
+            }
+            default {
+               if { $equinox != {} } {
+                  set att "Equinox=$equinox"
+               } else {
+                  set att "System=FK5,Equinox=J2000"
+               }
+            }
+         }
+         set astref_ [gaiautils::astskyframeset $att]
+      }
+
+      #  Check the AST FrameSet to see what type of coordinates are expected.
+      #  These are "hms" if an RA axis is found.
+      set hms 1
+      set astime [gaiautils::astget $astref_ "astime(1)"]
+      if { ! $astime } {
+         set astime [gaiautils::astget $astref_ "astime(2)"]
+         if { ! $astime } {
+            set hms 0
+         }
+      }
+
+      #  Set display format to hms or degrees as appropriate for the catalogue.
+      $w_.cat hms $hms
    }
 
    #  Set or reset the origin used when plotting positions and
@@ -745,6 +792,12 @@ itcl::class gaia::GaiaSearch {
    #  plotting. This allows X and Y coordinates which are displayed in
    #  NDF pixel coordinates to be plotted correctly.
    itk_option define -use_origin use_origin Use_Origin 0
+
+   #  Protected variables: (available to instance):
+   #  =============================================
+
+   #  Reference to the AST frameset describing the catalogue coordinates.
+   protected variable astref_ 0
 
    #  Common variables (shared between all instances):
    #  ================================================

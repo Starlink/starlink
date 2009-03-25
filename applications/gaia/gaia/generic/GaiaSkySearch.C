@@ -108,6 +108,7 @@ public:
     {"content",    &GaiaSkySearch::contentCmd,      0,  0},
     {"csize",      &GaiaSkySearch::csizeCmd,        1,  1},
     {"entry",      &GaiaSkySearch::entryCmd,        1,  4},
+    {"hms",        &GaiaSkySearch::hmsCmd,          1,  1},
     {"imgplot",    &GaiaSkySearch::imgplotCmd,      1,  4},
     {"info",       &GaiaSkySearch::infoCmd,         1,  2},
     {"namesvr",    &GaiaSkySearch::namesvrCmd,      2,  2},
@@ -197,7 +198,8 @@ GaiaSkySearch::GaiaSkySearch( Tcl_Interp *interp,
                                                 // as "public virtual"!
       SkySearch( interp, cmdname, instname ),
       xOrigin_(0.0),
-      yOrigin_(0.0)
+      yOrigin_(0.0),
+      hms_(1)
 {
     // Do nothing.
 }
@@ -277,6 +279,9 @@ int GaiaSkySearch::openCmd(int argc, char* argv[])
     //  Reset origins.
     xOrigin_ = 0.0;
     yOrigin_ = 0.0;
+
+    //  Reset display format.
+    hms_ = 1;
 
     return TCL_OK;
 }
@@ -568,13 +573,13 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
             break;
 
         //  Default values
-        char* shape = "";
-        char* fg = "white"; // if no color is specified, use 2: b&w
-        char* bg = "black";
-        char* ratio = "1";  // these may be Tcl expressions
-        char* angle = "0";
-        char* label = "";
-        char* cond = "1";
+        char* shape = (char *) "";
+        char* fg = (char *) "white"; // if no color is specified, use 2: b&w
+        char* bg = (char *) "black";
+        char* ratio = (char *) "1";  // these may be Tcl expressions
+        char* angle = (char *) "0";
+        char* label = (char *) "";
+        char* cond = (char *) "1";
         if ((status = parse_symbol(r, nsymb, symb, shape, fg, bg, ratio,
                                    angle, label, cond)) != TCL_OK)
             break;
@@ -587,7 +592,7 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
             break;
         }
         char* size = exprList[0];
-        char* units = "image";
+        char* units = (char *) "image";
         if (nexpr > 1 && strlen(exprList[1]))
             units = exprList[1];
 
@@ -1227,8 +1232,6 @@ int GaiaSkySearch::imgplotCmd( int argc, char* argv[] )
                 return error( "Failed to connect image and catalogue"
                               " coordinates" );
             }
-
-            astShow( frmset );
         }
         else {
             cout << "Warning: invalid FrameSet, cannot connect image and " <<
@@ -1277,22 +1280,22 @@ int GaiaSkySearch::imgplotCmd( int argc, char* argv[] )
  * necessarily re-format celestial latitude and longitude axis as sexagesimal
  * RA and Dec.
  */
-int TclAstroCat::queryCmd(int argc, char* argv[])
+int GaiaSkySearch::queryCmd(int argc, char* argv[])
 {
     if (!cat_)
-	return error("no catalog is currently open");
+        return error("no catalog is currently open");
 
     // generate the query from the command args
     AstroQuery q;
     if (genAstroQuery(interp_, argc, argv, q, pos1_, pos2_,
-		      equinoxStr_, feedback_, cat_->entry()) != TCL_OK)
-	return TCL_ERROR;
+                      equinoxStr_, feedback_, cat_->entry()) != TCL_OK)
+        return TCL_ERROR;
 
     // make new QueryResult object, or reuse previous one
     if (result_)
-	result_->clear();
+        result_->clear();
     else
-	result_ = new QueryResult;
+        result_ = new QueryResult;
 
     // do the query
     int nrows = cat_->query(q, NULL, *result_);
@@ -1303,49 +1306,59 @@ int TclAstroCat::queryCmd(int argc, char* argv[])
     int i = 0, j = 0;
 
     if (nrows >= 0) {
-	Tcl_ResetResult(interp_);
+        Tcl_ResetResult(interp_);
 
-	for (i = 0; i < nrows; i++) {
+        for (i = 0; i < nrows; i++) {
 
-	    // start a row
-	    Tcl_AppendResult(interp_, " {", NULL);
+            // start a row
+            Tcl_AppendResult(interp_, " {", NULL);
 
-	    if (cat_->isWcs()) { // include formatted world coords
-		GaiaWorldCoords pos;
-		if (result_->getPos(i, pos) != 0)
-		    return TCL_ERROR;
+            if (cat_->isWcs()) { // include formatted world coords
+                GaiaWorldCoords pos;
+                if (result_->getPos(i, pos) != 0)
+                    return TCL_ERROR;
 
-		// format the ra,dec position arguments in H:M:S...
-		char ra_buf[32], dec_buf[32];
-		int ra_col = result_->ra_col(), dec_col = result_->dec_col();
-		pos.format(ra_buf, dec_buf, equinoxStr_, 1); // XXX 1/0 is parameter.
+                // format the ra,dec position arguments in H:M:S...
+                char ra_buf[32], dec_buf[32];
+                int ra_col = result_->ra_col(), dec_col = result_->dec_col();
+                pos.format(ra_buf, dec_buf, equinoxStr_, hms_); 
 
-		// put the column values in a list
-		for (j = 0; j < ncols; j++) {
-		    if (result_->get(i, j, s) != 0)
-			s = "";
-		    if (j == ra_col)
-			Tcl_AppendElement(interp_, ra_buf) ;
-		    else if (j == dec_col)
-			Tcl_AppendElement(interp_, dec_buf) ;
-		    else
-			Tcl_AppendElement(interp_, s) ;
-		}
-	    }
-	    else {  // image coords - no special formatting needed
-		// put the column values in a list
-		for (j = 0; j < ncols; j++) {
-		    if (result_->get(i, j, s) != 0)
-			s = "";
-		    Tcl_AppendElement(interp_, s) ;
-		}
-	    }
+                // put the column values in a list
+                for (j = 0; j < ncols; j++) {
+                    if (result_->get(i, j, s) != 0)
+                        s = (char *) "";
+                    if (j == ra_col)
+                        Tcl_AppendElement(interp_, ra_buf) ;
+                    else if (j == dec_col)
+                        Tcl_AppendElement(interp_, dec_buf) ;
+                    else
+                        Tcl_AppendElement(interp_, s) ;
+                }
+            }
+            else {  // image coords - no special formatting needed
+                // put the column values in a list
+                for (j = 0; j < ncols; j++) {
+                    if (result_->get(i, j, s) != 0)
+                        s = (char *) "";
+                    Tcl_AppendElement(interp_, s) ;
+                }
+            }
 
-	    // end a row
-	    Tcl_AppendResult(interp_, "}", NULL);
-	}
+            // end a row
+            Tcl_AppendResult(interp_, "}", NULL);
+        }
 
-	return TCL_OK;
+        return TCL_OK;
     }
-    return TCL_ERROR;	// an query error occured (and was reported)
+    return TCL_ERROR;   // an query error occured (and was reported)
+}
+
+/**
+ *  Set the format used to display the world coordinates of the
+ *  catalogue. When true sexagesimal will be used, other the
+ *  values will be shown in degrees.
+ */
+int GaiaSkySearch::hmsCmd( int argc, char *argv[] )
+{
+    return Tcl_GetBoolean( interp_, argv[0], &hms_ );
 }
