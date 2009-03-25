@@ -1,0 +1,9 @@
+gaiavo_tcl
+.emacs_*
+*.FIT
+*.TAB
+*.TXT
+*.fits
+*.sdf
+*.ASC
+
