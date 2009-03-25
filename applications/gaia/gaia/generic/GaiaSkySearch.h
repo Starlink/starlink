@@ -49,6 +49,7 @@
  */
 
 #include "SkySearch.h"
+#include "GaiaQueryResult.h"
 
 class GaiaSkySearch : public SkySearch
 {
@@ -59,11 +60,11 @@ class GaiaSkySearch : public SkySearch
     double xOrigin_;
     double yOrigin_;
 
-    //  Convert tcl list to QueryResult given column headings and transform
-    //  the coordinates using a given FrameSet (as a Mapping).
+    //  Convert tcl list to a GaiaQueryResult given column headings and
+    //  transform the coordinates using a given FrameSet (as a Mapping).
     virtual int getQueryResult( int numCols, char** colNames, 
                                 const char* list, AstFrameSet *frmset, 
-                                QueryResult& r );
+                                GaiaQueryResult& r );
 
  public:
 

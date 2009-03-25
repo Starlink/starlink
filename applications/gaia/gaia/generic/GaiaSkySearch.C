@@ -82,6 +82,14 @@ extern "C" {
 #include "SkySearch.h"
 #include "GaiaSkySearch.h"
 #include "StarWCS.h"
+#include "TclQueryUtil.h"
+#include "GaiaWorldCoords.h"
+#include "GaiaQueryResult.h"
+
+//  Trig conversion factors.
+static const double pi_ = 3.14159265358979323846;
+static const double r2d_ = 57.295779513082323;   // (180.0/pi_)
+static const double d2r_ = 0.017453292519943295; // (pi_/180.0);
 
 //
 // Declare a table of tcl subcommands.
@@ -241,6 +249,10 @@ int GaiaSkySearch::openCmd(int argc, char* argv[])
         //  Local catalogues are either tab tables or a format
         //  recognised by GaiaLocalCatalog.
         if ( GaiaLocalCatalog::is_foreign( argv[0] ) ) {
+
+            //  Invalidate the URL of the entry to avoid premature
+            //  loading (when a known local catalogue).
+            e->url( " " );
             cat_ = new GaiaLocalCatalog( e, interp_ );
         }
         else {
@@ -603,7 +615,7 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
             else if (r.isWcs()) {
                 x = pos.ra_deg();
                 y = pos.dec_deg();
-                
+
                 //  Degrees in the same units as image, so same equinox
                 //  in skycat speak.
                 const char *equinox = image->image()->wcs().equinoxStr();
@@ -853,7 +865,7 @@ int GaiaSkySearch::contentCmd( int argc, char *argv[] )
 
     Tcl_ResetResult( interp_ );
     if ( cat_->isWcs() ) {
-        WorldCoords pos;
+        GaiaWorldCoords pos;
         char dec_buf[32];
         char ra_buf[32];
         int dec_col = qr->dec_col();
@@ -865,7 +877,7 @@ int GaiaSkySearch::contentCmd( int argc, char *argv[] )
             if ( qr->getPos( i, pos ) != 0 ) {
                 return error( "Failed getting world coordinates" );
             }
-            pos.print( ra_buf, dec_buf, equinoxStr_ );
+            pos.format( ra_buf, dec_buf, equinoxStr_ );
 
             //  Put the column values in a list.
             Tcl_AppendResult( interp_, " {", NULL );
@@ -953,12 +965,10 @@ int GaiaSkySearch::namesvrCmd( int argc, char *argv[] )
  * world coordinates to catalogue world coordinates (usually both SkyFrames)
  * and must define an inverse mapping.
  */
-int GaiaSkySearch::getQueryResult( int numCols, char **colNames, 
+int GaiaSkySearch::getQueryResult( int numCols, char **colNames,
                                    const char *list, AstFrameSet *frmset,
-                                   QueryResult &r )
+                                   GaiaQueryResult &r )
 {
-    cout << "Using GaiaSkySearch::getQueryResult" << endl;
-
     ostringstream os;
     int numRows = 0;
     char **rows = NULL;
@@ -973,32 +983,41 @@ int GaiaSkySearch::getQueryResult( int numCols, char **colNames,
         //  defined.
         if ( r.isWcs() && frmset != NULL ) {
 
-            //  Locate the RA and Dec axes in the given FrameSet (the current
-            //  coordinate system must be a SkyFrame and should represent the
-            //  catalogue coordinates).
+            //  Reset any AST errors.
             if ( !astOK ) {
                 astClearStatus;
             }
-            int base = astGetI( frmset, "Base" );
-            int current = astGetI( frmset, "Current" );
 
-            //  Base frame.
-            astSetI( frmset, "Current", base );
+            //  Locate the RA and Dec axes in the given FrameSet (the current
+            //  coordinate system must be a SkyFrame and should represent the
+            //  catalogue coordinates).
+            int astime1 = astGetI( frmset, "astime(1)" );
             int astime2 = astGetI( frmset, "astime(2)" );
-            int ra1_index = 1;
+            int ra_index = 1;
             if ( astime2 ) {
-                ra1_index  = 2;
+                ra_index  = 2;
             }
 
-            //  Current frame.
-            astSetI( frmset, "Current", current );
-            astime2 = astGetI( frmset, "astime(2)" );
-            int ra2_index = 1;
-            int dec2_index = 2;
-            if ( astime2 ) {
-                ra2_index  = 2;
-                dec2_index = 1;
+            //  If neither axis of catalogue is time then this is some other
+            //  coordinate system like AZEL. These need to be displayed as
+            //  degrees and not converted into hours.
+            int range_check = 1;
+            if ( !astime1 && !astime2 ) {
+                range_check = 0;
+                r.setAssumeDegrees( 1 );
             }
+
+            //  Slight wart is if the image doesn't show RA and Dec. In that
+            //  case the catalogue positions will not interpreted as hours.
+            int current = astGetI( frmset, "Current" );
+            int base = astGetI( frmset, "Base" );
+            astSetI( frmset, "Current", base );
+            int image_radec = 1;
+            if ( astGetI( frmset, "astime(1)" ) == 0 &&
+                 astGetI( frmset, "astime(2)" ) == 0 ) {
+                image_radec = 0;
+            }
+            astSetI( frmset, "Current", current );
 
             for ( int row = 0; row < numRows; row++ ) {
 
@@ -1020,54 +1039,93 @@ int GaiaSkySearch::getQueryResult( int numCols, char **colNames,
                 const char *raPtr = cols[ra_col];
                 const char *decPtr = cols[dec_col];
 
-                //  Convert values to double precision.
+                //  Convert values to double precision, use Skycat decoding as
+                //  that's what was used to encode (rather than astUnformat).
                 double xin[1];
                 double yin[1];
                 double xout[1];
                 double yout[1];
-                astUnformat( frmset, ra2_index, raPtr, &xin[0] );
-                astUnformat( frmset, dec2_index, decPtr, &yin[0] );
-
-                //  RA and Dec could be swapped.
-                if ( ra2_index == 1 ) {
-                    astTran2( frmset, 1, xin, yin, 0, xout, yout );
-                }
-                else {
-                    astTran2( frmset, 1, yin, xin, 0, xout, yout );
-                }
-                if ( ! astOK ) {
-                    astClearStatus;
+                GaiaWorldCoords pos( raPtr, decPtr, range_check, 2000.0,
+                                     !range_check );
+                if ( pos.status() != 0 ) {
                     raStr[0] = decStr[0] = '\0';
                 }
                 else {
-                    //  Format the values, in the base frame.
-                    if ( ra1_index == 1 ) {
-                        strcpy( raStr, astFormat( frmset, 1, xout[0] ) );
-                        strcpy( decStr, astFormat( frmset, 2, yout[0] ) );
-                    }
-                    else {
-                        strcpy( decStr, astFormat( frmset, 1, xout[0] ) );
-                        strcpy( raStr, astFormat( frmset, 2, yout[0] ) );
-                    }
-                }
+                    xin[0] = pos.ra_deg() * d2r_;
+                    yin[0] = pos.dec_deg() * d2r_;
 
-                //  Output the columns
-                for ( int col = 0; col < ncols; col++ ) {
-                    //  RA and Dec are formatted already.
-                    if ( col == ra_col ) {
-                        os << raStr;
-                    }
-                    else if ( col == dec_col ) {
-                        os << decStr;
+                    //  RA and Dec could be swapped.
+                    if ( ra_index == 1 ) {
+                        astTran2( frmset, 1, xin, yin, 0, xout, yout );
                     }
                     else {
-                        os << cols[col];
+                        astTran2( frmset, 1, yin, xin, 0, xout, yout );
                     }
-                    if ( col < n ) {
-                        os << '\t';
+                    if ( ! astOK ) {
+                        astClearStatus;
+                        raStr[0] = decStr[0] = '\0';
                     }
+                    else {
+                        //  Format value as decimal degrees for result.
+                        //  AST has returned in radians, so we convert for
+                        //  that. Depending on the coordinates of the image
+                        //  and catalogue differing interpretations will be
+                        //  applied to the "RA" values, so these need to be
+                        //  scaled to and from hours.
+                        xout[0] *= r2d_;
+                        yout[0] *= r2d_;
+                        if ( ! image_radec ){
+                            if ( range_check ) {
+                                //  Image in degrees, catalogue in RA/Dec.
+                                //  Values will be interpreted as hours.
+                                if ( ra_index == 1 ) {
+                                    xout[0] *= 15.0;
+                                }
+                                else {
+                                    yout[0] *= 15.0;
+                                }
+                            }
+                        }
+                        else {
+                            if ( ! range_check ) {
+                                //  Image in RA/Dec, catalogue in degrees.
+                                //  Values will be scaled as if in hours.
+                                if ( ra_index == 1 ) {
+                                    xout[0] /= 15.0;
+                                }
+                                else {
+                                    yout[0] /= 15.0;
+                                }
+                            }
+                        }
+                        if ( ra_index == 1 ) {
+                            sprintf( raStr, "%.17g", xout[0] );
+                            sprintf( decStr, "%.17g", yout[0] );
+                        }
+                        else {
+                            sprintf( raStr, "%.17g", yout[0] );
+                            sprintf( decStr, "%.17g", xout[0] );
+                        }
+                    }
+
+                    //  Output the columns
+                    for ( int col = 0; col < ncols; col++ ) {
+                        //  RA and Dec are formatted already.
+                        if ( col == ra_col ) {
+                            os << raStr;
+                        }
+                        else if ( col == dec_col ) {
+                            os << decStr;
+                        }
+                        else {
+                            os << cols[col];
+                        }
+                        if ( col < n ) {
+                            os << '\t';
+                        }
+                    }
+                    os << '\n';
                 }
-                os << '\n';
                 Tcl_Free( (char *)cols );
             }
         }
@@ -1117,32 +1175,30 @@ int GaiaSkySearch::getQueryResult( int numCols, char **colNames,
  *
  *  Overridden to use AST to transform the catalogue positions onto the image.
  *  The catalogue WCS must be passed as a reference to an AST FrameSet. See
- *  gaiautils:: to create on of these.
- * 
+ *  gaiautils:: to create one of these.
+ *
  */
 int GaiaSkySearch::imgplotCmd( int argc, char* argv[] )
 {
-    cout << "GaiaSkySearch::imgplotCmd" << endl;
-
     //  Can't plot without a catalog, since no plot symbols would be defined.
     if ( !cat_ ) {
-	return error( "no catalog is currently open" );
+        return error( "no catalog is currently open" );
     }
 
     //  Get a pointer to the C++ class implementing the extended rtdimage object.
     //  We will need this to access the image to plot the catalog symbols.
     Skycat *image = Skycat::getInstance( argv[0] );
     if ( ! image ) {
-	return TCL_ERROR;
+        return TCL_ERROR;
     }
 
     if ( argc == 1 ) {
-	if ( !result_ ) {
-	    return error( "no previous data to plot" );
+        if ( !result_ ) {
+            return error( "no previous data to plot" );
         }
 
         //  Plot data from last QueryResult.
-	return plot( image, *result_ );
+        return plot( image, *result_ );
     }
 
     AstFrameSet *frmset = NULL;
@@ -1171,36 +1227,125 @@ int GaiaSkySearch::imgplotCmd( int argc, char* argv[] )
                 return error( "Failed to connect image and catalogue"
                               " coordinates" );
             }
+
+            astShow( frmset );
+        }
+        else {
+            cout << "Warning: invalid FrameSet, cannot connect image and " <<
+                "catalogue coordinates" << endl;
         }
     }
 
     //  Get the column names
-    if ( argc < 4 ) {		
+    if ( argc < 4 ) {
         //  Use current catalogue.
-	numCols = cat_->numCols();
-	colNames = cat_->colNames();
+        numCols = cat_->numCols();
+        colNames = cat_->colNames();
     }
-    else {			
+    else {
         //  Use headings list.
-	if ( Tcl_SplitList(interp_, argv[3], &numCols, &colNames) != TCL_OK ) {
+        if ( Tcl_SplitList(interp_, argv[3], &numCols, &colNames) != TCL_OK ) {
             return TCL_ERROR;
         }
-	freeColNames++;
+        freeColNames++;
     }
 
     //  Get query results from arguments
-    QueryResult r;
+    GaiaQueryResult r;
     r.entry( cat_->entry() );
-    int status = getQueryResult( numCols, (char**)colNames, argv[1], 
+    int status = getQueryResult( numCols, (char**)colNames, argv[1],
                                  frmset, r );
     if ( status == TCL_OK ) {
-	status = plot( image, r );
+        status = plot( image, r );
     }
 
     //  Clean up
     if ( freeColNames && colNames ) {
-	Tcl_Free( (char *)colNames );
+        Tcl_Free( (char *)colNames );
     }
     return status;
 }
 
+
+/*
+ * pass a query to the current catalog and return the result as a list of
+ * rows.
+ *
+ * See TclAstroCat::queryCmd
+ *
+ * Overridden so we can use a special version of WorldCoords that doesn't
+ * necessarily re-format celestial latitude and longitude axis as sexagesimal
+ * RA and Dec.
+ */
+int TclAstroCat::queryCmd(int argc, char* argv[])
+{
+    if (!cat_)
+	return error("no catalog is currently open");
+
+    // generate the query from the command args
+    AstroQuery q;
+    if (genAstroQuery(interp_, argc, argv, q, pos1_, pos2_,
+		      equinoxStr_, feedback_, cat_->entry()) != TCL_OK)
+	return TCL_ERROR;
+
+    // make new QueryResult object, or reuse previous one
+    if (result_)
+	result_->clear();
+    else
+	result_ = new QueryResult;
+
+    // do the query
+    int nrows = cat_->query(q, NULL, *result_);
+
+    // get the results
+    int ncols = result_->numCols();
+    char* s;
+    int i = 0, j = 0;
+
+    if (nrows >= 0) {
+	Tcl_ResetResult(interp_);
+
+	for (i = 0; i < nrows; i++) {
+
+	    // start a row
+	    Tcl_AppendResult(interp_, " {", NULL);
+
+	    if (cat_->isWcs()) { // include formatted world coords
+		GaiaWorldCoords pos;
+		if (result_->getPos(i, pos) != 0)
+		    return TCL_ERROR;
+
+		// format the ra,dec position arguments in H:M:S...
+		char ra_buf[32], dec_buf[32];
+		int ra_col = result_->ra_col(), dec_col = result_->dec_col();
+		pos.format(ra_buf, dec_buf, equinoxStr_, 1); // XXX 1/0 is parameter.
+
+		// put the column values in a list
+		for (j = 0; j < ncols; j++) {
+		    if (result_->get(i, j, s) != 0)
+			s = "";
+		    if (j == ra_col)
+			Tcl_AppendElement(interp_, ra_buf) ;
+		    else if (j == dec_col)
+			Tcl_AppendElement(interp_, dec_buf) ;
+		    else
+			Tcl_AppendElement(interp_, s) ;
+		}
+	    }
+	    else {  // image coords - no special formatting needed
+		// put the column values in a list
+		for (j = 0; j < ncols; j++) {
+		    if (result_->get(i, j, s) != 0)
+			s = "";
+		    Tcl_AppendElement(interp_, s) ;
+		}
+	    }
+
+	    // end a row
+	    Tcl_AppendResult(interp_, "}", NULL);
+	}
+
+	return TCL_OK;
+    }
+    return TCL_ERROR;	// an query error occured (and was reported)
+}

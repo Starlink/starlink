@@ -351,12 +351,16 @@ itcl::class gaia::Gaia {
          make_init_window 1
       }
 
-      #  Do base class inits. Note stop creation of cat menu so we can
-      #  override use of SkySearch class.
+      #  Do base class inits. Note stop creation of cat menu and opening
+      #  of catalogues from the command-line so we can override use of
+      #  SkySearch class. 
       set curval $itk_option(-cat)
+      set curcats $itk_option(-catalog)
       set itk_option(-cat) 0
+      set itk_option(-catalog) {}
       SkyCat::init
       set itk_option(-cat) $curval
+      set itk_option(-catalog) $curcats
 
       #  Get the clone number for this window.
       set clone_ $itk_option(-number)
@@ -383,6 +387,19 @@ itcl::class gaia::Gaia {
       if {$itk_option(-cat)} {
          cat::AstroCat::add_catalog_menu \
             $w_ [code $image_] ::gaia::GaiaSearch $itk_option(-debug)
+      }
+
+      #  Open any local catalogues.
+      if { $itk_option(-catalog) != {} } {
+         #  Make sure we use full path name for local catalogs
+         #  and process option as a list
+         foreach f "$itk_option(-catalog)" {
+            if { [file exists $f] && "[string index $f 0]" != "/" } {
+               set $f [pwd]/$f
+            }
+            cat::AstroCat::open_catalog_window $f \
+                   [code $image_] ::gaia::GaiaSearch $itk_option(-debug) $w_
+         }
       }
 
       #  Initialise a cookie for remote control authentication.

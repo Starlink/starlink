@@ -340,7 +340,7 @@
 *  DEC. If qualified by {HOURS}, {HMS or the name is some variation of
 *  RA/Ra/r.a./Rightxxx/alphaxxx, then assume RA, otherwise it is a
 *  DEC. Note we need both of these to have a valid match, but we don't
-*  check for that. 
+*  check for that. Check for DAz which is JCMT AZEL coordinates.
             IF ( UNITS( 8: ) .EQ. '{hours}' .OR.
      :           UNITS( 8:11 ) .EQ. '{hms' ) THEN
                IF ( RACOL .EQ. -1 ) RACOL = I - 1
@@ -352,7 +352,8 @@
      :              LNAME( :5 ) .EQ. 'right' .OR.
      :              LNAME( :4 ) .EQ. 'r.a.' .OR.
      :              LNAME( :7 ) .EQ. 'x_world' .OR.
-     :              LNAME( :5 ) .EQ. 'alpha' ) THEN
+     :              LNAME( :5 ) .EQ. 'alpha' .OR.
+     :              LNAME       .EQ. 'daz' ) THEN
                   IF ( RACOL .EQ. -1 ) RACOL = I - 1
                ELSE
 

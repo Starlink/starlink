@@ -347,25 +347,73 @@ itcl::class gaia::GaiaSearch {
    #  positions to the image. In this version we need to pass an AST FrameSet
    #  reference that describes the WCS of the catalogue.
    protected method imgplot_ {equinox} {
-      puts "GaiaSearch: impgplot_ :$equinox"
-      
-      switch -glob $equinox {
-         B* {
-            set att "System=FK4,Equinox=$equinox"
-         }
-         J* {
-            set att "System=FK5,Equinox=$equinox"
-         }
-         default {
-            set att "Equinox=$equinox"
-         }
-         
+
+      #  Check catalogue for additional meta-data describing the coordinate
+      #  system. This can be either an AST FrameSet from a KAPPA compatible
+      #  application, or the description from a VOTable (which will become STC
+      #  someday). If neither is available we use the Skycat equinox.
+      set comments [$w_.cat comments]
+      if { $comments != {} } {
+         set astref [get_kaplibs_frameset_ $comments]
+      } else {
+         #  XXX check for the system, equinox and epoch values of the
+         #  catalogue. These will be present for formerly VOTables.
+         set astref 0
       }
-      set astref [gaiautils::astskyframeset $att]
+      if { $astref == 0 } {
+
+         #  Use the equinox, Skycat fashion.
+         switch -glob $equinox {
+            B* {
+               set att "System=FK4,Equinox=$equinox"
+            }
+            J* {
+               set att "System=FK5,Equinox=$equinox"
+            }
+            default {
+               set att "Equinox=$equinox"
+            }
+         }
+         set astref [gaiautils::astskyframeset $att]
+      }
 
       if {[catch {$w_.cat imgplot $image_ $info_ $astref $headings_} msg]} {
          error_dialog $msg
       }
+   }
+
+   #  See if a list of comments extracted from a table contain a KAPPA-like
+   #  AST FrameSet for aligning the table with the image.
+   #
+   #  These look like:
+   #     '^#[C|T| ]!!.*$'
+   #  where .* is the AST information. This is complicated as continuation
+   #  lines are also present. These look like:
+   #     '^#[C|T| ]!!\+.*$'
+   #
+   protected method get_kaplibs_frameset_ {comments} {
+
+      set object {}
+      set value {}
+      foreach line [split $comments "\n"] {
+         if { [regexp {\#?!!\+(.*)} $line -> ast] } {
+            append value $ast
+         } elseif { [regexp {\#?!!(.*)} $line -> ast] } {
+            if { $value != {} } {
+               append object "$value\n"
+            }
+            set value $ast
+         }
+      }
+      if { $value != {} } {
+         append object "$value\n"
+      }
+
+      if { $object != {} } {
+         return [gaiautils::astcreate native $object]
+      }
+      return 0
+
    }
 
    #  Set or reset the origin used when plotting positions and
