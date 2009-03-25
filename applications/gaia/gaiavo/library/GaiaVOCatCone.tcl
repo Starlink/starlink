@@ -230,8 +230,31 @@ itcl::class gaiavo::GaiaVOCatCone {
       #  Clear any existing positions.
       clear_plot
 
+      #  Create an AST FrameSet to describe the coordinates.
+      set att {}
+      set system [$w_.cat system]
+      if { $system != {} } {
+         append att "System=$system,"
+      }
+      set epoch [$w_.cat epoch]
+      if { $epoch != {} } {
+         append att "Epoch=$epoch,"
+      }
+      set equinox [$w_.cat equinox]
+      if { $equinox != {} } {
+         append att "Equinox=$equinox,"
+      }
+
+      #  Fallback to standard.
+      if { $equinox == {} && $att == {} } {
+         append att "System=FK5,Equinox=$equinox_"
+      }
+
+      #  Create the AST FrameSet.
+      set astref [gaiautils::astskyframeset $att]
+
       #  Do the plot.
-      if {[catch {$w_.cat imgplot $rtdimage_ $info_ $equinox_ $headings_} msg]} {
+      if {[catch {$w_.cat imgplot $rtdimage_ $info_ $astref $headings_} msg]} {
          error_dialog $msg
       }
    }
