@@ -29,7 +29,7 @@
 #     Performs the given method on this object.
 
 #  Copyright:
-#     Copyright (C) 2007 Science and Technology Facilities Council
+#     Copyright (C) 2007-2009 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -88,7 +88,7 @@ itcl::class gaia::GaiaSymbolConfig {
    #  Add local symbols to the Symbol menu. Only rotbox.
    protected method init {} {
       cat::SymbolConfig::init
-      foreach i {rotbox} {
+      foreach i {rotbox rectangle} {
          $symbol_ add \
             -bitmap $i \
             -value $i \
@@ -97,9 +97,12 @@ itcl::class gaia::GaiaSymbolConfig {
    }
 
    protected method set_symbol {symbol} {
-      if {"$symbol" == "rotbox" } {
+      if { "$symbol" == "rotbox" } {
          $ratio_ config -state normal
          $angle_ config -state normal
+      } elseif { "$symbol" == "rectangle" } {
+         $ratio_ config -state normal
+         $angle_ config -state disabled
       } else {
          cat::SymbolConfig::set_symbol $symbol
       }

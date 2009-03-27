@@ -16,7 +16,7 @@
  *  Copyright:
  *     Copyright (C) 1997-2005 Central Laboratory of the Research Councils.
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
- *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -302,26 +302,36 @@ class StarRtdImage : public Skycat
    //  Enable remote control interface.
    int remoteCmd( int argc, char *argv[] );
 
-   //  Draw a Skycat-like ellipse and rotbox
+   //  Draw a Skycat-like ellipse, rotbox and rectangle.
    virtual int draw_symbol(const char *shape,
                            double x, double y, const char *xy_units,
                            double radius, const char *radius_units,
                            const char *bg, const char *fg,
                            const char *symbol_tags,
                            double ratio = 1., double angle = 0.,
-                           const char *label = NULL, const char *label_tags = NULL);
+                           const char *label = NULL, 
+                           const char *label_tags = NULL);
    virtual int draw_ellipse(double x, double y, const char *xy_units,
                             double radius, const char *radius_units,
                             const char *bg, const char *fg,
                             const char *symbol_tags,
                             double ratio = 1., double angle = 0.0,
-                            const char *label = NULL, const char *label_tags = NULL);
+                            const char *label = NULL, 
+                            const char *label_tags = NULL);
    virtual int draw_rotbox(double x, double y, const char *xy_units,
                            double radius, const char *radius_units,
                            const char *bg, const char *fg,
                            const char *symbol_tags,
                            double ratio = 1., double angle = 0.0,
-                           const char *label = NULL, const char *label_tags = NULL);
+                           const char *label = NULL, 
+                           const char *label_tags = NULL);
+   virtual int draw_rectangle(double x, double y, const char *xy_units,
+                              double radius, const char *radius_units,
+                              const char *bg, const char *fg,
+                              const char *symbol_tags,
+                              double ratio = 1., double angle = 0.0,
+                              const char *label = NULL, const 
+                              char *label_tags = NULL);
 
    //  Set the colour of blank pixels.
    int blankcolorCmd( int argc, char *argv[] );

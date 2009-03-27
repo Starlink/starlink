@@ -674,6 +674,7 @@ int GaiaSkySearch::parse_symbol( const QueryResult& r, int argc, char** argv,
         "plus",
         "square",
         "triangle",
+        "rectangle",
         "rotbox",
         "xrange",
         "yrange"

@@ -964,8 +964,8 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             //  maintain). Note DSS gets through.
             if ( argc == 2 ) {
                 if ( strcmp( argv[1], default_encoding ) != 0 &&
-                     ( strncmp( argv[1], "FITS-", 5 ) == 0 &&
-                       ( strncmp( default_encoding, "FITS-", 5 ) != 0 ) ||
+                     ( ( strncmp( argv[1], "FITS-", 5 ) == 0 &&
+                         strncmp( default_encoding, "FITS-", 5 ) != 0 ) ||
                        native )
                     ) {
                     astSet( chan, "Encoding=%s", argv[1] );
@@ -1509,19 +1509,19 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
                     astSetI( wcs, "Current", i );
                     if ( strncmp( "ROI", astGetC( wcs, "Ident" ), 3 ) == 0 ){
                         if ( equinox ) {
-                            astSet( wcs, equinox );
+                            astSet( wcs, equinox, " " );
                         }
                         else {
                             astClear( wcs, "Equinox" );
                         }
                         if ( epoch ) {
-                            astSet( wcs, epoch );
+                            astSet( wcs, epoch, " " );
                         }
                         else {
                             astClear( wcs, "Epoch" );
                         }
                         if ( system ) {
-                            astSet( wcs, system );
+                            astSet( wcs, system, " " );
                         }
                         else {
                             astClear( wcs, "System" );
@@ -1532,15 +1532,15 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
                 astSetI( wcs, "Current", icur );
             }
             else {
-                newsky = astSkyFrame( "" );
+                newsky = astSkyFrame( " " );
                 if ( equinox ) {
-                    astSet( newsky, equinox );
+                    astSet( newsky, equinox, " " );
                 }
                 if ( epoch ) {
-                    astSet( newsky, epoch );
+                    astSet( newsky, epoch, " " );
                 }
                 if ( system ) {
-                    astSet( newsky, system) ;
+                    astSet( newsky, system, " " );
                 }
             }
         }
@@ -1612,7 +1612,7 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
                     if ( string != equinox && string != epoch &&
                          string != system && string != gap1 &&
                          string != gap2 ) {
-                        astSet( plot, string );
+                        astSet( plot, string, " " );
                         if ( !astOK ) {
                             cerr << "plot options: " << string <<
                                 " is not a valid attribute (" <<
@@ -1996,7 +1996,7 @@ int StarRtdImage::astcreateCmd( int argc, char *argv[] )
 void StarRtdImage::initChannel( int slot )
 {
     char buffer[FITSCARD];
-    channels_[slot] = astFitsChan( NULL, NULL, "" );
+    channels_[slot] = astFitsChan( NULL, NULL, " " );
     storeCard( channels_[slot], "NAXIS", "2", "Number of axes", 0 );
     sprintf( buffer, "%d", image_->width() );
     storeCard( channels_[slot], "NAXIS1", buffer, "Dimension 1", 0 );
@@ -2424,7 +2424,7 @@ int StarRtdImage::addLinear( int iframe, AstFrameSet *fset,
         matrix[2] = tr[4];
         matrix[3] = tr[5];
         AstMapping *matrixmap = (AstMapping *) astMatrixMap( 2, 2, 0,
-                                                             matrix, "");
+                                                             matrix, " " );
         astRemapFrame( fset, iframe, matrixmap );
         matrixmap = (AstMapping *) astAnnul( matrixmap );
     }
@@ -2437,7 +2437,7 @@ int StarRtdImage::addLinear( int iframe, AstFrameSet *fset,
     outb[0] = inb[0] + tr[0];
     outb[1] = inb[1] + tr[3];
     AstMapping *winmap = (AstMapping *) astWinMap( 2, ina, inb, outa,
-                                                   outb, "" );
+                                                   outb, " " );
 
     //  And append it to required frame of the FrameSet.
     astRemapFrame( fset, iframe, winmap );
@@ -3272,11 +3272,11 @@ int StarRtdImage::astsystemCmd( int argc, char *argv[] )
 
         //  Ok now create a new SkyFrame with the options we have been given.
         if ( argc <= 3 || ( argc == 4 && *argv[3] == '1' ) ) {
-            newfrm = (AstFrame *) astSkyFrame( argv[1] );
+            newfrm = (AstFrame *) astSkyFrame( argv[1], " " );
         }
         else {
             //  Just apply attributes to the FrameSet copy.
-            astSet( newset_, argv[1] );
+            astSet( newset_, argv[1], " " );
             if ( !astOK ) {
                 astClearStatus;
                 return error( "failed to modify coordinate system" );
@@ -3326,7 +3326,8 @@ int StarRtdImage::astsystemCmd( int argc, char *argv[] )
 //  bg and fg color, canvas tags list, x/y ratio and rotation angle.
 //
 //  shape may be one of "circle", "square", "plus", "cross", "triangle",
-//  "diamond", "ellipse", "compass", "line", "arrow" and "rotbox".
+//  "diamond", "ellipse", "compass", "line", "arrow", "rotbox" and
+//  rectangle.
 //
 //  x and y are the coordinates "xy_units", which is one of the units
 //  accepted by the Rtd commands (canvas, image, screen, "wcs $equinox",
@@ -3351,7 +3352,8 @@ int StarRtdImage::astsystemCmd( int argc, char *argv[] )
 //  Uses world coordinates, if available, for the rotation and orientation,
 //  for symbols that support it (i.e.: rotation is relative to WCS north).
 //
-//  Override Skycat equivalent to add rtd_ellipse and rtd_rotbox.
+//  Override Skycat equivalent to add rtd_ellipse, rtd_rotbox and
+//  rectangle.
 //
 int StarRtdImage::draw_symbol( const char *shape,
                                double x, double y, const char *xy_units,
@@ -3359,7 +3361,7 @@ int StarRtdImage::draw_symbol( const char *shape,
                                const char *bg, const char *fg,
                                const char *symbol_tags,
                                double ratio, double angle,
-                               const char *label, const char *label_tags)
+                               const char *label, const char *label_tags )
 {
 #ifdef _DEBUG_
     cout << "Called StarRtdImage::draw_symbol: " << shape << std::endl;
@@ -3375,17 +3377,18 @@ int StarRtdImage::draw_symbol( const char *shape,
                                   double ratio, double angle,
                                   const char *label, const char *label_tags);
     } symbols[] = {
+        {"arrow", &Skycat::draw_arrow},
         {"circle", &Skycat::draw_circle},
-        {"square", &Skycat::draw_square},
-        {"plus", &Skycat::draw_plus},
+        {"compass", &Skycat::draw_compass},
         {"cross", &Skycat::draw_cross},
-        {"triangle", &Skycat::draw_triangle},
         {"diamond", &Skycat::draw_diamond},
         {"ellipse", &StarRtdImage::draw_ellipse},
-        {"rotbox", &StarRtdImage::draw_rotbox},
-        {"compass", &Skycat::draw_compass},
         {"line", &Skycat::draw_line},
-        {"arrow", &Skycat::draw_arrow}
+        {"plus", &Skycat::draw_plus},
+        {"rectangle", &StarRtdImage::draw_rectangle},
+        {"rotbox", &StarRtdImage::draw_rotbox},
+        {"square", &Skycat::draw_square},
+        {"triangle", &Skycat::draw_triangle}
     };
     static int nsymbols = sizeof(symbols)/sizeof(SymbolTab);
 
@@ -3501,6 +3504,55 @@ int StarRtdImage::draw_rotbox(double x, double y, const char *xy_units,
 
     int result = eval( os.str().c_str() );
     return result;
+}
+
+//
+//  Draw an axis-aligned rectangle at the given coords.
+//  See draw_symbol for a description of the arguments.
+//
+int StarRtdImage::draw_rectangle( double x, double y, const char *xy_units,
+                                  double radius, const char *radius_units,
+                                  const char *bg, const char *fg,
+                                  const char *symbol_tags, double ratio,
+                                  double angle, const char *label,
+                                  const char *label_tags )
+{
+#ifdef _DEBUG_
+    cout << "Called StarRtdImage::draw_rectangle" << std::endl;
+#endif
+    double rx = radius, ry = radius * ratio;
+    if (convertCoords(0, x, y, xy_units, "canvas") != TCL_OK
+        || convertCoords(1, rx, ry, radius_units, "canvas") != TCL_OK) {
+        reset_result(); // ignore off scale symbols
+        return TCL_OK;
+    }
+    double x0 = x - rx;
+    double y0 = y - ry;
+    double x1 = x + rx;
+    double y1 = y + ry;
+
+    // if using 2 colors, draw 2 symbols, for visibility, one thicker
+    std::ostringstream os;
+    if (strcmp(fg, bg) != 0) {
+        os << canvasName_ << " create rect "
+           << x0-1 << ' ' << y0-1 << ' ' << x1+1 << ' ' << y1+1
+           << " -outline " << bg
+           << " -fill " << bg
+           << " -width 1 -stipple pat7 -tags " << "{" << symbol_tags << "}" 
+           << std::endl;
+    }
+    os << canvasName_ << " create rect "
+       << x0 << ' ' << y0 << ' ' << x1 << ' ' << y1
+       << " -outline " << fg
+       << " -fill " << bg
+       << " -width 1 -stipple pat7 -tags " << "{" << symbol_tags << "}"
+       << std::endl;
+    
+    if (label && strlen(label)) 
+        make_label(os, label, x, y, label_tags, fg);
+    
+    return eval(os.str().c_str());
+
 }
 
 //+
@@ -4260,7 +4312,7 @@ AstFrameSet* StarRtdImage::makeGridWCS( ImageData *image )
     AstFrame *grid = astFrame( 2, "Domain=GRID,Title=Grid Coordinates" );
 
     //  Create the FrameSet, adding the GRID domain.
-    AstFrameSet *set = astFrameSet( grid, "" );
+    AstFrameSet *set = astFrameSet( grid, " " );
     grid = (AstFrame *) astAnnul( grid );
 
     //  Need to add a pixel coordinates based Frame.
@@ -4295,7 +4347,7 @@ AstFrameSet* StarRtdImage::makeGridWCS( ImageData *image )
     outb[1] = outa[1] + height;
 
     //  Create the pixel indices to pixel coordinates mapping.
-    AstMapping *pixmap = (AstMapping *) astWinMap( 2, ina, inb, outa, outb,"");
+    AstMapping *pixmap = (AstMapping *) astWinMap( 2, ina, inb, outa, outb, " " );
 
     //  Add all these to the FrameSet. Assumes that the current
     //  base frame is the pixel index frame.
@@ -4480,7 +4532,7 @@ AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
     }
 
     //  Create the plot frameset.
-    AstPlot *plot = astPlot( plotset, gbox, pbox, "" );
+    AstPlot *plot = astPlot( plotset, gbox, pbox, " " );
     if ( extraset != (AstFrameSet *) NULL ) {
         plotset = (AstFrameSet *) astAnnul( plotset );
     }
@@ -4492,7 +4544,7 @@ AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
         int inperm[] = {2,1};
         int outperm[] = {2,1};
         AstPermMap *perm = astPermMap( 2, inperm, 2, outperm,
-                                       (double *) NULL, "" );
+                                       (double *) NULL, " " );
         astRemapFrame( plot, AST__BASE, perm );
         perm = (AstPermMap *) astAnnul( perm );
     }
@@ -5015,8 +5067,8 @@ int StarRtdImage::colorrampCmd( int argc, char *argv[] )
 
         //  Create a frameset that maps from BASE pixels to
         AstFrame *base = (AstFrame *) astFrame( 2, "Domain=GRID" );
-        AstFrameSet *fset = (AstFrameSet *) astFrameSet( base, "" );
-        AstMapping *map = (AstMapping *) astUnitMap( 2, "" );
+        AstFrameSet *fset = (AstFrameSet *) astFrameSet( base, " " );
+        AstMapping *map = (AstMapping *) astUnitMap( 2, " " );
         AstFrame *current = (AstFrame *) astFrame( 2, "Domain=PIXEL" );
         astAddFrame( fset, 1, map, current );
 
