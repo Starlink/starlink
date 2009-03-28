@@ -63,10 +63,12 @@
 *        Add smurfcopy
 *     2008-08-26 (TIMJ):
 *        Add calcflat / calcdark
+*     2009-09-27 (TIMJ):
+*        Add calcresp
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
 *     Council, University of British Columbia.  All Rights Reserved.
 
@@ -120,6 +122,7 @@ void smurf_sc2fft( int * );
 void smurf_smurfcopy( int * );
 void smurf_calcdark( int * );
 void smurf_calcflat( int * );
+void smurf_calcresp( int * );
 void smurf_sc2threadtest( int * );
 
 #endif /* SMURF_LIB_DEFINED */
