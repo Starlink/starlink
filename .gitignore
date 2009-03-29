@@ -758,6 +758,10 @@ buildsupport/starconf/starconf-deinstall
 buildsupport/starconf/starconf-finder
 buildsupport/starconf/starconf-validate
 
+applications/tsp/tsp.csh
+applications/tsp/tsp.icl
+applications/tsp/tsp.sh
+
 docs/sc/003/sc3-scripts.tex
 docs/sc/005/sc5.htx_tar.extras
 docs/sc/013/VERSION
