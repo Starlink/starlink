@@ -31,12 +31,17 @@
 
    o  NDFCOPY
 
-      -  A new parameter called LIKEWCS has been added.  This 
-      allows the shape of the template NDF in the WCS Frame to be 
-      used to determine the bounds of the output NDF.
       -  A new parameter caller EXTEN has been added.  This can be set
       TRUE to cause any extension NDFs contained within the supplied 
       NDF to be modified to match the shape of the output NDF.
+
+      -  A new parameter called LIKEWCS has been added.  This 
+      allows the shape of the template NDF in the WCS Frame to be 
+      used to determine the bounds of the output NDF.
+
+      -  A new logical parameter called TRIMBAD has been added.  If 
+      TRUE, the output NDF is trimmed to exclude any border of bad
+      pixels.
 
    o  ROTATE
 
