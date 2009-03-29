@@ -115,10 +115,12 @@
 *        Report if the EMS stack level has changed.
 *     2008-08-22 (TIMJ):
 *        Add CALCDARK
+*     2009-03-27 (TIMJ):
+*        Add CALCRESP
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2007 Council and the University of British Columbia.
 *     All Rights Reserved.
@@ -272,6 +274,8 @@ void smurf_mon( int * status ) {
     smurf_calcdark( status );
   } else if (strcmp( taskname, "CALCFLAT" ) == 0 ) {
     smurf_calcflat( status );
+  } else if (strcmp( taskname, "CALCRESP" ) == 0 ) {
+    smurf_calcresp( status );
   } else if (strcmp( taskname, "SC2THREADTEST" ) == 0 ) {
     smurf_sc2threadtest( status );
   } else {

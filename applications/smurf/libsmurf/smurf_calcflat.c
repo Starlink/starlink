@@ -72,10 +72,12 @@
 *        First version ready for testing.
 *     2008-11-18 (TIMJ):
 *        Trap erroneous final dark.
+*     2009-03-27 (TIMJ):
+*        Use new smf_create_respfile routine for creating the responsivity image.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -392,39 +394,10 @@ void smurf_calcflat( int *status ) {
                                          NULL, status );
 
       } else {
-        int lbnd[] = { 1, 1 };
-        int ubnd[2];
-
-        /* open the file */
-        ubnd[SMF__ROW_INDEX] = nrows - lbnd[SMF__ROW_INDEX] + 1;
-        ubnd[SMF__COL_INDEX] = ncols - lbnd[SMF__COL_INDEX] + 1;
-        smf_open_newfile( rgrp, 1, SMF__DOUBLE, 2, lbnd, ubnd,
-                          SMF__MAP_VAR, &respmap, status );
-
-        /* add some niceties - propagate some information from the first measurement */
-        if (*status == SAI__OK) {
-          smfData *refdata = (bbhtframe->sdata)[0];
-          char buffer[30];
-          AstFrameSet *wcs = NULL;
-
-          smf_accumulate_prov( NULL, dkgrp, 1, respmap->file->ndfid, "SMURF:CALCFLAT", status );
-          kpgPtfts( respmap->file->ndfid, refdata->hdr->fitshdr, status );
-
-          one_strlcpy( buffer, subarray, sizeof(buffer), status );
-          one_strlcat( buffer, " bolometer responsivity", sizeof(buffer), status );
-          respmap->hdr = smf_construct_smfHead( NULL, refdata->hdr->instrument,
-                                                NULL, NULL, NULL, NULL, 0, refdata->hdr->instap, 1,
-                                                refdata->hdr->steptime, refdata->hdr->obsmode,
-                                                refdata->hdr->obstype, 0, NULL, NULL, NULL, NULL,
-                                                0, NULL, buffer, "Responsivity",
-                                                "Amps/Watt", refdata->hdr->telpos, status );
-          smf_write_clabels( respmap, status );
-
-          /* create frame for focal plane coordinates */
-          sc2ast_createwcs( subnum, NULL, NULL, NULL, &wcs, status );
-          ndfPtwcs( wcs, respmap->file->ndfid, status );
-        }
-
+        /* Create the file on disk and handle provenance */
+        smfData *refdata = (bbhtframe->sdata)[0];
+        smf_create_respfile( rgrp, 1, refdata, &respmap, status );
+        smf_accumulate_prov( NULL, dkgrp, 1, respmap->file->ndfid, "SMURF:CALCFLAT", status );
       }
       if (rgrp) grpDelet( &rgrp, status );
     }

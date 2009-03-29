@@ -195,8 +195,10 @@
 #         Add NAVER parameter to STARECALC
 #     12-DEC-2008 (TIMJ):
 #         Add BPM masking param
-#     01-JAN-2008 (EC):
+#     01-JAN-2009 (EC):
 #         Add FLAGSTAT to SC2CLEAN
+#     27-MAR-2009 (TIMJ):
+#         Add CALCRESP
 #     {enter_changes_here}
 
 #  Bugs:
@@ -1066,6 +1068,50 @@ package @PACKAGE@ {
                 prompt {Mask bolometers with bad responsivity?}
                 ppath GLOBAL CURRENT
                 default TRUE
+                helpkey *
+            }
+
+        }
+
+        action calcresp {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input files containing flatfield parameters}
+                helpkey *
+            }
+
+            parameter out {
+                position 2
+                type NDF
+                access WRITE
+                ppath DYNAMIC CURRENT
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Responsivity images}
+                helpkey *
+            }
+
+            parameter msg_filter {
+                type _CHAR
+                prompt {Message level}
+                default NORM
+                vpath DEFAULT
+                helpkey *
+            }
+
+            parameter ngood {
+                size *
+                type _INTEGER
+                access WRITE
+                vpath INTERNAL
+                prompt {Number of good responsivities in each file}
                 helpkey *
             }
 

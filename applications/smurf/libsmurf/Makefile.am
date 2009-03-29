@@ -8,6 +8,7 @@ C_ROUTINES = \
 smurf_badbolos.c \
 smurf_calcdark.c \
 smurf_calcflat.c \
+smurf_calcresp.c \
 smurf_dreamsolve.c \
 smurf_dreamweights.c \
 smurf_extinction.c \
