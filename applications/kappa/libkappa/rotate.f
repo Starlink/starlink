@@ -247,6 +247,12 @@
 *        assigned to the output NDF.
 *     2008 June 17 (MJC):
 *        Trim trailing blanks from output NDF character components.
+*     2009 March 26 (MJC):
+*        Remove unnecessary processing for rotations of zero degrees and 
+*        arbitrary angles.  The latter case had unnecessary 
+*        propagation of the array components that could exhaust memory
+*        for large cubes.  Reduced memory requirements for 180-degree 
+*        rotation of cubes.
 *     {enter_further_changes_here}
 
 *-
@@ -311,7 +317,6 @@
       INTEGER I                  ! Loop counter
       INTEGER ICOMP              ! Loop counter for array components
       INTEGER IDIM               ! Total number of dimensions
-      INTEGER IERR               ! Location of first conversion error
       INTEGER ISHIFT( NDIM + 1 ) ! Extra shift to align pivot points
       INTEGER IWCS               ! WCS FrameSet for input NDF
       DOUBLE PRECISION IXC       ! X pixel co-ord., centre of i/p array
@@ -329,7 +334,6 @@
       INTEGER NDFO               ! Output NDF identifier
       INTEGER NDFOB              ! Section of output NDF to be filled
       INTEGER NDFS               ! NDF section identifier
-      INTEGER NERR               ! Number of conversion errors.
       LOGICAL NNMETH             ! Use nearest-neighbour method?
       LOGICAL NRAFLG             ! Non-right angle rotation requested?
       INTEGER NUMRA              ! Number of clockwise right angles to
@@ -576,9 +580,11 @@
          NUMRA   =  3
          NRAFLG  = .FALSE.
 
-*  Not a simple 90-degree rotation...
+*  Not a simple 90-degree rotation...  Use an undefined value
+*  for the multiple of right angles, as zero is being used
+*  for the null, i.e. zero degrees, rotation.
       ELSE
-         NUMRA   =  0
+         NUMRA   =  VAL__BADI
          NRAFLG  = .TRUE.
 
       END IF
@@ -662,14 +668,15 @@
 *  Create a section from the input NDF of the size of the required NDF.
       CALL NDF_SECT( NDFI, IDIM, LBNDO, UBNDO, NDFS, STATUS )
 
-*  Create the output NDF.  Two of the special cases (0 and 180-degree
-*  rotation) needs the array components to be copied.  Axes will be
-*  overwritten later for right-angle multiples.
-      IF ( NUMRA .EQ. 0 .OR. NUMRA .EQ. 2 ) THEN
+*  Create the output NDF.  0-degree rotation special case needs the 
+*  array components to be copied, as nothing else need be done.
+      IF ( NUMRA .EQ. 0 ) THEN
          CALL LPG_PROP( NDFS, 'AXIS,DATA,VARIANCE,QUALITY,UNITS',
      :                   'OUT', NDFO, STATUS )
 
-      ELSE IF ( NUMRA .EQ. 1 .OR. NUMRA .EQ. 3 ) THEN
+*  Axis arrays will be overwritten later for the other right-angle 
+*  multiples.
+      ELSE IF ( NUMRA .GE. 1 .AND. NUMRA .LE. 3 ) THEN
          CALL LPG_PROP( NDFS, 'AXIS,UNITS', 'OUT', NDFO, STATUS )
 
       ELSE
@@ -925,7 +932,10 @@
 
 *  90-degree multiple.
 *  ===================
-      ELSE
+
+*  Nothing to do for the zero-degree case.  It has been handdled by the
+*  earlier propagation.
+      ELSE IF ( NUMRA .NE. 0 ) THEN
 
 *  Process the main NDF array components.
 *  --------------------------------------
@@ -941,12 +951,10 @@
             CALL NDF_STATE( NDFI, COMP( ICOMP ), THERE, STATUS )
 
 *  If so, then determine its numeric type and map the input and output
-*  arrays for access using this type.  Note the array components have
-*  been copied to the output NDF already for 180-degree rotation so use
-*  update access for these.  PSX_CALLOC does not allow one- and two-byte
-*  integers.
+*  arrays for access using this type.  PSX_CALLOC does not allow one- 
+*  and two-byte integers.
             IF ( THERE ) THEN      
-               IF ( NUMRA .EQ. 0 .OR. NUMRA .EQ. 2 ) THEN
+               IF ( NUMRA .EQ. 2 ) THEN
                   CALL NDF_TYPE( NDFI, COMP( ICOMP ), TYPE, STATUS )
                ELSE
                   CALL NDF_MTYPE( '_INTEGER,_REAL,_DOUBLE', NDFI, NDFI,
@@ -970,20 +978,22 @@
                   CALL KPG1_MAP( NDFIB, COMP( ICOMP ), TYPE, 'READ', 
      :                           PNTRI, EL, STATUS )
 
-                  IF ( NUMRA .EQ. 0 .OR. NUMRA .EQ. 2 ) THEN
-                     CALL KPG1_MAP( NDFOB, COMP( ICOMP ), TYPE, 
-     :                              'UPDATE', PNTRO, EL, STATUS )
-                  ELSE
-                     CALL KPG1_MAP( NDFOB, COMP( ICOMP ), TYPE, 'WRITE',
-     :                              PNTRO, EL, STATUS )
-                  END IF
+                  CALL KPG1_MAP( NDFOB, COMP( ICOMP ), TYPE, 'WRITE',
+     :                           PNTRO, EL, STATUS )
+
                   IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Rotation is through 0 degrees - do nothing.
-                  IF ( NUMRA .EQ. 0 ) THEN
-
 *  Rotation is through 180 degrees
-                  ELSE IF ( NUMRA .EQ. 2 ) THEN
+                  IF ( NUMRA .EQ. 2 ) THEN
+
+*  This process works in situ swapping pixel values, therefore the array
+*  components must first be copied to the output NDF.  At one time all
+*  the arrays were copied in a single LPG_PROP call.   While this is 
+*  efficient for smaller arrays, it mapped both input and output array
+*  in their entirity, and could lead to excessive memory demands for 
+*  cubes.  The current coding only maps planes of the cube at a time.
+                     CALL KPG1_COPY( TYPE, EL, PNTRI( 1 ), PNTRO( 1 ), 
+     :                               STATUS )
 
 *  Call the appropriate routine to generate the output array for a
 *  180-degree rotation, depending on its numeric type.
@@ -1135,7 +1145,7 @@
 *  Output array depends on the rotation angle.  For 180 degrees the
 *  axes are flipped.  For 90 and 270 degrees there is an interchange
 *  as well.
-                  IF ( NUMRA .EQ. 0 .OR. NUMRA .EQ. 2 ) THEN
+                  IF ( NUMRA .EQ. 2 ) THEN
                      CALL NDF_AMAP( NDFO, ACOMP( ICOMP ), SDIM( 1 ),
      :                              TYPE, 'WRITE', PNTRO, EL, STATUS )
                   ELSE
@@ -1199,64 +1209,16 @@
                   ELSE
 
 *  Call the appropriate routine to copy the axis array, depending on its
-*  numeric type.  There will be no conversion errors so no need to check
-*  the returned IERR and NERR.
-                     IF ( TYPE .EQ. '_BYTE' ) THEN
-                        CALL VEC_BTOB( .FALSE., EL, 
-     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
-     :                                 IERR, NERR,
-     :                                 STATUS )
+*  numeric type. 
+                     CALL KPG1_COPY( TYPE, EL, PNTRI( 1 ), PNTRO( 1 ), 
+     :                               STATUS )
 
-                     ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                        CALL VEC_DTOD( .FALSE., EL, 
-     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
-     :                                 IERR, NERR,
-     :                                 STATUS )
-
-                     ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-                        CALL VEC_ITOI( .FALSE., EL, 
-     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
-     :                                 IERR, NERR,
-     :                                 STATUS )
-
-                     ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-                        CALL VEC_RTOR( .FALSE., EL, 
-     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
-     :                                 IERR, NERR,
-     :                                 STATUS )
-
-                     ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-                        CALL VEC_UBTOUB( .FALSE., EL,
-     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                                   IERR, NERR,
-     :                                   STATUS )
-
-                     ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-                        CALL VEC_UWTOUW( .FALSE., EL,
-     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                                   IERR, NERR,
-     :                                   STATUS )
-
-                     ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-                        CALL VEC_WTOW( .FALSE., EL, 
-     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                                 IERR, NERR,
-     :                                 STATUS )
-
-                     END IF
                   END IF
 
 *  Unmap the input and output axis arrays.
                   CALL NDF_AUNMP( NDFI, ACOMP( ICOMP ), SDIM( 1 ),
      :                            STATUS )
-                  IF ( NUMRA .EQ. 0 .OR. NUMRA .EQ. 2 ) THEN
+                  IF ( NUMRA .EQ. 2 ) THEN
                      CALL NDF_AUNMP( NDFO, ACOMP( ICOMP ), SDIM( 1 ),
      :                               STATUS )
                   ELSE
@@ -1283,7 +1245,7 @@
 *  Output array depends on the rotation angle.  For 180 degrees the
 *  axes are flipped.  For 90 and 270 degrees there is an interchange
 *  as well.
-                  IF ( NUMRA .EQ. 0 .OR. NUMRA .EQ. 2 ) THEN
+                  IF ( NUMRA .EQ. 2 ) THEN
                      CALL NDF_AMAP( NDFO, ACOMP( ICOMP ), SDIM( 2 ),
      :                              TYPE, 'WRITE', PNTRO, EL, STATUS )
                   ELSE
@@ -1311,8 +1273,9 @@
                      ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
                         CALL KPG1_FLIPD( 1, EL, 
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                1, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                                STATUS )
+     :                                   1, 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                                   STATUS )
  
                      ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                         CALL KPG1_FLIPI( 1, EL, 
@@ -1337,7 +1300,7 @@
  
                      ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
                         CALL KPG1_FLIPUW( 1, EL, 
-     :   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   1, 
      :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
@@ -1346,65 +1309,16 @@
                   ELSE
 
 *  Call the appropriate routine to copy the axis array, depending on its
-*  numeric type.  There will be no conversion errors so no need to check
-*  the returned IERR and NERR.
-                     IF ( TYPE .EQ. '_BYTE' ) THEN
-                        CALL VEC_BTOB( .FALSE., EL, 
-     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
-     :                                 IERR, NERR,
-     :                                 STATUS )
+*  numeric type. 
+                     CALL KPG1_COPY( TYPE, EL, PNTRI( 1 ), PNTRO( 1 ), 
+     :                               STATUS )
 
-
-                     ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                        CALL VEC_DTOD( .FALSE., EL, 
-     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
-     :                                 IERR, NERR,
-     :                                 STATUS )
-
-                     ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-                        CALL VEC_ITOI( .FALSE., EL, 
-     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
-     :                                 IERR, NERR,
-     :                                 STATUS )
-
-                     ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-                        CALL VEC_RTOR( .FALSE., EL, 
-     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
-     :                                 IERR, NERR,
-     :                                 STATUS )
-
-                     ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-                        CALL VEC_UBTOUB( .FALSE., EL,
-     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                                   IERR, NERR,
-     :                                   STATUS )
-
-                     ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-                        CALL VEC_UWTOUW( .FALSE., EL,
-     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
-     :                                   IERR, NERR,
-     :                                   STATUS )
-
-                     ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-                        CALL VEC_WTOW( .FALSE., EL, 
-     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
-     :                                 IERR, NERR,
-     :                                 STATUS )
-
-                     END IF
                   END IF
 
 *  Unmap the input and output axis arrays.
                   CALL NDF_AUNMP( NDFI, ACOMP( ICOMP ), SDIM( 2 ),
      :                            STATUS )
-                  IF ( NUMRA .EQ. 0 .OR. NUMRA .EQ. 2 ) THEN
+                  IF ( NUMRA .EQ. 2 ) THEN
                      CALL NDF_AUNMP( NDFO, ACOMP( ICOMP ), SDIM( 2 ),
      :                               STATUS )
                   ELSE
