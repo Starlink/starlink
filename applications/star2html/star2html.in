@@ -716,12 +716,7 @@ sub edit_main {
       print( $EDIT "\\input{$starsty} \n" );
    }
 
-#  Close the files.
-   if ( $SPLIT ) {
-     close( $SECTION );
-   }
-   close( $FILE );
-   close( $EDIT );
+#  Files close automatically on exit
 
 }
 
