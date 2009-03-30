@@ -911,23 +911,24 @@ sub remove_commands {
 #
 #  Removes all \footnote{}
 #-
-   local($_) = @_;
+   my $line = shift;
 
 #  Scan for occurrances of \command{}'s.
-   while ( m/\\(\w*)\{/m ) {
+   while ( $line =~ m/\\(\w*)\{/m ) {
 
 #  See if command content should be removed or kept.
-      if ( $1,m/(footnote|vspace)/m ) {
-         s/\\$1\{[^\}]*\}//m;
+      if ( $1 =~ m/(footnote|vspace)/m ) {
+         $line =~ s/\\$1\{[^\}]*\}//m;
       } else {
-         s/\\$1\{([^\}]*)\}//m;
-         $_ = $` . $1 . $';
+         $line =~ s/\\$1\{([^\}]*)\}//m;
+         # Do not use $` and $' since no longer recommended
+         $line = substr($line, 0, $-[0]) . $1 . substr($line, $+[0]);
       }
    }
 
 #  Scan for other known \command's.
-   s/(\\Large|\\large|\\Huge|\\huge|\\normalsize|\\small|\\bf|\\em|\\rm|\\it)//mg;
-   return $_;
+   $line =~ s/(\\Large|\\large|\\Huge|\\huge|\\normalsize|\\small|\\bf|\\em|\\rm|\\it)//mg;
+   return $line;
 }
 
 
