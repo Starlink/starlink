@@ -64,7 +64,7 @@
 itk::usual GaiaSymbolConfig {}
 
 itcl::class gaia::GaiaSymbolConfig {
-   
+
    #  Inheritances:
    #  -------------
    inherit cat::SymbolConfig
@@ -72,10 +72,10 @@ itcl::class gaia::GaiaSymbolConfig {
    #  Constructor:
    #  ------------
    constructor {args} {
-      
+
       #  Evaluate any options [incr Tk].
       eval itk_initialize $args
-   }   
+   }
 
    #  Destructor:
    #  -----------
@@ -108,9 +108,70 @@ itcl::class gaia::GaiaSymbolConfig {
       }
    }
 
+   #  Map "%%" to "::" for testing expressions that may contain
+   #  global variables.
+   protected method map_ {var} {
+      return [string map {"%%" "::"} $var]
+   }
+
+
+   #  Return a table row based on the current entries and menus or empty
+   #  if no data was entered. Raises an error if there was something wrong.
+   #  Override subclass method so that we can handle GAIA globals in
+   #  expressions.
+   protected method get_row {} {
+
+      set cols [$left_ get_contents]
+      set symbol [$symbol_ get]
+      set color [$color_ get]
+
+      set ratio [$ratio_ get]
+      set tratio [map_ $ratio]
+
+      set angle [$angle_ get]
+      set tangle [map_ $angle]
+
+      set label [$label_ get]
+
+      set cond  [$cond_ get]
+      set tcond [map_ $cond]
+
+      set size [$size_ get]
+      set tsize [map_ $size]
+
+      set units [$units_ get]
+
+      #  Test the variable usage in the expressions
+      foreach var $cols {
+         set $var 1
+      }
+      if {"$size" == ""} {
+         if {[llength $cols]} {
+            error "Please specify a value for size (expr or const) in $units"
+         }
+         return
+      }
+
+      foreach var {tsize tratio tangle tcond} {
+         set v [set $var]
+         if {"$v" != ""} {
+            if {[catch {expr [set $var]} msg]} {
+               error "in $var expr: $msg"
+            }
+         }
+      }
+
+      #  Label may also contain col name vars, but may not be numeric
+      if {[catch {subst $label} msg]} {
+         error "error in label '$label': $msg"
+      }
+
+      return [list $cols $symbol $color $ratio $angle $label $cond $size $units]
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
-   
+
    #  Protected variables: (available to instance)
    #  --------------------
 

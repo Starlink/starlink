@@ -361,7 +361,7 @@ itcl::class gaia::GaiaConvertTable {
             set unit $units(tunit$j)
          }
          if { [string match "radian*" $unit] || 
-              [string match "degree*" $unit] } {
+              [string match "deg*" $unit] } {
 
             #  Assuming this is a column with angle data. This is either an RA
             #  or DEC. If qualified by {HOURS}, {HMSxxx} or the name is some
@@ -375,12 +375,14 @@ itcl::class gaia::GaiaConvertTable {
                }
             } else {
                #  "daz" is AZEL for JAC, also DEl, bit that should be a dec.
+               #  "peak1" and "peak2" are support for CUPID.
                switch -glob -- $name {
                   ra* -
                   right* -
                   r.a.* -
                   x_world* -
                   daz -
+                  peak1 -
                   alpha* {
                      if { $racol == -1 } {
                         set racol $i
@@ -397,11 +399,9 @@ itcl::class gaia::GaiaConvertTable {
                            #  Do nothing.
                         }
                         default {
-                           set deccol $i
-                        }
-                     }
-                     if { ! [string match "pos*" $name] } {
-                        if { $deccol == -1 } {
+                           if { $deccol == -1 } {
+                              set deccol $i
+                           }
                         }
                      }
                   }

@@ -102,9 +102,6 @@ itcl::class gaia::GaiaSearch {
    #  Init method, called after the options have been evaluated.
    public method init {} {
 
-      #  Extra GAIA symbols for catalogues.
-      #set symbols_("rotbox") 1; TODO: add changes needed to support this.
-
       #  The catalogue may be accessed during construction (and converted
       #  to native format), catch any errors and dispose of this object.
       if { [catch {SkySearch::init} msg] } {
@@ -392,10 +389,21 @@ itcl::class gaia::GaiaSearch {
       }
 
       if { $object != {} } {
-         return [gaiautils::astcreate native $object]
+         set ref [gaiautils::astcreate native $object]
+         if { $ref != 0 } {
+
+            #  Some KAPLIBS framesets for catalogues contain a WCS that
+            #  describes more than two columns (in fact they have an axis per
+            #  column). In that case we just want a suitable skyframe, so
+            #  search for one.
+            if { [gaiautils::astget $ref naxes] > 2 } {
+               set skyframe [gaiautils::astskyframe "MaxAxes=20"]
+               return [gaiautils::astfindframe $ref $skyframe ","]
+            }
+            return $ref
+         }
       }
       return 0
-
    }
 
    #  Get a WCS description for the catalogue and set its display format.
@@ -466,13 +474,16 @@ itcl::class gaia::GaiaSearch {
       }
 
       #  Check the AST FrameSet to see what type of coordinates are expected.
-      #  These are "hms" if an RA axis is found.
+      #  These are "hms" if an RA axis is found, catch when axes are not even
+      #  sky axes.
       set hms 1
-      set astime [gaiautils::astget $astref_ "astime(1)"]
-      if { ! $astime } {
-         set astime [gaiautils::astget $astref_ "astime(2)"]
+      catch {
+         set astime [gaiautils::astget $astref_ "astime(1)"]
          if { ! $astime } {
-            set hms 0
+            set astime [gaiautils::astget $astref_ "astime(2)"]
+            if { ! $astime } {
+               set hms 0
+            }
          }
       }
 

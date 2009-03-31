@@ -34,7 +34,7 @@
 #  Copyright:
 #     Copyright (C) 2004-2005 Central Laboratory of the Research Councils
 #     Copyright (C) 2006-2007 Particle Physics & Astronomy Research Council
-#     Copyright (C) 2007-2008 Science and Technology Facilities Council
+#     Copyright (C) 2007-2009 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -105,11 +105,13 @@ itcl::class gaia::GaiaCube {
       configure_menubutton File -underline 0
 
       #  Add item to read an ARD region from a file.
-      $File add command -label {Read ARD region...} \
+      add_menuitem $File command {Read ARD region...} \
+         {Read an ARD region from a file and extract a spectrum} \
          -command [code $this read_ard_region_]
 
       #  Add the close menu item.
-      $File add command -label Close \
+      add_menuitem $File command Close \
+         {Close this window} \
          -command [code $this close] \
          -accelerator {Control-c}
       bind $w_ <Control-c> [code $this close]
@@ -119,7 +121,8 @@ itcl::class gaia::GaiaCube {
       configure_menubutton View -underline 0
 
       #  View the cube FITS headers.
-      $View add command -label "Fits header..." \
+      add_menuitem $View command  "Fits header..." \
+         {View the FITS header cards of the data-cube} \
          -command [code $this show_fitsheaders_] \
          -accelerator {Control-f}
       bind $w_ <Control-f> [code $this show_fitsheaders_]
@@ -138,8 +141,14 @@ itcl::class gaia::GaiaCube {
          -command [code $this make_toolbox volume 0]
 
       #  MEF selection.
-      $View add command -label "Select HDU..." \
+      add_menuitem $View command "Select HDU..." \
+         {Browse all the data components (MEF or NDF)} \
          -command [code $this show_hdu_list_]
+
+      #  CUPID catalogue.
+      add_menuitem $View command "Import CUPID catalogue..." \
+         {Import a CUPID catalogue for display over the plane} \
+         -command [code $this import_cupid_cat_]
 
       #  Add the Options menu.
       set Options [add_menubutton "Options"]
@@ -947,9 +956,15 @@ itcl::class gaia::GaiaCube {
       update idletasks
    }
 
-   #  Set the position of a reference line shown in the plot.
+   #  Set the position of a reference line shown in the plot and update
+   #  any CUPID catalogues with the new reference coordinate.
    public method set_spec_ref_coord {id coord} {
       $itk_component(spectrum) set_spec_ref_coord $id $coord
+      set ::cupid(COORD) $coord
+      puts "cupid(COORD) = $::cupid(COORD)"
+      if { [winfo exists $w_.cupidimporter] } {
+         $w_.cupidimporter replot
+      }
    }
 
    #  Set the position of a reference range shown in the plot.
@@ -1799,6 +1814,14 @@ itcl::class gaia::GaiaCube {
             -gaiacube $this \
             -notify_cmd [code $this coords_changed_]
       }
+   }
+
+   #  ================
+   #  CUPID catalogues
+   #  ================
+   protected method import_cupid_cat_ {} {
+      utilReUseWidget GaiaCupidImporter $w_.cupidimporter \
+         -gaiacube $this
    }
 
    #  Configuration options: (public variables)

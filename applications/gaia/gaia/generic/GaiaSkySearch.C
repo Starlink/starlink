@@ -551,6 +551,8 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
     char** symb = NULL;
     int nexpr = 0;
     char** exprList = NULL;
+    char *glsymbol;
+    char *p;
 
     //  This loop executes only once and is used for error
     //  handling/cleanup via "break".
@@ -573,10 +575,20 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
             break;
         }
 
+        //  In GAIA %% is a pseudonym for "::". Needed as ":" separates
+        //  multiple symbols and "::" allows global variable access.
+        glsymbol = strdup( symbol );
+        p = glsymbol;
+        while ( ( p = strstr( p, "%%" ) ) ) {
+            *p++ = ':';
+            *p++ = ':';
+        }
+
         //  Parse symbol info, a variable length list of
         //  {shape color ratio angle label cond}
-        if ((status = Tcl_SplitList(interp_, (char*)symbol, &nsymb, &symb)) != TCL_OK)
-            break;
+        if ((status = Tcl_SplitList(interp_, glsymbol, &nsymb, &symb)) != TCL_OK)
+            break;        
+        free( glsymbol );
 
         //  Default values
         char* shape = (char *) "";
