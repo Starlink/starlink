@@ -85,6 +85,8 @@ static int GaiaUtilsAstCreate( ClientData clientData, Tcl_Interp *interp,
                                int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstDomains( ClientData clientData, Tcl_Interp *interp,
                                 int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsAstFindFrame( ClientData clientData, Tcl_Interp *interp,
+                                  int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstFormat( ClientData clientData, Tcl_Interp *interp,
                                int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstGet( ClientData clientData, Tcl_Interp *interp,
@@ -161,6 +163,10 @@ int GaiaUtils_Init( Tcl_Interp *interp )
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::astdomains", GaiaUtilsAstDomains,
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::astfindframe",
+                          GaiaUtilsAstFindFrame,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::astget", GaiaUtilsAstGet,
@@ -609,7 +615,7 @@ static int GaiaUtilsAstCreate( ClientData clientData, Tcl_Interp *interp,
     /* Read the object */
     object = (AstObject *) astRead( chan );
     astAnnul( chan );
-    
+
     free( buf );
     free( SOURCEInfo.lines );
 
@@ -1406,7 +1412,6 @@ static int GaiaUtilsAstSkyFrameSet( ClientData clientData, Tcl_Interp *interp,
     return TCL_ERROR;
 }
 
-
 /**
  * Format a value along an axis of a given AST Frame or FrameSet.
  *
@@ -1705,6 +1710,59 @@ static int GaiaUtilsGtFrame( ClientData clientData, Tcl_Interp *interp,
         return TCL_OK;
     }
     Tcl_SetResult( interp, "Failed to extract frame from frameset",
+                   TCL_VOLATILE );
+    return TCL_ERROR;
+}
+
+/**
+ * Find an AST frame in a frameset.
+ *
+ * There are three arguments, the FrameSet to search and the Frame to locate,
+ * followed by the domainlist to constrain the search. See the astFindFrame
+ * function description for how to use this.
+ *
+ * The result is the address of a FrameSet, if found, otherwise 0.
+ */
+static int GaiaUtilsAstFindFrame( ClientData clientData, Tcl_Interp *interp,
+                                  int objc, Tcl_Obj *CONST objv[] )
+{
+    AstFrameSet *frameset = NULL;
+    AstFrame *findframe = NULL;
+    AstFrameSet *foundframe = NULL;
+    char *domainlist;
+    long adr;
+
+    /* Check arguments, only allow three. */
+    if ( objc != 4 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "frameset frame domainlist" );
+        return TCL_ERROR;
+    }
+
+    /* Get the FrameSet and Frame. */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    frameset = (AstFrameSet *) adr;
+
+    if ( Tcl_GetLongFromObj( interp, objv[2], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    findframe = (AstFrame *) adr;
+
+    /* Do the find. */
+    domainlist = Tcl_GetString( objv[3] );
+    foundframe = (AstFrameSet *) astFindFrame( frameset, findframe,
+                                               domainlist );
+
+    /* Export the new object as a long containing the address. */
+    if ( astOK ) {
+        Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) foundframe ) );
+        return TCL_OK;
+    }
+
+    /* Otherwise return an error (NULL is a valid return). */
+    astClearStatus;
+    Tcl_SetResult( interp, "Failed finding a frame in a frameset",
                    TCL_VOLATILE );
     return TCL_ERROR;
 }
