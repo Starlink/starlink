@@ -414,7 +414,10 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
    }
 
 #  Append tex file directory to TEXINPUTS to get /specials etc.
-   $ENV{'TEXINPUTS'} = join( ':', grep { defined $_ } $ENV{'TEXINPUTS'}, $DEFAULTDIR );
+#  Note that an empty string should be defaulted for $ENV{TEXINPUTS} if it does
+#  not exist in the environment.  ":$dir" is a valid form of the variable.
+   $ENV{'TEXINPUTS'} = join( ':',  (defined $ENV{TEXINPUTS} ? $ENV{TEXINPUTS} : ""),
+       $DEFAULTDIR );
 
 #  Open main file for use in the following sections (could be more efficient
 #  I guess).
