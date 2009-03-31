@@ -11213,8 +11213,9 @@ c        this.
 *     instance, a Format value of "iso.0" produces a time of day of the form 
 *     "hh:mm:ss", and a Format value of "iso.2" produces a time of day of the 
 *     form "hh:mm:ss.ss". The date and time fields will be separated by a 
-*     space. The value of the Digits attribute is ignored when using this 
-*     "iso" format. 
+*     space unless 'T' is appended to the end of string, in which case
+*     the letter T (upper case) will be used as the separator. The value of 
+*     the Digits attribute is ignored when using this "iso" format. 
 
 *  Notes:
 *     - When specifying this attribute by name, it should be

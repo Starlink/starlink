@@ -141,6 +141,9 @@ f     - AST_CURRENTTIME: Return the current system time
 *        Ensure Format string pointer is used correctly.
 *     19-JAN-2009 (DSB):
 *        Ensure "<bad>" is returned by astFormat if the axis value is bad.
+*     31-MAR-2009 (DSB):
+*        Extend TimeFrame "iso" Format to allow it to specify the character to
+*        place between the time and date strings.
 *class--
 */
 
@@ -345,7 +348,7 @@ static double GetEpoch( AstFrame *, int * );
 static double GetTimeOriginCur( AstTimeFrame *, int * );
 static double ToMJD( AstSystemType, double, int * );
 static double ToUnits( AstTimeFrame *, const char *, double, const char *, int * );
-static int DateFormat( const char *, int *, int * );
+static int DateFormat( const char *, int *, char *, int * );
 static int GetActiveUnit( AstFrame *, int * );
 static int MakeTimeMapping( AstTimeFrame *, AstTimeFrame *, AstTimeFrame *, int, AstMapping **, int * );
 static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame **, int * );
@@ -480,7 +483,7 @@ static const char *Abbrev( AstFrame *this_frame, int axis,  const char *fmt,
 
 /* Use the parent astAbbrev function unless the Format attribute indicates 
    that axis values are to be formatted as multi-field date/time strings. */
-   df = DateFormat( fmt, &ndp, status );
+   df = DateFormat( fmt, &ndp, NULL, status );
    if( !df ) {
       result = (*parent_abbrev)( this_frame, axis,  fmt, str1, str2, status );
 
@@ -557,7 +560,7 @@ static const char *Abbrev( AstFrame *this_frame, int axis,  const char *fmt,
    return result;
 }
 
-static int DateFormat( const char *fmt, int *ndp, int *status ){
+static int DateFormat( const char *fmt, int *ndp, char *sep, int *status ){
 /*
 *  Name:
 *     DateFormat
@@ -570,7 +573,7 @@ static int DateFormat( const char *fmt, int *ndp, int *status ){
 
 *  Synopsis:
 *     #include "timeframe.h"
-*     int DateFormat( const char *fmt, int *ndp, int *status )
+*     int DateFormat( const char *fmt, int *ndp, char *sep, int *status )
 
 *  Class Membership:
 *     TimeFrame member function 
@@ -588,6 +591,10 @@ static int DateFormat( const char *fmt, int *ndp, int *status ){
 *        if a time is required as well as a date. A value of -1 will be
 *        returned in no time is required, otherwise the returned value will 
 *        equal the number of decimal places required for the seconds field.
+*     ndp
+*        A pointer to a char in which is returned the character that
+*        should be used to separate the date and time fields. Ignored if
+*        NULL.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -598,6 +605,7 @@ static int DateFormat( const char *fmt, int *ndp, int *status ){
 
 /* Local Variables: */
    const char *c;
+   int nc;
    int result;
 
 /* Initialise  */
@@ -617,7 +625,15 @@ static int DateFormat( const char *fmt, int *ndp, int *status ){
    required (the interegr following the dot). */
       if( !strncmp( c, "iso", 3 ) ) {
          result = 1;
-         if( 1 != sscanf( c, "iso.%d", ndp ) ) *ndp = -1;
+         if( sscanf( c, "iso.%d%n", ndp, &nc ) == 1 ) {
+
+/* Check the separate character (if any) at the end of the format string.
+   Only "T" is allowed. A space is used if no separator is given. */
+            if( sep ) *sep = ( c[ nc ] == 'T' || c[ nc ] == 't' ) ? 'T' : ' ';
+
+         } else {
+            *ndp = -1;
+         }
       }
    }
 
@@ -1088,6 +1104,7 @@ static const char *Format( AstFrame *this_frame, int axis, double value, int *st
    AstTimeFrame *this;    
    AstTimeScaleType ts;   
    char *d;    
+   char sep;
    char tbuf[ 100 ];
    char sign[ 2 ];
    const char *fmt;    
@@ -1129,7 +1146,7 @@ static const char *Format( AstFrame *this_frame, int axis, double value, int *st
 /* If the format string does not indicate a date/time format, invoke the
    parent Format method. */
       fmt = astGetFormat( this, 0 );
-      df = DateFormat( fmt, &ndp, status );
+      df = DateFormat( fmt, &ndp, &sep, status );
       if( !df ) {
          result = (*parent_format)( this_frame, axis, value, status );
 
@@ -1163,11 +1180,12 @@ static const char *Format( AstFrame *this_frame, int axis, double value, int *st
 
 /* Format the time fields. */
                if( ndp > 0 ) {
-                  tlen = sprintf( tbuf, " %2.2d:%2.2d:%2.2d.%*.*d", ihmsf[0],
-                                ihmsf[1], ihmsf[2], ndp, ndp, ihmsf[3] );
+                  tlen = sprintf( tbuf, "%c%2.2d:%2.2d:%2.2d.%*.*d", sep, 
+                                  ihmsf[0], ihmsf[1], ihmsf[2], ndp, ndp, 
+                                  ihmsf[3] );
                } else {
-                  tlen = sprintf( tbuf, " %2.2d:%2.2d:%2.2d", ihmsf[0],
-                                ihmsf[1], ihmsf[2] );
+                  tlen = sprintf( tbuf, "%c%2.2d:%2.2d:%2.2d", sep, ihmsf[0],
+                                  ihmsf[1], ihmsf[2] );
                }
 
 /* Add in the formatted time. */
@@ -1353,7 +1371,7 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick, int *
 /* Use the parent astGap function unless the Format attribute indicates 
    that axis values are to be formatted as multi-field date/time strings. */
    fmt = astGetFormat( this, 0 );
-   df = DateFormat( fmt, &ndp, status );
+   df = DateFormat( fmt, &ndp, NULL, status );
    if( !df ) {
       result = (*parent_gap)( this_frame, axis, gap, ntick, status );
 
@@ -2026,7 +2044,7 @@ static const char *GetLabel( AstFrame *this, int axis, int *status ) {
 /* If the Format attribute indicates that time values will be formatted
    as dates, then choose a suitable label. */
       fmt = astGetFormat( this, 0 );
-      if( DateFormat( fmt, &ndp, status ) ) {
+      if( DateFormat( fmt, &ndp, NULL, status ) ) {
          result = ( ndp >= 0 ) ? "Date/Time" : "Date";
 
 /* Otherwise, identify the time coordinate system described by the 
@@ -2588,7 +2606,7 @@ static const char *GetTitle( AstFrame *this_frame, int *status ) {
    not indicate a date string (which is always absolute), include the
    offset now as a date/time string. */
          fmt = astGetFormat( this, 0 );
-         if( orig != 0.0 && !DateFormat( fmt, &ndp, status ) ) {
+         if( orig != 0.0 && !DateFormat( fmt, &ndp, NULL, status ) ) {
 
 /* Save the Format attribute, and then temporarily set it to give a date/time 
    string. */
@@ -5515,7 +5533,7 @@ static int Unformat( AstFrame *this_frame, int axis, const char *string,
    attribute if it has been set to a date format, since the parent Frame 
    class does not understand date format.*/
    txt = astGetFormat( this, axis );
-   if( DateFormat( txt, &ndp, status ) ) {
+   if( DateFormat( txt, &ndp, NULL, status ) ) {
        old_fmt = astStore( NULL, txt, strlen( txt ) + 1 );
        astClearFormat( this, axis );
    } else {
