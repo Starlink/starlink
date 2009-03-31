@@ -122,6 +122,8 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
 *        full width hash value (& may be faster than %).
 *     7-MAR-2008 (DSB):
 *         Added support for pointer ("P") entries.
+*     31-MAR-2009 (DSB):
+*         Remove rounding errors from formatted double values.
 *class--
 */
 
@@ -736,6 +738,8 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
    float fval;                   /* Single precision value */ 
    int ival;                     /* Integer value */ 
    int i;                        /* Loop count */
+   int n1;                       /* Number of characters at reduced precision */ 
+   int n2;                       /* Number of characters at full precision */ 
    int nc;                       /* Number of characters read from string */ 
    int nval;                     /* Number of values read from string */ 
    int result;                   /* Returned flag */
@@ -813,9 +817,15 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type, int *
       } else if( out_type == AST__FLOATTYPE ) {
          if( out ) *( (float *) out ) = (float) dval;
 
-/* Consider conversion to "const char *". */
+/* Consider conversion to "const char *". If reducing the number of 
+   decimal places by two produces a saving of 10 or more characters, 
+   assume the least significant two characters are rounding error. */
       } else if( out_type == AST__STRINGTYPE ) {
-         (void) sprintf( convertvalue_buff, "%.*g", DBL_DIG, dval );
+         n1 = sprintf( convertvalue_buff, "%.*g", DBL_DIG - 2, dval );
+         n2 = sprintf( convertvalue_buff, "%.*g", DBL_DIG, dval );
+         if( n2 - n1 > 9 ) {
+            (void) sprintf( convertvalue_buff, "%.*g", DBL_DIG - 2, dval );
+         } 
          cvalue = convertvalue_buff;
 
 /* Consider conversion to "AstObject *". */
