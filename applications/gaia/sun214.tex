@@ -16,12 +16,12 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {214.35}
+\newcommand{\stardocnumber}    {214.36}
 \newcommand{\stardocauthors}   {Peter W. Draper, 
                                 Norman Gray, 
                                 David S. Berry \& 
                                 Mark Taylor }
-\newcommand{\stardocdate}      {21st November 2008}
+\newcommand{\stardocdate}      {31st March 2009}
 \newcommand{\stardoctitle}     {GAIA -- 
                                 Graphical Astronomy and Image Analysis Tool}
 \newcommand{\stardocversion}   {4.3-0}
@@ -33,7 +33,7 @@ display tools, plus more astronomically useful ones such as aperture \&
 optimal photometry, contouring, source detection, surface photometry,
 arbitrary region analysis, celestial coordinate readout, calibration
 and modification, grid overlays, blink comparison, defect patching and
-the ability to query on-line (WWW) catalogues and image servers. It can 
+the ability to query on-line catalogues and image servers. It can 
 also display slices from data-cubes, extract and visualise spectra as 
 well as perform full 3D rendering.}
 
@@ -296,15 +296,17 @@ photometry, automatic source detection, surface photometry, contouring,
 arbitrary region analysis, celestial coordinate readout, calibration and
 modification, grid overlays, blink comparison, image defect patching,
 polarization vector plotting and the ability to connect to resources available
-in on-line (WWW) catalogues and image archives.
+in Virtual Observatory catalogues and image archives, as well as the older
+\mytt{Skycat} formats.
 
 GAIA also features tools for interactively displaying image planes from
 data-cubes and plotting spectra extracted from the third dimension. It can
 also display 3D visualisations of data-cubes using iso-surfaces and volume
 rendering.
 
-Interoperatability with other PLASTIC enabled applications is provided so that
-GAIA can be used as part of the Virtual Observatory.
+Interoperability with other PLASTIC enabled applications is provided so that
+GAIA can be used as part of a integrated desktop (usually querying the
+Virtual Observatory).
 
 GAIA is a derivative of the
 \htmladdnormallinkfoot{SkyCat}{http://archive.eso.org/skycat/} image
@@ -337,17 +339,21 @@ retangular region at the bottom of a window that may display a
 one-line description of the window element under the cursor (an
 approximation of balloon help).
 
-If you need help beyond what is available in these resources (or have
-any suggestions for improvements), then join the Starlink user support
+If you need help beyond what is available in these resources, or have
+any suggestions for improvements, then join the Starlink user support
 mailing lists at
 \begin{quote}
 \htmladdnormallink{\mytt{http://www.starlink.ac.uk}}{http://www.starlink.ac.uk}.
 \end{quote}
 The GAIA home page is at:
 \begin{quote}
-\htmladdnormallink{\mytt{http://www.starlink.rl.ac.uk/gaia/}}{http://www.starlink.rl.ac.uk/gaia/}.
+\htmladdnormallink{\mytt{http://www.starlink.ac.uk/gaia/}}{http://www.starlink.ac.uk/gaia/}.
 \end{quote}
-which may be updated from time-to-time. 
+which may be updated from time-to-time. GAIA is available for download
+as part of JAC Starlink Release at:
+\begin{quote}
+\htmladdnormallink{\mytt{http://starlink.jach.hawaii.edu}}{http://starlink.jach.hawaii.edu}.
+\end{quote}
 
 \subsection{\xlabel{using_gaia_from_the_cshell}Using GAIA from the C-shell}
 
@@ -367,8 +373,8 @@ You can also write to a specific window using the clone number:
 \begin{quote}
 \mytt{\% gaiadisp image\_name 2}
 \end{quote}
-This displays into the window with title \mytt{GAIA::SkyCat (2)}. If
-this window doesn't exist it will be created.
+This displays into the window with title \mytt{GAIA::SkyCat (2)}. 
+If this window doesn't exist it will be created.
 
 A list of images can be displayed in GAIA using the command:
 \begin{quote}
@@ -406,15 +412,15 @@ can be applied using the \mytt{-p} option:
 \section{\xlabel{what_does_it_actually_do}What does it actually do?}
 
 The capabilities of GAIA fall roughly into three areas; those of an
-image display tool, those provided for the analysis of images and
-those for querying on-line resources (catalogues of images and
-data). Each of these areas is described very briefly in the next
-sections. As with most graphical tools, probably the best way to find
-out about GAIA is to explore it interactively. Failing that many
-windows have a one-page description in the on-line help system and
-most graphical elements (\textit{buttons, entry fields etc.}) have
-one-line descriptions that appear in the short-help region at the
-bottom of windows.
+image and cube display tool, those provided for the analysis of images
+and cubes amd those for querying on-line resources (images and catalogue
+data held in the VO and other places). Each of these areas is described
+very briefly in the next sections. As with most graphical tools,
+probably the best way to find out about GAIA is to explore it
+interactively. Failing that many windows have a one-page description in
+the on-line help system and most graphical elements (\textit{buttons,
+entry fields etc.}) have one-line descriptions that appear in the
+short-help region at the bottom of windows.
 
 Windows that provide a limited range of controls for some kind of
 focussed task are called `toolboxes'. In general what they do should
@@ -565,30 +571,37 @@ astronomical work with images:
 \end{itemize}
 
 \subsection{\xlabel{online_catalogue_capabilities}On-line catalogue capabilities}
+
 Using the facilities provided by
 \htmladdnormallink{SkyCat}{http://archive.eso.org/skycat}, GAIA is
-also capable of using some of the increasingly large amounts of
-information available via the World Wide Web. For instance if your
-image has a world coordinate system associated with it, you can query
-the ESO catalogue of HST guide stars about any located within the
-bounds of your image. These will then be listed and plotted over your
-image.  Similarly you can query the
+capable of downloading images from several surveys and catalogues from a
+wide range of sources, so for instance if your image has a world
+coordinate system associated with it, you can query the ESO catalogue of
+HST guide stars about any located within the bounds of your image. These
+will then be listed and plotted over your image.  Similarly you can
+query the
 \htmladdnormallinkfoot{NED}{http://nedwww.ipac.caltech.edu}
-(NASA/IPAC Extragalactic Database) and SAO databases (and quite a few
-others) and see lists of all the objects that they know about on your
+(NASA/IPAC Extragalactic Database) and
+\htmladdnormallinkfoot{SIMBAD}{http://simbad.u-strasbg.fr/simbad}
+databases and see lists of all the objects that they know about on your
 image. You can also display an image returned directly from the
 \htmladdnormallinkfoot{Digital Sky Survey}
-{http://arch-http.hq.eso.org/dss/dss}(and then perform queries in
-other catalogues about this field). Named objects from certain
-catalogues can have their full information displayed in
-\htmladdnormallink{Netscape}{http://home.netscape.com} and may even
-have bibliography links to the
+{http://arch-http.hq.eso.org/dss/dss}(and then perform queries in other
+catalogues about this field). Named objects from certain catalogues can
+have their full information displayed in a web browser and may even have
+bibliography links to the
 \htmladdnormallinkfoot{ADS}{http://adswww.harvard.edu} abstract
 service.  Finally the
 \htmladdnormallinkfoot{HST}{http://cadcwww.dao.nrc.ca/hst} archives
 are also available. Using these you can see what observations have
 been made of any objects on your image (and preview any generally
 available).
+
+More recently GAIA has been extended to offer similar features,
+catalogue and image access, using the developing Virtual
+Observatory. These like the features above are found in the
+\mytt{Data-Servers} menu of the main window.
+
 \begin{htmlonly}
 \\
 \\
@@ -600,11 +613,13 @@ terms of the correct acknowledgement of copyright, use of service
 above.
 
 \subsection{Local catalogues}
-SkyCat allows you to save its catalogue queries to a local file. These
-can then be re-loaded and plotted as if on-line catalogues. This is
-very useful if you need to re-plot catalogues and have a slow network,
-but equally useful is the fact that local catalogues may be
-modified. So you can edit, sort, select and delete records.
+GAIA allows you to save remote catalogue queries to a local file. These
+can then be re-loaded and plotted as if on-line catalogues. This is very
+useful if you need to re-plot catalogues, but equally useful is the fact
+that local catalogues may be modified. So you can edit, sort, select and
+delete records (using a tool like 
+\htmladdnormallinkfoot{TOPCAT}{http://www.starlink.ac.uk/topcat} or a
+simple editor if the facilities GAIA offers are not sufficient).
 
 \subsubsection{Catalogue formats}
 Local catalogues may be stored in several formats. The ``native''
@@ -630,14 +645,16 @@ The usual format of a catalogue is as above, \textit{i.e.} an object identifier
 followed by an RA and DEC (in J2000 decimal degrees). Note the
 \mytt{<TAB>} strings shouldn't be typed in, they are shown explicitly
 just to make clear where they should be placed. The TST format is also
-recognised by the CURSA package (\xref{SUN/190}{sun190}{}), which also
-contains a description of this format.
+recognised by the TOPCAT and CURSA packages (\xref{SUN/190}{sun190}{}).
+CURSA also contains a description of this format.
 
 Additional formats that can be also read and written by GAIA (with a
 performance penalty) are those supported by the \xref{CURSA}{sun190}{}
 package (\textit{i.e.} FITS-tables and STL format) and the
 ``ASCII\_HEAD'' format of the SExtractor/EXTRACTOR package
-(\xref{SUN/226}{sun226}{}).
+(\xref{SUN/226}{sun226}{}), as well as the XML
+\htmladdnormallinkfoot{VOTable}{http://www.ivoa.net/cgi-bin/twiki/bin/view/IVOA/IvoaVOTable}
+format.
 
 The format that is used to open or write a catalogue, is determined by
 the file extension:
@@ -645,6 +662,7 @@ the file extension:
 \item \mybold{FITS tables}, accepted file types: \mytt{.FIT .fit .FITS .fits .GSC .gsc}
 \item \mybold{STL}, accepted file types: \mytt{.TXT .txt}
 \item \mybold{ASCII\_HEAD}, accepted file types: \mytt{.asc .ASC .lis .LIS}
+\item \mybold{VOTable}, accepted file types: \mytt{.xml .XML .vot .VOT}
 \end{itemize}
 All other file extensions are assumed to indicate a TST (the preferred
 extensions for these are \mytt{.tab} or \mytt{.TAB}).
@@ -670,12 +688,13 @@ in that order, \textit{e.g.}
 \end{verbatim}
 \end{quote}
 The columns should be space separated and the celestial coordinates
-should be in decimal degrees, or as shown above. More complex files
-can be imported into this toolbox using its `Import text file...'
-option (this allows fixed column widths or other separators). If you
-need to import such a file into a catalogue window, (this is the sort
-of window that queries to on-line catalogues are shown in, and provide
-extra facilities like applying intensity cuts etc.) then use the
+should be in decimal degrees, or sexagesimal format as shown above. More
+complex files can be imported into this toolbox using its `Import text
+file...'  option (this allows fixed column widths or other
+separators). If you need to import such a file into a catalogue window,
+(this is the sort of window that queries to on-line catalogues are shown
+in, and provide extra facilities like applying intensity cuts etc.) then
+use the
 \mytt{Import plain text file...} toolbox from the \mytt{Positions...} menu.
 
 You can also create your own local catalogues in TST format. This
@@ -721,7 +740,7 @@ local catalogue (which you can then edit into your tab files).
 To find out more about the TST format and how to configure plot
 symbols you should consult the ESO document
 \htmladdnormallinkfoot{`Astronomical Catalog Library'}
-{http://star-www.dur.ac.uk/\~{}pdraper/gaia/docs/cat.ps.gz} and
+{mytt{http://astro.dur.ac.uk/\~{}pdraper/gaia/docs/cat.ps.gz}} and
 `Writing Catalogue and Image Servers for GAIA and CURSA '
 (\xref{SSN/75}{ssn75}{}).
 
@@ -885,8 +904,8 @@ focus' type options switched off, if you feel that toolboxes and
 dialogs unnecessarily take charge of things like the focus.}).
 
 If you prefer to point at the image and text entry fields before using
-the keyboard, rather than having to click in them first (versions of
-GAIA pre-2.4 used this behaviour by default), then use the command:
+the keyboard, rather than having to click in them first, then use the
+command:
 \begin{quote}
 \begin{verbatim}
 % gaia image_name -focus_follows_mouse 1
@@ -924,7 +943,7 @@ reveal itself, just press the ``Start'' button to see the demo. Note
 that the demonstration contains flashing images.
 
 \section{\xlabel{finding_out_more_about_skycat}Finding out more about SkyCat}
-\htmladdnormallink{SkyCat}{http://archive.eso.org/skycat/} is being
+\htmladdnormallink{SkyCat}{http://archive.eso.org/skycat/} was
 developed at \htmladdnormallink{ESO}{http://www.eso.org/} as part of
 the \htmladdnormallink{VLT}{http://www.eso.org/vlt/} project and much
 documentation is available about the internals of how SkyCat (and
@@ -933,8 +952,8 @@ out about these then consult the postscript documents, which you can
 find from links on the \htmladdnormallinkfoot{SkyCat
 homepage}{http://archive.eso.org/skycat/}. The documents relevant to
 the version of SkyCat that GAIA is based on are also available at
-\htmladdnormallink{http://star-www.dur.ac.uk/\~{}pdraper/gaia/docs}
-{http://star-www.dur.ac.uk/~pdraper/gaia/docs}. People who would like
+\htmladdnormallink{\mytt{http://astro.dur.ac.uk/\~{}pdraper/gaia/docs}}
+{http://astro.dur.ac.uk/~pdraper/gaia/docs}. People who would like
 to extend SkyCat or GAIA at the user interface level are recommended
 to read about ``SkyCat plugins''.
 

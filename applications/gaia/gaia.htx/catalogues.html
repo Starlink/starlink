@@ -1,121 +1,77 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <html>
-<head>
-<title>On-line Catalogues and Image Stores</title>
-</head>
+  <head>
+    <title>On-line Catalogues and Image Stores</title>
+  </head>
 
-<body>
-<a name="xref_catalogues"></a>
-<h2 align=center><font color=red>On-line Catalogues and Image Stores</font></h2>
-<p>Using the facilities provided by SkyCat, GAIA is capable of using
-some of the increasingly large amounts of information available via
-the World Wide Web.
+  <body>
+    <a name="xref_catalogues"></a>
+    <h2 align=center><font color=red>On-line Catalogues and Image Stores</font></h2>
 
-<p>For instance if your image has a world coordinate system associated
-with it, you can query the ESO catalogue of HST guide stars about any
-located within the bounds of your image. These will then be listed and
-plotted over your image.  Similarly you can query the NED (NASA/IPAC
-Extragalactic Database) and SAO databases (and quite a few others) and
-see lists of all the objects that they know about on your image. To
-see the full list of available catalogues (they are many more and more
-are planned), look at the "Browse Catalog Directories..." item in the
-"Data-Servers" menu.
-<p align=center>
-<img src="dataservers.gif">
-<br>
-<p>Just for reference the catalogues shown in the "Catalogs" sub-menu are
-only a default set loaded from a local configuration file (you can add
-entries to this list using the "Add" button). Entries in the list that
-are shown as type "directory", should be expanded by pressing the
-associated plus sign (the names in this lists are returned from the
-remote server).
+    <p>
+      GAIA is capable of using much of the increasingly large amounts of
+      information available at astronomy data-centres distributed around the
+      world.
+    </p>
 
-<p>You can also display an image returned directly from the Digital
-Sky Survey (and then perform queries in other catalogues about this
-field). Named objects from certain catalogues can have their full
-information displayed in Netscape and may even have bibliography links
-to the ADS abstract service.  Finally the HST archives are also
-available. Using these you can see what observations have been made of
-any objects on your image (and preview any generally available).
+    <p>
+      The way that GAIA accesses on-line information is two-fold for
+      historical reasons. Using the older SkyCat facilities a preset list of
+      useful catalogues and images are available for query, whereas using the
+      newer Virtual Observatory query mechanisms an ever-expanding set of
+      resources is available. Access to both these query mechanisms is found
+      in the "Data-Servers" menu.
+    </p>
 
-Usage hints for the windows that actually display the catalogues are
-available:
-<ul>
-<li><a href="query.html">Catalogue query windows usage hints</a></li>
-</ul>
+    <ul>
+      <li><a href="skycat.html">SkyCat on-line resources</a></li>
+      <li><a href="vo.html">Virtual Observeratory on-line resources</a></li>
+    </ul>
 
-<p>It also has facilities for obtaining images (from the DSS) and for
-finding out about any previous observations made by HST, NNT and the
-CFHT.
+    <h3>Local catalogues</h3>
+    <p>Local catalogues are contained in files held on your local
+      computer. These are opened using the "Open" item in the "File" menu,
+      or by the "Local Catalogues" sub-menu in the "Data-Servers" menu (this
+      is available in the main window and in the catalogue window). Local
+      catalogues can be created by saving remote ones to disk (this is a
+      good idea when you have slow or intermittent internet access), or they
+      can be created by other programs (such as SExtractor -- SUN/225).
 
-<h3>Remote catalogues</h3>
-<p>Remote catalogues are obtained from Web servers over the internet.
-Typically these servers return object coordinates (as Right Ascension
-and Declination) together with other useful information, such as
-magnitudes and possibly links to bibliographic (ADS) and archive (HST,
-NNT and CFHT) details.
+    <p>The native format of local catalogues is called "tab-table". This
+      is a simple, plain-text, format that is described in the GAIA User
+      Note (SUN/214, the command <tt>showme sun214</tt> may display
+      this in netscape).
 
-<p>The main services used by GAIA and Skycat are provided by ESO, CADC
-and LEDAS.
+    <p>As well as this format (which is the most efficient to use), local
+      catalogues can be stored in any format accessible by the CURSA
+      (SUN/190) package (this includes FITS-tables), and the "ASCII_HEAD"
+      format used by the SExtractor package.
 
-<p>To see a list of all the catalogues available select the "Browse
-Catalog Directories..." item in the "Data-Servers" menu. This should
-reveal a window containing a directory-like listing of all the
-catalogues. Those marked with type "directory" may be expanded to show
-their full contents by pressing the plus sign against their names.
+    <p>It is also possible to "import" plain text files (that is ones that
+      are space, comma or fixed width separated) and display them as
+      catalogues. To do this you need to use the "Import plain text file..."
+      toolbox that is found in the "Positions..." sub menu of the
+      "Image-Analysis" menu. There is some specific help about the toolbox
+      that performs the import:
+    <ul>
+      <li><a href="importtext.html">Help on using the import text file toolbox</a></li>
+    </ul>
 
-<p>The catalogues shown outside of the site directory listings are the
-default set and are those shown in the "Catalogs" sub-menus of the
-"Data-Servers" menu.
+    <h3>Finding out more</h3>
+    <p>If you'd like to know more about the "Data-Servers" menu then look
+      in the "Help" menu on the main window and select "SkyCat...". This
+      should start up netscape and take you to the WWW Skycat page at
+      ESO. There's a FAQ and some other information. The description of how
+      the WCS system works is largely correct, but GAIA uses a different
+      back-end (the Starlink AST library) which supports more formats and
+      the NDF WCS component. You should also note that GAIA may not be using
+      the latest version of SkyCat, so everything described there may not be
+      available.
 
-<p>Queries for images of a region of sky can be made by selecting the
-"Image Servers" item and queries of existing observations of a region
-of sky by the "Archives" items.
+    <p>A rather more pointed description of how catalogues are served over
+      the web (and how to provide your own) is given in Starlink System Note
+      75 (SSN/75). This may be available on your local machine, or from
+      Starlink (try "http://www.starlink.rl.ac.uk/docs/ssn75.htx/ssn75.html").
 
-<h3>Local catalogues</h3>
-<p>Local catalogues are contained in files held on your local
-computer. These are opened using the "Open" item in the "File" menu,
-or by the "Local Catalogues" sub-menu in the "Data-Servers" menu (this
-is available in the main window and in the catalogue window). Local
-catalogues can be created by saving remote ones to disk (this is a
-good idea when you have slow or intermittent internet access), or they
-can be created by other programs (such as SExtractor -- SUN/225).
-
-<p>The native format of local catalogues is called "tab-table". This
-is a simple, plain-text, format that is described in the GAIA User
-Note (SUN/214, the command <tt>showme sun214</tt> may display
-this in netscape).
-
-<p>As well as this format (which is the most efficient to use), local
-catalogues can be stored in any format accessible by the CURSA
-(SUN/190) package (this includes FITS-tables), and the "ASCII_HEAD"
-format used by the SExtractor package.
-
-<p>It is also possible to "import" plain text files (that is ones that
-are space, comma or fixed width separated) and display them as
-catalogues. To do this you need to use the "Import plain text file..."
-toolbox that is found in the "Positions..." sub menu of the
-"Image-Analysis" menu. There is some specific help about the toolbox
-that performs the import:
-<ul>
-<li><a href="importtext.html">Help on using the import text file toolbox</a></li>
-</ul>
-
-<h3>Finding out more</h3>
-<p>If you'd like to know more about the "Data-Servers" menu then look
-in the "Help" menu on the main window and select "SkyCat...". This
-should start up netscape and take you to the WWW Skycat page at
-ESO. There's a FAQ and some other information. The description of how
-the WCS system works is largely correct, but GAIA uses a different
-back-end (the Starlink AST library) which supports more formats and
-the NDF WCS component. You should also note that GAIA may not be using
-the latest version of SkyCat, so everything described there may not be
-available.
-
-<p>A rather more pointed description of how catalogues are served over
-the web (and how to provide your own) is given in Starlink System Note
-75 (SSN/75). This may be available on your local machine, or from
-Starlink (try "http://www.starlink.rl.ac.uk/docs/ssn75.htx/ssn75.html").
-
-</body>
+  </body>
 </html>

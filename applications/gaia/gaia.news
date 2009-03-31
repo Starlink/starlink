@@ -1,7 +1,22 @@
-   
- 
+
     Version 4.3-0
     =============
+
+    The most significant changes in this release are the introduction
+    of facilities for querying the Virtual Observatory for images and
+    catalogues. These new query toolboxes are located in the Data-Analysis
+    menu.
+
+    Other significant changes are the introduction of support for the 
+    VOTable catalogue format, and various special catalogue types
+    created by the SMURF and KAPPA packages.
+
+    Catalogues with suitable descriptions will now have their coordinate
+    systems matched to that of the displayed image. For instance
+    this means you can now query for catalogue positions in J2000 and plot
+    over an image set to B1950 and vice versa.
+
+    Other changes include:
 
     The mean angles reported by the select positions toolbox are now
     normalised as position angles. Previously they were just the arithmetic
@@ -37,11 +52,6 @@
     A new command-line option -rtd_autocut has been added. This applies
     the -default_cut percentile to any images received by the realtime
     interface.
-
-    Catalogue windows now transform their positions from the given equinox
-    to the equinox of the image before plotting marker symbols. For instance
-    this means you can now query for catalogue positions in J2000 and plot
-    over an image set to B1950 and vice versa.
 
     The contour toolbox now detects cubes displayed in other windows and
     will step through the slices of the cube contouring each in turn over
