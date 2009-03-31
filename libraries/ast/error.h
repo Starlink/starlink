@@ -77,6 +77,15 @@
 *-
 */
 
+/* Suppress "operands are evaluated in unspecified order" warnings from
+   the Intel icc compiler. These are caused by the astGetStatusPtr_
+   function being called several times within each of the macros that 
+   form the public interface for AST. */
+#ifdef __INTEL_COMPILER
+#pragma warning(disable:981)
+#endif
+
+
 /* Include files. */
 /* ============== */
 #if defined(THREAD_SAFE)
@@ -263,7 +272,7 @@ typedef struct AstStatusBlock {
 
 int *astWatch_( int * );
 void astClearStatus_( int * );
-int *astGetStatusPtr_( void );
+int *astGetStatusPtr_( void )__attribute__((pure));
 void astAt_( const char *, const char *, int, int, int * );
 
 #if defined(astCLASS) || defined(astFORTRAN77)      /* Protected only */
