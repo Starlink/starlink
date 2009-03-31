@@ -11,7 +11,7 @@
 
 /* Main function. */
 /* ============== */
-int main( int argc, char *argv[] ) {
+int main( void ) {
 /*
 *+
 *  Name:
@@ -38,6 +38,7 @@ int main( int argc, char *argv[] ) {
 *     None.
 
 *  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
 
@@ -60,6 +61,7 @@ int main( int argc, char *argv[] ) {
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
 *     DSB: David S. Berry (Starlink)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 
 *  History:
 *     18-NOV-1997 (RFWS);
@@ -68,6 +70,8 @@ int main( int argc, char *argv[] ) {
 *        Ensure that the number of digits used is at least the minimum
 *        required by IEEE for a conversion from binary to string and back 
 *        to binary to be an identity. 
+*     31-MAR-2009 (TIMJ):
+*        Does not take any arguments so don't try to read arguments.
 *-
 */
 
