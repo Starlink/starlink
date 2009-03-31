@@ -42,6 +42,10 @@
 *          If set use polar representation of FFT with squared amplitudes
 *     OUT = NDF (Write)
 *          Output files
+*     OUTFILES = LITERAL (Write)
+*          The name of text file to create, in which to put the names of
+*          all the output NDFs created by this application (one per
+*          line). If a null (!) value is supplied no file is created. [!]
 
 *  Authors:
 *     Edward Chapin (UBC)
@@ -55,9 +59,12 @@
 *        Use kaplibs for group in/out.
 *     2008-07-30 (EC):
 *        Handle raw data (filter out / apply darks, flatfield)
+*     2009-03-30 (TIMJ):
+*        Add OUTFILES parameter.
+*     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2008 University of British Columbia.
 *     All Rights Reserved.
 
@@ -206,6 +213,13 @@ void smurf_sc2fft( int *status ) {
     
     /* Free resources */
     smf_close_file( &idata, status );
+  }
+
+  /* Write out the list of output NDF names, annulling the error if a null
+     parameter value is supplied. */
+  if( *status == SAI__OK ) {
+    grpList( "OUTFILES", 0, 0, NULL, ogrp, status );
+    if( *status == PAR__NULL ) errAnnul( status );
   }
 
   /* Tidy up after ourselves: release the resources used by the grp routines */

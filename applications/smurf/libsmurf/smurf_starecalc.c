@@ -38,6 +38,10 @@
 *          Name of input data files
 *     OUT = NDF (Write)
 *          Name of output file containing STARE images
+*     OUTFILES = LITERAL (Write)
+*          The name of text file to create, in which to put the names of
+*          all the output NDFs created by this application (one per
+*          line). If a null (!) value is supplied no file is created. [!]
 *     NAVER = _INTEGER (Read)
 *          Number of frames to average together in output images. If a
 *          NULL value is given, NAVER is calculated dynamically for
@@ -58,10 +62,12 @@
 *        Add NAVER as a parameter
 *     2008-12-12 (TIMJ):
 *        Add BPM parameter.
+*     2009-03-30 (TIMJ):
+*        Add OUTFILES parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2008 University of British Columbia. All Rights
 *     Reserved.
 
@@ -196,6 +202,13 @@ void smurf_starecalc ( int *status ) {
     }
     /* Free resources for output data */
     smf_close_file( &data, status );
+  }
+
+  /* Write out the list of output NDF names, annulling the error if a null
+     parameter value is supplied. */
+  if( *status == SAI__OK ) {
+    grpList( "OUTFILES", 0, 0, NULL, ogrp, status );
+    if( *status == PAR__NULL ) errAnnul( status );
   }
 
   /* Free up resources */

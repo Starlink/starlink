@@ -39,6 +39,10 @@
 *          Order of the polynomial to fit. Default 1 (linear).
 *     OUT = NDF (Write)
 *          Dark subtracted and flatfielded output file for each input file.
+*     OUTFILES = LITERAL (Write)
+*          The name of text file to create, in which to put the names of
+*          all the output NDFs created by this application (one per
+*          line). If a null (!) value is supplied no file is created. [!]
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -52,6 +56,9 @@
 *        Use kaplibs and do dark subtraction.
 *     2008-12-12 (TIMJ):
 *        Add bad pixel masking. Do not trap SMF__FLATN.
+*     2009-03-30 (TIMJ):
+*        Add OUTFILES parameter.
+*     {enter_further_changes_here}
 
 *  Notes:
 
@@ -172,6 +179,13 @@ void smurf_scanfit( int * status ) {
 
     /* Free resources for output data */
     smf_close_file( &ffdata, status );
+  }
+
+  /* Write out the list of output NDF names, annulling the error if a null
+     parameter value is supplied. */
+  if( *status == SAI__OK ) {
+    grpList( "OUTFILES", 0, 0, NULL, ogrp, status );
+    if( *status == PAR__NULL ) errAnnul( status );
   }
 
   /* Tidy up after ourselves */

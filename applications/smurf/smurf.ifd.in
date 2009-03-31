@@ -199,6 +199,8 @@
 #         Add FLAGSTAT to SC2CLEAN
 #     27-MAR-2009 (TIMJ):
 #         Add CALCRESP
+#     2009-03-30 (TIMJ):
+#         Add OUTFILES to all routines.
 #     {enter_changes_here}
 
 #  Bugs:
@@ -298,6 +300,15 @@ package @PACKAGE@ {
                 vpath {PROMPT }
                 association ->GLOBAL.DATA_ARRAY
                 prompt {Output NDF data structure}
+                helpkey *
+            }
+
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
                 helpkey *
             }
 
@@ -664,6 +675,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
             parameter bpm {
                 type NDF
                 access READ
@@ -790,6 +810,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
             parameter msg_filter {
                 type _CHAR
                 prompt {Message level}
@@ -866,6 +895,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
             parameter order {
                 position 3
                 type INTEGER
@@ -920,6 +958,15 @@ package @PACKAGE@ {
                 vpath {PROMPT }
                 association ->GLOBAL.DATA_ARRAY
                 prompt {Sky-subtracted timeseries}
+                helpkey *
+            }
+
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
                 helpkey *
             }
 
@@ -1219,6 +1266,7 @@ package @PACKAGE@ {
                 prompt {Input data file(s)}
                 helpkey *
             }
+
             parameter out {
                 position 2
                 type NDF
@@ -1229,11 +1277,21 @@ package @PACKAGE@ {
                 prompt {Output data file(s)}
                 helpkey *
             }
+
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
             parameter naver {
                 type _INTEGER
                 prompt {Number of samples to average together to produce an image}
                 vpath DEFAULT
-		default !
+                default !
                 ppath GLOBAL CURRENT
                 helpkey *
             }
@@ -2207,6 +2265,14 @@ package @PACKAGE@ {
                 prompt {Cleaned timeseries}
                 helpkey *
             }
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
             parameter apod {
                 type _INTEGER
                 vpath {DEFAULT}
@@ -2382,6 +2448,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
             parameter maxlen {
                 type _DOUBLE       
                 access READ
@@ -2447,6 +2522,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                helpkey *
+            }
+
             parameter inverse {
                 type _LOGICAL
                 vpath {DEFAULT }
@@ -2504,6 +2588,15 @@ package @PACKAGE@ {
                 vpath {PROMPT }
                 association ->GLOBAL.DATA_ARRAY
                 prompt {Output filename}
+                helpkey *
+            }
+
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
                 helpkey *
             }
 

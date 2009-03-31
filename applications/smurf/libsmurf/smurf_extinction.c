@@ -52,6 +52,10 @@
 *          filter.
 *     OUT = NDF (Write)
 *          Output file(s)
+*     OUTFILES = LITERAL (Write)
+*          The name of text file to create, in which to put the names of
+*          all the output NDFs created by this application (one per
+*          line). If a null (!) value is supplied no file is created. [!]
 *     HASSKYREM = LOGICAL (Read)
 *          Indicate that the data have been sky removed even if the
 *          fact can not be verified. This is useful for the case where you
@@ -115,12 +119,14 @@
 *     2008-12-16 (TIMJ):
 *        Rename METHOD to TAUSRC. METHOD now controls airmass calculation
 *        method. Use new API for smf_correct_extinction.
+*     2009-03-30 (TIMJ):
+*        Add OUTFILES parameter.
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2005 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2005-2008 University of British
 *     Columbia. All Rights Reserved.
@@ -329,6 +335,14 @@ void smurf_extinction( int * status ) {
     /* Free resources for output data */
     smf_close_file( &odata, status );
   }
+
+  /* Write out the list of output NDF names, annulling the error if a null
+     parameter value is supplied. */
+  if( *status == SAI__OK ) {
+    grpList( "OUTFILES", 0, 0, NULL, ogrp, status );
+    if( *status == PAR__NULL ) errAnnul( status );
+  }
+
   /* Tidy up after ourselves: release the resources used by the grp routines  */
   if (darks) smf_close_related( &darks, status );
   if (bpms) smf_close_related( &bpms, status );
