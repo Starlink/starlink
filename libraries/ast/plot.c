@@ -2152,7 +2152,7 @@ static void DrawText( AstPlot *, int, int, const char *, float, float, const cha
 static void DrawTicks( AstPlot *, TickInfo **, int, double *, double *, const char *, const char *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void GAttr( AstPlot *, int, double, double *, int, const char *, const char *, int * );
-static void GFlush( AstPlot *, const char *, const char *, int * );
+static void GFlush( AstPlot *, const char *, const char *, int * )__attribute__((unused));
 static void GLine( AstPlot *, int, const float *, const float *, const char *, const char *, int * );
 static void GMark( AstPlot *, int, const float *, const float *, int, const char *, const char *, int * );
 static void GQch( AstPlot *, float *, float *, const char *, const char *, int * );

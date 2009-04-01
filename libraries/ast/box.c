@@ -1248,6 +1248,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Initialise. */
    result = -1;
+   i1 = 0;
 
 /* Check the global error status. */
    if ( !astOK ) return result;

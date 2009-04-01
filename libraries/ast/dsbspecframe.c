@@ -251,7 +251,7 @@ AstDSBSpecFrame *astDSBSpecFrameId_( const char *, ... );
 /* ======================================== */
 
 static AstMapping *TopoMap( AstDSBSpecFrame *, int, const char *, int * );
-static AstMapping *ToLOMapping( AstDSBSpecFrame *, const char *, int * );
+static AstMapping *ToLOMapping( AstDSBSpecFrame *, const char *, int * )__attribute__((unused));
 static AstMapping *ToLSBMapping( AstDSBSpecFrame *, const char *, int * );
 static AstMapping *ToUSBMapping( AstDSBSpecFrame *, const char *, int * );
 static const char *GetAttrib( AstObject *, const char *, int * );

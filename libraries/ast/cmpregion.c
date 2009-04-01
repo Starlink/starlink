@@ -1917,11 +1917,11 @@ static AstRegion *RegBasePick( AstRegion *this_region, int naxes,
                                               (AstRegion *) frm2, 
                                               this->oper, "", status );
       }
-   }
 
 /* Free resources */
+      frm2 = astAnnul( frm2 );      
+   }
    frm1 = astAnnul( frm1 );      
-   frm2 = astAnnul( frm2 );      
 
 /* Return a NULL pointer if an error has occurred. */
    if( !astOK ) result = astAnnul( result );
