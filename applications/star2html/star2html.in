@@ -249,6 +249,12 @@
 #        - fix \n problem with `pwd` call
 #        - use multi-arg system() and 3-arg open()
 #        - use File::Spec and Getopt::Long
+#     31-MAR-2009 (TIMJ):
+#        - $' and $` no longer used (use @- and @+ instead)
+#        - Fix warning with undef TEXINPUTS
+#        - Handle multiple \copyrights in copyright section
+#        - Fix logic in edit_main so that filehandles close automatically
+#          on exit
 #     {enter_further_changes_here}
 
 #  Bugs:
