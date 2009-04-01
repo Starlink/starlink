@@ -282,7 +282,7 @@ my $AUXCOPY = 0;
 
 #  Default copyright statement.
 my $year = ((gmtime())[5]) + 1900;
-my $DEFAULT_COPYRIGHT = 'Copyright &copy ' . $year .
+my $DEFAULT_COPYRIGHT = 'Copyright &copy; ' . $year .
     ' Science and Technology Facilities Council';
 
 #  Do split file into parts by default.
@@ -471,7 +471,7 @@ if ( $NOCOPYRIGHT ) {
 } elsif ( !$COPYRIGHT ) {
    $COPYRIGHT = &get_item('\stardoccopyright');
    if ( $COPYRIGHT ) {
-      $COPYRIGHT =~ s/\\copyright\\/&copy/g;
+      $COPYRIGHT =~ s/\\copyright\\/&copy\;/g;
       $COPYRIGHT =~ s/\\newline\\/<BR>/g;
    } elsif ( $ENV{'HTX_COPYRIGHT'} ) {
       $COPYRIGHT = $ENV{'HTX_COPYRIGHT'};
@@ -562,7 +562,8 @@ system( $LATEX2HTML,
 if ( $? ) {
   print( "Star2HTML fatal: Translation of document $TEXFILE failed.\n" );
 } elsif ( $COPYRIGHT ) {
-   $COPYRIGHT =~ s/&copy/(C)/;
+   $COPYRIGHT =~ s/&copy\;?/(C)/g;
+   $COPYRIGHT =~ s/<BR>//g;
    print("Document copyrighted:\n$COPYRIGHT\n");
 }
 
