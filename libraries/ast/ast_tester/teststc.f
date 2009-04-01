@@ -178,9 +178,7 @@ c      call ast_listissued( 'teststc' )
 
       call ast_getregionbounds( obj, lbnd, ubnd, status )
       if( abs( lbnd(3) ) .gt. 1.0D-6 ) THEN
-
-      write(*,*) lbnd(3)
-
+         write(*,*) lbnd(3)
          call stopit( status, 'Error 0f' )
       END IF
 
@@ -531,8 +529,8 @@ c      call ast_listissued( 'teststc' )
 
 
 *  Uncertainty tests
-      unc = ast_getunc( obj, .false., status )
 
+      unc = ast_getunc( obj, .true., status )
 
       if( unc .eq. AST__NULL ) call stopit( status, 'Error 9' )
       if( ast_getunc( unc, .false., status ) .ne. AST__NULL ) 
@@ -540,8 +538,10 @@ c      call ast_listissued( 'teststc' )
 
       call ast_getregionbounds( unc, lbnd, ubnd, status )
 
+
       if( abs( lbnd(1) + 2.42406841E-06 ) .gt. 0.0000001E-06 ) 
      :      call stopit( status, 'Error 10' )
+
       if( abs( lbnd(2) + 2.42406841E-06 ) .gt. 0.0000001E-06 ) 
      :      call stopit( status, 'Error 11' )
       if( abs( 86400.0D0*lbnd(3) + 5.0D-5 ) .gt. 0.1E-10 ) 
@@ -1465,8 +1465,9 @@ c      end if
 *  Check it is a STCObsDataLocation
       if( .not. ast_isastcobsdatalocation( obj, status ) ) 
      :                      call stopit( status, 'Error 1' )
-*  Check it contains a Box.
-      if( .not. ast_isabox( ast_getstcregion( obj, status ),
+
+*  Check it contains a Prism.
+      if( .not. ast_isaprism( ast_getstcregion( obj, status ),
      :                           status  ) )
      :                      call stopit( status, 'Error 1a' )
 
@@ -1551,7 +1552,7 @@ c      end if
       if( ast_getc( obj, 'ObsLat', status ) .ne. 'N31:57:30.96' ) 
      :      call stopit( status, 'Error 19' )
 
-      unc = ast_getunc( obj, .false., status )
+      unc = ast_getunc( obj, .true., status )
       if( unc .eq. AST__NULL ) call stopit( status, 'Error 20' )
 
       call ast_getregionbounds( unc, lbnd, ubnd, status )
@@ -1561,19 +1562,20 @@ c      end if
       lbnd(3) = 0.5*(lbnd(3) + ubnd(3))
       lbnd(4) = 0.5*(lbnd(4) + ubnd(4))
 
-      if( abs( lbnd(1) - 2.59858948190075D0) .gt. 1E-06 ) 
+      if( abs( lbnd(1) - 2.59858948190075D0) .gt. 1E-05 ) 
      :      call stopit( status, 'Error 21' )
-      if( abs( lbnd(2) - 1.20541670934471D0) .gt. 1E-06 ) 
+      if( abs( lbnd(2) - 1.20541670934471D0) .gt. 1E-05 ) 
      :      call stopit( status, 'Error 22' )
-      if( abs( lbnd(3) ) .gt. 1.0D-6 ) 
+      if( abs( lbnd(3) ) .gt. 1.0D-05 ) 
      :      call stopit( status, 'Error 23' )
       if( abs( lbnd(4) - 4600.0D0) .gt. 0.0001 ) 
      :      call stopit( status, 'Error 24' )
-      if( abs( ubnd(1) - 2.59859209989462D0) .gt. 1E-06 ) 
+      if( abs( ubnd(1) - 2.59859209989462D0) .gt. 1E-05 ) 
      :      call stopit( status, 'Error 25' )
-      if( abs( ubnd(2) - 1.20541932733859D0) .gt. 1E-06 ) 
+
+      if( abs( ubnd(2) - 1.20541932733859D0) .gt. 1E-05 ) 
      :      call stopit( status, 'Error 26' )
-      if( abs( ubnd(3) - 0.3803143212621760D-03 ) .gt. 1E-6 ) 
+      if( abs( ubnd(3) - 0.3803143212621760D-03 ) .gt. 1E-05 ) 
      :      call stopit( status, 'Error 27' )
       if( abs( ubnd(4) - 4600.0002D0) .gt. 0.000001 ) 
      :      call stopit( status, 'Error 28' )

@@ -84,7 +84,7 @@ foreach prog (teststc testspecframe testfitschan testswitchmap testrebin testtra
 
 g95 -fno-second-underscore -w -g -o $prog -g $prog.f -I$AST/include \
      -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` \
-     `prm_link` `chr_link` `err_link`
+     `psx_link` `prm_link` `chr_link` `err_link`
 
 $prog
 #rm $prog
@@ -137,7 +137,7 @@ foreach n (*.head)
    endif
 
    if( $1 != "-nd" ) then
-      gv $psfile 
+      gv $psfile -orientation=landscape
    endif
 
 end
