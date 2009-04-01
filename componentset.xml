@@ -866,7 +866,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>1.10</version>
+  <version>1.10-5</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -1556,7 +1556,7 @@ package.
 </component>
 
 <component id="smurf">
-  <version>0.4.1</version>
+  <version>0.5.0</version>
   <path>applications/smurf</path>
   <description>SURF2 - SCUBA-2 User Reduction Facility</description>
   <abstract><p>
@@ -4827,7 +4827,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ast" support="S">
-  <version>5.1-0</version>
+  <version>5.2-0</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -6287,7 +6287,7 @@ Ultrix and for SunOS and may still work for them.
   <path>thirdparty/eso/skycat</path>
   <description>The main skycat component</description>
   <dependencies >
-    <build option='link'>tcl</build><build option='link'>tk</build><build option='link'>tkimg</build><build option='link'>blt</build><build option='link'>itcl</build><build option='link'>tclx</build>
+    <build option='link'>cfitsio</build><build option='link'>tcl</build><build option='link'>tk</build><build option='link'>tkimg</build><build option='link'>blt</build><build option='link'>itcl</build><build option='link'>tclx</build>
   </dependencies>
   <developers>
     <person>
@@ -6439,7 +6439,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="cfitsio" support="U">
-  <version>3.06</version>
+  <version>3.13</version>
   <path>thirdparty/heasarc/cfitsio</path>
   <description>CFITSIO -- C and Fortran libraries for access to FITS files
         </description>

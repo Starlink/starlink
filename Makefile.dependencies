@@ -2257,6 +2257,7 @@ $(MANIFESTS)/shl: \
 
 $(MANIFESTS)/skycat: \
 		$(MANIFESTS)/blt \
+		$(MANIFESTS)/cfitsio \
 		$(MANIFESTS)/itcl \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tclx \
