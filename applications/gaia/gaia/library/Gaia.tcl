@@ -27,7 +27,7 @@
 #  Copyright:
 #     Copyright (C) 1998-2001 Central Laboratory of the Research Councils
 #     Copyright (C) 2006-2007 Particle Physics & Astronomy Research Council.
-#     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+#     Copyright (C) 2007-2009 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -121,7 +121,7 @@ Starlink GAIA version $gaia_version
 
 Copyright (C) 1997-2005 Central Laboratory of the Research Councils
 Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council
-Copyright (C) 2007-2008 Science and Technology Facilities Council
+Copyright (C) 2007-2009 Science and Technology Facilities Council
 
 Authors:
 Peter W. Draper (p.w.draper@durham.ac.uk)
@@ -130,7 +130,7 @@ David S. Berry (dsb@ast.man.ac.uk)
 Mark Taylor (m.b.taylor@bristol.ac.uk)
 
 GAIA is derived from SkyCat version $skycat_version
-Copyright (C) 1996-2006 ESO - European Southern Observatory
+Copyright (C) 1996-2008 ESO - European Southern Observatory
 
 Authors:
 Allan Brighton (abrighto@eso.org)
@@ -518,14 +518,14 @@ itcl::class gaia::Gaia {
    public method add_help_menu {} {
       if { ! $help_menu_done_ } {
          set help_menu_done_ 1
-         set m [add_help_button index "Help topics index..." \
+         set m [add_help_button index "Help..." \
                    {Display the main help window and index}]
 
          add_menuitem $m command "About ${appname_}..." \
             {Display a window with information about this GAIA/SkyCat version}\
             -command [code $itk_component(image) about]
 
-         add_menuitem $m command "SkyCat..." \
+         add_menuitem $m command "About SkyCat..." \
             {Display information about SkyCat in browser} \
             -command [code $itk_component(image) send_to_browser \
                          $itk_option(-help_url)]
@@ -2376,7 +2376,8 @@ window gives you access to this."
 
          #  Open dialog.
          utilReUseWidget gaiavo::GaiaVOCatsSIAP $w_.siapquery \
-            -siap_catalog $siap_file -gaia [scope $this] -title "SIAP services"
+            -siap_catalog $siap_file -gaia [scope $this] \
+            -title "SIAP services" -help_file siap
 
       } else {
          error_dialog "No GAIA-VO extension is available" $w_
@@ -2393,9 +2394,11 @@ window gives you access to this."
          utilReUseWidget gaiavo::GaiaVOCatRegistry $w_.voregistry \
             -catalog $cone_file \
             -service CONE \
+            -title "Catalogue Cone search" \
             -show_cols {shortName title} \
             -activate_cmd [code $this vo_query_cone_] \
-            -whole_operation 0
+            -whole_operation 0 \
+            -help_file cone
       } else {
          error_dialog "No GAIA-VO extension is available" $w_
       }
@@ -2412,7 +2415,8 @@ window gives you access to this."
             set name [gaiavo::GaiaVOCatCone::getName $headers $row]
             gaiavo::GaiaVOCatCone $w_.conequery\#auto \
                -accessURL $accessURL -shortname $name -gaia $this \
-               -title "$name Cone Search service"
+               -title "$name Cone Search service" \
+               -help_file conesearch
          } else {
             warning_dialog "Cone service does not specify an accessURL" $w_
          }

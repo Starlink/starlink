@@ -198,7 +198,7 @@ itcl::class gaiavo::GaiaVOCatCone {
    #  Open a service, "args" is a list of values from a row of the current
    #  table.
    protected method open_service_ {args} {
-      puts "nothing done with open_service_"
+      #  Do nothing.
    }
 
    #  Extract the accessURL for the Cone Search service from a list of headers

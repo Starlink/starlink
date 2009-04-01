@@ -6,7 +6,7 @@
 #     [incr Tcl] class
 
 #  Purpose:
-#     Query a (the) VO registry for services.
+#     Query the VO registry for services.
 
 #  Description:
 #     Extends the GaiaVOCat class to query the supported registries
@@ -212,6 +212,14 @@ itcl::class gaiavo::GaiaVOCatRegistry {
          set info_ $result
       }
       $itk_component(results) config -info $info_
+   }
+
+   #  Add more help if this is just a simple registry query.
+   protected method add_help_menu_ {} {
+      if { $itk_option(-help_file) == {} } {
+         add_help_button registry "On Window..." {Help on this window}
+      }
+      GaiaVOCat::add_help_menu_
    }
 
    #  Configuration options: (public variables)

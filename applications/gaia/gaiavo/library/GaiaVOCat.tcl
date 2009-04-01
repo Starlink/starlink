@@ -156,6 +156,9 @@ itcl::class gaiavo::GaiaVOCat {
    #  options in sub-classes (add_query_component_ is defined there).
    public method init {} {
 
+      #  Help menu.
+      add_help_menu_
+
       #  Add the query component. Usually has some controls
       #  for establishing the query context and initiating it.
       add_query_component_
@@ -335,10 +338,10 @@ itcl::class gaiavo::GaiaVOCat {
    }
 
    #  Re-read catalogue to refresh. Note there is a wart here. For VOTables
-   #  only the backing store TST has been updated. So we need to take a copy 
+   #  only the backing store TST has been updated. So we need to take a copy
    #  of the backing file before opening it as it will be deleted when the
    #  astrocat sees that the file name has changed (from the VOTable name).
-   protected method refresh_ {} { 
+   protected method refresh_ {} {
 
       #  Prepare to delete last catalogue file (could be open, so defer).
       set oldfile $newfile_
@@ -353,7 +356,7 @@ itcl::class gaiavo::GaiaVOCat {
       if { [::file exists $oldfile] } {
          catch { ::file delete -force $oldfile }
       }
-      
+
       #   Finally open catalogue, read and update display.
       $w_.cat open $newfile_
       $w_.cat query
@@ -494,10 +497,20 @@ itcl::class gaiavo::GaiaVOCat {
       puts stderr "Must implement an add_query_component_ method"
    }
 
-   #  Open a service, "args" is a list of values from a row of the 
+   #  Open a service, "args" is a list of values from a row of the
    #  current table.
    protected method open_service_ {args} {
       puts stderr "Must implemenent an open_service_ method"
+   }
+
+   #  Add and populate the help menu. Has the VO overview by default
+   #  plus an additional topic defined by help_file and help_label.
+   protected method add_help_menu_ {} {
+      if { $itk_option(-help_file) != {} && $itk_option(-help_label) != {} } {
+         add_help_button $itk_option(-help_file) $itk_option(-help_label) \
+            {Help on this window...}
+      }
+      add_help_button vo "About VO services..." {Help on VO in GAIA}
    }
 
    #  Check for a file ~/.skycat/proxies, once each session, and use it to
@@ -534,6 +547,10 @@ itcl::class gaiavo::GaiaVOCat {
    #  this will open a window to do the actual service query for images etc.
    itk_option define -activate_cmd activate_cmd Activate_Cmd {}
 
+   #  Define a help file and label for the Help menu.
+   itk_option define -help_file help_file Help_File {}
+   itk_option define -help_label help_label Help_Label "On Window..."
+
    #  Protected variables: (available to instance)
    #  --------------------
 
@@ -545,7 +562,7 @@ itcl::class gaiavo::GaiaVOCat {
 
    #  Component that will perform the query. Must be defined in add_query_component_.
    protected variable query_component_ {}
-   
+
    #  Temporary file for modified table contents.
    protected variable newfile_ {}
 

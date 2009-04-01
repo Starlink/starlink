@@ -1,13 +1,47 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
-    <title>Virtual Observatory resources</title>
+    <title>Virtual Observatory Resources</title>
   </head>
 
   <body>
     <a name="xref_skycat"></a>
-    <h2 align=center><font color=red>Virtual Observatory resources</font></h2>
-
+    <h2 align=center><font color=red>Virtual Observatory Resources</font></h2>
+    <p>
+      Currently access to VO resources cover catalogues using so called cone
+      search (CS) and images using simple image access protocol
+      (SIAP). Toolboxes for accessing these are found in the "Data-Servers"
+      menu.
+    </p>
+    <p>
+      The two toolboxes offer differing approaches to accessing resources, but
+      fundamentally work the same way: locate what services are available by
+      querying a registry and then querying individual services for a
+      catalogue or image that covers a given region of sky.
+    </p>
+    <p>
+      VO resources are registered in a registry, so typically you find what
+      services are available for a service type by initially querying the
+      registry. To avoid this overhead GAIA has a cached version of a full
+      registry response, but typically you'll want to refine these lists using
+      additional constraints.
+    </p>
+    <p>
+      In the case of images, for which there are fewer servers and generally
+      you'll only want a single image at a time, this step needs to be
+      accessed using "View image servers..." dialog in the toolbox.
+    </p>
+    <p>
+      For catalogues, of which they are many, restricting the list of services
+      is a more immediate need, so this forms the first part of the dialog.
+    </p>
+    <p>
+      See the individual toolbox help pages for more.
+    </p>
+    <ul>
+      <li><a href="cone.html">Catalogue cone search</a></li>
+      <li><a href="siap.html">Simple image access search</a></li>
+    </ul>
 
   </body>
 </html>

@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Simple Image Access</title>
+  </head>
+
+  <body>
+    <a name="xref_siap"></a>
+    <h2 align=center><font color=red>Simple Image Access</font></h2>
+    <p>
+      Using this tool you can query the current list of Simple Image Access
+      servers for lists of any images that they have for the given region of
+      sky. 
+    </p>
+    <h3>Defining the search region</h3>
+    <p>
+      You can define the sky region using either an object name lookup,
+      entering the RA and Dec (FK5/J2000) coordinates, making it the same
+      region as the displayed image (<tt>Set area from image</tt>) or by
+      dragging out a region of the displayed image 
+      (<tt>Select area...</tt>). You can define a height and width for the
+      region, in arcminutes, but not all servers will make use of that
+      information, using just the width. Some servers will also just return a
+      plate containing the region.
+    </p>
+    <p>
+      Once you have defined the region to check for images press the 
+      <tt>Query</tt> button. That will initiate a series of queries to all the
+      known servers. Successful responses will add a new menu item to the
+      <tt>SIAP server results:</tt> drop-down menu. Select an item to see the
+      page of images available.
+    </p>
+
+    <h3>Displaying an image</h3>
+    <p
+      To download and display an image either double click on the selected
+      row, or just select a row and press either <tt>Display</tt> or 
+      <tt>Display in new</tt>. 
+    </p>
+
+    <h3>Changing the servers to query</h3>
+    <p>
+      Querying all the servers can take quite a long time and you may have a
+      better idea of those which are relevant to your science goal. To change
+      the list press the <tt>View image servers...</tt>. Using that you can 
+      remove servers from the query list and query a VO registry about
+      additional services not already available, as well as being able to
+      apply a constraint like selecting only servers that have a string in
+      their titles.
+    </p>
+    
+    <h3>Blacklisting</h3>
+    <p>
+      Because the VO is an evolving service many servers have been put up for
+      testing only and never return a good set of images. These servers are
+      best just forgotten about and so can be blacklisted. GAIA defines a
+      default set of such servers
+      (see <tt>$HOME/.skycat/GaiaSIAPBlacklist</tt>) and any servers that fail
+      in a response will be offered up addition to the blacklist.
+    </p>
+
+      
+  </body>
+</html>

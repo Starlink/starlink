@@ -130,6 +130,9 @@ itcl::class gaiavo::GaiaVOCats {
    #  options in sub-classes (add_query_component_ is defined there).
    public method init {} {
 
+      #  Add help menu.
+      add_help_menu_
+
       #  Add the query component. Usually has some controls
       #  for establishing the query context (SIAP/Registry etc.) and
       #  initiating it.
@@ -316,7 +319,7 @@ itcl::class gaiavo::GaiaVOCats {
                warning_dialog_ "$names_($current_): $msg"
                remove_current_ "$msg"
             } else {
-               if { $info_ == {} } { 
+               if { $info_ == {} } {
                   remove_current_ "No images in $names_($current_)"
                } else {
 
@@ -325,7 +328,7 @@ itcl::class gaiavo::GaiaVOCats {
                   set prev_headings $headings_
                   set headings_ [$w_.cat$current_ headings]
                   $itk_component(results$current_) config -headings $headings_
-                  
+
                   #  Initial show columns.
                   if { $itk_option(-show_cols) != {} } {
                      $itk_component(results$current_) \
@@ -333,17 +336,17 @@ itcl::class gaiavo::GaiaVOCats {
                      $itk_component(results$current_) \
                         set_options $itk_option(-show_cols) Show 1
                   }
-                  
+
                   if { "$prev_headings" != "$headings_" } {
                      $itk_component(results$current_) update_options
                   }
-                  
+
                   #  Update content.
                   $itk_component(results$current_) config -info $info_
-                  
+
                   $itk_component(results$current_) config -title \
                      "Returned [$itk_component(results$current_) total_rows] rows"
-                  
+
                   #  Make sure results are visible.
                   $itk_component(bookmenu) configure -value $current_
                   view_page_ $current_
@@ -351,7 +354,7 @@ itcl::class gaiavo::GaiaVOCats {
             }
          }
       } else {
-         #  Something went wrong, remove this service from consideration and 
+         #  Something went wrong, remove this service from consideration and
          #  make a report. Note a bad status is less bad than no file.
          if { ! $status } {
             warning_dialog_ "$names_($current_): $result"
@@ -374,7 +377,7 @@ itcl::class gaiavo::GaiaVOCats {
 
    #  Remove the current query result page and associated. Text is something
    #  set as the progressbar value (usually the error that caused this
-   #  removal). 
+   #  removal).
    protected method remove_current_ {text} {
       after 0 [list $itk_component(progressbar) config -text $text]
       $itk_component(notebook) delete $current_
@@ -397,9 +400,9 @@ itcl::class gaiavo::GaiaVOCats {
    }
 
    #  Start the queries. The implementation of this method should call query
-   #  once for each server. 
+   #  once for each server.
    protected method start_queries_ {} {
-      puts "you must implement a start_queries_ method"
+      puts stderr "you must implement a start_queries_ method"
    }
 
    #  Clear all the existing queries so that a new set can be done.
@@ -411,7 +414,7 @@ itcl::class gaiavo::GaiaVOCats {
       }
       $itk_component(bookmenu) clear
       $itk_component(bookmenu) update_menubutton
-      if { $current_ > -1 } { 
+      if { $current_ > -1 } {
          $itk_component(notebook) delete 0 end
       }
       set npages_ 0
@@ -480,7 +483,7 @@ itcl::class gaiavo::GaiaVOCats {
          set cbreak 1
          set ncolumn_ 0
       }
-         
+
       #  Add to "Query Results:" menu.
       $itk_component(bookmenu) add \
          -command [code $this view_page_ $current_] \
@@ -505,6 +508,16 @@ itcl::class gaiavo::GaiaVOCats {
    #  current table.
    protected method open_service_ {args} {
       puts stderr "you must implemenent an open_service_ method"
+   }
+
+   #  Add and populate the help menu. Has the VO overview by default
+   #  plus an additional topic defined by help_file and help_label.
+   protected method add_help_menu_ {} {
+      if { $itk_option(-help_file) != {} && $itk_option(-help_label) != {} } {
+         add_help_button $itk_option(-help_file) $itk_option(-help_label) \
+            {Help on this window...}
+      }
+      add_help_button vo "About VO services..." {Help on VO in GAIA}
    }
 
    #  Check for a file ~/.skycat/proxies, once each session, and use it to
@@ -534,6 +547,10 @@ itcl::class gaiavo::GaiaVOCats {
    #  this will open a window to do the actual service query for images etc.
    itk_option define -activate_cmd activate_cmd Activate_Cmd {}
 
+   #  Define a help file and label for the Help menu.
+   itk_option define -help_file help_file Help_File {}
+   itk_option define -help_label help_label Help_Label "On Window..."
+
    #  Protected variables: (available to instance)
    #  --------------------
 
@@ -543,7 +560,7 @@ itcl::class gaiavo::GaiaVOCats {
    #  Result from most recent query (list of rows).
    protected variable info_ {}
 
-   #  Component that will perform the query. 
+   #  Component that will perform the query.
    #  Must be defined in add_query_component_.
    protected variable query_component_ {}
 
@@ -564,7 +581,7 @@ itcl::class gaiavo::GaiaVOCats {
 
    #  True then interrupted.
    protected variable interrupted_ 0
-   
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
