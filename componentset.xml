@@ -6250,7 +6250,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="xerces-c" support="U">
-  <version>3.0.0</version>
+  <version>3.0.1</version>
   <path>thirdparty/apache/xerces-c</path>
   <description>Apache Xerces-c library for parsing XML</description>
   <dependencies >
