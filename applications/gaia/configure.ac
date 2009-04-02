@@ -3,10 +3,10 @@ AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
 dnl    *** After changing this value make sure that bootstrap is
-dnl    run and gaia/configure and gaia3d/configure scripts have
-dnl    been updated (this normally requires a bootstrap, configure,
-dnl    bootstrap, the configure updates the local directories which
-dnl    then require regenerating again).
+dnl    run and gaia/configure, gaia3d/configure and gaiavo/configure 
+dnl    scripts have been updated (this normally requires a bootstrap, 
+dnl    configure, bootstrap, the configure updates the local directories 
+dnl    which then require regenerating again).
 AC_INIT(gaia, 4.3-0, gaia@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
@@ -106,7 +106,6 @@ AC_SUBST(TCL_PACKAGE_VERSION)
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
 AC_CONFIG_FILES([Makefile tasks/Makefile scripts/Makefile teagaia/Makefile])
-AC_CONFIG_FILES([gaiavo/Makefile])
 AC_CONFIG_FILES([component.xml])
 AC_CONFIG_FILES([gaia/configure.in gaia3d/configure.in gaiavo/configure.in])
 
