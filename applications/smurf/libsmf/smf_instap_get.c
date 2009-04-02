@@ -35,10 +35,12 @@
 *        Check that the INSTAP keywords have a defined value.
 *     2-DEC-2008 (DSB)
 *        Modified to use smf_getfitsd.
+*     2-APR-2009 (DSB)
+*        Negate the instap values read from the FITS header.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -97,9 +99,10 @@ void smf_instap_get( smfHead * hdr, int * status ) {
 
   /* Use the old instap values as the defaults for the new values. These
      defaults will be used if the FITS keywords have undefined values in the
-     header. */
-  instapx = hdr->instap[ 0 ]/DAS2R;
-  instapy = hdr->instap[ 0 ]/DAS2R;
+     header. Also negate them since the values in the FITS header have
+     the opposite sign to the values used within smurf. */
+  instapx = -hdr->instap[ 0 ]/DAS2R;
+  instapy = -hdr->instap[ 0 ]/DAS2R;
 
   /* Try getting INSTAP keywords. An error is reported (but then annulled) 
      if either keyword is not present in the header. The values in instapx 
@@ -111,8 +114,9 @@ void smf_instap_get( smfHead * hdr, int * status ) {
   smf_getfitsd( hdr, "INSTAP_Y", &instapy, status );
   if( *status == SMF__NOKWRD ) errAnnul( status );
 
-  /* Convert from arc-secs to rads and store the values in the smfHead. */
-  hdr->instap[ 0 ] = instapx*DAS2R;
-  hdr->instap[ 1 ] = instapy*DAS2R;
+  /* Negate them back to the smurf sign convention, convert from arc-secs to 
+     rads and store the values in the smfHead. */
+  hdr->instap[ 0 ] = -instapx*DAS2R;
+  hdr->instap[ 1 ] = -instapy*DAS2R;
 
 }
