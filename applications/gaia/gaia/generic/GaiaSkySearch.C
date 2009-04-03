@@ -587,7 +587,7 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
         //  Parse symbol info, a variable length list of
         //  {shape color ratio angle label cond}
         if ((status = Tcl_SplitList(interp_, glsymbol, &nsymb, &symb)) != TCL_OK)
-            break;        
+            break;
         free( glsymbol );
 
         //  Default values
@@ -1307,7 +1307,7 @@ int GaiaSkySearch::queryCmd(int argc, char* argv[])
     // generate the query from the command args
     AstroQuery q;
     if (gaiaGenAstroQuery(interp_, argc, argv, q, pos1_, pos2_,
-                      equinoxStr_, feedback_, cat_->entry()) != TCL_OK)
+                          equinoxStr_, feedback_, cat_->entry()) != TCL_OK)
         return TCL_ERROR;
 
     // make new GaiaQueryResult object, or reuse previous one
@@ -1340,7 +1340,7 @@ int GaiaSkySearch::queryCmd(int argc, char* argv[])
                 // format the ra,dec position arguments in H:M:S...
                 char ra_buf[32], dec_buf[32];
                 int ra_col = result_->ra_col(), dec_col = result_->dec_col();
-                pos.format(ra_buf, dec_buf, equinoxStr_, hms_); 
+                pos.format(ra_buf, dec_buf, equinoxStr_, hms_);
 
                 // put the column values in a list
                 for (j = 0; j < ncols; j++) {
