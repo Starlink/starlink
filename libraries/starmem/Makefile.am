@@ -8,6 +8,9 @@ lib_LTLIBRARIES = libstarmem.la
 
 libstarmem_la_SOURCES = $(PRIVATE_C_FILES) $(PUBLIC_C_FILES)
 
+# Extra files to include in a "make dist" distribution.
+EXTRA_DIST = starMemInit.c starmem_link.in
+
 # Make all library code position independent. This is handy for creating
 # shareable libraries from the static ones (Java JNI libraries).
 if !NOPIC
