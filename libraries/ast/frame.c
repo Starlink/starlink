@@ -5579,7 +5579,7 @@ f     AST_DISTANCE function.
         ( b1[ 0 ] != AST__BAD ) && ( b1[ 1 ] != AST__BAD ) &&
         ( b2[ 0 ] != AST__BAD ) && ( b2[ 1 ] != AST__BAD ) ) {
 
-/* Find teh x increments spanned by the two lines. */
+/* Find the x increments spanned by the two lines. */
 
 /* Check the first line is not vertical. */
       dxa = a2[ 0 ] - a1[ 0 ];

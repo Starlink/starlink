@@ -1611,7 +1611,7 @@ f        The global status.
 /* Get a pointer to the PointSet holding the axis values. */
    pset = ( (AstRegion *) this )->points;
 
-/* Get the dimensions of this PointList, and get a pointer to teh axis
+/* Get the dimensions of this PointList, and get a pointer to the axis
    values. */
    ncoord = astGetNcoord( pset );
    npoint = astGetNpoint( pset );
