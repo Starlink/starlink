@@ -42,7 +42,7 @@
 #include "QueryResult.h"
 #include "WorldOrImageCoords.h"
 
-class GaiaQueryResult : public QueryResult 
+class GaiaQueryResult : public QueryResult
 {
 protected:
     //  If set true assume catalogure presents degrees, not sexagesimal.
@@ -57,6 +57,11 @@ public:
     virtual int getPos( int row, WorldOrImageCoords& pos ) const;
 
     void setAssumeDegrees( int assume_degrees ) { assume_degrees_ = assume_degrees; }
+
+    //  See if a row of the table matches a query.
+    int circularCompareRow( const TabTable& table, int row, 
+                            const AstroQuery& q, int mag_col,
+                            int* search_cols );
 };
 
 

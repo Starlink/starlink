@@ -115,6 +115,33 @@ GaiaWorldCoords::GaiaWorldCoords( const char* ra_str, const char* dec_str,
     dec_.show_sign( 1 );
     status_ = checkRange() || convertEquinox( equinox );
 }
+/*
+ * Constructor - parse a free format string assumed to contain RA and DEC
+ *
+ * If hflag is 1 and the ra value is not in H:M:S and is not an integer,
+ * convert to hours by dividing by 15.
+ */
+GaiaWorldCoords::GaiaWorldCoords( const char* ra_str, const char* dec_str,
+                                  int check_range, const char *equinoxStr, 
+                                  int hflag )
+    : WorldCoords(),
+      check_range_( check_range )
+{
+    ra_ = HMS( ra_str, hflag );
+    dec_ = HMS( dec_str );
+
+    if ( ra_.isNull() ) {
+        status_ = 1;
+        return;
+    }
+    if ( dec_.isNull() ) {
+        status_ = 1;
+        return;
+    }
+
+    dec_.show_sign( 1 );
+    status_ = checkRange() || convertEquinox( equinoxStr );
+}
 
 /*
  *  Format the coordinates into the given buffers:

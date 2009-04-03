@@ -58,6 +58,8 @@ public:
     // Parse RA and DEC in string format
     GaiaWorldCoords( const char* ra, const char* dec, int check_range,
                      double equinox = 2000.0, int hflag = 0 );
+    GaiaWorldCoords( const char* ra, const char* dec, int check_range,
+                     const char *equinoxStr, int hflag = 0 );
 
     //  Set whether to range check.
     void setRangeCheck( int check_range ) { check_range_ = check_range; }

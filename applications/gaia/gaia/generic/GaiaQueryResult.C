@@ -64,32 +64,120 @@ GaiaQueryResult::GaiaQueryResult()
 int GaiaQueryResult::getPos( int row, WorldOrImageCoords& pos ) const
 {
     if ( entry_->isWcs() ) {
-	//  Use world coords
-	char* ra;		// get ra and dec as strings
-	char* dec;		// so we can accept H:M:S or d.ddd
-	if ( get( row, entry_->ra_col(), ra ) ||
+        //  Use world coords
+        char* ra;               // get ra and dec as strings
+        char* dec;              // so we can accept H:M:S or d.ddd
+        if ( get( row, entry_->ra_col(), ra ) ||
              get( row, entry_->dec_col(), dec ) ) {
-	    return 1;		// error
+            return 1;           // error
         }
 
-	pos = GaiaWorldCoords( ra, dec, 0, entry_->equinox(), ! assume_degrees_ );
-	if ( pos.status() == 0 ) {
-	    return 0;		// success
+        pos = GaiaWorldCoords( ra, dec, 0, entry_->equinox(), ! assume_degrees_ );
+        if ( pos.status() == 0 ) {
+            return 0;           // success
         }
-	return 1;		// error
+        return 1;               // error
     }
     else if ( entry_->isPix() ) {
-	//  Use image coords
-	double x, y;
-	if ( get( row, entry_->x_col(), x ) ||
+        //  Use image coords
+        double x, y;
+        if ( get( row, entry_->x_col(), x ) ||
              get( row, entry_->y_col(), y ) ) {
-	    return 1;		// error
+            return 1;           // error
         }
-	pos = ImageCoords( x, y );
-	if ( pos.status() == 0 ) {
-	    return 0;	// success
+        pos = ImageCoords( x, y );
+        if ( pos.status() == 0 ) {
+            return 0;   // success
         }
-	return 1;	// error
+        return 1;       // error
     }
     return error( "This catalog does not have coordinates" );
+}
+
+
+/*
+ * Given a tab table and a row number, return 0 if the query position
+ * (q.pos()) is within the given radius range (q.radius1(), q.radius2())
+ * and mag (if applicable) is in the given magnitude range (q.mag1(),
+ * q.mag2()) and all of the other conditions given by q are met.
+ *
+ *  Overrides circularCompareRow of QueryResult to use GaiaWorldCoords.
+ */
+int GaiaQueryResult::circularCompareRow( const TabTable& table, int row, 
+                                         const AstroQuery& q, int mag_col, 
+                                         int* search_cols ) 
+{
+    // get value for mag, if there is one
+    if (mag_col != -1 && (q.mag1() != 0.0 || q.mag2() != 0.0)) {
+        double mag;
+        if (table.get(row, mag_col, mag) != 0 || mag < q.mag1() || mag > q.mag2())
+            return 1;
+    }
+
+    if (entry_->isWcs() || entry_->isPix()) {
+        if (q.radius1() || q.radius2()) {
+            // get ra,dec point
+            WorldOrImageCoords p;
+            if (entry_->isWcs()) {
+                char* ra;
+                char* dec;
+                if (table.get(row, entry_->ra_col(), ra) != 0 
+                    || table.get(row, entry_->dec_col(), dec) != 0)
+                    return 1;
+                p = GaiaWorldCoords(ra, dec, 0, entry_->equinox(), 1);
+            }
+            else if (entry_->isPix()) {
+                // get x,y
+                double x, y;
+                if (table.get(row, entry_->x_col(), x) != 0 
+                    || table.get(row, entry_->y_col(), y) != 0)
+                    return 1;
+                p = ImageCoords(x, y);
+            }
+            if (p.status() != 0)
+                return ERROR;
+
+            // see if point is in radius
+            double dist = q.pos().dist(p);
+            if (dist < q.radius1() || dist > q.radius2())
+                return 1;               // position for row not in range
+        }
+    }
+
+    // check any other conditions for column values
+    int n = q.numSearchCols();
+    if (n > 0) {
+        char** minValues = q.minValues();
+        char** maxValues = q.maxValues();
+        char* tableValue;
+        for(int i = 0; i < n; i++) {
+            if (table.get(row, search_cols[i], tableValue) != 0)
+                return 1;
+            // since we don't know the type of the column, try double, then int, then string
+            double d, d1, d2;
+            int j, j1, j2;
+            if (sscanf(tableValue, "%lf", &d) == 1
+                && sscanf(minValues[i], "%lf", &d1) == 1 
+                && sscanf(maxValues[i], "%lf", &d2) == 1) {
+                // compare as double
+                if (d < d1 || d > d2)
+                    return 1;  // no match
+            }
+            else if (sscanf(tableValue, "%d", &j) == 1
+                && sscanf(minValues[i], "%d", &j1) == 1 
+                && sscanf(maxValues[i], "%d", &j2) == 1) {
+                // compare as int
+                if (j < j1 || j > j2)
+                    return 1;  // no match
+            }
+            else {
+                // compare as string
+                if (strcmp(tableValue, minValues[i]) < 0
+                    || strcmp(tableValue, maxValues[i]) > 0)
+                    return 1;  // no match
+            }
+        }
+    }
+    
+    return 0;                   // a match
 }
