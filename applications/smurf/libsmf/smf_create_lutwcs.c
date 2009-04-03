@@ -117,6 +117,8 @@
 *        For extra speed, clone the cached SkyFrame rather than copying it.
 *     2009-01-13 (TIMJ):
 *        Add dut1 argument.
+*     2009-04-3 (DSB):
+*        Negate usage of instap values.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -348,7 +350,6 @@ smfCreateLutwcsCache *smf_create_lutwcs( int clearcache, const double *fplane_x,
       /* Apply focal plane ("instrument aperture") offsets */
       if( instap ) {
 	instapmap = astShiftMap( 2, instap, " " );
-        astInvert( instapmap );
 	cache->map = (AstMapping *) astCmpMap( cache->map, instapmap, 1, " " );
 
         cache->instap[ 0 ] = instap[ 0 ];
