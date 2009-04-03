@@ -10,22 +10,26 @@
 #     Bourne shell script
 
 #  Usage:
-#     remove-modules <submodule>
+#     remove-modules [-f] [submodule]
 
 #  Description:
 #     This script removes the content of the given submodule, or all
 #     submodules if ran without any arguments. It is destructive so
 #     should be used with care.
 #
-#     If any submodule contains local changes then this script will refuse 
+#     If any submodule contains local changes then this script will refuse
 #     to run. You will need to correct the problem that represents before
 #     running this script.
 #
-#     A typical use of this script is to clear out all submodules in a 
-#     working tree where update-modules has been ran, before switching 
+#     A typical use of this script is to clear out all submodules in a
+#     working tree where update-modules has been ran, before switching
 #     to an historical release branch. Historical branches contain the
 #     original source in place of the submodules (the last of these
 #     is lehuakona).
+#
+#     In extreme circumstances when you do not have any changes to preserve
+#     and the submodules are in a mess the "-f" flag can be used to skip all
+#     safety checks.
 
 #  Authors:
 #     PWD: P.W. Draper (JAC, Durham University)
@@ -61,36 +65,25 @@
 echo ""
 echo "Removing all local repository submodules:"
 
-#  If given a command-line argument assume this is the path of a submodule and
-#  just remove that.
-
+#  Parse any command-line arguments. We just have two optional ones,
+#  -f and a submodule.
+check=1
 if test "$1" != ""; then
+   if test "$1" = "-f"; then
+      check=0
+      shift
+   fi
    submodule="$1"
 else
    submodule=""
 fi
 
-#  Get a summary of the submodules. If this returns any content then one or
-#  more have been modified and committed and should be pushed or reset before
-#  proceeding.
-
-summary=`git submodule summary $submodule`
-
-if test "$summary" != ""; then
-   echo "ERROR: submodule(s) are modified, will not remove"
-   echo "$summary"
-   exit 1
-fi
-
-#  The above will not report modified files that have not been committed.
-#  This isn't important, but probably indicates some activity in the submodule
-#  so refuse to proceed when they are present as well.
-
+#  Get a list of all the paths to the submodules or check that the given
+#  submodule is valid.
 if test "$submodule" = ""; then
-   #  Get a list of all the paths to the submodules. Note only registered ones.
    submodule_list="`git ls-files --stage | grep ^160000| awk '{print $4}'`"
 else
-   submodule_list="$submodule" 
+   submodule_list="$submodule"
    #  Verify this a submodule.
    found="`git ls-files --stage | grep ^160000| grep $submodule| awk '{print $4}'`"
    if test "$found" != "$submodule"; then
@@ -99,25 +92,46 @@ else
    fi
 fi
 
-for m in $submodule_list; do
+#  Get a summary of the submodules. If this returns any content then one or
+#  more have been modified and committed and should be pushed or reset before
+#  proceeding.
 
-   #  May not be checked in yet, in that case we see the modified files in the
-   #  full repository. Avoid that case.
-   nfiles=`cd $m && ls -a | wc -w`
-   if test $nfiles -gt 2 ; then
-      modified=`cd $m && git diff-index --name-status HEAD`
-      if test "$modified" != ""; then
-         echo "WARNING: submodule contains modified files, will not proceed"
-         echo "... $m"
-         echo "$modified" | head
-         exit 1
-      fi
-   else
-      echo "... found uninitialised submodule: $m"
+if test "$check" = "1"; then
+
+   summary=`git submodule summary $submodule`
+
+   if test "$summary" != ""; then
+      echo "ERROR: submodule(s) are modified, will not remove"
+      echo "$summary"
+      exit 1
    fi
-done
 
-#  No modifications so safe to proceed with removal of contents.
+#  The above will not report modified files that have not been committed.
+#  This isn't important, but probably indicates some activity in the
+#  submodule so refuse to proceed when they are present as well.
+
+   if test "$check" = "1"; then
+      for m in $submodule_list; do
+
+         #  May not be checked in yet, in that case we see the modified files
+         #  in the full repository. Avoid that case.
+         nfiles=`cd $m && ls -a | wc -w`
+         if test $nfiles -gt 2 ; then
+            modified=`cd $m && git diff-index --name-status HEAD`
+            if test "$modified" != ""; then
+               echo "WARNING: submodule contains modified files, will not proceed"
+               echo "... $m"
+               echo "$modified" | head
+               exit 1
+            fi
+         else
+            echo "... found uninitialised submodule: $m"
+         fi
+      done
+   fi
+fi
+
+#  No modifications or told to proceed so get on with removal of contents.
 #  Since this is destructive, ask one more time.
 
 read -p "Are you sure you want to proceed (y/N)? " answer
