@@ -103,14 +103,22 @@ if test "$check" = "1" -a "$summary" != ""; then
             #  or could be missing.
             if test -d $path; then
                #  We want to check internally, ask submodule if it has the
-               #  requested SHA as its head, if not it needs an update.
+               #  requested SHA as its head, if not it may need an update.
                if GIT_DIR=$path/.git git rev-parse --verify $sha1^0 >/dev/null 2>&1; then
-                  #  Modified, and contains the SHA already, must be a local
-                  #  modification. Don't allow that.
-                  echo "ERROR: a submodule is modified, not updating anything"
-                  echo "... $path"
-                  echo "    `git submodule summary $path`"
-                  exit 1
+
+                  #  Contains the requested SHA already, that's OK as long
+                  #  as the branch isn't ahead of the remote tracked version.
+                  #  If we're not on a branch then there's no test available.
+                  branch=`GIT_DIR=$path/.git git symbolic-ref HEAD 2>/dev/null | sed 's,refs/heads/,,'`
+                  if test "$branch" != ""; then
+                     ahead=`GIT_DIR=$path/.git git log origin/$branch..$branch 2>/dev/null`
+                     if test "$ahead" != ""; then
+                        echo "ERROR: a submodule is ahead of remote branch, not updating anything"
+                        echo "... $path"
+                        echo "    `git submodule summary $path`"
+                        exit 1
+                     fi
+                  fi
                fi
             else
                #  No directory! That's an error.
