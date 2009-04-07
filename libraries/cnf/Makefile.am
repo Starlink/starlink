@@ -33,7 +33,9 @@ RTL_ROUTINES = cnfInitRTL.c
 # cnf.h is the old name for f77.h.  cnf.h is now deprecated, but we
 # should continue to install it for the sake of old code.  See f77.h
 # for some history, and sun209.tex for the current recommendations.
-cnf.h: f77.h
+install-exec-hook:
+	cd $(DESTDIR)$(includedir); \
+	test -f cnf.h && rm cnf.h; \
 	$(LN_S) f77.h cnf.h
 
 # CNF_PAR.F requires defintions from config.h.
@@ -51,7 +53,7 @@ CNF_PAR: CNF_PAR.processed
 	grep '^ .*[^ ]' CNF_PAR.processed >>CNF_PAR.tmp \
 	    && mv CNF_PAR.tmp CNF_PAR
 
-CLEANFILES = cnf.h CNF_PAR CNF_PAR.processed CNF_PAR.tmp
+CLEANFILES = CNF_PAR CNF_PAR.processed CNF_PAR.tmp
 
 # Testing
 
