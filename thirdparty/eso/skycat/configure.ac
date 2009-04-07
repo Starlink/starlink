@@ -1,7 +1,7 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
-AC_INIT(skycat, 3.0.1, ussc@star.rl.ac.uk)
+AC_INIT(skycat, 3.0.2, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -26,6 +26,7 @@ dnl    it's allowed to play there, too.
     for f in skycat/tclutil skycat/astrotcl skycat/cat skycat/rtd skycat/skycat; do
        (cd $f ; \
         cmd="./configure --prefix=$prefix \
+                         --with-cfitsio=$prefix/lib \
                          $star_extra_items \
                          --cache-file=../config.cache"; \
         echo $cmd; \
