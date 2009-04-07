@@ -231,6 +231,12 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
          catch {$querytask_ delete_now}
          set querytask_ {}
       }
+
+      #  Do the user command (always done as something may be waiting
+      #  for the query to complete, tempname may be an error message).
+      if { $itk_option(-command) != {} } {
+         eval $itk_option(-command) 0 interrupted
+      }
       if { $itk_option(-feedbackcommand) != {} } {
          eval $itk_option(-feedbackcommand) off
       }

@@ -355,11 +355,15 @@ itcl::class gaiavo::GaiaVOCats {
          }
       } else {
          #  Something went wrong, remove this service from consideration and
-         #  make a report. Note a bad status is less bad than no file.
-         if { ! $status } {
-            warning_dialog_ "$names_($current_): $result"
-         } else {
-            error_dialog_ "$names_($current_): $result"
+         #  make a report. Note a bad status is less bad than no file and
+         #  if the result is "Interrupted" with a bad status we just handle
+         #  the issue silently.
+         if { $result != "interrupted" } {
+            if { ! $status } {
+               warning_dialog_ "$names_($current_): $result"
+            } else {
+               error_dialog_ "$names_($current_): $result"
+            }
          }
          remove_current_ $result
       }
