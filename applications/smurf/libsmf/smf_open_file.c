@@ -181,10 +181,13 @@
  *        Free any resources if there is an error opening the file.
  *     2008-12-02 (DSB):
  *        Avoid use of astIsUndef functions.
+ *     2009-04-06 (TIMJ):
+ *        Improve the step time guess to take into account RTS_NUM.
+ *        The only guaranteed way to "guess" is to read the embedded XML configuration.
  *     {enter_further_changes_here}
 
  *  Copyright:
- *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
  *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
  *     Copyright (C) 2005-2008 University of British Columbia.
  *     All Rights Reserved.
@@ -894,12 +897,17 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
     if (*status == SMF__NOKWRD || ( *status == SAI__OK && 
                                     steptime == VAL__BADD ) ) {
       if (*status != SAI__OK) errAnnul( status );
-      /* Attempt to calculate it from adjacent entries */
+      /* Attempt to calculate it from adjacent entries - it will not
+         be correct but it might be close. The problem occurs if the
+         state entries are derived from distinct sequences. Almost
+         certainly to be the case for ACSIS in all cases except raster. */
       tmpState = hdr->allState;
       if (hdr->nframes > 1 && tmpState[0].rts_end != VAL__BADD
           && tmpState[1].rts_end != VAL__BADD) {
         steptime = tmpState[1].rts_end - tmpState[0].rts_end;
         steptime *= SPD;
+        /* Correct for actual number of steps */
+        steptime /= (tmpState[1].rts_num - tmpState[0].rts_num ); 
         msgSetd("STP", steptime);
         msgOutif(MSG__QUIET, " ", "WARNING: Determined step time to be ^STP"
                  " by examining state information", status );
