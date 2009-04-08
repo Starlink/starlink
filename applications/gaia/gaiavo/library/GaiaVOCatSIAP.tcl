@@ -145,7 +145,8 @@ itcl::class gaiavo::GaiaVOCatSIAP {
       set query_component_ $itk_component(siap)
    }
 
-   #  Open a service, "args" is a list of values from a row of the current table.
+   #  Open a service, "args" is a list of values from a row of the current
+   #  table. 
    protected method open_service_ {args} {
 
       #  Need to locate the VOX:Image_AccessReference field to get the URL for

@@ -133,11 +133,16 @@ proc get {query outfile} {
 #  Endpoint can terminate in & or ?
 switch -glob $endpoint {
    *& {
-      set query ${endpoint}POS=${ra},${dec}&SIZE=${size}&FORMAT=image/fits
+      set query ${endpoint}POS=${ra},${dec}&SIZE=${size}
    }
    default {
-      set query ${endpoint}&POS=${ra},${dec}&SIZE=${size}&FORMAT=image/fits
+      set query ${endpoint}&POS=${ra},${dec}&SIZE=${size}
    }
+}
+
+#  Add FORMAT is not already present.
+if { ! [string match "*image/fits*" $query] } {
+   set query ${query}&FORMAT=image/fits
 }
 
 #  Do it.
