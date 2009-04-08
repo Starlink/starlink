@@ -9,19 +9,20 @@
 #     Manage a list of identifiers that represent blacklisted services.
 
 #  Description:
-#     Instances of this class should be used to manage the blacklists
-#     for each service type (SIAP, ConeSearch). Services are usually blacklisted
-#     because they are known to be broken. Since each service should be uniquely
-#     identified by its identifier (an ivorn) we use that to represent a service.
+#     Instances of this class should be used to manage the blacklists for each
+#     service type (SIAP, ConeSearch). Services are usually blacklisted because
+#     they are known to be broken. Since each service should be uniquely
+#     identified by its identifier (an ivorn) we use that to represent a
+#     service.
 #
 #     A blacklist is usually stored in a backing file in the standard
 #     ~/.skycat directory. This may have a default equivalent in the
 #     distribution (like GaiaSIAPBlacklist), so this object just requires a
-#     filename. 
+#     filename.
 #
 #     Blacklists are just simple text files with comment lines starting with #
 #     in the first column and other lines being the identifiers of the
-#     blacklisted services. 
+#     blacklisted services.
 
 #  Invocations:
 #
@@ -146,7 +147,7 @@ itcl::class gaiavo::GaiaVOBlacklist {
       }
    }
 
-   #  Initialise the blacklist from the backing store. 
+   #  Initialise the blacklist from the backing store.
    protected method init_blacklist_ {} {
 
       #  Look for the blacklist.
@@ -173,6 +174,19 @@ itcl::class gaiavo::GaiaVOBlacklist {
       ::close $fid
    }
 
+   #  Public entry point for getting a instance of this related to a
+   #  particular service type. The service type is defined by the
+   #  backing store, which is a short name, SIAP, Cone etc.
+   #  The real backingstore is Gaia[SIAP|Cone]Blacklist.
+   public proc get_instance {backingstore} {
+      if { ! [info exists instances_($backingstore)] } {
+         set instances_($backingstore) \
+            [uplevel \#0 gaiavo::GaiaVOBlacklist \#auto \
+                -backingstore Gaia${backingstore}Blacklist]
+      }
+      return $instances_($backingstore)
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -196,7 +210,10 @@ itcl::class gaiavo::GaiaVOBlacklist {
    #  Common variables: (shared by all instances)
    #  -----------------
 
-   #  The blacklist of identifiers, indexed by the backingstore name and the 
+   #  The blacklist of identifiers, indexed by the backingstore name and the
    #  identifier so it is shared when the backingstore name is the same.
    protected common blacklist_
+
+   #  All instances created using get_instance_. Indexed by backingstore.
+   protected common instances_
 }
