@@ -2394,8 +2394,11 @@ window gives you access to this."
          #  Open the appropriate dialog.
          if { $use_list } {
             utilReUseWidget gaiavo::GaiaVOCatsSIAP $w_.siapquery \
-               -siap_catalog $siap_file -gaia [scope $this] \
-               -title "Query current SIAP list" -help_file siap
+               -siap_catalog $siap_file \
+               -gaia [scope $this] \
+               -title "Query current SIAP list" \
+               -help_file siap \
+               -blacklist [gaiavo::GaiaVOBlacklist::get_instance SIAP]
          } else {
             utilReUseWidget gaiavo::GaiaVOCatRegistry $w_.siapregistry \
                -catalog $siap_file \
@@ -2404,7 +2407,8 @@ window gives you access to this."
                -show_cols {shortName title} \
                -activate_cmd [code $this vo_query_siap_] \
                -whole_operation 0 \
-               -help_file siapregistry
+               -help_file siapregistry \
+               -blacklist [gaiavo::GaiaVOBlacklist::get_instance SIAP]
          }
       } else {
          error_dialog "No GAIA-VO extension is available" $w_
@@ -2420,10 +2424,16 @@ window gives you access to this."
          set accessURL [gaiavo::GaiaVOCatSIAP::getAccessURL $headers $row]
          if { $accessURL != {} } {
             set name [gaiavo::GaiaVOCatSIAP::getName $headers $row]
+            set id [gaiavo::GaiaVOCatSIAP::getIdentifier $headers $row]
             gaiavo::GaiaVOCatSIAP $w_.siapquery\#auto \
-               -accessURL $accessURL -shortname $name -gaia $this \
+               -accessURL $accessURL \
+               -identifier $id \
+               -shortname $name \
+               -gaia $this \
                -title "$name SIAP server" \
-               -help_file siapserver
+               -help_file siapserver \
+               -blacklist [gaiavo::GaiaVOBlacklist::get_instance SIAP] \
+               -blacklist_cmd [code $w_.siapregistry update_content]
          } else {
             warning_dialog "SIAP service does not specify an accessURL" $w_
          }
@@ -2444,7 +2454,8 @@ window gives you access to this."
             -show_cols {shortName title} \
             -activate_cmd [code $this vo_query_cone_] \
             -whole_operation 0 \
-            -help_file cone
+            -help_file cone \
+            -blacklist [gaiavo::GaiaVOBlacklist::get_instance Cone]
       } else {
          error_dialog "No GAIA-VO extension is available" $w_
       }
@@ -2460,7 +2471,9 @@ window gives you access to this."
          if { $accessURL != {} } {
             set name [gaiavo::GaiaVOCatCone::getName $headers $row]
             gaiavo::GaiaVOCatCone $w_.conequery\#auto \
-               -accessURL $accessURL -shortname $name -gaia $this \
+               -accessURL $accessURL \
+               -shortname $name \
+               -gaia $this \
                -title "$name Cone Search service" \
                -help_file conesearch
          } else {
