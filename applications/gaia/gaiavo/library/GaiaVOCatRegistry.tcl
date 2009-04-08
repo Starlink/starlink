@@ -127,6 +127,9 @@ itcl::class gaiavo::GaiaVOCatRegistry {
          #  permanent changes to be kept in the original.
          set initial_catalogue_ $itk_option(-catalog)
          $w_.cat open $itk_option(-catalog)
+
+         #  Apply the blacklist.
+         update_content
       }
 
       #  Add a menu option to apply the blacklist.
@@ -135,7 +138,7 @@ itcl::class gaiavo::GaiaVOCatRegistry {
          {Filter list to remove those in the blacklist} \
          -variable [scope itk_option(-apply_blacklist)] \
          -onvalue 1 -offvalue 0 \
-         -command [code $this update_content_]
+         -command [code $this update_content]
    }
 
    #  User pressed the accept button. Override to not necessarily require
@@ -197,8 +200,8 @@ itcl::class gaiavo::GaiaVOCatRegistry {
       catch {::focus $itk_component(results).listbox}
    }
 
-   #  Override update_content_ so we can apply the blacklist.
-   protected method update_content_ {} {
+   #  Override update_content so we can apply the blacklist.
+   public method update_content {} {
       set info_ [$w_.cat content]
       if { $itk_option(-blacklist) != {} && $itk_option(-apply_blacklist) } {
          set headings [$w_.cat headings]

@@ -72,7 +72,6 @@ itcl::class gaiavo::GaiaVOCatSIAP {
    #  Constructor:
    #  ------------
    constructor {args} {
-      wm title $w_ "Query VO Simple Image Access server"
       eval itk_initialize $args
    }
 
@@ -87,6 +86,8 @@ itcl::class gaiavo::GaiaVOCatSIAP {
    #  Add additional menu items. Nameserver.
    public method init {} {
       GaiaVOCat::init
+
+      wm title $w_ "Query VO Simple Image Access server"
 
       set m [add_menubutton Options "Options menu"]
 
@@ -111,6 +112,21 @@ itcl::class gaiavo::GaiaVOCatSIAP {
          error_dialog "No default name server found for astronomical objects"
          return
       }
+
+      #  Add additional commands to display the selected images in new
+      #  windows. Re-uses "Open" as Display.
+      $itk_component(open) configure -text "Display"
+      add_short_help $itk_component(open) "Download and display selected image"
+
+      itk_component add displaynew {
+         button $itk_component(buttons).displaynew \
+            -text "Display in new" \
+            -command [code $this display_in_new]
+      }
+      pack $itk_component(displaynew) -before $itk_component(close) \
+         -side left -expand 1 -pady 2m
+      add_short_help $itk_component(displaynew) \
+         {Download and display selected image in new windows}
 
       #  Set default name server.
       set_namesvr $namesvr
@@ -145,8 +161,17 @@ itcl::class gaiavo::GaiaVOCatSIAP {
       set query_component_ $itk_component(siap)
    }
 
+   #  Display the selected image in a new window.
+   public method display_in_new {} {
+      set new_window_ 1
+      foreach row [$itk_component(results) get_selected] {
+         open_service_ $row
+      }
+      set new_window_ 0
+   }
+
    #  Open a service, "args" is a list of values from a row of the current
-   #  table. 
+   #  table.
    protected method open_service_ {args} {
 
       #  Need to locate the VOX:Image_AccessReference field to get the URL for
@@ -164,7 +189,8 @@ itcl::class gaiavo::GaiaVOCatSIAP {
       if { $itk_option(-gaia) != {} } {
          if { $urlget_ == {} } {
             set urlget_ [gaia::GaiaUrlGet .\#auto \
-                            -notify_cmd [code $this display_image_]]
+                            -notify_cmd \
+                            [code $this display_image_ $new_window_]]
             blt::busy hold $w_
             $urlget_ get $accessref
          }
@@ -172,15 +198,45 @@ itcl::class gaiavo::GaiaVOCatSIAP {
    }
 
    #  Display an image, if it exists.
-   protected method display_image_ {filename type} {
+   protected method display_image_ {new_window filename type} {
       blt::busy release $w_
       if { [::file exists $filename] } {
-         $itk_option(-gaia) open $filename
+         if { $new_window } {
+            $itk_option(-gaia) newimage_clone $filename
+         } else {
+            $itk_option(-gaia) open $filename
+         }
       }
       if { $urlget_ != {} } {
          catch {delete object $urlget_}
       }
       set urlget_ {}
+   }
+
+   #  Use specialised warning dialog that offers to blacklist the current
+   #  server.
+   protected method warning_dialog_ {message} {
+      set choice [choice_dialog "$message" "OK Blacklist" "OK" $w_]
+      if { $choice != "OK" } {
+         $itk_option(-blacklist) blacklist $itk_option(-identifier)
+         if { $itk_option(-blacklist_cmd) != {} } {
+            eval $itk_option(-blacklist_cmd)
+         }
+         close
+      }
+   }
+
+   #  Use specialised error dialog that offers to blacklist the current
+   #  server.
+   protected method error_dialog_ {message} {
+      set choice [choice_dialog "$message" "OK Blacklist" "OK" $w_]
+      if { $choice != "OK" } {
+         $itk_option(-blacklist) blacklist $itk_option(-identifier)
+         if { $itk_option(-blacklist_cmd) } {
+            eval $itk_option(-blacklist_cmd)
+         }
+         close
+      }
    }
 
    #  Extract the accessURL for the SIAP service from a list of headers
@@ -189,6 +245,16 @@ itcl::class gaiavo::GaiaVOCatSIAP {
       eval lassign "$row" $headers
       if { [info exists accessURL] } {
          return $accessURL
+      }
+      return {}
+   }
+
+   #  Extract the IVOA identifier for the SIAP service from a list of headers
+   #  and the associated data row.
+   public proc getIdentifier {headers row} {
+      eval lassign "$row" $headers
+      if { [info exists identifier] } {
+         return $identifier
       }
       return {}
    }
@@ -215,11 +281,21 @@ itcl::class gaiavo::GaiaVOCatSIAP {
    #  The accessURL for the SIAP server.
    itk_option define -accessURL accessURL AccessURL {}
 
+   #  The identifier for the SIAP server.
+   itk_option define -identifier identifier Identifier {}
+
    #  Instance of GAIA to display the image.
    itk_option define -gaia gaia Gaia {}
 
    #  The name server.
    itk_option define -namesvr namesvr NameSvr {}
+
+   #  The blacklist object.
+   itk_option define -blacklist blacklist BlackList {}
+
+   #  Command to execute if this server is blacklisted. Better
+   #  arrange to remove it from any registry displays.
+   itk_option define -blacklist_cmd blacklist_cmd Blacklist_Cmd {}
 
    #  Protected variables: (available to instance)
    #  --------------------
@@ -227,7 +303,9 @@ itcl::class gaiavo::GaiaVOCatSIAP {
    #  Active getter for downloading an image.
    protected variable urlget_ {}
 
+   #  Whether downloaded images should be displayed in new windows.
+   protected variable new_window_ 0
+
    #  Common variables: (shared by all instances)
    #  -----------------
-
 }

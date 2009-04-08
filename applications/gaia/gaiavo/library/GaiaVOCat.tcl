@@ -360,11 +360,11 @@ itcl::class gaiavo::GaiaVOCat {
       #   Finally open catalogue, read and update display.
       $w_.cat open $newfile_
       $w_.cat query
-      update_content_
+      update_content
    }
 
    #  Update the display from the catalogue content.
-   protected method update_content_ {} {
+   public method update_content {} {
       set info_ [$w_.cat content]
       $itk_component(results) config -info $info_
    }
@@ -429,10 +429,10 @@ itcl::class gaiavo::GaiaVOCat {
       #  If status is bad result is a message, otherwise it should be
       #  the name of a VOTable file.
       if { ! $status } {
-         warning_dialog $result $w_
+         warning_dialog_ $result
          after 0 [list $itk_component(progressbar) config -text $result]
       } elseif { ! [file exists $result] } {
-         error_dialog $result $w_
+         error_dialog_ $result
          after 0 [list $itk_component(progressbar) config -text $result]
       } else {
 
@@ -461,12 +461,22 @@ itcl::class gaiavo::GaiaVOCat {
             }
 
             #  Update content.
-            update_content_
+            update_content
             $itk_component(results) config \
                -title "Returned [$itk_component(results) total_rows] rows"
 
          }
       }
+   }
+
+   #  Popup the warning dialog. Override for specialised behaviour.
+   protected method warning_dialog_ {message} {
+      warning_dialog "$message" $w_
+   }
+
+   #  Popup the error dialog. Override for specialised behaviour.
+   protected method error_dialog_ {message} {
+      error_dialog "$message" $w_
    }
 
    #  Start the catalogue query based on the current query options and

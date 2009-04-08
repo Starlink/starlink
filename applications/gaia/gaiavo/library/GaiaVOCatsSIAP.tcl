@@ -75,16 +75,11 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
    #  ------------
    constructor {args} {
       eval itk_initialize $args
-
-      #  Create the blacklist before we need it.
-      set blacklist_ \
-         [uplevel \#0 gaiavo::GaiaVOBlacklist \#auto -backingstore GaiaSIAPBlacklist]
    }
 
    #  Destructor:
    #  -----------
    destructor {
-      catch {delete object $blacklist_}
    }
 
    #  Methods:
@@ -169,7 +164,7 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
             -command [code $this query_done] \
             -namesvr $itk_option(-namesvr) \
             -gaiactrl [$itk_option(-gaia) get_image] \
-            -blacklist $blacklist_
+            -blacklist $itk_option(-blacklist)
       }
       pack $itk_component(siap) -side top -fill x
       add_short_help $itk_component(siap) {Controls for querying SIAP services}
@@ -249,7 +244,7 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
    protected method warning_dialog_ {message} {
       set choice [choice_dialog "$message" "OK Blacklist" "OK" $w_]
       if { $choice != "OK" } {
-         $blacklist_ blacklist $ids_($current_)
+         $itk_option(-blacklist) blacklist $ids_($current_)
       }
    }
 
@@ -258,7 +253,7 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
    protected method error_dialog_ {message} {
       set choice [choice_dialog "$message" "OK Blacklist" "OK" $w_]
       if { $choice != "OK" } {
-         $blacklist_ blacklist $ids_($current_)
+         $itk_option(-blacklist) blacklist $ids_($current_)
       }
    }
 
@@ -270,7 +265,7 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
       set result {}
       foreach row [$w_.cat content] {
          eval lassign \$row $headings
-         if { ! [$blacklist_ blacklisted $identifier] && $accessURL != {} } {
+         if { ! [$itk_option(-blacklist) blacklisted $identifier] && $accessURL != {} } {
             lappend result $accessURL $title $identifier
          }
       }
@@ -300,11 +295,11 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
    #  Active getter for downloading an image.
    protected variable urlget_ {}
 
-   #  The blacklist manager.
-   protected variable blacklist_
-
    #  Whether downloaded images should be displayed in new windows.
    protected variable new_window_ 0
+
+   #  The blacklist object. Usual shared between all SIAP widgets.
+   itk_option define -blacklist blacklist BlackList {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
