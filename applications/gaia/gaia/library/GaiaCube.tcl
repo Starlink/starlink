@@ -952,6 +952,9 @@ itcl::class gaia::GaiaCube {
       #  Update the coordinate label, if needed.
       update_coord_label_
 
+      #  Change the displayed catalogue overlays for CUPID.
+      set_cupid_coord 1
+
       #  Update everything to make sure we don't get partial image refreshes.
       update idletasks
    }
@@ -960,10 +963,19 @@ itcl::class gaia::GaiaCube {
    #  any CUPID catalogues with the new reference coordinate.
    public method set_spec_ref_coord {id coord} {
       $itk_component(spectrum) set_spec_ref_coord $id $coord
-      set ::cupid(COORD) $coord
-      puts "cupid(COORD) = $::cupid(COORD)"
+   }
+
+   #  Update the CUPID reference position to match the extracted slice
+   #  and update any displayed catalogues if propagate is true.
+   public method set_cupid_coord {propagate} {
       if { [winfo exists $w_.cupidimporter] } {
-         $w_.cupidimporter replot
+         set coord [get_plane_coord 0 0 0]
+         set ::cupid(COORD) $coord
+         if { [wm state $w_.cupidimporter] != "withdrawn" && $propagate } {
+            $w_.cupidimporter replot
+         }
+      } else {
+         set ::cupid(COORD) 0
       }
    }
 

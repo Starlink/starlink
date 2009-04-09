@@ -228,6 +228,15 @@ itcl::class gaia::GaiaCupidImporter {
       }
       create_entry_ $catalogue
 
+      #  Check this is a CUPID catalogue.
+      $astrocat_ open $catalogue
+      set headings [$astrocat_ headings]
+      if { ! [string first "Peak1" $headings] == -1 } {
+         $astrocat_ close
+         error_dialog "Not a CUPID catalogue: $catalogue" $w_
+         return
+      }
+
       #  Set the columns in which the various coordinates are found.
       #  XXX must be done after catalogue is loaded.
       set id_col 0
@@ -242,45 +251,22 @@ itcl::class gaia::GaiaCupidImporter {
       $astrocat_ entry update [list "x_col -1"] $catalogue
       $astrocat_ entry update [list "y_col -1"] $catalogue
 
-      #  Check this is a CUPID catalogue.
-      $astrocat_ open $catalogue
-      set headings [$astrocat_ headings]
-      if { ! [string first "Peak1" $headings] == -1 } {
-         $astrocat_ close
-         error_dialog "Not a CUPID catalogue: $catalogue" $w_
-         return
-      }
-
-      #$astrocat_ delete
-
       #  Now open the catalogue window.
-      catch {
-         set catwin [gaia::GaiaSearch::new_local_catalog $catalogue \
-                        [code $image_] ::gaia::GaiaSearch 0 catalog $w_]
-      } msg
-
-      #  And display the catalogue.
-      if { $catwin == {} } {
-
-         wait_ "$catwin_($catalogue) set_maxobjs 2000"
-
-         #  Catalogue window exists, switch searching back on and kick
-         #  it to force a reload.
-         gaia::GaiaSearch::allow_searches 1
-         set_plot_symbol_ $catwin_($catalogue)
-
-      } else {
-
+      set catwin [gaia::GaiaSearch::new_local_catalog $catalogue \
+                     [code $image_] ::gaia::GaiaSearch 0 catalog $w_]
+      if { $catwin != {} } {
          set catwin_($catalogue) $catwin
-         wait_ "$catwin set_maxobjs 2000"
-         set_plot_symbol_ $catwin
-
-         #  Switch searching back on.
-         gaia::GaiaSearch::allow_searches 1
-
-         #  Do search to display symbols.
-         $catwin search
       }
+
+      #  Make sure slice coordinate is set.
+      $itk_option(-gaiacube) set_cupid_coord 0
+
+      #  And display the catalogue. Note wait for the realization.
+      wait_ "$catwin_($catalogue) set_maxobjs 2000"
+      gaia::GaiaSearch::allow_searches 1
+      set_plot_symbol_ $catwin_($catalogue)
+
+      $catwin_($catalogue) search
    }
 
    #  Wait for a command to return 1 (non-blocking?).
@@ -297,7 +283,7 @@ itcl::class gaia::GaiaCupidImporter {
    protected method set_plot_symbol_ {catwin} {
 
       set symbol1 [list PIDENT Cen3 Size1 Size2 Size3]
-      set symbol2 [list rectangle blue {$Size1/$Size2} {} {} {($Cen3 > ($%%cupid(COORD) - $Size3)) && ($Cen3 < ($%%cupid(COORD) + $Size3))}]
+      set symbol2 [list rectangle green {$Size1/$Size2} {} {} {($Cen3 > ($%%cupid(COORD) - $Size3)) && ($Cen3 < ($%%cupid(COORD) + $Size3))}]
       set symbol3 [list {$Size1} {}]
 
       $catwin set_symbol $symbol1 $symbol2 $symbol3
@@ -325,7 +311,7 @@ itcl::class gaia::GaiaCupidImporter {
    #  Refresh all catalogues that are displaying.
    public method replot {} {
       foreach {catalogue catwin} [array get catwin_] {
-         if { [winfo exists $catwin] } { 
+         if { [winfo exists $catwin] && [wm state $catwin] != "withdrawn" } { 
             $catwin plot
             ::update idletasks
          }
