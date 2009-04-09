@@ -121,7 +121,6 @@ proc get {query outfile} {
          set newquery $location.
       }
 
-      puts "Redirected to: $newquery"
       catch {::close $fid}
       get $newquery $outfile
    }
