@@ -172,6 +172,8 @@ itcl::class gaia::GaiaSearch {
       if { [$w_.cat url] == {} } {
          after idle [code delete object $this]
       }
+
+      puts "info = [$w_.cat entry get $itk_option(-catalog)]"
    }
 
    #  Add the table for displaying the query results. Redefined from
@@ -199,6 +201,18 @@ itcl::class gaia::GaiaSearch {
       $results_ set_options {MORE PREVIEW more preview} Show 0
       bind $results_.listbox <Double-ButtonPress-1> [code $this label_selected_object]
       bind $results_.listbox <ButtonPress-2> [code $this centre_selected_object_]
+   }
+
+   #  Open a catalog. Override the AstroCat version so that we can apply
+   #  info changes before they are used, at which stage many can not
+   #  be undone, like the WCS columns. The changes are applied using a
+   #  given command which will be called immediately after the catalogue
+   #  is opened.
+   public method open_catalog {} {
+      AstroCat::open_catalog
+      if { $itk_option(-open_cmd) != {} } {
+         eval $itk_option(-open_cmd)
+      }
    }
 
    #  Method to set the symbol used when plotting. This is the same
@@ -532,8 +546,12 @@ itcl::class gaia::GaiaSearch {
    #    debug     is a flag: if true, run queries in foreground
    #
    #    w         should be the top level window of the caller, if specified
+   #
+   #    open_cmd  a command to call just after the catalogue is opened
+   #              (use callback to apply runtime info modifications).
    public proc new_local_catalog {name {id ""} {classname AstroCat}
-                                  {debug 0} {type "catalog"} {w ""}} {
+                                  {debug 0} {type "catalog"} {w ""}
+                                  {open_cmd ""} } {
 
       #  Check for existing catalogue.
       set i "$name,$id"
@@ -564,7 +582,8 @@ itcl::class gaia::GaiaSearch {
              -catalogtype catalog \
              -tcs 0 \
              -transient 0 \
-             -center 0]
+             -center 0\
+             -open_cmd $open_cmd]
    }
 
    public proc apply_history {skycat filename defaultcut } {
@@ -825,6 +844,9 @@ itcl::class gaia::GaiaSearch {
    #  plotting. This allows X and Y coordinates which are displayed in
    #  NDF pixel coordinates to be plotted correctly.
    itk_option define -use_origin use_origin Use_Origin 0
+
+   #  A command that will be called just after the catalogue is opened.
+   itk_option define -open_cmd open_cmd Open_Cmd {}
 
    #  Protected variables: (available to instance):
    #  =============================================
