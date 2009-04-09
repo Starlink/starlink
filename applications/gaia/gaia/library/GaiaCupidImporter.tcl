@@ -220,8 +220,16 @@ itcl::class gaia::GaiaCupidImporter {
       }
       gaia::GaiaSearch::allow_searches 0
 
-      #  Clear any existing info data.
+      #  If this catalogue is already open and displayed we need to kill
+      #  it to make sure the new info is used.
       set catalogue $itk_option(-catalogue)
+      if { [info exists catwin_($catalogue)] } {
+         $catwin_($catalogue) clear
+         $catwin_($catalogue) remove_catalog
+         destroy $catwin_($catalogue)
+      }
+
+      #  Now also clear any existing info data.
       if { ! [catch "$astrocat_ entry get $catalogue"] } {
          #  Catalogue already known, remove as may not match setup.
          $astrocat_ entry remove $catalogue
@@ -237,23 +245,10 @@ itcl::class gaia::GaiaCupidImporter {
          return
       }
 
-      #  Set the columns in which the various coordinates are found.
-      #  XXX must be done after catalogue is loaded.
-      set id_col 0
-      set ra_col $index_(ra)
-      set dec_col $index_(dec)
-      set x_col -1
-      set y_col -1
-
-      $astrocat_ entry update [list "id_col $id_col"] $catalogue
-      $astrocat_ entry update [list "ra_col $ra_col"] $catalogue
-      $astrocat_ entry update [list "dec_col $dec_col"] $catalogue
-      $astrocat_ entry update [list "x_col -1"] $catalogue
-      $astrocat_ entry update [list "y_col -1"] $catalogue
-
       #  Now open the catalogue window.
       set catwin [gaia::GaiaSearch::new_local_catalog $catalogue \
-                     [code $image_] ::gaia::GaiaSearch 0 catalog $w_]
+                     [code $image_] ::gaia::GaiaSearch 0 catalog $w_\
+                     [code $this set_cat_info_ $catalogue]]
       if { $catwin != {} } {
          set catwin_($catalogue) $catwin
       }
@@ -267,6 +262,23 @@ itcl::class gaia::GaiaCupidImporter {
       set_plot_symbol_ $catwin_($catalogue)
 
       $catwin_($catalogue) search
+   }
+
+   #  Set the columns in which the various coordinates are found. This
+   #  is called just after the catalogue is opened so that we can apply
+   #  the UI preferences (otherwise the catalogue meta-data is prefered).
+   protected method set_cat_info_ {catalogue} {
+      set id_col 0
+      set ra_col $index_(ra)
+      set dec_col $index_(dec)
+      set x_col -1
+      set y_col -1
+
+      $astrocat_ entry update [list "id_col $id_col"] $catalogue
+      $astrocat_ entry update [list "ra_col $ra_col"] $catalogue
+      $astrocat_ entry update [list "dec_col $dec_col"] $catalogue
+      $astrocat_ entry update [list "x_col -1"] $catalogue
+      $astrocat_ entry update [list "y_col -1"] $catalogue
    }
 
    #  Wait for a command to return 1 (non-blocking?).
@@ -311,7 +323,7 @@ itcl::class gaia::GaiaCupidImporter {
    #  Refresh all catalogues that are displaying.
    public method replot {} {
       foreach {catalogue catwin} [array get catwin_] {
-         if { [winfo exists $catwin] && [wm state $catwin] != "withdrawn" } { 
+         if { [winfo exists $catwin] && [wm state $catwin] != "withdrawn" } {
             $catwin plot
             ::update idletasks
          }
