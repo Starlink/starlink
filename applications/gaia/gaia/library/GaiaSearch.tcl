@@ -172,8 +172,6 @@ itcl::class gaia::GaiaSearch {
       if { [$w_.cat url] == {} } {
          after idle [code delete object $this]
       }
-
-      puts "info = [$w_.cat entry get $itk_option(-catalog)]"
    }
 
    #  Add the table for displaying the query results. Redefined from

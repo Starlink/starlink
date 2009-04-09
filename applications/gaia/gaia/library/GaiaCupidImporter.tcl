@@ -197,10 +197,6 @@ itcl::class gaia::GaiaCupidImporter {
       set index_(ra) 4
       $itk_component(dec) configure -value 5
       set index_(dec) 5
-      $itk_component(width) configure -value 7
-      set index_(width) 7
-      $itk_component(height) configure -value 8
-      set index_(height) 8
    }
 
    #  Set the column number used for a column type.
@@ -367,12 +363,12 @@ itcl::class gaia::GaiaCupidImporter {
    #  Common variables: (shared by all instances)
    #  -----------------
 
-   #  Special column types, display and window names. XXX spectral axis.
-   protected common coltypes_ "RA ra Dec dec Width width Height height"
+   #  Special column types, display and window names.
+   protected common coltypes_ "RA ra Dec dec"
 
    #  CUPID column names we may use, plus the column index.
    protected common colnames_ \
-       "Peak1 1 Peak2 2 Peak3 3 Cen1 4 Cen2 5 Cen3 6 Size1 7 Size2 8 Size3 9"
+      "Peak1 1 Peak2 2 Peak3 3 Cen1 4 Cen2 5 Cen3 6"
 
 #  End of class definition.
 }
