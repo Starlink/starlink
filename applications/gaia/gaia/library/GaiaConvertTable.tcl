@@ -374,18 +374,25 @@ itcl::class gaia::GaiaConvertTable {
                   set racol $i
                }
             } else {
-               #  "daz" is AZEL for JAC, also DEl, bit that should be a dec.
-               #  "peak1" and "peak2" are support for CUPID.
+               #  "daz" is AZEL for JAC, also DEl, but that should be a dec.
+               #  "cen1" and "cen2" are support for CUPID. Both follow
+               #   in definite columns (there can be others with degrees) so 
+               #   we assume one is followed by the other.
                switch -glob -- $name {
                   ra* -
                   right* -
                   r.a.* -
                   x_world* -
-                  daz -
-                  peak1 -
                   alpha* {
                      if { $racol == -1 } {
                         set racol $i
+                     }
+                  }
+                  daz -
+                  cen1 {
+                     if { $racol == -1 } {
+                        set racol $i
+                        set deccol [expr $i+1]
                      }
                   }
                   default {
