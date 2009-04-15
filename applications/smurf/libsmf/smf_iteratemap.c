@@ -177,6 +177,8 @@
 *     2009-03-20 (EC):
 *        Added capability to calculate model components after AST. Use must
 *        now explicitly give AST in MODELORDER keywordd from config file.
+*     2009-04-15 (EC):
+*        Factor cleaning parameter parsing into smf_get_cleanpar.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -266,7 +268,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
   double f_notchlow[SMF__MXNOTCH]; /* Array low-freq. edges of notch filters */
   double f_notchhigh[SMF__MXNOTCH];/* Array high-freq. edges of notch filters */
   int f_nnotch=0;               /* Number of notch filters in array */
-  int f_nnotch2=0;              /* Number of notch filters in array */
   dim_t goodbolo;               /* Number of good bolometers */
   int haveast=0;                /* Set if AST is one of the models */
   int haveext=0;                /* Set if EXT is one of the models */
@@ -427,97 +428,10 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
 
     /* Data-cleaning parameters (should match SC2CLEAN) */
     
-    if( astMapGet0I( keymap, "APOD", &temp ) ) {
-      if( temp < 0 ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "apod cannot be < 0.", status );
-      } else {
-        apod = (size_t) temp;
-      }
-    } else {
-      apod = 0;
-    }
-
-    if( !astMapGet0D( keymap, "BADFRAC", &badfrac ) ) {
-      badfrac = 0;
-    }
-
-    if( !astMapGet0D( keymap, "DCTHRESH", &dcthresh ) ) {
-      dcthresh = 0;
-    }
-
-    if( astMapGet0I( keymap, "DCBOX", &temp ) ) {
-      if( temp < 0 ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "dcbox cannot be < 0.", status );
-      } else {
-        dcbox = (dim_t) temp;
-      }
-    } else {
-      dcbox = 0;
-    }
-
-    if( !astMapGet0I( keymap, "ORDER", &baseorder ) ) {
-      baseorder = -1;
-    }
-
-    if( !astMapGet0D( keymap, "SPIKETHRESH", &spikethresh ) ) {
-      spikethresh = 0;
-    }
-
-    if( astMapGet0I( keymap, "SPIKEITER", &temp ) ) {
-      if( temp < 0 ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "spikeiter cannot be < 0.", status );
-      } else {
-        spikeiter = (size_t) temp;
-      }
-    } else {
-      spikeiter = 0;
-    }
-
-    if( astMapGet0D( keymap, "FLAGSTAT", &flagstat ) ) {
-      if( flagstat < 0 ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "flagstat cannot be < 0.", status );
-      }
-    } else {
-      flagstat = 0;
-    }
-
-    if( astMapGet0D( keymap, "FILT_EDGELOW", &f_edgelow ) ) {
-      dofft = 1;
-    } else {
-      f_edgelow = 0;
-    }
-
-    if( astMapGet0D( keymap, "FILT_EDGEHIGH", &f_edgehigh ) ) {
-      dofft=1;
-    } else {
-      f_edgehigh = 0;
-    }
-
-    if( !astMapGet1D( keymap, "FILT_NOTCHLOW", SMF__MXNOTCH, &f_nnotch, 
-                      f_notchlow ) ) {
-      f_nnotch=0;
-    }
-
-    if( !astMapGet1D( keymap, "FILT_NOTCHHIGH", SMF__MXNOTCH, &f_nnotch2, 
-                      f_notchhigh ) ) {
-      f_nnotch2=0;
-    }
-
-    if( f_nnotch ) {
-      /* Number of upper and lower edges must match */
-      if( f_nnotch != f_nnotch2 ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, 
-               "Elements in FILT_NOTCHHIGH != number in FILT_NOTCHLOW", 
-               status);      
-      } else {
-        dofft = 1;
-      }
-    }
+    smf_get_cleanpar( keymap, &apod, &badfrac, &dcbox, NULL, &dcthresh, 
+                      NULL, &f_edgelow, &f_edgehigh, f_notchlow,
+                      f_notchhigh, &f_nnotch, &dofft, &flagstat, &baseorder, 
+                      &spikethresh, &spikeiter, status );
 
     /* Maximum length of a continuous chunk */
     if( astMapGet0D( keymap, "MAXLEN", &dtemp ) ) {
@@ -1084,7 +998,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
             if( goodbolo < SMF__MINSTATSAMP ) {
               *status = SMF__INSMP;
               errRepf( "", FUNC_NAME ": Insufficient number of good bolos "
-                       "(%li<%i) to continue", status, goodbolo, 
+                       "(%" DIM_T_FMT "<%i) to continue", status, goodbolo, 
                        SMF__MINSTATSAMP );
             }
           }
