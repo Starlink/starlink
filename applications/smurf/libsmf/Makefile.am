@@ -140,6 +140,7 @@ smf_free_smfFilter.c \
 smf_freepolbins.c \
 smf_freetiles.c \
 smf_geod.c \
+smf_get_cleanpar.c \
 smf_get_dims.c \
 smf_get_findex.c \
 smf_get_gridcoords.c \

@@ -347,6 +347,8 @@
 *        Add smf_create_respfile
 *     2009-04-15 (DSB):
 *        Added smf_check_detpos.
+*     2009-04-15 (EC):
+*        Add smf_get_cleanpar
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1210,3 +1212,11 @@ void smf_calcmodel_flt( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 void smf_create_respfile( const Grp * rgrp, size_t index,
                           const smfData* refdata, smfData **respmap,
                           int *status );
+
+void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
+                       dim_t *dcbox, int *dcbad, double *dcthresh,
+                       int *dkclean, double *filt_edgelow, 
+                       double *filt_edgehigh, double *filt_notchlow,
+                       double *filt_notchhigh, int *filt_nnotch,
+                       int *dofilt, double *flagstat, int *order,
+                       double *spikethresh, size_t *spikeiter, int *status );
