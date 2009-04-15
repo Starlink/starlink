@@ -1,6 +1,11 @@
 1 Figaro - Spectroscopy Data Reduction Package
                                                       Expires: ????.??.??
 
+ Version 5.6-6
+
+ A bug in the longslit and arc2d applications has been fixed. Previously 
+ these applications failed to run.
+
  Version 5.6-5
 
  A bug in the movie application has been fixed. Previously the movie

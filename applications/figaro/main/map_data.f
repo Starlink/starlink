@@ -45,7 +45,7 @@
       character*5 mode
       logical ifcomb
       integer status
-      integer slot,sptr,nels,naxis
+      integer slot,nels,naxis
 
 
       if(ifcomb) then
@@ -63,7 +63,7 @@
 *
 *  Map the data
 *
-      call dsa_map_data('data','READ','float',sptr,slot,status)
+      call dsa_map_data('data','READ','float',d_sptr,slot,status)
       call dsa_get_work_array(nels,'float',d_vsptr,slot,status)
 
 *  See if there is an error array, and map it if present
