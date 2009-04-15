@@ -396,7 +396,7 @@ static int GaiaUtilsAstClear( ClientData clientData, Tcl_Interp *interp,
     astClear( object, Tcl_GetString( objv[2] ) );
     if ( ! astOK ) {
         astClearStatus;
-        Tcl_SetResult( interp, "Failed to clear AST attribute", TCL_DYNAMIC );
+        Tcl_SetResult( interp, "Failed to clear AST attribute", TCL_VOLATILE );
         return TCL_ERROR;
     }
     return TCL_OK;
@@ -1461,7 +1461,7 @@ static int GaiaUtilsAstFormat( ClientData clientData, Tcl_Interp *interp,
     /* Return result */
     if ( ! astOK ) {
         astClearStatus;
-        Tcl_SetResult( interp, "Failed to format value" , TCL_DYNAMIC );
+        Tcl_SetResult( interp, "Failed to format value" , TCL_VOLATILE );
         return TCL_ERROR;
     }
 
@@ -1513,7 +1513,7 @@ static int GaiaUtilsAstUnFormat( ClientData clientData, Tcl_Interp *interp,
         if ( !astOK ) {
             astClearStatus;
         }
-        Tcl_SetResult( interp, "Failed to unformat value" , TCL_DYNAMIC );
+        Tcl_SetResult( interp, "Failed to unformat value" , TCL_VOLATILE );
         return TCL_ERROR;
     }
 
