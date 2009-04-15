@@ -345,6 +345,8 @@
 *        -Added smf_calcmodel_flt
 *     2009-03-27 (TIMJ):
 *        Add smf_create_respfile
+*     2009-04-15 (DSB):
+*        Added smf_check_detpos.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -881,6 +883,7 @@ void smf_concat_smfGroup( smfGroup *igrp, const smfArray * darks,
                           int *status );
 
 void smf_checkdets( Grp *detgrp, smfData *data, int *status );
+int smf_check_detpos( smfData *data, int report, int *status );
 
 void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap, int mode, int *status );
 void smf_km2ext( int indf, const char *xname, AstKeyMap *keymap, int *timeout, int *status );

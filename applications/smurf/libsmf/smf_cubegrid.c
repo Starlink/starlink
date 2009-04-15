@@ -182,6 +182,9 @@
 *        Remove big chunks of code into smf_get_projpar and smf_calc_skyframe
 *     11-FEB-2009 (DSB):
 *        Ignore negative or zero input Tsys values.
+*     15-APR-2009 (DSB):
+*        Issue a warning if the REFCEPPOS and FPLANEX/Y positions are
+*        inconsistent.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -354,6 +357,11 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
          } 
       }
+
+/* Check that the detector sky positions implied by the RECEPPOS and FPLANEX/Y 
+   values in the file are consistent. Issue a warning message if not, but
+   then continue. */
+      (void) smf_check_detpos( data, 1, status );
 
 /* Get some convenient pointers. */
       file = data->file;
