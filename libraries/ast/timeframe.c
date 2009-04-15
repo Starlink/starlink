@@ -144,6 +144,14 @@ f     - AST_CURRENTTIME: Return the current system time
 *     31-MAR-2009 (DSB):
 *        Extend TimeFrame "iso" Format to allow it to specify the character to
 *        place between the time and date strings.
+*     15-APR-2009 (DSB):
+*        Increase the number of nice calendar time axis gaps allowed by
+*        the Gap function. Previously, there was a jump from 1 day to 1
+*        year making it difficult to plot calendar axes covering time 
+*        ranges of the order of 0.5 to 2 years. Now, nice numbers of days 
+*        are allowed as intermediate gaps. Since months do not all have
+*        the same number of days, this means that the day number at major
+*        ticks will bounce around a bit.
 *class--
 */
 
@@ -1399,10 +1407,57 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick, int *
          if( mjdgap >= 365.25 ) {
             mjdgap = 365.25*(*parent_gap)( this_frame, axis, mjdgap/365.25, ntick, status );
 
-/* If it is more than 19 days use 1 year. */
-         } else if( mjdgap > 19.0 ) {
+/* If it is more than 270 days days use 1 year. */
+         } else if( mjdgap > 270.0 ) {
             mjdgap = 365.25;
             *ntick = 4;
+
+/* If it is more than 150 days days use 180 days (roughly half a year).
+   Use 6 divisions (30 days each, or roughly 1 month). */
+         } else if( mjdgap > 150.0 ) {
+            mjdgap = 180.0;
+            *ntick = 6;
+
+/* If it is more than 90 days days use 120 days (roughly 4 months). */
+         } else if( mjdgap > 90.0 ) {
+            mjdgap = 120.0;
+            *ntick = 4;
+
+/* If it is more than 45 days days use 60 days (roughly 2 months). */
+         } else if( mjdgap > 45.0 ) {
+            mjdgap = 60.0;
+            *ntick = 2;
+
+/* If it is more than 22 days days use 30 days (roughly one month). Use 3
+   ten day divisions. */
+         } else if( mjdgap > 22.0 ) {
+            mjdgap = 30.0;
+            *ntick = 3;
+
+/* If it is more than 12 days days use 15 days (roughly half a month). */
+         } else if( mjdgap > 12.0 ) {
+            mjdgap = 15.0;
+            *ntick = 3;
+
+/* If it is more than 7.5 days days use 10 days, with 5 two-day divisions. */
+         } else if( mjdgap > 7.5 ) {
+            mjdgap = 10.0;
+            *ntick = 5;
+
+/* If it is more than 4.5 days days use 5 days. */
+         } else if( mjdgap > 4.5 ) {
+            mjdgap = 5.0;
+            *ntick = 5;
+
+/* If it is more than 3 days days use 4 days. */
+         } else if( mjdgap > 3.0 ) {
+            mjdgap = 4.0;
+            *ntick = 4;
+
+/* If it is more than 1.5 days days use 2 days. */
+         } else if( mjdgap > 1.5 ) {
+            mjdgap = 2.0;
+            *ntick = 2;
 
 /* If it is more than 0.5 of a day use 1 day. */
          } else if( mjdgap > 0.5 ) {
