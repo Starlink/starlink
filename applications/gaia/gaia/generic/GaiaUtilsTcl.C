@@ -109,6 +109,8 @@ static int GaiaUtilsAstTran2( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstTranN( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsAstUnFormat( ClientData clientData, Tcl_Interp *interp,
+                                 int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsDescribeAxes( ClientData clientData, Tcl_Interp *interp,
                                   int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsFrameIsA( ClientData clientData, Tcl_Interp *interp,
@@ -205,6 +207,10 @@ int GaiaUtils_Init( Tcl_Interp *interp )
 
     Tcl_CreateObjCommand( interp, "gaiautils::asttrann", GaiaUtilsAstTranN,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::astunformat",
+                          GaiaUtilsAstUnFormat, (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::describeaxes",
                           GaiaUtilsDescribeAxes, (ClientData) NULL,
@@ -1460,6 +1466,58 @@ static int GaiaUtilsAstFormat( ClientData clientData, Tcl_Interp *interp,
     }
 
     Tcl_SetResult( interp, (char *) result, TCL_VOLATILE );
+    return TCL_OK;
+}
+
+/**
+ * Un-format a value along an axis of a given AST Frame or FrameSet.
+ *
+ * There are three arguments, the address of the AST FrameSet, the axis
+ * to use and the value to unformat. The result is the unformatted value.
+ */
+static int GaiaUtilsAstUnFormat( ClientData clientData, Tcl_Interp *interp,
+                                 int objc, Tcl_Obj *CONST objv[] )
+{
+    AstFrameSet *wcs;
+    const char *value;
+    double result;
+    int axis;
+    int nchar;
+    long adr;
+
+    /* Check arguments, only allow three. */
+    if ( objc != 4 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "frameset axis value" );
+        return TCL_ERROR;
+    }
+
+    /* Get the frameset */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    wcs = (AstFrameSet *) adr;
+
+    /* Get the axis */
+    if ( Tcl_GetIntFromObj( interp, objv[2], &axis ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    /* Get the value */
+    value = Tcl_GetString( objv[3] );
+
+    /* Do the unformatting */
+    nchar = astUnformat( wcs, axis, value, &result );
+
+    /* Return result */
+    if ( ! astOK || nchar ==0 ) {
+        if ( !astOK ) {
+            astClearStatus;
+        }
+        Tcl_SetResult( interp, "Failed to unformat value" , TCL_DYNAMIC );
+        return TCL_ERROR;
+    }
+
+    Tcl_SetObjResult( interp, Tcl_NewDoubleObj( result ) );
     return TCL_OK;
 }
 
