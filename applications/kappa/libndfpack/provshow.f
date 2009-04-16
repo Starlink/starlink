@@ -122,7 +122,7 @@
 *     KAPPA: PROVADD, HISLIST.
 
 *  Copyright:
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -142,7 +142,7 @@
 *     02111-1307, USA.
 
 *  Authors:
-*     DSB: David Berry (STARLINK)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -152,6 +152,8 @@
 *        Added parameter PARENTS.
 *     12-AUG-2008 (DSB):
 *        Added parameter SHOW.
+*     16-APR-2009 (DSB):
+*        Corrected use of SHOW=ROOTS.
 *     {enter_further_changes_here}
 
 *-
@@ -261,7 +263,7 @@
 *  Decide if this ancestor should be displayed. This depends on the value
 *  supplied for parameter SHOW. If "ROOT" then only display this ancestor
 *  if it has no direct parents. 
-         IF( SHOW .EQ. 'ROOT' ) THEN
+         IF( SHOW .EQ. 'ROOTS' ) THEN
             USE = ( PARIDS .EQ. '<unknown>' )
 
 *  If "PARENTS" then only display this ancestor if its integer ID is 
