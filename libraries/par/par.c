@@ -8,6 +8,7 @@
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -41,7 +42,8 @@
 *     25-JUL-2008 (TIMJ):
 *         Use F77_CREATE_EXPORT_CHARACTER to completely avoid strlen
 *         null pointer risk.
-
+*     16-APR-2009 (DSB):
+*         Export maxval in the wrapper for parGet1c.
 *-
 */
 
@@ -1618,6 +1620,7 @@ DECLARE_INTEGER(fstatus);
 
    F77_CREATE_EXPORT_CHARACTER(param,fparam);
    F77_CREATE_CHARACTER_ARRAY(fvalues,values_length-1,maxval);
+   F77_EXPORT_INTEGER(maxval,fmaxval);
    F77_EXPORT_INTEGER(*status,fstatus);
 
    F77_CALL(par_get1c)( CHARACTER_ARG(fparam),
