@@ -14,7 +14,7 @@
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardoccopyright} 
-{Copyright \copyright\ 2008 University of British Columbia}
+{Copyright \copyright\ 2009 University of British Columbia}
 
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {258.1}
@@ -39,10 +39,13 @@ for reducing data produced by the ACSIS correlater, and SCUBA-2.
 %
 %  Authors:
 %     EC: Edward Chapin (UBC)
+%     AGG: Andy Gibb (UBC)
 %
 %  History:
 %     2008-11-14 (EC):
 %        Initial version -- based on sun.tex
+%     2009-04-15 (AGG):
+%        Convert Maria's document to LaTeX
 %     {Add further history here}
 %
 % -
@@ -282,7 +285,96 @@ for reducing data produced by the ACSIS correlater, and SCUBA-2.
 
 \section{\xlabel{introduction}Introduction}
 
-This guide is divided into two parts, ACSIS and SCUBA-2.
+This guide is divided into two parts, ACSIS and SCUBA-2. The first
+section will introduce SMURF and the basics of operation. Subsequent
+section will deal with ACSIS- and SCUBA-2-specific processing.
+
+\subsection{Using SMURF}
+
+\subsubsection{Starting SMURF}
+
+Enable the SMURF environment by typing \verb-smurf- at the shell
+prompt. The welcome message will appear as shown below:
+\begin{verbatim}
+
+        SMURF commands are now available -- (Version 0.4.1)
+
+        Type smurfhelp for help on SMURF commands.
+        Type 'showme sun258' to browse the hypertext documentation.
+
+        NOTE, several applications have had major changes made to their
+        parameter lists. See the 'Release Notes' section of SUN/XXX for
+        details.
+
+
+\end{verbatim}
+You can now use SMURF routines or ask for help.
+
+\subsubsection{Getting Help}
+
+Access the SMURF online help system as follows:
+\begin{enumerate}
+\item At the prompt, type \verb-smurfhelp-. The welcome message is
+  displayed along with a list of available topics.
+\item To get information, type the name of an available topic at the
+  help prompt.  The next level of help lists information and further
+  subtopics.
+\item To go to the next level, type the name of a subtopic.
+\item Type a question mark, \verb-?-, to re-display the available
+  topics at the current level.
+\item To go back one level, press \verb-<Enter>-.
+\item To exit the help system, press \verb-<Enter>- until you return
+  to the shell prompt.
+\end{enumerate}
+Further help on the help system maybe obtained by accessing the topic
+\verb-smurfhelp- from within \verb-smurfhelp-.
+
+\subsubsection{Message filter}
+
+Use the message filter parameter (\verb-msg_filter-) to control the
+number of messages SMURF writes to the screen during routines. The
+default setting for the message filter is normal. Table \ref{????}
+lists the available values for \verb-msg_filter-.
+
+\begin{table}
+\begin{tabular}{|c|l|}
+\hline
+Option  & Description \\
+\hline
+quiet   & No messages \\
+normal  & Very few messages \\
+verbose & Full messages \\
+debug   & Full message with debugging information (useful for programmers) \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Working with Data Files}
+
+ACSIS/SCUBA-2 file naming convention can go in here.
+
+You can process files either singly or in batches. It is more
+efficient to process multiple files at a time. When specifying a
+single file input to a routine, type in=s8ayyyymmdd\_xxxxx\_nnnn. It
+is not necessary to type the .sdf suffix. To work with multiple files:
+\begin{enumerate}
+\item Create an input list file listing the filename of each subscan
+  you wish to process. Name the text file with a suffix, e.g., .lis,
+  to indicate that it is a list file.
+\item Create an output list file listing output filenames for each input subscan.
+  \begin{itemize}
+  \item Name the output files differently otherwise the routine output
+    will overwrite the original subscan. For example, use a suffix,
+    \_ff, for output files from the Flatfield routine, to indicate
+    that the subscans have been processed.
+  \item List the output filenames in the same order as the input
+    filenames; otherwise, the processed data will be written under the
+    wrong filenames.  
+  \end{itemize}
+\item When specifying an input (or output list file for a routine,
+  type in=\verb-^-filename.lis, or out=\verb-^-filename.lis.  The
+  \verb-^- indicates that the input file is a list file.
+\end{enumerate}
 
 \section{\xlabel{acsis}ACSIS Data Reduction}
 
@@ -293,9 +385,917 @@ David Berry will write this part.
 Andy, Ed and Tim will write this part, starting with a draft imported
 from Maria's word document.
 
+\subsection{SCUBA-2 Data Files}
+
+Raw SCUBA-2 data is written to file every 30--60 seconds. Each file
+contains a number of samples (also known as timeslices) and is known
+as a subscan. Each subscan is composed of the following components:
+\begin{itemize}
+\item Raw data (a time-series stream)
+\item Flatfield data
+\item JCMT State structure (the telescope pointing record)
+\item Polynomial fit to detector signal versus raw data (a correction
+  for linear drift)
+\item Flexible Image Transport System (FITS) header containing
+  information that does not change during a subscan
+\end{itemize}
+The FITS header is used to store information that does not change
+rapidly during the course of an observation.
+
+Each subscan file is named using the convention mentioned above. Data
+observed at different wavelengths and collected from the different
+subarrays (4a, 4b, 4c, 4d, 8a, 8b, 8c, or 8d) are saved in different
+subscans.
+
+\subsection{SCAN Data Reduction Workflow}
+
+When observing with SCAN mode, there are two DR workflows available:
+Rebin and Iterate. In practice, the Iterate workflow will always yield
+the best results. However, for bright compact sources (bright enough
+to be detected in one sample and smaller than the field of view of the
+array), the Rebin method may allow for adequate processing.
+
+See Figure \ref{flow} for a flowchart showing the SCAN DR workflow.
+
+\begin{figure}
+%\includegraphics....
+\caption{Flowchart\label{flow}}
+\end{figure}
+
+For bright compact sources, or sources with structure on scales
+smaller than eight arcmin:
+\begin{enumerate}
+\item Rebin workflow
+  \begin{enumerate}
+  \item Apply the flatfield correction (see Section 2).
+  \item Remove the contribution of atmosphere to the signal (see Section 3).
+  \item Correct for atmospheric extinction (See Section 4).
+  \item Make a map using the Rebin method (see Section 5.2).
+  \end{enumerate}
+
+\item Iterate workflow
+  \begin{enumerate}
+  \item Make a map using the Iterate method (see Section 5.3).
+  \end{enumerate}
+\end{enumerate}
+
+\subsection{Applying the Flatfield Correction}
+
+A flatfield exposure records variation in the sensitivity of each
+bolometer. Ideally, every bolometer gives the same reading when
+exposed to a calibrated radiation source. In practice, each one
+responds in a slightly different way.
+
+The flatfield response is derived at the telescope from a dedicated
+FLATFIELD observation and processed automatically by the ORAC-DR
+pipeline. If the flatfield was deemed successful, the results are
+stored and written to every subsequent SCUBA-2 data file.
+
+Bolometer output is modified by the gain of the individual bolometer
+and its offset from a one-to-one relationship with the input
+radiation. This is summarized as:
+\begin{equation}
+P_{\rm out} = P_{\rm in} G + O.
+\end{equation}
+where $G$ is the gain and $O$ is the offset.
+
+Each observer receives NDF data files that include the appropriate
+flatfield response. For example, the flatfield response from the
+bolometers in subarray 4a is included with all raw data recorded using
+subarray 4a.
+
+The SMURF routine that applies the flatfield correction is called
+Flatfield. Since the flatfield information is already included in each
+subscan, multiple files to be flatfielded with a single call to the
+Flatfield routine.
+
+To apply a flatfield correction to a single data file:
+\begin{verbatim}
+flatfield in=filename out=filename_ff
+\end{verbatim}
+The Flatfield routine accesses the flatfield data in the subscan
+\verb-filename.sdf-, corrects the signal from every bolometer, and
+writes the output to \verb-filename_ff.sdf-.
+
+To apply a flatfield correction to a list of data files:
+\begin{verbatim}
+flatfield in=^input.lis out=^output.lis
+\end{verbatim}
+The Flatfield routine accesses the flatfield data in each subscan
+listed in \verb-input.lis-, corrects the signal from every bolometer
+in each subscan, and writes the output to a new set of output files,
+named as specified in the \verb-output.lis- file.
+
+Note: When creating the list files, enter an output filename
+corresponding to every input filename. The Flatfield task will abort
+with an error if this is not true.
+
+\subsubsection{Using alternative flatfield information}
+
+If necessary, you can obtain an alternative flatfield NDF file from
+your support scientist or re-calculate the flatfield solution using
+different settings.
+
+The flatfield solution is different for every subarray. If you get an
+alternative flatfield solution for subarray 8a, you must only apply it
+to the data taken using that subarray. In the example (see Section
+2.2.1), one of the data files is from subarray 8a.
+
+To apply an alternative flatfield correction:
+\begin{verbatim}
+flatfield in=s8a20080715_00001_0001 flat=flatfield8a \
+          out=s8a20080715_00001_0001_ff
+\end{verbatim}
+The Flatfield routine ignores the flatfield data included with the raw
+data and uses the information in the new file to make the flatfield
+correction.
+
+\subsection{Removing the Atmosphere}
+
+This section describes how to subtract the signal from the atmosphere
+(or sky) from your observations.
+
+\subsubsection{Radiation from the Atmosphere}
+
+The sky is bright at submillimetre wavelengths, and the radiation received from
+an astronomical source is only a fraction of the radiation received from the
+atmosphere (see the graph in Figure 5). There are several ways to estimate the
+amount of signal from the atmosphere in the data.
+
+\begin{figure}
+%\includegraphics{telescope.eps}
+\caption{Typical relative magntidues of atmospheric and source signals
+  at submillimetre wavelengths}
+\end{figure}
+
+In a single sample of 5 ms, the signal collected from an astronomical
+source is negligible in comparison with the signal from the sky. Many
+samples are required to collect a statistically significant signal
+from the source. Therefore, the signal from the sky is estimated by
+fitting a mathematical function to the signal from both the sky and
+the source.
+
+\subsubsection{SCUBA-2 methods for sky removal}
+
+The SMURF routine that removes the sky is called Remsky. There are two main
+methods for estimating the atmospheric signal available in Remsky:
+\begin{itemize}
+\item Fitting the atmosphere in the spatial domain;
+\item Fitting the atmosphere in the time domain.
+\end{itemize}
+
+In the first method (see Section 3.2), the atmospheric signal is
+estimated across all positions on the sky, i.e., across all the
+bolometers in the subarray, at every time step. The Remsky routine
+subtracts the solution from all the bolometers at each time step. This
+method makes use of the fact that the sky signal is correlated between
+adjacent bolometers (in fact right across the field of view).
+
+The second method (see Section 3.3) fits the atmospheric signal
+observed by each bolometer for all time steps. The routine subtracts
+the solution from each bolometer at all time steps. This method makes
+no assumptions about correlations in the sky signal between adjacent
+bolometers.
+
+\subsubsection{Fitting the atmosphere in the spatial domain}
+
+You can fit the atmospheric signal in the following ways:
+\begin{itemize}
+\item  Calculate the mean value of the signal;
+\item  Fit a gradient in elevation;
+\item  Fit an arbitrary plane.
+\end{itemize}
+In all cases, the method parameter should be set to plane so that
+Remsky fits in the spatial domain. The group parameter may be set to
+either true or false. If true, the routine groups data from the four
+subarrays at each wavelength and processes them simultaneously. If
+false, the routine processes data from each subarray independently. In
+the examples below, group has been set to false.
+
+\paragraph{Subtracting the mean value}
+
+Assuming that the atmosphere does not vary in elevation or azimuth
+across the field of view, use the Remsky routine to find the mean
+value of the signal. Set the fit parameter to mean.
+
+To remove the sky:
+\begin{verbatim}
+remsky in=^input.lis out=^output.lis method=plane fit=mean group=false
+\end{verbatim}
+
+The Remsky routine accesses each file listed in input.lis and
+calculates the mean value of the signal across all bolometers for each
+sample. The routine subtracts the mean signal from all the bolometers
+at each sample and writes the output to the new files specified in
+output.lis.
+
+\paragraph{Subtracting a gradient in elevation}
+
+Assuming that the atmosphere varies in elevation but not in azimuth,
+use the Remsky routine to fit a gradient to the signal. Set the fit
+parameter to slope, so that Remsky calculates the best-fit gradient in
+elevation.
+
+To remove the sky:
+\begin{verbatim}
+remsky in=^flatfield.lis out=^remsky.lis method=plane fit=slope group=false
+\end{verbatim}
+When the prompt appears, the routine is complete.
+
+The Remsky routine accesses each file listed in input.lis and
+calculates the best-fit gradient in elevation for the signal across
+all bolometers for each sample.  The routine subtracts the gradient in
+signal from all the bolometers at each sample and writes the output to
+the new files specified in output.lis.
+
+\paragraph{Subtracting an arbitrary plane}
+
+Assuming that the atmosphere varies in both elevation and azimuth, use
+the Remsky routine to fit an arbitrary plane to the signal. Set the
+fit parameter to plane, so that Remsky calculates the best-fit plane
+of arbitrary orientation.
+
+To remove the sky:
+\begin{verbatim}
+remsky in=^flatfield.lis out=^remsky.lis method=plane fit=plane group=false
+\end{verbatim}
+When the prompt appears, the routine is complete.
+
+The Remsky routine calculates the best-fit plane at arbitrary angle on
+the sky for the signal across all bolometers for each time sample. The
+routine subtracts the plane in signal from all the bolometers at each
+sample and writes the output to the new files specified in output.lis.
+
+\subsubsection{Fitting the atmosphere in the time domain}
+
+\paragraph{Subtracting a polynomial}
+
+Assuming that the atmosphere varies over time, use the Remsky routine
+to fit a polynomial to the signal by setting the method parameter to
+poly.
+
+To remove the sky:
+\begin{verbatim}
+remsky in=^flatfield.lis out=^remsky.lis method=poly group=false
+\end{verbatim}
+When the prompt appears, the routine is complete.
+
+
+The Remsky routine calculates the best-fit polynomial in time for the
+signal collected by each bolometer. The routine subtracts the
+polynomial from the signal at each bolometer for all samples.
+
+\subsubsection{Quick reference}
+
+Table \ref{????} summarizes the options available for each of the
+parameters passed to the Remsky routine.
+
+\begin{table}
+\begin{tabular}{llccc}
+\hline
+        &                        & \multicolumn{3}{c}{Parameter} \\
+Fit     & Degree of Variability  & Method  & Fit & Group\\
+\hline
+Spatial & Mean            & plane & mean  & true/false \\
+        & Gradient        & plane & slope & true/false \\
+        & Arbitrary Plane & plane & plane & true/false \\
+Time    & Polynomial      & poly  & N/A   &    false \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Correcting for atmospheric extinction}
+
+This section describes how to correct your data for atmospheric
+extinction, the loss of radiation from the source as it travels
+through the atmosphere.
+
+The observed signal from an astronomical source decreases as the
+atmosphere along the line of sight increases. At lower elevations,
+there is more atmosphere along the line of sight between the source
+and the telescope.
+
+\subsubsection{Optical Depth}
+
+The radiation received by SCUBA-2 is the sum of the radiation from the
+astronomical source (represented by $I_{\rm src}$ in Equation (1)) and
+the radiation from the atmosphere ($I_{\rm atms}$). However, $I_{\rm
+    src}$ is diminished by the optical depth of the atmosphere
+  ($\tau$) as follows:
+
+\begin{equation}
+I_{\rm obs} = I_{\rm atms} + I_{\rm src} \exp(-\tau)
+\end{equation}
+
+Optical depth is a measure of the total absorption along the line of
+sight between the source and the telescope. Optical depth is usually
+quoted as the value at the zenith ($\tau_{\rm zenith}$), but you need
+the value of tau at the same elevation as your observations
+($\tau_{\rm obs}$).
+
+To calculate $\tau_{\rm obs}$, use the relationship $\tau_{\rm obs} =
+A \times \tau_{\rm zenith}$, where airmass ($A$) is a measure of the
+total atmosphere along the line of sight.
+
+\subsubsection{Airmass}
+
+Airmass is defined as $1 / \cos \theta$, where $\theta$ is the zenith
+angle (see the two lower graphs in Figure 6). The zenith angle is the
+vertical angle measured from the zenith ($\theta = 0^\circ$) towards
+the horizon ($\theta = 90^\circ$). The zenith angle is thus equal to
+$90-\phi$, where $\phi$ is the elevation. You can now calculate
+$\tau_{\rm obs}$ from $\tau_{\rm zenith}$ and $\phi$ as follows:
+\begin{equation}
+\tau_{\rm obs} = \tau_{\rm zenith} / \cos(90 - \phi )
+\end{equation}
+
+\begin{figure}
+%\includegraphics{extinction.eps}
+\caption{Atmospheric extinction as a function of airmass.}
+\end{figure}
+
+Using Equation (2), rewrite Equation (1) as:
+\begin{equation}
+I_{\rm obs} = I_{\rm atms} + I_{\rm src} \exp \left( 
+\frac{-\tau_{\rm zenith}}{\cos(90-\phi)}\right)
+\end{equation}
+The top graph in Figure 6 shows how the observed signal varies with elevation
+and airmass.
+
+\subsubsection{Calculating Optical Depth}
+
+You already know the elevation angle of each bolometer and, if you can
+obtain $\tau_{\rm zenith}$ from SCUBA-2, or another instrument, you
+can calculate the $\tau_{\rm obs}$ at the elevation angle of each
+bolometer. The zenith optical depth can be obtained via three methods:
+\begin{enumerate}
+\item Skydips :
+
+Zenith tau is derived from observations of the atmospheric signal at
+several airmasses. To derive $\tau_{\rm zenith}$ at 450 and 850
+$\mu$m, you can observe skydips with SCUBA-2.  A skydip is a series of
+measurements, observing the signal from the atmosphere at the zenith
+($\phi = 90^\circ$), and then observing at successively smaller
+elevations.
+
+\item Caltech Submillimeter Observatory tipping radiometer:
+
+The Caltech Submillimeter Observatory (CSO) radiometer measures
+$\tau_{\rm zenith}$ from skydip observations at 225 GHz. The CSO
+radiometer records a new $\tau_{\rm zenith}$ every 10 minutes.
+
+SMURF converts CSO $\tau_{\rm zenith}$ to $\tau_{\rm zenith}$ at 450,
+or 850 $\mu$m, relying on an empirical relationship between $\tau_{\rm
+  zenith}$ at 225 GHz and $\tau_{\rm zenith}$ at 450, or 850 $\mu$m.
+
+\item JCMT Water Vapour Monitor:
+
+The JCMT Water Vapour Monitor (WVM) provides accurate measurements of
+$\tau_{\rm zenith}$ every 1.2 seconds, in conditions ranging from very
+dry to very wet. It measures $\tau_{\rm zenith}$ at 183 GHz and
+converts it to $\tau_{\rm zenith}$ at 225 GHz.
+
+\end{enumerate}
+Optical depth measurements derived from the WVM are most useful in
+variable atmospheric conditions where the CSO radiometer may not be
+giving reliable readings.
+
+\subsubsection{SCUBA-2 Methods}
+
+The SMURF routine that corrects for atmospheric extinction is called
+Extinction.  The Extinction routine accepts $\tau_{\rm zenith}$
+determined by all of the previously discussed methods:
+\begin{itemize}
+\item JCMT WVM (see Section 4.2)
+\item CSO radiometer (see Section 4.3)
+\item Observing skydips at 450 and 850 $\mu$m (see Section 4.4)
+\end{itemize}
+
+It is recommended that you use $\tau_{\rm zenith}$ measured by the
+JCMT WVM because the value is updated so regularly. The quick
+parameter is common to all methods. If true then the extinction
+correction is calculated once per time step at an airmass
+corresponding to the centre of the field of view and applied to every
+measurement. If false (the default) the airmass is calculated for
+every bolometer at every time step. 
+
+\paragraph{Using tau from the JCMT Water Vapour Monitor}
+
+SCUBA-2 automatically records $\tau_{\rm zenith}$ measured by the JCMT
+WVM and writes it into the state structure portion of each subscan
+(see Section 1.1).
+
+When using zenith tau from the WVM, you need to set the method
+parameter to wvmraw. The extinction routine looks up the WVM
+$\tau_{\rm zenith}$ and converts it to $\tau_{\rm zenith}$ at 450 and
+850 $\mu$m.
+
+To correct for atmospheric extinction:
+\begin{verbatim}
+extinction in=^input.lis out=^output.lis method=wvmraw quick=false
+\end{verbatim}
+
+\paragraph{Using tau from the CSO radiometer}
+
+SCUBA-2 automatically records $\tau_{\rm zenith}$ measured by the CSO
+radiometer in the FITS header for each subscan.
+
+When using zenith tau from the CSO radiometer, you need to set the
+method parameter to csotau and set the csotau parameter to the null
+value, i.e., !. When it receives the null value, the Extinction
+routine looks up the CSO $\tau_{\rm zenith}$ in the FITS header of the
+relevant scans. The routine converts it to $\tau_{\rm zenith}$ at 450
+and 850 $\mu$m as required. Alternatively you may give a value here
+which will be used instead.
+
+To correct for atmospheric extinction:
+\begin{verbatim}
+extinction in=^input.lis out=^output.lis method=csotau csotau=! quick=false
+\end{verbatim}
+
+
+\paragraph{Using tau from SCUBA-2 skydips}
+
+If you observed skydips, you can derive $\tau_{\rm zenith}$ from these
+observations. Before correcting for atmospheric extinction, reduce the
+skydip observations and derive $\tau_{\rm zenith}$ at 450 and 850 $\mu$m.
+
+Since the value of $\tau_{\rm zenith}$ is different at 450 and 850
+$\mu$m, process the data from the 850-$\mu$m subarrays and 450-$\mu$m
+subarrays separately. Typical values of $\tau_{\rm zenith}$ are 1.0 at
+450 $\mu$m and 0.4 at 850 $\mu$m.
+
+When using the Extinction routine with tau from skydips, set the
+method parameter to filtertau and the filtertau parameter to the value
+derived from the skydip.
+
+To correct for atmospheric extinction (with an example optical depth
+of 0.4):
+\begin{verbatim}
+extinction in=^input.lis out=^output.lis method=filtertau filtertau=0.4 \
+           quick=false
+\end{verbatim}
+
+\subsubsection{Quick reference}
+
+This table summarizes options available for each of the parameters
+passed to the Extinction routine.
+
+\begin{table}
+\begin{tabular}{llccc}
+\hline
+                 &           & \multicolumn{3}{c}{Parameter} \\
+Source of $\tau$ & Method    & \verb-csotau- & \verb-filtertau- & \verb-quick- \\
+\hline                                               
+WVM              & \verb-wvmraw-    &  --     &   --       & true or false \\
+CSO              & \verb-csotau-    & value   &   --       & true or false \\
+SCUBA-2 skydips  & \verb-filtertau- &  --     & value      & true or false \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Making an image}
+
+\subsubsection{Introduction}
+
+This section describes how to create a map of your observed
+source. The challenge is to make an image when the data taken at each
+bolometer position does not line up exactly with the output map
+pixels.
+
+For SCUBA-2, the distance between bolometers, as projected on the sky,
+is 6.28 arcsec. For mapping, the output pixel size is usually set at 1
+arcsec for observations at 450 µm and 3 arcsec at 850 µm.
+
+Data from the SCAN observing mode can be converted into a
+two-dimensional (2D) map using a routine called Makemap. This routine
+accepts multiple files as input and produces a single map file as
+output. There are two mapmaking methods available:
+\begin{itemize}
+\item Rebin method
+\item Iterate method
+\end{itemize}
+
+The Rebin method is the final step in the workflow for bright point
+sources, or sources with structure on scales less than eight arcmin
+(see Section 1.2 and Figure 2). This method applies a one-pass
+rebinning algorithm to the data, which regrids the signal from each
+bolometer onto a map in the desired co-ordinate system.
+
+The Iterate method is the workflow for faint point sources, or sources
+with structure on a scale larger than eight arcmin (see Section 1.2
+and Figure 2). This method applies an iterative algorithm to the raw
+data, assuming that the observed signal is composed of:
+\begin{itemize}
+\item Radiation from the atmosphere
+\item Radiation from the astronomical source
+\item Variations in bolometer response (detector drift)
+\item Cosmic ray spikes
+\item Systematic noise from the bolometers and the atmosphere
+\item White noise from the instrument and the atmosphere
+\end{itemize}
+
+The top panel of Figure 7 shows the observed signal from a single
+bolometer during one subscan. The lower three panels shows how the
+signal is composed of signal from the atmosphere, the source and white
+noise. The iterate algorithm estimates the contribution of all those
+factors and compares the model with the original raw data. The
+algorithm refines the estimates in an iterative loop until it meets
+certain convergence criteria.
+
+The Rebin method is a good option if you want to produce an image
+quickly, but it does not fully correct for systematic noise. The
+Iterate method produces more accurate maps, with better sky
+subtraction.
+
+\begin{figure}
+%\includegraphics{signal-components.eps}
+\caption{The top panel shows the observed signal, with subsequent
+  panels showing the relative contributions from the atmosphere, the
+  astronomical source and white noise.}
+\end{figure}
+
+\subsubsection{Rebin method}
+
+The rebinning algorithm shares the observed signal from a single
+bolometer between neighbouring output map pixels, as determined by the
+pixel-spreading function. The value of each pixel in the map is the
+sum of the signal from every bolometer that observed at that position.
+
+\paragraph{Pixel Spreading Schemes}
+
+There are many options for the pixel spreading scheme (see Table A-1
+for a summary). The fastest option is to use the nearest-neighbour
+pixel spreading scheme (Nearest), which assigns the whole signal from
+one bolometer to the nearest map pixel. This option does not always
+produce smooth maps, but it produces a robust estimate of the noise.
+
+For smoother maps, use the Linear scheme to share the input signal
+equally among the four nearest map pixels. There are more complicated
+options available, e.g., Sinc-type functions, or Gaussian
+distributions. These methods produce aesthetically pleasing maps, at
+the risk of introducing correlations into the noise.
+
+\paragraph{Example Image}
+
+Figure 8 shows an example map created from simulated observations of
+an extended source with bright features. It was created using the
+Rebin method and the nearest-neighbour pixel spreading scheme.
+
+Note the dark regions around the bright sources. They are negative
+bowls introduced by the sky subtraction method (Section 3.2). The
+random dots are cosmic ray spikes which are not removed by this
+workflow.
+
+\begin{figure}
+%\includegraphics...
+\caption{Example map}
+\end{figure}
+
+\paragraph{Using the Rebin Method}
+
+When using the Makemap routine with the rebin option, you need to set
+the method parameter to rebin and set the pixel size using the pixsize
+parameter. For 450-$\mu$m observations, set pixsize=1 arcsec. For
+850-$\mu$m observations, set pixsize=3 arcsec.
+
+If the co-ordinate system is not set, the Makemap routine uses the
+co-ordinate system used during the observations. If necessary, set the
+co-ordinate system using the system parameter.  Makemap supports all
+popular co-ordinate systems (see Section 5.4).
+
+If a pixel spreading option is not set, the Makemap routine uses the
+default option: the nearest-neighbour pixel spreading scheme
+(Nearest). If required, set the spread parameter to one of the pixel
+spreading schemes listed in Table A-1, e.g., spread=linear.
+
+To make the map:
+\begin{verbatim}
+makemap in=^input.lis out=mapname method=rebin pixsize=value
+\end{verbatim}
+When the prompt appears, the routine is complete.
+
+\subsubsection{Iterate method}
+
+The Iterate method works quite differently from the Rebin method (see
+Section 5.1).
+
+The iterative algorithm solves for different model components,
+creating a better model of the raw data in successive iterations. The
+algorithm runs until it reaches a pre-set number of iterations or
+until the difference between the model and the real data ($\chi^2$) is
+no longer changing significantly.
+
+Here is an outline of the workflow, in which the iterative algorithm:
+\begin{enumerate}
+\item Filters some of the artifacts from the data and flags the
+  bolometers which are giving bad data.
+\item Subtracts a simple estimate of the atmosphere, e.g., the mean
+  signal value across all detectors.
+\item Transforms the data back into the time domain, creating a
+  simulated observation to compare against the raw data.
+\item For each successive iteration, the routine:
+  \begin{enumerate}
+    \item Creates models of the atmosphere and of systematic noise
+      from the bolometers and the atmosphere.
+    \item Uses zenith tau from the JCMT WVM to correct for atmospheric
+      extinction.
+    \item Removes the signal spikes.
+    \item Estimates the signal from the source.
+    \item Estimates the signal from white noise.
+    \item Adds the components from steps a, d, and e, and transforms
+      the result back into the time domain to compare it with the raw
+      data.
+    \item Checks if it has completed the pre-set number of iterations,
+      or, if the convergence criteria (See Section 5.3.3) have been
+      met.
+    \item Returns to step a, or continues to step 5.
+  \end{enumerate}
+\item Uses the nearest-neighbour pixel spreading scheme to regrid the
+  signal from the bolometers onto a map.
+\end{enumerate}
+
+\paragraph{Model components}
+
+See Table 2 for a list of model components and their definitions. It
+will be necessary to add more model components during the
+commissioning of SCUBA-2.
+\begin{table}
+\begin{tabular}{ll}
+ Model Component & Definition \\
+\hline
+ com  &  Removes common-mode signal, i.e., the signal seen by all \\
+      &  bolometers. This is the removal of the atmosphere. \\
+ ext  &  Applies the extinction correction. \\
+ noi  &  Estimates the time-domain variance for chi-squared  \\
+      &  ($\chi^2$) tolerance. \\
+\end{tabular}
+\caption{Model Components for Iterative Mapmaking}
+\end{table}
+All of the model components and their configuration parameter are set
+up in a configuration file before running the iterate algorithm. See
+Table 3 for a summary of the available parameters.
+
+\paragraph{Processing time}
+
+The memiter parameter (Table 3) influences the time it takes the iterative
+algorithm to generate a solution. It determines whether:
+\begin{enumerate}
+\item Iterations are performed in memory (memiter=1)
+\item Component values are written to a file after each iteration
+  (memiter=0)
+\end{enumerate}
+
+For the first option, the algorithm loads as many data files as
+possible into memory and processes the data in a single, continuous
+chunk. Once the algorithm has estimated a map, it saves the map and
+loads the next continuous chunk of data. When all the data is
+processed, the routine combines the maps from each continuous chunk
+into one image.
+
+For the second option the algorithm loads one data file (or file
+chunk) into memory, processes the file, saves the map, and moves onto
+the next file. This method uses less memory, but it takes much longer
+because of the extra time spent writing files to disk.
+
+If your computer has enough random access memory (RAM), it is
+recommended that you set the memiter=1 and allow the iterative
+algorithm to process as much data as possible. However, you can still
+limit the size of the continuous chunk using the parameter maxmem.
+
+\paragraph{Convergence criteria}
+
+The iterative algorithm calculates the chi-squared ($\chi^2$)
+tolerance after each iteration, and then, calculates the difference
+between $\chi^2$ from current iteration and the previous iteration. If
+the difference is less than $10^{-6}$, then the iterative routine
+stops.
+
+\paragraph{Example image}
+
+\begin{figure}
+%\includegraphics...
+\caption{Example figure processed with the iterative mapmaker}
+\end{figure}
+
+Figure 9 shows an example of a map created from simulated observations
+of an extended source using the Iterate method. Compare this image
+with the map created from the same observations using the Rebin method
+(see Figure 8).The dark regions around the bright sources have
+disappeared and the cosmic ray spikes have been removed.
+
+
+\paragraph{Using the iterate method}
+When using the Makemap routine with the iterate option, you need to apply
+the following parameters and options:
+
+\begin{itemize}
+\item Create a configuration file, e.g. config.lis, containing all the
+  required parameters listed in the form keyword=value. The
+  configuration parameters are summarized in Table 3 and the default
+  values are shown in the third column.
+\item Set the method parameter to iterate.
+\item Set the correct pixel size for your observed wavelength using
+  the pixsize parameter.
+\item If necessary, set the co-ordinate system using the system
+  parameter.
+\end{itemize}
+
+To make the map:
+\begin{verbatim}
+makemap in=^input.lis out=mapname method=iterate config=^config.lis \
+        pixsize=value
+\end{verbatim}
+
+\paragraph{Worked Example\\}
+
+You receive data files after the first 30 seconds of observing an
+astronomical source on 15 July, 2009. The observation number is
+00001. SCUBA-2 generates eight data files containing 30 seconds of
+data from subarrays 8a–d and 4a–d.  The first 30-second interval is
+written to a data file as subscan 0001.
+
+For this example, to make an 850-$\mu$m map:
+\begin{enumerate}
+\item Create config.lis. See Section A.2 for the contents of the
+  config.lis file used to generate this example.
+\item Prepare an input listing file, e.g., raw850.lis, listing the
+  four 850-$\mu$m subscans.
+\item At the prompt, enter the following text:
+\begin{verbatim}
+makemap in=^raw850.lis out=map850_iterate method=iterate
+        config=^config.lis pixsize=3
+\end{verbatim}
+     When the prompt appears, the routine is complete and the map is
+     saved in map850\_iterate.sdf.
+\end{enumerate}
+
+In this example, maxmem is limited to 3072 megabytes (MB) of RAM and
+memiter=0, so that the algorithm processes the data in file chunks
+smaller than 3072 MB.
+
+\begin{verbatim}
+makemap in=^raw850.lis out=map850 pixsize=3 method=iterate config=^config.lis\
+        maxmem=3072
+SMF_ITERATEMAP: 5 iterations
+SMF_ITERATEMAP: Iteration 1 / 5 ---------------
+SMF_ITERATEMAP: File chunk 1 / 1
+SMF_ITERATEMAP: Pre-conditioning chunk
+SMF_ITERATEMAP: Calcualte time-stream model components
+SMF_ITERATEMAP: Rebin residual to estimate MAP
+SMF_ITERATEMAP: *** CHISQUARED = 3.31598 for chunk 1
+SMF_ITERATEMAP: Calculate ast
+SMF_ITERATEMAP: Iteration 2 / 5 ---------------
+SMF_ITERATEMAP: File chunk 1 / 1
+SMF_ITERATEMAP: Pre-conditioning chunk
+SMF_ITERATEMAP: Calcualte time-stream model components
+SMF_ITERATEMAP: Rebin residual to estimate MAP
+SMF_ITERATEMAP: *** CHISQUARED = 3.31598 for chunk 1
+SMF_ITERATEMAP: *** change: 
+SMF_ITERATEMAP: Calculate ast
+SMF_ITERATEMAP: Iteration 3 / 5 ---------------
+SMF_ITERATEMAP: File chunk 1 / 1
+SMF_ITERATEMAP: Pre-conditioning chunk
+SMF_ITERATEMAP: Calcualte time-stream model components
+SMF_ITERATEMAP: Rebin residual to estimate MAP
+SMF_ITERATEMAP: *** CHISQUARED = 3.31598 for chunk 1
+SMF_ITERATEMAP: *** change: 
+SMF_ITERATEMAP: Calculate ast
+SMF_ITERATEMAP: Iteration 4 / 5 ---------------
+SMF_ITERATEMAP: File chunk 1 / 1
+SMF_ITERATEMAP: Pre-conditioning chunk
+SMF_ITERATEMAP: Calcualte time-stream model components
+SMF_ITERATEMAP: Rebin residual to estimate MAP
+SMF_ITERATEMAP: *** CHISQUARED = 3.31598 for chunk 1
+SMF_ITERATEMAP: *** change: 
+SMF_ITERATEMAP: Calculate ast
+SMF_ITERATEMAP: Iteration 5 / 5 ---------------
+SMF_ITERATEMAP: File chunk 1 / 1
+SMF_ITERATEMAP: Pre-conditioning chunk
+SMF_ITERATEMAP: Calcualte time-stream model components
+SMF_ITERATEMAP: Rebin residual to estimate MAP
+SMF_ITERATEMAP: *** CHISQUARED = 3.31598 for chunk 1
+SMF_ITERATEMAP: *** change: 
+SMF_ITERATEMAP: Calculate ast
+SMF_ITERATEMAP: ****** Completed in 5 iterations
+\end{verbatim}
+
+The message filter parameter, msg\_filter, is set to normal, but the
+iterative algorithm still displays useful information on the
+screen. In this example, numiter is set to 5. The algorithm displays
+$\chi^2$, and the difference between successive $\chi^2$ (see
+change:), for each iteration.
+
+The comment Calculate the time-stream model components indicates that
+the algorithm is estimating and removing the user-specified
+components, such as the common mode and application of the extinction
+correction, one at a time.
+
+The comment Rebin residual to estimate MAP indicates that the
+algorithm is regridding all of the corrected bolometer signals into a
+map, along with the signal calculated from previous iterations.  The
+calculate ast comment means that the algorithm is transforming the
+modelled data back into the time domain for comparison with the raw
+data.
+
+\subsubsection{Quick reference}
+
+This table summarizes options available for each of the parameters
+passed to the Makemap routine.
+
+\begin{table}
+\begin{tabular}{lccccccc}
+\hline
+        & \multicolumn{4}{c}{Required Parameters}           & \multicolumn{3}{c}{Optional Parameter} \\
+Method & method    &  config   &    pixsize   &   system         &  spread    & params(1) & params(2) \\
+       &           &           &   (arcsec)   &  (co-ordinates)  &            &           & \\
+\hline
+Rebin  & rebin     &  --       &              &                  &  Linear,   &   --      & -- \\
+       &           &           &              &                  &  Nearest   &     --       & \\
+       &           &           &              &                  &  Sinc,     &              &   -- \\
+       &           &           &              &                  &  Somb      &              & \\
+       &           &           &              &   ICRS, GAPPT,   &            &              & \\
+       &           &           &              &   FK5, FK4,      &  SincSinc, &  Usually 2   &  Default: 2\\
+       &           &           &              &                  &  SincCos,  &  Minimum:1   &  Minimum: 1\\
+       &           &           &      3 or 1  &   FK4-NO-E,      &  SombCos   & Auto $\leq$0 & \\
+       &           &           &              &   AZEL,          &            &              & \\
+       &           &           &              &   GALACTIC,      &  Gauss,    &              &   Default: 1\\
+       &           &           &              &   ECLIPTIC       &  SincGauss &              &   Minimum:\\
+       &           &           &              &                  &            &              &           0.1\\
+\hline
+Iterate& iterate   &    See    &              &                  &  Nearest   &     --       &   -- \\
+       &           &    Section&              &                  &            &              & \\
+       &           &    5.4.1  &              &                  &            &              & \\
+\hline
+\end{tabular}
+\caption{For further information about spread, params(1) and params(2), see Table A-1.}
+\end{table}
+
+\paragraph{Configuration parameters}
+
+Table 3 summarizes the configuration parameters available for the
+model components in the Iterate method. The default values are shown
+in the third column.
+
+
+\begin{table}
+\begin{tabular}{llc}
+\hline
+Parameter        &       Definition                                                         &  Default Value \\
+(keyword)        &                                                                          & \\
+\hline
+numiter          &      Either give a positive number that equals the number of             & 10\\
+                 &      iterations, or give a negative number that equals the maximum       & \\
+                 &      number of iterations using chi squared ($\chi^2$) stopping criteria.& \\
+exportndf        &      An option to export iterative mapmaker files as NDF files. It       & 0 (do not\\
+                 &      exports one file per model component, per subarray. Use this        & export as NDF\\
+                 &      option if you want to view the values in these files.               & files)\\
+\hline
+\multicolumn{3}{l}{If applying a filter to remove artifacts} \\
+\hline
+filt\_edgehigh,      &   Enter low and high frequencies in hertz (Hz).                     & -- \\
+filt\_edgelow        & & \\
+filt\_notchhigh,     &   Enter a range of high frequencies for filt\_notchhigh and a range & -- \\
+filt\_notchlow       &   of low frequencies for filt\_notchlow. & \\
+\hline
+\multicolumn{3}{l}{If removing common mode signal (atmosphere)} \\
+\hline
+com\_boxcar          &    A low-pass boxcar filter that assists with convergence. Specify  & 400 \\
+                     &   size, i.e., the number of samples to use.                         & \\
+com\_boxfact         &    Reduce the width of the boxcar by this box factor in each        &   0.5 \\
+                     &   iteration.                                                        & \\
+com\_boxmin          &   The minimum width below which the boxcar can't be reduced.        & 100 \\
+\hline
+\multicolumn{3}{l}{If estimating the time-domain variance for chi-squared ($\chi^2$) tolerance (if numiter is negative)} \\
+\hline
+chitol            &   $\chi^2$ tolerance, requires noi model component. If the $\chi^2$ difference & $10^{-6}$\\
+                  &   $<1\times10^{-6}$, then make the current iteration the last iteration.       & \\
+noispikethresh    &   Additional despiking after each iteration, within the noi                    & 10 \\
+                  &   calculation.                                                                 & \\
+noispikeiter      &   Additional despiking after each iteration, within the noi                    & 0 \\
+                  &   calculation.                                                                 & \\
+varmapmethod      &   Method of estimating variance map. If equal to zero, then use the            & 0 \\
+                  &   spread of values from the time-series (i.e. the raw data). If equal          & \\
+                  &   to 1, then it samples the variance of data that land in each output          & \\
+                  &   map pixel.                                                                   & \\
+\hline
+\multicolumn{3}{l}{Whether to write the history of the modal components to file} \\
+\hline
+memiter           &   Either perform the iterations in memory (=1) or write the       &    1 \\
+                  &   component values to a file (=0).                                & \\
+maxlen            &   If performing the iterations in memory, this is the maximum     &    0 \\
+                  &   length (seconds) for concatenated data. If equal to zero, then  & \\
+                  &   attempt to concatenate entire continuous chunks.                & \\
+\hline
+\end{tabular}
+\caption{Stuff...}
+\end{table}
+
 \subsection{\xlabel{scuba2cookbook}Cookbook}
 
 This section is the most urgently needed.
 
 % ? End of main text
 \end{document}
+
+\paragraph{}
