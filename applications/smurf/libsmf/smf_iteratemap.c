@@ -179,6 +179,8 @@
 *        now explicitly give AST in MODELORDER keywordd from config file.
 *     2009-04-15 (EC):
 *        Factor cleaning parameter parsing into smf_get_cleanpar.
+*     2009-04-16 (EC):
+*        Option of exporting only certain model components to NDF
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -219,8 +221,8 @@
 #include "sae_par.h"
 #include "star/ndg.h"
 #include "prm_par.h"
-
 #include "par_par.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -261,6 +263,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
   dim_t dsize;                  /* Size of data arrays in containers */
   double dtemp;                 /* temporary double */
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
+  int *exportNDF_which=NULL;    /* Which models in modelorder will be exported*/
   smfFilter *filt=NULL;         /* Pointer to filter struct */
   double flagstat;              /* Threshold for flagging stationary regions */
   double f_edgelow=0;           /* Freq. cutoff for low-pass edge filter */
@@ -275,6 +278,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
   int havenoi=0;                /* Set if NOI is one of the models */
   smfHead *hdr=NULL;            /* Pointer to smfHead */
   dim_t i;                      /* Loop counter */
+  int ii;                       /* Loop counter */
   dim_t idx=0;                  /* index within subgroup */
   smfGroup *igroup=NULL;        /* smfGroup corresponding to igrp */
   int iter;                     /* Iteration number */
@@ -421,13 +425,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
                " variance map", status );
     }
 
-    /* Will we export components to NDF at the end? */
-    if( !astMapGet0I( keymap, "EXPORTNDF", &exportNDF ) ) {
-      exportNDF = 0;
-    } 
 
-    /* Data-cleaning parameters (should match SC2CLEAN) */
-    
+    /* Data-cleaning parameters (should match SC2CLEAN) */    
     smf_get_cleanpar( keymap, &apod, &badfrac, &dcbox, NULL, &dcthresh, 
                       NULL, &f_edgelow, &f_edgehigh, f_notchlow,
                       f_notchhigh, &f_nnotch, &dofft, &flagstat, &baseorder, 
@@ -498,6 +497,9 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
       /* Allocate modeltyps */
       if( nmodels >= 1 ) {
         modeltyps = smf_malloc( nmodels, sizeof(*modeltyps), 1, status );
+        /* Extra components for exportNDF_which for 'res', 'qua' */
+        exportNDF_which = smf_malloc( nmodels+2, sizeof(*exportNDF_which), 
+                                      1, status );
       } else {
         msgOut(" ", "SMF_ITERATEMAP: No valid models in MODELORDER",
                status );
@@ -536,6 +538,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
           }
         }
       }
+
     } else {
       *status = SAI__ERROR;
       errRep("", FUNC_NAME ": MODELORDER must be specified in config file!",
@@ -554,8 +557,74 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
       errRep("", FUNC_NAME ": AST must be member of MODELORDER in config file!",
              status);
     }
+
+
+    /* Will we export components to NDF files at the end? */
+    exportNDF = 0;
+    if( (*status==SAI__OK) && astMapHasKey( keymap, "EXPORTNDF" ) ){
+      /* There are two possibilities: (i) the user specified a "1" or
+         a "0" indicating all or none of the models should be
+         exported; or (ii) a vector containing the 3-character model
+         names for each component that will be exported (same syntax as
+         modelorder) */
+      
+      if(astMapGet1C(keymap, "EXPORTNDF", 4, SMF_MODEL_MAX, &nm, modelnames)) {
+        /* Re-use variables used to parse MODELORDER. If there is a
+         single element check to see if it is a single digit for the
+         0/1 case. Otherwise try to find matches to each of the parsed
+         MODELORDER components */
+
+        if( (nm==1) && (strlen(modelnames)<3) ) {
+          if( strtol(modelnames,NULL,10) == 1 ) {
+            /* Export all of the model components */
+            exportNDF = 1;
+            for( i=0; (*status==SAI__OK)&&(i<nmodels); i++ ) {
+              exportNDF_which[i] = 1;
+            }
+          }
+        } else {
+          /* Selectively export components */
+          for( ii=0; (*status==SAI__OK)&&(ii<nm); ii++ ) {
+            modelname = modelnames+ii*4; /* Pointer to current name */
+            thismodel = smf_model_gettype( modelname, status );
+
+            /* Check to see if thismodel matches something in modeltyps */
+            for( j=0; (*status==SAI__OK)&&(j<nmodels); j++ ) {
+              if( thismodel == modeltyps[j] ) {
+                /* Found a hit -- export this model component */
+                exportNDF = 1;
+                exportNDF_which[j] = 1;
+
+                /* Need to export RES as well if NOI is specified
+                   since it becomes the variance component of the
+                   residual file */
+                if( thismodel == SMF__NOI ) {
+                  exportNDF_which[nmodels]=1;
+                }
+              }
+            }
+
+            /* If the model type is 'qua' handle it here */
+            if( thismodel == SMF__QUA ) {
+              exportNDF = 1;
+              /* Like noi, qua becomes quality component of res */
+              exportNDF_which[nmodels]=1;
+              exportNDF_which[nmodels+1]=1;
+            }
+
+            /* If the model type is 'res' handle it here */
+            if( thismodel == SMF__RES ) {
+              exportNDF = 1;
+              exportNDF_which[nmodels]=1;
+            }
+          }
+        }
+      }
+    }
   }
 
+
+  
   if( untilconverge ) {
     msgSeti("MAX",maxiter);
     msgOut(" ", 
@@ -1328,46 +1397,63 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
             /* QUA becomes the quality component of RES. NOI becomes
                the variance component of RES if present. */
             if( *status == SAI__OK ) {
-              if( havenoi ) {
+              if( havenoi && exportNDF_which[whichnoi] ) {
                 var_data = (model[whichnoi][i]->sdata[idx]->pntr)[0];
               } else {
                 var_data = NULL;
               }
-	      
-              if( (res[i]->sdata[idx]->file->name)[0] ) {
-                smf_model_createHdr( res[i]->sdata[idx], SMF__RES, hdr,
-                                     status );
-                smf_model_stripsuffix( res[i]->sdata[idx]->file->name, 
-                                       name, status );
-                smf_write_smfData( res[i]->sdata[idx], var_data, 
-                                   qua[i]->sdata[idx]->pntr[0], name, NDF__NOID,
-                                   status );
+
+              if( exportNDF_which[nmodels+1] ) {
+                qua_data = (qua[i]->sdata[idx]->pntr)[0];
               } else {
-                msgOut( " ", 
-                        "SMF__ITERATEMAP: Can't export RES -- NULL filename",
-                        status);
+                qua_data = NULL;
               }
 	      
-              if( (ast[i]->sdata[idx]->file->name)[0] ) {
-                smf_model_createHdr( ast[i]->sdata[idx], SMF__AST, hdr,
-                                     status );
-                smf_model_stripsuffix( ast[i]->sdata[idx]->file->name, 
-                                       name, status );
-                smf_write_smfData( ast[i]->sdata[idx], NULL, NULL, name, 
-                                   NDF__NOID, status );
-              } else {
-                msgOut( " ", 
-                        "SMF__ITERATEMAP: Can't export AST -- NULL filename",
-                        status);
+              if( exportNDF_which[nmodels] ) {
+                if( (res[i]->sdata[idx]->file->name)[0] ) {
+                  smf_model_createHdr( res[i]->sdata[idx], SMF__RES, hdr,
+                                       status );
+                  smf_model_stripsuffix( res[i]->sdata[idx]->file->name, 
+                                         name, status );
+
+                  /* if memiter=1, need to append "_res" to the name */
+                  if( memiter ) {
+                    one_strlcat( name, "_res", SMF_PATH_MAX+1, status );
+                  }
+
+                  smf_write_smfData( res[i]->sdata[idx], var_data, qua_data, 
+                                     name, NDF__NOID, status );
+                } else {
+                  msgOut( " ", 
+                          "SMF__ITERATEMAP: Can't export RES -- NULL filename",
+                          status);
+                }
+              }
+	      
+              if( exportNDF_which[whichast] ) {
+
+                if( (ast[i]->sdata[idx]->file->name)[0] ) {
+                  smf_model_createHdr( ast[i]->sdata[idx], SMF__AST, hdr,
+                                       status );
+                  smf_model_stripsuffix( ast[i]->sdata[idx]->file->name, 
+                                         name, status );
+                  smf_write_smfData( ast[i]->sdata[idx], NULL, NULL, name, 
+                                     NDF__NOID, status );
+                } else {
+                  msgOut( " ", 
+                          "SMF__ITERATEMAP: Can't export AST -- NULL filename",
+                          status);
+                }
               }
             }
 
-            /* Dynamic components excluding NOI */
+            /* Dynamic components excluding NOI/AST */
             for( j=0; j<nmodels; j++ ) 
               /* Remember to check again whether model[j][i]->sdata[idx] exists
                  for cases like COM */
               if( (*status == SAI__OK) && (modeltyps[j] != SMF__NOI) &&
-                  model[j][i]->sdata[idx] ) {
+                  (modeltyps[j] != SMF__AST) && model[j][i]->sdata[idx] && 
+                  exportNDF_which[j] ) {
                 if( (model[j][i]->sdata[idx]->file->name)[0] ) {
                   smf_model_createHdr( model[j][i]->sdata[idx], modeltyps[j], 
                                        hdr,status );
@@ -1487,6 +1573,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
   if( thisweight != weights ) thisweight = smf_free( thisweight, status );
 
   if( modeltyps ) modeltyps = smf_free( modeltyps, status );
+  if( exportNDF_which ) exportNDF_which = smf_free( exportNDF_which, status );
 
   if( igroup ) {
     smf_close_smfGroup( &igroup, status );
