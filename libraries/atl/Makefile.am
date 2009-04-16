@@ -13,7 +13,9 @@ libatl_la_SOURCES = \
 libatl_adam_la_SOURCES = \
         $(PUBLIC_INCLUDES) \
         $(BASIC_C_ROUTINES) \
-        $(BASIC_F_ROUTINES) $(ADAM_F_ROUTINES)
+        $(BASIC_F_ROUTINES) \
+        $(ADAM_C_ROUTINES) \
+        $(ADAM_F_ROUTINES)
 
 include_HEADERS = $(PUBLIC_F_INCLUDES)
 cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
@@ -32,7 +34,7 @@ PUBLIC_INCLUDES = $(PUBLIC_F_INCLUDES) $(PUBLIC_C_INCLUDES)
 
 #  List of C functions required by both ADAM and standalone 
 # libraries.
-BASIC_C_ROUTINES = atl.c atlMapGet1S.c atlMapPut1S.c atlShow.c
+BASIC_C_ROUTINES = atl.c atlMapGet1S.c atlMapPut1S.c atlShow.c 
 
 #  List of Fortran routines required by both ADAM and standalone 
 # libraries.
@@ -44,6 +46,9 @@ atl_kychk.f
 
 #  Additional Fortran routines required for the ADAM library.
 ADAM_F_ROUTINES = atl_creat.f atl_gtgrp.f 
+
+#  Additional C routines required for the ADAM library.
+ADAM_C_ROUTINES = atlGetParam.c
 
 dist_starnews_DATA = atl.news
 dist_pkgdata_DATA = LICENCE

@@ -9,10 +9,10 @@
 \newcommand{\stardocsource}    {sun257.0}
 \newcommand{\stardocnumber}    {257.0}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {3rd July 2006}
+\newcommand{\stardocdate}      {16th April 2009}
 \newcommand{\stardoctitle}     {ATL \\ [\latex{1ex}]
                                 A Library of AST Utility Routines}
-\newcommand{\stardocversion}   {Version 1.0}
+\newcommand{\stardocversion}   {Version 1.1}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -1676,6 +1676,51 @@ higher-level utility tasks.
 
          \sstitem
          Double Sideband is always assumed
+      }
+   }
+}
+\sstroutine{
+   atlGetParam
+}{
+   Create a vector character string entry in an AST KeyMap from a list
+   of fixed length strings
+}{
+   \sstdescription{
+      This function obtains a value for a named environment paramater and
+      stores it in the supplied KeyMap, using the parameter name as the
+      key.
+   }
+   \sstinvocation{
+      void atlGetParam( const char $*$param, AstKeyMap $*$keymap, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         param
+      }{
+         The parameter name.
+      }
+      \sstsubsection{
+         keymap
+      }{
+         A pointer to an existing KeyMap.
+      }
+      \sstsubsection{
+         status
+      }{
+         Pointer to the global status variable.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         An error will be reported if the parameter value obtained from
+         the environment is a vector with more than 100 elements.
+
+         \sstitem
+         An error will be reported if any individual element in the parameter
+         value obtained from the environment requires more than 255 when
+         represented as a string.
       }
    }
 }

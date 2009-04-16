@@ -23,6 +23,8 @@
 *        Added atlMgfts.
 *     20-MAR-2007 (TIMJ):
 *        Added atlPtfts, atlPtfti
+*     16-APR-2009 (DSB):
+*        Added atlGetParam.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
@@ -73,6 +75,7 @@ void atlPtfts( AstFitsChan *, const char *, const char *, const char *,  int * )
 void atlShow( AstObject *, const char *, const char *, int * );
 void atlTolut( AstMapping *, double, double, double, const char *, AstMapping **, int * );
 void atlWcspx( AstKeyMap *, AstKeyMap *, double[3], double, double, AstFrameSet **, int * );
+void atlGetParam( const char *, AstKeyMap *, int * );
 
 
 #endif
