@@ -1,3 +1,6 @@
+
+#include "atl.h"
+
 #include "ast.h"
 #include "par.h"
 #include "sae_par.h"
@@ -22,7 +25,7 @@ void atlGetParam( const char *param, AstKeyMap *keymap, int *status ){
 *     void atlGetParam( const char *param, AstKeyMap *keymap, int *status )
 
 *  Description:
-*     This function obtains a value for a named environment paramater and
+*     This function obtains a value for a named environment parameter and
 *     stores it in the supplied KeyMap, using the parameter name as the
 *     key. 
 
