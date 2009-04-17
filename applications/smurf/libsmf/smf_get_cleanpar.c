@@ -13,13 +13,13 @@
 *     C function
 
 *  Invocation:
-*     smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double
-*                       *badfrac, dim_t *dcbox, int *dcbad, double
-*                       *dcthresh, int *dkclean, double *filt_edgelow,
+*     smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac, 
+*                       dim_t *dcbox, int *dcbad, double *dcthresh, 
+*                       int *dkclean, double *filt_edgelow,
 *                       double *filt_edgehigh, double *filt_notchlow,
-*                       double *filt_notchhigh, int *filt_nnotch, int
-*                       *dofilt, double *flagstat, int *order, double
-*                       *spikethresh, size_t *spikeiter, int *status )
+*                       double *filt_notchhigh, int *filt_nnotch, int *dofilt, 
+*                       double *flagstat, int *order, double *spikethresh, 
+*                       size_t *spikeiter, int *status )
 
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
