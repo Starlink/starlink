@@ -49,6 +49,8 @@
 *  History:
 *     14-APR-2009 (DSB):
 *        Initial version.
+*     17-APR-2009 (DSB):
+*        Avoid problems caused by breaking out of time slice loop.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -102,6 +104,7 @@ int smf_check_detpos( smfData *data, int report, int *status ){
    double b[ 2 ];        /* An FPLANEX/Y sky position */
    double dist;          /* Discrepancy between RECEPPOS and FPLANEX/Y */
    double max_dist;      /* Max discrepancy between RECEPPOS and FPLANEX/Y */
+   int done;             /* Has a test been performed yet? */
    int ibase;            /* Original index of Base Frame in WCS FrameSet */
    int result;           /* The result of the check */
    size_t irec;          /* Index of current input detector */
@@ -150,7 +153,8 @@ int smf_check_detpos( smfData *data, int report, int *status ){
 
 /* Loop round all the time slices in the input data structure until we 
    have found one that can be checked. */
-      for( itime = 0; itime < (data->dims)[ 2 ] && *status == SAI__OK; itime++ ) {
+      done = 0;
+      for( itime = 0; !done && itime < (data->dims)[ 2 ] && *status == SAI__OK; itime++ ) {
 
 /* We first create a WCS FrameSet for the time slice, based on the RECEPPOS 
    values. The smf_tslice_ast function uses the value of the hdr->detpos 
@@ -227,9 +231,8 @@ int smf_check_detpos( smfData *data, int report, int *status ){
                         msgBlank( status );
                      }
 
-/* Break out of the time slice loop once a test has been completed
-   succesfully. */
-                    break;
+/* Leave the time slice loop once a test has been completed succesfully. */
+                    done = 1;
                   }
 
 /* For efficincy within this loop, annul AST objects explicitly. */
