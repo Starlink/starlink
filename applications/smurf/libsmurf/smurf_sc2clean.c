@@ -50,12 +50,12 @@
 *          flagged as bad
 *     DCTHRESH = _DOUBLE (Read)
 *          N-sigma threshold at which to detect DC steps
+*     DCBAD = _LOGICAL (Read)
+*          If true, instead of repairing DC steps, flag bolo as bad
 *     DCBOX = _INTEGER (Read)
 *          Width of the box (samples) over which to estimate the mean
 *          signal level for DC step detection
-*     DCBAD = _LOGICAL (Read)
-*          If true, instead of repaiting DC steps, flag bolo as bad
-*     DKSQUID = _LOGICAL (Read)
+*     DKCLEAN = _LOGICAL (Read)
 *          If true fit and remove dark squid signals
 *     FILT_EDGEHIGH = _DOUBLE (Read)
 *          Apply a hard-edged high-pass filter at this frequency (Hz)
@@ -69,11 +69,11 @@
 *          Flag data during slew speeds less than FLAGSTAT (arcsec/sec)
 *     ORDER = INTEGER (Read)
 *          Fit and remove polynomial baselines of this order
-*     SPIKETHRESH = _DOUBLE (Read)
-*          Flag spikes SPIKETHRESH-sigma away from mean
 *     SPIKEITER = _INTEGER (Read)
 *          If 0 iteratively find spikes until convergence. Otherwise 
 *          execute precisely this many iterations.
+*     SPIKETHRESH = _DOUBLE (Read)
+*          Flag spikes SPIKETHRESH-sigma away from mean
 
 *  Authors:
 *     Edward Chapin (UBC)
@@ -90,6 +90,8 @@
 *        Added FLAGSTAT, use parGdr0X in more places.
 *     2009-03-30 (TIMJ):
 *        Add OUTFILES parameter.
+*     2009-04-17 (EC):
+*        Factor out parsing parameters to smf_get_cleanpar
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -128,6 +130,7 @@
 
 #include "star/ndg.h"
 #include "star/grp.h"
+#include "star/atl.h"
 #include "ndf.h"
 #include "mers.h"
 #include "par.h"
@@ -158,8 +161,8 @@ void smurf_sc2clean( int *status ) {
   smfData *ffdata = NULL;   /* Pointer to output data struct */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
   size_t i = 0;             /* Counter, index */
-  int j;                    /* Loop counter */
   Grp *igrp = NULL;         /* Input group of files */
+  AstKeyMap *keymap;        /* Keymap for storing cleaning parameters */
   unsigned char mask;       /* Bitmask for quality */
   size_t nflag;             /* Number of flagged samples */
   Grp *ogrp = NULL;         /* Output group of files */
@@ -168,12 +171,10 @@ void smurf_sc2clean( int *status ) {
   size_t size;              /* Number of files in input group */
   double spikethresh;       /* Threshold for finding spikes */
   size_t spikeiter=0;       /* Number of iterations for spike finder */
-  int sval;                 /* Temporary signed value */
   int dofft=0;              /* Set if freq. domain filtering the data */
   double f_edgelow;         /* Freq. cutoff for low-pass edge filter */
   double f_edgehigh;        /* Freq. cutoff for high-pass edge filter */
   int f_nnotch=0;           /* Number of notch filters in array */
-  int f_nnotch2=0;          /* Number of notch filters in array */
   double f_notchlow[SMF__MXNOTCH]; /* Array low-freq. edges of notch filters */
   double f_notchhigh[SMF__MXNOTCH];/* Array high-freq. edges of notch filters */
   smfFilter *filt=NULL;     /* Pointer to filter struct */
@@ -203,63 +204,34 @@ void smurf_sc2clean( int *status ) {
        " nothing to do", status );
   }
 
-  /* Apodization length */
-  parGdr0i( "APOD", 0, 0, NUM__MAXI, 1, &sval, status );
-  if( *status == SAI__OK ) {
-    apod = (size_t) sval;
-  }
+  /* Place cleaning parameters into a keymap and extract values */
+  keymap = astKeyMap( " " );
+  if( !astOK ) {
+    *status = SAI__ERROR;
+    errRep(FUNC_NAME, "ast error detected creating new astKeyMap", status );
+  } else {
+    atlGetParam( "APOD", keymap, status );
+    atlGetParam( "BADFRAC", keymap, status );
+    atlGetParam( "DCTHRESH", keymap, status );
+    parGet0l( "DCBAD", &dcbad, status );
+    astMapPut0I( keymap, "DCBAD", dcbad, NULL );
+    atlGetParam( "DCBOX", keymap, status );
+    parGet0l( "DKCLEAN", &dkclean, status );
+    astMapPut0I( keymap, "DKCLEAN", dkclean, NULL );
+    atlGetParam( "FILT_EDGEHIGH", keymap, status );
+    atlGetParam( "FILT_EDGELOW", keymap, status );
+    atlGetParam( "FILT_NOTCHHIGH", keymap, status );
+    atlGetParam( "FILT_NOTCHLOW", keymap, status );
+    atlGetParam( "FLAGSTAT", keymap, status );
+    atlGetParam( "ORDER", keymap, status );
+    atlGetParam( "SPIKEITER", keymap, status );
+    atlGetParam( "SPIKETHRESH", keymap, status );
 
-  /* Check for badfrac threshold for flagging bad bolos */
-  parGdr0d( "BADFRAC", 0, 0, NUM__MAXD, 1, &badfrac, status );
-
-  /* Check for DC step correction paramaters */
-  parGdr0d( "DCTHRESH", 0, 0, NUM__MAXD, 1, &dcthresh, status );
-  parGdr0i( "DCBOX", 1000, 0, NUM__MAXI, 1, &sval, status );
-  if( *status == SAI__OK ) {
-    dcbox = (dim_t) sval;
-  }
-  parGet0l( "DKCLEAN", &dkclean, status );
-
-  /* Order of polynomial for baseline fits */
-  parGdr0i( "ORDER", -1, -1, NUM__MAXI, 1, &order, status );
-
-  /* Spike flagging */
-  parGdr0d( "SPIKETHRESH", 0, 0, NUM__MAXD, 1, &spikethresh, status );
-  parGdr0i( "SPIKEITER", 0, 0, NUM__MAXI, 1, &sval, status );
-  if( *status == SAI__OK ) {
-    spikeiter = (size_t) sval;
-  }
-  parGet0l( "DKCLEAN", &dcbad, status );
-
-  /* Stationary flagging */
-  parGdr0d( "FLAGSTAT", 0, 0, NUM__MAXD, 1, &flagstat, status );
-
-  /* Clean dark squids */
-  parGet0l( "DKCLEAN", &dkclean, status );
-
-  /* Frequency-domain filtering */
-  parGdr0d( "FILT_EDGELOW", 0, 0, NUM__MAXD, 1, &f_edgelow, status );
-  parGdr0d( "FILT_EDGEHIGH", 0, 0, NUM__MAXD, 1, &f_edgehigh, status );
-  if( f_edgelow || f_edgehigh ) {
-    dofft = 1;
-  }
-
-  parGet1d( "FILT_NOTCHLOW", SMF__MXNOTCH, f_notchlow, &f_nnotch, status ); 
-  parGet1d( "FILT_NOTCHHIGH", SMF__MXNOTCH, f_notchhigh, &f_nnotch2, status ); 
-  if( f_nnotch ) {
-    /* Number of upper and lower edges must match */
-    if( f_nnotch != f_nnotch2 ) {
-      msgOut( "", FUNC_NAME "Number of upper and lower notch edges don't match,"
-              "no notch filters will be applied.", status );
-      f_nnotch = 0;
-    } else {
-      for( j=0; j<f_nnotch; j++ ) {
-        if( f_notchlow[j] != f_notchhigh[j] ) {
-          dofft = 1;
-        }
-      }
-    }
-  }
+    smf_get_cleanpar( keymap, &apod, &badfrac, &dcbox, &dcbad, &dcthresh,
+                      &dkclean, &f_edgelow, &f_edgehigh, f_notchlow,
+                      f_notchhigh, &f_nnotch, &dofft, &flagstat, &order,
+                      &spikethresh, &spikeiter, status );
+  }  
 
   /* Loop over input files */
   if( *status == SAI__OK ) for( i=1; i<=size; i++ ) {
@@ -395,7 +367,6 @@ void smurf_sc2clean( int *status ) {
       filt = smf_free_smfFilter( filt, status );
     }
 
-
     /* Ensure that the data is ICD ordered before closing */
     smf_dataOrder( ffdata, 1, status );
 
@@ -414,6 +385,6 @@ void smurf_sc2clean( int *status ) {
   if (darks) smf_close_related( &darks, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
-
+  if( keymap ) keymap = astAnnul( keymap );
   ndfEnd( status );
 }
