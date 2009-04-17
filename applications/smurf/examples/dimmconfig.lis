@@ -6,6 +6,18 @@ numiter = 5
 # chi^2 tolerance in negative-numiter case (requires noi model component)
 chitol = 1e-6
 
+# method of estimating variance map
+#  0 = propagate from the time-domain noise (requires noi model component)
+#  1 = sample variance of data that land in each pixel
+varmapmethod = 1
+
+# Perform iterations in memory?
+memiter = 1
+
+# If performing iterations in memory, maximum length (seconds) for concatenated
+# data. If 0 attempt to concatenate entire continuous chunks.
+maxlen = 0
+
 # Model components/order (space delimited list)
 # Note: components specified AFTER 'ast' will not be calculated for the
 # first time until the second iteration.
@@ -16,6 +28,7 @@ chitol = 1e-6
 #  ast = estimate the map and astronomical signal
 #  flt = apply filter to time streams
 #  noi = estimate time-domain variance
+
 modelorder = (com,gai,ext,ast,flt,noi)
 
 # Export model files as NDF?
@@ -31,38 +44,12 @@ modelorder = (com,gai,ext,ast,flt,noi)
 exportndf = 0
 #exportndf = (com,ast,flt,res,noi,qua)
 
-# low-pass boxcar filter on COM (samples) to assist with convergence
-# if boxfact set reduce width of boxcar by this factor each iteration
-# boxmin specifies a minimum width below which it can't be reduced
-
-com_boxcar = 10
-
-#com_boxcar  = 400
-#com_boxfact = 0.5
-#com_boxmin  = 100
-
-# low-pass filter dark squid signals using boxcar of this width (if dks
-# model is specified)
-dks_boxcar = 100
-
-# additional despiking after each iteration within noi calculation
-#noispikethresh = 10
-#noispikeiter = 0
-
-# method of estimating variance map
-#  0 = propagate from the time-domain noise (requires noi model component)
-#  1 = samples variance of data that land in each pixel
-varmapmethod = 1
-
-# Perform iterations in memory?
-memiter = 1
-
-# If performing iterations in memory, maximum length (seconds) for concatenated
-# data. If 0 attempt to concatenate entire continuous chunks.
-maxlen = 0
 
 # ----------------------------------------------------------------------------
-# The following are for data cleaning. 
+# The following parameters control data-cleaning before iterations start
+# ----------------------------------------------------------------------------
+
+# --- Padding, apodization and mean subtraction are all fairly useful ---
 
 # Number of samples of padding to add to start and end before filtering
 padstart = 1000
@@ -71,8 +58,24 @@ padend = 1000
 # Apodize signals with a sin function roll-off across apod samples
 apod = 1000
 
+# subtract a baseline polynomial of this order
+order = 0
+
+
+# --- badfrac ensures that bad data from DA system are ignored ---
+
 # fraction of samples to be bad to flag entire bolo as dead
 badfrac = 0.05
+
+
+# --- flag data when we're stationary because insensitive to sky signal ---
+
+# Flag data taken while telescope was stationary (value is a threshold
+# slew velocity (arcsec/sec) measured in tracking coordinates
+flagstat = 2
+
+
+# --- Most of the following are probably not useful ---
 
 # S/N threshold to detect DC steps
 #dcthresh = 150
@@ -80,18 +83,11 @@ badfrac = 0.05
 # box size over which to measure rms for DC step finder
 #dcbox = 400
 
-# subtract a baseline polynomial of this order
-order = 0
-
 # S/N ratio to flag spikes with sigma-clipper
 # spikethresh = 5
 
 # Number of iterations for sigma-clipper (0=until convergence)
 # spikeiter = 0
-
-# Flag data taken while telescope was stationary (value is a threshold
-# slew velocity (arcsec/sec) measured in tracking coordinates
-flagstat = 2
 
 # Hard-edge high-pass frequency-domain filter 
 #   e.g. keep only frequencies >= 0.1 Hz
@@ -107,4 +103,36 @@ flagstat = 2
 #   e.g. remove 25--35 Hz  and 55--65 Hz
 #filt_notchlow  = (25,55)
 #filt_notchhigh = (35,65)
+
+
+# ----------------------------------------------------------------------------
+# These parameters control the iterative model components
+# ----------------------------------------------------------------------------
+
+# low-pass boxcar filter on COM (samples) to assist with convergence
+# if boxfact set reduce width of boxcar by this factor each iteration
+# boxmin specifies a minimum width below which it can't be reduced
+
+com.boxcar = 10
+#com.boxcar  = 400
+#com.boxfact = 0.5
+#com.boxmin  = 10
+
+# low-pass filter dark squid signals using boxcar of this width (if dks
+# model is specified)
+dks.boxcar = 10
+
+# additional despiking after each iteration within noi calculation
+#noi.spikethresh = 10
+#noi.spikeiter = 0
+#noi.samp = 1000
+#noi.chunk = 10
+
+# iterative filter.
+flt.filt_edgehigh = 0.2
+flt.filt_edgelow = 20
+#flt.filt_notchlow  = (25,55)
+#flt.filt_notchhigh = (35,65)
+
+
 

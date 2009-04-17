@@ -83,6 +83,8 @@
 *        - Additionally look at spread in gain coefficients to flag bad bolos 
 *     2009-03-09 (EC)
 *        - Fit common mode gain to data, instead of using it to modify flatfield
+*     2009-04-17 (EC)
+*        - switch to subkeymap notation in config file 
 *     {enter_further_changes_here}
 
 
@@ -153,6 +155,7 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   dim_t i;                      /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
   dim_t j;                      /* Loop counter */
+  AstKeyMap *kmap=NULL;         /* Local keymap */
   double lastmean;              /* Mean from previous iteration */
   unsigned char mask_cor;       /* Ignore quality mask for correction */
   unsigned char mask_meas;      /* Ignore quality mask for measurement */
@@ -179,39 +182,48 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   /* Main routine */
   if (*status != SAI__OK) return;
 
+  /* Obtain pointer to sub-keymap containing COM parameters */
+  if( !astMapGet0A( keymap, "COM", &kmap ) ) {
+    kmap = NULL;
+  }
+
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
   qua = dat->qua[chunk];
   model = allmodel[chunk];
   if(dat->gai) gai = dat->gai[chunk];
   
-  /* Check for smoothing parameters in the CONFIG file */
-  if( astMapGet0I( keymap, "COM_BOXCAR", &boxcar) ) {
-    do_boxcar = 1;
-  }
+  /* Parse parameters */
 
-  /* Check for damping parameter on boxcar */
-  if( astMapGet0D( keymap, "COM_BOXFACT", &boxfact) ) {
-    do_boxfact = 1;
-
-    /* If first iteration, set COM_BOXCARD (this value will get decreased) */
-    if( flags&SMF__DIMM_FIRSTITER ) {
-      astMapPut0D( keymap, "COM_BOXCARD", (double) boxcar, NULL );
+  if( kmap ) {
+    /* Check for smoothing parameters in the CONFIG file */
+    if( astMapGet0I( kmap, "BOXCAR", &boxcar) ) {
+      do_boxcar = 1;
     }
 
-    if( !astMapGet0D( keymap, "COM_BOXCARD", &boxcard) ) {
-      *status = SAI__ERROR;
-      errRep( "", FUNC_NAME ": Failed to retrieve COM_BOXCARD from keymap", 
-              status);
-    } else {
-      /* Use damped boxcar for smoothing width */
-      boxcar = (int) boxcard;
-    }
-  }
+    /* Check for damping parameter on boxcar */
+    if( astMapGet0D( kmap, "BOXFACT", &boxfact) ) {
+      do_boxfact = 1;
 
-  /* Check for minimum boxcar width*/
-  if( astMapGet0I( keymap, "COM_BOXMIN", &boxmin) ) {
-    do_boxmin = 1;
+      /* If first iteration, set BOXCARD (this value will get decreased) */
+      if( flags&SMF__DIMM_FIRSTITER ) {
+        astMapPut0D( kmap, "BOXCARD", (double) boxcar, NULL );
+      }
+
+      if( !astMapGet0D( kmap, "BOXCARD", &boxcard) ) {
+        *status = SAI__ERROR;
+        errRep( "", FUNC_NAME ": Failed to retrieve BOXCARD from keymap", 
+                status);
+      } else {
+        /* Use damped boxcar for smoothing width */
+        boxcar = (int) boxcard;
+      }
+    }
+
+    /* Check for minimum boxcar width*/
+    if( astMapGet0I( kmap, "BOXMIN", &boxmin) ) {
+      do_boxmin = 1;
+    }
   }
 
   if( do_boxcar ) {
@@ -545,7 +557,7 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
       if( boxcard < boxmin ) boxcard = (double) boxmin;
     }
     /* Update value in the keymap so we can read it next iteration */
-    astMapPut0D( keymap, "COM_BOXCARD", boxcard, NULL );
+    astMapPut0D( kmap, "BOXCARD", boxcard, NULL );
   }
   
   /* Clean up */

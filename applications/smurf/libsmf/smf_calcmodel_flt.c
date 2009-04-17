@@ -44,6 +44,8 @@
 *  History:
 *     2009-03-10 (EC):
 *        Initial Version
+*     2009-04-17 (EC)
+*        - switch to subkeymap notation in config file 
 *     {enter_further_changes_here}
 
 
@@ -91,10 +93,12 @@ void smf_calcmodel_flt( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 
   /* Local Variables */
   size_t bstride;               /* bolo stride */
+  int dofft;                    /* flag if we will actually do any filtering */
   smfFilter *filt=NULL;         /* Pointer to filter struct */
   size_t i;                     /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
   size_t j;                     /* Loop counter */
+  AstKeyMap *kmap=NULL;         /* Pointer to FLT-specific keys */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   dim_t nbolo=0;                /* Number of bolometers */
@@ -108,6 +112,13 @@ void smf_calcmodel_flt( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
                                    
   /* Main routine */
   if (*status != SAI__OK) return;
+
+  /* Obtain pointer to sub-keymap containing FLT filter parameters */
+  if( !astMapGet0A( keymap, "FLT", &kmap ) ) {
+    msgOutif( MSG__VERB, " ", FUNC_NAME ": FLT model requested, "
+              "but no parameters specified.", status );
+    return;
+  }
 
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
@@ -141,9 +152,12 @@ void smf_calcmodel_flt( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 
       /* Create a filter */
       filt = smf_create_smfFilter( res->sdata[idx], status );
+      smf_filter_fromkeymap( filt, kmap, &dofft, status );
 
-      smf_filter_edge( filt, 0.2, 0, status ); /* KLUDGE */
-      smf_filter_edge( filt, 20, 1, status );
+      if( !dofft ) {
+        msgOutif( MSG__VERB, " ", FUNC_NAME 
+                  ": No valid filter specifiers for FLT given", status );
+      }
 
       if( *status == SAI__OK ) {
         /* Place last iteration of filtered signal back into residual */
@@ -159,7 +173,9 @@ void smf_calcmodel_flt( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
       }
 
       /* Apply the filter to the residual */
-      smf_filter_execute( res->sdata[idx], filt, status );
+      if( dofft ) {
+        smf_filter_execute( res->sdata[idx], filt, status );
+      }
 
       /* Store the difference between the filtered signal and the residual
          in the model container */

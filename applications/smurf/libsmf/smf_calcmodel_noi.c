@@ -67,10 +67,12 @@
 *        -Add chisquared calculation
 *     2008-05-02 (EC)
 *        - Use different levels of verbosity in messages
+*     2009-04-17 (EC)
+*        - switch to subkeymap notation in config file 
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
+*     Copyright (C) 2005-2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -119,17 +121,18 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   dim_t idx=0;                  /* Index within subgroup */
   dim_t j;                      /* Loop counter */
   dim_t k;                      /* Loop counter */
+  AstKeyMap *kmap=NULL;         /* Local keymap */
   unsigned char mask;           /* Bitmask for quality */
   unsigned char mask_spike;     /* Bitmask for quality */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   dim_t nbolo;                  /* Number of bolometers */
   size_t nchisq;                /* Number of data points in chisq calc */
-  dim_t nchunk=0;               /* Number of spots to measure white level */
+  dim_t nchunk=10;              /* Number of spots to measure white level */
   int nchunk_s;                 /* Signed version of nchunk */
   dim_t ndata;                  /* Total number of data points */
   size_t nflag;                 /* Number of new flags */
-  dim_t nsamp=0;                /* Length of window to measure white level */
+  dim_t nsamp=1000;             /* Length of window to measure white level */
   int nsamp_s;                  /* Signed version of nsamp */
   dim_t ntslice;                /* Number of time slices */
   smfArray *qua=NULL;           /* Pointer to RES at chunk */
@@ -138,12 +141,17 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   double *res_data=NULL;        /* Pointer to DATA component of res */
   size_t spikeiter=0;           /* Number of iterations for spike detection */
   int spikeiter_s;              /* signed version of spikeiter */
-  double spikethresh;           /* Threshold for spike detection */
+  double spikethresh=0;         /* Threshold for spike detection */
   size_t tstride;               /* time slice stride */
   double *var=NULL;             /* Sample variance */
    
   /* Main routine */
   if (*status != SAI__OK) return;
+
+  /* Obtain pointer to sub-keymap containing NOI parameters */
+  if( !astMapGet0A( keymap, "NOI", &kmap ) ) {
+    kmap = NULL;
+  }
 
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
@@ -156,44 +164,46 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     smf_dataOrder( qua->sdata[idx], 0, status );
   }
 
-  /* Obtain parameters for despiker */
+  /* Obtain parameters for NOI */
+  if( kmap ) {
 
-  if( !astMapGet0D( keymap, "NOISPIKETHRESH", &spikethresh ) ) {
-    spikethresh = 0;
-  }
+    /* Despiker */
+    if( !astMapGet0D( kmap, "SPIKETHRESH", &spikethresh ) ) {
+      spikethresh = 0;
+    }
   
-  if( !astMapGet0I( keymap, "NOISPIKEITER", &spikeiter_s ) ) {
-    spikeiter = 0;
-  } else {
-    if( spikeiter_s < 0 ) {
-      *status = SAI__ERROR;
-      errRep("", FUNC_NAME ": spikeiter cannot be < 0.", status );
+    if( !astMapGet0I( kmap, "SPIKEITER", &spikeiter_s ) ) {
+      spikeiter = 0;
     } else {
-      spikeiter = (size_t) spikeiter_s;
+      if( spikeiter_s < 0 ) {
+        *status = SAI__ERROR;
+        errRep("", FUNC_NAME ": NOI.SPIKEITER cannot be < 0.", status );
+      } else {
+        spikeiter = (size_t) spikeiter_s;
+      }
     }
-  }
-
-  /* Obtain parameters for the noise measurement */
-
-  if( !astMapGet0I( keymap, "NOISAMP", &nsamp_s ) ) {
-    nsamp = 1000;  /* Number of samples to measure white level */
-  } else {
-    if( nsamp_s <= 0 ) {
-      *status = SAI__ERROR;
-      errRep( "", FUNC_NAME ": NOISAMP must be > 0.", status );
+    
+    /* Obtain parameters for the noise measurement */
+    if( !astMapGet0I( kmap, "SAMP", &nsamp_s ) ) {
+      nsamp = 1000;  /* Number of samples to measure white level */
     } else {
-      nsamp = (dim_t) nsamp_s;
+      if( nsamp_s <= 0 ) {
+        *status = SAI__ERROR;
+        errRep( "", FUNC_NAME ": NOI.SAMP must be > 0.", status );
+      } else {
+        nsamp = (dim_t) nsamp_s;
+      }
     }
-  }
 
-  if( !astMapGet0I( keymap, "NOICHUNK", &nchunk_s ) ) {
-    nchunk = 10;  /* Number of locations from which to measure samples */
-  } else {
-    if( nchunk_s <= 0 ) {
-      *status = SAI__ERROR;
-      errRep( "", FUNC_NAME ": NOICHUNK must be > 0.", status );
+    if( !astMapGet0I( kmap, "CHUNK", &nchunk_s ) ) {
+      nchunk = 10;  /* Number of locations from which to measure samples */
     } else {
-      nchunk = (dim_t) nchunk_s;
+      if( nchunk_s <= 0 ) {
+        *status = SAI__ERROR;
+        errRep( "", FUNC_NAME ": NOI.CHUNK must be > 0.", status );
+      } else {
+        nchunk = (dim_t) nchunk_s;
+      }
     }
   }
 

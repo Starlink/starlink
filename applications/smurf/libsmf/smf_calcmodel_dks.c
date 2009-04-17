@@ -40,12 +40,14 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     2006-07-10 (EC):
+*     2008-09-30 (EC):
 *        Initial Version
+*     2009-04-17 (EC)
+*        - switch to subkeymap notation in config file 
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2008 University of British Columbia.
+*     Copyright (C) 2008-2009 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -96,6 +98,7 @@ void smf_calcmodel_dks( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   dim_t index;                  /* index into data buffer */
   dim_t j;                      /* Loop counter */
   dim_t k;                      /* Loop counter */
+  AstKeyMap *kmap=NULL;         /* Local keymap */
   unsigned char mask;           /* quality mask */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
@@ -113,18 +116,23 @@ void smf_calcmodel_dks( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   /* Main routine */
   if (*status != SAI__OK) return;
 
+  /* Obtain pointer to sub-keymap containing COM parameters */
+  if( !astMapGet0A( keymap, "DKS", &kmap ) ) {
+    kmap = NULL;
+  }
+
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
   qua = dat->qua[chunk];
   model = allmodel[chunk];
 
   /* Check for dark squid smoothing parameter in the CONFIG file */
-  if( astMapGet0I( keymap, "DKS_BOXCAR", &boxcar_i) ) {
+  if( kmap && astMapGet0I( kmap, "BOXCAR", &boxcar_i) ) {
     if( boxcar_i >= 0 ) boxcar = (size_t) boxcar_i;
     else {
       *status = SAI__ERROR;
       msgSeti("BOX",boxcar_i);
-      errRep("", FUNC_NAME ": DKS_BOXCAR in config file (^BOX) must be >= 0.",
+      errRep("", FUNC_NAME ": DKS.BOXCAR in config file (^BOX) must be >= 0.",
              status); 
     }
   } 
