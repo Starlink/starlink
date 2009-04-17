@@ -164,7 +164,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
       *apod = 0;
     }
 
-    msgOutiff( MSG__VERB, "", FUNC_NAME ": APOD=%zu", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": APOD=%zu", status,
                *apod );
   }
 
@@ -173,7 +173,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
       *badfrac = 0;
     }
 
-    msgOutiff( MSG__VERB, "", FUNC_NAME ": BADFRAC=%f", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": BADFRAC=%f", status,
                *badfrac );
   }
 
@@ -189,7 +189,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
       *dcbox = 0;
     }
 
-    msgOutiff( MSG__VERB, "", FUNC_NAME ": DCBOX=%" DIM_T_FMT, status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCBOX=%" DIM_T_FMT, status,
                *dcbox );
   }
 
@@ -204,7 +204,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
     } else {
       *dcbad = 0;
     }
-    msgOutiff( MSG__VERB, "", FUNC_NAME ": DCBAD=%i", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCBAD=%i", status,
                *dcbad );
   }
 
@@ -216,7 +216,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
       errRep(FUNC_NAME, "DCTHRESH must be >= 0.", status );
     }
 
-    msgOutiff( MSG__VERB, "", FUNC_NAME ": DCTHRESH=%f", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DCTHRESH=%f", status,
                *dcthresh );
   }
   
@@ -231,7 +231,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
     } else {
       *dkclean = -1;
     }
-    msgOutiff( MSG__VERB, "", FUNC_NAME ": DKCLEAN=%i", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DKCLEAN=%i", status,
                *dkclean );
   }
 
@@ -244,7 +244,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
       dofft = 1;
     }
 
-    msgOutiff( MSG__VERB, "", FUNC_NAME ": FILT_EDGELOW=%f", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FILT_EDGELOW=%f", status,
                *filt_edgelow );
   }
 
@@ -257,7 +257,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
       dofft = 1;
     }
 
-    msgOutiff( MSG__VERB, "", FUNC_NAME ": FILT_EDGEHIGH=%f", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FILT_EDGEHIGH=%f", status,
                *filt_edgehigh );
   }
 
@@ -292,12 +292,12 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
         *filt_nnotch = f_nnotch;
       }
 
-      msgOutiff( MSG__VERB, "", FUNC_NAME 
+      msgOutiff( MSG__DEBUG, "", FUNC_NAME 
                  ": number components in notch filter=%i", status,
                  f_nnotch );
 
       for( i=0; i<f_nnotch; i++ ) {
-        msgOutiff( MSG__VERB, "", FUNC_NAME ":     %f -- %f Hz", status,
+        msgOutiff( MSG__DEBUG, "", FUNC_NAME ":     %f -- %f Hz", status,
                    filt_notchlow[i], filt_notchhigh[i] );
       }
     } else {
@@ -308,7 +308,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
 
   if( dofilt ) {
     *dofilt = dofft;
-    msgOutiff( MSG__VERB, "", FUNC_NAME ": DOFILT=%i", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": DOFILT=%i", status,
                *dofilt );
   }
 
@@ -321,7 +321,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
     } else {
       *flagstat = 0;
     }
-    msgOutiff( MSG__VERB, "", FUNC_NAME ": FLAGSTAT=%f", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": FLAGSTAT=%f", status,
                *flagstat );
   }
 
@@ -332,7 +332,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "ORDER must be >= -1", status );
     }
-    msgOutiff( MSG__VERB, "", FUNC_NAME ": ORDER=%i", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": ORDER=%i", status,
                *order );
   }
 
@@ -344,7 +344,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
       errRep(FUNC_NAME, "SPIKETHRESH must be >= 0.", status );
     }
 
-    msgOutiff( MSG__VERB, "", FUNC_NAME ": SPIKETHRESH=%f", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": SPIKETHRESH=%f", status,
                *spikethresh );
   }
 
@@ -359,7 +359,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
     } else {
       *spikeiter = 0;
     }
-    msgOutiff( MSG__VERB, "", FUNC_NAME ": SPIKEITER=%zu", status,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": SPIKEITER=%zu", status,
                *spikeiter );
   }
 }
