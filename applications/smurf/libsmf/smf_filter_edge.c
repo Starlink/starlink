@@ -4,7 +4,7 @@
 *     smf_filter_edge
 
 *  Purpose:
-*     Apply a hard low- or high-pass edge to a smfFiler at given frequency
+*     Apply a hard low- or high-pass edge to a smfFilter at given frequency
 
 *  Language:
 *     Starlink ANSI C
