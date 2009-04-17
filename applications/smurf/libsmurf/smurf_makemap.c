@@ -1293,6 +1293,7 @@ void smurf_makemap( int *status ) {
   if( tiles ) tiles = smf_freetiles( tiles, ntile, status );
   if( darks ) smf_close_related( &darks, status );
   if( bpms ) smf_close_related( &bpms, status );
+  if( keymap ) keymap = astAnnul( keymap );
 
   ndfEnd( status );
   
