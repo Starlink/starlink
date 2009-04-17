@@ -18,7 +18,7 @@
 *	             int *lbnd_out, int *ubnd_out, size_t maxmem, 
 *                    double *map, unsigned int *hitsmap, double *mapvar, 
 *                    double *weights, int *status );
-
+ 
 *  Arguments:
 *     igrp = Grp* (Given)
 *        Group of input data files
@@ -181,6 +181,8 @@
 *        Factor cleaning parameter parsing into smf_get_cleanpar.
 *     2009-04-16 (EC):
 *        Option of exporting only certain model components to NDF
+*     2009-04-17 (EC):
+*        Factor filter generation out to smf_filter_fromkeymap
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -1029,29 +1031,13 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
               }
 
               /* filter the data */
+              filt = smf_create_smfFilter( data, status );
+              smf_filter_fromkeymap( filt, keymap, &dofft, status );
               if( dofft ) {
-
                 msgOutif( MSG__VERB," ", "  frequency domain filter", status );
-              
-                filt = smf_create_smfFilter( data, status );
-                
-                if( f_edgelow ) {
-                  smf_filter_edge( filt, f_edgelow, 1, status );
-                }
-
-                if( f_edgehigh ) {
-                  smf_filter_edge( filt, f_edgehigh, 0, status );
-                }
-
-                if( f_nnotch ) {
-                  smf_filter_notch( filt, f_notchlow, f_notchhigh, f_nnotch,
-                                    status );
-                }
-
                 smf_filter_execute( data, filt, status );
-
-                filt = smf_free_smfFilter( filt, status );
               }
+              filt = smf_free_smfFilter( filt, status );
 
               /* Count number of good bolometers in the file after flagging */
               smf_get_dims( data, NULL, NULL, &nbolo, NULL, NULL, &bstride,

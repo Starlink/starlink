@@ -92,8 +92,9 @@
 *        Add OUTFILES parameter.
 *     2009-04-17 (EC):
 *        Factor out parsing parameters to smf_get_cleanpar
+*        Factor filter generation out to smf_filter_fromkeymap
 *     {enter_further_changes_here}
-
+ 
 *  Copyright:
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -172,11 +173,6 @@ void smurf_sc2clean( int *status ) {
   double spikethresh;       /* Threshold for finding spikes */
   size_t spikeiter=0;       /* Number of iterations for spike finder */
   int dofft=0;              /* Set if freq. domain filtering the data */
-  double f_edgelow;         /* Freq. cutoff for low-pass edge filter */
-  double f_edgehigh;        /* Freq. cutoff for high-pass edge filter */
-  int f_nnotch=0;           /* Number of notch filters in array */
-  double f_notchlow[SMF__MXNOTCH]; /* Array low-freq. edges of notch filters */
-  double f_notchhigh[SMF__MXNOTCH];/* Array high-freq. edges of notch filters */
   smfFilter *filt=NULL;     /* Pointer to filter struct */
 
   /* Main routine */
@@ -228,9 +224,8 @@ void smurf_sc2clean( int *status ) {
     atlGetParam( "SPIKETHRESH", keymap, status );
 
     smf_get_cleanpar( keymap, &apod, &badfrac, &dcbox, &dcbad, &dcthresh,
-                      &dkclean, &f_edgelow, &f_edgehigh, f_notchlow,
-                      f_notchhigh, &f_nnotch, &dofft, &flagstat, &order,
-                      &spikethresh, &spikeiter, status );
+                      &dkclean, NULL, NULL, NULL, NULL, NULL, NULL, 
+                      &flagstat, &order, &spikethresh, &spikeiter, status );
   }  
 
   /* Loop over input files */
@@ -343,29 +338,17 @@ void smurf_sc2clean( int *status ) {
     }
 
     /* frequency-domain filtering */
+    filt = smf_create_smfFilter( ffdata, status );      
+    smf_filter_fromkeymap( filt, keymap, &dofft, status );
+
     if( dofft ) {
       msgOutif( MSG__VERB," ", "Apply frequency domain filter", status );
-      
-      filt = smf_create_smfFilter( ffdata, status );
-      
-      if( f_edgelow ) {
-        smf_filter_edge( filt, f_edgelow, 1, status );
-      }
-      
-      if( f_edgehigh ) {
-        smf_filter_edge( filt, f_edgehigh, 0, status );
-      }
-      
-      if( f_nnotch ) {
-        smf_filter_notch( filt, f_notchlow, f_notchhigh, f_nnotch,
-                          status );
-      }
-      
       smf_filter_execute( ffdata, filt, status );
       smf_convert_bad( ffdata, status );      
-
-      filt = smf_free_smfFilter( filt, status );
     }
+
+    filt = smf_free_smfFilter( filt, status );
+
 
     /* Ensure that the data is ICD ordered before closing */
     smf_dataOrder( ffdata, 1, status );
