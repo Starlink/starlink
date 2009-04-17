@@ -143,6 +143,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
   int dofft=0;                  /* Flag indicating that filtering is required */
   int f_nnotch=0;               /* Number of notch filters in array */
   int f_nnotch2=0;              /* Number of notch filters in array */
+  int i;                        /* Loop counter */
   int temp;                     /* temporary signed integer */
 
   /* Main routine */
@@ -210,7 +211,11 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
   if( dcthresh ) {
     if( !astMapGet0D( keymap, "DCTHRESH", dcthresh ) ) {
       *dcthresh = 0;
+    } else if( *dcthresh < 0 ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "DCTHRESH must be >= 0.", status );
     }
+
     msgOutiff( MSG__VERB, "", FUNC_NAME ": DCTHRESH=%f", status,
                *dcthresh );
   }
@@ -231,19 +236,29 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
   }
 
   if( filt_edgelow ) {
-    if( astMapGet0D( keymap, "FILT_EDGELOW", filt_edgelow ) ) {
-      dofft = 1;
-    } else {
+    if( !astMapGet0D( keymap, "FILT_EDGELOW", filt_edgelow ) ) {
       *filt_edgelow = 0;
     }
+
+    if( *filt_edgelow ) {
+      dofft = 1;
+    }
+
+    msgOutiff( MSG__VERB, "", FUNC_NAME ": FILT_EDGELOW=%f", status,
+               *filt_edgelow );
   }
 
   if( filt_edgehigh ) {
-    if( astMapGet0D( keymap, "FILT_EDGEHIGH", filt_edgehigh ) ) {
-      dofft = 1;
-    } else {
+    if( !astMapGet0D( keymap, "FILT_EDGEHIGH", filt_edgehigh ) ) {
       *filt_edgehigh = 0;
+    } 
+
+    if( *filt_edgehigh ) {
+      dofft = 1;
     }
+
+    msgOutiff( MSG__VERB, "", FUNC_NAME ": FILT_EDGEHIGH=%f", status,
+               *filt_edgehigh );
   }
 
 
@@ -266,17 +281,29 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
     if( f_nnotch != f_nnotch2 ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, 
-             "Elements in FILT_NOTCHHIGH != number in FILT_NOTCHLOW", 
+             ": Elements in FILT_NOTCHHIGH != number in FILT_NOTCHLOW", 
              status);      
-    } else {
+    } else if( (f_nnotch > 1) || (filt_notchlow[0] && filt_notchhigh[0]) ) {
+      /* Make sure we have multiple notches, or if there is only 1, that
+         the edges are not both set to 0 (defaults from smurf_sc2clean if
+         not being used) */
       dofft = 1;
       if( filt_nnotch ) {
         *filt_nnotch = f_nnotch;
       }
+
+      msgOutiff( MSG__VERB, "", FUNC_NAME 
+                 ": number components in notch filter=%i", status,
+                 f_nnotch );
+
+      for( i=0; i<f_nnotch; i++ ) {
+        msgOutiff( MSG__VERB, "", FUNC_NAME ":     %f -- %f Hz", status,
+                   filt_notchlow[i], filt_notchhigh[i] );
+      }
+    } else {
+      f_nnotch = 0;
+      *filt_nnotch = f_nnotch;
     }
-    msgOutiff( MSG__VERB, "", FUNC_NAME 
-               ": number components in notch filter=%i", status,
-               f_nnotch );
   }
 
   if( dofilt ) {
@@ -301,6 +328,9 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
   if( order ) {
     if( !astMapGet0I( keymap, "ORDER", order ) ) {
       *order = -1;
+    } else if( *order < -1 ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "ORDER must be >= -1", status );
     }
     msgOutiff( MSG__VERB, "", FUNC_NAME ": ORDER=%i", status,
                *order );
@@ -309,7 +339,11 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
   if( spikethresh ) {
     if( !astMapGet0D( keymap, "SPIKETHRESH", spikethresh ) ) {
       *spikethresh = 0;
+    } else if( *spikethresh < 0 ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "SPIKETHRESH must be >= 0.", status );
     }
+
     msgOutiff( MSG__VERB, "", FUNC_NAME ": SPIKETHRESH=%f", status,
                *spikethresh );
   }
