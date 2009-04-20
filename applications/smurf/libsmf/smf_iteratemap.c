@@ -184,7 +184,8 @@
 *     2009-04-17 (EC):
 *        Factor filter generation out to smf_filter_fromkeymap
 *     2009-04-20 (EC):
-*        Move flagging of stationary data to smf_model_create
+*        - Move flagging of stationary data to smf_model_create
+*        - Optinally delete .DIMM files (deldimm=1 in CONFIG file)
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -262,6 +263,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
   smfData *data=NULL;           /* Temporary smfData pointer */
   dim_t dcbox=0;                /* Box size for fixing DC steps */
   double dcthresh;              /* Threshold for fixing DC steps */
+  int deldimm=0;                /* Delete temporary .DIMM files */
   int dimmflags;                /* Control flags for DIMM model components */
   int dofft=0;                  /* Set if freq. domain filtering the data */
   dim_t dsize;                  /* Size of data arrays in containers */
@@ -311,12 +313,12 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
   dim_t nbolo;                  /* Number of bolometers */
   dim_t nchunks=0;              /* Number of chunks within iteration loop */
   size_t ncontchunks=0;         /* Number continuous chunks outside iter loop*/
-  size_t nflag;                 /* Number of flagged samples */
   int nm=0;                     /* Signed int version of nmodels */
   dim_t nmodels=0;              /* Number of model components / iteration */
   int numiter;                  /* Total number iterations */
   dim_t padEnd=0;               /* How many samples of padding at the end */
   dim_t padStart=0;             /* How many samples of padding at the start */
+  char *pname=NULL;             /* Poiner to name */
   smfArray **qua=NULL;          /* Quality flags for each file */
   unsigned char *qua_data=NULL; /* Pointer to DATA component of qua */
   smfGroup *quagroup=NULL;      /* smfGroup of quality model files */
@@ -412,6 +414,9 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
       msgOutif(MSG__VERB, " ", 
                "SMF_ITERATEMAP: MEMITER not set; perform iterations on disk",
                status );
+
+      /* Should temporary .DIMM files be deleted at the end? */
+      astMapGet0I( keymap, "DELDIMM", &deldimm );
     }
 
     /* Method to use for calculating the variance map */
@@ -1454,6 +1459,51 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
     }
 
     /* Cleanup things used specifically in this contchunk */
+
+    if( !memiter && deldimm ) {
+      msgOutif(MSG__VERB," ", 
+               "SMF_ITERATEMAP: Cleaning up " SMF__DIMM_SUFFIX " files", 
+               status);
+
+      /* Delete temporary .DIMM files if requested */
+      for( i=0; i<nchunks; i++ ) {               /* Loop over chunk */
+        pname = name;
+
+        /* static model components */
+        for( j=0; (resgroup)&&(j<resgroup->nrelated); j++ ) {  
+          grpGet( resgroup->grp, resgroup->subgroups[i][j], 1, &pname, 
+                  GRP__SZNAM, status );
+          remove(name);
+        }
+
+        for( j=0; (lutgroup)&&(j<lutgroup->nrelated); j++ ) {  
+          grpGet( lutgroup->grp, lutgroup->subgroups[i][j], 1, &pname, 
+                  GRP__SZNAM, status );
+          remove(name);
+        }
+
+        for( j=0; (astgroup)&&(j<astgroup->nrelated); j++ ) {  
+          grpGet( astgroup->grp, astgroup->subgroups[i][j], 1, &pname, 
+                  GRP__SZNAM, status );
+          remove(name);
+        }          
+
+        for( j=0; (quagroup)&&(j<quagroup->nrelated); j++ ) {  
+          grpGet( quagroup->grp, quagroup->subgroups[i][j], 1, &pname, 
+                  GRP__SZNAM, status );
+          remove(name);
+        }
+
+        /* dynamic model components */
+        for( k=0; k<nmodels; k++ ) {
+          for( j=0; (modelgroups[k])&&(j<(modelgroups[k])->nrelated); j++ ) {  
+            grpGet( (modelgroups[k])->grp, (modelgroups[k])->subgroups[i][j], 
+                    1, &pname, GRP__SZNAM, status );
+            remove(name);
+          }         
+        }
+      }
+    }
 
     /* fixed model smfGroups */
     if( resgroup ) smf_close_smfGroup( &resgroup, status );
