@@ -183,6 +183,8 @@
 *        Option of exporting only certain model components to NDF
 *     2009-04-17 (EC):
 *        Factor filter generation out to smf_filter_fromkeymap
+*     2009-04-20 (EC):
+*        Move flagging of stationary data to smf_model_create
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -817,17 +819,17 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
         smf_model_create( NULL, res, nchunks, SMF__LUT, 0, 
                           NULL, 0, NULL, NULL,
                           NULL, memiter, 
-                          memiter, lut, status ); 
+                          memiter, lut, 0, status ); 
 
         smf_model_create( NULL, res, nchunks, SMF__AST, 0, 
                           NULL, 0, NULL, NULL,
                           NULL, memiter, 
-                          memiter, ast, status );
+                          memiter, ast, 0, status );
 
         smf_model_create( NULL, res, nchunks, SMF__QUA, 0, 
                           NULL, 0, NULL, NULL,
                           NULL, memiter, 
-                          memiter, qua, status );
+                          memiter, qua, flagstat, status );
 
         /* Since a copy of the LUT is still open in res[0] free it up here */
         for( i=0; i<res[0]->ndat; i++ ) {
@@ -848,22 +850,22 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
         smf_model_create( igroup, NULL, 0, SMF__RES, 0, 
                           NULL, 0, NULL, NULL,
                           &resgroup, memiter, 
-                          memiter, res, status );
+                          memiter, res, 0, status );
 
         smf_model_create( igroup, NULL, 0, SMF__LUT, 0, 
                           outfset, moving, lbnd_out, ubnd_out,
                           &lutgroup, memiter, 
-                          memiter, lut, status ); 
+                          memiter, lut, 0, status ); 
 
         smf_model_create( igroup, NULL, 0, SMF__AST, 0, 
                           NULL, 0, NULL, NULL,
                           &astgroup, memiter, 
-                          memiter, ast, status );
+                          memiter, ast, 0, status );
 
         smf_model_create( igroup, NULL, 0, SMF__QUA, 0, 
                           NULL, 0, NULL, NULL,
                           &quagroup, memiter, 
-                          memiter, qua, status );
+                          memiter, qua, flagstat, status );
       }
     }
 
@@ -884,12 +886,12 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
         if( memiter ) {
           smf_model_create( NULL, res, nchunks, modeltyps[i], 0, 
                             NULL, 0, NULL, NULL,
-                            NULL, memiter, memiter, model[i], status ); 
+                            NULL, memiter, memiter, model[i], 0, status ); 
 
         } else {
           smf_model_create( igroup, NULL, 0, modeltyps[i], 0, 
                             NULL, 0, NULL, NULL, &modelgroups[i], 
-                            memiter, memiter, model[i], status );
+                            memiter, memiter, model[i], 0, status );
         }
       }
     }
@@ -1001,30 +1003,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
                          status); 
               }
               
-              if( flagstat ) {
-                if( !memiter ) {
-                  /* In order for this to work we need to check when we
-                     are reading in the raw data since model containers
-                     don't have the full JCMTState */
-                  *status = SAI__ERROR;
-                  errRep( "", FUNC_NAME ": Flagging stationary regions not "
-                          "supported if memiter=1. Do not set flagstat",
-                          status );
-                } else {
-                  msgSetd("THRESH",flagstat);
-                  msgOutif(MSG__VERB, "", 
-                           "  flagging regions slewing < ^THRESH arcsec/sec...",
-                           status );
-                  smf_flag_stationary( data, qua_data, flagstat, &nflag, 
-                                       status );
-                  if( *status == SAI__OK ) {
-                    msgSeti("N",nflag);
-                    msgOutif(MSG__VERB," ", "  ...^N new time slices flagged",
-                             status); 
-                  }
-                }
-              }
-
               if( apod ) {
                 msgOutif(MSG__VERB," ", "  apodizing data", status);
                 smf_apodize( data, qua_data, apod, status );

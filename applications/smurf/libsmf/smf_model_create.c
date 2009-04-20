@@ -58,6 +58,8 @@
 *        smfArray pointers. The top-level array must already be
 *        allocated (same number of elements as ngroups in igroup), but
 *        the individual smfArrays get allocated here.
+*     flagstat = double (Given)
+*        Speed threshold (arcsec/sec) below which data are flagged (SMF__QUA)
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -76,7 +78,12 @@
 
 *  Notes:
 *     QUAlity components are initialized to 0. Before using the caller
-*     should synchronize the SMF__Q_BADS bits with smf_update_quality.
+*     should synchronize the SMF__Q_BADS bits with
+*     smf_update_quality. In addition, the "flagstat" option can be
+*     specified to set the quality bit SMF__Q_STAT based on pointing
+*     information in the header. This is useful to calculate here
+*     since model components may not have their JCMTState information
+*     propagated.
 
 *  Authors:
 *     Edward Chapin (UBC)
@@ -144,6 +151,8 @@
 *        Create smfHead and propagate steptime
 *     2009-03-12 (EC):
 *        Add SMF__FLT
+*     2009-04-20 (EC):
+*        Add flagstat to interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -203,7 +212,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
                        AstFrameSet *outfset, int moving, 
                        int *lbnd_out, int *ubnd_out,
                        smfGroup **mgroup, int nofile, int leaveopen,
-                       smfArray **mdata, int *status ) {
+                       smfArray **mdata, double flagstat, int *status ) {
 
   /* Local Variables */
   size_t bstride;               /* Bolometer stride in data array */
@@ -232,6 +241,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
   char name[GRP__SZNAM+1];      /* Name of container file without suffix */
   dim_t nbolo;                  /* Number of bolometers */
   size_t ndata=0;               /* Number of elements in data array */
+  size_t nflag;                 /* Number of flagged samples */
   dim_t nrel=0;                 /* Number of related elements (subarrays) */
   int oflag=0;                  /* Flags for opening template file */
   long pagesize=0;              /* Size of memory page used by mmap */
@@ -316,8 +326,10 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
 
   oflag = 0;
 
-  /* Only map head if creating LUT or EXT */
-  if( (mtype != SMF__LUT) && (mtype != SMF__EXT) ) oflag |= SMF__NOCREATE_HEAD;
+  /* Only map head if creating LUT, EXT or QUA */
+  if( (mtype != SMF__LUT) && (mtype != SMF__EXT) && (mtype != SMF__QUA) ) {
+    oflag |= SMF__NOCREATE_HEAD;
+  }
 
   if( mtype == SMF__RES ) {
     /* Propagate input if RES */
@@ -685,6 +697,18 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
               /* If this is a QUA, and quality available in template copy it */
               if( (idata->pntr)[2] ) {
                 memcpy( dataptr, (idata->pntr)[2], datalen );
+              }
+
+              /* If flagstat is set, try flagging quality bits here */
+              if( flagstat > 0 ) {
+                msgOutiff(MSG__VERB, "", FUNC_NAME 
+                          ": flagging regions slewing < %f arcsec/sec...",
+                          status, flagstat );
+                smf_flag_stationary( idata, dataptr, flagstat, &nflag, status );
+                if( *status == SAI__OK ) {
+                  msgOutiff(MSG__VERB," ", FUNC_NAME 
+                            ": %zu new time slices flagged", status, nflag ); 
+                }
               }
 
             } else if( mtype == SMF__EXT ) {
