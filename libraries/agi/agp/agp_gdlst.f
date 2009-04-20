@@ -61,7 +61,7 @@
       EXTERNAL AGP1_INIT          ! Initializes AGP common blocks
 
 *  Local Variables:
-      CHARACTER BUF*80            ! Output text buffer
+      CHARACTER BUF*100           ! Output text buffer
       INTEGER I                   ! Loop count
       INTEGER IAT                 ! Used length of string
 *.

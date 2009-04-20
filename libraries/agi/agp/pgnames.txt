@@ -5,6 +5,8 @@
 #
 
 #  PGPLOT device which are not supported by GKS.
+png/          PNG/         -/    AGI_PNG/ Portable Network Graphics file/
+tpng/        TPNG/         -/   AGI_TPNG/ Portable Network Graphics file, transparent background/
 gif_l/        GIF/         -/    AGI_GIF/ GIF-format file, landscape/
 gif_p/       VGIF/         -/   AGI_VGIF/ GIF-format file, portrait/
 hpgl_l/      HPGL/         -/   AGI_HPGL/ Hewlett-Packard HP-GL plotters, landscape/
