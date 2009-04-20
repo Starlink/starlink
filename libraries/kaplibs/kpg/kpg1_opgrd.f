@@ -896,6 +896,7 @@
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -947,6 +948,11 @@
 *        it is now the weighted mean of the change between adjacent
 *        auto-correlation values (each weight is the reciprocal of the
 *        auto-correlation value).
+*     20-APR-2009 (DSB):
+*        Relax the check that says that the sum of the (un-weighted) squared
+*        values (SUM2) must be better than the previous maximum (MXAMP) for 
+*        the angle to be of any possible interest. This makes the algorithm 
+*        slightly less efficient, but more robust.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1091,10 +1097,19 @@
 
 c      write(*,*) 'Ang: ',ang*ast__dr2d,' sum2: ',sum2,' mxamp: ',mxamp
 
-*  If it looks like the new angle may be better than the supplied MXANG
-*  angle, then we continue to evaluate the wavelength of the
-*  periodicity.
-      IF( SUM2 .GT. MXAMP ) THEN
+*  If it looks like the new angle may be better than the supplied MXANG 
+*  angle, then we continue to evaluate the wavelength of the periodicity. 
+*  Note, SUM only needs to be a significant fraction of MXAMP to prompt 
+*  this further check (a factor of 0.5 is chosen more or less arbitrarily 
+*  and may need tweaking). This is because, even if SUM2 is less than 
+*  MXAMP, the effect of inclusing the wavelength in the weighting may 
+*  result in this angle being preferable to the previous best angle. We 
+*  could in principle do away with this IF check altogether and rely on 
+*  the comparison of the fully wavelength-weighted values performed below 
+*  to select the best angle, but that would involve evaluating the
+*  autocorrelation function for a lot of angles that cannot possibly be of
+*  any interest because of their very low SUM2 values.
+      IF( SUM2 .GT. 0.5*MXAMP ) THEN
 
 *  We now find the wavelength in grid pixels of any periodicity in the
 *  histogram. This is determined by forming the auto-correlation of the
@@ -1271,7 +1286,7 @@ c         call opgrd_autodump( ang, histsz, hist, status )
             NEWWAV = XSHIFT*SPC
 
 c      write(*,*) '   new total: ',NEWAMP*(NEWWAV**0.7),
-c     :           ' old total: ',MXAMP*(MXWAVE**7)
+c     :           ' old total: ',MXAMP*(MXWAVE**0.7)
 
 *  We use the new angle if the auto-correlation peak produces a greater
 *  value than the old angle. We include a weighting factor that gives
