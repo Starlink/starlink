@@ -1042,7 +1042,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
               /* Count number of good bolometers in the file after flagging */
               smf_get_dims( data, NULL, NULL, &nbolo, NULL, NULL, &bstride,
                             NULL, status );
-              for( j=0; j<nbolo; j++ ) {
+
+              for( j=0; (*status==SAI__OK)&&(j<nbolo); j++ ) {
                 if( !(qua_data[j*bstride]&SMF__Q_BADB) ) {
                   goodbolo++;
                 }
@@ -1050,7 +1051,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
             }
 
             /* If we don't have enough good detectors then set bad status */
-            if( goodbolo < SMF__MINSTATSAMP ) {
+            if( (*status==SAI__OK) && (goodbolo<SMF__MINSTATSAMP) ) {
               *status = SMF__INSMP;
               errRepf( "", FUNC_NAME ": Insufficient number of good bolos "
                        "(%" DIM_T_FMT "<%i) to continue", status, goodbolo, 
