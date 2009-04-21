@@ -640,6 +640,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
    double *p2;                    /* Pointer to array holding a single point */
    double angle;                  /* Angular position of point */
    double delta;                  /* Angular separation of points */
+   double dist;                   /* Offset along an axis */
    double lbx;                    /* Lower x bound of mesh bounding box */
    double lby;                    /* Lower y bound of mesh bounding box */
    double p[ 2 ];                 /* Position in 2D Frame */
@@ -722,17 +723,21 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
                ptr[ 0 ][ i ] = p[ 0 ];
                ptr[ 1 ][ i ] = p[ 1 ];
 
-/* Update the bounds of the mesh bounding box. */
+/* Update the bounds of the mesh bounding box. The box is expressed in
+   terms of axis offsets from the centre, in order to avoid problems with
+   boxes that cross RA=0 or RA=12h */
                if( p[ 0 ] != AST__BAD && p[ 1 ] != AST__BAD ){
-                  if( p[ 0 ] < lbx ) {
-                     lbx = p[ 0 ];
-                  } else if( p[ 0 ] > ubx ) {
-                     ubx = p[ 0 ];
+                  dist =  astAxDistance( frm, 1, this->centre[ 0 ], p[ 0 ] );
+                  if( dist < lbx ) {
+                     lbx = dist;
+                  } else if( dist > ubx ) {
+                     ubx = dist;
                   }
-                  if( p[ 1 ] < lby ) {
-                     lby = p[ 1 ];
-                  } else if( p[ 1 ] > uby ) {
-                     uby = p[ 1 ];
+                  dist =  astAxDistance( frm, 2, this->centre[ 1 ], p[ 1 ] );
+                  if( dist < lby ) {
+                     lby = dist;
+                  } else if( dist > uby ) {
+                     uby = dist;
                   }
                }
 
@@ -741,10 +746,10 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
             }
 
 /* Store the bounding box in the Circle structure. */
-            this->lb[ 0 ] = lbx;
-            this->lb[ 1 ] = lby;
-            this->ub[ 0 ] = ubx;
-            this->ub[ 1 ] = uby;
+            this->lb[ 0 ] = this->centre[ 0 ] + lbx;
+            this->lb[ 1 ] = this->centre[ 1 ] + lby;
+            this->ub[ 0 ] = this->centre[ 0 ] + ubx;
+            this->ub[ 1 ] = this->centre[ 1 ] + uby;
          }
 
 /* Now deal with circles with more than 2 dimensions. Producing an evenly

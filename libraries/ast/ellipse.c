@@ -823,6 +823,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
    double ang;                    /* Position angular of primary axis at "dx" */
    double angle;                  /* Ellipse parametric angle at point */
    double delta;                  /* Angular separation of points */
+   double dist;                   /* Offset along an axis */
    double dx;                     /* Primary axis offset */
    double dy;                     /* Secondary axis offset */
    double lbnd[2];                /* Lower bounding box bounds */
@@ -905,21 +906,27 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
    the primary axis. */
             astOffset2( frm, p, ang + AST__DPIBY2, dy, p2 );
 
-/* Store the resulting axis values and update the bounding box. */
+/* Store the resulting axis values. */
             ptr[ 0 ][ i ] = p2[ 0 ];
             ptr[ 1 ][ i ] = p2[ 1 ];
 
-/* Update the bounds of the mesh bounding box. */
+/* Update the bounds of the mesh bounding box. The box is expressed in
+   terms of axis offsets from the centre, in order to avoid problems with
+   boxes that cross RA=0 or RA=12h */
             if( p2[ 0 ] != AST__BAD && p2[ 1 ] != AST__BAD ){
-               if( p2[ 0 ] < lbx ) {
-                  lbx = p2[ 0 ];
-               } else if( p2[ 0 ] > ubx ) {
-                  ubx = p2[ 0 ];
+
+               dist =  astAxDistance( frm, 1, this->centre[ 0 ], p2[ 0 ] );
+               if( dist < lbx ) {
+                  lbx = dist;
+               } else if( dist > ubx ) {
+                  ubx = dist;
                }
-               if( p2[ 1 ] < lby ) {
-                  lby = p2[ 1 ];
-               } else if( p2[ 1 ] > uby ) {
-                  uby = p2[ 1 ];
+
+               dist =  astAxDistance( frm, 1, this->centre[ 1 ], p2[ 1 ] );
+               if( dist < lby ) {
+                  lby = dist;
+               } else if( dist > uby ) {
+                  uby = dist;
                }
             }
 
@@ -943,10 +950,10 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
          astSetNegated( reg, 0 );
 
 /* Normalise this box. */
-         lbnd[ 0 ] = lbx;
-         lbnd[ 1 ] = lby;
-         ubnd[ 0 ] = ubx;
-         ubnd[ 1 ] = uby;
+         lbnd[ 0 ] = this->centre[ 0 ] + lbx;
+         lbnd[ 1 ] = this->centre[ 1 ] + lby;
+         ubnd[ 0 ] = this->centre[ 0 ] + ubx;
+         ubnd[ 1 ] = this->centre[ 1 ] + uby;
          astNormBox( frm, lbnd, ubnd, reg );
 
 /* Save this box */

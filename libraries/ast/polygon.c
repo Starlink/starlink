@@ -591,6 +591,9 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
    double **ptr;              /* Pointer to PointSet data */
    double *x;                 /* Pointer to next X axis value */
    double *y;                 /* Pointer to next Y axis value */
+   double dist;               /* Offset along an axis */
+   double x0;                 /* The first X axis value */
+   double y0;                 /* The first Y axis value */
    int ip;                    /* Point index */
    int np;                    /* No. of points in PointSet */
 
@@ -618,23 +621,48 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
       ptr = astGetPoints( pset );
       np = astGetNpoint( pset );
 
-/* Find the upper and lower bounds of the box enclosing all the vertices. */
-      lbnd[ 0 ] = DBL_MAX;
-      lbnd[ 1 ] = DBL_MAX;
-      ubnd[ 0 ] = -DBL_MAX;
-      ubnd[ 1 ] = -DBL_MAX;
-      x = ptr[ 0 ];
-      y = ptr[ 1 ];
-      for( ip = 0; ip < np; ip++, x++, y++ ) {
-         if( *x < lbnd[ 0 ] ) lbnd[ 0 ] = *x;
-         if( *x > ubnd[ 0 ] ) ubnd[ 0 ] = *x;
-         if( *y < lbnd[ 1 ] ) lbnd[ 1 ] = *y;
-         if( *y > ubnd[ 1 ] ) ubnd[ 1 ] = *y;
-      }
-
 /* Get a pointer to the base Frame in the frameset encapsulated by the
    parent Region structure. */
       frm = astGetFrame( this_region->frameset, AST__BASE );
+
+/* Find the upper and lower bounds of the box enclosing all the vertices.
+   The box is expressed in terms of axis offsets from the first vertex, in 
+   order to avoid problems with boxes that cross RA=0 or RA=12h */
+      lbnd[ 0 ] = 0.0;
+      lbnd[ 1 ] = 0.0;
+      ubnd[ 0 ] = 0.0;
+      ubnd[ 1 ] = 0.0;
+
+      x = ptr[ 0 ];
+      y = ptr[ 1 ];
+
+      x0 = *x;
+      y0 = *y;
+
+      for( ip = 0; ip < np; ip++, x++, y++ ) {
+
+         dist =  astAxDistance( frm, 1, x0, *x );
+         if( dist < lbnd[ 0 ] ) {
+            lbnd[ 0 ] = dist;
+         } else if( dist > ubnd[ 0 ] ) {
+            ubnd[ 0 ] = dist;
+         }
+
+         dist =  astAxDistance( frm, 2, y0, *y );
+         if( dist < lbnd[ 1 ] ) {
+            lbnd[ 1 ] = dist;
+         } else if( dist > ubnd[ 1 ] ) {
+            ubnd[ 1 ] = dist;
+         }
+
+      }
+
+/* Convert the box bounds to absolute values, rather than values relative
+   to the first vertex. */
+      lbnd[ 0 ] += x0;
+      lbnd[ 1 ] += y0;
+      ubnd[ 0 ] += x0;
+      ubnd[ 1 ] += y0;
 
 /* The astNormBox requires a Mapping which can be used to test points in 
    this base Frame. Create a copy of the Polygon and then set its

@@ -2266,6 +2266,39 @@ C
       
       frm1 = ast_getframe( fs, ast__current, status )
 
+      p1( 1 ) = 0.0
+      p1( 2 ) = 1.0
+      p2( 1 ) = 0.01
+
+      cir1 = ast_circle( frm1, 1, p1, p2, AST__NULL, ' ', status )
+      call ast_getregionbounds( cir1, lbnd, ubnd, status )
+
+      if( abs(lbnd(1)-(-0.01850666061475259)) .gt. 1.0E-6 ) 
+     :    call stopit( status, 'Circle: Error AA1' )
+      if( abs(lbnd(2)-(0.9900000002235173)) .gt. 1.0E-6 ) 
+     :    call stopit( status, 'Circle: Error AA2' )
+      if( abs(ubnd(1)-(0.01850666061475276)) .gt. 1.0E-6 ) 
+     :    call stopit( status, 'Circle: Error AA3' )
+      if( abs(ubnd(2)-(1.009994987166073)) .gt. 1.0E-6 ) 
+     :    call stopit( status, 'Circle: Error AA4' )
+
+      p1( 1 ) = 0.0
+      p1( 2 ) = 1.57
+      p2( 1 ) = 0.01
+
+      cir1 = ast_circle( frm1, 1, p1, p2, AST__NULL, ' ', status )
+      call ast_getregionbounds( cir1, lbnd, ubnd, status )
+
+      if( abs(lbnd(1)-(0.0)) .gt. 1.0E-6 ) 
+     :    call stopit( status, 'Circle: Error AA5' )
+      if( abs(lbnd(2)-(1.560000052675599)) .gt. 1.0E-6 ) 
+     :    call stopit( status, 'Circle: Error AA6' )
+      if( abs(ubnd(1)-(6.283185307179586)) .gt. 1.0E-6 ) 
+     :    call stopit( status, 'Circle: Error AA7' )
+      if( abs(ubnd(2)-(1.5707963267948966)) .gt. 1.0E-6 ) 
+     :    call stopit( status, 'Circle: Error AA8' )
+
+
       p1( 1 ) = 1.2217305
       p1( 2 ) = 1.3962634
       p2( 1 ) = 0.8
