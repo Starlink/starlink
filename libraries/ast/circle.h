@@ -100,6 +100,8 @@ typedef struct AstCircle {
 /* Attributes specific to objects in this class. */
    double *centre;               /* Circle centre coords */
    double radius;                /* Circle radius */
+   double *lb;                   /* Lower limits of mesh bounding box */
+   double *ub;                   /* Upper limit of mesh bounding box */
    int stale;                    /* Is Cached information stale? */
 
 } AstCircle;

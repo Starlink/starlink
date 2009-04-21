@@ -419,6 +419,8 @@ static void Cache( AstCircle *this, int *status ){
    double **ptr;
    double *centre;
    double *circum;
+   double *lb;
+   double *ub;
    int i;
    int nc;
 
@@ -432,6 +434,13 @@ static void Cache( AstCircle *this, int *status ){
       frm = astGetFrame( ((AstRegion *) this)->frameset, AST__BASE );
       nc = astGetNaxes( frm );
 
+/* Allocate memory to store the base frame bounding box. This is just
+   initialised here. It is set properly when the astRegBaseMesh
+   function is called. This box should not be used unless the "basemesh" 
+   component of the parent Region structure is set to a non-null value. */
+      lb = (double *) astMalloc( sizeof( double )*(size_t) nc );   
+      ub = (double *) astMalloc( sizeof( double )*(size_t) nc );   
+
 /* Allocate memory to store two positions in the base Frame. */
       centre = (double *) astMalloc( sizeof( double )*(size_t) nc );   
       circum = (double *) astMalloc( sizeof( double )*(size_t) nc );   
@@ -443,20 +452,31 @@ static void Cache( AstCircle *this, int *status ){
 /* Check pointers can be used safely. */
       if( ptr ) {
 
-/* Copy the two points in to the allocated memory. */
+/* Copy the two points in to the allocated memory, and initialise the
+   bounding box. */
          for( i = 0; i < nc; i++ ) {
             centre[ i ] = ptr[ i ][ 0 ];
             circum[ i ] = ptr[ i ][ 1 ];
+            lb[ i ] = -DBL_MAX;
+            ub[ i ] = DBL_MAX;
          }
 
 /* Store the geodesic distance between these two points as the radius. */
          this->radius = astDistance( frm, centre, circum );      
 
-/* Store the pointer to the centre coords array in the Circle structure. */
+/* Store the pointer to each array in the Circle structure. */
          if( astOK ) {
            astFree( this->centre );
            this->centre = centre;
            centre = NULL;
+
+           astFree( this->lb );
+           this->lb = lb;
+           lb = NULL;
+
+           astFree( this->ub );
+           this->ub = ub;
+           ub = NULL;
          }
       }
 
@@ -517,11 +537,10 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
 
 /* Local Variables: */
    AstCircle *this;              /* Pointer to Circle structure */
-   AstFrame *frm;                /* Encapsulated Frame */
-   AstFrame *reg;                /* Base Frame region */
-   double axcen;                 /* Central axis value */
+   AstFrame *frm;                /* Pointer to base Frame */
+   const char *class;            /* Pointer to class name */
    int i;                        /* Axis index */
-   int nc;                       /* No. of axes in base Frame */
+   int nb;                       /* No. of axes in base Frame */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -529,42 +548,40 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
 /* Get a pointer to the Circle structure */
    this = (AstCircle *) this_region;
 
-/* Get the number of base Frame axes. */
-   nc = astGetNin( this_region->frameset );
-
 /* Ensure cached information is available. */
    Cache( this, status );
 
-/* Do each base Frame axis. */
-   for( i = 0; i < nc; i++ ) {
+/* Get a pointer to the base Frame in the Region, and get the number of
+   axes. */
+   frm = astGetFrame( this_region->frameset, AST__BASE );
+   nb = astGetNaxes( frm );
 
-/* Get the value on this axis at the centre. */
-      axcen = this->centre[ i ];
+/* If the Frame is a simple Frame, we can assume plane geometry. */
+   class = astGetClass( frm );
+   if( class && !strcmp( class, "Frame" ) ) {
+      for( i = 0; i < nb; i++ ) {
+         lbnd[ i ] = ( this->centre )[ i ] - this->radius;
+         ubnd[ i ] = ( this->centre )[ i ] + this->radius;
+      }
 
-/* Store the upper and lower bounds. */
-      lbnd[ i ] = axcen - this->radius;
-      ubnd[ i ] = axcen + this->radius;
+/* If the Frame is not a simple Frame we cannot assume plane geometry. */
+   } else {
+
+/* The bounding box of the mesh returned by astRegBaseMesh is used as the
+   bounding box of the Circle. These bounds are cached in the Circle
+   structure by astRegBaseMesh. Ensure astRegBaseMesh has been invoked,
+   so that it is safe to use the cached bounding box. */
+      if( !this_region->basemesh ) (void) astAnnul( astRegBaseMesh( this ) );
+
+/* Store the bounding box. */
+      for( i = 0; i < nb; i++ ) {
+         lbnd[ i ] = this->lb[ i ];
+         ubnd[ i ] = this->ub[ i ];
+      }
    }
 
-/* Get a pointer to the base Frame in the frameset encapsulated by the
-   parent Region structure. */
-   frm = astGetFrame( this_region->frameset, AST__BASE );
-
-/* The astNormBox requires a Mapping which can be used to test points in 
-   this base Frame. Create a copy of the Circle and then set its
-   FrameSet so that the current Frame in the copy is the same as the base
-   Frame in the original. */
-   reg = astCopy( this );
-   astSetRegFS( reg, frm );
-   astSetNegated( reg, 0 );
-
-/* Normalise this box. */
-   astNormBox( frm, lbnd, ubnd, reg );
-
-/* Free resources */
-   reg = astAnnul( reg );
+/* Free resources. */
    frm = astAnnul( frm );
-
 }
 
 static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
@@ -615,6 +632,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
 /* Local Variables: */
    AstBox *box;                   /* Bounding box for this Circle */
    AstCircle *this;               /* The Circle structure */
+   AstRegion *reg;                /* Copy of supplied Circle */
    AstFrame *frm;                 /* Base Frame in encapsulated FrameSet */
    AstPointSet *result;           /* Returned pointer */
    double **ptr;                  /* Pointers to data */
@@ -622,7 +640,11 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
    double *p2;                    /* Pointer to array holding a single point */
    double angle;                  /* Angular position of point */
    double delta;                  /* Angular separation of points */
+   double lbx;                    /* Lower x bound of mesh bounding box */
+   double lby;                    /* Lower y bound of mesh bounding box */
    double p[ 2 ];                 /* Position in 2D Frame */
+   double ubx;                    /* Upper x bound of mesh bounding box */
+   double uby;                    /* Upper y bound of mesh bounding box */
    int i;                         /* Point index */
    int j;                         /* Axis index */
    int naxes;                     /* No. of axes in base Frame */
@@ -669,6 +691,10 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
             ptr[ 0 ][ 1 ] = ( this->centre )[ 0 ] + this->radius;
          }
 
+/* Store the bounding box in the Circle structure. */
+         this->lb[ 0 ] = ptr[ 0 ][ 0 ];
+         this->ub[ 0 ] = ptr[ 0 ][ 1 ];
+
 /* Now deal with 2-D circles. */
       } else if( naxes == 2 ){
 
@@ -680,6 +706,12 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
          ptr = astGetPoints( result );
          if( astOK ) {
 
+/* Initialise the bounding box of the mesh points. */
+            lbx = DBL_MAX;
+            ubx = -DBL_MAX;
+            lby = DBL_MAX;
+            uby = -DBL_MAX;
+
 /* Loop round each point. */
             angle = 0.0;
             for( i = 0; i < np; i++ ) {
@@ -690,26 +722,57 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
                ptr[ 0 ][ i ] = p[ 0 ];
                ptr[ 1 ][ i ] = p[ 1 ];
 
+/* Update the bounds of the mesh bounding box. */
+               if( p[ 0 ] != AST__BAD && p[ 1 ] != AST__BAD ){
+                  if( p[ 0 ] < lbx ) {
+                     lbx = p[ 0 ];
+                  } else if( p[ 0 ] > ubx ) {
+                     ubx = p[ 0 ];
+                  }
+                  if( p[ 1 ] < lby ) {
+                     lby = p[ 1 ];
+                  } else if( p[ 1 ] > uby ) {
+                     uby = p[ 1 ];
+                  }
+               }
+
 /* Increment the angular position of the next mesh point. */
                angle += delta;
             }
+
+/* Store the bounding box in the Circle structure. */
+            this->lb[ 0 ] = lbx;
+            this->lb[ 1 ] = lby;
+            this->ub[ 0 ] = ubx;
+            this->ub[ 1 ] = uby;
          }
 
 /* Now deal with circles with more than 2 dimensions. Producing an evenly
    spread mesh of points over a sphere is a complex task (see e.g.
    http://www.eso.org/science/healpix/ ). This implementation does not
    attempt to produce a genuinely even spread. Instead it simply uses the 
-   mesh for the bounding box if the sphere, and projects each point on to
+   mesh for the bounding box of the sphere, and projects each point on to
    the surface of the sphere. */
       } else {
 
-/* Allocate memory and put the circle bounding box coords into it. */
+/* Allocate memory to hold an approximation of the circle bounding box. */
          p1 = astMalloc( sizeof( double )*(size_t) naxes );
          p2 = astMalloc( sizeof( double )*(size_t) naxes );
-         astRegBaseBox( this, p1, p2 );
+
+/* Get an approximation to the bounding box, and initialise the real 
+   bounding box of the mesh points. */
+         if( astOK ) {
+            memcpy( p1, this->centre, sizeof( double )*(size_t) naxes );
+            for( j = 0; j < naxes; j++ ) {
+               p1[ j ] += this->radius;
+               astOffset( frm, this->centre, p1, this->radius, p2 );
+               p1[ j ] = this->centre[ j ];
+               this->ub[ j ] = p2[ j ];
+            }
+         }
 
 /* Create a Box region which just encompasses the circle. */
-         box = astBox( frm, 0, this->centre, p1, NULL, "", status );
+         box = astBox( frm, 0, this->centre, this->ub, NULL, "", status );
 
 /* Get a mesh covering this box. */
          astSetMeshSize( box, np );
@@ -720,12 +783,30 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
 /* Allocate memory for a single point */
          if( astOK ) {
 
+/* Initialise the real bounding box of the mesh points. */
+            for( j = 0; j < naxes; j++ ) {
+               this->lb[ j ] = DBL_MAX;
+               this->ub[ j ] = -DBL_MAX;
+            }
+
 /* Move each point in this mesh radially so that its distance from the centre
    equals the radius of this Circle. */
             for( i = 0; i < np; i++ ) {
                for( j = 0; j < naxes; j++ ) p1[ j ] = ptr[ j ][ i ];
                astOffset( frm, this->centre, p1, this->radius, p2 );
-               for( j = 0; j < naxes; j++ ) ptr[ j ][ i ] = p2[ j ];
+
+               for( j = 0; j < naxes; j++ ) {
+                  ptr[ j ][ i ] = p2[ j ];
+
+/* Update the bounds of the mesh bounding box. */
+                  if( p2[ j ] != AST__BAD ){
+                     if( p2[ j ] < this->lb[ j ] ) {
+                        this->lb[ j ] = p2[ j ];
+                     } else if( p2[ j ] > this->ub[ j ] ) {
+                        this->ub[ j ] = p2[ j ];
+                     }
+                  }
+               }
             }    
          }
 
@@ -739,9 +820,20 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region, int *status ){
          box = astAnnul( box );
       }
 
-/* Free resources. */
-      frm = astAnnul( frm );
+/* Extend the bounding box if it contains any singularies. The astNormBox 
+   requires a Mapping which can be used to test points in the base Frame. 
+   Create a copy of the Circle and then set its FrameSet so that the current 
+   Frame in the copy is the same as the base Frame in the original. */
+      reg = astCopy( this );
+      astSetRegFS( reg, frm );
+      astSetNegated( reg, 0 );
 
+/* Normalise this box. */
+      astNormBox( frm, this->lb, this->ub, reg );
+
+/* Free resources. */
+      reg = astAnnul( reg );
+      frm = astAnnul( frm );
    }
 
 /* Annul the result if an error has occurred. */
@@ -1628,11 +1720,15 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 /* For safety, first clear any references to the input memory from
    the output Circle. */
    out->centre = NULL;
+   out->lb = NULL;
+   out->ub = NULL;
 
 /* Copy dynamic memory contents */
    nax = astGetNin( ((AstRegion *) in)->frameset );
    out->centre = astStore( NULL, in->centre, 
                            sizeof( double )*(size_t)nax );
+   out->lb = astStore( NULL, in->lb, sizeof( double )*(size_t)nax );
+   out->ub = astStore( NULL, in->ub, sizeof( double )*(size_t)nax );
 }
 
 
@@ -1674,6 +1770,8 @@ static void Delete( AstObject *obj, int *status ) {
 
 /* Annul all resources. */
    this->centre = astFree( this->centre );
+   this->lb = astFree( this->lb );
+   this->ub = astFree( this->ub );
 }
 
 /* Dump function. */
@@ -2181,6 +2279,8 @@ AstCircle *astInitCircle_( void *mem, size_t size, int init, AstCircleVtab *vtab
 /* ------------------------ */
          new->stale = 1;
          new->centre = NULL;
+         new->lb = NULL;
+         new->ub = NULL;
          Cache( new, status );
 
 /* If an error occurred, clean up by deleting the new Circle. */
@@ -2325,6 +2425,8 @@ AstCircle *astLoadCircle_( void *mem, size_t size, AstCircleVtab *vtab,
 
 /* Cache intermediate results in the Circle structure */
       new->centre = NULL;
+      new->lb = NULL;
+      new->ub = NULL;
       new->stale = 1;
       Cache( new, status );
 
