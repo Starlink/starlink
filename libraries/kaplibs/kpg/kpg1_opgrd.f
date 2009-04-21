@@ -261,6 +261,12 @@
 *     9-JAN-2006 (DSB):
 *        Check for insufficient points being supplied, and for all
 *        supplied points being co-incident.
+*     21-APR-2009 (DSB):
+*        The mean sample spacing over the bounding box can give a gross
+*        under-estimate of the pixel spacing if the samples are clustered 
+*        into groups where each group represents one pixel. For this
+*        reason, loop round trying larger sample spacing until the pixel
+*        size converges.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -323,6 +329,7 @@
       DOUBLE PRECISION YLO
       INTEGER FC
       INTEGER FS
+      INTEGER ALLOCD
       INTEGER HISTSZ
       INTEGER I
       INTEGER IANG
@@ -338,6 +345,7 @@
 *  Initialise
       PWAVE = 0.0D0
       PANG = 0.0D0
+      ALLOCD = 0
       IPHIST = 0
       OK = .TRUE.
       RDIAM = 0.0
@@ -490,26 +498,43 @@
      :                         PAR( 7 ) .EQ. AST__BAD ) ) THEN
          OK = .FALSE.
 
+*  If the positions are grouped into clusters of points, where each
+*  cluster represents a single sky position with errors, then the mean
+*  spacing between samples, SPC, will be much smaller than the required
+*  spacing (i.e. the spacing between clusters). This can upset the
+*  calculation of the best orientation. So we loop. On the first pass 
+*  we determine a likely cluster spacing in MXWAVE using the initial mean
+*  sample spacing to determine the histogram spacing. If this cluster
+*  spacing is much bigger than the mean sample spacing, we recalculate
+*  the cluster spacing using a larger histogram spacing.
+         MXWAVE = 0.5*SPC
+         SPC = 0.0
+         DO WHILE( MXWAVE .GT. 10.0*SPC .AND. STATUS .EQ. SAI__OK ) 
+
 *  Allocate a 1D work array which spans the circle enclosing the
-*  bounding box, but using smaller pixels (10 pixels to each regular
-*  grid space).
-         SPC = 0.1D0*SPC
-         HISTSZ = DIAM/SPC
-         CALL PSX_CALLOC( HISTSZ, '_REAL', IPHIST, STATUS )
+*  bounding box, but using smaller pixels (one fifth of the current
+*  estimate of the periodicity).
+            SPC = 0.2*MXWAVE
+            HISTSZ = DIAM/SPC
+            IF( ALLOCD .LT. HISTSZ ) THEN
+               IF( ALLOCD .GT. 0 ) CALL PSX_FREE( IPHIST, STATUS )
+               CALL PSX_CALLOC( HISTSZ, '_REAL', IPHIST, STATUS )
+               ALLOCD = HISTSZ
+            END IF
 
 *  Store the grid co-ordinate within this work array that will 
 *  correspond to the central position (XC,YC).
-         SPC0 = DBLE( ( HISTSZ + 1 )/2 )
+            SPC0 = DBLE( ( HISTSZ + 1 )/2 )
 
 *  Imagine a line passing through the centre position (XC,YC). We step 
 *  through all orientations of this line in units of 3 degrees. Zero
 *  angle corresponds to the second axis in the initial projection (i.e. 
 *  celestial north), and the first axis of the initial projection 
 *  (either east or west) is at angle of +90 degrees.
-         MXAMP = -1.0
-         MXWAVE = 0.0
-         DO IANG = 0, 177, 3
-            ANG = IANG*AST__DD2R
+            MXAMP = -1.0
+            MXWAVE = 0.0
+            DO IANG = 0, 177, 3
+               ANG = IANG*AST__DD2R
 
 *  For the current line orientation, project every initial grid position
 *  onto the line, and record where about the projected point falls on 
@@ -521,12 +546,19 @@
 *  (in units of initial grid pixels). The details of the orientation 
 *  with the strongest periodicity are retained in MXAMP, MXANG and 
 *  MXWAVE.
-            CALL KPG1_OPGR2( NPOS, XOUT, YOUT, ANG, SPC, XC, YC, SPC0,
-     :                       .TRUE., HISTSZ, %VAL( CNF_PVAL( IPHIST ) ),
-     :                       MXAMP, MXWAVE, MXANG, STATUS )
+               CALL KPG1_OPGR2( NPOS, XOUT, YOUT, ANG, SPC, XC, YC, 
+     :                          SPC0, .TRUE., HISTSZ, 
+     :                          %VAL( CNF_PVAL( IPHIST ) ), MXAMP, 
+     :                          MXWAVE, MXANG, STATUS )
 
 *  Next orientation.
+            END DO
+
          END DO
+
+c      write(*,*)
+c      write(*,*) '----- Accurate angle scanning ------'
+c      write(*,*)
 
 *  Check a direction was found that shows some periodicity.
          IF( MXWAVE .GT. 0.0 ) THEN      
@@ -1095,7 +1127,8 @@
          SUM2 = SUM2 + HIST( I )**2
       END DO
 
-c      write(*,*) 'Ang: ',ang*ast__dr2d,' sum2: ',sum2,' mxamp: ',mxamp
+c      write(*,*) 'Ang: ',ang*ast__dr2d,' sum2: ',sum2,' 0.5*mxamp: ',
+c     :            0.5*mxamp
 
 *  If it looks like the new angle may be better than the supplied MXANG 
 *  angle, then we continue to evaluate the wavelength of the periodicity. 
