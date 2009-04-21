@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="findcoords" support="U">
-  <version>1.0-1</version>
+  <version>1.0-2</version>
   <path>applications/findcoords</path>
   <description>Find the coordinates of a named object</description>
   <abstract><p>

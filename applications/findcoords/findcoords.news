@@ -39,3 +39,8 @@
   findcoords  pks1417-19
   findcoords  mkn477
   findcoords  altair
+
+2 Updates
+
+  The remote catalogue configuration file is now set as $CURSA_DIR/cursa.cfg.
+
