@@ -1137,9 +1137,9 @@ sub GetObjectCoords
 #
 #    Split the last line in the returned table into its component
 #    fields.
-      print "GetObjectCoords tableLines = $tableLines \n";
+#      print "GetObjectCoords tableLines = $tableLines \n";
       $lastLine = $tableLines - 1;
-      print "lastLine = $lastLine ($table[$lastLine]) \n";
+#      print "lastLine = $lastLine ($table[$lastLine]) \n";
       @fields = split(/\t/, $table[$lastLine]);
 
 #
