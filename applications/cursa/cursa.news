@@ -2,7 +2,7 @@
 
   Version 6.5 of CURSA is now part of the Starlink CVS release.
 
-  This version include a new "geturl" command that understands
+  This version includes a new "geturl" command that understands
   proxy servers. To define a proxy server set the environment 
   variable "http_proxy" to something like:  
  
