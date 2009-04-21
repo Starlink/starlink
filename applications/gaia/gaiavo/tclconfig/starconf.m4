@@ -49,17 +49,17 @@ m4_ifdef([_poss_STAR_RESTFP_FIX],
 ## acinclude.m4 file just before running ./bootstrap or autoreconf.
 m4_define([per_dir_PREFIX],   [m4_ifdef([OVERRIDE_PREFIX],
                                         [OVERRIDE_PREFIX],
-                                        [/loc/pwda/pdraper/starlink_svn/build])])
+                                        [/loc/pwda/pdraper/starlink_git/build])])
 m4_define([per_dir_STARLINK], [m4_ifdef([OVERRIDE_STARLINK],
                                         [OVERRIDE_STARLINK],
-                                        [/loc/pwda/pdraper/starlink_svn/build])])
+                                        [/loc/pwda/pdraper/starlink_git/build])])
 
 test -n "$_star_per_package_dirs" || _star_per_package_dirs=false
 test -n "$_star_docs_only"        || _star_docs_only=false
 
 
 # Ensure that STARLINK has a value, defaulting to
-# /loc/pwda/pdraper/starlink_svn/build.  Note that this directory may be
+# /loc/pwda/pdraper/starlink_git/build.  Note that this directory may be
 # different from /star, and reflects the value of
 # STARCONF_DEFAULT_STARLINK that the `starconf' package was configured
 # with before its installation. 
@@ -73,7 +73,7 @@ test -n "$_star_docs_only"        || _star_docs_only=false
 # is possible to make a test version of a new package, using tools
 # from an old installation, but installing in a new place.
 #
-# However, we install software in /loc/pwda/pdraper/starlink_svn/build by
+# However, we install software in /loc/pwda/pdraper/starlink_git/build by
 # default.  This is so even if $STARLINK and STARCONF_DEFAULT_STARLINK
 # are different, because in this case we are planning to use a
 # previous installation in $STARLINK or $STARCONF_DEFAULT_STARLINK,
@@ -611,14 +611,17 @@ AC_DEFUN([STAR_CNF_BLANK_COMMON],
 # STAR_PRM_COMPATIBLE_SYMBOLS
 # ---------------------------
 #
-#  See if any special flags are required to support PRM's use of typeless BOZ
-#  constants, or if there's no typeless BOZ support any special flags that are
-#  required for that. 
+#  See if any special flags are required to support PRM and the use of the
+#  PRM_PAR constants. If a typeless BOZ descriptor is available (usually 'X)
+#  then this macro will have no effect, however, if there's no typeless BOZ
+#  support any special Fortran compiler flags that are required when using
+#  PRM_PAR will be defined as part of the STAR_FCFLAGS and STAR_FFLAGS
+#  variables.
 #
 #  In fact this macro is only currently of use with the gfortran compiler
 #  which has no typeless BOZ support, so requires that the -fno-range-check
 #  flag is set so that assigments to integers can silently overflow (BOZ
-#  constants are replaced with their integer and floating point
+#  constants are replaced with their plain integer and floating point
 #  equivalents). In general this macro should be used by all packages that
 #  include PRM_PAR, all monoliths are assumed to use this by default.
 #
