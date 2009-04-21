@@ -1,5 +1,8 @@
 1 CCDPACK_bugfix_update
 
+  Release v4.0-23 fixes a memory handling bug in ccdwish. This effected
+  many of the UI applications, like PAIRNDF, CCDALIGN etc.
+
   Release v4.0-22 fixes a bug in the memory handling in FINDOFF.
 
   Release v4.0-20 updates the Tcl/Tk/Itcl core used by CCDPACK. Extensive
