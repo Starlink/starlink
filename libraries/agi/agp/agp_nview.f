@@ -52,6 +52,9 @@
 *
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
+*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
 *
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -73,6 +76,7 @@
 *     NE:  Nick Eaton (Durham University)
 *     BKM: Brian McIlwrath (Starlink, RAL)
 *     DSB: David Berry (Starlink)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *
 *  History:
 *     Oct 1988 (NE):
@@ -88,6 +92,8 @@
 *        Open PGPLOT using AGP1_PGBEG.
 *     16-NOV-2001 (DSB):
 *        Use AGP1_CHKDV to check the device has not changed.
+*     22-APR-2009 (TIMJ):
+*        ISTAT should not be used. Use STATUS instead.
 *-
 *  Type Definitions :
       IMPLICIT NONE
@@ -112,7 +118,7 @@
 *  Local variables :
       LOGICAL FOUND, GOTIT
 
-      INTEGER CLRNUM, CURMID, BASMID, I,  ISTAT, LENSTR, PICNUM,
+      INTEGER CLRNUM, CURMID, BASMID, I, LENSTR, PICNUM,
      :        OLDCOL, OLDFIL
 
       REAL CURDEV( 4 ), CURNDC( 4 ), CURWOR( 4 ), BASDEV( 4 ),
@@ -170,15 +176,16 @@
 *   If PGPLOT is not open then open it now for the current workstation
       IF( PWKNAM .EQ. ' ' ) THEN
          CALL AGP1_PGBEG( ' ', CGRAWK( CURPID ),STATUS )
-
+         IF (STATUS .EQ. SAI__OK) THEN
 *   Check to see that PGPLOT has opened successfully
-         CALL PGQINF( 'STATE', STRING, LENSTR )
-         IF ( ( STRING( :LENSTR ) .EQ. 'CLOSED' ) .OR.
-     :        ( ISTAT .NE. 1 ) ) THEN
-            STATUS = AGI__WKNOP
-            CALL ERR_REP( 'AGP_NVIEW_WKNOP',
-     :                    'Problems opening workstation', STATUS )
-            GOTO 99
+            CALL PGQINF( 'STATE', STRING, LENSTR )
+            IF ( ( STRING( :LENSTR ) .EQ. 'CLOSED' ) .OR.
+     :           ( ISTAT .NE. 1 ) ) THEN
+               STATUS = AGI__WKNOP
+               CALL ERR_REP( 'AGP_NVIEW_WKNOP',
+     :              'Problems opening workstation', STATUS )
+               GOTO 99
+            ENDIF
          ENDIF
       ENDIF
 
