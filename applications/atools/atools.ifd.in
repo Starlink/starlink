@@ -2718,6 +2718,70 @@ iraf! {
 
       }
 
+      action astcircle {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter frame {
+            position 1
+            type NDF
+            prompt {The Frame in which the Circle is defined}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter form {
+            position 2
+            type _INTEGER
+            prompt {Parameter form}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter centre {
+            position 3
+            type _DOUBLE
+            prompt {Centre coords}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter point {
+            position 4
+            type _DOUBLE
+            prompt {Circumference position or radius}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter unc {
+            position 5
+            type LITERAL
+            prompt {The uncertainty Region}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter options {
+            position 6
+            type LITERAL
+            prompt {Options for the Circle}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 7
+            type LITERAL
+            prompt {Name of file in which to store the Circle}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+
 
       action astinterval {
 

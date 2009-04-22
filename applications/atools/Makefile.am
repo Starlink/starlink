@@ -23,7 +23,8 @@ atools_mon_TASKS = astcopy astaddframe astclear astget astset asttest \
  astgetregbounds astunformat asttran1 asttran2 astmapregion astcmpregion \
  astmathmap astsetactunit astgetactunit astpolymap astswitchmap asttranmap \
  astdsbframe astfluxframe astsfluxframe astpolygon astellipse astmapsplit \
- astselectormap astinterval astbox astshowmesh astzoommap astdistance
+ astselectormap astinterval astbox astshowmesh astzoommap astdistance \
+ astcircle
 
 FSRC = \
  atl1_gtfrm.f \
@@ -99,7 +100,7 @@ astshiftmap.ifc astsimplify.ifc astskyframe.ifc asttimeframe.ifc astspecframe.if
 asttest.ifc asttran1.ifc asttran2.ifc astswitchmap.ifc asttranmap.ifc asttrann.ifc \
 astunitmap.ifc astwinmap.ifc atlhelp.ifc astmapsplit.ifc atools_mon.ifc \
 astselectormap.ifc astmapregion.ifc astcmpregion.ifc astgetregbounds.ifc \
-astshowmesh.ifc astzoommap.ifc astdistance.ifc
+astshowmesh.ifc astzoommap.ifc astdistance.ifc astcircle.ifc
 
 IFL_FILES = astaddframe.ifl astclear.ifl astcmpframe.ifl astcmpmap.ifl \
 astconvert.ifl astcopy.ifl astdsbframe.ifl astellipse.ifl \
@@ -114,6 +115,6 @@ astshiftmap.ifl astsimplify.ifl astskyframe.ifl astspecframe.ifl asttimeframe.if
 asttest.ifl asttran1.ifl asttran2.ifl astswitchmap.ifl asttranmap.ifl asttrann.ifl \
 astmapsplit.ifl astunitmap.ifl astwinmap.ifl atlhelp.ifl atools_mon.ifl \
 astselectormap.ifl astmapregion.ifl astcmpregion.ifl astgetregbounds.ifl \
-astshowmesh.ifl astzoommap.ifl astdistance.ifl
+astshowmesh.ifl astzoommap.ifl astdistance.ifl astcircle.ifl
 
 CLEANFILES = $(MISC_FILES) $(IFC_FILES) $(IFL_FILES)

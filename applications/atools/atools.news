@@ -9,6 +9,10 @@
  high-level interface to the AST library. 
 
 
+  Changes in V1.9-5
+
+  - New command astcircle.
+
   Changes in V1.9-4
 
   - New command astzoommap.
