@@ -1,6 +1,6 @@
       SUBROUTINE KPS1_CNVLV( VAR, NX, NY, DATIN, VARIN, NXP, NYP, PSFIN,
      :                       XC, YC, NPIX, NLIN, WLIM, DATOUT, VAROUT,
-     :                       BAD, W1, W2, W3, W4, STATUS )
+     :                       BAD, ISTAT, W1, W2, W3, W4, STATUS )
 *+
 *  Name:
 *     KPS1_CNVLV
@@ -13,8 +13,8 @@
 
 *  Invocation:
 *     CALL KPS1_CNVLV( VAR, NX, NY, DATIN, VARIN, NXP, NYP, PSFIN, XC,
-*                      YC, NPIX, NLIN, WLIM, DATOUT, VAROUT, BAD, W1,
-*                      W2, W3, W4, STATUS )
+*                      YC, NPIX, NLIN, WLIM, DATOUT, VAROUT, BAD, ISTAT,
+*                      W1, W2, W3, W4, STATUS )
 
 *  Description:
 *     This routine convolves the supplied data array (and optionally
@@ -93,6 +93,10 @@
 *     BAD = LOGICAL (Returned)
 *        Returned .TRUE. if any bad values are written to the output
 *        arrays.  It is .FALSE. otherwise.
+*     ISTAT = INTEGER (Returned)
+*        0 - The arrays were processed successfully.
+*        1 - All input pixels were bad.
+*        2 - All output pixels were bad.
 *     W1( NPIX, NLIN ) = DOUBLE PRECISION (Returned)
 *        Work array.
 *     W2( NPIX, NLIN ) = DOUBLE PRECISION (Returned)
@@ -107,6 +111,7 @@
 
 *  Copyright:
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -136,6 +141,8 @@
 *     1995 March 22 (MJC):
 *        Made some stylistic changes, removed long lines and used
 *        modern-style variable declarations.
+*     22-APR-2009 (DSB):
+*        Added ISTAT argument.
 *     {enter_further_changes_here}
 
 *-
@@ -166,11 +173,12 @@
       DOUBLE PRECISION DATOUT( NX, NY )
       DOUBLE PRECISION VAROUT( NX, NY )
       LOGICAL BAD
+      INTEGER ISTAT
       DOUBLE PRECISION W1( NPIX, NLIN )
       DOUBLE PRECISION W2( NPIX, NLIN )
       DOUBLE PRECISION W3( NPIX, NLIN )
       DOUBLE PRECISION W4( * )
-      
+
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -191,6 +199,9 @@
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise
+      ISTAT = 0
 
 *  Prepare the PSF for smoothing the DATA array, and store its FFT in
 *  array W1.
@@ -237,11 +248,12 @@
 
       END DO
 
-*  Report an error and abort if all input pixels are bad.
+*  Fill the output arrays with bad values and return with ISTAT set to 
+*  1 if all input pixels are bad.
       IF ( ALLBAD .AND. STATUS .EQ. SAI__OK ) THEN
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'KPS1_CNVLV_ERR1', 'No good input pixels '/
-     :                 /'found.', STATUS )
+         CALL KPG1_FILLD( VAL__BADD, NX*NY, DATOUT, STATUS )  
+         IF( VAR ) CALL KPG1_FILLD( VAL__BADD, NX*NY, VAROUT, STATUS )  
+         ISTAT = 1
          GO TO 999
       END IF
 
@@ -320,12 +332,11 @@
 
       END DO
 
-*  Report an error and abort if all the output pixel values are bad.
+*  Fill any output variance array with bad values and return with ISTAT set 
+*  to 2 if all the output pixel values are bad.
       IF ( ALLBAD ) THEN
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'KPS1_CNVLV_ERR2', 'All the output data values '/
-     :     /'are bad (is the value of parameter WLIM too high?)',
-     :     STATUS )
+         IF( VAR ) CALL KPG1_FILLD( VAL__BADD, NX*NY, VAROUT, STATUS )  
+         ISTAT = 2
          GO TO 999
       END IF
 

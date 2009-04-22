@@ -6,12 +6,17 @@
 
 2 Modified_applications
 
-   o CLINPLOT
+   o  CLINPLOT
 
-     -  New MODE and MARKER parameters permit different ways to 
-     show the loci of data values including the histogram
-     `staircase', dots or markers at each point, and lines 
-     connecting data points (the only available mode previously).
+      -  New MODE and MARKER parameters permit different ways to 
+      show the loci of data values including the histogram
+      `staircase', dots or markers at each point, and lines 
+      connecting data points (the only available mode previously).
+
+   o  CONVOLVE
+
+      -  No longer aborts if a slice within a cube contains no 
+      good data.
 
    o  FITSMOD
 

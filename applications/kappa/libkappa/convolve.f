@@ -140,6 +140,7 @@
 *     Copyright (C) 1995, 1998, 2004 Central Laboratory of the Research
 *     Councils. All Rights Reserved.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -181,6 +182,9 @@
 *     2006 June 22 (MJC):
 *        Added support for smoothing all two-dimensional planes in a
 *        three-dimensional cube.
+*     22-APR-2009 (DSB):
+*        Continue to convolve remaining slices if a slice of a cube
+*        contains or produces no good data.
 *     {enter_further_changes_here}
 
 *-
@@ -226,6 +230,7 @@
       INTEGER IPW3               ! Pointer to mapped work array
       INTEGER IPW4               ! Pointer to mapped work array
       INTEGER IPW5               ! Pointer to mapped work array
+      INTEGER ISTAT              ! Status for an individual slice
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF pixel axes
       INTEGER NLIN               ! Second dimension for internal arrays
       INTEGER NPIX               ! First dimension for internal arrays
@@ -241,6 +246,8 @@
       INTEGER SLBNDP( 2 )        ! Low bounds of used axes of psf
       INTEGER SUBNDP( 2 )        ! High bounds of used axes of psf
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF pixel axes
+      LOGICAL INBAD              ! Are all input data bad?
+      LOGICAL OUTBAD             ! Are all output data bad?
       LOGICAL VAR                ! Does input NDF have a VARIANCE array?
       INTEGER W1DIM( 2 )         ! Dimensions of work array 1
       REAL WLIM                  ! Fraction of good i/p pixels required
@@ -386,8 +393,10 @@
 *  Loop around planes.
 *  ===================
 
-*  Initialise bad-data flag.
+*  Initialise flags.
       BADDAT = .FALSE.
+      INBAD = .TRUE.
+      OUTBAD = .TRUE.
 
 *  Loop round every slice to be smoothed.
       PAXLO = LBND( PERPAX )
@@ -418,20 +427,41 @@
      :                    XCEN - SLBNDP( 1 ) + 1,
      :                    YCEN - SLBNDP( 2 ) + 1, NPIX, NLIN, WLIM, 
      :                    %VAL( CNF_PVAL( IPO( 1 ) ) ), 
-     :                    %VAL( CNF_PVAL( IPO( 2 ) ) ), BADOUT,
+     :                    %VAL( CNF_PVAL( IPO( 2 ) ) ), BADOUT, ISTAT,
      :                    %VAL( CNF_PVAL( IPW2 ) ), 
      :                    %VAL( CNF_PVAL( IPW3 ) ), 
      :                    %VAL( CNF_PVAL( IPW4 ) ),
      :                    %VAL( CNF_PVAL( IPW5 ) ), STATUS )
 
 *  Update the bad-data flag.
-         IF ( BADOUT ) BADDAT = .TRUE.
+         IF( BADOUT ) BADDAT = .TRUE.
+
+*  Update the "all input data bad" flag.
+         IF( ISTAT .NE. 1 ) INBAD = .FALSE.
+
+*  Update the "all output data bad" flag.
+         IF( ISTAT .EQ. 0 ) OUTBAD = .FALSE.
 
 *  Free the section identifiers.
          CALL NDF_ANNUL( INDFIB, STATUS )
          CALL NDF_ANNUL( INDFOB, STATUS )
 
       END DO
+
+*  Report an error and abort if all input pixels are bad.
+      IF( INBAD .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'CONVOLVE_ERR3', 'No good input pixels '//
+     :                 'found.', STATUS )
+      END IF
+
+*  Report an error and abort if all the output pixel values are bad.
+      IF( OUTBAD .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'CONVOLVE_ERR4', 'All the output data values '//
+     :                 'are bad (is the value of parameter WLIM too '//
+     :                 'high?)', STATUS )
+      END IF
 
 *  Set the bad-pixel flags for the output NDF components.
       CALL NDF_SBAD( BADDAT, INDFO, 'DATA', STATUS )
