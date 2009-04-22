@@ -22,7 +22,7 @@ C
       IF (TEXT.NE.' ') THEN
           STATUS = GRPGER
           CALL MSG_SETC('MESS', TEXT)
-          CALL ERR_REP('GRPGER','%PGPLOT - ^MESS', STATUS)
+          CALL ERR_REP('GRPGER','%%PGPLOT - ^MESS', STATUS)
 *
 *   This routine expects that the error message will appear immediately
 *   so make this occur!
