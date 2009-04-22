@@ -71,7 +71,7 @@
       INTEGER CF, CL, LENSTR, ISTAT
       CHARACTER DEVNAM*64
       CHARACTER STRING*40
-      CHARACTER AGINAM*40
+      CHARACTER AGINAM*(AGP__SZANM)
 *.
 
 *  Check inherited status.
