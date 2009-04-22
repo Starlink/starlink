@@ -133,7 +133,7 @@
       END DO
 
       CALL MSG_OUT( ' ', 'Region upper bounds: (^XU).', STATUS )
-      CALL PAR_PUT1D( 'UBND', NAXES, XL, STATUS ) 
+      CALL PAR_PUT1D( 'UBND', NAXES, XU, STATUS ) 
 
       CALL MSG_BLANK( STATUS )
 
