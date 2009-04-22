@@ -179,8 +179,7 @@
          IF (STATUS .EQ. SAI__OK) THEN
 *   Check to see that PGPLOT has opened successfully
             CALL PGQINF( 'STATE', STRING, LENSTR )
-            IF ( ( STRING( :LENSTR ) .EQ. 'CLOSED' ) .OR.
-     :           ( ISTAT .NE. 1 ) ) THEN
+            IF ( STRING( :LENSTR ) .EQ. 'CLOSED' ) THEN
                STATUS = AGI__WKNOP
                CALL ERR_REP( 'AGP_NVIEW_WKNOP',
      :              'Problems opening workstation', STATUS )
