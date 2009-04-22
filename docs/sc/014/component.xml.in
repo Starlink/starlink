@@ -4,7 +4,7 @@
 
 <component id="@PACKAGE@">
   <version>@PACKAGE_VERSION@</version>
-  <path>docs/sc/012</path>
+  <path>docs/sc/014</path>
   <description>The Fibre Spectroscopy Cookbook</description>
   <abstract><p>
       This cookbook is an introduction to fibre spectroscopy and, in

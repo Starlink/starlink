@@ -2034,7 +2034,7 @@ $(MANIFESTS)/sc13: \
 
 $(MANIFESTS)/sc14: \
 		$(MANIFESTS)/star2html
-	cd docs/sc/012 \
+	cd docs/sc/014 \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/sc15: \
