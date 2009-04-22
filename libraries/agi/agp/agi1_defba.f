@@ -39,7 +39,9 @@
 *        The global status
 *
 *  Copyright:
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
+*     All Rights Reserved.
 *
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -60,12 +62,16 @@
 *  Authors:
 *     BKM: Brian McIlwrath (Starlink, RAL)
 *     DSB: David Berry (Starlink)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *
 *  History:
 *     Dec 1999 (BKM):
 *        Original version
 *     1-NOV-2001 (DSB):
 *        Open PGPLOT using AGP1_PGBEG.
+*     21-APR-2009 (TIMJ):
+*        Check status after calling AGP1_PGBEG and before inquiring the plotting
+*        dimensions. Remove unsued label 99 (and corresponding call to ERR_RLSE)
 *-
 
 *  Type Definitions :
@@ -88,44 +94,56 @@
       INTEGER STATUS
 
 *  Local variables :
+      INTEGER I
       REAL XN, YN, D
       REAL VSURSZ(4)
 *.
+
+*   Initialise if the device fails to open
+      DO I = 1, 4
+         DEVICE(I) = 0.0
+         NDC(I) = 0.0
+         WORLD(I) = 0.0
+      END DO
+
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *   Ensure PGPLOT is open
          CALL AGP1_PGBEG( ' ', WKNAME, STATUS )
 
+         IF (STATUS .EQ. SAI__OK) THEN
+
 *   Get view surface size in inches
-	 CALL PGQVSZ( 2, VSURSZ(1), VSURSZ(2), VSURSZ(3), VSURSZ(4) )
+            CALL PGQVSZ( 2, VSURSZ(1), VSURSZ(2), VSURSZ(3), VSURSZ(4) )
 	 
 *   Calculate the normalised device coordinates for this display
-         D = MAX( ABS( VSURSZ(2) ), ABS( VSURSZ(4) ) )
-         XN = VSURSZ(2) / D
-         YN = VSURSZ(4) / D
+            D = MAX( ABS( VSURSZ(2) ), ABS( VSURSZ(4) ) )
+            XN = VSURSZ(2) / D
+            YN = VSURSZ(4) / D
 
 *   Define the NDC coordinates for this area
-         NDC( 1 ) = 0.0
-         NDC( 2 ) = XN
-         NDC( 3 ) = 0.0
-         NDC( 4 ) = YN
+            NDC( 1 ) = 0.0
+            NDC( 2 ) = XN
+            NDC( 3 ) = 0.0
+            NDC( 4 ) = YN
 
 *   Define the world coordinates for this area
-         WORLD( 1 ) = 0.0
-         WORLD( 2 ) = D / VSURSZ(4)
-         WORLD( 3 ) = 0.0
-         WORLD( 4 ) = D / VSURSZ(2)
+            WORLD( 1 ) = 0.0
+            WORLD( 2 ) = D / VSURSZ(4)
+            WORLD( 3 ) = 0.0
+            WORLD( 4 ) = D / VSURSZ(2)
 
 *   Get full view surface size in device units (dots/pixels)
-	 CALL PGQVSZ( 3, VSURSZ(1), VSURSZ(2), VSURSZ(3), VSURSZ(4) )
+            CALL PGQVSZ( 3, VSURSZ(1), VSURSZ(2), VSURSZ(3), VSURSZ(4) )
 
 *   Define the device coordinates for this area
-         DEVICE( 1 ) = 0.0
-         DEVICE( 2 ) = REAL( VSURSZ(2) )
-         DEVICE( 3 ) = 0.0
-         DEVICE( 4 ) = REAL( VSURSZ(4) )
+            DEVICE( 1 ) = 0.0
+            DEVICE( 2 ) = REAL( VSURSZ(2) )
+            DEVICE( 3 ) = 0.0
+            DEVICE( 4 ) = REAL( VSURSZ(4) )
+
+         ENDIF
 
       ENDIF
 
-99    CALL ERR_RLSE
       END
