@@ -97,6 +97,8 @@
 #        Should be ard_link_adam
 #     2008 June 3 (EC):
 #        Add fftw3
+#     2009 April 23 (EC)
+#        Link against multi-threaded fftw3 library
 #     {enter_further_changes_here}
 
 #-
@@ -107,7 +109,7 @@
            `prm_link_adam` `ard_link_adam` \
            `grp_link_adam` `ndg_link_adam` `kaplibs_link_adam -nogrf` \
            `gsd_link_adam` \
-           -lgsl -lgslcblas -lfftw3 \
+           -lgsl -lgslcblas -lfftw3_threads -lfftw3 \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
