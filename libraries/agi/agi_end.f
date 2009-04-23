@@ -52,6 +52,7 @@
 
 *  Authors:
 *     NE: Nick Eaton (Durham University)
+*     DSB: David Berry (JAC, Hawaii)
 *
 *  History:
 *     Nov 1990 (NE):
@@ -61,6 +62,8 @@
 *        Clear transformation flags in cache
 *     Nov 1990 (NE):
 *        Correct use of local status
+*     23-APR-2009 (DSB):
+*        Check that there was a matching call to AST_BEGIN.
 *-
 *  Type Definitions :
       IMPLICIT NONE
@@ -89,10 +92,19 @@
       INTEGER I, J, LPICID, LSTAT, LOSTAT
 *.
 
-*   Decrement the nest counter
-      IF ( CNEST .GT. 1 ) THEN
-         CNEST = CNEST - 1
+*  If there was no matching call to AST_BEGIN, report an error (if no
+*  previous error has been reported) and return.
+      IF ( CNEST .LE. 1 ) THEN
+         IF( STATUS .EQ. SAI__OK ) THEN
+            STATUS = AGI__BDNST
+            CALL ERR_REP( 'AGI_END_BDNST', 'Unbalanced nesting of '//
+     :                    'AST_BEGIN/AST_END calls.', STATUS )
+         END IF
+         GO TO 999
       ENDIF
+
+*   Decrement the nest counter
+      CNEST = CNEST - 1
 
 *   Initialise local status
       LSTAT = SAI__OK
@@ -198,6 +210,8 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
          STATUS = LSTAT
       ENDIF
+
+ 999  CONTINUE
 
 *      print*, '+++++ AGI_END +++++'
 *      call HDS_SHOW( 'FILES', status )

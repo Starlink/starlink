@@ -35,4 +35,6 @@ TRNIN	<Invalid number of transformation points>
 WKNOP	<Problem opening workstation>
 WKSNF	<Workstation not found>
 ZONTS	<SGS zone too small>
+
+BDNST	<Unbalanced nesting of AST_BEGIN/AST_END calls>
 .END
