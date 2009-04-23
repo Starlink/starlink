@@ -180,6 +180,7 @@
 #ifndef SMF_TYP_DEFINED
 #define SMF_TYP_DEFINED
 
+#include "smf_threads.h"
 #include "star/hds_types.h"
 #include "jcmt/state.h"
 #include "sc2da/sc2store_par.h"
@@ -504,8 +505,8 @@ typedef struct smfDIMMData {
 
 
 /* Prototype for function pointer to different models used by DIMM */
-typedef void(*smf_calcmodelptr)( smfDIMMData*, int, AstKeyMap*, smfArray**, 
-				 int, int* );
+typedef void(*smf_calcmodelptr)( smfWorkForce*, smfDIMMData*, int, AstKeyMap*, 
+                                 smfArray**, int, int* );
 
 /* Represents a box in some 2D cartesian coordinate system. */
 typedef struct smfBox {

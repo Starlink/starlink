@@ -13,13 +13,16 @@
 *     C function
 
 *  Invocation:
-*     smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
-*                    const smfArray *bpms, AstFrameSet *outfset, int moving, 
-*	             int *lbnd_out, int *ubnd_out, size_t maxmem, 
-*                    double *map, unsigned int *hitsmap, double *mapvar, 
-*                    double *weights, int *status );
+*     smf_iteratemap(smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
+*                    const smfArray * darks, const smfArray *bpms,
+*                    AstFrameSet *outfset, int moving, int *lbnd_out,
+*                    int *ubnd_out, size_t maxmem, double *map,
+*                    unsigned int *hitsmap, double *mapvar, double
+*                    *weights, int *status );
  
 *  Arguments:
+*     wf = smfWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     igrp = Grp* (Given)
 *        Group of input data files
 *     keymap = AstKeyMap* (Given)
@@ -242,10 +245,11 @@
 
 #define FUNC_NAME "smf_iteratemap"
 
-void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
-                     const smfArray *bpms, AstFrameSet *outfset, int moving, 
-                     int *lbnd_out, int *ubnd_out, size_t maxmem, 
-                     double *map, unsigned int *hitsmap, double *mapvar, 
+void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap, 
+                     const smfArray *darks, const smfArray *bpms, 
+                     AstFrameSet *outfset, int moving, int *lbnd_out, 
+                     int *ubnd_out, size_t maxmem, double *map, 
+                     unsigned int *hitsmap, double *mapvar, 
                      double *weights, int *status ) {
 
   /* Local Variables */
@@ -1106,7 +1110,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
               }
 
               if( *status == SAI__OK ) { 
-                (*modelptr)( &dat, i, keymap, model[j], dimmflags, status );
+                (*modelptr)( wf, &dat, i, keymap, model[j], dimmflags, status );
               } 
 
               /*** TIMER ***/
@@ -1282,7 +1286,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
                separate loop since the map estimate gets updated by
                each chunk in the main model component loop */
 
-            smf_calcmodel_ast( &dat, i, keymap, ast, 0, status );
+            smf_calcmodel_ast( wf, &dat, i, keymap, ast, 0, status );
 
             /*** TIMER ***/
             msgOutiff( MSG__DEBUG, "", FUNC_NAME 
@@ -1295,7 +1299,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray *darks,
                the next iteration. Ditto for GAIn. */
 
             if( haveext ) {
-              smf_calcmodel_ext( &dat, i, keymap, model[whichext], 
+              smf_calcmodel_ext( wf, &dat, i, keymap, model[whichext], 
                                  SMF__DIMM_INVERT, status );
             }
 

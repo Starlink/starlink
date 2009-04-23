@@ -13,10 +13,13 @@
 *     Library routine
 
 *  Invocation:
-*     smf_calcmodel_flt( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
-*			 smfArray **allmodel, int flags, int *status)
+*     smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int
+*			 chunk, AstKeyMap *keymap, smfArray
+*			 **allmodel, int flags, int *status)
 
 *  Arguments:
+*     wf = smfWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     dat = smfDIMMData * (Given)
 *        Struct of pointers to information required by model calculation
 *     chunk = int (Given)
@@ -88,8 +91,9 @@
 
 #define FUNC_NAME "smf_calcmodel_flt"
 
-void smf_calcmodel_flt( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
-			smfArray **allmodel, int flags, int *status) {
+void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk, 
+                        AstKeyMap *keymap, smfArray **allmodel, int flags, 
+                        int *status) {
 
   /* Local Variables */
   size_t bstride;               /* bolo stride */

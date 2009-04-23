@@ -622,12 +622,12 @@ void smf_insert_tslice ( smfData **idata, smfData *tdata, int index,
 
 inst_t smf_inst_get( const smfHead * hdr, int * status );
 
-void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, const smfArray * darks,
-                     const smfArray *bpms, AstFrameSet *outfset, int moving, 
-                     int *lbnd_out, int *ubnd_out, size_t mapmem,
-                     double *map, unsigned int *hitsmap, double *mapvar, 
+void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap, 
+                     const smfArray *darks, const smfArray *bpms, 
+                     AstFrameSet *outfset, int moving, int *lbnd_out, 
+                     int *ubnd_out, size_t maxmem, double *map, 
+                     unsigned int *hitsmap, double *mapvar, 
                      double *weights, int *status );
-
 
 void * smf_malloc( size_t nelem, size_t bytes_per_elem, int zero, 
                    int * status );
@@ -822,17 +822,21 @@ void smf_terr( double phi, double h, double lambda, double pos[3] );
 void smf_instap_get( smfHead * hdr, int * status );
 
 
-void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
-			smfArray **allmodel, int flags, int *status);
+void smf_calcmodel_com( smfWorkForce *wf, smfDIMMData *dat, int chunk, 
+                        AstKeyMap *keymap, smfArray **allmodel, int flags, 
+                        int *status);
 
-void smf_calcmodel_ast( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
-			smfArray **allmodel, int flags, int *status);
+void smf_calcmodel_ast( smfWorkForce *wf, smfDIMMData *dat, int chunk, 
+                        AstKeyMap *keymap, smfArray **allmodel, int flags, 
+                        int *status);
 
-void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
-			smfArray **allmodel, int flags, int *status);
+void smf_calcmodel_noi( smfWorkForce *wf, smfDIMMData *dat, int chunk, 
+                        AstKeyMap *keymap, smfArray **allmodel, int flags, 
+                        int *status);
 
-void smf_calcmodel_ext( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
-			smfArray **allmodel, int flags, int *status);
+void smf_calcmodel_ext( smfWorkForce *wf, smfDIMMData *dat, int chunk, 
+                        AstKeyMap *keymap, smfArray **allmodel, int flags, 
+                        int *status);
 
 smf_calcmodelptr smf_model_getptr( smf_modeltype type, int *status);
 
@@ -1130,8 +1134,9 @@ void smf_clean_dksquid( smfData *indata, unsigned char *quality,
 
 void smf_fft_cart2pol( smfData *data, int inverse, int power, int *status ); 
 
-void smf_calcmodel_dks( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
-			smfArray **allmodel, int flags, int *status);
+void smf_calcmodel_dks( smfWorkForce *wf, smfDIMMData *dat, int chunk, 
+                        AstKeyMap *keymap, smfArray **allmodel, int flags, 
+                        int *status);
 
 void smf_model_stripsuffix( const char *instr, char *outstr, int *status );
 
@@ -1188,8 +1193,9 @@ void smf_apply_mask( smfData *indata, unsigned char *quality,
 void smf_apodize( smfData *data, unsigned char *quality, size_t len, 
                   int *status );
 
-void smf_calcmodel_gai( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
-			smfArray **allmodel, int flags, int *status);
+void smf_calcmodel_gai( smfWorkForce *wf, smfDIMMData *dat, int chunk, 
+                        AstKeyMap *keymap, smfArray **allmodel, int flags, 
+                        int *status);
 
 void smf_request_mask( const char *param, smfArray ** bpms, int *status);
 
@@ -1210,8 +1216,9 @@ void smf_flag_stationary( smfData *data, unsigned char *quality,
                           double sthresh, size_t *nflagged, 
                           int *status );
 
-void smf_calcmodel_flt( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
-			smfArray **allmodel, int flags, int *status );
+void smf_calcmodel_flt( smfWorkForce *wf, smfDIMMData *dat, int chunk, 
+                        AstKeyMap *keymap, smfArray **allmodel, int flags, 
+                        int *status );
 
 void smf_create_respfile( const Grp * rgrp, size_t index,
                           const smfData* refdata, smfData **respmap,

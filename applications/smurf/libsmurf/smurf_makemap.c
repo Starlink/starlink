@@ -1219,7 +1219,7 @@ void smurf_makemap( int *status ) {
     }
 
     /* Call the low-level iterative map-maker */
-    smf_iteratemap( igrp, keymap, darks, bpms, outfset, moving, lbnd_out, 
+    smf_iteratemap( wf, igrp, keymap, darks, bpms, outfset, moving, lbnd_out, 
                     ubnd_out, maxmem-mapmem, map, hitsmap, variance, weights, 
                     status );
 
