@@ -69,6 +69,7 @@ smf_construct_smfFile.c \
 smf_construct_smfGroup.c \
 smf_construct_smfHead.c \
 smf_convert_bad.c \
+smf_copytime.c \
 smf_correct_extinction.c \
 smf_correct_steps.c \
 smf_create_lutwcs.c \

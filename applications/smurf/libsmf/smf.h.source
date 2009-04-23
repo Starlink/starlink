@@ -351,6 +351,8 @@
 *        Add smf_get_cleanpar
 *     2009-04-17 (EC):
 *        Add smf_filter_fromkeymap
+*     2009-04-23 (EC):
+*        Add smf_copytime
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1226,8 +1228,13 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
 void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, int *dofft, 
                             int *status );
  
-void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap, AstKeyMap * objmap,
+void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap, 
+                      AstKeyMap * objmap,
                       int * status );
 void smf_obsmap_report( AstKeyMap * obsmap, AstKeyMap * objmap,
                         int * status );
 void smf_summarize_obs( const Grp * igrp, int * status );
+
+void smf_copytime( struct timeval *target, struct timeval *source, 
+                   int *status);
+
