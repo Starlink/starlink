@@ -100,9 +100,6 @@ double smf_timerupdate( struct timeval *tv1, struct timeval *tv2, int *status) {
     return 0;
   }
 
-  //printf("&&&& t1=%li %li, t2=%li %li\n",tv1->tv_sec, tv1->tv_usec, 
-  //       tv2->tv_sec, tv2->tv_usec);
-
   gettimeofday( tv2, NULL ); 
   diff = smf_difftime( tv1, tv2, status);
   smf_copytime( tv1, tv2, status );
