@@ -14,11 +14,9 @@
 
 *  Invocation:
 *     smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
-*                     int moving, int autogrid,
-*                     int nallpos, const double allpos[], float telres, 
-*                     double map_pa, double par[7], int * issparse,int *usedefs,
-*                     int *status )
-
+*                      int moving, int autogrid, int nallpos, 
+*                      const double allpos[], float telres, double map_pa, 
+*                      double par[7], int * issparse,int *usedefs, int *status )
 
 *  Arguments:
 *     skyframe = AstFrameSet * (Given)
@@ -84,6 +82,8 @@
 *     2008-06-04 (TIMJ):
 *        Integrate more of smf_cubegrid to allow more code reuse even though
 *        SCUBA-2 does not use autogrid facilities.
+*     2008-06-04 (DSB):
+*        Correct signs of CDELT values when autogrid algorithm fails.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -92,6 +92,7 @@
 *     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2008 University of British Columbia.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -133,36 +134,35 @@
 #define FUNC_NAME "smf_get_projpar"
 
 void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
-                      int moving, int autogrid,
-                      int nallpos, const double * allpos, float telres, 
-                      double map_pa, double par[7], int * issparse,int *usedefs,
-                      int *status ) {
+                      int moving, int autogrid, int nallpos, 
+                      const double * allpos, float telres, double map_pa, 
+                      double par[7], int * issparse,int *usedefs, int *status ) {
 
-  /* Local Variables */
-  double autorot;       /* Autogrid default for CROTA parameter */
-  int coin;             /* Are all points effectively co-incident? */
-  const char *deflat;             /* Default for REFLAT */
-  const char *deflon;             /* Default for REFLON */
-  double defsize[ 2 ];            /* Default pixel sizes in arc-seconds */
-  int nval;                       /* Number of values supplied */
-  double pixsize[ 2 ];            /* Pixel sizes in arc-seconds */
-  double rdiam;         /* Diameter of bounding circle, in rads */
-  char reflat[ 41 ];              /* Reference latitude string */
-  char reflon[ 41 ];              /* Reference longitude string */
-  int sparse = 0;                 /* Local definition of sparseness */
-  int udefs = 0;                  /* Flag for defaults used or not */
-  char usesys[ 41 ];              /* Output skyframe system */
+/* Local Variables */
+   char reflat[ 41 ];    /* Reference latitude string */
+   char reflon[ 41 ];    /* Reference longitude string */
+   char usesys[ 41 ];    /* Output skyframe system */
+   const char *deflat;   /* Default for REFLAT */
+   const char *deflon;   /* Default for REFLON */
+   double autorot;       /* Autogrid default for CROTA parameter */
+   double defsize[ 2 ];  /* Default pixel sizes in arc-seconds */
+   double pixsize[ 2 ];  /* Pixel sizes in arc-seconds */
+   double rdiam;         /* Diameter of bounding circle, in rads */
+   int coin;             /* Are all points effectively co-incident? */
+   int nval;             /* Number of values supplied */
+   int sparse = 0;       /* Local definition of sparseness */
+   int udefs = 0;        /* Flag for defaults used or not */
 
-/* Main routine */
-  if (*status != SAI__OK) return;
+/* Check inherited status. */
+   if( *status != SAI__OK ) return;
 
-/* if the number of supplied positions is 0 or null pointer,
+/* If the number of supplied positions is 0 or null pointer,
    disable autogrid */
-  if (nallpos == 0 || !allpos) autogrid = 0;
+   if( nallpos == 0 || !allpos ) autogrid = 0;
 
 /* Get the output system */
-  one_strlcpy( usesys, astGetC( skyframe, "SYSTEM"), sizeof(usesys),
-               status );
+   one_strlcpy( usesys, astGetC( skyframe, "SYSTEM"), sizeof(usesys),
+                status );
 
 /* Ensure the reference position in the returned SkyFrame is set to the 
    first telescope base pointing position. */
@@ -193,7 +193,8 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
 /* If required, calculate the optimal projection parameters. If the target 
    is moving, these refer to the offset coordinate system centred on the 
    first time slice base pointing position, with north defined by the
-   requested output coordinate system. */
+   requested output coordinate system. The values found here are used as
+   dynamic defaults for the environment parameter */
       if( autogrid ) {
          kpg1Opgrd( nallpos, allpos, strcmp( usesys, "AZEL" ), par, &rdiam, 
                           status );
@@ -220,9 +221,11 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
                            "failed: the detector samples do not form a "
                            "regular grid.", status );
          }
-     
-/* Otherwise use fixed values. */
-      } else if( par ) {
+      }
+
+/* If autogrid values were not found, use the following fixed default 
+   values. */
+      if( !autogrid || autogrid && par[ 0 ] == AST__BAD ) {
          par[ 0 ] = 0.0;
          par[ 1 ] = 0.0;
          par[ 4 ] = (6.0/3600.0)*AST__DD2R;
@@ -230,7 +233,7 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
          par[ 6 ] = map_pa;
       }
      
-/* Ensure the pixel sizes have the correct signs. */
+/* Ensure the default pixel sizes have the correct signs. */
       if( par[ 4 ] != AST__BAD ) {
          if( !strcmp( usesys, "AZEL" ) ) {
             par[ 4 ] = fabs( par[ 4 ] );
@@ -378,7 +381,7 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
             par[ 0 ] = AST__BAD;
             par[ 1 ] = AST__BAD;
             kpg1Opgrd( nallpos, allpos, strcmp( usesys, "AZEL" ), par,
-                             &rdiam, status );
+                       &rdiam, status );
          }
      
 /* Display the projection parameters being used. */
@@ -402,7 +405,7 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
      *usedefs = udefs;
    }
 
-   /* Set sparse if requested */
-   if (issparse) *issparse = sparse;
+/* Set sparse if requested */
+   if( issparse ) *issparse = sparse;
 
 }
