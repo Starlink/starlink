@@ -38,6 +38,7 @@
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -67,6 +68,8 @@
 *        Allow CLASS and ISA to specify particular subclasses of Frame.
 *     31-MAY-2006 (DSB):
 *        Move from ATL to KAPLIBS because of the NDF dependency.
+*     23-APR-2009 (DSB):
+*        Take acount of forieign format conversion by the NDF library.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -97,6 +100,7 @@
       EXTERNAL ISA
 
 *  Local Variables:
+      INTEGER DOCVT
       INTEGER IAST2
       INTEGER IGRP
       INTEGER INDF
@@ -109,8 +113,15 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Attempt to access the parameter as an NDF.
+*  Attempt to access the parameter as an NDF, without foreign format
+*  conversion (in case the file has a known foreign format file type 
+*  but does not actualy contain an NDF). First switch off format
+*  conversion, then access the NDF then switch format conversion back on
+*  again if required.
+      CALL NDF_GTUNE( 'DOCVT', DOCVT, STATUS ) 
+      CALL NDF_TUNE( 0, 'DOCVT', STATUS ) 
       CALL NDF_EXIST( PARAM, 'READ', INDF, STATUS )
+      CALL NDF_TUNE( DOCVT, 'DOCVT', STATUS ) 
 
 *  If succesful, get the WCS FrameSet from it.
       IF( INDF .NE. NDF__NOID ) THEN
@@ -126,8 +137,8 @@
 *  Annul the NDF identifer.
          CALL NDF_ANNUL( INDF, STATUS )
 
-*  If it was not an NDF...
-      ELSE
+*  If it was not a native HDS NDF...
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
 
 *  Obtain a GRP group containing text from which an Object is to be read.
          CALL ATL_GTGRP( PARAM, IGRP, STATUS )
@@ -138,6 +149,25 @@
 *  Delete the group.
          CALL GRP_DELET( IGRP, STATUS )
 
+*  If it was not in a format readable by ATL, annull the error, switch on
+*  NDF data conversion (if it is enabled), and try to access it as a 
+*  foreign format NDF.
+         IF( STATUS .NE. SAI__OK .AND. DOCVT .NE. 0 ) THEN
+            CALL NDF_EXIST( PARAM, 'READ', INDF, STATUS )
+            IF( INDF .NE. NDF__NOID ) THEN
+               CALL KPG1_GTWCS( INDF, IAST, STATUS )
+
+*  Tell the user where the object came from. 
+               IF( IAST .NE. AST__NULL ) THEN
+                  CALL NDF_MSG( 'NDF', INDF ) 
+                  CALL ATL_NOTIF( '   AST data read from NDF ''^NDF''.', 
+     :                             STATUS )
+               END IF
+
+*  Annul the NDF identifer.
+               CALL NDF_ANNUL( INDF, STATUS )
+            END IF
+         END IF
       END IF
 
 *  Check the Object class if CLASS is not blank.
