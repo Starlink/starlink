@@ -36,6 +36,7 @@ export star_extra_items
    cmd="./configure --prefix=$prefix \
                     --srcdir=. \
                     $star_extra_items \
+                    --enable-threads \
                     --cache-file=../config.cache"; \
    echo $cmd; \
    $cmd; \
