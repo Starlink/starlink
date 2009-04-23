@@ -451,16 +451,13 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
         smf_stats1( corr, 1, nbolo, NULL, 0, &cmean, &csig, &cgood, status );
         msgSeti("N",cgood);
         msgOutif( MSG__VERB, "", FUNC_NAME ": ^N good bolos", status );
-        msgSetd("MEAN",cmean);
-        msgSetd("SIG",csig);
-        msgOutif( MSG__DEBUG, " ", FUNC_NAME 
-                  ": corr coeff ^MEAN +/- ^SIG", status );
+        msgOutiff( MSG__DEBUG, " ", FUNC_NAME 
+                   ": corr coeff %8.5f +/- %8.5f", status, cmean, csig );
 
         smf_stats1( gcoeff, 1, nbolo, NULL, 0, &gmean, &gsig, &ggood, status );
-        msgSetd("MEAN",gmean);
-        msgSetd("SIG",gsig);
-        msgOutif( MSG__DEBUG, " ", FUNC_NAME 
-                  ": log(abs(gain coeff))  ^MEAN +/- ^SIG", status );
+        msgOutiff( MSG__DEBUG, " ", FUNC_NAME 
+                   ": log(abs(gain coeff)) %8.5f +/- %8.5f", status,
+                   gmean, gsig);
 
         /* Flag new bad bolometers */
         newbad = 0;
