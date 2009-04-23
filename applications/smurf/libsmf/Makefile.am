@@ -253,6 +253,8 @@ smf_summarize_obs.c \
 smf_telpos_get.c \
 smf_terr.c \
 smf_threads.c \
+smf_timerinit.c \
+smf_timerupdate.c \
 smf_tslice_ast.c \
 smf_update_quality.c \
 smf_update_valbad.c \

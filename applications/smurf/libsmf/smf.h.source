@@ -352,7 +352,7 @@
 *     2009-04-17 (EC):
 *        Add smf_filter_fromkeymap
 *     2009-04-23 (EC):
-*        Add smf_copytime
+*        Add smf_copytime, smf_timerinit, timerupdate
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1238,3 +1238,6 @@ void smf_summarize_obs( const Grp * igrp, int * status );
 void smf_copytime( struct timeval *target, struct timeval *source, 
                    int *status);
 
+void smf_timerinit( struct timeval *tv1, struct timeval *tv2, int *status);
+
+double smf_timerupdate( struct timeval *tv1, struct timeval *tv2, int *status);
