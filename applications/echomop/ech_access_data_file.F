@@ -1,5 +1,5 @@
 #if HAVE_CONFIG_H
-# include <config.h>
+# include "config.h"
 #endif
       SUBROUTINE ECH_ACCESS_DATA_FILE(
      :           REQUIRED_OBJECT,

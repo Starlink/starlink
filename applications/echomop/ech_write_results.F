@@ -1,5 +1,5 @@
 #if HAVE_CONFIG_H
-# include <config.h>
+# include "config.h"
 #endif
       SUBROUTINE ECH_WRITE_RESULTS( ORDER_NUMBER, RESULT_TYPE,
      :           RESULT_FORMAT, TUNE_ARCHIVE, TUNE_USEAAA, TUNE_AAACODE,

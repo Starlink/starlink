@@ -1,5 +1,5 @@
 #if HAVE_CONFIG_H
-# include <config.h>
+# include "config.h"
 #endif
       SUBROUTINE ECH_SETUP_OBJECT_REF(
      :           REF_NAME,

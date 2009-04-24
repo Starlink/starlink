@@ -1,4 +1,6 @@
-#include <config.h>
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
       SUBROUTINE ARD1_EVAL( INDEX1, NDIM, LBND, UBND, OPCSIZ, OPNSIZ,
      :                      STKSIZ, MSKSIZ, OPCODE, OPRNDS, STACK, 
      :                      LEXSTK, UEXSTK, LINSTK, UINSTK, MASK, 

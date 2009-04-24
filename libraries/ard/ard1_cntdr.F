@@ -1,4 +1,6 @@
-#include <config.h>
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
       SUBROUTINE ARD1_CNTDR( IPLOT, DIM1, DIM2, ARRAY, XLL, YLL, XSIZE, 
      :                       YSIZE, CONT, MAXPTS, XY, DONE, STATUS )
 *+

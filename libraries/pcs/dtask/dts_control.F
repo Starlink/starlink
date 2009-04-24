@@ -1,4 +1,6 @@
-#include <config.h>
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
       SUBROUTINE DTASK_CONTROL( PATH, ACTION, VALUE, MESSID, STATUS )
 *+
 *  Name:
