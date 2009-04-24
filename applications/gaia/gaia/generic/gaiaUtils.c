@@ -58,7 +58,6 @@
 
 #define TCL_OK 0
 #define TCL_ERROR 1
-#define MAXDIM 7
 
 /*
  *  Name:
@@ -149,7 +148,7 @@ int gaiaUtilsGtAxisWcs( AstFrameSet *fullwcs, int axis, int offset,
    double zero[1];
    int i;
    int iaxes[1];
-   int inperm[MAXDIM];
+   int inperm[MAX_DIMS];
    int nin;
    int nout;
    int outperm[1];
@@ -260,9 +259,9 @@ int gaiaUtilsQueryCoord( AstFrameSet *frameset, int axis, double *coords,
     char *units;
     double *coords_in;
     double diff;
-    double out1[7];
-    double out2[7];
-    double static_coords_in[7];
+    double out1[MAX_DIMS];
+    double out2[MAX_DIMS];
+    double static_coords_in[MAX_DIMS];
     double tmp;
     int base;
     int caxis;
@@ -371,19 +370,19 @@ int gaiaUtilsGt2DWcs( AstFrameSet *fullwcs, int axis1, int axis2, int length1,
     AstMapping *map;
     double in1[2][1];
     double in2[2][1];
-    double out1[MAXDIM][1];
-    double out2[MAXDIM][1];
-    double zero[MAXDIM];
+    double out1[MAX_DIMS][1];
+    double out2[MAX_DIMS][1];
+    double zero[MAX_DIMS];
     int i;
     int ibase;
     int icurrent;
     int iframe;
-    int inperm[MAXDIM];
+    int inperm[MAX_DIMS];
     int izero;
     int n;
     int nbase;
     int ncurrent;
-    int outperm[MAXDIM];
+    int outperm[MAX_DIMS];
 
     astBegin;
 
@@ -394,8 +393,8 @@ int gaiaUtilsGt2DWcs( AstFrameSet *fullwcs, int axis1, int axis2, int length1,
     ncurrent = astGetI( currentframe, "Naxes" );
 
     /* Impossible cases */
-    if ( nbase > MAXDIM || ncurrent > MAXDIM ) {
-        *error_mess = strdup( "WCS has two many dimensions (max 7)" );
+    if ( nbase > MAX_DIMS || ncurrent > MAX_DIMS ) {
+        *error_mess = strdup( "WCS has too many dimensions" );
         astEnd;
         return TCL_ERROR;
     }
@@ -434,7 +433,7 @@ int gaiaUtilsGt2DWcs( AstFrameSet *fullwcs, int axis1, int axis2, int length1,
     /* Create a mapping for this permutation that doesn't have <bad>
      * values as the result. Set the constant for the axis we loose to the
      * given index, this then transform to the current system correctly. */
-    for ( i = 0; i < MAXDIM; i++ ) {
+    for ( i = 0; i < MAX_DIMS; i++ ) {
         zero[i] = 0.0;
         inperm[i] = -1;
     }
@@ -458,14 +457,14 @@ int gaiaUtilsGt2DWcs( AstFrameSet *fullwcs, int axis1, int axis2, int length1,
      * detect the correct axes. */
     in1[0][0] = 0.0;
     in1[1][0] = 0.0;
-    for ( i = 0; i < MAXDIM; i++ ) {
+    for ( i = 0; i < MAX_DIMS; i++ ) {
         out1[i][0] = 0.0;
     }
     astTranN( *iwcs, 1, 2, 1, (double *)in1, 1, ncurrent, 1, (double *)out1 );
 
     in2[0][0] = length1;
     in2[1][0] = length2;
-    for ( i = 0; i < MAXDIM; i++ ) {
+    for ( i = 0; i < MAX_DIMS; i++ ) {
         out2[i][0] = 0.0;
     }
     astTranN( *iwcs, 1, 2, 1, (double *)in2, 1, ncurrent, 1, (double *)out2 );
@@ -484,7 +483,7 @@ int gaiaUtilsGt2DWcs( AstFrameSet *fullwcs, int axis1, int axis2, int length1,
     if ( n != 2 ) {
         /* The axes are not independent, so more than two have moved.
          * In this case we just assume grid-WCS axes correspondence. */
-        for ( i = 0; i < MAXDIM; i++ ) {
+        for ( i = 0; i < MAX_DIMS; i++ ) {
             out1[i][0] = out2[i][0];
         }
         out1[axis1-1][0] = 0.0;

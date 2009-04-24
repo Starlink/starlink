@@ -1641,12 +1641,13 @@ static int GaiaUtilsAstTranN( ClientData clientData, Tcl_Interp *interp,
     Tcl_Obj **listObjv;
     Tcl_Obj *resultObj;
     const char *result;
-    double in[7];
-    double out[7];
+    double in[MAX_DIMS];
+    double out[MAX_DIMS];
     int formatted = 0;
     int forward = 1;
     int i;
     int indims;
+    int outdims;
     long adr;
 
     /* Check arguments, only allow three or four. */
@@ -1685,8 +1686,16 @@ static int GaiaUtilsAstTranN( ClientData clientData, Tcl_Interp *interp,
         }
     }
 
+    /* The output dimensions maybe be different to the input ones */
+    if ( forward ) {
+        outdims = astGetI( mapping, "Nout" );
+    }
+    else {
+        outdims = astGetI( mapping, "Nin" );
+    }
+
     /* Do the transform */
-    astTranN( mapping, 1, indims, 1, in, forward, indims, 1, out );
+    astTranN( mapping, 1, indims, 1, in, forward, outdims, 1, out );
 
     /* Normalise against the current frame only. Assume baseframes are
      * pixels. */
@@ -1698,14 +1707,14 @@ static int GaiaUtilsAstTranN( ClientData clientData, Tcl_Interp *interp,
         Tcl_ResetResult( interp );
         resultObj = Tcl_GetObjResult( interp );
         if ( formatted ) {
-            for ( i = 0; i < indims; i++ ) {
+            for ( i = 0; i < outdims; i++ ) {
                 result = astFormat( mapping, i + 1, out[i] );
                 Tcl_ListObjAppendElement( interp, resultObj,
                                           Tcl_NewStringObj( result, -1 ) );
             }
         }
         else {
-            for ( i = 0; i < indims; i++ ) {
+            for ( i = 0; i < outdims; i++ ) {
                 Tcl_ListObjAppendElement( interp, resultObj,
                                           Tcl_NewDoubleObj( out[i] ) );
             }
@@ -1841,10 +1850,10 @@ static int GaiaUtilsAstLinearApprox( ClientData clientData, Tcl_Interp *interp,
     AstFrameSet *mapping = NULL;
     Tcl_Obj **listObjv;
     Tcl_Obj *resultObj;
-    double fit[56]; // (7+1*7)
-    double lbnd[7];
+    double fit[MAX_DIMS*MAX_DIMS+MAX_DIMS];
+    double lbnd[MAX_DIMS];
     double tol;
-    double ubnd[7];
+    double ubnd[MAX_DIMS];
     int nbnd;
     int nin;
     int nout;
@@ -1961,7 +1970,7 @@ static int GaiaUtilsShiftWcs( ClientData clientData, Tcl_Interp *interp,
         Tcl_SetResult( interp, "Wrong no. of bounds", TCL_VOLATILE );
         return TCL_ERROR;
     }
-    double shifts[7];
+    double shifts[MAX_DIMS];
     for ( int i = 0; i < nvals; i++ ) {
         if (Tcl_GetDoubleFromObj(interp, listObjv[i], &shifts[i]) != TCL_OK) {
             return TCL_ERROR;

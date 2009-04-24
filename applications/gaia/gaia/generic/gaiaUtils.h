@@ -11,6 +11,9 @@ extern "C" {
 #include <ast.h>
 #include <star/atl.h>
 
+    /* Maximum AST axes. */
+    enum { MAX_DIMS = 32 };
+
     /* Construct an error message string from the current ADAM status. */
     char *gaiaUtilsErrMessage();
 
