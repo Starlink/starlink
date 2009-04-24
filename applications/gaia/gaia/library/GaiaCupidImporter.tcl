@@ -288,11 +288,19 @@ itcl::class gaia::GaiaCupidImporter {
    }
 
    #  Define a basic symbol {COORD} is the coordinate of the current slice.
+   #  XXX in the coordinates of the table, not the image XXX
+   #  {SCALE} is a scale factor (sizes are sigmas, so 2 + 3 should be typical).
+   #  Sizes are in arcsec for celestial coordinates.
    protected method set_plot_symbol_ {catwin} {
 
+      #  XXX hack, parameterise this.
+      set ::cupid(SCALE) 1.0
+
       set symbol1 [list PIDENT Cen3 Size1 Size2 Size3]
-      set symbol2 [list rectangle green {$Size1/$Size2} {} {} {($Cen3 > ($%%cupid(COORD) - $Size3)) && ($Cen3 < ($%%cupid(COORD) + $Size3))}]
-      set symbol3 [list {$Size1} {}]
+      set symbol2 [list rectangle green {$Size1/$Size2} {} {} {($Cen3 > ($%%cupid(COORD) - ($Size3*$%%cupid(SCALE)))) && ($Cen3 < ($%%cupid(COORD) + ($Size3*$%%cupid(SCALE))))}]
+      set symbol3 [list {$Size1/3600.0} {deg 2000.0}]
+      #  XXX should be:
+      #set symbol3 [list {$Size1/3600.0*$%%cupid(SCALE)} {deg 2000.0}]
 
       $catwin set_symbol $symbol1 $symbol2 $symbol3
    }
@@ -324,6 +332,11 @@ itcl::class gaia::GaiaCupidImporter {
             ::update idletasks
          }
       }
+   }
+
+   #  Get the astrocat instance.
+   public method get_astrocat {} {
+      return $astrocat_
    }
 
    #  Configuration options: (public variables)
