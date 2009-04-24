@@ -517,6 +517,10 @@ c
 
       IF (STATUS .NE. SAI__OK) RETURN
 
+*  Initialisations for compiler
+      RESW = .FALSE.
+      NFILES = 0
+
 *     Set the MSG output level (for use with MSG_OUTIF)
       CALL MSG_IFGET('MSG_FILTER', STATUS)
 
