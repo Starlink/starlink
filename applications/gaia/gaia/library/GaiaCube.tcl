@@ -1584,6 +1584,12 @@ itcl::class gaia::GaiaCube {
             busy {
                make_${type}_toolbox $basename $clone
             }
+
+
+            #  Establish the CUPID catalogue handler. If already active.
+            if { [winfo exists $w_.cupidimporter] } {
+               renderers_set_cupid_astrocat_ [$w_.cupidimporter get_astrocat]
+            }
          }
       }
    }
@@ -1670,6 +1676,19 @@ itcl::class gaia::GaiaCube {
          if { [info exists itk_component($name) ] } {
             if { [winfo exists $itk_component($name) ] } {
                eval $itk_component($name) set_spectral_line $type $desc
+            }
+         }
+      }
+   }
+
+   #  Set the CUPID catalogue to display (only one).
+   protected method renderers_set_cupid_astrocat_ {astrocat} {
+      puts "renderers_set_cupid_astrocat_: $astrocat"
+      foreach name "isosurface volume" {
+         if { [info exists itk_component($name) ] } {
+            if { [winfo exists $itk_component($name) ] } {
+               puts "$itk_component($name) set_cupid_astrocat $astrocat"
+               eval $itk_component($name) set_cupid_astrocat $astrocat
             }
          }
       }
@@ -1834,6 +1853,10 @@ itcl::class gaia::GaiaCube {
    protected method import_cupid_cat_ {} {
       utilReUseWidget GaiaCupidImporter $w_.cupidimporter \
          -gaiacube $this
+
+      #  XXX Do this only once 
+      #  XXX Need another call for each time the catalogue changes...
+      renderers_set_cupid_astrocat_ [$w_.cupidimporter get_astrocat]
    }
 
    #  Configuration options: (public variables)
