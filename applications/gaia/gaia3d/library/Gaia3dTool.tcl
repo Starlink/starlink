@@ -436,6 +436,21 @@ itcl::class gaia3d::Gaia3dTool {
       pack $itk_component(showastaxes) -fill x -expand 0 -ipady 5
       add_short_help $itk_component(showastaxes) \
          {Show annotated axes around cube (RA and Dec labelling)}
+
+      #  CUPID catalogue.
+      itk_component add showcupidcat {
+         gaia::StarLabelCheck $itk_component(controls).showcupidcat \
+            -text "CUPID catalogue:" \
+            -onvalue 1 \
+            -offvalue 0 \
+            -labelwidth $lwidth \
+            -variable [scope show_cupid_cat_] \
+            -command [code $this changed_show_cupid_cat_]
+      }
+      pack $itk_component(showcupidcat) -fill x -expand 0 -ipady 5
+      add_short_help $itk_component(showcupidcat) \
+         {Show CUPID catalogue clumps, if a catalogue is available}
+
    }
 
    #  Get a list of the standard colourmaps, sorted in alphabetic order
@@ -714,6 +729,24 @@ itcl::class gaia3d::Gaia3dTool {
       }
    }
 
+   #  Called when variable that controls visibility of the CUPID catalogue
+   #  clumps. When the clumps are translucent we must re-establish the
+   #  prop order, with the clumps at the back. So this is done the
+   #  hard way by completely redrawing the scene.
+   protected method changed_show_cupid_cat_ {} {
+      if { $drawn_ } {
+         if { $cupid_cat_ != {} } {
+            if { $show_cupid_cat_ } {
+               clear_scene 0
+               draw
+            } else {
+               $cupid_cat_ set_invisible
+               $renwindow_ render
+            }
+         }
+      }
+   }
+
    #  Start reporting the position of the cursor in the image plane, if
    #  tracking.
    protected method start_report_position_ {} {
@@ -726,7 +759,7 @@ itcl::class gaia3d::Gaia3dTool {
    #  Report the position of the cursor in the image plane, if tracking.
    #  Also updates the spectral extraction in GAIA, if that's enabled.
    #  If init is true then a request to autorange the data extraction limits
-   #  is made. 
+   #  is made.
    protected method report_position_ { {init 0} } {
       if { [$plane_ has_position] } {
          lassign [$plane_ get_position_and_delta] ix iy iz dx dy dz
@@ -765,9 +798,9 @@ itcl::class gaia3d::Gaia3dTool {
    #  Set the backingstore mode.
    protected method set_backingstore_mode_ {} {
       $props_ set_named_property Gaia3dTool backingstore_on_ $backingstore_on_
-      $renwindow_ configure -backingstore_on $backingstore_on_ 
+      $renwindow_ configure -backingstore_on $backingstore_on_
    }
-   
+
    #  Reset all the saved options to their default values. KEEP this up
    #  to date.
    protected method reset_options_ {} {
@@ -917,6 +950,20 @@ itcl::class gaia3d::Gaia3dTool {
       }
    }
 
+   #  Set the CUPID catalogue astrocat instance.
+   public method set_cupid_astrocat {astrocat} {
+      set astrocat_ $astrocat
+      puts "set_cupid_astrocat: $cupid_cat_, $astrocat"
+      if { $cupid_cat_ != {} } {
+
+         #  Fast LOD updates for volumes.
+         $renwindow_ set_rate_to_desired
+         $cupid_cat_ set_catalogue $astrocat_
+         $renwindow_ render
+         $renwindow_ set_rate_to_still
+      }
+   }
+
    #================================================================
    #  VTK setup.
    #================================================================
@@ -1011,6 +1058,24 @@ itcl::class gaia3d::Gaia3dTool {
          } else {
             $plane_ set_invisible
             $textwcs_ set_invisible
+         }
+
+         #  Draw the CUPID regions if requested.
+         if { $cupid_cat_ == {} } {
+            set cupid_cat_ [gaia3d::Gaia3dCupidPrism \#auto \
+                               -dataset [$imagedata_ get_imagedata] \
+                               -wcs [$imagedata_ get_wcs] \
+                               -renwindow $renwindow_ \
+                               -align_to_axis 1 \
+                               -colour $spectral_colour_ \
+                               -axis [$itk_option(-gaiacube) get_axis]]
+            $cupid_cat_ set_catalogue $astrocat_
+            $cupid_cat_ add_to_window
+         }
+         if { $show_cupid_cat_ } {
+            $cupid_cat_ set_visible
+         } else {
+            $cupid_cat_ set_invisible
          }
 
          #  Draw AST axes if requested. XXX allow attributes...
@@ -1162,7 +1227,7 @@ itcl::class gaia3d::Gaia3dTool {
          set wcs_prop_changes_ $prop_changes
          set changed_wcs 1
       }
-      
+
 
       #  Check name of cube data, if changed re-access, or
       #  bad value handling changed.
@@ -1324,6 +1389,9 @@ itcl::class gaia3d::Gaia3dTool {
    #  Whether to show the AST axes.
    protected variable show_ast_axes_ 0
 
+   #  Whether to show the CUPID catalogue.
+   protected variable show_cupid_cat_ 0
+
    #  The Plot3D instance used to draw axes (and markers).
    protected variable plot_ {}
    protected variable grf_context_ {}
@@ -1371,6 +1439,12 @@ itcl::class gaia3d::Gaia3dTool {
 
    #  Global properties handler.
    protected variable props_ {}
+
+   #  CUPID catalogue handler.
+   protected variable cupid_cat_ {}
+
+   #  The astrocat instance for the CUPID catalogue.
+   protected variable astrocat_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
