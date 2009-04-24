@@ -373,51 +373,6 @@ itcl::class gaia::GaiaSearch {
       }
    }
 
-   #  See if a list of comments extracted from a table contain a KAPPA-like
-   #  AST FrameSet for aligning the table with the image.
-   #
-   #  These look like:
-   #     '^#[C|T| ]!!.*$'
-   #  where .* is the AST information. This is complicated as continuation
-   #  lines are also present. These look like:
-   #     '^#[C|T| ]!!\+.*$'
-   #
-   protected method get_kaplibs_frameset_ {comments} {
-
-      set object {}
-      set value {}
-      foreach line [split $comments "\n"] {
-         if { [regexp {\#?!!\+(.*)} $line -> ast] } {
-            append value $ast
-         } elseif { [regexp {\#?!!(.*)} $line -> ast] } {
-            if { $value != {} } {
-               append object "$value\n"
-            }
-            set value $ast
-         }
-      }
-      if { $value != {} } {
-         append object "$value\n"
-      }
-
-      if { $object != {} } {
-         set ref [gaiautils::astcreate native $object]
-         if { $ref != 0 } {
-
-            #  Some KAPLIBS framesets for catalogues contain a WCS that
-            #  describes more than two columns (in fact they have an axis per
-            #  column). In that case we just want a suitable skyframe, so
-            #  search for one.
-            if { [gaiautils::astget $ref naxes] > 2 } {
-               set skyframe [gaiautils::astskyframe "MaxAxes=20"]
-               return [gaiautils::astfindframe $ref $skyframe ","]
-            }
-            return $ref
-         }
-      }
-      return 0
-   }
-
    #  Get a WCS description for the catalogue and set its display format.
    #  Only two allowed, degrees and hms. A side-effect is the updating
    #  of the astref_ frameset.
@@ -435,7 +390,23 @@ itcl::class gaia::GaiaSearch {
       #  someday). If neither is available we use the Skycat equinox.
       set comments [$w_.cat comments]
       if { $comments != {} } {
-         set astref_ [get_kaplibs_frameset_ $comments]
+         set astref_ [get_kaplibs_frameset $comments]
+         if { $astref_ != 0 } {
+
+            #  KAPLIBS framesets for catalogues contain a WCS that
+            #  describes more than two columns (in fact they have an axis per
+            #  column). In that case we just want a suitable skyframe, so
+            #  search for one, these are usually just the first two axes
+            if { [gaiautils::astget $astref_ naxes] > 2 } {
+               set skyframe [gaiautils::astskyframe "MaxAxes=20"]
+               set skyref [gaiautils::astfindframe $astref_ $skyframe ","]
+               if { $skyref != 0 } {
+                  catch {gaiautils::astannul $astref_}
+                  set astref_ $skyref
+                  catch {gaiautils::astannul $skyframe}
+               }
+            }
+         }
       }
       if { $astref_ == 0 } {
          #  Check for the system, equinox and epoch values of the
@@ -828,6 +799,40 @@ itcl::class gaia::GaiaSearch {
             -command [code cat::AstroCat::select_catalog history local $id $classname 0 $debug $w] \
             -accelerator "Control-h"
       }
+   }
+
+   #  See if a list of comments extracted from a table contain a KAPPA-like
+   #  AST FrameSet for aligning the table with the image. If so return
+   #  the FrameSet, otherwise return 0.
+   #
+   #  KAPLIBS comments (in a tab-table) look like:
+   #     '^#[C|T| ]!!.*$'
+   #  where .* is the AST information. This is complicated as continuation
+   #  lines are also present. These look like:
+   #     '^#[C|T| ]!!\+.*$'
+   #
+   public proc get_kaplibs_frameset {comments} {
+
+      set object {}
+      set value {}
+      foreach line [split $comments "\n"] {
+         if { [regexp {\#?!!\+(.*)} $line -> ast] } {
+            append value $ast
+         } elseif { [regexp {\#?!!(.*)} $line -> ast] } {
+            if { $value != {} } {
+               append object "$value\n"
+            }
+            set value $ast
+         }
+      }
+      if { $value != {} } {
+         append object "$value\n"
+      }
+
+      if { $object != {} } {
+         return [gaiautils::astcreate native $object]
+      }
+      return 0
    }
 
    #  Configuration options (public variables):
