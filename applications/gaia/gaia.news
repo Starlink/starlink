@@ -72,6 +72,10 @@
     Each window now has it's own instance so that more than one import can
     be done at a time.
 
+    A bug in saving and restoring the overlay graphics has been fixed.
+    This was introduced when dashed lines were offered as an option for
+    contouring.
+
   Lehuakona Release
   =================
 

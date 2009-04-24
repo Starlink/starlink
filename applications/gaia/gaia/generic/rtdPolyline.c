@@ -1982,9 +1982,10 @@ DashPrintProc( ClientData clientData, Tk_Window tkwin, char *recordPtr,
     
     ptr1 = linePtr->dash;
     ptr2 = buffer = ckalloc( 120 );
+    *ptr2 = '\0';
 
     while ( *ptr1 ) {
-        ptr2 += sprintf( ptr2, "%c", *ptr1 );
+        ptr2 += sprintf( ptr2, "%d ", *ptr1 );
         ptr1++;
     }
 
