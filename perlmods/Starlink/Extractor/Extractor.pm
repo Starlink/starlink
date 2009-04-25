@@ -66,7 +66,7 @@ use base qw/Exporter/;
 
 use vars qw/ $VERSION @EXPORT_OK $DEBUG /;
 
-'$Revision$ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
+$VERSION = 1.00;
 
 $DEBUG = 0;
 @EXPORT_OK = qw/ /;
