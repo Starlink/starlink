@@ -1226,3 +1226,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, size_t *apod, double *badfrac,
 void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, int *dofft, 
                             int *status );
  
+void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap, AstKeyMap * objmap,
+                      int * status );
+void smf_obsmap_report( AstKeyMap * obsmap, AstKeyMap * objmap,
+                        int * status );

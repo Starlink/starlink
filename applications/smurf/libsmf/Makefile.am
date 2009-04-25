@@ -188,6 +188,8 @@ smf_model_getptr.c \
 smf_model_gettype.c \
 smf_model_stripsuffix.c \
 smf_ndf_sbnd.c \
+smf_obsmap_fill.c \
+smf_obsmap_report.c \
 smf_obsmode_str.c \
 smf_obstype_str.c \
 smf_open_and_flatfield.c \

@@ -69,9 +69,11 @@
 *        Report observation details.
 *     2008-12-09 (TIMJ):
 *        Do not react badly if a fits header is missing.
+*     2009-04-24 (TIMJ):
+*        Factor out observation summary reporting.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -144,14 +146,9 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
   Grp * dgrp = NULL;  /* Internal dark group */
   size_t dkcount = 0; /* Dark counter */
   size_t i;           /* loop counter */
-  size_t nobs;        /* number of distinct observations */
-  size_t nobj;        /* number of distinct objects */
   smfData *infile = NULL; /* input file */
   size_t insize;     /* number of input files */
-  char obsid[SZFITSCARD]; /* Observation ID */
-  AstKeyMap * obsinfo = NULL; /* observation information */
   AstKeyMap * obsmap = NULL; /* Info from all observations */
-  char object[SZFITSCARD]; /* Object name */
   AstKeyMap * objmap = NULL; /* All the object names used */
   Grp *ogrp = NULL;   /* local copy of output group */
   smfSortInfo *sortinfo; /* individual struct in array */
@@ -194,37 +191,8 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
     smf_open_file( ingrp, i, "READ", SMF__NOCREATE_DATA, &infile, status );
     if (*status != SAI__OK) break;
 
-    /* if there is no hdr we can not index it in the reported summary */
-    if (infile->hdr && infile->hdr->fitshdr) {
-
-      /* Get observation ID and see if we already have an entry in the map */
-      (void)smf_getobsidss( infile->hdr->fitshdr, obsid, sizeof(obsid), NULL, 0, status );
-      /* As of 20080718 OBSID is not unique per obs so chop off date*/
-      obsid[22] = '\0';
-
-      if (!astMapHasKey(obsmap, obsid )) {
-        int itemp;
-
-        /* Create a sub keymap and populate it */
-        obsinfo = astKeyMap( " " );
-        /* fill with default value in case undefined */
-        one_strlcpy( object, "<undefined>", sizeof(object), status );
-        smf_getfitss( infile->hdr, "OBJECT", object, sizeof(object),
-                      status );
-        astMapPut0C( obsinfo, "OBJECT", object, NULL );
-        astMapPut0I( obsinfo, "OBSMODE", infile->hdr->obsmode, NULL );
-        astMapPut0I( obsinfo, "OBSTYPE", infile->hdr->obstype, NULL );
-        smf_fits_getI( infile->hdr, "OBSNUM", &itemp, status );
-        astMapPut0I( obsinfo, "OBSNUM", itemp, NULL );
-        smf_fits_getI( infile->hdr, "UTDATE", &itemp, status );
-        astMapPut0I( obsinfo, "UTDATE", itemp, NULL );
-
-        /* store information in the global observatio map
-           and also track how many distinct objects we have */
-        astMapPut0A( obsmap, obsid, obsinfo, NULL );
-        astMapPut0I( objmap, object, 0, NULL );
-      }
-    }
+    /* Fill in the keymap with observation details */
+    smf_obsmap_fill( infile, obsmap, objmap, status );
 
     if (smf_isdark( infile, status )) {
       /* Store the entry in the output group */
@@ -325,58 +293,8 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
               "^ND ^NDTXT", status );
   }
 
-  /* Now report the details of the observations */
-  nobj = astMapSize( objmap );
-  nobs = astMapSize( obsmap );
-  if (nobs > 0) {
-    if (nobs == 1) {
-      msgSetc("S", "");
-    } else {
-      msgSetc("S", "s");
-    }
-    /* if we only have on object name report it now */
-    if (nobj == 1) {
-      msgSetc( "OBJ", "for object '");
-      msgSetc( "OBJ", astMapKey( objmap, 0 ) );
-      msgSetc( "OBJ", "'");
-    } else {
-      msgSetc( "OBJ", " ");
-    }
-    msgOutif(MSG__NORM, " ", "Processing data ^OBJ from the following observation^S :", status);
-    for (i = 0; i < nobs; i++) {
-      if (astMapGet0A( obsmap, astMapKey(obsmap, i ), &obsinfo )) {
-        const char * ctemp;
-        int itemp;
-
-        /* only display object if we have not already done so */
-        if (nobj > 1) {
-          astMapGet0C( obsinfo, "OBJECT", &ctemp );
-          msgSetc( "OBJ", ctemp);
-        } else {
-          msgSetc( "OBJ", " ");
-        }
-
-        /* do not display "SCIENCE" as it is the default */
-        astMapGet0I( obsinfo, "OBSTYPE", &itemp );
-        if (itemp != SMF__TYP_SCIENCE) {
-          msgSetc( "OT", "(");
-          msgSetc( "OT", smf_obstype_str( itemp, status) );
-          msgSetc( "OT", ")");
-        } else {
-          msgSetc( "OT", " ");
-        }
-        astMapGet0I( obsinfo, "OBSMODE", &itemp );
-        msgSetc( "OM", smf_obsmode_str( itemp, status) );
-        astMapGet0I( obsinfo, "OBSNUM", &itemp );
-        msgSeti( "ON", itemp);
-        astMapGet0I( obsinfo, "UTDATE", &itemp );
-        msgSeti( "UT", itemp);
-        msgOutif(MSG__NORM, "", "  ^UT #^ON ^OM ^OBJ ^OT", status);
-      }
-    }
-    msgBlank( status );
-  }
-
+  /* Now report the details of the observation */
+  smf_obsmap_report( obsmap, objmap, status );
 
   obsmap = astAnnul( obsmap );
   objmap = astAnnul( objmap );
