@@ -36,13 +36,15 @@
 *        Initial version.
 *     2008-07-30 (EC):
 *        Don't fail if smfData is not data from a known instrument.
+*     2009-04-24 (TIMJ):
+*        Add ACSIS observing modes.
 
 *  Notes:
 *     This function relies on an accurate hdr->instrument. i.e. call
 *     smf_inst_get first.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 University of British Columbia.
 *     All Rights Reserved.
 
@@ -105,12 +107,17 @@ void smf_calc_mode ( smfHead * hdr, int * status ) {
     smf_fits_getS( hdr, "OBS_TYPE", obs_type, sizeof(obs_type), status );
 
     /* start with sample type */
-    if (strcasecmp( sam_mode, "SCAN" ) == 0) {
+    if (strcasecmp( sam_mode, "SCAN" ) == 0 ||
+        strcasecmp( sam_mode, "RASTER") == 0 ) {
       mode = SMF__OBS_SCAN;
     } else if (strcasecmp( sam_mode, "STARE" ) == 0) {
       mode = SMF__OBS_STARE;
     } else if (strcasecmp( sam_mode, "DREAM" ) == 0) {
       mode = SMF__OBS_DREAM;
+    } else if (strcasecmp( sam_mode, "JIGGLE" ) == 0) {
+      mode = SMF__OBS_JIGGLE;
+    } else if (strcasecmp( sam_mode, "GRID" ) == 0) {
+      mode = SMF__OBS_GRID;
     } else {
       if (*status != SAI__OK) {
         *status = SAI__ERROR;

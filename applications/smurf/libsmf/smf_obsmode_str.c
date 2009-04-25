@@ -36,13 +36,14 @@
 *  History:
 *     2008-07-24 (TIMJ):
 *        Initial version, copied from smf_dtype_str.
+*     2009-04-24 (TIMJ):
+*        Add ACSIS observing modes.
 
 *  Notes:
 *     - See also smf_dtype_str, smf_obstype_str
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -103,6 +104,12 @@ const char * smf_obsmode_str( smf_obsmode mode, int * status ) {
     break;
   case SMF__OBS_SCAN:
     retval = "scan";
+    break;
+  case SMF__OBS_GRID:
+    retval = "grid";
+    break;
+  case SMF__OBS_JIGGLE:
+    retval = "jiggle";
     break;
   default:
     retval = NULL;

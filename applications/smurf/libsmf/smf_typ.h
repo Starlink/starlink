@@ -147,10 +147,12 @@
 *        Add smfDIMMHead
 *     2009-03-10 (EC)
 *        Add SMF__FLT to smf_modeltype
+*     2009-04-24 (TIMJ):
+*        Add ACSIS observing modes.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2009 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2009 University of British Columbia.
 *     All Rights Reserved.
@@ -240,7 +242,9 @@ typedef enum smf_obsmode {
   SMF__OBS_NULL,
   SMF__OBS_DREAM,
   SMF__OBS_STARE,
-  SMF__OBS_SCAN
+  SMF__OBS_SCAN,
+  SMF__OBS_GRID,
+  SMF__OBS_JIGGLE
 } smf_obsmode;
 
 typedef enum smf_obstype {
