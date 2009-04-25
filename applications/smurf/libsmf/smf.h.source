@@ -1230,3 +1230,4 @@ void smf_obsmap_fill( const smfData * data, AstKeyMap * obsmap, AstKeyMap * objm
                       int * status );
 void smf_obsmap_report( AstKeyMap * obsmap, AstKeyMap * objmap,
                         int * status );
+void smf_summarize_obs( const Grp * igrp, int * status );

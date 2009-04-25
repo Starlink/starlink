@@ -187,6 +187,8 @@
 *        Correct bugs in setting the NDF origin for the spectral axis.
 *     22-JAN-2009 (DSB):
 *        Handle single time slice NDFs correctly.
+*     24-APR-2009 (TIMJ):
+*        Now summarizes the input observations.
 
 *  Copyright:
 *     Copyright (C) 2007-2009 Science and Technology Facilities Council.
@@ -405,6 +407,9 @@ void smurf_timesort( int *status ) {
 
 /* Get a group of input files */ 
    kpg1Rgndf( "IN", 0, 1, "  Give more NDFs...", &igrp1, &size, status );
+
+/* Report observation details early */
+   smf_summarize_obs( igrp1, status );
 
 /* Group the input NDFs according to OBSID, SUBSYSNR and NSUBSCAN values. 
    The groups are held in nested AST KeyMaps. Also returns the maximum number 

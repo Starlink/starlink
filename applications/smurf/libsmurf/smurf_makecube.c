@@ -761,9 +761,11 @@
 *     06-JUN-2008 (TIMJ):
 *        Change smf_open_ndfname API.
 *        Use smf_expand_tilegroup
+*     24-APR-2009 (TIMJ):
+*        Now summarizes the inpout observations.
 
 *  Copyright:
-*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2006-2008 University of British Columbia.
 *     All Rights Reserved.
@@ -964,6 +966,9 @@ void smurf_makecube( int *status ) {
 
 /* Get a group of input files */ 
    ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
+
+/* Report observation details early */
+   smf_summarize_obs( igrp, status );
 
 /* Get the celestial coordinate system for the output cube. */
    parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"

@@ -248,6 +248,7 @@ smf_subtract_plane.c \
 smf_subtract_plane1.c \
 smf_subtract_plane2.c \
 smf_subtract_poly.c \
+smf_summarize_obs.c \
 smf_telpos_get.c \
 smf_terr.c \
 smf_threads.c \
