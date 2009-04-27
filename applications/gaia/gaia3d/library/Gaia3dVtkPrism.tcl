@@ -1,30 +1,23 @@
 #+
 #  Name:
-#     Gaia3dVtkArdPrism
+#     Gaia3dVtkPrism
 
 #  Type of Module:
 #     [incr Tcl] class
 
 #  Purpose:
-#     Base class for creating and manipulating ARD prisms.
+#     Base class for creating and manipulating prisms.
 
 #  Description:
 #     Base class to create instances of a vtkPolyData that represent the
-#     extrusion of a 2D ARD shape into a third dimension and provide methods
-#     to manage the related work required to render it in a scene and provide
-#     the ability to fix it to the bounds and axis of a vtkImageData instance
+#     extrusion of a 2D shape into a third dimension and provide methods to
+#     manage the related work required to render it in a scene and provide the
+#     ability to fix to the given bounds or axis of a vtkImageData instance
 #     (cube). This is extended for specific shapes by implementing a
 #     create_polygon_ method that describes the 2D locus of the shape.
-#
-#     This class also includes factory methods for creating instances
-#     from a simple ARD description (CIRCLE(x,y,r) etc.) and mutating
-#     regions from one form to another (by sharing an actor). To participate
-#     in this sub-classes need to implement matches and instance procedures
-#     that check a description and parse it to create an instance (also
-#     add to the subclasses_ array).
 
 #  Copyright:
-#     Copyright (C) 2007 Science and Technology Facilities Council
+#     Copyright (C) 2009 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -48,7 +41,7 @@
 #     {enter_new_authors_here}
 
 #  History:
-#     07-DEC-2007 (PWD):
+#     27-APR-2009 (PWD):
 #        Original version.
 #     {enter_further_changes_here}
 
@@ -56,7 +49,7 @@
 
 #.
 
-itcl::class ::gaia3d::Gaia3dVtkArdPrism {
+itcl::class ::gaia3d::Gaia3dVtkPrism {
 
    #  Inheritances:
    #  -------------
@@ -114,22 +107,16 @@ itcl::class ::gaia3d::Gaia3dVtkArdPrism {
    #  Methods:
    #  --------
 
-   #  Set the properties of this object from an ARD description.
-   public method set_from_desc {desc} {
-      error "You need to implement a set_from_desc method"
-   }
-
-   #  Get an ARD description for this shape.
-   public method get_desc {} {
-      error "You need to implement a get_desc method"
-   }
-
-   #  Create the 2D polygon representing the ARD shape.
+   #  Create the 2D polygon representing the current shape. It is assumed
+   #  that the shape is positioned at "zlow" and will extrude to "zhigh".
+   #  For a cube "zlow" is the back or front face.
    protected method create_polygon_ {} {
       error "You need to implement a create_polygon_ method"
    }
 
-   #  Apply a shift to the ARD shape.
+   #  Apply a shift to the shape. Clearly can depends on the actual shape
+   #  properties (parameterised shapes, like circles, will typically need 
+   #  regenerating), so must be implementation in a sub-class. 
    protected method apply_shift_ {sx sy} {
       error "You need to implement a apply_shift_ method"
    }
@@ -179,18 +166,29 @@ itcl::class ::gaia3d::Gaia3dVtkArdPrism {
       extrude_polygon_
    }
 
-   #  Make the prism fit to the data cube along the current axis.
-   #  Call when ready to apply changes.
+   #  Make the prism fit to the data cube or the given extent along the
+   #  current axis. Call when ready to apply changes.
    public method fit_to_data {} {
-      lassign [get_dimensions_] xdim ydim zdim
+
+      if { $dataset != {} } {
+         #  Fitting to the data cube bounds.
+         lassign [get_dimensions_] xdim ydim zdim
+         if { $axis == 1 } {
+            set length_ $xdim
+         } elseif { $axis == 2 } {
+            set length_ $ydim
+         } else {
+            set length_ $zdim
+         }
+      } else {
+         #  Extruding to the given limits.
+         set length_ [expr $zhigh-$zlow]
+      }
       if { $axis == 1 } {
-         set length_ $xdim
          set extrusion_vector_ {1 0 0}
       } elseif { $axis == 2 } {
-         set length_ $ydim
          set extrusion_vector_ {0 1 0}
       } else {
-         set length_ $zdim
          set extrusion_vector_ {0 0 1}
       }
       update_
@@ -213,52 +211,6 @@ itcl::class ::gaia3d::Gaia3dVtkArdPrism {
       $polydata_ Modified
    }
 
-   #  Procedures:
-   #  -----------
-
-   #  Factory method to create an instance for a given ARD description.
-   #  The result is a subclass of this one.
-   public proc instance {desc} {
-      foreach shape [array names subclasses_] {
-         if { [eval gaia3d::$subclasses_($shape)::matches "\$desc"] } {
-            return [eval gaia3d::$subclasses_($shape)::instance "\$desc"]
-         }
-      }
-      error "Failed to parse \"$desc\" into an ARD region"
-   }
-
-   #  Extract the arguments from an ARD description of the form shape(a1,a2..).
-   public proc get_ard_args {desc} {
-      #  Replace all delimeters with spaces.
-      regsub -all {\(|,|\)} $desc { } desc
-
-      #  Return all words except first.
-      return [lrange $desc 1 end]
-   }
-
-   #  Return the ARD region shape from "shape(a1,a2..)".
-   public proc get_ard_region {desc} {
-      #  Replace all delimeters with spaces.
-      regsub -all {\(|,|\)} $desc { } desc
-
-      #  Return first word.
-      return [lindex $desc 0]
-   }
-
-   #  Return the ARD class for a shape. If not known returns {}.
-   public proc get_ard_class {shape} {
-      if { [info exists subclasses_($shape)] } {
-         return $subclasses_($shape)
-      }
-
-      #  Check case before giving up.
-      set shape [string tolower $shape]
-      if { [info exists subclasses_($shape)] } {
-         return $subclasses_($shape)
-      }
-      return {}
-   }
-
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -276,9 +228,9 @@ itcl::class ::gaia3d::Gaia3dVtkArdPrism {
    #  The extrusion axis.
    public variable axis 3 {}
 
-   #  Align prism to axis. Provided to meet the Gaia3dArdPrismProxy 
-   #  interface. Has no effect as always aligned.
-   public variable align_to_axis 1
+   #  The extrusion limits. Only used if the dataset is not defined.
+   public variable zhigh 0
+   public variable zlow 0
 
    #  The colour (Tcl colour).
    public variable colour {#0ff} {
@@ -287,6 +239,10 @@ itcl::class ::gaia3d::Gaia3dVtkArdPrism {
          eval $property_ SetColor $rgb
       }
    }
+
+   #  Align prism to axis. Provided to meet the Gaia3dArdPrismProxy 
+   #  interface. Has no effect as always aligned.
+   public variable align_to_axis 1
 
    #  Protected variables: (available to instance)
    #  --------------------
@@ -308,23 +264,11 @@ itcl::class ::gaia3d::Gaia3dVtkArdPrism {
 
    #  Common variables: (shared by all instances)
    #  -----------------
+
+   #  Useful for parameterised shapes.
    common 2pi_ 6.28319
    common d2r_ 0.0174533
    common r2d_ 57.2958
-
-   #  Array of the known sub-classes. Used to create instances from the
-   #  instance factory method and to map shapes to classes.
-   common subclasses_
-   array set subclasses_ {
-      circle  Gaia3dVtkArdCirclePrism
-      column  Gaia3dVtkArdColumnPrism
-      ellipse Gaia3dVtkArdEllipsePrism
-      line    Gaia3dVtkArdLinePrism
-      polygon Gaia3dVtkArdPolygonPrism
-      rect    Gaia3dVtkArdRectPrism
-      rotbox  Gaia3dVtkArdRotboxPrism
-      row     Gaia3dVtkArdRowPrism
-   }
 
 #  End of class definition.
 }
