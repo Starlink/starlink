@@ -130,13 +130,11 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
   size_t i;                    /* Loop counter */
   size_t j;                    /* Loop counter */
   size_t k;                    /* Loop counter */
-  size_t l;                    /* Loop counter */
   dim_t nbolo;                 /* Number of bolos in smfData */
   dim_t ndata;                 /* Size of DATA component in smfData */
   dim_t ntslice;               /* Number of time slices in smfData */
   dim_t nsub;                  /* Number of subarrays */
   double *val=NULL;            /* Pointer to DATA component of smfData */
-  double temp;
 
   if( *status != SAI__OK ) return;
 
@@ -201,13 +199,12 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
 
       if( data->type == 2 ) {
         /* --- FFT filter the data --- */
-        smf_filter_execute( array[i]->sdata[j], filt, status );
+        smf_filter_execute( NULL, array[i]->sdata[j], filt, status );
       }
     }
 
     if( filt ) filt = smf_free_smfFilter( filt, status );
   }
-
 
 
   /* Message indicating the thread started */
@@ -226,6 +223,7 @@ void smurf_sc2threadtest( int *status ) {
   smfArray **res=NULL;       /* array of smfArrays of test data */ 
   smfData *data=NULL;        /* Pointer to SCUBA2 data struct */
   dim_t datalen;             /* Number of data points */
+  smfFilter *filt=NULL;      /* Frequency domain filter */
   size_t i;                  /* Loop counter */
   size_t j;                  /* Loop counter */
   smfTimeChunkData *job_data=NULL; /* Array of pointers for job data */
@@ -263,7 +261,7 @@ void smurf_sc2threadtest( int *status ) {
   msgOut( "", TASK_NAME ": Running test with ^N threads", status );
 
   /*** TIMER ***/
-  gettimeofday( &tv1, NULL ); 
+  smf_timerinit( &tv1, &tv2, status );
 
   /* Create some fake test data in the form of an array of smfArrays */
 
@@ -305,9 +303,8 @@ void smurf_sc2threadtest( int *status ) {
   }
 
   /*** TIMER ***/
-  gettimeofday( &tv2, NULL ); 
-  msgSetd("D", smf_difftime(&tv1,&tv2,status));
-  msgOut("","** ^D seconds generating data",status);
+  msgOutf( "", "** %f seconds generating data", status, 
+           smf_timerupdate(&tv1,&tv2,status) );
 
   msgOut( "", TASK_NAME 
           ": Starting test 1 __parallel time: dataOrder__", status );
@@ -367,9 +364,8 @@ void smurf_sc2threadtest( int *status ) {
   smf_wait( wf, status );
 
   /*** TIMER ***/
-  gettimeofday( &tv1, NULL ); 
-  msgSetd("D", smf_difftime(&tv2,&tv1,status));
-  msgOut("","** ^D seconds to complete test",status);
+  msgOutf( "", "** %f seconds to complete test", status, 
+           smf_timerupdate(&tv1,&tv2,status) );
 
   /* The second test will boxcar smooth bolometers from time chunks in
      parallel */
@@ -400,9 +396,8 @@ void smurf_sc2threadtest( int *status ) {
   smf_wait( wf, status );
 
   /*** TIMER ***/
-  gettimeofday( &tv2, NULL ); 
-  msgSetd("D", smf_difftime(&tv1,&tv2,status));
-  msgOut("","** ^D seconds to complete test",status);
+  msgOutf( "", "** %f seconds to complete test", status, 
+           smf_timerupdate(&tv1,&tv2,status) );
 
   /* The third test will FFT filter bolometers from time chunks in
      parallel */
@@ -433,9 +428,27 @@ void smurf_sc2threadtest( int *status ) {
   smf_wait( wf, status );
 
   /*** TIMER ***/
-  gettimeofday( &tv1, NULL ); 
-  msgSetd("D", smf_difftime(&tv2,&tv1,status));
-  msgOut("","** ^D seconds to complete test",status);
+  msgOutf( "", "** %f seconds to complete test", status, 
+           smf_timerupdate(&tv1,&tv2,status) );
+
+
+  msgOut( "", TASK_NAME 
+          ": Starting test 4 __FFTW filter using internal threading__", 
+          status );
+
+  for( i=0; (*status==SAI__OK)&&(i<nchunks); i++ ) {
+    filt = smf_create_smfFilter( res[i]->sdata[0], status );
+    smf_filter_ident( filt, 1, status );
+
+    for( j=0; (*status==SAI__OK)&&(j<nsub); j++ ) {
+      smf_filter_execute( wf, res[i]->sdata[j], filt, status );
+    }
+
+    if( filt ) filt = smf_free_smfFilter( filt, status );
+  }
+  /*** TIMER ***/
+  msgOutf( "", "** %f seconds to complete test", status, 
+           smf_timerupdate(&tv1,&tv2,status) );
 
   /* Series of short single-thread array index tests */
   data = res[0]->sdata[0];
@@ -445,29 +458,27 @@ void smurf_sc2threadtest( int *status ) {
                 &tstride, status );
 
   msgOut("","Array index test #1: two multiplies in inner loop",status);
-  gettimeofday( &tv1, NULL ); 
+  smf_timerinit( &tv1, &tv2, status );
   for( i=0; i<nbolo; i++ ) {
     for( j=0; j<ntslice; j++ ) {
       dat[i*bstride + j*tstride] += 5;
     }
   }
-  gettimeofday( &tv2, NULL ); 
-  msgSetd("D", smf_difftime(&tv1,&tv2,status));
-  msgOut("","** ^D seconds to complete test",status);
+  msgOutf( "", "** %f seconds to complete test", status, 
+           smf_timerupdate(&tv1,&tv2,status) );
 
   msgOut("","Array index test #2: only index increments",status);
-  gettimeofday( &tv1, NULL ); 
+  smf_timerinit( &tv1, &tv2, status );
   for( i=0; i<nbolo*bstride; i+=bstride ) {
     for( j=i; j<(i+ntslice*tstride); j+=tstride ) {
       dat[j] += 5;
     }
   }
-  gettimeofday( &tv2, NULL ); 
-  msgSetd("D", smf_difftime(&tv1,&tv2,status));
-  msgOut("","** ^D seconds to complete test",status);
+  msgOutf( "", "** %f seconds to complete test", status, 
+           smf_timerupdate(&tv1,&tv2,status) );
 
   msgOut("","Array index test #3: one multiply in outer loop",status);
-  gettimeofday( &tv1, NULL ); 
+  smf_timerinit( &tv1, &tv2, status );
   offset = 0;
   for( i=0; i<nbolo; i++ ) {
     offset = i*bstride;
@@ -476,9 +487,8 @@ void smurf_sc2threadtest( int *status ) {
       offset += tstride;
     }
   }
-  gettimeofday( &tv2, NULL ); 
-  msgSetd("D", smf_difftime(&tv1,&tv2,status));
-  msgOut("","** ^D seconds to complete test",status);
+  msgOutf( "", "** %f seconds to complete test", status, 
+           smf_timerupdate(&tv1,&tv2,status) );
 
   /* Clean up */
   if( res ) {
@@ -491,5 +501,8 @@ void smurf_sc2threadtest( int *status ) {
   }
   if( wf ) wf = smf_destroy_workforce( wf );
   if( job_data ) job_data = smf_free( job_data, status );
+
+  /* Ensure that FFTW doesn't have any used memory kicking around */
+  fftw_cleanup();
 
 }

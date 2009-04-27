@@ -233,6 +233,7 @@
 #include "prm_par.h"
 #include "par_par.h"
 #include "star/one.h"
+#include "fftw3.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -373,7 +374,6 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
   isize = grpGrpsz( igrp, status );
 
   /* Parse the CONFIG parameters stored in the keymap */
-
   if( *status == SAI__OK ) {
     /* Number of iterations */
     if( !astMapGet0I( keymap, "NUMITER", &numiter ) ) {
@@ -1043,7 +1043,7 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
               smf_filter_fromkeymap( filt, keymap, &dofft, status );
               if( dofft ) {
                 msgOutif( MSG__VERB," ", "  frequency domain filter", status );
-                smf_filter_execute( data, filt, status );
+                smf_filter_execute( NULL, data, filt, status );
               }
               filt = smf_free_smfFilter( filt, status );
 
@@ -1664,5 +1664,8 @@ void smf_iteratemap( smfWorkForce *wf, Grp *igrp, AstKeyMap *keymap,
   if( igroup ) {
     smf_close_smfGroup( &igroup, status );
   }
+
+  /* Ensure that FFTW doesn't have any used memory kicking around */
+  fftw_cleanup();
 
 }

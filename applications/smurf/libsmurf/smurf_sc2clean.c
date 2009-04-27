@@ -343,7 +343,7 @@ void smurf_sc2clean( int *status ) {
 
     if( dofft ) {
       msgOutif( MSG__VERB," ", "Apply frequency domain filter", status );
-      smf_filter_execute( ffdata, filt, status );
+      smf_filter_execute( NULL, ffdata, filt, status );
       smf_convert_bad( ffdata, status );      
     }
 
