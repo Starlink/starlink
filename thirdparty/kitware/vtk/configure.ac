@@ -24,9 +24,11 @@ STAR_DECLARE_DEPENDENCIES([build], [mesa tcl tk])
 dnl    VTK and CMake do not use any autotools, so most of this is a
 dnl    complete fudge. Configuration consists of running bootstrap in CMake
 dnl    (this also does a basic build). Make runs the local cmake and then
-dnl    make in the VTK directory.
+dnl    make in the VTK directory. Remove cmConfigure.h file as that
+dnl    maybe from a full build and include components that are not to be
+dnl    used during a bootstrap (cmELF for instance).
 (
-   cmd="cd cmake && ./bootstrap";\
+   cmd="cd cmake && rm -f Source/cmConfigure.h && ./bootstrap";\
    echo $cmd; \
    eval $cmd
 )
