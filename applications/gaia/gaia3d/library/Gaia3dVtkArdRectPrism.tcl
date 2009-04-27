@@ -9,7 +9,7 @@
 #     Create and manipulate a rectangular ARD prism.
 
 #  Description:
-#     Class that extends Gaia3dVtkArdPrism to support rectangular shapes.
+#     Class that extends Gaia3dVtkRectPrism to support rectangular shapes.
 #     A rectangle is axis aligned.
 
 #  Copyright:
@@ -49,7 +49,7 @@ itcl::class ::gaia3d::Gaia3dVtkArdRectPrism {
 
    #  Inheritances:
    #  -------------
-   inherit gaia3d::Gaia3dVtkArdPrism
+   inherit gaia3d::Gaia3dVtkRectPrism
 
    #  Constructor:
    #  ------------
@@ -67,50 +67,6 @@ itcl::class ::gaia3d::Gaia3dVtkArdRectPrism {
    #  Methods and procedures:
    #  -----------------------
 
-   #  Create the polygon for the rectangle locus. Note -1 correction to
-   #  VTK grid coords.
-   protected method create_polygon_ {} {
-
-      $points_ Reset
-      $cells_ Reset
-      $cells_ InsertNextCell 4
-
-      set x0v [expr $x0-1]
-      set x1v [expr $x1-1]
-      set y0v [expr $y0-1]
-      set y1v [expr $y1-1]
-
-      if { $axis == 1 } {
-         $points_ InsertPoint 0 0.0 $x0v $y0v
-         $points_ InsertPoint 1 0.0 $x0v $y1v
-         $points_ InsertPoint 2 0.0 $x1v $y1v
-         $points_ InsertPoint 3 0.0 $x1v $y0v
-      } elseif { $axis == 2 } {
-         $points_ InsertPoint 0 $x0v 0.0 $y0v
-         $points_ InsertPoint 1 $x0v 0.0 $y1v
-         $points_ InsertPoint 2 $x1v 0.0 $y1v
-         $points_ InsertPoint 3 $x1v 0.0 $y0v
-      } else {
-         $points_ InsertPoint 0 $x0v $y0v 0.0
-         $points_ InsertPoint 1 $x0v $y1v 0.0
-         $points_ InsertPoint 2 $x1v $y1v 0.0
-         $points_ InsertPoint 3 $x1v $y0v 0.0
-      }
-      $cells_ InsertCellPoint 0
-      $cells_ InsertCellPoint 1
-      $cells_ InsertCellPoint 2
-      $cells_ InsertCellPoint 3
-
-      $polydata_ SetPoints $points_
-      $polydata_ SetPolys $cells_
-   }
-
-   #  Apply a shift to the corners.
-   protected method apply_shift_ {sx sy} {
-      configure -x0 [expr $x0+$sx] -x1 [expr $x1+$sx] \
-                -y0 [expr $y0+$sy] -y1 [expr $y1+$sy]      
-   }
-
    #  Get an ARD description for this shape.
    public method get_desc {} {
       return "RECT($x0,$y0,$x1,$y1)"
@@ -118,9 +74,12 @@ itcl::class ::gaia3d::Gaia3dVtkArdRectPrism {
 
    #  Set the properties of this object from an ARD description.
    public method set_from_desc {desc} {
-      lassign [get_ard_args $desc] x0 y0 x1 y1
+      lassign [gaia3d::Gaia3dArdUtils::get_ard_args $desc] x0 y0 x1 y1
       configure -x0 $x0 -x1 $x1 -y0 $y0 -y1 $y1
    }
+
+   #  Gaia3dArdPrismProxy support
+   #  ===========================
 
    #  See if an ARD description presents a polygon.
    public proc matches {desc} {
@@ -130,25 +89,13 @@ itcl::class ::gaia3d::Gaia3dVtkArdRectPrism {
    #  Given an ARD description of a rectangle create an instance of this class.
    #  Make sure this passes the matches check first.
    public proc instance {desc} {
-      lassign [get_ard_args $desc] x0 y0 x1 y1
+      lassign [gaia3d::Gaia3dArdUtils::get_ard_args $desc] x0 y0 x1 y1
       return [uplevel \#0 gaia3d::Gaia3dVtkArdRectPrism \#auto \
                  -x0 $x0 -x1 $x1 -y0 $y0 -y1 $y1]
    }
 
    #  Configuration options: (public variables)
    #  ----------------------
-
-   #  X coordinate, lower left.
-   public variable x0 0.0
-
-   #  Y coordinate, lower left.
-   public variable y0 0.0
-
-   #  X coordinate, upper right.
-   public variable x1 1.0
-
-   #  Y coordinate, upper right.
-   public variable y1 1.0
 
    #  Protected variables: (available to instance)
    #  --------------------
