@@ -69,6 +69,7 @@
 #include <sys/time.h>
 #include <time.h>
 #include <math.h>
+#include <pthread.h>
 
 /* STARLINK includes */
 #include "ast.h"
@@ -105,6 +106,8 @@
 #define TASK_NAME "SC2THREADTEST"
 
 /* --------------------------------------------------------------------------*/
+
+pthread_mutex_t smurf_sc2threadtest_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /* Structure used to pass data divided into time-chunks to different threads */
 typedef struct smfTimeChunkData {
@@ -155,11 +158,13 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
   }
 
   /* Message indicating the thread started */
+  smf_mutex_lock( &smurf_sc2threadtest_mutex, status );
   msgSeti( "C1", data->chunk1);
   msgSeti( "C2", data->chunk2);
   msgOutif( MSG__DEBUG, "",  
             "-- parallel time: thread starting on chunks ^C1 -- ^C2", 
             status );
+  smf_mutex_unlock( &smurf_sc2threadtest_mutex, status );
 
   /* Loop over time chunk. Some chunks may be flagged to skip if 
      chunk1=nchunks */
@@ -208,11 +213,13 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
 
 
   /* Message indicating the thread started */
+  smf_mutex_lock( &smurf_sc2threadtest_mutex, status );
   msgSeti( "C1", data->chunk1);
   msgSeti( "C2", data->chunk2);
   msgOutif( MSG__DEBUG, "",  
             "-- parallel time: thread finished chunks ^C1 -- ^C2", 
             status );
+  smf_mutex_unlock( &smurf_sc2threadtest_mutex, status );
 }
 
 /* --------------------------------------------------------------------------*/
