@@ -63,7 +63,8 @@
 *     2008-07-21 (EC):
 *        Only filter bolo if SMF__Q_BADB isn't set.
 *     2009-04-27 (EC):
-*        Modified so that it can optionally use multiple threads internally
+*        - Modified so that it can optionally use multiple threads internally
+*        - Each thread gets its own plan, rather than reusing same one
 
 *  Copyright:
 *     Copyright (C) 2007-2009 University of British Columbia.
@@ -125,8 +126,8 @@ typedef struct smfBoloChunkData {
   double *data_fft_i;      /* Imaginary part of the data FFT (1-bolo)*/
   smfFilter *filt;         /* Pointer to the filter */
   int ijob;                /* Job identifier */
-  fftw_plan *plan_forward; /* pointer to plan for forward transformation */
-  fftw_plan *plan_inverse; /* pointer to plan for inverse transformation */
+  fftw_plan plan_forward;  /* for forward transformation */
+  fftw_plan plan_inverse;  /* for inverse transformation */
 } smfBoloChunkData;
 
 /* Function to be executed in thread: filter all of the bolos from b1 to b2
@@ -146,10 +147,7 @@ void smfParallelFilt( void *job_data_ptr, int *status ) {
   size_t i;                     /* Loop counter */
   size_t j;                     /* Loop counter */
   dim_t ntslice;                /* Number of time slices */
-  fftw_plan *plan_forward=NULL; /* pointer to plan for forward transformation */
-  fftw_plan *plan_inverse=NULL; /* pointer to plan for inverse transformation */
   unsigned char *qua=NULL;      /* pointer to quality */
-  size_t tstride;               /* Time slice stride */
 
   if( *status != SAI__OK ) return;
 
@@ -168,8 +166,6 @@ void smfParallelFilt( void *job_data_ptr, int *status ) {
   filt = pdata->filt;
   data_fft_r = pdata->data_fft_r;
   data_fft_i = pdata->data_fft_i;
-  plan_forward = pdata->plan_forward;
-  plan_inverse = pdata->plan_inverse;
 
   if( !data ) {
     *status = SAI__ERROR;
@@ -197,7 +193,7 @@ void smfParallelFilt( void *job_data_ptr, int *status ) {
 
 
   /* Filter the data one bolo at a time */
-  smf_get_dims( data, NULL, NULL, NULL, &ntslice, NULL, &bstride, &tstride, 
+  smf_get_dims( data, NULL, NULL, NULL, &ntslice, NULL, &bstride, NULL, 
                 status );
 
   for( i=pdata->b1; (*status==SAI__OK) && (i<=pdata->b2); i++ ) 
@@ -209,12 +205,12 @@ void smfParallelFilt( void *job_data_ptr, int *status ) {
       base += i*bstride;
 
       /* Execute forward transformation using the guru interface */
-      fftw_execute_split_dft_r2c( *plan_forward, base, 
+      fftw_execute_split_dft_r2c( pdata->plan_forward, base, 
                                   data_fft_r, data_fft_i );
       
       /* Apply the frequency-domain filter */
       if( filt->isComplex ) {
-        for( j=0; j<ntslice/2+1; j++ ) {
+        for( j=0; j<filt->dim; j++ ) {
           /* Complex times complex, using only 3 multiplies */
           ac = data_fft_r[j] * filt->real[j];
           bd = data_fft_i[j] * filt->imag[j];
@@ -226,7 +222,7 @@ void smfParallelFilt( void *job_data_ptr, int *status ) {
           data_fft_i[j] = aPb*cPd - ac - bd;
         }
       } else { 
-        for( j=0; j<ntslice/2+1; j++ ) {
+        for( j=0; j<filt->dim; j++ ) {
           /* Complex times real */
           data_fft_r[j] *= filt->real[j];
           data_fft_i[j] *= filt->real[j];
@@ -234,8 +230,8 @@ void smfParallelFilt( void *job_data_ptr, int *status ) {
       }    
 
       /* Perform inverse transformation using guru interface */
-      fftw_execute_split_dft_c2r( *plan_inverse, pdata->data_fft_r, 
-                                  pdata->data_fft_i, base );
+      fftw_execute_split_dft_c2r( pdata->plan_inverse, data_fft_r, 
+                                  data_fft_i, base );
     }
 
   msgOutiff( MSG__DEBUG, "", 
@@ -260,8 +256,6 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
   int nw;                         /* Number of worker threads */
   dim_t ntslice=0;                /* Number of time slices */
   smfBoloChunkData *pdata=NULL;   /* Pointer to current job data */
-  fftw_plan plan_forward;         /* plan for forward transformation */
-  fftw_plan plan_inverse;         /* plan for inverse transformation */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -315,29 +309,6 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
 
   if( *status != SAI__OK ) return;
 
-  /* Set up the job data, excluding the plans which get created next */
-  job_data = smf_malloc( nw, sizeof(*job_data), 1, status );
-  for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
-    pdata = job_data + i;
-
-    pdata->b1 = i*(nbolo/nw);
-    pdata->b2 = (i+1)*(nbolo/nw)-1;
-    pdata->data = data;
-    pdata->data_fft_r = smf_malloc( filt->dim, sizeof(*pdata->data_fft_r), 0, 
-                                    status );
-    pdata->data_fft_i = smf_malloc( filt->dim, sizeof(*pdata->data_fft_i), 0, 
-                                    status );
-    pdata->filt = filt;
-    pdata->ijob = -1;   /* Flag job as ready to start */
-    pdata->plan_forward = NULL;
-    pdata->plan_inverse = NULL;
-
-    /* Ensure that the last thread gets the remainder of the bolos */
-    if( i==(nw-1) ) {
-      pdata->b2=nbolo-1;
-    }
-  }
-
   /* Describe the input and output array dimensions for FFTW guru interface.
      - dims describes the length and stepsize of time slices within a bolometer 
      - howmany_dims gives the number of bolos, and stride from one to the next*/
@@ -346,64 +317,79 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
   dims.is = 1;
   dims.os = 1;
 
-  /* Setup forward FFT plan using guru interface. Requires protection
-     with a mutex */
-  smf_mutex_lock( &plan_mutex, status );
+  /* Set up the job data */
+  job_data = smf_malloc( nw, sizeof(*job_data), 1, status );
+  for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
+    pdata = job_data + i;
 
-  if( *status == SAI__OK ) {
-    /* Just use the data_fft_* arrays from the first chunk of job data since
-       the guru interface allows you to use the same plans for multiple
-       transforms. */
-    pdata = job_data;
-    plan_forward = fftw_plan_guru_split_dft_r2c( 1, &dims, 0, NULL,
-                                                 data->pntr[0], 
-                                                 pdata->data_fft_r,
-                                                 pdata->data_fft_i, 
-                                                 FFTW_ESTIMATE | 
-                                                 FFTW_UNALIGNED );
+    pdata->b1 = i*(nbolo/nw);
+    pdata->b2 = (i+1)*(nbolo/nw)-1;
+    /* Ensure that the last thread gets the remainder of the bolos */
+    if( i==(nw-1) ) {
+      pdata->b2=nbolo-1;
+    }
+    pdata->data = data;
+    pdata->data_fft_r = smf_malloc( filt->dim, sizeof(*pdata->data_fft_r), 0, 
+                                    status );
+    pdata->data_fft_i = smf_malloc( filt->dim, sizeof(*pdata->data_fft_i), 0, 
+                                    status );
+    pdata->filt = filt;
+    pdata->ijob = -1;   /* Flag job as ready to start */
+
+
+    /* Setup forward FFT plan using guru interface. Requires protection
+       with a mutex */
+    smf_mutex_lock( &plan_mutex, status );
+
+    if( *status == SAI__OK ) {
+      /* Just use the data_fft_* arrays from the first chunk of job data since
+         the guru interface allows you to use the same plans for multiple
+         transforms. */
+      pdata->plan_forward = fftw_plan_guru_split_dft_r2c( 1, &dims, 0, NULL,
+                                                          data->pntr[0], 
+                                                          pdata->data_fft_r,
+                                                          pdata->data_fft_i, 
+                                                          FFTW_ESTIMATE | 
+                                                          FFTW_UNALIGNED );
+    }
+    
+    smf_mutex_unlock( &plan_mutex, status );
+    
+    if( !pdata->plan_forward && (*status == SAI__OK) ) {
+      *status = SAI__ERROR;
+      errRep( "", FUNC_NAME 
+              ": FFTW3 could not create plan for forward transformation",
+              status);
+    }
+    
+    /* Setup inverse FFT plan using guru interface */
+    smf_mutex_lock( &plan_mutex, status );
+    
+    if( *status == SAI__OK ) {
+      pdata->plan_inverse = fftw_plan_guru_split_dft_c2r( 1, &dims, 0, NULL,
+                                                          pdata->data_fft_r,
+                                                          pdata->data_fft_i, 
+                                                          data->pntr[0], 
+                                                          FFTW_ESTIMATE | 
+                                                          FFTW_UNALIGNED);
+    }
+    
+    smf_mutex_unlock( &plan_mutex, status );
+    
+    if( !pdata->plan_inverse && (*status==SAI__OK) ) {
+      *status = SAI__ERROR;
+      errRep( "", FUNC_NAME 
+              ": FFTW3 could not create plan for inverse transformation",
+              status);
+    }
+
   }
-
-  smf_mutex_unlock( &plan_mutex, status );
-
-  if( !plan_forward && (*status == SAI__OK) ) {
-    *status = SAI__ERROR;
-    errRep( "", FUNC_NAME 
-           ": FFTW3 could not create plan for forward transformation",
-           status);
-  }
-
-  /* Setup inverse FFT plan using guru interface */
-  smf_mutex_lock( &plan_mutex, status );
-
-  if( *status == SAI__OK ) {
-    pdata = job_data;
-    plan_inverse = fftw_plan_guru_split_dft_c2r( 1, &dims, 0, NULL,
-                                                 pdata->data_fft_r,
-                                                 pdata->data_fft_i, 
-                                                 data->pntr[0], FFTW_ESTIMATE | 
-                                                 FFTW_UNALIGNED);
-  }
-
-  smf_mutex_unlock( &plan_mutex, status );
-
-  if( !plan_inverse && (*status==SAI__OK) ) {
-    *status = SAI__ERROR;
-    errRep( "", FUNC_NAME 
-           ": FFTW3 could not create plan for inverse transformation",
-           status);
-  }
-
-  /* Set up the job data that is independent of smf_threads */
+ 
+  /* Execute the filter */
   if( nw > 1 ) {
-    /* Submit jobs in parallel of we have multiple worker threads */
+    /* Submit jobs in parallel if we have multiple worker threads */
     for( i=0; (*status==SAI__OK)&&i<nw; i++ ) {
       pdata = job_data + i;
-
-      /* Now we can fill the pointers to the plans */
-      pdata->plan_forward = &plan_forward;
-      pdata->plan_inverse = &plan_inverse;
-
-      /* Submit the job */
       pdata->ijob = smf_add_job( wf, SMF__REPORT_JOB, pdata, smfParallelFilt, 
                                  NULL, status );
     }
@@ -412,9 +398,6 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
   } else {
     /* If there is only a single thread call smfParallelFilt directly */
     pdata = job_data;
-    /* Now we can fill the pointers to the plans */
-    pdata->plan_forward = &plan_forward;
-    pdata->plan_inverse = &plan_inverse;
     smfParallelFilt( job_data, status );
   }
 
@@ -426,15 +409,13 @@ void smf_filter_execute( smfWorkForce *wf, smfData *data, smfFilter *filt,
                                                             status);
       if( pdata->data_fft_i ) pdata->data_fft_i = smf_free( pdata->data_fft_i, 
                                                             status);
+      /* Destroy the plans */ 
+      smf_mutex_lock( &plan_mutex, status );
+      fftw_destroy_plan( pdata->plan_forward );
+      fftw_destroy_plan( pdata->plan_inverse );
+      smf_mutex_unlock( &plan_mutex, status );
     }
     job_data = smf_free( job_data, status );
   }
-
-
-  /* Destroy the plans */ 
-  smf_mutex_lock( &plan_mutex, status );
-  fftw_destroy_plan( plan_forward );
-  fftw_destroy_plan( plan_inverse );
-  smf_mutex_unlock( &plan_mutex, status );
 
 }
