@@ -193,6 +193,54 @@ itcl::class ::gaia3d::Gaia3dArdPrismProxy {
    }
 
 
+   #  =================================
+   #  Procedures for creating instances
+   #  =================================
+
+   #  Factory method to create an instance for a given ARD description.
+   #  The result is a subclass of this one.
+   public proc instance {desc} {
+      foreach shape [array names subclasses_] {
+         if { [eval gaia3d::$subclasses_($shape)::matches "\$desc"] } {
+            return [eval gaia3d::$subclasses_($shape)::instance "\$desc"]
+         }
+      }
+      error "Failed to parse \"$desc\" into an ARD region"
+   }
+
+   #  Extract the arguments from an ARD description of the form shape(a1,a2..).
+   public proc get_ard_args {desc} {
+      #  Replace all delimeters with spaces.
+      regsub -all {\(|,|\)} $desc { } desc
+
+      #  Return all words except first.
+      return [lrange $desc 1 end]
+   }
+
+   #  Return the ARD region shape from "shape(a1,a2..)".
+   public proc get_ard_region {desc} {
+      #  Replace all delimeters with spaces.
+      regsub -all {\(|,|\)} $desc { } desc
+
+      #  Return first word.
+      return [lindex $desc 0]
+   }
+
+   #  Return the ARD class for a shape. If not known returns {}.
+   public proc get_ard_class {shape} {
+      if { [info exists subclasses_($shape)] } {
+         return $subclasses_($shape)
+      }
+
+      #  Check case before giving up.
+      set shape [string tolower $shape]
+      if { [info exists subclasses_($shape)] } {
+         return $subclasses_($shape)
+      }
+      return {}
+   }
+
+
    #  Configuration options: (public variables)
    #  ----------------------
    #  Note all these should be supported by the proxied objects.
@@ -245,6 +293,20 @@ itcl::class ::gaia3d::Gaia3dArdPrismProxy {
 
    #  Common variables: (shared by all instances)
    #  -----------------
+
+   #  Array of the known sub-classes. Used to create instances from the
+   #  instance factory method and to map shapes to classes.
+   common subclasses_
+   array set subclasses_ {
+      circle  Gaia3dVtkArdCirclePrism
+      column  Gaia3dVtkArdColumnPrism
+      ellipse Gaia3dVtkArdEllipsePrism
+      line    Gaia3dVtkArdLinePrism
+      polygon Gaia3dVtkArdPolygonPrism
+      rect    Gaia3dVtkArdRectPrism
+      rotbox  Gaia3dVtkArdRotboxPrism
+      row     Gaia3dVtkArdRowPrism
+   }
 
 #  End of class definition.
 }
