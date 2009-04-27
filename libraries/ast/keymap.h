@@ -161,6 +161,12 @@ typedef struct AstKeyMapVtab {
    int (* MapGet1D)( AstKeyMap *, const char *, int, int *, double *, int * );
    int (* MapGet1F)( AstKeyMap *, const char *, int, int *, float *, int * );
    int (* MapGet1I)( AstKeyMap *, const char *, int, int *, int *, int * );
+   int (* MapGetElemA)( AstKeyMap *, const char *, int, AstObject **, int * );
+   int (* MapGetElemP)( AstKeyMap *, const char *, int, void **, int * );
+   int (* MapGetElemC)( AstKeyMap *, const char *, int, int, char *, int * );
+   int (* MapGetElemD)( AstKeyMap *, const char *, int, double *, int * );
+   int (* MapGetElemF)( AstKeyMap *, const char *, int, float *, int * );
+   int (* MapGetElemI)( AstKeyMap *, const char *, int, int *, int * );
    void (* MapRemove)( AstKeyMap *, const char *, int * );
    int (* MapSize)( AstKeyMap *, int * );
    int (* MapLength)( AstKeyMap *, const char *, int * );
@@ -236,10 +242,12 @@ void astInitKeyMapGlobals_( AstKeyMapGlobals * );
 int astMapGet0A_( AstKeyMap *, const char *, AstObject **, int * );
 int astMapGet1A_( AstKeyMap *, const char *, int, int *, AstObject **, int * );
 void astMapPut1A_( AstKeyMap *, const char *, int, AstObject *[], const char *, int * );
+int astMapGetElemA_( AstKeyMap *, const char *, int, AstObject **, int * );
 #else
 int astMapGet0AId_( AstKeyMap *, const char *, AstObject **, int * );
 int astMapGet1AId_( AstKeyMap *, const char *, int, int *, AstObject **, int * );
 void astMapPut1AId_( AstKeyMap *, const char *, int, AstObject *[], const char *, int * );
+int astMapGetElemAId_( AstKeyMap *, const char *, int, AstObject **, int * );
 #endif
 
 const char *astMapKey_( AstKeyMap *, int, int * );
@@ -251,6 +259,10 @@ int astMapGet1C_( AstKeyMap *, const char *, int, int, int *, char *, int * );
 int astMapGet1D_( AstKeyMap *, const char *, int, int *, double *, int * );
 int astMapGet1F_( AstKeyMap *, const char *, int, int *, float *, int * );
 int astMapGet1I_( AstKeyMap *, const char *, int, int *, int *, int * );
+int astMapGetElemC_( AstKeyMap *, const char *, int, int, char *, int * );
+int astMapGetElemD_( AstKeyMap *, const char *, int, double *, int * );
+int astMapGetElemF_( AstKeyMap *, const char *, int, float *, int * );
+int astMapGetElemI_( AstKeyMap *, const char *, int, int *, int * );
 int astMapHasKey_( AstKeyMap *, const char *, int * );
 int astMapLength_( AstKeyMap *, const char *, int * );
 int astMapLenC_( AstKeyMap *, const char *, int * );
@@ -268,6 +280,7 @@ void astMapPut1I_( AstKeyMap *, const char *, int, int *, const char *, int * );
 void astMapRemove_( AstKeyMap *, const char *, int * );
 int astMapGet0P_( AstKeyMap *, const char *, void **, int * );
 int astMapGet1P_( AstKeyMap *, const char *, int, int *, void **, int * );
+int astMapGetElemP_( AstKeyMap *, const char *, int, void **, int * );
 void astMapPut0P_( AstKeyMap *, const char *, void *, const char *, int * );
 void astMapPut1P_( AstKeyMap *, const char *, int, void *[], const char *, int * );
 
@@ -340,6 +353,10 @@ astINVOKE(O,astLoadKeyMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PT
 #define astMapGet1D(this,key,mxval,nval,value) astINVOKE(V,astMapGet1D_(astCheckKeyMap(this),key,mxval,nval,value,STATUS_PTR))
 #define astMapGet1F(this,key,mxval,nval,value) astINVOKE(V,astMapGet1F_(astCheckKeyMap(this),key,mxval,nval,value,STATUS_PTR))
 #define astMapGet1C(this,key,l,mxval,nval,value) astINVOKE(V,astMapGet1C_(astCheckKeyMap(this),key,l,mxval,nval,value,STATUS_PTR))
+#define astMapGetElemI(this,key,elem,value) astINVOKE(V,astMapGetElemI_(astCheckKeyMap(this),key,elem,value,STATUS_PTR))
+#define astMapGetElemD(this,key,elem,value) astINVOKE(V,astMapGetElemD_(astCheckKeyMap(this),key,elem,value,STATUS_PTR))
+#define astMapGetElemF(this,key,elem,value) astINVOKE(V,astMapGetElemF_(astCheckKeyMap(this),key,elem,value,STATUS_PTR))
+#define astMapGetElemC(this,key,l,elem,value) astINVOKE(V,astMapGetElemC_(astCheckKeyMap(this),key,l,elem,value,STATUS_PTR))
 #define astMapRemove(this,key) astINVOKE(V,astMapRemove_(astCheckKeyMap(this),key,STATUS_PTR))
 #define astMapSize(this) astINVOKE(V,astMapSize_(astCheckKeyMap(this),STATUS_PTR))
 #define astMapLength(this,key) astINVOKE(V,astMapLength_(astCheckKeyMap(this),key,STATUS_PTR))
@@ -350,11 +367,13 @@ astINVOKE(O,astLoadKeyMap_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PT
 #define astMapGet0P(this,key,value) astINVOKE(V,astMapGet0P_(astCheckKeyMap(this),key,value,STATUS_PTR))
 #define astMapGet1P(this,key,mxval,nval,value) astINVOKE(V,astMapGet1P_(astCheckKeyMap(this),key,mxval,nval,value,STATUS_PTR))
 #define astMapPut1P(this,key,size,value,comment) astINVOKE(V,astMapPut1P_(astCheckKeyMap(this),key,size,value,comment,STATUS_PTR))
+#define astMapGetElemP(this,key,elem,value) astINVOKE(V,astMapGetElemP_(astCheckKeyMap(this),key,elem,value,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 #define astMapGet0A(this,key,value) astINVOKE(V,astMapGet0A_(astCheckKeyMap(this),key,(AstObject **)(value),STATUS_PTR))
 #define astMapGet1A(this,key,mxval,nval,value) astINVOKE(V,astMapGet1A_(astCheckKeyMap(this),key,mxval,nval,(AstObject **)(value),STATUS_PTR))
 #define astMapPut1A(this,key,size,value,comment) astINVOKE(V,astMapPut1A_(astCheckKeyMap(this),key,size,value,comment,STATUS_PTR))
+#define astMapGetElemA(this,key,elem,value) astINVOKE(V,astMapGetElemA_(astCheckKeyMap(this),key,elem,(AstObject **)(value),STATUS_PTR))
 
 #define astClearSizeGuess(this) \
 astINVOKE(V,astClearSizeGuess_(astCheckKeyMap(this),STATUS_PTR))
@@ -369,11 +388,8 @@ astINVOKE(V,astTestSizeGuess_(astCheckKeyMap(this),STATUS_PTR))
 #define astMapGet0A(this,key,value) astINVOKE(V,astMapGet0AId_(astCheckKeyMap(this),key,(AstObject **)(value),STATUS_PTR))
 #define astMapGet1A(this,key,mxval,nval,value) astINVOKE(V,astMapGet1AId_(astCheckKeyMap(this),key,mxval,nval,(AstObject **)(value),STATUS_PTR))
 #define astMapPut1A(this,key,size,value,comment) astINVOKE(V,astMapPut1AId_(astCheckKeyMap(this),key,size,value,comment,STATUS_PTR))
+#define astMapGetElemA(this,key,elem,value) astINVOKE(V,astMapGetElemAId_(astCheckKeyMap(this),key,elem,(AstObject **)(value),STATUS_PTR))
 #endif
 
 #endif
-
-
-
-
 

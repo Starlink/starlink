@@ -16,9 +16,12 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
-\item A new class of Channel, called StcsChan, has been added that allows
+- A new class of Channel, called StcsChan, has been added that allows
 conversion of suitable AST Objects to and from IVOA STC-S format.
 
+- A new set of methods, called astMapGetElem<X> (AST_MAPGETELEM<X>) has
+been added to the KeyMap class. They allow a single element of a vector
+valued entry to be returned.
 
 Main Changes in Version 5.1
 ---------------------------

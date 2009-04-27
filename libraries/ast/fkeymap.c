@@ -20,6 +20,7 @@
 *     AST_MAPPUT1<X>
 *     AST_MAPGET0<X>
 *     AST_MAPGET1<X>
+*     AST_MAPGETELEM<X>
 *     AST_MAPREMOVE
 *     AST_MAPSIZE
 *     AST_MAPLENGTH
@@ -627,7 +628,7 @@ F77_LOGICAL_FUNCTION(ast_mapget1c)( INTEGER(THIS),
    char *values, *c, *d;
    int i, j, term;
 
-   astAt( "AST_MAPGET1A", NULL, 0 );
+   astAt( "AST_MAPGET1C", NULL, 0 );
    astWatchSTATUS(
       values = astMalloc( sizeof( char )*(size_t) (*MXVAL)*( VALUE_length + 1 ) );
       key = astString( KEY, KEY_length );
@@ -803,5 +804,143 @@ F77_SUBROUTINE(ast_mapkey)( CHARACTER_RETURN_VALUE(RESULT),
 }
 
 
+F77_LOGICAL_FUNCTION(ast_mapgetelemi)( INTEGER(THIS),
+                                       CHARACTER(KEY),
+                                       INTEGER(ELEM),
+                                       INTEGER_ARRAY(VALUE),
+                                       INTEGER(STATUS)
+                                       TRAIL(KEY) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   GENPTR_INTEGER(ELEM)
+   GENPTR_INTEGER_ARRAY(VALUE)
+   F77_LOGICAL_TYPE(RESULT);
+   char *key;
+
+   astAt( "AST_MAPGETELEMI", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      RESULT = astMapGetElemI( astI2P( *THIS ), key, *ELEM - 1, VALUE ) ? F77_TRUE : F77_FALSE;
+      astFree( key );
+   )
+   return RESULT;
+}
+
+
+F77_LOGICAL_FUNCTION(ast_mapgetelemd)( INTEGER(THIS),
+                                       CHARACTER(KEY),
+                                       INTEGER(ELEM),
+                                       DOUBLE_ARRAY(VALUE),
+                                       INTEGER(STATUS)
+                                       TRAIL(KEY) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   GENPTR_INTEGER(ELEM)
+   GENPTR_DOUBLE_ARRAY(VALUE)
+   F77_LOGICAL_TYPE(RESULT);
+   char *key;
+
+   astAt( "AST_MAPGETELEMD", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      RESULT = astMapGetElemD( astI2P( *THIS ), key, *ELEM - 1, VALUE ) ? F77_TRUE : F77_FALSE;
+      astFree( key );
+   )
+   return RESULT;
+}
+
+F77_LOGICAL_FUNCTION(ast_mapgetelemr)( INTEGER(THIS),
+                                       CHARACTER(KEY),
+                                       INTEGER(ELEM),
+                                       REAL_ARRAY(VALUE),
+                                       INTEGER(STATUS)
+                                       TRAIL(KEY) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   GENPTR_INTEGER(ELEM)
+   GENPTR_REAL_ARRAY(VALUE)
+   F77_LOGICAL_TYPE(RESULT);
+   char *key;
+
+   astAt( "AST_MAPGETELEMR", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      RESULT = astMapGetElemF( astI2P( *THIS ), key, *ELEM - 1, VALUE ) ? F77_TRUE : F77_FALSE;
+      astFree( key );
+   )
+   return RESULT;
+}
+
+
+F77_LOGICAL_FUNCTION(ast_mapgetelema)( INTEGER(THIS),
+                                       CHARACTER(KEY),
+                                       INTEGER(ELEM),
+                                       INTEGER_ARRAY(VALUE),
+                                       INTEGER(STATUS)
+                                       TRAIL(KEY) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   GENPTR_INTEGER(ELEM)
+   GENPTR_INTEGER_ARRAY(VALUE)
+   F77_LOGICAL_TYPE(RESULT);
+   char *key;
+   AstObject *ptr;
+
+   astAt( "AST_MAPGETELEMA", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      RESULT = astMapGetElemA( astI2P( *THIS ), key, *ELEM - 1, &ptr ) ? F77_TRUE : F77_FALSE;
+      astFree( key );
+      if( astOK ) *VALUE = astP2I( ptr );
+   )
+   return RESULT;
+}
+
+
+F77_LOGICAL_FUNCTION(ast_mapgetelemc)( INTEGER(THIS),
+                                       CHARACTER(KEY),
+                                       INTEGER(ELEM),
+                                       CHARACTER_ARRAY(VALUE),
+                                       INTEGER(STATUS)
+                                       TRAIL(KEY)
+                                       TRAIL(VALUE) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   GENPTR_INTEGER(ELEM)
+   GENPTR_CHARACTER_ARRAY(VALUE)
+   F77_LOGICAL_TYPE(RESULT);
+   char *key;
+   char *values, *c, *d;
+   int j, term;
+
+   astAt( "AST_MAPGETELEMC", NULL, 0 );
+   astWatchSTATUS(
+      values = astMalloc( sizeof( char )*(size_t) ( VALUE_length + 1 ) );
+      key = astString( KEY, KEY_length );
+      RESULT = astMapGetElemC( astI2P( *THIS ), key, VALUE_length + 1, *ELEM - 1, 
+                               values ) ? F77_TRUE : F77_FALSE;
+      astFree( key );
+
+/* Copy characters from the work array until a terminating null is
+   found. Replace this null by a space and replace all subsequent
+   characters by spaces up to the end of the returned array element. */
+      if( astOK ) {
+         c = values;
+         d = VALUE;
+
+         term = 0;
+         for( j = 0; j < VALUE_length; j++, d++, c++ ) {
+            if( term ) {
+               *d = ' ';
+            } else if( (*d = *c) == 0 ) {
+               *d = ' ';
+               term = 1;
+            } 
+         }
+      }
+      astFree( values );
+   )
+   return RESULT;
+}
 
 

@@ -24,7 +24,7 @@ f+
 \newcommand{\stardocnumber}    {210.26}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {22nd April 2009}
+\newcommand{\stardocdate}      {27th April 2009}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -21697,6 +21697,16 @@ current version):
 
 \item A new class of Channel, called StcsChan, has been added that allows
 conversion of suitable AST Objects to and from IVOA STC-S format.
+
+\item A new set of methods, called 
+c+
+astMapGetElem<X>
+c-
+f+
+AST\_MAPGETELEM<X>
+f-
+has been added to the KeyMap class. They allow a single element of a vector
+valued entry to be returned.
 
 \end{enumerate}
 

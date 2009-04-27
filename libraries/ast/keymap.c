@@ -42,6 +42,7 @@ f     following routines may also be applied to all KeyMaps:
 *
 c     - astMapGet0<X>: Get a named scalar entry from a KeyMap
 c     - astMapGet1<X>: Get a named vector entry from a KeyMap
+c     - astMapGetElem<X>: Get an element of a named vector entry from a KeyMap
 c     - astMapHasKey: Does the KeyMap contain a named entry?
 c     - astMapKey: Return the key name at a given index in the KeyMap
 c     - astMapLenC: Get the length of a named character entry in a KeyMap
@@ -53,6 +54,7 @@ c     - astMapSize: Get the number of entries in a KeyMap
 c     - astMapType: Return the data type of a named entry in a map.
 f     - AST_MAPGET0<X>: Get a named scalar entry from a KeyMap
 f     - AST_MAPGET1<X>: Get a named vector entry from a KeyMap
+f     - AST_MAPGETELEM<X>: Get an element of a named vector entry from a KeyMap
 f     - AST_MAPHASKEY: Does the KeyMap contain a named entry?
 f     - AST_MAPKEY: Return the key name at a given index in the KeyMap
 f     - AST_MAPLENC: Get the length of a named character entry in a KeyMap
@@ -124,6 +126,8 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
 *         Added support for pointer ("P") entries.
 *     31-MAR-2009 (DSB):
 *         Remove rounding errors from formatted double values.
+*     27-APR-2009 (DSB):
+*         Added astMapGetElem<X>.
 *class--
 */
 
@@ -359,6 +363,12 @@ static int MapGet1C( AstKeyMap *, const char *, int, int, int *, char *, int * )
 static int MapGet1D( AstKeyMap *, const char *, int, int *, double *, int * );
 static int MapGet1F( AstKeyMap *, const char *, int, int *, float *, int * );
 static int MapGet1I( AstKeyMap *, const char *, int, int *, int *, int * );
+static int MapGetElemA( AstKeyMap *, const char *, int, AstObject **, int * );
+static int MapGetElemP( AstKeyMap *, const char *, int, void **, int * );
+static int MapGetElemC( AstKeyMap *, const char *, int, int, char *, int * );
+static int MapGetElemD( AstKeyMap *, const char *, int, double *, int * );
+static int MapGetElemF( AstKeyMap *, const char *, int, float *, int * );
+static int MapGetElemI( AstKeyMap *, const char *, int, int *, int * );
 static int MapHasKey( AstKeyMap *, const char *, int * );
 static int MapLenC( AstKeyMap *, const char *, int * );
 static int MapLength( AstKeyMap *, const char *, int * );
@@ -2273,6 +2283,12 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name, int *status ) {
    vtab->MapGet1D = MapGet1D;
    vtab->MapGet1F = MapGet1F;
    vtab->MapGet1I = MapGet1I;
+   vtab->MapGetElemP = MapGetElemP;
+   vtab->MapGetElemA = MapGetElemA;
+   vtab->MapGetElemC = MapGetElemC;
+   vtab->MapGetElemD = MapGetElemD;
+   vtab->MapGetElemF = MapGetElemF;
+   vtab->MapGetElemI = MapGetElemI;
    vtab->MapPut0A = MapPut0A;
    vtab->MapPut0P = MapPut0P;
    vtab->MapPut0C = MapPut0C;
@@ -3726,7 +3742,7 @@ static int MapGet1##X( AstKeyMap *this, const char *key, int mxval, int *nval, X
 /* Convert the value, storing the result in the supplied buffer. Report an \
    error if conversion is not possible. */ \
          if( !ConvertValue( raw, raw_type, value + i, Itype, status ) && astOK ){ \
-            astError( AST__MPGER, "astMapGet0" #X "(%s): The value of " \
+            astError( AST__MPGER, "astMapGet1" #X "(%s): The value of " \
                       "element %d of KeyMap key \"%s\" cannot be read using " \
                       "the requested data type.", status,astGetClass( this ), i + 1, key ); \
          } \
@@ -3783,8 +3799,6 @@ static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval,
 
 *  Parameters:
 *     (see astMapGet1<X>)
-*     status
-*        Pointer to the inherited status variable.
 */
 
 /* Local Variables: */ 
@@ -3894,7 +3908,7 @@ static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval,
 /* Convert the value, storing the result in the supplied buffer. Report an 
    error if conversion is not possible. */ 
          if( !ConvertValue( raw, raw_type, &cvalue, AST__STRINGTYPE, status ) && astOK ){ 
-            astError( AST__MPGER, "astMapGet0C(%s): The value of " 
+            astError( AST__MPGER, "astMapGet1C(%s): The value of " 
                       "element %d of KeyMap key \"%s\" cannot be read using " 
                       "the requested data type.", status,astGetClass( this ), i + 1, key ); 
 
@@ -4036,9 +4050,9 @@ int astMapGet1AId_( AstKeyMap *this, const char *key, int mxval, int *nval,
       } else { 
          raw_size = 0; 
          raw = NULL; 
-         astError( AST__INTER, "astMapGet1<X>(KeyMap): Illegal map entry data " 
-                   "type %d encountered (internal AST programming error).", status, 
-                   raw_type ); 
+         astError( AST__INTER, "astMapGet1A(KeyMap): Illegal map entry data " 
+                   "type %d encountered (internal AST programming error).", 
+                   status, raw_type ); 
       } 
 
 /* Treat scalars as single-value vectors. */ 
@@ -4056,9 +4070,10 @@ int astMapGet1AId_( AstKeyMap *this, const char *key, int mxval, int *nval,
 /* Convert the value, storing the result in the supplied buffer. Report an 
    error if conversion is not possible. */ 
          if( !ConvertValue( raw, raw_type, &avalue, AST__OBJECTTYPE, status ) && astOK ){ 
-            astError( AST__MPGER, "astMapGet0A(%s): The value of " 
+            astError( AST__MPGER, "astMapGet1A(%s): The value of " 
                       "element %d of KeyMap key \"%s\" cannot be read using " 
-                      "the requested data type.", status,astGetClass( this ), i + 1, key ); 
+                      "the requested data type.", status, astGetClass( this ),
+                      i + 1, key ); 
 
 /* If succesful, return an ID value for the Object. */
          } else {
@@ -4067,6 +4082,578 @@ int astMapGet1AId_( AstKeyMap *this, const char *key, int mxval, int *nval,
 
 /* Increment the pointers to the next raw value. */
          raw = (char *) raw + raw_size;
+      } 
+   } 
+
+/* If an error occurred,return zero. */ 
+   if( !astOK ) result = 0; 
+
+/* Return the result.*/ 
+   return result; 
+}
+
+/*
+*++
+*  Name:
+c     astMapGetElem<X>
+f     AST_MAPGETELEM<X>
+
+*  Purpose:
+*     Get a single element of a vector value from a KeyMap.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "ast.h"
+c     int astMapGetElem<X>( AstKeyMap *this, const char *key, int elem, 
+c                           <X>type *value )
+c     int astMapGetElemC( AstKeyMap *this, const char *key, int l, int elem,
+c                         const char *value )
+f     RESULT = AST_MAPGETELEM<X>( THIS, KEY, ELEM, VALUE, STATUS )
+
+*  Class Membership:
+*     KeyMap method.
+
+*  Description:
+*     This is a set of functions for retrieving a single element of a vector 
+*     value from a KeyMap. You should replace <X> in the generic function name 
+c     astMapGetElem<X> 
+f     AST_MAPGETELEM<X> 
+*     by an appropriate 1-character type code (see the "Data Type Codes" 
+*     section below for the code appropriate to each supported data type).
+*     The stored value is converted to the data type indiced by <X>
+*     before being returned (an error is reported if it is not possible to 
+*     convert the stored value to the requested data type).
+c     Note, the astMapGetElemC function has an extra parameter "l" which
+c     specifies the maximum length of the string to be stored in the
+c     "value" buffer (see the "astMapGetElemC" section below).
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the KeyMap.
+c     key
+f     KEY = CHARACTER * ( * ) (Given)
+*        The character string identifying the value to be retrieved. Trailing 
+*        spaces are ignored.
+c     elem
+f     ELEM = INTEGER (Given)
+*        The index of the required vector element, starting at 
+c        zero.
+f        one.
+*        An error will be reported if the value is outside the range of
+*        the vector.
+c     value
+f     VALUE( MXVAL ) = <X>type (Returned)
+c        A pointer to a buffer in which to return the requested value. 
+f        The requested value. 
+*        If the requested key is not found, then the contents of the
+*        buffer on entry to this function will be unchanged on exit.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astMapGetElem<X>()
+f     AST_MAPGETELEM<X> = LOGICAL
+f        A flag which is set to
+c        a non-zero value
+f        .TRUE.
+*        if the requested key name was found, and is set to
+c        zero
+f        .FALSE.
+*        otherwise.
+
+*  Notes:
+*     - No error is reported if the requested key cannot be found in the
+*     given KeyMap, but a
+c     zero
+f     .FALSE.
+*     value will be returned as the function value.
+*     - Key names are case sensitive, and white space is considered
+*     significant.
+
+c  astMapGetElemC:
+c     The "value" buffer supplied to the astMapGetElemC function should be a
+c     pointer to a character array with "l" elements, where "l" is the 
+c     maximum length of the string to be returned. The value of "l"
+c     should be supplied as an extra parameter following "key" when
+c     invoking astMapGetElemC, and should include space for a terminating
+c     null character.
+
+*  Data Type Codes:
+*     To select the appropriate 
+c     function, you should replace <X> in the generic function name
+c     astMapGetElem<X>
+f     routine, you should replace <X> in the generic routine name 
+f     AST_MAPGETELEM<X>
+*     with a 1-character data type code, so as to match the data type <X>type 
+*     of the data you are processing, as follows:
+c     - D: double
+c     - F: float
+c     - I: int
+c     - C: "const" pointer to null terminated character string
+c     - A: Pointer to AstObject
+c     - P: Generic "void *" pointer
+f     - D: DOUBLE PRECISION
+f     - R: REAL
+f     - I: INTEGER
+f     - C: CHARACTER
+f     - A: INTEGER used to identify an AstObject
+*
+c     For example, astMapGetElemD would be used to get a "double" value, while 
+c     astMapGetElemI would be used to get an "int" value, etc. For D or I, the 
+c     supplied "value" parameter should be a pointer to a double or int. For 
+c     C, the supplied "value" parameter should be a pointer to a character 
+c     string with "l" elements. For A, the supplied "value" parameter should 
+c     be a pointer to an AstObject pointer.
+f     For example, AST_MAPGETELEMD would be used to get a DOUBLE PRECISION 
+f     value, while AST_MAPGETELEMI would be used to get an INTEGER value, etc.
+
+*--
+*/
+/* Define a macro to implement the function for a specific data type
+(excluding "C" since that needs an extra parameter). */
+#define MAKE_MAPGETELEM(X,Xtype,Itype) \
+static int MapGetElem##X( AstKeyMap *this, const char *key, int elem, \
+                          Xtype *value, int *status ) { \
+\
+/* Local Variables: */ \
+   AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */ \
+   int itab;               /* Index of hash table element to use */ \
+   int nel;                /* Number of elements in raw vector */ \
+   int result;             /* Returned flag */ \
+   int raw_type;           /* Data type of stored value */ \
+   size_t raw_size;        /* Size of a single raw value */ \
+   unsigned long hash;     /* Full width hash value */ \
+   void *raw;              /* Pointer to stored value */ \
+\
+/* Initialise */ \
+   result = 0; \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return result; \
+\
+/* Use the hash function to determine the element of the hash table in \
+   which the key will be stored. */ \
+   itab = HashFun( key, this->mapsize - 1, &hash, status ); \
+\
+/* Search the relevent table entry for the required MapEntry. */ \
+   mapentry = SearchTableEntry( this, itab, key, status ); \
+\
+/* Skip rest if the key was not found. */ \
+   if( mapentry ) { \
+      result = 1; \
+\
+/* Get the address of the first raw value, and its data type. Also get \
+   the size of each element of the vector. */ \
+      nel = mapentry->nel; \
+      raw_type = mapentry->type; \
+      if( raw_type == AST__INTTYPE ){ \
+         raw_size = sizeof( int ); \
+         if( nel == 0 ) { \
+            raw = &( ((Entry0I *)mapentry)->value ); \
+         } else { \
+            raw = ((Entry1I *)mapentry)->value; \
+         } \
+\
+      } else if( raw_type == AST__DOUBLETYPE ){ \
+         raw_size = sizeof( double ); \
+         if( nel == 0 ) { \
+            raw = &( ((Entry0D *)mapentry)->value ); \
+         } else { \
+            raw = ((Entry1D *)mapentry)->value; \
+         } \
+\
+      } else if( raw_type == AST__POINTERTYPE ){ \
+         raw_size = sizeof( void * ); \
+         if( nel == 0 ) { \
+            raw = &( ((Entry0P *)mapentry)->value ); \
+         } else { \
+            raw = ((Entry1P *)mapentry)->value; \
+         } \
+\
+      } else if( raw_type == AST__FLOATTYPE ){ \
+         raw_size = sizeof( float ); \
+         if( nel == 0 ) { \
+            raw = &( ((Entry0F *)mapentry)->value ); \
+         } else { \
+            raw = ((Entry1F *)mapentry)->value; \
+         } \
+\
+      } else if( raw_type == AST__STRINGTYPE ){ \
+         raw_size = sizeof( const char * ); \
+         if( nel == 0 ) { \
+            raw = &( ((Entry0C *)mapentry)->value ); \
+         } else { \
+            raw = ((Entry1C *)mapentry)->value; \
+         } \
+\
+      } else if( raw_type == AST__OBJECTTYPE ){ \
+         raw_size = sizeof( AstObject * ); \
+         if( nel == 0 ) { \
+            raw = &( ((Entry0A *)mapentry)->value ); \
+         } else { \
+            raw = ((Entry1A *)mapentry)->value; \
+         } \
+\
+      } else { \
+         raw_size = 0; \
+         raw = NULL; \
+         astError( AST__INTER, "astMapGetElem<X>(KeyMap): Illegal map entry " \
+                   "data type %d encountered (internal AST programming " \
+                   "error).", status, raw_type ); \
+      } \
+\
+/* Treat scalars as single-value vectors. */ \
+      if( nel == 0 ) nel = 1; \
+\
+/* Ensure the requested element is within the bounds of the vector */ \
+      if( elem >= nel || elem < 0 ) { \
+         if( astOK ) { \
+            astError( AST__MPVIN, "astMapGetElem<X>(KeyMap): Illegal vector " \
+                      "index %d supplied for KeyMap entry '%s' - should be " \
+                      "in the range 1 to %d.", status, elem + 1, key, nel + 1 ); \
+         } \
+\
+/* Get a pointer to the requested raw value. */ \
+      } else { \
+         raw = (char *) raw + elem*raw_size; \
+\
+/* Convert the requested value, storing the result in the supplied buffer. \
+   Report an error if conversion is not possible. */ \
+         if( !ConvertValue( raw, raw_type, value, Itype, status ) && astOK ){ \
+            astError( AST__MPGER, "astMapGetElem" #X "(%s): The value of " \
+                      "element %d of KeyMap key \"%s\" cannot be read using " \
+                      "the requested data type.", status, astGetClass( this ), \
+                      elem + 1, key ); \
+         } \
+      } \
+   } \
+\
+/* If an error occurred,return zero. */ \
+   if( !astOK ) result = 0; \
+\
+/* Return the result.*/ \
+   return result; \
+}
+
+/* Expand the above macro to generate a function for each required 
+   data type (except C which is done differently). */
+MAKE_MAPGETELEM(I,int,AST__INTTYPE)
+MAKE_MAPGETELEM(D,double,AST__DOUBLETYPE)
+MAKE_MAPGETELEM(F,float,AST__FLOATTYPE)
+MAKE_MAPGETELEM(A,AstObject *,AST__OBJECTTYPE)
+MAKE_MAPGETELEM(P,void *,AST__POINTERTYPE)
+
+/* Undefine the macro. */
+#undef MAKE_MAPGETELEM
+
+
+static int MapGetElemC( AstKeyMap *this, const char *key, int l, int elem, 
+                        char *value, int *status ) { 
+/*
+*  Name:
+*     MapGetElemC
+
+*  Purpose:
+*     Get a single element of a vector value from a KeyMap.
+
+*  Type:
+*     Private member function.
+
+*  Synopsis:
+*     #include "ast.h"
+*     int MapGetElemC( AstKeyMap *this, const char *key, int l, int elem, 
+*                      char *value, int *status )
+
+*  Class Membership:
+*     KeyMap method.
+
+*  Description:
+*     This is the implementation of astMapGetElem<X> for <X> = "C". We
+*     cannot use the MAKE_MAPGETELEM macro for this because the string
+*     version of this function has an extra parameter giving the maximum
+*     length of each string which can be stored in the supplied buffer.
+
+*  Parameters:
+*     (see astMapGetElem<X>)
+*/
+
+/* Local Variables: */ 
+   AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */ 
+   const char *cvalue;     /* Pointer to converted string */ 
+   int itab;               /* Index of hash table element to use */
+   int nel;                /* Number of elements in raw vector */ 
+   int raw_type;           /* Data type of stored value */
+   int result;             /* Returned flag */
+   size_t raw_size;        /* Size of a single raw value */
+   unsigned long hash;     /* Full width hash value */
+   void *raw;              /* Pointer to stored value */ 
+
+/* Initialise */ 
+   result = 0; 
+
+/* Check the global error status. */ 
+   if ( !astOK ) return result; 
+
+/* Use the hash function to determine the element of the hash table in 
+   which the key will be stored. */ 
+   itab = HashFun( key, this->mapsize - 1, &hash, status ); 
+
+/* Search the relevent table entry for the required MapEntry. */ 
+   mapentry = SearchTableEntry( this, itab, key, status ); 
+
+/* Skip rest if the key was not found. */ 
+   if( mapentry ) { 
+      result = 1; 
+
+/* Get the address of the first raw value, and its data type. Also get 
+   the size of each element of the vector. */ 
+      nel = mapentry->nel; 
+      raw_type = mapentry->type; 
+      if( raw_type == AST__INTTYPE ){ 
+         raw_size = sizeof( int ); 
+         if( nel == 0 ) { 
+            raw = &( ((Entry0I *)mapentry)->value ); 
+         } else { 
+            raw = ((Entry1I *)mapentry)->value; 
+         } 
+
+      } else if( raw_type == AST__POINTERTYPE ){ 
+         raw_size = sizeof( void * ); 
+         if( nel == 0 ) { 
+            raw = &( ((Entry0P *)mapentry)->value ); 
+         } else { 
+            raw = ((Entry1P *)mapentry)->value; 
+         } 
+
+      } else if( raw_type == AST__DOUBLETYPE ){ 
+         raw_size = sizeof( double ); 
+         if( nel == 0 ) { 
+            raw = &( ((Entry0D *)mapentry)->value ); 
+         } else { 
+            raw = ((Entry1D *)mapentry)->value; 
+         } 
+
+      } else if( raw_type == AST__FLOATTYPE ){ 
+         raw_size = sizeof( float ); 
+         if( nel == 0 ) { 
+            raw = &( ((Entry0F *)mapentry)->value ); 
+         } else { 
+            raw = ((Entry1F *)mapentry)->value; 
+         } 
+
+      } else if( raw_type == AST__STRINGTYPE ){ 
+         raw_size = sizeof( const char * ); 
+         if( nel == 0 ) { 
+            raw = &( ((Entry0C *)mapentry)->value ); 
+         } else { 
+            raw = ((Entry1C *)mapentry)->value; 
+         } 
+
+      } else if( raw_type == AST__OBJECTTYPE ){ 
+         raw_size = sizeof( AstObject * ); 
+         if( nel == 0 ) { 
+            raw = &( ((Entry0A *)mapentry)->value ); 
+         } else { 
+            raw = ((Entry1A *)mapentry)->value; 
+         } 
+
+      } else { 
+         raw_size = 0; 
+         raw = NULL; 
+         astError( AST__INTER, "astMapGetElemC(KeyMap): Illegal map entry data " 
+                   "type %d encountered (internal AST programming error).", status, 
+                   raw_type ); 
+      } 
+
+/* Treat scalars as single-value vectors. */ 
+      if( nel == 0 ) nel = 1; 
+
+/* Ensure the requested element is within the bounds of the vector */ 
+      if( elem >= nel || elem < 0 ) { 
+         if( astOK ) {
+            astError( AST__MPVIN, "astMapGetElemC(KeyMap): Illegal vector "
+                      "index %d supplied for KeyMap entry '%s' - should be "
+                      "in the range 1 to %d.", status, elem + 1, key, nel + 1 );
+         }
+
+/* Get a pointer to the requested raw value. */
+      } else {
+         raw = (char *) raw + elem*raw_size; 
+
+/* Convert the value, storing the result in the supplied buffer. Report an 
+   error if conversion is not possible. */ 
+         if( !ConvertValue( raw, raw_type, &cvalue, AST__STRINGTYPE, status ) && astOK ){ 
+            astError( AST__MPGER, "astMapGetElemC(%s): The value of " 
+                      "element %d of KeyMap key \"%s\" cannot be read using " 
+                      "the requested data type.", status,astGetClass( this ), 
+                      elem + 1, key ); 
+
+/* If succesful, copy the string into the supplied buffer, or as much of
+   it as will fit. Leave room for a trailing null character. */
+         } else {
+            strncpy( value, cvalue, l - 1 );
+            value[ l - 1 ] = 0;
+         }
+      } 
+   } 
+
+/* If an error occurred,return zero. */ 
+   if( !astOK ) result = 0; 
+
+/* Return the result.*/ 
+   return result; 
+}
+
+int astMapGetElemAId_( AstKeyMap *this, const char *key, int elem, 
+                       AstObject **value, int *status ) { 
+/*
+*  Name:
+*     astMapGetElemAId_
+
+*  Purpose:
+*     Get a single element of a vector of AstObject pointers from a KeyMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "ast.h"
+*     int astMapGetElemA( AstKeyMap *this, const char *key, int elem, 
+*                         AstObject **value )
+
+*  Class Membership:
+*     KeyMap method.
+
+*  Description:
+*     This is the public implementation of the astMapGetElemA function
+*     It is identical to astMapGetElemA_ except that an ID value is returned 
+*     via the "value" parameter instead of a true C pointer. This is required 
+*     because this conversion cannot be performed by the macro that invokes
+*     the function.
+
+*  Parameters:
+*     (see astMapGet1<X>)
+
+*/
+
+/* Local Variables: */ 
+   AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */ 
+   AstObject *avalue;      /* Pointer to AstObject */
+   int itab;               /* Index of hash table element to use */
+   int nel;                /* Number of elements in raw vector */ 
+   int raw_type;           /* Data type of stored value */
+   int result;             /* Returned flag */
+   size_t raw_size;        /* Size of a single raw value */
+   unsigned long hash;     /* Full width hash value */
+   void *raw;              /* Pointer to stored value */ 
+
+/* Initialise */ 
+   result = 0; 
+
+/* Check the global error status. */ 
+   if ( !astOK ) return result; 
+
+/* Use the hash function to determine the element of the hash table in 
+   which the key will be stored. */ 
+   itab = HashFun( key, this->mapsize - 1, &hash, status ); 
+
+/* Search the relevent table entry for the required MapEntry. */ 
+   mapentry = SearchTableEntry( this, itab, key, status ); 
+
+/* Skip rest if the key was not found. */ 
+   if( mapentry ) { 
+      result = 1; 
+
+/* Get the address of the first raw value, and its data type. Also get 
+   the size of each element of the vector. */ 
+      nel = mapentry->nel; 
+      raw_type = mapentry->type; 
+      if( raw_type == AST__INTTYPE ){ 
+         raw_size = sizeof( int ); 
+         if( nel == 0 ) { 
+            raw = &( ((Entry0I *)mapentry)->value ); 
+         } else { 
+            raw = ((Entry1I *)mapentry)->value; 
+         } 
+
+      } else if( raw_type == AST__DOUBLETYPE ){ 
+         raw_size = sizeof( double ); 
+         if( nel == 0 ) { 
+            raw = &( ((Entry0D *)mapentry)->value ); 
+         } else { 
+            raw = ((Entry1D *)mapentry)->value; 
+         } 
+
+      } else if( raw_type == AST__POINTERTYPE ){ 
+         raw_size = sizeof( void * ); 
+         if( nel == 0 ) { 
+            raw = &( ((Entry0P *)mapentry)->value ); 
+         } else { 
+            raw = ((Entry1P *)mapentry)->value; 
+         } 
+
+      } else if( raw_type == AST__FLOATTYPE ){ 
+         raw_size = sizeof( float ); 
+         if( nel == 0 ) { 
+            raw = &( ((Entry0F *)mapentry)->value ); 
+         } else { 
+            raw = ((Entry1F *)mapentry)->value; 
+         } 
+
+      } else if( raw_type == AST__STRINGTYPE ){ 
+         raw_size = sizeof( const char * ); 
+         if( nel == 0 ) { 
+            raw = &( ((Entry0C *)mapentry)->value ); 
+         } else { 
+            raw = ((Entry1C *)mapentry)->value; 
+         } 
+
+      } else if( raw_type == AST__OBJECTTYPE ){ 
+         raw_size = sizeof( AstObject * ); 
+         if( nel == 0 ) { 
+            raw = &( ((Entry0A *)mapentry)->value ); 
+         } else { 
+            raw = ((Entry1A *)mapentry)->value; 
+         } 
+
+      } else { 
+         raw_size = 0; 
+         raw = NULL; 
+         astError( AST__INTER, "astMapGetElemA(KeyMap): Illegal map entry data " 
+                   "type %d encountered (internal AST programming error).", status, 
+                   raw_type ); 
+      } 
+
+/* Treat scalars as single-value vectors. */ 
+      if( nel == 0 ) nel = 1; 
+
+/* Ensure the requested element is within the bounds of the vector */
+      if( elem >= nel || elem < 0 ) {
+         if( astOK ) {
+            astError( AST__MPVIN, "astMapGetElemA(KeyMap): Illegal vector "
+                      "index %d supplied for KeyMap entry '%s' - should be "
+                      "in the range 1 to %d.", status, elem + 1, key, nel + 1 );
+         }
+
+/* Get a pointer to the requested raw value. */
+      } else {
+         raw = (char *) raw + elem*raw_size;
+
+/* Convert the value, storing the result in the supplied buffer. Report an 
+   error if conversion is not possible. */ 
+         if( !ConvertValue( raw, raw_type, &avalue, AST__OBJECTTYPE, status ) && astOK ){ 
+            astError( AST__MPGER, "astMapGetElemA(%s): The value of " 
+                      "element %d of KeyMap key \"%s\" cannot be read using " 
+                      "the requested data type.", status,astGetClass( this ), 
+                      elem + 1, key ); 
+
+/* If succesful, return an ID value for the Object. */
+         } else {
+            *value = avalue ? astMakeId( avalue ) : NULL;
+         }
       } 
    } 
 
@@ -6072,7 +6659,7 @@ MAKE_MAPGET0_(P,void *)
 int astMapGet1##X##_( AstKeyMap *this, const char *key, int mxval, int *nval, \
                       Xtype *value, int *status ){ \
    if ( !astOK ) return 0; \
-   return (**astMEMBER(this,KeyMap,MapGet1##X))(this,key,mxval,nval,value, status ); \
+   return (**astMEMBER(this,KeyMap,MapGet1##X))(this,key,mxval,nval,value,status); \
 }
 MAKE_MAPGET1_(D,double)
 MAKE_MAPGET1_(F,float)
@@ -6081,10 +6668,29 @@ MAKE_MAPGET1_(A,AstObject *)
 MAKE_MAPGET1_(P,void *)
 #undef MAKE_MAPGET1_
 
+#define MAKE_MAPGETELEM_(X,Xtype) \
+int astMapGetElem##X##_( AstKeyMap *this, const char *key, int elem, \
+                         Xtype *value, int *status ){ \
+   if ( !astOK ) return 0; \
+   return (**astMEMBER(this,KeyMap,MapGetElem##X))(this,key,elem,value,status); \
+}
+MAKE_MAPGETELEM_(D,double)
+MAKE_MAPGETELEM_(F,float)
+MAKE_MAPGETELEM_(I,int)
+MAKE_MAPGETELEM_(A,AstObject *)
+MAKE_MAPGETELEM_(P,void *)
+#undef MAKE_MAPGETELEM_
+
 int astMapGet1C_( AstKeyMap *this, const char *key, int l, int mxval, int *nval,
                   char *value, int *status ){ 
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,KeyMap,MapGet1C))(this,key,l,mxval,nval,value, status );
+   return (**astMEMBER(this,KeyMap,MapGet1C))(this,key,l,mxval,nval,value,status);
+}
+
+int astMapGetElemC_( AstKeyMap *this, const char *key, int l, int elem,
+                     char *value, int *status ){ 
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,KeyMap,MapGetElemC))(this,key,l,elem,value,status);
 }
 
 void astMapRemove_( AstKeyMap *this, const char *key, int *status ){ 

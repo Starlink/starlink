@@ -3,7 +3,7 @@
       include 'AST_PAR'
       include 'SAE_PAR'
       integer status,map,map2,ival,aval,l,ivec(2),avec(4),nval,i,iat
-      character cval*20,cvec(3)*10,key*20
+      character cval*20,cvec(3)*10,key*20,cval0*40
       double precision dval, dvec(2)
       logical gota, gotc, gotd, goti, gotr
       real rval
@@ -397,6 +397,40 @@ c  Read vector entries as vectors.
       else if( cvec( 3 ) .ne. '  Hello   ' ) then
          write(*,*) cvec( 2 )
          call stopit( status, 'Error B8d' )
+      end if
+ 
+c  Read single elements of vector entries as scalars.
+      if( .not. ast_mapgetelemi( map2, 'Fredi', 1, ivec, 
+     :                           status ) ) then
+         call stopit( status, 'Error B1z' )
+      else if( ivec( 1 ) .ne. 1999 ) then
+         write(*,*) ivec( 1 )
+         call stopit( status, 'Error B2bz' )
+      end if  
+      
+      if( .not. ast_mapgetelemd( map2, 'Fredd', 2, dvec, 
+     :                           status ) ) then
+         call stopit( status, 'Error B3z' )
+      else if( dvec( 1 ) .ne. -0.01D0 ) then
+         write(*,*) dvec( 1 )
+         call stopit( status, 'Error B4cz' )
+      end if  
+
+      if( .not. ast_mapgetelema( map2, 'Freda', 3, avec, 
+     :                           status ) ) then
+         call stopit( status, 'Error B5z' )
+      else if( .not. ast_isaspecframe( avec( 1 ), status ) ) then
+         write(*,*) ast_getc( avec( 1 ), 'class', status )
+         call stopit( status, 'Error B6dz' )
+      end if  
+
+
+      if( .not. ast_mapgetelemc( map2, 'Fredc', 3, cval0, 
+     :                           status ) ) then
+         call stopit( status, 'Error B7z' )
+      else if( cval0 .ne. '  Hello   ' ) then
+         write(*,*) cval0
+         call stopit( status, 'Error B8dz' )
       end if
  
 

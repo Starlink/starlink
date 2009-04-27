@@ -167,4 +167,9 @@ BADFLG          <Incompatible flags for re-sampling or re-binning>
 LCKERR          <Error locking or unlocking an AST Object>
 FUNDEF          <FITS keyword had undefined value>
 
+! New codes introduced for V5.2
+MPVIN           <invalid integer index supplied for a KeyMap vector element>
+
+
+
 .END
