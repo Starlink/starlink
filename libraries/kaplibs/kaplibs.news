@@ -7,6 +7,9 @@ and which may be of use to anyone developing their own KAPPA-like
 applications (see SUN/238).
 
 Version 2.8
+   - KPG1_WRCAT added. It writes a catalogue, exactly like KPG1_WRTAB,
+     except that it allows an arbitrary set of extra columns to be supplied,
+     specified via an AST KeyMap.
    - KPG1_BADBX added. It returns an NDF identifier for the smallest section 
      of a supplied NDF that encloses all the good data values in the NDF.
    - KPG1_BBOX<T> added. It obtains the pixel bounding box of a given value

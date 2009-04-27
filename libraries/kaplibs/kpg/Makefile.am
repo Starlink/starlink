@@ -315,6 +315,7 @@ kpg1_satkc.f \
 kpg1_satkd.f \
 kpg1_wgndf.f \
 kpg1_wrtab.f \
+kpg1_wrcat.f \
 kpg1_wrlst.f \
 kpg1_wrta2.f
 

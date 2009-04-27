@@ -1,5 +1,6 @@
       SUBROUTINE KPG1_WRTA2( PARAM, ARRDIM, NPOS, NAX, POS, IWCS,
-     :                       TITLE, ID0, IDENTS, LABS, HIST, STATUS )
+     :                       TITLE, ID0, IDENTS, KEYMAP, LABS, HIST, 
+     :                       STATUS )
 *+
 *  Name:
 *     KPG1_WRTA2
@@ -12,7 +13,7 @@
 
 *  Invocation:
 *     CALL KPG1_WRTA2( PARAM, ARRDIM, NPOS, NAX, POS, IWCS, TITLE, 
-*                      ID0, IDENTS, LABS, HIST, STATUS )
+*                      ID0, IDENTS, KEYMAP, LABS, HIST, STATUS )
 
 *  Description:
 *     This routine writes the supplied positions to a CAT catalogue
@@ -51,6 +52,14 @@
 *     IDENTS( NPOS ) = INTEGER (Given)
 *        The individual integer identifiers to associate with each
 *        position. Only accessed if ID0 is less than or equal to zero.
+*     KEYMAP = INTEGER (Given)
+*        An optional AST KeyMap containing data for up to 10 extra columns 
+*        to add to the catalogue. An error will be reported if the KeyMap
+*        contains more than 10 entries. Each entry in the KeyMap should be 
+*        a vector with length equal to NPOS. The key for the entry is used 
+*        as the column name in the table. No extra columns are added if a 
+*        value of AST__NULL is supplied for KEYMAP. This keyMap can be used
+*        (for instance) to add character columns to the catalogue.
 *     LABS = INTEGER (Given)
 *        A GRP group identifier containing the labels to be associated
 *        with the positions. The number of elements in this group should
@@ -65,6 +74,7 @@
 
 *  Copyright:
 *     Copyright (C) 1998, 2003 Central Laboratory of the Research Councils.
+*     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -100,6 +110,8 @@
 *        if the supplied Frame also contains one or more non-celestial axes.
 *     25-JAN-2007 (DSB):
 *        Added parameter HIST.
+*     27-APR-2009 (DSB):
+*        Added parameter KEYMAP.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -115,6 +127,7 @@
       INCLUDE 'CAT_PAR'          ! CAT constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'CNF_PAR'          ! CNF constants and function declarations
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
 *  Arguments Given:
@@ -127,6 +140,7 @@
       CHARACTER TITLE*(*)
       INTEGER ID0
       INTEGER IDENTS( NPOS )
+      INTEGER KEYMAP
       INTEGER LABS
       INTEGER HIST
  
@@ -136,14 +150,18 @@
 *  External References:
       INTEGER CHR_LEN            ! Used length of a string
 
-*  Local Variables:
+*  Local Constants:
       INTEGER MXDIM              ! Max no. of axes
       PARAMETER ( MXDIM = 50 )
+
+      INTEGER MXKEYS             ! Max no. of keys allowed in KeyMap
+      PARAMETER ( MXKEYS = 10 )
 
 *  Local Variables:
       CHARACTER ATTR*10          ! AST attribute name
       CHARACTER BUFFER*80        ! Text buffer
       CHARACTER HTEXT*(GRP__SZNAM)! A line of history text
+      CHARACTER KEY*40           ! KeyMap entry key
       CHARACTER LAB*50           ! Axis label
       CHARACTER LABEL*100        ! Position label
       CHARACTER SYM*20           ! Axis symbol
@@ -151,20 +169,29 @@
       DOUBLE PRECISION C( MXDIM) ! Buffer for a single position
       INTEGER AXFRM              ! 1D Frame holding current axis
       INTEGER AXMAP              ! Mapping from full Frame to 1D Frame
+      INTEGER CATYPE             ! CAT column data type
       INTEGER CI                 ! CAT identifier for catalogue
       INTEGER COLID( -1:MXDIM )  ! CAT identifiers for columns
       INTEGER FRM                ! Pointer to Frame
       INTEGER I                  ! Position index
       INTEGER IAT                ! No. of characters in string
+      INTEGER IPTEXT             ! Pointer to text buffer
       INTEGER J                  ! Axis index
+      INTEGER KMCOL( MXKEYS )    ! CAT identifiers for extra columns
+      INTEGER KMLEN( MXKEYS )    ! No. of values for each extra column
+      INTEGER KMSIZE             ! No. of columns supplied in KeyMap
       INTEGER LABLEN             ! Length of longest label
+      INTEGER LENC               ! Length of formatted KeyMap entry
       INTEGER LWCS               ! Pointer to the FrameSet to be stored
+      INTEGER MAXLEN             ! Maximum formatted string length
       INTEGER NHIST              ! Number of lines of history text
       INTEGER NLAB               ! Number of labels supplied
       INTEGER QI                 ! CAT identifier for another parameter
       INTEGER TI                 ! CAT identifier for TITLE parameter
+      INTEGER TYPE               ! AST KeyMap entry data type
       LOGICAL COPIED             ! Has a copy of the Frameet been taken?
       LOGICAL HASSKY             ! Does the Frame contain a SkyFrame?
+      LOGICAL JUNK               ! Unused
       LOGICAL SKYAX              ! Is the Axis a SkyAxis?
 *.
 
@@ -284,6 +311,78 @@
      :                   'Position label', COLID( -1 ), STATUS )
       END IF
 
+*  Create columns to hold the entries in any supplied KeyMap.
+      KMSIZE = 0
+      MAXLEN = 0
+
+      IF( KEYMAP .NE. AST__NULL ) THEN
+
+*  Loop round all entries in the supplied KeyMap.
+         KMSIZE = AST_MAPSIZE( KEYMAP, STATUS )
+
+         IF( KMSIZE .GT. MXKEYS .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETI( 'N', KMSIZE )
+            CALL MSG_SETI( 'M', MXKEYS )
+            CALL MSG_SETC( 'P', PARAM )
+            CALL ERR_REP( ' ', 'Cannot create ^N extra columns in the'//
+     :                       ' catalogue associated with parameter '//
+     :                       '''^P'' - no more than ^M are allowed '//
+     :                       '(programming error).', STATUS )
+            GO TO 999
+         END IF
+
+         DO I = 1, KMSIZE
+
+*  Get the column name.
+            KEY = AST_MAPKEY( KEYMAP, I, STATUS ) 
+
+*  Get the column data type, and convert from AST to CAT.
+            TYPE = AST_MAPTYPE( KEYMAP, KEY )
+
+            IF( TYPE .EQ . AST__INTTYPE ) THEN
+               CATYPE = CAT__TYPEI
+
+            ELSE IF( TYPE .EQ . AST__DOUBLETYPE ) THEN
+               CATYPE = CAT__TYPED
+
+            ELSE IF( TYPE .EQ . AST__FLOATTYPE ) THEN
+               CATYPE = CAT__TYPER
+
+            ELSE IF( TYPE .EQ . AST__STRINGTYPE ) THEN
+               CATYPE = CAT__TYPEC
+
+            ELSE IF( STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL MSG_SETC( 'K', KEY )
+               CALL MSG_SETC( 'P', PARAM )
+               CALL ERR_REP( ' ', 'Cannot create the ''^K'' column '//
+     :                       'within the catalogue associated with '//
+     :                       'parameter ''^P'' - the column data type'//
+     :                       ' is inappropriate (programming error).',
+     :                       STATUS )
+               GO TO 999
+            END IF
+
+*  Record the maximum formatted length. 
+            LENC = AST_MAPLENC( KEYMAP, KEY ) 
+            MAXLEN = MAX( MAXLEN, LENC )
+
+*  Create the column
+            CALL CAT_CNEWS( CI, KEY, CATYPE, LENC, ' ', ' ', ' ', 
+     :                      KMCOL( I ), STATUS )
+
+*  Store the number of values in each entry.
+            KMLEN( I ) = AST_MAPLENGTH( KEYMAP, KEY )
+
+         END DO
+      END IF
+
+*  Allocate memory to hold a string that is large enough for the longest
+*  formatted value in the KeyMap.
+      IF( MAXLEN .GT. 0 ) CALL PSX_CALLOC( MAXLEN, '_CHAR', IPTEXT, 
+     :                                     STATUS )
+
 *  Loop round each supplied position.
       DO I = 1, NPOS
 
@@ -317,6 +416,23 @@
          DO J = 1, NAX
             CALL CAT_PUT0D( COLID( J ), C( J ), 
      :                      ( C( J ) .EQ. AST__BAD ), STATUS )
+         END DO
+
+*  Extra columns. 
+         DO J = 1, KMSIZE
+
+            IF( I .LE. KMLEN( J ) ) THEN
+               KEY = AST_MAPKEY( KEYMAP, J, STATUS ) 
+               JUNK = AST_MAPGETELEMC( KEYMAP, KEY, I, 
+     :                                 %VAL( CNF_PVAL( IPTEXT ) ), 
+     :                                 STATUS, %VAL( MAXLEN ) ) 
+               CALL CAT_PUT0C( KMCOL( J ), %VAL( CNF_PVAL( IPTEXT ) ),
+     :                         .FALSE., STATUS, %VAL( MAXLEN ) )
+
+            ELSE
+               CALL CAT_PUT0C( KMCOL( J ), ' ', .TRUE., STATUS )
+            END IF
+
          END DO
 
 *  Append the current row buffer to the catalogue.
@@ -366,6 +482,11 @@
          END DO
          CALL CAT_PUTXT( CI, 'HISTORY', ' ', STATUS )
       END IF
+
+ 999  CONTINUE
+
+*  Free work space.
+      IF( MAXLEN .GT. 0 ) CALL PSX_FREE( IPTEXT, STATUS )
 
 *  Release the catalogue.
       CALL CAT_TRLSE( CI, STATUS )

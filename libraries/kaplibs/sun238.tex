@@ -24137,6 +24137,118 @@ from one graphical element to another.
    }
 }
 \sstroutine{
+   KPG1\_WRCAT
+}{
+   Writes a set of positions to a text file as a CAT catalogue
+}{
+   \sstdescription{
+      This routine is equivalent to KPG1\_WRLST, except that it provides
+      the option of storing a textual label with each position, via
+      the extra argument LABS, and extra arbitrary columns via the extra
+      argument KEYMAP.
+   }
+   \sstinvocation{
+      CALL KPG1\_WRCAT( PARAM, ARRDIM, NPOS, NAX, POS, IFRM, IWCS, TITLE,
+                       ID0, IDENTS, KEYMAP, LABS, HIST, NULL, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the parameter to use.
+      }
+      \sstsubsection{
+         ARRDIM = INTEGER (Given)
+      }{
+         The size of the first dimension of the positions array. This must
+         be larger than or equal to NPOS.
+      }
+      \sstsubsection{
+         NPOS = INTEGER (Given)
+      }{
+         The number of positions to store in the file.
+      }
+      \sstsubsection{
+         NAX = INTEGER (Given)
+      }{
+         The number of axes in the Frame specified by IFRM.
+      }
+      \sstsubsection{
+         POS( ARRDIM, NAX ) = DOUBLE PRECISION (Given)
+      }{
+         The positions to store in the file. POS( I, J ) should give the
+         axis J value for position I.
+      }
+      \sstsubsection{
+         IFRM = INTEGER (Given)
+      }{
+         The index of the Frame within IWCS to which the supplied
+         positions relate. Can be AST\_\_BASE or AST\_\_CURRENT.
+      }
+      \sstsubsection{
+         IWCS = INTEGER (Given)
+      }{
+         A pointer to an AST FrameSet to store with the positions.
+      }
+      \sstsubsection{
+         TITLE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A title to store at the top of the text file. Ignored if blank.
+      }
+      \sstsubsection{
+         ID0 = INTEGER (Given)
+      }{
+         The integer identifier value to associate with the first
+         supplied position. Identifiers for subsequent positions increase
+         by 1 for each position. If this is supplied less than or equal
+         to zero, then its value is ignored and the identifiers supplied
+         in array IDENTS are used instead.
+      }
+      \sstsubsection{
+         IDENTS( NPOS ) = INTEGER (Given)
+      }{
+         The individual integer identifiers to associate with each
+         position. Only accessed if ID0 is less than or equal to zero.
+      }
+      \sstsubsection{
+         KEYMAP = INTEGER (Given)
+      }{
+         An optional AST KeyMap containing data for extra columns to add
+         to the catalogue. Each entry in the KeyMap should be a vector
+         with length equal to NPOS. The key for the entry is used as the
+         column name in the table. No extra columns are added if a value
+         of AST\_\_NULL is supplied for KEYMAP. This keyMap can be used
+         (for instance) to add character columns to the catalogue.
+      }
+      \sstsubsection{
+         LABS = INTEGER (Given)
+      }{
+         A GRP group identifier containing the labels to be associated
+         with the positions. The number of elements in this group should
+         be equal to NPOS. If GRP\_\_NOID is supplied, no label column will
+         be created.
+      }
+      \sstsubsection{
+         HIST = INTEGER (Given)
+      }{
+         A GRP group identifier containing history text to store with the
+         catalogue.  If GRP\_\_NOID is supplied, no history information
+         will be stored with the catalogue.
+      }
+      \sstsubsection{
+         NULL = LOGICAL (Given)
+      }{
+         Is the user allowed to supply a null value? If so, the error
+         status will be annulled before returning.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    KPG1\_WREAD
 }{
    Read an AST Object from an HDS object
@@ -24296,7 +24408,7 @@ from one graphical element to another.
    }
    \sstinvocation{
       CALL KPG1\_WRTA2( PARAM, ARRDIM, NPOS, NAX, POS, IWCS, TITLE,
-                       ID0, IDENTS, LABS, HIST, STATUS )
+                       ID0, IDENTS, KEYMAP, LABS, HIST, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -24351,6 +24463,17 @@ from one graphical element to another.
       }{
          The individual integer identifiers to associate with each
          position. Only accessed if ID0 is less than or equal to zero.
+      }
+      \sstsubsection{
+         KEYMAP = INTEGER (Given)
+      }{
+         An optional AST KeyMap containing data for up to 10 extra columns
+         to add to the catalogue. An error will be reported if the KeyMap
+         contains more than 10 entries. Each entry in the KeyMap should be
+         a vector with length equal to NPOS. The key for the entry is used
+         as the column name in the table. No extra columns are added if a
+         value of AST\_\_NULL is supplied for KEYMAP. This keyMap can be used
+         (for instance) to add character columns to the catalogue.
       }
       \sstsubsection{
          LABS = INTEGER (Given)

@@ -133,6 +133,7 @@ void kpg1Rgndf( const char *, size_t, size_t, const char *, Grp **, size_t *, in
 void kpg1Wgndf( const char *, const Grp *, size_t, size_t, const char *, Grp **, size_t *, int * );
 void kpg1Wrlst( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, int, int * );
 void kpg1Wrtab( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, Grp *, Grp *, int, int * );
+void kpg1Wrcat( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, AstKeyMap *, Grp *, Grp *, int, int * );
 
 void irqAddqn( const IRQLocs *, const char *, int, const char *, int * );
 void irqDelet( int, int * );
